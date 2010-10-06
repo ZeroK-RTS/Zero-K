@@ -1,0 +1,62 @@
+-- blood_explode
+
+return {
+  ["blood_explode"] = {
+    pop = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      ground             = true,
+      count              = 5,
+      properties = {
+        airdrag            = .97,
+        colormap           = [[0.5 0.4 0.4 0.3   0 0 0 0]],
+        directional        = "0",
+        emitrot            = 0,
+        emitrotspread      = 80,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, -0.07, 0]],
+        numparticles       = 1,
+        particlelife       = 27,
+        particlelifespread = 10,
+        particlesize       = 14,
+        particlesizespread = 5,
+        particlespeed      = 0.5,
+        particlespeedspread = 0.15,
+        pos                = [[-10r20, -10r20, -10r20]],
+        size               = 0.2,
+        sizegrowth         = 0.5,
+        sizemod            = 1,
+        texture            = [[bloodblast]],
+      },
+    },
+    splashes = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      ground             = true,
+      count              = 4,
+      properties = {
+        airdrag            = 1.0,
+        colormap           = [[1.0 0.9 0.9 0.3   0 0 0 0]],
+        directional        = true,
+        emitrot            = 45,
+        emitrotspread      = 45,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0.07, 0]],
+        numparticles       = 2,
+        particlelife       = 25,
+        particlelifespread = 6,
+        particlesize       = 8,
+        particlesizespread = 4,
+        particlespeed      = 1.0,
+        particlespeedspread = 0.75,
+        pos                = [[-5r10, -5r10, -5r10]],
+        size               = 0.1,
+        sizegrowth         = 0.02,
+        sizemod            = 1,
+        texture            = [[blooddrop]],
+      },
+    },
+  },
+
+}
+

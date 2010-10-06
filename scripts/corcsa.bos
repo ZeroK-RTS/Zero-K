@@ -1,0 +1,201 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, leftwing, rightwing, nanopoint;
+
+static-var  Static_Var_1, statechg_DesiredState, statechg_StateChanging;
+
+// Signal definitions
+#define SIG_MOVE			2
+
+lua_QueryNanoPiece() 
+{
+  return 0;
+}
+
+activatescr()
+{
+	if( TRUE )
+	{
+		turn leftwing to z-axis <0.000000> now;
+		turn leftwing to z-axis <90.021978> speed <98.489011>;
+		turn rightwing to z-axis <0.000000> now;
+		turn rightwing to z-axis <-90.021978> speed <98.489011>;
+		sleep 914;
+	}
+	sleep 10;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		turn leftwing to z-axis <90.021978> now;
+		turn leftwing to z-axis <0.000000> speed <120.027473>;
+		turn rightwing to z-axis <-90.021978> now;
+		turn rightwing to z-axis <0.000000> speed <120.027473>;
+		sleep 750;
+	}
+	sleep 10;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+StartMoving()
+{
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+	while( TRUE )
+	{
+		if( Static_Var_1 == 3 )
+		{
+			emit-sfx 256 | 3 from base;
+			emit-sfx 256 | 3 from leftwing;
+			emit-sfx 256 | 3 from rightwing;
+			emit-sfx 256 | 3 from nanopoint;
+		}
+		sleep 150;
+	}
+}
+
+StopMoving()
+{
+	signal SIG_MOVE;
+}
+
+StartBuilding()
+{
+	set INBUILDSTANCE to 1;
+}
+
+StopBuilding()
+{
+	set INBUILDSTANCE to 0;
+}
+
+QueryNanoPiece(piecenum)
+{
+	piecenum = nanopoint;
+	call-script lua_QueryNanoPiece(piecenum);
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode leftwing type BITMAPONLY | BITMAP2;
+		explode rightwing type BITMAPONLY | BITMAP3;
+		explode nanopoint type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode leftwing type SHATTER | BITMAP2;
+		explode rightwing type BITMAPONLY | BITMAP3;
+		explode nanopoint type FALL | BITMAP4;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode leftwing type SHATTER | BITMAP2;
+		explode rightwing type BITMAPONLY | BITMAP3;
+		explode nanopoint type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP4;
+		return (0);
+	}
+	corpsetype = 2;
+	explode base type BITMAPONLY | BITMAP1;
+	explode leftwing type SHATTER | EXPLODE_ON_HIT | BITMAP2;
+	explode rightwing type BITMAPONLY | BITMAP3;
+	explode nanopoint type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP4;
+}
+
+setSFXoccupy(Func_Var_1)
+{
+	Static_Var_1 = Func_Var_1;
+}

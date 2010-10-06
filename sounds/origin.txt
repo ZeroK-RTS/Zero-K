@@ -1,0 +1,13 @@
+BZFlag:
+marker_place.wav
+
+Open Quarz:
+krog_stomp.wav
+
+Open LieroX:
+something.wav
+something2.wav
+
+Nanoblobs:
+beep4.wav
+beep6.wav

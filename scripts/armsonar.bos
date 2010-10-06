@@ -1,0 +1,179 @@
+#include "constants.h"
+
+piece  base, float, body, head, ball, wing1, wing2, wing3, wing4;
+
+static-var  statechg_DesiredState, statechg_StateChanging, isActive;
+
+BobAnim()
+{
+	while (get BUILD_PERCENT_LEFT)
+	{
+		sleep 1000;
+	}
+	move base to y-axis [-3] speed <250>;
+	if (isActive)
+	{
+		turn wing1 to x-axis <-50> speed <20>;
+		turn wing2 to z-axis <-50> speed <20>;
+		turn wing3 to x-axis <50> speed <20>;
+		turn wing4 to z-axis <50> speed <20>;
+	}
+	wait-for-move base along y-axis;
+	sleep 500;
+	
+	move base to y-axis [0] speed <250>;
+	if (isActive)
+	{
+		turn wing1 to x-axis <0> speed <20>;
+		turn wing2 to z-axis <0> speed <20>;
+		turn wing3 to x-axis <0> speed <20>;
+		turn wing4 to z-axis <0> speed <20>;
+	}
+	wait-for-move base along y-axis;
+	sleep 500;
+	
+	start-script BobAnim();
+}
+
+RotateAndTilt()
+{
+	while (get BUILD_PERCENT_LEFT)
+	{
+		sleep 1000;
+	}
+	
+	spin base around y-axis speed <2>;
+	
+	while (TRUE)
+	{
+		turn base to x-axis <5> speed <2>;
+		wait-for-turn base around x-axis;
+		sleep 800;
+		turn base to x-axis <-5> speed <2>;
+		wait-for-turn base around x-axis;
+		sleep 800;
+	}
+}
+
+closeWings()
+{
+	turn wing1 to x-axis <0> speed <20>;
+	turn wing2 to z-axis <0> speed <20>;
+	turn wing3 to x-axis <0> speed <20>;
+	turn wing4 to z-axis <0> speed <20>;
+}
+
+Go()
+{
+	spin float around y-axis speed <30>;
+	spin head around y-axis speed <-90>;
+	isActive = TRUE;
+	return (0);
+}
+
+Stop()
+{
+	stop-spin float around y-axis;
+	stop-spin head around y-axis;
+	isActive = FALSE;
+	start-script closeWings();
+	return (0);
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script Go();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script Stop();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	isActive = TRUE;
+	call-script InitState();
+	start-script BobAnim();
+	start-script RotateAndTilt();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode float type BITMAPONLY;
+		explode body type BITMAPONLY;
+		explode head type BITMAPONLY;
+		explode wing1 type BITMAPONLY;
+		explode wing2 type BITMAPONLY;
+		explode wing3 type BITMAPONLY;
+		explode wing4 type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode float type BITMAPONLY;
+		explode body type BITMAPONLY;
+		explode head type SHATTER;
+		explode wing1 type BITMAPONLY;
+		explode wing2 type BITMAPONLY;
+		explode wing3 type BITMAPONLY;
+		explode wing4 type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode float type SHATTER;
+		explode body type BITMAPONLY;
+		explode head type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode wing1 type SHATTER;
+		explode wing2 type SHATTER;
+		explode wing3 type SHATTER;
+		explode wing4 type SHATTER;
+		return (0);
+	}
+	corpsetype = 3;
+	explode float type SHATTER;
+	explode body type BITMAPONLY;
+	explode head type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode wing1 type SHATTER;
+	explode wing2 type SHATTER;
+	explode wing3 type SHATTER;
+	explode wing4 type SHATTER;
+}

@@ -1,0 +1,61 @@
+mini_nuke.wav - Open LieroX
+unit_explosion.wav - Astro Menace and Nanoblobs
+
+
+Astro Menace:
+ex_large1.wav
+ex_med1.wav
+ex_med2.wav
+ex_small1.wav
+
+Open LieroX:
+ex_large2.wav
+ex_large3.wav
+ex_large4.wav
+ex_med3.wav
+ex_med4.wav
+ex_med5.wav
+ex_med6.wav
+ex_small2.wav
+ex_small5.wav
+small_explosion.wav
+
+Scorced 3D:
+ex_large5.wav
+ex_large6.wav
+ex_large7.wav
+ex_med8.wav
+ex_med9.wav
+ex_small3.wav
+ex_small3.wav
+
+Golgotha:
+ex_ultra1.wav
+
+Nanoblobs:
+ex_large8.wav
+ex_large9.wav
+ex_med10.wav
+ex_med11.wav
+ex_med12.wav
+ex_med13.wav
+ex_med14.wav
+ex_med15.wav
+ex_med16.wav
+ex_med17.wav
+ex_small6.wav
+ex_small7.wav
+ex_small8.wav
+ex_small9.wav
+ex_small10.wav
+ex_small11.wav
+ex_small12.wav
+ex_small13.wav
+ex_with_debri.wav
+
+Merc Squad:
+ex_large10.wav
+ex_large11.wav
+
+Kanoba:
+ex_underwater.wav

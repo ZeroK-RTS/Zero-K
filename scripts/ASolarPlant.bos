@@ -1,0 +1,233 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, ground, upper, wing_1, wing_2, wing_3, wing_4, wing_5, wing_6, wing_7, wing_8, ungerade;
+
+static-var  statechg_DesiredState, statechg_StateChanging;
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Go()
+{
+	turn upper to y-axis <120.000000> speed <50.000000>;
+	move upper to y-axis [5] speed [2];
+	
+	turn wing_2 to z-axis <130.000000> speed <80.000000>;
+	turn wing_6 to z-axis <-130.000000> speed <80.000000>;
+	
+	turn wing_4 to x-axis <130.000000> speed <80.000000>;
+	turn wing_8 to x-axis <-130.000000> speed <80.000000>;
+	
+	
+	turn wing_1 to x-axis <-130.000000> speed <80.000000>;
+	turn wing_5 to x-axis <130.000000> speed <80.000000>;
+	
+	turn wing_3 to z-axis <130.000000> speed <80.000000>;
+	turn wing_7 to z-axis <-130.000000> speed <80.000000>;
+
+	
+	wait-for-move upper along x-axis;
+	stop-spin upper around y-axis decelerate <80.000000>;
+	
+	wait-for-turn wing_2 around x-axis;
+	wait-for-turn wing_6 around x-axis;
+	
+	wait-for-turn wing_4 around z-axis;
+	wait-for-turn wing_8 around z-axis;
+	
+	
+	wait-for-turn wing_1 around x-axis;
+	wait-for-turn wing_5 around x-axis;
+	
+	wait-for-turn wing_3 around z-axis;
+	wait-for-turn wing_7 around z-axis;
+
+	
+	set ARMORED to 0;
+}
+
+Stop()
+{
+	set ARMORED to 1;
+	
+	move upper to y-axis [0] speed [10];
+	turn upper to y-axis <0.000000> speed <170.000000>;	
+	
+	
+	turn wing_2 to z-axis <0.000000> speed <80.000000>;
+	turn wing_6 to z-axis <0.000000> speed <80.000000>;
+	
+	turn wing_4 to x-axis <0.000000> speed <80.000000>;
+	turn wing_8 to x-axis <0.000000> speed <80.000000>;
+	
+	
+	turn wing_1 to x-axis <0.000000> speed <80.000000>;
+	turn wing_5 to x-axis <0.000000> speed <80.000000>;
+	
+	turn wing_3 to z-axis <0.000000> speed <80.000000>;
+	turn wing_7 to z-axis <0.000000> speed <80.000000>;
+		
+	wait-for-turn wing_2 around x-axis;
+	wait-for-turn wing_6 around x-axis;
+	
+	wait-for-turn wing_4 around z-axis;
+	wait-for-turn wing_8 around z-axis;
+	
+	
+	wait-for-turn wing_1 around x-axis;
+	wait-for-turn wing_5 around x-axis;
+	
+	wait-for-turn wing_3 around z-axis;
+	wait-for-turn wing_7 around z-axis;
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script Go();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script Stop();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	turn ungerade to y-axis <45.000000> now;
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+HitByWeapon(Func_Var_1, Func_Var_2)
+{
+	signal 2;
+	set-signal-mask 2;
+	set ACTIVATION to 0;
+	sleep 8000;
+	set ACTIVATION to 1;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode ground type BITMAPONLY | BITMAP1;
+		explode upper type BITMAPONLY | BITMAP1;
+		explode wing_1 type BITMAPONLY | BITMAP1;
+		explode wing_2 type BITMAPONLY | BITMAP1;
+		explode wing_3 type BITMAPONLY | BITMAP1;
+		explode wing_4 type BITMAPONLY | BITMAP1;
+		explode wing_5 type BITMAPONLY | BITMAP1;
+		explode wing_6 type BITMAPONLY | BITMAP1;
+		explode wing_7 type BITMAPONLY | BITMAP1;
+		explode wing_8 type BITMAPONLY | BITMAP1;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode ground type SHATTER | BITMAP1;
+		explode upper type SHATTER | BITMAP1;
+		explode wing_1 type SHATTER | BITMAP1;
+		explode wing_2 type SHATTER | BITMAP1;
+		explode wing_3 type SHATTER | BITMAP1;
+		explode wing_4 type SHATTER | BITMAP1;
+		explode wing_5 type SHATTER | BITMAP1;
+		explode wing_6 type SHATTER | BITMAP1;
+		explode wing_7 type SHATTER | BITMAP1;
+		explode wing_8 type SHATTER | BITMAP1;		
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode ground type SHATTER | BITMAP1;
+		explode upper type SHATTER | BITMAP1;
+		explode wing_1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode wing_2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode wing_3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode wing_4 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode wing_5 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode wing_6 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode wing_7 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode wing_8 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;			
+		return (0);
+	}
+	corpsetype = 3;
+	explode ground type SHATTER | BITMAP1;
+	explode upper type SHATTER | BITMAP1;
+	explode wing_1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode wing_2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode wing_3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode wing_4 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode wing_5 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode wing_6 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode wing_7 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode wing_8 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;	
+}

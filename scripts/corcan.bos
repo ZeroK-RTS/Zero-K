@@ -1,0 +1,306 @@
+// by Chris Mackey 
+
+#include "constants.h"
+
+piece base, l_leg, l_foot, l_rocket, l_pt, r_leg, r_foot, r_rocket, r_pt, turret, ram, spike;
+
+static-var jumping, gun_1_yaw;
+
+//signal definitions
+#define SIG_MOVE			2
+#define SIG_AIM				4
+#define SIG_ROCK_X			8
+#define SIG_ROCK_Z			16
+
+//rockx
+#define ROCK_PIECE				turret	//piece to rock.
+#define ROCK_X_SPEED			10		//Number of half-cycles per second around x-axis.
+#define ROCK_X_DECAY			-1/2	//Rocking around x-axis is reduced by this factor each time; should be negative to alternate rocking direction.
+#define ROCK_X_MIN              <0.5>	//If around x-axis rock is not greater than this amount, rocking will stop after returning to center.
+#define ROCK_X_FIRE_1			-10
+
+#include "rockx.h"
+
+//rockz
+#define ROCK_PIECE				turret	//piece to rock.
+#define ROCK_Z_SPEED			10		//Number of half-cycles per second around z-axis.
+#define ROCK_Z_DECAY			-1/2	//Rocking around z-axis is reduced by this factor each time; should be between -1 and 0 to alternate rocking direction.
+#define ROCK_Z_MIN              <0.5>	//If around z-axis rock is not greater than this amount, rocking will stop after returning to center.
+#define ROCK_Z_FIRE_1			-10
+
+#include "rockz.h"
+
+
+
+BeginJump()
+{
+	move l_rocket to x-axis [1] now;
+	move r_rocket to x-axis [-1] now;
+	
+	jumping = 1;
+	emit-sfx 1025 from l_foot;
+	emit-sfx 1025 from r_foot;
+	
+	turn l_rocket to x-axis <30> speed <60>;
+	turn r_rocket to x-axis <30> speed <60>;
+	wait-for-turn r_rocket around x-axis;
+	turn l_rocket to x-axis <-20> speed <15>;
+	turn r_rocket to x-axis <-20> speed <15>;
+	wait-for-turn r_rocket around x-axis;
+	
+	turn l_rocket to x-axis <0> speed <30>;
+	turn r_rocket to x-axis <0> speed <30>;
+}
+
+EndJump()
+{
+	jumping = 0;
+	emit-sfx 1025 from l_foot;
+	emit-sfx 1025 from r_foot;
+	
+	sleep 500;
+	move l_rocket to x-axis [-1] speed [2];
+	move r_rocket to x-axis [1] speed [2];
+}
+
+JumpSmoke()
+{
+	while(1)
+	{
+		if (jumping)
+		{
+			turn l_leg to x-axis <0> now;
+			turn r_leg to x-axis <0> now;
+			turn l_pt to x-axis <90> now;
+			turn r_pt to x-axis <90> now;
+			emit-sfx 1024 from l_pt;
+			emit-sfx 1024 from r_pt;
+		}
+		sleep(33);
+	}
+}
+
+walk()
+{
+	while( TRUE )
+	{
+		move base to y-axis [2] speed [5];
+		if( TRUE )
+		{
+			turn r_leg to x-axis <25> speed <50>;
+			turn r_foot to x-axis <-10> speed <100>;
+			turn base to z-axis <-8> speed <15>;
+			move l_leg to y-axis [0.1] speed [2];
+			turn r_foot to z-axis <8> speed <15>;
+			turn l_foot to z-axis <8> speed <15>;
+			move base to y-axis [0] speed [2];
+			move r_foot to y-axis [0.5] speed [2];
+			move l_foot to y-axis [0.5] speed [2];
+			turn l_leg to x-axis <-18> speed <50>;
+			turn l_foot to x-axis <12> speed <100>;
+			wait-for-turn r_leg around x-axis;
+		}
+		if( TRUE )
+		{
+			turn r_leg to x-axis <0> speed <50>;
+			turn r_foot to x-axis <0> speed <100>;
+			turn base to z-axis <0> speed <15>;
+			move l_leg to y-axis [-1] speed [1.5];
+			turn r_foot to z-axis <0> speed <15>;
+			turn l_foot to z-axis <0> speed <15>;
+			move base to y-axis [2] speed [2];
+			move r_foot to y-axis [0] speed [2];
+			move l_foot to y-axis [0] speed [2];
+			turn l_leg to x-axis <0> speed <50>;
+			turn l_foot to x-axis <0> speed <100>;
+			//wait-for-turn r_leg around x-axis;
+		}
+		if( TRUE )
+		{
+			turn r_leg to x-axis <-18> speed <50>;
+			turn r_foot to x-axis <12> speed <100>;
+			turn base to z-axis <8> speed <15>;
+			move r_leg to y-axis [0.1] speed [2];
+			turn r_foot to z-axis <-8> speed <15>;
+			turn l_foot to z-axis <-8> speed <15>;
+			move base to y-axis [0] speed [2];
+			move r_foot to y-axis [0.5] speed [2];
+			move l_foot to y-axis [0.5] speed [2];
+			turn l_leg to x-axis <25> speed <50>;
+			turn l_foot to x-axis <-10> speed <100>;
+			wait-for-turn l_leg around x-axis;
+		}
+		if( TRUE )
+		{
+			turn r_leg to x-axis <0> speed <50>;
+			turn r_foot to x-axis <0> speed <100>;
+			turn base to z-axis <0> speed <15>;
+			move r_leg to y-axis [-1] speed [1.5];
+			turn r_foot to z-axis <0> speed <15>;
+			turn l_foot to z-axis <0> speed <15>;
+			move base to y-axis [2] speed [2];
+			move r_foot to y-axis [0] speed [2];
+			move l_foot to y-axis [0] speed [2];
+			turn l_leg to x-axis <0> speed <50>;
+			turn l_foot to x-axis <0> speed <100>;
+			//wait-for-turn l_leg around x-axis;
+		}
+	}
+}
+
+StartMoving()
+{
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+	call-script walk();
+}
+
+StopMoving()
+{
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+	//move all the pieces to their original spots
+	move l_rocket to x-axis [-1] speed [5];
+	turn l_leg to x-axis <0> speed <90>;
+	turn l_foot to x-axis <0> speed <90>;
+	turn l_foot to z-axis <0> speed <15>;
+	move l_foot to y-axis [0] speed [4];
+	
+	move r_rocket to x-axis [1] speed [5];
+	turn r_leg to x-axis <0> speed <90>;
+	turn r_foot to x-axis <0> speed <90>;
+	turn r_foot to z-axis <0> speed <15>;
+	move r_foot to y-axis [0] speed [4];
+	
+	turn base to z-axis <0> speed <90>;
+	turn base to x-axis <0> speed <90>;
+	move base to y-axis [0] speed [5];
+}
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from turret;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Create()
+{
+	start-script StopMoving();
+	start-script SmokeUnit();
+	start-script JumpSmoke();
+	call-script RockXInit();
+	call-script RockZInit();
+}
+
+AimFromPrimary(piecenum)
+{
+	piecenum = ram;
+}
+
+QueryPrimary(piecenum)
+{
+	piecenum = ram;
+}
+
+RestoreAfterDelay()
+{
+	sleep 3000;
+	turn turret to y-axis <0> speed <135>;
+	turn ram to x-axis <0> speed <85>;
+}
+
+AimPrimary(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	turn turret to y-axis heading speed <360>; // left-right
+	turn ram to x-axis <0> - pitch speed <270>; //up-down
+	wait-for-turn ram around y-axis;
+	wait-for-turn turret around x-axis;
+	gun_1_yaw = heading;
+	start-script RestoreAfterDelay();
+	return (1);
+}
+
+FirePrimary()
+{
+	start-script RockX(ROCK_X_FIRE_1, gun_1_yaw);
+	start-script RockZ(ROCK_Z_FIRE_1, gun_1_yaw);
+	move spike to z-axis [10] speed [600];
+	wait-for-move spike along z-axis;
+	move spike to z-axis [0] speed [20];
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode spike type BITMAPONLY | BITMAP2;
+		explode turret type BITMAPONLY | BITMAP4;
+		explode ram type BITMAPONLY | BITMAP5;
+		explode l_foot type BITMAPONLY | BITMAP1;
+		explode l_leg type BITMAPONLY | BITMAP2;
+		explode r_foot type BITMAPONLY | BITMAP5;
+		explode r_leg type BITMAPONLY | BITMAP1;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode spike type FALL | BITMAP2;
+		explode turret type FALL | BITMAP4;
+		explode ram type FALL | BITMAP5;
+		explode l_foot type FALL | BITMAP1;
+		explode l_leg type FALL | BITMAP2;
+		explode r_foot type FALL | BITMAP5;
+		explode r_leg type FALL | BITMAP1;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode base type BITMAPONLY | BITMAP1;
+		explode spike type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		explode ram type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode l_foot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode l_leg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode r_foot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode r_leg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		return (0);
+	}
+	corpsetype = 3;
+	explode base type BITMAPONLY | BITMAP1;
+	explode spike type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+	explode ram type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode l_foot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode l_leg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode r_foot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode r_leg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+}

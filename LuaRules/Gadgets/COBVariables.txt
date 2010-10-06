@@ -1,0 +1,9 @@
+per-unit
+1024: Wind Speed
+
+global:
+4096: Wind Direction
+4100: Amount of depth corresponding to 1% speed reduction
+4101: Depth where speed penalty starts (boats)
+4102: Depth where speed penalty starts (ships)
+4103: Maximum speed reduction (in percent)

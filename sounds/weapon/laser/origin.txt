@@ -1,0 +1,34 @@
+Psionic:
+corehlt_fire.wav
+corehlt_hit.wav
+
+Nanoblobs:
+mini_laser.wav
+pulse_laser2.wav
+
+Kanoba:
+heavylaser_fire.wav
+heavylaser_fire2.wav
+small_laser_fire.wav
+small_laser_fire2.wav
+small_laser_fire3.wav
+laser_burn.wav
+laser_burn2.wav
+laser_burn3.wav
+laser_burn4.wav
+laser_burn5.wav
+laser_burn6.wav
+laser_burn7.wav
+laser_burn8.wav
+laser_burn9.wav
+laser_burn10.wav
+laser_burn11.wav
+rapid_laser.wav
+heavy_laser6.wav
+
+Astro Menace:
+pulse_laser3.wav
+
+heavy_laser3.wav - Kanoba & Nanoblobs
+
+laser_fire_test1.wav - GoogleFrog

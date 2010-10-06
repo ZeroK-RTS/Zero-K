@@ -1,0 +1,2 @@
+hotspot topleft
+frame  anims/cursormove_0.png  5 

@@ -1,0 +1,215 @@
+//linear constant = 65536
+
+#include "constants.h"
+
+piece  fuselage, turretbase, turret, sleeve, barrell, barrelr, flarel, flarer, wing, finl, finr, enginel, enginer;
+
+static-var  gun_1, gun_2, statechg_DesiredState, statechg_StateChanging;
+
+// Signal definitions
+#define SIG_AIM_2			2
+
+#define FUEL_USE_DELAY		200
+
+activatescr()
+{
+	if( TRUE )
+	{
+
+	}
+	sleep 10;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+
+	}
+	sleep 10;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from fuselage;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	gun_1 = 0;
+	gun_2 = 0;
+	call-script InitState();
+	start-script SmokeUnit();
+	hide turretbase;
+	hide turret;
+	hide sleeve;
+	hide barrell;
+	hide barrelr;
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+RestoreAfterDelay()
+{
+	sleep 3000;
+	turn turret to y-axis <180> speed <90>;
+	turn sleeve to x-axis <0> speed <50>;
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = fuselage;
+}
+
+Shot1() {
+	gun_1 = !gun_1;
+	sleep FUEL_USE_DELAY;
+	set CURRENT_FUEL to 0;
+}
+
+AimWeapon2(heading, pitch)
+{
+	signal SIG_AIM_2;
+	set-signal-mask SIG_AIM_2;
+	turn turret to y-axis heading speed <390>;
+	turn sleeve to x-axis <0> - pitch speed <350>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn sleeve around x-axis;
+	start-script RestoreAfterDelay();
+	return (1);
+}
+
+QueryWeapon2(piecenum)
+{
+	if (gun_2) piecenum = flarel;
+	else piecenum = flarer;
+}
+
+AimFromWeapon2(piecenum)
+{
+	return sleeve;
+}
+
+Shot2() {
+	gun_2 = !gun_2;
+	if (gun_2) emit-sfx 1024 from flarel;
+	emit-sfx 1024 from flarer;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY;
+		explode wing type BITMAPONLY;
+		explode finl type BITMAPONLY;
+		explode finr type BITMAPONLY;
+		explode enginel type BITMAPONLY;
+		explode enginer type BITMAPONLY;
+		explode turret type BITMAPONLY;
+		explode barrell type BITMAPONLY;
+		explode barrelr type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY;
+		explode wing type SHATTER;
+		explode finl type FALL;
+		explode finr type FALL;
+		explode enginel type FALL | SMOKE | FIRE;
+		explode enginer type FALL | SMOKE | FIRE;
+		explode turret type FALL | SMOKE;
+		explode barrell type BITMAPONLY;
+		explode barrelr type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 2;
+		explode fuselage type SHATTER;
+		explode wing type SHATTER;
+		explode finl type FALL | SMOKE;
+		explode finr type FALL | SMOKE;
+		explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode turret type FALL | SMOKE | FIRE;
+		explode barrell type FALL | SMOKE;
+		explode barrelr type FALL | SMOKE;
+		return (0);
+	}
+	corpsetype = 2;
+	explode fuselage type SHATTER;
+	explode wing type SHATTER;
+	explode finl type FALL | SMOKE;
+	explode finr type FALL | SMOKE;
+	explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode turret type FALL | SMOKE | FIRE;
+	explode barrell type FALL | SMOKE;
+	explode barrelr type FALL | SMOKE;
+}

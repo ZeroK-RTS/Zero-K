@@ -1,0 +1,100 @@
+-- riot_shell_m
+-- riot_shell_l
+-- riot_shell_h
+
+return {
+  ["riot_shell_m"] = {
+    usedefaultexplosions = false,
+    shell = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.97,
+        colormap           = [[0.75 0 0 1   0.75 0 0 1]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 10,
+        emitvector         = [[dir]],
+        gravity            = [[0, -0.5, 0]],
+        numparticles       = 1,
+        particlelife       = 30,
+        particlelifespread = 0,
+        particlesize       = 6.0,
+        particlesizespread = 0,
+        particlespeed      = 3,
+        particlespeedspread = 0,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[shell]],
+      },
+    },
+  },
+
+  ["riot_shell_l"] = {
+    usedefaultexplosions = false,
+    shell = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.97,
+        colormap           = [[0.75 0 0 1   0.75 0 0 1]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 10,
+        emitvector         = [[dir]],
+        gravity            = [[0, -0.5, 0]],
+        numparticles       = 1,
+        particlelife       = 15,
+        particlelifespread = 0,
+        particlesize       = 6.0,
+        particlesizespread = 0,
+        particlespeed      = 3,
+        particlespeedspread = 0,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[shell]],
+      },
+    },
+  },
+
+  ["riot_shell_h"] = {
+    usedefaultexplosions = false,
+    shell = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.97,
+        colormap           = [[0.75 0 0 1   0.75 0 0 1]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 20,
+        emitvector         = [[dir]],
+        gravity            = [[0, -0.5, 0]],
+        numparticles       = 1,
+        particlelife       = 60,
+        particlelifespread = 0,
+        particlesize       = 12.0,
+        particlesizespread = 0,
+        particlespeed      = 2,
+        particlespeedspread = 2,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[shell]],
+      },
+    },
+  },
+
+}
+

@@ -1,0 +1,209 @@
+//linear = 2^16
+
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, platform, turret, barrels, fire1, fire2, door1, door2, tank1, tank2, smalltank1, smalltank2;
+
+static-var  gun_1, state, firing, gun_1_yaw;
+
+#define SIG_AIM			2
+#define PILOT_DELAY		500
+#define RESTORE_DELAY	2500
+#define PLATFORM_HEIGHT [-36]
+#define DOOR_HEIGHT		[33]
+#define TURRET_SPEED	<360>
+#define PACK_SPEED		[192]
+
+lua_FlameShot(weapon)
+{
+  return 0;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+PilotLight()
+{
+	set-signal-mask 0;
+	while( state == 1 )
+	{
+		if (!firing) {
+			emit-sfx 1024 | 1 from fire1;
+			emit-sfx 1024 | 1 from fire2;
+		}
+		sleep 60;
+	}
+}
+
+Go() {
+	set ARMORED to 0;
+	
+	show platform;
+	show turret;
+	show barrels;
+	show tank1;
+	show tank2;
+	show smalltank1;
+	show smalltank2;
+	
+	turn door1 to z-axis 0 speed TURRET_SPEED;
+	turn door2 to z-axis 0 speed TURRET_SPEED;
+	wait-for-turn door1 around z-axis;
+	wait-for-turn door2 around z-axis;
+	move door1 to y-axis 0 speed PACK_SPEED;
+	move door2 to y-axis 0 speed PACK_SPEED;
+	wait-for-move door1 along y-axis;
+	wait-for-move door2 along y-axis;
+	move platform to y-axis 0 speed PACK_SPEED;
+	wait-for-move platform along y-axis;
+	state = 1;
+	start-script PilotLight();
+}
+
+Stop() {
+	var direction;
+	direction = 0;
+	if (gun_1_yaw > <135> || gun_1_yaw < <-135>) direction = <180>;
+	else if (gun_1_yaw > <45>) direction = <90>;
+	else if (gun_1_yaw < <-45>) direction = <-90>;
+	turn turret to y-axis direction speed TURRET_SPEED;
+	turn barrels to x-axis <-90> speed TURRET_SPEED;
+	wait-for-turn turret around y-axis;
+	wait-for-turn barrels around x-axis;
+	move platform to y-axis PLATFORM_HEIGHT speed PACK_SPEED;
+	wait-for-move platform along y-axis;
+	move door1 to y-axis DOOR_HEIGHT speed PACK_SPEED;
+	move door2 to y-axis DOOR_HEIGHT speed PACK_SPEED;
+	wait-for-move door1 along y-axis;
+	wait-for-move door2 along y-axis;
+	turn door1 to z-axis <-90> speed TURRET_SPEED;
+	turn door2 to z-axis <90> speed TURRET_SPEED;
+	wait-for-turn door1 around z-axis;
+	wait-for-turn door2 around z-axis;
+	
+	hide platform;
+	hide turret;
+	hide barrels;
+	hide tank1;
+	hide tank2;
+	hide smalltank1;
+	hide smalltank2;
+	
+	set ARMORED to 1;
+	state = 0;
+}
+
+ChangeState(nextState) {
+	if (state == nextState) return;
+	state = -1;
+	if (nextState) {
+		call-script Go();
+	} else {
+		call-script Stop();
+	}
+}
+
+RestoreAfterDelay()
+{
+	set-signal-mask SIG_AIM;
+	sleep PILOT_DELAY;
+	firing = 0;
+	sleep RESTORE_DELAY;
+	call-script ChangeState(0);
+}
+
+Create()
+{
+	hide fire1;
+	hide fire2;
+	start-script SmokeUnit();
+	state = 1;
+	firing = 0;
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 1000;
+	}
+	start-script PilotLight();
+	start-script RestoreAfterDelay();
+}
+
+AimWeapon1(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	call-script ChangeState(1);
+	turn turret to y-axis heading speed TURRET_SPEED;
+	turn barrels to x-axis 0 - pitch speed TURRET_SPEED;
+	wait-for-turn turret around y-axis;
+	wait-for-turn barrels around x-axis;
+	start-script RestoreAfterDelay();
+	gun_1_yaw = heading;
+	return (1);
+}
+
+Shot1() {
+	call-script lua_FlameShot(1);
+	gun_1 = !gun_1;
+	firing = 1;
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = barrels;
+}
+
+QueryWeapon1(piecenum)
+{
+	if (gun_1) piecenum = fire1;
+	else piecenum = fire2;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	explode base type BITMAPONLY | BITMAP5;
+	explode platform type BITMAPONLY | BITMAP4;
+	explode turret type BITMAPONLY | BITMAP3;
+	explode tank1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode tank2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode smalltank1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode smalltank2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+	explode door1 type FALL | BITMAP3;
+	explode door2 type FALL | BITMAP2;
+	explode barrels type BITMAPONLY | BITMAP1;
+	
+	if (severity <= 25) corpsetype = 1;
+	else if (severity <= 50) corpsetype = 2;
+	else corpsetype = 3;
+}

@@ -1,0 +1,366 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, pad, beam1, beam2, cylinder1, cylinder2, cylinder3, cylinder4,
+       cylinder5, cylinder6, nano2, nano1;
+
+static-var  spray, unitviewer, statechg_DesiredState, statechg_StateChanging;
+
+// Signal definitions
+#define SIG_ACTIVATE			2
+
+lua_QueryNanoPiece() 
+{
+  return 0;
+}
+
+activatescr()
+{
+	if( TRUE )
+	{
+		move cylinder1 to x-axis [0.000000] now;
+		move cylinder1 to x-axis [10.849988] speed [35.341980];
+		move cylinder2 to x-axis [0.000000] now;
+		move cylinder2 to x-axis [-10.349988] speed [33.713318];
+		sleep 307;
+	}
+	if( TRUE )
+	{
+		move cylinder3 to x-axis [10.949988] speed [36.622046];
+		move cylinder4 to x-axis [-10.549982] speed [35.284216];
+		sleep 299;
+	}
+	if( TRUE )
+	{
+		move cylinder5 to x-axis [10.849994] speed [32.978711];
+		move cylinder6 to x-axis [-10.550000] speed [32.066870];
+		sleep 329;
+	}
+	if( TRUE )
+	{
+		move cylinder5 to x-axis [10.899994] speed [0.124994];
+		move cylinder6 to x-axis [-10.349988] speed [0.500018];
+		turn cylinder5 to y-axis <96.769231> speed <241.934066>;
+		turn cylinder6 to y-axis <100.368132> speed <250.934066>;
+		sleep 400;
+	}
+	if( TRUE )
+	{
+		turn nano2 to z-axis <117.027473> speed <182.280220>;
+		turn nano1 to z-axis <-117.027473> speed <182.280220>;
+		sleep 642;
+	}
+	sleep 17;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		move cylinder1 to x-axis [10.849988] now;
+		move cylinder2 to x-axis [-10.349988] now;
+		move cylinder3 to x-axis [10.949988] now;
+		move cylinder4 to x-axis [-10.549982] now;
+		move cylinder5 to x-axis [10.899994] now;
+		move cylinder6 to x-axis [-10.349988] now;
+		turn cylinder5 to y-axis <96.769231> now;
+		turn cylinder6 to y-axis <100.368132> now;
+		turn nano2 to z-axis <117.027473> now;
+		turn nano2 to z-axis <0.000000> speed <301.615385>;
+		turn nano1 to z-axis <-117.027473> now;
+		turn nano1 to z-axis <0.000000> speed <301.615385>;
+		sleep 388;
+	}
+	if( TRUE )
+	{
+		move cylinder5 to x-axis [10.849994] speed [0.086353];
+		move cylinder6 to x-axis [-10.550000] speed [0.345441];
+		turn cylinder5 to y-axis <0.000000> speed <167.137363>;
+		turn cylinder6 to y-axis <0.000000> speed <173.357143>;
+		sleep 579;
+	}
+	if( TRUE )
+	{
+		move cylinder1 to x-axis [0.399982] speed [37.188617];
+		move cylinder2 to x-axis [0.350006] speed [38.078296];
+		sleep 281;
+	}
+	if( TRUE )
+	{
+		move cylinder3 to x-axis [0.299988] speed [39.591095];
+		move cylinder4 to x-axis [0.200012] speed [39.962836];
+		sleep 269;
+	}
+	if( TRUE )
+	{
+		move cylinder5 to x-axis [0.249994] speed [40.769238];
+		move cylinder6 to x-axis [0.349994] speed [41.923077];
+		sleep 260;
+	}
+	sleep 20;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+OpenYard()
+{
+	set YARD_OPEN to 1;
+	while( !get YARD_OPEN )
+	{
+		set BUGGER_OFF to 1;
+		sleep 1500;
+		set YARD_OPEN to 1;
+	}
+	set BUGGER_OFF to 0;
+}
+
+CloseYard()
+{
+	set YARD_OPEN to 0;
+	while( get YARD_OPEN )
+	{
+		set BUGGER_OFF to 1;
+		sleep 1500;
+		set YARD_OPEN to 0;
+	}
+	set BUGGER_OFF to 0;
+}
+
+Go()
+{
+	dont-cache beam1;
+	dont-cache beam2;
+	dont-cache cylinder1;
+	dont-cache cylinder2;
+	dont-cache cylinder3;
+	dont-cache cylinder4;
+	dont-cache cylinder5;
+	dont-cache cylinder6;
+	dont-cache nano1;
+	dont-cache nano2;
+	dont-cache pad;
+	call-script activatescr();
+	call-script OpenYard();
+	set INBUILDSTANCE to 1;
+}
+
+Stop()
+{
+	set INBUILDSTANCE to 0;
+	call-script CloseYard();
+	call-script deactivatescr();
+	cache beam1;
+	cache beam2;
+	cache cylinder1;
+	cache cylinder2;
+	cache cylinder3;
+	cache cylinder4;
+	cache cylinder5;
+	cache cylinder6;
+	cache nano1;
+	cache nano2;
+	cache pad;
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script Go();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script Stop();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	dont-shade beam1;
+	dont-shade beam2;
+	dont-shade cylinder1;
+	dont-shade cylinder2;
+	dont-shade cylinder3;
+	dont-shade cylinder4;
+	dont-shade cylinder5;
+	dont-shade cylinder6;
+	dont-shade nano1;
+	dont-shade nano2;
+	dont-shade pad;
+	unitviewer = FALSE;
+	spray = base;
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+QueryNanoPiece(piecenum)
+{
+	if( spray == 0 )
+	{
+		piecenum = beam1;
+	}
+	if( spray != 0 )
+	{
+		piecenum = beam2;
+	}
+	spray = !spray;
+	call-script lua_QueryNanoPiece(piecenum);
+}
+
+Demo()
+{
+	unitviewer = TRUE;
+}
+
+Activate()
+{
+	signal SIG_ACTIVATE;
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	signal SIG_ACTIVATE;
+	set-signal-mask SIG_ACTIVATE;
+	if( !unitviewer )
+	{
+		sleep 5000;
+	}
+	set-signal-mask 0;
+	start-script RequestState(1);
+}
+
+StartBuilding()
+{
+	spin pad around y-axis speed <0.000000>;
+}
+
+StopBuilding()
+{
+	stop-spin pad around y-axis;
+}
+
+QueryBuildInfo(piecenum)
+{
+	piecenum = pad;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode beam1 type BITMAPONLY | BITMAP2;
+		explode beam2 type BITMAPONLY | BITMAP3;
+		explode cylinder1 type BITMAPONLY | BITMAP4;
+		explode cylinder2 type BITMAPONLY | BITMAP5;
+		explode cylinder3 type BITMAPONLY | BITMAP1;
+		explode cylinder4 type BITMAPONLY | BITMAP2;
+		explode cylinder5 type BITMAPONLY | BITMAP3;
+		explode cylinder6 type BITMAPONLY | BITMAP4;
+		explode nano1 type BITMAPONLY | BITMAP5;
+		explode nano2 type BITMAPONLY | BITMAP1;
+		explode pad type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode beam1 type FALL | BITMAP2;
+		explode beam2 type FALL | BITMAP3;
+		explode cylinder1 type BITMAPONLY | BITMAP4;
+		explode cylinder2 type BITMAPONLY | BITMAP5;
+		explode cylinder3 type BITMAPONLY | BITMAP1;
+		explode cylinder4 type BITMAPONLY | BITMAP2;
+		explode cylinder5 type SHATTER | BITMAP3;
+		explode cylinder6 type SHATTER | BITMAP4;
+		explode nano1 type FALL | BITMAP5;
+		explode nano2 type FALL | BITMAP1;
+		explode pad type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode base type BITMAPONLY | BITMAP1;
+		explode beam1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode beam2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode cylinder1 type BITMAPONLY | BITMAP4;
+		explode cylinder2 type BITMAPONLY | BITMAP5;
+		explode cylinder3 type BITMAPONLY | BITMAP1;
+		explode cylinder4 type BITMAPONLY | BITMAP2;
+		explode cylinder5 type SHATTER | BITMAP3;
+		explode cylinder6 type SHATTER | BITMAP4;
+		explode nano1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode nano2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode pad type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	corpsetype = 3;
+	explode base type BITMAPONLY | BITMAP1;
+	explode beam1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode beam2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode cylinder1 type BITMAPONLY | BITMAP4;
+	explode cylinder2 type BITMAPONLY | BITMAP5;
+	explode cylinder3 type BITMAPONLY | BITMAP1;
+	explode cylinder4 type BITMAPONLY | BITMAP2;
+	explode cylinder5 type SHATTER | EXPLODE_ON_HIT | BITMAP3;
+	explode cylinder6 type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+	explode nano1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode nano2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode pad type BITMAPONLY | BITMAP2;
+}

@@ -1,0 +1,206 @@
+unitDef = {
+  unitname            = [[armzeus]],
+  name                = [[Zeus]],
+  description         = [[Assault Walker]],
+  acceleration        = 0.12,
+  bmcode              = [[1]],
+  brakeRate           = 0.25,
+  buildCostEnergy     = 350,
+  buildCostMetal      = 350,
+  builder             = false,
+  buildPic            = [[ARMZEUS.png]],
+  buildTime           = 350,
+  canAttack           = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canstop             = [[1]],
+  category            = [[LAND]],
+  corpse              = [[DEAD]],
+
+  customParams        = {
+    description_bp = [[Robô de assalto]],
+    description_es = [[Caminante de Asalto]],
+    description_fi = [[Rynn?kk?robotti]],
+    description_fr = [[Marcheur d'Assaut]],
+    description_it = [[Camminatore d'Assalto]],
+    helptext       = [[Slowly and steadily, groups of Zeuses can shrug off heavy fire as they make their way towards enemy fortifications, until they can field their short-range lightning cannon, which damages and stuns entrenched foes. Counter with anything that can reliably kite it, making sure that you don't get paralyzed (in which case you are as good as dead.)]],
+    helptext_bp    = [[Zeus ? o principal rob? de assalto de Nova. Devagar e sempre, grupos de Zeus podem resistir fogo pesado a medida que avan?am contra fortifica?oes inimigas, at? poderem atirar seu canhao de raios de curto-alcan?e, que danifica e paraliza inimigos.]],
+    helptext_es    = [[Lentamente, grupos de Zeus pueden soportar fuogo pesado mientras caminan hacia las fortificaciones enemigas, hasta che pueden usar su ca?on de rayos, que da?a y paraliza los enemigos atrincherados. Contrastalos con qualquier unidad che puede mantenerse fuera de su alcance, y no te dejes paralizar (que si pasa eres muerto.)]],
+    helptext_fi    = [[Hitaasti mutta varmasti etenev? Zeus kest?? vihollisen tulitusta kohtuullisesti. Sen lyhyen kantaman tesla-ase halvaannuttaa ja vaurioittaa kohteensa tehokkaasti.]],
+    helptext_fr    = [[Lentement mais surement, un groupe de Zeus peut encaisser les tirs enemis lourd jusqu'a ce qu'ils atteignent les fortifications et puissent utiliser leur canon élclaire courte porté qui peut paralyzer et endomager les enemis retranchés.]],
+    helptext_it    = [[Lentamente, gruppi di Zeus possono sopportare fuoco pesante mentre camminano verso le fortificazioni nemiche, fino a che possono usare il loro cannone spara-fulmini a corto raggio, che danneggia e paralizza i nemici trincerati. Contrastali con qualunque cosa che puo tenersi fuori dal loro raggio, stando sicuro di non essere paralizzato (in quel caso sei morto.)]],
+  },
+
+  defaultmissiontype  = [[Standby]],
+  explodeAs           = [[BIG_UNITEX]],
+  footprintX          = 2,
+  footprintZ          = 2,
+  iconType            = [[kbotassault]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  leaveTracks         = true,
+  maneuverleashlength = [[640]],
+  mass                = 175,
+  maxDamage           = 2400,
+  maxSlope            = 36,
+  maxVelocity         = 1.787,
+  maxWaterDepth       = 22,
+  minCloakDistance    = 75,
+  movementClass       = [[KBOT2]],
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName          = [[ARMZEUS]],
+  seismicSignature    = 4,
+  selfDestructAs      = [[BIG_UNITEX]],
+
+  sfxtypes            = {
+
+    explosiongenerators = {
+      [[custom:zeusmuzzle]],
+      [[custom:zeusgroundflash]],
+    },
+
+  },
+
+  side                = [[ARM]],
+  sightDistance       = 325,
+  smoothAnim          = true,
+  steeringmode        = [[2]],
+  TEDClass            = [[KBOT]],
+  trackOffset         = 0,
+  trackStrength       = 8,
+  trackStretch        = 1,
+  trackType           = [[ComTrack]],
+  trackWidth          = 22,
+  turninplace         = 0,
+  turnRate            = 1056,
+  upright             = true,
+  workerTime          = 0,
+
+  weapons             = {
+
+    {
+      def                = [[LIGHTNING]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+
+  },
+
+
+  weaponDefs          = {
+
+    LIGHTNING = {
+      name                    = [[LightningGun]],
+      areaOfEffect            = 8,
+      beamWeapon              = true,
+      craterBoost             = 0,
+      craterMult              = 0,
+      cylinderTargetting      = 0,
+
+      damage                  = {
+        default        = 800,
+        commanders     = 80,
+        empresistant75 = 200,
+        empresistant99 = 8,
+      },
+
+      duration                = 10,
+      explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
+      fireStarter             = 50,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      intensity               = 12,
+      interceptedByShieldType = 1,
+      lineOfSight             = true,
+      noSelfDamage            = true,
+      paralyzer               = true,
+      paralyzeTime            = 1,
+      range                   = 280,
+      reloadtime              = 1.8,
+      renderType              = 7,
+      rgbColor                = [[0.5 0.5 1]],
+      soundStart              = [[weapon/more_lightning]],
+      soundTrigger            = true,
+      startsmoke              = [[1]],
+      targetMoveError         = 0.3,
+      texture1                = [[lightning]],
+      thickness               = 10,
+      turret                  = true,
+      weaponType              = [[LightningCannon]],
+      weaponVelocity          = 400,
+    },
+
+  },
+
+
+  featureDefs         = {
+
+    DEAD  = {
+      description      = [[Wreckage - Zeus]],
+      blocking         = true,
+      category         = [[corpses]],
+      damage           = 2400,
+      energy           = 0,
+      featureDead      = [[DEAD2]],
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      height           = [[20]],
+      hitdensity       = [[100]],
+      metal            = 140,
+      object           = [[wreck2x2c.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 140,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    DEAD2 = {
+      description      = [[Debris - Zeus]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 2400,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 140,
+      object           = [[debris2x2c.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 140,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    HEAP  = {
+      description      = [[Debris - Zeus]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 2400,
+      energy           = 0,
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 70,
+      object           = [[debris2x2c.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 70,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+  },
+
+}
+
+return lowerkeys({ armzeus = unitDef })

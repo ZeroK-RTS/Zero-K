@@ -1,0 +1,57 @@
+#define TA			// This is a TA script
+
+#include "constants.h"
+
+piece  base, box, crank;
+
+#define CRANK_SPEED <180>
+#define CRANK_ACCEL <5>
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from box;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Create()
+{
+	start-script SmokeUnit();
+}
+
+StartMoving()
+{
+	spin crank around x-axis speed CRANK_SPEED accelerate CRANK_ACCEL;
+}
+
+StopMoving()
+{
+	stop-spin crank around x-axis decelerate CRANK_ACCEL;
+}
+
+Killed(severity, corpsetype)
+{
+	corpsetype = 1;
+	explode box type FALL | FIRE | EXPLODE_ON_HIT;
+}

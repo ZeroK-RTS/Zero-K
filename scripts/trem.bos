@@ -1,0 +1,300 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece	base, turret, gun, triple, bolt, shell,
+		brl1, brl2, brl3, flare1, flare2, flare3,
+		door1, door2, bay1, bay2,
+		tracks1, tracks2, tracks3, tracks4,
+		wheels1, wheels2, wheels3, wheels4, wheels5, wheels6;
+
+static-var  gun_1, isOpen, isMoving, tracks;
+
+// Signal definitions
+#define SIG_AIM					2
+
+#define RESTORE_DELAY			10000
+
+#define WHEEL_SPIN_SPEED_L		<360>
+#define WHEEL_SPIN_ACCEL_L		<10>
+#define WHEEL_SPIN_DECEL_L		<30>
+#define WHEEL_SPIN_SPEED_S		<900>
+#define WHEEL_SPIN_ACCEL_S		<25>
+#define WHEEL_SPIN_DECEL_S		<75>
+
+#define BAY_SPEED				[20]
+#define BAY2_DIST				[17]
+#define BAY1_DIST				[15.693]
+#define DOOR_SPEED				<120>				
+#define DOOR1_ANGLE				<105>
+#define DOOR2_ANGLE				<-105>
+#define TURRET_HEIGHT			[8]
+#define TURRET_SPEED			[20]
+#define BARREL_EXTEND			[14.5]
+#define BARREL_SPEED			[20]
+#define TRIPLE_SPEED			<600>
+
+#define BOLT_RECOIL				[-2.8]
+#define BOLT_RESTORE_SPEED		[10]
+#define BARREL_RECOIL			[7.5]
+#define BARREL_RESTORE_SPEED	[20]
+
+#define TURRET_YAW_SPEED		<30>
+#define TURRET_PITCH_SPEED		<30>
+
+#define TRACK_PERIOD			50
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+TrackControl() {
+	while (isMoving) {
+		++tracks;
+		if (tracks == 2) {
+			hide tracks1;
+			show tracks2;
+		} else if (tracks == 3) {
+			hide tracks2;
+			show tracks3;
+		} else if (tracks == 4) {
+			hide tracks3;
+			show tracks4;
+		} else {
+			tracks = 1;
+			hide tracks4;
+			show tracks1;
+		}
+		sleep TRACK_PERIOD;
+	}
+}
+
+Create()
+{
+	gun_1 = 0;
+	isOpen = 0;
+	isMoving = 0;
+	tracks = 1;
+	turn shell to x-axis <-90> now;
+	start-script SmokeUnit();
+}
+
+StartMoving() {
+	isMoving = 1;
+	start-script TrackControl();
+	spin wheels1 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels2 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels3 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels4 around x-axis speed WHEEL_SPIN_SPEED_S accelerate WHEEL_SPIN_ACCEL_S;
+	spin wheels5 around x-axis speed WHEEL_SPIN_SPEED_S accelerate WHEEL_SPIN_ACCEL_S;
+	spin wheels6 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+}
+
+StopMoving() {
+	isMoving = 0;
+	stop-spin wheels1 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels2 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels3 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels4 around x-axis decelerate WHEEL_SPIN_DECEL_S;
+	stop-spin wheels5 around x-axis decelerate WHEEL_SPIN_DECEL_S;
+	stop-spin wheels6 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+}
+
+Open() {
+	move bay2 to z-axis BAY2_DIST speed BAY_SPEED;
+	move bay1 to z-axis BAY1_DIST speed BAY_SPEED;
+	turn door1 to z-axis DOOR1_ANGLE speed DOOR_SPEED;
+	turn door2 to z-axis DOOR2_ANGLE speed DOOR_SPEED;
+	wait-for-move bay2 along z-axis;
+	wait-for-move bay1 along z-axis;
+	wait-for-turn door1 around z-axis;
+	wait-for-turn door2 around z-axis;
+	
+	move turret to y-axis TURRET_HEIGHT speed TURRET_SPEED;
+	wait-for-move turret along y-axis;
+	
+	move brl1 to z-axis BARREL_EXTEND speed BARREL_SPEED;
+	move brl2 to z-axis BARREL_EXTEND speed BARREL_SPEED;
+	move brl3 to z-axis BARREL_EXTEND speed BARREL_SPEED;
+	wait-for-move brl1 along z-axis;
+	wait-for-move brl2 along z-axis;
+	wait-for-move brl3 along z-axis;
+	
+	isOpen = 1;
+}
+
+Close() {
+	sleep RESTORE_DELAY;
+	turn turret to y-axis 0 speed TURRET_YAW_SPEED;
+	turn gun to x-axis 0 speed TURRET_PITCH_SPEED;
+	wait-for-turn turret around y-axis;
+	wait-for-turn gun around x-axis;
+	
+	isOpen = 0;
+	
+	move brl1 to z-axis 0 speed BARREL_SPEED;
+	move brl2 to z-axis 0 speed BARREL_SPEED;
+	move brl3 to z-axis 0 speed BARREL_SPEED;
+	wait-for-move brl1 along z-axis;
+	wait-for-move brl2 along z-axis;
+	wait-for-move brl3 along z-axis;
+	
+	move turret to y-axis 0 speed TURRET_SPEED;
+	wait-for-move turret along y-axis;
+	
+	move bay1 to z-axis 0 speed BAY_SPEED;
+	turn door1 to z-axis 0 speed DOOR_SPEED;
+	turn door2 to z-axis 0 speed DOOR_SPEED;
+	move bay2 to z-axis 0 speed BAY_SPEED;
+}
+
+AimPrimary(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	if (!isOpen) {
+		start-script Open();
+		while (!isOpen) sleep 400;
+	}
+	turn turret to y-axis heading speed TURRET_YAW_SPEED;
+	turn gun to x-axis 0 - pitch speed TURRET_PITCH_SPEED;
+	wait-for-turn turret around y-axis;
+	wait-for-turn gun around x-axis;
+	start-script Close();
+	return (1);
+}
+
+FirePrimary()
+{
+	emit-sfx 1024 from shell;
+	++gun_1;
+	if (gun_1 > 3) gun_1 = 1;
+	if (gun_1 == 1) {
+		show flare1;
+		hide flare1;
+		move brl1 to z-axis BARREL_RECOIL now;
+		move brl1 to z-axis BARREL_EXTEND speed BARREL_RESTORE_SPEED;
+	} else if (gun_1 == 2) {
+		show flare2;
+		hide flare2;
+		move brl2 to z-axis BARREL_RECOIL now;
+		move brl2 to z-axis BARREL_EXTEND speed BARREL_RESTORE_SPEED;
+	} else {
+		show flare3;
+		hide flare3;
+		move brl3 to z-axis BARREL_RECOIL now;
+		move brl3 to z-axis BARREL_EXTEND speed BARREL_RESTORE_SPEED;
+	}
+	move bolt to z-axis BOLT_RECOIL now;
+	move bolt to z-axis 0 speed BOLT_RESTORE_SPEED;
+	turn triple to z-axis <120> * gun_1 speed TRIPLE_SPEED;
+}
+
+QueryPrimary(piecenum)
+{
+	if (gun_1 == 1) piecenum = flare1;
+	else if (gun_1 == 2) piecenum = flare2;
+	else piecenum = flare3;
+}
+
+AimFromPrimary(piecenum)
+{
+	piecenum = triple;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode brl1 type BITMAPONLY | BITMAP1;
+		explode brl2 type BITMAPONLY | BITMAP1;
+		explode brl3 type BITMAPONLY | BITMAP1;
+		explode door1 type BITMAPONLY | BITMAP1;
+		explode door2 type BITMAPONLY | BITMAP1;
+		explode bay1 type BITMAPONLY | BITMAP1;
+		explode bay2 type BITMAPONLY | BITMAP1;
+		explode turret type BITMAPONLY | BITMAP1;
+		explode gun type BITMAPONLY | BITMAP1;
+		explode triple type BITMAPONLY | BITMAP1;
+		explode bolt type BITMAPONLY | BITMAP1;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode brl1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode brl2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode brl3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode door1 type BITMAPONLY | BITMAP1;
+		explode door2 type BITMAPONLY | BITMAP1;
+		explode bay1 type BITMAPONLY | BITMAP1;
+		explode bay2 type BITMAPONLY | BITMAP1;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode triple type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode bolt type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode base type BITMAPONLY | BITMAP1;
+		explode brl1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode brl2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode brl3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode door1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode door2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode bay1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode bay2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode triple type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode bolt type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		return (0);
+	}
+	corpsetype = 3;
+	explode base type BITMAPONLY | BITMAP1;
+	explode brl1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode brl2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode brl3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode door1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode door2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode bay1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode bay2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode triple type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode bolt type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+}

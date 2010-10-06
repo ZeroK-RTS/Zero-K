@@ -1,0 +1,434 @@
+//by Chris Mackey
+
+#include "constants.h"
+
+piece 
+//body
+base, axle, flap, low_head, rh_pist, lh_pist, turret, barrel, up_head, tank, firept,
+//left leg
+l_leg, l_foot, l_sock1, l_sock2, l_knee, l_pist1, l_pist2, l_pist3, l_stab, l_toe, l_jet, l_jetpt,
+//right leg
+r_leg, r_foot, r_sock1, r_sock2, r_knee, r_pist1, r_pist2, r_pist3, r_stab, r_toe, r_jet, r_jetpt,
+//left 'arm'
+l_fuelfeed, l_boxlid, l_can, l_barrel, l_box, 
+//right 'arm'
+r_fuelfeed, r_boxlid, r_can, r_barrel, r_box;
+
+static-var sp, lsp, jump, walking;
+
+#define sigmove     2
+#define sigaim      4
+
+lua_FlameShot(weapon) //flame effect?
+{
+  return 0;
+}
+
+Jumping( jumpPercent )
+{
+	if( jumpPercent < 20 )
+	{
+	emit-sfx 1026 from l_jetpt;
+	emit-sfx 1026 from r_jetpt;
+	}
+	
+	if( jumpPercent > 95 ) 
+	{
+	//pistons absorb shock, recoil back up
+	sleep 100;
+	turn low_head to x-axis <50> speed sp*2.5;
+	move base to y-axis [-2] speed lsp*2;
+	turn base to x-axis <10> speed sp;
+	
+	move l_pist1 to y-axis [2] speed lsp*2;
+	turn l_leg to x-axis <-15> speed sp;
+	turn l_foot to x-axis <15> speed sp;
+	
+	move r_pist1 to y-axis [2] speed lsp*2;
+	turn r_leg to x-axis <-15> speed sp;
+	turn r_foot to x-axis <15> speed sp;
+	
+	wait-for-turn low_head around x-axis;
+	turn low_head to x-axis <0> speed sp;
+	turn base to x-axis <0> speed sp;
+	wait-for-move r_pist1 along y-axis;
+	move base to y-axis [0] speed lsp;
+	move l_pist1 to y-axis [0] speed lsp;
+	move r_pist1 to y-axis [0] speed lsp;
+	}
+}
+
+BeginJump()
+{
+	jump = 1;
+	walking = 0;
+	signal sigmove;
+	set-signal-mask sigmove;
+	start-script Jumping();
+	//crouch and prepare to jump
+	turn l_can to x-axis <0> speed sp*6;
+	move l_can to y-axis [-.5] speed lsp*2;
+	turn l_leg to x-axis <0> speed sp*6;
+	turn l_foot to x-axis <30> speed sp*4;
+	turn l_jet to x-axis <80> now;
+	
+	turn r_can to x-axis <0> speed sp*6;
+	move r_can to y-axis [-.5] speed lsp*2;
+	turn r_leg to x-axis <0> speed sp*6;
+	turn r_foot to x-axis <30> speed sp*4;
+	turn r_jet to x-axis <80> now;
+	
+	move base to y-axis [-3] speed lsp*4;
+	wait-for-turn l_leg around x-axis;
+	//spring off with lower legs
+	move base to y-axis [3] speed lsp*4;
+	move l_pist1 to y-axis [-2] speed lsp*8;
+	move r_pist1 to y-axis [-2] speed lsp*8;
+	//begin rocket boost
+	emit-sfx 1027 from l_jet;
+	emit-sfx 1027 from r_jet;
+	//small adjustments in flight
+	sleep 600;
+	
+	//flip cans/jets up
+	move l_can to y-axis [.5] speed lsp;
+	turn l_can to x-axis <90> speed <90>;
+	turn l_jet to x-axis <0> now;
+	
+	move r_can to y-axis [.5] speed lsp;
+	turn r_can to x-axis <90> speed <90>;
+	turn r_jet to x-axis <0> now;
+	
+	//move to neutral
+	move base to y-axis [0] speed lsp;
+	move base to z-axis [-4] speed lsp;
+	move l_pist1 to y-axis [0] speed lsp/2;
+	move r_pist1 to y-axis [0] speed lsp/2;	
+	
+	//wiggle legs in glee
+	turn l_leg to x-axis <-20> speed sp;
+	turn r_leg to x-axis <-50> speed sp;
+	wait-for-turn r_leg around x-axis;
+	turn l_leg to x-axis <-60> speed sp;
+	turn r_leg to x-axis <-10> speed sp;
+	wait-for-turn l_leg around x-axis;
+	turn l_leg to x-axis <-10> speed sp;
+	turn r_leg to x-axis <-70> speed sp;
+	wait-for-turn l_leg around x-axis;
+	turn l_leg to x-axis <-50> speed sp;
+	turn r_leg to x-axis <-20> speed sp;
+	wait-for-turn r_leg around x-axis;
+	
+	//move legs to landing position
+	turn l_leg to x-axis <-40> speed sp/2;
+	turn l_foot to x-axis <30> speed sp;
+	turn r_leg to x-axis <-40> speed sp/2;
+	turn r_foot to x-axis <30> speed sp;
+	wait-for-move r_pist1 along y-axis;
+	move l_pist1 to y-axis [-1] speed lsp/2;
+	move r_pist1 to y-axis [-1] speed lsp/2;
+	
+}
+
+EndJump()
+{
+	jump = 0;
+	emit-sfx 1027 from l_foot;
+	emit-sfx 1027 from r_foot;
+	
+	//stumble forward
+	move base to z-axis [0] speed lsp*1.8;
+	
+	turn l_leg to x-axis <0> speed sp;//left max back
+	turn l_foot to x-axis <0> speed sp;
+	
+	turn r_leg to x-axis <-65> speed sp;//right max forward
+	turn r_foot to x-axis <65> speed sp;
+	move r_pist1 to y-axis [-1.3] speed lsp;
+	wait-for-turn r_leg around x-axis;
+	
+	turn l_leg to x-axis <-20> speed sp;
+	turn l_foot to x-axis <20> speed sp;
+	move l_pist1 to y-axis [1] speed lsp;
+	
+	turn r_leg to x-axis <-35> speed sp;
+	turn r_foot to x-axis <35> speed sp;
+	wait-for-turn r_leg around x-axis;
+	
+	turn l_leg to x-axis <-65> speed sp;//left max forward
+	turn l_foot to x-axis <65> speed sp;
+	move l_pist1 to y-axis [-1.3] speed lsp;
+	turn l_sock2 to x-axis <-60> speed sp*1.2;
+	//move l_pist3 to y-axis [0.55] speed lsp;
+	move l_sock1 to y-axis [0.55] speed lsp;
+	
+	turn r_leg to x-axis <0> speed sp;//right max back
+	turn r_foot to x-axis <0> speed sp;
+	wait-for-turn l_leg around x-axis;
+	turn r_sock2 to x-axis <-50> speed sp;
+	move r_pist3 to y-axis [-0.45] speed lsp;
+	move r_sock1 to y-axis [-0.45] speed lsp;
+}
+
+walk()
+{
+	while( TRUE )
+	{
+		if( walking )
+		{
+			move base to y-axis [1.5] speed lsp;
+			turn low_head to z-axis <-7> speed sp/4;
+			turn low_head to x-axis <-5> speed sp/2.5;
+			turn flap to x-axis <10> speed sp*1.2;
+			
+			turn l_leg to x-axis <-35> speed sp*1.4;
+			turn l_foot to x-axis <35> speed sp;
+			move l_pist1 to y-axis [-1.5] speed lsp/1.5;
+			
+			turn r_leg to x-axis <-20> speed sp*1.4;
+			turn r_foot to x-axis <20> speed sp;
+			move r_pist1 to y-axis [1] speed lsp;
+			move r_pist3 to y-axis [0.1] speed lsp/2;
+			move r_sock1 to y-axis [0.5] speed lsp/2;
+			
+			wait-for-turn flap around x-axis;
+		}
+		if( walking )
+		{
+			move base to y-axis [0] speed lsp/3;
+			turn low_head to x-axis <10> speed sp/3;
+			turn flap to x-axis <-10> speed sp*1.2;
+			
+			turn l_leg to x-axis <0> speed sp*1.6;//left max back
+			turn l_foot to x-axis <0> speed sp*1.2;
+			turn l_sock2 to x-axis <-50> speed sp*1.2;
+			move l_pist3 to y-axis [-0.45] speed lsp/2;
+			move l_sock1 to y-axis [-0.45] speed lsp/2;
+			
+			turn r_leg to x-axis <-65> speed sp*1.4;//right max forward
+			turn r_foot to x-axis <65> speed sp*1.2;
+			move r_pist1 to y-axis [-1.3] speed lsp/1.5;
+			turn r_sock2 to x-axis <-60> speed sp;
+			
+			wait-for-turn r_leg around x-axis;
+			move l_pist1 to y-axis [.5] speed lsp*2;
+		}
+		if( walking )
+		{
+			move base to y-axis [1.5] speed lsp;
+			turn low_head to z-axis <7> speed sp/4;
+			turn low_head to x-axis <-5> speed sp/2.5;
+			turn flap to x-axis <10> speed sp*1.2;
+			
+			turn l_leg to x-axis <-20> speed sp*1.4;
+			turn l_foot to x-axis <20> speed sp;
+			move l_pist1 to y-axis [1] speed lsp;
+			move l_pist3 to y-axis [0.1] speed lsp/2;
+			move l_sock1 to y-axis [0.5] speed lsp/2;
+			
+			turn r_leg to x-axis <-35> speed sp*1.4;
+			turn r_foot to x-axis <35> speed sp;
+			move r_pist1 to y-axis [-1.5] speed lsp/1.5;
+			
+			wait-for-turn flap around x-axis;
+		}
+		if( walking )
+		{
+			move base to y-axis [0] speed lsp/3;
+			turn low_head to x-axis <10> speed sp/3;
+			turn flap to x-axis <-10> speed sp*1.2;
+			
+			turn l_leg to x-axis <-65> speed sp*1.4;//left max forward
+			turn l_foot to x-axis <65> speed sp*1.2;
+			move l_pist1 to y-axis [-1.3] speed lsp/1.5;
+			turn l_sock2 to x-axis <-60> speed sp;
+			
+			turn r_leg to x-axis <0> speed sp*1.6;//right max back
+			turn r_foot to x-axis <0> speed sp*1.4;
+			turn r_sock2 to x-axis <-50> speed sp*1.2;
+			move r_pist3 to y-axis [-0.45] speed lsp/2;
+			move r_sock1 to y-axis [-0.45] speed lsp/2;
+			
+			wait-for-turn l_leg around x-axis;
+			move r_pist1 to y-axis [.5] speed lsp*2;
+		}
+		
+	}
+}
+
+StartMoving()
+{
+	walking = 1;
+	signal sigmove;
+	set-signal-mask sigmove;
+	
+	turn l_leg to x-axis <-65> speed sp;
+	turn l_foot to x-axis <65> speed sp;
+	move l_pist1 to y-axis [-2] speed lsp;
+	
+	turn r_leg to x-axis <0> speed sp;
+	turn r_foot to x-axis <0> speed sp;
+	move r_pist1 to y-axis [0] speed lsp;
+	start-script walk();
+}
+
+StopMoving()
+{
+	walking = 0;
+	signal sigmove;
+	set-signal-mask sigmove;
+	//move all the pieces to their original spots
+	
+	move base to y-axis [0] speed lsp;
+	turn low_head to z-axis <0> speed sp;
+	turn low_head to x-axis <0> speed sp;
+	turn flap to x-axis <0> speed sp;
+	
+	turn l_leg to x-axis <-30> speed sp;
+	turn l_foot to x-axis <30> speed sp;
+	move l_pist1 to y-axis [0] speed lsp;
+	turn l_sock2 to x-axis <-50> speed sp;
+	move l_pist3 to y-axis [0] speed lsp;
+	move l_sock1 to y-axis [0] speed lsp;
+	
+	turn r_leg to x-axis <-30> speed sp;
+	turn r_foot to x-axis <30> speed sp;
+	move r_pist1 to y-axis [0] speed lsp;
+	turn r_sock2 to x-axis <-50> speed sp;
+	move r_pist3 to y-axis [0] speed lsp;
+	move r_sock1 to y-axis [0] speed lsp;
+}
+
+//make smokeunit another file; cleaner than copypasta
+
+PilotLight(Func_Var_1) //Func_Var_1?
+{
+	while( TRUE )
+	{
+		while ((get IN_WATER) or (get CLOAKED))
+		{
+			sleep 200;
+		}
+		if( walking ) 
+		{
+		    emit-sfx 1024 from up_head;
+		    sleep 35;
+		}
+		else
+		{
+			emit-sfx 1025 from up_head;
+			sleep 120;
+		}
+	}
+}
+
+Create()
+{
+	sp = <160>;
+	lsp = [10];
+	jump = 0;
+	walking = 0;
+	start-script StopMoving();
+	//start-script SmokeUnit();
+	//start-script PilotLight();
+	
+	spin tank around z-axis speed <70>;
+	
+	//initialize pieces
+	move l_barrel to z-axis [-1.4] now;
+	move l_can to y-axis [.5] now;
+	turn l_can to x-axis <90> now;
+	
+	move r_barrel to z-axis [-1.4] now;
+	move r_can to y-axis [.5] now;
+	turn r_can to x-axis <90> now;
+	
+	turn l_leg to x-axis <-30> now;
+	turn l_foot to x-axis <30> now;
+	turn l_sock2 to x-axis <-50> now;
+	
+	turn r_leg to x-axis <-30> now;
+	turn r_foot to x-axis <30> now;
+	turn r_sock2 to x-axis <-50> now;
+}
+
+
+AimFromPrimary(piecenum)
+{
+	piecenum = low_head;
+}
+
+QueryPrimary(piecenum)
+{
+	piecenum = firept;
+}
+
+RestoreAfterDelay()
+{
+	sleep 2500;
+	turn low_head to y-axis <0> speed <200>;
+	turn low_head to x-axis <0> speed <45>;
+	move up_head to y-axis [0] speed lsp/3;
+	move turret to y-axis [0] speed lsp/3;
+	move turret to z-axis [0] speed lsp/3;
+	move lh_pist to y-axis [0] speed lsp/3;
+	move rh_pist to y-axis [0] speed lsp/3;
+	move barrel to z-axis [0] speed lsp;
+}
+
+AimPrimary(heading, pitch)
+{
+	signal sigaim;
+	set-signal-mask sigaim;
+	//turn head, open mouth/limbs
+	turn low_head to y-axis heading speed <300>; // left-right
+	turn low_head to x-axis <0> - pitch speed <145>; //up-down
+	move up_head to y-axis [1] speed lsp/2;
+	move turret to y-axis [-1.4] speed lsp/4;
+	move turret to z-axis [1] speed lsp/4;
+	move lh_pist to y-axis [0.5] speed lsp/4;
+	move rh_pist to y-axis [0.5] speed lsp/4;
+	wait-for-turn low_head around y-axis;
+	wait-for-turn low_head around x-axis;
+	start-script RestoreAfterDelay();
+	return (1);
+}
+
+FirePrimary()
+{
+	move barrel to z-axis [1.3] speed lsp;
+	emit-sfx 1026 from firept;
+}
+
+Shot1()
+{
+	call-script lua_FlameShot(1);
+	return (TRUE);
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode l_foot type BITMAPONLY | BITMAP2;
+		explode l_leg type BITMAPONLY | BITMAP3;
+		explode r_foot type BITMAPONLY | BITMAP2;
+		explode r_leg type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		//yadda yadda
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		//yadda yadda
+		return (0);
+	}
+	corpsetype = 3;
+}

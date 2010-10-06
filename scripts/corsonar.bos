@@ -1,0 +1,145 @@
+#include "constants.h"
+
+piece  base, float, body, head, ball, tail;
+
+static-var  statechg_DesiredState, statechg_StateChanging;
+
+BobAnim()
+{
+	while (get BUILD_PERCENT_LEFT)
+	{
+		sleep 1000;
+	}
+	move base to y-axis [-2] speed <250>;
+	wait-for-move base along y-axis;
+	sleep 500;
+	
+	move base to y-axis [0] speed <250>;
+	wait-for-move base along y-axis;
+	sleep 500;
+	
+	start-script BobAnim();
+}
+
+RotateAndTilt()
+{
+	while (get BUILD_PERCENT_LEFT)
+	{
+		sleep 1000;
+	}
+	
+	spin base around y-axis speed <2>;
+	
+	while (TRUE)
+	{
+		turn base to x-axis <5> speed <2>;
+		wait-for-turn base around x-axis;
+		sleep 800;
+		turn base to x-axis <-5> speed <2>;
+		wait-for-turn base around x-axis;
+		sleep 800;
+	}
+}
+
+Go()
+{
+//	spin float around y-axis speed <60>;
+	spin body around y-axis speed <30>;
+	return (0);
+}
+
+Stop()
+{
+//	spin float around y-axis speed <0>;
+	stop-spin body around y-axis;
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script Go();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script Stop();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	call-script InitState();
+	start-script BobAnim();
+	start-script RotateAndTilt();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode float type BITMAPONLY;
+		explode body type BITMAPONLY;
+		explode head type BITMAPONLY;
+		explode tail type BITMAPONLY;
+		explode ball type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode float type BITMAPONLY;
+		explode body type BITMAPONLY;
+		explode head type SHATTER;
+		explode tail type SHATTER;
+		explode ball type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode float type SHATTER;
+		explode body type BITMAPONLY;
+		explode head type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode tail type SHATTER;
+		explode ball type BITMAPONLY;
+		return (0);
+	}
+	corpsetype = 3;
+	explode float type SHATTER;
+	explode body type BITMAPONLY;
+	explode head type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode tail type SHATTER;
+	explode ball type BITMAPONLY;
+	return (0);
+}

@@ -1,0 +1,330 @@
+#include "constants.h"
+
+piece		base, body, turret, sleeve, barrel, firepoint,
+			rwheel1, rwheel2, rwheel3,
+			lwheel1, lwheel2, lwheel3,
+			gs1r, gs2r, gs3r,
+			gs1l, gs2l, gs3l;
+			
+static-var	moving, once, animCount,
+			s1r, s2r, s3r,
+			s1l, s2l, s3l,
+			xtilt, xtiltv, xtilta, ztilt, ztilta, ztiltv, 
+			ya, yv, yp, runsp, reloading, mainHead, WHEEL_TURN_SPEED;
+
+// Signal definitions
+#define SIG_AIM1						1
+#define ANIM_SPEED						50
+#define RESTORE_DELAY					3000
+
+#define TURRET_TURN_SPEED				<160>
+#define GUN_TURN_SPEED					<50>
+
+#define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
+#define SIG_TILT_Z				8		//Signal to prevent multiple tilting. REPLACE!
+
+// definitions for weapons behaviour
+#define RELOAD      3400 // time in milliseconds between shots
+#define RECOIL      [-1.75] // distance to recoil the gun
+#define RECOILAMOUNT 1       // how much the tank whole tank recoils
+#define RETURN_SPEED   [15] // speed at which the barrel returns
+
+RestoreAfterDelay(delay)
+{
+	sleep delay;
+	turn turret to y-axis 0 speed TURRET_TURN_SPEED;
+	turn sleeve to x-axis 0 speed GUN_TURN_SPEED;
+}
+
+Suspension()
+{
+   while(1)
+   {
+   
+   while(runsp)
+   {   
+      s1r = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs1r)) - get PIECE_Y(gs1r);
+      if(s1r < [-1])
+      {
+         s1r = [-1];
+      }
+      if(s1r > [1])
+      {
+         s1r = [1];
+      }
+
+      s2r = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs2r)) - get PIECE_Y(gs2r);
+      if(s2r < [-1])
+      {
+         s2r = [-1];
+      }
+      if(s2r > [1])
+      {
+         s2r = [1];
+      }
+      
+      s3r = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs3r)) - get PIECE_Y(gs3r);
+      if(s3r < [-1])
+      {
+         s3r = [-1];
+      }
+      if(s3r > [1])
+      {
+         s3r = [1];
+      }
+      
+      s1l = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs1l)) - get PIECE_Y(gs1l);
+      if(s1l < [-1])
+      {
+         s1l = [-1];
+      }
+      if(s1l > [1])
+      {
+         s1l = [1];
+      }
+      
+      s2l = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs2l)) - get PIECE_Y(gs2l);
+      if(s2l < [-1])
+      {
+         s2l = [-1];
+      }
+      if(s2l > [1])
+      {
+         s2l = [1];
+      }
+
+      s3l = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs3l)) - get PIECE_Y(gs3l);
+      if(s3l < [-1])
+      {
+         s3l = [-1];
+      }
+      if(s3l > [1])
+      {
+         s3l = [1];
+      }
+      
+      
+      xtilta = 0 - (s1r - s3r + s1l - s3l)/58000 + xtiltv/7;      
+      xtiltv = xtiltv + xtilta;
+      xtilt = xtilt + xtiltv*4;
+      
+      ztilta = 0 + (s1r + s3r - s1l - s3l)/58000 - ztiltv/7;
+      ztiltv = ztiltv + ztilta;
+      ztilt = ztilt + ztiltv*4;
+      
+      ya = (s1r + s3r + s1l + s3l)/100 - yv/25;
+      yv = yv + ya;
+      yp = yp + yv/10;
+      
+      move base to y-axis yp speed <9000>;
+      turn base to x-axis xtilt speed <9000>;
+      turn base to z-axis ztilt speed <9000>;
+      
+      move rwheel1 to y-axis s1r speed <9000>;
+      move rwheel2 to y-axis s2r speed <9000>;
+      move rwheel3 to y-axis s3r speed <9000>;
+      
+      move lwheel1 to y-axis s1l speed <9000>;
+      move lwheel2 to y-axis s2l speed <9000>;
+      move lwheel3 to y-axis s3l speed <9000>;
+      
+      WHEEL_TURN_SPEED = ((get CURRENT_SPEED)/2);
+      
+	spin rwheel1 around x-axis speed WHEEL_TURN_SPEED;
+	spin rwheel2 around x-axis speed WHEEL_TURN_SPEED;
+	spin rwheel3 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel1 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel2 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel3 around x-axis speed WHEEL_TURN_SPEED;
+	
+      sleep 10;
+      }
+      sleep 10;
+   } 
+}
+
+Recoil()
+   {
+   runsp = TRUE;
+   
+   if(mainHead >= <0> && mainHead <= <90>)
+   {
+   ztiltv = ztiltv + (0 - mainhead/90)/RECOILAMOUNT;
+   xtiltv = xtiltv + (mainhead/90 - <1>)/RECOILAMOUNT;
+   }
+   
+   if(mainHead >= <-90> && mainHead < <0>)
+   {
+   ztiltv = ztiltv + (0 - mainhead/90)/RECOILAMOUNT;
+   xtiltv = xtiltv + (0 - <1> - mainhead/90)/RECOILAMOUNT;
+   }
+   
+   if(mainHead < <-90>)
+   {
+   ztiltv = ztiltv + (<2> + mainhead/90)/RECOILAMOUNT;
+   xtiltv = xtiltv + (0 - <1> - mainhead/90)/RECOILAMOUNT;
+   }
+   
+   if(mainHead > <90>)
+   {
+   ztiltv = ztiltv + (0 - <2> + mainhead/90)/RECOILAMOUNT;
+   xtiltv = xtiltv + (0 - <1> + mainhead/90)/RECOILAMOUNT;
+   }
+   
+   sleep 1500;
+   if(!moving)
+   {
+   runsp = FALSE;
+   }
+   
+   return(1);
+
+}
+   
+DamageControl()
+{
+	var health;
+	while (TRUE)
+	{
+		health = get HEALTH;
+		
+		// Restore damaged parts
+/*		if (health > 25)
+		{
+			if (health > 50)
+			{
+				
+			}
+
+		}*/
+		
+		// Damage parts, smoke emits etc.
+		if (health < 50)
+		{
+			emit-sfx SFXTYPE_WHITESMOKE from body;
+			if (health < 25)
+			{	
+				emit-sfx SFXTYPE_BLACKSMOKE from turret;
+			}
+		}
+		sleep 1000;
+	}
+}
+
+StartMoving()
+{
+	runsp = TRUE;
+	moving = TRUE;
+	animCount = 0;
+	
+	spin rwheel1 around x-axis speed WHEEL_TURN_SPEED;
+	spin rwheel2 around x-axis speed WHEEL_TURN_SPEED;
+	spin rwheel3 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel1 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel2 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel3 around x-axis speed WHEEL_TURN_SPEED;
+}
+
+StopMoving()
+{
+	moving = FALSE;
+	sleep 500;
+	if	(!moving)
+	{
+		once = animCount*ANIM_SPEED/1000;
+		if (once > 3) once = 3;
+	
+		stop-spin rwheel1 around x-axis;
+		stop-spin rwheel2 around x-axis;
+		stop-spin rwheel3 around x-axis;
+		stop-spin lwheel1 around x-axis;
+		stop-spin lwheel2 around x-axis;
+		stop-spin lwheel3 around x-axis;
+	
+		runsp = FALSE;
+	}
+}
+
+// Weapons
+AimFromWeapon1(piecenum)
+{
+	piecenum = turret;
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = firepoint;
+}
+
+AimWeapon1 (heading, pitch)
+{
+	signal SIG_AIM1;
+	set-signal-mask SIG_AIM1;
+	
+
+	turn turret to y-axis (heading) speed TURRET_TURN_SPEED;
+	turn sleeve to x-axis (0-pitch) speed GUN_TURN_SPEED;
+
+	wait-for-turn turret around y-axis;
+	wait-for-turn sleeve around x-axis;
+	start-script RestoreAfterDelay(RESTORE_DELAY);
+	mainHead = heading;
+	return (TRUE);
+}
+
+Shot1()
+{
+	start-script Recoil();
+	move barrel to z-axis [-1] now;
+	move barrel to z-axis 0 speed [4];
+	emit-sfx 1024 from firepoint;
+	emit-sfx 1025 from firepoint;
+	return (0);
+}
+
+Killed(severity, corpsetype)
+{
+	if(severity >= 0 AND severity < 25)
+	{
+		corpsetype = 1;
+		explode barrel type BITMAPONLY | BITMAP;
+		explode sleeve type BITMAPONLY | BITMAP;
+		explode body type BITMAPONLY | BITMAP;
+		explode turret type BITMAPONLY | BITMAP;
+	}
+	else if(severity >= 25 AND severity < 50)
+	{
+		corpsetype = 2;
+		explode barrel type FALL | BITMAP;
+		explode sleeve type FALL | BITMAP;
+		explode body type BITMAPONLY | BITMAP;
+		explode turret type SHATTER | BITMAP;
+	}
+	else if(severity >= 50 AND severity < 100)
+	{
+		corpsetype = 3;
+		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode body type BITMAPONLY | BITMAP;
+		explode turret type SHATTER | BITMAP;
+	}
+	// D-Gunned/Self-D
+	else if(severity >= 100)
+	{
+		corpsetype = 3;
+		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode body type SHATTER | BITMAP;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	}
+}
+
+Create()
+{
+	moving = FALSE;
+	start-script suspension();
+	
+	while (get BUILD_PERCENT_LEFT)
+		sleep 250;
+	start-script DamageControl();
+}

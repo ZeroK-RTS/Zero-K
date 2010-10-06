@@ -1,0 +1,38 @@
+Nexuiz:
+banisher_fire.wav
+
+Open LieroX:
+large_missile_fire.wav
+missile2_fire.wav
+missile2_fire_bass.wav
+missile2_hit.wav
+missile_fire2.wav
+missile_fire3.wav
+missile_fire4.wav
+missile_fire.wav
+missile_fire5.wav
+missile_fire6.wav
+missile_fire11.wav
+missile_launch.wav
+
+Scorched 3D:
+missile_small.wav
+
+Nanoblobs:
+large_missile_fire2.wav
+missile_fire7.wav
+missile_fire8.wav
+
+Kanoba:
+tacnuke_launch.wav
+vlaunch_hit.wav
+med_rocket_fire.wav
+missile_fire10.wav
+missile_fire12.wav
+
+Golgotha:
+missile_fire9.wav
+
+emp_missile_hit.wav - Nanoblobs & Open LieroX
+nalpalm_missile_hit.wav - Nanoblobs & Open LieroX
+heavymissile_launch.wav- Nanoblobs & Open LieroX

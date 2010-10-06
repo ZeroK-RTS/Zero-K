@@ -1,0 +1,155 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  fuselage, wingl, wingr, canardl, canardr, enginel, enginer;
+
+static-var  statechg_DesiredState, statechg_StateChanging;
+
+
+activatescr()
+{
+	if( TRUE )
+	{
+		sleep 1326;
+	}
+	sleep 60;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		sleep 1326;
+	}
+	sleep 60;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from fuselage;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = fuselage;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY | BITMAP1;
+		explode wingl type BITMAPONLY | BITMAP5;
+		explode wingr type BITMAPONLY | BITMAP1;
+		explode canardl type BITMAPONLY | BITMAP2;
+		explode canardr type BITMAPONLY | BITMAP3;
+		explode enginel type BITMAPONLY | BITMAP4;
+		explode enginer type BITMAPONLY | BITMAP1;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY | BITMAP1;
+		explode canardl type SHATTER | BITMAP5;
+		explode canardr type SHATTER | BITMAP1;
+		explode wingl type FALL | BITMAP2;
+		explode wingr type FALL | BITMAP3;
+		explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 1;
+		explode fuselage type SHATTER | EXPLODE_ON_HIT | BITMAP1;
+		explode canardl type SHATTER | BITMAP5;
+		explode canardr type SHATTER | BITMAP1;
+		explode wingl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode wingr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;		
+		return (0);
+	}
+	corpsetype = 1;
+	explode fuselage type BITMAPONLY | BITMAP1;
+	explode canardl type SHATTER | EXPLODE_ON_HIT | BITMAP5;
+	explode canardr type SHATTER | EXPLODE_ON_HIT | BITMAP1;
+	explode wingl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode wingr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+}

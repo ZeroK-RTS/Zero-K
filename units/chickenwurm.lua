@@ -1,0 +1,128 @@
+unitDef = {
+  unitname            = [[chickenwurm]],
+  name                = [[Wurm]],
+  description         = [[Burrowing Flamer]],
+  acceleration        = 0.36,
+  bmcode              = [[1]],
+  brakeRate           = 0.2,
+  buildCostEnergy     = 0,
+  buildCostMetal      = 0,
+  builder             = false,
+  buildPic            = [[chickena.png]],
+  buildTime           = 350,
+  canAttack           = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canstop             = [[1]],
+  category            = [[LAND]],
+
+  customParams        = {
+    description_fr = [[Burrowing Assault]],
+    helptext       = [[Burn baby Burn!]],
+  },
+
+  defaultmissiontype  = [[Standby]],
+  explodeAs           = [[CORPYRO_NAPALM]],
+  footprintX          = 4,
+  footprintZ          = 4,
+  iconType            = [[chickena]],
+  idleAutoHeal        = 20,
+  idleTime            = 300,
+  leaveTracks         = true,
+  maneuverleashlength = [[640]],
+  mass                = 176,
+  maxDamage           = 1900,
+  maxSlope            = 90,
+  maxVelocity         = 1.8,
+  maxWaterDepth       = 5000,
+  minCloakDistance    = 75,
+  movementClass       = [[TKBOT3]],
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
+  objectName          = [[chickenwurm.s3o]],
+  power               = 350,
+  script              = [[chickenwurm.lua]],
+  seismicSignature    = 4,
+  selfDestructAs      = [[CORPYRO_NAPALM]],
+
+  sfxtypes            = {
+
+    explosiongenerators = {
+      [[custom:blood_spray]],
+      [[custom:blood_explode]],
+      [[custom:dirt]],
+    },
+
+  },
+
+  side                = [[THUNDERBIRDS]],
+  sightDistance       = 384,
+  smoothAnim          = true,
+  stealth             = true,
+  steeringmode        = [[2]],
+  TEDClass            = [[KBOT]],
+  turnRate            = 768,
+  upright             = false,
+  workerTime          = 0,
+
+  weapons             = {
+
+    {
+      def                = [[NAPALM]],
+      badTargetCategory  = [[GUNSHIP]],
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 120,
+      onlyTargetCategory = [[SWIM LAND SINK FLOAT GUNSHIP SHIP HOVER]],
+    },
+
+  },
+
+
+  weaponDefs          = {
+
+    NAPALM = {
+      name                    = [[NAPALM]],
+      areaOfEffect            = 128,
+      burst                   = 6,
+      burstrate               = 0.01,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 50,
+        planes  = 50,
+        subs    = 7,
+      },
+
+      endsmoke                = [[0]],
+      explosionGenerator      = [[custom:NAPALM_Expl]],
+      fireStarter             = 400,
+      impulseBoost            = 0,
+      impulseFactor           = 0.2,
+      intensity               = 0.7,
+      interceptedByShieldType = 1,
+      lineOfSight             = true,
+      noSelfDamage            = true,
+      range                   = 300,
+      reloadtime              = 4,
+      renderType              = 4,
+      rgbColor                = [[0.8 0.3 0]],
+      size                    = 3,
+      sizeDecay               = 0,
+      soundHit                = [[golgotha/acid2]],
+      soundStart              = [[golgotha/acid]],
+      sprayAngle              = 1024,
+      startsmoke              = [[0]],
+      tolerance               = 5000,
+      turret                  = true,
+      weaponTimer             = 0.2,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 200,
+    },
+
+  },
+
+}
+
+return lowerkeys({ chickenwurm = unitDef })

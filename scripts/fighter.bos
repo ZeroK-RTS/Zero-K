@@ -1,0 +1,170 @@
+#include "constants.h"
+
+piece  base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body;
+
+static-var  statechg_DesiredState, statechg_StateChanging, engine, pitch_01, pitch_02, heading_01, heading_02, gun_1;
+
+activatescr()
+{
+	move rwing to x-axis [0] speed [3];
+	move lwing to x-axis [0] speed [3];
+	return (0);
+	// Build by COBBLER Ver4.0 Copyright @1998 DIGITAL CONCEPT SOFTWARE (MANU@inext.fr) / http://www.annihilationcenter.com/DCS/  
+}
+
+deactivatescr()
+{
+	move rwing to x-axis [-3] speed [2];
+	move lwing to x-axis [3] speed [2];
+	engine = 0;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+
+Create()
+{
+	engine = 0;
+	call-script InitState();
+	start-script SmokeUnit();
+	//start-script Engines();
+}
+
+FireWeapon3()
+{
+	emit-sfx 1025 from missile;
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+QueryPrimary(piecenum)
+{
+	if (gun_1) piecenum = flare1;
+	else piecenum = flare2;
+}
+
+AimPrimary(heading, pitch)
+{
+	return (1);
+}
+
+FireWeapon1()
+{
+	gun_1 = !gun_1;
+	if (gun_1) emit-sfx 1026 from flare1;
+	else emit-sfx 1026 from flare2;
+}
+
+QuerySecondary(piecenum)
+{
+	piecenum = flare2;
+}
+
+AimSecondary(heading, pitch)
+{
+	return (1);
+}
+
+FireWeapon2()
+{
+	emit-sfx 1026 from flare2;
+}
+
+
+BlockShot1(unit, block)
+{
+	if (get CRASHING)
+	{
+		block = 1;
+	}
+}
+
+BlockShot2(unit, block)
+{
+	if (get CRASHING)
+	{
+		block = 1;
+	}
+}
+
+Killed(severity, corpsetype)
+{
+	if (severity <= 50)
+	{
+		corpsetype = 1;
+	}
+	else
+	{
+		corpsetype = 2;
+	}
+	explode base type BITMAPONLY | BITMAP1;
+	explode rwing type BITMAPONLY | BITMAP1;
+	explode lwing type BITMAPONLY | BITMAP1;
+	explode rjet type SHATTER | FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode ljet type SHATTER | FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+}

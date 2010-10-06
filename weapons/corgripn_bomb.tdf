@@ -1,0 +1,30 @@
+[CORGRIPN_BOMB]
+{
+  name=EMPbomb;
+  areaofeffect=240;
+  commandfire=1;
+  craterboost=0;
+  cratermult=0;
+  dropped=1;
+  edgeeffectiveness=0.4;
+  explosiongenerator=custom:ELECTRIC_EXPLOSION;
+  firestarter=90;
+  impulseboost=0;
+  impulsefactor=0;
+  interceptedbyshieldtype=0;
+  model=bomb;
+  noselfdamage=1;
+  paralyzer=1;
+  paralyzetime=15;
+  range=1280;
+  reloadtime=0.3;
+  rendertype=6;
+  soundhit=otaunit/EMGPULS1;
+  soundstart=otaunit/bombrel;
+  tolerance=7000;
+  [DAMAGE]
+  {
+    default=1500;
+    commanders=150;
+  }
+}

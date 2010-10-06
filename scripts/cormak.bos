@@ -1,0 +1,335 @@
+#include "constants.h"
+
+piece  base, pelvis, torso,
+       emit, fire, Lleg, Rleg, lowerLleg,
+       lowerRleg, Lfoot, Rfoot;
+
+static-var  bMoving, bAiming, Static_Var_4;
+
+// Signal definitions
+#define SIG_AIM				2
+#define SIG_AIM_2			4
+#define SIG_ACTIVATE		8
+
+
+
+walk()
+{
+	if( TRUE )
+	{
+		move torso to y-axis [0.000000] now;
+		turn Rleg to x-axis <0.000000> now;
+		turn lowerRleg to x-axis <0.000000> now;
+		turn Rfoot to x-axis <0.000000> now;
+		turn Lleg to x-axis <0.000000> now;
+		turn lowerLleg to x-axis <0.000000> now;
+		turn Lfoot to x-axis <0.000000> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [0.300000] now;
+		turn Rleg to x-axis <-10.000000> now;
+		turn lowerRleg to x-axis <-20.000000> now;
+		turn Rfoot to x-axis <20.000000> now;
+		turn Lleg to x-axis <10.000000> now;
+		turn lowerLleg to x-axis <20.000000> now;
+		turn Lfoot to x-axis <-20.000000> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [0.700000] now;
+		turn Rleg to x-axis <-20.000000> now;
+		turn lowerRleg to x-axis <-30.005495> now;
+		turn Rfoot to x-axis <30.005495> now;
+		turn lowerLleg to x-axis <20.000000> now;
+		turn Lfoot to x-axis <-20.000000> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [0.300000] now;
+		turn Rleg to x-axis <-30.005495> now;
+		turn lowerRleg to x-axis <-20.000000> now;
+		turn Rfoot to x-axis <40.005495> now;
+		turn lowerLleg to x-axis <30.005495> now;
+		turn Lfoot to x-axis <-30.005495> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [0.000000] now;
+		turn Rleg to x-axis <-20.000000> now;
+		turn lowerRleg to x-axis <-10.000000> now;
+		turn Rfoot to x-axis <30.005495> now;
+		turn lowerLleg to x-axis <40.005495> now;
+		turn Lfoot to x-axis <-40.005495> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [-0.100000] now;
+		turn Rleg to x-axis <0.000000> now;
+		turn lowerRleg to x-axis <0.000000> now;
+		turn Rfoot to x-axis <0.000000> now;
+		turn Lleg to x-axis <0.000000> now;
+		turn lowerLleg to x-axis <0.000000> now;
+		turn Lfoot to x-axis <0.000000> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [-0.200000] now;
+		turn Rleg to x-axis <10.000000> now;
+		turn lowerRleg to x-axis <20.000000> now;
+		turn Rfoot to x-axis <-20.000000> now;
+		turn Lleg to x-axis <-10.000000> now;
+		turn lowerLleg to x-axis <-20.000000> now;
+		turn Lfoot to x-axis <20.000000> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [-0.300000] now;
+		turn lowerRleg to x-axis <20.000000> now;
+		turn Rfoot to x-axis <-20.000000> now;
+		turn Lleg to x-axis <-20.000000> now;
+		turn lowerLleg to x-axis <-30.005495> now;
+		turn Lfoot to x-axis <30.005495> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [-0.400000] now;
+		turn lowerRleg to x-axis <30.005495> now;
+		turn Rfoot to x-axis <-30.005495> now;
+		turn Lleg to x-axis <-30.005495> now;
+		turn lowerLleg to x-axis <-20.000000> now;
+		turn Lfoot to x-axis <40.005495> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [-0.500000] now;
+		turn lowerRleg to x-axis <40.005495> now;
+		turn Rfoot to x-axis <-40.005495> now;
+		turn Lleg to x-axis <-20.000000> now;
+		turn lowerLleg to x-axis <-10.000000> now;
+		turn Lfoot to x-axis <30.005495> now;
+		sleep 67;
+	}
+	if( TRUE )
+	{
+		move torso to y-axis [0.000000] now;
+		turn lowerRleg to x-axis <0.000000> speed <200.000000>;
+		turn Rleg to x-axis <0.000000> speed <200.000000>;
+		turn Rfoot to x-axis <0.000000> speed <200.000000>;
+		turn Lleg to x-axis <0.000000> now;
+		turn lowerLleg to x-axis <0.000000> now;
+		turn Lfoot to x-axis <0.000000> now;
+		sleep 67;
+	}
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+MotionControl(moving, aiming, justmoved)
+{
+	justmoved = TRUE;
+	while( TRUE )
+	{
+		moving = bMoving;
+		aiming = bAiming;
+		if( moving )
+		{
+			if( aiming )
+			{
+				Static_Var_4 = 1;
+				call-script walk();
+			}
+			if( !aiming )
+			{
+				Static_Var_4 = 0;
+				call-script walk();
+			}
+			justmoved = TRUE;
+		}
+		if( !moving )
+		{
+			Static_Var_4 = 1;
+			if( justmoved )
+			{
+				move torso to y-axis [0.000000] now;
+				turn Rleg to x-axis <0.000000> speed <300.000000>;
+				turn Lleg to x-axis <0.000000> speed <300.000000>;
+				turn lowerRleg to x-axis <0.000000> speed <300.000000>;
+				turn lowerLleg to x-axis <0.000000> speed <300.000000>;
+				turn Rfoot to x-axis <0.000000> speed <300.000000>;
+				turn Lfoot to x-axis <0.000000> speed <300.000000>;
+				if( !aiming )
+				{
+				}
+				justmoved = FALSE;
+			}
+			sleep 100;
+		}
+	}
+}
+
+Create()
+{
+	bMoving = FALSE;
+	bAiming = FALSE;
+	Static_Var_4 = 1;
+	start-script SmokeUnit();
+	start-script MotionControl();
+}
+
+Activate()
+{
+	signal SIG_ACTIVATE;
+	set-signal-mask SIG_ACTIVATE;
+}
+
+Deactivate()
+{
+	signal SIG_ACTIVATE;
+	set-signal-mask SIG_ACTIVATE;
+}
+
+StartMoving()
+{
+	bMoving = TRUE;
+}
+
+StopMoving()
+{
+	bMoving = FALSE;
+}
+
+AimWeapon4(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	return (1);
+}
+
+FireWeapon4()
+{
+	emit-sfx 1027 from emit;
+}
+
+QueryWeapon4(piecenum)
+{
+	piecenum = emit;
+}
+
+AimFromWeapon4(piecenum)
+{
+	piecenum = torso;
+}
+
+FireWeapon3()
+{
+	emit-sfx 2049 from emit;
+}
+
+AimFromWeapon3(piecenum)
+{
+	piecenum = torso;
+}
+
+AimWeapon3(heading, pitch)
+{
+	return(1);
+}
+
+QueryWeapon3(piecenum)
+{
+	piecenum = emit;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = torso;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP2;
+		explode torso type BITMAPONLY | BITMAP2;
+		explode Rleg type BITMAPONLY | BITMAP2;
+		explode Lleg type BITMAPONLY | BITMAP2;
+		explode lowerRleg type BITMAPONLY | BITMAP3;
+		explode lowerLleg type BITMAPONLY | BITMAP3;
+		explode Rfoot type BITMAPONLY | BITMAP4;
+		explode Lfoot type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP2;
+		explode torso type BITMAPONLY | BITMAP2;
+		explode Rleg type BITMAPONLY | BITMAP2;
+		explode Lleg type BITMAPONLY | BITMAP2;
+		explode lowerRleg type BITMAPONLY | BITMAP3;
+		explode lowerLleg type BITMAPONLY | BITMAP3;
+		explode Rfoot type BITMAPONLY | BITMAP4;
+		explode Lfoot type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode base type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+		explode torso type BITMAPONLY | BITMAP2;
+
+		explode Rleg type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+		explode Lleg type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+		explode lowerRleg type BITMAPONLY | BITMAP3;
+		explode lowerLleg type BITMAPONLY | BITMAP3;
+		explode Rfoot type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP4;
+		explode Lfoot type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	corpsetype = 3;
+	explode base type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+	explode torso type BITMAPONLY | BITMAP2;
+
+	explode Rleg type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+	explode Lleg type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+	explode lowerRleg type BITMAPONLY | BITMAP3;
+	explode lowerLleg type BITMAPONLY | BITMAP3;
+	explode Rfoot type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP4;
+	explode Lfoot type BITMAPONLY | BITMAP4;
+}

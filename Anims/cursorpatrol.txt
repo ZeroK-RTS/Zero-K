@@ -1,0 +1,4 @@
+hotspot topleft
+frame  anims/cursorpatrol_0.png  0.2
+frame  anims/cursorpatrol_1.png  0.2
+

@@ -1,0 +1,16 @@
+all on/off state icons should follow same scheme - colored icon for ON, grayscale for OFF
+
+for example recycle symbol should be green for ON state and grayscale for OFF state
+
+
+important missing icons:
+
+repair (placeholder)
+reclaim (placeholder)
+resurrect (placeholder)
+capture
+build
+
+
+less important icons:
+land at level 

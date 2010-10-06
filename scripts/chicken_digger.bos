@@ -1,0 +1,365 @@
+piece body,head,tail,lthigh,lknee,lshin,lfoot,rthigh,rknee,rshin,rfoot,lforearm,lupperarm,lblade,rforearm,rupperarm,rblade;
+
+static-var bMoving, bAiming, bCanAim,shooting_num, base_speed, bStayAbove, restore_delay, bDigging;
+
+// Signal definitions
+#define SIG_AIM				2
+#define SIG_AIM_2			4
+#define SIG_MOVE			16
+#define SIG_RESTORE			32
+
+#include "sfxtype.h"
+#include "exptype.h"
+#include "StateChg.h"
+
+
+
+lua_ReplaceMe() { return 0; }
+lua_Surface() { return 0; }
+
+
+activatescr()
+{
+	bDigging = TRUE;
+    
+    move body to y-axis [-12.0] now;
+    turn body to x-axis <-45> now;
+    
+   	show body;
+	show head;
+	show tail;
+	show lthigh;
+	show lknee;
+	show lshin;
+	show lfoot;
+	show rthigh;
+	show rknee;
+	show rshin;
+	show rfoot;
+	show lforearm;
+	show lupperarm;
+	show lblade;
+	show rforearm;
+	show rupperarm;
+	show rblade;
+	
+    if (!bMoving) {
+        //turn body to y-axis <180> now;
+    	//turn body to y-axis <0> speed <150>;
+    }
+        	
+	move body to y-axis [0] speed [8];
+	turn body to x-axis <0> speed <20>;
+	wait-for-move body along y-axis;
+
+	bDigging = FALSE;
+	
+}
+
+digdig()
+{
+	while (TRUE)
+	{
+		call-script lua_Surface();
+		sleep 500;
+	}
+}
+
+deactivatescr()
+{    
+	bDigging = TRUE;
+	
+	//start-script digdig();
+    
+    if (!bMoving) {
+    	//turn body to y-axis <180> speed <150>;
+    }
+       	
+	turn body to x-axis <60> speed <40>;	
+	sleep 500;
+	move body to y-axis [-12] speed [6];
+
+	wait-for-move body along y-axis;
+	turn body to y-axis <0> now;
+	bDigging = FALSE;		
+
+}
+Go()
+{
+    SET MAX_SPEED to base_speed / 3;
+	call-script activatescr();
+	SET MAX_SPEED to base_speed;
+}
+
+Stop()
+{	
+    SET MAX_SPEED to base_speed / 3;
+	call-script deactivatescr();
+	
+	call-script lua_Surface();
+	call-script lua_ReplaceMe();
+}
+
+#define ACTIVATECMD	    call-script Go();
+#define DEACTIVATECMD   call-script Stop();
+#include "StateChg.h"
+
+
+
+
+walk()
+{		
+			turn lthigh to x-axis <70> speed<230>;
+			turn lknee to x-axis <-40> speed<270>;
+			turn lshin to x-axis <20> speed<270>;
+			turn lfoot to x-axis <-50> speed<420>;
+			
+			turn rthigh to x-axis <-20> speed<420>;
+			turn rknee to x-axis <-60> speed<420>;
+			turn rshin to x-axis <50> speed<420>;
+			turn rfoot to x-axis <30> speed<420>;
+			
+			turn body to z-axis <5> speed <40>;
+			turn lthigh to z-axis <-5> speed <40>;
+			turn rthigh to z-axis <-5> speed <40>;
+			//move body to y-axis [0.7] speed <8000>;			
+			turn tail to y-axis <10> speed <80>;
+			turn head to x-axis <-10> speed <40>;
+			turn tail to x-axis <10> speed <40>;
+			wait-for-turn lthigh around x-axis;
+			
+			turn lthigh to x-axis <-10> speed<320>;
+			turn lknee to x-axis <15> speed<270>;
+			turn lshin to x-axis <-60> speed<500>;
+			turn lfoot to x-axis <30> speed<270>;
+			
+			turn rthigh to x-axis <40> speed<270>;
+			turn rknee to x-axis <-35> speed<270>;
+			turn rshin to x-axis <-40> speed<270>;
+			turn rfoot to x-axis <35> speed<270>;
+			
+			//move body to y-axis <0> speed <8000>;
+			turn head to x-axis <10> speed <40>;
+			turn tail to x-axis <-10> speed <40>;
+			wait-for-turn lshin around x-axis;
+			
+			turn rthigh to x-axis <70> speed<230>;
+			turn rknee to x-axis <-40> speed<270>;
+			turn rshin to x-axis <20> speed<270>;
+			turn rfoot to x-axis <-50> speed<420>;
+			
+			turn lthigh to x-axis <-20> speed<420>;
+			turn lknee to x-axis <-60> speed<420>;
+			turn lshin to x-axis <50> speed<420>;
+			turn lfoot to x-axis <30> speed<420>;
+			
+			turn tail to y-axis <-10> speed <80>;
+			turn body to z-axis <-5> speed <40>;
+			turn lthigh to z-axis <5> speed <40>;
+			turn rthigh to z-axis <5> speed <40>;
+			//move body to y-axis [0.7] speed <8000>;
+			turn head to x-axis <-10> speed <40>;
+			turn tail to x-axis <10> speed <40>;
+			wait-for-turn rthigh around x-axis;
+			
+			turn rthigh to x-axis <-10> speed<320>;
+			turn rknee to x-axis <15> speed<270>;
+			turn rshin to x-axis <-60> speed<500>;
+			turn rfoot to x-axis <30> speed<270>;
+			
+			turn lthigh to x-axis <40> speed<270>;
+			turn lknee to x-axis <-35> speed<270>;
+			turn lshin to x-axis <-40> speed<270>;
+			turn lfoot to x-axis <35> speed<270>;
+			
+			
+			//move body to y-axis <0> speed <8000>;
+			turn head to x-axis <10> speed <40>;
+			turn tail to x-axis <-10> speed <40>;
+			wait-for-turn rshin around x-axis;
+			
+}
+stopwalk ()
+{	
+	turn lfoot		to x-axis <0> 		speed <200>;
+	turn rfoot		to x-axis <0> 		speed <200>;
+	turn rthigh 	to x-axis <0> 		speed <200>;
+	turn lthigh 	to x-axis <0> 		speed <200>;
+	turn lshin  	to x-axis <0> 		speed <200>;
+	turn rshin 		to x-axis <0> 		speed <200>;
+	turn lfoot		to y-axis <0> 		speed <200>;
+	turn rfoot		to y-axis <0> 		speed <200>;
+	turn rthigh 	to y-axis <0> 		speed <200>;
+	turn lthigh 	to y-axis <0> 		speed <200>;
+	turn lshin  	to y-axis <0> 		speed <200>;
+	turn rshin 		to y-axis <0> 		speed <200>;
+}
+
+MotionControl(moving, aiming, justmoved, digging)
+{
+	justmoved = TRUE;
+	while( TRUE )
+	{
+		moving = bMoving;
+		aiming = bAiming;
+		digging = bDigging;
+		if( moving || digging )
+		{
+			call-script walk();
+			justmoved = TRUE;
+		}
+		if( !moving && !digging && justmoved)
+		{
+			call-script stopwalk ();
+			justmoved = FALSE;
+		}
+		sleep 100;
+	}
+}
+
+
+
+
+SetMaxReloadTime(time)
+{
+	restore_delay = time * 2;
+}
+
+StartMoving()
+{
+	bMoving = TRUE;
+	//start-script walk();
+}
+
+StopMoving()
+{
+	bMoving = FALSE;
+	start-script	stopwalk();
+}
+
+
+Activate()
+{	
+	bStayAbove = TRUE;
+	start-script RequestState(ACTIVE);
+}
+
+Deactivate()
+{
+    bStayAbove = FALSE;
+	start-script RequestState(INACTIVE);
+}
+
+RestoreAfterDelay()
+{
+	set-signal-mask SIG_RESTORE;
+	sleep restore_delay;
+	
+	if (!bStayAbove)
+	{
+		start-script RequestState(INACTIVE);
+	}
+	
+}
+
+Create()
+{
+	emit-sfx 1024+2 from body;
+	
+   	hide body;
+	hide head;
+	hide tail;
+	hide lthigh;
+	hide lknee;
+	hide lshin;
+	hide lfoot;
+	hide rthigh;
+	hide rknee;
+	hide rshin;
+	hide rfoot;
+	hide lforearm;
+	hide lupperarm;
+	hide lblade;
+	hide rforearm;
+	hide rupperarm;
+	hide rblade;
+	
+		
+	bMoving = FALSE;
+	bAiming = FALSE;
+	bDigging = TRUE;
+	bStayAbove = GET ACTIVATION;
+	
+	base_speed = GET MAX_SPEED;
+	SET MAX_SPEED to base_speed / 3;
+	
+	start-script MotionControl();
+	
+	restore_delay = 3000;
+	
+	//set-signal-mask SIG_AIM;
+	
+	
+	call-script InitState();				
+	start-script RequestState(ACTIVE);	
+	
+	//start-script RestoreAfterDelay();
+}
+
+SweetSpot(piecenum)
+	{	piecenum=body;	}	
+	
+AimFromPrimary(piecenum)
+	{	piecenum=head;	}
+
+QueryPrimary(piecenum)
+	{	piecenum=head; }
+
+
+AimPrimary(heading,pitch)
+{
+	
+	start-script RequestState(ACTIVE);
+	
+	signal SIG_RESTORE;	
+	
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	bAiming = TRUE;
+	turn head to y-axis heading speed <250>;
+	turn head to x-axis 0 -pitch speed <200>;
+		
+	wait-for-turn head around y-axis;
+	
+		
+	start-script RestoreAfterDelay();
+	
+	return(TRUE);
+}
+	
+Shot1()
+	{
+	turn lforearm to y-axis <-140> speed <600>;
+	turn rforearm to y-axis <140> speed <600>;
+	turn lblade to y-axis <140> speed <600>;
+	turn rblade to y-axis <-140> speed <600>;
+	wait-for-turn rblade around y-axis;
+	turn lforearm to y-axis <0> speed <120>;
+	turn rforearm to y-axis <0> speed <120>;
+	turn lblade to y-axis <0> speed <120>;
+	turn rblade to y-axis <0> speed <120>;
+	}
+	
+
+HitByWeaponId()
+	{
+	emit-sfx 1024 from body;
+	return 100;
+	}
+
+Killed( severity, corpsetype )
+	{
+	corpsetype = 1;
+	emit-sfx 1025 from body;
+	return( 0 );
+	}

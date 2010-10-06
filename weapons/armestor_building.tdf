@@ -1,0 +1,22 @@
+[ARMESTOR_BUILDING]
+{
+  name=Smallbuilding;
+  areaofeffect=260;
+  craterboost=1;
+  cratermult=4;
+  explosiongenerator=custom:FLASHBIGBUILDING;
+  impulseboost=0;
+  impulsefactor=0.4;
+  interceptedbyshieldtype=1;
+  range=580;
+  reloadtime=3.6;
+  rendertype=4;
+  soundhit=otaunit/xplolrg4;
+  soundstart=otaunit/largegun;
+  turret=1;
+  weaponvelocity=250;
+  [DAMAGE]
+  {
+    default=950;
+  }
+}

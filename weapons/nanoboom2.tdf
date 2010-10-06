@@ -1,0 +1,24 @@
+[NANOBOOM2]
+{
+  name=MEX;
+  areaofeffect=128;
+  craterboost=1;
+  cratermult=4;
+  edgeeffectiveness=0.75;
+  explosionart=explode2;
+  explosiongaf=fx;
+  explosiongenerator=custom:FLASH1;
+  impulseboost=0;
+  impulsefactor=0.4;
+  interceptedbyshieldtype=1;
+  range=128;
+  reloadtime=3.6;
+  rendertype=4;
+  soundhit=explosion/ex_small1;
+  turret=1;
+  weaponvelocity=70;
+  [DAMAGE]
+  {
+    default=500;
+  }
+}

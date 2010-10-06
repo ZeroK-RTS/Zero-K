@@ -1,0 +1,193 @@
+#include "constants.h"
+//#include "exptype.h"
+
+piece  fuselage;	//add moar pieces later
+
+static-var  statechg_DesiredState, statechg_StateChanging, gun_1, isSpinning;
+
+
+activatescr()
+{
+	if( TRUE )
+	{
+		sleep 30;
+	}
+	sleep 15;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		sleep 30;
+	}
+	sleep 9;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from fuselage;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	call-script InitState();
+	start-script SmokeUnit();
+	gun_1 = 0;
+	isSpinning = FALSE;
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+QueryWeapon1(piecenum)
+{
+	gun_1 = !gun_1;
+	if (gun_1) {piecenum = fuselage;}
+	else piecenum = fuselage;
+	//remember to give it real firing points!
+}
+
+Shot1()
+{
+	if (isSpinning)
+	{
+		return(0);
+	}
+	if (gun_1)
+	{
+		isSpinning = TRUE;
+		turn fuselage to z-axis <120> speed <600>;
+		wait-for-turn fuselage around z-axis;
+		turn fuselage to z-axis <-120> speed <600>;
+		wait-for-turn fuselage around z-axis;
+		turn fuselage to z-axis <0> speed <600>;
+		wait-for-turn fuselage around z-axis;
+	}
+	else
+	{
+		isSpinning = TRUE;
+		turn fuselage to z-axis <-120> speed <600>;
+		wait-for-turn fuselage around z-axis;
+		turn fuselage to z-axis <120> speed <600>;
+		wait-for-turn fuselage around z-axis;
+		turn fuselage to z-axis <0> speed <600>;
+		wait-for-turn fuselage around z-axis;
+	}
+	isSpinning = FALSE;
+	return(0);
+}
+
+
+BlockShot1(unit, block)
+{
+	if (get CRASHING)
+	{
+		block = 1;
+	}
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY | BITMAP1;
+//		explode jet type BITMAPONLY | BITMAP2;
+//		explode missilea type BITMAPONLY | BITMAP3;
+//		explode missileb type BITMAPONLY | BITMAP4;
+//		explode winga type BITMAPONLY | BITMAP3;
+//		explode wingb type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY | BITMAP1;
+//		explode jet type FALL | BITMAP2;
+//		explode missilea type FALL | BITMAP3;
+//		explode missileb type FALL | BITMAP4;
+//		explode winga type SHATTER | BITMAP3;
+//		explode wingb type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY | BITMAP1;
+//		explode jet type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+//		explode missilea type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+//		explode missileb type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+//		explode winga type SHATTER | BITMAP3;
+//		explode wingb type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	corpsetype = 1;
+	explode fuselage type BITMAPONLY | BITMAP1;
+//	explode jet type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+//	explode missilea type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+//	explode missileb type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+//	explode winga type SHATTER | EXPLODE_ON_HIT | BITMAP3;
+//	explode wingb type BITMAPONLY | BITMAP4;
+}

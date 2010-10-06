@@ -1,0 +1,175 @@
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, bottom, tamper, furnace, door_l, door_r, drill1, drill2, drill3, posts;
+
+static-var  OPEN, Static_Var_1, Static_Var_2, Static_Var_3, statechg_DesiredState, statechg_StateChanging;
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from bottom;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Animation()
+{
+	while (TRUE)
+	{		
+	        if(Static_Var_1 >= 0 AND OPEN == TRUE)
+ 			{ 
+ 				spin furnace around y-axis speed Static_Var_1 accelerate Static_Var_2;
+ 				spin drill1 around y-axis speed Static_Var_1 accelerate Static_Var_2;
+				move tamper to y-axis [10] speed Static_Var_1*13;	
+				wait-for-move tamper along y-axis;
+				move tamper to y-axis [18] speed Static_Var_1*13;
+				wait-for-move tamper along y-axis;
+            }   
+    stop-spin tamper around y-axis decelerate Static_Var_3;
+    stop-spin drill1 around y-axis decelerate Static_Var_3;
+    sleep 1;
+    }
+}
+
+
+Go()
+{
+	turn door_r to z-axis <120.000000> speed <50.000000>;
+	turn door_l to z-axis <-120.000000> speed <50.000000>;
+	wait-for-turn door_l around z-axis;	
+	wait-for-turn door_r around z-axis;		
+	move tamper to y-axis [15] speed [3];
+	wait-for-move furnace along y-axis;
+	OPEN = TRUE;
+}
+
+Stop()
+{
+	OPEN = FALSE;
+	move tamper to y-axis [0] speed [7.000000];
+	move furnace to y-axis [0] speed [7.000000];
+	wait-for-move tamper along y-axis;	
+	wait-for-move furnace along y-axis;	
+	turn door_r to z-axis <0.000000> speed <60.000000>;
+	turn door_l to z-axis <0.000000> speed <60.000000>;
+	wait-for-turn door_l around z-axis;	
+	wait-for-turn door_r around z-axis;	
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script Go();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script Stop();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	turn base to y-axis Rand(0, 65534) now;
+
+	Static_Var_1 = 0;
+	Static_Var_2 = 91;
+	Static_Var_3 = 182;
+	OPEN = FALSE;
+	call-script InitState();
+	start-script SmokeUnit();
+	start-script Animation();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = bottom;
+}
+
+SetSpeed(Func_Var_1)
+{
+	Static_Var_1 = Func_Var_1 * 45;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode bottom type BITMAPONLY | BITMAP1;
+		explode furnace type BITMAPONLY | BITMAP1;
+		explode tamper type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode tamper type SHATTER | BITMAP1;
+		explode bottom type BITMAPONLY | BITMAP2;
+		explode furnace type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode tamper type SHATTER | EXPLODE_ON_HIT | BITMAP1;
+		explode bottom type BITMAPONLY | BITMAP2;
+		explode furnace type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	corpsetype = 3;
+	explode tamper type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode bottom type SHATTER | EXPLODE_ON_HIT | BITMAP2;
+	explode furnace type SHATTER | EXPLODE_ON_HIT | BITMAP2;
+}

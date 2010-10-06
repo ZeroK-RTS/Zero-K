@@ -1,0 +1,202 @@
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  fuselage, wingl, wingr, wingtipl, wingtipr, canardl, canardr, laserl, laserr, enginel, enginer;
+
+static-var  Static_Var_1, statechg_DesiredState, statechg_StateChanging, gun_1;
+
+
+activatescr()
+{
+	if( TRUE )
+	{
+		move wingtipl to x-axis [0.000000] speed [20];
+		move wingtipr to x-axis [0] speed [20];
+		sleep 998;
+	}
+	sleep 44;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		move wingtipl to x-axis [2.500000] speed [10];
+		move wingtipr to x-axis [-2.5] speed [10];
+	}
+	sleep 44;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from fuselage;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+MoveRate2()
+{
+	if( Rand( 1, 10 ) == 1 AND ( !Static_Var_1 ) )
+	{
+		Static_Var_1 = 1;
+		turn fuselage to z-axis <240.054945> speed <120.027473>;
+		wait-for-turn fuselage around z-axis;
+		turn fuselage to z-axis <120.027473> speed <180.043956>;
+		wait-for-turn fuselage around z-axis;
+		turn fuselage to z-axis <0.000000> speed <120.027473>;
+		Static_Var_1 = 0;
+	}
+}
+
+Create()
+{
+	Static_Var_1 = 0;
+	gun_1 = 0;
+	move wingtipl to x-axis [2.5] now;
+	move wingtipr to x-axis [-2.5] now;
+	turn enginel to y-axis <180> now;
+	turn enginer to y-axis <180> now;
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+FirePrimary()
+{
+	gun_1 = !gun_1;
+}
+
+AimWeapon1(heading, pitch)
+{
+	return (1);
+}
+
+QueryWeapon1(piecenum)
+{
+	if (gun_1) piecenum = laserl;
+	else piecenum = laserr;
+}
+
+AimWeapon2(heading, pitch)
+{
+	return (1);
+}
+
+QueryWeapon2(piecenum)
+{
+	piecenum = fuselage;
+}
+
+AimFromWeapon2(piecenum)
+{
+	piecenum = fuselage;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY;
+		explode wingl type BITMAPONLY;
+		explode wingr type BITMAPONLY;
+		explode wingtipl type BITMAPONLY;
+		explode wingtipr type BITMAPONLY;
+		explode canardl type BITMAPONLY;
+		explode canardr type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode fuselage type BITMAPONLY;
+		explode wingl type FALL;
+		explode wingr type FALL;
+		explode wingtipl type FALL;
+		explode wingtipr type FALL ;
+		explode canardl type BITMAPONLY;
+		explode canardr type SHATTER;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode fuselage type BITMAPONLY;
+		explode wingl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode wingr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode wingtipl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode wingtipl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode canardl type BITMAPONLY;
+		explode canardr type SHATTER;
+		return (0);
+	}
+	corpsetype = 3;
+	explode fuselage type BITMAPONLY;
+	explode wingl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode wingr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode wingtipl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode wingtipl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode canardl type BITMAPONLY;
+	explode canardr type SHATTER | EXPLODE_ON_HIT;
+}

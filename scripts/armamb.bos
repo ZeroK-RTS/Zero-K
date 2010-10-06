@@ -1,0 +1,244 @@
+//linear 65536
+
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, lid, engine1, engine2, gun1, gun2, barrels1, barrels2, fire1, fire2, ejector1, ejector2, aim;
+
+static-var gun_1, state, gun_1_yaw;
+
+#define SIG_AIM				2
+#define RESTORE_DELAY		2500
+#define SPIN_DELAY			500
+#define TURRET_SPEED		<360>
+#define TURRET_ROLL_SPEED	<900>
+#define TURRET_ROLL_ACCEL	<15>
+#define LID_HEIGHT 			[-96]
+#define ENGINE_WIDTH_1		[-4]
+#define ENGINE_HEIGHT		[-2]
+#define ENGINE_WIDTH_2		[-12]
+#define PACK_SPEED			[192]
+#define HOVER_HEIGHT		[32]
+#define HOVER_SPEED			[16]
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Hover() {
+	set-signal-mask 0;
+	while (state == 1) {
+		move lid to y-axis HOVER_HEIGHT speed HOVER_SPEED;
+		wait-for-move lid along y-axis;
+		if (state != 1) break;
+		move lid to y-axis 0 speed HOVER_SPEED;
+		wait-for-move lid along y-axis;
+	}
+}
+
+Go() {
+	set ARMORED to 0;
+	
+	show gun1;
+	show gun2;
+	show barrels1;
+	show barrels2;
+	
+	move lid to y-axis 0 speed PACK_SPEED;
+	wait-for-move lid along y-axis;
+	
+	turn gun1 to x-axis 0 speed TURRET_SPEED;
+	turn gun2 to x-axis 0 speed TURRET_SPEED;
+	
+	move engine1 to x-axis 0 - ENGINE_WIDTH_1 speed PACK_SPEED;
+	move engine2 to x-axis ENGINE_WIDTH_1 speed PACK_SPEED;
+	wait-for-move engine1 along x-axis;
+	wait-for-move engine2 along x-axis;
+	
+	move engine1 to y-axis 0 speed PACK_SPEED;
+	move engine2 to y-axis 0 speed PACK_SPEED;
+	wait-for-move engine1 along y-axis;
+	wait-for-move engine2 along y-axis;
+	
+	move engine1 to x-axis 0 speed PACK_SPEED;
+	move engine2 to x-axis 0 speed PACK_SPEED;
+	wait-for-move engine1 along x-axis;
+	wait-for-move engine2 along x-axis;
+	
+	wait-for-turn gun1 around x-axis;
+	wait-for-turn gun2 around x-axis;
+	
+	state = 1;
+	start-script Hover();
+}
+
+Stop() {
+	var direction;
+	direction = 0;
+	if (gun_1_yaw > <135> || gun_1_yaw < <-135>) direction = <180>;
+	else if (gun_1_yaw > <45>) direction = <90>;
+	else if (gun_1_yaw < <-45>) direction = <-90>;
+	
+	turn lid to y-axis direction speed TURRET_SPEED;
+	turn lid to x-axis 0 speed TURRET_SPEED;
+	turn gun1 to x-axis <90> speed TURRET_SPEED;
+	turn gun2 to x-axis <90> speed TURRET_SPEED;
+	
+	move engine1 to x-axis 0 - ENGINE_WIDTH_1 speed PACK_SPEED;
+	move engine2 to x-axis ENGINE_WIDTH_1 speed PACK_SPEED;
+	wait-for-move engine1 along x-axis;
+	wait-for-move engine2 along x-axis;
+	
+	move engine1 to y-axis ENGINE_HEIGHT speed PACK_SPEED;
+	move engine2 to y-axis ENGINE_HEIGHT speed PACK_SPEED;
+	wait-for-move engine1 along y-axis;
+	wait-for-move engine2 along y-axis;
+	
+	move engine1 to x-axis 0 - ENGINE_WIDTH_2 speed PACK_SPEED;
+	move engine2 to x-axis ENGINE_WIDTH_2 speed PACK_SPEED;
+	wait-for-move engine1 along x-axis;
+	wait-for-move engine2 along x-axis;
+	
+	wait-for-turn lid around y-axis;
+	wait-for-turn lid around x-axis;
+	wait-for-turn gun1 around x-axis;
+	wait-for-turn gun2 around x-axis;
+	
+	move lid to y-axis LID_HEIGHT speed PACK_SPEED;
+	wait-for-move lid along y-axis;
+	
+	hide gun1;
+	hide gun2;
+	hide barrels1;
+	hide barrels2;
+	
+	set ARMORED to 1;
+	state = 0;
+}
+
+ChangeState(nextState) {
+	if (state == nextState) return;
+	state = -1;
+	if (nextState) {
+		call-script Go();
+	} else {
+		call-script Stop();
+	}
+}
+
+RestoreAfterDelay()
+{
+	set-signal-mask SIG_AIM;
+	sleep SPIN_DELAY;
+	stop-spin barrels1 around z-axis decelerate TURRET_ROLL_ACCEL / 2;
+	stop-spin barrels2 around z-axis decelerate 0 - TURRET_ROLL_ACCEL / 2;
+	sleep RESTORE_DELAY;
+	call-script ChangeState(0);
+}
+
+Create()
+{
+	hide fire1;
+	hide fire2;
+	hide ejector1;
+	hide ejector2;
+	hide aim;
+	turn ejector1 to y-axis <90> now;
+	turn ejector2 to y-axis <-90> now;
+	gun_1 = 0;
+	state = 1;
+	start-script SmokeUnit();
+	start-script Hover();
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 1000;
+	}
+	start-script RestoreAfterDelay();
+}
+
+AimWeapon1(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	call-script ChangeState(1);
+	turn lid to y-axis heading speed TURRET_SPEED;
+	turn lid to x-axis <15> - (pitch * 2) speed TURRET_SPEED;
+	wait-for-turn lid around y-axis;
+	wait-for-turn lid around x-axis;
+	start-script RestoreAfterDelay();
+	gun_1_yaw = heading;
+	return (1);
+}
+
+FireWeapon1() {
+	spin barrels1 around z-axis speed TURRET_ROLL_SPEED accelerate TURRET_ROLL_ACCEL;
+	spin barrels2 around z-axis speed 0 - TURRET_ROLL_SPEED accelerate TURRET_ROLL_ACCEL;
+}
+
+Shot1() {
+	gun_1 = !gun_1;
+	if (gun_1) {
+		emit-sfx 1024 from fire1;
+		emit-sfx 1025 from ejector1;
+	} else {
+		emit-sfx 1024 from fire2;
+		emit-sfx 1025 from ejector2;
+	}
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = aim;
+}
+
+QueryWeapon1(piecenum)
+{
+	if (gun_1) piecenum = fire1;
+	else piecenum = fire2;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	explode base type BITMAPONLY | BITMAP5;
+	explode lid type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode engine1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode engine2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode gun1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+	explode gun2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode barrels1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode barrels2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	if (severity <= 25) corpsetype = 1;
+	else if (severity <= 50) corpsetype = 2;
+	else corpsetype = 3;
+}

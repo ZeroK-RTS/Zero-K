@@ -1,0 +1,145 @@
+
+
+
+piece	base, slot1, slot2, load_shoulder, load_arm, unload_shoulder, unload_arm;
+
+static-var moving, firing_laser, firing_gatling, wanting_to_fire_gatling, gatling_angle, ReturnDelay, weapon_out, counter_gatling, patte1_status, patte2_status, patte3_status, patte4_status, patte5_status, patte6_status, embedded_spring_test;
+
+
+#include "exptype.h"
+#include "sfxtype.h"
+
+
+static-var units_inside;// Make sure you initialise it to 0 in the Create()
+
+#define MAX_LOAD_RADIUS [120]
+#define MAX_UNLOAD_RADIUS [300]
+#define LOAD_TIME 2500
+#define UNLOAD_TIME 1500
+//#define UNIT_ALLIED			74
+
+TransportPickup(id)
+	{
+	if( get UNIT_ALLIED(id) == 1) //only load friendlies
+	/*
+	//Abort if already filled up
+	if(units_inside>=2)
+		{
+		return;
+		}
+	
+	// If close enough to allow loading:
+	if(get XZ_HYPOT(get PIECE_XZ(base) - get UNIT_XZ(id))<=MAX_LOAD_RADIUS)
+		{
+	*/	
+		{
+		// we're busy loading, don't disturb:
+		set BUSY to 1;
+		
+		// instantly move the magical invisible arm to the position where the unit to load is
+		turn load_shoulder to y-axis get XZ_ATAN(get PIECE_XZ(load_shoulder) - get UNIT_XZ(id)) now;
+		move load_arm to z-axis get XZ_HYPOT(get PIECE_XZ(load_shoulder) - get UNIT_XZ(id)) now;
+		move load_arm to y-axis get UNIT_Y(id) - get PIECE_Y(load_shoulder) now;
+		
+		attach-unit id to load_arm;
+		
+		//slowly move the arm, carrying the unit, to the spider center (moving to proper basket pos would be too complex for now)
+		move load_arm to z-axis 0 speed ((get XZ_HYPOT(get PIECE_XZ(load_shoulder) - get UNIT_XZ(id)))/(LOAD_TIME))*1000;
+		move load_arm to y-axis get PIECE_Y(base) - get PIECE_Y(load_shoulder) speed ((get PIECE_Y(base) - get UNIT_Y(id))/(LOAD_TIME))*1000;// I assumed the torax would have a higher Y than the loaded unit, if not the speed would be negative and that would be BAD!
+		sleep LOAD_TIME;
+		
+		// Ideally here I would check that the loading was successful. Bah, let's not to simplify.
+		
+		// Let's not forget to update the counter
+		++units_inside;
+		
+		// now that part that specifically interest you:
+		if(units_inside==1)	
+			{
+			attach-unit id to slot1;
+			}
+		if(units_inside==2)	
+			{
+			attach-unit id to slot2;
+			}
+
+		// Ok, we're done, the engine may proceed to next action. (Or something like that, I'm not even sure that "BUSY" really do something.)
+		set BUSY to 0;
+		}
+	//	}
+	
+	}
+
+
+TransportDrop(id,xz)
+	{
+	/* // If close enough to allow unloading:
+	if(get XZ_HYPOT(get PIECE_XZ(base) - get UNIT_XZ(id))<=MAX_UNLOAD_RADIUS)
+		{
+		*/
+		// we're busy unloading, don't disturb:
+		set BUSY to 1;
+		
+		// instantly reset the position of the magical invisible arm (and turn it already, ok)
+		turn unload_shoulder to y-axis get XZ_ATAN(get PIECE_XZ(unload_shoulder) - xz) now;
+		move unload_arm to z-axis 0 now;
+		move unload_arm to y-axis get PIECE_Y(base) - get PIECE_Y(unload_shoulder) now;
+		
+		attach-unit id to unload_arm;
+		
+		//slowly move the arm, carrying the unit, to the pos where to unload
+		move unload_arm to z-axis get XZ_HYPOT(get PIECE_XZ(unload_shoulder) - xz) speed ((get XZ_HYPOT(get PIECE_XZ(unload_shoulder) - xz))/(UNLOAD_TIME))*1000;
+		move unload_arm to y-axis get GROUND_HEIGHT(xz) - get PIECE_Y(unload_shoulder) speed ((get PIECE_Y(base) - get GROUND_HEIGHT(xz))/(UNLOAD_TIME))*1000;//again, I assumed that torax was above ground, if not, speed would be negative, and things could go BAD!!
+		sleep UNLOAD_TIME;
+		
+		// Ideally here I would check that the unloading was successful. Bah, let's not to simplify.
+		
+		// Let's not forget to update the counter
+		--units_inside;
+		
+		// And now, ladies and gentlemen, the drop command:
+		drop-unit id;
+		
+		// Ok, we're done, the engine may proceed to next action. (Or something like that, I'm not even sure that "BUSY" really do something.)
+		set BUSY to 0;
+		
+		//}
+	
+	}
+
+EmbeddedSpringTest()
+	{
+	wait-for-move base along x-axis;
+	wait-for-move base along y-axis;
+	wait-for-move base along z-axis;
+	wait-for-turn base around x-axis;
+	wait-for-turn base around y-axis;
+	wait-for-turn base around z-axis;
+	embedded_spring_test=0;
+	}
+
+Create()
+	{
+	units_inside=0;
+	set ACTIVATION to TRUE;
+	embedded_spring_test=0 - 1;
+	start-script EmbeddedSpringTest();
+	sleep 1;
+	embedded_spring_test=1;
+	set ACTIVATION to TRUE;
+	return;
+	}
+
+
+SetMaxReloadTime(time)
+	{
+	//ReturnDelay=time*2;// The five hour reload Tertiary weapon sorta mess that up
+	ReturnDelay=20000;
+	}
+	
+Killed(severity, corpsetype)
+	{
+		
+	explode base type SHATTER | SMOKE | FIRE;
+	
+	}

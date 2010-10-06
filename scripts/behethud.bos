@@ -1,0 +1,279 @@
+// By Chris Mackey
+
+#include "constants.h"
+
+piece base, head, l_gun, r_gun, firept1, r_barrel, firept2, l_barrel,
+l_leg, lb_lever, l_foot, lf_lever, l_heel, l_heeltoe,
+r_leg, rb_lever, r_foot, rf_lever, r_heel, r_heeltoe;
+
+static-var gun_1, restore_delay, Static_Var_4, sp1, sp2, ShieldOn;
+
+#define sig_move 	2
+#define sig_aim 	4
+
+walk()
+{
+	while( TRUE )
+	{
+		turn lb_lever to x-axis <-60> speed sp1; //left forward
+		turn l_foot to x-axis <60> speed sp1;
+		turn lf_lever to x-axis <-20> speed <30>;
+		turn rb_lever to x-axis <50> speed sp2; //right back
+		turn r_foot to x-axis <-50> speed sp2;
+		turn rf_lever to x-axis <10> speed <30>;
+		move base to y-axis [-1] speed [2];
+		wait-for-turn l_foot around x-axis;
+		wait-for-turn r_foot around x-axis;
+		
+		turn lb_lever to x-axis <0> speed sp1; //left center
+		turn l_foot to x-axis <0> speed sp1;
+		turn lf_lever to x-axis <0> speed <30>;
+		turn rb_lever to x-axis <0> speed sp2; //right center
+		turn r_foot to x-axis <0> speed sp2;
+		turn rf_lever to x-axis <0> speed <30>;
+		move base to y-axis [0] speed [2];
+		wait-for-turn l_foot around x-axis;
+		wait-for-turn r_foot around x-axis;
+		
+		turn lb_lever to x-axis <50> speed sp2; //left back
+		turn l_foot to x-axis <-50> speed sp2;
+		turn lf_lever to x-axis <10> speed <30>;
+		turn rb_lever to x-axis <-60> speed sp1; //right forward
+		turn r_foot to x-axis <60> speed sp1;
+		turn rf_lever to x-axis <-20> speed <30>;
+		move base to y-axis [-1] speed [2];
+		wait-for-turn l_foot around x-axis;
+		wait-for-turn r_foot around x-axis;
+		
+		turn lb_lever to x-axis <0> speed sp2; //left center
+		turn l_foot to x-axis <0> speed sp2;
+		turn lf_lever to x-axis <0> speed <30>;
+		turn rb_lever to x-axis <0> speed sp1; //right center
+		turn r_foot to x-axis <0> speed sp1;
+		turn rf_lever to x-axis <0> speed <30>;
+		move base to y-axis [0] speed [2];
+		wait-for-turn l_foot around x-axis;
+		wait-for-turn r_foot around x-axis;
+	}
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from head;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Activate()
+{
+	ShieldOn = 1;
+}
+
+Deactivate()
+{
+	ShieldOn = 0;
+}
+
+Create()
+{
+	sp1 = <170>;
+	sp2 = <150>;
+	gun_1 = head;
+	Static_Var_4 = 1;
+	restore_delay = 3000;
+	start-script SmokeUnit();
+}
+
+StartMoving()
+{
+	signal sig_move;
+	set-signal-mask sig_move;
+	call-script walk();
+}
+
+StopMoving()
+{
+	signal sig_move;
+	set-signal-mask sig_move;
+	//move all the pieces to their original spots
+	
+}
+
+SetMaxReloadTime(Func_Var_1)
+{
+	restore_delay = Func_Var_1 * 2; //I have no idea what this function does :(
+}
+
+RestoreAfterDelay()
+{
+	sleep restore_delay;
+	//move all the pieces to their original spots
+	turn head to y-axis <0> speed <100>;
+	turn l_gun to x-axis <0> speed <100>;
+	turn r_gun to x-axis <0> speed <100>;
+	
+}
+
+QueryWeapon1(piecenum)
+{
+	if(gun_1)
+	{
+		piecenum = firept1;
+	}
+	else 
+	{
+		piecenum = firept2;
+	}
+}
+
+AimWeapon1(heading, pitch)
+{
+	signal sig_aim;
+	set-signal-mask sig_aim;
+	while( !Static_Var_4 )
+	{
+		sleep 200;
+	}
+	turn head to y-axis heading speed <100>;
+	turn l_gun to x-axis <0> - pitch speed <100>;
+	turn r_gun to x-axis <0> - pitch speed <100>;
+	wait-for-turn head around y-axis;
+	start-script RestoreAfterDelay();
+	return(1); //--whats this for?
+}
+
+FireWeapon1()
+{
+	gun_1 = !gun_1;
+	if(gun_1)
+	{
+		emit-sfx 1024 from firept1;
+		emit-sfx 1025 from firept1;
+		move r_barrel to z-axis [-2] speed [500];
+		wait-for-move r_barrel along z-axis;
+		move r_barrel to z-axis [0] speed [5];
+	}
+	else
+	{
+		emit-sfx 1024 from firept2;
+		emit-sfx 1025 from firept2;
+		move l_barrel to z-axis [-2] speed [500];
+		wait-for-move l_barrel along z-axis;
+		move l_barrel to z-axis [0] speed [5];
+	}
+	return (1); //--whats this for?
+}
+
+AimFromWeapon2(piecenum) {
+	piecenum = head;
+}
+
+QueryWeapon2(piecenum)
+{
+	piecenum = head;
+}
+
+AimWeapon2(heading, pitch)
+{
+	return (ShieldOn);
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode head type BITMAPONLY | BITMAP2;
+		explode l_gun type BITMAPONLY | BITMAP2;
+		explode r_gun type BITMAPONLY | BITMAP3;
+		explode l_leg type BITMAPONLY | BITMAP3;
+		explode r_leg type BITMAPONLY | BITMAP3;
+		explode l_foot type BITMAPONLY | BITMAP3;
+		explode r_foot type BITMAPONLY | BITMAP4;
+		explode lb_lever type BITMAPONLY | BITMAP3;
+		explode rb_lever type BITMAPONLY | BITMAP3;
+		explode lf_lever type BITMAPONLY | BITMAP2;
+		explode rf_lever type BITMAPONLY | BITMAP2;
+		explode l_heel type BITMAPONLY | BITMAP3;
+		explode r_heel type BITMAPONLY | BITMAP3;
+		explode l_heeltoe type BITMAPONLY | BITMAP4;
+		explode r_heeltoe type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode head type BITMAPONLY | BITMAP2;
+		explode l_gun type BITMAPONLY | BITMAP2;
+		explode r_gun type FALL | EXPLODE_ON_HIT | BITMAP3;
+		explode l_leg type FALL | EXPLODE_ON_HIT | BITMAP3;
+		explode r_leg type BITMAPONLY | BITMAP3;
+		explode l_foot type BITMAPONLY | BITMAP3;
+		explode r_foot type BITMAPONLY | BITMAP4;
+		explode lb_lever type BITMAPONLY | BITMAP3;
+		explode rb_lever type BITMAPONLY | BITMAP3;
+		explode lf_lever type BITMAPONLY | BITMAP2;
+		explode rf_lever type BITMAPONLY | BITMAP2;
+		explode l_heel type BITMAPONLY | BITMAP3;
+		explode r_heel type BITMAPONLY | BITMAP3;
+		explode l_heeltoe type BITMAPONLY | BITMAP4;
+		explode r_heeltoe type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode head type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+		explode l_gun type BITMAPONLY | BITMAP2;
+		explode r_gun type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+		explode l_leg type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+		explode r_leg type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+		explode l_foot type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+		explode r_foot type BITMAPONLY | BITMAP4;
+		explode lb_lever type BITMAPONLY | BITMAP3;
+		explode rb_lever type BITMAPONLY | BITMAP3;
+		explode lf_lever type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+		explode rf_lever type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+		explode l_heel type BITMAPONLY | BITMAP3;
+		explode r_heel type BITMAPONLY | BITMAP3;
+		explode l_heeltoe type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP4;
+		explode r_heeltoe type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	corpsetype = 3;
+	explode head type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+	explode l_gun type BITMAPONLY | BITMAP2;
+	explode r_gun type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+	explode l_leg type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+	explode r_leg type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+	explode l_foot type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
+	explode r_foot type BITMAPONLY | BITMAP4;
+	explode lb_lever type BITMAPONLY | BITMAP3;
+	explode rb_lever type BITMAPONLY | BITMAP3;
+	explode lf_lever type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+	explode rf_lever type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
+	explode l_heel type BITMAPONLY | BITMAP3;
+	explode r_heel type BITMAPONLY | BITMAP3;
+	explode l_heeltoe type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP4;
+	explode r_heeltoe type BITMAPONLY | BITMAP4;
+}

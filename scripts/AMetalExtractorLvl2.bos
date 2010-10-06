@@ -1,0 +1,202 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, bottom, tamper, center, leg_1, leg_1d, leg_1u, leg_2, leg_2d, leg_2u, leg_3, leg_3d, leg_3u;
+
+static-var  Static_Var_1, statechg_DesiredState, statechg_StateChanging, ison;
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from bottom;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Go()
+{
+	ison = 1;
+	spin tamper around y-axis speed Static_Var_1 accelerate <0.500000>;
+}
+
+Stop()
+{
+	ison = 0;
+	stop-spin tamper around y-axis decelerate <5.000000>;
+	wait-for-turn tamper around y-axis;
+	
+ 			 turn leg_1d to z-axis <0> speed <40>;
+ 			 turn leg_2d to z-axis <0> speed <40>;
+ 			 turn leg_3d to z-axis <0> speed <40>;
+ 			 
+ 			 turn leg_1u to z-axis <0> speed <80>;
+ 			 turn leg_2u to z-axis <0> speed <80>;
+ 			 turn leg_3u to z-axis <0> speed <80>;
+ 			 
+ 			 move center to y-axis [0] speed [16.2];
+ 			 
+ 			 wait-for-turn leg_1u around z-axis;
+ 			 wait-for-turn leg_2u around z-axis;
+  			 wait-for-turn leg_3u around z-axis;
+  			 wait-for-move center along y-axis;
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script Go();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script Stop();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+HitByWeapon(Func_Var_1, Func_Var_2)
+{
+	signal 2;
+	set-signal-mask 2;
+	set ACTIVATION to 0;
+	sleep 6000;
+	set ACTIVATION to 1;
+}
+
+SetSpeed(Func_Var_1)
+{
+	Static_Var_1 = Func_Var_1 * 10;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = bottom;
+}
+
+AnimationCenter(Func_Var_1)
+{
+	while (Static_Var_1 > 0)
+	{		
+	        if(ison == 1)
+ 			{
+ 			 	turn leg_1d to z-axis <-10.000000> speed <40>;
+ 			 	turn leg_2d to z-axis <-10.000000> speed <40>;
+ 			 	turn leg_3d to z-axis <-10.000000> speed <40>;
+ 			 
+ 			 	turn leg_1u to z-axis <-20.000000> speed <80>;
+ 			 	turn leg_2u to z-axis <-20.000000> speed <80>;
+ 			 	turn leg_3u to z-axis <-20.000000> speed <80>;
+ 				 	
+ 				move center to y-axis [4.3] speed [15.95];
+	
+ 				wait-for-turn leg_1u around z-axis;
+ 				wait-for-turn leg_2u around z-axis;
+  				wait-for-turn leg_3u around z-axis;
+  				wait-for-move center along y-axis;
+  			  			 
+	 			turn leg_1d to z-axis <0> speed <40>;
+ 				turn leg_2d to z-axis <0> speed <40>;
+ 				turn leg_3d to z-axis <0> speed <40>;
+ 			 
+	 			turn leg_1u to z-axis <0> speed <80>;
+ 				turn leg_2u to z-axis <0> speed <80>;
+ 				turn leg_3u to z-axis <0> speed <80>;
+ 			 
+	 			move center to y-axis [0] speed [16.2];
+ 			 
+ 				wait-for-turn leg_1u around z-axis;
+ 				wait-for-turn leg_2u around z-axis;
+  				wait-for-turn leg_3u around z-axis;
+  			 	wait-for-move center along y-axis; 
+            }
+	   
+    sleep 10;
+    }
+}
+
+Create()
+{
+	turn leg_2 to y-axis <120.000000> now;
+	turn leg_3 to y-axis <240.000000> now;
+	ison = 0;
+	Static_Var_1 = 0;
+	call-script InitState();
+	call-script SetSpeed();
+	start-script SmokeUnit();
+	start-script AnimationCenter();
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode bottom type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode bottom type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode bottom type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	corpsetype = 3;
+	explode bottom type SHATTER | EXPLODE_ON_HIT | BITMAP2;
+}

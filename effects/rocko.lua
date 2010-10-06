@@ -1,0 +1,62 @@
+-- rockomuzzle
+
+return {
+  ["rockomuzzle"] = {
+    smoke = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.8,
+        colormap           = [[1 1 1 1.0    0 0 0 0.01]],
+        directional        = false,
+        emitrot            = 0,
+        emitrotspread      = 20,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 20,
+        particlelife       = 30,
+        particlelifespread = 0,
+        particlesize       = 1,
+        particlesizespread = 3,
+        particlespeed      = 5,
+        particlespeedspread = 2,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0.05,
+        sizemod            = 1.0,
+        texture            = [[smoke]],
+      },
+    },
+    smoke2 = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.8,
+        colormap           = [[1 1 1 1.0    0 0 0 0.01]],
+        directional        = false,
+        emitrot            = 0,
+        emitrotspread      = 10,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0.05, 0]],
+        numparticles       = 20,
+        particlelife       = 30,
+        particlelifespread = 0,
+        particlesize       = 2,
+        particlesizespread = 3,
+        particlespeed      = -1,
+        particlespeedspread = -12,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0.5,
+        sizemod            = 1.0,
+        texture            = [[smoke]],
+      },
+    },
+  },
+
+}
+

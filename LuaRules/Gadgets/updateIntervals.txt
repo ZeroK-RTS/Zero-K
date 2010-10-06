@@ -1,0 +1,32 @@
+################################################################################
+# This file holds all gadgets, which catch the GameFrame(n) event
+################################################################################
+# Small info:
+# The engine handles 30 gameframes per second 
+# (so a (n%30<1) script would be called every 1s)
+#
+# If now all gadgets would do somethings in every 30nd frame the game would lag 
+# (the rendering of that frame would be slower as the rest). So this file tries
+# to balance all work over the whole second (so the update interval is still be
+# 1s) as it holds offset for each gadget. The work is well balanced if such an
+# offset only exists once and all offsets are distributed over the whole second.
+#
+# Description:
+#         epd  = expected performance drop
+#  -1 offsets  = called every frame if a special table holds stuff todo
+#   0 offsets  = called every frame
+#
+#################################################################################
+
+>offset(interval)<      >epd<                           >widget/gadget<                 >handled units<
+-1                      weak                            unit_storage_dies_penalty       small list
+-1                      weak                            unit_stealth                    small list
+-1                      unknown                         unit_cloak_shield               small list
+0                       weak                            share_levels                    teams
+0                       weak                            share_delayed			teams
++1                      unknown                         unit_retreat                    small up to big list
++8 (2s)                 unknown                         unit_estall_disable             huge list
++16                     medium (up to extreme)          unit_windmill_control           windmiles
++24                     none (up to extreme)            unit_morph                      all units with a xp depended morph
++15                     none (up to extreme)            unit_priority                   teams
++30                     weak                            unit_mex_rate			mexes

@@ -1,0 +1,148 @@
+unitDef = {
+  unitname                      = [[factorycloak]],
+  name                          = [[Cloaky Bot Plant]],
+  description                   = [[Produces Cloaky Robots, Builds at 6 m/s]],
+  acceleration                  = 0,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildCostEnergy               = 550,
+  buildCostMetal                = 550,
+  builder                       = true,
+  buildingGroundDecalDecaySpeed = 0.01,
+  buildingGroundDecalSizeX      = 7,
+  buildingGroundDecalSizeY      = 7,
+  buildingGroundDecalType       = [[asphalt512c.dds]],
+
+  buildoptions                  = {
+    [[armrectr]],
+    [[armpw]],
+    [[spherepole]],
+    [[armrock]],
+    [[armzeus]],
+    [[armtick]],
+    [[armwar]],
+    [[armham]],
+    [[armsnipe]],
+    [[armjeth]],
+    [[spherecloaker]],
+  },
+
+  buildPic                      = [[factorycloak.png]],
+  buildTime                     = 550,
+  canMove                       = true,
+  canPatrol                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK UNARMED]],
+  corpse                        = [[DEAD]],
+
+  customParams                  = {
+    helptext = [[Emphasizing guile over brute force, the Cloaky Bot Plant makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Tick, Zeus]],
+    sortName = [[1]],
+  },
+
+  energyMake                    = 0.15,
+  energyUse                     = 0,
+  explodeAs                     = [[LARGE_BUILDINGEX]],
+  footprintX                    = 7,
+  footprintZ                    = 7,
+  iconType                      = [[fackbot]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 275,
+  maxDamage                     = 4000,
+  maxSlope                      = 15,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  metalMake                     = 0.15,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  objectName                    = [[cremfactory.s3o]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[LARGE_BUILDINGEX]],
+
+  sfxtypes                      = {
+
+    explosiongenerators = {
+      [[custom:WhiteLight]],
+    },
+
+  },
+
+  showNanoSpray                 = false,
+  side                          = [[CORE]],
+  sightDistance                 = 273,
+  smoothAnim                    = true,
+  TEDClass                      = [[PLANT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 6,
+  yardMap                       = [[ooooooo ooooooo ooooooo oocccoo oocccoo oocccoo oocccoo]],
+
+  featureDefs                   = {
+
+    DEAD  = {
+      description      = [[Wreckage - Infantry Bot Factory]],
+      blocking         = true,
+      category         = [[corpses]],
+      damage           = 4000,
+      energy           = 0,
+      featureDead      = [[DEAD2]],
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 6,
+      footprintZ       = 6,
+      height           = [[20]],
+      hitdensity       = [[100]],
+      metal            = 220,
+      object           = [[cremfactorywreck.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 220,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    DEAD2 = {
+      description      = [[Debris - Infantry Bot Factory]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 4000,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 6,
+      footprintZ       = 6,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 220,
+      object           = [[debris4x4b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 220,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    HEAP  = {
+      description      = [[Debris - Infantry Bot Factory]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 4000,
+      energy           = 0,
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 6,
+      footprintZ       = 6,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 110,
+      object           = [[debris4x4b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 110,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+  },
+
+}
+
+return lowerkeys({ factorycloak = unitDef })

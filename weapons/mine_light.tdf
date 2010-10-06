@@ -1,0 +1,23 @@
+[MINE_LIGHT]
+{
+  name=Mine;
+  areaofeffect=100;
+  craterboost=0.5;
+  cratermult=1;
+  edgeeffectiveness=0.5;
+  explosiongenerator=custom:BigBulletImpact;
+  impulseboost=0.25;
+  impulsefactor=0.1;
+  interceptedbyshieldtype=1;
+  range=100;
+  reloadtime=3.6;
+  rendertype=4;
+  soundhit=otaunit/xplosml1;
+  soundstart=otaunit/largegun;
+  weaponvelocity=250;
+  [DAMAGE]
+  {
+    default=400;
+    mines=1;
+  }
+}

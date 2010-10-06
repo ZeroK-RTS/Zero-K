@@ -1,0 +1,203 @@
+#define TAK
+#include "constants.h"
+
+// WARNING: change your constant for the []-brackets to 65536 before compiling!
+piece		base, body, turret, sleeve, barrel, firepoint, tracks1, tracks2, tracks3, tracks4,
+			wheels1, wheels2, wheels3, wheels4, wheels5, wheels6, wheels7, wheels8;
+
+static-var	moving, once, animCount, curShownTracks;
+
+// Signal definitions
+#define SIG_AIM1						1
+#define ANIM_SPEED						50
+#define RESTORE_DELAY					3000
+
+#define TURRET_TURN_SPEED				<150>
+#define GUN_TURN_SPEED					<90>
+
+#define WHEEL_TURN_SPEED1				<480>
+#define WHEEL_TURN_SPEED1_ACCELERATION	<75>
+#define WHEEL_TURN_SPEED1_DECELERATION	<200>
+
+RestoreAfterDelay(delay)
+{
+	sleep delay;
+	turn turret to y-axis 0 speed TURRET_TURN_SPEED/2;
+	turn sleeve to x-axis 0 speed TURRET_TURN_SPEED/2;
+}
+
+DamageControl()
+{
+	var health;
+	while (TRUE)
+	{
+		health = get HEALTH;
+		
+		// Restore damaged parts
+/*		if (health > 25)
+		{
+			if (health > 50)
+			{
+				
+			}
+
+		}*/
+		
+		// Damage parts, smoke emits etc.
+		if (health < 50)
+		{
+			emit-sfx SFXTYPE_WHITESMOKE from body;
+			if (health < 25)
+			{	
+				emit-sfx SFXTYPE_BLACKSMOKE from turret;
+			}
+		}
+		sleep 1000;
+	}
+}
+AnimationControl()
+{
+	var current_tracks;
+	current_tracks = 0;
+	
+	while (TRUE)
+	{
+		if (moving OR once)
+		{
+			if (current_tracks == 0)
+			{
+				show tracks1;
+				hide tracks4;
+				++current_tracks;
+			}
+			else if (current_tracks == 1)
+				{
+				show tracks2;
+				hide tracks1;
+				++current_tracks;
+			}
+			else if (current_tracks == 2)
+			{
+				show tracks3;
+				hide tracks2;
+				++current_tracks;
+			}
+			else if (current_tracks == 3)
+			{
+				show tracks4;
+				hide tracks3;
+				current_tracks=0;
+				if (once) --once;
+			}
+		}
+		++animCount;
+		sleep ANIM_SPEED;
+	}
+}
+
+StartMoving()
+{
+	moving = TRUE;
+	animCount = 0;
+	
+	spin wheels1 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+	spin wheels2 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+	spin wheels3 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+	spin wheels4 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+	spin wheels5 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+	spin wheels6 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+	spin wheels7 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+	spin wheels8 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+}
+
+StopMoving()
+{
+	moving = FALSE;
+	
+	// I don't like insta braking. It's not perfect but works for most cases.
+	// Probably looks goofy when the unit is turtling around, i.e. does not become faster as time increases..
+	once = animCount*ANIM_SPEED/1000;
+
+	stop-spin wheels1 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+	stop-spin wheels2 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+	stop-spin wheels3 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+	stop-spin wheels4 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+	stop-spin wheels5 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+	stop-spin wheels6 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+	stop-spin wheels7 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+	stop-spin wheels8 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+}
+
+// Weapons
+AimFromWeapon1(piecenum)
+{
+	piecenum = turret;
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = firepoint;
+}
+
+AimWeapon1 (heading, pitch)
+{
+	signal SIG_AIM1;
+	set-signal-mask SIG_AIM1;
+	
+
+	turn turret to y-axis (heading) speed TURRET_TURN_SPEED;
+	turn sleeve to x-axis (0-pitch) speed GUN_TURN_SPEED;
+
+	wait-for-turn turret around y-axis;
+	wait-for-turn sleeve around x-axis;
+	start-script RestoreAfterDelay(RESTORE_DELAY);
+	
+	return (TRUE);
+}
+
+Shot1()
+{
+	move barrel to z-axis [-3.5] now;
+	sleep 150;
+	move barrel to z-axis 0 speed [10];
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode body type BITMAPONLY | BITMAP;
+		explode turret type BITMAPONLY | BITMAP;
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode barrel type FALL | SMOKE | FIRE | BITMAP;
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode tracks1 type SHATTER | SMOKE | FIRE | BITMAP;
+		hide tracks2;
+		hide tracks3;
+		hide tracks4;
+	}
+
+	return corpsetype;
+}
+
+Create()
+{
+	moving = FALSE;
+	
+	hide tracks1;
+	hide tracks2;
+	hide tracks3;
+
+	while (get BUILD_PERCENT_LEFT)
+		sleep 250;
+	
+	start-script AnimationControl();
+	start-script DamageControl();
+}

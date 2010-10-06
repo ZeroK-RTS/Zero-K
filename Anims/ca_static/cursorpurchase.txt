@@ -1,0 +1,2 @@
+hotspot topleft
+frame  anims/ca_static/cursorpurchase_0.png  0.100 

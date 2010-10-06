@@ -1,0 +1,149 @@
+piece body,head,tail,lthigh,lknee,lshin,lfoot,rthigh,rknee,rshin,rfoot,rsack,lsack,rblade,lblade,spike1,spike2,spike3;
+
+static-var bMoving, lasthit, counter;
+
+// Signal definitions
+#define SIG_AIM				2
+#define SIG_AIM_2			4
+#define SIG_MOVE			16
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+walk()
+{		
+	if (bMoving)
+			{
+//			bMoving = FALSE;
+			turn lthigh to x-axis <70> speed<230>;
+			turn lknee to x-axis <-40> speed<270>;
+			turn lshin to x-axis <20> speed<270>;
+			turn lfoot to x-axis <-50> speed<420>;
+			
+			turn rthigh to x-axis <-20> speed<420>;
+			turn rknee to x-axis <-60> speed<420>;
+			turn rshin to x-axis <50> speed<420>;
+			turn rfoot to x-axis <30> speed<420>;
+			
+			turn body to z-axis <5> speed <40>;
+			turn lthigh to z-axis <-5> speed <40>;
+			turn rthigh to z-axis <-5> speed <40>;
+			move body to y-axis [0.7] speed <8000>;			
+			turn tail to y-axis <10> speed <80>;
+			turn head to x-axis <-10> speed <40>;
+			turn tail to x-axis <10> speed <40>;
+			wait-for-turn lthigh around x-axis;
+			
+			turn lthigh to x-axis <-10> speed<320>;
+			turn lknee to x-axis <15> speed<270>;
+			turn lshin to x-axis <-60> speed<500>;
+			turn lfoot to x-axis <30> speed<270>;
+			
+			turn rthigh to x-axis <40> speed<270>;
+			turn rknee to x-axis <-35> speed<270>;
+			turn rshin to x-axis <-40> speed<270>;
+			turn rfoot to x-axis <35> speed<270>;
+			
+			move body to y-axis <0> speed <8000>;
+			turn head to x-axis <10> speed <40>;
+			turn tail to x-axis <-10> speed <40>;
+			wait-for-turn lshin around x-axis;
+			
+			turn rthigh to x-axis <70> speed<230>;
+			turn rknee to x-axis <-40> speed<270>;
+			turn rshin to x-axis <20> speed<270>;
+			turn rfoot to x-axis <-50> speed<420>;
+			
+			turn lthigh to x-axis <-20> speed<420>;
+			turn lknee to x-axis <-60> speed<420>;
+			turn lshin to x-axis <50> speed<420>;
+			turn lfoot to x-axis <30> speed<420>;
+			
+			turn tail to y-axis <-10> speed <80>;
+			turn body to z-axis <-5> speed <40>;
+			turn lthigh to z-axis <5> speed <40>;
+			turn rthigh to z-axis <5> speed <40>;
+			move body to y-axis [0.7] speed <8000>;
+			turn head to x-axis <-10> speed <40>;
+			turn tail to x-axis <10> speed <40>;
+			wait-for-turn rthigh around x-axis;
+			
+			turn rthigh to x-axis <-10> speed<320>;
+			turn rknee to x-axis <15> speed<270>;
+			turn rshin to x-axis <-60> speed<500>;
+			turn rfoot to x-axis <30> speed<270>;
+			
+			turn lthigh to x-axis <40> speed<270>;
+			turn lknee to x-axis <-35> speed<270>;
+			turn lshin to x-axis <-40> speed<270>;
+			turn lfoot to x-axis <35> speed<270>;
+			
+			
+			move body to y-axis <0> speed <8000>;
+			turn head to x-axis <10> speed <40>;
+			turn tail to x-axis <-10> speed <40>;
+			wait-for-turn rshin around x-axis;
+			
+//			bMoving = FALSE;
+			start-script walk();
+			}
+}
+
+stopwalk ()
+{	
+	turn lfoot		to x-axis <0> 		speed <200>;
+	turn rfoot		to x-axis <0> 		speed <200>;
+	turn rthigh 	to x-axis <0> 		speed <200>;
+	turn lthigh 	to x-axis <0> 		speed <200>;
+	turn lshin  	to x-axis <0> 		speed <200>;
+	turn rshin 		to x-axis <0> 		speed <200>;
+	turn lknee  	to x-axis <0> 		speed <200>;
+	turn rknee 		to x-axis <0> 		speed <200>;
+}
+
+StartMoving()
+{
+	bMoving = TRUE;
+	start-script walk();
+}
+
+StopMoving()
+{
+	bMoving = FALSE;
+	start-script stopwalk();
+}
+
+Create()
+{	
+	emit-sfx 1024+2 from body;
+}
+
+SweetSpot(piecenum)
+	{	piecenum=body;	}	
+	
+
+RestoreAfterDelay()
+	{
+	sleep 1000;
+	}
+
+
+HitByWeaponId()
+	{
+	emit-sfx 1024 from body;
+	return 100;
+	}
+
+Killed(severity, corpsetype)
+{
+	explode spike1 type FALL | EXPLODE_ON_HIT;
+	explode spike2 type FALL | EXPLODE_ON_HIT;
+	explode spike3 type FALL | EXPLODE_ON_HIT;
+	explode spike1 type FALL | EXPLODE_ON_HIT;
+	explode spike2 type FALL | EXPLODE_ON_HIT;
+	explode spike3 type FALL | EXPLODE_ON_HIT;
+	explode spike1 type FALL | EXPLODE_ON_HIT;
+	explode spike2 type FALL | EXPLODE_ON_HIT;
+	explode spike3 type FALL | EXPLODE_ON_HIT;
+	explode body type SHATTER | EXPLODE_ON_HIT;
+}

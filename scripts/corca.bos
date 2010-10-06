@@ -1,0 +1,187 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, winga, wingb, doora, doorb, thrusta1, thrusta2, thrustb, emit;
+
+static-var  statechg_DesiredState, statechg_StateChanging;
+
+lua_QueryNanoPiece() 
+{
+  return 0;
+}
+
+activatescr()
+{
+	if( TRUE )
+	{
+		turn winga to z-axis <0.000000> now;
+		turn winga to z-axis <-90.142857> speed <61.868132>;
+		turn wingb to z-axis <0.000000> now;
+		turn wingb to z-axis <90.142857> speed <61.868132>;
+		sleep 1457;
+	}
+	sleep 12;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		turn winga to z-axis <-90.142857> now;
+		turn winga to z-axis <0.000000> speed <61.950549>;
+		turn wingb to z-axis <90.142857> now;
+		turn wingb to z-axis <0.000000> speed <61.950549>;
+		sleep 1455;
+	}
+	sleep 18;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+StartBuilding()
+{
+	set INBUILDSTANCE to 1;
+}
+
+StopBuilding()
+{
+	set INBUILDSTANCE to 0;
+}
+
+QueryNanoPiece(piecenum)
+{
+	piecenum = emit;
+	call-script lua_QueryNanoPiece(piecenum);
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode doora type BITMAPONLY | BITMAP3;
+		explode doorb type BITMAPONLY | BITMAP4;
+		explode thrusta1 type BITMAPONLY | BITMAP1;
+		explode thrusta2 type BITMAPONLY | BITMAP2;
+		explode thrustb type BITMAPONLY | BITMAP3;
+		explode winga type BITMAPONLY | BITMAP5;
+		explode wingb type BITMAPONLY | BITMAP1;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode doora type BITMAPONLY | BITMAP3;
+		explode doorb type BITMAPONLY | BITMAP4;
+		explode thrusta1 type FALL | BITMAP1;
+		explode thrusta2 type FALL | BITMAP2;
+		explode thrustb type FALL | BITMAP3;
+		explode winga type SHATTER | BITMAP5;
+		explode wingb type BITMAPONLY | BITMAP1;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode doora type BITMAPONLY | BITMAP3;
+		explode doorb type BITMAPONLY | BITMAP4;
+		explode thrusta1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode thrusta2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode thrustb type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode winga type SHATTER | BITMAP5;
+		explode wingb type BITMAPONLY | BITMAP1;
+		return (0);
+	}
+	corpsetype = 2;
+	explode base type BITMAPONLY | BITMAP1;
+	explode doora type BITMAPONLY | BITMAP3;
+	explode doorb type BITMAPONLY | BITMAP4;
+	explode thrusta1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode thrusta2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode thrustb type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode winga type SHATTER | EXPLODE_ON_HIT | BITMAP5;
+	explode wingb type BITMAPONLY | BITMAP1;
+}

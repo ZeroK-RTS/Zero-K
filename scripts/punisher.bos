@@ -1,0 +1,475 @@
+piece base, pelvis, torso, rgun, lgun, rbarrel, lbarrel, fp1, fp2, rflap1, rflap2, rflap3, rflap4, lflap1,
+lflap2, lflap3, lflap4, rupleg, rloleg, rfoot, lupleg, lloleg, lfoot, rftoe, rrtoe, lftoe, lrtoe;
+
+static-var  bMoving, bAiming, Static_Var_3, restore_delay, gun1, aimer, regspeed, ready, pace;
+#include "constants.h"
+
+#ifndef MAX_SPEED
+#define MAX_SPEED 75 
+#endif
+
+// Signal definitions
+
+#define SIG_AIM				2
+#define SIG_AIM_2			4
+#define SIG_MOVE			16
+#define pace				6000
+
+
+
+
+walk()
+{
+//	signal 32;
+//	set-signal-mask 32;
+	turn rupleg 	to y-axis <0> 		speed pace;
+	turn lupleg 	to y-axis <0> 		speed pace;
+	
+	turn rupleg 	to z-axis <0> 		speed pace;
+	turn lupleg 	to z-axis <0> 		speed pace;
+	turn lfoot 	to z-axis <0> 		speed pace;
+	turn rfoot 	to z-axis <0> 		speed pace;
+			
+	if (bMoving)
+	{
+
+		turn rupleg to x-axis <-70.000000> speed pace*4; //Forward
+		turn rloleg to x-axis <70.000000> speed pace*9;
+		turn rfoot to x-axis <0.000000> speed pace*4;
+		
+		turn rftoe to x-axis <0> speed  pace*6;
+		turn rrtoe to x-axis <0> speed pace*6;
+		
+		turn lupleg to x-axis <10.000000> speed pace*4; //Back
+		turn lloleg to x-axis <0.000000> speed pace*2;
+		turn lfoot to x-axis <-10.000000> speed pace*2;
+		
+		turn lftoe to x-axis <-20> speed  pace*6;
+		
+		turn torso to z-axis <5> speed  pace*0.4;
+		turn torso to x-axis <3> speed  pace*1;
+
+		wait-for-turn rloleg around x-axis;
+	}
+	if (bMoving)
+	{
+	
+		turn rupleg to x-axis <10.000000> speed pace*4; //Mid
+		turn rloleg to x-axis <20.000000> speed pace*5;
+		turn rfoot to x-axis <10.000000> speed pace*1;
+	
+		turn lupleg to x-axis <-70.000000> speed pace*4; //Up
+		turn lloleg to x-axis <-20.000000> speed pace*2;
+		turn lfoot to x-axis <40.000000> speed pace*4;
+		
+		turn lftoe to x-axis <30> speed  pace*3;
+		turn lrtoe to x-axis <-30> speed pace*3;
+		
+		turn torso to x-axis <-3> speed  pace*1;
+		
+		wait-for-turn rloleg around x-axis;
+	}	
+	if (bMoving)
+	{
+	
+		turn rupleg to x-axis <10.000000> speed pace*4; //Back
+		turn rloleg to x-axis <0.000000> speed pace*2;
+		turn rfoot to x-axis <-10.000000> speed pace*2;
+		
+		turn rftoe to x-axis <-20> speed  pace*6;
+		
+		turn lupleg to x-axis <-70.000000> speed pace*4; //Forward
+		turn lloleg to x-axis <70.000000> speed pace*9;
+		turn lfoot to x-axis <0.000000> speed pace*4;
+		
+		turn lftoe to x-axis <0> speed  pace*6;
+		turn lrtoe to x-axis <0> speed pace*6;
+		
+		turn torso to z-axis <-5> speed  pace*0.4;
+		turn torso to x-axis <3> speed  pace*1;
+		
+		wait-for-turn rloleg around x-axis;
+	}
+	if (bMoving)
+	{
+	
+		turn rupleg to x-axis <-70.000000> speed pace*4; //Up
+		turn rloleg to x-axis <-20.000000> speed pace*2;
+		turn rfoot to x-axis <40.000000> speed pace*4;
+		
+		turn rftoe to x-axis <30> speed  pace*3;
+		turn rrtoe to x-axis <-30> speed pace*3;
+	
+		turn lupleg to x-axis <10.000000> speed pace*4; //Mid
+		turn lloleg to x-axis <20.000000> speed pace*5;
+		turn lfoot to x-axis <10.000000> speed pace*1;
+		
+		turn torso to x-axis <-3> speed  pace*1;
+		
+		wait-for-turn rloleg around x-axis;
+	}
+}
+
+stop()
+{
+	signal 32;
+	turn lupleg to x-axis <0.000000> speed <50.010989>;
+	turn rupleg to x-axis <0.000000> speed <50.010989>;
+	turn lloleg to x-axis <0.000000> speed <100.021978>;
+	turn rloleg to x-axis <0.000000> speed <100.021978>;
+	if( !bAiming )
+	{
+		turn torso to z-axis <0.000000> speed <100.021978>;
+		turn torso to x-axis <0.000000> speed <20.000000>;
+	}
+	turn rftoe to x-axis <0.000000> speed <100.021978>;
+	turn rrtoe to x-axis <0.000000> speed <100.021978>;
+	turn lftoe to x-axis <0.000000> speed <100.021978>;
+	turn lrtoe to x-axis <0.000000> speed <100.021978>;
+	turn rfoot to x-axis <0.000000> speed <100.021978>;
+	turn lfoot to x-axis <0.000000> speed <100.021978>;
+	wait-for-turn torso around x-axis;
+	if( !bAiming )
+	{
+		turn torso to x-axis <10.000000> speed <48.010989>;
+	}
+	wait-for-turn torso around x-axis;
+	if( !bAiming )
+	{
+		turn torso to x-axis <-3.000000> speed <48.010989>;
+	}
+	wait-for-turn torso around x-axis;
+	if( !bAiming )
+	{
+		turn torso to x-axis <0.000000> speed <48.010989>;
+	}
+	wait-for-turn torso around x-axis;
+	sleep 20;
+	return (0);
+}
+
+MotionControl()
+{
+	while ( TRUE )
+	{
+		IF (bMoving)
+		{
+			IF (bAiming)
+			{
+				CALL-SCRIPT walk();
+			}
+                else
+			{
+				CALL-SCRIPT walk();
+			}
+		}
+		else
+		{
+			sleep 20; 
+		}
+	}
+} 
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from torso;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+
+undeploy()
+{
+	aimer = 0;
+	sleep 2000;	
+	aimer = 1;
+	set MAX_SPEED to regspeed;
+}
+
+deploy()
+{
+	aimer = 0;
+	set MAX_SPEED to 1;
+	sleep 2000;
+	aimer = 2;
+}
+
+Toggle(t,value) 
+{
+
+if(t==1)
+	{
+if(value==0)
+{
+call-script undeploy();
+}
+
+if(value==1)
+{
+call-script deploy();	
+}
+	}
+
+}
+
+Create()
+{
+	bMoving = FALSE;
+	bAiming = FALSE;
+	Static_Var_3 = 1;
+	regspeed = get MAX_SPEED;
+//	pace = get ((MAX_SPEED)*60000); // Sets the walking pace to the current speed of the unit
+	start-script SmokeUnit();
+	start-script MotionControl();
+	gun1 = 0;
+	ready=1;
+	aimer = 1;
+}
+
+StartMoving()
+{
+	bMoving = TRUE;
+}
+
+StopMoving()
+{
+	bMoving = FALSE;
+	CALL-SCRIPT stop();
+}
+
+
+RestoreAfterDelay()
+{
+if (aimer == 1)
+{
+	sleep 6000;
+}
+if (aimer == 2)
+{
+	sleep 30000;
+}
+	turn rflap1 to x-axis <0> speed <168.192308>;
+	turn rflap2 to x-axis <0> speed <168.192308>;
+	turn rflap3 to y-axis <0> speed <168.192308>;
+	turn rflap4 to y-axis <0> speed <168.192308>;
+	turn lflap1 to x-axis <0> speed <168.192308>;
+	turn lflap2 to x-axis <0> speed <168.192308>;
+	turn lflap3 to y-axis <0> speed <168.192308>;
+	turn lflap4 to y-axis <0> speed <168.192308>;
+	turn torso to y-axis <0.000000> speed <90.016484>;
+	turn torso to x-axis <0.000000> speed <45.005495>;
+	turn lgun to x-axis <0.000000> speed <45.005495>;
+	turn rgun to x-axis <0.000000> speed <45.005495>;
+	wait-for-turn torso around y-axis;
+	wait-for-turn torso around x-axis;
+	wait-for-turn lgun around x-axis;
+	wait-for-turn rgun around x-axis;
+	bAiming = FALSE;
+}
+
+reload()
+{
+if (ready == 0)
+	{
+	sleep 5000;
+	ready = 1;
+	}
+if (ready == 6)
+	{
+	sleep 30000;
+	ready = 1;
+	}
+}
+
+AimPrimary(heading, pitch)
+{
+if (aimer == 2 OR aimer == 0)
+	{
+	return 0;
+	}
+if (aimer == 1)
+{	
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	bAiming = TRUE;
+	start-script RestoreAfterDelay();
+	turn rflap1 to x-axis <0> speed <168.192308>;
+	turn rflap2 to x-axis <0> speed <168.192308>;
+	turn rflap3 to y-axis <0> speed <168.192308>;
+	turn rflap4 to y-axis <0> speed <168.192308>;
+	turn lflap1 to x-axis <0> speed <168.192308>;
+	turn lflap2 to x-axis <0> speed <168.192308>;
+	turn lflap3 to y-axis <0> speed <168.192308>;
+	turn lflap4 to y-axis <0> speed <168.192308>;
+	turn rgun to x-axis 0 - pitch speed <168.192308>;
+	turn lgun to x-axis 0 - pitch speed <168.192308>;
+	turn torso to y-axis heading speed <65>;
+	wait-for-turn torso around y-axis;
+	wait-for-turn lgun around x-axis;	 
+	if (ready == 1)
+		{
+		return (1);
+		}
+	}
+}
+
+AimSecondary(heading, pitch)
+{
+if (aimer == 1 OR aimer == 0)
+	{
+	return 0;
+	}
+if (aimer == 2)
+{	
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	bAiming = TRUE;
+	start-script RestoreAfterDelay();
+	turn rflap1 to x-axis <-30> speed <168.192308>;
+	turn rflap2 to x-axis <30> speed <168.192308>;
+	turn rflap3 to y-axis <-30> speed <168.192308>;
+	turn rflap4 to y-axis <25> speed <168.192308>;
+	turn lflap1 to x-axis <-30> speed <168.192308>;
+	turn lflap2 to x-axis <30> speed <168.192308>;
+	turn lflap3 to y-axis <-25> speed <168.192308>;
+	turn lflap4 to y-axis <30> speed <168.192308>;	
+	turn rgun to x-axis 0 - pitch speed <168.192308>;
+	turn lgun to x-axis 0 - pitch speed <168.192308>;
+	turn torso to y-axis heading speed <65>;
+	wait-for-turn torso around y-axis;
+	wait-for-turn lgun around x-axis;	 
+		if (ready == 1)
+		{
+		return (1);
+		}
+	}
+}
+
+AimFromPrimary(piecenum)
+{
+	piecenum = torso;
+}
+
+AimFromSecondary(piecenum)
+{
+	piecenum = torso;
+}
+
+FirePrimary()
+{
+if ( aimer == 1)
+	{
+	if (gun1 == 1)
+	{
+	emit-sfx 1024+0 from fp2;
+	move lbarrel to z-axis [-3.0000] speed [200.000000];
+	sleep 150;
+	move lbarrel to z-axis [0.000000] speed [10.000000];
+	}
+	if ( gun1 == 0)
+	{
+	emit-sfx 1024+0 from fp1;
+	move rbarrel to z-axis [-3.0000] speed [200.000000];
+	sleep 150;
+	move rbarrel to z-axis [0.000000] speed [10.000000];
+	}
+gun1 = 1 - gun1;
+	}
+}
+
+Shot2()
+{
+if (aimer == 2)
+{
+	if (gun1 == 1)
+	{
+	emit-sfx 1024+0 from fp2;
+	move lbarrel to z-axis [-3.0000] speed [200.000000];
+	sleep 150;
+	move lbarrel to z-axis [0.000000] speed [20.000000];
+	}
+	if ( gun1 == 0)
+	{
+	emit-sfx 1024+0 from fp1;
+	move rbarrel to z-axis [-3.0000] speed [200.000000];
+	sleep 150;
+	move rbarrel to z-axis [0.000000] speed [20.000000];
+	}
+gun1 = 1 - gun1;
+}
+}
+
+
+QueryPrimary(piecenum)
+{
+	if ( gun1 == 0)
+	{
+	piecenum = fp1;
+	}
+	if ( gun1 == 1)
+	{
+	piecenum = fp2;
+	}
+
+}
+
+QuerySecondary(piecenum)
+{
+	if ( gun1 == 0 )
+	{
+	piecenum = fp1;
+	}
+	if ( gun1 == 1 )
+	{
+	piecenum = fp2;
+	}
+
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = torso;
+}
+
+Killed(severity, corpsetype)
+{
+
+	if( severity <= 199 )
+	{
+		corpsetype = 3;
+		explode base type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode pelvis type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode torso type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode lgun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode rgun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode rupleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode rloleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode rfoot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode lupleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode lloleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode lfoot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		return (0);
+	}
+
+}

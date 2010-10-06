@@ -1,0 +1,23 @@
+[MINE_NUKE]
+{
+  name=NuclearMine;
+  areaofeffect=768;
+  craterboost=5;
+  cratermult=5;
+  edgeeffectiveness=0.2;
+  explosiongenerator=custom:NUKE_300;
+  impulseboost=0.25;
+  impulsefactor=0.1;
+  interceptedbyshieldtype=1;
+  range=1000;
+  reloadtime=3.6;
+  rendertype=4;
+  soundhit=otaunit/xplonuk3;
+  soundstart=otaunit/largegun;
+  waterweapon=1;
+  weaponvelocity=250;
+  [DAMAGE]
+  {
+    default=7500;
+  }
+}

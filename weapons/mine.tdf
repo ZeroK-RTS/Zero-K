@@ -1,0 +1,22 @@
+
+[MINE_CORE]
+{
+  name=Mine;
+  areaofeffect=240;
+  craterboost=0.5;
+  cratermult=1;
+  edgeeffectiveness=0.6;
+  explosiongenerator=custom:BigBulletImpact;
+  impulseboost=0.25;
+  impulsefactor=0.1;
+  interceptedbyshieldtype=1;
+  range=240;
+  reloadtime=3.6;
+  rendertype=4;
+  soundhit=explosion/ex_small1;
+  weaponvelocity=250;
+  [DAMAGE]
+  {
+    default=2200;
+  }
+}

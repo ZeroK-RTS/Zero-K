@@ -1,0 +1,12 @@
+"By extracting any of the contents from this archive you are agreeing to the terms of 'flex rights' copyright system, which is transferable to CCNC, CCSA, GPL, or PD with the exception that proper credit is given to the original artists of the content."
+
+"Credits are as following, and if are not specified are given to "SeanHeron, bobthedinosaur, and the Engines of War Development Team":"
+
+Dante (Queen): bobthedinosaur (model), Wolf-in-Exile (texture)
+-corpse: bobthedinosaur
+
+Recon Comm (Knight): bobthedinosaur
+
+Support Comm (Bishop): bobthedinosaur (model), Wolf-in-Exile (texture)
+-corpse: bobthedinosaur
+

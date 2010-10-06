@@ -1,0 +1,211 @@
+piece body,head,tail,lthigh,lknee,lshin,lfoot,rthigh,rknee,rshin,rfoot;
+
+static-var bMoving, bAiming, bCanAim,shooting_num;
+
+// Signal definitions
+#define SIG_AIM				2
+#define SIG_AIM_2			4
+#define SIG_MOVE			16
+
+#include "sfxtype.h"
+#include "exptype.h"
+#include "StateChg.h"
+
+
+
+lua_ReplaceMe() { return 0; }
+lua_Surface() { return 0; }
+
+Go()
+{
+	call-script lua_Surface();
+	call-script lua_ReplaceMe();	
+}
+
+Stop()
+{	
+}
+#define ACTIVATECMD	    call-script Go();
+#define DEACTIVATECMD   call-script Stop();
+#include "StateChg.h"
+
+Activate()
+{	
+	start-script RequestState(ACTIVE);
+}
+
+Deactivate()
+{
+	start-script RequestState(INACTIVE);
+}
+walk()
+{		
+	if (bMoving)
+			{
+//			bMoving = FALSE;
+			turn lthigh to x-axis <70> speed<230>;
+			turn lknee to x-axis <-40> speed<270>;
+			turn lshin to x-axis <20> speed<270>;
+			turn lfoot to x-axis <-50> speed<420>;
+			
+			turn rthigh to x-axis <-20> speed<420>;
+			turn rknee to x-axis <-60> speed<420>;
+			turn rshin to x-axis <50> speed<420>;
+			turn rfoot to x-axis <30> speed<420>;
+			
+			turn body to z-axis <5> speed <40>;
+			turn lthigh to z-axis <-5> speed <40>;
+			turn rthigh to z-axis <-5> speed <40>;
+			move body to y-axis [0.7] speed <8000>;			
+			turn tail to y-axis <10> speed <80>;
+			turn head to x-axis <-10> speed <40>;
+			turn tail to x-axis <10> speed <40>;
+			wait-for-turn lthigh around x-axis;
+			
+			turn lthigh to x-axis <-10> speed<320>;
+			turn lknee to x-axis <15> speed<270>;
+			turn lshin to x-axis <-60> speed<500>;
+			turn lfoot to x-axis <30> speed<270>;
+			
+			turn rthigh to x-axis <40> speed<270>;
+			turn rknee to x-axis <-35> speed<270>;
+			turn rshin to x-axis <-40> speed<270>;
+			turn rfoot to x-axis <35> speed<270>;
+			
+			move body to y-axis <0> speed <8000>;
+			turn head to x-axis <10> speed <40>;
+			turn tail to x-axis <-10> speed <40>;
+			wait-for-turn lshin around x-axis;
+			
+			turn rthigh to x-axis <70> speed<230>;
+			turn rknee to x-axis <-40> speed<270>;
+			turn rshin to x-axis <20> speed<270>;
+			turn rfoot to x-axis <-50> speed<420>;
+			
+			turn lthigh to x-axis <-20> speed<420>;
+			turn lknee to x-axis <-60> speed<420>;
+			turn lshin to x-axis <50> speed<420>;
+			turn lfoot to x-axis <30> speed<420>;
+			
+			turn tail to y-axis <-10> speed <80>;
+			turn body to z-axis <-5> speed <40>;
+			turn lthigh to z-axis <5> speed <40>;
+			turn rthigh to z-axis <5> speed <40>;
+			move body to y-axis [0.7] speed <8000>;
+			turn head to x-axis <-10> speed <40>;
+			turn tail to x-axis <10> speed <40>;
+			wait-for-turn rthigh around x-axis;
+			
+			turn rthigh to x-axis <-10> speed<320>;
+			turn rknee to x-axis <15> speed<270>;
+			turn rshin to x-axis <-60> speed<500>;
+			turn rfoot to x-axis <30> speed<270>;
+			
+			turn lthigh to x-axis <40> speed<270>;
+			turn lknee to x-axis <-35> speed<270>;
+			turn lshin to x-axis <-40> speed<270>;
+			turn lfoot to x-axis <35> speed<270>;
+			
+			
+			move body to y-axis <0> speed <8000>;
+			turn head to x-axis <10> speed <40>;
+			turn tail to x-axis <-10> speed <40>;
+			wait-for-turn rshin around x-axis;
+			
+//			bMoving = FALSE;
+			start-script walk();
+			}
+}
+
+MotionControl(moving, aiming, justmoved)
+{
+	justmoved = TRUE;
+	while( TRUE )
+	{
+		moving = bMoving;
+		aiming = bAiming;
+	}
+}
+
+stopwalk ()
+{	
+	turn lfoot		to x-axis <0> 		speed <200>;
+	turn rfoot		to x-axis <0> 		speed <200>;
+	turn rthigh 	to x-axis <0> 		speed <200>;
+	turn lthigh 	to x-axis <0> 		speed <200>;
+	turn lshin  	to x-axis <0> 		speed <200>;
+	turn rshin 		to x-axis <0> 		speed <200>;
+	turn lfoot		to y-axis <0> 		speed <200>;
+	turn rfoot		to y-axis <0> 		speed <200>;
+	turn rthigh 	to y-axis <0> 		speed <200>;
+	turn lthigh 	to y-axis <0> 		speed <200>;
+	turn lshin  	to y-axis <0> 		speed <200>;
+	turn rshin 		to y-axis <0> 		speed <200>;
+}
+
+StartMoving()
+{
+	bMoving = TRUE;
+	start-script walk();
+}
+
+StopMoving()
+{
+	bMoving = FALSE;
+	start-script	stopwalk();
+}
+
+Create()
+{
+	
+	move body to y-axis [-20.0] now;
+	
+	emit-sfx 1024+2 from body;
+	
+	
+	start-script RequestState(INACTIVE);
+}
+
+
+
+SweetSpot(piecenum)
+	{	piecenum=body;	}	
+	
+AimFromPrimary(piecenum)
+	{	piecenum=head;	}
+
+QueryPrimary(piecenum)
+	{	piecenum=head; }
+
+RestoreAfterDelay()
+	{
+	sleep 1000;
+	}
+
+AimPrimary(heading,pitch)
+	{
+	
+    call-script lua_ReplaceMe();
+	
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	bAiming = TRUE;
+	turn head to y-axis heading speed <250>;
+	turn head to x-axis 0 -pitch speed <200>;
+		
+	wait-for-turn head around y-axis;
+	start-script RestoreAfterDelay();
+	
+	return(TRUE);
+	}
+	
+	
+
+Killed( severity, corpsetype )
+	{
+	if (severity <= 25)
+		{
+		corpsetype = 1;
+		}
+	return( 0 );
+	}

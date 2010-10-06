@@ -1,0 +1,266 @@
+//linear constant = 65536
+
+#include "constants.h"
+
+piece  fuselage, wingl, wingr, enginel, enginer, head, turretbase, turret, sleevel, sleever, barrell, barrelr, flarel, flarer, bomb;
+
+static-var  Static_Var_1, gun_2, statechg_DesiredState, statechg_StateChanging;
+
+// Signal definitions
+#define SIG_AIM_2			2
+
+#define FUEL_USE_DELAY		200
+
+activatescr()
+{
+	if( TRUE )
+	{
+		move wingl to x-axis [0] speed [7];
+		move wingr to x-axis [0] speed [7];
+		sleep 998;
+	}
+	sleep 44;
+	return (0);
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		move wingl to x-axis [0] now;
+		move wingl to x-axis [2] speed [7];
+		move wingr to x-axis [0] now;
+		move wingr to x-axis [-2] speed [7];
+		sleep 998;
+	}
+	sleep 44;
+	return (0);
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from fuselage;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+	return (0);
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+	return (0);
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+	return (0);
+}
+
+Create()
+{
+	turn turret to y-axis <180.000000> now;
+	Static_Var_1 = 3000;
+	call-script InitState();
+	start-script SmokeUnit();
+	move wingl to x-axis [2] now;
+	move wingr to x-axis [-2] now;
+	return (0);
+}
+
+Activate()
+{
+	start-script RequestState(0);
+	return (0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+	return (0);
+}
+
+RestoreAfterDelay()
+{
+	sleep Static_Var_1;
+	turn turret to y-axis <180> speed <90>;
+	turn sleevel to x-axis <0> speed <50>;
+	turn sleever to x-axis <0> speed <50>;
+	return (0);
+}
+AimPrimary(heading, pitch)
+{
+	return (1);
+}
+
+FirePrimary()
+{
+	sleep FUEL_USE_DELAY;
+	set CURRENT_FUEL to 0;
+	return (0);
+}
+
+QueryPrimary(piecenum)
+{
+	piecenum = bomb;
+	return (0);
+}
+
+AimFromPrimary(piecenum)
+{
+	piecenum = bomb;
+	return (0);
+}
+
+FireWeapon2()
+{
+    emit-sfx 1025 from turret;
+	if ( gun_2 == 0)
+	{
+	    emit-sfx 1024 from flarel;
+		gun_2 = 1;
+	}
+	else if ( gun_2 == 1)
+	{
+	    emit-sfx 1024 from flarer;
+		gun_2 = 0;
+	}
+}
+
+AimFromWeapon2(piecenum)
+{
+	if ( gun_2 == 0)
+	{
+		piecenum = flarel;
+	}
+	if ( gun_2 == 1 )
+	{
+	    piecenum = flarer;
+	}
+}
+
+QueryWeapon2(piecenum)
+{
+	if ( gun_2 == 0)
+	{
+		piecenum = flarel;
+	}
+	if ( gun_2 == 1 )
+	{
+	    piecenum = flarer;
+	}
+}
+
+
+AimWeapon2(heading, pitch)
+{
+	signal SIG_AIM_2;
+	set-signal-mask SIG_AIM_2;
+	turn turret to y-axis heading speed <390>;
+	turn sleevel to x-axis <0> - pitch speed <350>;
+	turn sleever to x-axis <0> - pitch speed <350>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn sleevel around x-axis;
+	wait-for-turn sleever around x-axis;
+	start-script RestoreAfterDelay();
+	return (1);
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY;
+		explode head type BITMAPONLY;
+		explode wingl type BITMAPONLY;
+		explode wingr type BITMAPONLY;
+		explode enginel type BITMAPONLY;
+		explode enginer type BITMAPONLY;
+		explode turret type BITMAPONLY;
+		explode sleevel type BITMAPONLY;
+		explode sleever type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY;
+		explode head type SHATTER;
+		explode wingl type FALL;
+		explode wingr type FALL;
+		explode enginel type FALL | SMOKE;
+		explode enginer type FALL | SMOKE;
+		explode turret type SHATTER;
+		explode sleevel type FALL;
+		explode sleever type FALL;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 2;
+		explode fuselage type FALL | SMOKE;
+		explode head type FALL | SMOKE | FIRE;
+		explode wingl type FALL | SMOKE;
+		explode wingr type FALL | SMOKE;
+		explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode turret type FALL | SMOKE | FIRE;
+		explode sleevel type FALL | SMOKE;
+		explode sleever type FALL | SMOKE;
+		return (0);
+	}
+	corpsetype = 2;
+	explode fuselage type FALL | SMOKE;
+	explode head type FALL | SMOKE | FIRE;
+	explode wingl type FALL | SMOKE;
+	explode wingr type FALL | SMOKE;
+	explode enginel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode enginer type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode turret type FALL | SMOKE | FIRE;
+	explode sleevel type FALL | SMOKE;
+	explode sleever type FALL | SMOKE;
+	return (0);
+}

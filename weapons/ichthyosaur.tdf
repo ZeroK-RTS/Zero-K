@@ -1,0 +1,24 @@
+[ICHTHYOSAUR]
+{
+  name=Super Torpedo;
+  areaofeffect=128;
+  craterboost=1;
+  cratermult=4;
+  edgeeffectiveness=0.8;
+  explosionGenerator=custom:TORPEDO_HIT;
+  explosionSpeed=10000;
+  impulseboost=0;
+  impulsefactor=0.4;
+  interceptedbyshieldtype=1;
+  range=450;
+  reloadtime=3.6;
+  rendertype=4;
+  soundhit=otaunit/xplonuk3;
+  soundstart=otaunit/largegun;
+  turret=1;
+  weaponvelocity=250;
+  [DAMAGE]
+  {
+    default=2000;
+  }
+}

@@ -1,0 +1,36 @@
+TA Weapons Factory:
+bomb_hit.wav
+
+Open LieroX:
+burn.wav
+burning.wav
+flamethrower.wav
+LightningBolt.wav
+soft_crunch.wav
+more_lightning.wav
+
+Astro Menance:
+emg.wav
+heavy_emg.wav
+
+Golgotha:
+lightning_fire.wav
+small_lightning.wav
+
+Nanoblobs:
+electrical_crackle.wav
+heavy_machinegun.wav
+nanosound2.wav
+saw.wav
+
+Kanoba:
+aoe_aura.wav
+bomb_drop.wav
+bomb_drop_short.wav
+depthcharge.wav
+
+Unkown:
+other_lightning.wav
+
+burn_mixed.wav - Open LieroX & Nanoblobs
+torpedo.wav - Kanoba & freeloops

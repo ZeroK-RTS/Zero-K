@@ -1,0 +1,195 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, solbase, solarpan_1, solarpan_2, solarpan_3, solar_1, solar_2, solar_3, solar_4;
+
+static-var  statechg_DesiredState, statechg_StateChanging;
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Go()
+{
+	turn solar_1 to z-axis <-130.000000> speed <80.000000>;
+	turn solar_2 to z-axis <130.000000> speed <80.000000>;
+	turn solar_3 to x-axis <130.000000> speed <80.000000>;
+	turn solar_4 to x-axis <-130.000000> speed <80.000000>;
+	wait-for-turn solar_1 around z-axis;
+	wait-for-turn solar_2 around z-axis;
+	wait-for-turn solar_3 around x-axis;
+	wait-for-turn solar_4 around x-axis;
+	turn solarpan_1 to z-axis <180.000000> speed <80.000000>;
+	turn solarpan_2 to z-axis <180.000000> speed <80.000000>;
+	turn solarpan_3 to z-axis <180.000000> speed <80.000000>;
+	wait-for-turn solarpan_1 around z-axis;
+	wait-for-turn solarpan_2 around z-axis;
+	wait-for-turn solarpan_3 around z-axis;
+	set ARMORED to 0;
+}
+
+Stop()
+{
+	set ARMORED to 1;
+	turn solarpan_1 to z-axis <0.000000> speed <120.000000>;
+	turn solarpan_2 to z-axis <0.000000> speed <120.000000>;
+	turn solarpan_3 to z-axis <0.000000> speed <120.000000>;
+	wait-for-turn solarpan_1 around z-axis;
+	wait-for-turn solarpan_2 around z-axis;
+	wait-for-turn solarpan_3 around z-axis;
+	turn solar_1 to z-axis <0.000000> speed <80.000000>;
+	turn solar_2 to z-axis <0.000000> speed <80.000000>;
+	turn solar_3 to x-axis <0.000000> speed <80.000000>;
+	turn solar_4 to x-axis <0.000000> speed <80.000000>;
+	wait-for-turn solar_1 around z-axis;
+	wait-for-turn solar_2 around z-axis;
+	wait-for-turn solar_3 around x-axis;
+	wait-for-turn solar_4 around x-axis;
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script Go();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script Stop();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	dont-shade solar_1;
+	dont-shade solar_2;
+	dont-shade solar_3;
+	dont-shade solar_4;
+	dont-shade solarpan_1;
+	dont-shade solarpan_2;
+	dont-shade solarpan_3;
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+HitByWeapon(Func_Var_1, Func_Var_2)
+{
+	signal 2;
+	set-signal-mask 2;
+	set ACTIVATION to 0;
+	sleep 8000;
+	set ACTIVATION to 1;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode solbase type BITMAPONLY | BITMAP1;
+		explode solar_1 type BITMAPONLY | BITMAP1;
+		explode solar_2 type BITMAPONLY | BITMAP1;
+		explode solar_3 type BITMAPONLY | BITMAP1;
+		explode solar_4 type BITMAPONLY | BITMAP1;
+		explode solarpan_1 type BITMAPONLY | BITMAP1;
+		explode solarpan_2 type BITMAPONLY | BITMAP1;
+		explode solarpan_3 type BITMAPONLY | BITMAP1;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode solbase type SHATTER | BITMAP4;
+		explode solar_1 type SHATTER | BITMAP4;
+		explode solar_2 type SHATTER | BITMAP4;
+		explode solar_3 type SHATTER | BITMAP4;
+		explode solar_4 type SHATTER | BITMAP4;
+		explode solarpan_1 type SHATTER | BITMAP4;
+		explode solarpan_2 type SHATTER | BITMAP4;
+		explode solarpan_3 type SHATTER | BITMAP4;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode solbase type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode solar_1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode solar_2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode solar_3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode solar_4 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode solarpan_1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode solarpan_2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode solarpan_3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		return (0);
+	}
+	corpsetype = 3;
+	explode solbase type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode solar_1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode solar_2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode solar_3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode solar_4 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode solarpan_1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode solarpan_2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode solarpan_3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+}

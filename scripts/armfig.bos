@@ -1,0 +1,303 @@
+#include "constants.h"
+
+piece	base, rfstrut, rrstrut, rhull, rwing, rgun, rbarrel, rflare1, rflare2, rjet, rwingtip, rfintip,
+		lfstrut, lrstrut, lhull, lwing, lgun, lbarrel, lflare1, lflare2, ljet, lwingtip, lfintip;
+
+static-var gun1, statechg_DesiredState, statechg_StateChanging;
+
+activatescr()
+{
+	if( TRUE )
+	{
+		move base to y-axis [0] speed [3.83];
+		
+		//extend wings
+			
+		move rwing to x-axis [0] speed [16];
+		move lwing to x-axis [0] speed [16];
+		
+		sleep 500;
+	}
+	if( TRUE )
+	{	
+		//extend side hulls
+		
+		turn rrstrut to y-axis <0> speed <180>;
+		turn rfstrut to y-axis <0> speed <180>;
+		turn rhull to y-axis <0> speed <180>;
+	
+		turn lrstrut to y-axis <0> speed <180>;
+		turn lfstrut to y-axis <0> speed <180>;
+		turn lhull to y-axis <0> speed <180>;
+	
+		sleep 500;
+	}
+	if( TRUE )
+	{	
+		//extend guns
+		move rgun to z-axis [0] speed [4];
+		move lbarrel to z-axis [0] speed [4];
+		
+		move lgun to z-axis [0] speed [4];
+		move lbarrel to z-axis [0] speed [4];
+		
+		sleep 500;
+	}
+	sleep 10;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		move base to y-axis [5.75] speed [3.83];
+		
+		//retract guns
+		
+		move rgun to z-axis [-2] speed [4];
+		move lbarrel to z-axis [-2] speed [4];
+		
+		move lgun to z-axis [-2] speed [4];
+		move lbarrel to z-axis [-2] speed [4];
+				
+		sleep 500;
+	}
+	if( TRUE )
+	{
+		//retract side hulls
+
+		turn rrstrut to y-axis <90> speed <180>;
+		turn rfstrut to y-axis <90> speed <180>;
+		turn rhull to y-axis <-90> speed <180>;
+	
+		turn lrstrut to y-axis <-90> speed <180>;
+		turn lfstrut to y-axis <-90> speed <180>;
+		turn lhull to y-axis <90> speed <180>;
+	
+		sleep 500;
+	}
+	if( TRUE )
+	{
+		//retract wings
+
+		move rwing to x-axis [-8] speed [16];
+		move lwing to x-axis [8] speed [16];
+		
+		sleep 500;
+	}
+	sleep 10;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{	
+	move base to y-axis [5.75] now;
+
+	move rgun to z-axis [-2] now;
+	move lbarrel to z-axis [-2] now;
+		
+	move lgun to z-axis [-2] now;
+	move lbarrel to z-axis [-2] now;
+	
+	move rwing to x-axis [-8] now;
+	move lwing to x-axis [8] now;
+
+	turn rrstrut to y-axis <90> now;
+	turn rfstrut to y-axis <90> now;
+	turn rhull to y-axis <-90> now;
+	
+	turn lrstrut to y-axis <-90> now;
+	turn lfstrut to y-axis <-90> now;
+	turn lhull to y-axis <90> now;		
+	
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+QueryWeapon1(piecenum)
+{
+	if( gun1 == 0 )
+	{
+		piecenum = rflare1;
+	}
+	if( gun1 == 1 )
+	{
+		piecenum = lflare1;
+	}
+	if( gun1 == 2 )
+	{
+		piecenum = rflare2;
+	}
+	if( gun1 == 3 )
+	{
+		piecenum = lflare2;
+	}
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = base;
+}
+
+AimWeapon1(heading, pitch)
+{
+	return (1);
+}
+
+Shot1()
+{
+	if( gun1 == 0 )
+	{
+		emit-sfx 1024 from rflare1;
+		emit-sfx 1025 from rbarrel;
+		sleep 60;
+	}
+	if( gun1 == 1 )
+	{
+		emit-sfx 1024 from lflare1;
+		emit-sfx 1025 from lbarrel;
+		sleep 60;
+	}
+	if( gun1 == 2 )
+	{
+		emit-sfx 1024 from rflare2;
+		emit-sfx 1025 from rbarrel;
+		sleep 60;
+	}
+	if( gun1 == 3 )
+	{
+		emit-sfx 1024 from lflare2;
+		emit-sfx 1025 from lbarrel;
+		sleep 60;
+	}
+	gun1 = 1 + gun1;
+
+	if( gun1 == 4 )
+	{
+		gun1 = 0;
+	}
+}
+
+BlockShot1(unit, block)
+{
+	if (get CRASHING)
+	{
+		block = 1;
+	}
+}
+
+BlockShot2(unit, block)
+{
+	if (get CRASHING)
+	{
+		block = 1;
+	}
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode rwing type BITMAPONLY | BITMAP5;
+		explode lwing type BITMAPONLY | BITMAP1;
+		explode rhull type BITMAPONLY | BITMAP2;
+		explode lhull type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode rwing type FALL | BITMAP2;
+		explode lwing type FALL | BITMAP3;
+		explode rhull type BITMAPONLY | BITMAP5;
+		explode lhull type SHATTER | BITMAP1;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode rwing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode lwing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode rhull type SHATTER | BITMAP1;
+		explode lhull type SHATTER | BITMAP1;
+		return (0);
+	}
+	corpsetype = 2;
+	explode base type BITMAPONLY | BITMAP1;
+	explode rwing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode lwing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode rhull type SHATTER | BITMAP1;
+	explode lhull type SHATTER | BITMAP1;
+}

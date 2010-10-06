@@ -1,0 +1,221 @@
+unitDef = {
+  unitname            = [[armroy]],
+  name                = [[Crusader]],
+  description         = [[Destroyer (Artillery/Skirmisher)]],
+  acceleration        = 0.033,
+  activateWhenBuilt   = true,
+  bmcode              = [[1]],
+  brakeRate           = 0.13,
+  buildAngle          = 16384,
+  buildCostEnergy     = 700,
+  buildCostMetal      = 700,
+  builder             = false,
+  buildPic            = [[armroy.png]],
+  buildTime           = 700,
+  canAttack           = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canstop             = [[1]],
+  category            = [[SHIP]],
+  corpse              = [[DEAD]],
+
+  customParams        = {
+    description_fr = [[Destroyer Artillerie/Anti-Sous-Marins]],
+    description_pl = [[Niszczyciel (Artyleria/Przeciw ?odziom Podwodnym)]],
+    helptext       = [[This Destroyer packs a powerful, long-range main cannon, useful for bombarding fixed emplacements and shore targets, as well as a depth charge launcher for use against subs. Beware of aircraft and Corvettes--the Destroyer's weapons have trouble hitting fast-moving targets.]],
+    helptext_fr    = [[Ce Destroyer embarque un puissant canon longue port?e et un lance grenade sous marines. Utile pour se d?barrasser de menaces sous marines ou de positions fixes, son canon est cependant trop peu pr?cis pour d?truire des menaces rapides.]],
+    helptext_pl    = [[Crusader posiada pot?n? armat? ?redniego zasi?gu idealn? do bombardowania nieruchomych wie?yczek broni?cych wybrze?y. Jego drug? broni? jest wyrzutnia ?adunk?w g??binowych przeciwko ?odziom podwodnym. ?atwo pada ofiar? jednostek lataj?cych i Korwet, gdy? nie posiada broni skutecznym przeciwko szybkim celom.]],
+  },
+
+  defaultmissiontype  = [[Standby]],
+  explodeAs           = [[BIG_UNITEX]],
+  floater             = true,
+  footprintX          = 4,
+  footprintZ          = 4,
+  iconType            = [[destroyer]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  maneuverleashlength = [[640]],
+  mass                = 350,
+  maxDamage           = 3090,
+  maxVelocity         = 3.1,
+  minCloakDistance    = 75,
+  minWaterDepth       = 10,
+  movementClass       = [[BOAT4]],
+  moveState           = 0,
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE]],
+  objectName          = [[armroy.s3o]],
+  scale               = [[0.5]],
+  seismicSignature    = 4,
+  selfDestructAs      = [[BIG_UNITEX]],
+  side                = [[ARM]],
+  sightDistance       = 660,
+  smoothAnim          = true,
+  sonarDistance       = 400,
+  steeringmode        = [[1]],
+  TEDClass            = [[SHIP]],
+  turninplace         = 0,
+  turnRate            = 199,
+  waterline           = 0,
+  workerTime          = 0,
+
+  weapons             = {
+
+    {
+      def                = [[PLASMA]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK FLOAT GUNSHIP HOVER]],
+    },
+
+
+    {
+      def                = [[DEPTHCHARGE]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK FLOAT SHIP GUNSHIP]],
+    },
+
+  },
+
+
+  weaponDefs          = {
+
+    DEPTHCHARGE = {
+      name                    = [[DepthCharge]],
+      areaOfEffect            = 32,
+      avoidFriendly           = false,
+      collideFriendly         = false,
+      craterBoost             = 1,
+      craterMult              = 2,
+
+      damage                  = {
+        default = 100,
+      },
+
+      edgeEffectiveness       = 0.99,
+      explosionGenerator      = [[custom:TORPEDO_HIT]],
+      guidance                = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      lineOfSight             = true,
+      model                   = [[depthcharge.s3o]],
+      noSelfDamage            = true,
+      predictBoost            = 1,
+      propeller               = [[1]],
+      range                   = 300,
+      reloadtime              = 5,
+      renderType              = 1,
+      selfprop                = true,
+      soundHit                = [[explosion/ex_underwater]],
+      soundStart              = [[weapon/torpedo]],
+      startVelocity           = 100,
+      tolerance               = 100000,
+      tracks                  = true,
+      turnRate                = 8000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponAcceleration      = 1,
+      weaponType              = [[TorpedoLauncher]],
+      weaponVelocity          = 100,
+    },
+
+
+    PLASMA      = {
+      name                    = [[Plasma Cannon]],
+      areaOfEffect            = 32,
+      craterBoost             = 1,
+      craterMult              = 2,
+
+      damage                  = {
+        default = 300,
+        planes  = 300,
+        subs    = 15,
+      },
+
+      explosionGenerator      = [[custom:PLASMA_HIT_32]],
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      minbarrelangle          = [[-25]],
+      noSelfDamage            = true,
+      range                   = 750,
+      reloadtime              = 2,
+      renderType              = 4,
+      soundHit                = [[weapon/cannon/cannon_hit2]],
+      soundStart              = [[weapon/cannon/heavy_cannon]],
+      startsmoke              = [[1]],
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 360,
+    },
+
+  },
+
+
+  featureDefs         = {
+
+    DEAD  = {
+      description      = [[Wreckage - Crusader]],
+      blocking         = false,
+      category         = [[corpses]],
+      damage           = 3090,
+      energy           = 0,
+      featureDead      = [[DEAD2]],
+      footprintX       = 5,
+      footprintZ       = 5,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 280,
+      object           = [[armroy_dead.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 280,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    DEAD2 = {
+      description      = [[Debris - Crusader]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 3090,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 4,
+      footprintZ       = 4,
+      hitdensity       = [[100]],
+      metal            = 280,
+      object           = [[debris4x4b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 280,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    HEAP  = {
+      description      = [[Debris - Crusader]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 3090,
+      energy           = 0,
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 4,
+      footprintZ       = 4,
+      hitdensity       = [[100]],
+      metal            = 140,
+      object           = [[debris4x4b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 140,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+  },
+
+}
+
+return lowerkeys({ armroy = unitDef })

@@ -1,0 +1,169 @@
+piece  fuselage, head, wingl, wingr, enginel, enginer, arm, lathe, jaw1, jaw2, nanopoint;
+
+static-var  Static_Var_1, statechg_DesiredState, statechg_StateChanging;
+
+// Signal definitions
+#define SIG_MOVE			2
+#define SMOKEPIECE1 fuselage
+#include "smokeunit.h"
+
+lua_QueryNanoPiece() 
+{
+  return 0;
+}
+
+activatescr()
+{
+	if( TRUE )
+	{
+		turn arm to x-axis <-80> speed <200>;
+		turn lathe to x-axis <-80> speed <200>;
+		sleep 996;
+	}
+	sleep 6;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		turn arm to x-axis <0> speed <200>;
+		turn lathe to x-axis <0> speed <200>;
+		sleep 823;
+	}
+	sleep 7;
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+Create()
+{
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+StartMoving()
+{
+	signal SIG_MOVE;
+	set-signal-mask SIG_MOVE;
+	turn enginel to x-axis <10> speed <200>;
+	turn enginer to x-axis <10> speed <200>;
+}
+
+StopMoving()
+{
+	signal SIG_MOVE;
+	turn enginel to x-axis <0> speed <100>;
+	turn enginer to x-axis <0> speed <100>;
+}
+
+StartBuilding()
+{
+	set CLOAKED to 0;
+	set INBUILDSTANCE to 1;
+	turn jaw1 to x-axis <-30> speed <150>;
+	turn jaw2 to x-axis <30> speed <150>;
+	
+}
+
+StopBuilding()
+{
+	set INBUILDSTANCE to 0;
+	turn jaw1 to x-axis <0> speed <100>;
+	turn jaw2 to x-axis <0> speed <100>;
+}
+
+QueryNanoPiece(piecenum)
+{
+	piecenum = nanopoint;
+	call-script lua_QueryNanoPiece(piecenum);
+}
+
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY;
+		explode head type BITMAPONLY;		
+		explode wingl type BITMAPONLY;
+		explode wingr type BITMAPONLY;
+		explode enginel type BITMAPONLY;
+		explode enginer type BITMAPONLY;
+		explode lathe type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode fuselage type BITMAPONLY;
+		explode head type SHATTER;		
+		explode wingl type FALL;
+		explode wingr type FALL;
+		explode enginel type FALL | FIRE | SMOKE;
+		explode enginer type FALL | FIRE | SMOKE;
+		explode lathe type FALL;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 2;
+		explode fuselage type BITMAPONLY;
+		explode head type SHATTER;		
+		explode wingl type FALL | SMOKE;
+		explode wingr type FALL | SMOKE;
+		explode enginel type FALL | FIRE | SMOKE | EXPLODE_ON_HIT;
+		explode enginer type FALL | FIRE | SMOKE | EXPLODE_ON_HIT;
+		explode lathe type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		return (0);
+	}
+	corpsetype = 2;
+	explode fuselage type BITMAPONLY;
+	explode head type SHATTER;		
+	explode wingl type FALL | SMOKE;
+	explode wingr type FALL | SMOKE;
+	explode enginel type FALL | FIRE | SMOKE | EXPLODE_ON_HIT;
+	explode enginer type FALL | FIRE | SMOKE | EXPLODE_ON_HIT;
+	explode lathe type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+}

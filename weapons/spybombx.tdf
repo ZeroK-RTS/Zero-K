@@ -1,0 +1,31 @@
+[SPYBOMBX]
+{
+  name=spyexplosion;
+  areaofeffect=100;
+  commandfire=1;
+  craterboost=0;
+  cratermult=0;
+  edgeeffectiveness=1;
+  explosiongenerator=custom:EMPFLASH360;
+  firestarter=90;
+  impulseboost=0;
+  impulsefactor=0;
+  interceptedbyshieldtype=1;
+  noselfdamage=1;
+  paralyzer=1;
+  paralyzetime=45;
+  range=1280;
+  reloadtime=0.3;
+  rendertype=4;
+  soundhit=otaunit/xplomed4;
+  soundstart=otaunit/bombrel;
+  tolerance=7000;
+  turret=1;
+  [DAMAGE]
+  {
+    default=6000;
+    empresistant99=60;
+    empresistant75=1500;
+    commanders=600;
+  }
+}

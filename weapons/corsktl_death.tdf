@@ -1,0 +1,25 @@
+[CORSKTL_DEATH]
+{
+  name=Skuttle;
+  areaofeffect=180;
+  craterboost=4;
+  cratermult=5;
+  edgeeffectiveness=0.3;
+  explosiongenerator=custom:NUKE_150;
+  explosionSpeed=10000;
+  impulseboost=0;
+  impulsefactor=0.4;
+  interceptedbyshieldtype=1;
+  noselfdamage=1;
+  range=480;
+  reloadtime=3.6;
+  rendertype=4;
+  shakeduration=0;
+  shakemagnitude=0;
+  soundhit=explosion/mini_nuke;
+  weaponvelocity=400;
+  [DAMAGE]
+  {
+    default=10000;
+  }
+}

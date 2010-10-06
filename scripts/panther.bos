@@ -1,0 +1,312 @@
+//linear 65536
+
+#define TA			// This is a TA script
+
+
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+
+
+
+piece	main,
+		nose, nosefan1, nosefan2,
+		turret, sleeve, barrel1, flare1, barrel2, flare2,
+		sparkcenter, sparkcenter2,
+		door1, door2, rud1, rud2, mainfan1, mainfan2,
+		wheels1, wheels2, wheels3, wheels4, wheels5, wheels6, wheels7,
+		tracks1, tracks2, tracks3, tracks4;
+		
+
+static-var  gun_1, isMoving, gun_1_yaw, nextRud, fire;
+
+// Signal definitions
+#define SIG_AIM					2
+#define SIG_RUD					16
+
+#define RESTORE_DELAY			3000
+
+#define TURRET_YAW_SPEED		<150>
+#define TURRET_PITCH_SPEED		<150>
+
+#define RECOIL_DIST				[-5]
+#define RECOIL_RESTORE_SPEED	[10]
+
+#define ANIM_PERIOD				50
+#define NOSE_TURN_SPEED			<90>
+#define RUDDER_DIST_Z			[-3]
+#define RUDDER_DIST_X_P			[2.25]
+#define RUDDER_DIST_X_N			[-2.25]
+#define RUDDER_SPEED_OUT		[2]
+#define RUDDER_SPEED_IN			[8]
+#define PANEL_ANGLE_1			<105>
+#define PANEL_ANGLE_2			<-105>
+#define PANEL_TURN_SPEED		<105>
+
+#define FAN_SPIN_SPEED_P		<360>
+#define FAN_SPIN_SPEED_N		<-360>
+#define FAN_SPIN_ACCEL			<5>
+#define FAN_SPIN_DECEL			<15>
+#define WHEEL_SPIN_SPEED_L		<720>
+#define WHEEL_SPIN_ACCEL_L		<10>
+#define WHEEL_SPIN_DECEL_L		<30>
+#define WHEEL_SPIN_SPEED_S		<1080>
+#define WHEEL_SPIN_ACCEL_S		<15>
+#define WHEEL_SPIN_DECEL_S		<45>
+
+
+RudderOut() {
+	turn nose to x-axis <90> speed NOSE_TURN_SPEED;
+	turn door1 to y-axis PANEL_ANGLE_1 speed PANEL_TURN_SPEED;
+	turn door2 to y-axis PANEL_ANGLE_2 speed PANEL_TURN_SPEED;
+	
+	move rud1 to z-axis RUDDER_DIST_Z speed RUDDER_SPEED_OUT;
+	move rud2 to z-axis RUDDER_DIST_Z speed RUDDER_SPEED_OUT;	
+	wait-for-move rud1 along z-axis;
+	wait-for-move rud2 along z-axis;
+	
+	if (!nextRud) return;
+	
+	move rud1 to x-axis RUDDER_DIST_X_P speed RUDDER_SPEED_OUT;
+	move rud2 to x-axis RUDDER_DIST_X_N speed RUDDER_SPEED_OUT;
+}
+
+RudderIn() {
+	turn nose to x-axis 0 speed NOSE_TURN_SPEED;
+	move rud1 to x-axis 0 speed RUDDER_SPEED_IN;
+	move rud2 to x-axis 0 speed RUDDER_SPEED_IN;	
+	wait-for-move rud1 along x-axis;
+	wait-for-move rud2 along x-axis;
+	
+	if (nextRud) return;
+	
+	move rud1 to z-axis 0 speed RUDDER_SPEED_IN;
+	move rud2 to z-axis 0 speed RUDDER_SPEED_IN;
+	turn door1 to y-axis 0 speed PANEL_TURN_SPEED;
+	turn door2 to y-axis 0 speed PANEL_TURN_SPEED;
+}
+
+AnimControl() {
+	var tracks, bubbles;
+	bubbles = 0;
+	tracks = 1;
+	nextRud = 0;
+	
+	
+	
+    while(1) {
+		
+		emit-sfx 1024 from sparkcenter;
+		/*
+		//doors
+		if (isMoving && GET IN_WATER) {
+			nextRud = 1;
+			start-script RudderOut();
+			
+			bubbles = !bubbles;
+			if (bubbles) emit-sfx 259 from mainfan1;
+			else emit-sfx 259 from mainfan2;
+		} else {
+			nextRud = 0;
+			start-script RudderIn();
+		}
+		
+		//tracks
+		if (isMoving) {
+			++tracks;
+			if (tracks == 2) {
+				hide tracks1;
+				show tracks2;
+			} else if (tracks == 3) {
+				hide tracks2;
+				show tracks3;
+			} else if (tracks == 4) {
+				hide tracks3;
+				show tracks4;
+			} else {
+				tracks = 1;
+				hide tracks4;
+				show tracks1;
+			}
+		}
+		*/
+		sleep ANIM_PERIOD;
+		
+	}
+	
+}
+
+AnimControl2() {
+	while(1) {
+		move sparkcenter to z-axis [-4] speed [6];
+		wait-for-move sparkcenter along z-axis;
+		move sparkcenter to z-axis [0] speed [6];
+		wait-for-move sparkcenter along z-axis;
+	}
+}
+	
+
+Create()
+{
+	hide flare1;
+	hide flare2;
+	hide tracks2;
+	hide tracks3;
+	hide tracks4;
+	isMoving = 0;
+	fire = 0;
+	start-script AnimControl();
+	start-script AnimControl2();
+	
+	
+}
+
+RestoreAfterDelay()
+{
+	sleep RESTORE_DELAY;
+	turn turret to y-axis 0 speed TURRET_YAW_SPEED;
+	turn sleeve to x-axis 0 speed TURRET_PITCH_SPEED;
+}
+
+StartMoving()
+{
+	isMoving = 1;
+	spin wheels1 around x-axis speed WHEEL_SPIN_SPEED_S accelerate WHEEL_SPIN_ACCEL_S;
+	spin wheels2 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels3 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels4 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels5 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels6 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels7 around x-axis speed WHEEL_SPIN_SPEED_S accelerate WHEEL_SPIN_ACCEL_S;
+	spin nosefan1 around y-axis speed FAN_SPIN_SPEED_P accelerate FAN_SPIN_ACCEL;
+	spin nosefan2 around y-axis speed FAN_SPIN_SPEED_N accelerate FAN_SPIN_ACCEL;
+	spin mainfan1 around z-axis speed FAN_SPIN_SPEED_P accelerate FAN_SPIN_ACCEL;
+	spin mainfan2 around z-axis speed FAN_SPIN_SPEED_N accelerate FAN_SPIN_ACCEL;
+}
+
+StopMoving()
+{
+	isMoving = 0;
+	stop-spin wheels1 around x-axis decelerate WHEEL_SPIN_DECEL_S;
+	stop-spin wheels2 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels3 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels4 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels5 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels6 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels7 around x-axis decelerate WHEEL_SPIN_DECEL_S;
+	stop-spin nosefan1 around y-axis decelerate FAN_SPIN_DECEL;
+	stop-spin nosefan2 around y-axis decelerate FAN_SPIN_DECEL;
+	stop-spin mainfan1 around z-axis decelerate FAN_SPIN_DECEL;
+	stop-spin mainfan2 around z-axis decelerate FAN_SPIN_DECEL;
+}
+AimPrimary(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	turn turret to y-axis heading speed TURRET_YAW_SPEED;
+	turn sleeve to x-axis 0 - pitch speed TURRET_PITCH_SPEED;
+	wait-for-turn turret around y-axis;
+	wait-for-turn sleeve around x-axis;
+	start-script RestoreAfterDelay();
+	fire = 1;
+	gun_1_yaw = heading;
+	return (1);
+}
+
+FirePrimary()
+{
+	
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = sparkcenter2;
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = sparkcenter2;
+}
+
+
+
+AimSecondary(heading, pitch)
+{
+	while (TRUE)
+	{
+		if (fire)
+		{
+			fire = 0;
+			return (1);
+		}
+	sleep 10;
+	}
+}
+
+FireSecondary()
+{
+	
+}
+
+QueryWeapon2(piecenum)
+{
+	//if (gun_1) piecenum = flare1;
+	//else piecenum = flare2;
+	//piecenum = sparkcenter2;
+	piecenum = sparkcenter2;
+}
+
+AimFromWeapon2(piecenum)
+{
+	piecenum = sparkcenter2;
+}
+
+
+
+
+
+SweetSpot(piecenum)
+{
+	piecenum = main;
+}
+
+Killed(severity, corpsetype)
+{
+	hide flare1;
+	hide flare2;
+	if (severity < 25) {
+		corpsetype = 1;
+		explode main type BITMAPONLY | BITMAP5;
+		explode nose type BITMAPONLY | BITMAP4;
+		explode turret type BITMAPONLY | BITMAP3;
+		explode door1 type BITMAPONLY | BITMAP2;
+		explode door2 type BITMAPONLY | BITMAP1;
+		explode rud1 type BITMAPONLY | BITMAP3;
+		explode rud2 type BITMAPONLY | BITMAP3;
+		explode barrel1 type BITMAPONLY | BITMAP5;
+		explode barrel2 type BITMAPONLY | BITMAP4;
+	} else if (severity < 50) {
+		corpsetype = 2;
+		explode main type BITMAPONLY | BITMAP5;
+		explode nose type BITMAPONLY | BITMAP4;
+		explode turret type FALL | BITMAP3;
+		explode door1 type BITMAPONLY | BITMAP2;
+		explode door2 type BITMAPONLY | BITMAP1;
+		explode rud1 type BITMAPONLY | BITMAP3;
+		explode rud2 type BITMAPONLY | BITMAP3;
+		explode barrel1 type FALL | BITMAP5;
+		explode barrel2 type FALL | BITMAP4;
+	} else {
+		corpsetype = 3;
+		explode main type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode nose type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode door1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode door2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode rud1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode rud2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode barrel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode barrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+	}
+}

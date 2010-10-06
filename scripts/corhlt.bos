@@ -1,0 +1,144 @@
+#define TA			// This is a TA script
+
+#include "constants.h"
+
+piece  basebottom, basemid, basetop, holder, housing, spindle, aim, flare1, flare2, flare3;
+
+static-var  gun;
+
+// Signal definitions
+#define SIG_AIM				2
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from basebottom;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Create()
+{
+	gun = 1;
+	start-script SmokeUnit();
+//	if (GET GROUND_HEIGHT(GET UNIT_XZ)) hide pontoons;
+/*	else move basebottom to y-axis [0.5] now; */
+}
+
+AimWeapon1(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	turn basetop to y-axis ( 2 * heading ) speed <200.038462>;
+	turn basemid to y-axis ( -1 * heading ) speed <230.038462>;
+	turn housing to x-axis <0.000000> - pitch speed <200.038462>;
+	wait-for-turn basetop around y-axis;
+	wait-for-turn basemid around y-axis;
+	wait-for-turn housing around x-axis;
+	return (1);
+}
+
+FireWeapon1()
+{
+	if (gun == 1) {
+		emit-sfx 1025 from flare1;
+	    sleep 1200;
+	    turn spindle to z-axis <120.000000> speed <240.000000>;
+    } else if (gun == 2) {
+        emit-sfx 1025 from flare2;
+		sleep 1200;
+		turn spindle to z-axis <240.000000> speed <240.000000>;
+    } else {
+    	emit-sfx 1025 from flare3;
+		sleep 1200;
+		turn spindle to z-axis <0.000000> speed <240.000000>;
+    }
+    ++gun;
+    if (gun == 4) { gun = 1; }
+}
+
+QueryWeapon1(piecenum)
+{
+    if (gun== 1) {
+    	piecenum = flare1;
+    } else if (gun== 2) {
+    	piecenum = flare2;
+    } else {
+    	piecenum = flare3;
+    }
+	
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = basebottom;
+}
+
+AimFromPrimary(piecenum)
+{
+	piecenum = holder;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode basebottom type BITMAPONLY | BITMAP1;
+		explode housing type BITMAPONLY | BITMAP4;
+		explode holder type BITMAPONLY | BITMAP5;
+		explode spindle type BITMAPONLY | BITMAP1;
+		explode basemid type BITMAPONLY | BITMAP2;
+		explode basetop type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode basebottom type BITMAPONLY | BITMAP1;
+		explode housing type FALL | BITMAP3;
+		explode holder type FALL | BITMAP4;
+		explode spindle type FALL | BITMAP1;
+		explode basetop type FALL | BITMAP2;
+		explode basemid type SHATTER | BITMAP3;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode basebottom type BITMAPONLY | BITMAP1;
+		explode holder type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		explode spindle type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode basemid type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode basetop type SHATTER | BITMAP3;
+		return (0);
+	}
+	corpsetype = 3;
+	explode basebottom type BITMAPONLY | BITMAP1;
+	explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode holder type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode spindle type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode basetop type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode basemid type SHATTER | EXPLODE_ON_HIT | BITMAP3;
+}

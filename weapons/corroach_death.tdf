@@ -1,0 +1,23 @@
+[CORROACH_DEATH]
+{
+  name=CrawlingBomb;
+  areaofeffect=384;
+  craterboost=1;
+  cratermult=4;
+  edgeeffectiveness=0.4;
+  explosiongenerator=custom:ROACHPLOSION;
+  explosionSpeed=10000;
+  impulseboost=0;
+  impulsefactor=0.4;
+  interceptedbyshieldtype=1;
+  range=450;
+  reloadtime=3.6;
+  rendertype=4;
+  soundhit=explosion/mini_nuke;
+  turret=1;
+  weaponvelocity=250;
+  [DAMAGE]
+  {
+    default=1200;
+  }
+}

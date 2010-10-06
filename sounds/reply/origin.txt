@@ -1,0 +1,68 @@
+http://www.freesound.org/ -- CC >:(
+http://www.pacdv.com/sounds/
+
+builder_start.wav - Golgotha
+
+fusion_select.wav - Golgotha
+adv_fusion_select.wav - Golgotha
+geo_select.wav - soundsnap.com and Scorched 3D
+cloaker_select.wav - Scorched 3D
+shield_select.wav - Scorched 3D
+building_select1.wav - simply the best
+building_select2.wav - Scorched 3D
+factory_select.wav - Golgotha
+factory_select2.wav - Nanoblobs
+turret_select.wav - Golgotha
+light_turret_select.wav - Golgotha
+silo_select.wav - Scorched 3D
+faraday_select.wav - Golgotha
+turret_move.wav - pacdv
+sonar_select.wav - CC BY -- Auswaschbar
+sonar_deactivate.wav - CC BY -- Auswaschbar
+building_clonk.wav - Merc Squad
+rumble1.wav - Nanoblobs
+rumble2.wav - Nanoblobs
+rumble3.wav - Nanoblobs
+
+bot_select - Golgotha
+bot_move.wav - freeloops
+spider_move.wav - awesund
+spider_select.wav - awesund
+spider_select2.wav - Nanoblobs
+crawlie_select.wav - awesund
+heavy_bot_move.wav - Golgotha and freeloops
+sniper_select.wav - pacdv
+sniper_move.wav - pacdv
+light_bot_select.wav - pacdv and Golgotha
+light_bot_select2.wav - Nanoblobs
+light_bot_move.wav - pacdv
+medium_bot_select.wav - pacdv and Golgotha
+
+tank_move.wav - Golgotha
+light_tank_move.wav - Golgotha
+light_tank_move2.wav - Nanoblobs
+tank_select.wav - Golgotha
+vehicle_move.wav - partners in rhyme
+vehicle_move2.wav - Nanoblobs
+vehicle_select.wav - Scorched 3D
+vehicle_select2.wav - pdsounds
+hovercraft_select.wav - Simply the best and pacdv
+
+fighter_move.wav - Scorched 3D
+fighter_select.wav - Scorched 3D
+bomber_select.wav - Open Quarz
+bomber_move.wav - Scorched 3D
+light_gunship_select.wav - Golgotha and pacdv
+heavy_gunship_select.wav - Golgotha and Scorched 3D
+gunship_move.wav - Scorched 3D
+air_move.wav - Nanoblobs
+heavy_gunship_move.wav - Nanoblobs
+gunship_select.wav - Golgotha
+hele_select.wav - Nanoblobs
+
+sub_select.wav - Nanoblobs
+
+light_something_select.wav - Nanoblobs
+
+windmill. wav - freesound and Golgotha
+

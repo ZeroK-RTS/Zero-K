@@ -1,0 +1,94 @@
+#define TA			// This is a TA script
+
+#include "constants.h"
+
+piece  base, blades;
+
+static-var base_dir, wind_speed, wind_dir;
+
+#define UPDATE_PERIOD	1000
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+SpinWind() {
+    while( get BUILD_PERCENT_LEFT ) {
+		sleep 400;
+	}
+	while( TRUE ) {
+		wind_speed = GET 1024;
+		wind_dir = GET 4096 ;
+		spin blades around y-axis speed 0 - wind_speed;
+		//turn cradle to y-axis wind_dir - base_dir speed <20.000000>;
+		sleep UPDATE_PERIOD;
+	}
+}
+
+Create()
+{
+    base_dir = Rand(0, 65534);
+	turn base to y-axis base_dir now;
+	start-script SmokeUnit();
+	start-script SpinWind();
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode blades type BITMAPONLY | BITMAP2;
+		//explode cradle type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode blades type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		//explode cradle type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode base type BITMAPONLY | BITMAP1;
+		explode blades type SHATTER | BITMAP2;
+		//explode cradle type BITMAPONLY | BITMAP3;
+		return (0);
+	}
+	corpsetype = 3;
+	explode base type BITMAPONLY | BITMAP1;
+	explode blades type SHATTER | BITMAP2;
+	//explode cradle type BITMAPONLY | BITMAP3;
+}

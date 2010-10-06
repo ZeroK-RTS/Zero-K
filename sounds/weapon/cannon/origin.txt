@@ -1,0 +1,55 @@
+Astro Menace:
+emg_hit.wav
+
+Golgotha:
+big_begrtha_gun_fire.wav
+cannon_fire1.wav
+cannon_fire2.wav
+cannon_fire3.wav
+cannon_fire4.wav
+cannon_hit1.wav
+reaper_hit.wav
+tremor_fire.wav
+supergun.wav
+supergun_bass_boost.wav
+heavy_cannon.wav
+
+Open LieroX:
+cannon_fire5.wav
+cannon_hit2.wav
+earthshaker.wav
+earthshaker2.wav
+generic_cannon2.wav
+generic_cannon.wav
+large_cannon_fire.wav
+small_pop.WAV
+arty_hit.wav
+
+Scorched 3D:
+cannon_fire6.wav
+cannon_fire7.wav
+heavy_cannon2.wav
+
+Open Quarz:
+outlaw_gun_openQuarz.wav
+pillager_fire_openQuarz.wav
+rhino.wav
+
+TA Weapons Factory:
+wolverine_fire.wav
+wolverine_hit.wav
+
+Nanoblobs:
+cannon_fire8.wav
+
+Merc Squad:
+mini_cannon.wav
+
+Partners in Rhyme
+Machineg_single.wav
+
+Unknown:
+brawler_emg.wav
+
+Kanoba:
+cannon_hit3

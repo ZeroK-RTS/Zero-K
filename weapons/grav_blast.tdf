@@ -1,0 +1,42 @@
+[GRAV_BLAST]
+{
+  name=NuclearMissile;
+  areaofeffect=2200;
+  collidefriendly=0;
+  commandfire=1;
+  craterboost=0;
+  cratermult=0;
+  cruise=1;
+  edgeeffectiveness=0.1;
+  energypershot=125000;
+  explosiongenerator=custom:GRAV_BLAST_EFFECT;
+  firestarter=0;
+  impulseboost=10.0;
+  impulsefactor=-3.0;
+  interceptedbyshieldtype=2;
+  lineofsight=1;
+  metalpershot=1000;
+  model=ballmiss;
+  noautorange=1;
+  propeller=1;
+  range=72000;
+  reloadtime=120;
+  rendertype=1;
+  selfprop=1;
+  shakeduration=3;
+  shakemagnitude=50;
+  smokedelay=0.1;
+  smoketrail=1;
+  soundhit=explosion/ex_ultra1;;
+  startsmoke=1;
+  targetable=1;
+  tolerance=4000;
+  vlaunch=1;
+  weaponacceleration=100;
+  weapontimer=9;
+  weaponvelocity=3000;
+  [DAMAGE]
+  {
+    default=1000;
+  }
+}

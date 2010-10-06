@@ -1,0 +1,279 @@
+/*
+	Linear constant is 65536 * 2.5, angular 182.044449!
+	
+	Needs two explosion generators, one for the muzzle flame and one for
+	smoke from the sides of the muzzle brakes, in the unit definition!   
+*/
+
+#define TAK
+#include "constants.h"
+
+piece		base, body, turret, sleeve1, sleeve2, barrel1, barrel2, firepoint1, firepoint2, smoke1, smoke2,
+			tracks1, tracks2, tracks3, tracks4, wheels1, wheels2, wheels3, wheels4, wheels5, wheels6, wheels7;
+			
+static-var	moving, once, animCount, gun1, gun_1_yaw;
+
+#define SIG_AIM1						1
+#define ANIM_SPEED						50
+#define RESTORE_DELAY					3000
+
+#define TURRET_TURN_SPEED				<70>
+#define GUN_TURN_SPEED					<50>
+
+#define WHEEL_TURN_SPEED1				<960>
+#define WHEEL_TURN_SPEED1_ACCELERATION	<30>
+#define WHEEL_TURN_SPEED1_DECELERATION	<60>
+
+#define WHEEL_TURN_SPEED2				<480>
+#define WHEEL_TURN_SPEED2_ACCELERATION	<15>	
+#define WHEEL_TURN_SPEED2_DECELERATION	<30>
+
+
+#define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
+#define SIG_TILT_Z				8		//Signal to prevent multiple rocking. REPLACE!
+
+//rocking
+#define ROCK_PIECE				base	//piece to rock. REPLACE!
+#define ROCK_X_SPEED			3		//Number of half-cycles per second around x-axis.
+#define ROCK_X_DECAY			-1/2	//Rocking around x-axis is reduced by this factor each time; should be negative to alternate rocking direction.
+#define ROCK_X_MIN              <0.5>	//If around x-axis rock is not greater than this amount, rocking will stop after returning to center.
+#define ROCK_X_FIRE_1			-12
+
+//tiltz
+#define TILT_PIECE				base	//piece to tilt. REPLACE!
+#define TILT_Z_ANGLE			<-5>	//How much to tilt at maximum
+#define TILT_Z_DIST				[7]		//Typically half the width of the unit. Keeps the unit's edges from sinking into the ground.
+#define TILT_Z_SPEED			6		//Number of half-cycles per second around z-axis
+
+#include "tiltz.h"
+
+#include "rockx.h"
+
+
+RestoreAfterDelay(delay)
+{
+	sleep delay;
+	turn turret to y-axis 0 speed TURRET_TURN_SPEED;
+	turn sleeve1 to x-axis 0 speed GUN_TURN_SPEED;
+	turn sleeve2 to x-axis 0 speed GUN_TURN_SPEED;
+}
+
+DamageControl()
+{
+	var health;
+	while (TRUE)
+	{
+		health = get HEALTH;
+		
+		// Restore damaged parts
+/*		if (health > 25)
+		{
+			if (health > 50)
+			{
+				
+			}
+
+		}*/
+		
+		// Damage parts, smoke emits etc.
+		if (health < 50)
+		{
+			emit-sfx SFXTYPE_WHITESMOKE from body;
+			if (health < 25)
+			{	
+				emit-sfx SFXTYPE_BLACKSMOKE from turret;
+			}
+		}
+		sleep 1000;
+	}
+}
+AnimationControl()
+{
+	var current_tracks;
+	current_tracks = 0;
+	
+	while (TRUE)
+	{
+		if (moving OR once)
+		{
+			if (current_tracks == 0)
+			{
+				show tracks1;
+				hide tracks4;
+				++current_tracks;
+			}
+			else if (current_tracks == 1)
+				{
+				show tracks2;
+				hide tracks1;
+				++current_tracks;
+			}
+			else if (current_tracks == 2)
+			{
+				show tracks3;
+				hide tracks2;
+				++current_tracks;
+			}
+			else if (current_tracks == 3)
+			{
+				show tracks4;
+				hide tracks3;
+				current_tracks=0;
+				if (once) --once;
+			}
+		}
+		++animCount;
+		sleep ANIM_SPEED;
+	}
+}
+
+StartMoving()
+{
+	moving = TRUE;
+	animCount = 0;
+	
+	spin wheels2 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+	spin wheels4 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+	spin wheels6 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
+
+	spin wheels1 around x-axis speed WHEEL_TURN_SPEED2 accelerate WHEEL_TURN_SPEED2_ACCELERATION;
+	spin wheels3 around x-axis speed WHEEL_TURN_SPEED2 accelerate WHEEL_TURN_SPEED2_ACCELERATION;
+	spin wheels5 around x-axis speed WHEEL_TURN_SPEED2 accelerate WHEEL_TURN_SPEED2_ACCELERATION;
+	spin wheels7 around x-axis speed WHEEL_TURN_SPEED2 accelerate WHEEL_TURN_SPEED2_ACCELERATION;
+}
+
+StopMoving()
+{
+	moving = FALSE;
+	
+	// I don't like insta braking. It's not perfect but works for most cases.
+	// Probably looks goofy when the unit is turtling around, i.e. does not become faster as time increases..
+	once = animCount*ANIM_SPEED/1000;
+	if (once > 3) once = 3;
+
+	stop-spin wheels2 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+	stop-spin wheels4 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+	stop-spin wheels6 around x-axis decelerate WHEEL_TURN_SPEED1_DECELERATION;
+
+	stop-spin wheels1 around x-axis decelerate WHEEL_TURN_SPEED2_DECELERATION;
+	stop-spin wheels3 around x-axis decelerate WHEEL_TURN_SPEED2_DECELERATION;
+	stop-spin wheels5 around x-axis decelerate WHEEL_TURN_SPEED2_DECELERATION;
+	stop-spin wheels7 around x-axis decelerate WHEEL_TURN_SPEED2_DECELERATION;
+}
+
+// Weapons
+AimFromWeapon1(piecenum)
+{
+	piecenum = turret;
+}
+
+QueryWeapon1(piecenum)
+{
+	if (gun1) {
+		piecenum = firepoint1;
+	}
+	else {
+		piecenum = firepoint2;
+	}
+}
+
+AimWeapon1 (heading, pitch)
+{
+	signal SIG_AIM1;
+	set-signal-mask SIG_AIM1;
+	
+
+	turn turret to y-axis (heading) speed TURRET_TURN_SPEED;
+	turn sleeve1 to x-axis (0-pitch) speed GUN_TURN_SPEED;
+	turn sleeve2 to x-axis (0-pitch) speed GUN_TURN_SPEED;
+
+	wait-for-turn turret around y-axis;
+	wait-for-turn sleeve1 around x-axis;
+	wait-for-turn sleeve2 around x-axis;
+	start-script RestoreAfterDelay(RESTORE_DELAY);
+	gun_1_yaw = heading;
+	return (TRUE);
+}
+
+Shot1()
+{
+	start-script RockX(ROCK_X_FIRE_1, gun_1_yaw);
+	start-script TiltZ(gun_1_yaw);
+	gun1 = !gun1;
+	if (gun1) {
+		emit-sfx 1024 + 0 from smoke1;
+		move barrel1 to z-axis [-2] speed [40];
+		sleep 150;
+		move barrel1 to z-axis 0 speed [4];
+	}
+	else {
+		emit-sfx 1024 + 0 from smoke2;
+		move barrel2 to z-axis [-2] speed [40];
+		sleep 150;
+		move barrel2 to z-axis 0 speed [4];
+	}
+}
+
+Killed(severity, corpsetype)
+{
+	if(severity >= 0 AND severity < 25)
+	{
+		corpsetype = 1;
+		explode barrel1 type BITMAPONLY | BITMAP;
+		explode barrel2 type BITMAPONLY | BITMAP;
+		explode sleeve1 type BITMAPONLY | BITMAP;
+		explode sleeve2 type BITMAPONLY | BITMAP;
+		explode body type BITMAPONLY | BITMAP;
+		explode turret type BITMAPONLY | BITMAP;
+	}
+	else if(severity >= 25 AND severity < 50)
+	{
+		corpsetype = 2;
+		explode barrel1 type FALL | BITMAP;
+		explode barrel2 type FALL | BITMAP;
+		explode sleeve1 type SHATTER | BITMAP;
+		explode sleeve2 type FALL | BITMAP;
+		explode body type BITMAPONLY | BITMAP;
+		explode turret type SHATTER | BITMAP;
+	}
+	else if(severity >= 50 AND severity < 100)
+	{
+		corpsetype = 3;
+		explode barrel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode barrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode sleeve1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode sleeve2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode body type BITMAPONLY | BITMAP;
+		explode turret type SHATTER | BITMAP;
+	}
+	// D-Gunned/Self-D
+	else if(severity >= 100)
+	{
+		corpsetype = 3;
+		explode barrel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode barrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode sleeve1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode sleeve2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode body type SHATTER | BITMAP;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	}
+}
+
+Create()
+{
+	moving = FALSE;
+	gun1 = 0;
+	
+	hide tracks1;
+	hide tracks2;
+	hide tracks3;
+	turn smoke1 to y-axis <-90> now;
+	turn smoke2 to y-axis <90> now;
+
+	while (get BUILD_PERCENT_LEFT)
+		sleep 250;
+	
+	start-script AnimationControl();
+	start-script DamageControl();
+	call-script RockXInit();
+}

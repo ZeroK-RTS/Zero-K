@@ -1,0 +1,164 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, turret, sleeve, barrel, flare;
+
+static-var  gun_1;
+
+// Signal definitions
+#define SIG_AIM				2
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+Create()
+{
+	hide flare;
+	dont-cache flare;
+	dont-cache barrel;
+	dont-cache turret;
+	dont-cache sleeve;
+    dont-shade flare;
+	dont-shade barrel;
+	dont-shade turret;
+	dont-shade sleeve;
+    gun_1 = 0;
+    set ARMORED to 1;
+	start-script SmokeUnit();
+}
+
+//AimWeapon
+
+AimWeapon1(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	turn turret to y-axis heading speed <700.000000>;
+	turn sleeve to x-axis <0.000000> - pitch speed <650.000000>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn sleeve around x-axis;
+        if( gun_1 == 0 )
+        {
+                wait-for-move barrel along z-axis;
+        }
+	return (1);
+}
+
+//FireWeapon
+
+FireWeapon1()
+{
+	if( gun_1 == 0 )
+	{
+		show flare;
+		sleep 50;
+		hide flare;
+		turn barrel to z-axis <120.000000> speed <350.00000>;
+	}
+	if( gun_1 == 1 )
+	{
+		show flare;
+		sleep 50;
+		hide flare;
+		turn barrel to z-axis <240.000000> speed <350.00000>;
+	}
+	if( gun_1 == 2 )
+	{
+		show flare;
+		sleep 50;
+		hide flare;
+		turn barrel to z-axis <360.000000> speed <350.00000>;
+	}
+	gun_1 = gun_1 + 1;
+	if( gun_1 == 3 )
+	{
+	gun_1=0;
+	}
+}
+
+//AimFromWeapon
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = turret;
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = flare;
+}
+
+
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	hide flare;
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode barrel type BITMAPONLY | BITMAP1;
+		explode barrel type BITMAPONLY | BITMAP2;
+		explode base type BITMAPONLY | BITMAP3;
+		explode turret type BITMAPONLY | BITMAP1;
+		explode turret type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode barrel type FALL | BITMAP1;
+		explode barrel type FALL | BITMAP2;
+		explode base type BITMAPONLY | BITMAP3;
+		explode turret type SHATTER | BITMAP1;
+		explode turret type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode base type BITMAPONLY | BITMAP3;
+		explode turret type SHATTER | BITMAP1;
+		explode turret type BITMAPONLY | BITMAP2;
+		return (0);
+	}
+	corpsetype = 3;
+	explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode base type BITMAPONLY | BITMAP3;
+	explode turret type SHATTER | EXPLODE_ON_HIT | BITMAP1;
+	explode turret type BITMAPONLY | BITMAP2;
+}

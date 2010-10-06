@@ -1,0 +1,230 @@
+#include "sfxtype.h"
+#include "exptype.h"
+#include "StateChg.h"
+
+piece  basebottom, flare, basetop, housing, rotor, barrel, shellleft, shellright, aim;
+
+static-var  open, open2;
+
+// Signal definitions
+#define SIG_AIM				2
+
+
+
+
+
+
+//--------------------------------START DA FUNK!
+activatescr()
+{
+	turn shellleft to y-axis <-60.000000> speed <80.000000>;
+	turn shellright to y-axis <60.000000> speed <80.000000>;
+	move barrel to z-axis [3.500000] speed [5.000000];
+	open = TRUE;
+	wait-for-turn shellleft around y-axis;
+	wait-for-turn shellright around y-axis;
+	wait-for-move barrel along z-axis;
+	
+	//sleep 39;
+}
+
+deactivatescr()
+{
+
+	turn shellleft to y-axis <0.000000> speed <80.000000>;
+	turn shellright to y-axis <0.000000> speed <80.000000>;
+	move barrel to z-axis [0.000000] speed [5.000000];
+	wait-for-turn shellleft around y-axis;
+	wait-for-turn shellright around y-axis;
+	wait-for-move barrel along z-axis;
+
+	sleep 39;
+}
+
+
+Go()
+{
+	if( !open )
+	{
+		call-script activatescr();
+	}
+	open = TRUE;
+	set ARMORED to FALSE;
+}
+
+Stop()
+{
+	set ARMORED to TRUE;
+	open  = FALSE;	
+	call-script deactivatescr();
+}
+
+#define ACTIVATECMD	    call-script Go();
+#define DEACTIVATECMD   call-script Stop();
+#include "StateChg.h"
+//--------------------------------END DA FUNK! 
+
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from basebottom;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+
+Activate()
+{
+	open2 = TRUE;
+	start-script RequestState(ACTIVE);
+}
+
+Deactivate()
+{
+	open2 = FALSE;
+	start-script RequestState(INACTIVE);
+}
+
+
+RestoreAfterDelay()
+{
+	sleep 1200;
+	turn shellleft to y-axis <0.000000> speed <80.000000>;
+	turn shellright to y-axis <0.000000> speed <80.000000>;
+	move barrel to z-axis [0.000000] speed [5.000000];
+	wait-for-turn shellleft around y-axis;
+	wait-for-turn shellright around y-axis;
+	wait-for-move barrel along z-axis;	
+}
+
+Create()
+{
+	hide flare;
+	start-script SmokeUnit();
+		open = FALSE;
+		open2 = FALSE;
+	set ARMORED to TRUE;
+/*	turn shellleft to y-axis <-60.000000> speed <80.000000>;
+	turn shellright to y-axis <60.000000> speed <80.000000>;
+	move barrel to z-axis [3.500000] speed [5.000000];
+	wait-for-turn shellleft around y-axis;
+	wait-for-turn shellright around y-axis;
+	wait-for-move barrel along z-axis;*/
+}
+
+AimPrimary(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+//	turn shellleft to y-axis <-60.000000> speed <100.000000>;
+//	turn shellright to y-axis <60.000000> speed <100.000000>;
+//	move barrel to z-axis [3.500000] speed [5.500000];
+	turn basetop to y-axis heading speed <300.071429>;
+	turn housing to x-axis <0.000000> - pitch speed <200.043956>;
+	start-script activatescr();
+//	wait-for-turn shellleft around y-axis;
+//	wait-for-turn shellright around y-axis;
+//	wait-for-move barrel along z-axis;
+	wait-for-turn basetop around y-axis;
+	wait-for-turn housing around x-axis;
+	start-script RestoreAfterDelay();
+	//if( open )
+	//{ 
+	sleep 20;
+	return (1);
+		
+		
+	//}
+	//if( !open ) 
+	//{
+		//return (0);
+	//}
+
+}
+
+FirePrimary()
+{
+	//if ( open ) 
+//	{
+		move barrel to z-axis [3.150000] speed [10.000000];
+		emit-sfx 1024 from flare;
+		wait-for-move barrel along z-axis;
+		move barrel to z-axis [3.500000] speed [8.000000];
+//	}
+//	if ( !open )
+	
+//	call-script Go();
+
+}
+
+AimFromPrimary(piecenum)
+{
+	piecenum = aim;
+}
+
+QueryPrimary(piecenum)
+{
+	piecenum = flare;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = basebottom;
+}
+
+Killed(severity, corpsetype)
+{
+	hide flare;
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode basebottom type BITMAPONLY | BITMAP1;
+		explode flare type BITMAPONLY | BITMAP2;
+		explode housing type BITMAPONLY | BITMAP3;
+		explode basetop type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode basebottom type BITMAPONLY | BITMAP1;
+		explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode basetop type BITMAPONLY | BITMAP4;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode basebottom type BITMAPONLY | BITMAP1;
+		explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode basetop type SHATTER | BITMAP4;
+		return (0);
+	}
+	corpsetype = 3;
+	explode basebottom type BITMAPONLY | BITMAP1;
+	explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode basetop type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+}

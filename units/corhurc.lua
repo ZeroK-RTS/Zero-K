@@ -1,0 +1,175 @@
+unitDef = {
+  unitname            = [[corhurc]],
+  name                = [[Condor]],
+  description         = [[Temporary-Impulse-Mine Bomber (mines cost energy)]],
+  amphibious          = true,
+  buildCostEnergy     = 400,
+  buildCostMetal      = 400,
+  builder             = false,
+  buildPic            = [[corhurc.png]],
+  buildTime           = 400,
+  canAttack           = true,
+  canFly              = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canstop             = [[1]],
+  canSubmerge         = false,
+  category            = [[FIXEDWING]],
+  collide             = false,
+  corpse              = [[HEAP]],
+  cruiseAlt           = 180,
+
+  customParams        = {
+    description_bp = [[Bombardeiro de minas temporárias (As minas custam energia)]],
+    description_fr = [[Bombardier de Mines r Impulsions]],
+    helptext       = [[The Condor lays down light mines over an area, allowing it to set lethal traps for enemy forces. Mines placed by air explode on their own after 30 seconds.]],
+    helptext_bp    = [[Condor joga minas leves sobre uma área, permitindo que arme armadilhas para tropas inimigas. As minas que o Condor lança explodir?o sozinhas se n?o forem detonadas normalmente após 30 segundos.]],
+    helptext_fr    = [[Le Condor peut larguer un tapis de mines r impulsion dont les dégâts peuvent litteralement balayer une armée. Attention, les mines nécessites cependant une forte dose d'énergie pour etre lancées, et elles explosent au bout de 30 secondes.]],
+  },
+
+  defaultmissiontype  = [[VTOL_standby]],
+  explodeAs           = [[GUNSHIPEX]],
+  floater             = true,
+  footprintX          = 4,
+  footprintZ          = 4,
+  iconType            = [[bomberriot]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  maneuverleashlength = [[1380]],
+  mass                = 200,
+  maxAcc              = 0.5,
+  maxDamage           = 1000,
+  maxFuel             = 1000,
+  maxVelocity         = 9,
+  minCloakDistance    = 75,
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName          = [[ARMALK]],
+  seismicSignature    = 0,
+  selfDestructAs      = [[GUNSHIPEX]],
+  side                = [[CORE]],
+  sightDistance       = 660,
+  smoothAnim          = true,
+  TEDClass            = [[VTOL]],
+  workerTime          = 0,
+
+  weapons             = {
+
+    {
+      def                = [[MINEBOMB]],
+      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+    },
+
+  },
+
+
+  weaponDefs          = {
+
+    MINEBOMB = {
+      name                    = [[AdvancedBombs]],
+      areaOfEffect            = 30,
+      avoidFeature            = false,
+      avoidFriendly           = false,
+      burst                   = 10,
+      burstrate               = 0.1,
+      collideFriendly         = false,
+      commandfire             = true,
+      craterBoost             = 1,
+      craterMult              = 2,
+
+      damage                  = {
+        default = -1E-06,
+      },
+
+      dropped                 = true,
+      edgeEffectiveness       = 0.7,
+      explosionGenerator      = [[custom:none]],
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      manualBombSettings      = true,
+      model                   = [[ARMMINE1]],
+      myGravity               = 0.7,
+      noSelfDamage            = true,
+      range                   = 800,
+      reloadtime              = 10,
+      renderType              = 6,
+      soundHit                = [[OTAunit/XPLOMED2]],
+      soundStart              = [[OTAunit/BOMBREL]],
+      sprayAngle              = 4000,
+      weaponType              = [[AircraftBomb]],
+    },
+
+  },
+
+
+  featureDefs         = {
+
+    DEAD  = {
+      description      = [[Wreckage - Condor]],
+      blocking         = true,
+      category         = [[corpses]],
+      damage           = 1000,
+      energy           = 0,
+      featureDead      = [[DEAD2]],
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      height           = [[40]],
+      hitdensity       = [[100]],
+      metal            = 160,
+      object           = [[ARMHAM_DEAD]],
+      reclaimable      = true,
+      reclaimTime      = 160,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    DEAD2 = {
+      description      = [[Debris - Condor]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 1000,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 160,
+      object           = [[debris2x2c.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 160,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    HEAP  = {
+      description      = [[Debris - Condor]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 1000,
+      energy           = 0,
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 80,
+      object           = [[debris2x2c.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 80,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+  },
+
+}
+
+return lowerkeys({ corhurc = unitDef })

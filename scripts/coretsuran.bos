@@ -1,0 +1,181 @@
+//Core Tsuranuke Flame/Depthcharge Destroyer script. By Legion.
+
+#define TA 	//This is a TA script
+
+piece hull, turret, barrel, firept, flame1, flame2, flame3, wake1, wake2, dcharge;
+
+#define SIG_AIM1	2
+#define SIG_AIM2	4
+#define SIG_WAKE	8
+#define SMOKEPIECE1	hull
+#include "smokeunit.h"
+#include "exptype.h"
+#include "SFXtype.h"
+
+#define RESTORE_DELAY	3000
+
+PilotLight()
+	{
+	var	i;
+
+	while (TRUE)
+		{
+		i = rand(1,3);
+
+		if (i == 1)
+			{
+			show flame1;
+			sleep 100;
+			hide flame1;
+			}
+		if (i == 2)
+			{
+			show flame2;
+			sleep 100;
+			hide flame2;
+			}
+		if (i == 3)
+			{
+			show flame3;
+			sleep 100;
+			hide flame3;
+			}
+		}
+	}
+	
+Create()
+	{
+	hide flame1;
+	hide flame2;
+	hide flame3;
+	start-script SmokeUnit();
+	}
+
+
+RestoreAfterDelay()
+	{
+	sleep RESTORE_DELAY;
+	turn turret to y-axis 0 speed <30>;
+	turn barrel to x-axis 0 speed <12.5>;
+	}
+
+StartMoving()
+	{
+	signal SIG_WAKE;
+	set-signal-mask SIG_WAKE;
+	while (TRUE)
+		{
+		emit-sfx SFXTYPE_WAKE1 from wake1;
+		emit-sfx SFXTYPE_WAKE1 from wake2;
+		sleep 300;
+		}
+	}
+
+StopMoving()
+	{
+	signal SIG_WAKE;
+	}
+
+AimPrimary(heading,pitch)
+	{
+	signal SIG_AIM1;
+	set-signal-mask SIG_AIM1;
+	turn turret to y-axis heading speed <75>;
+	turn barrel to x-axis (0-pitch) speed <30>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn barrel around x-axis;
+	start-script RestoreAfterDelay();
+	return(TRUE);
+	}
+	
+
+TargetCleared(which)
+	{
+	stop-spin turret around y-axis;
+	stop-spin barrel around x-axis;
+	}
+
+QueryPrimary(piecenum)
+	{
+	piecenum=firept;
+	}
+
+AimFromPrimary(piecenum)
+	{
+	piecenum=turret;
+	}
+
+AimSecondary(heading,pitch)
+	{
+	signal SIG_AIM2;
+	set-signal-mask SIG_AIM2;
+	start-script RestoreAfterDelay();
+	return(TRUE);
+	}
+	
+FireSecondary()
+	{
+	sleep 150;
+	}
+	
+AimFromSecondary(piecenum)
+	{
+	piecenum=hull;
+	}
+
+QuerySecondary(piecenum)
+	{
+	piecenum=dcharge;
+	}
+
+SweetSpot(piecenum)
+	{
+	piecenum=hull;
+	}
+
+Killed( severity, corpsetype )
+	{
+	hide flame1;
+	hide flame2;
+	hide flame3;
+	if (severity <= 25)
+		{
+		corpsetype = 1;
+		explode barrel type	BITMAPONLY | BITMAP1;
+		explode hull type	BITMAPONLY | BITMAP2;
+		explode turret type	BITMAPONLY | BITMAP1;
+		explode wake1 type	BITMAPONLY | BITMAP3;
+		explode wake2 type	BITMAPONLY | BITMAP4;
+		return( 0 );
+		}
+
+	if (severity <= 50)
+		{
+		corpsetype = 2;
+		explode barrel type	FALL | BITMAP1;
+		explode hull type	BITMAPONLY | BITMAP3;
+		explode turret type	BITMAPONLY | BITMAP1;
+		explode wake1 type	FALL | BITMAP3;
+		explode wake2 type	FALL | BITMAP4;
+		return( 0 );
+		}
+
+	if (severity <= 99)
+		{
+		corpsetype = 3;
+		explode barrel type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode hull type	BITMAPONLY | BITMAP3;
+		explode turret type	BITMAPONLY | BITMAP1;
+		explode wake1 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode wake2 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		return( 0 );
+		}
+
+	corpsetype = 3;
+	explode barrel type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode hull type	BITMAPONLY | BITMAP3;
+	explode turret type	BITMAPONLY | BITMAP1;
+	explode wake1 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode wake2 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+	return( 0 );
+	}

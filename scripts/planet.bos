@@ -1,0 +1,7 @@
+piece base, body;
+
+#include "exptype.h"
+
+Create() {
+	explode body type SHATTER;
+}

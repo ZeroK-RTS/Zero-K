@@ -1,0 +1,199 @@
+
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece	base, bay, gantry, clamp1, clamp2, missile, smoke, strobe, 
+		tracks1, tracks2, tracks3, tracks4,
+		wheels1, wheels2, wheels3, wheels4, wheels5, wheels6;
+
+static-var isLoaded, isReady, isMoving, tracks, doStrobe;
+
+// Signal definitions
+#define SIG_AIM				2
+
+#define RESTORE_DELAY		5000
+#define LOAD_DELAY			500
+#define TRACK_PERIOD		50
+
+#define BAY_DISTANCE		[-4]
+#define BAY_SPEED			[8]
+#define GANTRY_SPEED		<90>
+#define CLAMP_SPEED			<180>
+
+#define WHEEL_SPIN_SPEED	<720>
+#define WHEEL_SPIN_ACCEL	<10>
+#define WHEEL_SPIN_DECEL	<30>
+
+SmokeUnit(healthpercent, sleeptime, smoketype) {
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+TrackControl() {
+	while (isMoving) {
+		++tracks;
+		if (tracks == 2) {
+			hide tracks1;
+			show tracks2;
+		} else if (tracks == 3) {
+			hide tracks2;
+			show tracks3;
+		} else if (tracks == 4) {
+			hide tracks3;
+			show tracks4;
+		} else {
+			tracks = 1;
+			hide tracks4;
+			show tracks1;
+		}
+		sleep TRACK_PERIOD;
+	}
+}
+
+Prepare() {
+	move bay to x-axis 0 speed BAY_SPEED;
+	wait-for-move bay along x-axis;
+	doStrobe = 1;
+	turn gantry to x-axis <-90> speed GANTRY_SPEED;
+	wait-for-turn gantry around x-axis;
+	turn clamp1 to z-axis <90> speed CLAMP_SPEED;
+	turn clamp2 to z-axis <-90> speed CLAMP_SPEED;
+	wait-for-turn clamp1 around y-axis;
+	wait-for-turn clamp2 around y-axis;
+	isReady = 1;
+}
+
+Reload() {
+	isReady = 0;
+	doStrobe = 0;
+	turn clamp1 to z-axis 0 speed CLAMP_SPEED;
+	turn clamp2 to z-axis 0 speed CLAMP_SPEED;
+	wait-for-turn clamp1 around z-axis;
+	wait-for-turn clamp2 around z-axis;
+	turn gantry to x-axis 0 speed GANTRY_SPEED;
+	wait-for-turn gantry around x-axis;
+	move bay to x-axis BAY_DISTANCE speed BAY_SPEED;
+	wait-for-move bay along x-axis;
+	
+	set-signal-mask 0;
+	sleep LOAD_DELAY;
+	isLoaded = 1;
+	show missile;
+}
+
+StartMoving() {
+	isMoving = 1;
+	start-script TrackControl();
+	spin wheels1 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels2 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels3 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels4 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels5 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels6 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+}
+
+StopMoving() {
+	isMoving = 0;
+	stop-spin wheels1 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels2 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels3 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels4 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels5 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels6 around x-axis decelerate WHEEL_SPIN_DECEL;
+}
+
+RestoreAfterDelay() {
+	sleep RESTORE_DELAY;
+	start-script Reload();
+}
+
+AimWeapon1(heading, pitch) {
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	if (isLoaded) {
+		start-script Prepare();
+		if (doStrobe) emit-sfx 1024 from strobe;
+	}
+	while (!isReady) sleep 250;
+	start-script RestoreAfterDelay();
+	return (1);
+}
+
+QueryWeapon1(piecenum) {
+	piecenum = smoke;
+}
+
+Shot1() {
+	hide missile;
+	isLoaded = 0;
+	doStrobe = 0;
+	start-script Reload();
+}
+
+Create() {
+	hide tracks2;
+	hide tracks3;
+	hide tracks4;
+	move bay to x-axis BAY_DISTANCE now;
+	tracks = 0;
+	isMoving = 0;
+	isLoaded = 1;
+	isReady = 0;
+	doStrobe = 0;
+	start-script SmokeUnit();
+}
+
+SweetSpot(piecenum) {
+	piecenum = base;
+}
+
+Killed(severity, corpsetype) {
+	if( severity <= 25 ) {
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode bay type BITMAPONLY | BITMAP1;
+		explode gantry type BITMAPONLY | BITMAP1;
+		explode clamp1 type BITMAPONLY | BITMAP1;
+		explode clamp2 type BITMAPONLY | BITMAP1;
+		explode missile type BITMAPONLY | BITMAP1;
+	} else if( severity <= 50 ) {
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode bay type BITMAPONLY | BITMAP1;
+		explode gantry type FALL | BITMAP1;
+		explode clamp1 type FALL | BITMAP1;
+		explode clamp2 type FALL | BITMAP1;
+		explode missile type BITMAPONLY | BITMAP1;
+	} else {
+		corpsetype = 3;
+		explode base type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode bay type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode gantry type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode clamp1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode clamp2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode missile type BITMAPONLY | BITMAP1;
+	}
+}

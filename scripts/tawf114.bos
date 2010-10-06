@@ -1,0 +1,253 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  	base, turret, sleeve, dummy1, dummy2, smoke1, smoke2,
+		tracks1, tracks2, tracks3, tracks4,
+		wheels1, wheels2, wheels3, wheels4, wheels5, wheels6, wheels7, wheels8;
+
+static-var  gun_1, gun_1_yaw, isMoving, tracks;
+
+// Signal definitions
+#define RESTORE_DELAY			3000
+#define TRACK_PERIOD			50
+
+#define SIG_AIM					2
+#define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
+#define SIG_TILT_Z				8		//Signal to prevent multiple rocking. REPLACE!
+
+#define WHEEL_SPIN_SPEED_L		<360>
+#define WHEEL_SPIN_ACCEL_L		<10>
+#define WHEEL_SPIN_DECEL_L		<30>
+#define WHEEL_SPIN_SPEED_S		<540>
+#define WHEEL_SPIN_ACCEL_S		<15>
+#define WHEEL_SPIN_DECEL_S		<45>
+
+//rocking
+#define ROCK_PIECE				base	//piece to rock. REPLACE!
+#define ROCK_X_SPEED			3		//Number of half-cycles per second around x-axis.
+#define ROCK_X_DECAY			-1/2	//Rocking around x-axis is reduced by this factor each time; should be negative to alternate rocking direction.
+#define ROCK_X_MIN              <0.5>	//If around x-axis rock is not greater than this amount, rocking will stop after returning to center.
+#define ROCK_X_FIRE_1			-8
+
+//tiltz
+#define TILT_PIECE				base	//piece to tilt. REPLACE!
+#define TILT_Z_ANGLE			<-10>	//How much to tilt at maximum
+#define TILT_Z_DIST				[24]	//Typically half the width of the unit. Keeps the unit's edges from sinking into the ground.
+#define TILT_Z_SPEED			3		//Number of half-cycles per second around z-axis
+
+#include "tiltz.h"
+
+#include "rockx.h"
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+TrackControl() {
+	while (isMoving) {
+		++tracks;
+		if (tracks == 2) {
+			hide tracks1;
+			show tracks2;
+		} else if (tracks == 3) {
+			hide tracks2;
+			show tracks3;
+		} else if (tracks == 4) {
+			hide tracks3;
+			show tracks4;
+		} else {
+			tracks = 1;
+			hide tracks4;
+			show tracks1;
+		}
+		sleep TRACK_PERIOD;
+	}
+}
+
+StartMoving() {
+	isMoving = 1;
+	start-script TrackControl();
+	spin wheels1 around x-axis speed WHEEL_SPIN_SPEED_S accelerate WHEEL_SPIN_ACCEL_S;
+	spin wheels2 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels3 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels4 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels5 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels6 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels7 around x-axis speed WHEEL_SPIN_SPEED_L accelerate WHEEL_SPIN_ACCEL_L;
+	spin wheels8 around x-axis speed WHEEL_SPIN_SPEED_S accelerate WHEEL_SPIN_ACCEL_S;
+}
+
+StopMoving() {
+	isMoving = 0;
+	stop-spin wheels1 around x-axis decelerate WHEEL_SPIN_DECEL_S;
+	stop-spin wheels2 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels3 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels4 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels5 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels6 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels7 around x-axis decelerate WHEEL_SPIN_DECEL_L;
+	stop-spin wheels8 around x-axis decelerate WHEEL_SPIN_DECEL_S;
+}
+
+HitByWeapon(Func_Var_1, Func_Var_2)
+{
+	turn base to z-axis Func_Var_2 speed <105.000000>;
+	turn base to x-axis Func_Var_1 speed <105.000000>;
+	wait-for-turn base around z-axis;
+	wait-for-turn base around x-axis;
+	turn base to z-axis <0.000000> speed <30.000000>;
+	turn base to x-axis <0.000000> speed <30.000000>;
+}
+
+Create()
+{
+	hide tracks2;
+	hide tracks3;
+	hide tracks4;
+	turn smoke1 to y-axis <180> now;
+	turn smoke2 to y-axis <180> now;
+	isMoving = 0;
+	gun_1 = 1;
+	tracks = 1;
+	call-script RockXInit();
+	start-script SmokeUnit();
+}
+
+RestoreAfterDelay()
+{
+	sleep RESTORE_DELAY;
+	turn turret to y-axis <0.000000> speed <100.000000>;
+	turn sleeve to x-axis <0.000000> speed <100.000000>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn sleeve around x-axis;
+	return (1);
+}
+
+AimPrimary(heading, pitch)
+{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	turn turret to y-axis heading speed <125.000000>;
+	turn sleeve to x-axis <0.000000> - pitch speed <125.000000>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn sleeve around x-axis;
+	start-script RestoreAfterDelay();
+	gun_1_yaw = heading;
+	return (1);
+}
+
+FirePrimary()
+{
+	start-script RockX(ROCK_X_FIRE_1, gun_1_yaw);
+	start-script TiltZ(gun_1_yaw);
+	gun_1 = !gun_1;
+	if( gun_1 )
+	{
+		show smoke1;		
+		hide smoke1;
+	} else {
+		show smoke2;		
+		hide smoke2;
+	}
+}
+
+Shot1(){
+	if( gun_1 )
+	{
+		hide dummy1;
+		move dummy1 to z-axis [-3.000000] now;
+		sleep 2000;		
+		show dummy1;
+		move dummy1 to z-axis [0.000000] speed [1.000000];
+	} else {
+		hide dummy2;
+		move dummy2 to z-axis [-3.000000] now;
+		sleep 2000;		
+		show dummy2;
+		move dummy2 to z-axis [0.000000] speed [1.000000];
+	}	
+}
+
+AimFromPrimary(piecenum)
+{
+	piecenum = sleeve;
+}
+
+QueryPrimary(piecenum)
+{
+	if (gun_1) {
+		piecenum = dummy1;
+	} else {
+		piecenum = dummy2;
+	}
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode turret type BITMAPONLY | BITMAP4;
+		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode dummy1 type SHATTER | BITMAP4;
+		explode dummy2 type SHATTER | BITMAP4;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode turret type SHATTER | BITMAP4;
+		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode dummy1 type SHATTER | BITMAP4;
+		explode dummy2 type SHATTER | BITMAP4;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode base type BITMAPONLY | BITMAP1;
+		explode turret type SHATTER | BITMAP4;
+		explode sleeve type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+		explode dummy1 type SHATTER | BITMAP4;
+		explode dummy2 type SHATTER | BITMAP4;
+		return (0);
+	}
+	corpsetype = 3;
+	explode base type BITMAPONLY | BITMAP1;
+	explode turret type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+	explode sleeve type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+	explode dummy1 type SHATTER | BITMAP4;
+	explode dummy2 type SHATTER | BITMAP4;
+}

@@ -1,0 +1,222 @@
+#define TAK
+#include "constants.h"
+
+piece		base, swivel, turret, arm, wrist, gun, barrel, muzzle, breech, eject, 
+			tracks1, tracks2, tracks3, tracks4,
+			wheels1, wheels2, wheels3, wheels4, wheels5, wheels6;
+
+static-var	tracks, isMoving, gun_1_yaw;
+
+// Signal definitions
+#define SIG_AIM_1					2
+
+#define RESTORE_DELAY				3000
+#define RECOIL_BARREL				[-3.5]
+#define RECOIL_BREECH				[-3]
+#define RECOIL_SWIVEL				<60>
+#define RECOIL_RESTORE_BARREL		[1.4]
+#define RECOIL_RESTORE_BREECH		[1.2]
+#define RECOIL_RESTORE_SWIVEL		<24>
+#define TURRET_SPEED				<90>
+
+#define WHEEL_SPIN_SPEED		<360>
+#define WHEEL_SPIN_ACCEL		<10>
+#define WHEEL_SPIN_DECEL		<30>
+
+#define TRACK_PERIOD			50
+
+#define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
+#define SIG_TILT_Z				8		//Signal to prevent multiple tilting. REPLACE!
+
+//rocking
+#define ROCK_PIECE				base	//piece to rock. REPLACE!
+#define ROCK_X_SPEED			4		//Number of half-cycles per second around x-axis.
+#define ROCK_X_DECAY			-1/2	//Rocking around x-axis is reduced by this factor each time; should be negative to alternate rocking direction.
+#define ROCK_X_MIN              <0.5>	//If around x-axis rock is not greater than this amount, rocking will stop after returning to center.
+
+#define ROCK_X_FIRE_1			-20
+
+//tiltz
+#define TILT_PIECE				base	//piece to tilt. REPLACE!
+#define TILT_Z_ANGLE			<-5>	//How much to tilt at maximum
+#define TILT_Z_DIST				[14]	//Typically half the width of the unit. Keeps the unit's edges from sinking into the ground.
+#define TILT_Z_SPEED			7		//Number of half-cycles per second around z-axis
+
+#include "tiltz.h"
+
+#include "rockx.h"
+
+RestoreAfterDelay()
+{
+	sleep RESTORE_DELAY;
+	turn turret to y-axis 0 speed TURRET_SPEED;
+	turn arm to z-axis 0 speed TURRET_SPEED;
+	turn wrist to z-axis 0 speed TURRET_SPEED;
+	turn gun to x-axis 0 speed TURRET_SPEED;
+}
+
+DamageControl()
+{
+	var health;
+	while (TRUE)
+	{
+		health = get HEALTH;
+		
+		if (health < 50)
+		{
+			emit-sfx SFXTYPE_WHITESMOKE from base;
+			if (health < 25)
+			{	
+				emit-sfx SFXTYPE_BLACKSMOKE from turret;
+			}
+		}
+		sleep 1000;
+	}
+}
+
+TrackControl() {
+	while (isMoving) {
+		++tracks;
+		if (tracks == 2) {
+			hide tracks1;
+			show tracks2;
+		} else if (tracks == 3) {
+			hide tracks2;
+			show tracks3;
+		} else if (tracks == 4) {
+			hide tracks3;
+			show tracks4;
+		} else {
+			tracks = 1;
+			hide tracks4;
+			show tracks1;
+		}
+		sleep TRACK_PERIOD;
+	}
+}
+
+StartMoving()
+{
+	isMoving = 1;
+	start-script TrackControl();
+	spin wheels1 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels2 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels3 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels4 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels5 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheels6 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+}
+
+StopMoving()
+{
+	isMoving = 0;
+
+	stop-spin wheels1 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels2 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels3 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels4 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels5 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheels6 around x-axis decelerate WHEEL_SPIN_DECEL;
+}
+
+// Weapons
+AimFromWeapon1(piecenum)
+{
+	piecenum = swivel;
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = muzzle;
+}
+
+AimWeapon1 (heading, pitch)
+{
+	signal SIG_AIM_1;
+	set-signal-mask SIG_AIM_1;
+
+	turn turret to y-axis heading speed TURRET_SPEED;
+	turn arm to z-axis 0 - pitch speed TURRET_SPEED;
+	turn wrist to z-axis pitch speed TURRET_SPEED;
+	turn gun to x-axis 0 - pitch speed TURRET_SPEED;
+
+	wait-for-turn turret around y-axis;
+	wait-for-turn gun  around x-axis;
+	start-script RestoreAfterDelay();
+	gun_1_yaw = heading;
+	return (TRUE);
+}
+
+Shot1()
+{
+	start-script RockX(ROCK_X_FIRE_1, gun_1_yaw);
+	start-script TiltZ(gun_1_yaw);
+	move barrel to z-axis RECOIL_BARREL now;
+	move breech to z-axis RECOIL_BREECH now;
+	turn swivel to y-axis RECOIL_SWIVEL now;
+	
+	emit-sfx 1024 from muzzle;
+	
+	move barrel to z-axis 0 speed RECOIL_RESTORE_BARREL;
+	move breech to z-axis 0 speed RECOIL_RESTORE_BREECH;
+	turn swivel to y-axis 0 speed RECOIL_RESTORE_SWIVEL;
+	return (0);
+}
+
+Killed(severity, corpsetype)
+{
+	if(severity >= 0 AND severity < 25)
+	{
+		corpsetype = 1;
+		explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode barrel type BITMAPONLY | BITMAP;
+		explode gun type BITMAPONLY | BITMAP;
+		explode base type BITMAPONLY | BITMAP;
+		explode turret type BITMAPONLY | BITMAP;
+	}
+	else if(severity >= 25 AND severity < 50)
+	{
+		corpsetype = 2;
+		explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode barrel type FALL | BITMAP;
+		explode gun type FALL | BITMAP;
+		explode base type BITMAPONLY | BITMAP;
+		explode turret type SHATTER | BITMAP;
+	}
+	else if(severity >= 50 AND severity < 100)
+	{
+		corpsetype = 3;
+		explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode base type BITMAPONLY | BITMAP;
+		explode turret type SHATTER | BITMAP;
+	}
+	// D-Gunned/Self-D
+	else if(severity >= 100)
+	{
+		corpsetype = 3;
+		explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode base type SHATTER | BITMAP;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	}
+}
+
+Create()
+{
+	isMoving = 0;
+	tracks = 1;
+	hide tracks2;
+	hide tracks3;
+	hide tracks4;
+	
+	call-script RockXInit();
+
+	while (get BUILD_PERCENT_LEFT)
+		sleep 250;
+	
+	
+	start-script DamageControl();
+}

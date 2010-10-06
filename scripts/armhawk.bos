@@ -1,0 +1,324 @@
+//linear constant=65536
+
+#include "constants.h"
+
+piece  	base, mfbeam, mrbeam, mhull, mwing, mwingtip, mjet, mrack, mmissile, mmissleflare,
+		rbase, rfbeam, rrbeam, rhull, rwing, rwingtip, rjet, rrack, rmissile, rmissleflare,
+		lbase, lfbeam, lrbeam, lhull, lwing, lwingtip, ljet, lrack, lmissile, lmissleflare;
+
+static-var gun1, barrelroll, statechg_DesiredState, statechg_StateChanging;
+
+//13.425
+
+activatescr()
+{
+	if( TRUE )
+	{
+		turn base to x-axis <0> speed <180>;
+		move base to y-axis [0] speed [26.85];
+		
+		move mwing to y-axis [0] speed [16];
+		move rwing to x-axis [0] speed [16];
+		move lwing to x-axis [0] speed [16];
+		
+		sleep 500;
+	}
+	if( TRUE )
+	{
+		turn mrbeam to x-axis <0> speed <180>;
+		turn mfbeam to x-axis <0> speed <180>;
+		turn mhull to x-axis <0> speed <180>;	
+	
+		turn rrbeam to y-axis <0> speed <180>;
+		turn rfbeam to y-axis <0> speed <180>;
+		turn rhull to y-axis <0> speed <180>;
+	
+		turn lrbeam to y-axis <0> speed <180>;
+		turn lfbeam to y-axis <0> speed <180>;
+		turn lhull to y-axis <0> speed <180>;
+	
+		sleep 500;
+	}
+	if( TRUE )
+	{	
+		move mrack to y-axis [0] speed [6];
+		move rrack to x-axis [0] speed [6];
+		move lrack to x-axis [0] speed [6];
+		
+		sleep 500;
+	}
+	sleep 10;
+}
+
+deactivatescr()
+{
+	if( TRUE )
+	{
+		move mrack to y-axis [3] speed [6];
+		move rrack to x-axis [3] speed [6];
+		move lrack to x-axis [-3] speed [6];
+		sleep 500;
+	}
+	if( TRUE )
+	{	
+		turn mrbeam to x-axis <90> speed <180>;
+		turn mfbeam to x-axis <90> speed <180>;
+		turn mhull to x-axis <-90> speed <180>;	
+
+		turn rrbeam to y-axis <90> speed <180>;
+		turn rfbeam to y-axis <90> speed <180>;
+		turn rhull to y-axis <-90> speed <180>;
+	
+		turn lrbeam to y-axis <-90> speed <180>;
+		turn lfbeam to y-axis <-90> speed <180>;
+		turn lhull to y-axis <90> speed <180>;
+	
+		sleep 500;
+	}
+	if( TRUE )
+	{
+		turn base to x-axis <-90> speed <180>;
+		move base to y-axis [13.425] speed [26.85];
+		move mwing to y-axis [-8] speed [16];
+		move rwing to x-axis [-8] speed [16];
+		move lwing to x-axis [8] speed [16];
+		
+		sleep 500;
+	}
+	sleep 10;
+}
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+
+InitState()
+{
+	statechg_DesiredState = TRUE;
+	statechg_StateChanging = FALSE;
+}
+
+RequestState(requestedstate, currentstate)
+{
+	if( statechg_StateChanging )
+	{
+		statechg_DesiredState = requestedstate;
+		return (0);
+	}
+	statechg_StateChanging = TRUE;
+	currentstate = statechg_DesiredState;
+	statechg_DesiredState = requestedstate;
+	while( statechg_DesiredState != currentstate )
+	{
+		if( statechg_DesiredState == 0 )
+		{
+			call-script activatescr();
+			currentstate = 0;
+		}
+		if( statechg_DesiredState == 1 )
+		{
+			call-script deactivatescr();
+			currentstate = 1;
+		}
+	}
+	statechg_StateChanging = FALSE;
+}
+
+MoveRate2()
+{
+	if( Rand( 1, 10 ) == 1 AND ( !barrelroll ) )
+	{
+		barrelroll = 1;
+		turn base to z-axis <240> speed <120>;
+		wait-for-turn base around z-axis;
+		turn base to z-axis <120> speed <120>;
+		wait-for-turn base around z-axis;
+		turn base to z-axis <0.000000> speed <120>;
+		barrelroll = 0;
+	}
+}
+
+Create()
+{
+	barrelroll = 0;
+	
+	turn rbase to z-axis <-30> now;
+	turn lbase to z-axis <30> now;
+	
+	turn base to x-axis <-90> now;
+	move base to y-axis [13.425] now;
+	
+	move mwing to y-axis [-8] now;
+	move rwing to x-axis [-8] now;
+	move lwing to x-axis [8] now;
+	
+	move mrack to y-axis [3] now;
+	move rrack to x-axis [3] now;
+	move lrack to x-axis [-3] now;
+	
+	turn mrbeam to x-axis <90> now;
+	turn mfbeam to x-axis <90> now;
+	turn mhull to x-axis <-90> now;	
+
+	turn rrbeam to y-axis <90> now;
+	turn rfbeam to y-axis <90> now;
+	turn rhull to y-axis <-90> now;
+	
+	turn lrbeam to y-axis <-90> now;
+	turn lfbeam to y-axis <-90> now;
+	turn lhull to y-axis <90> now;		
+	
+	call-script InitState();
+	start-script SmokeUnit();
+}
+
+Activate()
+{
+	start-script RequestState(0);
+}
+
+Deactivate()
+{
+	start-script RequestState(1);
+}
+
+QueryWeapon1(piecenum)
+{
+	if( gun1 == 0 )
+	{
+		piecenum = mmissile;
+	}
+	if( gun1 == 1 )
+	{
+		piecenum = rmissile;
+	}
+	if( gun1 == 2 )
+	{
+		piecenum = lmissile;
+	}
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = rbase;
+}
+
+
+
+AimWeapon1(heading, pitch)
+{
+	return (1);
+}
+
+Shot1()
+{
+	if( gun1 == 0 )
+	{
+		emit-sfx 1024 from mmissleflare;
+		hide mmissile;
+		move mrack to y-axis [-3] speed [6];
+		sleep 750;
+		show mmissile;
+		move mrack to y-axis [0] speed [6];
+	}
+	if( gun1 == 1 )
+	{
+		emit-sfx 1024 from rmissleflare;
+		hide rmissile;
+		move rrack to x-axis [3] speed [6];
+		sleep 750;
+		show rmissile;
+		move rrack to x-axis [0] speed [6];
+	}
+	if( gun1 == 2 )
+	{
+		emit-sfx 1024 from lmissleflare;
+		hide lmissile;
+		move lrack to x-axis [-3] speed [6];
+		sleep 750;
+		show lmissile;
+		move lrack to x-axis [0] speed [6];
+	}
+
+	gun1 = 1 + gun1;
+
+	if( gun1 == 3 )
+	{
+		gun1 = 0;
+	}
+}
+
+BlockShot1(unit, block)
+{
+	if (get CRASHING)
+	{
+		block = 1;
+	}
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode mhull type BITMAPONLY;
+		explode lhull type BITMAPONLY;
+		explode rhull type BITMAPONLY;
+		explode mwing type BITMAPONLY;
+		explode lwing type BITMAPONLY;
+		explode rwing type BITMAPONLY;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 1;
+		explode mhull type BITMAPONLY;
+		explode lhull type BITMAPONLY;
+		explode rhull type BITMAPONLY;
+		explode mwing type FALL;
+		explode lwing type FALL;
+		explode rwing type FALL;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 2;
+		explode mhull type SHATTER;
+		explode lhull type SHATTER;
+		explode rhull type SHATTER;
+		explode mwing type FALL | SMOKE | FIRE;
+		explode lwing type FALL | SMOKE | FIRE;
+		explode rwing type FALL | SMOKE | FIRE;
+		return (0);
+	}
+	corpsetype = 2;
+	explode mhull type FALL | SMOKE | FIRE;
+	explode lhull type FALL | SMOKE | FIRE;
+	explode rhull type FALL | SMOKE | FIRE;
+	explode mwing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode lwing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode rwing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+}

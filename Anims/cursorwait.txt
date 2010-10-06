@@ -1,0 +1,5 @@
+hotspot center
+frame  anims/cursorwait_0.png  0.1
+frame  anims/cursorwait_1.png  0.1
+frame  anims/cursorwait_2.png  0.1
+frame  anims/cursorwait_1.png  0.1

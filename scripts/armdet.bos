@@ -1,0 +1,143 @@
+// Arm EMG Defense Battery
+
+piece base, flare1, flare2, turreta, turretb, sleeve1, barrel1, barrel2;
+static-var fire;
+
+#define SIG_AIM	2
+#define SMOKEPIECE1 base
+#include "smokeunit.h"
+#include "exptype.h"
+
+Create()
+	{
+	hide flare1;
+	hide flare2;
+	dont-cache flare1;
+	dont-cache flare2;
+	dont-cache turreta;
+	dont-cache turretb;
+	dont-cache sleeve1;
+	dont-cache barrel1;
+	dont-cache barrel2;
+	dont-shade flare1;
+	dont-shade flare2;
+	dont-shade turreta;
+	dont-shade turretb;
+	dont-shade sleeve1;
+	dont-shade barrel1;
+	dont-shade barrel2;
+	fire=0;
+	start-script SmokeUnit();
+	}
+
+AimPrimary(heading,pitch)
+	{
+	signal SIG_AIM;
+	set-signal-mask SIG_AIM;
+	turn turreta to y-axis heading speed <300>;
+	turn turretb to x-axis (0-pitch) speed <200>;
+	turn sleeve1 to x-axis (0-pitch) speed <200>;
+	wait-for-turn turreta around y-axis;
+	wait-for-turn turretb around x-axis;
+	wait-for-turn sleeve1 around x-axis;
+	return(TRUE);
+	}
+
+FirePrimary()
+	{
+	if (fire==0)
+		{
+		show flare1;
+		move barrel1 to z-axis [-1.4] speed [300];
+		sleep 150;
+		hide flare1;
+		wait-for-move barrel1 along z-axis;
+		move barrel1 to z-axis [0] speed [3.0];
+		}
+	if (fire==1)
+		{
+		show flare2;
+		move barrel2 to z-axis [-1.4] speed [300];
+		sleep 150;
+		hide flare2;
+		wait-for-move barrel2 along z-axis;
+		move barrel2 to z-axis [0] speed [3.0];
+		}
+	fire = !fire;
+	}	
+	
+AimFromPrimary(piecenum)
+	{
+	piecenum=turretb;
+	}
+
+QueryPrimary(piecenum)
+	{
+	if (fire==0) {
+		piecenum=flare1; }
+	if (fire==1) {
+		piecenum=flare2; }
+	}
+
+SweetSpot(piecenum)
+	{
+	piecenum=base;
+	}
+
+Killed( severity, corpsetype )
+	{
+	hide flare1;
+	hide flare2;
+	if (severity <= 25)
+		{
+		corpsetype = 1;
+		explode barrel1 type	BITMAPONLY | BITMAP1;
+		explode barrel2 type	BITMAPONLY | BITMAP2;
+		explode base type	BITMAPONLY | BITMAP3;
+		explode flare1 type	BITMAPONLY | BITMAP4;
+		explode flare2 type	BITMAPONLY | BITMAP5;
+		explode sleeve1 type	BITMAPONLY | BITMAP1;
+		explode turreta type	BITMAPONLY | BITMAP2;
+		explode turretb type	BITMAPONLY | BITMAP3;
+		return( 0 );
+		}
+
+	if (severity <= 50)
+		{
+		corpsetype = 2;
+		explode barrel1 type	FALL | BITMAP1;
+		explode barrel2 type	FALL | BITMAP2;
+		explode base type	BITMAPONLY | BITMAP3;
+		explode flare1 type	FALL | BITMAP4;
+		explode flare2 type	FALL | BITMAP5;
+		explode sleeve1 type	SHATTER | BITMAP1;
+		explode turreta type	FALL | BITMAP2;
+		explode turretb type	FALL | BITMAP3;
+		return( 0 );
+		}
+
+	if (severity <= 99)
+		{
+		corpsetype = 3;
+		explode barrel1 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode barrel2 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode base type	BITMAPONLY | BITMAP3;
+		explode flare1 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		explode flare2 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode sleeve1 type	SHATTER | BITMAP1;
+		explode turreta type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode turretb type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		return( 0 );
+		}
+
+	corpsetype = 3;
+	explode barrel1 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+	explode barrel2 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode base type	BITMAPONLY | BITMAP3;
+	explode flare1 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+	explode flare2 type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode sleeve1 type	SHATTER | EXPLODE_ON_HIT | BITMAP1;
+	explode turreta type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode turretb type	FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	return( 0 );
+	}

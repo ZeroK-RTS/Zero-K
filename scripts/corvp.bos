@@ -1,0 +1,400 @@
+// wobbling nanoturrets, comment out to disable
+//#define WOBBLE
+
+#include "constants.h"
+
+piece  base, body, pad, strobe, top, top1, top2, top3, mid, mid1, mid2, mid3,
+       door1, door2, bay1a, bay1b, bay2a, bay2b,
+       turret1, turret2, turret3, turret4, nano1, nano2, nano3, nano4,
+       bottom, bottom1, bottom2, bottom3, fan1, fan2, fan3,
+       beam1, beam2, beam3, beam4;
+       
+static-var spray;
+
+lua_QueryNanoPiece() { return 0; }
+
+#define SIG_ACTIVATION 0x01
+#define SIG_BUILD      0x02
+
+#define TURNSPEED1 <180>
+#define TURNSPEED2 <240>
+#define TURNSPEED3 <360>
+
+#define FANSPEED1   <180>
+#define FANSPEED2  <1200>
+#define FANRATE     <45>
+
+#define MOVESPEED1 [20]
+#define MOVESPEED2 [30]
+#define MOVESPEED3 [40]
+
+
+#define BAY_Z [7.777]
+#define TURRET_X [2.4]
+
+SmokeUnit(healthpercent, sleeptime, smoketype)
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		healthpercent = get HEALTH;
+		if( healthpercent < 66 )
+		{
+			smoketype = 256 | 2;
+			if( Rand( 1, 66 ) < healthpercent )
+			{
+				smoketype = 256 | 1;
+			}
+			emit-sfx smoketype from base;
+		}
+		sleeptime = healthpercent * 50;
+		if( sleeptime < 200 )
+		{
+			sleeptime = 200;
+		}
+		sleep sleeptime;
+	}
+}
+Open()
+{
+	turn top to y-axis <-90> speed TURNSPEED2;
+	wait-for-turn top around y-axis;
+	turn mid to y-axis <90> speed TURNSPEED2;
+	wait-for-turn mid around y-axis;
+	turn bottom to y-axis <180>+1 speed TURNSPEED3;
+	wait-for-turn bottom around y-axis;
+
+	move top1 to z-axis     [13] speed MOVESPEED2;
+	move top3 to z-axis    [-13] speed MOVESPEED2;
+	move mid1 to z-axis    [-13] speed MOVESPEED2;
+	move mid3 to z-axis     [13] speed MOVESPEED2;
+	move bottom1 to x-axis [-13] speed MOVESPEED2;
+	move bottom3 to x-axis  [13] speed MOVESPEED2;
+	move top2 to x-axis    [30.869] speed MOVESPEED3;
+	sleep 250;
+	move mid2 to x-axis    [-30.869] speed MOVESPEED3;
+	sleep 250;
+	move bottom2 to z-axis [30.869] speed MOVESPEED3;
+
+	wait-for-move top1    along z-axis;
+	wait-for-move top2    along x-axis;
+	wait-for-move top3    along z-axis;
+	wait-for-move mid1    along z-axis;
+	wait-for-move mid2    along x-axis;
+	wait-for-move mid3    along z-axis;
+	wait-for-move bottom1 along x-axis;
+	wait-for-move bottom2 along z-axis;
+	wait-for-move bottom3 along x-axis;
+	
+	turn bay1a to y-axis  <-90>   speed TURNSPEED1;
+	turn bay2a to y-axis   <90>   speed TURNSPEED1;
+	turn door1 to y-axis <-180>+1 speed TURNSPEED3;
+	turn door2 to y-axis  <180>-1 speed TURNSPEED3;
+	wait-for-turn bay1a around y-axis;
+	wait-for-turn bay2a around y-axis;
+	wait-for-turn door1 around y-axis;
+	wait-for-turn door2 around y-axis;
+	
+	move bay1a to z-axis   BAY_Z speed MOVESPEED1;	
+	move bay2a to z-axis 0-BAY_Z speed MOVESPEED1;
+	move turret1 to z-axis  [6] speed MOVESPEED1;
+	move turret4 to z-axis [-6] speed MOVESPEED1;
+	sleep 100;
+
+	turn bay1b to y-axis <-135> speed TURNSPEED2;
+	turn bay2b to y-axis  <135> speed TURNSPEED2;
+
+	wait-for-move turret1 along z-axis;
+	wait-for-move turret4 along z-axis;
+	
+	move turret2 to x-axis TURRET_X speed MOVESPEED1;
+	move turret3 to x-axis TURRET_X speed MOVESPEED1;
+	turn nano2 to y-axis  <90> speed TURNSPEED1;
+	turn nano3 to y-axis <-90> speed TURNSPEED1;
+	turn nano2 to z-axis <-10> speed TURNSPEED1;
+	turn nano3 to z-axis <-10> speed TURNSPEED1;
+	turn nano1 to x-axis  <15> speed TURNSPEED1;
+	turn nano4 to x-axis <-15> speed TURNSPEED1;
+	wait-for-turn nano2 around y-axis;
+	wait-for-turn nano3 around y-axis;
+	wait-for-turn nano1 around x-axis;
+	wait-for-turn nano4 around x-axis;
+}
+Close()
+{
+	move turret2 to x-axis 0 speed MOVESPEED2;
+	move turret3 to x-axis 0 speed MOVESPEED2;
+	turn nano2 to y-axis 0 speed TURNSPEED1;
+	turn nano3 to y-axis 0 speed TURNSPEED1;
+	turn nano2 to z-axis 0 speed TURNSPEED1;
+	turn nano3 to z-axis 0 speed TURNSPEED1;
+	turn nano1 to x-axis 0 speed TURNSPEED1;
+	turn nano4 to x-axis 0 speed TURNSPEED1;
+	wait-for-turn nano2 around y-axis;
+	wait-for-turn nano3 around y-axis;
+	wait-for-turn nano1 around x-axis;
+	wait-for-turn nano4 around x-axis;
+		
+	turn bay1b to y-axis 0 speed TURNSPEED1;
+	turn bay2b to y-axis 0 speed TURNSPEED1;
+	wait-for-turn bay1b around y-axis;
+	wait-for-turn bay2b around y-axis;
+	sleep 100;
+
+	move bay1a to z-axis 0 speed MOVESPEED1;	
+	move bay2a to z-axis 0 speed MOVESPEED1;
+	move turret1 to z-axis 0 speed MOVESPEED1;
+	move turret4 to z-axis 0 speed MOVESPEED1;
+
+	wait-for-move turret1 along z-axis;
+	wait-for-move turret4 along z-axis;
+
+
+	turn bay1a to y-axis 0 speed TURNSPEED1;
+	turn bay2a to y-axis 0 speed TURNSPEED1;
+	turn door1 to y-axis 0 speed TURNSPEED3;
+	turn door2 to y-axis 0 speed TURNSPEED3;
+	wait-for-turn bay1a around y-axis;
+	wait-for-turn bay2a around y-axis;
+	wait-for-turn door1 around y-axis;
+	wait-for-turn door2 around y-axis;
+
+	move top1 to z-axis    0 speed MOVESPEED2;
+	move top3 to z-axis    0 speed MOVESPEED2;
+	move mid1 to z-axis    0 speed MOVESPEED2;
+	move mid3 to z-axis    0 speed MOVESPEED2;
+	move bottom1 to x-axis 0 speed MOVESPEED2;
+	move bottom3 to x-axis 0 speed MOVESPEED2;
+
+	move bottom2 to z-axis 0 speed MOVESPEED3;
+	sleep 250;
+	move mid2 to x-axis 0 speed MOVESPEED3;
+	sleep 250;
+	move top2 to x-axis 0 speed MOVESPEED3;
+
+	wait-for-move top1    along z-axis;
+	wait-for-move top2    along z-axis;
+	wait-for-move top3    along z-axis;
+	wait-for-move mid1    along z-axis;
+	wait-for-move mid2    along z-axis;
+	wait-for-move mid3    along z-axis;
+	wait-for-move bottom1 along x-axis;
+	wait-for-move bottom2 along z-axis;
+	wait-for-move bottom3 along x-axis;
+
+	turn bottom to y-axis 0 speed TURNSPEED3;
+	wait-for-turn bottom around y-axis;
+	turn mid to y-axis 0 speed TURNSPEED2;
+	wait-for-turn mid around y-axis;
+	turn top to y-axis 0 speed TURNSPEED2;
+	wait-for-turn top around y-axis;
+}
+
+Activate()
+{
+	signal SIG_ACTIVATION;
+	set-signal-mask SIG_ACTIVATION;
+	
+	call-script Open();
+	set YARD_OPEN to 1;
+	while( !get YARD_OPEN )
+	{
+		set BUGGER_OFF to 1;
+		sleep 1500;
+		set YARD_OPEN to 1;
+	}
+	set BUGGER_OFF to 0;
+	set INBUILDSTANCE to 1;
+}
+
+Deactivate()
+{
+	signal SIG_ACTIVATION;
+	set-signal-mask SIG_ACTIVATION;
+
+	set INBUILDSTANCE to 0;
+
+	set YARD_OPEN to 0;
+	while( get YARD_OPEN )
+	{
+		set BUGGER_OFF to 1;
+		sleep 1500;
+		set YARD_OPEN to 0;
+	}
+	set BUGGER_OFF to 0;
+	call-script Close();
+}
+
+
+Create()
+{
+	spray = 0;
+	spin fan1 around x-axis speed FANSPEED1 accelerate FANRATE;
+	spin fan2 around z-axis speed FANSPEED1 accelerate FANRATE;
+	spin fan3 around x-axis speed FANSPEED1 accelerate FANRATE;
+	start-script SmokeUnit();
+}
+
+QueryNanoPiece(piecenum)
+{
+	if(spray == 0) {
+		piecenum = beam1;
+	}
+	else if(spray == 1) {
+		piecenum = beam2;
+	}
+	else if(spray == 2) {
+		piecenum = beam3;
+	}
+	else if(spray == 3) {
+		piecenum = beam4;
+	}
+	
+	if (spray == 3) {
+		spray = 0;
+	}
+	else {
+		++spray;
+	}
+	call-script lua_QueryNanoPiece(piecenum);
+}
+
+
+StartBuilding(heading, pitch)
+{
+	signal SIG_BUILD;
+	set-signal-mask SIG_BUILD;	
+
+	spin fan1 around x-axis speed FANSPEED2 accelerate FANRATE;
+	spin fan2 around z-axis speed FANSPEED2 accelerate FANRATE;
+	spin fan3 around x-axis speed FANSPEED2 accelerate FANRATE;
+	
+	turn nano2 to z-axis 0-pitch speed TURNSPEED1;
+	turn nano3 to z-axis 0-pitch speed TURNSPEED1;
+	turn nano1 to x-axis 0-pitch speed TURNSPEED1;
+	turn nano4 to x-axis 0-pitch speed TURNSPEED1;
+
+	move pad to z-axis 0 now;
+	move pad to z-axis [10] speed [0.5];
+
+#ifdef WOBBLE
+	var offset1, offset2;
+	while (TRUE)
+	{
+		offset1 = rand(<-15>,<15>);
+		offset2 = rand(-2, 2)*[1]; // rand([-2],[2]) => results are negative mostly
+
+		turn nano2 to y-axis (heading + offset1 + <90>) speed TURNSPEED1;
+		turn nano3 to y-axis (heading + offset1 - <90>) speed TURNSPEED1;
+		turn nano1 to y-axis (heading + offset1)        speed TURNSPEED1;
+		turn nano4 to y-axis (heading - offset1)        speed TURNSPEED1;
+		if (rand(0,1)) {
+			move turret2 to x-axis (TURRET_X + offset2) speed MOVESPEED1;
+			move turret3 to x-axis (TURRET_X - offset2) speed MOVESPEED1;
+		}
+
+		sleep rand(150,500);
+	}
+#endif
+}
+
+StopBuilding()
+{
+	signal SIG_BUILD;
+	set-signal-mask SIG_BUILD;	
+	
+	move pad to z-axis 0 now;
+	stop-spin fan1 around x-axis decelerate FANRATE;
+	stop-spin fan2 around z-axis decelerate FANRATE;
+	stop-spin fan3 around x-axis decelerate FANRATE;
+	sleep 500;
+	spin fan1 around x-axis speed FANSPEED1 accelerate 0-FANRATE;
+	spin fan2 around z-axis speed FANSPEED1 accelerate 0-FANRATE;
+	spin fan3 around x-axis speed FANSPEED1 accelerate 0-FANRATE;
+}
+
+QueryBuildInfo(piecenum)
+{
+	piecenum = pad;
+}
+
+Killed(severity, corpsetype)
+{
+	if(severity >= 0 AND severity < 25)
+	{
+		corpsetype = 1;
+		explode body type BITMAPONLY | BITMAP;
+		explode top1 type BITMAPONLY | BITMAP;
+		explode top2 type BITMAPONLY | BITMAP;
+		explode top3 type BITMAPONLY | BITMAP;
+		explode mid1 type BITMAPONLY | BITMAP;
+		explode mid2 type BITMAPONLY | BITMAP;
+		explode mid3 type BITMAPONLY | BITMAP;
+		explode bottom1 type BITMAPONLY | BITMAP;
+		explode bottom2 type BITMAPONLY | BITMAP;
+		explode bottom3 type BITMAPONLY | BITMAP;
+	}
+	else if(severity >= 25 AND severity < 50)
+	{
+		corpsetype = 2;
+		explode body type BITMAPONLY | BITMAP;
+		explode top1 type BITMAPONLY | BITMAP;
+		explode top2 type BITMAPONLY | BITMAP;
+		explode top3 type BITMAPONLY | BITMAP;
+		explode mid1 type BITMAPONLY | BITMAP;
+		explode mid2 type BITMAPONLY | BITMAP;
+		explode mid3 type BITMAPONLY | BITMAP;
+		explode bottom1 type BITMAPONLY | BITMAP;
+		explode bottom2 type BITMAPONLY | BITMAP;
+		explode bottom3 type BITMAPONLY | BITMAP;
+		explode bay1a type FALL | BITMAP;;
+		explode bay2a type FALL | BITMAP;;
+		explode bay1b type FALL | BITMAP;;
+		explode bay2b type FALL | BITMAP;;
+	}
+	else if(severity >= 50 AND severity < 100)
+	{
+		corpsetype = 3;
+		explode body type BITMAPONLY | BITMAP;
+		explode top1 type BITMAPONLY | BITMAP;
+		explode top2 type BITMAPONLY | BITMAP;
+		explode top3 type BITMAPONLY | BITMAP;
+		explode mid1 type BITMAPONLY | BITMAP;
+		explode mid2 type BITMAPONLY | BITMAP;
+		explode mid3 type BITMAPONLY | BITMAP;
+		explode bottom1 type BITMAPONLY | BITMAP;
+		explode bottom2 type BITMAPONLY | BITMAP;
+		explode bottom3 type BITMAPONLY | BITMAP;
+		explode bay1a type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode bay2a type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode bay1b type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode bay2b type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode door2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode door1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		
+	}
+	// D-Gunned/Self-D
+	else if(severity >= 100)
+	{
+		corpsetype = 3;
+		explode body type SHATTER | BITMAP;
+		explode top1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode top2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode top3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode mid1 type SHATTER | BITMAP;
+		explode mid2 type SHATTER | BITMAP;
+		explode mid3 type SHATTER | BITMAP;
+		explode bottom1 type BITMAPONLY | BITMAP;
+		explode bottom2 type BITMAPONLY | BITMAP;
+		explode bottom3 type BITMAPONLY | BITMAP;
+		explode bay1a type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode bay2a type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode bay1b type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode bay2b type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode door2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode door1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	}
+}

@@ -1,0 +1,3 @@
+hotspot topleft
+frame  anims/ca_static/cursorrepair.png  5
+

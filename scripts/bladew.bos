@@ -1,0 +1,130 @@
+piece  base, cap, boosters, rjet, jets, ljet,
+       firepoint, weapon, housing, hinge, cover1, cover2;
+       
+static-var	moving, attacking, lastPos;
+			
+// Signal definitions
+#define SIG_MOVE			2
+
+#define SMOKEPIECE1 base
+#include "smokeunit.h"
+
+#include "sfxtype.h"
+#include "exptype.h"
+#include "constants.h"
+
+
+DamageControl()
+{
+	var health;
+	while (TRUE)
+	{
+		health = get HEALTH;
+		if (health < 50)
+		{
+			emit-sfx SFXTYPE_WHITESMOKE from base;
+			if (health < 25)
+			{	
+				emit-sfx SFXTYPE_BLACKSMOKE from rjet;
+			}
+		}
+		sleep 1000;
+	}
+}
+
+TurnJets()
+{
+	
+	while ( TRUE )
+	{
+		
+		sleep 100;
+		if (!attacking) {
+			turn base to x-axis ((get CURRENT_SPEED) +1) / 75 speed <100>;
+			turn boosters to x-axis ((get CURRENT_SPEED) +1) / 100 speed <140>;		
+		} else {
+			turn base to x-axis 0 speed <100>;
+			turn boosters to x-axis 0 speed <140>;		
+		}
+	}
+}
+
+
+RestoreAfterDelay()
+{
+	signal 2;
+	set-signal-mask 2;
+	sleep 1500;
+	turn base to y-axis <0.000000> speed <30>;
+	turn cap to x-axis <0.000000> speed <55>;
+	turn boosters to x-axis <0.000000> speed <30.000000>;
+	turn cover1 to x-axis <0.000000> speed <25.000000>;
+	turn cover2 to x-axis <0.000000> speed <25.000000>;
+	move weapon to y-axis [0.000000] speed [3.000000];
+	wait-for-turn base around y-axis;
+	wait-for-turn cap around x-axis;
+	attacking = FALSE;
+}
+
+
+Create()
+{
+	while (get BUILD_PERCENT_LEFT) {
+		sleep 1000;
+	}
+	attacking = FALSE;
+	start-script TurnJets();
+	start-script DamageControl();
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = housing;
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = firepoint;
+}
+
+AimWeapon1 (heading, pitch)
+{
+	attacking = TRUE;
+	turn base to y-axis heading speed <100>;
+	turn cap to x-axis <-140> speed <1000>;
+	start-script RestoreAfterDelay();
+	turn cover1 to x-axis <-25.000000> speed <70.000000>;
+	turn cover2 to x-axis <25.000000> speed <70.000000>;
+	move weapon to y-axis [-2.500000] speed [5.000000];
+	return (TRUE);
+}
+
+FireWeapon1()
+{
+
+	sleep 20;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+StartMoving()
+{
+	moving = TRUE;
+}
+
+StopMoving()
+{
+	moving = FALSE;
+}
+
+Killed(severity, corpsetype)
+{
+	corpsetype = 1;
+	explode base type 3;
+	explode cap type 3;
+	explode rjet type 30;
+	explode ljet type 30;
+}

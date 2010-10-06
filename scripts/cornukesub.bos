@@ -1,0 +1,132 @@
+#define TA			// This is a TA script
+
+#include "sfxtype.h"
+#include "exptype.h"
+
+piece  base, door1, door2, missile, firepoint;
+
+// Signal definitions
+#define SIG_MOVE			2
+
+
+Create()
+{
+	return (0);
+}
+
+StartMoving()
+{
+//	signal SIG_MOVE;
+//	set-signal-mask SIG_MOVE;
+//	while( TRUE )
+//	{
+//		emit-sfx 259 from bubbles1;
+//		emit-sfx 259 from bubbles2;
+//		sleep 300;
+//	}
+}
+
+StopMoving()
+{
+	signal SIG_MOVE;
+}
+
+RestoreAfterDelay()
+{
+	turn door1 to z-axis <0> speed <80>;
+	turn door2 to z-axis <0> speed <80>;
+	turn missile to x-axis <0> speed <8000>;
+	wait-for-turn door1 around z-axis;
+	show missile;
+}
+
+AimWeapon1()
+{
+	turn door1 to z-axis <-90> speed <200>;
+	turn door2 to z-axis <90> speed <200>;
+	turn missile to x-axis <-90> speed <100>;
+	wait-for-turn missile around x-axis;
+	return (1);
+}
+
+FireWeapon1()
+{
+	hide missile;
+	start-script RestoreAfterDelay();
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = firepoint;
+}
+
+QueryWeapon1(piecenum)
+{
+	piecenum = firepoint;
+}
+
+AimWeapon2()
+{
+	turn door1 to z-axis <-90> speed <200>;
+	turn door2 to z-axis <90> speed <200>;
+	turn missile to x-axis <-90> speed <50>;
+	wait-for-turn missile around x-axis;
+	return (1);
+	turn door1 to z-axis <0> speed <100>;
+	turn door2 to z-axis <0> speed <100>;
+	turn missile to x-axis <-90> speed <25>;
+	wait-for-turn missile around x-axis;
+}
+
+FireWeapon2()
+{
+	hide missile;
+	start-script RestoreAfterDelay();
+}
+
+AimFromWeapon2(piecenum)
+{
+	piecenum = firepoint;
+}
+
+QueryWeapon2(piecenum)
+{
+	piecenum = firepoint;
+}
+
+SweetSpot(piecenum)
+{
+	piecenum = base;
+}
+
+Killed(severity, corpsetype)
+{
+	if( severity <= 25 )
+	{
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode door1 type BITMAPONLY | BITMAP4;
+		explode door2 type BITMAPONLY | BITMAP5;
+		return (0);
+	}
+	if( severity <= 50 )
+	{
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
+		explode door1 type BITMAPONLY | BITMAP4;
+		explode door2 type BITMAPONLY | BITMAP5;
+		return (0);
+	}
+	if( severity <= 99 )
+	{
+		corpsetype = 3;
+		explode base type BITMAPONLY | BITMAP1;
+		explode door1 type BITMAPONLY | BITMAP4;
+		explode door2 type BITMAPONLY | BITMAP5;
+		return (0);
+	}
+	corpsetype = 3;
+	explode base type BITMAPONLY | BITMAP1;
+	explode door1 type BITMAPONLY | BITMAP4;
+	explode door2 type BITMAPONLY | BITMAP5;
+}
