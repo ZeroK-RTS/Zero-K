@@ -1,6 +1,6 @@
 return {
-  name='Complete Annihilation 1 faction $VERSION',
-  description='Complete Annihilation 1 faction',
+  name='Complete Annihilation PZK $VERSION',
+  description='Complete Annihilation PZK',
   shortname='CA1f',
   version='$VERSION',
   mutator='1',
