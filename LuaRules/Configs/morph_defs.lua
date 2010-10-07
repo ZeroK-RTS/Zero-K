@@ -182,11 +182,6 @@ local morphDefs = {
       time = 10,
       rank = 3,
     },
-    {
-      into = 'spherepole',
-      time = 20,
-      rank = 3,
-    }, 
   }, 
   armrock = {
       into = 'armsptk',
@@ -224,11 +219,6 @@ local morphDefs = {
   armcrabe = {
     {
       into = 'armraz',
-      time = 45,
-      rank = 3,
-    },
-    {
-      into = 'armshock',
       time = 45,
       rank = 3,
     },
@@ -298,7 +288,7 @@ local morphDefs = {
       rank = 3,
     },
     {
-      into = 'cormort',
+      into = 'slowmort',
       time = 15,
       rank = 3,
     },
@@ -309,7 +299,7 @@ local morphDefs = {
     rank = 3,
   },
   corcrash = {
-    into = 'coraak',
+    into = 'armaak',
     time = 20,
     rank = 3,
   },
@@ -348,7 +338,7 @@ local morphDefs = {
     rank = 3,   
   },
   corlevlr = {
-    into = 'core_egg_shell',
+    into = 'tawf114',
     time = 20,
     rank = 3,   
   },
@@ -380,13 +370,6 @@ local morphDefs = {
   },
   
   --// hovers and amphs
-  armsh = {
-    {
-      into = 'armanac',
-      time = 10,
-      rank = 3,   
-    },
-  },
   corsh = {
     {
       into = 'hoverassault',
@@ -402,21 +385,14 @@ local morphDefs = {
   --//ships
   armpt = {
     {
-      into = 'decade',
-      time = 10,
-      rank = 3,   
-    },
-  },
-  decade = {
-    {
-      into = 'armroy',
+      into = 'coresupp',
       time = 10,
       rank = 3,   
     },
   },
   armroy = {
     {
-      into = 'armcrus',
+      into = 'corcrus',
       time = 20,
       rank = 3,   
     },
@@ -432,6 +408,11 @@ local morphDefs = {
   coresupp = {
     {
       into = 'corroy',
+      time = 10,
+      rank = 3,   
+    },
+	{
+      into = 'armroy',
       time = 10,
       rank = 3,   
     },
@@ -470,24 +451,9 @@ local morphDefs = {
       rank = 3,
     },
   }, 
-  corpre = {
-    into = 'corvipe',
-    time = 60,
-    rank = 3,
-  },
   corhlt = {
     into = 'cordoom',
     time = 90,
-    rank = 3,
-  },
-  armrl = {
-    into = 'armarch',
-    time = 30,
-    rank = 3,
-  },
-  armarch = {
-    into = 'armcir',
-    time = 60,
     rank = 3,
   },
   corrl = {
@@ -521,16 +487,6 @@ local morphDefs = {
   },
   
   --// sea turrets
-  armtl = {
-    into = 'armatl',
-    time = 60,
-    rank = 3,
-  },
-  cortl = {
-    into = 'coratl',
-    time = 60,
-    rank = 3,
-  },
   
   --// concept
 
