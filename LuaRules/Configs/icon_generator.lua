@@ -369,7 +369,14 @@ unitConfigs = {
     attempts = 10,
   },
 
-
+  [UnitDefNames.commrecon.id] = {
+    attack = true,
+  },
+  
+  [UnitDefNames.commsupport.id] = {
+    attack = true,
+  }, 
+  
   [UnitDefNames.fakeunit.id] = {
     empty  = true,
   },

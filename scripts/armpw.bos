@@ -238,7 +238,7 @@ AimPrimary(heading,pitch)
 	spin magazine around y-axis speed <1000> accelerate <400>;
 	turn lforearm to y-axis <-90> speed <400>;
 	turn chest to y-axis heading speed <450>;
-	turn lshoulder to x-axis (<-70> - pitch) speed <500>;
+	turn lshoulder to x-axis (<-90> - pitch) speed <500>;
 
 	wait-for-turn chest around y-axis;
 	wait-for-turn lshoulder around x-axis;
