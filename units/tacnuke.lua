@@ -130,7 +130,7 @@ unitDef = {
 	buildingGroundDecalDecaySpeed=30,
 	buildingGroundDecalSizeX=3,
 	buildingGroundDecalSizeY=3,
-	useBuildingGroundDecal = true,
+	useBuildingGroundDecal = false,
 	buildingGroundDecalType=[[tacnuke_aoplane.dds]],
 }
 
