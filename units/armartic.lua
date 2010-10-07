@@ -220,6 +220,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=4,
+	buildingGroundDecalSizeY=4,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[armartic_aoplane.dds]],
 }
 
 return lowerkeys({ armartic = unitDef })

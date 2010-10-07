@@ -135,6 +135,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=8,
+	buildingGroundDecalSizeY=8,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[factoryveh_aoplane.dds]],
 }
 
 return lowerkeys({ factoryveh = unitDef })

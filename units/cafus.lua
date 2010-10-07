@@ -113,6 +113,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=9,
+	buildingGroundDecalSizeY=9,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[cafus_aoplane.dds]],
 }
 
 return lowerkeys({ cafus = unitDef })

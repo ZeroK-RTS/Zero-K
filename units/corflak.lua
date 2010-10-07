@@ -168,6 +168,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=5,
+	buildingGroundDecalSizeY=5,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[corflak_aoplane.dds]],
 }
 
 return lowerkeys({ corflak = unitDef })

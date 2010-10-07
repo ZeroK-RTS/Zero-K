@@ -121,6 +121,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=5,
+	buildingGroundDecalSizeY=5,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[armnanotc_aoplane.dds]],
 }
 
 return lowerkeys({ armnanotc = unitDef })

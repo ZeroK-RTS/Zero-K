@@ -136,6 +136,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=8,
+	buildingGroundDecalSizeY=7,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[factoryjump_aoplane.dds]],
 }
 
 return lowerkeys({ factoryjump = unitDef })

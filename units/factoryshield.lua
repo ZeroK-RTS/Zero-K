@@ -140,6 +140,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=7,
+	buildingGroundDecalSizeY=7,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[factoryshield_aoplane.dds]],
 }
 
 return lowerkeys({ factoryshield = unitDef })

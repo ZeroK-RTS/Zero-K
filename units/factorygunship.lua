@@ -135,6 +135,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=9,
+	buildingGroundDecalSizeY=7,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[factorygunship_aoplane.dds]],
 }
 
 return lowerkeys({ factorygunship = unitDef })

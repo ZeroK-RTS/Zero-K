@@ -127,6 +127,11 @@ unitDef = {
   featureDefs            = {
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=3,
+	buildingGroundDecalSizeY=3,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[tacnuke_aoplane.dds]],
 }
 
 return lowerkeys({ tacnuke = unitDef })

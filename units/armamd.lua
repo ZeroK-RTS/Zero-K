@@ -172,6 +172,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=6,
+	buildingGroundDecalSizeY=6,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[armamd_aoplane.dds]],
 }
 
 return lowerkeys({ armamd = unitDef })

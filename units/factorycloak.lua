@@ -143,6 +143,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=7,
+	buildingGroundDecalSizeY=7,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[factorycloak_aoplane.dds]],
 }
 
 return lowerkeys({ factorycloak = unitDef })

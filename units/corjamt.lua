@@ -150,6 +150,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=4,
+	buildingGroundDecalSizeY=4,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[corjamt_aoplane.dds]],
 }
 
 return lowerkeys({ corjamt = unitDef })

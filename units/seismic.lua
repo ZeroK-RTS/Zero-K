@@ -123,6 +123,11 @@ unitDef = {
   featureDefs            = {
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=3,
+	buildingGroundDecalSizeY=3,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[seismic_aoplane.dds]],
 }
 
 return lowerkeys({ seismic = unitDef })

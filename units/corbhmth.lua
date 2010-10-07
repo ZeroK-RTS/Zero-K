@@ -155,6 +155,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=8,
+	buildingGroundDecalSizeY=8,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[corbhmth_aoplane.dds]],
 }
 
 return lowerkeys({ corbhmth = unitDef })

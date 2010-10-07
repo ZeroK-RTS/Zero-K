@@ -114,6 +114,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=4,
+	buildingGroundDecalSizeY=4,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[armarad_aoplane.dds]],
 }
 
 return lowerkeys({ armarad = unitDef })

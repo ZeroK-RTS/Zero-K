@@ -135,6 +135,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=10,
+	buildingGroundDecalSizeY=8,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[factorytank_aoplane.dds]],
 }
 
 return lowerkeys({ factorytank = unitDef })

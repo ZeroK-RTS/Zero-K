@@ -242,6 +242,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=11,
+	buildingGroundDecalSizeY=11,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[mahlazer_aoplane.dds]],
 }
 
 return lowerkeys({ mahlazer = unitDef })

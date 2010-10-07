@@ -182,6 +182,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=6,
+	buildingGroundDecalSizeY=6,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[screamer_aoplane.dds]],
 }
 
 return lowerkeys({ screamer = unitDef })

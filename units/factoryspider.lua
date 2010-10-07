@@ -132,6 +132,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=7,
+	buildingGroundDecalSizeY=7,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[factoryspider_aoplane.dds]],
 }
 
 return lowerkeys({ factoryspider = unitDef })

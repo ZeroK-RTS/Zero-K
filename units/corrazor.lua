@@ -177,6 +177,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=5,
+	buildingGroundDecalSizeY=5,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[corrazor_aoplane.dds]],
 }
 
 return lowerkeys({ corrazor = unitDef })

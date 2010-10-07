@@ -182,6 +182,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=6,
+	buildingGroundDecalSizeY=6,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[armcir_aoplane.dds]],
 }
 
 return lowerkeys({ armcir = unitDef })

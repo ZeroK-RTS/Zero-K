@@ -44,6 +44,11 @@ unitDef = {
   upright                = false,
   workerTime             = 0,
   yardMap                = [[yyyy]],
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=4,
+	buildingGroundDecalSizeY=4,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[terraunit_aoplane.dds]],
 }
 
 return lowerkeys({ terraunit = unitDef })

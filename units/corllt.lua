@@ -192,6 +192,11 @@ unitDef = {
 
   },
 
+	buildingGroundDecalDecaySpeed=30,
+	buildingGroundDecalSizeX=4,
+	buildingGroundDecalSizeY=4,
+	useBuildingGroundDecal = true,
+	buildingGroundDecalType=[[corllt_aoplane.dds]],
 }
 
 return lowerkeys({ corllt = unitDef })
