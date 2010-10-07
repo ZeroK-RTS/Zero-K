@@ -100,9 +100,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 60,
-        planes  = 60,
-        subs    = 3,
+        default = 100,
+        planes  = 100,
+        subs    = 5,
       },
 
       explosionGenerator      = [[custom:gauss_hit_l]],
@@ -117,7 +117,7 @@ unitDef = {
       noSelfDamage            = true,
       numbounce               = 40,
       range                   = 320,
-      reloadtime              = 4,
+      reloadtime              = 3,
       renderType              = 4,
       rgbColor                = [[0.5 1 1]],
       separation              = 0.5,
