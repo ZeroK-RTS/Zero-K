@@ -63,7 +63,7 @@ unitDef = {
     [[cormine1]],
   },
 
-  buildPic            = [[armcom.png]],
+  buildPic            = [[commrecon.png]],
   buildTime           = 1800,
   canAttack           = true,
   canGuard            = true,

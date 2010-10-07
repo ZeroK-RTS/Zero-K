@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armcomdgun]],
-  name                = [[Commander with Dgun]],
-  description         = [[Commander with Dgun, Builds at 12 m/s]],
+  name                = [[Ultimatum]],
+  description         = [[D-Gun Walker (Anti-Strider)]],
   acceleration        = 0.18,
   activateWhenBuilt   = false,
   amphibious          = [[1]],
@@ -11,12 +11,8 @@ unitDef = {
   buildCostEnergy     = 2000,
   buildCostMetal      = 2000,
   buildDistance       = 120,
-  builder             = true,
-
-  buildoptions        = {
-  },
-
-  buildPic            = [[armcom.png]],
+  builder             = false,
+  buildPic            = [[noruas.png]],
   buildTime           = 2000,
   canAttack           = true,
   canDGun             = true,
@@ -36,8 +32,6 @@ unitDef = {
   },
 
   defaultmissiontype  = [[Standby]],
-  energyMake          = 0.3,
-  energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
@@ -49,26 +43,23 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 2500,
-  maxDamage           = 4000,
+  maxDamage           = 2000,
   maxSlope            = 36,
   maxVelocity         = 1.45,
   maxWaterDepth       = 5000,
-  metalMake           = 0.3,
-  metalStorage        = 0,
   minCloakDistance    = 100,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
-  objectName          = [[ARMCOM]],
+  objectName          = [[noruas]],
+  script			  = [[noruas.cob]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
-
     explosiongenerators = {
       [[custom:COMGATE]],
     },
-
   },
 
   showNanoSpray       = false,
@@ -82,7 +73,7 @@ unitDef = {
   terraformSpeed      = 600,
   turnRate            = 1148,
   upright             = true,
-  workerTime          = 12,
+  --workerTime          = 12,
 
   weapons             = {
 
@@ -92,18 +83,9 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
     [3] = {
       def = [[DISINTEGRATOR]],
     },
-
-
-    [4] = {
-      def                = [[LASER]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
   },
 
 
@@ -189,62 +171,15 @@ unitDef = {
       weaponVelocity          = 900,
     },
 
-
-    LASER         = {
-      name                    = [[Commander Laser]],
-      areaOfEffect            = 12,
-      beamlaser               = 1,
-      beamTime                = 0.1,
-      coreThickness           = 0.5,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 15.75,
-        subs    = 3.75,
-      },
-
-      duration                = 0.11,
-      edgeEffectiveness       = 0.99,
-      explosionGenerator      = [[custom:flash1green]],
-      fireStarter             = 70,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 0,
-      largeBeamLaser          = true,
-      laserFlareSize          = 4.31,
-      lineOfSight             = true,
-      minIntensity            = 1,
-      noSelfDamage            = true,
-      range                   = 300,
-      reloadtime              = 0.11,
-      renderType              = 0,
-      rgbColor                = [[0 1 0]],
-      soundStart              = [[weapon/laser/pulse_laser3]],
-      soundTrigger            = true,
-      targetMoveError         = 0.05,
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
-      thickness               = 4.31331514035318,
-      tolerance               = 10000,
-      turret                  = true,
-      weaponType              = [[BeamLaser]],
-      weaponVelocity          = 900,
-    },
-
   },
-
 
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Commander with Dgun]],
+      description      = [[Wreckage - Ultimatum]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 4000,
+      damage           = 2000,
       energy           = 0,
       featureDead      = [[DEAD2]],
       featurereclamate = [[SMUDGE01]],
@@ -262,10 +197,10 @@ unitDef = {
 
 
     DEAD2     = {
-      description      = [[Debris - Commander with Dgun]],
+      description      = [[Debris - Ultimatum]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 4000,
+      damage           = 2000,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -282,10 +217,10 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Commander with Dgun]],
+      description      = [[Debris - Ultimatum]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 4000,
+      damage           = 2000,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
