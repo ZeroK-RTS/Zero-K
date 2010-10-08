@@ -65,7 +65,7 @@ function RemoveMissile(deadID)
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit,smokePiece)
 	--set INBUILDSTANCE to 1
 end
 

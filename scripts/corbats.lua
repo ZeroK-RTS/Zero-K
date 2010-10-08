@@ -24,6 +24,8 @@ local flares = {
 --------------------------------------------------------------------
 local smokePiece = {hull, turret1, turret2, turret3}
 
+local SIG_Move = 1
+
 local RESTORE_DELAY = 5000
 
 local TURRET_PITCH_SPEED_1 = math.rad(30)
@@ -32,24 +34,28 @@ local RECOIL_DISTANCE =	-3
 local RECOIL_RESTORE_SPEED = 2.5
 
 --rockz
+include 'rockz.lua'
+
 local ROCK_PIECE = ground	--piece to rock
 local ROCK_Z_SPEED = 3		--number of quarter-cycles per second around z-axis
-local ROCK_Z_DECAY = -1/2	--rocking around z-axis is reduced by this factor each time; should be negative to alternate rocking direction
+local ROCK_Z_DECAY = -0.5	--rocking around z-axis is reduced by this factor each time; should be negative to alternate rocking direction
 local ROCK_Z_MIN  = math.rad(0.5)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
 local SIG_ROCK_Z = 1024		--signal to prevent multiple rocking
 
-local ROCK_Z_FIRE = -16
+local ROCK_Z_FIRE = -0.2
 
 --------------------------------------------------------------------
 --variables
 --------------------------------------------------------------------
 local gun = {1, 1, 1}
+local gunHeading = {0, 0, 0}
+local rockZAngle = 0
 
 function script.Create()
 	Turn(turret2, y_axis, math.rad(180))
 	Turn(turret3, y_axis, math.rad(180))
 	Spin(radar, y_axis, math.rad(100))
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit, smokePiece)
 	--RockZInit()
 end
 
@@ -61,8 +67,8 @@ local function RestoreAfterDelay()
 end
 
 local function Wake()
-	Signal( SIG_MOVE)
-	SetSignalMask( SIG_MOVE)
+	Signal(SIG_Move)
+	SetSignalMask(SIG_Move)
 	while true do
 		EmitSfx( wake1,  2 )
 		EmitSfx( wake2,  2 )
@@ -75,7 +81,7 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal( SIG_MOVE)
+	Signal(SIG_Move)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -89,11 +95,12 @@ function script.AimWeapon(num, heading, pitch)
 	WaitForTurn(barrels[num][1], x_axis)	
 	WaitForTurn(turrets[num], y_axis)
 	StartThread(RestoreAfterDelay)
+	gunHeading[num] = heading
 	return true
 end
 
 function script.FireWeapon(num)
-	--StartThread(RockZ)
+	--StartThread(RockZ, gunHeading[num], ROCK_Z_FIRE)
 end
 
 function script.Shot(num)
@@ -115,12 +122,36 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	local r = math.random
-	Explode(barrels[1][r(1,3)], sfxNone)
-	Explode(barrels[2][r(1,3)], sfxNone)
-	Explode(barrels[3][r(1,3)], sfxNone)
+	if severity < 0.25 then
+		Explode(barrels[1][r(1,3)], sfxNone)
+		Explode(barrels[2][r(1,3)], sfxNone)
+		Explode(barrels[3][r(1,3)], sfxNone)
+		Explode(ground, sfxNone)
+		Explode(turret1, sfxNone)
+		Explode(turret2, sfxNone)
+		Explode(turret3, sfxNone)
+		return 1
+	elseif severity < 0.5 then
+		for i=1,3 do
+			for v=1,3 do
+				Explode(barrels[i][v], sfxFall + sfxSmoke + sfxExplode)
+			end
+		end
+		Explode(ground, sfxNone)
+		Explode(turret1, sfxShatter)
+		Explode(turret2, sfxShatter)
+		Explode(turret3, sfxShatter)
+		return 1	
+	end
+	for i=1,3 do
+		for v=1,3 do
+			Explode(barrels[i][v], sfxFall + sfxSmoke + sfxExplode)
+		end
+	end
+	Explode(hull, sfxNone)
 	Explode(ground, sfxNone)
-	Explode(turret1, sfxNone)
-	Explode(turret2, sfxNone)
-	Explode(turret3, sfxNone)
-	return 1
+	Explode(turret1, sfxShatter)
+	Explode(turret2, sfxShatter)
+	Explode(turret3, sfxShatter)
+	return 2	
 end

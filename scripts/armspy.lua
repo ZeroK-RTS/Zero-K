@@ -104,7 +104,7 @@ end
 function script.Create()
 	bMoving = false
 	StartThread(MotionControl)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit,smokePiece)
 end
 
 

@@ -51,23 +51,22 @@ DETO_W6 = 4101
 DETO_W7 = 4102
 DETO_W8 = 4103
 
+SMOKEPUFF = 258
+
 local spGetUnitHealth = Spring.GetUnitHealth
 
-local smokePiece = {}
-
-function SmokeUnit()
-	if not (smokePiece and smokePiece[1]) then return end
-	local health,maxHealth,_,_,buildPercent = spGetUnitHealth(unitID)
-	while buildPercent < 100 do Sleep(400) end
+function SmokeUnit(smokePiece)
+	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do
+		Sleep(400)
+	end
 	--Smoke loop
+	--if not (smokePiece and smokePiece[1]) then return end
 	while true do
 		--How is the unit doing?
-		local health, maxHealth = spGetUnitHealth(unitID)
-		local healthPercent = health/maxHealth --GetUnitValue(COB.HEALTH)
-
-		if (healthPercent < .66) then -- only smoke if less then 2/3rd health left
-			EmitSfx(smokePiece[random(1,#smokePiece)], SMOKEPUFF)
+		local health = GetUnitValue(COB.HEALTH)
+		if (health < 66) then -- only smoke if less then 2/3rd health left
+			EmitSfx(smokePiece[math.random(1,#smokePiece)], SMOKEPUFF)
 		end
-		Sleep(100*healthPercent + random(100,200))
+		Sleep(health + math.random(100,200))
 	end
 end

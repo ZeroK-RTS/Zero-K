@@ -81,7 +81,7 @@ function script.Create()
 	StartThread(Bounce)
 	StartThread(Wobble)
 	StartThread(HoverFX)
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit,smokePiece, smokePiece)
 end
 
 function script.setSFXoccupy(curTerrainType)

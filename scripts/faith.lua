@@ -120,7 +120,7 @@ function script.StopMoving()
 end
 
 function script.Create()
-	StartThread(SmokeUnit)
+	StartThread(SmokeUnit,smokePiece)
 	SpinBall()
 end
 
