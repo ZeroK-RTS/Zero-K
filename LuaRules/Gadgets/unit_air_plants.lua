@@ -24,10 +24,8 @@ local InsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local GiveOrderToUnit = Spring.GiveOrderToUnit
 
 local AIRPLANT = {
-  [UnitDefNames["corap"].id] = true,
-  [UnitDefNames["coraap"].id] = true,
-  [UnitDefNames["armap"].id] = true,
-  [UnitDefNames["armaap"].id] = true,
+  [UnitDefNames["factoryplane"].id] = true,
+  [UnitDefNames["factorygunship"].id] = true,
 }
 
 local plantList = {}

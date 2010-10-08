@@ -48,20 +48,14 @@ local changeStateDelay = 3 -- delay in seconds before state of unit can be chang
 local radarDefs = {
   [ UnitDefNames['armarad'].id ] = true,
   [ UnitDefNames['armrad'].id ] = true,
-  [ UnitDefNames['armseer'].id ] = true,
-  [ UnitDefNames['arm_marky'].id ] = true,
-  [ UnitDefNames['armaser'].id ] = true,
+  [ UnitDefNames['spherecloaker'].id ] = true,
   [ UnitDefNames['armawac'].id ] = true,
   [ UnitDefNames['armjamt'].id ] = true,
-  [ UnitDefNames['armsehak'].id ] = true,
-  [ UnitDefNames['armpeep'].id ] = true,
   [ UnitDefNames['armsonar'].id ] = true,
   [ UnitDefNames['corarad'].id ] = true,
   [ UnitDefNames['corrad'].id ] = true,
   [ UnitDefNames['corawac'].id ] = true,
   [ UnitDefNames['corsonar'].id ] = true,
-  [ UnitDefNames['corhunt'].id ] = true,
-  [ UnitDefNames['corvoyr'].id ] = true,
   [ UnitDefNames['corvrad'].id ] = true,
 }
 

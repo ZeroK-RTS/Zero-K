@@ -651,28 +651,38 @@ factionBuildConfig = {
 			},
 			
 			[2] = {
-				count = 1,
-				[1] = {ID = UnitDefNames['corrazor'].id, chance = 1},
+				count = 2,
+				[1] = {ID = UnitDefNames['corrazor'].id, chance = 0.7},
+				[2] = {ID = UnitDefNames['missiletower'].id, chance = 0.3},
 			},
 			
 			[3] = {
-				count = 1,
-				[1] = {ID = UnitDefNames['armcir'].id, chance = 1},
+				count = 2,
+				[1] = {ID = UnitDefNames['armcir'].id, chance = 0.7},
+				[2] = {ID = UnitDefNames['corflak'].id, chance = 0.3},
 			},
 		},
 
 		airDefenceByDefId = {
-			[UnitDefNames['armrl'].id] = {
+			[UnitDefNames['corrl'].id] = {
 				level = 1,
 				index = 1,
 			},
-			[UnitDefNames['armarch'].id] = {
+			[UnitDefNames['corrazor'].id] = {
 				level = 2,
 				index = 1,
+			},
+			[UnitDefNames['missiletower'].id] = {
+				level = 2,
+				index = 2,
 			},
 			[UnitDefNames['armcir'].id] = {
 				level = 3,
 				index = 1,
+			},
+			[UnitDefNames['corflak'].id] = {
+				level = 3,
+				index = 2,
 			},
 		},
 

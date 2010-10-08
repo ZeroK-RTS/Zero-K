@@ -69,20 +69,18 @@ local disembarkCmdDesc = {
 
 local transDefs = {
   [ UnitDefNames['armatlas'].id ] = true,
-	[ UnitDefNames['corvalk'].id ] = true,
   [ UnitDefNames['armdfly'].id ] = true,
   [ UnitDefNames['corbtrans'].id ] = true,
 }
 
 local factDefs = {
-  [ UnitDefNames['armlab'].id ] = true,
-  [ UnitDefNames['corlab'].id ] = true,
-  [ UnitDefNames['armalab'].id ] = true,
-  [ UnitDefNames['coralab'].id ] = true,
-  [ UnitDefNames['armvp'].id ] = true,
-  [ UnitDefNames['corvp'].id ] = true,
-  [ UnitDefNames['armavp'].id ] = true,
-  [ UnitDefNames['coravp'].id ] = true,
+  [ UnitDefNames['factorycloak'].id ] = true,
+  [ UnitDefNames['factoryshield'].id ] = true,
+  [ UnitDefNames['factoryspider'].id ] = true,
+  [ UnitDefNames['factoryjump'].id ] = true,
+  [ UnitDefNames['factoryhover'].id ] = true,
+  [ UnitDefNames['factoryveh'].id ] = true,
+  [ UnitDefNames['factorytank'].id ] = true,
 }
 
 local hasTransports = {}
