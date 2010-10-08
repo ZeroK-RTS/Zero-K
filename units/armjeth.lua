@@ -58,8 +58,8 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:STORMMUZZLE]],
-      [[custom:STORMBACK]],
+      [[custom:NONE]],
+      [[custom:NONE]],
     },
 
   },
@@ -128,7 +128,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       pitchtolerance          = 8192,
-      range                   = 760,
+      range                   = 820,
       reloadtime              = 0.4,
       renderType              = 0,
       rgbColor                = [[0 1 1]],

@@ -84,13 +84,6 @@ unitDef = {
       badTargetCategory  = [[FIREPROOF]],
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
     },
-
-
-    [3] = {
-      def                = [[DISINTEGRATOR]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
-    },
-
   },
 
 
@@ -161,39 +154,6 @@ unitDef = {
       weaponType              = [[Flame]],
       weaponVelocity          = 150,
     },
-
-
-    DISINTEGRATOR       = {
-      name                    = [[Tankbuster High-Energy Cannon]],
-      areaOfEffect            = 15,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 30,
-      },
-
-      energypershot           = 300,
-      explosionGenerator      = [[custom:DGUNTRACE]],
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      noExplode               = true,
-      noSelfDamage            = true,
-      range                   = 400,
-      reloadtime              = 8,
-      renderType              = 4,
-      soundHit                = [[explosion/ex_large1]],
-      soundStart              = [[weapon/cannon/earthshaker2]],
-      startsmoke              = [[1]],
-      turret                  = true,
-      weaponType              = [[DGun]],
-      weaponVelocity          = 350,
-    },
-
   },
 
 

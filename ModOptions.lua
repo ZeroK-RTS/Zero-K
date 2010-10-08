@@ -100,8 +100,6 @@ local options = {
     def='default',
     items = {
       { key='default', name="Default Commander", desc='The default comm of CA.' },
-      { key='advcomm', name="Advanced Commander", desc='Commander that can morph into different advanced commanders, each with their own special abilities' },
-      { key='concomm', name="ConComm", desc='Low-health Commander with no abilities, just builds.' },
 	},
   },
   { 
@@ -136,11 +134,6 @@ local options = {
         key  = "classic", 
         name = "Classic", 
         desc = "Classic mode.",
-      },
-      { 
-        key  = "facinabox", 
-        name = "Fac-In-A-Box", 
-        desc = "A Fac-In-A-Box spawns alongside each commander.",
       },
     },
   },
@@ -321,15 +314,6 @@ local options = {
     step   = 0.01,
   },
   {
-    key    = 'reducedquality',
-    name   = 'Reduced Quality Units',
-    desc   = 'Units changing control (such as share, capture, rez) get reduced stats. If new owner is of the same faction then stats are reverted after 3 minutes.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
-    
-  {
     key    = 'doesnotcountmode',
     name   = 'DoesNotCount Mode',
     desc   = "Does Not Count mode.",
@@ -407,7 +391,6 @@ local options = {
     section= 'fun',
     def    = false,
   },
-
   {
     key    = 'planetwars',
     name   = 'Planet Wars Options',
@@ -423,14 +406,6 @@ local options = {
     section= 'experimental',
     def    = true,
   },]]
-  {
-    key    = 'golly',
-    name   = 'Special Golly',
-    desc   = 'Goliath Tank Buster tank has a special High-Energy Laser Blast.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
   {
     key    = "disablefeatures",
     name   = "Disable Features",

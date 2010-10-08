@@ -49,7 +49,7 @@ local moveDefs = {
 		maxwaterdepth = 5000,
 		depthmod = 0,
 		maxslope = 36,
-		crushstrength = 50,
+		crushstrength = 150,
 	},
 	
 	AKBOT6 = {
@@ -81,6 +81,14 @@ local moveDefs = {
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 22,
+		maxslope = 55,
+		crushstrength = 500,
+	},
+
+	ATKBOT3 = {
+		footprintx = 3,
+		footprintz = 3,
+		maxwaterdepth = 5000,
 		maxslope = 55,
 		crushstrength = 150,
 	},
@@ -116,6 +124,15 @@ local moveDefs = {
 		maxwaterdepth = 5000,
 		slopemod = 60,
 		crushstrength = 5,
+	},
+
+	BHOVER3 = {
+		footprintx = 3,
+		footprintz = 3,
+		maxslope = 36,
+		maxwaterdepth = 5000,
+		slopemod = 60,
+		crushstrength = 150,
 	},
 	
 	BOAT3 = {
