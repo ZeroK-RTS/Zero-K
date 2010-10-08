@@ -6,7 +6,6 @@ local raider = {
 	"corfav",
 	"corgator",
 	
-	"armfast",
 	"corpyro",
 	"panther",
 	"logkoda",
@@ -20,11 +19,11 @@ local raider = {
 
 local assault = {
 	"corthud",
-	"armstump",
 	"corraid",
 	
 	"armzeus",
 	--"armcrabe",
+	"spiderassault",
 	"corcan",
 	--"corsumo",
 	"armbull",
@@ -47,10 +46,13 @@ local skirm = {
 	"armrock",
 	"corstorm",
 	"armjanus",
+	"armstump",
 	
 	"armsptk",
 	"armsnipe",
 	"cormort",
+	"slowmort",
+	"cormortgold",
 	"armmanni",
 	
 	"nsaclash",
@@ -100,28 +102,15 @@ skirmArray = {}
 riotArray = {}
 artyArray = {}
 
-for i=1, #raider do
-	local id = UnitDefNames[raider[i]].id
-	raiderArray[id] = true
+local function CreateArray(source, target)
+	for i=1, #source do
+		local def = UnitDefNames[source[i]]
+		if def then target[def.id] = true end
+	end
 end
 
-for i=1, #assault do
-	local id = UnitDefNames[assault[i]].id
-	assaultArray[id] = true
-end
-
-for i=1, #skirm do
-	local id = UnitDefNames[skirm[i]].id
-	skirmArray[id] = true
-end
-
-for i=1, #riot do
-	local id = UnitDefNames[riot[i]].id
-	riotArray[id] = true
-end
-
-for i=1, #arty do
-	local id = UnitDefNames[arty[i]].id
-	artyArray[id] = true
-end
-
+CreateArray(raider, raiderArray)
+CreateArray(assault, assaultArray)
+CreateArray(skirm, skirmArray)
+CreateArray(riot, riotArray)
+CreateArray(arty, artyArray)
