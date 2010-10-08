@@ -2,8 +2,8 @@
 
 #include "constants.h"
 
-piece  base, shield, turret, flare, wake1, wake2, wake3, wake4,
-       wake5, wake6, wake7, wake8, ground1, door1, door2, turretbase;
+piece  base, shield, turret, gun, flare, wake1, wake2, wake3, wake4,
+       wake5, wake6, wake7, wake8, ground1, door1, door2, turretbase, rim1, rim2;
 
 static-var  Static_Var_1, ShieldOn, wobble, random, aiming;
 
@@ -148,10 +148,14 @@ RestoreAfterDelay()
 	sleep RESTORE_DELAY;
 	set ARMORED to 1;
 	move turretbase to y-axis [0] speed [20];
-	turn door1 to z-axis <0> speed <90.000000>;
-	turn door2 to z-axis <0> speed <90.000000>;
-	turn turret to y-axis <0.000000> speed <300.000000>;
-	turn turret to x-axis <0.000000> speed <45.000000>;
+	turn turretbase to x-axis <0> speed <150.000000>;
+	turn turret to x-axis <0> speed <150.000000>;
+	turn door1 to z-axis <0> speed <150.000000>;
+	turn door2 to z-axis <0> speed <150.000000>;
+	turn rim1 to z-axis <0> speed <150.000000>;
+	turn rim2 to z-axis <0> speed <150.000000>;
+	turn gun to y-axis <0.000000> speed <300.000000>;
+	turn gun to x-axis <0.000000> speed <60.000000>;
 }
 
 AimFromWeapon1(piecenum) {
@@ -163,11 +167,15 @@ AimWeapon1(heading, pitch)
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
 	set ARMORED to 0;
-	move turretbase to y-axis [4] speed [20];
-	turn door1 to z-axis <-90> speed <90.000000>;
-	turn door2 to z-axis <90> speed <90.000000>;
-	turn turret to y-axis heading speed <300.000000>;
-	turn turret to x-axis <0.000000> - pitch speed <60.000000>;
+	move turretbase to y-axis [3] speed [30];
+	turn turretbase to x-axis <30> speed <150.000000>;
+	turn turret to x-axis <-30> speed <150.000000>;
+	turn door1 to z-axis <-80> speed <150.000000>;
+	turn door2 to z-axis <80> speed <150.000000>;
+	turn rim1 to z-axis <30> speed <150.000000>;
+	turn rim2 to z-axis <-30> speed <150.000000>;
+	turn gun to y-axis heading speed <300.000000>;
+	turn gun to x-axis <0.000000> - pitch speed <60.000000>;
 	wait-for-turn turret around y-axis;
 	wait-for-turn turret around x-axis;
 	start-script RestoreAfterDelay();
