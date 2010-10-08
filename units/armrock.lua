@@ -95,7 +95,7 @@ unitDef = {
     BOT_ROCKET = {
       name                    = [[Rocket]],
       areaOfEffect            = 48,
-      cegTag                  = [[missiletrailred]],
+      cegTag                  = [[missiletrailredsmall]],
       craterBoost             = 0,
       craterMult              = 0,
 

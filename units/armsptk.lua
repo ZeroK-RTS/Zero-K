@@ -79,7 +79,7 @@ unitDef = {
       areaOfEffect            = 48,
       burst                   = 3,
       burstrate               = 0.3,
-      cegTag                  = [[missiletrailred]],
+      cegTag                  = [[missiletrailredsmall]],
       craterBoost             = 0,
       craterMult              = 0,
 

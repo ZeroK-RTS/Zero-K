@@ -82,7 +82,7 @@ unitDef = {
     ROCKET = {
       name                    = [[Rocket]],
       areaOfEffect            = 48,
-      cegTag                  = [[missiletrailred]],
+      cegTag                  = [[missiletrailredsmall]],
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -103,7 +103,7 @@ unitDef = {
       noSelfDamage            = true,
       predictBoost            = 1,
       range                   = 270,
-      reloadtime              = 1,
+      reloadtime              = 1.2,
       renderType              = 1,
       selfprop                = true,
       smokedelay              = [[.1]],
@@ -118,10 +118,10 @@ unitDef = {
       tracks                  = false,
       trajectoryHeight        = 0.05,
       turret                  = true,
-      weaponAcceleration      = 150,
+      weaponAcceleration      = 130,
       weaponTimer             = 3,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 150,
+      weaponVelocity          = 130,
     },
 
   },

@@ -2,10 +2,10 @@
 
 #include "constants.h"
 
-piece  base, shield, turret, gun, flare, wake1, wake2, wake3, wake4,
+piece  base, shield, turret, gun, flare1, flare2, wake1, wake2, wake3, wake4,
        wake5, wake6, wake7, wake8, ground1, door1, door2, turretbase, rim1, rim2;
 
-static-var  Static_Var_1, ShieldOn, wobble, random, aiming;
+static-var  Static_Var_1, ShieldOn, wobble, random, aiming, gun1;
 
 // Signal definitions
 #define SIG_MOVE			2
@@ -135,9 +135,9 @@ Deactivate()
 
 Create()
 {
+	gun1 = 0;
 	set ARMORED to 1;
 	wobble=TRUE;
-	hide flare;
 	hide ground1;
 	start-script SmokeUnit();
 	start-script WobbleUnit();
@@ -184,7 +184,14 @@ AimWeapon1(heading, pitch)
 
 QueryWeapon1(piecenum)
 {
-	piecenum = flare;
+	if (gun1 == 0)
+	{
+		piecenum = flare1;
+	}
+	if (gun1 == 1)
+	{
+		piecenum = flare2;
+	}
 }
 
 AimFromWeapon2(piecenum) {
@@ -208,10 +215,22 @@ SweetSpot(piecenum)
 
 FireWeapon1()
 {
-	emit-sfx 1025 from flare;
+	if (gun1 == 2)
+	{
+		gun1 = 0;
+	}
+	if (gun1 == 0)
+	{
+		emit-sfx 1025 from flare1;
+	}
+	if (gun1 == 1)
+	{
+		emit-sfx 1025 from flare2;
+	}
 	aiming = TRUE;
 	sleep 100;
 	aiming = FALSE;
+	++gun1;
 }
 
 Killed(severity, corpsetype)
