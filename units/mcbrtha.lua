@@ -1,4 +1,4 @@
-unitDef = {
+wreck3x3b.s3o = {
   unitname                      = [[mcbrtha]],
   name                          = [[Quantum's Mind-control Capture Cannon]],
   description                   = [[Strategic Capture Cannon]],
@@ -133,7 +133,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 2400,
-      object           = [[ARMBRTHA_DEAD]],
+      object           = [[ARMBRTHA_DEAD.s3o]],
       reclaimable      = true,
       reclaimTime      = 2400,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -185,4 +185,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ mcbrtha = unitDef })
+return lowerkeys({ mcbrtha = wreck3x3b.s3o })

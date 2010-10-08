@@ -1,4 +1,4 @@
-unitDef = {
+wreck3x3b.s3o = {
   unitname            = [[armanni]],
   name                = [[Annihilator]],
   description         = [[Tachyon Accelerator (Counter-Artillery/Anti-Armor)]],
@@ -129,7 +129,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 1040,
-      object           = [[wreck4x4c.s3o]],
+      object           = [[arm_annihilator_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 1040,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -186,4 +186,4 @@ unitDef = {
 	buildingGroundDecalType=[[armanni_aoplane.dds]],
 }
 
-return lowerkeys({ armanni = unitDef })
+return lowerkeys({ armanni = wreck3x3b.s3o })

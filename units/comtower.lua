@@ -1,4 +1,4 @@
-unitDef = {
+wreck3x3b.s3o = {
   unitname                      = [[comtower]],
   name                          = [[Command Tower]],
   description                   = [[Commands!, Builds at 12 m/s]],
@@ -78,7 +78,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 880,
-      object           = [[ARMANNI_DEAD]],
+      object           = [[arm_annihilator_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 880,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -130,4 +130,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ comtower = unitDef })
+return lowerkeys({ comtower = wreck3x3b.s3o })
