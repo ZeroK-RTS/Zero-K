@@ -21,7 +21,7 @@ local silo2 = piece 'silo2'
 local silo3 = piece 'silo3' 
 local silo4 = piece 'silo4' 
 
-local smokePiece = {body, silo1, silo3, scaffold}
+smokePiece = {body, silo1, silo3, scaffold}
 
 --------------------------------------------------------------------------------
 -- variables

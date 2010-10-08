@@ -8,7 +8,7 @@ local leftThigh, leftKnee, leftShin, leftFoot, rightThigh, rightKnee, rightShin,
 local lforearml,lbladel,rforearml,rbladel,lforearmu,lbladeu,rforearmu,rbladeu = piece("lforearml", "lbladel", "rforearml", "rbladel", "lforearmu", "lbladeu", "rforearmu", "rbladeu")
 local spike1, spike2, spike3, firepoint, spore1, spore2, spore3 = piece("spike1", "spike2", "spike3", "firepoint", "spore1", "spore2", "spore3")
 
-local smokePiece = {}
+smokePiece = {}
 
 local turretIndex = {
 }

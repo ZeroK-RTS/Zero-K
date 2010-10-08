@@ -2,7 +2,7 @@ include "constants.lua"
 include "fakeUpright.lua"
 
 local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,x,z,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","z","x","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
-local smokePiece = {base, jet1, jet2}
+smokePiece = {base, jet1, jet2}
 
 
 --signals

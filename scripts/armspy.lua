@@ -12,7 +12,7 @@ local fire = piece 'fire'
 
 local  bMoving, Static_Var_2, Static_Var_3, Static_Var_4
 
-local smokePiece = {body, gun}
+smokePiece = {body, gun}
 
 local function Walk()
 	if bMoving then

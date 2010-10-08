@@ -22,7 +22,7 @@ local flares = {
 --------------------------------------------------------------------
 --constants
 --------------------------------------------------------------------
-local smokePiece = {hull, turret1, turret2, turret3}
+smokePiece = {hull, turret1, turret2, turret3}
 
 local SIG_Move = 1
 
@@ -55,7 +55,7 @@ function script.Create()
 	Turn(turret2, y_axis, math.rad(180))
 	Turn(turret3, y_axis, math.rad(180))
 	Spin(radar, y_axis, math.rad(100))
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(SmokeUnit)
 	--RockZInit()
 end
 

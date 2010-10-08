@@ -15,7 +15,7 @@ local bMoving = false
 local fired = false
 local active = false
 
-local smokePiece = {body, sphere}
+smokePiece = {body, sphere}
 
 local SIG_Walk = 2
 

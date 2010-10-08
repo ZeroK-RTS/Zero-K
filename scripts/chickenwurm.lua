@@ -4,7 +4,7 @@ include "constants.lua"
 local mbody, fbody, bbody, head, tail = piece("mbody","fbody","bbody","head","tail")
 local rsack, rblade, lsack, lblade, fire = piece("rsack","rblade","lsack","lblade","fire")
 
-local smokePiece = {}
+smokePiece = {}
 
 local turretIndex = {
 }

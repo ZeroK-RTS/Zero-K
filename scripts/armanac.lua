@@ -4,7 +4,7 @@ include "constants.lua"
 local base, turret, sleeve, barrel, flare = piece("base", "turret", "sleeve", "barrel", "flare")
 local wake1, wake2, wake3, wake4, wake5, wake6, wake7, wake8, ground = piece("wake1", "wake2", "wake3", "wake4", "wake5", "wake6", "wake7", "wake8", "ground1")
 
-local smokePiece = { base, turret }
+smokePiece = { base, turret }
 
 --constants
 local restoreDelay = 6000

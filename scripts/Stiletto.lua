@@ -1,7 +1,7 @@
 include "constants.lua"
 
 local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
-local smokePiece = {base, jet1, jet2}
+smokePiece = {base, jet1, jet2}
 
 --constants
 

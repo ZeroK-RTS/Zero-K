@@ -6,7 +6,7 @@ local wingR, wingL, wingtipR, wingtipL = piece("wingr", "wingl", "wingtip1", "wi
 local engineR, engineL, thrust1, thrust2, thrust3 = piece("jetr", "jetl", "thrust1", "thrust2", "thrust3")
 local missR, missL = piece("m1", "m2")
 
-local smokePiece = {base, engineL, engineR}
+smokePiece = {base, engineL, engineR}
 
 --constants
 

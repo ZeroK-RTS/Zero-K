@@ -53,9 +53,8 @@ DETO_W8 = 4103
 
 SMOKEPUFF = 258
 
-local spGetUnitHealth = Spring.GetUnitHealth
-
-function SmokeUnit(smokePiece)
+function SmokeUnit()
+	if not (smokePiece and smokePiece[1]) then return end
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do
 		Sleep(400)
 	end
