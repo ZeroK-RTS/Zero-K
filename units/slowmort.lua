@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[slowmort]],
   name                = [[Morty]],
-  description         = [[Slowbeam (aka awesome) walker]],
+  description         = [[Slowbeam Walker]],
   acceleration        = 0.132,
   activateWhenBuilt   = true,
   bmcode              = [[1]],
@@ -91,9 +91,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 0,
-        planes  = 0,
-        subs    = 0,
+        default = 50,
       },
 
       energypershot           = 0.3,

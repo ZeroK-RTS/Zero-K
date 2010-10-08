@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[factoryjump]],
-  name                          = [[Jumpjet Factory]],
+  name                          = [[Advanced Jumpjet Plant]],
   description                   = [[Produces Jumpjets, Builds at 6 m/s]],
   acceleration                  = 0,
   bmcode                        = [[0]],

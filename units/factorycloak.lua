@@ -36,7 +36,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    helptext = [[Emphasizing guile over brute force, the Cloaky Bot Plant makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Tick, Zeus]],
+    helptext = [[Emphasizing guile over brute force, the Cloaky Bot Plant makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Tick, Zeus, Sharpshooter]],
     sortName = [[1]],
   },
 
