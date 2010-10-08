@@ -1,4 +1,4 @@
-wreck3x3b.s3o = {
+unitDef = {
   unitname            = [[armanni]],
   name                = [[Annihilator]],
   description         = [[Tachyon Accelerator (Counter-Artillery/Anti-Armor)]],
@@ -186,4 +186,4 @@ wreck3x3b.s3o = {
 	buildingGroundDecalType=[[armanni_aoplane.dds]],
 }
 
-return lowerkeys({ armanni = wreck3x3b.s3o })
+return lowerkeys({ armanni = unitDef })

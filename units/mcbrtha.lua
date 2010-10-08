@@ -1,4 +1,4 @@
-wreck3x3b.s3o = {
+unitDef = {
   unitname                      = [[mcbrtha]],
   name                          = [[Quantum's Mind-control Capture Cannon]],
   description                   = [[Strategic Capture Cannon]],
@@ -185,4 +185,4 @@ wreck3x3b.s3o = {
 
 }
 
-return lowerkeys({ mcbrtha = wreck3x3b.s3o })
+return lowerkeys({ mcbrtha = unitDef })

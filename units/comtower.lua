@@ -1,4 +1,4 @@
-wreck3x3b.s3o = {
+unitDef = {
   unitname                      = [[comtower]],
   name                          = [[Command Tower]],
   description                   = [[Commands!, Builds at 12 m/s]],
@@ -130,4 +130,4 @@ wreck3x3b.s3o = {
 
 }
 
-return lowerkeys({ comtower = wreck3x3b.s3o })
+return lowerkeys({ comtower = unitDef })
