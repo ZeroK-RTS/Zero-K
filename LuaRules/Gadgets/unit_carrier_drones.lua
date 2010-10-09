@@ -108,10 +108,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-  if (unitDefID == CORE) then
-    carrierList[unitID] = carrier(unitTeam, 0, RELOAD_TIME, "corcdrone", 0)
-  elseif (unitDefID == ARM) then
-    carrierList[unitID] = carrier(unitTeam, 0, RELOAD_TIME, "armcdrone", 0)
+  if (unitDefID == ARM) then
+    carrierList[unitID] = carrier(unitTeam, 0, RELOAD_TIME, "carrydrone", 0)
   end
 end
 
