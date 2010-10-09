@@ -105,6 +105,7 @@ local resources = {
       electnovaexplo= "cc/electnovaexplo.png",
       lightening= "cc/lightening.tga",
       laserend= "laserend.tga",
+	  laserfalloff='laserfalloff.tga',
       orangesmoke= "pd/orangesmoke.tga",
       exp00_5= "gpl/explosion2/exp00_5.tga",
       exp00_1= "gpl/explosion2/exp00_1.tga",
