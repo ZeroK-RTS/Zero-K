@@ -26,7 +26,6 @@ local turret_commands = {
 
 local other_turret_commands = {
 	[-UnitDefNames["corrl"].id] = {level = 1, order = 1},
-	[-UnitDefNames["armdl"].id] = {level = 2, order = 9},
 	[-UnitDefNames["cortl"].id] = {level = 2, order = 10},
 	[-UnitDefNames["armatl"].id] = {level = 3, order = 11},
 	[-UnitDefNames["corrazor"].id] = {level = 2, order = 4},
