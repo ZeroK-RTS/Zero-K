@@ -1,10 +1,10 @@
 local array = {}
 
 local weapons = {
-	zeus_lightning = {damage = 250},
+	armzeus_lightning = {damage = 250},
 	panther_lightning = {damage = 160},
-	bantha_lightning = {damage = 240},
-	commadvsupport = {damage = 1600},
+	armbanth_lightning = {damage = 240},
+	commadvsupport_electrolaser = {damage = 1600},
 }
 
 for i=1,#WeaponDefs do

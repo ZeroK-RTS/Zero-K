@@ -30,7 +30,7 @@ local paralysisList = include("LuaRules/Configs/paralysis_defs.lua")
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-	if paralysisList[weaponID] and paralyzer then
+	if paralysisList[weaponID] then
 		attackerID = attackerID or -1
 		Spring.AddUnitDamage(unitID, paralysisList[weaponID].damage, 0, attackerID)
 	end
