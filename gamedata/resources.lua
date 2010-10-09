@@ -54,12 +54,16 @@ local resources = {
 		},
 
 		projectiletextures = {
- lightb= "pd/lightningball.tga",
+      -- MANUAL
+	  laserfalloff='laserfalloff.tga',
+	  -- MANUAL
+
+		lightb= "pd/lightningball.tga",
+		largelaser= "gpl/largelaserfalloff.png",
       dust= "other/dust.tga",
       circularthingy= "circularthingy.tga",
       smokesmall= "pd/smokesmall.tga",
       plasma= "gpl/plasma.tga",
-      largelaser= "gpl/largelaserfalloff.png",
       flare= "flare.tga",
       smallflare= "gpl/smallflare.tga",
       flowerflash= "pd/flowerflash.tga",
@@ -105,7 +109,6 @@ local resources = {
       electnovaexplo= "cc/electnovaexplo.png",
       lightening= "cc/lightening.tga",
       laserend= "laserend.tga",
-	  laserfalloff='laserfalloff.tga',
       orangesmoke= "pd/orangesmoke.tga",
       exp00_5= "gpl/explosion2/exp00_5.tga",
       exp00_1= "gpl/explosion2/exp00_1.tga",
