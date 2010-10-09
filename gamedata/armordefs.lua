@@ -39,8 +39,6 @@ local armorDefs = {
   COMMANDERS = {	
     "cordecom",
     "armdecom",
-    "chickenflyerqueen",
-	"chickenqueenlite",
   },
 
   BURROWED = {	
