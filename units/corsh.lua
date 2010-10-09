@@ -21,7 +21,7 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Hovercraft d'Attaque Éclair]],
-    helptext       = [[The Scrubber is the Logos hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of oppurtunity.]],
+    helptext       = [[The Scrubber is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of oppurtunity.]],
     helptext_fr    = [[Le Scrubber est petit, maniable, rapide et n'a qu'une faible puissance de feu. Idéal pour les attaques surprises depuis la mer, il surprendra bien des ennemis. Son blindage est cependant trop faible pour faire face r une quelquonque résistance. ]],
   },
 
@@ -139,7 +139,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 32,
-      object           = [[wreck2x2c.s3o]],
+      object           = [[corsh_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 32,
       seqnamereclamate = [[TREE1RECLAMATE]],
