@@ -89,17 +89,17 @@ local function SelectComm(team, strat)
 		if rand < total then
 			commName = strategies[strat].commanders[i].ID
 			GG.SetFaction(commName, team)
+			Spring.Echo("CAI: team "..team.." has selected strategy: "..strategies[strat].name..", using commander "..commName)
 			break
 		end
 	end
-	Spring.Echo("CAI: team "..team.." has selected strategy: "..strategies[strat].name..", using commander "..commName)
 end
 
 function SelectRandomStrat(team)
 	local count = #strategies
 	local rand = math.random()
 	
-	local stratIndex
+	local stratIndex = 1
 	local total = 0
 	for i = 1, count do
 		total = total + strategies[i].chance

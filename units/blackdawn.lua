@@ -88,7 +88,7 @@ unitDef = {
 
       damage                  = {
         default = 220,
-        subs    = 10,
+        subs    = 11,
       },
 
       dance                   = 30,
