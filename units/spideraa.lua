@@ -116,51 +116,6 @@ unitDef = {
       weaponVelocity          = 450,
     },
 
-
-    TORPEDO = {
-      name                    = [[Torpedo]],
-      areaOfEffect            = 16,
-      avoidFriendly           = false,
-      burnblow                = true,
-      collideFriendly         = false,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 250,
-        subs    = 250,
-      },
-
-      explosionGenerator      = [[custom:TORPEDO_HIT]],
-      fixedlauncher           = true,
-      fixedLauncher           = true,
-      guidance                = true,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
-      model                   = [[torpedo]],
-      noSelfDamage            = true,
-      propeller               = [[1]],
-      range                   = 400,
-      reloadtime              = 4,
-      renderType              = 1,
-      selfprop                = true,
-      soundHit                = [[OTAunit/XPLODEP1]],
-      soundStart              = [[OTAunit/TORPEDO1]],
-      startVelocity           = 10,
-      tolerance               = 32000,
-      tracks                  = true,
-      turnRate                = 16000,
-      turret                  = false,
-      waterWeapon             = true,
-      weaponAcceleration      = 50,
-      weaponTimer             = 4,
-      weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 200,
-    },
-
   },
 
 

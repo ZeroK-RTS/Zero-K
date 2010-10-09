@@ -29,8 +29,12 @@ bomb_drop.wav
 bomb_drop_short.wav
 depthcharge.wav
 
+awesund:
+quick_lightning.wav
+
 Unkown:
 other_lightning.wav
+hiss.wav
 
 burn_mixed.wav - Open LieroX & Nanoblobs
 torpedo.wav - Kanoba & freeloops

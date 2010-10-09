@@ -1,0 +1,9 @@
+All origins of these files unknown unless otherwise stated. Pretty sure to be free
+
+Golgotha:
+acid_fire.wav
+acid_hit.wav
+
+awesund:
+spike_fire.wav
+spike_hit.wav

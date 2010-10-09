@@ -4,16 +4,16 @@
 local Sounds = {
    SoundItems = {
       IncomingChat = {
-         file = "sounds/nexuiz/talk.wav",
+         file = "sounds/talk.wav",
       },
       --MultiSelect = {
       --   file = "sounds/button9.wav",
       --},
       MapPoint = {
-         file = "sounds/bzflag/teamgrab.wav",
+         file = "sounds/marker_place.wav",
       },
 --[[
-      MyAwesomeSouns = {
+      MyAwesomeSounds = {
          file = "sounds/booooom.wav",
          gain = 2.0, --- for uber-loudness
          pitch = 0.2, --- bass-test
@@ -36,7 +36,7 @@ local Sounds = {
          maxdist = FLT_MAX, --- no cutoff at all
       },
 	  Sparks = {
-         file = "sounds/nexuiz/sparks.wav",
+         file = "sounds/sparks.wav",
          priority = -10,
          maxconcurrent = 1,
          maxdist = 1000,
