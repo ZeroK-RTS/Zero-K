@@ -1,5 +1,0 @@
-those parts beginning with "TOP" are rotating
-
-those with "teamcolor/TC" are for 100% teamcolor
-
-uses anihilator skin
