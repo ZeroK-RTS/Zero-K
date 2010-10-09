@@ -57,5 +57,8 @@ Merc Squad:
 ex_large10.wav
 ex_large11.wav
 
+freedroid:
+clogger_death.wav
+
 Kanoba:
 ex_underwater.wav
