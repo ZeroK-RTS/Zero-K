@@ -161,7 +161,6 @@ unitDef = {
       category         = [[heaps]],
       damage           = 190,
       energy           = 0,
-      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -176,8 +175,6 @@ unitDef = {
     },
 
 
-    HEAP  = {
-    },
 
   },
 
