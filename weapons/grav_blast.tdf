@@ -16,7 +16,7 @@
   interceptedbyshieldtype=2;
   lineofsight=1;
   metalpershot=1000;
-  model=ballmiss;
+  model=crblmsslr.s3o;
   noautorange=1;
   propeller=1;
   range=72000;
