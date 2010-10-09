@@ -55,7 +55,18 @@ local resources = {
 
 		projectiletextures = {
       -- MANUAL
-	  laserfalloff='laserfalloff.tga',
+			----------Spring Effects--------
+			circularthingy='circularthingy.tga',
+			laserend='laserend.tga',
+			laserfalloff='laserfalloff.tga',
+			randdots='randdots.tga',
+			smoketrail='PD/smoketrail.tga',
+			wake='GPL/wake.png',
+			flare='flare.tga',
+			flame='GPL/flame.tga',
+			explofade='explofade.tga',
+			heatcloud='GPL/explo.png',
+			explo='GPL/fire.png',
 	  -- MANUAL
 
       bigexplo= "cc/bigexplo.tga",
@@ -66,7 +77,6 @@ local resources = {
       bloodsplat= "pd/bloodsplat.tga",
       bluenovaexplo= "cc/bluenovaexplo.tga",
       bluering= "cc/bluering.tga",
-      circularthingy= "circularthingy.tga",
       corelaser= "gpl/corelaser.png",
       darksmoketrail= "darksmoketrail.tga",
       debris2= "other/debris2.tga",
@@ -88,10 +98,8 @@ local resources = {
       exp02_1= "gpl/explosion3/exp02_1.png",
       exp02_2= "gpl/explosion3/exp02_2.png",
       exp02_3= "gpl/explosion3/exp02_3.png",
-      explo= "gpl/fire.png",
       fireball= "pd/fireball.tga",
       fireyexplo= "cc/fireyexplo.tga",
-      flare= "flare.tga",
       flashside1= "cc/flashside1.tga",
       flashside2= "cc/flashside2.tga",
       flowerflash= "pd/flowerflash.tga",
@@ -100,7 +108,6 @@ local resources = {
       kfoam= "other/foam.tga",
       kfoom= "other/foom.tga",
       largelaser= "gpl/largelaserfalloff.png",
-      laserend= "laserend.tga",
       lightb= "pd/lightningball.tga",
       lightb3= "pd/lightningball3.tga",
       lightb4= "pd/lightningball4.tga",
@@ -119,7 +126,6 @@ local resources = {
       plasma0029= "other/plasma0029.tga",
       plasma2= "gpl/plasma.tga",
       plasma3= "gpl/plasmashot.png",
-      randdots= "randdots.tga",
       redexplo= "cc/redexplo.tga",
       redlight= "other/light_red.png",
       sakexplo= "saktoths/sakexplo.tga",
@@ -135,7 +141,6 @@ local resources = {
       sporetrailblue= "gpl/sporetrailblue.tga",
       starexplo= "saktoths/starexplo.tga",
       uglynovaexplo= "cc/uglynovaexplo.tga",
-      wake= "gpl/wake.png",
       whitelightb= "pd/whitelightningball.tga",
 	  },
 	},
