@@ -16,6 +16,7 @@ unitDef = {
   canstop             = [[1]],
   category            = [[LAND]],
   corpse              = [[DEAD]],
+  buildPic = [[panther.png]],
 
   customParams        = {
     description_bp = [[Tanque agressor]],
