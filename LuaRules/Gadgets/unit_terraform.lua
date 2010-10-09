@@ -159,7 +159,7 @@ local checkInterval 		= 0
 local terraunitDefID = UnitDefNames["terraunit"].id
 
 local corclogDefID = UnitDefNames["corclog"].id
-local novheavymineDefID = UnitDefNames["novheavymine"].id
+--local novheavymineDefID = UnitDefNames["novheavymine"].id
 
 --------------------------------------------------------------------------------
 -- Custom Commands
@@ -2554,7 +2554,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		end
 		--spAdjustHeightMap(ux-64, uz-64, ux+64, uz+64 , 0)
 	end
-  
+	--[[
   	if (unitDefID == novheavymineDefID) then
 		local  _,_,_,_,build = spGetUnitHealth(unitID)
 		
@@ -2611,7 +2611,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		end
 		--spAdjustHeightMap(ux-64, uz-64, ux+64, uz+64 , 0)
 	end
-  
+	--]]
 	if constructor[unitID] then
 		local index = constructor[unitID].index
 		if index ~= constructors then

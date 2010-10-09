@@ -29,7 +29,6 @@ if (gadgetHandler:IsSyncedCode()) then
 
 local windDefs = {
   [ UnitDefNames['armwin'].id ] = true,
-  [ UnitDefNames['corwin'].id ] = true,
 }
 
 local windmills = {}

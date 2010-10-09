@@ -68,8 +68,7 @@ local disembarkCmdDesc = {
 
 
 local transDefs = {
-  [ UnitDefNames['armatlas'].id ] = true,
-  [ UnitDefNames['armdfly'].id ] = true,
+  [ UnitDefNames['corvalk'].id ] = true,
   [ UnitDefNames['corbtrans'].id ] = true,
 }
 

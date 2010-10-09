@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------------
 
 -- Automatically generated local definitions
-
+--[[
 local spAreTeamsAllied     = Spring.AreTeamsAllied
 local spEcho               = Spring.Echo
 local spGetGaiaTeamID      = Spring.GetGaiaTeamID
@@ -411,3 +411,4 @@ function gadget:Shutdown()
 end
 
 end
+--]]

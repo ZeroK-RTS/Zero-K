@@ -83,8 +83,6 @@ local particleIDs = {}
 local initialized = false --// if LUPS isn't started yet, we try it once a gameframe later
 local tryloading  = 1     --// try to activate lups if it isn't found
 
-local corfusdefid = UnitDefNames["corfus"].id
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --

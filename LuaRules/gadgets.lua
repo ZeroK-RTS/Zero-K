@@ -74,7 +74,6 @@ end
 
 VFS.Include(SCRIPT_DIR .. 'system.lua', nil, VFSMODE)
 VFS.Include(SCRIPT_DIR .. 'callins.lua', nil, VFSMODE)
-VFS.Include(SCRIPT_DIR .. 'factions.lua', nil, VFSMODE)
 VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
 

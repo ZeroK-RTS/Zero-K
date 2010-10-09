@@ -47,15 +47,11 @@ local disabledUnits = {}
 local changeStateDelay = 3 -- delay in seconds before state of unit can be changed. Do not set it below 2 seconds, because it takes 2 seconds before enabled unit reaches full energy use
 local radarDefs = {
   [ UnitDefNames['armarad'].id ] = true,
-  [ UnitDefNames['armrad'].id ] = true,
   [ UnitDefNames['spherecloaker'].id ] = true,
-  [ UnitDefNames['armawac'].id ] = true,
   [ UnitDefNames['armjamt'].id ] = true,
   [ UnitDefNames['armsonar'].id ] = true,
-  [ UnitDefNames['corarad'].id ] = true,
   [ UnitDefNames['corrad'].id ] = true,
   [ UnitDefNames['corawac'].id ] = true,
-  [ UnitDefNames['corsonar'].id ] = true,
   [ UnitDefNames['corvrad'].id ] = true,
 }
 
