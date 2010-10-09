@@ -9,6 +9,7 @@
   impulsefactor=0;
   interceptedbyshieldtype=1;
   rendertype=4;
+  soundhit=explosion/clogger_death;
   weaponvelocity=250;
   [DAMAGE]
   {

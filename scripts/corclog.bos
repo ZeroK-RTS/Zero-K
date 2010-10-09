@@ -6,14 +6,6 @@ piece  pelvis, rfoot,
 static-var  bMoving, Static_Var_2, Static_Var_3, Static_Var_4;
 
 
-
-Sounds()
-{
-	play-sound("freedroid/brik_hit", 10);
-	#define death 0
-}
-
-
 walk()
 {
 
@@ -178,7 +170,6 @@ SweetSpot(piecenum)
 
 Killed(severity, corpsetype)
 {
-    get PLAY_SOUND(death, 655360,1,0);
     explode box type SHATTER | SMOKE | BITMAP2;
     return (4); //leave no wreckage
 }
