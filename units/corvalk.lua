@@ -50,7 +50,7 @@ unitDef = {
   moverate2           = [[2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  objectName          = [[CORVALK]],
+  objectName          = [[CORVALK.s3o]],
   pitchscale          = [[1]],
   releaseHeld         = false,
   seismicSignature    = 0,
@@ -74,7 +74,6 @@ unitDef = {
   transportSize       = 3,
   turnInPlace         = 0,
   turnRate            = 550,
-  workerTime          = 0,
 
   featureDefs         = {
 
@@ -91,7 +90,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 32,
-      object           = [[wreck3x3c.s3o]],
+      object           = [[corvalk_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 32,
       seqnamereclamate = [[TREE1RECLAMATE]],
