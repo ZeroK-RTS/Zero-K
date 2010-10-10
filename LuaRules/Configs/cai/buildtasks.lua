@@ -76,25 +76,27 @@ factionBuildConfig = {
 				
 				[5] = { --assault
 					importanceMult = 1,
-					count = 3,
+					count = 1,
 					[1] = {ID = UnitDefNames['corraid'].id, chance = 1},
 				},
 				
 				[6] = { -- skirm
-					importanceMult = 0,
-					count = 0,
+					importanceMult = 0.3,
+					count = 1,
+					[1] = {ID = UnitDefNames['cormist'].id, chance = 1},
 				},	
 				
 				[7] = { -- riot
 					importanceMult = 1.2,
 					count = 2,
-					[1] = {ID = UnitDefNames['cormist'].id, chance = 0.35},
-					[2] = {ID = UnitDefNames['corlevlr'].id, chance = 0.65},
+					[1] = {ID = UnitDefNames['cormist'].id, chance = 0.26},
+					[2] = {ID = UnitDefNames['corlevlr'].id, chance = 0.75},
 				},
 				
 				[8] = { -- aa
-					importanceMult = 0,
-					count = 0,
+					importanceMult = 0.4,
+					count = 1,
+					[1] = {ID = UnitDefNames['cormist'].id, chance = 1},
 				},
 			},
 			[UnitDefNames['factoryjump'].id] = {
@@ -146,8 +148,8 @@ factionBuildConfig = {
 				[7] = { -- riot
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['corcan'].id, chance = 0.4},
-					[2] = {ID = UnitDefNames['corcan'].id, chance = 0.6},
+					[1] = {ID = UnitDefNames['corcan'].id, chance = 0.9},
+					[2] = {ID = UnitDefNames['corsumo'].id, chance = 0.1},
 				},
 				
 				[8] = { -- aa
