@@ -238,7 +238,7 @@ unitDef = {
       reloadtime              = 0.8,
       renderType              = 0,
       rgbColor                = [[0.3 0 0.7]],
-      soundStart              = [[weapon/laser/laser_burn8]],
+      soundStart              = [[weapon/laser/small_laser_fire2]],
       soundTrigger            = false,
       targetMoveError         = 0.05,
       texture1                = [[largelaser]],
@@ -261,9 +261,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 400,
-        planes  = 400,
-        subs    = 20,
+        default = 300,
+        planes  = 300,
+        subs    = 15,
       },
 	  
 	  energypershot           = 20,
@@ -277,7 +277,7 @@ unitDef = {
       model                   = [[bomb]],
       noSelfDamage            = true,
       range                   = 450,
-      reloadtime              = 12,
+      reloadtime              = 8,
       renderType              = 4,
       smokeTrail              = true,
       soundHit                = [[weapon/aoe_aura]],

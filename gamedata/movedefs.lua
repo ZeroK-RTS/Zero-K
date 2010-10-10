@@ -131,7 +131,7 @@ local moveDefs = {
 		footprintz = 3,
 		maxslope = 36,
 		maxwaterdepth = 5000,
-		slopemod = 60,
+		--slopemod = 60,
 		crushstrength = 150,
 	},
 	
