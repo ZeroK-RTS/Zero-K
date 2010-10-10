@@ -123,7 +123,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['puppy'].id, chance = 0.6},
-					[1] = {ID = UnitDefNames['corpyro'].id, chance = 0.4},
+					[2] = {ID = UnitDefNames['corpyro'].id, chance = 0.4},
 				},
 				
 				[4] = { -- arty
@@ -136,7 +136,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['corcan'].id, chance = 0.9},
-					[1] = {ID = UnitDefNames['corsumo'].id, chance = 0.1},
+					[2] = {ID = UnitDefNames['corsumo'].id, chance = 0.1},
 				},
 				
 				[6] = { -- skirm
@@ -195,7 +195,7 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['spiderassault'].id, chance = 0.95},
-					[3] = {ID = UnitDefNames['armcrabe'].id, chance = 0.05},
+					[2] = {ID = UnitDefNames['armcrabe'].id, chance = 0.05},
 				},
 				
 				[6] = { -- skirm

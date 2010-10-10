@@ -80,7 +80,7 @@ if (gadgetHandler:IsSyncedCode()) then
         Spring.GiveOrderToUnit(uid,CMD.STOP,{},{});
 
 		env = Spring.UnitScript.GetScriptEnv(uid)
-		if env then Spring.UnitScript.CallAsUnit(uid, env.Activate)
+		if env and env.Activate then Spring.UnitScript.CallAsUnit(uid, env.Activate)
         else Spring.CallCOBScript(uid,"Activate",0) end
 
         if (cunit.move) then
