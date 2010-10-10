@@ -79,7 +79,9 @@ if (gadgetHandler:IsSyncedCode()) then
         Spring.GiveOrderToUnit(uid,CMD.FIRE_STATE,{0},{});
         Spring.GiveOrderToUnit(uid,CMD.STOP,{},{});
 
-        Spring.CallCOBScript(uid,"Activate",0);
+		env = Spring.UnitScript.GetScriptEnv(uid)
+		if env then Spring.UnitScript.CallAsUnit(uid, env.Activate)
+        else Spring.CallCOBScript(uid,"Activate",0) end
 
         if (cunit.move) then
           Spring.CallCOBScript(uid,"StartMoving",0);

@@ -73,8 +73,8 @@ unitDef = {
   canreclamate        = [[1]],
   canstop             = [[1]],
   category            = [[LAND FIREPROOF]],
-  cloakCost           = 10,
-  cloakCostMoving     = 30,
+  cloakCost           = 5,
+  cloakCostMoving     = 25,
   commander           = true,
   corpse              = [[DEAD]],
 

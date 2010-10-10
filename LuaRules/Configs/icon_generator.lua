@@ -69,7 +69,10 @@ local function GreaterZero(a)   return a>0;   end
 local function GreaterEqZero(a) return a>=0;  end
 local function GreaterFour(a)   return a>4;   end
 local function LessEqZero(a)    return a<=0;  end
-local function IsCoreOrChicken(a) return a.chicken; end
+local function IsCoreOrChicken(a)
+	if a then return a.chicken
+	else return false end
+end
 backgrounds = {
 --//chicken queen has air movementtype
   {check={name="chickenq"},                                  texture="LuaRules/Images/IconGenBkgs/bg_ground_rock.png"},
@@ -134,15 +137,7 @@ defaults = {border=0.05, angle=45, rot="right", clamp=-10000, scale=1.5, empty=f
 --// per unitdef settings
 unitConfigs = {
   
-  [UnitDefNames.corestor.id] = {
-    rot = 0,
-  },
   [UnitDefNames.corrad.id] = {
-    scale = 3,
-    rot   = 200,
-    clamp = 10,
-  },
-  [UnitDefNames.corarad.id] = {
     scale = 3,
     rot   = 200,
     clamp = 10,
@@ -153,32 +148,8 @@ unitConfigs = {
   [UnitDefNames.corsilo.id] = {
     clamp = 0,
   },
-  [UnitDefNames.armmex.id] = {
-    clamp = 2,
-  },
   [UnitDefNames.corsh.id] = {
     clamp = 0,
-  },
-  [UnitDefNames.armsh.id] = {
-    clamp = 0,
-  },
-  [UnitDefNames.armgeo.id] = {
-    clamp = 0,
-  },
-  [UnitDefNames.armtl.id] = {
-    clamp = 0,
-  },
-  [UnitDefNames.armamph.id] = {
-    clamp = 0,
-  },
-  [UnitDefNames.armlab.id] = {
-    clamp = 0,
-  },
-  [UnitDefNames.armrad.id] = {
-    clamp = 10,
-  },
-  [UnitDefNames.armrl.id] = {
-    clamp = 2,
   },
   [UnitDefNames.corrl.id] = {
     clamp = 2,
@@ -186,25 +157,13 @@ unitConfigs = {
   [UnitDefNames.corhlt.id] = {
     clamp = 2,
   },
-  [UnitDefNames.armhlt.id] = {
-    clamp = 4,
-  },
-  [UnitDefNames.armfav.id] = {
-    border = 0.156,
-  },
   [UnitDefNames.corfav.id] = {
-    border = 0.156,
-  },
-  [UnitDefNames.chicken_dodo.id] = {
     border = 0.156,
   },
   [UnitDefNames.blastwing.id] = {
     border = 0.156,
   },
   [UnitDefNames.bladew.id] = {
-    border = 0.125,
-  },
-  [UnitDefNames.armlab.id] = {
     border = 0.125,
   },
   [UnitDefNames.corgator.id] = {
@@ -231,26 +190,12 @@ unitConfigs = {
     unfold = true,
   },
   	
-  [UnitDefNames.armarch.id] = {
-    unfold = true,
-    attack = true,
-    wait   = 120,
-    clamp  = 0,
-  },
-  [UnitDefNames.tawf013.id] = {
-    unfold = true,
-    attack = true,
-    shotangle = 45,
-    wait   = 120,
-  },
-
   [UnitDefNames.cormart.id] = {
     unfold = true,
     attack = true,
     shotangle = 45,
     wait   = 120,
   },
-
   [UnitDefNames.corak.id] = {
     unfold = true,
     attack = true,
@@ -264,20 +209,12 @@ unitConfigs = {
   [UnitDefNames.armspy.id] = {
     unfold = true,
   },
-  [UnitDefNames.armafrad.id] = {
-    unfold = true,
-    wait   = 210,
-  },
   [UnitDefNames.armanni.id] = {
     unfold = true,
   },
   [UnitDefNames.armarad.id] = {
     unfold = true,
     wait   = 225,
-  },
-  [UnitDefNames.armgmm.id] = {
-    clamp  = 0,
-    unfold = true,
   },
   [UnitDefNames.armsolar.id] = {
     unfold = true,
@@ -293,21 +230,10 @@ unitConfigs = {
   [UnitDefNames.cormex.id] = {
     clamp  = 0,
     unfold = true,
-    wait   = 300,
-  },
-  [UnitDefNames.corsolar.id] = {
-    unfold = true,
+    wait   = 600,
   },
   [UnitDefNames.cordoom.id] = {
     unfold = true,
-  },
-  [UnitDefNames.cordoom2.id] = {
-    unfold = true,
-  },
-  [UnitDefNames.core_egg_shell.id] = {
-    unfold = true,
-    attack = true,
-    wait   = 6,
   },
   [UnitDefNames.corcrw.id] = {
     unfold = true,
@@ -319,7 +245,6 @@ unitConfigs = {
   [UnitDefNames.chicken_pigeon.id] = {
     border = 0.11,
   },
-
 
   [UnitDefNames.chicken_dodo.id] = {
     border = defaults.border,
@@ -335,15 +260,6 @@ unitConfigs = {
     rot    = 29,
     angle  = 10,
     unfold = false,
-  },
-  [UnitDefNames.corkrog.id] = {
-    rot    = 28,
-    angle  = 10,
-  },
-  [UnitDefNames.corkarg.id] = {
-    rot    = 28,
-    angle  = 10,
-    border = 0.09,
   },
   [UnitDefNames.armorco.id] = {
     rot    = 28,
@@ -363,33 +279,21 @@ unitConfigs = {
     rot    = 30,
     angle  = 30,
   },
-
   [UnitDefNames.arm_spider.id] = {
     scale    = 3,
     attempts = 10,
   },
-
   [UnitDefNames.commrecon.id] = {
     attack = true,
+	delay = 100,
   },
-  
   [UnitDefNames.commsupport.id] = {
     attack = true,
+	delay = 100,
   }, 
-  
   [UnitDefNames.fakeunit.id] = {
     empty  = true,
   },
-  [UnitDefNames.fakeunit_aatarget.id] = {
-    empty  = true,
-  },--[[
-  [UnitDefNames.rampup.id]     = { empty  = true },
-  [UnitDefNames.rampdown.id]   = { empty  = true },
-  [UnitDefNames.levelterra.id] = { empty  = true },
-  [UnitDefNames.armblock.id]   = { empty  = true },
-  [UnitDefNames.corblock.id]   = { empty  = true },
-  [UnitDefNames.armtrench.id]  = { empty  = true },
-  [UnitDefNames.cortrench.id]  = { empty  = true },]]--
 }
 
 for i=1,#UnitDefs do
