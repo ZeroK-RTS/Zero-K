@@ -60,6 +60,12 @@ local skirm = {
 	"chickens",
 }
 
+local jumper = { -- uses jump for offense. IE do not put commander or AA here.
+	"corpyro",
+	"corcan",
+	"corsumo",
+}
+
 local riot = {
 	"armwar",
 	"cormak",
@@ -98,6 +104,7 @@ local arty = {
 --global versions
 raiderArray = {}
 assaultArray = {}
+jumperArray = {}
 skirmArray = {}
 riotArray = {}
 artyArray = {}
@@ -111,6 +118,7 @@ end
 
 CreateArray(raider, raiderArray)
 CreateArray(assault, assaultArray)
+CreateArray(jumper, jumperArray)
 CreateArray(skirm, skirmArray)
 CreateArray(riot, riotArray)
 CreateArray(arty, artyArray)

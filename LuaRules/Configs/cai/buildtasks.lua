@@ -46,7 +46,7 @@ factionBuildConfig = {
 				defenceRange = 500,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
-				BPQuota = 90,
+				BPQuota = 70,
 				minFacCount = 0,
 				
 				[1] = { -- con
@@ -104,7 +104,7 @@ factionBuildConfig = {
 				defenceRange = 500,
 				airDefenceQuota = {2,1,0.1},
 				importance = 0.8,
-				BPQuota = 120,
+				BPQuota = 70,
 				minFacCount = 1,
 				
 				[1] = { -- con
@@ -163,7 +163,7 @@ factionBuildConfig = {
 				defenceRange = 500,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
-				BPQuota = 120,
+				BPQuota = 70,
 				minFacCount = 1,
 				
 				[1] = { -- con
@@ -221,7 +221,7 @@ factionBuildConfig = {
 				defenceRange = 500,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
-				BPQuota = 90,
+				BPQuota = 70,
 				minFacCount = 0,
 				
 				[1] = { -- con
@@ -279,7 +279,7 @@ factionBuildConfig = {
 				defenceRange = 500,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
-				BPQuota = 90,
+				BPQuota = 70,
 				minFacCount = 0,
 				
 				[1] = { -- con
@@ -334,7 +334,7 @@ factionBuildConfig = {
 				defenceRange = 500,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
-				BPQuota = 120,
+				BPQuota = 70,
 				minFacCount = 0,
 				
 				[1] = { -- con
@@ -392,7 +392,7 @@ factionBuildConfig = {
 				defenceRange = 500,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
-				BPQuota = 120,
+				BPQuota = 100,
 				minFacCount = 1,
 				
 				[1] = { -- con
@@ -453,7 +453,7 @@ factionBuildConfig = {
 				airDefenceQuota = {2,1,0.1},
 				airFactory = true,
 				importance = 1,
-				BPQuota = 120,
+				BPQuota = 70,
 				minFacCount = 1,
 				
 				[1] = { -- con
@@ -493,7 +493,7 @@ factionBuildConfig = {
 				airDefenceQuota = {2,1,0.1},
 				airFactory = true,
 				importance = 1,
-				BPQuota = 120,
+				BPQuota = 70,
 				minFacCount = 1,
 				
 				[1] = { -- con

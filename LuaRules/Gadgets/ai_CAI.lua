@@ -22,15 +22,18 @@ local spGetUnitAllyTeam 	= Spring.GetUnitAllyTeam
 local spGiveOrderToUnit 	= Spring.GiveOrderToUnit
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetTeamResources 	= Spring.GetTeamResources
+local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local spGetCommandQueue 	= Spring.GetCommandQueue
 local spGetUnitHealth		= Spring.GetUnitHealth
 local spTestBuildOrder		= Spring.TestBuildOrder		
 local spGetUnitBuildFacing	= Spring.GetUnitBuildFacing
 local spGetUnitRadius		= Spring.GetUnitRadius
 local spGetFactoryCommands	= Spring.GetFactoryCommands
+local spGetUnitSeparation	= Spring.GetUnitSeparation
 local spIsPosInLos			= Spring.IsPosInLos
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetUnitDefID		= Spring.GetUnitDefID
+local spGetUnitsInRectangle	= Spring.GetUnitsInRectangle
 local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
 local spGetGameFrame		= Spring.GetGameFrame
 local spValidUnitID			= Spring.ValidUnitID
@@ -38,6 +41,13 @@ local spGetUnitTeam			= Spring.GetUnitTeam
 --local spSetUnitSensorRadius = Spring.SetUnitSensorRadius
 local spIsPosInRadar		= Spring.IsPosInRadar
 local spGetTeamUnits		= Spring.GetTeamUnits
+
+local jumpDefNames  = VFS.Include"LuaRules/Configs/jump_defs.lua"
+local jumpDefs = {}
+for name, data in pairs(jumpDefNames) do
+  jumpDefs[UnitDefNames[name].id] = data
+end
+
 
 -- commands
 local CMD_MOVE_STATE	= CMD.MOVE_STATE
@@ -51,7 +61,11 @@ local CMD_PATROL        = CMD.PATROL
 local CMD_STOP          = CMD.STOP
 local CMD_GUARD			= CMD.GUARD
 local CMD_OPT_SHIFT		= CMD.OPT_SHIFT 
-CMD_PRIORITY		= 34220
+local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
+local CMD_INSERT 		= CMD.INSERT
+local CMD_REMOVE 		= CMD.REMOVE
+local CMD_PRIORITY		= 34220
+local CMD_JUMP 			= 38521
 
 local twoPi = math.pi*2
 
@@ -123,7 +137,11 @@ heatmapPosition = {}
 for i = 1,heatArrayWidth do -- init array
 	heatmapPosition[i] = {}
 	for j = 1, heatArrayHeight do
-		heatmapPosition[i][j] = {x = heatSquareWidth*(i-0.5), z = heatSquareHeight*(j-0.5)}
+		heatmapPosition[i][j] = {
+			x = heatSquareWidth*(i-0.5), z = heatSquareHeight*(j-0.5),
+			left = heatSquareWidth*(i-1), right = heatSquareWidth*i,
+			top = heatSquareHeight*(j-1), bottom = heatSquareHeight*j,
+		}
 		heatmapPosition[i][j].y = spGetGroundHeight(heatmapPosition[i][j].x,heatmapPosition[i][j].z)
 	end
 end
@@ -158,6 +176,28 @@ local function chooseUnitDefID(array)
 	
 	local total = 0
 	for i = 1, count do
+		total = total + array[i].chance
+		if rand < total then
+			return array[i].ID
+		end
+	end
+	Spring.Echo(" ******* Chance Wrong ******* ")
+end
+
+-- chooses a unitDef at random from the chance of each being chosen and prints useful debug
+local function chooseUnitDefIDWithDebug(array, unitID, ud, choice)
+	local count = array.count
+	if count == 0 then return end
+	local rand = math.random()
+	
+	local total = 0
+	for i = 1, count do
+		if not array then
+			Spring.Echo("bad array for " .. ud.humanName .. " with choice " .. choice)
+		end
+		if not array[i] then
+			Spring.Echo("bad array index for " .. ud.humanName .. " with choice " .. choice)
+		end
 		total = total + array[i].chance
 		if rand < total then
 			return array[i].ID
@@ -223,6 +263,7 @@ local function updateTeamResourcing(team)
 	end
 end
 
+-- changes the weighting on con and factory jobs based on brain
 local function executeControlFunction(team, frame)
 
 	local a = aiTeamData[team]
@@ -381,10 +422,13 @@ local function nearFactory(team,tx,tz,distance)
 	
 	local unitArray = allyTeamData[aiTeamData[team].allyTeam].units.factoryByID
 	
-	for unitID,_ in pairs(unitArray) do
+	for unitID, data in pairs(unitArray) do
 		--mapEcho(unitID,"factroyChecked")
 		local x,_,z = spGetUnitPosition(unitID)
 		if disSQ(x,z,tx,tz) < distance^2 then
+			return true
+		end
+		if disSQ(data.wayX,data.wayZ,tx,tz) < distance^2 then
 			return true
 		end
 	end
@@ -848,14 +892,15 @@ local function makeEnergy(team,unitID)
 		end
 	end
 	
-	local searchRange = 80
+	local searchRange = 120
+	local minDistance = 100
 	
-	x = ux + math.random(-searchRange,searchRange)
-	z = uz + math.random(-searchRange,searchRange)
+	x = ux + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
+	z = uz + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
 	
 	while spTestBuildOrder(energyDefID, x, 0 ,z, 1) == 0 or nearFactory(team,x,z,400) or nearMexSpot(x,z,60) or nearEcon(team,x,z, buildDefs.econByDefId[energyDefID].energySpacing) do
-		x = ux + math.random(-searchRange,searchRange)
-		z = uz + math.random(-searchRange,searchRange)
+		x = ux + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
+		z = uz + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
 		searchRange = searchRange + 10
 		if searchRange > 500 then
 			x = ux + math.random(-700,700)
@@ -1113,6 +1158,45 @@ local function conJobHandler(team)
 	
 end
 
+local function setUnitPosting(team, unitID)
+	
+	local a = aiTeamData[team]
+	
+	if a.conJob.mex.assignedBP == 0 then
+		return
+	end
+	
+	local rand = math.random(0,a.conJob.mex.assignedBP)
+	local total = 0
+	for cid,_ in pairs(a.conJob.mex.con) do
+		total = total + a.controlledUnit.conByID[cid].bp
+		if total > rand then
+			local x,y,z = spGetUnitPosition(cid)
+			spGiveOrderToUnit(unitID, CMD_FIGHT , {x+math.random(-100,100),y,z+math.random(-100,100)}, {})
+			break
+		end
+	end
+	
+end
+
+local function getPositionTowardsMiddle(unitID, range)
+	
+	local x,y,z = spGetUnitPosition(unitID)
+	local vectorX = mapWidth*0.5 - x
+	local vectorZ = mapHeight*0.5 - z
+	
+	local vectorMag = math.sqrt(disSQ(0,0,vectorX,vectorZ))
+	if vectorMag == 0 then
+		vectorMag = 1
+	end
+	vectorMag = 1/vectorMag
+	while spTestBuildOrder(waypointTester, x + vectorX*range*vectorMag, 0, z + vectorZ*range*vectorMag, 1) == 0 do
+		range = range + 25
+	end
+	
+	return x + vectorX*range*vectorMag, y, z + vectorZ*range*vectorMag 
+end
+
 -- updates factory that has finished it's queue with a new order
 local function factoryJobHandler(team)
 
@@ -1148,6 +1232,11 @@ local function factoryJobHandler(team)
 					end
 				end
 			else
+				if math.random() < a.unitHording then
+					setUnitPosting(team, unitID)
+				else
+					spGiveOrderToUnit(unitID, CMD_FIGHT, { data.wayX, data.wayY, data.wayZ}, {})
+				end
 				local facJob = a.facJob
 				local totalImportance = 0
 				for i = 1, 8 do
@@ -1167,7 +1256,7 @@ local function factoryJobHandler(team)
 				end
 			end
 			
-			local bud = chooseUnitDefID(defData[choice])
+			local bud = chooseUnitDefIDWithDebug(defData[choice], unitID, data.ud, choice)
 			data.producingScout = scouting
 			spGiveOrderToUnit(unitID, -bud , {}, {})
 		end
@@ -1205,6 +1294,28 @@ local function wipeSquareData(team,aX,aZ)
 		removeIndexFromArray(enemyEconomy,enemyEconomyHeatmap[aX][aZ].index)
 	end
 	
+end
+
+local function getEnemyAntiAirInRange(allyTeam, x, z)
+
+	local at = allyTeamData[allyTeam]
+	local static = 0
+	local mobile = 0
+	
+	for id, data in pairs(at.enemyStaticAA) do
+		if (x-data.x)^2 + (z-data.z)^2 < data.rangeSQ then
+			static = static + data.cost
+		end	
+	end
+	
+	for id, data in pairs(at.enemyMobileAA) do
+		if (x-data.x)^2 + (z-data.z)^2 < data.rangeSQ then
+			mobile = mobile + data.cost
+		end	
+	end
+	
+	return static, mobile
+
 end
 
 local function gatherBattlegroupNeededAA(team, index)
@@ -1245,9 +1356,10 @@ local function gatherBattlegroupNeededAA(team, index)
 
 end
 
-local function battleGroupHandler(team)
+local function battleGroupHandler(team, frame)
 
 	local a = aiTeamData[team]
+	local at = allyTeamData[a.allyTeam]
 	local battleGroup = a.battleGroup
 	local unitInBattleGroupByID = a.unitInBattleGroupByID
 	
@@ -1338,12 +1450,54 @@ local function battleGroupHandler(team)
 			local aZ = math.ceil(averageZ/heatSquareHeight) 
 			
 			if aX == data.aX and aZ == data.aZ then
-				for unitID,_ in pairs(data.unit) do
-					unitInBattleGroupByID[unitID] = nil
-				end
 				wipeSquareData(team, aX, aZ)
-				removeIndexFromArray(battleGroup,i)
-				break
+				if data.disbandable then
+					for unitID,_ in pairs(data.unit) do
+						unitInBattleGroupByID[unitID] = nil
+					end
+					removeIndexFromArray(battleGroup,i)
+					break
+				else
+					local minTargetDistance = false
+					local changed = false
+					local x = data.aimX
+					local z = data.aimZ
+					for i = 1, at.enemyEconomy.count do
+						local dis = disSQ(x, z, at.enemyEconomy[i].x, at.enemyEconomy[i].z)
+						if (not minTargetDistance) or minTargetDistance > dis and 
+								not (data.aimX == heatmapPosition[at.enemyEconomy[i].aX][at.enemyEconomy[i].aZ].x and 
+									data.aimZ == heatmapPosition[at.enemyEconomy[i].aX][at.enemyEconomy[i].aZ].z) then
+							data.aX = at.enemyEconomy[i].aX
+							data.aZ = at.enemyEconomy[i].aZ
+							minTargetDistance = dis
+							changed = true
+						end
+					end
+					
+					if changed then
+						data.aimX = heatmapPosition[data.aX][data.aZ].x
+						data.aimY = heatmapPosition[data.aX][data.aZ].y
+						data.aimZ = heatmapPosition[data.aX][data.aZ].z
+						data.regroup = false
+						local groupRange = 450 + averageCount*30
+						local moveGroupRange = groupRange*0.4
+						for unitID,_ in pairs(data.unit) do
+							if not data.aa[unitID] then
+								local x, y, z = spGetUnitPosition(unitID)
+								--spGiveOrderToUnit(unitID, CMD_FIGHT , {data.aimX ,data.aimY,data.aimZ,}, {})
+								spGiveOrderToUnit(unitID, CMD_FIGHT , {data.aimX + math.random(-moveGroupRange,moveGroupRange),
+								data.aimY,data.aimZ + math.random(-moveGroupRange,moveGroupRange),}, {})
+							end
+						end
+					else
+						for unitID,_ in pairs(data.unit) do
+							unitInBattleGroupByID[unitID] = nil
+						end
+						removeIndexFromArray(battleGroup,i)
+						break
+					end
+				end
+				
 			else
 				local groupRange = 450 + averageCount*30
 				local moveGroupRange = groupRange*0.4
@@ -1353,10 +1507,24 @@ local function battleGroupHandler(team)
 				end
 
 				if maxX - minX > groupRange or maxZ - minZ > groupRange then
+					if not data.regroup then
+						data.lastStuck = frame
+					end
 					data.regroup = true
-					for unitID,_ in pairs(data.unit) do
-						if not data.aa[unitID] then
-							spGiveOrderToUnit(unitID, CMD_FIGHT , {averageX,gy,averageZ}, {})
+					if data.lastStuck and data.lastStuck + stuckTimerUntilDisband < frame then
+						for unitID,_ in pairs(data.unit) do
+							local x, y, z = spGetUnitPosition(unitID)
+							if x <= maxX and x >= minX and z <= maxZ and z >= minZ then
+								unitInBattleGroupByID[unitID] = nil
+							end
+						end
+						removeIndexFromArray(battleGroup,i)
+						break
+					else
+						for unitID,_ in pairs(data.unit) do
+							if not data.aa[unitID] then
+								spGiveOrderToUnit(unitID, CMD_FIGHT , {averageX,gy,averageZ}, {})
+							end
 						end
 					end
 				else
@@ -1430,30 +1598,16 @@ local function raiderJobHandler(team)
 		local idleFactor = idleCost/raider.cost
 	
 		if a.raiderBattlegroupCondition(idleFactor, idleCost) then
-			local minTargetDistance = false
+			local minCost = false
 			
 			for i = 1, enemyEconomy.count do
 				aX = enemyEconomy[i].aX
 				aZ = enemyEconomy[i].aZ
 				if enemyOffenseHeatmap[aX][aZ].cost*2 < raider.cost and enemyDefenceHeatmap[aX][aZ].cost*2 < raider.cost then
-					if (not minTargetDistance) or minTargetDistance > disSQ(averageX,averageZ,enemyEconomy[i].x,enemyEconomy[i].z) then
+					if (not minCost) or minCost < enemyEconomyHeatmap[aX][aZ].cost then
 						tX = enemyEconomy[i].x
 						tY = enemyEconomy[i].y
 						tZ = enemyEconomy[i].z
-					end
-				end
-			end
-			
-			if not tX then
-				for i = 1, enemyOffense.count do
-					aX = enemyOffense[i].aX
-					aZ = enemyOffense[i].aZ
-					if enemyOffenseHeatmap[aX][aZ].cost*3 < raider.cost and enemyDefenceHeatmap[aX][aZ].cost*4 < raider.cost then
-						if (not minTargetDistance) or minTargetDistance > disSQ(averageX,averageZ,enemyOffense[i].x,enemyOffense[i].z) then
-							tX = enemyOffense[i].x
-							tY = enemyOffense[i].y
-							tZ = enemyOffense[i].z
-						end
 					end
 				end
 			end
@@ -1467,8 +1621,10 @@ local function raiderJobHandler(team)
 				regroup = true, 
 				unit = {}, 
 				tempTarget = false,
+				disbandable = false,
 				aa = {},
 				neededAA = 0,
+				lastStuck = false,
 			}
 			--wipeSquareData(team, aX, aZ)
 		end
@@ -1542,11 +1698,123 @@ local function bomberJobHandler(team)
 			local cQueue = spGetCommandQueue(unitID)
 			if #cQueue == 0 then
 				local randIndex = math.floor(math.random(1,enemyOffense.count))
-				spGiveOrderToUnit(unitID, CMD_FIGHT , {enemyOffense[randIndex].x,enemyOffense[randIndex].y, enemyOffense[randIndex].z,}, {})
+				local static, mobile = getEnemyAntiAirInRange(a.allyTeam, enemyOffense[randIndex].x, enemyOffense[randIndex].z)
+				if static*2 + mobile < 600 then
+					spGiveOrderToUnit(unitID, CMD_FIGHT , {enemyOffense[randIndex].x,enemyOffense[randIndex].y, enemyOffense[randIndex].z,}, {})
+				end
 			end
 		end
 	end
 	
+end
+
+local function gunshipJobHandler(team)
+
+	local a = aiTeamData[team]
+	local at = allyTeamData[a.allyTeam]
+	
+	local gunship = a.controlledUnit.gunship
+	local gunshipByID = a.controlledUnit.gunshipByID
+	
+	local battleGroup = a.battleGroup
+	
+	local enemyOffenseHeatmap = at.enemyOffenseHeatmap
+	local enemyOffense = at.enemyOffense
+	local enemyDefenceHeatmap = at.enemyDefenceHeatmap
+	local enemyDefence = at.enemyDefence
+	local enemyEconomyHeatmap = at.enemyEconomyHeatmap
+	local enemyEconomy = at.enemyEconomy
+	
+	local unitInBattleGroupByID = a.unitInBattleGroupByID
+
+	if gunship.count == 0 then
+		return
+	end
+	
+	local tX = false
+	local tY = false
+	local tZ = false
+	local idleCost = 0
+	
+	local averageX = 0
+	local averageZ = 0
+	local averageCount = 0
+	
+	for unitID,data in pairs(gunshipByID) do
+		local cQueue = spGetCommandQueue(unitID)
+		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
+			local x, y, z = spGetUnitPosition(unitID)
+			idleCost = idleCost + data.cost
+			averageX = averageX + x
+			averageZ = averageZ + z
+			averageCount = averageCount + 1
+		end
+	end
+
+	if averageCount > 0 then
+	
+		averageX = averageX/averageCount
+		averageZ = averageZ/averageCount
+		local aX,aZ
+		local idleFactor = idleCost/gunship.cost
+	
+		if a.gunshipBattlegroupCondition(idleFactor, idleCost) then
+			local minCost = false
+			
+			for i = 1, enemyEconomy.count do
+				aX = enemyEconomy[i].aX
+				aZ = enemyEconomy[i].aZ
+				
+				local static, mobile = getEnemyAntiAirInRange(a.allyTeam, enemyEconomy[i].x, enemyEconomy[i].z)
+				
+				if enemyOffenseHeatmap[aX][aZ].cost*2 < gunship.cost and enemyDefenceHeatmap[aX][aZ].cost*2 < gunship.cost and static*3 + mobile*2 < gunship.cost then
+					if (not minCost) or minCost < enemyEconomyHeatmap[aX][aZ].cost then
+						tX = enemyEconomy[i].x
+						tY = enemyEconomy[i].y
+						tZ = enemyEconomy[i].z
+					end
+				end
+			end
+		end
+		
+		if tX then
+			battleGroup.count = battleGroup.count+1
+			battleGroup[battleGroup.count] = {
+				aimX = tX, aimY = tY, aimZ = tZ, 
+				aX = aX, aZ = aZ, 
+				regroup = true, 
+				unit = {}, 
+				tempTarget = false,
+				disbandable = true,
+				aa = {},
+				neededAA = 0,
+				lastStuck = false,
+			}
+			--wipeSquareData(team, aX, aZ)
+		end
+	end
+	
+	for unitID,data in pairs(gunshipByID) do
+		local cQueue = spGetCommandQueue(unitID)
+		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
+			local eID = spGetUnitNearestEnemy(unitID,1200)
+			if eID then
+				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})
+			elseif tX and not unitInBattleGroupByID[unitID] then
+				--spGiveOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-200,200),tY,tZ + math.random(-200,200),}, {})
+				for i = 1, battleGroup.count do
+					if battleGroup[i].unit[unitID] then
+						Spring.Echo("Unit already in battle group")
+					end
+				end
+				battleGroup[battleGroup.count].unit[unitID] = true
+				unitInBattleGroupByID[unitID] = true
+			end
+		end
+	end
+
+
+
 end
 
 local function fighterJobHandler(team)
@@ -1641,6 +1909,19 @@ local function combatJobHandler(team)
 				end
 			end
 			
+			for i = 1, enemyEconomy.count do
+				aX = enemyEconomy[i].aX
+				aZ = enemyEconomy[i].aZ
+				
+				if enemyOffenseHeatmap[aX][aZ].cost*2 < combat.cost and enemyDefenceHeatmap[aX][aZ].cost < combat.cost then
+					if (not minTargetDistance) or minTargetDistance > disSQ(averageX,averageZ,enemyEconomy[i].x,enemyEconomy[i].z) then
+						tX = enemyEconomy[i].x
+						tY = enemyEconomy[i].y
+						tZ = enemyEconomy[i].z
+					end
+				end
+			end
+			
 			if not tX then
 				for i = 1, enemyDefence.count do
 					aX = enemyDefence[i].aX
@@ -1665,8 +1946,10 @@ local function combatJobHandler(team)
 				regroup = true, 
 				unit = {}, 
 				tempTarget = false, 
+				disbandable = false,
 				aa = {}, 
 				neededAA = idleCost/5,
+				lastStuck = false,
 			}
 			gatherBattlegroupNeededAA(team,battleGroup.count)
 			--wipeSquareData(team,aX, aZ)
@@ -1686,7 +1969,6 @@ local function combatJobHandler(team)
 						Spring.Echo("Unit already in battle group")
 					end
 				end
-				
 				battleGroup[battleGroup.count].unit[unitID] = true
 				unitInBattleGroupByID[unitID] = true
 			end
@@ -1717,7 +1999,7 @@ local function scoutJobHandler(team)
 end
 
 -- updates the scouted state of the map
-local function updateScoutingHeatmap(allyTeam,frame)
+local function updateScoutingHeatmap(allyTeam,frame,removeEmpty)
 
 	local at = allyTeamData[allyTeam]
 	
@@ -1733,6 +2015,26 @@ local function updateScoutingHeatmap(allyTeam,frame)
 				if debugData.drawScoutmap[allyTeam] and not data.scouted then
 					Spring.MarkerAddPoint(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z,"now scouted") 
 				end
+				if removeEmpty then -- called infrequently
+					local units = CallAsTeam(at.aTeamOnThisTeam, 
+						function () 
+							return spGetUnitsInRectangle(
+									heatmapPosition[i][j].left,heatmapPosition[i][j].top,
+									heatmapPosition[i][j].right, heatmapPosition[i][j].bottom)
+						end 
+					) 
+					local empty = true
+					for u = i, #units do
+						if spGetUnitAllyTeam(units[u]) ~= allyTeam then
+							empty = false
+							break
+						end
+					end
+					if empty then
+						wipeSquareData(allyTeam, i, j)
+					end
+				end
+				
 				data.scouted = true
 				data.lastScouted = frame
 			else
@@ -2017,7 +2319,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 					addValueToHeatmap(enemyDefenceHeatmap, ud.metalCost, x, z)
 				end
 			end
-		else -- econ
+		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.extractsMetal then -- econ
 			local data = enemyEconomyHeatmap[aX][aZ]
 			if data.cost == 0 then
 				enemyEconomy.count = enemyEconomy.count + 1
@@ -2067,11 +2369,12 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 				if ud.weapons[1].onlyTargets.land then
 					at.enemyForceComposition.unit.groundDefence = at.enemyForceComposition.unit.groundDefence + ud.metalCost
 				else
-					at.enemyStaticAA[unitID] = {x = x, y = y, rangeSQ = ud.maxWeaponRange^2, cost = ud.metalCost}
+					at.enemyStaticAA[unitID] = {x = x, z = z, rangeSQ = ud.maxWeaponRange^2, range = ud.maxWeaponRange, cost = ud.metalCost}
 					at.enemyForceComposition.unit.airDefence = at.enemyForceComposition.unit.airDefence + ud.metalCost
 				end
 			end
-		else -- econ
+		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.extractsMetal then -- econ
+			
 		end
 	end
 	
@@ -2080,7 +2383,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 	end
 	
 	if ud.maxWeaponRange > 0 and (not ud.weapons[1].onlyTargets.land) and ud.speed > 0 then
-		at.enemyMobileAA[unitID] = {x = x, y = y, rangeSQ = ud.maxWeaponRange^2, cost = ud.metalCost, spottedFrame = spGetGameFrame()}
+		at.enemyMobileAA[unitID] = {x = x, z = z, rangeSQ = ud.maxWeaponRange^2, range = ud.maxWeaponRange, cost = ud.metalCost, spottedFrame = spGetGameFrame()}
 	end
 
 end
@@ -2094,9 +2397,23 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	local a = aiTeamData[unitTeam]
 	
 	if attackerID then
-		spotEnemyUnit(a.allyTeam,attackerID,attackerDefID,false)
+		if jumperArray[unitDefID] then
+			local ud = UnitDefs[attackerDefID]
+			if not ud.canFly then
+				local jump = spGetUnitRulesParam(unitID, "jumpReload")
+				if ((not jump) or jump == 1) and spGetUnitSeparation(unitID, attackerID, true) < jumpDefs[unitDefID].range + 100 then
+					local cQueue = spGetCommandQueue(unitID)
+					if #cQueue == 0 or cQueue[1].id ~= CMD_JUMP then
+						local x,y,z = spGetUnitPosition(attackerID)
+						spGiveOrderToUnit(unitID, CMD_JUMP, {x+math.random(-30,30),y,z+math.random(-30,30)}, {"alt"} )
+					end
+				end
+			end
+		end
 	
-		callForMobileDefence(unitTeam, unitID, attackerID,sosRadius)
+		spotEnemyUnit(a.allyTeam, attackerID, attackerDefID, false)
+	
+		callForMobileDefence(unitTeam, unitID, attackerID, sosRadius)
 	
 		if a.controlledUnit.conByID[unitID] and not a.controlledUnit.conByID[unitID].makingDefence then
 			makeReponsiveDefence(unitTeam,unitID,attackerID,attackerDefID,200)
@@ -2187,7 +2504,7 @@ function gadget:GameFrame(n)
 		end
 		
 		if n%40 == 15 then
-			battleGroupHandler(team)
+			battleGroupHandler(team, n)
 		end
 		
 		if n%40 == 35 then
@@ -2196,6 +2513,7 @@ function gadget:GameFrame(n)
 			artyJobHandler(team)
 			bomberJobHandler(team)
 			fighterJobHandler(team)
+			gunshipJobHandler(team)
 		end
 		
 		if n%30 == 0 then
@@ -2205,10 +2523,10 @@ function gadget:GameFrame(n)
 		end
 	end
 	
-	if n%40 == 25 then
+	if n%50 == 25 then
 		for allyTeam,data in pairs(allyTeamData) do
 			if data.ai then
-				updateScoutingHeatmap(allyTeam,n)
+				updateScoutingHeatmap(allyTeam,n, n%500 == 25)
 			end
 		end
 	end
@@ -2242,19 +2560,6 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 	if build == 1 then -- will catch reverse build, UnitFinished will not ever be called for this unit
 		gadget:UnitFinished(unitID, unitDefID, team)
 	end
-end
-
-local function giveMiddleFightOrder(unitID, range)
-	
-	local x,y,z = spGetUnitPosition(unitID)
-	local vectorX = mapWidth*0.5 - x
-	local vectorZ = mapHeight*0.5 - z
-	
-	local vectorMag = math.sqrt(disSQ(0,0,vectorX,vectorZ))
-	if vectorMag == 0 then
-		vectorMag = 1
-	end
-	spGiveOrderToUnit(unitID, CMD_FIGHT, { x + vectorX*range/vectorMag, y, z + vectorZ*range/vectorMag }, {})
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
@@ -2318,6 +2623,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 				else -- nano turret
 					
 				end
+			elseif controlledUnit.anyByID[unitID].isScout then
+				controlledUnit.scout.cost = controlledUnit.scout.cost - ud.metalCost
+				controlledUnit.scout.count = controlledUnit.scout.count - 1
+				controlledUnit.scoutByID[unitID] = nil
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
 					if ud.isFighter then -- fighter
@@ -2338,10 +2647,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 					controlledUnit.scout.count = controlledUnit.scout.count - 1
 					controlledUnit.scoutByID[unitID] = nil
 				end
-			elseif controlledUnit.anyByID[unitID].isScout then
-				controlledUnit.scout.cost = controlledUnit.scout.cost - ud.metalCost
-				controlledUnit.scout.count = controlledUnit.scout.count - 1
-				controlledUnit.scoutByID[unitID] = nil
 			elseif ud.maxWeaponRange > 0 and ud.speed > 0 then -- land combat unit
 				
 				if ud.weapons[1].onlyTargets.land then -- land firing combat
@@ -2474,6 +2779,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					ud = ud, x = x, y = y, z = z, cost = ud.metalCost}
 			elseif ud.isFactory then -- factory
 				local x,y,z = spGetUnitPosition(unitID)
+				local mx,my,mz = getPositionTowardsMiddle(unitID, 450)
 				editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,1)
 				a.totalFactoryBPQuota = a.totalFactoryBPQuota + buildDefs.factoryByDefId[unitDefID].BPQuota
 				a.uncompletedFactory = unitID
@@ -2486,7 +2792,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				controlledUnit.factory.cost = controlledUnit.factory.cost + ud.metalCost
 				controlledUnit.factory[controlledUnit.factory.count] = unitID
 				controlledUnit.factoryByID[unitID] = {finished = false,index = controlledUnit.factory.count, 
-					ud = ud,bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost, producingScout = false}
+					ud = ud,bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost, producingScout = false, wayX = mx, wayY = my, wayZ = mz}
 			elseif ud.buildSpeed > 0 then
 				if ud.speed > 0 then -- constructor
 					controlledUnit.con.count = controlledUnit.con.count + 1
@@ -2500,6 +2806,10 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					controlledUnit.nano[nano.count] = unitID
 					controlledUnit.nanoByID[unitID] = {index = controlledUnit.nano.count, ud = ud,bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost}--]]
 				end
+			elseif controlledUnit.anyByID[unitID].isScout then
+				controlledUnit.scout.cost = controlledUnit.scout.cost + ud.metalCost
+				controlledUnit.scout.count = controlledUnit.scout.count + 1
+				controlledUnit.scoutByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
 					if ud.isFighter then -- fighter
@@ -2520,10 +2830,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					controlledUnit.scout.count = controlledUnit.scout.count + 1
 					controlledUnit.scoutByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
 				end
-			elseif controlledUnit.anyByID[unitID].isScout then
-				controlledUnit.scout.cost = controlledUnit.scout.cost + ud.metalCost
-				controlledUnit.scout.count = controlledUnit.scout.count + 1
-				controlledUnit.scoutByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
 			elseif ud.maxWeaponRange > 0 and ud.speed > 0 then -- land combat unit
 	
 				if ud.weapons[1].onlyTargets.land then -- land firing combat
@@ -2584,7 +2890,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			units.mex.count = units.mex.count + 1
 			units.mexByID[unitID] = true
 		elseif ud.isFactory then -- factory
-			units.factoryByID[unitID] = true
+			local mx,my,mz = getPositionTowardsMiddle(unitID, 450)
+			units.factoryByID[unitID] = {wayX = mx, wayY = my, wayZ = mz}
 			--mapEcho(unitID,"factory added")
 		elseif ud.buildSpeed > 0 then
 			
@@ -2628,7 +2935,6 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				a.conJob.factory.assignedBP = a.conJob.factory.assignedBP + ud.buildSpeed
 				a.totalBP = a.totalBP + controlledUnit.factoryByID[unitID].bp
 				a.uncompletedFactory = false
-				giveMiddleFightOrder(unitID,400)
 				controlledUnit.factoryByID[unitID].finished = true
 			elseif ud.buildSpeed > 0 then
 				if ud.speed > 0 then -- constructor
@@ -2638,6 +2944,8 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 					controlledUnit.conByID[unitID].finished = true
 				else -- nano turret
 				end
+			elseif controlledUnit.anyByID[unitID].isScout then
+				controlledUnit.scoutByID[unitID].finished = true
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
 					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 1 }, {})
@@ -2652,8 +2960,6 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				else -- scout plane
 					controlledUnit.scoutByID[unitID].finished = true
 				end
-			elseif controlledUnit.anyByID[unitID].isScout then
-				controlledUnit.scoutByID[unitID].finished = true
 			elseif ud.maxWeaponRange > 0 and ud.speed > 0 then -- land combat unit
 				spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 1 }, {})
 				spGiveOrderToUnit(unitID, CMD_FIRE_STATE, { 2 }, {})
@@ -2696,7 +3002,8 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 		buildConfig = CopyTable(aiConfig.buildConfig),
 		raiderBattlegroupCondition = aiConfig.raiderBattlegroupCondition,
 		combatBattlegroupCondition = aiConfig.combatBattlegroupCondition,
-		
+		gunshipBattlegroupCondition = aiConfig.gunshipBattlegroupCondition,
+
 		averagedEcon = {
 			prevEcon = {},
 			aveMInc = 3, 
@@ -2721,6 +3028,8 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 		factoryCountByDefID = {},
 		
 		wantedDefence = {count = 0},
+		
+		unitHording = 0, -- factor from 0 to 1 of percentage of units horded at main base
 		
 		totalBP = 0, -- total controlled build power
 		totalFactoryBPQuota = 0, -- build more factories when over this
@@ -2846,6 +3155,7 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 	allyTeamData[allyTeam] = {	
 	
 		teams = {},
+		aTeamOnThisTeam = 0,
 		ai = aiOnTeam,
 		
 		units = { -- most of these are unused - would be used in cheating AI
@@ -2879,6 +3189,7 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 		if at == allyTeam then
 			Spring.Echo("Team " .. t .. " on allyTeam " .. allyTeam)
 			allyTeamData[allyTeam].teams[t] = true
+			allyTeamData[allyTeam].aTeamOnThisTeam = t
 		end
 	end
 	

@@ -1,3 +1,5 @@
+local CMD_PRIORITY		= 34220
+
 -- The "brains" implement the high level reasoning of the AI.
 -- Takes inputs such as economy status, own units by cost, enemy scouted units by cost.
 -- Outputs factory and constructor job weights
@@ -9,6 +11,8 @@ function constructionAndEconomyHandler(a, at, frame)
 	local facJob = a.facJob
 	local facJobAir = a.facJobAir
 	local controlledUnit = a.controlledUnit
+	
+	a.unitHording = 0.4
 	
 	-- example of setting default values
 	conJob.defence.importance = 3
@@ -81,7 +85,7 @@ function constructionAndEconomyHandler(a, at, frame)
 	end
 	
 	conJob.factory.airFactor = 0.3
-	facJobAir[1].importance = 2
+	facJobAir[1].importance = 2.1
 	facJobAir[2].importance = 2
 	facJobAir[3].importance = 2
 	facJobAir[4].importance = 2
@@ -122,14 +126,14 @@ function constructionAndEconomyHandler(a, at, frame)
 	
 	conJob.factory.importance = 12
 	
-	if averagedEcon.activeBpToMetalRatio < 1 then
-		facJob[1].importance = 20
+	if averagedEcon.activeBpToMetalRatio < 1.2 then
+		facJob[1].importance = 22
 		conJob.factory.importance = 25
-	elseif averagedEcon.activeBpToMetalRatio < 2 then
-		facJob[1].importance = 1.2
+	elseif averagedEcon.activeBpToMetalRatio < 2.3 then
+		facJob[1].importance = 1.4
 		conJob.factory.importance = 20
 	else
-		facJob[1].importance = 0.1
+		facJob[1].importance = 0.15
 	end
 	
 	if averagedEcon.aveMInc < 10 then

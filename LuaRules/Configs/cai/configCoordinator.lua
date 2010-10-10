@@ -14,6 +14,7 @@ aiConfigByName =
 		buildConfig = factionBuildConfig,
 		raiderBattlegroupCondition = battleGroupCondition1,
 		combatBattlegroupCondition = battleGroupCondition2,
+		gunshipBattlegroupCondition = battleGroupCondition3,
 	},
 }
 	
