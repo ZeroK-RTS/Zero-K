@@ -22,7 +22,7 @@ unitDef = {
     canjump        = [[1]],
     description_bp = [[Robô de assaulto]],
     description_fr = [[Robot d'Assaut]],
-    helptext       = [[The Jack is Logos' main assault walker. A few Jacks can easily level most fortification lines. Its small range and very low speed make it very vulnerable to skirmishers.]],
+    helptext       = [[The Jack is a melee assault walker with jumpjets. A few Jacks can easily level most fortification lines. Its small range and very low speed make it very vulnerable to skirmishers.]],
     helptext_bp    = [[Can é o principal robô de assaulto de Logos. Alguns podem facilmente destruir a maioria das linhas de defesa, e n?o podem ser "sufocados" por agressores devido a sua rápida velocidade de disparo. Sua velocidade e principalmente alcançe s?o muito baixos, tornando-o um alvo fácil, embora resistente, a escaramuçadores.]],
     helptext_fr    = [[Le Jack est un robot extr?mement bien blind? ?quip? d'un jetpack et d'un lance a syst?me hydrolique. Il ne frappe qu'au corps ? corps, mais il frappe fort. ]],
   },
@@ -103,7 +103,6 @@ unitDef = {
         subs    = 15,
       },
 
-      energypershot           = 0.2,
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],
       fireStarter             = 90,
       impactOnly              = true,

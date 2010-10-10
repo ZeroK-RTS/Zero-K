@@ -89,7 +89,7 @@ factionBuildConfig = {
 				[7] = { -- riot
 					importanceMult = 1.2,
 					count = 2,
-					[1] = {ID = UnitDefNames['cormist'].id, chance = 0.26},
+					[1] = {ID = UnitDefNames['cormist'].id, chance = 0.25},
 					[2] = {ID = UnitDefNames['corlevlr'].id, chance = 0.75},
 				},
 				
