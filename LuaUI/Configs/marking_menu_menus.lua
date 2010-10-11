@@ -11,14 +11,14 @@ local menu_use = {
   armrectr = menu_armcom,
   arm_spider = menu_armcom,
 
-  coracv = menu_corcom,
+  coracv = menu_armcom,
   corch = menu_armcom,
   corcs = menu_armcom,
   corfast = menu_armcom,
   cornecro = menu_armcom,
   corned = menu_armcom,
   
-  armcsa = menu_armcsa
+  armcsa = menu_armcsa,
   
   armcom = menu_armcom,
   corcom = menu_armcom,
@@ -29,13 +29,5 @@ local menu_use = {
   commadvrecon = menu_armcom,
   commadvsupport = menu_armcom,
 }
-
--- override menus for 1 faction
-if Game.modShortName == "CA1f" then
-  for i,v in pairs(menu_use) do
-    menu_use[i] = menu_armcom
-  end
-
-end
 
 return menu_use

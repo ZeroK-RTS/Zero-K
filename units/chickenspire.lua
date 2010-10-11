@@ -48,7 +48,7 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[spire.s3o]],
   onoffable                     = true,
-  power                         = 120,
+  power                         = 1000,
   seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 
