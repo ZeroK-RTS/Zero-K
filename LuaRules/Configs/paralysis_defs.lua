@@ -2,7 +2,7 @@ local array = {}
 
 local weapons = {
 	armzeus_lightning = {damage = 250},
-	panther_lightning = {damage = 160},
+	panther_armlatnk_weapon = {damage = 160},
 	armbanth_lightning = {damage = 240},
 	commadvsupport_electrolaser = {damage = 1600},
 }
