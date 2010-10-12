@@ -352,8 +352,8 @@ factionBuildConfig = {
 				[3] = { -- raider
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['corsh'].id, chance = 0.8},
-					[2] = {ID = UnitDefNames['hoverassault'].id, chance = 0.2},
+					[1] = {ID = UnitDefNames['corsh'].id, chance = 0.5},
+					[2] = {ID = UnitDefNames['hoverassault'].id, chance = 0.5},
 				},
 				
 				[4] = { -- arty
@@ -363,7 +363,7 @@ factionBuildConfig = {
 				},
 				
 				[5] = { --assault
-					importanceMult = 1,
+					importanceMult = 1.2,
 					count = 2,
 					[1] = {ID = UnitDefNames['hoverassault'].id, chance = 0.65},
 					[2] = {ID = UnitDefNames['nsaclash'].id, chance = 0.35},
@@ -689,5 +689,6 @@ factionBuildConfig = {
 		},
 
 		airpadDefID = UnitDefNames['armasp'].id,
+		nanoDefID = UnitDefNames['armnanotc'].id,
 	}
 }

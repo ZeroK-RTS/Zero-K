@@ -575,6 +575,24 @@ local function makeReponsiveDefence(team,unitID,eid,eUnitDefID,aidSearchRange)
 	end
 end
 
+local function runAway(unitID, enemyID, range)
+
+	local ux,uy,uz = spGetUnitPosition(unitID)
+	local ex,ey,ez = spGetUnitPosition(enemyID)
+
+	local vectorX = ex - ux
+	local vectorZ = ez - uz
+	local vectorMag = math.sqrt(disSQ(0,0,vectorX,vectorZ))
+	if vectorMag == 0 then
+		return
+	end
+	
+	vectorX = vectorX/vectorMag
+	vectorZ = vectorZ/vectorMag
+	
+	spGiveOrderToUnit(unitID, CMD_MOVE, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
+end
+
 -- makes defence using wantedDefence position
 local function makeWantedDefence(team,unitID,searchRange, maxDistance)
 	
@@ -842,6 +860,67 @@ local function makeMex(team, unitID)
 end
 
 
+-- makes a nano turret for nearest factory
+local function makeNano(team,unitID)
+
+	local a = aiTeamData[team]
+	local factory = a.controlledUnit.factory
+	local nano = a.controlledUnit.nano
+	local nanoDefID = a.buildDefs.nanoDefID
+	local nanoRangeSQ = (UnitDefs[nanoDefID].buildDistance-60)^2
+	
+	local ux,uy,uz = spGetUnitPosition(unitID)
+	
+	-- check for nearby nano frames
+	for i = 1, nano.count do
+		local nid = nano[i]
+		local data = a.controlledUnit.nanoByID[nid]
+		if (not a.controlledUnit.nanoByID[nid].finished) and disSQ(data.x,data.z,ux,uz) < 1000^2 then
+			spGiveOrderToUnit(unitID, CMD_REPAIR, {nid}, {})
+			return
+		end
+	end
+	
+	closestFactory = false
+	minDis = false
+	minNanoCount = false
+	
+	for i = 1, factory.count do
+		local fid = factory[i]
+		local data = a.controlledUnit.factoryByID[fid]
+		local dis = disSQ(data.x, data.z, ux, uz)
+		if (not minDis) or dis < minDis then
+			closestFactory = fid
+			minDis = dis
+		end
+		if (not minNanoCount) or data.nanoCount < minNanoCount then
+			minNanoCount = data.nanoCount
+		end
+	end
+	
+	local data = a.controlledUnit.factoryByID[closestFactory]
+	
+	if minNanoCount ~= data.nanoCount then
+		return
+	end
+	
+	local searchRange = 0
+	
+	x = data.nanoX + math.random(-searchRange,searchRange)
+	z = data.nanoZ + math.random(-searchRange,searchRange)
+	
+	while spTestBuildOrder(nanoDefID, x, 0 ,z, 1) == 0 or disSQ(data.x, data.z, x ,z) > nanoRangeSQ do
+		x = data.nanoX + math.random(-searchRange,searchRange)
+		z = data.nanoZ + math.random(-searchRange,searchRange)
+		searchRange = searchRange + 20
+		if searchRange > 250 then
+			return
+		end
+	end
+
+	spGiveOrderToUnit(unitID, -nanoDefID, {x,0,z}, {})
+end
+
 -- queues energy order or helps nearby construction
 local function makeEnergy(team,unitID)
 
@@ -1029,7 +1108,7 @@ local function assignFactory(team,unitID,cQueue)
 			local searchRange = 200
 			x = ux + math.random(-searchRange,searchRange)
 			z = uz + math.random(-searchRange,searchRange)
-			while spTestBuildOrder(buildableFactory[choice].ID, x, 0 ,z, 1) == 0 or nearMexSpot(x,z,100) or nearEcon(team,x,z,200) or nearMapEdge(x,z,600) or nearFactory(team,x,z,1000) or nearDefence(team,x,z,120) do
+			while spTestBuildOrder(buildableFactory[choice].ID, x, 0 ,z, 1) == 0 or nearMexSpot(x,z,160) or nearEcon(team,x,z,200) or nearMapEdge(x,z,600) or nearFactory(team,x,z,1000) or nearDefence(team,x,z,120) do
 				
 				x = ux + math.random(-searchRange,searchRange)
 				z = uz + math.random(-searchRange,searchRange)
@@ -1137,11 +1216,14 @@ local function conJobHandler(team)
 	-- factory assist/construction
 	for unitID,data in pairs(conJob.factory.con) do
 		local cQueue = spGetCommandQueue(unitID)
+			
 		if #cQueue == 0 or controlledUnit.conByID[unitID].idle then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].makingDefence = false
 			controlledUnit.conByID[unitID].oldJob = conJob.factory.index
 			assignFactory(team,unitID,cQueue)
+		elseif a.wantedNanoCount > controlledUnit.nano.count and math.random() < 0.05 then
+			makeNano(team, unitID)
 		end
 	end
 	
@@ -1251,6 +1333,7 @@ local function factoryJobHandler(team)
 					if rand < total then
 						choice = i
 						scouting = (i == 2)
+						raiding = (i == 3)
 						break
 					end
 				end
@@ -1258,16 +1341,16 @@ local function factoryJobHandler(team)
 			
 			local bud = chooseUnitDefIDWithDebug(defData[choice], unitID, data.ud, choice)
 			data.producingScout = scouting
+			data.producingRaider = raiding
 			spGiveOrderToUnit(unitID, -bud , {}, {})
 		end
 	end
 
 end
 
-local function wipeSquareData(team,aX,aZ)
+local function wipeSquareData(allyTeam,aX,aZ)
 	
-	local a = aiTeamData[team]
-	local at = allyTeamData[a.allyTeam]
+	local at = allyTeamData[allyTeam]
 	
 	local enemyOffenseHeatmap = at.enemyOffenseHeatmap
 	local enemyOffense = at.enemyOffense
@@ -2031,6 +2114,7 @@ local function updateScoutingHeatmap(allyTeam,frame,removeEmpty)
 						end
 					end
 					if empty then
+						--Spring.MarkerAddPoint(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z,"econ removed")
 						wipeSquareData(allyTeam, i, j)
 					end
 				end
@@ -2259,7 +2343,7 @@ local function callForMobileDefence(team ,unitID, attackerID, callRange)
 	if not a.sosTimeout[unitID] or a.sosTimeout[unitID] < spGetGameFrame() then
 		if UnitDefs[Spring.GetUnitDefID(unitID)].commander then callRange = callRange * 2 end
 		a.sosTimeout[unitID] = spGetGameFrame() + sosTime
-		local dx, dy, dz = spGetUnitPosition(unitID)
+		local dx, dy, dz = spGetUnitPosition(attackerID)
 		local friendlies = Spring.GetUnitsInCylinder(dx, dz, callRange, team)
 		if friendlies then
 			for i=1, #friendlies do
@@ -2416,7 +2500,12 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		callForMobileDefence(unitTeam, unitID, attackerID, sosRadius)
 	
 		if a.controlledUnit.conByID[unitID] and not a.controlledUnit.conByID[unitID].makingDefence then
-			makeReponsiveDefence(unitTeam,unitID,attackerID,attackerDefID,200)
+			local ud = UnitDefs[attackerDefID]
+			if ud.speed == 0 then
+				makeReponsiveDefence(unitTeam,unitID,attackerID,attackerDefID,200)
+			else
+				runAway(unitID,attackerID,500)
+			end
 		end
 	end
 
@@ -2621,12 +2710,24 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 					controlledUnit.con.count = controlledUnit.con.count - 1
 					controlledUnit.conByID[unitID] = nil
 				else -- nano turret
-					
+					controlledUnit.nano.cost = controlledUnit.nano.cost - ud.metalCost
+					controlledUnit.nano.count = controlledUnit.nano.count - 1
+					local index = controlledUnit.nanoByID[unitID].index
+					closestFactory = controlledUnit.nanoByID[unitID].closestFactory
+					if a.controlledUnit.factoryByID[closestFactory] then
+						a.controlledUnit.factoryByID[closestFactory].nanoCount = a.controlledUnit.factoryByID[closestFactory].nanoCount - 1
+					end
+					controlledUnit.nanoByID[unitID] = nil
+					removeIndexFromArray(controlledUnit.nano,index)
 				end
 			elseif controlledUnit.anyByID[unitID].isScout then
 				controlledUnit.scout.cost = controlledUnit.scout.cost - ud.metalCost
 				controlledUnit.scout.count = controlledUnit.scout.count - 1
 				controlledUnit.scoutByID[unitID] = nil
+			elseif controlledUnit.anyByID[unitID].isRaider then
+				controlledUnit.raider.cost = controlledUnit.raider.cost - ud.metalCost
+				controlledUnit.raider.count = controlledUnit.raider.count - 1
+				controlledUnit.raiderByID[unitID] = nil
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
 					if ud.isFighter then -- fighter
@@ -2764,7 +2865,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			controlledUnit.any.cost = controlledUnit.any.cost + ud.metalCost
 			controlledUnit.any.count = controlledUnit.any.count + 1
 			controlledUnit.anyByID[unitID] = {ud = ud, cost = ud.metalCost, finished = false, 
-				isScout = (builderID and controlledUnit.factoryByID[builderID] and controlledUnit.factoryByID[builderID].producingScout)}
+				isScout = (builderID and controlledUnit.factoryByID[builderID] and controlledUnit.factoryByID[builderID].producingScout),
+				isRaider = (builderID and controlledUnit.factoryByID[builderID] and controlledUnit.factoryByID[builderID].producingRaider)}
 			
 			if unitDefID == buildDefs.airpadDefID then
 				controlledUnit.airpad.cost = controlledUnit.airpad.cost + ud.metalCost
@@ -2780,6 +2882,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			elseif ud.isFactory then -- factory
 				local x,y,z = spGetUnitPosition(unitID)
 				local mx,my,mz = getPositionTowardsMiddle(unitID, 450)
+				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250)
 				editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,1)
 				a.totalFactoryBPQuota = a.totalFactoryBPQuota + buildDefs.factoryByDefId[unitDefID].BPQuota
 				a.uncompletedFactory = unitID
@@ -2791,25 +2894,44 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				controlledUnit.factory.count = controlledUnit.factory.count + 1
 				controlledUnit.factory.cost = controlledUnit.factory.cost + ud.metalCost
 				controlledUnit.factory[controlledUnit.factory.count] = unitID
-				controlledUnit.factoryByID[unitID] = {finished = false,index = controlledUnit.factory.count, 
-					ud = ud,bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost, producingScout = false, wayX = mx, wayY = my, wayZ = mz}
+				controlledUnit.factoryByID[unitID] = {finished = false,index = controlledUnit.factory.count, nanoCount = 0,
+					ud = ud,bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost, producingScout = false, producingRaider = false,
+					wayX = mx, wayY = my, wayZ = mz, nanoX = amx, nanoY = amy, nanoZ = amz,}
 			elseif ud.buildSpeed > 0 then
 				if ud.speed > 0 then -- constructor
 					controlledUnit.con.count = controlledUnit.con.count + 1
 					controlledUnit.con.cost = controlledUnit.con.cost + ud.metalCost
 					controlledUnit.conByID[unitID] = {ud = ud,bp = ud.buildSpeed, finished = false, index = controlledUnit.con.count, idle = true, currentJob = 0, oldJob = 0, makingDefence  = false}
 				else -- nano turret
-					--[[local x,y,z = spGetUnitPosition(unitID)
-					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 2 }, {})
-					spGiveOrderToUnit(unitID, CMD_PATROL, { x + 25, y, z - 25 }, {})
+					local x,y,z = spGetUnitPosition(unitID)
 					controlledUnit.nano.count = controlledUnit.nano.count + 1
-					controlledUnit.nano[nano.count] = unitID
-					controlledUnit.nanoByID[unitID] = {index = controlledUnit.nano.count, ud = ud,bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost}--]]
+					controlledUnit.nano[controlledUnit.nano.count] = unitID
+					closestFactory = false
+					minDis = false
+					for i = 1, a.controlledUnit.factory.count do
+						local fid = a.controlledUnit.factory[i]
+						local data = a.controlledUnit.factoryByID[fid]
+						local dis = disSQ(data.x, data.z, x, z)
+						if (not minDis) or dis < minDis then
+							closestFactory = fid
+							minDis = dis
+						end
+					end
+					if closestFactory then
+						a.controlledUnit.factoryByID[closestFactory].nanoCount = a.controlledUnit.factoryByID[closestFactory].nanoCount + 1
+						Spring.Echo(a.controlledUnit.factoryByID[closestFactory].nanoCount)
+					end
+					controlledUnit.nanoByID[unitID] = {index = controlledUnit.nano.count,  finished = false, ud = ud,
+						bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost, closestFactory = closestFactory}
 				end
 			elseif controlledUnit.anyByID[unitID].isScout then
 				controlledUnit.scout.cost = controlledUnit.scout.cost + ud.metalCost
 				controlledUnit.scout.count = controlledUnit.scout.count + 1
 				controlledUnit.scoutByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
+			elseif controlledUnit.anyByID[unitID].isRaider then
+				controlledUnit.raider.cost = controlledUnit.raider.cost + ud.metalCost
+				controlledUnit.raider.count = controlledUnit.raider.count + 1
+				controlledUnit.raiderByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
 					if ud.isFighter then -- fighter
@@ -2943,9 +3065,15 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 					a.unassignedCons[a.unassignedCons.count] = unitID
 					controlledUnit.conByID[unitID].finished = true
 				else -- nano turret
+					local x,y,z = spGetUnitPosition(unitID)
+					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 2 }, {})
+					spGiveOrderToUnit(unitID, CMD_PATROL, { x + 25, y, z - 25 }, {})
+					controlledUnit.nanoByID[unitID].finished = true
 				end
 			elseif controlledUnit.anyByID[unitID].isScout then
 				controlledUnit.scoutByID[unitID].finished = true
+			elseif controlledUnit.anyByID[unitID].isRaider then
+				controlledUnit.raiderByID[unitID].finished = true
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
 					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 1 }, {})
@@ -3030,6 +3158,7 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 		wantedDefence = {count = 0},
 		
 		unitHording = 0, -- factor from 0 to 1 of percentage of units horded at main base
+		wantedNanoCount = 0,
 		
 		totalBP = 0, -- total controlled build power
 		totalFactoryBPQuota = 0, -- build more factories when over this
@@ -3072,6 +3201,8 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 			mexByID = {},
 			factory = {cost = 0, count = 0,},
 			factoryByID = {},
+			nano = {cost = 0, count = 0,},
+			nanoByID = {},
 			con = {cost = 0, count = 0,},
 			conByID = {},
 			scout = {cost = 0, count = 0,},

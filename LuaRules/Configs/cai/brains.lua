@@ -13,9 +13,10 @@ function constructionAndEconomyHandler(a, at, frame)
 	local controlledUnit = a.controlledUnit
 	
 	a.unitHording = 0.4
+	a.wantedNanoCount = math.floor(averagedEcon.aveMInc/24)
 	
 	-- example of setting default values
-	conJob.defence.importance = 3
+	conJob.defence.importance = 2
 	conJob.defence.radarChance = 1
 	conJob.defence.airChance = 0
 	
@@ -27,9 +28,17 @@ function constructionAndEconomyHandler(a, at, frame)
 	end
 	
 	-- defence handling
-	if controlledUnit.turret.cost/controlledUnit.any.cost < 0.05 and averagedEcon.aveMInc > 7 then
-		conJob.defence.importance = 7
+	if controlledUnit.turret.cost/controlledUnit.any.cost < 0.04 and averagedEcon.aveMInc > 7 then
+		conJob.defence.importance = 4
 		conJob.defence.radarChance = 0.2
+	end
+	
+	if controlledUnit.turret.count < 2 then
+		conJob.defence.importance = 12
+		conJob.defence.radarChance = 0
+	elseif controlledUnit.turret.count < 3 then
+		conJob.defence.importance = 6
+		conJob.defence.radarChance = 0
 	end
 	
 	-- controls AA chance
@@ -110,10 +119,27 @@ function constructionAndEconomyHandler(a, at, frame)
 		facJob[3].importance = 2
 	end
 	
-	if averagedEcon.energyToMetalRatio > 1.3 then
+	--conJob.mex.importance = conJob.mex.importance + 14*(1 - at.units.mex.count/mexSpot.count)
+	conJob.energy.interruptable = false
+	
+	if averagedEcon.energyToMetalRatio > 1.9 then
+		conJob.energy.interruptable = true
+		conJob.energy.importance = 0.5
+		conJob.mex.importance = 8
+		if averagedEcon.mCur < 30 then
+			for unitID,_ in pairs(controlledUnit.mexByID) do
+				Spring.GiveOrderToUnit(unitID,CMD_PRIORITY,{2},{})
+			end
+		end
+	elseif averagedEcon.energyToMetalRatio > 1.3 then
 		conJob.energy.importance = 1
-		conJob.mex.importance = 6
-	elseif averagedEcon.energyToMetalRatio > 1 then
+		conJob.mex.importance = 8
+		if averagedEcon.mCur < 30 then
+			for unitID,_ in pairs(controlledUnit.mexByID) do
+				Spring.GiveOrderToUnit(unitID,CMD_PRIORITY,{2},{})
+			end
+		end
+	elseif averagedEcon.energyToMetalRatio > 1.1 then
 		conJob.energy.importance = 3
 		conJob.mex.importance = 2.5
 	elseif averagedEcon.energyToMetalRatio > 0.5 then
@@ -124,14 +150,14 @@ function constructionAndEconomyHandler(a, at, frame)
 		conJob.mex.importance = 0
 	end
 	
-	conJob.factory.importance = 12
+	conJob.factory.importance = 7
 	
 	if averagedEcon.activeBpToMetalRatio < 1.2 then
-		facJob[1].importance = 22
-		conJob.factory.importance = 25
+		facJob[1].importance = 3 + 4*(1 - at.units.mex.count/mexSpot.count)
+		conJob.factory.importance = 6
 	elseif averagedEcon.activeBpToMetalRatio < 2.3 then
-		facJob[1].importance = 1.4
-		conJob.factory.importance = 20
+		facJob[1].importance = 1 + (1 - at.units.mex.count/mexSpot.count)
+		conJob.factory.importance = 6
 	else
 		facJob[1].importance = 0.15
 	end
@@ -145,7 +171,6 @@ function constructionAndEconomyHandler(a, at, frame)
 		conJob.defence.importance = 3
 	end
 	
-	conJob.mex.importance = conJob.mex.importance + 14*(1 - at.units.mex.count/mexSpot.count)
 	facJob[1].importance = facJob[1].importance + 5*(1 - at.units.mex.count/mexSpot.count)
 		
 	if controlledUnit.factory.count == 0 or (not controlledUnit.factoryByID[controlledUnit.factory[1]].finished) then
