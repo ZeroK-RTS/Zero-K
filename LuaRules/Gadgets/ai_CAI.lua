@@ -428,7 +428,7 @@ local function nearFactory(team,tx,tz,distance)
 		if disSQ(x,z,tx,tz) < distance^2 then
 			return true
 		end
-		if disSQ(data.wayX,data.wayZ,tx,tz) < distance^2 then
+		if disSQ(data.wayX,data.wayZ,tx,tz) < (distance*1.5)^2 then
 			return true
 		end
 	end
@@ -594,8 +594,7 @@ local function runAway(unitID, enemyID, range)
 end
 
 -- makes defence using wantedDefence position
-local function makeWantedDefence(team,unitID,searchRange, maxDistance)
-	
+local function makeWantedDefence(team,unitID,searchRange, maxDistance, priorityDistance)
 	local a = aiTeamData[team]
 	local wantedDefence = a.wantedDefence
 	local turretByID = a.controlledUnit.turretByID
@@ -612,6 +611,7 @@ local function makeWantedDefence(team,unitID,searchRange, maxDistance)
 	end
 	
 	local minDefDisSQ = false
+	local minPriority = 0
 	local minDeftID = 0
 	
 	x = x + math.random(-searchRange,searchRange)
@@ -620,9 +620,15 @@ local function makeWantedDefence(team,unitID,searchRange, maxDistance)
 	for i = 1, wantedDefence.count do
 		if spTestBuildOrder(wantedDefence[i].ID, wantedDefence[i].x, 0 ,wantedDefence[i].z, 1) ~= 0 then
 			local dis = disSQ(wantedDefence[i].x,wantedDefence[i].z,x,z)
-			if ((not minDefDisSQ) or dis < minDefDisSQ) and ((not maxDistance) or maxDistance^2 < dis) then
+			if ((not maxDistance) or maxDistance^2 < dis) and minPriority == wantedDefence[i].priority then
+				if ((not minDefDisSQ) or dis < minDefDisSQ) then
+					minDefDisSQ = dis
+					minDeftID = i
+				end
+			elseif ((not priorityDistance) or dis < priorityDistance^2) and minPriority < wantedDefence[i].priority then
 				minDefDisSQ = dis
 				minDeftID = i
+				minPriority = wantedDefence[i].priority
 			end
 		else
 			removeIndexFromArray(wantedDefence,i)
@@ -711,7 +717,7 @@ local function makeAirDefence(team,unitID, searchRange,maxDistance)
 		
 		local searches = 0
 		
-		while spTestBuildOrder(deID, bx, 0 ,bz, 1) == 0 or nearFactory(team,bx,bz,300) or nearMexSpot(bx,bz,60) or nearMapEdge(bx,bz,300) do
+		while spTestBuildOrder(deID, bx, 0 ,bz, 1) == 0 or nearFactory(team,bx,bz,250) or nearMexSpot(bx,bz,60) or nearMapEdge(bx,bz,300) do
 			theta = math.random(twoPi)
 			bx = ox + r*math.sin(theta)
 			bz = oz + r*math.cos(theta)
@@ -764,7 +770,7 @@ local function makeMiscBuilding(team, unitID, defId, searchRange, maxRange)
 	x = ux + math.random(-searchRange,searchRange)
 	z = uz + math.random(-searchRange,searchRange)
 	
-	while spTestBuildOrder(defId, x, 0 ,z, 1) == 0 or nearFactory(team,x,z,300) or nearMexSpot(x,z,100) do
+	while spTestBuildOrder(defId, x, 0 ,z, 1) == 0 or nearFactory(team,x,z,250) or nearMexSpot(x,z,100) do
 		x = ux + math.random(-searchRange,searchRange)
 		z = uz + math.random(-searchRange,searchRange)
 		searchRange = searchRange + 10
@@ -801,7 +807,7 @@ local function makeRadar(team, unitID, searchRange, minDistance)
 	x = ux + math.random(-searchRange,searchRange)
 	z = uz + math.random(-searchRange,searchRange)
 	
-	while spTestBuildOrder(radarDefID, x, 0 ,z, 1) == 0 or nearFactory(team,x,z,300) or nearMexSpot(x,z,60) do
+	while spTestBuildOrder(radarDefID, x, 0 ,z, 1) == 0 or nearFactory(team,x,z,250) or nearMexSpot(x,z,60) do
 		x = ux + math.random(-searchRange,searchRange)
 		z = uz + math.random(-searchRange,searchRange)
 		searchRange = searchRange + 10
@@ -898,6 +904,10 @@ local function makeNano(team,unitID)
 		end
 	end
 	
+	if not minNanoCount then
+		return
+	end
+	
 	local data = a.controlledUnit.factoryByID[closestFactory]
 	
 	if minNanoCount ~= data.nanoCount then
@@ -965,7 +975,9 @@ local function makeEnergy(team,unitID)
 	
 	for i = 1, buildDefs.energyIds.count do
 		local udID = buildDefs.energyIds[i].ID
-		if averagedEcon.aveEInc >= buildDefs.econByDefId[udID].energyGreaterThan and (averagedEcon.eCur > 200 or buildDefs.econByDefId[udID].whileStall) and buildDefs.econByDefId[udID].chance > math.random() then
+		if averagedEcon.aveEInc >= buildDefs.econByDefId[udID].energyGreaterThan and 
+				((not buildDefs.econByDefId[udID].makeNearFactory) or nearFactory(team,ux,uz,buildDefs.econByDefId[udID].makeNearFactory)) and 
+				(averagedEcon.eCur > 200 or buildDefs.econByDefId[udID].whileStall) and buildDefs.econByDefId[udID].chance > math.random() then
 			energyDefID = udID
 			break
 		end
@@ -977,7 +989,7 @@ local function makeEnergy(team,unitID)
 	x = ux + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
 	z = uz + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
 	
-	while spTestBuildOrder(energyDefID, x, 0 ,z, 1) == 0 or nearFactory(team,x,z,400) or nearMexSpot(x,z,60) or nearEcon(team,x,z, buildDefs.econByDefId[energyDefID].energySpacing) do
+	while spTestBuildOrder(energyDefID, x, 0 ,z, 1) == 0 or nearFactory(team,x,z,250) or nearMexSpot(x,z,60) or nearEcon(team,x,z, buildDefs.econByDefId[energyDefID].energySpacing) do
 		x = ux + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
 		z = uz + math.random(minDistance,searchRange)*math.ceil(math.random(-1,1))
 		searchRange = searchRange + 10
@@ -1182,7 +1194,7 @@ local function conJobHandler(team)
 				)
 			) 
 			then
-				makeWantedDefence(team,unitID,1000,false)
+				makeWantedDefence(team,unitID,1000,false, 2000)
 			end
 		end
 	end
@@ -1193,7 +1205,7 @@ local function conJobHandler(team)
 		if #cQueue == 0 or controlledUnit.conByID[unitID].idle then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].oldJob = conJob.mex.index
-			if math.random() < conJob.mex.defenceChance and makeWantedDefence(team,unitID,500,500) then
+			if math.random() < conJob.mex.defenceChance and makeWantedDefence(team,unitID,500,500,1500) then
 				controlledUnit.conByID[unitID].makingDefence = true
 			else
 				controlledUnit.conByID[unitID].makingDefence = false
@@ -1317,7 +1329,7 @@ local function factoryJobHandler(team)
 				if math.random() < a.unitHording then
 					setUnitPosting(team, unitID)
 				else
-					spGiveOrderToUnit(unitID, CMD_FIGHT, { data.wayX, data.wayY, data.wayZ}, {})
+					spGiveOrderToUnit(unitID, CMD_FIGHT, { data.wayX+math.random(-200,200), data.wayY, data.wayZ+math.random(-200,200)}, {})
 				end
 				local facJob = a.facJob
 				local totalImportance = 0
@@ -1509,6 +1521,9 @@ local function battleGroupHandler(team, frame)
 		
 		averageX = averageX/averageCount
 		averageZ = averageZ/averageCount
+		
+		data.currentX = averageX
+		data.currentZ = averageZ
 	
 		local gy = spGetGroundHeight(averageX,averageZ)
 		for unitID,_ in pairs(data.aa) do
@@ -1590,17 +1605,22 @@ local function battleGroupHandler(team, frame)
 				end
 
 				if maxX - minX > groupRange or maxZ - minZ > groupRange then
-					if not data.regroup then
+					if (not data.regroup) or (not data.lastStuck) then
 						data.lastStuck = frame
 					end
+					--Spring.MarkerAddPoint(data.currentX,0,data.currentZ, frame - data.lastStuck)
 					data.regroup = true
 					if data.lastStuck and data.lastStuck + stuckTimerUntilDisband < frame then
 						for unitID,_ in pairs(data.unit) do
 							local x, y, z = spGetUnitPosition(unitID)
 							if x <= maxX and x >= minX and z <= maxZ and z >= minZ then
 								unitInBattleGroupByID[unitID] = nil
+								Spring.MarkerAddPoint(x,y,z, "Disbanded")
+							--else
+								--Spring.MarkerAddPoint(x,y,z, "Left Behind")
 							end
 						end
+						
 						removeIndexFromArray(battleGroup,i)
 						break
 					else
@@ -1701,6 +1721,8 @@ local function raiderJobHandler(team)
 			battleGroup[battleGroup.count] = {
 				aimX = tX, aimY = tY, aimZ = tZ, 
 				aX = aX, aZ = aZ, 
+				currentX = false, currentZ = false,
+				respondToSOS = false,
 				regroup = true, 
 				unit = {}, 
 				tempTarget = false,
@@ -1865,6 +1887,8 @@ local function gunshipJobHandler(team)
 			battleGroup[battleGroup.count] = {
 				aimX = tX, aimY = tY, aimZ = tZ, 
 				aX = aX, aZ = aZ, 
+				currentX = false, currentZ = false,
+				respondToSOS = false,
 				regroup = true, 
 				unit = {}, 
 				tempTarget = false,
@@ -2026,6 +2050,8 @@ local function combatJobHandler(team)
 			battleGroup[battleGroup.count] = {
 				aimX = tX, aimY = tY, aimZ = tZ, 
 				aX = aX, aZ = aZ, 
+				currentX = false, currentZ = false,
+				respondToSOS = false,
 				regroup = true, 
 				unit = {}, 
 				tempTarget = false, 
@@ -2261,7 +2287,7 @@ local function addValueToHeatmap(heatmap, value, x, z)
 	heatmap[aX2][aZ2].cost = heatmap[aX2][aZ2].cost + value*((1-sXfactor) +  (1-sZfactor))*0.5
 end
 
-local function editDefenceHeatmap(team,unitID,groundArray,airArray,range,sign)
+local function editDefenceHeatmap(team,unitID,groundArray,airArray,range,sign,priority)
 
 	local a = aiTeamData[team]
 	local ux,uy,uz = spGetUnitPosition(unitID)
@@ -2272,8 +2298,6 @@ local function editDefenceHeatmap(team,unitID,groundArray,airArray,range,sign)
 	local selfDefenceHeatmap = a.selfDefenceHeatmap
 	local selfDefenceAirTask = a.selfDefenceAirTask
 	local wantedDefence = a.wantedDefence
-	local factorySearchRange = 250
-	local econSearchRange = 0
 	local defenceChoice = buildDefs.defenceIds
 	
 	
@@ -2301,19 +2325,32 @@ local function editDefenceHeatmap(team,unitID,groundArray,airArray,range,sign)
 		if sign > 0 then
 			selfDefenceHeatmap[aX][aZ][i].toBuild = selfDefenceHeatmap[aX][aZ][i].toBuild + groundArray[i]*sign
 		
+			local oldX = false
+			local oldZ = false
+			local x, z, ox, oz,searchRange
+		
 			while selfDefenceHeatmap[aX][aZ][i].toBuild >= 1 do
 				
 				local deID = chooseUnitDefID(defenceChoice[i])
-				
-				local searchRange = range
 				local success = true
-		
-				local x = ux + math.random(-searchRange,searchRange)
-				local z = uz + math.random(-searchRange,searchRange)
-			
-				while spTestBuildOrder(deID, x, 0 ,z, 1) == 0 or nearEcon(team,x,z,econSearchRange) or nearFactory(team,x,z,factorySearchRange) or nearMexSpot(x,z,60) or nearDefence(team,x,z,60) do
+				
+				if oldX then
+					x = 2*ux - oldX
+					z = 2*uz - oldZ
+					ox = x
+					oz = z
+					searchRange = 0
+				else
+					searchRange = range
 					x = ux + math.random(-searchRange,searchRange)
 					z = uz + math.random(-searchRange,searchRange)
+					ox = ux
+					oz = uz
+				end
+			
+				while spTestBuildOrder(deID, x, 0 ,z, 1) == 0 or nearEcon(team,x,z,50) or nearFactory(team,x,z,200) or nearMexSpot(x,z,60) or nearDefence(team,x,z,140) do
+					x = ox + math.random(-searchRange,searchRange)
+					z = oz + math.random(-searchRange,searchRange)
 					searchRange = searchRange + 10
 					if searchRange > range+300 then
 						success = false
@@ -2323,8 +2360,12 @@ local function editDefenceHeatmap(team,unitID,groundArray,airArray,range,sign)
 				
 				if success then
 					wantedDefence.count = wantedDefence.count + 1
-					wantedDefence[wantedDefence.count] = {ID = deID, x = x, z = z}
-					--Spring.MarkerAddPoint(x,0,z,"Defence Added")
+					wantedDefence[wantedDefence.count] = {ID = deID, x = x, z = z, priority = priority}
+					oldX = x
+					oldZ = z
+					--if priority ~= 0 then
+						--Spring.MarkerAddPoint(x,0,z,"Defence Added")
+					--end
 				end
 				
 				selfDefenceHeatmap[aX][aZ][i].toBuild = selfDefenceHeatmap[aX][aZ][i].toBuild - 1 
@@ -2351,6 +2392,12 @@ local function callForMobileDefence(team ,unitID, attackerID, callRange)
 				if (a.controlledUnit.combatByID[fid] or a.controlledUnit.raiderByID[fid]) and (not a.unitInBattleGroupByID[fid]) then
 					spGiveOrderToUnit(fid, CMD_FIGHT, { dx, 0, dz }, {})
 				end
+			end
+		end
+		local battleGroup = a.battleGroup
+		for i = 1, battleGroup.count do
+			if battleGroup.respondToSOS then
+				battleGroup.tempTarget = attackerID
 			end
 		end
 	end
@@ -2669,14 +2716,18 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 				controlledUnit.airpad.count = controlledUnit.airpad.count - 1
 				controlledUnit.airpadByID[unitID] = nil
 			elseif ud.extractsMetal > 0 then
-				editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,-1)
+				if controlledUnit.mexByID[unitID].onDefenceHeatmap then
+					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,-1,0)
+				end
 				controlledUnit.mex.cost = controlledUnit.mex.cost - ud.metalCost
 				local index = controlledUnit.mexByID[unitID].index
 				controlledUnit.mexByID[controlledUnit.mex[controlledUnit.mex.count]].index = index
 				controlledUnit.mexByID[unitID] = nil
 				removeIndexFromArray(controlledUnit.mex,index)
 			elseif ud.isFactory then -- factory
-				editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,-1)
+				if controlledUnit.factoryByID[unitID].onDefenceHeatmap then
+					editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,-1,0)
+				end
 				controlledUnit.factory.cost = controlledUnit.factory.cost - ud.metalCost
 				if controlledUnit.factoryByID[unitID].finished then
 					a.totalBP = a.totalBP - controlledUnit.factoryByID[unitID].bp
@@ -2772,12 +2823,17 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 				
 			elseif ud.isBuilding or ud.speed == 0 then -- building
 				if ud.maxWeaponRange > 0 then -- turret
+					a.wantedDefence.count = a.wantedDefence.count + 1
+					a.wantedDefence[a.wantedDefence.count] = {ID = ud.id, 
+						x = controlledUnit.turretByID[unitID].x, z = controlledUnit.turretByID[unitID].z, priority = 0}
 					controlledUnit.turret.cost = controlledUnit.turret.cost - ud.metalCost
 					controlledUnit.turret.count = controlledUnit.turret.count - 1
 					controlledUnit.turretByID[unitID] = nil
 				elseif (ud.energyMake > 0 or ud.energyUpkeep < 0) then
 					controlledUnit.econ.cost = controlledUnit.econ.cost - ud.metalCost
-					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,-1)
+					if controlledUnit.econByID[unitID].onDefenceHeatmap then
+						editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,-1,0)
+					end
 					local index = controlledUnit.econByID[unitID].index
 					controlledUnit.econByID[controlledUnit.econ[controlledUnit.econ.count]].index = index
 					controlledUnit.econByID[unitID] = nil
@@ -2859,6 +2915,9 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		local a = aiTeamData[unitTeam]
 		local controlledUnit = a.controlledUnit
 		
+		local _,_,_,_,build  = spGetUnitHealth(unitID)
+		local built = (build == 1)
+		
 		if (ud ~= nil) and initialiseFaction(unitTeam) then
 			local buildDefs = a.buildDefs
 		
@@ -2874,16 +2933,21 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				controlledUnit.airpadByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
 			elseif ud.extractsMetal > 0 then
 				local x,y,z = spGetUnitPosition(unitID)
-				editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1)
+				if not built then
+					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1,0)
+				end
 				controlledUnit.mex.count = controlledUnit.mex.count + 1
 				controlledUnit.mex[controlledUnit.mex.count] = unitID
 				controlledUnit.mexByID[unitID] = {finished = false,index = controlledUnit.mex.count, 
-					ud = ud, x = x, y = y, z = z, cost = ud.metalCost}
+					ud = ud, x = x, y = y, z = z, cost = ud.metalCost, onDefenceHeatmap = not built}
 			elseif ud.isFactory then -- factory
 				local x,y,z = spGetUnitPosition(unitID)
-				local mx,my,mz = getPositionTowardsMiddle(unitID, 450)
+				local mx,my,mz = getPositionTowardsMiddle(unitID, 500)
 				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250)
-				editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,1)
+				local amx,amy,amz = getPositionTowardsMiddle(unitID, -250)
+				if not built then
+					editDefenceHeatmap(unitTeam,unitID,buildDefs.factoryByDefId[unitDefID].defenceQuota,buildDefs.factoryByDefId[unitDefID].airDefenceQuota,buildDefs.factoryByDefId[unitDefID].defenceRange,1,1)
+				end
 				a.totalFactoryBPQuota = a.totalFactoryBPQuota + buildDefs.factoryByDefId[unitDefID].BPQuota
 				a.uncompletedFactory = unitID
 				if a.factoryCountByDefID[unitDefID] then
@@ -2896,7 +2960,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				controlledUnit.factory[controlledUnit.factory.count] = unitID
 				controlledUnit.factoryByID[unitID] = {finished = false,index = controlledUnit.factory.count, nanoCount = 0,
 					ud = ud,bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost, producingScout = false, producingRaider = false,
-					wayX = mx, wayY = my, wayZ = mz, nanoX = amx, nanoY = amy, nanoZ = amz,}
+					wayX = mx, wayY = my, wayZ = mz, nanoX = amx, nanoY = amy, nanoZ = amz, onDefenceHeatmap = not built}
 			elseif ud.buildSpeed > 0 then
 				if ud.speed > 0 then -- constructor
 					controlledUnit.con.count = controlledUnit.con.count + 1
@@ -2919,7 +2983,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					end
 					if closestFactory then
 						a.controlledUnit.factoryByID[closestFactory].nanoCount = a.controlledUnit.factoryByID[closestFactory].nanoCount + 1
-						Spring.Echo(a.controlledUnit.factoryByID[closestFactory].nanoCount)
 					end
 					controlledUnit.nanoByID[unitID] = {index = controlledUnit.nano.count,  finished = false, ud = ud,
 						bp = ud.buildSpeed, x = x, y = y, z = z, cost = ud.metalCost, closestFactory = closestFactory}
@@ -2989,11 +3052,14 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					controlledUnit.turretByID[unitID] = {index = controlledUnit.turret.count, ud = ud,x = x, y = y, z = z, cost = ud.metalCost, finished = false, air = not ud.weapons[1].onlyTargets.land }
 				elseif (ud.energyMake > 0 or ud.energyUpkeep < 0) then
 					local x,y,z = spGetUnitPosition(unitID)
-					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1)
+					if not built then
+						editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1,0)
+					end
 					controlledUnit.econ.cost = controlledUnit.econ.cost + ud.metalCost
 					controlledUnit.econ.count = controlledUnit.econ.count + 1
 					controlledUnit.econ[controlledUnit.econ.count] = unitID
-					controlledUnit.econByID[unitID] = {index = controlledUnit.econ.count,finished = false, ud = ud,x = x, y = y, z = z, nearbyTurrets = 0, cost = ud.metalCost}
+					controlledUnit.econByID[unitID] = {index = controlledUnit.econ.count,finished = false, 
+						ud = ud,x = x, y = y, z = z, nearbyTurrets = 0, cost = ud.metalCost, onDefenceHeatmap = not built}
 				elseif ud.radarRadius > 0 then -- radar
 					controlledUnit.radar.cost = controlledUnit.econ.cost + ud.metalCost
 					controlledUnit.radar.count = controlledUnit.econ.count + 1

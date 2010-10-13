@@ -12,14 +12,14 @@ function constructionAndEconomyHandler(a, at, frame)
 	local facJobAir = a.facJobAir
 	local controlledUnit = a.controlledUnit
 	
-	a.unitHording = 0.4
+	a.unitHording = 0.3
 	a.wantedNanoCount = math.floor(averagedEcon.aveMInc/24)
 	
 	-- example of setting default values
-	conJob.defence.importance = 2
+	conJob.defence.importance = 1.8 + at.relativeEnemyForceComposition.unit.raider
 	conJob.defence.radarChance = 1
 	conJob.defence.airChance = 0
-	
+
 	-- build airpads if the AI has too many bombers
 	if controlledUnit.bomber.count*0.2 > controlledUnit.airpad.count then
 		conJob.defence.airpadChance = 1
@@ -29,16 +29,20 @@ function constructionAndEconomyHandler(a, at, frame)
 	
 	-- defence handling
 	if controlledUnit.turret.cost/controlledUnit.any.cost < 0.04 and averagedEcon.aveMInc > 7 then
-		conJob.defence.importance = 4
+		conJob.defence.importance = 3.5 + at.relativeEnemyForceComposition.unit.raider
 		conJob.defence.radarChance = 0.2
 	end
 	
-	if controlledUnit.turret.count < 2 then
-		conJob.defence.importance = 12
-		conJob.defence.radarChance = 0
-	elseif controlledUnit.turret.count < 3 then
-		conJob.defence.importance = 6
-		conJob.defence.radarChance = 0
+	if controlledUnit.mex.count < 3 then
+		conJob.mex.importance = 8
+	else
+		if controlledUnit.turret.count < 2 then
+			conJob.defence.importance = 12
+			conJob.defence.radarChance = 0
+		elseif controlledUnit.turret.count < 3 then
+			conJob.defence.importance = 5
+			conJob.defence.radarChance = 0
+		end
 	end
 	
 	-- controls AA chance
@@ -104,12 +108,12 @@ function constructionAndEconomyHandler(a, at, frame)
 	
 	if at.units.mex.count/mexSpot.count > 0.5 then
 		conJob.mex.defenceChance = 0.5
-	elseif averagedEcon.aveMInc > 7 and averagedEcon.energyToMetalRatio < 1.5 then
-		conJob.mex.defenceChance = 0.2
+	elseif averagedEcon.aveMInc > 7 and averagedEcon.energyToMetalRatio < 1.2 then
+		conJob.mex.defenceChance = 0.26
 	end
 	
 	conJob.reclaim.importance = 0
-	if averagedEcon.aveMInc > 15 then
+	if at.units.mex.count*3 > mexSpot.count or frame > 14400 then
 		conJob.reclaim.importance = 4
 	end
 	
