@@ -76,11 +76,12 @@ local overrides = {
 	[CMD.PATROL] = { texture = 'LuaUi/Images/commands/patrol.png', text= '\255\0\255\0P\008atrol'},
 	[CMD.WAIT] = { texture = 'LuaUi/Images/commands/wait.png', text= '\255\0\255\0W\008ait'},
 	
-	
 	[CMD.REPAIR] = {text= '\255\0\255\0R\008epair', texture = 'LuaUi/Images/commands/repair.png'},
 	[CMD.RECLAIM] = {text= 'R\255\0\255\0e\008claim', texture = 'LuaUi/Images/commands/reclaim.png'},
 	[CMD.RESURRECT] = {text= 'Resurrec\255\0\255\0t\008', texture = 'LuaUi/Images/commands/resurrect.png'},
 	[CMD_BUILD] = {text = '\255\0\255\0B\008uild'},
+	
+	[CMD.DGUN] = { texture = 'LuaUi/Images/commands/dgun.png', text= '\255\0\255\0D\008Gun'},
 	
 	[CMD_RAMP] = {text = 'Ramp', texture = 'LuaUi/Images/commands/ramp.png'},
 	[CMD_LEVEL] = {text = 'Level', texture = 'LuaUi/Images/commands/level.png'},
@@ -452,7 +453,6 @@ local function Update()
 	UpdateContainer(sp_special, n_special)
 	UpdateContainer(sp_states, n_states, MAX_STATE_COLUMNS)
 end 
-
 
 local function CopyTable(outtable,intable)
   for i,v in pairs(intable) do 
