@@ -55,20 +55,14 @@ unitDef = {
 
   weapons             = {
 
-    {
-      def               = [[BOGUS_MISSILE]],
-      badTargetCategory = [[SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-    },
-
-
-    {
+    [2] = {
       def                = [[LASER]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
 
-    {
+    [3] = {
       def                = [[EMG]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
