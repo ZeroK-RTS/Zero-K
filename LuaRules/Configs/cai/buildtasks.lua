@@ -523,10 +523,10 @@ factionBuildConfig = {
 				[5] = { -- gunship
 					importanceMult = 1.4,
 					count = 4,
-					[1] = {ID = UnitDefNames['corape'].id, chance = 0.25},
+					[1] = {ID = UnitDefNames['corape'].id, chance = 0.30},
 					[2] = {ID = UnitDefNames['armkam'].id, chance = 0.35},
-					[3] = {ID = UnitDefNames['armbrawl'].id, chance = 0.2},
-					[4] = {ID = UnitDefNames['blackdawn'].id, chance = 0.2},
+					[3] = {ID = UnitDefNames['armbrawl'].id, chance = 0.175},
+					[4] = {ID = UnitDefNames['blackdawn'].id, chance = 0.175},
 				},	
 			},
 		},

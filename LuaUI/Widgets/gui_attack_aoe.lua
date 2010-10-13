@@ -170,11 +170,11 @@ local function SetupUnitDef(unitDefID, unitDef)
   local maxSpread = minSpread
   local maxWeaponDef
   
-  for _, weapon in ipairs(unitDef.weapons) do
+  for num, weapon in ipairs(unitDef.weapons) do
     if (weapon.weaponDef) then
       local weaponDef = WeaponDefs[weapon.weaponDef]
       if (weaponDef) then
-        if (weaponDef.type == "DGun") then
+        if (num == 3 and unitDef.canDGun) then
           dgunInfo[unitDefID] = {range = weaponDef.range, aoe = weaponDef.areaOfEffect}
         elseif (weaponDef.canAttackGround
                 and not weaponDef.isShield 
