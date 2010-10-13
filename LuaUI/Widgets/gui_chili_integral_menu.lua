@@ -6,7 +6,7 @@ function widget:GetInfo()
   return {
     name      = "Chili Integral Menu ",
     desc      = "v0.1 Integral Command Menu",
-    author    = "Licho",
+    author    = "Licho, KingRaptor",
     date      = "6.9.2010",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
@@ -297,15 +297,7 @@ local function ProcessCommand(cmd)
 				n_defense[#n_defense+1] = cmd
 			--end 			
 		else
-		--[[
-			if special_commands[cmd.id] then 
-				if  btn_special.level >= special_commands[cmd.id] then 
-					n_special[#n_special+1] = cmd 
-				end
-			elseif btn_special.level >= 1 then 
-				n_special[#n_special+1] = cmd
-			end
-		--]]
+			n_common[#n_common+1] = cmd
 			--n_common[#n_common+1] = cmd		--shove unclassified stuff in common
 		end 
 	end

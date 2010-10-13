@@ -63,7 +63,7 @@ unitDef = {
     [[cormine1]],
   },
 
-  buildPic            = [[commrecon.png]],
+  buildPic            = [[commadvrecon.png]],
   buildTime           = 2400,
   canAttack           = true,
   canDGun			  = true,

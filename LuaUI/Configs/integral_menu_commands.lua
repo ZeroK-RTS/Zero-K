@@ -10,12 +10,13 @@ local CMD_EMBARK = 31800
 local CMD_DISEMBARK = 31801
 local CMD_RETREAT_ZONE = 10001
 local CMD_RETREAT =	10000
-local CMD_PAGES = 60
 local CMD_PRIORITY=34220
 local CMD_STEALTH = 32100
 local CMD_UNIT_AI = 36214
 local CMD_AREA_MEX = 10100
 local CMD_CLOAK_SHIELD = 32101
+
+CMD_PAGES = 60
 
 local factories = {
 	factorycloak = 1,
