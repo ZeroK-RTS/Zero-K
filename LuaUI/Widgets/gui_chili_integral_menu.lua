@@ -398,18 +398,17 @@ end
 local function Update() 
     local commands = widgetHandler.commands
     local customCommands = widgetHandler.customCommands
-	--local buildOptions = UpdateBuildOptions()
 	
-	if (#commands + #customCommands == 0) then 
+	--if (#commands + #customCommands == 0) then 
 		---screen0:RemoveChild(window);
 		--window_visible = false;
-		return
+	--	return
 	--else 
 		--if not window_visible then 
 			--screen0:AddChild(window);
 			--window_visible = true;
 		--end 
-	end 
+	--end 
 	
 	n_common = {}
 	n_factories = {}

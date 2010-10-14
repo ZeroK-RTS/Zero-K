@@ -1,5 +1,3 @@
---this crap should be autodetected tbfh, I don't even know why I'm putting it here
-
 local CMD_BUILD = 10010
 local CMD_RAMP = 39734
 local CMD_LEVEL = 39736
@@ -45,10 +43,11 @@ local econ = {
 
 local aux = {	--merged into econ
 	corrad = 10,
-	corjamt = 11,
-	armsonar = 12,
-	armarad = 13,
-	armasp = 14,
+	armjamt = 11,
+	corjamt = 12,
+	armsonar = 13,
+	armarad = 14,
+	armasp = 15,
 }
 
 local defense = {
@@ -66,6 +65,7 @@ local defense = {
 	corflak = 12,
 	screamer = 13,
 	cortl = 14,
+	armamd = 15,
 }
 
 local common_commands = {
