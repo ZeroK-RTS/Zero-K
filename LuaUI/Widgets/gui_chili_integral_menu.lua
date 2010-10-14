@@ -25,7 +25,9 @@ HOW IT WORKS:
 	Both parents and children resize with main window.
 --]]
 
-include 'Configs/integral_menu_commands.lua'
+local CMD_PAGES = 60
+
+local common_commands, states_commands, factory_commands, econaux_commands, defense_commands, overrides = include("Configs/integral_menu_commands.lua")
 
 local MAX_COLUMNS = 10
 local MAX_STATE_ROWS = 5
@@ -112,6 +114,7 @@ end
 -----------------------
 local function MakeButton(container, cmd, insertItem) 
 	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
+	local isBuild = (cmd.id < 0)
 	local text
 	local texture
 	local tooltip = cmd.tooltip
@@ -123,6 +126,8 @@ local function MakeButton(container, cmd, insertItem)
 		text = te.text 
 	elseif isState then 
 		text = cmd.params[cmd.params[1]+2]
+	elseif isBuild then
+		text = ''
 	else 
 		text = cmd.name 
 	end
@@ -134,7 +139,9 @@ local function MakeButton(container, cmd, insertItem)
 		else 
 			texture = te.texture
 		end 
-	else 
+	elseif isBuild then
+		texture = '#' .. -cmd.id		
+	else
 		texture = cmd.texture 
 	end 
 	
@@ -184,6 +191,10 @@ local function MakeButton(container, cmd, insertItem)
 			--button.height = '20%'
 			--button.width = button.height
 		end 
+		if (isBuild) then
+			button.padding = {0,0,0,0}
+			--button.margin = {0,0,0,0}
+		end
 		
 		local label 
 		if (not cmd.onlyTexture and text and text ~= '') then 
@@ -211,6 +222,7 @@ local function MakeButton(container, cmd, insertItem)
 				file = texture;
 				parent = button;
 			}
+			if isBuild then image.file2 = WG.GetBuildIconFrame(UnitDefs[-cmd.id]) end
 		else 
 			if label~=nil then label.valign="center" end
 		end 
@@ -261,14 +273,14 @@ local n_states = {}
 local menuChoices = {
 	[1] = { array = n_common, name = "General" },
 	[2] = { array = n_factories, name = "Factories" },
-	[3] = { array = n_factories, name = "Econ/Aux" },
+	[3] = { array = n_econaux, name = "Econ/Aux" },
 	[4] = { array = n_defense, name = "Defense" },
 	[5] = { array = n_units, name = "Units" },
 }
 local menuChoice = 1
 
 local function ProcessCommand(cmd) 
-	if cmd.id >= 0 and not cmd.hidden and cmd.id ~= CMD_PAGES then 
+	if not cmd.hidden and cmd.id ~= CMD_PAGES then 
 		--- state icons 
 		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then 
 			--if states_commands[cmd.id] then 
@@ -278,28 +290,23 @@ local function ProcessCommand(cmd)
 			--elseif btn_states.level >= 1 then 
 				--n_states[#n_states+1] = cmd
 			--end 
-		
 		--this stuff is broken
 		elseif common_commands[cmd.id] then 
 			--if btn_common.level >= common_commands[cmd.id] then 
 				n_common[#n_common+1] = cmd
 			--end 
-		elseif factory_commands[cmd.id] then 
-			--if btn_factory.level >= factory_commands[cmd.id] then 
-				n_factory[#n_factory+1] = cmd
-			--end
-		elseif econaux_commands[cmd.id] then 
-			--if btn_econaux.level >= econaux_commands[cmd.id] then 
-				n_econaux[#n_econaux+1] = cmd
-			--end 
-		elseif defense_commands[cmd.id] then 
-			--if btn_defense.level >= defense_commands[cmd.id] then 
-				n_defense[#n_defense+1] = cmd
-			--end 			
+		elseif factory_commands[cmd.id] then
+			n_factories[#n_factories+1] = cmd
+		elseif econaux_commands[cmd.id] then
+			n_econaux[#n_econaux+1] = cmd
+		elseif defense_commands[cmd.id] then
+			n_defense[#n_defense+1] = cmd
+		elseif UnitDefs[-(cmd.id)] then
+			n_units[#n_units+1] = cmd
 		else
 			n_common[#n_common+1] = cmd
 			--n_common[#n_common+1] = cmd		--shove unclassified stuff in common
-		end 
+		end
 	end
 end 
 
@@ -355,6 +362,7 @@ local function UpdateContainer(container, nl, columns)
 	end 
 end 
 
+--these two functions place the items into their rows
 local function ManageStateIcons()
 	local stateCols = { {}, {}, {} }
 	for i=1, MAX_STATE_ROWS do
@@ -387,26 +395,7 @@ local function ManageCommandIcons(sourceArray)
 	end
 end
 
---this is obviously going to be very laggy, need to either not use it at all or only when selection changes
-local function UpdateBuildOptions()
-	local units = Spring.GetSelectedUnits()
-	if not units then return end
-	local buildopts = {}
-	for i=1,#units do
-		local udef = UnitDefs[Spring.GetUnitDefID(units[i])]
-		if udef and udef.buildOptions then
-			for i=1, #udef.buildOptions do
-				local name = udef.buildOptions[i]
-				buildopts[UnitDefs[name].id] = true
-			end
-		end
-	end
-	return buildopts
-end
-
 local function Update() 
-	--maxStateRows = window.height%32
-	--Spring.Echo(maxStateRows)
     local commands = widgetHandler.commands
     local customCommands = widgetHandler.customCommands
 	--local buildOptions = UpdateBuildOptions()
@@ -428,18 +417,31 @@ local function Update()
 	n_defense = {}
 	n_units = {}
 	n_states = {}
+	
+	--Spring.Echo(#commands)
+	for i = 1, #commands do ProcessCommand(commands[i]) end 
+	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
+	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end 
+	--for i,v in pairs(buildOptions) do ProcessCommand(i) end 
+
 	menuChoices[1].array = n_common
 	menuChoices[2].array = n_factories
 	menuChoices[3].array = n_econaux
 	menuChoices[4].array = n_defense
 	menuChoices[5].array = n_units
+
+	--[[
+	local function Sort(a, b, array)
+		return array[a.id] < array[b.id]
+	end
 	
-	--Spring.Echo(#commands)
-	--for i = 1, #commands do ProcessCommand(commands[i]) end
-	for i,v in ipairs(commands) do ProcessCommand(v) end 
-	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
-	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end 
-	--for i,v in pairs(buildOptions) do ProcessCommand(i) end 
+	table.sort(n_factories, Sort(a,b, factory_commands))
+	table.sort(n_econaux, Sort(a,b, econaux_commands))
+	table.sort(n_defense, Sort(a,b, defense_commands))
+	]]--
+	table.sort(n_factories, function(a,b) return factory_commands[a.id] < factory_commands[b.id] end )
+	table.sort(n_econaux, function(a,b) return econaux_commands[a.id] < econaux_commands[b.id] end)
+	table.sort(n_defense, function(a,b) return defense_commands[a.id] < defense_commands[b.id] end)
 
 	ManageStateIcons()
 	ManageCommandIcons(menuChoices[menuChoice].array)
@@ -600,7 +602,7 @@ function widget:Initialize()
 	}
 	
 	for i=1,5 do
-		menuButtons[1] = Button:New{
+		menuButtons[i] = Button:New{
 			parent = buttonRow;
 			x = tostring((20*i)-20).."%",
 			y = 0,

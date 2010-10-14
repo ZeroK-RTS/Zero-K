@@ -218,7 +218,6 @@ local n_support = {}
 
 local function ProcessCommand(cmd) 
 	if cmd.id <= 0 and not cmd.hidden and cmd.id ~= CMD_PAGES then 
-		--- state icons 
 		if economy_commands[cmd.id] then 
 			if btn_economy.level >= economy_commands[cmd.id].level then 
 				n_economy[#n_economy+1] = cmd

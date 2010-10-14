@@ -16,59 +16,59 @@ local CMD_UNIT_AI = 36214
 local CMD_AREA_MEX = 10100
 local CMD_CLOAK_SHIELD = 32101
 
-CMD_PAGES = 60
-
+-- the number is the order
 local factories = {
 	factorycloak = 1,
-	factoryshield = 1,
-	factoryspider = 1,
-	factoryjump = 1,
-	factoryveh = 1,
-	factorytank = 1,
-	factoryhover = 1,
-	factoryplane = 1,
-	factorygunship = 1,
-	corsy = 1,
-	armcsa = 1,
+	factoryshield = 2,
+	factoryveh = 3,
+	factoryhover = 4,
+	factoryspider = 5,
+	factoryjump = 6,
+	factorytank = 7,
+	factoryplane = 8,
+	factorygunship = 9,
+	corsy = 10,
+	armcsa = 11,
 }
 
 local econ = {
 	cormex = 1,
-	armsolar = 1,
-	armwin = 1,
-	armfus = 1,
-	geo = 1,
-	cafus = 2,
-	armmstor = 2,
-	armestor = 2,
-	armnanotc = 1,
+	armsolar = 2,
+	armwin = 3,
+	armfus = 4,
+	geo = 5,
+	cafus = 6,
+	armmstor = 7,
+	armestor = 8,
+	armnanotc = 9,
 }
 
 local aux = {	--merged into econ
-	corrad = 1,
-	armarad = 2,
-	corjamt = 1,
-	armsonar = 1,
-	armasp = 1,
+	corrad = 10,
+	corjamt = 11,
+	armsonar = 12,
+	armarad = 13,
+	armasp = 14,
 }
 
 local defense = {
 	corllt = 1,
-	armdeva = 1,
-	corhlt = 1,
-	armartic = 2,
-	corgrav = 2,
-	armpb = 2,
-	armanni = 3,
-	corrl = 1,
-	corrazor = 1,
-	missiletower = 1,
-	armcir = 2,
-	corflak = 2,
-	screamer = 3,
+	armdeva = 2,
+	armartic = 3,
+	corgrav = 4,
+	armpb = 5,
+	corhlt = 6,
+	armanni = 7,
+	corrl = 8,
+	corrazor = 9,
+	missiletower = 10,
+	armcir = 11,
+	corflak = 12,
+	screamer = 13,
+	cortl = 14,
 }
 
-common_commands = {
+local common_commands = {
 	[CMD.STOP]=1, [CMD.GUARD]=1, [CMD.ATTACK]=1, [CMD.FIGHT]=1,
 	[CMD.WAIT]=2, [CMD.PATROL]=2, [CMD.MOVE]=2, 
 	[CMD.REPAIR]=1,   [CMD.RECLAIM]=1, [CMD_BUILD] = 1, [CMD.CAPTURE] = 1, [CMD.RESURRECT] = 1, [CMD_LEVEL] =1,  [CMD_RAMP]= 1, 
@@ -78,29 +78,29 @@ common_commands = {
 	[CMD_AREA_MEX] = 1,
 }
 
-states_commands = {
+local states_commands = {
 	[CMD_CLOAK_SHIELD] = 1,
 	[CMD_RETREAT] = 2, [CMD.MOVE_STATE] = 2, [CMD.FIRE_STATE] = 2, [CMD_UNIT_AI] = 2,
 	[CMD_STEALTH] = 2,
 	[CMD.AISELECT] = 3, 
 }
 
-factory_commands = {
+local factory_commands = {
 }
 
-econaux_commands = {
-
+local econaux_commands = {
 }
 
-defense_commands = {
-
+local defense_commands = {
 }
 
 local function CopyBuildArray(source, target)
 	for name, value in pairs(source) do
-		cmdid = UnitDefNames[name].id
-		if cmdid then target[-cmdid] = value end
-		Spring.Echo("Adding command "..-cmdid.." unit "..UnitDefs[cmdid].name.." to menu")
+		udid = (UnitDefNames[name].id)
+		if udid then
+			target[-udid] = value
+			--Spring.Echo("Adding command "..-udid.." unit "..UnitDefs[udid].name.." to menu")
+		end
 	end
 end
 
@@ -109,9 +109,10 @@ CopyBuildArray(econ, econaux_commands)
 CopyBuildArray(aux, econaux_commands)
 CopyBuildArray(defense, defense_commands)
 
+
 -- Command overrides. State commands by default expect array of textures, one for each state. States are drawn without button borders and keep aspect ratio. 
 -- You can specify texture, text,tooltip, color
-overrides = {
+local overrides = {
 	[CMD.ATTACK] = { texture = 'LuaUi/Images/commands/attack.png',  text= '\255\0\255\0A\008ttack'},
 	[CMD.STOP] = { texture = 'LuaUi/Images/commands/cancel.png', color={1,0,0,1.2}, text= '\255\0\255\0S\008top'},
 	[CMD.FIGHT] = { texture = 'LuaUi/Images/commands/fight.png',text= '\255\0\255\0F\008ight'},
@@ -145,3 +146,5 @@ overrides = {
 	[CMD.FIRE_STATE] = { texture = {'LuaUi/Images/commands/states/fire_hold.png', 'LuaUi/Images/commands/states/fire_return.png', 'LuaUi/Images/commands/states/fire_atwill.png'}, text=''},
 	[CMD_RETREAT] = { texture = {'LuaUi/Images/commands/states/retreat_off.png', 'LuaUi/Images/commands/states/retreat_30.png', 'LuaUi/Images/commands/states/retreat_60.png', 'LuaUi/Images/commands/states/retreat_90.png'}, text=''},
 }
+
+return common_commands, states_commands, factory_commands, econaux_commands, defense_commands, overrides
