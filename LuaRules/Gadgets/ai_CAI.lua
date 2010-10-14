@@ -146,6 +146,8 @@ for i = 1,heatArrayWidth do -- init array
 	end
 end
 
+
+
 -- area of a command placed in the centre of the map
 local areaCommandRadius = math.sqrt( (mapWidth/2)^2 + (mapHeight/2)^2 )
 
@@ -1194,7 +1196,7 @@ local function conJobHandler(team)
 				)
 			) 
 			then
-				makeWantedDefence(team,unitID,1000,false, 2000)
+				makeWantedDefence(team,unitID,1000,false, 1500)
 			end
 		end
 	end
@@ -1205,7 +1207,7 @@ local function conJobHandler(team)
 		if #cQueue == 0 or controlledUnit.conByID[unitID].idle then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].oldJob = conJob.mex.index
-			if math.random() < conJob.mex.defenceChance and makeWantedDefence(team,unitID,500,500,1500) then
+			if math.random() < conJob.mex.defenceChance and makeWantedDefence(team,unitID,500,500,1000) then
 				controlledUnit.conByID[unitID].makingDefence = true
 			else
 				controlledUnit.conByID[unitID].makingDefence = false
@@ -1360,34 +1362,30 @@ local function factoryJobHandler(team)
 
 end
 
+local function removeValueFromHeatmap(indexer, heatmap, aX, aZ)
+
+	if heatmap[aX][aZ].cost > 0 then		
+		indexer.totalCost = indexer.totalCost - heatmap[aX][aZ].cost
+		heatmap[aX][aZ].cost = 0
+		-- remove index
+		local index = heatmap[aX][aZ].index
+		indexer[index] = indexer[indexer.count]
+		indexer[indexer.count] = nil
+		if index ~= indexer.count then
+			heatmap[indexer[index].aX][indexer[index].aZ].index = index
+		end
+		indexer.count = indexer.count - 1
+	end
+
+end
+
 local function wipeSquareData(allyTeam,aX,aZ)
 	
 	local at = allyTeamData[allyTeam]
 	
-	local enemyOffenseHeatmap = at.enemyOffenseHeatmap
-	local enemyOffense = at.enemyOffense
-	local enemyDefenceHeatmap = at.enemyDefenceHeatmap
-	local enemyDefence = at.enemyDefence
-	local enemyEconomyHeatmap = at.enemyEconomyHeatmap
-	local enemyEconomy = at.enemyEconomy
-	
-	if enemyOffenseHeatmap[aX][aZ].cost > 0 then
-		enemyOffense.totalCost = enemyOffense.totalCost - enemyOffenseHeatmap[aX][aZ].cost
-		enemyOffenseHeatmap[aX][aZ].cost = 0
-		removeIndexFromArray(enemyOffense,enemyOffenseHeatmap[aX][aZ].index)
-	end
-	
-	if enemyDefenceHeatmap[aX][aZ].cost > 0 then
-		enemyDefence.totalCost = enemyDefence.totalCost - enemyDefenceHeatmap[aX][aZ].cost
-		enemyDefenceHeatmap[aX][aZ].cost = 0
-		removeIndexFromArray(enemyDefence,enemyDefenceHeatmap[aX][aZ].index)
-	end
-	
-	if enemyEconomyHeatmap[aX][aZ].cost > 0 then
-		enemyEconomy.totalCost = enemyEconomy.totalCost - enemyEconomyHeatmap[aX][aZ].cost
-		enemyEconomyHeatmap[aX][aZ].cost = 0
-		removeIndexFromArray(enemyEconomy,enemyEconomyHeatmap[aX][aZ].index)
-	end
+	removeValueFromHeatmap(at.enemyOffense, at.enemyOffenseHeatmap, aX, aZ)
+	removeValueFromHeatmap(at.enemyDefence, at.enemyDefenceHeatmap, aX, aZ)
+	removeValueFromHeatmap(at.enemyEconomy, at.enemyEconomyHeatmap, aX, aZ)
 	
 end
 
@@ -1451,7 +1449,7 @@ local function gatherBattlegroupNeededAA(team, index)
 
 end
 
-local function battleGroupHandler(team, frame)
+local function battleGroupHandler(team, frame, slowUpdate)
 
 	local a = aiTeamData[team]
 	local at = allyTeamData[a.allyTeam]
@@ -1563,8 +1561,7 @@ local function battleGroupHandler(team, frame)
 					for i = 1, at.enemyEconomy.count do
 						local dis = disSQ(x, z, at.enemyEconomy[i].x, at.enemyEconomy[i].z)
 						if (not minTargetDistance) or minTargetDistance > dis and 
-								not (data.aimX == heatmapPosition[at.enemyEconomy[i].aX][at.enemyEconomy[i].aZ].x and 
-									data.aimZ == heatmapPosition[at.enemyEconomy[i].aX][at.enemyEconomy[i].aZ].z) then
+								not (data.aX == at.enemyEconomy[i].aX and data.aZ == at.enemyEconomy[i].aZ) then
 							data.aX = at.enemyEconomy[i].aX
 							data.aZ = at.enemyEconomy[i].aZ
 							minTargetDistance = dis
@@ -1576,6 +1573,7 @@ local function battleGroupHandler(team, frame)
 						data.aimX = heatmapPosition[data.aX][data.aZ].x
 						data.aimY = heatmapPosition[data.aX][data.aZ].y
 						data.aimZ = heatmapPosition[data.aX][data.aZ].z
+						--Spring.MarkerAddPoint(data.aimX,0,data.aimZ, "New Target " .. at.enemyEconomyHeatmap[data.aX][data.aZ].cost)
 						data.regroup = false
 						local groupRange = 450 + averageCount*30
 						local moveGroupRange = groupRange*0.4
@@ -1605,29 +1603,45 @@ local function battleGroupHandler(team, frame)
 				end
 
 				if maxX - minX > groupRange or maxZ - minZ > groupRange then
-					if (not data.regroup) or (not data.lastStuck) then
-						data.lastStuck = frame
-					end
-					--Spring.MarkerAddPoint(data.currentX,0,data.currentZ, frame - data.lastStuck)
-					data.regroup = true
-					if data.lastStuck and data.lastStuck + stuckTimerUntilDisband < frame then
+					if (not data.regroup) or slowUpdate then
+						
+						local aDivX = 0
+						local aDivZ = 0
+						
 						for unitID,_ in pairs(data.unit) do
 							local x, y, z = spGetUnitPosition(unitID)
-							if x <= maxX and x >= minX and z <= maxZ and z >= minZ then
-								unitInBattleGroupByID[unitID] = nil
-								Spring.MarkerAddPoint(x,y,z, "Disbanded")
-							--else
-								--Spring.MarkerAddPoint(x,y,z, "Left Behind")
+							aDivX = aDivX + math.abs(x - averageX)
+							aDivZ = aDivZ + math.abs(z - averageZ)
+						end
+						aDivX = aDivX/averageCount
+						aDivZ = aDivZ/averageCount
+						
+						if aDivX < 300 and aDivZ < 300 then
+							for unitID,_ in pairs(data.unit) do
+								local x, y, z = spGetUnitPosition(unitID)
+								if math.abs(x-averageX) > aDivX*1.7 and math.abs(z-averageZ) > aDivX*1.7 then
+									data.unit[unitID] = nil
+									data.aa[unitID] = nil
+									unitInBattleGroupByID[unitID] = nil
+									--Spring.MarkerAddPoint(x,y,z, "Left Behind")
+								end
 							end
 						end
 						
-						removeIndexFromArray(battleGroup,i)
-						break
-					else
-						for unitID,_ in pairs(data.unit) do
-							if not data.aa[unitID] then
-								spGiveOrderToUnit(unitID, CMD_FIGHT , {averageX,gy,averageZ}, {})
-							end
+						--[[Spring.MarkerAddPoint(averageX,0,averageZ, "Div")
+						Spring.MarkerAddLine(averageX-aDivX,Spring.GetGroundHeight(averageX-aDivX,averageZ-aDivZ),averageZ-aDivZ,
+							averageX+aDivX,Spring.GetGroundHeight(averageX+aDivX,averageZ-aDivZ),averageZ-aDivZ)
+						Spring.MarkerAddLine(averageX-aDivX,Spring.GetGroundHeight(averageX-aDivX,averageZ+aDivZ),averageZ+aDivZ,
+							averageX+aDivX,Spring.GetGroundHeight(averageX+aDivX,averageZ+aDivZ),averageZ+aDivZ)
+						Spring.MarkerAddLine(averageX+aDivX,Spring.GetGroundHeight(averageX+aDivX,averageZ-aDivZ),averageZ-aDivZ,
+							averageX+aDivX,Spring.GetGroundHeight(averageX+aDivX,averageZ+aDivZ),averageZ+aDivZ)
+						Spring.MarkerAddLine(averageX-aDivX,Spring.GetGroundHeight(averageX-aDivX,averageZ-aDivZ),averageZ-aDivZ,
+							averageX-aDivX,Spring.GetGroundHeight(averageX-aDivX,averageZ+aDivZ),averageZ+aDivZ)--]]
+					end
+					data.regroup = true
+					for unitID,_ in pairs(data.unit) do
+						if not data.aa[unitID] then
+							spGiveOrderToUnit(unitID, CMD_FIGHT , {averageX,gy,averageZ}, {})
 						end
 					end
 				else
@@ -1729,7 +1743,6 @@ local function raiderJobHandler(team)
 				disbandable = false,
 				aa = {},
 				neededAA = 0,
-				lastStuck = false,
 			}
 			--wipeSquareData(team, aX, aZ)
 		end
@@ -1895,7 +1908,6 @@ local function gunshipJobHandler(team)
 				disbandable = true,
 				aa = {},
 				neededAA = 0,
-				lastStuck = false,
 			}
 			--wipeSquareData(team, aX, aZ)
 		end
@@ -2058,7 +2070,6 @@ local function combatJobHandler(team)
 				disbandable = false,
 				aa = {}, 
 				neededAA = idleCost/5,
-				lastStuck = false,
 			}
 			gatherBattlegroupNeededAA(team,battleGroup.count)
 			--wipeSquareData(team,aX, aZ)
@@ -2141,7 +2152,13 @@ local function updateScoutingHeatmap(allyTeam,frame,removeEmpty)
 					end
 					if empty then
 						--Spring.MarkerAddPoint(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z,"econ removed")
-						wipeSquareData(allyTeam, i, j)
+						if scoutingHeatmap[i][j].previouslyEmpty then
+							wipeSquareData(allyTeam, i, j)
+						else
+							scoutingHeatmap[i][j].previouslyEmpty = true
+						end
+					else
+						scoutingHeatmap[i][j].previouslyEmpty = false
 					end
 				end
 				
@@ -2185,9 +2202,7 @@ local function decayEnemyHeatmaps(allyTeam,frame)
 		local aZ = enemyOffense[i].aZ
 		local data = scoutingHeatmap[aX][aZ]
 		if frame - data.lastScouted > 2000 then
-			enemyOffense.totalCost = enemyOffense.totalCost - enemyOffenseHeatmap[aX][aZ].cost
-			enemyOffenseHeatmap[aX][aZ].cost = 0
-			removeIndexFromArray(enemyOffense,i)
+			removeValueFromHeatmap(enemyOffense, enemyOffenseHeatmap, aX, aZ)
 			break
 		end
 	end
@@ -2239,7 +2254,19 @@ local function diluteEnemyForceComposition(allyTeam)
 	
 end
 
-local function addValueToHeatmap(heatmap, value, x, z)
+local function addValueToHeatmap(indexer,heatmap, value, aX, aZ)
+	if value > 0 then
+		if heatmap[aX][aZ].cost == 0 then
+			indexer.count = indexer.count + 1
+			indexer[indexer.count] = {x = heatmapPosition[aX][aZ].x, y = heatmapPosition[aX][aZ].y, z = heatmapPosition[aX][aZ].z, aX = aX, aZ = aZ}
+			heatmap[aX][aZ].index = indexer.count
+		end
+		indexer.totalCost = indexer.totalCost + value
+		heatmap[aX][aZ].cost = heatmap[aX][aZ].cost + value
+	end
+end
+
+local function addValueToHeatmapInArea(indexer,heatmap, value, x, z)
 
 	local aX = math.ceil(x/heatSquareWidth)
 	local aZ = math.ceil(z/heatSquareHeight) 
@@ -2249,42 +2276,43 @@ local function addValueToHeatmap(heatmap, value, x, z)
 	local sXfactor = 1
 	local sZfactor = 1
 	
-	if (aX+0.5)*heatSquareWidth > x then
+	if (aX-0.5)*heatSquareWidth > x then
 		if aX == 1 then
 			aX2 = 1
 		else
 			aX2 = aX - 1
-			sXfactor = ((aX+0.5)*heatSquareWidth-x)/heatSquareWidth
+			sXfactor = (aX-0.5) - x/heatSquareWidth
 		end
 	else
 		if aX == heatArrayWidth then
 			aX2 = heatArrayWidth
 		else
 			aX2 = aX + 1
-			sXfactor = (x-(aX+0.5)*heatSquareWidth)/heatSquareWidth
+			sXfactor = x/heatSquareWidth - (aX-0.5)
 		end
 	end
 	
-	if (aZ+0.5)*heatSquareHeight > z then
+	if (aZ-0.5)*heatSquareHeight > z then
 		if aZ == 1 then
 			aZ2 = 1
 		else
 			aZ2 = aZ - 1
-			sZfactor = ((aZ+0.5)*heatSquareHeight-z)/heatSquareHeight
+			sZfactor = (aZ-0.5) - z/heatSquareHeight
 		end
 	else
 		if aZ == heatArrayHeight then
 			aZ2 = heatArrayHeight
 		else
 			aZ2 = aZ + 1
-			sXfactor = (z-(aZ+0.5)*heatSquareHeight)/heatSquareHeight
+			sZfactor = z/heatSquareHeight - (aZ-0.5)
 		end
 	end
 	
-	heatmap[aX][aZ].cost = heatmap[aX][aZ].cost + value*(sXfactor + sZfactor)*0.5
-	heatmap[aX2][aZ].cost = heatmap[aX2][aZ].cost + value*((1-sXfactor) + sZfactor)*0.5
-	heatmap[aX][aZ2].cost = heatmap[aX][aZ2].cost + value*(sXfactor + (1-sZfactor))*0.5
-	heatmap[aX2][aZ2].cost = heatmap[aX2][aZ2].cost + value*((1-sXfactor) +  (1-sZfactor))*0.5
+	addValueToHeatmap(indexer, heatmap, value*(sXfactor + sZfactor)*0.5, aX, aZ)
+	addValueToHeatmap(indexer, heatmap, value*((1-sXfactor) + sZfactor)*0.5, aX2, aZ)
+	addValueToHeatmap(indexer, heatmap, value*(sXfactor + (1-sZfactor))*0.5, aX, aZ2)
+	addValueToHeatmap(indexer, heatmap, value*((1-sXfactor) + (1-sZfactor))*0.5, aX2, aZ2)
+	
 end
 
 local function editDefenceHeatmap(team,unitID,groundArray,airArray,range,sign,priority)
@@ -2431,34 +2459,13 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 			at.enemyForceComposition.totalCost = at.enemyForceComposition.totalCost + ud.metalCost
 			if ud.weapons[1].onlyTargets.land then 
 				if ud.speed > 0 then -- offense
-					local data = enemyOffenseHeatmap[aX][aZ]
-					if data.cost == 0 then
-						enemyOffense.count = enemyOffense.count + 1
-						enemyOffense[enemyOffense.count] = {x = heatmapPosition[aX][aZ].x, y = heatmapPosition[aX][aZ].y, z = heatmapPosition[aX][aZ].z, aX = aX, aZ = aZ}--, lastScouted = spGetGameFrame()}
-						data.index = enemyOffense.count
-					end
-					enemyOffense.totalCost = enemyOffense.totalCost + ud.metalCost
-					data.cost = data.cost + ud.metalCost
+					addValueToHeatmap(enemyOffense,enemyOffenseHeatmap, ud.metalCost, aX, aZ)
 				else -- defence
-					local data = enemyDefenceHeatmap[aX][aZ]
-					if data.cost == 0 then
-						enemyDefence.count = enemyDefence.count + 1
-						enemyDefence[enemyDefence.count] = {x = heatmapPosition[aX][aZ].x, y = heatmapPosition[aX][aZ].y, z = heatmapPosition[aX][aZ].z, aX = aX, aZ = aZ}
-						data.index = enemyDefence.count
-					end
-					enemyDefence.totalCost = enemyDefence.totalCost + ud.metalCost
-					addValueToHeatmap(enemyDefenceHeatmap, ud.metalCost, x, z)
+					addValueToHeatmapInArea(enemyDefence,enemyDefenceHeatmap, ud.metalCost, x, z)
 				end
 			end
-		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.extractsMetal then -- econ
-			local data = enemyEconomyHeatmap[aX][aZ]
-			if data.cost == 0 then
-				enemyEconomy.count = enemyEconomy.count + 1
-				enemyEconomy[enemyEconomy.count] = {x = heatmapPosition[aX][aZ].x, y = heatmapPosition[aX][aZ].y, z = heatmapPosition[aX][aZ].z, aX = aX, aZ = aZ}
-				data.index = enemyEconomy.count
-			end
-			enemyEconomy.totalCost = enemyEconomy.totalCost + ud.metalCost
-			data.cost = data.cost + ud.metalCost
+		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.extractsMetal ~= 0 then -- econ
+			addValueToHeatmap(enemyEconomy, enemyEconomyHeatmap, ud.metalCost, aX, aZ)
 		end
 		
 	end
@@ -2504,7 +2511,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 					at.enemyForceComposition.unit.airDefence = at.enemyForceComposition.unit.airDefence + ud.metalCost
 				end
 			end
-		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.extractsMetal then -- econ
+		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.extractsMetal ~= 0 then -- econ
 			
 		end
 	end
@@ -2596,6 +2603,41 @@ local function drawHeatmap(heatmap)
 
 end
 
+local function checkHeatmap(heatmap, indexer, name, team)
+	for i = 1, indexer.count do -- init array
+		local cost = heatmap[indexer[i].aX][indexer[i].aZ].cost
+		if cost == 0 then
+			Spring.MarkerAddPoint(indexer[i].x,0,indexer[i].z, "0 cost! " .. name .. ", allyTeam " .. team)
+		else
+			if heatmap[indexer[i].aX][indexer[i].aZ].index ~= i then
+				Spring.MarkerAddPoint(indexer[i].x,0,indexer[i].z, "Index Mismatch from indexer")
+			end
+		end
+	end
+	
+	for i = 1,heatArrayWidth do -- init array
+		for j = 1, heatArrayHeight do
+			if heatmap[i][j].cost ~= 0 then
+				if heatmap[i][j].index == 0 then
+					Spring.MarkerAddPoint(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z, "Zero Index")
+				end
+				if not indexer[heatmap[i][j].index] == 0 then
+					Spring.MarkerAddPoint(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z, "Null Indexer")
+				elseif indexer[heatmap[i][j].index].aX ~= i or indexer[heatmap[i][j].index].aZ ~= j then
+					Spring.MarkerAddPoint(heatmapPosition[i][j].x,0,heatmapPosition[i][j].z, "Index Mismatch from heatmap")
+				end
+			end
+		end
+	end	
+	
+end
+
+local function drawHeatmapIndex(heatmap, indexer)
+	for i = 1, indexer.count do -- init array
+		Spring.MarkerAddPoint(indexer[i].x,0,indexer[i].z, heatmap[indexer[i].aX][indexer[i].aZ].cost)
+	end
+end
+
 local function initialiseFaction(team)
 
 	local a = aiTeamData[team]
@@ -2640,7 +2682,7 @@ function gadget:GameFrame(n)
 		end
 		
 		if n%40 == 15 then
-			battleGroupHandler(team, n)
+			battleGroupHandler(team, n, n%200 == 15)
 		end
 		
 		if n%40 == 35 then
@@ -2675,14 +2717,19 @@ function gadget:GameFrame(n)
 				decayEnemyMobileAA(allyTeam,n)
 				diluteEnemyForceComposition(allyTeam)
 				
+				-- DEBUG functions, check entire heatmap index consistency. They look slow
+				--checkHeatmap(allyTeamData[allyTeam].enemyOffenseHeatmap, allyTeamData[allyTeam].enemyOffense,allyTeam,"Offense")
+				--checkHeatmap(allyTeamData[allyTeam].enemyEconomyHeatmap, allyTeamData[allyTeam].enemyEconomy,allyTeam,"Economy")
+				--checkHeatmap(allyTeamData[allyTeam].enemyDefenceHeatmap, allyTeamData[allyTeam].enemyDefence,allyTeam,"Defence")
+				
 				if debugData.drawOffensemap[allyTeam] then
-					drawHeatmap(allyTeamData[allyTeam].enemyOffenseHeatmap)
+					drawHeatmapIndex(allyTeamData[allyTeam].enemyOffenseHeatmap, allyTeamData[allyTeam].enemyOffense)
 				end
 				if debugData.drawEconmap[allyTeam] then
-					drawHeatmap(allyTeamData[allyTeam].enemyEconomyHeatmap)
+					drawHeatmapIndex(allyTeamData[allyTeam].enemyEconomyHeatmap, allyTeamData[allyTeam].enemyEconomy)
 				end
 				if debugData.drawDefencemap[allyTeam] then
-					drawHeatmap(allyTeamData[allyTeam].enemyDefenceHeatmap)
+					drawHeatmapIndex(allyTeamData[allyTeam].enemyDefenceHeatmap, allyTeamData[allyTeam].enemyDefence)
 				end
 			end
 		end
@@ -3469,7 +3516,7 @@ local function initialiseAllyTeam(allyTeam, aiOnTeam)
 		for i = 1,heatArrayWidth do 
 			at.scoutingHeatmap[i] = {}
 			for j = 1, heatArrayHeight do
-				at.scoutingHeatmap[i][j] = {scouted = false, lastScouted = -10000}
+				at.scoutingHeatmap[i][j] = {scouted = false, lastScouted = -10000, previouslyEmpty = false}
 			end
 		end
 	
@@ -3575,7 +3622,7 @@ local function SetupCmdChangeAIDebug()
 end
 
 function gadget:Initialize()
-	
+
 	-- Initialise AI for all team that are set to use it
 	local aiOnTeam = {}
 	usingAI = false
