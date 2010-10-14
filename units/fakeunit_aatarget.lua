@@ -49,11 +49,6 @@ unitDef = {
   TEDClass              = [[VTOL]],
   turnRate              = 0,
   workerTime            = 0,
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=2,
-	buildingGroundDecalSizeY=2,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[fakeunit_aatarget_aoplane.dds]],
 }
 
 return lowerkeys({ fakeunit_aatarget = unitDef })
