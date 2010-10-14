@@ -388,6 +388,7 @@ turn lloarm to z-axis <94.000000> speed <250.000000>;  //upspring 94
 	hide flare;
 	hide jx1;
 	hide jx2;
+	hide grenade;
 	aimer = 1; //sets primary weapon  normaly 1 but rev for sword test // so 2 is sword ?
 	swing = 0; //not ready to swing sword
 	dead = 0;

@@ -340,12 +340,7 @@ if (modOptions and tobool(modOptions.xmas)) then
   end
 
   for name, ud in pairs(UnitDefs) do
-    local unitname = ud.unitname
-    if (unitname == "corclog") then
-    --  ud.objectname = "core_christmas_clogger.s3o"
-      ud.featuredefs.dead.object = "christmastree_dt.S3O"
-
-    elseif (type(ud.weapondefs) == "table") then
+	if (type(ud.weapondefs) == "table") then
       for wname,wd in pairs(ud.weapondefs) do
         if (wd.weapontype == "AircraftBomb") then
           wd.model = gifts[ GetRandom(wname,#gifts) ]

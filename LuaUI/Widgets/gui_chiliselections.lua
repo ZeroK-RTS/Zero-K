@@ -704,12 +704,6 @@ local function UpdateSelectedUnitsTooltip()
 					windbar:SetCaption( ("%0.f%%"):format(100*power) )
 				end
 
-				--// Overdrive Pylons
-				if (ud.name == 'mexpylon' or ud.name=='pylon') and (maxhealth and (para or 0.1) and maxhealth > para) and (buildProgress >= 1) then 
-					absMetal = Spring.GetUnitRulesParam(selectedUnits[1], "OverdriveMetalBonus") or 0
-					absEnergy = -(Spring.GetUnitRulesParam(selectedUnits[1], "OverdriveEnergySpent") or 0)
-				end
-				
 				--// Mexes
 	--[[ FIXME
 				local odbar = barsContainer.childrenByName['overdrive']
@@ -951,8 +945,6 @@ function widget:Initialize()
 		local ud = UnitDefs[i]
 		if (ud.isCommander)           --// engine overrides commanders tooltips with playernames
 		  or (ud.extractsMetal > 0)   --// the Overdrive gadgets adds additional information to the tooltip, but the visualize it a different way
-		  or (ud.name == 'mexpylon')
-		  or (ud.name=='pylon')
 		then
 			ud.chili_selections_useStaticTooltip = true
 		end
