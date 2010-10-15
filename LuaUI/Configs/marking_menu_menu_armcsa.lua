@@ -17,7 +17,14 @@ local menu_armcsa = {
   },
   {
     angle = -45,
-    unit = "arm_spider",
+    unit = "armrectr",
+	label = "Bots",
+    items = {
+      {
+        angle= -90,
+        unit = "armflea",
+      },
+    }
   },
 --[[  {
     angle = -90,

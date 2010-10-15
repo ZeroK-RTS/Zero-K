@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armcsa]],
   name                = [[Athena]],
-  description         = [[Airborne SpecOps Engineer, Builds at 6 m/s]],
+  description         = [[Airborne SpecOps Engineer, Builds at 9 m/s]],
   acceleration        = 0.084,
   airStrafe           = 0,
   amphibious          = true,
@@ -35,7 +35,11 @@ unitDef = {
     [[armorco]],
     [[armsonar]],
     [[cortl]],
-    [[arm_spider]],
+    [[armrectr]],
+    [[armflea]],
+--    [[armrock]],
+--    [[corpyro]],
+--    [[armsptk]],
   },
 
   buildPic            = [[ARMCSA.png]],
@@ -49,7 +53,7 @@ unitDef = {
   canstop             = [[1]],
   canSubmerge         = false,
   category            = [[GUNSHIP UNARMED]],
-  cloakCost           = 10,
+  cloakCost           = 3,
   cloakCostMoving     = 10,
   collide             = true,
   corpse              = [[HEAP]],
@@ -94,7 +98,7 @@ unitDef = {
   TEDClass            = [[VTOL]],
   terraformSpeed      = 300,
   turnRate            = 148,
-  workerTime          = 6,
+  workerTime          = 9,
 
   featureDefs         = {
 
