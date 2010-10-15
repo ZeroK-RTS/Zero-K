@@ -1,15 +1,16 @@
+-- TODO: optimize where possible
 -- TODO: make EPIC save changed options somehow!
 -- TODO: state switches need icons 
 -- TODO: commandschanged gets called 2x for some reason, investigate
 -- TODO: display which unit is currently selected
--- TODO: make tab highlighting work properly
--- TODO: display number of units queued by fac
--- TODO: display build queue in 3rd row when only one factory selected
+-- TODO: allow inserting units into factory queue at arbitrary positions
+-- TODO: display number of units queued by fac on build buttons
+-- TODO: fix priority tooltip
 
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.1 Integral Command Menu",
+    desc      = "v0.2 Integral Command Menu",
     author    = "Licho, KingRaptor",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -23,15 +24,22 @@ end
 HOW IT WORKS:
 	Main window (invisible) is parent of a fake window.
 		Tabs are buttons in main window, just above fake window.
-	Two parent StackPanels, a column for normal commands and a row for state commands.
-	Three (currently this is a hardcoded figure) more StackPanels are nested in each of the parents, at right angles.
-	When sorting commands, it splits state commands into batches of (MAX_COLUMNS) and assigns them to children
-		so if there are 12 commands, it puts 10 in first row and 2 in second row
-	Ditto for states, except it uses MAX_STATE_ROWS
-	Both parents and children resize with main window.
+		Currently selected tab is highlighted, when tab is changed all tabs are removed and regenerated.
+		
+		Two parent StackPanels (children of fake window), a column for normal commands and a row for state commands.
+		Three (currently this is a hardcoded figure) more StackPanels are nested in each of the parents, at right angles.
+		When sorting commands, it splits state commands into batches of (MAX_COLUMNS) and assigns them to children
+			so if there are 12 commands, it puts 10 in first row and 2 in second row
+		Ditto for states, except it uses MAX_STATE_ROWS
+		
+		If unit tab is selected and third command row is free, build queue of first selected factory found in array returned by SelectionChanged is displayed.
+		The queue shows up to 10 batches of units and their exact sequence. Currently you can't do anything with the sequence buttons, this may be changed in future.
+		
+	All items resize with main window.
 --]]
 
 local spGetUnitDefID = Spring.GetUnitDefID
+local spGetFullBuildQueue = Spring.GetFullBuildQueue
 
 local CMD_PAGES = 60
 local CMD_MORPH = 31210
@@ -85,16 +93,19 @@ local Control
 
 -- Chili instances
 local screen0
-local window
-local fakewindow
-local menuButtonRow
-local commands_main
-local sp_commands = {}
-local sp_states = {}
-local menuButtons = {}
-local buildRow
+local window		--main window (invisible)
+local fakewindow	--visible ScrollPanel
+local menuTabRow	--parent row of tabs
+local commands_main	--parent column of command buttons
+local states_main	--parent row of state buttons
+local sp_commands = {}	--buttons
+local sp_states = {}	--buttons
+local menuTabs = {}		--buttons
+local buildRow	--row of build queue buttons
+local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
 
 local buildRow_visible = false
+local buildQueue	--build order table of selectedFac
 
 -- command id indexed field of items - each item is button, label and image 
 local commandButtons = {} 
@@ -225,7 +236,7 @@ local function MakeButton(container, cmd, insertItem)
 				height="90%";
 				y="6%";
 				color = color;
-				keepAspect = isState;
+				keepAspect = true,	--isState;
 				file = texture;
 				parent = button;
 			}
@@ -310,7 +321,7 @@ end
 local function RemoveChildren(container) 
 	for i = 1, #container.children do 
 		container:RemoveChild(container.children[1])
-	end 
+	end
 end 
 
 -- compared real chili container with new commands and update accordingly
@@ -376,6 +387,86 @@ local function ManageStateIcons()
 	end
 end
 
+local function BuildRowButtonFunc(num, cmdid)
+	local _,_,left,_,right = Spring.GetMouseState()
+	local alt,ctrl,meta,shift = Spring.GetModKeyState()
+	local order
+	
+	local function BooleanMult(int, bool)
+		if bool then return int
+		else return 0 end
+	end
+	
+	local options = BooleanMult(CMD.OPT_SHIFT, shift) + BooleanMult(CMD.OPT_ALT, alt) + BooleanMult(CMD.OPT_CTRL, ctrl) + BooleanMult(CMD.OPT_META, meta)
+	
+	if left then order = CMD.INSERT
+	--elseif right then order = CMD.REMOVE
+	else return end	
+	--Spring.Echo(cmdid)
+	Spring.GiveOrderToUnit(selectedFac, order, {num, cmdid, options}, {"alt", "control"})		--command ID invalid for some daft reason
+end
+
+--uses its own function for more fine control
+local function ManageBuildRow()
+	--if (menuChoice ~= 5) or (not buildRow_visible) or (not selectedFac) then return end
+	local overrun = false
+	buildQueue = spGetFullBuildQueue(selectedFac, MAX_COLUMNS + 1)
+	RemoveChildren(buildRow)
+	if buildQueue[MAX_COLUMNS + 1] then overrun = true end
+	
+	for i=1, MAX_COLUMNS do
+		local buttonArray = buildRowButtons[i]
+		if buttonArray.button then RemoveChildren(buttonArray.button) end
+		if buildQueue[i] then	--adds button for queued unit
+			local udid, count, caption
+			for id, num in pairs(buildQueue[i]) do
+				udid = id
+				count = num
+				break
+			end
+			buildRowButtons[i].cmdid = -udid
+			if count > 1 then caption = tostring(count)
+			else caption = '' end
+			buttonArray.button = Button:New{
+				parent = buildRow;
+				x = tostring((i-1)*(100/MAX_COLUMNS)).."%",
+				y = 0,
+				width = tostring(100/MAX_COLUMNS).."%",
+				height = "100%",
+				--caption = '',
+				--OnClick = {	function () BuildRowButtonFunc(i, buildRowButtons[i].cmdid) end },
+				padding = {1,1,1,1},
+				keepAspect = true,
+			}
+			if overrun and i == MAX_COLUMNS then buttonArray.button.caption = '...' end
+			buttonArray.button.backgroundColor[4] = 0.3
+			buttonArray.label = Label:New {
+				parent = buttonArray.button,
+				width="100%";
+				height="100%";
+				autosize=false;
+				--x = "70%",
+				--y = "70%",
+				align="right";
+				valign="bottom";
+				caption = caption;
+				fontSize = 16;
+				fontShadow = true;
+			}
+			if not (overrun and i == MAX_COLUMNS) then
+				buttonArray.image = Image:New {
+					parent = buttonArray.button,
+					width="100%";
+					height="90%";
+					y="6%";
+					file = '#'..udid,
+					file2 = WG.GetBuildIconFrame(UnitDefs[udid]),
+				}
+			end
+		end
+	end
+end
+
 local function ManageCommandIcons(sourceArray)
 	local commandRows = { {}, {}, {} }
 	for i=1, MAX_COLUMNS do
@@ -391,17 +482,19 @@ local function ManageCommandIcons(sourceArray)
 	for i=1, 3 do
 		UpdateContainer(sp_commands[i], commandRows[i], MAX_COLUMNS)
 	end
-end
-
-local function ColorButtons(arg)
-	arg = arg or menuChoice
-	for i=1,5 do
-		menuButtons[i].backgroundColor[4] = 0.4
+	if menuChoice == 5 and #commandRows[3] == 0 and selectedFac then
+		if not buildRow_visible then
+			commands_main:AddChild(buildRow)
+			buildRow_visible = true
+		end
+		ManageBuildRow()
+	else
+		commands_main:RemoveChild(buildRow)
+		buildRow_visible = false
 	end
-	menuButtons[arg].backgroundColor[4] = 1
 end
 
-local function Update(buttonpush, layoutUpdate) 
+local function Update(buttonpush) 
     local commands = widgetHandler.commands
     local customCommands = widgetHandler.customCommands
 	
@@ -449,20 +542,50 @@ local function Update(buttonpush, layoutUpdate)
 
 	ManageStateIcons()
 	ManageCommandIcons(menuChoices[menuChoice].array)
-	--ColorButtons()
 end 
+
+local function MakeMenuTab(i, alpha)
+	local button = Button:New{
+		parent = menuTabRow;
+		x = tostring((20*i)-20).."%",
+		y = 0,
+		width = "20%",
+		height = "100%",
+		caption = menuChoices[i].name,
+		OnClick = {
+			function()
+				menuChoice = i
+				Update(true)
+				ColorTabs(i)
+			end
+		},
+	}
+	button.backgroundColor[4] = alpha or 1
+	return button
+end
+
+--need to recreate the tabs completely because chili is dumb
+--also needs to be non-local so MakeMenuTab can call it
+function ColorTabs(arg)
+	arg = arg or menuChoice
+	RemoveChildren(menuTabRow)
+	for i=1,5 do
+		if i ~= arg then menuTabs[i] = MakeMenuTab(i, 0.4) end
+	end
+	menuTabs[arg] = MakeMenuTab(arg, 1)
+end
 
 local function SmartTabSelect()
 	Update()
 	if #n_units > 0 and #n_econaux == 0 then
 		menuChoice = 5	--selected factory, jump to units
-		--ColorButtons(5)
+		ColorTabs(5)
 	elseif #n_units == 0 and menuChoice == 5 then
 		menuChoice = 1	--selected non-fac and in units menu, jump to common
-		--ColorButtons(1)
+		ColorTabs(1)
 	elseif #n_factories + #n_econaux + #n_defense + #n_units == 0 then
 		menuChoice = 1	--selected non-builder, jump to common
-		--ColorButtons(1)
+		ColorTabs(1)
 	end
 end
 
@@ -622,7 +745,7 @@ function widget:Initialize()
 		--itemMargin  = {0, 0, 0, 0},
 	}
 
-	menuButtonRow = StackPanel:New{
+	menuTabRow = StackPanel:New{
 		parent = window,
 		resizeItems = true;
 		orientation   = "horizontal";
@@ -635,22 +758,9 @@ function widget:Initialize()
 	}
 	
 	for i=1,5 do
-		menuButtons[i] = Button:New{
-			parent = menuButtonRow;
-			x = tostring((20*i)-20).."%",
-			y = 0,
-			width = "20%",
-			height = "100%",
-			caption = menuChoices[i].name,
-			OnClick = {
-				function()
-					menuChoice = i
-					Update(true)
-					--ColorButtons(i)
-				end
-			},
-		}
+		menuTabs[i] = MakeMenuTab(i, 1)
 	end
+	ColorTabs()
 	
 	commands_main = StackPanel:New{
 		parent = fakewindow,
@@ -696,18 +806,6 @@ function widget:Initialize()
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
-	buildRow = StackPanel:New{
-		parent = commands_main,
-		resizeItems = true;
-		orientation   = "horizontal";
-		height = "33%";
-		width = "100%";
-		x = "0%";
-		y = "66%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-	}
-	commands_main:RemoveChild(buildRow);
 	
 	states_main = StackPanel:New{
 		parent = fakewindow,
@@ -754,6 +852,22 @@ function widget:Initialize()
 		itemMargin  = {0, 0, 0, 0},
 	}
 	
+	buildRow = StackPanel:New{
+		parent = commands_main,
+		resizeItems = true;
+		orientation   = "horizontal";
+		height = "33%";
+		width = "100%";
+		x = "0%";
+		y = "66%";
+		padding = {0, 0, 0, 0},
+		itemMargin  = {0, 0, 0, 0},
+	}
+	
+	commands_main:RemoveChild(buildRow);
+	for i=1,MAX_COLUMNS do
+		buildRowButtons[i] = {}
+	end
 end
 
 local lastCmd = nil  -- last active command 
@@ -776,18 +890,21 @@ function widget:DrawScreen()
 		end 
 		lastCmd = cmdid
 	end 
-	--ColorButtons()
 end
 
 function widget:SelectionChanged(newSelection)
+	local function IsFactory(udid)
+		return (UnitDefs[udid].TEDClass == "PLANT") or UnitDefs[udid].isFactory
+	end
 	for i=1,#newSelection do
 		local id = newSelection[i]
-		if factory_commands[-(spGetUnitDefID(id))] then
+		if IsFactory((spGetUnitDefID(id))) then
 			selectedFac = id
 			SmartTabSelect()
-			break
+			return
 		end
 	end
+	selectedFac = nil
 end
 
 function widget:Shutdown()
