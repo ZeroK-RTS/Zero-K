@@ -97,7 +97,8 @@ unitDef = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 40,
-  turnRate            = 200,
+  turninplace		  = 0,
+  turnRate            = 500,
   upright             = false,
   workerTime          = 8,
 

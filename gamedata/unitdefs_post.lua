@@ -91,7 +91,7 @@ local function TagTree(unit, faction, newbuildoptions)
 	  for _, buildoption in ipairs(ud.buildoptions) do
         Tag(buildoption)
       end
-	  if (ud.maxvelocity > 0) and unit ~= "armcsa" and unit ~= "corcsa" then
+	  if (ud.maxvelocity > 0) and unit ~= "armcsa" then
 	    ud.buildoptions = newbuildoptions
 	  end
     end
@@ -119,8 +119,9 @@ local commanders = {
 	"commsupport",
 	"commadvsupport",
 }
-
-TagTree("armcom", "arm", UnitDefs["armcom"].buildoptions)
+for _,name in pairs(commanders) do
+	TagTree(name, "arm", UnitDefs["armcom"].buildoptions)
+end
 --TagTree("corcom", "core", UnitDefs["corcom"].buildoptions)
 
 for name, ud in pairs(UnitDefs) do

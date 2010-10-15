@@ -1,9 +1,10 @@
-#include "sfxtype.h"
-#include "exptype.h"
+//linear constant 65536
+
+#include "constants.h"
 
 piece  base, bottom, tamper, furnace, door_l, door_r, drill1, drill2, drill3, posts;
 
-static-var  OPEN, Static_Var_1, Static_Var_2, Static_Var_3, statechg_DesiredState, statechg_StateChanging;
+static-var  OPEN, animSpeed, acceleration, decceleration, statechg_DesiredState, statechg_StateChanging;
 
 
 SmokeUnit(healthpercent, sleeptime, smoketype)
@@ -37,17 +38,17 @@ Animation()
 {
 	while (TRUE)
 	{		
-	        if(Static_Var_1 >= 0 AND OPEN == TRUE)
+	        if(animSpeed >= 0 AND OPEN == TRUE)
  			{ 
- 				spin furnace around y-axis speed Static_Var_1 accelerate Static_Var_2;
- 				spin drill1 around y-axis speed Static_Var_1 accelerate Static_Var_2;
-				move tamper to y-axis [10] speed Static_Var_1*13;	
+ 				spin furnace around y-axis speed animSpeed accelerate acceleration;
+ 				spin drill1 around y-axis speed animSpeed accelerate acceleration;
+				move tamper to y-axis [20] speed animSpeed*13;	
 				wait-for-move tamper along y-axis;
-				move tamper to y-axis [18] speed Static_Var_1*13;
+				move tamper to y-axis [40] speed animSpeed*13;
 				wait-for-move tamper along y-axis;
             }   
-    stop-spin tamper around y-axis decelerate Static_Var_3;
-    stop-spin drill1 around y-axis decelerate Static_Var_3;
+    stop-spin tamper around y-axis decelerate decceleration;
+    stop-spin drill1 around y-axis decelerate decceleration;
     sleep 1;
     }
 }
@@ -113,9 +114,9 @@ Create()
 {
 	turn base to y-axis Rand(0, 65534) now;
 
-	Static_Var_1 = 0;
-	Static_Var_2 = 91;
-	Static_Var_3 = 182;
+	animSpeed = 0;
+	acceleration = <30>;
+	decceleration = <60>;
 	OPEN = FALSE;
 	call-script InitState();
 	start-script SmokeUnit();
@@ -139,7 +140,7 @@ SweetSpot(piecenum)
 
 SetSpeed(Func_Var_1)
 {
-	Static_Var_1 = Func_Var_1 * 45;
+	animSpeed = Func_Var_1 * 45;
 }
 
 Killed(severity, corpsetype)

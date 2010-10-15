@@ -2,12 +2,13 @@
 -- TODO: state switches need icons 
 -- TODO: commandschanged gets called 2x for some reason, investigate
 -- TODO: display which unit is currently selected
+-- TODO: make tab highlighting work properly
 -- TODO: display number of units queued by fac
 -- TODO: display build queue in 3rd row when only one factory selected
 
 function widget:GetInfo()
   return {
-    name      = "Chili Integral Menu ",
+    name      = "Chili Integral Menu",
     desc      = "v0.1 Integral Command Menu",
     author    = "Licho, KingRaptor",
     date      = "12.10.2010",
@@ -20,6 +21,8 @@ end
 
 --[[
 HOW IT WORKS:
+	Main window (invisible) is parent of a fake window.
+		Tabs are buttons in main window, just above fake window.
 	Two parent StackPanels, a column for normal commands and a row for state commands.
 	Three (currently this is a hardcoded figure) more StackPanels are nested in each of the parents, at right angles.
 	When sorting commands, it splits state commands into batches of (MAX_COLUMNS) and assigns them to children
@@ -28,14 +31,17 @@ HOW IT WORKS:
 	Both parents and children resize with main window.
 --]]
 
+local spGetUnitDefID = Spring.GetUnitDefID
+
 local CMD_PAGES = 60
+local CMD_MORPH = 31210
 
 local common_commands, states_commands, factory_commands, econaux_commands, defense_commands, overrides = include("Configs/integral_menu_commands.lua")
 
 local MAX_COLUMNS = 10
 local MAX_STATE_ROWS = 5
 local MIN_HEIGHT = 180
-local MIN_WIDTH = 400
+local MIN_WIDTH = 600
 
 -- Global commands defined here - they have cmdDesc format + 
 local globalCommands = {
@@ -58,6 +64,8 @@ local globalCommands = {
 	}]]--
 }
 
+local selectedFac	--unitID
+
 -- Chili classes
 local Chili
 local Button
@@ -78,11 +86,15 @@ local Control
 -- Chili instances
 local screen0
 local window
+local fakewindow
+local menuButtonRow
+local commands_main
 local sp_commands = {}
 local sp_states = {}
 local menuButtons = {}
+local buildRow
 
-local window_visible = true
+local buildRow_visible = false
 
 -- command id indexed field of items - each item is button, label and image 
 local commandButtons = {} 
@@ -114,6 +126,7 @@ end
 local function MakeButton(container, cmd, insertItem) 
 	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
 	local isBuild = (cmd.id < 0)
+	--local isMorph = (UnitDefs[cmd.id - CMD_MORPH]
 	local text
 	local texture
 	local tooltip = cmd.tooltip
@@ -139,7 +152,7 @@ local function MakeButton(container, cmd, insertItem)
 			texture = te.texture
 		end 
 	elseif isBuild then
-		texture = 'unitpics/' .. cmd.name  .. ".png"	--'#'..-cmd.id		--workaround for vanishing buildpics
+		texture = 'unitpics/' .. cmd.name  .. ".png"	--'#'..-cmd.id		--reload buildpic in chili instead of using engine one: workaround for vanishing buildpics
 	else
 		texture = cmd.texture 
 	end 
@@ -210,7 +223,7 @@ local function MakeButton(container, cmd, insertItem)
 			image= Image:New {
 				width="100%";
 				height="90%";
-				y="8%";
+				y="6%";
 				color = color;
 				keepAspect = isState;
 				file = texture;
@@ -381,16 +394,14 @@ local function ManageCommandIcons(sourceArray)
 end
 
 local function ColorButtons(arg)
---[[
-	for i=1,5 do
-		menuButtons[i].backgroundColor[4] = 0.35
-	end
 	arg = arg or menuChoice
+	for i=1,5 do
+		menuButtons[i].backgroundColor[4] = 0.4
+	end
 	menuButtons[arg].backgroundColor[4] = 1
---]]
 end
 
-local function Update(buttonpush) 
+local function Update(buttonpush, layoutUpdate) 
     local commands = widgetHandler.commands
     local customCommands = widgetHandler.customCommands
 	
@@ -416,18 +427,6 @@ local function Update(buttonpush)
 	for i = 1, #commands do ProcessCommand(commands[i]) end 
 	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
 	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end 
-	--for i,v in pairs(buildOptions) do ProcessCommand(i) end 
-	
-	if not buttonpush and #n_units > 0 and #n_econaux == 0 then
-		menuChoice = 5	--selected factory, jump to units
-		--ColorButtons(5)
-	elseif #n_units == 0 and menuChoice == 5 then
-		menuChoice = 1	--selected non-fac and in units menu, jump to common
-		--ColorButtons(1)
-	elseif #n_factories + #n_econaux + #n_defense + #n_units == 0 then
-		menuChoice = 1	--selected non-builder, jump to common
-		--ColorButtons(1)
-	end
 
 	menuChoices[1].array = n_common
 	menuChoices[2].array = n_factories
@@ -450,8 +449,22 @@ local function Update(buttonpush)
 
 	ManageStateIcons()
 	ManageCommandIcons(menuChoices[menuChoice].array)
+	--ColorButtons()
 end 
 
+local function SmartTabSelect()
+	Update()
+	if #n_units > 0 and #n_econaux == 0 then
+		menuChoice = 5	--selected factory, jump to units
+		--ColorButtons(5)
+	elseif #n_units == 0 and menuChoice == 5 then
+		menuChoice = 1	--selected non-fac and in units menu, jump to common
+		--ColorButtons(1)
+	elseif #n_factories + #n_econaux + #n_defense + #n_units == 0 then
+		menuChoice = 1	--selected non-builder, jump to common
+		--ColorButtons(1)
+	end
+end
 
 local function CopyTable(outtable,intable)
   for i,v in pairs(intable) do 
@@ -507,7 +520,7 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 		AddCommand(globalCommands[i])
 	end
 
-	Update()		
+	Update()
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
 end 
 
@@ -576,21 +589,37 @@ function widget:Initialize()
 	
 	
 	window = Window:New{
+		parent = screen0,
 		name   = 'integralwindow';
 		--padding = {0, 0, 0, 0},
-		--color = {0, 0, 0, 1},
+		color = {0, 0, 0, 0},
 		width = "54%";
-		height = "25%";
+		height = "29%";
 		--temporary position fudges so it looks right on my screen w/o docking
 		x = '23%';
-		y = '76%';
+		y = '72%';
 		dockable = true;
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
-		parent = screen0,
+		padding = {0, 0, 0, 0},
+		--itemMargin  = {0, 0, 0, 0},
+	}
+	
+	fakewindow = ScrollPanel:New{
+		parent = window,
+		x = 0,
+		y = '15%',
+		width = "100%";
+		height = "86%";
+		--horizontalScrollbar = false,
+		verticalSmartScroll = true,
+		disableChildrenHitTest = false,
+		--color = {1, 1, 1, 1},
+		--padding = {0, 0, 0, 0},
+		--itemMargin  = {0, 0, 0, 0},
 	}
 
 	menuButtonRow = StackPanel:New{
@@ -599,8 +628,8 @@ function widget:Initialize()
 		orientation   = "horizontal";
 		height = "15%";
 		width = "80%";
-		x = "0%";
-		y = "0%";
+		x = 0;
+		y = 0;
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
@@ -616,21 +645,21 @@ function widget:Initialize()
 			OnClick = {
 				function()
 					menuChoice = i
-					--ColorButtons(i)
 					Update(true)
+					--ColorButtons(i)
 				end
 			},
 		}
 	end
 	
 	commands_main = StackPanel:New{
-		parent = window,
+		parent = fakewindow,
 		resizeItems = true;
 		orientation   = "vertical";
-		height = "88%";
+		height = "100%";
 		width = "80%";
 		x = "0%";
-		y = "12%";
+		y = "1%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
@@ -667,15 +696,27 @@ function widget:Initialize()
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
-
+	buildRow = StackPanel:New{
+		parent = commands_main,
+		resizeItems = true;
+		orientation   = "horizontal";
+		height = "33%";
+		width = "100%";
+		x = "0%";
+		y = "66%";
+		padding = {0, 0, 0, 0},
+		itemMargin  = {0, 0, 0, 0},
+	}
+	commands_main:RemoveChild(buildRow);
+	
 	states_main = StackPanel:New{
-		parent = window,
+		parent = fakewindow,
 		resizeItems = true;
 		orientation   = "horizontal";
 		height = "100%";
 		width = "20%";
 		x = "80%";
-		y = "0%";
+		y = "1%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
@@ -719,7 +760,7 @@ local lastCmd = nil  -- last active command
 local lastColor = nil  -- original color of button with last active command
 
 -- this is needed to highlight active command
-function widget:DrawScreen() 
+function widget:DrawScreen()
 	local _,cmdid,_,cmdname = Spring.GetActiveCommand()
 	if cmdid ~= lastCmd then 
 		if cmdid and commandButtons[cmdid]  then 
@@ -736,7 +777,18 @@ function widget:DrawScreen()
 		lastCmd = cmdid
 	end 
 	--ColorButtons()
-end 
+end
+
+function widget:SelectionChanged(newSelection)
+	for i=1,#newSelection do
+		local id = newSelection[i]
+		if factory_commands[-(spGetUnitDefID(id))] then
+			selectedFac = id
+			SmartTabSelect()
+			break
+		end
+	end
+end
 
 function widget:Shutdown()
   widgetHandler:ConfigLayoutHandler(nil)
