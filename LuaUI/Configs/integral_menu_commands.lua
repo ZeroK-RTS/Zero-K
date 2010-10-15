@@ -96,10 +96,9 @@ local defense_commands = {
 
 local function CopyBuildArray(source, target)
 	for name, value in pairs(source) do
-		udid = (UnitDefNames[name].id)
-		if udid then
-			target[-udid] = value
-			--Spring.Echo("Adding command "..-udid.." unit "..UnitDefs[udid].name.." to menu")
+		udef = (UnitDefNames[name])
+		if udef then
+			target[-udef.id] = value
 		end
 	end
 end
@@ -110,7 +109,7 @@ CopyBuildArray(aux, econaux_commands)
 CopyBuildArray(defense, defense_commands)
 
 
--- Command overrides. State commands by default expect array of textures, one for each state. States are drawn without button borders and keep aspect ratio. 
+-- Command overrides. State commands by default expect array of textures, one for each state.
 -- You can specify texture, text,tooltip, color
 local overrides = {
 	[CMD.ATTACK] = { texture = 'LuaUi/Images/commands/attack.png',  text= '\255\0\255\0A\008ttack'},

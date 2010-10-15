@@ -19,7 +19,7 @@ unitDef = {
     [[armmanni]],
   },
 
-  buildPic         = [[ARMFHP.png]],
+  buildPic         = [[factoryhover.png]],
   buildTime        = 550,
   canMove          = true,
   canPatrol        = true,

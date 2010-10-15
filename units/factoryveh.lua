@@ -24,7 +24,7 @@ unitDef = {
     [[armmerl]],
   },
 
-  buildPic                      = [[corvp.png]],
+  buildPic                      = [[factoryveh.png]],
   buildTime                     = 550,
   canMove                       = true,
   canPatrol                     = true,

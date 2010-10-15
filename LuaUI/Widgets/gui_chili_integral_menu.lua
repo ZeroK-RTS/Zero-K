@@ -1,15 +1,18 @@
 -- TODO: make EPIC save changed options somehow!
 -- TODO: state switches need icons 
 -- TODO: commandschanged gets called 2x for some reason, investigate
+-- TODO: display which unit is currently selected
+-- TODO: display number of units queued by fac
+-- TODO: display build queue in 3rd row when only one factory selected
 
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu ",
     desc      = "v0.1 Integral Command Menu",
     author    = "Licho, KingRaptor",
-    date      = "6.9.2010",
+    date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
-    layer     = 50,
+    layer     = math.huge,
     enabled   = false,
 	handler   = true,
   }
@@ -77,10 +80,6 @@ local screen0
 local window
 local sp_commands = {}
 local sp_states = {}
-
-local btn_special
-local btn_common
-local btn_build
 local menuButtons = {}
 
 local window_visible = true
@@ -140,7 +139,7 @@ local function MakeButton(container, cmd, insertItem)
 			texture = te.texture
 		end 
 	elseif isBuild then
-		texture = '#' .. -cmd.id		
+		texture = 'unitpics/' .. cmd.name  .. ".png"	--'#'..-cmd.id		--workaround for vanishing buildpics
 	else
 		texture = cmd.texture 
 	end 
@@ -184,16 +183,11 @@ local function MakeButton(container, cmd, insertItem)
 		if cmd.OnClick then 
 			button.OnMouseDown = cmd.OnClick
 		end 
-		
 		if (isState) then 
 			button.padding = {0,0,0,0}
-			--button.backgroundColor = {0,0,0,0}
-			--button.height = '20%'
-			--button.width = button.height
 		end 
 		if (isBuild) then
-			button.padding = {0,0,0,0}
-			--button.margin = {0,0,0,0}
+			button.padding = {1,1,1,1}
 		end
 		
 		local label 
@@ -260,7 +254,7 @@ local function MakeButton(container, cmd, insertItem)
 		item.image.file = texture
 		item.image:Invalidate()
 	end 
-end 
+end
 
 -- arrays with commands to be displayed 
 local n_common = {}
@@ -283,18 +277,9 @@ local function ProcessCommand(cmd)
 	if not cmd.hidden and cmd.id ~= CMD_PAGES then 
 		--- state icons 
 		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then 
-			--if states_commands[cmd.id] then 
-				--if btn_states.level >= states_commands[cmd.id] then 
-					n_states[#n_states+1] = cmd 
-				--end 
-			--elseif btn_states.level >= 1 then 
-				--n_states[#n_states+1] = cmd
-			--end 
-		--this stuff is broken
+			n_states[#n_states+1] = cmd 
 		elseif common_commands[cmd.id] then 
-			--if btn_common.level >= common_commands[cmd.id] then 
-				n_common[#n_common+1] = cmd
-			--end 
+			n_common[#n_common+1] = cmd
 		elseif factory_commands[cmd.id] then
 			n_factories[#n_factories+1] = cmd
 		elseif econaux_commands[cmd.id] then
@@ -304,8 +289,7 @@ local function ProcessCommand(cmd)
 		elseif UnitDefs[-(cmd.id)] then
 			n_units[#n_units+1] = cmd
 		else
-			n_common[#n_common+1] = cmd
-			--n_common[#n_common+1] = cmd		--shove unclassified stuff in common
+			n_common[#n_common+1] = cmd	--shove unclassified stuff in common
 		end
 	end
 end 
@@ -390,12 +374,23 @@ local function ManageCommandIcons(sourceArray)
 	for i=(2*MAX_COLUMNS)+1, MAX_COLUMNS*3 do
 		commandRows[3][i-(2*MAX_COLUMNS)] = sourceArray[i]
 	end
+	--code for factory queue goes here
 	for i=1, 3 do
 		UpdateContainer(sp_commands[i], commandRows[i], MAX_COLUMNS)
 	end
 end
 
-local function Update() 
+local function ColorButtons(arg)
+--[[
+	for i=1,5 do
+		menuButtons[i].backgroundColor[4] = 0.35
+	end
+	arg = arg or menuChoice
+	menuButtons[arg].backgroundColor[4] = 1
+--]]
+end
+
+local function Update(buttonpush) 
     local commands = widgetHandler.commands
     local customCommands = widgetHandler.customCommands
 	
@@ -422,6 +417,17 @@ local function Update()
 	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
 	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end 
 	--for i,v in pairs(buildOptions) do ProcessCommand(i) end 
+	
+	if not buttonpush and #n_units > 0 and #n_econaux == 0 then
+		menuChoice = 5	--selected factory, jump to units
+		--ColorButtons(5)
+	elseif #n_units == 0 and menuChoice == 5 then
+		menuChoice = 1	--selected non-fac and in units menu, jump to common
+		--ColorButtons(1)
+	elseif #n_factories + #n_econaux + #n_defense + #n_units == 0 then
+		menuChoice = 1	--selected non-builder, jump to common
+		--ColorButtons(1)
+	end
 
 	menuChoices[1].array = n_common
 	menuChoices[2].array = n_factories
@@ -585,10 +591,9 @@ function widget:Initialize()
 		tweakResizable = true,
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
 		parent = screen0,
-		anchors = {bottom=true},
 	}
 
-	buttonRow = StackPanel:New{
+	menuButtonRow = StackPanel:New{
 		parent = window,
 		resizeItems = true;
 		orientation   = "horizontal";
@@ -602,17 +607,17 @@ function widget:Initialize()
 	
 	for i=1,5 do
 		menuButtons[i] = Button:New{
-			parent = buttonRow;
+			parent = menuButtonRow;
 			x = tostring((20*i)-20).."%",
 			y = 0,
 			width = "20%",
 			height = "100%",
 			caption = menuChoices[i].name,
-			anchors = {top=true},
 			OnClick = {
 				function()
 					menuChoice = i
-					Update()
+					--ColorButtons(i)
+					Update(true)
 				end
 			},
 		}
@@ -730,26 +735,8 @@ function widget:DrawScreen()
 		end 
 		lastCmd = cmdid
 	end 
-
+	--ColorButtons()
 end 
-
-
-function widget:GetConfigData()
-	if btn_common then 
-		local ret = 
-		{
-
-		}
-	  return ret
-	else return nil end 
-end
-
-function widget:SetConfigData(data)
-	if (data and type(data) == 'table') then
-
-	end 
-end 
-
 
 function widget:Shutdown()
   widgetHandler:ConfigLayoutHandler(nil)
