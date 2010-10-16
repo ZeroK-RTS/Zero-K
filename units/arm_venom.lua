@@ -78,13 +78,6 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
 
-
-    {
-      def                = [[spider2]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
   },
 
 
@@ -127,44 +120,6 @@ unitDef = {
       targetMoveError         = 0.2,
       texture1                = [[lightning]],
       thickness               = 10,
-      turret                  = true,
-      weaponType              = [[LightningCannon]],
-      weaponVelocity          = 450,
-    },
-
-
-    spider2 = {
-      name                    = [[lazer]],
-      areaOfEffect            = 10,
-      beamWeapon              = true,
-      collideFriendly         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 6,
-        planes  = 6,
-        subs    = 0.3,
-      },
-
-      duration                = 0.0025,
-      energypershot           = 0,
-      explosionGenerator      = [[custom:DEFAULT]],
-      heightMod               = 1,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      intensity               = 0,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
-      noradar                 = [[1]],
-      noSelfDamage            = true,
-      range                   = 440,
-      reloadtime              = 2.5,
-      renderType              = 7,
-      rgbColor                = [[1 1 1]],
-      targetMoveError         = 0.2,
-      thickness               = 0,
       turret                  = true,
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 450,

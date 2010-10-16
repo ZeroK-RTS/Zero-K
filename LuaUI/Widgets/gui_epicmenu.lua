@@ -1627,7 +1627,7 @@ function widget:Initialize()
 	-- Set default positions of windows on first run
 	if not settings.pos_x then
 		settings.pos_x = scrW/3
-		settings.pos_y = scrH
+		settings.pos_y = scrH*0.5
 		settings.sub_pos_x = scrW/2
 		settings.sub_pos_y = scrH/2
 		settings.vol_x = scrW/3

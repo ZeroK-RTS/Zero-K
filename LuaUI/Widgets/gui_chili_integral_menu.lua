@@ -15,7 +15,7 @@ function widget:GetInfo()
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
     layer     = math.huge,
-    enabled   = false,
+    enabled   = true,
 	handler   = true,
   }
 end
@@ -716,11 +716,11 @@ function widget:Initialize()
 		name   = 'integralwindow';
 		--padding = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
-		width = "54%";
-		height = "29%";
+		width = 600; -- chilli selections is not resizable
+		height = "20%";
 		--temporary position fudges so it looks right on my screen w/o docking
-		x = '23%';
-		y = '72%';
+		x = 300; -- chilli selections is not resizable
+		y = '80%'; 
 		dockable = true;
 		draggable = false,
 		resizable = false,

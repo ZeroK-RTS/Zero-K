@@ -81,7 +81,7 @@ unitDef = {
 
     DEAD2 = {
       description      = [[Debris - Metal Extractor]],
-      blocking         = true,
+      blocking         = false,
       category         = [[heaps]],
       damage           = 400,
       energy           = 0,
