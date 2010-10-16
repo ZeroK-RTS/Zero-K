@@ -40,7 +40,7 @@ graceMaxPlayers		 = 4
 
 queenTime            = 50*60    -- time at which the queen appears, seconds
 miniQueenTime		= {}		--times at which miniqueens are spawned (multiplier of queentime)
-endMiniQueenWaves	= 7		--waves per miniqueen in PvP endgame
+endMiniQueenWaves	= 6		--waves per miniqueen in PvP endgame
 
 burrowQueenTime		= 150		--how much killing a burrow shaves off the queen timer, seconds (divided by malus)
 burrowWaveBonus		= 0.2		--size of temporary bonus to add to next wave (divided by playercount)
@@ -208,7 +208,7 @@ difficulties = {
 	queenSpawnMult   = 5,
 	queenTime		 = 40*60,
 	miniQueenTime	 = {0.37, 0.75},
-	endMiniQueenWaves	= 6,
+	endMiniQueenWaves	= 5,
   },
 }
 

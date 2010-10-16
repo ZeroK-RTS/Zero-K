@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[chickenwurm]],
   name                = [[Wurm]],
-  description         = [[Burrowing Flamer]],
+  description         = [[Burrowing Flamer (Assault)]],
   acceleration        = 0.36,
   bmcode              = [[1]],
   brakeRate           = 0.2,
@@ -83,7 +83,7 @@ unitDef = {
 
     NAPALM = {
       name                    = [[NAPALM]],
-      areaOfEffect            = 128,
+      areaOfEffect            = 64,
       burst                   = 6,
       burstrate               = 0.01,
       craterBoost             = 0,

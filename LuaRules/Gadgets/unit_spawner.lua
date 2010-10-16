@@ -867,7 +867,7 @@ function gadget:GameFrame(n)
 			local xp = (malus or 1) - 1
 			Spring.SetUnitExperience(queenID, xp)
 		else
-			chickenSpawnRate = chickenSpawnRate/2
+			--chickenSpawnRate = chickenSpawnRate/2
 			for i=1,playerCount do SpawnMiniQueen() end
 		end
 		endgame = true
