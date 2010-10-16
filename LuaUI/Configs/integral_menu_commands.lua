@@ -14,7 +14,7 @@ local CMD_UNIT_AI = 36214
 local CMD_AREA_MEX = 10100
 local CMD_CLOAK_SHIELD = 32101
 
--- the number is the order
+--number is the order
 local factories = {
 	factorycloak = 1,
 	factoryshield = 2,
@@ -66,8 +66,18 @@ local defense = {
 	screamer = 13,
 	cortl = 14,
 	armamd = 15,
+	cormine1 = 16,
 }
 
+local super = {
+	missilesilo = 1,
+	corbhmth = 2,
+	armbrtha = 3,
+	corsilo = 4,
+	mahlazer = 5,
+}
+
+--number doesn't mean anything
 local common_commands = {
 	[CMD.STOP]=1, [CMD.GUARD]=1, [CMD.ATTACK]=1, [CMD.FIGHT]=1,
 	[CMD.WAIT]=2, [CMD.PATROL]=2, [CMD.MOVE]=2, 
@@ -85,14 +95,10 @@ local states_commands = {
 	[CMD.AISELECT] = 3, 
 }
 
-local factory_commands = {
-}
-
-local econaux_commands = {
-}
-
-local defense_commands = {
-}
+local factory_commands = {}
+local econaux_commands = {}
+local defense_commands = {}
+local super_commands = {}
 
 local function CopyBuildArray(source, target)
 	for name, value in pairs(source) do
@@ -107,7 +113,7 @@ CopyBuildArray(factories, factory_commands)
 CopyBuildArray(econ, econaux_commands)
 CopyBuildArray(aux, econaux_commands)
 CopyBuildArray(defense, defense_commands)
-
+CopyBuildArray(super, super_commands)
 
 -- Command overrides. State commands by default expect array of textures, one for each state.
 -- You can specify texture, text,tooltip, color
@@ -146,4 +152,4 @@ local overrides = {
 	[CMD_RETREAT] = { texture = {'LuaUi/Images/commands/states/retreat_off.png', 'LuaUi/Images/commands/states/retreat_30.png', 'LuaUi/Images/commands/states/retreat_60.png', 'LuaUi/Images/commands/states/retreat_90.png'}, text=''},
 }
 
-return common_commands, states_commands, factory_commands, econaux_commands, defense_commands, overrides
+return common_commands, states_commands, factory_commands, econaux_commands, defense_commands, super_commands, overrides

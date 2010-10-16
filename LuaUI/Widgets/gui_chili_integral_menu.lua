@@ -10,7 +10,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.2 Integral Command Menu",
+    desc      = "v0.21 Integral Command Menu",
     author    = "Licho, KingRaptor",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -44,7 +44,7 @@ local spGetFullBuildQueue = Spring.GetFullBuildQueue
 local CMD_PAGES = 60
 local CMD_MORPH = 31210
 
-local common_commands, states_commands, factory_commands, econaux_commands, defense_commands, overrides = include("Configs/integral_menu_commands.lua")
+local common_commands, states_commands, factory_commands, econaux_commands, defense_commands, super_commands, overrides = include("Configs/integral_menu_commands.lua")
 
 local MAX_COLUMNS = 10
 local MAX_STATE_ROWS = 5
@@ -96,11 +96,11 @@ local screen0
 local window		--main window (invisible)
 local fakewindow	--visible ScrollPanel
 local menuTabRow	--parent row of tabs
-local commands_main	--parent column of command buttons
-local states_main	--parent row of state buttons
-local sp_commands = {}	--buttons
-local sp_states = {}	--buttons
 local menuTabs = {}		--buttons
+local commands_main	--parent column of command buttons
+local sp_commands = {}	--buttons
+local states_main	--parent row of state buttons
+local sp_states = {}	--buttons
 local buildRow	--row of build queue buttons
 local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
 
@@ -285,18 +285,22 @@ local n_common = {}
 local n_factories = {}
 local n_econaux = {}
 local n_defense = {}
+local n_super = {}
 local n_units = {}
 local n_states = {}
 
+--shortcuts
 local menuChoices = {
-	[1] = { array = n_common, name = "General" },
+	[1] = { array = n_common, name = "Commands" },
 	[2] = { array = n_factories, name = "Factories" },
 	[3] = { array = n_econaux, name = "Econ/Aux" },
 	[4] = { array = n_defense, name = "Defense" },
-	[5] = { array = n_units, name = "Units" },
+	[5] = { array = n_super, name = "Super" },
+	[6] = { array = n_units, name = "Units" },
 }
 local menuChoice = 1
 
+--sorts commands into categories
 local function ProcessCommand(cmd) 
 	if not cmd.hidden and cmd.id ~= CMD_PAGES then 
 		--- state icons 
@@ -310,6 +314,8 @@ local function ProcessCommand(cmd)
 			n_econaux[#n_econaux+1] = cmd
 		elseif defense_commands[cmd.id] then
 			n_defense[#n_defense+1] = cmd
+		elseif super_commands[cmd.id] then
+			n_super[#n_super+1] = cmd
 		elseif UnitDefs[-(cmd.id)] then
 			n_units[#n_units+1] = cmd
 		else
@@ -387,30 +393,56 @@ local function ManageStateIcons()
 	end
 end
 
-local function BuildRowButtonFunc(num, cmdid)
-	local _,_,left,_,right = Spring.GetMouseState()
+--this is supposed to be what clicking on a build queue button does - broken ATM
+local function BuildRowButtonFunc(num, cmdid, left, right)
+	buildQueue = spGetFullBuildQueue(selectedFac)
 	local alt,ctrl,meta,shift = Spring.GetModKeyState()
-	local order
+	local order = CMD.INSERT
+	local pos = 1
+	local numInput = 1	--number of times to send the order
 	
 	local function BooleanMult(int, bool)
 		if bool then return int
 		else return 0 end
 	end
 	
-	local options = BooleanMult(CMD.OPT_SHIFT, shift) + BooleanMult(CMD.OPT_ALT, alt) + BooleanMult(CMD.OPT_CTRL, ctrl) + BooleanMult(CMD.OPT_META, meta)
+	--Spring.Echo(CMD.OPT_META) = 4
+	--Spring.Echo(CMD.OPT_RIGHT) = 16
+	--Spring.Echo(CMD.OPT_SHIFT) = 32
+	--Spring.Echo(CMD.OPT_CTRL) = 64
+	--Spring.Echo(CMD.OPT_ALT) = 128
 	
-	if left then order = CMD.INSERT
-	--elseif right then order = CMD.REMOVE
-	else return end	
+	--it's not using the options, even though it's receiving them correctly
+	if shift then numInput = numInput * 5 end
+	if ctrl then numInput = numInput * 20 end
+	
+	--local options = BooleanMult(CMD.OPT_SHIFT, shift) + BooleanMult(CMD.OPT_ALT, alt) + BooleanMult(CMD.OPT_CTRL, ctrl) + BooleanMult(CMD.OPT_META, meta) + BooleanMult(CMD.OPT_RIGHT, right)
+	--Spring.Echo(options)
+	
+	--insertion position is by unit rather than batch, so we need to add up all the units in front of us to get the queue
+	for i=1,num-1 do
+		for _,units in pairs(buildQueue[i]) do
+			pos = pos + units
+		end
+	end
+	
 	--Spring.Echo(cmdid)
-	Spring.GiveOrderToUnit(selectedFac, order, {num, cmdid, options}, {"alt", "control"})		--command ID invalid for some daft reason
+	if not right then
+		for i = 1, numInput do
+			Spring.GiveOrderToUnit(selectedFac, order, {pos, cmdid, 0 }, {"alt", "ctrl"})
+		end
+	else
+		--for i = 1, numInput do
+		--	Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {cmdid}, {"alt", "ctrl"})
+		--end
+	end
 end
 
 --uses its own function for more fine control
 local function ManageBuildRow()
 	--if (menuChoice ~= 5) or (not buildRow_visible) or (not selectedFac) then return end
 	local overrun = false
-	buildQueue = spGetFullBuildQueue(selectedFac, MAX_COLUMNS + 1)
+	buildQueue = spGetFullBuildQueue(selectedFac)
 	RemoveChildren(buildRow)
 	if buildQueue[MAX_COLUMNS + 1] then overrun = true end
 	
@@ -425,7 +457,9 @@ local function ManageBuildRow()
 				break
 			end
 			buildRowButtons[i].cmdid = -udid
-			if count > 1 then caption = tostring(count)
+			if overrun and i == MAX_COLUMNS then
+				caption = tostring(#buildQueue - MAX_COLUMNS + 1)
+			elseif count > 1 then caption = tostring(count)
 			else caption = '' end
 			buttonArray.button = Button:New{
 				parent = buildRow;
@@ -434,14 +468,26 @@ local function ManageBuildRow()
 				width = tostring(100/MAX_COLUMNS).."%",
 				height = "100%",
 				--caption = '',
-				--OnClick = {	function () BuildRowButtonFunc(i, buildRowButtons[i].cmdid) end },
+				OnMouseDown = {	function () 
+					local _,_,left,_,right = Spring.GetMouseState()
+					BuildRowButtonFunc(i, buildRowButtons[i].cmdid, left, right)
+					end},
 				padding = {1,1,1,1},
 				keepAspect = true,
 			}
 			if overrun and i == MAX_COLUMNS then buttonArray.button.caption = '...' end
 			buttonArray.button.backgroundColor[4] = 0.3
+			if not (overrun and i == MAX_COLUMNS) then
+				buttonArray.image = Image:New {
+					parent = buttonArray.button,
+					width="100%";
+					height="90%";
+					y="6%";
+					file = '#'..udid,
+					file2 = WG.GetBuildIconFrame(UnitDefs[udid]),
+				}
 			buttonArray.label = Label:New {
-				parent = buttonArray.button,
+				parent = buttonArray.image,
 				width="100%";
 				height="100%";
 				autosize=false;
@@ -453,15 +499,6 @@ local function ManageBuildRow()
 				fontSize = 16;
 				fontShadow = true;
 			}
-			if not (overrun and i == MAX_COLUMNS) then
-				buttonArray.image = Image:New {
-					parent = buttonArray.button,
-					width="100%";
-					height="90%";
-					y="6%";
-					file = '#'..udid,
-					file2 = WG.GetBuildIconFrame(UnitDefs[udid]),
-				}
 			end
 		end
 	end
@@ -482,7 +519,7 @@ local function ManageCommandIcons(sourceArray)
 	for i=1, 3 do
 		UpdateContainer(sp_commands[i], commandRows[i], MAX_COLUMNS)
 	end
-	if menuChoice == 5 and #commandRows[3] == 0 and selectedFac then
+	if menuChoice == 6 and #commandRows[3] == 0 and selectedFac then
 		if not buildRow_visible then
 			commands_main:AddChild(buildRow)
 			buildRow_visible = true
@@ -513,6 +550,7 @@ local function Update(buttonpush)
 	n_factories = {}
 	n_econaux = {}
 	n_defense = {}
+	n_super = {}
 	n_units = {}
 	n_states = {}
 	
@@ -525,7 +563,8 @@ local function Update(buttonpush)
 	menuChoices[2].array = n_factories
 	menuChoices[3].array = n_econaux
 	menuChoices[4].array = n_defense
-	menuChoices[5].array = n_units
+	menuChoices[5].array = n_super
+	menuChoices[6].array = n_units
 
 	--[[
 	local function Sort(a, b, array)
@@ -536,6 +575,8 @@ local function Update(buttonpush)
 	table.sort(n_econaux, Sort(a,b, econaux_commands))
 	table.sort(n_defense, Sort(a,b, defense_commands))
 	]]--
+	
+	--sorting isn't strictly needed, it uses the same order as listed in buildoptions
 	table.sort(n_factories, function(a,b) return factory_commands[a.id] < factory_commands[b.id] end )
 	table.sort(n_econaux, function(a,b) return econaux_commands[a.id] < econaux_commands[b.id] end)
 	table.sort(n_defense, function(a,b) return defense_commands[a.id] < defense_commands[b.id] end)
@@ -547,9 +588,9 @@ end
 local function MakeMenuTab(i, alpha)
 	local button = Button:New{
 		parent = menuTabRow;
-		x = tostring((20*i)-20).."%",
+		x = tostring((16*i)-16).."%",
 		y = 0,
-		width = "20%",
+		width = "16%",
 		height = "100%",
 		caption = menuChoices[i].name,
 		OnClick = {
@@ -569,7 +610,7 @@ end
 function ColorTabs(arg)
 	arg = arg or menuChoice
 	RemoveChildren(menuTabRow)
-	for i=1,5 do
+	for i=1,6 do
 		if i ~= arg then menuTabs[i] = MakeMenuTab(i, 0.4) end
 	end
 	menuTabs[arg] = MakeMenuTab(arg, 1)
@@ -578,9 +619,9 @@ end
 local function SmartTabSelect()
 	Update()
 	if #n_units > 0 and #n_econaux == 0 then
-		menuChoice = 5	--selected factory, jump to units
-		ColorTabs(5)
-	elseif #n_units == 0 and menuChoice == 5 then
+		menuChoice = 6	--selected factory, jump to units
+		ColorTabs(6)
+	elseif #n_units == 0 and menuChoice == 6 then
 		menuChoice = 1	--selected non-fac and in units menu, jump to common
 		ColorTabs(1)
 	elseif #n_factories + #n_econaux + #n_defense + #n_units == 0 then
@@ -750,14 +791,14 @@ function widget:Initialize()
 		resizeItems = true;
 		orientation   = "horizontal";
 		height = "15%";
-		width = "80%";
+		width = "100%";
 		x = 0;
 		y = 0;
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
 	
-	for i=1,5 do
+	for i=1,6 do
 		menuTabs[i] = MakeMenuTab(i, 1)
 	end
 	ColorTabs()
@@ -905,6 +946,7 @@ function widget:SelectionChanged(newSelection)
 		end
 	end
 	selectedFac = nil
+	SmartTabSelect()
 end
 
 function widget:Shutdown()
