@@ -3,7 +3,7 @@ local unitArray = {}
 
 -- various weapons on a unit can deal different damages
 local weapons = {
-	armslowllt_slowlaser = {captureDamage = 20, scaleDamage = false},
+	capturecar_captureray = {captureDamage = 20, scaleDamage = false},
 }
 
 -- capture damage	- how much damage capture damage is dealt to the unit per hit
@@ -11,7 +11,7 @@ local weapons = {
 
 -- all units with capture weapons must have a unit entry
 local units = {
-	armslowllt = { captureQuota = 1250, unitLimit = false},
+	capturecar = { captureQuota = 280, unitLimit = false},
 }
 -- captureQuota		- the quota of units that it can control. False for infinite
 -- unitLimit		- the max number of units it can control. False for infinite

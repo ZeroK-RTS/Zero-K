@@ -214,7 +214,7 @@ local function DrawSearchlights()
   
   for _, unitID in pairs(visibleUnits) do
     local _, _, _, _, buildProgress = GetUnitHealth(unitID)
-    local unitRadius = GetUnitRadius(unitID)
+    local unitRadius = GetUnitRadius(unitID) or 0
     local px, py, pz = GetUnitPosition(unitID)
     py = py + searchlightHeightOffset * unitRadius
     local groundy = math.max(GetGroundHeight(px, pz), 0)

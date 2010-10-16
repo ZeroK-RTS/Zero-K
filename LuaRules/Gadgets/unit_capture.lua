@@ -173,7 +173,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- add stats that the unit requires for this gadget
 	if not capturedUnits[unitID] then
 		capturedUnits[unitID] = {
-			captureHealth = UnitDefs[unitDefID].metalCost,
+			captureHealth = UnitDefs[unitDefID].buildTime,
 			originTeam = unitTeam,
 			originAllyTeam = Spring.GetUnitAllyTeam(unitID),
 			aTeams = {},

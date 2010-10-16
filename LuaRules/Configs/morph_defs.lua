@@ -152,7 +152,8 @@ local morphDefs = {
       time = 25,
     }, 
 
-	-- radar	
+	-- radar
+--[[
 	corrad = {
       into = 'corvrad',
       time = 12,
@@ -161,7 +162,8 @@ local morphDefs = {
       into = 'corrad',
       time = 12,
     },	
-  
+--]]
+
   --// construction units
 	
   --// combat units
@@ -398,13 +400,6 @@ local morphDefs = {
     },
   },
 
-  corpt = {
-    {
-      into = 'coresupp',
-      time = 10,
-      rank = 3,   
-    },
-  },
   coresupp = {
     {
       into = 'corroy',
@@ -421,6 +416,18 @@ local morphDefs = {
     {
       into = 'corcrus',
       time = 20,
+      rank = 3,   
+    },
+  },
+  corcrus = {
+    {
+      into = 'armcarry',
+      time = 30,
+      rank = 3,   
+    },
+	{
+      into = 'corbats',
+      time = 30,
       rank = 3,   
     },
   },
