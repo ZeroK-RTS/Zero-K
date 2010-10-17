@@ -475,7 +475,10 @@ local function ManageBuildRow()
 				padding = {1,1,1,1},
 				keepAspect = true,
 			}
-			if overrun and i == MAX_COLUMNS then buttonArray.button.caption = '...' end
+			if overrun and i == MAX_COLUMNS then
+				buttonArray.button.caption = '...'
+				buttonArray.button.OnMouseDown = nil
+			end
 			buttonArray.button.backgroundColor[4] = 0.3
 			if not (overrun and i == MAX_COLUMNS) then
 				buttonArray.image = Image:New {
