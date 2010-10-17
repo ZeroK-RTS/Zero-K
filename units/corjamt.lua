@@ -1,49 +1,54 @@
 unitDef = {
-  unitname          = [[corjamt]],
-  name              = [[Aegis]],
-  description       = [[Light Shield Device]],
-  acceleration      = 0,
-  activateWhenBuilt = true,
-  bmcode            = [[0]],
-  brakeRate         = 0,
-  buildAngle        = 9821,
-  buildCostEnergy   = 480,
-  buildCostMetal    = 480,
-  builder           = false,
-  buildPic          = [[CORJAMT.png]],
-  buildTime         = 480,
-  canAttack         = false,
-  category          = [[SINK UNARMED]],
-  corpse            = [[DEAD]],
-  energyUse         = 1.5,
-  explodeAs         = [[BIG_UNITEX]],
-  footprintX        = 2,
-  footprintZ        = 2,
-  iconType          = [[defenseshield]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
-  levelGround       = false,
-  mass              = 240,
-  maxDamage         = 900,
-  maxSlope          = 36,
-  maxVelocity       = 0,
-  maxWaterDepth     = 0,
-  minCloakDistance  = 150,
-  noAutoFire        = false,
-  objectName        = [[m-8.s3o]],
-  onoffable         = true,
-  script            = [[corjamt.lua]],
-  seismicSignature  = 4,
-  selfDestructAs    = [[BIG_UNITEX]],
-  side              = [[CORE]],
-  sightDistance     = 200,
-  smoothAnim        = true,
-  TEDClass          = [[SPECIAL]],
-  turnRate          = 0,
-  workerTime        = 0,
-  yardMap           = [[oooo]],
+  unitname                      = [[corjamt]],
+  name                          = [[Aegis]],
+  description                   = [[Light Shield Device]],
+  acceleration                  = 0,
+  activateWhenBuilt             = true,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 9821,
+  buildCostEnergy               = 480,
+  buildCostMetal                = 480,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[corjamt_aoplane.dds]],
+  buildPic                      = [[CORJAMT.png]],
+  buildTime                     = 480,
+  canAttack                     = false,
+  category                      = [[SINK UNARMED]],
+  corpse                        = [[DEAD]],
+  energyUse                     = 1.5,
+  explodeAs                     = [[BIG_UNITEX]],
+  footprintX                    = 2,
+  footprintZ                    = 2,
+  iconType                      = [[defenseshield]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  levelGround                   = false,
+  mass                          = 219,
+  maxDamage                     = 900,
+  maxSlope                      = 36,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  objectName                    = [[m-8.s3o]],
+  onoffable                     = true,
+  script                        = [[corjamt.lua]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[BIG_UNITEX]],
+  side                          = [[CORE]],
+  sightDistance                 = 200,
+  smoothAnim                    = true,
+  TEDClass                      = [[SPECIAL]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooo]],
 
-  weapons           = {
+  weapons                       = {
 
     {
       def         = [[COR_SHIELD_SMALL]],
@@ -53,7 +58,7 @@ unitDef = {
   },
 
 
-  weaponDefs        = {
+  weaponDefs                    = {
 
     COR_SHIELD_SMALL = {
       name                    = [[Energy Shield]],
@@ -87,7 +92,7 @@ unitDef = {
   },
 
 
-  featureDefs       = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Aegis]],
@@ -150,11 +155,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=4,
-	buildingGroundDecalSizeY=4,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[corjamt_aoplane.dds]],
 }
 
 return lowerkeys({ corjamt = unitDef })

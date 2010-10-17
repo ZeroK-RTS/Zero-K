@@ -1,41 +1,45 @@
 unitDef = {
-  unitname            = [[missiletower]],
-  name                = [[Hacksaw]],
-  description         = [[SAM Tower (Anti-Heavy)]],
-  bmcode              = [[0]],
-  buildAngle          = 8192,
-  buildCostEnergy     = 300,
-  buildCostMetal      = 300,
-  builder             = false,
-  buildPic            = [[missiletower.png]],
-  buildTime           = 300,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[FLOAT]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[missiletower]],
+  name                          = [[Hacksaw]],
+  description                   = [[SAM Tower (Anti-Heavy)]],
+  bmcode                        = [[0]],
+  buildAngle                    = 8192,
+  buildCostEnergy               = 300,
+  buildCostMetal                = 300,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 5,
+  buildingGroundDecalSizeY      = 5,
+  buildingGroundDecalType       = [[missiletower_aoplane.dds]],
+  buildPic                      = [[missiletower.png]],
+  buildTime                     = 300,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[FLOAT]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     helptext = [[The Hacksaw's twin missiles can drop even the most heavily armored bomber in one pair of hits, but take a considerable amount of time to reload, making them less than ideal against light targets.]],
   },
 
-  explodeAs           = [[SMALL_BUILDINGEX]],
-  floater             = true,
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[defenseaa]],
-  levelGround         = false,
-  mass                = 150,
-  maxDamage           = 2200,
-  maxSlope            = 18,
-  minCloakDistance    = 150,
-  noAutoFire          = false,
-  noChaseCategory     = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName          = [[missiletower.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[SMALL_BUILDINGEX]],
+  explodeAs                     = [[SMALL_BUILDINGEX]],
+  floater                       = true,
+  footprintX                    = 3,
+  footprintZ                    = 3,
+  iconType                      = [[defenseaa]],
+  levelGround                   = false,
+  mass                          = 233,
+  maxDamage                     = 2200,
+  maxSlope                      = 18,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
+  objectName                    = [[missiletower.s3o]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[SMALL_BUILDINGEX]],
 
-  sfxtypes            = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:STORMMUZZLE]],
@@ -44,14 +48,15 @@ unitDef = {
 
   },
 
-  shootme             = [[1]],
-  side                = [[CORE]],
-  sightDistance       = 660,
-  TEDClass            = [[FORT]],
-  workerTime          = 0,
-  yardMap             = [[ooooooooo]],
+  shootme                       = [[1]],
+  side                          = [[CORE]],
+  sightDistance                 = 660,
+  TEDClass                      = [[FORT]],
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[ooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[MISSILE]],
@@ -62,7 +67,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     MISSILE = {
       name                    = [[Homing Missiles]],
@@ -115,7 +120,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Hacksaw]],
@@ -177,11 +182,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=5,
-	buildingGroundDecalSizeY=5,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[missiletower_aoplane.dds]],
 }
 
 return lowerkeys({ missiletower = unitDef })

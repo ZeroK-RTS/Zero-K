@@ -1,50 +1,54 @@
 unitDef = {
-  unitname           = [[mahlazer]],
-  name               = [[Starlight]],
-  description        = [[Planetary Energy Chisel]],
-  acceleration       = 0,
-  activateWhenBuilt  = true,
-  antiweapons        = [[1]],
-  bmcode             = [[0]],
-  brakeRate          = 0,
-  buildAngle         = 32700,
-  buildCostEnergy    = 35000,
-  buildCostMetal     = 35000,
-  builder            = false,
-  buildPic           = [[mahlazer.png]],
-  buildTime          = 35000,
-  canAttack          = true,
-  canstop            = [[1]],
-  category           = [[SINK]],
-  corpse             = [[DEAD]],
+  unitname                      = [[mahlazer]],
+  name                          = [[Starlight]],
+  description                   = [[Planetary Energy Chisel]],
+  acceleration                  = 0,
+  activateWhenBuilt             = true,
+  antiweapons                   = [[1]],
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 32700,
+  buildCostEnergy               = 35000,
+  buildCostMetal                = 35000,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 11,
+  buildingGroundDecalSizeY      = 11,
+  buildingGroundDecalType       = [[mahlazer_aoplane.dds]],
+  buildPic                      = [[mahlazer.png]],
+  buildTime                     = 35000,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK]],
+  corpse                        = [[DEAD]],
 
-  customParams       = {
+  customParams                  = {
     description_fr = [[Lazer ? Charge ?liptique]],
     helptext       = [[This large scale tool is used to shape terrain for Nova's terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases.]],
     helptext_fr    = [[Le MAH Lazer est un b?timent abritant un puissant g?n?rateur de faisceau laser ?liptique, dont l'impact est param?trable. Sa puissance est telle qu'il coupe tout sur son passage, y compris les alli?s. Pensez ? pr?voir un espace d?gag? autour de lui pour ?viter que le laser ne coupe votre base en deux en d?marrant.]],
   },
 
-  defaultmissiontype = [[GUARD_NOMOVE]],
-  energyUse          = 300,
-  explodeAs          = [[ATOMIC_BLAST]],
-  footprintX         = 8,
-  footprintZ         = 8,
-  iconType           = [[mahlazer]],
-  idleAutoHeal       = 5,
-  idleTime           = 1800,
-  mass               = 17500,
-  maxDamage          = 12000,
-  maxSlope           = 18,
-  maxVelocity        = 0,
-  maxWaterDepth      = 0,
-  minCloakDistance   = 150,
-  noChaseCategory    = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName         = [[lazer.3do]],
-  onoffable          = true,
-  seismicSignature   = 4,
-  selfDestructAs     = [[ATOMIC_BLAST]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  energyUse                     = 300,
+  explodeAs                     = [[ATOMIC_BLAST]],
+  footprintX                    = 8,
+  footprintZ                    = 8,
+  iconType                      = [[mahlazer]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 2013,
+  maxDamage                     = 12000,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName                    = [[lazer.3do]],
+  onoffable                     = true,
+  seismicSignature              = 4,
+  selfDestructAs                = [[ATOMIC_BLAST]],
 
-  sfxtypes           = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:IMMA_LAUNCHIN_MAH_LAZER]],
@@ -52,15 +56,16 @@ unitDef = {
 
   },
 
-  side               = [[ARM]],
-  sightDistance      = 660,
-  smoothAnim         = true,
-  TEDClass           = [[FORT]],
-  turnRate           = 0,
-  workerTime         = 0,
-  yardMap            = [[oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
+  side                          = [[ARM]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
-  weapons            = {
+  weapons                       = {
 
     {
       def                = [[LAZER]],
@@ -78,7 +83,7 @@ unitDef = {
   },
 
 
-  weaponDefs         = {
+  weaponDefs                    = {
 
     LAZER    = {
       name                    = [[Energy Chisel]],
@@ -177,7 +182,7 @@ unitDef = {
   },
 
 
-  featureDefs        = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Starlight]],
@@ -242,11 +247,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=11,
-	buildingGroundDecalSizeY=11,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[mahlazer_aoplane.dds]],
 }
 
 return lowerkeys({ mahlazer = unitDef })

@@ -10,9 +10,13 @@ unitDef = {
   buildCostEnergy               = 70,
   buildCostMetal                = 70,
   builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
   BuildingGroundDecalDecaySpeed = 0.01,
+  buildingGroundDecalSizeX      = 4,
   BuildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
   BuildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[armsolar_aoplane.dds]],
   BuildingGroundDecalType       = [[arm_solar_ground.dds]],
   buildPic                      = [[ARMSOLAR.png]],
   buildTime                     = 70,
@@ -33,7 +37,7 @@ unitDef = {
   iconType                      = [[energy1]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 35,
+  mass                          = 104,
   maxDamage                     = 500,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -49,6 +53,7 @@ unitDef = {
   smoothAnim                    = true,
   TEDClass                      = [[ENERGY]],
   turnRate                      = 0,
+  useBuildingGroundDecal        = true,
   UseBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooooooooooooooooooooooooo]],
@@ -118,11 +123,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=4,
-	buildingGroundDecalSizeY=4,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[armsolar_aoplane.dds]],
 }
 
 return lowerkeys({ armsolar = unitDef })

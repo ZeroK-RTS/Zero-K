@@ -37,9 +37,6 @@ unitDef = {
     [[cortl]],
     [[armrectr]],
     [[armflea]],
---    [[armrock]],
---    [[corpyro]],
---    [[armsptk]],
   },
 
   buildPic            = [[ARMCSA.png]],
@@ -75,7 +72,7 @@ unitDef = {
   iconType            = [[t3builder]],
   initCloaked         = false,
   maneuverleashlength = [[1280]],
-  mass                = 250,
+  mass                = 196,
   maxDamage           = 200,
   maxSlope            = 36,
   maxVelocity         = 9.17,

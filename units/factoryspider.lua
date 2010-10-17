@@ -8,10 +8,10 @@ unitDef = {
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
   builder                       = true,
-  buildingGroundDecalDecaySpeed = 0.01,
+  buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 7,
   buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[asphalt512.dds]],
+  buildingGroundDecalType       = [[factoryspider_aoplane.dds]],
 
   buildoptions                  = {
     [[arm_spider]],
@@ -47,7 +47,7 @@ unitDef = {
   iconType                      = [[facspider]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 275,
+  mass                          = 324,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -132,11 +132,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=7,
-	buildingGroundDecalSizeY=7,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[factoryspider_aoplane.dds]],
 }
 
 return lowerkeys({ factoryspider = unitDef })

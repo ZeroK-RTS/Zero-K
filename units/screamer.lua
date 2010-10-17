@@ -1,55 +1,60 @@
 unitDef = {
-  unitname            = [[screamer]],
-  name                = [[Screamer]],
-  description         = [[Long-Range AA Missile Tower]],
-  acceleration        = 0,
-  activateWhenBuilt   = true,
-  bmcode              = [[0]],
-  brakeRate           = 0,
-  buildCostEnergy     = 2400,
-  buildCostMetal      = 2400,
-  builder             = false,
-  buildPic            = [[SCREAMER.png]],
-  buildTime           = 2400,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[SINK UNARMED]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[screamer]],
+  name                          = [[Screamer]],
+  description                   = [[Long-Range AA Missile Tower]],
+  acceleration                  = 0,
+  activateWhenBuilt             = true,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildCostEnergy               = 2400,
+  buildCostMetal                = 2400,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
+  buildingGroundDecalType       = [[screamer_aoplane.dds]],
+  buildPic                      = [[SCREAMER.png]],
+  buildTime                     = 2400,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK UNARMED]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Tourelle Lance Missile Anti-Air Longue Portée]],
     helptext       = [[The Screamer is an extremely long-ranging first strike anti-air weapon that sends a clear message to enemy aircraft - can't go here, sonny. Each shot must be stockpiled at the cost of resources, but this is well worth the price, for a quick salvo of missiles will wipe out almost any air attack without fuss.]],
     helptext_fr    = [[Leest un lance missile trcs longue portée. Ses missiles r tete chercheuse ultra rapides peuvent abattre r peu prcs nimporte quel avion d'un seul tir. L'ultime défense Anti-Air, de tous points de vue, met necessite de programmer la production de missiles Sol/Air dans son interface avant d'etre apte r faire feu.]],
   },
 
-  defaultmissiontype  = [[GUARD_NOMOVE]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[heavysam]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  mass                = 1200,
-  maxDamage           = 1570,
-  maxSlope            = 18,
-  maxVelocity         = 0,
-  maxWaterDepth       = 0,
-  minCloakDistance    = 150,
-  noAutoFire          = false,
-  objectName          = [[SCREAMER]],
-  onoffable           = false,
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  TEDClass            = [[FORT]],
-  turnRate            = 0,
-  workerTime          = 0,
-  yardMap             = [[oooooooooooooooo]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[BIG_UNITEX]],
+  footprintX                    = 4,
+  footprintZ                    = 4,
+  iconType                      = [[heavysam]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 476,
+  maxDamage                     = 1570,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  objectName                    = [[SCREAMER]],
+  onoffable                     = false,
+  seismicSignature              = 4,
+  selfDestructAs                = [[BIG_UNITEX]],
+  side                          = [[CORE]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooooooooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[ADVSAM]],
@@ -59,7 +64,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     ADVSAM = {
       name                    = [[Advanced AA Missile]],
@@ -119,7 +124,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Screamer]],
@@ -182,11 +187,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=6,
-	buildingGroundDecalSizeY=6,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[screamer_aoplane.dds]],
 }
 
 return lowerkeys({ screamer = unitDef })

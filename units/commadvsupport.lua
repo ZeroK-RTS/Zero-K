@@ -19,7 +19,7 @@ unitDef = {
   buildPic            = [[commsupport.png]],
   buildTime           = 2400,
   canAttack           = true,
-  canDGun			  = true,
+  canDGun             = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -61,7 +61,7 @@ unitDef = {
   norestrict          = [[1]],
   objectName          = [[commsupport.s3o]],
   radarDistance       = 1800,
-  script	          = [[commsupport.cob]],
+  script              = [[commsupport.cob]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
@@ -95,7 +95,8 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-	[3] = {
+
+    [3] = {
       def                = [[ELECTROLASER]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -105,7 +106,52 @@ unitDef = {
 
   weaponDefs          = {
 
-    STUNRIFLE = {
+    ELECTROLASER = {
+      name                    = [[Electrolaser]],
+      areaOfEffect            = 48,
+      beamWeapon              = true,
+      commandfire             = true,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default        = 8000,
+        commanders     = 800,
+        empresistant75 = 2000,
+        empresistant99 = 80,
+      },
+
+      duration                = 10,
+      edgeEffectiveness       = 1,
+      energypershot           = 75,
+      explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
+      fireStarter             = 150,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      intensity               = 12,
+      interceptedByShieldType = 1,
+      lineOfSight             = true,
+      noSelfDamage            = true,
+      paralyzer               = true,
+      paralyzeTime            = 10,
+      range                   = 600,
+      reloadtime              = 15,
+      renderType              = 7,
+      rgbColor                = [[0.5 0.5 1]],
+      soundStart              = [[weapon/LightningBolt]],
+      soundTrigger            = true,
+      startsmoke              = [[1]],
+      targetMoveError         = 0.3,
+      texture1                = [[lightning]],
+      thickness               = 10,
+      turret                  = true,
+      weaponType              = [[LightningCannon]],
+      weaponVelocity          = 400,
+    },
+
+
+    STUNRIFLE    = {
       name                    = [[Stun Rifle]],
       areaOfEffect            = 48,
       beamWeapon              = true,
@@ -147,50 +193,6 @@ unitDef = {
       turret                  = true,
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 450,
-    },
-
-	ELECTROLASER    = {
-      name                    = [[Electrolaser]],
-      areaOfEffect            = 48,
-      beamWeapon              = true,
-	  commandfire			  = true,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default        = 8000,
-        commanders     = 800,
-        empresistant75 = 2000,
-        empresistant99 = 80,
-      },
-
-      duration                = 10,
-	  edgeEffectiveness		  = 1,
-	  energypershot			  = 75,
-      explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
-      fireStarter             = 150,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      intensity               = 12,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
-      noSelfDamage            = true,
-      paralyzer               = true,
-      paralyzeTime            = 10,
-      range                   = 600,
-      reloadtime              = 15,
-      renderType              = 7,
-      rgbColor                = [[0.5 0.5 1]],
-      soundStart              = [[weapon/LightningBolt]],
-      soundTrigger            = true,
-      startsmoke              = [[1]],
-      targetMoveError         = 0.3,
-      texture1                = [[lightning]],
-      thickness               = 10,
-      turret                  = true,
-      weaponType              = [[LightningCannon]],
-      weaponVelocity          = 400,
     },
 
   },

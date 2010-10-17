@@ -19,7 +19,7 @@ unitDef = {
   buildPic            = [[commrecon.png]],
   buildTime           = 2400,
   canAttack           = true,
-  canDGun			  = true,
+  canDGun             = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -64,7 +64,7 @@ unitDef = {
   onoffable           = true,
   radarDistance       = 1250,
   radarDistanceJam    = 550,
-  script	          = [[commrecon.cob]],
+  script              = [[commrecon.cob]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
@@ -84,7 +84,7 @@ unitDef = {
   sightDistance       = 500,
   smoothAnim          = true,
   sonarDistance       = 300,
-  stealth			  = true,
+  stealth             = true,
   steeringmode        = [[2]],
   TEDClass            = [[COMMANDER]],
   terraformSpeed      = 600,
@@ -100,10 +100,12 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-	[3] = {
+
+    [3] = {
       def                = [[SLOWBOMB]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
+
 
     [4] = {
       def                = [[LASER]],
@@ -207,11 +209,12 @@ unitDef = {
       weaponVelocity          = 900,
     },
 
-    SLOWBOMB = {
+
+    SLOWBOMB  = {
       name                    = [[Disruptor Bomb]],
-	  accuracy				  = 256,
+      accuracy                = 256,
       areaOfEffect            = 512,
-	  commandFire			  = true,
+      commandFire             = true,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -220,15 +223,15 @@ unitDef = {
         planes  = 300,
         subs    = 15,
       },
-	  
-	  energypershot           = 20,
+
+      energypershot           = 20,
       explosionGenerator      = [[custom:riotball]],
       fireStarter             = 100,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 2,
       lineOfSight             = true,
-	  metalpershot			  = 10,
+      metalpershot            = 10,
       model                   = [[bomb]],
       noSelfDamage            = true,
       range                   = 450,
@@ -240,11 +243,10 @@ unitDef = {
       soundStart              = [[weapon/cannon/cannon_fire3]],
       startsmoke              = [[1]],
       turret                  = true,
-	  --trajectoryHeight		  = 0.15,
       weaponType              = [[Cannon]],
       weaponVelocity          = 350,
     },
-	
+
   },
 
 

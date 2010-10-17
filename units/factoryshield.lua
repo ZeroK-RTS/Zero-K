@@ -8,10 +8,10 @@ unitDef = {
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
   builder                       = true,
-  buildingGroundDecalDecaySpeed = 0.01,
+  buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 7,
   buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[asphalt512.dds]],
+  buildingGroundDecalType       = [[factoryshield_aoplane.dds]],
 
   buildoptions                  = {
     [[cornecro]],
@@ -54,7 +54,7 @@ unitDef = {
   iconType                      = [[facwalker]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 275,
+  mass                          = 324,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -140,11 +140,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=7,
-	buildingGroundDecalSizeY=7,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[factoryshield_aoplane.dds]],
 }
 
 return lowerkeys({ factoryshield = unitDef })

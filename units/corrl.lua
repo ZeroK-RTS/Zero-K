@@ -1,48 +1,52 @@
 unitDef = {
-  unitname            = [[corrl]],
-  name                = [[Defender]],
-  description         = [[Light Missile Tower]],
-  acceleration        = 0,
-  bmcode              = [[0]],
-  brakeRate           = 0,
-  buildCostEnergy     = 80,
-  buildCostMetal      = 80,
-  builder             = false,
-  buildPic            = [[CORRL.png]],
-  buildTime           = 80,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[FLOAT]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[corrl]],
+  name                          = [[Defender]],
+  description                   = [[Light Missile Tower]],
+  acceleration                  = 0,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildCostEnergy               = 80,
+  buildCostMetal                = 80,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[corrl_aoplane.dds]],
+  buildPic                      = [[CORRL.png]],
+  buildTime                     = 80,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[FLOAT]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Tourelle Lance-Missile Légcre]],
     helptext       = [[The Defender is a light multi-purpose missile tower. It is good for sniping units from a distance, providing some degree of anti-air protection, and skirmishing enemy LLTs from outside their range. However, it breaks when you sneeze on it.]],
     helptext_fr    = [[Le Defender est une tourelle légcre mais r plus longue portée que la LLT, il peut de plus attaquer les unité aeriennes avec précision grâce r ses roquettes r tete chercheuse. C'est la meilleure parade contre les bombes rampantes. Son blindage et son temps de rechargement la rendent rapidement obsolcte.]],
   },
 
-  defaultmissiontype  = [[GUARD_NOMOVE]],
-  explodeAs           = [[BIG_UNITEX]],
-  floater             = true,
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[defenseskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  levelGround         = false,
-  mass                = 40,
-  maxDamage           = 300,
-  maxSlope            = 18,
-  maxVelocity         = 0,
-  minCloakDistance    = 150,
-  noAutoFire          = false,
-  noChaseCategory     = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName          = [[lmt2.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[BIG_UNITEX]],
+  floater                       = true,
+  footprintX                    = 2,
+  footprintZ                    = 2,
+  iconType                      = [[defenseskirm]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  levelGround                   = false,
+  mass                          = 94,
+  maxDamage                     = 300,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
+  objectName                    = [[lmt2.s3o]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:PULVMUZZLE]],
@@ -51,15 +55,16 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  TEDClass            = [[METAL]],
-  turnRate            = 0,
-  workerTime          = 0,
-  yardMap             = [[ooooooooo]],
+  side                          = [[CORE]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  TEDClass                      = [[METAL]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[ooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[ARMRL_MISSILE]],
@@ -70,7 +75,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     ARMRL_MISSILE = {
       name                    = [[Homing Missiles]],
@@ -122,7 +127,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Pulverizer]],
@@ -187,11 +192,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=4,
-	buildingGroundDecalSizeY=4,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[corrl_aoplane.dds]],
 }
 
 return lowerkeys({ corrl = unitDef })

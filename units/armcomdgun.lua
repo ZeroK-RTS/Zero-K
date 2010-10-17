@@ -52,14 +52,16 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
   objectName          = [[noruas]],
-  script			  = [[noruas.cob]],
+  script              = [[noruas.cob]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
+
     explosiongenerators = {
       [[custom:COMGATE]],
     },
+
   },
 
   showNanoSpray       = false,
@@ -73,7 +75,6 @@ unitDef = {
   terraformSpeed      = 600,
   turnRate            = 1148,
   upright             = true,
-  --workerTime          = 12,
 
   weapons             = {
 
@@ -83,9 +84,11 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
+
     [3] = {
       def = [[DISINTEGRATOR]],
     },
+
   },
 
 
@@ -172,6 +175,7 @@ unitDef = {
     },
 
   },
+
 
   featureDefs         = {
 

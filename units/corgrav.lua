@@ -1,52 +1,57 @@
 unitDef = {
-  unitname            = [[corgrav]],
-  name                = [[Newton]],
-  description         = [[Gravity Turret - On to Repulse, Off to Attract]],
-  activateWhenBuilt   = true,
-  bmcode              = [[0]],
-  buildCostEnergy     = 200,
-  buildCostMetal      = 200,
-  builder             = false,
-  buildPic            = [[corgrav.png]],
-  buildTime           = 200,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[SINK]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[corgrav]],
+  name                          = [[Newton]],
+  description                   = [[Gravity Turret - On to Repulse, Off to Attract]],
+  activateWhenBuilt             = true,
+  bmcode                        = [[0]],
+  buildCostEnergy               = 200,
+  buildCostMetal                = 200,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[corgrav_aoplane.dds]],
+  buildPic                      = [[corgrav.png]],
+  buildTime                     = 200,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Tourrelle r Gravité Répulsive/Attractive]],
     helptext       = [[The Newton is armed with an experimental graviton projector. This weapon does virtually no damage directly, but can push units toward or away from the Newton. You can use it on your own units as well, but beware of friendly fire.]],
     helptext_fr    = [[Le Newton est un équipement toute dernicre génération utilisant des flux de gravitron densifiés pour repousser ou attirer ses cibles. Régler par défaut sur repousser, il empechera les ennemis de grimper sur une collinne fortifiée par exemple. Il peut également attirer dans l'eau des unités non-amphibies.]],
   },
 
-  defaultmissiontype  = [[GUARD_NOMOVE]],
-  explodeAs           = [[MEDIUM_BUILDINGEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  healtime            = [[-1]],
-  iconType            = [[defenseriot]],
-  levelGround         = false,
-  mass                = 100,
-  maxDamage           = 2000,
-  maxSlope            = 36,
-  maxWaterDepth       = 0,
-  minCloakDistance    = 150,
-  noAutoFire          = false,
-  noChaseCategory     = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName          = [[corgrav]],
-  onoffable           = true,
-  seismicSignature    = 4,
-  selfDestructAs      = [[MEDIUM_BUILDINGEX]],
-  shootme             = [[1]],
-  side                = [[CORE]],
-  sightDistance       = 473,
-  TEDClass            = [[FORT]],
-  workerTime          = 0,
-  yardMap             = [[oooo]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[MEDIUM_BUILDINGEX]],
+  footprintX                    = 2,
+  footprintZ                    = 2,
+  healtime                      = [[-1]],
+  iconType                      = [[defenseriot]],
+  levelGround                   = false,
+  mass                          = 208,
+  maxDamage                     = 2000,
+  maxSlope                      = 36,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
+  objectName                    = [[corgrav]],
+  onoffable                     = true,
+  seismicSignature              = 4,
+  selfDestructAs                = [[MEDIUM_BUILDINGEX]],
+  shootme                       = [[1]],
+  side                          = [[CORE]],
+  sightDistance                 = 473,
+  TEDClass                      = [[FORT]],
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[GRAVITY_POS]],
@@ -64,7 +69,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     GRAVITY_NEG = {
       name                    = [[Attractive Gravity]],
@@ -156,7 +161,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Newton]],
@@ -218,11 +223,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=4,
-	buildingGroundDecalSizeY=4,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[corgrav_aoplane.dds]],
 }
 
 return lowerkeys({ corgrav = unitDef })

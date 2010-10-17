@@ -1,45 +1,49 @@
 unitDef = {
-  unitname            = [[armartic]],
-  name                = [[Faraday]],
-  description         = [[EMP Weapon]],
-  buildCostEnergy     = 170,
-  buildCostMetal      = 170,
-  builder             = false,
-  buildPic            = [[armartic.png]],
-  buildTime           = 170,
-  canAttack           = true,
-  canstop             = true,
-  category            = [[SINK]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[armartic]],
+  name                          = [[Faraday]],
+  description                   = [[EMP Weapon]],
+  buildCostEnergy               = 170,
+  buildCostMetal                = 170,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[armartic_aoplane.dds]],
+  buildPic                      = [[armartic.png]],
+  buildTime                     = 170,
+  canAttack                     = true,
+  canstop                       = true,
+  category                      = [[SINK]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Tourelle EMP]],
     helptext       = [[The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed, it has additional health. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy.]],
     helptext_fr    = [[le Faraday est une redoutable tour r canon EMP. Sa zone d'effet et sa puissance de feu lui permettent de venir r bout de nombreux ennemis massés, laissant d'autre tirs les achever. Une fois repliée, elle gagne en blindage. Attention cependant r ne pas paralyser ses propres unités avec la zone d'impact EMP.]],
   },
 
-  damageModifier      = 0.25,
-  designation         = [[AM-TIC]],
-  digger              = [[1]],
-  explodeAs           = [[MEDIUM_BUILDINGEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[defensespecial]],
-  immunetoparalyzer   = true,
-  levelGround         = false,
-  mass                = 85,
-  maxDamage           = 1000,
-  maxSlope            = 36,
-  maxWaterDepth       = 0,
-  minCloakDistance    = 150,
-  noAutoFire          = false,
-  noChaseCategory     = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName          = [[ARMARTIC]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[MEDIUM_BUILDINGEX]],
+  damageModifier                = 0.25,
+  designation                   = [[AM-TIC]],
+  digger                        = [[1]],
+  explodeAs                     = [[MEDIUM_BUILDINGEX]],
+  footprintX                    = 2,
+  footprintZ                    = 2,
+  iconType                      = [[defensespecial]],
+  immunetoparalyzer             = true,
+  levelGround                   = false,
+  mass                          = 159,
+  maxDamage                     = 1000,
+  maxSlope                      = 36,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName                    = [[ARMARTIC]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[MEDIUM_BUILDINGEX]],
 
-  sfxtypes            = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:YELLOW_LIGHTNING_MUZZLE]],
@@ -48,15 +52,16 @@ unitDef = {
 
   },
 
-  shootme             = [[1]],
-  side                = [[ARM]],
-  sightDistance       = 484,
-  TEDClass            = [[FORT]],
-  threed              = [[1]],
-  version             = [[3.1]],
-  yardMap             = [[ooooooooo]],
+  shootme                       = [[1]],
+  side                          = [[ARM]],
+  sightDistance                 = 484,
+  TEDClass                      = [[FORT]],
+  threed                        = [[1]],
+  useBuildingGroundDecal        = true,
+  version                       = [[3.1]],
+  yardMap                       = [[ooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[arm_det_weapon2]],
@@ -74,7 +79,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     arm_det_weapon  = {
       name                    = [[EMP]],
@@ -160,7 +165,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Faraday]],
@@ -220,11 +225,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=4,
-	buildingGroundDecalSizeY=4,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[armartic_aoplane.dds]],
 }
 
 return lowerkeys({ armartic = unitDef })

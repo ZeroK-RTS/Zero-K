@@ -19,7 +19,7 @@ unitDef = {
   buildPic            = [[armcom.png]],
   buildTime           = 2400,
   canAttack           = true,
-  canDGun			  = true,
+  canDGun             = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -60,7 +60,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
   objectName          = [[ARMCOM]],
-  script	          = [[armcom.cob]],
+  script              = [[armcom.cob]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
@@ -92,10 +92,12 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-	[3] = {
+
+    [3] = {
       def                = [[DISINTEGRATOR]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
+
 
     [4] = {
       def                = [[LASER]],
@@ -119,8 +121,8 @@ unitDef = {
       craterMult              = 6,
 
       damage                  = {
-       default     = 999,
-       commanders  = 1,
+        default    = 999,
+        commanders = 1,
       },
 
       energypershot           = 150,

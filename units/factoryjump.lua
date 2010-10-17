@@ -8,10 +8,10 @@ unitDef = {
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
   builder                       = true,
-  buildingGroundDecalDecaySpeed = 0.01,
+  buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 8,
   buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[asphalt512c.dds]],
+  buildingGroundDecalType       = [[factoryjump_aoplane.dds]],
 
   buildoptions                  = {
     [[corfast]],
@@ -50,7 +50,7 @@ unitDef = {
   iconType                      = [[facjumpjet]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 275,
+  mass                          = 324,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -136,11 +136,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=8,
-	buildingGroundDecalSizeY=7,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[factoryjump_aoplane.dds]],
 }
 
 return lowerkeys({ factoryjump = unitDef })

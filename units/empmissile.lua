@@ -1,49 +1,53 @@
 unitDef = {
-  unitname               = [[empmissile]],
-  name                   = [[Shockley]],
-  description            = [[EMP missile]],
-  acceleration           = 1,
-  antiweapons            = [[1]],
-  bmcode                 = [[0]],
-  brakeRate              = 0,
-  buildAngle             = 8192,
-  buildCostEnergy        = 400,
-  buildCostMetal         = 400,
-  builder                = false,
-  buildPic               = [[empmissile.png]],
-  buildTime              = 400,
-  canAttack              = true,
-  canGuard               = true,
-  canstop                = [[1]],
-  category               = [[SINK UNARMED]],
-  collisionVolumeOffsets = [[0 35 0]],
-  collisionVolumeScales  = [[20 80 20]],
-  collisionVolumeTest    = 1,
-  collisionVolumeType    = [[CylY]],
+  unitname                      = [[empmissile]],
+  name                          = [[Shockley]],
+  description                   = [[EMP missile]],
+  acceleration                  = 1,
+  antiweapons                   = [[1]],
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 8192,
+  buildCostEnergy               = 400,
+  buildCostMetal                = 400,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 3,
+  buildingGroundDecalSizeY      = 3,
+  buildingGroundDecalType       = [[empmissile_aoplane.dds]],
+  buildPic                      = [[empmissile.png]],
+  buildTime                     = 400,
+  canAttack                     = true,
+  canGuard                      = true,
+  canstop                       = [[1]],
+  category                      = [[SINK UNARMED]],
+  collisionVolumeOffsets        = [[0 35 0]],
+  collisionVolumeScales         = [[20 80 20]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[CylY]],
 
-  customParams           = {
+  customParams                  = {
     helptext       = [[The Shockley disables units in a moderate area for up to 45 seconds.]],
     mobilebuilding = [[1]],
   },
 
-  explodeAs              = [[SMALL_UNITEX]],
-  footprintX             = 1,
-  footprintZ             = 1,
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
-  mass                   = 200,
-  maxDamage              = 2000,
-  maxSlope               = 18,
-  maxVelocity            = 0,
-  maxWaterDepth          = 0,
-  minCloakDistance       = 150,
-  noAutoFire             = false,
-  objectName             = [[wep_empmissile.s3o]],
-  script                 = [[cruisemissile.lua]],
-  seismicSignature       = 4,
-  selfDestructAs         = [[SMALL_UNITEX]],
+  explodeAs                     = [[SMALL_UNITEX]],
+  footprintX                    = 1,
+  footprintZ                    = 1,
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 243,
+  maxDamage                     = 2000,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  objectName                    = [[wep_empmissile.s3o]],
+  script                        = [[cruisemissile.lua]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[SMALL_UNITEX]],
 
-  sfxtypes               = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
@@ -51,15 +55,16 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
-  sightDistance          = 200,
-  smoothAnim             = true,
-  TEDClass               = [[SPECIAL]],
-  turnRate               = 0,
-  workerTime             = 0,
-  yardMap                = [[o]],
+  side                          = [[CORE]],
+  sightDistance                 = 200,
+  smoothAnim                    = true,
+  TEDClass                      = [[SPECIAL]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = false,
+  workerTime                    = 0,
+  yardMap                       = [[o]],
 
-  weapons                = {
+  weapons                       = {
 
     {
       def                = [[EMP_WEAPON]],
@@ -70,7 +75,7 @@ unitDef = {
   },
 
 
-  weaponDefs             = {
+  weaponDefs                    = {
 
     EMP_WEAPON = {
       name                    = [[EMPMissile]],
@@ -126,14 +131,9 @@ unitDef = {
   },
 
 
-  featureDefs            = {
+  featureDefs                   = {
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=3,
-	buildingGroundDecalSizeY=3,
-	useBuildingGroundDecal = false,
-	buildingGroundDecalType=[[empmissile_aoplane.dds]],
 }
 
 return lowerkeys({ empmissile = unitDef })

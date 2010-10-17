@@ -39,7 +39,7 @@ unitDef = {
   idleAutoHeal          = 5,
   idleTime              = 1800,
   maneuverleashlength   = [[640]],
-  mass                  = 80,
+  mass                  = 66,
   maxDamage             = 120,
   maxSlope              = 36,
   maxVelocity           = 3.6,
@@ -173,8 +173,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
 
   },
 

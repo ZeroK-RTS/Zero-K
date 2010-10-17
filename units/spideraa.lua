@@ -34,7 +34,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[640]],
-  mass                = 200,
+  mass                = 215,
   maxDamage           = 1200,
   maxSlope            = 72,
   maxVelocity         = 2.3,
@@ -68,7 +68,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    AA      = {
+    AA = {
       name                    = [[Missiles]],
       areaOfEffect            = 48,
       canattackground         = false,

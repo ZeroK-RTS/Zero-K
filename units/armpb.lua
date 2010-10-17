@@ -1,56 +1,61 @@
 unitDef = {
-  unitname            = [[armpb]],
-  name                = [[Pit Bull]],
-  description         = [[Ambush Rocket Turret]],
-  acceleration        = 0,
-  bmcode              = [[0]],
-  brakeRate           = 0,
-  buildCostEnergy     = 400,
-  buildCostMetal      = 400,
-  builder             = false,
-  buildPic            = [[ARMPB.png]],
-  buildTime           = 400,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[SINK]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[armpb]],
+  name                          = [[Pit Bull]],
+  description                   = [[Ambush Rocket Turret]],
+  acceleration                  = 0,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildCostEnergy               = 400,
+  buildCostMetal                = 400,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 5,
+  buildingGroundDecalSizeY      = 5,
+  buildingGroundDecalType       = [[armpb_aoplane.dds]],
+  buildPic                      = [[ARMPB.png]],
+  buildTime                     = 400,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Canon Gauss Ambusqué]],
     helptext       = [[The Pit Bull is a compact, resilent turret with a medium-range rocket launcher. When popped down, it is very difficult to destroy, making it a good choice when the enemy is using artillery.]],
     helptext_fr    = [[Le Pit Bull s'enterre et profite de son camouflage radar et optique pour attendre la bonne occasion. L'ennemi de le verra pas avant qu'il ne soit trop tard. Son canon Gauss r haute cadence fait des ravages sur tous tupes d'unités, mais il ne faut pas éspcrer percer un blindage lourd du premier coup.]],
   },
 
-  damageModifier      = 0.2,
-  defaultmissiontype  = [[GUARD_NOMOVE]],
-  digger              = [[1]],
-  explodeAs           = [[SMALL_BUILDINGEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[defense]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  levelGround         = false,
-  mass                = 250,
-  maxDamage           = 2250,
-  maxSlope            = 18,
-  maxVelocity         = 0,
-  maxWaterDepth       = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName          = [[ARMPB]],
-  seismicSignature    = 16,
-  selfDestructAs      = [[SMALL_BUILDINGEX]],
-  side                = [[ARM]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  stealth             = true,
-  TEDClass            = [[FORT]],
-  turnRate            = 0,
-  yardMap             = [[ooooooooo]],
+  damageModifier                = 0.2,
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  digger                        = [[1]],
+  explodeAs                     = [[SMALL_BUILDINGEX]],
+  footprintX                    = 3,
+  footprintZ                    = 3,
+  iconType                      = [[defense]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  levelGround                   = false,
+  mass                          = 252,
+  maxDamage                     = 2250,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName                    = [[ARMPB]],
+  seismicSignature              = 16,
+  selfDestructAs                = [[SMALL_BUILDINGEX]],
+  side                          = [[ARM]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  stealth                       = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  yardMap                       = [[ooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[ROCKET]],
@@ -61,7 +66,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     ROCKET = {
       name                    = [[Rocket]],
@@ -110,7 +115,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Pit Bull]],
@@ -175,11 +180,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=5,
-	buildingGroundDecalSizeY=5,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[armpb_aoplane.dds]],
 }
 
 return lowerkeys({ armpb = unitDef })

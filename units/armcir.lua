@@ -1,56 +1,61 @@
 unitDef = {
-  unitname            = [[armcir]],
-  name                = [[Chainsaw]],
-  description         = [[Medium-Range AA Missile Battery]],
-  acceleration        = 0,
-  bmcode              = [[0]],
-  brakeRate           = 0,
-  buildAngle          = 65536,
-  buildCostEnergy     = 800,
-  buildCostMetal      = 800,
-  builder             = false,
-  buildPic            = [[ARMCIR.png]],
-  buildTime           = 800,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[FLOAT]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[armcir]],
+  name                          = [[Chainsaw]],
+  description                   = [[Medium-Range AA Missile Battery]],
+  acceleration                  = 0,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 65536,
+  buildCostEnergy               = 800,
+  buildCostMetal                = 800,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
+  buildingGroundDecalType       = [[armcir_aoplane.dds]],
+  buildPic                      = [[ARMCIR.png]],
+  buildTime                     = 800,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[FLOAT]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Batterie de Missiles Anti-Air ? Moyenne Port?e]],
     helptext       = [[The Chainsaw is a long range anti-air turret, dealing out massive damage, able to knock bombers out of the sky very quickly. It can't take very much damage in return, though, and does poorly when attacked directly.]],
     helptext_fr    = [[Cette batterie de missile ultra v?loce permet d'abattre des cibles aeriennes lourdes - comme les bombardiers - avant qu'elles ne puissent passer ? l'attaque. Il n?cessite d'?tre plac? en terrain d?gag? pour utiliser pleinement son potentiel. Reste assez fragile et ? prot?ger.]],
   },
 
-  defaultmissiontype  = [[GUARD_NOMOVE]],
-  explodeAs           = [[LARGE_BUILDINGEX]],
-  floater             = true,
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[staticaa]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  mass                = 400,
-  maxDamage           = 2500,
-  maxSlope            = 18,
-  maxVelocity         = 0,
-  maxWaterDepth       = 5000,
-  minCloakDistance    = 150,
-  noAutoFire          = false,
-  noChaseCategory     = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName          = [[ARMCIR]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[LARGE_BUILDINGEX]],
-  side                = [[ARM]],
-  sightDistance       = 702,
-  smoothAnim          = true,
-  TEDClass            = [[FORT]],
-  turnRate            = 0,
-  workerTime          = 0,
-  yardMap             = [[oooooooooooooooo]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[LARGE_BUILDINGEX]],
+  floater                       = true,
+  footprintX                    = 4,
+  footprintZ                    = 4,
+  iconType                      = [[staticaa]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 318,
+  maxDamage                     = 2500,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 5000,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
+  objectName                    = [[ARMCIR]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[LARGE_BUILDINGEX]],
+  side                          = [[ARM]],
+  sightDistance                 = 702,
+  smoothAnim                    = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooooooooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[MISSILE]],
@@ -61,7 +66,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     MISSILE = {
       name                    = [[Long-Range SAM]],
@@ -117,7 +122,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Chainsaw]],
@@ -182,11 +187,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=6,
-	buildingGroundDecalSizeY=6,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[armcir_aoplane.dds]],
 }
 
 return lowerkeys({ armcir = unitDef })

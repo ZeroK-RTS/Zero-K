@@ -19,12 +19,12 @@ unitDef = {
   buildPic            = [[corcom.png]],
   buildTime           = 2400,
   canAttack           = true,
+  canDGun             = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
   canreclamate        = [[1]],
   canstop             = [[1]],
-  canDGun			  = true,
   category            = [[LAND FIREPROOF]],
   commander           = true,
   corpse              = [[DEAD]],
@@ -58,8 +58,8 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
   objectName          = [[corcom.s3o]],
-  onoffable    		  = true,
-  script	          = [[corcom.cob]],
+  onoffable           = true,
+  script              = [[corcom.cob]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
@@ -92,16 +92,19 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
-	[2] = {
-	  def				 = [[COR_SHIELD_COM]],
-	},
+
+
+    [2] = {
+      def = [[COR_SHIELD_COM]],
+    },
+
 
     [3] = {
       def                = [[CLUSTERBOMB]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
+
+
     [4] = {
       def                = [[AUTOCANNON]],
       badTargetCategory  = [[FIXEDWING]],
@@ -113,7 +116,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    AUTOCANNON    = {
+    AUTOCANNON     = {
       name                    = [[Pulse Autocannon]],
       alphaDecay              = 0.7,
       areaOfEffect            = 64,
@@ -151,11 +154,12 @@ unitDef = {
       weaponVelocity          = 550,
     },
 
-    CLUSTERBOMB = {
+
+    CLUSTERBOMB    = {
       name                    = [[Cluster Bomb]],
-	  accuracy				  = 200,
+      accuracy                = 200,
       areaOfEffect            = 160,
-	  commandFire			  = true,
+      commandFire             = true,
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -164,15 +168,15 @@ unitDef = {
         planes  = 300,
         subs    = 15,
       },
-	  
-	  energypershot           = 30,
+
+      energypershot           = 30,
       explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],
       fireStarter             = 100,
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       interceptedByShieldType = 2,
       lineOfSight             = true,
-	  metalpershot			  = 15,
+      metalpershot            = 15,
       model                   = [[bomb]],
       noSelfDamage            = true,
       projectiles             = 8,
@@ -187,12 +191,42 @@ unitDef = {
       sprayangle              = 2048,
       startsmoke              = [[1]],
       turret                  = true,
-	  --trajectoryHeight		  = 0.15,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
     },
-	
-    FAKELASER     = {
+
+
+    COR_SHIELD_COM = {
+      name                    = [[Energy Shield]],
+      craterMult              = 0,
+
+      damage                  = {
+        default = 10,
+      },
+
+      exteriorShield          = true,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      isShield                = true,
+      shieldAlpha             = 0.2,
+      shieldBadColor          = [[1 0.1 0.1]],
+      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldInterceptType     = 3,
+      shieldPower             = 3500,
+      shieldPowerRegen        = 60,
+      shieldPowerRegenEnergy  = 6,
+      shieldRadius            = 300,
+      shieldRepulser          = false,
+      smartShield             = true,
+      texture1                = [[wake]],
+      visibleShield           = true,
+      visibleShieldHitFrames  = 4,
+      visibleShieldRepulse    = true,
+      weaponType              = [[Shield]],
+    },
+
+
+    FAKELASER      = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
       beamlaser               = 1,
@@ -235,35 +269,6 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
-    },
-	
-    COR_SHIELD_COM = {
-      name                    = [[Energy Shield]],
-      craterMult              = 0,
-
-      damage                  = {
-        default = 10,
-      },
-
-      exteriorShield          = true,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      isShield                = true,
-      shieldAlpha             = 0.2,
-      shieldBadColor          = [[1 0.1 0.1]],
-      shieldGoodColor         = [[0.1 0.1 1]],
-      shieldInterceptType     = 3,
-      shieldPower             = 3500,
-      shieldPowerRegen        = 60,
-      shieldPowerRegenEnergy  = 6,
-      shieldRadius            = 300,
-      shieldRepulser          = false,
-      smartShield             = true,
-      texture1                = [[wake]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 4,
-      visibleShieldRepulse    = true,
-      weaponType              = [[Shield]],
     },
 
   },

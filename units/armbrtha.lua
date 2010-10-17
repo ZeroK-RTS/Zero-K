@@ -1,49 +1,53 @@
 unitDef = {
-  unitname            = [[armbrtha]],
-  name                = [[Big Bertha]],
-  description         = [[Strategic Plasma Cannon]],
-  acceleration        = 0,
-  antiweapons         = [[1]],
-  bmcode              = [[0]],
-  brakeRate           = 0,
-  buildAngle          = 32700,
-  buildCostEnergy     = 6000,
-  buildCostMetal      = 6000,
-  builder             = false,
-  buildPic            = [[ARMBRTHA.png]],
-  buildTime           = 6000,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[SINK]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[armbrtha]],
+  name                          = [[Big Bertha]],
+  description                   = [[Strategic Plasma Cannon]],
+  acceleration                  = 0,
+  antiweapons                   = [[1]],
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 32700,
+  buildCostEnergy               = 6000,
+  buildCostMetal                = 6000,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
+  buildingGroundDecalType       = [[armbrtha_aoplane.dds]],
+  buildPic                      = [[ARMBRTHA.png]],
+  buildTime                     = 6000,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Canon ? Plasma Strat?gique]],
     helptext       = [[The Bertha is a massive cannon that fires high-energy plasmoids across the map. Used appropriately, it can effectively suppress enemy operations from the safety of your base. Do not expect it to win battles alone for you, however.]],
     helptext_fr    = [[Le Big Bertha est un canon ? plasma lourd, tr?s lourd. Un seul impact de son tir peut r?duire ? n?ant plusieurs unit?s ou structures. Sa port?e de tir op?rationnelle est immense et n'?gale que son co?t de cr?ation et d'entretient. En effet chaque tir consomme 300 unit?s d'?nergie. Notez que le Big Bertha effectue des tirs tendus. Autrement dit, pensez ? le placer en hauteur, ou chaque colline servira de refuge ? l'ennemi.]],
   },
 
-  defaultmissiontype  = [[GUARD_NOMOVE]],
-  explodeAs           = [[ATOMIC_BLAST]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[lrpc]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  levelGround         = false,
-  mass                = 3000,
-  maxDamage           = 4200,
-  maxSlope            = 18,
-  maxVelocity         = 0,
-  maxWaterDepth       = 0,
-  minCloakDistance    = 150,
-  noChaseCategory     = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName          = [[armbrtha.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[ATOMIC_BLAST]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[ATOMIC_BLAST]],
+  footprintX                    = 4,
+  footprintZ                    = 4,
+  iconType                      = [[lrpc]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  levelGround                   = false,
+  mass                          = 791,
+  maxDamage                     = 4200,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName                    = [[armbrtha.s3o]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[ATOMIC_BLAST]],
 
-  sfxtypes            = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:ARMBRTHA_SHOCKWAVE]],
@@ -53,15 +57,16 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  TEDClass            = [[FORT]],
-  turnRate            = 0,
-  workerTime          = 0,
-  yardMap             = [[oooooooooooooooo]],
+  side                          = [[ARM]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooooooooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[PLASMA]],
@@ -71,7 +76,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     PLASMA = {
       name                    = [[Heavy Plasma Cannon]],
@@ -108,7 +113,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Big Bertha]],
@@ -173,11 +178,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=6,
-	buildingGroundDecalSizeY=6,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[armbrtha_aoplane.dds]],
 }
 
 return lowerkeys({ armbrtha = unitDef })

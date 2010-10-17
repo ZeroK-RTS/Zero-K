@@ -1,51 +1,55 @@
 unitDef = {
-  unitname               = [[tacnuke]],
-  name                   = [[Eos]],
-  description            = [[Tactical Nuke]],
-  acceleration           = 1,
-  antiweapons            = [[1]],
-  bmcode                 = [[0]],
-  brakeRate              = 0,
-  buildAngle             = 8192,
-  buildCostEnergy        = 600,
-  buildCostMetal         = 600,
-  builder                = false,
-  buildPic               = [[tacnuke.png]],
-  buildTime              = 600,
-  canAttack              = true,
-  canGuard               = true,
-  canstop                = [[1]],
-  category               = [[SINK UNARMED]],
-  collisionVolumeOffsets = [[0 35 0]],
-  collisionVolumeScales  = [[20 80 20]],
-  collisionVolumeTest    = 1,
-  collisionVolumeType    = [[CylY]],
+  unitname                      = [[tacnuke]],
+  name                          = [[Eos]],
+  description                   = [[Tactical Nuke]],
+  acceleration                  = 1,
+  antiweapons                   = [[1]],
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 8192,
+  buildCostEnergy               = 600,
+  buildCostMetal                = 600,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 3,
+  buildingGroundDecalSizeY      = 3,
+  buildingGroundDecalType       = [[tacnuke_aoplane.dds]],
+  buildPic                      = [[tacnuke.png]],
+  buildTime                     = 600,
+  canAttack                     = true,
+  canGuard                      = true,
+  canstop                       = [[1]],
+  category                      = [[SINK UNARMED]],
+  collisionVolumeOffsets        = [[0 35 0]],
+  collisionVolumeScales         = [[20 80 20]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[CylY]],
 
-  customParams           = {
+  customParams                  = {
     description_fr = [[Lance Missile Nucléaire Tactique]],
     helptext       = [[A long-range precision strike weapon. The Eos' blast radius is small, but lethal.]],
     helptext_fr    = [[Le Eos est un lance missile nucléaire tactique. Les tetes nucléaires ne sont pas aussi lourdes que celles du Silencer et la portée moindre. Mais bien placé, il peut faire des ravages, et présente un rapport cout/efficacité plus qu'interressant.]],
     mobilebuilding = [[1]],
   },
 
-  explodeAs              = [[SMALL_UNITEX]],
-  footprintX             = 1,
-  footprintZ             = 1,
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
-  mass                   = 350,
-  maxDamage              = 2000,
-  maxSlope               = 18,
-  maxVelocity            = 0,
-  maxWaterDepth          = 0,
-  minCloakDistance       = 150,
-  noAutoFire             = false,
-  objectName             = [[wep_tacnuke.s3o]],
-  script                 = [[cruisemissile.lua]],
-  seismicSignature       = 4,
-  selfDestructAs         = [[SMALL_UNITEX]],
+  explodeAs                     = [[SMALL_UNITEX]],
+  footprintX                    = 1,
+  footprintZ                    = 1,
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 275,
+  maxDamage                     = 2000,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  objectName                    = [[wep_tacnuke.s3o]],
+  script                        = [[cruisemissile.lua]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[SMALL_UNITEX]],
 
-  sfxtypes               = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
@@ -53,15 +57,16 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
-  sightDistance          = 200,
-  smoothAnim             = true,
-  TEDClass               = [[SPECIAL]],
-  turnRate               = 0,
-  workerTime             = 0,
-  yardMap                = [[o]],
+  side                          = [[CORE]],
+  sightDistance                 = 200,
+  smoothAnim                    = true,
+  TEDClass                      = [[SPECIAL]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = false,
+  workerTime                    = 0,
+  yardMap                       = [[o]],
 
-  weapons                = {
+  weapons                       = {
 
     {
       def                = [[WEAPON]],
@@ -72,7 +77,7 @@ unitDef = {
   },
 
 
-  weaponDefs             = {
+  weaponDefs                    = {
 
     WEAPON = {
       name                    = [[Tactical Nuke]],
@@ -124,14 +129,9 @@ unitDef = {
   },
 
 
-  featureDefs            = {
+  featureDefs                   = {
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=3,
-	buildingGroundDecalSizeY=3,
-	useBuildingGroundDecal = false,
-	buildingGroundDecalType=[[tacnuke_aoplane.dds]],
 }
 
 return lowerkeys({ tacnuke = unitDef })

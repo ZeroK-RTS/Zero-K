@@ -33,7 +33,7 @@ unitDef = {
   idleTime              = 1800,
   immunetoparalyzer     = [[1]],
   maneuverleashlength   = [[640]],
-  mass                  = 6000,
+  mass                  = 1387,
   maxDamage             = 35000,
   maxSlope              = 36,
   maxVelocity           = 1.718,
@@ -83,7 +83,7 @@ unitDef = {
 
     {
       def                = [[PARALYZER]],
-      onlyTargetCategory = [[NONE]],	--disabled
+      onlyTargetCategory = [[NONE]],
     },
 
 

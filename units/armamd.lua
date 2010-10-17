@@ -1,53 +1,58 @@
 unitDef = {
-  unitname          = [[armamd]],
-  name              = [[Protector]],
-  description       = [[Anti-Nuke System]],
-  acceleration      = 0,
-  activateWhenBuilt = true,
-  antiweapons       = [[1]],
-  bmcode            = [[0]],
-  brakeRate         = 0,
-  buildAngle        = 4096,
-  buildCostEnergy   = 3000,
-  buildCostMetal    = 3000,
-  builder           = false,
-  buildPic          = [[ARMAMD.png]],
-  buildTime         = 3000,
-  category          = [[SINK]],
-  corpse            = [[DEAD]],
+  unitname                      = [[armamd]],
+  name                          = [[Protector]],
+  description                   = [[Anti-Nuke System]],
+  acceleration                  = 0,
+  activateWhenBuilt             = true,
+  antiweapons                   = [[1]],
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 4096,
+  buildCostEnergy               = 3000,
+  buildCostMetal                = 3000,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
+  buildingGroundDecalType       = [[armamd_aoplane.dds]],
+  buildPic                      = [[ARMAMD.png]],
+  buildTime                     = 3000,
+  category                      = [[SINK]],
+  corpse                        = [[DEAD]],
 
-  customParams      = {
+  customParams                  = {
     description_fr = [[Syst?me de D?fense Anti Missile (AntiNuke)]],
     helptext       = [[The Protector automatically intercepts enemy nuclear ICBMs aimed within its coverage radius.]],
     helptext_fr    = [[Le Protector est un b?timent indispensable dans tout conflit qui dure. Il est toujours malvenu de voir sa base r?duite en cendres ? cause d'un missile nucl?aire. Le Protector est un syst?me de contre mesure capable de faire exploser en vol les missiles nucl?aires ennemis.]],
   },
 
-  damageModifier    = 0.5,
-  explodeAs         = [[LARGE_BUILDINGEX]],
-  footprintX        = 4,
-  footprintZ        = 4,
-  iconType          = [[antinuke]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
-  mass              = 1500,
-  maxDamage         = 3300,
-  maxSlope          = 18,
-  maxVelocity       = 0,
-  maxWaterDepth     = 0,
-  minCloakDistance  = 150,
-  objectName        = [[antinuke.s3o]],
-  radarDistance     = 2000,
-  seismicSignature  = 4,
-  selfDestructAs    = [[LARGE_BUILDINGEX]],
-  side              = [[ARM]],
-  sightDistance     = 660,
-  smoothAnim        = true,
-  TEDClass          = [[FORT]],
-  turnRate          = 0,
-  workerTime        = 0,
-  yardMap           = [[oooooooooooooooo]],
+  damageModifier                = 0.5,
+  explodeAs                     = [[LARGE_BUILDINGEX]],
+  footprintX                    = 4,
+  footprintZ                    = 4,
+  iconType                      = [[antinuke]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 561,
+  maxDamage                     = 3300,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  objectName                    = [[antinuke.s3o]],
+  radarDistance                 = 2000,
+  seismicSignature              = 4,
+  selfDestructAs                = [[LARGE_BUILDINGEX]],
+  side                          = [[ARM]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooooooooooooooo]],
 
-  weapons           = {
+  weapons                       = {
 
     {
       def = [[AMD_ROCKET]],
@@ -56,7 +61,7 @@ unitDef = {
   },
 
 
-  weaponDefs        = {
+  weaponDefs                    = {
 
     AMD_ROCKET = {
       name                    = [[Anti-Nuke Missile]],
@@ -107,7 +112,7 @@ unitDef = {
   },
 
 
-  featureDefs       = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Protector]],
@@ -172,11 +177,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=6,
-	buildingGroundDecalSizeY=6,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[armamd_aoplane.dds]],
 }
 
 return lowerkeys({ armamd = unitDef })

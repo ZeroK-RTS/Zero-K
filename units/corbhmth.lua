@@ -1,49 +1,54 @@
 unitDef = {
-  unitname           = [[corbhmth]],
-  name               = [[Behemoth]],
-  description        = [[Plasma Battery]],
-  acceleration       = 0,
-  activateWhenBuilt  = true,
-  bmcode             = [[0]],
-  brakeRate          = 0,
-  buildAngle         = 8192,
-  buildCostEnergy    = 3500,
-  buildCostMetal     = 3500,
-  builder            = false,
-  buildPic           = [[CORBHMTH.png]],
-  buildTime          = 3500,
-  canAttack          = true,
-  canstop            = [[1]],
-  category           = [[SINK]],
-  corpse             = [[DEAD]],
-  defaultmissiontype = [[GUARD_NOMOVE]],
-  explodeAs          = [[LARGE_BUILDINGEX]],
-  footprintX         = 5,
-  footprintZ         = 5,
-  iconType           = [[staticarty]],
-  idleAutoHeal       = 5,
-  idleTime           = 1800,
-  mass               = 1750,
-  maxDamage          = 3500,
-  maxSlope           = 18,
-  maxVelocity        = 0,
-  maxWaterDepth      = 0,
-  minCloakDistance   = 150,
-  noAutoFire         = false,
-  noChaseCategory    = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName         = [[CORBHMTH]],
-  onoffable          = false,
-  seismicSignature   = 4,
-  selfDestructAs     = [[LARGE_BUILDINGEX]],
-  side               = [[CORE]],
-  sightDistance      = 660,
-  smoothAnim         = true,
-  TEDClass           = [[FORT]],
-  turnRate           = 0,
-  workerTime         = 0,
-  yardMap            = [[ooooo ooooo ooooo ooooo ooooo]],
+  unitname                      = [[corbhmth]],
+  name                          = [[Behemoth]],
+  description                   = [[Plasma Battery]],
+  acceleration                  = 0,
+  activateWhenBuilt             = true,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 8192,
+  buildCostEnergy               = 3500,
+  buildCostMetal                = 3500,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 8,
+  buildingGroundDecalSizeY      = 8,
+  buildingGroundDecalType       = [[corbhmth_aoplane.dds]],
+  buildPic                      = [[CORBHMTH.png]],
+  buildTime                     = 3500,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK]],
+  corpse                        = [[DEAD]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[LARGE_BUILDINGEX]],
+  footprintX                    = 5,
+  footprintZ                    = 5,
+  iconType                      = [[staticarty]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 605,
+  maxDamage                     = 3500,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName                    = [[CORBHMTH]],
+  onoffable                     = false,
+  seismicSignature              = 4,
+  selfDestructAs                = [[LARGE_BUILDINGEX]],
+  side                          = [[CORE]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[ooooo ooooo ooooo ooooo ooooo]],
 
-  weapons            = {
+  weapons                       = {
 
     {
       def                = [[PLASMA]],
@@ -53,7 +58,7 @@ unitDef = {
   },
 
 
-  weaponDefs         = {
+  weaponDefs                    = {
 
     PLASMA = {
       name                    = [[Long-Range Plasma Battery]],
@@ -90,7 +95,7 @@ unitDef = {
   },
 
 
-  featureDefs        = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Behemoth]],
@@ -155,11 +160,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=8,
-	buildingGroundDecalSizeY=8,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[corbhmth_aoplane.dds]],
 }
 
 return lowerkeys({ corbhmth = unitDef })

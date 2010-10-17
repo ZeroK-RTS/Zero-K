@@ -40,7 +40,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[640]],
-  mass                = 100,
+  mass                = 155,
   maxDamage           = 750,
   maxSlope            = 72,
   maxVelocity         = 2.85,
@@ -83,7 +83,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    spider  = {
+    spider = {
       name                    = [[Electro-Stunner]],
       areaOfEffect            = 160,
       beamWeapon              = true,

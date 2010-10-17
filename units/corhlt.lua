@@ -1,53 +1,57 @@
 unitDef = {
-  unitname               = [[corhlt]],
-  name                   = [[Stinger]],
-  description            = [[High-Energy Laser Tower]],
-  acceleration           = 0,
-  bmcode                 = [[0]],
-  brakeRate              = 0,
-  buildAngle             = 4096,
-  buildCostEnergy        = 450,
-  buildCostMetal         = 450,
-  builder                = false,
-  buildPic               = [[CORHLT.png]],
-  buildTime              = 450,
-  canAttack              = true,
-  canstop                = [[1]],
-  category               = [[FLOAT]],
-  collisionVolumeOffsets = [[0 -38 0]],
-  collisionVolumeScales  = [[32 118 32]],
-  collisionVolumeTest    = 1,
-  collisionVolumeType    = [[CylY]],
-  corpse                 = [[DEAD]],
+  unitname                      = [[corhlt]],
+  name                          = [[Stinger]],
+  description                   = [[High-Energy Laser Tower]],
+  acceleration                  = 0,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 4096,
+  buildCostEnergy               = 450,
+  buildCostMetal                = 450,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[corhlt_aoplane.dds]],
+  buildPic                      = [[CORHLT.png]],
+  buildTime                     = 450,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[FLOAT]],
+  collisionVolumeOffsets        = [[0 -38 0]],
+  collisionVolumeScales         = [[32 118 32]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[CylY]],
+  corpse                        = [[DEAD]],
 
-  customParams           = {
+  customParams                  = {
     description_fr = [[Tourelle Laser Moyenne HLT]],
     helptext       = [[The Stinger is a medium laser turret. Its three rotating laser guns can kill almost any small unit, but its low rate of fire makes it vulnerable to swarms when unassisted.]],
     helptext_fr    = [[Le Gaat Gun est compos? de trois canons lasers rotatifs lourd. Oblig?s de se refroidir apr?s chaque tir, il n'en d?livrent pas moins une forte puissance de feu instann?e. Tr?s utile sur des grosses cibles, elle aura besoin d'assistance en cas de nombreux ennemis.]],
   },
 
-  defaultmissiontype     = [[GUARD_NOMOVE]],
-  explodeAs              = [[MEDIUM_BUILDINGEX]],
-  floater                = true,
-  footprintX             = 2,
-  footprintZ             = 2,
-  iconType               = [[defenseheavy]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
-  levelGround            = false,
-  mass                   = 225,
-  maxDamage              = 2475,
-  maxSlope               = 36,
-  maxVelocity            = 0,
-  minCloakDistance       = 150,
-  modelCenterOffset      = [[0 55 0]],
-  noAutoFire             = false,
-  noChaseCategory        = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName             = [[hlt.s3o]],
-  seismicSignature       = 4,
-  selfDestructAs         = [[MEDIUM_BUILDINGEX]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[MEDIUM_BUILDINGEX]],
+  floater                       = true,
+  footprintX                    = 2,
+  footprintZ                    = 2,
+  iconType                      = [[defenseheavy]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  levelGround                   = false,
+  mass                          = 267,
+  maxDamage                     = 2475,
+  maxSlope                      = 36,
+  maxVelocity                   = 0,
+  minCloakDistance              = 150,
+  modelCenterOffset             = [[0 55 0]],
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName                    = [[hlt.s3o]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[MEDIUM_BUILDINGEX]],
 
-  sfxtypes               = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:HLTRADIATE0]],
@@ -56,16 +60,17 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
-  sightDistance          = 660,
-  smoothAnim             = true,
-  sweepfire              = [[1]],
-  TEDClass               = [[FORT]],
-  turnRate               = 0,
-  workerTime             = 0,
-  yardMap                = [[oooo]],
+  side                          = [[CORE]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  sweepfire                     = [[1]],
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooo]],
 
-  weapons                = {
+  weapons                       = {
 
     {
       def                = [[LASER]],
@@ -76,7 +81,7 @@ unitDef = {
   },
 
 
-  weaponDefs             = {
+  weaponDefs                    = {
 
     LASER = {
       name                    = [[High-Energy Laserbeam]],
@@ -128,7 +133,7 @@ unitDef = {
   },
 
 
-  featureDefs            = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Stinger]],
@@ -193,11 +198,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=4,
-	buildingGroundDecalSizeY=4,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[corhlt_aoplane.dds]],
 }
 
 return lowerkeys({ corhlt = unitDef })

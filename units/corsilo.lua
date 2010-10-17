@@ -1,53 +1,58 @@
 unitDef = {
-  unitname            = [[corsilo]],
-  name                = [[Silencer]],
-  description         = [[Nuclear ICBM Launcher, Drains 19.2 m/s, 3 minute stockpile]],
-  acceleration        = 0,
-  antiweapons         = [[1]],
-  bmcode              = [[0]],
-  brakeRate           = 0,
-  buildAngle          = 8192,
-  buildCostEnergy     = 7000,
-  buildCostMetal      = 7000,
-  builder             = false,
-  buildPic            = [[CORSILO.png]],
-  buildTime           = 7000,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[SINK UNARMED]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[corsilo]],
+  name                          = [[Silencer]],
+  description                   = [[Nuclear ICBM Launcher, Drains 19.2 m/s, 3 minute stockpile]],
+  acceleration                  = 0,
+  antiweapons                   = [[1]],
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 8192,
+  buildCostEnergy               = 7000,
+  buildCostMetal                = 7000,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 10,
+  buildingGroundDecalSizeY      = 10,
+  buildingGroundDecalType       = [[corsilo_aoplane.dds]],
+  buildPic                      = [[CORSILO.png]],
+  buildTime                     = 7000,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK UNARMED]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Lance Missile Ballistique Intercontinental Nucl?aire (Nuke)]],
     helptext_fr    = [[Le Silencer est long a construire, et il faut qui plus est, ordonner la creation de missiles une fois celui-ci construit. Et pourtant, quel bonheur de r?duire tous vos ennemis en poussi?re en une seconde! Pensez ? v?rifier la pr?sence d'une contre mesure AntiNuke.]],
   },
 
-  explodeAs           = [[ATOMIC_BLAST]],
-  footprintX          = 7,
-  footprintZ          = 7,
-  iconType            = [[nuke]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  mass                = 3500,
-  maxDamage           = 5560,
-  maxSlope            = 18,
-  maxVelocity         = 0,
-  maxWaterDepth       = 0,
-  minCloakDistance    = 150,
-  noAutoFire          = false,
-  objectName          = [[Silencer.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[ATOMIC_BLAST]],
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  TEDClass            = [[SPECIAL]],
-  turnRate            = 0,
-  workerTime          = 0,
-  yardMap             = [[ooooooooooooooooooooooooooooooooooooooooooooooooo]],
+  explodeAs                     = [[ATOMIC_BLAST]],
+  footprintX                    = 7,
+  footprintZ                    = 7,
+  iconType                      = [[nuke]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 869,
+  maxDamage                     = 5560,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  objectName                    = [[Silencer.s3o]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[ATOMIC_BLAST]],
+  side                          = [[CORE]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  TEDClass                      = [[SPECIAL]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[ooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[CRBLMSSL]],
@@ -58,7 +63,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     CRBLMSSL = {
       name                    = [[CoreNuclearMissile]],
@@ -118,7 +123,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Silencer]],
@@ -183,11 +188,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=10,
-	buildingGroundDecalSizeY=10,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[corsilo_aoplane.dds]],
 }
 
 return lowerkeys({ corsilo = unitDef })

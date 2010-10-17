@@ -8,10 +8,10 @@ unitDef = {
   buildCostEnergy               = 1200,
   buildCostMetal                = 1200,
   builder                       = true,
-  buildingGroundDecalDecaySpeed = 0.01,
+  buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
   buildingGroundDecalSizeY      = 6,
-  buildingGroundDecalType       = [[asphalt512.dds]],
+  buildingGroundDecalType       = [[missilesilo_aoplane.dds]],
 
   buildoptions                  = {
     [[tacnuke]],
@@ -43,7 +43,7 @@ unitDef = {
   iconType                      = [[cruisemissile]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 600,
+  mass                          = 403,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -129,11 +129,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=6,
-	buildingGroundDecalSizeY=6,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[missilesilo_aoplane.dds]],
 }
 
 return lowerkeys({ missilesilo = unitDef })

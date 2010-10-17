@@ -8,10 +8,10 @@ unitDef = {
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
   builder                       = true,
-  buildingGroundDecalDecaySpeed = 0.01,
+  buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 9,
   buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[asphalt512c.dds]],
+  buildingGroundDecalType       = [[factorygunship_aoplane.dds]],
 
   buildoptions                  = {
     [[armca]],
@@ -50,7 +50,7 @@ unitDef = {
   iconType                      = [[facgunship]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 275,
+  mass                          = 324,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -135,11 +135,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=9,
-	buildingGroundDecalSizeY=7,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[factorygunship_aoplane.dds]],
 }
 
 return lowerkeys({ factorygunship = unitDef })

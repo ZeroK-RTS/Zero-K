@@ -10,9 +10,13 @@ unitDef = {
   buildCostEnergy               = 1000,
   buildCostMetal                = 1000,
   builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
   BuildingGroundDecalDecaySpeed = 0.01,
+  buildingGroundDecalSizeX      = 6,
   BuildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
   BuildingGroundDecalSizeY      = 6,
+  buildingGroundDecalType       = [[armfus_aoplane.dds]],
   BuildingGroundDecalType       = [[arm_fusion_ground.dds]],
   buildPic                      = [[ARMFUS.png]],
   buildTime                     = 1000,
@@ -33,7 +37,7 @@ unitDef = {
   iconType                      = [[energy2]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 500,
+  mass                          = 336,
   maxDamage                     = 2200,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -47,6 +51,7 @@ unitDef = {
   smoothAnim                    = true,
   TEDClass                      = [[ENERGY]],
   turnRate                      = 0,
+  useBuildingGroundDecal        = true,
   UseBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oooooooooooooooooooo]],
@@ -116,11 +121,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=6,
-	buildingGroundDecalSizeY=6,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[armfus_aoplane.dds]],
 }
 
 return lowerkeys({ armfus = unitDef })

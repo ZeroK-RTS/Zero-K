@@ -1,56 +1,61 @@
 unitDef = {
-  unitname            = [[corflak]],
-  name                = [[Cobra]],
-  description         = [[Anti-Air Flak Gun]],
-  acceleration        = 0,
-  bmcode              = [[0]],
-  brakeRate           = 0,
-  buildAngle          = 8192,
-  buildCostEnergy     = 800,
-  buildCostMetal      = 800,
-  builder             = false,
-  buildPic            = [[CORFLAK.png]],
-  buildTime           = 800,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[FLOAT]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[corflak]],
+  name                          = [[Cobra]],
+  description                   = [[Anti-Air Flak Gun]],
+  acceleration                  = 0,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 8192,
+  buildCostEnergy               = 800,
+  buildCostMetal                = 800,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 5,
+  buildingGroundDecalSizeY      = 5,
+  buildingGroundDecalType       = [[corflak_aoplane.dds]],
+  buildPic                      = [[CORFLAK.png]],
+  buildTime                     = 800,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[FLOAT]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Canon Flak Anti-Air]],
     helptext_fr    = [[Le Cobra est une d?fense Anti-Air de moyenne port?e projetant des balles a fragmentation en l'air. Assez impr?cis mais tirant en zone, il est parfait pour les attaques aeriennes mass?es.]],
   },
 
-  defaultmissiontype  = [[GUARD_NOMOVE]],
-  explodeAs           = [[MEDIUM_BUILDINGEX]],
-  floater             = true,
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[staticaa]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  levelGround         = false,
-  mass                = 400,
-  maxDamage           = 2500,
-  maxSlope            = 18,
-  maxVelocity         = 0,
-  maxWaterDepth       = 5000,
-  minCloakDistance    = 150,
-  noAutoFire          = false,
-  noChaseCategory     = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName          = [[CORFLAK.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[MEDIUM_BUILDINGEX]],
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  TEDClass            = [[FORT]],
-  turnRate            = 0,
-  workerTime          = 0,
-  yardMap             = [[oooo]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[MEDIUM_BUILDINGEX]],
+  floater                       = true,
+  footprintX                    = 3,
+  footprintZ                    = 3,
+  iconType                      = [[staticaa]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  levelGround                   = false,
+  mass                          = 318,
+  maxDamage                     = 2500,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 5000,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
+  objectName                    = [[CORFLAK.s3o]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[MEDIUM_BUILDINGEX]],
+  side                          = [[CORE]],
+  sightDistance                 = 660,
+  smoothAnim                    = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[ARMFLAK_GUN]],
@@ -61,7 +66,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     ARMFLAK_GUN = {
       name                    = [[Flak Cannon]],
@@ -103,7 +108,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Cobra]],
@@ -168,11 +173,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=5,
-	buildingGroundDecalSizeY=5,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[corflak_aoplane.dds]],
 }
 
 return lowerkeys({ corflak = unitDef })

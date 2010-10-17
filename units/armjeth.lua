@@ -41,7 +41,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   maneuverleashlength = [[640]],
-  mass                = 50,
+  mass                = 117,
   maxDamage           = 550,
   maxSlope            = 36,
   maxVelocity         = 3,
@@ -92,7 +92,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    AA_LASER = {
+    AA_LASER      = {
       name                    = [[Anti-Air Laser]],
       areaOfEffect            = 12,
       beamDecay               = 0.736,
@@ -136,7 +136,7 @@ unitDef = {
     },
 
 
-    BOGUS_MISSILE   = {
+    BOGUS_MISSILE = {
       name                    = [[Missiles]],
       areaOfEffect            = 48,
       craterBoost             = 1,

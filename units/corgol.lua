@@ -36,7 +36,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   maneuverleashlength = [[640]],
-  mass                = 950,
+  mass                = 613,
   maxDamage           = 12000,
   maxSlope            = 18,
   maxVelocity         = 2.05,
@@ -73,17 +73,18 @@ unitDef = {
 
   weapons             = {
 
-    [1] = {
+    {
       def                = [[COR_GOL]],
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
     },
 
 
-    [2] = {
+    {
       def                = [[CORGOL_FLAMETHROWER]],
       badTargetCategory  = [[FIREPROOF]],
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
     },
+
   },
 
 
@@ -154,6 +155,7 @@ unitDef = {
       weaponType              = [[Flame]],
       weaponVelocity          = 150,
     },
+
   },
 
 

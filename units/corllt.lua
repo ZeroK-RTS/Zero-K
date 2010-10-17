@@ -1,55 +1,59 @@
 unitDef = {
-  unitname               = [[corllt]],
-  name                   = [[Lotus]],
-  description            = [[Light Laser Tower]],
-  acceleration           = 0,
-  activateWhenBuilt      = false,
-  bmcode                 = [[0]],
-  brakeRate              = 0,
-  buildAngle             = 32768,
-  buildCostEnergy        = 90,
-  buildCostMetal         = 90,
-  builder                = false,
-  buildPic               = [[CORLLT.png]],
-  buildTime              = 90,
-  canAttack              = true,
-  canstop                = [[1]],
-  category               = [[SINK]],
-  collisionVolumeOffsets = [[0 -32 0]],
-  collisionVolumeScales  = [[32 90 32]],
-  collisionVolumeTest    = 1,
-  collisionVolumeType    = [[CylY]],
-  corpse                 = [[DEAD]],
+  unitname                      = [[corllt]],
+  name                          = [[Lotus]],
+  description                   = [[Light Laser Tower]],
+  acceleration                  = 0,
+  activateWhenBuilt             = false,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 32768,
+  buildCostEnergy               = 90,
+  buildCostMetal                = 90,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[corllt_aoplane.dds]],
+  buildPic                      = [[CORLLT.png]],
+  buildTime                     = 90,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK]],
+  collisionVolumeOffsets        = [[0 -32 0]],
+  collisionVolumeScales         = [[32 90 32]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[CylY]],
+  corpse                        = [[DEAD]],
 
-  customParams           = {
+  customParams                  = {
     description_fr = [[Light Laser Tower ou Tourelle Laser Légcre]],
     helptext       = [[The Lotus is a basic turret. A versatile, solid anti-ground weapon, it does well versus scouts as well as being able to take on one or two raiders. Falls relatively easily to skirmishers, artillery or assault units unless supported.]],
     helptext_fr    = [[La Tourelle Laser Légcre aussi appellée LLT est une tourelle basique, peu solide mais utile pour se protéger des éclaireurs ou des pilleurs. Des tirailleurs ou de l'artillerie en viendrons rapidement r bout. ]],
   },
 
-  defaultmissiontype     = [[GUARD_NOMOVE]],
-  explodeAs              = [[SMALL_BUILDINGEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
-  healtime               = [[4]],
-  iconType               = [[defenseraider]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
-  levelGround            = false,
-  mass                   = 55,
-  maxDamage              = 785,
-  maxSlope               = 36,
-  maxVelocity            = 0,
-  maxWaterDepth          = 0,
-  minCloakDistance       = 150,
-  modelCenterOffset      = [[0 32 0]],
-  noAutoFire             = false,
-  noChaseCategory        = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName             = [[lotustest2.s3o]],
-  seismicSignature       = 4,
-  selfDestructAs         = [[SMALL_BUILDINGEX]],
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[SMALL_BUILDINGEX]],
+  footprintX                    = 2,
+  footprintZ                    = 2,
+  healtime                      = [[4]],
+  iconType                      = [[defenseraider]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  levelGround                   = false,
+  mass                          = 128,
+  maxDamage                     = 785,
+  maxSlope                      = 36,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  modelCenterOffset             = [[0 32 0]],
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName                    = [[lotustest2.s3o]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[SMALL_BUILDINGEX]],
 
-  sfxtypes               = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
@@ -57,15 +61,16 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
-  sightDistance          = 473,
-  smoothAnim             = true,
-  TEDClass               = [[FORT]],
-  turnRate               = 0,
-  workerTime             = 0,
-  yardMap                = [[oooo]],
+  side                          = [[CORE]],
+  sightDistance                 = 473,
+  smoothAnim                    = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooo]],
 
-  weapons                = {
+  weapons                       = {
 
     {
       def                = [[LASER]],
@@ -76,7 +81,7 @@ unitDef = {
   },
 
 
-  weaponDefs             = {
+  weaponDefs                    = {
 
     LASER = {
       name                    = [[Laserbeam]],
@@ -127,7 +132,7 @@ unitDef = {
   },
 
 
-  featureDefs            = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Lotus]],
@@ -192,11 +197,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=4,
-	buildingGroundDecalSizeY=4,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[corllt_aoplane.dds]],
 }
 
 return lowerkeys({ corllt = unitDef })

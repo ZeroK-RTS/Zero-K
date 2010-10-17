@@ -9,10 +9,10 @@ unitDef = {
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
   builder                       = true,
-  buildingGroundDecalDecaySpeed = 0.01,
+  buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 9,
   buildingGroundDecalSizeY      = 7,
-  buildingGroundDecalType       = [[asphalt512c.dds]],
+  buildingGroundDecalType       = [[factoryplane_aoplane.dds]],
 
   buildoptions                  = {
     [[armca]],
@@ -49,7 +49,7 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   isAirBase                     = true,
-  mass                          = 275,
+  mass                          = 324,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -135,11 +135,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=9,
-	buildingGroundDecalSizeY=7,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[factoryplane_aoplane.dds]],
 }
 
 return lowerkeys({ factoryplane = unitDef })

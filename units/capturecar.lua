@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Dreamweaver]],
   description         = [[Capture Vehicle]],
   acceleration        = 0.036,
-  --activateWhenBuilt   = true,
   bmcode              = [[1]],
   brakeRate           = 0.015,
   buildCostEnergy     = 420,
@@ -37,7 +36,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   maneuverleashlength = [[640]],
-  mass                = 50,
+  mass                = 201,
   maxDamage           = 720,
   maxSlope            = 18,
   maxVelocity         = 2.5,
@@ -48,9 +47,8 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],
   objectName          = [[corvrad.s3o]],
-  --onoffable           = true,
   radarDistance       = 1200,
-  script			  = [[capturecar.lua]],
+  script              = [[capturecar.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   side                = [[CORE]],
@@ -67,7 +65,7 @@ unitDef = {
   turnRate            = 320,
   workerTime          = 0,
 
-  weapons                       = {
+  weapons             = {
 
     {
       def                = [[CAPTURERAY]],
@@ -76,8 +74,9 @@ unitDef = {
     },
 
   },
-  
-   weaponDefs                    = {
+
+
+  weaponDefs          = {
 
     CAPTURERAY = {
       name                    = [[Capture Ray]],
@@ -126,7 +125,8 @@ unitDef = {
     },
 
   },
-  
+
+
   featureDefs         = {
 
     DEAD  = {

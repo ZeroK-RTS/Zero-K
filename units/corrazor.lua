@@ -1,44 +1,48 @@
 unitDef = {
-  unitname            = [[corrazor]],
-  name                = [[Razor's Kiss]],
-  description         = [[Anti-Air Laser]],
-  bmcode              = [[0]],
-  buildAngle          = 8192,
-  buildCostEnergy     = 280,
-  buildCostMetal      = 280,
-  builder             = false,
-  buildPic            = [[corrazor.png]],
-  buildTime           = 280,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[FLOAT]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[corrazor]],
+  name                          = [[Razor's Kiss]],
+  description                   = [[Anti-Air Laser]],
+  bmcode                        = [[0]],
+  buildAngle                    = 8192,
+  buildCostEnergy               = 280,
+  buildCostMetal                = 280,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 5,
+  buildingGroundDecalSizeY      = 5,
+  buildingGroundDecalType       = [[corrazor_aoplane.dds]],
+  buildPic                      = [[corrazor.png]],
+  buildTime                     = 280,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[FLOAT]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Laser Anti-Air]],
     helptext       = [[The Razor's Kiss is a medium anti-air turret. Though inaccurate at its max range, it does well against units flying directly over it and gunships. Its high hit points and armour bonus when closed makes it very hard for the enemy to dislodge.]],
     helptext_fr    = [[le Razor est une tourelle Anti-Air de portée moyenne. Enterrée et protégée par un blindage, elle sort et tir avec son laser r haute cadence. Assez imprécise r distance, elle compense par sa solidité.]],
   },
 
-  damageModifier      = 0.25,
-  explodeAs           = [[SMALL_BUILDINGEX]],
-  floater             = true,
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[defenseaa]],
-  levelGround         = false,
-  mass                = 140,
-  maxDamage           = 2200,
-  maxSlope            = 18,
-  minCloakDistance    = 150,
-  noAutoFire          = false,
-  noChaseCategory     = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName          = [[aapopup.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[SMALL_BUILDINGEX]],
+  damageModifier                = 0.25,
+  explodeAs                     = [[SMALL_BUILDINGEX]],
+  floater                       = true,
+  footprintX                    = 3,
+  footprintZ                    = 3,
+  iconType                      = [[defenseaa]],
+  levelGround                   = false,
+  mass                          = 230,
+  maxDamage                     = 2200,
+  maxSlope                      = 18,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
+  objectName                    = [[aapopup.s3o]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[SMALL_BUILDINGEX]],
 
-  sfxtypes            = {
+  sfxtypes                      = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
@@ -46,14 +50,15 @@ unitDef = {
 
   },
 
-  shootme             = [[1]],
-  side                = [[CORE]],
-  sightDistance       = 660,
-  TEDClass            = [[FORT]],
-  workerTime          = 0,
-  yardMap             = [[ooooooooo]],
+  shootme                       = [[1]],
+  side                          = [[CORE]],
+  sightDistance                 = 660,
+  TEDClass                      = [[FORT]],
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[ooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[corrazor_WEAPON]],
@@ -64,7 +69,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     corrazor_WEAPON = {
       name                    = [[Anti-Air Laser]],
@@ -115,7 +120,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Razor's Kiss]],
@@ -177,11 +182,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=5,
-	buildingGroundDecalSizeY=5,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[corrazor_aoplane.dds]],
 }
 
 return lowerkeys({ corrazor = unitDef })

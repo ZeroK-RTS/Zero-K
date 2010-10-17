@@ -1,24 +1,28 @@
 unitDef = {
-  unitname            = [[armanni]],
-  name                = [[Annihilator]],
-  description         = [[Tachyon Accelerator (Counter-Artillery/Anti-Armor)]],
-  acceleration        = 0,
-  activateWhenBuilt   = true,
-  bmcode              = [[0]],
-  brakeRate           = 0,
-  buildAngle          = 4096,
-  buildCostEnergy     = 2200,
-  buildCostMetal      = 2200,
-  builder             = false,
-  buildPic            = [[ARMANNI.png]],
-  buildTime           = 2200,
-  canAttack           = true,
-  canstop             = [[1]],
-  category            = [[SINK]],
-  collisionVolumeTest = 1,
-  corpse              = [[DEAD]],
+  unitname                      = [[armanni]],
+  name                          = [[Annihilator]],
+  description                   = [[Tachyon Accelerator (Counter-Artillery/Anti-Armor)]],
+  acceleration                  = 0,
+  activateWhenBuilt             = true,
+  bmcode                        = [[0]],
+  brakeRate                     = 0,
+  buildAngle                    = 4096,
+  buildCostEnergy               = 2200,
+  buildCostMetal                = 2200,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 6,
+  buildingGroundDecalSizeY      = 6,
+  buildingGroundDecalType       = [[armanni_aoplane.dds]],
+  buildPic                      = [[ARMANNI.png]],
+  buildTime                     = 2200,
+  canAttack                     = true,
+  canstop                       = [[1]],
+  category                      = [[SINK]],
+  collisionVolumeTest           = 1,
+  corpse                        = [[DEAD]],
 
-  customParams        = {
+  customParams                  = {
     description_fr = [[Acc?lerateur Tachyon]],
     description_pl = [[Akcelerator Tachyonów]],
     helptext       = [[Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you have plenty of energy reserves. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders.]],
@@ -26,34 +30,35 @@ unitDef = {
     helptext_pl    = [[Pod ci??kim pancerzem Annihilatora znajduje si? niszczycielski Akcelerator Tachyonów. Ta straszliwa bro? pozwala na zadawanie wysokich obra?e? oddalonym celom, zak?adaj?c ?e masz do?? energii by j? zasili?.]],
   },
 
-  damageModifier      = 0.25,
-  defaultmissiontype  = [[GUARD_NOMOVE]],
-  explodeAs           = [[CRAWL_BLASTSML]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[fixedtachyon]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  mass                = 1100,
-  maxDamage           = 7000,
-  maxSlope            = 18,
-  maxVelocity         = 0,
-  maxWaterDepth       = 0,
-  minCloakDistance    = 150,
-  noChaseCategory     = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName          = [[arm_annihilator.s3o]],
-  onoffable           = true,
-  seismicSignature    = 4,
-  selfDestructAs      = [[CRAWL_BLASTSML]],
-  side                = [[ARM]],
-  sightDistance       = 780,
-  smoothAnim          = true,
-  TEDClass            = [[FORT]],
-  turnRate            = 0,
-  workerTime          = 0,
-  yardMap             = [[oooooooooooooooo]],
+  damageModifier                = 0.25,
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[CRAWL_BLASTSML]],
+  footprintX                    = 4,
+  footprintZ                    = 4,
+  iconType                      = [[fixedtachyon]],
+  idleAutoHeal                  = 5,
+  idleTime                      = 1800,
+  mass                          = 556,
+  maxDamage                     = 7000,
+  maxSlope                      = 18,
+  maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
+  minCloakDistance              = 150,
+  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName                    = [[arm_annihilator.s3o]],
+  onoffable                     = true,
+  seismicSignature              = 4,
+  selfDestructAs                = [[CRAWL_BLASTSML]],
+  side                          = [[ARM]],
+  sightDistance                 = 780,
+  smoothAnim                    = true,
+  TEDClass                      = [[FORT]],
+  turnRate                      = 0,
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooooooooooooooo]],
 
-  weapons             = {
+  weapons                       = {
 
     {
       def                = [[ATA]],
@@ -64,7 +69,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs                    = {
 
     ATA = {
       name                    = [[Tachyon Accelerator]],
@@ -114,7 +119,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Annihilator]],
@@ -179,11 +184,6 @@ unitDef = {
 
   },
 
-	buildingGroundDecalDecaySpeed=30,
-	buildingGroundDecalSizeX=6,
-	buildingGroundDecalSizeY=6,
-	useBuildingGroundDecal = true,
-	buildingGroundDecalType=[[armanni_aoplane.dds]],
 }
 
 return lowerkeys({ armanni = unitDef })
