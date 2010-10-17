@@ -1,7 +1,7 @@
 local array = {}
 
 local weapons = {
-	slowmort_slowbeam = { slowDamage = 11, onlySlow = true, smartRetarget = true, scaleSlow = true},
+	slowmort_slowbeam = { slowDamage = 350, onlySlow = true, smartRetarget = true, scaleSlow = true},
 	armslowllt_slowlaser = { slowDamage = 7, onlySlow = true, smartRetarget = true, scaleSlow = true},
 	cormak_blast = { slowDamage = 80, noFF = true, noDeathBlast = true, scaleSlow = true },
 	slowmissile_weapon = { slowDamage = 1, onlySlow = true, scaleSlow = true },

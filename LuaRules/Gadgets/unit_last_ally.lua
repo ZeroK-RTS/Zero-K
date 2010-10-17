@@ -30,6 +30,7 @@ function gadget:GameFrame(n)
 
     if Spring.IsCheatingEnabled() then
       gadgetHandler:RemoveGadget()
+	  return
     end
 
     local allylist = Spring.GetAllyTeamList()

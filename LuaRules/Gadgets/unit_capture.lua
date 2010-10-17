@@ -20,6 +20,19 @@ local RETAKING_DEGRADE_TIMER = 5
 local GENERAL_DEGRADE_TIMER = 2
 local DEGRADE_FACTOR = 0.2
 
+local CMD_UNIT_KILL_SUBORDINATES = 35821
+local CMD_STOP = CMD.STOP
+local CMD_SELFD = CMD.SELFD
+
+local unitKillSubordinatesCmdDesc = {
+	id      = CMD_UNIT_KILL_SUBORDINATES,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Kill Subordinates',
+	action  = 'killsubordinates',
+	tooltip	= 'Toggles auto self-d of captured units',
+	params 	= {0, 'Kill Off','Kill On'}
+}
+
 --SYNCED
 if gadgetHandler:IsSyncedCode() then
 
@@ -277,6 +290,12 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	
 		-- give the unit
 		Spring.TransferUnit(unitID, transferePlayer, false)
+		Spring.GiveOrderToUnit(unitID, CMD_STOP, {}, {})
+		
+		-- destroy the unit if the controller is set to destroy units
+		if controllers[attackerID].killSubordinates and aTeam ~= capturedUnits[unitID].originAllyTeam then
+			Spring.GiveOrderToUnit(unitID, CMD_SELFD, {}, {})
+		end
 		
 		removeOtherCaptureFromUnit(unitID, aTeam)
 	end
@@ -294,12 +313,15 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		return
 	end
 	
+	Spring.InsertUnitCmdDesc(unitID, unitKillSubordinatesCmdDesc)
+	
 	controllers[unitID] = {
 		captureMax = captureUnitDefs[unitDefID].captureQuota,
 		unitMax = captureUnitDefs[unitDefID].unitLimit,
 		captureUsed = 0,
 		units = {},
 		unitCount = 0,
+		killSubordinates = false,
 	}
 
 end
@@ -359,9 +381,39 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	
 end
 
+--------------------------------------------------------------------------------
+-- Command Handling
+local function KillToggleCommand(unitID, cmdParams, cmdOptions)
+	if controllers[unitID] then
+		local state = cmdParams[1]
+		local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_UNIT_KILL_SUBORDINATES)
+		
+		if (cmdDescID) then
+			unitKillSubordinatesCmdDesc.params[1] = state
+			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = unitKillSubordinatesCmdDesc.params})
+		end
+		controllers[unitID].killSubordinates = (state == 1)
+	end
+	
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	
+	if (cmdID ~= CMD_UNIT_KILL_SUBORDINATES) then
+		return true  -- command was not used
+	end
+	KillToggleCommand(unitID, cmdParams, cmdOptions)  
+	return false  -- command was used
+end
+
+------------------------------------------------------
+
 function gadget:Initialize()
 
 	_G.controllers = controllers
+	
+	-- register command
+	gadgetHandler:RegisterCMDID(CMD_UNIT_KILL_SUBORDINATES)
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

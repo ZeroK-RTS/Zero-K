@@ -465,6 +465,17 @@ local behaviourConfig = {
 		swarmLeeway = 40, 
 		stoppingDistance = 8
 	},
+	
+	["corsh"] = {
+		skirms = raiderRangeSkirmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true, 
+		strafeOrderLength = 180,
+		maxSwarmLeeway = 40, 
+		swarmLeeway = 40, 
+		stoppingDistance = 8
+	},
   
 	["armfast"] = {
 		skirms = raiderRangeSkirmieeArray, 
