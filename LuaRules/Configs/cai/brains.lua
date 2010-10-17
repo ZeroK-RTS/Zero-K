@@ -13,7 +13,13 @@ function constructionAndEconomyHandler(a, at, frame)
 	local controlledUnit = a.controlledUnit
 	
 	a.unitHording = 0.3
-	a.wantedNanoCount = math.floor(averagedEcon.aveMInc/24)
+	if averagedEcon.aveMInc < 50 then
+		a.wantedNanoCount = math.floor(averagedEcon.aveMInc/24)
+	elseif averagedEcon.aveMInc < 100 then
+		a.wantedNanoCount = math.floor(averagedEcon.aveMInc/15)
+	else
+		a.wantedNanoCount = math.floor(averagedEcon.aveMInc/10)
+	end
 	
 	-- example of setting default values
 	conJob.defence.importance = 1.8 + at.relativeEnemyForceComposition.unit.raider
@@ -25,6 +31,12 @@ function constructionAndEconomyHandler(a, at, frame)
 		conJob.defence.airpadChance = 1
 	else
 		conJob.defence.airpadChance = 0
+	end
+	
+	if averagedEcon.mStor/averagedEcon.aveMInc < 6 then
+		conJob.defence.metalStorageChance = 1
+	else
+		conJob.defence.metalStorageChance = 0
 	end
 	
 	-- defence handling

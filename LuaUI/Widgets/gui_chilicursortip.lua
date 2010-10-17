@@ -1001,27 +1001,23 @@ function widget:Update(dt)
 	local mousemoved = (mx ~= old_mx or my ~= old_my)
 	
 	local show_cursortip = true
-	if options.statictip.value then
+	if meta then
+		if not showExtendedTip then changeNow = true end
 		showExtendedTip = true
+	
 	else
-		if meta then
-			if not showExtendedTip then changeNow = true end
-			showExtendedTip = true
-		
-		else
-			if options.tooltip_delay.value > 0 then
-				if not mousemoved then
-					stillCursorTime = stillCursorTime + dt
-				else
-					stillCursorTime = 0 
-				end
-				show_cursortip = stillCursorTime > options.tooltip_delay.value
+		if options.tooltip_delay.value > 0 then
+			if not mousemoved then
+				stillCursorTime = stillCursorTime + dt
+			else
+				stillCursorTime = 0 
 			end
-			
-			if showExtendedTip then changeNow = true end
-			showExtendedTip = false
-		
+			show_cursortip = stillCursorTime > options.tooltip_delay.value
 		end
+		
+		if showExtendedTip then changeNow = true end
+		showExtendedTip = false
+	
 	end
 
 	if mousemoved or changeNow then

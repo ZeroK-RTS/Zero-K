@@ -101,6 +101,24 @@ local arty = {
 	"chickenblobber",
 }
 
+local prioritySos = {
+	"armfus",
+	"factoryshield",
+    "factorycloak",
+    "factoryveh",
+    "factoryplane",
+    "factorygunship",
+    "factoryhover",
+    "factoryspider",
+    "factoryjump",
+    "factorytank",
+    "corsy",
+	"armcom",
+	"corcom",
+	"commrecon",
+	"commsupport",
+}
+
 --global versions
 raiderArray = {}
 assaultArray = {}
@@ -108,6 +126,7 @@ jumperArray = {}
 skirmArray = {}
 riotArray = {}
 artyArray = {}
+prioritySosArray = {}
 
 local function CreateArray(source, target)
 	for i=1, #source do
@@ -122,3 +141,4 @@ CreateArray(jumper, jumperArray)
 CreateArray(skirm, skirmArray)
 CreateArray(riot, riotArray)
 CreateArray(arty, artyArray)
+CreateArray(prioritySos, prioritySosArray)

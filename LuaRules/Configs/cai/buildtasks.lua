@@ -43,7 +43,7 @@ factionBuildConfig = {
 		factoryByDefId = {	
 			[UnitDefNames['factoryveh'].id] = {
 				defenceQuota = {2,0.6,0.3},
-				defenceRange = 500,
+				defenceRange = 400,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
 				BPQuota = 70,
@@ -101,7 +101,7 @@ factionBuildConfig = {
 			},
 			[UnitDefNames['factoryjump'].id] = {
 				defenceQuota = {2,0.6,0.3},
-				defenceRange = 500,
+				defenceRange = 400,
 				airDefenceQuota = {2,1,0.1},
 				importance = 0.8,
 				BPQuota = 70,
@@ -160,7 +160,7 @@ factionBuildConfig = {
 			},
 			[UnitDefNames['factoryspider'].id] = {
 				defenceQuota = {2,0.6,0.3},
-				defenceRange = 500,
+				defenceRange = 400,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
 				BPQuota = 70,
@@ -218,7 +218,7 @@ factionBuildConfig = {
 			},
 			[UnitDefNames['factorycloak'].id] = {
 				defenceQuota = {2,0.6,0.3},
-				defenceRange = 500,
+				defenceRange = 400,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
 				BPQuota = 70,
@@ -276,7 +276,7 @@ factionBuildConfig = {
 			},
 			[UnitDefNames['factoryshield'].id] = {
 				defenceQuota = {2,0.6,0.3},
-				defenceRange = 500,
+				defenceRange = 400,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
 				BPQuota = 70,
@@ -331,7 +331,7 @@ factionBuildConfig = {
 			},
 			[UnitDefNames['factoryhover'].id] = {
 				defenceQuota = {2,0.6,0.3},
-				defenceRange = 500,
+				defenceRange = 400,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
 				BPQuota = 70,
@@ -389,7 +389,7 @@ factionBuildConfig = {
 			},
 			[UnitDefNames['factorytank'].id] = {
 				defenceQuota = {2,0.6,0.3},
-				defenceRange = 500,
+				defenceRange = 400,
 				airDefenceQuota = {2,1,0.1},
 				importance = 1,
 				BPQuota = 100,
@@ -449,7 +449,7 @@ factionBuildConfig = {
 			},
 			[UnitDefNames['factoryplane'].id] = {
 				defenceQuota = {2,0.6,0.3},
-				defenceRange = 500,
+				defenceRange = 400,
 				airDefenceQuota = {2,1,0.1},
 				airFactory = true,
 				importance = 1,
@@ -489,7 +489,7 @@ factionBuildConfig = {
 			},
 			[UnitDefNames['factorygunship'].id] = {
 				defenceQuota = {2,0.6,0.3},
-				defenceRange = 500,
+				defenceRange = 400,
 				airDefenceQuota = {2,1,0.1},
 				airFactory = true,
 				importance = 1,
@@ -693,5 +693,6 @@ factionBuildConfig = {
 
 		airpadDefID = UnitDefNames['armasp'].id,
 		nanoDefID = UnitDefNames['armnanotc'].id,
+		metalStoreDefID = UnitDefNames['armmstor'].id,
 	}
 }

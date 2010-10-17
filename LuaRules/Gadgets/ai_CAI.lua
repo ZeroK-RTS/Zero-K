@@ -106,33 +106,42 @@ include "LuaRules/Gadgets/mex_spot_finder.lua"
 
 -- *** 'Globals'
 
-local usingAI
+local usingAI -- whether there is AI in the game
 
+-- array of allyTeams to draw heatmap data for
 local debugData = {
 	drawScoutmap = {}, 
 	drawOffensemap = {},
 	drawEconmap = {},
 	drawDefencemap = {},
+	showEnemyForceCompostion = {},
+	showConJobList = {},
+	showFacJobList = {},
 }
 
-local aiTeamData = {}
-local allyTeamData = {}
+local aiTeamData = {} -- all the information a single AI stores
+local allyTeamData = {} -- all the information that each ally team is required to store
+-- some information is stored by all. Other info is stored only be allyTeams with AI
 
 -- spots that mexes can be built on
 mexSpot = {count = 0}
 
-local econAverageMemory = 3 
+local econAverageMemory = 3 -- how many econ update steps economy is averaged over
 
 -- size of heatmap arrays and squares
 mapWidth = Game.mapSizeX
 mapHeight = Game.mapSizeZ
 
+-- elements in array
 heatArrayWidth = math.ceil(mapWidth/heatSquareMinSize)
 heatArrayHeight = math.ceil(mapHeight/heatSquareMinSize)
+-- size of a single square in elmos
 heatSquareWidth = mapWidth/heatArrayWidth
 heatSquareHeight = mapHeight/heatArrayHeight
+-- how many elements there are in total
 heatSquares = heatArrayWidth*heatArrayHeight
 
+-- Initialise heatmap position data
 heatmapPosition = {}
 for i = 1,heatArrayWidth do -- init array
 	heatmapPosition[i] = {}
@@ -145,8 +154,6 @@ for i = 1,heatArrayWidth do -- init array
 		heatmapPosition[i][j].y = spGetGroundHeight(heatmapPosition[i][j].x,heatmapPosition[i][j].z)
 	end
 end
-
-
 
 -- area of a command placed in the centre of the map
 local areaCommandRadius = math.sqrt( (mapWidth/2)^2 + (mapHeight/2)^2 )
@@ -205,7 +212,7 @@ local function chooseUnitDefIDWithDebug(array, unitID, ud, choice)
 			return array[i].ID
 		end
 	end
-	Spring.Echo(" ******* Chance Wrong ******* ")
+	Spring.Echo("Chance Wrong for " .. ud.humanName .. " with choice " .. choice)
 end
 
 -- normalises the importance factors in an importance array
@@ -234,13 +241,14 @@ local function updateTeamResourcing(team)
 	local eCur, eMax, ePull, eInc, eExp, eShare, eSent, eRec = spGetTeamResources(team, "energy")
 	local mCur, mMax, mPull, mInc, mExp, mShare, mSent, mRec = spGetTeamResources(team, "metal")	
 	
+	averagedEcon.mStor = mMax -- m storage
+	
 	--// average the resourcing over the past few updates to reduce sharp spikes and dips
 	-- update previous frame info
 	for i = econAverageMemory, 2, -1 do
 		averagedEcon.prevEcon[i] = averagedEcon.prevEcon[i-1]
 	end
 	averagedEcon.prevEcon[1] = {eInc = eInc, mInc = mInc, activeBp = mPull}
-	
 	-- calculate average
 	averagedEcon.aveEInc = 0
 	averagedEcon.aveMInc = 0
@@ -265,7 +273,7 @@ local function updateTeamResourcing(team)
 	end
 end
 
--- changes the weighting on con and factory jobs based on brain
+-- changes the weighting on con and factory jobs based on brain, can do other things too
 local function executeControlFunction(team, frame)
 
 	local a = aiTeamData[team]
@@ -293,8 +301,8 @@ local function conJobAllocator(team)
 	local unassignedCons = a.unassignedCons
 	local controlledUnit = a.controlledUnit
 	
-	local lackingCons = {}
-	local lackingConCount = 0
+	local lackingCons = {} -- jobs that need more cons
+	local lackingConCount = 0 -- number of jobs that need more cons
 	
 	-- remove con from jobs with too much BP
 	for _,data in pairs(conJob) do
@@ -326,6 +334,7 @@ local function conJobAllocator(team)
 		local largestChange = 0
 		local largestID = -1
 		
+		-- find the job with the largest bp need
 		for i = 1,lackingConCount do
 			if lackingCons[i].bpChange > largestChange then
 				largestID = i
@@ -333,12 +342,14 @@ local function conJobAllocator(team)
 			end
 		end
 		
+		-- add a con to the job with the largest bp need
 		if largestID ~= -1 then
 			local data = lackingCons[largestID]
 			local i = unassignedCons.count
 			local unitID = unassignedCons[i]
 			local oldConJob = conJobByIndex[controlledUnit.conByID[unitID].oldJob]
 			
+			-- find the closest free con
 			while oldConJob and oldConJob.location ~= data.location and i > 1 do
 				i = i-1
 				unitID = unassignedCons[i]
@@ -360,7 +371,7 @@ local function conJobAllocator(team)
 			
 			--mapEcho(unitID,"con added to " .. data.name)
 		else
-			Spring.Echo("broke 'add con to jobs with not enough BP'")
+			Spring.Echo("broke 'add con to jobs with not enough BP'") -- should not happen
 			break
 		end
 	end
@@ -404,8 +415,7 @@ local function getBuildFacing(left,top)
 	end
 end	
 
-
--- checks if position is within distance of a unit in unit array
+-- returns if position is within distance of a unit in unit array
 local function nearRadar(team,tx,tz,distance)
 	
 	local unitArray = allyTeamData[aiTeamData[team].allyTeam].units.radarByID
@@ -419,7 +429,7 @@ local function nearRadar(team,tx,tz,distance)
 	return false
 end
 
--- checks if position is within distance of a unit in unit array
+-- returns if position is within distance of a unit in unit array
 local function nearFactory(team,tx,tz,distance)
 	
 	local unitArray = allyTeamData[aiTeamData[team].allyTeam].units.factoryByID
@@ -437,7 +447,7 @@ local function nearFactory(team,tx,tz,distance)
 	return false
 end
 
--- checks if position is within distance of a unit in unit array
+-- returns if position is within distance of a unit in unit array
 local function nearEcon(team,tx,tz,distance)
 	
 	local unitArray = allyTeamData[aiTeamData[team].allyTeam].units.econByID
@@ -450,7 +460,7 @@ local function nearEcon(team,tx,tz,distance)
 	return false
 end
 
--- checks if position is within distance of a mex spot
+-- returns if position is within distance of a mex spot
 local function nearMexSpot(tx,tz,distance)
 
 	for i = 1, mexSpot.count do
@@ -463,6 +473,7 @@ local function nearMexSpot(tx,tz,distance)
 	return false
 end
 
+-- returns if position is within distance of defence structure or wanted defence location
 local function nearDefence(team,tx,tz,distance)
 
 	local a = aiTeamData[team]
@@ -492,7 +503,7 @@ local function nearMapEdge(tx,tz,distance)
 	return false
 end
 
--- makes defence in response to enemy presence
+-- makes defence in response to an enemy
 local function makeReponsiveDefence(team,unitID,eid,eUnitDefID,aidSearchRange)
 	
 	local a = aiTeamData[team]
@@ -611,6 +622,7 @@ local function makeWantedDefence(team,unitID,searchRange, maxDistance, priorityD
 			return true
 		end
 	end
+	
 	
 	local minDefDisSQ = false
 	local minPriority = 0
@@ -1194,6 +1206,12 @@ local function conJobHandler(team)
 				and 
 					makeMiscBuilding(team,unitID,buildDefs.airpadDefID,200,1000)
 				)
+			or
+				(
+					math.random() < conJob.defence.metalStorageChance
+				and 
+					makeMiscBuilding(team,unitID,buildDefs.metalStoreDefID,200,1000)
+				)
 			) 
 			then
 				makeWantedDefence(team,unitID,1000,false, 1500)
@@ -1304,6 +1322,7 @@ local function factoryJobHandler(team)
 	for unitID,data in pairs(factoryByID) do
 		
 		local scouting = false
+		local raiding = false
 		
 		local cQueue = spGetFactoryCommands(unitID)
 		if #cQueue == 0 then
@@ -1546,7 +1565,7 @@ local function battleGroupHandler(team, frame, slowUpdate)
 			local aZ = math.ceil(averageZ/heatSquareHeight) 
 			
 			if aX == data.aX and aZ == data.aZ then
-				wipeSquareData(team, aX, aZ)
+				wipeSquareData(a.allyTeam, aX, aZ)
 				if data.disbandable then
 					for unitID,_ in pairs(data.unit) do
 						unitInBattleGroupByID[unitID] = nil
@@ -1736,7 +1755,7 @@ local function raiderJobHandler(team)
 				aimX = tX, aimY = tY, aimZ = tZ, 
 				aX = aX, aZ = aZ, 
 				currentX = false, currentZ = false,
-				respondToSOS = false,
+				respondToSOSpriority = 1,
 				regroup = true, 
 				unit = {}, 
 				tempTarget = false,
@@ -1901,7 +1920,7 @@ local function gunshipJobHandler(team)
 				aimX = tX, aimY = tY, aimZ = tZ, 
 				aX = aX, aZ = aZ, 
 				currentX = false, currentZ = false,
-				respondToSOS = false,
+				respondToSOSpriority = 1,
 				regroup = true, 
 				unit = {}, 
 				tempTarget = false,
@@ -2063,7 +2082,7 @@ local function combatJobHandler(team)
 				aimX = tX, aimY = tY, aimZ = tZ, 
 				aX = aX, aZ = aZ, 
 				currentX = false, currentZ = false,
-				respondToSOS = false,
+				respondToSOSpriority = 0,
 				regroup = true, 
 				unit = {}, 
 				tempTarget = false, 
@@ -2249,9 +2268,7 @@ local function diluteEnemyForceComposition(allyTeam)
 	
 	for index,value in pairs(at.relativeEnemyForceComposition.unit) do
 		at.relativeEnemyForceComposition.unit[index] = at.enemyForceComposition.unit[index]/totalCost*9
-		--Spring.Echo(index .. " \t\t" .. value)
 	end
-	
 end
 
 local function addValueToHeatmap(indexer,heatmap, value, aX, aZ)
@@ -2403,7 +2420,7 @@ local function editDefenceHeatmap(team,unitID,groundArray,airArray,range,sign,pr
 	
 end
 
-local function callForMobileDefence(team ,unitID, attackerID, callRange)
+local function callForMobileDefence(team ,unitID, attackerID, callRange, priority)
 
 	local a = aiTeamData[team]
 	local at = allyTeamData[a.allyTeam]
@@ -2424,8 +2441,8 @@ local function callForMobileDefence(team ,unitID, attackerID, callRange)
 		end
 		local battleGroup = a.battleGroup
 		for i = 1, battleGroup.count do
-			if battleGroup.respondToSOS then
-				battleGroup.tempTarget = attackerID
+			if battleGroup[i].respondToSOSpriority <= priority then
+				battleGroup[i].tempTarget = attackerID
 			end
 		end
 	end
@@ -2551,7 +2568,12 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	
 		spotEnemyUnit(a.allyTeam, attackerID, attackerDefID, false)
 	
-		callForMobileDefence(unitTeam, unitID, attackerID, sosRadius)
+		if prioritySosArray[unitDefID] then
+			callForMobileDefence(unitTeam, unitID, attackerID, prioritySosRadius, 1)
+		else
+			callForMobileDefence(unitTeam, unitID, attackerID, sosRadius, 0)
+		end
+		
 	
 		if a.controlledUnit.conByID[unitID] and not a.controlledUnit.conByID[unitID].makingDefence then
 			local ud = UnitDefs[attackerDefID]
@@ -2669,6 +2691,34 @@ local function initialiseFaction(team)
 	return false
 end
 
+local function echoEnemyForceComposition(allyTeam)
+	local at = allyTeamData[allyTeam]
+	Spring.Echo("")
+	for index,value in pairs(at.relativeEnemyForceComposition.unit) do
+		Spring.Echo(index .. " \t\t" .. value .. "\t\t" .. at.enemyForceComposition.unit[index])
+	end
+end
+
+local function echoConJobList(team)
+	local data = aiTeamData[team]
+	Spring.Echo("")
+	for index,value in pairs(data.conJob) do
+		Spring.Echo(conJobNames[index] .. "   " .. math.floor(value.importance*1000) .. "   " .. value.assignedBP)
+	end
+end
+
+local function echoFacJobList(team)
+	local data = aiTeamData[team]
+	Spring.Echo("")
+	for index,value in ipairs(data.facJob) do
+		Spring.Echo(factoryJobNames[index] .. "   " .. math.floor(value.importance*1000))
+	end
+	Spring.Echo("")
+	for index,value in ipairs(data.facJobAir) do
+		Spring.Echo(airFactoryJobNames[index] .. "   " .. math.floor(value.importance*1000))
+	end
+end
+
 function gadget:GameFrame(n)
 
 	for team,_ in pairs(aiTeamData) do
@@ -2699,18 +2749,33 @@ function gadget:GameFrame(n)
 			factoryJobHandler(team)
 			scoutJobHandler(team)
 		end
+		
+		if n%200 == 0 then
+			if debugData.showConJobList[team] then
+				echoConJobList(team)
+			end
+			if debugData.showFacJobList[team] then
+				echoFacJobList(team)
+			end
+		end
+		
 	end
 	
-	if n%50 == 25 then
-		for allyTeam,data in pairs(allyTeamData) do
+	for allyTeam,data in pairs(allyTeamData) do
+		
+		if n%50 == 25 then
 			if data.ai then
 				updateScoutingHeatmap(allyTeam,n, n%500 == 25)
 			end
 		end
-	end
 	
-	if n%120 == 30 then
-		for allyTeam,data in pairs(allyTeamData) do
+		if n%200 == 0 then
+			if debugData.showEnemyForceCompostion[team] then
+				echoEnemyForceComposition(allyTeam)
+			end
+		end
+	
+		if n%120 == 30 then
 			if data.ai then
 			
 				decayEnemyHeatmaps(allyTeam,n)
@@ -2733,6 +2798,7 @@ function gadget:GameFrame(n)
 				end
 			end
 		end
+		
 	end
 end
 
@@ -3042,6 +3108,9 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				controlledUnit.raider.cost = controlledUnit.raider.cost + ud.metalCost
 				controlledUnit.raider.count = controlledUnit.raider.count + 1
 				controlledUnit.raiderByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
+				if ud.canFly then
+					Spring.Echo("flying raider")
+				end
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
 					if ud.isFighter then -- fighter
@@ -3252,6 +3321,7 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 			aveActiveBp = 0,
 			eCur = 0, 
 			mCur = 0,
+			mStor = 500,
 			energyToMetalRatio = 1,
 			activeBpToMetalRatio = 0,
 		},
@@ -3279,7 +3349,8 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 		
 		conJob = {
 			reclaim = {importance = 0, con = {}, assignedBP = 0, name = "reclaim", interruptable = true, index = 1, grouping = 1},
-			defence = {importance = 0, con = {}, assignedBP = 0, name = "defence", interruptable = false, index = 2, grouping = 2,radarChance = 0, airChance = 0, airpadChance},
+			defence = {importance = 0, con = {}, assignedBP = 0, name = "defence", interruptable = false, index = 2, grouping = 2,
+				radarChance = 0, airChance = 0, airpadChance = 0, metalStorageChance = 0},
 			mex = {importance = 0, con = {}, assignedBP = 0, name = "mex", interruptable = false, defenceChance = 0, index = 3, grouping = 1},
 			factory = {importance = 0, con = {}, assignedBP = 0, name = "factory", airFactor = 0,interruptable = true, index = 4, grouping = 2},
 			energy = {importance = 0, con = {}, assignedBP = 0, name = "energy", interruptable = false, index = 5, grouping = 2},
@@ -3591,38 +3662,78 @@ local function changeAIdefenceDrawing(cmd,line,words,player)
 	return true
 end
 
+local function changeAIshowEnemyForceComposition(cmd,line,words,player)
+	local team=tonumber(words[1])
+	if team and aiTeamData[team] then
+		if debugData.showEnemyForceCompostion[team] then
+			debugData.showEnemyForceCompostion[team] = false
+			Spring.Echo("CAI enemy force composition " .. team .. " OFF")
+		else
+			debugData.showEnemyForceCompostion[team] = true
+			Spring.Echo("CAI enemy force composition " .. team .. " ON")
+		end
+	else
+		Spring.Echo("Incorrect CAI team")
+	end
+	return true
+end
+
+local function changeAIshowConJob(cmd,line,words,player)
+	local team=tonumber(words[1])
+	if team and aiTeamData[team] then
+		if debugData.showConJobList[team] then
+			debugData.showConJobList[team] = false
+			Spring.Echo("CAI con job " .. team .. " OFF")
+		else
+			debugData.showConJobList[team] = true
+			Spring.Echo("CAI con job " .. team .. " ON")
+		end
+	else
+		Spring.Echo("Incorrect CAI team")
+	end
+	return true
+end
+
+local function changeAIshowFacJob(cmd,line,words,player)
+	local team=tonumber(words[1])
+	if team and aiTeamData[team] then
+		if debugData.showFacJobList[team] then
+			debugData.showFacJobList[team] = false
+			Spring.Echo("CAI factory job " .. team .. " OFF")
+		else
+			debugData.showFacJobList[team] = true
+			Spring.Echo("CAI factory job " .. team .. " ON")
+		end
+	else
+		Spring.Echo("Incorrect CAI team")
+	end
+	return true
+end
+
 local function SetupCmdChangeAIDebug()
-	local cmd,func,help
-	cmd  = "caiscout"
-	func = changeAIscoutmapDrawing
-	help = "toggles CAI scoutmap drawing"
-	gadgetHandler:AddChatAction(cmd,func,help)
-	Script.AddActionFallback(cmd..' ',help)
+	gadgetHandler:AddChatAction("caiscout",changeAIscoutmapDrawing,"toggles CAI scoutmap drawing")
+	Script.AddActionFallback("caiscout"..' ',"toggles CAI scoutmap drawing")
+
+	gadgetHandler:AddChatAction("caioffense",changeAIoffenseDrawing,"toggles CAI offense drawing")
+	Script.AddActionFallback("caioffense"..' ',"toggles CAI offense drawing")
 	
-	local cmd,func,help
-	cmd  = "caioffense"
-	func = changeAIoffenseDrawing
-	help = "toggles CAI offense drawing"
-	gadgetHandler:AddChatAction(cmd,func,help)
-	Script.AddActionFallback(cmd..' ',help)
+	gadgetHandler:AddChatAction("caiecon",changeAIeconDrawing,"toggles CAI economy drawing")
+	Script.AddActionFallback("caiecon"..' ',"toggles CAI economy drawing")
 	
-	local cmd,func,help
-	cmd  = "caiecon"
-	func = changeAIeconDrawing
-	help = "toggles CAI economy drawing"
-	gadgetHandler:AddChatAction(cmd,func,help)
-	Script.AddActionFallback(cmd..' ',help)
+	gadgetHandler:AddChatAction("caidefence",changeAIdefenceDrawing,"toggles CAI defence drawing")
+	Script.AddActionFallback("caidefence"..' ',"toggles CAI defence drawing")
 	
-	local cmd,func,help
-	cmd  = "caidefence"
-	func = changeAIdefenceDrawing
-	help = "toggles CAI defence drawing"
-	gadgetHandler:AddChatAction(cmd,func,help)
-	Script.AddActionFallback(cmd..' ',help)
+	gadgetHandler:AddChatAction("caicomp",changeAIshowEnemyForceComposition,"toggles CAI enemy composition output")
+	Script.AddActionFallback("caicomp"..' ',"toggles CAI enemy composition output")
+	
+	gadgetHandler:AddChatAction("caicon",changeAIshowConJob,"toggles CAI con job output")
+	Script.AddActionFallback("caicon"..' ',"toggles CAI con job output")
+	
+	gadgetHandler:AddChatAction("caifac",changeAIshowFacJob,"toggles CAI factory job output")
+	Script.AddActionFallback("caifac"..' ',"toggles CAI factory job output")
 end
 
 function gadget:Initialize()
-
 	-- Initialise AI for all team that are set to use it
 	local aiOnTeam = {}
 	usingAI = false
