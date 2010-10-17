@@ -393,6 +393,30 @@ local function ManageStateIcons()
 	end
 end
 
+-- if you ever want to know why the command removal works use this on Spring.GetFactoryCommands(selectedFac)
+--[[
+local function EchoTable(ta, front)
+	for i, v in pairs(ta) do
+		if (type(v) == "table") then
+			Spring.Echo(i)
+			EchoTable(v,front .. "  ")
+		elseif v == nil then
+			if i == nil then
+				Spring.Echo(front .. "nil  nil")
+			else
+				Spring.Echo(front .. i .. "   nil")
+			end
+		else
+			if i == nil then
+				Spring.Echo(front .. "nil   " .. v)
+			else
+				Spring.Echo(front .. i .. "  " .. v)
+			end
+		end
+	end
+end
+--]]
+
 --this is supposed to be what clicking on a build queue button does - broken ATM
 local function BuildRowButtonFunc(num, cmdid, left, right)
 	buildQueue = spGetFullBuildQueue(selectedFac)
@@ -432,9 +456,19 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 			Spring.GiveOrderToUnit(selectedFac, order, {pos, cmdid, 0 }, {"alt", "ctrl"})
 		end
 	else
-		--for i = 1, numInput do
-		--	Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {cmdid}, {"alt", "ctrl"})
-		--end
+		local commands = Spring.GetFactoryCommands(selectedFac)
+		local i = 0
+		while i < numInput do
+			if commands[i+pos] and commands[i+pos].id ~= cmdid then
+				pos = pos + 1
+			else
+				while commands[i+pos] and commands[i+pos].id == cmdid and i < numInput do
+					Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
+					i = i + 1
+				end
+				break
+			end
+		end
 	end
 end
 
@@ -444,7 +478,9 @@ local function ManageBuildRow()
 	local overrun = false
 	buildQueue = spGetFullBuildQueue(selectedFac)
 	RemoveChildren(buildRow)
-	if buildQueue[MAX_COLUMNS + 1] then overrun = true end
+	if buildQueue[MAX_COLUMNS + 1] then 
+		overrun = true 
+	end
 	
 	for i=1, MAX_COLUMNS do
 		local buttonArray = buildRowButtons[i]
