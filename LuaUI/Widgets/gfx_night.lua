@@ -93,6 +93,7 @@ local GetGameSpeed = Spring.GetGameSpeed
 local GetCameraPosition = Spring.GetCameraPosition
 local GetUnitTransporter = Spring.GetUnitTransporter
 local SendMessage = Spring.SendMessage
+local ValidUnitID = Spring.ValidUnitID
 
 local glMatrixMode = gl.MatrixMode
 local glLoadIdentity = gl.LoadIdentity
@@ -213,78 +214,80 @@ local function DrawSearchlights()
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
   
   for _, unitID in pairs(visibleUnits) do
-    local _, _, _, _, buildProgress = GetUnitHealth(unitID)
-    local unitRadius = GetUnitRadius(unitID) or 0
-    local px, py, pz = GetUnitPosition(unitID)
-    py = py + searchlightHeightOffset * unitRadius
-    local groundy = math.max(GetGroundHeight(px, pz), 0)
-    local height = py - groundy
-    local unitDefID = GetUnitDefID(unitID)
-    local unitDef = UnitDefs[unitDefID]
-    local speed = unitDef.speed
-    
-    if (height > 0
-        and (not buildProgress or buildProgress >= 1)
-        and not noLightList[unitDefID]
-        and timeFromNoon > (0.25 + ((unitID * 97) % 256) / 8192)
-        and not GetUnitIsCloaked(unitID)
-        and not GetUnitTransporter(unitID)
-        ) then
-      local leadDistance
-      local radius
-      local ecc
-      local heading
-      local baseX, baseZ
-      
-      if (not speed or speed == 0) then
-        heading = searchlightBuildingAngle * (0.5 + ((unitID * 137) % 256) / 512)
-        leadDistance = unitRadius * 2
-        radius = unitRadius
-      elseif (unitDef.type == "Bomber" or unitDef.type == "Fighter") then
-        local vx, _, vz = GetUnitVelocity(unitID)
-        heading = math.atan2(vz, vx)
-        leadDistance = searchlightAirLeadTime * math.sqrt(vx * vx + vz * vz) * 30
-        radius = unitRadius * 2
-      elseif (unitDef.canFly) then
-        heading = -GetUnitHeading(unitID) * RADIANS_PER_COBANGLE + math.pi / 2
-        local range = math.max(unitDef.buildDistance, unitDef.maxWeaponRange)
-        leadDistance = math.sqrt(math.max(range * range - unitDef.wantedHeight * unitDef.wantedHeight, 0)) * 0.8
-        radius = unitRadius * 2
-      else
-        heading = -GetUnitHeading(unitID) * RADIANS_PER_COBANGLE + math.pi / 2
-        leadDistance = searchlightGroundLeadTime * speed
-        radius = unitRadius
-      end
-      
-      baseX = px + leadDistance * math.cos(heading)
-      baseZ = pz + leadDistance * math.sin(heading)
-      ecc = math.min(1 - 2 / (leadDistance / height + 2), 0.75)
-      
-      --base
-      glBlending(GL_DST_COLOR, GL_ONE)
-      glColor(currColorInverse)
-      
-      if (baseType == 2) then
-        glDepthTest(true)
-        glBeginEnd(GL_TRIANGLE_FAN, ConeVertices, baseX, baseZ, radius, ecc, heading, cx, cy, cz, groundy)
-      elseif (baseType == 1) then
-        glDepthTest(false)
-        glBeginEnd(GL_POLYGON, BaseVertices, baseX, baseZ, radius, ecc, heading)
-      end
-      
-      --beam
-      glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-      
-      if (drawBeam) then
-        glColor(searchlightBeamColor)
-        glDepthTest(true)
-        glBeginEnd(GL_TRIANGLE_FAN, BeamVertices, baseX, baseZ, radius, ecc, heading, px, py, pz)
-      end
-      
-      glColor(1, 1, 1, 1)
-      glDepthTest(false)
-      
-    end
+	if ValidUnitID(unitID) then
+		local _, _, _, _, buildProgress = GetUnitHealth(unitID)
+		local unitRadius = GetUnitRadius(unitID)
+		local px, py, pz = GetUnitPosition(unitID)
+		py = py + searchlightHeightOffset * unitRadius
+		local groundy = math.max(GetGroundHeight(px, pz), 0)
+		local height = py - groundy
+		local unitDefID = GetUnitDefID(unitID)
+		local unitDef = UnitDefs[unitDefID]
+		local speed = unitDef.speed
+		
+		if (height > 0
+			and (not buildProgress or buildProgress >= 1)
+			and not noLightList[unitDefID]
+			and timeFromNoon > (0.25 + ((unitID * 97) % 256) / 8192)
+			and not GetUnitIsCloaked(unitID)
+			and not GetUnitTransporter(unitID)
+			) then
+		  local leadDistance
+		  local radius
+		  local ecc
+		  local heading
+		  local baseX, baseZ
+		  
+		  if (not speed or speed == 0) then
+			heading = searchlightBuildingAngle * (0.5 + ((unitID * 137) % 256) / 512)
+			leadDistance = unitRadius * 2
+			radius = unitRadius
+		  elseif (unitDef.type == "Bomber" or unitDef.type == "Fighter") then
+			local vx, _, vz = GetUnitVelocity(unitID)
+			heading = math.atan2(vz, vx)
+			leadDistance = searchlightAirLeadTime * math.sqrt(vx * vx + vz * vz) * 30
+			radius = unitRadius * 2
+		  elseif (unitDef.canFly) then
+			heading = -GetUnitHeading(unitID) * RADIANS_PER_COBANGLE + math.pi / 2
+			local range = math.max(unitDef.buildDistance, unitDef.maxWeaponRange)
+			leadDistance = math.sqrt(math.max(range * range - unitDef.wantedHeight * unitDef.wantedHeight, 0)) * 0.8
+			radius = unitRadius * 2
+		  else
+			heading = -GetUnitHeading(unitID) * RADIANS_PER_COBANGLE + math.pi / 2
+			leadDistance = searchlightGroundLeadTime * speed
+			radius = unitRadius
+		  end
+		  
+		  baseX = px + leadDistance * math.cos(heading)
+		  baseZ = pz + leadDistance * math.sin(heading)
+		  ecc = math.min(1 - 2 / (leadDistance / height + 2), 0.75)
+		  
+		  --base
+		  glBlending(GL_DST_COLOR, GL_ONE)
+		  glColor(currColorInverse)
+		  
+		  if (baseType == 2) then
+			glDepthTest(true)
+			glBeginEnd(GL_TRIANGLE_FAN, ConeVertices, baseX, baseZ, radius, ecc, heading, cx, cy, cz, groundy)
+		  elseif (baseType == 1) then
+			glDepthTest(false)
+			glBeginEnd(GL_POLYGON, BaseVertices, baseX, baseZ, radius, ecc, heading)
+		  end
+		  
+		  --beam
+		  glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+		  
+		  if (drawBeam) then
+			glColor(searchlightBeamColor)
+			glDepthTest(true)
+			glBeginEnd(GL_TRIANGLE_FAN, BeamVertices, baseX, baseZ, radius, ecc, heading, px, py, pz)
+		  end
+		  
+		  glColor(1, 1, 1, 1)
+		  glDepthTest(false)
+		  
+		end
+	end
   end
   
 end

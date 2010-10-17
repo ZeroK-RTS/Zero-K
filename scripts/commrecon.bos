@@ -486,7 +486,7 @@ turn lloarm to z-axis <152.000000> speed <450.000000>;
 	
 	turn turret to y-axis heading speed <350.000000>;
 	turn armhold to x-axis <0.000000> - pitch speed <250.000000>;
-	wait-for-turn torso around y-axis;
+	wait-for-turn turret around y-axis;
 	start-script RestoreAfterDelay();
 	return (1);
 }
@@ -494,6 +494,11 @@ turn lloarm to z-axis <152.000000> speed <450.000000>;
 QueryWeapon3(piecenum)
 {
 	piecenum = grenade;
+}
+
+FireWeapon3()
+{
+	emit-sfx 1027 from grenade;
 }
 
 AimFromWeapon4(piecenum)
@@ -575,7 +580,7 @@ turn lloarm to z-axis <152.000000> speed <450.000000>;
 	
 	turn turret to y-axis Func_Var_1 speed <350.000000>;
 	turn armhold to x-axis <0.000000> - Func_Var_2 speed <250.000000>;
-	wait-for-turn torso around y-axis;
+	wait-for-turn turret around y-axis;
 	start-script RestoreAfterDelay();
 	return (1);
 }

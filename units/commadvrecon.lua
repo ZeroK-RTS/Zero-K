@@ -74,6 +74,7 @@ unitDef = {
       [[custom:HLTRADIATE0]],
       [[custom:VINDIBACK]],
       [[custom:FLASH64]],
+      [[custom:RAIDMUZZLE]],
     },
 
   },

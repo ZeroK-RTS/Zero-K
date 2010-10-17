@@ -56,6 +56,7 @@ unitDef = {
   noAutoFire           = false,
   objectName           = [[ARMCRABE]],
   pushResistant        = 1,
+  script			   = [[armcrabe.lua]],
   seismicSignature     = 4,
   selfDestructAs       = [[BIG_UNIT]],
 
