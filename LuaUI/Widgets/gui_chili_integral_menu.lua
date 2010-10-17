@@ -444,10 +444,21 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 	--Spring.Echo(options)
 	
 	--insertion position is by unit rather than batch, so we need to add up all the units in front of us to get the queue
+	
 	for i=1,num-1 do
 		for _,units in pairs(buildQueue[i]) do
 			pos = pos + units
 		end
+	end
+	
+	-- skip over the commands with an id of 0, left behind by removal
+	local commands = Spring.GetFactoryCommands(selectedFac)
+	local i = 1
+	while i <= pos do
+		if commands[i].id == 0 then
+			pos = pos + 1
+		end
+		i = i + 1
 	end
 	
 	--Spring.Echo(cmdid)
@@ -456,18 +467,10 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 			Spring.GiveOrderToUnit(selectedFac, order, {pos, cmdid, 0 }, {"alt", "ctrl"})
 		end
 	else
-		local commands = Spring.GetFactoryCommands(selectedFac)
 		local i = 0
-		while i < numInput do
-			if commands[i+pos] and commands[i+pos].id ~= cmdid then
-				pos = pos + 1
-			else
-				while commands[i+pos] and commands[i+pos].id == cmdid and i < numInput do
-					Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
-					i = i + 1
-				end
-				break
-			end
+		while commands[i+pos] and commands[i+pos].id == cmdid and i < numInput do
+			Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
+			i = i + 1
 		end
 	end
 end

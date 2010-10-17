@@ -26,7 +26,6 @@ local factories = {
 	factoryplane = 8,
 	factorygunship = 9,
 	corsy = 10,
-	armcsa = 11,
 }
 
 local econ = {
