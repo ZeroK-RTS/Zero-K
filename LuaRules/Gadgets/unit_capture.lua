@@ -307,13 +307,38 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	
 end
 
+
+--------------------------------------------------------------------------------
+-- Command Handling
+local function KillToggleCommand(unitID, cmdParams, cmdOptions)
+	if controllers[unitID] then
+		local state = cmdParams[1]
+		local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_UNIT_KILL_SUBORDINATES)
+		
+		if (cmdDescID) then
+			unitKillSubordinatesCmdDesc.params[1] = state
+			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = unitKillSubordinatesCmdDesc.params})
+		end
+		controllers[unitID].killSubordinates = (state == 1)
+	end
+	
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	
+	if (cmdID ~= CMD_UNIT_KILL_SUBORDINATES) then
+		return true  -- command was not used
+	end
+	KillToggleCommand(unitID, cmdParams, cmdOptions)  
+	return false  -- command was used
+end
+
+
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 
 	if not captureUnitDefs[unitDefID] then
 		return
 	end
-	
-	Spring.InsertUnitCmdDesc(unitID, unitKillSubordinatesCmdDesc)
 	
 	controllers[unitID] = {
 		captureMax = captureUnitDefs[unitDefID].captureQuota,
@@ -323,6 +348,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		unitCount = 0,
 		killSubordinates = false,
 	}
+	
+	Spring.InsertUnitCmdDesc(unitID, unitKillSubordinatesCmdDesc)
+	KillToggleCommand(unitID, {0}, {})
 
 end
 
@@ -379,31 +407,6 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		end
 	end
 	
-end
-
---------------------------------------------------------------------------------
--- Command Handling
-local function KillToggleCommand(unitID, cmdParams, cmdOptions)
-	if controllers[unitID] then
-		local state = cmdParams[1]
-		local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_UNIT_KILL_SUBORDINATES)
-		
-		if (cmdDescID) then
-			unitKillSubordinatesCmdDesc.params[1] = state
-			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = unitKillSubordinatesCmdDesc.params})
-		end
-		controllers[unitID].killSubordinates = (state == 1)
-	end
-	
-end
-
-function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	
-	if (cmdID ~= CMD_UNIT_KILL_SUBORDINATES) then
-		return true  -- command was not used
-	end
-	KillToggleCommand(unitID, cmdParams, cmdOptions)  
-	return false  -- command was used
 end
 
 ------------------------------------------------------
