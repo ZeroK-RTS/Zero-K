@@ -22,6 +22,7 @@ unitDef = {
     [[corlevlr]],
     [[corraid]],
     [[armmerl]],
+	[[capturecar]],
   },
 
   buildPic                      = [[factoryveh.png]],

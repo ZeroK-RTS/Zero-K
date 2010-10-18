@@ -94,7 +94,7 @@ end
 
 local function RestoreAfterDelay()
 	Sleep(7000)
-	Turn(arm_1, x_axis, math.rad(90), math.rad(45))
+	--Turn(arm_1, x_axis, math.rad(90), math.rad(45))
 	StartThread(IdleAnim)
 end
 
@@ -106,6 +106,7 @@ function script.AimWeapon(num, heading, pitch)
 	--Turn(arm_1, x_axis, math.rad(90) - pitch, math.rad(60))
 	--WaitForTurn(arm_1, x_axis)
 	WaitForTurn(turret, y_axis)
+	StartThread(RestoreAfterDelay)
 	return true
 end
 
