@@ -57,6 +57,22 @@ local mapCenterZ
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+options_path = 'Game'
+options = 
+{
+	idleSeconds = {
+		name = 'Nano Tower Idle Seconds (0-5)',
+		desc = 'Number of seconds a nano turret is idle before it is set to patrol (0 for never).',
+		type = 'number',
+		
+		min = 0,max=5,value = 0,
+		OnChange = function(self) idleFrames = self.value*30 end,
+	},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local function IsImmobileBuilder(ud)
   return(ud and ud.builder and not ud.canMove
          and not ud.isFactory)
@@ -113,12 +129,14 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-if (idleFrames > 0) then
+--if (idleFrames > 0) then
+if true then
 
   local idlers = {}
 
 
   function widget:GameFrame(frame)
+	if idleFrames == 0 then return end
     for unitID, f in pairs(idlers) do
       local idler = idlers[k]
       if ((frame - f) > idleFrames) then
