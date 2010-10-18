@@ -1,9 +1,6 @@
-
-local menu_corcom = include("Configs/marking_menu_menu_corcom.lua")
 local menu_armcom = include("Configs/marking_menu_menu_armcom.lua")
-
 local menu_armcsa = include("Configs/marking_menu_menu_armcsa.lua")
-local menu_corcsa = include("Configs/marking_menu_menu_corcsa.lua")
+local menu_chickenbroodqueen = include("Configs/marking_menu_menu_chickenbroodqueen.lua")
 
 
 local menu_use = {
@@ -28,6 +25,8 @@ local menu_use = {
   coradvcom = menu_armcom,
   commadvrecon = menu_armcom,
   commadvsupport = menu_armcom,
+  
+  chickenbroodqueen = menu_chickenbroodqueen,
 }
 
 return menu_use
