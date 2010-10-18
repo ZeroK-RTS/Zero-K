@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip",
-    desc      = "v0.24 Chili Cursor Tooltips.",
+    desc      = "v0.25 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -69,7 +69,7 @@ local stillCursorTime = 0
 
 local scrH, scrW = 0,0
 local cycle = 0
-local old_ttstr
+local old_ttstr, old_data
 local old_mx, old_my = -1,-1
 local mx, my = -1,-1
 local showExtendedTip = false
@@ -812,10 +812,12 @@ end
 --Determines what type of tooltip to show
 local function DetermineTooltip()
 	local cur_ttstr = screen0.currentTooltip or spGetCurrentTooltip()
-	if (not changeNow) and old_ttstr == cur_ttstr then
+	local type, data = spTraceScreenRay(mx, my)
+	if (not changeNow) and old_ttstr == cur_ttstr and old_data == data then
 		PlaceToolTipWindow(false, mx+20,my-20)
 		return
 	end
+	old_data = data
 	old_ttstr = cur_ttstr
 	
 	tt_unitID = nil
@@ -888,8 +890,6 @@ local function DetermineTooltip()
 	
 	--unit(s) selected/pointed at
 	if unit_tooltip then
-	
-		local type, data = spTraceScreenRay(mx, my)
 		-- pointing at unit/feature
 		if type == 'unit' or type == 'feature' then
 			
