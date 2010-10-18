@@ -13,11 +13,11 @@ static-var bMoving, restore_delay, gun_0, bCurled, bCurling, base_speed, nocurl;
 #define SIG_UNCURL	16
 #define SMOKEPIECE1 turret
 #include "smokeunit.h"
-#include "smokeunit.h"
 #include "exptype.h"
 
 walkscr()
 	{
+		SET MAX_SPEED to base_speed;
 		WHILE (bMoving)
 			{
 			IF (bMoving)
@@ -443,7 +443,7 @@ Killed(severity,corpsetype)
 		}
 	IF (severity <= 50 )
 		{
-		corpsetype = 2 ;
+		corpsetype = 1 ;
 		EXPLODE base 	type  	BITMAPONLY | BITMAP1;
 		explode leg1 	type 	BITMAPONLY | BITMAP2;
 		explode leg3 	type 	BITMAPONLY | BITMAP3;
@@ -453,7 +453,7 @@ Killed(severity,corpsetype)
 		}
 	IF (severity <= 99 )
 		{
-		corpsetype = 3 ;
+		corpsetype = 2 ;
 		EXPLODE base 	type  	BITMAPONLY | BITMAP1;
 		explode leg1 	type 	BITMAPONLY | BITMAP2;
 		explode leg3 	type 	BITMAPONLY | BITMAP3;
