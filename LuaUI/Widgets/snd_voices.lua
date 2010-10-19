@@ -60,7 +60,7 @@ local NOISE_SOUND_DIRNAME = 'Sounds/'
 local VFSMODE          = VFS.ZIP_FIRST
 local CMD_RETREAT      = 10000
 
-local mySide
+local mySide	--not used for anything right now
 local myTeamID
 local myAllyTeamID
 local saidPaused
@@ -78,17 +78,49 @@ local fireState        = {}
 local sexTable         = {}
 local statsBuffer      = {0, 0, 0, 0, 0}
 local energyList = {     --FIXME
-  "corsolar",
   "armsolar",
-  "corfus",
   "armfus", 
-  "aafus", 
   "cafus", 
-  "cortide", 
   "armtide", 
-  "corwin",
-  "armwin"
+  "armwin",
+  "geo",
 }
+local commanders = {
+	"armcom",
+	"corcom",
+	"commrecon",
+	"commsupport",
+	"armadvcom",
+	"coradvcom",
+	"commadvrecon",
+	"commadvsupport",
+}
+
+local heavies = {
+	"correap",
+	"corgol",
+	"corcan",
+	"corsumo",
+	"dante",
+}
+
+local aa = {
+	"corrl",
+	"corrazor",
+	"missiletower",
+	"corflak",
+	"armcir",
+	"screamer",
+}
+
+local aaList = {}
+local commanderList = {}
+for i,v in pairs (commanders) do
+	commanderList[v] = true
+end
+for i,v in pairs (aa) do
+	aaList[v] = true
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -99,13 +131,16 @@ local function rand(x)
 end
 
 local function assignSex(unitID)
-  if (random() > 0.3) then
+  if (random() > 0.5) then
     sexTable[unitID] = 'f'
   else
     sexTable[unitID] = 'm'
   end
-  if (UnitDefNames['armcom'].id == GetUnitDefID(unitID)) then
-    sexTable[unitID] = 'f'     
+  local defID = GetUnitDefID(unitID)
+  if (UnitDefNames['armcom'].id == defID) or (UnitDefNames['commsupport'].id == defID) or (UnitDefNames['armadvcom'].id == defID) or (UnitDefNames['commadvsupport'].id == defID)  then
+    sexTable[unitID] = 'f'
+  elseif (UnitDefNames['corcom'].id == defID) or (UnitDefNames['commrecon'].id == defID) or (UnitDefNames['coradvcom'].id == defID) or (UnitDefNames['commadvrecon'].id == defID)  then
+    sexTable[unitID] = 'm' 
   end
 end
 
@@ -115,22 +150,21 @@ local function PlaySound(fileName, ...)
 end
 
 
-local function Play(category, sex)
+local function Play(category, sex, side)
   local fileExclude
   local fileSearch
   local fileName
   local numFiles
-  if (mySide == "core") then
-    sex = nil
-  end
+  if not side then side = "arm" end
+  if category == "selectcom" then side = "core" end
   if (not sex) then
-    fileSearch = category.."_"..mySide.."_*.wav"
+    fileSearch = category.."_"..side.."_*.wav"
     fileList = VFS.DirList(SOUND_DIRNAME.."Voices/", fileSearch, VFSMODE)
-    fileSearch = category.."_"..mySide.."_*_*.wav"
+    fileSearch = category.."_"..side.."_*_*.wav"
     fileExclude = VFS.DirList(SOUND_DIRNAME.."Voices/", fileSearch, VFSMODE)
     numFiles = #fileList - #fileExclude
   else
-    fileSearch = category.."_"..mySide.."_"..sex.."_*.wav"
+    fileSearch = category.."_"..side.."_"..sex.."_*.wav"
     fileList = VFS.DirList(SOUND_DIRNAME.."Voices/", fileSearch, VFSMODE)
     numFiles = #fileList
   end
@@ -138,9 +172,9 @@ local function Play(category, sex)
   if (numFiles > 0) then
     local fileNum = rand(numFiles)
     if (not sex) then
-      fileName = category.."_"..mySide.."_"..fileNum..".wav"
+      fileName = category.."_"..side.."_"..fileNum..".wav"
     else
-      fileName = category.."_"..mySide.."_"..sex.."_"..fileNum..".wav"
+      fileName = category.."_"..side.."_"..sex.."_"..fileNum..".wav"
     end
     local fullName = SOUND_DIRNAME.."Voices/"..fileName
     local exists = VFS.DirList(fullName, fileSearch, VFSMODE)
@@ -161,38 +195,36 @@ local function CheckSelected()
   for _, unitID in ipairs(unitTable) do
     local unitDefID = GetUnitDefID(unitID)
    
+   local name = UnitDefs[unitDefID].name
+   
    if ((not UnitDefs[unitDefID].canMove) and
         (UnitDefs[unitDefID].canAttack == 1)) then
       isTurret =true
     end
     
-    if ((UnitDefs[unitDefID].name == "corfus") or
-        (UnitDefs[unitDefID].name == "armfus") or
-        (UnitDefs[unitDefID].name == "cafus") or
-        (UnitDefs[unitDefID].name == "aafus")) then --FIXME: sea & cloak
+    if ((name == "corfus") or
+        (name == "armfus") or
+        (name == "cafus") or
+        (name == "aafus")) then --FIXME: sea & cloak
       isFus = true
     end
     
-    if ((UnitDefs[unitDefID].name == "corrl") or
-        (UnitDefs[unitDefID].name == "armrl")) then --FIXME: more AA
+    if aaList[name] then --FIXME: more AA
       isSam = true
     end
     
-    if (((UnitDefs[unitDefID].name == "armcom") or
-        (UnitDefs[unitDefID].name == "corcom")) and
-        (GetGameSeconds() > 3)) then
+    if commanderList[name] then
       isCom = true
     end
   end
   
-  if (isTurret) then
+  if (isSam) then
+    Play("selectsam")
+  elseif (isTurret) then
     Play("turret")
   elseif (isFus) then
     Play("selectfus")
-  elseif (isSam) then
-    Play("selectsam")
-  elseif ((isCom) and
-          (GetGameSeconds()) > 2) then
+  elseif ((isCom) and (GetGameSeconds()) > 2) then
     Play("selectcom")
   elseif (#unitTable > 1) then
     Play("selectgroup")
@@ -212,12 +244,12 @@ local function IsStructure(unitID)
 end
 
 
-local function CoolPlay(category, cooldownTime, sex)
+local function CoolPlay(category, cooldownTime, sex, side)
   cooldownTime = cooldownTime or 0
   local t = GetGameSeconds()
   if ((not cooldown[category]) or
       (t - cooldown[category] > cooldownTime)) then
-    Play(category, sex)
+    Play(category, sex, side)
     cooldown[category] = t
   end
 end
@@ -278,10 +310,7 @@ function widget:Initialize()
   myTeamID = team
   myAllyTeamID = Spring.GetMyAllyTeamID()
   local _, _, _, _, side = Spring.GetTeamInfo(myTeamID)
-  mySide = side
-  if (side == "random") then
-    mySide = "arm"
-  end
+  mySide = "arm"
   Play("initialized")
   for _, unitID in ipairs(GetTeamUnits(myTeamID)) do
     assignSex(unitID)
@@ -296,10 +325,6 @@ end
 
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-  local name = UnitDefs[unitDefID].name
-  if (name == "corcom" and unitTeam == myTeamID) then
-    mySide = "core"
-  end
   if (UnitDefs[unitDefID].canMove) then
     moveState[unitID] = 1
     retreatState[unitID] = 0

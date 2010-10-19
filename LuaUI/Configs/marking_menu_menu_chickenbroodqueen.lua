@@ -2,7 +2,7 @@ local menu_chickenbroodqueen = {
   items = {
   {
     angle = 0,
-    unit = "chicken_drone_starter",
+    unit = "chicken_drone",
     label = "Basic",
     items = {
       {
@@ -69,11 +69,11 @@ local menu_chickenbroodqueen = {
     items = {
       {
         angle = -90,
-        unit = "chickenf"
+        unit = "chickenf",
       },
       {
         angle = 90,
-        unit = "chicken_blimpy"
+        unit = "chicken_blimpy",
       },
     }
   },
@@ -84,15 +84,15 @@ local menu_chickenbroodqueen = {
     items = {
       {
         angle = 0,
-        unit = "chicken_listener"
+        unit = "chicken_listener,"
       },
       {
         angle = -45,
-        unit = "chicken_digger"
+        unit = "chicken_digger,"
       },
       {
         angle = 180,
-        unit = "chicken_dragon"
+        unit = "chicken_dragon,"
       },
     }
   },
