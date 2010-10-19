@@ -35,6 +35,12 @@ function widget:UnitCreated(unitID)
 
 end
 
+function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+
+  drawUnits[unitID] = true
+
+end
+
 function widget:UnitDestroyed(unitID)
 
   if (drawUnits[unitID]) then

@@ -248,8 +248,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	controllers[attackerID].units[unitID].damage = controllers[attackerID].units[unitID].damage + newCaptureDamage
 	
 	-- add to damage by Team and total damage by AllyTeam
-	capturedUnits[unitID].aTeams[aTeam].teams[attackerTeam].damage = capturedUnits[unitID].aTeams[attackerTeam].teams[attackerTeam].damage + newCaptureDamage
-	capturedUnits[unitID].aTeams[aTeam].totalDamage = capturedUnits[unitID].aTeams[attackerTeam].totalDamage + newCaptureDamage
+	capturedUnits[unitID].aTeams[aTeam].teams[attackerTeam].damage = capturedUnits[unitID].aTeams[aTeam].teams[attackerTeam].damage + newCaptureDamage
+	capturedUnits[unitID].aTeams[aTeam].totalDamage = capturedUnits[unitID].aTeams[aTeam].totalDamage + newCaptureDamage
 	
 	-- capture the unit if total damage is greater than max hp of unit
 	if capturedUnits[unitID].aTeams[aTeam].totalDamage >= capturedUnits[unitID].captureHealth then 
