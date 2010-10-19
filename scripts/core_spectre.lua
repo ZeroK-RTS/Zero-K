@@ -1,5 +1,6 @@
 
 --by Chris Mackey
+local spGetUnitHealth = Spring.GetUnitHealth
 
 --pieces
 local base = piece "base"
@@ -145,6 +146,12 @@ function script.StartMoving()
 	--StopSpin( glow, y_axis )
 	--Turn( glow, y_axis, 0, 1 )
 	StartThread( Walk )
+end
+
+function script.HitByWeapon(x, z, weaponID, damage)
+	--workaround for immortal unit
+	local health = spGetUnitHealth(unitID)
+	if health <= 0 then Spring.DestroyUnit(unitID, false) end
 end
 
 function script.StopMoving()

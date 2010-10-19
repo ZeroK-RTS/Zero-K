@@ -26,13 +26,13 @@ return {
 	redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 60,
+      count              = 180,
       ground             = true,
       water              = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_long]],
-        pos                = [[0 r200 r-200, 0, 0 r200 r-200]],
+        pos                = [[0 r200 r-200, 0 r200 r-200, 0 r200 r-200]],
       },
     },
   },

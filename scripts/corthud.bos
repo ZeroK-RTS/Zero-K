@@ -184,6 +184,13 @@ AimWeapon2()
 	return(1);
 }
 
+//workaround for immortal thug
+HitByWeaponId()
+{
+	if ((get HEALTH) <= 0) get KILL_UNIT;
+	return 100;
+}
+
 Killed(severity, corpsetype)
 {
 	if( severity <= 25 )

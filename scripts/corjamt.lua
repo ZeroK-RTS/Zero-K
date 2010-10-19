@@ -1,5 +1,5 @@
-
 --by Chris Mackey
+local spGetUnitHealth = Spring.GetUnitHealth
 
 --pieces
 local base = piece "base"
@@ -97,6 +97,12 @@ function script.Deactivate()
 	
 	Turn( rb_leaf, x_axis, 0, 1 )
 	Turn( rb_leaf, z_axis, 0, 1 )
+end
+
+function script.HitByWeapon(x, z, weaponID, damage)
+	--workaround for immortal unit
+	local health = spGetUnitHealth(unitID)
+	if health <= 0 then Spring.DestroyUnit(unitID, false) end
 end
 
 function script.Killed(recentDamage, maxHealth)

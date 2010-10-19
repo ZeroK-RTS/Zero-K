@@ -207,7 +207,7 @@ function script.Killed(recentDamage, maxHealth)
 	EmitSfx(body, 1025)
 end
 
-function script.HitByWeaponId()
+function script.HitByWeapon(x, z, weaponID, damage)
 	EmitSfx(body, 1024)
 	--return 100
 end
