@@ -43,7 +43,7 @@ local GetUnitHealth    = Spring.GetUnitHealth
 
 local SOUND_DIRNAME = 'Sounds/reply/'
 local LUAUI_DIRNAME = 'LuaUI/'
-local SOUNDTABLE_FILENAME = LUAUI_DIRNAME.."Widgets/noises/sounds.lua"
+local SOUNDTABLE_FILENAME = LUAUI_DIRNAME.."Configs/sounds_noises.lua"
 local soundTable = VFS.Include(SOUNDTABLE_FILENAME, nil, VFS.RAW_FIRST)
 local myTeamID
 local cooldown = {}
@@ -108,7 +108,7 @@ function widget:CommandNotify(cmdID)
   end
   local unitDefID = GetUnitDefID(unitID)
   local unitName = UnitDefs[unitDefID].name
-  local sounds = soundTable[unitName]
+  local sounds = soundTable[unitName] or soundTable[default]
   if (CMD[cmdID]) then
     if (sounds and sounds.ok) then
       CoolNoisePlay(sounds.ok[1], 0.5)
@@ -121,16 +121,10 @@ end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam)
   if (unitTeam == myTeamID) then
-    
-    if (UnitDefs[unitDefID].isCommander) then
-      health, maxHealth = GetUnitHealth(unitID)
-      if health/maxHealth < 0.5 then
-        CoolNoisePlay("warning2", 2)
-      else
-        CoolNoisePlay("warning1", 2)
-      end
-    end
-  
+	local unitDefID = GetUnitDefID(unitID)
+	local unitName = UnitDefs[unitDefID].name
+	local sounds = soundTable[unitName] or soundTable[default]
+	CoolNoisePlay(sounds.underattack[1], 5)
   end
 end
 
