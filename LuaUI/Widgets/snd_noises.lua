@@ -124,7 +124,9 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam)
 	local unitDefID = GetUnitDefID(unitID)
 	local unitName = UnitDefs[unitDefID].name
 	local sounds = soundTable[unitName] or soundTable[default]
-	CoolNoisePlay(sounds.underattack[1], 5)
+	if sounds and sounds.underattack then
+		--CoolNoisePlay(sounds.underattack[1], 5)
+	end
   end
 end
 

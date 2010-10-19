@@ -10,6 +10,7 @@ reclaim (placeholder)
 resurrect (placeholder)
 capture
 build
+area attack
 
 
 less important icons:
