@@ -36,6 +36,7 @@ local GetSelectedUnits = Spring.GetSelectedUnits
 local GetUnitDefID     = Spring.GetUnitDefID
 local GetGameSeconds   = Spring.GetGameSeconds
 local GetUnitHealth    = Spring.GetUnitHealth
+local spInView		   = Spring.IsUnitInView
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -120,12 +121,12 @@ end
 
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam)
-  if (unitTeam == myTeamID) then
+  if (unitTeam == myTeamID) and (not spInView(unitID)) then
 	local unitDefID = GetUnitDefID(unitID)
 	local unitName = UnitDefs[unitDefID].name
 	local sounds = soundTable[unitName] or soundTable[default]
 	if sounds and sounds.underattack then
-		--CoolNoisePlay(sounds.underattack[1], 5)
+		CoolNoisePlay(sounds.underattack[1], 40)
 	end
   end
 end

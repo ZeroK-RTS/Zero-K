@@ -1110,8 +1110,8 @@ local sounds = {
 }
 
 local underAttackSounds = {
-	[1] = "udamaged_1",
---	[2] = "udamaged_2",
+--	[1] = "udamaged_1",
+	[1] = "udamaged_2",
 }
 
 sounds.coradvcom = sounds.corcom
