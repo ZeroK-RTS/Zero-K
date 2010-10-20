@@ -1,11 +1,11 @@
 unitDef = {
-  unitname            = [[armstiletto_laser]],
-  name                = [[Stiletto II]],
-  description         = [[EMP Lightning Bomber (stealthy)]],
+  unitname            = [[armstiletto]],
+  name                = [[Stiletto]],
+  description         = [[EMP Bomber]],
   amphibious          = true,
   buildCostEnergy     = 600,
   buildCostMetal      = 600,
-  buildPic            = [[armstiletto_laser.png]],
+  buildPic            = [[CORGRIPN.png]],
   buildTime           = 600,
   canAttack           = true,
   canDropFlare        = false,
@@ -17,19 +17,16 @@ unitDef = {
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
-  corpse              = [[HEAP]],
-  cruiseAlt           = 180,
+  corpse              = [[DEAD]],
+  cruiseAlt           = 250,
 
   customParams        = {
-    description_bp = [[Bombardeiro de raios PEM invisível a radar]],
-    description_fr = [[Bombardier EMP Furtif]],
-    helptext       = [[Fast stealthy bomber armed with a lightning generator that paralyzes units.]],
-    helptext_bp    = [[Bombardeiro rápido e invisível a radar equipado com um gerador de raios ao invés de bombas que dispara raios de PEM contra o inimigo ao atacar.]],
-    helptext_fr    = [[Rapide et furtif, le Stiletto II permet des tirs sur une large zone ? l'aide de ses canons EMP, pouvant paralyser toute une arm?e en un clin d'oeuil.]],
+    helptext = [[Sleek, fast and able to take a beating, the Stiletto drops EMP bombs that can paralyze an entire column of tanks in a single pass, rendering them helpless before allied forces.]],
   },
 
   defaultmissiontype  = [[VTOL_standby]],
   explodeAs           = [[GUNSHIPEX]],
+  fireState           = 1,
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
@@ -42,17 +39,48 @@ unitDef = {
   maxAcc              = 0.5,
   maxDamage           = 1130,
   maxFuel             = 1000,
-  maxVelocity         = 10,
+  maxVelocity         = 12,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName          = [[stiletto.s3o]],
-  script              = [[Stiletto_laser.lua]],
+  objectName          = [[Stiletto.s3o]],
+  script              = [[Stiletto.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   side                = [[ARM]],
   sightDistance       = 660,
   smoothAnim          = true,
+
+  sounds              = {
+    canceldestruct = [[ota/cancel2]],
+
+    cant           = {
+      [[ota/cantdo4]],
+    },
+
+
+    count          = {
+      [[ota/count6]],
+      [[ota/count5]],
+      [[ota/count4]],
+      [[ota/count3]],
+      [[ota/count2]],
+      [[ota/count1]],
+    },
+
+
+    ok             = {
+      [[ota/vtolcrmv]],
+    },
+
+
+    select         = {
+      [[ota/vtolcrac]],
+    },
+
+    underattack    = [[ota/warning1]],
+  },
+
   stealth             = true,
   steeringmode        = [[1]],
   TEDClass            = [[VTOL]],
@@ -61,16 +89,9 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[BOGUS_BOMB]],
+      def                = [[CORGRIPN_BOMB]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP]],
-    },
-
-
-    {
-      def                = [[ARMBOMBLIGHTNING]],
-      mainDir            = [[0 -1 0]],
-      maxAngleDif        = 180,
+      fuelUsage          = 999,
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP]],
     },
 
@@ -79,16 +100,13 @@ unitDef = {
 
   weaponDefs          = {
 
-    ARMBOMBLIGHTNING = {
-      name                    = [[BombLightning]],
-      areaOfEffect            = 64,
+    CORGRIPN_BOMB = {
+      name                    = [[EMPbomb]],
+      areaOfEffect            = 240,
       avoidFeature            = false,
       avoidFriendly           = false,
-      beamlaser               = 1,
-      beamTime                = 0.01,
-      burst                   = 0,
       collideFriendly         = false,
-      coreThickness           = 0.6,
+      commandfire             = true,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -100,65 +118,24 @@ unitDef = {
         planes         = 1500,
       },
 
+      dropped                 = true,
       edgeEffectiveness       = 0.4,
-      explosionGenerator      = [[custom:YELLOW_LIGHTNING_BOMB]],
-      fireStarter             = 90,
+      explosionGenerator      = [[custom:ELECTRIC_EXPLOSION]],
+      fireStarter             = 0,
       impulseBoost            = 0,
       impulseFactor           = 0,
-      intensity               = 12,
       interceptedByShieldType = 1,
-      largeBeamLaser          = true,
-      laserFlareSize          = 5,
-      lineOfSight             = true,
-      minIntensity            = 1,
+      model                   = [[bomb]],
+      myGravity               = 0.7,
       noSelfDamage            = true,
       paralyzer               = true,
       paralyzeTime            = 15,
-      range                   = 730,
-      reloadtime              = 10,
-      renderType              = 0,
-      rgbColor                = [[1 1 0]],
-      sprayAngle              = 6000,
-      texture1                = [[lightning]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
-      thickness               = 10,
-      tileLength              = 300,
-      tolerance               = 32767,
-      turret                  = true,
-      weaponType              = [[BeamLaser]],
-      weaponVelocity          = 2250,
-    },
-
-
-    BOGUS_BOMB       = {
-      name                    = [[BogusBomb]],
-      areaOfEffect            = 80,
-      burst                   = 2,
-      burstrate               = 5,
-      commandfire             = true,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 0,
-      },
-
-      dropped                 = true,
-      edgeEffectiveness       = 0,
-      explosionGenerator      = [[custom:NONE]],
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      manualBombSettings      = true,
-      model                   = [[bomb]],
-      myGravity               = 1000,
-      noSelfDamage            = true,
-      range                   = 10,
-      reloadtime              = 10,
+      range                   = 800,
+      reloadtime              = 0.3,
       renderType              = 6,
-      scale                   = [[0]],
+      soundHit                = [[OTAunit/EMGPULS1]],
+      soundStart              = [[OTAunit/BOMBREL]],
+      tolerance               = 7000,
       weaponType              = [[AircraftBomb]],
     },
 
@@ -168,7 +145,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Stiletto II]],
+      description      = [[Wreckage - Stiletto]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1130,
@@ -189,7 +166,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Stiletto II]],
+      description      = [[Debris - Stiletto]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1130,
@@ -201,7 +178,7 @@ unitDef = {
       height           = [[4]],
       hitdensity       = [[100]],
       metal            = 240,
-      object           = [[debris2x2c.s3o]],
+      object           = [[Stiletto_dead.s3o]], --debris2x2c.s3o
       reclaimable      = true,
       reclaimTime      = 240,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -210,7 +187,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Stiletto II]],
+      description      = [[Debris - Stiletto]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1130,
@@ -232,4 +209,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armstiletto_laser = unitDef })
+return lowerkeys({ armstiletto = unitDef })
