@@ -21,9 +21,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fr = [[Canon Gauss Ambusqué]],
+    --description_fr = [[Canon Gauss Ambusqué]],
     helptext       = [[The Pit Bull is a compact, resilent turret with a medium-range rocket launcher. When popped down, it is very difficult to destroy, making it a good choice when the enemy is using artillery.]],
-    helptext_fr    = [[Le Pit Bull s'enterre et profite de son camouflage radar et optique pour attendre la bonne occasion. L'ennemi de le verra pas avant qu'il ne soit trop tard. Son canon Gauss r haute cadence fait des ravages sur tous tupes d'unités, mais il ne faut pas éspcrer percer un blindage lourd du premier coup.]],
+    --helptext_fr    = [[Le Pit Bull s'enterre et profite de son camouflage radar et optique pour attendre la bonne occasion. L'ennemi de le verra pas avant qu'il ne soit trop tard. Son canon Gauss r haute cadence fait des ravages sur tous tupes d'unités, mais il ne faut pas éspcrer percer un blindage lourd du premier coup.]],
   },
 
   damageModifier                = 0.2,
@@ -76,9 +76,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 180,
-        planes  = 180,
-        subs    = 9,
+        default = 200,
+        planes  = 200,
+        subs    = 10,
       },
 
       fireStarter             = 70,
