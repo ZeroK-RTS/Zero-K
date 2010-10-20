@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armrock]],
   name                = [[Rocko]],
-  description         = [[Skirmisher Bot]],
+  description         = [[Skirmisher Bot (Direct-Fire)]],
   acceleration        = 0.12,
   bmcode              = [[1]],
   brakeRate           = 0.188,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armsnipe]],
   name                   = [[Sharpshooter]],
-  description            = [[Sniper Walker]],
+  description            = [[Sniper Walker (Skirmish/Anti-Armor)]],
   acceleration           = 0.12,
   bmcode                 = [[1]],
   brakeRate              = 0.188,

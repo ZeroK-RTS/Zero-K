@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corcan]],
   name                = [[Jack]],
-  description         = [[Melee Assault Walker]],
+  description         = [[Melee Assault Jumper]],
   acceleration        = 0.12,
   bmcode              = [[1]],
   brakeRate           = 0.188,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[nsaclash]],
   name                = [[Scalpel]],
-  description         = [[Skirmisher Hover]],
+  description         = [[Skirmisher Hover (Anti-Armor)]],
   acceleration        = 0.035,
   bmcode              = [[1]],
   brakeRate           = 0.2,

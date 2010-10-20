@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corstorm]],
   name                = [[Rogue]],
-  description         = [[Skirmisher Bot]],
+  description         = [[Skirmisher Bot (Indirect Fire)]],
   acceleration        = 0.108,
   bmcode              = [[1]],
   brakeRate           = 0.188,

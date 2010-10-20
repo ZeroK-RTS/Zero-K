@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armraven]],
   name                = [[Catapult]],
-  description         = [[Heavy Rocket Strider]],
+  description         = [[Heavy Rocket Artillery Strider]],
   acceleration        = 0.108,
   bmcode              = [[1]],
   brakeRate           = 0.188,

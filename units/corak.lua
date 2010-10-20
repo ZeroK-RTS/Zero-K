@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corak]],
   name                = [[Bandit]],
-  description         = [[Raider Bot]],
+  description         = [[Medium-Light Raider Bot]],
   acceleration        = 0.384,
   bmcode              = [[1]],
   brakeRate           = 0.25,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[cormart]],
   name                = [[Pillager]],
-  description         = [[Mobile Artillery]],
+  description         = [[General-Purpose Artillery]],
   acceleration        = 0.018,
   bmcode              = [[1]],
   brakeRate           = 0.1232,
@@ -21,7 +21,7 @@ unitDef = {
   customParams        = {
     description_bp = [[Artilharia móvel]],
     description_fr = [[Artillerie Mobile]],
-    helptext       = [[The heavy, long-ranging gun of the Pillager makes it the Logos general-purpose artillery unit of choice. As always, it should be wary of anything that gets close to it.]],
+    helptext       = [[The heavy, long-ranging gun of the Pillager makes it the unit of choice for standoff shelling of enemy mobiles or structures. As always, it should be wary of anything that gets close to it.]],
     helptext_bp    = [[O Pillager é uma unidade de artilharia com grande poder de fogo e alcançe e a unidade de artilharia genérica de Logos. Vulnerável a qualquer coisa que possa chegar perto dele.]],
     helptext_fr    = [[Le Pillager est équipé d'un canon plasma lourd r trcs grande portée. C'est une artillerie r forte puissance de feu et précise. Elle est capable de toucher certaines cibles en mouvement mais reste plus efficace sur les structures immobiles. Sa cadence et son angle de tir sont ses principaux défauts.]],
   },

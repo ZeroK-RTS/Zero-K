@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[corrl]],
   name                          = [[Defender]],
-  description                   = [[Light Missile Tower]],
+  description                   = [[Light Missile Tower (AA/Skirmish)]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,

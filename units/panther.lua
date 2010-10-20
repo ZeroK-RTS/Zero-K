@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[panther]],
   name                = [[Panther]],
-  description         = [[Raider Tank]],
+  description         = [[Lightning Raider Tank]],
   acceleration        = 0.125,
   bmcode              = [[1]],
   brakeRate           = 0.125,

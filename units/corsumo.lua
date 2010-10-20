@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corsumo]],
   name                = [[Sumo]],
-  description         = [[Jumping Riot Walker]],
+  description         = [[Jumping Assault/Riot Walker]],
   acceleration        = 0.048,
   bmcode              = [[1]],
   brakeRate           = 0.125,

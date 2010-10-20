@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[trem]],
   name                = [[Tremor]],
-  description         = [[Heavy Artillery Tank]],
+  description         = [[Heavy Saturation Artillery Tank]],
   acceleration        = 0.0528,
   bmcode              = [[1]],
   brakeRate           = 0.11,

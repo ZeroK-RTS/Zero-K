@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armsptk]],
   name                = [[Recluse]],
-  description         = [[Skirmisher Spider]],
+  description         = [[Skirmisher Spider (Indirect Fire)]],
   acceleration        = 0.18,
   bmcode              = [[1]],
   brakeRate           = 0.188,

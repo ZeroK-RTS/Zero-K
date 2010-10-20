@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armflea]],
   name                = [[Flea]],
-  description         = [[All-Terrain Scout Bot]],
+  description         = [[Ultralight Scout Spider]],
   acceleration        = 0.5,
   bmcode              = [[1]],
   brakeRate           = 0.5,

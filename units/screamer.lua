@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[screamer]],
   name                          = [[Screamer]],
-  description                   = [[Long-Range AA Missile Tower]],
+  description                   = [[Very Long-Range AA Missile Tower]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   bmcode                        = [[0]],

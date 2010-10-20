@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armpw]],
   name                = [[Glaive]],
-  description         = [[Raider Bot]],
+  description         = [[Light Raider Bot]],
   acceleration        = 0.36,
   bmcode              = [[1]],
   brakeRate           = 0.2,

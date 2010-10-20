@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corthud]],
   name                = [[Thug]],
-  description         = [[Assault Bot]],
+  description         = [[Shielded Assault Bot]],
   acceleration        = 0.113,
   activateWhenBuilt   = true,
   bmcode              = [[1]],

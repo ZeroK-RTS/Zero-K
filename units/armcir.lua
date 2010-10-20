@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armcir]],
   name                          = [[Chainsaw]],
-  description                   = [[Medium-Range AA Missile Battery]],
+  description                   = [[Long-Range AA Missile Battery]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,
