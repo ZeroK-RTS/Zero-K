@@ -87,13 +87,13 @@ local GetUnitHeading = Spring.GetUnitHeading
 local GetUnitDefID = Spring.GetUnitDefID
 local GetUnitVelocity = Spring.GetUnitVelocity
 local GetUnitIsCloaked = Spring.GetUnitIsCloaked
+local GetUnitIsDead = Spring.GetUnitIsDead
 local GetUnitHealth = Spring.GetUnitHealth
 local GetUnitRadius = Spring.GetUnitRadius
 local GetGameSpeed = Spring.GetGameSpeed
 local GetCameraPosition = Spring.GetCameraPosition
 local GetUnitTransporter = Spring.GetUnitTransporter
 local SendMessage = Spring.SendMessage
-local ValidUnitID = Spring.ValidUnitID
 
 local glMatrixMode = gl.MatrixMode
 local glLoadIdentity = gl.LoadIdentity
@@ -214,7 +214,7 @@ local function DrawSearchlights()
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
   
   for _, unitID in pairs(visibleUnits) do
-	if ValidUnitID(unitID) then
+	if not GetUnitIsDead(unitID) then
 		local _, _, _, _, buildProgress = GetUnitHealth(unitID)
 		local unitRadius = GetUnitRadius(unitID)
 		local px, py, pz = GetUnitPosition(unitID)

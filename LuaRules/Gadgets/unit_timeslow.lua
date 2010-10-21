@@ -152,7 +152,7 @@ function gadget:GameFrame(f)
         
 			if state.degradeTimer <= 0 then
 				
-				local health = Spring.GetUnitHealth(unitID)
+				local health = Spring.GetUnitHealth(unitID) or 0
 				state.slowDamage = state.slowDamage-health*0.02
 				if state.slowDamage < 0 then
 					state.slowDamage = 0
