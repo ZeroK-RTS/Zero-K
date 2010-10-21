@@ -26,7 +26,7 @@ unitDef = {
 
   defaultmissiontype  = [[VTOL_standby]],
   explodeAs           = [[GUNSHIPEX]],
-  fireState           = 1,
+  --fireState           = 1,
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
@@ -35,7 +35,7 @@ unitDef = {
   idleTime            = 1800,
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[1380]],
-  mass                = 300,
+  mass                = 238,
   maxAcc              = 0.5,
   maxDamage           = 1130,
   maxFuel             = 1000,

@@ -147,7 +147,7 @@ else
 end
 
 local allyTeams = Spring.GetAllyTeamList()
-if #allyTeams > 3 then pvp = true end	--chicken, players, and gaia
+--if #allyTeams > 3 then pvp = true end	--chicken, players, and gaia
 
 local gaiaTeamID          = Spring.GetGaiaTeamID()
 computerTeams[gaiaTeamID] = nil
