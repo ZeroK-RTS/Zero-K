@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat",
-    desc      = "v0.37 Chili Chat Console.",
+    desc      = "v0.38 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -329,13 +329,42 @@ function remakeConsole()
 	end 
 end
 
+local function ReshapeConsole()
+	--[[ I wish these worked
+	scrollpanel1.bottom = inputtext_inside and 25 or 0
+	scrollpanel1.right  = inputtext_inside and 0 or 6
+	
+	scrollpanel1:UpdateLayout()
+	scrollpanel1:UpdateClientArea()
+	window_console:UpdateLayout()
+	window_console:UpdateClientArea()
+	--]]
+	
+	scrollpanel1:Dispose()
+	scrollpanel1 = ScrollPanel:New{
+		parent = window_console,
+		x = 0,
+		y = 0,
+		bottom = inputtext_inside and 25 or 0,
+		right= inputtext_inside and 0 or 6,
+		--horizontalScrollbar = false,
+		verticalSmartScroll = true,
+		disableChildrenHitTest = true,
+		children = {
+			stack_console,
+		},
+	}
+
+	
+end
+
 local function MakeInputSpace()
 	inputtext_inside = true
-	remakeConsole()
+	ReshapeConsole()	
 end
 local function RemoveInputSpace()
 	inputtext_inside = false
-	remakeConsole()
+	ReshapeConsole()
 end
 
 
@@ -409,7 +438,7 @@ local function addLine(msg)
 	GenerateTextControl(line)
 	
 	if lines_count >= options.max_lines.value then
-		stack_console:RemoveChild(stack_console.children[1])
+		stack_console:RemoveChild(stack_console.children[2])
 		
 		lines_count = lines_count - 1
 		
