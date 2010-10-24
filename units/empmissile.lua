@@ -7,15 +7,15 @@ unitDef = {
   bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 8192,
-  buildCostEnergy               = 400,
-  buildCostMetal                = 400,
+  buildCostEnergy               = 450,
+  buildCostMetal                = 450,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 3,
   buildingGroundDecalSizeY      = 3,
   buildingGroundDecalType       = [[empmissile_aoplane.dds]],
   buildPic                      = [[empmissile.png]],
-  buildTime                     = 400,
+  buildTime                     = 450,
   canAttack                     = true,
   canGuard                      = true,
   canstop                       = [[1]],
@@ -26,7 +26,7 @@ unitDef = {
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {
-    helptext       = [[The Shockley disables units in a moderate area for up to 45 seconds.]],
+    helptext       = [[The Shockley disables units in a small area for up to 45 seconds.]],
     mobilebuilding = [[1]],
   },
 
@@ -79,7 +79,7 @@ unitDef = {
 
     EMP_WEAPON = {
       name                    = [[EMPMissile]],
-      areaOfEffect            = 350,
+      areaOfEffect            = 280,
       avoidFriendly           = false,
       collideFriendly         = false,
       craterBoost             = 0,
