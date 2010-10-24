@@ -48,8 +48,8 @@ local common_commands, states_commands, factory_commands, econaux_commands, defe
 
 local MAX_COLUMNS = 10
 local MAX_STATE_ROWS = 5
-local MIN_HEIGHT = 180
-local MIN_WIDTH = 600
+local MIN_HEIGHT = 40
+local MIN_WIDTH = 100
 
 -- Global commands defined here - they have cmdDesc format + 
 local globalCommands = {
