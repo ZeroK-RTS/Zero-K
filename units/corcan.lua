@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Melee Assault Jumper]],
   acceleration        = 0.12,
   bmcode              = [[1]],
-  brakeRate           = 0.188,
+  brakeRate           = 0.1942,
   buildCostEnergy     = 650,
   buildCostMetal      = 650,
   builder             = false,
@@ -70,7 +70,7 @@ unitDef = {
   trackType           = [[ComTrack]],
   trackWidth          = 22,
   turninplace         = 0,
-  turnRate            = 970,
+  turnRate            = 982,
   upright             = true,
   workerTime          = 0,
 

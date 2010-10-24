@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Heavy Anti-Air Walker]],
   acceleration        = 0.12,
   bmcode              = [[1]],
-  brakeRate           = 0.188,
+  brakeRate           = 0.1942,
   buildCostEnergy     = 550,
   buildCostMetal      = 550,
   buildPic            = [[ARMAAK.png]],
@@ -50,7 +50,7 @@ unitDef = {
   steeringmode        = [[2]],
   TEDClass            = [[KBOT]],
   turninplace         = 0,
-  turnRate            = 1021,
+  turnRate            = 1026,
   upright             = true,
 
   weapons             = {

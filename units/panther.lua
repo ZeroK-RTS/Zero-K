@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Lightning Raider Tank]],
   acceleration        = 0.125,
   bmcode              = [[1]],
-  brakeRate           = 0.125,
+  brakeRate           = 0.1375,
   buildCostEnergy     = 350,
   buildCostMetal      = 350,
   builder             = false,
@@ -67,7 +67,7 @@ unitDef = {
   trackType           = [[StdTank]],
   trackWidth          = 30,
   turninplace         = 0,
-  turnRate            = 550,
+  turnRate            = 616,
   workerTime          = 0,
 
   weapons             = {

@@ -26,7 +26,6 @@ unitDef = {
 
   defaultmissiontype  = [[VTOL_standby]],
   explodeAs           = [[GUNSHIPEX]],
-  --fireState           = 1,
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
@@ -178,7 +177,7 @@ unitDef = {
       height           = [[4]],
       hitdensity       = [[100]],
       metal            = 240,
-      object           = [[Stiletto_dead.s3o]], --debris2x2c.s3o
+      object           = [[Stiletto_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 240,
       seqnamereclamate = [[TREE1RECLAMATE]],

@@ -2,7 +2,7 @@ unitDef = {
   unitname            = [[corned]],
   name                = [[Mason]],
   description         = [[Construction Vehicle, Builds at 6 m/s]],
-  acceleration        = 0.06,
+  acceleration        = 0.066,
   brakeRate           = 1.5,
   buildCostEnergy     = 140,
   buildCostMetal      = 140,
@@ -71,7 +71,7 @@ unitDef = {
   trackType           = [[StdTank]],
   trackWidth          = 32,
   turninplace         = 0,
-  turnRate            = 560,
+  turnRate            = 625,
   workerTime          = 6,
 
   featureDefs         = {

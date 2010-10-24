@@ -59,7 +59,7 @@ unitDef = {
   smoothAnim          = true,
   steeringmode        = [[2]],
   TEDClass            = [[KBOT]],
-  turnRate            = 434,
+  turnRate            = 515,
   upright             = true,
   workerTime          = 0,
 

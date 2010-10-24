@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Light Artillery/Skirmisher Bot]],
   acceleration        = 0.12,
   bmcode              = [[1]],
-  brakeRate           = 0.225,
+  brakeRate           = 0.2275,
   buildCostEnergy     = 130,
   buildCostMetal      = 130,
   builder             = false,
@@ -76,7 +76,7 @@ unitDef = {
   trackType           = [[ComTrack]],
   trackWidth          = 22,
   turninplace         = 0,
-  turnRate            = 500,
+  turnRate            = 573,
   upright             = true,
   workerTime          = 0,
 

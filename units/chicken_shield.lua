@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Shield/AA]],
   acceleration        = 0.36,
   bmcode              = [[1]],
-  brakeRate           = 0.2,
+  brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -66,7 +66,7 @@ unitDef = {
   trackStretch        = 1,
   trackType           = [[ChickenTrack]],
   trackWidth          = 34,
-  turnRate            = 768,
+  turnRate            = 806,
   upright             = false,
   workerTime          = 0,
 

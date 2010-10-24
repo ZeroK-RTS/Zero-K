@@ -2,7 +2,7 @@ unitDef = {
   unitname            = [[coracv]],
   name                = [[Welder]],
   description         = [[Armed Construction Tank, Builds at 9 m/s]],
-  acceleration        = 0.06,
+  acceleration        = 0.066,
   brakeRate           = 1.5,
   buildCostEnergy     = 250,
   buildCostMetal      = 250,
@@ -76,7 +76,7 @@ unitDef = {
   trackType           = [[StdTank]],
   trackWidth          = 32,
   turninplace         = 0,
-  turnRate            = 560,
+  turnRate            = 625,
   workerTime          = 9,
 
   weapons             = {

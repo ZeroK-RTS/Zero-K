@@ -5,7 +5,7 @@ unitDef = {
   acceleration        = 0.12,
   activateWhenBuilt   = true,
   bmcode              = [[1]],
-  brakeRate           = 0.15,
+  brakeRate           = 0.16,
   buildCostEnergy     = 481,
   buildCostMetal      = 481,
   builder             = false,
@@ -59,7 +59,7 @@ unitDef = {
   steeringmode        = [[1]],
   TEDClass            = [[KBOT]],
   turninplace         = 0,
-  turnRate            = 1045,
+  turnRate            = 1047,
   upright             = false,
   workerTime          = 0,
 

@@ -4,7 +4,7 @@ unitDef = {
   description        = [[Construction Spider, Builds at 9 m/s]],
   acceleration       = 0.15,
   bmcode             = [[1]],
-  brakeRate          = 0.15,
+  brakeRate          = 0.16,
   buildCostEnergy    = 200,
   buildCostMetal     = 200,
   buildDistance      = 80,
@@ -70,7 +70,7 @@ unitDef = {
   terraformSpeed     = 450,
   threed             = [[1]],
   turninplace        = 0,
-  turnRate           = 1020,
+  turnRate           = 1025,
   workerTime         = 9,
   zbuffer            = [[1]],
 

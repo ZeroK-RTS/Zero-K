@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Burrowing Flamer (Assault)]],
   acceleration        = 0.36,
   bmcode              = [[1]],
-  brakeRate           = 0.2,
+  brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -62,7 +62,7 @@ unitDef = {
   stealth             = true,
   steeringmode        = [[2]],
   TEDClass            = [[KBOT]],
-  turnRate            = 768,
+  turnRate            = 806,
   upright             = false,
   workerTime          = 0,
 

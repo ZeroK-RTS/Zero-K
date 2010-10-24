@@ -4,7 +4,7 @@ unitDef = {
   description          = [[Heavy Riot/Skirmish Walker]],
   acceleration         = 0.12,
   bmcode               = [[1]],
-  brakeRate            = 0.125,
+  brakeRate            = 0.1375,
   buildCostEnergy      = 1600,
   buildCostMetal       = 1600,
   builder              = false,
@@ -78,7 +78,7 @@ unitDef = {
   TEDClass             = [[KBOT]],
   threed               = [[1]],
   turninplace          = 0,
-  turnRate             = 320,
+  turnRate             = 416,
   version              = [[1]],
   workerTime           = 0,
 

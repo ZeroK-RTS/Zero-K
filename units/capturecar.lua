@@ -2,9 +2,9 @@ unitDef = {
   unitname            = [[capturecar]],
   name                = [[Dreamweaver]],
   description         = [[Capture Vehicle]],
-  acceleration        = 0.036,
+  acceleration        = 0.0444,
   bmcode              = [[1]],
-  brakeRate           = 0.015,
+  brakeRate           = 0.0385,
   buildCostEnergy     = 420,
   buildCostMetal      = 420,
   builder             = false,
@@ -19,11 +19,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    --description_bp = [[Veículo radar]],
-    --description_fr = [[Véhicule Radar]],
-    helptext       = [[The Dreamweaver captures up to 280 metal worth of enemy units, turning them against their former allies.]],
-   -- helptext_bp    = [[]],
-   -- helptext_fr    = [[Le Informant est un peu comme tous les radars mobiles, aussi indispensable que faible.]],
+    helptext = [[The Dreamweaver captures up to 280 metal worth of enemy units, turning them against their former allies.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -62,7 +58,7 @@ unitDef = {
   trackType           = [[StdTank]],
   trackWidth          = 26,
   turninplace         = 0,
-  turnRate            = 320,
+  turnRate            = 416,
   workerTime          = 0,
 
   weapons             = {
