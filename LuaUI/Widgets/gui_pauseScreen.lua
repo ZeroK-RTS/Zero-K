@@ -54,6 +54,7 @@ local windowIconPath = "LuaUI/Images/SpringIconmkII.png"
 local fontPath = "LuaUI/Fonts/MicrogrammaDBold.ttf"
 local windowClosePath = "LuaUI/Images/closex_32.png"
 local imgCloseWidth = 32
+local minTransparency = 0 -- transparency after [X] is pressed
 --Color config in drawPause function
 	
 ----------------
@@ -184,7 +185,12 @@ function drawPause()
 		if ( clickTimestamp ) then		
 			factor = ( 1.0 - ( now - clickTimestamp ) / fadeTime )
 		end
-		factor = max( factor, 0.3 )
+		factor = max( factor, minTransparency )
+    
+    if factor == 0 then
+      return
+    end
+    
 		colorWnd[4] = colorWnd[4] * factor
 		text[4] = text[4] * factor
 		text2[4] = text2[4] * factor
