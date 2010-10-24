@@ -70,7 +70,7 @@ unitDef = {
 
     ARM_PIDR = {
       name                    = [[PlasmaImplosionDumpRocket]],
-      areaOfEffect            = 192,
+      areaOfEffect            = 384,
       avoidFeature            = false,
       avoidFriendly           = false,
       collideFriendly         = false,
@@ -78,8 +78,8 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 2500,
-        planes  = 2500,
+        default = 2000,
+        planes  = 2000,
         subs    = 125,
       },
 
@@ -96,7 +96,7 @@ unitDef = {
       noautorange             = [[1]],
       noSelfDamage            = true,
       pitchtolerance          = [[16000]],
-      range                   = 900,
+      range                   = 600,
       reloadtime              = 8,
       renderType              = 1,
       selfprop                = true,
