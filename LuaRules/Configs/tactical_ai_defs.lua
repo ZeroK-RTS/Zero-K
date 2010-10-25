@@ -104,6 +104,7 @@ local artyRangeSkirmieeArray = {
 	"arm_venom",
 	"cormak",
 	"corlevlr",
+	"capturecar",
 	"armwar",
 	"armstump",
 	"corraid",
@@ -164,6 +165,7 @@ local longRangeSkirmieeArray = {
 	"arm_venom",
 	"cormak",
 	"corlevlr",
+	"capturecar",
 	"armwar",
 	"armstump",
 	"armbull",
@@ -220,6 +222,7 @@ local medRangeSkirmieeArray = {
 	"arm_venom",
 	"cormak",
 	"corlevlr",
+	"capturecar",
 	"tawf003", -- mumbo
 	"tawf114", -- banisher
 	"corthud",
@@ -288,6 +291,7 @@ local fleeables = {
 	"arm_venom",
 	"cormak",
 	"corlevlr",
+	"capturecar",
 	"armwar",
 	"armstump",
 	"armbull",

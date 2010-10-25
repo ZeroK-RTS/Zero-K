@@ -69,7 +69,7 @@ Spring.UnitScript.SetSignalMask ( SIG_Fire )
   	if sound_index == 0 then
   	
   	    local px, py, pz = Spring.GetUnitPosition(unitID)
-		Spring.PlaySoundFile("sounds/otaunit/LGHTHVY1.WAV", 10, px, py, pz)
+		Spring.PlaySoundFile("sounds/weapon/LightningBolt", 10, px, py, pz)
   	end
   	sound_index = sound_index + 1
   	if sound_index >= 6 then
