@@ -2,9 +2,9 @@ unitDef = {
   unitname            = [[armmerl]],
   name                = [[Merl]],
   description         = [[Mobile Cruise Missile Launcher]],
-  acceleration        = 0.048,
+  acceleration        = 0.042,
   bmcode              = [[1]],
-  brakeRate           = 0.088,
+  brakeRate           = 0.08,
   buildCostEnergy     = 800,
   buildCostMetal      = 800,
   builder             = false,
@@ -71,7 +71,7 @@ unitDef = {
   trackType           = [[StdTank]],
   trackWidth          = 38,
   turninplace         = 0,
-  turnRate            = 521,
+  turnRate            = 460,
   workerTime          = 0,
 
   weapons             = {
@@ -96,9 +96,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 850,
-        planes  = 850,
-        subs    = 42.5,
+        default = 800,
+        planes  = 800,
+        subs    = 40,
       },
 
       edgeEffectiveness       = 0.5,
