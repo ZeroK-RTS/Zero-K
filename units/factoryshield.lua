@@ -22,6 +22,7 @@ unitDef = {
     [[corcrash]],
     [[corclog]],
     [[corroach]],
+	[[punisher]],
     [[core_spectre]],
   },
 

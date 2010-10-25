@@ -89,22 +89,22 @@ unitDef = {
 
     CORTRUCK_ROCKET = {
       name                    = [[Cruise Missile]],
-      areaOfEffect            = 64,
       cegTag                  = [[raventrail]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
-        default = 800,
-        planes  = 800,
+        default = 500,
+        planes  = 500,
         subs    = 40,
       },
 
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 100,
-      flighttime              = 12,
+	  impactOnly              = true,
+      flighttime              = 14,
       guidance                = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -114,7 +114,7 @@ unitDef = {
       model                   = [[corvrocket]],
       noautorange             = [[1]],
       noSelfDamage            = true,
-      range                   = 1500,
+      range                   = 1300,
       reloadtime              = 10,
       renderType              = 1,
       selfprop                = true,
@@ -129,7 +129,7 @@ unitDef = {
       weaponAcceleration      = 315,
       weaponTimer             = 2,
       weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 10000,
+      weaponVelocity          = 8000,
     },
 
   },

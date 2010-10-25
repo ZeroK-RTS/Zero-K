@@ -35,7 +35,7 @@ function widget:UnitCreated(unitID)
 
 end
 
-function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
+function widget:UnitGiven(unitID, unitDefID, oldTeam, newTeam)
 
   drawUnits[unitID] = true
 

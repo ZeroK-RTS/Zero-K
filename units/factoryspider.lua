@@ -16,9 +16,9 @@ unitDef = {
   buildoptions                  = {
     [[arm_spider]],
     [[armflea]],
+	[[arm_venom]],
     [[armsptk]],
     [[spiderassault]],
-    [[arm_venom]],
     [[armcrabe]],
     [[spideraa]],
     [[armspy]],

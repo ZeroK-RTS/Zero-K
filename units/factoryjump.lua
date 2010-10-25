@@ -21,7 +21,6 @@ unitDef = {
     [[slowmort]],
     [[corsktl]],
     [[armaak]],
-    [[punisher]],
     [[corsumo]],
   },
 
