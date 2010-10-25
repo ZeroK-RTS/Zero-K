@@ -46,7 +46,7 @@ local CMD_MORPH = 31210
 
 local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, overrides = include("Configs/integral_menu_commands.lua")
 
-local MAX_COLUMNS = 7
+local MAX_COLUMNS = 6
 local MAX_STATE_ROWS = 5
 local MIN_HEIGHT = 80
 local MIN_WIDTH = 200
@@ -297,8 +297,8 @@ local n_states = {}
 
 --shortcuts
 local menuChoices = {
-	[1] = { array = n_common, name = "Commands" },
-	[2] = { array = n_factories, name = "Factories" },
+	[1] = { array = n_common, name = "Order" },
+	[2] = { array = n_factories, name = "Factory" },
 	[3] = { array = n_econ, name = "Econ" },
 	[4] = { array = n_defense, name = "Defense" },
 	[5] = { array = n_special, name = "Special" },
