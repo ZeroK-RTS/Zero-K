@@ -51,8 +51,8 @@ local MAX_STATE_ROWS = 5
 local MIN_HEIGHT = 80
 local MIN_WIDTH = 200
 local DEFAULT_WIDTH = 500
-local COMMAND_SECTION_WIDTH = 80	--percent
-local STATE_SECTION_WIDTH = 20	--percent
+local COMMAND_SECTION_WIDTH = 78	--percent
+local STATE_SECTION_WIDTH = 18	--percent
 
 local numRows = 3
 local numStateColumns = 3
@@ -311,6 +311,7 @@ local configArrayList = {	--should merge with the above array but ehh...
 	[5] = special_commands,
 }
 local menuChoice = 1
+local lastBuildChoice = 2
 
 --sorts commands into categories
 local function ProcessCommand(cmd) 
@@ -660,6 +661,7 @@ local function MakeMenuTab(i, alpha)
 		OnClick = {
 			function()
 				menuChoice = i
+				if i >= 2 and i <= 5 then lastBuildChoice = i end
 				Update(true)
 				ColorTabs(i)
 			end
@@ -685,9 +687,9 @@ local function SmartTabSelect()
 	if #n_units > 0 and #n_econ == 0 then
 		menuChoice = 6	--selected factory, jump to units
 		ColorTabs(6)
-	elseif #n_units == 0 and menuChoice == 6 then
-		menuChoice = 1	--selected non-fac and in units menu, jump to common
-		ColorTabs(1)
+	elseif #n_econ > 0 and menuChoice == 6 then
+		menuChoice = lastBuildChoice	--selected non-fac and in units menu, jump to last build menu
+		ColorTabs(lastBuildChoice)
 	elseif #n_factories + #n_econ + #n_defense + #n_units == 0 then
 		menuChoice = 1	--selected non-builder, jump to common
 		ColorTabs(1)
@@ -797,6 +799,7 @@ function widget:Initialize()
 	Colorbars = Chili.Colorbars
 	Checkbox = Chili.Checkbox
 	Window = Chili.Window
+	Panel = Chili.Panel
 	ScrollPanel = Chili.ScrollPanel
 	StackPanel = Chili.StackPanel
 	LayoutPanel = Chili.LayoutPanel
@@ -819,7 +822,6 @@ function widget:Initialize()
 	window = Window:New{
 		parent = screen0,
 		name   = 'integralwindow';
-		--padding = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
 		width = DEFAULT_WIDTH; -- chilli selections is not resizable
 		height = "20%";
@@ -836,18 +838,20 @@ function widget:Initialize()
 		--itemMargin  = {0, 0, 0, 0},
 	}
 	
-	fakewindow = ScrollPanel:New{
+	fakewindow = Panel:New{
 		parent = window,
 		x = 0,
 		y = '15%',
 		width = "100%";
 		height = "86%";
-		--horizontalScrollbar = false,
-		verticalSmartScroll = true,
-		disableChildrenHitTest = false,
-		--color = {1, 1, 1, 1},
-		--padding = {0, 0, 0, 0},
+		--disableChildrenHitTest = false,
 		--itemMargin  = {0, 0, 0, 0},
+		dockable = false;
+		draggable = false,
+		resizable = false,
+		padding = {0, 0, 0, 0},
+		--color = {0.3, 0.3, 0.3, 1},	--broke?
+		skinName  = "DarkGlass",
 	}
 
 	menuTabRow = StackPanel:New{
@@ -856,7 +860,7 @@ function widget:Initialize()
 		orientation   = "horizontal";
 		height = "15%";
 		width = "100%";
-		x = 0;
+		x = '1%';
 		y = 0;
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
@@ -871,10 +875,10 @@ function widget:Initialize()
 		parent = fakewindow,
 		resizeItems = true;
 		orientation   = "vertical";
-		height = "100%";
+		height = "98%";
 		width = tostring(COMMAND_SECTION_WIDTH).."%";
-		x = "0%";
-		y = "1%";
+		x = "1.5%";
+		y = "1.5%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
@@ -897,10 +901,10 @@ function widget:Initialize()
 		parent = fakewindow,
 		resizeItems = true;
 		orientation   = "horizontal";
-		height = "100%";
+		height = "96%";
 		width = tostring(STATE_SECTION_WIDTH).."%";
-		x = tostring(100-STATE_SECTION_WIDTH).."%";
-		y = "1%";
+		x = tostring(98-STATE_SECTION_WIDTH).."%";
+		y = "3%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
