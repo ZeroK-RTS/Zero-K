@@ -121,6 +121,7 @@ function Ribbon:Draw()
   if (self.isvalid) then
     --local x,y,z = GetPiecePos(self.unit,self.piecenum)
     local x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
+	z = z or 0
     glUniform( oldPosUniform[quads0+1] , x,y,z )
   else
     local dir = self.oldPos[j]

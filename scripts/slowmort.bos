@@ -1,7 +1,6 @@
-#define TA			// This is a TA script
+//linear constant=163840
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  Support, Flare, Thigh1, Thigh2, Torso, Barrel, Foot2,
        Foot1, Leg2, Leg1;
@@ -351,10 +350,6 @@ StopMoving()
 	bMoving = FALSE;
 }
 
-SweetSpot(piecenum)
-{
-	piecenum = Torso;
-}
 
 RestoreAfterDelay()
 {
@@ -386,9 +381,9 @@ FirePrimary()
 	move Barrel to z-axis [-5.000000] speed [500.000000];
 	emit-sfx 1024 from flare;
 	sleep 150;
-	turn Torso to x-axis <-10.000000> speed <500.120879>;
+	//turn Torso to x-axis <-10.000000> speed <500.120879>;
 	sleep 150;
-	turn Torso to x-axis <0.000000> speed <20.000000>;
+	//turn Torso to x-axis <0.000000> speed <20.000000>;
 	move Barrel to z-axis [0.000000] speed [3.000000];
 }
 

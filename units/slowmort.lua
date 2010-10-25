@@ -91,7 +91,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 50,
+        default = 100,
       },
 
       energypershot           = 0.3,
@@ -107,7 +107,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 600,
-      reloadtime              = 1,
+      reloadtime              = 2,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/pulse_laser2]],
