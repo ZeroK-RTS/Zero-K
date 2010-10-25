@@ -161,6 +161,8 @@ local function AdjustLinks()
    end
 end
 
+local RECHARGE_KOEF = 0.01
+
 function gadget:GameFrame(n)
    if n%30 == 18 then AdjustLinks() end 
 
@@ -181,18 +183,43 @@ function gadget:GameFrame(n)
             if not unitStat[unitID] then break end -- continue
 
             local currentPower = 0
-            local maxPower = 0
             local linkUnits = 0
             for unitID2,su2 in pairs(su.link) do
-               local shieldOn,shieldCharge = Spring.GetUnitShieldState(unitID2, -1)
-               su.shieldOn = shieldOn
-               currentPower = currentPower + shieldCharge
-               maxPower = maxPower + su2.shieldPower
-               linkUnits = linkUnits + 1
+				local shieldOn,shieldCharge = Spring.GetUnitShieldState(unitID2, -1)
+				su.shieldOn = shieldOn
+				if (shieldOn) then 
+					currentPower = currentPower + shieldCharge
+					linkUnits = linkUnits + 1
+				end 
             end
-            for unitID3,su2 in pairs(su.link) do
-              Spring.SetUnitShieldState(unitID3, -1, currentPower * su2.shieldPower / maxPower)
+            local avg = currentPower / linkUnits  -- calculate average charge of netwrok 
+			local overflow = 0
+			local slack = 0 
+			for unitID2,su2 in pairs(su.link) do  -- equalize all sheilds to average by 1% of their difference from average 
+				local shieldOn,shieldCharge = Spring.GetUnitShieldState(unitID2, -1)
+				if (shieldOn) then 
+					local newCharge = shieldCharge + (avg - shieldCharge) * RECHARGE_KOEF
+					if (newCharge > su2.shieldPower) then 
+						overflow = overflow + newCharge - su2.shieldPower
+						newCharge = su2.shieldPower
+					else 
+						slack = slack + su2.shieldPower - newCharge
+					end 
+					Spring.SetUnitShieldState(unitID2, -1, newCharge)
+				end 
             end
+			if overflow > 0 and slack > 0 then  -- if there was overflow (above max charge) and  there is still some unused space for charge, transfer it there 
+				for unitID2,su2 in pairs(su.link) do
+					local shieldOn,shieldCharge = Spring.GetUnitShieldState(unitID2, -1)
+					if (shieldOn) then 
+						if (shieldCharge < su2.shieldPower) then 
+							newCharge = shieldCharge + overflow * (su2.shieldPower - shieldCharge) / slack 
+							Spring.SetUnitShieldState(unitID2, -1, newCharge)
+						end 
+					end 
+				end
+			end 
+			
          end
          until true
       end
