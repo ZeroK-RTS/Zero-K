@@ -3,14 +3,14 @@
 -- TODO: state switches need icons 
 -- TODO: commandschanged gets called 2x for some reason, investigate
 -- TODO: display which unit is currently selected
--- TODO: allow inserting units into factory queue at arbitrary positions
 -- TODO: display number of units queued by fac on build buttons
 -- TODO: fix priority tooltip
+-- TODO: fix tooltips for queue buttons
 
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.21 Integral Command Menu",
+    desc      = "v0.25 Integral Command Menu",
     author    = "Licho, KingRaptor",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -44,12 +44,18 @@ local spGetFullBuildQueue = Spring.GetFullBuildQueue
 local CMD_PAGES = 60
 local CMD_MORPH = 31210
 
-local common_commands, states_commands, factory_commands, econaux_commands, defense_commands, super_commands, overrides = include("Configs/integral_menu_commands.lua")
+local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, overrides = include("Configs/integral_menu_commands.lua")
 
-local MAX_COLUMNS = 10
+local MAX_COLUMNS = 7
 local MAX_STATE_ROWS = 5
-local MIN_HEIGHT = 40
-local MIN_WIDTH = 100
+local MIN_HEIGHT = 80
+local MIN_WIDTH = 200
+local DEFAULT_WIDTH = 500
+local COMMAND_SECTION_WIDTH = 80	--percent
+local STATE_SECTION_WIDTH = 20	--percent
+
+local numRows = 3
+local numStateColumns = 3
 
 -- Global commands defined here - they have cmdDesc format + 
 local globalCommands = {
@@ -283,9 +289,9 @@ end
 -- arrays with commands to be displayed 
 local n_common = {}
 local n_factories = {}
-local n_econaux = {}
+local n_econ = {}
 local n_defense = {}
-local n_super = {}
+local n_special = {}
 local n_units = {}
 local n_states = {}
 
@@ -293,10 +299,16 @@ local n_states = {}
 local menuChoices = {
 	[1] = { array = n_common, name = "Commands" },
 	[2] = { array = n_factories, name = "Factories" },
-	[3] = { array = n_econaux, name = "Econ/Aux" },
+	[3] = { array = n_econ, name = "Econ" },
 	[4] = { array = n_defense, name = "Defense" },
-	[5] = { array = n_super, name = "Super" },
+	[5] = { array = n_special, name = "Special" },
 	[6] = { array = n_units, name = "Units" },
+}
+local configArrayList = {	--should merge with the above array but ehh...
+	[2] = factory_commands,
+	[3] = econ_commands,
+	[4] = defense_commands,
+	[5] = special_commands,
 }
 local menuChoice = 1
 
@@ -310,12 +322,12 @@ local function ProcessCommand(cmd)
 			n_common[#n_common+1] = cmd
 		elseif factory_commands[cmd.id] then
 			n_factories[#n_factories+1] = cmd
-		elseif econaux_commands[cmd.id] then
-			n_econaux[#n_econaux+1] = cmd
+		elseif econ_commands[cmd.id] then
+			n_econ[#n_econ+1] = cmd
 		elseif defense_commands[cmd.id] then
 			n_defense[#n_defense+1] = cmd
-		elseif super_commands[cmd.id] then
-			n_super[#n_super+1] = cmd
+		elseif special_commands[cmd.id] then
+			n_special[#n_special+1] = cmd
 		elseif UnitDefs[-(cmd.id)] then
 			n_units[#n_units+1] = cmd
 		else
@@ -375,23 +387,6 @@ local function UpdateContainer(container, nl, columns)
 		end 
 	end 
 end 
-
---these two functions place the items into their rows
-local function ManageStateIcons()
-	local stateCols = { {}, {}, {} }
-	for i=1, MAX_STATE_ROWS do
-		stateCols[1][i] = n_states[i]
-	end
-	for i=MAX_STATE_ROWS+1, MAX_STATE_ROWS*2 do
-		stateCols[2][i-MAX_STATE_ROWS] = n_states[i]
-	end	
-	for i=(2*MAX_STATE_ROWS)+1, MAX_STATE_ROWS*3 do
-		stateCols[3][i-(2*MAX_STATE_ROWS)] = n_states[i]
-	end
-	for i=1, 3 do
-		UpdateContainer(sp_states[i], stateCols[i], MAX_STATE_ROWS)
-	end
-end
 
 -- if you ever want to know why the command removal works use this on Spring.GetFactoryCommands(selectedFac)
 --[[
@@ -477,7 +472,7 @@ end
 
 --uses its own function for more fine control
 local function ManageBuildRow()
-	--if (menuChoice ~= 5) or (not buildRow_visible) or (not selectedFac) then return end
+	--if (menuChoice ~= 6) or (not buildRow_visible) or (not selectedFac) then return end
 	local overrun = false
 	buildQueue = spGetFullBuildQueue(selectedFac)
 	RemoveChildren(buildRow)
@@ -520,6 +515,7 @@ local function ManageBuildRow()
 			end
 			buttonArray.button.backgroundColor[4] = 0.3
 			if not (overrun and i == MAX_COLUMNS) then
+				buttonArray.button.tooltip = 'Add to/subtract from queued batch'
 				buttonArray.image = Image:New {
 					parent = buttonArray.button,
 					width="100%";
@@ -528,40 +524,63 @@ local function ManageBuildRow()
 					file = '#'..udid,
 					file2 = WG.GetBuildIconFrame(UnitDefs[udid]),
 				}
-			buttonArray.label = Label:New {
-				parent = buttonArray.image,
-				width="100%";
-				height="100%";
-				autosize=false;
-				--x = "70%",
-				--y = "70%",
-				align="right";
-				valign="bottom";
-				caption = caption;
-				fontSize = 16;
-				fontShadow = true;
-			}
+				buttonArray.label = Label:New {
+					parent = buttonArray.image,
+					width="100%";
+					height="100%";
+					autosize=false;
+					--x = "70%",
+					--y = "70%",
+					align="right";
+					valign="bottom";
+					caption = caption;
+					fontSize = 16;
+					fontShadow = true;
+				}
 			end
 		end
 	end
 end
 
-local function ManageCommandIcons(sourceArray)
-	local commandRows = { {}, {}, {} }
-	for i=1, MAX_COLUMNS do
-		commandRows[1][i] = sourceArray[i]
+--these two functions place the items into their rows
+local function ManageStateIcons()
+	local stateCols = { }
+	for i=1, numStateColumns do
+		stateCols[i] = {}
+		for v=(MAX_STATE_ROWS * (i-1)) + 1, (MAX_STATE_ROWS*i) do
+			stateCols[i][v - MAX_STATE_ROWS*(i-1)] = n_states[v]
+		end
 	end
-	for i=MAX_COLUMNS+1, MAX_COLUMNS*2 do
-		commandRows[2][i-MAX_COLUMNS] = sourceArray[i]
-	end	
-	for i=(2*MAX_COLUMNS)+1, MAX_COLUMNS*3 do
-		commandRows[3][i-(2*MAX_COLUMNS)] = sourceArray[i]
+	for i=1, numStateColumns do
+		UpdateContainer(sp_states[i], stateCols[i], MAX_STATE_ROWS)
+	end
+end
+
+local function ManageCommandIcons(sourceArray, useRowSort, configArray)
+	local commandRows = { }
+	--most commands don't use row sorting; econ, defense and special do
+	if not useRowSort then
+		for i=1, numRows do
+			commandRows[i] = {}
+			for v=(MAX_COLUMNS * (i-1)) + 1, (MAX_COLUMNS*i) do
+				commandRows[i][v - MAX_COLUMNS*(i-1)] = sourceArray[v]
+			end
+		end
+	else
+		for i=1, numRows do
+			commandRows[i] = {}
+			for v=1,#sourceArray do
+				if configArray[sourceArray[v].id].row == i then
+					commandRows[i][#commandRows[i]+1] = sourceArray[v]
+				end
+			end
+		end	
 	end
 	--code for factory queue goes here
-	for i=1, 3 do
+	for i=1, numRows do
 		UpdateContainer(sp_commands[i], commandRows[i], MAX_COLUMNS)
 	end
-	if menuChoice == 6 and #commandRows[3] == 0 and selectedFac then
+	if menuChoice == 6 and #commandRows[numRows] == 0 and selectedFac then
 		if not buildRow_visible then
 			commands_main:AddChild(buildRow)
 			buildRow_visible = true
@@ -576,6 +595,8 @@ end
 local function Update(buttonpush) 
     local commands = widgetHandler.commands
     local customCommands = widgetHandler.customCommands
+	--most commands don't use row sorting; econ, defense and special do
+	local useRowSort = (menuChoice == 3 or menuChoice == 4 or menuChoice == 5)
 	
 	--if (#commands + #customCommands == 0) then 
 		---screen0:RemoveChild(window);
@@ -590,9 +611,9 @@ local function Update(buttonpush)
 	
 	n_common = {}
 	n_factories = {}
-	n_econaux = {}
+	n_econ = {}
 	n_defense = {}
-	n_super = {}
+	n_special = {}
 	n_units = {}
 	n_states = {}
 	
@@ -603,34 +624,35 @@ local function Update(buttonpush)
 
 	menuChoices[1].array = n_common
 	menuChoices[2].array = n_factories
-	menuChoices[3].array = n_econaux
+	menuChoices[3].array = n_econ
 	menuChoices[4].array = n_defense
-	menuChoices[5].array = n_super
+	menuChoices[5].array = n_special
 	menuChoices[6].array = n_units
-
+	
 	--[[
 	local function Sort(a, b, array)
 		return array[a.id] < array[b.id]
 	end
 	
 	table.sort(n_factories, Sort(a,b, factory_commands))
-	table.sort(n_econaux, Sort(a,b, econaux_commands))
+	table.sort(n_econ, Sort(a,b, econ_commands))
 	table.sort(n_defense, Sort(a,b, defense_commands))
 	]]--
 	
 	--sorting isn't strictly needed, it uses the same order as listed in buildoptions
-	table.sort(n_factories, function(a,b) return factory_commands[a.id] < factory_commands[b.id] end )
-	table.sort(n_econaux, function(a,b) return econaux_commands[a.id] < econaux_commands[b.id] end)
-	table.sort(n_defense, function(a,b) return defense_commands[a.id] < defense_commands[b.id] end)
+	table.sort(n_factories, function(a,b) return factory_commands[a.id].order < factory_commands[b.id].order end )
+	table.sort(n_econ, function(a,b) return econ_commands[a.id].order < econ_commands[b.id].order end)
+	table.sort(n_defense, function(a,b) return defense_commands[a.id].order < defense_commands[b.id].order end)
+	table.sort(n_special, function(a,b) return special_commands[a.id].order < special_commands[b.id].order end)
 
 	ManageStateIcons()
-	ManageCommandIcons(menuChoices[menuChoice].array)
+	ManageCommandIcons(menuChoices[menuChoice].array, useRowSort, configArrayList[menuChoice])
 end 
 
 local function MakeMenuTab(i, alpha)
 	local button = Button:New{
 		parent = menuTabRow;
-		x = tostring((16*i)-16).."%",
+		x = tostring((16.5*i)-16.5).."%",
 		y = 0,
 		width = "16%",
 		height = "100%",
@@ -660,13 +682,13 @@ end
 
 local function SmartTabSelect()
 	Update()
-	if #n_units > 0 and #n_econaux == 0 then
+	if #n_units > 0 and #n_econ == 0 then
 		menuChoice = 6	--selected factory, jump to units
 		ColorTabs(6)
 	elseif #n_units == 0 and menuChoice == 6 then
 		menuChoice = 1	--selected non-fac and in units menu, jump to common
 		ColorTabs(1)
-	elseif #n_factories + #n_econaux + #n_defense + #n_units == 0 then
+	elseif #n_factories + #n_econ + #n_defense + #n_units == 0 then
 		menuChoice = 1	--selected non-builder, jump to common
 		ColorTabs(1)
 	end
@@ -799,7 +821,7 @@ function widget:Initialize()
 		name   = 'integralwindow';
 		--padding = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
-		width = 600; -- chilli selections is not resizable
+		width = DEFAULT_WIDTH; -- chilli selections is not resizable
 		height = "20%";
 		--temporary position fudges so it looks right on my screen w/o docking
 		x = 300; -- chilli selections is not resizable
@@ -850,90 +872,51 @@ function widget:Initialize()
 		resizeItems = true;
 		orientation   = "vertical";
 		height = "100%";
-		width = "80%";
+		width = tostring(COMMAND_SECTION_WIDTH).."%";
 		x = "0%";
 		y = "1%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
-	sp_commands[1] = StackPanel:New{
-		parent = commands_main,
-		resizeItems = true;
-		orientation   = "horizontal";
-		height = "33%";
-		width = "100%";
-		x = "0%";
-		y = "0%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-	}
-	sp_commands[2] = StackPanel:New{
-		parent = commands_main,
-		resizeItems = true;
-		orientation   = "horizontal";
-		height = "33%";
-		width = "100%";
-		x = "0%";
-		y = "33%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-	}
-	sp_commands[3] = StackPanel:New{
-		parent = commands_main,
-		resizeItems = true;
-		orientation   = "horizontal";
-		height = "33%";
-		width = "100%";
-		x = "0%";
-		y = "66%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-	}
+	for i=1,numRows do
+		sp_commands[i] = StackPanel:New{
+			parent = commands_main,
+			resizeItems = true;
+			orientation   = "horizontal";
+			height = tostring(math.floor(100/numRows)).."%";
+			width = "100%";
+			x = "0%";
+			y = tostring(math.floor(100/numRows))*(i-1).."%";
+			padding = {0, 0, 0, 0},
+			itemMargin  = {0, 0, 0, 0},
+		}
+		--Spring.Echo("Command row "..i.." created")
+	end
 	
 	states_main = StackPanel:New{
 		parent = fakewindow,
 		resizeItems = true;
 		orientation   = "horizontal";
 		height = "100%";
-		width = "20%";
-		x = "80%";
+		width = tostring(STATE_SECTION_WIDTH).."%";
+		x = tostring(100-STATE_SECTION_WIDTH).."%";
 		y = "1%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
-	sp_states[1] = StackPanel:New {
-		parent = states_main,
-		resizeItems = true;
-		orientation   = "vertical";
-		height = "98%";
-		width = "33%";
-		x = "66%";
-		y = "0%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-	}
-	sp_states[2] = StackPanel:New {
-		parent = states_main,
-		resizeItems = true;
-		orientation   = "vertical";
-		height = "98%";
-		width = "33%";
-		x = '33%';
-		y = "0%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-	}
-	sp_states[3] = StackPanel:New {
-		parent = states_main,
-		resizeItems = true;
-		orientation   = "vertical";
-		height = "98%";
-		width = "33%";
-		x = "0%";
-		y = "0%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-	}
+	for i=1, numStateColumns do
+		sp_states[i] = StackPanel:New {
+			parent = states_main,
+			resizeItems = true;
+			orientation   = "vertical";
+			height = "98%";
+			width = tostring(math.floor(100/numStateColumns)).."%";
+			x = tostring(100 - (math.floor(100/numStateColumns))*i).."%";
+			y = "0%";
+			padding = {0, 0, 0, 0},
+			itemMargin  = {0, 0, 0, 0},
+		}
+	end
 	
 	buildRow = StackPanel:New{
 		parent = commands_main,

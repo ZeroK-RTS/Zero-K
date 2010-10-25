@@ -14,74 +14,83 @@ local CMD_UNIT_AI = 36214
 local CMD_AREA_MEX = 10100
 local CMD_CLOAK_SHIELD = 32101
 
---number is the order
 local factories = {
-	factorycloak = 1,
-	factoryshield = 2,
-	factoryveh = 3,
-	factoryhover = 4,
-	factoryspider = 5,
-	factoryjump = 6,
-	factorytank = 7,
-	factoryplane = 8,
-	factorygunship = 9,
-	corsy = 10,
+	factorycloak = {order = 1},
+	factoryshield = {order = 2},
+	factoryveh = {order = 3},
+	factoryhover = {order = 4},
+	factoryspider = {order = 5},
+	factoryjump = {order = 6},
+	factorytank = {order = 7},
+	factoryplane = {order = 8},
+	factorygunship = {order = 9},
+	corsy = {order = 10},
 }
 
+--Integral menu is NON-ROBUST
+--all buildings (except facs) need a row or they won't appear!
+--also if you put too many things into the same row, the overflow won't be displayed!
 local econ = {
-	cormex = 1,
-	armsolar = 2,
-	armwin = 3,
-	armfus = 4,
-	geo = 5,
-	cafus = 6,
-	armmstor = 7,
-	armestor = 8,
-	armnanotc = 9,
-}
-
-local aux = {	--merged into econ
-	corrad = 10,
-	armjamt = 11,
-	corjamt = 12,
-	armsonar = 13,
-	armarad = 14,
-	armasp = 15,
+	cormex = {order = 1, row = 1},
+	armsolar = {order = 2, row = 2},
+	armwin = {order = 3, row = 2},
+	armfus = {order = 4, row = 2},
+	geo = {order = 5, row = 2},
+	cafus = {order = 6, row = 2},
+	armmstor = {order = 7, row = 3},
+	armestor = {order = 8, row = 3},
+	armnanotc = {order = 9, row = 3},
+	armasp = {order = 10, row = 3},
 }
 
 local defense = {
-	corllt = 1,
-	armdeva = 2,
-	armartic = 3,
-	corgrav = 4,
-	armpb = 5,
-	corhlt = 6,
-	armanni = 7,
-	corrl = 8,
-	corrazor = 9,
-	missiletower = 10,
-	armcir = 11,
-	corflak = 12,
-	screamer = 13,
-	cortl = 14,
-	armamd = 15,
-	cormine1 = 16,
+	corrl = {order = 0, row = 1},
+	corllt = {order = 1, row = 1},
+	armdeva = {order = 2, row = 1},
+	armartic = {order = 3, row = 1},
+--	corgrav = {order = 4, row = 1},
+	armpb = {order = 5, row = 1},
+	corhlt = {order = 6, row = 1},
+--	armanni = {order = 7, row = 1},
+
+--	corrl = {order = 8, row = 2},
+	corrazor = {order = 9, row = 2},
+	missiletower = {order = 10, row = 2},
+	armcir = {order = 11, row = 2},
+	corflak = {order = 12, row = 2},
+	screamer = {order = 13, row = 2},
+
+--	armartic = {order = 3, row = 3},
+	corgrav = {order = 4, row = 3},
+	cortl = {order = 14, row = 3},
+	cormine1 = {order = 16, row = 3},
+	armanni = {order = 17, row = 3},
 }
 
-local super = {
-	missilesilo = 1,
-	corbhmth = 2,
-	armbrtha = 3,
-	corsilo = 4,
-	mahlazer = 5,
+local aux = {	--merged into special
+	corrad = {order = 10, row = 1},
+	armjamt = {order = 11, row = 1},
+	corjamt = {order = 12, row = 1},
+	armsonar = {order = 13, row = 1},
+	armarad = {order = 14, row = 1},
+	--armasp = {order = 15, row = 1},
+}
+
+local super = {	--merged into special
+	armamd = {order = 0, row = 2},
+	missilesilo = {order = 1, row = 2},
+	corbhmth = {order = 2, row = 2},
+	armbrtha = {order = 3, row = 2},
+	corsilo = {order = 4, row = 2},
+	mahlazer = {order = 5, row = 2},
 }
 
 --number doesn't mean anything
 local common_commands = {
 	[CMD.STOP]=1, [CMD.GUARD]=1, [CMD.ATTACK]=1, [CMD.FIGHT]=1,
 	[CMD.WAIT]=2, [CMD.PATROL]=2, [CMD.MOVE]=2, 
-	[CMD.REPAIR]=1,   [CMD.RECLAIM]=1, [CMD_BUILD] = 1, [CMD.CAPTURE] = 1, [CMD.RESURRECT] = 1, [CMD_LEVEL] =1,  [CMD_RAMP]= 1, 
-	[CMD_RAISE] = 2, [CMD_SMOOTH] =2,  [CMD_RESTORE] =2,
+	[CMD.REPAIR]=1,   [CMD.RECLAIM]=1, [CMD_BUILD] = 1, [CMD.CAPTURE] = 1, [CMD.RESURRECT] = 1, 
+--	[CMD_LEVEL] =1, [CMD_RAMP]= 1, [CMD_RAISE] = 2, [CMD_SMOOTH] =2,  [CMD_RESTORE] =2,
 	[CMD.SELFD]=1, [CMD.AUTOREPAIRLEVEL]=1,[CMD.DGUN]=1,
 	[CMD_RETREAT_ZONE] = 2,
 	[CMD_AREA_MEX] = 1,
@@ -95,9 +104,15 @@ local states_commands = {
 }
 
 local factory_commands = {}
-local econaux_commands = {}
+local econ_commands = {}
 local defense_commands = {}
-local super_commands = {}
+local special_commands = {
+	[CMD_RAMP] = {order = 16, row = 3},
+	[CMD_LEVEL] = {order = 17, row = 3},
+	[CMD_RAISE] = {order = 18, row = 3},
+	[CMD_SMOOTH] = {order = 19, row = 3},
+	[CMD_RESTORE] = {order = 20, row = 3},
+}
 
 local function CopyBuildArray(source, target)
 	for name, value in pairs(source) do
@@ -109,10 +124,10 @@ local function CopyBuildArray(source, target)
 end
 
 CopyBuildArray(factories, factory_commands)
-CopyBuildArray(econ, econaux_commands)
-CopyBuildArray(aux, econaux_commands)
+CopyBuildArray(econ, econ_commands)
+CopyBuildArray(aux, special_commands)
 CopyBuildArray(defense, defense_commands)
-CopyBuildArray(super, super_commands)
+CopyBuildArray(super, special_commands)
 
 -- Command overrides. State commands by default expect array of textures, one for each state.
 -- You can specify texture, text,tooltip, color
@@ -151,4 +166,4 @@ local overrides = {
 	[CMD_RETREAT] = { texture = {'LuaUi/Images/commands/states/retreat_off.png', 'LuaUi/Images/commands/states/retreat_30.png', 'LuaUi/Images/commands/states/retreat_60.png', 'LuaUi/Images/commands/states/retreat_90.png'}, text=''},
 }
 
-return common_commands, states_commands, factory_commands, econaux_commands, defense_commands, super_commands, overrides
+return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, overrides
