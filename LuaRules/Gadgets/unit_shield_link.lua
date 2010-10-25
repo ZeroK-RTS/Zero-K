@@ -182,40 +182,42 @@ function gadget:GameFrame(n)
             end
             if not unitStat[unitID] then break end -- continue
 
-            local currentPower = 0
+            local totalCharge =  0
             local linkUnits = 0
+			local udata = {}  -- unit data,  charge and chargeMax
             for unitID2,su2 in pairs(su.link) do
 				local shieldOn,shieldCharge = Spring.GetUnitShieldState(unitID2, -1)
 				su.shieldOn = shieldOn
 				if (shieldOn) then 
-					currentPower = currentPower + shieldCharge
+					udata[unitID2] = {
+						charge = shieldCharge,
+						chargeMax = su2.shieldPower
+					}
+					totalCharge = totalCharge + shieldCharge
 					linkUnits = linkUnits + 1
 				end 
             end
-            local avg = currentPower / linkUnits  -- calculate average charge of netwrok 
+            local avg = totalCharge / linkUnits  -- calculate average charge of netwrok 
 			local overflow = 0
 			local slack = 0 
-			for unitID2,su2 in pairs(su.link) do  -- equalize all sheilds to average by 1% of their difference from average 
-				local shieldOn,shieldCharge = Spring.GetUnitShieldState(unitID2, -1)
-				if (shieldOn) then 
-					local newCharge = shieldCharge + (avg - shieldCharge) * RECHARGE_KOEF
-					if (newCharge > su2.shieldPower) then 
-						overflow = overflow + newCharge - su2.shieldPower
-						newCharge = su2.shieldPower
-					else 
-						slack = slack + su2.shieldPower - newCharge
-					end 
-					Spring.SetUnitShieldState(unitID2, -1, newCharge)
+
+			for uid,d in pairs(udata) do  -- equalize all sheilds to average by 1% of their difference from average 
+				local newCharge = d.charge + (avg - d.charge) * RECHARGE_KOEF
+				if (newCharge > d.chargeMax) then 
+					overflow = overflow + newCharge - d.chargeMax
+					newCharge = d.chargeMax
+				else 
+					slack = slack + d.chargeMax - newCharge
 				end 
+				d.charge = newCharge
+				Spring.SetUnitShieldState(uid, -1, newCharge)
             end
+			
 			if overflow > 0 and slack > 0 then  -- if there was overflow (above max charge) and  there is still some unused space for charge, transfer it there 
-				for unitID2,su2 in pairs(su.link) do
-					local shieldOn,shieldCharge = Spring.GetUnitShieldState(unitID2, -1)
-					if (shieldOn) then 
-						if (shieldCharge < su2.shieldPower) then 
-							newCharge = shieldCharge + overflow * (su2.shieldPower - shieldCharge) / slack 
-							Spring.SetUnitShieldState(unitID2, -1, newCharge)
-						end 
+				for uid,d in pairs(udata) do
+					if (d.charge < d.chargeMax) then 
+						local newCharge = d.charge + overflow * (d.chargeMax - d.charge) / slack 
+						Spring.SetUnitShieldState(uid, -1, newCharge)
 					end 
 				end
 			end 
