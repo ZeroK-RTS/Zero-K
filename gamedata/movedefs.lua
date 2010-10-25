@@ -34,7 +34,7 @@ local moveDefs = {
 		crushstrength = 500,
 	},
 	
-	AKBOT2 = {
+	AKBOT2 = {		--amphib
 		footprintx = 2,
 		footprintz = 2,
 		maxwaterdepth = 5000,
@@ -43,7 +43,7 @@ local moveDefs = {
 		crushstrength = 50,
 	},
 	
-	AKBOT3 = {
+	AKBOT3 = {		--amphib
 		footprintx = 2,
 		footprintz = 2,
 		maxwaterdepth = 5000,
@@ -52,7 +52,7 @@ local moveDefs = {
 		crushstrength = 150,
 	},
 	
-	AKBOT6 = {
+	AKBOT6 = {		--amphib
 		footprintx = 6,
 		footprintz = 6,
 		maxwaterdepth = 5000,
@@ -61,7 +61,7 @@ local moveDefs = {
 		crushstrength = 5000,
 	},
 	
-	TKBOT1 = {
+	TKBOT1 = {		--allterrain
 		footprintx = 1,
 		footprintz = 1,
 		maxwaterdepth = 15,
@@ -69,7 +69,7 @@ local moveDefs = {
 		crushstrength = 5,
 	},
 
-	TKBOT3 = {
+	TKBOT3 = {		--allterrain
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 22,
@@ -77,7 +77,7 @@ local moveDefs = {
 		crushstrength = 150,
 	},
 	
-	TKBOT4 = {
+	TKBOT4 = {		--allterrain
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 22,
@@ -85,7 +85,7 @@ local moveDefs = {
 		crushstrength = 500,
 	},
 
-	ATKBOT3 = {
+	ATKBOT3 = {		--amphib + allterrain
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 5000,
@@ -126,7 +126,7 @@ local moveDefs = {
 		crushstrength = 5,
 	},
 
-	BHOVER3 = {
+	BHOVER3 = {		--hover with bot slope
 		footprintx = 3,
 		footprintz = 3,
 		maxslope = 36,
