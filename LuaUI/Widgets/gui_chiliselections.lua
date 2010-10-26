@@ -309,7 +309,7 @@ local function MakeUnitToolTip(unitid)
 	local teamColor      = Chili.color2incolor(spGetTeamColor(team))
 
 	window_corner:ClearChildren();
-	window_corner:Resize(300,window_height, true)
+	--window_corner:Resize(300,window_height, true)
 	
 	Image:New{
 		parent  = window_corner;
@@ -622,10 +622,10 @@ end
 local function MakeUnitGroupSelectionToolTip()
 	window_corner:ClearChildren();
 	if options.showgroupinfo.value then
-		window_corner:Resize(395,window_height,true)
+		--window_corner:Resize(395,window_height,true)
 		--subwindow:Resize("70%",window_height,true)
 	else
-		window_corner:Resize(300,window_height,true)
+		--window_corner:Resize(300,window_height,true)
 		--subwindow:Resize("95%",window_height,true)
 	end
 	
@@ -949,7 +949,7 @@ function widget:Initialize()
 		draggable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {3, 3, 15, 3}
+		--padding = {3, 3, 15, 3}
 		--color       = {Spring.GetTeamColor(Spring.GetLocalTeamID())};
 	}
 	--[[
