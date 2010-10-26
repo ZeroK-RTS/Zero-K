@@ -309,7 +309,7 @@ local function AddPylonToGrid(unitID)
 	end--]]
 end
 
-local function AddPylon(unitID, unitDefID, unitTeam, unitOverdrive, range)
+local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
 	local pX,_,pZ = Spring.GetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
@@ -900,7 +900,7 @@ function gadget:Initialize()
 			SetupMex(unitID,unitDefID, Spring.GetUnitTeam(unitID))
 		end
 		if (pylonDefs[unitDefID]) then
-			AddPylon(unitID, unitDefID, unitTeam, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
+			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
 		end
 		--if (energyDefs[unitDefID]) then
 		--	AddEnergy(unitID, unitDefID, unitTeam)
@@ -912,7 +912,6 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	
 	if (mexDefs[unitDefID]) then
 		SetupMex(unitID, unitDefID, teamID)
 	end
@@ -920,21 +919,43 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (pylonDefs[unitDefID]) then
-		AddPylon(unitID, unitDefID, unitTeam, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
+		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
+	end
+end
+
+function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
+	
+	if (newAllyTeam ~= oldAllyTeam) then
+		if (mexDefs[unitDefID]) then 
+			SetupMex(unitID, unitDefID, teamID)
+		end
+		
+		if (pylonDefs[unitDefID]) then
+			local _,_,_,_,build  = Spring.GetUnitHealth(unitID)
+			if (build == 1) then
+				AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
+				Spring.Echo(Spring.GetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
+			end
+		end
+		--if (energyDefs[unitDefID]) then
+		--	AddEnergy(unitID, unitDefID, unitTeam)
+		--	RemoveEnergy(unitID, unitDefID, unitTeam)
+		--end
 	end
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	local _,_,_,_,_,newTeam = Spring.GetTeamInfo(teamID)
-	local _,_,_,_,_,oldTeam = Spring.GetTeamInfo(oldTeamID)
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
 	
-	if (newTeam ~= oldTeam) then
+	if (newAllyTeam ~= oldAllyTeam) then
 		if (mexDefs[unitDefID]) then 
 			RemoveMex(unitID, oldTeamID)
-			SetupMex(unitID, unitDefID, teamID)
 		end
+		
 		if (pylonDefs[unitDefID]) then
-			AddPylon(unitID, unitDefID, unitTeam, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
 			RemovePylon(unitID)
 		end
 		--if (energyDefs[unitDefID]) then
@@ -943,28 +964,6 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		--end
 	end
 end
-
-
-function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-	local _,_,_,_,_,newTeam = Spring.GetTeamInfo(teamID)
-	local _,_,_,_,_,oldTeam = Spring.GetTeamInfo(oldTeamID)
-
-	if (newTeam ~= oldTeam) then
-		if (mexDefs[unitDefID]) then 
-			RemoveMex(unitID, oldTeamID)
-			SetupMex(unitID, unitDefID, teamID)
-		end
-		if (pylonDefs[unitDefID]) then
-			AddPylon(unitID, unitDefID, unitTeam, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
-			RemovePylon(unitID)
-		end
-		--if (energyDefs[unitDefID]) then
-		--	AddEnergy(unitID, unitDefID, unitTeam)
-		--	RemoveEnergy(unitID, unitDefID, unitTeam)
-		--end
-	end
-end
-
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then  
