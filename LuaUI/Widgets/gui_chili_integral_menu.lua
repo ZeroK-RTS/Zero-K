@@ -5,13 +5,13 @@
 -- TODO: display which unit is currently selected
 -- TODO: display number of units queued by fac on build buttons
 -- TODO: fix priority tooltip
--- TODO: fix tooltips for queue buttons
+-- TODO: proper tooltips for queue buttons
 
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
     desc      = "v0.25 Integral Command Menu",
-    author    = "Licho, KingRaptor",
+    author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
     layer     = math.huge,
@@ -27,13 +27,14 @@ HOW IT WORKS:
 		Currently selected tab is highlighted, when tab is changed all tabs are removed and regenerated.
 		
 		Two parent StackPanels (children of fake window), a column for normal commands and a row for state commands.
-		Three (currently this is a hardcoded figure) more StackPanels are nested in each of the parents, at right angles.
-		When sorting commands, it splits state commands into batches of (MAX_COLUMNS) and assigns them to children
-			so if there are 12 commands, it puts 10 in first row and 2 in second row
+		<numRows> (or <numStateColumns>) more StackPanels are nested in each of the parents, at right angles.
+		When sorting commands, it splits commands into batches of <MAX_COLUMNS> and assigns them to children
+			so if there are 10 commands, it puts 6 in first row and 4 in second row
+			Build orders work a little differently, they have a predefined row in the config.
 		Ditto for states, except it uses MAX_STATE_ROWS
 		
 		If unit tab is selected and third command row is free, build queue of first selected factory found in array returned by SelectionChanged is displayed.
-		The queue shows up to 10 batches of units and their exact sequence. Currently you can't do anything with the sequence buttons, this may be changed in future.
+		The queue shows up to <MAX_COLUMNS> batches of units and their exact sequence.
 		
 	All items resize with main window.
 --]]
@@ -51,8 +52,8 @@ local MAX_STATE_ROWS = 5
 local MIN_HEIGHT = 80
 local MIN_WIDTH = 200
 local DEFAULT_WIDTH = 500
-local COMMAND_SECTION_WIDTH = 78	--percent
-local STATE_SECTION_WIDTH = 18	--percent
+local COMMAND_SECTION_WIDTH = 74	--percent
+local STATE_SECTION_WIDTH = 24	--percent
 
 local numRows = 3
 local numStateColumns = 3
@@ -100,7 +101,7 @@ local Control
 -- Chili instances
 local screen0
 local window		--main window (invisible)
-local fakewindow	--visible ScrollPanel
+local fakewindow	--visible Panel
 local menuTabRow	--parent row of tabs
 local menuTabs = {}		--buttons
 local commands_main	--parent column of command buttons
@@ -926,10 +927,10 @@ function widget:Initialize()
 		parent = commands_main,
 		resizeItems = true;
 		orientation   = "horizontal";
-		height = "33%";
+		height = tostring(math.floor(100/numRows)).."%";
 		width = "100%";
 		x = "0%";
-		y = "66%";
+		y = tostring(math.floor(100/numRows))*(numRows-1).."%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}

@@ -15,9 +15,8 @@ local Static_Var_1, firing
 local sound_index = 0
 
 function script.Create()
-	
-	Spring.UnitScript.Hide( preDrop)
-	Spring.UnitScript.Hide( drop)
+	Hide( preDrop)
+	Hide( drop)
 	FakeUprightInit(x,z,drop)
 
 	Turn(Lwing, z_axis, math.rad(90))
@@ -43,10 +42,8 @@ function script.Deactivate()
 end
 
 function script.MoveRate(moveRate)
-
 	if moveRate == 2 then
 		if  not Static_Var_1   then
-		
 			Static_Var_1 = 1
 			Turn( base , z_axis, math.rad(-(240.000000)), 120.000000 )
 			WaitForTurn(base, z_axis)
@@ -58,57 +55,44 @@ function script.MoveRate(moveRate)
 	end
 end
 
-function FireLoop()
-	
-Spring.UnitScript.SetSignalMask ( SIG_Fire )
-  while(firing) do
-	
-  
-  	FakeUprightTurn(unitID,x,z,preDrop,base)
-  	EmitSfx( drop,  2049 )
-  	if sound_index == 0 then
-  	
-  	    local px, py, pz = Spring.GetUnitPosition(unitID)
-		Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 10, px, py, pz)
-  	end
-  	sound_index = sound_index + 1
-  	if sound_index >= 6 then
-  	
-  	    sound_index = 0
-  	end
-  	Sleep( 25) -- fire density
-  end
+local function FireLoop()
+	SetSignalMask( SIG_Fire )
+	while(firing) do
+		FakeUprightTurn(unitID,x,z,preDrop,base)
+		EmitSfx( drop,  2049 )
+		if sound_index == 0 then
+			local px, py, pz = Spring.GetUnitPosition(unitID)
+			Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 10, px, py, pz)
+		end
+		sound_index = sound_index + 1
+		if sound_index >= 6 then
+			sound_index = 0
+		end
+		Sleep(25) -- fire density
+	end
 end
 
-
 function script.FireWeapon1()
-	
 	if Spring.GetUnitFuel(unitID) < 1 then
-			return
+		return
 	end
-	
-	Spring.UnitScript.Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
+	Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
 	firing = 1
 	StartThread(FireLoop)
-	Spring.UnitScript.Sleep( 2030 ) -- Duration of burst. The number of frames is roughly (time - 30) * 1000 / 30.
+	Sleep( 2030 ) -- Duration of burst. The number of frames is roughly (time - 30) * 1000 / 30.
 	firing = 0
-	Spring.UnitScript.Signal(SIG_Fire)
-	Spring.UnitScript.Sleep( 500) --delay before fuel runs out, to let it retreat a little
+	Signal(SIG_Fire)
+	Sleep( 500) --delay before fuel runs out, to let it retreat a little
 	Spring.SetUnitFuel(unitID,0)
-	
-	return (0)
-	
-	
 end
 
 function script.QueryWeapon1()
-	 return drop
+	return drop
 end
 
 function script.AimFromWeapon1() return base end
 
 function script.AimWeapon1(heading, pitch)
-	
 	if (GetUnitValue(CRASHING) == 1) then return false end
 	return true
 end
