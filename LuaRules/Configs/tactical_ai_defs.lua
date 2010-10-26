@@ -560,7 +560,7 @@ local behaviourConfig = {
 		flees = {},
 		circleStrafe = true,
 		maxSwarmLeeway = 40,
-		skirmLeeway = 0, 
+		skirmLeeway = 30, 
 		minCircleStrafeDistance = 10,
 	},
 	["cormak"] = {
