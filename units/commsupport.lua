@@ -36,7 +36,7 @@ unitDef = {
 
   defaultmissiontype  = [[Standby]],
   energyMake          = 4.5,
-  energyStorage       = 100,
+  energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
@@ -53,7 +53,7 @@ unitDef = {
   maxVelocity         = 1.2,
   maxWaterDepth       = 5000,
   metalMake           = 4.5,
-  metalStorage        = 100,
+  metalStorage        = 0,
   minCloakDistance    = 100,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
@@ -88,7 +88,7 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[ELECTROLASER]],
+      def                = [[STUNRIFLE]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -98,8 +98,8 @@ unitDef = {
 
   weaponDefs          = {
 
-    ELECTROLASER = {
-      name                    = [[Electrolaser]],
+    STUNRIFLE    = {
+      name                    = [[Stun Rifle]],
       areaOfEffect            = 48,
       beamWeapon              = true,
       collideFriendly         = false,
@@ -108,10 +108,10 @@ unitDef = {
       cylinderTargetting      = 0,
 
       damage                  = {
-        default        = 600,
-        commanders     = 60,
-        empresistant75 = 150,
-        empresistant99 = 6,
+        default        = 500,
+        commanders     = 50,
+        empresistant75 = 125,
+        empresistant99 = 5,
       },
 
       duration                = 8,
@@ -128,13 +128,13 @@ unitDef = {
       noSelfDamage            = true,
       paralyzer               = true,
       paralyzeTime            = 2.5,
-      range                   = 400,
+      range                   = 350,
       reloadtime              = 1.5,
       renderType              = 7,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/lightning_fire]],
       soundTrigger            = true,
-      targetMoveError         = 0,
+      targetMoveError         = 0.3,
       texture1                = [[lightning]],
       thickness               = 10,
       turret                  = true,
