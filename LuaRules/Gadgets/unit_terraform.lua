@@ -2511,8 +2511,8 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 		local  _,_,_,_,build = spGetUnitHealth(unitID)
 		if build == 1 then
 			local ux, uy, uz  = spGetUnitPosition(unitID)
-			ux = ceil(ux/8)*8-4
-			uz = ceil(uz/8)*8-4
+			ux = floor((ux+4)/8)*8
+			uz = floor((uz+4)/8)*8
 			
 			local posCount = 57
 			
@@ -2677,8 +2677,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 	-- add structure to structure table
     if (ud.isBuilding == true or ud.maxAcc == 0) and (not ud.customParams.mobilebuilding) then
 	    local ux, uy, uz = spGetUnitPosition(unitID)
-		ux = floor((ux+4)/8)*8-4
-		uz = floor((uz+4)/8)*8-4
+		ux = floor((ux+4)/8)*8
+		uz = floor((uz+4)/8)*8
 	    local face = spGetUnitBuildFacing(unitID)
 	    local xsize = ud.xsize*4
 	    local ysize = (ud.zsize or ud.ysize)*4
@@ -2778,6 +2778,12 @@ function gadget:Initialize()
 	
 	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
 		RaiseWater(modOptions.waterlevel)
+	end
+	
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 end
 
