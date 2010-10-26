@@ -19,7 +19,7 @@ repairerDefs = {
 ]]--
 	commadvsupport = {
 		range = 450,
-		rate = 4,
+		rate = 6,
 		ignoreDelay = true,
 	}
 }

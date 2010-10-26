@@ -40,8 +40,8 @@ unitDef = {
   leaveTracks            = true,
   maneuverleashlength    = [[640]],
   mass                   = 1363,
-  maxDamage              = 32000,
-  maxVelocity            = 2.2,
+  maxDamage              = 30000,
+  maxVelocity            = 2.1,
   minCloakDistance       = 225,
   movementClass          = [[AKBOT6]],
   noAutoFire             = false,
@@ -172,9 +172,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 400,
-        planes  = 400,
-        subs    = 400,
+        default = 300,
+        planes  = 300,
+        subs    = 300,
       },
 
       endsmoke                = [[0]],

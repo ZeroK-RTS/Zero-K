@@ -94,29 +94,29 @@ local morphDefs = {
   --// commanders
   armcom = {
     into = 'armadvcom',
-	metal = 800,
-	energy = 800,
+	metal = 750,
+	energy = 750,
     time = 75,
   },
   
   corcom = {
     into = 'coradvcom',
-	metal = 800,
-	energy = 800,
+	metal = 750,
+	energy = 750,
     time = 75,
   },
   
   commrecon = {
     into = 'commadvrecon',
-	metal = 800,
-	energy = 800,
+	metal = 750,
+	energy = 750,
     time = 75,
   },
 
   commsupport = {
     into = 'commadvsupport',
-	metal = 800,
-	energy = 800,
+	metal = 750,
+	energy = 750,
     time = 75,
   },  
   
