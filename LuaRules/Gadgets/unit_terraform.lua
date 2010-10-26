@@ -2513,43 +2513,57 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 			local ux, uy, uz  = spGetUnitPosition(unitID)
 			ux = ceil(ux/8)*8-4
 			uz = ceil(uz/8)*8-4
+			
+			local posCount = 57
+			
+			local posX = 
+							{ux-8,ux,ux+8,
+						ux-16,ux-8,ux,ux+8,ux+16,
+				  ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,
+			ux-32,ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,ux+32,
+			ux-32,ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,ux+32,
+			ux-32,ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,ux+32,
+				  ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,
+						ux-16,ux-8,ux,ux+8,ux+16,
+							  ux-8,ux,ux+8}
+							  
+			local posZ = 
+							{uz-32,uz-32,uz-32,
+						uz-24,uz-24,uz-24,uz-24,uz-24,
+				  uz-16,uz-16,uz-16,uz-16,uz-16,uz-16,uz-16,
+			uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,
+			uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,
+			uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,
+				  uz+16,uz+16,uz+16,uz+16,uz+16,uz+16,uz+16,
+						uz+24,uz+24,uz+24,uz+24,uz+24,
+							  uz+32,uz+32,uz+32}
+			
+			local posY = 
+					{6 ,7 ,6 ,
+				  9 ,15,18,15,9 ,
+			   9 ,17,24,27,24,17,9 ,
+			6 ,15,24,29,36,29,24,15,6 ,
+			7 ,18,27,36,40,36,27,18,7 ,
+			6 ,15,24,29,36,29,24,15,6 ,
+			   9 ,17,24,27,24,17,9 ,
+				  9 ,15,18,15,9 ,
+					 6 ,7 ,6 }
+			
+			for i = 1, posCount do
+				if structureAreaMap[posX[i]] and structureAreaMap[posX[i]][posZ[i]] then
+					posY[i] = 0
+				end	
+			end
+			
 			spSetHeightMapFunc(
 				function(x,z,h)
 					for i = 1, #x, 1 do
 						spAddHeightMap(x[i],z[i],h[i])
 					end
 				end,
-						   
-						         {ux-8,ux,ux+8,
-					        ux-16,ux-8,ux,ux+8,ux+16,
-					  ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,
-				ux-32,ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,ux+32,
-				ux-32,ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,ux+32,
-				ux-32,ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,ux+32,
-					  ux-24,ux-16,ux-8,ux,ux+8,ux+16,ux+24,
-							ux-16,ux-8,ux,ux+8,ux+16,
-							      ux-8,ux,ux+8},
-							
-							     {uz-32,uz-32,uz-32,
-						    uz-24,uz-24,uz-24,uz-24,uz-24,
-					  uz-16,uz-16,uz-16,uz-16,uz-16,uz-16,uz-16,
-				uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,uz-8 ,
-				uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,uz   ,
-				uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,uz+8 ,
-					  uz+16,uz+16,uz+16,uz+16,uz+16,uz+16,uz+16,
-							uz+24,uz+24,uz+24,uz+24,uz+24,
-							      uz+32,uz+32,uz+32},
-					  
-					 
-					    {6 ,7 ,6 ,
-				      9 ,15,18,15,9 ,
-				   9 ,17,24,27,24,17,9 ,
-				6 ,15,24,29,36,29,24,15,6 ,
-				7 ,18,27,36,40,36,27,18,7 ,
-				6 ,15,24,29,36,29,24,15,6 ,
-				   9 ,17,24,27,24,17,9 ,
-				      9 ,15,18,15,9 ,
-					     6 ,7 ,6 }
+				posX,
+				posZ,
+				posY
 			) 
 		end
 		--spAdjustHeightMap(ux-64, uz-64, ux+64, uz+64 , 0)
@@ -2663,8 +2677,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 	-- add structure to structure table
     if (ud.isBuilding == true or ud.maxAcc == 0) and (not ud.customParams.mobilebuilding) then
 	    local ux, uy, uz = spGetUnitPosition(unitID)
-		ux = floor((ux+4)/8)*8
-		uz = floor((uz+4)/8)*8
+		ux = floor((ux+4)/8)*8-4
+		uz = floor((uz+4)/8)*8-4
 	    local face = spGetUnitBuildFacing(unitID)
 	    local xsize = ud.xsize*4
 	    local ysize = (ud.zsize or ud.ysize)*4
