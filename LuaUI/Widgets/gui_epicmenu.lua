@@ -1019,9 +1019,9 @@ local function flattenTree(tree, parent)
 				
 			elseif option.type == 'list' then
 				option.OnChange = 
-					function(key) 
+					function(key)
 						option.value = key
-						--settings.config[fullkey] = option.value
+						settings.config[fullkey] = option.value
 						origOnChange(option)
 					end
 				

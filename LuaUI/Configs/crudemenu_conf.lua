@@ -233,12 +233,28 @@ confdata.menu_tree = {
 	{'Mouse Settings|Change your cursor and other mouse settings',
 		{
 			{'Cursor Sets'},
-			{'Complete Annihilation', function() WG.crude.RestoreCursor() end },
-			{'CA Static', function() WG.crude.SetCursor("ca_static") end },
-			{'Erom', function() WG.crude.SetCursor("erom") end },
-			{'Masse', function() WG.crude.SetCursor("masse") end },
-			{'Lathan', function() WG.crude.SetCursor("lathan") end },
-			{'K_haos_girl', function() WG.crude.SetCursor("k_haos_girl") end },
+			
+			{'lh',
+				{
+					name = 'Cursor Sets!',
+					type = 'list',
+					OnChange = function (self) 
+						if self.value == 'ca' then
+							WG.crude.RestoreCursor()
+						else
+							WG.crude.SetCursor( self.value ); 
+						end
+						Spring.Echo ('test', self.value)
+					end,
+					items = {
+						{ key = 'ca', name = 'Complete Annihilation', },
+						{ key = 'ca_static', name = 'CA Static', },
+						{ key = 'erom', name = 'Erom', },
+						{ key = 'Lathan', name = 'Lathan', },
+						{ key = 'k_haos_girl', name = 'K_haos_girl', },
+					},
+				}
+			},
 			{},
 			{'Toggle Grab Input|Mouse cursor won\'t be able to leave the window.', function() spSendCommands{"grabinput"} end },
 		},
