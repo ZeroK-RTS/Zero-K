@@ -214,11 +214,10 @@ local function DrawSearchlights()
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
   
   for _, unitID in pairs(visibleUnits) do
-	if not GetUnitIsDead(unitID) then
+	if GetUnitPosition(unitID) and not GetUnitIsDead(unitID) then
 		local _, _, _, _, buildProgress = GetUnitHealth(unitID)
-		local unitRadius = GetUnitRadius(unitID) or 0
+		local unitRadius = GetUnitRadius(unitID)
 		local px, py, pz = GetUnitPosition(unitID)
-		if not py then py = 0 end
 		py = py + searchlightHeightOffset * unitRadius
 		local groundy = math.max(GetGroundHeight(px, pz), 0)
 		local height = py - groundy

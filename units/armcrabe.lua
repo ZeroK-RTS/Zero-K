@@ -54,6 +54,7 @@ unitDef = {
   movementClass        = [[TKBOT4]],
   moveState            = 0,
   noAutoFire           = false,
+  noChaseCategory      = [[FIXEDWING GUNSHIP]],
   objectName           = [[ARMCRABE]],
   pushResistant        = 1,
   script               = [[armcrabe.cob]],
