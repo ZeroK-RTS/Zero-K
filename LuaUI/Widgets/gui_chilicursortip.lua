@@ -1025,7 +1025,6 @@ function widget:Update(dt)
 			KillTooltip()
 			return
 		end
-		
 		DetermineTooltip()
 		changeNow = false
 	end

@@ -71,6 +71,7 @@ local screen0
 local window_height = 140
 
 local window_corner
+local subwindow
 
 local cur_tooltip
 local old_mx, old_my
@@ -100,6 +101,9 @@ local gi_energyincome = 0
 local gi_energydrain = 0
 local gi_usedbp = 0
 local gi_totalbp = 0
+
+local gi_str	--group info string
+local gi_label	--group info Chili label
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -197,9 +201,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- group selection
-	
-local function UpdateDynamicGroupInfo()
 
+--updates cost, HP, and resourcing info for group info
+local function UpdateDynamicGroupInfo()
 	gi_cost = 0
 	gi_hp = 0
 	gi_metalincome = 0
@@ -267,11 +271,10 @@ local function UpdateDynamicGroupInfo()
 	gi_energyincome = ToSIPrec(gi_energyincome)
 	gi_energydrain = ToSIPrec(gi_energydrain)
 	gi_usedbp = ToSIPrec(gi_usedbp)
-	
 end
 
+--updates values that don't change over time for group info
 local function UpdateStaticGroupInfo()
-
 	gi_count = numSelectedUnits
 	gi_finishedcost = 0
 	gi_totalbp = 0
@@ -510,7 +513,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 		tooltip = ud.humanName .. " - " .. ud.tooltip.. "\n\255\0\255\0Click: Select \nRightclick: Deselect \nAlt+Click: Select One \nCtrl+click: Select Type \nMiddle-click: Goto";
 		file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
 		file    = "#" .. defid;
-		keepAspect = false;
+		keepAspect = true;
 		height  = 50 * (options.squarepics.value and 1 or (4/5));
 		--height  = 50;
 		width   = 50;
@@ -589,13 +592,41 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 	};
 end
 
+--this is a separate function to allow group info to be regenerated without reloading the whole tooltip
+local function WriteGroupInfo()
+	if gi_label then
+		window_corner:RemoveChild(gi_label)
+	end
+	gi_str = 
+		"Selected Units " .. gi_count .. "\n" ..
+		"Health " .. gi_hp .. " / " ..  gi_maxhp  .. "\n" ..
+		"Cost " .. gi_cost .. " / " ..  gi_finishedcost .. "\n" ..
+		"Metal \255\0\255\0+" .. gi_metalincome .. "\255\255\255\255 / \255\255\0\0-" ..  gi_metaldrain  .. "\255\255\255\255\n" ..
+		"Energy \255\0\255\0+" .. gi_energyincome .. "\255\255\255\255 / \255\255\0\0-" .. gi_energydrain .. "\255\255\255\255\n" ..
+		"Build Power " .. gi_usedbp .. " / " ..  gi_totalbp 
+		
+	gi_label = Label:New{
+		parent  = window_corner;
+		y=5,
+		right=5,
+		--x=-110,
+		height  = '100%';
+		width = 120,
+		caption = gi_str;
+		valign  = 'top';
+		fontSize = 12;
+		fontShadow = true;
+	}
+end
 
 local function MakeUnitGroupSelectionToolTip()
 	window_corner:ClearChildren();
 	if options.showgroupinfo.value then
 		window_corner:Resize(395,window_height,true)
+		--subwindow:Resize("70%",window_height,true)
 	else
 		window_corner:Resize(300,window_height,true)
+		--subwindow:Resize("95%",window_height,true)
 	end
 	
 	local barGrid = LayoutPanel:New{
@@ -614,27 +645,7 @@ local function MakeUnitGroupSelectionToolTip()
 	}
 
 	if options.showgroupinfo.value then
-
-		local gi_str = 
-			"Selected Units " .. gi_count .. "\n" ..
-			"Health " .. gi_hp .. " / " ..  gi_maxhp  .. "\n" ..
-			"Cost " .. gi_cost .. " / " ..  gi_finishedcost .. "\n" ..
-			"Metal \255\0\255\0+" .. gi_metalincome .. "\255\255\255\255 / \255\255\0\0-" ..  gi_metaldrain  .. "\255\255\255\255\n" ..
-			"Energy \255\0\255\0+" .. gi_energyincome .. "\255\255\255\255 / \255\255\0\0-" .. gi_energydrain .. "\255\255\255\255\n" ..
-			"Build Power " .. gi_usedbp .. " / " ..  gi_totalbp 
-		
-		local gi_label = Label:New{
-			parent  = window_corner;
-			y=5,
-			right=5,
-			--x=-110,
-			height  = '100%';
-			width = 120,
-			caption = gi_str;
-			valign  = 'top';
-			fontSize = 12;
-			fontShadow = true;
-		}
+		WriteGroupInfo()
 	end
 
 	if ((numSelectedUnits<8) and (not options.groupalways.value)) then
@@ -714,7 +725,7 @@ local function UpdateSelectedUnitsTooltip()
 	--]]
 
 	-- special cases for mexes
-				if ud.name == 'armmex' or ud.name=='cormex' then 
+				if ud.name=='cormex' then 
 					local tooltip = spGetUnitTooltip(selectedUnits[1])
 					window_corner.childrenByName['tooltip']:SetCaption(tooltip)
 					
@@ -842,10 +853,33 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:CommandsChanged()
+--lags like a brick due to being spammed constantly for unknown reason, moved all its behavior to SelectionChanged
+--function widget:CommandsChanged()
+--end
+--
+
+local cycle, timer = 1, 0
+function widget:Update(dt)
+	--UpdateDynamicGroupInfo()
+	timer = timer + dt
+	--cycle = cycle%100 + 1
+	if timer >= 0.25  then
+		UpdateSelectedUnitsTooltip()
+		UpdateDynamicGroupInfo()
+		WriteGroupInfo()
+		timer = 0
+	end
+	--if cycle == 1 then
+	--end
+end
+
+function widget:SelectionChanged(newSelection)
 	numSelectedUnits = spGetSelectedUnitsCount()
+	selectedUnits = newSelection
+
 	if (numSelectedUnits>0) then
-		selectedUnits = spGetSelectedUnits() or {}
+		UpdateStaticGroupInfo()
+		UpdateDynamicGroupInfo()
 		selectedUnitsByDef       = spGetSelectedUnitsByDef()
 		selectedUnitsByDef.n     = nil
 		selectedUnitsByDefCounts = {}
@@ -870,31 +904,11 @@ function widget:CommandsChanged()
 		else
 			MakeUnitGroupSelectionToolTip()
 		end
-
 		Show(window_corner)
 	else
 		Hide(window_corner)
 	end
 end
-
-local cycle = 1
-function widget:Update(dt)
-	UpdateSelectedUnitsTooltip()
-	
-	cycle = cycle%30 + 1
-
-	if cycle == 1 then
-		UpdateDynamicGroupInfo()
-	end
-end
-
-function widget:SelectionChanged(newSelection)
-	numSelectedUnits = spGetSelectedUnitsCount()
-	selectedUnits = newSelection
-	UpdateStaticGroupInfo()
-	UpdateDynamicGroupInfo()
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -934,9 +948,21 @@ function widget:Initialize()
 		resizable   = false;
 		draggable = false,
 		tweakDraggable = true,
+		tweakResizable = true,
+		padding = {3, 3, 15, 3}
 		--color       = {Spring.GetTeamColor(Spring.GetLocalTeamID())};
 	}
-
+	--[[
+	subwindow = ScrollPanel:New{
+	  parent = window_corner,
+	  name   = 'unitinfo_subwindow';  
+      width = "95%",
+      height = "95%",
+      anchors = {top=true,left=true,bottom=true,right=true},
+      horizontalScrollbar = false,
+	  backgroundColor = {0, 0, 0, 0}
+	}
+	--]]
 
 	windMin = Spring.GetGameRulesParam("WindMin")
 	windMax = Spring.GetGameRulesParam("WindMax")
