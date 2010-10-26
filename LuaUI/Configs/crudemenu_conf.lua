@@ -244,12 +244,12 @@ confdata.menu_tree = {
 						else
 							WG.crude.SetCursor( self.value ); 
 						end
-						Spring.Echo ('test', self.value)
 					end,
 					items = {
 						{ key = 'ca', name = 'Complete Annihilation', },
 						{ key = 'ca_static', name = 'CA Static', },
 						{ key = 'erom', name = 'Erom', },
+						{ key = 'masse', name = 'Masse', },
 						{ key = 'Lathan', name = 'Lathan', },
 						{ key = 'k_haos_girl', name = 'K_haos_girl', },
 					},
