@@ -360,9 +360,9 @@ return {
       flashsize          = 18,
       ttl                = 3,
       color = {
-        [1]  = 0.60000002384186,
-        [2]  = 0.20000000298023,
-        [3]  = 0.40999999642372,
+        [1]  = 0.6,
+        [2]  = 0.2,
+        [3]  = 0.4,
       },
     },
     meltage = {
@@ -521,7 +521,7 @@ return {
     },
   },
 
-  ["flash1green"] = {
+   ["flash1green"] = {
     usedefaultexplosions = false,
     groundflash = {
       circlealpha        = 0,
@@ -547,6 +547,34 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
+   },
+   
+   ["flash2purple"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      circlealpha        = 0,
+      circlegrowth       = 0,
+      flashalpha         = 1,
+      flashsize          = 15,
+      ttl                = 3,
+      color = {
+        [1]  = 0.6,
+        [2]  = 0,
+        [3]  = 0.7,
+      },
+    },
+    meltage = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:LASERS_MELT2]],
+        pos                = [[0, 0, 0]],
+      },
+    },
     pikes = {
       air                = true,
       class              = [[explspike]],
@@ -556,7 +584,7 @@ return {
       properties = {
         alpha              = 1,
         alphadecay         = 0.05,
-        color              = [[0,1,0]],
+        color              = [[0.4,0,0.5]],
         dir                = [[-1 r2,-1 r2,-1 r2]],
         length             = 5,
         width              = 10,
