@@ -38,6 +38,7 @@ unitDef = {
   maneuverleashlength = [[64000]],
   mass                = 258,
   maxDamage           = 2200,
+  maxSlope            = 18,
   maxVelocity         = 5,
   minCloakDistance    = 75,
   moverate1           = [[32]],

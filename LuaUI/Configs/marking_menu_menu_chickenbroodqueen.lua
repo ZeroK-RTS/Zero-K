@@ -84,15 +84,15 @@ local menu_chickenbroodqueen = {
     items = {
       {
         angle = 0,
-        unit = "chicken_listener,"
+        unit = "chicken_listener",
       },
       {
         angle = -45,
-        unit = "chicken_digger,"
+        unit = "chicken_digger",
       },
       {
         angle = 180,
-        unit = "chicken_dragon,"
+        unit = "chicken_dragon",
       },
     }
   },
