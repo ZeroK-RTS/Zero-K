@@ -513,7 +513,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 		tooltip = ud.humanName .. " - " .. ud.tooltip.. "\n\255\0\255\0Click: Select \nRightclick: Deselect \nAlt+Click: Select One \nCtrl+click: Select Type \nMiddle-click: Goto";
 		file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
 		file    = "#" .. defid;
-		keepAspect = true;
+		keepAspect = false;
 		height  = 50 * (options.squarepics.value and 1 or (4/5));
 		--height  = 50;
 		width   = 50;
