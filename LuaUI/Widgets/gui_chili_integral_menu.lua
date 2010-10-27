@@ -824,10 +824,10 @@ function widget:Initialize()
 		parent = screen0,
 		name   = 'integralwindow';
 		color = {0, 0, 0, 0},
-		width = DEFAULT_WIDTH; -- chilli selections is not resizable
+		width = DEFAULT_WIDTH;
 		height = "20%";
 		--temporary position fudges so it looks right on my screen w/o docking
-		x = 300; -- chilli selections is not resizable
+		x = 395 + 25; -- default chili selections width + buffer, FIXME later if needed
 		y = '80%'; 
 		dockable = true;
 		draggable = false,

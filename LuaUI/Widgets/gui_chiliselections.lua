@@ -1,3 +1,5 @@
+--TODO: Make item placement less stupidly dependent on precisely hardcoded values
+
 function widget:GetInfo()
   return {
     name      = "Chili Selections",
@@ -68,7 +70,7 @@ local screen0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local window_height = 140
+local window_height = 130
 
 local window_corner
 local subwindow
@@ -316,7 +318,7 @@ local function MakeUnitToolTip(unitid)
 		file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud));
 		file    = "#" .. ud.id;
 		keepAspect = false;
-		x       = 240;
+		x       = 210;
 		height  = 55 * (4/5);
 		--height  = 55;
 		width   = 55;
@@ -364,7 +366,7 @@ local function MakeUnitToolTip(unitid)
 	Grid:New{
 		name     = 'info';
 		parent   = window_corner;
-		x        = 222;
+		x        = 200;
 		y        = 56;
 		height   = 55;
 		width    = 71;
@@ -376,40 +378,38 @@ local function MakeUnitToolTip(unitid)
 		itemPadding = {0,1,0,2};
 		itemMargin  = {0,0,0,0};
 		--debug=true;
-children = {
-	Label:New{
-		name    = 'metal';
-		autosize= false;
-		height  = 15;
-		width   = 42;
-		caption = '\255\000\254\000+0';
-		align   = 'right';
-		margin  = {0,0,5,0};
-	},
-	Image:New{
-		file    = 'LuaUI/images/ibeam.png';
-		height  = 15;
-		width   = 15;
-	},
+		children = {
+			Label:New{
+				name    = 'metal';
+				autosize= false;
+				height  = 15;
+				width   = 42;
+				caption = '\255\000\254\000+0';
+				align   = 'right';
+				margin  = {0,0,5,0};
+			},
+			Image:New{
+				file    = 'LuaUI/images/ibeam.png';
+				height  = 15;
+				width   = 15;
+			},
 
-	Label:New{
-		name    = 'energy';
-		autosize= false;
-		height  = 15;
-		width   = 42;
-		caption = '\255\254\000\000+0';
-		align   = 'right';
-		margin  = {0,0,5,0};
-	},
-	Image:New{
-		file    = 'LuaUI/images/energy.png';
-		height  = 15;
-		width   = 15;
+			Label:New{
+				name    = 'energy';
+				autosize= false;
+				height  = 15;
+				width   = 42;
+				caption = '\255\254\000\000+0';
+				align   = 'right';
+				margin  = {0,0,5,0};
+			},
+			Image:New{
+				file    = 'LuaUI/images/energy.png';
+				height  = 15;
+				width   = 15;
+			}
+		}
 	}
-
-}
-	}
-
 
 	local barGrid = Grid:New{
 		name     = 'Bars';
@@ -594,6 +594,7 @@ end
 
 --this is a separate function to allow group info to be regenerated without reloading the whole tooltip
 local function WriteGroupInfo()
+	if not options.showgroupinfo.value then return end
 	if gi_label then
 		window_corner:RemoveChild(gi_label)
 	end
@@ -643,10 +644,10 @@ local function MakeUnitGroupSelectionToolTip()
 		itemMargin  = {0,0,2,2};
 		tooltip = "Left Click: Just select clicked unit(s)\nRight Click: Deselect unit(s)";
 	}
-
-	if options.showgroupinfo.value then
+	--if check is done in target function
+	--if options.showgroupinfo.value then
 		WriteGroupInfo()
-	end
+	--end
 
 	if ((numSelectedUnits<8) and (not options.groupalways.value)) then
 		for i=1,numSelectedUnits do
@@ -940,9 +941,9 @@ function widget:Initialize()
 	window_corner = Window:New{
 		name   = 'unitinfo';
 		x      = 0;
-		y = Chili.Screen.y - window_height;
+		y = Chili.Screen.y - window_height - 10;
 		clientHeight = window_height;
-		clientWidth  = 395;
+		clientWidth  = 400;
 		dockable = true,
 		--autosize    = true;
 		resizable   = false;
@@ -951,6 +952,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		--padding = {3, 3, 15, 3}
 		--color       = {Spring.GetTeamColor(Spring.GetLocalTeamID())};
+		minimumSize = {120, 40},
 	}
 	--[[
 	subwindow = ScrollPanel:New{
