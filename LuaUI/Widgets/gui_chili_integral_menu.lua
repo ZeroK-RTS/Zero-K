@@ -144,7 +144,6 @@ end
 local function MakeButton(container, cmd, insertItem) 
 	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
 	local isBuild = (cmd.id < 0)
-	--local isMorph = (UnitDefs[cmd.id - CMD_MORPH]
 	local text
 	local texture
 	local tooltip = cmd.tooltip
@@ -170,7 +169,7 @@ local function MakeButton(container, cmd, insertItem)
 			texture = te.texture
 		end 
 	elseif isBuild then
-		texture = 'unitpics/' .. cmd.name  .. ".png"	--'#'..-cmd.id		--reload buildpic in chili instead of using engine one: workaround for vanishing buildpics
+		texture = '#'..-cmd.id
 	else
 		texture = cmd.texture 
 	end 
@@ -414,7 +413,6 @@ local function EchoTable(ta, front)
 end
 --]]
 
---this is supposed to be what clicking on a build queue button does - broken ATM
 local function BuildRowButtonFunc(num, cmdid, left, right)
 	buildQueue = spGetFullBuildQueue(selectedFac)
 	local alt,ctrl,meta,shift = Spring.GetModKeyState()
@@ -819,7 +817,6 @@ function widget:Initialize()
 	--	height = 300
 	--end
 	
-	
 	window = Window:New{
 		parent = screen0,
 		name   = 'integralwindow';
@@ -983,4 +980,3 @@ function widget:Shutdown()
   widgetHandler:ConfigLayoutHandler(nil)
   Spring.ForceLayoutUpdate()
 end
-
