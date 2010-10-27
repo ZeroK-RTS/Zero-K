@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "BuildpicPreloader",
+    name      = "Buildpic Preloader",
     desc      = "Fixes buildpic issues",
     author    = "jK",
     date      = "@2009",

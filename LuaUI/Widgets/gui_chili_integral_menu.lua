@@ -3,14 +3,14 @@
 -- TODO: state switches need icons 
 -- TODO: commandschanged gets called 2x for some reason, investigate
 -- TODO: display which unit is currently selected
--- TODO: display number of units queued by fac on build buttons
+-- TODO: display build progress
 -- TODO: fix priority tooltip
 -- TODO: proper tooltips for queue buttons
 
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.25 Integral Command Menu",
+    desc      = "v0.3 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -41,6 +41,8 @@ HOW IT WORKS:
 
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetFullBuildQueue = Spring.GetFullBuildQueue
+
+local push        = table.insert
 
 local CMD_PAGES = 60
 local CMD_MORPH = 31210
@@ -112,7 +114,35 @@ local buildRow	--row of build queue buttons
 local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
 
 local buildRow_visible = false
-local buildQueue	--build order table of selectedFac
+local buildQueue = {}	--build order table of selectedFac
+local buildQueueUnsorted = {}
+
+-- arrays with commands to be displayed 
+local n_common = {}
+local n_factories = {}
+local n_econ = {}
+local n_defense = {}
+local n_special = {}
+local n_units = {}
+local n_states = {}
+
+--shortcuts
+local menuChoices = {
+	[1] = { array = n_common, name = "Order" },
+	[2] = { array = n_factories, name = "Factory" },
+	[3] = { array = n_econ, name = "Econ" },
+	[4] = { array = n_defense, name = "Defense" },
+	[5] = { array = n_special, name = "Special" },
+	[6] = { array = n_units, name = "Units" },
+}
+local configArrayList = {	--should merge with the above array but ehh...
+	[2] = factory_commands,
+	[3] = econ_commands,
+	[4] = defense_commands,
+	[5] = special_commands,
+}
+local menuChoice = 1
+local lastBuildChoice = 2
 
 -- command id indexed field of items - each item is button, label and image 
 local commandButtons = {} 
@@ -121,9 +151,7 @@ local cmdColors = {}
 
 -- default config
 local config = {
-
 }
-
 
 -- this gets invoked when button is clicked 
 local function ClickFunc(button) 
@@ -146,6 +174,7 @@ local function MakeButton(container, cmd, insertItem)
 	local isBuild = (cmd.id < 0)
 	local text
 	local texture
+	local countText = ''
 	local tooltip = cmd.tooltip
 
 	local te = overrides[cmd.id]  -- command overrides 
@@ -159,6 +188,11 @@ local function MakeButton(container, cmd, insertItem)
 		text = ''
 	else 
 		text = cmd.name 
+	end
+	
+	--count label (for factory build options)
+	if menuChoice == 6 and isBuild and buildQueueUnsorted[-cmd.id] then
+		countText = tostring(buildQueueUnsorted[-cmd.id])
 	end
 	
 	--texture 
@@ -198,7 +232,6 @@ local function MakeButton(container, cmd, insertItem)
 				color[4] = color[4] + 0.2
 			end 
 		end
-
 		
 		local button = Button:New {
 			parent=container;
@@ -233,7 +266,7 @@ local function MakeButton(container, cmd, insertItem)
 				fontShadow = true;
 				parent = button;
 			}
-		end 
+		end
 		
 		local image
 		if (texture and texture ~= "") then
@@ -250,10 +283,32 @@ local function MakeButton(container, cmd, insertItem)
 		else 
 			if label~=nil then label.valign="center" end
 		end 
+		
+		local countLabel
+		if isBuild then
+			countLabel = Label:New {
+				parent = image,
+				autosize=false;
+				width="100%";
+				height="100%";
+				align="right";
+				valign="bottom";
+				caption = countText;
+				fontSize = 16;
+				fontShadow = true;
+			}
+		end
+		
+		--if button is disabled, set effect accordingly
+		if button.isDisabled then 
+			button.backgroundColor = {0,0,0,1};
+		end
+		
 		item = {
 			button = button,
 			image = image,
-			label = label 
+			label = label,
+			countLabel = countLabel,
 		}
 		commandButtons[cmd.id] = item
 	else 
@@ -264,21 +319,22 @@ local function MakeButton(container, cmd, insertItem)
 	
 	-- update item if something changed
 	if (cmd.disabled ~= item.button.isDisabled) then 
-		if cmd.isDisabled then 
+		if cmd.disabled then 
 			item.button.backgroundColor = {0,0,0,1};
-			if item.image then item.image.color[4] = 0.3 end
 		else 
 			item.button.backgroundColor = {1,1,1,0.7};
-			if item.image then item.image.color[4] = 1 end 
 		end 
 		item.button:Invalidate()
 		item.button.isDisabled = cmd.disabled
 	end 
 	
-	
 	if (not cmd.onlyTexture and item.label and text ~= item.label.caption) then 
 		item.label:SetCaption(text)
-	end 
+	end
+	
+	if (item.countLabel and countText ~= item.countLabel.caption) then
+		item.countLabel:SetCaption(countText)
+	end
 	
 	if (item.image and texture ~= item.image.file) then 
 		item.image.file = texture
@@ -286,37 +342,10 @@ local function MakeButton(container, cmd, insertItem)
 	end 
 end
 
--- arrays with commands to be displayed 
-local n_common = {}
-local n_factories = {}
-local n_econ = {}
-local n_defense = {}
-local n_special = {}
-local n_units = {}
-local n_states = {}
-
---shortcuts
-local menuChoices = {
-	[1] = { array = n_common, name = "Order" },
-	[2] = { array = n_factories, name = "Factory" },
-	[3] = { array = n_econ, name = "Econ" },
-	[4] = { array = n_defense, name = "Defense" },
-	[5] = { array = n_special, name = "Special" },
-	[6] = { array = n_units, name = "Units" },
-}
-local configArrayList = {	--should merge with the above array but ehh...
-	[2] = factory_commands,
-	[3] = econ_commands,
-	[4] = defense_commands,
-	[5] = special_commands,
-}
-local menuChoice = 1
-local lastBuildChoice = 2
-
 --sorts commands into categories
 local function ProcessCommand(cmd) 
 	if not cmd.hidden and cmd.id ~= CMD_PAGES then 
-		--- state icons 
+		-- state icons 
 		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then 
 			n_states[#n_states+1] = cmd 
 		elseif common_commands[cmd.id] then 
@@ -369,7 +398,6 @@ local function UpdateContainer(container, nl, columns)
 			break
 		end 
 	end 
-	
 	
 	if needUpdate then 
 		RemoveChildren(container) 
@@ -432,11 +460,11 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 	--Spring.Echo(CMD.OPT_ALT) = 128
 	
 	--it's not using the options, even though it's receiving them correctly
+	--so we have to do it manually
 	if shift then numInput = numInput * 5 end
 	if ctrl then numInput = numInput * 20 end
 	
 	--local options = BooleanMult(CMD.OPT_SHIFT, shift) + BooleanMult(CMD.OPT_ALT, alt) + BooleanMult(CMD.OPT_CTRL, ctrl) + BooleanMult(CMD.OPT_META, meta) + BooleanMult(CMD.OPT_RIGHT, right)
-	--Spring.Echo(options)
 	
 	--insertion position is by unit rather than batch, so we need to add up all the units in front of us to get the queue
 	
@@ -470,11 +498,21 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 	end
 end
 
+local function UpdateFactoryBuildQueue() 
+	buildQueue = spGetFullBuildQueue(selectedFac)
+	buildQueueUnsorted = {}
+	for i=1, #buildQueue do
+		for udid, count in pairs(buildQueue[i]) do
+			buildQueueUnsorted[udid] = (buildQueueUnsorted[udid] or 0) + count
+			--Spring.Echo(udid .. "\t" .. buildQueueUnsorted[udid])
+		end
+	end
+end
+
 --uses its own function for more fine control
 local function ManageBuildRow()
 	--if (menuChoice ~= 6) or (not buildRow_visible) or (not selectedFac) then return end
 	local overrun = false
-	buildQueue = spGetFullBuildQueue(selectedFac)
 	RemoveChildren(buildRow)
 	if buildQueue[MAX_COLUMNS + 1] then 
 		overrun = true 
@@ -557,6 +595,10 @@ local function ManageStateIcons()
 end
 
 local function ManageCommandIcons(sourceArray, useRowSort, configArray)
+	--update factory data
+	if menuChoice == 6 and selectedFac then
+		UpdateFactoryBuildQueue()
+	end
 	local commandRows = { }
 	--most commands don't use row sorting; econ, defense and special do
 	if not useRowSort then
@@ -576,11 +618,12 @@ local function ManageCommandIcons(sourceArray, useRowSort, configArray)
 			end
 		end	
 	end
-	--code for factory queue goes here
 	for i=1, numRows do
 		UpdateContainer(sp_commands[i], commandRows[i], MAX_COLUMNS)
 	end
-	if menuChoice == 6 and #commandRows[numRows] == 0 and selectedFac then
+	
+	--manage factory queue if needed
+	if menuChoice == 6 and selectedFac and #commandRows[numRows] == 0 then
 		if not buildRow_visible then
 			commands_main:AddChild(buildRow)
 			buildRow_visible = true
@@ -930,6 +973,7 @@ function widget:Initialize()
 		y = tostring(math.floor(100/numRows))*(numRows-1).."%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
+		backgroundColor = {0.2, 0.2, 0.2, 0.6}
 	}
 	
 	commands_main:RemoveChild(buildRow);
@@ -940,6 +984,53 @@ end
 
 local lastCmd = nil  -- last active command 
 local lastColor = nil  -- original color of button with last active command
+
+
+--what it says on the tin
+--probably inefficient, should get a better way of doing this
+local function DrawBuildProgress(left,top,right,bottom, progress, color)
+  gl.Color(color)
+  local xcen = (left+right)/2
+  local ycen = (top+bottom)/2
+
+  local alpha = 360*(progress)
+  local alpha_rad = math.rad(alpha)
+  local beta_rad  = math.pi/2 - alpha_rad
+  local list = {}
+  push(list, {v = { xcen,  ycen }})
+  push(list, {v = { xcen,  top }})
+
+  local x,y
+  x = (top-ycen)*tan(alpha_rad) + xcen
+  if (alpha<90)and(x<right) then
+    push(list, {v = { x,  top }})   
+  else
+    push(list, {v = { right,  top }})
+    y = (right-xcen)*tan(beta_rad) + ycen
+    if (alpha<180)and(y>bottom) then
+      push(list, {v = { right,  y }})
+    else
+      push(list, {v = { right,  bottom }})
+      x = (top-ycen)*tan(-alpha_rad) + xcen
+      if (alpha<270)and(x>left) then
+        push(list, {v = { x,  bottom }})
+      else
+        push(list, {v = { left,  bottom }})
+        y = (right-xcen)*tan(-beta_rad) + ycen
+        if (alpha<350)and(y<top) then
+          push(list, {v = { left,  y }})
+        else
+          push(list, {v = { left,  top }})
+          x = (top-ycen)*tan(alpha_rad) + xcen
+          push(list, {v = { x,  top }})
+        end
+      end
+    end
+  end
+
+  gl.Shape(GL.TRIANGLE_FAN, list)
+  gl.Color(1,1,1,1)
+end
 
 -- this is needed to highlight active command
 function widget:DrawScreen()
@@ -957,7 +1048,15 @@ function widget:DrawScreen()
 			but:Invalidate()
 		end 
 		lastCmd = cmdid
-	end 
+	end
+	--[[
+	if buildRow_visible and (menuChoice == 6) and selectedFac then
+		local button = buildRowButtons[1] and buildRowButtons[1].button
+		local buildee = Spring.GetUnitIsBuilding(selectedFac)
+		if buildee then local _, _, _, _, progress = Spring.GetUnitHealth(buildee) end
+		if button then DrawBuildProgress(button.left,button.top,button.right,button.bottom, progress, { 1, 1, 1, 0.5 }) end	--can't use this until I figure out how to get chili to give me button bounds
+	end
+	--]]
 end
 
 function widget:SelectionChanged(newSelection)
