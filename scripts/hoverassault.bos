@@ -1,3 +1,5 @@
+//linear constant = 65536
+
 #define TA			// This is a TA script
 
 #include "constants.h"
@@ -10,6 +12,7 @@ static-var  Static_Var_1, ShieldOn, wobble, random, aiming, gun1;
 // Signal definitions
 #define SIG_MOVE			2
 #define SIG_AIM				4
+#define SIG_RESTORE			8
 
 #define RESTORE_DELAY		1100
 
@@ -145,8 +148,9 @@ Create()
 
 RestoreAfterDelay()
 {
+	signal SIG_RESTORE;
+	set-signal-mask SIG_RESTORE;
 	sleep RESTORE_DELAY;
-	set ARMORED to 1;
 	move turretbase to y-axis [0] speed [20];
 	turn turretbase to x-axis <0> speed <150.000000>;
 	turn turret to x-axis <0> speed <150.000000>;
@@ -156,6 +160,8 @@ RestoreAfterDelay()
 	turn rim2 to z-axis <0> speed <150.000000>;
 	turn gun to y-axis <0.000000> speed <300.000000>;
 	turn gun to x-axis <0.000000> speed <60.000000>;
+	wait-for-move turretbase along y-axis;
+	set ARMORED to 1;
 }
 
 AimFromWeapon1(piecenum) {
@@ -164,6 +170,7 @@ AimFromWeapon1(piecenum) {
 
 AimWeapon1(heading, pitch)
 {
+	signal SIG_RESTORE;
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
 	set ARMORED to 0;
