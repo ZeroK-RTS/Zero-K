@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections",
-    desc      = "v0.15 Chili Selections.",
+    desc      = "v0.16 Chili Selections.",
     author    = "jK & CarRepairer",
     date      = "@2009,2010",
     license   = "GNU GPL, v2 or later",
@@ -122,6 +122,12 @@ options = {
   groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect},
   showgroupinfo = {name='Show Group Info', type='bool', value=false, OnChange = option_Deselect},
   squarepics = {name='Square Buildpics', type='bool', value=true, OnChange = option_Deselect},
+  hpshort = {
+		name = "HP Short Notation",
+		type = 'bool',
+		value = false,
+		desc = 'Shows short number for HP.',
+	},
 }
 
 
@@ -166,6 +172,11 @@ local function ToSIPrec(num) -- more presise
     end
   end
 end
+
+local function number_format(num)
+	return options.hpshort.value and ToSIPrec(num) or num
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -266,13 +277,13 @@ local function UpdateDynamicGroupInfo()
 		
 	end
 	
-	gi_cost = ToSIPrec(gi_cost)
-	gi_hp = ToSIPrec(gi_hp)
-	gi_metalincome = ToSIPrec(gi_metalincome)
-	gi_metaldrain = ToSIPrec(gi_metaldrain)
-	gi_energyincome = ToSIPrec(gi_energyincome)
-	gi_energydrain = ToSIPrec(gi_energydrain)
-	gi_usedbp = ToSIPrec(gi_usedbp)
+	gi_cost = number_format(gi_cost)
+	gi_hp = number_format(gi_hp)
+	gi_metalincome = number_format(gi_metalincome)
+	gi_metaldrain = number_format(gi_metaldrain)
+	gi_energyincome = number_format(gi_energyincome)
+	gi_energydrain = number_format(gi_energydrain)
+	gi_usedbp = number_format(gi_usedbp)
 end
 
 --updates values that don't change over time for group info
@@ -294,9 +305,9 @@ local function UpdateStaticGroupInfo()
 		end
 	end
 	
-	gi_finishedcost = ToSIPrec(gi_finishedcost)
-	gi_totalbp = ToSIPrec(gi_totalbp)
-	gi_maxhp = ToSIPrec(gi_maxhp)
+	gi_finishedcost = number_format(gi_finishedcost)
+	gi_totalbp = number_format(gi_totalbp)
+	gi_maxhp = number_format(gi_maxhp)
 end
 
 ----------------------------------------------------------------

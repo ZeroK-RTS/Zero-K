@@ -101,7 +101,7 @@ local function StaticChanged()
 end 
 
 options_path = 'Settings/Interface/Tooltip'
-options_order = { 'tooltip_delay',  'statictip', 'fontsize', 'staticfontsize', 'hplong'}
+options_order = { 'tooltip_delay',  'statictip', 'fontsize', 'staticfontsize', 'hpshort'}
 
 options = {
 
@@ -139,11 +139,11 @@ options = {
 		OnChange = StaticChanged,
 	},
 	
-	hplong = {
-		name = "HP Long Notation",
+	hpshort = {
+		name = "HP Short Notation",
 		type = 'bool',
 		value = false,
-		desc = 'Shows full number for HP.',
+		desc = 'Shows short number for HP.',
 	},
 	
 	
@@ -456,20 +456,20 @@ local function SetHealthbar()
 		
 		tt_health_fraction = health/maxhealth
 		tt_healthbar:SetValue(tt_health_fraction)
-		if options.hplong.value then
-			tt_healthbar:SetCaption(math.ceil(health) .. ' / ' .. math.ceil(maxhealth))
-		else
+		if options.hpshort.value then
 			tt_healthbar:SetCaption(numformat(health) .. ' / ' .. numformat(maxhealth))
+		else
+			tt_healthbar:SetCaption(math.ceil(health) .. ' / ' .. math.ceil(maxhealth))
 		end
 		
 	else
 		tt_healthbar.color = {0,0,0.5, 1}
 		local maxhealth = tt_ud.health
 		tt_healthbar:SetValue(1)
-		if options.hplong.value then
-			tt_healthbar:SetCaption('??? / ' .. math.ceil(maxhealth))
-		else
+		if options.hpshort.value then
 			tt_healthbar:SetCaption('??? / ' .. numformat(maxhealth))
+		else
+			tt_healthbar:SetCaption('??? / ' .. math.ceil(maxhealth))
 		end
 	end
 end
