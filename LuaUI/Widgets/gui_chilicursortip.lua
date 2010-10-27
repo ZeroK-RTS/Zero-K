@@ -264,7 +264,6 @@ end
 -- group selection
 	
 local function UpdateDynamicGroupInfo()
-	local selectedUnits = selectedUnits
 	gi_cost = 0
 	gi_hp = 0
 	gi_metalincome = 0
@@ -334,8 +333,8 @@ local function UpdateDynamicGroupInfo()
 	gi_usedbp = ToSIPrec(gi_usedbp)
 end
 
+--updates values that don't change over time for group info
 local function UpdateStaticGroupInfo()
-
 	gi_count = numSelectedUnits
 	gi_finishedcost = 0
 	gi_totalbp = 0
@@ -352,7 +351,6 @@ local function UpdateStaticGroupInfo()
 			end
 		end
 	end
-	
 	gi_finishedcost = ToSIPrec(gi_finishedcost)
 	gi_totalbp = ToSIPrec(gi_totalbp)
 	gi_maxhp = ToSIPrec(gi_maxhp)

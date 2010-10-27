@@ -304,7 +304,6 @@ local function UpdateStaticGroupInfo()
 			end
 		end
 	end
-	
 	gi_finishedcost = number_format(gi_finishedcost)
 	gi_totalbp = number_format(gi_totalbp)
 	gi_maxhp = number_format(gi_maxhp)
