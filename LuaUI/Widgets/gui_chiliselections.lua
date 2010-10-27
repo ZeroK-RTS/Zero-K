@@ -542,7 +542,6 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 							break
 						end
 					end
-					Spring.SelectUnitArray(selectedUnits)
 				else
 					--// deselect a whole unitdef block
 					for i=numSelectedUnits,1,-1 do
@@ -553,10 +552,11 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 							end
 						end
 					end
-
-					Spring.SelectUnitArray(selectedUnits)
-			
 				end
+				Spring.SelectUnitArray(selectedUnits)
+				--update selected units right now
+				local sel = Spring.GetSelectedUnits()
+				widget:SelectionChanged(sel)
 			elseif button == 1 then
 				if not ctrl then 
 					if (alt) then
@@ -814,9 +814,8 @@ local function UpdateSelectedUnitsTooltip()
 					local unitid = selectedUnits[i]
 
 					local unitIcon = barsContainer.childrenByName[unitid]
-					Spring.Echo(unitid)
+					--Spring.Echo(unitid)
 					local healthbar = unitIcon.childrenByName['health']
-
 					local health, maxhealth = spGetUnitHealth(unitid)
 					if (health) then
 						healthbar:SetValue(health/maxhealth)

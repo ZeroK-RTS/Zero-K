@@ -1,10 +1,8 @@
--- TODO: optimize where possible
 -- TODO: make EPIC save changed options somehow!
--- TODO: state switches need icons 
+-- TODO: add missing command icons
 -- TODO: commandschanged gets called 2x for some reason, investigate
 -- TODO: display which unit is currently selected
 -- TODO: display build progress
--- TODO: fix priority tooltip
 -- TODO: proper tooltips for queue buttons
 
 function widget:GetInfo()
@@ -115,7 +113,7 @@ local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS,
 
 local buildRow_visible = false
 local buildQueue = {}	--build order table of selectedFac
-local buildQueueUnsorted = {}
+local buildQueueUnsorted = {}	--puts all units of same type into single index; thus no sequence
 
 -- arrays with commands to be displayed 
 local n_common = {}

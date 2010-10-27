@@ -332,7 +332,6 @@ local function UpdateDynamicGroupInfo()
 	gi_energyincome = ToSIPrec(gi_energyincome)
 	gi_energydrain = ToSIPrec(gi_energydrain)
 	gi_usedbp = ToSIPrec(gi_usedbp)
-	
 end
 
 local function UpdateStaticGroupInfo()
