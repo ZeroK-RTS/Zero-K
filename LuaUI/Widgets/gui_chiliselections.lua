@@ -174,7 +174,7 @@ local function ToSIPrec(num) -- more presise
 end
 
 local function number_format(num)
-	return options.hpshort.value and ToSIPrec(num) or num
+	return options.hpshort.value and ToSIPrec(num) or numformat(num, 2)
 end
 
 --------------------------------------------------------------------------------
@@ -683,6 +683,7 @@ end
 --------------------------------------------------------------------------------
 
 local function UpdateSelectedUnitsTooltip()
+	local selectedUnits = selectedUnits
 	if (numSelectedUnits>0) then
 		if (numSelectedUnits == 1) then
 			local infoContainer = window_corner.childrenByName['info']
@@ -813,6 +814,7 @@ local function UpdateSelectedUnitsTooltip()
 					local unitid = selectedUnits[i]
 
 					local unitIcon = barsContainer.childrenByName[unitid]
+					Spring.Echo(unitid)
 					local healthbar = unitIcon.childrenByName['health']
 
 					local health, maxhealth = spGetUnitHealth(unitid)

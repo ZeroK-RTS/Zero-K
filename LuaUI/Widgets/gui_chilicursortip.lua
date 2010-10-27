@@ -264,7 +264,7 @@ end
 -- group selection
 	
 local function UpdateDynamicGroupInfo()
-
+	local selectedUnits = selectedUnits
 	gi_cost = 0
 	gi_hp = 0
 	gi_metalincome = 0
