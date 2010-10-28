@@ -127,6 +127,27 @@ CopyBuildArray(aux, special_commands)
 CopyBuildArray(defense, defense_commands)
 CopyBuildArray(super, special_commands)
 
+-- Global commands defined here - they have cmdDesc format + 
+local globalCommands = {
+--[[	{
+		name = "crap",
+		texture= 'LuaUi/Images/move_hold.png',
+		id = math.huge,
+		OnClick = {function() 
+			Spring.SendMessage("crap")
+		end }
+	}
+	{
+		id      = CMD_RETREAT_ZONE
+		type    = CMDTYPE.ICON_MAP,
+		tooltip = 'Place a retreat zone. Units will retreat there. Constructors placed in it will repair units.',
+		cursor  = 'Repair',
+		action  = 'sethaven',
+		params  = { }, 
+		texture = 'LuaUI/Images/ambulance.png',
+	}]]--
+}
+
 -- Command overrides. State commands by default expect array of textures, one for each state.
 -- You can specify texture, text,tooltip, color
 local overrides = {
@@ -164,4 +185,4 @@ local overrides = {
 	[CMD_RETREAT] = { texture = {'LuaUi/Images/commands/states/retreat_off.png', 'LuaUi/Images/commands/states/retreat_30.png', 'LuaUi/Images/commands/states/retreat_60.png', 'LuaUi/Images/commands/states/retreat_90.png'}, text=''},
 }
 
-return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, overrides
+return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides

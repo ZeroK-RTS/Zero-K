@@ -37,6 +37,10 @@ HOW IT WORKS:
 	All items resize with main window.
 --]]
 
+------------------------
+--  CONFIG
+------------------------
+--speedups
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetFullBuildQueue = Spring.GetFullBuildQueue
 
@@ -45,7 +49,7 @@ local push        = table.insert
 local CMD_PAGES = 60
 local CMD_MORPH = 31210
 
-local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, overrides = include("Configs/integral_menu_commands.lua")
+local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides = include("Configs/integral_menu_commands.lua")
 
 local MAX_COLUMNS = 6
 local MAX_STATE_ROWS = 5
@@ -57,27 +61,6 @@ local STATE_SECTION_WIDTH = 24	--percent
 
 local numRows = 3
 local numStateColumns = 3
-
--- Global commands defined here - they have cmdDesc format + 
-local globalCommands = {
---[[	{
-		name = "crap",
-		texture= 'LuaUi/Images/move_hold.png',
-		id = math.huge,
-		OnClick = {function() 
-			Spring.SendMessage("crap")
-		end }
-	}
-	{
-		id      = CMD_RETREAT_ZONE
-		type    = CMDTYPE.ICON_MAP,
-		tooltip = 'Place a retreat zone. Units will retreat there. Constructors placed in it will repair units.',
-		cursor  = 'Repair',
-		action  = 'sethaven',
-		params  = { }, 
-		texture = 'LuaUI/Images/ambulance.png',
-	}]]--
-}
 
 local selectedFac	--unitID
 
@@ -151,6 +134,10 @@ local cmdColors = {}
 local config = {
 }
 
+
+------------------------
+--  FUNCTIONS
+------------------------
 -- this gets invoked when button is clicked 
 local function ClickFunc(button) 
 	local _,_,left,_,right = Spring.GetMouseState()
@@ -166,7 +153,7 @@ end
 
 ------------------------
 --  Generates or updates chili button - either image or text or both based - container is parent of button, cmd is command desc structure
------------------------
+------------------------
 local function MakeButton(container, cmd, insertItem) 
 	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
 	local isBuild = (cmd.id < 0)
@@ -858,6 +845,7 @@ function widget:Initialize()
 	--	height = 300
 	--end
 	
+	--create main Chili elements
 	window = Window:New{
 		parent = screen0,
 		name   = 'integralwindow';
@@ -980,10 +968,6 @@ function widget:Initialize()
 	end
 end
 
-local lastCmd = nil  -- last active command 
-local lastColor = nil  -- original color of button with last active command
-
-
 --what it says on the tin
 --probably inefficient, should get a better way of doing this
 local function DrawBuildProgress(left,top,right,bottom, progress, color)
@@ -1030,6 +1014,9 @@ local function DrawBuildProgress(left,top,right,bottom, progress, color)
   gl.Color(1,1,1,1)
 end
 
+local lastCmd = nil  -- last active command 
+local lastColor = nil  -- original color of button with last active command
+
 -- this is needed to highlight active command
 function widget:DrawScreen()
 	local _,cmdid,_,cmdname = Spring.GetActiveCommand()
@@ -1058,6 +1045,7 @@ function widget:DrawScreen()
 end
 
 function widget:SelectionChanged(newSelection)
+	--get new selected fac, if any
 	local function IsFactory(udid)
 		return (UnitDefs[udid].TEDClass == "PLANT") or UnitDefs[udid].isFactory
 	end

@@ -104,6 +104,29 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Utility
+--
+
+local function SetToList(set)
+  local list = {}
+  for k in pairs(set) do
+    table.insert(list, k)
+  end
+  return list
+end
+
+
+local function SetCount(set)
+  local count = 0
+  for k in pairs(set) do
+    count = count + 1
+  end
+  return count
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Teams
 --
 
@@ -147,7 +170,11 @@ else
 end
 
 local allyTeams = Spring.GetAllyTeamList()
---if #allyTeams > 3 then pvp = true end	--chicken, players, and gaia
+local allyTeamCount = SetCount(allyTeams)
+if allyTeamCount > 4 then	--chicken, players, gaia, and unidentified team
+	pvp = true
+	Spring.Echo("Chicken: PvP mode detected")
+end	
 
 local gaiaTeamID          = Spring.GetGaiaTeamID()
 computerTeams[gaiaTeamID] = nil
@@ -155,30 +182,6 @@ humanTeams[gaiaTeamID]    = nil
 
 if (luaAI == 0) then
   return false
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Utility
---
-
-local function SetToList(set)
-  local list = {}
-  for k in pairs(set) do
-    table.insert(list, k)
-  end
-  return list
-end
-
-
-local function SetCount(set)
-  local count = 0
-  for k in pairs(set) do
-    count = count + 1
-  end
-  return count
 end
 
 
@@ -828,6 +831,7 @@ function gadget:GameFrame(n)
 
   if (n == 1) then
     DisableComputerUnits()
+	if pvp then Spring.Echo("Chicken: PvP mode initialized") end
   end
   
   if ((n+19) % (30 * chickenSpawnRate) < 0.1) then
