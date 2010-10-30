@@ -130,6 +130,7 @@ options = {
 	},
 }
 
+local updateFrequency = 0.2
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -875,7 +876,7 @@ function widget:Update(dt)
 	--UpdateDynamicGroupInfo()
 	timer = timer + dt
 	--cycle = cycle%100 + 1
-	if timer >= 0.25  then
+	if timer >= updateFrequency  then
 		UpdateSelectedUnitsTooltip()
 		UpdateDynamicGroupInfo()
 		WriteGroupInfo()

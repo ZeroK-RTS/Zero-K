@@ -35,6 +35,10 @@ HOW IT WORKS:
 		The queue shows up to <MAX_COLUMNS> batches of units and their exact sequence.
 		
 	All items resize with main window.
+	
+NOTE FOR OTHER GAME DEVS:
+	ZK uses WG.GetBuildIconFrame to draw the unit type border around buildpics.
+	IF you're not using them (likely), remove all lines containing that function.
 --]]
 
 ------------------------
@@ -287,6 +291,7 @@ local function MakeButton(container, cmd, insertItem)
 		--if button is disabled, set effect accordingly
 		if button.isDisabled then 
 			button.backgroundColor = {0,0,0,1};
+			image.color = {0.3, 0.3, 0.3, 1}
 		end
 		
 		item = {
@@ -306,10 +311,13 @@ local function MakeButton(container, cmd, insertItem)
 	if (cmd.disabled ~= item.button.isDisabled) then 
 		if cmd.disabled then 
 			item.button.backgroundColor = {0,0,0,1};
+			item.image.color = {0.3, 0.3, 0.3, 1}
 		else 
 			item.button.backgroundColor = {1,1,1,0.7};
+			item.image.color = {1, 1, 1, 1}
 		end 
 		item.button:Invalidate()
+		item.image:Invalidate()
 		item.button.isDisabled = cmd.disabled
 	end 
 	
