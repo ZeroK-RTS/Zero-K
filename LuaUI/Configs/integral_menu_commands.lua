@@ -13,6 +13,7 @@ local CMD_STEALTH = 32100
 local CMD_UNIT_AI = 36214
 local CMD_AREA_MEX = 10100
 local CMD_CLOAK_SHIELD = 32101
+local CMD_JUMP = 38521
 
 local factories = {
 	factorycloak = {order = 1},
@@ -94,6 +95,7 @@ local common_commands = {
 	[CMD.SELFD]=1, [CMD.AUTOREPAIRLEVEL]=1,[CMD.DGUN]=1,
 	[CMD_RETREAT_ZONE] = 2,
 	[CMD_AREA_MEX] = 1,
+	[CMD.LOAD_UNITS]=1, [CMD.UNLOAD_UNITS]=1,
 }
 
 --not needed; menu has autodetection
@@ -150,6 +152,7 @@ local globalCommands = {
 
 -- Command overrides. State commands by default expect array of textures, one for each state.
 -- You can specify texture, text,tooltip, color
+--[[
 local overrides = {
 	[CMD.ATTACK] = { texture = 'LuaUi/Images/commands/attack.png',  text= '\255\0\255\0A\008ttack'},
 	[CMD.STOP] = { texture = 'LuaUi/Images/commands/cancel.png', color={1,0,0,1.2}, text= '\255\0\255\0S\008top'},
@@ -180,6 +183,45 @@ local overrides = {
 	[CMD_CLOAK_SHIELD] = { texture = {'LuaUi/Images/commands/states/areacloak_off.png', 'LuaUI/Images/commands/states/areacloak_on.png'}, text ='',},
 	[CMD_STEALTH] = { texture = {'LuaUi/Images/commands/states/stealth_off.png', 'LuaUI/Images/commands/states/stealth_on.png'}, text ='', },
 	[CMD_PRIORITY] = { texture = {'LuaUi/Images/commands/states/wrench_low.png', 'LuaUi/Images/commands/states/wrench_med.png', 'LuaUi/Images/commands/states/wrench_high.png'}, text='', tooltip = 'Set construction priority (high, normal, low)'},
+	[CMD.MOVE_STATE] = { texture = {'LuaUi/Images/commands/states/move_hold.png', 'LuaUi/Images/commands/states/move_engage.png', 'LuaUi/Images/commands/states/move_roam.png'}, text=''},
+	[CMD.FIRE_STATE] = { texture = {'LuaUi/Images/commands/states/fire_hold.png', 'LuaUi/Images/commands/states/fire_return.png', 'LuaUi/Images/commands/states/fire_atwill.png'}, text=''},
+	[CMD_RETREAT] = { texture = {'LuaUi/Images/commands/states/retreat_off.png', 'LuaUi/Images/commands/states/retreat_30.png', 'LuaUi/Images/commands/states/retreat_60.png', 'LuaUi/Images/commands/states/retreat_90.png'}, text=''},
+}]]
+local overrides = {
+	[CMD.ATTACK] = { texture = 'LuaUi/Images/commands/Bold/attack.png',  text= ' '},
+	[CMD.STOP] = { texture = 'LuaUi/Images/commands/Bold/cancel.png', text= ' '},
+	[CMD.FIGHT] = { texture = 'LuaUi/Images/commands/Bold/fight.png',text= ' '},
+	[CMD.GUARD] = { texture = 'LuaUi/Images/commands/Bold/guard.png', text= ' '},
+	[CMD.MOVE] = { texture = 'LuaUi/Images/commands/Bold/move.png', text= ' '},
+	[CMD.PATROL] = { texture = 'LuaUi/Images/commands/Bold/patrol.png', text= ' '},
+	[CMD.WAIT] = { texture = 'LuaUi/Images/commands/Bold/wait.png', text= ' '},
+	
+	[CMD.REPAIR] = {text= ' ', texture = 'LuaUi/Images/commands/Bold/repair.png'},
+	[CMD.RECLAIM] = {text= ' ', texture = 'LuaUi/Images/commands/Bold/reclaim.png'},
+	[CMD.RESURRECT] = {text= ' ', texture = 'LuaUi/Images/commands/Bold/resurrect.png'},
+	[CMD_BUILD] = {text = ' ', texture = 'LuaUi/Images/commands/Bold/build.png'},
+	[CMD.DGUN] = { texture = 'LuaUi/Images/commands/dgun.png', text= ' '},
+
+	[CMD.LOAD_UNITS] = { texture = 'LuaUi/Images/commands/Bold/load.png', text= ' '},
+	[CMD.UNLOAD_UNITS] = { texture = 'LuaUi/Images/commands/Bold/unload.png', text= ' '},	
+	
+	[CMD_RAMP] = {text = ' ', texture = 'LuaUi/Images/commands/ramp.png'},
+	[CMD_LEVEL] = {text = ' ', texture = 'LuaUi/Images/commands/level.png'},
+	[CMD_RAISE] = {text = ' ', texture = 'LuaUi/Images/commands/raise.png'},
+	[CMD_SMOOTH] = {text = ' ', texture = 'LuaUi/Images/commands/smooth.png'},
+	[CMD_RESTORE] = {text = ' ', texture = 'LuaUi/Images/commands/restore.png'},
+	
+	[CMD_AREA_MEX] = {text = ' ', texture = 'LuaUi/Images/commands/Bold/mex.png'},
+	
+	[CMD_JUMP] = {text = ' ', texture = 'LuaUi/Images/commands/Bold/jump.png'},	
+	
+	[CMD.ONOFF] = { texture = {'LuaUi/Images/commands/states/off.png', 'LuaUi/Images/commands/states/on.png'}, text=''},
+	[CMD_UNIT_AI] = { texture = {'LuaUi/Images/commands/states/bulb_off.png', 'LuaUi/Images/commands/states/bulb_on.png'}, text=''},
+	[CMD.REPEAT] = { texture = {'LuaUi/Images/commands/states/repeat_off.png', 'LuaUi/Images/commands/states/repeat_on.png'}, text=''},
+	[CMD.CLOAK] = { texture = {'LuaUi/Images/commands/states/cloak_off.png', 'LuaUI/Images/commands/states/cloak_on.png'}, text ='', tooltip =  'Unit cloaking state - press \255\0\255\0K\008 to toggle'},
+	[CMD_CLOAK_SHIELD] = { texture = {'LuaUi/Images/commands/states/areacloak_off.png', 'LuaUI/Images/commands/states/areacloak_on.png'}, text ='', tooltip = 'Area Cloaker State'},
+	[CMD_STEALTH] = { texture = {'LuaUi/Images/commands/states/stealth_off.png', 'LuaUI/Images/commands/states/stealth_on.png'}, text ='', },
+	[CMD_PRIORITY] = { texture = {'LuaUi/Images/commands/states/wrench_low.png', 'LuaUi/Images/commands/states/wrench_med.png', 'LuaUi/Images/commands/states/wrench_high.png'}, text=""},
 	[CMD.MOVE_STATE] = { texture = {'LuaUi/Images/commands/states/move_hold.png', 'LuaUi/Images/commands/states/move_engage.png', 'LuaUi/Images/commands/states/move_roam.png'}, text=''},
 	[CMD.FIRE_STATE] = { texture = {'LuaUi/Images/commands/states/fire_hold.png', 'LuaUi/Images/commands/states/fire_return.png', 'LuaUi/Images/commands/states/fire_atwill.png'}, text=''},
 	[CMD_RETREAT] = { texture = {'LuaUi/Images/commands/states/retreat_off.png', 'LuaUi/Images/commands/states/retreat_30.png', 'LuaUi/Images/commands/states/retreat_60.png', 'LuaUi/Images/commands/states/retreat_90.png'}, text=''},

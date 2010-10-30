@@ -211,7 +211,7 @@ local function MakeButton(container, cmd, insertItem)
 			Spring.SendMessage("CommandBar - internal error, unexpectedly adding item!")
 		end 
 		-- decide color 
-		local color = {1,1,1,1}
+--[[		local color = {1,1,1,1}
 		if te ~= nil and te.color ~= nil then 
 			color = te.color 
 		elseif cmd.name ~= nil then 
@@ -220,7 +220,7 @@ local function MakeButton(container, cmd, insertItem)
 				color = cmdColors[nl]
 				color[4] = color[4] + 0.2
 			end 
-		end
+		end]]
 		
 		local button = Button:New {
 			parent=container;
@@ -263,7 +263,7 @@ local function MakeButton(container, cmd, insertItem)
 				width="100%";
 				height="90%";
 				y="6%";
-				color = color;
+--				color = color;
 				keepAspect = true,	--isState;
 				file = texture;
 				parent = button;
