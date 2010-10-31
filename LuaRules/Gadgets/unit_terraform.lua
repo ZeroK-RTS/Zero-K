@@ -101,6 +101,9 @@ local maxRampLegth = 200 -- maximun length of ramp segment
 local maxHeightDifference = 30 -- max difference of height around terraforming, Makes Shraka Pyramids
 local maxRampGradient = 5
 
+local pointBaseCost = 0.16
+local volumeCost = 0.016
+
 -- seismic missile
 local seismicRad = 256
 
@@ -126,8 +129,7 @@ if modOptions.terracostmult then
 	costMult = modOptions.terracostmult
 end
 
-costMult = costMult * 0.01
-
+costMult = costMult * volumeCost
 
 --------------------------------------------------------------------------------
 -- Arrays
@@ -564,7 +566,10 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					progress = 0, 
 					lastUpdate = 0, 
 					totalSpent = 0,
+					baseCostSpent = 0,
 					cost = totalCost, 
+					baseCost = segment[i].points*pointBaseCost,
+					totalCost = totalCost + segment[i].points*pointBaseCost,
 					point = segment[i].point, 
 					points = segment[i].points, 
 					area = segment[i].area, 
@@ -967,7 +972,10 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					progress = 0, 
 					lastUpdate = 0, 
 					totalSpent = 0,
+					baseCostSpent = 0,
 					cost = totalCost, 
+					baseCost = segment[i].points*pointBaseCost,
+					totalCost = totalCost + segment[i].points*pointBaseCost,
 					point = segment[i].point, 
 					points = segment[i].points, 
 					area = segment[i].area, 
@@ -1482,7 +1490,10 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					progress = 0, 
 					lastUpdate = 0, 
 					totalSpent = 0,
+					baseCostSpent = 0,
 					cost = totalCost, 
+					baseCost = segment[i].points*pointBaseCost,
+					totalCost = totalCost + segment[i].points*pointBaseCost,
 					point = segment[i].point, 
 					points = segment[i].points,
 					area = segment[i].area, 
@@ -1639,7 +1650,9 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 		Spring.Echo("Tell Google Frog")
 		return
 	end
+	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Cost " .. math.floor(terraformUnit[id].totalSpent))
 
+	
 	-- remove from intercepts tables
 	for j = 1, terraformUnit[id].intercepts do -- CRASH ON THIS LINE
 		local oid = terraformUnit[id].intercept[j].id
@@ -1726,7 +1739,7 @@ local function updateTerraformEdgePoints(id)
 
 end
 
-local function updateTerraformCost(id,terraformIndex)
+local function updateTerraformCost(id)
 
 	local totalCost = 0
 	for i = 1, terraformUnit[id].points do
@@ -1754,10 +1767,7 @@ local function updateTerraformCost(id,terraformIndex)
 	
 	if totalCost == 0 then
 		totalCost = 0.01
-		-- deregistering causes crash bug
-		--deregisterTerraformUnit(id,terraformIndex,1)
-		--spDestroyUnit(id,{reclaimed = true})
-		--return false
+		-- deregistering here causes crash bug
 	end
 
 	terraformUnit[id].lastProgress = 0
@@ -1807,6 +1817,23 @@ end
 local function updateTerraform(diffProgress,health,id,index,costDiff)
 	
 	local terra = terraformUnit[id]
+	if terra.baseCostSpent then
+		if costDiff < terra.baseCost-terra.baseCostSpent then
+			terra.baseCostSpent = terra.baseCostSpent + costDiff
+			
+			local newBuild = terra.baseCostSpent/terra.totalCost
+			spSetUnitHealth(id, {
+				health = newBuild*terraUnitHP,
+				build  = newBuild
+			})
+			terra.lastHealth = newBuild*terraUnitHP
+			terra.lastProgress = newBuild
+			return 1
+		else
+			costDiff = costDiff - (terra.baseCost-terra.baseCostSpent)
+			terra.baseCostSpent = false
+		end
+	end
 	
 	local newProgress = terra.progress + costDiff/terra.cost
 	if newProgress> 1 then
@@ -1909,7 +1936,7 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 		-- diamond pyramids
 		--local maxHeightDifferenceLocal = (abs(extraPoint[i].x-extraPoint[i].supportX) + abs(extraPoint[i].z-extraPoint[i].supportZ))*maxHeightDifference/8+maxHeightDifference
 		-- circular pyramids
-		local maxHeightDifferenceLocal = math.sqrt((extraPoint[i].x-extraPoint[i].supportX)^2 + (extraPoint[i].z-extraPoint[i].supportZ)^2)*maxHeightDifference/8+maxHeightDifference
+		local maxHeightDifferenceLocal = math.sqrt((extraPoint[i].x-extraPoint[i].supportX)^2 + (extraPoint[i].z-extraPoint[i].supportZ)^2)*maxHeightDifference/8+maxHeightDifference 
 		for j = 1, 4 do
 			local x = checkCoord[j].x + extraPoint[i].x
 			local z = checkCoord[j].z + extraPoint[i].z
@@ -2055,13 +2082,15 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 		edgeTerraMult = 1
 	end
 
+	local newBuild = (terra.progress*terra.cost+terra.baseCost)/terra.totalCost
+	
 	spSetUnitHealth(id, {
-		health = terra.progress*terraUnitHP,
-		build  = terra.progress
+		health = newBuild*terraUnitHP,
+		build  = newBuild
 	})
 	
-	terra.lastHealth = terra.progress*terraUnitHP
-	terra.lastProgress = terra.progress
+	terra.lastHealth = newBuild*terraUnitHP
+	terra.lastProgress = newBuild
 
 	local test2 = 0
 	local test3 = 0
@@ -2086,7 +2115,7 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 	if terraformUnit[id].intercepts ~= 0 then
 		local i = 1
 		while i <= terra.intercepts  do
-			local test = updateTerraformCost(terra.intercept[i].id,terra.intercept[i].index)
+			local test = updateTerraformCost(terra.intercept[i].id)
 			if test then
 				i = i + 1
 			end
@@ -2146,7 +2175,7 @@ function gadget:GameFrame(n)
 					spSetUnitTooltip(id, terraUnitTooltip .. terraformUnit[id].totalSpent)
 					local updateVar = updateTerraform(diffProgress,health,id,i,costDiff) 
 					while updateVar == -1 do
-						if updateTerraformCost(id,i) then
+						if updateTerraformCost(id) then
 							updateTerraformEdgePoints(id)
 							updateVar = updateTerraform(diffProgress,health,id,i,costDiff) 
 						else
@@ -2466,7 +2495,7 @@ local function deregisterStructure(unitID)
 						
 						if recalc then
 							updateTerraformEdgePoints(oid)
-							updateTerraformCost(oid,terraformOrder[i].index[j])
+							updateTerraformCost(oid)
 						end
 					end
 				end
@@ -2474,11 +2503,11 @@ local function deregisterStructure(unitID)
 		end
 	end
 	
-	for i = structure[unitID].minx, structure[unitID].maxx+8, 8 do
+	for i = structure[unitID].minx, structure[unitID].maxx, 8 do
 		if not structureAreaMap[i] then
 			structureAreaMap[i] = {}
 		end
-		for j = structure[unitID].minz, structure[unitID].maxz+8, 8 do
+		for j = structure[unitID].minz, structure[unitID].maxz, 8 do
 			structureAreaMap[i][j] = structureAreaMap[i][j] - 1
 			if structureAreaMap[i][j] < 1 then
 				structureAreaMap[i][j] = nil
@@ -2693,12 +2722,12 @@ function gadget:UnitCreated(unitID, unitDefID)
 	        minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize, area = {}, index = structureCount}
 	    end
 		
-		for i = structure[unitID].minx, structure[unitID].maxx+8, 8 do
+		for i = structure[unitID].minx, structure[unitID].maxx, 8 do
 			structure[unitID].area[i] = {}
 			if not structureAreaMap[i] then
 				structureAreaMap[i] = {}
 			end
-			for j = structure[unitID].minz, structure[unitID].maxz+8, 8 do
+			for j = structure[unitID].minz, structure[unitID].maxz, 8 do
 				structure[unitID].area[i][j] = true
 				if structureAreaMap[i][j] then
 					structureAreaMap[i][j] = structureAreaMap[i][j] + 1
@@ -2756,7 +2785,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 						end
 						
 						if recalc then
-							updateTerraformCost(oid,terraformOrder[i].index[j])
+							updateTerraformCost(oid)
 						end
 						
 					end
