@@ -108,7 +108,7 @@ local max					= math.max
 local min					= math.min
 
 function widget:Initialize()
-	Echo("<Unit Marker>: init")
+	--Echo("<Unit Marker>: init")
 	if isSpec then
 		Echo("<Unit Marker>: Spectator mode or replay. Widget removed.")
 		widgetHandler:RemoveWidget()

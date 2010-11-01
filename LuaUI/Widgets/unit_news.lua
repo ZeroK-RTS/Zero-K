@@ -84,7 +84,7 @@ function IsSpec()
 end
 
 function widget:Initialize()
-	Echo("<Unit News>: init")
+--Echo("<Unit News>: init")
 	if isSpec then
 		Echo("<Unit News>: Spectator mode or replay. Widget removed.")
 		widgetHandler:RemoveWidget()

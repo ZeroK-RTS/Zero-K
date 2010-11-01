@@ -56,7 +56,6 @@ end
 -- init already present units
 --	printDebug("<unit_auto_retreat60>: game start !")
 --	checkUnits()
-end
 
 function checkUnits()
 -- init already present units
@@ -86,7 +85,7 @@ function widget:UnitCreated()-- need for resurected units
 	printDebug("<unit_auto_retreat60>: unit created & set to 60% retreat !")
 	checkUnits()
 -- for chickens faction units, to do.
---end
+end
 
 function printDebug( value )
 	if ( debug ) then Echo( value )

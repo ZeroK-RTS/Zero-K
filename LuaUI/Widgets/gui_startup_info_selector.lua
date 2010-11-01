@@ -26,7 +26,7 @@ _ Make each player broadcast their choice to their team in a way it can be used 
 -- SirMaverick,		v1.0				:	Creation.
 --]]
 ----------------------------------------------
-local debug	= true --generates debug message
+local debug	= false --generates debug message
 local Echo	= Spring.Echo
 local spGetSpectatingState	= Spring.GetSpectatingState()
 local spIsReplay			= Spring.IsReplay()

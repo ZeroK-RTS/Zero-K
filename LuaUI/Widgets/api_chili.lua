@@ -50,7 +50,7 @@ function widget:Shutdown()
 end
 
 function widget:Dispose()
-  screen0:Dipsose()
+  screen0:Dispose()
 end
 
 --------------------------------------------------------------------------------
