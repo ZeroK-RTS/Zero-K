@@ -42,10 +42,10 @@ return {
     desc = 'Watch you eggs! Easter bunny is coming!'
   },
   {
-	-- to be recognised as a CAI there must be an entry with this name in 
+	-- to be recognised as a CAI there must be an entry with this name in -> need changes to be renamed to ZK AI ?
 	-- LuaRules\Configs\cai\configCoordinator.lua
     name = 'CAI',
-    desc = 'AI that plays CA'
+    desc = 'AI that plays zero-K'
   },
 }
 
