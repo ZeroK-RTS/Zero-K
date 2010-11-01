@@ -1,4 +1,7 @@
 -- $Id$
+
+-- changelog: versus666,	(21oct2010):	corrected the numerous awfull bad spellings in french.
+
 return {
 	en = {
 		tasks = {
@@ -67,15 +70,15 @@ return {
 				'Introduction',
 				'Restaurez votre interface',
 				'Construire un extracteur de métal',
-				'Construire un colleteur solaire',
-				'Constuire une tourelle lazer légère LLT',
-				'Construire un autre extracteur sur un autre spot',
+				'Construire un collecteur solaire',
+				'Constuire une tourelle laser légère LLT',
+				'Construire un autre extracteur sur un autre point de minerai',
 				'Construire un autre collecteur solaire',
 				'Construire une usine',
 				'Construire un radar',
-				'Construire un Constructeur',
+				'Construire un constructeur',
 				'Utilisez le Constructeur pour assister une usine',
-				'Construire des Robots Pilleus dans une usine',
+				'Construire des Robots Pilleurs dans une usine',
 				'Félicitations!',
 			},
 			tips = { --made this part between [[]] because I used some ' in it.
@@ -84,41 +87,41 @@ return {
 				nil,
 				[[Les structures générant de l'énergie font fonctionner vos extracteurs et vos usines]],
 				nil,
-				[[Essayez d'acquérir toujours plus de spots de métal pour construire plus d'éxtracteurs.]],
-				[[Essaye de construire toujours plus de structures énergitiques pour garder une économie florissante.]],
+				[[Essayez d'acquérir toujours plus de point de minerai pour construire plus d'extracteurs.]],
+				[[Essayez de construire toujours plus de structures énergétiques pour garder une économie forte.]],
 				nil,
-				[[La couverture radar vous montre les ennemis en tant que points radars.]],
-				[[Tout comme votre commander, votre constructeur construit et assiste les constructions.]],
-				[[Les usines assistées par des Constructeurs construisent plus vite.]],
+				[[La couverture radar vous indiquer les ennemis en tant que points radars.]],
+				[[Tout comme votre commandeur, votre constructeur peut construire et assister les constructions.]],
+				[[Les usines assistées par des constructeurs construisent plus vite.]],
 				[[Les unités de combat sont utilisées pour attaquer et détruire vos ennemis.]],
 				nil,
 			},
 		},
 		steps = {
-			intro = [[Bonjour! Je suis Nubtron, votre amical compagnon robot multilingue! Je vais vous apprendre à jouer a Complete Annihilation. <(Cliquez ici pour continuer)>]],
-			intro2 = [[Vous n'avez qu'a suivre mes instructions. Vous pouvez déplacer cette fenêtre en cliquant autour de ma tête. <(Cliquez ici pour continuer)>]],
-			intro3 = [[Entrainez vous à zoomer avec la camera en utilisant la molette de la souris <(Cliquez ici pour continuer)>]],
-			intro4 = [[Vous pouvez déplacer la caméra en utilisant les flèches du clavier, ou en touchant les bords de l'écran avec la souris. <(Cliquez ici pour continuer)>]],
+			intro = [[Bonjour! Je suis Nubtron, votre amical compagnon robot multilingue! Je vais vous apprendre à jouer a Zero-K. <(Cliquez ici pour continuer)>]],
+			intro2 = [[Vous n'avez qu'à suivre mes instructions. Vous pouvez déplacer cette fenêtre en cliquant autour de ma tête. <(Cliquez ici pour continuer)>]],
+			intro3 = [[Entrainez-vous à zoomer avec la camera en utilisant la molette de la souris <(Cliquez ici pour continuer)>]],
+			intro4 = [[Vous pouvez déplacer la caméra en utilisant les flèches du clavier, ou en approchant les bords de l'écran avec le curseur. <(Cliquez ici pour continuer)>]],
 			intro5 =  [[Choisissez votre position de départ en cliquant sur le sol. Prenons un endroit plat et large pour commencer. Cliquez ensuite sur le bouton <Ready>]],
 			selectComm = [[Sélectionnez votre commandeur en cliquant sur lui ou en pressant <ctrl+c>.]],
 			showMetalMap = [[Vous pouvez voir la présence de métal sur le sol en pressant <F4>.]],
-			hideMetalMap = [[Rappuyez sur <F4> pour cacher l'affichage du metal sur le sol.]],
+			hideMetalMap = [[Rappuyez sur <F4> pour cacher l'affichage du metal sur le sol et ainsi revenir à la vue normale.]],
 			selectBotLab = [[Selectionnez votre Usine de Robots en cliquant sur elle. (Le cercle bleu vous aidera à la trouver).]], 
 			selectCon = [[Selectionnez un constructeur en cliquant sur lui. (Le cercle bleu vous aidera à le trouver).]], 
-			guardFac = [[Ordonnez à votre constructeur de garder votre Usine de Robots en cliquant avec le bouton droit dessus. Le constructeur assistera la production de celle-ci jusqu'à ce que vous lui donniez un autre ordre.]],
-			tutorialEnd = [[C'est la fin de ce tutorial, je n'ai plus rien à vous apprendre. Vous pouvez éteindre Nubtron et reprendre une activité guerrière normale. Merci et au revoir! (Cliquez pour redémarrer le tutorial)]],
+			guardFac = [[Ordonnez à votre constructeur de garder votre Usine de Robots en cliquant avec le bouton droit dessus. Le constructeur assistera la production de celle-ci jusqu'à ce que vous lui donniez un autre ordre ou que celle-ci finisse sa file de production.]],
+			tutorialEnd = [[C'est la fin de ce tutoriel, je n'ai plus rien à vous apprendre. Vous pouvez éteindre Nubtron et reprendre une activité guerrière normale. Merci et au revoir! (Cliquez pour redémarrer le tutoriel)]],
 			
-			selectBuild_m = [[Selectionnez #replace# depuis le menu de construction (l'icône est montré ici).]],
-			build_m = [[Vous êtes désormais en train de construire un(e) #replace#. <Patientez jusqu'à sa finition>]],
+			selectBuild_m = [[Selectionnez #replace# depuis le menu de construction (l'icône est montrée ici).]],
+			build_m = [[Vous êtes désormais en train de construire un(e) #replace#. <Patientez jusqu'à son achèvement>]],
 			
-			finish = [[Vous avec un #replace# non terminé, signalé par des cercles rouges. <Cliquez à l'aide du bouton droit pour le finir.>. ]],
+			finish = [[Vous avez un #replace# non terminé, signalé par des cercles rouges. <Cliquez à l'aide du bouton droit pour le finir.>. ]],
 			selectBuild = [[Sélectionnez le #replace# depuis votre menu de construction.]];
-			start = [[<Placez le a proximité d'autres structures.> Il deviendra rouge si vous le placez sur un terrain inaproprié, et vous devrez le re-sélectionner.]],
-			build = [[ Bon boulot! Vous construisez désormais un(e) #replace#. <Attendez qu'il/elle se termine>]],
+			start = [[<Placez-le à proximité d'autres structures.> Il deviendra rouge si vous le placez sur un terrain inaproprié, et vous devrez le re-sélectionner.]],
+			build = [[ Bon travail! Vous construisez désormais un(e) #replace#. <Attendez qu'il/elle se termine>]],
 			
-			startMex = [[Placez le sur une tâche verte]],
-			selectBuildMex = [[L'icône de construction pour l'Extracteur de metal (Mex) est à droite dans le menu de construction qui lui, est à gauche. Vous suivez?]],
-			startBotLab = [[Avant de la placer, vous pouvez tourner une structure avec les touches <)> et <0>.<Tournez la et placez la de sorte que les unités puissent sortir facilement par la facade.>. Elle deviendra rouge si vous tentez de la placer sur un terrain inaproprié.]],
+			startMex = [[Placez-le sur une tâche verte représentant un point de minerai.]],
+			selectBuildMex = [[L'icône de construction pour l'Extracteur de metal (Mex) est à droite dans le menu de construction qui lui, est à gauche. Vous suivez toujours ?]],
+			startBotLab = [[Avant de la placer, vous pouvez tourner une structure avec les touches <)> et <0>.<Tournez-la et placez-la de sorte que les unités puissent sortir en sortir facilement.>. Elle deviendra rouge si vous tentez de la placer sur un terrain inaproprié.]],
 		}
 	}, --end fr
 
