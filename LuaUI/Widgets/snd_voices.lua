@@ -1,19 +1,28 @@
 -- $Id: snd_voices.lua 3727 2009-01-08 22:36:55Z licho $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+local versionNumber = "1.1.1"
 
 function widget:GetInfo()
-  return {
-    name      = "Voices",
-    desc      = "Unit replies and notifications",
-    author    = "quantum",
-    date      = "1/7/2007",
-    license   = "GNU GPL, v2 or later",
-    layer     = -10,
-    enabled   = true --  loaded by default?
-  }
+	return {
+	name      = "Voices",
+	desc	= "[v" .. string.format("%s", versionNumber ) .. "] Unit replies and notifications",
+	author    = "quantum",
+	date      = "1/7/2007",
+	license   = "GNU GPL, v2 or later",
+	layer     = -10,
+	enabled   = true --  loaded by default?
+	}
 end
+
+--[[
+-- Features:
+_ Add many units replies.
+
+---- CHANGELOG -----
+-- versus666, 	v1.1.1	(30oct2010)	:	Added and Completed some lists, cleaned other things.
+-- licho,		v1.1	(08janv2009):	?
+-- quantum,		v1.0				:	Creation.
 
 --TODO:
 --unit retreating
@@ -28,7 +37,9 @@ end
 --playerdied
 --selectsensor
 --move plane
-
+--List the sounds used
+--make use or HEAVIES list, ENERGY list, only AALIST & COMMANDERLIST are used.
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -77,7 +88,7 @@ local retreatState     = {}
 local fireState        = {}
 local sexTable         = {}
 local statsBuffer      = {0, 0, 0, 0, 0}
-local energyList = {     --FIXME
+local energy = {     --FIXME not used, see line 443 in widget:UnitDestroyed
   "armsolar",
   "armfus", 
   "cafus", 
@@ -96,30 +107,57 @@ local commanders = {
 	"commadvsupport",
 }
 
-local heavies = {
+local heavies = { --not used yet
 	"correap",
-	"corgol",
+	"corgol", --goliath
 	"corcan",
 	"corsumo",
+	"gorg", --juggernaut
 	"dante",
 }
 
 local aa = {
-	"corrl",
-	"corrazor",
-	"missiletower",
+	"corrl", --defender
+	"corrazor", --razor kiss
+	"missiletower",--hacksaw
 	"corflak",
-	"armcir",
+	"armcir", --chainsaw
 	"screamer",
 }
 
-local aaList = {}
+local sea = { --not used yet
+	"corcrus", --executioner
+	"corbats", --warlord
+	"corarch", --Shredder
+	"armroy", --crusader
+	"corroy", --enforcer
+	"armpt", --skeeter
+	"armroy", --crusader
+	"coresupp", --supporter
+	"cornukesub", --leviathan
+	"armboat", --surboat(sea transporter)
+}
+
+local energyList = {} --not used yet
 local commanderList = {}
+local heaviesList = {} --not used yet
+local aaList = {}
+local seaList = {} --not used yet
+
+for i,v in pairs (energy) do --not used yet
+	energyList[v] = true
+end
 for i,v in pairs (commanders) do
 	commanderList[v] = true
 end
+for i,v in pairs (heavies) do --not used yet
+	heaviesList[v] = true
+end
 for i,v in pairs (aa) do
 	aaList[v] = true
+end
+for i,v in pairs (sea) do --not used yet
+	seaList[v] = true
 end
 
 --------------------------------------------------------------------------------
@@ -202,13 +240,16 @@ local function CheckSelected()
       isTurret =true
     end
     
-    if ((name == "corfus") or
-        (name == "armfus") or
-        (name == "cafus") or
-        (name == "aafus")) then --FIXME: sea & cloak
+    if ((name == "armfus") or -- fusion
+	--(name == "corfus") or (name == "aafus") are not in game anymore.
+        (name == "cafus"))then  --adv fusion
       isFus = true
     end
-    
+
+	if seaList[name] then 
+      isSea = true
+    end
+	
     if aaList[name] then --FIXME: more AA
       isSam = true
     end

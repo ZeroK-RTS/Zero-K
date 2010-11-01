@@ -1,14 +1,28 @@
+local versionNumber = "1.0.1"
+
 function widget:GetInfo()
-  return {
-    name      = "Unit News",
-    desc      = "Informs player of unit completion/death events",
-    author    = "KingRaptor",
-    date      = "July 26, 2009",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = false  --  loaded by default?
-  }
+	return {
+		name	= "Unit News",
+		desc	= "[v" .. string.format("%s", versionNumber ) .. "] Informs player of unit completion/death events",
+		author	= "KingRaptor",
+		date	= "July 26, 2009",
+		license	= "GNU GPL, v2 or later",
+		layer	= 0,
+		enabled	= false  --  loaded by default?
+	}
 end
+
+--[[
+-- Features:
+_ Informs player of unit completion/death events, with sound events depending of incomes ( so no constant 'unit operational unit operational unit operational' when building heaps of peewees).
+
+-- To do:
+_ Maybe fusion this with minimap_events.lua and unit_marker.lua as they have a pretty similar task, maybe even unit_sounds.
+
+---- CHANGELOG -----
+-- versus666,		v1.0.1	(31oct2010)	:	Simplified/sped up things, completed verbose things.
+-- KingRaptor,		v1.0	(26juil2009):	Creation.
+--]]
 
 local soundTimeout = 0
 
@@ -19,19 +33,22 @@ local _
 
 --SPEEDUPS
 
-local spGiveOrderToUnit = Spring.GiveOrderToUnit
-local spEcho = Spring.Echo
-local spGetTeam = Spring.GetUnitTeam
-local spGetGameSeconds = Spring.GetGameSeconds
-local spInView = Spring.IsUnitInView
-local spGetTeamRes = Spring.GetTeamResources
-local spGetLastAttacker = Spring.GetUnitLastAttacker
-local spGetGameFrame = Spring.GetGameFrame
-local spPlaySoundFile = Spring.PlaySoundFile
+local spGiveOrderToUnit		= Spring.GiveOrderToUnit
+local Echo					= Spring.Echo
+local spGetTeam				= Spring.GetUnitTeam
+local spGetGameSeconds		= Spring.GetGameSeconds
+local spInView				= Spring.IsUnitInView
+local spGetTeamRes			= Spring.GetTeamResources
+local spGetLastAttacker		= Spring.GetUnitLastAttacker
+local spGetGameFrame		= Spring.GetGameFrame
+local spGetSpectatingState	= Spring.GetSpectatingState
+local spIsReplay			= Spring.IsReplay
 
-local playerID = Spring.GetMyPlayerID()
-local teamID = Spring.GetMyTeamID()
+local spPlaySoundFile		= Spring.PlaySoundFile
+local spMarkerAddPoint		= Spring.MarkerAddPoint
 
+local playerID				= Spring.GetMyPlayerID()
+local teamID				= Spring.GetMyTeamID()
 --------------------------
 --CONFIG
 --------------------------
@@ -53,18 +70,25 @@ local useCompleteMinCost = true
 local logDeathInView = true
 local logCompleteInView = true
 
-function widget:Initialize()
-  if Spring.GetSpectatingState() or Spring.IsReplay() then
-    widgetHandler:RemoveWidget()
-    return true
-  end
+
+--function isSpec()
+--	if (spGetSpectatingState or spIsReplay) then
+--		return true
+--	end
+--end
+
+function IsSpec()
+	if Spring.GetSpectatingState() or Spring.IsReplay() then
+		return true
+	end
 end
 
-local function CheckSpecState()
-  if Spring.GetSpectatingState() then
-	Spring.Echo("<Unit News> Spectator mode. Widget removed.")
-	widgetHandler:RemoveWidget()
-  end
+function widget:Initialize()
+	Echo("<Unit News>: init")
+	if isSpec then
+		Echo("<Unit News>: Spectator mode or replay. Widget removed.")
+		widgetHandler:RemoveWidget()
+	end
 end
 
 function widget:Update()
@@ -73,7 +97,7 @@ function widget:Update()
 		return
 	end
 	lastUpdate = now
-	CheckSpecState()
+	--isSpec()
 	_, _, _, mIncome, _ = spGetTeamRes(teamID, "metal")
 end
 
@@ -86,14 +110,15 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (spGetTeam(unitID) ~= teamID) or (ud.metalCost < (mIncome * mFactor) and useDeathMinCost) then return end
 	--can u c me?
 	if (spInView(unitID)) and (logDeathInView == false) then return end
-	if (ud.canFly) then spEcho("Aircraft shot down: " .. ud.humanName)
-	elseif (ud.isBuilding) then spEcho("Building destroyed: " .. ud.humanName)
-	elseif (ud.TEDClass == "SHIP") or (ud.TEDClass == "WATER") then spEcho("Vessel sunk: " .. ud.humanName)
-	else spEcho("Unit lost: " .. ud.humanName)
+	if (ud.canFly) then Echo("<Unit News>: " .. ud.humanName .. " shot down.")
+	elseif (ud.isFactory) then Echo("<Unit News>: " .. ud.humanName .. " factory destroyed.")
+	elseif (ud.isCommander) then Echo("<Unit News>: " .. ud.humanName .. " is iced.")
+	elseif (ud.isBuilding) then Echo("<Unit News>: " .. ud.humanName .. " building annihilated.")
+	elseif (ud.TEDClass == "SHIP") or (ud.TEDClass == "WATER") then Echo("<Unit News>: ud.humanName vessel sunk.")
+	elseif (ud.isBuilder) then Echo("<Unit News>: " .. ud.humanName .. " builder destroyed.")
+	else Echo("<Unit News>: " .. ud.humanName .. "lost.")
 	end
 end
-
-
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	--visibility check
@@ -103,16 +128,17 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	-- cheap units aren't newsworthy unless they're builders
 	if (not ud.isBuilder and (UnitDefs[unitDefID].metalCost < (mIncome * mFactor) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
 	if (not ud.canMove) or (ud.isFactory) then
-		spEcho(ud.humanName .. ": construction completed")
+		Echo( "<Unit News>: " .. ud.humanName .. " construction completed")
 		if useSounds and soundTimeout < frame then
 			spPlaySoundFile(sounds.StructureComplete.file)
 			soundTimeout = frame + sounds.StructureComplete.timeout
 		end
 	else
-		spEcho(ud.humanName .. ": unit operational")
+		Echo("<Unit News>: " .. ud.humanName .. ": unit operational")
 		if useSounds and soundTimeout < frame then
 			spPlaySoundFile(sounds.UnitComplete.file)
 			soundTimeout = frame + sounds.UnitComplete.timeout
 		end
 	end
 end
+------
