@@ -26,9 +26,9 @@ unitDef = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
-    description_fr = [[Clucking Hell!]],
+    description_fr = [[Le mal incarné!]],
     helptext       = [[Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit acid, spray spores to kill aircraft, and kick land units away from it. Most of all, its jaws can rip apart the largest assault mech in seconds. Only the most determined, focused assault can hope to stop this beast in her tracks.]],
-    helptext_fr    = [[Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit acid, spray spores to kill aircraft, and kick land units away from it. Most of all, its jaws can rip apart the largest assault mech in seconds. Only the most determined, focused assault can hope to stop this beast in her tracks.]],
+	helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa colère attisée elle est presque indestructible. Elle crache un acide extrèmement corrosif, largue des poulets et envoie des spores aux unités volantes. Seulement les assauts les plus brutaux et coordonnés peuvent espêrer venir à bout de cette monstruosité.]],
   },
 
   defaultmissiontype     = [[standby]],

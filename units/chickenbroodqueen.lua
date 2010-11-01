@@ -48,7 +48,9 @@ unitDef = {
   commander           = true,
 
   customParams        = {
-    helptext = [[The egg-laying brood queen is not quite as fearsome in combat as the other queen, but can in the long run present an even bigger threat. It produces all the different chicken breeds of the Thunderbirds.]],
+	description_fr = [[Reine pondeuse]],
+	helptext = [[The egg-laying brood queen is not quite as fearsome in combat as the other queen, but can in the long run present an even bigger threat. It produces all the different chicken breeds of the Thunderbirds.]],
+	helptext_fr    = [[Cette reine pondeuse n'est pas aussi effrayante en combat que l'autre reine mais peut à long terme se montrer une menace bien plus grande. En éffet elle peut engendrer rapidement par elle-même toutes les unités poulet.]],
   },
 
   defaultmissiontype  = [[standby]],

@@ -67,6 +67,7 @@ unitDef = {
   buildTime           = 1800,
   canAttack           = true,
   canGuard            = true,
+  canCloak			= true,
   canMove             = true,
   canPatrol           = true,
   canreclamate        = [[1]],
@@ -95,7 +96,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 2500,
-  maxDamage           = 2200,
+  maxDamage           = 2200,--health
   maxSlope            = 36,
   maxVelocity         = 1.325,
   maxWaterDepth       = 5000,
@@ -149,7 +150,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    DISINTEGRATOR = {
+    DISINTEGRATOR = {--unused actually
       name                    = [[Disintegrator]],
       areaOfEffect            = 36,
       avoidFeature            = false,

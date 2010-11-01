@@ -26,7 +26,7 @@ unitDef = {
     description_fr = [[Acc?lerateur Tachyon]],
     description_pl = [[Akcelerator Tachyonów]],
     helptext       = [[Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you have plenty of energy reserves. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders.]],
-    helptext_fr    = [[Cach? au fond du blindage lourd de l'Annihilator se terre le terrible Canon Acc?lerateur de Tachyon. Cette arme terrifiante est capable d'envoyer des quantit?s colossales d'?nergie sur un point pr?cis, percant tous les blindages ais?ment, le tout ? une port?e d?fiant toute concurrence. Son prix et sa consommation d'?nergie la rendent cependant plus difficile ? utiliser.]],
+    helptext_fr    = [[Protégé derrière le blindage lourd de l'Annihilator se trouve le terrible Canon Accélerateur de Tachyon. Cette arme terrifiante est capable d'envoyer des quantités colossales d'énergie sur un point précis, percant tous les blindages aisément, le tout à une distance terrifiante. Son coût et sa consommation d'énergie la rendent cependant difficile à employer.]],
     helptext_pl    = [[Pod ci??kim pancerzem Annihilatora znajduje si? niszczycielski Akcelerator Tachyonów. Ta straszliwa bro? pozwala na zadawanie wysokich obra?e? oddalonym celom, zak?adaj?c ?e masz do?? energii by j? zasili?.]],
   },
 

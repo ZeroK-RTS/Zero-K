@@ -19,9 +19,9 @@ unitDef = {
   category            = [[SWIM]],
 
   customParams        = {
-    description_fr = [[Swarmer]],
+    description_fr = [[Soldat d'essaim]],
     helptext       = [[The footsoldier of the Thunderbirds is an aggressive zergling-type unit. What it lacks in individual strength, it compensates for with its sheer numbers, overwhelming enemies with floods and floods of little chickens. A good riot unit is recommended for stopping them.]],
-    helptext_fr    = [[The footsoldier of the Thunderbirds is an aggressive zergling-type unit. What it lacks in individual strength, it compensates for with its sheer numbers, overwhelming enemies with floods and floods of little chickens. A good riot unit is recommended for stopping them.]],
+    helptext_fr    = [[Le soldat de base terrestre des poulets est une créature agressive apparentée aux Zergs. Ce qu'il lui manque en puissance il le compense par son nombre impressionnant lors des attaques qui submerge l'adversaire sous un flot continu de petites unités. Pour les contrer rien de mieux qu'une arme anti émeute.]],
   },
 
   defaultmissiontype  = [[Standby]],

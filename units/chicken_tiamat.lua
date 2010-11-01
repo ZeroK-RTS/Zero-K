@@ -19,9 +19,10 @@ unitDef = {
   category            = [[LAND FIREPROOF]],
 
   customParams        = {
-    description_fr = [[Assault]],
+    description_fr = [[Assault lourd]],
     fireproof      = 1,
     helptext       = [[The ultimate assault chicken, the Tiamat is a fire-breathing, iron-jawed, spore-spewing monstrosity that knows no fear, no mercy. It even has a mucous shield to protect itself and surrounding chickens from damage.]],
+	helptext_fr = [[L'ultime unité d'assault pouler, le Tiamat est une monstruosité crachant des flammes, déchirant de ses machoires d'acier et lançant des spores sur ses victimes. Elle possède même un bouclier énergétique résultant de sa fureur, lui procurant à elle et aux unités alliées à proximité une protection efficace durant leur progession vers l'adversaire.]],
   },
 
   defaultmissiontype  = [[Standby]],

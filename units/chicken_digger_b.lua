@@ -19,7 +19,9 @@ unitDef = {
   category            = [[LAND BURROWED]],
 
   customParams        = {
-    helptext = [[The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can burrow and travel underground (very slowly), where the only way to locate it is with sesimic detection equipment.]],
+	description_fr = [[Taupe Scout/Raider]],
+	helptext       = [[The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can burrow and travel underground (very slowly), where the only way to locate it is with sesimic detection equipment.]],
+	helptext_fr    = [[Les griffes puissantes du Digger lui permettent de creuser avec facilité même dans les sols les plus durs. Cela lui permet donc de s'enterrer et de creuser des galeries sous terre, bien que très lentement, mais nécessitant alors pour le localiser un équipement de détection sismique.]],
   },
 
   defaultmissiontype  = [[Standby]],

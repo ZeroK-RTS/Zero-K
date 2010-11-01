@@ -18,9 +18,9 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
-    description_fr = [[All-Terrain Anti-Air Webslinger]],
-    helptext       = [[The Spidermonkey is a very unusual support chicken. As the name suggests, it can climb walls, however it can also spin thick webs to ensnare aircraft like a spider catching insects.]],
-    helptext_fr    = [[The Spidermonkey is a very unusual support chicken. As the name suggests, it can climb walls, however it can also spin thick webs to ensnare aircraft like a spider catching insects.]],
+	description_fr = [[Lanceur de filet tout terrain]],
+	helptext       = [[The Spidermonkey is a very unusual support chicken. As the name suggests, it can climb walls, however it can also spin thick webs to ensnare aircraft like a spider catching insects.]],
+	helptext_fr    = [[Le spidermonkey est une unité de soutien très inhabituelle parmis les poulets. Comme le nom l'indique il peut grimper les parois les plus escarpées mais peut en plus projetter comme une fronde un filet pour bloquer au sol les unités aériennes, à la manière d'une araignée attrappant des insectes.]],
   },
 
   defaultmissiontype  = [[Standby]],

@@ -18,7 +18,9 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
-    helptext = [[The Sporeshooter shoots spores to drop aircraft and hit land targets from a distance.]],
+	description_fr = [[Lanceur de spores tout terrain (AA/Skirm)]],
+	helptext = [[The Sporeshooter shoots spores to drop aircraft and hit land targets from a distance. Can climb walls for surprise attacks.]],
+	helptext_fr = [[Le Sporeshooter lance des salves de spores à tête chercheuse sur les unités adverses, tant terrestres qu'aériennes, tout en étant très mobile et pouvant grimper même les parois les plus escarpées afin de surprendre l'adversaire.]],
   },
 
   defaultmissiontype  = [[Standby]],

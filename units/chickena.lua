@@ -18,8 +18,9 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
+	description_fr = [[Unité lourde de mêlée]],
     helptext    = [[The Cockatrice is truly a beast. Seemingly impervious to enemy fire, it casually walks up to its target and dismembers it with its incredibly powerful jaws. Fortunately, it is not fast or particularly intelligent, and can be destroyed with skirmishers or swarmers easily.]],
-    helptext_fr = [[The Cockatrice is truly a beast. Seemingly impervious to enemy fire, it casually walks up to its target and dismembers it with its incredibly powerful jaws. Fortunately, it is not fast or particularly intelligent, and can be destroyed with skirmishers or air easily.]],
+    helptext_fr = [[Le Cockatrice est un véritale monstre. Apparament insensible aux feu adverse it charge sans ralentir sa cible et la démembre avec ses lentes mais puissantes machoires démesurées. Heuresement il n'est pas très rapide ni intelligent et peut dont être abattu relativement aisément par des essaims ou des unités à longue portée.]],
   },
 
   defaultmissiontype  = [[Standby]],

@@ -18,9 +18,9 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
-    description_fr = [[All-Terrain Riot]],
+    description_fr = [[Anti émeute tout terrain]],
     helptext       = [[The Basilisk climbs walls like a spider to surprise the enemy with its highly acidic spit. Only a vigilant watch keeps these critters from sauntering over hills to wreck your base from unexpected directions. Gunships are the best solution to Basilisk incursions.]],
-    helptext_fr    = [[]],
+    helptext_fr    = [[Le Basilisk grimpe le long des murs comme un lézard pour surprend l'enemi avec ses attaques hautement corrosives. Seule une surveillance de tout les instants peut empêcher ces bestioles d'arriver des chemins cru inpassables. Les VTOLs sont la meilleure réponse à offrir aux incursions de Basilisks.]],
   },
 
   defaultmissiontype  = [[Standby]],

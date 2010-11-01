@@ -24,8 +24,9 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-    description_fr = [[Flying Scout]],
-    helptext       = [[A small flying chicken scout with spore.]],
+	description_fr = [[Scout volant]],
+	helptext       = [[A small flying chicken scout with spore.]],
+	helptext_fr    = [[Le Pigeon est une unité aérienne légère mais dotée d'une attaque à mi chemin entre la bombe et le missile guidé provoquant des dommages non négligeables.]],
   },
 
   defaultmissiontype  = [[VTOL_standby]],

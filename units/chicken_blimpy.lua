@@ -23,7 +23,9 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-    helptext = [[Blimpy drops a Dodo on unsuspecting armies and bases. ]],
+	description_fr = [[Bombardier à Dodos]],
+	helptext = [[Blimpy drops a Dodo on unsuspecting armies and bases. ]],
+	helptext_fr = [[Le Blimpy est une unité aérienne ressemblant à un bourdon dont apparemment la seule vocation soit de lâcher sur l'adversaire le Dodo qu'elle transporte sous son ventre. Dévastateur contre les bases.]],
   },
 
   defaultmissiontype  = [[Standby]],

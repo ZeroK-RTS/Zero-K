@@ -26,8 +26,9 @@ unitDef = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
-    description_fr = [[Uber Assault Chicken]],
+    description_fr = [[Unité d'assaut poulet ultra lourde]],
     helptext       = [[The White Dragons, senior guardians of the chicken hive, are monstrous beings second only to the queen herself. With a powerful stomp, lethal jaws, corrosive goo and a multitude of spores, they are a threat to be feared indeed.]],
+	helptext_fr    = [[Les White Dragons, gardiens séculaires des nids poulet sont d'immenses créatures monstrueuses extrèmement féroces. Capables d'écraser sous leur poids leurs adversaires, de broyer les alliages les plus robustes avec leur mâchoire, de projeter leur bave corrosive et de cribler les unités aériennes d'un amas de spores corrosifs, leur simple apparition sur le champ de bataille glace le sang.]],
   },
 
   defaultmissiontype     = [[standby]],

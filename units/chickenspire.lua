@@ -24,9 +24,9 @@ unitDef = {
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {
-    description_fr = [[Static Artillery]],
+    description_fr = [[Artillerie statique]],
     helptext       = [[Long range static artillery.]],
-    helptext_fr    = [[]],
+	helptext_fr    = [[La terreur verte projette des amas commposés de d'acides corrosifs et de germes sur de très longues distances.]],
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],

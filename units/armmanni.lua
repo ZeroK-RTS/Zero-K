@@ -24,7 +24,7 @@ unitDef = {
     description_fr = [[Accelerateur Tachyon Mobile]],
     helptext       = [[The Penetrator's weapon, nicknamed 'the Blue Laser of Death', has the power and accuracy to skewer most units with a single shot. Use it against high armor units, but keep it behind the front lines - it has light armor and can't run from danger. Make sure you have lots of energy storage, as its weapon has an exorbitant energy cost.]],
     helptext_bp    = [[A arma do Penetrator, apelidada de "O laser azul da morte", tem o poder e a precis?o para destruir a maioria das unidades com um único tiro. Use-o contra unidades muito resistentes, mas mantenha-o atras da linha de frente: Sua armadura é fina e ele é lento demais para fugir do perigo. Esta arma consome muita energia, ent?o será necessária uma produç?o de energia e capacidade de armazenamento de energia altas.]],
-    helptext_fr    = [[Le surnon du Penetrator est 'le laser bleu de la mort'. Le Penetrator est le tank le plus devastateur de tous, son laser peut traverser les rangs ennemis et décimer les plus lourds blindage r une grande distance. Il est cependant peu protégé et peu maniable. Assurez vous également d'avoir les ressources nécéssaire: c'est un gouffre r énergie. ]],
+    helptext_fr    = [[Le surnon du Penetrator est 'le rayon bleu de la mort'. Le Penetrator est le tank le plus devastateur de tous, son laser peut traverser les rangs ennemis et décimer les plus lourds blindages à grande distance. Il est cependant peu protégé et peu maniable. Assurez vous également d'avoir les ressources nécessaires: c'est un gouffre à énergie. ]],
   },
 
   defaultmissiontype  = [[Standby]],

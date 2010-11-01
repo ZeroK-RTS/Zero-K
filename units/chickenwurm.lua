@@ -18,8 +18,9 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
-    description_fr = [[Burrowing Assault]],
+    description_fr = [[Assaut souterrain]],
     helptext       = [[Burn baby Burn!]],
+	helptext_fr    = [[Ces poulets tenant partiellement de la taupe ont une particularité : ils savent mettre le feu où qu'ils aillent.]],
   },
 
   defaultmissiontype  = [[Standby]],

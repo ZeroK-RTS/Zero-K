@@ -18,8 +18,9 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
-    description_fr = [[Artillery]],
+    description_fr = [[Artillery Lourde poulet]],
     helptext       = [[The Lobber's big brother, the Blobber hurls a wide-scatter rain of acid goo. It can pummel even the toughest shield network very quickly, but remains relatively prone to direct attack.]],
+	helptext_fr    = [[Grand frère du Lobber, le Blobber projette à longue distance une véritable pluie d'acide sur une zone importante. Il peut ainsi rapidement annihiler même les défenses protégées par un important réseau de boucliers mais il reste très vulnérable aux attaques raprochées.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -57,7 +58,7 @@ unitDef = {
   },
 
   side                = [[THUNDERBIRDS]],
-  sightDistance       = 2000,
+  sightDistance       = 1000, --was 2000 which then defeat the moto " long range units have to have scouts forward to allow them to use their full range, 1000 is already twice the range of chicken FLYERS.
   smoothAnim          = true,
   sonarDistance       = 450,
   steeringmode        = [[2]],
