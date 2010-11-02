@@ -470,7 +470,7 @@ local function MakeWidgetList()
 			widget_checks[wdata.name] = Checkbox:New{ 
 					caption = wdata.name_display, 
 					checked = enabled,
-					tooltip = '(By ' .. wdata.author .. ")\n" .. wdata.desc,
+					tooltip = '(By ' .. tostring(wdata.author) .. ")\n" .. tostring(wdata.desc),
 					OnChange = { 
 						function(self) 
 							widgetHandler:ToggleWidget(wdata.name)
