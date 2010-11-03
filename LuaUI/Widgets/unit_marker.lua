@@ -2,8 +2,8 @@ local versionNumber = "1.3.4"
 
 function widget:GetInfo()
 	return {
-		name	= "Unit Marker compatible Zero-K",
-		desc	= "[v" .. string.format("%s", versionNumber ) .. "] Marks spotted buildings of interest. Support ZK chicken games",
+		name	= "Unit Marker Zero-K",
+		desc	= "[v" .. string.format("%s", versionNumber ) .. "] Marks spotted buildings of interest.",
 		author	= "very_bad_soldier",
 		date	= "October 21, 2007 / September 08, 2010",
 		license	= "GNU GPL v2",
@@ -33,7 +33,7 @@ Probably erase the BA & XTA config as this is a ZK only widget. Left for now as 
 local debug = false --generates debug message
 
 local unitList = {}
---MARKER LIST ------------------------------------ NEED TO UPDATE CA1F TO ZK WHEN MOD DO.
+--MARKER LIST ------------------------------------ NEED TO UPDATE CA1F TO ZK WHEN MOD UPDATES.
 unitList["BA"] = {} --initialize table
 unitList["BA"]["armamd"] = { markerText = "Anti Nuke" }
 unitList["BA"]["corfmd"] = { markerText = "Anti Nuke" }
@@ -51,7 +51,7 @@ unitList["CA"]["corint"] =		{ markerText = "Intimidator" }
 unitList["CA"]["corbhmth"] =	{ markerText = "Behemoth" }
 unitList["CA"]["armbrtha"] =	{ markerText = "Big Bertha" }
 unitList["CA"]["kettle"] =		{ markerText = "Kettle" }
-unitList["CA"]["starlight"] =	{ markerText = "Mah Lazer" }
+unitList["CA"]["starlight"] =	{ markerText = "Starlight" }
 unitList["CA"]["corebeac"] =	{ markerText = "Zenith" }
 unitList["CA"]["corfus"] =		{ markerText = "Graviton Power Gen" }
 unitList["CA"]["cafus"] =		{ markerText = "Singularity Reactor" }
@@ -70,11 +70,11 @@ unitList["CA1F"]["armbrtha"] =		{ markerText = "Big Bertha" }
 unitList["CA1F"]["corbhmth"] =		{ markerText = "Behemoth" }
 unitList["CA1F"]["armanni"] =		{ markerText = "Annihilator" }
 unitList["CA1F"]["cordoom"] =		{ markerText = "Doomsday" }
-unitList["CA1F"]["starlight"] =		{ markerText = "Mah Lazer" }
+unitList["CA1F"]["starlight"] =		{ markerText = "Starlight" }
 unitList["CA1F"]["cafus"] =			{ markerText = "Singularity Reactor" }
 unitList["CA1F"]["armfus"] =		{ markerText = "Fusion Reactor" }
 unitList["CA1F"]["amgeo"] =			{ markerText = "Moho Geo" }
-unitList["CA1F"]["armgeo"] =		{ markerText = "Geo" }
+unitList["CA1F"]["geo"] =		{ markerText = "Geo" }
 --END OF MARKER LIST---------------------------------------
 local markerTimePerId = 0.2 --400ms
 

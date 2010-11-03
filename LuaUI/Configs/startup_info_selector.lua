@@ -13,7 +13,7 @@ strikecomm = {
 	button = function()
 	Spring.SendLuaRulesMsg("faction:nova")
 	printDebug("strike com")
-	Spring.SendCommands({'say a: I chose:\nStrike Commander !'})
+	Spring.SendCommands({'say a: I choose: Strike Commander !'})
 	Close()
 	end 
 	},
@@ -22,10 +22,10 @@ battlecomm = {
 	enabled = function() return (not Spring.GetSpectatingState()) end,
 	poster = "LuaUI/Images/startup_info_selector/corcom.jpg",
 	selector ="Battle Comm",
-	tooltip = "Battle Commander\nUse a pulse autocannon and have more health but slower speed too.\nADV Battle Commander\nGain better damages, AoE cluster bombs, an high power personal shield and double health gains.\n\* BOTH HAVE NO CLOAK \*",
+	tooltip = "Battle Commander\nUse a pulse autocannon and have more health but slower speed too.\nADV Battle Commander\nGain better damages, AoE cluster bombs, an high power area shield and double health gains.\n\* BOTH HAVE NO CLOAK \*",
 	button = function() 
 	Spring.SendLuaRulesMsg("faction:logos")
-	Spring.SendCommands({'say a:I chose:\nBattle Commander !'})
+	Spring.SendCommands({'say a:I choose: Battle Commander !'})
 	Close()
 	end 
 	},
@@ -37,7 +37,7 @@ reconcomm = {
 	tooltip = "Recon Commander\nUse a low cost cloak and high mobility suit but a low range pulse rifle, lower income and very low health.\nADV Recon Commander\nGain longer range & faster rifle, AoE slow bombs, higher mobility suit and an ULTRA LOW cost cloak.\n\* BOTH CAN JUMP \*",
 	button = function() 
 	Spring.SendLuaRulesMsg("faction:reconcomm")
-	Spring.SendCommands({'say a:I chose:\nRecon Commander !'})
+	Spring.SendCommands({'say a:I choose: Recon Commander !'})
 	Close()
 	end 
 	},
@@ -46,17 +46,17 @@ supportcomm = {
 	enabled = function() return (not Spring.GetSpectatingState()) end,
 	poster = "LuaUI/Images/startup_info_selector/commsupport.jpg",
 	selector = "Support Comm",--because of the way spring handle font this text ("pp") is a shown few pixels higher than expected, nothing lethal.
-	tooltip = "Support Commander\nUse an EMP rifle (stun only), have increased income, build and radar range but low health and speed.\nADV Support Commander\nGain better build power and radar range, wide healing aura, small ressources storage and a better STUN damage & range rifle.",
+	tooltip = "Support Commander\nUse an EMP rifle (stun only), have increased income, build and radar range but low health and speed.\nADV Support Commander\nGain better build power and radar range, wide healing aura, small resources storage and a better STUN damage & range rifle.",
 	button = function() 
 	Spring.SendLuaRulesMsg("faction:supportcomm")
-	Spring.SendCommands({'say a:I chose:\nSupport Commander !'})
+	Spring.SendCommands({'say a:I choose: Support Commander !'})
 	Close()
 	end 
 	},
 
 communism = {
 	enabled = function()
-	return false -- always enabled - so we hide it
+		return false -- always enabled - so we hide it
 	end,
 	poster = "LuaUI/Images/startup_info_selector/communism.jpg",
 	selector = "Communism Mode",-- set here for futur modifications, even is unused at the moment
@@ -65,7 +65,7 @@ communism = {
 	},
 shuffle = {
 	enabled = function()
-	return false -- Reminder panel now dedicated to commander selection.
+		return false -- Reminder panel now dedicated to commander selection.
 	end,
 	poster = "LuaUI/Images/startup_info_selector/shuffle.png",
 	selector = "Commander Shuffle",-- set here for futur modifications, even is unused at the moment
@@ -76,7 +76,7 @@ planetwars = {
 	--if modoptions and modoptions.planetwars ~= "" then
 	--  return true
 	--end
-	return false
+		return false
 	end,
 	poster = "LuaUI/Images/startup_info_selector/planetwars.png",
 	selector = "PlanetWars",-- set here for futur modifications, even is unused at the moment

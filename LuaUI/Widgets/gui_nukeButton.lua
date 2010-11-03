@@ -2,7 +2,7 @@ local versionNumber = "1.3.1"
 
 function widget:GetInfo()
 	return {
-		name      = "Nuke Button COMPATIBLE Zero-K",
+		name      = "Nuke Button Zero-K",
 		desc      = "[v" .. string.format("%s", versionNumber ) .. "] Displays Nuke Button",
 		author    = "very_bad_soldier / versus666",
 		date      = "July 19, 2009 / September 08, 2010",

@@ -285,13 +285,14 @@ local function GetStartUnit(teamID, playerID)
 
   if replace then
     local new_starters = {
-      [1]=select(2, Spring.GetSideData(2)), -- arm
-      [2]=select(2, Spring.GetSideData(3)), -- core
+      [1]="armcom",	--select(2, Spring.GetSideData(2)), -- arm
+--      [2]="corcom",	--select(2, Spring.GetSideData(3)), -- core
     }
+--[[
     if chicken then
       new_starters[#new_starters+1] = select(2, Spring.GetSideData(4))  -- chicken
     end
-
+]]--
     local rand = math.ceil( math.random() * #new_starters )
     startUnit = new_starters[rand]
   end

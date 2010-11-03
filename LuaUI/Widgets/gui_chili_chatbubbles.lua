@@ -61,7 +61,7 @@ options = {
 		type = 'number',
 		min = 200,
 		max = 600,
-		value = 300,
+		value = 260,
 	},
 	window_height  = {
 		name = 'Height 60-120',
@@ -282,7 +282,7 @@ function widget:AddChatMessage(player, msg, type)
 		align    = "left";
 		autosize = false;
 		font    = {
-			size   = 14;
+			size   = 12;
 			shadow = true;
 		}
 	}
@@ -296,7 +296,7 @@ function widget:AddChatMessage(player, msg, type)
 		valign  = "ascender";
 		align   = "left";
 		font    = {
-			size   = 18;
+			size   = 14;
 			shadow = true;
 		}
 	}
@@ -443,7 +443,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 			align    = "left";
 			autosize = false;
 			font    = {
-				size   = 14;
+				size   = 12;
 				shadow = true;
 			}
 		}
@@ -457,7 +457,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 			valign  = "ascender";
 			align   = "left";
 			font    = {
-				size   = 18;
+				size   = 14;
 				shadow = true;
 			}
 		}
@@ -472,7 +472,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 			align    = "left";
 			autosize = false;
 			font    = {
-				size   = 18;
+				size   = 14;
 				shadow = true;
 			},
 		}
@@ -528,7 +528,7 @@ function widget:AddWarning(text)
 		valign  = "center";
 		align   = "left";
 		font    = {
-			size   = 18;
+			size   = 14;
 			shadow = true;
 		}
 	}

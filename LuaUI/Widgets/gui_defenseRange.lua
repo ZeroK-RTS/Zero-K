@@ -5,7 +5,7 @@ local versionNumber = "6.2.2"
 
 function widget:GetInfo()
 	return {
-		name      = "Defense Range COMPATIBLE zero-K",-- will need update when CA1F code -> ZK
+		name      = "Defense Range Zero-K",-- will need update when CA1F code -> ZK
 		desc      = "[v" .. string.format("%s", versionNumber ) .. "] Displays range of defenses (enemy and ally)",
 		author    = "very_bad_soldier / versus666",
 		date      = "October 21, 2007 / September 08, 2010",

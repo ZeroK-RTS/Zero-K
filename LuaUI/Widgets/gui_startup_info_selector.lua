@@ -21,7 +21,8 @@ _ Make a small (2-3 frames) animation when cursor hover comms' posters (like the
 _ Make each player broadcast their choice to their team in a way it can be used by chili_chatbubbles, I had issues with that, left it for later. Use Spring.SendCommands( ?
 
 ---- CHANGELOG -----
--- versus666, 		v1.2	(30oct2010)	:	Placed CreateWindow() @ _DrawScreen() to avoid showing commander selection after game start when DEBUG is FALSE and doing /luiaui reload . Thanks to [LCC]Quantum[0K] for spotting the little mistake which was blocking me for 1 complete day.
+-- versus666, 		v1.2	(30oct2010)	:	Placed CreateWindow() @ _DrawScreen() to avoid showing commander selection after game start when DEBUG is FALSE and doing /luiaui reload.
+--											Thanks to [LCC]Quantum[0K] for spotting the little mistake which was blocking me for 1 complete day.
 -- versus666,		v1.1	(28oct2010)	:	Corrected typos, cosmetic changes and added comments & infos about comm choices.
 -- SirMaverick,		v1.0				:	Creation.
 --]]
@@ -178,8 +179,8 @@ function CreateWindow()
     local cbWidth = posterx*actived*0.75-- calculate width of close button depending of number or posters
     local closeButton = Button:New{
       parent = mainWindow,
-      caption = "CLOSE  (to use Strike Commander by default or chicken faction)",
-	  tooltip = "CLOSE\nNo commander selection made, will use Strike Commander or chicken brood queen if chicken faction is enabled.",
+      caption = "CLOSE  (defaults to Strike Commander)",
+	  tooltip = "CLOSE\nNo commander selection made, will use Strike Commander",
       width = cbWidth,
       height = 30,
       x = (posterx*actived - cbWidth)/2,
@@ -215,6 +216,7 @@ function widget:GameStart()
 end
 
 function UpdateCallins()
+  --why is this called twice?
   widgetHandler:UpdateCallIn('DrawScreen')
   widgetHandler:UpdateCallIn('DrawScreen')
 end
@@ -231,7 +233,7 @@ end
 
 -- use to play communism (always enabled) sound only at game start
 function _DrawScreen()
-  if ((Spring.GetGameSeconds() < 0.1) and not (selectorShown)) then --create window in pregame and if not already shown
+  if (((Spring.GetGameSeconds() < 0.1) or Spring.IsCheatingEnabled()) and not (selectorShown)) then --create window in pregame and if not already shown
     Spring.PlaySoundFile("LuaUI/Sounds/communism/sovnat1.wav", 1)
 		printDebug("<gui_startup_info_selector DEBUG >: it's _DrawScreen")
 		CreateWindow()

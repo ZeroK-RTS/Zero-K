@@ -16,8 +16,8 @@
 
 function widget:GetInfo()
   return {
-    name      = "Central Build AI v1.1",
-    desc      = "Common non-hierarchical permanent build queue",
+    name      = "Central Build AI",
+    desc      = "v1.1 Common non-hierarchical permanent build queue",
     author    = "Troy H. Cheek",
     date      = "July 20, 2009",
     license   = "GNU GPL, v2 or later",

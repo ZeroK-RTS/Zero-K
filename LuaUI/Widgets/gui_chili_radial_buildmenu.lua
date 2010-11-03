@@ -378,7 +378,7 @@ function widget:Initialize()
 		dockable = true,
 		name = "chiliradialmenu",
 		color = orig_color,
-		x=200,y=200,
+		x=0,y=200,
 		width  = 215,
 		height = 215,
 		padding  = {5,5,5,5},
