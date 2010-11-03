@@ -8,7 +8,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.3 Integral Command Menu",
+    desc      = "v0.31 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -18,6 +18,12 @@ function widget:GetInfo()
   }
 end
 
+include("keysym.h.lua")
+--[[
+for i,v in pairs(KEYSYMS) do
+	Spring.Echo(i.."\t"..v)
+end
+--]]
 --[[
 HOW IT WORKS:
 	Main window (invisible) is parent of a fake window.
@@ -1067,6 +1073,21 @@ function widget:SelectionChanged(newSelection)
 	end
 	selectedFac = nil
 	SmartTabSelect()
+end
+
+function widget:KeyPress(key)
+	local delta
+	if key == KEYSYMS.COMMA then delta = -1
+	elseif key == KEYSYMS.PERIOD then delta = 1 end
+	if not delta then return false end
+	
+	menuChoice = menuChoice + delta
+	if menuChoice <= 0 then menuChoice = #menuChoices
+	elseif menuChoice > #menuChoices then menuChoice = 1 end
+	if menuChoice >= 2 and menuChoice <= 5 then lastBuildChoice = menuChoice end
+	Update(true)
+	ColorTabs()
+	return false	--true cockblocks the keypress so nothing else registers it
 end
 
 function widget:Shutdown()
