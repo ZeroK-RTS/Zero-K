@@ -20,8 +20,9 @@ _ Informs player of unit completion/death events, with sound events depending of
 _ Maybe fusion this with minimap_events.lua and unit_marker.lua as they have a pretty similar task, maybe even unit_sounds.
 
 ---- CHANGELOG -----
+-- KingRaptor,		v1.0.2	(4nov2009):	Colored messages; misc. fixes
 -- versus666,		v1.0.1	(31oct2010)	:	Simplified/sped up things, completed verbose things.
--- KingRaptor,		v1.0	(26juil2009):	Creation.
+-- KingRaptor,		v1.0	(26jul2009):	Creation.
 --]]
 
 local soundTimeout = 0
@@ -70,6 +71,7 @@ local useCompleteMinCost = true
 local logDeathInView = true
 local logCompleteInView = true
 
+local widgetString = "\255\255\64\32<Unit News> \008"	--ARGB
 
 --function isSpec()
 --	if (spGetSpectatingState or spIsReplay) then
@@ -110,13 +112,14 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (spGetTeam(unitID) ~= teamID) or (ud.metalCost < (mIncome * mFactor) and useDeathMinCost) then return end
 	--can u c me?
 	if (spInView(unitID)) and (logDeathInView == false) then return end
-	if (ud.canFly) then Echo("<Unit News>: " .. ud.humanName .. " shot down.")
-	elseif (ud.isFactory) then Echo("<Unit News>: " .. ud.humanName .. " factory destroyed.")
-	elseif (ud.isCommander) then Echo("<Unit News>: " .. ud.humanName .. " is iced.")
-	elseif (ud.isBuilding) then Echo("<Unit News>: " .. ud.humanName .. " building annihilated.")
-	elseif (ud.TEDClass == "SHIP") or (ud.TEDClass == "WATER") then Echo("<Unit News>: ud.humanName vessel sunk.")
-	elseif (ud.isBuilder) then Echo("<Unit News>: " .. ud.humanName .. " builder destroyed.")
-	else Echo("<Unit News>: " .. ud.humanName .. "lost.")
+	
+	if (ud.canFly) then Echo(widgetString .. ud.humanName .. " shot down")
+	elseif (ud.isFactory) then Echo(widgetString .. ud.humanName .. ": factory destroyed")
+	elseif (ud.isCommander) then Echo(widgetString .. ud.humanName .. ": commander lost")
+	elseif (ud.isBuilding) then Echo(widgetString .. ud.humanName .. ": building destroyed")
+	elseif (ud.TEDClass == "SHIP") or (ud.TEDClass == "WATER") then Echo(widgetString .. ud.humanName .. "vessel sunk")
+	elseif (ud.isBuilder) then Echo(widgetString .. ud.humanName .. " constructor lost")
+	else Echo(widgetString .. ud.humanName .. ": unit lost")
 	end
 end
 
@@ -128,13 +131,13 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	-- cheap units aren't newsworthy unless they're builders
 	if (not ud.isBuilder and (UnitDefs[unitDefID].metalCost < (mIncome * mFactor) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
 	if (not ud.canMove) or (ud.isFactory) then
-		Echo( "<Unit News>: " .. ud.humanName .. " construction completed")
+		Echo(widgetString .. ud.humanName .. ": construction completed")
 		if useSounds and soundTimeout < frame then
 			spPlaySoundFile(sounds.StructureComplete.file)
 			soundTimeout = frame + sounds.StructureComplete.timeout
 		end
 	else
-		Echo("<Unit News>: " .. ud.humanName .. ": unit operational")
+		Echo(widgetString .. ud.humanName .. ": unit operational")
 		if useSounds and soundTimeout < frame then
 			spPlaySoundFile(sounds.UnitComplete.file)
 			soundTimeout = frame + sounds.UnitComplete.timeout

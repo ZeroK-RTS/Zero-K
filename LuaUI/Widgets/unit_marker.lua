@@ -62,6 +62,7 @@ unitList["CA"]["amgeo"] =		{ markerText = "MOHO GEO" }
 unitList["CA"]["armgmm"] =		{ markerText = "Prude" }
 unitList["CA"]["armgeo"] =		{ markerText = "Geo" }
 unitList["CA"]["corgeo"] =		{ markerText = "Geo" }
+
 unitList["CA1F"] = {} --initialize table, should contain ZK buildings currently used.
 unitList["CA1F"]["armamd"] =		{ markerText = "Anti Nuke" }
 unitList["CA1F"]["corsilo"] =		{ markerText = "Nuke" }
@@ -74,7 +75,12 @@ unitList["CA1F"]["starlight"] =		{ markerText = "Starlight" }
 unitList["CA1F"]["cafus"] =			{ markerText = "Singularity Reactor" }
 unitList["CA1F"]["armfus"] =		{ markerText = "Fusion Reactor" }
 unitList["CA1F"]["amgeo"] =			{ markerText = "Moho Geo" }
-unitList["CA1F"]["geo"] =		{ markerText = "Geo" }
+unitList["CA1F"]["geo"] =			{ markerText = "Geo" }
+--unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
+unitList["CA1F"]["chickenspire"] =		{ markerText = "Spire" }
+unitList["CA1F"]["chicken_dragon"] =	{ markerText = "White Dragon" }
+unitList["CA1F"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen" }
+
 --END OF MARKER LIST---------------------------------------
 local markerTimePerId = 0.2 --400ms
 
@@ -113,26 +119,13 @@ function widget:Initialize()
 		Echo("<Unit Marker>: Spectator mode or replay. Widget removed.")
 		widgetHandler:RemoveWidget()
 	end
-
-myPlayerID = spGetLocalPlayerID() --spGetMyPlayerID() --spGetLocalTeamID()
-curModID = upper(Game.modShortName or "")
-printDebug("<Unit Marker DEBUG>: my Player ID: " .. myPlayerID .. "MOD ID: " .. curModID)
+	myPlayerID = spGetLocalPlayerID() --spGetMyPlayerID() --spGetLocalTeamID()
+	curModID = upper(Game.modShortName or "")
+	printDebug("<Unit Marker DEBUG>: my Player ID: " .. myPlayerID .. "MOD ID: " .. curModID)
 	if ( unitList[curModID] == nil ) then
 		Echo("<Unit Marker>: unsupported Mod, shutting down...")
 		widgetHandler:RemoveWidget()
 		return
-	end
-
---	if (unitList[curModID] == "CA1F" and check for GameRule 'difficulty' showing presence of chicken game (weird and a bit unreliable in the futur but easy) as there seems to be no way to extract info from luaAI.lua data. If someone know a better method please do.
-	if (curModID =="CA1F" and isChickenGame()) then --mod CA1F->ZK
-		--add chicken game POI markers
-		unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
-		unitList["CA1F"]["roostfact"] =			{ markerText = "Roostfact" }
-		unitList["CA1F"]["chickend"] =			{ markerText = "Tube" } --regular orange tube
-		unitList["CA1F"]["chickenspire"] =		{ markerText = "Spire" } -- green tube-of-death
-		unitList["CA1F"]["nest"] =				{ markerText = "Nest" }
-		unitList["CA1F"]["chicken_dragon"] =	{ markerText = "White Dragon" }
-		unitList["CA1F"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen" }
 	end
 end
 
@@ -142,6 +135,7 @@ function IsSpec()
 	end
 end
 
+--[[	--really pointless, markers can just be added by default
 function isChickenGame()
 	if (Spring.GetGameRulesParam("difficulty")) then
 		printDebug("<Unit Marker DEBUG>: chicken game detected, new PoI markers added.")
@@ -149,6 +143,7 @@ function isChickenGame()
 		else printDebug("<Unit Marker DEBUG>: normal game detected, normal PoI markers used.")
 	end
 end
+]]--
 
 function widget:Update()
 	local timef = spGetGameSeconds()
@@ -224,9 +219,9 @@ function widget:UnitDestroyed(unitID, unitDefID)-- to do: use this to remove mar
  local ud = UnitDefs[unitDefID]
 	if (ud.isCommander==true) then
 		local x, y, z = spGetUnitPosition(unitID)
-		local myName	= Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+		local myName	= ''	--Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 		spMarkerAddPoint( x, y, z, myName .. "\nCommander corpse")
-		Spring.SendCommands({'say a:I lost my commander !'})
+		--Spring.SendCommands({'say a:I lost my commander !'})
 	end
 end
 

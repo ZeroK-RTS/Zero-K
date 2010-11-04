@@ -6,9 +6,6 @@ local rsack, rblade, lsack, lblade, fire = piece("rsack","rblade","lsack","lblad
 
 smokePiece = {}
 
-local turretIndex = {
-}
-
 --constants
 local digSpeed = 1
 local digRotate = 0.6
@@ -18,7 +15,6 @@ local isMoving = false
 
 --signals
 local SIG_Aim = 1
-local SIG_Aim2 = 2
 local SIG_Move = 16
 
 --cob values
@@ -85,7 +81,7 @@ end
 
 function script.StopMoving()
 	isMoving = false
-	StartThread(StopDig)
+	--StartThread(StopDig)
 end
 
 function script.Create()
@@ -107,6 +103,6 @@ function script.Killed(recentDamage, maxHealth)
 	EmitSfx(mbody, 1025)
 end
 
-function script.HitByWeaponId()
-	EmitSfx(body, 1024)
+function script.HitByWeapon(x, z, weaponID, damage)
+	EmitSfx(mbody, 1024)
 end

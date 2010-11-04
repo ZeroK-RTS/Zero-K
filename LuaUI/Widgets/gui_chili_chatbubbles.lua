@@ -48,12 +48,12 @@ options = {
 		path = 'Settings/Interface/Chat',
 	},
 	window_margin = {
-		name = 'Margin (1 - 10)',
-		desc = '',
+		name = 'Margin (0 - 10)',
+		desc = 'Margin between bubbles',
 		type = 'number',
-		min = 1,
+		min = 0,
 		max = 10,
-		value = 2,
+		value = 0,
 	},
 	window_width  = {
 		name = 'Width (200 - 600)',

@@ -1,6 +1,5 @@
 -- $Id$
 
-
 if (gadgetHandler:IsSyncedCode()) then
 
 function gadget:GetInfo()
@@ -22,12 +21,8 @@ local function RefundUnit(unitID, unitDefID, teamID)
 	--Spring.AddTeamResource(teamID, "e", refund)
 end
 
-local function IsFactory(udef)
-	return udef.TEDClass == "PLANT" or udef.isFactory
-end
-
 function gadget:AllowUnitBuildStep(_, _, unitID, unitDefID, step)
-	if (step < 0) and IsFactory(UnitDefs[unitDefID]) then
+	if (step < 0) and UnitDefs[unitDefID].isFactory then
 		local buildID = Spring.GetUnitIsBuilding(unitID)
 		if (buildID) then
 			local teamID = Spring.GetUnitTeam(buildID)

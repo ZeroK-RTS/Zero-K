@@ -544,7 +544,7 @@ end
 
 local function SpawnTurret(burrowID, turret)
   local temp = defenderChance
-  defenderChance = defenderChance + waveBonusDelta
+  defenderChance = defenderChance + waveBonus
   
   if turret then
 	if defenders[turret].quasiAttacker then

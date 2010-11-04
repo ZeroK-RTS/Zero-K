@@ -125,27 +125,27 @@ modConfig["BA"]["color"]["ally"] = modConfig["BA"]["color"]["enemy"]
 --to support other mods
 --table initialized and unitList is needed!
 modConfig["XTA"] = {}
-modConfig["XTA"]["unitList"] =
-{
-		--ARM
-		arm_light_laser_tower = { weapons = { 1 } },
-		arm_sentinel = { weapons = { 1 } },
-		arm_ambusher = { weapons = { 1 } },
-		arm_defender = { weapons = { 2 } },
-		arm_floating_light_laser_tower = { weapons = { 1 } },
-		arm_stingray = { weapons = { 1 } },
-		arm_sentry = { weapons = { 2 } },
-		arm_torpedo_launcher = { weapons = { 1 } },
-		arm_repulsor = { weapons = { 3 } },
-		arm_advanced_torpedo_launcher = { weapons = { 1 } }, 								armanni = { weapons = { 1 } },
-		arm_naval_flakker = { weapons = { 2 } },
-		arm_protector = { weapons = { 3 } },
-		arm_flakker = { weapons = { 2 } },
-		arm_guardian = { weapons = { 1 } },
-		arm_annihilator = { weapons = { 1 } },
-		arm_big_bertha = { weapons = { 1 } },
-		arm_vulcan = { weapons = { 1 } },
-		armarch = { weapons = { 2 } },
+modConfig["XTA"]["unitList"] = {
+	--ARM
+	arm_light_laser_tower = { weapons = { 1 } },
+	arm_sentinel = { weapons = { 1 } },
+	arm_ambusher = { weapons = { 1 } },
+	arm_defender = { weapons = { 2 } },
+	arm_floating_light_laser_tower = { weapons = { 1 } },
+	arm_stingray = { weapons = { 1 } },
+	arm_sentry = { weapons = { 2 } },
+	arm_torpedo_launcher = { weapons = { 1 } },
+	arm_repulsor = { weapons = { 3 } },
+	arm_advanced_torpedo_launcher = { weapons = { 1 } },
+	armanni = { weapons = { 1 } },
+	arm_naval_flakker = { weapons = { 2 } },
+	arm_protector = { weapons = { 3 } },
+	arm_flakker = { weapons = { 2 } },
+	arm_guardian = { weapons = { 1 } },
+	arm_annihilator = { weapons = { 1 } },
+	arm_big_bertha = { weapons = { 1 } },
+	arm_vulcan = { weapons = { 1 } },
+	armarch = { weapons = { 2 } },
 
 	--CORE
 	core_light_laser_tower = { weapons = { 1 } },
@@ -276,8 +276,7 @@ modConfig["CA1F"]["unitList"] =
 	armartic = { weapons = { 4 } },		--faraday
 	armdeva = { weapons = { 4 } },		--stardust
 	armpb = { weapons = { 4 } },		--pitbull
-	mahlazer = { weapons = { 4 } },		--mah
-	armemp = { weapons = { 1 } },		--arm emp
+	mahlazer = { weapons = { 4 } },		--starlight
 	armanni = { weapons = { 1 } },		--anihilator
 	armbrtha = { weapons = { 1 } },		--bertha
 	armarch = { weapons = { 2 } },		--packo
@@ -293,7 +292,6 @@ modConfig["CA1F"]["unitList"] =
 	corrazor = { weapons = { 2 } },		--razorkiss
 	corflak = { weapons = { 2 } },		--flak
 	screamer = { weapons = { 2 } },		--screamer
-	cortron = { weapons = { 1 } },		--catalyst
 	corbhmth = { weapons = { 1 } },		--behemoth
 	cortl = { weapons = { 1 } },		--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher

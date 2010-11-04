@@ -4,6 +4,7 @@
 -- TODO: display which unit is currently selected
 -- TODO: display build progress
 -- TODO: proper tooltips for queue buttons
+-- TODO: make tab scrolling with keyboard detect actions prevmenu and nextmenu instead of KeyPress
 
 function widget:GetInfo()
   return {
@@ -1079,7 +1080,7 @@ function widget:KeyPress(key)
 	local delta
 	if key == KEYSYMS.COMMA then delta = -1
 	elseif key == KEYSYMS.PERIOD then delta = 1 end
-	if not delta then return false end
+	if not delta then return end
 	
 	menuChoice = menuChoice + delta
 	if menuChoice <= 0 then menuChoice = #menuChoices
@@ -1087,7 +1088,7 @@ function widget:KeyPress(key)
 	if menuChoice >= 2 and menuChoice <= 5 then lastBuildChoice = menuChoice end
 	Update(true)
 	ColorTabs()
-	return false	--true cockblocks the keypress so nothing else registers it
+	return	--returning true "eats" the keypress so nothing else registers it
 end
 
 function widget:Shutdown()
