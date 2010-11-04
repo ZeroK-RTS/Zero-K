@@ -167,7 +167,7 @@ unitDef = {
 
       duration                = 0.11,
       edgeEffectiveness       = 0.99,
-      explosionGenerator      = [[custom:flash1blue]],
+      explosionGenerator      = [[custom:flash2purple]],
       fireStarter             = 70,
       impactOnly              = true,
       impulseBoost            = 0,

@@ -40,8 +40,8 @@ local strFormat 				= string.format
 
 local echo = Spring.Echo
 
-
 local iconFormat = ''
+local icontypes = include("Configs/icontypes.lua")
 local color = {}
 
 --------------------------------------------------------------------------------
@@ -937,7 +937,7 @@ local function DetermineTooltip()
 					{ icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0'), },
 				},
 				main = {
-					{ icon = 'icons/'.. ((tt_ud and tt_ud.iconType) or "") ..iconFormat, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
+					{ icon = icontypes[(tt_ud and tt_ud.iconType or "default")].bitmap, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
 					{ text = unittooltip, wrap=true },
 					((type == 'unit') and { directcontrol = 'healthbar', } or {}),
 					{ directcontrol = GetResourceStack(type, tt_unitID, tt_ud or tt_fd, tooltip, ttFontSize ) },

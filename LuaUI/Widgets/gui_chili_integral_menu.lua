@@ -121,18 +121,13 @@ local n_states = {}
 --shortcuts
 local menuChoices = {
 	[1] = { array = n_common, name = "Order" },
-	[2] = { array = n_factories, name = "Factory" },
-	[3] = { array = n_econ, name = "Econ" },
-	[4] = { array = n_defense, name = "Defense" },
-	[5] = { array = n_special, name = "Special" },
+	[2] = { array = n_factories, name = "Factory", config = factory_commands },
+	[3] = { array = n_econ, name = "Econ", config = econ_commands },
+	[4] = { array = n_defense, name = "Defense", config = defense_commands },
+	[5] = { array = n_special, name = "Special", config = special_commands },
 	[6] = { array = n_units, name = "Units" },
 }
-local configArrayList = {	--should merge with the above array but ehh...
-	[2] = factory_commands,
-	[3] = econ_commands,
-	[4] = defense_commands,
-	[5] = special_commands,
-}
+
 local menuChoice = 1
 local lastBuildChoice = 2
 
@@ -594,7 +589,9 @@ local function ManageStateIcons()
 	end
 end
 
-local function ManageCommandIcons(sourceArray, useRowSort, configArray)
+local function ManageCommandIcons(useRowSort)
+	local sourceArray = menuChoices[menuChoice].array
+	local configArray = menuChoices[menuChoice].config
 	--update factory data
 	if menuChoice == 6 and selectedFac then
 		UpdateFactoryBuildQueue()
@@ -689,7 +686,7 @@ local function Update(buttonpush)
 	table.sort(n_special, function(a,b) return special_commands[a.id].order < special_commands[b.id].order end)
 
 	ManageStateIcons()
-	ManageCommandIcons(menuChoices[menuChoice].array, useRowSort, configArrayList[menuChoice])
+	ManageCommandIcons(useRowSort)
 end 
 
 local function MakeMenuTab(i, alpha)
@@ -1076,7 +1073,7 @@ function widget:SelectionChanged(newSelection)
 	SmartTabSelect()
 end
 
-function widget:KeyPress(key)
+local function ScrollTabs(key)
 	local delta
 	if key == KEYSYMS.COMMA then delta = -1
 	elseif key == KEYSYMS.PERIOD then delta = 1 end
@@ -1089,6 +1086,22 @@ function widget:KeyPress(key)
 	Update(true)
 	ColorTabs()
 	return	--returning true "eats" the keypress so nothing else registers it
+end
+
+--[[
+local function AddAction(cmd, func, data, types)
+	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
+end
+local function RemoveAction(cmd, types)
+	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
+end
+
+AddAction(nextMenu, ScrollTabs, {KEYSYMS.PERIOD}, "t")
+AddAction(prevMenu, ScrollTabs, {KEYSYMS.COMMA}, "t")
+--]]
+
+function widget:KeyPress(key)
+	return ScrollTabs(key)
 end
 
 function widget:Shutdown()
