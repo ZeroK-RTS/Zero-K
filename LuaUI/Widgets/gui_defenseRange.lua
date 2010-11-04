@@ -1,7 +1,7 @@
 include("colors.h.lua")
 include("keysym.h.lua")
 
-local versionNumber = "6.2.2"
+local versionNumber = "6.2.3"
 
 function widget:GetInfo()
 	return {
@@ -16,7 +16,11 @@ function widget:GetInfo()
 end
 
 --[[
+-- to do : include chicken buildings.
+
 ---- CHANGELOG -----
+-- versus666,			v6.2.3	(04nov2010)	:	Added hacksaw to unit list + defRangeNoButtons var & checks due to licho's request, need to add var to option menu.
+												made defRangeNoButtons = true & all ranges visible by default until there is a decent (chili?)gui to enable/disable ranges or buttons. Change at will but use the damn changelog to show who, when, what and how. Thanks.
 -- versus666, 			v6.2.2	(28oct2010)	:	Cleaned some bits of code.
 --		?,				v6.2.1	(17oct2010)	:	Added compatibilty to CA1F ->will need update when CA1F->ZK.
 --		?,				v6.2	(17oct2010)	:	Speed-up by cpu culling.
@@ -27,7 +31,8 @@ end
  --]]
 
 -- CONFIGURATION
-local debug = false --generates debug message
+local debug = false --generates debug messages when set to true.
+local defRangeNoButtons = true -- true = do not show 2-3 buttons range selectors.
 
 local modConfig = {}
 -- BA
@@ -89,7 +94,6 @@ modConfig["BA"]["unitList"] =
 	corint = { weapons = { 1 } },
 	corbuzz = { weapons = { 1 } }
 }
-
 --uncomment this if you want dps-depending ring-colors
 --colors will be interpolated by dps scores between min and max values. values outside range will be set to nearest value in range -> min or max
 modConfig["BA"]["armorTags"] = {}
@@ -119,7 +123,6 @@ modConfig["BA"]["color"]["ally"] = modConfig["BA"]["color"]["enemy"]
 --]]
 --end of custom colors
 --end of BA
-
 
 -- XTA
 --to support other mods
@@ -251,7 +254,6 @@ modConfig["CA"]["unitList"] =
 
 	corfmd = { weapons = { 3 } }		--antinuke
 }
-
 --uncomment this if you want dps-depending ring-colors
 --colors will be interpolated by dps scores between min and max values. values outside range will be set to nearest value in range -> min or max
 modConfig["CA"]["armorTags"] = {}
@@ -277,7 +279,8 @@ modConfig["CA1F"]["unitList"] =
 	armdeva = { weapons = { 4 } },		--stardust
 	armpb = { weapons = { 4 } },		--pitbull
 	mahlazer = { weapons = { 4 } },		--starlight
-	armanni = { weapons = { 1 } },		--anihilator
+	armartic = { weapons = { 1 } },		--faraday
+	armanni = { weapons = { 1 } },		--annihilator
 	armbrtha = { weapons = { 1 } },		--bertha
 	armarch = { weapons = { 2 } },		--packo
 	armcir = { weapons = { 2 } },		--chainsaw
@@ -285,13 +288,14 @@ modConfig["CA1F"]["unitList"] =
 	corrl = { weapons = { 4 } },		--pulveriser
 	corllt = { weapons = { 4 } },		--LLT
 	corhlt = { weapons = { 4 } },		--HLT
-	corpre = { weapons = { 4 } },		--scorcher
-	corvipe = { weapons = { 4 } },		--viper
+	corpre = { weapons = { 4 } },		--scorcher -> unused now but I still hope for a return.
+	corvipe = { weapons = { 4 } },		--viper -> unused now but I still hope for a return.
 	cordoom = { weapons = { 1, 4 } },	--doomsday
 	cordl = { weapons = { 1 } },		--jellyfish
 	corrazor = { weapons = { 2 } },		--razorkiss
 	corflak = { weapons = { 2 } },		--flak
 	screamer = { weapons = { 2 } },		--screamer
+	hacksaw = { weapons = { 2 } },		--hacksaw
 	corbhmth = { weapons = { 1 } },		--behemoth
 	cortl = { weapons = { 1 } },		--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher
@@ -347,7 +351,7 @@ buttonConfig["borderColor"] = { 0, 0, 0, 1.0 }
 buttonConfig["currentHeight"] = 0 --do not change
 buttonConfig["currentWidth"] = 0 --do not change
 buttonConfig["nextOrigin"] = {{0,0}, 0, 0, 0, 0} --do not change
-buttonConfig["enabled"] = { ally = { ground = false, air = false, nuke = false }, enemy = { ground = true, air = true, nuke = true } }
+buttonConfig["enabled"] = { ally = { ground = true, air = true, nuke = true }, enemy = { ground = true, air = true, nuke = true } }
 
 buttonConfig["highlightColor"] = { 1.0, 1.0, 0.0, 1.0 }
 buttonConfig["baseColorEnemy"] = { 0.6, 0.0, 0.0, 0.6 }
@@ -693,7 +697,7 @@ end
 
 function widget:DrawScreen()
 
-	if spIsGUIHidden() then
+	if spIsGUIHidden() or defRangeNoButtons then
 		return
 	end
 
@@ -798,7 +802,7 @@ end
 
 function widget:MousePress(x, y, button)
 	local buttondata = GetButton(x, y)
-	if (not buttondata) then
+	if (not buttondata) or defRangeNoButtons then
 		return false
 	end
 	return true
@@ -814,7 +818,7 @@ end
 
 function widget:MouseRelease(x, y, button)
 	local buttondata = GetButton(x, y)
-		if (not buttondata) then
+		if (not buttondata) or defRangeNoButtons then
 			return false
 		end
 		if (button > 1) then
@@ -1112,13 +1116,14 @@ end
 
 -- needed for GetTooltip
 function widget:IsAbove(x, y)
-	if (not GetButton(x, y)) then
+	if not GetButton(x, y) then
 		return false
 	end
 	return true
 end
 
 function widget:GetTooltip(x, y)
+	if defRangeNoButtons then return end
 	local buttondata = GetButton(x, y)
 	if (not buttondata) then
 		return tooltips[-1]

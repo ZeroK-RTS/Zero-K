@@ -1,4 +1,4 @@
-local versionNum = '2.24'
+local versionNum = '2.25'
 
 function widget:GetInfo()
   return {
@@ -15,6 +15,7 @@ end
 include("keysym.h.lua")
 
 ---- CHANGELOG -----
+-- versus666, 		v2.25	(04nov2010)	:	Added switch to show or not group number, by licho's request.
 -- versus666, 		v2.24	(27oct2010)	:	Added switch to auto add units when built from factories.
 --											Add group label numbers to units in group.
 --											Sped up some routines & cleaned code.
@@ -38,6 +39,7 @@ local loadGroups = true
 local verboseMode = true
 local addAll = false
 local immediateMode = false
+local groupNumbers = true
 local createdFrame = {}
 local textColor = {0.7, 1.0, 0.7, 1.0} -- r g b alpha
 local textSize = 13.0
@@ -53,6 +55,7 @@ local helpText = {
 	'/luaui autogroup verbose -- Toggle whether a notification is made when adding/removing autogroups.',
 	'/luaui autogroup addall -- Toggle whether existing units are added to group# when setting autogroup#.',
 	'/luaui autogroup immediate -- Toggle whether built units are directly added to group# when from exiting factory or when rally point reached.',
+	'/luaui autogroup groupnumbers  -- Toggle whether group units have their group number listed next to them.', 
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 }
 -- speedups
@@ -63,7 +66,7 @@ local Echo 				= Spring.Echo
 local GetAllUnits		= Spring.GetAllUnits
 local GetUnitHealth		= Spring.GetUnitHealth
 local GetMouseState		= Spring.GetMouseState
-local GetUnitTeam		= Spring.GetUnitTeam
+--local GetUnitTeam		= Spring.GetUnitTeam --NOT USED FOR NOW
 local SelectUnitArray	= Spring.SelectUnitArray
 local TraceScreenRay	= Spring.TraceScreenRay
 local GetUnitPosition	= Spring.GetUnitPosition
@@ -84,20 +87,22 @@ end
 
 function widget:DrawWorld()
 	local existingGroups = GetGroupList()
-	for inGroup, _ in pairs(existingGroups) do
-	units = GetGroupUnits(inGroup)
-		for _, unit in ipairs(units) do
-			if Spring.IsUnitInView(unit) then
-				local ux, uy, uz = Spring.GetUnitViewPosition(unit)
-				gl.PushMatrix()
-				gl.Translate(ux, uy, uz)
-				gl.Billboard()
-				gl.Color(textColor)--unused anyway when gl.Text have option 's' (and b & w)
-				gl.Text("" .. inGroup, 30.0, -10.0, textSize, "cns")
-				gl.PopMatrix()
+	if groupNumbers then
+		for inGroup, _ in pairs(existingGroups) do
+			units = GetGroupUnits(inGroup)
+			for _, unit in ipairs(units) do
+				if Spring.IsUnitInView(unit) then
+					local ux, uy, uz = Spring.GetUnitViewPosition(unit)
+					gl.PushMatrix()
+					gl.Translate(ux, uy, uz)
+					gl.Billboard()
+					gl.Color(textColor)--unused anyway when gl.Text have option 's' (and b & w)
+					gl.Text("" .. inGroup, 30.0, -10.0, textSize, "cns")
+					gl.PopMatrix()
+				end
 			end
 		end
-	end
+	else end
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
@@ -299,7 +304,7 @@ function widget:TextCommand(command)
 		return true
 	elseif command == "autogroup cleargroups" then
 		unit2group = {}
-		Echo('Autogroup: All autogroups cleared.')
+		Echo('Autogroup: all autogroups cleared.')
 		return true
 	elseif command == "autogroup verbose" then
 		verboseMode = not verboseMode 
@@ -307,12 +312,15 @@ function widget:TextCommand(command)
 		return true
 	elseif command == "autogroup addall" then
 		addAll = not addAll
-		Echo('Autogroup: Existing units will '.. (addAll and '' or 'NOT') ..' be added to group# when setting autogroup#.')
+		Echo('Autogroup: existing units will '.. (addAll and '' or 'NOT') ..' be added to group# when setting autogroup#.')
 		return true
 	elseif command == "autogroup immediate" then
 		immediateMode = not immediateMode
-		Echo('Autogroup: Immediate mode registering units from factory is '.. (immediateMode and '' or 'NOT') ..' activated.') 
-		Echo(immediateMode)
+		Echo('Autogroup: immediate mode registering units from factory is '.. (immediateMode and '' or 'NOT') ..' activated.') 
+		return true
+	elseif command == "autogroup groupnumbers" then
+		groupNumbers = not groupNumbers
+		Echo('Autogroup: group numbers next to group unit are '.. (groupNumbers and '' or 'NOT') ..' shown.') 
 		return true
 	elseif command == "autogroup help" then
 		for i, text in ipairs(helpText) do

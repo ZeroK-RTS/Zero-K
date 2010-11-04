@@ -1,4 +1,4 @@
-local versionNumber = "1.3.1"
+local versionNumber = "1.3.2"
 
 function widget:GetInfo()
 	return {
@@ -18,14 +18,17 @@ Features:
 -with one clic you select the next ready nuke silo for easy nuclear winter.
 
 ---- CHANGELOG -----
--- versus666, 			v1.3.1 (30oct2010)	: added compatibility to CA1F -> need update when CA1F-> zero-K will be enforced.
+-- versus666,			v1.3.2	(04nov2010)	: removed other mods support to avoid rants about widget being a BA widget, added check to disable ghost tooltips when no nuke was built.
+-- versus666, 			v1.3.1	(30oct2010)	: added compatibility to CA1F -> need update when CA1F-> zero-K will be enforced.
 -- very_bad_soldier	V1.0					: initial release.
+
 --]]
 
 -- CONFIGURATION
 local debug = false		--generates debug message
 local updateInt = 1 --seconds for the ::update loop
 local baseFontSize = 14
+local hideTooltips = true
 
 
 local intConfig = {}
@@ -57,21 +60,8 @@ config["buttonYPer"] = 0.765
 
 --Game Config ------------------------------------
 local unitList = {}
-unitList["BA"] = {} --initialize table
-unitList["BA"]["armsilo"] = {}
-unitList["BA"]["corsilo"] = {}
-
-unitList["CA"] = {} --initialize table
-unitList["CA"]["armsilo"] = {}
-unitList["CA"]["corsilo"] = {}
-
 unitList["CA1F"] = {} --initialize table
 unitList["CA1F"]["corsilo"] = {}
-
-unitList["XTA"] = {} --initialize table
-unitList["XTA"]["arm_retaliator"] = {}
-unitList["XTA"]["core_silencer"] = {}
-
 --End
 
 local upper                 = string.upper
@@ -274,6 +264,7 @@ function widget:IsAbove(x, y)
 end
 
 function widget:GetTooltip(x, y)
+	if hideTooltips then return end
 	local text = ""
 	if ( readyNukeCount > 0 ) then
 		text = "Left-Click: Select next nuke\nDouble-Click: Aim next nuke"
@@ -320,6 +311,7 @@ end
 
 function widget:UnitDestroyed( unitID, unitDefID, unitTeam )
 	deleteNuke( unitID )
+	hideTooltips = true
 end
 
 
@@ -344,6 +336,7 @@ function searchAndAddNukes()
 		local unitDefID = spGetUnitDefID(unitID)
 		if ( unitDefID ~= nil ) then
 			addPossibleNuke( unitID, unitDefID )
+			else hideTooltips  = true
 		end
 	end
 end
@@ -362,6 +355,7 @@ function addPossibleNuke( unitID, unitDefID )
 	if ( curUnitList[udef.name] ~= nil ) then
 		printDebug("Nuke added!")
 		nukeList[unitID] = udef.name
+		hideTooltips = false
 	end
 end
 

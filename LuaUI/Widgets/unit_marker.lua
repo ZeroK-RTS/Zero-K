@@ -1,4 +1,4 @@
-local versionNumber = "1.3.4"
+local versionNumber = "1.3.6"
 
 function widget:GetInfo()
 	return {
@@ -17,11 +17,16 @@ Features:
 -multiple mod support, deactivate if used on unknown mod.
 -no multiple markers if multiple players use it.
 -check for ZK chicken game to add more PoI.
-- Is disabled when player go spec/use replay. NEED TESTING TO KNOW IF WIDGET STOPS (and need to be reactivated) WHEN RE-REJOINING GAME AFTER CRASH !!
+-Is disabled when player go spec/use replay. NEED TESTING TO KNOW IF WIDGET STOPS (and need to be reactivated) WHEN RE-REJOINING GAME AFTER CRASH !!
 ---- TODO ----
 Probably erase the BA & XTA config as this is a ZK only widget. Left for now as it may be useful to a LUA (beginner or not) even just as an exemple.
+erase markers when units die.
+finish check when com morph
+
 ---- CHANGELOG -----
--- versus666, 			v1.3.4	(01nov2010)	: added marker where own commander die + message to allies.
+-- versus666,			v1.3.6	(04oct2010)	: commented the commander death warning part until I find a reliable ways to check for commanders morphs. Re added ROOST in PoI as it's an important building in chicken games and it have AA.
+-- kingraptor,			v1.3.5	(04oct2010)	: moved chickens PoI to general list and commented isChickenGame().
+-- versus666, 			v1.3.4	(01nov2010)	: added marker where own commander die + message to allies, removed other mods refs. Old CA refs left for now as it may be useful to a LUA (beginner or not) even just as an exemple.
 -- versus666, 			v1.3.3	(29oct2010)	: added IsSpec & isChickenGame for more PoI for chicken games and cleaned code.
 -- versus666,			v1.3.2	(28oct2010)	: added chickens buildings.
 -- versus666,			v1.2.1	(08seot2010): added compatibility to CA1F.
@@ -76,7 +81,7 @@ unitList["CA1F"]["cafus"] =			{ markerText = "Singularity Reactor" }
 unitList["CA1F"]["armfus"] =		{ markerText = "Fusion Reactor" }
 unitList["CA1F"]["amgeo"] =			{ markerText = "Moho Geo" }
 unitList["CA1F"]["geo"] =			{ markerText = "Geo" }
---unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
+unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
 unitList["CA1F"]["chickenspire"] =		{ markerText = "Spire" }
 unitList["CA1F"]["chicken_dragon"] =	{ markerText = "White Dragon" }
 unitList["CA1F"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen" }
@@ -86,13 +91,17 @@ local markerTimePerId = 0.2 --400ms
 
 local myPlayerID
 local curModID
+local myName
+
 local updateInt = 1 --seconds for the ::update loop
 local lastTimeUpdate = 0
 
 local markersToSet = {} --this is a todo list filled with marker which have to be set, widget waits before setting them to see if another play tags them before to avoid multitagging
 local knownUnits = {} --all units that have been marked already, so they wont get marked again
 
---local spGetLocalTeamID	 = Spring.GetLocalTeamID
+--local myTeamID	 = Spring.GetLocalTeamID
+local GetMyTeamID			= Spring.GetMyTeamID
+local GetUnitTeam			= Spring.GetUnitTeam
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitPosition		= Spring.GetUnitPosition
 local spSendLuaUIMsg		= Spring.SendLuaUIMsg
@@ -114,20 +123,35 @@ local max					= math.max
 local min					= math.min
 
 function widget:Initialize()
-	--Echo("<Unit Marker>: init")
+	printDebug("<Unit Marker>: init")
 	if isSpec then
 		Echo("<Unit Marker>: Spectator mode or replay. Widget removed.")
 		widgetHandler:RemoveWidget()
 	end
 	myPlayerID = spGetLocalPlayerID() --spGetMyPlayerID() --spGetLocalTeamID()
+	myName = Spring.GetPlayerInfo(myPlayerID)
 	curModID = upper(Game.modShortName or "")
-	printDebug("<Unit Marker DEBUG>: my Player ID: " .. myPlayerID .. "MOD ID: " .. curModID)
+	printDebug("<Unit Marker DEBUG>: my Player ID: " .. myPlayerID .. " myname " .. myName .. " MOD ID: " .. curModID)
 	if ( unitList[curModID] == nil ) then
 		Echo("<Unit Marker>: unsupported Mod, shutting down...")
 		widgetHandler:RemoveWidget()
 		return
 	end
+
+[[--	if (unitList[curModID] == "CA1F" and check for GameRule 'difficulty' showing presence of chicken game (weird and a bit unreliable in the futur but easy) as there seems to be no way to extract info from luaAI.lua data. If someone know a better method please do.
+	if (curModID =="CA1F" and isChickenGame()) then --mod CA1F->ZK
+		--add chicken game POI markers
+		unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
+		unitList["CA1F"]["roostfact"] =			{ markerText = "Roostfact" }
+		unitList["CA1F"]["chickend"] =			{ markerText = "Tube" } --regular orange tube
+		unitList["CA1F"]["chickenspire"] =		{ markerText = "Spire" } -- green tube-of-death
+		unitList["CA1F"]["nest"] =				{ markerText = "Nest" }
+		unitList["CA1F"]["chicken_dragon"] =	{ markerText = "White Dragon" }
+		unitList["CA1F"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen" }
+	end
+	]]--
 end
+
 
 function IsSpec()
 		if spGetSpectatingState or spIsReplay then
@@ -135,14 +159,14 @@ function IsSpec()
 	end
 end
 
---[[	--really pointless, markers can just be added by default
+ --[[	--really pointless, markers can just be added by default
 function isChickenGame()
 	if (Spring.GetGameRulesParam("difficulty")) then
 		printDebug("<Unit Marker DEBUG>: chicken game detected, new PoI markers added.")
 		return true
 		else printDebug("<Unit Marker DEBUG>: normal game detected, normal PoI markers used.")
 	end
-end
+end 
 ]]--
 
 function widget:Update()
@@ -176,7 +200,6 @@ function widget:UnitEnteredLos(unitID, allyTeam)
 		end
 	end
 end
-
 function setMarkerForUnit( unitId, udef, pos )
 	local markerText = unitList[curModID][udef.name]["markerText"]
 	spSendLuaUIMsg("dfT" .. unitId, "allies")
@@ -196,34 +219,53 @@ function widget:RecvLuaMsg(msg, playerID)
 		if ( playerID < myPlayerID ) then
 			--he is first, delete mine
 			printDebug("<Unit Marker DEBUG>: player #" .. playerID .. " is first. Removing my marker #" .. unitId )
+			
 			markersToSet[unitId] = nil
 		end
-		--printDebugTable( markersToSet )
+		printDebugTable( markersToSet )
 		return true; 
 	end
 end
 
+--function markedUnits() -- to remember marked ones to erase their marker once dead.
+--(local x, y, z = Spring.GetUnitPosition(unitID))
+--for i,  iterate markedunits array
+--if destroyed id=markedunit id then
+-- -- Spring.MarkerErasePosition(x, y, z)
+--end
+
+
 function widget:DrawWorld()
 	local now = spGetGameSeconds()
-	printDebug(now)
+	--printDebug(now)
 	for k, marker in pairs( markersToSet ) do
 if ( now >= ( myPlayerID * markerTimePerId + marker["time"] ) ) then 
 			spMarkerAddPoint( marker["pos"][1], marker["pos"][2], marker["pos"][3],  marker["text"] )
+			--markedunits(unitID, marker["pos"][1], marker["pos"][2], marker["pos"][3])
+			printDebug(unitID, marker["pos"][1], marker["pos"][2], marker["pos"][3])
+			printDebug(markersToSet[k])
 			markersToSet[k] = nil
 		--else	printDebug("Key: " .. k .. " Waiting: " .. ( myPlayerID * markerTimePerId + marker["time"] ) - now .. "ms" )
 		end
 	end
 end
 
-function widget:UnitDestroyed(unitID, unitDefID)-- to do: use this to remove markers
- local ud = UnitDefs[unitDefID]
-	if (ud.isCommander==true) then
+--[[ function widget:UnitDestroyed(unitID, unitDefID) --to do: use this to remove markers + finish test for commander morph
+--	local teamID = GetUnitTeam(unitID)
+	ud = UnitDefs[unitDefID]
+	if (ud.isCommander==true) and (teamID == GetMyTeamID()) then
 		local x, y, z = spGetUnitPosition(unitID)
-		local myName	= ''	--Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+		unitChecked[] = Spring.GetUnitsInRectangle (x-1, 2, y-1, 2, teamID ) -- ( number xmin, number zmin, number xmax, number zmax [,number teamID] ) 
+**pseudo code>
+			if unitChecked == commander then 
+			echo ("Your commander is upgraded.")
+			return end
+			else
+<pseudocode**			
 		spMarkerAddPoint( x, y, z, myName .. "\nCommander corpse")
-		--Spring.SendCommands({'say a:I lost my commander !'})
+		Spring.SendCommands({'say a:I lost my commander !'})
 	end
-end
+end --]]
 
 function printDebug( value )
 	if ( debug ) then
