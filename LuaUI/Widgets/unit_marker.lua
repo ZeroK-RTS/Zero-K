@@ -138,7 +138,7 @@ function widget:Initialize()
 		return
 	end
 
-[[--	if (unitList[curModID] == "CA1F" and check for GameRule 'difficulty' showing presence of chicken game (weird and a bit unreliable in the futur but easy) as there seems to be no way to extract info from luaAI.lua data. If someone know a better method please do.
+--[[	if (unitList[curModID] == "CA1F" and check for GameRule 'difficulty' showing presence of chicken game (weird and a bit unreliable in the futur but easy) as there seems to be no way to extract info from luaAI.lua data. If someone know a better method please do.
 	if (curModID =="CA1F" and isChickenGame()) then --mod CA1F->ZK
 		--add chicken game POI markers
 		unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
