@@ -19,8 +19,35 @@ end
 local echo = Spring.Echo
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-options = {}
+options_order = { 'xdir', 'ydir', 'zdir', 'radius', }
+options = {
+	xdir = {
+		name = 'X (-1,1)',
+		type = 'number',
+		min = -1, max = 1, step = 0.1,
+		value = 0,
+	},
+	ydir = {
+		name = 'Y (-1,1)',
+		type = 'number',
+		min = -1, max = 1, step = 0.1,
+		value = 0,
+	},
+	zdir = {
+		name = 'Z (-1,1)',
+		type = 'number',
+		min = -1, max = 1, step = 0.1,
+		value = 0,
+	},
+	radius = {
+		name = 'Radius (0 - 100)',
+		type = 'number',
+		min = 0, max = 100, step = 1,
+		value = 20,
+	},
+	
+	
+}
 
 
 local vsx, vsy = widgetHandler:GetViewSizes()
@@ -30,6 +57,7 @@ local explosionDefs = VFS.Include("gamedata/explosions.lua")
 
 
 local function AddCEGButton(cegname)
+	options_order[#options_order+1] = cegname
 	options[cegname] = {
 		type = 'button',
 		name = cegname,
@@ -45,6 +73,13 @@ local function AddCEGButton(cegname)
 					.. '|' .. pos[1]
 					.. '|' .. pos[2]
 					.. '|' .. pos[3]
+					
+					.. '|' .. options.xdir.value
+					.. '|' .. options.ydir.value
+					.. '|' .. options.zdir.value
+					.. '|' .. options.radius.value
+					
+					
 				) 
 			else
 				echo "Cannot do this with a unit in the center of the screen."
@@ -53,10 +88,16 @@ local function AddCEGButton(cegname)
 	}
 end
 
+local explosions2 = {}
 for k,v in pairs(explosionDefs) do
 	--echo(k,v)
-	AddCEGButton(k)
+	explosions2[#explosions2+1] = k
 end
+table.sort(explosions2)
+for i,v in ipairs(explosions2) do
+	AddCEGButton(v)	
+end
+
 
 
 function widget:ViewResize(viewSizeX, viewSizeY)

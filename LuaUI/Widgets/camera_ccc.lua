@@ -241,8 +241,8 @@ local helpText = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
 local vsx, vsy = widgetHandler:GetViewSizes()
+local cx,cy = vsx * 0.5,vsy * 0.5
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX
 	vsy = viewSizeY
