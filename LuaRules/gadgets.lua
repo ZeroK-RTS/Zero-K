@@ -1200,9 +1200,9 @@ function gadgetHandler:AllowResourceLevel(teamID, res, level)
 end
 
 
-function gadgetHandler:AllowResourceTransfer(teamID, res, level)
+function gadgetHandler:AllowResourceTransfer(oldTeam, newTeam, type, amount)
   for _,g in ipairs(self.AllowResourceTransferList) do
-    if (not g:AllowResourceTransfer(teamID, res, level)) then
+    if (not g:AllowResourceTransfer(oldTeam, newTeam, type, amount)) then
       return false
     end
   end
