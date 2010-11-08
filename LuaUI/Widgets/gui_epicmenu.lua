@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.12 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.13 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -104,7 +104,8 @@ local kb_item
 --------------------------------------------------------------------------------
 -- widget settings
 local customwidgets = {}
-local custompaths = {}
+--local custompaths = {}
+local custompaths_i = {} --number indexed so that paths are added to menu in the order they appear in the widget
 local custompathsettings = {}
 	
 --------------------------------------------------------------------------------
@@ -298,13 +299,23 @@ local function tableMerge(t1, t2, appendIndex)
 	return t1
 end
 
-
+local function tableremove(table1, item)
+	local table2 = {}
+	for i,v in ipairs(table1) do
+		if v ~= item then
+			table2[#table2+1] = v
+		end
+	end
+	return table2
+end
+--[[
 local function MergeTable(table1,table2)
   local ret = {}
   CopyTable(ret,table2)
   CopyTable(ret,table1)
   return ret
 end
+--]]
 
 -- function GetTimeString() taken from trepan's clock widget
 local function GetTimeString()
@@ -740,12 +751,14 @@ local function IntegrateWidget(w, addoptions)
 				deletepath = false
 			end
 			if deletepath then
-				custompaths[path] = nil
+				--custompaths[path] = nil
+				custompaths_i = tableremove(custompaths_i, path) --number indexed so that paths are added to menu in the order they appear in the widget
 				--custompathsettings[path] = nil --causes strange error
 				custompathsettings[path] = {}
 			end
 		else
-			custompaths[path] = true
+			--custompaths[path] = true
+			custompaths_i[#custompaths_i+1] = path --number indexed so that paths are added to menu in the order they appear in the widget
 			if not custompathsettings[path] then
 				custompathsettings[path] = {}
 			end
@@ -1421,7 +1434,8 @@ local function AddCustomPaths(menutree, menuname)
 	local menutreeret = {}
 	CopyTable(menutreeret, menutree)
 	local custompathtree = {}
-	for pathstring, _ in pairs(custompaths) do
+	--for pathstring, _ in pairs(custompaths) do
+	for _, pathstring in ipairs(custompaths_i) do --number indexed so that paths are added to menu in the order they appear in the widget
 		local path = explode('/', pathstring)
 		if path[1] == menuname then
 			local custompathtreecur = MakePath( path )

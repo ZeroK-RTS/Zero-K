@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "CEG Spawner",
-    desc      = "Spawn CEGs",
+    desc      = "v0.02 Spawn CEGs",
     author    = "CarRepairer",
     date      = "2010-11-07",
     license   = "GPLv2",
@@ -16,10 +16,14 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+--Set to true to sort CEGs into alphabetic submenus. This cannot be added to epicmenu options because it's used to actually change those options.
+local ALPHA = true
+
 local echo = Spring.Echo
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 options_order = { 'xdir', 'ydir', 'zdir', 'radius', }
+options_path = 'Settings/Misc/CEG Spawner'
 options = {
 	xdir = {
 		name = 'X (-1,1)',
@@ -47,17 +51,17 @@ options = {
 	},
 	
 	
+	
 }
 
 
 local vsx, vsy = widgetHandler:GetViewSizes()
 local cx,cy = vsx * 0.5,vsy * 0.5
 
-local explosionDefs = VFS.Include("gamedata/explosions.lua")
-
 
 local function AddCEGButton(cegname)
 	options_order[#options_order+1] = cegname
+	
 	options[cegname] = {
 		type = 'button',
 		name = cegname,
@@ -86,18 +90,29 @@ local function AddCEGButton(cegname)
 			end
 		end,
 	}
+	
+	if ALPHA then
+		options[cegname].path = 'Settings/Misc/CEG Spawner/' .. cegname:sub(1,1):upper()	
+		--echo ( options[cegname].path )
+	end
 end
 
-local explosions2 = {}
-for k,v in pairs(explosionDefs) do
-	--echo(k,v)
-	explosions2[#explosions2+1] = k
-end
-table.sort(explosions2)
-for i,v in ipairs(explosions2) do
-	AddCEGButton(v)	
+local function SetupOptions()
+	local explosionDefs = VFS.Include("gamedata/explosions.lua")
+
+	local explosions2 = {}
+	for k,v in pairs(explosionDefs) do
+		--echo(k,v)
+		explosions2[#explosions2+1] = k
+	end
+	table.sort(explosions2)
+	for i,v in ipairs(explosions2) do
+		AddCEGButton(v)	
+	end
 end
 
+
+SetupOptions()
 
 
 function widget:ViewResize(viewSizeX, viewSizeY)
