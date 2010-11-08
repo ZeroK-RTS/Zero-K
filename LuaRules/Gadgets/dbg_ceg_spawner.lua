@@ -47,7 +47,11 @@ function gadget:RecvLuaMsg(msg, playerID)
 		msg = msg:sub(2)
 		msg = explode('|', msg)
 		echo ('Spawning CEG', msg[1] )
-		Spring.SpawnCEG( msg[1], msg[2], msg[3], msg[4],  1,1,1,  20 )
+		Spring.SpawnCEG( msg[1], --cegname
+			msg[2], msg[3], msg[4],  --pos
+			msg[5], msg[6], msg[7],  --dir
+			msg[8]  --radius
+			)
 	end
 end
 
