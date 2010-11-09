@@ -17,6 +17,11 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+if VFS.FileExists("mission.lua") then
+  -- stats are meaningless in missions
+  return
+end
+
   
 if (not gadgetHandler:IsSyncedCode()) then
   return false  --  silent removal

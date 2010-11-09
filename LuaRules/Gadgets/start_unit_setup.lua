@@ -11,7 +11,6 @@ function gadget:GetInfo()
 end
 
 
-
 -- partially based on Spring's unit spawn gadget
 
 -- TODO
@@ -33,6 +32,26 @@ local OVERDRIVE_BUFFER=10000
 local EXCLUDED_UNITS = {
   [ UnitDefNames['terraunit'].id ] = true,
 }
+
+
+
+
+if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage
+  if not gadgetHandler:IsSyncedCode() then
+    return false -- no unsynced code
+  end
+  function gadget:GameFrame(n)
+    if n == 0 then
+      for _, teamID in ipairs(Spring.GetTeamList()) do
+        Spring.SetTeamResource(teamID, "es", START_STORAGE + OVERDRIVE_BUFFER)
+        Spring.SetTeamResource(teamID, "ms", START_STORAGE)
+      end
+    end
+  end
+  return
+end
+
+
 local modOptions = Spring.GetModOptions()
 local startMode = Spring.GetModOption("startingresourcetype",false,"facplopboost")
 
