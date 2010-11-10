@@ -18,18 +18,6 @@ local echo 				= Spring.Echo
 
 
 -------------------------------------------------------------------------------------
-local function explode(div,str)
-  if (div=='') then return false end
-  local pos,arr = 0,{}
-  -- for each divider found
-  for st,sp in function() return string.find(str,div,pos,true) end do
-    table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
-    pos = sp + 1 -- Jump past current divider
-  end
-  table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
-  return arr
-end
-
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -72,13 +60,13 @@ local function Transfers( send_messages )
 				local xfer_amount = math.min(amount, m)
 				if Spring.UseTeamResource( debtor_team, "metal" , xfer_amount ) then
 					
-					--Spring.SendMessageToTeam(debtor_team, '<Bank> Transfering ' .. xfer_amount .. 'm from ' .. debtor_team .. ' to ' .. lender_team)
+					local amount_new = amount - xfer_amount
+					
 					if send_messages then
-						Spring.SendMessageToTeam(debtor_team, '<Bank> Transfering metal. You still owe ' .. math.round( amount ) .. ' to Team #' .. lender_team .. '. No building can proceed until debt is paid.' )
+						Spring.SendMessageToTeam(debtor_team, '<Bank> Transfering metal. You still owe ' .. math.round( amount_new ) .. ' to Team #' .. lender_team .. '. No building can proceed until debt is paid.' )
 					end
 					
 					Spring.AddTeamResource( lender_team, "metal" , xfer_amount )
-					local amount_new = amount - xfer_amount
 					bank[debtor_team][lender_team] = amount_new
 				end
 			end
