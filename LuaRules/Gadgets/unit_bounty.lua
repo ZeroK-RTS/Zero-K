@@ -101,6 +101,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		
 		if not bounty[unitID] then
 			bounty[unitID] = {}
+			bounty[unitID][teamID] = 0
 		end
 		
 		bounty[unitID][teamID] = math.max( price, bounty[unitID][teamID] )
@@ -179,6 +180,8 @@ local fontSize = 6
 
 local inColors, teamNames = {}, {}
 
+local BountyTextCache = {}
+
 local spec = false
 
 --gadget:ViewResize(Spring.GetViewGeometry())
@@ -209,6 +212,21 @@ local function SetupTeamData()
 		end
 	end
 end
+
+local function GetBountyText(unitID, ubounty)
+
+	if BountyTextCache[unitID] then
+		return BountyTextCache[unitID]
+	end
+
+	local text = '\255\255\255\255Bounty: '
+	for team, amount in spairs(ubounty) do
+		text = text .. inColors[team] .. '$' .. amount .. ' '
+	end
+	BountyTextCache[unitID] = text
+	return text
+end
+
 -----------------------------------------------------------------------------
 --Callins	
 
@@ -230,11 +248,7 @@ function gadget:DrawWorld()
 		end
 		local height = 80
 		if visible then
-			
-			local text = '\255\255\255\255Bounty: '
-			for team, amount in spairs(ubounty) do
-				text = text .. inColors[team] .. '$' .. amount .. ' '
-			end
+			local text = GetBountyText(unitID, ubounty)
 			glDrawFuncAtUnit(unitID, false, DrawPrice, unitID, text, height)
 		end
 		
@@ -247,13 +261,18 @@ function gadget:Initialize()
 end
 
 local cycle = 1
+local cacheCycle = 1
 function gadget:Update()
 	
 	spec = spGetSpectatingState()
 	
 	cycle = cycle % (32*40) + 1
+	cacheCycle = cacheCycle % (32*1) + 1
 	if cycle == 1 then
 		SetupTeamData()
+	end
+	if cacheCycle == 1 then
+		BountyTextCache = {}
 	end
 	
 	if SYNCED.bounty then

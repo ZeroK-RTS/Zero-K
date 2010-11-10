@@ -220,6 +220,8 @@ local inColors, teamNames = {}, {}
 
 local spec = false
 
+local MpTextCache = {}
+
 --gadget:ViewResize(Spring.GetViewGeometry())
 --------------------------------------------------------
 
@@ -248,6 +250,35 @@ local function SetupTeamData()
 		end
 	end
 end
+
+local function GetMpText(unitID, data)
+	
+	if MpTextCache[unitID] then
+		return MpTextCache[unitID]
+	end
+
+	local sellingAt = data.sell
+	local buyers = data.buy
+	local team = data.team and data.team+0 or 0
+
+	local text = ''
+	if sellingAt then
+		text = inColors[team] .. 'Sale $' .. sellingAt 
+	end
+	if buyers then
+		local addedOffers = false
+		
+		for teamID, price in spairs(buyers) do
+			if not addedOffers then
+				text = text .. ' \255\255\255\255Offers: '
+				addedOffers = true
+			end
+			text = text .. inColors[teamID] .. '$' .. price .. ' (' .. teamNames[teamID] ..') '
+		end
+	end
+	MpTextCache[unitID] = text
+	return text
+end
 -----------------------------------------------------------------------------
 --Callins	
 
@@ -268,25 +299,8 @@ function gadget:DrawWorld()
 			end)
 		end
 		if visible then
-			local sellingAt = data.sell
-			local buyers = data.buy
-			local team = data.team and data.team+0 or 0
 			local height = 60
-			local text = ''
-			if sellingAt then
-				text = inColors[team] .. 'Sale $' .. sellingAt 
-			end
-			if buyers then
-				local addedOffers = false
-				
-				for teamID, price in spairs(buyers) do
-					if not addedOffers then
-						text = text .. ' \255\255\255\255Offers: '
-						addedOffers = true
-					end
-					text = text .. inColors[teamID] .. '$' .. price .. ' (' .. teamNames[teamID] ..') '
-				end
-			end
+			local text = GetMpText(unitID, data)
 			if text ~= '' then
 				glDrawFuncAtUnit(unitID, false, DrawPrice, unitID, text, height)
 			end
@@ -301,13 +315,18 @@ function gadget:Initialize()
 end
 
 local cycle = 1
+local cacheCycle = 1
 function gadget:Update()
 	
 	spec = spGetSpectatingState()
 	
 	cycle = cycle % (32*40) + 1
+	cacheCycle = cacheCycle % (32*1) + 1
 	if cycle == 1 then
 		SetupTeamData()
+	end
+	if cacheCycle == 1 then
+		MpTextCache = {}
 	end
 	
 	if SYNCED.market then
@@ -317,4 +336,4 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-end
+end             

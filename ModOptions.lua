@@ -269,6 +269,14 @@ local options = {
     desc   = 'Experimental settings.',
     type   = 'section',
   },
+  {
+	key    = 'marketandbounty',
+	name   = 'Enable MarketPlace and Bounties',
+	desc   = 'Adds option to sell your units, buy units from allies (including temporary allies). Also allows you to place a bounty on a unit.',
+	type   = 'bool',
+	section= 'experimental',
+	def    = false,
+  },
     {
     key    = 'terracostmult',
     name   = 'Terraform Cost Multiplier',
