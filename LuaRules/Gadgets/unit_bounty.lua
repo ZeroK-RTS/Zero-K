@@ -100,11 +100,13 @@ function gadget:RecvLuaMsg(msg, playerID)
 		end
 		
 		if not bounty[unitID] then
-			bounty[unitID] = {}
-			bounty[unitID][teamID] = 0
+			bounty[unitID] = {
+				[teamID] = {price = 0}
+			}
 		end
 		
-		bounty[unitID][teamID] = math.max( price, bounty[unitID][teamID] )
+		local newprice = math.max( price, bounty[unitID][teamID].price )
+		bounty[unitID][teamID] = {price = newprice, timer = 500,}
 		
 	end
 
@@ -119,16 +121,38 @@ function gadget:Initialize()
 		local allUnits = Spring.GetAllUnits()
 		for _,unitID in ipairs(allUnits) do
 			bounty[unitID] = {
-				[0] = 500,
-				[1] = 100,
-				[2] = 200,
+				[0] = {price = 500, timer=20,},
+				[1] = {price = 100, timer=500,},
+				[2] = {price = 200, timer=500,},
 			}
 			
 		end
 	end
 	
-	_G.bounty = bounty
+	_G.bounty 	= bounty
 
+end
+
+local timerPeriod = 5
+
+function gadget:GameFrame(f)
+	
+	if f % (32*timerPeriod) == 0 then
+		for unitID, teamData in pairs(bounty) do
+			local bountiesLeft = false
+			for teamID, bData in pairs(teamData) do
+				if bData.timer <= timerPeriod then
+					bounty[unitID][teamID] = nil
+				else
+					bountiesLeft = true
+					bounty[unitID][teamID].timer = bData.timer - timerPeriod
+				end
+			end
+			if not bountiesLeft then
+				bounty[unitID] = nil
+			end
+		end
+	end
 end
 
 
@@ -183,6 +207,9 @@ local inColors, teamNames = {}, {}
 local BountyTextCache = {}
 
 local spec = false
+local cycle_40s = 1
+local cycle_1s = 1
+
 
 --gadget:ViewResize(Spring.GetViewGeometry())
 --------------------------------------------------------
@@ -220,8 +247,8 @@ local function GetBountyText(unitID, ubounty)
 	end
 
 	local text = '\255\255\255\255Bounty: '
-	for team, amount in spairs(ubounty) do
-		text = text .. inColors[team] .. '$' .. amount .. ' '
+	for team, data in spairs(ubounty) do
+		text = text .. inColors[team] .. '($' .. data.price .. ' ' .. data.timer .. 's) '
 	end
 	BountyTextCache[unitID] = text
 	return text
@@ -260,18 +287,16 @@ function gadget:Initialize()
 	SetupTeamData()
 end
 
-local cycle = 1
-local cacheCycle = 1
 function gadget:Update()
 	
 	spec = spGetSpectatingState()
 	
-	cycle = cycle % (32*40) + 1
-	cacheCycle = cacheCycle % (32*1) + 1
-	if cycle == 1 then
+	cycle_40s = cycle_40s % (32*40) + 1
+	cycle_1s = cycle_1s % (32*1) + 1
+	if cycle_40s == 1 then
 		SetupTeamData()
 	end
-	if cacheCycle == 1 then
+	if cycle_1s == 1 then
 		BountyTextCache = {}
 	end
 	
