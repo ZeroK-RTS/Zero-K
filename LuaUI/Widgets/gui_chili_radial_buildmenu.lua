@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Radial Build Menu",
-    desc      = "v0.07 Radial Build Menu",
+    desc      = "v0.08 Radial Build Menu",
     author    = "CarRepairer",
     date      = "2010-09-15",
     license   = "GNU GPL, v2 or later",
@@ -193,11 +193,12 @@ local function AddButton(item, index)
 		end
 		advance_builder = false
 	end
-	  
+	
+	local tooltip1 = (level ~= 0) and ('Build: ' ..ud.humanName .. ' - ' .. ud.tooltip) or ('Category: ' .. item.label)
 	local button1 = Button:New{
 		name = index ,
 		caption = '', 
-		tooltip = 'Build: ' ..ud.humanName .. ' - ' .. ud.tooltip,
+		tooltip = tooltip1,
 		OnMouseDown = { function() HotKeyMode(false); end }, 
 		OnMouseUp = { func }, 
 		children = {
