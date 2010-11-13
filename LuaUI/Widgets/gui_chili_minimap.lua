@@ -2,7 +2,7 @@ function widget:GetInfo()
   return {
     name      = "Chili Minimap",
     desc      = "v0.82 Chili Minimap",
-    author    = "Licho",
+    author    = "Licho, tweaked by CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
     layer     = -math.huge,
@@ -28,21 +28,22 @@ local function AdjustToMapAspectRatio(w,h)
 end
 
 
-options_path = 'Settings/Interface'
-options_order = { 'use_map_ratio', 'simplecolors', }
+options_path = 'Game'
+options_order = { 'use_map_ratio', 'simplecolors', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', }
 options = {
 	
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
 		type = 'bool',
 		value = true,
+		path = 'Settings/Interface',
 		advanced = true,
-		OnChange = function()
-			if (options.use_map_ratio.value) then 
+		OnChange = function(self)
+			if (self.value) then 
 				local w,h = AdjustToMapAspectRatio(300, 200)
 				window_minimap:Resize(w,h,false,false)
 			end 
-			window_minimap.fixedRatio = options.use_map_ratio.value;			
+			window_minimap.fixedRatio = self.value;			
 		end,
 	},
 	simplecolors = {
@@ -52,6 +53,44 @@ options = {
 		springsetting = 'SimpleMiniMapColors',
 		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
 	},
+	
+	lblViews = { type = 'label', name = 'Views', },
+	
+	viewstandard = {
+		name = 'Normal View',
+		type = 'button',
+		OnChange= function() Spring.SendCommands{"showstandard"} end
+	},
+	viewheightmap = {
+		name = 'Toggle Height Map',
+		type = 'button',
+		OnChange= function() Spring.SendCommands{"showelevation"} end
+	},
+	viewblockmap = {
+		name = 'Toggle Pathing Map',
+		type = 'button',
+		OnChange= function() Spring.SendCommands{"showpathmap"} end
+	},
+	viewmetalmap = {
+		name = 'Toggle Metal Map',
+		type = 'button',
+		OnChange= function() Spring.SendCommands{"ShowMetalMap"} end
+	},
+	
+	lblLos = { type = 'label', name = 'Line of Sight', },
+	
+	viewfow = {
+		name = 'Toggle Fog of War View',
+		type = 'button',
+		OnChange= function() Spring.SendCommands{"togglelos"} end
+	},
+	viewradar = {
+		name = 'Toggle Radar & Jammer View',
+		desc = 'Only shows when Fog of War is enabled',
+		type = 'button',
+		OnChange= function() Spring.SendCommands{"toggleradarandjammer"} end
+	},
+	
 }
 
 
@@ -89,15 +128,13 @@ function widget:Initialize()
 		dragUseGrip = true,
 		minimumSize = {50,50},
 		children = {
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='-', bottom=0, right=iconsize*1, tooltip='Normal View', 	OnClick={function() Spring.SendCommands{"showstandard"} 	end}, },
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='H', bottom=0, right=iconsize*2, tooltip='Height Map',	OnClick={function() Spring.SendCommands{"showelevation"} 	end}, },
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='B', bottom=0, right=iconsize*3, tooltip='Pathing Map', 	OnClick={function() Spring.SendCommands{"showpathmap"} 		end}, },
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='M', bottom=0, right=iconsize*4, tooltip='Metal Map', 	OnClick={function() Spring.SendCommands{"ShowMetalMap"} 	end}, },
+			Chili.Button:New{ height=iconsize, width=iconsize, caption='-', bottom=0, right=iconsize*1, tooltip=options.viewstandard.name, 	OnClick={ options.viewstandard.OnChange }, },
+			Chili.Button:New{ height=iconsize, width=iconsize, caption='H', bottom=0, right=iconsize*2, tooltip=options.viewheightmap.name,	OnClick={ options.viewheightmap.OnChange }, },
+			Chili.Button:New{ height=iconsize, width=iconsize, caption='B', bottom=0, right=iconsize*3, tooltip=options.viewblockmap.name, 	OnClick={ options.viewblockmap.OnChange	}, },
+			Chili.Button:New{ height=iconsize, width=iconsize, caption='M', bottom=0, right=iconsize*4, tooltip=options.viewmetalmap.name, 	OnClick={ options.viewmetalmap.OnChange }, },
 			
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='L', bottom=0, right=iconsize*6, tooltip='Fog of War View', 	
-								OnClick={function() Spring.SendCommands{"togglelos"} 			end}, },
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='R', bottom=0, right=iconsize*7, tooltip='Radar & Jammer view (Only shows when Fog of War is enabled)', 	
-								OnClick={function() Spring.SendCommands{"toggleradarandjammer"} end}, },
+			Chili.Button:New{ height=iconsize, width=iconsize, caption='L', bottom=0, right=iconsize*6, tooltip=options.viewfow.name, 		OnClick={ options.viewfow.OnChange }, },
+			Chili.Button:New{ height=iconsize, width=iconsize, caption='R', bottom=0, right=iconsize*7, tooltip=options.viewradar.name .. ' (' .. options.viewradar.desc ..')', 	OnClick={ options.viewradar.OnChange }, },
 		},
 	}
 	gl.SlaveMiniMap(true)

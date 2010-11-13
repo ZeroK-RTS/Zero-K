@@ -81,17 +81,7 @@ confdata.game_menu_tree = {
 		}
 	},
 	{'Factory Guard', function() spSendCommands{"luaui togglewidget FactoryGuard"} end },
-	
-	{'Views'},
-	{'Line of Sight'},
-	{'Toggle Fog of War', function(self) spSendCommands{"togglelos"} end },
-	{'Toggle Radar/Jammer', function(self) spSendCommands{"toggleradarandjammer"} end },	
-	
-	{'Map Views'},
-	{'Normal', function(self) spSendCommands{"showstandard"} end },	
-	{'Toggle Metal Map', function(self) spSendCommands{"ShowMetalMap"} end },
-	{'Toggle Elevation', function(self) spSendCommands{"showelevation"} end },	
-	{'Toggle Pathing', function(self) spSendCommands{"showpathmap"} end },
+
 	{},
 	{'Screenshots|Take screenshots.',
 		{
