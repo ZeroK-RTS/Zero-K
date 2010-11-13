@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.13 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.14 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1152,7 +1152,9 @@ local function MakeHotkeyedControl(control, key, i, item)
 	--local hotkey, hotkeystring = GetHotkeyData_i(key, i)
 	local hotkey, hotkeystring = GetHotkeyData(key, item.key)
 	local kbfunc = function() 
-			MakeKeybindWindow(item, key, i, hotkey ) 
+			if not get_key then
+				MakeKeybindWindow(item, key, i, hotkey ) 
+			end
 		end
 
 	return StackPanel:New{
