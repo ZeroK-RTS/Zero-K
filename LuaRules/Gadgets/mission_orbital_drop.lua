@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
     name      = "Orbital Drop",
-    desc      = "Makes units spawned in missions fall from the sky.",
+    desc      = "Makes units spawned with GG.DropUnit fall from the sky.",
     author    = "quantum",
     date      = "November 2010",
     license   = "GNU GPL, v2 or later",
@@ -58,8 +58,9 @@ function gadget:GameFrame(frame)
     if Spring.ValidUnitID(unitID) then
       local x, y, z = Spring.GetUnitBasePosition(unitID)
       local h = Spring.GetGroundHeight(x, z)
-      if y < h then
-        -- unit has landed
+      local _, dy = Spring.GetUnitVelocity(unitID) 
+      if y < h or dy >= 1 then 
+        -- unit has landed (or is moving up, which means it has missed the ground)
         Spring.MoveCtrl.SetPosition(unitID, x, h, z)
         Spring.MoveCtrl.SetVelocity(unitID, 0, 0, 0)
         Spring.MoveCtrl.Disable(unitID)
