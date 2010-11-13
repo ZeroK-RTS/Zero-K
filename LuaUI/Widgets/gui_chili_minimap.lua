@@ -22,7 +22,7 @@ local iconsize = 20
 
 local function AdjustToMapAspectRatio(w,h)
 	if (Game.mapX > Game.mapY) then
-		return w, w*Game.mapY/Game.mapX
+		return w, w*Game.mapY/Game.mapX+iconsize
 	end
 	return h*Game.mapX/Game.mapY, h+iconsize
 end
