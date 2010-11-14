@@ -1178,7 +1178,7 @@ local function MakeHotkeyedControl(control, key, i, item)
 				minHeight = 30,
 				right=0,
 				x=-30,
-				caption = 'K', 
+				caption = hotkey and 'K*' or 'K', 
 				OnMouseUp = { kbfunc },
 				backgroundColor = color.sub_button_bg,
 				textColor = color.sub_button_fg, 

@@ -134,7 +134,7 @@ local function AddBuildButton()
 		tooltip = 'Click to activate build menu hotkeys.',
 		OnMouseUp = { Make_KB_Menu, }, 
 		children = {
-			Label:New{ caption = 'Buil'.. green ..'d', fontSize=18, bottom='0'},
+			Label:New{ caption = 'BUIL'.. green ..'D', fontSize=14, bottom='1'},
 			Image:New {
 				--file = 'LuaUI/Images/resbar/work.png', --ugly when scaled
 				--file = 'LuaUI/Images/resbar/huge_m.png', --nice gear
