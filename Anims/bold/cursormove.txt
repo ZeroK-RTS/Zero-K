@@ -1,0 +1,19 @@
+hotspot center
+frame  anims/bold/cursormove_0.png  0.1
+frame  anims/bold/cursormove_1.png  0.1
+frame  anims/bold/cursormove_2.png  0.1
+frame  anims/bold/cursormove_3.png  0.1
+frame  anims/bold/cursormove_4.png  0.1
+frame  anims/bold/cursormove_5.png  0.1
+frame  anims/bold/cursormove_6.png  0.1
+frame  anims/bold/cursormove_7.png  0.1
+frame  anims/bold/cursormove_8.png  0.1
+frame  anims/bold/cursormove_9.png  0.1
+frame  anims/bold/cursormove_10.png  0.1
+frame  anims/bold/cursormove_11.png  0.1
+frame  anims/bold/cursormove_12.png  0.1
+frame  anims/bold/cursormove_13.png  0.1
+frame  anims/bold/cursormove_14.png  0.1
+frame  anims/bold/cursormove_15.png  0.1
+frame  anims/bold/cursormove_16.png  0.1
+frame  anims/bold/cursormove_17.png  0.1

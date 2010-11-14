@@ -1,0 +1,5 @@
+hotspot center
+frame anims/bold/cursordefend_0.png 0.5
+frame anims/bold/cursordefend_1.png 0.5
+frame anims/bold/cursordefend_2.png 0.5
+frame anims/bold/cursordefend_3.png 0.5

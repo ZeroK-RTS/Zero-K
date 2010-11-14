@@ -1,0 +1,3 @@
+hotspot center
+frame  anims/ca_static/cursorrepair_0.png  5
+
