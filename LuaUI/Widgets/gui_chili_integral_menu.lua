@@ -239,6 +239,7 @@ local function MakeButton(container, cmd, insertItem)
 		end 
 		if (isState) then 
 			button.padding = {0,0,0,0}
+			button.backgroundColor = {0,0,0,0}
 		end 
 		if (isBuild) then
 			button.padding = {1,1,1,1}

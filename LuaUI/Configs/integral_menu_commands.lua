@@ -96,6 +96,7 @@ local common_commands = {
 	[CMD_RETREAT_ZONE] = 2,
 	[CMD_AREA_MEX] = 1,
 	[CMD.LOAD_UNITS]=1, [CMD.UNLOAD_UNITS]=1,
+	[CMD.AREA_ATTACK]=1,
 }
 
 --not needed; menu has autodetection
@@ -204,7 +205,8 @@ local overrides = {
 	[CMD.DGUN] = { texture = 'LuaUi/Images/commands/dgun.png', text= ' '},
 
 	[CMD.LOAD_UNITS] = { texture = 'LuaUi/Images/commands/Bold/load.png', text= ' '},
-	[CMD.UNLOAD_UNITS] = { texture = 'LuaUi/Images/commands/Bold/unload.png', text= ' '},	
+	[CMD.UNLOAD_UNITS] = { texture = 'LuaUi/Images/commands/Bold/unload.png', text= ' '},
+	[CMD.AREA_ATTACK] = { texture = 'LuaUi/Images/commands/Bold/areaattack.png', text=' '},
 	
 	[CMD_RAMP] = {text = ' ', texture = 'LuaUi/Images/commands/ramp.png'},
 	[CMD_LEVEL] = {text = ' ', texture = 'LuaUi/Images/commands/level.png'},
@@ -226,6 +228,7 @@ local overrides = {
 	[CMD.MOVE_STATE] = { texture = {'LuaUi/Images/commands/states/move_hold.png', 'LuaUi/Images/commands/states/move_engage.png', 'LuaUi/Images/commands/states/move_roam.png'}, text=''},
 	[CMD.FIRE_STATE] = { texture = {'LuaUi/Images/commands/states/fire_hold.png', 'LuaUi/Images/commands/states/fire_return.png', 'LuaUi/Images/commands/states/fire_atwill.png'}, text=''},
 	[CMD_RETREAT] = { texture = {'LuaUi/Images/commands/states/retreat_off.png', 'LuaUi/Images/commands/states/retreat_30.png', 'LuaUi/Images/commands/states/retreat_60.png', 'LuaUi/Images/commands/states/retreat_90.png'}, text=''},
+	[CMD.IDLEMODE] = { texture = {'LuaUi/Images/commands/states/fly_on.png', 'LuaUi/Images/commands/states/fly_off.png'}, text=''},	
 }
 
 return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides
