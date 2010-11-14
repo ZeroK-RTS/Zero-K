@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili FactoryBar",
-    desc      = "v0.01 Chili buildmenu for factories.",
+    desc      = "v0.02 Chili buildmenu for factories.",
     author    = "CarRepairer (converted from jK's Buildbar)",
     date      = "2010-11-10",
     license   = "GNU GPL, v2 or later",
@@ -46,6 +46,8 @@ local echo = Spring.Echo
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
+local function RecreateFacbar() end
+
 options_path = 'Settings/Interface/FactoryBar'
 options = {
 	maxVisibleBuilds = {
@@ -55,6 +57,14 @@ options = {
 		min = 2, max = 8,
 		value = 3,
 	},	
+	
+	buttonsize = {
+		type = 'number',
+		name = 'Button Size',
+		min = 40, max = 100, step=5,
+		value = 60,
+		OnChange = function() RecreateFacbar() end,
+	},
 }
 
 -------------------------------------------------------------------------------
@@ -67,7 +77,6 @@ local unfinished_facs = {}
 local pressedFac  = -1
 local waypointFac = -1
 local waypointMode = 0   -- 0 = off; 1=lazy; 2=greedy (greedy means: you have to left click once before leaving waypoint mode and you can have units selected)
-local buttonsize = 60
 
 local myTeamID = 0
 local inTweak  = 0
@@ -125,8 +134,8 @@ local push        = table.insert
 local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 	tocontrol:AddChild(
 		Button:New{
-			width = buttonsize*1.2,
-			height = buttonsize*1.0,
+			width = options.buttonsize.value*1.2,
+			height = options.buttonsize.value*1.0,
 			tooltip = 			'Click - ' 			.. GreenStr .. 'Select \n' 					
 				.. WhiteStr .. 	'Middle click - ' 	.. GreenStr .. 'Go to \n'
 				.. WhiteStr .. 	'Right click - ' 	.. GreenStr .. 'Quick Rallypoint Mode' 
@@ -167,7 +176,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		padding={0,0,0,0},
 		x=0,
 		width=700,
-		height = buttonsize,
+		height = options.buttonsize.value,
 		resizeItems = false,
 		orientation = 'horizontal',
 		centerItems = false,
@@ -179,7 +188,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		padding={0,0,0,0},
 		x=0,
 		width=700,
-		height = buttonsize,
+		height = options.buttonsize.value,
 		resizeItems = false,
 		orientation = 'horizontal',
 		centerItems = false,
@@ -192,7 +201,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		itemPadding={0,0,0,0},
 		padding={0,0,0,0},
 		width=800,
-		height = buttonsize*1.0,
+		height = options.buttonsize.value*1.0,
 		resizeItems = false,
 		centerItems = false,
 	}
@@ -212,8 +221,8 @@ local function MakeButton(unitDefID, facID)
 			name = unitDefID,
 			tooltip=tooltip,
 			x=0,
-			width = buttonsize,
-			height = buttonsize,
+			width = options.buttonsize.value,
+			height = options.buttonsize.value,
 			padding = {8,8,8,8},
 			--padding = {0,0,0,0},
 			backgroundColor = queueColor,
@@ -335,7 +344,7 @@ local function WaypointHandler(x,y,button)
   --if not shift then waypointMode = 0; return true end
 end
 
-local function RecreateFacbar()
+RecreateFacbar = function()
 	stack_main:ClearChildren()
 	for i,facInfo in ipairs(facs) do
 		local unitDefID = facInfo.unitDefID
@@ -377,6 +386,7 @@ local function RecreateFacbar()
 	stack_main:Invalidate()
 	stack_main:UpdateLayout()
 end
+
 local function UpdateFactoryList()
 
   facs = {}
@@ -651,7 +661,7 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		resizable = false,
-		dragUseGrip = true,
+		dragUseGrip = false,
 		minimumSize = {600,200},
 		color = {0,0,0,0},
 		children = {
