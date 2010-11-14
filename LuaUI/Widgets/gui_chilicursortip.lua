@@ -862,7 +862,7 @@ local function DetermineTooltip()
 				tt_table.requires and { text = 'REQUIRES' .. tt_table.requires, } or {},
 				tt_table.provides and { text = 'PROVIDES' .. tt_table.provides, } or {},
 				tt_table.consumes and { text = 'CONSUMES' .. tt_table.consumes, } or {},
-				{ icon = 'LuaUI/images/health.png',  text = numformat(tt_ud.health), },
+				{ icon = 'LuaUI/images/commands/Bold/health.png',  text = numformat(tt_ud.health), },
 				{ directcontrol = morph_control },
 				{ text = green .. helptext, wrap=true},
 			},
@@ -1087,7 +1087,7 @@ function widget:Initialize()
 			caption = 'a',
 
 			children = {
-				Image:New{file='LuaUI/images/health.png',height= icon_size,width= icon_size,  x=0,y=0},
+				Image:New{file='LuaUI/images/commands/bold/health.png',height= icon_size,width= icon_size,  x=0,y=0},
 			},
 		}
 		

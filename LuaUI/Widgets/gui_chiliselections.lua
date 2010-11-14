@@ -452,7 +452,7 @@ local function MakeUnitToolTip(unitid)
 
 	Image:New{
 		parent  = barGrid;
-		file    = 'LuaUI/images/health.png';
+		file    = 'LuaUI/images/commands/Bold/health.png';
 		height  = 15;
 		width   = 15;
 	}
@@ -468,7 +468,7 @@ local function MakeUnitToolTip(unitid)
 	if (ud.name:find("win", 1, true)) then
 		Image:New{
 			parent  = barGrid;
-			file    = 'LuaUI/Images/resbar/wind.png';
+			file    = 'LuaUI/Images/commands/Bold/wind.png';
 			height  = 15;
 			width   = 15;
 		}
@@ -486,7 +486,7 @@ local function MakeUnitToolTip(unitid)
 	if (ud.builder) then
 		Image:New{
 			parent  = barGrid;
-			file    = 'LuaUI/Images/resbar/work.png';
+			file    = 'LuaUI/Images/commands/Bold/buildsmall.png';
 			height  = 15;
 			width   = 15;
 		}

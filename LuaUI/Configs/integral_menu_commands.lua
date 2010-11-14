@@ -14,6 +14,7 @@ local CMD_UNIT_AI = 36214
 local CMD_AREA_MEX = 10100
 local CMD_CLOAK_SHIELD = 32101
 local CMD_JUMP = 38521
+local CMD_FLY_STATE = 34569
 
 local factories = {
 	factorycloak = {order = 1},
@@ -229,6 +230,7 @@ local overrides = {
 	[CMD.FIRE_STATE] = { texture = {'LuaUi/Images/commands/states/fire_hold.png', 'LuaUi/Images/commands/states/fire_return.png', 'LuaUi/Images/commands/states/fire_atwill.png'}, text=''},
 	[CMD_RETREAT] = { texture = {'LuaUi/Images/commands/states/retreat_off.png', 'LuaUi/Images/commands/states/retreat_30.png', 'LuaUi/Images/commands/states/retreat_60.png', 'LuaUi/Images/commands/states/retreat_90.png'}, text=''},
 	[CMD.IDLEMODE] = { texture = {'LuaUi/Images/commands/states/fly_on.png', 'LuaUi/Images/commands/states/fly_off.png'}, text=''},	
+	[CMD_FLY_STATE] = { texture = {'LuaUi/Images/commands/states/fly_on.png', 'LuaUi/Images/commands/states/fly_off.png'}, text=''},
 }
 
 return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides
