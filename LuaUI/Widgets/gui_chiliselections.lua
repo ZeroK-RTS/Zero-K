@@ -120,7 +120,7 @@ local function option_Deselect()
 end
 options = {
   groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect},
-  showgroupinfo = {name='Show Group Info', type='bool', value=false, OnChange = option_Deselect},
+  showgroupinfo = {name='Show Group Info', type='bool', value=true, OnChange = option_Deselect},
   squarepics = {name='Square Buildpics', type='bool', value=true, OnChange = option_Deselect},
   hpshort = {
 		name = "HP Short Notation",
