@@ -1,9 +1,9 @@
-local versionNumber = "1.3.6"
+local versionNumber = "1.3.7"
 
 function widget:GetInfo()
 	return {
 		name	= "Unit Marker Zero-K",
-		desc	= "[v" .. string.format("%s", versionNumber ) .. "] Marks spotted buildings of interest.",
+		desc	= "[v" .. string.format("%s", versionNumber ) .. "] Marks spotted buildings of interest and commander corpse.",
 		author	= "very_bad_soldier",
 		date	= "October 21, 2007 / September 08, 2010",
 		license	= "GNU GPL v2",
@@ -17,13 +17,13 @@ Features:
 -multiple mod support, deactivate if used on unknown mod.
 -no multiple markers if multiple players use it.
 -check for ZK chicken game to add more PoI.
--Is disabled when player go spec/use replay. NEED TESTING TO KNOW IF WIDGET STOPS (and need to be reactivated) WHEN RE-REJOINING GAME AFTER CRASH !!
+-Is disabled when player go spec/use replay. NEED TESTING TO KNOW IF WIDGET STOPS (and need to be reactivated) WHEN RE-REJOINING GAME AFTER CRASH !
+
 ---- TODO ----
-Probably erase the BA & XTA config as this is a ZK only widget. Left for now as it may be useful to a LUA (beginner or not) even just as an exemple.
 erase markers when units die.
-finish check when com morph
 
 ---- CHANGELOG -----
+-- versus666,			v1.3.7	(10nov2010)	: tested many ways to check for comm death/morph and used the most reliable.
 -- versus666,			v1.3.6	(04oct2010)	: commented the commander death warning part until I find a reliable ways to check for commanders morphs. Re added ROOST in PoI as it's an important building in chicken games and it have AA.
 -- kingraptor,			v1.3.5	(04oct2010)	: moved chickens PoI to general list and commented isChickenGame().
 -- versus666, 			v1.3.4	(01nov2010)	: added marker where own commander die + message to allies, removed other mods refs. Old CA refs left for now as it may be useful to a LUA (beginner or not) even just as an exemple.
@@ -36,6 +36,8 @@ finish check when com morph
 -- very_bad_soldier,	v1.0	(21oct2007)	: initial release.
 --]]
 local debug = false --generates debug message
+local firstUnitID --for 1rst check when comm die
+local secondUnitID -- for 2nd check when comm die
 
 local unitList = {}
 --MARKER LIST ------------------------------------ NEED TO UPDATE CA1F TO ZK WHEN MOD UPDATES.
@@ -121,6 +123,7 @@ local upper					= string.upper
 local floor					= math.floor
 local max					= math.max
 local min					= math.min
+local spGetLastAttacker		= Spring.GetUnitLastAttacker
 
 function widget:Initialize()
 	printDebug("<Unit Marker>: init")
@@ -222,7 +225,7 @@ function widget:RecvLuaMsg(msg, playerID)
 			
 			markersToSet[unitId] = nil
 		end
-		printDebugTable( markersToSet )
+		printDebug ( markersToSet ) -- print table of units to mark
 		return true; 
 	end
 end
@@ -249,23 +252,55 @@ if ( now >= ( myPlayerID * markerTimePerId + marker["time"] ) ) then
 		end
 	end
 end
-
---[[ function widget:UnitDestroyed(unitID, unitDefID) --to do: use this to remove markers + finish test for commander morph
---	local teamID = GetUnitTeam(unitID)
-	ud = UnitDefs[unitDefID]
-	if (ud.isCommander==true) and (teamID == GetMyTeamID()) then
-		local x, y, z = spGetUnitPosition(unitID)
-		unitChecked[] = Spring.GetUnitsInRectangle (x-1, 2, y-1, 2, teamID ) -- ( number xmin, number zmin, number xmax, number zmax [,number teamID] ) 
-**pseudo code>
-			if unitChecked == commander then 
-			echo ("Your commander is upgraded.")
-			return end
-			else
-<pseudocode**			
-		spMarkerAddPoint( x, y, z, myName .. "\nCommander corpse")
-		Spring.SendCommands({'say a:I lost my commander !'})
+--[[ ]]--
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to remove markers
+--[[	local killer = spGetLastAttacker(unitID) -- last attacker does NOT register splash or wide radius attack, only direct attack.
+	if killer == nil then
+			Echo("<Unit Marker>: killer is nil.")
+	else Echo("<Unit Marker>: killer is " .. killer )
 	end
-end --]]
+	local teamID = GetUnitTeam(unitID)
+	ud = UnitDefs[unitDefID]
+	Echo ("<Unit Marker>: " .. unitID .. " from team " .. teamID .. " died.")
+	if (ud.isCommander==true) then --and (teamID == GetMyTeamID()) then
+		Echo("<Unit Marker>: " .. unitID .. " is comm !")
+		spMarkerAddPoint( x, y, z)
+		if killer == nil then
+			Echo("<Unit Marker>: Your commander is upgraded.")
+		else Echo("<Unit Marker>: comm killed")
+			spMarkerAddPoint( x, y, z, myName .. "\nCommander corpse")
+			Spring.SendCommands({'say a:I lost my commander !'})
+		end
+	end ]]--
+
+
+	local unitTeamID = GetUnitTeam(unitID)
+	ud = UnitDefs[unitDefID]
+	local x, y, z = spGetUnitPosition(unitID)
+	if (ud.isCommander==true) and (unitTeamID == GetMyTeamID()) then
+		printDebug("<Unit Marker>: " .. unitID .. " is comm !")
+		firstUnitID = unitID
+		unitChecked = Spring.GetUnitsInRectangle (x-1, z-1, x+1, z+1) -- ( number xmin, number zmin, number xmax, number zmax [,number teamID] )
+		if unitChecked[1] ~= nil then
+			printDebug( "<Unit Marker>: something found !")
+			for _,unitID in ipairs (unitChecked) do
+				printDebug("<Unit Marker>: Found this : " .. unitID )
+				secondUnitID = unitID
+				if ( secondUnitID == firstUnitID ) then
+					spMarkerAddPoint( x, y, z, myName .. "\nComm\ncorpse")
+					Spring.SendCommands({'say a:I lost my commander !'})
+				else
+					ud = UnitDefs[unitDefID]
+					if (ud.isCommander==true) and (unitTeamID == GetMyTeamID()) then
+						Echo ("<Unit Marker>: Your commander is upgraded.")
+					return end 
+				return end
+			end
+		else printDebug("<Unit Marker>: nothing found, very weird!")
+		end
+	else printDebug(unitID .. " is NOT comm !")
+	return end 
+end
 
 function printDebug( value )
 	if ( debug ) then

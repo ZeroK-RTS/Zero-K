@@ -1,7 +1,7 @@
 include("colors.h.lua")
 include("keysym.h.lua")
 
-local versionNumber = "6.2.3"
+local versionNumber = "6.2.4"
 
 function widget:GetInfo()
 	return {
@@ -19,7 +19,8 @@ end
 -- to do : include chicken buildings.
 
 ---- CHANGELOG -----
--- versus666,			v6.2.3	(04nov2010)	:	Added hacksaw to unit list + defRangeNoButtons var & checks due to licho's request, need to add var to option menu.
+-- versus666,			v6.2.4	(04nov2010)	:	added widget name over buttons when in tweak mode, cleared than a plain box + widget name in tooltips when hovering over buttons.
+-- versus666,			v6.2.3	(04nov2010)	:	added hacksaw to unit list + defRangeNoButtons var & checks due to licho's request, need to add var to option menu.
 												made defRangeNoButtons = true & all ranges visible by default until there is a decent (chili?)gui to enable/disable ranges or buttons. Change at will but use the damn changelog to show who, when, what and how. Thanks.
 -- versus666, 			v6.2.2	(28oct2010)	:	Cleaned some bits of code.
 --		?,				v6.2.1	(17oct2010)	:	Added compatibilty to CA1F ->will need update when CA1F->ZK.
@@ -842,7 +843,7 @@ function CheckSpecState()
 	local _, _, spec, _, _, _, _, _ = spGetPlayerInfo(playerID)
 
 	if ( spec == true ) then
-		spEcho("<DefenseRange> Spectator mode. Widget removed.")
+		spEcho("<DefenseRange>: Spectator mode. Widget removed.")
 		widgetHandler:RemoveWidget()
 		return false
 	end
@@ -901,7 +902,7 @@ function DetectMod()
 	state["curModID"] = upper(Game.modShortName or "")
 
 	if ( modConfig[state["curModID"]] == nil ) then
-		spEcho("<DefenseRange> Unsupported Game, shutting down...")
+		spEcho("<DefenseRange>: Unsupported Game, shutting down...")
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -913,7 +914,7 @@ function DetectMod()
 		colorConfig = currentModConfig["color"]
 		printDebug("Game-specfic color configuration loaded")
 	end
-	printDebug( "<DefenseRange> ModName: " .. Game.modName .. " Detected Mod: " .. state["curModID"] )
+	printDebug( "<DefenseRange>: ModName: " .. Game.modName .. " Detected Mod: " .. state["curModID"] )
 end
 
 function ResizeButtonsToScreen()
@@ -1239,6 +1240,7 @@ function widget:TweakDrawScreen()
 	glColor(0.0,0.0,1.0,0.5)
 	glRect(xPosMin, yPosMax, xPosMax, yPosMin)
 	glColor(1,1,1,1)
+	glText( "Defense\nRange", xPosMin+1, ((yPosMin+yPosMax)/2), 12)
 end
 
 function widget:TweakIsAbove(x,y)
@@ -1249,8 +1251,9 @@ function widget:TweakIsAbove(x,y)
 end
 
 function widget:TweakGetTooltip(x,y)
-  return 'Click and hold left mouse button\n'..
-         'over a button to drag\n'
+  return	'Defense Range Buttons\n'..
+			'Click and hold left mouse button\n'..
+			'over a button to drag\n'
 end
 
 --END OF TWEAK MODE

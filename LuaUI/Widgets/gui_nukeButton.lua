@@ -1,4 +1,4 @@
-local versionNumber = "1.3.2"
+local versionNumber = "1.3.3"
 
 function widget:GetInfo()
 	return {
@@ -18,7 +18,8 @@ Features:
 -with one clic you select the next ready nuke silo for easy nuclear winter.
 
 ---- CHANGELOG -----
--- versus666,			v1.3.2	(04nov2010)	: removed other mods support to avoid rants about widget being a BA widget, added check to disable ghost tooltips when no nuke was built.
+-- versus666,			v1.3.3	(10nov2010)	: added more precise tweakmode tooltip + placeholder name + nuke icon.
+-- versus666,			v1.3.2	(04nov2010)	: removed other mods support to avoid rants about widget being a BA widget, added check to disable ghost tooltips when no nuke is built.
 -- versus666, 			v1.3.1	(30oct2010)	: added compatibility to CA1F -> need update when CA1F-> zero-K will be enforced.
 -- very_bad_soldier	V1.0					: initial release.
 
@@ -118,22 +119,14 @@ local printDebug
 local GL_FILL				= GL.FILL
 local GL_LINE_LOOP          = GL.LINE_LOOP
 local GL_TRIANGLE_STRIP 	= GL_TRIANGLE_STRIP
-local glTexEnv				= gl.TexEnv
 local glUnitShape			= gl.UnitShape
 local glFeatureShape		= gl.FeatureShape
 local glBeginEnd            = gl.BeginEnd
 local glBillboard           = gl.Billboard
-local glColor               = gl.Color
-local glDepthTest           = gl.DepthTest
 local glDrawGroundCircle    = gl.DrawGroundCircle
 local glDrawGroundQuad      = gl.DrawGroundQuad
-local glLineWidth           = gl.LineWidth
-local glPopMatrix           = gl.PopMatrix
-local glPushMatrix          = gl.PushMatrix
 local glTexRect             = gl.TexRect
 local glText                = gl.Text
-local glTexture             = gl.Texture
-local glTranslate           = gl.Translate
 local glVertex              = gl.Vertex
 local glAlphaTest			= gl.AlphaTest
 local glBlending			= gl.Blending
@@ -147,7 +140,7 @@ function widget:Initialize()
 	curModID = upper(Game.modShortName or "")
 	
 	if ( unitList[curModID] == nil ) then
-		spEcho("<Nuke Icon> Unsupported Game, shutting down...")
+		spEcho("<Nuke Icon>: Unsupported Game, shutting down...")
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -408,7 +401,7 @@ function drawButton( )
  -- draw icon
 	glColor( { 1.0, 1.0, 1.0} )
  
-	glTexture( ":n:LuaUI/Images/nuke_button_64.png" )
+	glTexture( ":n:LuaUI/Images/nuke_button_48.png" )
 
 	local texBorder = 0.75
 	glTexRect( xmin, ymin, xmax, ymax, 0.0, texBorder, texBorder, 0.0 )
@@ -563,6 +556,8 @@ function widget:TweakDrawScreen()
 	glColor(0.0,0.0,1.0,0.5)                                   
 	glRect( intConfig["buttonCoords"][1]["x"], intConfig["buttonCoords"][2]["y"], intConfig["buttonCoords"][2]["x"], intConfig["buttonCoords"][1]["y"])
 	glColor(1,1,1,1)
+	local centerx = xmin - intConfig["buttonCurrentWidth"] - 16
+	glText( "NUKE\nButton", centerx, ymin+12, intConfig["fontSize"])
 end
 
 function widget:TweakIsAbove(x,y)
@@ -570,8 +565,9 @@ function widget:TweakIsAbove(x,y)
 end
 
 function widget:TweakGetTooltip(x,y)
-  return 'Click and hold left mouse button\n'..
-         'over button to drag\n'
+  return 	'Nuke Button Icon\n'..
+			'Click and hold left mouse button\n'..
+			'over button to drag\n'
 end
 
 --END OF TWEAK MODE
