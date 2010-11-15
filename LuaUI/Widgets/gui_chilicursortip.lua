@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip",
-    desc      = "v0.25 Chili Cursor Tooltips.",
+    desc      = "v0.26 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -41,7 +41,10 @@ local strFormat 				= string.format
 local echo = Spring.Echo
 
 local iconFormat = ''
-local icontypes = include("Configs/icontypes.lua")
+
+local iconTypesPath = "Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and include(iconTypesPath)
+
 local color = {}
 
 --------------------------------------------------------------------------------
@@ -851,13 +854,18 @@ local function DetermineTooltip()
 		--help text
 		local helptext = GetHelpText( buildType )
 		
+		local iconPath = icontypes 
+			and	icontypes[(tt_ud and tt_ud.iconType or "default")].bitmap
+			or 	'icons/'.. tt_ud.iconType ..iconFormat
+			
+		
 		MakeToolTip2({
 			leftmargin = {
 				{ directcontrol = UnitBuildpic( tt_ud ) },
 				{ icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat(tt_ud.metalCost), },
 			},
 			main = {
-				{ icon = 'icons/'.. tt_ud.iconType ..iconFormat, text = tt_ud.humanName, fontSize=2 },
+				{ icon = iconPath, text = tt_ud.humanName, fontSize=2 },
 				{ text = tt_ud.tooltip, wrap=true },
 				tt_table.requires and { text = 'REQUIRES' .. tt_table.requires, } or {},
 				tt_table.provides and { text = 'PROVIDES' .. tt_table.provides, } or {},
@@ -890,17 +898,19 @@ local function DetermineTooltip()
 		-- pointing at unit/feature
 		if type == 'unit' or type == 'feature' then
 			
-			tt_unitID = data
+			--tt_unitID = data
+			local unitfeature_id = data
 			local tt_fd
 			local team, fullname
 			if type == 'unit' then
+				tt_unitID = unitfeature_id
 				team = spGetUnitTeam(tt_unitID) 
 				tt_ud = UnitDefs[ spGetUnitDefID(tt_unitID) or -1]
 				
 				fullname = ((tt_ud and tt_ud.humanName) or "")	
 			else -- type == feature
-				team = spGetFeatureTeam(tt_unitID)
-				local fdid = spGetFeatureDefID(tt_unitID)
+				team = spGetFeatureTeam(unitfeature_id)
+				local fdid = spGetFeatureDefID(unitfeature_id)
 				tt_fd = fdid and FeatureDefs[fdid or -1]
 				local feature_name = tt_fd and tt_fd.name
 				
@@ -928,8 +938,11 @@ local function DetermineTooltip()
 				playerName     = spGetPlayerInfo(player) or 'noname'
 			end
 			local teamColor      = Chili.color2incolor(spGetTeamColor(team))
-			
 			local unittooltip = tt_unitID and spGetUnitTooltip(tt_unitID) or (tt_ud and tt_ud.tooltip) or ""
+			
+			local iconPath = icontypes 
+				and	icontypes[(tt_ud and tt_ud.iconType or "default")].bitmap
+				or 	'icons/'.. ((tt_ud and tt_ud.iconType) or "") ..iconFormat
 			
 			MakeToolTip2({
 				leftmargin = {
@@ -937,7 +950,7 @@ local function DetermineTooltip()
 					{ icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0'), },
 				},
 				main = {
-					{ icon = icontypes[(tt_ud and tt_ud.iconType or "default")].bitmap, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
+					{ icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
 					{ text = unittooltip, wrap=true },
 					((type == 'unit') and { directcontrol = 'healthbar', } or {}),
 					{ directcontrol = GetResourceStack(type, tt_unitID, tt_ud or tt_fd, tooltip, ttFontSize ) },

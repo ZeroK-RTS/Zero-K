@@ -266,7 +266,7 @@ local function MakeButton(unitDefID, facID)
 				},
 
 				
-				Label:New{ caption = ud.metalCost .. ' m', fontSize = 11, x=2, bottom=2, },
+				Label:New{ caption = ud.metalCost .. ' m', fontSize = 11, x=2, bottom=2, fontShadow = true, },
 				Image:New {
 					name = 'bp',
 					file = "#"..unitDefID,

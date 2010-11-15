@@ -134,7 +134,7 @@ local function AddBuildButton()
 		tooltip = 'Click to activate build menu hotkeys.',
 		OnMouseUp = { Make_KB_Menu, }, 
 		children = {
-			Label:New{ caption = 'BUIL'.. green ..'D', fontSize=14, bottom='1'},
+			Label:New{ caption = 'BUIL'.. green ..'D', fontSize=14, bottom='1', fontShadow = true, },
 			Image:New {
 				--file = 'LuaUI/Images/resbar/work.png', --ugly when scaled
 				--file = 'LuaUI/Images/resbar/huge_m.png', --nice gear
@@ -205,7 +205,7 @@ local function AddButton(item, index)
 		},
 	}
 	if level == 0 and item.label then
-		button1:AddChild( Label:New{ caption = item.label, fontSize = 11, bottom=0 } )
+		button1:AddChild( Label:New{ caption = item.label, fontSize = 11, bottom=0, fontShadow = true,  } )
 	end
 	local label_hotkey
 	if index then
@@ -213,7 +213,7 @@ local function AddButton(item, index)
 		if angle < 0 then angle = angle + 360 end 
 		local idx = angle / 45
 		local hotkey = keys_display[1 + idx%8]
-		local label_hotkey = Label:New{ name = hotkey, caption = (hotkey_mode and green..hotkey or ''), fontSize = 11, right=0, }
+		local label_hotkey = Label:New{ name = hotkey, caption = (hotkey_mode and green..hotkey or ''), fontSize = 11, right=0, fontShadow = true, }
 		hotkey_labels[#hotkey_labels +1] = label_hotkey
 		button1:AddChild( label_hotkey )
 	end 
@@ -225,7 +225,7 @@ local function AddButton(item, index)
 		height = '80%',
 	})
 	if level ~= 0 then
-		button1:AddChild( Label:New{ caption = ud.metalCost .. ' m', fontSize = 11, bottom=0 } )
+		button1:AddChild( Label:New{ caption = ud.metalCost .. ' m', fontSize = 11, bottom=0, fontShadow = true,  } )
 	end
 	
 	grid_menu:AddChild(button1)
