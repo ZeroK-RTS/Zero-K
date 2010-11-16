@@ -275,7 +275,7 @@ local options = {
 	desc   = 'Adds option to sell your units, buy units from allies (including temporary allies). Also allows you to place a bounty on a unit.',
 	type   = 'bool',
 	section= 'experimental',
-	def    = false,
+	def    = true,
   },
     {
     key    = 'terracostmult',
@@ -335,6 +335,7 @@ local options = {
 
     },
   },
+  --[[
   {
     key    = 'easymetal',
     name   = 'Easy Metal',
@@ -343,6 +344,7 @@ local options = {
     section= 'experimental',
     def    = false,
   },
+  --]]
   {
     key    = 'stayonteam',
     name   = 'Stay On Team (Dysfunctional)',
