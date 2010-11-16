@@ -486,11 +486,18 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 			Spring.GiveOrderToUnit(selectedFac, order, {pos, cmdid, 0 }, {"alt", "ctrl"})
 		end
 	else
+		-- delete from back so that the order is not canceled while under construction
 		local i = 0
-		while commands[i+pos] and commands[i+pos].id == cmdid and i < numInput do
-			Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
+		while commands[i+pos] and commands[i+pos].id == cmdid do
 			i = i + 1
 		end
+		i = i - 1
+		j = 0
+		while commands[i+pos] and commands[i+pos].id == cmdid and j < numInput do
+			Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
+			j = j + 1
+			i = i - 1
+		end 
 	end
 end
 
