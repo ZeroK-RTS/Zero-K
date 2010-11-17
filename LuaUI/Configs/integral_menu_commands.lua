@@ -87,23 +87,9 @@ local super = {	--merged into special
 	mahlazer = {order = 5, row = 2},
 }
 
---number doesn't mean anything
-local common_commands = {
-	[CMD.STOP]=1, [CMD.GUARD]=1, [CMD.ATTACK]=1, [CMD.FIGHT]=1,
-	[CMD.WAIT]=2, [CMD.PATROL]=2, [CMD.MOVE]=2, 
-	[CMD.REPAIR]=1,   [CMD.RECLAIM]=1, [CMD_BUILD] = 1, [CMD.CAPTURE] = 1, [CMD.RESURRECT] = 1, 
---	[CMD_LEVEL] =1, [CMD_RAMP]= 1, [CMD_RAISE] = 2, [CMD_SMOOTH] =2,  [CMD_RESTORE] =2,
-	[CMD.SELFD]=1, [CMD.AUTOREPAIRLEVEL]=1,[CMD.DGUN]=1,
-	[CMD_RETREAT_ZONE] = 2,
-	[CMD_AREA_MEX] = 1,
-	[CMD.LOAD_UNITS]=1, [CMD.UNLOAD_UNITS]=1,
-	[CMD.AREA_ATTACK]=1,
-}
-
---not needed; menu has autodetection
-local states_commands = {
-
-}
+--manual entries not needed; menu has autodetection
+local common_commands = {}
+local states_commands = {}
 
 local factory_commands = {}
 local econ_commands = {}
