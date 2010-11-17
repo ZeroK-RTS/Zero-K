@@ -88,7 +88,7 @@ end
 
 options_path = "Settings/Interface/Chat/Console"
 options_order = { 'autoHideChat', 'noColorName',  'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
-		'col_text', 'col_ally', 'col_othertext', 'col_dup', 
+		'opacity', 'col_text', 'col_ally', 'col_othertext', 'col_dup', 
 		}
 options = {
 	
@@ -177,8 +177,20 @@ options = {
 		value = {1,0.2,0.2,1},
 		OnChange = option_remakeConsole,
 	},
-	
-	
+	opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 1, min = 0, max = 1, step = 0.01,
+		OnChange = function(self) 
+			window_console.color = {1,1,1,self.value}
+			scrollpanel1.color = {1,1,1,self.value}
+			stack_console.color = {1,1,1,self.value}
+			window_console:Invalidate() 
+			scrollpanel1:Invalidate() 
+			stack_console:Invalidate() 
+		end,
+	}
+
 	
 	
 }
@@ -268,6 +280,7 @@ local function makeNewConsole(x, y, w, h)
 		--horizontalScrollbar = false,
 		verticalSmartScroll = true,
 		disableChildrenHitTest = true,
+		--color = {1,1,1,options.opacity.value},
 	}
 	
 	stack_console = StackPanel:New{
@@ -281,6 +294,7 @@ local function makeNewConsole(x, y, w, h)
 		itemMargin  = {1,1,1,1},
 		autosize = true,
 		preserveChildrenOrder=true,
+		--color = {1,1,1,options.opacity.value},
 	}
 	
 
@@ -298,7 +312,7 @@ local function makeNewConsole(x, y, w, h)
 		resizable = true,
 		dragUseGrip = true,
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
-		
+		color = {1,1,1,options.opacity.value},
 		children = {
 			scrollpanel1,
 		},
