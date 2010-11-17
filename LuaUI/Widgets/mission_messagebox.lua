@@ -27,7 +27,7 @@ function WG.ShowMessageBox(text, width, pause)
   local Chili = WG.Chili
   local vsx, vsy = gl.GetViewSizes()
   local height = 300
-  local x = math.floor((vsx - height)/2)
+  local x = math.floor((vsx - width)/2)
   local y = math.floor((vsy - height)/2)
   if pause then
   end
