@@ -599,15 +599,7 @@ local sounds = {
 			[1] = "hovercraft_select",
 		},
 	},
-	hoverartillery = {
-		ok = {
-			[1] = "hovercraft_move",
-		},
-		select = {
-			[1] = "hovercraft_select",
-		},
-	},
-	corah = {
+	hoveraa = {
 		ok = {
 			[1] = "hovercraft_move",
 		},
@@ -781,11 +773,6 @@ local sounds = {
 	cafus = {
 		select = {
 			[1] = "adv_fusion_select",
-		},
-	},
-	armwin = {
-		select = {
-			[1] = "windmill_select",
 		},
 	},
 	geo = {

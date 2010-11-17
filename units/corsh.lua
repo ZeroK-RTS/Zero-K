@@ -88,8 +88,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 50,
-        planes  = 50,
+        default = 65,
+        planes  = 65,
         subs    = 2.5,
       },
 
@@ -119,7 +119,7 @@ unitDef = {
       turret                  = true,
       waterbounce             = 1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 900,
+      weaponVelocity          = 1000,
     },
 
   },

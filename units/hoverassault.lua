@@ -77,41 +77,64 @@ unitDef = {
   },
 
 
+  weapons             = {
+
+    {
+      def                = [[ROCKET]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+
+  },
+
+
   weaponDefs          = {
 
-    CANNON = {
-      name                    = [[Cannon]],
-      areaOfEffect            = 32,
-      avoidFeature            = true,
-      avoidFriendly           = true,
-      burnblow                = true,
-      craterBoost             = 1,
-      craterMult              = 2,
+    ROCKET = {
+      name                    = [[Rocket]],
+      areaOfEffect            = 48,
+      cegTag                  = [[missiletrailredsmall]],
+      craterBoost             = 0,
+      craterMult              = 0,
 
       damage                  = {
-        default = 200,
-        planes  = 200,
-        subs    = 10,
+        default = 130,
+        planes  = 130,
+        subs    = 7,
       },
 
-      edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:INGEBORG]],
+      fireStarter             = 70,
+      flightTime              = 2.2,
+      guidance                = false,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
+      interceptedByShieldType = 2,
       lineOfSight             = true,
+      model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
-      range                   = 200,
-      reloadtime              = 2,
-      renderType              = 4,
-      soundHit                = [[weapon/cannon/cannon_hit2]],
-      soundStart              = [[weapon/cannon/cannon_fire4]],
-      soundStartVolume        = 3,
+      predictBoost            = 1,
+      range                   = 270,
+      reloadtime              = 1.2,
+      renderType              = 1,
+      selfprop                = true,
+      smokedelay              = [[.1]],
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/sabot_hit]],
+      soundHitVolume          = 8,
+      soundStart              = [[weapon/missile/sabot_fire]],
+      soundStartVolume        = 7,
       startsmoke              = [[1]],
+      startVelocity           = 150,
+      texture2                = [[darksmoketrail]],
+      tracks                  = false,
+      trajectoryHeight        = 0.05,
       turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 150,
+      weaponAcceleration      = 130,
+      weaponTimer             = 3,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 130,
     },
+
   },
 
 

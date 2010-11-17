@@ -73,7 +73,7 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
                             attackerID, attackerDefID, attackerTeam)
         
-	if (not weaponID) or (not attritionWeaponDefs[weaponID]) or ((not attackerID) and attritionWeaponDefs[weaponID].noDeathBlast)or (attritionWeaponDefs[weaponID].noFF and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam)) then 
+	if (not spValidUnitID(unitID)) or (not weaponID) or (not attritionWeaponDefs[weaponID]) or ((not attackerID) and attritionWeaponDefs[weaponID].noDeathBlast)or (attritionWeaponDefs[weaponID].noFF and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam)) then 
 		return damage
 	end
 	

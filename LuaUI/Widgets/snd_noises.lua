@@ -101,9 +101,9 @@ end
 
 function widget:CommandNotify(cmdID)
 	local unitID = GetSelectedUnits()[1]
-		if (not unitID) then
+	if (not unitID) then
 		return
-		end
+	end
 	local unitDefID = GetUnitDefID(unitID)
 	local unitName = UnitDefs[unitDefID].name
 	local sounds = soundTable[unitName] or soundTable[default]

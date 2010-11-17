@@ -52,6 +52,7 @@ vehicle_move2.wav - Nanoblobs
 vehicle_select.wav - Scorched 3D
 vehicle_select2.wav - pdsounds
 hovercraft_select.wav - Simply the best and pacdv
+hovercraft_move.wav - pacdv
 
 fighter_move.wav - Scorched 3D
 fighter_select.wav - Scorched 3D
@@ -69,5 +70,5 @@ sub_select.wav - Nanoblobs
 
 light_something_select.wav - Nanoblobs
 
-windmill. wav - freesound and Golgotha
+windmill.wav - Golgotha and PD sound from OpenGameArt
 
