@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.82 Chili Minimap",
+    desc      = "v0.83 Chili Minimap",
     author    = "Licho, tweaked by CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -27,9 +27,11 @@ local function AdjustToMapAspectRatio(w,h)
 	return h*Game.mapX/Game.mapY, h+iconsize
 end
 
+local function MakeMinimapWindow()
+end
 
 options_path = 'Game'
-options_order = { 'use_map_ratio', 'simplecolors', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', }
+options_order = { 'use_map_ratio', 'hidebuttons', 'simplecolors', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', }
 options = {
 	
 	use_map_ratio = {
@@ -91,28 +93,26 @@ options = {
 		OnChange= function() Spring.SendCommands{"toggleradarandjammer"} end
 	},
 	
+	hidebuttons = {
+		name = 'Hide Minimap Buttons',
+		type = 'bool',
+		advanced = true,
+		path = 'Settings/Interface',
+		OnChange= function(self) iconsize = self.value and 0 or 20; MakeMinimapWindow() end
+	},
+	
 }
 
-
-function widget:Initialize()
-	if (Spring.GetMiniMapDualScreen()) then
-		Spring.Echo("ChiliMinimap: auto disabled (DualScreen is enabled).")
-		widgetHandler:RemoveWidget()
-		return
+MakeMinimapWindow = function()
+	if (window_minimap) then
+		window_minimap:Dispose()
 	end
-
-	if (not WG.Chili) then
-		widgetHandler:RemoveWidget()
-		return
-	end
-
-	Chili = WG.Chili
-
+	
 	local w,h = 300,200+iconsize
 	if (options.use_map_ratio.value) then
 		w,h = AdjustToMapAspectRatio(w,h)
 	end
-
+	
 	window_minimap = Chili.Window:New{  
 		dockable = true,
 		name = "minimap",
@@ -137,6 +137,26 @@ function widget:Initialize()
 			Chili.Button:New{ height=iconsize, width=iconsize, caption='R', bottom=0, right=iconsize*7, tooltip=options.viewradar.name .. ' (' .. options.viewradar.desc ..')', 	OnClick={ options.viewradar.OnChange }, },
 		},
 	}
+end
+
+function widget:Initialize()
+	if (Spring.GetMiniMapDualScreen()) then
+		Spring.Echo("ChiliMinimap: auto disabled (DualScreen is enabled).")
+		widgetHandler:RemoveWidget()
+		return
+	end
+
+	if (not WG.Chili) then
+		widgetHandler:RemoveWidget()
+		return
+	end
+
+	Chili = WG.Chili
+
+	
+	MakeMinimapWindow()
+	
+	
 	gl.SlaveMiniMap(true)
 end
 
