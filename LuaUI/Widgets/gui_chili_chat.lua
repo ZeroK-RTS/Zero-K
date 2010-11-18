@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat",
-    desc      = "v0.38 Chili Chat Console.",
+    desc      = "v0.39 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -56,18 +56,7 @@ local lines_count = 0
 local MIN_HEIGHT = 150
 local MIN_WIDTH = 300
 
-local def_settings = {
-	minversion = 21,
-	pos_x = 450,
-	pos_y = 0,
-	c_width = 400,
-	c_height = 200,
-}
-local settings = def_settings
-
-local rightmargin = 35
-
-local window_console, window_settings
+local window_console
 
 local colorNames = {}
 local colors = {}
@@ -191,10 +180,7 @@ options = {
 		end,
 	}
 
-	
-	
 }
-
 
 
 --------------------------------------------------------------------------------
@@ -269,55 +255,10 @@ local function GenerateTextControl(line, remake)
 end 
 
 
-local function makeNewConsole(x, y, w, h)
-	local h=h
+local function UpdateConsole()
 
-	scrollpanel1 = ScrollPanel:New{
-		x = 0,
-		y = 0,
-		bottom = inputtext_inside and 25 or 0,
-		right= inputtext_inside and 0 or 6,
-		--horizontalScrollbar = false,
-		verticalSmartScroll = true,
-		disableChildrenHitTest = true,
-		--color = {1,1,1,options.opacity.value},
-	}
-	
-	stack_console = StackPanel:New{
-		parent = scrollpanel1,
-		x = 0,
-		y = 0,
-		width='100%',
-		height = 10,
-		resizeItems=false,
-		itemPadding  = {1,1,1,1},
-		itemMargin  = {1,1,1,1},
-		autosize = true,
-		preserveChildrenOrder=true,
-		--color = {1,1,1,options.opacity.value},
-	}
-	
 
-	window_console = Window:New{  
-		dockable = true,
-		name = "chat",
-		x = x,  
-		y = y,
-		width  = w,
-		height = h,
-		--parent = screen0,
-		--visible = false,
-		--backgroundColor = settings.col_bg,
-		draggable = true,
-		resizable = true,
-		dragUseGrip = true,
-		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
-		color = {1,1,1,options.opacity.value},
-		children = {
-			scrollpanel1,
-		},
-	}
-
+	stack_console:ClearChildren()
 	for i = 1, lines_count do
 		local line = lines[i]
 		GenerateTextControl(line, true)
@@ -327,20 +268,8 @@ local function makeNewConsole(x, y, w, h)
 end
 
 function remakeConsole()
-	setup()
-		
-	if window_console ~= nil then
-		local x,y = window_console.x, window_console.y
-		local w,h = window_console.width, window_console.height
-		
-		window_console:Dispose()
-		window_console=nil
-		stack_console:Dispose()
-		stack_console=nil
-		makeNewConsole(x, y, w, h)
-	else 
-		makeNewConsole(settings.pos_x, settings.pos_y, settings.c_width, settings.c_height)
-	end 
+	setup()	
+	UpdateConsole()
 end
 
 local function ReshapeConsole()
@@ -453,12 +382,9 @@ local function addLine(msg)
 	
 	if lines_count >= options.max_lines.value then
 		stack_console:RemoveChild(stack_console.children[1])
-		
 		lines_count = lines_count - 1
-		
 		--stack_console:UpdateLayout()
 	end
-	
 	
 	if playername == myName then
 		if WG.enteringText then
@@ -500,9 +426,6 @@ end
 
 
 function widget:Shutdown()
-	if (window_settings) then
-		window_settings:Dispose()
-	end
 	if (window_console) then
 		window_console:Dispose()
 	end
@@ -518,9 +441,7 @@ function widget:Update(s)
 	if timer > 2 then
 		timer = 0
 		spSendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
-			--window_console.x / screen0.width + (options.inputtext_inside.value and 0.008 or 0), 
 			window_console.x / screen0.width + 0.008, 
-			--1 - (window_console.y + window_console.height) / screen0.height + (options.inputtext_inside.value and 0.01 or (-0.023) ), 
 			1 - (window_console.y + window_console.height) / screen0.height + 0.01, 
 			window_console.width / screen0.width)})
 	end
@@ -529,7 +450,6 @@ end
 -----------------------------------------------------------------------
 
 function widget:Initialize()
-
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget()
 		return
@@ -546,14 +466,58 @@ function widget:Initialize()
 	
 	Spring.SendCommands("bind Any+enter  chat")
 	
-	setup()
+	stack_console = StackPanel:New{
+		x = 0,
+		y = 0,
+		width='100%',
+		height = 10,
+		resizeItems=false,
+		itemPadding  = {1,1,1,1},
+		itemMargin  = {1,1,1,1},
+		autosize = true,
+		preserveChildrenOrder=true,
+		--color = {1,1,1,options.opacity.value},
+	}
+	
+	scrollpanel1 = ScrollPanel:New{
+		x = 0,
+		y = 0,
+		bottom = inputtext_inside and 25 or 0,
+		right= inputtext_inside and 0 or 6,
+		verticalSmartScroll = true,
+		disableChildrenHitTest = true,
+		--color = {1,1,1,options.opacity.value},
+		children = {
+			stack_console,
+		},
+	}
+	
+	window_console = Window:New{  
+		dockable = true,
+		name = "chat",
+		x = x,  
+		y = y,
+		width  = w,
+		height = h,
+		--parent = screen0,
+		--visible = false,
+		--backgroundColor = settings.col_bg,
+		draggable = true,
+		resizable = true,
+		dragUseGrip = true,
+		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
+		color = {1,1,1,options.opacity.value},
+		children = {
+			scrollpanel1,
+		},
+	}
+	
 	remakeConsole()
 
 	local oldLines = Spring.GetConsoleBuffer(30)
 	for i=1,#oldLines do
 		addLine(oldLines[i].text)
 	end
-
+	
 	spSendCommands({"console 0"})
-
 end
