@@ -33,7 +33,7 @@ local EXCLUDED_UNITS = {
   [ UnitDefNames['terraunit'].id ] = true,
 }
 
-
+local DEFAULT_UNIT = "armcom"		--FIXME: hardcodey until I cba to identify precise source of problem
 
 
 if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage
@@ -272,13 +272,11 @@ end
 
 
 local function GetStartUnit(teamID, playerID)
-
   local side = select(5, Spring.GetTeamInfo(teamID))
   local sideCase = select(2, Spring.GetSideData(side)) -- case pls
   local startUnit = Spring.GetSideData(side)
   local chickens = modOptions and tobool(modOptions.chickens)
   local replace = false
-
 	
   if (playerID and playerSides[playerID]) then 
 	return startUnits[playerSides[playerID]]
@@ -288,24 +286,15 @@ local function GetStartUnit(teamID, playerID)
 	return startUnits[teamSides[teamID]]
   end
   
-  -- 1 faction
+--FIXME: cleanup
   if ((sideCase == "Chicken (Robots if disabled)") and not chickens) then
-    return select(2, Spring.GetSideData(1)) -- robots
-  end
-
-  -- ca
-  if (side == "") or (sideCase == "Random") then
-    replace = true
-  end
-
-  if ((sideCase == "Chicken (Random if disabled)") and not chickens) then
-    replace = true
+    return DEFAULT_UNIT	--select(2, Spring.GetSideData(1)) -- robots
   end
 
   if replace then
     local new_starters = {
       [1]="armcom",	--select(2, Spring.GetSideData(2)), -- arm
---      [2]="corcom",	--select(2, Spring.GetSideData(3)), -- core
+--    [2]="corcom",	--select(2, Spring.GetSideData(3)), -- core
     }
 --[[
     if chicken then
@@ -315,7 +304,7 @@ local function GetStartUnit(teamID, playerID)
     local rand = math.ceil( math.random() * #new_starters )
     startUnit = new_starters[rand]
   end
-  return startUnit
+  return startUnit or DEFAULT_UNIT
 end
 
 
