@@ -382,6 +382,19 @@ local behaviourConfig = {
 		swarmLeeway = 30, 
 		alwaysJinkFight = true,	
 	},
+	
+	["puppy"] = {
+		skirms = {}, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true, 
+		maxSwarmLeeway = 40, 
+		jinkTangentLength = 100, 
+		minCircleStrafeDistance = 0,
+		minSwarmLeeway = 100,
+		swarmLeeway = 30, 
+		alwaysJinkFight = true,	
+	},
   
 	["armpw"] = {
 		skirms = raiderRangeSkirmieeArray, 

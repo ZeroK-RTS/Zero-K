@@ -49,37 +49,6 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 660,
   smoothAnim          = true,
-
-  sounds              = {
-    canceldestruct = [[ota/cancel2]],
-
-    cant           = {
-      [[ota/cantdo4]],
-    },
-
-
-    count          = {
-      [[ota/count6]],
-      [[ota/count5]],
-      [[ota/count4]],
-      [[ota/count3]],
-      [[ota/count2]],
-      [[ota/count1]],
-    },
-
-
-    ok             = {
-      [[ota/vtolcrmv]],
-    },
-
-
-    select         = {
-      [[ota/vtolcrac]],
-    },
-
-    underattack    = [[ota/warning1]],
-  },
-
   stealth             = true,
   steeringmode        = [[1]],
   TEDClass            = [[VTOL]],
