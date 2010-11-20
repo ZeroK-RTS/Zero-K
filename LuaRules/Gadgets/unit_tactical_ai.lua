@@ -32,6 +32,7 @@ local spFindUnitCmdDesc		= Spring.FindUnitCmdDesc
 local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
 local spGetUnitLosState		= Spring.GetUnitLosState
 local spGetUnitStates		= Spring.GetUnitStates
+local spValidUnitID			= Spring.ValidUnitID
 local random 				= math.random
 local sqrt 					= math.sqrt
 
@@ -381,6 +382,12 @@ local function updateUnits(n)
 	for unitID, data in pairs(unit) do
 		
 		while true do
+			
+			if not spValidUnitID(unitID) then
+				unit[unitID] = nil
+				break
+			end
+		
 			--Spring.Echo("unit parsed")
 			if not data.active then
 				if data.receivedOrder then
