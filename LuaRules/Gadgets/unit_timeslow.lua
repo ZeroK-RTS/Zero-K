@@ -55,18 +55,19 @@ local function checkTargetRandomTarget(unitID)
 
 end
 
-local function updateSlow( unitID, state)
+local function updateSlow(unitID, state)
 
 	local health = Spring.GetUnitHealth(unitID)
 	
-	if state.slowDamage > health*0.66 then
-		state.slowDamage = health*0.66
-	end
-	
-	local percentSlow = state.slowDamage/health
+	if health then
+		if state.slowDamage > health*0.66 then
+			state.slowDamage = health*0.66
+		end
+		
+		local percentSlow = state.slowDamage/health
 
-	Spring.SetUnitRulesParam(unitID,"slowState",percentSlow, {inlos = true})
-	
+		Spring.SetUnitRulesParam(unitID,"slowState",percentSlow, {inlos = true})
+	end
 end
 
 
