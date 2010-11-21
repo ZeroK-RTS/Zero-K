@@ -757,6 +757,14 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
+	["corgarp"] = {
+		skirms = longRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 10, 
+	},
 	
 	-- arty range skirms
 	["corhrk"] = {

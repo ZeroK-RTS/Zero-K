@@ -78,7 +78,7 @@ unitDef = {
 
     {
       def                = [[MINE]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
+      badTargetCategory  = [[]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 180,
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
