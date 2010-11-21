@@ -1,6 +1,6 @@
 unitDef = {
   unitname              = [[corclog]],
-  name                  = [[Clogger]],
+  name                  = [[Dirtbag]],
   description           = [[Box of Dirt]],
   acceleration          = 0.093,
   amphibious            = [[1]],
