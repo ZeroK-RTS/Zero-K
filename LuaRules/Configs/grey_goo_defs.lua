@@ -1,5 +1,5 @@
 local unitArray = {}
-local UPDATE_FREQUNECY = 15
+local UPDATE_FREQUNECY = 30
 
 local units = {
 

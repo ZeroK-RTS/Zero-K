@@ -142,6 +142,7 @@ local barColors = {
   mana    = { 0.80,0.20,0.90,barAlpha },
   fuel    = { 0.70,0.30,0.00,barAlpha },
   slow    = { 0.50,0.10,0.70,barAlpha },
+  goo     = { 0.50,0.50,0.50,barAlpha },
   shield  = { 0.20,0.60,0.60,barAlpha },
 
   resurrect = { 1.00,0.50,0.00,featureBarAlpha },
@@ -675,6 +676,12 @@ do
       local slowState = GetUnitRulesParam(unitID,"slowState")
       if (slowState and (slowState>0)) then
         AddBar("slow",slowState,"slow",(fullText and floor(slowState*100)..'%') or '')
+      end
+	  
+	  --// GOO
+      local gooState = GetUnitRulesParam(unitID,"gooState")
+      if (gooState and (gooState>0)) then
+        AddBar("goo",gooState,"goo",(fullText and floor(gooState*100)..'%') or '')
       end
 	  
       --// JUMPJET
