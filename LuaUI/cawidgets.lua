@@ -267,7 +267,7 @@ function widgetHandler:LoadOrderList()
     if (not self.orderList) then
       self.orderList = {} -- safety
     end
-	if (self.orderList.version or ORDER_VERSION) < ORDER_VERSION then 
+	if (self.orderList.version or 0) < ORDER_VERSION then 
 		self.orderList = {}
 		self.orderList.version = ORDER_VERSION
 	end 
@@ -298,7 +298,7 @@ function widgetHandler:LoadConfigData()
     if (not self.configData) then
       self.configData = {} -- safety
     end
-	if (self.configData.version or DATA_VERSION) < DATA_VERSION then 
+	if (self.configData.version or 0) < DATA_VERSION then 
 		self.configData = {}
 		self.configData.version = DATA_VERSION
 	end 
