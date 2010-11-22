@@ -9,7 +9,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.31 Integral Command Menu",
+    desc      = "v0.32 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -50,6 +50,16 @@ NOTE FOR OTHER GAME DEVS:
 
 ------------------------
 --  CONFIG
+------------------------
+------------------------
+options_path = 'Settings/Interface/Integral Menu'
+options = {
+	disablesmartselect = {
+		name = 'Disable Smart Tab Select',
+		type = 'bool',
+	},
+}
+
 ------------------------
 --speedups
 local spGetUnitDefID = Spring.GetUnitDefID
@@ -1073,7 +1083,9 @@ function widget:SelectionChanged(newSelection)
 		local id = newSelection[i]
 		if IsFactory((spGetUnitDefID(id))) then
 			selectedFac = id
-			SmartTabSelect()
+			if not options.disablesmartselect.value then
+				SmartTabSelect()
+			end
 			return
 		end
 	end
@@ -1082,6 +1094,8 @@ function widget:SelectionChanged(newSelection)
 end
 
 local function ScrollTabs(key)
+	return false
+	--[[
 	local delta
 	if key == KEYSYMS.COMMA then delta = -1
 	elseif key == KEYSYMS.PERIOD then delta = 1 end
@@ -1094,6 +1108,7 @@ local function ScrollTabs(key)
 	Update(true)
 	ColorTabs()
 	return	--returning true "eats" the keypress so nothing else registers it
+	--]]
 end
 
 --[[
