@@ -2,6 +2,13 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local passiveStealth = {
+	draw   = true,
+    init   = false,
+    energy = 0,
+    delay  = 0,
+	tieToCloak = true,
+}
 
 local stealthDefs = {
 
@@ -60,9 +67,11 @@ local stealthDefs = {
     energy = 20,
     delay  = 30,
   },
-  
 }
 
+for name, _ in pairs(stealthDefs) do
+	stealthDefs[name] = passiveStealth
+end
 
 if (Spring.IsDevLuaEnabled()) then
   for k,v in pairs(UnitDefNames) do

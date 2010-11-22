@@ -105,6 +105,7 @@ local function ValidateStealthDefs(mds)
       newData.init   = stealthData.init
       newData.energy = stealthData.energy or 0
       newData.delay  = stealthData.delay or 30
+	  newData.tieToCloak = stealthData.tieToCloak
       newDefs[ud.id] = newData
 --[[
       print('Stealth ' .. udName)
@@ -136,7 +137,7 @@ end
 
 
 local function AddStealthUnit(unitID, stealthDef)
-  AddStealthCmdDesc(unitID, stealthDef)
+  if not stealthDef.tieToCloak then AddStealthCmdDesc(unitID, stealthDef) end
 
   local stealthData = {
     id      = unitID,
@@ -144,6 +145,7 @@ local function AddStealthUnit(unitID, stealthDef)
     draw    = stealthDef.draw,
     active  = stealthDef.init,
     energy  = stealthDef.energy / 32,
+	tieToCloak = stealthDef.tieToCloak
   }
   stealthUnits[unitID] = stealthData
 
@@ -268,8 +270,8 @@ end
 
 --------------------------------------------------------------------------------
 
-function StealthCommand(unitID, cmdParams)
-  if (type(cmdParams[1]) ~= 'number') then
+function StealthCommand(unitID, cmdParams, stateArg)
+  if (cmdParams and type(cmdParams[1]) ~= 'number') and (not stateArg) then
     return false
   end
   local stealthData = stealthUnits[unitID]
@@ -277,7 +279,7 @@ function StealthCommand(unitID, cmdParams)
     return false
   end
 
-  local state = (cmdParams[1] == 1)
+  local state = (cmdParams and cmdParams[1] == 1) or stateArg
   if (state) then
     wantingUnits[unitID] = stealthData
     SetUnitRulesParam(unitID, "stealth", 2)
@@ -319,7 +321,21 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
   return true, true  -- command was used, remove it
 end
 
+function gadget:UnitCloaked(unitID, unitDefID, teamID)
+  local stealthData = stealthUnits[unitID]
+  if (not stealthData) or (not stealthData.tieToCloak) then
+    return false
+  end
+  StealthCommand(unitID, nil, true)  
+end
 
+function gadget:UnitDecloaked(unitID, unitDefID, teamID)
+  local stealthData = stealthUnits[unitID]
+  if (not stealthData) or (not stealthData.tieToCloak) then
+    return false
+  end
+  StealthCommand(unitID, nil, false)  
+end
 --------------------------------------------------------------------------------
 --  SYNCED
 --------------------------------------------------------------------------------
