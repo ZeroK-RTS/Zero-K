@@ -71,7 +71,7 @@ local useCompleteMinCost = true
 local logDeathInView = true
 local logCompleteInView = true
 
-local widgetString = "\255\255\64\32<Unit News> \008"	--ARGB
+local widgetString = "\255\255\255\255<Unit News> \008"	--ARGB
 
 --function isSpec()
 --	if (spGetSpectatingState or spIsReplay) then
@@ -117,8 +117,8 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	elseif (ud.isFactory) then Echo(widgetString .. ud.humanName .. ": factory destroyed")
 	elseif (ud.isCommander) then Echo(widgetString .. ud.humanName .. ": commander lost")
 	elseif (ud.isBuilding) then Echo(widgetString .. ud.humanName .. ": building destroyed")
-	elseif (ud.TEDClass == "SHIP") or (ud.TEDClass == "WATER") then Echo(widgetString .. ud.humanName .. "vessel sunk")
-	elseif (ud.isBuilder) then Echo(widgetString .. ud.humanName .. " constructor lost")
+	elseif (ud.TEDClass == "SHIP") or (ud.TEDClass == "WATER") then Echo(widgetString .. ud.humanName .. ": vessel sunk")
+	elseif (ud.isBuilder) then Echo(widgetString .. ud.humanName .. ": constructor lost")
 	else Echo(widgetString .. ud.humanName .. ": unit lost")
 	end
 end
