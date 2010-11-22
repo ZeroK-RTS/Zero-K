@@ -58,6 +58,11 @@ options = {
 		name = 'Disable Smart Tab Select',
 		type = 'bool',
 	},
+	hidetabs = {
+		name = 'Hide Tab Row',
+		type = 'bool',
+		advanced = true,
+	},
 }
 
 ------------------------
@@ -741,7 +746,12 @@ end
 
 local function SmartTabSelect()
 	Update()
-	if #n_units > 0 and #n_econ == 0 then
+	if options.hidetabs.value then
+		menuChoice = 1
+		ColorTabs(1)
+	elseif options.disablesmartselect.value then 
+		return
+	elseif #n_units > 0 and #n_econ == 0 then
 		menuChoice = 6	--selected factory, jump to units
 		ColorTabs(6)
 	elseif #n_econ > 0 and menuChoice == 6 then
@@ -1083,9 +1093,7 @@ function widget:SelectionChanged(newSelection)
 		local id = newSelection[i]
 		if IsFactory((spGetUnitDefID(id))) then
 			selectedFac = id
-			if not options.disablesmartselect.value then
-				SmartTabSelect()
-			end
+			SmartTabSelect()
 			return
 		end
 	end
@@ -1130,4 +1138,17 @@ end
 function widget:Shutdown()
   widgetHandler:ConfigLayoutHandler(nil)
   Spring.ForceLayoutUpdate()
+end
+
+options.hidetabs.OnChange = function(self) 
+	fakewindow:SetPosRelative(fakewindow.x, self.value and 0 or '15%', fakewindow.width, self.value and '100%' or '86%')
+	fakewindow:SetPosRelative(fakewindow.x, self.value and 0 or '15%', fakewindow.width, self.value and '100%' or '86%')
+	
+	if self.value then 
+		window:RemoveChild(menuTabRow)
+	else
+		window:AddChild(menuTabRow)
+	end
+	menuChoice = 1
+	ColorTabs(1)
 end
