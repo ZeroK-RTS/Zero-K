@@ -2,14 +2,13 @@
 -- TODO: add missing command icons
 -- TODO: commandschanged gets called 2x for some reason, investigate
 -- TODO: display which unit is currently selected
--- TODO: display build progress
 -- TODO: proper tooltips for queue buttons
 -- TODO: make tab scrolling with keyboard detect actions prevmenu and nextmenu instead of KeyPress
 
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.32 Integral Command Menu",
+    desc      = "v0.33 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -45,7 +44,7 @@ HOW IT WORKS:
 	
 NOTE FOR OTHER GAME DEVS:
 	ZK uses WG.GetBuildIconFrame to draw the unit type border around buildpics.
-	IF you're not using them (likely), remove all lines containing that function.
+	If you're not using them (likely), remove all lines containing that function.
 --]]
 
 ------------------------
@@ -68,7 +67,9 @@ options = {
 ------------------------
 --speedups
 local spGetUnitDefID = Spring.GetUnitDefID
+local spGetUnitHealth     = Spring.GetUnitHealth
 local spGetFullBuildQueue = Spring.GetFullBuildQueue
+local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
 
 local push        = table.insert
 
@@ -119,6 +120,7 @@ local states_main	--parent row of state buttons
 local sp_states = {}	--buttons
 local buildRow	--row of build queue buttons
 local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
+local buildProgress = {}	--Progressbar, child of buildRowButtons[1].image; updates every gameframe
 
 local buildRow_visible = false
 local buildQueue = {}	--build order table of selectedFac
@@ -287,6 +289,10 @@ local function MakeButton(container, cmd, insertItem)
 				parent = button;
 			}
 			if isBuild then image.file2 = WG.GetBuildIconFrame(UnitDefs[-cmd.id]) end
+			if isState then 
+				height = "100%"
+				y = 0
+			end
 		else 
 			if label~=nil then label.valign="center" end
 		end 
@@ -535,7 +541,7 @@ local function ManageBuildRow()
 	if buildQueue[MAX_COLUMNS + 1] then 
 		overrun = true 
 	end
-	
+
 	for i=1, MAX_COLUMNS do
 		local buttonArray = buildRowButtons[i]
 		if buttonArray.button then RemoveChildren(buttonArray.button) end
@@ -570,6 +576,7 @@ local function ManageBuildRow()
 				buttonArray.button.OnMouseDown = nil
 			end
 			buttonArray.button.backgroundColor[4] = 0.3
+			
 			if not (overrun and i == MAX_COLUMNS) then
 				buttonArray.button.tooltip = 'Add to/subtract from queued batch'
 				buttonArray.image = Image:New {
@@ -593,6 +600,11 @@ local function ManageBuildRow()
 					fontSize = 16;
 					fontShadow = true;
 				}
+			end
+			
+			if i == 1 then
+				buttonArray.image:AddChild(buildProgress)
+				--Spring.Echo("Adding build progress bar")
 			end
 		end
 	end
@@ -970,7 +982,7 @@ function widget:Initialize()
 		orientation   = "horizontal";
 		height = "96%";
 		width = tostring(STATE_SECTION_WIDTH).."%";
-		x = tostring(98-STATE_SECTION_WIDTH).."%";
+		x = tostring(100-STATE_SECTION_WIDTH).."%";
 		y = "3%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
@@ -980,7 +992,7 @@ function widget:Initialize()
 			parent = states_main,
 			resizeItems = true;
 			orientation   = "vertical";
-			height = "98%";
+			height = "100%";
 			width = tostring(math.floor(100/numStateColumns)).."%";
 			x = tostring(100 - (math.floor(100/numStateColumns))*i).."%";
 			y = "0%";
@@ -1001,57 +1013,23 @@ function widget:Initialize()
 		itemMargin  = {0, 0, 0, 0},
 		backgroundColor = {0.2, 0.2, 0.2, 0.6}
 	}
+
+	buildProgress = Progressbar:New{
+		value = 0.0,
+		name    = 'prog';
+		max     = 1;
+		color   		= {0.7, 0.7, 0.4, 0.6},
+		backgroundColor = {1, 1, 1, 0.01},
+		--x = 0, y = 0, bottom = "100%", right = "100%",
+		x=12, y=4, bottom=4, right=12,
+		skin=nil,
+		skinName='default',
+	},
 	
 	commands_main:RemoveChild(buildRow);
 	for i=1,MAX_COLUMNS do
 		buildRowButtons[i] = {}
 	end
-end
-
---what it says on the tin
---probably inefficient, should get a better way of doing this
-local function DrawBuildProgress(left,top,right,bottom, progress, color)
-  gl.Color(color)
-  local xcen = (left+right)/2
-  local ycen = (top+bottom)/2
-
-  local alpha = 360*(progress)
-  local alpha_rad = math.rad(alpha)
-  local beta_rad  = math.pi/2 - alpha_rad
-  local list = {}
-  push(list, {v = { xcen,  ycen }})
-  push(list, {v = { xcen,  top }})
-
-  local x,y
-  x = (top-ycen)*tan(alpha_rad) + xcen
-  if (alpha<90)and(x<right) then
-    push(list, {v = { x,  top }})   
-  else
-    push(list, {v = { right,  top }})
-    y = (right-xcen)*tan(beta_rad) + ycen
-    if (alpha<180)and(y>bottom) then
-      push(list, {v = { right,  y }})
-    else
-      push(list, {v = { right,  bottom }})
-      x = (top-ycen)*tan(-alpha_rad) + xcen
-      if (alpha<270)and(x>left) then
-        push(list, {v = { x,  bottom }})
-      else
-        push(list, {v = { left,  bottom }})
-        y = (right-xcen)*tan(-beta_rad) + ycen
-        if (alpha<350)and(y<top) then
-          push(list, {v = { left,  y }})
-        else
-          push(list, {v = { left,  top }})
-          x = (top-ycen)*tan(alpha_rad) + xcen
-          push(list, {v = { x,  top }})
-        end
-      end
-    end
-  end
-
-  gl.Shape(GL.TRIANGLE_FAN, list)
-  gl.Color(1,1,1,1)
 end
 
 local lastCmd = nil  -- last active command 
@@ -1074,14 +1052,17 @@ function widget:DrawScreen()
 		end 
 		lastCmd = cmdid
 	end
-	--[[
-	if buildRow_visible and (menuChoice == 6) and selectedFac then
-		local button = buildRowButtons[1] and buildRowButtons[1].button
-		local buildee = Spring.GetUnitIsBuilding(selectedFac)
-		if buildee then local _, _, _, _, progress = Spring.GetUnitHealth(buildee) end
-		if button then DrawBuildProgress(button.left,button.top,button.right,button.bottom, progress, { 1, 1, 1, 0.5 }) end	--can't use this until I figure out how to get chili to give me button bounds
+end
+
+function widget:GameFrame()
+	--set progress bar
+	if menuChoice == 6 and selectedFac and buildRowButtons[1] and buildRowButtons[1].image then
+		local progress
+		local unitBuildID      = spGetUnitIsBuilding(selectedFac)
+		if unitBuildID then _, _, _, _, progress = spGetUnitHealth(unitBuildID) end
+		--Spring.Echo(progress)
+		buildProgress:SetValue(progress or 0)
 	end
-	--]]
 end
 
 function widget:SelectionChanged(newSelection)
