@@ -370,7 +370,6 @@ local options = {
     section= 'experimental',
     def    = false,
   },
-
   {
     key    = 'fun',
     name   = 'Fun Stuff',
@@ -378,25 +377,9 @@ local options = {
     type   = 'section',
   },
   {
-    key    = 'chickens',
-    name   = 'Enable Chicken Faction',
-    desc   = 'It\'s mandatory for someone willing to use the chicken faction to have this enabled AND to close the commander selector once ingame else he/she will get the selected commander or the Striker commander, by default.',
-    type   = 'bool',
-    section= 'fun',
-    def    = false,
-  },
-  {
     key    = 'xmas',
     name   = 'Enable festive units',
     desc   = "Zero K units get into the spirit of the season with a festive new look.",
-    type   = 'bool',
-    section= 'fun',
-    def    = false,
-  },
-  {
-    key    = 'HiddenUnits',
-    name   = 'Unlock Hidden Units',
-    desc   = "Enables the building of hidden units and structures not in the game, through the concept factory.",
     type   = 'bool',
     section= 'fun',
     def    = false,
