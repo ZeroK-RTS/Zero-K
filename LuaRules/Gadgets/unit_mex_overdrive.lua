@@ -807,6 +807,7 @@ function gadget:GameFrame(n)
 				local grid = pylonData.gridID
 				local conversion = 0
 				if (grid ~= 0 and gridMetalGain[grid]>0) then conversion = gridEnergySpent[grid]/gridMetalGain[grid] end 
+				
 				pylonData.color = GetGridColor(conversion, false)
 				
 				if not pylonData.overdrive then
@@ -1161,12 +1162,10 @@ local colors = {
 }
 
 local function HighlightPylons(selectedUnitDefID)
-	--glDepthTest(false)
-	glPolygonOffset(-50, -2)
-	
 	local myAlly = spGetMyAllyTeamID()
 	local pylon = SYNCED.pylon
 
+	gl.BlendFunc(GL.ONE_MINUS_SRC_ALPHA, GL.ZERO)
 	for id, data in spairs(pylon[myAlly]) do 
 		local radius = pylonDefs[spGetUnitDefID(id)].range
 		if (radius) then 
@@ -1178,14 +1177,12 @@ local function HighlightPylons(selectedUnitDefID)
 			end 
 			glColor(color[1],color[2], color[3], color[4])
 
-			glPushMatrix()
-			glTranslate(spGetUnitBasePosition(id))
-			glScale(radius,1,radius)
-			glCallList(circlePolys)
-			glPopMatrix()
+			local x,y,z = spGetUnitBasePosition(id)
+			gl.Utilities.DrawGroundCircle(x,z, radius)
 		end 
 	end 
-
+	
+	
 	if selectedUnitDefID then 
 		local mx, my = spGetMouseState()
 		local _, coords = spTraceScreenRay(mx, my, true, true)
@@ -1193,21 +1190,23 @@ local function HighlightPylons(selectedUnitDefID)
 			local radius = pylonDefs[selectedUnitDefID].range
 			if (radius == 0) then
 			else
-				coords[1] = floor((coords[1])/16)*16 +8
-				coords[3] = floor((coords[3])/16)*16 +8
+				local x = floor((coords[1])/16)*16 +8
+				local z = floor((coords[3])/16)*16 +8
 				glColor(disabledColor)
 --				coords[1] = floor((coords[1]+8)/16)*16
 				--coords[3] = floor((coords[3]+8)/16)*16
-				glPushMatrix()
+				gl.Utilities.DrawGroundCircle(x,z, radius)
+
+				--[[glPushMatrix()
 				glTranslate(unpack(coords))
 				glScale(radius,1,radius)
 				glCallList(circlePolys)
-				glPopMatrix()
+				glPopMatrix()]]--
 			end
 		end 
 	end 
 	
-	glPolygonOffset(false)
+	--glPolygonOffset(false)
 
 	--glDepthTest(true)
 --[[
@@ -1243,7 +1242,6 @@ function gadget:DrawWorldPreUnit()
 		gl.PopAttrib() 
 	end]]--
 
-
 	local _, cmd_id = spGetActiveCommand()  -- show pylons if pylon is about to be placed
 	if (cmd_id) then 
 		if pylonDefs[-cmd_id] then 
@@ -1266,7 +1264,6 @@ function gadget:DrawWorldPreUnit()
 		return 
 		end 
 	end 
-
 end
 
 -------------------------------------------------------------------------------------
