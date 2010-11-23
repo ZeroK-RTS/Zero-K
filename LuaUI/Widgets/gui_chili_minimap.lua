@@ -118,6 +118,9 @@ MakeMinimapWindow = function()
 		name = "minimap",
 		x = 0,  
 		y = 0,
+		color = {0,0,0,0},
+		padding = {0,0,0,0},
+		margin = {0,0,0,0},
 		width  = w,
 		height = h,
 		parent = Chili.Screen0,
@@ -128,6 +131,7 @@ MakeMinimapWindow = function()
 		dragUseGrip = true,
 		minimumSize = {50,50},
 		children = {
+			Chili.Panel:New {bottom = iconsize-3, x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},
 			Chili.Button:New{ height=iconsize, width=iconsize, caption='-', bottom=0, right=iconsize*1, tooltip=options.viewstandard.name, 	OnClick={ options.viewstandard.OnChange }, },
 			Chili.Button:New{ height=iconsize, width=iconsize, caption='H', bottom=0, right=iconsize*2, tooltip=options.viewheightmap.name,	OnClick={ options.viewheightmap.OnChange }, },
 			Chili.Button:New{ height=iconsize, width=iconsize, caption='B', bottom=0, right=iconsize*3, tooltip=options.viewblockmap.name, 	OnClick={ options.viewblockmap.OnChange	}, },
@@ -178,11 +182,11 @@ local lx, ly, lw, lh
 function widget:DrawScreen() 
 	if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) then 
 		local cx,cy,cw,ch = Chili.unpack4(window_minimap.clientArea)
-		ch = ch-iconsize*1.2		
-		cx = cx - 4
-		cy = cy - 4
-		cw = cw + 8
-		ch = ch + 8
+		ch = ch-iconsize	
+		cx = cx + 8 
+		cy = cy + 4  
+		cw = cw - 16  
+		ch = ch - 8  
 		--window_minimap.x, window_minimap.y, window_minimap.width, window_minimap.height
 		--Chili.unpack4(window_minimap.clientArea)
 		cx,cy = window_minimap:LocalToScreen(cx,cy)
