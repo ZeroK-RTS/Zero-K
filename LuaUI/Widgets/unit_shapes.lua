@@ -360,7 +360,8 @@ function widget:Initialize()
 		local scale = scalefaktor*( xsize^2 + zsize^2 )^0.5
 		local shape, xscale, zscale
 		
-		if (unitDef.isBuilding or unitDef.isFactory) then
+		
+		if (unitDef.isBuilding or unitDef.isFactory or unitDef.speed==0) then
 			shape = shapes.square
 			xscale, zscale = rectangleFactor * xsize, rectangleFactor * zsize
 		elseif (unitDef.canFly) then
@@ -370,7 +371,7 @@ function widget:Initialize()
 			shape = shapes.circle
 			xscale, zscale = scale, scale
 		end
-		
+
 		unitConf[udid] = {shape=shape, xscale=xscale, zscale=zscale}
 	end
 
@@ -432,7 +433,7 @@ function widget:DrawWorldPreUnit()
 	-- To fix Water
 	gl_ColorMask(false,false,false,true)
 	gl_BlendFunc(GL_ONE, GL_ONE)
-	glColor(0,1,1,1)
+	glColor(0,1,0,1)
 	-- Does not need to be drawn per Unit .. it covers the whole map
 	gl_DrawList(clearquad)
 	
@@ -467,7 +468,7 @@ function widget:DrawWorldPreUnit()
 	-- (without protecting form drawing them twice)
 	gl_ColorMask(true,true,true,true)
 	gl_BlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA)
-	glColor(0,1,1,1)
+	glColor(0,1,0,1)
 --	for i=1, #visibleSelected do
 --		unitID = visibleSelected[i]
 --		udid = spGetUnitDefID(unitID)
@@ -527,7 +528,7 @@ function widget:DrawWorldPreUnit()
 		unit = unitConf[udid]
 		
 		if (unit) then
-			glColor(0,1,1,0)
+			glColor(0,1,0,0)
 			glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
 		end
 	end

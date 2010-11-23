@@ -1165,8 +1165,8 @@ local function HighlightPylons(selectedUnitDefID)
 	local myAlly = spGetMyAllyTeamID()
 	local pylon = SYNCED.pylon
 
-	gl.PushAttrib(GL.COLOR_BUFFER_BIT)
-	gl.BlendFunc(GL.ONE_MINUS_SRC_ALPHA, GL.ZERO)
+	--gl.PushAttrib(GL.COLOR_BUFFER_BIT)
+	--gl.BlendFunc(GL.ONE_MINUS_SRC_ALPHA, GL.ZERO)
 	for id, data in spairs(pylon[myAlly]) do 
 		local radius = pylonDefs[spGetUnitDefID(id)].range
 		if (radius) then 
@@ -1222,7 +1222,7 @@ local function HighlightPylons(selectedUnitDefID)
 		gl.PopAttrib() 
 	end
 --]]
-	gl.PopAttrib()
+	--gl.PopAttrib()
 end 
 
 
