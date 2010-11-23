@@ -105,7 +105,6 @@ options = {
 --------------------------------------------------------------------------------
 
 function widget:Update(s)
-
 	if not window then return end
 
 	local myTeamID = GetMyTeamID()
@@ -120,6 +119,12 @@ function widget:Update(s)
 	else
 		ePull = ePull - WG.energyWasted
 	end
+	
+	
+	if (WG.energyChange ~= nil and WG.energyChange < 0) then   -- we donated energy, which causes income and expenses to indicate higher value, fix it 
+		eInco = eInco + WG.energyChange
+		eExpe = eExpe + WG.energyChange
+	end 
 
 	blink = (blink + s)%blink_periode
 	blink_alpha = math.abs(blink_periode/2 - blink)
@@ -467,11 +472,12 @@ end
 --------------------------------------------------------------------------------
 
 
-function MexEnergyEvent(teamID, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive)
+function MexEnergyEvent(teamID, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, change)
   if (Spring.GetLocalTeamID() == teamID) then 
   	WG.energyWasted = energyWasted
 	--Spring.Echo("energyWasted " .. energyWasted)
 	WG.energyForOverdrive = energyForOverdrive
+	WG.energyChange = change -- energy change by OD - substract that from income 
   end
 end
 
