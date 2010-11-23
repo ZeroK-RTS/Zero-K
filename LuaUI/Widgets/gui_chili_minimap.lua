@@ -70,6 +70,7 @@ options = {
 	},
 	viewblockmap = {
 		name = 'Toggle Pathing Map',
+		desc = 'Select unit then click this to see, where unit can go',
 		type = 'button',
 		OnChange= function() Spring.SendCommands{"showpathmap"} end
 	},
