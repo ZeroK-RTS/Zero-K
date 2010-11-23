@@ -35,6 +35,7 @@ for i=1,#UnitDefs do
 		or(udef.windGenerator > 0)
 		or(udef.customParams.windgen)
 		or(udef.extractsMetal > 0)
+		or(tonumber(udef.customParams.pylonrange) or 0 > 0)
 		then
 			pylonDefs[i] = {
 				range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE,

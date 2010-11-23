@@ -21,7 +21,7 @@ unitDef = {
 
   customParams                  = {
     helptext   = [[The Singularity Reactor employs graviton power-generation theory beyond safety specifications. With such immense generating capacity in one structure comes great consequence. All mobile units within the enormous death blast radius are sent careening to ground zero. An entire continent on which this is built should be considered unsafe ground.]],
-    pylonrange = 800,
+    pylonrange = 200,
   },
 
   damageModifier                = 0.95,

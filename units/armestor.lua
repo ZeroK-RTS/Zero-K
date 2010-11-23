@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armestor]],
-  name                          = [[Energy Storage]],
-  description                   = [[Stores Energy (500)]],
+  name                          = [[Energy Pylon]],
+  description                   = [[Increases extent of energy grid]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   bmcode                        = [[0]],
@@ -16,9 +16,12 @@ unitDef = {
   buildingGroundDecalType       = [[armestor_aoplane.dds]],
   buildPic                      = [[ARMESTOR.png]],
   buildTime                     = 150,
+  customParams                  = {
+    pylonrange = 500,
+  },
+
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
-  energyStorage                 = 500,
   explodeAs                     = [[ESTOR_BUILDINGEX]],
   footprintX                    = 3,
   footprintZ                    = 3,
