@@ -471,7 +471,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
+-- note works only in communism mode
 function MexEnergyEvent(teamID, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, change)
   if (Spring.GetLocalTeamID() == teamID) then 
   	WG.energyWasted = energyWasted

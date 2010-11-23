@@ -62,7 +62,7 @@ local HIDDEN_STORAGE = 10000 -- hidden storage - it will spend all energy above 
 
 --local CMD_MEXE = 30666
 
-local SHARED_MODE = true
+local SHARED_MODE = Spring.GetModOption('communism',true,true)
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -635,6 +635,11 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								maxedOverdriveMetal = maxedOverdriveMetal + orgMetal * metalMult
 								allyMetalSquared = allyMetalSquared - orgMetal * orgMetal
 								gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
+								
+								if (not SHARED_MODE) then 
+									Spring.AddTeamResource(Spring.GetUnitTeam(unitID), "m", thisMexM)
+								end 
+
 								local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 								if unitDef then
 									Spring.SetUnitTooltip(unitID,unitDef.humanName .. " - Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2))
@@ -653,8 +658,8 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedOverdriveMetal = summedOverdriveMetal + orgMetal * metalMult
 					
-					if ( not SHARED_MODE) then 
-						Spring.AddTeamResource(GetUnitTeam(unitID), "m", thisMexM)
+					if (not SHARED_MODE) then 
+						Spring.AddTeamResource(Spring.GetUnitTeam(unitID), "m", thisMexM)
 					end 
 					
 					gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
@@ -833,8 +838,9 @@ function gadget:GameFrame(n)
 				local teamID = allyTeamData.team[i]
 				if (SHARED_MODE) then 
 					Spring.AddTeamResource(teamID, "m", summedMetalProduction / allyTeamData.teams)
-				end 
-				SendToUnsynced("MexEnergyEvent", teamID, energyWasted / allyTeamData.teams, (allyEExcess - energyWasted)/ allyTeamData.teams,summedMetalProduction / allyTeamData.teams,summedOverdriveMetal / allyTeamData.teams, changeTeams[teamID]) 
+				else 
+					SendToUnsynced("MexEnergyEvent", teamID, energyWasted / allyTeamData.teams, (allyEExcess - energyWasted)/ allyTeamData.teams,summedMetalProduction / allyTeamData.teams,summedOverdriveMetal / allyTeamData.teams, changeTeams[teamID]) 
+				end
 			end 
 		end
 	end

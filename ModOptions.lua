@@ -391,14 +391,14 @@ local options = {
     type   = 'string',
     def    = false,
   },
-  --[[{
-    key    = 'communism',
-    name   = 'Communism - metal sharing',
+  {
+	key    = 'communism',
+    name   = 'Communism - resource sharing',
     desc   = 'Overdrive energy and metal extractors are used for common good, resulting metal is shared equally.',
     type   = 'bool',
-    section= 'experimental',
+    section= 'modifiers',
     def    = true,
-  },]]
+  },
   {
     key    = "disablefeatures",
     name   = "Disable Features",
