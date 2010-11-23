@@ -2,11 +2,11 @@ function widget:GetInfo()
    return {
       name      = "UnitShapes 0.5.7",
       desc      = "Draws blended shapes around units and buildings",
-      author    = "Lelousius and aegis",
+      author    = "Lelousius and aegis, modded Licho",
       date      = "30.07.2010",
       license   = "GNU GPL, v2 or later",
       layer     = 2, -- what is this?
-      enabled   = false  --  loaded by default?
+      enabled   = true  --  loaded by default?
    }
 end
 
@@ -401,14 +401,14 @@ end
 --------------------------------------------------------------------------------
 local visibleUnits, visibleSelected = {}, {}
 function widget:Update()
-	local mx, my = spGetMouseState()
+	--[[local mx, my = spGetMouseState()
 	local ct, id = spTraceScreenRay(mx, my)
 	if (ct == "unit") then
 		hoveredUnit = id
 	else
 		hoveredUnit = nil
 	end
-	
+	]]--
 	visibleUnits, visibleSelected = GetVisibleUnits()
 end
 
@@ -432,7 +432,7 @@ function widget:DrawWorldPreUnit()
 	-- To fix Water
 	gl_ColorMask(false,false,false,true)
 	gl_BlendFunc(GL_ONE, GL_ONE)
-	glColor(0,1,0,1)
+	glColor(0,1,1,1)
 	-- Does not need to be drawn per Unit .. it covers the whole map
 	gl_DrawList(clearquad)
 	
@@ -467,7 +467,7 @@ function widget:DrawWorldPreUnit()
 	-- (without protecting form drawing them twice)
 	gl_ColorMask(true,true,true,true)
 	gl_BlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA)
-	glColor(0,1,0,1)
+	glColor(0,1,1,1)
 --	for i=1, #visibleSelected do
 --		unitID = visibleSelected[i]
 --		udid = spGetUnitDefID(unitID)
@@ -527,25 +527,11 @@ function widget:DrawWorldPreUnit()
 		unit = unitConf[udid]
 		
 		if (unit) then
-			glColor(0,1,0,0)
+			glColor(0,1,1,0)
 			glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
 		end
 	end
-	
-	-- highlight unit under mouse cursor
-	if (hoveredUnit) then
-		local unitID = hoveredUnit
-		udid = spGetUnitDefID(unitID)
-		unit = unitConf[udid]
-		
-		if (unit) then
-			gl_ColorMask(true,true,true,true)
-			gl_BlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA)
-			
-			glColor(0.5,0.5,0.5,0)
-			glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
-		end
-	end
+
 	glPopAttrib()
 end
 
