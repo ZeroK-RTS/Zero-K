@@ -1,3 +1,4 @@
+//linear constant 65536
 piece base, pelvis, torso, rgun, lgun, rbarrel, lbarrel, fp1, fp2, rflap1, rflap2, rflap3, rflap4, lflap1,
 lflap2, lflap3, lflap4, rupleg, rloleg, rfoot, lupleg, lloleg, lfoot, rftoe, rrtoe, lftoe, lrtoe;
 
@@ -431,7 +432,6 @@ QueryPrimary(piecenum)
 	{
 	piecenum = fp2;
 	}
-
 }
 
 QuerySecondary(piecenum)
@@ -444,7 +444,6 @@ QuerySecondary(piecenum)
 	{
 	piecenum = fp2;
 	}
-
 }
 
 SweetSpot(piecenum)
@@ -454,22 +453,33 @@ SweetSpot(piecenum)
 
 Killed(severity, corpsetype)
 {
-
-	if( severity <= 199 )
+	if( severity <= 50 )
 	{
-		corpsetype = 3;
-		explode base type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode pelvis type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode torso type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode lgun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode rgun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode rupleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode rloleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode rfoot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode lupleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode lloleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode lfoot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		corpsetype = 1;
+		explode base type BITMAPONLY;
+		explode pelvis type BITMAPONLY;
+		explode torso type BITMAPONLY;
+		explode lgun type BITMAPONLY;
+		explode rgun type BITMAPONLY;
+		explode rupleg type BITMAPONLY;
+		explode rloleg type BITMAPONLY;
+		explode rfoot type BITMAPONLY;
+		explode lupleg type BITMAPONLY;
+		explode lloleg type BITMAPONLY;
+		explode lfoot type BITMAPONLY;
 		return (0);
 	}
-
+	corpsetype = 3;
+	explode base type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode pelvis type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode torso type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode lgun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode rgun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode rupleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode rloleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode rfoot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode lupleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode lloleg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode lfoot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	return (0);
 }

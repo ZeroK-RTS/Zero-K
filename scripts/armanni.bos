@@ -1,7 +1,6 @@
 #define TA			// This is a TA script
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, arm, turret, gun, ledgun, radar, barrel, fire,
        antenna, door1, door2;
@@ -170,6 +169,11 @@ AimPrimary(heading, pitch)
 	wait-for-turn turret around y-axis;
 	wait-for-turn gun around x-axis;
 	return (1);
+}
+
+AimFromWeapon1(piecenum)
+{
+	piecenum = barrel;
 }
 
 TargetCleared(Func_Var_1)

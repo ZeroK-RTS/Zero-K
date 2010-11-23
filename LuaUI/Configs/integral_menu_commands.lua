@@ -67,12 +67,13 @@ local defense = {
 	cortl = {order = 14, row = 3},
 	cormine1 = {order = 16, row = 3},
 	armanni = {order = 17, row = 3},
+	corjamt = {order = 18, row = 3},
 }
 
 local aux = {	--merged into special
 	corrad = {order = 10, row = 1},
 	armjamt = {order = 11, row = 1},
-	corjamt = {order = 12, row = 1},
+--	corjamt = {order = 12, row = 1},
 	armsonar = {order = 13, row = 1},
 	armarad = {order = 14, row = 1},
 	--armasp = {order = 15, row = 1},
