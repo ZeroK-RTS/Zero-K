@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.01 Chili Cursor Tooltips.",
+    desc      = "v0.02 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -192,7 +192,7 @@ local function ToSI(num)
     elseif (absNum < 1) then
       return strFormat("%.1f", num)
     elseif (absNum < 1000) then
-      return strFormat("%.0f", num)
+	  return strFormat("%.0f", num)
     elseif (absNum < 1000000) then
       return strFormat("%.1fk", 0.001 * num)
     else
@@ -200,9 +200,30 @@ local function ToSI(num)
     end
   end
 end
+local function ToSIPrec(num) -- more presise
+  if type(num) ~= 'number' then
+	return 'Tooltip wacky error #56'
+  end
+  if (num == 0) then
+    return "0"
+  else
+    local absNum = abs(num)
+    if (absNum < 0.001) then
+      return strFormat("%.2fu", 1000000 * num)
+    elseif (absNum < 1) then
+      return strFormat("%.2f", num)
+    elseif (absNum < 1000) then
+      return strFormat("%.1f", num)
+    elseif (absNum < 1000000) then
+      return strFormat("%.2fk", 0.001 * num)
+    else
+      return strFormat("%.2fM", 0.000001 * num)
+    end
+  end
+end
 
 local function numformat(num)
-	return comma_value(ToSI(num))
+	return comma_value(ToSIPrec(num))
 end
 
 
@@ -398,11 +419,13 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 		
 		if metalMake then
 			metal = metalMake - metalUse
+		end
+		if energyMake then
 			energy = energyMake - energyUse
 		end
 		
 		-- special cases for mexes
-		if ud.name == 'armmex' or ud.name=='cormex' then 
+		if ud.name=='cormex' then 
 			local baseMetal = 0
 			local s = tooltip:match("Makes: ([^ ]+)")
 			if s ~= nil then baseMetal = tonumber(s) end 
@@ -413,9 +436,10 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 			
 			metal = metal + baseMetal + baseMetal * od / 100
 			
-			s = tooltip:match("Energy: ([^ ]+)")
-			if s ~= nil and type(s) == number then 
-				energy = energy +tonumber(s) 
+			s = tooltip:match("Energy: ([^ \n]+)")
+			s = tonumber(s)
+			if s ~= nil and type(s) == 'number' then 
+				energy = energy + tonumber(s)
 			end 
 		end 
 		
