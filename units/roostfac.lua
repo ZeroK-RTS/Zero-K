@@ -21,9 +21,10 @@ unitDef = {
     [[chicken_listener]],
     [[chickena]],
     [[chickenc]],
+    [[chickenblobber]],
     [[chicken_spidermonkey]],
     [[chicken_tiamat]],
-    [[chickenq]],
+    [[chicken_dragon]],
   },
 
   buildPic                      = [[roostfac.png]],

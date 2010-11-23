@@ -500,16 +500,19 @@ local morphDefs = {
   chicken_drone = {
     [1] = {
       into = 'chickend',
+	  energy = 15,
       time = 20,
       rank = 0,
     },
    [2] = {
       into = 'nest',
+	  energy = 30,
       time = 20,
       rank = 0,
     },
    [3] = {
       into = 'chickenspire',
+	  energy = 600,
       time = 90,
       rank = 0,
     },
