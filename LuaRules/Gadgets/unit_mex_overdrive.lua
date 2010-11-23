@@ -653,6 +653,10 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedOverdriveMetal = summedOverdriveMetal + orgMetal * metalMult
 					
+					if ( not SHARED_MODE) then 
+						Spring.AddTeamResource(GetUnitTeam(unitID), "m", thisMexM)
+					end 
+					
 					gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
 					local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 					if unitDef then
@@ -707,37 +711,39 @@ function gadget:GameFrame(n)
 			local allyEMissing = 0
 			local changeTeams = {}
 
-			-- calcullate total income - tax 95% of energy income 
-			local sumInc = 0
-			for i = 1, allyTeamData.teams do 
-				local teamID = allyTeamData.team[i]
-				local eCur, eMax, ePull, eInc, eExp, _, eSent, eRec = Spring.GetTeamResources(teamID, "energy")
-				if (eCur ~= nil) then 
-					local eTax = eInc * 0.95
-					if (eTax > 0) then 
-						sumInc = sumInc + eTax 
+			if (SHARED_MODE) then 
+				-- calcullate total income - tax 95% of energy income 
+				local sumInc = 0
+				for i = 1, allyTeamData.teams do 
+					local teamID = allyTeamData.team[i]
+					local eCur, eMax, ePull, eInc, eExp, _, eSent, eRec = Spring.GetTeamResources(teamID, "energy")
+					if (eCur ~= nil) then 
+						local eTax = eInc * 0.95
+						if (eTax > 0) then 
+							sumInc = sumInc + eTax 
+						end 
 					end 
 				end 
-			end 
 
-			-- distribute taxes evenly - apply "change" on individual teams 
-			local share = sumInc / allyTeamData.teams
-			for i = 1, allyTeamData.teams do 
-				local teamID = allyTeamData.team[i]
-				local eCur, eMax, ePull, eInc, eExp, _, eSent, eRec = Spring.GetTeamResources(teamID, "energy")
-				if (eCur ~= nil) then 
-					local eTax = eInc * 0.95
-					if (eTax < 0) then eTax = 0 end 
+				-- distribute taxes evenly - apply "change" on individual teams 
+				local share = sumInc / allyTeamData.teams
+				for i = 1, allyTeamData.teams do 
+					local teamID = allyTeamData.team[i]
+					local eCur, eMax, ePull, eInc, eExp, _, eSent, eRec = Spring.GetTeamResources(teamID, "energy")
+					if (eCur ~= nil) then 
+						local eTax = eInc * 0.95
+						if (eTax < 0) then eTax = 0 end 
 
-					local change = share - eTax 
-					changeTeams[teamID] = change
-					if (change > 0) then 
-						Spring.AddTeamResource(teamID, "e", change)
-					else 
-						Spring.AddTeamResource(teamID, "e", -change)
+						local change = share - eTax 
+						changeTeams[teamID] = change
+						if (change > 0) then 
+							Spring.AddTeamResource(teamID, "e", change)
+						else 
+							Spring.AddTeamResource(teamID, "e", -change)
+						end 
 					end 
 				end 
-			end 
+			end
 
 			-- calculate overdrive energy excess 
 			for i = 1, allyTeamData.teams do 
@@ -824,7 +830,9 @@ function gadget:GameFrame(n)
 			--// Share Overdrive Metal
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
-				Spring.AddTeamResource(teamID, "m", summedMetalProduction / allyTeamData.teams)
+				if (SHARED_MODE) then 
+					Spring.AddTeamResource(teamID, "m", summedMetalProduction / allyTeamData.teams)
+				end 
 				SendToUnsynced("MexEnergyEvent", teamID, energyWasted / allyTeamData.teams, (allyEExcess - energyWasted)/ allyTeamData.teams,summedMetalProduction / allyTeamData.teams,summedOverdriveMetal / allyTeamData.teams, changeTeams[teamID]) 
 			end 
 		end
