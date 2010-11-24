@@ -2,9 +2,9 @@ unitDef = {
   unitname            = [[cormak]],
   name                = [[Outlaw]],
   description         = [[Riot Bot]],
-  acceleration        = 0.1018866,
+  acceleration        = 0.102,
   bmcode              = [[1]],
-  brakeRate           = 0.136294,
+  brakeRate           = 0.135,
   buildCostEnergy     = 250,
   buildCostMetal      = 250,
   builder             = false,
@@ -28,7 +28,6 @@ unitDef = {
   },
 
   defaultmissiontype  = [[Standby]],
-  designation         = [[CP-CMAK]],
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
@@ -75,9 +74,7 @@ unitDef = {
   trackWidth          = 22,
   turninplace         = 0,
   turnRate            = 1051,
-  unitnumber          = [[3203]],
   upright             = true,
-  version             = [[1.2]],
   workerTime          = 0,
   zbuffer             = [[1]],
 
@@ -120,7 +117,7 @@ unitDef = {
         subs    = 5,
       },
 
-      edgeeffectiveness       = 0.75,
+      edgeeffectiveness       = 0.6,
       explosionGenerator      = [[custom:riotball]],
       explosionSpeed          = 5,
       impulseBoost            = 0,
