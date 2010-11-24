@@ -76,8 +76,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 40,
-        planes  = 40,
+        default = 20,
+        planes  = 20,
         subs    = 15,
       },
 
@@ -111,7 +111,7 @@ unitDef = {
       turret                  = true,
       weaponAcceleration      = 200,
       weaponTimer             = 1,
-      weaponType              = [[MissileLauncher]],
+      weaponType              = [[Cannon]],
       weaponVelocity          = 300,
     },
 

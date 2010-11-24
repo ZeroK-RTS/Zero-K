@@ -37,7 +37,7 @@ unitDef = {
   leaveTracks         = true,
   maneuverleashlength = [[500]],
   mass                = 182,
-  maxDamage           = 1100,
+  maxDamage           = 1000,
   maxSlope            = 36,
   maxVelocity         = 1.5,
   maxWaterDepth       = 22,
@@ -117,7 +117,7 @@ unitDef = {
         subs    = 5,
       },
 
-      edgeeffectiveness       = 0.6,
+      edgeeffectiveness       = 0.75,
       explosionGenerator      = [[custom:riotball]],
       explosionSpeed          = 5,
       impulseBoost            = 0,

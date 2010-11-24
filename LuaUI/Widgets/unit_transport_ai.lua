@@ -250,6 +250,7 @@ end
 
 function widget:UnitIdle(unitID, unitDefID, teamID) 
   if teamID ~= myTeamID then return end
+  if WG.FerryUnits and WG.FerryUnits[unitID] then return end
   if (hackIdle[unitID] ~= nil) then
     hackIdle[unitID] = nil
     return

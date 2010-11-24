@@ -69,17 +69,6 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[CANNON]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-  },
-
-
-  weapons             = {
-
-    {
       def                = [[ROCKET]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
