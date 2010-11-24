@@ -95,7 +95,7 @@ local white = '\255\255\255\255'
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+--[[
 local function StaticChanged() 
 	if (window_tooltip2) then
 		window_tooltip2:Dispose()
@@ -103,9 +103,10 @@ local function StaticChanged()
 	
 	Initialize()
 end 
-
+--]]
 options_path = 'Settings/Interface/Tooltip'
-options_order = { 'tooltip_delay',  'statictip', 'fontsize', 'staticfontsize', 'hpshort'}
+--options_order = { 'tooltip_delay',  'statictip', 'fontsize', 'staticfontsize', 'hpshort'}
+options_order = { 'tooltip_delay',  'fontsize', 'hpshort'}
 
 options = {
 	tooltip_delay = {
@@ -123,6 +124,7 @@ options = {
 		value = 10,
 		OnChange = FontChanged,
 	},
+	--[[
 	staticfontsize = {
 		name = 'Static Display Font Size (10-30)',
 		desc = 'Resizes the font for the static display of group and terrain information',
@@ -138,6 +140,7 @@ options = {
 		desc = 'Makes the tooltip static and moveable',
 		OnChange = StaticChanged,
 	},
+	--]]
 	hpshort = {
 		name = "HP Short Notation",
 		type = 'bool',
@@ -151,12 +154,12 @@ options = {
 
 local function FontChanged() 
 	ttFontSize = options.fontsize.value
-	gFontSize = options.staticfontsize.value - ttFontSize
+	--gFontSize = options.staticfontsize.value - ttFontSize
 end
 
 
 options.fontsize.OnChange = FontChanged
-options.staticfontsize.OnChange = FontChanged
+--options.staticfontsize.OnChange = FontChanged
 
 function comma_value(amount)
 	local formatted
@@ -384,12 +387,14 @@ end
 
 
 local function KillTooltip(force)
+	--[[
 	if options.statictip.value and not force then
 		return
 	else
+	--]]
 		old_ttstr = ''
 		tt_unitID = nil
-	end
+	--end
 	
 	if window_tooltip2 and window_tooltip2:IsDescendantOf(screen0) then
 		screen0:RemoveChild(window_tooltip2)
@@ -499,12 +504,12 @@ local function PlaceToolTipWindow2(x,y)
 	if not window_tooltip2:IsDescendantOf(screen0) then
 		screen0:AddChild(window_tooltip2)
 	end
-	if not options.statictip.value then
+	--if not options.statictip.value then
 		local x = x
 		local y = scrH-y
 		window_tooltip2:SetPos(x,y)
 		AdjustWindow(window_tooltip2)
-	end
+	--end
 
 	window_tooltip2:BringToFront()
 end
@@ -777,14 +782,14 @@ end
 
 local function SetTooltip(tt_window)
 	
-	if options.statictip.value then
-	else
+	--if options.statictip.value then
+	--else
 		if window_tooltip2 ~= tt_window then
 			KillTooltip(true)
 			window_tooltip2 = tt_window
 		end
 		PlaceToolTipWindow2(mx+20,my-20)
-	end
+	--end
 end
 
 local function MakeToolTip_Text(text)
@@ -1101,7 +1106,7 @@ function widget:Initialize()
 	stack_leftbar = StackPanel:New{
 		width=10, -- needed for initial tooltip
 	}
-	
+	--[[
 	if options.statictip.value then
 		window_tooltip2_static = Window:New{  
 			--skinName = 'default',
@@ -1121,6 +1126,7 @@ function widget:Initialize()
 		}
 	
 	else
+	--]]
 		window_tooltip2 = Window:New{
 			--skinName = 'default',
 			useDList = false,
@@ -1130,7 +1136,7 @@ function widget:Initialize()
 			backgroundColor = color.tooltip_bg, 
 			children = { stack_leftbar, stack_main, }
 		}
-	end
+	--end
 
 	FontChanged()
 	spSendCommands({"tooltip 0"})
