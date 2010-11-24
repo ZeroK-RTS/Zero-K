@@ -127,9 +127,9 @@ factionBuildConfig = {
 				},
 				
 				[4] = { -- arty
-					importanceMult = 1,
-					count = 1,
-					[1] = {ID = UnitDefNames['punisher'].id, chance = 1},	
+					importanceMult = 0,
+					count = 0,
+--					[1] = {ID = UnitDefNames['punisher'].id, chance = 1},	
 				},
 				
 				[5] = { --assault
@@ -301,8 +301,9 @@ factionBuildConfig = {
 				},
 				
 				[4] = { -- arty
-					importanceMult = 0,
-					count = 0,				
+					importanceMult = 1,
+					count = 1,	
+					[1] = {ID = UnitDefNames['punisher'].id, chance = 1},					
 				},
 				
 				[5] = { --assault
@@ -511,8 +512,7 @@ factionBuildConfig = {
 				[3] = { -- fighter
 					importanceMult = 0.6,
 					count = 2,
-					[1] = {ID = UnitDefNames['corape'].id, chance = 0.7},
-					[2] = {ID = UnitDefNames['armkam'].id, chance = 0.3},
+					[1] = {ID = UnitDefNames['corape'].id, chance = 1},
 				},
 				
 				[4] = { -- bomber

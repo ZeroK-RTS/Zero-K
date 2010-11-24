@@ -28,7 +28,7 @@ local assault = {
 	--"corsumo",
 	"armbull",
 	"correap",
-	--"corgol",
+	"corgol",
 	
 	"armanac",
 	"hoverassault",
@@ -78,7 +78,7 @@ local riot = {
 	"hoverriot",
 	
 	"armraz",
-	"corkarg",
+	"dante",
 }
 
 local arty = {
