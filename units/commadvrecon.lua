@@ -37,7 +37,7 @@ unitDef = {
   },
 
   defaultmissiontype  = [[Standby]],
-  energyMake          = 2.5,
+  energyMake          = 3,
   energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
@@ -54,7 +54,7 @@ unitDef = {
   maxSlope            = 36,
   maxVelocity         = 1.55,
   maxWaterDepth       = 5000,
-  metalMake           = 2.5,
+  metalMake           = 3,
   metalStorage        = 0,
   minCloakDistance    = 100,
   movementClass       = [[AKBOT2]],
