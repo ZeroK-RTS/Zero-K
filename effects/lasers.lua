@@ -844,5 +844,60 @@ return {
     },
   },
 
+  ["flash1teal"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      circlealpha        = 0,
+      circlegrowth       = 0,
+      flashalpha         = 1,
+      flashsize          = 18,
+      ttl                = 3,
+      color = {
+        [1]  = 0.2,
+        [2]  = 1,
+        [3]  = 1,
+      },
+    },
+    meltage = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:LASERS_MELT2]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+    sparks = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.97,
+        colormap           = [[1 1 1 0.01   1 0.7 0.2 0.01   0 0 0 0.01]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 80,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, -0.4, 0]],
+        numparticles       = 15,
+        particlelife       = 15,
+        particlelifespread = 0,
+        particlesize       = 1,
+        particlesizespread = 2.5,
+        particlespeed      = 6,
+        particlespeedspread = 2,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[plasma]],
+      },
+    },
+  },
+  
 }
 
