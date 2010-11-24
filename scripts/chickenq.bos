@@ -1,3 +1,4 @@
+//linear constant 65536
 piece body,head,tail,lthighf,lkneef,lshinf,lfootf,rthighf,rkneef,rshinf,rfootf,lthighb,lkneeb,lshinb,lfootb,rthighb,rkneeb,rshinb,rfootb,lforearml,lbladel,rforearml,rbladel,lforearmu,lbladeu,rforearmu,rbladeu,spike1,spike2,spike3,firepoint;
 
 static-var bMoving, gun_1;
@@ -7,8 +8,7 @@ static-var bMoving, gun_1;
 #define SIG_AIM_2			4
 #define SIG_MOVE			16
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 walk()
 {		
@@ -40,7 +40,7 @@ walk()
 			turn rthighf to z-axis <-5> speed <20>;
 			turn lthighb to z-axis <-5> speed <20>;
 			turn rthighb to z-axis <-5> speed <20>;
-			move body to y-axis [0.7] speed <4000>;			
+			move body to y-axis [1.8] speed <4000>;			
 			turn tail to y-axis <10> speed <40>;
 			turn head to x-axis <-10> speed <20>;
 			turn tail to x-axis <10> speed <20>;
@@ -97,7 +97,7 @@ walk()
 			turn rthighf to z-axis <5> speed <20>;
 			turn lthighb to z-axis <5> speed <20>;
 			turn rthighb to z-axis <5> speed <20>;
-			move body to y-axis [0.7] speed <4000>;
+			move body to y-axis [1.8] speed <4000>;
 			turn head to x-axis <-10> speed <20>;
 			turn tail to x-axis <10> speed <20>;
 			wait-for-turn rthighf around x-axis;

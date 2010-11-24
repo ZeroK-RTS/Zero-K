@@ -35,6 +35,36 @@ return {
     },
   },
 
+  ["queen_trail_fire"] = {
+    splashes = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.9,
+        colormap           = [[0.8 0.4 0 1   0.8 0.4 0 1   0 0 0 0]],
+        directional        = true,
+        emitrot            = 1,
+        emitrotspread      = -2,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 8,
+        particlelifespread = 8,
+        particlesize       = 6,
+        particlesizespread = 6,
+        particlespeed      = 0.05,
+        particlespeedspread = 0,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 2,
+        sizemod            = 1,
+        texture            = [[blooddropwhite]],
+      },
+    },
+  },
+  
   ["large_green_goo"] = {
     groundflash = {
       circlealpha        = .4,

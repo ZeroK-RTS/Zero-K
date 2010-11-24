@@ -17,14 +17,15 @@ lagTrigger           = 0.6       -- average cpu usage after which lag prevention
 triggerTolerance     = 0.05      -- increase if lag prevention mode switches on and off too fast
 maxAge               = 5*60      -- chicken die at this age, seconds
 queenName            = "chickenflyerqueen"
+queenMorphName		 = "chickenlandqueen"
 miniQueenName		 = "chicken_dragon"
 waveRatio            = 0.6       -- waves are composed by two types of chicken, waveRatio% of one and (1-waveRatio)% of the other
 defenderChance       = 0.1       -- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
-quasiAttackerChance  = 0.6		--subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
+quasiAttackerChance  = 0.6		-- subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
 maxBurrows           = 40
-minBurrows			 = 0	--extra burrows (half of deficit or half of malus, whichever is lower) spawn each wave if there are presently fewer than this
-minBurrowsIncrease	 = 0.15	--increase each wave (multiplied by malus)
-minBurrowsMax		 = 3.5    --multiplied by malus
+minBurrows			 = 0		-- extra burrows (half of deficit or half of malus, whichever is lower) spawn each wave if there are presently fewer than this
+minBurrowsIncrease	 = 0.15		-- increase each wave (multiplied by malus)
+minBurrowsMax		 = 3.5    	-- multiplied by malus
 burrowEggs           = 15       -- number of eggs each burrow spawns
 --forceBurrowRespawn	 = false	-- burrows always respawn even if the modoption is set otherwise        
 queenSpawnMult       = 4         -- how many times bigger is a queen hatch than a normal burrow hatch
@@ -39,14 +40,15 @@ graceBonus			 = 31		-- extended grace in seconds for each player less than...
 graceMaxPlayers		 = 4
 
 queenTime            = 50*60    -- time at which the queen appears, seconds
-miniQueenTime		= {}		--times at which miniqueens are spawned (multiplier of queentime)
-endMiniQueenWaves	= 6		--waves per miniqueen in PvP endgame
+queenMorphTime		 = {60*30, 120*30}	--lower and upper bounds for delay between morphs, gameframes
+miniQueenTime		= {}		-- times at which miniqueens are spawned (multiplier of queentime)
+endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 
-burrowQueenTime		= 150		--how much killing a burrow shaves off the queen timer, seconds (divided by malus)
-burrowWaveBonus		= 0.2		--size of temporary bonus to add to next wave (divided by playercount)
-waveBonusDecay		= 0.05		--linear rate at which burrow wave bonus decreases
-burrowTechTime		= 10		--how many seconds each burrow deducts from the tech time per wave (divided by playercount)
-burrowRespawnChance = 0.2
+burrowQueenTime		= 150		-- how much killing a burrow shaves off the queen timer, seconds (divided by malus)
+burrowWaveBonus		= 0.2		-- size of temporary bonus to add to next wave (divided by playercount)
+waveBonusDecay		= 0.05		-- linear rate at which burrow wave bonus decreases
+burrowTechTime		= 10		-- how many seconds each burrow deducts from the tech time per wave (divided by playercount)
+burrowRespawnChance = 0.15
 
 
 gameMode		= Spring.GetModOption("camode")
@@ -154,6 +156,7 @@ difficulties = {
     defenders        = Copy(defenders),
 	queenTime		 = 40*60,
 	queenName        = "chicken_dragon",
+	queenMorphName	 = '',
 	miniQueenName	 = "chicken_tiamat",
 	maxBurrows       = 12,	
 	minBurrows		 = 0,
@@ -167,6 +170,7 @@ difficulties = {
     firstSpawnSize   = 1.2,
     timeSpawnBonus   = .03,
     queenName        = "chickenqueenlite",
+	queenMorphName	 = "chickenqueenlite2",
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
   },
@@ -204,11 +208,11 @@ difficulties = {
 	burrowQueenTime	 = 180,
 	burrowWaveBonus	 = 0.25,
 	burrowTechTime	 = 15,
-	burrowRespawnChance = 0.3,
+	burrowRespawnChance = 0.25,
 	queenSpawnMult   = 5,
 	queenTime		 = 40*60,
 	miniQueenTime	 = {0.37, 0.75},
-	endMiniQueenWaves	= 5,
+	endMiniQueenWaves	= 6,
   },
 }
 

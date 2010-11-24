@@ -217,7 +217,7 @@ unitDef = {
 
       edgeEffectiveness       = 1,
       explosionGenerator      = [[custom:NONE]],
-      impulseBoost            = 450,
+      impulseBoost            = 300,
       impulseFactor           = 1,
       intensity               = 1,
       interceptedByShieldType = 1,

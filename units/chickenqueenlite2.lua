@@ -1,6 +1,6 @@
 unitDef = {
-  unitname               = [[chickenlandqueen]],
-  name                   = [[Chicken Queen]],
+  unitname               = [[chickenqueenlite2]],
+  name                   = [[Chicken Queen Junior]],
   description            = [[Clucking Hell!]],
   acceleration           = 1,
   autoHeal               = 0,
@@ -41,7 +41,7 @@ unitDef = {
   leaveTracks            = true,
   maneuverleashlength    = [[640]],
   mass                   = 4251,
-  maxDamage              = 240000,
+  maxDamage              = 150000,
   maxVelocity            = 2.5,
   minCloakDistance       = 250,
   movementClass          = [[AKBOT6]],
@@ -139,7 +139,7 @@ unitDef = {
       noSelfDamage            = true,
       proximityPriority       = -4,
       range                   = 1200,
-      reloadtime              = 6,
+      reloadtime              = 8,
       renderType              = 4,
       rgbColor                = [[0.8 0.4 0]],
       size                    = 8,
@@ -162,9 +162,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 1000,
-        planes  = 1000,
-        subs    = 1000,
+        default = 800,
+        planes  = 800,
+        subs    = 800,
       },
 
       endsmoke                = [[0]],
@@ -205,7 +205,7 @@ unitDef = {
 
       edgeEffectiveness       = 1,
       explosionGenerator      = [[custom:NONE]],
-      impulseBoost            = 500,
+      impulseBoost            = 450,
       impulseFactor           = 1,
       intensity               = 1,
       interceptedByShieldType = 1,
@@ -256,7 +256,7 @@ unitDef = {
       model                   = [[chickeneggpink.s3o]],
       noSelfDamage            = true,
       range                   = 600,
-      reloadtime              = 4,
+      reloadtime              = 5,
       renderType              = 1,
       selfprop                = true,
       smokedelay              = [[0.1]],
@@ -280,4 +280,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ chickenlandqueen = unitDef })
+return lowerkeys({ chickenqueenlite2 = unitDef })

@@ -40,6 +40,7 @@ local malus = GG.malus or 1
 
 --maximum HP for additional weapons
 local healthSpore3 = 0.55
+local healthStomp = 0.7
 
 --signals
 local SIG_Aim = {
@@ -54,16 +55,95 @@ local function RestoreAfterDelay()
 	Sleep(1000)
 end
 
+local function Stomp(piece)
+	local health, maxHealth = spGetUnitHealth(unitID)
+	if (health/maxHealth) < healthStomp then EmitSfx(piece, 4096 + 5) end
+end
+
 local function Walk()
 	Signal(SIG_Move)
 	SetSignalMask(SIG_Move)
---	while true do
-		--walkscript
---	end
+	while true do
+		Turn( leftThigh , x_axis, math.rad(70), math.rad(115/2) )
+		Turn( leftKnee , x_axis, math.rad(-40), math.rad(145/2) )
+		Turn( leftShin , x_axis, math.rad(20), math.rad(145/2) )
+		Turn( leftFoot , x_axis, math.rad(-50), math.rad(210/2) )
+		Turn( rightThigh , x_axis, math.rad(-20), math.rad(210/2) )
+		Turn( rightKnee , x_axis, math.rad(-60), math.rad(210/2) )
+		Turn( rightShin , x_axis, math.rad(50), math.rad(210/2) )
+		Turn( rightFoot , x_axis, math.rad(30), math.rad(210/2) )
+			
+		Turn( body , z_axis, math.rad(-(5)), math.rad(20) )
+		Turn( leftThigh , z_axis, math.rad(-(-5)), math.rad(20/2) )
+		Turn( rightThigh , z_axis, math.rad(-(-5)), math.rad(20/2) )
+		Move( body , y_axis, 10, 20 )			
+		Turn( tail , y_axis, math.rad(20), math.rad(40) )
+		Turn( head , x_axis, math.rad(-10), math.rad(20) )
+		Turn( tail , x_axis, math.rad(20), math.rad(20) )
+		WaitForTurn(leftThigh, x_axis)
+		Sleep(30)
+		
+		Stomp(leftFoot)
+		Turn( leftThigh , x_axis, math.rad(-10), math.rad(160/2) )
+		Turn( leftKnee , x_axis, math.rad(15), math.rad(145/2) )
+		Turn( leftShin , x_axis, math.rad(-60), math.rad(250/2) )
+		Turn( leftFoot , x_axis, math.rad(30), math.rad(145/2) )
+		Turn( rightThigh , x_axis, math.rad(40), math.rad(145/2) )
+		Turn( rightKnee , x_axis, math.rad(-35), math.rad(145/2) )
+		Turn( rightShin , x_axis, math.rad(-40), math.rad(145/2) )
+		Turn( rightFoot , x_axis, math.rad(35), math.rad(145/2) )
+		Move( body , y_axis, 0, 20 )
+		Turn( head , x_axis, math.rad(10), math.rad(20) )
+		Turn( tail , x_axis, math.rad(-20), math.rad(20) )
+		WaitForTurn(leftShin, x_axis)
+		Sleep(30)
+			
+		Turn( rightThigh , x_axis, math.rad(70), math.rad(115/2) )
+		Turn( rightKnee , x_axis, math.rad(-40), math.rad(145/2) )
+		Turn( rightShin , x_axis, math.rad(20), math.rad(145/2) )
+		Turn( rightFoot , x_axis, math.rad(-50), math.rad(210/2) )
+		Turn( leftThigh , x_axis, math.rad(-20), math.rad(210/2) )
+		Turn( leftKnee , x_axis, math.rad(-60), math.rad(210/2) )
+		Turn( leftShin , x_axis, math.rad(50), math.rad(210/2) )
+		Turn( leftFoot , x_axis, math.rad(30), math.rad(210/2) )
+		Turn( tail , y_axis, math.rad(-20), math.rad(40) )
+		Turn( body , z_axis, math.rad(-(-5)), math.rad(20) )
+		Turn( leftThigh , z_axis, math.rad(-(5)), math.rad(20/2) )
+		Turn( rightThigh , z_axis, math.rad(-(5)), math.rad(20/2) )
+		Move( body , y_axis, 10, 20 )
+		Turn( head , x_axis, math.rad(-10), math.rad(20) )
+		Turn( tail , x_axis, math.rad(20), math.rad(20) )
+		WaitForTurn(rightThigh, x_axis)
+		Sleep(30)
+		
+		Stomp(rightFoot)
+		Turn( rightThigh , x_axis, math.rad(-10), math.rad(160/2) )
+		Turn( rightKnee , x_axis, math.rad(15), math.rad(145/2) )
+		Turn( rightShin , x_axis, math.rad(-60), math.rad(250/2) )
+		Turn( rightFoot , x_axis, math.rad(30), math.rad(145/2) )
+		Turn( leftThigh , x_axis, math.rad(40), math.rad(145/2) )
+		Turn( leftKnee , x_axis, math.rad(-35), math.rad(145/2) )
+		Turn( leftShin , x_axis, math.rad(-40), math.rad(145/2) )
+		Turn( leftFoot , x_axis, math.rad(35), math.rad(145/2) )
+		Move( body , y_axis, 0, 20 )
+		Turn( head , x_axis, math.rad(10), math.rad(20) )
+		Turn( tail , x_axis, math.rad(-20), math.rad(20) )
+		WaitForTurn(rightShin, x_axis)
+		Sleep(30)
+	end
 end
 
 local function StopWalk()
 	Signal(SIG_Move)
+	Turn( rightThigh , x_axis,0, math.rad(160) )
+	Turn( rightKnee , x_axis, 0, math.rad(145) )
+	Turn( rightShin , x_axis, 0, math.rad(250) )
+	Turn( rightFoot , x_axis, 0, math.rad(145) )
+	Turn( leftThigh , x_axis, 0, math.rad(145) )
+	Turn( leftKnee , x_axis, 0, math.rad(145) )
+	Turn( leftShin , x_axis, 0, math.rad(145) )
+	Turn( leftFoot , x_axis, 0, math.rad(145) )
+	Move( body , y_axis, 0, 20 )
 end
 
 function script.StartMoving()
@@ -80,6 +160,12 @@ function script.Create()
 	EmitSfx(body, 1026)
 	EmitSfx(head, 1026)
 	EmitSfx(tail, 1026)
+	EmitSfx(firepoint, 1026)
+	EmitSfx(leftWing, 1026)
+	EmitSfx(rightWing, 1026)
+	EmitSfx(spike1, 1026)
+	EmitSfx(spike2, 1026)
+	EmitSfx(spike3, 1026)
 	Turn(spore1, x_axis, math.rad(90))
 	Turn(spore2, x_axis, math.rad(90))
 	Turn(spore3, x_axis, math.rad(90))

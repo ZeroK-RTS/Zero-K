@@ -48,6 +48,7 @@ local spCreateUnit        = Spring.CreateUnit
 local spGetUnitPosition   = Spring.GetUnitPosition
 local spGetUnitDefID	  = Spring.GetUnitDefID
 local spGetUnitSeparation = Spring.GetUnitSeparation
+local spGetGameFrame	  = Spring.GetGameFrame
 
 local echo = Spring.Echo
 
@@ -85,6 +86,9 @@ local totalTimeReduction = 0
 local pvp = false
 local endgame = false
 local endMiniQueenNum = 0
+
+local morphFrame = -1
+local morphed = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -646,10 +650,13 @@ local function SpawnBurrow(number)
   
 end
 
+local function SetMorphFrame()
+	morphFrame = spGetGameFrame() + math.random(queenMorphTime[1], queenMorphTime[2])
+	--Spring.Echo("Morph frame set to: " .. morphFrame)
+	Spring.Echo("Next morph in: " .. math.ceil((morphFrame - spGetGameFrame())/30) .. " seconds")
+end
 
 local function SpawnQueen()
-  --chickenSpawnRate = chickenSpawnRate/2
-  
   local x, z
   local tries = 0
    
@@ -669,6 +676,8 @@ local function SpawnQueen()
       end
     end
   until (blocking == 2 or tries > maxTries)
+  
+  if queenMorphName ~= '' then SetMorphFrame() end
   return spCreateUnit(queenName, x, 0, z, "n", chickenTeamID)
 end
 
@@ -828,7 +837,6 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:GameFrame(n)
-
   if (n == 1) then
     DisableComputerUnits()
 	if pvp then Spring.Echo("Chicken: PvP mode initialized") end
@@ -907,6 +915,49 @@ function gadget:GameFrame(n)
         end
       end
     end
+	
+	--morphs queen
+	if n == morphFrame then
+		--Spring.Echo("Morphing queen")
+		--store values to be copied
+		local tempID = queenID
+		local x, y, z = spGetUnitPosition(tempID)
+		local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(tempID)
+		local xp = Spring.GetUnitExperience(tempID)
+		local heading = Spring.GetUnitHeading(tempID)
+		local cmdQueue = spGetUnitCommands(tempID)
+		
+		--perform switcheroo
+		queenID = nil
+		Spring.DestroyUnit(tempID, false, true)
+		if morphed == true then
+			queenID = spCreateUnit(queenName, x, y, z, "n", chickenTeamID)
+		else
+			queenID = spCreateUnit(queenMorphName, x, y, z, "n", chickenTeamID)
+		end
+		morphed = not morphed
+		SetMorphFrame()
+		
+		--copy values
+		--position
+		Spring.MoveCtrl.Enable(queenID)
+		--Spring.MoveCtrl.SetPosition(queenID, x, y, z)	--needed to reset y-axis position
+		--Spring.SpawnCEG("dirt", x, y, z)	--helps mask the transition
+		Spring.MoveCtrl.SetHeading(queenID, heading)
+		Spring.MoveCtrl.Disable(queenID)
+		--health handling
+		local _,newMaxHealth         = Spring.GetUnitHealth(queenID)
+		local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
+		local hpercent = newHealth/newMaxHealth
+		if newHealth<=1 then newHealth = 1 end
+		Spring.SetUnitHealth(queenID, {health = newHealth, build = buildProgress})
+		--orders, XP
+		Spring.SetUnitExperience(queenID, xp)
+		if (cmdQueue and cmdQueue[1]) then		--copy order queue
+			spGiveOrderToUnit(queenID, cmdQueue[1].id, cmdQueue[1].params, cmdQueue[1].options)
+		end
+	end
+	
   end
  
 end
@@ -926,15 +977,15 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
   end
+  if (unitID == queenID) then
+    KillAllComputerUnits()
+    --KillAllChicken()
+  end
   local name = UnitDefs[unitDefID].name
   if (unitTeam == chickenTeamID) then
     if (chickenTypes[name] or defenders[name] or (name == burrowName)) then
       local kills = Spring.GetGameRulesParam(name.."Kills")
       Spring.SetGameRulesParam(name.."Kills", kills + 1)
-    end
-    if (name == queenName) then
-      KillAllComputerUnits()
-      --KillAllChicken()
     end
   end
   if (burrows[unitID]) then
