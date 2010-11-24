@@ -28,7 +28,7 @@ unitDef = {
   customParams        = {
     description_bp = [[Transporte aéreo]],
     description_fr = [[Transport Aerien]],
-    helptext       = [[The Valkyrie is Logos' basic transport unit. It's used to ferry units to the front or make a drop deep behind enemy lines, but should not be used to land in areas with any kind of serious AA cover.]],
+    helptext       = [[The Valkyrie the basic air transport. It's used to ferry units to the front or make a drop deep behind enemy lines, but should not be used to land in areas with any kind of AA cover.]],
     helptext_bp    = [[A unidade de transporte básica de Logos. é usada para levar unidades rapidamente de um lugar a outro ou para depositalas dentro do território inimigo, mas n?o deve ser usada para aterrisagens em qualquer lugar com defesas anti-aéreas decentes.]],
     helptext_fr    = [[Le Valkyrie est une unit? de transport a?rien basique. Elle peut ?tre utilis?e pour a?roporter des troups sur le front comme derri?re les lignes ennemies. Il faut cependant ?viter ? tout prix les endroits couvert par de l'Anti-Air: il n'y survivrait pas.]],
   },

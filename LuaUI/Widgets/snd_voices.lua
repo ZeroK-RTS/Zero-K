@@ -1,7 +1,7 @@
 -- $Id: snd_voices.lua 3727 2009-01-08 22:36:55Z licho $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local versionNumber = "1.1.1"
+local versionNumber = "1.1.2"
 
 function widget:GetInfo()
 	return {
@@ -20,8 +20,9 @@ end
 _ Add many units replies.
 
 ---- CHANGELOG -----
+-- kingraptor, 	v1.1.2  (23nov2010)	:	COOLDOWNS
 -- versus666, 	v1.1.1	(30oct2010)	:	Added and Completed some lists, cleaned other things.
--- licho,		v1.1	(08janv2009):	?
+-- licho,		v1.1	(08jan2009):	?
 -- quantum,		v1.0				:	Creation.
 
 --TODO:
@@ -286,7 +287,7 @@ end
 
 
 local function CoolPlay(category, cooldownTime, sex, side)
-  cooldownTime = cooldownTime or 0
+  cooldownTime = cooldownTime or 2	--default 2 s cooldown
   local t = GetGameSeconds()
   if ((not cooldown[category]) or
       (t - cooldown[category] > cooldownTime)) then
@@ -333,7 +334,7 @@ local function UnitPlay(category, sex, unitID, coolDownTime)
   for _, selectedUnit in ipairs(selectedUnits) do
     if (unitID == selectedUnit) then
       if (coolDownTime) then
-        CoolPlay(category, cooDownTime, sex)
+        CoolPlay(category, coolDownTime, sex)
       else
         Play(category, sex)
       end
@@ -554,9 +555,9 @@ function widget:CommandNotify(commandID, params ,options)
 		end --if canmove
 	end --for
 	if (newRetreatOrder == 2) then
-		Play("retreatm")
+		CoolPlay("retreatm", 2)
 	elseif (newRetreatOrder == 3) then
-		Play("retreath")
+		CoolPlay("retreath", 2)
 	end
 	
 
@@ -568,7 +569,7 @@ function widget:CommandNotify(commandID, params ,options)
       fireState[unitID] = 2
     else
       fireState[unitID] = 0
-      Play("firehold", sexTable[unitID])
+      CoolPlay("firehold", 2, sexTable[unitID])
     end
 
 
@@ -577,20 +578,20 @@ function widget:CommandNotify(commandID, params ,options)
       moveState[unitID] = 1
     elseif (moveState[unitID] == 1) then
       moveState[unitID] = 2
-      Play("moveroam")
+      CoolPlay("moveroam", 2)
     else
       moveState[unitID] = 0
-      Play("movehold", sexTable[unitID])
+      CoolPlay("movehold", 2, sexTable[unitID])
     end
 
   elseif (commandID == CMD.GUARD)   then
-    Play("guard", sexTable[unitID])
+    CoolPlay("guard", 2 sexTable[unitID])
   
   elseif (commandID == CMD.PATROL) then
-    Play("patrol")
+    CoolPlay("patrol", 2)
 
   elseif (commandID == CMD.RECLAIM) then
-    Play("reclaim", sexTable[unitID])
+    CoolPlay("reclaim", 2, sexTable[unitID])
 
 
   elseif ((commandID == CMD.ATTACK) or
@@ -598,17 +599,17 @@ function widget:CommandNotify(commandID, params ,options)
      (commandID == CMD.AREA_ATTACK) or
      (commandID == CMD.DGUN)) then
     if (UnitDefs[unitDefID].canFly) then
-      Play("attackp", sexTable[unitID])
+      CoolPlay("attackp", 3, sexTable[unitID])
     else
-      Play("attack", sexTable[unitID])
+      CoolPlay("attack", 3,  sexTable[unitID])
     end
 
 
   elseif (commandID == CMD.MOVE) then
     if (IsStructure(unitID)) then
-      Play("movef")
+      CoolPlay("movef", 3)
     else
-      Play("move", sexTable[unitID])
+      CoolPlay("move", 3, sexTable[unitID])
     end
   end
   return false

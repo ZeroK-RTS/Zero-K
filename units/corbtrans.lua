@@ -23,14 +23,13 @@ unitDef = {
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = false,
-  copyright           = [[Copyright 1997 Humongous Entertainment. All rights reserved.]],
   corpse              = [[HEAP]],
   cruiseAlt           = 250,
 
   customParams        = {
     description_bp = [[Transporte aéreo pesado armado]],
     description_fr = [[Transport Aerien Arm? Lourd]],
-    helptext       = [[Vindicator means bad news in the Nova dialect. Shoot at the dropship and it will shoot back with its two rapid-fire laser guns. Kill it and it will release its deadly cargo, thanks to a cargo ejection mechanism.]],
+    helptext       = [[The Vindicator can haul any land unit in the game. Its twin laser guns and automated cargo ejection system make it ideal for drops into hot LZs.]],
     helptext_bp    = [[Essa aeronave de transporte é resistente o suficiente para aguentar algum fogo anti-aéreo e vem armada com canh?es laser que dispara contra aquilo que a ataca. Se for destruída durante o voo sua carga é ejetada e com sorte pousa em segurança. ]],
     helptext_fr    = [[Le Vindicator est le summum du transport aerien. Rapide et puissant il peut transporter toutes vos unit?s sur le champ de bataille, il riposte aux tirs gr?ce ? ses multiples canons laser, et s'il est abattu, il ejecte sa livraison au sol avant d'exploser.]],
   },
