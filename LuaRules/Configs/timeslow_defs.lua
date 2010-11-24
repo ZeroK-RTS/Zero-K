@@ -4,6 +4,10 @@ local weapons = {
 	slowmort_slowbeam = { slowDamage = 300, onlySlow = true, smartRetarget = true, scaleSlow = true},
 	cormak_blast = { slowDamage = 80, noFF = true, noDeathBlast = true, scaleSlow = true },
 	slowmissile_weapon = { slowDamage = 1, onlySlow = true, scaleSlow = true },
+	
+	commsupport_slowbeam = { slowDamage = 750, onlySlow = true, smartRetarget = true, scaleSlow = true},
+	commadvsupport_slowbeam = { slowDamage = 850, onlySlow = true, smartRetarget = true, scaleSlow = true},
+	commadvsupport_disruptorbeam = { slowDamage = 8000, scaleSlow = true},
 	commadvrecon_slowbomb = { slowDamage = 5000, scaleSlow = true },
 }
 

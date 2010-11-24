@@ -368,26 +368,26 @@ aimer = 2;  //normaly 2
 
 Create()
 {
-//alert to dirt
-turn armhold to x-axis <-45.000000> speed <250.000000>; //upspring
-turn ruparm to x-axis <0.000000> speed <250.000000>; 
-turn ruparm to y-axis <0.000000> speed <250.000000>; 
-turn ruparm to z-axis <0.000000> speed <250.000000>; 
-turn rarm to x-axis <2.000000> speed <250.000000>;      //
-turn rarm to y-axis <0.000000> speed <250.000000>;  
-turn rarm to z-axis <-12.000000> speed <250.000000>;    //up
-turn rloarm to x-axis <47.000000> speed <250.000000>;   //up 
-turn rloarm to y-axis <76.000000> speed <250.000000>;   //up 
-turn rloarm to z-axis <-47.000000> speed <250.000000>;   //up 
-turn luparm to x-axis <12.000000> speed <250.000000>;       //up
-turn luparm to y-axis <0.000000> speed <250.000000>;  
-turn luparm to z-axis <0.000000> speed <250.000000>;  
-turn larm to x-axis <-35.000000> speed <250.000000>;       //up 
-turn larm to y-axis <-3.000000> speed <250.000000>;       //up 
-turn larm to z-axis <22.000000> speed <250.000000>;       //up 
-turn lloarm to x-axis <92.000000> speed <250.000000>;    // up 
-turn lloarm to y-axis <0.000000> speed <250.000000>;  
-turn lloarm to z-axis <94.000000> speed <250.000000>;  //upspring
+	//alert to dirt
+	turn armhold to x-axis <-45.000000> speed <250.000000>; //upspring
+	turn ruparm to x-axis <0.000000> speed <250.000000>; 
+	turn ruparm to y-axis <0.000000> speed <250.000000>; 
+	turn ruparm to z-axis <0.000000> speed <250.000000>; 
+	turn rarm to x-axis <2.000000> speed <250.000000>;      //
+	turn rarm to y-axis <0.000000> speed <250.000000>;  
+	turn rarm to z-axis <-12.000000> speed <250.000000>;    //up
+	turn rloarm to x-axis <47.000000> speed <250.000000>;   //up 
+	turn rloarm to y-axis <76.000000> speed <250.000000>;   //up 
+	turn rloarm to z-axis <-47.000000> speed <250.000000>;   //up 
+	turn luparm to x-axis <12.000000> speed <250.000000>;       //up
+	turn luparm to y-axis <0.000000> speed <250.000000>;  
+	turn luparm to z-axis <0.000000> speed <250.000000>;  
+	turn larm to x-axis <-35.000000> speed <250.000000>;       //up 
+	turn larm to y-axis <-3.000000> speed <250.000000>;       //up 
+	turn larm to z-axis <22.000000> speed <250.000000>;       //up 
+	turn lloarm to x-axis <92.000000> speed <250.000000>;    // up 
+	turn lloarm to y-axis <0.000000> speed <250.000000>;  
+	turn lloarm to z-axis <94.000000> speed <250.000000>;  //upspring
 
 	hide flare;
 	hide ac1;
@@ -419,12 +419,6 @@ StopMoving()
 {
 	bMoving = FALSE;
 }
-
-SweetSpot(piecenum)
-{
-	piecenum = torso;
-}
-
 
 AimFromWeapon1(piecenum)
 {
@@ -520,16 +514,18 @@ AimWeapon1(Func_Var_1, Func_Var_2)
 
 Shot1()
 {
-//recoil
-//set 76 to 0; //turn off cloak for fliker
-//emit-sfx 1024 from flare;
-sleep 50;
-turn gun to x-axis <-2.000000> speed <1250.000000>;
-sleep 250;
-turn gun to x-axis <0.000000> speed <250.000000>;
-sleep 800;
-if ( rand (1,3) == 3 ) turn armhold to x-axis <15.000000> speed <150.000000>; //check the sexy shot
-//return (1);	
+	//recoil
+	/*
+	//set 76 to 0; //turn off cloak for fliker
+	//emit-sfx 1024 from flare;
+	sleep 50;
+	turn gun to x-axis <-2.000000> speed <1250.000000>;
+	sleep 250;
+	turn gun to x-axis <0.000000> speed <250.000000>;
+	sleep 800;
+	if ( rand (1,3) == 3 ) turn armhold to x-axis <15.000000> speed <150.000000>; //check the sexy shot
+	//return (1);
+	*/	
 }
 
 Shot2()
