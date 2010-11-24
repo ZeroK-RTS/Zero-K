@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.83 Chili Minimap",
+    desc      = "v0.84 Chili Minimap",
     author    = "Licho, tweaked by CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -103,6 +103,22 @@ options = {
 	},
 	
 }
+			
+local function MakeMinimapButton(caption, pos, option )
+	return Chili.Button:New{ 
+		height=iconsize, width=iconsize, 
+		caption=caption, 
+		bottom=0, 
+		right=iconsize*pos, 
+		tooltip = 
+			options[option].name 
+			.. ( options[option].desc 
+				and (' (' .. options[option].desc ..')') 
+				or '' 
+				),
+		OnClick={ options[option].OnChange }, 
+	}
+end
 
 MakeMinimapWindow = function()
 	if (window_minimap) then
@@ -132,14 +148,16 @@ MakeMinimapWindow = function()
 		dragUseGrip = true,
 		minimumSize = {50,50},
 		children = {
-			Chili.Panel:New {bottom = iconsize-3, x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='-', bottom=0, right=iconsize*1, tooltip=options.viewstandard.name, 	OnClick={ options.viewstandard.OnChange }, },
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='H', bottom=0, right=iconsize*2, tooltip=options.viewheightmap.name,	OnClick={ options.viewheightmap.OnChange }, },
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='B', bottom=0, right=iconsize*3, tooltip=options.viewblockmap.name, 	OnClick={ options.viewblockmap.OnChange	}, },
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='M', bottom=0, right=iconsize*4, tooltip=options.viewmetalmap.name, 	OnClick={ options.viewmetalmap.OnChange }, },
 			
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='L', bottom=0, right=iconsize*6, tooltip=options.viewfow.name, 		OnClick={ options.viewfow.OnChange }, },
-			Chili.Button:New{ height=iconsize, width=iconsize, caption='R', bottom=0, right=iconsize*7, tooltip=options.viewradar.name .. ' (' .. options.viewradar.desc ..')', 	OnClick={ options.viewradar.OnChange }, },
+			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},
+			
+			MakeMinimapButton( '-', 1, 'viewstandard' ),
+			MakeMinimapButton( 'H', 2, 'viewheightmap' ),
+			MakeMinimapButton( 'B', 3, 'viewblockmap' ),
+			MakeMinimapButton( 'M', 4, 'viewmetalmap' ),
+			MakeMinimapButton( 'L', 6, 'viewfow' ),
+			MakeMinimapButton( 'R', 7, 'viewradar' ),
+			
 		},
 	}
 end
@@ -184,10 +202,10 @@ function widget:DrawScreen()
 	if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) then 
 		local cx,cy,cw,ch = Chili.unpack4(window_minimap.clientArea)
 		ch = ch-iconsize	
-		cx = cx + 8 
-		cy = cy + 4  
-		cw = cw - 16  
-		ch = ch - 8  
+		cx = cx + 8
+		cy = cy + 4
+		cw = cw - 16 
+		ch = ch - 12
 		--window_minimap.x, window_minimap.y, window_minimap.width, window_minimap.height
 		--Chili.unpack4(window_minimap.clientArea)
 		cx,cy = window_minimap:LocalToScreen(cx,cy)
