@@ -301,7 +301,7 @@ factionBuildConfig = {
 				},
 				
 				[4] = { -- arty
-					importanceMult = 1,
+					importanceMult = 0.4,
 					count = 1,	
 					[1] = {ID = UnitDefNames['punisher'].id, chance = 1},					
 				},
