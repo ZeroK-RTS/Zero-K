@@ -20,6 +20,7 @@ local NEAR_WAYPOINT_RANGE_SQ = 200^2
 local NEAR_START_RANGE_SQ = 300^2
 local UNLOAD_RADIUS = 160
 local CANT_BE_TRANSPORTED_DECAY_TIME = 200
+local COMMAND_MOVE_RADIUS = 80
 
 local CMD_SET_FERRY	= 11000
 local CMD_MOVE 		= CMD.MOVE
@@ -29,6 +30,8 @@ local ferryRoutes = {count = 0, route = {}}
 
 local placedRoute = false
 local myTeam = Spring.GetMyTeamID()
+
+local movingPoint = false
 
 local toBeWaited = {count = 0, unit = {}}
 
@@ -59,6 +62,27 @@ local function nearFerryPoint(x, z, r)
 	for i = 1, ferryRoutes.count do
 		if disSQ(x, z, ferryRoutes.route[i].start.x, ferryRoutes.route[i].start.z) < rsq then
 			return i
+		end
+	end
+	
+	return false
+end
+
+local function nearAnyPoint(x, z, r)
+	
+	local rsq = r^2
+	
+	for i = 1, ferryRoutes.count do
+		if disSQ(x, z, ferryRoutes.route[i].start.x, ferryRoutes.route[i].start.z) < rsq then
+			return {r = i, index = 0}
+		end
+		for p = 1, ferryRoutes.route[i].pointcount do
+			if disSQ(x, z, ferryRoutes.route[i].points[p].x, ferryRoutes.route[i].points[p].z) < rsq then
+				return {r = i, index = p}
+			end
+		end
+		if disSQ(x, z, ferryRoutes.route[i].finish.x, ferryRoutes.route[i].finish.z) < rsq then
+			return {r = i, index = ferryRoutes.route[i].pointcount+1}
 		end
 	end
 	
@@ -157,7 +181,24 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	
 	if cmdID == CMD_SET_FERRY then
 		
-		if not placedRoute then
+		if movingPoint then
+			if movingPoint.index == 0 then
+				ferryRoutes.route[movingPoint.r].start = {x = cmdParams[1], y = cmdParams[2], z = cmdParams[3]}
+			elseif movingPoint.index <= ferryRoutes.route[movingPoint.r].pointcount then
+				ferryRoutes.route[movingPoint.r].points[movingPoint.index] = {x = cmdParams[1], y = cmdParams[2], z = cmdParams[3]}
+			else
+				ferryRoutes.route[movingPoint.r].finish = {x = cmdParams[1], y = cmdParams[2], z = cmdParams[3]}
+			end
+			movingPoint = false
+		elseif not placedRoute then
+			
+			if cmdOptions.shift then
+				movingPoint = nearAnyPoint(cmdParams[1], cmdParams[3], COMMAND_MOVE_RADIUS)
+				if movingPoint then
+					return true
+				end
+			end
+			
 			local pointHere = nearFerryPoint(cmdParams[1], cmdParams[3], COLLECTION_RADIUS_DRAW)
 			if pointHere then
 				removeRoute(pointHere)
@@ -241,8 +282,13 @@ function widget:MousePress(mx, my, button)
 	end
 end
 
+function widget:MouseMove(x,y,dx,dy,button)
+	Spring.Echo(x)
+	
+end
+
 function widget:Update()
-	if placedRoute and Spring.GetActiveCommand() ~= Spring.GetCmdDescIndex(CMD_SET_FERRY) then
+	if (placedRoute or movingPoint) and Spring.GetActiveCommand() ~= Spring.GetCmdDescIndex(CMD_SET_FERRY) then
 		Spring.SetActiveCommand(Spring.GetCmdDescIndex(CMD_SET_FERRY))
 	end
 	
