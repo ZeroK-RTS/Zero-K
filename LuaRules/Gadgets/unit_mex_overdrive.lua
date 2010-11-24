@@ -724,7 +724,7 @@ function gadget:GameFrame(n)
 					local teamID = allyTeamData.team[i]
 					local eCur, eMax, ePull, eInc, eExp, _, eSent, eRec = Spring.GetTeamResources(teamID, "energy")
 					if (eCur ~= nil) then 
-						local eTax = eInc * 0.95
+						local eTax = eInc * (eCur) / (eMax - HIDDEN_STORAGE) 
 						if (eTax > 0) then 
 							sumInc = sumInc + eTax 
 						end 
@@ -737,7 +737,7 @@ function gadget:GameFrame(n)
 					local teamID = allyTeamData.team[i]
 					local eCur, eMax, ePull, eInc, eExp, _, eSent, eRec = Spring.GetTeamResources(teamID, "energy")
 					if (eCur ~= nil) then 
-						local eTax = eInc * 0.95
+						local eTax = eInc * (eCur) / (eMax - HIDDEN_STORAGE) 
 						if (eTax < 0) then eTax = 0 end 
 
 						local change = share - eTax 
