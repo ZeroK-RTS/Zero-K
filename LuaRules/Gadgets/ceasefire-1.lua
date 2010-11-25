@@ -280,7 +280,9 @@ function gadget:Initialize()
 	end
 	for _,name in pairs(nukeNames) do
 		local ud = UnitDefNames[name]
-		nukeDefs[ud.id] = true
+		if ud then
+			nukeDefs[ud.id] = true
+		end
 	end
 	
 	gadgetHandler:RegisterCMDID(CMD_ANTINUKEZONE)
