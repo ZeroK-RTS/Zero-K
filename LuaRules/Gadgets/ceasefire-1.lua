@@ -272,9 +272,11 @@ function gadget:Initialize()
 
 	for _,name in pairs(antinukeNames) do
 		local ud = UnitDefNames[name]
-		local weaponDef = ud.weapons[1].weaponDef
-		local coverage = WeaponDefs[weaponDef].coverageRange
-		antinukeDefs[ud.id] = coverage
+		if ud then
+			local weaponDef = ud.weapons[1].weaponDef
+			local coverage = WeaponDefs[weaponDef].coverageRange
+			antinukeDefs[ud.id] = coverage
+		end
 	end
 	for _,name in pairs(nukeNames) do
 		local ud = UnitDefNames[name]
