@@ -109,7 +109,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (unitTeam == myTeam and unitID ~= nil) then
 		if (createdFrame[unitID] == GetGameFrame()) then
 			local gr = unit2group[unitDefID]
-printDebug("<AUTOGROUP>: Unit finished " ..  unitID) --
+--printDebug("<AUTOGROUP>: Unit finished " ..  unitID) --
 			if gr ~= nil then SetUnitGroup(unitID, gr) end
 		else 
 			finiGroup[unitID] = 1
@@ -129,7 +129,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
 			createdFrame[unitID] = GetGameFrame()
 			local gr = unit2group[unitDefID]
 			if gr ~= nil then SetUnitGroup(unitID, gr) end
-printDebug("<AUTOGROUP>: Unit from factory " ..  unitID)
+--printDebug("<AUTOGROUP>: Unit from factory " ..  unitID)
 		end
 	end
 end
@@ -137,13 +137,13 @@ end
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	finiGroup[unitID] = nil
 	createdFrame[unitID] = nil
-printDebug("<AUTOGROUP> : Unit destroyed "..  unitID)
+--printDebug("<AUTOGROUP> : Unit destroyed "..  unitID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	if (newTeamID == myTeam) then
 		local gr = unit2group[unitDefID]
-printDebug("<AUTOGROUP> : Unit given "..  unit2group[unitDefID])
+--printDebug("<AUTOGROUP> : Unit given "..  unit2group[unitDefID])
 		if gr ~= nil then SetUnitGroup(unitID, gr) end
 	end
 	createdFrame[unitID] = nil
@@ -153,7 +153,7 @@ end
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	if (teamID == myTeam) then
 		local gr = unit2group[unitDefID]
-printDebug("<AUTOGROUP> : Unit taken "..  unit2group[unitDefID])
+--printDebug("<AUTOGROUP> : Unit taken "..  unit2group[unitDefID])
 		if gr ~= nil then SetUnitGroup(unitID, gr) end
 	end
 	createdFrame[unitID] = nil
@@ -164,7 +164,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (unitTeam == myTeam and finiGroup[unitID]~=nil) then
 		local gr = unit2group[unitDefID]
 		if gr ~= nil then SetUnitGroup(unitID, gr)
-printDebug("<AUTOGROUP> : Unit idle " ..  gr)
+--printDebug("<AUTOGROUP> : Unit idle " ..  gr)
 		end
 	finiGroup[unitID] = nil
 	end
