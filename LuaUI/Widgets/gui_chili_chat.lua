@@ -85,7 +85,7 @@ options = {
 	autoHideChat = {
 		name = "Autohide Console",
 		type = 'bool',
-		value = true, 
+		value = false, 
 		desc = "Auto hides when not typing text",
 		OnChange = option_autoHideChanged,
 	},
