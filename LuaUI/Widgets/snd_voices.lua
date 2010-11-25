@@ -585,7 +585,7 @@ function widget:CommandNotify(commandID, params ,options)
     end
 
   elseif (commandID == CMD.GUARD)   then
-    CoolPlay("guard", 2 sexTable[unitID])
+    CoolPlay("guard", 2, sexTable[unitID])
   
   elseif (commandID == CMD.PATROL) then
     CoolPlay("patrol", 2)
