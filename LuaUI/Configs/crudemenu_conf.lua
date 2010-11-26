@@ -238,6 +238,8 @@ confdata.menu_tree = {
 					items = {
 						{ key = 'ca', name = 'Complete Annihilation', },
 						{ key = 'ca_static', name = 'CA Static', },
+						{ key = 'bold', name = 'Bold', },
+						{ key = 'bold_static', name = 'Bold Static', },
 						{ key = 'erom', name = 'Erom', },
 						{ key = 'masse', name = 'Masse', },
 						{ key = 'Lathan', name = 'Lathan', },

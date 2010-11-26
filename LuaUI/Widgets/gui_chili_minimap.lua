@@ -104,10 +104,10 @@ options = {
 	
 }
 			
-local function MakeMinimapButton(caption, pos, option )
-	return Chili.Button:New{ 
+local function MakeMinimapButton(file, pos, option )
+	return Chili.Image:New{ 
 		height=iconsize, width=iconsize, 
-		caption=caption, 
+		file=file, 
 		bottom=0, 
 		right=iconsize*pos, 
 		tooltip = 
@@ -151,12 +151,12 @@ MakeMinimapWindow = function()
 			
 			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},
 			
-			MakeMinimapButton( '-', 1, 'viewstandard' ),
-			MakeMinimapButton( 'H', 2, 'viewheightmap' ),
-			MakeMinimapButton( 'B', 3, 'viewblockmap' ),
-			MakeMinimapButton( 'M', 4, 'viewmetalmap' ),
-			MakeMinimapButton( 'L', 6, 'viewfow' ),
-			MakeMinimapButton( 'R', 7, 'viewradar' ),
+			MakeMinimapButton( 'LuaUI/images/map/standard.png', 1, 'viewstandard' ),
+			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 2, 'viewheightmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 3, 'viewblockmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 4, 'viewmetalmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 6, 'viewfow' ),
+			MakeMinimapButton( 'LuaUI/images/map/radar.png', 7, 'viewradar' ),
 			
 		},
 	}
