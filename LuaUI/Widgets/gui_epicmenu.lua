@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.14 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.15 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -84,7 +84,6 @@ local init, resetting = false, false
 --------------------------------------------------------------------------------
 -- Key bindings
 include("keysym.h.lua")
-local keybinds = {}
 local keysyms = {}
 for k,v in pairs(KEYSYMS) do
 	keysyms['' .. v] = k	
@@ -362,6 +361,15 @@ local function AdjustWindow(window)
 		window:SetPos(nx,ny)
 	end
 end
+
+-- Adding functions because of "handler=true"
+local function AddAction(cmd, func, data, types)
+	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
+end
+local function RemoveAction(cmd, types)
+	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
+end
+
 
 -- returns whether widget is enabled
 local function WidgetEnabled(wname)
@@ -866,9 +874,6 @@ end
 
 -- Assign a keybinding to settings and other tables that keep track of related info
 local function AssignKeyBind(hotkey, menukey, itemindex, item)
-	if not keybinds[hotkey.key] then
-		keybinds[hotkey.key] = {}
-	end
 	local kbfunc = item.OnChange
 	if item.type == 'bool' then
 		kbfunc = function()
@@ -881,14 +886,20 @@ local function AssignKeyBind(hotkey, menukey, itemindex, item)
 			end
 		end
 	end
-	keybinds[hotkey.key][hotkey.mod] = kbfunc
-	settings.keybounditems[menukey .. '_' .. item.key] = hotkey
+	
+	local actionName = 'epic_'.. menukey .. '_' .. item.key
+	actionName = actionName:lower()
+	settings.keybounditems[actionName] = hotkey
+	AddAction(actionName, kbfunc, nil, "t")
+	Spring.SendCommands("bind " .. hotkey.mod .. hotkey.key .. " " .. actionName)
 end
 
 -- Unsssign a keybinding from settings and other tables that keep track of related info
 local function UnassignKeyBind(hotkey, menukey, itemindex, item)
-	keybinds[hotkey.key][hotkey.mod] = nil
-	settings.keybounditems[menukey .. '_' .. item.key] = nil
+	local actionName = 'epic_'.. menukey .. '_' .. item.key
+	actionName = actionName:lower()
+	settings.keybounditems[actionName] = nil
+	Spring.SendCommands({"unbindaction " .. actionName})
 end
 
 
@@ -1063,7 +1074,9 @@ local function flattenTree(tree, parent)
 			
 			--Keybindings
 			if option.type == 'button' or option.type == 'bool' then
-				local hotkey = settings.keybounditems[fullkey] or option.hotkey
+				local actionName = 'epic_' .. fullkey
+				actionName = actionName:lower()
+				local hotkey = settings.keybounditems[actionName] or option.hotkey
 				if hotkey then
 					AssignKeyBind(hotkey, curkey, option.key, option)
 				end
@@ -1129,19 +1142,21 @@ local function MakeKeybindWindow(item, menukey, i, hotkey)
 end
 
 local function GetReadableHotkeyMod(mod)
-	return (mod:find('a') and 'Alt+' or '') ..
-		(mod:find('c') and 'Ctrl+' or '') ..
-		(mod:find('m') and 'Meta+' or '') ..
-		(mod:find('s') and 'Shift+' or '') ..
+	return (mod:find('a+') and 'Alt+' or '') ..
+		(mod:find('c+') and 'Ctrl+' or '') ..
+		(mod:find('m+') and 'Meta+' or '') ..
+		(mod:find('s+') and 'Shift+' or '') ..
 		''		
 end
 
 
 --Get hotkey action and readable hotkey string
 local function GetHotkeyData(key, itemkey)
-	local hotkey = settings.keybounditems[key .. '_' .. itemkey]
+	local actionName = 'epic_' .. key .. '_' .. itemkey
+	actionName = actionName:lower()
+	local hotkey = settings.keybounditems[actionName]
 	if hotkey then
-		return hotkey, GetReadableHotkeyMod(hotkey.mod) .. keysyms[hotkey.key .. '' ]
+		return hotkey, GetReadableHotkeyMod(hotkey.mod) .. hotkey.key
 	end
 	
 	return nil, 'None'
@@ -1572,14 +1587,6 @@ function widget:ViewResize(vsx, vsy)
 	scrH = vsy
 end
 
--- Adding functions because of "handler=true"
-local function AddAction(cmd, func, data, types)
-	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
-end
-local function RemoveAction(cmd, types)
-	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
-end
-
 
 function widget:Initialize()
 	if (not WG.Chili) then
@@ -1608,8 +1615,12 @@ function widget:Initialize()
 	end
 	
 	WG.crude.ResetKeys = function()
-		keybinds = {}
+		for actionName,_ in pairs(settings.keybounditems) do
+			local actionNameL = actionName:lower()
+			Spring.SendCommands({"unbindaction " .. actionNameL})
+		end
 		settings.keybounditems = {}
+		
 		echo 'Cleared all hotkeys.'
 	end
 
@@ -1816,17 +1827,16 @@ function widget:KeyPress(key, modifier, isRepeat)
 	end
 	
 	local modstring = 
-		(modifier.alt and 'a' or '') ..
-		(modifier.ctrl and 'c' or '') ..
-		(modifier.meta and 'm' or '') ..
-		(modifier.shift and 's' or '')
+		(modifier.alt and 'a+' or '') ..
+		(modifier.ctrl and 'c+' or '') ..
+		(modifier.meta and 'm+' or '') ..
+		(modifier.shift and 's+' or '')
 	
 	--Set a keybinding 
 	if get_key then
 		get_key = false
 		window_getkey:Dispose()
-		
-		kbval = { key = key, mod = modstring }		
+		kbval = { key = keysyms[''..key]:lower(), mod = modstring, }		
 		
 		if key ~= KEYSYMS.ESCAPE then		
 			AssignKeyBind(kbval, kb_mkey, kb_mindex, kb_item)
@@ -1839,11 +1849,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 		return true
 	end
 	
-	--Perform an action based on a keybinding
-	local action = keybinds[key] and keybinds[key][modstring]
-	if action then
-		action()
-	end
 end
 
 function ActionMenu()
