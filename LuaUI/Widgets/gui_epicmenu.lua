@@ -1410,8 +1410,6 @@ local function ShowHideCrudeMenu()
 		end
 	else
 		if window_crude then
-			settings.pos_x = window_crude.x
-			settings.pos_y = window_crude.y
 			screen0:RemoveChild(window_crude)
 		end
 		if window_sub_cur then
@@ -1486,12 +1484,12 @@ local function MakeCrudeMenu()
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 35, height=5, textColor = color.main_fg, autosize=false, }
 	img_flag = Image:New{ file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, }
 	
-	window_crude = Window:New{  
+	window_crude = Window:New{
+		name='epicmenubar',
 		caption=title_text,
-		x = settings.pos_x ,  
-		y = settings.pos_y ,
+		x = '60%',  
+		y = '0%',
 		dockable = true,
-		name = "crude bar",
 		clientWidth = crude_width,
 		clientHeight = crude_height,
 		draggable = false,
@@ -1652,13 +1650,9 @@ function widget:Initialize()
 	widget:ViewResize(Spring.GetViewGeometry())
 	
 	-- Set default positions of windows on first run
-	if not settings.pos_x then
-		settings.pos_x = scrW/3
-		settings.pos_y = scrH*0.5
+	if not settings.sub_pos_x then
 		settings.sub_pos_x = scrW/2
 		settings.sub_pos_y = scrH/2
-		settings.vol_x = scrW/3
-		settings.vol_y = scrH/2
 	end
 	if not settings.wl_x then -- widget list
 		settings.wl_h = 0.7*scrH
@@ -1776,10 +1770,6 @@ function widget:Shutdown()
 end
 
 function widget:GetConfigData()
-	if window_crude then	
-		settings.pos_x = window_crude.x
-		settings.pos_y = window_crude.y
-	end
 	return settings
 end
 
