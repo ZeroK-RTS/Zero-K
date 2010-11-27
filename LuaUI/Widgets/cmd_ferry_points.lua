@@ -127,8 +127,6 @@ local function addTransportToRoute(unitID, routeID)
 	trans.route = routeID
 	trans.routeTransportIndex = route.transportCount
 	
-	trans.unitStillWaited = true
-	
 	WG.FerryUnits[unitID] = true
 
 end
@@ -354,35 +352,21 @@ end
 -------------------------------------------------------------------
 --- UNIT HANDLING
 
-function widget:GameFrame(frame)
-	
-	if frame%30 == 8 then
-	
-		for i = 1, wasTransported.count do
-			unitID = wasTransported.unit[i]
-			if Spring.ValidUnitID(unitID) then
-				if Spring.GetUnitTransporter(unitID) == nil then
-					local cmd = Spring.GetCommandQueue(unitID)
-					if #cmd > 0 and cmd[1].id == CMD.WAIT then
-						Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
-						if #cmd == 1 then
-							Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
-						end
-					end
-					wasTransported.unit[i] = wasTransported.unit[wasTransported.count]
-					wasTransported.unit[wasTransported.count] = nil
-					wasTransported.count = wasTransported.count - 1
-					break
-				end
-			else
-				wasTransported.unit[i] = wasTransported.unit[wasTransported.count]
-				wasTransported.unit[wasTransported.count] = nil
-				wasTransported.count = wasTransported.count - 1
-				break
+function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
+
+	if Spring.ValidUnitID(unitID) then
+		local cmd = Spring.GetCommandQueue(unitID)
+		if #cmd > 0 and cmd[1].id == CMD.WAIT then
+			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+			if #cmd == 1 then
+				Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
 			end
 		end
-	
 	end
+	
+end
+
+function widget:GameFrame(frame)
 	
 	if frame%15 == 12 then
 		
@@ -429,22 +413,12 @@ function widget:GameFrame(frame)
 						end
 					end
 					
-					if trans.unitStillWaited then
-						trans.unitStillWaited = false
-						for u = 1, #carriedUnits do
-							route.unitsQueuedToBeTransported[carriedUnits[u]] = nil
-							wasTransported.count = wasTransported.count + 1
-							wasTransported.unit[wasTransported.count] = carriedUnits[u]
-						end
-					end
-					
 				else
 					local x,_,z = Spring.GetUnitPosition(unitID)
 					if trans.waypoint > 0 then
 						if trans.waypoint > route.pointcount or disSQ(x, z, route.points[trans.waypoint].x, route.points[trans.waypoint].z) < NEAR_WAYPOINT_RANGE_SQ then
 							trans.waypoint = trans.waypoint - 1
 							if trans.waypoint == 0 then
-								trans.unitStillWaited = true
 								Spring.GiveOrderToUnit(unitID, CMD_MOVE, 
 									{route.start.x, route.start.y, route.start.z}, {} )
 							else
@@ -494,7 +468,6 @@ local function addUnit(unitID, unitDefID, unitTeam)
 			capacity = ud.transportCapacity,
 			maxMass = ud.transportMass,
 			maxSize = ud.transportSize*2,
-			unitStillWaited = true,
 		}
 	end
 end

@@ -70,8 +70,8 @@ unitDef = {
   steeringmode        = [[1]],
   TEDClass            = [[VTOL]],
   transportCapacity   = 1,
-  transportMass       = 5000,
-  transportSize       = 3,
+  transportMass       = 650,
+  transportSize       = 4,
   turnInPlace         = 0,
   turnRate            = 550,
 
