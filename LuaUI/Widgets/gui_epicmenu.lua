@@ -601,7 +601,7 @@ local function MakeFlags()
 			backgroundColor = color.sub_button_bg,
 			OnMouseUp = { 
 				function(self) 
-					Spring.Echo('Setting country: "' .. country .. '" ') 
+					echo('Setting country: "' .. country .. '" ') 
 					
 					WG.country = country
 					settings.country = country
@@ -819,11 +819,20 @@ local function ShorthandTree2Long(tree, name)
 			if #data == 2 then
 				if type(data[1]) == 'string' and type(data[2]) == 'string' then
 					subname = data[1]
-					subtree[ subname ] = {
-						type = 'text',
-						name = subname,
-						value = data[2],
-					}
+					if data[2]:sub(1,1) == '=' then
+						subtree[ subname ] = {
+							type = 'text',
+							name = subname,
+							value = data[2]:sub(2),
+						}
+					else
+						subtree[ subname ] = {
+							type = 'button',
+							name = subname,
+							--OnChange = function(self) end,
+							action = data[2],
+						}
+					end
 				else
 					subname = data[1]
 					if subname == 'lh' then
@@ -854,8 +863,6 @@ local function ShorthandTree2Long(tree, name)
 			subtree[subname].key = subname
 		end
 		
-		
-		
 		rettree.order = order
 		rettree.value = subtree
 
@@ -872,50 +879,6 @@ end
 -- Make submenu window based on index from flat window list
 -- Defined later
 local function MakeSubWindow(key)
-end
-
--- Assign a keybinding to settings and other tables that keep track of related info
-local function AssignKeyBind(hotkey, menukey, itemindex, item)
-	local kbfunc = item.OnChange
-	if item.type == 'bool' then
-		kbfunc = function()
-			newval = not flatwindowlist[menukey].tree[itemindex].value	
-			flatwindowlist[menukey].tree[itemindex].value = newval 
-			item.OnChange({checked=newval})
-			
-			if menukey == curSubKey then
-				MakeSubWindow(menukey)
-			end
-		end
-	end
-	
-	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
-	actionName = actionName:lower()
-	settings.keybounditems[actionName] = hotkey
-	AddAction(actionName, kbfunc, nil, "t")
-	Spring.SendCommands("bind " .. hotkey.mod .. hotkey.key .. " " .. actionName)
-end
-
--- Unsssign a keybinding from settings and other tables that keep track of related info
-local function UnassignKeyBind(hotkey, menukey, itemindex, item)
-	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
-	actionName = actionName:lower()
-	settings.keybounditems[actionName] = nil
-	Spring.SendCommands("unbindaction " .. actionName)
-end
-
-
-local function RemoveDups(t)
-	local t2 = {}
-	--CopyTable(t2, t)
-	local dupcheck = {}
-	for i,v in ipairs(t) do
-		if not dupcheck[v] then
-			t2[#t2+1] = v
-			dupcheck[v] = true
-		end
-	end
-	return t2
 end
 
 
@@ -941,6 +904,70 @@ local function HotkeyFromUikey(uikey_hotkey)
 		key = uikey_table[#uikey_table],
 		mod = modstring,
 	}
+end
+
+
+-- Assign a keybinding to settings and other tables that keep track of related info
+local function AssignKeyBind(hotkey, menukey, itemindex, item)
+	if not (hotkey.key and hotkey.mod) then
+		echo '<EPIC Menu> Wacky assign keybind error #1'
+		return
+	end
+	
+	local kbfunc = item.OnChange
+	if item.type == 'bool' then
+		kbfunc = function()
+			newval = not flatwindowlist[menukey].tree[itemindex].value	
+			flatwindowlist[menukey].tree[itemindex].value = newval 
+			item.OnChange({checked=newval})
+			
+			if menukey == curSubKey then
+				MakeSubWindow(menukey)
+			end
+		end
+	end
+	
+	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
+	actionName = actionName:lower()
+	settings.keybounditems[actionName] = hotkey
+	AddAction(actionName, kbfunc, nil, "t")
+	Spring.SendCommands("bind " .. hotkey.mod .. hotkey.key .. " " .. actionName)
+end
+
+local function GetUikeyHotkeyStr(action)
+	local uikey_hotkey_strs = Spring.GetActionHotKeys(action)
+	if uikey_hotkey_strs and uikey_hotkey_strs[1] then
+		return (uikey_hotkey_strs[1])
+	end
+	return false
+end
+
+-- Unsssign a keybinding from settings and other tables that keep track of related info
+local function UnassignKeyBind(menukey, item)
+	local actionName = 'epic_'.. menukey .. '_' .. item.key
+	actionName = actionName:lower()
+	if item.action then
+		actionName = item.action:lower()
+		local uikey_hotkey_str = GetUikeyHotkeyStr(actionName)
+		Spring.SendCommands("unbind " .. uikey_hotkey_str .. ' ' .. actionName)
+	else
+		Spring.SendCommands("unbindaction " .. actionName)
+	end
+	settings.keybounditems[actionName] = nil
+end
+
+
+local function RemoveDups(t)
+	local t2 = {}
+	--CopyTable(t2, t)
+	local dupcheck = {}
+	for i,v in ipairs(t) do
+		if not dupcheck[v] then
+			t2[#t2+1] = v
+			dupcheck[v] = true
+		end
+	end
+	return t2
 end
 
 
@@ -1091,8 +1118,7 @@ local function flattenTree(tree, parent)
 						settings.config[fullkey] = option.value		
 					end
 			end
-			
-			
+						
 			if option.windex then 
 				local widget = widgetHandler.widgets[option.windex]
 				widget.options[option.key].OnChange = 
@@ -1125,17 +1151,18 @@ local function flattenTree(tree, parent)
 			if option.type == 'button' or option.type == 'bool' then
 				local actionName = 'epic_' .. fullkey
 				actionName = actionName:lower()
-				local uikey_hotkey 
 				if option.action then
-					uikey_hotkey = Spring.GetActionHotKeys(option.action)
 					actionName = option.action:lower()
 				end
-				local hotkey = settings.keybounditems[actionName] or option.hotkey
+				
+				local uikey_hotkey_str = GetUikeyHotkeyStr(actionName)
+				local uikey_hotkey = uikey_hotkey_str and HotkeyFromUikey(uikey_hotkey_str)
+				
+				local hotkey = settings.keybounditems[actionName] or option.hotkey or uikey_hotkey
 				if hotkey then
-					if uikey_hotkey and uikey_hotkey[1] then
-						local uikey_hotkey_str = HotkeyFromUikey(uikey_hotkey[1])
-						UnassignKeyBind(uikey_hotkey_str, curkey, option.key, option)
-					end
+					if uikey_hotkey then
+						UnassignKeyBind(curkey, option)
+					end					
 					AssignKeyBind(hotkey, curkey, option.key, option)
 				end					
 				
@@ -1172,7 +1199,7 @@ end
 --Make little window to indicate user needs to hit a keycombo to save a keybinding
 local function MakeKeybindWindow(item, menukey, i, hotkey)
 	if hotkey then
-		UnassignKeyBind(hotkey, menukey, i, item)
+		UnassignKeyBind(menukey, item)
 	end
 	
 	local window_height = 80
