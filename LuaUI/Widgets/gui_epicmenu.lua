@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.15 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.16 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -681,7 +681,7 @@ local function MakeHelp(caption, text)
 end
 
 --(Un)Store custom widget settings for a widget
-local function IntegrateWidget(w, addoptions)
+local function IntegrateWidget(w, addoptions, index)
 	local options = w.options
 	if type(options) ~= 'table' then
 		return
@@ -733,6 +733,8 @@ local function IntegrateWidget(w, addoptions)
 	
 	for _,option in ipairs(options_ordered) do
 		local k = option.key
+		option.wname = wname
+		option.windex = index
 		
 		local origOnChange = w.options[k].OnChange
 		if option.OnChange then
@@ -785,8 +787,8 @@ end
 --Store custom widget settings for all active widgets
 local function AddAllCustSettings()
 	local cust_tree = {}
-	for _,widget in ipairs(widgetHandler.widgets) do
-		IntegrateWidget(widget, true)
+	for i,widget in ipairs(widgetHandler.widgets) do
+		IntegrateWidget(widget, true, i)
 	end
 end
 
@@ -887,7 +889,7 @@ local function AssignKeyBind(hotkey, menukey, itemindex, item)
 		end
 	end
 	
-	local actionName = 'epic_'.. menukey .. '_' .. item.key
+	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
 	actionName = actionName:lower()
 	settings.keybounditems[actionName] = hotkey
 	AddAction(actionName, kbfunc, nil, "t")
@@ -896,10 +898,10 @@ end
 
 -- Unsssign a keybinding from settings and other tables that keep track of related info
 local function UnassignKeyBind(hotkey, menukey, itemindex, item)
-	local actionName = 'epic_'.. menukey .. '_' .. item.key
+	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
 	actionName = actionName:lower()
 	settings.keybounditems[actionName] = nil
-	Spring.SendCommands({"unbindaction " .. actionName})
+	Spring.SendCommands("unbindaction " .. actionName)
 end
 
 
@@ -915,6 +917,32 @@ local function RemoveDups(t)
 	end
 	return t2
 end
+
+
+local function HotkeyFromUikey(uikey_hotkey)
+	local uikey_table = explode('+', uikey_hotkey)
+	local alt, ctrl, meta, shift
+
+	for i, str in ipairs(uikey_table) do
+		local str2 = str:lower()
+		if str2 == 'alt' 		then alt = true
+		elseif str2 == 'ctrl' 	then ctrl = true
+		elseif str2 == 'shift' 	then shift = true
+		elseif str2 == 'meta' 	then meta = true
+		end
+	end
+	
+	local modstring = '' ..
+		(alt and 'a+' or '') ..
+		(ctrl and 'c+' or '') ..
+		(meta and 'm+' or '') ..
+		(shift and 's+' or '')
+	return {
+		key = uikey_table[#uikey_table],
+		mod = modstring,
+	}
+end
+
 
 -- Convert settings tree into flat list of settings rather than tree, 
 -- indexed by each setting's name in the format: "Settings_Interface_Whatever"
@@ -967,12 +995,12 @@ local function flattenTree(tree, parent)
 		else
 			
 			local option = subcount
-			local k = option.key
 			
 			--set keys to index by
 			if not option.key then
 				option.key = option.name
 			end
+			
 			local fullkey = curkey .. '_' .. option.key
 			
 			--get spring config setting
@@ -994,16 +1022,25 @@ local function flattenTree(tree, parent)
 				option.value = newval
 			end
 			
-			--set onchange if doesn't exist
+			local onchangefuncs = {}
+			
+			--get original option.onchange function
+			local origOnChange = option.OnChange
 			if not option.OnChange or type(option.OnChange) ~= 'function' then
-				option.OnChange = function() end
+				origOnChange = function(option) end
 			end
 			
-			local origOnChange = option.OnChange
-			
-			if option.type == 'bool' then
+			if option.type == 'button' then
+				onchangefuncs[#onchangefuncs+1] =  
+					function(self)
+						if option.action then
+							Spring.SendCommands{option.action} 
+						end
+					end
+					
+			elseif option.type == 'bool' then
 				
-				option.OnChange = 
+				onchangefuncs[#onchangefuncs+1] = 
 					function(self)
 						if self then
 							option.value = self.checked
@@ -1013,8 +1050,6 @@ local function flattenTree(tree, parent)
 							Spring.SetConfigInt( option.springsetting, BoolToInt(option.value) )
 						end
 						settings.config[fullkey] = option.value
-						
-						origOnChange(option)
 					end
 				
 			elseif option.type == 'number' then
@@ -1024,7 +1059,7 @@ local function flattenTree(tree, parent)
 					option.step	= 1
 				end
 								
-				option.OnChange = 
+				onchangefuncs[#onchangefuncs+1] = 
 					function(self) 
 						if self then
 							if option.valuelist then
@@ -1038,28 +1073,42 @@ local function flattenTree(tree, parent)
 							Spring.SetConfigInt( option.springsetting, option.value )
 						end
 						settings.config[fullkey] = option.value
-						origOnChange(option)
 					end
 				
 			elseif option.type == 'list' then
-				option.OnChange = 
+				onchangefuncs[#onchangefuncs+1] = 
 					function(key)
 						option.value = key
 						settings.config[fullkey] = option.value
-						origOnChange(option)
 					end
 				
 			elseif option.type == 'colors' then
-				option.OnChange = 
+				onchangefuncs[#onchangefuncs+1] = 
 					function(self) 
 						if self then
 							option.value = self.color
 						end
-						settings.config[fullkey] = option.value
-						
-						origOnChange(option)
+						settings.config[fullkey] = option.value		
 					end
 			end
+			
+			
+			if option.windex then 
+				local widget = widgetHandler.widgets[option.windex]
+				widget.options[option.key].OnChange = 
+					function(option2) 
+						onchangefuncs[#onchangefuncs](option)
+					end
+			else
+				onchangefuncs[#onchangefuncs+1] = origOnChange
+			end
+			
+			option.OnChange = function(option)
+				for _,func in pairs(onchangefuncs) do
+					func(option)
+				end
+			end
+			
 			
 			--call onchange once
 			if valuechanged and option.type ~= 'button' and (origOnChange ~= nil) 
@@ -1076,10 +1125,20 @@ local function flattenTree(tree, parent)
 			if option.type == 'button' or option.type == 'bool' then
 				local actionName = 'epic_' .. fullkey
 				actionName = actionName:lower()
+				local uikey_hotkey 
+				if option.action then
+					uikey_hotkey = Spring.GetActionHotKeys(option.action)
+					actionName = option.action:lower()
+				end
 				local hotkey = settings.keybounditems[actionName] or option.hotkey
 				if hotkey then
+					if uikey_hotkey and uikey_hotkey[1] then
+						local uikey_hotkey_str = HotkeyFromUikey(uikey_hotkey[1])
+						UnassignKeyBind(uikey_hotkey_str, curkey, option.key, option)
+					end
 					AssignKeyBind(hotkey, curkey, option.key, option)
-				end
+				end					
+				
 			end
 			
 		end			
@@ -1151,8 +1210,9 @@ end
 
 
 --Get hotkey action and readable hotkey string
-local function GetHotkeyData(key, itemkey)
-	local actionName = 'epic_' .. key .. '_' .. itemkey
+local function GetHotkeyData(key, item)
+	local itemkey = item.key
+	local actionName = item.action or ('epic_' .. key .. '_' .. itemkey)
 	actionName = actionName:lower()
 	local hotkey = settings.keybounditems[actionName]
 	if hotkey then
@@ -1165,7 +1225,7 @@ end
 --Make a stack with control and its hotkey "K" button
 local function MakeHotkeyedControl(control, key, i, item)
 	--local hotkey, hotkeystring = GetHotkeyData_i(key, i)
-	local hotkey, hotkeystring = GetHotkeyData(key, item.key)
+	local hotkey, hotkeystring = GetHotkeyData(key, item)
 	local kbfunc = function() 
 			if not get_key then
 				MakeKeybindWindow(item, key, i, hotkey ) 
