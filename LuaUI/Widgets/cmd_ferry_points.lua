@@ -32,6 +32,7 @@ local placedRoute = false
 local myTeam = Spring.GetMyTeamID()
 
 local movingPoint = false
+local movingPointNeighbours = false
 
 local toBeWaited = {count = 0, unit = {}}
 
@@ -182,19 +183,67 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_SET_FERRY then
 		
 		if movingPoint then
+			local route = ferryRoutes.route[movingPoint.r]
 			if movingPoint.index == 0 then
-				ferryRoutes.route[movingPoint.r].start = {x = cmdParams[1], y = cmdParams[2], z = cmdParams[3]}
+				route.start = {x = cmdParams[1], y = cmdParams[2], z = cmdParams[3]}
+				for i = 1, route.transportCount do
+					local trans = transport[route.transporters[i]]
+					if trans.waypoint == 0 then
+						Spring.GiveOrderToUnit(route.transporters[i], CMD_MOVE, 
+							{route.start.x, route.start.y, route.start.z}, {} )
+					end
+				end
 			elseif movingPoint.index <= ferryRoutes.route[movingPoint.r].pointcount then
-				ferryRoutes.route[movingPoint.r].points[movingPoint.index] = {x = cmdParams[1], y = cmdParams[2], z = cmdParams[3]}
+				route.points[movingPoint.index] = {x = cmdParams[1], y = cmdParams[2], z = cmdParams[3]}
+				for i = 1, route.transportCount do
+					local trans = transport[route.transporters[i]]
+					if trans.waypoint == movingPoint.index then
+						Spring.GiveOrderToUnit(route.transporters[i], CMD_MOVE, 
+							{route.points[movingPoint.index].x, route.points[movingPoint.index].y, route.points[movingPoint.index].z}, {} )
+					end
+				end
 			else
-				ferryRoutes.route[movingPoint.r].finish = {x = cmdParams[1], y = cmdParams[2], z = cmdParams[3]}
+				route.finish = {x = cmdParams[1], y = cmdParams[2], z = cmdParams[3]}
+				for i = 1, route.transportCount do
+					local trans = transport[route.transporters[i]]
+					if trans.waypoint > route.pointcount then
+						Spring.GiveOrderToUnit(route.transporters[i], CMD.UNLOAD_UNITS, 
+							{route.finish.x, route.finish.y, route.finish.z, UNLOAD_RADIUS}, {} )
+					end
+				end
 			end
+			movingPointNeighbours = false
 			movingPoint = false
 		elseif not placedRoute then
 			
 			if cmdOptions.shift then
 				movingPoint = nearAnyPoint(cmdParams[1], cmdParams[3], COMMAND_MOVE_RADIUS)
 				if movingPoint then
+					movingPointNeighbours = {}
+					if movingPoint.index == 0 then
+						if ferryRoutes.route[movingPoint.r].pointcount == 0 then
+							movingPointNeighbours[1] = ferryRoutes.route[movingPoint.r].finish
+						else
+							movingPointNeighbours[1] = ferryRoutes.route[movingPoint.r].points[1]
+						end
+					elseif movingPoint.index <= ferryRoutes.route[movingPoint.r].pointcount then
+						if movingPoint.index == ferryRoutes.route[movingPoint.r].pointcount then
+							movingPointNeighbours[1] = ferryRoutes.route[movingPoint.r].finish
+						else
+							movingPointNeighbours[1] = ferryRoutes.route[movingPoint.r].points[movingPoint.index+1]
+						end
+						if movingPoint.index == 1 then
+							movingPointNeighbours[2] = ferryRoutes.route[movingPoint.r].start
+						else
+							movingPointNeighbours[2] = ferryRoutes.route[movingPoint.r].points[movingPoint.index-1]
+						end
+					else
+						if ferryRoutes.route[movingPoint.r].pointcount == 0 then
+							movingPointNeighbours[1] = ferryRoutes.route[movingPoint.r].start
+						else
+							movingPointNeighbours[1] = ferryRoutes.route[movingPoint.r].points[ferryRoutes.route[movingPoint.r].pointcount]
+						end
+					end
 					return true
 				end
 			end
@@ -509,6 +558,14 @@ local function DrawPlacedRoute(pos)
 	end
 end
 
+local function DrawMovingPoints(pos)
+	if movingPointNeighbours[2] then
+		gl.Vertex(movingPointNeighbours[2].x, movingPointNeighbours[2].y, movingPointNeighbours[2].z)
+	end
+	gl.Vertex(pos[1],pos[2],pos[3])
+	gl.Vertex(movingPointNeighbours[1].x, movingPointNeighbours[1].y, movingPointNeighbours[1].z)
+end
+
 function widget:DrawWorld()
 
 	gl.DepthTest(false)
@@ -520,9 +577,23 @@ function widget:DrawWorld()
 		gl.BeginEnd(GL.LINE_STRIP, DrawRoute, ferryRoutes.route[i])
 	end
 	
-	if placedRoute then
+	local pos
+	if( movingPoint and movingPointNeighbours) or placedRoute then
 		local mx, my = Spring.GetMouseState()
-		local _,pos = Spring.TraceScreenRay(mx, my, true, true)
+		local _,p = Spring.TraceScreenRay(mx, my, true, true)
+		pos = p
+	end
+	
+	if movingPoint and pos and movingPointNeighbours then
+		gl.LineStipple(true)
+		if movingPoint.index == 0 then
+			gl.DrawGroundCircle(pos[1], pos[2], pos[3], COLLECTION_RADIUS_DRAW, 32)
+		end
+		gl.BeginEnd(GL.LINE_STRIP, DrawMovingPoints, pos)
+		gl.LineStipple(false)
+	end
+	
+	if placedRoute then
 		gl.DrawGroundCircle(placedRoute.start.x, placedRoute.start.y, placedRoute.start.z, COLLECTION_RADIUS_DRAW, 32)
 		gl.BeginEnd(GL.LINE_STRIP, DrawPlacedRoute, pos)
 	end
