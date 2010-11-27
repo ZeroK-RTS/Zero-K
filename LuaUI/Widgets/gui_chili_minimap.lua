@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.85 Chili Minimap",
+    desc      = "v0.84 Chili Minimap",
     author    = "Licho, tweaked by CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -61,23 +61,23 @@ options = {
 	viewstandard = {
 		name = 'Normal View',
 		type = 'button',
-		action = 'showstandard',
+		OnChange= function() Spring.SendCommands{"showstandard"} end
 	},
 	viewheightmap = {
 		name = 'Toggle Height Map',
 		type = 'button',
-		action = 'showelevation',
+		OnChange= function() Spring.SendCommands{"showelevation"} end
 	},
 	viewblockmap = {
 		name = 'Toggle Pathing Map',
 		desc = 'Select unit then click this to see, where unit can go',
 		type = 'button',
-		action = 'showpathmap',
+		OnChange= function() Spring.SendCommands{"showpathmap"} end
 	},
 	viewmetalmap = {
 		name = 'Toggle Metal Map',
 		type = 'button',
-		action = 'showmetalmap',
+		OnChange= function() Spring.SendCommands{"ShowMetalMap"} end
 	},
 	
 	lblLos = { type = 'label', name = 'Line of Sight', },
@@ -85,13 +85,13 @@ options = {
 	viewfow = {
 		name = 'Toggle Fog of War View',
 		type = 'button',
-		action = 'togglelos',
+		OnChange= function() Spring.SendCommands{"togglelos"} end
 	},
 	viewradar = {
 		name = 'Toggle Radar & Jammer View',
 		desc = 'Only shows when Fog of War is enabled',
 		type = 'button',
-		action = 'toggleradarandjammer',
+		OnChange= function() Spring.SendCommands{"toggleradarandjammer"} end
 	},
 	
 	hidebuttons = {
@@ -109,14 +109,14 @@ local function MakeMinimapButton(file, pos, option )
 		height=iconsize, width=iconsize, 
 		file=file, 
 		bottom=0, 
-		right=iconsize*pos+5, 
+		right=iconsize*pos, 
 		tooltip = 
 			options[option].name 
 			.. ( options[option].desc 
 				and (' (' .. options[option].desc ..')') 
 				or '' 
 				),
-		OnClick={ function(self) options[option].OnChange() end }, 
+		OnClick={ options[option].OnChange }, 
 	}
 end
 
@@ -146,7 +146,7 @@ MakeMinimapWindow = function()
 		resizable = true,
 		fixedRatio = options.use_map_ratio.value,
 		dragUseGrip = true,
-		minimumSize = {iconsize*9,50},
+		minimumSize = {50,50},
 		children = {
 			
 			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},

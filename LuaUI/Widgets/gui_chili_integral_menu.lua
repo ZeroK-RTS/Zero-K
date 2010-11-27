@@ -52,7 +52,6 @@ NOTE FOR OTHER GAME DEVS:
 ------------------------
 ------------------------
 options_path = 'Settings/Interface/Integral Menu'
-options_order = { 'disablesmartselect', 'hidetabs', }
 options = {
 	disablesmartselect = {
 		name = 'Disable Smart Tab Select',
@@ -64,7 +63,6 @@ options = {
 		advanced = true,
 	},
 }
-
 
 ------------------------
 --speedups
@@ -79,25 +77,6 @@ local CMD_PAGES = 60
 local CMD_MORPH = 31210
 
 local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides = include("Configs/integral_menu_commands.lua")
-
-
-
-for cmd, _ in pairs(overrides) do 
-	
-	local cmdname = CMD[cmd]
-	if cmdname then
-		options[cmdname] = {
-			name = cmdname,
-			type = 'button',
-			action = cmdname,
-			path = 'Game/Settings/Commands',
-		}
-	end
-	options_order[#options_order+1] = cmdname
-end 
-
-
-
 
 local MAX_COLUMNS = 6
 local MAX_STATE_ROWS = 5
@@ -1003,8 +982,7 @@ function widget:Initialize()
 		orientation   = "horizontal";
 		height = "96%";
 		width = tostring(STATE_SECTION_WIDTH).."%";
-		--x = tostring(100-STATE_SECTION_WIDTH).."%";
-		right = 4;
+		x = tostring(100-STATE_SECTION_WIDTH).."%";
 		y = "3%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
