@@ -60,9 +60,10 @@ confdata.color = color
 local spSendCommands = Spring.SendCommands
 
 confdata.game_menu_tree = {
-	{'Pause/Unpause', function(self) spSendCommands{"pause"} end },
+	--{'Pause/Unpause', function(self) spSendCommands{"pause"} end },
+	{'Pause/Unpause', 'pause' },
 	{},
-	{'Share Dialog...', function(self) spSendCommands{"sharedialog"} end },	
+	{'Share Dialog...', 'sharedialog' },	
 	{'Autogroup', 
 		{
 			{'Clear Groups', function(self) spSendCommands{"luaui autogroup cleargroups"} end },
@@ -72,7 +73,7 @@ confdata.game_menu_tree = {
 			{},
 			{
 				'AutoGroup Help',
-				'Autogroup is a widget that places newly built units into groups you can quickly define with keyboard shortcuts. '..
+				'=Autogroup is a widget that places newly built units into groups you can quickly define with keyboard shortcuts. '..
 				'Alt+0-9 sets an number for the unit type(s) you currently have selected. When a new unit is built, it gets added to the group based on this autogroup.'..
 				'Alt+\~ deletes the autogrouping for the selected unit type(s).'..
 				'Ctrl+~ removes the nearest selected unit from its group and selects it. '
@@ -85,8 +86,8 @@ confdata.game_menu_tree = {
 	{},
 	{'Screenshots|Take screenshots.',
 		{
-			{'Save Screenshot (PNG)|Find your screenshots under Spring/screenshots', function() spSendCommands{"screenshot"} end },	
-			{'Save Screenshot (JPG)|Find your screenshots under Spring/screenshots', function() spSendCommands{"screenshot jpg"} end },	
+			{'Save Screenshot (PNG)|Find your screenshots under Spring/screenshots', 'screenshot' },	
+			{'Save Screenshot (JPG)|Find your screenshots under Spring/screenshots', 'screenshot jpg' },	
 		}
 	},
 	
@@ -96,7 +97,7 @@ confdata.game_menu_tree = {
 confdata.help_tree = {
 	{
 		'Tips',
-		'Hold your meta-key (spacebar by default) while clicking on a unit or corpse for more info and options. '..
+		'=Hold your meta-key (spacebar by default) while clicking on a unit or corpse for more info and options. '..
 		'You can also space-click on menu elements to see context settings. '..
 		'There is much more to come. Please enjoy using Crude Menu!'
 	},			
@@ -123,7 +124,8 @@ confdata.menu_tree = {
 						'luaui disablewidget LupsManager',
 						"luaui disablewidget Display DPS",
 						"luaui disablewidget SelectionHalo",
-						"luaui enablewidget SelectionCircle2",
+						"luaui disablewidget SelectionCircle",
+						"luaui disablewidget UnitShapes",
 					}
 				end 
 			},
@@ -162,7 +164,7 @@ confdata.menu_tree = {
 	},
 	{'Interface|Settings relating to the GUI', 
 		{
-			
+			--[[
 			{'Command Menu',
 				{
 					{'lh',
@@ -194,10 +196,9 @@ confdata.menu_tree = {
 					
 				}
 			},
+			--]]
 			
 			--{'Set An Avatar...|Requires Avatar widget, used in widgets such as Chili Chat Bubbles', function() spSendCommands{"luaui enablewidget Avatars", "setavatar"} end },
-			--{'Toggle Chili Chat', function() spSendCommands{"luaui togglewidget Chili Chat"} end },
-			--{'Toggle BuildBar', function() spSendCommands{"luaui togglewidget BuildBar"} end },
 			
 		}
 	},
@@ -285,13 +286,13 @@ confdata.menu_tree = {
 				} 
 			},
 			{'View Radius'},
-			{'Increase Radius', function() spSendCommands{"increaseViewRadius"} end },	
-			{'Decrease Radius', function() spSendCommands{"decreaseViewRadius"} end },
+			{'Increase Radius', "increaseViewRadius" },	
+			{'Decrease Radius', "decreaseViewRadius" },
 			
 			{'Trees'},
-			{'Toggle View', function() spSendCommands{'drawtrees'} end },	
-			{'See More Trees', function() spSendCommands{'moretrees'} end },	
-			{'See Less Trees', function() spSendCommands{'lesstrees'} end },	
+			{'Toggle View', 'drawtrees' },	
+			{'See More Trees', 'moretrees' },	
+			{'See Less Trees', 'lesstrees' },	
 			--{'Toggle Dynamic Sky', function(self) spSendCommands{'dynamicsky'} end },	
 			
 			{'Water Settings'},
