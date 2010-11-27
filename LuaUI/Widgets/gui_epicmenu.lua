@@ -970,7 +970,6 @@ local function RemoveDups(t)
 	return t2
 end
 
-
 -- Convert settings tree into flat list of settings rather than tree, 
 -- indexed by each setting's name in the format: "Settings_Interface_Whatever"
 local function flattenTree(tree, parent)
@@ -1051,11 +1050,7 @@ local function flattenTree(tree, parent)
 			
 			local onchangefuncs = {}
 			
-			--get original option.onchange function
-			local origOnChange = option.OnChange
-			if not option.OnChange or type(option.OnChange) ~= 'function' then
-				origOnChange = function(option) end
-			end
+
 			
 			if option.type == 'button' then
 				onchangefuncs[#onchangefuncs+1] =  
@@ -1118,23 +1113,25 @@ local function flattenTree(tree, parent)
 						settings.config[fullkey] = option.value		
 					end
 			end
-						
-			if option.windex then 
-				local widget = widgetHandler.widgets[option.windex]
-				widget.options[option.key].OnChange = 
-					function(option2) 
-						onchangefuncs[#onchangefuncs](option)
-					end
-			else
-				onchangefuncs[#onchangefuncs+1] = origOnChange
-			end
 			
-			option.OnChange = function(option)
-				for _,func in pairs(onchangefuncs) do
-					func(option)
+			--get original option.onchange function
+			local origOnChange = option.OnChange
+			if not option.OnChange or type(option.OnChange) ~= 'function' then
+				origOnChange = function(self) end
+			end
+			onchangefuncs[#onchangefuncs+1] = origOnChange			
+			
+			option.OnChange = function(self)
+				for _,func in ipairs(onchangefuncs) do
+					func(self)
 				end
 			end
 			
+			--[[ THIS DOESN'T WORK RIGHT, FIX LATER
+			if option.windex then 
+				widgetHandler.widgets[option.windex].options[option.key].OnChange = option.OnChange
+			end
+			--]]
 			
 			--call onchange once
 			if valuechanged and option.type ~= 'button' and (origOnChange ~= nil) 
