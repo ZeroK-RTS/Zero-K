@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.16 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.17 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -700,7 +700,7 @@ local function IntegrateWidget(w, addoptions, index)
 	--Add empty onchange function if doesn't exist
 	for k,option in pairs(options) do
 		if not option.OnChange or type(option.OnChange) ~= 'function' then
-			options[k].OnChange = function() end
+			options[k].OnChange = function(self) end
 		end
 	end	
 	
@@ -737,7 +737,7 @@ local function IntegrateWidget(w, addoptions, index)
 		option.windex = index
 		
 		local origOnChange = w.options[k].OnChange
-		if option.OnChange then
+		if option.OnChange and option.type ~= 'button' then
 			option.OnChange = 
 				function(self)
 					if self then
@@ -1133,7 +1133,12 @@ local function flattenTree(tree, parent)
 			
 			-- [[ doesn't work right for non-buttons
 			if option.windex and option.type == 'button' then 
-				widgetHandler.widgets[option.windex].options[option.key].OnChange = option.OnChange
+				option.OnChange = function(self)
+					origOnChange(option)
+				end
+				widgetHandler.widgets[option.windex].options[option.key].OnChange = function(self)
+					controlfunc(self)
+				end
 			end
 			--]]
 			
