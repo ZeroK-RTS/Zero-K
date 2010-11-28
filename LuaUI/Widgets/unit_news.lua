@@ -20,7 +20,8 @@ _ Informs player of unit completion/death events, with sound events depending of
 _ Maybe fusion this with minimap_events.lua and unit_marker.lua as they have a pretty similar task, maybe even unit_sounds.
 
 ---- CHANGELOG -----
--- KingRaptor,		v1.0.2	(4nov2009):	Colored messages; misc. fixes
+-- KingRaptor,		v1.0.3	(29nov2010):	Debroke widget
+-- KingRaptor,		v1.0.2	(4nov2010):	Colored messages; misc. fixes
 -- versus666,		v1.0.1	(31oct2010)	:	Simplified/sped up things, completed verbose things.
 -- KingRaptor,		v1.0	(26jul2009):	Creation.
 --]]
@@ -79,18 +80,16 @@ local widgetString = "\255\255\255\255<Unit News> \008"	--ARGB
 --	end
 --end
 
-function IsSpec()
-	if Spring.GetSpectatingState() or Spring.IsReplay() then
-		return true
+local function CheckSpecState()
+	if (Spring.GetSpectatingState() or Spring.IsReplay()) then
+		Echo("<Unit News> Spectator mode or replay. Widget removed.")
+		widgetHandler:RemoveWidget()
 	end
 end
 
 function widget:Initialize()
---Echo("<Unit News>: init")
-	if isSpec then
-		Echo("<Unit News>: Spectator mode or replay. Widget removed.")
-		widgetHandler:RemoveWidget()
-	end
+--	Echo("<Unit News>: init")
+	CheckSpecState()
 end
 
 function widget:Update()
@@ -99,7 +98,7 @@ function widget:Update()
 		return
 	end
 	lastUpdate = now
-	--isSpec()
+	CheckSpecState()
 	_, _, _, mIncome, _ = spGetTeamRes(teamID, "metal")
 end
 
@@ -117,7 +116,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	elseif (ud.isFactory) then Echo(widgetString .. ud.humanName .. ": factory destroyed")
 	elseif (ud.isCommander) then Echo(widgetString .. ud.humanName .. ": commander lost")
 	elseif (ud.isBuilding) then Echo(widgetString .. ud.humanName .. ": building destroyed")
-	elseif (ud.TEDClass == "SHIP") or (ud.TEDClass == "WATER") then Echo(widgetString .. ud.humanName .. ": vessel sunk")
+	elseif (ud.TEDClass == "SHIP") or (ud.TEDClass == "WATER") then Echo(widgetString .. ud.humanName .. " sunk")
 	elseif (ud.isBuilder) then Echo(widgetString .. ud.humanName .. ": constructor lost")
 	else Echo(widgetString .. ud.humanName .. ": unit lost")
 	end

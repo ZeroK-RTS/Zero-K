@@ -23,9 +23,10 @@ Features:
 erase markers when units die.
 
 ---- CHANGELOG -----
+-- kingraptor,			v1.3.8	(29nov2010)	: made widget not suck
 -- versus666,			v1.3.7	(10nov2010)	: tested many ways to check for comm death/morph and used the most reliable.
 -- versus666,			v1.3.6	(04oct2010)	: commented the commander death warning part until I find a reliable ways to check for commanders morphs. Re added ROOST in PoI as it's an important building in chicken games and it have AA.
--- kingraptor,			v1.3.5	(04oct2010)	: moved chickens PoI to general list and commented isChickenGame().
+-- kingraptor,			v1.3.5	(04oct2010)	: moved chickens PoI to general list and commented out isChickenGame().
 -- versus666, 			v1.3.4	(01nov2010)	: added marker where own commander die + message to allies, removed other mods refs. Old CA refs left for now as it may be useful to a LUA (beginner or not) even just as an exemple.
 -- versus666, 			v1.3.3	(29oct2010)	: added IsSpec & isChickenGame for more PoI for chicken games and cleaned code.
 -- versus666,			v1.3.2	(28oct2010)	: added chickens buildings.
@@ -125,12 +126,16 @@ local max					= math.max
 local min					= math.min
 local spGetLastAttacker		= Spring.GetUnitLastAttacker
 
-function widget:Initialize()
-	printDebug("<Unit Marker>: init")
-	if isSpec then
-		Echo("<Unit Marker>: Spectator mode or replay. Widget removed.")
+local function CheckSpecState()
+	if (Spring.GetSpectatingState() or Spring.IsReplay()) then
+		Echo("<Unit Marker> Spectator mode or replay. Widget removed.")
 		widgetHandler:RemoveWidget()
 	end
+end
+
+function widget:Initialize()
+	printDebug("<Unit Marker>: init")
+	CheckSpecState()
 	myPlayerID = spGetLocalPlayerID() --spGetMyPlayerID() --spGetLocalTeamID()
 	myName = Spring.GetPlayerInfo(myPlayerID)
 	curModID = upper(Game.modShortName or "")
@@ -155,13 +160,6 @@ function widget:Initialize()
 	]]--
 end
 
-
-function IsSpec()
-		if spGetSpectatingState or spIsReplay then
-		return true
-	end
-end
-
  --[[	--really pointless, markers can just be added by default
 function isChickenGame()
 	if (Spring.GetGameRulesParam("difficulty")) then
@@ -172,6 +170,7 @@ function isChickenGame()
 end 
 ]]--
 
+-- what is this function even trying to do?
 function widget:Update()
 	local timef = spGetGameSeconds()
 	local time = floor(timef)
@@ -179,9 +178,7 @@ function widget:Update()
 	if (time % updateInt == 0 and time ~= lastTimeUpdate) then	
 		lastTimeUpdate = time
 		--do update stuff:
-		if ( not IsSpec ) then
-			return false
-		end
+		CheckSpecState()
 	end
 end
 
@@ -288,7 +285,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to 
 				secondUnitID = unitID
 				if ( secondUnitID == firstUnitID ) then
 					spMarkerAddPoint( x, y, z, myName .. "\nComm\ncorpse")
-					Spring.SendCommands({'say a:I lost my commander !'})
+					--Spring.SendCommands({'say a:I lost my commander !'})	--would it kill you to actually check for spec state before doing this?
 				else
 					ud = UnitDefs[unitDefID]
 					if (ud.isCommander==true) and (unitTeamID == GetMyTeamID()) then
