@@ -1,12 +1,12 @@
 function widget:GetInfo()
    return {
-      name      = "UnitShapes 0.5.7.zk.01",
-      desc      = "Draws blended shapes around units and buildings",
+      name      = "UnitShapes",
+      desc      = "0.5.7.zk.01 Draws blended shapes around units and buildings",
       author    = "Lelousius and aegis, modded Licho, CarRepairer",
       date      = "30.07.2010",
       license   = "GNU GPL, v2 or later",
-      layer     = 2, -- what is this?
-      enabled   = true  --  loaded by default?
+      layer     = 2,
+      enabled   = true 
    }
 end
 

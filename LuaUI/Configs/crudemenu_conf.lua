@@ -223,11 +223,9 @@ confdata.menu_tree = {
 	},
 	{'Mouse Settings|Change your cursor and other mouse settings',
 		{
-			{'Cursor Sets'},
-			
 			{'lh',
 				{
-					name = 'Cursor Sets!',
+					name = 'Cursor Sets',
 					type = 'list',
 					OnChange = function (self) 
 						if self.value == 'ca' then

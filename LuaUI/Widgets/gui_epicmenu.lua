@@ -819,10 +819,19 @@ local function ShorthandTree2Long(tree, name)
 			if #data == 2 then
 				if type(data[1]) == 'string' and type(data[2]) == 'string' then
 					subname = data[1]
+					
+					local tooltip_start = subname and subname:find('|')
+					local tooltip = ''
+					if tooltip_start then
+						tooltip 	= subname:sub(tooltip_start+1)
+						subname 	= subname:sub(1,tooltip_start-1)
+					end
+					
 					if data[2]:sub(1,1) == '=' then
 						subtree[ subname ] = {
 							type = 'text',
 							name = subname,
+							desc = tooltip,
 							value = data[2]:sub(2),
 						}
 					else
@@ -830,6 +839,7 @@ local function ShorthandTree2Long(tree, name)
 							type = 'button',
 							name = subname,
 							--OnChange = function(self) end,
+							desc = tooltip,
 							action = data[2],
 						}
 					end
@@ -1250,6 +1260,25 @@ local function MakeHotkeyedControl(control, key, i, item)
 			end
 		end
 
+	local hklength = math.max( hotkeystring:len() * 10, 20)
+	local control2 = control
+	control.x = 0
+	control.right = hklength+2
+	control:DetectRelativeBounds()
+	
+	local hkbutton = Button:New{
+		minHeight = 30,
+		right=0,
+		width = hklength,
+		--x=-30,
+		--caption = hotkey and 'K*' or 'K', 
+		caption = hotkeystring, 
+		OnMouseUp = { kbfunc },
+		backgroundColor = color.sub_button_bg,
+		textColor = color.sub_button_fg, 
+		tooltip = 'Hotkey: ' .. hotkeystring,
+	}
+	
 	return StackPanel:New{
 		width = "100%",
 		orientation='horizontal',
@@ -1260,23 +1289,9 @@ local function MakeHotkeyedControl(control, key, i, item)
 		margin = {0,0,0,0},
 		itemPadding = {2,0,0,0},
 		padding = {0,0,0,0},
-		
-		
 		children={
-			--menu control
-			control,
-			
-			--hotkey button
-			Button:New{
-				minHeight = 30,
-				right=0,
-				x=-30,
-				caption = hotkey and 'K*' or 'K', 
-				OnMouseUp = { kbfunc },
-				backgroundColor = color.sub_button_bg,
-				textColor = color.sub_button_fg, 
-				tooltip = 'Hotkey: ' .. hotkeystring,
-			},
+			control2,
+			hkbutton
 		},
 	}
 end
@@ -1313,7 +1328,7 @@ MakeSubWindow = function(fwkey)
 		elseif data.type == 'button' then	
 			local button = Button:New{
 				x=0,
-				right = 30,
+				--right = 30,
 				minHeight = 30,
 				caption = data.name, 
 				OnMouseUp = {data.OnChange},
@@ -1889,6 +1904,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		or key == KEYSYMS.RSHIFT
 		or key == KEYSYMS.LMETA
 		or key == KEYSYMS.RMETA
+		--or key == KEYSYMS.SPACE
 		then
 		
 		return
