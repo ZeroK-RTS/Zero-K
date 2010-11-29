@@ -73,13 +73,16 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP SATELLITE]],
     },
 
-
     {
       def                = [[TARGETER]],
-      badTargetCategory  = [[FIXEDWING GUNSHIP SATELLITE]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK FLOAT FIXEDWING GUNSHIP SATELLITE HOVER]],
+      onlyTargetCategory = [[NONE]],
     },
 
+	{
+      def                = [[RELAY]],
+      onlyTargetCategory = [[NONE]],
+    },
+	
   },
 
 
@@ -97,7 +100,7 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 1,
       craterMult              = 2,
-      cylinderTargetting      = 8192,
+      cylinderTargetting      = 1,
 
       damage                  = {
         default = 3000,
@@ -105,7 +108,7 @@ unitDef = {
         subs    = 150,
       },
 
-      energypershot           = 10000,
+      energypershot           = 200,
       explosionGenerator      = [[custom:megapartgun]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -125,12 +128,11 @@ unitDef = {
       texture3                = [[flare]],
       texture4                = [[smallflare]],
       thickness               = 48,
-      tolerance               = 1000,
+      tolerance               = 10000,
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 1400,
     },
-
 
     TARGETER = {
       name                    = [[MAH TARGETIN LAZER]],
@@ -140,6 +142,7 @@ unitDef = {
       avoidNeutral            = false,
       beamlaser               = 1,
       beamTime                = 0.001,
+	  canattackground		  = false,
       coreThickness           = 0.5,
       craterBoost             = 1,
       craterMult              = 2,
@@ -178,9 +181,53 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 1400,
     },
+	
+    RELAY = {
+      name                    = [[MAH RELAY LAZER]],
+      alwaysVisible           = 18,
+      areaOfEffect            = 32,
+      avoidFeature            = false,
+      avoidNeutral            = false,
+      beamlaser               = 1,
+      beamTime                = 0.001,
+	  canattackground		  = false,
+      coreThickness           = 0.5,
+      craterBoost             = 1,
+      craterMult              = 2,
+      cylinderTargetting      = 8192,
 
+      damage                  = {
+        default = -1E-06,
+      },
+
+      energypershot           = 0,
+      --explosionGenerator      = [[custom:FLASHLAZER]],
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 12,
+      lineOfSight             = true,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 9000,
+      reloadtime              = 7,
+      renderType              = 0,
+      rgbColor                = [[0.25 0 1]],
+      soundTrigger            = true,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 16,
+      tolerance               = 10000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 1400,
+    },
   },
-
+  
 
   featureDefs                   = {
 
