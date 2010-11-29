@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.03 Chili Cursor Tooltips.",
+    desc      = "v0.04 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -11,6 +11,12 @@ function widget:GetInfo()
     enabled   = true,
   }
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Modder's choices
+
+local SHOW_FEATURE_HP = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -77,7 +83,7 @@ local mx, my = -1,-1
 local showExtendedTip = false
 local changeNow = false
 
-local window_tooltip2, window_tooltip_uf, window_tooltip_ud, window_tooltip_morph, window_tooltip_text
+local window_tooltip2, window_tooltip_unit, window_tooltip_feat, window_tooltip_ud, window_tooltip_morph, window_tooltip_text
 --local tt_buildpic
 local tt_healthbar, tt_unitID, tt_fid, tt_ud, tt_fd
 local controls = {}
@@ -355,11 +361,15 @@ local function SetHealthbar()
 		return 'err' 
 	end
 	
+	local tt_healthbar
+	
 	local health, maxhealth
 	if tt_unitID then
 		health, maxhealth = spGetUnitHealth(tt_unitID)
+		tt_healthbar = globalitems.hp_unit
 	elseif tt_fid then
 		health, maxhealth = Spring.GetFeatureHealth(tt_fid)
+		tt_healthbar = globalitems.hp_feature
 	end
 	
 	if health then
@@ -409,7 +419,10 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 	local color_m = {1,1,1,1}
 	local color_e = {1,1,1,1}
 	
+	local resource_tt_name = 'resources_unit'
+	
 	if tooltip_type == 'feature' then
+		resource_tt_name = 'resources_feature'
 		metal = ud.metal
 		energy = ud.energy
 		
@@ -451,8 +464,8 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 	end
 	
 	if tooltip_type == 'feature' then
-		color_m = {0.5,0.5,0.5,1}
-		color_e = {0.5,0.5,0.5,1}
+		color_m = {1,1,1,1}
+		color_e = {1,1,1,1}
 	else
 		if metal > 0 then
 			color_m = {0,1,0,1}
@@ -466,9 +479,9 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 		end
 	end
 	
-	if globalitems.resources then
-		local metalcontrol 	= globalitems.resources:GetChildByName('metal')
-		local energycontrol = globalitems.resources:GetChildByName('energy')
+	if globalitems[resource_tt_name] then
+		local metalcontrol 	= globalitems[resource_tt_name]:GetChildByName('metal')
+		local energycontrol = globalitems[resource_tt_name]:GetChildByName('energy')
 		
 		metalcontrol.font:SetColor(color_m)
 		energycontrol.font:SetColor(color_e)
@@ -481,7 +494,7 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal), autosize=true, fontSize=fontSize, valign='center' }
 	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy), autosize=true, fontSize=fontSize, valign='center'  }
 	
-	globalitems.resources = StackPanel:New{
+	globalitems[resource_tt_name] = StackPanel:New{
 		centerItems = false,
 		autoArrangeV = true,
 		orientation='horizontal',
@@ -738,7 +751,7 @@ local function BuildTooltip2(curwindow, ttname, ttdata)
 				itemMargin = {0,0,0,0},
 				resizeItems=false,
 				autosize=true,
-				width = 60,
+				width = 70,
 				children = children_leftbar,
 			}
 		leftside = true
@@ -826,9 +839,6 @@ local function MakeToolTip_UD(tt_table)
 	local helptext = GetHelpText( buildType )
 	local iconPath = GetUnitIcon(tt_table.unitDef)
 	
-	UpdateBuildpic( tt_table.unitDef, 'buildpic_morph' )
-	UpdateBuildpic( tt_table.unitDef, 'buildpic_ud' )
-	
 	local tt_structure = {
 		leftbar = {
 			tt_table.morph_data 
@@ -850,12 +860,16 @@ local function MakeToolTip_UD(tt_table)
 			
 		},
 	}
+	
+	
 	if tt_table.morph_data then
+		UpdateBuildpic( tt_table.unitDef, 'buildpic_morph' )
 		UpdateMorphControl( tt_table.morph_data )
 		
 		window_tooltip_morph = BuildTooltip2(window_tooltip_morph, 'morph', tt_structure)
 		SetTooltip(window_tooltip_morph)
 	else
+		UpdateBuildpic( tt_table.unitDef, 'buildpic_ud' )
 		window_tooltip_ud = BuildTooltip2(window_tooltip_ud, 'ud', tt_structure)
 		SetTooltip(window_tooltip_ud)
 	end
@@ -873,7 +887,6 @@ local function MakeToolTip_UnitFeature(type, data, tooltip)
 		
 		fullname = ((tt_ud and tt_ud.humanName) or "")	
 		
-		
 	else -- type == feature
 		tt_fid = unitfeature_id
 		team = spGetFeatureTeam(unitfeature_id)
@@ -882,7 +895,7 @@ local function MakeToolTip_UnitFeature(type, data, tooltip)
 		local feature_name = tt_fd and tt_fd.name
 		
 		local desc = ''
-		if feature_name:find('dead2') then
+		if feature_name:find('dead2') or feature_name:find('heap') then
 			desc = ' (debris)'
 		elseif feature_name:find('dead') then
 			desc = ' (wreckage)'
@@ -904,30 +917,60 @@ local function MakeToolTip_UnitFeature(type, data, tooltip)
 	local unittooltip	= tt_unitID and spGetUnitTooltip(tt_unitID) or (tt_ud and tt_ud.tooltip) or ""
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	UpdateBuildpic( tt_ud, 'buildpic_uf' )
 	UpdateResourceStack( type, unitfeature_id, tt_ud or tt_fd, tooltip, ttFontSize )
-	window_tooltip_uf = BuildTooltip2(window_tooltip_uf, 'unitfeature',{
+	
+	local tt_structure = {
 		leftbar = {
-			{ name='bp', directcontrol = 'buildpic_uf' },
+			type == 'unit'
+				and { name= 'bp', directcontrol = 'buildpic_unit' }
+				or { name= 'bp', directcontrol = 'buildpic_feature' },
 			{ name='cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0'), },
 		},
 		main = {
 			{ name='uname', icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
 			{ name='utt', text = unittooltip, wrap=true },
-			{ name='hp', directcontrol = 'healthbar', },
-			{ name='res', directcontrol = 'resources' },
+			--type == 'unit' and { name='hp', directcontrol = 'healthbar', } or {},
+			type == 'unit' and { name='hp', directcontrol = 'hp_unit', } or (SHOW_FEATURE_HP and { name='hp', directcontrol = 'hp_feature', } or {}),
+			{ name='res', directcontrol = type == 'unit' and 'resources_unit' or 'resources_feature' },
 			{ name='help', text = green .. 'Space+click: Show options', },
 		},
-	})
+	}
 	
-	SetTooltip(window_tooltip_uf)
+	if type == 'unit' then
+		UpdateBuildpic( tt_ud, 'buildpic_unit' )
+		window_tooltip_unit = BuildTooltip2(window_tooltip_unit, 'unit', tt_structure)
+		SetTooltip(window_tooltip_unit)
+	else --type == 'feature'
+		UpdateBuildpic( tt_ud, 'buildpic_feature' )
+		window_tooltip_feature = BuildTooltip2(window_tooltip_feature, 'feature', tt_structure)
+		SetTooltip(window_tooltip_feature)
+	end
+	
+	
 end
-	
+
+local function CreateHpBar(name)
+	globalitems[name] = Progressbar:New {
+		name = name,
+		width = '100%',
+		height = icon_size+2,
+		itemMargin    = {0,0,0,0},
+		itemPadding   = {0,0,0,0},	
+		padding = {0,0,0,0},
+		color = {0,1,0,1},
+		max=1,
+		caption = 'a',
+
+		children = {
+			Image:New{file='LuaUI/images/commands/bold/health.png',height= icon_size,width= icon_size,  x=0,y=0},
+		},
+	}
+end
 	
 local function MakeTooltip()
 	local cur_ttstr = screen0.currentTooltip or spGetCurrentTooltip()
 	local type, data = spTraceScreenRay(mx, my)
-	if (not changeNow) and old_ttstr == cur_ttstr and old_data == data then
+	if (not changeNow) and cur_ttstr ~= '' and old_ttstr == cur_ttstr and old_data == data then
 		PlaceToolTipWindow2(mx+20,my-20)
 		return
 	end
@@ -935,7 +978,7 @@ local function MakeTooltip()
 	old_ttstr = cur_ttstr
 	
 	tt_unitID = nil
-	tt_ud = nil
+	 tt_ud = nil
 
 	--chili control tooltip
 	if screen0.currentTooltip ~= nil 
@@ -952,7 +995,7 @@ local function MakeTooltip()
 	
 	local tt_table = tooltipBreakdown(cur_ttstr)
 	local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
-	
+		
 	if not tooltip then
 		KillTooltip()
 		return
@@ -967,7 +1010,7 @@ local function MakeTooltip()
 		KillTooltip()
 		return
 	end	
-
+	
 	--unit(s) selected/pointed at 
 	local unit_tooltip = tooltip:find('Experience %d+.%d+ Cost ')  --shows on your units, not enemy's
 		or tooltip:find('TechLevel %d') --shows on units
@@ -1083,23 +1126,9 @@ function widget:Initialize()
 
 	widget:ViewResize(Spring.GetViewGeometry())
 
-	tt_healthbar = 
-		Progressbar:New {
-			width = '100%',
-			height = icon_size+2,
-			itemMargin    = {0,0,0,0},
-			itemPadding   = {0,0,0,0},	
-			padding = {0,0,0,0},
-			color = {0,1,0,1},
-			max=1,
-			caption = 'a',
-
-			children = {
-				Image:New{file='LuaUI/images/commands/bold/health.png',height= icon_size,width= icon_size,  x=0,y=0},
-			},
-		}
-		
-	globalitems['healthbar'] = tt_healthbar
+	CreateHpBar('hp_unit')
+	CreateHpBar('hp_feature')
+	
 	
 	stack_main = StackPanel:New{
 		width=300, -- needed for initial tooltip
