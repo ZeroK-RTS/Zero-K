@@ -105,7 +105,6 @@ unitDef = {
 
       dropped                 = true,
       edgeEffectiveness       = 0,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -138,7 +137,6 @@ unitDef = {
 
       dance                   = 60,
       dropped                 = 1,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       fixedlauncher           = 1,

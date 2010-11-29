@@ -100,7 +100,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:lobber_goo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

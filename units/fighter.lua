@@ -105,7 +105,6 @@ unitDef = {
 
       duration                = 0.012,
       edgeEffectiveness       = 1,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
       fireStarter             = 10,
       impactOnly              = true,
@@ -148,7 +147,6 @@ unitDef = {
         subs    = 10,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:WEAPEXP_PUFF]],
       fireStarter             = 70,
       flightTime              = 3,

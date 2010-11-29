@@ -68,7 +68,6 @@ unitDef = {
         default = 10,
       },
 
-      energypershot           = [[0]],
       exteriorShield          = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,

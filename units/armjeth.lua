@@ -111,7 +111,6 @@ unitDef = {
         subs    = 0.9,
       },
 
-      energypershot           = 0.2,
       explosionGenerator      = [[custom:flash_teal7]],
       fireStarter             = 100,
       impactOnly              = true,

@@ -81,7 +81,6 @@ unitDef = {
         subs    = 15,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:DEFAULT]],
       fireStarter             = 70,
       fixedlauncher           = 1,

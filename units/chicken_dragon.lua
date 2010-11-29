@@ -142,7 +142,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:large_green_goo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -181,7 +180,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 1,
@@ -218,7 +216,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 1,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 300,
       impulseFactor           = 1,
@@ -256,7 +253,6 @@ unitDef = {
 
       dance                   = 60,
       dropped                 = 1,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       flightTime              = 5,

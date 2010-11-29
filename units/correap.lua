@@ -97,7 +97,6 @@ unitDef = {
         subs    = 16.65,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:DEFAULT]],
       impactOnly              = true,
       impulseBoost            = 0,

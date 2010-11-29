@@ -113,7 +113,6 @@ unitDef = {
         subs    = 150,
       },
 
-      energypershot           = 150,
       explosionGenerator      = [[custom:megapartgun]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -154,7 +153,6 @@ unitDef = {
         subs    = 12,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 70,
       guidance                = true,
@@ -201,7 +199,6 @@ unitDef = {
       },
 
       duration                = 10,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
       fireStarter             = 50,
       impactOnly              = true,
@@ -248,7 +245,6 @@ unitDef = {
       },
 
       duration                = 0.01,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 0,

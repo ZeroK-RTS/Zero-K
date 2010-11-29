@@ -95,7 +95,6 @@ unitDef = {
         subs    = 5,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:DEFAULT]],
       fireStarter             = 70,
       flightTime              = 2.2,

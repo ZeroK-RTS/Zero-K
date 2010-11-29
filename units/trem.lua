@@ -100,7 +100,6 @@ unitDef = {
         subs    = 9,
       },
 
-      energypershot           = [[0]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,

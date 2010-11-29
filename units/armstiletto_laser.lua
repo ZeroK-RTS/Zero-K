@@ -101,7 +101,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:YELLOW_LIGHTNING_BOMB]],
       fireStarter             = 90,
       impulseBoost            = 0,
@@ -148,7 +147,6 @@ unitDef = {
 
       dropped                 = true,
       edgeEffectiveness       = 0,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 0,

@@ -83,7 +83,6 @@ unitDef = {
         subs    = 5,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
       fireStarter             = 200,
       flameGfxTime            = 0.1,

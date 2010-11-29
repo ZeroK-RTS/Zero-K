@@ -107,7 +107,6 @@ unitDef = {
         subs    = 40,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 100,
       guidance                = true,
@@ -151,7 +150,6 @@ unitDef = {
         subs    = 75,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
       flighttime              = 100,
@@ -199,7 +197,6 @@ unitDef = {
         subs    = 5E-08,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       impactOnly              = true,

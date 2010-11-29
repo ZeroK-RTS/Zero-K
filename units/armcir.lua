@@ -83,7 +83,6 @@ unitDef = {
         subs    = 17.5,
       },
 
-      energypershot           = 0,
       explosionGenerator      = [[custom:MISSILE_HIT_PIKES_160]],
       fireStarter             = 20,
       flightTime              = 4,

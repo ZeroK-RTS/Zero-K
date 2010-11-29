@@ -102,7 +102,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 100,
       flighttime              = 14,

@@ -105,7 +105,6 @@ unitDef = {
         subs    = 1.25,
       },
 
-      energypershot           = 0.25,
       explosionGenerator      = [[custom:flash1green]],
       fireStarter             = 30,
       impactOnly              = true,
@@ -150,7 +149,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

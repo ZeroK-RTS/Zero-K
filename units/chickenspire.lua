@@ -97,7 +97,6 @@ unitDef = {
       },
 
       dance                   = 60,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:large_green_goo]],
       fireStarter             = 0,
       flightTime              = 30,

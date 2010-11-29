@@ -111,7 +111,6 @@ unitDef = {
         default = 270,
       },
 
-      energypershot           = 1,
       explosionGenerator      = [[custom:flash2purple]],
       fireStarter             = 30,
       impactOnly              = true,

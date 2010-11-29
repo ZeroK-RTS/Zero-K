@@ -100,7 +100,6 @@ unitDef = {
       duration                = 8,
       dynDamageExp            = 0,
       edgeEffectiveness       = 0.8,
-      energypershot           = 3,
       explosionGenerator      = [[custom:YELLOW_LIGHTNINGPLOSION]],
       fireStarter             = 0,
       impulseBoost            = 0,
@@ -141,7 +140,6 @@ unitDef = {
       },
 
       duration                = 0.0025,
-      energypershot           = 0,
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 0,

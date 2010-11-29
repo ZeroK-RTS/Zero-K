@@ -79,7 +79,6 @@ unitDef = {
         subs    = 320,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:TORPEDO_HIT]],
       fixedLauncher           = true,
       guidance                = true,

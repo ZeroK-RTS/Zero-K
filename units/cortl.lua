@@ -121,7 +121,6 @@ unitDef = {
         default = 300,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:TORPEDO_HIT]],
       groundbounce            = 1,
       guidance                = true,

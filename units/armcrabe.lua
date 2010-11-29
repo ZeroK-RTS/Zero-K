@@ -108,7 +108,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.3,
-      energypershot           = 0,
       explosionGenerator      = [[custom:ARMCRABE_EXPLOSION]],
       impulseBoost            = 0,
       impulseFactor           = 0.32,

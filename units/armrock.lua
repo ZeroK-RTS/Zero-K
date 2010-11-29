@@ -105,7 +105,6 @@ unitDef = {
         subs    = 9,
       },
 
-      energypershot           = [[0]],
       fireStarter             = 70,
       flightTime              = 2.4,
       guidance                = false,

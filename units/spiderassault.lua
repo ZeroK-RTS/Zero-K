@@ -101,7 +101,6 @@ unitDef = {
         subs    = 7,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:MARY_SUE]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

@@ -122,7 +122,6 @@ unitDef = {
       },
 
       duration                = 0.02,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
       fireStarter             = 30,
       heightMod               = 1,
@@ -161,7 +160,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.8,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:TORPEDO_HIT]],
       guidance                = true,
       impulseBoost            = 0,
@@ -209,7 +207,6 @@ unitDef = {
       },
 
       duration                = 0.05,
-      energypershot           = 28,
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_YELLOW]],
       fireStarter             = 90,
       heightMod               = 1,

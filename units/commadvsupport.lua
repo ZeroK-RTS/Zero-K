@@ -120,7 +120,6 @@ unitDef = {
         default = 800,
       },
 
-      energypershot           = 80,
       explosionGenerator      = [[custom:flash1teal]],
       fireStarter             = 30,
       impulseBoost            = 0,
@@ -164,7 +163,6 @@ unitDef = {
         default = 360,
       },
 
-      energypershot           = 1,
       explosionGenerator      = [[custom:flash2purple]],
       fireStarter             = 30,
       impactOnly              = true,

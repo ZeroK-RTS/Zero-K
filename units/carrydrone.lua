@@ -93,7 +93,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT]],
       fireStarter             = 30,
       impactOnly              = true,

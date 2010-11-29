@@ -112,7 +112,6 @@ unitDef = {
 
       dropped                 = true,
       edgeEffectiveness       = 0,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -146,7 +145,6 @@ unitDef = {
         subs    = 1,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:none]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -189,7 +187,6 @@ unitDef = {
       },
 
       dropped                 = true,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:none]],
       fireStarter             = 70,
       flightTime              = 0,

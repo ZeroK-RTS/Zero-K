@@ -93,7 +93,6 @@ unitDef = {
         subs    = 2.5,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:gauss_hit_l]],
       groundbounce            = 1,
       impactOnly              = true,

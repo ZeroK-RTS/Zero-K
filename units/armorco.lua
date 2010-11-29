@@ -103,7 +103,6 @@ unitDef = {
         subs    = 10,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:gauss_hit_h]],
       groundbounce            = 1,
       impactOnly              = true,
@@ -154,7 +153,6 @@ unitDef = {
         subs    = 1,
       },
 
-      energypershot           = 0.2,
       explosionGenerator      = [[custom:flash_teal7]],
       fireStarter             = 100,
       impactOnly              = true,
@@ -192,7 +190,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.75,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 55,
       guidance                = true,

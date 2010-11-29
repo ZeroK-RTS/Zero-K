@@ -86,7 +86,6 @@ unitDef = {
         subs    = 150,
       },
 
-      energypershot           = 150,
       explosionGenerator      = [[custom:ataalaser]],
       impactOnly              = true,
       impulseBoost            = 0,

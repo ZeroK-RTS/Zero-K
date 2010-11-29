@@ -102,7 +102,6 @@ unitDef = {
         subs    = 50,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:TESS]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -134,7 +133,6 @@ unitDef = {
         subs    = 0.001,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:SMOKE]],
       fireStarter             = 100,
       flameGfxTime            = 1.6,

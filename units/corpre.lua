@@ -81,7 +81,6 @@ unitDef = {
       duration                = 0.3,
       dynDamageExp            = 1,
       dynDamageInverted       = false,
-      energypershot           = 0.75,
       explosionGenerator      = [[custom:HEATRAY_HIT]],
       fallOffRate             = 0.9,
       fireStarter             = 90,

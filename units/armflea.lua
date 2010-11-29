@@ -103,7 +103,6 @@ unitDef = {
         subs    = 0.4,
       },
 
-      energypershot           = 0.2,
       explosionGenerator      = [[custom:FLASH1yellow2]],
       fireStarter             = 50,
       impactOnly              = true,

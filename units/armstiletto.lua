@@ -88,7 +88,6 @@ unitDef = {
 
       dropped                 = true,
       edgeEffectiveness       = 0.4,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:ELECTRIC_EXPLOSION]],
       fireStarter             = 0,
       impulseBoost            = 0,

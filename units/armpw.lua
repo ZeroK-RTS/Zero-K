@@ -110,7 +110,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:FLASHPLOSION]],
       impactOnly              = true,
       impulseBoost            = 0,

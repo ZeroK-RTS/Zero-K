@@ -99,7 +99,6 @@ unitDef = {
       },
 
       duration                = 10,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
       fireStarter             = 50,
       impactOnly              = true,

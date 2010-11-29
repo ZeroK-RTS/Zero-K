@@ -91,7 +91,6 @@ unitDef = {
         subs    = 500,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:TORPEDO_HIT]],
       guidance                = true,
       impactOnly              = true,

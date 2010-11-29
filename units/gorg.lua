@@ -119,7 +119,6 @@ unitDef = {
 
       duration                = 0.0333,
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 35,
@@ -163,7 +162,6 @@ unitDef = {
       },
 
       duration                = 0.04,
-      energypershot           = 0.1,
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
       fireStarter             = 30,
       heightMod               = 1,

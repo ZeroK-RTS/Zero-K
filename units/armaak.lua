@@ -119,7 +119,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:ARCHPLOSION]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -168,7 +167,6 @@ unitDef = {
         subs    = 0.8,
       },
 
-      energypershot           = 0.2,
       explosionGenerator      = [[custom:flash_teal7]],
       fireStarter             = 100,
       impactOnly              = true,

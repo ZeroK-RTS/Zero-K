@@ -93,7 +93,6 @@ unitDef = {
         subs    = 75,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
       flighttime              = 100,
@@ -144,7 +143,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
-      energypershot           = 500,
       explosionGenerator      = [[custom:NUKE_150]],
       fireStarter             = 0,
       guidance                = true,

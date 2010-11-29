@@ -101,7 +101,6 @@ unitDef = {
         default = 10,
       },
 
-      energypershot           = [[0]],
       exteriorShield          = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -137,7 +136,6 @@ unitDef = {
         subs    = 7.5,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:MARY_SUE]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

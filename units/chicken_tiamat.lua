@@ -124,7 +124,6 @@ unitDef = {
         subs          = 0.002,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:SMOKE]],
       fireStarter             = 100,
       flameGfxTime            = 1.6,
@@ -162,7 +161,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -193,7 +191,6 @@ unitDef = {
         default = 10,
       },
 
-      energypershot           = [[0]],
       exteriorShield          = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -233,7 +230,6 @@ unitDef = {
       },
 
       dance                   = 60,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       fixedlauncher           = 1,

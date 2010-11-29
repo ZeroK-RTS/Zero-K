@@ -120,7 +120,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT_HE]],
       firestarter             = 70,
       impulseBoost            = 0,
@@ -195,7 +194,6 @@ unitDef = {
 
       duration                = 0.11,
       edgeEffectiveness       = 0.99,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:flash1green]],
       fireStarter             = 70,
       impactOnly              = true,

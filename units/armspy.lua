@@ -98,7 +98,6 @@ unitDef = {
       },
 
       duration                = 8,
-      energypershot           = 3,
       explosionGenerator      = [[custom:YELLOW_LIGHTNINGPLOSION]],
       fireStarter             = 0,
       heightMod               = 1,

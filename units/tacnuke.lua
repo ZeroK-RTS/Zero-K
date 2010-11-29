@@ -94,7 +94,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NUKE_150]],
       fireStarter             = 0,
       guidance                = true,

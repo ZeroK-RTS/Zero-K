@@ -132,7 +132,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT_HE]],
       firestarter             = 70,
       impulseBoost            = 0,
@@ -171,7 +170,6 @@ unitDef = {
         subs    = 15,
       },
 
-      energypershot           = 30,
       explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],
       fireStarter             = 100,
       impulseBoost            = 0,
@@ -206,7 +204,6 @@ unitDef = {
         default = 10,
       },
 
-      energypershot           = [[0]],
       exteriorShield          = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -245,7 +242,6 @@ unitDef = {
 
       duration                = 0.11,
       edgeEffectiveness       = 0.99,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:flash1green]],
       fireStarter             = 70,
       impactOnly              = true,

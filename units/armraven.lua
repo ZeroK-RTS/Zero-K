@@ -83,7 +83,6 @@ unitDef = {
 
       dance                   = 20,
       edgeEffectiveness       = 0.5,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],
       fireStarter             = 100,
       flightTime              = 8,

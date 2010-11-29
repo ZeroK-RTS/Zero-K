@@ -99,7 +99,6 @@ unitDef = {
       },
 
       duration                = 0.02,
-      energypershot           = 0,
       explosionGenerator      = [[custom:GATORLASERFLASH]],
       fireStarter             = 50,
       heightMod               = 1,

@@ -98,7 +98,6 @@ unitDef = {
       duration                = 0.3,
       dynDamageExp            = 1,
       dynDamageInverted       = false,
-      energypershot           = 0.75,
       explosionGenerator      = [[custom:HEATRAY_HIT]],
       fallOffRate             = 0.9,
       fireStarter             = 90,
@@ -139,7 +138,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.7,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:FLASHSMALLBUILDINGEX]],
       fireStarter             = 99,
       impulseBoost            = 0,

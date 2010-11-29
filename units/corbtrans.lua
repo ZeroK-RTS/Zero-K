@@ -121,7 +121,6 @@ unitDef = {
       },
 
       duration                = 0.02,
-      energypershot           = 0,
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
       fireStarter             = 50,
       impactOnly              = true,

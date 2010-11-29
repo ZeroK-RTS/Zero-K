@@ -140,7 +140,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
       firestarter             = 400,
       impulseBoost            = 0,
@@ -181,7 +180,6 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 1,
@@ -218,7 +216,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 1,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 500,
       impulseFactor           = 1,
@@ -256,7 +253,6 @@ unitDef = {
 
       dance                   = 60,
       dropped                 = 1,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       flightTime              = 5,

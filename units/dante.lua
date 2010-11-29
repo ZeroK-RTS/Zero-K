@@ -112,7 +112,6 @@ unitDef = {
         subs    = 0.006,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:SMOKE]],
       fireStarter             = 120,
       flameGfxTime            = 1.6,
@@ -156,7 +155,6 @@ unitDef = {
       duration                = 0.3,
       dynDamageExp            = 1,
       dynDamageInverted       = false,
-      energypershot           = 0.35,
       explosionGenerator      = [[custom:HEATRAY_HIT]],
       fallOffRate             = 1,
       fireStarter             = 90,
@@ -200,7 +198,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.75,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
       fireStarter             = 250,
       fixedlauncher           = true,
@@ -257,7 +254,6 @@ unitDef = {
 
       dance                   = 10,
       edgeEffectiveness       = 0.75,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
       fireStarter             = 250,
       fixedlauncher           = true,

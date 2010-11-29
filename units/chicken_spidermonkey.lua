@@ -107,7 +107,6 @@ unitDef = {
       },
 
       dance                   = 60,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       fixedlauncher           = 1,
@@ -162,7 +161,6 @@ unitDef = {
       },
 
       dance                   = 150,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       fixedlauncher           = true,

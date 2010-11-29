@@ -108,7 +108,6 @@ unitDef = {
         subs    = 75,
       },
 
-      energypershot           = 50,
       explosionGenerator      = [[custom:megapartgun]],
       impactOnly              = true,
       impulseBoost            = 0,

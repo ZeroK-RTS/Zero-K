@@ -106,7 +106,6 @@ unitDef = {
         subs    = 7,
       },
 
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT]],
       impactOnly              = true,
       impulseBoost            = 0,

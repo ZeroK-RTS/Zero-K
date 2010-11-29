@@ -91,7 +91,6 @@ unitDef = {
       },
 
       duration                = 0.02,
-      energypershot           = 0.5,
       explosionGenerator      = [[custom:FLASH1yellow2]],
       fireStarter             = 50,
       heightMod               = 1,

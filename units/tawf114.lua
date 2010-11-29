@@ -88,7 +88,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
-      energypershot           = [[0]],
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 20,
       flightTime              = 4,

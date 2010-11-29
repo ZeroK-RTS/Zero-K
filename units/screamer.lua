@@ -84,7 +84,6 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.25,
-      energypershot           = 80,
       explosionGenerator      = [[custom:MISSILE_HIT_SPHERE_120]],
       fireStarter             = 90,
       flightTime              = 4,
