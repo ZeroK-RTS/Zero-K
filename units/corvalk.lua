@@ -23,7 +23,7 @@ unitDef = {
   category            = [[GUNSHIP UNARMED]],
   collide             = false,
   corpse              = [[DEAD]],
-  cruiseAlt           = 200,
+  cruiseAlt           = 80,
 
   customParams        = {
     description_bp = [[Transporte aéreo]],
@@ -52,7 +52,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   objectName          = [[CORVALK.s3o]],
   pitchscale          = [[1]],
-  releaseHeld         = false,
+  releaseHeld         = true,
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
