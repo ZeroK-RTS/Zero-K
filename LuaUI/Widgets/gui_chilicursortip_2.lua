@@ -2,13 +2,13 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.02 Chili Cursor Tooltips.",
+    desc      = "v0.03 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
@@ -775,6 +775,7 @@ local function BuildTooltip2(curwindow, ttname, ttdata)
 end
 
 local function GetUnitIcon(ud)
+	if not ud then return false end
 	return icontypes 
 		and	icontypes[(ud and ud.iconType or "default")].bitmap
 		or 	'icons/'.. ud.iconType ..iconFormat
