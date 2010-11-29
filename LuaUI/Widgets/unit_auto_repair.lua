@@ -2,7 +2,7 @@
 function widget:GetInfo()
 	return {
 		name = "Auto Repair",
-		desc = "v0.6 Makes repairing units that are ordered into battle with combat units repair the combat units when they get damaged",
+		desc = "v0.8 Makes repairing units that are ordered into battle with combat units repair the combat units when they get damaged",
 		author = "thesleepless",
 		date = "Dec 29, 2008",
 		license = "Public Domain",
@@ -12,7 +12,9 @@ function widget:GetInfo()
 end
 --[[
 Changelog:
-	v0.6 CarRepairer: 
+	v0.8 KingRaptor: 
+		- use GameFrame() % 30 instead of Update()
+	v0.7 CarRepairer: 
 		- Fixed so units don't autorepair if they are busy with something else.
 		- Added leash so that builders return to where they were sitting when they began autorepairing if they stray too far.
 		- Other small code fixes.
@@ -143,15 +145,17 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	end
 end
 
-function widget:Update()
-	for unitID, f in pairs(idleRepairUnits) do
-		repairNearestDamagedUnit(unitID)
-	end
-	for unitID, pos in pairs(repairingUnits) do
-		local posx, posy, posz = spGetUnitPosition(unitID)
-		if posx then
-			if distSqr(pos[1], pos[2], pos[3], posx, posy, posz) > leashLength*leashLength then
-				spGiveOrderToUnit(unitID, CMD.MOVE, pos, {})
+function widget:GameFrame(n)
+	if n%30 < 0.1 then
+		for unitID, f in pairs(idleRepairUnits) do
+			repairNearestDamagedUnit(unitID)
+		end
+		for unitID, pos in pairs(repairingUnits) do
+			local posx, posy, posz = spGetUnitPosition(unitID)
+			if posx then
+				if distSqr(pos[1], pos[2], pos[3], posx, posy, posz) > leashLength*leashLength then
+					spGiveOrderToUnit(unitID, CMD.MOVE, pos, {})
+				end
 			end
 		end
 	end
