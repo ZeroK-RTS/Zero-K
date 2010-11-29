@@ -50,6 +50,7 @@ local col_buildpower = {0.8, 0.8, 0.2, 1}
 
 local window
 local bar_metal
+local bar_energy
 local bar_buildpower
 local lbl_metal
 local lbl_energy
@@ -147,7 +148,7 @@ function widget:Update(s)
 		wastingE = (WG.energyWasted > eInco*0.05) and (WG.energyWasted > 15)
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
---[[	if stallingE or wastingE then
+	if stallingE or wastingE then
 		blinkE_status = true
 		bar_energy:SetValue( 100 )
 		if wastingE then
@@ -161,7 +162,7 @@ function widget:Update(s)
 	elseif (blinkE_status) then
 		blinkE_status = false
 		bar_energy:SetColor( col_energy )
-	end]]--
+	end
 
 
 	local mPercent = 100 * mCurr / mStor
@@ -174,6 +175,16 @@ function widget:Update(s)
 		bar_metal:SetCaption( ("%i/%i"):format(mCurr, mStor) )
 	end
 
+	if (not blinkE_status) then
+		bar_energy:SetValue( ePercent )
+	end
+	if stallingE then
+		bar_energy:SetCaption( (RedStr.."%i/%i"):format(eCurr, eStor) )
+	elseif wastingE then
+                bar_energy:SetCaption( (GreenStr.."%i/%i"):format(eCurr, eStor) )
+	else
+		bar_energy:SetCaption( ("%i/%i"):format(eCurr, eStor) )
+	end
 
 
 	--// UPDATE THE LABELS JUST ONCE PER SECOND!
@@ -387,6 +398,16 @@ function CreateWindow()
                 right  = 10,
                 y      = 1,
 		file   = 'LuaUI/Images/energy.png',
+	}
+	bar_energy = Chili.Progressbar:New{
+		parent = window,
+		color  = col_energy,
+		height = p(100/bars),
+		right  = 36,
+                x      = 100,
+                y      = 1,
+		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
+		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
 	lbl_energy = Chili.Label:New{
 		parent = window,
