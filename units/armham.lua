@@ -107,6 +107,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:MARY_SUE]],
       impactOnly              = true,
       impulseBoost            = 0,

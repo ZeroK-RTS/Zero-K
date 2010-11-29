@@ -101,6 +101,7 @@ unitDef = {
 
       edgeEffectiveness       = 0.5,
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT_HE]],
       firestarter             = 70,
       impulseBoost            = 0,

@@ -61,7 +61,7 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[roost]],
   power                         = 600,
-  script						= [[roost.cob]],
+  script                        = [[roost.cob]],
   seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 

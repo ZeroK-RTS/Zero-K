@@ -18,9 +18,9 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
-    description_fr = [[Artillerie légère]],
+    description_fr = [[Artillerie l?g?re]],
     helptext       = [[A form of organic artillery, the Lobber hurls balls of venom at a high trajectory over long distances. It proves a problem for those who rely excessively on static defenses, but is practically helpless when attacked directly.]],
-    helptext_fr    = [[Un genre d'artillerie organique, le Lobber projette des boules envenimées corrosives selon une trajectoire en cloche sur de longues distances, ce qui pose un problème de taille aux ennemis se concentrant sur une défense statique. Mais il est sans défenses face aux attaques raprochées.]],
+    helptext_fr    = [[Un genre d'artillerie organique, le Lobber projette des boules envenim?es corrosives selon une trajectoire en cloche sur de longues distances, ce qui pose un probl?me de taille aux ennemis se concentrant sur une d?fense statique. Mais il est sans d?fenses face aux attaques raproch?es.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -100,6 +100,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:lobber_goo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

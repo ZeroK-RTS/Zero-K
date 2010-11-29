@@ -18,9 +18,9 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
-	description_fr = [[Bouclier mobile/AA léger]],
-	helptext       = [[Protects adjacent chickens.]],
-	helptext_fr    = [[Le Toad est une sorte de crapaud géant avec comme particularité de posséder un puissant bouclier énergétique protégeant les unités amies proches des tirs adverses lors de leur progression vers l'adversaire. Il utilise aussi des spores basiques pour se défendre des unités aériennes.]],
+    description_fr = [[Bouclier mobile/AA l?ger]],
+    helptext       = [[Protects adjacent chickens.]],
+    helptext_fr    = [[Le Toad est une sorte de crapaud g?ant avec comme particularit? de poss?der un puissant bouclier ?nerg?tique prot?geant les unit?s amies proches des tirs adverses lors de leur progression vers l'adversaire. Il utilise aussi des spores basiques pour se d?fendre des unit?s a?riennes.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -110,6 +110,7 @@ unitDef = {
       },
 
       dance                   = 60,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       fixedlauncher           = 1,
@@ -162,6 +163,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -192,6 +194,7 @@ unitDef = {
         default = 10,
       },
 
+      energypershot           = [[0]],
       exteriorShield          = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,

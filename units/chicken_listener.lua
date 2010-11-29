@@ -18,9 +18,9 @@ unitDef = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
-	description_fr = [[Détecteur sismic mobile enfoui]],
-	helptext       = [[The Listener is an evolved form of the Digger. While it has lost all fighting ability, it has gained a unique sense of hearing that allows it to pinpoint the location of enemy ground forces.]],
-	helptext_fr    = [[Le Listener est une forme évoluée du Digger. Ayant perdu ses capacités d'attaque il a en retour gagné une puissante ouie qui lui permet de déterminer avec précision l'emplacement des troupes terrestres enemies.]],
+    description_fr = [[D?tecteur sismic mobile enfoui]],
+    helptext       = [[The Listener is an evolved form of the Digger. While it has lost all fighting ability, it has gained a unique sense of hearing that allows it to pinpoint the location of enemy ground forces.]],
+    helptext_fr    = [[Le Listener est une forme ?volu?e du Digger. Ayant perdu ses capacit?s d'attaque il a en retour gagn? une puissante ouie qui lui permet de d?terminer avec pr?cision l'emplacement des troupes terrestres enemies.]],
   },
 
   defaultmissiontype  = [[Standby]],

@@ -724,10 +724,8 @@ function gadget:GameFrame(n)
 					local teamID = allyTeamData.team[i]
 					local eCur, eMax, ePull, eInc, eExp, _, eSent, eRec = Spring.GetTeamResources(teamID, "energy")
 					if (eCur ~= nil) then 
-						local eTax = eInc * (eCur) / (eMax - HIDDEN_STORAGE) 
-						if (eTax > 0) then 
-							sumInc = sumInc + eTax 
-						end 
+						local eTax = eCur - eInc * 2
+						if (eTax > 0) then sumInc = sumInc + eTax end 
 					end 
 				end 
 
@@ -737,9 +735,9 @@ function gadget:GameFrame(n)
 					local teamID = allyTeamData.team[i]
 					local eCur, eMax, ePull, eInc, eExp, _, eSent, eRec = Spring.GetTeamResources(teamID, "energy")
 					if (eCur ~= nil) then 
-						local eTax = eInc * (eCur) / (eMax - HIDDEN_STORAGE) 
+						local eTax = eCur - eInc * 2
 						if (eTax < 0) then eTax = 0 end 
-
+						
 						local change = share - eTax 
 						changeTeams[teamID] = change
 						if (change > 0) then 
@@ -757,11 +755,8 @@ function gadget:GameFrame(n)
 				local eCur, eMax, ePull, eInc, eExp, _, eSent, eRec = Spring.GetTeamResources(teamID, "energy")
 					
 				if (eCur ~= nil) then 
-					local inc = eInc - eExp + (lastTeamNe[teamID] or 0)  -- increment - based on income-expenses without last team OD usage 
-					local ne = 0 
-					if (inc > 0) then  
-						local fillRatio = (eCur) / (eMax - HIDDEN_STORAGE) 
-						ne = inc * fillRatio   -- actual energy used for overdrive depends on fill ratio. At 50% of storage, 50% of income is used 
+					local ne = eCur - eInc * 2
+					if (ne > 0) then  
 						allyEExcess  = allyEExcess + ne
 						Spring.UseTeamResource(teamID, "e", ne) -- spend the extra energy
 					end 

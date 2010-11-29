@@ -26,9 +26,9 @@ unitDef = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
-    description_fr = [[Unité d'assaut poulet ultra lourde]],
+    description_fr = [[Unit? d'assaut poulet ultra lourde]],
     helptext       = [[The White Dragons, senior guardians of the chicken hive, are monstrous beings second only to the queen herself. With a powerful stomp, lethal jaws, corrosive goo and a multitude of spores, they are a threat to be feared indeed.]],
-	helptext_fr    = [[Les White Dragons, gardiens séculaires des nids poulet sont d'immenses créatures monstrueuses extrèmement féroces. Capables d'écraser sous leur poids leurs adversaires, de broyer les alliages les plus robustes avec leur mâchoire, de projeter leur bave corrosive et de cribler les unités aériennes d'un amas de spores corrosifs, leur simple apparition sur le champ de bataille glace le sang.]],
+    helptext_fr    = [[Les White Dragons, gardiens s?culaires des nids poulet sont d'immenses cr?atures monstrueuses extr?mement f?roces. Capables d'?craser sous leur poids leurs adversaires, de broyer les alliages les plus robustes avec leur m?choire, de projeter leur bave corrosive et de cribler les unit?s a?riennes d'un amas de spores corrosifs, leur simple apparition sur le champ de bataille glace le sang.]],
   },
 
   defaultmissiontype     = [[standby]],
@@ -42,7 +42,7 @@ unitDef = {
   maneuverleashlength    = [[640]],
   mass                   = 1363,
   maxDamage              = 30000,
-  maxSlope           	 = 18,
+  maxSlope               = 18,
   maxVelocity            = 2.1,
   minCloakDistance       = 225,
   movementClass          = [[AKBOT6]],
@@ -142,6 +142,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:large_green_goo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -180,6 +181,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 1,
@@ -216,6 +218,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 300,
       impulseFactor           = 1,
@@ -253,6 +256,7 @@ unitDef = {
 
       dance                   = 60,
       dropped                 = 1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       flightTime              = 5,

@@ -139,6 +139,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.7,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:FLASHSMALLBUILDINGEX]],
       fireStarter             = 99,
       impulseBoost            = 0,

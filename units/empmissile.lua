@@ -94,6 +94,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:POWERPLANT_EXPLOSION]],
       fireStarter             = 0,
       guidance                = true,

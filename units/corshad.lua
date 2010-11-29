@@ -88,6 +88,7 @@ unitDef = {
 
       dropped                 = true,
       edgeEffectiveness       = 0,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -121,6 +122,7 @@ unitDef = {
         subs    = 1200,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
       flightTime              = 2,

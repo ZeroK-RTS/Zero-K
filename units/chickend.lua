@@ -22,7 +22,7 @@ unitDef = {
   customParams                  = {
     description_fr = [[Defense d'antres]],
     helptext       = [[The Tube is the chicken's only defense structure, firing deadly spores at air and ground targets alike.]],
-	helptext_fr    = [[La défense basique des antres de poulets, employant des spores à grande durée de vie poursuivant l'adversaire avant de le percuter brutalement.]],
+    helptext_fr    = [[La d?fense basique des antres de poulets, employant des spores ? grande dur?e de vie poursuivant l'adversaire avant de le percuter brutalement.]],
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],
@@ -96,6 +96,7 @@ unitDef = {
       },
 
       dance                   = 60,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       flightTime              = 5,

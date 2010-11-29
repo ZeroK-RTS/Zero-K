@@ -40,7 +40,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Embedded Thicket]],
       blocking         = true,
       category         = [[dragonteeth]],
@@ -59,6 +59,7 @@ unitDef = {
       seqnamereclamate = [[tree1reclamate]],
       world            = [[allworld]],
     },
+
   },
 
 }

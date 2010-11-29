@@ -16,12 +16,13 @@ unitDef = {
   buildingGroundDecalType       = [[armestor_aoplane.dds]],
   buildPic                      = [[ARMESTOR.png]],
   buildTime                     = 150,
+  category                      = [[SINK UNARMED]],
+  corpse                        = [[DEAD]],
+
   customParams                  = {
     pylonrange = 500,
   },
 
-  category                      = [[SINK UNARMED]],
-  corpse                        = [[DEAD]],
   explodeAs                     = [[ESTOR_BUILDINGEX]],
   footprintX                    = 3,
   footprintZ                    = 3,

@@ -106,6 +106,7 @@ unitDef = {
         subs    = 22.5,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:PLASMA_HIT_96]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

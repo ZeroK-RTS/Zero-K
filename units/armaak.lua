@@ -119,6 +119,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:ARCHPLOSION]],
       impactOnly              = true,
       impulseBoost            = 0,

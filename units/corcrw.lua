@@ -156,6 +156,7 @@ unitDef = {
       },
 
       duration                = 0.03,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],
       fireStarter             = 90,
       impactOnly              = true,

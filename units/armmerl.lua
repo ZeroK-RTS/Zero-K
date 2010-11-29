@@ -89,7 +89,7 @@ unitDef = {
 
     CORTRUCK_ROCKET = {
       name                    = [[Cruise Missile]],
-	  areaOfEffect            = 16,
+      areaOfEffect            = 16,
       cegTag                  = [[raventrail]],
       collideFriendly         = false,
       craterBoost             = 1,
@@ -102,10 +102,11 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 100,
-	  impactOnly              = true,
       flighttime              = 14,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -124,7 +125,6 @@ unitDef = {
       soundStart              = [[weapon/missile/missile_launch]],
       startsmoke              = [[1]],
       tolerance               = 4000,
-	  --turnRate				  = 24000,
       twoPhase                = true,
       vlaunch                 = true,
       weaponAcceleration      = 315,

@@ -84,6 +84,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NUKE_150]],
       fireStarter             = 100,
       flightTime              = 4,

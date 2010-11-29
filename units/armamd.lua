@@ -76,6 +76,7 @@ unitDef = {
         subs    = 75,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
       flighttime              = 100,

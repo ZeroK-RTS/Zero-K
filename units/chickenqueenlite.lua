@@ -25,9 +25,9 @@ unitDef = {
   cruiseAlt           = 150,
 
   customParams        = {
-    description_fr = [[Le mal incarné!]],
+    description_fr = [[Le mal incarn?!]],
     helptext       = [[Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit acid, spray spores to kill aircraft.Only the most determined, focused assault can hope to stop this beast in her tracks.]],
-	helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa colère atisée elle est presque indestructible. Elle crache un acide extrèmement corrosif, largue des poulets et envoie des spores aux unités volantes. Seulement les assauts les plus brutaux et les mieux coordonnés peuvent espêrer venir à bout de cette monstruosité.]],
+    helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa col?re atis?e elle est presque indestructible. Elle crache un acide extr?mement corrosif, largue des poulets et envoie des spores aux unit?s volantes. Seulement les assauts les plus brutaux et les mieux coordonn?s peuvent esp?rer venir ? bout de cette monstruosit?.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -50,7 +50,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE]],
   objectName          = [[chickenflyerqueen.s3o]],
   power               = 30000,
---script              = [[chickenflyerqueen.cob]],
   seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
   separation          = [[0.2]],
@@ -116,6 +115,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:large_green_goo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -240,6 +240,7 @@ unitDef = {
 
       dance                   = 60,
       dropped                 = 1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       fixedlauncher           = true,

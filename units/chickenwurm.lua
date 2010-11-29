@@ -20,7 +20,7 @@ unitDef = {
   customParams        = {
     description_fr = [[Assaut souterrain]],
     helptext       = [[Burn baby Burn!]],
-	helptext_fr    = [[Ces poulets tenant partiellement de la taupe ont une particularité : ils savent mettre le feu où qu'ils aillent.]],
+    helptext_fr    = [[Ces poulets tenant partiellement de la taupe ont une particularit? : ils savent mettre le feu o? qu'ils aillent.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -97,6 +97,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
       fireStarter             = 400,
       impulseBoost            = 0,

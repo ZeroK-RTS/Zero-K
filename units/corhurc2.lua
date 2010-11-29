@@ -136,6 +136,7 @@ unitDef = {
 
       dropped                 = true,
       edgeEffectiveness       = 0.7,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
       fireStarter             = 250,
       flameGfxTime            = 2,

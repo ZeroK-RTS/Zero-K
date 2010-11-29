@@ -21,7 +21,7 @@ unitDef = {
   customParams        = {
     description_fr = [[Cracheur de piques]],
     helptext       = [[The Spiker's razor sharp projectiles can pierce even the thickest armor. While it doesn't have much health, it remains a potent threat to both air and ground units. Counter with anything that can reliably outrange it.]],
-    helptext_fr    = [[Le Spiker envoie des projectiles affutés comme des rasoirs qui peuvent traverser même les armures les plus solides. Bien que possédant peu de vie il reste une menace très réelle tant pour les unités terrestres que volantes. Pour le contrer il faut utiliser tout ce qui tire plus loin.]],
+    helptext_fr    = [[Le Spiker envoie des projectiles affut?s comme des rasoirs qui peuvent traverser m?me les armures les plus solides. Bien que poss?dant peu de vie il reste une menace tr?s r?elle tant pour les unit?s terrestres que volantes. Pour le contrer il faut utiliser tout ce qui tire plus loin.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -106,6 +106,7 @@ unitDef = {
         subs    = 7,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT]],
       impactOnly              = true,
       impulseBoost            = 0,

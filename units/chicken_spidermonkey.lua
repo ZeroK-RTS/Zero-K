@@ -18,9 +18,9 @@ unitDef = {
   category            = [[LAND]],
 
   customParams        = {
-	description_fr = [[Lanceur de filet tout terrain]],
-	helptext       = [[The Spidermonkey is a very unusual support chicken. As the name suggests, it can climb walls, however it can also spin thick webs to ensnare aircraft like a spider catching insects.]],
-	helptext_fr    = [[Le spidermonkey est une unité de soutien très inhabituelle parmis les poulets. Comme le nom l'indique il peut grimper les parois les plus escarpées mais peut en plus projetter comme une fronde un filet pour bloquer au sol les unités aériennes, à la manière d'une araignée attrappant des insectes.]],
+    description_fr = [[Lanceur de filet tout terrain]],
+    helptext       = [[The Spidermonkey is a very unusual support chicken. As the name suggests, it can climb walls, however it can also spin thick webs to ensnare aircraft like a spider catching insects.]],
+    helptext_fr    = [[Le spidermonkey est une unit? de soutien tr?s inhabituelle parmis les poulets. Comme le nom l'indique il peut grimper les parois les plus escarp?es mais peut en plus projetter comme une fronde un filet pour bloquer au sol les unit?s a?riennes, ? la mani?re d'une araign?e attrappant des insectes.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -107,6 +107,7 @@ unitDef = {
       },
 
       dance                   = 60,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       fixedlauncher           = 1,
@@ -161,6 +162,7 @@ unitDef = {
       },
 
       dance                   = 150,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       fixedlauncher           = true,

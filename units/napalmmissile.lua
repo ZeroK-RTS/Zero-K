@@ -91,6 +91,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:napalmmissile]],
       fireStarter             = 75,
       guidance                = true,

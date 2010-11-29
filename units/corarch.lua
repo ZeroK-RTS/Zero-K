@@ -96,6 +96,7 @@ unitDef = {
 
       duration                = 0.02,
       edgeEffectiveness       = 1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:FLASH1RED]],
       fireStarter             = 10,
       impactOnly              = true,

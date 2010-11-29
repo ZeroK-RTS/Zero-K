@@ -101,6 +101,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.75,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:FLASH64]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

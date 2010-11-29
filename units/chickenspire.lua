@@ -26,7 +26,7 @@ unitDef = {
   customParams                  = {
     description_fr = [[Artillerie statique]],
     helptext       = [[Long range static artillery.]],
-	helptext_fr    = [[La terreur verte projette des amas commposés de d'acides corrosifs et de germes sur de très longues distances.]],
+    helptext_fr    = [[La terreur verte projette des amas commpos?s de d'acides corrosifs et de germes sur de tr?s longues distances.]],
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],
@@ -97,6 +97,7 @@ unitDef = {
       },
 
       dance                   = 60,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:large_green_goo]],
       fireStarter             = 0,
       flightTime              = 30,

@@ -23,9 +23,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fr = [[Canon à Plasma Stratégique]],
+    description_fr = [[Canon ? Plasma Strat?gique]],
     helptext       = [[The Bertha is a massive cannon that fires high-energy plasmoids across the map. Used appropriately, it can effectively suppress enemy operations from the safety of your base. Do not expect it to win battles alone for you, however.]],
-    helptext_fr    = [[Le Big Bertha est un canon à plasma lourd, très lourd. Un seul impact de son tir peut réduire à néant plusieurs unités ou structures. Sa portée de tir opérationnelle est immense et n'égale que son coût de construction et d'usage. En effet chaque tir consomme 300 unités d'énergie. Notez que le Big Bertha effectue des tirs tendus. Autrement dit, pensez à le placer en hauteur, ou le moindre relief servira de refuge à l'ennemi.]],
+    helptext_fr    = [[Le Big Bertha est un canon ? plasma lourd, tr?s lourd. Un seul impact de son tir peut r?duire ? n?ant plusieurs unit?s ou structures. Sa port?e de tir op?rationnelle est immense et n'?gale que son co?t de construction et d'usage. En effet chaque tir consomme 300 unit?s d'?nergie. Notez que le Big Bertha effectue des tirs tendus. Autrement dit, pensez ? le placer en hauteur, ou le moindre relief servira de refuge ? l'ennemi.]],
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],

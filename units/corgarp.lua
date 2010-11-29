@@ -101,6 +101,7 @@ unitDef = {
         subs    = 0.5,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:dirt]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

@@ -86,6 +86,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:FLAK_HIT_24]],
       impulseBoost            = 0,
       impulseFactor           = 0,

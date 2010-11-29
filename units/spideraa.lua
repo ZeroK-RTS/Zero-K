@@ -83,6 +83,7 @@ unitDef = {
         subs    = 20,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
       fixedlauncher           = true,

@@ -27,7 +27,7 @@ unitDef = {
   customParams        = {
     description_fr = [[Lanceur de pikes volant]],
     helptext       = [[It's a flying chicken! The Talon is a lethal predator that takes down enemy aircraft with its spikes, but will also happily employ them on ground targets. It can be defeated like any other air unit, however.]],
-    helptext_fr    = [[Un poulet volant ! Le talon est un prédateur mortel qui peut détruire un avion adverse avec ses dards ainsi que les employer sur des cibles terrestres. Il reste dependant vulnérable à toute défense à capacité anti aérienne.]],
+    helptext_fr    = [[Un poulet volant ! Le talon est un pr?dateur mortel qui peut d?truire un avion adverse avec ses dards ainsi que les employer sur des cibles terrestres. Il reste dependant vuln?rable ? toute d?fense ? capacit? anti a?rienne.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -101,6 +101,7 @@ unitDef = {
         default = 160,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT]],
       impactOnly              = true,
       impulseBoost            = 0,

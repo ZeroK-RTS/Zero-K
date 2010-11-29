@@ -150,6 +150,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

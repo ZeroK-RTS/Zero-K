@@ -26,9 +26,9 @@ unitDef = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
-    description_fr = [[Le mal incarné!]],
+    description_fr = [[Le mal incarn?!]],
     helptext       = [[Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit acid, spray spores to kill aircraft, and kick land units away from it. Most of all, its jaws can rip apart the largest assault mech in seconds. Only the most determined, focused assault can hope to stop this beast in her tracks.]],
-	helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa colère attisée elle est presque indestructible. Elle crache un acide extrèmement corrosif, largue des poulets et envoie des spores aux unités volantes. Seulement les assauts les plus brutaux et coordonnés peuvent espêrer venir à bout de cette monstruosité.]],
+    helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa col?re attis?e elle est presque indestructible. Elle crache un acide extr?mement corrosif, largue des poulets et envoie des spores aux unit?s volantes. Seulement les assauts les plus brutaux et coordonn?s peuvent esp?rer venir ? bout de cette monstruosit?.]],
   },
 
   defaultmissiontype     = [[standby]],
@@ -139,6 +139,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:large_green_goo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -177,6 +178,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 1,
@@ -213,6 +215,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 2000,
       impulseFactor           = 1,
@@ -250,6 +253,7 @@ unitDef = {
 
       dance                   = 60,
       dropped                 = 1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       flightTime              = 5,

@@ -106,6 +106,7 @@ unitDef = {
         subs    = 0.0015,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:SMOKE]],
       fireStarter             = 100,
       flameGfxTime            = 1.6,

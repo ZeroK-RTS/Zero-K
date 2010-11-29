@@ -48,9 +48,9 @@ unitDef = {
   commander           = true,
 
   customParams        = {
-	description_fr = [[Reine pondeuse]],
-	helptext = [[The egg-laying brood queen is not quite as fearsome in combat as the other queen, but can in the long run present an even bigger threat. It produces all the different chicken breeds of the Thunderbirds.]],
-	helptext_fr    = [[Cette reine pondeuse n'est pas aussi effrayante en combat que l'autre reine mais peut à long terme se montrer une menace bien plus grande. En éffet elle peut engendrer rapidement par elle-même toutes les unités poulet.]],
+    description_fr = [[Reine pondeuse]],
+    helptext       = [[The egg-laying brood queen is not quite as fearsome in combat as the other queen, but can in the long run present an even bigger threat. It produces all the different chicken breeds of the Thunderbirds.]],
+    helptext_fr    = [[Cette reine pondeuse n'est pas aussi effrayante en combat que l'autre reine mais peut ? long terme se montrer une menace bien plus grande. En ?ffet elle peut engendrer rapidement par elle-m?me toutes les unit?s poulet.]],
   },
 
   defaultmissiontype  = [[standby]],
@@ -152,6 +152,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 1,
@@ -188,6 +189,7 @@ unitDef = {
       },
 
       dance                   = 60,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       flightTime              = 4,

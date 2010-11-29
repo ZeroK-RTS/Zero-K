@@ -90,6 +90,7 @@ unitDef = {
         default = 0,
       },
 
+      energypershot           = [[0]],
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -199,6 +200,7 @@ unitDef = {
         subs    = 4.5,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
       flightTime              = 4,

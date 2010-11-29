@@ -89,6 +89,7 @@ unitDef = {
 
       duration                = 0.0333,
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 25,
@@ -133,6 +134,7 @@ unitDef = {
 
       duration                = 0.0333,
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 25,

@@ -118,6 +118,7 @@ unitDef = {
       },
 
       edgeeffectiveness       = 0.75,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:riotball]],
       explosionSpeed          = 5,
       impulseBoost            = 0,
@@ -150,6 +151,7 @@ unitDef = {
         subs    = 5E-08,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       impactOnly              = true,
@@ -187,6 +189,7 @@ unitDef = {
         subs    = 5E-08,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       impactOnly              = true,

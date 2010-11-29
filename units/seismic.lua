@@ -92,6 +92,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:large_green_goo]],
       fireStarter             = 0,
       guidance                = true,

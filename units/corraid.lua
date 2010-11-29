@@ -97,6 +97,7 @@ unitDef = {
         subs    = 11.5,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:INGEBORG]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

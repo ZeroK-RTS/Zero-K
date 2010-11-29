@@ -66,8 +66,8 @@ unitDef = {
   buildPic            = [[armcom.png]],
   buildTime           = 1800,
   canAttack           = true,
+  canCloak            = true,
   canGuard            = true,
-  canCloak			= true,
   canMove             = true,
   canPatrol           = true,
   canreclamate        = [[1]],
@@ -96,7 +96,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 2500,
-  maxDamage           = 2200,--health
+  maxDamage           = 2200,
   maxSlope            = 36,
   maxVelocity         = 1.325,
   maxWaterDepth       = 5000,
@@ -150,7 +150,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    DISINTEGRATOR = {--unused actually
+    DISINTEGRATOR = {
       name                    = [[Disintegrator]],
       areaOfEffect            = 36,
       avoidFeature            = false,
@@ -200,6 +200,7 @@ unitDef = {
 
       duration                = 0.11,
       edgeEffectiveness       = 0.99,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:flash1green]],
       fireStarter             = 70,
       impactOnly              = true,
@@ -246,6 +247,7 @@ unitDef = {
 
       duration                = 0.11,
       edgeEffectiveness       = 0.99,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:flash1blue]],
       fireStarter             = 70,
       impactOnly              = true,

@@ -112,6 +112,7 @@ unitDef = {
         subs    = 0.006,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:SMOKE]],
       fireStarter             = 120,
       flameGfxTime            = 1.6,
@@ -199,6 +200,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.75,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
       fireStarter             = 250,
       fixedlauncher           = true,
@@ -255,6 +257,7 @@ unitDef = {
 
       dance                   = 10,
       edgeEffectiveness       = 0.75,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
       fireStarter             = 250,
       fixedlauncher           = true,

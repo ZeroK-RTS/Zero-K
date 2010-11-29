@@ -94,6 +94,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.99,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:TORPEDO_HIT]],
       guidance                = true,
       impulseBoost            = 0,
@@ -134,6 +135,7 @@ unitDef = {
         subs    = 15,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:PLASMA_HIT_32]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,

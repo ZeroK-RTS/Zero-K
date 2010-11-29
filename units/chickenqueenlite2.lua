@@ -26,9 +26,9 @@ unitDef = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
-    description_fr = [[Le mal incarné!]],
+    description_fr = [[Le mal incarn?!]],
     helptext       = [[Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit fiery napalm, spray spores to kill aircraft, and kick land units away from it. Most of all, its jaws can rip apart the largest assault mech in seconds. Only the most determined, focused assault can hope to stop this beast in her tracks.]],
-	helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa colère attisée elle est presque indestructible. Elle crache un acide extrèmement corrosif, largue des poulets et envoie des spores aux unités volantes. Seulement les assauts les plus brutaux et coordonnés peuvent espêrer venir à bout de cette monstruosité.]],
+    helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa col?re attis?e elle est presque indestructible. Elle crache un acide extr?mement corrosif, largue des poulets et envoie des spores aux unit?s volantes. Seulement les assauts les plus brutaux et coordonn?s peuvent esp?rer venir ? bout de cette monstruosit?.]],
   },
 
   defaultmissiontype     = [[standby]],
@@ -49,7 +49,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE]],
   objectName             = [[chickenflyerqueen.s3o]],
   power                  = 65536,
-  script				 = [[chickenlandqueen.lua]],
+  script                 = [[chickenlandqueen.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
@@ -86,24 +86,34 @@ unitDef = {
       maxAngleDif        = 150,
       onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP HOVER]],
     },
+
+
     {
       def                = [[FIREGOO]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 150,
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
     },
+
+
     {
       def                = [[SPORES]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
+
+
     {
       def                = [[SPORES]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
+
+
     {
       def                = [[SPORES]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
+
+
     {
       def                = [[QUEENCRUSH]],
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
@@ -111,9 +121,10 @@ unitDef = {
 
   },
 
+
   weaponDefs             = {
 
-    FIREGOO        = {
+    FIREGOO    = {
       name                    = [[Napalm Goo]],
       areaOfEffect            = 256,
       burst                   = 8,
@@ -129,8 +140,9 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
-	  firestarter			  = 400,
+      firestarter             = 400,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       intensity               = 0.7,
@@ -155,6 +167,7 @@ unitDef = {
       weaponVelocity          = 600,
     },
 
+
     MELEE      = {
       name                    = [[ChickenClaws]],
       areaOfEffect            = 32,
@@ -168,6 +181,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 1,
@@ -204,6 +218,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 450,
       impulseFactor           = 1,
@@ -241,6 +256,7 @@ unitDef = {
 
       dance                   = 60,
       dropped                 = 1,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       flightTime              = 5,

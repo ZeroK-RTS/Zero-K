@@ -93,6 +93,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
+      energypershot           = [[0]],
       fireStarter             = 20,
       flightTime              = 4,
       guidance                = true,

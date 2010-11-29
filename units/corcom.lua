@@ -19,7 +19,7 @@ unitDef = {
   buildPic            = [[corcom.png]],
   buildTime           = 1800,
   canAttack           = true,
-  canCloak			= false,
+  canCloak            = false,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -47,7 +47,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 2500,
-  maxDamage           = 2800,--health
+  maxDamage           = 2800,
   maxSlope            = 36,
   maxVelocity         = 1.25,
   maxWaterDepth       = 5000,
@@ -120,6 +120,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:EMG_HIT_HE]],
       firestarter             = 70,
       impulseBoost            = 0,
@@ -194,6 +195,7 @@ unitDef = {
 
       duration                = 0.11,
       edgeEffectiveness       = 0.99,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:flash1green]],
       fireStarter             = 70,
       impactOnly              = true,

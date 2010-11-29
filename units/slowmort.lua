@@ -111,7 +111,7 @@ unitDef = {
       renderType              = 0,
       rgbColor                = [[0.4 0 0.5]],
       soundStart              = [[weapon/laser/pulse_laser2]],
-	  soundStartVolume        = 0.9,
+      soundStartVolume        = 0.9,
       soundTrigger            = true,
       sweepfire               = false,
       texture1                = [[largelaser]],
@@ -124,7 +124,7 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },
-	
+
   },
 
 

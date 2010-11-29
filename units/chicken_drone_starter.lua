@@ -18,9 +18,9 @@ unitDef = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
-	description_fr = [[Morph en structures poulet]],
-	helptext       = [[A hapless non-combat organism whose sole purpose in life is to morph into one of the Chicken Hive's structures.]],
-	helptext_fr    = [[Un organisme sans défenses dont la seule vocation semble être de se transformer en structure poulet.]],
+    description_fr = [[Morph en structures poulet]],
+    helptext       = [[A hapless non-combat organism whose sole purpose in life is to morph into one of the Chicken Hive's structures.]],
+    helptext_fr    = [[Un organisme sans d?fenses dont la seule vocation semble ?tre de se transformer en structure poulet.]],
   },
 
   defaultmissiontype  = [[Standby]],

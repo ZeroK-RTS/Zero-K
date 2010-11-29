@@ -18,9 +18,11 @@ unitDef = {
   buildTime                     = 500,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
+
   customParams                  = {
     pylonrange = 150,
   },
+
   energyMake                    = 25,
   energyUse                     = 0,
   explodeAs                     = [[ESTOR_BUILDING]],

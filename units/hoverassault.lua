@@ -23,7 +23,6 @@ unitDef = {
   customParams        = {
     description_fr = [[Hovecraft d'Assaut Lourd]],
     helptext       = [[The Halberd buttons down into its armored hull when not firing, offering excellent damage resistance. Its slow, short-ranged cannon is unsuitable for use against highly mobile targets.]],
-    --helptext_fr    = [[Équivalent des mers du Can, le Halberd est etrememnt résistant et posscde une portée de tir trcs réduite.]],
   },
 
   damageModifier      = 0.25,
@@ -92,6 +91,7 @@ unitDef = {
         subs    = 7,
       },
 
+      energypershot           = [[0]],
       fireStarter             = 70,
       flightTime              = 2.2,
       guidance                = false,

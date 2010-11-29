@@ -91,6 +91,7 @@ unitDef = {
         subs    = 7.5,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
       flightTime              = 4,

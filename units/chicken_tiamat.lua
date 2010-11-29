@@ -22,7 +22,7 @@ unitDef = {
     description_fr = [[Assault lourd]],
     fireproof      = 1,
     helptext       = [[The ultimate assault chicken, the Tiamat is a fire-breathing, iron-jawed, spore-spewing monstrosity that knows no fear, no mercy. It even has a mucous shield to protect itself and surrounding chickens from damage.]],
-	helptext_fr = [[L'ultime unité d'assault pouler, le Tiamat est une monstruosité crachant des flammes, déchirant de ses machoires d'acier et lançant des spores sur ses victimes. Elle possède même un bouclier énergétique résultant de sa fureur, lui procurant à elle et aux unités alliées à proximité une protection efficace durant leur progession vers l'adversaire.]],
+    helptext_fr    = [[L'ultime unit? d'assault pouler, le Tiamat est une monstruosit? crachant des flammes, d?chirant de ses machoires d'acier et lan?ant des spores sur ses victimes. Elle poss?de m?me un bouclier ?nerg?tique r?sultant de sa fureur, lui procurant ? elle et aux unit?s alli?es ? proximit? une protection efficace durant leur progession vers l'adversaire.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -124,6 +124,7 @@ unitDef = {
         subs          = 0.002,
       },
 
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:SMOKE]],
       fireStarter             = 100,
       flameGfxTime            = 1.6,
@@ -161,6 +162,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -191,6 +193,7 @@ unitDef = {
         default = 10,
       },
 
+      energypershot           = [[0]],
       exteriorShield          = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -230,6 +233,7 @@ unitDef = {
       },
 
       dance                   = 60,
+      energypershot           = [[0]],
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
       fixedlauncher           = 1,
