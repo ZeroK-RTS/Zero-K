@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[gorg]],
-  name                = [[Juggernaut]],
+  name                = [[Jugglenaut]],
   description         = [[Heavy Assault Strider]],
   acceleration        = 0.0552,
   bmcode              = [[1]],
