@@ -112,9 +112,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 150,
-        planes  = 150,
-        subs    = 5,
+        default = 30,
+        planes  = 30,
+        subs    = 0.3,
       },
 
       edgeeffectiveness       = 0.75,
@@ -126,9 +126,9 @@ unitDef = {
       myGravity               = 10,
       noSelfDamage            = true,
       range                   = 120,
-      reloadtime              = 1.5,
+      reloadtime              = 0.3,
       renderType              = 4,
-      soundHit                = [[weapon/aoe_aura]],
+--      soundHit                = [[weapon/aoe_aura]],
       soundHitVolume          = 1,
       startsmoke              = [[1]],
       turret                  = true,
@@ -155,7 +155,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 32,
-      reloadtime              = 1.5,
+      reloadtime              = 0.3,
       size                    = 1E-06,
       smokeTrail              = false,
 
@@ -192,7 +192,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 256,
-      reloadtime              = 1.5,
+      reloadtime              = 0.3,
       size                    = 1E-06,
       smokeTrail              = false,
 

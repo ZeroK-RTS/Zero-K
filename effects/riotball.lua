@@ -5,13 +5,13 @@ return {
       alwaysvisible      = true,
       circlealpha        = 0.4,
       circlegrowth       = 7,
-      flashalpha         = 0.5,
+      flashalpha         = 0.1,
       flashsize          = 256,
       ttl                = 45,
       color = {
-        [1]  = 0,
-        [2]  = 1,
-        [3]  = 1,
+        [1]  = 0.3,
+        [2]  = 0,
+        [3]  = 0.4,
       },
     },
     sphere = {
@@ -21,8 +21,8 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        alpha              = 0.5,
-        color              = [[0,1,1]],
+        alpha              = 0.05,
+        color              = [[0.3,0,0.4]],
         expansionspeed     = 6,
         ttl                = 32,
       },
