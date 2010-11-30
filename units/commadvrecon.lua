@@ -224,7 +224,7 @@ unitDef = {
         subs    = 15,
       },
 
-      explosionGenerator      = [[custom:riotball]],
+      explosionGenerator      = [[custom:riotballplus]],
       fireStarter             = 100,
       impulseBoost            = 0,
       impulseFactor           = 0,

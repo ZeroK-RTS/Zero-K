@@ -142,6 +142,7 @@ local resources = {
       starexplo= "saktoths/starexplo.tga",
       uglynovaexplo= "cc/uglynovaexplo.tga",
       whitelightb= "pd/whitelightningball.tga",
+	  dosray = "pd/dosray.tga",
 	  },
 	},
 }
