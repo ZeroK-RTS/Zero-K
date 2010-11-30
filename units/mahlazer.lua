@@ -100,8 +100,8 @@ unitDef = {
       beamlaser               = 1,
       beamTime                = 1,
       coreThickness           = 0.5,
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 4,
+      craterMult              = 8,
       cylinderTargetting      = 1,
 
       damage                  = {
@@ -151,9 +151,13 @@ unitDef = {
       cylinderTargetting      = 8192,
 
       damage                  = {
-        default = -1E-06,
+        default = 100,
+        planes  = 100,
+        subs    = 5,
       },
 
+	  endsmoke                = [[0]],
+	  explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -168,6 +172,7 @@ unitDef = {
       renderType              = 0,
       rgbColor                = [[0.25 0 1]],
       soundTrigger            = true,
+	  startsmoke              = [[0]],
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
@@ -190,8 +195,8 @@ unitDef = {
       beamTime                = 0.001,
       canattackground         = false,
       coreThickness           = 0.5,
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 2,
+      craterMult              = 4,
       cylinderTargetting      = 8192,
 
       damage                  = {
@@ -201,7 +206,6 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
-      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -216,6 +220,7 @@ unitDef = {
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/laser_burn6]],
       soundTrigger            = true,
+	  soundStartVolume        = 1,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],

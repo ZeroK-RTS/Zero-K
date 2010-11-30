@@ -364,13 +364,19 @@ local function LoadMetalMap(filename)
 	index = 1
 	while true do
 		l1 = file:read()
-		if not l1 then break end
+		if not l1 then 
+			break 
+		end
+		if not l2 then 
+			Spring.Echo("error in mexmap " .. l1)
+			break 
+		end
 		l2 = file:read()
 		--l3 = file:read()
 		--l4 = file:read()
 		mexes[index] = {
 			x = l1,
-			z = l2 --,
+			z = l2,
 			--weight = l4
 		}
 		index = index+1
