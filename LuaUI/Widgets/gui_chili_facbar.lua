@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili FactoryBar",
-    desc      = "v0.03 Chili buildmenu for factories.",
+    desc      = "v0.04 Chili buildmenu for factories.",
     author    = "CarRepairer (converted from jK's Buildbar)",
     date      = "2010-11-10",
     license   = "GNU GPL, v2 or later",
@@ -176,28 +176,35 @@ local function UpdateFac(i, facInfo)
 	local buildQueue  = GetBuildQueue(facInfo.unitID)
 	for j,unitDefIDb in ipairs(buildList) do
 		local unitDefIDb = unitDefIDb
-		local qButton = facs[i].qStore[i .. '|' .. unitDefIDb]
-		
-		facs[i].qStack:RemoveChild(qButton)
 		
 		local boButton = facs[i].boStack.childrenByName[unitDefIDb]
 		local qButton = facs[i].qStore[i .. '|' .. unitDefIDb]
-				
+		
 		local boBar = boButton.childrenByName['bp'].childrenByName['prog']
 		local qBar = qButton.childrenByName['bp'].childrenByName['prog']
-		
-		boBar:SetValue(0)
-		qBar:SetValue(0)
-		
-		boButton.backgroundColor = buttonColor
-		boButton:Invalidate()
 		
 		local amount = buildQueue[unitDefIDb] or 0
 		local boCount = boButton.childrenByName['count']
 		local qCount = qButton.childrenByName['count']			
-		boCount:SetCaption(amount > 1 and amount or '')
-		qCount:SetCaption(amount > 1 and amount or '')		
 		
+		facs[i].qStack:RemoveChild(qButton)
+		
+		boBar:SetValue(0)
+		qBar:SetValue(0)
+		if unitDefIDb == unitBuildDefID then
+			boBar:SetValue(progress)
+			qBar:SetValue(progress)
+		end
+		
+		if amount > 0 then
+			boButton.backgroundColor = queueColor
+		else
+			boButton.backgroundColor = buttonColor
+		end
+		boButton:Invalidate()
+		
+		boCount:SetCaption(amount > 0 and amount or '')
+		qCount:SetCaption(amount > 0 and amount or '')
 	end
 end
 local function UpdateFacQ(i, facInfo)
@@ -221,28 +228,11 @@ local function UpdateFacQ(i, facInfo)
 			local unitDefIDb, count = next(buildQueue[n], nil)
 			
 			local qButton = facs[i].qStore[i .. '|' .. unitDefIDb]
-			local boButton = facs[i].boStack.childrenByName[unitDefIDb]
-			
-			local boBar = boButton.childrenByName['bp'].childrenByName['prog']
-			local qBar = qButton.childrenByName['bp'].childrenByName['prog']
-			
-			boButton.backgroundColor = queueColor
-			boButton:Invalidate()
 			
 			if not facs[i].qStack:GetChildByName(qButton.name) then
 				facs[i].qStack:AddChild(qButton)
 			end
-			
-			if unitDefIDb == unitBuildDefID then
-				boBar:SetValue(progress)
-				qBar:SetValue(progress)
-			end
-			
-			local boCount = boButton.childrenByName['count']
-			local qCount = qButton.childrenByName['count']			
-			boCount:SetCaption(count > 1 and count or '')
-			qCount:SetCaption(count > 1 and count or '')
-			
+		
 			j = j-1
 			if j==0 then break end
 			n = n+1
