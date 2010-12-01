@@ -76,9 +76,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 20,
-        planes  = 20,
-        subs    = 15,
+        default = 40,
+        planes  = 40,
+        subs    = 4,
       },
 
       explosionGenerator      = [[custom:DEFAULT]],
@@ -94,7 +94,7 @@ unitDef = {
       model                   = [[wep_b_fabby.s3o]],
       noSelfDamage            = true,
       range                   = 100,
-      reloadtime              = 10,
+      reloadtime              = 20,
       renderType              = 1,
       selfprop                = true,
       smokedelay              = [[.1]],
@@ -111,7 +111,7 @@ unitDef = {
       turret                  = true,
       weaponAcceleration      = 200,
       weaponTimer             = 1,
-      weaponType              = [[Cannon]],
+      weaponType              = [[MissileLauncher]],
       weaponVelocity          = 300,
     },
 

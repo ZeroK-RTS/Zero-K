@@ -26,10 +26,10 @@ AimWeapon1 ()
 FirePrimary()
 {
 	sleep 300;
-	get KILL_UNIT(get MY_ID, 1, 0);
+	//get KILL_UNIT(get MY_ID, 1, 0);
 }
 
 Killed(severity, corpsetype)
 {
-	emit-sfx 2048 from flare;
+	//emit-sfx 2048 from flare;
 }

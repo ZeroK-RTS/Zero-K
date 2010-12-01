@@ -122,7 +122,7 @@ end
 
 function gadget:GameFrame(f)
 	
-	if f % 16 == 0 then
+	if f % 16 == 1 then
 		for unitID, teamID in pairs(GG.attUnits) do
 		
 			if not Spring.ValidUnitID(unitID) then
