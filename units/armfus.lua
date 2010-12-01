@@ -26,7 +26,7 @@ unitDef = {
 
   customParams                  = {
     helptext   = [[Fusion reactors provide a good amount of steady energy output at a fair price. They are attractive targets and not very well-armored, so keep them well-protected. When killed, fusion reactors will cause heavy damage to nearby units.]],
-    pylonrange = 150,
+    pylonrange = 450,
   },
 
   energyMake                    = 35,

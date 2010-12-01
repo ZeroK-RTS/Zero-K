@@ -20,7 +20,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    pylonrange = 150,
+    pylonrange = 250,
   },
 
   energyMake                    = 25,

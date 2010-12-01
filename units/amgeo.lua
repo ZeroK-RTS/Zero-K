@@ -19,7 +19,7 @@ unitDef = {
   category                      = [[SINK UNARMED]],
 
   customParams                  = {
-    pylonrange = 200,
+    pylonrange = 600,
   },
 
   energyMake                    = 100,

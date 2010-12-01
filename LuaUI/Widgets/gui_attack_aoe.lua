@@ -164,6 +164,68 @@ end
 --initialization
 --------------------------------------------------------------------------------
 
+local function getWeaponInfo(weaponDef, unitDef)
+
+	local retData
+
+	local weaponType = weaponDef.type
+	local scatter = weaponDef.accuracy + weaponDef.sprayAngle
+	local aoe = weaponDef.areaOfEffect
+	local cost = unitDef.cost
+	local mobile = unitDef.speed > 0
+	local waterWeapon = weaponDef.waterWeapon
+	local ee = weaponDef.edgeEffectiveness
+  
+	if (weaponDef.cylinderTargetting >= 100) then
+		retData = {type = "orbital", scatter = scatter}
+	elseif (weaponType == "Cannon") then
+		retData = {type = "ballistic", scatter = scatter, v = weaponDef.maxVelocity, range = weaponDef.range}
+	elseif (weaponType == "MissileLauncher") then
+		local turnRate = 0
+		if (weaponDef.tracks) then
+			turnRate = weaponDef.turnRate
+		end
+		if (weaponDef.wobble > turnRate * 1.4) then
+			scatter = (weaponDef.wobble - weaponDef.turnRate) * weaponDef.maxVelocity * 16
+			local rangeScatter = (8 * weaponDef.wobble - weaponDef.turnRate)
+			retData = {type = "wobble", scatter = scatter, rangeScatter = rangeScatter, range = weaponDef.range}
+		elseif (weaponDef.wobble > turnRate) then
+			scatter = (weaponDef.wobble - weaponDef.turnRate) * weaponDef.maxVelocity * 16
+			retData = {type = "wobble", scatter = scatter}
+		elseif (weaponDef.tracks) then
+			retData = {type = "tracking"}
+		else
+			retData = {type = "direct", scatter = scatter, range = weaponDef.range}
+		end
+	elseif (weaponType == "AircraftBomb") then
+		retData = {type = "dropped", scatter = scatter, v = unitDef.speed, h = unitDef.wantedHeight, salvoSize = weaponDef.salvoSize, salvoDelay = weaponDef.salvoDelay}
+	elseif (weaponType == "StarburstLauncher") then
+		if (weaponDef.tracks) then
+			retData = {type = "tracking"}
+		else
+			retData = {type = "cruise"}
+		end
+	elseif (weaponType == "TorpedoLauncher") then
+		if (weaponDef.tracks) then
+			retData = {type = "tracking"}
+		else
+			retData = {type = "direct", scatter = scatter, range = weaponDef.range}
+		end
+	elseif (weaponType == "Flame" or weaponDef.noExplode) then
+		retData = {type = "noexplode", range = weaponDef.range}
+	else
+		retData = {type = "direct", scatter = scatter, range = weaponDef.range}
+	end
+  
+	retData.aoe = aoe
+	retData.cost = cost
+	retData.mobile = mobile
+	retData.waterWeapon = waterWeapon
+	retData.ee = ee
+	
+	return retData
+end
+
 local function SetupUnitDef(unitDefID, unitDef)
   if (not unitDef.weapons) then return end
   
@@ -175,7 +237,7 @@ local function SetupUnitDef(unitDefID, unitDef)
       local weaponDef = WeaponDefs[weapon.weaponDef]
       if (weaponDef) then
         if (num == 3 and unitDef.canDGun) then
-          dgunInfo[unitDefID] = {range = weaponDef.range, aoe = weaponDef.areaOfEffect}
+          dgunInfo[unitDefID] = getWeaponInfo(weaponDef, unitDef)
         elseif (weaponDef.canAttackGround
                 and not weaponDef.isShield 
                 and not ToBool(weaponDef.interceptor)
@@ -188,62 +250,10 @@ local function SetupUnitDef(unitDefID, unitDef)
     end
   end
   
-  if (not maxWeaponDef) then return end
-  
-  local weaponType = maxWeaponDef.type
-  local scatter = maxWeaponDef.accuracy + maxWeaponDef.sprayAngle
-  local aoe = maxWeaponDef.areaOfEffect
-  local cost = unitDef.cost
-  local mobile = unitDef.speed > 0
-  local waterWeapon = maxWeaponDef.waterWeapon
-  local ee = maxWeaponDef.edgeEffectiveness
-  
-  if (maxWeaponDef.cylinderTargetting >= 100) then
-    aoeDefInfo[unitDefID] = {type = "orbital", scatter = scatter}
-  elseif (weaponType == "Cannon") then
-    aoeDefInfo[unitDefID] = {type = "ballistic", scatter = scatter, v = maxWeaponDef.maxVelocity, range = maxWeaponDef.range}
-  elseif (weaponType == "MissileLauncher") then
-    local turnRate = 0
-    if (maxWeaponDef.tracks) then
-      turnRate = maxWeaponDef.turnRate
-    end
-    if (maxWeaponDef.wobble > turnRate * 1.4) then
-      scatter = (maxWeaponDef.wobble - maxWeaponDef.turnRate) * maxWeaponDef.maxVelocity * 16
-      local rangeScatter = (8 * maxWeaponDef.wobble - maxWeaponDef.turnRate)
-      aoeDefInfo[unitDefID] = {type = "wobble", scatter = scatter, rangeScatter = rangeScatter, range = maxWeaponDef.range}
-    elseif (maxWeaponDef.wobble > turnRate) then
-      scatter = (maxWeaponDef.wobble - maxWeaponDef.turnRate) * maxWeaponDef.maxVelocity * 16
-      aoeDefInfo[unitDefID] = {type = "wobble", scatter = scatter}
-    elseif (maxWeaponDef.tracks) then
-      aoeDefInfo[unitDefID] = {type = "tracking"}
-    else
-      aoeDefInfo[unitDefID] = {type = "direct", scatter = scatter, range = maxWeaponDef.range}
-    end
-  elseif (weaponType == "AircraftBomb") then
-    aoeDefInfo[unitDefID] = {type = "dropped", scatter = scatter, v = unitDef.speed, h = unitDef.wantedHeight, salvoSize = maxWeaponDef.salvoSize, salvoDelay = maxWeaponDef.salvoDelay}
-  elseif (weaponType == "StarburstLauncher") then
-    if (maxWeaponDef.tracks) then
-      aoeDefInfo[unitDefID] = {type = "tracking"}
-    else
-      aoeDefInfo[unitDefID] = {type = "cruise"}
-    end
-  elseif (weaponType == "TorpedoLauncher") then
-    if (maxWeaponDef.tracks) then
-      aoeDefInfo[unitDefID] = {type = "tracking"}
-    else
-      aoeDefInfo[unitDefID] = {type = "direct", scatter = scatter, range = maxWeaponDef.range}
-    end
-  elseif (weaponType == "Flame" ) then
-    aoeDefInfo[unitDefID] = {type = "noexplode", range = maxWeaponDef.range}
-  else
-    aoeDefInfo[unitDefID] = {type = "direct", scatter = scatter, range = maxWeaponDef.range}
+  if (maxWeaponDef) then 
+	aoeDefInfo[unitDefID] = getWeaponInfo(maxWeaponDef, unitDef)
   end
   
-  aoeDefInfo[unitDefID].aoe = aoe
-  aoeDefInfo[unitDefID].cost = cost
-  aoeDefInfo[unitDefID].mobile = mobile
-  aoeDefInfo[unitDefID].waterWeapon = waterWeapon
-  aoeDefInfo[unitDefID].ee = ee
 end
 
 local function SetupDisplayLists()
@@ -589,34 +599,30 @@ function widget:DrawWorld()
   local tx, ty, tz = GetMouseTargetPosition()
   if (not tx) then return end
   local _, cmd, _ = GetActiveCommand()
+  local info, unitID
   
-  if (cmd == CMD_DGUN and dgunUnitDefID) then
-    local info = dgunInfo[dgunUnitDefID]
-    local fx, fy, fz = GetUnitPosition(dgunUnitID)
-    if (not fx) then return end
-    
-    DrawNoExplode(info.aoe, fx, fy, fz, tx, ty, tz, info.range)
-    glColor(1, 0, 0, 0.75)
-    glLineWidth(1)
-    glDrawGroundCircle(fx, fy, fz, info.range, circleDivs)
-    glColor(1,1,1,1)
+  if (cmd == CMD_ATTACK and aoeUnitDefID) then 
+    info = aoeDefInfo[aoeUnitDefID]
+	unitID = aoeUnitID
+  elseif (cmd == CMD_DGUN and dgunUnitDefID) then
+    info = dgunInfo[dgunUnitDefID]
+	unitID = dgunUnitID
+  else
     return
   end
   
-  if (cmd ~= CMD_ATTACK or not aoeUnitDefID) then return end
-  
-  local info = aoeDefInfo[aoeUnitDefID]
-  
-  local fx, fy, fz = GetUnitPosition(aoeUnitID)
+  local fx, fy, fz = GetUnitPosition(unitID)
   if (not fx) then return end
-  if (not info.mobile) then fy = fy + GetUnitRadius(aoeUnitID) end
+  if (not info.mobile) then fy = fy + GetUnitRadius(unitID) end
   
   if (not info.waterWeapon) then ty = max(0, ty) end
   
   local weaponType = info.type
   
-  if (weaponType == "ballistic") then
-    local states = GetUnitStates(aoeUnitID)
+  if (weaponType == "noexplode") then
+    DrawNoExplode(info.aoe, fx, fy, fz, tx, ty, tz, info.range)
+  elseif (weaponType == "ballistic") then
+    local states = GetUnitStates(unitID)
     local trajectory
     if (states.trajectory) then
       trajectory = 1
@@ -625,13 +631,11 @@ function widget:DrawWorld()
     end
     DrawAoE(tx, ty, tz, info.aoe, info.ee)
     DrawBallisticScatter(info.scatter, info.v, fx, fy, fz, tx, ty, tz, trajectory, info.range)
-  elseif (weaponType == "noexplode") then
-    DrawNoExplode(info.aoe, fx, fy, fz, tx, ty, tz, info.range)
   elseif (weaponType == "tracking") then
     DrawAoE(tx, ty, tz, info.aoe, info.ee)
   elseif (weaponType == "direct") then
     DrawAoE(tx, ty, tz, info.aoe, info.ee)
-    DrawDirectScatter(info.scatter, fx, fy, fz, tx, ty, tz, info.range, GetUnitRadius(aoeUnitID))
+    DrawDirectScatter(info.scatter, fx, fy, fz, tx, ty, tz, info.range, GetUnitRadius(unitID))
   elseif (weaponType == "dropped") then
     DrawDroppedScatter(info.aoe, info.ee, info.scatter, info.v, fx, info.h, fz, tx, ty, tz, info.salvoSize, info.salvoDelay)
   elseif (weaponType == "wobble") then
@@ -640,9 +644,19 @@ function widget:DrawWorld()
   elseif (weaponType == "orbital") then
     DrawAoE(tx, ty, tz, info.aoe, info.ee)
     DrawOrbitalScatter(info.scatter, tx, ty, tz)
+  elseif (weaponType == "dontdraw") then
+	-- don't draw anything foo
   else
     DrawAoE(tx, ty, tz, info.aoe, info.ee)
   end
+  
+  if (cmd == CMD_DGUN) then
+    glColor(1, 0, 0, 0.75)
+    glLineWidth(1)
+    glDrawGroundCircle(fx, fy, fz, info.range, circleDivs)
+    glColor(1,1,1,1)
+  end
+  
 end
 
 function widget:SelectionChanged(sel)

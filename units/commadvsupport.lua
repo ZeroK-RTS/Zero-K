@@ -122,6 +122,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:flash1teal]],
       fireStarter             = 30,
+	  impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
