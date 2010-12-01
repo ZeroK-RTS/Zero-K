@@ -53,7 +53,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:MISSILE_EXPLOSION]],
-      [[custom:WEAPEXP_PUFF]],
+      [[custom:MEDMISSILE_EXPLOSION]],
     },
 
   },

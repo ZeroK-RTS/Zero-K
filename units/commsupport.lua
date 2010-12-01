@@ -60,6 +60,7 @@ unitDef = {
   norestrict          = [[1]],
   objectName          = [[commsupport.s3o]],
   radarDistance       = 1400,
+  script              = [[commsupport.cob]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 

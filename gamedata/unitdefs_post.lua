@@ -71,6 +71,15 @@ for name, ud in pairs(UnitDefs) do
   end
 end 
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Modular commander handling
+--
+
+VFS.Include("gamedata/modularcomms/moduledefs.lua")
+VFS.Include("gamedata/modularcomms/testdata.lua")
+VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -119,6 +128,7 @@ local commanders = {
 	"commsupport",
 	"commadvsupport",
 }
+
 for _,name in pairs(commanders) do
 	TagTree(name, "arm", UnitDefs["armcom"].buildoptions)
 end

@@ -202,7 +202,7 @@ Killed(severity, corpsetype)
 	{
 		corpsetype = 1;
 				
-		spin hull around x-axis speed <-2>;
+		spin hull around x-axis speed <-5>;
 		move hull to y-axis [-4] speed [2];
 		
 		emit-sfx 1025 from exp1;

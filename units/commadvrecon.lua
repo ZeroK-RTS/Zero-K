@@ -163,7 +163,6 @@ unitDef = {
       weaponVelocity          = 900,
     },
 
-
     LASER     = {
       name                    = [[Recon Pulse Laser]],
       areaOfEffect            = 12,
