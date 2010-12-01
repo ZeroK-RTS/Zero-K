@@ -91,8 +91,20 @@ local waveFontSize   = fontHandler.GetFontSize()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--broken for some reason; saves wildly offscreen values
+--[[
+function widget:GetConfigData(data)
+  return {
+    position_x = x1,
+    position_y = y1,
+  }
+end
 
-
+function widget:SetConfigData(data)
+	x1 = data.position_x or x1
+	y1 = data.position_y or y1
+end
+--]]
 local function MakeCountString(type)
   local t = {}
   local total = 0

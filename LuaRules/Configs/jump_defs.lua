@@ -76,10 +76,10 @@ overCategory = {
     delay = 30, height = 100, range = 300, reload = 13, cobscript = false, rotateMidAir = false},	
 
  commrecon = {
-      reload = 30,},	
+      reload = 25,},	
 
  commadvrecon = {
-      reload = 20, range = 450, height = 225},
+      reload = 15, range = 450, height = 225},
 	  
 -- corpyro = {
 	-- range = 400, height = 200, speed = 6,  reload = 10, },	

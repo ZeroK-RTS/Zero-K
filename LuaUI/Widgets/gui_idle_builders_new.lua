@@ -287,7 +287,7 @@ function widget:GetConfigData(data)
 end
 
 function widget:SetConfigData(data)
-  POSITION_X = data.position_x or POSITION_X
+	POSITION_X = data.position_x or POSITION_X
 	POSITION_Y = data.position_y or POSITION_Y
 	MAX_ICONS = data.max_icons or MAX_ICONS
 end
