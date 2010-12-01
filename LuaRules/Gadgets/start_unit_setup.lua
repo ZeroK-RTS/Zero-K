@@ -653,6 +653,7 @@ function gadget:DrawWorldPreUnit()
 		local ut = Spring.GetUnitTeam(unitID)
 		if (ut ~= nil and (spec or Spring.AreTeamsAllied(teamID, ut))) then
 			if (value > 0 and boostMax[unitID] ~= nil) then 
+				gl.DepthTest(false)
 				gl.LineWidth(6.5)
 				gl.Color({255,0,0})
 				local radius = 30
@@ -662,6 +663,7 @@ function gadget:DrawWorldPreUnit()
 					value = value - START_BOOST
 				end
 				gl.DrawFuncAtUnit(unitID, false, circleLines, value / START_BOOST, radius)
+				gl.DepthTest(true)
 			end
 		end
 	end

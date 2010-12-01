@@ -367,11 +367,11 @@ local function LoadMetalMap(filename)
 		if not l1 then 
 			break 
 		end
+		l2 = file:read()
 		if not l2 then 
 			Spring.Echo("error in mexmap " .. l1)
 			break 
 		end
-		l2 = file:read()
 		--l3 = file:read()
 		--l4 = file:read()
 		mexes[index] = {
