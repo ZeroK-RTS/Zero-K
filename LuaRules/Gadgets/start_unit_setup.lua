@@ -141,6 +141,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 			metalCost = 1,
 			energyCost = 1
 		})
+		local x,y,z = Spring.GetUnitPosition(unitID)
+		Spring.SpawnCEG("riotball", x, y, z)
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
 		facplopsrunning[unitID] = true
 	end
