@@ -30,6 +30,7 @@ unitDef = {
     helptext_pl    = [[Pod ci??kim pancerzem Annihilatora znajduje si? niszczycielski Akcelerator Tachyonów. Ta straszliwa bro? pozwala na zadawanie wysokich obra?e? oddalonym celom, zak?adaj?c ?e masz do?? energii by j? zasili?.]],
     pylonrange     = 50,
 	neededlink     = 50,
+	keeptooltip    = [[any string I want]],
   },
 
   damageModifier                = 0.25,
