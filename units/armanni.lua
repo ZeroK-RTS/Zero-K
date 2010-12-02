@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armanni]],
   name                          = [[Annihilator]],
-  description                   = [[Tachyon Accelerator (Counter-Artillery/Anti-Armor)]],
+  description                   = [[Tachyon Accelerator - Requires 50 Power (Counter-Artillery/Anti-Armor)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   bmcode                        = [[0]],
@@ -49,6 +49,7 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[arm_annihilator.s3o]],
   onoffable                     = true,
+  script						= [[armanni.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[CRAWL_BLASTSML]],
   side                          = [[ARM]],
@@ -128,7 +129,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 7000,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
@@ -141,28 +142,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Annihilator]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 7000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 880,
-      object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 880,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Annihilator]],
