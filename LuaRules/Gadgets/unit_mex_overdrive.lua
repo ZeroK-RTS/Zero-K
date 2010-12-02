@@ -20,6 +20,7 @@ end
 local mexDefs = {}
 --local energyDefs = {}
 local pylonDefs = {}
+local linkdefs = {}
 
 local DEFAULT_PYLON_RANGE = 200 -- mex range, link = range*2
 
@@ -29,17 +30,17 @@ for i=1,#UnitDefs do
 		mexDefs[i] = true
 	end
 	if (udef.type == "Building")or(udef.extractsMetal > 0) then
-		if  (udef.energyMake > 0)
-		or(udef.energyUpkeep < 0)
-		or(udef.tidalGenerator > 0)
-		or(udef.windGenerator > 0)
-		or(udef.customParams.windgen)
-		or(udef.extractsMetal > 0)
-		or(tonumber(udef.customParams.pylonrange) or 0 > 0)
-		then
+		if (udef.energyMake > 0)
+			or(udef.energyUpkeep < 0)
+			or(udef.tidalGenerator > 0)
+			or(udef.windGenerator > 0)
+			or(udef.customParams.windgen)
+			or(udef.extractsMetal > 0)
+			or(tonumber(udef.customParams.pylonrange) or 0 > 0) then
 			pylonDefs[i] = {
 				range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE,
 				extractor = (udef.extractsMetal > 0),
+				neededLink = tonumber(udef.customParams.neededlink) or false,
 			}
 		end
 		
@@ -54,7 +55,9 @@ end
 
 if (gadgetHandler:IsSyncedCode()) then
 
-local HIDDEN_STORAGE = 10000 -- hidden storage - it will spend all energy above storage - hidden_storage
+Spring.SetGameRulesParam("lowpower",1)
+
+local HIDDEN_STORAGE = 10000 -- hidden storage: it will spend all energy above (storage - hidden_storage)
 
 --local PYLON_ENERGY_RANGESQ = 160000
 --local PYLON_LINK_RANGESQ = 40000
@@ -77,6 +80,8 @@ local takenMexId = {} -- mex ids that are taken by disabled pylons
 
 local mexes = {}   -- mexes[teamID][gridID][unitID] == mexMetal
 local mexesToAdd = {}
+
+local lowPowerUnits = {inner = {count = 0, units = {}}}
 
 local pylon = {} -- pylon[allyTeamID][unitID] = {gridID,mexes,mex[unitID],x,z,overdrive, nearPlant[unitID],nearPylon[unitID], color}
 
@@ -325,6 +330,7 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 		--nearEnergy = {},
 		x = pX,
 		z = pZ,
+		neededLink = pylonDefs[unitDefID].neededLink,
 		overdrive = unitOverdrive, 
 		active = true,
 	}
@@ -700,7 +706,11 @@ function gadget:GameFrame(n)
 	AddNewMexes(n)
 
 	if (n%32 == 1) then
+	
+		lowPowerUnits.inner = {count = 0, units = {}}
+		
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
+			
 			--// check if pylons changed their active status (emp, reverse-build, ..)
 			for unitID, pylonData in pairs(pylon[allyTeamID]) do
 				local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
@@ -782,6 +792,19 @@ function gadget:GameFrame(n)
 							local _,_,em,eu = Spring.GetUnitResources(unitID)
 							maxGridCapacity[i] = maxGridCapacity[i] + (em or 0) - (eu or 0)
 						end
+					end
+				end
+			end
+			
+			--// check if pylons disable due to low grid power (eg weapons)
+			for unitID, pylonData in pairs(pylon[allyTeamID]) do
+				if pylonData.neededLink then
+					if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
+						Spring.SetUnitRulesParam(unitID,"lowpower",1, {inlos = true})
+						lowPowerUnits.inner.count = lowPowerUnits.inner.count + 1
+						lowPowerUnits.inner.units[lowPowerUnits.inner.count] = unitID
+					else
+						Spring.SetUnitRulesParam(unitID,"lowpower",0, {inlos = true})
 					end
 				end
 			end
@@ -930,6 +953,7 @@ end
 
 function gadget:Initialize()
 	_G.pylon = pylon
+	_G.lowPowerUnits = lowPowerUnits
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		if (mexDefs[unitDefID]) then
@@ -1047,6 +1071,8 @@ local GL_TRIANGLE_FAN        = GL.TRIANGLE_FAN
 local spGetMyAllyTeamID = Spring.GetMyAllyTeamID
 local spGetTeamList = Spring.GetTeamList
 local spGetTeamUnits = Spring.GetTeamUnits
+
+local powerTexture = 'Luarules/Images/energy.png'
 
 local floor = math.floor
 
@@ -1273,6 +1299,25 @@ function gadget:DrawWorldPreUnit()
 		return 
 		end 
 	end 
+end
+
+local function DrawUnitFunc(yshift)
+	gl.Translate(0,yshift,0)
+	gl.Billboard()
+	gl.TexRect(-10, -10, 10, 10)
+end
+
+function gadget:DrawWorld()
+
+	local lowPowerUnits = SYNCED.lowPowerUnits.inner
+	
+	if lowPowerUnits.count > 0 then
+		gl.Texture(powerTexture )
+		for i = 1, lowPowerUnits.count do
+			gl.DrawFuncAtUnit(lowPowerUnits.units[i], false, DrawUnitFunc,  UnitDefs[spGetUnitDefID(lowPowerUnits.units[i])].height+30)
+		end
+	end
+	
 end
 
 -------------------------------------------------------------------------------------
