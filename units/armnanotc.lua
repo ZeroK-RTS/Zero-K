@@ -69,27 +69,6 @@ unitDef = {
       category         = [[heaps]],
       damage           = 500,
       energy           = 0,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 88,
-      object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
-    DEAD2 = {
-      description      = [[Debris - Caretaker]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 500,
-      energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
@@ -103,7 +82,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Caretaker]],

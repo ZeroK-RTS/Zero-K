@@ -122,7 +122,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(clampu2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(trolleyu, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(trolleyb, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		return 3
+		return 2
 	else
 		Explode(body, sfxShatter)
 		Explode(scaffold, sfxFall + sfxSmoke + sfxFire + sfxExplode)
@@ -132,6 +132,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(clampu2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(trolleyu, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(trolleyb, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		return 3
+		return 2
 	end
 end

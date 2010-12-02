@@ -168,7 +168,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 10000,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
@@ -181,28 +181,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Doomsday Machine]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 10000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 1040,
-      object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1040,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Doomsday Machine]],

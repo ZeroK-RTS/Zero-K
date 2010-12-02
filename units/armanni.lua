@@ -118,7 +118,6 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 1400,
     },
-
   },
 
 

@@ -125,6 +125,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(Rwing, sfxSmoke + sfxExplode)
 		Explode(LwingTip, sfxSmoke + sfxExplode)
 		Explode(RwingTip, sfxSmoke + sfxExplode)
-		return 3
+		return 2
 	end
 end

@@ -16,9 +16,6 @@ local gun = false
 --signals
 local SIG_Aim = 1
 
---cob values
-local CRASHING = 97
-
 ----------------------------------------------------------
 
 function script.Create()
@@ -48,8 +45,7 @@ end
 function script.AimFromWeapon1() return base end
 
 function script.AimWeapon1(heading, pitch)
-	if (GetUnitValue(CRASHING) == 1) then return false end
-	return true
+	return not (GetUnitValue(COB.CRASHING) == 1) 
 end
 
 function script.Shot1()
@@ -75,13 +71,13 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(engineR, sfxSmoke + sfxFire + sfxExplode)
 		Explode(wingL, sfxFall + sfxSmoke)
 		Explode(wingR, sfxFall + sfxSmoke)
-		return 2
+		return 1
 	else
 		Explode(base, sfxShatter)
 		Explode(engineL, sfxSmoke + sfxFire + sfxExplode)
 		Explode(engineR, sfxSmoke + sfxFire + sfxExplode)
 		Explode(wingL, sfxSmoke + sfxExplode)
 		Explode(wingR, sfxSmoke + sfxExplode)
-		return 3
+		return 2
 	end
 end

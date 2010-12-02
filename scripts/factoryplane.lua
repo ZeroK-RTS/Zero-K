@@ -207,7 +207,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(door1, SFX.EXPLODE_ON_HIT)
 		Explode(door2, SFX.EXPLODE_ON_HIT)
 
-		return 2 -- corpsetype
+		return 1 -- corpsetype
 	else
 		Explode(base, SFX.SHATTER)
 		Explode(bay, SFX.SHATTER)
@@ -220,6 +220,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(nano1, SFX.EXPLODE_ON_HIT)
 		Explode(nano2, SFX.EXPLODE_ON_HIT)
 
-		return 3 -- corpsetype
+		return 2 -- corpsetype
 	end
 end

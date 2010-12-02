@@ -189,7 +189,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 10000,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
@@ -202,28 +202,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Sumo]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 10000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 920,
-      object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 920,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Sumo]],

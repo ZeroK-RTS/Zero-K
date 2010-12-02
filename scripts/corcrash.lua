@@ -172,17 +172,21 @@ end
 --]]
 
 function script.Killed(recentDamage, maxHealth)
-	Explode( head, SFX.EXPLODE )
-	--etc... for other pieces
 	local severity = recentDamage / maxHealth
-
 	if (severity <= .25) then
+		Explode(base, sfxNone)
+		Explode(head, sfxNone)
+		Explode(pod, sfxNone)
 		return 1 -- corpsetype
-
 	elseif (severity <= .5) then
+		Explode(base, sfxNone)
+		Explode(head, sfxNone)
+		Explode(pod, sfxShatter)
+		return 1 -- corpsetype
+	else
+		Explode(base, sfxShatter)
+		Explode(head, sfxSmoke + sfxFire)
+		Explode(pod, sfxSmoke + sfxFire + sfxExplode)
 		return 2 -- corpsetype
-
-	else		
-		return 3 -- corpsetype
 	end
 end

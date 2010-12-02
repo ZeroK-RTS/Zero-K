@@ -78,7 +78,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 4000,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 7,
       footprintZ       = 6,
@@ -91,28 +91,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Airplane Plant]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 4000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 6,
-      footprintZ       = 6,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 220,
-      object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 220,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Airplane Plant]],

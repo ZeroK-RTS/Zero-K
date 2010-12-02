@@ -127,18 +127,15 @@ if not on then return false end
 end
 
 function script.QueryWeapon2()
-if heat then return flare2
-else
-return flare3
-end
+	if heat then return flare2
+	else return flare3
+	end
 end
 
 function script.AimFromWeapon2()
-if heat then return flare2
-else
-return flare3
+	if heat then return flare2
+	else return flare3 end
 end
- end
 
 function script.AimWeapon2( heading, pitch )
 if not on then return false end
@@ -160,16 +157,10 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 
 	if (severity <= .25) then
-
 		return 1 -- corpsetype
-
 	elseif (severity <= .5) then
-
-		return 2 -- corpsetype
-
+		return 1 -- corpsetype
 	else		
-
-		return 3 -- corpsetype
-	
+		return 2 -- corpsetype
 	end
 end

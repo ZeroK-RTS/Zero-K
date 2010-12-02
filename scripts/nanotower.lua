@@ -38,7 +38,7 @@ function script.QueryNanoPiece()
 end
 
 
-function script.Killed()
+function script.Killed(recentDamage, maxHealth)
 	Explode( body, SFX.EXPLODE )
 	Explode( aim, SFX.EXPLODE )
 --[[

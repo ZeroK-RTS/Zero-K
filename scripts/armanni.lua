@@ -26,7 +26,8 @@ local open = true
 local function Open()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
-	Spring.SetUnitArmored(unitID,false)
+	Spring.SetUnitArmored(unitID,false)	--broken
+	Spring.SetUnitCOBValue(unitID, COB.ARMORED, 0)
 	Turn( door1 , z_axis, 0, math.rad(80) )
 	Turn( door2 , z_axis, 0, math.rad(80) )
 	WaitForTurn(door1, z_axis)
@@ -57,7 +58,8 @@ local function Close()
 	Turn( door2 , z_axis, math.rad(-(-90)), math.rad(80) )
 	WaitForTurn(door1, z_axis)
 	WaitForTurn(door2, z_axis)
-	Spring.SetUnitArmored(unitID,true)
+	Spring.SetUnitArmored(unitID,true)	--broken
+	Spring.SetUnitCOBValue(unitID, COB.ARMORED, 1)
 end
 
 function script.Create()

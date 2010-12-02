@@ -137,7 +137,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 270,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
       height           = [[20]],
@@ -149,27 +149,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Infiltrator]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 270,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 80,
-      object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Infiltrator]],
