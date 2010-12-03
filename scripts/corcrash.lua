@@ -1,6 +1,8 @@
 -- This is very much wip. There are lots of parts broken, so be warned. 
 --by Chris Mackey
 
+include "constants.lua"
+
 -- pieces
 local base = piece "base"
 local head = piece "head"
@@ -43,6 +45,8 @@ local r_toe = piece "r_toe"
 local rf_toe = piece "rf_toe"
 local rb_toe = piece "rb_toe"
 
+smokePiece = {head, pod}
+
 --constants
 local missile = 1
 local missilespeed = 850 --fixme
@@ -61,6 +65,7 @@ function script.Create()
 	Turn( ex_2, x_axis, math.rad(170) )
 	Turn( ex_3, x_axis, math.rad(170) )
 	Turn( axle, x_axis, math.rad(-30) )
+	StartThread(SmokeUnit)
 end
 
 local function Walk()

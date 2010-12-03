@@ -26,6 +26,7 @@ local shields = {
 	"corthud",
 	"core_spectre",
 	"corjamt",
+	"coradvcom",
 }
 
 local shieldUnits = {}
