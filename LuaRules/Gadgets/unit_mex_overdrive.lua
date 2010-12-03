@@ -1323,7 +1323,9 @@ function gadget:DrawWorld()
 	if lowPowerUnits.count > 0 then
 		gl.Texture(powerTexture )
 		for i = 1, lowPowerUnits.count do
-			gl.DrawFuncAtUnit(lowPowerUnits.units[i], false, DrawUnitFunc,  UnitDefs[spGetUnitDefID(lowPowerUnits.units[i])].height+30)
+			if spValidUnitID(lowPowerUnits.units[i]) and spGetUnitDefID(lowPowerUnits.units[i]) then
+				gl.DrawFuncAtUnit(lowPowerUnits.units[i], false, DrawUnitFunc,  UnitDefs[spGetUnitDefID(lowPowerUnits.units[i])].height+30)
+			end
 		end
 	end
 	
