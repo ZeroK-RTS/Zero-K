@@ -252,4 +252,22 @@ effectUnitDefsXmas = {
   corcom = {
     {class='SantaHat', options={pos={0,6,2}, emitVector={0.4,1,0.2}, width=2.7, height=6, ballSize=0.7, piece="head"}},
   },
+   armadvcom = {
+    {class='SantaHat', options={color={0,0.7,0,1}, pos={0,4,0.35}, emitVector={0.3,1,0.2}, width=2.7, height=6, ballSize=1, piece="head"}},
+  },
+  coradvcom = {
+    {class='SantaHat', options={pos={0,6,2}, emitVector={0.4,1,0.2}, width=2.7, height=6, ballSize=1, piece="head"}},
+  },
+  commsupport = {
+    {class='SantaHat', options={pos={0,3.8,0.35}, emitVector={0,1,0}, width=2.7, height=6, ballSize=0.7, piece="head"}},
+  },
+  commrecon = {
+    {class='SantaHat', options={color={0,0.7,0,1}, pos={1.5,4,0.5}, emitVector={0.7,1.6,0.2}, width=2.2, height=6, ballSize=0.7, piece="head"}},
+  },
+  commadvsupport = {
+    {class='SantaHat', options={pos={0,3.8,0.35}, emitVector={0,1,0}, width=2.7, height=6, ballSize=1, piece="head"}},
+  },
+  commadvrecon = {
+    {class='SantaHat', options={color={0,0.7,0,1}, pos={1.5,4,0.5}, emitVector={0.7,1.6,0.2}, width=2.2, height=6, ballSize=1, piece="head"}},
+  },
 }
