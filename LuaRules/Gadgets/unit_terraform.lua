@@ -2222,13 +2222,15 @@ function gadget:GameFrame(n)
 							-- area command
 							local radSQ = cQueue[i].params[4]^2
 							local cX, _, cZ = cQueue[i].params[1],cQueue[i].params[2],cQueue[i].params[3]
-							local allyTeam = constructor[constructorTable[currentCon]].allyTeam
-							for j = 1, terraformUnitCount do
-								local terra = terraformUnit[terraformUnitTable[j]]
-								if terra.allyTeam == allyTeam then
-									local disSQ = (terra.position.x - cX)^2 + (terra.position.z - cZ)^2
-									if disSQ < radSQ then
-										terra.decayTime = terraformDecayFrames
+							if constructor[constructorTable[currentCon]] and constructor[constructorTable[currentCon]].allyTeam then
+								local allyTeam = constructor[constructorTable[currentCon]].allyTeam 
+								for j = 1, terraformUnitCount do
+									local terra = terraformUnit[terraformUnitTable[j]]
+									if terra.allyTeam == allyTeam then
+										local disSQ = (terra.position.x - cX)^2 + (terra.position.z - cZ)^2
+										if disSQ < radSQ then
+											terra.decayTime = terraformDecayFrames
+										end
 									end
 								end
 							end
