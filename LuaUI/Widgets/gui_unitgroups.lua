@@ -1,10 +1,7 @@
--- $Id: gui_unitgroups5_1.lua 3171 2008-11-06 09:06:29Z det $
-
-
 function widget:GetInfo()
   return {
-    name      = "UnitGroups v5.1",
-    desc      = "Unit Group Icons, fixed bug",
+    name      = "UnitGroups",
+    desc      = "v5.1 Unit Group Icons, fixed bug",
     author    = "gunblob, original by tinnun",
     date      = "Aug 8, 2007",
     license   = "GNU GPL, v2 or later",
@@ -69,8 +66,14 @@ local oldMouseY = 0
 local iconSizeX = math.floor(100)
 local iconSizeY = math.floor(50)
 
-local iconDefaultWidth = {}
-local iconDefaultHeight = {}
+local iconDefaultWidth = {
+	right = 130,
+	bottom = 60,
+}
+local iconDefaultHeight = {
+	right = 40,
+	bottom = 72,
+}
 
 local alpha = 0.8
 local bgIcexuickGrey = {0.22, 0.22, 0.22, alpha}
@@ -94,22 +97,36 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   end
 end
 -------------------------------------------------------------------------------
+
+function widget:GetConfigData(data)
+	return {
+	  alignment = alignment,
+	  iconsShrink = iconsShrink,
+	  iconsAlwaysOn = iconsAlwaysOn,
+	  iconDefaultWidthRight = iconDefaultWidth.right,
+	  iconDefaultHeightRight = iconDefaultHeight.right,
+	  iconDefaultWidthBottom = iconDefaultWidth.bottom,
+	  iconDefaultHeightBottom = iconDefaultHeight.bottom,
+	  slideOffsetRight = slideOffset.right,
+	  slideOffsetBottom = slideOffset.bottom,
+	}
+end
+
+function widget:SetConfigData(data)
+	alignment = data.alignment or "right"
+	iconsShrink = data.iconsShrink or false
+	iconsAlwaysOn = data.iconsAlwaysOn or false
+	iconDefaultWidth.right = data.iconDefaultWidthRight or 130
+	iconDefaultHeight.right = data.iconDefaultHeightRight or 40
+	iconDefaultWidth.bottom = data.iconDefaultWidthBottom or 60
+	iconDefaultHeight.bottom = data.iconDefaultHeightBottom or 72
+	slideOffset.right = data.slideOffsetRight or -1
+	slideOffset.bottom = data.slideOffsetBottom or -1
+end
+
 function widget:Initialize()
   local groupId
   local icon
-
-  alignment = Spring.GetConfigString("AdvUnitGroups_alignment", "right")
-  iconsShrink = numberToBool(Spring.GetConfigInt("AdvUnitGroups_iconsShrink", 0))
-  iconsAlwaysOn = numberToBool(Spring.GetConfigInt("AdvUnitGroups_iconsAlwaysOn", 0))
-
-  iconDefaultWidth.right = Spring.GetConfigInt("AdvUnitGroups_iconDefaultWidth.right", 130)
-  iconDefaultHeight.right = Spring.GetConfigInt("AdvUnitGroups_iconDefaultHeight.right", 40)
-
-  iconDefaultWidth.bottom = Spring.GetConfigInt("AdvUnitGroups_iconDefaultWidth.bottom", 60)
-  iconDefaultHeight.bottom = Spring.GetConfigInt("AdvUnitGroups_iconDefaultHeight.bottom", 72)
-
-  slideOffset.right = Spring.GetConfigInt("AdvUnitGroups_slideOffset.right", -1)
-  slideOffset.bottom = Spring.GetConfigInt("AdvUnitGroups_slideOffset.bottom", -1)
 
   iconSizeX = iconDefaultWidth[alignment]
   iconSizeY = iconDefaultHeight[alignment]
@@ -144,23 +161,7 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-  Spring.SetConfigString("AdvUnitGroups_alignment", alignment)
-  Spring.SetConfigInt("AdvUnitGroups_iconsShrink", boolToNumber(iconsShrink))
-  Spring.SetConfigInt("AdvUnitGroups_iconsAlwaysOn", boolToNumber(iconsAlwaysOn))
 
-  Spring.SetConfigInt("AdvUnitGroups_iconDefaultWidth.right", iconDefaultWidth.right)
-  Spring.SetConfigInt("AdvUnitGroups_iconDefaultHeight.right", iconDefaultHeight.right)
-
-  Spring.SetConfigInt("AdvUnitGroups_iconDefaultWidth.bottom", iconDefaultWidth.bottom)
-  Spring.SetConfigInt("AdvUnitGroups_iconDefaultHeight.bottom", iconDefaultHeight.bottom)
-
-  if slideOffsetChanged.right then
-    Spring.SetConfigInt("AdvUnitGroups_slideOffset.right", slideOffset.right)
-  end
-
-  if slideOffsetChanged.bottom then
-    Spring.SetConfigInt("AdvUnitGroups_slideOffset.bottom", slideOffset.bottom)	
-  end
 end
 
 function widget:GroupChanged(groupId)
