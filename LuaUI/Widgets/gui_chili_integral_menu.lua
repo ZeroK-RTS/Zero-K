@@ -301,11 +301,12 @@ local function MakeButton(container, cmd, insertItem)
 		local image
 		if (texture and texture ~= "") then
 			image= Image:New {
-				width="100%";
+				width="90%";
 				height="90%";
-				y="6%";
+				y="5%";
+				x="5%";
 --				color = color;
-				keepAspect = true,	--isState;
+				keepAspect = not isBuild,	--true,	--isState;
 				file = texture;
 				parent = button;
 			}
@@ -590,7 +591,7 @@ local function ManageBuildRow()
 					BuildRowButtonFunc(i, buildRowButtons[i].cmdid, left, right)
 					end},
 				padding = {1,1,1,1},
-				keepAspect = true,
+				--keepAspect = true,
 			}
 			if overrun and i == MAX_COLUMNS then
 				buttonArray.button.caption = '...'
@@ -602,11 +603,13 @@ local function ManageBuildRow()
 				buttonArray.button.tooltip = 'Add to/subtract from queued batch'
 				buttonArray.image = Image:New {
 					parent = buttonArray.button,
-					width="100%";
+					width="90%";
 					height="90%";
-					y="6%";
+					x="5%";
+					y="5%";
 					file = '#'..udid,
 					file2 = WG.GetBuildIconFrame(UnitDefs[udid]),
+					keepAspect = false,
 				}
 				buttonArray.label = Label:New {
 					parent = buttonArray.image,
@@ -1043,7 +1046,11 @@ function widget:Initialize()
 		color   		= {0.7, 0.7, 0.4, 0.6},
 		backgroundColor = {1, 1, 1, 0.01},
 		--x = 0, y = 0, bottom = "100%", right = "100%",
-		x=12, y=4, bottom=4, right=12,
+		--x=12, y=4, bottom=4, right=12,
+		width = "98%",
+		height = "98%",
+		x = "1%",
+		y = "1.5%",
 		skin=nil,
 		skinName='default',
 	},
