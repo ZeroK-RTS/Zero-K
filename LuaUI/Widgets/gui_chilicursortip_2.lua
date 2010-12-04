@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.04 Chili Cursor Tooltips.",
+    desc      = "v0.05 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -83,7 +83,8 @@ local mx, my = -1,-1
 local showExtendedTip = false
 local changeNow = false
 
-local window_tooltip2, window_tooltip_unit, window_tooltip_feat, window_tooltip_ud, window_tooltip_morph, window_tooltip_text
+local window_tooltip2
+local windows = {}
 --local tt_buildpic
 local tt_healthbar, tt_unitID, tt_fid, tt_ud, tt_fd
 local controls = {}
@@ -159,6 +160,8 @@ options = {
 --------------------------------------------------------------------------------
 
 local function FontChanged() 
+	controls = {}
+	controls_icons = {}
 	ttFontSize = options.fontsize.value
 	--gFontSize = options.staticfontsize.value - ttFontSize
 end
@@ -514,6 +517,8 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 end
 
 local function PlaceToolTipWindow2(x,y)
+	if not window_tooltip2 then return end
+	
 	if not window_tooltip2:IsDescendantOf(screen0) then
 		screen0:AddChild(window_tooltip2)
 	end
@@ -710,7 +715,8 @@ local function UpdateStack(ttname, stack)
 				else
 					controls[ttname][name]:SetCaption( item.text )
 				end
-				
+			end
+			if controls_icons[ttname][name] then
 				if item.icon then
 					controls_icons[ttname][name].file = item.icon
 					controls_icons[ttname][name]:Invalidate()
@@ -721,7 +727,19 @@ local function UpdateStack(ttname, stack)
 	
 end
 
-local function BuildTooltip2(curwindow, ttname, ttdata)
+local function SetTooltip(tt_window)
+	
+	--if options.statictip.value then
+	--else
+		if not window_tooltip2 or window_tooltip2 ~= tt_window then
+			KillTooltip(true)
+			window_tooltip2 = tt_window
+		end
+		PlaceToolTipWindow2(mx+20,my-20)
+	--end
+end
+
+local function BuildTooltip2(ttname, ttdata)
 	if not ttdata.main then
 		echo '<Cursortip> Missing ttdata.main'
 		return
@@ -731,60 +749,61 @@ local function BuildTooltip2(curwindow, ttname, ttdata)
 		if ttdata.leftbar then
 			UpdateStack(ttname, ttdata.leftbar)
 		end
-		return curwindow
-	end
-	
-	controls[ttname] = {}
-	controls_icons[ttname] = {}
-	local stack_leftbar_temp, stack_main_temp
-	local children_main  = MakeStack(ttname, ttdata.main)
-	local leftside = false
-	if ttdata.leftbar then
-		children_leftbar  = MakeStack(ttname, ttdata.leftbar)
-		
-		stack_leftbar_temp = 
-			StackPanel:New{
-				name = 'leftbar',
-				orientation='vertical',
-				padding = {0,0,0,0},
-				itemPadding = {1,0,0,0},
-				itemMargin = {0,0,0,0},
-				resizeItems=false,
-				autosize=true,
-				width = 70,
-				children = children_leftbar,
-			}
-		leftside = true
 	else
-		stack_leftbar_temp = StackPanel:New{ width=10, }
+	
+		controls[ttname] = {}
+		controls_icons[ttname] = {}
+		local stack_leftbar_temp, stack_main_temp
+		local children_main  = MakeStack(ttname, ttdata.main)
+		local leftside = false
+		if ttdata.leftbar then
+			children_leftbar  = MakeStack(ttname, ttdata.leftbar)
+			
+			stack_leftbar_temp = 
+				StackPanel:New{
+					name = 'leftbar',
+					orientation='vertical',
+					padding = {0,0,0,0},
+					itemPadding = {1,0,0,0},
+					itemMargin = {0,0,0,0},
+					resizeItems=false,
+					autosize=true,
+					width = 70,
+					children = children_leftbar,
+				}
+			leftside = true
+		else
+			stack_leftbar_temp = StackPanel:New{ width=10, }
+		end
+		
+		stack_main_temp = StackPanel:New{
+			name = 'main',
+			autosize=true,
+			x = leftside and 60 or 0,
+			y = 0,
+			orientation='vertical',
+			centerItems = false,
+			width = 240,
+			padding = {0,0,0,0},
+			itemPadding = {1,0,0,0},
+			itemMargin = {0,0,0,0},
+			resizeItems=false,
+			children = children_main,
+		}
+		
+		windows[ttname] = Window:New{
+			name = ttname,
+			--skinName = 'default',
+			useDList = false,
+			resizable = false,
+			draggable = false,
+			autosize  = true,
+			--tweakDraggable = true,
+			backgroundColor = color.tooltip_bg, 
+			children = { stack_leftbar_temp, stack_main_temp, }
+		}
 	end
-	
-	stack_main_temp = StackPanel:New{
-		name = 'main',
-		autosize=true,
-		x = leftside and 60 or 0,
-		y = 0,
-		orientation='vertical',
-		centerItems = false,
-		width = 240,
-		padding = {0,0,0,0},
-		itemPadding = {1,0,0,0},
-		itemMargin = {0,0,0,0},
-		resizeItems=false,
-		children = children_main,
-	}
-	
-	return Window:New{
-		name = ttname,
-		--skinName = 'default',
-		useDList = false,
-		resizable = false,
-		draggable = false,
-		autosize  = true,
-		--tweakDraggable = true,
-		backgroundColor = color.tooltip_bg, 
-		children = { stack_leftbar_temp, stack_main_temp, }
-	}
+	SetTooltip(windows[ttname])
 end
 
 local function GetUnitIcon(ud)
@@ -794,26 +813,13 @@ local function GetUnitIcon(ud)
 		or 	'icons/'.. ud.iconType ..iconFormat
 end
 
-local function SetTooltip(tt_window)
-	
-	--if options.statictip.value then
-	--else
-		if window_tooltip2 ~= tt_window then
-			KillTooltip(true)
-			window_tooltip2 = tt_window
-		end
-		PlaceToolTipWindow2(mx+20,my-20)
-	--end
-end
 
 local function MakeToolTip_Text(text)
-	window_tooltip_text = BuildTooltip2(window_tooltip_text, 'tt_text',{
+	BuildTooltip2('tt_text',{
 		main = {
 			{ name='text', text = text, wrap=true },
 		}
 	})
-	
-	SetTooltip(window_tooltip_text)
 end
 
 local function UpdateBuildpic( ud, globalitem_name )
@@ -866,12 +872,10 @@ local function MakeToolTip_UD(tt_table)
 		UpdateBuildpic( tt_table.unitDef, 'buildpic_morph' )
 		UpdateMorphControl( tt_table.morph_data )
 		
-		window_tooltip_morph = BuildTooltip2(window_tooltip_morph, 'morph', tt_structure)
-		SetTooltip(window_tooltip_morph)
+		BuildTooltip2('morph', tt_structure)
 	else
 		UpdateBuildpic( tt_table.unitDef, 'buildpic_ud' )
-		window_tooltip_ud = BuildTooltip2(window_tooltip_ud, 'ud', tt_structure)
-		SetTooltip(window_tooltip_ud)
+		BuildTooltip2('ud', tt_structure)
 	end
 	
 end
@@ -929,8 +933,11 @@ local function MakeToolTip_UnitFeature(type, data, tooltip)
 		main = {
 			{ name='uname', icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
 			{ name='utt', text = unittooltip, wrap=true },
-			--type == 'unit' and { name='hp', directcontrol = 'healthbar', } or {},
-			type == 'unit' and { name='hp', directcontrol = 'hp_unit', } or (SHOW_FEATURE_HP and { name='hp', directcontrol = 'hp_feature', } or {}),
+			type == 'unit' 
+				and { name='hp', directcontrol = 'hp_unit', } 
+				or (SHOW_FEATURE_HP 
+						and { name='hp', directcontrol = 'hp_feature', } 
+						or {}),
 			{ name='res', directcontrol = type == 'unit' and 'resources_unit' or 'resources_feature' },
 			{ name='help', text = green .. 'Space+click: Show options', },
 		},
@@ -938,12 +945,10 @@ local function MakeToolTip_UnitFeature(type, data, tooltip)
 	
 	if type == 'unit' then
 		UpdateBuildpic( tt_ud, 'buildpic_unit' )
-		window_tooltip_unit = BuildTooltip2(window_tooltip_unit, 'unit', tt_structure)
-		SetTooltip(window_tooltip_unit)
+		window_tooltip_unit = BuildTooltip2('unit', tt_structure)
 	else --type == 'feature'
 		UpdateBuildpic( tt_ud, 'buildpic_feature' )
-		window_tooltip_feature = BuildTooltip2(window_tooltip_feature, 'feature', tt_structure)
-		SetTooltip(window_tooltip_feature)
+		BuildTooltip2('feature', tt_structure)
 	end
 	
 	
