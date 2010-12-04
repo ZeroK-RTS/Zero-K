@@ -106,6 +106,11 @@ unitDef = {
       beamlaser               = 1,
       beamTime                = 0.1,
       beamttl                 = 50,
+	  
+	  customParams			  = {
+		timeslow_preset	= "commsupport_slowbeam",
+	  },
+	  
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,

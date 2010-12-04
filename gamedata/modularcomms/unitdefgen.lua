@@ -11,7 +11,7 @@
 --------------------------------------------------------------------------------
 --	HOW IT WORKS: 
 --	First, it makes one unitdef for each level of each player's comms, basing them off the template commanders.
---		The unitdefs are named: comm<type>_<playerID>_<level>
+--		The unitdefs are named: comm<type><level>_<playerID>
 --	It then modifies each unitdef based on the upgrades selected for that player, comm type and level
 --		For this test, the upgrade data is read from gamedata/modularcomms/testdata.lua.
 --	Comm and upgrade types are defined in gamedata/modularcomms/moduledefs.lua.
@@ -32,23 +32,24 @@ players = { [0] = {},  [1] = {} }
 --also for some reason ipairs ignores the item at index 0, wtf?
 
 -- copy and edit comm defs
-for id, playerData in ipairs(players) do	--per player
-	Spring.Echo("Processing player "..id)
+for level=1,NUM_LEVELS do --per level
 	for commName, commData in pairs(commTypes) do	--per type
-		for level=1,NUM_LEVELS do	--per level
-			Spring.Echo("\tProcessing commtype: ".. commName .. " level ".. level)
-			commDefs["comm"..commName.."_"..id.."_"..level] = CopyTable(commData[level], true)	--prep comm data by copying from template
+		Spring.Echo("Processing commtype: ".. commName .. " level ".. level)
+		for id, playerData in ipairs(players) do --per player
+			Spring.Echo("\tProcessing player "..id)
+			local name = "comm"..commName..level.."_"..id
+			commDefs[name] = CopyTable(commData[level], true)	--prep comm data by copying from template
 
 			--upgrade handling
 			if testdata[id][commName] and testdata[id][commName][level] then
 				for _,upgradeName in pairs(testdata[id][commName][level]) do  --reads from testdata.lua, modify in future to read from other source
-					upgrades[upgradeName].func(commDefs["comm"..commName.."_"..id.."_"..level])	--apply upgrade function
+					upgrades[upgradeName].func(commDefs[name])	--apply upgrade function
 					Spring.Echo("\t\tApplying upgrade: "..upgradeName)
 				end
 			end
 			if testdata[id][commName] and testdata[id][commName].all then	-- upgrades applied to all levels 
 				for _,upgradeName in pairs(testdata[id][commName].all) do  --reads from testdata.lua, modify in future to read from other source
-					upgrades[upgradeName].func(commDefs["comm"..commName.."_"..id.."_"..level])	--apply upgrade function
+					upgrades[upgradeName].func(commDefs[name])	--apply upgrade function
 					Spring.Echo("\t\tApplying upgrade: "..upgradeName)
 				end
 			end

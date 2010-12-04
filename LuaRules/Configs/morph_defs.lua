@@ -563,16 +563,12 @@ local morphDefs = {
   },
 }
 
-
-local modOptions
-if (Spring.GetModOptions) then
-  modOptions = Spring.GetModOptions()
-end
-
-if (modOptions and modOptions.commtype == 'default') then
-
-end
-
+-- currently unused
+local comMorph = {
+	metal = 600,
+	energy = 600,
+	time = 60,
+}
 
 
 --

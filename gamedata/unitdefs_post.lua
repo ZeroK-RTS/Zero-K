@@ -129,6 +129,11 @@ local commanders = {
 	"commadvsupport",
 }
 
+--add procedural comms
+for name in pairs(commDefs) do
+	commanders[#commanders + 1] = name
+end
+
 for _,name in pairs(commanders) do
 	TagTree(name, "arm", UnitDefs["armcom"].buildoptions)
 end

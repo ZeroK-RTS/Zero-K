@@ -33,6 +33,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+	cloakshield_preset = "commstrike2",
     fireproof = [[1]],
   },
 

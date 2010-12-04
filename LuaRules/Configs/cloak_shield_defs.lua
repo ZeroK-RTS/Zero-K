@@ -16,6 +16,20 @@
 
 -- decloakDistance: Units cloaked by the cloaker have this decloakdistance. Use false to use the unit's own decloak distance (typically 0)
 
+
+--deep not safe with circular tables! defaults To false
+function CopyTable(tableToCopy, deep)
+	local copy = {}
+		for key, value in pairs(tableToCopy) do
+		if (deep and type(value) == "table") then
+			copy[key] = CopyTable(value, true)
+		else
+			copy[key] = value
+		end
+	end
+	return copy
+end
+
 local function JammerAlign(defName)
   local ud = UnitDefNames[defName]
   if (ud == nil) then return 0 end
@@ -51,7 +65,12 @@ local cloakShieldDefs = {
     selfCloak = true,
     decloakDistance = 300,
   },
-  armadvcom = {
+}
+
+-- reads from customParams and copies to cloakShieldDefs as appropriate - needed for procedurally generated comms
+-- as always, need better way to handle if upgrades are desired!
+local presets = {
+  commstrike2 = {
     init = true,
     draw = true,
     energy = 8,
@@ -63,6 +82,11 @@ local cloakShieldDefs = {
   },
 }
 
+for name, ud in pairs(UnitDefNames) do
+	if ud.customParams.cloakshield_preset then
+		cloakShieldDefs[name] = CopyTable(presets[ud.customParams.cloakshield_preset])
+	end
+end
 
 local uncloakables = {}
 

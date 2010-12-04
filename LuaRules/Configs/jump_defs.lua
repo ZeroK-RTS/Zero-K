@@ -26,10 +26,14 @@ local name
   
 jumpCategory = { 
 	baseclass = {
-		range = 400, height = 200, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = true,rotateMidAir = true},	
+		range = 400, height = 200, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},	
 	-- category containining only optional tags for testing error code only.
 	-- iammissingstuff ={
 	-- 	reload	= 10, aaShootMe	= false, },	
+	commrecon1 = {
+		range = 400, height = 200, speed = 6,  reload = 25,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},
+	commrecon2 = {
+		range = 450, height = 225, speed = 6,  reload = 15,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},	
 }
 
 jumpClassGroups = {
@@ -43,11 +47,14 @@ jumpClassGroups = {
 	"armaak",
 	"corclog",
 	"corsumo",
-	"commrecon",
-	"commadvrecon",
 	-- "pizzathehut",--bad unit left for testing purposes
 	},
-
+	commrecon1 = {
+		"commrecon",
+	},
+	commrecon2 = {
+		"commadvrecon",
+	},
 	-- iammissingstuff = {--bad category
 	-- "puffthemagic",--bad unit left for testing purposes
 	-- },
@@ -75,15 +82,24 @@ overCategory = {
  corsumo = {
     delay = 30, height = 100, range = 300, reload = 13, cobscript = false, rotateMidAir = false},	
 
- commrecon = {
-      reload = 25,},	
-
- commadvrecon = {
-      reload = 15, range = 450, height = 225},
-	  
 -- corpyro = {
 	-- range = 400, height = 200, speed = 6,  reload = 10, },	
 }
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+-- apply for procedurally generated comms - really need a better way to do this if we ever want jumpjet-related upgrades...
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+local numPlayers = #Spring.GetPlayerList()
+
+for i=0, numPlayers-1 do
+	for v=1,2 do
+		local name = "commrecon"..v.."_"..i
+		local array = jumpClassGroups["commrecon"..v]
+		array[#array + 1] = name
+	end
+end
+
 ------------------------------------------------------------------------------------------------------------------------------------------------
 -- this is just an error checking block, not our configuration area
 -- I know n^2, bite me... see error checking comment
@@ -167,11 +183,11 @@ for uName,uOvers in pairs(overCategory) do
 			end
 			
 			if ( uOvers.height == jumpers[uName].height) then
-				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded warning override )")
+				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded height override )")
 			end
 			
 			if ( uOvers.delay == jumpers[uName].delay) then
-				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded warning override )")
+				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded delay override )")
 			end
 			
 			if ( uOvers.cobscript == jumpers[uName].cobscript) then

@@ -33,6 +33,7 @@ unitDef = {
 
   customParams        = {
     fireproof = [[1]],
+    repairaura_preset	= "commsupport2",
   },
 
   defaultmissiontype  = [[Standby]],
@@ -116,6 +117,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams			  = {
+		timeslow_preset	= "commsupport2_disruptorbeam",
+	  },
+	  
       damage                  = {
         default = 800,
       },
@@ -159,6 +164,11 @@ unitDef = {
       beamTime                = 0.1,
       beamttl                 = 52,
       coreThickness           = 0,
+	  
+	  customParams			  = {
+		timeslow_preset	= "commsupport2_slowbeam",
+	  },
+	  
       craterBoost             = 0,
       craterMult              = 0,
 
