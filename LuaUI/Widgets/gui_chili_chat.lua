@@ -77,7 +77,7 @@ end
 
 options_path = "Settings/Interface/Chat/Console"
 options_order = { 'autoHideChat', 'noColorName',  'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
-		'opacity', 'col_text', 'col_ally', 'col_othertext', 'col_dup', 
+		'backgroundOpacity', 'col_text', 'col_ally', 'col_othertext', 'col_dup', 
 		}
 options = {
 	
@@ -166,17 +166,13 @@ options = {
 		value = {1,0.2,0.2,1},
 		OnChange = option_remakeConsole,
 	},
-	opacity = {
-		name = "Opacity",
+	backgroundOpacity = {
+		name = "Background opacity",
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self) 
-			window_console.color = {1,1,1,self.value}
-			scrollpanel1.color = {1,1,1,self.value}
-			stack_console.color = {1,1,1,self.value}
-			window_console:Invalidate() 
+			scrollpanel1.backgroundColor = {1,1,1,self.value}
 			scrollpanel1:Invalidate() 
-			stack_console:Invalidate() 
 		end,
 	}
 
@@ -292,7 +288,7 @@ local function ReshapeConsole()
 		y = 0,
 		bottom = inputtext_inside and 25 or 0,
 		right= inputtext_inside and 0 or 6,
-		skinName="EmptyScrollbar",
+		--skinName="EmptyScrollbar",
 		--horizontalScrollbar = false,
 		verticalSmartScroll = true,
 		disableChildrenHitTest = true,
@@ -481,7 +477,6 @@ function widget:Initialize()
 		itemMargin  = {1,1,1,1},
 		autosize = true,
 		preserveChildrenOrder=true,
-		--color = {1,1,1,options.opacity.value},
 	}
 	
 	scrollpanel1 = ScrollPanel:New{
@@ -493,9 +488,9 @@ function widget:Initialize()
 		right= inputtext_inside and 0 or 6,
 		verticalSmartScroll = true,
 		disableChildrenHitTest = true,
-		skinName="EmptyScrollbar",
-		backgroundColor = {0,0,0,0},
-		--color = {1,1,1,options.opacity.value},
+		--skinName="EmptyScrollbar",
+		--color = {0,0,0,0},
+		backgroundColor = {1,1,1,options.backgroundOpacity.value},
 		children = {
 			stack_console,
 		},
@@ -518,7 +513,7 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
-		color = {1,1,1,options.opacity.value},
+		color = {0,0,0,0},
 		children = {
 			scrollpanel1,
 		},

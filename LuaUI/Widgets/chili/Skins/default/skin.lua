@@ -171,7 +171,7 @@ function _DrawBackground(obj)
   local y = obj.y
   local w = obj.width
   local h = obj.height
-
+	
   gl.Color(obj.backgroundColor)
   gl.Vertex(x,   y)
   gl.Vertex(x,   y+h)
