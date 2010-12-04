@@ -40,7 +40,7 @@ unitDef = {
   maneuverleashlength = [[1280]],
   mass                = 200,
   maxAcc              = 0.1,
-  maxDamage           = 1300,
+  maxDamage           = 975,
   maxVelocity         = 11,
   minCloakDistance    = 75,
   noChaseCategory     = [[TERRAFORM LAND SINK SHIP SWIM FLOAT SUB HOVER]],
@@ -87,9 +87,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 1.2,
-        planes  = 12,
-        subs    = 0.6,
+        default = 0.9,
+        planes  = 9,
+        subs    = 0.1,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

@@ -148,9 +148,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 2,
-        planes  = 20,
-        subs    = 1,
+        default = 1.6,
+        planes  = 16,
+        subs    = 0.1,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

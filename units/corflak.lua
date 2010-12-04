@@ -6,8 +6,8 @@ unitDef = {
   bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 8192,
-  buildCostEnergy               = 800,
-  buildCostMetal                = 800,
+  buildCostEnergy               = 500,
+  buildCostMetal                = 500,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
@@ -22,7 +22,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fr = [[Canon Flak Anti-Air]],
+    description_fr = [[Canon Flak Anti-Air. It's rapid fire and splash damage make it good agaisnt light targets]],
     helptext_fr    = [[Le Cobra est une d?fense Anti-Air de moyenne port?e projetant des balles a fragmentation en l'air. Assez impr?cis mais tirant en zone, il est parfait pour les attaques aeriennes mass?es.]],
   },
 
@@ -70,7 +70,7 @@ unitDef = {
 
     ARMFLAK_GUN = {
       name                    = [[Flak Cannon]],
-      accuracy                = 0,
+      accuracy                = 500,
       areaOfEffect            = 128,
       burnblow                = true,
       canattackground         = false,
@@ -80,9 +80,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 20,
-        planes  = [[200]],
-        subs    = 10,
+        default = 14,
+        planes  = 140,
+        subs    = 0.1,
       },
 
       edgeEffectiveness       = 0.5,
@@ -92,7 +92,7 @@ unitDef = {
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       predictBoost            = 1,
-      range                   = 1200,
+      range                   = 1000,
       reloadtime              = 0.5,
       renderType              = 4,
       soundHit                = [[weapon/flak_hit]],

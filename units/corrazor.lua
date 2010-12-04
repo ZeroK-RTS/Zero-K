@@ -21,11 +21,11 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Laser Anti-Air]],
-    helptext       = [[The Razor's Kiss is a medium anti-air turret. Though inaccurate at its max range, it does well against units flying directly over it and gunships. Its high hit points and armour bonus when closed makes it very hard for the enemy to dislodge.]],
+    helptext       = [[The Razor's Kiss is a hardy anti-air turret. Its high hit points and armour bonus when closed makes it very hard for the enemy to dislodge.]],
     helptext_fr    = [[le Razor est une tourelle Anti-Air de portée moyenne. Enterrée et protégée par un blindage, elle sort et tir avec son laser r haute cadence. Assez imprécise r distance, elle compense par sa solidité.]],
   },
 
-  damageModifier                = 0.25,
+  damageModifier                = 0.2,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,
@@ -33,7 +33,7 @@ unitDef = {
   iconType                      = [[defenseaa]],
   levelGround                   = false,
   mass                          = 230,
-  maxDamage                     = 2200,
+  maxDamage                     = 3400,
   maxSlope                      = 18,
   minCloakDistance              = 150,
   noAutoFire                    = false,
@@ -73,7 +73,7 @@ unitDef = {
 
     corrazor_WEAPON = {
       name                    = [[Anti-Air Laser]],
-      accuracy                = 256,
+      accuracy                = 50,
       areaOfEffect            = 8,
       beamWeapon              = true,
       canattackground         = false,
@@ -84,9 +84,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 2.5,
-        planes  = [[25]],
-        subs    = 1.25,
+        default = 1,
+        planes  = 10,
+        subs    = 0.1,
       },
 
       duration                = 0.02,

@@ -6,8 +6,8 @@ unitDef = {
   bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 65536,
-  buildCostEnergy               = 800,
-  buildCostMetal                = 800,
+  buildCostEnergy               = 900,
+  buildCostMetal                = 900,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
@@ -78,9 +78,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 35,
-        planes  = 350,
-        subs    = 17.5,
+        default = 27,
+        planes  = 270,
+        subs    = 0.1,
       },
 
       explosionGenerator      = [[custom:MISSILE_HIT_PIKES_160]],

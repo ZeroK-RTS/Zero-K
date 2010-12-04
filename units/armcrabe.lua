@@ -16,7 +16,6 @@ unitDef = {
   canPatrol            = true,
   canstop              = [[1]],
   category             = [[LAND]],
-  collisionSphereScale = 0.75,
   copyright            = [[Copyright 1997 Humongous Entertainment. All rights reserved.]],
   corpse               = [[DEAD]],
 
