@@ -495,7 +495,6 @@ local function UpdateFactoryList()
     local unitID = teamUnits[num]
     local unitDefID = GetUnitDefID(unitID)
     if UnitDefs[unitDefID].isFactory then
-	echo ('updating fac list ' .. unitID)
 		local bo =  UnitDefs[unitDefID] and UnitDefs[unitDefID].buildOptions
 		if bo and #bo > 0 then	
 		  push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions })
