@@ -26,7 +26,7 @@ unitDef = {
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {
-    helptext = [[The Inferno is a large AoE fire weapon. Its direct damage is modest, but the fires it creates last for a very long time.]],
+    helptext = [[The Inferno is a large AoE fire weapon. Its direct damage is modest, but the cloud of fire it creates lasts for a very long time.]],
   },
 
   explodeAs                     = [[SMALL_UNITEX]],
@@ -35,7 +35,7 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   mass                          = 260,
-  maxDamage                     = 2000,
+  maxDamage                     = 1000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,

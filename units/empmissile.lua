@@ -10,10 +10,6 @@ unitDef = {
   buildCostEnergy               = 450,
   buildCostMetal                = 450,
   builder                       = false,
-  buildingGroundDecalDecaySpeed = 30,
-  buildingGroundDecalSizeX      = 3,
-  buildingGroundDecalSizeY      = 3,
-  buildingGroundDecalType       = [[empmissile_aoplane.dds]],
   buildPic                      = [[empmissile.png]],
   buildTime                     = 450,
   canAttack                     = true,
@@ -36,7 +32,7 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   mass                          = 243,
-  maxDamage                     = 2000,
+  maxDamage                     = 1000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
@@ -78,7 +74,7 @@ unitDef = {
   weaponDefs                    = {
 
     EMP_WEAPON = {
-      name                    = [[EMPMissile]],
+      name                    = [[EMP Missile]],
       areaOfEffect            = 280,
       avoidFriendly           = false,
       collideFriendly         = false,
@@ -86,11 +82,11 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default        = 36000,
-        commanders     = 3600,
-        empresistant75 = 9000,
-        empresistant99 = 360,
-        planes         = 36000,
+        default        = 30000,
+        commanders     = 3000,
+        empresistant75 = 7500,
+        empresistant99 = 300,
+        planes         = 30000,
       },
 
       edgeEffectiveness       = 1,
