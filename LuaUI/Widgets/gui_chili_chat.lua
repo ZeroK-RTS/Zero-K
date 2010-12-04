@@ -513,9 +513,10 @@ function widget:Initialize()
 		--parent = screen0,
 		--visible = false,
 		--backgroundColor = settings.col_bg,
-		draggable = true,
-		resizable = true,
-		dragUseGrip = true,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
 		color = {1,1,1,options.opacity.value},
 		children = {
