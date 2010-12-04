@@ -10,7 +10,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     experimental = false,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
@@ -169,7 +169,7 @@ options = {
 	opacity = {
 		name = "Opacity",
 		type = "number",
-		value = 1, min = 0, max = 1, step = 0.01,
+		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self) 
 			window_console.color = {1,1,1,self.value}
 			scrollpanel1.color = {1,1,1,self.value}
@@ -286,10 +286,13 @@ local function ReshapeConsole()
 	scrollpanel1:Dispose()
 	scrollpanel1 = ScrollPanel:New{
 		parent = window_console,
+		margin = {0,0,0,0},
+		padding = {5,5,5,5},
 		x = 0,
 		y = 0,
 		bottom = inputtext_inside and 25 or 0,
 		right= inputtext_inside and 0 or 6,
+		skinName="EmptyScrollbar",
 		--horizontalScrollbar = false,
 		verticalSmartScroll = true,
 		disableChildrenHitTest = true,
@@ -302,12 +305,12 @@ local function ReshapeConsole()
 end
 
 local function MakeInputSpace()
-	inputtext_inside = true
-	ReshapeConsole()	
+--	inputtext_inside = true
+---	ReshapeConsole()	
 end
 local function RemoveInputSpace()
-	inputtext_inside = false
-	ReshapeConsole()
+--	inputtext_inside = false
+--	ReshapeConsole()
 end
 
 
@@ -442,7 +445,7 @@ function widget:Update(s)
 		timer = 0
 		spSendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
 			window_console.x / screen0.width + 0.008, 
-			1 - (window_console.y + window_console.height) / screen0.height + 0.01, 
+			1 - (window_console.y + window_console.height + 35) / screen0.height + 0.01, 
 			window_console.width / screen0.width)})
 	end
 end
@@ -467,6 +470,8 @@ function widget:Initialize()
 	Spring.SendCommands("bind Any+enter  chat")
 	
 	stack_console = StackPanel:New{
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
 		x = 0,
 		y = 0,
 		width='100%',
@@ -480,12 +485,16 @@ function widget:Initialize()
 	}
 	
 	scrollpanel1 = ScrollPanel:New{
+		--margin = {5,5,5,5},
+		padding = {5,5,5,5},
 		x = 0,
 		y = 0,
 		bottom = inputtext_inside and 25 or 0,
 		right= inputtext_inside and 0 or 6,
 		verticalSmartScroll = true,
 		disableChildrenHitTest = true,
+		skinName="EmptyScrollbar",
+		backgroundColor = {0,0,0,0},
 		--color = {1,1,1,options.opacity.value},
 		children = {
 			stack_console,
@@ -493,6 +502,8 @@ function widget:Initialize()
 	}
 	
 	window_console = Window:New{  
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
 		dockable = true,
 		name = "chat",
 		x = x,  
