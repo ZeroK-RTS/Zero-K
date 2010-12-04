@@ -65,6 +65,7 @@ unitDef = {
   side                = [[CORE]],
   sightDistance       = 325,
   smoothAnim          = true,
+  sonarDistance       = 350,
   steeringmode        = [[1]],
   TEDClass            = [[CNSTR]],
   terraformSpeed      = 300,
