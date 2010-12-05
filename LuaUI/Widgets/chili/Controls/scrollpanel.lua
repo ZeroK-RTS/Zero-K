@@ -288,7 +288,7 @@ end
 
 
 function ScrollPanel:MouseWheel(x, y, up, value, ...)
-  if self._vscrollbar then
+  if self._vscrollbar and not self.noMouseWheel then
     self.scrollPosY = self.scrollPosY - value*30
     self.scrollPosY = clamp(0, self.contentArea[4] - self.clientArea[4], self.scrollPosY)
     self:Invalidate()

@@ -292,6 +292,7 @@ local function ReshapeConsole()
 		--horizontalScrollbar = false,
 		verticalSmartScroll = true,
 		disableChildrenHitTest = true,
+		noMouseWheel = true,
 		children = {
 			stack_console,
 		},
@@ -491,6 +492,7 @@ function widget:Initialize()
 		--skinName="EmptyScrollbar",
 		--color = {0,0,0,0},
 		backgroundColor = {1,1,1,options.backgroundOpacity.value},
+		noMouseWheel = true,
 		children = {
 			stack_console,
 		},
