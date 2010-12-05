@@ -47,8 +47,8 @@ local echo = Spring.Echo
 
 local iconFormat = ''
 
-local iconTypesPath = "Configs/icontypes.lua"
-local icontypes = VFS.FileExists(iconTypesPath) and include(iconTypesPath)
+local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local color = {}
 

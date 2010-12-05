@@ -42,8 +42,8 @@ local echo = Spring.Echo
 
 local iconFormat = ''
 
-local iconTypesPath = "Configs/icontypes.lua"
-local icontypes = VFS.FileExists(iconTypesPath) and include(iconTypesPath)
+local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local color = {}
 
@@ -1129,6 +1129,7 @@ function widget:Initialize()
 			tweakDraggable = true,
 			backgroundColor = color.tooltip_bg, 
 			children = { stack_leftmargin, stack_main, },
+			padding = {8, 12, 6, 6,},
 		}
 	
 	else
@@ -1139,7 +1140,8 @@ function widget:Initialize()
 			draggable = false,
 			autosize  = true,
 			backgroundColor = color.tooltip_bg, 
-			children = { stack_leftmargin, stack_main, }
+			children = { stack_leftmargin, stack_main, },
+			--padding = {4, 6, 2, 2,},
 		}
 	end
 

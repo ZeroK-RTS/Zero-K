@@ -48,6 +48,10 @@ local strFormat 				= string.format
 local windMin = 0
 local windMax = 2.5
 
+local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
+local iconFormat = '.dds'
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -342,10 +346,14 @@ local function MakeUnitToolTip(unitid)
 			end
 		end}
 	}
+	
+	local iconPath = icontypes 
+			and	icontypes[(ud.iconType or "default")].bitmap
+			or 	'icons/'.. ud.iconType ..iconFormat
 
-	Image:New{
+			Image:New{
 		parent  = window_corner;
-		file    = 'icons/'.. ud.iconType .. '.dds', --iconFormat,
+		file    = iconPath,
 		x       = 0;--57;
 		y       = 0;
 		height  = 20;
