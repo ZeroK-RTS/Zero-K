@@ -49,7 +49,7 @@ options = {
 	disableForBuilders = {
 		name = "Disable for groups of builders",
 		type = 'bool',
-		value = true,
+		value = false,
 		desc = 'This is needed to allow gesture menu for groups of builders. If you want to put workers into formation, use M + left mouse',
 	},
 }

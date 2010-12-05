@@ -107,9 +107,9 @@ options = {
 		name = 'Keyboard/edge scroll speed',
 		desc = 'This speed applies to edge scrolling and keyboard keys.',
 		type = 'number',
-		min = 5,
+		min = 1,
 		max = 50,
-		value = 20,
+		value = 4,
 	},
 	zoominfactor = {
 		name = 'Zoom-in speed',

@@ -10,7 +10,7 @@ local weapons = {
 
 -- radius		- defines size of sphereical area in which damage is dealt
 -- damage		- maximun damage over 1 second that can be dealt to a unit
--- duration		- how long the area damage stays around for
+-- duration		- how long the area damage stays around for (in frames)
 -- rangeFall	- the proportion of damage not dealt increases linearly with distance from 0 to rangeFall at the radius
 -- timeFall		- the proportion of damage not dealt increases linearly with elapsed time from 0 to timeFall at the duration
 

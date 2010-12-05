@@ -314,6 +314,9 @@ function CreateWindow()
 	local function p(a)
 		return tostring(a).."%"
 	end
+	
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	
 	--// WINDOW
 	window = Chili.Window:New{
 		color = {1,1,1,options.opacity.value},
@@ -322,8 +325,9 @@ function CreateWindow()
 		name="ResourceBars",
 		right = 0,
 		y = 0,
-		clientWidth  = 300,
-		clientHeight = 45,
+		x = "63%",
+		clientWidth  = screenWidth*0.28,
+		clientHeight = screenWidth*0.026,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,

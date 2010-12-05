@@ -933,6 +933,8 @@ function widget:Initialize()
 	
 	Spring.SetDrawSelectionInfo(false) 
 	
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	
 	-- setup Chili
 	 Chili = WG.Chili
 	 Button = Chili.Button
@@ -952,8 +954,8 @@ function widget:Initialize()
 
 	window_corner = Window:New{
 		name   = 'unitinfo';
-		x      = 0;
-		y = Chili.Screen.y - window_height - 10;
+		x      = "35%";
+		y = screenHeight - window_height - 10;
 		clientHeight = window_height;
 		clientWidth  = 400;
 		dockable = true,

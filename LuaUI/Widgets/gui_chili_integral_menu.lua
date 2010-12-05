@@ -103,7 +103,6 @@ local MAX_COLUMNS = 6
 local MAX_STATE_ROWS = 5
 local MIN_HEIGHT = 80
 local MIN_WIDTH = 200
-local DEFAULT_WIDTH = 500
 local COMMAND_SECTION_WIDTH = 74	--percent
 local STATE_SECTION_WIDTH = 24	--percent
 
@@ -914,19 +913,22 @@ function widget:Initialize()
 	Control = Chili.Control
 	screen0 = Chili.Screen0
 	
-	local viewWidth,viewHeight = Spring.GetWindowGeometry()
-	local width = (viewWidth-480)
-	local height = 200	
 	--create main Chili elements
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
+	local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
+	
+	Spring.Echo(height)
+	Spring.Echo(y)
+	
 	window = Window:New{
 		parent = screen0,
 		name   = 'integralwindow';
 		color = {0, 0, 0, 0},
-		width = DEFAULT_WIDTH;
-		height = height;
-		--temporary position fudges so it looks right on my screen w/o docking
-		x = 395 + 25; -- default chili selections width + buffer, FIXME later if needed
-		y = viewHeight - height; 
+		width = "35%";
+		height = height; -- keep an aspect ratio regardless of screen ratio
+		x = 0; 
+		y = y; 
 		dockable = true;
 		draggable = false,
 		resizable = false,
@@ -1041,12 +1043,10 @@ function widget:Initialize()
 		max     = 1;
 		color   		= {0.7, 0.7, 0.4, 0.6},
 		backgroundColor = {1, 1, 1, 0.01},
-		--x = 0, y = 0, bottom = "100%", right = "100%",
-		--x=12, y=4, bottom=4, right=12,
-		width = "98%",
-		height = "98%",
-		x = "1%",
-		y = "1.5%",
+		width = "92%",
+		height = "92%",
+		x = "4%",
+		y = "4%",
 		skin=nil,
 		skinName='default',
 	},
