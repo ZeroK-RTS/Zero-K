@@ -130,7 +130,8 @@ options = {
 	invertzoom = {
 		name = 'Invert zoom',
 		type = 'bool',
-		value = Spring.GetConfigInt('ScrollWheelSpeed') < 0 or false,
+		springsetting = 'ScrollWheelSpeed',
+		value = false,
 		desc = 'Invert the scroll wheel direction for zooming and altitude.',
 	},
 	zoomoutfromcursor = {
