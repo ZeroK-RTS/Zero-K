@@ -428,7 +428,7 @@ function Control:SetPos(x, y, w, h, clientArea, dontUpdateRelative)
         self._relativeBounds.top = false
         self._givenBounds.top = false
         self._relativeBounds.bottom = false
-        self._givenBounds.top = false
+        self._givenBounds.bottom = false
         changed = true
       end
     end
