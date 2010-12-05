@@ -72,14 +72,14 @@ unitDef = {
     ROCKET = {
       name                    = [[Rocket]],
       areaOfEffect            = 48,
-      cegTag                  = [[missiletrailredsmall]],
+      cegTag                  = [[missiletrailred]],
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 200,
-        planes  = 200,
-        subs    = 10,
+        default = 250,
+        planes  = 250,
+        subs    = 12.5,
       },
 
       fireStarter             = 70,

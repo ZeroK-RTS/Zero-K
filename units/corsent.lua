@@ -75,38 +75,9 @@ unitDef = {
 
   weaponDefs          = {
 
-    BOGUS_MISSILE = {
-      name                    = [[Missiles]],
-      areaOfEffect            = 48,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 0,
-      },
-
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
-      metalpershot            = 0,
-      range                   = 800,
-      reloadtime              = 0.5,
-      renderType              = 1,
-      startVelocity           = 450,
-      tolerance               = 9000,
-      turnRate                = 33000,
-      turret                  = true,
-      weaponAcceleration      = 101,
-      weaponTimer             = 0.1,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 650,
-    },
-
-
     FLAK          = {
       name                    = [[Flak Cannon]],
-      accuracy                = 0,
+      accuracy                = 100,
       areaOfEffect            = 64,
       burnblow                = true,
       canattackground         = false,
@@ -116,9 +87,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 8.1,
-        planes  = 81,
-        subs    = 4.05,
+        default = 9,
+        planes  = 90,
+        subs    = 4.5,
       },
 
       edgeEffectiveness       = 0.85,

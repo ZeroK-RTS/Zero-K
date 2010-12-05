@@ -78,7 +78,7 @@ unitDef = {
 
     AALASER       = {
       name                    = [[Anti-Air Laser]],
-      accuracy                = 256,
+      accuracy                = 128,
       areaOfEffect            = 8,
       beamWeapon              = true,
       canattackground         = false,
@@ -89,9 +89,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 1.875,
-        planes  = 18.75,
-        subs    = 0.9375,
+        default = 1.2,
+        planes  = 12,
+        subs    = 0.6,
       },
 
       duration                = 0.02,
@@ -107,7 +107,7 @@ unitDef = {
       predictBoost            = 1,
       proximityPriority       = 4,
       range                   = 1040,
-      reloadtime              = 0.18,
+      reloadtime              = 0.12,
       renderType              = 0,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
