@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat",
-    desc      = "v0.39 Chili Chat Console.",
+    desc      = "v0.40 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -76,7 +76,7 @@ local function option_autoHideChanged()
 end 
 
 options_path = "Settings/Interface/Chat/Console"
-options_order = { 'autoHideChat', 'noColorName',  'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
+options_order = { 'autoHideChat', 'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
 		'backgroundOpacity', 'col_text', 'col_ally', 'col_othertext', 'col_dup', 
 		}
 options = {
@@ -174,7 +174,13 @@ options = {
 			scrollpanel1.backgroundColor = {1,1,1,self.value}
 			scrollpanel1:Invalidate() 
 		end,
-	}
+	},
+	mousewheel = {
+		name = "Scroll with mousewheel",
+		type = 'bool',
+		value = false,
+		OnChange = function(self) scrollpanel1.noMouseWheel = not self.value; end,
+	},
 
 }
 
@@ -269,45 +275,21 @@ function remakeConsole()
 end
 
 local function ReshapeConsole()
-	--[[ I wish these worked
-	scrollpanel1.bottom = inputtext_inside and 25 or 0
-	scrollpanel1.right  = inputtext_inside and 0 or 6
+	--scrollpanel1.bottom = inputtext_inside and 35 or 0
 	
-	scrollpanel1:UpdateLayout()
-	scrollpanel1:UpdateClientArea()
-	window_console:UpdateLayout()
-	window_console:UpdateClientArea()
-	--]]
-	
-	scrollpanel1:Dispose()
-	scrollpanel1 = ScrollPanel:New{
-		parent = window_console,
-		margin = {0,0,0,0},
-		padding = {5,5,5,5},
-		x = 0,
-		y = 0,
-		bottom = inputtext_inside and 25 or 0,
-		right= inputtext_inside and 0 or 6,
-		--skinName="EmptyScrollbar",
-		--horizontalScrollbar = false,
-		verticalSmartScroll = true,
-		disableChildrenHitTest = true,
-		noMouseWheel = true,
-		children = {
-			stack_console,
-		},
-	}
-
+	-- Testing with temporary change to Control:SetPosRelative() 
+	--   with signature Control:SetPosRelative(x, y, right, bottom, w, h, ...). Only works sometimes.
+	--scrollpanel1:SetPosRelative(_, _, inputtext_inside and 0 or 1, inputtext_inside and 35 or 0 ) 
 	
 end
 
 local function MakeInputSpace()
---	inputtext_inside = true
----	ReshapeConsole()	
+	inputtext_inside = true
+	ReshapeConsole() -- ****** THIS ONE DOESN'T WORK!
 end
 local function RemoveInputSpace()
---	inputtext_inside = false
---	ReshapeConsole()
+	inputtext_inside = false
+	ReshapeConsole() -- ****** THIS ONE WORKS!
 end
 
 
@@ -441,8 +423,8 @@ function widget:Update(s)
 	if timer > 2 then
 		timer = 0
 		spSendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
-			window_console.x / screen0.width + 0.008, 
-			1 - (window_console.y + window_console.height + 35) / screen0.height + 0.01, 
+			window_console.x / screen0.width + 0.004, 
+			1 - (window_console.y + window_console.height) / screen0.height + 0.01, 
 			window_console.width / screen0.width)})
 	end
 end
@@ -485,14 +467,15 @@ function widget:Initialize()
 		padding = {5,5,5,5},
 		x = 0,
 		y = 0,
-		bottom = inputtext_inside and 25 or 0,
-		right= inputtext_inside and 0 or 6,
+		width = '100%',
+		--height = '100%',
+		bottom = 35, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times!
 		verticalSmartScroll = true,
 		disableChildrenHitTest = true,
 		--skinName="EmptyScrollbar",
 		--color = {0,0,0,0},
 		backgroundColor = {1,1,1,options.backgroundOpacity.value},
-		noMouseWheel = true,
+		noMouseWheel = not options.mousewheel.value,
 		children = {
 			stack_console,
 		},
