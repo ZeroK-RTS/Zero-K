@@ -115,7 +115,7 @@ unitDef = {
       damage                  = {
         default = 0.9,
         planes  = 9,
-        subs    = 0.1,
+        subs    = 0.45,
       },
 
       endsmoke                = [[0]],
@@ -164,7 +164,7 @@ unitDef = {
       damage                  = {
         default = 1.2,
         planes  = 12,
-        subs    = 0.1,
+        subs    = 0.6,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

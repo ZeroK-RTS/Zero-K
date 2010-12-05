@@ -83,7 +83,7 @@ unitDef = {
       damage                  = {
         default = 27,
         planes  = 270,
-        subs    = 0.1,
+        subs    = 13.5,
       },
 
       explosionGenerator      = [[custom:MISSILE_HIT_PIKES_160]],

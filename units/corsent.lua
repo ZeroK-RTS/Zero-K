@@ -118,7 +118,7 @@ unitDef = {
       damage                  = {
         default = 8.1,
         planes  = 81,
-        subs    = 0.1,
+        subs    = 4.05,
       },
 
       edgeEffectiveness       = 0.85,

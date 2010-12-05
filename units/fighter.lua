@@ -144,7 +144,7 @@ unitDef = {
       damage                  = {
         default = 16,
         planes  = 160,
-        subs    = 0.1,
+        subs    = 8,
       },
 
       explosionGenerator      = [[custom:WEAPEXP_PUFF]],
