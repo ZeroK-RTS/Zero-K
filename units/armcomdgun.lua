@@ -25,6 +25,10 @@ unitDef = {
   cloakCost           = 10,
   cloakCostMoving     = 50,
   commander           = true,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[35 35 35]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {

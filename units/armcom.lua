@@ -75,6 +75,10 @@ unitDef = {
   category            = [[LAND FIREPROOF]],
   cloakCost           = 10,
   cloakCostMoving     = 50,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[50 50 50]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   commander           = true,
   corpse              = [[DEAD]],
 

@@ -17,7 +17,10 @@ unitDef = {
   buildTime                     = 420,
   canAttack                     = false,
   category                      = [[SINK UNARMED]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[32 70 32]],
   collisionVolumeTest           = 1,
+  collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

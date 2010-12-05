@@ -15,6 +15,10 @@ unitDef = {
   canstop                = [[1]],
   category               = [[LAND]],
   cloakCost              = 0,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[15 15 15]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
   customParams           = {

@@ -23,6 +23,10 @@ unitDef = {
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = false,
+  collisionVolumeOffsets = [[0 -10 0]],
+  collisionVolumeScales  = [[40 20 40]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[HEAP]],
   cruiseAlt           = 120,
 

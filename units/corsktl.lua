@@ -18,6 +18,10 @@ unitDef = {
   category               = [[LAND]],
   cloakCost              = 5,
   cloakCostMoving        = 15,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[20 15 20]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
     canjump        = [[1]],
