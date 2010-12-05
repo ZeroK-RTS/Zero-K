@@ -15,10 +15,8 @@ function widget:GetInfo()
   local grey   = "\255\192\192\192"
   local yellow = "\255\255\255\128"
   return {
-    name      = "HighlightUnit",
-    desc      = "Highlights the unit or feature under the cursor\n"..
-                grey.."Hold "..yellow.."META"..grey..
-                " to show the unit or feature name",
+    name      = "HighlightUnitZK",
+    desc      = "v.zk.01 (ZKFIX) Highlights the unit or feature under the cursor\n"..
     author    = "trepan",
     date      = "Apr 16, 2007",
     license   = "GNU GPL, v2 or later",
@@ -355,6 +353,7 @@ function widget:DrawWorld()
       end
     end
   end
+  glColor(1,1,1,1)
 end
 
 
