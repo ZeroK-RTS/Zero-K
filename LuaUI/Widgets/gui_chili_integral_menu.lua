@@ -916,21 +916,17 @@ function widget:Initialize()
 	
 	local viewWidth,viewHeight = Spring.GetWindowGeometry()
 	local width = (viewWidth-480)
-	--local height = (viewHeight)
-	--if height > 300 then
-	--	height = 300
-	--end
-	
+	local height = 200	
 	--create main Chili elements
 	window = Window:New{
 		parent = screen0,
 		name   = 'integralwindow';
 		color = {0, 0, 0, 0},
 		width = DEFAULT_WIDTH;
-		height = "20%";
+		height = height;
 		--temporary position fudges so it looks right on my screen w/o docking
 		x = 395 + 25; -- default chili selections width + buffer, FIXME later if needed
-		y = '80%'; 
+		y = viewHeight - height; 
 		dockable = true;
 		draggable = false,
 		resizable = false,

@@ -62,7 +62,7 @@ options = {
 		type = 'number',
 		name = 'Button Size',
 		min = 40, max = 100, step=5,
-		value = 60,
+		value = 50,
 		OnChange = function() RecreateFacbar() end,
 	},
 }
@@ -268,6 +268,8 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 					end
 				end
 			},
+			padding={3, 3, 3, 3},
+			--margin={0, 0, 0, 0},
 			children = {
 				Image:New {
 					file = "#"..unitDefID,
@@ -285,6 +287,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		itemMargin={0,0,0,0},
 		itemPadding={0,0,0,0},
 		padding={0,0,0,0},
+		--margin={0, 0, 0, 0},
 		x=0,
 		width=700,
 		height = options.buttonsize.value,
@@ -297,6 +300,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		itemMargin={0,0,0,0},
 		itemPadding={0,0,0,0},
 		padding={0,0,0,0},
+		--margin={0, 0, 0, 0},
 		x=0,
 		width=700,
 		height = options.buttonsize.value,
@@ -311,6 +315,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		itemMargin={0,0,0,0},
 		itemPadding={0,0,0,0},
 		padding={0,0,0,0},
+		--margin={0, 0, 0, 0},
 		width=800,
 		height = options.buttonsize.value*1.0,
 		resizeItems = false,
@@ -334,8 +339,9 @@ local function MakeButton(unitDefID, facID, facIndex)
 			x=0,
 			width = options.buttonsize.value,
 			height = options.buttonsize.value,
-			padding = {8,8,8,8},
+			padding = {4, 4, 4, 4},
 			--padding = {0,0,0,0},
+			--margin={0, 0, 0, 0},
 			backgroundColor = queueColor,
 			OnClick = {
 				function(_,_,_,button)
@@ -673,7 +679,7 @@ function widget:Initialize()
 		padding = {3,3,3,3,},
 		dockable = true,
 		name = "facbar",
-		x = 0, y = 0,
+		x = 0, y = "30%",
 		width  = 600,
 		height = 200,
 		parent = Chili.Screen0,
