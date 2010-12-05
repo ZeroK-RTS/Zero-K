@@ -1,7 +1,7 @@
 function widget:GetInfo()
    return {
       name      = "UnitShapes",
-      desc      = "0.5.7.zk.01 Draws blended shapes around units and buildings",
+      desc      = "0.5.7.zk.02 Draws blended shapes around units and buildings",
       author    = "Lelousius and aegis, modded Licho, CarRepairer",
       date      = "30.07.2010",
       license   = "GNU GPL, v2 or later",
@@ -435,7 +435,7 @@ end
 
 
 function widget:DrawWorldPreUnit()
-	if (#visibleAllySelUnits + #visibleSelected == 0) then return end
+	if Spring.IsGUIHidden() or (#visibleAllySelUnits + #visibleSelected == 0) then return end
 	
 	glPushAttrib(GL_COLOR_BUFFER_BIT)
 
