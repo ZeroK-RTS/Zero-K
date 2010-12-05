@@ -5,10 +5,6 @@ lflap2, lflap3, lflap4, rupleg, rloleg, rfoot, lupleg, lloleg, lfoot, rftoe, rrt
 static-var  bMoving, bAiming, Static_Var_3, restore_delay, gun1, aimer, regspeed, ready, pace;
 #include "constants.h"
 
-#ifndef MAX_SPEED
-#define MAX_SPEED 75 
-#endif
-
 // Signal definitions
 
 #define SIG_AIM				2
@@ -243,8 +239,8 @@ Create()
 //	pace = get ((MAX_SPEED)*60000); // Sets the walking pace to the current speed of the unit
 	start-script SmokeUnit();
 	start-script MotionControl();
-	gun1 = 0;
-	ready=1;
+	gun1 = 1;
+	ready = 1;
 	aimer = 1;
 }
 
@@ -303,14 +299,8 @@ if (ready == 6)
 	}
 }
 
-AimPrimary(heading, pitch)
+AimWeapon1(heading, pitch)
 {
-if (aimer == 2 OR aimer == 0)
-	{
-	return 0;
-	}
-if (aimer == 1)
-{	
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
 	bAiming = TRUE;
@@ -329,127 +319,48 @@ if (aimer == 1)
 	wait-for-turn torso around y-axis;
 	wait-for-turn lgun around x-axis;	 
 	if (ready == 1)
-		{
-		return (1);
-		}
-	}
-}
-
-AimSecondary(heading, pitch)
-{
-if (aimer == 1 OR aimer == 0)
 	{
-	return 0;
-	}
-if (aimer == 2)
-{	
-	signal SIG_AIM;
-	set-signal-mask SIG_AIM;
-	bAiming = TRUE;
-	start-script RestoreAfterDelay();
-	turn rflap1 to x-axis <-30> speed <168.192308>;
-	turn rflap2 to x-axis <30> speed <168.192308>;
-	turn rflap3 to y-axis <-30> speed <168.192308>;
-	turn rflap4 to y-axis <25> speed <168.192308>;
-	turn lflap1 to x-axis <-30> speed <168.192308>;
-	turn lflap2 to x-axis <30> speed <168.192308>;
-	turn lflap3 to y-axis <-25> speed <168.192308>;
-	turn lflap4 to y-axis <30> speed <168.192308>;	
-	turn rgun to x-axis 0 - pitch speed <168.192308>;
-	turn lgun to x-axis 0 - pitch speed <168.192308>;
-	turn torso to y-axis heading speed <65>;
-	wait-for-turn torso around y-axis;
-	wait-for-turn lgun around x-axis;	 
-		if (ready == 1)
-		{
 		return (1);
-		}
 	}
 }
 
-AimFromPrimary(piecenum)
+AimFromWeapon1(piecenum)
 {
 	piecenum = torso;
 }
 
-AimFromSecondary(piecenum)
-{
-	piecenum = torso;
-}
 
-FirePrimary()
+Shot1()
 {
-if ( aimer == 1)
-	{
+	gun1 = !gun1;
 	if (gun1 == 1)
 	{
-	emit-sfx 1024+0 from fp2;
-	move lbarrel to z-axis [-3.0000] speed [200.000000];
-	sleep 150;
-	move lbarrel to z-axis [0.000000] speed [10.000000];
+		emit-sfx 1024+0 from fp2;
+		move lbarrel to z-axis [-4] speed [200.000000];
+		sleep 150;
+		move lbarrel to z-axis [0] speed [10.000000];
 	}
-	if ( gun1 == 0)
+	else
 	{
-	emit-sfx 1024+0 from fp1;
-	move rbarrel to z-axis [-3.0000] speed [200.000000];
-	sleep 150;
-	move rbarrel to z-axis [0.000000] speed [10.000000];
-	}
-gun1 = 1 - gun1;
+		emit-sfx 1024+0 from fp1;
+		move rbarrel to z-axis [-4] speed [200.000000];
+		sleep 150;
+		move rbarrel to z-axis [0] speed [10.000000];
 	}
 }
 
-Shot2()
-{
-if (aimer == 2)
-{
-	if (gun1 == 1)
-	{
-	emit-sfx 1024+0 from fp2;
-	move lbarrel to z-axis [-3.0000] speed [200.000000];
-	sleep 150;
-	move lbarrel to z-axis [0.000000] speed [20.000000];
-	}
-	if ( gun1 == 0)
-	{
-	emit-sfx 1024+0 from fp1;
-	move rbarrel to z-axis [-3.0000] speed [200.000000];
-	sleep 150;
-	move rbarrel to z-axis [0.000000] speed [20.000000];
-	}
-gun1 = 1 - gun1;
-}
-}
-
-
-QueryPrimary(piecenum)
+QueryWeapon1(piecenum)
 {
 	if ( gun1 == 0)
 	{
-	piecenum = fp1;
+		piecenum = fp1;
 	}
-	if ( gun1 == 1)
+	else
 	{
-	piecenum = fp2;
+		piecenum = fp2;
 	}
 }
 
-QuerySecondary(piecenum)
-{
-	if ( gun1 == 0 )
-	{
-	piecenum = fp1;
-	}
-	if ( gun1 == 1 )
-	{
-	piecenum = fp2;
-	}
-}
-
-SweetSpot(piecenum)
-{
-	piecenum = torso;
-}
 
 Killed(severity, corpsetype)
 {
