@@ -605,10 +605,10 @@ local function GetHelpText(tooltip_type)
 			if showExtendedTip then
 			
 				sc_caption = 
-					'Shift+click: Add 5 to queue.\n'..
-					'Ctrl+click: Add 20 to queue.\n'..
-					'Alt+click: Add one unit to front of queue. \n'..
-					'Rightclick: remove 1 unit from queue.\n'..
+					'Shift+click: x5 multiplier.\n'..
+					'Ctrl+click: x20 multiplier.\n'..
+					'Alt+click: Add units to front of queue. \n'..
+					'Rightclick: remove units from queue.\n'..
 					'Space+click: Show unit stats'
 			else
 				sc_caption = '(Hold Spacebar for help)'
