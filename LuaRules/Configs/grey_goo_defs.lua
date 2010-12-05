@@ -4,8 +4,8 @@ local UPDATE_FREQUNECY = 30
 local units = {
 
 	puppy = { 
-		drain = 10, 
-		cost = 60, 
+		drain = 7.5, 
+		cost = 75, 
 		spawns = "puppy",
 		range = 120
 	},
