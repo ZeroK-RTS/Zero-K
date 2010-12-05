@@ -1147,8 +1147,8 @@ function widget:Shutdown()
 end
 
 options.hidetabs.OnChange = function(self) 
-	fakewindow:SetPosRelative(fakewindow.x, self.value and 0 or '15%', fakewindow.width, self.value and '100%' or '86%')
-	fakewindow:SetPosRelative(fakewindow.x, self.value and 0 or '15%', fakewindow.width, self.value and '100%' or '86%')
+	fakewindow:SetPosRelative(_, self.value and 0 or '15%', _, self.value and '100%' or '86%')
+	fakewindow:SetPosRelative(_, self.value and 0 or '15%', _, self.value and '100%' or '86%')
 	
 	if self.value then 
 		window:RemoveChild(menuTabRow)
