@@ -34,6 +34,7 @@ local spGetUnitWeaponState  = Spring.GetUnitWeaponState
 
 origUnitSpeed = {}
 origUnitReload = {}
+origUnitBuildPower = {}
 
 if not GG.attUnits then
 	GG.attUnits = {}
@@ -83,6 +84,9 @@ local function updateMovementSpeed( unitID, ud, speedFactor)
 	
 		origUnitSpeed[unitID] = {
 			origSpeed = ud.speed,
+			origTurnRate = ud.turnRate,
+			origMaxAcc = ud.maxAcc,
+			origMaxDec = ud.maxDec,
 			movetype = -1,
 		}
 		
@@ -105,10 +109,17 @@ local function updateMovementSpeed( unitID, ud, speedFactor)
 	if Spring.MoveCtrl.GetTag(unitID) == nil then
 		if state.movetype == 0 then
 			Spring.MoveCtrl.SetAirMoveTypeData(unitID, {maxSpeed = state.origSpeed*(1-speedFactor)})
+			Spring.MoveCtrl.SetAirMoveTypeData (unitID, {maxAcc = state.origMaxAcc*(1-speedFactor)})
 		elseif state.movetype == 1 then
 			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {maxSpeed = state.origSpeed*(1-speedFactor)})
+			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {turnRate = state.origTurnRate*(1-speedFactor)})
+			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {accRate = state.origMaxAcc*(1-speedFactor)})
+			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {decRate = state.origMaxDec*(1-speedFactor)})
 		elseif state.movetype == 2 then
 			Spring.MoveCtrl.SetGroundMoveTypeData(unitID, {maxSpeed = state.origSpeed*(1-speedFactor)})
+			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {turnRate = state.origTurnRate*(1-speedFactor)})
+			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {accRate = state.origMaxAcc*(1-speedFactor)})
+			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {decRate = state.origMaxDec*(1-speedFactor)})
 		end
 	end
 	

@@ -1081,7 +1081,7 @@ local spGetMyAllyTeamID = Spring.GetMyAllyTeamID
 local spGetTeamList = Spring.GetTeamList
 local spGetTeamUnits = Spring.GetTeamUnits
 
-local powerTexture = 'Luarules/Images/energy.png'
+local powerTexture = 'Luaui/Images/energy.png'
 
 local floor = math.floor
 
@@ -1321,9 +1321,14 @@ function gadget:DrawWorld()
 	local lowPowerUnits = SYNCED.lowPowerUnits.inner
 	
 	if lowPowerUnits.count > 0 then
+		local spec, fullview = Spring.GetSpectatingState()
+		local myAllyID = Spring.GetMyAllyTeamID()
+
+		spec = spec or fullview
 		gl.Texture(powerTexture )
 		for i = 1, lowPowerUnits.count do
-			if spValidUnitID(lowPowerUnits.units[i]) and spGetUnitDefID(lowPowerUnits.units[i]) then
+			local los = Spring.GetUnitLosState(lowPowerUnits.units[i], myAllyID, false)
+			if spValidUnitID(lowPowerUnits.units[i]) and spGetUnitDefID(lowPowerUnits.units[i]) and ((los and los.los) or spec) then
 				gl.DrawFuncAtUnit(lowPowerUnits.units[i], false, DrawUnitFunc,  UnitDefs[spGetUnitDefID(lowPowerUnits.units[i])].height+30)
 			end
 		end

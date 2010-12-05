@@ -36,7 +36,7 @@ unitDef = {
   idleTime                      = 1800,
   levelGround                   = false,
   mass                          = 318,
-  maxDamage                     = 2500,
+  maxDamage                     = 3000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 5000,
@@ -80,8 +80,8 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 14,
-        planes  = 140,
+        default = 18,
+        planes  = 180,
         subs    = 7,
       },
 
