@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armanni]],
   name                          = [[Annihilator]],
-  description                   = [[Tachyon Accelerator - Requires 50 Power (Counter-Artillery/Anti-Armor)]],
+  description                   = [[Tachyon Accelerator - Requires 50 Power CONNECTED TO IT VIA A POWER GRID to fire]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   bmcode                        = [[0]],
@@ -103,7 +103,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 1250,
-      reloadtime              = 8,
+      reloadtime              = 6,
       renderType              = 0,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
