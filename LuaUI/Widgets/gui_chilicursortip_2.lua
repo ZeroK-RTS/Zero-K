@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.05 Chili Cursor Tooltips.",
+    desc      = "v0.06 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -842,7 +842,7 @@ end
 
 local function MakeToolTip_UD(tt_table)
 	
-	local helptext = GetHelpText( buildType )
+	local helptext = GetHelpText(tt_table.buildType)
 	local iconPath = GetUnitIcon(tt_table.unitDef)
 	
 	local tt_structure = {
