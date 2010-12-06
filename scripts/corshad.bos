@@ -1,6 +1,8 @@
+//linear constant = 65536
+
 #include "constants.h"
 
-piece  fuselage, wingl, wingr, enginel, enginer, finl, finr, bombcent, thrustl, thrustr;
+piece  fuselage, wingl, wingr, enginel, enginer, finl, finr, bombcent, thrustl, thrustr, wingtipl, wingtipr;
 
 static-var  statechg_DesiredState, statechg_StateChanging;
 
@@ -80,10 +82,25 @@ RequestState(requestedstate, currentstate)
 	statechg_StateChanging = FALSE;
 }
 
+Lights()
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		emit-sfx 1024 from wingtipl;
+		emit-sfx 1025 from wingtipr;
+		sleep 2000;
+	}
+}
+
 Create()
 {
 	call-script InitState();
 	start-script SmokeUnit();
+	start-script Lights();
 }
 
 Activate()

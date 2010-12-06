@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corvamp]],
   name                = [[Vamp]],
-  description         = [[Air Superiority Stealth Fighter]],
+  description         = [[Air Superiority Fighter]],
   amphibious          = true,
   buildCostEnergy     = 300,
   buildCostMetal      = 300,

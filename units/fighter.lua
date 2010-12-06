@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[fighter]],
   name                = [[Avenger]],
-  description         = [[Multirole Fighter]],
+  description         = [[Multirole Stealth Fighter]],
   amphibious          = true,
   buildCostEnergy     = 150,
   buildCostMetal      = 150,

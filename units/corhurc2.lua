@@ -50,11 +50,11 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {
-
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
+	  [[custom:light_red]],
+	  [[custom:light_green]],
     },
-
   },
 
   side                = [[CORE]],

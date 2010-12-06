@@ -2,7 +2,7 @@
 
 #include "constants.h"
 
-piece  fuselage, turretbase, turret, sleeve, barrell, barrelr, flarel, flarer, wing, finl, finr, enginel, enginer;
+piece  fuselage, turretbase, turret, sleeve, barrell, barrelr, flarel, flarer, wing, finl, finr, enginel, enginer, wingtipl, wingtipr;
 
 static-var  gun_1, gun_2, statechg_DesiredState, statechg_StateChanging;
 
@@ -56,6 +56,20 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 	}
 }
 
+Lights()
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	while( TRUE )
+	{
+		emit-sfx 1025 from wingtipl;
+		emit-sfx 1026 from wingtipr;
+		sleep 2000;
+	}
+}
+
 InitState()
 {
 	statechg_DesiredState = TRUE;
@@ -94,6 +108,7 @@ Create()
 	gun_2 = 0;
 	call-script InitState();
 	start-script SmokeUnit();
+	start-script Lights();
 	hide turretbase;
 	hide turret;
 	hide sleeve;
@@ -103,12 +118,12 @@ Create()
 
 Activate()
 {
-	start-script RequestState(0);
+	//start-script RequestState(0);
 }
 
 Deactivate()
 {
-	start-script RequestState(1);
+	//start-script RequestState(1);
 }
 
 RestoreAfterDelay()

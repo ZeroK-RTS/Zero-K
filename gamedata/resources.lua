@@ -75,6 +75,7 @@ local resources = {
       blooddrop= "pd/blooddrop.png",
       blooddropwhite= "pd/blooddropwhite.tga",
       bloodsplat= "pd/bloodsplat.tga",
+	  bluelight = "other/light_blue.png",
       bluenovaexplo= "cc/bluenovaexplo.tga",
       bluering= "cc/bluering.tga",
       corelaser= "gpl/corelaser.png",
@@ -83,6 +84,7 @@ local resources = {
       diamondstar= "other/diamondstar.tga",
       dirt= "cc/dirt.png",
       dirtplosion2= "pd/dirtplosion2.tga",
+	  dosray = "pd/dosray.tga",
       dust= "other/dust.tga",
       electnovaexplo= "cc/electnovaexplo.png",
       exp00_1= "gpl/explosion2/exp00_1.tga",
@@ -103,6 +105,7 @@ local resources = {
       flashside1= "cc/flashside1.tga",
       flashside2= "cc/flashside2.tga",
       flowerflash= "pd/flowerflash.tga",
+	  greenlight= "other/light_green.png",
       gunshot= "cc/gunshot.tga",
       kburst= "other/burst.tga",
       kfoam= "other/foam.tga",
@@ -142,7 +145,8 @@ local resources = {
       starexplo= "saktoths/starexplo.tga",
       uglynovaexplo= "cc/uglynovaexplo.tga",
       whitelightb= "pd/whitelightningball.tga",
-	  dosray = "pd/dosray.tga",
+	  whitelightgpl = 'GPL/lightw.png',
+
 	  },
 	},
 }

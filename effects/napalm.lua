@@ -1,5 +1,9 @@
 -- napalm_expl
 -- napalmfireball_piece3
+-- napalmmissile
+-- napalmfireball_missile
+-- firewalker_impact
+-- napalmfireball_firewalker
 
 return {
   ["napalm_expl"] = {
@@ -9,9 +13,9 @@ return {
       flashsize          = 140,
       ttl                = 150,
       color = {
-        [1]  = 0.69999998807907,
-        [2]  = 0.30000001192093,
-        [3]  = 0.10000000149012,
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
       },
     },
     redploom = {
@@ -65,9 +69,9 @@ return {
       flashsize          = 512,
       ttl                = 1000,
       color = {
-        [1]  = 0.69999998807907,
-        [2]  = 0.30000001192093,
-        [3]  = 0.10000000149012,
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
       },
     },
     redploom = {
@@ -133,9 +137,9 @@ return {
       flashsize          = 256,
       ttl                = 450,
       color = {
-        [1]  = 0.69999998807907,
-        [2]  = 0.30000001192093,
-        [3]  = 0.10000000149012,
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
       },
     },
     redploom = {

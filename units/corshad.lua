@@ -48,6 +48,14 @@ unitDef = {
   objectName          = [[spirit.s3o]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
+  
+  sfxtypes            = {
+    explosiongenerators = {
+	  [[custom:light_red]],
+	  [[custom:light_green]],
+    },
+  },
+  
   side                = [[CORE]],
   sightDistance       = 660,
   smoothAnim          = true,
