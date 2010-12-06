@@ -63,6 +63,7 @@ unitDef = {
   sightDistance       = 690,
   smoothAnim          = true,
   speedToFront        = 0,
+  stealth             = true,
   steeringmode        = [[1]],
   TEDClass            = [[VTOL]],
   turnRate            = 839,
