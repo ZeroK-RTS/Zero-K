@@ -1,11 +1,11 @@
 unitDef = {
   unitname            = [[coresupp]],
-  name                = [[Supporter]],
+  name                = [[Typhoon]],
   description         = [[Corvette (Assault/Raider)]],
   acceleration        = 0.0768,
   activateWhenBuilt   = true,
   bmcode              = [[1]],
-  brakeRate           = 0.0421,
+  brakeRate           = 0.042,
   buildAngle          = 16384,
   buildCostEnergy     = 320,
   buildCostMetal      = 320,
@@ -18,11 +18,15 @@ unitDef = {
   canPatrol           = true,
   canstop             = [[1]],
   category            = [[SHIP]],
+  collisionVolumeOffset = [[0 20 -20]],
+  collisionVolumeScales = [[30 35 110]],
+  collisionVolumeTest   = 1,
+  collisionVolumeType   = [[box]],
   corpse              = [[DEAD]],
 
   customParams        = {
     description_fr = [[Corvette d'Assaut/Pillage]],
-    helptext       = [[This Corvette combines high speed, decent armor, and strong firepower at a low cost--for a ship. Use Corvette packs against anything on the surface, but watch out for submarine attacks.]],
+    helptext       = [[The Typhoon is a brawler, combining high speed, decent armor, and strong firepower at a low cost--for a ship. Use corvette packs against anything on the surface, but watch out for submarine attacks.]],
     helptext_fr    = [[La corvette est ? la fois bon-march? et rapide. Son blindage moyen et sa forte puissance de feu laser en font un bon compromis, mais est vuln?rable aux attaques sousmarines. ]],
   },
 

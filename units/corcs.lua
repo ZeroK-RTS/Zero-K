@@ -21,6 +21,10 @@ unitDef = {
   canreclamate        = [[1]],
   canstop             = [[1]],
   category            = [[SHIP UNARMED]],
+  collisionVolumeOffset = [[0 15 -20]],
+  collisionVolumeScales = [[40 40 120]],
+  collisionVolumeTest   = 1,
+  collisionVolumeType   = [[box]],
   corpse              = [[DEAD]],
 
   customParams        = {

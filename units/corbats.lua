@@ -56,8 +56,8 @@ unitDef = {
   
   sfxtypes            = {
     explosiongenerators = {
+	  [[custom:xamelimpact]],
       [[custom:ROACHPLOSION]],
-      [[custom:EXP_MEDIUM_BUILDING_SMALL]],
 	  [[custom:shellshockflash]],
     },
   },

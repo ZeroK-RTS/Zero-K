@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corcrus]],
   name                = [[Executioner]],
-  description         = [[Cruiser (Assault/Anti-Sub)]],
+  description         = [[Cruiser (Shield Bearer/Anti-Sub)]],
   acceleration        = 0.0498,
   activateWhenBuilt   = true,
   bmcode              = [[1]],
@@ -22,7 +22,7 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Croiseur d'Assaut (Anti-Sousmarins)]],
-    helptext       = [[The workhorse of the open seas, the Executioner possesses a hefty complement of weapons: a double-barreled high-energy laser, twin deck lasers, and a depthcharge launcher for fending off sub ambush.]],
+    helptext       = [[A reliable support ship, the Executioner protects nearby ships with its shield. It also possesses a hefty complement of weapons: a double-barreled high-energy laser, twin deck lasers, and a depthcharge launcher for fending off sub ambush.]],
     helptext_fr    = [[Veritable couteau suisse des mers, le Executioner dispose d'un double canon laser lourd, d'un lance grenade sousmarin et d'une tourelle de laser anti-air l?g?re. Capable de se battre contre tout type de menace, il trouve sa place dans toutes les flottes.]],
   },
 
@@ -44,6 +44,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE]],
   objectName          = [[CORCRUS]],
+  onoffable			  = true,
   scale               = [[0.5]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
@@ -100,6 +101,11 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK FLOAT SHIP GUNSHIP]],
     },
+	
+    {
+      def         = [[COR_SHIELD_SMALL]],
+    },
+	
 
   },
 
@@ -196,7 +202,7 @@ unitDef = {
       burstrate               = 0.2,
       canattackground         = true,
       cegTag                  = [[yellowlaser_hlt]],
-      coreThickness           = 0.5,
+      coreThickness           = 0.4,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -206,7 +212,7 @@ unitDef = {
         subs    = 21,
       },
 
-      duration                = 0.05,
+      duration                = 0.1,
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_YELLOW]],
       fireStarter             = 90,
       heightMod               = 1,
@@ -224,13 +230,42 @@ unitDef = {
       soundHit                = [[weapon/laser/corehlt_hit]],
       soundStart              = [[weapon/laser/corehlt_fire]],
       targetMoveError         = 0.2,
-      thickness               = 10.988630487918,
+      thickness               = 7,
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 2120,
     },
 
+    COR_SHIELD_SMALL = {
+      name                    = [[Energy Shield]],
+      craterMult              = 0,
+
+      damage                  = {
+        default = 10,
+      },
+
+      exteriorShield          = true,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      isShield                = true,
+      shieldAlpha             = 0.2,
+      shieldBadColor          = [[1 0.1 0.1]],
+      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldInterceptType     = 3,
+      shieldPower             = 3500,
+      shieldPowerRegen        = 60,
+      shieldPowerRegenEnergy  = 9,
+      shieldRadius            = 350,
+      shieldRepulser          = false,
+      smartShield             = true,
+      texture1                = [[wake]],
+      visibleShield           = true,
+      visibleShieldHitFrames  = 4,
+      visibleShieldRepulse    = true,
+      weaponType              = [[Shield]],
+    },
+	
   },
 
 

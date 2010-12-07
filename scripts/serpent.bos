@@ -1,3 +1,5 @@
+//linear constant = 66536
+
 #include "constants.h"
 
 piece  tube1, tube2, base, wake, wake2;
@@ -28,6 +30,11 @@ StartMoving()
 StopMoving()
 {
 	signal SIG_MOVE;
+}
+
+AimPrimary()
+{
+	return (1);
 }
 
 FirePrimary()

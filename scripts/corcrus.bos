@@ -1,13 +1,12 @@
-#define TA			// This is a TA script
+//linear constant 65536
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, wake1, wake2, box, chrgflare, turret, sleeve, barrels,
        patch, foreturret, foregun, foreflare, aftturret, aftgun, aftflare, flare1,
        flare2;
 
-static-var  gun_1;
+static-var  gun_1, shieldOn;
 
 // Signal definitions
 #define SIG_AIM_3			8
@@ -46,6 +45,17 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 	}
 }
 
+Activate()
+{
+	shieldOn = 1;
+}
+
+Deactivate()
+{
+	shieldOn = 0;
+}
+
+
 Create()
 {
 	hide flare1;
@@ -54,6 +64,7 @@ Create()
 	hide aftflare;
 	gun_1 = 0;
 	start-script SmokeUnit();
+	shieldOn = 1;
 }
 
 RestoreAfterDelay()
@@ -213,6 +224,20 @@ QueryWeapon4(piecenum)
 	piecenum = base;
 }
 
+
+//---------------------------------------------------------------
+//------ WEAPON 5 -----------------------------------------------
+//---------------------------------------------------------------
+AimWeapon5(heading, pitch)
+{
+	sleep 100;
+	return (shieldOn);
+}
+
+FireWeapon5()
+{
+	sleep 100;
+}
 
 //---------------------------------------------------------------
 //------ KILLED -------------------------------------------------

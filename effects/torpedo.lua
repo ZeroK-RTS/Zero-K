@@ -1,5 +1,7 @@
 -- torpedo_hit
 -- torpedo_hit_main
+-- torpedo_trail
+-- torpedo_trail_long
 
 return {
   ["torpedo_hit"] = {
@@ -90,6 +92,52 @@ return {
       },
     },
   },
-
+  
+  ["torpedo_trail"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    largeflash = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = [[0.9 0.9 0.9 0.01 0.8 0.8 0.8 0.01 0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[wake]],
+        length             = 4,
+        sidetexture        = [[wake]],
+        size               = 2,
+        sizegrowth         = 0.4,
+        ttl                = 20,
+      },
+    },
+  },
+  ["torpedo_trail_big"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    largeflash = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = [[0.9 0.9 0.9 0.01 0.8 0.8 0.8 0.01 0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[wake]],
+        length             = 4,
+        sidetexture        = [[wake]],
+        size               = 3,
+        sizegrowth         = 0.4,
+        ttl                = 40,
+      },
+    },
+  },
 }
 

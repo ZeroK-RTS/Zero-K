@@ -22,7 +22,7 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Destroyer Lance-Missile (Support/Anti-Air)]],
-    helptext       = [[This Destroyer packs a powerful, long-range missile, useful for bombarding sea and shore targets and destroying aircraft. Beware of subs and Corvettes.]],
+    helptext       = [[This frigate packs a powerful, long-range missile, useful for bombarding sea and shore targets and destroying aircraft. Beware of subs and Corvettes.]],
     helptext_fr    = [[Le Enforcer embarque deux batteries de missiles: une lourde et longue port?e pour d?truire les navires et les installation c?ti?res, ainsi qu'un batterie longue port?e anti-air. Il est rapide mais peu solide.]],
   },
 
