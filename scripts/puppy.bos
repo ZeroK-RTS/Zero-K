@@ -279,10 +279,16 @@ AimPrimary(heading, pitch)
 	return (1);
 }
 
+lua_PuppyShot()
+{
+	return 0;
+}
+
 Shot1()
 {
 	sleep 1;
-	get KILL_UNIT (get MY_ID);	
+	// get KILL_UNIT (get MY_ID); handled by gadget
+	call-script lua_PuppyShot(1);
 }
 
 Killed(severity, corpsetype)
