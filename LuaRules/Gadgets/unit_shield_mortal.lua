@@ -27,6 +27,8 @@ local shields = {
 	"core_spectre",
 	"corjamt",
 	"coradvcom",
+	"chicken_shield",
+	"chicken_tiamat",
 }
 
 local shieldUnits = {}
