@@ -142,7 +142,7 @@ unitDef = {
       soundStart              = [[weapon/laser/small_laser_fire]],
       soundTrigger            = true,
       targetMoveError         = 0.2,
-      thickness               = 4.79583152331272,
+      thickness               = 4.8,
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[BeamLaser]],
@@ -195,7 +195,7 @@ unitDef = {
       damage                  = {
         default = 6.75,
         planes  = 67.5,
-        subs    = 0.1,
+        subs    = 3.375,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

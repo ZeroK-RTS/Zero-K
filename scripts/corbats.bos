@@ -272,11 +272,26 @@ SweetSpot(piecenum)
 
 Killed(severity, corpsetype)
 {
-	explode barrel11 type BITMAPONLY | BITMAP1;
-	explode barrel22 type BITMAPONLY | BITMAP2;
-	explode ground type BITMAPONLY | BITMAP3;
-	explode turret1 type BITMAPONLY | BITMAP2;
-	explode barrel33 type BITMAPONLY | BITMAP3;
-	explode turret3 type BITMAPONLY | BITMAP4;
-	explode turret2 type BITMAPONLY | BITMAP4;
+	if (severity <= 50)
+	{
+		corpsetype = 1;
+		explode barrel11 type BITMAPONLY;
+		explode barrel22 type BITMAPONLY;
+		explode hull type BITMAPONLY;
+		explode turret1 type BITMAPONLY;
+		explode barrel33 type BITMAPONLY;
+		explode turret3 type BITMAPONLY;
+		explode turret2 type BITMAPONLY;
+	}
+	else
+	{
+		corpsetype = 2;
+		explode barrel11 type FALL | SMOKE | FIRE;
+		explode barrel22 type BITMAPONLY;
+		explode ground type BITMAPONLY;
+		explode turret1 type BITMAPONLY;
+		explode barrel33 type BITMAPONLY;
+		explode turret3 type BITMAPONLY;
+		explode turret2 type BITMAPONLY;
+	}
 }

@@ -1,7 +1,7 @@
 include "constants.lua"
 
 local spGetUnitVelocity = Spring.GetUnitVelocity
-local math = math
+--local math = math
 
 --pieces
 local fuselage = piece "fuselage"
@@ -24,15 +24,15 @@ local flare = piece "flare"
 local smokePiece = {fuselage, engineL, engineR}
 
 --constants
-local tiltAngle = math.rad(3)
-local tiltSpeed = math.rad(5)
+local tiltAngle = math.rad(10)
+local tiltSpeed = math.rad(30)
 local rotorSpeed = math.rad(1080)
 local rotorAccel = math.rad(240)
 local rotorDecel = math.rad(120)
 local pivotSpeed = math.rad(180)
 
 --variables
-
+local tilt = 0
 
 --signals
 local SIG_Aim = 1
@@ -44,9 +44,15 @@ local SIG_Aim = 1
 
 local function Tilt()
 	while true do
-		Sleep(100)
-		local vel = GetUnitValue(CURRENT_SPEED)/60
-		Turn(fuselage, x_axis, tiltAngle * vel, tiltSpeed)
+		Sleep(1500)
+		local vx, vy, vz = spGetUnitVelocity(unitID)
+		local vel = (vx^2 + vz^2)^0.5	--horizontal speed
+		vel = math.max(vel - 1.5, 0)	--counteract jerking
+		--Spring.Echo(vel)
+		tilt = math.min(tiltAngle * vel, math.rad(20))	--cap at 20 degree tilt
+		Turn(fuselage, x_axis, tilt, tiltSpeed)
+		WaitForTurn(fuselage, x_axis)
+		Sleep(30)
 	end
 end
 
@@ -60,7 +66,7 @@ local function RotorStop()
 	StopSpin(rotor2, y_axis, rotorDecel)
 end
 function script.Create()
-	--StartThread(Tilt)
+	StartThread(Tilt)
 	StartThread(RotorStart)
 end
 
@@ -80,7 +86,7 @@ function script.AimWeapon1(heading, pitch)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
 	Turn(pivot, y_axis, heading, pivotSpeed)
-	Turn(pivot, x_axis, -pitch, pivotSpeed)
+	Turn(pivot, x_axis, -pitch - tilt, pivotSpeed)
 	WaitForTurn(pivot, y_axis)
 	WaitForTurn(pivot, x_axis)
 	return true

@@ -50,8 +50,18 @@ unitDef = {
   noChaseCategory        = [[FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[battleship.s3o]],
   radarDistance          = 2400,
+  script				 = [[corbats.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
+  
+  sfxtypes            = {
+    explosiongenerators = {
+      [[custom:ROACHPLOSION]],
+      [[custom:EXP_MEDIUM_BUILDING_SMALL]],
+	  [[custom:shellshockflash]],
+    },
+  },
+
   side                   = [[CORE]],
   sightDistance          = 660,
   smoothAnim             = true,
@@ -143,7 +153,7 @@ unitDef = {
       height           = [[4]],
       hitdensity       = [[100]],
       metal            = 1840,
-      object           = [[CORBATTLESHIP_DEAD]],
+      object           = [[BATTLESHIP_DEAD.s3o]],
       reclaimable      = true,
       reclaimTime      = 1840,
       seqnamereclamate = [[TREE1RECLAMATE]],
