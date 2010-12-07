@@ -24,6 +24,13 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- shortcuts
+local spValidUnitID = Spring.ValidUnitID
+local spAreTeamsAllied = Spring.AreTeamsAllied
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local puppyDefID
 local puppyWeaponID
 
@@ -63,13 +70,25 @@ function gadget:Shutdown()
 end
 
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-  if weaponID == puppyWeaponID and Spring.ValidUnitID(attackerID) and 
-    attackerTeam and unitTeam and not Spring.AreTeamsAllied(unitTeam, attackerTeam) then
-    -- the puppy hit something, destroy it
-    Spring.DestroyUnit(attackerID, false, true)
+  if weaponID == puppyWeaponID and spValidUnitID(attackerID) then
+    if attackerTeam and unitTeam then
+      -- attacker and attacked units are known (both units are alive)
+      if spAreTeamsAllied(unitTeam, attackerTeam) then
+        -- attacked unit is an ally
+        if unitDefID == puppyDefID then
+          -- attacked unit is an allied puppy, cancel damage
+          return 0
+        end
+      else
+        -- attacked unit is an enemy, self-destruct the puppy
+        Spring.DestroyUnit(attackerID, false, true)
+        return damage
+      end
+    end    
   end
+  return damage
 end
 
 
