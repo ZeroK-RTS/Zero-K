@@ -201,7 +201,7 @@ Killed(severity, corpsetype)
 	if( severity <= 50 )
 	{
 		corpsetype = 1;
-				
+		/*		
 		spin hull around x-axis speed <-5>;
 		move hull to y-axis [-4] speed [2];
 		
@@ -215,6 +215,7 @@ Killed(severity, corpsetype)
 		sleep 1000;
 		
 		emit-sfx 1024 from hull;
+		*/
 		explode hull type BITMAPONLY;
 		explode neck type BITMAPONLY;
 		explode turret type SHATTER;

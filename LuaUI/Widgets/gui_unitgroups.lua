@@ -56,7 +56,10 @@ windowHidden
 
 local selectedGroupId = nil
 local slideMode = false	-- used to indicate that the box is moved by the user
-local slideOffset={}
+local slideOffset={
+	right = -1,
+	bottom = -1,
+}
 local slideOffsetChanged={}	-- this table holds two booleans, "right" and "bottom".  if false, then the player has not changed the offset in that direction so 
 -- we just use the screen resolution.  If true, we ignore the screen resolution.
 local oldMouseX = 0
