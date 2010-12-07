@@ -58,8 +58,8 @@ unitDef = {
 
     {
       def                = [[BOMBLET]],
-      badTargetCategory  = [[GUNSHIP FIXEDWING]],
-      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER GUNSHIP FIXEDWING]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER GUNSHIP]],
     },
 
   },
