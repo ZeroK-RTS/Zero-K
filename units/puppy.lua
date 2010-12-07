@@ -97,7 +97,6 @@ unitDef = {
         planes  = 410,
         subs    = 15,
       },
-
       fireStarter             = 70,
       fixedlauncher           = 1,
       flightTime              = 0.8,
@@ -109,7 +108,7 @@ unitDef = {
       model                   = [[puppymissile.s3o]],
       noSelfDamage            = true,
       range                   = 190,
-      reloadtime              = 0.5,
+      reloadtime              = 1,
       renderType              = 1,
       selfprop                = true,
       smokedelay              = [[.1]],

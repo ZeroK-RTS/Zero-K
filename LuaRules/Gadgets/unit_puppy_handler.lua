@@ -33,6 +33,7 @@ local spAreTeamsAllied = Spring.AreTeamsAllied
 
 local puppyDefID
 local puppyWeaponID
+local puppyLosRadius
 
 
 local function HidePuppy(unitID)
@@ -41,6 +42,12 @@ local function HidePuppy(unitID)
   local x, y, z = Spring.GetUnitPosition(unitID)
   Spring.MoveCtrl.SetPosition(unitID, x, y + 1000000, z)
   Spring.SetUnitCloak(unitID, 4)
+  -- Spring.SetUnitSensorRadius(unitID, "los", 0)
+  Spring.SetUnitStealth(unitID, true)
+  Spring.SetUnitNoDraw(unitID, true)
+  -- Spring.SetUnitNoSelect(unitID, true)
+  Spring.SetUnitNoMinimap(unitID, true)
+  Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
 end
 
 
@@ -48,6 +55,12 @@ local function RestorePuppy(unitID, x, y, z)
   Spring.SetUnitCloak(unitID, false)
   Spring.MoveCtrl.SetPosition(unitID, x, y, z)
   Spring.MoveCtrl.Disable(unitID)
+  -- Spring.SetUnitSensorRadius(unitID, "los", puppyLosRadius)
+  Spring.SetUnitStealth(unitID, false)
+  Spring.SetUnitNoDraw(unitID, false)
+  -- Spring.SetUnitNoSelect(unitID, false)
+  Spring.SetUnitNoMinimap(unitID, false)
+  Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
 end
 
 local function PuppyShot(unitID, unitDefID)
@@ -59,7 +72,8 @@ end
 function gadget:Initialize()
   local puppyDef =  UnitDefNames.puppy
   puppyDefID = puppyDef.id
-  puppyWeaponID = puppyDef.weapons[1].weaponDef  
+  puppyWeaponID = puppyDef.weapons[1].weaponDef
+  puppyLosRadius = puppyDef.losRadius
   Script.SetWatchWeapon(puppyWeaponID, true)
   gadgetHandler:RegisterGlobal("PuppyShot", PuppyShot)
 end

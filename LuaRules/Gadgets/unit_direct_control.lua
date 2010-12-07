@@ -48,6 +48,7 @@ local badUnits = {
 	"logkoda",
 	"cormist",
 	"tawf114",
+  "puppy",
 }
 
 local badUnitDefs = {}
