@@ -65,6 +65,7 @@ if (gadgetHandler:IsSyncedCode()) then
       if (#units>10 or ((curTeam) and (cunit.team~=curTeam))) then
         leftunits[#leftunits+1] = cunit;
       else
+		local lus = false
         local x,z = nextUnitX,nextUnitZ;
         nextUnitX = nextUnitX+200;
         if (nextUnitX>=Game.mapSizeX) then nextUnitX,nextUnitZ = 100,nextUnitZ+200 end;
@@ -79,12 +80,14 @@ if (gadgetHandler:IsSyncedCode()) then
         Spring.GiveOrderToUnit(uid,CMD.FIRE_STATE,{0},{});
         Spring.GiveOrderToUnit(uid,CMD.STOP,{},{});
 
-		env = Spring.UnitScript.GetScriptEnv(uid)
-		if env and env.Activate then Spring.UnitScript.CallAsUnit(uid, env.Activate)
+		local env = Spring.UnitScript.GetScriptEnv(uid)
+		if env then lus = true end
+		if lus and env.Activate then Spring.UnitScript.CallAsUnit(uid, env.Activate)
         else Spring.CallCOBScript(uid,"Activate",0) end
 
         if (cunit.move) then
-          Spring.CallCOBScript(uid,"StartMoving",0);
+		  if lus then Spring.UnitScript.CallAsUnit(uid, env.StartMoving)
+          else Spring.CallCOBScript(uid,"StartMoving",0) end
         end;
 
         if (cunit.attack) then
@@ -98,6 +101,7 @@ if (gadgetHandler:IsSyncedCode()) then
 
           Spring.CallCOBScript(uid,"AimTertiary",0,Spring.GetHeadingFromVector(0,1),angle);
           Spring.CallCOBScript(uid,"AimWeapon3",0,Spring.GetHeadingFromVector(0,1),angle);
+
         end;
       end;
     end;

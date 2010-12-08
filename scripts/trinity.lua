@@ -59,7 +59,7 @@ local function BlinkingLight()
 end
 
 local function IdleAnim()
-	while GetUnitValue(unitID, COB.BUILD_PERCENT_LEFT) ~= 0 do Sleep(200) end
+	while GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0 do Sleep(200) end
 	StartThread(BlinkingLight)
 	while true do
 		Turn(dish, x_axis, math.rad(math.random(-65, -30)), math.rad(30) )

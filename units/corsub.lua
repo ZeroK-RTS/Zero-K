@@ -82,7 +82,7 @@ unitDef = {
       avoidFriendly           = false,
       burnblow                = true,
 	  cegTag                  = [[torpedo_trail]],
-      collideFriendly         = true,
+      collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -111,7 +111,7 @@ unitDef = {
       soundHit                = [[explosion/ex_underwater]],
       soundStart              = [[weapon/torpedo]],
       startVelocity           = 90,
-      tolerance               = 42767,
+      tolerance               = 120000,
       tracks                  = true,
       turnRate                = 10000,
       turret                  = false,

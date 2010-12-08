@@ -48,6 +48,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE HOVER]],
   objectName          = [[serpent]],
+  script			  = [[serpent.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   side                = [[ARM]],

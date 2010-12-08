@@ -1,4 +1,4 @@
-#define TA			// This is a TA script
+//linear constant = 65536
 
 #include "constants.h"
 
@@ -796,7 +796,7 @@ Killed(severity, corpsetype)
 		emit-sfx 1026 from turret; //impact
 		//start-script burn();
     	//sleep (1000 * rand (2 , 5)); 
-		sleep (500);
+		sleep (100);
 		corpsetype = 1;
 	}
 

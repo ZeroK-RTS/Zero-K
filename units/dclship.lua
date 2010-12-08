@@ -19,7 +19,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Torpedo Frigate is Nova's method of dealing with subs.]],
+    helptext = [[The Torpedo Frigate is a (relatively) cheap countermeasure to subs, though it can also attack surface targets.]],
   },
 
   defaultmissiontype  = [[Standby]],

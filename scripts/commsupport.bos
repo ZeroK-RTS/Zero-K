@@ -1,4 +1,4 @@
-#define TA			// This is a TA script
+//linear constant = 65536
 
 #include "constants.h"
 
@@ -679,7 +679,7 @@ Killed(severity, corpsetype)
 		sleep 650;
 		//emit-sfx 1026 from turret; //impact
 
-		sleep 500;
+		sleep 100;
 /*
 		explode gun type BITMAPONLY;
 		explode head type BITMAPONLY;
