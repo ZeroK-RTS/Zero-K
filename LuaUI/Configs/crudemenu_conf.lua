@@ -60,27 +60,9 @@ confdata.color = color
 local spSendCommands = Spring.SendCommands
 
 confdata.game_menu_tree = {
-	--{'Pause/Unpause', function(self) spSendCommands{"pause"} end },
 	{'Pause/Unpause', 'pause' },
 	{},
 	{'Share Dialog...', 'sharedialog' },	
-	{'Autogroup', 
-		{
-			{'Clear Groups', function(self) spSendCommands{"luaui autogroup cleargroups"} end },
-			{'Toggle Load Groups', function(self) spSendCommands{"luaui autogroup loadgroups"} end },
-			{'Toggle Verbose', function(self) spSendCommands{"luaui autogroup verbose"} end },
-			{'Toggle Add All', function(self) spSendCommands{"luaui autogroup addall"} end },
-			{},
-			{
-				'AutoGroup Help',
-				'=Autogroup is a widget that places newly built units into groups you can quickly define with keyboard shortcuts. '..
-				'Alt+0-9 sets an number for the unit type(s) you currently have selected. When a new unit is built, it gets added to the group based on this autogroup.'..
-				'Alt+\~ deletes the autogrouping for the selected unit type(s).'..
-				'Ctrl+~ removes the nearest selected unit from its group and selects it. '
-				
-			},
-		}
-	},
 	{'Factory Guard', function() spSendCommands{"luaui togglewidget FactoryGuard"} end },
 
 	{},

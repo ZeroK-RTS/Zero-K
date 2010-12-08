@@ -1,8 +1,8 @@
-local versionNum = '2.25'
+local versionNum = '3.00'
 
 function widget:GetInfo()
   return {
-	name		= "Auto group",
+	name		= "Auto Group",
 	desc 		= "v".. (versionNum) .." Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#. Type '/luaui autogroup help' for help.",
 	author		= "Licho",
 	date		= "Mar 23, 2007",
@@ -30,34 +30,79 @@ include("keysym.h.lua")
 -- LuaUI\Configs\crudemenu_conf.lua need to be adapted with new commands.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local unit2group = {} -- list of unit types to group
+
+local helpText =
+	'Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#.'..
+	'Alt+\~ deletes autogrouping for selected unit type(s).'..
+	'Ctrl+~ removes nearest selected unit from its group and selects it. '
+	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
+
+options_order = { 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'verbose', 'immediate', 'groupnumbers', }
+options_path = 'Game/AutoGroup'
+options = {
+	loadgroups = {
+		name = 'Preserve Auto Groups',
+		desc = 'Preserve auto groupings for next game. Unchecking this clears the groups!',
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			if not self.value then
+				unit2group = {}
+			end
+		end
+	},
+	addall = {
+		name = 'Add All',
+		desc = 'Existing units will be added to group# when setting autogroup#.',
+		type = 'bool',
+		value = false,
+	},
+	verbose = {
+		name = 'Verbose Mode',
+		type = 'bool',
+		value = true,
+	},
+	immediate = {
+		name = 'Immediate Mode',
+		desc = 'Units are added to autogroup as soon as they are built instead of when they go idle.',
+		type = 'bool',
+		value = false,
+	},
+	groupnumbers = {
+		name = 'Display Group Numbers',
+		type = 'bool',
+		value = true,
+	},
+	
+	help = {
+		name = 'Help',
+		type = 'text',
+		value = helpText,
+	},
+	
+	cleargroups = {
+		name = 'Clear Auto Groups',
+		type = 'button',
+		OnChange = function() 
+			unit2group = {} 
+			Spring.Echo('Cleared Autogroups.')
+		end,
+	},
+}
+
 local debug = false --generates debug message
 local finiGroup = {}
-local unit2group = {} -- list of unit types to group
 local myTeam
 local selUnitDefs = {}
 local loadGroups = true
-local verboseMode = true
-local addAll = false
-local immediateMode = false
-local groupNumbers = true
 local createdFrame = {}
 local textColor = {0.7, 1.0, 0.7, 1.0} -- r g b alpha
 local textSize = 13.0
 
 -- gr = groupe selected/wanted
 
-local helpText = {
-	'Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#.',
-	'Alt+\~ deletes autogrouping for selected unit type(s).',
-	'Ctrl+~ removes nearest selected unit from its group and selects it. ',
-	'/luaui autogroup cleargroups -- Clears your autogroupings.',
-	'/luaui autogroup loadgroups -- Toggles whether your groups are re-loaded for all future games.',
-	'/luaui autogroup verbose -- Toggle whether a notification is made when adding/removing autogroups.',
-	'/luaui autogroup addall -- Toggle whether existing units are added to group# when setting autogroup#.',
-	'/luaui autogroup immediate -- Toggle whether built units are directly added to group# when from exiting factory or when rally point reached.',
-	'/luaui autogroup groupnumbers  -- Toggle whether group units have their group number listed next to them.', 
-	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
-}
 -- speedups
 local SetUnitGroup 		= Spring.SetUnitGroup
 local GetSelectedUnits 	= Spring.GetSelectedUnits
@@ -66,7 +111,6 @@ local Echo 				= Spring.Echo
 local GetAllUnits		= Spring.GetAllUnits
 local GetUnitHealth		= Spring.GetUnitHealth
 local GetMouseState		= Spring.GetMouseState
---local GetUnitTeam		= Spring.GetUnitTeam --NOT USED FOR NOW
 local SelectUnitArray	= Spring.SelectUnitArray
 local TraceScreenRay	= Spring.TraceScreenRay
 local GetUnitPosition	= Spring.GetUnitPosition
@@ -87,7 +131,7 @@ end
 
 function widget:DrawWorld()
 	local existingGroups = GetGroupList()
-	if groupNumbers then
+	if options.groupnumbers.value then
 		for inGroup, _ in pairs(existingGroups) do
 			units = GetGroupUnits(inGroup)
 			for _, unit in ipairs(units) do
@@ -124,7 +168,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
-	if immediateMode then
+	if options.immediate.value then
 		if (unitTeam == myTeam) then
 			createdFrame[unitID] = GetGameFrame()
 			local gr = unit2group[unitDefID]
@@ -195,14 +239,14 @@ function widget:KeyPress(key, modifier, isRepeat)
 						unit2group[udid] = gr
 						exec = true
 						SetUnitGroup(unitID, gr)
-						Echo('AUTOGROUP : Add unit ' .. unitID .. 'to group ' .. gr)
+						--Echo('AUTOGROUP : Add unit ' .. unitID .. 'to group ' .. gr)
 					end
 				end
 				if ( exec == false ) then
 					return false --nothing to do
 				end
 				for udid,_ in pairs(selUnitDefIDs) do
-					if verboseMode then
+					if options.verbose.value then
 						if gr then
 							Echo('Added '..  UnitDefs[udid].humanName ..' to autogroup #'.. gr ..'.')
 						else
@@ -210,7 +254,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 						end
 					end
 				end
-				if addAll then
+				if options.addall.value then
 					local myUnits = Spring.GetTeamUnits(myTeam)
 					for _, unitID in pairs(myUnits) do
 						local curUnitDefID = GetUnitDefID(unitID)
@@ -267,24 +311,16 @@ function widget:GetConfigData()
 		end 
 		local ret = 
 		{
-		version 		= versionNum,
-		groups 			= groups,
-		loadGroups 		= loadGroups,
-		verboseMode		= verboseMode,
-		addAll			= addAll,
-		immediatemode	= immediateMode,
+			version 		= versionNum,
+			groups 			= groups,
 		}
 	return ret
 end
 
 function widget:SetConfigData(data)
 	if (data and type(data) == 'table' and data.version and (data.version+0) > 2.1) then
-		loadGroups	= data.loadGroups
-		verbose		= data.verboseMode
-		addAll		= data.addAll
-		immediateMode	= data.immediatemode
 		local groupData	= data.groups
-		if loadGroups and groupData and type(groupData) == 'table' then
+		if groupData and type(groupData) == 'table' then
 			for _, nam in ipairs(groupData) do
 				if type(nam) == 'table' then
 					local gr = UnitDefNames[nam[1]]
@@ -295,40 +331,6 @@ function widget:SetConfigData(data)
 			end
 		end
 	end
-end
-
-function widget:TextCommand(command)
-	if command == "autogroup loadgroups" then
-		loadGroups = not loadGroups
-		Echo('Autogroup: your autogroups will '.. (loadGroups and '' or 'NOT') ..' be preserved for future games') 
-		return true
-	elseif command == "autogroup cleargroups" then
-		unit2group = {}
-		Echo('Autogroup: all autogroups cleared.')
-		return true
-	elseif command == "autogroup verbose" then
-		verboseMode = not verboseMode 
-		Echo('Autogroup: verbose mode '.. (verboseMode and 'ON' or 'OFF') ..'.')
-		return true
-	elseif command == "autogroup addall" then
-		addAll = not addAll
-		Echo('Autogroup: existing units will '.. (addAll and '' or 'NOT') ..' be added to group# when setting autogroup#.')
-		return true
-	elseif command == "autogroup immediate" then
-		immediateMode = not immediateMode
-		Echo('Autogroup: immediate mode registering units from factory is '.. (immediateMode and '' or 'NOT') ..' activated.') 
-		return true
-	elseif command == "autogroup groupnumbers" then
-		groupNumbers = not groupNumbers
-		Echo('Autogroup: group numbers next to group unit are '.. (groupNumbers and '' or 'NOT') ..' shown.') 
-		return true
-	elseif command == "autogroup help" then
-		for i, text in ipairs(helpText) do
-			Echo('['.. i ..'] Autogroup: '.. text)
-		end
-		return true
-	end
-	return false
 end
 
 function printDebug( value )

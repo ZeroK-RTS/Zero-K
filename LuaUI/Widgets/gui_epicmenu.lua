@@ -700,7 +700,7 @@ local function IntegrateWidget(w, addoptions, index)
 	--Add empty onchange function if doesn't exist
 	for k,option in pairs(options) do
 		if not option.OnChange or type(option.OnChange) ~= 'function' then
-			options[k].OnChange = function(self) end
+			w.options[k].OnChange = function(self) end
 		end
 	end	
 	
@@ -737,12 +737,17 @@ local function IntegrateWidget(w, addoptions, index)
 		option.windex = index
 		
 		local origOnChange = w.options[k].OnChange
-		if option.OnChange and option.type ~= 'button' then
+		if option.type ~= 'button' then
 			option.OnChange = 
 				function(self)
 					if self then
 						w.options[k].value = self.value
 					end
+					origOnChange(self)
+				end
+		else
+			option.OnChange = 
+				function(self)
 					origOnChange(self)
 				end
 		end
@@ -1134,10 +1139,12 @@ local function flattenTree(tree, parent)
 			-- [[ doesn't work right for non-buttons
 			if option.windex and option.type == 'button' then 
 				option.OnChange = function(self)
+					--controlfunc(self)
 					origOnChange(option)
 				end
 				widgetHandler.widgets[option.windex].options[option.key].OnChange = function(self)
 					controlfunc(self)
+					--origOnChange(option)
 				end
 			end
 			--]]
