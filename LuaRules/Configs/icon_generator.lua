@@ -290,7 +290,10 @@ unitConfigs = {
   [UnitDefNames.commsupport.id] = {
 	unfold = true,
     --attack = true,
-  }, 
+  },
+  [UnitDefNames.railgunturret.id] = {
+    attempts = 200,
+  },
   [UnitDefNames.fakeunit.id] = {
     empty  = true,
   },

@@ -1,0 +1,178 @@
+unitDef = {
+  unitname                      = [[railgunturret]],
+  name                          = [[Splinter]],
+  description                   = [[Railgun Turret (Anti-Armor)]],
+  activateWhenBuilt             = true,
+  bmcode                        = [[0]],
+  buildCostEnergy               = 700,
+  buildCostMetal                = 700,
+  builder                       = false,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 5,
+  buildingGroundDecalSizeY      = 5,
+  buildingGroundDecalType       = [[railgunturret_decal.dds]],
+  buildPic                      = [[armdeva.png]],
+  buildTime                     = 700,
+  canAttack                     = true,
+  canGuard                      = true,
+  canstop                       = [[1]],
+  category                      = [[FLOAT]],
+  corpse                        = [[DEAD]],
+
+  customParams                  = {
+    description_fr = [[Mitrailleurs Anti-Nuée]],
+    helptext       = [[The Splinter's high velocity gauss cannon slices through enemy armor like a chainsaw through butter.]],
+    helptext_fr    = [[Le Stardust est une tourelle mitrailleuse r haute energie. Son incroyable cadence de tir lui permettent d'arreter quasiment nimporte quelle nuée de Pilleur ou d'unités légcres, cependant sa portée est relativement limitée, et étant prcs du sol nimporte quel obstacle l'empeche de tirer.]],
+  },
+
+  defaultmissiontype            = [[GUARD_NOMOVE]],
+  explodeAs                     = [[LARGE_BUILDINGEX]],
+  floater                       = true,
+  footprintX                    = 4,
+  footprintZ                    = 4,
+  iconType                      = [[defenseheavy]],
+  levelGround                   = false,
+  mass                          = 192,
+  maxDamage                     = 3600,
+  maxSlope                      = 18,
+  minCloakDistance              = 150,
+  noAutoFire                    = false,
+  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName                    = [[railgunturret.s3o]],
+  script                        = [[railgunturret.lua]],
+  seismicSignature              = 4,
+  selfDestructAs                = [[LARGE_BUILDINGEX]],
+  shootme                       = [[1]],
+  side                          = [[ARM]],
+  sightDistance                 = 550,
+  TEDClass                      = [[FORT]],
+  useBuildingGroundDecal        = true,
+  workerTime                    = 0,
+  yardMap                       = [[oooo]],
+
+  weapons                       = {
+
+    {
+      def                = [[GAUSS]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+
+  },
+
+
+  weaponDefs                    = {
+
+    GAUSS = {
+      name                    = [[Gauss Cannon]],
+      alphaDecay              = 0.12,
+      areaOfEffect            = 16,
+      bouncerebound           = 0.15,
+      bounceslip              = 1,
+      cegTag                  = [[gauss_tag_l]],
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 450,
+        planes  = 450,
+        subs    = 22.5,
+      },
+
+      explosionGenerator      = [[custom:gauss_hit_l]],
+      groundbounce            = 1,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 0,
+      lineOfSight             = true,
+      minbarrelangle          = [[-15]],
+      noExplode               = true,
+      noSelfDamage            = true,
+      numbounce               = 40,
+      range                   = 650,
+      reloadtime              = 3,
+      renderType              = 4,
+      rgbColor                = [[0.5 1 1]],
+      separation              = 0.5,
+      size                    = 0.8,
+      sizeDecay               = -0.1,
+      soundHit                = [[weapon/gauss_hit]],
+      soundStart              = [[weapon/gauss_fire]],
+      sprayangle              = 800,
+      stages                  = 32,
+      startsmoke              = [[1]],
+      turret                  = true,
+      waterbounce             = 1,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 900,
+    },
+
+  },
+
+
+  featureDefs                   = {
+
+    DEAD  = {
+      description      = [[Wreckage - Splinter]],
+      blocking         = true,
+      category         = [[arm_corpses]],
+      damage           = 2100,
+      featureDead      = [[DEAD2]],
+      featurereclamate = [[smudge01]],
+      footprintX       = 3,
+      footprintZ       = 3,
+      height           = 100,
+      hitdensity       = 100,
+      metal            = 280,
+      object           = [[railgunturret_dead.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 280,
+      seqnamereclamate = [[tree1reclamate]],
+      world            = [[All Worlds]],
+    },
+
+
+    DEAD2 = {
+      description      = [[Debris - Splinter]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 2100,
+      featureDead      = [[HEAP]],
+      featurereclamate = [[smudge01]],
+      footprintX       = 3,
+      footprintZ       = 3,
+      height           = 4,
+      hitdensity       = 100,
+      metal            = 280,
+      object           = [[debris4x4b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 280,
+      seqnamereclamate = [[tree1reclamate]],
+      world            = [[All Worlds]],
+    },
+
+
+    HEAP  = {
+      description      = [[Debris - Splinter]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 2100,
+      featurereclamate = [[smudge01]],
+      footprintX       = 3,
+      footprintZ       = 3,
+      height           = 4,
+      hitdensity       = 100,
+      metal            = 140,
+      object           = [[debris4x4b.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 140,
+      seqnamereclamate = [[tree1reclamate]],
+      world            = [[All Worlds]],
+    },
+
+  },
+
+}
+
+return lowerkeys({ railgunturret = unitDef })
