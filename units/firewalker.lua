@@ -32,7 +32,7 @@ unitDef = {
   immunetoparalyzer   = [[0]],
   maneuverleashlength = [[640]],
   mass                = 217,
-  maxDamage           = 1200,
+  maxDamage           = 1150,
   maxSlope            = 36,
   maxVelocity         = 1.9,
   maxWaterDepth       = 22,
@@ -84,9 +84,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 200,
-        planes  = 200,
-        subs    = 10,
+        default = 100,
+        planes  = 100,
+        subs    = 5,
       },
 
       explosionGenerator      = [[custom:firewalker_impact]],
@@ -99,7 +99,7 @@ unitDef = {
       noSelfDamage            = true,
 	  projectiles			  = 2,
       range                   = 900,
-      reloadtime              = 8,
+      reloadtime              = 10,
       renderType              = 4,
 	  sprayangle			  = 2048,
       soundHit                = [[weapon/cannon/wolverine_hit]],

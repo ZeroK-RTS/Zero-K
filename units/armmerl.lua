@@ -96,9 +96,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 500,
-        planes  = 500,
-        subs    = 2.5,
+        default = 600,
+        planes  = 600,
+        subs    = 3,
       },
 
       edgeEffectiveness       = 0.5,
@@ -114,7 +114,7 @@ unitDef = {
       model                   = [[wep_m_kickback.s3o]],
       noautorange             = [[1]],
       noSelfDamage            = true,
-      range                   = 1300,
+      range                   = 1400,
       reloadtime              = 10,
       renderType              = 1,
       selfprop                = true,
