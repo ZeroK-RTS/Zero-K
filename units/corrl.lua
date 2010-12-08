@@ -17,7 +17,10 @@ unitDef = {
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[FLOAT]],
+  collisionVolumeOffsets        = [[0 -5 0]],
+  collisionVolumeScales         = [[24 60 24]],
   collisionVolumeTest           = 1,
+  collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

@@ -176,7 +176,7 @@ end
 -- Set reverse velocities
 --
 for name, ud in pairs(UnitDefs) do
-  if ((not ud.tedclass) or ud.tedclass:find("SHIP",1,true) or ud.tedclass:find("TANK",1,true)) then
+  if ud.category and not (ud.category:find("SHIP",1,true) or ud.category:find("SUB",1,true)) then
     if (ud.maxvelocity) then ud.maxreversevelocity = ud.maxvelocity * 0.33 end
   end
 end 

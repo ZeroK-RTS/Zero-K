@@ -69,7 +69,7 @@ unitDef = {
       def                = [[STANDOFF_TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 60,
       onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK FLOAT SHIP GUNSHIP]],
     },
 
@@ -83,7 +83,7 @@ unitDef = {
       areaOfEffect            = 16,
       avoidFriendly           = false,
       burnblow                = true,
-	  cegTag                  = [[torpedo_trail_big]],
+	  --cegTag                  = [[torpedo_trail_big]],
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
@@ -96,7 +96,7 @@ unitDef = {
       explosionGenerator      = [[custom:TORPEDO_HIT]],
 	  flightTime			  = 8,
 	  fireSubmersed			  = true,
-	  fixedLauncher			  = true,
+	  --fixedLauncher			  = true,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -120,7 +120,7 @@ unitDef = {
       turret                  = false,
       waterWeapon             = true,
       weaponAcceleration      = 25,
-      weaponType              = [[MissileLauncher]],
+      weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 250,
     },
 
@@ -135,7 +135,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 2600,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 6,
       footprintZ       = 6,
@@ -148,28 +148,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Serpent]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 2600,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 6,
-      footprintZ       = 6,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 800,
-      object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 800,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Serpent]],

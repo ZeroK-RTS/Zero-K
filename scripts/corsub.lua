@@ -52,6 +52,7 @@ function script.FireWeapon1()
 	tube = not tube
 end
 
+--[[
 function script.BlockShot1()
 	local targID = GetUnitValue(COB.TARGET_ID, 1)
 	if targID < 0 then return false end	--attacking ground
@@ -59,6 +60,7 @@ function script.BlockShot1()
 	local y = Spring.GetGroundHeight(ux, uz)
 	return (y > -3)		--bit of leeway for just being toe deep
 end
+--]]
 
 function script.Killed(recentDamage, maxHealth)
 	Explode( base, SFX.SHATTER )
