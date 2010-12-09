@@ -3,7 +3,7 @@ local array = {}
 local DAMAGE_PERIOD = 2 -- how often damage is applied
 
 local weapons = {
-	napalmmissile_weapon = { radius = 256, damage = 60, duration = 900, rangeFall = 0.6, timeFall = 0.5},
+	napalmmissile_weapon = { radius = 228, damage = 60, duration = 900, rangeFall = 0.6, timeFall = 0.5},
 	slowmissile_weapon = { radius = 512, damage = 3000, duration = 1800, rangeFall = 0, timeFall = 0},
 	firewalker_napalm_mortar = { radius = 128, damage = 40, duration = 450, rangeFall = 0.6, timeFall = 0.5 },
 }

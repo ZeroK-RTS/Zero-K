@@ -9,8 +9,8 @@ local weapons = {
 -- reads from customParams and copies to weapons as appropriate - needed for procedurally generated comms
 -- as always, need better way to handle if upgrades are desired!
 local presets = {
-	commsupport_slowbeam = { slowDamage = 750, onlySlow = true, smartRetarget = true, scaleSlow = true},
-	commsupport2_slowbeam = { slowDamage = 850, onlySlow = true, smartRetarget = true, scaleSlow = true},
+	commsupport_slowbeam = { slowDamage = 450, onlySlow = true, smartRetarget = true, scaleSlow = true},
+	commsupport2_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = true, scaleSlow = true},
 	commsupport2_disruptorbeam = { slowDamage = 8000, scaleSlow = true},
 	commrecon2_slowbomb = { slowDamage = 5000, scaleSlow = true },
 }

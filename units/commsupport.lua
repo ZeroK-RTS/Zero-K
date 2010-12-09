@@ -116,7 +116,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 270,
+        default = 120,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -130,7 +130,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 300,
+      range                   = 350,
       reloadtime              = 1.5,
       renderType              = 0,
       rgbColor                = [[0.4 0 0.5]],

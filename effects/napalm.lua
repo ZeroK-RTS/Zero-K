@@ -163,7 +163,7 @@ return {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_firewalker]],
-        pos                = [[0 r100 r-100, 0 r100 r-100, 0 r100 r-100]],
+        pos                = [[0 r90 r-90, 0 r90 r-90, 0 r90 r-90]],
       },
     },
   },
