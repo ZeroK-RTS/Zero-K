@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[blackdawn]],
   name                = [[Black Dawn]],
-  description         = [[Ground Assault Gunship]],
+  description         = [[Heavy Skirmish Gunship]],
   acceleration        = 0.135,
   amphibious          = true,
   bankscale           = [[1]],
@@ -41,7 +41,7 @@ unitDef = {
   iconType            = [[heavygunship]],
   maneuverleashlength = [[2350]],
   mass                = 341,
-  maxDamage           = 2900,
+  maxDamage           = 2200,
   maxVelocity         = 4.65,
   minCloakDistance    = 75,
   noAutoFire          = false,

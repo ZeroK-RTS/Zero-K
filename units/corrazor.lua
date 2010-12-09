@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[corrazor]],
   name                          = [[Razor's Kiss]],
-  description                   = [[Anti-Air Laser]],
+  description                   = [[Hardened Anti-Air Laser]],
   bmcode                        = [[0]],
   buildAngle                    = 8192,
   buildCostEnergy               = 280,
@@ -109,7 +109,7 @@ unitDef = {
       soundStart              = [[weapon/laser/lasercannon_fire]],
       soundTrigger            = true,
       startsmoke              = [[1]],
-      thickness               = 2.25346954716499,
+      thickness               = 2.25,
       tolerance               = 1000,
       turnRate                = 48000,
       turret                  = true,
