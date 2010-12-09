@@ -366,8 +366,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   if (not jumpDefs[unitDefID]) then
     return
   end 
-  local t = spGetGameSeconds()
-  lastJump[unitID] = t
+  --local t = spGetGameSeconds()
+  lastJump[unitID] = 0
   spInsertUnitCmdDesc(unitID, jumpCmdDesc)
 end
 

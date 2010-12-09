@@ -67,6 +67,8 @@ unitDef = {
       name                    = [[Gauss Cannon]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
+	  burst					  = 2,
+	  burstrate				  = 0.4,
       bouncerebound           = 0.15,
       bounceslip              = 1,
       cegTag                  = [[gauss_tag_l]],
@@ -74,9 +76,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 450,
-        planes  = 450,
-        subs    = 22.5,
+        default = 300,
+        planes  = 300,
+        subs    = 15,
       },
 
       explosionGenerator      = [[custom:gauss_hit_l]],
