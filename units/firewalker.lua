@@ -79,7 +79,7 @@ unitDef = {
     NAPALM_MORTAR = {
       name                    = [[Immolation Mortar]],
       accuracy                = 320,
-      areaOfEffect            = 228,
+      areaOfEffect            = 256,
       craterBoost             = 1,
       craterMult              = 2,
 
