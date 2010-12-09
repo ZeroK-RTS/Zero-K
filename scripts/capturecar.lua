@@ -1,5 +1,7 @@
 include "constants.lua"
 
+local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
+
 local base, front, bigwheel, rear = piece('base', 'front', 'bigwheel', 'rear')
 local turret, arm_1, arm_2, arm_3, dish, panel_a1, panel_b1, panel_a2, panel_b2 = piece('turret', 'arm_1', 'arm_2', 'arm_3', 'dish', 'panel_a1', 'panel_b1', 'panel_a2', 'panel_b2')
 local tracks1, tracks2, tracks3, tracks4, wheels1, wheels2, wheels3, wheels4 = piece('tracks1', 'tracks2', 'tracks3', 'tracks4', 'wheels1', 'wheels2', 'wheels3', 'wheels4')
@@ -107,7 +109,7 @@ function script.AimWeapon(num, heading, pitch)
 	--WaitForTurn(arm_1, x_axis)
 	WaitForTurn(turret, y_axis)
 	StartThread(RestoreAfterDelay)
-	return true
+	return (spGetUnitRulesParam(unitID, "cantfire") == 0)	--checks for max capture
 end
 
 function script.AimFromWeapon(num) return dish end

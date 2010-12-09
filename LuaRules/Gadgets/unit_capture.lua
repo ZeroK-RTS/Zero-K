@@ -36,6 +36,8 @@ local unitKillSubordinatesCmdDesc = {
 --SYNCED
 if gadgetHandler:IsSyncedCode() then
 
+Spring.SetGameRulesParam("cantfire",1)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetUnitDefID        = Spring.GetUnitDefID
@@ -52,19 +54,28 @@ controllers = {}
 
 -- updates capture bar for controllers
 local function updateControllerBar(unitID)
-	if controllers[unitID].captureMax then
-		spSetUnitHealth(unitID, {capture = controllers[unitID].captureUsed/controllers[unitID].captureMax} )
+	if controllers[unitID].unitMax then
+		if controllers[unitID].unitMax == controllers[unitID].totallyControlledUnits then
+			Spring.SetUnitRulesParam(unitID,"cantfire",1, {inlos = true})
+		else
+			Spring.SetUnitRulesParam(unitID,"cantfire",0, {inlos = true})
+		end
 	end
 end
 
 -- remove all capture damage from a unit, does not transfere unit
 local function removeCapturedUnit(unitID, alive)
 	
+	local unitTeam = Spring.GetUnitAllyTeam(unitID)
+	
 	for aTeam, allyData in pairs(capturedUnits[unitID].aTeams) do
 		for id, data in pairs(allyData.attackers) do
 			controllers[id].captureUsed = controllers[id].captureUsed - controllers[id].units[unitID].damage
 			controllers[id].units[unitID] = nil
 			controllers[id].unitCount = controllers[id].unitCount - 1
+			if unitTeam == aTeam then
+				controllers[id].totallyControlledUnits = controllers[id].totallyControlledUnits - 1
+			end
 			updateControllerBar(id)
 		end
 	end
@@ -133,22 +144,30 @@ local function transferController(unitID, aTeam, oldTeam, newTeam)
 	
 end
 
--- removes capture damage dealt by teams other than allyTeam, does not transfere unit
-local function removeOtherCaptureFromUnit(unitID, allyTeam)
+-- removes capture damage dealt by teams other than allyTeam and attackerID, does not transfere unit
+local function removeOtherCaptureFromUnit(unitID, allyTeam, attackerID)
+	
+	local unitTeam = Spring.GetUnitAllyTeam(unitID)
 	
 	if capturedUnits[unitID].originAllyTeam == allyTeam then
 		capturedUnits[unitID].aTeams[allyTeam].degradeTimer = RETAKING_DEGRADE_TIMER
 	end
 	
 	for aTeam, allyData in pairs(capturedUnits[unitID].aTeams) do
-		if allyTeam ~= aTeam then
-			
-			for id, data in pairs(allyData.attackers) do
+		for id, data in pairs(allyData.attackers) do
+			if attackerID ~= id then	
 				controllers[id].captureUsed = controllers[id].captureUsed - controllers[id].units[unitID].damage
 				controllers[id].units[unitID] = nil
 				controllers[id].unitCount = controllers[id].unitCount - 1
+				if allyTeam == aTeam then
+					capturedUnits[unitID].aTeams[aTeam].attackers[id] = nil
+				else
+					controllers[id].totallyControlledUnits = controllers[id].totallyControlledUnits - 1
+				end
 				updateControllerBar(id)
 			end
+		end
+		if allyTeam ~= aTeam then
 			capturedUnits[unitID].aTeams[aTeam] = nil
 		end
 	end
@@ -159,10 +178,15 @@ end
 -- removes capture damage dealt by allyTeam from the unit
 local function removeTeamCaptureFromUnit(unitID, allyTeam)
 	
+	local unitTeam = Spring.GetUnitAllyTeam(unitID)
+	
 	for id, data in pairs(capturedUnits[unitID].aTeams[allyTeam].attackers) do
 		controllers[id].captureUsed = controllers[id].captureUsed - controllers[id].units[unitID].damage
 		controllers[id].units[unitID] = nil
 		controllers[id].unitCount = controllers[id].unitCount - 1
+		if unitTeam == allyTeam then
+			controllers[id].totallyControlledUnits = controllers[id].totallyControlledUnits - 1
+		end
 		updateControllerBar(id)
 	end
 	capturedUnits[unitID].aTeams[allyTeam] = nil
@@ -222,23 +246,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- reset degrade timer for against this allyteam
 	capturedUnits[unitID].aTeams[aTeam].degradeTimer = GENERAL_DEGRADE_TIMER
 	
-	-- if the attacker cannot capture any more units return
-	if controllers[attackerID].captureMax and controllers[attackerID].captureUsed == controllers[attackerID].captureMax then
-		return 0
-	end
-	
 	-- the captured unit rememeber the unitID of it's attacker
 	capturedUnits[unitID].aTeams[aTeam].attackers[attackerID] = true
 	
 	-- take up attacker capture quota
 	controllers[attackerID].captureUsed = controllers[attackerID].captureUsed + newCaptureDamage
-	
-	-- check for values over the capture quota
-	if controllers[attackerID].captureMax and controllers[attackerID].captureUsed > controllers[attackerID].captureMax then
-		local excessCapture = controllers[attackerID].captureUsed - controllers[attackerID].captureMax
-		newCaptureDamage = newCaptureDamage - excessCapture
-		controllers[attackerID].captureUsed = controllers[attackerID].captureMax
-	end
 	
 	-- controller remember how much it is controlling the target unit
 	if not controllers[attackerID].units[unitID] then
@@ -264,7 +276,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		capturedUnits[unitID].aTeams[aTeam].inControl = true
 		
 		-- decide which player on the allyteam controls the unit
-		
+		--[[
 		-- find the player or players with the most control damage on the unit
 		local controllingPlayers = {count = 0, team = {}}
 		local maxCapture = 0
@@ -286,10 +298,14 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 				transferePlayer = controllingPlayers.team [i]
 				break 
 			end
-		end
+		end--]]
+		
+		controllers[attackerID].totallyControlledUnits = controllers[attackerID].totallyControlledUnits + 1
+		
+		removeOtherCaptureFromUnit(unitID, aTeam, attackerID)
 	
 		-- give the unit
-		Spring.TransferUnit(unitID, transferePlayer, false)
+		Spring.TransferUnit(unitID, attackerTeam, false)
 		Spring.GiveOrderToUnit(unitID, CMD_STOP, {}, {})
 		
 		-- destroy the unit if the controller is set to destroy units
@@ -297,7 +313,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			Spring.GiveOrderToUnit(unitID, CMD_SELFD, {}, {})
 		end
 		
-		removeOtherCaptureFromUnit(unitID, aTeam)
+		
 	end
 	
 	updateCapturedUnitBarForTeam(unitID, aTeam)
@@ -341,13 +357,15 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
 	controllers[unitID] = {
-		captureMax = captureUnitDefs[unitDefID].captureQuota,
 		unitMax = captureUnitDefs[unitDefID].unitLimit,
 		captureUsed = 0,
+		totallyControlledUnits = 0,
 		units = {},
 		unitCount = 0,
 		killSubordinates = false,
 	}
+	
+	Spring.SetUnitRulesParam(unitID,"cantfire",0, {inlos = true})
 	
 	Spring.InsertUnitCmdDesc(unitID, unitKillSubordinatesCmdDesc)
 	KillToggleCommand(unitID, {0}, {})
@@ -470,13 +488,7 @@ function gadget:DrawWorld()
 					local los1 = spGetUnitLosState(cid, myTeam, false)
 					local los2 = spGetUnitLosState(id, myTeam, false)
 					if spValidUnitID(cid) and (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(cid) or spIsUnitInView(id)) then
-						local color 
-						if data.captureMax then
-							color = damage.damage/data.captureMax
-						else
-							color = 1
-						end
-						gl.Color(color, color, color, 0.9)
+						gl.Color(1, 1, 1, 0.9)
 						gl.BeginEnd(GL.LINES, DrawFunc, id, cid)
 					end
 				end

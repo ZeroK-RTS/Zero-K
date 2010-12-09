@@ -1005,7 +1005,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 			local _,_,_,_,build  = Spring.GetUnitHealth(unitID)
 			if (build == 1) then
 				AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
-				Spring.Echo(Spring.GetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
+				--Spring.Echo(Spring.GetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
 			end
 		end
 		--if (energyDefs[unitDefID]) then
