@@ -2146,6 +2146,18 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 	terra.lastHealth = newBuild*terraUnitHP
 	terra.lastProgress = newBuild
 
+	-- Bug Safety
+	for i = 1, extraPoints do
+		if math.abs(extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult) > 3000 then
+			Spring.Echo("Terraform:")
+			Spring.Echo("Strange pyramid construction")
+			Spring.Echo("Destroying Terraform Unit")
+			deregisterTerraformUnit(id,index,2)			
+			spDestroyUnit(id,{reclaimed = true})
+			return 0
+		end
+	end
+	
 	local test2 = 0
 	local test3 = 0
 	local func = function()
