@@ -1028,7 +1028,7 @@ local function assignFactory(team,unitID,cQueue)
 	local buildDefs = a.buildDefs
 
 	if #cQueue == 0 or not buildDefs.factoryByDefId[-cQueue[1].id] then 
-		if a.totalBP < a.totalFactoryBPQuota or a.uncompletedFactory ~= false then
+		if (a.totalBP < a.totalFactoryBPQuota or a.uncompletedFactory ~= false) and controlledUnit.factory.count > 0 then
 			
 			--local assistAir = (math.random() < conJob.factory.airFactor)
 

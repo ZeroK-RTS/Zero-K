@@ -9,7 +9,7 @@ function gadget:GetInfo()
     author    = "quantum",
     date      = "June 24, 2008",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = -999,
     enabled   = true  --  loaded by default?
   }
 end
