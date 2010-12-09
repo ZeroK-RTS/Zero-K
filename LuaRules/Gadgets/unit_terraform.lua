@@ -1710,21 +1710,71 @@ local function updateTerraformEdgePoints(id)
 			local edges = 0
 			local edge = {}
 			
+			local spots = {top = false, bot = false, left = false, right = false}
+			
 			if (not area[x-8]) or (not area[x-8][z]) then
-				edges = edges + 1
-				edge[edges] = {x = x-8, z = z}
+				spots.left = true
 			end
 			if (not area[x+8]) or (not area[x+8][z]) then
-				edges = edges + 1
-				edge[edges] = {x = x+8, z = z}
+				spots.right = true
 			end
 			if not area[x][z-8] then
-				edges = edges + 1
-				edge[edges] = {x = x, z = z-8}
+				spots.top = true
 			end
 			if not area[x][z+8] then
+				spots.bot = true
+			end
+			
+			if spots.left then
 				edges = edges + 1
-				edge[edges] = {x = x, z = z+8}
+				edge[edges] = {x = x-8, z = z, check = {count = 1, pos = {[1] = {x = -8, z = 0}, } } }
+				if spots.top then
+					edge[edges].check.count = edge[edges].check.count + 1
+					edge[edges].check.pos[edge[edges].check.count] = {x = 0, z = -8}
+				end
+				if spots.bot then
+					edge[edges].check.count = edge[edges].check.count + 1
+					edge[edges].check.pos[edge[edges].check.count] = {x = 0, z = 8}
+				end
+			end
+			
+			if spots.right then
+				edges = edges + 1
+				edge[edges] = {x = x+8, z = z, check = {count = 1, pos = {[1] = {x = 8, z = 0}, } } }
+				if spots.top then
+					edge[edges].check.count = edge[edges].check.count + 1
+					edge[edges].check.pos[edge[edges].check.count] = {x = 0, z = -8}
+				end
+				if spots.bot then
+					edge[edges].check.count = edge[edges].check.count + 1
+					edge[edges].check.pos[edge[edges].check.count] = {x = 0, z = 8}
+				end
+			end
+			
+			if spots.top then
+				edges = edges + 1
+				edge[edges] = {x = x, z = z-8, check = {count = 1, pos = {[1] = {x = 0, z = -8}, } } }
+				if spots.left then
+					edge[edges].check.count = edge[edges].check.count + 1
+					edge[edges].check.pos[edge[edges].check.count] = {x = -8, z = 0}
+				end
+				if spots.right then
+					edge[edges].check.count = edge[edges].check.count + 1
+					edge[edges].check.pos[edge[edges].check.count] = {x = 8, z = 0}
+				end
+			end
+			
+			if spots.bot then
+				edges = edges + 1
+				edge[edges] = {x = x, z = z+8, check = {count = 1, pos = {[1] = {x = 0, z = 8}, } } }
+				if spots.left then
+					edge[edges].check.count = edge[edges].check.count + 1
+					edge[edges].check.pos[edge[edges].check.count] = {x = -8, z = 0}
+				end
+				if spots.right then
+					edge[edges].check.count = edge[edges].check.count + 1
+					edge[edges].check.pos[edge[edges].check.count] = {x = 8, z = 0}
+				end
 			end
 			
 			if edges ~= 0 then
@@ -1876,6 +1926,7 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						supportZ = terra.point[i].z, 
 						supportH = newHeight,
 						supportID = i,
+						check = terra.point[i].edge[j].check,
 					}
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
@@ -1906,6 +1957,7 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						supportZ = terra.point[i].z, 
 						supportH = newHeight,
 						supportID = i,
+						check = terra.point[i].edge[j].check,
 					}
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
@@ -1937,9 +1989,9 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 		--local maxHeightDifferenceLocal = (abs(extraPoint[i].x-extraPoint[i].supportX) + abs(extraPoint[i].z-extraPoint[i].supportZ))*maxHeightDifference/8+maxHeightDifference
 		-- circular pyramids
 		local maxHeightDifferenceLocal = math.sqrt((extraPoint[i].x-extraPoint[i].supportX)^2 + (extraPoint[i].z-extraPoint[i].supportZ)^2)*maxHeightDifference/8+maxHeightDifference 
-		for j = 1, 4 do
-			local x = checkCoord[j].x + extraPoint[i].x
-			local z = checkCoord[j].z + extraPoint[i].z
+		for j = 1, extraPoint[i].check.count do
+			local x = extraPoint[i].check.pos[j].x + extraPoint[i].x
+			local z = extraPoint[i].check.pos[j].z + extraPoint[i].z
 			--and not (extraPointArea[x] and extraPointArea[x][z])
 			if not (terra.area[x] and terra.area[x][z]) then
 
@@ -1971,6 +2023,7 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						supportZ = extraPoint[i].supportZ, 
 						supportH = extraPoint[i].supportH,
 						supportID = extraPoint[i].supportID,
+						check =  extraPoint[i].check,
 					}
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
@@ -2006,6 +2059,7 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						supportZ = extraPoint[i].supportZ, 
 						supportH = extraPoint[i].supportH,
 						supportID = extraPoint[i].supportID,
+						check =  extraPoint[i].check,
 					}
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
@@ -2095,15 +2149,15 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 	local test2 = 0
 	local test3 = 0
 	local func = function()
-	        for i = 1, terra.points do	
-				test3 = test3 + abs(spGetGroundHeight(terra.point[i].x,terra.point[i].z)-(terra.point[i].orHeight+terra.point[i].diffHeight*progress))
-				spSetHeightMap(terra.point[i].x,terra.point[i].z,terra.point[i].orHeight+terra.point[i].diffHeight*progress)
-	        end 
-			for i = 1, extraPoints do
-				test2 = test2 + abs(spGetGroundHeight(extraPoint[i].x,extraPoint[i].z)-(extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult))
-				spSetHeightMap(extraPoint[i].x,extraPoint[i].z,extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult)
-			end
-		 end
+		for i = 1, terra.points do	
+			test3 = test3 + abs(spGetGroundHeight(terra.point[i].x,terra.point[i].z)-(terra.point[i].orHeight+terra.point[i].diffHeight*progress))
+			spSetHeightMap(terra.point[i].x,terra.point[i].z,terra.point[i].orHeight+terra.point[i].diffHeight*progress)
+		end 
+		for i = 1, extraPoints do
+			test2 = test2 + abs(spGetGroundHeight(extraPoint[i].x,extraPoint[i].z)-(extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult))
+			spSetHeightMap(extraPoint[i].x,extraPoint[i].z,extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult)
+		end
+	end
 	spSetHeightMapFunc(func)
 --[[
 	Spring.Echo("costDiff " .. oldCostDiff)
