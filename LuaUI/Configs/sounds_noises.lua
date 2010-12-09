@@ -465,6 +465,14 @@ local sounds = {
 			[1] = "vehicle_select2",
 		},
 	},
+	capturecar = {
+		ok = {
+			[1] = "vehicle_move",
+		},
+		select = {
+			[1] = "vehicle_select2",
+		},
+	},
 	
 	-- Tank
 	coracv = {
