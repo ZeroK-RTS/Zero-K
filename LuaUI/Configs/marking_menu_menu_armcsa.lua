@@ -114,7 +114,7 @@ local menu_armcsa = {
     items = {
       {
         angle = 0,
-        unit = "armraz"
+        unit = "dante"
       },
       --[[{
         angle = 90,

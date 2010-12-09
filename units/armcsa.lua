@@ -28,7 +28,7 @@ unitDef = {
     [[armdeva]],
     [[corhlt]],
     [[armcomdgun]],
-    [[armraz]],
+    [[dante]],
     [[armraven]],
     [[armbanth]],
     [[gorg]],
