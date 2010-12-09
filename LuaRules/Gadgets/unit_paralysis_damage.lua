@@ -32,7 +32,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam)
 	if paralysisList[weaponID] then
 		attackerID = attackerID or -1
-		Spring.AddUnitDamage(unitID, paralysisList[weaponID].damage, 0, attackerID)
+		Spring.AddUnitDamage(unitID, paralysisList[weaponID].damage*damage/WeaponDefs[weaponID].damages[0], 0, attackerID)
 	end
 	return damage
 end
