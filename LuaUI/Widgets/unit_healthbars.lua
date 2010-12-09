@@ -139,7 +139,7 @@ local barColors = {
   stock   = { 0.50,0.50,0.50,barAlpha },
   reload  = { 0.00,0.60,0.60,barAlpha },
   jump    = { 0.00,0.60,0.60,barAlpha },
-  mana    = { 0.80,0.20,0.90,barAlpha },
+  sheath  = { 0.00,0.20,1.00,barAlpha },
   fuel    = { 0.70,0.30,0.00,barAlpha },
   slow    = { 0.50,0.10,0.70,barAlpha },
   goo     = { 0.50,0.50,0.50,barAlpha },
@@ -660,18 +660,12 @@ do
         end
       end
 
-	  --// MANA
-	  --[[
-	  local manaState = GetUnitRulesParam(unitID,"manaState")
-	  if (manaState or -1) >= 0 then
-		local manaMax = tonumber(UnitDefs[unitDefID].customParams.manamax)
-		manaState = manaState/manaMax
-		if manaState < 1 then
-			AddBar("mana",manaState,"mana",(fullText and floor(manaState*100)..'%') or '')
-		end
-      end	  
-	  ]]--
-	  
+	  --// SHEATH
+	  local sheathState = GetUnitRulesParam(unitID,"sheathState")
+	  if sheathState and (sheathState < 1) then
+			AddBar("sheath",sheathState,"sheath",(fullText and floor(sheathState*100)..'%') or '')
+	  end
+      	  
 	  --// SLOW
       local slowState = GetUnitRulesParam(unitID,"slowState")
       if (slowState and (slowState>0)) then
