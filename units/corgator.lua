@@ -51,7 +51,7 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:THUDMUZZLE]],
+      [[custom:BEAMWEAPON_MUZZLE_RED]],
     },
 
   },
@@ -73,7 +73,7 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[CANNON]],
+      def                = [[GATOR_LASERX]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -83,39 +83,43 @@ unitDef = {
 
   weaponDefs          = {
 
-    CANNON = {
-      name                    = [[Kinetic Cannon]],
+    GATOR_LASERX = {
+      name                    = [[Laser Blaster]],
       areaOfEffect            = 8,
+      beamWeapon              = true,
+      cegTag                  = [[redlaser_ak]],
+      coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 180,
-        planes  = 180,
-        subs    = 9,
+        default = 15,
+        planes  = 15,
+        subs    = 0.829,
       },
 
-      explosionGenerator      = [[custom:INGEBORG]],
+      duration                = 0.02,
+      explosionGenerator      = [[custom:GATORLASERFLASH]],
       fireStarter             = 50,
-	  impactonly			  = true,
+      heightMod               = 1,
+      impactOnly              = true,
       impulseBoost            = 0,
-      impulseFactor           = 0.2,
-      interceptedByShieldType = 2,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
       range                   = 220,
-      reloadtime              = 2,
-      renderType              = 4,
-      soundHit                = [[explosion/ex_med6]],
-      soundHitVolume          = 2,
-      soundStart              = [[weapon/cannon/cannon_fire5]],
-      soundStartVolume        = 2,
-      startsmoke              = [[1]],
-      startVelocity           = 450,
+      reloadtime              = 0.19,
+      renderType              = 0,
+      rgbColor                = [[1 0 0]],
+      soundStart              = [[weapon/laser/small_laser_fire3]],
+      soundTrigger            = true,
+      targetMoveError         = 0.15,
+      thickness               = 3.76646385884692,
+      tolerance               = 10000,
       turret                  = true,
-      weaponAcceleration      = 190,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 450,
+      weaponType              = [[LaserCannon]],
+      weaponVelocity          = 1500,
     },
 
   },
