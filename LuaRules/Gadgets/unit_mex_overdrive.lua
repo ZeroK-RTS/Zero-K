@@ -67,7 +67,7 @@ local HIDDEN_STORAGE = 10000 -- hidden storage: it will spend all energy above (
 
 --local CMD_MEXE = 30666
 
-local SHARED_MODE = Spring.GetModOption('communism',true,true)
+local SHARED_MODE = true --Spring.GetModOption('communism',true,true)
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
