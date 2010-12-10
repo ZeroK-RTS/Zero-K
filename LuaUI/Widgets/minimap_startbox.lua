@@ -408,10 +408,10 @@ function widget:DrawInMiniMap(sx, sz)
         local r, g, b = color[1], color[2], color[3]
         local time = Spring.DiffTimers(Spring.GetTimer(), startTimer)
         local i = 2 * math.abs(((time * 3) % 1) - 0.5)
-        gl.PointSize(11)
+        -- FIXME ATIBUG gl.PointSize(11)
         gl.Color(i, i, i)
         gl.BeginEnd(GL.POINTS, gl.Vertex, x, z)
-        gl.PointSize(7.5)
+        -- FIXME ATIBUG gl.PointSize(7.5)
         gl.Color(r, g, b)
         gl.BeginEnd(GL.POINTS, gl.Vertex, x, z)
       end
@@ -419,7 +419,7 @@ function widget:DrawInMiniMap(sx, sz)
   end
 
   gl.LineWidth(1.0)
-  gl.PointSize(1.0)
+  -- FIXME ATIBUG gl.PointSize(1.0)
   gl.PopAttrib() --reset point smoothing
   gl.PopMatrix()
 end

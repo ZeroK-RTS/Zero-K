@@ -826,7 +826,7 @@ local function DrawLine(x0, y0, c0, x1, y1, c1)
 end
 
 local function DrawPoint(x, y, c, s)
-  glPointSize(s)
+  --FIXME reenable later - ATIBUG glPointSize(s)
   glColor(c)
   glBeginEnd(GL_POINTS, glVertex, x, y)
 end

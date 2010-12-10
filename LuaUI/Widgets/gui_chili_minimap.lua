@@ -5,7 +5,7 @@ function widget:GetInfo()
     author    = "Licho, tweaked by CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
-    layer     = -math.huge,
+    layer     = -100000,
     experimental = false,
     enabled   = true --  loaded by default?
   }

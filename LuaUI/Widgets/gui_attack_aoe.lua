@@ -469,14 +469,14 @@ local function DrawBallisticScatter(scatter, v, fx, fy, fz, tx, ty, tz, trajecto
   end
   
   glLineWidth(scatterLineWidthMult / mouseDistance)
-  glPointSize(pointSizeMult / mouseDistance)
+  -- FIXME ATIBUG  glPointSize(pointSizeMult / mouseDistance)
   glColor(scatterColor)
   glDepthTest(false)
   glBeginEnd(GL_LINES, VertexList, bars)
   glBeginEnd(GL_POINTS, VertexList, vertices)
   glDepthTest(true)
   glColor(1,1,1,1)
-  glPointSize(1)
+  -- FIXME ATIBUG  glPointSize(1)
   glLineWidth(1)
 end
 
