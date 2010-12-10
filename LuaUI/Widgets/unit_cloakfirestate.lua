@@ -37,13 +37,9 @@ local exceptionArray = {}	--used by the widget code; don't mess with this kthx
 
 local cloakUnit = {}	--stores the desired fire state when decloaked of each unitID
 
-local function IsFactory(udef)
-	return udef.TEDClass == "PLANT" or udef.isFactory
-end
-
 function widget:UnitCloaked(unitID, unitDefID, teamID)
 	local ud = UnitDefs[unitDefID]
-	if (teamID ~= team) or not ud.canMove or exceptionArray[ud.name] or IsFactory(UnitDefs[unitDefID]) then return end
+	if (teamID ~= team) or (not ud.canMove) or exceptionArray[ud.name] or ud.isFactory or not (ud.canCloak) then return end	--only affects units with intrinsic cloak, i.e. not just anything under a field
 	local states = GetUnitStates(unitID)
 	cloakUnit[unitID] = states.firestate	--store last state
 	if states.firestate ~= 0 then
