@@ -31,7 +31,7 @@ local modrules  = {
 
 
   repair = {
-    energyCostFactor = 1,  -- defaults to 0
+    energyCostFactor = 1/3,  -- defaults to 0
   },
 
 

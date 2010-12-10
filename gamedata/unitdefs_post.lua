@@ -294,6 +294,19 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- 3x repair speed than BP
+--
+
+for name, unitDef in pairs(UnitDefs) do
+	if (unitDef.repairspeed) then
+		unitDef.repairspeed = unitDef.repairspeed * 3
+	elseif (unitDef.workertime) then 
+		unitDef.repairspeed = unitDef.workertime * 3
+    end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Lasercannons going through units fix
 -- 
 
