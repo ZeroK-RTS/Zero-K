@@ -370,7 +370,7 @@ local function DrawEvent(event)
   glColor(color)
 
   local scale = minPixels + pixels
-
+  
   glPushMatrix()
   glTranslate(event.x, 0, event.z)
   glScale(scale * pxScale, 1, scale * pyScale)
@@ -380,6 +380,7 @@ end
 
 
 local function DrawDamage(damage)
+
   local px, py, pz = spGetUnitViewPosition(damage.u)
   if (px == nil) then
     return
@@ -387,11 +388,11 @@ local function DrawDamage(damage)
 
 
   local pixels = damage.v
+  
   if (pixels > 0) then
     glColor(damageColor)
-
-    local scale = minPixels + pixels
-
+	local scale = minPixels + pixels
+	
     glPushMatrix()
     glTranslate(px, 0, pz)
     glScale(scale * pxScale, 1, scale * pyScale)
@@ -422,6 +423,7 @@ function widget:DrawInMiniMap(xSize, ySize)
       (next(damageMap) == nil)) then
     return
   end
+ 
 --  glSmoothing(false, false, false)
 --  glBlending(GL_SRC_ALPHA, GL_ONE)
   glLineWidth(lineWidth)
@@ -434,8 +436,9 @@ function widget:DrawInMiniMap(xSize, ySize)
 
   glLoadIdentity()
   glTranslate(0, 1, 0)
-  glScale(1 / xMapSize, 1 / yMapSize, 1)
-  glRotate(90, 1, 0, 0)
+  glScale(1 / xMapSize, -1 / yMapSize,1)
+  glRotate(270, 1, 0, 0)
+
 
   -- draw damages before events
   for _,damage in pairs(damageMap) do
