@@ -1,7 +1,7 @@
 include("colors.h.lua")
 include("keysym.h.lua")
 
-local versionNumber = "6.2.4"
+local versionNumber = "6.2.5"
 
 function widget:GetInfo()
 	return {
@@ -19,6 +19,7 @@ end
 -- to do : include chicken buildings.
 
 ---- CHANGELOG -----
+-- Google Frog          v6.2.5  (11dec2010) :   moved all range display config to chilli menu. Removed extraneous configs
 -- versus666,			v6.2.4	(04nov2010)	:	added widget name over buttons when in tweak mode, cleared than a plain box + widget name in tooltips when hovering over buttons.
 -- versus666,			v6.2.3	(04nov2010)	:	added hacksaw to unit list + defRangeNoButtons var & checks due to licho's request, need to add var to option menu.
 												made defRangeNoButtons = true & all ranges visible by default until there is a decent (chili?)gui to enable/disable ranges or buttons. Change at will but use the damn changelog to show who, when, what and how. Thanks.
@@ -33,243 +34,8 @@ end
 
 -- CONFIGURATION
 local debug = false --generates debug messages when set to true.
-local defRangeNoButtons = true -- true = do not show 2-3 buttons range selectors.
 
 local modConfig = {}
--- BA
---to support other mods
---table initialized and unitList is needed!
-modConfig["BA"] = {}
-modConfig["BA"]["unitList"] =
-{
-	armclaw = { weapons = { 1 } },
-	cormaw = { weapons = { 1 } },
-	armllt = { weapons = { 1 } },
-	tawf001 = { weapons = { 1 } },
-	armhlt = { weapons = { 1 } },
-	armguard = { weapons = { 1, 1 } },
-	armrl = { weapons = { 2 } }, --light aa
-	packo = { weapons = { 2 } },
-	armcir = { weapons = { 2 } }, --chainsaw
-	armdl = { weapons = { 1 } }, --depthcharge
-	ajuno = { weapons = { 1 } },
-	armtl = { weapons = { 1 } }, --torp launcher
-	armfhlt = { weapons = { 1 } },  --floating hlt
-	armfrt = { weapons = { 2 } },  --floating rocket laucher
-
-	armamb = { weapons = { 1,1 } }, --ambusher
-	armpb = { weapons = { 1 } }, --pitbull
-	armanni = { weapons = { 1 } },
-	armflak = { weapons = { 2 } },
-	mercury = { weapons = { 2 } },
-	armemp = { weapons = { 1 } },
-	armamd = { weapons = { 3 } }, --antinuke
-
-	armbrtha = { weapons = { 1 } },
-	armvulc = { weapons = { 1 } },
-
-	--CORE
-	corexp = { weapons = { 1 } },
-	cormaw = { weapons = { 1 } },
-	corllt = { weapons = { 1 } },
-	hllt = { weapons = { 1 } },
-	corhlt = { weapons = { 1 } },
-	corpun = { weapons = { 1, 1 } },
-	corrl = { weapons = { 2 } },
-	madsam = { weapons = { 2 } },
-	corerad = { weapons = { 2 } },
-	cordl = { weapons = { 1 } },
-	cjuno = { weapons = { 1 } },
-
-	corfhlt = { weapons = { 1 } },  --floating hlt
-	cortl = { weapons = { 1 } }, --torp launcher
-	corfrt = { weapons = { 2 } }, --floating rocket laucher
-
-	cortoast = { weapons = { 1 } },
-	corvipe = { weapons = { 1 } },
-	cordoom = { weapons = { 1 } },
-	corflak = { weapons = { 2 } },
-	screamer = { weapons = { 2 } },
-	cortron = { weapons = { 1 } },
-	corfmd = { weapons = { 3 } },
-	corint = { weapons = { 1 } },
-	corbuzz = { weapons = { 1 } }
-}
---uncomment this if you want dps-depending ring-colors
---colors will be interpolated by dps scores between min and max values. values outside range will be set to nearest value in range -> min or max
-modConfig["BA"]["armorTags"] = {}
-modConfig["BA"]["armorTags"]["air"] = "vtol"
-modConfig["BA"]["armorTags"]["ground"] = "else"
-modConfig["BA"]["dps"] = {}
-modConfig["BA"]["dps"]["ground"] = {}
-modConfig["BA"]["dps"]["air"] = {}
-modConfig["BA"]["dps"]["ground"]["min"] = 50
-modConfig["BA"]["dps"]["ground"]["max"] = 500
-modConfig["BA"]["dps"]["air"]["min"] = 80
-modConfig["BA"]["dps"]["air"]["max"] = 500
---end of dps-colors
---uncomment this if you want custom colors - we dont want it for BA
---[[
-modConfig["BA"]["color"] = {}
-modConfig["BA"]["color"]["enemy"] = {}
-modConfig["BA"]["color"]["enemy"]["ground"] = {}
-modConfig["BA"]["color"]["enemy"]["air"] = {}
-modConfig["BA"]["color"]["enemy"]["nuke"] = {}
-modConfig["BA"]["color"]["enemy"]["ground"]["min"] = { 1.0, 0.0, 0.0 }
-modConfig["BA"]["color"]["enemy"]["ground"]["max"] = { 1.0, 1.0, 0.0 }
-modConfig["BA"]["color"]["enemy"]["air"]["min"] = { 0.0, 1.0, 0.0 }
-modConfig["BA"]["color"]["enemy"]["air"]["max"] = { 0.0, 0.0, 1.0 }
-modConfig["BA"]["color"]["enemy"]["nuke"] =  { 1.0, 1.0, 1.0 }
-modConfig["BA"]["color"]["ally"] = modConfig["BA"]["color"]["enemy"]
---]]
---end of custom colors
---end of BA
-
--- XTA
---to support other mods
---table initialized and unitList is needed!
-modConfig["XTA"] = {}
-modConfig["XTA"]["unitList"] = {
-	--ARM
-	arm_light_laser_tower = { weapons = { 1 } },
-	arm_sentinel = { weapons = { 1 } },
-	arm_ambusher = { weapons = { 1 } },
-	arm_defender = { weapons = { 2 } },
-	arm_floating_light_laser_tower = { weapons = { 1 } },
-	arm_stingray = { weapons = { 1 } },
-	arm_sentry = { weapons = { 2 } },
-	arm_torpedo_launcher = { weapons = { 1 } },
-	arm_repulsor = { weapons = { 3 } },
-	arm_advanced_torpedo_launcher = { weapons = { 1 } },
-	armanni = { weapons = { 1 } },
-	arm_naval_flakker = { weapons = { 2 } },
-	arm_protector = { weapons = { 3 } },
-	arm_flakker = { weapons = { 2 } },
-	arm_guardian = { weapons = { 1 } },
-	arm_annihilator = { weapons = { 1 } },
-	arm_big_bertha = { weapons = { 1 } },
-	arm_vulcan = { weapons = { 1 } },
-	armarch = { weapons = { 2 } },
-
-	--CORE
-	core_light_laser_tower = { weapons = { 1 } },
-	core_floating_light_laser_tower = { weapons = { 1 } },
-	core_torpedo_launcher = { weapons = { 1 } },
-	core_gaat_gun = { weapons = { 1 } },
-	core_toaster = { weapons = { 1 } },
-	core_pulverizer = { weapons = { 2 } },
-	core_cobra = { weapons = { 2 } },
-	core_punisher = { weapons = { 1 } },
-	core_fortitude_missile_defense = { weapons = { 3 } },
-	core_viper = { weapons = { 1 } },
-	core_immolator = { weapons = { 1 } },
-	core_doomsday_machine = { weapons = { 1 } },
-	core_intimidator = { weapons = { 1 } },
-	core_buzzsaw = { weapons = { 1 } },
-	screamer = { weapons = { 2 } },
-	core_thunderbolt = { weapons = { 1 } },
-	core_stinger = { weapons = { 2 } },
-	core_naval_cobra = { weapons = { 2 } },
-	core_advanced_torpedo_launcher = { weapons = { 1 } },
-	core_resistor = { weapons = { 3 } }
-}
-
---uncomment this if you want dps-depending ring-colors
---colors will be interpolated by dps scores between min and max values. values outside range will be set to nearest value in range -> min or max
-modConfig["XTA"]["armorTags"] = {}
-modConfig["XTA"]["armorTags"]["air"] = "group_landair"
-modConfig["XTA"]["armorTags"]["ground"] = "default"
-modConfig["XTA"]["dps"] = {}
-modConfig["XTA"]["dps"]["ground"] = {}
-modConfig["XTA"]["dps"]["air"] = {}
-modConfig["XTA"]["dps"]["ground"]["min"] = 50
-modConfig["XTA"]["dps"]["ground"]["max"] = 500
-modConfig["XTA"]["dps"]["air"]["min"] = 80
-modConfig["XTA"]["dps"]["air"]["max"] = 500
---end of dps-colors
---uncomment this if you want custom colors - we dont want it for BA
---[[
-modConfig["XTA"]["color"] = {}
-modConfig["XTA"]["color"]["enemy"] = {}
-modConfig["XTA"]["color"]["enemy"]["ground"] = {}
-modConfig["XTA"]["color"]["enemy"]["air"] = {}
-modConfig["XTA"]["color"]["enemy"]["nuke"] = {}
-modConfig["XTA"]["color"]["enemy"]["ground"]["min"] = { 1.0, 0.0, 0.0 }
-modConfig["XTA"]["color"]["enemy"]["ground"]["max"] = { 1.0, 1.0, 0.0 }
-modConfig["XTA"]["color"]["enemy"]["air"]["min"] = { 0.0, 1.0, 0.0 }
-modConfig["XTA"]["color"]["enemy"]["air"]["max"] = { 0.0, 0.0, 1.0 }
-modConfig["XTA"]["color"]["enemy"]["nuke"] =  { 1.0, 1.0, 1.0 }
-modConfig["XTA"]["color"]["ally"] = modConfig["BA"]["color"]["enemy"]
---]]
---end of custom colors
---end of XTA
-
--- CA
-modConfig["CA"] = {}
-modConfig["CA"]["unitList"] =
-{
-	--ARM
-	armamd = { weapons = { 3 } },		--antinuke
-	armrl = { weapons = { 4 } },
-	armllt = { weapons = { 1 } },
-	armhlt = { weapons = { 1 } },
-	armartic = { weapons = { 1 } },
-	armdeva = { weapons = { 1 } },
-	armpb = { weapons = { 1 } },
-	mahlazer = { weapons = { 1 } },
-
-	armemp = { weapons = { 1 } },
-	mercury = { weapons = { 2 } },
-
-	armanni = { weapons = { 1 } },
-	armbrtha = { weapons = { 1 } },		--bertha
-
-	armarch = { weapons = { 2 } },		--packo
-	armcir = { weapons = { 2 } },		--chainsaw
-
-	armdl = { weapons = { 1 } },
-
-	armtd = { weapons = { 1 } },		--torpedo launcher
-	armatl = { weapons = { 1 } },		--adv torpedo launcher
-
-	--CORE
-	corrl = { weapons = { 4 } },
-	corllt = { weapons = { 1 } },
-	corhlt = { weapons = { 1 } },
-	corpre = { weapons = { 1 } },
-	corvipe = { weapons = { 1 } },
-	cordoom = { weapons = { 1 } },
-	cordl = { weapons = { 1 } },		--jellyfish
-
-	corrazor = { weapons = { 2 } },
-	corflak = { weapons = { 2 } },
-	screamer = { weapons = { 2 } },
-
-	cortron = { weapons = { 1 } },
-
-	corint = { weapons = { 1 } },		--bertha
-	corbhmth = { weapons = { 1 } },		--behemoth
-
-	cortl = { weapons = { 1 } },		--torpedo launcher
-	coratl = { weapons = { 1 } },		--adv torpedo launcher
-
-	corfmd = { weapons = { 3 } }		--antinuke
-}
---uncomment this if you want dps-depending ring-colors
---colors will be interpolated by dps scores between min and max values. values outside range will be set to nearest value in range -> min or max
-modConfig["CA"]["armorTags"] = {}
-modConfig["CA"]["armorTags"]["air"] = "planes"
-modConfig["CA"]["armorTags"]["ground"] = "else"
-modConfig["CA"]["dps"] = {}
-modConfig["CA"]["dps"]["ground"] = {}
-modConfig["CA"]["dps"]["air"] = {}
-modConfig["CA"]["dps"]["ground"]["min"] = 90
-modConfig["CA"]["dps"]["ground"]["max"] = 750 --doomsday does 450 and 750
-modConfig["CA"]["dps"]["air"]["min"] = 90
-modConfig["CA"]["dps"]["air"]["max"] = 400 --core flak
---end of dps-colors
---end of CA
-
 -- CA1F
 modConfig["CA1F"] = {}
 modConfig["CA1F"]["unitList"] =
@@ -337,39 +103,29 @@ colorConfig["enemy"]["nuke"] =  { 1.0, 1.0, 1.0 }
 colorConfig["ally"] = colorConfig["enemy"]
 --end of DEFAULT COLOR CONFIG
 
+local Chili
+options_path = 'Settings/Interface/Defence Ranges'
+
+options = { 
+	allyground = {name = 'Show Ally Ground Defence', type = 'bool', value = false},
+	allyair = {name = 'Show Ally Air Defence', type = 'bool', value = false},
+	allynuke = {name = 'Show Ally Nuke Defence', type = 'bool', value = true},
+	enemyground = {name = 'Show Enemy Ground Defence', type = 'bool', value = true},
+	enemyair = {name = 'Show Enemy Air Defence', type = 'bool', value = true},
+	enemynuke = {name = 'Show Enemy Nuke Defence', type = 'bool', value = true}
+}
+
+options_order = {
+	'allyground',
+	'allyair',
+	'allynuke',
+	'enemyground',
+	'enemyair',
+	'enemynuke'
+}
 
 --Button display configuration
 --position only relevant if no saved config data found
-local buttonConfig = {}
-buttonConfig["posPercRight"] = 0.98
-buttonConfig["posPercBottom"] = 0.8
-buttonConfig["defaultScreenResY"] = 1050 --do not change
-buttonConfig["defaultWidth"] = 23 --size in pixels in default screen resolution
-buttonConfig["defaultWidth"] = 23 --size in pixels in default screen resolution
-buttonConfig["spacingy"] = 3
-buttonConfig["spacingx"] = 3
-buttonConfig["borderColor"] = { 0, 0, 0, 1.0 }
-buttonConfig["currentHeight"] = 0 --do not change
-buttonConfig["currentWidth"] = 0 --do not change
-buttonConfig["nextOrigin"] = {{0,0}, 0, 0, 0, 0} --do not change
-buttonConfig["enabled"] = { ally = { ground = false, air = false, nuke = false }, enemy = { ground = true, air = true, nuke = true } }
-
-buttonConfig["highlightColor"] = { 1.0, 1.0, 0.0, 1.0 }
-buttonConfig["baseColorEnemy"] = { 0.6, 0.0, 0.0, 0.6 }
-buttonConfig["baseColorAlly"] = { 0.0, 0.3, 0.0, 0.6 }
-buttonConfig["enabledColorAlly"] = { 0.0, .80, 0.0, 1.9 }
-buttonConfig["enabledColorEnemy"] = { 1.00, 0.0, 0.0, 0.95 }
-
-
-local tooltips = {
-	[-1] = 'DefenseRange by very_bad_soldier',
-	[1] = 'Display ally ground defense (on/off)',
-	[2] = 'Display enemy ground defense (on/off)',
-	[3] = 'Display ally air defense (on/off)',
-	[4] = 'Display enemy air defense (on/off)',
-	[5] = 'Display ally nuke defense (on/off)',
-	[6] = 'Display enemy nuke defense (on/off)'
-}
 
 local defences = {}
 local currentModConfig = {}
@@ -381,7 +137,6 @@ updateTimes["line"] = 0
 updateTimes["removeInterval"] = 1 --configurable: seconds for the ::update loop
 
 local state = {}
-state["screenx"], state["screeny"] = widgetHandler:GetViewSizes()
 state["curModID"] = nil
 state["myPlayerID"] = nil
 
@@ -450,15 +205,12 @@ local weapTab				= WeaponDefs
 
 --functions
 local printDebug
-local UpdateButtons
 local AddButton
 local DetectMod
 local SetButtonOrigin
 local DrawButtonGL
 local ResetGl
 local GetButton
-local ButtonAllyPressed
-local ButtonEnemyPressed
 local GetColorsByTypeAndDps
 local UnitDetected
 local GetColorByDps
@@ -473,7 +225,6 @@ function widget:Initialize()
 
 	DetectMod()
 
-	UpdateButtons()
 end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
@@ -635,207 +386,9 @@ function GetColorByDps( dps, isEnemy, typeStr )
 	return color
 end
 
-function SetButtonOrigin(coords, xlen, ylen, xstep, ystep)
-  buttonConfig["nextOrigin"] = {coords, xlen, ylen, xstep, ystep}
-end
-
-function UpdateButtons()
-	--resize buttons depening on screen resolution
-	ResizeButtonsToScreen()
-
-	buttons = {}
-
-	local maxx = floor( state["screenx"] * buttonConfig["posPercRight"] + 0.5 )
-	local maxy = floor( state["screeny"] * buttonConfig["posPercBottom"] + 0.5 )
-
-	local xSpace = buttonConfig["spacingx"] * ( buttonConfig["currentWidth"] / buttonConfig["defaultWidth"] )
-	local ySpace = buttonConfig["spacingy"] * ( buttonConfig["currentWidth"] / buttonConfig["defaultWidth"] )
-
-	local ButtonYStep = 0 - (buttonConfig["currentHeight"]  + ySpace)
-	local ButtonXStep = 0
-
-	SetButtonOrigin({maxx, maxy}, buttonConfig["currentWidth"], buttonConfig["currentHeight"] , ButtonXStep, ButtonYStep)
-
-	AddButton(1, "LuaUI/Images/tank_icon_32.png", (buttonConfig["currentWidth"] + xSpace), 0)
-	AddButton(2, "LuaUI/Images/tank_icon_32.png", -(buttonConfig["currentWidth"] + xSpace), ButtonYStep )
-
-	AddButton(3, "LuaUI/Images/air_icon_32.png", (buttonConfig["currentWidth"] + xSpace), 0)
-	AddButton(4, "LuaUI/Images/air_icon_32.png", -(buttonConfig["currentWidth"] + xSpace), ButtonYStep)
-
-	AddButton(5, "LuaUI/Images/nuke_icon_32.png", (buttonConfig["currentWidth"] + xSpace), 0 )
-	AddButton(6, "LuaUI/Images/nuke_icon_32.png", -(buttonConfig["currentWidth"] + xSpace), ButtonYStep)
-end
-
-function AddButton(index, title, xstep, ystep )
-	if (buttons[index]) then
-		error('plugin: internal error. Adding button with a repeated index: '..index..'. Old: '..buttons[index][2]..', new: '..title)
-	end
-
-	local cur_coords = buttonConfig["nextOrigin"][1]
-	local xlen = buttonConfig["nextOrigin"][2]
-	local ylen = buttonConfig["nextOrigin"][3]
-
-	if ( xstep == nil ) then
-		xstep = buttonConfig["nextOrigin"][4]
-	end
-	if ( ystep == nil ) then
-		ystep = buttonConfig["nextOrigin"][5]
-	end
-
-	local corner_coords = {cur_coords[1] - xlen, cur_coords[2] - ylen}
-
-	table.insert(buttons, {index, title, {corner_coords, cur_coords}} )
-	local new_coords = {cur_coords[1] + xstep, cur_coords[2] + ystep}
-	buttonConfig["nextOrigin"] = {new_coords, xlen, ylen, xstep, ystep}
-end
-
-function widget:ViewResize(viewSizeX, viewSizeY)
-	state["screenx"] = viewSizeX
-	state["screeny"] = viewSizeY
-
-	UpdateButtons()
-end
-
-function widget:DrawScreen()
-
-	if spIsGUIHidden() or defRangeNoButtons then
-		return
-	end
-
-	local mx,my,lmb,mmb,rmb = spGetMouseState()
-	local currButton = GetButton(mx, my)
-	local highlightIndex = (currButton and currButton[1]) or -1
-
-	for num, data in pairs(buttons) do
-		local doHighLight = false
-		if (highlightIndex == data[1]) then
-			doHighLight = true
-		end
-		local coords = data[3]
-
-		local enemy = true
-		if ( num % 2 > 0 ) then
-			enemy = false
-		end
-
-		local enabled = false
-		if ( num == 1 and buttonConfig["enabled"]["ally"]["ground"] ) then
-			enabled = true
-		elseif ( num == 2 and buttonConfig["enabled"]["enemy"]["ground"] ) then
-			enabled = true
-		elseif ( num == 3 and buttonConfig["enabled"]["ally"]["air"] ) then
-			enabled = true
-		elseif ( num == 4 and buttonConfig["enabled"]["enemy"]["air"] ) then
-			enabled = true
-		elseif ( num == 5 and buttonConfig["enabled"]["ally"]["nuke"] ) then
-			enabled = true
-		elseif ( num == 6 and buttonConfig["enabled"]["enemy"]["nuke"] ) then
-			enabled = true
-		end
-
-		DrawButtonGL(data[2], coords[1][1], coords[1][2], coords[2][1], coords[2][2], doHighLight, enemy, enabled)
-	end
-
-	ResetGl()
-end
-
-function DrawButtonGL(text, xmin, ymin, xmax, ymax, highlight, enemy, enabled )
-	-- draw button body
-	local bgColor = buttonConfig["baseColorAlly"]
-	if ( enemy ) then
-		if (enabled) then
-			bgColor = buttonConfig["enabledColorEnemy"]
-		else
-			bgColor = buttonConfig["baseColorEnemy"]
-		end
-	else
-		if (enabled) then
-			bgColor = buttonConfig["enabledColorAlly"]
-		else
-			bgColor = buttonConfig["baseColorAlly"]
-		end
-	end
-
- -- draw colored background rectangle
-	glColor( bgColor )
-	glTexture(false)
-	glTexRect( xmin, ymin, xmax, ymax )
-
- -- draw icon
-	glColor( { 1.0, 1.0, 1.0} )
-
-	glTexture( ":n:" .. text)
-
-  local texBorder = 0.71875
- -- glShape(GL_QUADS, { { v = { xmin, ymin }, t = { 0.0, texBorder} }, { v = { xmax, ymin }, t = { texBorder, texBorder} },
- --   { v = { xmax, ymax }, t = { texBorder, 0.0} }, { v = { xmin, ymax }, t = { 0.0, 0.0} }  })
-	glTexRect( xmin, ymin, xmax, ymax, 0.0, texBorder, texBorder, 0.0 )
-	glTexture(false)
-   -- draw the outline
-	if (highlight) then
-		glColor(buttonConfig["highlightColor"])
-	else
-		glColor(buttonConfig["borderColor"])
-	end
-	local function Draw()
-	glVertex(xmin, ymin)
-	glVertex(xmax, ymin)
-	glVertex(xmax, ymax)
-	glVertex(xmin, ymax)
-	end
-	glBeginEnd(GL_LINE_LOOP, Draw)
-end
-
 function ResetGl()
 	glColor( { 1.0, 1.0, 1.0, 1.0 } )
 	glLineWidth( 1.0 )
-end
-
-function GetButton(x, y)
-	for num, data in pairs(buttons) do
-		local coords = data[3]
-		if (x > coords[1][1] and x < coords[2][1] and y > coords[1][2] and y < coords[2][2] ) then
-			return buttons[num]
-		end
-	end
-	return nil
-end
-
-function widget:MousePress(x, y, button)
-	local buttondata = GetButton(x, y)
-	if (not buttondata) or defRangeNoButtons then
-		return false
-	end
-	return true
-end
-
-function ButtonAllyPressed(tag)
-	buttonConfig["enabled"]["ally"][tag] = not buttonConfig["enabled"]["ally"][tag]
-end
-
-function ButtonEnemyPressed(tag)
-	buttonConfig["enabled"]["enemy"][tag] = not buttonConfig["enabled"]["enemy"][tag]
-end
-
-function widget:MouseRelease(x, y, button)
-	local buttondata = GetButton(x, y)
-		if (not buttondata) or defRangeNoButtons then
-			return false
-		end
-		if (button > 1) then
-			return -1
-		end
-
-	local buttonIndex = buttondata[1]
-	if (buttonIndex == 1) then ButtonAllyPressed("ground") end
-	if (buttonIndex == 2) then ButtonEnemyPressed("ground") end
-	if (buttonIndex == 3) then ButtonAllyPressed("air") end
-	if (buttonIndex == 4) then ButtonEnemyPressed("air") end
-	if (buttonIndex == 5) then ButtonAllyPressed("nuke") end
-	if (buttonIndex == 6) then ButtonEnemyPressed("nuke") end
-
-	UpdateButtons()
-	return -1
 end
 
 function CheckSpecState()
@@ -915,14 +468,6 @@ function DetectMod()
 		printDebug("Game-specfic color configuration loaded")
 	end
 	printDebug( "<DefenseRange>: ModName: " .. Game.modName .. " Detected Mod: " .. state["curModID"] )
-end
-
-function ResizeButtonsToScreen()
-	state["screenx"], state["screeny"] = widgetHandler:GetViewSizes()
-	--printDebug("Old Width:" .. ButtonWidthOrg .. " vsy: " .. vsy )
-	buttonConfig["currentWidth"] = ( state["screeny"] / buttonConfig["defaultScreenResY"] ) * buttonConfig["defaultWidth"]
-	buttonConfig["currentHeight"] = buttonConfig["currentWidth"]
-	--printDebug("New Width:" .. ButtonWidth )
 end
 
 function GetRange2DWeapon( range, yDiff)
@@ -1032,25 +577,25 @@ end
 
 function CheckDrawTodo( def, weaponIdx )
 	if ( def.weapons[weaponIdx]["type"] == 1 or def.weapons[weaponIdx]["type"] == 4 ) then
-		if ( def["allyState"] == true and buttonConfig["enabled"]["enemy"]["ground"] ) then
+		if ( def["allyState"] == true and options.enemyground.value ) then
 			return true
-		elseif ( def["allyState"] == false and buttonConfig["enabled"]["ally"]["ground"] ) then
+		elseif ( def["allyState"] == false and options.allyground.value ) then
 			return true
 		end
 	end
 
 	if ( def.weapons[weaponIdx]["type"] == 2 or def.weapons[weaponIdx]["type"] == 4 ) then
-		if ( def["allyState"] == true and buttonConfig["enabled"]["enemy"]["air"] ) then
+		if ( def["allyState"] == true and options.enemyair.value ) then
 			return true
-		elseif ( def["allyState"] == false and buttonConfig["enabled"]["ally"]["air"] ) then
+		elseif ( def["allyState"] == false and options.allyair.value ) then
 			return true
 		end
 	end
 
 	if ( def.weapons[weaponIdx]["type"] == 3 ) then
-		if ( def["allyState"] == true and buttonConfig["enabled"]["enemy"]["nuke"] ) then
+		if ( def["allyState"] == true and options.enemynuke.value ) then
 			return true
-		elseif ( def["allyState"] == false and buttonConfig["enabled"]["ally"]["nuke"] ) then
+		elseif ( def["allyState"] == false and options.allynuke.value ) then
 			return true
 		end
 	end
@@ -1081,9 +626,9 @@ function DrawRanges()
 				range = weapon["range"]
 				if ( weapon["type"] == 4 ) then
 					if (
-						( ( def["allyState"] == true and buttonConfig["enabled"]["enemy"]["air"] ) or ( def["allyState"] == false and buttonConfig["enabled"]["ally"]["air"] ) )
+						( ( def["allyState"] == true and options.enemyair.value ) or ( def["allyState"] == false and options.allyair.value ) )
 						and
-						( ( def["allyState"] == true and buttonConfig["enabled"]["enemy"]["ground"] == false ) or ( def["allyState"] == false and buttonConfig["enabled"]["ally"]["ground"] == false ) )
+						( ( def["allyState"] == true and options.enemyground.value == false ) or ( def["allyState"] == false and options.allyground.value == false ) )
 						) then
 						-- check if unit is combo unit, get secondary color if so
 						--if air only is selected
@@ -1096,9 +641,9 @@ function DrawRanges()
 				--printDebug( "Drawing defence: range: " .. range .. " Color: " .. color[1] .. "/" .. color[2] .. "/" .. color[3] .. " a:" .. lineConfig["alphaValue"] )
 				if ( ( weapon["type"] == 4 )
 						and
-						( ( def["allyState"] == true and buttonConfig["enabled"]["enemy"]["air"] ) or ( def["allyState"] == false and buttonConfig["enabled"]["ally"]["air"] ) )
+						( ( def["allyState"] == true and options.enemyair.value ) or ( def["allyState"] == false and options.allyair.value ) )
 						and
-						( ( def["allyState"] == true and buttonConfig["enabled"]["enemy"]["ground"] ) or ( def["allyState"] == false and buttonConfig["enabled"]["ally"]["ground"] ) )
+						( ( def["allyState"] == true and options.enemyground.value ) or ( def["allyState"] == false and options.allyground.value ) )
 				) then
 					--air and ground: draw 2nd circle
 					glColor( weapon["color2"][1], weapon["color2"][2], weapon["color2"][3], lineConfig["alphaValue"])
@@ -1113,26 +658,6 @@ end
 function widget:DrawWorld()
 	DrawRanges()
 	ResetGl()
-end
-
--- needed for GetTooltip
-function widget:IsAbove(x, y)
-	if not GetButton(x, y) then
-		return false
-	end
-	return true
-end
-
-function widget:GetTooltip(x, y)
-	if defRangeNoButtons then return end
-	local buttondata = GetButton(x, y)
-	if (not buttondata) then
-		return tooltips[-1]
-	end
-
-	local buttonIndex = buttondata[1]
-	local tt = tooltips[buttonIndex]
-	return (tt and tt) or tooltips[-1]
 end
 
 function printDebug( value )
@@ -1150,110 +675,3 @@ function printDebug( value )
 		end
 	end
 end
-
---SAVE / LOAD CONFIG FILE
-function widget:GetConfigData()
-	printDebug("Saving config. Bottom: " .. buttonConfig["posPercBottom"] )
-	local data = {}
-	data["buttons"] = buttonConfig["enabled"]
-	data["positionPercentageRight"] = buttonConfig["posPercRight"]
-	data["positionPercentageBottom"] = buttonConfig["posPercBottom"]
-
-	return data
-end
-
-function widget:SetConfigData(data)
-	printDebug("Loading config...")
-	if (data ~= nil) then
-		if ( data["buttons"] ~= nil ) then
-			buttonConfig["enabled"] = data["buttons"]
-			printDebug("enabled config found...")
-		end
-
-		if ( data["positionPercentageRight"] ~= nil ) then
-			buttonConfig["posPercRight"] = data["positionPercentageRight"]
-			printDebug("right pos config found...")
-		end
-
-		if ( data["positionPercentageBottom"] ~= nil ) then
-			buttonConfig["posPercBottom"] = data["positionPercentageBottom"]
-			printDebug("bottom config found: " .. buttonConfig["posPercBottom"])
-		end
-	end
-end
---END OF SAFE CONFIG FILE
-
---TWEAK MODE
-local inTweakDrag = false
-function widget:TweakMousePress(x,y,button)
-	local buttondata = GetButton(x, y)
-	if (not buttondata) then
-		return false
-	end
-
-	inTweakDrag = true	--allows button movement when mouse moves
-	return true
-end
-
-function widget:TweakMouseMove(x,y,dx,dy,button)
-	if ( inTweakDrag == false ) then
-		return
-	end
-	--todo: no need to recalc every frame, only on screenResize
-	local scaleFactor = ( buttonConfig["currentWidth"] / buttonConfig["defaultWidth"] )
-	local xSpace = buttonConfig["spacingx"] * scaleFactor
-	local ySpace = buttonConfig["spacingy"] * scaleFactor
-	--
-
-	local xMod = dx / state["screenx"] --delta in screen pixels
-	local xPosMin = ((buttonConfig["posPercRight"] + xMod) * state["screenx"]) - buttonConfig["currentWidth"]
-	local xPosMax = xPosMin + 2 * buttonConfig["currentWidth"] + xSpace
-
-	if ( ( xPosMin >= 0.0 ) and ( xPosMax < state["screenx"] ) ) then
-		buttonConfig["posPercRight"] = buttonConfig["posPercRight"] + xMod
-	end
-
-	local yMod = dy / state["screeny"]
-	local yPosMin = ((buttonConfig["posPercBottom"] + yMod) * state["screeny"])
-	local yPosMax = ( yPosMin - ( buttonConfig["currentHeight"]  ) * 3 - ySpace * 2)
-
-	if ( ( yPosMin < state["screeny"] ) and (  yPosMax > 0.0 ) ) then
-		buttonConfig["posPercBottom"] = buttonConfig["posPercBottom"] + yMod
-	end
-
-	UpdateButtons()
-end
-
-function widget:TweakMouseRelease(x,y,button)
-	inTweakDrag = false
-end
-
-function widget:TweakDrawScreen()
-	--todo: no need to recalc every frame, only on screenResize
-	local scaleFactor = ( buttonConfig["currentWidth"] / buttonConfig["defaultWidth"] )
-	local xSpace = buttonConfig["spacingx"] * scaleFactor
-	local ySpace = buttonConfig["spacingy"] * scaleFactor
-	local xPosMin = ((buttonConfig["posPercRight"]) * state["screenx"]) - buttonConfig["currentWidth"]
-	local xPosMax = xPosMin + 2 * buttonConfig["currentWidth"] + xSpace
-	local yPosMin = (buttonConfig["posPercBottom"] * state["screeny"])
-	local yPosMax = ( yPosMin - ( buttonConfig["currentHeight"]  ) * 3 - ySpace * 2)
-	glColor(0.0,0.0,1.0,0.5)
-	glRect(xPosMin, yPosMax, xPosMax, yPosMin)
-	glColor(1,1,1,1)
-	glText( "Defense\nRange", xPosMin+1, ((yPosMin+yPosMax)/2), 12)
-end
-
-function widget:TweakIsAbove(x,y)
-	if (not GetButton(x, y)) then
-		return false
-	end
-	return true
-end
-
-function widget:TweakGetTooltip(x,y)
-  return	'Defense Range Buttons\n'..
-			'Click and hold left mouse button\n'..
-			'over a button to drag\n'
-end
-
---END OF TWEAK MODE

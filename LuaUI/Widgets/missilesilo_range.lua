@@ -169,8 +169,7 @@ local function DrawActiveCommandRangesMinimap()
 	glLoadIdentity()
 	glTranslate(0,1,0)
 	glScale(1/mapX , -1/mapZ, 1)
-	glRotate(90,1,0,0)
-	glTranslate(0,0,-mouse[3])
+	glRotate(270,1,0,0)
 	
 	for i = 1, radiusCount do
 		local radius = drawRadius[i]
@@ -183,7 +182,7 @@ local function DrawActiveCommandRangesMinimap()
 			glLineStipple(false)
 		end
 		
-		glDrawGroundCircle(mouse[1], mouse[3], 0, radius.range, circleDivs )
+		glDrawGroundCircle(mouse[1],0, mouse[3], radius.range, circleDivs )
 			
 	end
 	

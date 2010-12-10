@@ -160,7 +160,7 @@ function widget:DrawScreen()
         if not UnitDefs[Spring.GetUnitDefID(unitID)].reclaimable then
          color = "\255\220\10\10"
         end
-        gl.Text(color.."   M:"..metal,x,y,form)
+        gl.Text(color.."   M:"..metal*0.5,x,y,form) -- multiply metal by unit reclaim mult in gamerules
       end
     end
     --
