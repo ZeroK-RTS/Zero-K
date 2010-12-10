@@ -57,7 +57,7 @@ unitDef = {
 
   shootme                       = [[1]],
   side                          = [[ARM]],
-  sightDistance                 = 484,
+  sightDistance                 = 506,
   TEDClass                      = [[FORT]],
   threed                        = [[1]],
   useBuildingGroundDecal        = true,

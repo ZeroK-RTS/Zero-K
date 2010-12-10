@@ -78,7 +78,7 @@ unitDef = {
 
   showPlayerName      = true,
   side                = [[ARM]],
-  sightDistance       = 500,
+  sightDistance       = 660,
   smoothAnim          = true,
   sonarDistance       = 300,
   steeringmode        = [[2]],

@@ -62,7 +62,7 @@ unitDef = {
   },
 
   side                          = [[CORE]],
-  sightDistance                 = 473,
+  sightDistance                 = 506,
   smoothAnim                    = true,
   TEDClass                      = [[FORT]],
   turnRate                      = 0,
