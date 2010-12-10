@@ -48,7 +48,7 @@ local badUnits = {
 	"logkoda",
 	"cormist",
 	"tawf114",
-  "puppy",
+	"puppy",
 }
 
 local badUnitDefs = {}
@@ -77,7 +77,7 @@ local function ChatControl(cmd, line, words, playerID)
       enabled = (words[1] == '1')
     end
   end
-  Spring.Echo('direct unit control is ' ..
+  Spring.Echo('direct unit control: blocking is ' ..
               (enabled and 'enabled' or 'disabled'))
   return true
 end
