@@ -3,13 +3,13 @@
 
 function widget:GetInfo()
   return {
-    name      = "Cloak Fire State (off)",
+    name      = "Cloak Fire State",
     desc      = "Sets units to Hold Fire when cloaked, reverts to original state when decloaked",
     author    = "KingRaptor (L.J. Lim)",
     date      = "Feb 14, 2010",
     license   = "GNU GPL, v2 or later",
     layer     = -1,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
