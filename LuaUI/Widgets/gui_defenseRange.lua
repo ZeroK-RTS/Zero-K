@@ -211,12 +211,12 @@ modConfig["CA"]["unitList"] =
 	--ARM
 	armamd = { weapons = { 3 } },		--antinuke
 	armrl = { weapons = { 4 } },
-	armllt = { weapons = { 4 } },
-	armhlt = { weapons = { 4 } },
-	armartic = { weapons = { 4 } },
-	armdeva = { weapons = { 4 } },
-	armpb = { weapons = { 4 } },
-	mahlazer = { weapons = { 4 } },
+	armllt = { weapons = { 1 } },
+	armhlt = { weapons = { 1 } },
+	armartic = { weapons = { 1 } },
+	armdeva = { weapons = { 1 } },
+	armpb = { weapons = { 1 } },
+	mahlazer = { weapons = { 1 } },
 
 	armemp = { weapons = { 1 } },
 	mercury = { weapons = { 2 } },
@@ -234,11 +234,11 @@ modConfig["CA"]["unitList"] =
 
 	--CORE
 	corrl = { weapons = { 4 } },
-	corllt = { weapons = { 4 } },
-	corhlt = { weapons = { 4 } },
-	corpre = { weapons = { 4 } },
-	corvipe = { weapons = { 4 } },
-	cordoom = { weapons = { 1, 4 } },
+	corllt = { weapons = { 1 } },
+	corhlt = { weapons = { 1 } },
+	corpre = { weapons = { 1 } },
+	corvipe = { weapons = { 1 } },
+	cordoom = { weapons = { 1 } },
 	cordl = { weapons = { 1 } },		--jellyfish
 
 	corrazor = { weapons = { 2 } },
@@ -276,10 +276,10 @@ modConfig["CA1F"]["unitList"] =
 {
 	--1FACTION
 	armamd = { weapons = { 3 } },		--antinuke
-	armartic = { weapons = { 4 } },		--faraday
-	armdeva = { weapons = { 4 } },		--stardust
-	armpb = { weapons = { 4 } },		--pitbull
-	mahlazer = { weapons = { 4 } },		--starlight
+	armartic = { weapons = { 1 } },		--faraday
+	armdeva = { weapons = { 1 } },		--stardust
+	armpb = { weapons = { 1 } },		--pitbull
+	mahlazer = { weapons = { 1 } },		--starlight
 	armartic = { weapons = { 1 } },		--faraday
 	armanni = { weapons = { 1 } },		--annihilator
 	armbrtha = { weapons = { 1 } },		--bertha
@@ -287,11 +287,11 @@ modConfig["CA1F"]["unitList"] =
 	armcir = { weapons = { 2 } },		--chainsaw
 	armdl = { weapons = { 1 } },		--anemone
 	corrl = { weapons = { 4 } },		--pulveriser
-	corllt = { weapons = { 4 } },		--LLT
-	corhlt = { weapons = { 4 } },		--HLT
-	corpre = { weapons = { 4 } },		--scorcher -> unused now but I still hope for a return.
-	corvipe = { weapons = { 4 } },		--viper -> unused now but I still hope for a return.
-	cordoom = { weapons = { 1, 4 } },	--doomsday
+	corllt = { weapons = { 1 } },		--LLT
+	corhlt = { weapons = { 1 } },		--HLT
+	corpre = { weapons = { 1 } },		--scorcher -> unused now but I still hope for a return.
+	corvipe = { weapons = { 1 } },		--viper -> unused now but I still hope for a return.
+	cordoom = { weapons = { 1 } },	--doomsday
 	cordl = { weapons = { 1 } },		--jellyfish
 	corrazor = { weapons = { 2 } },		--razorkiss
 	corflak = { weapons = { 2 } },		--flak
@@ -352,7 +352,7 @@ buttonConfig["borderColor"] = { 0, 0, 0, 1.0 }
 buttonConfig["currentHeight"] = 0 --do not change
 buttonConfig["currentWidth"] = 0 --do not change
 buttonConfig["nextOrigin"] = {{0,0}, 0, 0, 0, 0} --do not change
-buttonConfig["enabled"] = { ally = { ground = true, air = true, nuke = true }, enemy = { ground = true, air = true, nuke = true } }
+buttonConfig["enabled"] = { ally = { ground = false, air = false, nuke = false }, enemy = { ground = true, air = true, nuke = true } }
 
 buttonConfig["highlightColor"] = { 1.0, 1.0, 0.0, 1.0 }
 buttonConfig["baseColorEnemy"] = { 0.6, 0.0, 0.0, 0.6 }
