@@ -60,11 +60,12 @@ local lbl_m_income
 local lbl_e_income
 
 local blink = 0
-local blink_periode = 5
+local blink_periode = 2
 local blink_alpha = 1
 local blinkM_status = 0
 local blinkE_status = 0
 local time_old = 0
+local excessE = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -104,7 +105,32 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:GameFrame(s)
+function widget:Update(s)
+
+	blink = (blink+s)%blink_periode
+	blink_alpha = math.abs(blink_periode/2 - blink)
+
+	if blinkM_status then
+		bar_metal:SetColor( 1 - 119/255*blink_alpha,214/255,251/255,0.65 + 0.3*blink_alpha )
+	end
+
+	if blinkE_status then
+		if excessE then
+			bar_energy:SetColor(1-0.5*blink_alpha,1,0,0.65 + 0.35 *blink_alpha)
+		else
+			-- flash red if stalling
+			bar_energy:SetColor(1,0,0,blink_alpha)
+		end
+	end
+
+end
+
+
+
+function widget:GameFrame(n)
+
+	if (n%32 ~= 1) then return end
+
 	if not window then return end
 
 	local myTeamID = GetMyTeamID()
@@ -114,28 +140,17 @@ function widget:GameFrame(s)
 	
 	eStor = eStor - 10000 -- reduce by hidden storage
 	if eCurr > eStor then eCurr = eStor end -- cap by storage
+
 	if options.onlyShowExpense.value then
 		eExpe = eExpe - WG.energyWasted -- if there is energy wastage, dont show it as used pull energy
 	else
 		ePull = ePull - WG.energyWasted
 	end
 	
-	
-	if (WG.energyChange ~= nil and WG.energyChange < 0) then   -- we donated energy, which causes income and expenses to indicate higher value, fix it 
-		eInco = eInco + WG.energyChange
-		eExpe = eExpe + WG.energyChange
-	end 
-
-	blink = (s)%blink_periode
-	blink_alpha = math.abs(blink_periode/2 - blink)
-
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
 	local wastingM = mCurr >= mStor * 0.9
 	if wastingM then
 		blinkM_status = true
-		bar_metal:SetColor( 136/255,214/255,251/255,0.65 + 0.35*blink_alpha )
-		-- fade to green
-		--bar_metal:SetColor( 136/255*blink_alpha,214/255,251/255*blink_alpha,1)
 	elseif (blinkM_status) then
 		blinkM_status = false
 		bar_metal:SetColor( col_metal )
@@ -151,14 +166,7 @@ function widget:GameFrame(s)
 	if stallingE or wastingE then
 		blinkE_status = true
 		bar_energy:SetValue( 100 )
-		if wastingE then
-			bar_energy:SetColor(1,1,0,0.65 + 0.35 *blink_alpha)
-			-- blink between energy color and green
-			--bar_energy:SetColor(blink_alpha,1,0,1)
-		else
-			-- flash red if stalling
-			bar_energy:SetColor(1,0,0,blink_alpha)
-		end
+		excessE = wastingE
 	elseif (blinkE_status) then
 		blinkE_status = false
 		bar_energy:SetColor( col_energy )
