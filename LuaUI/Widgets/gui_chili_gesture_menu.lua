@@ -313,13 +313,15 @@ function SetupMenu(keyboard)
   if units and #units > 0 then 
     origin = {Spring.GetMouseState()} -- origin might by set by mouse hold detection so we only set it if unset
     
-    local ud = nil
     local found = false
     for _, unitID in ipairs(units) do 
-      ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+      local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
       if ud.builder and menu_use[ud.name] then 
-        found = true
-        break
+		found = ud
+	  elseif ud.canMove then
+		menu = nil
+        menu_selected=  nil
+        return false
       end
     end 
 
@@ -328,7 +330,7 @@ function SetupMenu(keyboard)
       levels = {}
       level =0
       menu_flash = nil -- erase previous flashing
-      menu = menu_use[ud.name]
+      menu = menu_use[found.name]
       menu_selected = menu
       menu_start = os.clock()
     else
@@ -338,6 +340,7 @@ function SetupMenu(keyboard)
     end
 
     return true
+
   end
 end 
 

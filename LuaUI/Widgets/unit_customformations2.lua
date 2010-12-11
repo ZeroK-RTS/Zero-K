@@ -358,11 +358,17 @@ function widget:MousePress(mx, my, button)
 		if (defid == CMD_MOVE and activeid == nil) then  -- this is needed for gestures
 			local units = spGetSelUnitsSorted()
 			units.n = nil
+			local allWorkers = true
 			for udefID,_ in pairs(units) do 
-				if UnitDefs[udefID].builder then  -- if worker is selected dont handle it
-					return false 
+				if (not UnitDefs[udefID].builder) and UnitDefs[udefID].canMove then  -- if worker is selected dont handle it
+					allWorkers = false
+					break
 				end 
 			end 
+			if allWorkers then
+				Spring.Echo("Custom Break")
+				return false
+			end
 		end 
 	end
 	
