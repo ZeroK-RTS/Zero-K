@@ -9,6 +9,7 @@ function widget:GetInfo()
     handler   = true,
     experimental = false,	
     enabled   = true,
+	alwaysStart = true,
   }
 end
 
@@ -435,7 +436,7 @@ local function MakeWidgetList()
 	
 	local buttonWidth = window_width - 20
 	
-	for name,data in pairs(widgetHandler.knownWidgets) do
+	for name,data in pairs(widgetHandler.knownWidgets) do if not data.alwaysStart then 
 		local name = name
 		local name_display = name .. (data.fromZip and ' (mod)' or '')
 		local data = data
@@ -459,7 +460,8 @@ local function MakeWidgetList()
 			desc 			= data.desc,
 			author 			= data.author,
 		}
-	end
+	end 
+	end 
 	
 	local widgets_cats_i = {}
 	for catdesc, catwidgets in pairs(widgets_cats) do

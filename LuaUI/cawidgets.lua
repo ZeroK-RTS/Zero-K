@@ -461,6 +461,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
     knownInfo.author   = widget.whInfo.author
     knownInfo.basename = widget.whInfo.basename
     knownInfo.filename = widget.whInfo.filename
+	knownInfo.alwaysStart = widget.whInfo.alwaysStart
     knownInfo.fromZip  = true
     if (_VFSMODE ~= VFS.ZIP) then
       if (_VFSMODE == VFS.RAW_FIRST) then

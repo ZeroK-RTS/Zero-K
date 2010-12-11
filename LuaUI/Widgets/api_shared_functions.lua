@@ -7,6 +7,8 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = -math.huge,
     enabled   = true,
+	api = true,
+	alwaysStart = true,
   }
 end
 
