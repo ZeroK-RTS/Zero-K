@@ -42,6 +42,7 @@ local minHungarianUnits		= 10
 -- We only increase maxUnits if the units are great enough for time to be meaningful
 local unitIncreaseThresh	= 0.85
 
+local menu_use = include("Configs/marking_menu_menus.lua")
 
 options_section = 'Interface'
 options = {
@@ -360,13 +361,13 @@ function widget:MousePress(mx, my, button)
 			units.n = nil
 			local allWorkers = true
 			for udefID,_ in pairs(units) do 
-				if (not UnitDefs[udefID].builder) and UnitDefs[udefID].canMove then  -- if worker is selected dont handle it
+				local ud = UnitDefs[udefID]
+				if (not (ud.builder and menu_use[ud.name])) and ud.canMove then  -- if worker is selected dont handle it
 					allWorkers = false
 					break
 				end 
 			end 
 			if allWorkers then
-				Spring.Echo("Custom Break")
 				return false
 			end
 		end 

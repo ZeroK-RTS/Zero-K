@@ -318,7 +318,7 @@ function SetupMenu(keyboard)
       local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
       if ud.builder and menu_use[ud.name] then 
 		found = ud
-	  elseif ud.canMove then
+	  elseif ud.canMove and not keyboard then
 		menu = nil
         menu_selected=  nil
         return false
