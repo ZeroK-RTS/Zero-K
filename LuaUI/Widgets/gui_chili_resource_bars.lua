@@ -62,8 +62,8 @@ local lbl_e_income
 local blink = 0
 local blink_periode = 2
 local blink_alpha = 1
-local blinkM_status = 0
-local blinkE_status = 0
+local blinkM_status = false
+local blinkE_status = false
 local time_old = 0
 local excessE = false
 

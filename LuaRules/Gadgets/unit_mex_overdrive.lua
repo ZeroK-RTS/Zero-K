@@ -705,34 +705,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 		gridMetalGain;
 end
 
-local function addTeamEnergy(team, energy)
-	if energy < 0 then
-		Spring.Echo("negative energy added in OD")
-		causeAnError[bla] = 22
-	end
+local function changeTeamEnergy(team, energy)
 	team.totalChange = team.totalChange + energy
 	team.eCur = team.eCur + energy
-	team.eInc = team.eInc + energy
-end
-
-local function spendTeamEnergy(team, energy)
-	if energy < 0 then
-		Spring.Echo("negative energy spent in OD")
-		causeAnError[bla] = 22
-	end
-	team.totalChange = team.totalChange - energy
-	team.eCur = team.eCur - energy
-	team.eExp = team.eExp + energy
-end
-
-local function signedChangeTeamEnergy(team, energy)
-	team.totalChange = team.totalChange + energy
-	team.eCur = team.eCur + energy
-	if energy > 0 then
-		team.eInc = team.eInc + energy
-	else
-		team.eExp = team.eExp - energy
-	end
 end
 
 local lastTeamNe = {}
@@ -772,35 +747,29 @@ function gadget:GameFrame(n)
 					local te = teamEnergy[teamID]
 					te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = Spring.GetTeamResources(teamID, "energy")
 					if (te.eCur ~= nil) then 
-						local eTax = te.eInc * (te.eCur) / (te.eMax - HIDDEN_STORAGE) 
-						if (eTax > 0) then 
-							sumInc = sumInc + eTax 
+						te.eTax = te.eInc * (te.eCur) / (te.eMax - HIDDEN_STORAGE) 
+						--Spring.Echo(teamID .. ",   Tax: " .. te.eTax .. ",   Inc: " .. te.eInc .. ",   Cur: " .. te.eCur)
+						if (te.eTax > 0) then 
+							sumInc = sumInc + te.eTax 
 						end 
 					end 
 				end 
-
+				--Spring.Echo("sumInc: " .. sumInc)
 				-- distribute taxes evenly - apply "change" on individual teams 
 				local share = sumInc / allyTeamData.teams
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
-					if (eCur ~= nil) then 
-						local eTax = te.eInc * (te.eCur) / (eMax - HIDDEN_STORAGE) 
-						if (eTax < 0) then eTax = 0 end 
-
-						local change = share - eTax 
+					if (te.eCur ~= nil) then 
+						if (te.eTax < 0) then te.eTax = 0 end 
+						
+						local change = share - te.eTax 
+						--Spring.Echo(teamID .. ",   Change: " .. change)
 						changeTeams[teamID] = change
-						if (change > 0) then 
-							addTeamEnergy(te, change)
-							--Spring.AddTeamResource(teamID, "e", change)
-						else 
-							addTeamEnergy(te, -change)
-							--Spring.AddTeamResource(teamID, "e", -change)
-						end 
+						changeTeamEnergy(te, change)
 					end 
 				end 
 			end
-
 			-- calculate overdrive energy excess 
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
@@ -812,7 +781,8 @@ function gadget:GameFrame(n)
 						local fillRatio = (te.eCur) / (te.eMax - HIDDEN_STORAGE) 
 						ne = inc * fillRatio   -- actual energy used for overdrive depends on fill ratio. At 50% of storage, 50% of income is used 
 						allyEExcess  = allyEExcess + ne
-						spendTeamEnergy(te, ne)
+						changeTeamEnergy(te, -ne)
+						--Spring.Echo(teamID .. ",   To OD: " .. ne)
 						--Spring.UseTeamResource(teamID, "e", ne) -- spend the extra energy
 					end 
 					lastTeamNe[teamID] = ne 
@@ -864,7 +834,8 @@ function gadget:GameFrame(n)
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
-					addTeamEnergy(te, energyWasted*( te.eMax - HIDDEN_STORAGE - te.eCur)/totalFreeStorage)
+					--Spring.Echo(teamID .. ",   Refund: " .. energyWasted*( te.eMax - HIDDEN_STORAGE - te.eCur)/totalFreeStorage)
+					changeTeamEnergy(te, energyWasted*( te.eMax - HIDDEN_STORAGE - te.eCur)/totalFreeStorage)
 					--Spring.AddTeamResource(teamID, "e", energyWasted*( eMax - HIDDEN_STORAGE - eCur)/totalFreeStorage)
 				end
 				energyWasted = 0
@@ -872,7 +843,8 @@ function gadget:GameFrame(n)
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
-					signedChangeTeamEnergy(te, te.eMax - HIDDEN_STORAGE - te.eCur)
+					--Spring.Echo(teamID .. ",   Refund fill: " .. te.eMax - HIDDEN_STORAGE - te.eCur)
+					changeTeamEnergy(te, te.eMax - HIDDEN_STORAGE - te.eCur)
 					--Spring.AddTeamResource(teamID, "e", ( eMax - HIDDEN_STORAGE - eCur))
 				end
 				energyWasted = energyWasted - totalFreeStorage
