@@ -43,7 +43,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[chickens.s3o]],
-  power               = 150,
+  power               = 200,
   seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 

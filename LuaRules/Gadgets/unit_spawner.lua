@@ -176,7 +176,7 @@ end
 local allyTeams = Spring.GetAllyTeamList()
 local allyTeamCount = SetCount(allyTeams)
 if allyTeamCount > 4 then	--chicken, players, gaia, and unidentified team
-	pvp = true
+	--pvp = true
 	Spring.Echo("Chicken: PvP mode detected")
 end	
 

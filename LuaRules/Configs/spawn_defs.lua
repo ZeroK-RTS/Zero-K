@@ -124,8 +124,8 @@ end
 local chickenTypes = {
   chicken        =  {time =  -5,  squadSize =   3, obsolete = 30},
   chicken_pigeon =  {time =  7,  squadSize =   1.4, obsolete = 50},
-  chickena       =  {time = 14,   squadSize = 0.5, obsolete = 50},
-  chickens       =  {time = 21,  squadSize =   1, obsolete = 60},
+  chickens       =  {time = 14,  squadSize =   1, obsolete = 60},
+  chickena       =  {time = 21,   squadSize = 0.5, obsolete = 50},
   chickenwurm       =  {time = 25,  squadSize =   0.7},
   chickenr       =  {time = 30,  squadSize = 1.2, obsolete = 60},
   chicken_sporeshooter =  {time = 35,  squadSize =   0.5},
