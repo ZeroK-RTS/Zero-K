@@ -587,11 +587,16 @@ local function DrawMenuItem(item, x,y, size, alpha, displayLabel, angle)
       gl.TexRect(x-size, y-size, x+size, y+size)
       gl.Texture(false)
 
+	  if (ud.metalCost) then 
+		--gl.Color(1,1,1,alpha)
+		gl.Text(ud.metalCost .. " m",x-size+4,y-size + 4,10,"")
+	  end 
 
 	  if angle then 
 		if angle < 0 then angle = angle + 360 end 
 		local idx = angle / 45
-		gl.Text(keys_display[1 + idx%8],x-size+4,y-size + 4,10,"")
+		gl.Color(0,1,0,1)
+		gl.Text(keys_display[1 + idx%8],x-size+4,y+size-10,10,"")
 	  end 
     end 
   end 
