@@ -107,7 +107,7 @@ options = {
 		name = 'Keyboard/edge scroll speed',
 		desc = 'This speed applies to edge scrolling and keyboard keys.',
 		type = 'number',
-		min = 1,
+		min = 20,
 		max = 50,
 		value = 4,
 	},
@@ -173,7 +173,7 @@ options = {
 		min = 0.0,
 		max = 0.8,
 		step = 0.1,
-		value = 0.0,
+		value = 0.2,
 	},
 	fov = {
 		name = 'Field of View',
