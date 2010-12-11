@@ -37,28 +37,36 @@ local uncombatTimes = {}
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 
-	local done = Spring.GetGameFrame() + TIME_SINCE_DAMAGED
+	local newDone = Spring.GetGameFrame() + TIME_SINCE_DAMAGED
 
 	if combatUnits[unitID] then
-		uncombatTimes[combatUnits[unitID].done][unitID] = nil
-		combatUnits[unitID].done = done
-		if not uncombatTimes[done] then
-			uncombatTimes[done] = {}
+		-- Debug
+		if not uncombatTimes[combatUnits[unitID].done] then
+			local x,y,z = Spring.GetUnitPosition(unitID)
+			Spring.MarkerAddPoint( x,0,z,"Failed at 46")
+		elseif not uncombatTimes[combatUnits[unitID].done][unitID] then
+			local x,y,z = Spring.GetUnitPosition(unitID)
+			Spring.MarkerAddPoint( x,0,z,"Failed at 49")
 		end
-		uncombatTimes[done][unitID] = true
+		-- end debug
+		uncombatTimes[combatUnits[unitID].done][unitID] = nil
+		combatUnits[unitID].done = newDone
+		if not uncombatTimes[newDone] then
+			uncombatTimes[newDone] = {}
+		end
+		uncombatTimes[newDone][unitID] = true
 	else
-		if not uncombatTimes[done] then
-			uncombatTimes[done] = {}
+		if not uncombatTimes[newDone] then
+			uncombatTimes[newDone] = {}
 		end
 		local bt = UnitDefs[unitDefID].buildTime
-		uncombatTimes[done][unitID] = true
-		combatUnits[unitID] = {done = done, bt = bt}
+		uncombatTimes[newDone][unitID] = true
+		combatUnits[unitID] = {done = newDone, bt = bt}
 		if select(5,Spring.GetUnitHealth(unitID)) == 1 then
 			Spring.SetUnitCosts(unitID, {buildTime = bt*REPAIR_PENALTY})
 		end
 	end
 	
-
 end
 
 
@@ -84,9 +92,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	if step < 0 and combatUnits[unitID] and select(5,Spring.GetUnitHealth(unitID)) == 1 then
 		Spring.SetUnitCosts(unitID, {buildTime = combatUnits[unitID].bt})
 	end
-	
 	return true
-	
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
