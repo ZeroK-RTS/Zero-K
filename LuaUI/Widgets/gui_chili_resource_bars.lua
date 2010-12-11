@@ -60,7 +60,7 @@ local lbl_m_income
 local lbl_e_income
 
 local blink = 0
-local blink_periode = 1
+local blink_periode = 5
 local blink_alpha = 1
 local blinkM_status = 0
 local blinkE_status = 0
@@ -104,7 +104,7 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Update(s)
+function widget:GameFrame(s)
 	if not window then return end
 
 	local myTeamID = GetMyTeamID()
@@ -126,7 +126,7 @@ function widget:Update(s)
 		eExpe = eExpe + WG.energyChange
 	end 
 
-	blink = (blink + s)%blink_periode
+	blink = (s)%blink_periode
 	blink_alpha = math.abs(blink_periode/2 - blink)
 
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
