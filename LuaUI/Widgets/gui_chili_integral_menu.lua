@@ -288,7 +288,7 @@ local function MakeButton(container, cmd, insertItem)
 				width="100%";
 				height="100%";
 				autosize=false;
-				align="center";
+				align="left";
 				valign="top";
 				caption = text;
 				fontSize = 11;
