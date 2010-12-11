@@ -40,18 +40,6 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 	local newDone = Spring.GetGameFrame() + TIME_SINCE_DAMAGED
 
 	if combatUnits[unitID] then
-		-- Debug
-		if not combatUnits[unitID].done then
-			local x,y,z = Spring.GetUnitPosition(unitID)
-			Spring.MarkerAddPoint( x,0,z,"Failed at 46")
-		elseif not uncombatTimes[combatUnits[unitID].done] then
-			local x,y,z = Spring.GetUnitPosition(unitID)
-			Spring.MarkerAddPoint( x,0,z,"Failed at 49")
-		elseif not uncombatTimes[combatUnits[unitID].done][unitID] then
-			local x,y,z = Spring.GetUnitPosition(unitID)
-			Spring.MarkerAddPoint( x,0,z,"Failed at 52")
-		end
-		-- end debug
 		uncombatTimes[combatUnits[unitID].done][unitID] = nil
 		combatUnits[unitID].done = newDone
 		if not uncombatTimes[newDone] then
@@ -84,8 +72,8 @@ function gadget:GameFrame(n)
 		for unitID,_ in pairs(uncombatTimes[n]) do
 			if Spring.ValidUnitID(unitID) then
 				Spring.SetUnitCosts(unitID, {buildTime = combatUnits[unitID].bt})
-				combatUnits[unitID] = nil
 			end
+			combatUnits[unitID] = nil
 		end
 		uncombatTimes[n] = false
 	end
