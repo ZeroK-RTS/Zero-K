@@ -155,8 +155,9 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 2, 'viewheightmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 3, 'viewblockmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 4, 'viewmetalmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 6, 'viewfow' ),
-			MakeMinimapButton( 'LuaUI/images/map/radar.png', 7, 'viewradar' ),
+			MakeMinimapButton( 'LuaUI/images/map/radar.png', 6, 'viewradar' ),
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow' ),
+			
 			
 		},
 	}
