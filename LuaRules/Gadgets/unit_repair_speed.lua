@@ -41,12 +41,15 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 
 	if combatUnits[unitID] then
 		-- Debug
-		if not uncombatTimes[combatUnits[unitID].done] then
+		if not combatUnits[unitID].done then
 			local x,y,z = Spring.GetUnitPosition(unitID)
 			Spring.MarkerAddPoint( x,0,z,"Failed at 46")
-		elseif not uncombatTimes[combatUnits[unitID].done][unitID] then
+		elseif not uncombatTimes[combatUnits[unitID].done] then
 			local x,y,z = Spring.GetUnitPosition(unitID)
 			Spring.MarkerAddPoint( x,0,z,"Failed at 49")
+		elseif not uncombatTimes[combatUnits[unitID].done][unitID] then
+			local x,y,z = Spring.GetUnitPosition(unitID)
+			Spring.MarkerAddPoint( x,0,z,"Failed at 52")
 		end
 		-- end debug
 		uncombatTimes[combatUnits[unitID].done][unitID] = nil
