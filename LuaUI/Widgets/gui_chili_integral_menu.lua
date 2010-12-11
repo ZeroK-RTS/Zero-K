@@ -301,7 +301,8 @@ local function MakeButton(container, cmd, insertItem)
 		if (texture and texture ~= "") then
 			image= Image:New {
 				width="90%";
-				height="90%";
+				height= (not isBuild) and nil or "90%";
+				bottom = (isBuild) and 10 or nil;
 				y="5%";
 				x="5%";
 --				color = color;
@@ -309,7 +310,10 @@ local function MakeButton(container, cmd, insertItem)
 				file = texture;
 				parent = button;
 			}
-			if isBuild then image.file2 = WG.GetBuildIconFrame(UnitDefs[-cmd.id]) end
+			if isBuild then 
+				image.file2 = WG.GetBuildIconFrame(UnitDefs[-cmd.id]) 
+			end 
+			
 			if isState then 
 				height = "100%"
 				y = 0
@@ -331,7 +335,22 @@ local function MakeButton(container, cmd, insertItem)
 				fontSize = 16;
 				fontShadow = true;
 			}
+			local costLabel = Label:New {
+					parent = button,
+					right = 0;
+					y = 0;
+					x = 3;
+					bottom = 3;
+					autosize=false;
+					align="left";
+					valign="bottom";
+					caption = string.format("%d m", UnitDefs[-cmd.id].metalCost);
+					fontSize = 11;
+					fontShadow = true;
+			}
 		end
+		
+
 		
 		--if button is disabled, set effect accordingly
 		if button.isDisabled then 
