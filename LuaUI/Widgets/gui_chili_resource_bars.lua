@@ -163,9 +163,13 @@ function widget:GameFrame(n)
 	
 	local totalConstruction = 0
 	local totalExpense = 0
+	local teamMInco = 0
+	local teamFreeStorage = 0
 	for i = 1, #teams do
 		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(teams[i], "metal")
 		totalConstruction = totalConstruction + mExpe
+		teamMInco = teamMInco + mInco
+		teamFreeStorage = teamFreeStorage + mStor - mCurr
 		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(teams[i], "energy")
 		totalExpense = totalExpense + eExpe
 	end
@@ -235,12 +239,10 @@ function widget:GameFrame(n)
 	local shareM = Format(mReci - mSent)
 	local constuction = Format(-mExpe)
 	
-	bar_metal.tooltip = "Local Metal Economy" ..
-	"\nBase Extraction: " .. mexInc ..
-	"\nOverdrive: " .. odInc ..
-	"\nReclaim and Cons: " .. otherM ..
-	"\nSharing: " .. shareM .. 
-	"\nConstruction: " .. constuction
+	local teamMexInc = Format(WG.mexIncome or 0)
+	local teamODInc = Format(WG.metalFromOverdrive or 0)
+	local teamOtherM = Format(teamMInco - (WG.metalFromOverdrive or 0) - (WG.mexIncome or 0))
+	local teamWasteM = Format(math.min(teamFreeStorage - teamMInco,0))
 	
 	local energyInc = Format(eInco - math.max(0, (WG.change or 0)))
 	local energyShare =  Format(WG.change or 0)
@@ -252,6 +254,20 @@ function widget:GameFrame(n)
 	local totalWaste = Format(-(WG.energyWasted or 0))
 	local totalOtherE = Format(-totalExpense + (WG.energyForOverdrive or 0) + totalConstruction + (WG.energyWasted or 0))
 	local totalConstruction = Format(-totalConstruction)
+	
+	bar_metal.tooltip = "Local Metal Economy" ..
+	"\nBase Extraction: " .. mexInc ..
+	"\nOverdrive: " .. odInc ..
+	"\nReclaim and Cons: " .. otherM ..
+	"\nSharing: " .. shareM .. 
+	"\nConstruction: " .. constuction ..
+	"\n" .. 
+	"\nTeam Metal Economy" ..
+	"\nBase Extraction: " .. teamMexInc ..
+	"\nOverdrive: " .. teamODInc ..
+	"\nReclaim and Cons: " .. teamOtherM ..
+	"\nConstruction: " .. totalConstruction ..
+	"\nWaste: " .. teamWasteM
 	
 	bar_energy.tooltip = "Local Energy Economy" ..
 	"\nIncome: " .. energyInc ..
@@ -428,10 +444,6 @@ function CreateWindow()
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
 	
-	function bar_metal:HitTest(x,y)
-		return self
-	end
-	
 	lbl_metal = Chili.Label:New{
 		parent = window,
 		height = p(100/bars),
@@ -443,7 +455,7 @@ function CreateWindow()
 		caption = "0",
 		autosize = false,
 		font   = {size = 19, outline = true, outlineWidth = 4, outlineWeight = 3,},
-		tooltip = "Your metal gain.",
+		tooltip = "Your net metal income",
 	}
 	lbl_m_income = Chili.Label:New{
 		parent = window,
@@ -456,7 +468,7 @@ function CreateWindow()
  		align  = "center",
 		autosize = false,
 		font   = {size = 12, outline = true, color = {0,1,0,1}},
-		tooltip = "Your metal income.",
+		tooltip = "Your metal Income.\nGained primarilly from metal extractors, overdrive and reclaim",
 	}
 	lbl_m_expense = Chili.Label:New{
 		parent = window,
@@ -469,7 +481,7 @@ function CreateWindow()
 		align  = "center",
 		autosize = false,
 		font   = {size = 12, outline = true, color = {1,0,0,1}},
-		tooltip = "Your metal expense.",
+		tooltip = "This is the metal demand of your construction",
 	}
 
 
@@ -493,10 +505,6 @@ function CreateWindow()
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
 	
-	function bar_energy:HitTest(x,y)
-		return self
-	end
-	
 	lbl_energy = Chili.Label:New{
 		parent = window,
 		height = p(100/bars),
@@ -508,7 +516,7 @@ function CreateWindow()
 		caption = "0",
 		autosize = false,
 		font   = {size = 19, outline = true, outlineWidth = 4, outlineWeight = 3,},
-		tooltip = "Your energy gain.",
+		tooltip = "Your net energy income.",
 	}
 	lbl_e_income = Chili.Label:New{
 		parent = window,
@@ -521,7 +529,7 @@ function CreateWindow()
 		align   = "center",
 		autosize = false,
 		font   = {size = 12, outline = true, color = {0,1,0,1}},
-		tooltip = "Your energy income.",
+		tooltip = "Your energy income.\nGained from powerplants.",
 	}
 	lbl_e_expense = Chili.Label:New{
 		parent = window,
@@ -534,8 +542,18 @@ function CreateWindow()
 		align  = "center",
 		autosize = false,
 		font   = {size = 12, outline = true, color = {1,0,0,1}},
-		tooltip = "Your energy expense.",
+		tooltip = "This is the energy demand of your economy, cloakers, shields and overdrive",
 	}
+	
+	-- Activate tooltips for lables and bars, they do not have them in default chili
+	function bar_metal:HitTest(x,y) return self end
+	function bar_energy:HitTest(x,y) return self end
+	function lbl_energy:HitTest(x,y) return self end
+	function lbl_metal:HitTest(x,y) return self end
+	function lbl_e_income:HitTest(x,y) return self end
+	function lbl_m_income:HitTest(x,y) return self end
+	function lbl_e_expense:HitTest(x,y) return self end
+	function lbl_m_expense:HitTest(x,y) return self end
 
 	if not options.workerUsage.value then return end
 	-- worker usage
