@@ -21,6 +21,7 @@ include("colors.h.lua")
 
 WG.energyWasted = 0
 WG.energyForOverdrive = 0
+WG.allies = 1
 --[[
 WG.windEnergy = 0 
 WG.highPriorityBP = 0
@@ -125,7 +126,30 @@ function widget:Update(s)
 
 end
 
-
+local function Format(input)
+	
+	local leadingString = GreenStr .. "+"
+	if input < 0 then
+		leadingString = RedStr .. "-"
+	end
+	input = math.abs(input)
+	
+	if input < 0.01 then
+		return WhiteStr .. "0"
+	elseif input < 5 then
+		return leadingString .. ("%.2f"):format(input) .. WhiteStr
+	elseif input < 50 then
+		return leadingString .. ("%.1f"):format(input) .. WhiteStr
+	elseif input < 10^3 then
+		return leadingString .. ("%.0f"):format(input) .. WhiteStr
+	elseif input < 10^4 then
+		return leadingString .. ("%.2f"):format(input/1000) .. "k" .. WhiteStr
+	elseif input < 10^5 then
+		return leadingString .. ("%.1f"):format(input/1000) .. "k" .. WhiteStr
+	else
+		return leadingString .. ("%.0f"):format(input/1000) .. "k" .. WhiteStr
+	end
+end
 
 function widget:GameFrame(n)
 
@@ -134,6 +158,17 @@ function widget:GameFrame(n)
 	if not window then return end
 
 	local myTeamID = GetMyTeamID()
+	local myAllyTeamID = Spring.GetMyAllyTeamID()
+	local teams = Spring.GetTeamList(myAllyTeamID)
+	
+	local totalConstruction = 0
+	local totalExpense = 0
+	for i = 1, #teams do
+		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(teams[i], "metal")
+		totalConstruction = totalConstruction + mExpe
+		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(teams[i], "energy")
+		totalExpense = totalExpense + eExpe
+	end
 
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(myTeamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(myTeamID, "metal")
@@ -142,9 +177,9 @@ function widget:GameFrame(n)
 	if eCurr > eStor then eCurr = eStor end -- cap by storage
 
 	if options.onlyShowExpense.value then
-		eExpe = eExpe - WG.energyWasted -- if there is energy wastage, dont show it as used pull energy
+		eExpe = eExpe - WG.energyWasted/WG.allies -- if there is energy wastage, dont show it as used pull energy
 	else
-		ePull = ePull - WG.energyWasted
+		ePull = ePull - WG.energyWasted/WG.allies
 	end
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
@@ -160,7 +195,7 @@ function widget:GameFrame(n)
 	if options.eexcessflashalways.value then
 		wastingE = (WG.energyWasted > 0)
 	else
-		wastingE = (WG.energyWasted > eInco*0.05) and (WG.energyWasted > 15)
+		wastingE = (WG.energyWasted/WG.allies > eInco*0.05) and (WG.energyWasted/WG.allies > 15)
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
 	if stallingE or wastingE then
@@ -193,13 +228,43 @@ function widget:GameFrame(n)
 	else
 		bar_energy:SetCaption( ("%i/%i"):format(eCurr, eStor) )
 	end
-
-
-	--// UPDATE THE LABELS JUST ONCE PER SECOND!
-  local time_now = GetTimer()
-  local diff = DiffTimers(time_now, time_old)
-  if (diff < 1) then return end
-  time_old = time_now
+	
+	local mexInc = Format((WG.mexIncome or 0)/(WG.allies or 1))
+	local odInc = Format((WG.metalFromOverdrive or 0)/(WG.allies or 1))
+	local otherM = Format(mInco - (WG.metalFromOverdrive or 0)/(WG.allies or 1) - (WG.mexIncome or 0)/(WG.allies or 1) - mReci)
+	local shareM = Format(mReci - mSent)
+	local constuction = Format(-mExpe)
+	
+	bar_metal.tooltip = "Local Metal Economy" ..
+	"\nBase Extraction: " .. mexInc ..
+	"\nOverdrive: " .. odInc ..
+	"\nReclaim and Cons: " .. otherM ..
+	"\nSharing: " .. shareM .. 
+	"\nConstruction: " .. constuction
+	
+	local energyInc = Format(eInco - math.max(0, (WG.change or 0)))
+	local energyShare =  Format(WG.change or 0)
+	local otherE = Format(-eExpe - math.min(0, (WG.change or 0)) + mExpe)
+	
+	local teamIncome = Format(WG.teamIncome or 0)
+	local totalODE = Format(-(WG.energyForOverdrive or 0))
+	local totalODM = Format(WG.metalFromOverdrive or 0)
+	local totalWaste = Format(-(WG.energyWasted or 0))
+	local totalOtherE = Format(-totalExpense + (WG.energyForOverdrive or 0) + totalConstruction + (WG.energyWasted or 0))
+	local totalConstruction = Format(-totalConstruction)
+	
+	bar_energy.tooltip = "Local Energy Economy" ..
+	"\nIncome: " .. energyInc ..
+	"\nSharing & Overdrive: " .. energyShare .. 
+	"\nConstruction: " .. constuction .. 
+	"\nOther: " .. otherE ..
+	"\n" .. 
+	"\nTeam Energy Economy" ..
+	"\nIncome: " .. teamIncome .. 
+	"\nOverdrive: " .. totalODE .. " -> " .. totalODM .. " metal" ..
+	"\nConstruction: " .. totalConstruction ..
+	"\nOther: " .. totalOtherE ..
+	"\nWaste: " .. totalWaste
 
 	local mTotal = mInco - mExpe
 	if options.onlyShowExpense.value then
@@ -336,7 +401,7 @@ function CreateWindow()
 		y = 0,
 		x = "63%",
 		clientWidth  = screenWidth*0.28,
-		clientHeight = screenWidth*0.026,
+		clientHeight = screenWidth*0.019,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -362,6 +427,11 @@ function CreateWindow()
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
+	
+	function bar_metal:HitTest(x,y)
+		return self
+	end
+	
 	lbl_metal = Chili.Label:New{
 		parent = window,
 		height = p(100/bars),
@@ -422,6 +492,11 @@ function CreateWindow()
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
+	
+	function bar_energy:HitTest(x,y)
+		return self
+	end
+	
 	lbl_energy = Chili.Label:New{
 		parent = window,
 		height = p(100/bars),
@@ -485,12 +560,15 @@ end
 --------------------------------------------------------------------------------
 
 -- note works only in communism mode
-function MexEnergyEvent(teamID, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, change)
+function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, change, teamIncome)
   if (Spring.GetLocalTeamID() == teamID) then 
   	WG.energyWasted = energyWasted
-	--Spring.Echo("energyWasted " .. energyWasted)
 	WG.energyForOverdrive = energyForOverdrive
-	WG.energyChange = change -- energy change by OD - substract that from income 
+	WG.change = change -- energy change by OD - substract that from income 
+	WG.mexIncome = totalIncome-metalFromOverdrive
+	WG.metalFromOverdrive = metalFromOverdrive
+	WG.teamIncome = teamIncome
+	WG.allies = allies
   end
 end
 

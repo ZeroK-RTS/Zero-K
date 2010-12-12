@@ -959,11 +959,14 @@ function widget:Initialize()
 	 Image = Chili.Image
 	 Progressbar = Chili.Progressbar
 	 screen0 = Chili.Screen0
+	 
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local y = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100 - window_height)) .. "%"
 
 	window_corner = Window:New{
 		name   = 'unitinfo';
-		x      = "35%";
-		y = screenHeight - window_height - 10;
+		x      = 0;
+		y = y;
 		clientHeight = window_height;
 		clientWidth  = 400;
 		dockable = true,

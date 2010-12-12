@@ -735,8 +735,8 @@ function gadget:GameFrame(n)
 			local allyE = 0
 			local allyEExcess = 0
 			local allyEMissing = 0
-			local changeTeams = {}
 			local teamEnergy = {}
+			local teamIncome = 0
 
 			if (SHARED_MODE) then 
 				-- calcullate total income - tax 95% of energy income 
@@ -746,6 +746,7 @@ function gadget:GameFrame(n)
 					teamEnergy[teamID] = {totalChange = 0}
 					local te = teamEnergy[teamID]
 					te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = Spring.GetTeamResources(teamID, "energy")
+					teamIncome = teamIncome + te.eInc
 					if (te.eCur ~= nil) then 
 						te.eTax = te.eInc * (te.eCur) / (te.eMax - HIDDEN_STORAGE) 
 						--Spring.Echo(teamID .. ",   Tax: " .. te.eTax .. ",   Inc: " .. te.eInc .. ",   Cur: " .. te.eCur)
@@ -765,7 +766,6 @@ function gadget:GameFrame(n)
 						
 						local change = share - te.eTax 
 						--Spring.Echo(teamID .. ",   Change: " .. change)
-						changeTeams[teamID] = change
 						changeTeamEnergy(te, change)
 					end 
 				end 
@@ -821,6 +821,8 @@ function gadget:GameFrame(n)
 
 			--// Use the free Grid-Energy for Overdrive
 			local energyWasted, summedMetalProduction, summedOverdriveMetal, gridEnergySpent, gridMetalGain = OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
+			
+			local ODenergy = allyE - energyWasted
 
 			--// Refund excess energy
 			local totalFreeStorage = 0
@@ -915,7 +917,7 @@ function gadget:GameFrame(n)
 				local teamID = allyTeamData.team[i]
 				if (SHARED_MODE) then 
 					Spring.AddTeamResource(teamID, "m", summedMetalProduction / allyTeamData.teams)
-					SendToUnsynced("MexEnergyEvent", teamID, energyWasted / allyTeamData.teams, (allyEExcess - energyWasted)/ allyTeamData.teams,summedMetalProduction / allyTeamData.teams,summedOverdriveMetal / allyTeamData.teams, changeTeams[teamID]) 
+					SendToUnsynced("MexEnergyEvent", teamID, allyTeamData.teams, energyWasted, ODenergy,summedMetalProduction,summedOverdriveMetal, teamEnergy[teamID].totalChange, teamIncome) 
 				end
 			end 
 		end
@@ -1130,10 +1132,10 @@ local floor = math.floor
 
 local circlePolys = 0 -- list for circles
 
-function WrapToLuaUI(_,teamID, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive)
+function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, EnergyChange, teamIncome)
   if (teamID ~= Spring.GetLocalTeamID()) then return end
   if (Script.LuaUI('MexEnergyEvent')) then
-    Script.LuaUI.MexEnergyEvent(teamID, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive)
+    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, EnergyChange, teamIncome)
   end
 end
 
