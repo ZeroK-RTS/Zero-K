@@ -331,6 +331,7 @@ function CreateWindow()
 		parent = Chili.Screen0,
 		dockable = true,
 		name="ResourceBars",
+		padding = {0,0,0,0},
 		right = 0,
 		y = 0,
 		x = "63%",

@@ -182,9 +182,8 @@ function StopRetreating(unitID)
 			GiveOrderToUnit(unitID, CMD_REMOVE, { cmd1.tag }, {} )
 
 		elseif (cmd1.id == CMD_WAIT) then			
-			GiveOrderToUnit(unitID, CMD_WAIT, {}, {})
+			GiveOrderToUnit(unitID, CMD_REMOVE, { cmd1.tag}, {})
 			retreatingUnits[unitID] = nil
-			
 		else
 			--retreatingUnits[unitID] = nil
 		end
@@ -267,8 +266,8 @@ function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	mobileUnits[unitID] = nil
 end
 
+
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	
 	if cmdID == CMD_SETHAVEN then
 		local x,y,z = cmdParams[1], cmdParams[2], cmdParams[3]
 		local _, _, _, dSquared, closestHavenID = FindClosestHaven(x,y,z)
@@ -312,6 +311,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		return true
 	end
 end
+
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdParams) 
 	local commandOverriden = false
 	
@@ -336,14 +336,25 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdP
 		commandOverriden = true
 	end
 
-	if commandOverriden then			
-		local selectedUnits = GetSelectedUnits()
+	if commandOverriden and retreatingUnits[unitID] then
+		local cmd1 = GetFirstCommand(unitID)
+
+		if not cmd1 then
+			--retreatingUnits[unitID] = nil
+		elseif IsRetreatMove(unitID, cmd1) then
+			Retreat(unitID)	
+		elseif (cmd1.id == CMD_WAIT) then			
+			GiveOrderToUnit(unitID, CMD_WAIT, {}, {})
+		end
+		
+		--local selectedUnits = GetSelectedUnits()
 		--for _, unitID in ipairs(selectedUnits) do
-			retreatingUnits[unitID] = nil
+			--retreatingUnits[unitID] = nil
 		--end
 
 	end
-
+	
+	
 
 end
 
@@ -397,6 +408,31 @@ function widget:CommandsChanged()
 
 	end--for 
 end
+
+function widget:UnitDamaged(unitID) 
+	local retreatOrder = retreatOrdersArray[unitID]
+	if (retreatOrder ~= nil and retreatOrder > 0 and mobileUnits[unitID]) then 
+		local health, maxHealth = GetUnitHealth(unitID)
+		if (health) then
+
+			local healthRatio = health / maxHealth
+			local threshold = retreatOrder * 0.3
+
+			if healthRatio < threshold then        
+				wantRetreat[unitID] = true
+			elseif (healthRatio == 1) then
+				wantRetreat[unitID] = nil	
+			end
+
+			if wantRetreat[unitID] then				        
+				if (havenCount > 0) and not retreatingUnits[unitID] then
+					Retreat(unitID)        
+				end
+			end 
+		end 
+	end 
+
+end 
 
 function widget:DrawWorld()
 	local gameFrame = GetGameFrame()
