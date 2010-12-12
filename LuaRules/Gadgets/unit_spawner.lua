@@ -469,6 +469,7 @@ end
 
 local function ChooseTarget(unitID)
   local teamID
+  local tries = 0
   if unitID then
 	teamID = spGetUnitTeam(unitID)
 	--targetID = unitID
@@ -483,7 +484,10 @@ local function ChooseTarget(unitID)
   units  = spGetTeamUnits(teamID)
   local targetID
   if (units[2]) then
-    targetID = units[random(#units)]
+    repeat
+	  targetID = units[random(1,#units)]
+      tries = tries + 1
+    until (targetID and not (noTarget[UnitDefs[Spring.GetUnitDefID(targetID)].name]))
   else
     targetID = units[1]
   end
@@ -651,7 +655,7 @@ local function SpawnBurrow(number)
 end
 
 local function SetMorphFrame()
-	morphFrame = spGetGameFrame() + math.random(queenMorphTime[1], queenMorphTime[2])
+	morphFrame = spGetGameFrame() + random(queenMorphTime[1], queenMorphTime[2])
 	--Spring.Echo("Morph frame set to: " .. morphFrame)
 	Spring.Echo("Next morph in: " .. math.ceil((morphFrame - spGetGameFrame())/30) .. " seconds")
 end
@@ -897,7 +901,7 @@ function gadget:GameFrame(n)
 	end
   end
   
-  if ((n+29) % 90) > 0.1 then
+  if ((n+29) % 90) < 0.1 then
     KillOldChicken()
     DecayEggs()
   
@@ -915,7 +919,7 @@ function gadget:GameFrame(n)
         end
       end
     end
-	
+  end
 	--morphs queen
 	if n == morphFrame then
 		--Spring.Echo("Morphing queen")
@@ -949,7 +953,7 @@ function gadget:GameFrame(n)
 		local _,newMaxHealth         = Spring.GetUnitHealth(queenID)
 		local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
 		local hpercent = newHealth/newMaxHealth
-		if newHealth<=1 then newHealth = 1 end
+		--if newHealth <= 1 then newHealth = 1 end
 		Spring.SetUnitHealth(queenID, {health = newHealth, build = buildProgress})
 		--orders, XP
 		Spring.SetUnitExperience(queenID, xp)
@@ -957,9 +961,6 @@ function gadget:GameFrame(n)
 			spGiveOrderToUnit(queenID, cmdQueue[1].id, cmdQueue[1].params, cmdQueue[1].options)
 		end
 	end
-	
-  end
- 
 end
 
 
@@ -1004,7 +1005,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	
     if alwaysEggs then SpawnEggs(spGetUnitPosition(unitID)) end
     if (eggs) then SpawnEggs(spGetUnitPosition(unitID)) end
-	if (respawnBurrows) or (math.random() < burrowRespawnChance) then
+	if (respawnBurrows) or (random() < burrowRespawnChance) then
 		--echo("Respawning burrow")
 		SpawnBurrow()
 	end

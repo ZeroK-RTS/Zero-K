@@ -4,7 +4,6 @@ local weapons = {
 	armzeus_lightning = {damage = 250},
 	panther_armlatnk_weapon = {damage = 160},
 	armbanth_lightning = {damage = 240},
-	commadvsupport_electrolaser = {damage = 1600},
 }
 
 for i=1,#WeaponDefs do
