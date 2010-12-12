@@ -523,11 +523,14 @@ function DrawCheckbox(obj)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-  local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
-  local tw,th = texInfo.xsize, texInfo.ysize
 
   gl.Color(1,1,1,1)
   TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
+
+  local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
+  local tw,th = texInfo.xsize, texInfo.ysize
+
+  
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
