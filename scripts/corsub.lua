@@ -2,10 +2,8 @@
 
 local wake = piece "wake"
 local base = piece "base"
-local tube1 = piece "tube1"
-local tube2 = piece "tube2"
+local firepoint = piece "firepoint"
 
-local tube = false
 local SIG_MOVE = 1
 
 local function Rise()
@@ -38,8 +36,7 @@ end
 
 function script.QueryWeapon1() 
 --	return base
-	if tube then return tube1
-	else return tube2 end
+	return firepoint
 end
 
 function script.AimFromWeapon1() return base end
@@ -49,7 +46,7 @@ function script.AimWeapon1( heading, pitch )
 end
 
 function script.FireWeapon1()
-	tube = not tube
+--FX here
 end
 
 --[[
