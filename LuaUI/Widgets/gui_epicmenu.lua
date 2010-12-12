@@ -1577,7 +1577,7 @@ local function MakeCrudeMenu()
 	end
 		
 	local crude_width = 440
-	local crude_height = B_HEIGHT+0
+	local crude_height = B_HEIGHT+0 - 10
 	
 	local menu_tree3 		= AddCustomPaths(menu_tree2, 'Settings')
 	local game_menu_tree3 	= AddCustomPaths(game_menu_tree2, 'Game')
@@ -1589,11 +1589,10 @@ local function MakeCrudeMenu()
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header,  }
 	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', textColor = color.sub_header, align="center" }
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 35, height=5, textColor = color.main_fg, autosize=false, }
-	img_flag = Image:New{ file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, }
+	img_flag = Image:New{ file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,4}  }
 	
 	window_crude = Window:New{
 		name='epicmenubar',
-		caption=title_text,
 		x = '60%',  
 		y = '0%',
 		dockable = true,
@@ -1603,13 +1602,16 @@ local function MakeCrudeMenu()
 		tweakDraggable = true,
 		resizable = false,
 		backgroundColor = color.main_bg,
+		color = {1,1,1,0.5},
+		margin = {0,0,0,0},
+		padding = {1,1,1,1},
 		
 		children = {
 			StackPanel:New{
 				name='stack_main',
 				orientation = 'horizontal',
-				width = crude_width,
-				height = crude_height,
+				width = '100%',
+				height = '100%',
 				resizeItems = false,
 				padding = {0,0,0,0},
 				itemPadding = {2,0,0,0},
@@ -1620,7 +1622,7 @@ local function MakeCrudeMenu()
 					Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
 					Trackbar:New{
 						x=20,
-						height='60%',
+						height='40%',
 						width=80,
 						trackColor = color.main_fg,
 						value = spGetConfigInt("snd_volmaster", 50),
@@ -1660,7 +1662,8 @@ local function MakeCrudeMenu()
 								},
 							},
 							
-							img_flag,
+							-- img_flag,
+							Button:New{margin={0,0,0,4}, caption = "Move", OnMouseUp = { function() spSendCommands{"luaui tweakgui"} end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=25,  tooltip="Change layout of user interface"},
 						},
 					},
 					
