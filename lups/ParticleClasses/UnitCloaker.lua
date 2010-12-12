@@ -259,7 +259,8 @@ function UnitCloaker:ReInitialize()
 end
 
 function UnitCloaker:CreateParticle()
-  self.isS3o = (UnitDefs[self.unitDefID].model.name:lower():find("s3o") and true)
+  local name = UnitDefs[self.unitDefID].model.name
+  self.isS3o = ((name:lower():find("s3o") or name:lower():find("obj")) and true)
   self.firstGameFrame = thisGameFrame
   self.dieGameFrame   = self.firstGameFrame + self.life
 end

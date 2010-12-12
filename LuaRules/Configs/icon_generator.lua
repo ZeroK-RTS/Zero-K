@@ -275,6 +275,10 @@ unitConfigs = {
     angle  = 10,
     border = 0.09,
   },
+  [UnitDefNames.dante.id] = {
+    rot    = 28,
+    angle  = 10,
+  },
   [UnitDefNames.screamer.id] = {
     rot    = 30,
     angle  = 30,
@@ -295,6 +299,9 @@ unitConfigs = {
     attempts = 200,
   },
   [UnitDefNames.fakeunit.id] = {
+    empty  = true,
+  },
+  [UnitDefNames.fakeunit_aatarget.id] = {
     empty  = true,
   },
 }

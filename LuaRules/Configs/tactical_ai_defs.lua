@@ -22,6 +22,7 @@ local lowRangeSwarmieeArray = {
 	"cormort",
 	"cormortgold",
 	"punisher",
+	"firewalker",
   
 	"armbull",
 	"armmanni",
@@ -51,6 +52,7 @@ local medRangeSwarmieeArray = {
 	"cormort",
 	"cormortgold",
 	"punisher",
+	"firewalker",
   
 	"cormart",
 	"hoverartillery",
@@ -793,7 +795,15 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
 	},
-	
+	["firewalker"] = {
+		skirms = artyRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 40, 
+	},	
 	-- cowardly support units
 	["arm_marky"] = {
 		skirms = {}, 
