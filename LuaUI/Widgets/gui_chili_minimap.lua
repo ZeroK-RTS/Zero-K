@@ -65,17 +65,19 @@ options = {
 	},
 	viewheightmap = {
 		name = 'Toggle Height Map',
+		desc = '\255\0\255\0F1\008',
 		type = 'button',
 		action = 'showelevation',
 	},
 	viewblockmap = {
 		name = 'Toggle Pathing Map',
-		desc = 'Select unit then click this to see, where unit can go',
+		desc = 'Select unit then click this to see, where unit can go (\255\0\255\0F2\008',
 		type = 'button',
 		action = 'showpathmap',
 	},
 	viewmetalmap = {
 		name = 'Toggle Metal Map',
+		desc = 'Shows concentration of metal (\255\0\255\0F4\008',
 		type = 'button',
 		action = 'showmetalmap',
 	},
@@ -84,12 +86,13 @@ options = {
 	
 	viewfow = {
 		name = 'Toggle Fog of War View',
+		desc ='\255\0\255\0L\008',
 		type = 'button',
 		action = 'togglelos',
 	},
 	viewradar = {
 		name = 'Toggle Radar & Jammer View',
-		desc = 'Only shows when Fog of War is enabled',
+		desc = 'Only shows when Fog of War is enabled (\255\0\255\0;\008',
 		type = 'button',
 		action = 'toggleradarandjammer',
 	},

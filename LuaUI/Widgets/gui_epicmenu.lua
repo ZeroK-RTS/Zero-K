@@ -1663,7 +1663,7 @@ local function MakeCrudeMenu()
 							},
 							
 							-- img_flag,
-							Button:New{margin={0,0,0,4}, caption = "Move", OnMouseUp = { function() spSendCommands{"luaui tweakgui"} end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=25,  tooltip="Change layout of user interface"},
+							Button:New{margin={0,0,0,4}, caption = "Move", OnMouseUp = { function() spSendCommands{"luaui tweakgui"} end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=25,  tooltip="Change layout of user interface (\255\0\255\0Ctrl+F11\008)"},
 						},
 					},
 					
