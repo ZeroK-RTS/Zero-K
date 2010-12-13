@@ -13,11 +13,20 @@ stringAirSpotted = "\255\255\0\0Enemy aircraft spotted.\008 Now might be a good 
 stringNukeSpotted = "\255\255\0\0Enemy nuclear silo located.\008 Build an anti-nuke launcher while you still can."
 
 generalTips = {
+	"Use the priority buttons to maximize your efficiency during stalls (expenditure outstripping income). Resources will be allocated to high priority units before low priority ones.",
 	"Repairing units is 3x faster than building them, but proceeds at 1/6th the normal speed if the unit has been recently damaged.",
 	"Different AA types are effective against different targets. The Hacksaw missile turret is lethal against bombers, while the Cobra flak cannon cuts down gunships well.",
-	"When fighting AoE weapons, fan out your units to minimize damage.",
+	"When fighting AoE weapons, spread out your units to minimize damage.",
 	"You can draw on the map with tilde (~) and left mouse. ~ + double click adds a labelled point, while ~ + middle click adds a point without label. ~ + right click erases.",
 	"Many commands can be issued over a whole area by keeping button the down and dragging a box or disc.",
+	"The Dreamweaver capture vehicle can capture a single enemy unit, but control is lost if the capturing Dreamweaver dies.",
+	"Heavy striders are built by the Athena specops aircraft, buildable by any mobile constructor.",
+	"Riot units double as improvised anti-air against most gunships.",
+	"Nuclear missiles are devastating, but can be intercepted by antinuke systems which provide coverage over a wide area.",
+	"Cloaked units can be revealed by close contact, or when damaged.",
+	"Slow-rays and other weapons with slowing effects will reduce the target's movement and firing rate by up to 66%.",
+	"Hovercraft are fast and can transverse water, but struggle on even gentle slopes.",
+	"Spiders have excellent mobility including the ability to scale cliffs, although they tend to lack direct strength.",
 }
 
 raiderDefs = {

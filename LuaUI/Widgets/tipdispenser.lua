@@ -139,7 +139,6 @@ end
 local function AddTipOnce(str, level, weight, sound)
 	if alreadyDisplayedTips[str] then return end
 	AddTip(str, level, weight, sound) 
-	alreadyDisplayedTips[str] = true
 end
 
 local function CountMy(unitKind)
@@ -213,30 +212,31 @@ local function GetTipsList()
 	AddTipOnce("Use Mouse Wheel to zoom in and out", 1)
 
 	-- Beginning: Getting the commander to build the starting base
-	if CountMy(energy)+CountMy(mex)==0 then
+	if CountMy(energy) + CountMy(mex) <= 3 then
 		if Spring.GetTeamUnitCount(t)==0 then
 			if Game.startPosType==2 and Spring.GetGameFrame()==0 then
-				AddTipOnce("Pick a starting position, then click ready.\nLook for areas with metal spots (press F4 to toggle the metal map). Do not spawn in a cliff!", 1)
+				AddTip("Pick a starting position, then click ready.\nLook for areas with metal spots (press F4 to toggle the metal map). Do not spawn in a cliff!", 1, 5)
 			else
 				AddTip("Game is loading.\nIf it takes forever you may want to consider Alt+F.", 3, 10000)
 			end
 		elseif CountMy(commander)==1 then
 			if Spring.GetSelectedUnitsCount()==0 then
-				AddTipOnce("Select your commander and start building your base.", 1)
-				AddTipOnce("You can select something to build by pressing right click and drawing a gesture, or using the buttons in the menu (bottom right)", 1)
+				AddTip("Select your commander and start building your base.", 1)
+				AddTip("You can select something to build by pressing right click and drawing a gesture, or using the buttons in the menu (bottom right)", 1)
 			end
-			AddTipOnce("Metal is the principal game resource. Build some Metal Extractors (mexes) on the metal spots.", 1)
-			AddTipOnce("Energy is also essential for your economy to function. Build some Solar Collectors or Wind Generators.", 1)
-			AddTipOnce("Buildpower, often described as the third resource, is the measure of how much you can spend at once. We'll discuss that later.", 1)
+			AddTip("Metal is the principal game resource. Build some Metal Extractors (mexes) on the metal spots.", 1)
+			AddTip("Energy is also essential for your economy to function. Build some Solar Collectors or Wind Generators.", 1)
+			AddTip("Buildpower, often described as the third resource, is the measure of how much you can spend at once. We'll discuss that later.", 1)
 		end
-
+		
 	-- Beginning: Getting commander) to build the first fac
-	elseif CountMy(energy)>=3 and CountMy(mex)>=1 and CountMy(factory) == 0 then
-		AddTipOnce("Use your commander to make a factory. The Shield Bot Factory is a good choice for beginners.", 1)
-	-- Once the player has started getting stuff done
+	elseif CountMy(energy) >= 3 and CountMy(mex)>= 1 and CountMy(factory) == 0 then
+		AddTip("Use your commander to make a factory. The Shield Bot Factory is a good choice for beginners.", 1, 5)
+
+		-- Once the player has started getting stuff done
 	else
 		if CountMy(factory)>=1 then
-			AddTipOnce("Build some units with that factory. You'll want to start with a couple of constructors for expansion and a few raiders for early combat.", 1)
+			AddTipOnce("Build some units with that factory. You'll want to start with a couple of constructors for expansion and a few raiders for early combat.", 1, 10)
 		end
 		if CountMy(energy)>= 5 then
 			AddTipOnce("Connect energy to your mexes to allow them to OVERDRIVE, which uses excess energy to produce more metal.", 1)
@@ -269,7 +269,7 @@ local function GetTipsList()
 			AddTip("Your metal storage is overflowing. You should get more buildpower and spend it.", 2, 5)
 		end
 		local elevel, estore = spGetTeamResources(myTeam, "energy")
-		if elevel < 100 then
+		if elevel < 100 and mlevel > 80 then
 			AddTip("Your energy reserves are running dangerously low. You should build more energy structures.", 3, 10)
 		end		
 		
@@ -278,8 +278,9 @@ local function GetTipsList()
 		AddTipOnce("Left click in empty area to deselect units.",1)
 		AddTipOnce("Right click to issue default order.\nKeep the button down to draw a formation line.",1)
 		AddTipOnce("Left click an action on the menu in the bottom-right, then left click in the terrain to give specific orders.",1)
-		AddTipOnce("Use the SHIFT key to enqueue orders",1)
+		AddTipOnce("Use the SHIFT key to enqueue orders.",1)
 		
+		AddTipOnce("Multiple constructors can build a structure together, or assist a factory.",2)
 		AddTipOnce("Keep making constructors and nanotowers as needed to spend your resources.", 2)
 		AddTipOnce("Avoid having large amounts of metal sitting in your storage. Spend it on combat units.", 2)
 	end
@@ -342,6 +343,7 @@ end
 local timer = 0
 local function SetTip(str)
 	local str = str or GetRandomTip()
+	alreadyDisplayedTips[str] = true
 	--Spring.Echo("Writing tip: "..str)
 	GenerateTextBox(str)
 	timer = 0	-- resets update timer if called by something other than Update()
@@ -357,16 +359,16 @@ function widget:Update(dt)
 end
 
 --tells people not to build the expensive stuff early
-function widget:UnitCreated(unitID, unitDefID, team)
-	if team ~= myTeam then return end
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+	if unitTeam ~= myTeam then return end
 	local t = Spring.GetGameSeconds()
 	local str
-	if superweapon[unitDefID] and t < TIMER_SUPERWEAPON then
-		str = WriteString(stringSuperweapon, unitDefID)
-	elseif adv_factory[unitDefID] and t < TIMER_ADV_FACTORY then
-		str = WriteString(stringAdvFactory, unitDefID)
-	elseif expensive_unit[unitDefID] and t < TIMER_EXPENSIVE_UNITS then
-		str = WriteString(stringExpensiveUnits, unitDefID)
+	if superweapon[-cmdID] and t < TIMER_SUPERWEAPON then
+		str = WriteString(stringSuperweapon, -cmdID)
+	elseif adv_factory[-cmdID] and t < TIMER_ADV_FACTORY then
+		str = WriteString(stringAdvFactory, -cmdID)
+	elseif expensive_unit[-cmdID] and t < TIMER_EXPENSIVE_UNITS then
+		str = WriteString(stringExpensiveUnits, -cmdID)
 	end
 	if str then SetTip(str) end	-- bring up the tip NOW
 end

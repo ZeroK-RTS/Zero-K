@@ -9,7 +9,7 @@ strikecomm = {
 	enabled = function() return (not Spring.GetSpectatingState()) end, -- enabled = true is not spec
 	poster = "LuaUI/Images/startup_info_selector/armcom.jpg",--will be used as option.poster
 	selector = "Strike Comm",--will be used as option.selector
-	tooltip = "Strike Commander\nUse beam laser, have a greater speed but less health.\nADV Strike Commander\nGain DGUN (150 E), even greater speed, cloak field, and personal cloak cost halved.",--will be used as option.tooltip
+	tooltip = "Strike Commander\nUse beam laser, have a greater speed but less health.\nADV Strike Commander\nGain DGUN, even greater speed, cloak field, and personal cloak cost halved.",--will be used as option.tooltip
 	button = function()
 	Spring.SendLuaRulesMsg("faction:nova")
 	printDebug("strike com")
@@ -34,7 +34,7 @@ reconcomm = {
 	enabled = function() return (not Spring.GetSpectatingState()) end,
 	poster = "LuaUI/Images/startup_info_selector/commrecon.jpg",
 	selector ="Recon Comm",
-	tooltip = "Recon Commander\nUse a low cost cloak and high mobility suit but a low RoF pulse rifle, lower income and very low health.\nADV Recon Commander\nGain AoE slow bombs, higher mobility suit and an ULTRA LOW cost cloak.\n\* BOTH CAN JUMP \*",
+	tooltip = "Recon Commander\nUse a low cost cloak and high mobility suit but a low RoF pulse rifle, lower income and reduced health.\nADV Recon Commander\nGain AoE slow bombs, higher mobility suit and an ULTRA LOW cost cloak.\n\* BOTH CAN JUMP \*",
 	button = function() 
 	Spring.SendLuaRulesMsg("faction:reconcomm")
 	Spring.SendCommands({'say a:I choose: Recon Commander !'})
@@ -46,7 +46,7 @@ supportcomm = {
 	enabled = function() return (not Spring.GetSpectatingState()) end,
 	poster = "LuaUI/Images/startup_info_selector/commsupport.jpg",
 	selector = "Support Comm",--because of the way spring handle font this text ("pp") is a shown few pixels higher than expected, nothing lethal.
-	tooltip = "Support Commander\nUse a slow-ray (non-damaging), have increased income, build and radar range but low health and speed. Comes with free storage.\nADV Support Commander\nGain better build power and radar range, wide healing aura, increased income, and a disruptor beam (damage + slow).",
+	tooltip = "Support Commander\nUse a slow-ray (non-damaging), have increased income and build range but low health and speed. Comes with free storage.\nADV Support Commander\nGain better build power and radar range, wide healing aura, increased income, and a disruptor beam (damage + slow).",
 	button = function() 
 	Spring.SendLuaRulesMsg("faction:supportcomm")
 	Spring.SendCommands({'say a:I choose: Support Commander !'})
