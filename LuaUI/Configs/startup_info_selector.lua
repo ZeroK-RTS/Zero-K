@@ -14,7 +14,7 @@ strikecomm = {
 	Spring.SendLuaRulesMsg("faction:nova")
 	printDebug("strike com")
 	Spring.SendCommands({'say a: I choose: Strike Commander !'})
-	Close()
+	Close(true)
 	end 
 	},
 
@@ -26,7 +26,7 @@ battlecomm = {
 	button = function() 
 	Spring.SendLuaRulesMsg("faction:logos")
 	Spring.SendCommands({'say a:I choose: Battle Commander !'})
-	Close()
+	Close(true)
 	end 
 	},
 
@@ -38,7 +38,7 @@ reconcomm = {
 	button = function() 
 	Spring.SendLuaRulesMsg("faction:reconcomm")
 	Spring.SendCommands({'say a:I choose: Recon Commander !'})
-	Close()
+	Close(true)
 	end 
 	},
 
@@ -50,7 +50,7 @@ supportcomm = {
 	button = function() 
 	Spring.SendLuaRulesMsg("faction:supportcomm")
 	Spring.SendCommands({'say a:I choose: Support Commander !'})
-	Close()
+	Close(true)
 	end 
 	},
 

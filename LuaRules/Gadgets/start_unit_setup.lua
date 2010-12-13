@@ -101,7 +101,9 @@ local ploppableDefs = {}
 local facplopsrunning = {}
 
 local gamestart = false
+local commSpawned = {}
 local createBeforeGameStart = {}
+local scheduledSpawn = {}
 local startPosition = {} -- [teamID] = {x, y, z}
 local shuffledStartPosition = {}
 local playerSides = {} -- sides selected ingame from widget  - per players
@@ -210,44 +212,6 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	return true
 end
 
-
-function gadget:GameFrame(n)
-  -- reset resources in frame 33 because of pre 0.82 engine
-  if (n == 33) then
-	local teamIDs = Spring.GetTeamList()
-	for i=1,#teamIDs do
-		local teamID = teamIDs[i]
-		local gaiaID = Spring.GetGaiaTeamID()
-		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
-		if	teamID ~= gaiaID 
-			and ((not teamLuaAI) or teamLuaAI == "" or teamLuaAI == "CAI")
-			and (
-				startMode == "boost" 
-				or startMode == "limitboost" 
-				or startMode == "facplopboost"
-			)
-		then
-
-			Spring.SetTeamResource(teamID, 'energy', START_BOOST_ENERGY)
-			Spring.SetTeamResource(teamID, 'metal', 0)
-
-    else
-
-      if startMode == "classic" then
-        Spring.SetTeamResource(teamID, "energy", START_CLASSIC_STORAGE)
-        Spring.SetTeamResource(teamID, "metal", START_CLASSIC_STORAGE)
-      else
-        Spring.SetTeamResource(teamID, "energy", START_STORAGE)
-        Spring.SetTeamResource(teamID, "metal", START_STORAGE)
-      end
-
-    end
-
-	end
-  end
-end
-
-
 function gadget:Initialize()
   -- self linking
   GG['boostHandler'] = {}
@@ -278,7 +242,6 @@ local function GetStartUnit(teamID, playerID)
   local sideCase = select(2, Spring.GetSideData(side)) -- case pls
   local startUnit = Spring.GetSideData(side)
   local chickens = modOptions and tobool(modOptions.chickens)
-  local replace = false
 	
   if (playerID and playerSides[playerID]) then 
 	return startUnits[playerSides[playerID]]
@@ -287,29 +250,9 @@ local function GetStartUnit(teamID, playerID)
   if (teamID and teamSides[teamID]) then 
 	return startUnits[teamSides[teamID]]
   end
-  
---FIXME: cleanup
-  if ((sideCase == "Chicken (Robots if disabled)") and not chickens) then
-    return DEFAULT_UNIT	--select(2, Spring.GetSideData(1)) -- robots
-  end
-
-  if replace then
-    local new_starters = {
-      [1]="armcom",	--select(2, Spring.GetSideData(2)), -- arm
---    [2]="corcom",	--select(2, Spring.GetSideData(3)), -- core
-    }
---[[
-    if chicken then
-      new_starters[#new_starters+1] = select(2, Spring.GetSideData(4))  -- chicken
-    end
-]]--
-    local rand = math.ceil( math.random() * #new_starters )
-    startUnit = new_starters[rand]
-  end
-  return startUnit or DEFAULT_UNIT
+  --didn't pick a comm, wait for user to pick
+  return nil	-- startUnit or DEFAULT_UNIT
 end
-
-
 
 
 local function GetFacingDirection(x, z, teamID)
@@ -356,6 +299,7 @@ end
 
 local function SpawnStartUnit(teamID, playerID)
   -- get start unit
+  if commSpawned[teamID] then return end	-- no getting double comms now!
   local startUnit = GetStartUnit(teamID, playerID)
 
   if startUnit then
@@ -366,8 +310,14 @@ local function SpawnStartUnit(teamID, playerID)
     local facing = GetFacingDirection(x, z, teamID)
 
     -- CREATE UNIT
-    local unitID = Spring.CreateUnit(startUnit, x, y, z, facing, teamID)
-
+	local unitID
+    if Spring.GetGameFrame() <= 1 then
+		unitID = Spring.CreateUnit(startUnit, x, y, z, facing, teamID)
+	else
+		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
+	end
+	commSpawned[teamID] = true
+	
     -- set the *team's* lineage root
     if Spring.SetUnitLineage then
       Spring.SetUnitLineage(unitID, teamID, true)
@@ -602,21 +552,63 @@ function gadget:GameStart()
   end
 end
 
-
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("faction:",1,true) then
 		local side = msg:sub(9)
 		playerSides[playerID] = side
 		local _,_,_,teamID = Spring.GetPlayerInfo(playerID)
 		teamSides[teamID] = side
+		if gamestart then
+			-- picked commander after game start, prep for orbital drop
+			-- can't do it directly because that's an unsafe change
+			local frame = Spring.GetGameFrame() + 3
+			if not scheduledSpawn[frame] then scheduledSpawn[frame] = {} end
+			scheduledSpawn[frame][#scheduledSpawn[frame] + 1] = {teamID, playerID}
+		end
 	end
 end
 
-local function SetFaction(side, teamID)
-	teamSides[teamID] = side
+function gadget:GameFrame(n)
+  -- reset resources in frame 33 because of pre 0.82 engine
+  if (n == 33) then
+	local teamIDs = Spring.GetTeamList()
+	for i=1,#teamIDs do
+		local teamID = teamIDs[i]
+		local gaiaID = Spring.GetGaiaTeamID()
+		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
+		if	teamID ~= gaiaID 
+			and ((not teamLuaAI) or teamLuaAI == "" or teamLuaAI == "CAI")
+			and (
+				startMode == "boost" 
+				or startMode == "limitboost" 
+				or startMode == "facplopboost"
+			)
+		then
+
+			Spring.SetTeamResource(teamID, 'energy', START_BOOST_ENERGY)
+			Spring.SetTeamResource(teamID, 'metal', 0)
+
+    else
+
+      if startMode == "classic" then
+        Spring.SetTeamResource(teamID, "energy", START_CLASSIC_STORAGE)
+        Spring.SetTeamResource(teamID, "metal", START_CLASSIC_STORAGE)
+      else
+        Spring.SetTeamResource(teamID, "energy", START_STORAGE)
+        Spring.SetTeamResource(teamID, "metal", START_STORAGE)
+      end
+
+    end
+
+	end
+  end
+  if scheduledSpawn[n] then
+	for _, spawnData in pairs(scheduledSpawn[n]) do
+		SpawnStartUnit(spawnData[1], spawnData[2])
+	end
+  end
 end
 
-GG.SetFaction = SetFaction
 --------------------------------------------------------------------
 -- unsynced code
 --------------------------------------------------------------------

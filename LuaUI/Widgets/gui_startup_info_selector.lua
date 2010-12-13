@@ -192,8 +192,9 @@ function CreateWindow()
   end
 end
 
-function Close()
-	printDebug("<gui_startup_info_selector DEBUG >: you have chosen to close.")
+function Close(commPicked)
+	printDebug("<gui_startup_info_selector DEBUG >: closing")
+	if not commPicked then Spring.SendLuaRulesMsg("faction:nova") end
 	--Spring_SendCommands("say: a:I chose " .. option.button})
 	mainWindow:Dispose()
 end
@@ -209,9 +210,10 @@ function widget:Shutdown()
 
 end
 
+-- keep the window open, we want to be able to pick later
 function widget:GameStart()
   if mainWindow then
-    mainWindow:Dispose()
+    --mainWindow:Dispose()
   end
 end
 
@@ -233,13 +235,12 @@ end
 
 -- use to play communism (always enabled) sound only at game start
 function _DrawScreen()
-  if (((Spring.GetGameSeconds() < 0.1) or Spring.IsCheatingEnabled()) and not (selectorShown)) then --create window in pregame and if not already shown
+  if (((Spring.GetGameSeconds() < 0.1) or Spring.IsCheatingEnabled())) then --create window in pregame and if not already shown
     if (Spring.GetModOption('communism',true,true)) then Spring.PlaySoundFile("LuaUI/Sounds/communism/sovnat1.wav", 1) 
 	else Spring.PlaySoundFile("LuaUI/Sounds/communism/cash-register-01.wav", 1) end 
-	
-		printDebug("<gui_startup_info_selector DEBUG >: it's _DrawScreen")
-		CreateWindow()
+	printDebug("<gui_startup_info_selector DEBUG >: it's _DrawScreen")
   end
+  if not (selectorShown) then CreateWindow() end
   UnbindCallins()
 end
 
