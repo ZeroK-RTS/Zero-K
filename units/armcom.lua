@@ -47,6 +47,7 @@ unitDef = {
     [[corhlt]],
     [[armpb]],
     [[armanni]],
+	[[cordoom]],
     [[cortl]],
     [[corrazor]],
     [[missiletower]],

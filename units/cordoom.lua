@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[cordoom]],
   name                          = [[Doomsday Machine]],
-  description                   = [[Medium Range Defense Fortress]],
+  description                   = [[Medium Range Defense Fortress - Requires 50 Power CONNECTED TO IT VIA A POWER GRID to fire main gun]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   armoredMultiple               = 0.25,
@@ -29,6 +29,9 @@ unitDef = {
     description_fr = [[Forteresse Arm?e]],
     helptext       = [[Armed with a heavy plasma cannon and a Heat Ray, the Doomsday Machine forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks, although it cannot fire its weapons while doing so.]],
     helptext_fr    = [[Arm?e d'un canon plasma lourd de moyenne port?e et d'un rayon ? chaleur la Doomday Machine ou DDM comme on la surnomme, est capable de faire face ? tous type de menace. Nu?e, unit?s blind?es voire aerienne si assez proche, tout y passe! Son prix relativement ?lev? en limite cependant l'usage.]],
+    pylonrange     = 50,
+	neededlink     = 50,
+	keeptooltip    = [[any string I want]],
   },
 
   damageModifier                = 0.25,

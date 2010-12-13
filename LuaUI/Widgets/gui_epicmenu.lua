@@ -1144,9 +1144,11 @@ local function flattenTree(tree, parent)
 					--controlfunc(self)
 					origOnChange(option)
 				end
-				widgetHandler.widgets[option.windex].options[option.key].OnChange = function(self)
-					controlfunc(self)
-					--origOnChange(option)
+				if widgetHandler.widgets[option.windex].options then
+					widgetHandler.widgets[option.windex].options[option.key].OnChange = function(self)
+						controlfunc(self)
+						--origOnChange(option)
+					end
 				end
 			end
 			--]]

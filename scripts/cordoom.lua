@@ -17,6 +17,7 @@ local heatray = piece "Heatray"
 local flare2 = piece "flare2"
 local flare3 = piece "flare3"
 
+local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
 local smokePieces = { shell_1, shell_2, cannonbase, heatray }
 
@@ -114,7 +115,7 @@ if not on then return false end
 	WaitForTurn (shellbase, y_axis)
 	WaitForTurn (cannonbase, x_axis)
 
-	return true
+	return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
 end
 
 function script.FireWeapon1()

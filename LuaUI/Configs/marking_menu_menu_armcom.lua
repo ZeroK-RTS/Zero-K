@@ -205,7 +205,7 @@ local menu_armcom = {
       },
       {
         angle = 180,
-        unit = "mahlazer"
+        unit = "cordoom"
       },
       {
         angle = -45,
@@ -222,10 +222,10 @@ local menu_armcom = {
     unit = "cormine1",
     label = "Misc.",
     items = {
-      --{
-        --angle = -90,
-        --unit = "armatl"
-      --},  
+	   {
+        angle = -90,
+        unit = "mahlazer"
+       },  
     },
   },
   },
