@@ -19,7 +19,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Dreamweaver captures up to 280 metal worth of enemy units, turning them against their former allies.]],
+    helptext = [[The Dreamweaver captures a single enemy unit, turning it against its former allies.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -102,7 +102,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 380,
+      range                   = 460,
       reloadtime              = 0.1,
       renderType              = 0,
       rgbColor                = [[0 0.8 0.2]],

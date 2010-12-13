@@ -31,7 +31,6 @@ end
 for name,data in pairs(WeaponDefNames) do
 	if data.customParams.timeslow_preset then
 		weapons[name] = CopyTable(presets[data.customParams.timeslow_preset])
-		Spring.Echo(name)
 	end
 	if weapons[name] then array[data.id] = weapons[name] end
 end
