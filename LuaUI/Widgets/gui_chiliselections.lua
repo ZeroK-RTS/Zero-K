@@ -966,7 +966,7 @@ function widget:Initialize()
 	window_corner = Window:New{
 		name   = 'unitinfo';
 		x      = 0;
-		y = y;
+		bottom = 200;
 		clientHeight = window_height;
 		clientWidth  = 400;
 		dockable = true,

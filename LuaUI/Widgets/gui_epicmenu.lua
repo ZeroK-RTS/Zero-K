@@ -1593,8 +1593,8 @@ local function MakeCrudeMenu()
 	
 	window_crude = Window:New{
 		name='epicmenubar',
-		x = '60%',  
-		y = '0%',
+		x = 420,  
+		bottom = 0,
 		dockable = true,
 		clientWidth = crude_width,
 		clientHeight = crude_height,

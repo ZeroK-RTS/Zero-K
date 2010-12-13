@@ -109,7 +109,7 @@ options = {
 		type = 'number',
 		min = 1,
 		max = 50,
-		value = 12,
+		value = 20,
 	},
 	zoominfactor = {
 		name = 'Zoom-in speed',
