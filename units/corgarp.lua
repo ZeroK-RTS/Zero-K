@@ -105,6 +105,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+	  model                   = [[logmine.s3o]],
       myGravity               = 0.3,
       noSelfDamage            = true,
       range                   = 800,

@@ -243,6 +243,7 @@ function widget:GameFrame(n)
 	local teamODInc = Format(WG.metalFromOverdrive or 0)
 	local teamOtherM = Format(teamMInco - (WG.metalFromOverdrive or 0) - (WG.mexIncome or 0))
 	local teamWasteM = Format(math.min(teamFreeStorage - teamMInco,0))
+	local totalMetalIncome = Format(teamMInco)
 	
 	local energyInc = Format(eInco - math.max(0, (WG.change or 0)))
 	local energyShare =  Format(WG.change or 0)
@@ -263,6 +264,7 @@ function widget:GameFrame(n)
 	"\nConstruction: " .. constuction ..
 	"\n" .. 
 	"\nTeam Metal Economy" ..
+	"\nTotal Income: " .. totalMetalIncome ..
 	"\nBase Extraction: " .. teamMexInc ..
 	"\nOverdrive: " .. teamODInc ..
 	"\nReclaim and Cons: " .. teamOtherM ..
