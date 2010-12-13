@@ -17,8 +17,8 @@
 -- stable release?
 local isStable = false
 
-local ORDER_VERSION = 6 --- change this to reset enabled/disabled widgets
-local DATA_VERSION = 5 -- change this to reset enabled/disabled widgets
+local ORDER_VERSION = 7 --- change this to reset enabled/disabled widgets
+local DATA_VERSION = 7 -- change this to reset enabled/disabled widgets
 
 function includeZIPFirst(filename, envTable)
   if (string.find(filename, '.h.lua', 1, true)) then
