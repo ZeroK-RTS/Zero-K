@@ -875,7 +875,8 @@ function gadget:GameFrame(n)
 
 				local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 				summedMetalProduction = summedMetalProduction + orgMetal
-				if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
+				local pylonDef = pylonDefs[Spring.GetUnitDefID(unitID)]
+				if pylonDef and not pylonDef.keeptooltip then
 					if unitDef then
 						Spring.SetUnitTooltip(unitID,"Metal Extractor - Makes: " .. math.round(orgMetal,2) .. " Not connected to Grid")
 					else
