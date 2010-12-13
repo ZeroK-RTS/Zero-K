@@ -1,0 +1,509 @@
+local widgetName = "Automatic Tip Dispenser"
+
+local playerID = Spring.GetMyPlayerID()
+local rank = playerID and select(9, Spring.GetPlayerInfo(playerID))
+
+function widget:GetInfo()
+	return {
+		name = widgetName,
+		desc = "Teach you to play the game, one tip at a time",
+		author = "KingRaptor; original by zwzsg",
+		date = "July 30th, 2009",
+		license = "Public Domain",
+		layer = 8,
+		enabled = (rank and rank == 1) or false,
+		handler  = true,
+	}
+end
+
+------------------------
+-- speedups
+local spGetMyTeamID = Spring.GetMyTeamID
+local spGetTeamUnitsByDefs = Spring.GetTeamUnitsByDefs
+local spGetTeamResources = Spring.GetTeamResources
+
+------------------------
+--  CONFIG
+------------------------
+VFS.Include("LuaUI/Configs/tipconfig.lua",nil)
+
+local tipsList = {}
+local alreadyDisplayedTips = {}
+local tipPeriod = 8 -- How long each tip is displayed, in seconds
+local FontSize = nil
+local SoundTable = {}
+local SoundToggle = true
+local MouseButton = nil
+
+local generalTipsIndex = math.random(1, #generalTips)
+
+local airSpotted = false
+local nukeSpotted = false
+
+local updateFrequency = tipPeriod
+
+local myTeam = spGetMyTeamID()
+
+-----------------------
+-- minimum complexity of tips to display
+-- 1 = new to RTS
+-- 2 = a bit of experience with ZK
+-- 3 = up to intermediate
+local helpLevel = 1		-- rank and math.max(rank, 3) or 1
+
+-- Chili classes
+local Chili
+local Button
+local Label
+local Window
+local Panel
+local TextBox
+local Image
+local Control
+
+-- Chili instances
+local screen0
+local window
+local image
+local textBox
+local close
+local closeImage
+local nextTip
+
+local function SortCompareTables(t1,t2)
+	table.sort(t1)
+	table.sort(t2)
+	if #t1~=#t2 then
+		return false
+	else
+		for k=1,#t1 do
+			if t1[k]~=t2[k] then
+				return false
+			end
+		end
+		return true
+	end
+end
+
+-- The round2 function from http://lua-users.org/wiki/SimpleRound fails on 0.11
+local function FormatNbr(x,digits)
+	local _,fractional = math.modf(x)
+	if fractional==0 then
+		return x
+	elseif fractional<0.01 then
+		return math.floor(x)
+	elseif fractional>0.99 then
+		return math.ceil(x)
+	else
+		local ret=string.format("%."..(digits or 0).."f",x)
+		if digits and digits>0 then
+			while true do
+				local last = string.sub(ret,string.len(ret))
+				if last=="0" or last=="." then
+					ret = string.sub(ret,1,string.len(ret)-1)
+				end
+				if last~="0" then
+					break
+				end
+			end
+		end
+		return ret
+	end
+end
+
+local function MakePlural(str)
+	local ending=string.sub(str,string.len(str),string.len(str))
+	if ending=="y" then
+		return string.sub(str,1,string.len(str)-1).."ies"
+	elseif ending==">" or ending=="s" then
+		return str
+	else
+		return str.."s"
+	end
+end
+
+local function WriteString(str, unitDef, plural)
+	local name = (type(unitDef) == "number") and UnitDefs[unitDef].humanName or UnitDefNames[unitDef].humanName 
+	if plural then name = MakePlural(name) end
+	return string.gsub(str, "<name>", name, 1)
+end
+
+local function AddTip(str, level, weight, sound)
+	level = level or 1
+	if level < helpLevel then return end
+	weight = weight or 1
+	local text, sound = str or "", sound or nil
+	tipsList[#tipsList + 1] = {weight = weight, text = text, sound = sound}
+end
+
+local function AddTipOnce(str, level, weight, sound)
+	if alreadyDisplayedTips[str] then return end
+	AddTip(str, level, weight, sound) 
+	alreadyDisplayedTips[str] = true
+end
+
+local function CountMy(unitKind)
+	local defs = {}
+	for i in pairs(unitKind) do
+		defs[#defs+1] = i
+	end
+	local got=spGetTeamUnitsByDefs(myTeam, defs)
+	if got==nil then
+		return 0
+	else
+		return #got
+	end
+end
+
+local function CountTheirs(unitKind)
+	local nGot=0
+	local defs = {}
+	for i in pairs(unitKind) do
+		defs[#defs+1] = i
+	end
+	for _,team in ipairs(Spring.GetTeamList()) do
+		if not Spring.AreTeamsAllied(team,myTeam) then
+			nGot=nGot+#(spGetTeamUnitsByDefs(team,defs) or {})
+		end
+	end
+	return nGot
+end
+
+local function Prevalence(unitKind)
+	local Total=Spring.GetTeamUnitCount(myTeam)
+	if Total==0 then
+		return 0
+	else
+		return CountMy(unitKind)/Total
+	end
+end
+
+local function IsSelected(unitKind)
+	local isSelected=false
+	for _,u in ipairs(spGetTeamUnitsByDefs(myTeam,unitKind)) do
+		if Spring.IsUnitSelected(u) then
+			isSelected=true
+		end
+	end
+	return isSelected
+end
+
+-- used to get weighted sum of units in existence and selected
+local function PSC(unitKind,PrevalenceWeight,isSelectedWeight)
+	PrevalenceWeight=PrevalenceWeight or 1
+	isSelectedWeight=isSelectedWeight or 1
+	return PrevalenceWeight*Prevalence(unitKind)+isSelectedWeight*(IsSelected(unitKind) and 1 or 0)
+end
+
+local function GetDamage(predator,prey)
+	return WeaponDefs[UnitDefs[UnitDefNames[predator].id].weapons[1].weaponDef].damages[UnitDefs[UnitDefNames[prey].id].armorType]
+end
+
+local function GetTipsList()
+	local t=myTeam
+	tipsList={}
+
+	-- Always shown tips
+	AddTipOnce("Use F11 to toggle \"widgets\",\nsuch as this automatic tip dispenser.", 1)
+	-- ("Tips voice-over is on",91)
+	-- ("Tips voice-over is off",92)
+
+	-- General interface tips
+	AddTipOnce("Ctrl + F1 to F5 to change camera mode.\nCtrl F2 is the default (TA Overhead).", 1)
+	AddTipOnce("Use Mouse Wheel to zoom in and out", 1)
+
+	-- Beginning: Getting the commander to build the starting base
+	if CountMy(energy)+CountMy(mex)==0 then
+		if Spring.GetTeamUnitCount(t)==0 then
+			if Game.startPosType==2 and Spring.GetGameFrame()==0 then
+				AddTipOnce("Pick a starting position, then click ready.\nLook for areas with metal spots (press F4 to toggle the metal map). Do not spawn in a cliff!", 1)
+			else
+				AddTip("Game is loading.\nIf it takes forever you may want to consider Alt+F.", 3, 10000)
+			end
+		elseif CountMy(commander)==1 then
+			if Spring.GetSelectedUnitsCount()==0 then
+				AddTipOnce("Select your commander and start building your base.", 1)
+				AddTipOnce("You can select something to build by pressing right click and drawing a gesture, or using the buttons in the menu (bottom right)", 1)
+			end
+			AddTipOnce("Metal is the principal game resource. Build some Metal Extractors (mexes) on the metal spots.", 1)
+			AddTipOnce("Energy is also essential for your economy to function. Build some Solar Collectors or Wind Generators.", 1)
+			AddTipOnce("Buildpower, often described as the third resource, is the measure of how much you can spend at once. We'll discuss that later.", 1)
+		end
+
+	-- Beginning: Getting commander) to build the first fac
+	elseif CountMy(energy)>=3 and CountMy(mex)>=1 and CountMy(factory) == 0 then
+		AddTipOnce("Use your commander to make a factory. The Shield Bot Factory is a good choice for beginners.", 1)
+	-- Once the player has started getting stuff done
+	else
+		if CountMy(factory)>=1 then
+			AddTipOnce("Build some units with that factory. You'll want to start with a couple of constructors for expansion and a few raiders for early combat.", 1)
+		end
+		if CountMy(energy)>= 5 then
+			AddTipOnce("Connect energy to your mexes to allow them to OVERDRIVE, which uses excess energy to produce more metal.", 1)
+		end
+		if CountMy(energy)>= 5 and (IsSelected(mex) or IsSelected(energy)) then
+			AddTipOnce("The circles around your mexes and energy (when selected) indicate their pylon radius.\nTwo econ buildings are connected if their circles overlap.", 2)
+			AddTipOnce("The color of a pylon grid denotes its efficiency. Blue is good, red is bad. Purple is unlinked.", 2)
+		end
+		if CountMy(raider) >= 1 then
+			AddTipOnce("Fast but fragile, raiders are suitable for harassing the enemy's economy, as well as jumping skirmishers and the like.", 1, 2)
+			AddTipOnce("Raiders should avoid charging enemy defenses or riot units head-on.",1, 2)
+		end
+		if CountMy(assault) >= 1 then
+			AddTipOnce("Assault units are generally good all-rounders, but they particularly excel at punching through defensive lines.", 1, 2)
+		end
+		if CountMy(skirm) >= 1 then
+			AddTipOnce("Skirmishers are medium-ranged units, ideal for picking off riot units and some defenses from afar. They are vulnerable to raider charges.", 1, 2)
+		end
+		if CountMy(riot) >= 1 then
+			AddTipOnce("Riot units are slow, short-ranged, and extremely deadly. Use them to counter raiders, but do not attack defenses head-on with them.", 1, 2)
+		end
+		if CountMy(arty) >= 1 then
+			AddTipOnce("Artillery excels at shelling enemy defenses from a safe distance. It is usually (though not always) relatively ineffective against mobile units.", 1, 2)
+		end
+		if CountMy(bomber) >= 1 then
+			AddTipOnce("Bombers require air repair pads to reload after each run. The Aircraft Plant comes with one free pad, but you should build more to avoid long waiting lines.", 2, 5)
+		end
+		local mlevel, mstore = spGetTeamResources(myTeam, "metal")
+		if mlevel/mstore >= 0.95 then
+			AddTip("Your metal storage is overflowing. You should get more buildpower and spend it.", 2, 5)
+		end
+		local elevel, estore = spGetTeamResources(myTeam, "energy")
+		if elevel < 100 then
+			AddTip("Your energy reserves are running dangerously low. You should build more energy structures.", 3, 10)
+		end		
+		
+		--always tips
+		AddTipOnce("Left click to select a unit.\nKeep button down to drag a selection box.",1)
+		AddTipOnce("Left click in empty area to deselect units.",1)
+		AddTipOnce("Right click to issue default order.\nKeep the button down to draw a formation line.",1)
+		AddTipOnce("Left click an action on the menu in the bottom-right, then left click in the terrain to give specific orders.",1)
+		AddTipOnce("Use the SHIFT key to enqueue orders",1)
+		
+		AddTipOnce("Keep making constructors and nanotowers as needed to spend your resources.", 2)
+		AddTipOnce("Avoid having large amounts of metal sitting in your storage. Spend it on combat units.", 2)
+	end
+end
+
+local function GetGeneralTip(index)
+	local index = index or generalTipsIndex
+	if index > #generalTips then index = 1 end
+	local str = generalTips[index]
+	generalTipsIndex = index + 1
+	return str, nil
+end
+
+-- Pick a contextual tip
+local function GetRandomTip()
+	GetTipsList()-- Create tipsList according to what's going on
+	if #tipsList >=2 then
+		local w=0
+		for t,_ in ipairs(tipsList) do
+			w=w+tipsList[t].weight
+		end
+		local d = w*math.random()
+		w=0
+		for t,_ in ipairs(tipsList) do
+			w=w+tipsList[t].weight
+			if w>=d then
+				local text, sound = tipsList[t].text,tipsList[t].sound
+				--table.remove(tipsList, t)
+				return text, sound
+			end
+		end
+		return "Could not fetch tip",nil
+	elseif #tipsList==1 then
+		local text, sound = tipsList[1].text,tipsList[1].sound
+		--tipsList[1] = nil
+		return text, sound
+	else
+		return GetGeneralTip()
+	end
+end
+
+-- need to regenerate textBox each time because TextBox:SetText() doesn't always do so
+local function GenerateTextBox(str)
+	if textBox then window:RemoveChild(textBox) end
+	textBox = TextBox:New{
+		parent  = window;
+		text    = str or '',
+		x       = image.width + image.x + 5,
+		y       = 16;
+		width   = window.width - 90 - 30,
+		valign  = "ascender";
+		align   = "left";
+		font    = {
+			size   = 12;
+			shadow = true;
+		},
+	}	
+end
+
+local timer = 0
+local function SetTip(str)
+	local str = str or GetRandomTip()
+	--Spring.Echo("Writing tip: "..str)
+	GenerateTextBox(str)
+	timer = 0	-- resets update timer if called by something other than Update()
+end
+
+function widget:Update(dt)
+	timer = timer + dt
+	if timer > updateFrequency then
+--		myTeam = spGetMyTeamID()	-- just refresh for fun
+		SetTip()
+		timer = 0
+	end
+end
+
+--tells people not to build the expensive stuff early
+function widget:UnitCreated(unitID, unitDefID, team)
+	if team ~= myTeam then return end
+	local t = Spring.GetGameSeconds()
+	local str
+	if superweapon[unitDefID] and t < TIMER_SUPERWEAPON then
+		str = WriteString(stringSuperweapon, unitDefID)
+	elseif adv_factory[unitDefID] and t < TIMER_ADV_FACTORY then
+		str = WriteString(stringAdvFactory, unitDefID)
+	elseif expensive_unit[unitDefID] and t < TIMER_EXPENSIVE_UNITS then
+		str = WriteString(stringExpensiveUnits, unitDefID)
+	end
+	if str then SetTip(str) end	-- bring up the tip NOW
+end
+
+function widget:UnitEnteredLos(unitID, unitTeam)
+	if not Spring.AreTeamsAllied(unitTeam, myTeam) then
+		local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
+		if unitDef.canFly and not airSpotted then
+			SetTip(stringAirSpotted)
+			airSpotted = true
+		elseif unitDef.name == "corsilo" and not nukeSpotted then
+			SetTip(stringNukeSpotted)
+			nukeSpotted = true			
+		end
+	end
+end
+
+function widget:Initialize()
+	if VFS.FileExists("LuaRules/Gadgets/mission.lua") then
+		widgetHandler:RemoveWidget()	-- no need for tips in mission
+	end
+	
+	-- setup Chili
+	Chili = WG.Chili
+	Button = Chili.Button
+	Label = Chili.Label
+	Window = Chili.Window
+	Panel = Chili.Panel
+	TextBox = Chili.TextBox
+	Image = Chili.Image
+	Control = Chili.Control
+	screen0 = Chili.Screen0
+	
+	window = Window:New{
+		parent = screen0,
+		name   = 'tipwindow';
+		width = 320,
+		height = 100,
+		right = 0; 
+		bottom = 350;
+		dockable = true;
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = false,
+		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
+		padding = {5, 0, 5, 0},
+		--itemMargin  = {0, 0, 0, 0},
+	}
+	image = Image:New {
+		width = 80,
+		height = 80,
+		bottom = 10,
+		y= 10;
+		x= 5;
+		keepAspect = true,
+		file = "LuaUI/Images/advisor2.jpg";
+		parent = window;
+	}
+
+	GenerateTextBox()
+	
+	close = Button:New {
+		width = 20,
+		height = 20,
+		y = 4,
+		right = 3,
+		parent=window;
+		padding = {0, 0, 0,0},
+		margin = {0, 0, 0, 0},
+		backgroundColor = {1, 1, 1, 0.4},
+		caption="";
+		tooltip = "Close Tip Dispenser";
+		OnMouseDown = {function() Spring.SendCommands("luaui disablewidget ".. widgetName) end}
+	}
+	closeImage = Image:New {
+		width = 16,
+		height = 16,
+		x = 2,
+		y = 2,
+		keepAspect = false,
+		file = "LuaUI/Images/closex_16.png";
+		parent = close;
+	}	
+		
+	--sound code
+	--[[
+	local TipSoundFileList=VFS.DirList("sounds/tips")
+	for _,FileName in ipairs(TipSoundFileList) do
+		local ext=string.lower(string.sub(FileName,-4))
+		if ext==".ogg" or ext==".wav" then
+			local pref=string.match(FileName,".*%/(%d+)%.%a+")
+			if pref and (ext==".ogg" or SoundTable[tonumber(pref) or pref]==nil) then
+				SoundTable[tonumber(pref) or pref]=FileName
+			end
+		end
+	end
+	-- List the tips that do not contain side specific words:
+	for _,t in ipairs({87,88,711,712,713,11,12,21,22,23,24,25,26,27,71,72,73,81,82,83,84,85,86}) do
+		for s=1000,5000,1000 do
+			if not SoundTable[s+t] then-- If they have no side specific voice file
+				if not SoundTable[3000+t] then
+					Spring.Echo("No sound for tip #"..s+t..", default #"..(3000+t).." not available either!")
+				else
+					SoundTable[s+t]=SoundTable[3000+t]-- Make them use the Network voice
+					--Spring.Echo("No sound for tip #"..s+t..", defaulting to "..(3000+t))
+				end
+			end
+		end
+	end
+	
+	local function QS(a)
+		if type(a)=="number" then
+			return tostring(a)
+		elseif type(a)=="string" then
+			return "\""..a.."\""
+		else
+			return "("..tostring(type(a))..")"..a
+		end
+	end
+	if Spring.IsDevLuaEnabled() then
+		Spring.Echo("<SoundTable>")
+		for key,value in pairs(SoundTable) do
+			Spring.Echo("Soundtable["..QS(key).."]="..QS(value))
+		end
+		Spring.Echo("</SoundTable>")
+	end
+	--]]
+	
+	SetTip()
+end
+
+--function widget:GameFrame(f)
+--end
+
+function widget:Shutdown()
+	WG.KP_AutomaticTipDispenser=nil
+end
+
+
