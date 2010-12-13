@@ -1,4 +1,3 @@
--- $Id: actions.lua 2491 2008-07-17 13:36:51Z det $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -31,7 +30,7 @@ local isSyncedCode = (SendToUnsynced ~= nil)
 
 local function MakeWords(line)
   local words = {}
-  for w in line:gmatch("[^%s]+") do
+  for w in string.gmatch(line, "[^%s]+") do
     table.insert(words, w)
   end   
   return words
@@ -48,7 +47,7 @@ local function InsertCallInfo(callInfoList, gadget, func, help)
   local layer = gadget.ghInfo.layer
   local index = 1
   for i,ci in ipairs(callInfoList) do
-    local g = ci[2]
+    local g = ci[1]
     if (g == gadget) then
       return false  --  already in the table
     end
@@ -80,7 +79,7 @@ end
 local function RemoveCallInfo(callInfoList, gadget)
   local count = 0
   for i,callInfo in ipairs(callInfoList) do
-    local g = callInfo[2]
+    local g = callInfo[1]
     if (g == gadget) then
       table.remove(callInfoList, i)
       count = count + 1
@@ -152,7 +151,7 @@ end
 --------------------------------------------------------------------------------
 
 local function EchoLines(msg)
-  for line in msg:gmatch('([^\n]+)\n?') do
+  for line in string.gmatch(msg, '([^\n]+)\n?') do
     Spring.Echo(line)
   end
 end
@@ -216,7 +215,7 @@ local function GotChatMsg(msg, playerID)
 
   -- remove the command from the words list and the raw line
   table.remove(words, 1)
-  local _,_,msg = msg:find("[%s]*[^%s]+[%s]+(.*)")
+  local _,_,msg = string.find(msg, "[%s]*[^%s]+[%s]+(.*)")
   if (msg == nil) then
     msg = ""  -- no args
   end
@@ -233,7 +232,8 @@ local function GotChatMsg(msg, playerID)
 end
 
 
-local function RecvFromSynced(arg1,arg2,...)
+local function RecvFromSynced(...)
+  local arg1, arg2 = ...
   if (type(arg1) == 'string') then
     -- a raw sync msg
     local callInfoList = syncActions[arg1]
@@ -244,13 +244,21 @@ local function RecvFromSynced(arg1,arg2,...)
     for i,callInfo in ipairs(callInfoList) do
       local func = callInfo[1]
       -- local gadget = callInfo[2]
-      if (func(arg1,arg2,...)) then
+      if (func(...)) then
         return true
       end
     end
     return false
   end
 
+  if (type(arg1) == 'number') then
+    -- a proxied chat msg
+    if (type(arg2) == 'string') then
+      return GotChatMsg(arg2, arg1)
+    end
+    return false
+  end
+  
   return false -- unknown type
 end
 
