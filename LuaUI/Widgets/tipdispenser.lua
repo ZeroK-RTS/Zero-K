@@ -6,12 +6,12 @@ local rank = playerID and select(9, Spring.GetPlayerInfo(playerID))
 function widget:GetInfo()
 	return {
 		name = widgetName,
-		desc = "Teach you to play the game, one tip at a time",
+		desc = "v0.4 Teach you to play the game, one tip at a time",
 		author = "KingRaptor; original by zwzsg",
 		date = "July 30th, 2009",
 		license = "Public Domain",
 		layer = 8,
-		enabled = (rank and rank == 1) or false,
+		enabled = (rank and rank == 1) or true,
 		handler  = true,
 	}
 end
@@ -231,7 +231,7 @@ local function GetTipsList()
 		
 	-- Beginning: Getting commander) to build the first fac
 	elseif CountMy(energy) >= 3 and CountMy(mex)>= 1 and CountMy(factory) == 0 then
-		AddTip("Use your commander to make a factory. The Shield Bot Factory is a good choice for beginners.", 1, 5)
+		AddTip("Use your commander to make a factory. The Shield Bot Factory is a good choice for beginners.\nYour first factory is \255\255\64\0FREE\008.", 1, 5)
 
 		-- Once the player has started getting stuff done
 	else
@@ -239,7 +239,7 @@ local function GetTipsList()
 			AddTipOnce("Build some units with that factory. You'll want to start with a couple of constructors for expansion and a few raiders for early combat.", 1, 10)
 		end
 		if CountMy(energy)>= 5 then
-			AddTipOnce("Connect energy to your mexes to allow them to OVERDRIVE, which uses excess energy to produce more metal.", 1)
+			AddTipOnce("Connect energy to your mexes to allow them to \255\255\64\0overdrive\008, which uses excess energy to produce more metal.", 1)
 		end
 		if CountMy(energy)>= 5 and (IsSelected(mex) or IsSelected(energy)) then
 			AddTipOnce("The circles around your mexes and energy (when selected) indicate their pylon radius.\nTwo econ buildings are connected if their circles overlap.", 2)

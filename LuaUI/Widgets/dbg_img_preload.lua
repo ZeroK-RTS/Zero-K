@@ -27,8 +27,7 @@ function widget:DrawGenesis()
 		gl.Texture(7, file)
 		gl.Texture(7, false)
 		v = v + 1
-	end
-	if (UnitDefs[i])or(Spring.GetGameFrame()>1) then
+	elseif (UnitDefs[i])or(Spring.GetGameFrame()>1) then
 		gl.Texture(7,'#'..i)
 		gl.Texture(7,false)
 		i = i + 1
