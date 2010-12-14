@@ -100,12 +100,13 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- only changes target if the target is fully slowed and next order is an attack order
 	if Spring.ValidUnitID(attackerID) and attritionWeaponDefs[weaponID].smartRetarget then
 		local health = Spring.GetUnitHealth(unitID)
-		if slowedUnits[unitID].slowDamage > health*0.66 then
+		if slowedUnits[unitID].slowDamage > health*0.5 then
 			
 			local cmd = Spring.GetCommandQueue(attackerID)
 
 			-- set order by player
-			if #cmd > 1 and (cmd[1].id == CMD_ATTACK and (cmd[2].id == CMD_ATTACK or 
+			if #cmd > 1 and (cmd[1].id == CMD_ATTACK and #cmd[1].params == 1 and cmd[1].params[1] == unitID 
+				and (cmd[2].id == CMD_ATTACK or 
 				(#cmd > 2 and cmd[2].id == CMD_SET_WANTED_MAX_SPEED and cmd[3].id == CMD_ATTACK))) then
 				
 				local re = Spring.GetUnitStates(attackerID)["repeat"]
@@ -127,6 +128,13 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 				local newTargetID = Spring.GetUnitNearestEnemy(attackerID,UnitDefs[attackerDefID].range, true)
 				if newTargetID ~= unitID and spValidUnitID(attackerID) and spValidUnitID(newTargetID) then
 					Spring.SetUnitTarget(attackerID,newTargetID)
+					if #cmd > 0 and cmd[1].id == CMD_ATTACK then
+						if #cmd > 1 and cmd[2].id == CMD_SET_WANTED_MAX_SPEED then
+							Spring.GiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag},{})
+						else
+							Spring.GiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
+						end
+					end
 				end
 			end
 			
