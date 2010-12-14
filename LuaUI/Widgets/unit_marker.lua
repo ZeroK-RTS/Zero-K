@@ -1,4 +1,4 @@
-local versionNumber = "1.3.7"
+local versionNumber = "1.3.9"
 
 function widget:GetInfo()
 	return {
@@ -83,7 +83,7 @@ unitList["CA1F"]["starlight"] =		{ markerText = "Starlight" }
 unitList["CA1F"]["cafus"] =			{ markerText = "Singularity Reactor" }
 unitList["CA1F"]["armfus"] =		{ markerText = "Fusion Reactor" }
 unitList["CA1F"]["amgeo"] =			{ markerText = "Moho Geo" }
-unitList["CA1F"]["geo"] =			{ markerText = "Geo" }
+--unitList["CA1F"]["geo"] =			{ markerText = "Geo" }
 unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
 unitList["CA1F"]["chickenspire"] =		{ markerText = "Spire" }
 unitList["CA1F"]["chicken_dragon"] =	{ markerText = "White Dragon" }
@@ -284,7 +284,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to 
 				printDebug("<Unit Marker>: Found this : " .. unitID )
 				secondUnitID = unitID
 				if ( secondUnitID == firstUnitID ) then
-					spMarkerAddPoint( x, y, z, myName .. "\nComm\ncorpse")
+					--spMarkerAddPoint( x, y, z, myName .. "\nComm\ncorpse")	-- not really important enough to merit a marker
 					--Spring.SendCommands({'say a:I lost my commander !'})	--would it kill you to actually check for spec state before doing this?
 				else
 					ud = UnitDefs[unitDefID]

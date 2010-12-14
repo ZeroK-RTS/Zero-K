@@ -26,6 +26,7 @@ generalTips = {
 	"Cloaked units can be revealed by close contact, or when damaged.",
 	"Slow-rays and other weapons with slowing effects will reduce the target's movement and firing rate by up to 66%.",
 	"Hovercraft are fast and can transverse water, but struggle on even gentle slopes.",
+	"Most units have a smart Unit AI, which has them automatically kite or jink enemy units as needed on a fight order or when standing still.",
 	"Spiders have excellent mobility including the ability to scale cliffs, although they tend to lack direct strength.",
 }
 

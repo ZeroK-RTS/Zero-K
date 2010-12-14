@@ -224,7 +224,7 @@ local function GetTipsList()
 				AddTip("Select your commander and start building your base.", 1)
 				AddTip("You can select something to build by pressing right click and drawing a gesture, or using the buttons in the menu (bottom right)", 1)
 			end
-			AddTip("Metal is the principal game resource. Build some Metal Extractors (mexes) on the metal spots.", 1)
+			AddTip("Metal is the principal game resource. Build some Metal Extractors (mexes) on the metal spots.", 1, 3)
 			AddTip("Energy is also essential for your economy to function. Build some Solar Collectors or Wind Generators.", 1)
 			AddTip("Buildpower, often described as the third resource, is the measure of how much you can spend at once. We'll discuss that later.", 1)
 		end
@@ -246,20 +246,20 @@ local function GetTipsList()
 			AddTipOnce("The color of a pylon grid denotes its efficiency. Blue is good, red is bad. Purple is unlinked.", 2)
 		end
 		if CountMy(raider) >= 1 then
-			AddTipOnce("Fast but fragile, raiders are suitable for harassing the enemy's economy, as well as jumping skirmishers and the like.", 1, 2)
+			AddTipOnce("Fast but fragile, raiders are suitable for harassing the enemy's economy, as well as jumping skirmishers and the like.", 1, 3)
 			AddTipOnce("Raiders should avoid charging enemy defenses or riot units head-on.",1, 2)
 		end
 		if CountMy(assault) >= 1 then
-			AddTipOnce("Assault units are generally good all-rounders, but they particularly excel at punching through defensive lines.", 1, 2)
+			AddTipOnce("Assault units are generally good all-rounders, but they particularly excel at punching through defensive lines.", 1, 3)
 		end
 		if CountMy(skirm) >= 1 then
-			AddTipOnce("Skirmishers are medium-ranged units, ideal for picking off riot units and some defenses from afar. They are vulnerable to raider charges.", 1, 2)
+			AddTipOnce("Skirmishers are medium-ranged units, ideal for picking off riot units and some defenses from afar. They are vulnerable to raider charges.", 1, 3)
 		end
 		if CountMy(riot) >= 1 then
-			AddTipOnce("Riot units are slow, short-ranged, and extremely deadly. Use them to counter raiders, but do not attack defenses head-on with them.", 1, 2)
+			AddTipOnce("Riot units are slow, short-ranged, and extremely deadly. Use them to counter raiders, but do not attack defenses head-on with them.", 1, 3)
 		end
 		if CountMy(arty) >= 1 then
-			AddTipOnce("Artillery excels at shelling enemy defenses from a safe distance. It is usually (though not always) relatively ineffective against mobile units.", 1, 2)
+			AddTipOnce("Artillery excels at shelling enemy defenses from a safe distance. It is usually (though not always) relatively ineffective against mobile units.", 1, 3)
 		end
 		if CountMy(bomber) >= 1 then
 			AddTipOnce("Bombers require air repair pads to reload after each run. The Aircraft Plant comes with one free pad, but you should build more to avoid long waiting lines.", 2, 5)
