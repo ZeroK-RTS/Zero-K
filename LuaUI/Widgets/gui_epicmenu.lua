@@ -834,7 +834,12 @@ local function ShorthandTree2Long(tree, name)
 		tooltip = name:sub(tooltip_start+1)
 		name 	= name:sub(1,tooltip_start-1)
 	end
-
+	local advanced = false
+	if name:sub(1,1) == '@' then
+		name = name:sub(2)
+		advanced = true
+	end
+						
 	rettree.desc = tooltip
 	
 	if type(tree) == 'table'  and #tree > 0 and type(tree[1]) == 'table' then
@@ -856,6 +861,7 @@ local function ShorthandTree2Long(tree, name)
 						subname 	= subname:sub(1,tooltip_start-1)
 					end
 					
+					
 					if data[2]:sub(1,1) == '=' then
 						subtree[ subname ] = {
 							type = 'text',
@@ -864,12 +870,20 @@ local function ShorthandTree2Long(tree, name)
 							value = data[2]:sub(2),
 						}
 					else
+						local advanced = false
+						local action = data[2]
+						if subname:sub(1,1) == '@' then
+							subname = subname:sub(2)
+							advanced = true
+						end
+						
 						subtree[ subname ] = {
 							type = 'button',
 							name = subname,
 							--OnChange = function(self) end,
 							desc = tooltip,
-							action = data[2],
+							action = action,
+							advanced = advanced,
 						}
 					end
 				else
@@ -910,6 +924,7 @@ local function ShorthandTree2Long(tree, name)
 		rettree.type = 'button'
 		rettree.name = name
 		rettree.OnChange = tree
+		rettree.advanced = advanced
 	end
 	--rettree.key = rettree.name
 	return rettree
@@ -1167,9 +1182,17 @@ local function flattenTree(tree, parent)
 					origOnChange(option)
 				end
 				if widgetHandler.widgets[option.windex].options then
-					widgetHandler.widgets[option.windex].options[option.key].OnChange = function(self)
-						controlfunc(self)
-						--origOnChange(option)
+				
+					--
+					if not option.key then
+						echo('<EPIC Menu> Error #76', option.windex)
+					elseif not widgetHandler.widgets[option.windex].options[option.key] then
+						echo('<EPIC Menu> Error #77', option.windex, option.key)
+					else
+						widgetHandler.widgets[option.windex].options[option.key].OnChange = function(self)
+							controlfunc(self)
+							--origOnChange(option)
+						end
 					end
 				end
 			end

@@ -71,18 +71,11 @@ local statswindows = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+--[[
 options = {
-
-	noContextClick = {
-		name = 'Disable Context Menu',
-		type = 'bool',
-		value = false,		
-		advanced = true,
-	},
-	
 }
 options_path = 'Settings/Interface'
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -800,7 +793,7 @@ function widget:MousePress(x,y,button)
 	
 	local alt, ctrl, meta, shift = spGetModKeyState()
 	
-	if not options.noContextClick.value and meta then
+	if meta then
 		local cur_ttstr = screen0.currentTooltip or spGetCurrentTooltip()
 		local ud = tooltipBreakdown(cur_ttstr)
 		

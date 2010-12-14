@@ -187,9 +187,9 @@ confdata.menu_tree = {
 	{'Misc|Less common advanced settings', 
 		{
 			
-			{'Widget List...', function() WG.crude.ShowWidgetList2() end },
-			{'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end},
-			{'LuaUI TweakMode (Esc to exit)|LuaUI TweakMode. This mode is used to configure some older widgets. (Hit Esc to exit)', function() spSendCommands{"luaui tweakgui"} end },
+			{'@Widget List...', function() WG.crude.ShowWidgetList2() end },
+			{'@Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end},
+			{'LuaUI TweakMode (Esc to exit)|LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)', 'luaui tweakgui' },
 			--[[
 			{'Reset all widget settings', function() 
 				include("savetable.lua")
