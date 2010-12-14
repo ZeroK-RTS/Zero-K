@@ -11,8 +11,8 @@ local weapons = {
 local presets = {
 	commsupport_slowbeam = { slowDamage = 450, onlySlow = true, smartRetarget = true, scaleSlow = true},
 	commsupport2_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = true, scaleSlow = true},
-	commsupport2_disruptorbeam = { slowDamage = 8000, scaleSlow = true},
-	commrecon2_slowbomb = { slowDamage = 5000, scaleSlow = true },
+	commsupport2_disruptorbeam = { slowDamage = 3500, scaleSlow = true},
+	commrecon2_slowbomb = { slowDamage = 1500, scaleSlow = true },
 }
 
 --deep not safe with circular tables! defaults To false
