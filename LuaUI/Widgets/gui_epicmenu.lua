@@ -81,7 +81,7 @@ local cycle = 1
 local curSubKey = ''
 
 local init, resetting = false, false
-
+local myCountry = 'wut'
 --------------------------------------------------------------------------------
 -- Key bindings
 include("keysym.h.lua")
@@ -363,6 +363,11 @@ local function AdjustWindow(window)
 	end
 end
 
+WG.SetRawSetting = function(fwkey, optionkey, value)
+	--Settings_lhShow Advanced Settings
+	--flatwindowlist[fwkey].tree[optionkey].OnChange()
+end
+
 -- Adding functions because of "handler=true"
 local function AddAction(cmd, func, data, types)
 	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
@@ -565,6 +570,21 @@ local function MakeWidgetList()
 	AdjustWindow(window_widgetlist)
 end
 
+local function SetCountry(self) 
+	echo('Setting country: "' .. self.country .. '" ') 
+	
+	WG.country = self.country
+	settings.country = self.country
+	
+	WG.lang = self.countryLang 
+	settings.lang = self.countryLang
+	
+	if img_flag then
+		img_flag.file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png'
+		img_flag:Invalidate()
+	end
+end 
+
 --Make country chooser window
 local function MakeFlags()
 
@@ -591,7 +611,22 @@ local function MakeFlags()
 		pr='es',
 	}
 
+	
+	
 	local flagChildren = {}
+	
+	flagChildren[#flagChildren + 1] = Label:New{ caption='Flag', align='center' }
+	flagChildren[#flagChildren + 1] = Button:New{ 
+		caption = 'Auto', 
+		country = myCountry, 
+		countryLang = 'en',
+		width='50%',
+		textColor = color.sub_button_fg,
+		backgroundColor = color.sub_button_bg, 
+		OnMouseUp = { SetCountry }  
+	}
+	
+
 	local flagCount = 0
 	for _,country in ipairs(countries) do
 		local countryLang = country_langs[country] or 'en'
@@ -601,22 +636,9 @@ local function MakeFlags()
 			width='50%',
 			textColor = color.sub_button_fg,
 			backgroundColor = color.sub_button_bg,
-			OnMouseUp = { 
-				function(self) 
-					echo('Setting country: "' .. country .. '" ') 
-					
-					WG.country = country
-					settings.country = country
-					
-					WG.lang = countryLang 
-					settings.lang = countryLang
-					
-					if img_flag then
-						img_flag.file = ":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png'
-						img_flag:Invalidate()
-					end
-				end 
-			} 
+			country = country,
+			countryLang = countryLang,
+			OnMouseUp = { SetCountry } 
 		}
 	end
 	local window_height = 300
@@ -639,7 +661,7 @@ local function MakeFlags()
 						columns=2,
 						x=0,y=0,
 						width='100%',
-						height=#countries*B_HEIGHT*.7,
+						height=#flagChildren/2*B_HEIGHT*.75,
 						children = flagChildren,
 					}
 				}
@@ -1578,8 +1600,8 @@ local function MakeCrudeMenu()
 		window_crude = nil
 	end
 		
-	local crude_width = 440
-	local crude_height = B_HEIGHT+0 - 10
+	local crude_width = 475
+	local crude_height = B_HEIGHT+10
 	
 	local menu_tree3 		= AddCustomPaths(menu_tree2, 'Settings')
 	local game_menu_tree3 	= AddCustomPaths(game_menu_tree2, 'Game')
@@ -1606,7 +1628,7 @@ local function MakeCrudeMenu()
 		backgroundColor = color.main_bg,
 		color = {1,1,1,0.5},
 		margin = {0,0,0,0},
-		padding = {1,1,1,1},
+		padding = {0,0,0,0},
 		
 		children = {
 			StackPanel:New{
@@ -1616,19 +1638,32 @@ local function MakeCrudeMenu()
 				height = '100%',
 				resizeItems = false,
 				padding = {0,0,0,0},
-				itemPadding = {2,0,0,0},
-				itemMargin = {0,0,0,0},
+				itemPadding = {1,1,1,1},
+				itemMargin = {1,1,1,1},
+				autoArrangeV = false,
+				autoArrangeH = false,
+						
 				children = {
-					Button:New{caption = "Game", OnMouseUp = { function() MakeSubWindow(game_menu_index) end, }, backgroundColor=color.game_bg, textColor=color.game_fg, height=B_HEIGHT, width=60, },
-					Button:New{caption = "Settings", OnMouseUp = { function() MakeSubWindow(main_menu_index) end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=60, },
-					Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
+					--GAME LOGO GOES HERE
+					Image:New{ tooltip = title_text, file=LUAUI_DIRNAME .. 'Images/ranks/PWstar.png', height=B_HEIGHT, width=B_HEIGHT, },
+					
+					--Button:New{caption = "Game", OnMouseUp = { function() MakeSubWindow(game_menu_index) end, }, backgroundColor=color.game_bg, textColor=color.game_fg, height=B_HEIGHT, width=60, },
+					Image:New{ tooltip = 'Game Actions', file=LUAUI_DIRNAME .. 'Images/advplayerslist/units.png', OnClick = { function() MakeSubWindow(game_menu_index) end, },  height=B_HEIGHT, width=B_HEIGHT, },
+					
+					--Button:New{caption = "Settings", OnMouseUp = { function() MakeSubWindow(main_menu_index) end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=60, },
+					Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/advplayerslist/settings.png', OnClick = { function() MakeSubWindow(main_menu_index) end, }, height=B_HEIGHT,width=B_HEIGHT, },
+					
+					Image:New{ file=LUAUI_DIRNAME .. 'Images/advplayerslist/move.png', OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, height=B_HEIGHT, width=B_HEIGHT, tooltip="Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)"},
+					
+					--Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
+					Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/vol.png', width= 20,height= 20, },
 					Trackbar:New{
-						x=20,
+						tooltip = 'Volume',
 						height='40%',
 						width=80,
 						trackColor = color.main_fg,
 						value = spGetConfigInt("snd_volmaster", 50),
-						OnMouseUp = { function(self)	Spring.SendCommands{"set snd_volmaster " .. self.value} end	},
+						OnChange = { function(self)	Spring.SendCommands{"set snd_volmaster " .. self.value} end	},
 					},
 					
 					Grid:New{
@@ -1642,7 +1677,7 @@ local function MakeCrudeMenu()
 						autoArrangeV = true,
 						autoArrangeH = true,
 						padding = {0,0,0,0},
-						itemPadding = {3,0,0,0},
+						itemPadding = {0,0,0,0},
 						itemMargin = {0,0,0,0},
 						
 						children = {
@@ -1663,15 +1698,14 @@ local function MakeCrudeMenu()
 									lbl_clock,
 								},
 							},
-							
-							-- img_flag,
-							Button:New{margin={0,0,0,4}, caption = "Move", OnMouseUp = { function() spSendCommands{"luaui tweakgui"} end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=25,  tooltip="Change layout of user interface (\255\0\255\0Ctrl+F11\008)"},
+							img_flag,							
 						},
 					},
 					
-					Button:New{caption = "?", OnMouseUp = { function() MakeSubWindow(help_menu_index) end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=35, },
-					Button:New{caption = "Quit", OnMouseUp = { function() spSendCommands{"quitmenu"} end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=45, },
-					
+					--Button:New{caption = "?", OnMouseUp = { function() MakeSubWindow(help_menu_index) end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=35, },
+					Image:New{ tooltip = 'Help', file2= LUAUI_DIRNAME .. 'Images/advplayerslist/button.png', file=LUAUI_DIRNAME .. 'Images/advplayerslist/random.png', OnClick = { function() MakeSubWindow(help_menu_index) end, },  height=B_HEIGHT,width=B_HEIGHT,  },
+					--Button:New{caption = "Quit", OnMouseUp = { function() spSendCommands{"quitmenu"} end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=45, },
+					Image:New{ tooltip = 'Exit the game...', file2= LUAUI_DIRNAME .. 'Images/advplayerslist/button.png', file=LUAUI_DIRNAME .. 'Images/advplayerslist/cross.png', OnClick = { function() spSendCommands{"quitmenu"} end, },  height=B_HEIGHT, width=B_HEIGHT,},
 				}
 			}
 		}
@@ -1782,7 +1816,7 @@ function widget:Initialize()
 	
 	if not settings.country or settings.country == 'wut' then
 		settings.country = 'wut'
-		local myCountry = select(8, Spring.GetPlayerInfo( Spring.GetLocalPlayerID() ) ) 
+		myCountry = select(8, Spring.GetPlayerInfo( Spring.GetLocalPlayerID() ) ) 
 		if myCountry and myCountry ~= '' then
 			settings.country = myCountry
 		end

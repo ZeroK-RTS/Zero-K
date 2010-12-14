@@ -59,12 +59,14 @@ local customKeyBind = false
 local menu_use = include("Configs/marking_menu_menus.lua")
 local hotkey_mode = false
 local green = '\255\1\255\1'
+local white = '\255\255\255\255'
 
 local builder_types = {}
 local builder_types_i = {}
 local builder_ids_i = {}
 local curbuilder = 1
 
+local last_cmdid
 
 local function AngleToIndex(angle)
 	angle=angle+0
@@ -131,8 +133,9 @@ local function AddBuildButton()
 		name = 5,
 		--caption = 'Buil'.. green ..'d', 
 		caption = '', 
-		tooltip = 'Click to activate build menu hotkeys.',
-		OnMouseUp = { Make_KB_Menu, }, 
+		tooltip = 'Click or press ' .. green .. 'D' .. white .. ' to activate build menu hotkeys.\n' 
+			.. 'Press ' .. green .. 'Space+D' .. white .. ' to build the last thing you built.' ,
+		OnMouseUp = { Make_KB_Menu, },
 		children = {
 			Label:New{ caption = 'BUIL'.. green ..'D', fontSize=14, bottom='1', fontShadow = true, },
 			Image:New {
@@ -182,6 +185,7 @@ local function AddButton(item, index)
 					level = level + 1  -- save level
 				end 
 				Spring.SetActiveCommand(cmdid, _, left, right, alt, ctrl, meta, shift)
+				last_cmdid = cmdid
 			end
 			HotKeyMode(false)
 		end 
@@ -315,9 +319,16 @@ local function StoreBuilders(units)
 	end
 end
 
+local function BuildPrev()
+	if last_cmdid then
+		--(cmdid, _, left, right, alt, ctrl, meta, shift)
+		Spring.SetActiveCommand(last_cmdid, _, true)
+	end
+end
+
 --------------------------------------------------------------------------------
 
-function widget:KeyPress(k)
+function widget:KeyPress(k, modifier)
 	if hotkey_mode then
 		if not menu or k == KEYSYMS.ESCAPE then  -- cancel menu
 			HotKeyMode(false)
@@ -363,6 +374,19 @@ function widget:Initialize()
   widgetHandler:AddAction("radialmenu", Make_KB_Menu, nil, "t")
   if not customKeyBind then
     Spring.SendCommands("bind any+d radialmenu")
+  end
+  
+  -- check for custom key bind
+  local hotkeys = Spring.GetActionHotKeys("buildprev")
+  if hotkeys == nil then
+  else
+    if #hotkeys > 0 then
+      customKeyBind = true
+    end
+  end
+  widgetHandler:AddAction("buildprev", BuildPrev, nil, "t")
+  if not customKeyBind then
+    Spring.SendCommands("bind meta+d buildprev")
   end
 
 	grid_menu = Grid:New{
