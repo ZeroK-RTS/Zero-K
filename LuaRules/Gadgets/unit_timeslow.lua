@@ -33,7 +33,10 @@ local spValidUnitID 		= Spring.ValidUnitID
 
 local CMD_ATTACK = CMD.ATTACK
 local CMD_REMOVE = CMD.REMOVE
+local CMD_MOVE	 = CMD.MOVE
+local CMD_FIGHT	 = CMD.FIGHT
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -134,6 +137,9 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 						else
 							Spring.GiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
 						end
+					elseif #cmd > 1 and cmd[1].id == CMD_MOVE and cmd[2].id == CMD_FIGHT and 
+						cmd[2].options.internal and #cmd[2].params == 1 and cmd[2].params[1] == unitID then
+						Spring.GiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[2].tag},{})
 					end
 				end
 			end
