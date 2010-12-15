@@ -218,9 +218,13 @@ local icontypes = {
     bitmap='icons/vehiclearty.dds',
     size=1.8,
   },
+  vehiclespecial = {
+    bitmap='icons/vehiclespecial.png',
+    size=2.1,
+  },
   vehiclelrarty = {
     bitmap='icons/vehiclelrarty.dds',
-    size=1.8,
+    size=2.2,
   },
   vehicleaa = {
     bitmap='icons/vehicleaa.dds',
@@ -603,6 +607,10 @@ local icontypes = {
   bomberraider = {
     bitmap='icons/bomberraider.dds',
     size=2.1,
+  },
+  smallgunship = {
+    bitmap='icons/gunship.dds',
+    size=1.4,
   },
   gunship = {
     bitmap='icons/gunship.dds',
