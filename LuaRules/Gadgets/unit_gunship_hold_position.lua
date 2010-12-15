@@ -89,7 +89,7 @@ function gadget:GameFrame(n)
 
 				i = i + 1
 			else
-				removeUnit(UnitID)
+				removeUnit(unitID)
 			end
 		end
 
@@ -118,4 +118,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	return true
 end
 
-
+function gadget:UnitDestroyed(unitID,unitDefID,teamID)
+	if units[unitID] then
+		removeUnit(unitID)
+	end
+end
