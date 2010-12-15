@@ -122,7 +122,7 @@ local unitConf = {}
 ------------------------------------------------------------------------------------
 
 local visibleAllySelUnits = {}
-local showally = true
+
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface'
@@ -133,7 +133,6 @@ options = {
 		value = false,
 		OnChange = function(self) 
 			visibleAllySelUnits = {}
-			showally = self.value
 		end,
 	},
 }
@@ -175,7 +174,7 @@ local function GetVisibleUnits()
 				visibleSelected[#visibleSelected+1] = unitID
 			--else
 				--visibleUnits[#visibleUnits+1] = unitID
-			elseif showally and WG.allySelUnits[unitID] then
+			elseif options.showally.value and WG.allySelUnits[unitID] then
 				visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
 			end
 		end
