@@ -245,11 +245,16 @@ local function GenerateTextControl(line, remake)
 			padding = {0,0,0,0},
 			--text = tx.."\n",
 			text = tx,
-			fontOutline = true,
+			--fontShadow = true,
 			--[[
 			autoHeight=true,
 			autoObeyLineHeight=true,
 			--]]
+			font = {
+				outlineWidth=3,
+				outlineWeight = 10,
+				outline=true
+			}
 		}
 		stack_console:AddChild(lab, false)
 		stack_console:UpdateClientArea()
