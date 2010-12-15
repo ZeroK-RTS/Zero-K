@@ -415,21 +415,6 @@ StopMoving()
 	bMoving = FALSE;
 }
 
-AimFromWeapon1(piecenum)
-{
-	piecenum = armhold;
-}
-
-AimWeapon1(heading, pitch)
-{
-	return 0;
-}
-
-QueryWeapon1(piecenum)
-{
-	piecenum = flare;
-}
-
 AimFromWeapon3(piecenum)
 {
 	piecenum = armhold;
@@ -445,42 +430,42 @@ AimWeapon3(heading, pitch)
 		sleep 5;  //smooth animation?
 	}
 	swing = 0; // mess up ready for sword animation
-//torso	
-turn torso to x-axis <15.000000> speed <250.000000>;
-turn torso to y-axis <-25.000000> speed <250.000000>;
-turn torso to z-axis <0.000000> speed <250.000000>;	
-//head	
-turn head to x-axis <-15.000000> speed <250.000000>;
-turn head to y-axis <25.000000> speed <250.000000>;
-turn head to z-axis <0.000000> speed <250.000000>;	
-//rarm	
-turn ruparm to x-axis <-83.000000> speed <250.000000>;
-turn ruparm to y-axis <30.000000> speed <250.000000>;
-turn ruparm to z-axis <10.000000> speed <250.000000>;
-
-turn rarm to x-axis <41.000000> speed <250.000000>;
-turn rarm to y-axis <19.000000> speed <250.000000>;
-turn rarm to z-axis <-3.000000> speed <250.000000>;
-
-turn rloarm to x-axis <18.000000> speed <250.000000>;
-turn rloarm to y-axis <19.000000> speed <250.000000>;
-turn rloarm to z-axis <14.000000> speed <250.000000>;
-
-turn gun to x-axis <15.0> speed <250.000000>;
-turn gun to y-axis <-15.0> speed <250.000000>;
-turn gun to z-axis <-31.0> speed <250.000000>;
-//larm
-turn luparm to x-axis <-80.000000> speed <250.000000>;
-turn luparm to y-axis <-15.000000> speed <250.000000>;
-turn luparm to z-axis <10.000000> speed <250.000000>;
-
-turn larm to x-axis <5.000000> speed <250.000000>;
-turn larm to y-axis <-77.000000> speed <250.000000>;
-turn larm to z-axis <-26.000000> speed <250.000000>;
-
-turn lloarm to x-axis <65.000000> speed <250.000000>;
-turn lloarm to y-axis <-37.000000> speed <250.000000>;
-turn lloarm to z-axis <152.000000> speed <450.000000>;
+	//torso	
+	turn torso to x-axis <15.000000> speed <250.000000>;
+	turn torso to y-axis <-25.000000> speed <250.000000>;
+	turn torso to z-axis <0.000000> speed <250.000000>;	
+	//head	
+	turn head to x-axis <-15.000000> speed <250.000000>;
+	turn head to y-axis <25.000000> speed <250.000000>;
+	turn head to z-axis <0.000000> speed <250.000000>;	
+	//rarm	
+	turn ruparm to x-axis <-83.000000> speed <250.000000>;
+	turn ruparm to y-axis <30.000000> speed <250.000000>;
+	turn ruparm to z-axis <10.000000> speed <250.000000>;
+	
+	turn rarm to x-axis <41.000000> speed <250.000000>;
+	turn rarm to y-axis <19.000000> speed <250.000000>;
+	turn rarm to z-axis <-3.000000> speed <250.000000>;
+	
+	turn rloarm to x-axis <18.000000> speed <250.000000>;
+	turn rloarm to y-axis <19.000000> speed <250.000000>;
+	turn rloarm to z-axis <14.000000> speed <250.000000>;
+	
+	turn gun to x-axis <15.0> speed <250.000000>;
+	turn gun to y-axis <-15.0> speed <250.000000>;
+	turn gun to z-axis <-31.0> speed <250.000000>;
+	//larm
+	turn luparm to x-axis <-80.000000> speed <250.000000>;
+	turn luparm to y-axis <-15.000000> speed <250.000000>;
+	turn luparm to z-axis <10.000000> speed <250.000000>;
+	
+	turn larm to x-axis <5.000000> speed <250.000000>;
+	turn larm to y-axis <-77.000000> speed <250.000000>;
+	turn larm to z-axis <-26.000000> speed <250.000000>;
+	
+	turn lloarm to x-axis <65.000000> speed <250.000000>;
+	turn lloarm to y-axis <-37.000000> speed <250.000000>;
+	turn lloarm to z-axis <152.000000> speed <450.000000>;
 	wait-for-turn ruparm around x-axis;
 	
 	
@@ -501,12 +486,12 @@ FireWeapon3()
 	emit-sfx 1027 from grenade;
 }
 
-AimFromWeapon4(piecenum)
+AimFromWeapon1(piecenum)
 {
 	piecenum = armhold;
 }
 
-QueryWeapon4(piecenum)
+QueryWeapon1(piecenum)
 {
 	piecenum = flare;
 }
@@ -521,7 +506,7 @@ QueryWeapon2(piecenum)
 	piecenum = stab;
 }
 
-Shot4()
+Shot1()
 {
   //triple flash
 		//emit-sfx 1024 from flare;
@@ -529,7 +514,7 @@ Shot4()
 	return (1);
 }
 
-AimWeapon4(Func_Var_1, Func_Var_2)
+AimWeapon1(Func_Var_1, Func_Var_2)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
@@ -539,42 +524,42 @@ AimWeapon4(Func_Var_1, Func_Var_2)
 		sleep 5;  //smooth animation?
 	}
 	swing = 0; // mess up ready for sword animation
-//torso	
-turn torso to x-axis <15.000000> speed <250.000000>;
-turn torso to y-axis <-25.000000> speed <250.000000>;
-turn torso to z-axis <0.000000> speed <250.000000>;	
-//head	
-turn head to x-axis <-15.000000> speed <250.000000>;
-turn head to y-axis <25.000000> speed <250.000000>;
-turn head to z-axis <0.000000> speed <250.000000>;	
-//rarm	
-turn ruparm to x-axis <-83.000000> speed <250.000000>;
-turn ruparm to y-axis <30.000000> speed <250.000000>;
-turn ruparm to z-axis <10.000000> speed <250.000000>;
-
-turn rarm to x-axis <41.000000> speed <250.000000>;
-turn rarm to y-axis <19.000000> speed <250.000000>;
-turn rarm to z-axis <-3.000000> speed <250.000000>;
-
-turn rloarm to x-axis <18.000000> speed <250.000000>;
-turn rloarm to y-axis <19.000000> speed <250.000000>;
-turn rloarm to z-axis <14.000000> speed <250.000000>;
-
-turn gun to x-axis <15.0> speed <250.000000>;
-turn gun to y-axis <-15.0> speed <250.000000>;
-turn gun to z-axis <-31.0> speed <250.000000>;
-//larm
-turn luparm to x-axis <-80.000000> speed <250.000000>;
-turn luparm to y-axis <-15.000000> speed <250.000000>;
-turn luparm to z-axis <10.000000> speed <250.000000>;
-
-turn larm to x-axis <5.000000> speed <250.000000>;
-turn larm to y-axis <-77.000000> speed <250.000000>;
-turn larm to z-axis <-26.000000> speed <250.000000>;
-
-turn lloarm to x-axis <65.000000> speed <250.000000>;
-turn lloarm to y-axis <-37.000000> speed <250.000000>;
-turn lloarm to z-axis <152.000000> speed <450.000000>;
+	//torso	
+	turn torso to x-axis <15.000000> speed <250.000000>;
+	turn torso to y-axis <-25.000000> speed <250.000000>;
+	turn torso to z-axis <0.000000> speed <250.000000>;	
+	//head	
+	turn head to x-axis <-15.000000> speed <250.000000>;
+	turn head to y-axis <25.000000> speed <250.000000>;
+	turn head to z-axis <0.000000> speed <250.000000>;	
+	//rarm	
+	turn ruparm to x-axis <-83.000000> speed <250.000000>;
+	turn ruparm to y-axis <30.000000> speed <250.000000>;
+	turn ruparm to z-axis <10.000000> speed <250.000000>;
+	
+	turn rarm to x-axis <41.000000> speed <250.000000>;
+	turn rarm to y-axis <19.000000> speed <250.000000>;
+	turn rarm to z-axis <-3.000000> speed <250.000000>;
+	
+	turn rloarm to x-axis <18.000000> speed <250.000000>;
+	turn rloarm to y-axis <19.000000> speed <250.000000>;
+	turn rloarm to z-axis <14.000000> speed <250.000000>;
+	
+	turn gun to x-axis <15.0> speed <250.000000>;
+	turn gun to y-axis <-15.0> speed <250.000000>;
+	turn gun to z-axis <-31.0> speed <250.000000>;
+	//larm
+	turn luparm to x-axis <-80.000000> speed <250.000000>;
+	turn luparm to y-axis <-15.000000> speed <250.000000>;
+	turn luparm to z-axis <10.000000> speed <250.000000>;
+	
+	turn larm to x-axis <5.000000> speed <250.000000>;
+	turn larm to y-axis <-77.000000> speed <250.000000>;
+	turn larm to z-axis <-26.000000> speed <250.000000>;
+	
+	turn lloarm to x-axis <65.000000> speed <250.000000>;
+	turn lloarm to y-axis <-37.000000> speed <250.000000>;
+	turn lloarm to z-axis <152.000000> speed <450.000000>;
 	wait-for-turn ruparm around x-axis;
 	
 	

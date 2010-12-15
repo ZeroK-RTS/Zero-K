@@ -14,8 +14,7 @@ local ignoreweapon =
 	armadvcom = {1,2},	
 	corcom = {1,2,3},
 	coradvcom = {1},
-	commrecon = {1,2,3},
-	commadvrecon = {1,2},
+	commadvrecon = {2},
 	commadvsupport = {2},
 }
 local iconFormat = '.dds'

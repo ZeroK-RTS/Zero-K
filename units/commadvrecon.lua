@@ -93,121 +93,71 @@ unitDef = {
   workerTime          = 12,
 
   weapons             = {
-
     [1] = {
-      def                = [[FAKELASER]],
+      def                = [[SLOWBEAM]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-
-
+  
     [3] = {
       def                = [[SLOWBOMB]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-
-
-    [4] = {
-      def                = [[LASER]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
   },
 
 
   weaponDefs          = {
 
-    FAKELASER = {
-      name                    = [[Fake Laser]],
-      areaOfEffect            = 12,
+    SLOWBEAM = {
+      name                    = [[Slowing Beam]],
+      areaOfEffect            = 8,
+      beamlaser               = 1,
+      beamDecay               = 0.9,
       beamlaser               = 1,
       beamTime                = 0.1,
-      coreThickness           = 0.5,
+      beamttl                 = 50,
+	  
+	  customParams			  = {
+		timeslow_preset	= "commrecon2_slowbeam",
+	  },
+	  
+      coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 0,
-        subs    = 0,
+        default = 150,
       },
 
-      duration                = 0.11,
-      edgeEffectiveness       = 0.99,
-      explosionGenerator      = [[custom:flash1green]],
-      fireStarter             = 70,
+      explosionGenerator      = [[custom:flash2purple]],
+      fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
-      laserFlareSize          = 5.53,
+      laserFlareSize          = 6,
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 350,
-      reloadtime              = 0.11,
+      reloadtime              = 1.5,
       renderType              = 0,
-      rgbColor                = [[0 1 0]],
-      soundStart              = [[weapon/laser/laser_burn5]],
+      rgbColor                = [[0.4 0 0.5]],
+      soundStart              = [[weapon/laser/pulse_laser2]],
+      soundStartVolume        = 0.9,
       soundTrigger            = true,
-      targetMoveError         = 0.05,
+      sweepfire               = false,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
       texture4                = [[smallflare]],
-      thickness               = 5.53,
-      tolerance               = 10000,
+      thickness               = 8,
+      tolerance               = 18000,
       turret                  = true,
       weaponType              = [[BeamLaser]],
-      weaponVelocity          = 900,
+      weaponVelocity          = 500,
     },
-
-    LASER     = {
-      name                    = [[Recon Pulse Laser]],
-      areaOfEffect            = 12,
-      beamlaser               = 1,
-      beamTime                = 0.1,
-      coreThickness           = 0.8,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 140,
-        subs    = 7,
-      },
-
-      duration                = 0.11,
-      edgeEffectiveness       = 0.99,
-      explosionGenerator      = [[custom:flash1purple]],
-      fireStarter             = 70,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      largeBeamLaser          = true,
-      laserFlareSize          = 6.4,
-      lineOfSight             = true,
-      minIntensity            = 1,
-      noSelfDamage            = true,
-      range                   = 350,
-      reloadtime              = 0.8,
-      renderType              = 0,
-      rgbColor                = [[0.3 0 0.7]],
-      soundStart              = [[weapon/laser/small_laser_fire2]],
-      soundTrigger            = false,
-      targetMoveError         = 0.05,
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
-      thickness               = 4,
-      tolerance               = 10000,
-      turret                  = true,
-      weaponType              = [[BeamLaser]],
-      weaponVelocity          = 900,
-    },
-
 
     SLOWBOMB  = {
       name                    = [[Disruptor Bomb]],
@@ -217,6 +167,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams			  = {
+		timeslow_preset	= "commrecon2_slowbomb",
+	  },	  
+	  
       damage                  = {
         default = 300,
         planes  = 300,
@@ -244,7 +198,6 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 350,
     },
-
   },
 
 
