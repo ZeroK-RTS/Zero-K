@@ -170,23 +170,31 @@ end
 options.fontsize.OnChange = FontChanged
 --options.staticfontsize.OnChange = FontChanged
 
-function comma_value(amount)
+function comma_value(amount, displayPlusMinus)
 	local formatted
 
 	-- amount is a string when ToSI is used before calling this function
 	if type(amount) == "number" then
-		formatted = strFormat("%.2f", amount)
+		if (amount < 20 and (amount * 10)%10 ~=0) then 
+			if displayPlusMinus then formatted = strFormat("%+.1f", amount)
+			else formatted = strFormat("%.1f", amount) end 
+		else 
+			if displayPlusMinus then formatted = strFormat("%+d", amount)
+			else formatted = strFormat("%d", amount) end 
+		end 
 	else
 		formatted = amount .. ""
 	end
 
-	local k
-	while true do  
-		formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", '%1,%2')
-		if (k==0) then
-			break
+	if options.hpshort.value then 
+		local k
+		while true do  
+			formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", '%1,%2')
+			if (k==0) then
+				break
+			end
 		end
-	end
+	end 
   	return formatted
 end
 
@@ -216,6 +224,9 @@ local function ToSIPrec(num) -- more presise
   if type(num) ~= 'number' then
 	return 'Tooltip wacky error #56'
   end
+  if not options.hpshort.value then 
+	return num
+  end 
   if (num == 0) then
     return "0"
   else
@@ -234,8 +245,8 @@ local function ToSIPrec(num) -- more presise
   end
 end
 
-local function numformat(num)
-	return comma_value(ToSIPrec(num))
+local function numformat(num, displayPlusMinus)
+	return comma_value(ToSIPrec(num), displayPlusMinus)
 end
 
 
@@ -489,13 +500,13 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 		metalcontrol.font:SetColor(color_m)
 		energycontrol.font:SetColor(color_e)
 		
-		metalcontrol:SetCaption( numformat(metal) )
-		energycontrol:SetCaption( numformat(energy) )
+		metalcontrol:SetCaption( numformat(metal, true) )
+		energycontrol:SetCaption( numformat(energy, true) )
 		return
 	end
 	
-	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal), autosize=true, fontSize=fontSize, valign='center' }
-	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy), autosize=true, fontSize=fontSize, valign='center'  }
+	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal, true), autosize=true, fontSize=fontSize, valign='center' }
+	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy, true), autosize=true, fontSize=fontSize, valign='center'  }
 	
 	globalitems[resource_tt_name] = StackPanel:New{
 		centerItems = false,

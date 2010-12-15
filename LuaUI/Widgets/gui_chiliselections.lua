@@ -148,39 +148,17 @@ function round(num, idp)
   end
 end
 
-local function numformat(x,idp)
-  if (x>0 and x<10) then
-    return ("%."..(idp or 3).."f"):format(x)
-  else
-    return round(x)
-  end
+local function numformat(x, displayPlusMinus)
+	
+	if (x < 20 and (x * 10)%10 ~=0) then 
+		if (displayPlusMinus) then return strFormat("%+.1f", x)
+		else return strFormat("%.1f", x) end 
+	else 
+		if (displayPlusMinus) then return strFormat("%+d", x)
+		else return strFormat("%d", x) end
+	end 
 end
 
-local function ToSIPrec(num) -- more presise
-  if type(num) ~= 'number' then
-	return 'Tooltip wacky error #56'
-  end
-  if (num == 0) then
-    return "0"
-  else
-    local absNum = abs(num)
-    if (absNum < 0.001) then
-      return strFormat("%.2fu", 1000000 * num)
-    elseif (absNum < 1) then
-      return strFormat("%.2f", num)
-    elseif (absNum < 1000) then
-      return strFormat("%.1f", num)
-    elseif (absNum < 1000000) then
-      return strFormat("%.2fk", 0.001 * num)
-    else
-      return strFormat("%.2fM", 0.000001 * num)
-    end
-  end
-end
-
-local function number_format(num)
-	return options.hpshort.value and ToSIPrec(num) or numformat(num, 2)
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -282,13 +260,13 @@ local function UpdateDynamicGroupInfo()
 		
 	end
 	
-	gi_cost = number_format(gi_cost)
-	gi_hp = number_format(gi_hp)
-	gi_metalincome = number_format(gi_metalincome)
-	gi_metaldrain = number_format(gi_metaldrain)
-	gi_energyincome = number_format(gi_energyincome)
-	gi_energydrain = number_format(gi_energydrain)
-	gi_usedbp = number_format(gi_usedbp)
+	gi_cost = numformat(gi_cost)
+	gi_hp = numformat(gi_hp)
+	gi_metalincome = numformat(gi_metalincome)
+	gi_metaldrain = numformat(gi_metaldrain)
+	gi_energyincome = numformat(gi_energyincome)
+	gi_energydrain = numformat(gi_energydrain)
+	gi_usedbp = numformat(gi_usedbp)
 end
 
 --updates values that don't change over time for group info
@@ -309,9 +287,9 @@ local function UpdateStaticGroupInfo()
 			end
 		end
 	end
-	gi_finishedcost = number_format(gi_finishedcost)
-	gi_totalbp = number_format(gi_totalbp)
-	gi_maxhp = number_format(gi_maxhp)
+	gi_finishedcost = numformat(gi_finishedcost)
+	gi_totalbp = numformat(gi_totalbp)
+	gi_maxhp = numformat(gi_maxhp)
 end
 
 ----------------------------------------------------------------
@@ -733,7 +711,7 @@ local function UpdateSelectedUnitsTooltip()
 				if (windbar) then
 					local power = (absEnergy - windMin) / (windMax - windMin)
 					windbar:SetValue(power, true)
-					windbar:SetCaption( ("%0.f%%"):format(100*power) )
+					windbar:SetCaption( numformat(100*power) .."%" )
 				end
 
 				--// Mexes
@@ -768,14 +746,14 @@ local function UpdateSelectedUnitsTooltip()
 				local lbl_metal = infoContainer.childrenByName['metal']
 				if abs(absMetal) <= 0.1 then
 					lbl_metal.font:SetColor(0.5,0.5,0.5,1)
-					lbl_metal:SetCaption("0.0")
+					lbl_metal:SetCaption("0")
 				else
 					if (absMetal<0) then
 						lbl_metal.font:SetColor(1,0,0,1)
 					else
 						lbl_metal.font:SetColor(0,1,0,1)
 					end
-					lbl_metal:SetCaption( ("%0.1f"):format(absMetal) )
+					lbl_metal:SetCaption(numformat(absMetal,true) )
 				end
 
 				local lbl_energy = infoContainer.childrenByName['energy']
@@ -788,7 +766,7 @@ local function UpdateSelectedUnitsTooltip()
 					else
 						lbl_energy.font:SetColor(0,1,0,1)
 					end
-					lbl_energy:SetCaption( ("%0.1f"):format(absEnergy) )
+					lbl_energy:SetCaption( numformat(absEnergy, true) )
 				end
 			else -- unit is stunned
 			
