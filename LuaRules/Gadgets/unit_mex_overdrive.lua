@@ -1315,6 +1315,7 @@ end
 
 
 function gadget:DrawWorldPreUnit()
+	if Spring.IsGUIHidden() then return end
 	--[[if SYNCED.pylon and snext(SYNCED.pylon) then
 		gl.PushAttrib(GL.LINE_BITS)
 		
@@ -1363,7 +1364,7 @@ local function DrawUnitFunc(yshift)
 end
 
 function gadget:DrawWorld()
-
+	if Spring.IsGUIHidden() then return end
 	local lowPowerUnits = SYNCED.lowPowerUnits.inner
 	
 	if lowPowerUnits.count > 0 then

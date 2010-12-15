@@ -182,6 +182,7 @@ function widget:Update()
 end
 
 function widget:DrawWorld()
+  if Spring.IsGUIHidden() then return end
   if (type == 'feature') or (type == 'unit') then
     if (smoothPolys) then
       glSmoothing(nil, nil, true)

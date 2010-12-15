@@ -645,6 +645,7 @@ local function circleLines(percentage, radius)
 end  
 
 function gadget:DrawWorldPreUnit()
+	if Spring.IsGUIHidden() then return end
 	teamID = Spring.GetLocalTeamID()
 	local spec, fullview = Spring.GetSpectatingState()
 	spec = spec or fullview

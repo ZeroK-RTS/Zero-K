@@ -886,6 +886,7 @@ do
   local glDepthMask          = gl.DepthMask
 
   function widget:DrawWorld()
+	if Spring.IsGUIHidden() then return end
     if (#visibleUnits+#visibleFeatures==0) then
       return
     end

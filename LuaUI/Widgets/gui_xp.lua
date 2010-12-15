@@ -211,6 +211,7 @@ end
 
 
 function widget:DrawWorld()
+  if Spring.IsGUIHidden() then return end
   if (next(unitHeights) == nil) then
     return -- avoid unnecessary GL calls
   end

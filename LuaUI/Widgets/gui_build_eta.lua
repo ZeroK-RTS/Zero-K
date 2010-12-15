@@ -245,6 +245,7 @@ local function DrawEtaText(timeLeft,yoffset)
 end
 
 function widget:DrawWorld()
+	if Spring.IsGUIHidden() then return end
 	gl.DepthTest(true)
 
 	gl.Color(1, 1, 1)
