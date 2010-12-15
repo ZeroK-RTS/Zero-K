@@ -568,6 +568,11 @@ function gadget:RecvLuaMsg(msg, playerID)
 	end
 end
 
+local function SetFaction(side, teamID)
+    teamSides[teamID] = side
+end
+GG.SetFaction = SetFaction
+
 function gadget:GameFrame(n)
   -- reset resources in frame 33 because of pre 0.82 engine
   if (n == 33) then
