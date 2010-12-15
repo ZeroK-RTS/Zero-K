@@ -74,18 +74,18 @@ unitList["CA"]["corgeo"] =		{ markerText = "Geo" }
 unitList["CA1F"] = {} --initialize table, should contain ZK buildings currently used.
 unitList["CA1F"]["armamd"] =		{ markerText = "Anti Nuke" }
 unitList["CA1F"]["corsilo"] =		{ markerText = "Nuke" }
-unitList["CA1F"]["missilesilo"] =	{ markerText = "Missle Silo" }
-unitList["CA1F"]["armbrtha"] =		{ markerText = "Big Bertha" }
-unitList["CA1F"]["corbhmth"] =		{ markerText = "Behemoth" }
-unitList["CA1F"]["armanni"] =		{ markerText = "Annihilator" }
-unitList["CA1F"]["cordoom"] =		{ markerText = "Doomsday" }
+--unitList["CA1F"]["missilesilo"] =	{ markerText = "Missle Silo" }
+--unitList["CA1F"]["armbrtha"] =		{ markerText = "Big Bertha" }
+--unitList["CA1F"]["corbhmth"] =		{ markerText = "Behemoth" }
+--unitList["CA1F"]["armanni"] =		{ markerText = "Annihilator" }
+--unitList["CA1F"]["cordoom"] =		{ markerText = "Doomsday" }
 unitList["CA1F"]["starlight"] =		{ markerText = "Starlight" }
 unitList["CA1F"]["cafus"] =			{ markerText = "Singularity Reactor" }
-unitList["CA1F"]["armfus"] =		{ markerText = "Fusion Reactor" }
-unitList["CA1F"]["amgeo"] =			{ markerText = "Moho Geo" }
+--unitList["CA1F"]["armfus"] =		{ markerText = "Fusion Reactor" }
+--unitList["CA1F"]["amgeo"] =			{ markerText = "Moho Geo" }
 --unitList["CA1F"]["geo"] =			{ markerText = "Geo" }
-unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
-unitList["CA1F"]["chickenspire"] =		{ markerText = "Spire" }
+--unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
+--unitList["CA1F"]["chickenspire"] =		{ markerText = "Spire" }
 unitList["CA1F"]["chicken_dragon"] =	{ markerText = "White Dragon" }
 unitList["CA1F"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen" }
 
