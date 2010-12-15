@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections",
-    desc      = "v0.16 Chili Selections.",
+    desc      = "v0.17 Chili Selections.",
     author    = "jK & CarRepairer",
     date      = "@2009,2010",
     license   = "GNU GPL, v2 or later",
@@ -295,6 +295,20 @@ end
 ----------------------------------------------------------------
 ----------------------------------------------------------------
 
+local function GetUnitDesc(unitID, ud)
+	local lang = WG.lang or 'en'
+	if lang == 'en' then 
+		return ud.tooltip
+	end
+	local suffix = ('_' .. lang)
+	local desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'
+	if unitID then
+		local endesc = ud.tooltip
+		--(ud.chili_selections_useStaticTooltip)and(ud.tooltip) or spGetUnitTooltip(unitid);
+		return spGetUnitTooltip(unitID):gsub(endesc, desc)
+	end
+	return desc
+end
 
 local function MakeUnitToolTip(unitid)
 	local ud             = UnitDefs[spGetUnitDefID(unitid) or 0]
@@ -356,7 +370,8 @@ local function MakeUnitToolTip(unitid)
 		width = 235;
 		--height = 30;
 		autoSize = false;
-		caption = (ud.chili_selections_useStaticTooltip)and(ud.tooltip) or spGetUnitTooltip(unitid);
+		--caption = (ud.chili_selections_useStaticTooltip)and(ud.tooltip) or spGetUnitTooltip(unitid);
+		caption = GetUnitDesc(unitid, ud);
 		valign  = 'top';
 	}
 

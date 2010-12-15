@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.06 Chili Cursor Tooltips.",
+    desc      = "v0.07 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -286,6 +286,22 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function GetUnitDesc(unitID, ud)
+	if not (unitID or ud) then return '' end
+	
+	local lang = WG.lang or 'en'
+	if lang == 'en' then 
+		return ud.tooltip
+	end
+	local suffix = ('_' .. lang)
+	local desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'
+	if unitID then
+		local endesc = ud.tooltip
+		return spGetUnitTooltip(unitID):gsub(endesc, desc)
+	end
+	return desc
+end
 
 local UnitDefByHumanName_cache = {}
 local function GetUnitDefByHumanName(humanName)
@@ -920,7 +936,7 @@ local function MakeToolTip_UnitFeature(type, data, tooltip)
 		local live_name = feature_name:gsub('([^_]*).*', '%1')
 		tt_ud = UnitDefNames[live_name]
 		
-		fullname = ((tt_ud and tt_ud.humanName .. desc) or "")
+		fullname = ((tt_ud and tt_ud.humanName .. desc) or tt_fd.tooltip or "")
 	end
 	
 	if not (tt_ud or tt_fd) then
@@ -931,18 +947,23 @@ local function MakeToolTip_UnitFeature(type, data, tooltip)
 	local _, player		= spGetTeamInfo(team)
 	local playerName	= player and spGetPlayerInfo(player) or 'noname'
 	local teamColor		= Chili.color2incolor(spGetTeamColor(team))
-	local unittooltip	= tt_unitID and spGetUnitTooltip(tt_unitID) or (tt_ud and tt_ud.tooltip) or ""
+	---local unittooltip	= tt_unitID and spGetUnitTooltip(tt_unitID) or (tt_ud and tt_ud.tooltip) or ""
+	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
 	UpdateResourceStack( type, unitfeature_id, tt_ud or tt_fd, tooltip, ttFontSize )
 	
+	
 	local tt_structure = {
-		leftbar = {
-			type == 'unit'
-				and { name= 'bp', directcontrol = 'buildpic_unit' }
-				or { name= 'bp', directcontrol = 'buildpic_feature' },
-			{ name='cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0'), },
-		},
+		leftbar =
+			tt_ud and
+			{
+				type == 'unit'
+					and { name= 'bp', directcontrol = 'buildpic_unit' }
+					or { name= 'bp', directcontrol = 'buildpic_feature' },
+				{ name='cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0'), },
+			}
+			or nil,
 		main = {
 			{ name='uname', icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
 			{ name='utt', text = unittooltip, wrap=true },

@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.18 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.181 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -611,8 +611,6 @@ local function MakeFlags()
 		pr='es',
 	}
 
-	
-	
 	local flagChildren = {}
 	
 	flagChildren[#flagChildren + 1] = Label:New{ caption='Flag', align='center' }
@@ -1762,8 +1760,11 @@ function widget:Initialize()
 	end
 	init = true
 	
-	-- Clears all saved settings of custom widgets stored in crudemenu's config
+	WG.country = settings.country	
+	WG.lang = settings.lang
 	
+	
+	-- Clears all saved settings of custom widgets stored in crudemenu's config
 	WG.crude.ResetSettings = function()
 		resetting = true
 		settings.config = {}
