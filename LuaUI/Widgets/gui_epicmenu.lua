@@ -122,6 +122,7 @@ local settings = {
 	lang = 'en',
 	widgets = {},
 	show_crudemenu = false,
+	music_volume = 0.5,
 }
 
 
@@ -1676,16 +1677,60 @@ local function MakeCrudeMenu()
 					
 					Image:New{ file=LUAUI_DIRNAME .. 'Images/advplayerslist/move.png', OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, height=B_HEIGHT, width=B_HEIGHT, tooltip="Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)"},
 					
-					--Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
-					Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/vol.png', width= 20,height= 20, },
-					Trackbar:New{
-						tooltip = 'Volume',
-						height='40%',
-						width=80,
-						trackColor = color.main_fg,
-						value = spGetConfigInt("snd_volmaster", 50),
-						OnChange = { function(self)	Spring.SendCommands{"set snd_volmaster " .. self.value} end	},
+					Grid:New{
+						height = '100%',
+						width = 120,
+						columns = 2,
+						rows = 2,
+						resizeItems = false,
+						margin = {0,0,0,0},
+						padding = {0,0,0,0},
+						itemPadding = {1,1,1,1},
+						itemMargin = {1,1,1,1},
+						
+						
+						children = {
+							--Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
+							Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/vol.png', width= 18,height= 18, },
+							Trackbar:New{
+								tooltip = 'Volume',
+								height=15,
+								width=80,
+								trackColor = color.main_fg,
+								value = spGetConfigInt("snd_volmaster", 50),
+								OnChange = { function(self)	Spring.SendCommands{"set snd_volmaster " .. self.value} end	},
+							},
+							
+							Image:New{ tooltip = 'Music', file=LUAUI_DIRNAME .. 'Images/vol_music.png', width= 18,height= 18, },
+							Trackbar:New{
+								tooltip = 'Music',
+								height=15,
+								width=80,
+								min = 0,
+								max = 1,
+								step = 0.01,
+								trackColor = color.main_fg,
+								value = settings.music_volume or 0.5,
+								prevValue = settings.music_volume or 0.5,
+								OnChange = { 
+									function(self)	
+										if (WG.music_start_volume or 0 > 0) then 
+											Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+										else 
+											Spring.SetSoundStreamVolume(self.value) 
+										end 
+										settings.music_volume = self.value
+										WG.music_volume = self.value
+										if (self.prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
+										if (self.prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
+										self.prevValue = self.value
+									end	
+								},
+							},
+						}
+					
 					},
+
 					
 					Grid:New{
 						orientation = 'horizontal',
@@ -1949,6 +1994,7 @@ function widget:SetConfigData(data)
 			settings = data
 		end
 	end
+	WG.music_volume = settings.music_volume or 0.5
 end
 
 function widget:Update()
