@@ -22,7 +22,7 @@ unitDef = {
   customParams        = {
     description_bp = [[Robô escaramuçador]],
     description_fr = [[Marcheur Tirailleur]],
-    helptext       = [[The Morty offers cheap, mobile skirmishing capability. It can outrange light defenses such as LLTs, although it is vulnerable to swarms of raiders.]],
+    helptext       = [[The Morty's slow-ray reduces enemy speed and rate of fire by up to two-thirds. Though doing no damage themselves, Morties are effective against almost all targets.]],
     helptext_bp    = [[Morty é um escaramuçador barato e rápido. Tem maior alcançe que defesas leves com torres de laser leves, mas é vulnerável a grupos de agressores.]],
     helptext_fr    = [[Le Morty offre des capacités de tirailleur idéales pour un prix réduit. Son canon plasma lui permet une longue portée pour une cadence de tir honorable. Il pourra détruire la plupart des tourelles sans risquer d'y laisser sa carcasse. ]],
   },
