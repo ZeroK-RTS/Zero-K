@@ -1679,7 +1679,7 @@ local function MakeCrudeMenu()
 					
 					Grid:New{
 						height = '100%',
-						width = 120,
+						width = 100,
 						columns = 2,
 						rows = 2,
 						resizeItems = false,
@@ -1695,7 +1695,7 @@ local function MakeCrudeMenu()
 							Trackbar:New{
 								tooltip = 'Volume',
 								height=15,
-								width=80,
+								width=70,
 								trackColor = color.main_fg,
 								value = spGetConfigInt("snd_volmaster", 50),
 								OnChange = { function(self)	Spring.SendCommands{"set snd_volmaster " .. self.value} end	},
@@ -1705,7 +1705,7 @@ local function MakeCrudeMenu()
 							Trackbar:New{
 								tooltip = 'Music',
 								height=15,
-								width=80,
+								width=70,
 								min = 0,
 								max = 1,
 								step = 0.01,
