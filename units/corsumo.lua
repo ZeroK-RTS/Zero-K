@@ -53,6 +53,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:sumosmoke]],
+      [[custom:BEAMWEAPON_MUZZLE_ORANGE]],
     },
 
   },

@@ -514,7 +514,45 @@ return {
       },
     },
   },
-
+  
+  ["beamweapon_muzzle_orange_small"] = {
+    usedefaultexplosions = false,
+    glow = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 8,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.25,
+        alwaysvisible      = false,
+        color              = [[1,0.5,0]],
+        dir                = [[-4 r8, -4 r8, -4 r8]],
+        length             = 1,
+        lengthgrowth       = 1,
+        width              = 2,
+      },
+    },
+    white = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.25,
+        alwaysvisible      = false,
+        color              = [[1,1,1]],
+        dir                = [[-2 r4, -2 r4, -2 r4]],
+        length             = 1,
+        lengthgrowth       = 1,
+        width              = 1,
+      },
+    },
+  },
+  
   ["beamweapon_muzzle_blue"] = {
     usedefaultexplosions = false,
     glow = {

@@ -66,6 +66,7 @@ local sh_speed = 1
 local drop = .8
 
 local dirtfling = 1024
+local muzzle_flash = 1025
 local crater = 4098
 
 --variables
@@ -404,6 +405,7 @@ end
 
 function script.FireWeapon1()
 	--effects
+	EmitSfx( l_barrel, muzzle_flash )
 end
 
 function script.QueryWeapon2() return r_barrel end
@@ -420,6 +422,7 @@ end
 
 function script.FireWeapon2()
 	--effects
+	EmitSfx( r_barrel, muzzle_flash )
 end
 
 function script.Killed(recentDamage, maxHealth)
