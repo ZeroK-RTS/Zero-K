@@ -203,12 +203,10 @@ local function GetTipsList()
 	tipsList={}
 
 	-- Always shown tips
-	AddTipOnce("Use F11 to toggle \"widgets\",\nsuch as this automatic tip dispenser.", 1)
-	-- ("Tips voice-over is on",91)
-	-- ("Tips voice-over is off",92)
 
 	-- General interface tips
-	AddTipOnce("Ctrl + F1 to F5 to change camera mode.\nCtrl F2 is the default (TA Overhead).", 1)
+	AddTipOnce("Use Ctrl+F11 to to move screen elements around.", 1)
+	AddTipOnce("Press Esc to toggle the game menu, where you can alter settings.", 1)
 	AddTipOnce("Use Mouse Wheel to zoom in and out", 1)
 
 	-- Beginning: Getting the commander to build the starting base
@@ -217,7 +215,7 @@ local function GetTipsList()
 			if Game.startPosType==2 and Spring.GetGameFrame()==0 then
 				AddTip("Pick a starting position, then click ready.\nLook for areas with metal spots (press F4 to toggle the metal map). Do not spawn in a cliff!", 1, 5)
 			else
-				AddTip("Game is loading.\nIf it takes forever you may want to consider Alt+F.", 3, 10000)
+				AddTip("Game is loading.", 3, 10000)
 			end
 		elseif CountMy(commander)==1 then
 			if Spring.GetSelectedUnitsCount()==0 then

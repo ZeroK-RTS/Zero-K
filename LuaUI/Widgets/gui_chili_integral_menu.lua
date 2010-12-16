@@ -336,17 +336,17 @@ local function MakeButton(container, cmd, insertItem)
 				fontShadow = true;
 			}
 			local costLabel = Label:New {
-					parent = button,
-					right = 0;
-					y = 0;
-					x = 3;
-					bottom = 3;
-					autosize=false;
-					align="left";
-					valign="bottom";
-					caption = string.format("%d m", UnitDefs[-cmd.id].metalCost);
-					fontSize = 11;
-					fontShadow = true;
+				parent = button,
+				right = 0;
+				y = 0;
+				x = 3;
+				bottom = 3;
+				autosize=false;
+				align="left";
+				valign="bottom";
+				caption = string.format("%d m", UnitDefs[-cmd.id].metalCost);
+				fontSize = 11;
+				fontShadow = true;
 			}
 		end
 		
