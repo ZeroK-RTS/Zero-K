@@ -113,14 +113,13 @@ function widget:Update(dt)
 		end
 		dethklok[1] = 0
 		
+		--Spring.Echo (totalKilled)
 		
 		if (totalKilled > WAR_THRESHOLD) then
-			-- Spring.Echo("war!")
 			musicType = 'war'
 		end
 		
 		if (totalKilled <= PEACE_THRESHOLD) then
-			--Spring.Echo("peace!")
 			musicType = 'peace'
 		end
 		

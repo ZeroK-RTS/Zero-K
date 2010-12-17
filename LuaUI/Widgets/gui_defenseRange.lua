@@ -5,7 +5,7 @@ local versionNumber = "6.2.5"
 
 function widget:GetInfo()
 	return {
-		name      = "Defense Range Zero-K",-- will need update when CA1F code -> ZK
+		name      = "Defense Range Zero-K",
 		desc      = "[v" .. string.format("%s", versionNumber ) .. "] Displays range of defenses (enemy and ally)",
 		author    = "very_bad_soldier / versus666",
 		date      = "October 21, 2007 / September 08, 2010",
@@ -36,9 +36,9 @@ end
 local debug = false --generates debug messages when set to true.
 
 local modConfig = {}
--- CA1F
-modConfig["CA1F"] = {}
-modConfig["CA1F"]["unitList"] =
+-- ZK
+modConfig["ZK"] = {}
+modConfig["ZK"]["unitList"] =
 {
 	--1FACTION
 	armamd = { weapons = { 3 } },		--antinuke
@@ -70,18 +70,18 @@ modConfig["CA1F"]["unitList"] =
 
 --uncomment this if you want dps-depending ring-colors
 --colors will be interpolated by dps scores between min and max values. values outside range will be set to nearest value in range -> min or max
-modConfig["CA1F"]["armorTags"] = {}
-modConfig["CA1F"]["armorTags"]["air"] = "planes"
-modConfig["CA1F"]["armorTags"]["ground"] = "else"
-modConfig["CA1F"]["dps"] = {}
-modConfig["CA1F"]["dps"]["ground"] = {}
-modConfig["CA1F"]["dps"]["air"] = {}
-modConfig["CA1F"]["dps"]["ground"]["min"] = 90
-modConfig["CA1F"]["dps"]["ground"]["max"] = 750 --doomsday does 450 and 750
-modConfig["CA1F"]["dps"]["air"]["min"] = 90
-modConfig["CA1F"]["dps"]["air"]["max"] = 400 --core flak
+modConfig["ZK"]["armorTags"] = {}
+modConfig["ZK"]["armorTags"]["air"] = "planes"
+modConfig["ZK"]["armorTags"]["ground"] = "else"
+modConfig["ZK"]["dps"] = {}
+modConfig["ZK"]["dps"]["ground"] = {}
+modConfig["ZK"]["dps"]["air"] = {}
+modConfig["ZK"]["dps"]["ground"]["min"] = 90
+modConfig["ZK"]["dps"]["ground"]["max"] = 750 --doomsday does 450 and 750
+modConfig["ZK"]["dps"]["air"]["min"] = 90
+modConfig["ZK"]["dps"]["air"]["max"] = 400 --core flak
 --end of dps-colors
---end of CA1F
+--end of ZK
 
 --DEFAULT COLOR CONFIG
 --is used when no game-specfic color config is found in current game-definition

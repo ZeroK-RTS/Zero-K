@@ -61,8 +61,8 @@ config["buttonYPer"] = 0.765
 
 --Game Config ------------------------------------
 local unitList = {}
-unitList["CA1F"] = {} --initialize table
-unitList["CA1F"]["corsilo"] = {}
+unitList["ZK"] = {} --initialize table
+unitList["ZK"]["corsilo"] = {}
 --End
 
 local upper                 = string.upper

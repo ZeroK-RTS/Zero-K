@@ -1,7 +1,7 @@
 return {
-  name='Complete Annihilation PZK $VERSION',
-  description='Complete Annihilation PZK',
-  shortname='CA1f',
+  name='Zero-K $VERSION',
+  description='Zero-K',
+  shortname='ZK',
   version='$VERSION',
   mutator='1',
   game='',
@@ -11,6 +11,6 @@ return {
     'Spring content v1',
   },
   NTAI = {
-    tdfpath='CA';
+    tdfpath='ZK';
   },
 }

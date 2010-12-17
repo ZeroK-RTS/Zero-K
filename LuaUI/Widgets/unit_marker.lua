@@ -41,7 +41,7 @@ local firstUnitID --for 1rst check when comm die
 local secondUnitID -- for 2nd check when comm die
 
 local unitList = {}
---MARKER LIST ------------------------------------ NEED TO UPDATE CA1F TO ZK WHEN MOD UPDATES.
+--MARKER LIST ------------------------------------
 unitList["BA"] = {} --initialize table
 unitList["BA"]["armamd"] = { markerText = "Anti Nuke" }
 unitList["BA"]["corfmd"] = { markerText = "Anti Nuke" }
@@ -71,25 +71,25 @@ unitList["CA"]["armgmm"] =		{ markerText = "Prude" }
 unitList["CA"]["armgeo"] =		{ markerText = "Geo" }
 unitList["CA"]["corgeo"] =		{ markerText = "Geo" }
 
-unitList["CA1F"] = {} --initialize table, should contain ZK buildings currently used.
-unitList["CA1F"]["armamd"] =		{ markerText = "Anti Nuke" }
-unitList["CA1F"]["corsilo"] =		{ markerText = "Nuke" }
---unitList["CA1F"]["missilesilo"] =	{ markerText = "Missile Silo" }
---unitList["CA1F"]["armbrtha"] =		{ markerText = "Big Bertha" }
---unitList["CA1F"]["corbhmth"] =		{ markerText = "Behemoth" }
---unitList["CA1F"]["armanni"] =		{ markerText = "Annihilator" }
---unitList["CA1F"]["cordoom"] =		{ markerText = "Doomsday" }
-unitList["CA1F"]["starlight"] =		{ markerText = "Starlight" }
-unitList["CA1F"]["cafus"] =			{ markerText = "Singularity Reactor" }
---unitList["CA1F"]["armfus"] =		{ markerText = "Fusion Reactor" }
---unitList["CA1F"]["amgeo"] =			{ markerText = "Moho Geo" }
---unitList["CA1F"]["geo"] =			{ markerText = "Geo" }
---unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
---unitList["CA1F"]["chickenspire"] =		{ markerText = "Spire" }
-unitList["CA1F"]["chicken_dragon"] =	{ markerText = "White Dragon" }
-unitList["CA1F"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen Aerial" }
-unitList["CA1F"]["chickenlandqueen"] =	{ markerText = "Chicken Queen Grounded" }
-unitList["CA1F"]["chickenqueenlite"] =	{ markerText = "Chicken Queen Junior" }
+unitList["ZK"] = {} --initialize table, should contain ZK buildings currently used.
+unitList["ZK"]["armamd"] =		{ markerText = "Anti Nuke" }
+unitList["ZK"]["corsilo"] =		{ markerText = "Nuke" }
+--unitList["ZK"]["missilesilo"] =	{ markerText = "Missile Silo" }
+--unitList["ZK"]["armbrtha"] =		{ markerText = "Big Bertha" }
+--unitList["ZK"]["corbhmth"] =		{ markerText = "Behemoth" }
+--unitList["ZK"]["armanni"] =		{ markerText = "Annihilator" }
+--unitList["ZK"]["cordoom"] =		{ markerText = "Doomsday" }
+unitList["ZK"]["starlight"] =		{ markerText = "Starlight" }
+unitList["ZK"]["cafus"] =			{ markerText = "Singularity Reactor" }
+--unitList["ZK"]["armfus"] =		{ markerText = "Fusion Reactor" }
+--unitList["ZK"]["amgeo"] =			{ markerText = "Moho Geo" }
+--unitList["ZK"]["geo"] =			{ markerText = "Geo" }
+--unitList["ZK"]["roost"] =				{ markerText = "Roost" }
+--unitList["ZK"]["chickenspire"] =		{ markerText = "Spire" }
+unitList["ZK"]["chicken_dragon"] =	{ markerText = "White Dragon" }
+unitList["ZK"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen Aerial" }
+unitList["ZK"]["chickenlandqueen"] =	{ markerText = "Chicken Queen Grounded" }
+unitList["ZK"]["chickenqueenlite"] =	{ markerText = "Chicken Queen Junior" }
 
 --END OF MARKER LIST---------------------------------------
 local markerTimePerId = 0.2 --400ms
@@ -148,16 +148,16 @@ function widget:Initialize()
 		return
 	end
 
---[[	if (unitList[curModID] == "CA1F" and check for GameRule 'difficulty' showing presence of chicken game (weird and a bit unreliable in the futur but easy) as there seems to be no way to extract info from luaAI.lua data. If someone know a better method please do.
-	if (curModID =="CA1F" and isChickenGame()) then --mod CA1F->ZK
+--[[	if (unitList[curModID] == "ZK" and check for GameRule 'difficulty' showing presence of chicken game (weird and a bit unreliable in the futur but easy) as there seems to be no way to extract info from luaAI.lua data. If someone know a better method please do.
+	if (curModID =="ZK" and isChickenGame()) then --mod ->ZK
 		--add chicken game POI markers
-		unitList["CA1F"]["roost"] =				{ markerText = "Roost" }
-		unitList["CA1F"]["roostfact"] =			{ markerText = "Roostfact" }
-		unitList["CA1F"]["chickend"] =			{ markerText = "Tube" } --regular orange tube
-		unitList["CA1F"]["chickenspire"] =		{ markerText = "Spire" } -- green tube-of-death
-		unitList["CA1F"]["nest"] =				{ markerText = "Nest" }
-		unitList["CA1F"]["chicken_dragon"] =	{ markerText = "White Dragon" }
-		unitList["CA1F"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen" }
+		unitList["ZK"]["roost"] =				{ markerText = "Roost" }
+		unitList["ZK"]["roostfact"] =			{ markerText = "Roostfact" }
+		unitList["ZK"]["chickend"] =			{ markerText = "Tube" } --regular orange tube
+		unitList["ZK"]["chickenspire"] =		{ markerText = "Spire" } -- green tube-of-death
+		unitList["ZK"]["nest"] =				{ markerText = "Nest" }
+		unitList["ZK"]["chicken_dragon"] =	{ markerText = "White Dragon" }
+		unitList["ZK"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen" }
 	end
 	]]--
 end

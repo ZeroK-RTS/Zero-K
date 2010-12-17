@@ -2668,7 +2668,7 @@ local function initialiseFaction(team)
 	end
 	
 	local shortname = Game.modShortName
-	if shortname == "CA1f" then
+	if shortname == "ZK" then
 		a.buildDefs = a.buildConfig.robots
 		return true
 	else
