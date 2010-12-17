@@ -117,7 +117,7 @@ unitDef = {
         subs    = 150,
       },
 
-      explosionGenerator      = [[custom:megapartgun]],
+      explosionGenerator      = [[custom:ataalaser]],
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,

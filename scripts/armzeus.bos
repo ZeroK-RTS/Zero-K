@@ -1,7 +1,6 @@
-#define TA			// This is a TA script
+//linear constant=65536
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, chest, flare, hips, lthigh, rthigh, head, lforearm, rforearm, rshoulder, lshoulder, rshin, rfoot, lshin, lfoot;
 
@@ -584,8 +583,8 @@ RestoreAfterDelay()
 {
 	sleep RESTORE_DELAY;
 	set-signal-mask 0;
-	turn chest to y-axis <0.000000> speed <90.000000>;
-	turn chest to x-axis <0.000000> speed <45.000000>;
+	turn chest to y-axis <0> speed <90>;
+	turn chest to x-axis <0> speed <45>;
 	wait-for-turn chest around y-axis;
 	wait-for-turn chest around x-axis;
 	bAiming = FALSE;
@@ -624,8 +623,8 @@ AimPrimary(heading, pitch)
 //	{
 //		sleep 100;
 //	}
-	turn chest to y-axis heading speed <200.000000>;
-	turn chest to x-axis <0.000000> - pitch speed <60.000000>;
+	turn chest to y-axis heading speed <150>;
+	turn chest to x-axis <0> - pitch speed <60>;
 	wait-for-turn chest around y-axis;
 	wait-for-turn chest around x-axis;
 	start-script RestoreAfterDelay();
