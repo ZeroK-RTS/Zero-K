@@ -18,6 +18,7 @@ end
 
 ------------------------
 -- speedups
+local spGetGameSeconds = Spring.GetGameSeconds
 local spGetMyTeamID = Spring.GetMyTeamID
 local spGetTeamUnitsByDefs = Spring.GetTeamUnitsByDefs
 local spGetTeamResources = Spring.GetTeamResources
@@ -207,15 +208,15 @@ local function GetTipsList()
 	-- General interface tips
 	AddTipOnce("Use Ctrl+F11 to to move screen elements around.", 1)
 	AddTipOnce("Press Esc to toggle the game menu, where you can alter settings.", 1)
-	AddTipOnce("Use Mouse Wheel to zoom in and out", 1)
+	AddTipOnce("Use Mouse Wheel to zoom in and out. Hold down the mousewheel and drag to pan.", 1)
 
 	-- Beginning: Getting the commander to build the starting base
-	if CountMy(energy) + CountMy(mex) <= 3 then
+	if CountMy(energy) + CountMy(mex) <= 3 and spGetGameSeconds() < 30 then
 		if Spring.GetTeamUnitCount(t)==0 then
 			if Game.startPosType==2 and Spring.GetGameFrame()==0 then
 				AddTip("Pick a starting position, then click ready.\nLook for areas with metal spots (press F4 to toggle the metal map). Do not spawn in a cliff!", 1, 5)
-			else
-				AddTip("Game is loading.", 3, 10000)
+			--else
+				--AddTip("Game is loading.", 3, 10000)
 			end
 		elseif CountMy(commander)==1 then
 			if Spring.GetSelectedUnitsCount()==0 then
@@ -228,7 +229,7 @@ local function GetTipsList()
 		end
 		
 	-- Beginning: Getting commander) to build the first fac
-	elseif CountMy(energy) >= 3 and CountMy(mex)>= 1 and CountMy(factory) == 0 then
+	elseif CountMy(energy) >= 3 and CountMy(mex)>= 1 and CountMy(factory) == 0 and spGetGameSeconds() < 60 then
 		AddTip("Use your commander to make a factory. The Shield Bot Factory is a good choice for beginners.\nYour first factory is \255\255\64\0FREE\008.", 1, 5)
 
 		-- Once the player has started getting stuff done

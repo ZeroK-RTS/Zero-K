@@ -311,11 +311,11 @@ local function SpawnStartUnit(teamID, playerID)
 
     -- CREATE UNIT
 	local unitID
-    if Spring.GetGameFrame() <= 1 then
-		unitID = Spring.CreateUnit(startUnit, x, y, z, facing, teamID)
-	else
+    --if Spring.GetGameFrame() <= 1 then
+	--	unitID = Spring.CreateUnit(startUnit, x, y, z, facing, teamID)
+	--else
 		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
-	end
+	--end
 	commSpawned[teamID] = true
 	
     -- set the *team's* lineage root

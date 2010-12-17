@@ -46,7 +46,7 @@ supportcomm = {
 	enabled = function() return (not Spring.GetSpectatingState()) end,
 	poster = "LuaUI/Images/startup_info_selector/commsupport.jpg",
 	selector = "Support Comm",--because of the way spring handle font this text ("pp") is a shown few pixels higher than expected, nothing lethal.
-	tooltip = "Support Commander\nUse a railgun (pierces units), has increased income and build range but low health and speed. Comes with free storage.\nADV Support Commander\nGain better build power and radar range, wide healing aura, increased income, and can fire a concussion shot (AoE + impulse).",
+	tooltip = "Support Commander\nUses a railgun (pierces units), has increased income and build range but low health and speed. Comes with free storage.\nADV Support Commander\nGain better build power and radar range, wide healing aura, increased income, and can fire a concussion shot (AoE + impulse).",
 	button = function() 
 	Spring.SendLuaRulesMsg("faction:supportcomm")
 	Spring.SendCommands({'say a:I choose: Support Commander !'})

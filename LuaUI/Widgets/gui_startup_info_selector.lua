@@ -186,7 +186,7 @@ function CreateWindow()
       x = (posterx*actived - cbWidth)/2,
       y = postery + (buttonspace)/2+14,
       --OnMouseUp = {Close}
-	  OnClick = {Close}
+	  OnClick = {function() Close(false) end}
 	}
 
   end
