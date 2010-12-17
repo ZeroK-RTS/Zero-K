@@ -34,9 +34,7 @@ function script.StopMoving()
 end
 --]]
 function script.Create()
-	StartThread( Rise )
-	Turn(tube1, x_axis, -90)
-	Turn(tube2, x_axis, -180)
+	--StartThread( Rise )
 end
 
 function script.QueryWeapon1() 

@@ -31,7 +31,7 @@ function script.StopMoving()
 end
 --]]
 function script.Create()
-	StartThread( Rise )
+	--StartThread( Rise )
 end
 
 function script.QueryWeapon1() 

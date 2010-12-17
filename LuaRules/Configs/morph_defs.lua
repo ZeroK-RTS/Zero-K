@@ -394,18 +394,12 @@ local morphDefs = {
   },
   armroy = {
     {
-      into = 'corcrus',
+      into = 'corroy',
       time = 20,
       rank = 3,   
     },
   },
-
   coresupp = {
-    {
-      into = 'corroy',
-      time = 10,
-      rank = 3,   
-    },
 	{
       into = 'armroy',
       time = 10,
@@ -414,20 +408,15 @@ local morphDefs = {
   },
   corroy = {
     {
-      into = 'corcrus',
-      time = 20,
+      into = 'corbats',
+      time = 45,
       rank = 3,   
     },
   },
-  corcrus = {
+  corsub = {
     {
-      into = 'armcarry',
-      time = 30,
-      rank = 3,   
-    },
-	{
-      into = 'corbats',
-      time = 30,
+      into = 'serpent',
+      time = 45,
       rank = 3,   
     },
   },
