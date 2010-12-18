@@ -515,7 +515,6 @@ AimWeapon1(Func_Var_1, Func_Var_2)
 Shot1()
 {
 	//recoil
-	/*
 	//set 76 to 0; //turn off cloak for fliker
 	//emit-sfx 1024 from flare;
 	sleep 50;
@@ -525,7 +524,6 @@ Shot1()
 	sleep 800;
 	if ( rand (1,3) == 3 ) turn armhold to x-axis <15.000000> speed <150.000000>; //check the sexy shot
 	//return (1);
-	*/	
 }
 
 Shot2()
@@ -568,7 +566,8 @@ QueryWeapon3(piecenum)
 AimWeapon3(Func_Var_1, Func_Var_2)
 {
 	signal SIG_AIM;
-	set-signal-mask SIG_AIM;
+	signal SIG_AIM_3;
+	set-signal-mask SIG_AIM_3;
 	bAiming = TRUE;
 	
 	while( !Static_Var_3 )

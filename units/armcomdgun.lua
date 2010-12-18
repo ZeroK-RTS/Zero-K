@@ -15,7 +15,7 @@ unitDef = {
   buildPic            = [[armcomdgun.png]],
   buildTime           = 2000,
   canAttack           = true,
-  canDGun             = true,
+  canDGun             = false,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -82,14 +82,14 @@ unitDef = {
 
   weapons             = {
 
+    --[1] = {
+    --  def                = [[FAKELASER]],
+    --  badTargetCategory  = [[FIXEDWING]],
+    --  onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    --},
+
+
     [1] = {
-      def                = [[FAKELASER]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
-    [3] = {
       def = [[DISINTEGRATOR]],
     },
 
