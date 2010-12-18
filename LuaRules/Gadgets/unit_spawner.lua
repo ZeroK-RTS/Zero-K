@@ -174,8 +174,13 @@ else
 end
 
 local allyTeams = Spring.GetAllyTeamList()
-local allyTeamCount = SetCount(allyTeams)
-if allyTeamCount > 4 then	--chicken, players, gaia, and unidentified team
+local allyTeamCount = 0
+Spring.Echo("TEAM DATA")
+for i,v in ipairs(allyTeams) do 
+	Spring.Echo(i.."\t"..v) 
+	allyTeamCount = allyTeamCount + 1
+end
+if allyTeamCount > 3 then	--chicken, players, gaia, and unidentified team
 	--pvp = true
 	Spring.Echo("Chicken: PvP mode detected")
 end	
