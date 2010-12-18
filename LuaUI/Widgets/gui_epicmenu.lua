@@ -73,7 +73,7 @@ local widget_categorize = true
 
 --------------------------------------------------------------------------------
 -- Misc
-local B_HEIGHT = 35
+local B_HEIGHT = 26
 local C_HEIGHT = 20
 
 local scrH, scrW = 0,0
@@ -1622,7 +1622,7 @@ local function MakeCrudeMenu()
 		window_crude = nil
 	end
 		
-	local crude_width = 475
+	local crude_width = 420
 	local crude_height = B_HEIGHT+10
 	
 	local menu_tree3 		= AddCustomPaths(menu_tree2, 'Settings')
