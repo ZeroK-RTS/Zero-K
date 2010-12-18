@@ -42,7 +42,7 @@ unitDef = {
   moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[ARMPT]],
+  objectName          = [[scoutboat.s3o]],
   seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
   side                = [[ARM]],
@@ -63,14 +63,14 @@ unitDef = {
 
 
     {
-      def                = [[LASER]],
+      def                = [[MISSILE]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
 
     {
-      def                = [[MISSILE]],
+      def                = [[AAMISSILE]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
@@ -107,48 +107,55 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 650,
     },
-
-
-    LASER         = {
-      name                    = [[Laser]],
+	
+    MISSILE       = {
+      name                    = [[Light SAM]],
       areaOfEffect            = 8,
-      beamlaser               = 1,
-      beamTime                = 0.1,
-      coreThickness           = 0.5,
+      canattackground         = false,
       craterBoost             = 0,
       craterMult              = 0,
+      cylinderTargetting      = 1,
 
       damage                  = {
-        default = 40,
-        planes  = 40,
-        subs    = 2,
+        default = 80,
+        planes  = 80,
+        subs    = 4,
       },
 
-      duration                = 0.02,
-      explosionGenerator      = [[custom:FLASH1yellow2]],
-      fireStarter             = 50,
+      explosionGenerator      = [[custom:FLASH2]],
+      fireStarter             = 70,
+	  fixedlauncher           = true,
+      flightTime              = 4,
+      guidance                = true,
+      heightmod               = 0.5,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      laserFlareSize          = 7.19,
+      interceptedByShieldType = 2,
       lineOfSight             = true,
-      minIntensity            = 1,
+      metalpershot            = 0,
+      model                   = [[wep_m_fury.s3o]],
       noSelfDamage            = true,
-      range                   = 220,
-      reloadtime              = 0.8,
-      renderType              = 0,
-      rgbColor                = [[1 1 0]],
-      soundStart              = [[weapon/laser/small_laser_fire]],
-      soundTrigger            = true,
-      targetMoveError         = 0.2,
-      thickness               = 4.8,
+      range                   = 300,
+      reloadtime              = 1.6,
+      renderType              = 1,
+      selfprop                = true,
+      smokedelay              = [[0.1]],
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/rocket_hit]],
+      soundStart              = [[weapon/missile/missile_fire7]],
+      startsmoke              = [[1]],
+      startVelocity           = 300,
       tolerance               = 10000,
+      tracks                  = true,
+      trajectoryHeight        = 1.2,
+      turnRate                = 60000,
       turret                  = true,
-      weaponType              = [[BeamLaser]],
+      weaponAcceleration      = 350,
+      weaponTimer             = 5,
+      weaponType              = [[MissileLauncher]],
       weaponVelocity          = 750,
     },
-
 
     MINESWEEP     = {
       name                    = [[MineSweep]],
@@ -184,7 +191,7 @@ unitDef = {
     },
 
 
-    MISSILE       = {
+    AAMISSILE       = {
       name                    = [[Light SAM]],
       areaOfEffect            = 8,
       canattackground         = false,
@@ -200,6 +207,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
+	  fixedlauncher           = true,
       flightTime              = 4,
       guidance                = true,
       heightmod               = 0.5,
@@ -224,7 +232,7 @@ unitDef = {
       tolerance               = 10000,
       tracks                  = true,
       trajectoryHeight        = 1.2,
-      turnRate                = 16000,
+      turnRate                = 60000,
       turret                  = true,
       weaponAcceleration      = 150,
       weaponTimer             = 5,
