@@ -25,6 +25,10 @@ unitDef = {
   category            = [[LAND UNARMED]],
   cloakCost           = 0.1,
   cloakCostMoving     = 0.5,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[34 51 34]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
