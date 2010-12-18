@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[armrock]],
-  name                = [[Rocko]],
-  description         = [[Skirmisher Bot (Direct-Fire)]],
-  acceleration        = 0.12,
-  bmcode              = [[1]],
-  brakeRate           = 0.1942,
-  buildCostEnergy     = 90,
-  buildCostMetal      = 90,
-  builder             = false,
-  buildPic            = [[ARMROCK.png]],
-  buildTime           = 90,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[armrock]],
+  name                   = [[Rocko]],
+  description            = [[Skirmisher Bot (Direct-Fire)]],
+  acceleration           = 0.12,
+  bmcode                 = [[1]],
+  brakeRate              = 0.1942,
+  buildCostEnergy        = 90,
+  buildCostMetal         = 90,
+  builder                = false,
+  buildPic               = [[ARMROCK.png]],
+  buildTime              = 90,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[26 39 26]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô escaramuçador]],
     description_fi = [[Kahakoitsijarobotti]],
     description_fr = [[Robot Tirailleur]],
@@ -36,31 +36,31 @@ unitDef = {
     helptext_it    = [[Il basso danno e la bassa velocita dei razzi non guidati del Rocko riscattati dal suo raggio. Sono al meglio in una linea, attaccando dal suo raggio massimo. Si contrastano attaccandoli con unita veloci, o mettendo le tue difese dietro di un muro di terraform.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[kbotskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 109,
-  maxDamage           = 480,
-  maxSlope            = 36,
-  maxVelocity         = 2.1,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  modelCenterOffset   = [[0 6 0]],
-  movementClass       = [[KBOT2]],
-  moveState           = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[sphererock.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[kbotskirm]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 109,
+  maxDamage              = 480,
+  maxSlope               = 36,
+  maxVelocity            = 2.1,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  modelCenterOffset      = [[0 6 0]],
+  movementClass          = [[KBOT2]],
+  moveState              = 0,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[sphererock.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:rockomuzzle]],
@@ -68,22 +68,22 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 523,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 22,
-  turninplace         = 0,
-  turnRate            = 1106,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 523,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 22,
+  turninplace            = 0,
+  turnRate               = 1106,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[BOT_ROCKET]],
@@ -94,7 +94,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     BOT_ROCKET = {
       name                    = [[Rocket]],
@@ -144,7 +144,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Rocko]],

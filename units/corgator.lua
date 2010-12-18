@@ -101,8 +101,8 @@ unitDef = {
 
       duration                = 0.3,
       dynDamageExp            = 1,
-      dynDamageRange		  = 300,
       dynDamageInverted       = false,
+      dynDamageRange          = 300,
       explosionGenerator      = [[custom:HEATRAY_HIT]],
       fallOffRate             = 0.75,
       fireStarter             = 90,
@@ -128,7 +128,6 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 500,
     },
-
 
   },
 

@@ -38,7 +38,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
-  mass                = 200,
+  mass                = 187,
   maxAcc              = 0.14,
   maxDamage           = 975,
   maxVelocity         = 10,
@@ -119,7 +119,7 @@ unitDef = {
 
   featureDefs         = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Vamp]],
       blocking         = true,
       category         = [[corpses]],
@@ -139,7 +139,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Vamp]],
       blocking         = false,
       category         = [[heaps]],

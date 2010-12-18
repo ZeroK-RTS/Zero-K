@@ -63,7 +63,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Caretaker]],
       blocking         = false,
       category         = [[heaps]],
@@ -83,7 +83,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Caretaker]],
       blocking         = false,
       category         = [[heaps]],

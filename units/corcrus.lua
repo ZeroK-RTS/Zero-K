@@ -44,7 +44,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE]],
   objectName          = [[CORCRUS]],
-  onoffable			  = true,
+  onoffable           = true,
   scale               = [[0.5]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
@@ -101,18 +101,48 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK FLOAT SHIP GUNSHIP]],
     },
-	
+
+
     {
-      def         = [[COR_SHIELD_SMALL]],
+      def = [[COR_SHIELD_SMALL]],
     },
-	
 
   },
 
 
   weaponDefs          = {
 
-    DECKLASER   = {
+    COR_SHIELD_SMALL = {
+      name                    = [[Energy Shield]],
+      craterMult              = 0,
+
+      damage                  = {
+        default = 10,
+      },
+
+      exteriorShield          = true,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      isShield                = true,
+      shieldAlpha             = 0.2,
+      shieldBadColor          = [[1 0.1 0.1]],
+      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldInterceptType     = 3,
+      shieldPower             = 3500,
+      shieldPowerRegen        = 60,
+      shieldPowerRegenEnergy  = 9,
+      shieldRadius            = 350,
+      shieldRepulser          = false,
+      smartShield             = true,
+      texture1                = [[wake]],
+      visibleShield           = true,
+      visibleShieldHitFrames  = 4,
+      visibleShieldRepulse    = true,
+      weaponType              = [[Shield]],
+    },
+
+
+    DECKLASER        = {
       name                    = [[Deck Laser]],
       areaOfEffect            = 8,
       beamWeapon              = true,
@@ -153,7 +183,7 @@ unitDef = {
     },
 
 
-    DEPTHCHARGE = {
+    DEPTHCHARGE      = {
       name                    = [[Depth Charge]],
       areaOfEffect            = 128,
       avoidFriendly           = false,
@@ -194,7 +224,7 @@ unitDef = {
     },
 
 
-    LASER       = {
+    LASER            = {
       name                    = [[High-Energy Laser]],
       areaOfEffect            = 14,
       beamWeapon              = true,
@@ -237,35 +267,6 @@ unitDef = {
       weaponVelocity          = 2120,
     },
 
-    COR_SHIELD_SMALL = {
-      name                    = [[Energy Shield]],
-      craterMult              = 0,
-
-      damage                  = {
-        default = 10,
-      },
-
-      exteriorShield          = true,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      isShield                = true,
-      shieldAlpha             = 0.2,
-      shieldBadColor          = [[1 0.1 0.1]],
-      shieldGoodColor         = [[0.1 0.1 1]],
-      shieldInterceptType     = 3,
-      shieldPower             = 3500,
-      shieldPowerRegen        = 60,
-      shieldPowerRegenEnergy  = 9,
-      shieldRadius            = 350,
-      shieldRepulser          = false,
-      smartShield             = true,
-      texture1                = [[wake]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 4,
-      visibleShieldRepulse    = true,
-      weaponType              = [[Shield]],
-    },
-	
   },
 
 

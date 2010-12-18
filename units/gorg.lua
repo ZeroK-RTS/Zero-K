@@ -1,57 +1,57 @@
 unitDef = {
-  unitname            = [[gorg]],
-  name                = [[Jugglenaut]],
-  description         = [[Heavy Assault Strider]],
-  acceleration        = 0.0552,
-  bmcode              = [[1]],
-  brakeRate           = 0.1375,
-  buildCostEnergy     = 12000,
-  buildCostMetal      = 12000,
-  builder             = false,
-  buildPic            = [[GORG.png]],
-  buildTime           = 12000,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[gorg]],
+  name                   = [[Jugglenaut]],
+  description            = [[Heavy Assault Strider]],
+  acceleration           = 0.0552,
+  bmcode                 = [[1]],
+  brakeRate              = 0.1375,
+  buildCostEnergy        = 12000,
+  buildCostMetal         = 12000,
+  builder                = false,
+  buildPic               = [[GORG.png]],
+  buildTime              = 12000,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[65 65 65]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_fr = [[Mechwarrior d'Assaut]],
     helptext       = [[The Juggernaut is the big daddy to the Sumo. Where its smaller cousin sported the exotic heatray, the Jugg is even more bizzare with its three gravity guns complementing a standard laser cannon. This beast is slow and expensive, but seemingly impervious to enemy fire.]],
     helptext_fr    = [[Le Juggernaut est un quadrip?de lourd et lent, mais ?xtr?mement solide. Il est ?quip? de deux canons laser ? haute fr?quence, et d'un double laser anti gravit? de technologie Newton. Il d?cole les unit?s ennemies du sol et les ?jecte en arri?re tout en les bombardant de ses tirs. Difficilement arr?table, voire la silhouette d'un Juggernaut ? l'horizon est une des pires chose que l'on puisse apercevoir.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[ESTOR_BUILDINGEX]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[t3generic]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 1848,
-  maxDamage           = 100000,
-  maxSlope            = 36,
-  maxVelocity         = 0.8325,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT4]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[GORG]],
-  pieceTrailCEGRange  = 1,
-  pieceTrailCEGTag    = [[trail_huge]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[ESTOR_BUILDINGEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[ESTOR_BUILDINGEX]],
+  footprintX             = 4,
+  footprintZ             = 4,
+  iconType               = [[t3generic]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[640]],
+  mass                   = 1848,
+  maxDamage              = 100000,
+  maxSlope               = 36,
+  maxVelocity            = 0.8325,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT4]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[GORG]],
+  pieceTrailCEGRange     = 1,
+  pieceTrailCEGTag       = [[trail_huge]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
@@ -59,15 +59,15 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 650,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turnRate            = 233,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 650,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  turnRate               = 233,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[LASER]],
@@ -103,7 +103,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     GRAVITY_NEG = {
       name                    = [[Attractive Gravity]],
@@ -195,7 +195,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Juggernaut]],

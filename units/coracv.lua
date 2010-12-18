@@ -1,32 +1,32 @@
 unitDef = {
-  unitname            = [[coracv]],
-  name                = [[Welder]],
-  description         = [[Armed Construction Tank, Builds at 9 m/s]],
-  acceleration        = 0.066,
-  brakeRate           = 1.5,
-  buildCostEnergy     = 250,
-  buildCostMetal      = 250,
-  buildDistance       = 180,
-  builder             = true,
+  unitname               = [[coracv]],
+  name                   = [[Welder]],
+  description            = [[Armed Construction Tank, Builds at 9 m/s]],
+  acceleration           = 0.066,
+  brakeRate              = 1.5,
+  buildCostEnergy        = 250,
+  buildCostMetal         = 250,
+  buildDistance          = 180,
+  builder                = true,
 
-  buildoptions        = {
+  buildoptions           = {
   },
 
-  buildPic            = [[coracv.png]],
-  buildTime           = 250,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canreclamate        = [[1]],
-  canstop             = [[1]],
-  category            = [[LAND]],
+  buildPic               = [[coracv.png]],
+  buildTime              = 250,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canreclamate           = [[1]],
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 -15 0]],
   collisionVolumeScales  = [[60 60 60]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Tanque de construç?o armado, contrói a 9 m/s]],
     description_fr = [[Tank de Construction Arm?e, Construit ? 9 m/s]],
     helptext       = [[Armed with a small defensive tower, the Welder can defend itself against light enemy attacks.]],
@@ -34,32 +34,32 @@ unitDef = {
     helptext_fr    = [[Arm? d'une tourelle laser l?g?re, le Welder saura parfaitement se d?fendre contre les attaques de tirailleurs ou d'?claireurs.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  energyMake          = 0.225,
-  energyUse           = 0,
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[builder]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 213,
-  maxDamage           = 1900,
-  maxSlope            = 18,
-  maxVelocity         = 2.1,
-  maxWaterDepth       = 22,
-  metalMake           = 0.225,
-  minCloakDistance    = 75,
-  movementClass       = [[TANK3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[coracv]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  energyMake             = 0.225,
+  energyUse              = 0,
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 3,
+  footprintZ             = 3,
+  iconType               = [[builder]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 213,
+  maxDamage              = 1900,
+  maxSlope               = 18,
+  maxVelocity            = 2.1,
+  maxWaterDepth          = 22,
+  metalMake              = 0.225,
+  minCloakDistance       = 75,
+  movementClass          = [[TANK3]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[coracv]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
@@ -67,23 +67,23 @@ unitDef = {
 
   },
 
-  showNanoSpray       = false,
-  side                = [[CORE]],
-  sightDistance       = 255,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  terraformSpeed      = 450,
-  trackOffset         = 3,
-  trackStrength       = 6,
-  trackStretch        = 1,
-  trackType           = [[StdTank]],
-  trackWidth          = 32,
-  turninplace         = 0,
-  turnRate            = 625,
-  workerTime          = 9,
+  showNanoSpray          = false,
+  side                   = [[CORE]],
+  sightDistance          = 255,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[TANK]],
+  terraformSpeed         = 450,
+  trackOffset            = 3,
+  trackStrength          = 6,
+  trackStretch           = 1,
+  trackType              = [[StdTank]],
+  trackWidth             = 32,
+  turninplace            = 0,
+  turnRate               = 625,
+  workerTime             = 9,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[LASER]],
@@ -94,7 +94,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     LASER = {
       name                    = [[Mini Laser]],
@@ -138,7 +138,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Welder]],

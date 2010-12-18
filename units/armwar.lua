@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[armwar]],
-  name                = [[Warrior]],
-  description         = [[Riot Bot]],
-  acceleration        = 0.0768,
-  bmcode              = [[1]],
-  brakeRate           = 0.2392,
-  buildCostEnergy     = 220,
-  buildCostMetal      = 220,
-  builder             = false,
-  buildPic            = [[ARMWAR.png]],
-  buildTime           = 220,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[armwar]],
+  name                   = [[Warrior]],
+  description            = [[Riot Bot]],
+  acceleration           = 0.0768,
+  bmcode                 = [[1]],
+  brakeRate              = 0.2392,
+  buildCostEnergy        = 220,
+  buildCostMetal         = 220,
+  builder                = false,
+  buildPic               = [[ARMWAR.png]],
+  buildTime              = 220,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[46 46 46]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô dispersador]],
     description_es = [[Robot de alboroto]],
     description_fi = [[Mellakkarobotti]],
@@ -36,28 +36,28 @@ unitDef = {
     helptext_it    = [[La devastante mitraglia ad alta energia del Warrior é efficace contro la maggioranza delle unitá namiche, in particolare quelli da invasione. Non é molto efficace contro la difesa statica, sicché non usarlo come unitá d'assalto. Contrastali stando fuero dal loro raggio, siccome sono lenti.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[SMALL_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[kbotriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[1]],
-  mass                = 165,
-  maxDamage           = 880,
-  maxSlope            = 36,
-  maxVelocity         = 1.71,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[Spherewarrior.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[SMALL_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[SMALL_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[kbotriot]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[1]],
+  mass                   = 165,
+  maxDamage              = 880,
+  maxSlope               = 36,
+  maxVelocity            = 1.71,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[Spherewarrior.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[SMALL_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:WARMUZZLE]],
@@ -66,17 +66,17 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 330,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turninplace         = 0,
-  turnRate            = 808,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 330,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  turninplace            = 0,
+  turnRate               = 808,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[WARRIOR_WEAPON]],
@@ -87,7 +87,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     WARRIOR_WEAPON = {
       name                    = [[Heavy EMG]],
@@ -132,7 +132,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Warrior]],

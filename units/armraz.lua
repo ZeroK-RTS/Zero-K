@@ -1,55 +1,55 @@
 unitDef = {
-  unitname            = [[armraz]],
-  name                = [[Razorback]],
-  description         = [[Assault/Riot Strider]],
-  acceleration        = 0.156,
-  bmcode              = [[1]],
-  brakeRate           = 0.262,
-  buildCostEnergy     = 4000,
-  buildCostMetal      = 4000,
-  builder             = false,
-  buildPic            = [[ARMRAZ.png]],
-  buildTime           = 4000,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[armraz]],
+  name                   = [[Razorback]],
+  description            = [[Assault/Riot Strider]],
+  acceleration           = 0.156,
+  bmcode                 = [[1]],
+  brakeRate              = 0.262,
+  buildCostEnergy        = 4000,
+  buildCostMetal         = 4000,
+  builder                = false,
+  buildPic               = [[ARMRAZ.png]],
+  buildTime              = 4000,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[65 65 65]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_fr = [[Mechwarrior d'Assaut]],
     helptext       = [[The lightest of Nova's heavy striders, the Razorback features twin multi-barelled pulse cannons for extreme crowd control, as well as a head-mounted short-range laser for close in work. Don't use recklessly - its short range can be a real liability.]],
     helptext_fr    = [[Le Razorback est un Robot au blindage lourd arm? de deux Miniguns et d'un canon laser continu ind?pendant. Son blindage et sa pr?cision le rendent utile contre nimporte quel type d'arm?e, ? l'exception des unit?s longues port?e. V?ritable rouleau compresseur, il est pourtant le moins cher et le plus faible des Mechs.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[CRAWL_BLASTSML]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[t3generic]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 750,
-  maxDamage           = 11000,
-  maxSlope            = 36,
-  maxVelocity         = 1.9,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT4]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[ARMRAZ]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[CRAWL_BLASTSML]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[CRAWL_BLASTSML]],
+  footprintX             = 4,
+  footprintZ             = 4,
+  iconType               = [[t3generic]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[640]],
+  mass                   = 750,
+  maxDamage              = 11000,
+  maxSlope               = 36,
+  maxVelocity            = 1.9,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT4]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  objectName             = [[ARMRAZ]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[CRAWL_BLASTSML]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:WARMUZZLE]],
@@ -58,16 +58,16 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 578,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turnRate            = 515,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 578,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  turnRate               = 515,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[RAZORBACK_EMG]],
@@ -92,7 +92,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     LASER         = {
       name                    = [[High Intensity Laserbeam]],
@@ -182,7 +182,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Razorback]],

@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[armjeth]],
-  name                = [[Jethro]],
-  description         = [[Anti-air Bot]],
-  acceleration        = 0.36,
-  bmcode              = [[1]],
-  brakeRate           = 0.205,
-  buildCostEnergy     = 100,
-  buildCostMetal      = 100,
-  builder             = false,
-  buildPic            = [[ARMJETH.png]],
-  buildTime           = 100,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[armjeth]],
+  name                   = [[Jethro]],
+  description            = [[Anti-air Bot]],
+  acceleration           = 0.36,
+  bmcode                 = [[1]],
+  brakeRate              = 0.205,
+  buildCostEnergy        = 100,
+  buildCostMetal         = 100,
+  builder                = false,
+  buildPic               = [[ARMJETH.png]],
+  buildTime              = 100,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[35 40 35]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô anti-ar]],
     description_es = [[Robot Antiaéreo]],
     description_fi = [[Ilmatorjuntarobotti]],
@@ -36,30 +36,30 @@ unitDef = {
     helptext_it    = [[Un passo tra un defender ed un pack0, senza le sue debolezze, e con l'abilitá di proteggere bene una forza mobile, il Jethro offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[kbotaa]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 117,
-  maxDamage           = 550,
-  maxSlope            = 36,
-  maxVelocity         = 3,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  moveState           = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName          = [[spherejeth.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[kbotaa]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 117,
+  maxDamage              = 550,
+  maxSlope               = 36,
+  maxVelocity            = 3,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  moveState              = 0,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
+  objectName             = [[spherejeth.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:NONE]],
@@ -68,22 +68,22 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 22,
-  turninplace         = 0,
-  turnRate            = 1118,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 22,
+  turninplace            = 0,
+  turnRate               = 1118,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     [3] = {
       def                = [[AA_LASER]],
@@ -94,7 +94,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     AA_LASER      = {
       name                    = [[Anti-Air Laser]],
@@ -170,7 +170,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Jethro]],

@@ -1,59 +1,59 @@
 unitDef = {
-  unitname            = [[corroy]],
-  name                = [[Enforcer]],
-  description         = [[Light Missile Cruiser (Skirmisher/Riot Support)]],
-  acceleration        = 0.039,
-  activateWhenBuilt   = true,
-  bmcode              = [[1]],
-  brakeRate           = 0.115,
-  buildAngle          = 16384,
-  buildCostEnergy     = 1200,
-  buildCostMetal      = 1200,
-  builder             = false,
-  buildPic            = [[CORROY.png]],
-  buildTime           = 1200,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[SHIP]],
+  unitname              = [[corroy]],
+  name                  = [[Enforcer]],
+  description           = [[Light Missile Cruiser (Skirmisher/Riot Support)]],
+  acceleration          = 0.039,
+  activateWhenBuilt     = true,
+  bmcode                = [[1]],
+  brakeRate             = 0.115,
+  buildAngle            = 16384,
+  buildCostEnergy       = 1200,
+  buildCostMetal        = 1200,
+  builder               = false,
+  buildPic              = [[CORROY.png]],
+  buildTime             = 1200,
+  canAttack             = true,
+  canGuard              = true,
+  canMove               = true,
+  canPatrol             = true,
+  canstop               = [[1]],
+  category              = [[SHIP]],
   collisionVolumeOffset = [[0 20 -20]],
   collisionVolumeScales = [[50 35 110]],
   collisionVolumeTest   = 1,
   collisionVolumeType   = [[box]],
-  corpse              = [[DEAD]],
+  corpse                = [[DEAD]],
 
-  customParams        = {
+  customParams          = {
     description_fr = [[Destroyer Lance-Missile (Support/Anti-Air)]],
     helptext       = [[This light cruiser packs a powerful, long-range missile, useful for bombarding sea and shore targets and destroying aircraft. Beware of subs and Corvettes.]],
     helptext_fr    = [[Le Enforcer embarque deux batteries de missiles: une lourde et longue port?e pour d?truire les navires et les installation c?ti?res, ainsi qu'un batterie longue port?e anti-air. Il est rapide mais peu solide.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  floater             = true,
-  footprintX          = 5,
-  footprintZ          = 5,
-  iconType            = [[aaship]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 340,
-  maxDamage           = 4200,
-  maxVelocity         = 2.5,
-  minCloakDistance    = 150,
-  minWaterDepth       = 10,
-  movementClass       = [[BOAT4]],
-  moveState           = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[logsiren.s3o]],
-  scale               = [[0.6]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype    = [[Standby]],
+  explodeAs             = [[BIG_UNITEX]],
+  floater               = true,
+  footprintX            = 5,
+  footprintZ            = 5,
+  iconType              = [[aaship]],
+  idleAutoHeal          = 5,
+  idleTime              = 1800,
+  maneuverleashlength   = [[640]],
+  mass                  = 407,
+  maxDamage             = 4200,
+  maxVelocity           = 2.5,
+  minCloakDistance      = 150,
+  minWaterDepth         = 10,
+  movementClass         = [[BOAT4]],
+  moveState             = 0,
+  noAutoFire            = false,
+  noChaseCategory       = [[TERRAFORM SATELLITE SUB]],
+  objectName            = [[logsiren.s3o]],
+  scale                 = [[0.6]],
+  seismicSignature      = 4,
+  selfDestructAs        = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes              = {
 
     explosiongenerators = {
       [[custom:MISSILE_EXPLOSION]],
@@ -62,17 +62,17 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[SHIP]],
-  turninplace         = 0,
-  turnRate            = 306,
-  waterline           = 4,
-  workerTime          = 0,
+  side                  = [[CORE]],
+  sightDistance         = 660,
+  smoothAnim            = true,
+  steeringmode          = [[1]],
+  TEDClass              = [[SHIP]],
+  turninplace           = 0,
+  turnRate              = 306,
+  waterline             = 4,
+  workerTime            = 0,
 
-  weapons             = {
+  weapons               = {
 
     {
       def                = [[MISSILE]],
@@ -82,7 +82,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs            = {
 
     MISSILE = {
       name                    = [[Heavy Multi-Role Guided Missile]],
@@ -130,9 +130,9 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs           = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Enforcer]],
       blocking         = false,
       category         = [[corpses]],
@@ -151,7 +151,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Enforcer]],
       blocking         = false,
       category         = [[heaps]],

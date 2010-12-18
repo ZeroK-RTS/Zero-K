@@ -17,7 +17,7 @@ unitDef = {
     [[corsub]],
     [[armroy]],
     [[corroy]],
-	[[serpent]],
+    [[serpent]],
     [[cornukesub]],
     [[armcarry]],
     [[corbats]],

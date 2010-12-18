@@ -67,7 +67,41 @@ unitDef = {
 
   weaponDefs          = {
 
-    MISSILE       = {
+    MINESWEEP = {
+      name                    = [[MineSweep]],
+      areaOfEffect            = 512,
+      avoidFeature            = false,
+      avoidFriendly           = false,
+      collideFeature          = false,
+      collideFriendly         = false,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 11,
+      },
+
+      edgeEffectiveness       = 1,
+      explosionGenerator      = [[custom:MINESWEEP]],
+      impulseFactor           = 0,
+      intensity               = 0,
+      interceptedByShieldType = 0,
+      lineOfSight             = false,
+      noSelfDamage            = true,
+      paralyzer               = true,
+      paralyzeTime            = 10,
+      range                   = 300,
+      reloadtime              = 3,
+      renderType              = 4,
+      tolerance               = 32367,
+      turret                  = false,
+      weaponTimer             = 0.1,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 1024,
+    },
+
+
+    MISSILE   = {
       name                    = [[Light Missile]],
       areaOfEffect            = 8,
       craterBoost             = 0,
@@ -82,7 +116,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
-	  fixedlauncher           = true,
+      fixedlauncher           = true,
       flightTime              = 4,
       guidance                = true,
       heightmod               = 0.5,
@@ -115,44 +149,12 @@ unitDef = {
       weaponVelocity          = 750,
     },
 
-    MINESWEEP     = {
-      name                    = [[MineSweep]],
-      areaOfEffect            = 512,
-      avoidFeature            = false,
-      avoidFriendly           = false,
-      collideFeature          = false,
-      collideFriendly         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 11,
-      },
-
-      edgeEffectiveness       = 1,
-      explosionGenerator      = [[custom:MINESWEEP]],
-      impulseFactor           = 0,
-      intensity               = 0,
-      interceptedByShieldType = 0,
-      lineOfSight             = false,
-      noSelfDamage            = true,
-      paralyzer               = true,
-      paralyzeTime            = 10,
-      range                   = 300,
-      reloadtime              = 3,
-      renderType              = 4,
-      tolerance               = 32367,
-      turret                  = false,
-      weaponTimer             = 0.1,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 1024,
-    },
   },
 
 
   featureDefs         = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Skeeter]],
       blocking         = false,
       category         = [[corpses]],
@@ -171,7 +173,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Skeeter]],
       blocking         = false,
       category         = [[heaps]],

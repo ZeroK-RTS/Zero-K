@@ -32,7 +32,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   maneuverleashlength = [[640]],
-  mass                = 201,
+  mass                = 205,
   maxDamage           = 820,
   maxSlope            = 18,
   maxVelocity         = 2,
@@ -77,10 +77,10 @@ unitDef = {
     CAPTURERAY = {
       name                    = [[Capture Ray]],
       areaOfEffect            = 8,
-	  beamdecay				  = 0.9,
+      beamdecay               = 0.9,
       beamlaser               = 1,
       beamTime                = 0.1,
-	  beamttl				  = 1,
+      beamttl                 = 1,
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
@@ -106,7 +106,7 @@ unitDef = {
       reloadtime              = 0.1,
       renderType              = 0,
       rgbColor                = [[0 0.8 0.2]],
-	  scrollSpeed             = 2,
+      scrollSpeed             = 2,
       soundStart              = [[weapon/laser/pulse_laser2]],
       soundStartVolume        = 0.5,
       soundTrigger            = true,
@@ -128,7 +128,7 @@ unitDef = {
 
   featureDefs         = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Dreamweaver]],
       blocking         = true,
       category         = [[corpses]],
@@ -148,7 +148,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Dreamweaver]],
       blocking         = false,
       category         = [[heaps]],

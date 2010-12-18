@@ -72,7 +72,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Heavy Tank Factory]],
       blocking         = true,
       category         = [[corpses]],
@@ -92,7 +92,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Heavy Tank Factory]],
       blocking         = false,
       category         = [[heaps]],

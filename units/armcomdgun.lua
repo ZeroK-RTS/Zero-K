@@ -1,66 +1,66 @@
 unitDef = {
-  unitname            = [[armcomdgun]],
-  name                = [[Ultimatum]],
-  description         = [[D-Gun Walker (Anti-Strider)]],
-  acceleration        = 0.18,
-  activateWhenBuilt   = false,
-  amphibious          = [[1]],
-  autoHeal            = 5,
-  bmcode              = [[1]],
-  brakeRate           = 0.375,
-  buildCostEnergy     = 2000,
-  buildCostMetal      = 2000,
-  buildDistance       = 120,
-  builder             = false,
-  buildPic            = [[armcomdgun.png]],
-  buildTime           = 2000,
-  canAttack           = true,
-  canDGun             = false,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canreclamate        = [[1]],
-  canstop             = [[1]],
-  category            = [[LAND FIREPROOF]],
-  cloakCost           = 10,
-  cloakCostMoving     = 50,
-  commander           = true,
+  unitname               = [[armcomdgun]],
+  name                   = [[Ultimatum]],
+  description            = [[D-Gun Walker (Anti-Strider)]],
+  acceleration           = 0.18,
+  activateWhenBuilt      = false,
+  amphibious             = [[1]],
+  autoHeal               = 5,
+  bmcode                 = [[1]],
+  brakeRate              = 0.375,
+  buildCostEnergy        = 2000,
+  buildCostMetal         = 2000,
+  buildDistance          = 120,
+  builder                = false,
+  buildPic               = [[armcomdgun.png]],
+  buildTime              = 2000,
+  canAttack              = true,
+  canDGun                = false,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canreclamate           = [[1]],
+  canstop                = [[1]],
+  category               = [[LAND FIREPROOF]],
+  cloakCost              = 10,
+  cloakCostMoving        = 50,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[35 35 35]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  commander              = true,
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     fireproof = [[1]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  energyUse           = 0,
-  explodeAs           = [[ESTOR_BUILDINGEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  hideDamage          = true,
-  iconType            = [[armcommander]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  immunetoparalyzer   = [[1]],
-  maneuverleashlength = [[640]],
-  mass                = 2500,
-  maxDamage           = 2000,
-  maxSlope            = 36,
-  maxVelocity         = 1.45,
-  maxWaterDepth       = 5000,
-  minCloakDistance    = 100,
-  movementClass       = [[AKBOT2]],
-  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  norestrict          = [[1]],
-  objectName          = [[noruas]],
-  script              = [[noruas.cob]],
-  seismicSignature    = 16,
-  selfDestructAs      = [[ESTOR_BUILDINGEX]],
+  defaultmissiontype     = [[Standby]],
+  energyUse              = 0,
+  explodeAs              = [[ESTOR_BUILDINGEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  hideDamage             = true,
+  iconType               = [[armcommander]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  immunetoparalyzer      = [[1]],
+  maneuverleashlength    = [[640]],
+  mass                   = 2500,
+  maxDamage              = 2000,
+  maxSlope               = 36,
+  maxVelocity            = 1.45,
+  maxWaterDepth          = 5000,
+  minCloakDistance       = 100,
+  movementClass          = [[AKBOT2]],
+  noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
+  norestrict             = [[1]],
+  objectName             = [[noruas]],
+  script                 = [[noruas.cob]],
+  seismicSignature       = 16,
+  selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:COMGATE]],
@@ -68,35 +68,28 @@ unitDef = {
 
   },
 
-  showNanoSpray       = false,
-  showPlayerName      = true,
-  side                = [[ARM]],
-  sightDistance       = 500,
-  smoothAnim          = true,
-  sonarDistance       = 300,
-  steeringmode        = [[2]],
-  TEDClass            = [[COMMANDER]],
-  terraformSpeed      = 600,
-  turnRate            = 1148,
-  upright             = true,
+  showNanoSpray          = false,
+  showPlayerName         = true,
+  side                   = [[ARM]],
+  sightDistance          = 500,
+  smoothAnim             = true,
+  sonarDistance          = 300,
+  steeringmode           = [[2]],
+  TEDClass               = [[COMMANDER]],
+  terraformSpeed         = 600,
+  turnRate               = 1148,
+  upright                = true,
 
-  weapons             = {
+  weapons                = {
 
-    --[1] = {
-    --  def                = [[FAKELASER]],
-    --  badTargetCategory  = [[FIXEDWING]],
-    --  onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    --},
-
-
-    [1] = {
+    {
       def = [[DISINTEGRATOR]],
     },
 
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     DISINTEGRATOR = {
       name                    = [[Disintegrator]],
@@ -180,7 +173,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD      = {
       description      = [[Wreckage - Ultimatum]],

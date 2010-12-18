@@ -1,35 +1,34 @@
 unitDef = {
-  unitname           = [[corape]],
-  name               = [[Rapier]],
-  description        = [[Skirmisher/AA Gunship]],
-  acceleration       = 0.152,
-  amphibious         = true,
-  bankscale          = [[1]],
-  bmcode             = [[1]],
-  brakeRate          = 3.563,
-  buildCostEnergy    = 300,
-  buildCostMetal     = 300,
-  builder            = false,
-  buildPic           = [[CORAPE.png]],
-  buildTime          = 300,
-  canAttack          = true,
-  canFly             = true,
-  canGuard           = true,
-  canMove            = true,
-  canPatrol          = true,
-  canstop            = [[1]],
-  canSubmerge        = false,
-  category           = [[GUNSHIP]],
-  collide            = true,
-  corpse             = [[DEAD]],
+  unitname               = [[corape]],
+  name                   = [[Rapier]],
+  description            = [[Skirmisher/AA Gunship]],
+  acceleration           = 0.152,
+  amphibious             = true,
+  bankscale              = [[1]],
+  bmcode                 = [[1]],
+  brakeRate              = 3.563,
+  buildCostEnergy        = 300,
+  buildCostMetal         = 300,
+  builder                = false,
+  buildPic               = [[CORAPE.png]],
+  buildTime              = 300,
+  canAttack              = true,
+  canFly                 = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  canSubmerge            = false,
+  category               = [[GUNSHIP]],
+  collide                = true,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[32 32 32]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  
-  cruiseAlt          = 140,
+  corpse                 = [[DEAD]],
+  cruiseAlt              = 140,
 
-  customParams       = {
+  customParams           = {
     description_bp = [[Aeronave flutuadora agressora]],
     description_fr = [[ADAV Pilleur]],
     helptext       = [[Logos' light raider gunship. Its missiles are accurate and hit air, and it is good against small targets and defending against other raiders.]],
@@ -37,27 +36,27 @@ unitDef = {
     helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
   },
 
-  defaultmissiontype = [[VTOL_standby]],
-  explodeAs          = [[GUNSHIPEX]],
-  floater            = true,
-  footprintX         = 3,
-  footprintZ         = 3,
-  hoverAttack        = true,
-  iconType           = [[gunship]],
-  idleAutoHeal       = 5,
-  idleTime           = 1800,
-  mass               = 188,
-  maxDamage          = 1500,
-  maxVelocity        = 3.8,
-  minCloakDistance   = 75,
-  noAutoFire         = false,
-  noChaseCategory    = [[TERRAFORM SATELLITE SUB]],
-  objectName         = [[corape.s3o]],
-  scale              = [[1]],
-  seismicSignature   = 0,
-  selfDestructAs     = [[GUNSHIPEX]],
+  defaultmissiontype     = [[VTOL_standby]],
+  explodeAs              = [[GUNSHIPEX]],
+  floater                = true,
+  footprintX             = 3,
+  footprintZ             = 3,
+  hoverAttack            = true,
+  iconType               = [[gunship]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  mass                   = 208,
+  maxDamage              = 1500,
+  maxVelocity            = 3.8,
+  minCloakDistance       = 75,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  objectName             = [[corape.s3o]],
+  scale                  = [[1]],
+  seismicSignature       = 0,
+  selfDestructAs         = [[GUNSHIPEX]],
 
-  sfxtypes           = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:rapiermuzzle]],
@@ -65,15 +64,15 @@ unitDef = {
 
   },
 
-  side               = [[CORE]],
-  sightDistance      = 550,
-  smoothAnim         = true,
-  steeringmode       = [[1]],
-  TEDClass           = [[VTOL]],
-  turnRate           = 594,
-  workerTime         = 0,
+  side                   = [[CORE]],
+  sightDistance          = 550,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[VTOL]],
+  turnRate               = 594,
+  workerTime             = 0,
 
-  weapons            = {
+  weapons                = {
 
     {
       def                = [[VTOL_ROCKET]],
@@ -83,7 +82,7 @@ unitDef = {
   },
 
 
-  weaponDefs         = {
+  weaponDefs             = {
 
     VTOL_ROCKET = {
       name                    = [[Light Homing Missiles]],
@@ -137,7 +136,7 @@ unitDef = {
   },
 
 
-  featureDefs        = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Rapier]],

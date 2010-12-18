@@ -37,7 +37,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[1380]],
-  mass                = 186,
+  mass                = 179,
   maxAcc              = 0.5,
   maxDamage           = 525,
   maxFuel             = 1000,
@@ -50,11 +50,13 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {
+
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
-	  [[custom:light_red]],
-	  [[custom:light_green]],
+      [[custom:light_red]],
+      [[custom:light_green]],
     },
+
   },
 
   side                = [[CORE]],

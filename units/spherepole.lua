@@ -1,30 +1,30 @@
 unitDef = {
-  unitname            = [[spherepole]],
-  name                = [[Scythe]],
-  description         = [[Stealth Raider Bot]],
-  acceleration        = 0.36,
-  bmcode              = [[1]],
-  brakeRate           = 0.205,
-  buildCostEnergy     = 250,
-  buildCostMetal      = 250,
-  builder             = false,
-  buildPic            = [[spherepole.png]],
-  buildTime           = 250,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  cloakCost           = 0.2,
-  cloakCostMoving     = 1,
+  unitname               = [[spherepole]],
+  name                   = [[Scythe]],
+  description            = [[Stealth Raider Bot]],
+  acceleration           = 0.36,
+  bmcode                 = [[1]],
+  brakeRate              = 0.205,
+  buildCostEnergy        = 250,
+  buildCostMetal         = 250,
+  builder                = false,
+  buildPic               = [[spherepole.png]],
+  buildTime              = 250,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  cloakCost              = 0.2,
+  cloakCostMoving        = 1,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[36 46 36]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô agressor]],
     description_es = [[Robot de invasi?n]],
     description_fi = [[Hy?kk??j?robotti]],
@@ -34,31 +34,31 @@ unitDef = {
     helptext       = [[The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defenses to stab at the enemy's economy.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[SMALL_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[stealth]],
-  idleAutoHeal        = 20,
-  idleTime            = 300,
-  initCloaked         = true,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 169,
-  maxDamage           = 800,
-  maxSlope            = 36,
-  maxVelocity         = 3,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  moveState			  = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[spherepole.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[SMALL_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[SMALL_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[stealth]],
+  idleAutoHeal           = 20,
+  idleTime               = 300,
+  initCloaked            = true,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 169,
+  maxDamage              = 800,
+  maxSlope               = 36,
+  maxVelocity            = 3,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  moveState              = 0,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[spherepole.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[SMALL_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:emg_shells_l]],
@@ -67,23 +67,23 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 425,
-  smoothAnim          = true,
-  stealth             = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 18,
-  turninplace         = 0,
-  turnRate            = 1250,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 425,
+  smoothAnim             = true,
+  stealth                = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 18,
+  turninplace            = 0,
+  turnRate               = 1250,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[Blade]],
@@ -93,7 +93,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     Blade = {
       name                    = [[Blade]],
@@ -140,7 +140,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Scythe]],

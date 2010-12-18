@@ -93,16 +93,19 @@ unitDef = {
   workerTime          = 12,
 
   weapons             = {
+
     [1] = {
       def                = [[SLOWBEAM]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-  
+
+
     [3] = {
       def                = [[SLOWBOMB]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
+
   },
 
 
@@ -111,19 +114,18 @@ unitDef = {
     SLOWBEAM = {
       name                    = [[Slowing Beam]],
       areaOfEffect            = 8,
-      beamlaser               = 1,
       beamDecay               = 0.9,
       beamlaser               = 1,
       beamTime                = 0.1,
       beamttl                 = 50,
-	  
-	  customParams			  = {
-		timeslow_preset	= "commrecon2_slowbeam",
-	  },
-	  
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams            = {
+        timeslow_preset = [[commrecon2_slowbeam]],
+      },
+
 
       damage                  = {
         default = 150,
@@ -159,7 +161,8 @@ unitDef = {
       weaponVelocity          = 500,
     },
 
-    SLOWBOMB  = {
+
+    SLOWBOMB = {
       name                    = [[Disruptor Bomb]],
       accuracy                = 256,
       areaOfEffect            = 512,
@@ -167,10 +170,11 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams			  = {
-		timeslow_preset	= "commrecon2_slowbomb",
-	  },	  
-	  
+      customParams            = {
+        timeslow_preset = [[commrecon2_slowbomb]],
+      },
+
+
       damage                  = {
         default = 300,
         planes  = 300,
@@ -183,7 +187,6 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 2,
       lineOfSight             = true,
-      metalpershot            = 10,
       model                   = [[bomb]],
       noSelfDamage            = true,
       range                   = 450,
@@ -198,6 +201,7 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 350,
     },
+
   },
 
 

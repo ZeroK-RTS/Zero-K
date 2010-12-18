@@ -31,9 +31,9 @@ unitDef = {
     helptext       = [[Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you have plenty of energy reserves. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders.]],
     helptext_fr    = [[Protégé derri?re le blindage lourd de l'Annihilator se trouve le terrible Canon Accélerateur de Tachyon. Cette arme terrifiante est capable d'envoyer des quantités colossales d'énergie sur un point précis, percant tous les blindages aisément, le tout ? une distance terrifiante. Son co?t et sa consommation d'énergie la rendent cependant difficile ? employer.]],
     helptext_pl    = [[Pod ci??kim pancerzem Annihilatora znajduje si? niszczycielski Akcelerator Tachyonów. Ta straszliwa bro? pozwala na zadawanie wysokich obra?e? oddalonym celom, zak?adaj?c ?e masz do?? energii by j? zasili?.]],
+    keeptooltip    = [[any string I want]],
+    neededlink     = 50,
     pylonrange     = 50,
-	neededlink     = 50,
-	keeptooltip    = [[any string I want]],
   },
 
   damageModifier                = 0.25,
@@ -53,7 +53,7 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[arm_annihilator.s3o]],
   onoffable                     = true,
-  script						= [[armanni.lua]],
+  script                        = [[armanni.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[CRAWL_BLASTSML]],
   side                          = [[ARM]],
@@ -121,12 +121,13 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 1400,
     },
+
   },
 
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Annihilator]],
       blocking         = true,
       category         = [[corpses]],
@@ -146,7 +147,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Annihilator]],
       blocking         = false,
       category         = [[heaps]],

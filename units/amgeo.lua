@@ -53,8 +53,8 @@ unitDef = {
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooooo ooooo ooooo ooooo ooooo oGGGo oGGGo ooooo]],
-  
-    featureDefs                   = {
+
+  featureDefs                   = {
 
     DEAD  = {
       description      = [[Wreckage - Advanced Geothermal Powerplant]],
@@ -118,6 +118,7 @@ unitDef = {
     },
 
   },
+
 }
 
 return lowerkeys({ amgeo = unitDef })

@@ -80,7 +80,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.3,
-	  energypershot           = 3240,
+      energypershot           = 3240,
       explosionGenerator      = [[custom:LONDON]],
       fireStarter             = 0,
       guidance                = true,

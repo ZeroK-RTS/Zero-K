@@ -32,8 +32,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    fireproof = [[1]],
-    repairaura_preset	= "commsupport2",
+    fireproof         = [[1]],
+    repairaura_preset = [[commsupport2]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -96,6 +96,7 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
+
     [3] = {
       def                = [[CONCUSSION_GAUSS]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
@@ -112,7 +113,7 @@ unitDef = {
       areaOfEffect            = 160,
       burst                   = 1,
       cegTag                  = [[gauss_tag_m]],
-	  commandfire			  = true,
+      commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -130,7 +131,6 @@ unitDef = {
       lineOfSight             = true,
       noExplode               = false,
       noSelfDamage            = true,
-      --numbounce               = 40,
       range                   = 500,
       reloadtime              = 10,
       renderType              = 4,
@@ -139,7 +139,6 @@ unitDef = {
       size                    = 0.8,
       sizeDecay               = -0.1,
       soundHit                = [[weapon/cannon/earthshaker]],
-	  --soundHitVolume		  = 5,
       soundStart              = [[weapon/gauss_fire]],
       sprayangle              = 800,
       stages                  = 32,
@@ -150,7 +149,8 @@ unitDef = {
       weaponVelocity          = 1000,
     },
 
-    GAUSS = {
+
+    GAUSS            = {
       name                    = [[Gauss Rifle]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,

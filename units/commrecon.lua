@@ -103,19 +103,18 @@ unitDef = {
     SLOWBEAM = {
       name                    = [[Slowing Beam]],
       areaOfEffect            = 8,
-      beamlaser               = 1,
       beamDecay               = 0.9,
       beamlaser               = 1,
       beamTime                = 0.1,
       beamttl                 = 50,
-	  
-	  customParams			  = {
-		timeslow_preset	= "commrecon_slowbeam",
-	  },
-	  
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams            = {
+        timeslow_preset = [[commrecon_slowbeam]],
+      },
+
 
       damage                  = {
         default = 120,

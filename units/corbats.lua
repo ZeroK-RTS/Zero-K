@@ -50,16 +50,18 @@ unitDef = {
   noChaseCategory        = [[FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[battleship.s3o]],
   radarDistance          = 2400,
-  script				 = [[corbats.lua]],
+  script                 = [[corbats.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  
-  sfxtypes            = {
+
+  sfxtypes               = {
+
     explosiongenerators = {
-	  [[custom:xamelimpact]],
+      [[custom:xamelimpact]],
       [[custom:ROACHPLOSION]],
-	  [[custom:shellshockflash]],
+      [[custom:shellshockflash]],
     },
+
   },
 
   side                   = [[CORE]],

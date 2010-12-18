@@ -37,7 +37,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[1380]],
-  mass                = 243,
+  mass                = 231,
   maxAcc              = 0.5,
   maxDamage           = 1125,
   maxFuel             = 1000,
@@ -48,14 +48,16 @@ unitDef = {
   objectName          = [[spirit.s3o]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
-  
+
   sfxtypes            = {
+
     explosiongenerators = {
-	  [[custom:light_red]],
-	  [[custom:light_green]],
+      [[custom:light_red]],
+      [[custom:light_green]],
     },
+
   },
-  
+
   side                = [[CORE]],
   sightDistance       = 660,
   smoothAnim          = true,

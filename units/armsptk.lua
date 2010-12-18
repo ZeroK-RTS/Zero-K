@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[armsptk]],
-  name                = [[Recluse]],
-  description         = [[Skirmisher Spider (Indirect Fire)]],
-  acceleration        = 0.18,
-  bmcode              = [[1]],
-  brakeRate           = 0.1942,
-  buildCostEnergy     = 300,
-  buildCostMetal      = 300,
-  builder             = false,
-  buildPic            = [[ARMSPTK.png]],
-  buildTime           = 300,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[armsptk]],
+  name                   = [[Recluse]],
+  description            = [[Skirmisher Spider (Indirect Fire)]],
+  acceleration           = 0.18,
+  bmcode                 = [[1]],
+  brakeRate              = 0.1942,
+  buildCostEnergy        = 300,
+  buildCostMetal         = 300,
+  builder                = false,
+  buildPic               = [[ARMSPTK.png]],
+  buildTime              = 300,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 30 40]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Aranha escaramuçadora]],
     description_es = [[Ara?a escaramuzadora]],
     description_fi = [[Kahakkakiipeilij?]],
@@ -36,36 +36,36 @@ unitDef = {
     helptext_it    = [[Un unita all-terrain lancia-razzi. Arrampicati sui muri con questo camminatore ragno e sorprendi al nemico. I razzi non-guidati no riescono a colpire unita che si muovon rapidamente, pero hanno un raggio piuttosto lungo]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[spiderskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 171,
-  maxDamage           = 600,
-  maxSlope            = 72,
-  maxVelocity         = 1.8,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[TKBOT3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
-  objectName          = [[ARMSPTK]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[ARM]],
-  sightDistance       = 605,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  turninplace         = 0,
-  turnRate            = 1122,
-  workerTime          = 0,
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 3,
+  footprintZ             = 3,
+  iconType               = [[spiderskirm]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[640]],
+  mass                   = 171,
+  maxDamage              = 600,
+  maxSlope               = 72,
+  maxVelocity            = 1.8,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[TKBOT3]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
+  objectName             = [[ARMSPTK]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
+  side                   = [[ARM]],
+  sightDistance          = 605,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[TANK]],
+  turninplace            = 0,
+  turnRate               = 1122,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[ADV_ROCKET]],
@@ -76,7 +76,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     ADV_ROCKET = {
       name                    = [[Rocket Volley]],
@@ -128,7 +128,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Recluse]],

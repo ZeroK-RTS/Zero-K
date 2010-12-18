@@ -1,19 +1,19 @@
 unitDef = {
-  unitname            = [[armcom]],
-  name                = [[Strike Commander]],
-  description         = [[Mobile Assault Commander, Builds at 12 m/s]],
-  acceleration        = 0.18,
-  activateWhenBuilt   = true,
-  amphibious          = [[1]],
-  autoHeal            = 5,
-  bmcode              = [[1]],
-  brakeRate           = 0.375,
-  buildCostEnergy     = 1800,
-  buildCostMetal      = 1800,
-  buildDistance       = 120,
-  builder             = true,
+  unitname               = [[armcom]],
+  name                   = [[Strike Commander]],
+  description            = [[Mobile Assault Commander, Builds at 12 m/s]],
+  acceleration           = 0.18,
+  activateWhenBuilt      = true,
+  amphibious             = [[1]],
+  autoHeal               = 5,
+  bmcode                 = [[1]],
+  brakeRate              = 0.375,
+  buildCostEnergy        = 1800,
+  buildCostMetal         = 1800,
+  buildDistance          = 120,
+  builder                = true,
 
-  buildoptions        = {
+  buildoptions           = {
     [[cormex]],
     [[armsolar]],
     [[armfus]],
@@ -47,7 +47,7 @@ unitDef = {
     [[corhlt]],
     [[armpb]],
     [[armanni]],
-	[[cordoom]],
+    [[cordoom]],
     [[cortl]],
     [[corrazor]],
     [[missiletower]],
@@ -64,58 +64,58 @@ unitDef = {
     [[cormine1]],
   },
 
-  buildPic            = [[armcom.png]],
-  buildTime           = 1800,
-  canAttack           = true,
-  canCloak            = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canreclamate        = [[1]],
-  canstop             = [[1]],
-  category            = [[LAND FIREPROOF]],
-  cloakCost           = 10,
-  cloakCostMoving     = 50,
+  buildPic               = [[armcom.png]],
+  buildTime              = 1800,
+  canAttack              = true,
+  canCloak               = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canreclamate           = [[1]],
+  canstop                = [[1]],
+  category               = [[LAND FIREPROOF]],
+  cloakCost              = 10,
+  cloakCostMoving        = 50,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[50 50 50]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  commander           = true,
-  corpse              = [[DEAD]],
+  commander              = true,
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     fireproof = [[1]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  energyMake          = 3.2,
-  energyStorage       = 0,
-  energyUse           = 0,
-  explodeAs           = [[ESTOR_BUILDINGEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  hideDamage          = true,
-  iconType            = [[armcommander]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  immunetoparalyzer   = [[1]],
-  maneuverleashlength = [[640]],
-  mass                = 2500,
-  maxDamage           = 2250,
-  maxSlope            = 36,
-  maxVelocity         = 1.325,
-  maxWaterDepth       = 5000,
-  metalMake           = 3.2,
-  metalStorage        = 0,
-  minCloakDistance    = 100,
-  movementClass       = [[AKBOT2]],
-  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  norestrict          = [[1]],
-  objectName          = [[ARMCOM]],
-  seismicSignature    = 16,
-  selfDestructAs      = [[ESTOR_BUILDINGEX]],
+  defaultmissiontype     = [[Standby]],
+  energyMake             = 3.2,
+  energyStorage          = 0,
+  energyUse              = 0,
+  explodeAs              = [[ESTOR_BUILDINGEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  hideDamage             = true,
+  iconType               = [[armcommander]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  immunetoparalyzer      = [[1]],
+  maneuverleashlength    = [[640]],
+  mass                   = 2500,
+  maxDamage              = 2250,
+  maxSlope               = 36,
+  maxVelocity            = 1.325,
+  maxWaterDepth          = 5000,
+  metalMake              = 3.2,
+  metalStorage           = 0,
+  minCloakDistance       = 100,
+  movementClass          = [[AKBOT2]],
+  noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
+  norestrict             = [[1]],
+  objectName             = [[ARMCOM]],
+  seismicSignature       = 16,
+  selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:COMGATE]],
@@ -123,19 +123,19 @@ unitDef = {
 
   },
 
-  showPlayerName      = true,
-  side                = [[ARM]],
-  sightDistance       = 500,
-  smoothAnim          = true,
-  sonarDistance       = 300,
-  steeringmode        = [[2]],
-  TEDClass            = [[COMMANDER]],
-  terraformSpeed      = 600,
-  turnRate            = 1148,
-  upright             = true,
-  workerTime          = 12,
+  showPlayerName         = true,
+  side                   = [[ARM]],
+  sightDistance          = 500,
+  smoothAnim             = true,
+  sonarDistance          = 300,
+  steeringmode           = [[2]],
+  TEDClass               = [[COMMANDER]],
+  terraformSpeed         = 600,
+  turnRate               = 1148,
+  upright                = true,
+  workerTime             = 12,
 
-  weapons             = {
+  weapons                = {
 
     [1] = {
       def                = [[FAKELASER]],
@@ -153,7 +153,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     DISINTEGRATOR = {
       name                    = [[Disintegrator]],
@@ -283,7 +283,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD      = {
       description      = [[Wreckage - Strike Commander]],

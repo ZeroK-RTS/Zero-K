@@ -1,29 +1,29 @@
 unitDef = {
-  unitname             = [[armcrabe]],
-  name                 = [[Crabe]],
-  description          = [[Heavy Riot/Skirmish Walker]],
-  acceleration         = 0.12,
-  bmcode               = [[1]],
-  brakeRate            = 0.1375,
-  buildCostEnergy      = 1600,
-  buildCostMetal       = 1600,
-  builder              = false,
-  buildPic             = [[armcrabe.png]],
-  buildTime            = 1600,
-  canAttack            = true,
-  canGuard             = true,
-  canMove              = true,
-  canPatrol            = true,
-  canstop              = [[1]],
-  category             = [[LAND]],
+  unitname               = [[armcrabe]],
+  name                   = [[Crabe]],
+  description            = [[Heavy Riot/Skirmish Walker]],
+  acceleration           = 0.12,
+  bmcode                 = [[1]],
+  brakeRate              = 0.1375,
+  buildCostEnergy        = 1600,
+  buildCostMetal         = 1600,
+  builder                = false,
+  buildPic               = [[armcrabe.png]],
+  buildTime              = 1600,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[50 40 50]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  copyright            = [[Copyright 1997 Humongous Entertainment. All rights reserved.]],
-  corpse               = [[DEAD]],
+  copyright              = [[Copyright 1997 Humongous Entertainment. All rights reserved.]],
+  corpse                 = [[DEAD]],
 
-  customParams         = {
+  customParams           = {
     description_bp = [[Robô dispersador pesado.]],
     description_es = [[Unidad pesante de alborote/escaramuzador]],
     description_fi = [[Raskas mellakka/kahakoitsijarobotti]],
@@ -37,34 +37,34 @@ unitDef = {
     helptext_it    = [[I proiettili enrmi del crabe obliterano sciami di unita economiche, e ha un raggio maggiore di molte difese basiche. Quando smette di camminare, Crabe si raggomitola nella sua forma corazzata. La deboleza principale del crabe é la mancanza di mobilitá.]],
   },
 
-  damageModifier       = 0.33,
-  defaultmissiontype   = [[Standby]],
-  designation          = [[ARM-CRABE]],
-  energyUse            = 1.5,
-  explodeAs            = [[BIG_UNIT]],
-  footprintX           = 4,
-  footprintZ           = 4,
-  iconType             = [[t3spiderriot]],
-  idleAutoHeal         = 5,
-  idleTime             = 1800,
-  maneuverleashlength  = [[640]],
-  mass                 = 445,
-  maxDamage            = 4000,
-  maxSlope             = 36,
-  maxVelocity          = 1.35,
-  maxWaterDepth        = 22,
-  minCloakDistance     = 75,
-  movementClass        = [[TKBOT4]],
-  moveState            = 0,
-  noAutoFire           = false,
-  noChaseCategory      = [[FIXEDWING GUNSHIP]],
-  objectName           = [[ARMCRABE]],
-  pushResistant        = 1,
-  script               = [[armcrabe.cob]],
-  seismicSignature     = 4,
-  selfDestructAs       = [[BIG_UNIT]],
+  damageModifier         = 0.33,
+  defaultmissiontype     = [[Standby]],
+  designation            = [[ARM-CRABE]],
+  energyUse              = 1.5,
+  explodeAs              = [[BIG_UNIT]],
+  footprintX             = 4,
+  footprintZ             = 4,
+  iconType               = [[t3spiderriot]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[640]],
+  mass                   = 445,
+  maxDamage              = 4000,
+  maxSlope               = 36,
+  maxVelocity            = 1.35,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[TKBOT4]],
+  moveState              = 0,
+  noAutoFire             = false,
+  noChaseCategory        = [[FIXEDWING GUNSHIP]],
+  objectName             = [[ARMCRABE]],
+  pushResistant          = 1,
+  script                 = [[armcrabe.cob]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNIT]],
 
-  sfxtypes             = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:ARMCRABE_FLARE]],
@@ -74,19 +74,19 @@ unitDef = {
 
   },
 
-  shootme              = [[1]],
-  side                 = [[ARM]],
-  sightDistance        = 660,
-  smoothAnim           = true,
-  steeringmode         = [[1]],
-  TEDClass             = [[KBOT]],
-  threed               = [[1]],
-  turninplace          = 0,
-  turnRate             = 416,
-  version              = [[1]],
-  workerTime           = 0,
+  shootme                = [[1]],
+  side                   = [[ARM]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[KBOT]],
+  threed                 = [[1]],
+  turninplace            = 0,
+  turnRate               = 416,
+  version                = [[1]],
+  workerTime             = 0,
 
-  weapons              = {
+  weapons                = {
 
     {
       def                = [[ARM_CRABE_GAUSS]],
@@ -96,7 +96,7 @@ unitDef = {
   },
 
 
-  weaponDefs           = {
+  weaponDefs             = {
 
     ARM_CRABE_GAUSS = {
       name                    = [[Heavy Plasma Cannon]],
@@ -132,7 +132,7 @@ unitDef = {
   },
 
 
-  featureDefs          = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Crabe]],

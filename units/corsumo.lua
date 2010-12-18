@@ -35,7 +35,7 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[640]],
-  mass                = 613,
+  mass                = 621,
   maxDamage           = 11000,
   maxSlope            = 36,
   maxVelocity         = 1.2,
@@ -184,7 +184,7 @@ unitDef = {
 
   featureDefs         = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Sumo]],
       blocking         = true,
       category         = [[corpses]],
@@ -204,7 +204,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Sumo]],
       blocking         = false,
       category         = [[heaps]],

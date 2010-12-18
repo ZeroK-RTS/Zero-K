@@ -1,64 +1,64 @@
 unitDef = {
-  unitname            = [[corcrw]],
-  name                = [[Krow]],
-  description         = [[Flying Fortress]],
-  acceleration        = 0.154,
-  activateWhenBuilt   = true,
-  airStrafe           = 0,
-  amphibious          = true,
-  bankscale           = [[0.5]],
-  bmcode              = [[1]],
-  brakeRate           = 3.75,
-  buildCostEnergy     = 5000,
-  buildCostMetal      = 5000,
-  builder             = false,
-  buildPic            = [[CORCRW.png]],
-  buildTime           = 5000,
-  canAttack           = true,
-  canFly              = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  canSubmerge         = false,
-  category            = [[GUNSHIP]],
-  collide             = false,
+  unitname               = [[corcrw]],
+  name                   = [[Krow]],
+  description            = [[Flying Fortress]],
+  acceleration           = 0.154,
+  activateWhenBuilt      = true,
+  airStrafe              = 0,
+  amphibious             = true,
+  bankscale              = [[0.5]],
+  bmcode                 = [[1]],
+  brakeRate              = 3.75,
+  buildCostEnergy        = 5000,
+  buildCostMetal         = 5000,
+  builder                = false,
+  buildPic               = [[CORCRW.png]],
+  buildTime              = 5000,
+  canAttack              = true,
+  canFly                 = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  canSubmerge            = false,
+  category               = [[GUNSHIP]],
+  collide                = false,
   collisionVolumeOffsets = [[0 -10 0]],
   collisionVolumeScales  = [[40 20 40]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[HEAP]],
-  cruiseAlt           = 120,
+  corpse                 = [[HEAP]],
+  cruiseAlt              = 120,
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Fortaleza voadora]],
     description_fr = [[Forteresse Volante]],
     helptext_bp    = [[Aeronave flutuante armada com lasers para ataque terrestre. Muito cara e muito poderosa.]],
     helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
-  explodeAs           = [[SMALL_BUILDING]],
-  floater             = true,
-  footprintX          = 3,
-  footprintZ          = 3,
-  hoverAttack         = true,
-  iconType            = [[heavygunship]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[500]],
-  mass                = 886,
-  maxDamage           = 17000,
-  maxVelocity         = 4.03,
-  minCloakDistance    = 75,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[CORCRW]],
-  scale               = [[1]],
-  seismicSignature    = 0,
-  selfDestructAs      = [[SMALL_BUILDING]],
+  defaultmissiontype     = [[VTOL_standby]],
+  explodeAs              = [[SMALL_BUILDING]],
+  floater                = true,
+  footprintX             = 3,
+  footprintZ             = 3,
+  hoverAttack            = true,
+  iconType               = [[heavygunship]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[500]],
+  mass                   = 886,
+  maxDamage              = 17000,
+  maxVelocity            = 4.03,
+  minCloakDistance       = 75,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[CORCRW]],
+  scale                  = [[1]],
+  seismicSignature       = 0,
+  selfDestructAs         = [[SMALL_BUILDING]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
@@ -67,16 +67,16 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 633,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[VTOL]],
-  turnRate            = 297,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 633,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[VTOL]],
+  turnRate               = 297,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[KROWLASER2]],
@@ -101,7 +101,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     KROWLASER  = {
       name                    = [[Laser]],
@@ -185,7 +185,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Krow]],

@@ -1,34 +1,34 @@
 unitDef = {
-  unitname            = [[armkam]],
-  name                = [[Banshee]],
-  description         = [[Raider Gunship]],
-  acceleration        = 0.154,
-  amphibious          = true,
-  bankscale           = [[1]],
-  bmcode              = [[1]],
-  brakeRate           = 3.75,
-  buildCostEnergy     = 220,
-  buildCostMetal      = 220,
-  builder             = false,
-  buildPic            = [[ARMKAM.png]],
-  buildTime           = 220,
-  canAttack           = true,
-  canFly              = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  canSubmerge         = false,
-  category            = [[GUNSHIP]],
-  collide             = true,
-  corpse              = [[HEAP]],
+  unitname               = [[armkam]],
+  name                   = [[Banshee]],
+  description            = [[Raider Gunship]],
+  acceleration           = 0.154,
+  amphibious             = true,
+  bankscale              = [[1]],
+  bmcode                 = [[1]],
+  brakeRate              = 3.75,
+  buildCostEnergy        = 220,
+  buildCostMetal         = 220,
+  builder                = false,
+  buildPic               = [[ARMKAM.png]],
+  buildTime              = 220,
+  canAttack              = true,
+  canFly                 = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  canSubmerge            = false,
+  category               = [[GUNSHIP]],
+  collide                = true,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[32 32 32]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  cruiseAlt           = 100,
+  corpse                 = [[HEAP]],
+  cruiseAlt              = 100,
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Aeronave agressora]],
     description_fr = [[ADAV Pilleur]],
     helptext       = [[The Banshee is Nova's light gunship. It has decent health but does low DPS. Does well when directly attacking defenders, allowing it to take out AA and then attack with impunity, but does poorly vs packos. It can easily hit moving units, and makes excellent defense against an enemy who does not bring mobile AA.]],
@@ -36,29 +36,29 @@ unitDef = {
     helptext_fr    = [[Le Banshee est un ADAV l?ger, un blindage l?ger et peu de d?g?ts en font la hantise des d?buts de conflits. Envoy? dans une base non pr?par?e ou contre une arm?e sans d?fense Anti Air, son attaque rapide est bien souvent fatale.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
-  explodeAs           = [[GUNSHIPEX]],
-  floater             = true,
-  footprintX          = 2,
-  footprintZ          = 2,
-  hoverAttack         = true,
-  iconType            = [[gunship]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[1280]],
-  mass                = 167,
-  maxDamage           = 850,
-  maxVelocity         = 6.5,
-  minCloakDistance    = 75,
-  moverate1           = [[3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[banshee.s3o]],
-  scale               = [[1]],
-  seismicSignature    = 0,
-  selfDestructAs      = [[GUNSHIPEX]],
+  defaultmissiontype     = [[VTOL_standby]],
+  explodeAs              = [[GUNSHIPEX]],
+  floater                = true,
+  footprintX             = 2,
+  footprintZ             = 2,
+  hoverAttack            = true,
+  iconType               = [[gunship]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[1280]],
+  mass                   = 164,
+  maxDamage              = 850,
+  maxVelocity            = 6.5,
+  minCloakDistance       = 75,
+  moverate1              = [[3]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  objectName             = [[banshee.s3o]],
+  scale                  = [[1]],
+  seismicSignature       = 0,
+  selfDestructAs         = [[GUNSHIPEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:VINDIBACK]],
@@ -66,15 +66,15 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 500,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[VTOL]],
-  turnRate            = 693,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 500,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[VTOL]],
+  turnRate               = 693,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[LASER]],
@@ -86,7 +86,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     LASER = {
       name                    = [[Light Laserbeam]],
@@ -136,7 +136,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Banshee]],

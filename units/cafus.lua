@@ -54,7 +54,8 @@ unitDef = {
   yardMap                       = [[oooooooooooooooooooooooooooooooooooo]],
 
   featureDefs                   = {
-    DEAD  = {
+
+    DEAD = {
       description      = [[Wreckage - Singularity Reactor]],
       blocking         = true,
       category         = [[corpses]],
@@ -74,7 +75,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Singularity Reactor]],
       blocking         = false,
       category         = [[heaps]],

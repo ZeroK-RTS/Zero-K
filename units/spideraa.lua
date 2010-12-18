@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[spideraa]],
-  name                = [[Tarantula]],
-  description         = [[AA Spider]],
-  acceleration        = 0.18,
-  bmcode              = [[1]],
-  brakeRate           = 0.1942,
-  buildCostEnergy     = 400,
-  buildCostMetal      = 400,
-  builder             = false,
-  buildPic            = [[spideraa.png]],
-  buildTime           = 400,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[spideraa]],
+  name                   = [[Tarantula]],
+  description            = [[AA Spider]],
+  acceleration           = 0.18,
+  bmcode                 = [[1]],
+  brakeRate              = 0.1942,
+  buildCostEnergy        = 400,
+  buildCostMetal         = 400,
+  builder                = false,
+  buildPic               = [[spideraa.png]],
+  buildTime              = 400,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 30 40]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Aranha anti-aérea e torpedeira]],
     description_fr = [[Araign?e AA]],
     helptext       = [[An all terrain AA unit. Can support other spiders against air and when crossing the sea.]],
@@ -30,36 +30,36 @@ unitDef = {
     helptext_fr    = [[Un unit? anti air et torpille tout terrain. Peut prot?ger ses alli?s des attaques marines et a?riennes. ]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[spideraa]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 215,
-  maxDamage           = 1200,
-  maxSlope            = 72,
-  maxVelocity         = 2.3,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[TKBOT3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName          = [[ARMSPIDAAT]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[ARM]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  sonarDistance       = 400,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  turnRate            = 1122,
-  workerTime          = 0,
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 3,
+  footprintZ             = 3,
+  iconType               = [[spideraa]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[640]],
+  mass                   = 215,
+  maxDamage              = 1200,
+  maxSlope               = 72,
+  maxVelocity            = 2.3,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[TKBOT3]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
+  objectName             = [[ARMSPIDAAT]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
+  side                   = [[ARM]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  sonarDistance          = 400,
+  steeringmode           = [[1]],
+  TEDClass               = [[TANK]],
+  turnRate               = 1122,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[AA]],
@@ -70,7 +70,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     AA = {
       name                    = [[Missiles]],
@@ -123,7 +123,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Tarantula]],

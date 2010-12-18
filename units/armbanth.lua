@@ -1,57 +1,57 @@
 unitDef = {
-  unitname              = [[armbanth]],
-  name                  = [[Bantha]],
-  description           = [[Heavy Combat Strider]],
-  acceleration          = 0.1047,
-  bmcode                = [[1]],
-  brakeRate             = 0.2212,
-  buildCostEnergy       = 12000,
-  buildCostMetal        = 12000,
-  builder               = false,
-  buildPic              = [[ARMBANTH.png]],
-  buildTime             = 12000,
-  canAttack             = true,
-  canGuard              = true,
-  canMove               = true,
-  canPatrol             = true,
-  canstop               = [[1]],
-  category              = [[LAND]],
+  unitname               = [[armbanth]],
+  name                   = [[Bantha]],
+  description            = [[Heavy Combat Strider]],
+  acceleration           = 0.1047,
+  bmcode                 = [[1]],
+  brakeRate              = 0.2212,
+  buildCostEnergy        = 12000,
+  buildCostMetal         = 12000,
+  builder                = false,
+  buildPic               = [[ARMBANTH.png]],
+  buildTime              = 12000,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[65 65 65]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse                = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams          = {
+  customParams           = {
     description_fr = [[Mechwarrior d'Assaut Lourd]],
     helptext       = [[The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and cruise missiles for stand-off engagements, lightning hand cannons for general purpose combat, and plenty of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own.]],
     helptext_fr    = [[Supérieur au Razorback en taille, en blindage, en prix, en portée, en armement mais pas en vitesse. Le Bantha est aussi cher et lent qu'il est inarretable. Il dispose de canons lasers, d'un canon accelerateur tachyon et de missiles. Courez.]],
   },
 
-  defaultmissiontype    = [[Standby]],
-  explodeAs             = [[ATOMIC_BLASTSML]],
-  footprintX            = 4,
-  footprintZ            = 4,
-  iconType              = [[t3generic]],
-  idleAutoHeal          = 5,
-  idleTime              = 1800,
-  immunetoparalyzer     = [[1]],
-  maneuverleashlength   = [[640]],
-  mass                  = 1387,
-  maxDamage             = 35000,
-  maxSlope              = 36,
-  maxVelocity           = 1.718,
-  maxWaterDepth         = 22,
-  minCloakDistance      = 75,
-  movementClass         = [[KBOT4]],
-  noAutoFire            = false,
-  noChaseCategory       = [[FIXEDWING SATELLITE SUB]],
-  objectName            = [[ARMBANTH]],
-  seismicSignature      = 4,
-  selfDestructAs        = [[ATOMIC_BLASTSML]],
-  selfDestructCountdown = 10,
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[ATOMIC_BLASTSML]],
+  footprintX             = 4,
+  footprintZ             = 4,
+  iconType               = [[t3generic]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  immunetoparalyzer      = [[1]],
+  maneuverleashlength    = [[640]],
+  mass                   = 1387,
+  maxDamage              = 35000,
+  maxSlope               = 36,
+  maxVelocity            = 1.718,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT4]],
+  noAutoFire             = false,
+  noChaseCategory        = [[FIXEDWING SATELLITE SUB]],
+  objectName             = [[ARMBANTH]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[ATOMIC_BLASTSML]],
+  selfDestructCountdown  = 10,
 
-  sfxtypes              = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:zeusmuzzle]],
@@ -60,16 +60,16 @@ unitDef = {
 
   },
 
-  side                  = [[ARM]],
-  sightDistance         = 720,
-  smoothAnim            = true,
-  steeringmode          = [[2]],
-  TEDClass              = [[KBOT]],
-  turnRate              = 1056,
-  upright               = true,
-  workerTime            = 0,
+  side                   = [[ARM]],
+  sightDistance          = 720,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  turnRate               = 1056,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons               = {
+  weapons                = {
 
     {
       def                = [[ATA]],
@@ -100,7 +100,7 @@ unitDef = {
   },
 
 
-  weaponDefs            = {
+  weaponDefs             = {
 
     ATA            = {
       name                    = [[Tachyon Accelerator]],
@@ -277,7 +277,7 @@ unitDef = {
   },
 
 
-  featureDefs           = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Bantha]],

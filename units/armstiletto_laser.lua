@@ -167,7 +167,7 @@ unitDef = {
 
   featureDefs         = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Stiletto II]],
       blocking         = true,
       category         = [[corpses]],
@@ -187,7 +187,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Stiletto II]],
       blocking         = false,
       category         = [[heaps]],

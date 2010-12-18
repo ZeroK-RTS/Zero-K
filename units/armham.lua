@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[armham]],
-  name                = [[Hammer]],
-  description         = [[Light Artillery/Skirmisher Bot]],
-  acceleration        = 0.12,
-  bmcode              = [[1]],
-  brakeRate           = 0.2275,
-  buildCostEnergy     = 130,
-  buildCostMetal      = 130,
-  builder             = false,
-  buildPic            = [[ARMHAM.png]],
-  buildTime           = 130,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[armham]],
+  name                   = [[Hammer]],
+  description            = [[Light Artillery/Skirmisher Bot]],
+  acceleration           = 0.12,
+  bmcode                 = [[1]],
+  brakeRate              = 0.2275,
+  buildCostEnergy        = 130,
+  buildCostMetal         = 130,
+  builder                = false,
+  buildPic               = [[ARMHAM.png]],
+  buildTime              = 130,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 45 30]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô de artilharia]],
     description_es = [[Robot de artilleria]],
     description_fi = [[Tykist?/kahakkarobotti]],
@@ -36,30 +36,30 @@ unitDef = {
     helptext_it    = [[Il Hammer ha un cannone al plasma da lungo raggio che gli permette di fare fuoco indiretto sopra ostacoli, ed ha un raggio maggiore di molte difese basiche fino alla HLT. Anche se é efficace contro unitá mobili, é consigliabile difenderli con warriors per prevenire che le unitá da invasione si avvicinino troppo]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[kbotarty]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 114,
-  maxDamage           = 350,
-  maxSlope            = 36,
-  maxVelocity         = 1.72,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  moveState           = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName          = [[Milo.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[kbotarty]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 114,
+  maxDamage              = 350,
+  maxSlope               = 36,
+  maxVelocity            = 1.72,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  moveState              = 0,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
+  objectName             = [[Milo.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:THUDMUZZLE]],
@@ -69,22 +69,22 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 22,
-  turninplace         = 0,
-  turnRate            = 573,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 22,
+  turninplace            = 0,
+  turnRate               = 573,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[HAMMER_WEAPON]],
@@ -95,7 +95,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     HAMMER_WEAPON = {
       name                    = [[Light Plasma Cannon]],
@@ -134,7 +134,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Hammer]],

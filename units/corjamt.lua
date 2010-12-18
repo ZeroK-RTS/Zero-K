@@ -94,7 +94,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Aegis]],
       blocking         = true,
       category         = [[corpses]],
@@ -114,7 +114,8 @@ unitDef = {
       world            = [[all]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Aegis]],
       blocking         = false,
       category         = [[heaps]],

@@ -75,7 +75,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    FLAK          = {
+    FLAK = {
       name                    = [[Flak Cannon]],
       accuracy                = 100,
       areaOfEffect            = 64,

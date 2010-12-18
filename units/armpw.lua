@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[armpw]],
-  name                = [[Glaive]],
-  description         = [[Light Raider Bot]],
-  acceleration        = 0.36,
-  bmcode              = [[1]],
-  brakeRate           = 0.205,
-  buildCostEnergy     = 65,
-  buildCostMetal      = 65,
-  builder             = false,
-  buildPic            = [[armpw.png]],
-  buildTime           = 65,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[armpw]],
+  name                   = [[Glaive]],
+  description            = [[Light Raider Bot]],
+  acceleration           = 0.36,
+  bmcode                 = [[1]],
+  brakeRate              = 0.205,
+  buildCostEnergy        = 65,
+  buildCostMetal         = 65,
+  builder                = false,
+  buildPic               = [[armpw.png]],
+  buildTime              = 65,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 30 20]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô agressor]],
     description_es = [[Robot de invasi?n]],
     description_fi = [[Hy?kk??j?robotti]],
@@ -38,29 +38,29 @@ unitDef = {
     helptext_pl    = [[Glaive jest lekki, tani i szybki. Mo?e by? budowany dziesi?tkami, ale ginie bardzo szybko w kontakcie z podstawowymi nawet jednostkami obronnymi.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[SMALL_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[kbotraider]],
-  idleAutoHeal        = 20,
-  idleTime            = 300,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 79,
-  maxDamage           = 190,
-  maxSlope            = 36,
-  maxVelocity         = 3.8,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[spherebot.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[SMALL_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[SMALL_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[kbotraider]],
+  idleAutoHeal           = 20,
+  idleTime               = 300,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 79,
+  maxDamage              = 190,
+  maxSlope               = 36,
+  maxVelocity            = 3.8,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[spherebot.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[SMALL_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:emg_shells_l]],
@@ -69,22 +69,22 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 425,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 18,
-  turninplace         = 0,
-  turnRate            = 1250,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 425,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 18,
+  turninplace            = 0,
+  turnRate               = 1250,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[EMG]],
@@ -95,7 +95,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     EMG = {
       name                    = [[Pulse MG]],
@@ -145,7 +145,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Glaive]],

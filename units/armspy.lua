@@ -131,7 +131,7 @@ unitDef = {
 
   featureDefs           = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Infiltrator]],
       blocking         = true,
       category         = [[corpses]],
@@ -150,7 +150,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Infiltrator]],
       blocking         = false,
       category         = [[heaps]],

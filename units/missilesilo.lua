@@ -66,7 +66,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Missile Silo]],
       blocking         = true,
       category         = [[corpses]],
@@ -86,7 +86,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Missile Silo]],
       blocking         = false,
       category         = [[heaps]],

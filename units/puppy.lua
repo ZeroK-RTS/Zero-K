@@ -97,6 +97,7 @@ unitDef = {
         planes  = 410,
         subs    = 15,
       },
+
       fireStarter             = 70,
       fixedlauncher           = 1,
       flightTime              = 0.8,

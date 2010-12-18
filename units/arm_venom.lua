@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[arm_venom]],
-  name                = [[Venom]],
-  description         = [[Riot EMP Spider]],
-  acceleration        = 0.18,
-  bmcode              = [[1]],
-  brakeRate           = 0.1942,
-  buildCostEnergy     = 200,
-  buildCostMetal      = 200,
-  builder             = false,
-  buildPic            = [[arm_venom.png]],
-  buildTime           = 200,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname               = [[arm_venom]],
+  name                   = [[Venom]],
+  description            = [[Riot EMP Spider]],
+  acceleration           = 0.18,
+  bmcode                 = [[1]],
+  brakeRate              = 0.1942,
+  buildCostEnergy        = 200,
+  buildCostMetal         = 200,
+  builder                = false,
+  buildPic               = [[arm_venom.png]],
+  buildTime              = 200,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 30 40]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Aranha de PEM dispersadora]],
     description_es = [[Ara?a PEM de alborote]],
     description_fi = [[EMP-mellakkarobotti]],
@@ -36,28 +36,28 @@ unitDef = {
     helptext_it    = [[Il Venom é un'unita all-terrain fatta per paralizzare i nemici cosi che altre unita le possano distruggere facilmente. Ha un AdE ed é utile come unita da rissa, per tenere lontano sciame di nemici. Funziona bene con i recluse per non peremttere ai nemici di avvicinarsi troppo al fragili scaramuzzatore.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[spidergeneric]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 155,
-  maxDamage           = 750,
-  maxSlope            = 72,
-  maxVelocity         = 2.85,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[TKBOT3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[ARMSPID]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 3,
+  footprintZ             = 3,
+  iconType               = [[spidergeneric]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[640]],
+  mass                   = 155,
+  maxDamage              = 750,
+  maxSlope               = 72,
+  maxVelocity            = 2.85,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[TKBOT3]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[ARMSPID]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:YELLOW_LIGHTNING_MUZZLE]],
@@ -66,16 +66,16 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 440,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  turninplace         = 0,
-  turnRate            = 1122,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 440,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[TANK]],
+  turninplace            = 0,
+  turnRate               = 1122,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[spider]],
@@ -85,7 +85,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     spider = {
       name                    = [[Electro-Stunner]],
@@ -131,7 +131,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Venom]],
