@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armpt]],
   name                = [[Skeeter]],
-  description         = [[Patrol Boat (AA/Scout)]],
+  description         = [[Patrol Boat (Scout/Short-Range AA)]],
   acceleration        = 0.0984,
   bmcode              = [[1]],
   brakeRate           = 0.0475,
@@ -20,7 +20,7 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Navire de Patrouille Éclaireur et Anti-Air]],
-    helptext       = [[Cheap, fast, and fragile, this Patrol Boat is good as AA support and spotting for longer-ranged ships. Although it is has a small laser, it is easily destroyed by any armed resistance.]],
+    helptext       = [[Cheap, fast, and fragile, this Patrol Boat is good as AA support and spotting for longer-ranged ships. It lacks the firepower or armor for brawling.]],
     helptext_fr    = [[Pas cher, rapide et peu solide, voici venir le Skeeter et ses canons laser. Utile en début de conflit ou en tant qu'éclaireur son blindage le rends trcs vite obsolcte.]],
   },
 
@@ -57,22 +57,9 @@ unitDef = {
   weapons             = {
 
     {
-      def               = [[BOGUS_MISSILE]],
-      badTargetCategory = [[SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-    },
-
-
-    {
       def                = [[MISSILE]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
-    {
-      def                = [[AAMISSILE]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP LAND SINK SHIP SWIM FLOAT HOVER]],
     },
 
   },
@@ -80,38 +67,9 @@ unitDef = {
 
   weaponDefs          = {
 
-    BOGUS_MISSILE = {
-      name                    = [[Missiles]],
-      areaOfEffect            = 48,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 0,
-      },
-
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
-      metalpershot            = 0,
-      range                   = 800,
-      reloadtime              = 0.5,
-      renderType              = 1,
-      startVelocity           = 450,
-      tolerance               = 9000,
-      turnRate                = 33000,
-      turret                  = true,
-      weaponAcceleration      = 101,
-      weaponTimer             = 0.1,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 650,
-    },
-	
     MISSILE       = {
-      name                    = [[Light SAM]],
+      name                    = [[Light Missile]],
       areaOfEffect            = 8,
-      canattackground         = false,
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargetting      = 1,
@@ -136,7 +94,7 @@ unitDef = {
       metalpershot            = 0,
       model                   = [[wep_m_fury.s3o]],
       noSelfDamage            = true,
-      range                   = 300,
+      range                   = 350,
       reloadtime              = 1.6,
       renderType              = 1,
       selfprop                = true,
@@ -189,57 +147,6 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 1024,
     },
-
-
-    AAMISSILE       = {
-      name                    = [[Light SAM]],
-      areaOfEffect            = 8,
-      canattackground         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-      cylinderTargetting      = 1,
-
-      damage                  = {
-        default = 6.75,
-        planes  = 67.5,
-        subs    = 3.375,
-      },
-
-      explosionGenerator      = [[custom:FLASH2]],
-      fireStarter             = 70,
-	  fixedlauncher           = true,
-      flightTime              = 4,
-      guidance                = true,
-      heightmod               = 0.5,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 2,
-      lineOfSight             = true,
-      metalpershot            = 0,
-      model                   = [[wep_m_fury.s3o]],
-      noSelfDamage            = true,
-      range                   = 700,
-      reloadtime              = 2,
-      renderType              = 1,
-      selfprop                = true,
-      smokedelay              = [[0.1]],
-      smokeTrail              = true,
-      soundHit                = [[weapon/missile/rocket_hit]],
-      soundStart              = [[weapon/missile/missile_fire7]],
-      startsmoke              = [[1]],
-      startVelocity           = 300,
-      tolerance               = 10000,
-      tracks                  = true,
-      trajectoryHeight        = 1.2,
-      turnRate                = 60000,
-      turret                  = true,
-      weaponAcceleration      = 150,
-      weaponTimer             = 5,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 750,
-    },
-
   },
 
 
@@ -251,39 +158,18 @@ unitDef = {
       category         = [[corpses]],
       damage           = 460,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
       height           = [[4]],
       hitdensity       = [[100]],
       metal            = 48,
-      object           = [[ARMPT_DEAD]],
+      object           = [[scoutboat_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 48,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Skeeter]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 460,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      hitdensity       = [[100]],
-      metal            = 48,
-      object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 48,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Skeeter]],
