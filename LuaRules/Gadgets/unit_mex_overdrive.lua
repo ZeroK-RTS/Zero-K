@@ -41,7 +41,7 @@ for i=1,#UnitDefs do
 				range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE,
 				extractor = (udef.extractsMetal > 0),
 				neededLink = tonumber(udef.customParams.neededlink) or false,
-				keeptooltip = udef.customParams.keeptooltip,
+				keeptooltip = udef.customParams.keeptooltip or false,
 			}
 		end
 		
@@ -651,7 +651,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 								if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
 									if unitDef then
-										Spring.SetUnitTooltip(unitID,unitDef.humanName .. " - Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2))
+										Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  \nEnergy: -" .. math.round(mexE,2))
 									else
 										Spring.Echo("unitDefID missing for maxxed metal extractor")
 									end
@@ -677,9 +677,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
 						if unitDef then
 							if (metalMult < 1.5) then
-								Spring.SetUnitTooltip(unitID,unitDef.humanName .. " - Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2))
+								Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2))
 							else
-								Spring.SetUnitTooltip(unitID,unitDef.humanName .. " - Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2) .. " Construct Additional Pylons")
+								Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2) .. " \nConstruct Additional Pylons")
 							end
 						else
 							Spring.Echo("unitDefID missing for metal extractor")
@@ -898,7 +898,7 @@ function gadget:GameFrame(n)
 						if grid ~= 0 then
 							local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 							if unitDef then
-								Spring.SetUnitTooltip(unitID,unitDef.humanName .. " - GRID: "  .. math.round(gridEnergySpent[grid],2) .. "/" .. math.round(maxGridCapacity[grid],2) .. "E => " .. math.round(gridMetalGain[grid],2).."M")
+								Spring.SetUnitTooltip(unitID,"GRID: "  .. math.round(gridEnergySpent[grid],2) .. "/" .. math.round(maxGridCapacity[grid],2) .. "E => " .. math.round(gridMetalGain[grid],2).."M")
 							else
 								Spring.Echo("unitDefID missing for pylon")
 							end

@@ -23,7 +23,6 @@ end
 -- 
 if (gadgetHandler:IsSyncedCode()) then
 	
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -133,6 +132,7 @@ local function SetupUnit(unitID,unitDefID, teamID)
   end
 
   local unitDef   = UnitDefs[unitDefID]
+  Spring.SetUnitRulesParam(unitID,"minWind",windMin+(windMax-windMin)*scriptIDs.alt, {inlos = true})
   SetUnitTooltip(unitID, --Spring.GetUnitTooltip(unitID)..
     unitDef.humanName .. " - " .. unitDef.tooltip ..
     " (E " .. round(windMin+(windMax-windMin)*scriptIDs.alt,1) .. "-" .. round(windMax,1) .. ")"

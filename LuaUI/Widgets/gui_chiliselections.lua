@@ -71,6 +71,32 @@ local Image
 local Progressbar
 local screen0
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- pylon tooltips
+
+local pylonTooltips = {
+	["amgeo"] = true,
+	["armestor"] = true,
+	["armfus"] = true,
+	["armsolar"] = true,
+	["cafus"] = true,
+	["chickend"] = true,
+	["chickenspire"] = true,
+	["geo"] = true,
+	["armwin"] = true,
+}
+
+local windTooltips = {
+	["armwin"] = true,
+}
+
+local mexTooltips = {
+	["cormex"] = true,
+}
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -739,7 +765,7 @@ local function UpdateSelectedUnitsTooltip()
 	--]]
 
 	-- special cases for mexes
-				if ud.name=='cormex' then 
+				if mexTooltips[ud.name] then 
 					local tooltip = spGetUnitTooltip(selectedUnits[1])
 					window_corner.childrenByName['tooltip']:SetCaption(tooltip)
 					
@@ -756,6 +782,14 @@ local function UpdateSelectedUnitsTooltip()
 					s = tooltip:match("Energy: ([^ ]+)")
 					if s ~= nil then absEnergy = absEnergy +tonumber(s) end 
 				end 
+				
+				if pylonTooltips[ud.name] then 
+					local tooltip = spGetUnitTooltip(selectedUnits[1])
+					if windTooltips[ud.name] then
+						tooltip = tooltip .. "\nWind Range " .. round(Spring.GetUnitRulesParam(selectedUnits[1],"minWind"),1) .. " - " Spring.GetGameRulesParam("WindMax")
+					end
+					window_corner.childrenByName['tooltip']:SetCaption(tooltip)
+				end
 			
 				
 				local lbl_metal = infoContainer.childrenByName['metal']
