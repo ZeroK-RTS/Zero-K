@@ -20,6 +20,10 @@ unitDef = {
   canreclamate        = [[1]],
   canstop             = [[1]],
   category            = [[LAND UNARMED]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[36 54 56]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {

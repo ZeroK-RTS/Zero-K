@@ -17,6 +17,10 @@ unitDef = {
   canPatrol             = true,
   canstop               = [[1]],
   category              = [[LAND]],
+  collisionVolumeOffsets        = [[0 -1 0]],
+  collisionVolumeScales         = [[20 20 20]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[ellipsoid]],
   cloakCost             = 0,
 
   customParams          = {

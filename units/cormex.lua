@@ -13,6 +13,10 @@ unitDef = {
   buildPic          = [[cormex.png]],
   buildTime         = 75,
   category          = [[UNARMED FLOAT]],
+  collisionVolumeOffsets        = [[0 -9 0]],
+  collisionVolumeScales         = [[41 66 41]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[ellipsoid]],
   corpse            = [[DEAD]],
 
   customParams      = {
