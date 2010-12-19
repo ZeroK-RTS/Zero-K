@@ -84,13 +84,13 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 100,
-        planes  = 100,
-        subs    = 5,
+        default = 80,
+        planes  = 80,
+        subs    = 4,
       },
 
       explosionGenerator      = [[custom:firewalker_impact]],
-      firestarter             = 50,
+      firestarter             = 40,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
@@ -99,7 +99,7 @@ unitDef = {
       noSelfDamage            = true,
       projectiles             = 2,
       range                   = 900,
-      reloadtime              = 10,
+      reloadtime              = 12,
       renderType              = 4,
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
