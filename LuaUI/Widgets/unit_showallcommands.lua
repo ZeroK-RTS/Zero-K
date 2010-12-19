@@ -20,13 +20,14 @@ local spGetAllUnits = Spring.GetAllUnits
 local drawUnits = {}
 
 function widget:DrawWorld()
- 	
-  for i, v in pairs(drawUnits) do
-    if i then
-	  spDrawUnitCommands(i)
+ 
+  if not Spring.IsGUIHidden() then 
+    for i, v in pairs(drawUnits) do
+      if i then
+	    spDrawUnitCommands(i)
+      end
     end
   end
-  
 end
 
 function widget:UnitCreated(unitID)
