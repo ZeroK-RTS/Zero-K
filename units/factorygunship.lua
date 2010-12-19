@@ -33,9 +33,9 @@ unitDef = {
   canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 -10 0]],
-  collisionVolumeScales         = [[96 45 96]],
+  collisionVolumeScales         = [[95 43 95]],
   collisionVolumeTest           = 1,
-  collisionVolumeType           = [[box]],
+  collisionVolumeType           = [[cylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

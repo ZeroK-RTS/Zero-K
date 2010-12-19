@@ -17,6 +17,10 @@ unitDef = {
   canMove               = true,
   canPatrol             = true,
   canstop               = [[1]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[34 45 27]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[box]],
   category              = [[LAND UNARMED]],
 
   customParams          = {

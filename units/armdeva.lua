@@ -17,10 +17,10 @@ unitDef = {
   canGuard                      = true,
   canstop                       = [[1]],
   category                      = [[FLOAT]],
-  collisionVolumeOffsets        = [[0 -2 0]],
-  collisionVolumeScales         = [[48 42 48]],
+  collisionVolumeOffsets        = [[0 -8 0]],
+  collisionVolumeScales         = [[49 60 49]],
   collisionVolumeTest           = 1,
-  collisionVolumeType           = [[box]],
+  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
