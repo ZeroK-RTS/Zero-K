@@ -47,6 +47,7 @@ jumpClassGroups = {
 	"armaak",
 	"corclog",
 	"corsumo",
+	"factoryjump",
 	-- "pizzathehut",--bad unit left for testing purposes
 	},
 	commrecon1 = {
