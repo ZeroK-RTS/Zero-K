@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Complete Control Camera",
-    desc      = "v0.24 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
+    desc      = "v0.25 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
     author    = "CarRepairer (smoothscroll code by trepan)",
     date      = "2009-12-15",
     license   = "GNU GPL, v2 or later",
@@ -15,6 +15,11 @@ function widget:GetInfo()
 end
 
 include("keysym.h.lua")
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local init = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -46,6 +51,8 @@ options_order = {
 	'follow', 
 	'smoothness',
 	'fov',
+	'restrictangle',
+	'mingrounddist',
 
 }
 options = {
@@ -77,15 +84,15 @@ options = {
 	},
 	smoothscroll = {
 		name = 'Smooth scrolling',
+		desc = 'Use smoothscroll method when mouse scrolling.',
 		type = 'bool',
 		value = true,
-		desc = 'Use smoothscroll method when mouse scrolling.',
 	},
 	targetmouse = {
 		name = 'Rotate world origin at cursor',
+		desc = 'Rotate world using origin at the cursor rather than the center of screen.',
 		type = 'bool',
 		value = false,
-		desc = 'Rotate world using origin at the cursor rather than the center of screen.',
 	},
 	edgemove = {
 		name = 'Scroll camera at edge',
@@ -99,80 +106,70 @@ options = {
 		name = 'Mouse scroll speed',
 		desc = 'This speed applies to scrolling with the middle button.',
 		type = 'number',
-		min = 10,
-		max = 40,
+		min = 10, max = 40,
 		value = 25,
 	},
 	speedFactor_k = {
 		name = 'Keyboard/edge scroll speed',
 		desc = 'This speed applies to edge scrolling and keyboard keys.',
 		type = 'number',
-		min = 1,
-		max = 50,
+		min = 1, max = 50,
 		value = 20,
 	},
 	zoominfactor = {
 		name = 'Zoom-in speed',
 		type = 'number',
-		min = 0.1,
-		max = 0.5,
-		step = 0.05,
+		min = 0.1, max = 0.5, step = 0.05,
 		value = 0.2,
 	},
 	zoomoutfactor = {
 		name = 'Zoom-out speed',
 		type = 'number',
-		min = 0.1,
-		max = 0.5,
-		step = 0.05,
+		min = 0.1, max = 0.5, step = 0.05,
 		value = 0.2,
 	},
 	invertzoom = {
 		name = 'Invert zoom',
+		desc = 'Invert the scroll wheel direction for zooming and altitude.',
 		type = 'bool',
 		value = true,
-		desc = 'Invert the scroll wheel direction for zooming and altitude.',
 	},
 	zoomoutfromcursor = {
 		name = 'Zoom out from cursor',
+		desc = 'Zoom out from the cursor rather than center of the screen.',
 		type = 'bool',
 		value = false,
-		desc = 'Zoom out from the cursor rather than center of the screen.',
 	},
 	zoomintocursor = {
 		name = 'Zoom in to cursor',
+		desc = 'Zoom in to the cursor rather than the center of the screen.',
 		type = 'bool',
 		value = true,
-		desc = 'Zoom in to the cursor rather than the center of the screen.',
 	},
 	follow = {
 		name = "Follow player's cursor",
+		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on).",
 		type = 'bool',
 		value = false,
-		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on).",
 		path = 'Settings/View',
 	},	
 	rotfactor = {
 		name = 'Rotation speed',
 		type = 'number',
-		min = 0.001,
-		max = 0.010,
-		step = 0.001,
+		min = 0.001, max = 0.010, step = 0.001,
 		value = 0.005,
 	},	
 	rotateonedge = {
 		name = "Rotate camera at edge",
+		desc = "Rotate camera when the cursor is at the edge of the screen (edge scroll must be off).",
 		type = 'bool',
 		value = false,
-		desc = "Rotate camera when the cursor is at the edge of the screen (edge scroll must be off).",
 	},
 	smoothness = {
 		name = 'Smoothness',
 		desc = "Controls how smooth the camera moves.",
 		type = 'number',
-		min = 0.0,
-		max = 0.8,
-		step = 0.1,
+		min = 0.0, max = 0.8, step = 0.1,
 		value = 0.2,
 	},
 	fov = {
@@ -180,16 +177,30 @@ options = {
 		desc = "FOV (35 deg - 100 deg). Requires restart to take effect.",
 		springsetting = 'CamFreeFOV',
 		type = 'number',
-		min = 35,
-		max = 100,
-		step = 5,
+		min = 35, max = 100, step = 5,
 		value = 45,
 	},
 	invertscroll = {
 		name = "Invert scrolling direction",
+		desc = "Invert scrolling direction (doesn't apply to smoothscroll).",
 		type = 'bool',
 		value = false,
-		desc = "Invert scrolling direction (doesn't apply to smoothscroll).",
+	},
+	restrictangle = {
+		name = "Restrict Camera Angle",
+		desc = "If disabled you can point the camera upward, but end up with strange camera positioning.",
+		type = 'bool',
+		advanced = true,
+		value = true,
+	},
+	mingrounddist = {
+		name = 'Minimum Ground Distance',
+		desc = 'Getting too close to the ground allows strange camera positioning.',
+		type = 'number',
+		advanced = true,
+		min = 0, max = 10, step = 1,
+		value = 5,
+		OnChange = function(self) init = true; end
 	},
 }
 
@@ -257,7 +268,6 @@ local HALFPI		= PI/2
 local HALFPIMINUS	= HALFPI-0.01
 
 
-local init = true
 local fpsmode = false
 local mx, my = 0,0
 local msx, msy = 0,0
@@ -458,10 +468,13 @@ local function RotateCamera(x, y, dx, dy, smooth)
 		
 		cs.rx = cs.rx + dy * options.rotfactor.value
 		cs.ry = cs.ry - dx * options.rotfactor.value
+		
+		local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
+		
 		if cs.rx < -HALFPIMINUS then
 			cs.rx = -HALFPIMINUS
-		elseif cs.rx > HALFPIMINUS then
-			cs.rx = HALFPIMINUS 
+		elseif cs.rx > max_rx then
+			cs.rx = max_rx 
 		end
 		
 		
@@ -643,7 +656,7 @@ function widget:Update(dt)
 		local cs = spGetCameraState()
 		cs.tiltSpeed = 0
 		cs.scrollSpeed = 0
-		cs.gndOffset = 2
+		cs.gndOffset = options.mingrounddist.value
 		spSetCameraState(cs,0)
 	end
 	
