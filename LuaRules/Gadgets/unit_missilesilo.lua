@@ -42,8 +42,8 @@ local silos = {}
 local missileParents = {}	--stores the parent silo unitID for each missile unitID
 
 function gadget:Initialize()
-	--partial /luarules reload support
-	--it'll lose track of any missiles already built (meaning you can stack new missiles on them, and they don't die when the silo does
+	-- partial /luarules reload support
+	-- it'll lose track of any missiles already built (meaning you can stack new missiles on them, and they don't die when the silo does)
 	if Spring.GetGameFrame() > 1 then
 		local unitList = Spring.GetAllUnits()
 		for i,v in pairs(unitList) do

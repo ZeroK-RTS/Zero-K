@@ -300,7 +300,8 @@ end
 
 local function SpawnStartUnit(teamID, playerID)
   -- get start unit
-  if commSpawned[teamID] then return end	-- no getting double comms now!
+  if Spring.GetGameRulesParam("commSpawned"..teamID) == 1 then return end
+  --if commSpawned[teamID] then return end	-- no getting double comms now!
   local startUnit = GetStartUnit(teamID, playerID)
 
   if startUnit then
@@ -317,7 +318,8 @@ local function SpawnStartUnit(teamID, playerID)
 	--else
 		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
 	--end
-	commSpawned[teamID] = true
+	Spring.SetGameRulesParam("commSpawned"..teamID, 1)
+	--commSpawned[teamID] = true
 	
     -- set the *team's* lineage root
     if Spring.SetUnitLineage then
