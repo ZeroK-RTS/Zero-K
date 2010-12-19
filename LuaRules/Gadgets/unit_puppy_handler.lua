@@ -25,8 +25,10 @@ end
 --------------------------------------------------------------------------------
 
 -- shortcuts
-local spValidUnitID = Spring.ValidUnitID
 local spAreTeamsAllied = Spring.AreTeamsAllied
+local spGetUnitTeam = Spring.GetUnitTeam
+local spGetUnitDefID = Spring.GetUnitDefID
+local spValidUnitID = Spring.ValidUnitID
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -83,6 +85,23 @@ function gadget:Shutdown()
   Script.SetWatchWeapon(puppyWeaponID, false)
 end
 
+-- problem: no way to get weaponID
+--[[
+-- in event of shield impact, gets data about both units and passes it to UnitPreDamaged
+function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile)
+	local attackerTeam, attackerDefID, defenderTeam, defenderDefID
+	if spValidUnitID(proOwnerID) then
+		attackerTeam = spGetUnitTeam(proOwnerID)
+		attackerDefID = spGetUnitDefID(proOwnerID)
+	end
+	if spValidUnitID(shieldCarrierID) then
+		defenderTeam = spGetUnitTeam(shieldCarrierUnitID)
+		defenderDefID = spGetUnitDefID(shieldCarrierUnitID)
+	end
+	gadget:UnitPreDamaged(proOwnerID, defenderDefID, defenderTeam, 0, false, weaponID, proOwnerID, attackerDefID, attackerTeam)
+	return false
+end
+]]--
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)

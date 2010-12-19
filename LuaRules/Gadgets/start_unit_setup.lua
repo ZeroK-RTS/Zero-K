@@ -233,6 +233,7 @@ function gadget:Initialize()
   local frame = Spring.GetGameFrame()
   if frame and frame > 0 then
     gamestart = true
+	Shuffle()
   end
 end
 

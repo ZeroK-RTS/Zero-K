@@ -253,7 +253,7 @@ local function DrawSearchlights()
 			leadDistance = math.sqrt(math.max(range * range - unitDef.wantedHeight * unitDef.wantedHeight, 0)) * 0.8
 			radius = unitRadius * 2
 		  else
-			heading = -GetUnitHeading(unitID) * RADIANS_PER_COBANGLE + math.pi / 2
+			heading = (GetUnitIsDead(unitID) and -GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
 			leadDistance = searchlightGroundLeadTime * speed
 			radius = unitRadius
 		  end
