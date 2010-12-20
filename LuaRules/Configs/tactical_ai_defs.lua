@@ -480,6 +480,7 @@ local behaviourConfig = {
 		flees = {},
 		circleStrafe = true, 
 		strafeOrderLength = 180,
+		skirmLeeway = 60,
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 40, 
 		stoppingDistance = 8

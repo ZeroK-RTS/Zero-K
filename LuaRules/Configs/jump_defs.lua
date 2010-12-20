@@ -31,9 +31,9 @@ jumpCategory = {
 	-- iammissingstuff ={
 	-- 	reload	= 10, aaShootMe	= false, },	
 	commrecon1 = {
-		range = 400, height = 200, speed = 6,  reload = 25,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},
+		range = 400, height = 200, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},
 	commrecon2 = {
-		range = 450, height = 225, speed = 6,  reload = 15,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},	
+		range = 450, height = 225, speed = 6,  reload = 12,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},	
 }
 
 jumpClassGroups = {
@@ -97,7 +97,7 @@ for i=0, numPlayers-1 do
 	for v=1,2 do
 		local name = "commrecon"..v.."_"..i
 		local array = jumpClassGroups["commrecon"..v]
-		array[#array + 1] = name
+		--array[#array + 1] = name
 	end
 end
 

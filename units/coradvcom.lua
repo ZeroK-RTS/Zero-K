@@ -68,7 +68,8 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:COMGATE]],
-      [[custom:brawlermuzzle]],
+	  [[custom:RAIDMUZZLE]],
+      [[custom:LEVLRMUZZLE]],
     },
 
   },
@@ -107,7 +108,7 @@ unitDef = {
 
 
     [4] = {
-      def                = [[AUTOCANNON]],
+      def                = [[SHOCK_CANNON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -117,42 +118,38 @@ unitDef = {
 
   weaponDefs          = {
 
-    AUTOCANNON     = {
-      name                    = [[Pulse Autocannon]],
-      alphaDecay              = 0.7,
-      areaOfEffect            = 64,
+    SHOCK_CANNON = {
+      name                    = [[Shock Cannon]],
+      areaOfEffect            = 144,
+      avoidFeature            = true,
+      avoidFriendly           = true,
       burnblow                = true,
-      craterBoost             = 0.15,
-      craterMult              = 0.3,
+      craterBoost             = 1,
+      craterMult              = 2,
 
       damage                  = {
-        default = 40,
-        planes  = 40,
-        subs    = 2,
+        default = 280,
+        planes  = 280,
+        subs    = 14,
       },
 
-      edgeEffectiveness       = 0.5,
-      explosionGenerator      = [[custom:EMG_HIT_HE]],
-      firestarter             = 70,
+      edgeEffectiveness       = 0.75,
+      explosionGenerator      = [[custom:FLASH64]],
       impulseBoost            = 0,
-      impulseFactor           = 0.2,
-      intensity               = 0.7,
+      impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
-      range                   = 350,
-      reloadtime              = 0.2,
+      range                   = 330,
+      reloadtime              = 2,
       renderType              = 4,
-      rgbColor                = [[1 0.95 0.4]],
-      separation              = 1.5,
-      soundHit                = [[weapon/cannon/emg_hit]],
-      soundStart              = [[weapon/cannon/brawler_emg]],
-      sprayangle              = 900,
-      stages                  = 10,
-      targetMoveError         = 0.3,
+      soundHit                = [[weapon/cannon/generic_cannon]],
+      soundStart              = [[weapon/cannon/outlaw_gun]],
+      soundStartVolume        = 3,
+      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 550,
+      weaponVelocity          = 750,
     },
 
 

@@ -479,6 +479,7 @@ QueryWeapon4(piecenum)
 
 Shot4() {
 	emit-sfx 1025 from mlasflsh;
+	emit-sfx 1026 from mlasflsh;
 }
 
 RestoreLaser(){

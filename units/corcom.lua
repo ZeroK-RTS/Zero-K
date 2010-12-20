@@ -66,7 +66,8 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:COMGATE]],
-      [[custom:brawlermuzzle]],
+	  [[custom:RAIDMUZZLE]],
+      [[custom:LEVLRMUZZLE]],
     },
 
   },
@@ -94,7 +95,7 @@ unitDef = {
 
 
     [4] = {
-      def                = [[AUTOCANNON]],
+      def                = [[SHOCK_CANNON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -104,80 +105,39 @@ unitDef = {
 
   weaponDefs          = {
 
-    AUTOCANNON    = {
-      name                    = [[Pulse Autocannon]],
-      alphaDecay              = 0.7,
-      areaOfEffect            = 64,
+    SHOCK_CANNON = {
+      name                    = [[Shock Cannon]],
+      areaOfEffect            = 144,
+      avoidFeature            = true,
+      avoidFriendly           = true,
       burnblow                = true,
-      burst                   = 3,
-      burstrate               = 0.1,
-      craterBoost             = 0.15,
-      craterMult              = 0.3,
+      craterBoost             = 1,
+      craterMult              = 2,
 
       damage                  = {
-        default = 35,
-        planes  = 35,
-        subs    = 1.75,
+        default = 220,
+        planes  = 220,
+        subs    = 11,
       },
 
-      edgeEffectiveness       = 0.5,
-      explosionGenerator      = [[custom:EMG_HIT_HE]],
-      firestarter             = 70,
+      edgeEffectiveness       = 0.75,
+      explosionGenerator      = [[custom:FLASH64]],
       impulseBoost            = 0,
-      impulseFactor           = 0.2,
-      intensity               = 0.7,
+      impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
-      range                   = 300,
-      reloadtime              = 0.7,
+      range                   = 290,
+      reloadtime              = 2,
       renderType              = 4,
-      rgbColor                = [[1 0.95 0.4]],
-      separation              = 1.5,
-      soundHit                = [[weapon/cannon/emg_hit]],
-      soundStart              = [[weapon/cannon/brawler_emg]],
-      sprayangle              = 900,
-      stages                  = 10,
-      targetMoveError         = 0.3,
+      soundHit                = [[weapon/cannon/generic_cannon]],
+      soundStart              = [[weapon/cannon/outlaw_gun]],
+      soundStartVolume        = 3,
+      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 550,
+      weaponVelocity          = 750,
     },
-
-
-    DISINTEGRATOR = {
-      name                    = [[Disintegrator]],
-      areaOfEffect            = 36,
-      avoidFeature            = false,
-      avoidFriendly           = false,
-      avoidNeutral            = false,
-      commandfire             = true,
-      craterBoost             = 1,
-      craterMult              = 6,
-
-      damage                  = {
-        default    = 99999,
-        commanders = [[1]],
-      },
-
-      energypershot           = 300,
-      explosionGenerator      = [[custom:DGUNTRACE]],
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      noExplode               = true,
-      noSelfDamage            = true,
-      range                   = 250,
-      reloadtime              = 1,
-      renderType              = 3,
-      soundTrigger            = true,
-      tolerance               = 10000,
-      turret                  = true,
-      weaponTimer             = 4.2,
-      weaponType              = [[DGun]],
-      weaponVelocity          = 300,
-    },
-
 
     FAKELASER     = {
       name                    = [[Fake Laser]],
@@ -206,7 +166,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 250,
+      range                   = 290,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
