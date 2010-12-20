@@ -385,6 +385,14 @@ local options = {
     def    = false,
   },
   {
+    key    = 'chatroom',
+    name   = 'Chatroom Mode',
+    desc   = "No battles here. Players choose a unit as their avatar and mingle.",
+    type   = 'bool',
+    section= 'fun',
+    def    = false,
+  },
+  {
     key    = 'planetwars',
     name   = 'Planet Wars Options',
     desc   = 'A string is put here by the Planet Wars server to set up ingame conditions.',
