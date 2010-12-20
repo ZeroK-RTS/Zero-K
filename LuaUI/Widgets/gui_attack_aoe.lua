@@ -179,7 +179,9 @@ local function getWeaponInfo(weaponDef, unitDef)
 	if (weaponDef.cylinderTargetting >= 100) then
 		retData = {type = "orbital", scatter = scatter}
 	elseif (weaponType == "Cannon") then
-		retData = {type = "ballistic", scatter = scatter, v = weaponDef.maxVelocity, range = weaponDef.range}
+		retData = {type = "ballistic", scatter = scatter, v = weaponDef.maxVelocity,range = weaponDef.range,
+			mygravity = weaponDef.customParams and weaponDef.customParams.mygravity and weaponDef.customParams.mygravity*800
+		}
 	elseif (weaponType == "MissileLauncher") then
 		local turnRate = 0
 		if (weaponDef.tracks) then
@@ -353,10 +355,9 @@ end
 --ballistics
 --------------------------------------------------------------------------------
 
-local function GetBallisticVector(v, dx, dy, dz, trajectory, range)
+local function GetBallisticVector(v, mg, dx, dy, dz, trajectory, range)
   local dr_sq = dx*dx + dz*dz
   local dr = sqrt(dr_sq)
-  
   if (dr > range) then return nil end
   
   local d_sq = dr_sq + dy*dy
@@ -365,10 +366,10 @@ local function GetBallisticVector(v, dx, dy, dz, trajectory, range)
     return 0, v * trajectory, 0
   end
   
-  local root1 = v*v*v*v - 2*v*v*g*dy - g*g*dr_sq
+  local root1 = v*v*v*v - 2*v*v*mg*dy - mg*mg*dr_sq
   if (root1 < 0) then return nil end
   
-  local root2 = 2*dr_sq*d_sq*(v*v - g*dy - trajectory*sqrt(root1))
+  local root2 = 2*dr_sq*d_sq*(v*v - mg*dy - trajectory*sqrt(root1))
   
   if (root2 < 0) then return nil end
   
@@ -377,7 +378,7 @@ local function GetBallisticVector(v, dx, dy, dz, trajectory, range)
   
   if (r == 0 or vr == 0) 
     then vy = v
-    else vy = vr*dy/dr + dr*g/(2*vr)
+    else vy = vr*dy/dr + dr*mg/(2*vr)
   end
   
   local bx = dx*vr/dr
@@ -418,14 +419,16 @@ end
 
 --v: weaponvelocity
 --trajectory: +1 for high, -1 for low
-local function DrawBallisticScatter(scatter, v, fx, fy, fz, tx, ty, tz, trajectory, range)
+local function DrawBallisticScatter(scatter, v, mygravity ,fx, fy, fz, tx, ty, tz, trajectory, range)
   if (scatter == 0) then return end
   local dx = tx - fx
   local dy = ty - fy
   local dz = tz - fz
   if (dx == 0 and dz == 0) then return end
-  
-  local bx, by, bz = GetBallisticVector(v, dx, dy, dz, trajectory, range)
+
+  local mg = mygravity or g
+
+  local bx, by, bz = GetBallisticVector(v, mg, dx, dy, dz, trajectory, range)
   
   --don't draw anything if out of range
   if (not bx) then return end
@@ -630,7 +633,7 @@ function widget:DrawWorld()
       trajectory = -1
     end
     DrawAoE(tx, ty, tz, info.aoe, info.ee)
-    DrawBallisticScatter(info.scatter, info.v, fx, fy, fz, tx, ty, tz, trajectory, info.range)
+    DrawBallisticScatter(info.scatter, info.v, info.mygravity, fx, fy, fz, tx, ty, tz, trajectory, info.range)
   elseif (weaponType == "tracking") then
     DrawAoE(tx, ty, tz, info.aoe, info.ee)
   elseif (weaponType == "direct") then
