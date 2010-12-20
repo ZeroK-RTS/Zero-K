@@ -44,6 +44,7 @@ unitDef = {
   noChaseCategory       = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName            = [[logmine.s3o]],
   onoffable             = false,
+  script				= [[wolverine_mine.lua]],
   seismicDistance       = 80,
   seismicSignature      = 16,
   selfDestructAs        = [[NOWEAPON]],
