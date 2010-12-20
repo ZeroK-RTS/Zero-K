@@ -292,7 +292,7 @@ local function GetUnitDesc(unitID, ud)
 	
 	local lang = WG.lang or 'en'
 	if lang == 'en' then 
-		return ud.tooltip
+		return unitID and spGetUnitTooltip(unitID) or ud.tooltip
 	end
 	local suffix = ('_' .. lang)
 	local desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'

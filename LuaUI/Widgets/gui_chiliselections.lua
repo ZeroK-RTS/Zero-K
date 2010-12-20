@@ -324,7 +324,7 @@ end
 local function GetUnitDesc(unitID, ud)
 	local lang = WG.lang or 'en'
 	if lang == 'en' then 
-		return ud.tooltip
+		return unitID and spGetUnitTooltip(unitID) or ud.tooltip
 	end
 	local suffix = ('_' .. lang)
 	local desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'
@@ -767,6 +767,7 @@ local function UpdateSelectedUnitsTooltip()
 	-- special cases for mexes
 				if mexTooltips[ud.name] then 
 					local tooltip = spGetUnitTooltip(selectedUnits[1])
+					--local tooltip = GetUnitDesc(selectedUnits[1])
 					window_corner.childrenByName['tooltip']:SetCaption(tooltip)
 					
 					local baseMetal = 0
