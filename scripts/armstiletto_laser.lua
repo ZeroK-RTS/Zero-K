@@ -1,13 +1,8 @@
 include "constants.lua"
 include "fakeUpright.lua"
 
-local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,x,z,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","z","x","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
+local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","z","x","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
 local smokePiece = {base, jet1, jet2}
-
-
---signals
-local SIG_Aim = 1
-local SIG_Fire = 2
 
 --cob values
 local CRASHING = 97
@@ -17,13 +12,19 @@ local sound_index = 0
 function script.Create()
 	Hide( preDrop)
 	Hide( drop)
-	FakeUprightInit(x,z,drop)
-
+	
+	-- upright
+	-- Someone bugged the piece positions so I offset them by a large amout to counteract the buggering
+	Move (xp,z_axis,5000)
+	Move (zp,x_axis,5000)
+	--
+	
 	Turn(Lwing, z_axis, math.rad(90))
 	Turn(Rwing, z_axis, math.rad(-90))	
 	Turn(LwingTip, z_axis, math.rad(-165))
 	Turn(RwingTip, z_axis, math.rad(165))
 	
+	Turn( drop , x_axis,  math.rad(90))
 end
 
 function script.Activate()
@@ -40,7 +41,7 @@ function script.Deactivate()
 	Turn(LwingTip, z_axis, math.rad(-30), 2) -- -30
 	Turn(RwingTip, z_axis, math.rad(30), 2) --30
 end
-
+--[[
 function script.MoveRate(moveRate)
 	if moveRate == 2 then
 		if  not Static_Var_1   then
@@ -53,16 +54,29 @@ function script.MoveRate(moveRate)
 			Static_Var_1 = 0
 		end
 	end
-end
+end--]]
 
 local function FireLoop()
-	SetSignalMask( SIG_Fire )
 	while(firing) do
-		FakeUprightTurn(unitID,x,z,preDrop,base)
-		EmitSfx( drop,  2049 )
+		local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
+		local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
+		local bx, by, bz = Spring.GetUnitPiecePosDir(unitID,base)
+		local xdx = xx - bx
+		local xdy = xy - by
+		local xdz = xz - bz
+		local zdx = zx - bx
+		local zdy = zy - by
+		local zdz = zz - bz
+		local angle_x = math.atan2(xdy, math.sqrt(xdx^2 + xdz^2))
+		local angle_z = math.atan2(zdy, math.sqrt(zdx^2 + zdz^2))
+
+		Turn( preDrop , x_axis, angle_x)
+		Turn( preDrop , z_axis, -angle_z)
+		
+		EmitSfx( drop,  FIRE_W2 )
 		if sound_index == 0 then
 			local px, py, pz = Spring.GetUnitPosition(unitID)
-			Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 10, px, py, pz)
+			Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 8, px, py, pz)
 		end
 		sound_index = sound_index + 1
 		if sound_index >= 6 then
@@ -77,11 +91,10 @@ function script.FireWeapon1()
 		return
 	end
 	Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
-	firing = 1
+	firing = true
 	StartThread(FireLoop)
-	Sleep( 2030 ) -- Duration of burst. The number of frames is roughly (time - 30) * 1000 / 30.
-	firing = 0
-	Signal(SIG_Fire)
+	Sleep( 3000 ) -- Duration of burst. The number of frames is roughly (time - 30) * 1000 / 30.
+	firing = false
 	Sleep( 500) --delay before fuel runs out, to let it retreat a little
 	Spring.SetUnitFuel(unitID,0)
 end
@@ -90,7 +103,7 @@ function script.QueryWeapon1()
 	return drop
 end
 
-function script.AimFromWeapon1() return base end
+function script.AimFromWeapon1() return drop end
 
 function script.AimWeapon1(heading, pitch)
 	if (GetUnitValue(CRASHING) == 1) then return false end

@@ -70,8 +70,8 @@ unitDef = {
     {
       def                = [[ARMBOMBLIGHTNING]],
       mainDir            = [[0 -1 0]],
-      maxAngleDif        = 180,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP]],
+      maxAngleDif        = 0,
+      onlyTargetCategory = [[NONE]],
     },
 
   },
@@ -87,6 +87,7 @@ unitDef = {
       beamlaser               = 1,
       beamTime                = 0.01,
       burst                   = 0,
+	  canattackground         = false,
       collideFriendly         = false,
       coreThickness           = 0.6,
       craterBoost             = 0,
