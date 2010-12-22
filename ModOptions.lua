@@ -28,7 +28,6 @@
 --  Example ModOptions.lua
 --
 --+ TO DOI : change CAMODE to ZKMODE once ZK name will be enforced to all files.
-
 local options = {
   {
     key    = 'camode',
