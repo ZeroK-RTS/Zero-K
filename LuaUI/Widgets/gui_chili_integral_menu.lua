@@ -886,7 +886,7 @@ function widget:Initialize()
 	Spring.ForceLayoutUpdate()
 
 
-	local f,it,isFile = nil,nil,false
+	--[[local f,it,isFile = nil,nil,false
 	f  = io.open('cmdcolors.txt','r')
 	if f then
 		it = f:lines()
@@ -916,7 +916,7 @@ function widget:Initialize()
 				cmdColors[n]= r
 			end
 		end
-	end
+	end]]--
 	
 	-- setup Chili
 	Chili = WG.Chili
