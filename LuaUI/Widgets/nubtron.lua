@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Nubtron",
-    desc      = "v0.4 Friendly Tutorial Robot",
+    desc      = "v0.41 Friendly Tutorial Robot",
     author    = "CarRepairer",
     date      = "2008-08-18",
     license   = "GNU GPL, v2 or later",
@@ -68,7 +68,7 @@ local Progressbar
 local Control
 
 local window_nubtron, title, tip, blurb, img, button_next
-local wantClickNubtron = true
+local wantClickNubtron, showImage = true, true
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -1029,8 +1029,17 @@ function widget:Update()
 		else
 			imageToUse = curStep.image
 		end
+		if not showImage then
+			showImage = true
+			window_nubtron:AddChild(img)
+		end
 		img.file = imageToUse
 		img:Invalidate()
+	else
+		if showImage then
+			showImage = false
+			window_nubtron:RemoveChild(img)
+		end
 	end
 	
 	title:SetCaption(curTask.desc)
