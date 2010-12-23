@@ -37,10 +37,10 @@ return {
 			},
 		},
 		steps = {
-			intro = [[Hello! I am Nubtron, the multilingual friendly robot. I will teach you how to play Complete Annihilation. <(Click here to continue)>]],
-			intro2 = [[Just follow my instructions. You can drag this window around by my face. <(Click here to continue)>]],
-			intro3 = [[Practice zooming the camera in and out with your mouse's scroll wheel <(Click here to continue)>]],
-			intro4 = [[Practice panning the camera up, down, left and right with your arrow keys. <(Click here to continue)>]],
+			intro = [[Hello! I am Nubtron, the multilingual friendly robot. I will teach you how to play Complete Annihilation. <(Click next to continue)>]],
+			intro2 = [[Just follow my instructions and learn at your own pace. <(Click next to continue)>]],
+			intro3 = [[Practice zooming the camera in and out with your mouse's scroll wheel <(Click next to continue)>]],
+			intro4 = [[Practice panning the camera by holding down the middle mouse button and dragging. <(Click next to continue)>]],
 			intro5 =  [[Place your starting position by clicking on a nice flat spot on the map, then click on the <Ready> button]],
 			selectComm = [[Select only your commander by clicking on it or pressing <ctrl+c>.]],
 			showMetalMap = [[View the metal map by pressing <F4>.]],
@@ -48,14 +48,14 @@ return {
 			selectBotLab = [[Select only your Bot Lab by clicking on it (the blue circles will help you find it).]],
 			selectCon = [[Select one constructor by clicking on it (the blue circles will help you find it).]],
 			guardFac = [[Have the constructor guard your Bot Lab by right clicking on the Lab. The constructor will assist it until you give it a different order.]],
-			tutorialEnd = [[This is the end of the tutorial. It is now safe to shut off Nubtron. Goodbye! (Click here to restart tutorial)]],
+			tutorialEnd = [[This is the end of the tutorial. It is now safe to shut off Nubtron. Goodbye! (Click next to restart tutorial)]],
 			
 			selectBuild_m = [[Select the #replace# from your build menu (build-icon shown here).]],
 			build_m = [[You are now building a #replace#. <Wait for it to finish.>]],
 			
 			finish = [[You have an unfinished #replace# shown by the red circles. <Right click on it to finish building>. ]],
 			selectBuild = [[Select the #replace# from your build menu (build-icon shown here). ]],
-			start = [[<Place it near your other structures.> It will turn red if you try to place it on uneven terrain and you'll have to select it again.]],
+			start = [[<Place it near your other structures.> It will turn red if you try to place it on uneven terrain.]],
 			build = [[Good work! You are now building a #replace#. <Wait for it to finish.>]],
 			
 			startMex = [[Place it on a green patch.]],

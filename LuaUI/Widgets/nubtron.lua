@@ -1,11 +1,10 @@
--- $Id: nubtron.lua 4259 2009-03-31 14:41:49Z carrepairer $
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
   return {
     name      = "Nubtron",
-    desc      = "v0.3 Friendly Tutorial Robot",
+    desc      = "v0.4 Friendly Tutorial Robot",
     author    = "CarRepairer",
     date      = "2008-08-18",
     license   = "GNU GPL, v2 or later",
@@ -24,32 +23,11 @@ local widgetHandler   = widgetHandler
 local math            = math
 local table           = table
 
-local titleFont		= LUAUI_DIRNAME.."Fonts/FreeSansBold_16"
-local smallFont		= LUAUI_DIRNAME.."Fonts/FreeSansBold_14"
-
-local fhDraw    = fontHandler.Draw
-local floor     = math.floor
-local sqrt	= math.sqrt
-
-local glPushMatrix		= gl.PushMatrix
-local glVertex			= gl.Vertex
-local glBeginEnd		= gl.BeginEnd
 local glColor			= gl.Color
-local glRect			= gl.Rect
-local glPopMatrix		= gl.PopMatrix
-local glTranslate		= gl.Translate
-local glTexture			= gl.Texture
-local glTexRect			= gl.TexRect
-local glAlphaTest		= gl.AlphaTest
-local glScale			= gl.Scale
 local glLineWidth		= gl.LineWidth
 local glDepthTest		= gl.DepthTest
 local glDrawGroundCircle	= gl.DrawGroundCircle
 
-local GL_GREATER      = GL.GREATER
-local GL_LINE_STRIP   = GL.LINE_STRIP
-local GL_LINES        = GL.LINES
-local GL_QUADS        = GL.QUADS
 
 local GetActiveCmdDescs	= Spring.GetActiveCmdDescs	
 local GetActiveCommand	= Spring.GetActiveCommand
@@ -69,6 +47,31 @@ local GetUnitIsBuilding	= Spring.GetUnitIsBuilding
 local GetUnitTeam	= Spring.GetUnitTeam
 local GetTeamResources	= Spring.GetTeamResources
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+-- Chili classes
+local Chili
+local Button
+local Label
+local Colorbars
+local Checkbox
+local Window
+local ScrollPanel
+local StackPanel
+local LayoutPanel
+local Grid
+local Trackbar
+local TextBox
+local Image
+local Progressbar
+local Control
+
+local window_nubtron, title, tip, blurb, img, button_next
+local wantClickNubtron = true
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local CMD_REPAIR        = CMD.REPAIR
 local CMD_GUARD		= CMD.GUARD
 
@@ -81,27 +84,17 @@ local messageColorIn	= "\255\255\255\255"
 local viewSizeX, viewSizeY
 local w			= 550
 local h			= 85
-local x1		= 300
-local y1		= 300
 local px		= -1
 local py		= -1
-local xButtonWidth 	= 43
-local xButtonHeight = 18
-
-local moving		= false
-local maxChars		= 70
-local margin		= 6
-local tipScale		= 0.8
 
 local mThresh		= 6
 local eThresh		= 10
 
-local curTooltip	= ''
 local metalIncome, energyIncome	= 0,0
 local myTeamID, myFaction, myCommID, guardingConID
 local myLabID = 0
 local curStepNum, curTaskNum
-local checkAllUnitsFlag
+--local checkAllUnitsFlag
 --local buildFacing
 local commBuildingUnitID, labBuildingUnitID
 
@@ -122,14 +115,14 @@ local lang = 'en'
 --- unit classes ---
 local classesByUnit = {}
 local unitClasses = {
-	Mex	= { 'armmex', 'cormex' },
-	Solar	= { 'armsolar', 'corsolar' },
-	LLT	= { 'armllt', 'corllt' },
-	BotLab	= { 'armlab', 'corlab' },
-	Radar	= { 'armrad', 'corrad' },
+	Mex	= { 'cormex' },
+	Solar	= { 'armsolar' },
+	LLT	= { 'corllt' },
+	BotLab	= { 'factoryshield' },
+	Radar	= { 'corrad' },
 
-	Con	= { 'armrectr', 'cornecro' },
-	Raider	= { 'armpw', 'corak' },
+	Con	= { 'cornecro' },
+	Raider	= { 'corak' },
 }
 local unitClassNames = {
 	Mex	= 'Mex',
@@ -187,7 +180,8 @@ local steps = {
 
 	selectCon = {
 		--message		= 'Select one constructor by clicking on it (the blue circles will help you find it).',
-		image		= { arm='unitpics/'.. unitClasses.Con[1] ..'.png', core='unitpics/'.. unitClasses.Con[2] ..'.png' },
+		--image		= { arm='unitpics/'.. unitClasses.Con[1] ..'.png', core='unitpics/'.. unitClasses.Con[2] ..'.png' },
+		image		= unitClasses.Con[1] ..'.png',
 		passIfAny	= { 'ConSelected' },
 	},
 
@@ -305,30 +299,7 @@ local tasks = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-fontHandler.UseFont(smallFont)
-local panelFontSize  = fontHandler.GetFontSize()
-fontHandler.DisableCache()
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local function DrawQuad(w,h)
-  glVertex(0,0)
-  glVertex(0,h)
-  glVertex(0,0)
-  glVertex(w,0)
-end
-
-local function DrawBox(x1,x2,y1,y2)
-	glColor(0.2, 0.2, 0.2, 0.9)
-	glVertex(x1, y1)
-	glVertex(x1, y2)
-	
-	glVertex(x2, y2)
-	glVertex(x2, y1)
-end
-
---------------------------------------------------------------------------------
 
 function setCondition(condition)
 	if not conditions[condition] then
@@ -398,6 +369,18 @@ function CheckState()
 	local curTask = tasks[curTaskNum]
 	local curStep = steps[tasks[curTaskNum].states[curStepNum]]
 	local taskStates = curTask.states
+	
+	if curStep.passIfAny and curStep.passIfAny[1] == 'clickedNubtron' then
+		if not wantClickNubtron then
+			wantClickNubtron = true
+			window_nubtron:AddChild(button_next)
+		end
+	else
+		if wantClickNubtron then
+			wantClickNubtron = false
+			window_nubtron:RemoveChild(button_next)
+		end
+	end
 
 
 	---- Task Error ----
@@ -453,33 +436,6 @@ function CheckState()
 		CheckState()
 
 	end
-end
-
-function WrapText(text)
-	local text_array = {}
-	local curString = text:reverse()
-	local i=7
-	repeat
-		local position = curString:find(' ', -maxChars)
-		local strOut =''
-		if position then
-			strOut = curString:sub(position)
-		else
-			strOut = curString
-		end
-
-		if curString:len() < maxChars then
-			strOut = curString
-		end
-
-		curString = curString:sub(1,-strOut:len()-1)
-		
-		text_array[#text_array + 1] = strOut:reverse()
-		i = i-1
-
-	until curString:len() <= 0 or i <= 0
-
-	return text_array
 end
 
 function CheckAllUnits()
@@ -630,148 +586,124 @@ end
 local function setup_text_test(_,_,words)
 	setup_text(words[1])
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
-function widget:DrawScreen()
-	fontHandler.DisableCache()
-
-	local gameFrame = GetGameFrame()
-	local frame32 = (gameFrame) % 32
-
-	if (frame32 < 0.1) then
-		--- started game ---
-		if GetGameSeconds() > 2 then
-			setCondition('gameStarted')
-		end
+local function SetupNubtronWindow()
+	local imgsize = 80
+	local nextbuttonwidth = 40
+	title = Label:New {
+		width="100%";
+		--height="100%";
+		x=imgsize+2,
 		
+		autosize=false;
+		align="left";
+		valign="top";
+		caption = 'Title';
+		fontSize = 16;
+		fontShadow = true;
+		parent = button;
+	}
+	tip = Label:New {
+		width="100%";
+		--height="100%";
+		x=imgsize+2,
+		y=15,
 		
-		--- metal map ---
-		if GetMapDrawMode() == 'metal' then
-			setCondition('metalMapView')
-		else
-			remCondition('metalMapView')
-		end
-
-
-		--- build facing direction ---
-		--[[
-		if buildFacing ~= Spring.GetUnitBuildFacing() then
-			buildFacing = Spring.GetUnitBuildFacing() 
-			setCondition('rotatedBuilding')
-		end
-		--]]
-
-		--- Check resources ---
-		--local mCurrentLevel, mStorage, mPull, mIncome, mExpense, mShare, mSent, mReceived = GetTeamResources('teamID')
-		local mCurrentLevel, mStorage, mPull, mIncome = GetTeamResources(myTeamID, 'metal')
-		local eCurrentLevel, eStorage, ePull, eIncome = GetTeamResources(myTeamID, 'energy')
-		metalIncome = mIncome
-		energyIncome = eIncome
+		autosize=false;
+		align="left";
+		valign="top";
+		caption = 'Tip';
+		fontSize = 10;
+		fontShadow = true;
+		parent = button;
+	}
+	blurb = TextBox:New {
+		width="100%";
+		--height="100%";
+		x=imgsize+2,
+		y=40,
+		bottom=0,
+		right = imgsize+2 + nextbuttonwidth,
 		
-		if metalIncome < mThresh then
-			setCondition('lowMetalIncome')
-		elseif metalIncome > mThresh+1 then
-			remCondition('lowMetalIncome')
-		end
-		if energyIncome < eThresh then
-			setCondition('lowEnergyIncome')
-		elseif energyIncome > eThresh+1 then
-			remCondition('lowEnergyIncome')
-		end
-		
-		CheckAllUnits()
-	end
-
-	local curTask = tasks[curTaskNum]
-	local curStep = steps[curTask.states[curStepNum]]
-
-	glPushMatrix()
-	glTranslate(x1, y1, 0)
-	glBeginEnd(GL_QUADS, DrawBox, w,0,0,h)
-
-	fontHandler.UseFont(smallFont)
-
-	textHeight = 7
-
-	-- draw helper image --
-	if curStep.image then
-
-		local imageToUse
-		if type(curStep.image) == 'table' then
-			imageToUse = curStep.image[myFaction]
-		else
-			imageToUse = curStep.image
-		end
-
-		maxChars = 68
-		glPushMatrix()
-		glTexture(imageToUse)
-		glColor(1,1,1,1)
-		glAlphaTest(GL_GREATER, 0)
-		glTexRect(w-h, 0, w, h)
-		glAlphaTest(false)
-		glPopMatrix()
-	else
-		maxChars = 80
-	end
-
-	-- print title --
-	fontHandler.UseFont(titleFont)
-	glColor(titleColor)	
-	fhDraw(curTask.desc, margin, h - textHeight - margin)
-	fontHandler.UseFont(smallFont)
-
-	-- print tip --
-	local tipHeight = 0
-	if curTask.tip then		
-		tipHeight = textHeight * tipScale
-		glColor(tipColor)
-		glPushMatrix()
-		glScale(tipScale, tipScale, tipScale)
-		fhDraw(curTask.tip, margin, (h - textHeight*2 - margin*2)/tipScale )
-		glPopMatrix()
-		
-	end
-
-	-- print message --
-	glColor(messageColor)
-	local msg_array = WrapText(curStep.message)
-	for i,message_part in ipairs(msg_array) do
-		local formattedLine = message_part:gsub('<', emphasisColorIn):gsub('>', messageColorIn)
-		fhDraw(formattedLine, margin, h - textHeight*(1+i) - margin*(2*i+2) - tipHeight)
-	end
-
-	-- draw nubtron --
-	glPushMatrix()
-	glTexture('LuaUI/Images/friendly.png')
-	glColor(1,1,1,1)
-	glAlphaTest(GL_GREATER, 0)
-	if moving then
-		glTexRect(0, 0, -h, h)
-	else
-		glTexRect(-h, 0, 0, h)
-	end
-	glAlphaTest(false)
-	glPopMatrix()
-
-	-- draw X --
-	--local mouseX,mouseY = GetMouseState()
-	--if ( mouseX > x1 and mouseX < x1 + w and mouseY > y1 and mouseY < y1 + h) then
-		glPushMatrix()
-		glTexture('LuaUI/Images/x.png')
-		glColor(1,1,1,1)
-		glAlphaTest(GL_GREATER, 0)
-		glTexRect(w-xButtonWidth, h-xButtonHeight, w, h)
-		glAlphaTest(false)
-		glPopMatrix()
-	--end
+		autosize=false;
+		align="left";
+		valign="top";
+		caption = text;
+		fontSize = 14;
+		fontShadow = true;
+		parent = button;
+	}
 	
-	glPopMatrix()
-	glColor(0,0,0,0)
-	glTexture(false)
-
+	imgnubtron = Image:New {
+		width = imgsize;
+		height = imgsize;
+		file = 'LuaUI/Images/friendly.png';
+	}
+	img = Image:New {
+		width = imgsize;
+		height = imgsize * (4/5);
+		keepAspect = false,
+		right=0,
+		bottom=0,
+		file = '';
+	}
+	button_next = Button:New {
+		width = nextbuttonwidth;
+		height = 50;
+		caption = 'Next',
+		right=imgsize+2,
+		bottom = 0,
+		OnClick = {
+			function(self)
+				setCondition('clickedNubtron')
+			end
+		}
+	}
+	local button_x = Button:New {
+		width = 20;
+		height = 15;
+		caption = 'X',
+		right=2,
+		captionColor = {1,0,0,1},
+		OnClick = {
+			function(self)
+				Spring.SendCommands({"luaui togglewidget Nubtron"})
+				--widgetHandler:RemoveWidget() --when using this, it requires two clicks to restart the widget from the menu
+			end
+		}
+	}
+	
+		
+	
+	window_nubtron = Window:New{
+		parent = screen0,
+		name   = 'nubtron';
+		--color = {0, 0, 0, 0},
+		width = 600;
+		height = imgsize+20; 
+		x = 0; 
+		bottom = 0;
+		dockable = true;
+		draggable = true,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = false,
+		padding = {10, 10, 10, 10},
+		--itemMargin  = {0, 0, 0, 0},
+		children = {
+			title,
+			tip,
+			blurb,
+			img,
+			imgnubtron,
+			button_next,
+			button_x,
+		},
+	}
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 
 function widget:DrawWorld()
 
@@ -783,7 +715,7 @@ function widget:DrawWorld()
 	local gameFrame = GetGameFrame()
 	local frame32 = (gameFrame) % 32
 	local pulse = frame32 / 32
-	local radius = 65 - pulse*15
+	local radius = 100 - pulse*40
 
 	-- draw circle around units --	
 	for unitClass, units in pairs(unitClasses) do
@@ -802,9 +734,9 @@ function widget:DrawWorld()
 			for unitID, _ in pairs(unitSet) do
 				local ux, uy, uz = GetUnitPosition(unitID)
 				if ux then
-					glDrawGroundCircle(ux, uy, uz, radius, 32)
-					glDrawGroundCircle(ux, uy, uz, radius+3, 32)
-					glDrawGroundCircle(ux, uy, uz, radius+6, 32)
+					for i = 1, 5 do
+						glDrawGroundCircle(ux, uy, uz, radius +3*i, 32)
+					end
 				end
 			end
 		end
@@ -875,9 +807,28 @@ end
 
 
 function widget:Initialize()
-	x1 = 400
-	y1 = 400
 
+	-- setup Chili
+	Chili = WG.Chili
+	Button = Chili.Button
+	Label = Chili.Label
+	Colorbars = Chili.Colorbars
+	Checkbox = Chili.Checkbox
+	Window = Chili.Window
+	Panel = Chili.Panel
+	ScrollPanel = Chili.ScrollPanel
+	StackPanel = Chili.StackPanel
+	LayoutPanel = Chili.LayoutPanel
+	Grid = Chili.Grid
+	Trackbar = Chili.Trackbar
+	TextBox = Chili.TextBox
+	Image = Chili.Image
+	Progressbar = Chili.Progressbar
+	Control = Chili.Control
+	screen0 = Chili.Screen0
+	
+	SetupNubtronWindow()
+	
 	for unitClass, units in pairs(unitClasses) do
 		for _,unit in pairs(units) do
 			classesByUnit[unit] = unitClass
@@ -899,7 +850,8 @@ function widget:Initialize()
 		if mClasses[unitClass] then
 			steps['selectBuild'.. unitClass] = {
 				--message		= 'Select the '.. unitClassName ..' from your build menu (build-icon shown here).',
-				image		= { arm='unitpics/'.. unitClasses[unitClass][1] ..'.png', core='unitpics/'.. unitClasses[unitClass][2] ..'.png' },
+				--image		= { arm='unitpics/'.. unitClasses[unitClass][1] ..'.png', core='unitpics/'.. unitClasses[unitClass][2] ..'.png' },
+				image		= 'unitpics/'.. unitClasses[unitClass][1] ..'.png',
 				errIfAnyNot	= { 'BotLabSelected', },
 				passIfAny	= { 'build'.. unitClass, 'have'.. unitClass }
 				}
@@ -918,7 +870,8 @@ function widget:Initialize()
 				}
 			steps['selectBuild'.. unitClass] = {
 				--message		= 'Select the '.. unitClassName ..' from your build menu (build-icon shown here). ',
-				image		= { arm='unitpics/'.. unitClasses[unitClass][1] ..'.png', core='unitpics/'.. unitClasses[unitClass][2] ..'.png' },
+				--image		= { arm='unitpics/'.. unitClasses[unitClass][1] ..'.png', core='unitpics/'.. unitClasses[unitClass][2] ..'.png' },
+				image		= 'unitpics/'.. unitClasses[unitClass][1] ..'.png',
 				errIfAnyNot	= { 'commSelected', },
 				passIfAny	= { 'selbuild'.. unitClass, 'build'.. unitClass }
 				}
@@ -1002,43 +955,9 @@ function widget:Shutdown()
 	fontHandler.FreeCache()
 end
 
-function widget:MouseMove(x, y, dx, dy, button)
-	--if (moving and viewSizeX and viewSizeY) then
-	if (moving) then
-		x1 = floor(x1 + dx)
-		y1 = floor(y1 + dy)
-		--px = x1/viewSizeX
-		--py = y1/viewSizeY
-	end
-end
 
-function widget:MousePress(x, y, button)
-	if ( x > x1 + w - xButtonWidth and x < x1 + w and y > y1 + h - xButtonHeight and y < y1 + h) then
-		Spring.SendCommands({"luaui togglewidget Nubtron"})
-		--widgetHandler:RemoveWidget() --when using this, it requires two clicks to restart the widget from the menu
-		
-	elseif ( x > x1 and x < x1 + w and y > y1 and y < y1 + h) then
-		setCondition('clickedNubtron')
-		
-	elseif ( x > x1-h and x < x1 and y > y1 and y < y1 + h) then
-		moving = true
-	end
-	return moving
-end
  
-function widget:MouseRelease(x, y, button)
-	moving  = false
-	return false
-end
-
 function widget:ViewResize(vsx, vsy)
-	if (px == -1) then 
-		x1 = floor((vsx - w)/2)
-		y1 = floor((vsy - h)/2)
-	else
-		x1 = floor(px * vsx)
-		y1 = floor(py * vsy)
-	end
 	viewSizeX = vsx
 	viewSizeY = vsy
 end
@@ -1052,6 +971,73 @@ function widget:Update()
 			setup_text(lang)
 		end
 	end
+	local gameFrame = GetGameFrame()
+	local frame32 = (gameFrame) % 32
+
+	if (frame32 < 0.1) then
+		--- started game ---
+		if GetGameSeconds() > 2 then
+			setCondition('gameStarted')
+		end
+		
+		
+		--- metal map ---
+		if GetMapDrawMode() == 'metal' then
+			setCondition('metalMapView')
+		else
+			remCondition('metalMapView')
+		end
+
+
+		--- build facing direction ---
+		--[[
+		if buildFacing ~= Spring.GetUnitBuildFacing() then
+			buildFacing = Spring.GetUnitBuildFacing() 
+			setCondition('rotatedBuilding')
+		end
+		--]]
+
+		--- Check resources ---
+		--local mCurrentLevel, mStorage, mPull, mIncome, mExpense, mShare, mSent, mReceived = GetTeamResources('teamID')
+		local mCurrentLevel, mStorage, mPull, mIncome = GetTeamResources(myTeamID, 'metal')
+		local eCurrentLevel, eStorage, ePull, eIncome = GetTeamResources(myTeamID, 'energy')
+		metalIncome = mIncome
+		energyIncome = eIncome
+		
+		if metalIncome < mThresh then
+			setCondition('lowMetalIncome')
+		elseif metalIncome > mThresh+1 then
+			remCondition('lowMetalIncome')
+		end
+		if energyIncome < eThresh then
+			setCondition('lowEnergyIncome')
+		elseif energyIncome > eThresh+1 then
+			remCondition('lowEnergyIncome')
+		end
+		
+		CheckAllUnits()
+	end
+
+	local curTask = tasks[curTaskNum]
+	local curStep = steps[curTask.states[curStepNum]]
+	
+	
+	if curStep.image then
+		local imageToUse
+		if type(curStep.image) == 'table' then
+			imageToUse = curStep.image[myFaction]
+		else
+			imageToUse = curStep.image
+		end
+		img.file = imageToUse
+		img:Invalidate()
+	end
+	
+	title:SetCaption(curTask.desc)
+	tip:SetCaption(curTask.tip or '')
+	local formattedLine = curStep.message:gsub('<', emphasisColorIn):gsub('>', messageColorIn)
+	blurb:SetText(formattedLine)
+	
 end
 	
 	
