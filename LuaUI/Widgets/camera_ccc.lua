@@ -198,7 +198,7 @@ options = {
 		desc = 'Getting too close to the ground allows strange camera positioning.',
 		type = 'number',
 		advanced = true,
-		min = 10, max = 500, step = 10,
+		min = 0, max = 500, step = 1,
 		value = 100,
 		OnChange = function(self) init = true; end
 	},
