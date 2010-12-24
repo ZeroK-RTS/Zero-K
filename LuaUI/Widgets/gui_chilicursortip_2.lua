@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.07 Chili Cursor Tooltips.",
+    desc      = "v0.08 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -12,11 +12,6 @@ function widget:GetInfo()
   }
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Modder's choices
-
-local SHOW_FEATURE_HP = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -113,7 +108,7 @@ end
 --]]
 options_path = 'Settings/Interface/Tooltip'
 --options_order = { 'tooltip_delay',  'statictip', 'fontsize', 'staticfontsize', 'hpshort'}
-options_order = { 'tooltip_delay',  'fontsize', 'hpshort'}
+options_order = { 'tooltip_delay',  'fontsize', 'hpshort', 'featurehp', 'hide_for_unreclaimable', }
 
 options = {
 	tooltip_delay = {
@@ -154,6 +149,22 @@ options = {
 		value = false,
 		desc = 'Shows short number for HP.',
 	},
+	featurehp = {
+		name = "Show HP on Features",
+		type = 'bool',
+		advanced = true,
+		value = false,
+		desc = 'Shows short number for HP.',
+		OnChange = function() controls['feature']=nil; end,
+	},
+	hide_for_unreclaimable = {
+		name = "Hide Tooltip for Unreclaimables",
+		type = 'bool',
+		advanced = true,
+		value = true,
+		desc = 'Shows short number for HP.',
+	},
+	
 }
 
 --------------------------------------------------------------------------------
@@ -909,39 +920,19 @@ local function MakeToolTip_UD(tt_table)
 	
 end
 
-local function MakeToolTip_UnitFeature(type, data, tooltip)
-	local unitfeature_id = data
-	local tt_fd
+
+local function MakeToolTip_Unit(type, data, tooltip)
+	local unitID = data
 	local team, fullname
-	if type == 'unit' then
-		tt_unitID = unitfeature_id
-		team = spGetUnitTeam(tt_unitID) 
-		tt_ud = UnitDefs[ spGetUnitDefID(tt_unitID) or -1]
-		
-		fullname = ((tt_ud and tt_ud.humanName) or "")	
-		
-	else -- type == feature
-		tt_fid = unitfeature_id
-		team = spGetFeatureTeam(unitfeature_id)
-		local fdid = spGetFeatureDefID(unitfeature_id)
-		tt_fd = fdid and FeatureDefs[fdid or -1]
-		local feature_name = tt_fd and tt_fd.name
-		
-		local desc = ''
-		if feature_name:find('dead2') or feature_name:find('heap') then
-			desc = ' (debris)'
-		elseif feature_name:find('dead') then
-			desc = ' (wreckage)'
-		end
-		local live_name = feature_name:gsub('([^_]*).*', '%1')
-		tt_ud = UnitDefNames[live_name]
-		
-		fullname = ((tt_ud and tt_ud.humanName .. desc) or tt_fd.tooltip or "")
-	end
+	tt_unitID = unitID
+	team = spGetUnitTeam(tt_unitID) 
+	tt_ud = UnitDefs[ spGetUnitDefID(tt_unitID) or -1]
 	
-	if not (tt_ud or tt_fd) then
+	fullname = ((tt_ud and tt_ud.humanName) or "")	
+		
+	if not (tt_ud) then
 		--fixme
-		return
+		return false
 	end
 	--local alliance       = spGetUnitAllyTeam(tt_unitID)
 	local _, player		= spGetTeamInfo(team)
@@ -951,42 +942,92 @@ local function MakeToolTip_UnitFeature(type, data, tooltip)
 	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	UpdateResourceStack( type, unitfeature_id, tt_ud or tt_fd, tooltip, ttFontSize )
+	UpdateResourceStack( type, unitID, tt_ud, tooltip, ttFontSize )
 	
+	local tt_structure = {
+		leftbar = {
+			{ name= 'bp', directcontrol = 'buildpic_unit' },
+			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0') },
+		},
+		main = {
+			{ name='uname', icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
+			{ name='utt', text = unittooltip, wrap=true },
+			{ name='hp', directcontrol = 'hp_unit', },
+			{ name='res', directcontrol = type == 'unit' and 'resources_unit' or 'resources_feature' },
+			{ name='help', text = green .. 'Space+click: Show options', },
+		},
+	}
+	
+	UpdateBuildpic( tt_ud, 'buildpic_unit' )
+	BuildTooltip2('unit', tt_structure)
+end
+
+local function MakeToolTip_Feature(type, data, tooltip)
+	local featureID = data
+	local tt_fd
+	local team, fullname
+	
+	tt_fid = featureID
+	team = spGetFeatureTeam(featureID)
+	local fdid = spGetFeatureDefID(featureID)
+	tt_fd = fdid and FeatureDefs[fdid or -1]
+	local feature_name = tt_fd and tt_fd.name
+	
+	local desc = ''
+	if feature_name:find('dead2') or feature_name:find('heap') then
+		desc = ' (debris)'
+	elseif feature_name:find('dead') then
+		desc = ' (wreckage)'
+	end
+	local live_name = feature_name:gsub('([^_]*).*', '%1')
+	tt_ud = UnitDefNames[live_name]
+	
+	fullname = ((tt_ud and tt_ud.humanName .. desc) or tt_fd.tooltip or "")
+	
+	if not (tt_fd) then
+		--fixme
+		return false
+	end
+	
+	if options.hide_for_unreclaimable.value and not tt_fd.reclaimable then
+		return false
+	end
+	
+	--local alliance       = spGetUnitAllyTeam(tt_unitID)
+	local _, player		= spGetTeamInfo(team)
+	local playerName	= player and spGetPlayerInfo(player) or 'noname'
+	local teamColor		= Chili.color2incolor(spGetTeamColor(team))
+	---local unittooltip	= tt_unitID and spGetUnitTooltip(tt_unitID) or (tt_ud and tt_ud.tooltip) or ""
+	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
+	local iconPath		= GetUnitIcon(tt_ud)
+	
+	UpdateResourceStack( type, featureID, tt_ud or tt_fd, tooltip, ttFontSize )
 	
 	local tt_structure = {
 		leftbar =
 			tt_ud and
 			{
-				type == 'unit'
-					and { name= 'bp', directcontrol = 'buildpic_unit' }
-					or { name= 'bp', directcontrol = 'buildpic_feature' },
+				{ name= 'bp', directcontrol = 'buildpic_feature' },
 				{ name='cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0'), },
 			}
 			or nil,
 		main = {
 			{ name='uname', icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
 			{ name='utt', text = unittooltip, wrap=true },
-			type == 'unit' 
-				and { name='hp', directcontrol = 'hp_unit', } 
-				or (SHOW_FEATURE_HP 
-						and { name='hp', directcontrol = 'hp_feature', } 
-						or {}),
+			(	options.featurehp.value
+					and { name='hp', directcontrol = 'hp_feature', } 
+					or {}),
 			{ name='res', directcontrol = type == 'unit' and 'resources_unit' or 'resources_feature' },
 			{ name='help', text = green .. 'Space+click: Show options', },
 		},
 	}
 	
-	if type == 'unit' then
-		UpdateBuildpic( tt_ud, 'buildpic_unit' )
-		window_tooltip_unit = BuildTooltip2('unit', tt_structure)
-	else --type == 'feature'
-		UpdateBuildpic( tt_ud, 'buildpic_feature' )
-		BuildTooltip2('feature', tt_structure)
-	end
-	
-	
+	UpdateBuildpic( tt_ud, 'buildpic_feature' )
+	BuildTooltip2('feature', tt_structure)
+	return true
 end
+
+
 
 local function CreateHpBar(name)
 	globalitems[name] = Progressbar:New {
@@ -1058,9 +1099,13 @@ local function MakeTooltip()
 	--unit(s) selected/pointed at
 	if unit_tooltip then
 		-- pointing at unit/feature
-		if type == 'unit' or type == 'feature' then
-			MakeToolTip_UnitFeature(type, data, tooltip)
+		if type == 'unit' then
+			MakeToolTip_Unit(type, data, tooltip)
 			return
+		elseif type == 'feature' then
+			if MakeToolTip_Feature(type, data, tooltip) then
+				return
+			end
 		end
 	
 		--holding meta or static tip
