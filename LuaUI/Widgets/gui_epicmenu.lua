@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.181 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.19 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -981,7 +981,7 @@ local function AssignKeyBind(hotkey, menukey, itemindex, item)
 	end
 	
 	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
-	actionName = actionName:lower()
+	--actionName = actionName:lower()
 	settings.keybounditems[actionName] = hotkey
 	AddAction(actionName, kbfunc, nil, "t")
 	Spring.SendCommands("bind " .. hotkey.mod .. hotkey.key .. " " .. actionName)
@@ -998,13 +998,20 @@ end
 -- Unsssign a keybinding from settings and other tables that keep track of related info
 local function UnassignKeyBind(menukey, item)
 	local actionName = 'epic_'.. menukey .. '_' .. item.key
-	actionName = actionName:lower()
 	if item.action then
-		actionName = item.action:lower()
+		actionName = item.action
 		local uikey_hotkey_str = GetUikeyHotkeyStr(actionName)
-		Spring.SendCommands("unbind " .. uikey_hotkey_str .. ' ' .. actionName)
+		if uikey_hotkey_str then
+			-- unbindaction doesn't work on a command+params, must be command only!
+			local actionName_split = explode(' ', actionName)
+			local actionName_cmd = actionName_split[1]
+			--echo('unassign', "unbind " .. uikey_hotkey_str .. ' ' .. actionName_cmd)
+			Spring.SendCommands("unbind " .. uikey_hotkey_str .. ' ' .. actionName_cmd) 
+			--Spring.SendCommands("unbindaction " .. actionName)
+		end
 	else
-		Spring.SendCommands("unbindaction " .. actionName)
+		--echo('unassign', "unbindaction " .. actionName)
+		Spring.SendCommands("unbindaction " .. actionName:lower()) -- this only works if lowercased, even if /keyprint says otherwise!
 	end
 	settings.keybounditems[actionName] = nil
 end
@@ -1211,9 +1218,8 @@ local function flattenTree(tree, parent)
 			--Keybindings
 			if option.type == 'button' or option.type == 'bool' then
 				local actionName = 'epic_' .. fullkey
-				actionName = actionName:lower()
 				if option.action then
-					actionName = option.action:lower()
+					actionName = option.action
 				end
 				
 				local uikey_hotkey_str = GetUikeyHotkeyStr(actionName)
@@ -1301,7 +1307,6 @@ end
 local function GetHotkeyData(key, item)
 	local itemkey = item.key
 	local actionName = item.action or ('epic_' .. key .. '_' .. itemkey)
-	actionName = actionName:lower()
 	local hotkey = settings.keybounditems[actionName]
 	if hotkey then
 		return hotkey, GetReadableHotkeyMod(hotkey.mod) .. hotkey.key
@@ -1829,7 +1834,8 @@ function widget:Initialize()
 	
 	WG.crude.ResetKeys = function()
 		for actionName,_ in pairs(settings.keybounditems) do
-			local actionNameL = actionName:lower()
+			--local actionNameL = actionName:lower()
+			local actionNameL = actionName
 			Spring.SendCommands({"unbindaction " .. actionNameL})
 		end
 		settings.keybounditems = {}

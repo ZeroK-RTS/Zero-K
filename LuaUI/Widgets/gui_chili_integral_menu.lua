@@ -89,8 +89,8 @@ for cmd, _ in pairs(overrides) do
 		options[cmdname] = {
 			name = cmdname,
 			type = 'button',
-			action = cmdname,
-			path = 'Game/Settings/Commands',
+			action = cmdname:lower(),
+			path = 'Game/Hotkeys/Commands',
 		}
 	end
 	options_order[#options_order+1] = cmdname
