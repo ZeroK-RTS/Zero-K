@@ -398,29 +398,29 @@ AimFromWeapon1(piecenum)
 
 QueryWeapon1(piecenum)
 {
-if (gun1 == 1)
+	if (gun1 == 1)
 	{
-	piecenum = rf1;
+		piecenum = rf1;
 	}
-if (gun1 == 2)
+	if (gun1 == 2)
 	{
-	piecenum = lf1;
+		piecenum = lf1;
 	}
-if (gun1 == 3)
+	if (gun1 == 3)
 	{
-	piecenum = rf2;
+		piecenum = rf2;
 	}
-if (gun1 == 4)
+	if (gun1 == 4)
 	{
-	piecenum = lf2;
+		piecenum = lf2;
 	}
-if (gun1 == 5)
+	if (gun1 == 5)
 	{
-	piecenum = rf3;
+		piecenum = rf3;
 	}
-if (gun1 == 0)
+	if (gun1 == 0)
 	{
-	piecenum = lf3;
+		piecenum = lf3;
 	}
 }
 
@@ -510,13 +510,13 @@ AimFromWeapon2(piecenum)
 
 QueryWeapon2(piecenum)
 {
-if (gun2 == 0)
+	if (gun2 == 0)
 	{
-	piecenum = flame1;
+		piecenum = flame1;
 	}
-if (gun2 == 1)
+	if (gun2 == 1)
 	{
-	piecenum = flame2;
+		piecenum = flame2;
 	}
 }
 

@@ -101,9 +101,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 160,
-        planes  = 160,
-        subs    = 7,
+        default = 180,
+        planes  = 180,
+        subs    = 9,
       },
 
       explosionGenerator      = [[custom:EMG_HIT]],
@@ -116,7 +116,7 @@ unitDef = {
       noSelfDamage            = true,
       propeller               = [[1]],
       range                   = 460,
-      reloadtime              = 2,
+      reloadtime              = 3,
       renderType              = 1,
       selfprop                = true,
       soundHit                = [[chickens/spike_hit]],
@@ -128,7 +128,7 @@ unitDef = {
       weaponAcceleration      = 100,
       weaponTimer             = 1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 320,
+      weaponVelocity          = 280,
     },
 
   },

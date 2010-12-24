@@ -211,6 +211,18 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	EmitSfx(body, 1025)
+	Explode(body, sfxFall)
+	Explode(head, sfxFall)
+	Explode(tail, sfxFall)
+	Explode(leftWing, sfxFall)
+	Explode(rightWing, sfxFall)
+	Explode(spike1, sfxFall)
+	Explode(spike2, sfxFall)
+	Explode(spike3, sfxFall)
+	Explode(leftThigh, sfxFall)
+	Explode(rightThigh, sfxFall)
+	Explode(leftShin, sfxFall)
+	Explode(rightShin, sfxFall)
 end
 
 function script.HitByWeapon(x, z, weaponID, damage)

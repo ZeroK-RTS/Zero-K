@@ -46,7 +46,7 @@ unitDef = {
   minCloakDistance       = 250,
   movementClass          = [[AKBOT6]],
   noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM SATELLITE]],
+  noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],
   objectName             = [[chickenflyerqueen.s3o]],
   power                  = 65536,
   script                 = [[chickenlandqueen.lua]],
@@ -75,7 +75,7 @@ unitDef = {
   trackType              = [[ChickenTrack]],
   trackWidth             = 100,
   turnRate               = 399,
-  upright                = false,
+  upright                = true,
   workerTime             = 0,
 
   weapons                = {
@@ -174,20 +174,21 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 800,
-        planes  = 800,
-        subs    = 800,
+        default = 1600,
+        planes  = 1600,
+        subs    = 1600,
       },
 
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:NONE]],
+	  --projectiles			  = 2,
       impulseBoost            = 0,
       impulseFactor           = 1,
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
       range                   = 200,
-      reloadtime              = 0.8,
+      reloadtime              = 1.6,
       size                    = 0,
       soundStart              = [[chickens/bigchickenbreath]],
       startsmoke              = [[0]],
