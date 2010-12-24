@@ -1,7 +1,6 @@
 #define TA			// This is a TA script
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, pelvis, torso, tail, flagellum, ruparm, rarm, rshield,
 lshield, luparm, larm, rupleg, lupleg, lleg, rleg, rfoot, lfoot, 
@@ -29,29 +28,29 @@ lua_FlameShot(weapon) //flame effect?
 
 RestoreAfterDelay()
 {
-sleep 3200;
-//torso	
-if (dead ==0)
+	sleep 8000;
+	//torso	
+	if (dead ==0)
 	{
-turn torso to x-axis <0.000000> speed <250.000000>;
-turn torso to y-axis <0.000000> speed <250.000000>;
-turn torso to z-axis <0.000000> speed <250.000000>;	
-
-turn ruparm to x-axis <0.000000> speed <250.000000>; 
-turn ruparm to y-axis <0.000000> speed <250.000000>; 
-turn ruparm to z-axis <0.000000> speed <250.000000>; 
-turn rarm to x-axis <0.000000> speed <250.000000>;      //up 2
-turn rarm to y-axis <0.000000> speed <250.000000>;  
-turn rarm to z-axis <0.000000> speed <250.000000>;    //up -12
-turn flagellum to x-axis (<0>) speed <90>;
-//left
-turn luparm to x-axis <0.000000> speed <250.000000>;       //up -9
-turn luparm to y-axis <0.000000> speed <250.000000>;  
-turn luparm to z-axis <0.000000> speed <250.000000>;  
-turn larm to x-axis <0.000000> speed <250.000000>;       //up 5
-turn larm to y-axis <0.000000> speed <250.000000>;       //up -3
-turn larm to z-axis <0.000000> speed <250.000000>;       //up 22
-bAiming = 0;
+		turn torso to x-axis <0.000000> speed <250.000000>;
+		turn torso to y-axis <0.000000> speed <250.000000>;
+		turn torso to z-axis <0.000000> speed <250.000000>;	
+		
+		turn ruparm to x-axis <0.000000> speed <250.000000>; 
+		turn ruparm to y-axis <0.000000> speed <250.000000>; 
+		turn ruparm to z-axis <0.000000> speed <250.000000>; 
+		turn rarm to x-axis <0.000000> speed <250.000000>;      //up 2
+		turn rarm to y-axis <0.000000> speed <250.000000>;  
+		turn rarm to z-axis <0.000000> speed <250.000000>;    //up -12
+		turn flagellum to x-axis (<0>) speed <90>;
+		//left
+		turn luparm to x-axis <0.000000> speed <250.000000>;       //up -9
+		turn luparm to y-axis <0.000000> speed <250.000000>;  
+		turn luparm to z-axis <0.000000> speed <250.000000>;  
+		turn larm to x-axis <0.000000> speed <250.000000>;       //up 5
+		turn larm to y-axis <0.000000> speed <250.000000>;       //up -3
+		turn larm to z-axis <0.000000> speed <250.000000>;       //up 22
+	bAiming = 0;
 	}
 }
 
@@ -319,22 +318,20 @@ MotionControl(moving, aiming, justmoved)
 
 Toggle(t,value) 
 {
-
-if(t==1)
+	if(t==1)
 	{
-if(value==0)
-{
-sleep 100;  //10th second
-aimer = 1;  //normaly 1
-}
-
-if(value==1)
-{
-sleep 100;  //10th second
-aimer = 2;  //normaly 2
-}
+		if(value==0)
+		{
+		sleep 100;  //10th second
+		aimer = 1;  //normaly 1
+		}
+		
+		if(value==1)
+		{
+		sleep 100;  //10th second
+		aimer = 2;  //normaly 2
+		}
 	}
-
 }
 
 Create()
@@ -571,6 +568,7 @@ if (gun1 == 0)
 
 AimWeapon3(Func_Var_1, Func_Var_2)
 {
+	signal SIG_AIM;
 	signal SIG_AIM_3;
 	set-signal-mask SIG_AIM_3;
 	bAiming = TRUE;
@@ -591,6 +589,7 @@ AimWeapon3(Func_Var_1, Func_Var_2)
 	turn larm to x-axis <20.000000> - Func_Var_2 speed <250.000000>;
 	wait-for-turn torso around y-axis;
 	wait-for-turn larm around x-axis;  //need to make sure!
+	start-script RestoreAfterDelay();
 	return (1);
 	}
 }
@@ -714,8 +713,8 @@ burn()
 
 Killed(severity, corpsetype)
 {
-dead = 1;
-turn torso to y-axis <0> speed <500.000000>;
+	dead = 1;
+	turn torso to y-axis <0> speed <200.000000>;
 	
 	if( severity <= 50 ) { corpsetype = 1; }
 	if( severity <= 98 )
@@ -752,11 +751,10 @@ turn torso to y-axis <0> speed <500.000000>;
 		explode ruparm type BITMAPONLY;
 		explode rupleg type BITMAPONLY;
 		explode torso type BITMAPONLY;
-    	corpsetype = 3;
+    	corpsetype = 2;
 	}
 	if( severity >= 99 )
 	{
-		corpsetype = 3;
 		explode pelvis type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP4;
 		explode luparm type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP1;
 		explode lleg type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
@@ -766,7 +764,7 @@ turn torso to y-axis <0> speed <500.000000>;
 		explode ruparm type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
 		explode rupleg type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
 		explode torso type SHATTER | EXPLODE_ON_HIT | BITMAP5;
-		corpsetype = 3;
+		corpsetype = 2;
 	}
 
 }
