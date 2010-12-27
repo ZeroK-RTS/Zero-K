@@ -16,6 +16,10 @@ unitDef = {
   canPatrol           = true,
   canstop             = [[1]],
   category            = [[LAND]],
+  collisionVolumeOffsets        = [[0 0 0]],
+  collisionVolumeScales         = [[44 34 60]],
+  collisionVolumeTest           = 1,
+  collisionVolumeType           = [[cylZ]],
   corpse              = [[DEAD]],
 
   customParams        = {
