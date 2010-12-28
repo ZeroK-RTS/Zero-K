@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.081 Chili Cursor Tooltips.",
+    desc      = "v0.082 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -154,7 +154,7 @@ options = {
 		type = 'bool',
 		advanced = true,
 		value = false,
-		desc = 'Shows short number for HP.',
+		desc = 'Shows healthbar for features.',
 		OnChange = function() controls['feature']=nil; end,
 	},
 	hide_for_unreclaimable = {
@@ -162,7 +162,7 @@ options = {
 		type = 'bool',
 		advanced = true,
 		value = true,
-		desc = 'Shows short number for HP.',
+		desc = 'Don\'t show the tooltip for unreclaimable features.',
 	},
 	
 }
