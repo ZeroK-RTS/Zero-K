@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.082 Chili Cursor Tooltips.",
+    desc      = "v0.09 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -155,7 +155,11 @@ options = {
 		advanced = true,
 		value = false,
 		desc = 'Shows healthbar for features.',
-		OnChange = function() controls['feature']=nil; end,
+		OnChange = function() 
+			--fixme: dispose?
+			controls['feature']=nil; 
+			controls['corpse']=nil; 
+		end,
 	},
 	hide_for_unreclaimable = {
 		name = "Hide Tooltip for Unreclaimables",
@@ -398,8 +402,7 @@ end
 
 local function SetHealthbar()
 	if 
-		not tt_ud 
-		or not (tt_unitID or tt_fid)
+		not ( tt_ud or tt_unitID or tt_fid )
 		then 
 		return 'err' 
 	end
@@ -412,7 +415,7 @@ local function SetHealthbar()
 		tt_healthbar = globalitems.hp_unit
 	elseif tt_fid then
 		health, maxhealth = Spring.GetFeatureHealth(tt_fid)
-		tt_healthbar = globalitems.hp_feature
+		tt_healthbar = tt_ud and globalitems.hp_corpse or globalitems.hp_feature
 	end
 	
 	if health then
@@ -462,10 +465,9 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 	local color_m = {1,1,1,1}
 	local color_e = {1,1,1,1}
 	
-	local resource_tt_name = 'resources_unit'
+	local resource_tt_name = 'resources_' .. tooltip_type
 	
-	if tooltip_type == 'feature' then
-		resource_tt_name = 'resources_feature'
+	if tooltip_type == 'feature' or tooltip_type == 'corpse' then
 		metal = ud.metal
 		energy = ud.energy
 		
@@ -474,8 +476,7 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 			metal = m or metal
 			energy =  e or energy
 		end
-		
-	else
+	else --tooltip_type == 'unit'
 		local metalMake, metalUse, energyMake, energyUse = Spring.GetUnitResources(unitID)
 		
 		if metalMake then
@@ -506,7 +507,7 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 		
 	end
 	
-	if tooltip_type == 'feature' then
+	if tooltip_type == 'feature' or tooltip_type == 'corpse' then
 		color_m = {1,1,1,1}
 		color_e = {1,1,1,1}
 	else
@@ -921,7 +922,7 @@ local function MakeToolTip_UD(tt_table)
 end
 
 
-local function MakeToolTip_Unit(type, data, tooltip)
+local function MakeToolTip_Unit(data, tooltip)
 	local unitID = data
 	local team, fullname
 	tt_unitID = unitID
@@ -942,7 +943,7 @@ local function MakeToolTip_Unit(type, data, tooltip)
 	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	UpdateResourceStack( type, unitID, tt_ud, tooltip, ttFontSize )
+	UpdateResourceStack( 'unit', unitID, tt_ud, tooltip, ttFontSize )
 	
 	local tt_structure = {
 		leftbar = {
@@ -953,7 +954,7 @@ local function MakeToolTip_Unit(type, data, tooltip)
 			{ name='uname', icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
 			{ name='utt', text = unittooltip, wrap=true },
 			{ name='hp', directcontrol = 'hp_unit', },
-			{ name='res', directcontrol = type == 'unit' and 'resources_unit' or 'resources_feature' },
+			{ name='res', directcontrol = 'resources_unit' },
 			{ name='help', text = green .. 'Space+click: Show options', },
 		},
 	}
@@ -962,7 +963,7 @@ local function MakeToolTip_Unit(type, data, tooltip)
 	BuildTooltip2('unit', tt_structure)
 end
 
-local function MakeToolTip_Feature(type, data, tooltip)
+local function MakeToolTip_Feature(data, tooltip)
 	local featureID = data
 	local tt_fd
 	local team, fullname
@@ -1001,7 +1002,7 @@ local function MakeToolTip_Feature(type, data, tooltip)
 	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	UpdateResourceStack( type, featureID, tt_ud or tt_fd, tooltip, ttFontSize )
+	UpdateResourceStack( tt_ud and 'corpse' or 'feature', featureID, tt_ud or tt_fd, tooltip, ttFontSize )
 	
 	local tt_structure = {
 		leftbar =
@@ -1015,15 +1016,20 @@ local function MakeToolTip_Feature(type, data, tooltip)
 			{ name='uname', icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
 			{ name='utt', text = unittooltip, wrap=true },
 			(	options.featurehp.value
-					and { name='hp', directcontrol = 'hp_feature', } 
+					and { name='hp', directcontrol = (tt_ud and 'hp_corpse' or 'hp_feature'), } 
 					or {}),
-			{ name='res', directcontrol = type == 'unit' and 'resources_unit' or 'resources_feature' },
+			{ name='res', directcontrol = tt_ud and 'resources_corpse' or 'resources_feature' },
 			{ name='help', text = green .. 'Space+click: Show options', },
 		},
 	}
 	
-	UpdateBuildpic( tt_ud, 'buildpic_feature' )
-	BuildTooltip2('feature', tt_structure)
+	
+	if tt_ud then
+		UpdateBuildpic( tt_ud, 'buildpic_feature' )
+		BuildTooltip2('corpse', tt_structure)
+	else
+		BuildTooltip2('feature', tt_structure)
+	end
 	return true
 end
 
@@ -1058,7 +1064,7 @@ local function MakeTooltip()
 	old_ttstr = cur_ttstr
 	
 	tt_unitID = nil
-	 tt_ud = nil
+	tt_ud = nil
 
 	--chili control tooltip
 	if screen0.currentTooltip ~= nil 
@@ -1100,10 +1106,10 @@ local function MakeTooltip()
 	if unit_tooltip then
 		-- pointing at unit/feature
 		if type == 'unit' then
-			MakeToolTip_Unit(type, data, tooltip)
+			MakeToolTip_Unit(data, tooltip)
 			return
 		elseif type == 'feature' then
-			if MakeToolTip_Feature(type, data, tooltip) then
+			if MakeToolTip_Feature(data, tooltip) then
 				return
 			end
 		end
@@ -1212,6 +1218,7 @@ function widget:Initialize()
 
 	CreateHpBar('hp_unit')
 	CreateHpBar('hp_feature')
+	CreateHpBar('hp_corpse')
 	
 	
 	stack_main = StackPanel:New{
