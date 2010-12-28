@@ -74,7 +74,7 @@ local widget_categorize = true
 --------------------------------------------------------------------------------
 -- Misc
 local B_HEIGHT = 26
-local C_HEIGHT = 20
+local C_HEIGHT = 16
 
 local scrH, scrW = 0,0
 local cycle = 1
@@ -1672,15 +1672,15 @@ local function MakeCrudeMenu()
 						
 				children = {
 					--GAME LOGO GOES HERE
-					Image:New{ tooltip = title_text, file=LUAUI_DIRNAME .. 'Images/ranks/PWstar.png', height=B_HEIGHT, width=B_HEIGHT, },
+					Image:New{ tooltip = title_text, file = LUAUI_DIRNAME .. 'Images/ZK_logo.png', height=B_HEIGHT, width=B_HEIGHT, },
 					
 					--Button:New{caption = "Game", OnMouseUp = { function() MakeSubWindow(game_menu_index) end, }, backgroundColor=color.game_bg, textColor=color.game_fg, height=B_HEIGHT, width=60, },
-					Image:New{ tooltip = 'Game Actions', file=LUAUI_DIRNAME .. 'Images/advplayerslist/units.png', OnClick = { function() MakeSubWindow(game_menu_index) end, },  height=B_HEIGHT, width=B_HEIGHT, },
+					Image:New{ tooltip = 'Game Actions', file=LUAUI_DIRNAME .. 'Images/epicmenu/game.png',OnClick = { function() MakeSubWindow(game_menu_index) end, }, height=B_HEIGHT, width=B_HEIGHT,},
 					
 					--Button:New{caption = "Settings", OnMouseUp = { function() MakeSubWindow(main_menu_index) end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=60, },
-					Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/advplayerslist/settings.png', OnClick = { function() MakeSubWindow(main_menu_index) end, }, height=B_HEIGHT,width=B_HEIGHT, },
+					Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', OnClick = { function() MakeSubWindow(main_menu_index) end, }, height=B_HEIGHT,width=B_HEIGHT, },
 					
-					Image:New{ file=LUAUI_DIRNAME .. 'Images/advplayerslist/move.png', OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, height=B_HEIGHT, width=B_HEIGHT, tooltip="Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)"},
+					Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, height=B_HEIGHT, width=B_HEIGHT, tooltip="Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)"},
 					
 					Grid:New{
 						height = '100%',
@@ -1774,9 +1774,9 @@ local function MakeCrudeMenu()
 					},
 					
 					--Button:New{caption = "?", OnMouseUp = { function() MakeSubWindow(help_menu_index) end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=35, },
-					Image:New{ tooltip = 'Help', file2= LUAUI_DIRNAME .. 'Images/advplayerslist/button.png', file=LUAUI_DIRNAME .. 'Images/advplayerslist/random.png', OnClick = { function() MakeSubWindow(help_menu_index) end, },  height=B_HEIGHT,width=B_HEIGHT,  },
+					Image:New{ tooltip = 'Help', file=LUAUI_DIRNAME .. 'Images/epicmenu/questionmark.png', OnClick = { function() MakeSubWindow(help_menu_index) end, }, height=B_HEIGHT,width=B_HEIGHT,  },
 					--Button:New{caption = "Quit", OnMouseUp = { function() spSendCommands{"quitmenu"} end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=45, },
-					Image:New{ tooltip = 'Exit the game...', file2= LUAUI_DIRNAME .. 'Images/advplayerslist/button.png', file=LUAUI_DIRNAME .. 'Images/advplayerslist/cross.png', OnClick = { function() spSendCommands{"quitmenu"} end, },  height=B_HEIGHT, width=B_HEIGHT,},
+					Image:New{ tooltip = 'Exit the game...', file=LUAUI_DIRNAME .. 'Images/epicmenu/quit.png', OnClick = { function() spSendCommands{"quitmenu"} end, },  height=B_HEIGHT, width=B_HEIGHT,},
 				}
 			}
 		}
