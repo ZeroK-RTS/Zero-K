@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat",
-    desc      = "v0.40 Chili Chat Console.",
+    desc      = "v0.41 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -36,8 +36,9 @@ local myName -- my console name
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local stack_console = nil
-local scrollpanel1 = nil
+local stack_console
+local scrollpanel1
+local inputspace
 WG.enteringText = false
 
 --------------------------------------------------------------------------------
@@ -173,6 +174,8 @@ options = {
 		OnChange = function(self) 
 			scrollpanel1.backgroundColor = {1,1,1,self.value}
 			scrollpanel1:Invalidate() 
+			inputspace.backgroundColor = {1,1,1,self.value}
+			inputspace:Invalidate()
 		end,
 	},
 	mousewheel = {
@@ -429,7 +432,7 @@ function widget:Update(s)
 		timer = 0
 		spSendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
 			window_console.x / screen0.width + 0.004, 
-			1 - (window_console.y + window_console.height) / screen0.height + 0.01, 
+			1 - (window_console.y + window_console.height) / screen0.height + 0.005, 
 			window_console.width / screen0.width)})
 	end
 end
@@ -453,6 +456,8 @@ function widget:Initialize()
 	
 	Spring.SendCommands("bind Any+enter  chat")
 	
+	local inputsize = 33
+	
 	stack_console = StackPanel:New{
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
@@ -466,6 +471,14 @@ function widget:Initialize()
 		autosize = true,
 		preserveChildrenOrder=true,
 	}
+	inputspace = ScrollPanel:New{
+		x = 0,
+		bottom = 0,
+		right=5,
+		height = inputsize,
+		backgroundColor = {1,1,1,options.backgroundOpacity.value},
+		--backgroundColor = {1,1,1,1},
+	}
 	
 	scrollpanel1 = ScrollPanel:New{
 		--margin = {5,5,5,5},
@@ -474,7 +487,7 @@ function widget:Initialize()
 		y = 0,
 		width = '100%',
 		--height = '100%',
-		bottom = 35, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times!
+		bottom = inputsize+2, -- This line is temporary until chili is fixed so that ReshapeConsole() works both times!
 		verticalSmartScroll = true,
 		disableChildrenHitTest = true,
 		--skinName="EmptyScrollbar",
@@ -506,6 +519,7 @@ function widget:Initialize()
 		color = {0,0,0,0},
 		children = {
 			scrollpanel1,
+			inputspace,
 		},
 	}
 	
