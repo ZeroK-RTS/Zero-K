@@ -618,7 +618,7 @@ local function MakeFlags()
 	flagChildren[#flagChildren + 1] = Button:New{ 
 		caption = 'Auto', 
 		country = myCountry, 
-		countryLang = 'en',
+		countryLang = country_langs[myCountry] or 'en',
 		width='50%',
 		textColor = color.sub_button_fg,
 		backgroundColor = color.sub_button_bg, 
@@ -660,7 +660,7 @@ local function MakeFlags()
 						columns=2,
 						x=0,y=0,
 						width='100%',
-						height=#flagChildren/2*B_HEIGHT*.75,
+						height=#flagChildren/2*B_HEIGHT*1,
 						children = flagChildren,
 					}
 				}
@@ -1696,7 +1696,7 @@ local function MakeCrudeMenu()
 						
 						children = {
 							--Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
-							Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/vol.png', width= 18,height= 18, },
+							Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width= 18,height= 18, },
 							Trackbar:New{
 								tooltip = 'Volume',
 								height=15,
@@ -1706,7 +1706,7 @@ local function MakeCrudeMenu()
 								OnChange = { function(self)	Spring.SendCommands{"set snd_volmaster " .. self.value} end	},
 							},
 							
-							Image:New{ tooltip = 'Music', file=LUAUI_DIRNAME .. 'Images/vol_music.png', width= 18,height= 18, },
+							Image:New{ tooltip = 'Music', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol_music.png', width= 18,height= 18, },
 							Trackbar:New{
 								tooltip = 'Music',
 								height=15,
@@ -1890,11 +1890,11 @@ function widget:Initialize()
 	end
 	
 	if not settings.country or settings.country == 'wut' then
-		settings.country = 'wut'
 		myCountry = select(8, Spring.GetPlayerInfo( Spring.GetLocalPlayerID() ) ) 
-		if myCountry and myCountry ~= '' then
-			settings.country = myCountry
+		if not myCountry or myCountry == '' then
+			myCountry = 'wut'
 		end
+		settings.country = myCountry
 	end
 	
 	-- Add actions for keybinds
