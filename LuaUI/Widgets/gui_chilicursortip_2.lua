@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.09 Chili Cursor Tooltips.",
+    desc      = "v0.091 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -402,7 +402,7 @@ end
 
 local function SetHealthbar()
 	if 
-		not ( tt_ud or tt_unitID or tt_fid )
+		not ( tt_unitID or tt_fid )
 		then 
 		return 'err' 
 	end
