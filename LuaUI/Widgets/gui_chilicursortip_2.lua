@@ -431,7 +431,7 @@ local function SetHealthbar()
 		
 	else
 		tt_healthbar.color = {0,0,0.5, 1}
-		local maxhealth = tt_ud.health
+		local maxhealth = (tt_fd and tt_fd.health) or (tt_ud and tt_ud.health) or 0
 		tt_healthbar:SetValue(1)
 		if options.hpshort.value then
 			tt_healthbar:SetCaption('??? / ' .. numformat(maxhealth))
