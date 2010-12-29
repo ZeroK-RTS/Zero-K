@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.19 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.20 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1181,10 +1181,11 @@ local function flattenTree(tree, parent)
 				origOnChange(option)
 			end
 			
-			-- [[ doesn't work right for non-buttons
+			--[[ doesn't work right for non-buttons
 			if option.windex and option.type == 'button' then 
 				option.OnChange = function(self)
 					--controlfunc(self)
+					echo '11'
 					origOnChange(option)
 				end
 				if widgetHandler.widgets[option.windex].options then
@@ -1195,6 +1196,7 @@ local function flattenTree(tree, parent)
 					elseif not widgetHandler.widgets[option.windex].options[option.key] then
 						echo('<EPIC Menu> Error #77', option.windex, option.key)
 					else
+						echo '22'
 						widgetHandler.widgets[option.windex].options[option.key].OnChange = function(self)
 							controlfunc(self)
 							--origOnChange(option)
@@ -2033,7 +2035,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		or key == KEYSYMS.RSHIFT
 		or key == KEYSYMS.LMETA
 		or key == KEYSYMS.RMETA
-		--or key == KEYSYMS.SPACE
+		or key == KEYSYMS.SPACE
 		then
 		
 		return

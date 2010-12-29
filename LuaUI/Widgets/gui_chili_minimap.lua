@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.85 Chili Minimap",
+    desc      = "v0.851 Chili Minimap",
     author    = "Licho, tweaked by CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -119,7 +119,8 @@ local function MakeMinimapButton(file, pos, option )
 				and (' (' .. options[option].desc ..')') 
 				or '' 
 				),
-		OnClick={ function(self) options[option].OnChange() end }, 
+		--OnClick={ function(self) options[option].OnChange() end }, 
+		OnClick={ function(self) Spring.SendCommands( options[option].action ); end }, 
 	}
 end
 
