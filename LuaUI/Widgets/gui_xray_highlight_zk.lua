@@ -1,21 +1,11 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---
---  file:    gui_xray_Highlight.lua
---  brief:   xray Highlight
---  author:  Dave Rodgers
---
---  Copyright (C) 2007.
---  Licensed under the terms of the GNU GPL, v2 or later.
---
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function widget:GetInfo()
   return {
-    name      = "XrayHighlight",
-    desc      = "XrayHighlight",
-    author    = "trepan/TheFatController",
+    name      = "XrayHighlight-ZK",
+    desc      = "XrayHighlight ZK",
+    author    = "trepan/TheFatController - CarRepairer tweak",
     date      = "Jul 15, 2007",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
@@ -71,7 +61,11 @@ local edgeExponent = 2.5
 
 local doFeatures = false
 
-local featureColor = { 0.7, 0.7, 0.7 }
+local featureColor 	= { 1, 0, 1 }
+local myColor 		= { 0, 1, 1 }
+local allyColor 	= { 1, 1, 0 }
+local enemyColor 	= { 1, 0, 0 }
+
 
 -- looks a lot nicer, esp. without FSAA  (but eats into the FPS too much)
 local smoothPolys = glSmoothing and true
@@ -157,6 +151,14 @@ end
 local teamColors = {}
 
 local function SetTeamColor(teamID)
+	if teamID == Spring.GetMyTeamID() then
+		glColor(myColor)
+	elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
+		glColor(allyColor)
+	else
+		glColor(enemyColor)
+	end
+--[[
   local color = teamColors[teamID]
   if (color) then
     glColor(color)
@@ -169,6 +171,7 @@ local function SetTeamColor(teamID)
     glColor(color)
     return
   end
+  --]]
 end
 
 --------------------------------------------------------------------------------
