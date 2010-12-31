@@ -48,6 +48,10 @@ local function RestoreAfterDelay()
 	Sleep(1000)
 end
 
+-- used for queen morph - blank in this case as it does nothing
+function MorphFunc()
+end
+
 local function Fly()
 	if (isMoving) then
 		Turn(leftWing, z_axis, -wingAngle, wingSpeed)

@@ -84,13 +84,6 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
-    {
-      def                = [[PARALYZER]],
-      onlyTargetCategory = [[NONE]],
-    },
-
-
     {
       def                = [[CORKROG_ROCKET]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
@@ -232,52 +225,6 @@ unitDef = {
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 400,
     },
-
-
-    PARALYZER      = {
-      name                    = [[Paralyzer]],
-      areaOfEffect            = 8,
-      beamlaser               = 1,
-      beamTime                = 0.1,
-      collideFriendly         = false,
-      coreThickness           = 0.1,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default        = 1200,
-        commanders     = 120,
-        empresistant75 = 300,
-        empresistant99 = 12,
-        planes         = 12,
-      },
-
-      duration                = 0.01,
-      explosionGenerator      = [[custom:NONE]],
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      intensity               = 0,
-      interceptedByShieldType = 1,
-      laserFlareSize          = 0,
-      lineOfSight             = true,
-      minbarrelangle          = [[0]],
-      noSelfDamage            = true,
-      paralyzer               = true,
-      paralyzeTime            = 1,
-      range                   = 465,
-      reloadtime              = 1,
-      renderType              = 0,
-      rgbColor                = [[1 1 0]],
-      soundTrigger            = true,
-      targetMoveError         = 0.3,
-      thickness               = 1.2,
-      tolerance               = 10000,
-      turret                  = true,
-      weaponType              = [[BeamLaser]],
-      weaponVelocity          = 800,
-    },
-
   },
 
 

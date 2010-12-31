@@ -42,6 +42,8 @@ local lowRangeSwarmieeArray = {
 	"armroy",
 	"armsub",
 	"corsub",
+	
+	"chickens",
 }
 
 local medRangeSwarmieeArray = { 
@@ -64,6 +66,8 @@ local medRangeSwarmieeArray = {
 	"armroy",
 	"armsub",
 	"corsub",
+	
+	"chickens",
 }
 
 local longRangeSwarmieeArray = { 

@@ -176,11 +176,13 @@ end
 local allyTeams = Spring.GetAllyTeamList()
 local allyTeamCount = 0
 Spring.Echo("TEAM DATA")
-for i,v in ipairs(allyTeams) do 
-	Spring.Echo(i.."\t"..v) 
-	allyTeamCount = allyTeamCount + 1
+for i=0, #allyTeams do 
+	if allyTeams[i] then
+		Spring.Echo(i.."\t"..allyTeams[i]) 
+		allyTeamCount = allyTeamCount + 1
+	end
 end
-if allyTeamCount > 3 then	--chicken, players, gaia, and unidentified team
+if allyTeamCount > 2 then	--chicken, players, gaia?
 	--pvp = true
 	Spring.Echo("Chicken: PvP mode detected")
 end	
@@ -954,6 +956,8 @@ function gadget:GameFrame(n)
 		--Spring.SpawnCEG("dirt", x, y, z)	--helps mask the transition
 		Spring.MoveCtrl.SetHeading(queenID, heading)
 		Spring.MoveCtrl.Disable(queenID)
+		local env = Spring.UnitScript.GetScriptEnv(queenID)
+		Spring.UnitScript.CallAsUnit(queenID, env.MorphFunc)
 		--health handling
 		local _,newMaxHealth         = Spring.GetUnitHealth(queenID)
 		local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth

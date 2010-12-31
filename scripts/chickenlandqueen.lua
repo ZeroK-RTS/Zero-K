@@ -56,6 +56,13 @@ local function RestoreAfterDelay()
 	Sleep(1000)
 end
 
+-- used for queen morph
+function MorphFunc()
+	--Move(body, y_axis, 100)
+	--Sleep(33)
+	--Move(body, y_axis, 0, 60)
+end
+
 local function Stomp(piece)
 	local health, maxHealth = spGetUnitHealth(unitID)
 	if (health/maxHealth) < healthStomp then EmitSfx(piece, 4096 + 5) end

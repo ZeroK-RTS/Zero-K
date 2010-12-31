@@ -62,7 +62,6 @@ unitDef = {
   smoothAnim          = true,
   sonarDistance       = 500,
   steeringmode        = [[2]],
-  TEDClass            = [[AKBOT2]],
   trackOffset         = 6,
   trackStrength       = 8,
   trackStretch        = 1,

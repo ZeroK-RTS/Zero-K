@@ -1,7 +1,6 @@
 #define TA			// This is a TA script
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  head, torso, hips, mpack, rgunflare, lgunflare, eyeflare, rmispoint,
        lmispoint, rleg, rthigh, lthigh, lleg, ltoes, lheel, rtoes,
@@ -777,19 +776,6 @@ AimWeapon2(heading, pitch)
 	return (1);
 }
 
-AimWeapon3(heading, pitch)
-{
-	while (TRUE)
-	{
-		if (fire)
-		{
-			fire = 0;
-			return (1);
-		}
-	sleep 10;
-	}
-}
-
 AimWeapon1(heading, pitch)
 {
 	signal SIG_AIM;
@@ -801,7 +787,7 @@ AimWeapon1(heading, pitch)
 	return (1);
 }
 
-AimWeapon4(heading, pitch)
+AimWeapon3(heading, pitch)
 {
 	signal SIG_AIM_4;
 	set-signal-mask SIG_AIM_4;
@@ -840,10 +826,6 @@ FireWeapon2()
 	}
 }
 
-FireWeapon3() {
-	return (0);
-}
-
 FireWeapon1()
 {
 	show eyeflare;
@@ -851,7 +833,7 @@ FireWeapon1()
 	hide eyeflare;
 }
 
-FireWeapon4()
+FireWeapon3()
 {
 	if( gun_3 == 1 )
 	{
@@ -870,17 +852,12 @@ AimFromWeapon2(piecenum)
 	piecenum = torso;
 }
 
-AimFromWeapon3(piecenum)
-{
-	piecenum = torso;
-}
-
 AimFromWeapon1(piecenum)
 {
 	piecenum = torso;
 }
 
-AimFromWeapon4(piecenum)
+AimFromWeapon3(piecenum)
 {
 	piecenum = mpack;
 }
@@ -897,24 +874,12 @@ QueryWeapon2(piecenum)
 	}
 }
 
-QueryWeapon3(piecenum)
-{
-	if( gun_1 == 1 )
-	{
-		piecenum = rgunflare;
-	}
-	if( gun_1 == 2 )
-	{
-		piecenum = lgunflare;
-	}
-}
-
 QueryWeapon1(piecenum)
 {
 	piecenum = eyeflare;
 }
 
-QueryWeapon4(piecenum)
+QueryWeapon3(piecenum)
 {
 	if( gun_3 == 1 )
 	{
@@ -924,11 +889,6 @@ QueryWeapon4(piecenum)
 	{
 		piecenum = lmispoint;
 	}
-}
-
-SweetSpot(piecenum)
-{
-	piecenum = torso;
 }
 
 Killed(severity, corpsetype)
