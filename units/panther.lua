@@ -94,7 +94,11 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargetting      = 0,
-
+	  
+	  customParams = { 
+		extra_damage = '160', 
+	  },
+      
       damage                  = {
         default        = 1200,
         commanders     = 120,

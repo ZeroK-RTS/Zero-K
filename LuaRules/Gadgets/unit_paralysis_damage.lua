@@ -23,8 +23,14 @@ local spGetUnitHealth = Spring.GetUnitHealth
 local spSetUnitHealth = Spring.SetUnitHealth
 local spGetUnitDefID  = Spring.GetUnitDefID
 
-local paralysisList = include("LuaRules/Configs/paralysis_defs.lua")
-  
+
+local paralysisList = {}
+
+for i=1,#WeaponDefs do
+	if WeaponDefs[i].customParams and WeaponDefs[i].customParams.extra_damage then 
+		paralysisList[i] = WeaponDefs[i].customParams.extra_damage
+	end
+end  
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -32,7 +38,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam)
 	if paralysisList[weaponID] then
 		attackerID = attackerID or -1
-		Spring.AddUnitDamage(unitID, paralysisList[weaponID].damage, 0, attackerID)
+		Spring.AddUnitDamage(unitID, paralysisList[weaponID], 0, attackerID)
 	end
 	return damage
 end

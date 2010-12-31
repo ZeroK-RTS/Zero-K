@@ -193,6 +193,10 @@ unitDef = {
       beamWeapon              = true,
       craterBoost             = 0,
       craterMult              = 0,
+	  
+	  customParams = { 
+		extra_damage = '240', 
+	  },
 
       damage                  = {
         default        = 1200,
