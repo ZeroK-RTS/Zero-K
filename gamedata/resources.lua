@@ -69,6 +69,7 @@ local resources = {
 			explo='GPL/fire.png',
 	  -- MANUAL
 
+      AAsmoketrail= "AAsmoketrail.tga",
       bigexplo= "cc/bigexplo.tga",
       bloodblast= "pd/bloodblast.png",
       bloodblastwhite= "pd/bloodblastwhite.tga",
