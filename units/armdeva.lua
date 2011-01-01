@@ -25,7 +25,7 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Mitrailleurs Anti-Nuée]],
-    helptext       = [[The Stardust is a turret sporting Nova's long perfected and deadly Energy Machine Gun. While it has a short range and is thus even more vulnerable to skirmishers than the LLT, its high rate of fire and AoE allow it to quickly chew up swarms of lighter units.]],
+    helptext       = [[The Stardust is a turret sporting the long perfected and deadly Energy Machine Gun. While it has a short range and is thus even more vulnerable to skirmishers than the LLT, its high rate of fire and AoE allow it to quickly chew up swarms of lighter units.]],
     helptext_fr    = [[Le Stardust est une tourelle mitrailleuse r haute energie. Son incroyable cadence de tir lui permettent d'arreter quasiment nimporte quelle nuée de Pilleur ou d'unités légcres, cependant sa portée est relativement limitée, et étant prcs du sol nimporte quel obstacle l'empeche de tirer.]],
   },
 

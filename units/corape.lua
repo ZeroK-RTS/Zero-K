@@ -31,7 +31,7 @@ unitDef = {
   customParams           = {
     description_bp = [[Aeronave flutuadora agressora]],
     description_fr = [[ADAV Pilleur]],
-    helptext       = [[Logos' light raider gunship. Its missiles are accurate and hit air, and it is good against small targets and defending against other raiders.]],
+    helptext       = [[The Rapier is a light raider gunship. Its missiles are accurate and hit air, and it is good against small targets and defending against other raiders.]],
     helptext_bp    = [[A aeronave flutuante agressora leve de Logos. Seus mísseis s?o precisos e pode atingir o ar, tornando-a útil contra alvos pequenos e outras aeronaves agressoras.]],
     helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
   },

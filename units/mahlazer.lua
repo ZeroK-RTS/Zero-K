@@ -28,7 +28,7 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Lazer ? Charge ?liptique]],
-    helptext       = [[This large scale tool is used to shape terrain for Nova's terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases.]],
+    helptext       = [[This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases.]],
     helptext_fr    = [[Le MAH Lazer est un b?timent abritant un puissant g?n?rateur de faisceau laser ?liptique, dont l'impact est param?trable. Sa puissance est telle qu'il coupe tout sur son passage, y compris les alli?s. Pensez ? pr?voir un espace d?gag? autour de lui pour ?viter que le laser ne coupe votre base en deux en d?marrant.]],
   },
 
