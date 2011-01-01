@@ -89,6 +89,7 @@ unitDef = {
       burst                   = 0,
 	  canattackground         = false,
       collideFriendly         = false,
+	  commandfire             = true,
       coreThickness           = 0.6,
       craterBoost             = 0,
       craterMult              = 0,

@@ -74,6 +74,7 @@ unitDef = {
       avoidFeature            = false,
       avoidFriendly           = false,
       collideFriendly         = false,
+	  commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
 

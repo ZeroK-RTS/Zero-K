@@ -122,6 +122,7 @@ unitDef = {
       burnblow                = true,
       cegTag                  = [[KBOTROCKETTRAIL]],
       collideFriendly         = false,
+	  commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
 

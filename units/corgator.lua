@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[corgator]],
-  name                = [[Instigator]],
+  name                = [[Scorcher]],
   description         = [[Raider Vehicle]],
   acceleration        = 0.057,
   bmcode              = [[1]],
@@ -25,7 +25,7 @@ unitDef = {
   customParams        = {
     description_bp = [[Veículo escaramuçador]],
     description_fr = [[V?hicule Pilleur]],
-    helptext       = [[Capable of taking damage and dishing it out, the Instigator is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Its regeneration dramatically decreases its losses vs inferior opposition- it is impossible to kill the gator with attrition. Though able to hold its own in combat, it is no match for anti-swarm or riot units or defenses.]],
+    helptext       = [[Capable of taking damage and dishing it out, the Instigator is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Its regeneration dramatically decreases its losses vs inferior opposition- it is impossible to kill the scorcher with attrition. Though able to hold its own in combat, it is no match for anti-swarm or riot units or defenses.]],
     helptext_bp    = [[Instigator é um tanque agressor. ? capaz de aguentar dano considerável e muito versátil, mas n?o t?o ágil quanto outras unidades agressoras. Sua regeneraç?o rápida lhe dá vantagem em pequenos combates onde estiver em maior número. Embora capaz em combate, n?o é pareo para unidades e defesas dispersadoras.]],
     helptext_fr    = [[ Le Instigator est rapide et solide. ?quip? d'une mitrailleuse laser il saura faire face de lui m?me ? un combat et ses nano-robots auto r?g?nerants se chargeront de le remettre sur pied pour la suite. Particuli?rement allergique aux anti-nu?es et au ?meutiers.]],
   },
