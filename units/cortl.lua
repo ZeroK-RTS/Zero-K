@@ -107,7 +107,7 @@ unitDef = {
 
 
     TORPEDO     = {
-      name                    = [[Level1 Torpedo Launcher]],
+      name                    = [[Torpedo Launcher]],
       areaOfEffect            = 16,
       avoidFriendly           = false,
       bouncerebound           = 0.5,

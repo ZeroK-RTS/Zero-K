@@ -94,7 +94,7 @@ unitDef = {
   weaponDefs            = {
 
     EMG = {
-      name                    = [[EMG]],
+      name                    = [[Pulse MG]],
       areaOfEffect            = 8,
       burst                   = 2,
       burstrate               = 0.12,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factoryjump]],
   name                          = [[Advanced Jumpjet Plant]],
-  description                   = [[Produces Jumpjets, Builds at 6 m/s]],
+  description                   = [[Produces Jumpjets and Special Walkers, Builds at 6 m/s]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,
@@ -38,7 +38,7 @@ unitDef = {
 
   customParams                  = {
     canjump        = [[1]],
-    helptext = [[The esoteric Jumpjet Factory offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Can, Skuttle, Sumo]],
+    helptext = [[The esoteric Jumpjet Factory offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Skuttle, Sumo]],
     sortName = [[5]],
   },
 

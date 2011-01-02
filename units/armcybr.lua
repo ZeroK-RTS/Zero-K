@@ -69,7 +69,7 @@ unitDef = {
   weaponDefs          = {
 
     ARM_PIDR = {
-      name                    = [[PlasmaImplosionDumpRocket]],
+      name                    = [[Implosion Bomb]],
       areaOfEffect            = 384,
       avoidFeature            = false,
       avoidFriendly           = false,

@@ -86,7 +86,7 @@ unitDef = {
   weaponDefs          = {
 
     BOGUS_BOMB = {
-      name                    = [[BogusBomb]],
+      name                    = [[Fake Bomb]],
       areaOfEffect            = 80,
       commandfire             = true,
       craterBoost             = 0,

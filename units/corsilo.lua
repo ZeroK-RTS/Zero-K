@@ -66,7 +66,7 @@ unitDef = {
   weaponDefs                    = {
 
     CRBLMSSL = {
-      name                    = [[CoreNuclearMissile]],
+      name                    = [[Strategic Nuclear Missile]],
       areaOfEffect            = 1920,
       cegTag                  = [[NUCKLEARMINI]],
       collideFriendly         = false,

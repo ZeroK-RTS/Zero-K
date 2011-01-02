@@ -185,7 +185,7 @@ unitDef = {
 
 
     carriertargeting   = {
-      name                    = [[carriertargeting]],
+      name                    = [[Fake Targeting Weapon]],
       areaOfEffect            = 8,
       collideFriendly         = false,
       craterBoost             = 0,

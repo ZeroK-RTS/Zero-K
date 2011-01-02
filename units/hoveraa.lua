@@ -75,7 +75,7 @@ unitDef = {
   weaponDefs          = {
 
     WEAPON = {
-      name                    = [[Cruise Missile]],
+      name                    = [[Medium SAM]],
       areaOfEffect            = 64,
       canattackground         = false,
       cegTag                  = [[missiletrailbluebig]],

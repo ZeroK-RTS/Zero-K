@@ -91,7 +91,7 @@ unitDef = {
   weaponDefs             = {
 
     WARRIOR_WEAPON = {
-      name                    = [[Heavy EMG]],
+      name                    = [[Heavy Pulse MG]],
       accuracy                = 350,
       alphaDecay              = 0.7,
       areaOfEffect            = 96,

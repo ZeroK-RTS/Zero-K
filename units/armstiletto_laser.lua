@@ -135,7 +135,7 @@ unitDef = {
 
 
     BOGUS_BOMB       = {
-      name                    = [[BogusBomb]],
+      name                    = [[Fake Bomb]],
       areaOfEffect            = 80,
       burst                   = 2,
       burstrate               = 5,

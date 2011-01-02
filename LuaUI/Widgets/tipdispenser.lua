@@ -130,7 +130,7 @@ local function WriteString(str, unitDef, plural)
 end
 
 local function AddTip(str, level, weight, sound, prereq)
-	if not alreadyDisplayedTips[prereq] then return end
+	if prereq and (not alreadyDisplayedTips[prereq]) then return end
 	level = level or 1
 	if level < helpLevel then return end
 	weight = weight or 1
@@ -138,9 +138,9 @@ local function AddTip(str, level, weight, sound, prereq)
 	tipsList[#tipsList + 1] = {weight = weight, text = text, sound = sound}
 end
 
-local function AddTipOnce(str, level, weight, sound)
+local function AddTipOnce(str, level, weight, sound, prereq)
 	if alreadyDisplayedTips[str] then return end
-	AddTip(str, level, weight, sound) 
+	AddTip(str, level, weight, sound, prereq) 
 end
 
 local function CountMy(unitKind)

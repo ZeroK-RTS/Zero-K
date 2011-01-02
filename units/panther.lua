@@ -88,7 +88,7 @@ unitDef = {
   weaponDefs          = {
 
     ARMLATNK_WEAPON = {
-      name                    = [[LightningGun]],
+      name                    = [[Lightning Gun]],
       areaOfEffect            = 8,
       beamWeapon              = true,
       craterBoost             = 0,

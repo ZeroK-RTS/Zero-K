@@ -85,7 +85,7 @@ unitDef = {
   weaponDefs          = {
 
     EMG = {
-      name                    = [[Heavy EMG]],
+      name                    = [[Heavy Pulse MG]],
       areaOfEffect            = 40,
       avoidFeature            = false,
       burst                   = 4,

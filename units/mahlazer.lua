@@ -95,7 +95,7 @@ unitDef = {
   weaponDefs                    = {
 
     LAZER    = {
-      name                    = [[Energy Chisel]],
+      name                    = [[Craterpuncher]],
       accuracy                = 0,
       alwaysVisible           = 0,
       areaOfEffect            = 140,
@@ -142,7 +142,7 @@ unitDef = {
 
 
     RELAY    = {
-      name                    = [[MAH RELAY LAZER]],
+      name                    = [[MAH RELAY LAZER (fake weapon)]],
       alwaysVisible           = 18,
       areaOfEffect            = 32,
       avoidFeature            = false,
@@ -192,7 +192,7 @@ unitDef = {
 
 
     TARGETER = {
-      name                    = [[MAH TARGETIN LAZER]],
+      name                    = [[Groovecutter]],
       alwaysVisible           = 18,
       areaOfEffect            = 56,
       avoidFeature            = false,

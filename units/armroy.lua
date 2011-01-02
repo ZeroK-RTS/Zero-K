@@ -82,7 +82,7 @@ unitDef = {
   weaponDefs          = {
 
     DEPTHCHARGE = {
-      name                    = [[DepthCharge]],
+      name                    = [[Depth Charge]],
       areaOfEffect            = 32,
       avoidFriendly           = false,
       collideFriendly         = false,

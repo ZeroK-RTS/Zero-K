@@ -128,7 +128,7 @@ unitDef = {
 
 
     PLASMA  = {
-      name                    = [[Heavy Plasma]],
+      name                    = [[Heavy Plasma Cannon]],
       areaOfEffect            = 192,
       burnBlow                = true,
       craterBoost             = 0.7,

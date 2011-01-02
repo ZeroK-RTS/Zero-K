@@ -129,7 +129,7 @@ unitDef = {
 
 
     TACNUKE        = {
-      name                    = [[TacticalNuke]],
+      name                    = [[Tactical Nuke]],
       areaOfEffect            = 256,
       collideFriendly         = false,
       commandfire             = true,

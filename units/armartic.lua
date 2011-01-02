@@ -65,22 +65,11 @@ unitDef = {
   yardMap                       = [[ooooooooo]],
 
   weapons                       = {
-
-    {
-      def                = [[arm_det_weapon2]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
     {
       def                = [[arm_det_weapon]],
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
-      slaveTo            = 1,
     },
-
   },
-
 
   weaponDefs                    = {
 
@@ -124,42 +113,6 @@ unitDef = {
       thickness               = 10,
       turret                  = true,
       weaponType              = [[LightningCannon]],
-      weaponVelocity          = 450,
-    },
-
-
-    arm_det_weapon2 = {
-      name                    = [[EMP Gun]],
-      areaOfEffect            = 10,
-      beamWeapon              = true,
-      collideFriendly         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 6,
-        planes  = 6,
-        subs    = 0.3,
-      },
-
-      duration                = 0.0025,
-      explosionGenerator      = [[custom:NONE]],
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      intensity               = 0,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
-      noradar                 = [[1]],
-      noSelfDamage            = true,
-      range                   = 440,
-      reloadtime              = 2.5,
-      renderType              = 7,
-      rgbColor                = [[1 1 1]],
-      targetMoveError         = 0.2,
-      thickness               = 0,
-      turret                  = true,
-      weaponType              = [[BeamLaser]],
       weaponVelocity          = 450,
     },
 

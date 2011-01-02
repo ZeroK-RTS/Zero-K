@@ -181,7 +181,7 @@ unitDef = {
 
 
     ORCONE_ROCKET = {
-      name                    = [[Riot Rockets]],
+      name                    = [[Medium-Range Missiles]],
       areaOfEffect            = 160,
       collideFriendly         = false,
       craterBoost             = 1,
