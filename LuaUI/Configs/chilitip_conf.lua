@@ -1,13 +1,12 @@
 local ignoreweapon =
 {
 	armaak = {1},
-	armcrus = {3},
 	armcarry = {1},
 	armaas = {1},
 	armraz = {2},
 	
+	cormak = {1,3},
 	coraak = {1},
-	corcrus = {3},
 	coramph = {2},
 
 	armcom = {1,2,3},

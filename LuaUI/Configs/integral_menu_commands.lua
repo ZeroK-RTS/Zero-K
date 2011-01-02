@@ -15,6 +15,7 @@ local CMD_AREA_MEX = 10100
 local CMD_CLOAK_SHIELD = 32101
 local CMD_JUMP = 38521
 local CMD_FLY_STATE = 34569
+local CMD_UNIT_KILL_SUBORDINATES = 35821
 
 --FIXME: use this table until state tooltip detection is fixed
 local tooltips = {
@@ -225,6 +226,7 @@ local overrides = {
 	[CMD_RETREAT] = { texture = {'LuaUi/Images/commands/states/retreat_off.png', 'LuaUi/Images/commands/states/retreat_30.png', 'LuaUi/Images/commands/states/retreat_60.png', 'LuaUi/Images/commands/states/retreat_90.png'}, text='', tooltip = tooltips.retreat,},
 	[CMD.IDLEMODE] = { texture = {'LuaUi/Images/commands/states/fly_on.png', 'LuaUi/Images/commands/states/fly_off.png'}, text=''},	
 	[CMD_FLY_STATE] = { texture = {'LuaUi/Images/commands/states/fly_on.png', 'LuaUi/Images/commands/states/fly_off.png'}, text=''},
+	[CMD_UNIT_KILL_SUBORDINATES] = {texture = {'LuaUi/Images/commands/states/capturekill_off.png', 'LuaUi/Images/commands/states/capturekill_on.png'}, text=''},
 }
 
 return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides

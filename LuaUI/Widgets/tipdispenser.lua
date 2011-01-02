@@ -129,7 +129,8 @@ local function WriteString(str, unitDef, plural)
 	return string.gsub(str, "<name>", name, 1)
 end
 
-local function AddTip(str, level, weight, sound)
+local function AddTip(str, level, weight, sound, prereq)
+	if not alreadyDisplayedTips[prereq] then return end
 	level = level or 1
 	if level < helpLevel then return end
 	weight = weight or 1
@@ -220,12 +221,14 @@ local function GetTipsList()
 			end
 		elseif CountMy(commander)==1 then
 			if Spring.GetSelectedUnitsCount()==0 then
-				AddTip("Select your commander and start building your base.", 1)
-				AddTip("You can select something to build by pressing right click and drawing a gesture, or using the buttons in the menu (bottom right)", 1)
+				AddTip("Select your commander and start building your base. You can select something to build by pressing right click and drawing a gesture, or using the buttons in the menu (bottom right)", 1)
 			end
-			AddTip("Metal is the principal game resource. Build some Metal Extractors (mexes) on the metal spots.", 1, 3)
-			AddTip("Energy is also essential for your economy to function. Build some Solar Collectors or Wind Generators.", 1)
-			AddTip("Buildpower, often described as the third resource, is the measure of how much you can spend at once. We'll discuss that later.", 1)
+			local econStr1 = "Metal is the principal game resource. Build some Metal Extractors (mexes) on the metal spots."
+			local econStr2 = "Energy is also essential for your economy to function. Build some Solar Collectors or Wind Generators."
+			local econStr3 = "Buildpower, often described as the third resource, is the measure of how much you can spend at once. We'll discuss that later."
+			AddTip(econStr1, 1, 3)
+			AddTip(econStr2, 1, 3, nil, econStr1)
+			AddTip(econStr3, 1, 3, nil, econStr2)
 		end
 		
 	-- Beginning: Getting commander) to build the first fac
@@ -241,12 +244,16 @@ local function GetTipsList()
 			AddTipOnce("Connect energy to your mexes to allow them to \255\255\64\0overdrive\008, which uses excess energy to produce more metal.", 1)
 		end
 		if CountMy(energy)>= 5 and (IsSelected(mex) or IsSelected(energy)) then
-			AddTipOnce("The circles around your mexes and energy (when selected) indicate their pylon radius.\nTwo econ buildings are connected if their circles overlap.", 2)
-			AddTipOnce("The color of a pylon grid denotes its efficiency. Blue is good, red is bad. Purple is unlinked.", 2)
+			local odStr1 = "The circles around your mexes and energy (when selected) indicate their pylon radius.\nTwo econ buildings are connected if their circles overlap."
+			local odStr2 = "The color of a pylon grid denotes its efficiency. Blue is good, red is bad. Purple is unlinked."
+			AddTipOnce(odStr1, 2, 1)
+			AddTipOnce(odStr2, 2, 1, nil, odStr1)
 		end
 		if CountMy(raider) >= 1 then
-			AddTipOnce("Fast but fragile, raiders are suitable for harassing the enemy's economy, as well as jumping skirmishers and the like.", 1, 3)
-			AddTipOnce("Raiders should avoid charging enemy defenses or riot units head-on.",1, 2)
+			local raiderStr1 = "Fast but fragile, raiders are suitable for harassing the enemy's economy, as well as jumping skirmishers and the like."
+			local raiderStr2 = "Raiders should avoid charging enemy defenses or riot units head-on."
+			AddTipOnce(raiderStr1, 1, 3)
+			AddTipOnce(raiderStr2,1, 2, nil, raiderStr1)
 		end
 		if CountMy(assault) >= 1 then
 			AddTipOnce("Assault units are generally good all-rounders, but they particularly excel at punching through defensive lines.", 1, 3)

@@ -220,12 +220,12 @@ local morphDefs = {
   },
   armcrabe = {
     {
-      into = 'armraz',
+      into = 'dante',
       time = 45,
       rank = 3,
     },
   },
-  armraz = {
+  dante = {
     into = 'armbanth',
     time = 90,
     rank = 3,
