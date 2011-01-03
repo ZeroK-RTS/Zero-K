@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armcomdgun]],
   name                   = [[Ultimatum]],
-  description            = [[D-Gun Walker (Anti-Strider)]],
+  description            = [[Disintegrator Walker (Anti-Strider)]],
   acceleration           = 0.18,
   activateWhenBuilt      = false,
   amphibious             = [[1]],
@@ -28,11 +28,11 @@ unitDef = {
   collisionVolumeScales  = [[35 35 35]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  commander              = true,
   corpse                 = [[DEAD]],
 
   customParams           = {
     fireproof = [[1]],
+	helptext  = [[The Ultimatum packs only one weapon: a disintegrator gun that can vaporize a heavy tank in one blast. It is best used for sneaking up to enemy heavy striders and inflicting serious damage or destruction with a few shots. Defense against it is achieved by screening your heavyweights with lighter units.]],
   },
 
   defaultmissiontype     = [[Standby]],
@@ -97,7 +97,7 @@ unitDef = {
       avoidFeature            = false,
       avoidFriendly           = false,
       avoidNeutral            = false,
-      commandfire             = true,
+      commandfire             = false,
       craterBoost             = 1,
       craterMult              = 6,
 
@@ -112,10 +112,10 @@ unitDef = {
       noExplode               = true,
       noSelfDamage            = true,
       range                   = 250,
-      reloadtime              = 1,
+      reloadtime              = 2,
       renderType              = 3,
-      soundHit                = [[explosion/ex_large1]],
-      soundStart              = [[weapon/cannon/earthshaker]],
+      soundHit                = [[explosion/ex_med6]],
+      soundStart              = [[weapon/laser/heavy_laser4]],
       soundTrigger            = true,
       tolerance               = 10000,
       turret                  = true,
