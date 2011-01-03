@@ -614,11 +614,15 @@ local icontypes = {
   },
   gunship = {
     bitmap='icons/gunship.dds',
-    size=2.1,
+    size=2,
   },
   heavygunship = {
     bitmap='icons/heavygunship.dds',
-    size=2.3,
+    size=2.4,
+  },
+  supergunship = {
+    bitmap='icons/supergunship.dds',
+    size=2.8,
   },
   airtransport = {
     bitmap='icons/airtransport.dds',

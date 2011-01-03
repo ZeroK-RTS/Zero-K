@@ -74,7 +74,7 @@ unitDef = {
   weaponDefs                    = {
 
     arm_det_weapon  = {
-      name                    = [[EMP]],
+      name                    = [[Electro-Stunner]],
       areaOfEffect            = 160,
       beamWeapon              = true,
       collideFriendly         = false,
