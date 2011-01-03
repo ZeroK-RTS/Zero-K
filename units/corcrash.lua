@@ -109,6 +109,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:FLASH2]],
+	  --fixedLauncher			  = true,
       fireStarter             = 70,
       flightTime              = 3,
       impulseBoost            = 0,
@@ -136,35 +137,6 @@ unitDef = {
       weaponVelocity          = 850,
     },
 
-
-    BOGUS_MISSILE   = {
-      name                    = [[Missiles]],
-      areaOfEffect            = 48,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 0,
-      },
-
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
-      metalpershot            = 0,
-      range                   = 800,
-      reloadtime              = 0.5,
-      renderType              = 1,
-      startVelocity           = 450,
-      tolerance               = 9000,
-      turnRate                = 33000,
-      turret                  = true,
-      weaponAcceleration      = 101,
-      weaponTimer             = 0.1,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 650,
-    },
-
   },
 
 
@@ -176,7 +148,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 650,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -189,28 +161,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Crasher]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 650,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 40,
-      object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 40,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Crasher]],

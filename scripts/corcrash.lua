@@ -47,8 +47,15 @@ local rb_toe = piece "rb_toe"
 
 smokePiece = {head, pod}
 
---constants
+local points = {
+	{missile = m_1, exhaust = ex_1},
+	{missile = m_2, exhaust = ex_2},
+	{missile = m_3, exhaust = ex_3},
+}
+
 local missile = 1
+
+--constants
 local missilespeed = 850 --fixme
 local mfront = 10 --fixme
 local pause = 600
@@ -57,8 +64,9 @@ local pause = 600
 local smokeblast = 1024
 
 --signals
-local walk = 2
-local aim  = 4
+local SIG_Restore = 1
+local SIG_Walk = 2
+local SIG_Aim  = 4
 
 function script.Create()
 	Turn( ex_1, x_axis, math.rad(170) )
@@ -69,9 +77,8 @@ function script.Create()
 end
 
 local function Walk()
-	SetSignalMask( walk )
+	SetSignalMask( SIG_Walk )
 	while ( true ) do -- needs major fixing. 
-		
 		Move(base, y_axis, 3.6, 12)
 		
 		Turn( l_thigh, x_axis, 0.6, 4 )
@@ -112,7 +119,6 @@ local function Walk()
 end
 
 local function StopWalk()
-
 	Move(base, y_axis, 0, 12)
 	
 	Turn( l_thigh, x_axis, 0, 2 )
@@ -130,29 +136,42 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal( walk )
-	--SetSignalMask( walk )
+	Signal( SIG_Walk )
+	--SetSignalMask( SIG_Walk )
 	StartThread( StopWalk )
 end
 
+local function RestoreAfterDelay()
+	Signal(SIG_Restore)
+	SetSignalMask(SIG_Restore)
+	Sleep(2000)
+	Turn( head, y_axis, 0, 3 )
+	Turn( pod, x_axis, 0, 3 )
+	Move(podpist, y_axis, 0, 3)
+end
+
 ----[[
-function script.QueryWeapon1() return pod end
+function script.QueryWeapon1() return points[missile].missile end
 
 function script.AimFromWeapon1() return pod end
 
 function script.AimWeapon1( heading, pitch )
-	Signal( aim )
-	SetSignalMask( aim )
+	Signal( SIG_Aim )
+	SetSignalMask( SIG_Aim )
+	pitch = math.max(pitch, math.rad(20))	-- results in a minimum pod angle of 20° above horizontal
 	Turn( head, y_axis, heading, 3 )
 	Turn( pod, x_axis, -pitch, 3 )
-	--WaitForTurn( head, y_axis )
-	--WaitForTurn( pod, x_axis )
+	Move(podpist, y_axis, pitch*2.5, 3)
+	WaitForTurn( head, y_axis )
+	WaitForTurn( pod, x_axis )
+	StartThread(RestoreAfterDelay)
 	return true
 end
 
 function script.FireWeapon1()
-	--effects
-	EmitSfx( ex_1, smokeblast )
+	EmitSfx( points[missile].exhaust, smokeblast )
+	missile = missile + 1
+	if missile > 3 then missile = 1 end
 end
 --]]
 
@@ -162,8 +181,8 @@ function script.QueryWeapon2() return pod end
 function script.AimFromWeapon2() return pod end
 
 function script.AimWeapon2( heading, pitch )
-	Signal( aim )
-	SetSignalMask( aim )
+	Signal( SIG_Aim )
+	SetSignalMask( SIG_Aim )
 	Turn( head, y_axis, heading, 5 )
 	Turn( pod, x_axis, -pitch, 5 )
 	--WaitForTurn( head, y_axis )

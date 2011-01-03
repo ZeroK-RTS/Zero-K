@@ -1,6 +1,6 @@
 #include "constants.h"
 
-piece  base, nozzle, thrust, laserdrop;
+piece  base, nozzle, thrust;
 
 static-var  statechg_DesiredState, statechg_StateChanging;
 
@@ -86,7 +86,6 @@ Create()
 {
 	call-script InitState();
 	start-script SmokeUnit();
-	hide laserdrop;
 }
 
 Activate()
