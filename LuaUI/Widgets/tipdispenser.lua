@@ -50,7 +50,7 @@ local myTeam = spGetMyTeamID()
 -- 1 = new to RTS
 -- 2 = a bit of experience with ZK
 -- 3 = up to intermediate
-local helpLevel = 1		-- rank and math.max(rank, 3) or 1
+local helpLevel = rank and math.max(rank, 3) or 1
 
 -- Chili classes
 local Chili
@@ -283,7 +283,7 @@ local function GetTipsList()
 		AddTipOnce("Left click to select a unit.\nKeep button down to drag a selection box.",1)
 		AddTipOnce("Left click in empty area to deselect units.",1)
 		AddTipOnce("Right click to issue default order.\nKeep the button down to draw a formation line.",1)
-		AddTipOnce("Left click an action on the menu in the bottom-right, then left click in the terrain to give specific orders.",1)
+		AddTipOnce("Left click an action on the menu in the bottom-left, then left click in the terrain to give specific orders.",1)
 		AddTipOnce("Use the SHIFT key to enqueue orders.",1)
 		
 		AddTipOnce("Multiple constructors can build a structure together, or assist a factory.",2)

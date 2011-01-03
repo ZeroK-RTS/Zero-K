@@ -44,7 +44,6 @@ local SIG_Aim = 1
 
 local function Tilt()
 	while true do
-		Sleep(1500)
 		local vx, vy, vz = spGetUnitVelocity(unitID)
 		local vel = (vx^2 + vz^2)^0.5	--horizontal speed
 		vel = math.max(vel - 1.5, 0)	--counteract jerking
@@ -52,8 +51,12 @@ local function Tilt()
 		tilt = math.min(tiltAngle * vel, math.rad(20))	--cap at 20 degree tilt
 		Turn(fuselage, x_axis, tilt, tiltSpeed)
 		WaitForTurn(fuselage, x_axis)
-		Sleep(30)
+		Sleep(330)
 	end
+end
+
+function script.MoveRate(n)
+	--Turn(fuselage, x_axis, math.rad(10)*n, tiltSpeed)
 end
 
 local function RotorStart()
@@ -65,6 +68,7 @@ local function RotorStop()
 	StopSpin(rotor1, y_axis, rotorDecel)
 	StopSpin(rotor2, y_axis, rotorDecel)
 end
+
 function script.Create()
 	StartThread(Tilt)
 	StartThread(RotorStart)
