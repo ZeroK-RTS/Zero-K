@@ -1,3 +1,6 @@
+-- see http://springrts.com/phpbb/viewtopic.php?f=23&t=21244&start=60 for opt
+-- http://code.google.com/p/zero-k/source/browse/trunk/mods/zk/LuaUI/Widgets/unit_shapes.lua?spec=svn647&r=647
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -48,7 +51,7 @@ local spGetTimer             = Spring.GetTimer
 local spGetUnitBasePosition  = Spring.GetUnitBasePosition
 local spGetUnitDefDimensions = Spring.GetUnitDefDimensions
 local spGetUnitDefID         = Spring.GetUnitDefID
-local spGetUnitRadius        = Spring.GetUnitRadius
+--local spGetUnitRadius        = Spring.GetUnitRadius --not used
 local spGetUnitTeam          = Spring.GetUnitTeam
 local spGetUnitViewPosition  = Spring.GetUnitViewPosition
 local spIsUnitSelected       = Spring.IsUnitSelected
@@ -171,6 +174,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:DrawWorldPreUnit()
+if not Spring.IsGUIHidden() then
   glLineWidth(3.0)
 
   glDepthTest(true)
@@ -243,6 +247,7 @@ function widget:DrawWorldPreUnit()
   end
 
   glLineWidth(1.0)
+end
 end
               
 

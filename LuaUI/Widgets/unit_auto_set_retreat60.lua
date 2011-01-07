@@ -1,4 +1,4 @@
-local versionNumber = "1.2"
+local versionNumber = "1.3"
 
 function widget:GetInfo()
 	return {
@@ -13,7 +13,7 @@ function widget:GetInfo()
 end
 --[[
 Features:
-_ Set every units exiting from factories to retreat @60% automaticaly.
+_ Set every units exiting from factories to retreat @60% automatically. Don't trigger auto retreat.
 _ Set Commander to same value @ game start.
 _ Set everything to 60% when reloaded (/luaui reload) as a safety.
 _ Is disabled when player go spec/use replay. NEED TESTING TO KNOW IF WIDGET STOPS (and need to be reactivated) WHEN RE-JOINING GAME AFTER CRASH !!
@@ -21,9 +21,10 @@ _ Is disabled when player go spec/use replay. NEED TESTING TO KNOW IF WIDGET STO
 -- to do : probably fusion with unit_news.lua.
 
 Changelog:
--- versus666, 			v1.2	(01nov2010)	: .
+-- versus666, 			v1.3	(07jan2011)	: changed detection logic to avoid to triger auto retreat for units being built. Doesn't check
+-- versus666, 			v1.2	(01nov2010)	: some changes.
 -- versus666, 			v1.1	(18oct2010)	: added debug mode and optimised.
--- versus666, 			v1.0	(17oct2010)	: creation
+-- versus666, 			v1.0	(17oct2010)	: creation.
 --]]
 
 --------------------------------------------------------------------------------
@@ -35,16 +36,11 @@ local Echo				= Spring.Echo
 local spGetMyTeamID		= Spring.GetMyTeamID
 local spGetTeamUnits	= Spring.GetTeamUnits
 local spGetUnitDefID	= Spring.GetUnitDefID
+local spGetUnitTeam		= Spring.GetUnitTeam
 local debug = false --generates debug message
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-function widget:Initialize()
-	if (IsSpec()) then return false end
-end
-
 function IsSpec()
 	if Spring.GetSpectatingState() or Spring.IsReplay() then
 		widgetHandler:RemoveWidget()
@@ -52,41 +48,58 @@ function IsSpec()
 	end
 end
 
---function widget:GameStart()
--- init already present units
---	printDebug("<unit_auto_retreat60>: game start !")
---	checkUnits()
-
-function checkUnits()
--- init already present units
+function widget:Initialize()
+	MyTeam = spGetMyTeamID()
+	if (IsSpec()) then return false end
+	-- init already present units
 	for _,unitID in ipairs(spGetTeamUnits(spGetMyTeamID())) do
-	local unitDefID = spGetUnitDefID(unitID)
-	local ud = UnitDefs[unitDefID]
-		if ((ud ~= nil) and not (ud.isBuilding or not ud.canMove)) then -- test if exist and (is mobile and not a building) [I know buildings can't move but you never know]
-			WG['retreat'].addRetreatCommand(unitID, unitDefID, 2)
-			printDebug("<unit_auto_retreat60>: autorepair level 2 for unit : " .. unitID)
-		end
-	end
-end
-
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
-	printDebug("<unit_auto_retreat60> : unit from factory with ID: " .. unitID)
-	if (unitTeam == spGetMyTeamID()) then 
-		printDebug("<unit_auto_retreat60>: unit from factory 1st test, ID: " .. unitID)
+		local unitDefID = spGetUnitDefID(unitID)
 		local ud = UnitDefs[unitDefID]
-		if ((ud ~= nil) and (ud.canMove or not ud.isBuilding)) then	-- test if exist and (is mobile and not a building) [I know buildings can't move but you never know what some devs can do next]
-			WG['retreat'].addRetreatCommand(unitID, unitDefID, 2)
-			printDebug("<unit_auto_retreat60>: autorepair level 2 for unit : " .. unitID)
-		end
+		printDebug("<unit_auto_retreat60>: " .. ud.humanName .. " with ID " .. unitID .. " presence detected !")
+		checkUnits(unitID,unitDefID)
 	end
 end
 
-function widget:UnitCreated()-- need for resurected units
-	printDebug("<unit_auto_retreat60>: unit created & set to 60% retreat !")
-	checkUnits()
--- for chickens faction units, to do.
+function checkUnits(unitID,unitDefID)
+	local ud = UnitDefs[unitDefID]
+	printDebug("<unit_auto_retreat60>: checking " .. ud.humanName .. " with ID " .. unitID .. " in team " .. spGetUnitTeam(unitID))
+	if ((spGetUnitTeam(unitID) == MyTeam) and ((ud ~= nil) and not (ud.isBuilding or not ud.canMove))) then -- test if exist and (is mobile and not a building) [I know buildings can't move but you never know]
+			WG['retreat'].addRetreatCommand(unitID, unitDefID, 2)
+			printDebug("<unit_auto_retreat60>: set autorepair level 2 for " .. ud.humanName .. " with ID " .. unitID)
+		else printDebug("<unit_auto_retreat60>: " .. ud.humanName .. " with ID ".. unitID .. " NOT suitable -> rejected !")
+		end
+	end
+
+--[[function widget:UnitFromFactory(unitID, unitDefID, unitTeam)
+	printDebug("<unit_auto_retreat60> : unit " .. unitID .. " from factory detected !")
+	checkUnits(unitID)
+end]]--
+
+function widget:UnitCreated(unitID,unitDefID)-- needed for resurrected units
+	local ud = UnitDefs[unitDefID]
+	printDebug("<unit_auto_retreat60>: " .. ud.humanName .. " with ID" .. unitID .. " created detected !")
+	checkUnits(unitID)
 end
 
+function widget:UnitFinished(unitID)-- test
+	local ud = UnitDefs[unitDefID]
+	printDebug("<unit_auto_retreat60>: " .. ud.humanName .. " with ID ".. unitID .. " finished detected !")
+	checkUnits(unitID)
+end
+
+function widget:UnitTaken(unitID)-- needed for taken units
+	local ud = UnitDefs[unitDefID]
+	printDebug("<unit_auto_retreat60>: " .. ud.humanName .. " with ID ".. unitID .. " taken detected !")
+	checkUnits(unitID)
+end
+
+--[[
+function widget:UnitIdle()-- test, check if executed every frame -> bad
+	printDebug("<unit_auto_retreat60>: unit idle detected !")
+	checkUnits()
+end
+	]]--
+	
 function printDebug( value )
 	if ( debug ) then Echo( value )
 	end

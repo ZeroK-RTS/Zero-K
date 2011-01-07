@@ -116,6 +116,7 @@ end
 --  Ghost stuff borrowed from very_bad_soldier's Ghost Radar.
 
 function widget:DrawWorld()
+if not Spring.IsGUIHidden() then
 	local alt, ctrl, meta, shift = spGetModKeyState()
 
 	for unitID,myCmd in pairs(myUnits) do	-- show user which units are in CB
@@ -160,6 +161,7 @@ function widget:DrawWorld()
 			glColor(1, 1, 1, 1)
 		end -- if inview
 	end
+end
 end
 
 function DrawOutline(cmd,x,y,z,h)

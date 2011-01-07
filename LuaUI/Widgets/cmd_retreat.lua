@@ -55,6 +55,7 @@ local GetUnitStates    = Spring.GetUnitStates
 
 local AreTeamsAllied   = Spring.AreTeamsAllied
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
+local IsGuiHidden		=	Spring.IsGUIHidden
 
 local abs, rand       = math.abs, math.random
 
@@ -247,6 +248,7 @@ function widget:UnitFromFactory(unitID, unitDefID, teamID, builderID, _, _)
 	local ud = UnitDefs[unitDefID]
 	if ud.canMove and builderID then      
 		setRetreatOrder(unitID, unitDefID, retreatOrdersArray[builderID])
+		wantRetreat[unitID] = nil
 	end	
 end
 
@@ -525,7 +527,7 @@ function widget:DrawWorld()
 	end --if havens
 	
 	--Draw medic symbol on critical units.
-	if wantRetreat then --also do alliedWantRetreat table
+	if wantRetreat and not IsGuiHidden() then --also do alliedWantRetreat table
 		glDepthTest(true)
 		glAlphaTest(GL_GREATER, 0)
 		glColor(1,1,1,fade)

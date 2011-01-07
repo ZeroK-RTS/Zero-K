@@ -1,4 +1,4 @@
-local versionNum = '3.00'
+local versionNum = '3.01'
 
 function widget:GetInfo()
   return {
@@ -15,6 +15,8 @@ end
 include("keysym.h.lua")
 
 ---- CHANGELOG -----
+-- versus666,		v3.01	(07jan2011)	: 	Added check to comply with F5.
+-- wagonrepairer	v3.00	(07dec2010)	:	'Chilified' autogroup.
 -- versus666, 		v2.25	(04nov2010)	:	Added switch to show or not group number, by licho's request.
 -- versus666, 		v2.24	(27oct2010)	:	Added switch to auto add units when built from factories.
 --											Add group label numbers to units in group.
@@ -118,7 +120,7 @@ local UDefTab			= UnitDefs
 local GetGroupList		= Spring.GetGroupList
 local GetGroupUnits		= Spring.GetGroupUnits
 local GetGameFrame		= Spring.GetGameFrame
-
+local IsGuiHidden		=	Spring.IsGUIHidden
 
 function widget:Initialize() 
 	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
@@ -130,6 +132,7 @@ function widget:Initialize()
 end
 
 function widget:DrawWorld()
+if not IsGuiHidden() then
 	local existingGroups = GetGroupList()
 	if options.groupnumbers.value then
 		for inGroup, _ in pairs(existingGroups) do
@@ -147,6 +150,7 @@ function widget:DrawWorld()
 			end
 		end
 	else end
+end
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)

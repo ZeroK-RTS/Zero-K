@@ -1,4 +1,4 @@
-local versionNumber = "1.3.3"
+local versionNumber = "1.3.4"
 
 function widget:GetInfo()
 	return {
@@ -18,6 +18,7 @@ Features:
 -with one clic you select the next ready nuke silo for easy nuclear winter.
 
 ---- CHANGELOG -----
+-- versus666,			v1.3.4	(07jan2011)	: added check to comply with F5.
 -- versus666,			v1.3.3	(10nov2010)	: added more precise tweakmode tooltip + placeholder name + nuke icon.
 -- versus666,			v1.3.2	(04nov2010)	: removed other mods support to avoid rants about widget being a BA widget, added check to disable ghost tooltips when no nuke is built.
 -- versus666, 			v1.3.1	(30oct2010)	: added compatibility to CA1F -> need update when CA1F-> zero-K will be enforced.
@@ -74,29 +75,28 @@ local udefTab				= UnitDefs
 local glColor               = gl.Color
 local glDepthTest           = gl.DepthTest
 local glTexture             = gl.Texture
-local glTexEnv				= gl.TexEnv
+--local glTexEnv				= gl.TexEnv
 local glLineWidth           = gl.LineWidth
-local glPopMatrix           = gl.PopMatrix
-local glPushMatrix          = gl.PushMatrix
-local glTranslate           = gl.Translate
-local glFeatureShape		= gl.FeatureShape
+--local glPopMatrix           = gl.PopMatrix
+--local glPushMatrix          = gl.PushMatrix
+--local glTranslate           = gl.Translate
+--local glFeatureShape		= gl.FeatureShape
 local spGetGameSeconds      = Spring.GetGameSeconds
 local spGetMyPlayerID       = Spring.GetMyPlayerID
 local spGetPlayerInfo       = Spring.GetPlayerInfo
-local spGetAllFeatures		= Spring.GetAllFeatures
-local spGetFeaturePosition  = Spring.GetFeaturePosition
-local spGetFeatureDefID		= Spring.GetFeatureDefID
-local spGetMyAllyTeamID		= Spring.GetMyAllyTeamID
-local spGetFeatureAllyTeam	= Spring.GetFeatureAllyTeam
-local spGetFeatureTeam		= Spring.GetFeatureTeam
-local spGetUnitHealth 		= Spring.GetUnitHealth
-local spGetFeatureHealth 	= Spring.GetFeatureHealth
-local spGetFeatureResurrect = Spring.GetFeatureResurrect
+--local spGetAllFeatures		= Spring.GetAllFeatures
+--local spGetFeaturePosition  = Spring.GetFeaturePosition
+--local spGetFeatureDefID		= Spring.GetFeatureDefID
+--local spGetMyAllyTeamID		= Spring.GetMyAllyTeamID
+--local spGetFeatureAllyTeam	= Spring.GetFeatureAllyTeam
+--local spGetFeatureTeam		= Spring.GetFeatureTeam
+--local spGetUnitHealth 		= Spring.GetUnitHealth
+--local spGetFeatureHealth 	= Spring.GetFeatureHealth
+--local spGetFeatureResurrect = Spring.GetFeatureResurrect
 local spGetPositionLosState = Spring.GetPositionLosState
 local spGetUnitStockpile	= Spring.GetUnitStockpile
-local spIsUnitAllied		= Spring.IsUnitAllied
-local spGetUnitPosition     = Spring.GetUnitPosition
-local spGetUnitHealth 	    = Spring.GetUnitHealth
+--local spIsUnitAllied		= Spring.IsUnitAllied
+--local spGetUnitPosition     = Spring.GetUnitPosition
 local spEcho                = Spring.Echo
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetTeamUnits 		= Spring.GetTeamUnits
@@ -106,31 +106,31 @@ local spGiveOrderToUnit 	= Spring.GiveOrderToUnit
 local spSelectUnitArray 	= Spring.SelectUnitArray
 local spGetGameSpeed		= Spring.GetGameSpeed
 local spSetActiveCommand	= Spring.SetActiveCommand
-local DrawGhostFeatures
-local DrawGhostSites
-local ScanFeatures
-local DeleteGhostFeatures
-local DeleteGhostSites
+--local DrawGhostFeatures
+--local DrawGhostSites
+--local ScanFeatures
+--local DeleteGhostFeatures
+--local DeleteGhostSites
 local ResetGl
 local CheckSpecState
 local printDebug
 
 
-local GL_FILL				= GL.FILL
+--local GL_FILL				= GL.FILL
 local GL_LINE_LOOP          = GL.LINE_LOOP
-local GL_TRIANGLE_STRIP 	= GL_TRIANGLE_STRIP
-local glUnitShape			= gl.UnitShape
-local glFeatureShape		= gl.FeatureShape
+--local GL_TRIANGLE_STRIP 	= GL_TRIANGLE_STRIP
+--local glUnitShape			= gl.UnitShape
 local glBeginEnd            = gl.BeginEnd
-local glBillboard           = gl.Billboard
-local glDrawGroundCircle    = gl.DrawGroundCircle
-local glDrawGroundQuad      = gl.DrawGroundQuad
+--local glBillboard           = gl.Billboard
+--local glDrawGroundCircle    = gl.DrawGroundCircle
+--local glDrawGroundQuad      = gl.DrawGroundQuad
 local glTexRect             = gl.TexRect
 local glText                = gl.Text
 local glVertex              = gl.Vertex
-local glAlphaTest			= gl.AlphaTest
-local glBlending			= gl.Blending
+--local glAlphaTest			= gl.AlphaTest
+--local glBlending			= gl.Blending
 local glRect				= gl.Rect
+local IsGuiHidden		=	Spring.IsGUIHidden
 
 
 function widget:Initialize()
@@ -189,7 +189,7 @@ function widget:Update()
 			end
 		end
 		
-		printDebug("HighProgress: " .. highProgress )
+		printDebug("<Nuke Icon>: HighProgress: " .. highProgress )
 		
 		updateProgressLayer()
 	end
@@ -270,6 +270,7 @@ end
 
 
 function widget:DrawScreen()
+	if not IsGuiHidden() then
 	--printDebug("Count: " .. lastTime )
 	local mx,my,lmb,mmb,rmb = spGetMouseState()
 	intConfig["mouseOver"] = false
@@ -282,6 +283,7 @@ function widget:DrawScreen()
 		
 		drawButton( )
 	end
+end
 end
 
   
@@ -343,7 +345,7 @@ end
 
 function addPossibleNuke( unitID, unitDefID )
 	local udef = UnitDefs[unitDefID]
-	printDebug( "Name: " .. udef.name .. " UnitID: " .. unitID .. "udefid: " .. unitDefID  )
+	printDebug( "<Nuke Icon>: Name: " .. udef.name .. " UnitID: " .. unitID .. "udefid: " .. unitDefID  )
 
 	if ( curUnitList[udef.name] ~= nil ) then
 		printDebug("Nuke added!")
@@ -401,7 +403,7 @@ function drawButton( )
  -- draw icon
 	glColor( { 1.0, 1.0, 1.0} )
  
-	glTexture( ":n:LuaUI/Images/nuke_button_48.png" )
+	glTexture( ":n:LuaUI/Images/nuke_button_64.png" )
 
 	local texBorder = 0.75
 	glTexRect( xmin, ymin, xmax, ymax, 0.0, texBorder, texBorder, 0.0 )
