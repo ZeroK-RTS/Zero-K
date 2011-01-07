@@ -62,8 +62,6 @@ local window_console
 local colorNames = {}
 local colors = {}
 
-local chatPos = 14	-- location of first character in player name (after framenumber)
-
 
 local function option_remakeConsole()
 	remakeConsole()

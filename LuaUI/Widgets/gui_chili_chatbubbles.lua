@@ -322,6 +322,8 @@ end
 
 
 function widget:AddConsoleLine(msg)
+	msg = msg:sub(13)	-- truncate framenumber (workaround for 0.82.7)
+	
 	local firstChar = msg:sub(1,1)
 
 	local nickend
