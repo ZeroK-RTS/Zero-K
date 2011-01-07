@@ -6,7 +6,7 @@ function widget:GetInfo()
     author    = "Google Frog",
     date      = "24 Nov 2010",
     license   = "GNU GPL, v2 or later",
-	 handler   = true,
+	handler   = true,
     layer     = 1,
     enabled   = true  --  loaded by default?
   }

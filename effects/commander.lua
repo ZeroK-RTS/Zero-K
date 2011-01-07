@@ -233,7 +233,7 @@ return {
       circlegrowth       = 0,
       flashalpha         = 1,
       flashsize          = 200,
-      ttl                = 200,
+      ttl                = 180,
       color = {
         [1]  = 0.80000001192093,
         [2]  = 0.80000001192093,
@@ -248,7 +248,7 @@ return {
       circlegrowth       = 0,
       flashalpha         = 1,
       flashsize          = 150,
-      ttl                = 200,
+      ttl                = 120,
       color = {
         [1]  = 1,
         [2]  = 0.20000000298023,
@@ -332,7 +332,7 @@ return {
       circlegrowth       = 0,
       flashalpha         = 1,
       flashsize          = 150,
-      ttl                = 200,
+      ttl                = 150,
       color = {
         [1]  = 1,
         [2]  = 1,

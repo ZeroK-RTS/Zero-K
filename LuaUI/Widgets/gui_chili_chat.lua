@@ -62,6 +62,7 @@ local window_console
 local colorNames = {}
 local colors = {}
 
+local chatPos = 14	-- location of first character in player name (after framenumber)
 
 
 local function option_remakeConsole()
@@ -311,6 +312,8 @@ end
 
 
 local function addLine(msg)
+	msg = msg:sub(13)	-- truncate framenumber (workaround for 0.82.7)
+
 	if lines_count>0 and lines[lines_count].msg == msg then
 		lines[lines_count].dup = lines[lines_count].dup + 1
 		GenerateTextControl(lines[lines_count])

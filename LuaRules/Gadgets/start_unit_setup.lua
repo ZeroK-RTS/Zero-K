@@ -318,6 +318,7 @@ local function SpawnStartUnit(teamID, playerID)
 	--else
 		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
 	--end
+	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("comgate", x, y, z) end
 	Spring.SetGameRulesParam("commSpawned"..teamID, 1)
 	--commSpawned[teamID] = true
 	
