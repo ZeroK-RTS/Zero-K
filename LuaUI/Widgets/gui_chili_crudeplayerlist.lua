@@ -48,19 +48,41 @@ local function SetupPlayerNames()
 	local playerroster = Spring.GetPlayerList()
 	
 	myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
-	
+	local lheight = 14
+	local allyTeams = {}
+	-- [[
 	for i,v in ipairs(playerroster) do
-		local name,_,_,teamID = Spring.GetPlayerInfo(playerroster[i])
-		
+		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerroster[i])
+		if not allyTeams[spectator and 's' or allyTeamID] then
+			allyTeams[spectator and 's' or allyTeamID] = {}
+		end
+		table.insert( allyTeams[spectator and 's' or allyTeamID], playerroster[i] )
+	end
+	-- [[
+	local row = 0
+	for allyTeam,players in pairs(allyTeams) do
 		window_cpl:AddChild(
 			Label:New{
-				y=12*(i-1),
-				caption = teamID .. ') ' .. name,
-				textColor = {Spring.GetTeamColor(teamID)},
+				y=lheight*row,
+				caption = '[' .. allyTeam .. ']',
+				textColor = {1,1,1,1},
 			}
 		)
+		row = row + 1
+		for _, playerID in ipairs( players ) do
+			local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
+		
+			window_cpl:AddChild(
+				Label:New{
+					y=lheight*row,
+					caption = (spectator and teamID or '-') .. ') ' .. name,
+					textColor = spectator and {1,1,1,1} or {Spring.GetTeamColor(teamID)},
+				}
+			)
+			row = row + 1
+		end
 	end
-	
+	--]]
 	
 end
 
