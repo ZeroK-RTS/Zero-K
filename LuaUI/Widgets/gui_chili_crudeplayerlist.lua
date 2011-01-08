@@ -75,7 +75,7 @@ local function SetupPlayerNames()
 			window_cpl:AddChild(
 				Label:New{
 					y=lheight*row,
-					caption = (spectator and teamID or '-') .. ') ' .. name,
+					caption = (spectator and '-' or teamID) .. ') ' .. name,
 					textColor = spectator and {1,1,1,1} or {Spring.GetTeamColor(teamID)},
 				}
 			)
