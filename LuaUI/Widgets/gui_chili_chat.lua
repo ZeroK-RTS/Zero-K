@@ -310,7 +310,7 @@ end
 
 
 local function addLine(msg)
-	msg = msg:sub(13)	-- truncate framenumber (workaround for 0.82.7)
+	if Game.version == "0.82.7.0 (0.82.7)" then msg = msg:sub(13) end	-- truncate framenumber (workaround for 0.82.7.0)
 
 	if lines_count>0 and lines[lines_count].msg == msg then
 		lines[lines_count].dup = lines[lines_count].dup + 1

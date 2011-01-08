@@ -322,7 +322,7 @@ end
 
 
 function widget:AddConsoleLine(msg)
-	msg = msg:sub(13)	-- truncate framenumber (workaround for 0.82.7)
+	if Game.version == "0.82.7.0 (0.82.7)" then msg = msg:sub(13) end	-- truncate framenumber (workaround for 0.82.7.0)
 	
 	local firstChar = msg:sub(1,1)
 
