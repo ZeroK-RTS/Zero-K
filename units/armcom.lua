@@ -112,6 +112,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict             = [[1]],
   objectName             = [[ARMCOM]],
+  script				 = [[armcom.cob]],
   seismicSignature       = 16,
   selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
