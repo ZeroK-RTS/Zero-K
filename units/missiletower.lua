@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[missiletower]],
   name                          = [[Hacksaw]],
-  description                   = [[SAM Tower (Anti-Heavy)]],
+  description                   = [[SAM Tower (Anti-Bomber)]],
   bmcode                        = [[0]],
   buildAngle                    = 8192,
   buildCostEnergy               = 300,
@@ -136,7 +136,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 120,
-      object           = [[wreck3x3b.s3o]],
+      object           = [[missiletower_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 120,
       seqnamereclamate = [[TREE1RECLAMATE]],

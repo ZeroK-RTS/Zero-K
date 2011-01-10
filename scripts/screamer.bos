@@ -1,7 +1,7 @@
 #include "constants.h"
 
 piece  flare1, base, spindle, firepoint, radardish, feet, turret, bigbox,
-       littlebox, radarbase, gunbarrel, magazine, magclips, sight, fins, port;
+       radarbase, gunbarrel, magazine;
 
 static-var  pivot, facing;
 

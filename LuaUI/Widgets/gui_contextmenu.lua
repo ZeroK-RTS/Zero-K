@@ -37,6 +37,9 @@ local ignoreweapon, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_
 local confdata = VFS.Include(LUAUI_DIRNAME .. "Configs/crudemenu_conf.lua", nil, VFSMODE)
 local color = confdata.color
 
+local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
+local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -362,7 +365,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 	if ud.iconType ~= 'default' then
 		icons[#icons + 1] = 
 			Image:New{
-				file='icons/'.. ud.iconType ..iconFormat,
+				file=icontypes and icontypes[(ud and ud.iconType or "default")].bitmap
+					or 'icons/'.. ud.iconType ..iconFormat,
 				height=40,
 				width=40,
 			}
