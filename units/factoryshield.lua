@@ -22,7 +22,6 @@ unitDef = {
     [[corcrash]],
     [[corclog]],
     [[corroach]],
-    [[firewalker]],
     [[core_spectre]],
   },
 

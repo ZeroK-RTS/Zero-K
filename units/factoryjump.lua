@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[factoryjump]],
-  name                          = [[Advanced Jumpjet Plant]],
+  name                          = [[Jumpjet/Specialist Plant]],
   description                   = [[Produces Jumpjets and Special Walkers, Builds at 6 m/s]],
   acceleration                  = 0,
   bmcode                        = [[0]],
@@ -21,6 +21,7 @@ unitDef = {
     [[slowmort]],
     [[corsktl]],
     [[armaak]],
+	[[firewalker]],
     [[corsumo]],
   },
 

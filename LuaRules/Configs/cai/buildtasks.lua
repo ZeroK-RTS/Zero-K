@@ -127,9 +127,9 @@ factionBuildConfig = {
 				},
 				
 				[4] = { -- arty
-					importanceMult = 0,
-					count = 0,
---					[1] = {ID = UnitDefNames['punisher'].id, chance = 1},	
+					importanceMult = 0.3,
+					count = 1,
+					[1] = {ID = UnitDefNames['firewalker'].id, chance = 1},	
 				},
 				
 				[5] = { --assault
@@ -301,9 +301,9 @@ factionBuildConfig = {
 				},
 				
 				[4] = { -- arty
-					importanceMult = 0.2,
-					count = 1,	
-					[1] = {ID = UnitDefNames['firewalker'].id, chance = 1},					
+					importanceMult = 0,
+					count = 0,	
+				--	[1] = {ID = UnitDefNames['firewalker'].id, chance = 1},					
 				},
 				
 				[5] = { --assault

@@ -272,11 +272,6 @@ local morphDefs = {
       rank = 3,
     },
   },
-  corkarg = {
-    into = 'gorg',
-    time = 90,
-    rank = 3,
-  },
   gorg = {
     into = 'armorco',
     time = 180,
@@ -284,11 +279,6 @@ local morphDefs = {
   },
 
   corstorm = {
-    {
-      into = 'punisher',
-      time = 20,
-      rank = 3,
-    },
     {
       into = 'slowmort',
       time = 15,

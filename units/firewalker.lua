@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[firewalker]],
-  name                = [[Arsonist]],
+  name                = [[Firewalker]],
   description         = [[Fire Support Walker (Artillery/Skirmish)]],
   acceleration        = 0.0984,
   bmcode              = [[1]],
@@ -23,7 +23,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Arsonist's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
+    helptext = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -132,7 +132,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 512,
-      object           = [[CORKARG_DEAD]],
+      object           = [[firewalker_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 512,
       world            = [[All Worlds]],
