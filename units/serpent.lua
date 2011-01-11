@@ -17,7 +17,7 @@ unitDef = {
   canPatrol             = true,
   canstop               = [[1]],
   category              = [[SUB FIREPROOF]],
-  collisionVolumeOffset = [[0 0 0]],
+  collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales = [[30 20 70]],
   collisionVolumeTest   = 1,
   collisionVolumeType   = [[box]],
@@ -60,7 +60,7 @@ unitDef = {
   turninplace           = 0,
   turnRate              = 320,
   upright               = true,
-  waterline             = 15,
+  waterline             = 25,
   workerTime            = 0,
 
   weapons               = {

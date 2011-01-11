@@ -14,7 +14,7 @@ unitDef = {
   buildingGroundDecalSizeY      = 6,
   buildingGroundDecalType       = [[chickenspire_aoplane.dds]],
   buildPic                      = [[chickenspire.png]],
-  buildTime                     = 1200,
+  buildTime                     = 2500,
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[SINK]],
@@ -48,7 +48,7 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[spire.s3o]],
   onoffable                     = true,
-  power                         = 1000,
+  power                         = 2500,
   seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 

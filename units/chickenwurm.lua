@@ -83,7 +83,7 @@ unitDef = {
   weaponDefs          = {
 
     NAPALM = {
-      name                    = [[NAPALM]],
+      name                    = [[Napalm Blob]],
       areaOfEffect            = 64,
       burst                   = 6,
       burstrate               = 0.01,
