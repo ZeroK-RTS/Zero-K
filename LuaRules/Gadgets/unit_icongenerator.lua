@@ -641,7 +641,7 @@ local function DrawIcon(udid,teamID,uid)
   gl.LoadIdentity();
 
   if (uid) then
-    if (UnitDefs[udid].model.type == "s3o") then
+    if (UnitDefs[udid].model.type ~= "3do") then
       gl.Texture(0, "%" .. udid .. ":0");
     else
       gl.Texture(0, "$units");

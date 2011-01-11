@@ -23,6 +23,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    helptext	   = [[The Silencer launches devastating nuclear missiles that can obliterate entire bases. However, it is easily defeated by enemy anti-nuke systems, which must be removed from the desired target area beforehand.]],
     description_fr = [[Lance Missile Ballistique Intercontinental Nucl?aire (Nuke)]],
     helptext_fr    = [[Le Silencer est long a construire, et il faut qui plus est, ordonner la creation de missiles une fois celui-ci construit. Et pourtant, quel bonheur de r?duire tous vos ennemis en poussi?re en une seconde! Pensez ? v?rifier la pr?sence d'une contre mesure AntiNuke.]],
   },

@@ -25,6 +25,7 @@ unitDef = {
 
   customParams                  = {
     pylonrange = 250,
+	helptext = [[Geothermal plants are highly efficient energy sources that can only be build on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent.]],
   },
 
   energyMake                    = 25,

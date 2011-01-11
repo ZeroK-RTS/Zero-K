@@ -30,6 +30,11 @@ unitDef = {
   collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
+  
+  customParams           = {
+	helptext       = [[The most cost-effective source of buildpower, the Caretaker is ideal for increasing the output of factories or automatically repairing nearby defenses. It cannot start any construction projects itself, however.]],
+  },
+  
   defaultmissiontype            = [[Standby]],
   energyMake                    = 0.3,
   explodeAs                     = [[NANOBOOM2]],

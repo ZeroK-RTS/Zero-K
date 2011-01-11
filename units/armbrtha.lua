@@ -82,7 +82,7 @@ unitDef = {
   weaponDefs                    = {
 
     PLASMA = {
-      name                    = [[Heavy Plasma Cannon]],
+      name                    = [[Very Heavy Plasma Cannon]],
       accuracy                = 500,
       areaOfEffect            = 192,
       cegTag                  = [[vulcanfx]],
