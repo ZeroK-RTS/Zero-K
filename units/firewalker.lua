@@ -84,6 +84,7 @@ unitDef = {
       name                    = [[Immolation Mortar]],
       accuracy                = 320,
       areaOfEffect            = 256,
+	  --cegTag				  = [[BANISHERTRAIL]],
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -105,6 +106,8 @@ unitDef = {
       range                   = 900,
       reloadtime              = 12,
       renderType              = 4,
+	  rgbColor                = [[1 0.5 0.2]],
+	  size					  = 8,
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
       sprayangle              = 2048,

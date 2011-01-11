@@ -78,13 +78,12 @@ unitDef = {
     TAWF_BANISHER = {
       name                    = [[Heavy Missile]],
       areaOfEffect            = 160,
-      cegTag                  = [[BANISHERTRAIL]],
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
         default = 650,
-        subs    = 45,
+        subs    = 32.5,
       },
 
       edgeEffectiveness       = 0.4,

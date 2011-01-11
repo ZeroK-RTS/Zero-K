@@ -34,7 +34,7 @@ unitDef = {
 
   customParams                  = {
     description_fi = [[Taktinen robottitehdas. Rakentaa erikoistuneita robotteja 6m/s nopeudella]],
-    helptext       = [[Optimized for rough terrain, the Spider Factory relies primarily on range and mobility. Key units: Flea, Recluse, Venom, Crabe]],
+    helptext       = [[Optimized for rough terrain, the Spider Factory relies primarily on range and maneuverability rather than brute force. Key units: Flea, Recluse, Cudgel, Crabe]],
     helptext_fi    = [[Tuottaa pitk?lti erikoistuneita tai jalkav?kirobotteja raskaampia yksik?it?. Esimerkiksi EMP, n?kym?tt?myys ja maastokelpoisuus ovat joidenkin t?m?n tehtaan tuotoksien erikoisuuksia.]],
     sortName       = [[5]],
   },
