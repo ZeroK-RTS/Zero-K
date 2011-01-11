@@ -57,7 +57,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Advanced Geothermal Powerplant]],
+      description      = [[Wreckage - Moho Geothermal Powerplant]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1750,
@@ -69,7 +69,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 600,
-      object           = [[wreck4x4c.s3o]],
+      object           = [[amgeo_dead.obj]],
       reclaimable      = true,
       reclaimTime      = 600,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -78,7 +78,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Advanced Geothermal Powerplant]],
+      description      = [[Debris - Moho Geothermal Powerplant]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1750,
@@ -99,7 +99,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Advanced Geothermal Powerplant]],
+      description      = [[Debris - Moho Geothermal Powerplant]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1750,
