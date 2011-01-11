@@ -4,7 +4,7 @@
 function gadget:GetInfo()
   return {
     name      = "CAI",
-    desc      = "AI that plays normal CA sides",
+    desc      = "AI that plays normal ZK sides",
     author    = "Google Frog",
     date      = "June 8 2010",
     license   = "GNU GPL, v2 or later",
@@ -86,7 +86,7 @@ local function CopyTable(original)   -- Warning: circular table references lead 
 end
 
 --unused
-local function ModifyTable(original, modify)   -- Warning: circular table references lead to  an infinite loop.
+local function ModifyTable(original, modify)   -- Warning: circular table references lead to an infinite loop.
   for k, v in pairs(modify) do
 	--Spring.Echo("Original entry: "..original[k])
 	--Spring.Echo("Modifier entry: "..k)
@@ -2725,17 +2725,17 @@ function gadget:GameFrame(n)
 	
 		initialiseFaction(team)
 	
-		if n%60 == 0 then
+		if n%60 == 0 + team then
 			updateTeamResourcing(team)
 			executeControlFunction(team, n)
 			conJobAllocator(team)
 		end
 		
-		if n%40 == 15 then
+		if n%40 == 15 + team then
 			battleGroupHandler(team, n, n%200 == 15)
 		end
 		
-		if n%40 == 35 then
+		if n%40 == 35 + team then
 			raiderJobHandler(team)
 			combatJobHandler(team)
 			artyJobHandler(team)
@@ -2744,13 +2744,13 @@ function gadget:GameFrame(n)
 			gunshipJobHandler(team)
 		end
 		
-		if n%30 == 0 then
+		if n%30 == 0 + team then
 			conJobHandler(team)
 			factoryJobHandler(team)
 			scoutJobHandler(team)
 		end
 		
-		if n%200 == 0 then
+		if n%200 == 0 + team then
 			if debugData.showConJobList[team] then
 				echoConJobList(team)
 			end
@@ -2763,19 +2763,19 @@ function gadget:GameFrame(n)
 	
 	for allyTeam,data in pairs(allyTeamData) do
 		
-		if n%50 == 25 then
+		if n%50 == 25 + allyTeam then
 			if data.ai then
 				updateScoutingHeatmap(allyTeam,n, n%500 == 25)
 			end
 		end
 	
-		if n%200 == 0 then
+		if n%200 == 0 + allyTeam then
 			if debugData.showEnemyForceCompostion[team] then
 				echoEnemyForceComposition(allyTeam)
 			end
 		end
 	
-		if n%120 == 30 then
+		if n%120 == 30 + allyTeam then
 			if data.ai then
 			
 				decayEnemyHeatmaps(allyTeam,n)

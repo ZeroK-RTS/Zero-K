@@ -27,6 +27,7 @@ unitDef = {
   customParams        = {
     description_bp = [[Caça de superioridade aérea invisível a radar]],
     description_fr = [[Chasseur Anti-Air Sup?rieur]],
+	helptext       = [[The Vamp specializes in bringing down anything else that flies. It is sturdy enough to take limited AA fire, although it has no ground attack capability.]],
     helptext_bp    = [[Vamp é um caça poderoso contra unidades aéreas mas incapaz de atacar unidades terrestres.]],
     helptext_fr    = [[le Vamp combine, vitesse, invisibilit? au radar, et puissante force offensive Air/Air, afin d'abatre les aeronefs ennemis. Sans d?fense contre les attaques Sol/Air.]],
   },

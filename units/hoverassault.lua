@@ -22,7 +22,7 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Hovecraft d'Assaut Lourd]],
-    helptext       = [[The Halberd buttons down into its armored hull when not firing, offering excellent damage resistance. Its slow, short-ranged cannon is unsuitable for use against highly mobile targets.]],
+    helptext       = [[The Halberd buttons down into its armored hull when not firing, offering excellent damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets.]],
   },
 
   damageModifier      = 0.25,

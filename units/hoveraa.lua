@@ -20,7 +20,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Flail launches a single large, short-medium ranged SAM that does heavy damage.]],
+    helptext = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -143,7 +143,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 200,
-      object           = [[wreck3x3a.s3o]],
+      object           = [[hoveraa_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 200,
       seqnamereclamate = [[TREE1RECLAMATE]],

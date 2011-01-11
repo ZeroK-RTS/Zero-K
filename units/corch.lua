@@ -26,6 +26,7 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Hovercraft de Construction, Construit r 6 m/s]],
+	helptext       = [[The Hovercon allows smooth expansion across both land and sea. It can also detect submarines that get too close.]],
     helptext_fr    = [[L'Hovercon est rapide et agile mais son blindage et ses nanoconstructeurs sont de mauvaise facture.]],
   },
 

@@ -1,10 +1,10 @@
 --[[
 example buildTasksMods
-		buildTasksMods = function(teamArray)
-			teamArray.robots.factoryByDefId[UnitDefNames['factorycloak'].id].importance = 0
-			teamArray.robots.factoryByDefId[UnitDefNames['factoryshield'].id].importance = 1
-			teamArray.robots.factoryByDefId[UnitDefNames['factoryveh'].id].importance = 0
-			teamArray.robots.factoryByDefId[UnitDefNames['factoryspider'].id].importance = 0
+		buildTasksMods = function(buildConfig)
+			buildConfig.robots.factoryByDefId[UnitDefNames['factorycloak'].id].importance = 0
+			buildConfig.robots.factoryByDefId[UnitDefNames['factoryshield'].id].importance = 1
+			buildConfig.robots.factoryByDefId[UnitDefNames['factoryveh'].id].importance = 0
+			buildConfig.robots.factoryByDefId[UnitDefNames['factoryspider'].id].importance = 0
 		end,
 
 nova = armcom
@@ -13,8 +13,96 @@ logos = corcom
 local function noFunc()
 end
 
+-- these buildTaskMods function by editing the config supplied as the arg
+
+local function BuildTasksMod_Blitz(buildConfig)
+	local factory = buildConfig.robots.factoryByDefId
+	factory[UnitDefNames['factorycloak'].id].importance = 1.1
+	factory[UnitDefNames['factoryshield'].id].importance = 0.9
+	factory[UnitDefNames['factoryveh'].id].importance = 1.2
+	factory[UnitDefNames['factoryhover'].id].importance = 1.2
+	factory[UnitDefNames['factoryspider'].id].importance = 0.8
+	factory[UnitDefNames['factoryjump'].id].importance = 0.8
+	for fac, data in pairs(factory) do
+		if not data.airFactory then
+			data[3].importanceMult = data[3].importanceMult*1.2 -- more raiders
+			data[4].importanceMult = data[4].importanceMult*0.8 -- fewer arty
+			data[5].importanceMult = data[5].importanceMult*1.15 -- more assaults
+			data[6].importanceMult = data[6].importanceMult*0.9 -- fewer skirms
+			data[7].importanceMult = data[7].importanceMult*0.9 -- fewer riots
+		end
+		for i=1,3 do
+			data.defenceQuota[i] = data.defenceQuota[i] * 0.8
+			data.airDefenceQuota[i] = data.airDefenceQuota[i] * 0.9
+		end
+	end
+	local econ = buildConfig.robots.econByDefId
+	for econBldg, data in pairs(econ) do
+		for i=1,3 do
+			data.defenceQuota[i] = data.defenceQuota[i] * 0.8
+			data.airDefenceQuota[i] = data.airDefenceQuota[i] * 0.9
+		end
+	end
+end
+
+local function BuildTasksMod_Pusher(buildConfig)
+	local factory = buildConfig.robots.factoryByDefId
+	factory[UnitDefNames['factoryshield'].id].importance = 1.1
+	factory[UnitDefNames['factoryhover'].id].importance = 0.9
+	factory[UnitDefNames['factoryspider'].id].importance = 0.9
+	factory[UnitDefNames['factorytank'].id].importance = 1.1
+	for fac, data in pairs(factory) do
+		if not data.airFactory then
+			data[3].importanceMult = data[3].importanceMult*0.9 -- fewer raiders
+			data[4].importanceMult = data[4].importanceMult*1.1 -- more arty
+			data[6].importanceMult = data[6].importanceMult*1.2 -- more skirms
+			data[7].importanceMult = data[7].importanceMult*1.1 -- more riots
+		end
+		for i=1,3 do
+			data.defenceQuota[i] = data.defenceQuota[i] * 0.9
+		end
+	end
+	local econ = buildConfig.robots.econByDefId
+	for econBldg, data in pairs(econ) do
+		for i=1,3 do
+			data.defenceQuota[i] = data.defenceQuota[i] * 0.9
+		end
+	end
+end
+
+local function BuildTasksMod_Defensive(buildConfig)
+	local factory = buildConfig.robots.factoryByDefId
+	factory[UnitDefNames['factorycloak'].id].importance = 0.9
+	factory[UnitDefNames['factoryshield'].id].importance = 1.1
+	factory[UnitDefNames['factoryveh'].id].importance = 1.1
+	factory[UnitDefNames['factoryhover'].id].importance = 0.8
+	factory[UnitDefNames['factoryspider'].id].importance = 0.8
+	factory[UnitDefNames['factoryjump'].id].importance = 1.1
+	factory[UnitDefNames['factorytank'].id].importance = 1.1
+	for fac, data in pairs(factory) do
+		if not data.airFactory then
+			data[3].importanceMult = data[3].importanceMult*0.8 -- fewer raiders
+			data[4].importanceMult = data[4].importanceMult*0.9 -- less arty
+			data[5].importanceMult = data[5].importanceMult*0.9 -- fewer assaults
+			data[6].importanceMult = data[6].importanceMult*1.1 -- more skirms
+			data[7].importanceMult = data[7].importanceMult*1.2 -- more riots
+		end
+		for i=1,3 do
+			data.defenceQuota[i] = data.defenceQuota[i] * 1.2
+			data.airDefenceQuota[i] = data.airDefenceQuota[i] * 1.2
+		end
+	end
+	local econ = buildConfig.robots.econByDefId
+	for econBldg, data in pairs(econ) do
+		for i=1,3 do
+			data.defenceQuota[i] = data.defenceQuota[i] * 1.2
+			data.airDefenceQuota[i] = data.airDefenceQuota[i] * 1.2
+		end
+	end
+end
+
 strategies = {
-	[1] = {	--standard
+	[1] = {	-- standard
 		name = "Standard",
 		chance	= 0.2,
 		commanders = {
@@ -27,7 +115,7 @@ strategies = {
 		buildTasksMods = noFunc,
 		conAndEconHandlerMods = {},
 	},
-	[2] = {	--blitz
+	[2] = {	-- blitz
 		name = "Blitz",
 		chance	= 0.2,
 		commanders = {
@@ -36,10 +124,10 @@ strategies = {
 			[2] = {ID = "logos", chance = 0.2},
 			[3] = {ID = "reconcomm", chance = 0.4},
 		},
-		buildTasksMods = noFunc,
+		buildTasksMods = BuildTasksMod_Blitz,
 		conAndEconHandlerMods = {},
 	},
-	[3] = {	--pusher
+	[3] = {	-- pusher
 		name = "Push",
 		chance	= 0.2,
 		commanders = {
@@ -49,10 +137,10 @@ strategies = {
 			[3] = {ID = "reconcomm", chance = 0.2},
 			[4] = {ID = "supportcomm", chance = 0.2},
 		},
-		buildTasksMods = noFunc,
+		buildTasksMods = BuildTasksMod_Pusher,
 		conAndEconHandlerMods = {},
 	},
-	[4] = {	--defensive
+	[4] = {	-- defensive
 		name = "Defensive",
 		chance	= 0.2,
 		commanders = {
@@ -61,10 +149,10 @@ strategies = {
 			[2] = {ID = "logos", chance = 0.37},
 			[3] = {ID = "supportcomm", chance = 0.37},
 		},
-		buildTasksMods = noFunc,
+		buildTasksMods =  BuildTasksMod_Defensive,
 		conAndEconHandlerMods = {},
 	},
-	[5] = {	--econ
+	[5] = {	-- econ	-- FIXME: doesn't do anything right now
 		name = "Econ",
 		chance	= 0.2,
 		commanders = {

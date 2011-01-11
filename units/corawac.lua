@@ -25,6 +25,7 @@ unitDef = {
   customParams        = {
     description_bp = [[Avi?o invisível a radar com radar e sonar]],
     description_fr = [[Avion Sonar/Radar Furtif]],
+	helptext       = [[The Vulture provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar.]],
     helptext_bp    = [[Este avi?o possui radar, sonar e um grande raio de vis?o, e desta forma pode encontrar inimigos escondidos com maior facilidade que a maioria das unidades batedoras.]],
     helptext_fr    = [[Summum de la technologie d'information, ses multiples capteurs vous renseigneront sur toutes les activit?s ennemies: terrestre aerienne ou sousmarine.]],
   },
