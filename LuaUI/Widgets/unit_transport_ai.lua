@@ -270,7 +270,7 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
       if (marked ~= 0) then  
 --        Echo("to pick unit idle "..unitID)
         DeleteToPickTran(marked)
-        GiveOrderToUnit(marked, CMD.STOP, {}, {})  -- and stop it (when it becomes idle it will be assigned
+        GiveOrderToUnit(marked, CMD.STOP, {}, {})  -- and stop it (when it becomes idle it will be assigned)
       end
     end
   end
@@ -439,6 +439,8 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
     GiveOrderToUnit(unitID, x[1], x[2], x[3])
   end
   storedQueue[unitID] = nil
+  local queue = GetCommandQueue(unitID)
+  if (queue and queue[1].id == CMD.WAIT) then GiveOrderToUnit(unitID, CMD.WAIT, {}, {}) end -- clears wait order if STOP fails to do so
 end
 
 

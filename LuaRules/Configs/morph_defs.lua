@@ -445,18 +445,25 @@ local morphDefs = {
   corrl = {
 	{
 		into = 'corrazor',
-		time = 60,
+		time = 30,
 		rank = 3,
 	},
 	{
 		into = 'missiletower',
-		time = 60,
+		time = 30,
 		rank = 3,
 	},
   },
   corrazor = {
 	{
 		into = 'corflak',
+		time = 60,
+		rank = 3,
+	},
+  },
+  missiletower = {
+	{
+		into = 'armcir',
 		time = 60,
 		rank = 3,
 	},
@@ -468,7 +475,7 @@ local morphDefs = {
   },
   corflak = {
     into = 'screamer',
-    time = 60,
+    time = 75,
     rank = 3,
   },
   
