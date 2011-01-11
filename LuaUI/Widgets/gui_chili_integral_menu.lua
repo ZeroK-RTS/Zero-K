@@ -96,20 +96,19 @@ for cmd, _ in pairs(overrides) do
 	options_order[#options_order+1] = cmdname
 end 
 
-
-
-
 local MAX_COLUMNS = 6
 local MAX_STATE_ROWS = 5
 local MIN_HEIGHT = 80
 local MIN_WIDTH = 200
-local COMMAND_SECTION_WIDTH = 74	--percent
-local STATE_SECTION_WIDTH = 24	--percent
+local COMMAND_SECTION_WIDTH = 74	-- percent
+local STATE_SECTION_WIDTH = 24	-- percent
 
 local numRows = 3
 local numStateColumns = 3
 
-local selectedFac	--unitID
+local forceUpdateFrequency = 0.2	-- seconds
+
+local selectedFac	-- unitID
 
 -- Chili classes
 local Chili
@@ -831,6 +830,16 @@ local function CopyTable(outtable,intable)
       outtable[i] = v
     end
   end
+end
+
+-- force update every 0.2 seconds
+local timer = 0
+function widget:Update(dt)
+	timer = timer + dt
+	if timer >= forceUpdateFrequency then
+		Update()
+		timer = 0
+	end
 end
 
 -- layout handler - its needed for custom commands to work and to delete normal spring menu
