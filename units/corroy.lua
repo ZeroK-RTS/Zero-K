@@ -40,7 +40,7 @@ unitDef = {
   idleTime              = 1800,
   maneuverleashlength   = [[640]],
   mass                  = 407,
-  maxDamage             = 4350,
+  maxDamage             = 4800,
   maxVelocity           = 2.5,
   minCloakDistance      = 150,
   minWaterDepth         = 10,
@@ -92,8 +92,8 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 1200,
-        subs    = 60,
+        default = 1350,
+        subs    = 67.5,
       },
 
       edgeEffectiveness       = 0.4,
@@ -136,7 +136,7 @@ unitDef = {
       description      = [[Wreckage - Enforcer]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 1800,
+      damage           = 4800,
       energy           = 0,
       featureDead      = [[DEAD]],
       footprintX       = 5,
@@ -156,7 +156,7 @@ unitDef = {
       description      = [[Debris - Enforcer]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 1800,
+      damage           = 4800,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,

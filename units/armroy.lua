@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armroy]],
   name                = [[Crusader]],
-  description         = [[Destroyer (Artillery/Skirmisher)]],
+  description         = [[Destroyer (Fire Support/Antisub)]],
   acceleration        = 0.0417,
   activateWhenBuilt   = true,
   bmcode              = [[1]],
@@ -18,6 +18,12 @@ unitDef = {
   canPatrol           = true,
   canstop             = [[1]],
   category            = [[SHIP]],
+  
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales = [[35 40 130]],
+  collisionVolumeTest   = 1,
+  collisionVolumeType   = [[box]],  
+  
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -38,8 +44,8 @@ unitDef = {
   idleTime            = 1800,
   maneuverleashlength = [[640]],
   mass                = 320,
-  maxDamage           = 3090,
-  maxVelocity         = 3.1,
+  maxDamage           = 3300,
+  maxVelocity         = 3.0,
   minCloakDistance    = 75,
   minWaterDepth       = 10,
   movementClass       = [[BOAT4]],
@@ -53,7 +59,7 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 660,
   smoothAnim          = true,
-  sonarDistance       = 400,
+  sonarDistance       = 800,
   steeringmode        = [[1]],
   TEDClass            = [[SHIP]],
   turninplace         = 0,
@@ -90,7 +96,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 100,
+        default = 165,
       },
 
       edgeEffectiveness       = 0.99,
@@ -105,7 +111,7 @@ unitDef = {
       predictBoost            = 1,
       propeller               = [[1]],
       range                   = 300,
-      reloadtime              = 5,
+      reloadtime              = 3,
       renderType              = 1,
       selfprop                = true,
       soundHit                = [[explosion/ex_underwater]],
@@ -124,14 +130,15 @@ unitDef = {
 
     PLASMA      = {
       name                    = [[Plasma Cannon]],
-      areaOfEffect            = 32,
+	  accuracy				  = 200,
+      areaOfEffect            = 96,
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 15,
+        default = 250,
+        planes  = 250,
+        subs    = 12.5,
       },
 
       explosionGenerator      = [[custom:PLASMA_HIT_32]],
@@ -160,7 +167,7 @@ unitDef = {
       description      = [[Wreckage - Crusader]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 3090,
+      damage           = 3300,
       energy           = 0,
       featureDead      = [[DEAD2]],
       footprintX       = 5,
@@ -180,7 +187,7 @@ unitDef = {
       description      = [[Debris - Crusader]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 3090,
+      damage           = 3300,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -200,7 +207,7 @@ unitDef = {
       description      = [[Debris - Crusader]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 3090,
+      damage           = 3300,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,

@@ -173,16 +173,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Set reverse velocities
---
-for name, ud in pairs(UnitDefs) do
-  if ud.category and not (ud.category:find("SHIP",1,true) or ud.category:find("SUB",1,true)) then
-    if (ud.maxvelocity) then ud.maxreversevelocity = ud.maxvelocity * 0.33 end
-  end
-end 
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Disable smoothmesh
 -- 
 
@@ -291,6 +281,19 @@ if (modOptions and modOptions.damagemult and modOptions.damagemult ~= 1) then
     end
   end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Set turnInPlace speed limits, reverse velocities (but not for ships
+--
+for name, ud in pairs(UnitDefs) do
+  if ud.turninplace == 0 then
+	ud.turninplacespeedlimit = ud.maxvelocity*0.75
+  end
+  if ud.category and not (ud.category:find("SHIP",1,true) or ud.category:find("SUB",1,true)) then
+    if (ud.maxvelocity) then ud.maxreversevelocity = ud.maxvelocity * 0.33 end
+  end
+end 
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -405,7 +408,6 @@ if (modOptions and tobool(modOptions.specialdecloak)) then
 		end
 		ud.customparams.specialdecloakrange = ud.mincloakdistance or 0
 		ud.mincloakdistance = 0
-		
 	end
 end
 

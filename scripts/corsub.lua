@@ -34,23 +34,23 @@ function script.Create()
 	--StartThread( Rise )
 end
 
-function script.QueryWeapon1() 
+function script.QueryWeapon(num) 
 --	return base
 	return firepoint
 end
 
-function script.AimFromWeapon1() return base end
+function script.AimFromWeapon(num) return base end
 
-function script.AimWeapon1( heading, pitch )
-	return true
+function script.AimWeapon( num, heading, pitch )
+	return num == 2
 end
 
-function script.FireWeapon1()
---FX here
+function script.FireWeapon(num)
+-- FX goes here
 end
 
 --[[
-function script.BlockShot1()
+function script.BlockShot(num)
 	local targID = GetUnitValue(COB.TARGET_ID, 1)
 	if targID < 0 then return false end	--attacking ground
 	local ux,uy,uz = Spring.GetUnitBasePosition(targID)
@@ -60,15 +60,15 @@ end
 --]]
 
 function script.Killed(recentDamage, maxHealth)
-	Explode( base, SFX.SHATTER )
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
+		Explode(base, SFX.NONE)
 		return 1 -- corpsetype
-
 	elseif (severity <= .5) then
+		Explode(base, SFX.SHATTER)
+		return 1 -- corpsetype
+	else	
+		Explode(base, SFX.SHATTER)
 		return 2 -- corpsetype
-
-	else		
-		return 3 -- corpsetype
 	end
 end

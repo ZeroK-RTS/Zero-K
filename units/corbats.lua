@@ -40,7 +40,7 @@ unitDef = {
   idleTime               = 1800,
   maneuverleashlength    = [[640]],
   mass                   = 776,
-  maxDamage              = 10000,
+  maxDamage              = 12000,
   maxVelocity            = 2.8,
   minCloakDistance       = 75,
   minWaterDepth          = 15,
@@ -113,9 +113,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 450,
-        planes  = 450,
-        subs    = 22.5,
+        default = 500,
+        planes  = 500,
+        subs    = 25,
       },
 
       explosionGenerator      = [[custom:PLASMA_HIT_96]],
@@ -149,7 +149,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 10000,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
       height           = [[4]],
@@ -162,32 +162,11 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-
-    DEAD2 = {
-      description      = [[Debris - Warlord]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 10000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 7,
-      footprintZ       = 7,
-      hitdensity       = [[100]],
-      metal            = 1840,
-      object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1840,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
     HEAP  = {
       description      = [[Debris - Warlord]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 10000,
+      damage           = 12000,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 7,

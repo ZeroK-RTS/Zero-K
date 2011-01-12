@@ -40,8 +40,8 @@ unitDef = {
   idleTime              = 1800,
   maneuverleashlength   = [[640]],
   mass                  = 237,
-  maxDamage             = 2210,
-  maxVelocity           = 3.4,
+  maxDamage             = 2400,
+  maxVelocity           = 3.5,
   minCloakDistance      = 75,
   minWaterDepth         = 5,
   movementClass         = [[BOAT3]],
@@ -55,7 +55,8 @@ unitDef = {
   sfxtypes              = {
 
     explosiongenerators = {
-      [[custom:flashmuzzle1]],
+      [[custom:brawlermuzzle]],
+      [[custom:emg_shells_l]],
     },
 
   },
@@ -75,7 +76,7 @@ unitDef = {
       def                = [[EMG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 -1]],
-      maxAngleDif        = 290,
+      maxAngleDif        = 300,
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -94,33 +95,33 @@ unitDef = {
   weaponDefs            = {
 
     EMG = {
-      name                    = [[Pulse MG]],
-      areaOfEffect            = 8,
+      name                    = [[Medium Pulse MG]],
+      areaOfEffect            = 48,
       burst                   = 2,
-      burstrate               = 0.12,
-      craterBoost             = 0,
-      craterMult              = 0,
+      burstrate               = 0.2,
+      craterBoost             = 0.15,
+      craterMult              = 0.3,
 
       damage                  = {
-        default = 7,
-        planes  = 7,
-        subs    = 0.35,
+        default = 20,
+        planes  = 20,
+        subs    = 10,
       },
-
+	  
+      edgeEffectiveness       = 0.5,
       endsmoke                = [[0]],
-      explosionGenerator      = [[custom:EMG_HIT]],
-      impactOnly              = true,
+      explosionGenerator      = [[custom:EMG_HIT_HE]],
       impulseBoost            = 0,
-      impulseFactor           = 0.4,
+      impulseFactor           = 0.2,
       intensity               = 0.7,
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
       range                   = 270,
-      reloadtime              = 0.16,
+      reloadtime              = 0.4,
       renderType              = 4,
       rgbColor                = [[1 0.95 0.4]],
-      size                    = 1.75,
+      soundHit                = [[weapon/cannon/emg_hit]],
       soundStart              = [[weapon/emg]],
       sprayAngle              = 1180,
       startsmoke              = [[0]],
@@ -137,10 +138,10 @@ unitDef = {
   featureDefs           = {
 
     DEAD  = {
-      description      = [[Wreckage - Supporter]],
+      description      = [[Wreckage - Typhoon]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 2210,
+      damage           = 2400,
       energy           = 0,
       featureDead      = [[DEAD2]],
       featurereclamate = [[SMUDGE01]],
@@ -158,10 +159,10 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Supporter]],
+      description      = [[Debris - Typhoon]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2210,
+      damage           = 2400,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -178,10 +179,10 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Supporter]],
+      description      = [[Debris - Typhoon]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2210,
+      damage           = 2400,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
