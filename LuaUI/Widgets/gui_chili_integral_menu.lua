@@ -833,6 +833,7 @@ local function CopyTable(outtable,intable)
 end
 
 -- force update every 0.2 seconds
+--[[
 local timer = 0
 function widget:Update(dt)
 	timer = timer + dt
@@ -841,7 +842,7 @@ function widget:Update(dt)
 		timer = 0
 	end
 end
-
+]]--
 -- layout handler - its needed for custom commands to work and to delete normal spring menu
 local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 	widgetHandler.commands   = commands
