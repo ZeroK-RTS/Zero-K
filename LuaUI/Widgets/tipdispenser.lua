@@ -11,7 +11,7 @@ function widget:GetInfo()
 		date = "July 30th, 2009",
 		license = "Public Domain",
 		layer = 8,
-		enabled = false, -- (rank and rank == 1),
+		enabled = (rank and rank == 1) or true,
 		handler  = true,
 	}
 end
@@ -212,6 +212,7 @@ local function GetTipsList()
 	AddTipOnce("Use Mouse Wheel to zoom in and out. Hold down the mousewheel and drag to pan.", 1)
 
 	-- Beginning: Getting the commander to build the starting base
+	--[[
 	if CountMy(energy) + CountMy(mex) <= 3 and spGetGameSeconds() < 30 then
 		if Spring.GetTeamUnitCount(t)==0 then
 			if Game.startPosType==2 and Spring.GetGameFrame()==0 then
@@ -230,22 +231,23 @@ local function GetTipsList()
 			AddTip(econStr2, 1, 3, nil, econStr1)
 			AddTip(econStr3, 1, 3, nil, econStr2)
 		end
-		
+	
 	-- Beginning: Getting commander) to build the first fac
 	elseif CountMy(energy) >= 3 and CountMy(mex)>= 1 and CountMy(factory) == 0 and spGetGameSeconds() < 60 then
 		AddTip("Use your commander to make a factory. The Shield Bot Factory is a good choice for beginners.\nYour first factory is \255\255\64\0FREE\008.", 1, 5)
 
 		-- Once the player has started getting stuff done
 	else
-		if CountMy(factory)>=1 then
+	]]--	
+		--[[if CountMy(factory)>=1 then
 			AddTipOnce("Build some units with that factory. You'll want to start with a couple of constructors for expansion and a few raiders for early combat.", 1, 10)
-		end
+		end --]]
 		if CountMy(energy)>= 5 then
 			AddTipOnce("Connect energy to your mexes to allow them to \255\255\64\0overdrive\008, which uses excess energy to produce more metal.", 1)
 		end
 		if CountMy(energy)>= 5 and (IsSelected(mex) or IsSelected(energy)) then
 			local odStr1 = "The circles around your mexes and energy (when selected) indicate their pylon radius.\nTwo econ buildings are connected if their circles overlap."
-			local odStr2 = "The color of a pylon grid denotes its efficiency. Blue is good, red is bad. Purple is unlinked."
+			local odStr2 = "The color of a pylon grid denotes its efficiency. Blue is good, red is bad. Pink is unlinked."
 			AddTipOnce(odStr1, 2, 1)
 			AddTipOnce(odStr2, 2, 1, nil, odStr1)
 		end
@@ -275,7 +277,7 @@ local function GetTipsList()
 			AddTip("Your metal storage is overflowing. You should get more buildpower and spend it.", 2, 5)
 		end
 		local elevel, estore = spGetTeamResources(myTeam, "energy")
-		if elevel < 100 and mlevel > 80 then
+		if elevel < 80 and mlevel > elevel then
 			AddTip("Your energy reserves are running dangerously low. You should build more energy structures.", 3, 10)
 		end		
 		
@@ -289,7 +291,7 @@ local function GetTipsList()
 		AddTipOnce("Multiple constructors can build a structure together, or assist a factory.",2)
 		AddTipOnce("Keep making constructors and nanotowers as needed to spend your resources.", 2)
 		AddTipOnce("Avoid having large amounts of metal sitting in your storage. Spend it on combat units.", 2)
-	end
+	--end
 end
 
 local function GetGeneralTip(index)

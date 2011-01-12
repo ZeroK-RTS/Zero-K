@@ -17,6 +17,10 @@ unitDef = {
   canPatrol           = true,
   canstop             = [[1]],
   category            = [[SHIP]],
+  collisionVolumeOffsets = [[0 -4 4]],
+  collisionVolumeScales = [[32 44 128]],
+  collisionVolumeTest   = 1,
+  collisionVolumeType   = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {

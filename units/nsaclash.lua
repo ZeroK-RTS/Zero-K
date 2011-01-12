@@ -39,7 +39,7 @@ unitDef = {
   mass                = 153,
   maxDamage           = 620,
   maxSlope            = 18,
-  maxVelocity         = 2.1,
+  maxVelocity         = 2.2,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
@@ -66,7 +66,7 @@ unitDef = {
   steeringmode        = [[1]],
   TEDClass            = [[TANK]],
   turninplace         = 0,
-  turnRate            = 442,
+  turnRate            = 500,
   workerTime          = 0,
 
   weapons             = {

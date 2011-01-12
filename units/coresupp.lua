@@ -18,10 +18,10 @@ unitDef = {
   canPatrol             = true,
   canstop               = [[1]],
   category              = [[SHIP]],
-  collisionVolumeOffsets = [[0 10 0]],
-  collisionVolumeScales = [[30 35 110]],
+  collisionVolumeOffsets = [[0 4 -2]],
+  collisionVolumeScales = [[27 36 104]],
   collisionVolumeTest   = 1,
-  collisionVolumeType   = [[box]],
+  collisionVolumeType   = [[ellipsoid]],
   corpse                = [[DEAD]],
 
   customParams          = {
@@ -96,7 +96,7 @@ unitDef = {
 
     EMG = {
       name                    = [[Medium Pulse MG]],
-      areaOfEffect            = 48,
+      areaOfEffect            = 64,
       burst                   = 2,
       burstrate               = 0.2,
       craterBoost             = 0.15,

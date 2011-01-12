@@ -65,10 +65,17 @@ unitDef = {
   weapons                = {
 
     {
+      def                = [[FAKEWEAPON]],
+      badTargetCategory  = [[FIXEDWING]],
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 90,
+      onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP]],
+    },  
+    {
       def                = [[ARM_TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 240,
+      maxAngleDif        = 180,
       onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP]],
     },
 
@@ -77,6 +84,46 @@ unitDef = {
 
   weaponDefs             = {
 
+    FAKEWEAPON = {
+      name                    = [[Fake Torpedo - Points me in the right direction]],
+      areaOfEffect            = 16,
+      avoidFriendly           = false,
+      burnblow                = true,
+      collideFriendly         = false,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 0.1,
+        planes  = 0.1,
+        subs    = 0.1,
+      },
+
+      explosionGenerator      = [[custom:TORPEDO_HIT]],
+	  fixedLauncher			  = true,
+      flightTime              = 6,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 0,
+      lineOfSight             = true,
+      model                   = [[wep_t_longbolt.s3o]],
+      propeller               = true,
+      range                   = 500,
+      reloadtime              = 1,
+      renderType              = 1,
+      selfprop                = true,
+      startVelocity           = 90,
+      tolerance               = 10000,
+      tracks                  = true,
+      turnRate                = 10000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponAcceleration      = 25,
+      weaponType              = [[TorpedoLauncher]],
+      weaponVelocity          = 140,
+    },  
+  
     ARM_TORPEDO = {
       name                    = [[Torpedo]],
       areaOfEffect            = 16,
@@ -110,7 +157,7 @@ unitDef = {
       soundHit                = [[explosion/ex_underwater]],
       soundStart              = [[weapon/torpedo]],
       startVelocity           = 90,
-      tolerance               = 10000,
+      tolerance               = 31999,
       tracks                  = true,
       turnRate                = 10000,
       turret                  = true,
@@ -129,9 +176,9 @@ unitDef = {
       description      = [[Wreckage - Snake]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 900,
+      damage           = 950,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
       height           = [[4]],
@@ -143,27 +190,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Snake]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 900,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      hitdensity       = [[100]],
-      metal            = 240,
-      object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Snake]],
