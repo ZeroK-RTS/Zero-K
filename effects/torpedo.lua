@@ -1,7 +1,8 @@
 -- torpedo_hit
 -- torpedo_hit_main
 -- torpedo_trail
--- torpedo_trail_long
+-- torpedo_trail_big
+-- hydromissile
 
 return {
   ["torpedo_hit"] = {
@@ -96,7 +97,7 @@ return {
   ["torpedo_trail"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
-    largeflash = {
+    trail_water = {
       air                = true,
       class              = [[CBitmapMuzzleFlame]],
       count              = 1,
@@ -119,7 +120,7 @@ return {
   ["torpedo_trail_big"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
-    largeflash = {
+    trail_water = {
       air                = true,
       class              = [[CBitmapMuzzleFlame]],
       count              = 1,
@@ -136,6 +137,48 @@ return {
         size               = 3,
         sizegrowth         = 0.4,
         ttl                = 40,
+      },
+    },
+  },
+  ["hydromissile"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    trail_water = {
+      air                = false,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = false,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = [[0.9 0.9 0.9 0.01 0.8 0.8 0.8 0.01 0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[wake]],
+        length             = 4,
+        sidetexture        = [[wake]],
+        size               = 3,
+        sizegrowth         = 0.4,
+        ttl                = 40,
+      },
+    },
+	groundflash = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = 0,
+      water              = false,
+      properties = {
+        colormap           = [[0.5 0.2 0.9 0.01 0.6 0.2 0.4 0.01 0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[muzzlefront]],
+        length             = -20,
+        sidetexture        = [[muzzleside]],
+        size               = -9,
+        sizegrowth         = 0.75,
+        ttl                = 1,
       },
     },
   },

@@ -1,4 +1,3 @@
-#define TAK
 #include "constants.h"
 
 // WARNING: change your constant for the []-brackets to 65536 before compiling!
@@ -172,12 +171,17 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
+		explode body type BITMAPONLY | BITMAP;
+		explode turret type BITMAPONLY | BITMAP;
 		explode barrel type FALL | SMOKE | FIRE | BITMAP;
 	}
-	if( severity <= 99 )
+	else
 	{
-		corpsetype = 3;
+		corpsetype = 2;
+		explode body type SHATTER;
+		explode turret type SHATTER;
+		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		explode tracks1 type SHATTER | SMOKE | FIRE | BITMAP;
 		hide tracks2;
 		hide tracks3;
