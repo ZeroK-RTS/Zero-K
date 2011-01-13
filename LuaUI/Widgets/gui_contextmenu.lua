@@ -335,17 +335,25 @@ local function printWeapons(unitDef)
 					
 				end
 			end
-			if not wsTemp.wname then print("BAD", unitDef.unitname) return false end -- stupid negative in corhurc is breaking me.
-			weaponStats[i] = wsTemp
+			if not wsTemp.wname 
+				or wsTemp.wname:find('fake')
+				or wsTemp.wname:find('Fake')
+				then 
+				weaponStats[i] = false
+			else
+				weaponStats[i] = wsTemp
+			end 
 		end
 	end
 	
 	local cells = {}
 		
 	for index,ws in pairs(weaponStats) do
-		if not ignoreweapon[unitDef.name] or not ignoreweapon[unitDef.name][index] then
+		--if not ignoreweapon[unitDef.name] or not ignoreweapon[unitDef.name][index] then
+		if ws then
 			cells = weapons2Table(cells, weaponStats, ws, merw, index)
 		end
+		--end
 	end
 		
 	
