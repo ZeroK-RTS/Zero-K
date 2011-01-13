@@ -12,8 +12,8 @@ end
 
 
 
-if VFS.FileExists("Luaui/Configs/CATeamColors.lua") then
-	colorCFG = VFS.Include("Luaui/Configs/CATeamColors.lua")
+if VFS.FileExists("Luaui/Configs/ZKTeamColors.lua") then
+	colorCFG = VFS.Include("Luaui/Configs/ZKTeamColors.lua")
 elseif VFS.FileExists("Luaui/Configs/LocalColors.lua") then -- allow for user over ride
 	colorCFG = VFS.Include("Luaui/Configs/LocalColors.lua")
 else
