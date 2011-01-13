@@ -56,7 +56,9 @@ end
 local function RestorePuppy(unitID, x, y, z)
   Spring.SetUnitCloak(unitID, false)
   Spring.MoveCtrl.SetPosition(unitID, x, y, z)
+  Spring.SetUnitBlocking(unitID, true, false)	-- allows it to clip into wrecks (workaround for puppies staying in heaven)
   Spring.MoveCtrl.Disable(unitID)
+  Spring.SetUnitBlocking(unitID, true, true)	-- restores normal state once they land
   -- Spring.SetUnitSensorRadius(unitID, "los", puppyLosRadius)
   Spring.SetUnitStealth(unitID, false)
   Spring.SetUnitNoDraw(unitID, false)
@@ -69,7 +71,6 @@ local function PuppyShot(unitID, unitDefID)
   -- the puppy fired its weapon, hide it
   HidePuppy(unitID)
 end
-
 
 function gadget:Initialize()
   local puppyDef =  UnitDefNames.puppy
@@ -85,23 +86,22 @@ function gadget:Shutdown()
   Script.SetWatchWeapon(puppyWeaponID, false)
 end
 
--- problem: no way to get weaponID
---[[
 -- in event of shield impact, gets data about both units and passes it to UnitPreDamaged
 function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile)
 	local attackerTeam, attackerDefID, defenderTeam, defenderDefID
 	if spValidUnitID(proOwnerID) then
-		attackerTeam = spGetUnitTeam(proOwnerID)
 		attackerDefID = spGetUnitDefID(proOwnerID)
+		if attackerDefID ~= puppyDefID then return false end	-- nothing to do with us, exit
+		attackerTeam = spGetUnitTeam(proOwnerID)
 	end
-	if spValidUnitID(shieldCarrierID) then
+	if spValidUnitID(shieldCarrierUnitID) then
 		defenderTeam = spGetUnitTeam(shieldCarrierUnitID)
 		defenderDefID = spGetUnitDefID(shieldCarrierUnitID)
 	end
-	gadget:UnitPreDamaged(proOwnerID, defenderDefID, defenderTeam, 0, false, weaponID, proOwnerID, attackerDefID, attackerTeam)
+	-- we don't actually have the weaponID, but can assume it is puppyWeaponID
+	gadget:UnitPreDamaged(shieldCarrierID, defenderDefID, defenderTeam, 0, false, puppyWeaponID, proOwnerID, attackerDefID, attackerTeam)
 	return false
 end
-]]--
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
