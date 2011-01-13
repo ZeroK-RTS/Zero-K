@@ -231,7 +231,7 @@ function UnitJitter.Initialize()
   })
 
   if (warpShader2 == nil) then
-    print(PRIO_MAJOR,"LUPS->UnitJitter: criticle shader2 error: "..gl.GetShaderLog())
+    print(PRIO_MAJOR,"LUPS->UnitJitter: critical shader2 error: "..gl.GetShaderLog())
     return false
   end
 end

@@ -108,13 +108,13 @@ end
 
 local CloakedHitEffect = { class='UnitJitter',options={ life=50, pos={0,0,0}, enemyHit=true, repeatEffect=false} }
 local CloakEffect      = {
-  { class='UnitCloaker',options={ life=60 } },
-  { class='UnitJitter',options={ delay=30, life=math.huge } },
+  --{ class='UnitCloaker',options={ life=60 } },
+  --{ class='UnitJitter',options={ delay=27, life=math.huge } },
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
 local DecloakEffect    = {
-  { class='UnitCloaker',options={ inverse=true, life=60 } },
-  { class='UnitJitter',options={ life=30 } },
+  --{ class='UnitCloaker',options={ inverse=true, life=60 } },
+  --{ class='UnitJitter',options={ life=27 } },
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
 

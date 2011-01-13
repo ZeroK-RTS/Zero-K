@@ -99,6 +99,7 @@ Shot1()
 	} else {
 		emit-sfx 1024 from flarebl;
 	}
+	emit-sfx 1025 from gunb;
 }
 
 AimFromWeapon1(piecenum)
@@ -129,6 +130,7 @@ Shot2()
 	} else {
 		emit-sfx 1024 from flarefl;
 	}
+	emit-sfx 1025 from gunf;
 }
 
 AimFromWeapon2(piecenum)
@@ -179,7 +181,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode hull type BITMAPONLY | BITMAP1;
 		explode gunf type FALL | BITMAP2;
 		explode base type BITMAPONLY | BITMAP3;
@@ -191,7 +193,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode hull type SHATTER | BITMAP1;
 		explode gunf type FALL | BITMAP2;
 		explode base type BITMAPONLY | BITMAP3;
@@ -203,7 +205,7 @@ Killed(severity, corpsetype)
 		explode wake2 type BITMAPONLY | BITMAP4;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 		explode hull type SHATTER | BITMAP1;
 		explode gunf type FALL | BITMAP2;
 		explode base type BITMAPONLY | BITMAP3;
