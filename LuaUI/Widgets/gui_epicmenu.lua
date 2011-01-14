@@ -1624,12 +1624,14 @@ end
 
 -- Make menubar
 local function MakeCrudeMenu()
+	local btn_padding = {4,3,2,2}
+	local btn_margin = {0,0,0,0}
 	if window_crude then
 		window_crude:Dispose()
 		window_crude = nil
 	end
 		
-	local crude_width = 420
+	local crude_width = 425
 	local crude_height = B_HEIGHT+10
 	
 	local menu_tree3 		= AddCustomPaths(menu_tree2, 'Settings')
@@ -1676,13 +1678,28 @@ local function MakeCrudeMenu()
 					--GAME LOGO GOES HERE
 					Image:New{ tooltip = title_text, file = LUAUI_DIRNAME .. 'Images/ZK_logo.png', height=B_HEIGHT, width=B_HEIGHT, },
 					
-					--Button:New{caption = "Game", OnMouseUp = { function() MakeSubWindow(game_menu_index) end, }, backgroundColor=color.game_bg, textColor=color.game_fg, height=B_HEIGHT, width=60, },
-					Image:New{ tooltip = 'Game Actions', file=LUAUI_DIRNAME .. 'Images/epicmenu/game.png',OnClick = { function() MakeSubWindow(game_menu_index) end, }, height=B_HEIGHT, width=B_HEIGHT,},
-					
-					--Button:New{caption = "Settings", OnMouseUp = { function() MakeSubWindow(main_menu_index) end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=60, },
-					Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', OnClick = { function() MakeSubWindow(main_menu_index) end, }, height=B_HEIGHT,width=B_HEIGHT, },
-					
-					Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, height=B_HEIGHT, width=B_HEIGHT, tooltip="Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)"},
+					-- odd-number button width keeps image centered
+					Button:New{
+						caption = "", OnMouseUp = { function() MakeSubWindow(game_menu_index) end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						padding = btn_padding, margin = btn_margin,	tooltip = 'Game Actions',
+						children = {
+							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/game.png', height=B_HEIGHT-2,width=B_HEIGHT-2},
+						},
+					},
+					Button:New{
+						caption = "", OnMouseUp = { function() MakeSubWindow(main_menu_index) end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						padding = btn_padding, margin = btn_margin,	tooltip = 'Settings', 
+						children = {
+							Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
+						},
+					},
+					Button:New{
+						caption = "", OnMouseUp = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
+						padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
+						children = {
+							Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
+						},
+					},
 					
 					Grid:New{
 						height = '100%',
@@ -1734,7 +1751,7 @@ local function MakeCrudeMenu()
 									end	
 								},
 							},
-						}
+						},
 					
 					},
 
@@ -1775,10 +1792,20 @@ local function MakeCrudeMenu()
 						},
 					},
 					
-					--Button:New{caption = "?", OnMouseUp = { function() MakeSubWindow(help_menu_index) end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=35, },
-					Image:New{ tooltip = 'Help', file=LUAUI_DIRNAME .. 'Images/epicmenu/questionmark.png', OnClick = { function() MakeSubWindow(help_menu_index) end, }, height=B_HEIGHT,width=B_HEIGHT,  },
-					--Button:New{caption = "Quit", OnMouseUp = { function() spSendCommands{"quitmenu"} end, }, backgroundColor=color.menu_bg, textColor=color.menu_fg, height=B_HEIGHT, width=45, },
-					Image:New{ tooltip = 'Exit the game...', file=LUAUI_DIRNAME .. 'Images/epicmenu/quit.png', OnClick = { function() spSendCommands{"quitmenu"} end, },  height=B_HEIGHT, width=B_HEIGHT,},
+					Button:New{
+						caption = "", OnMouseUp = { function() MakeSubWindow(help_menu_index) end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						padding = btn_padding, margin = btn_margin, tooltip = 'Help', 
+						children = {
+							Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/questionmark.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  },
+						},
+					},
+					Button:New{
+						caption = "", OnMouseUp = { function() spSendCommands{"quitmenu"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						padding = btn_padding, margin = btn_margin, tooltip = 'Exit the game...,',
+						children = {
+							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/quit.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  }, 
+						},
+					},	
 				}
 			}
 		}

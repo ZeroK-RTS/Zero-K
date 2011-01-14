@@ -350,7 +350,6 @@ local function MakeButton(container, cmd, insertItem)
 		end
 		
 
-		
 		--if button is disabled, set effect accordingly
 		if button.isDisabled then 
 			button.backgroundColor = {0,0,0,1};
@@ -392,7 +391,7 @@ local function MakeButton(container, cmd, insertItem)
 		item.countLabel:SetCaption(countText)
 	end
 	
-	if (item.image and texture ~= item.image.file) then 
+	if (item.image and (texture ~= item.image.file or isState) ) then 
 		item.image.file = texture
 		item.image:Invalidate()
 	end 
