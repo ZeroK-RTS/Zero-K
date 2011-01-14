@@ -158,7 +158,7 @@ unitDef = {
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
-      range                   = 160,
+      range                   = 140,
       reloadtime              = 7,
       size                    = 0,
       soundHit                = [[chickens/chickenbig2]],
@@ -169,7 +169,7 @@ unitDef = {
       turret                  = true,
       waterWeapon             = false,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 500,
+      weaponVelocity          = 1000,
     },
 
   },
