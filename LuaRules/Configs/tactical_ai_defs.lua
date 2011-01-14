@@ -722,6 +722,14 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 30, 
 	},
+	["capturecar"] = {
+		skirms = medRangeSkirmieeArray, 
+		swarms = medRangeSwarmieeArray, 
+		flees = {},
+		maxSwarmLeeway = 30, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 30, 
+	},
 	
 	-- long range skirms
 	["armsptk"] = {
