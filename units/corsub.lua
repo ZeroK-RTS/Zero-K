@@ -70,7 +70,9 @@ unitDef = {
       mainDir            = [[0 0 1]],
       maxAngleDif        = 90,
       onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP]],
-    },  
+    },
+
+
     {
       def                = [[ARM_TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
@@ -84,46 +86,6 @@ unitDef = {
 
   weaponDefs             = {
 
-    FAKEWEAPON = {
-      name                    = [[Fake Torpedo - Points me in the right direction]],
-      areaOfEffect            = 16,
-      avoidFriendly           = false,
-      burnblow                = true,
-      collideFriendly         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 0.1,
-        planes  = 0.1,
-        subs    = 0.1,
-      },
-
-      explosionGenerator      = [[custom:TORPEDO_HIT]],
-	  fixedLauncher			  = true,
-      flightTime              = 6,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 0,
-      lineOfSight             = true,
-      model                   = [[wep_t_longbolt.s3o]],
-      propeller               = true,
-      range                   = 500,
-      reloadtime              = 1,
-      renderType              = 1,
-      selfprop                = true,
-      startVelocity           = 90,
-      tolerance               = 10000,
-      tracks                  = true,
-      turnRate                = 10000,
-      turret                  = true,
-      waterWeapon             = true,
-      weaponAcceleration      = 25,
-      weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 140,
-    },  
-  
     ARM_TORPEDO = {
       name                    = [[Torpedo]],
       areaOfEffect            = 16,
@@ -140,7 +102,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
-	  fixedLauncher			  = true,
+      fixedLauncher           = true,
       flightTime              = 6,
       impactOnly              = true,
       impulseBoost            = 0,
@@ -167,12 +129,53 @@ unitDef = {
       weaponVelocity          = 140,
     },
 
+
+    FAKEWEAPON  = {
+      name                    = [[Fake Torpedo - Points me in the right direction]],
+      areaOfEffect            = 16,
+      avoidFriendly           = false,
+      burnblow                = true,
+      collideFriendly         = false,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 0.1,
+        planes  = 0.1,
+        subs    = 0.1,
+      },
+
+      explosionGenerator      = [[custom:TORPEDO_HIT]],
+      fixedLauncher           = true,
+      flightTime              = 6,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 0,
+      lineOfSight             = true,
+      model                   = [[wep_t_longbolt.s3o]],
+      propeller               = true,
+      range                   = 500,
+      reloadtime              = 1,
+      renderType              = 1,
+      selfprop                = true,
+      startVelocity           = 90,
+      tolerance               = 10000,
+      tracks                  = true,
+      turnRate                = 10000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponAcceleration      = 25,
+      weaponType              = [[TorpedoLauncher]],
+      weaponVelocity          = 140,
+    },
+
   },
 
 
   featureDefs            = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Snake]],
       blocking         = false,
       category         = [[corpses]],
@@ -191,7 +194,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Snake]],
       blocking         = false,
       category         = [[heaps]],
