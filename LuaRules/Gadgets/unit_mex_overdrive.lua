@@ -540,7 +540,7 @@ end
 -------------------------------------------------------------------------------------
 
 local function AddNewMexes(n)
-	if (n%32 ~= 1) then
+	if (n%32 ~= 2) then -- in sync 1 frame after slow update
 		return
 	end
 	for unitID,_ in pairs(mexesToAdd) do -- check units to add 

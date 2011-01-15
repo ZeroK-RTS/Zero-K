@@ -118,6 +118,7 @@ local artyRangeSkirmieeArray = {
 	"tawf114", -- banisher
 	"corthud",
 	"spiderassault",
+	"corsumo",
 	
 	"armrock",
 	"corstorm",
@@ -182,6 +183,7 @@ local longRangeSkirmieeArray = {
 	"tawf114", -- banisher
 	"corthud",
 	"spiderassault",
+	"corsumo",
 	
 	"armrock",
 	"corstorm",
@@ -233,6 +235,7 @@ local medRangeSkirmieeArray = {
 	"tawf114", -- banisher
 	"corthud",
 	"spiderassault",
+	"corsumo",
 
 	"armstump",
 	"corraid",
@@ -272,6 +275,8 @@ local riotRangeSkirmieeArray = {
 	"panther",
 	"armst",
 	"logkoda",
+	
+	"corsumo",
 	
 	"corsh",
 }
@@ -318,6 +323,7 @@ local fleeables = {
 	"coresupp",
 	"armcrus",
 	"corcrus",
+	"corsumo",
 }
 
 
@@ -485,7 +491,7 @@ local behaviourConfig = {
 		circleStrafe = true, 
 		strafeOrderLength = 180,
 		skirmLeeway = 60,
-		maxSwarmLeeway = 40, 
+		maxSwarmLeeway = 100, 
 		swarmLeeway = 40, 
 		stoppingDistance = 8
 	},

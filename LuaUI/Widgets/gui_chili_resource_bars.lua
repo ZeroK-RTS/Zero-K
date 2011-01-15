@@ -153,7 +153,7 @@ end
 
 function widget:GameFrame(n)
 
-	if (n%32 ~= 1) then return end
+	if (n%32 ~= 2) then return end
 
 	if not window then return end
 
