@@ -57,7 +57,6 @@ unitDef = {
   onoffable              = true,
   pushResistant          = 1,
   radarDistanceJam       = 550,
-  --script                 = [[spherecloaker.cob]],
   seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNITEX]],
   side                   = [[ARM]],

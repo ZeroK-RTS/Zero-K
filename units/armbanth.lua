@@ -84,6 +84,7 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
+
     {
       def                = [[CORKROG_ROCKET]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
@@ -186,10 +187,11 @@ unitDef = {
       beamWeapon              = true,
       craterBoost             = 0,
       craterMult              = 0,
-	  
-	  customParams = { 
-		extra_damage = '240', 
-	  },
+
+      customParams            = {
+        extra_damage = [[240]],
+      },
+
 
       damage                  = {
         default        = 1200,
@@ -225,6 +227,7 @@ unitDef = {
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 400,
     },
+
   },
 
 

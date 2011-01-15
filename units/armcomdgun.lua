@@ -32,7 +32,7 @@ unitDef = {
 
   customParams           = {
     fireproof = [[1]],
-	helptext  = [[The Ultimatum packs only one weapon: a disintegrator gun that can vaporize a heavy tank in one blast. It is best used for sneaking up to enemy heavy striders and inflicting serious damage or destruction with a few shots. Defense against it is achieved by screening your heavyweights with lighter units.]],
+    helptext  = [[The Ultimatum packs only one weapon: a disintegrator gun that can vaporize a heavy tank in one blast. It is best used for sneaking up to enemy heavy striders and inflicting serious damage or destruction with a few shots. Defense against it is achieved by screening your heavyweights with lighter units.]],
   },
 
   defaultmissiontype     = [[Standby]],
@@ -249,6 +249,7 @@ unitDef = {
       metal            = 937.5,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
+      reclaimTime      = 937.5,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },

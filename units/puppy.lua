@@ -1,29 +1,29 @@
 unitDef = {
-  unitname              = [[corroach]],
-  name                  = [[Puppy]],
-  description           = [[Walking Missile]],
-  acceleration          = 0.12,
-  activateWhenBuilt     = true,
-  bmcode                = [[1]],
-  brakeRate             = 0.16,
-  buildCostEnergy       = 50,
-  buildCostMetal        = 50,
-  builder               = false,
-  buildPic              = [[PUPPY.png]],
-  buildTime             = 50,
-  canAttack             = true,
-  canGuard              = true,
-  canMove               = true,
-  canPatrol             = true,
-  canstop               = [[1]],
-  category              = [[LAND]],
-  collisionVolumeOffsets        = [[0 -1 0]],
-  collisionVolumeScales         = [[20 20 20]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],
-  cloakCost             = 0,
+  unitname               = [[corroach]],
+  name                   = [[Puppy]],
+  description            = [[Walking Missile]],
+  acceleration           = 0.12,
+  activateWhenBuilt      = true,
+  bmcode                 = [[1]],
+  brakeRate              = 0.16,
+  buildCostEnergy        = 50,
+  buildCostMetal         = 50,
+  builder                = false,
+  buildPic               = [[PUPPY.png]],
+  buildTime              = 50,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  cloakCost              = 0,
+  collisionVolumeOffsets = [[0 -1 0]],
+  collisionVolumeScales  = [[20 20 20]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
 
-  customParams          = {
+  customParams           = {
     description_bp = [[Bomba rastejante]],
     description_es = [[Bomba móvil]],
     description_fr = [[Bombe Rampante]],
@@ -35,30 +35,30 @@ unitDef = {
     helptext_it    = [[Questa veloce unitá suicida é buona contro unitá ammassate, specialmente carri armati d'assalto. Esplode a catena terribilmente, sicche é meglio non ammassarle. Contrastale con carri o torri lancia-razzi o singole unitá economiche per provocare una detonazione prematura.]],
   },
 
-  defaultmissiontype    = [[Standby]],
-  explodeAs             = [[TINY_BUILDINGEX]],
-  footprintX            = 2,
-  footprintZ            = 2,
-  iconType              = [[kbotbomb]],
-  idleAutoHeal          = 5,
-  idleTime              = 1800,
-  maneuverleashlength   = [[640]],
-  mass                  = 66,
-  maxDamage             = 120,
-  maxSlope              = 36,
-  maxVelocity           = 3.6,
-  maxWaterDepth         = 15,
-  minCloakDistance      = 75,
-  movementClass         = [[KBOT2]],
-  noAutoFire            = false,
-  noChaseCategory       = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName            = [[puppy.s3o]],
-  pushResistant         = 1,
-  seismicSignature      = 4,
-  selfDestructAs        = [[TINY_BUILDINGEX]],
-  selfDestructCountdown = 0,
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[TINY_BUILDINGEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[kbotbomb]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[640]],
+  mass                   = 66,
+  maxDamage              = 120,
+  maxSlope               = 36,
+  maxVelocity            = 3.6,
+  maxWaterDepth          = 15,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  noAutoFire             = false,
+  noChaseCategory        = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
+  objectName             = [[puppy.s3o]],
+  pushResistant          = 1,
+  seismicSignature       = 4,
+  selfDestructAs         = [[TINY_BUILDINGEX]],
+  selfDestructCountdown  = 0,
 
-  sfxtypes              = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
@@ -68,16 +68,16 @@ unitDef = {
 
   },
 
-  side                  = [[CORE]],
-  sightDistance         = 425,
-  smoothAnim            = true,
-  steeringmode          = [[1]],
-  TEDClass              = [[KBOT]],
-  turninplace           = 0,
-  turnRate              = 1507,
-  workerTime            = 0,
+  side                   = [[CORE]],
+  sightDistance          = 425,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[KBOT]],
+  turninplace            = 0,
+  turnRate               = 1507,
+  workerTime             = 0,
 
-  weapons               = {
+  weapons                = {
 
     {
       def                = [[MISSILE]],
@@ -87,7 +87,7 @@ unitDef = {
   },
 
 
-  weaponDefs            = {
+  weaponDefs             = {
 
     MISSILE = {
       name                    = [[Legless Puppy]],
@@ -136,7 +136,7 @@ unitDef = {
   },
 
 
-  featureDefs           = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Debris - Puppy]],

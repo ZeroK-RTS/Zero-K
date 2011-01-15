@@ -65,15 +65,18 @@ unitDef = {
   yardMap                       = [[ooooooooo]],
 
   weapons                       = {
+
     {
       def                = [[arm_det_weapon]],
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
+
   },
+
 
   weaponDefs                    = {
 
-    arm_det_weapon  = {
+    arm_det_weapon = {
       name                    = [[Electro-Stunner]],
       areaOfEffect            = 160,
       beamWeapon              = true,

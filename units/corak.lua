@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[corak]],
-  name                = [[Bandit]],
-  description         = [[Medium-Light Raider Bot]],
-  acceleration        = 0.384,
-  bmcode              = [[1]],
-  brakeRate           = 0.25,
-  buildCostEnergy     = 75,
-  buildCostMetal      = 75,
-  builder             = false,
-  buildPic            = [[CORAK.png]],
-  buildTime           = 75,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[25 29 25]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[cylY]],
-  corpse              = [[DEAD]],
+  unitname               = [[corak]],
+  name                   = [[Bandit]],
+  description            = [[Medium-Light Raider Bot]],
+  acceleration           = 0.384,
+  bmcode                 = [[1]],
+  brakeRate              = 0.25,
+  buildCostEnergy        = 75,
+  buildCostMetal         = 75,
+  builder                = false,
+  buildPic               = [[CORAK.png]],
+  buildTime              = 75,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[25 29 25]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[cylY]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô agressor]],
     description_es = [[Robot de invasión]],
     description_fr = [[Robot Pilleur]],
@@ -34,29 +34,29 @@ unitDef = {
     helptext_it    = [[Come unita d'invasione, il Bandit sacrifica potenza di fuoco per sopravvivenza. ? pi? resistente del suo equivalente Nova, ma comnque non ? da mandare contro nemici ben difesi. Si contrastano con unita da rissa ed llt.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[SMALL_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[walkerraider]],
-  idleAutoHeal        = 10,
-  idleTime            = 50,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 88,
-  maxDamage           = 250,
-  maxSlope            = 36,
-  maxVelocity         = 3.15,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[mbot.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[SMALL_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[SMALL_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[walkerraider]],
+  idleAutoHeal           = 10,
+  idleTime               = 50,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 88,
+  maxDamage              = 250,
+  maxSlope               = 36,
+  maxVelocity            = 3.15,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[mbot.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[SMALL_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
@@ -64,22 +64,22 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 440,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 18,
-  turninplace         = 0,
-  turnRate            = 1200,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 440,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 18,
+  turninplace            = 0,
+  turnRate               = 1200,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[LASER]],
@@ -90,7 +90,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     LASER = {
       name                    = [[Laser Blaster]],
@@ -134,7 +134,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Bandit]],

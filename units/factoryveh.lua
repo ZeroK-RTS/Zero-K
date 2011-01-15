@@ -20,7 +20,7 @@ unitDef = {
     [[corgator]],
     [[corlevlr]],
     [[corraid]],
-	[[corgarp]],
+    [[corgarp]],
     [[armmerl]],
     [[capturecar]],
   },

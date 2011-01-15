@@ -116,7 +116,7 @@ unitDef = {
 
   featureDefs         = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Kodachi]],
       blocking         = true,
       category         = [[corpses]],
@@ -137,7 +137,7 @@ unitDef = {
     },
 
 
-    HEAP  = {
+    HEAP = {
       description      = [[Debris - Kodachi]],
       blocking         = false,
       category         = [[heaps]],

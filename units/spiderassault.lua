@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[spiderassault]],
-  name                = [[Cudgel]],
-  description         = [[All Terrain Assault Bot]],
-  acceleration        = 0.1137,
-  bmcode              = [[1]],
-  brakeRate           = 0.2275,
-  buildCostEnergy     = 160,
-  buildCostMetal      = 160,
-  builder             = false,
-  buildPic            = [[spiderassault.png]],
-  buildTime           = 160,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[25 38 25]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[cylY]],
-  corpse              = [[DEAD]],
+  unitname               = [[spiderassault]],
+  name                   = [[Cudgel]],
+  description            = [[All Terrain Assault Bot]],
+  acceleration           = 0.1137,
+  bmcode                 = [[1]],
+  brakeRate              = 0.2275,
+  buildCostEnergy        = 160,
+  buildCostMetal         = 160,
+  builder                = false,
+  buildPic               = [[spiderassault.png]],
+  buildTime              = 160,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[25 38 25]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[cylY]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô assaltante]],
     description_es = [[Robot de Asalto]],
     description_fr = [[Robot d'Assaut]],
@@ -34,29 +34,29 @@ unitDef = {
     helptext_it    = [[Il Thud é incredibilmente resistente, ed e utile come scudo per i Recluse che fanno piú danno]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[spiderassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 175,
-  maxDamage           = 1400,
-  maxSlope            = 36,
-  maxVelocity         = 1.85,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[TKBOT3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[behecrash.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[spiderassault]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 175,
+  maxDamage              = 1400,
+  maxSlope               = 36,
+  maxVelocity            = 1.85,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[TKBOT3]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[behecrash.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:THUDMUZZLE]],
@@ -66,21 +66,21 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 420,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 22,
-  turninplace         = 0,
-  turnRate            = 1099,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 420,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 22,
+  turninplace            = 0,
+  turnRate               = 1099,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[THUD_WEAPON]],
@@ -91,7 +91,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     THUD_WEAPON = {
       name                    = [[Light Plasma Cannon]],
@@ -125,7 +125,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Cudgel]],

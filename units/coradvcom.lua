@@ -68,7 +68,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:COMGATE]],
-	  [[custom:RAIDMUZZLE]],
+      [[custom:RAIDMUZZLE]],
       [[custom:LEVLRMUZZLE]],
     },
 
@@ -117,41 +117,6 @@ unitDef = {
 
 
   weaponDefs          = {
-
-    SHOCK_CANNON = {
-      name                    = [[Shock Cannon]],
-      areaOfEffect            = 144,
-      avoidFeature            = true,
-      avoidFriendly           = true,
-      burnblow                = true,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 280,
-        planes  = 280,
-        subs    = 14,
-      },
-
-      edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:FLASH64]],
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
-      noSelfDamage            = true,
-      range                   = 330,
-      reloadtime              = 2,
-      renderType              = 4,
-      soundHit                = [[weapon/cannon/generic_cannon]],
-      soundStart              = [[weapon/cannon/outlaw_gun]],
-      soundStartVolume        = 3,
-      startsmoke              = [[1]],
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 750,
-    },
-
 
     CLUSTERBOMB    = {
       name                    = [[Cluster Bomb]],
@@ -268,6 +233,41 @@ unitDef = {
       weaponVelocity          = 900,
     },
 
+
+    SHOCK_CANNON   = {
+      name                    = [[Shock Cannon]],
+      areaOfEffect            = 144,
+      avoidFeature            = true,
+      avoidFriendly           = true,
+      burnblow                = true,
+      craterBoost             = 1,
+      craterMult              = 2,
+
+      damage                  = {
+        default = 280,
+        planes  = 280,
+        subs    = 14,
+      },
+
+      edgeEffectiveness       = 0.75,
+      explosionGenerator      = [[custom:FLASH64]],
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      lineOfSight             = true,
+      noSelfDamage            = true,
+      range                   = 330,
+      reloadtime              = 2,
+      renderType              = 4,
+      soundHit                = [[weapon/cannon/generic_cannon]],
+      soundStart              = [[weapon/cannon/outlaw_gun]],
+      soundStartVolume        = 3,
+      startsmoke              = [[1]],
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 750,
+    },
+
   },
 
 
@@ -347,6 +347,7 @@ unitDef = {
       metal            = 500,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
+      reclaimTime      = 500,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },

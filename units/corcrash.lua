@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[corcrash]],
-  name                = [[Crasher]],
-  description         = [[Anti-air Bot]],
-  acceleration        = 0.384,
-  bmcode              = [[1]],
-  brakeRate           = 0.25,
-  buildCostEnergy     = 100,
-  buildCostMetal      = 100,
-  builder             = false,
-  buildPic            = [[CORCRASH.png]],
-  buildTime           = 100,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = true,
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[30 41 30]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[cylY]],
-  corpse              = [[DEAD]],
+  unitname               = [[corcrash]],
+  name                   = [[Crasher]],
+  description            = [[Anti-air Bot]],
+  acceleration           = 0.384,
+  bmcode                 = [[1]],
+  brakeRate              = 0.25,
+  buildCostEnergy        = 100,
+  buildCostMetal         = 100,
+  builder                = false,
+  buildPic               = [[CORCRASH.png]],
+  buildTime              = 100,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = true,
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[30 41 30]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[cylY]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô anti-aéreo]],
     description_es = [[Robot Antiaéreo]],
     description_fr = [[Robot Anti-Air]],
@@ -34,31 +34,31 @@ unitDef = {
     helptext_it    = [[Il crasher é un economico robot da contraerea. Offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[walkeraa]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 123,
-  maxDamage           = 650,
-  maxSlope            = 36,
-  maxVelocity         = 2.7,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  moveState           = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName          = [[m-6.s3o]],
-  script              = [[corcrash.lua]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[walkeraa]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 123,
+  maxDamage              = 650,
+  maxSlope               = 36,
+  maxVelocity            = 2.7,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  moveState              = 0,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
+  objectName             = [[m-6.s3o]],
+  script                 = [[corcrash.lua]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:CRASHMUZZLE]],
@@ -66,21 +66,21 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 22,
-  turninplace         = 0,
-  turnRate            = 1112,
-  upright             = true,
+  side                   = [[CORE]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 22,
+  turninplace            = 0,
+  turnRate               = 1112,
+  upright                = true,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[ARMKBOT_MISSILE]],
@@ -91,7 +91,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     ARMKBOT_MISSILE = {
       name                    = [[Homing Missiles]],
@@ -109,7 +109,6 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:FLASH2]],
-	  --fixedLauncher			  = true,
       fireStarter             = 70,
       flightTime              = 3,
       impulseBoost            = 0,
@@ -140,9 +139,9 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Crasher]],
       blocking         = true,
       category         = [[corpses]],
@@ -162,7 +161,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Crasher]],
       blocking         = false,
       category         = [[heaps]],

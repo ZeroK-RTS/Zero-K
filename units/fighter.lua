@@ -1,29 +1,29 @@
 unitDef = {
-  unitname            = [[fighter]],
-  name                = [[Avenger]],
-  description         = [[Multirole Stealth Fighter]],
-  amphibious          = true,
-  buildCostEnergy     = 150,
-  buildCostMetal      = 150,
-  buildPic            = [[fighter.png]],
-  buildTime           = 150,
-  canAttack           = true,
-  canFly              = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  canSubmerge         = false,
-  category            = [[FIXEDWING]],
-  collide             = false,
+  unitname               = [[fighter]],
+  name                   = [[Avenger]],
+  description            = [[Multirole Stealth Fighter]],
+  amphibious             = true,
+  buildCostEnergy        = 150,
+  buildCostMetal         = 150,
+  buildPic               = [[fighter.png]],
+  buildTime              = 150,
+  canAttack              = true,
+  canFly                 = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  canSubmerge            = false,
+  category               = [[FIXEDWING]],
+  collide                = false,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[29 8 35]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
-  cruiseAlt           = 200,
+  corpse                 = [[DEAD]],
+  cruiseAlt              = 200,
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Caça básico]],
     description_fr = [[Chasseur Multirôle]],
     helptext       = [[The Avenger can hit both land and air. It protects well again air units, but enemy AA and air superiority fighters will kill it quickly. In numbers it can harass land units.]],
@@ -31,30 +31,30 @@ unitDef = {
     helptext_fr    = [[Capable de tirer en l'air ou au sol le Avenger n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
-  explodeAs           = [[GUNSHIPEX]],
-  fireState           = 2,
-  floater             = true,
-  footprintX          = 2,
-  footprintZ          = 2,
-  frontToSpeed        = 0,
-  iconType            = [[fighter]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[1280]],
-  mass                = 114,
-  maxAcc              = 0.5,
-  maxDamage           = 260,
-  maxVelocity         = 13,
-  minCloakDistance    = 75,
-  modelCenterOffset   = [[0 3 0]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[fighter.s3o]],
-  seismicSignature    = 0,
-  selfDestructAs      = [[GUNSHIPEX]],
+  defaultmissiontype     = [[VTOL_standby]],
+  explodeAs              = [[GUNSHIPEX]],
+  fireState              = 2,
+  floater                = true,
+  footprintX             = 2,
+  footprintZ             = 2,
+  frontToSpeed           = 0,
+  iconType               = [[fighter]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[1280]],
+  mass                   = 114,
+  maxAcc                 = 0.5,
+  maxDamage              = 260,
+  maxVelocity            = 13,
+  minCloakDistance       = 75,
+  modelCenterOffset      = [[0 3 0]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  objectName             = [[fighter.s3o]],
+  seismicSignature       = 0,
+  selfDestructAs         = [[GUNSHIPEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:MUZZLE_ORANGE]],
@@ -64,16 +64,16 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 690,
-  smoothAnim          = true,
-  speedToFront        = 0,
-  stealth             = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[VTOL]],
-  turnRate            = 839,
+  side                   = [[CORE]],
+  sightDistance          = 690,
+  smoothAnim             = true,
+  speedToFront           = 0,
+  stealth                = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[VTOL]],
+  turnRate               = 839,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[AVENGER_WEAPON]],
@@ -93,7 +93,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     AVENGER_WEAPON  = {
       name                    = [[Mini Laser Blaster]],
@@ -187,7 +187,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Avenger]],

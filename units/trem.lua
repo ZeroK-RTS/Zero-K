@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[trem]],
-  name                = [[Tremor]],
-  description         = [[Heavy Saturation Artillery Tank]],
-  acceleration        = 0.05952,
-  bmcode              = [[1]],
-  brakeRate           = 0.124,
-  buildCostEnergy     = 1500,
-  buildCostMetal      = 1500,
-  builder             = false,
-  buildPic            = [[TREM.png]],
-  buildTime           = 1500,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[44 34 60]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[cylZ]],
-  corpse              = [[DEAD]],
+  unitname               = [[trem]],
+  name                   = [[Tremor]],
+  description            = [[Heavy Saturation Artillery Tank]],
+  acceleration           = 0.05952,
+  bmcode                 = [[1]],
+  brakeRate              = 0.124,
+  buildCostEnergy        = 1500,
+  buildCostMetal         = 1500,
+  builder                = false,
+  buildPic               = [[TREM.png]],
+  buildTime              = 1500,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[44 34 60]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[cylZ]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Tanque de artilharia pesado]],
     description_fr = [[Artillerie Lourde]],
     helptext       = [[The principle behind the Tremor is simple: flood an area with enough shots, and you'll hit something at least once. Slow, clumsy, vulnerable and extremely frightening, the Tremor works best against high-density target areas, where its saturation shots are most likely to do damage.]],
@@ -30,31 +30,31 @@ unitDef = {
     helptext_fr    = [[Le principe du Tremor est simple: inonder une zone de tirs plasma gr?ce ? son triple canon, avec une chance de toucher quelquechose. Par d?finition impr?cis, le Tremor est l'outil indispensable de destruction de toutes les zones ? h'aute densit? d'ennemis.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNIT]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  highTrajectory      = 1,
-  iconType            = [[tanklrarty]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 392,
-  maxDamage           = 2045,
-  maxSlope            = 18,
-  maxVelocity         = 1.7,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[TANK4]],
-  moveState           = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName          = [[cortrem.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNIT]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNIT]],
+  footprintX             = 4,
+  footprintZ             = 4,
+  highTrajectory         = 1,
+  iconType               = [[tanklrarty]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 392,
+  maxDamage              = 2045,
+  maxSlope               = 18,
+  maxVelocity            = 1.7,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[TANK4]],
+  moveState              = 0,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName             = [[cortrem.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNIT]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:wolvmuzzle1]],
@@ -62,21 +62,21 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  trackOffset         = -8,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[StdTank]],
-  trackWidth          = 28,
-  turninplace         = 1,
-  turnRate            = 312,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[TANK]],
+  trackOffset            = -8,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[StdTank]],
+  trackWidth             = 28,
+  turninplace            = 1,
+  turnRate               = 312,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[PLASMA]],
@@ -89,7 +89,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     PLASMA = {
       name                    = [[Rapid-Fire Plasma Artillery]],
@@ -123,7 +123,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Tremor]],

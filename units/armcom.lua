@@ -112,7 +112,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict             = [[1]],
   objectName             = [[ARMCOM]],
-  script				 = [[armcom.cob]],
+  script                 = [[armcom.cob]],
   seismicSignature       = 16,
   selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
@@ -360,6 +360,7 @@ unitDef = {
       metal            = 500,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
+      reclaimTime      = 500,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },

@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[cormak]],
-  name                = [[Outlaw]],
-  description         = [[Riot Bot]],
-  acceleration        = 0.102,
-  bmcode              = [[1]],
-  brakeRate           = 0.135,
-  buildCostEnergy     = 250,
-  buildCostMetal      = 250,
-  builder             = false,
-  buildPic            = [[cormak.png]],
-  buildTime           = 250,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[46 48 37]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[cylY]],
-  corpse              = [[DEAD]],
+  unitname               = [[cormak]],
+  name                   = [[Outlaw]],
+  description            = [[Riot Bot]],
+  acceleration           = 0.102,
+  bmcode                 = [[1]],
+  brakeRate              = 0.135,
+  buildCostEnergy        = 250,
+  buildCostMetal         = 250,
+  builder                = false,
+  buildPic               = [[cormak.png]],
+  buildTime              = 250,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[46 48 37]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[cylY]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô dispersador]],
     description_es = [[Robot de alboroto]],
     description_fr = [[Robot ?meurier]],
@@ -31,29 +31,29 @@ unitDef = {
     nofriendlyfire = 1,
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[walkerriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[500]],
-  mass                = 177,
-  maxDamage           = 1000,
-  maxSlope            = 36,
-  maxVelocity         = 1.5,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
-  objectName          = [[behethud.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[walkerriot]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[500]],
+  mass                   = 177,
+  maxDamage              = 1000,
+  maxSlope               = 36,
+  maxVelocity            = 1.5,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
+  objectName             = [[behethud.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
@@ -64,25 +64,25 @@ unitDef = {
 
   },
 
-  shootme             = [[1]],
-  side                = [[CORE]],
-  sightDistance       = 347,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  threed              = [[1]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 22,
-  turninplace         = 0,
-  turnRate            = 1051,
-  upright             = true,
-  workerTime          = 0,
-  zbuffer             = [[1]],
+  shootme                = [[1]],
+  side                   = [[CORE]],
+  sightDistance          = 347,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  threed                 = [[1]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 22,
+  turninplace            = 0,
+  turnRate               = 1051,
+  upright                = true,
+  workerTime             = 0,
+  zbuffer                = [[1]],
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[FAKEGUN1]],
@@ -107,7 +107,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     BLAST    = {
       name                    = [[Disruptor Pulser]],
@@ -216,7 +216,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Outlaw]],

@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[corraid]],
-  name                = [[Ravager]],
-  description         = [[Assault Vehicle]],
-  acceleration        = 0.0255,
-  bmcode              = [[1]],
-  brakeRate           = 0.0385,
-  buildCostEnergy     = 250,
-  buildCostMetal      = 250,
-  builder             = false,
-  buildPic            = [[corraid.png]],
-  buildTime           = 250,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 1 0]],
-  collisionVolumeScales         = [[47 36 45]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  unitname               = [[corraid]],
+  name                   = [[Ravager]],
+  description            = [[Assault Vehicle]],
+  acceleration           = 0.0255,
+  bmcode                 = [[1]],
+  brakeRate              = 0.0385,
+  buildCostEnergy        = 250,
+  buildCostMetal         = 250,
+  builder                = false,
+  buildPic               = [[corraid.png]],
+  buildTime              = 250,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 1 0]],
+  collisionVolumeScales  = [[47 36 45]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Veículo de assalto]],
     description_fr = [[Véhicule d'Assaut]],
     helptext       = [[Expensive and powerful, the Ravager is capable of holding its own against most opposition. Though its manueverability is terrible, its strength is when moving at a considerable top speed in a straight line. Due to this, it is almost impossible to skirmish using raiders. In combat, you should attempt to keep travelling forward and not turn too suddenly, so as to maintain top speed. Circling your target at the edge of your range is a good tactic. An arcing projectile allows it to shoot over corpses, other tanks, etc. Vulnerable to crawling bombs when in swarms.]],
@@ -30,29 +30,29 @@ unitDef = {
     helptext_fr    = [[Le Ravager est un tank d'assaut. Sont blindage lui permet de faire face r nombre de menaces, et son canon plasma lui permet de tirer au dessus de ses alliés et des carcasses. Son moteur met du temps r atteindre sa vitesse maximale, mais celle ci est assez élevée pour qu'il ne puisse pas se faire harrasser par des tirailleurs qui seront trop occupés r le suivre.  Attention donc, r ne pas lui faire prendre de virages trop secs afin de conserver sa vitesse.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[vehicleassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 212,
-  maxDamage           = 1850,
-  maxSlope            = 18,
-  maxVelocity         = 2.9,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[TANK3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[CORRAID.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 3,
+  footprintZ             = 3,
+  iconType               = [[vehicleassault]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 212,
+  maxDamage              = 1850,
+  maxSlope               = 18,
+  maxVelocity            = 2.9,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[TANK3]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[CORRAID.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
@@ -61,22 +61,22 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 385,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  trackOffset         = 6,
-  trackStrength       = 5,
-  trackStretch        = 1,
-  trackType           = [[StdTank]],
-  trackWidth          = 30,
-  turninplace         = 0,
-  turnInPlace         = 0,
-  turnRate            = 407,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 385,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[TANK]],
+  trackOffset            = 6,
+  trackStrength          = 5,
+  trackStretch           = 1,
+  trackType              = [[StdTank]],
+  trackWidth             = 30,
+  turninplace            = 0,
+  turnInPlace            = 0,
+  turnRate               = 407,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[PLASMA]],
@@ -87,7 +87,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     PLASMA = {
       name                    = [[Light Plasma Cannon]],
@@ -120,7 +120,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Ravager]],

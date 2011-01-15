@@ -168,6 +168,7 @@ unitDef = {
 
 
     MELEE      = {
+      [1                      ] = 6,
       name                    = [[ChickenClaws]],
       areaOfEffect            = 32,
       craterBoost             = 1,
@@ -186,9 +187,8 @@ unitDef = {
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
-	  --projectiles			  = 2,
       range                   = 200,
-      reloadtime              = 1,6,
+      reloadtime              = 1,
       size                    = 0,
       soundStart              = [[chickens/bigchickenbreath]],
       startsmoke              = [[0]],

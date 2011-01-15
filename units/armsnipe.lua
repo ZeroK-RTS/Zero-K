@@ -135,7 +135,7 @@ unitDef = {
 
   featureDefs            = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Sharpshooter]],
       blocking         = true,
       category         = [[corpses]],
@@ -155,7 +155,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Sharpshooter]],
       blocking         = false,
       category         = [[heaps]],

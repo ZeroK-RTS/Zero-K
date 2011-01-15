@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[corgator]],
-  name                = [[Scorcher]],
-  description         = [[Raider Vehicle]],
-  acceleration        = 0.057,
-  bmcode              = [[1]],
-  brakeRate           = 0.07,
-  buildCostEnergy     = 130,
-  buildCostMetal      = 130,
-  builder             = false,
-  buildPic            = [[corgator.png]],
-  buildTime           = 130,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 1 0]],
-  collisionVolumeScales         = [[33 23 42]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  unitname               = [[corgator]],
+  name                   = [[Scorcher]],
+  description            = [[Raider Vehicle]],
+  acceleration           = 0.057,
+  bmcode                 = [[1]],
+  brakeRate              = 0.07,
+  buildCostEnergy        = 130,
+  buildCostMetal         = 130,
+  builder                = false,
+  buildPic               = [[corgator.png]],
+  buildTime              = 130,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 1 0]],
+  collisionVolumeScales  = [[33 23 42]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Veículo escaramuçador]],
     description_fr = [[V?hicule Pilleur]],
     helptext       = [[Capable of taking damage and dishing it out, the Instigator is a versatile unit that remains very useful for more than just raiding, though it pays the price in manueverability and in cost. Its regeneration dramatically decreases its losses vs inferior opposition- it is impossible to kill the scorcher with attrition. Though able to hold its own in combat, it is no match for anti-swarm or riot units or defenses.]],
@@ -30,29 +30,29 @@ unitDef = {
     helptext_fr    = [[ Le Instigator est rapide et solide. ?quip? d'une mitrailleuse laser il saura faire face de lui m?me ? un combat et ses nano-robots auto r?g?nerants se chargeront de le remettre sur pied pour la suite. Particuli?rement allergique aux anti-nu?es et au ?meutiers.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[vehicleraider]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 118,
-  maxDamage           = 420,
-  maxSlope            = 18,
-  maxVelocity         = 3.55,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[TANK2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[corgator_512.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[vehicleraider]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 118,
+  maxDamage              = 420,
+  maxSlope               = 18,
+  maxVelocity            = 3.55,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[TANK2]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[corgator_512.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_ORANGE_SMALL]],
@@ -60,21 +60,21 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 360,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  trackOffset         = 5,
-  trackStrength       = 5,
-  trackStretch        = 1,
-  trackType           = [[StdTank]],
-  trackWidth          = 21,
-  turninplace         = 0,
-  turnRate            = 703,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 360,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[TANK]],
+  trackOffset            = 5,
+  trackStrength          = 5,
+  trackStretch           = 1,
+  trackType              = [[StdTank]],
+  trackWidth             = 21,
+  turninplace            = 0,
+  turnRate               = 703,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[HEATRAY]],
@@ -85,7 +85,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     HEATRAY = {
       name                    = [[Heat Ray]],
@@ -135,7 +135,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Instigator]],

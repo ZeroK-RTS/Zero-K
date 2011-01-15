@@ -181,7 +181,6 @@ unitDef = {
 
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:NONE]],
-	  --projectiles			  = 2,
       impulseBoost            = 0,
       impulseFactor           = 1,
       interceptedByShieldType = 1,

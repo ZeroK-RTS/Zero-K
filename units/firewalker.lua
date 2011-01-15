@@ -1,55 +1,55 @@
 unitDef = {
-  unitname            = [[firewalker]],
-  name                = [[Firewalker]],
-  description         = [[Fire Support Walker (Artillery/Skirmish)]],
-  acceleration        = 0.0984,
-  bmcode              = [[1]],
-  brakeRate           = 0.2392,
-  buildCostEnergy     = 1280,
-  buildCostMetal      = 1280,
-  builder             = false,
-  buildPic            = [[firewalker.png]],
-  buildTime           = 1280,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[48 47 48]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[cylY]],
-  corpse              = [[DEAD]],
+  unitname               = [[firewalker]],
+  name                   = [[Firewalker]],
+  description            = [[Fire Support Walker (Artillery/Skirmish)]],
+  acceleration           = 0.0984,
+  bmcode                 = [[1]],
+  brakeRate              = 0.2392,
+  buildCostEnergy        = 1280,
+  buildCostMetal         = 1280,
+  builder                = false,
+  buildPic               = [[firewalker.png]],
+  buildTime              = 1280,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[48 47 48]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[cylY]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     helptext = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[walkerarty]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  immunetoparalyzer   = [[0]],
-  maneuverleashlength = [[640]],
-  mass                = 347,
-  maxDamage           = 1250,
-  maxSlope            = 36,
-  maxVelocity         = 1.9,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT4]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[firewalker.s3o]],
-  script              = [[punisher.cob]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 4,
+  footprintZ             = 4,
+  iconType               = [[walkerarty]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  immunetoparalyzer      = [[0]],
+  maneuverleashlength    = [[640]],
+  mass                   = 347,
+  maxDamage              = 1250,
+  maxSlope               = 36,
+  maxVelocity            = 1.9,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT4]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  objectName             = [[firewalker.s3o]],
+  script                 = [[punisher.cob]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:shellshockflash]],
@@ -59,16 +59,16 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turnRate            = 538,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  turnRate               = 538,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[NAPALM_MORTAR]],
@@ -78,13 +78,12 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     NAPALM_MORTAR = {
       name                    = [[Immolation Mortar]],
       accuracy                = 320,
       areaOfEffect            = 256,
-	  --cegTag				  = [[BANISHERTRAIL]],
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -106,8 +105,8 @@ unitDef = {
       range                   = 900,
       reloadtime              = 12,
       renderType              = 4,
-	  rgbColor                = [[1 0.5 0.2]],
-	  size					  = 8,
+      rgbColor                = [[1 0.5 0.2]],
+      size                    = 8,
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
       sprayangle              = 2048,
@@ -120,7 +119,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Firewalker]],

@@ -216,6 +216,7 @@ unitDef = {
       metal            = 510,
       object           = [[debris4x4b.s3o]],
       reclaimable      = true,
+      reclaimTime      = 510,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },

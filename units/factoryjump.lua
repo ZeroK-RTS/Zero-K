@@ -21,7 +21,7 @@ unitDef = {
     [[slowmort]],
     [[corsktl]],
     [[armaak]],
-	[[firewalker]],
+    [[firewalker]],
     [[corsumo]],
   },
 
@@ -38,7 +38,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    canjump        = [[1]],
+    canjump  = [[1]],
     helptext = [[The esoteric Jumpjet/Specialist Plant offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Sumo]],
     sortName = [[5]],
   },

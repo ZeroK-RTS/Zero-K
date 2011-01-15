@@ -191,9 +191,8 @@ local gaiaTeamID          = Spring.GetGaiaTeamID()
 computerTeams[gaiaTeamID] = nil
 humanTeams[gaiaTeamID]    = nil
 
-if (luaAI == 0) then
-  return false
-end
+if (luaAI == 0) then return false
+else GG.chicken = true end
 
 
 --------------------------------------------------------------------------------

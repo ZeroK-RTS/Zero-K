@@ -55,7 +55,7 @@ unitDef = {
       nodrawundergray  = true,
       object           = [[Tyranid2.s3o]],
       reclaimable      = true,
-      reclaimTime      = 90,
+      reclaimTime      = 1,
       seqnamereclamate = [[tree1reclamate]],
       world            = [[allworld]],
     },

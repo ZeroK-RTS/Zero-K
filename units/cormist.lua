@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[cormist]],
-  name                = [[Slasher]],
-  description         = [[Ranged Support/AA Truck (must stop to fire)]],
-  acceleration        = 0.0354,
-  bmcode              = [[1]],
-  brakeRate           = 0.0358,
-  buildCostEnergy     = 120,
-  buildCostMetal      = 120,
-  builder             = false,
-  buildPic            = [[CORMIST.png]],
-  buildTime           = 120,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 -1 0]],
-  collisionVolumeScales         = [[38 55 59]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],
-  corpse              = [[DEAD]],
+  unitname               = [[cormist]],
+  name                   = [[Slasher]],
+  description            = [[Ranged Support/AA Truck (must stop to fire)]],
+  acceleration           = 0.0354,
+  bmcode                 = [[1]],
+  brakeRate              = 0.0358,
+  buildCostEnergy        = 120,
+  buildCostMetal         = 120,
+  builder                = false,
+  buildPic               = [[CORMIST.png]],
+  buildTime              = 120,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 -1 0]],
+  collisionVolumeScales  = [[38 55 59]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Veículo lançador de mísseis]],
     description_fr = [[Camion Lance-Missile]],
     helptext       = [[Keep the Slasher at maximum range to harass the opponent's units. The Slasher's missiles track, so they are ideal to kill fast-moving crawling bombs. It is able to hit both air and land, allowing you to counter an enemy who is using both. Cannot fire over terraform walls, and does poorly if an enemy is allowed to close range. Unlike normal skirmishers, the Slasher cannot fire while moving.]],
@@ -30,31 +30,31 @@ unitDef = {
     helptext_fr    = [[Le Slasher est un camion Tirailleur. Sa trcs grande portée compense un peu son manque de puissance de feu. Capable de tirer en l'air ou au sol, il saura quand meme trouver sa place dans votre armée.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[vehiclesupport]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 120,
-  maxDamage           = 500,
-  maxSlope            = 18,
-  maxVelocity         = 2.5,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[TANK3]],
-  moveState           = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[cormist_512.s3o]],
-  pushResistant       = 1,
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 3,
+  footprintZ             = 3,
+  iconType               = [[vehiclesupport]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 120,
+  maxDamage              = 500,
+  maxSlope               = 18,
+  maxVelocity            = 2.5,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[TANK3]],
+  moveState              = 0,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  objectName             = [[cormist_512.s3o]],
+  pushResistant          = 1,
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:SLASHMUZZLE]],
@@ -63,22 +63,22 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  trackOffset         = -6,
-  trackStrength       = 5,
-  trackStretch        = 1,
-  trackType           = [[StdTank]],
-  trackWidth          = 30,
-  turninplace         = 0,
-  turnInPlace         = 0,
-  turnRate            = 486,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[TANK]],
+  trackOffset            = -6,
+  trackStrength          = 5,
+  trackStretch           = 1,
+  trackType              = [[StdTank]],
+  trackWidth             = 30,
+  turninplace            = 0,
+  turnInPlace            = 0,
+  turnRate               = 486,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[CORTRUCK_MISSILE]],
@@ -88,7 +88,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     CORTRUCK_MISSILE = {
       name                    = [[Homing Missiles]],
@@ -137,7 +137,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Slasher]],

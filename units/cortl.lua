@@ -61,7 +61,7 @@ unitDef = {
 
   weaponDefs        = {
 
-    TORPEDO     = {
+    TORPEDO = {
       name                    = [[Torpedo Launcher]],
       areaOfEffect            = 16,
       avoidFriendly           = false,

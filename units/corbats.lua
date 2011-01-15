@@ -143,7 +143,7 @@ unitDef = {
 
   featureDefs            = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Warlord]],
       blocking         = false,
       category         = [[corpses]],
@@ -162,7 +162,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Warlord]],
       blocking         = false,
       category         = [[heaps]],

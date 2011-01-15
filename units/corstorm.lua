@@ -1,28 +1,28 @@
 unitDef = {
-  unitname            = [[corstorm]],
-  name                = [[Rogue]],
-  description         = [[Skirmisher Bot (Indirect Fire)]],
-  acceleration        = 0.1092,
-  bmcode              = [[1]],
-  brakeRate           = 0.1942,
-  buildCostEnergy     = 120,
-  buildCostMetal      = 120,
-  builder             = false,
-  buildPic            = [[CORSTORM.png]],
-  buildTime           = 120,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[28 42 28]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[cylY]],
-  corpse              = [[DEAD]],
+  unitname               = [[corstorm]],
+  name                   = [[Rogue]],
+  description            = [[Skirmisher Bot (Indirect Fire)]],
+  acceleration           = 0.1092,
+  bmcode                 = [[1]],
+  brakeRate              = 0.1942,
+  buildCostEnergy        = 120,
+  buildCostMetal         = 120,
+  builder                = false,
+  buildPic               = [[CORSTORM.png]],
+  buildTime              = 120,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[28 42 28]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[cylY]],
+  corpse                 = [[DEAD]],
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Robô escaramuçador]],
     description_fr = [[Robot Tirailleur]],
     helptext       = [[The Rogue's arcing missiles have a low rate of fire, but do a lot of damage, making it very good at dodging in and out of range of enemy units or defense, or in a powerful initial salvo. Counter them by attacking them with fast units, or crawling bombs when massed.]],
@@ -30,29 +30,29 @@ unitDef = {
     helptext_fr    = [[Le Rogue est un tirailleur typique: longue port?e, cadence de tir lente et faible blindage. Ces deux puissants missiles ? t?tes chercheuse sont tr?s puissant mais cette unit? doit fuir le corps ? corps ? tout prix.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[walkerskirm]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 124,
-  maxDamage           = 570,
-  maxSlope            = 36,
-  maxVelocity         = 1.95,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName          = [[storm.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  footprintX             = 2,
+  footprintZ             = 2,
+  iconType               = [[walkerskirm]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  maneuverleashlength    = [[640]],
+  mass                   = 124,
+  maxDamage              = 570,
+  maxSlope               = 36,
+  maxVelocity            = 1.95,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
+  objectName             = [[storm.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:STORMMUZZLE]],
@@ -61,22 +61,22 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 572,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 22,
-  turninplace         = 0,
-  turnRate            = 1103,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 572,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ComTrack]],
+  trackWidth             = 22,
+  turninplace            = 0,
+  turnRate               = 1103,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[STORM_ROCKET]],
@@ -86,7 +86,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     STORM_ROCKET = {
       name                    = [[Heavy Rocket]],
@@ -135,7 +135,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Rogue]],

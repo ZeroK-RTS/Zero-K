@@ -25,10 +25,10 @@ unitDef = {
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
-  customParams          = {
+  customParams                  = {
     helptext = [[The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly.]],
   },
-  
+
   defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 5,
