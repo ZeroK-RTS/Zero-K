@@ -51,10 +51,10 @@ local airCmd = {
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
   if AIRPLANT[unitDefID] then
     InsertUnitCmdDesc(unitID, 500, landCmd)
-    --InsertUnitCmdDesc(unitID, 500, airCmd)
+    InsertUnitCmdDesc(unitID, 500, airCmd)
     plantList[unitID] = {landAt=1, repairAt=1}
   elseif plantList[builderID] then
-    --GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, { plantList[builderID].repairAt }, { })
+    GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, { plantList[builderID].repairAt }, { })
     GiveOrderToUnit(unitID, CMD.IDLEMODE, { plantList[builderID].landAt }, { })
   end
 end
@@ -71,14 +71,12 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
       EditUnitCmdDesc(unitID, cmdDescID, landCmd)
       plantList[unitID].landAt = cmdParams[1]
       landCmd.params[1] = 1
-	--[[
     elseif (cmdID == 34570) then
       local cmdDescID = FindUnitCmdDesc(unitID, 34570)
       airCmd.params[1] = cmdParams[1]
       EditUnitCmdDesc(unitID, cmdDescID, airCmd)
       plantList[unitID].repairAt = cmdParams[1]
       airCmd.params[1] = 1
-	]]--
     end
   end
   return true

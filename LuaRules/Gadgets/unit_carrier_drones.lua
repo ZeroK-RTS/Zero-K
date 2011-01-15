@@ -77,7 +77,7 @@ local function NewDrone(unitID, droneName)
   SetUnitPosition(droneID, xS, zS, true)
   GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, {})
   GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, {})
-  --GiveOrderToUnit(droneID, CMD.AUTOREPAIRLEVEL, { 3 }, {})
+  GiveOrderToUnit(droneID, CMD.AUTOREPAIRLEVEL, { 3 }, {})
   GiveOrderToUnit(droneID, CMD.FIGHT,  {(x + (random(0,600) - 300)), 60, (z + (random(0,600) - 300))}, {""})
   GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
     
