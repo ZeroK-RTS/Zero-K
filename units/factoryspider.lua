@@ -51,6 +51,7 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
+  maxWaterDepth                 = 0,
   metalMake                     = 0.3,
   minCloakDistance              = 150,
   noAutoFire                    = false,
