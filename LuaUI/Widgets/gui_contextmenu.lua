@@ -242,7 +242,7 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 		cells[#cells+1] = ' - Damage:'
 		cells[#cells+1] = dam_str
 		cells[#cells+1] = ' - Reloadtime:'
-		cells[#cells+1] = numformat(ws.reloadtime,2) ..'s'
+		cells[#cells+1] = string.format("%.1f", ws.reloadtime) ..'s'
 		cells[#cells+1] = ' - Damage/second:'
 		cells[#cells+1] = dps_str
 		cells[#cells+1] = ' - Range:'
