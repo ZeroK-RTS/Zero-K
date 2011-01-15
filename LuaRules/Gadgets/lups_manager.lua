@@ -108,17 +108,26 @@ end
 
 local CloakedHitEffect = { class='UnitJitter',options={ life=50, pos={0,0,0}, enemyHit=true, repeatEffect=false} }
 local CloakEffect      = {
-  --{ class='UnitCloaker',options={ life=60 } },
-  --{ class='UnitJitter',options={ delay=27, life=math.huge } },
+  { class='UnitCloaker',options={ life=50 } },
+  { class='UnitJitter',options={ delay=24, life=math.huge } },
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
+local EnemyCloakEffect      = {
+  { class='UnitCloaker',options={ life=20 } },
+  { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
+}
+
 local DecloakEffect    = {
-  --{ class='UnitCloaker',options={ inverse=true, life=60 } },
-  --{ class='UnitJitter',options={ life=27 } },
+  { class='UnitCloaker',options={ inverse=true, life=50 } },
+  { class='UnitJitter',options={ life=24 } },
+  { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
+}
+local EnemyDecloakEffect      = {
+  { class='UnitCloaker',options={ inverse=true, life=60 } },
   { class='Sound',options={ file="sounds/cloak.wav",volume=0.9 } },
 }
 
-
+--[[
 local function UnitDamaged(_,unitID,unitDefID,teamID)
   local allyTeamID = Spring.GetUnitAllyTeam(unitID)
 
@@ -145,7 +154,7 @@ local function UnitDamaged(_,unitID,unitDefID,teamID)
     tinsert( particleIDs[unitID],Lups.AddParticles(CloakedHitEffect.class,CloakedHitEffect.options) )
   end
 end
-
+--]]
 
 local function UnitCloaked(_,unitID,unitDefID,teamID)
   local allyTeamID = Spring.GetUnitAllyTeam(unitID)
@@ -164,19 +173,21 @@ local function UnitCloaked(_,unitID,unitDefID,teamID)
     end
   end
   particleIDs[unitID] = {}
-  for i=1,#CloakEffect do
-    local fx = CloakEffect[i]
-    if (fx.class~="UnitJitter")or(allyTeamID==LocalAllyTeamID) then
-      if (fx.class=="UnitCloaker") then
-        fx.options.unit      = unitID
-        fx.options.unitDefID = unitDefID
-        fx.options.team      = teamID
-      else
-        fx.options.unit      = unitID
-        fx.options.unitDefID = unitDefID
-        fx.options.team      = teamID
-      end
-      tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
+  if (LocalAllyTeamID==allyTeamID) then
+    for i=1,#CloakEffect do
+      local fx = CloakEffect[i]
+      fx.options.unit      = unitID
+      fx.options.unitDefID = unitDefID
+      fx.options.team      = teamID
+	  tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
+    end
+  else
+    for i=1,#EnemyCloakEffect do
+      local fx = EnemyCloakEffect[i]
+      fx.options.unit      = unitID
+      fx.options.unitDefID = unitDefID
+      fx.options.team      = teamID
+	  tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
     end
   end
 
@@ -200,19 +211,21 @@ local function UnitDecloaked(_,unitID,unitDefID,teamID)
     end
   end
   particleIDs[unitID] = {}
-  for i=1,#DecloakEffect do
-    local fx = DecloakEffect[i]
-    if (fx.class~="UnitJitter")or(allyTeamID==LocalAllyTeamID) then
-      if (fx.class=="UnitCloaker") then
-        fx.options.unit      = unitID
-        fx.options.unitDefID = unitDefID
-        fx.options.team      = teamID
-      else
-        fx.options.unit      = unitID
-        fx.options.unitDefID = unitDefID
-        fx.options.team      = teamID
-      end
-      tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
+  if (LocalAllyTeamID==allyTeamID) then
+    for i=1,#DecloakEffect do
+      local fx = DecloakEffect[i]
+      fx.options.unit      = unitID
+      fx.options.unitDefID = unitDefID
+      fx.options.team      = teamID
+	  tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
+    end
+  else
+    for i=1,#EnemyDecloakEffect do
+      local fx = EnemyDecloakEffect[i]
+      fx.options.unit      = unitID
+      fx.options.unitDefID = unitDefID
+      fx.options.team      = teamID
+	  tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
     end
   end
 end
@@ -278,7 +291,7 @@ function gadget:Update()
   Lups  = GG['Lups']
 
   if (Lups) then
-    gadgetHandler:AddSyncAction("lups_unit_cloakeddamaged", UnitDamaged)
+    --gadgetHandler:AddSyncAction("lups_unit_cloakeddamaged", UnitDamaged)
     gadgetHandler:AddSyncAction("lups_unit_cloaked",        UnitCloaked)
     gadgetHandler:AddSyncAction("lups_unit_decloaked",      UnitDecloaked)
     gadgetHandler:AddSyncAction("lups_unit_destroyed",      UnitDestroyed)

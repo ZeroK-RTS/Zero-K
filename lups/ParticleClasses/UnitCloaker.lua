@@ -271,8 +271,8 @@ function UnitCloaker:Visible()
   end
 
   local losState = Spring.GetUnitLosState(self.unit, LocalAllyTeamID) or {}
-  local inLos = (inLos)and(not losState.los)
-  return (inLos)and(Spring.IsUnitVisible(self.unit))
+  local losState = (losState)and(losState.los)
+  return losState
 end
 
 -----------------------------------------------------------------------------------------------------------------
