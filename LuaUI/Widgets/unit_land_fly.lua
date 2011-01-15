@@ -3,8 +3,8 @@ local versionNumber = "v1.2.2"
 
 function widget:GetInfo()
   return {
-    name      = "Land Fly " .. versionNumber,
-    desc      = "Sets air units to land or fly.",
+    name      = "Land Fly",
+    desc      = versionNumber .. " Sets air units to land or fly.",
     author    = "Evil4Zerggin",
     date      = "2 June 2008",
     license   = "GNU GPL, v2 or later",

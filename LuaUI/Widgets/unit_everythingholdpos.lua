@@ -86,11 +86,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	  else
 		spGiveOrderToUnit(unitID, CMD.MOVE_STATE, { 1 }, {})
       end
-	
-	  if ud.canFly then
-	    spGiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, { 0 }, {})
-	  end
-	
+	  --if ud.canFly then
+	  --  spGiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, { 0 }, {})
+	  --end
 	end
 	
   end
