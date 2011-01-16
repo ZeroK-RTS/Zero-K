@@ -21,6 +21,8 @@ if not gadgetHandler:IsSyncedCode() then
 	return
 end
 
+local UPDATE_PERIOD = 15
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetUnitDefID        	= Spring.GetUnitDefID
@@ -40,7 +42,7 @@ if not GG.attUnits then
 	GG.attUnits = {}
 end
 
-local function updateReloadSpeed( unitID, ud, speedFactor)
+local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 	
 	if not origUnitReload[unitID] then
 	
@@ -64,15 +66,22 @@ local function updateReloadSpeed( unitID, ud, speedFactor)
 	
 	for i = 0, state.weaponCount do
 		local w = state.weapon[i]
-		local newReload = w.reload * (1+speedFactor*2) 
-		spSetUnitWeaponState(unitID, i, {reloadTime = newReload})
-		
-		local newReloadFrames = math.floor(newReload*30)
-		local reloadChange = newReloadFrames - w.oldReloadFrames
-		w.oldReloadFrames = newReloadFrames
-		
 		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
-		spSetUnitWeaponState(unitID, i, {reloadState = reloadState+reloadChange})
+		local reloadTime = spGetUnitWeaponState(unitID, i , 'reloadTime')
+		if speedFactor <= 0 then
+			local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
+			if reloadState < 0 then -- unit is already reloaded, so set unit to almost reloaded
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
+			else
+				local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+			end
+			-- add UPDATE_PERIOD so that the reload time never advances past what it is now
+		else
+			local newReload = w.reload/speedFactor
+			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
+			spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+		end
 	end
 	
 end
@@ -105,21 +114,26 @@ local function updateMovementSpeed( unitID, ud, speedFactor)
 	end
 	
 	local state = origUnitSpeed[unitID]
+	local decFactor = speedFactor
+	if speedFactor < 0 then
+		speedFactor = 0
+		decFactor = 100000 -- a unit with 0 decRate will not deccelerate down to it's 0 maxVelocity
+	end
 	
 	if Spring.MoveCtrl.GetTag(unitID) == nil then
 		if state.movetype == 0 then
-			Spring.MoveCtrl.SetAirMoveTypeData(unitID, {maxSpeed = state.origSpeed*(1-speedFactor)})
-			Spring.MoveCtrl.SetAirMoveTypeData (unitID, {maxAcc = state.origMaxAcc*(1-speedFactor)})
+			Spring.MoveCtrl.SetAirMoveTypeData(unitID, {maxSpeed = state.origSpeed*speedFactor})
+			Spring.MoveCtrl.SetAirMoveTypeData (unitID, {maxAcc = state.origMaxAcc*decFactor})
 		elseif state.movetype == 1 then
-			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {maxSpeed = state.origSpeed*(1-speedFactor)})
-			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {turnRate = state.origTurnRate*(1-speedFactor)})
-			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {accRate = state.origMaxAcc*(1-speedFactor)})
-			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {decRate = state.origMaxDec*(1-speedFactor)})
+			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {maxSpeed = state.origSpeed*speedFactor})
+			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {turnRate = state.origTurnRate*speedFactor})
+			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {accRate = state.origMaxAcc*speedFactor})
+			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {decRate = state.origMaxDec*decFactor})
 		elseif state.movetype == 2 then
-			Spring.MoveCtrl.SetGroundMoveTypeData(unitID, {maxSpeed = state.origSpeed*(1-speedFactor)})
-			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {turnRate = state.origTurnRate*(1-speedFactor)})
-			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {accRate = state.origMaxAcc*(1-speedFactor)})
-			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {decRate = state.origMaxDec*(1-speedFactor)})
+			Spring.MoveCtrl.SetGroundMoveTypeData(unitID, {maxSpeed = state.origSpeed*speedFactor})
+			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {turnRate = state.origTurnRate*speedFactor})
+			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {accRate = state.origMaxAcc*speedFactor})
+			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {decRate = state.origMaxDec*decFactor})
 		end
 	end
 	
@@ -133,7 +147,7 @@ end
 
 function gadget:GameFrame(f)
 	
-	if f % 16 == 1 then
+	if f % UPDATE_PERIOD == 1 then
 		for unitID, teamID in pairs(GG.attUnits) do
 		
 			if not Spring.ValidUnitID(unitID) then
@@ -151,8 +165,8 @@ function gadget:GameFrame(f)
 			-- SLOW --
 			local slowState = spGetUnitRulesParam(unitID,"slowState")
 			if slowState then
-				updateReloadSpeed(unitID,ud,slowState)
-				updateMovementSpeed(unitID,ud,slowState)
+				updateReloadSpeed(unitID, ud, 1-slowState, f)
+				updateMovementSpeed(unitID,ud,1-slowState)
 				
 				if slowState ~= 0 then
 					changedAtt = true
