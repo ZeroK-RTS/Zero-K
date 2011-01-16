@@ -59,12 +59,12 @@ local defense = {
 	cormine1 = {order = 16, row = 3},
 	armanni = {order = 17, row = 3},
 	cordoom = {order = 18, row = 3},
+	corjamt = {order = 19, row = 1},
 }
 
 local aux = {	--merged into special
 	corrad = {order = 10, row = 1},
 	armjamt = {order = 11, row = 1},
-	corjamt = {order = 12, row = 1},
 --	corjamt = {order = 12, row = 1},
 	armsonar = {order = 13, row = 1},
 	armarad = {order = 14, row = 1},

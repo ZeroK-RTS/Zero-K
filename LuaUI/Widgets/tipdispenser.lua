@@ -11,7 +11,7 @@ function widget:GetInfo()
 		date = "July 30th, 2009",
 		license = "Public Domain",
 		layer = 8,
-		enabled = (rank and rank == 1) or true,
+		enabled = false,	-- (rank and rank == 1) or true,
 		handler  = true,
 	}
 end
@@ -379,6 +379,12 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 		str = WriteString(stringExpensiveUnits, -cmdID)
 	end
 	if str then SetTip(str) end	-- bring up the tip NOW
+end
+
+function widget:UnitCreated(unitID, unitDefID, unitTeam)
+	if unitTeam ~= myTeam then return end
+	local name = UnitDefs[unitDefID].name
+	if unitTips[name] then AddTipOnce(unpack(unitTips[name])) end
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)

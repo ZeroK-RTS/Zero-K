@@ -19,7 +19,7 @@ generalTips = {
 	"When fighting AoE weapons, spread out your units to minimize damage.",
 	"You can draw on the map with tilde (~) and left mouse. ~ + double click adds a labelled point, while ~ + middle click adds a point without label. ~ + right click erases.",
 	"Many commands can be issued over a whole area by keeping button the down and dragging a box or disc.",
-	"The Dreamweaver capture vehicle can capture a single enemy unit, but control is lost if the capturing Dreamweaver dies.",
+	
 	"Heavy striders are built by the Athena specops aircraft, buildable by any mobile constructor.",
 	"Riot units double as improvised anti-air against most gunships.",
 	"Nuclear missiles are devastating, but can be intercepted by antinuke systems which provide coverage over a wide area.",
@@ -28,6 +28,16 @@ generalTips = {
 	"Hovercraft are fast and can transverse water, but struggle on even gentle slopes.",
 	"Most units have a smart Unit AI, which has them automatically kite or jink enemy units as needed on a fight order or when standing still.",
 	"Spiders have excellent mobility including the ability to scale cliffs, although they tend to lack direct strength.",
+	"Space-clicking on a unit or its build button in the menu brings up the \255\255\64\0Context Menu\008, where you can view unit data or access marketplace functions.",
+}
+
+unitTips = {
+	corclog = {"The \255\255\64\0Clogger\008 leaves a mound of earth when it dies, obstructing units (especially vehicles).", 3, 5}
+	capturecar = {"The \255\255\64\0Dreamweaver\008 capture vehicle can capture a single enemy unit, but control is lost if the capturing Dreamweaver dies.", 3, 5},
+	armcrabe = {"The \255\255\64\0Crabe\008 outranges basic defenses. It curls up into armored form when stationary, becoming a formidable defense turret.", 3, 5}
+	firewalker = {"The \255\255\64\0Firewalker\008 creates large clouds of fire which can seriously harm units - friend or foe - standing in them.", 3, 5},
+	
+	tawf114 = {"The \255\255\64\0Banisher\008 packs a punch against groups of small units, but can be easily rushed - make sure to screen it.", 3, 4},
 }
 
 raiderDefs = {

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armcrabe]],
   name                   = [[Crabe]],
-  description            = [[Heavy Riot/Skirmish Walker]],
+  description            = [[Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary]],
   acceleration           = 0.12,
   bmcode                 = [[1]],
   brakeRate              = 0.1375,
@@ -20,7 +20,6 @@ unitDef = {
   collisionVolumeScales  = [[50 40 50]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  copyright              = [[Copyright 1997 Humongous Entertainment. All rights reserved.]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -29,7 +28,7 @@ unitDef = {
     description_fi = [[Raskas mellakka/kahakoitsijarobotti]],
     description_fr = [[Marcheur Émeutier Lourd]],
     description_it = [[Unita pesante da rissa/scaramucciatore]],
-    helptext       = [[The Crabe's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crabe curls up into armored form. The Crabe's main weakness is its lack of mobility.]],
+    helptext       = [[The Crabe's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crabe curls up into armored form, becoming a formidable defense turret. The Crabe's main weakness is its lack of mobility.]],
     helptext_bp    = [[]],
     helptext_es    = [[Las balas enormes del Crabe arrasan pelotones de unidades baratas enemigas, y tienes alcance mayor que muchas defensas básicas. Cuando para de caminar, Crabe se enrosca en su forma acorazada. La debilidad principal del Crabe es su falta de movilidad.]],
     helptext_fi    = [[Craben massiiviset plasma-ammukset vahingoittavat yksik?it? laajalla alueella. Pys?htyess??n Crabe linnoittautuu v?hent?en itseens? kohdistuvaa vahinkoa.]],

@@ -422,7 +422,7 @@ local function SetupNubtronWindow()
 		align="left";
 		valign="top";
 		caption = 'Title';
-		fontSize = 16;
+		fontSize = 14;
 		fontShadow = true;
 		parent = button;
 	}
@@ -444,7 +444,7 @@ local function SetupNubtronWindow()
 		width="100%";
 		--height="100%";
 		x=imgsize+2,
-		y=40,
+		y=30,
 		bottom=0,
 		right = imgsize+2 + nextbuttonwidth,
 		
@@ -452,7 +452,7 @@ local function SetupNubtronWindow()
 		align="left";
 		valign="top";
 		caption = text;
-		fontSize = 14;
+		fontSize = 12;
 		fontShadow = true;
 		parent = button;
 	}
@@ -474,7 +474,7 @@ local function SetupNubtronWindow()
 		width = nextbuttonwidth;
 		height = 50;
 		caption = 'Next',
-		right=imgsize+2,
+		right = imgsize+2,
 		bottom = 0,
 		OnClick = {
 			function(self)
@@ -486,7 +486,7 @@ local function SetupNubtronWindow()
 		width = 20;
 		height = 15;
 		caption = 'X',
-		right=2,
+		right = 2,
 		captionColor = {1,0,0,1},
 		OnClick = {
 			function(self)
@@ -502,9 +502,9 @@ local function SetupNubtronWindow()
 		parent = screen0,
 		name   = 'nubtron';
 		--color = {0, 0, 0, 0},
-		width = 600;
+		width = 550;
 		height = imgsize+20; 
-		x = 0; 
+		x = 430; 
 		bottom = 0;
 		dockable = true;
 		draggable = true,
