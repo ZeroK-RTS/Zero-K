@@ -91,17 +91,6 @@ local options = {
     },
 
   {
-    key='commtype',
-    name='Starting Unit',
-    desc='Choose the Commander type.',
-    type='list',
-    section= 'startconds',
-    def='default',
-    items = {
-      { key='default', name="Strike Commander", desc='The Strike commander of Zero K, by default.' },
-	},
-  },
-  {
     key = "startingresourcetype",
     name = "Starting Resource Type",
     desc = "Choose the form in which starting resources are given.",
@@ -124,11 +113,13 @@ local options = {
         name = "Boost",
         desc = "Commanders start with boost instead of initial resources, which allows them to build using those resources at increased speed.",
       },
+	  --[[
       {
         key  = "limitboost",
         name = "Limited Boost",
         desc = "Boost mode only commander cannot boostbuild anything with a weapon (uses normal build instead).",
       },
+	  --]]
       {
         key  = "classic",
         name = "Classic",
@@ -436,6 +427,7 @@ local options = {
     section= "startconds",
     def    = true,
   },
+--[[
 	{
 		key		= "perkcount",
 		name	= "Number of perks",
@@ -447,6 +439,7 @@ local options = {
 		step	= 1,
 		section	= "experimental",
 	},
+]]--
 --[[
   {
     key    = 'noawards',

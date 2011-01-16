@@ -13,19 +13,16 @@ end
 
 -- partially based on Spring's unit spawn gadget
 
--- TODO
--- when spring 0.82 is released:
--- * remove killing of engine spawned units
--- * remove GameFrame()
-
 -- storage
-local START_CLASSIC_STORAGE=1000
+local START_STORAGE_CLASSIC=1000
 local START_STORAGE=500
+local START_STORAGE_FACPLOP=1000
 
 local BOOST_RATE = 2.0
 local START_BOOST=600
--- extra energy for boost
-local START_BOOST_ENERGY=0
+
+local START_ENERGY_FACPLOP=500
+local START_METAL_FACPLOP=500
 
 local OVERDRIVE_BUFFER=10000
 
@@ -339,8 +336,7 @@ local function SpawnStartUnit(teamID, playerID)
     if validTeam then
 
       if boost then
-
-        Spring.SetTeamResource(teamID, 'energy', START_BOOST_ENERGY)
+        Spring.SetTeamResource(teamID, 'energy', 0)
         Spring.SetTeamResource(teamID, 'metal', 0)
 
         if (udef.isCommander and udef.name ~= "chickenbroodqueen") then
@@ -354,12 +350,16 @@ local function SpawnStartUnit(teamID, playerID)
         end
 
       else
-
         if startMode == "classic" then
-          Spring.SetTeamResource(teamID, "es", START_CLASSIC_STORAGE + OVERDRIVE_BUFFER)
-          Spring.SetTeamResource(teamID, "ms", START_CLASSIC_STORAGE)
-          Spring.SetTeamResource(teamID, "energy", START_CLASSIC_STORAGE)
-          Spring.SetTeamResource(teamID, "metal", START_CLASSIC_STORAGE)
+          Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER)
+          Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC)
+          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC)
+          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC)
+        elseif startMode == "facplop" then
+          Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER)
+          Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP)
+          Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP)
+          Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP)		  
         else
           Spring.SetTeamResource(teamID, "energy", START_STORAGE)
           Spring.SetTeamResource(teamID, "metal", START_STORAGE)
@@ -579,6 +579,7 @@ GG.SetFaction = SetFaction
 
 function gadget:GameFrame(n)
   -- reset resources in frame 33 because of pre 0.82 engine
+  --[[
   if (n == 33) then
 	local teamIDs = Spring.GetTeamList()
 	for i=1,#teamIDs do
@@ -594,14 +595,14 @@ function gadget:GameFrame(n)
 			)
 		then
 
-			Spring.SetTeamResource(teamID, 'energy', START_BOOST_ENERGY)
+			Spring.SetTeamResource(teamID, 'energy', 0)
 			Spring.SetTeamResource(teamID, 'metal', 0)
 
     else
 
       if startMode == "classic" then
-        Spring.SetTeamResource(teamID, "energy", START_CLASSIC_STORAGE)
-        Spring.SetTeamResource(teamID, "metal", START_CLASSIC_STORAGE)
+        Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC)
+        Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC)
       else
         Spring.SetTeamResource(teamID, "energy", START_STORAGE)
         Spring.SetTeamResource(teamID, "metal", START_STORAGE)
@@ -611,6 +612,7 @@ function gadget:GameFrame(n)
 
 	end
   end
+  ]]--
   if scheduledSpawn[n] then
 	for _, spawnData in pairs(scheduledSpawn[n]) do
 		SpawnStartUnit(spawnData[1], spawnData[2])
