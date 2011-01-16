@@ -41,8 +41,7 @@ local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
-local attritionWeaponDefs = include("LuaRules/Configs/timeslow_defs.lua")
+local attritionWeaponDefs, MAX_SLOW_FACTOR, DEGRADE_TIMER, DEGRADE_FACTOR, UPDATE_PERIOD = include("LuaRules/Configs/timeslow_defs.lua")
 local slowedUnits = {}
 
 if not GG.attUnits then
@@ -63,8 +62,8 @@ local function updateSlow(unitID, state)
 	local health = Spring.GetUnitHealth(unitID)
 	
 	if health then
-		if state.slowDamage > health*0.66 then
-			state.slowDamage = health*0.66
+		if state.slowDamage > health*MAX_SLOW_FACTOR then
+			state.slowDamage = health*MAX_SLOW_FACTOR
 		end
 		
 		local percentSlow = state.slowDamage/health
@@ -85,7 +84,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if not slowedUnits[unitID] then
 		slowedUnits[unitID] = {
 			slowDamage = 0, 
-			degradeTimer = 1,
+			degradeTimer = DEGRADE_TIMER,
 		}
 		GG.attUnits[unitID] = true -- unit with attribute change to be handled by unit_attributes
 	end
@@ -97,13 +96,13 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end	--scale slow damage based on real damage (i.e. take into account armortypes etc.)
 	
 	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + slowdown
-	slowedUnits[unitID].degradeTimer = 1
+	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER
 
 	-- check if a target change is needed
 	-- only changes target if the target is fully slowed and next order is an attack order
 	if Spring.ValidUnitID(attackerID) and attritionWeaponDefs[weaponID].smartRetarget then
 		local health = Spring.GetUnitHealth(unitID)
-		if slowedUnits[unitID].slowDamage > health*0.5 then
+		if slowedUnits[unitID].slowDamage > health*attritionWeaponDefs[weaponID].smartRetarget then
 			
 			local cmd = Spring.GetCommandQueue(attackerID)
 
@@ -162,13 +161,13 @@ local function removeUnit(unitID)
 end
 
 function gadget:GameFrame(f)
-    if (f-1) % 16 == 0 then
+    if (f-1) % UPDATE_PERIOD == 0 then
         for unitID, state in pairs(slowedUnits) do
         
 			if state.degradeTimer <= 0 then
 				
 				local health = Spring.GetUnitHealth(unitID) or 0
-				state.slowDamage = state.slowDamage-health*0.02
+				state.slowDamage = state.slowDamage-health*DEGRADE_FACTOR
 				if state.slowDamage < 0 then
 					state.slowDamage = 0
 					updateSlow(unitID, state)

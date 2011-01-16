@@ -1,7 +1,24 @@
 local array = {}
 
+------------------------
+-- Config
+
+local MAX_SLOW_FACTOR = 0.66
+-- Max slow damage on a unit = MAX_SLOW_FACTOR * current health
+-- Slowdown of unit = slow damage / current health
+-- So MAX_SLOW_FACTOR is the limit for how much units can be slowed
+
+local DEGRADE_TIMER = 0.5
+-- Time in seconds before the slow damage a unit takes starts to decay
+
+local DEGRADE_FACTOR = 0.04
+-- Units will lose DEGRADE_FACTOR*(current health) slow damage per second
+
+local UPDATE_PERIOD = 15 -- I'd preffer if this was not changed
+
+
 local weapons = {
-	slowmort_slowbeam = { slowDamage = 300, onlySlow = true, smartRetarget = true, scaleSlow = true},
+	slowmort_slowbeam = { slowDamage = 300, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
 	cormak_blast = { slowDamage = 12, noDeathBlast = true, scaleSlow = true },
 	slowmissile_weapon = { slowDamage = 1, onlySlow = true, scaleSlow = true },
 }
@@ -9,10 +26,13 @@ local weapons = {
 -- reads from customParams and copies to weapons as appropriate - needed for procedurally generated comms
 -- as always, need better way to handle if upgrades are desired!
 local presets = {
-	commrecon_slowbeam = { slowDamage = 450, onlySlow = true, smartRetarget = true, scaleSlow = true},
-	commrecon2_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = true, scaleSlow = true},
+	commrecon_slowbeam = { slowDamage = 450, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
+	commrecon2_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
 	commrecon2_slowbomb = { slowDamage = 1500, scaleSlow = true },
 }
+
+------------------------
+-- Send the Config
 
 --deep not safe with circular tables! defaults To false
 function CopyTable(tableToCopy, deep)
@@ -34,4 +54,4 @@ for name,data in pairs(WeaponDefNames) do
 	if weapons[name] then array[data.id] = weapons[name] end
 end
 
-return array
+return array, MAX_SLOW_FACTOR, DEGRADE_TIMER*30/UPDATE_PERIOD, DEGRADE_FACTOR*UPDATE_PERIOD/30, UPDATE_PERIOD
