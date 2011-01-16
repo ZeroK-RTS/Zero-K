@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armpt]],
   name                = [[Skeeter]],
-  description         = [[Patrol Boat (Scout/Short-Range AA)]],
+  description         = [[Patrol Boat (Scout/Raider)]],
   acceleration        = 0.0984,
   bmcode              = [[1]],
   brakeRate           = 0.0475,
@@ -24,7 +24,7 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Navire de Patrouille Éclaireur et Anti-Air]],
-    helptext       = [[Cheap, fast, and fragile, this Patrol Boat is good as AA support and spotting for longer-ranged ships. It lacks the firepower or armor for brawling.]],
+    helptext       = [[Cheap, fast, and fragile, this Patrol Boat is good as a raider and spotting for longer-ranged ships. It lacks the firepower or armor for brawling.]],
     helptext_fr    = [[Pas cher, rapide et peu solide, voici venir le Skeeter et ses canons laser. Utile en début de conflit ou en tant qu'éclaireur son blindage le rends trcs vite obsolcte.]],
   },
 
@@ -132,7 +132,7 @@ unitDef = {
       metalpershot            = 0,
       model                   = [[wep_m_fury.s3o]],
       noSelfDamage            = true,
-      range                   = 350,
+      range                   = 270,
       reloadtime              = 1.6,
       renderType              = 1,
       selfprop                = true,

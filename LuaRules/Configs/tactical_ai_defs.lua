@@ -516,15 +516,11 @@ local behaviourConfig = {
 	["armpt"] = { -- scout boat
 		skirms = raiderRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
-		flees = fleeables,
+		flees = {},
 		circleStrafe = true, 
-		strafeOrderLength = 180,
 		maxSwarmLeeway = 40, 
-		swarmLeeway = 40, 
-		stoppingDistance = 15,
-		minCircleStrafeDistance = 50,
-		fleeLeeway = 100,
-		fleeDistance = 150,
+		swarmLeeway = 30, 
+		stoppingDistance = 8
 	},
 	
 	-- riots

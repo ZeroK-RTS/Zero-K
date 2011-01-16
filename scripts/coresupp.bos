@@ -81,7 +81,7 @@ AimWeapon1(heading, pitch)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
-	turn gunb to y-axis heading speed <270>;
+	turn gunb to y-axis heading speed <375>;
 	turn barrelbr to x-axis <0.> - pitch speed <150>;
 	turn barrelbl to x-axis <0.> - pitch speed <150>;
 	wait-for-turn gunb around y-axis;
@@ -112,7 +112,7 @@ AimWeapon2(heading, pitch)
 {
 	signal SIG_AIM_2;
 	set-signal-mask SIG_AIM_2;
-	turn gunf to y-axis heading speed <270>;
+	turn gunf to y-axis heading speed <375>;
 	turn barrelfr to x-axis <0.> - pitch speed <150>;
 	turn barrelfl to x-axis <0.> - pitch speed <150>;
 	wait-for-turn gunf around y-axis;
