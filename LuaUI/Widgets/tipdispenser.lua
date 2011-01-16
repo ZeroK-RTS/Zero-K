@@ -29,6 +29,7 @@ local spGetTeamResources = Spring.GetTeamResources
 VFS.Include("LuaUI/Configs/tipconfig.lua",nil)
 
 local tipsList = {}
+local unitTipsAvailable = {}
 local alreadyDisplayedTips = {}
 local tipPeriod = 8 -- How long each tip is displayed, in seconds
 local FontSize = nil
@@ -50,7 +51,8 @@ local myTeam = spGetMyTeamID()
 -- 1 = new to RTS
 -- 2 = a bit of experience with ZK
 -- 3 = up to intermediate
-local helpLevel = rank and math.max(rank, 3) or 1
+local helpLevel = rank and math.min(rank, 3) or 1
+Spring.Echo(rank)
 
 -- Chili classes
 local Chili
@@ -204,6 +206,11 @@ local function GetTipsList()
 	local t=myTeam
 	tipsList={}
 
+	-- add unit tips from available list
+	for name, _ in pairs(unitTipsAvailable) do
+		AddTipOnce(unpack(unitTips[name]))
+	end
+	
 	-- Always shown tips
 
 	-- General interface tips
@@ -384,7 +391,7 @@ end
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if unitTeam ~= myTeam then return end
 	local name = UnitDefs[unitDefID].name
-	if unitTips[name] then AddTipOnce(unpack(unitTips[name])) end
+	if unitTips[name] then unitTipsAvailable[name] = true end
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
