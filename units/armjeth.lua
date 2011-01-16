@@ -110,9 +110,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 1.35,
-        planes  = 13.5,
-        subs    = 0.675,
+        default = 1.5,
+        planes  = 15,
+        subs    = 0.75,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],
@@ -131,7 +131,7 @@ unitDef = {
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],
       soundStartVolume        = 4,
-      thickness               = 2.1650635094611,
+      thickness               = 2.165,
       tolerance               = 8192,
       turret                  = true,
       weaponType              = [[BeamLaser]],
