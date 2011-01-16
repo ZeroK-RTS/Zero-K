@@ -445,20 +445,6 @@ local behaviourConfig = {
 		minCircleStrafeDistance = 10,
 	},
 
-	["armfav"] = { -- jeffy
-		skirms = raiderRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = fleeables,
-		circleStrafe = true, 
-		strafeOrderLength = 180,
-		maxSwarmLeeway = 40, 
-		swarmLeeway = 40, 
-		stoppingDistance = 15,
-		minCircleStrafeDistance = 50,
-		fleeLeeway = 100,
-		fleeDistance = 150,
-	},
-	
 	["corfav"] = { -- weasel
 		skirms = raiderRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
@@ -473,17 +459,6 @@ local behaviourConfig = {
 		fleeDistance = 150,
 	},
   
-	["armflash"] = {
-		skirms = raiderRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		circleStrafe = true, 
-		strafeOrderLength = 180,
-		maxSwarmLeeway = 40, 
-		swarmLeeway = 40, 
-		stoppingDistance = 8
-	},
-	
 	["corgator"] = {
 		skirms = raiderRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
@@ -507,32 +482,12 @@ local behaviourConfig = {
 		stoppingDistance = 8
 	},
   
-	["armfast"] = {
-		skirms = raiderRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		circleStrafe = true, 
-		maxSwarmLeeway = 40, 
-		swarmLeeway = 30, 
-		stoppingDistance = 8
-	},
-	
 	["corpyro"] = {
 		skirms = raiderRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		circleStrafe = true, 
 		maxSwarmLeeway = 160, 
-		swarmLeeway = 30, 
-		stoppingDistance = 8
-	},
-	
-	["armst"] = {
-		skirms = raiderRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		circleStrafe = true, 
-		maxSwarmLeeway = 40, 
 		swarmLeeway = 30, 
 		stoppingDistance = 8
 	},
@@ -604,14 +559,6 @@ local behaviourConfig = {
 		skirmLeeway = -30, 
 		stoppingDistance = 5
 	},
-	["tawf003"] = {
-		skirms = riotRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		maxSwarmLeeway = 0, 
-		skirmLeeway = -30, 
-		stoppingDistance = 5
-	},
 	["hoverriot"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
@@ -660,12 +607,6 @@ local behaviourConfig = {
 		flees = {},
 		skirmLeeway = 40, 
 	},	
-	["corkarg"] = {
-		skirms = riotRangeSkirmieeArray, 
-		swarms = {}, 
-		flees = {},
-		skirmLeeway = 40, 
-	},
 	["dante"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = {}, 
@@ -677,14 +618,6 @@ local behaviourConfig = {
 		swarms = {}, 
 		flees = {},
 		skirmLeeway = 120, 
-	},	
-	["decade"] = {
-		skirms = riotRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		maxSwarmLeeway = 30, 
-		minSwarmLeeway = 90, 
-		skirmLeeway = 20, 
 	},	
 	["coresupp"] = {
 		skirms = riotRangeSkirmieeArray, 
@@ -711,14 +644,6 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
-	},
-	["armjanus"] = {
-		skirms = medRangeSkirmieeArray, 
-		swarms = medRangeSwarmieeArray, 
-		flees = {},
-		maxSwarmLeeway = 30, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 30, 
 	},
 	["nsaclash"] = {
 		skirms = medRangeSkirmieeArray, 
