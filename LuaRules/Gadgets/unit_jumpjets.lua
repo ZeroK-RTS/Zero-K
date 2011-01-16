@@ -33,7 +33,7 @@ Spring.SetGameRulesParam("jumpJets",1)
 --   30000 - 39999:  LuaRules
 --
 
-local CMD_JUMP = 38521
+include("LuaRules/Configs/customcmds.h.lua")
 -- needed for checks
 local CMD_MORPH = 31210
 

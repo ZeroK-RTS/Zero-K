@@ -18,7 +18,7 @@ end
 local spGetUnitDefID 			= Spring.GetUnitDefID
 local echo 			= Spring.Echo
 
-local CMD_MINE = 32105
+include("LuaRules/Configs/customcmds.h.lua")
 local CMD_INSERT = CMD.INSERT
 
 local mexBuilder = {}

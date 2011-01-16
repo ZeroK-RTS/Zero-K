@@ -50,6 +50,8 @@ end
 
 
 -- commands
+include("LuaRules/Configs/customcmds.h.lua")
+
 local CMD_MOVE_STATE	= CMD.MOVE_STATE
 local CMD_FIRE_STATE	= CMD.FIRE_STATE
 local CMD_RECLAIM    	= CMD.RECLAIM
@@ -64,8 +66,6 @@ local CMD_OPT_SHIFT		= CMD.OPT_SHIFT
 local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
 local CMD_INSERT 		= CMD.INSERT
 local CMD_REMOVE 		= CMD.REMOVE
-local CMD_PRIORITY		= 34220
-local CMD_JUMP 			= 38521
 
 local twoPi = math.pi*2
 

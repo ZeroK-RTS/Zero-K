@@ -44,7 +44,8 @@ local gaiaID = Spring.GetGaiaTeamID();
 
 -- commands
 
-CMD_EMBARK = 31800
+include("LuaRules/Configs/customcmds.h.lua")
+
 local embarkCmdDesc = {
   id      = CMD_EMBARK,
   type    = CMDTYPE.ICON,
@@ -55,7 +56,6 @@ local embarkCmdDesc = {
   params  = {"alt"}
 }
 
-CMD_DISEMBARK = 31801
 local disembarkCmdDesc = {
   id      = CMD_DISEMBARK,
   type    = CMDTYPE.ICON,

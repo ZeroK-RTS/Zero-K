@@ -29,9 +29,10 @@ local aStar = VFS.Include "LuaRules/Gadgets/astar.lua"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+include("LuaRules/Configs/customcmds.h.lua")
+
 local leaperDefID = UnitDefNames.chicken_leaper.id
 local pathCache = {}
-local CMD_JUMP = 38521
 local threadCyclesPerFrame = 1
 local cyclesPerYield = 25 -- A* cycles per thread cycle
 

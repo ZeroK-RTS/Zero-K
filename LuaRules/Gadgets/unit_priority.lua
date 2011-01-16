@@ -24,7 +24,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local CMD_PRIORITY=34220
+include("LuaRules/Configs/customcmds.h.lua")
 
 local Tooltips = {
 	'Construction Low priority.',

@@ -20,7 +20,7 @@ local RETAKING_DEGRADE_TIMER = 5
 local GENERAL_DEGRADE_TIMER = 2
 local DEGRADE_FACTOR = 0.2
 
-local CMD_UNIT_KILL_SUBORDINATES = 35821
+include("LuaRules/Configs/customcmds.h.lua")
 local CMD_STOP = CMD.STOP
 local CMD_SELFD = CMD.SELFD
 

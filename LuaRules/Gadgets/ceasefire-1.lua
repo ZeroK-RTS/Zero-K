@@ -49,7 +49,8 @@ local CMD_ATTACK            = CMD.ATTACK
 local cfData = {}
 local cloakedUnits = {}
 local gaiaAlliance, gaiaTeam
-local CMD_ANTINUKEZONE = 35130
+
+include("LuaRules/Configs/customcmds.h.lua")
 
 local antinukeDefs = {}
 local antinukeNames = {'armamd', 'armscab', 'cormabm', 'corfmd', 'cornukesub', 'armcarry'}

@@ -53,7 +53,7 @@ local CMD_OPT_RIGHT 	= CMD.OPT_RIGHT
 local CMD_INSERT 		= CMD.INSERT
 local CMD_REMOVE 		= CMD.REMOVE
 
-local CMD_UNIT_AI = 36214
+include("LuaRules/Configs/customcmds.h.lua")
 
 local unitAICmdDesc = {
 	id      = CMD_UNIT_AI,
