@@ -430,7 +430,7 @@ local function SetupNubtronWindow()
 		width="100%";
 		--height="100%";
 		x=imgsize+2,
-		y=15,
+		y=18,
 		
 		autosize=false;
 		align="left";
@@ -444,7 +444,7 @@ local function SetupNubtronWindow()
 		width="100%";
 		--height="100%";
 		x=imgsize+2,
-		y=30,
+		y=35,
 		bottom=0,
 		right = imgsize+2 + nextbuttonwidth,
 		
@@ -506,7 +506,7 @@ local function SetupNubtronWindow()
 		height = imgsize+20; 
 		x = 430; 
 		bottom = 0;
-		dockable = true;
+		dockable = false;
 		draggable = true,
 		resizable = false,
 		tweakDraggable = true,
