@@ -236,8 +236,8 @@ end
 -- use to play communism (always enabled) sound only at game start
 function _DrawScreen()
   if (((Spring.GetGameSeconds() < 0.1) or Spring.IsCheatingEnabled())) then --create window in pregame and if not already shown
-    if (Spring.GetModOption('communism',true,true)) then Spring.PlaySoundFile("LuaUI/Sounds/communism/sovnat1.wav", 1) 
-	else Spring.PlaySoundFile("LuaUI/Sounds/communism/cash-register-01.wav", 1) end 
+    --if (Spring.GetModOption('communism',true,true)) then Spring.PlaySoundFile("LuaUI/Sounds/communism/sovnat1.wav", 1) 
+	--else Spring.PlaySoundFile("LuaUI/Sounds/communism/cash-register-01.wav", 1) end 
 	printDebug("<gui_startup_info_selector DEBUG >: it's _DrawScreen")
   end
   if not (selectorShown) then CreateWindow() end
