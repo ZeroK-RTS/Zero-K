@@ -56,6 +56,7 @@ local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 			local reload = WeaponDefs[ud.weapons[i+1].weaponDef].reload
 			state.weapon[i] = {
 				reload = reload,
+				burstRate = WeaponDefs[ud.weapons[i+1].weaponDef].salvoDelay,
 				oldReloadFrames = math.floor(reload*30),
 			}
 		end
@@ -80,7 +81,7 @@ local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 		else
 			local newReload = w.reload/speedFactor
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
-			spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+			spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/speedFactor})
 		end
 	end
 	
