@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, flare, turret, wake01, wake02, wake03, wake04, wake05,
        wake06, wake07, wake08, gun, ground01;

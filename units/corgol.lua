@@ -128,9 +128,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 2,
-        planes  = 2,
-        subs    = 0.001,
+        default = 4,
+        planes  = 4,
+        subs    = 0.002,
       },
 
       explosionGenerator      = [[custom:SMOKE]],
@@ -143,7 +143,7 @@ unitDef = {
       lineOfSight             = true,
       noExplode               = true,
       noSelfDamage            = true,
-      range                   = 180,
+      range                   = 240,
       reloadtime              = 0.16,
       renderType              = 5,
       sizeGrowth              = 1.05,
