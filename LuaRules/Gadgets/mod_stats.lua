@@ -159,5 +159,13 @@ function gadget:GameOver()
 	Echo("STATS:teams,"..players .. ",".. allycount)
 end
 
+-- need to use GameFrame because GameStart breaks other gadgets for no comprehensible reason whatsoever
+function gadget:GameFrame(n)
+	if n == 1 and GG.chicken then
+		Spring.Echo("Chicken game detected - disabling mod stats")
+		gadgetHandler:RemoveGadget()
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

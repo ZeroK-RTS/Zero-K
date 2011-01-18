@@ -35,9 +35,9 @@ chickenSpawnRate     = 59
 minBaseDistance      = 700      
 maxBaseDistance      = 4500
 
-gracePeriod          = 30       -- no chicken spawn in this period, seconds
-graceBonus			 = 31		-- extended grace in seconds for each player less than...
-graceMaxPlayers		 = 4
+gracePeriod          = 120       -- no chicken spawn in this period, seconds
+gracePenalty		 = 15		-- reduced grace per player, seconds
+gracePeriodMin		 = 60
 
 queenTime            = 50*60    -- time at which the queen appears, seconds
 queenMorphTime		 = {60*30, 120*30}	--lower and upper bounds for delay between morphs, gameframes
@@ -166,7 +166,7 @@ difficulties = {
   ['Chicken: Easy'] = {
     chickenSpawnRate = 60, 
     burrowSpawnRate  = 50,
-    gracePeriod      = 60,
+    gracePeriod      = 150,
     firstSpawnSize   = 1.2,
     timeSpawnBonus   = .03,
     queenName        = "chickenqueenlite",

@@ -66,19 +66,19 @@ local commanders          = {}
 local maxTries            = 100
 local computerTeams       = {}
 local humanTeams          = {}
-local allyTeams = {}
 local lagging             = false
 local cpuUsages           = {}
 local chickenBirths       = {}
 local kills               = {}
 local idleQueue           = {}
 local turrets             = {}
-local timeOfLastSpawn     = 0    
+local timeOfLastSpawn     = 0    -- when the last burrow was spawned
+local waveSchedule		  = {}	-- indexed by gameframe, true/nil
 
-local eggDecay = {}
+local eggDecay = {}	-- indexed by featureID, value = game second
 local targets = {}	--indexed by unitID, value = teamID
 
-local respawnBurrows = false	--the full respawn, not % respawn chance
+local respawnBurrows = false	--the always respawn, not % respawn chance
 local waveBonus = 0		--decreases linearly
 local waveBonusDelta = 0		--resets to zero every wave
 local totalTimeReduction = 0
@@ -173,23 +173,19 @@ else
   luaAI = highestLevel
 end
 
-local allyTeams = Spring.GetAllyTeamList()
-local allyTeamCount = 0
-Spring.Echo("TEAM DATA")
-for i=0, #allyTeams do 
-	if allyTeams[i] then
-		Spring.Echo(i.."\t"..allyTeams[i]) 
-		allyTeamCount = allyTeamCount + 1
-	end
-end
-if allyTeamCount > 2 then	--chicken, players, gaia?
-	--pvp = true
-	Spring.Echo("Chicken: PvP mode detected")
-end	
-
 local gaiaTeamID          = Spring.GetGaiaTeamID()
 computerTeams[gaiaTeamID] = nil
 humanTeams[gaiaTeamID]    = nil
+
+local humanTeamsOrdered = {}
+for id,_ in ipairs(humanTeams) do humanTeamsOrdered[#humanTeamsOrdered+1] = id end	
+for i=1, #humanTeamsOrdered do
+	if humanTeamsOrdered[i+1] and not Spring.AreTeamsAllied(humanTeamsOrdered[i], humanTeamsOrdered[i+1]) then
+		pvp = true
+		Spring.Echo("Chicken: PvP mode detected")
+		break
+	end
+end
 
 if (luaAI == 0) then return false
 else GG.chicken = true end
@@ -222,7 +218,7 @@ burrowSpawnRate = burrowSpawnRate/malus/SetCount(computerTeams)
 minBurrowsIncrease = minBurrowsIncrease * malus
 minBurrowsMax	   = minBurrowsMax * malus
 if minBurrowsMax > maxBurrows then minBurrowsMax = maxBurrows end
-if playerCount < graceMaxPlayers then gracePeriod = gracePeriod + graceBonus*(graceMaxPlayers - playerCount) end
+gracePeriod = math.max(gracePeriod - gracePenalty*(playerCount), gracePeriodMin)
 
 local function DisableBuildButtons(unitID, buildNames)
   for _, unitName in ipairs(buildNames) do
@@ -497,6 +493,7 @@ local function ChooseTarget(unitID)
   else
     targetID = units[1]
   end
+  if not targetID then return end
   return {spGetUnitPosition(targetID)}
 end
 
@@ -723,7 +720,7 @@ local function Wave()
   
   local t = spGetGameSeconds()
   
-  if (Spring.GetTeamUnitCount(chickenTeamID) > maxChicken or lagging or t < gracePeriod) then
+  if (Spring.GetTeamUnitCount(chickenTeamID) > maxChicken or lagging) then
     return
   end
   
@@ -846,19 +843,23 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
   end
 end
 
-function gadget:GameFrame(n)
-  if (n == 1) then
+function gadget:GameStart()
     DisableComputerUnits()
 	if pvp then Spring.Echo("Chicken: PvP mode initialized") end
-  end
-  
-  if ((n+19) % (30 * chickenSpawnRate) < 0.1) then
+	waveSchedule[gracePeriod*30] = true	-- schedule first wave
+end
+
+function gadget:GameFrame(n)
+  --if ((n+19 - gracePeriod*30) % (30 * chickenSpawnRate) < 0.1) and (n - gracePeriod*30 > 0) then
+  if waveSchedule[n] then
     local args = {Wave()}
     if (args[1]) then
       _G.chickenEventArgs = {type="wave", unpack(args)}
       SendToUnsynced("ChickenEvent")
       _G.chickenEventArgs = nil
+	  waveSchedule[n + (30 * chickenSpawnRate)] = true
     end
+	--waveSchedule[n] = nil
   end
 
   if ((n+17) % 30 < 0.1) then

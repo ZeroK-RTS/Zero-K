@@ -21,7 +21,7 @@ unitDef = {
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
-  cruiseAlt           = 250,
+  cruiseAlt           = 200,
 
   customParams        = {
     description_fr = [[Scout volant]],
