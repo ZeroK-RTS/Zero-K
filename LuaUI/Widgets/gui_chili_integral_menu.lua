@@ -274,8 +274,8 @@ local function MakeButton(container, cmd, insertItem)
 			button.OnMouseDown = cmd.OnClick
 		end 
 		if (isState) then 
-			button.padding = {0,0,0,0}
-			button.backgroundColor = {0,0,0,0}
+			button.padding = {4,4,2.5,2}
+--			button.backgroundColor = {0,0,0,0}
 		end 
 		if (isBuild) then
 			button.padding = {1,1,1,1}
