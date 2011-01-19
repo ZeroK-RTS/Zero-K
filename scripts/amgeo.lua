@@ -1,5 +1,8 @@
 local base = piece "base"
 
+function script.Create()
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 

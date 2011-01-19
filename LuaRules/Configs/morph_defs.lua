@@ -464,7 +464,7 @@ local morphDefs = {
   missiletower = {
 	{
 		into = 'armcir',
-		time = 60,
+		time = 75,
 		rank = 3,
 	},
   },
@@ -516,37 +516,12 @@ local morphDefs = {
   },
   
   chicken_drone_starter = {
-	
-   [1] = {
+	{
       into = 'nest',
       time = 1,
       rank = 0,
     },
-	
   }, 
-
-  armfacinabox = {
-    [1] = {into = 'armavp', metal = 0, energy = 0, time = 10, facing = true,},
-    [2] = {into = 'armalab', metal = 0, energy = 0, time = 10, facing = true,},
-    [3] = {into = 'armap', metal = 0, energy = 0, time = 10, facing = true,},
-    [4] = {into = 'armfhp', metal = 0, energy = 0, time = 10, facing = true,},
-    [5] = {into = 'armcsa', metal = 0, energy = 0, time = 10, facing = true,},
-    [6] = {into = 'armaap', metal = 0, energy = 0, time = 10, facing = true,},
-    [7] = {into = 'armlab', metal = 0, energy = 0, time = 10, facing = true,},
-    [8] = {into = 'armsy', metal = 0, energy = 0, time = 10, facing = true,},
-    [9] = {into = 'armvp', metal = 0, energy = 0, time = 10, facing = true,},
-  },
-  corfacinabox = {
-    [1] = {into = 'coravp', metal = 0, energy = 0, time = 10, facing = true,},
-    [2] = {into = 'coralab', metal = 0, energy = 0, time = 10, facing = true,},
-    [3] = {into = 'corap', metal = 0, energy = 0, time = 10, facing = true,},
-    [4] = {into = 'corfhp', metal = 0, energy = 0, time = 10, facing = true,},
-    [5] = {into = 'corcsa', metal = 0, energy = 0, time = 10, facing = true,},
-    [6] = {into = 'coraap', metal = 0, energy = 0, time = 10, facing = true,},
-    [7] = {into = 'corlab', metal = 0, energy = 0, time = 10, facing = true,},
-    [8] = {into = 'corsy', metal = 0, energy = 0, time = 10, facing = true,},
-    [9] = {into = 'corvp', metal = 0, energy = 0, time = 10, facing = true,},
-  },
 }
 
 -- currently unused
