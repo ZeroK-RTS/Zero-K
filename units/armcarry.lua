@@ -58,6 +58,7 @@ unitDef = {
   radarDistance          = 1500,
   seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLASTSML]],
+  showNanoSpray          = false,
   side                   = [[ARM]],
   sightDistance          = 1105,
   smoothAnim             = true,

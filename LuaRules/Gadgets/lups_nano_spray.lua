@@ -231,12 +231,32 @@ end
 local nanoParticles = {}
 
 local function GetFaction(udid)
-  local udef_factions = UnitDefs[udid].factions or {}
-  return ((#udef_factions~=1) and 'unknown') or udef_factions[1]
+  --local udef_factions = UnitDefs[udid].factions or {}
+  --return ((#udef_factions~=1) and 'unknown') or udef_factions[1]
+  return "default" -- default 
 end
 
 local factionsNanoFx = {
-  arm = {
+  default = {
+    fxtype      = "NanoParticles",
+    delaySpread = 30,
+    size        = 3,
+    sizeSpread  = 5,
+    sizeGrowth  = 0.25,
+    texture     = "bitmaps/PD/nano.tga"
+  },
+  ["default_high_quality"] = {
+    fxtype      = "NanoParticles",
+    alpha       = 0.27,
+    size        = 6,
+    sizeSpread  = 6,
+    sizeGrowth  = 0.65,
+    rotSpeed    = 0.1,
+    rotSpread   = 360,
+    texture     = "bitmaps/Other/Poof.png",
+    particles   = 1.2,
+  },
+  --[[arm = {
     fxtype      = "NanoParticles",
     delaySpread = 30,
     size        = 3,
@@ -270,7 +290,7 @@ local factionsNanoFx = {
     corethickness   = "limcount",
     streamThickness = "0.5+5*limcount",
     streamSpeed     = "limcount*0.05",
-  },
+  },]]--
 }
 
 -------------------------------------------------------------------------------------
@@ -340,7 +360,7 @@ local factionsNanoFx = {
               cmdTag       = cmdTag, --//used to end the fx when the command is finished
             }
 
-            local nanoSettings = CopyMergeTables(factionsNanoFx[faction] or factionsNanoFx.unknown,nanoParams)
+            local nanoSettings = CopyMergeTables(factionsNanoFx[faction] or factionsNanoFx.default,nanoParams)
             ExecuteLuaCode(nanoSettings)
 
             local fxType  = nanoSettings.fxtype
@@ -374,7 +394,7 @@ function gadget:Update()
 
   --// enable freaky arm nano fx when quality>4
   if ((Lups.Config["quality"] or 4)>=4) then
-    factionsNanoFx.arm = factionsNanoFx["arm_high_quality"]
+    factionsNanoFx.default = factionsNanoFx["default_high_quality"]
   end
 
   --// init user custom nano fxs
@@ -396,7 +416,7 @@ function gadget:Update()
 
   for faction,fx in pairs(factionsNanoFx) do
     if (not fxSupported(fx.fxtype or "noneNANO")) then
-      factionsNanoFx[faction] = factionsNanoFx.unknown
+      factionsNanoFx[faction] = factionsNanoFx.default
     end
 
     local factionNanoFx = factionsNanoFx[faction]

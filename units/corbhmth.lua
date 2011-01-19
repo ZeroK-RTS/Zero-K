@@ -26,10 +26,10 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    helptext = [[The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly.]],
-    keeptooltip    = [[any string I want]],
-    neededlink     = 50,
-    pylonrange     = 50,	
+    helptext    = [[The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly.]],
+    keeptooltip = [[any string I want]],
+    neededlink  = 50,
+    pylonrange  = 50,
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],
@@ -49,7 +49,7 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[CORBHMTH]],
   onoffable                     = false,
-  script						= [[corbhmth.lua]],
+  script                        = [[corbhmth.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   side                          = [[CORE]],
@@ -110,7 +110,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Behemoth]],
       blocking         = true,
       category         = [[corpses]],
@@ -131,7 +131,7 @@ unitDef = {
     },
 
 
-    HEAP  = {
+    HEAP = {
       description      = [[Debris - Behemoth]],
       blocking         = false,
       category         = [[heaps]],

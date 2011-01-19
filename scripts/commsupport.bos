@@ -630,7 +630,7 @@ lua_QueryNanoPiece()
 QueryNanoPiece(piecenum)
 {
 	piecenum = nanospray;
-	//call-script lua_QueryNanoPiece(piecenum);
+	call-script lua_QueryNanoPiece(piecenum);
 }
 
 StopBuilding(){

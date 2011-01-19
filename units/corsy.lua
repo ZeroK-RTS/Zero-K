@@ -61,6 +61,7 @@ unitDef = {
   objectName             = [[seafac.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
+  showNanoSpray          = false,
   side                   = [[CORE]],
   sightDistance          = 273,
   smoothAnim             = true,

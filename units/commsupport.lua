@@ -73,6 +73,7 @@ unitDef = {
 
   },
 
+  showNanoSpray       = false,
   showPlayerName      = true,
   side                = [[ARM]],
   sightDistance       = 500,
@@ -134,7 +135,7 @@ unitDef = {
       sizeDecay               = -0.1,
       soundHit                = [[weapon/gauss_hit]],
       soundHitVolume          = 3,
-	  soundStart              = [[weapon/gauss_fire]],
+      soundStart              = [[weapon/gauss_fire]],
       soundStartVolume        = 2.5,
       sprayangle              = 800,
       stages                  = 32,

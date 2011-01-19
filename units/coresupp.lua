@@ -1,58 +1,58 @@
 unitDef = {
-  unitname              = [[coresupp]],
-  name                  = [[Typhoon]],
-  description           = [[Corvette (Assault/Raider)]],
-  acceleration          = 0.0768,
-  activateWhenBuilt     = true,
-  bmcode                = [[1]],
-  brakeRate             = 0.042,
-  buildAngle            = 16384,
-  buildCostEnergy       = 320,
-  buildCostMetal        = 320,
-  builder               = false,
-  buildPic              = [[CORESUPP.png]],
-  buildTime             = 320,
-  canAttack             = true,
-  canGuard              = true,
-  canMove               = true,
-  canPatrol             = true,
-  canstop               = [[1]],
-  category              = [[SHIP]],
+  unitname               = [[coresupp]],
+  name                   = [[Typhoon]],
+  description            = [[Corvette (Assault/Raider)]],
+  acceleration           = 0.0768,
+  activateWhenBuilt      = true,
+  bmcode                 = [[1]],
+  brakeRate              = 0.042,
+  buildAngle             = 16384,
+  buildCostEnergy        = 320,
+  buildCostMetal         = 320,
+  builder                = false,
+  buildPic               = [[CORESUPP.png]],
+  buildTime              = 320,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[SHIP]],
   collisionVolumeOffsets = [[0 4 -2]],
-  collisionVolumeScales = [[27 36 104]],
-  collisionVolumeTest   = 1,
-  collisionVolumeType   = [[ellipsoid]],
-  corpse                = [[DEAD]],
+  collisionVolumeScales  = [[27 36 104]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
+  corpse                 = [[DEAD]],
 
-  customParams          = {
+  customParams           = {
     description_fr = [[Corvette d'Assaut/Pillage]],
     helptext       = [[The Typhoon is a brawler, combining high speed, decent armor, and strong firepower at a low cost--for a ship. Use corvette packs against anything on the surface, but watch out for submarine attacks.]],
     helptext_fr    = [[La corvette est ? la fois bon-march? et rapide. Son blindage moyen et sa forte puissance de feu laser en font un bon compromis, mais est vuln?rable aux attaques sousmarines. ]],
   },
 
-  defaultmissiontype    = [[Standby]],
-  explodeAs             = [[BIG_UNITEX]],
-  floater               = true,
-  footprintX            = 3,
-  footprintZ            = 3,
-  iconType              = [[corvette]],
-  idleAutoHeal          = 5,
-  idleTime              = 1800,
-  maneuverleashlength   = [[640]],
-  mass                  = 237,
-  maxDamage             = 2400,
-  maxVelocity           = 3.5,
-  minCloakDistance      = 75,
-  minWaterDepth         = 5,
-  movementClass         = [[BOAT3]],
-  noAutoFire            = false,
-  noChaseCategory       = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName            = [[vette.s3o]],
-  scale                 = [[0.5]],
-  seismicSignature      = 4,
-  selfDestructAs        = [[BIG_UNITEX]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[BIG_UNITEX]],
+  floater                = true,
+  footprintX             = 3,
+  footprintZ             = 3,
+  iconType               = [[corvette]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  maneuverleashlength    = [[640]],
+  mass                   = 237,
+  maxDamage              = 2400,
+  maxVelocity            = 3.5,
+  minCloakDistance       = 75,
+  minWaterDepth          = 5,
+  movementClass          = [[BOAT3]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[vette.s3o]],
+  scale                  = [[0.5]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[BIG_UNITEX]],
 
-  sfxtypes              = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:brawlermuzzle]],
@@ -61,16 +61,16 @@ unitDef = {
 
   },
 
-  side                  = [[CORE]],
-  sightDistance         = 429,
-  smoothAnim            = true,
-  steeringmode          = [[1]],
-  TEDClass              = [[SHIP]],
-  turninplace           = 0,
-  turnRate              = 571,
-  workerTime            = 0,
+  side                   = [[CORE]],
+  sightDistance          = 429,
+  smoothAnim             = true,
+  steeringmode           = [[1]],
+  TEDClass               = [[SHIP]],
+  turninplace            = 0,
+  turnRate               = 571,
+  workerTime             = 0,
 
-  weapons               = {
+  weapons                = {
 
     {
       def                = [[EMG]],
@@ -92,7 +92,7 @@ unitDef = {
   },
 
 
-  weaponDefs            = {
+  weaponDefs             = {
 
     EMG = {
       name                    = [[Medium Pulse MG]],
@@ -107,7 +107,7 @@ unitDef = {
         planes  = 20,
         subs    = 10,
       },
-	  
+
       edgeEffectiveness       = 0.5,
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:EMG_HIT_HE]],
@@ -135,9 +135,9 @@ unitDef = {
   },
 
 
-  featureDefs           = {
+  featureDefs            = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Typhoon]],
       blocking         = false,
       category         = [[corpses]],
@@ -157,7 +157,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Typhoon]],
       blocking         = false,
       category         = [[heaps]],

@@ -20,9 +20,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    --description_fr = [[Mitrailleurs Anti-Nuée]],
-    helptext       = [[The Splinter's high velocity gauss cannon slices through enemy armor like a chainsaw through butter.]],
-    --helptext_fr    = [[Le Stardust est une tourelle mitrailleuse r haute energie. Son incroyable cadence de tir lui permettent d'arreter quasiment nimporte quelle nuée de Pilleur ou d'unités légcres, cependant sa portée est relativement limitée, et étant prcs du sol nimporte quel obstacle l'empeche de tirer.]],
+    helptext = [[The Splinter's high velocity gauss cannon slices through enemy armor like a chainsaw through butter.]],
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],
@@ -115,7 +113,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Splinter]],
       blocking         = true,
       category         = [[arm_corpses]],
@@ -134,7 +132,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Splinter]],
       blocking         = false,
       category         = [[heaps]],
