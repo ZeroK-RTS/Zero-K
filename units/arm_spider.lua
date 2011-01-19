@@ -59,6 +59,7 @@ unitDef = {
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
   metalMake              = 0.15,
+  minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
