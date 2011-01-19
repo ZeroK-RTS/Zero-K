@@ -50,7 +50,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 983,
-  maxDamage           = 3000,
+  maxDamage           = 4800,
   maxSlope            = 36,
   maxVelocity         = 1.55,
   maxWaterDepth       = 5000,
@@ -176,9 +176,9 @@ unitDef = {
 
 
       damage                  = {
-        default = 400,
-        planes  = 400,
-        subs    = 20,
+        default = 300,
+        planes  = 300,
+        subs    = 15,
       },
 
       explosionGenerator      = [[custom:riotballplus]],

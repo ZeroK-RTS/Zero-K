@@ -51,7 +51,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 992,
-  maxDamage           = 3250,
+  maxDamage           = 5300,
   maxSlope            = 36,
   maxVelocity         = 1.4,
   maxWaterDepth       = 5000,
@@ -123,7 +123,8 @@ unitDef = {
       craterMult              = 6,
 
       damage                  = {
-        default    = 1250,
+        default    = 999,
+        commanders = 1,
       },
 
       explosionGenerator      = [[custom:DGUNTRACE]],
@@ -202,8 +203,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 22,
-        subs    = 11,
+        default = 20,
+        subs    = 10,
       },
 
       duration                = 0.11,

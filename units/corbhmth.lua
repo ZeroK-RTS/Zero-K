@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[corbhmth]],
   name                          = [[Behemoth]],
-  description                   = [[Plasma Battery - Requires 40 Power CONNECTED VIA GRID]],
+  description                   = [[Plasma Battery - Requires 50 Power CONNECTED VIA A POWER GRID to fire]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   bmcode                        = [[0]],
@@ -28,7 +28,7 @@ unitDef = {
   customParams                  = {
     helptext = [[The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly.]],
     keeptooltip    = [[any string I want]],
-    neededlink     = 40,
+    neededlink     = 50,
     pylonrange     = 50,	
   },
 
@@ -40,7 +40,7 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   mass                          = 605,
-  maxDamage                     = 4500,
+  maxDamage                     = 3750,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
@@ -102,7 +102,7 @@ unitDef = {
       startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 400,
+      weaponVelocity          = 620,
     },
 
   },
@@ -114,7 +114,7 @@ unitDef = {
       description      = [[Wreckage - Behemoth]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 4500,
+      damage           = 3750,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -135,7 +135,7 @@ unitDef = {
       description      = [[Debris - Behemoth]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 4500,
+      damage           = 3750,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 5,
