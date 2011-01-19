@@ -13,6 +13,28 @@
 ---------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------
 
+local function GetCmdTag(unitID) 
+    local cmdTag = 0
+    local cmds = Spring.GetFactoryCommands(unitID,1)
+	if (cmds) then
+        local cmd = cmds[1]
+        if cmd then
+           cmdTag = cmd.tag
+        end
+    end
+	if cmdTag == 0 then 
+		local cmds = Spring.GetUnitCommands(unitID,1)
+		if (cmds) then
+			local cmd = cmds[1]
+			if cmd then
+				cmdTag = cmd.tag
+			end
+        end
+	end 
+	return cmdTag
+end 
+
+
 function UpdateNanoParticles(self)
 
   --// UPDATE START- & FINALPOS
@@ -20,6 +42,7 @@ function UpdateNanoParticles(self)
   if (not lastup)or(thisGameFrame-lastup > 1) then
     self._lastupdate = thisGameFrame
 
+	
     --// UPDATE STARTPOS
     local uid = self.unitID
     if Spring.ValidUnitID(uid) then
@@ -57,17 +80,17 @@ function UpdateNanoParticles(self)
         end
       end
     end
+	
+	
 
-    local cmds = Spring.GetUnitCommands(self.unitID,1)
-    if (cmds) then
-      local cmd = cmds[1]
-      if (not cmd)or(cmd.tag ~= self.cmdTag) then
-        --// command finished
+    local cmdTag = GetCmdTag(self.unitID)
+    if (cmdTag == 0 or cmdTag ~= self.cmdTag) then
         self._dead = true
         return
-      end
     end
+	
   end
+
 
 
   --// UPDATE LOS
@@ -122,6 +145,7 @@ function UpdateNanoParticles(self)
       end
     end
 
+	
     local dir      = Vsub(endPos, startPos)
     local half_dir = Vmul(dir, 0.5)
     local length   = Vlength(dir)

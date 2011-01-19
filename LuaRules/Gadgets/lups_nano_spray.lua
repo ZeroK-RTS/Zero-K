@@ -14,6 +14,30 @@ function gadget:GetInfo()
   }
 end
 
+
+local function GetCmdTag(unitID) 
+    local cmdTag = 0
+    local cmds = Spring.GetFactoryCommands(unitID,1)
+	if (cmds) then
+        local cmd = cmds[1]
+        if cmd then
+           cmdTag = cmd.tag
+        end
+    end
+	if cmdTag == 0 then 
+		local cmds = Spring.GetUnitCommands(unitID,1)
+		if (cmds) then
+			local cmd = cmds[1]
+			if cmd then
+				cmdTag = cmd.tag
+			end
+        end
+	end 
+	return cmdTag
+end 
+	
+
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then
@@ -38,15 +62,9 @@ if (gadgetHandler:IsSyncedCode()) then
   -------------------------------------------------------------------------------------
 
   function QueryNanoPieceLua(unitID,unitDefID,teamID,piecenum)
-    local cmds = Spring.GetUnitCommands(unitID,1)
-    local cmdTag = 0
-    if (cmds) then
-      local cmd = cmds[1]
-      if cmd then
-        cmdTag = cmd.tag
-      end
-    end
+    local cmdTag = GetCmdTag(unitID)
 
+	
     local offset = unitID%30
     local emitter = nanoEmitters[offset][unitID]
     if (emitter) then
@@ -301,14 +319,8 @@ local factionsNanoFx = {
       local type, target = Spring.Utilities.GetUnitIsBuilding(unitID)
 
       if (target) then
-        local cmds = Spring.GetUnitCommands(unitID,1)
-        local cmdTag = 0
-        if (cmds) then
-          local cmd = cmds[1]
-          if cmd then
-            cmdTag = cmd.tag
-          end
-        end
+        local cmdTag = GetCmdTag(unitID)
+		
         if (nanoInfo.cmdTag == cmdTag) then
           local radius = 30
           if (type=="restore") then
