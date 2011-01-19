@@ -136,7 +136,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		facplops[builderID] = nil
 		-- 3 seconds to build with commander
 		Spring.SetUnitCosts(unitID, {
-			buildTime = 36,
+			buildTime = 1,
 			metalCost = 1,
 			energyCost = 1
 		})
