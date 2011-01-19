@@ -6,7 +6,7 @@ piece		base, body, turret, arms, firepoint1, firepoint2, exhaust1, exhaust2, gun
 			gs1r, gs2r, gs3r,
 			gs1l, gs2l, gs3l;
 
-static-var	moving, once, animCount, curGun, firepoint,
+static-var	moving, once, animCount, curGun, firepoint, deployed, 
 			s1r, s2r, s3r,
 			s1l, s2l, s3l,
 			xtilt, xtiltv, xtilta, ztilt, ztilta, ztiltv, 
@@ -19,7 +19,7 @@ static-var	moving, once, animCount, curGun, firepoint,
 
 #define TURRET_TURN_SPEED				<240>
 #define GUN_TURN_SPEED					<60>
-#define ARMS_MOVE_SPEED					[36]
+#define ARMS_MOVE_SPEED					[10]
 
 #define ANIM_PERIOD				50
 #define PIVOT_MOD				11 //appox. equal to MAX_PIVOT / turnrate
@@ -196,16 +196,17 @@ Deploy()
 {
 	if (moving == 1)
 	{
+		deployed = 0;
 		turn turret to y-axis 0 speed TURRET_TURN_SPEED/2;
 		turn gun to x-axis 0 speed GUN_TURN_SPEED/2;
-		move arms to y-axis 0 speed ARMS_MOVE_SPEED/2;
+		move arms to y-axis 0 speed ARMS_MOVE_SPEED;
 	}
 	if (moving == 0)
 	{
 		move arms to y-axis [4] speed ARMS_MOVE_SPEED;
 		wait-for-move arms along y-axis;
+		deployed = 1;
 	}
-	sleep 10;
 }
 
 StopMoving()
@@ -259,7 +260,7 @@ QueryWeapon1(piecenum)
 
 AimWeapon1 (heading, pitch)
 {
-	if (moving == 1) return (0);
+	if (deployed == 0) return (0);
 	signal SIG_AIM1;
 	set-signal-mask SIG_AIM1;
 
