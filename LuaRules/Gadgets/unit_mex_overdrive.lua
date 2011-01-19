@@ -1379,6 +1379,7 @@ function gadget:DrawWorld()
 				gl.DrawFuncAtUnit(lowPowerUnits.units[i], false, DrawUnitFunc,  UnitDefs[spGetUnitDefID(lowPowerUnits.units[i])].height+30)
 			end
 		end
+		gl.Texture("")
 	end
 	
 end

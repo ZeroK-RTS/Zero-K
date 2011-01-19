@@ -982,6 +982,14 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
+	cordoom = {
+		ok = {
+			[1] = "turret_select",
+		},
+		select = {
+			[1] = "turret_select",
+		},
+	},
 	armbrtha = {
 		ok = {
 			[1] = "turret_select",
