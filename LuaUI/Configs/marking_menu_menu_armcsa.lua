@@ -24,6 +24,27 @@ local menu_armcsa = {
         angle= -90,
         unit = "armflea",
       },
+	  { 
+		angle = -135,
+		unit = "armpw",
+	  },
+	  { 
+		angle = -180,
+		unit = "spherepole",
+	  },
+	  { 
+		angle = -270,
+		unit = "armsnipe",
+	  },
+ 	  { 
+		angle = -315,
+		unit = "armrock",
+	  },
+	  { 
+		angle = 0,
+		unit = "armjeth",
+	  },
+
     }
   },
 --[[  {
