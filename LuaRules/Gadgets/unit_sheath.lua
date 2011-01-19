@@ -138,7 +138,7 @@ function gadget:DrawWorld()
 	--glLighting(true)
 	glPolygonOffset(-10, -10)
 	glCulling(GL_BACK)
-	for u,_ in spairs(recharge) do
+	for u,_ in spairs(sheathed) do
 		local x,y,z = GetUnitPosition(u)
 		local _,los = GetPositionLosState(x,y,z,ateam)
 		local mult = sheathed[u]/sheathDefs[Spring.GetUnitDefID(u)].maxHP

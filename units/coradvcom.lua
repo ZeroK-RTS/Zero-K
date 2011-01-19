@@ -48,7 +48,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 1027,
-  maxDamage           = 7200,
+  maxDamage           = 4000,
   maxSlope            = 36,
   maxVelocity         = 1.3,
   maxWaterDepth       = 5000,
@@ -236,7 +236,7 @@ unitDef = {
 
     SHOCK_CANNON   = {
       name                    = [[Shock Cannon]],
-      areaOfEffect            = 144,
+      areaOfEffect            = 160,
       avoidFeature            = true,
       avoidFriendly           = true,
       burnblow                = true,
@@ -244,9 +244,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 280,
-        planes  = 280,
-        subs    = 14,
+        default = 320,
+        planes  = 320,
+        subs    = 16,
       },
 
       edgeEffectiveness       = 0.75,

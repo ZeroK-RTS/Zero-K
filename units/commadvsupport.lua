@@ -50,7 +50,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 976,
-  maxDamage           = 4400,
+  maxDamage           = 2850,
   maxSlope            = 36,
   maxVelocity         = 1.25,
   maxWaterDepth       = 5000,
@@ -162,9 +162,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 75,
-        planes  = 75,
-        subs    = 3.75,
+        default = 80,
+        planes  = 80,
+        subs    = 4,
       },
 
       explosionGenerator      = [[custom:gauss_hit_m]],

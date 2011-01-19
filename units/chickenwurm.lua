@@ -93,12 +93,12 @@ unitDef = {
       damage                  = {
         default = 50,
         planes  = 50,
-        subs    = 7,
+        subs    = 2.5,
       },
 
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:NAPALM_Expl]],
-      fireStarter             = 400,
+      fireStarter             = 350,
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       intensity               = 0.7,
