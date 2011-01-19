@@ -108,9 +108,12 @@ options = {
 }
 			
 local function MakeMinimapButton(file, pos, option )
-	return Chili.Image:New{ 
+	return Chili.Button:New{ 
 		height=iconsize, width=iconsize, 
-		file=file, 
+--		file=file,
+		caption="",
+		margin={0,0,0,0},
+		padding={2,2,0,0},
 		bottom=0, 
 		right=iconsize*pos+5, 
 		tooltip = 
@@ -120,7 +123,16 @@ local function MakeMinimapButton(file, pos, option )
 				or '' 
 				),
 		--OnClick={ function(self) options[option].OnChange() end }, 
-		OnClick={ function(self) Spring.SendCommands( options[option].action ); end }, 
+		OnClick={ function(self) Spring.SendCommands( options[option].action ); end },
+		children={
+			Chili.Image:New{
+				file=file,
+				width="90%";
+				height="90%";
+				x="0%";
+				y="0%";
+			}
+		},
 	}
 end
 
