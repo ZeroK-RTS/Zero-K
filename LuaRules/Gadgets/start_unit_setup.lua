@@ -50,7 +50,7 @@ end
 
 
 local modOptions = Spring.GetModOptions()
-local startMode = Spring.GetModOption("startingresourcetype",false,"facplopboost")
+local startMode = Spring.GetModOption("startingresourcetype",false,"facplop")
 
 if (startMode == "limitboost") then
 	for udid, ud in pairs(UnitDefs) do

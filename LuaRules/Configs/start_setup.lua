@@ -9,4 +9,5 @@ ploppables = {
   "factoryplane",
   "factorygunship",
   "corsy",
+  "armcsa",
 }

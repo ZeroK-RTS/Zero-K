@@ -96,7 +96,7 @@ local options = {
     desc = "Choose the form in which starting resources are given.",
     type = "list",
     section= 'startconds',
-    def = "facplopboost",
+    def = "facplop",
     items = {
       {
         key  = "facplop",
