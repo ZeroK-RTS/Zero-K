@@ -658,7 +658,7 @@ local function GetHelpText(tooltip_type)
 	elseif tooltip_type == 'morph' then
 		sc_caption = 'Space+click: Show unit stats'
 	else
-		sc_caption = 'Space+click: Show options'
+		sc_caption = 'Space+click: Show unit stats'
 	end
 	--return TextBox:New{ text = sc_caption, textColor=color.tooltip_help, width=250, fontSize=ttFontSize,  }
 	return sc_caption
@@ -955,7 +955,7 @@ local function MakeToolTip_Unit(data, tooltip)
 			{ name='utt', text = unittooltip, wrap=true },
 			{ name='hp', directcontrol = 'hp_unit', },
 			{ name='res', directcontrol = 'resources_unit' },
-			{ name='help', text = green .. 'Space+click: Show options', },
+			{ name='help', text = green .. 'Space+click: Show unit stats', },
 		},
 	}
 	
@@ -1019,7 +1019,7 @@ local function MakeToolTip_Feature(data, tooltip)
 					and { name='hp', directcontrol = (tt_ud and 'hp_corpse' or 'hp_feature'), } 
 					or {}),
 			{ name='res', directcontrol = tt_ud and 'resources_corpse' or 'resources_feature' },
-			{ name='help', text = green .. 'Space+click: Show options', },
+			{ name='help', text = green .. 'Space+click: Show unit stats', },
 		},
 	}
 	

@@ -101,15 +101,24 @@ if tobool(Spring.GetModOptions().marketandbounty) then
 end 
 
 
-function comma_value(amount)
-	local formatted = amount .. ''
-	local k
-	while true do  
-		formatted, k = formatted:gsub("^(-?%d+)(%d%d%d)", '%1,%2')
-		if (k==0) then
-			break
+function comma_value(amount, displayPlusMinus)
+	local formatted
+
+	-- amount is a string when ToSI is used before calling this function
+	if type(amount) == "number" then
+		if (amount ==0) then formatted = "0" else 
+			if (amount < 20 and (amount * 10)%10 ~=0) then 
+				if displayPlusMinus then formatted = strFormat("%+.1f", amount)
+				else formatted = strFormat("%.1f", amount) end 
+			else 
+				if displayPlusMinus then formatted = strFormat("%+d", amount)
+				else formatted = strFormat("%d", amount) end 
+			end 
 		end
+	else
+		formatted = amount .. ""
 	end
+
   	return formatted
 end
 
@@ -137,7 +146,7 @@ local function ToSI(num)
 end
 
 local function numformat(num)
-	return comma_value(ToSI(num))
+	return comma_value(num)
 end
 
 local function AdjustWindow(x,y, width, height)
@@ -552,8 +561,8 @@ local function MakeStatsWindow(ud, x,y)
 	local y = scrH-y
 	local x = x
 	
-	local window_width = 300
-	local window_height = 300
+	local window_width = 450
+	local window_height = 450
 
 	local num = #statswindows+1
 	
@@ -811,7 +820,7 @@ function widget:MousePress(x,y,button)
 		
 		local _,cmd_id = Spring.GetActiveCommand()
 		
-		if cmd_id and cmd_id < 0 then
+		if cmd_id then
 			return false
 		end
 		
@@ -823,7 +832,8 @@ function widget:MousePress(x,y,button)
 		local type, data = spTraceScreenRay(x, y)
 		if (type == 'unit') then
 			local unitID = data
-			MakeUnitContextMenu(unitID,x,y)
+			MakeStatsWindow(UnitDefs[Spring.GetUnitDefID(unitID)],x,y)
+			-- FIXME enable later when does not show useless info MakeUnitContextMenu(unitID,x,y)
 			return true
 		elseif (type == 'feature') then
 			local fdid = Spring.GetFeatureDefID(data)
