@@ -219,4 +219,36 @@ local overrides = {
 	[CMD_UNIT_KILL_SUBORDINATES] = {texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'}, text=''},
 }
 
-return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides
+local custom_cmd_actions = {
+	retreat=1,
+	--retreat_zone=1,
+	sethaven=1,
+	['luaui noretreat']=1,
+
+	build=1,
+	area_mex=1,
+
+	embark=1,
+	disembark=1,
+	stealth=1,
+	cloak_shield=1,
+	mine=1,
+	priority=1,
+	ap_fly_state=1,
+	ap_autorepairlevel=1,
+	antinukezone=1,
+	unit_ai=1,
+	unit_kill_subordinates=1,
+	jump=1,
+
+	-- terraform
+	ramp=1,
+	level=1,
+	raise=1,
+	smooth=1,
+	restore=1,
+	--terraform_internal=1,
+}
+
+
+return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions

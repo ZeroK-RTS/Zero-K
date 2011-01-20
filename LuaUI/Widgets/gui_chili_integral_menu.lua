@@ -8,7 +8,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.33 Integral Command Menu",
+    desc      = "v0.34 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -78,23 +78,42 @@ local push        = table.insert
 local CMD_PAGES = 60
 local CMD_MORPH = 31210
 
-local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides = include("Configs/integral_menu_commands.lua")
+local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
 
+local function AddHotkeyOptions()
+	local cmd_actions = {}
+	for cmd, _ in pairs(custom_cmd_actions) do 
+		cmd_actions[cmd] = 1
+	end
 
-
-for cmd, _ in pairs(overrides) do 
-	
-	local cmdname = CMD[cmd]
-	if cmdname then
-		options[cmdname] = {
-			name = cmdname,
+	for cmd, _ in pairs(overrides) do 
+		local cmdname = CMD[cmd]
+		if cmdname then
+			cmd_actions[cmdname] = 1
+		end
+	end
+	local options_order_tmp = {}
+	for cmdname, _ in pairs(cmd_actions) do 
+			
+		local cmdnamel = cmdname:lower()
+		options[cmdnamel] = {
+			name = cmdnamel,
 			type = 'button',
-			action = cmdname:lower(),
+			action = cmdnamel,
 			path = 'Game/Hotkeys/Commands',
 		}
+		options_order_tmp[#options_order_tmp+1] = cmdnamel
 	end
-	options_order[#options_order+1] = cmdname
-end 
+
+	table.sort(options_order_tmp)
+
+	for _, option in ipairs( options_order_tmp ) do
+		options_order[#options_order+1] = option
+	end
+end
+
+AddHotkeyOptions()
+
 
 local MAX_COLUMNS = 6
 local MAX_STATE_ROWS = 5
