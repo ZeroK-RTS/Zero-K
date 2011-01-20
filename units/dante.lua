@@ -17,8 +17,11 @@ unitDef = {
   canPatrol           = true,
   canstop             = [[1]],
   category            = [[LAND]],
+  collisionVolumeScales		= [[72 82 72]],
+  collisionVolumeOffsets	= [[0 -3 0]],  
+  collisionVolumeTest	    = 1,
+  collisionVolumeType	    = [[ellipsoid]],
   corpse              = [[DEAD]],
-
   customParams        = {
     description_fr = [[Mechwarrior d'Assaut]],
     helptext       = [[The Dante is a heavy frontal assault unit for when conventional means don't cut it. Its flamethrower and twin heatrays aren't extraordinary, but its incendiary rockets can be fired in a salvo of twenty that devastates a wide swath of terrain.]],
@@ -54,7 +57,6 @@ unitDef = {
       [[custom:SLASHREARMUZZLE]],
       [[custom:RAIDMUZZLE]],
     },
-
   },
 
   side                = [[CORE]],

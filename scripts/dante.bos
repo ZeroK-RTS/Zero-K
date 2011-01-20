@@ -5,14 +5,15 @@ lshield, luparm, larm, rupleg, lupleg, lleg, rleg, rfoot, lfoot,
 rtoef, rtoer, ltoef, ltoer, rf1, rf2, rf3, rbak1, rbak2, 
 lbak1, lbak2, lf1, lf2, lf3, flame1, flame2, jet1, jet2, fix;
 
-static-var  bMoving, bAiming, Static_Var_3, restore_delay, Static_Var_5, 
-Static_Var_6, aimer, gun1, gun2, dead, reloading;
+static-var  bMoving, bAiming, Static_Var_3, restore_delay, dgunning, 
+aimer, gun1, gun2, dead, reloading;
 
 #define SIG_AIM				2
 #define SIG_AIM_2			4
 #define SIG_AIM_3			8
 #define SIG_AIM_4			16
 #define RELOADTIME			20000
+#define SALVO_TIME			2000
 //#define SIG_AIM_4			//16 //repair?
 
 //#ifndef MAX_SPEED
@@ -351,8 +352,8 @@ Create()
 	dead = 0;
 	bMoving = FALSE;
 	bAiming = 0;
+	dgunning = FALSE;
 	Static_Var_3 = 1;
-	Static_Var_5 = 0;
 	reloading = FALSE;
 	start-script MotionControl();
 	start-script RestoreAfterDelay();
@@ -421,19 +422,11 @@ QueryWeapon1(piecenum)
 
 AimWeapon1(Func_Var_1, Func_Var_2)
 {
+	if ( dgunning )	return 0;
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
 	bAiming = TRUE;
-	while( !Static_Var_3 )
-	{
-		sleep 5;
-	}
-	if ( aimer == 2 )
-	{
-	return 0;
-	}
-	if ( aimer == 1 )
-	{
+
 	turn ruparm to x-axis <-20.000000> speed <250.000000>;
 	turn luparm to x-axis <-20.000000> speed <250.000000>;
 	turn torso to y-axis Func_Var_1 speed <250.000000>;
@@ -443,7 +436,6 @@ AimWeapon1(Func_Var_1, Func_Var_2)
 	wait-for-turn larm around x-axis;  //need to make sure!
 	if ( reloading == TRUE ) { return (0); }
 	return (1);
-	}
 }
 
 Shot1()
@@ -522,6 +514,7 @@ Shot2()
 
 AimWeapon2(Func_Var_1, Func_Var_2)
 {
+	if ( dgunning )	return 0;
 	//signal SIG_AIM;
 	set-signal-mask SIG_AIM;
 	bAiming = TRUE;
@@ -594,7 +587,10 @@ AimWeapon3(Func_Var_1, Func_Var_2)
 
 FireWeapon3()
 {
-	start-script ReloadRockets(); 
+	start-script ReloadRockets();
+	dgunning = TRUE;
+	sleep SALVO_TIME;
+	dgunning = FALSE; 
 }
 
 Shot3()
@@ -651,6 +647,7 @@ Shot3()
 
 AimWeapon4(heading, pitch)
 {
+	if ( dgunning )	return 0;
 	signal SIG_AIM_4;
 	set-signal-mask SIG_AIM;
 	set-signal-mask SIG_AIM_4;
@@ -658,7 +655,7 @@ AimWeapon4(heading, pitch)
 
 	turn ruparm to x-axis <-20.000000> speed <250.000000>;
 	turn flagellum to x-axis (<20> - pitch) speed <90>;
-	turn torso to y-axis Func_Var_1 speed <250.000000>;
+	turn torso to y-axis heading speed <250.000000>;
 	wait-for-turn ruparm around x-axis;
 	wait-for-turn flagellum around x-axis;
 	wait-for-turn torso around y-axis;
