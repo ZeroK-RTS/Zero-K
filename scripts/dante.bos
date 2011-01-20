@@ -522,7 +522,7 @@ Shot2()
 
 AimWeapon2(Func_Var_1, Func_Var_2)
 {
-	signal SIG_AIM;
+	//signal SIG_AIM;
 	set-signal-mask SIG_AIM;
 	bAiming = TRUE;
 	turn torso to y-axis Func_Var_1 speed <200.000000>;
@@ -652,13 +652,16 @@ Shot3()
 AimWeapon4(heading, pitch)
 {
 	signal SIG_AIM_4;
+	set-signal-mask SIG_AIM;
 	set-signal-mask SIG_AIM_4;
 	bAiming = TRUE;
 
 	turn ruparm to x-axis <-20.000000> speed <250.000000>;
 	turn flagellum to x-axis (<20> - pitch) speed <90>;
+	turn torso to y-axis Func_Var_1 speed <250.000000>;
 	wait-for-turn ruparm around x-axis;
 	wait-for-turn flagellum around x-axis;
+	wait-for-turn torso around y-axis;
 	start-script RestoreAfterDelay();
 	return (1);
 }

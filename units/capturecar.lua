@@ -19,7 +19,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Dreamweaver captures a single enemy unit, turning it against its former allies.]],
+    helptext = [[The Dreamweaver captures a single enemy unit, turning it against its former allies. Multiple Dreamweavers can capture a single target faster, although only one unit becomes the controller. If the controlling Dreamweaver is destroyed, the unit is freed.]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -102,7 +102,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 460,
+      range                   = 520,
       reloadtime              = 0.1,
       renderType              = 0,
       rgbColor                = [[0 0.8 0.2]],

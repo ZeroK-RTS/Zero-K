@@ -30,6 +30,10 @@ unitDef = {
   cloakCost           = 5,
   cloakCostMoving     = 25,
   commander           = true,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[50 50 50]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
@@ -115,7 +119,7 @@ unitDef = {
 
     DISINTEGRATOR = {
       name                    = [[Disintegrator]],
-      areaOfEffect            = 36,
+      areaOfEffect            = 48,
       avoidFeature            = false,
       avoidFriendly           = false,
       avoidNeutral            = false,
@@ -124,8 +128,7 @@ unitDef = {
       craterMult              = 6,
 
       damage                  = {
-        default    = 999,
-        commanders = 1,
+        default    = 1200,
       },
 
       explosionGenerator      = [[custom:DGUNTRACE]],
@@ -137,6 +140,7 @@ unitDef = {
       range                   = 250,
       reloadtime              = 15,
       renderType              = 3,
+	  size					  = 6,
       soundHit                = [[explosion/ex_med6]],
       soundStart              = [[weapon/laser/heavy_laser4]],
       soundTrigger            = true,

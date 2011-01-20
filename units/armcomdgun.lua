@@ -93,7 +93,7 @@ unitDef = {
 
     DISINTEGRATOR = {
       name                    = [[Disintegrator]],
-      areaOfEffect            = 36,
+      areaOfEffect            = 48,
       avoidFeature            = false,
       avoidFriendly           = false,
       avoidNeutral            = false,
@@ -114,6 +114,7 @@ unitDef = {
       range                   = 250,
       reloadtime              = 2,
       renderType              = 3,
+	  size					  = 6,
       soundHit                = [[explosion/ex_med6]],
       soundStart              = [[weapon/laser/heavy_laser4]],
       soundTrigger            = true,

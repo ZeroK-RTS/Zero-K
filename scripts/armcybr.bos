@@ -1,7 +1,6 @@
-#define TA			// This is a TA script
+//linear constant 163840
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  flare1, flare2, base, wing1, wing2, rearthrust, wingthrust1, wingthrust2, thrust1, thrust2, drop,
 		emit1, emit2, emit3, emit4;
@@ -156,11 +155,6 @@ FirePrimary()
 QueryPrimary(piecenum)
 {
 	piecenum = gun_1;
-}
-
-SweetSpot(piecenum)
-{
-	piecenum = base;
 }
 
 BlockShot1(unit, block)
