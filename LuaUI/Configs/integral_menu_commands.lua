@@ -22,7 +22,7 @@ local factories = {
 
 --Integral menu is NON-ROBUST
 --all buildings (except facs) need a row or they won't appear!
---also if you put too many things into the same row, the overflow won't be displayed!
+--you can put too many things into the same row, but the buttons will be squished
 local econ = {
 	cormex = {order = 1, row = 1},
 	armsolar = {order = 2, row = 2},
@@ -59,7 +59,7 @@ local defense = {
 	cormine1 = {order = 16, row = 3},
 	armanni = {order = 17, row = 3},
 	cordoom = {order = 18, row = 3},
-	corjamt = {order = 19, row = 1},
+	corjamt = {order = 19, row = 3},
 }
 
 local aux = {	--merged into special
