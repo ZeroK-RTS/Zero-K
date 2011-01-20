@@ -260,7 +260,7 @@ QueryWeapon1(piecenum)
 
 AimWeapon1 (heading, pitch)
 {
-	if (deployed == 0) return (0);
+	if (deployed == 0 || moving == 1) return (0);
 	signal SIG_AIM1;
 	set-signal-mask SIG_AIM1;
 
