@@ -225,8 +225,8 @@ local custom_cmd_actions = {
 	sethaven=1,
 	['luaui noretreat']=1,
 
-	build=1,
-	area_mex=1,
+	--build=1,
+	areamex=1,
 
 	embark=1,
 	disembark=1,
@@ -248,6 +248,8 @@ local custom_cmd_actions = {
 	smooth=1,
 	restore=1,
 	--terraform_internal=1,
+	
+	selfd=1,
 }
 
 

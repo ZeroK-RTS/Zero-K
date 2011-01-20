@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.20 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.21 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -100,6 +100,28 @@ local kb_mkey
 local kb_mindex
 local kb_item
 
+local transkey = {
+	leftbracket 	= '[',
+	rightbracket 	= ']',
+	delete 			= 'del',
+	
+	kp_multiply		= 'numpad*',
+	kp_divide		= 'numpad/',
+	kp_add			= 'numpad+',
+	kp_subract		= 'numpad-',
+	kp_period		= 'numpad.',
+	
+	kp0				= 'numpad0',
+	kp1				= 'numpad1',
+	kp2				= 'numpad2',
+	kp3				= 'numpad3',
+	kp4				= 'numpad4',
+	kp5				= 'numpad5',
+	kp6				= 'numpad6',
+	kp7				= 'numpad7',
+	kp8				= 'numpad8',
+	kp9				= 'numpad9',
+}
 
 --------------------------------------------------------------------------------
 -- widget settings
@@ -2078,7 +2100,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if get_key then
 		get_key = false
 		window_getkey:Dispose()
-		kbval = { key = keysyms[''..key]:lower(), mod = modstring, }		
+		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
+		kbval = { key = translatedkey, mod = modstring, }		
 		
 		if key ~= KEYSYMS.ESCAPE then		
 			AssignKeyBind(kbval, kb_mkey, kb_mindex, kb_item)

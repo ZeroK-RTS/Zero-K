@@ -63,8 +63,8 @@ confdata.game_menu_tree = {
 	{'Pause/Unpause', 'pause' },
 	{},
 	{'Share Dialog...', 'sharedialog' },	
-	{'Factory Guard', function() spSendCommands{"luaui togglewidget FactoryGuard"} end },
-
+	{'Last Message Position', 'lastmsgpos' },	
+	
 	{},
 	{'Screenshots|Take screenshots.',
 		{
@@ -72,6 +72,7 @@ confdata.game_menu_tree = {
 			{'Save Screenshot (JPG)|Find your screenshots under Spring/screenshots', 'screenshot jpg' },	
 		}
 	},
+	{'Factory Guard', function() spSendCommands{"luaui togglewidget FactoryGuard"} end },
 	
 
 }
