@@ -35,9 +35,9 @@ chickenSpawnRate     = 59
 minBaseDistance      = 700      
 maxBaseDistance      = 4500
 
-gracePeriod          = 120       -- no chicken spawn in this period, seconds
-gracePenalty		 = 15		-- reduced grace per player, seconds
-gracePeriodMin		 = 60
+gracePeriod          = 150       -- no chicken spawn in this period, seconds
+gracePenalty		 = 10		-- reduced grace per player, seconds
+gracePeriodMin		 = 90
 
 queenTime            = 50*60    -- time at which the queen appears, seconds
 queenMorphTime		 = {60*30, 120*30}	--lower and upper bounds for delay between morphs, gameframes
@@ -149,7 +149,7 @@ difficulties = {
   ['Chicken: Very Easy'] = {
     chickenSpawnRate = 120, 
     burrowSpawnRate  = 60,
-    gracePeriod      = 240,
+    gracePeriod      = 300,
     firstSpawnSize   = 0.8,
     timeSpawnBonus   = .02,     -- how much each time level increases spawn size
     chickenTypes     = Copy(chickenTypes),
@@ -166,7 +166,7 @@ difficulties = {
   ['Chicken: Easy'] = {
     chickenSpawnRate = 60, 
     burrowSpawnRate  = 50,
-    gracePeriod      = 150,
+    gracePeriod      = 180,
     firstSpawnSize   = 1.2,
     timeSpawnBonus   = .03,
     queenName        = "chickenqueenlite",
@@ -203,6 +203,7 @@ difficulties = {
     burrowSpawnRate  = 40,
     firstSpawnSize   = 2.2,
     timeSpawnBonus   = .05,
+	gracePeriod		 = 120,
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
 	--burrowQueenTime	 = 180,
@@ -214,6 +215,22 @@ difficulties = {
 	miniQueenTime	 = {0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
   },
+  
+  -- FIXME: read modoptions
+--[[
+  ['Chicken: Custom'] = {
+    chickenSpawnRate = 50, 
+    burrowSpawnRate  = 45,
+    firstSpawnSize   = 1.4,
+    timeSpawnBonus   = .04,
+    chickenTypes     = Copy(chickenTypes),
+    defenders        = Copy(defenders),
+	miniQueenTime		= {0.6},
+	burrowWaveBonus	 = 0.15,
+	burrowTechTime	 = 10,
+	burrowRespawnChance = 0.2,
+  }.
+]]--
 }
 
 -- minutes to seconds

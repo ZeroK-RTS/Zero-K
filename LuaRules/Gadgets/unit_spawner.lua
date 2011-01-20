@@ -218,7 +218,7 @@ burrowSpawnRate = burrowSpawnRate/malus/SetCount(computerTeams)
 minBurrowsIncrease = minBurrowsIncrease * malus
 minBurrowsMax	   = minBurrowsMax * malus
 if minBurrowsMax > maxBurrows then minBurrowsMax = maxBurrows end
-gracePeriod = math.max(gracePeriod - gracePenalty*(playerCount), gracePeriodMin)
+gracePeriod = math.max(gracePeriod - gracePenalty*(playerCount - 1), gracePeriodMin)
 
 local function DisableBuildButtons(unitID, buildNames)
   for _, unitName in ipairs(buildNames) do
