@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------------
 
 local hardModifier   = 0.9	--0.75
-local suicidalModifier = 0.75
+local suicidalModifier = 0.8
 
 local eggsModifier = 0.8	--unused
 alwaysEggs = true			--spawn limited-lifespan eggs when not in Eggs mode?
@@ -208,7 +208,7 @@ difficulties = {
     defenders        = Copy(defenders),
 	--burrowQueenTime	 = 180,
 	burrowWaveBonus	 = 0.25,
-	burrowTechTime	 = 12.5,
+	burrowTechTime	 = 15,
 	burrowRespawnChance = 0.25,
 	queenSpawnMult   = 5,
 	queenTime		 = 45*60,

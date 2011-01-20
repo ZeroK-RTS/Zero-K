@@ -261,8 +261,6 @@ SetupUnit(burrowName)
 SetupUnit(queenName)
 
 
-
-
 local difficulty = modes[luaAI or defaultDifficulty]
 Spring.SetGameRulesParam("difficulty", difficulty)
 
@@ -322,7 +320,7 @@ local function DetectCpuLag()
       cpuUsageCount = cpuUsageCount + 1
     end
     local averageCpu = (cpuUsageSum/cpuUsageCount) * (setspeed/actualspeed)
-    if (averageCpu > lagTrigger+triggerTolerance) and not queenID then
+    if (averageCpu > lagTrigger+triggerTolerance) then
       if (not lagging) then
         Spring.SetGameRulesParam("lagging", 1)
       end

@@ -449,13 +449,17 @@ local icontypes = {
   },
   t3builder = {
     bitmap='icons/t3builder.dds',
-    size=1.8,
+    size=2,
   },
   staticbuilder = {
     bitmap='icons/staticbuilder.dds',
     size=1,
   },
-
+  t3hub = {
+    bitmap='icons/t3hub.dds',
+    size=2.4,
+  },
+  
   --defense
   defenseshield = {
     bitmap='icons/defenseshield.dds',
