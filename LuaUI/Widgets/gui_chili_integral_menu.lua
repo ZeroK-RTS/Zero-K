@@ -567,12 +567,12 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 	else
 		-- delete from back so that the order is not canceled while under construction
 		local i = 0
-		while commands[i+pos] and commands[i+pos].id == cmdid do
+		while commands[i+pos] and commands[i+pos].id == cmdid and not alreadyRemovedTag[commands[i+pos].tag] do
 			i = i + 1
 		end
 		i = i - 1
 		j = 0
-		while commands[i+pos] and commands[i+pos].id == cmdid and j < numInput and not alreadyRemovedTag[commands[i+pos].tag] do
+		while commands[i+pos] and commands[i+pos].id == cmdid and j < numInput do
 			Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
 			alreadyRemovedTag[commands[i+pos].tag] = true
 			j = j + 1
