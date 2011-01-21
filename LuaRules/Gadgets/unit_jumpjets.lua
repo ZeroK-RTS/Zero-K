@@ -35,7 +35,6 @@ Spring.SetGameRulesParam("jumpJets",1)
 
 include("LuaRules/Configs/customcmds.h.lua")
 -- needed for checks
-local CMD_MORPH = 31210
 
 local Spring      = Spring
 local MoveCtrl    = Spring.MoveCtrl
