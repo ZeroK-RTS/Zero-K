@@ -36,7 +36,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
                             weaponID, attackerID, attackerDefID, attackerTeam)
 					
 	if recloakUnitID[unitID] then
-		recloakUnit[recloakUnitID[unitID]].frames = 10
+		recloakUnit[recloakUnitID[unitID]].frames = 16
 	else
 		local cloak = Spring.GetUnitIsCloaked(unitID)
 		if cloak then
@@ -79,7 +79,6 @@ function gadget:GameFrame(n)
 		end
 	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
