@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.851 Chili Minimap",
+    desc      = "v0.86 Chili Minimap",
     author    = "Licho, tweaked by CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -65,19 +65,18 @@ options = {
 	},
 	viewheightmap = {
 		name = 'Toggle Height Map',
-		desc = '\255\0\255\0F1\008',
 		type = 'button',
 		action = 'showelevation',
 	},
 	viewblockmap = {
 		name = 'Toggle Pathing Map',
-		desc = 'Select unit then click this to see, where unit can go (\255\0\255\0F2\008',
+		desc = 'Select unit then click this to see where it can go.',
 		type = 'button',
 		action = 'showpathmap',
 	},
 	viewmetalmap = {
 		name = 'Toggle Metal Map',
-		desc = 'Shows concentration of metal (\255\0\255\0F4\008',
+		desc = 'Shows concentration of metal',
 		type = 'button',
 		action = 'showmetalmap',
 	},
@@ -86,13 +85,12 @@ options = {
 	
 	viewfow = {
 		name = 'Toggle Fog of War View',
-		desc ='\255\0\255\0L\008',
 		type = 'button',
 		action = 'togglelos',
 	},
 	viewradar = {
 		name = 'Toggle Radar & Jammer View',
-		desc = 'Only shows when Fog of War is enabled (\255\0\255\0;\008',
+		desc = 'Only shows when Fog of War is enabled',
 		type = 'button',
 		action = 'toggleradarandjammer',
 	},
@@ -116,12 +114,16 @@ local function MakeMinimapButton(file, pos, option )
 		padding={2,2,0,0},
 		bottom=0, 
 		right=iconsize*pos+5, 
-		tooltip = 
-			options[option].name 
-			.. ( options[option].desc 
-				and (' (' .. options[option].desc ..')') 
-				or '' 
-				),
+		
+		tooltip = (
+			options[option].name
+				.. ( options[option].desc 
+					and (' (' .. options[option].desc .. ')') 
+					or '' )
+				.. ' (\255\0\255\0' .. WG.crude.GetHotkey(options[option].action) .. '\008)' 
+			),
+		
+		
 		--OnClick={ function(self) options[option].OnChange() end }, 
 		OnClick={ function(self) Spring.SendCommands( options[option].action ); end },
 		children={

@@ -5,7 +5,7 @@ function widget:GetInfo()
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = -100001,
     handler   = true,
     experimental = false,	
     enabled   = true,
@@ -1127,7 +1127,6 @@ local function flattenTree(tree, parent)
 			end
 			if option.default == nil then
 				option.default = option.value ~= nil and option.value or newval
-				echo (option.name, option.default)
 			end
 			if newval ~= nil and option.value ~= newval then --must nilcheck newval
 				valuechanged = true
@@ -1328,6 +1327,12 @@ local function GetReadableHotkeyMod(mod)
 		(mod:find('m+') and 'Meta+' or '') ..
 		(mod:find('s+') and 'Shift+' or '') ..
 		''		
+end
+
+WG.crude.GetHotkey = function(actionName)
+	local hotkey = settings.keybounditems[actionName]
+	if not hotkey then return '' end
+	return GetReadableHotkeyMod(hotkey.mod) .. hotkey.key
 end
 
 
