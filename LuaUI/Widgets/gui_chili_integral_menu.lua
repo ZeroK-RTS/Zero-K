@@ -128,6 +128,7 @@ local numStateColumns = 3
 local forceUpdateFrequency = 0.2	-- seconds
 
 local selectedFac	-- unitID
+local alreadyRemovedTag = {}
 
 -- Chili classes
 local Chili
@@ -571,8 +572,9 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 		end
 		i = i - 1
 		j = 0
-		while commands[i+pos] and commands[i+pos].id == cmdid and j < numInput do
+		while commands[i+pos] and commands[i+pos].id == cmdid and j < numInput and not alreadyRemovedTag[commands[i+pos].tag] do
 			Spring.GiveOrderToUnit(selectedFac, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
+			alreadyRemovedTag[commands[i+pos].tag] = true
 			j = j + 1
 			i = i - 1
 		end 
@@ -1150,6 +1152,9 @@ function widget:SelectionChanged(newSelection)
 	for i=1,#newSelection do
 		local id = newSelection[i]
 		if IsFactory((spGetUnitDefID(id))) then
+			if selectedFac ~= id then
+				alreadyRemovedTag = {}
+			end
 			selectedFac = id
 			SmartTabSelect()
 			return
