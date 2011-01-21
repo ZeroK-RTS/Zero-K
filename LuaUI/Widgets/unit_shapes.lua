@@ -1,7 +1,7 @@
 function widget:GetInfo()
    return {
       name      = "UnitShapes",
-      desc      = "0.5.7.zk.02 Draws blended shapes around units and buildings",
+      desc      = "0.5.8.zk.02 Draws blended shapes around units and buildings",
       author    = "Lelousius and aegis, modded Licho, CarRepairer",
       date      = "30.07.2010",
       license   = "GNU GPL, v2 or later",
@@ -31,6 +31,7 @@ local math_pi				= math.pi
 local math_cos				= math.cos
 local math_sin				= math.sin
 local math_abs				= math.abs
+local rad_con				= 180 / math_pi
 
 local GL_ONE_MINUS_SRC_ALPHA = GL.ONE_MINUS_SRC_ALPHA
 local GL_ONE_MINUS_DST_ALPHA = GL.ONE_MINUS_DST_ALPHA
@@ -408,6 +409,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local visibleUnits, visibleSelected = {}, {}
+local degrot = {}
 function widget:Update()
 	-- [[
 	local mx, my = spGetMouseState()
@@ -420,6 +422,21 @@ function widget:Update()
 	--]]
 	--visibleUnits, visibleSelected = GetVisibleUnits()
 	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
+	heading = {}
+	for i=1, #visibleUnits do
+		local unitID = visibleUnits[i]
+		dirx, _, dirz = spGetUnitDirection(unitID)
+		if (dirz ~= nil) then
+			degrot[unitID] = 180 - math_acos(dirz) * rad_con
+		end
+	end
+	for i=1, #visibleSelected do
+		local unitID = visibleSelected[i]
+		dirx, _, dirz = spGetUnitDirection(unitID)
+		if (dirz ~= nil) then
+			degrot[unitID] = 180 - math_acos(dirz) * rad_con
+		end
+	end
 end
 
 --Funktion-vars for later use
@@ -456,7 +473,7 @@ function widget:DrawWorldPreUnit()
 			unit = unitConf[udid]
 			
 			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
+				glDrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
 			end
 		end
 
@@ -470,7 +487,7 @@ function widget:DrawWorldPreUnit()
 			unit = unitConf[udid]
 			
 			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale,  0, 0, 0, 0)	
+				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
 			end
 		end	
 
@@ -493,8 +510,8 @@ function widget:DrawWorldPreUnit()
 			unit = unitConf[udid]
 			
 			if (unit) then
-				glDrawListAtUnit(unitID, unit.shape.shape, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
-				glDrawListAtUnit(unitID, unit.shape.inner, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
+				glDrawListAtUnit(unitID, unit.shape.shape, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+				glDrawListAtUnit(unitID, unit.shape.inner, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
 			end
 		end
 		
@@ -505,7 +522,7 @@ function widget:DrawWorldPreUnit()
 			
 			if (unit) then
 				glColor(0,1,0,0)
-				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
+				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
 			end
 		end
 	end --if #visibleSelected > 0
@@ -565,7 +582,7 @@ function widget:DrawWorldPreUnit()
 			
 			if (unit) then
 				glDrawListAtUnit(unitID, unit.shape.shape, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
-				glDrawListAtUnit(unitID, unit.shape.inner, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
+				glDrawListAtUnit(unitID, unit.shape.inner, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
 			end
 		end
 		
@@ -576,7 +593,7 @@ function widget:DrawWorldPreUnit()
 			
 			if (unit) then
 				glColor(1,1,0,0)
-				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, 0, 0, 0, 0)
+				glDrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
 			end
 		end
 	end --if #visibleAllySelUnits > 0

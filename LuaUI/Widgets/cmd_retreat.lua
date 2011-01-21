@@ -372,7 +372,7 @@ function widget:CommandsChanged()
 		cursor  = 'Repair',
 		action  = 'sethaven',
 		params  = { }, 
-		texture = 'LuaUI/Images/ambulance.png',
+		texture = 'LuaUI/Images/commands/Bold/retreat.png',
 
 		pos = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT}, 
 	})
@@ -510,7 +510,7 @@ function widget:DrawWorld()
 		end --for
 		glAlphaTest(GL_GREATER, 0)
 		glColor(1,fade,fade,fade+0.1)
-		glTexture('LuaUI/Images/ambulance.png')
+		glTexture('LuaUI/Images/commands/Bold/retreat.png')
 		
 		for unitID, havenPosition in pairs(havens) do
 			local x, y, z = havenPosition[1], havenPosition[2], havenPosition[3]

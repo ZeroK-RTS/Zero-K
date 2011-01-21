@@ -169,7 +169,7 @@ function widget:CommandsChanged()
 		cursor  = 'Repair',
 		action  = 'setferry',
 		params  = { }, 
-		texture = 'LuaUI/Images/Crystal_Clear_action_flag.png',
+		texture = 'LuaUI/Images/commands/Bold/ferry.png',
 
 		pos = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT}, 
 	})
