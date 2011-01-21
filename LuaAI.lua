@@ -42,10 +42,14 @@ return {
     desc = 'Watch you eggs! Easter bunny is coming!'
   },
   {
+    name = 'Chicken: Custom',
+    desc = 'A customizable chicken experience using modoptions'
+  },
+  {
 	-- to be recognised as a CAI there must be an entry with this name in -> need changes to be renamed to ZK AI ?
 	-- LuaRules\Configs\cai\configCoordinator.lua
     name = 'CAI',
-    desc = 'AI that plays zero-K'
+    desc = 'AI that plays regular Zero-K'
   },
 }
 

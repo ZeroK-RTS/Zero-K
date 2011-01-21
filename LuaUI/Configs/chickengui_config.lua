@@ -12,6 +12,7 @@ configs.difficulties = {
     [6] = 'Eggs: Normal',
     [7] = 'Eggs: Hard',
 	[8] = 'Suicidal',
+	[9] = 'Custom',
 }
 
 configs.colorSet = {

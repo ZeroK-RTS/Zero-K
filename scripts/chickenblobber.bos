@@ -1,3 +1,4 @@
+//linear constant 163840
 piece body,head,rsack,lsack,neck,tail,lthighf,lkneef,lshinf,lfootf,rthighf,rkneef,rshinf,rfootf,lthighb,lkneeb,lshinb,lfootb,rthighb,rkneeb,rshinb,rfootb,firepoint;
 
 static-var bMoving, gun_1;
@@ -8,8 +9,7 @@ static-var bMoving, gun_1;
 #define SIG_MOVE			16
 #define SIG_BUILD;
 	
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 walk()
 {
@@ -171,7 +171,7 @@ AimFromPrimary(piecenum)
 	{	piecenum=head;	}
 
 QueryPrimary(piecenum)
-	{	piecenum=head; }
+	{	piecenum=firepoint; }
 
 RestoreAfterDelay()
 	{

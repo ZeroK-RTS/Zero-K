@@ -3,6 +3,7 @@
 
 local hardModifier   = 0.9	--0.75
 local suicidalModifier = 0.8
+local customModifier = Spring.GetModOptions().techtimemult or 1
 
 local eggsModifier = 0.8	--unused
 alwaysEggs = true			--spawn limited-lifespan eggs when not in Eggs mode?
@@ -36,7 +37,7 @@ minBaseDistance      = 700
 maxBaseDistance      = 4500
 
 gracePeriod          = 150       -- no chicken spawn in this period, seconds
-gracePenalty		 = 10		-- reduced grace per player, seconds
+gracePenalty		 = 10		-- reduced grace per player over one, seconds
 gracePeriodMin		 = 90
 
 queenTime            = 50*60    -- time at which the queen appears, seconds
@@ -86,6 +87,7 @@ modes = {
     [6] = 'Chicken Eggs: Normal',
     [7] = 'Chicken Eggs: Hard',
 	[8] = 'Chicken: Suicidal',
+	[9] = 'Chicken: Custom',
 }
 defaultDifficulty = modes[2]
 testBuilding 	= UnitDefNames["armestor"].id	--testing to place burrow
@@ -143,7 +145,13 @@ local defenders = {
   chicken_shield =  {time = 30, squadSize = 0.6, quasiAttacker = true, },
   --chicken_rafflesia =  {time = 30, squadSize = 0.4 },
 }
-    
+
+local function SetCustomMiniQueenTime()
+	if Spring.GetModOptions().miniqueentime then
+		if Spring.GetModOptions().miniqueentime == 0 then return nil
+		else return Spring.GetModOptions().miniqueentime end
+	else return 0.6 end
+end    
     
 difficulties = {
   ['Chicken: Very Easy'] = {
@@ -215,22 +223,23 @@ difficulties = {
 	miniQueenTime	 = {0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
   },
-  
-  -- FIXME: read modoptions
---[[
+
   ['Chicken: Custom'] = {
-    chickenSpawnRate = 50, 
-    burrowSpawnRate  = 45,
+    chickenSpawnRate = Spring.GetModOptions().chickenspawnrate or 50, 
+    burrowSpawnRate  = Spring.GetModOptions().burrowspawnrate or 45,
     firstSpawnSize   = 1.4,
     timeSpawnBonus   = .04,
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
-	miniQueenTime		= {0.6},
-	burrowWaveBonus	 = 0.15,
-	burrowTechTime	 = 10,
-	burrowRespawnChance = 0.2,
-  }.
-]]--
+	queenTime		 = (Spring.GetModOptions().queentime or 50)*60,
+	miniQueenTime	= {	SetCustomMiniQueenTime() },
+	gracePeriod		= (Spring.GetModOptions().graceperiod and Spring.GetModOptions().graceperiod * 60) or 150,
+	gracePenalty	= 0,
+	gracePeriodMin	= 30,
+	--burrowWaveBonus	 = 0.15,
+	--burrowTechTime	 = 10,
+	--burrowRespawnChance = 0.2,
+  },
 }
 
 -- minutes to seconds
@@ -244,6 +253,8 @@ TimeModifier(difficulties['Chicken: Hard'].chickenTypes, hardModifier)
 TimeModifier(difficulties['Chicken: Hard'].defenders,    hardModifier)
 TimeModifier(difficulties['Chicken: Suicidal'].chickenTypes, suicidalModifier)
 TimeModifier(difficulties['Chicken: Suicidal'].defenders,    suicidalModifier)
+TimeModifier(difficulties['Chicken: Custom'].chickenTypes, customModifier)
+TimeModifier(difficulties['Chicken: Custom'].defenders,    customModifier)
 
 difficulties['Chicken Eggs: Very Easy']   = Copy(difficulties['Chicken: Very Easy'])
 difficulties['Chicken Eggs: Easy']   = Copy(difficulties['Chicken: Easy'])
