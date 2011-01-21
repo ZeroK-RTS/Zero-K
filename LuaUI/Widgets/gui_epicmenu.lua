@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.21 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.22 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -80,7 +80,7 @@ local scrH, scrW = 0,0
 local cycle = 1
 local curSubKey = ''
 
-local init, resetting = false, false
+local init = false
 local myCountry = 'wut'
 --------------------------------------------------------------------------------
 -- Key bindings
@@ -1125,6 +1125,10 @@ local function flattenTree(tree, parent)
 					newval = settings.config[fullkey]
 				end
 			end
+			if option.default == nil then
+				option.default = option.value ~= nil and option.value or newval
+				echo (option.name, option.default)
+			end
 			if newval ~= nil and option.value ~= newval then --must nilcheck newval
 				valuechanged = true
 				option.value = newval
@@ -1498,7 +1502,7 @@ MakeSubWindow = function(fwkey)
 				caption = data.name, 
 				OnMouseUp = { function() MakeSubWindow(data.subindex) end },
 				backgroundColor = color.sub_button_bg,
-				textColor = color.sub_button_fg, 
+				textColor = color.sub_button_fg,
 				tooltip=data.desc,
 			}
 				
@@ -1867,19 +1871,22 @@ function widget:Initialize()
 	
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
 	WG.crude.ResetSettings = function()
-		resetting = true
-		settings.config = {}
-		for wname,_ in pairs(customwidgets) do
-			if WidgetEnabled(wname) then
-				-- Note: this can cause chili crash (not full crash) if the widget doesn't dispose of its named windows on shutdown.
-				-- 		Chili automatically disposes of the window but it takes a few cycles, 
-				--		and if it recreates the window before the disposal, the conflict shuts down chili.
-				widgetHandler:ToggleWidget(wname)
-				widgetHandler:ToggleWidget(wname)
+		for fwkey, windowdata in pairs(flatwindowlist) do
+			local tree = windowdata.tree
+			for i, optionkey in ipairs(windowdata.order) do
+				local data = tree[optionkey]
+				--fixme : check if default doesn't exist. causes crash
+				if data.type == 'bool' or data.type == 'number' then
+					data.value = data.valuelist and GetIndex(data.valuelist, data.default) or data.default
+					data.checked = data.value
+					data.OnChange(data)
+				elseif data.type == 'list' then
+					data.value = data.default
+					data.OnChange(data.default)
+				end
 			end
 		end
-		RemakeCrudemenu()
-		resetting = false
+		
 		echo 'Cleared all settings.'
 	end
 	
@@ -1969,7 +1976,7 @@ function widget:Initialize()
 		local ret = self:OriginalInsertWidget(widget)
 		if type(widget) == 'table' and type(widget.options) == 'table' then
 			IntegrateWidget(widget, true)
-			if not (init or resetting) then
+			if not (init) then
 				RemakeCrudemenu()
 			end
 		end
@@ -1983,7 +1990,7 @@ function widget:Initialize()
 		local ret = self:OriginalRemoveWidget(widget)
 		if type(widget) == 'table' and type(widget.options) == 'table' then
 			IntegrateWidget(widget, false)
-			if not (init or resetting) then
+			if not (init) then
 				RemakeCrudemenu()
 			end
 		end
@@ -1995,7 +2002,7 @@ function widget:Initialize()
 	widgetHandler.OriginalToggleWidget = widgetHandler.ToggleWidget
 	widgetHandler.ToggleWidget = function(self, name)
 		local ret = self:OriginalToggleWidget(name)
-		if resetting then return ret end
+		
 		local w = widgetHandler:FindWidget(name)
 		if w then
 			checkWidget(w)

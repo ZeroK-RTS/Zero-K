@@ -227,6 +227,7 @@ confdata.menu_tree = {
 						{ key = 'Lathan', name = 'Lathan', },
 						{ key = 'k_haos_girl', name = 'K_haos_girl', },
 					},
+					value = 'ca',
 				}
 			},
 			{},
