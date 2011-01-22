@@ -25,19 +25,25 @@ local spGetSelectedUnits 		= Spring.GetSelectedUnits
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 options_path = 'Game/Hotkeys/Commands'
+
+options_order = {'resetfire', 'resetmove', 'lblspace', }
+
 options = {
 	resetfire = {
-		name = 'Hold Fire, Stop',
+		name = 'Hold Fire & Stop',
 		desc = 'Set the unit to hold fire, then stop all commands.',
 		type = 'button',
 		action = 'reset_firestate',
 	},
 	resetmove = {
-		name = 'Hold Position, Stop',
+		name = 'Hold Position & Stop',
 		desc = 'Set the unit to hold position, then stop all commands.',
 		type = 'button',
 		action = 'reset_movestate',
 	},
+	
+	lblspace = { type = 'label', name = '', },
+	
 	
 }
 

@@ -1881,6 +1881,7 @@ function widget:Initialize()
 			for i, optionkey in ipairs(windowdata.order) do
 				local data = tree[optionkey]
 				--fixme : check if default doesn't exist. causes crash
+				--fixme : add RemakeCrudemenu
 				if data.type == 'bool' or data.type == 'number' then
 					data.value = data.valuelist and GetIndex(data.valuelist, data.default) or data.default
 					data.checked = data.value

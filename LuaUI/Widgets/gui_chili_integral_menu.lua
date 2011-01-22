@@ -8,7 +8,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.34 Integral Command Menu",
+    desc      = "v0.35 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -80,24 +80,30 @@ local CMD_MORPH = 31210
 
 local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
 
+local function CapCase(str)
+	local str = str:lower()
+	str = str:gsub( '_', ' ' )
+	str = str:sub(1,1):upper() .. str:sub(2)
+	
+	str = str:gsub( ' (.)', 
+		function(x) return (' ' .. x):upper(); end
+		)
+	return str
+end
+
 local function AddHotkeyOptions()
 	local cmd_actions = {}
 	for cmd, _ in pairs(custom_cmd_actions) do 
 		cmd_actions[cmd] = 1
 	end
-
-	for cmd, _ in pairs(overrides) do 
-		local cmdname = CMD[cmd]
-		if cmdname then
-			cmd_actions[cmdname] = 1
-		end
-	end
+	
 	local options_order_tmp = {}
 	for cmdname, _ in pairs(cmd_actions) do 
 			
 		local cmdnamel = cmdname:lower()
+		local cmdname_disp = CapCase(cmdname)
 		options[cmdnamel] = {
-			name = cmdnamel,
+			name = cmdname_disp,
 			type = 'button',
 			action = cmdnamel,
 			path = 'Game/Hotkeys/Commands',
@@ -237,6 +243,13 @@ local function MakeButton(container, cmd, insertItem)
 		text = cmd.name 
 	end
 	
+	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action):upper() or ''
+	
+	
+	if not isState and hotkey ~= '' then
+		text = '\255\0\255\0' .. hotkey
+	end
+	
 	--count label (for factory build options)
 	if menuChoice == 6 and isBuild and buildQueueUnsorted[-cmd.id] then
 		countText = tostring(buildQueueUnsorted[-cmd.id])
@@ -252,7 +265,7 @@ local function MakeButton(container, cmd, insertItem)
 	elseif isBuild then
 		texture = '#'..-cmd.id
 	else
-		texture = cmd.texture 
+		texture = cmd.texture
 	end 
 	
 	-- tooltip 
@@ -261,6 +274,11 @@ local function MakeButton(container, cmd, insertItem)
 	else 
 		tooltip = cmd.tooltip
 	end
+	
+	if hotkey ~= '' then
+		tooltip = tooltip .. ' (\255\0\255\0' .. hotkey .. '\008)'
+	end
+	
 	
 	-- get cached menu item 
 	local item = commandButtons[cmd.id]
@@ -972,8 +990,8 @@ function widget:Initialize()
 	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
 	local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
 	
-	Spring.Echo(height)
-	Spring.Echo(y)
+	--Spring.Echo(height)
+	--Spring.Echo(y)
 	
 	window = Window:New{
 		parent = screen0,

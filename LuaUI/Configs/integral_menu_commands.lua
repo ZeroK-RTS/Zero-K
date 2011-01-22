@@ -220,27 +220,50 @@ local overrides = {
 }
 
 local custom_cmd_actions = {
+
+	--SPRING COMMANDS
+	
+	selfd=1,
+	attack=1,
+	stop=1,
+	fight=1,
+	guard=1,
+	move=1,
+	patrol=1,
+	wait=1,
+	repair=1,
+	reclaim=1,
+	resurrect=1,
+	dgun=1,
+	loadunits=1,
+	unloadunits=1,
+	area_attack=1,
+	
+	-- states
+	onoff=1,
+	['repeat']=1,
+	cloak=1,
+	move_state=1,
+	fire_state=1,
+	idlemode=1,
+	autorepairlevel=1,
+	
+	      
+	--CUSTOM COMMANDS
+
 	retreat=1,
 	--retreat_zone=1,
 	sethaven=1,
 	['luaui noretreat']=1,
-
 	--build=1,
 	areamex=1,
-
 	embark=1,
 	disembark=1,
 	stealth=1,
 	cloak_shield=1,
 	mine=1,
-	priority=1,
-	ap_fly_state=1,
-	ap_autorepairlevel=1,
-	antinukezone=1,
-	unit_ai=1,
-	unit_kill_subordinates=1,
 	jump=1,
-
+	
 	-- terraform
 	ramp=1,
 	level=1,
@@ -249,7 +272,15 @@ local custom_cmd_actions = {
 	restore=1,
 	--terraform_internal=1,
 	
-	selfd=1,
+	--states
+	priority=1,
+	ap_fly_state=1,
+	ap_autorepairlevel=1,
+	antinukezone=1,
+	unit_ai=1,
+	unit_kill_subordinates=1,
+	
+	
 }
 
 
