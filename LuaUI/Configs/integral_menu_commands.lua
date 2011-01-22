@@ -265,11 +265,11 @@ local custom_cmd_actions = {
 	jump=1,
 	
 	-- terraform
-	ramp=1,
-	level=1,
-	raise=1,
-	smooth=1,
-	restore=1,
+	rampground=1,
+	levelground=1,
+	raiseground=1,
+	smoothground=1,
+	restoreground=1,
 	--terraform_internal=1,
 	
 	--states

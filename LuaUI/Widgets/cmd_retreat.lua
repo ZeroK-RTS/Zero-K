@@ -365,10 +365,10 @@ function widget:CommandsChanged()
 	local foundRetreatable = false
 	local customCommands = widgetHandler.customCommands
 
-	table.insert(customCommands, {			
+	table.insert(customCommands, {
 		id      = CMD_SETHAVEN,
 		type    = CMDTYPE.ICON_MAP,
-		tooltip = 'Place a retreat zone. Units will retreat there. Constructors placed in it will repair units.',
+		tooltip = 'Place a retreat zone. Units will retreat there.',
 		cursor  = 'Repair',
 		action  = 'sethaven',
 		params  = { }, 
