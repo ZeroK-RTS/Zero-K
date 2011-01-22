@@ -21,7 +21,7 @@ unitDef = {
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = true,
-  corpse              = [[HEAP]],
+  corpse              = [[DEAD]],
   cruiseAlt           = 210,
 
   customParams        = {

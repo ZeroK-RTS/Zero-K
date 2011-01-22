@@ -58,7 +58,7 @@ unitDef = {
   cloakCost           = 3,
   cloakCostMoving     = 10,
   collide             = true,
-  corpse              = [[HEAP]],
+  corpse              = [[DEAD]],
   cruiseAlt           = 80,
 
   customParams        = {

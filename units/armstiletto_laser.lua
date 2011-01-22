@@ -17,7 +17,7 @@ unitDef = {
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
-  corpse              = [[HEAP]],
+  corpse              = [[DEAD]],
   cruiseAlt           = 180,
 
   customParams        = {

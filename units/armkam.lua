@@ -25,7 +25,7 @@ unitDef = {
   collisionVolumeScales  = [[32 24 32]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse                 = [[HEAP]],
+  corpse                 = [[DEAD]],
   cruiseAlt              = 100,
 
   customParams           = {
@@ -47,7 +47,7 @@ unitDef = {
   idleTime               = 1800,
   maneuverleashlength    = [[1280]],
   mass                   = 164,
-  maxDamage              = 850,
+  maxDamage              = 860,
   maxVelocity            = 6.5,
   minCloakDistance       = 75,
   moverate1              = [[3]],
