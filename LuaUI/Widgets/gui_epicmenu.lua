@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.22 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.221 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -103,7 +103,7 @@ local kb_item
 local transkey = {
 	leftbracket 	= '[',
 	rightbracket 	= ']',
-	delete 			= 'del',
+	--delete 			= 'del',
 	
 	kp_multiply		= 'numpad*',
 	kp_divide		= 'numpad/',
@@ -1873,6 +1873,9 @@ function widget:Initialize()
 	WG.country = settings.country	
 	WG.lang = settings.lang
 	
+	
+	Spring.SendCommands("unbindaction hotbind")
+	Spring.SendCommands("unbindaction hotunbind")
 	
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
 	WG.crude.ResetSettings = function()

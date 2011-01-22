@@ -240,13 +240,13 @@ local custom_cmd_actions = {
 	area_attack=1,
 	
 	-- states
-	onoff=1,
-	['repeat']=1,
-	cloak=1,
-	move_state=1,
-	fire_state=1,
-	idlemode=1,
-	autorepairlevel=1,
+	onoff=2,
+	['repeat']=2,
+	cloak=2,
+	movestate=2,
+	firestate=2,
+	idlemode=2,
+	autorepairlevel=2,
 	
 	      
 	--CUSTOM COMMANDS
@@ -273,12 +273,12 @@ local custom_cmd_actions = {
 	--terraform_internal=1,
 	
 	--states
-	priority=1,
-	ap_fly_state=1,
-	ap_autorepairlevel=1,
-	antinukezone=1,
-	unit_ai=1,
-	unit_kill_subordinates=1,
+	priority=2,
+	ap_fly_state=2,
+	ap_autorepairlevel=2,
+	antinukezone=2,
+	unit_ai=2,
+	unit_kill_subordinates=2,
 	
 	
 }

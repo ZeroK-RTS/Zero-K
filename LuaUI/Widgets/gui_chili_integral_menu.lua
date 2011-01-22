@@ -8,7 +8,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.35 Integral Command Menu",
+    desc      = "v0.351 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -92,13 +92,11 @@ local function CapCase(str)
 end
 
 local function AddHotkeyOptions()
-	local cmd_actions = {}
-	for cmd, _ in pairs(custom_cmd_actions) do 
-		cmd_actions[cmd] = 1
-	end
+
 	
-	local options_order_tmp = {}
-	for cmdname, _ in pairs(cmd_actions) do 
+	local options_order_tmp_cmd = {}
+	local options_order_tmp_states = {}
+	for cmdname, number in pairs(custom_cmd_actions) do 
 			
 		local cmdnamel = cmdname:lower()
 		local cmdname_disp = CapCase(cmdname)
@@ -108,12 +106,27 @@ local function AddHotkeyOptions()
 			action = cmdnamel,
 			path = 'Game/Hotkeys/Commands',
 		}
-		options_order_tmp[#options_order_tmp+1] = cmdnamel
+		if number == 2 then
+			options_order_tmp_states[#options_order_tmp_states+1] = cmdnamel
+		else
+			options_order_tmp_cmd[#options_order_tmp_cmd+1] = cmdnamel
+		end
 	end
 
-	table.sort(options_order_tmp)
+	options.lblcmd 			= { type='label', name='Instant Commands', path = 'Game/Hotkeys/Commands',}
+	options['lblstate'] 	= { type='label', name='State Commands', path = 'Game/Hotkeys/Commands',}
+	
+	
+	table.sort(options_order_tmp_cmd)
+	table.sort(options_order_tmp_states)
 
-	for _, option in ipairs( options_order_tmp ) do
+	options_order[#options_order+1] = 'lblcmd'
+	for _, option in ipairs( options_order_tmp_cmd ) do
+		options_order[#options_order+1] = option
+	end
+	
+	options_order[#options_order+1] = 'lblstate'
+	for _, option in ipairs( options_order_tmp_states ) do
 		options_order[#options_order+1] = option
 	end
 end
