@@ -54,7 +54,7 @@ return {
     ["electric circle0"] = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 100,
+      count              = 30,
       ground             = true,
       water              = true,
       properties = {
@@ -66,7 +66,7 @@ return {
     ["electric circle1"] = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 450,
+      count              = 60,
       ground             = true,
       water              = true,
       properties = {
@@ -78,7 +78,7 @@ return {
     ["electric circle2"] = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 730,
+      count              = 120,
       ground             = true,
       water              = true,
       properties = {
@@ -90,7 +90,7 @@ return {
     ["electric circle3"] = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 3500,
+      count              = 180,
       ground             = true,
       water              = true,
       properties = {
