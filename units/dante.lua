@@ -1,74 +1,76 @@
 unitDef = {
-  unitname            = [[dante]],
-  name                = [[Dante]],
-  description         = [[Assault/Riot Strider]],
-  acceleration        = 0.0984,
-  bmcode              = [[1]],
-  brakeRate           = 0.2392,
-  buildCostEnergy     = 3500,
-  buildCostMetal      = 3500,
-  builder             = false,
-  buildPic            = [[dante.png]],
-  buildTime           = 3500,
-  canAttack           = true,
-  canDGun             = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  collisionVolumeScales		= [[72 82 72]],
-  collisionVolumeOffsets	= [[0 -3 0]],  
-  collisionVolumeTest	    = 1,
-  collisionVolumeType	    = [[ellipsoid]],
-  corpse              = [[DEAD]],
-  customParams        = {
+  unitname               = [[dante]],
+  name                   = [[Dante]],
+  description            = [[Assault/Riot Strider]],
+  acceleration           = 0.0984,
+  bmcode                 = [[1]],
+  brakeRate              = 0.2392,
+  buildCostEnergy        = 3500,
+  buildCostMetal         = 3500,
+  builder                = false,
+  buildPic               = [[dante.png]],
+  buildTime              = 3500,
+  canAttack              = true,
+  canDGun                = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 -3 0]],
+  collisionVolumeScales  = [[72 82 72]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
+  corpse                 = [[DEAD]],
+
+  customParams           = {
     description_fr = [[Mechwarrior d'Assaut]],
     helptext       = [[The Dante is a heavy frontal assault unit for when conventional means don't cut it. Its flamethrower and twin heatrays aren't extraordinary, but its incendiary rockets can be fired in a salvo of twenty that devastates a wide swath of terrain.]],
     helptext_fr    = [[]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[CRAWL_BLASTSML]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[t3generic]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  immunetoparalyzer   = [[0]],
-  maneuverleashlength = [[640]],
-  mass                = 716,
-  maxDamage           = 11000,
-  maxSlope            = 36,
-  maxVelocity         = 1.787,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT4]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[dante.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[CRAWL_BLASTSML]],
+  defaultmissiontype     = [[Standby]],
+  explodeAs              = [[CRAWL_BLASTSML]],
+  footprintX             = 4,
+  footprintZ             = 4,
+  iconType               = [[t3generic]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  immunetoparalyzer      = [[0]],
+  maneuverleashlength    = [[640]],
+  mass                   = 716,
+  maxDamage              = 11000,
+  maxSlope               = 36,
+  maxVelocity            = 1.56796845,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 75,
+  movementClass          = [[KBOT4]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  objectName             = [[dante.s3o]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[CRAWL_BLASTSML]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:SLASHMUZZLE]],
       [[custom:SLASHREARMUZZLE]],
       [[custom:RAIDMUZZLE]],
     },
+
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turnRate            = 597,
-  upright             = true,
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  steeringmode           = [[2]],
+  TEDClass               = [[KBOT]],
+  turnRate               = 597,
+  upright                = true,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[NAPALM_ROCKETS]],
@@ -99,7 +101,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     DANTE_FLAMER         = {
       name                    = [[Flame Thrower]],
@@ -294,7 +296,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Dante]],
