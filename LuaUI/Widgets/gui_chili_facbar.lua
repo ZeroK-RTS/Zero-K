@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili FactoryBar",
-    desc      = "v0.05 Chili buildmenu for factories.",
+    desc      = "v0.051 Chili buildmenu for factories.",
     author    = "CarRepairer (converted from jK's Buildbar)",
     date      = "2010-11-10",
     license   = "GNU GPL, v2 or later",
@@ -454,6 +454,7 @@ local function WaypointHandler(x,y,button)
 end
 
 RecreateFacbar = function()
+	enteredTweak = false
 	if inTweak then return end
 	
 	stack_main:ClearChildren()
