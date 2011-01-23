@@ -89,17 +89,17 @@ unitDef = {
 
     spider = {
       name                    = [[Electro-Stunner]],
-      areaOfEffect            = 160,
+      areaOfEffect            = 120,
       beamWeapon              = true,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default        = 1000,
-        commanders     = 100,
-        empresistant75 = 250,
-        empresistant99 = 10,
+        default        = 700,
+        commanders     = 70,
+        empresistant75 = 175,
+        empresistant99 = 7,
       },
 
       duration                = 8,
@@ -115,7 +115,7 @@ unitDef = {
       paralyzer               = true,
       paralyzeTime            = 3,
       range                   = 240,
-      reloadtime              = 1.75,
+      reloadtime              = 2,
       renderType              = 7,
       rgbColor                = [[1 1 0.25]],
       soundStart              = [[weapon/lightning_fire]],
@@ -146,7 +146,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 80,
-      object           = [[wreck3x3c.s3o]],
+      object           = [[wreck2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 80,
       seqnamereclamate = [[TREE1RECLAMATE]],
