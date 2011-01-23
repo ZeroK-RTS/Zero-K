@@ -224,7 +224,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Metal Bonus
+-- Metal and Energy Bonus
 --
 
 if (modOptions and modOptions.metalmult) then
@@ -232,6 +232,20 @@ if (modOptions and modOptions.metalmult) then
     local em = UnitDefs[name].extractsmetal
     if (em) then
       UnitDefs[name].extractsmetal = em * modOptions.metalmult
+    end
+  end
+end
+
+if (modOptions and modOptions.energymult) then
+  for name in pairs(UnitDefs) do
+    local em = UnitDefs[name].energymake
+    if (em) then
+      UnitDefs[name].energymake = em * modOptions.energymult
+    end
+	-- for solars
+	em = (UnitDefs[name].energyuse and UnitDefs[name].energyuse < 0) and UnitDefs[name].energyuse
+	if (em) then
+      UnitDefs[name].energyuse = em * modOptions.energymult
     end
   end
 end
