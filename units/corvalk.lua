@@ -72,7 +72,7 @@ unitDef = {
   transportCapacity   = 1,
   transportMass       = 650,
   transportSize       = 4,
-  turnInPlace         = 0,
+  turninplace         = 0,
   turnRate            = 550,
 
   featureDefs         = {

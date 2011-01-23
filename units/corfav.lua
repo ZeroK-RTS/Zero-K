@@ -64,7 +64,6 @@ unitDef = {
   trackType              = [[StdTank]],
   trackWidth             = 8,
   turninplace            = 0,
-  turnInPlace            = 0,
   turnRate               = 1097,
   workerTime             = 0,
 
