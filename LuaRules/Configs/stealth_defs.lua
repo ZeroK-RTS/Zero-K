@@ -73,6 +73,13 @@ for name, _ in pairs(stealthDefs) do
 	stealthDefs[name] = passiveStealth
 end
 
+-- for procedural comms - lazy hack
+for name, ud in pairs(UnitDefNames) do
+	if ud.customParams.cloakstealth then
+		stealthDefs[name] = passiveStealth
+	end
+end
+
 if (Spring.IsDevLuaEnabled()) then
   for k,v in pairs(UnitDefNames) do
     stealthDefs[k] = {
@@ -82,6 +89,7 @@ if (Spring.IsDevLuaEnabled()) then
     }
   end
 end
+
 
 
 return stealthDefs

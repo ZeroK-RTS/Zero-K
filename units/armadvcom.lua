@@ -38,6 +38,7 @@ unitDef = {
 
   customParams        = {
     cloakshield_preset = [[commstrike2]],
+	cloakstealth = [[1]],
     fireproof          = [[1]],
   },
 

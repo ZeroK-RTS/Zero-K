@@ -33,7 +33,9 @@ jumpCategory = {
 	commrecon1 = {
 		range = 400, height = 200, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},
 	commrecon2 = {
-		range = 450, height = 225, speed = 6,  reload = 12,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},	
+		range = 450, height = 220, speed = 6,  reload = 14,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},
+	commrecon3 = {
+		range = 500, height = 240, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},			
 }
 
 jumpClassGroups = {
@@ -51,10 +53,12 @@ jumpClassGroups = {
 	-- "pizzathehut",--bad unit left for testing purposes
 	},
 	commrecon1 = {
-		"commrecon",
+		--"commrecon",
 	},
 	commrecon2 = {
-		"commadvrecon",
+		--"commadvrecon",
+	},
+	commrecon3 = {
 	},
 	-- iammissingstuff = {--bad category
 	-- "puffthemagic",--bad unit left for testing purposes
@@ -64,6 +68,13 @@ jumpClassGroups = {
 	-- "chillichilli",--bad unit left for testing purposes
 	-- },
 }
+
+for name,data in pairs(UnitDefNames) do
+	if data.customParams.jumpclass then
+		local class = jumpClassGroups[data.customParams.jumpclass]
+		class[#class+1] = name
+	end
+end
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 -- Unit overrides

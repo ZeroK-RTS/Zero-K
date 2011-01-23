@@ -27,8 +27,12 @@ local weapons = {
 -- as always, need better way to handle if upgrades are desired!
 local presets = {
 	commrecon_slowbeam = { slowDamage = 450, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
+	
 	commrecon2_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
 	commrecon2_slowbomb = { slowDamage = 1250, scaleSlow = true },
+	
+	commrecon3_slowbeam = { slowDamage = 750, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
+	commrecon3_slowbomb = { slowDamage = 1500, scaleSlow = true },
 }
 
 ------------------------

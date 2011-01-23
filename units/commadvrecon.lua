@@ -34,6 +34,7 @@ unitDef = {
   customParams        = {
     canjump   = [[1]],
     fireproof = [[1]],
+	jumpclass = [[commrecon2]],
   },
 
   defaultmissiontype  = [[Standby]],

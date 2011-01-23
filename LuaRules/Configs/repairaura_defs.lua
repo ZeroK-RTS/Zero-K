@@ -38,7 +38,12 @@ local presets = {
 		range = 450,
 		rate = 12,
 		ignoreDelay = true,
-	}
+	},
+	commsupport3 = {
+		range = 500,
+		rate = 18,
+		ignoreDelay = true,
+	},
 }
 
 for name, ud in pairs(UnitDefNames) do

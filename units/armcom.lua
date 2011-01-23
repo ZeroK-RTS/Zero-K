@@ -85,6 +85,7 @@ unitDef = {
 
   customParams           = {
     fireproof = [[1]],
+	cloakstealth = [[1]],
   },
 
   defaultmissiontype     = [[Standby]],

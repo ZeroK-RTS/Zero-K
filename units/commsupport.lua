@@ -32,6 +32,7 @@ unitDef = {
 
   customParams        = {
     fireproof = [[1]],
+	cloakstealth = [[1]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -105,7 +106,6 @@ unitDef = {
       areaOfEffect            = 16,
       bouncerebound           = 0.15,
       bounceslip              = 1,
-      burst                   = 1,
       cegTag                  = [[gauss_tag_l]],
       craterBoost             = 0,
       craterMult              = 0,
@@ -137,7 +137,6 @@ unitDef = {
       soundHitVolume          = 3,
       soundStart              = [[weapon/gauss_fire]],
       soundStartVolume        = 2.5,
-      sprayangle              = 800,
       stages                  = 32,
       startsmoke              = [[1]],
       turret                  = true,
