@@ -87,6 +87,9 @@ local Grid = 16 -- grid size, do not change without other changes.
 --Config
 ---------------------------------
 
+-- for command canceling when the command has been given and shift is de-pressed
+local originalCommandGiven = false
+
 -- max difference of height around terraforming, Makes Shraka Pyramids. Not used
 local maxHeightDifference = 30 
 
@@ -198,9 +201,11 @@ local function SendCommand()
 			
 			if s then
 				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
+				originalCommandGiven = true
 			else
 				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 				spSetActiveCommand(-1)
+				originalCommandGiven = false
 			end
 		end
 	else
@@ -230,9 +235,11 @@ local function SendCommand()
 			
 			if s then
 				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
+				originalCommandGiven = true
 			else
 				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 				spSetActiveCommand(-1)
+				originalCommandGiven = false
 			end
 		end
 	end
@@ -721,6 +728,20 @@ end
 -- Mouse/keyboard Callins
 --------------------------------------------------------------------------------
 
+local function completelyStopCommand()
+	spSetActiveCommand(-1)
+	originalCommandGiven = false
+	drawingLasso = false
+	drawingRectangle = false
+	setHeight = false
+	volumeDraw = false
+	groundGridDraw = false
+	mouseGridDraw = false
+	drawingRamp = false
+	volumeSelection = 0
+	points = 0
+end
+
 local function snapToHeight(heightArray, snapHeight, arrayCount)
 	local smallest = abs(heightArray[1] - snapHeight)
 	local smallestIndex = 1
@@ -793,6 +814,7 @@ function widget:MousePress(mx, my, button)
 			end
 		else
 			spSetActiveCommand(-1)
+			originalCommandGiven = false
 			return true
 		end
 		
@@ -846,16 +868,7 @@ function widget:MousePress(mx, my, button)
 	
 	if drawingLasso or setHeight or drawingRamp or drawingRectangle then
 		if button == 3 then
-			spSetActiveCommand(-1)
-			drawingLasso = false
-			drawingRectangle = false
-			setHeight = false
-			volumeDraw = false
-			groundGridDraw = false
-			mouseGridDraw = false
-			drawingRamp = false
-			volumeSelection = 0
-			points = 0
+			completelyStopCommand()
 			return true
 		end
 	end
@@ -1390,7 +1403,10 @@ function widget:KeyRelease(key)
 end
 
 function widget:KeyRelease(key)
-
+	if (key == KEYSYMS.LSHIFT or key == KEYSYMS.RSHIFT) and originalCommandGiven then
+		completelyStopCommand()
+	end
+	
 	if ((key == KEYSYMS.LCTRL) or (key == KEYSYMS.RCTRL)) and drawingLasso then
 		local mx,my = Spring.GetMouseState()
 		local _, pos = spTraceScreenRay(mx, my, true)

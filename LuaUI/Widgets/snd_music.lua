@@ -26,6 +26,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local unitExceptions = include("Configs/snd_music_exception.lua")
 
 local windows = {}
 
@@ -184,6 +185,10 @@ function widget:Update(dt)
 end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
+	if unitExceptions[unitDefID] then
+		return
+	end
+	
 	if (damage < 1.5) then return end
 	local PlayerTeam = Spring.GetMyTeamID()
 	
@@ -204,6 +209,9 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID) 
+	if unitExceptions[unitDefID] then
+		return
+	end
 	local unitWorth = 50
 	if (UnitDefs[unitDefID].metalCost > 500) then
 		unitWorth = 200
