@@ -41,7 +41,7 @@ unitDef = {
   mass                = 278,
   maxDamage           = 1100,
   maxSlope            = 18,
-  maxVelocity         = 2.1,
+  maxVelocity         = 2.25,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
@@ -96,9 +96,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 600,
-        planes  = 600,
-        subs    = 3,
+        default = 650,
+        planes  = 650,
+        subs    = 3.25,
       },
 
       edgeEffectiveness       = 0.5,

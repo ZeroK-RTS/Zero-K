@@ -28,7 +28,7 @@ local weapons = {
 local presets = {
 	commrecon_slowbeam = { slowDamage = 450, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
 	commrecon2_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
-	commrecon2_slowbomb = { slowDamage = 1500, scaleSlow = true },
+	commrecon2_slowbomb = { slowDamage = 1250, scaleSlow = true },
 }
 
 ------------------------
