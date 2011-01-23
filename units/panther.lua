@@ -61,7 +61,7 @@ unitDef = {
   },
 
   side                   = [[ARM]],
-  sightDistance          = 540,
+  sightDistance          = 440,
   smoothAnim             = true,
   steeringmode           = [[1]],
   TEDClass               = [[TANK]],

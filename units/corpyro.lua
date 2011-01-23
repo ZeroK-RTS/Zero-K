@@ -65,7 +65,7 @@ unitDef = {
   },
 
   side                  = [[CORE]],
-  sightDistance         = 318,
+  sightDistance         = 420,
   smoothAnim            = true,
   steeringmode          = [[2]],
   TEDClass              = [[KBOT]],
