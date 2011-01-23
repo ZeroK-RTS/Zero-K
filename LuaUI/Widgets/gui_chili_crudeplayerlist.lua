@@ -137,7 +137,7 @@ function widget:Initialize()
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
-		tweakResizable = true,
+		tweakResizable = false,
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
 		children = {
 		},

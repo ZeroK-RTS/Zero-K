@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.221 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.23 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -747,6 +747,7 @@ local function IntegrateWidget(w, addoptions, index)
 		if not option.OnChange or type(option.OnChange) ~= 'function' then
 			w.options[k].OnChange = function(self) end
 		end
+		w.options[k].default = w.options[k].value
 	end	
 	
 	if w.options.order then
@@ -782,6 +783,7 @@ local function IntegrateWidget(w, addoptions, index)
 		option.windex = index
 		
 		local origOnChange = w.options[k].OnChange
+		
 		if option.type ~= 'button' then
 			option.OnChange = 
 				function(self)
@@ -956,6 +958,9 @@ end
 local function MakeSubWindow(key)
 end
 
+local function RemakeEpicMenu()
+end
+
 
 local function HotkeyFromUikey(uikey_hotkey)
 	local uikey_table = explode('+', uikey_hotkey)
@@ -1125,9 +1130,15 @@ local function flattenTree(tree, parent)
 					newval = settings.config[fullkey]
 				end
 			end
+			
 			if option.default == nil then
-				option.default = option.value ~= nil and option.value or newval
+				if option.value ~= nil then
+					option.default = option.value
+				else
+					option.default = newval
+				end	
 			end
+			
 			if newval ~= nil and option.value ~= newval then --must nilcheck newval
 				valuechanged = true
 				option.value = newval
@@ -1394,6 +1405,26 @@ local function MakeHotkeyedControl(control, key, i, item)
 	}
 end
 
+local function ResetWinSettings(windowdata)
+	local tree = windowdata.tree
+	for i, optionkey in ipairs(windowdata.order) do
+		local data = tree[optionkey]
+		if data.default ~= nil then --fixme : need default
+			if data.type == 'bool' or data.type == 'number' then
+				data.value = data.valuelist and GetIndex(data.valuelist, data.default) or data.default
+				data.checked = data.value
+				data.OnChange(data)
+			elseif data.type == 'list' then
+				data.value = data.default
+				data.OnChange(data.default)
+			end
+		else
+			echo ('<EPIC Menu> Error #627', data.name)
+		end
+	end
+end
+
+
 -- Make submenu window based on index from flat window list
 --local function MakeSubWindow(key)
 MakeSubWindow = function(fwkey)
@@ -1566,11 +1597,22 @@ MakeSubWindow = function(fwkey)
 	if parent_key then
 		window_height = window_height + B_HEIGHT
 		window_children[#window_children+1] = Button:New{ caption = 'Back', OnMouseUp = { KillSubWindow, function() MakeSubWindow(parent_key) end,  }, 
-			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='50%', height=B_HEIGHT, }
+			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT, }
 	end
+	
+	
+	--reset button
+	window_children[#window_children+1] = Button:New{ caption = 'Reset', OnMouseUp = { function() ResetWinSettings(windowdata); RemakeEpicMenu(); end }, 
+		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='33%', right='33%', bottom=1, height=B_HEIGHT, }
+	
+	
 	--close button
 	window_children[#window_children+1] = Button:New{ caption = 'Close', OnMouseUp = { KillSubWindow }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width=settings_width, x='50%', right=1, bottom=1, height=B_HEIGHT, }
+		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, width='33%', x='66%', right=1, bottom=1, height=B_HEIGHT, }
+	
+	
+	
+	
 	
 	KillSubWindow()
 	curSubKey = fwkey -- must be done after KillSubWindow
@@ -1845,7 +1887,7 @@ local function MakeCrudeMenu()
 end
 
 --Remakes crudemenu and remembers last submenu open
-local function RemakeCrudemenu()
+RemakeEpicMenu = function()
 	local lastSubKey = curSubKey
 	KillSubWindow()
 	MakeCrudeMenu()
@@ -1853,6 +1895,7 @@ local function RemakeCrudemenu()
 		MakeSubWindow(lastSubKey)
 	end
 end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1880,22 +1923,9 @@ function widget:Initialize()
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
 	WG.crude.ResetSettings = function()
 		for fwkey, windowdata in pairs(flatwindowlist) do
-			local tree = windowdata.tree
-			for i, optionkey in ipairs(windowdata.order) do
-				local data = tree[optionkey]
-				--fixme : check if default doesn't exist. causes crash
-				--fixme : add RemakeCrudemenu
-				if data.type == 'bool' or data.type == 'number' then
-					data.value = data.valuelist and GetIndex(data.valuelist, data.default) or data.default
-					data.checked = data.value
-					data.OnChange(data)
-				elseif data.type == 'list' then
-					data.value = data.default
-					data.OnChange(data.default)
-				end
-			end
+			ResetWinSettings(windowdata)
 		end
-		
+		RemakeEpicMenu()
 		echo 'Cleared all settings.'
 	end
 	
@@ -1986,7 +2016,7 @@ function widget:Initialize()
 		if type(widget) == 'table' and type(widget.options) == 'table' then
 			IntegrateWidget(widget, true)
 			if not (init) then
-				RemakeCrudemenu()
+				RemakeEpicMenu()
 			end
 		end
 		
@@ -2000,7 +2030,7 @@ function widget:Initialize()
 		if type(widget) == 'table' and type(widget.options) == 'table' then
 			IntegrateWidget(widget, false)
 			if not (init) then
-				RemakeCrudemenu()
+				RemakeEpicMenu()
 			end
 		end
 		

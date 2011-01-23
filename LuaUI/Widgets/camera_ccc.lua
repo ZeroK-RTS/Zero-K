@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Complete Control Camera",
-    desc      = "v0.25 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
+    desc      = "v0.251 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
     author    = "CarRepairer (smoothscroll code by trepan)",
     date      = "2009-12-15",
     license   = "GNU GPL, v2 or later",
@@ -156,7 +156,7 @@ options = {
 	rotfactor = {
 		name = 'Rotation speed',
 		type = 'number',
-		min = 0.001, max = 0.010, step = 0.001,
+		min = 0.001, max = 0.020, step = 0.001,
 		value = 0.005,
 	},	
 	rotateonedge = {

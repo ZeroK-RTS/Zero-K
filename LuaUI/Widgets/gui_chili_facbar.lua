@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili FactoryBar",
-    desc      = "v0.04 Chili buildmenu for factories.",
+    desc      = "v0.05 Chili buildmenu for factories.",
     author    = "CarRepairer (converted from jK's Buildbar)",
     date      = "2010-11-10",
     license   = "GNU GPL, v2 or later",
@@ -79,7 +79,8 @@ local waypointFac = -1
 local waypointMode = 0   -- 0 = off; 1=lazy; 2=greedy (greedy means: you have to left click once before leaving waypoint mode and you can have units selected)
 
 local myTeamID = 0
-local inTweak  = 0
+local inTweak  = false
+local leftTweak, enteredTweak = false, false
 local cycle_half_s = 1
 local cycle_2_s = 1
 
@@ -252,32 +253,37 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 				.. WhiteStr .. 	'Right click - ' 	.. GreenStr .. 'Quick Rallypoint Mode' 
 				,
 			backgroundColor = buttonColor,
+			
 			OnClick = {
-				function(_,_,_,button)
-					if button == 2 then
-						local x,y,z = Spring.GetUnitPosition(unitID)
-						Spring.SetCameraTarget(x,y,z)
-					elseif button == 3 then
-						Spring.Echo("BuildBar: Entered greedy waypoint mode")
-						Spring.PlaySoundFile(sound_waypoint, 1)
-						waypointMode = 2 -- greedy mode
-						waypointFac  = stackname
-					else
-						Spring.PlaySoundFile(sound_click, 1)
-						Spring.SelectUnitArray({unitID})
+				unitID ~= 0 and
+					function(_,_,_,button)
+						if button == 2 then
+							local x,y,z = Spring.GetUnitPosition(unitID)
+							Spring.SetCameraTarget(x,y,z)
+						elseif button == 3 then
+							Spring.Echo("FactoryBar: Entered easy waypoint mode")
+							Spring.PlaySoundFile(sound_waypoint, 1)
+							waypointMode = 2 -- greedy mode
+							waypointFac  = stackname
+						else
+							Spring.PlaySoundFile(sound_click, 1)
+							Spring.SelectUnitArray({unitID})
+						end
 					end
-				end
+					or nil
 			},
 			padding={3, 3, 3, 3},
 			--margin={0, 0, 0, 0},
 			children = {
-				Image:New {
-					file = "#"..unitDefID,
-					file2 = WG.GetBuildIconFrame(UnitDefs[unitDefID]),
-					keepAspect = false;
-					width = '100%',
-					height = '100%',
-				},
+				unitID ~= 0 and
+					Image:New {
+						file = "#"..unitDefID,
+						file2 = WG.GetBuildIconFrame(UnitDefs[unitDefID]),
+						keepAspect = false;
+						width = '100%',
+						height = '100%',
+					}
+				or nil,
 			},
 		}
 	)
@@ -420,7 +426,7 @@ end
 
 local function WaypointHandler(x,y,button)
   if (button==1)or(button>3) then
-    Spring.Echo("BuildBar: Exited greedy waypoint mode")
+    Spring.Echo("FactoryBar: Exited easy waypoint mode")
     Spring.PlaySoundFile(sound_waypoint, 1)
     waypointFac  = -1
     waypointMode = 0
@@ -448,6 +454,8 @@ local function WaypointHandler(x,y,button)
 end
 
 RecreateFacbar = function()
+	if inTweak then return end
+	
 	stack_main:ClearChildren()
 	for i,facInfo in ipairs(facs) do
 		local unitDefID = facInfo.unitDefID
@@ -592,6 +600,24 @@ function widget:Update()
 			end
 		end
 	end
+	
+	
+	if inTweak and not enteredTweak then
+		enteredTweak = true
+		stack_main:ClearChildren()
+		for i = 1,5 do
+			local facStack, boStack, qStack, qStore = AddFacButton(0, 0, stack_main, i)
+		end
+		stack_main:Invalidate()
+		stack_main:UpdateLayout()
+		leftTweak = true
+	end
+	
+	if not inTweak and leftTweak then
+		enteredTweak = false
+		leftTweak = false
+		RecreateFacbar()
+	end
 end
 
 
@@ -638,7 +664,7 @@ function widget:MousePress(x, y, button)
 		return (button~=2) -- we allow middle click scrolling in greedy waypoint mode
 	end
 	if waypointMode>1 then
-		Spring.Echo("BuildBar: Exited greedy waypoint mode")
+		Spring.Echo("FactoryBar: Exited easy waypoint mode")
 		Spring.PlaySoundFile(sound_waypoint, 1)
 	end
 	waypointFac  = -1
@@ -665,6 +691,7 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 
 	stack_main = Grid:New{
+		y=20,
 		padding = {0,0,0,0},
 		itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
@@ -691,6 +718,7 @@ function widget:Initialize()
 		minimumSize = {600,200},
 		color = {0,0,0,0},
 		children = {
+			Label:New{ caption='Factories', fontShadow = true, },
 			stack_main,
 		},
 	}
