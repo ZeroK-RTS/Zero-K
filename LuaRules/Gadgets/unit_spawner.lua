@@ -857,7 +857,7 @@ function gadget:GameFrame(n)
       _G.chickenEventArgs = nil
 	  waveSchedule[n + (30 * chickenSpawnRate)] = true
     end
-	--waveSchedule[n] = nil
+	waveSchedule[n] = nil	-- just to be sure
   end
 
   if ((n+17) % 30 < 0.1) then
