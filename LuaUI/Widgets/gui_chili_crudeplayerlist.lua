@@ -20,6 +20,7 @@ local spSendCommands			= Spring.SendCommands
 local echo = Spring.Echo
 
 local Chili
+local Image
 local Button
 local Window
 local ScrollPanel
@@ -41,9 +42,10 @@ local colors = {}
 local green = '\255\0\255\0'
 local red = '\255\0\255\0'
 
-local x_name = 20
-local x_cpu = 140
-local x_ping = 180
+local x_name 	= 20
+local x_share 	= x_name + 120 
+local x_cpu 	= x_share + 20
+local x_ping 	= x_cpu + 40
 
 pingCpuColors = {
 	{0, 1, 0, 1},
@@ -52,6 +54,8 @@ pingCpuColors = {
 	{1, 0.6, 0, 1},
 	{1, 0, 0, 1}
 }
+
+local sharePic        = ":n:"..LUAUI_DIRNAME.."Images/advplayerslist/units.png"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -71,6 +75,21 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function ShareUnits(playername, team)
+	local selcnt = Spring.GetSelectedUnitsCount()
+	if selcnt > 0 then
+		Spring.SendCommands("say a: I gave "..selcnt.." units to "..playername..".")
+		-- no point spam, thx
+		--[[local su = Spring.GetSelectedUnits()
+		for _,uid in ipairs(su) do
+		local ux,uy,uz = Spring.GetUnitPosition(uid)
+		Spring.MarkerAddPoint(ux,uy,uz)
+		end]]
+		Spring.ShareResources(team, "units")     
+	else
+		echo 'Player List: No units selected to share.'
+	end
+end
 
 local function AddAllyteamPlayers(row, allyTeam,players)
 	if not players then
@@ -78,6 +97,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 	end
 	local row = row
 	local localAlliance = Spring.GetLocalAllyTeamID()
+	local localTeam = Spring.GetLocalTeamID()
 	local aCol = {1,0,0,1}
 	if allyTeam == 'S' then
 		aCol = {1,1,1,1}
@@ -118,6 +138,28 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				fontShadow = true,
 			}
 		)
+		if allyTeam == localAlliance and teamID ~= localTeam then
+			window_cpl:AddChild(
+				Button:New{
+					x=x_share,
+					y=options.text_height.value * row,
+					height = options.text_height.value,
+					width = options.text_height.value,
+					tooltip = 'Double click to share selected units to this player.',
+					caption = '',
+					padding ={0,0,0,0},
+					OnDblClick = { function(self) ShareUnits(name, teamID) end, },
+					children = 	{
+						Image:New{
+							x=0,y=0,
+							height='100%',
+							width='100%',
+							file = sharePic,
+						},
+					},
+				}
+			)
+		end
 		window_cpl:AddChild(
 			Label:New{
 				x=x_cpu,
@@ -206,6 +248,7 @@ function widget:Initialize()
 	end
 
 	Chili = WG.Chili
+	Image = Chili.Image
 	Button = Chili.Button
 	Window = Chili.Window
 	ScrollPanel = Chili.ScrollPanel
