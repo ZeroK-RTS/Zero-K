@@ -54,7 +54,6 @@ unitDef = {
   iconType               = [[builder]],
   mass                   = 155,
   maxDamage              = 750,
-  maxslope               = 16,
   maxSlope               = 72,
   maxVelocity            = 1.8,
   maxWaterDepth          = 22,
