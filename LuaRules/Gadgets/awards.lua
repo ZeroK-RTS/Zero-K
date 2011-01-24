@@ -6,7 +6,7 @@ function gadget:GetInfo()
     author    = "CarRepairer",
     date      = "2008-10-15",
     license   = "GNU GPL, v2 or later",
-    layer     = 1,
+    layer     = 1000000, -- Must be after all other build steps
     enabled   = true -- loaded by default?
   }
 end
@@ -35,7 +35,10 @@ local spGetUnitTeam			= Spring.GetUnitTeam
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitExperience	= Spring.GetUnitExperience
 
-local floor     = math.floor
+local floor = math.floor
+
+local terraunitDefID = UnitDefNames["terraunit"].id
+local terraformCost = UnitDefNames["terraunit"].metalCost
 
 local airDamageList		= {}
 local friendlyDamageList= {}
@@ -47,6 +50,8 @@ local nuxDamageList		= {}
 local defDamageList		= {}
 local t3DamageList		= {}
 local captureList		= {}
+local reclaimList		= {}
+local terraformList		= {}
 local ouchDamageList	= {}
 local kamDamageList		= {}
 
@@ -149,6 +154,8 @@ function gadget:Initialize()
 		defDamageList[team] 	= 0
 		t3DamageList[team] 		= 0
 		captureList[team]		= 0
+		reclaimList[team]		= 0
+		terraformList[team] 	= 0
 		ouchDamageList[team]	= 0
 		kamDamageList[team]		= 0
 		
@@ -203,6 +210,20 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		expUnitTeam = unitTeam
 		expUnitDefID = unitDefID
 	end
+end
+
+function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
+	if FeatureDefs[featureDefID] then
+		reclaimList[builderTeam] = reclaimList[builderTeam] - FeatureDefs[featureDefID].metal*part
+	end
+	return true
+end
+
+function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, step) 
+	if terraunitDefID == unitDefID then
+		terraformList[builderTeam] = terraformList[builderTeam] + step*terraformCost
+	end
+	return true
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
@@ -294,6 +315,9 @@ function gadget:GameFrame(n)
 		local t3Team, 	maxT3Damage 	= getMaxVal(t3DamageList)
 		local kamTeam, 	maxKamDamage 	= getMaxVal(kamDamageList)
 		
+		local reclaimTeam, 	maxReclaim 	= getMaxVal(reclaimList)
+		local terraTeam, maxTerra		= getMaxVal(terraformList)
+		
 		local ouchTeam, maxOuchDamage 	= getMaxVal(ouchDamageList)
 		
 		local capTeam, 	maxCap	 		= getMaxVal(captureList)
@@ -379,6 +403,13 @@ function gadget:GameFrame(n)
 		if capTeam and maxCap > 1000 then
 			awardAward(capTeam, 'cap', 'Captured value: '.. comma_value(maxCap))
 		end
+		if terraTeam then
+			awardAward(terraTeam, 'terra', 'Terraform: '.. comma_value(maxTerra) .. " spent")
+		end
+		if reclaimTeam then
+			Spring.Echo("Reclaim Awarded")
+			awardAward(reclaimTeam , 'reclaim', comma_value(maxReclaim) .. "m from wreckage")
+		end
 		if friendTeam and maxFriendlyDamageRatio > minFriendRatio then
 			awardAward(friendTeam, 'friend', 'Damage inflicted on allies: '.. floor(maxFriendlyDamageRatio * 100) ..'%')
 		end
@@ -458,16 +489,18 @@ local fontHeight 	= 16
 
 local awardDescs = 
 {
-	pwn 	= 'Complete Annihilation Award', 
+	pwn 	= 'Complete Annihilation', 
 	navy 	= 'Fleet Admiral', 
 	air 	= 'Airforce General', 
-	nux 	= 'Apocalyptic Achievement Award', 
+	nux 	= 'Apocalyptic Achievement', 
 	friend 	= 'Friendly Fire Award', 
 	shell 	= 'Turtle Shell Award', 
 	fire 	= 'Master Grill-Chef',
 	emp 	= 'EMP Wizard',
 	t3 		= 'Experimental Engineer',
 	cap 	= 'Capture Award',
+	terra	= 'Legendary Landscaper',
+	reclaim = 'Spoils of War',
 	vet 	= 'Decorated Veteran',
 	ouch 	= 'Big Purple Heart',
 	kam		= 'Kamikaze Award',

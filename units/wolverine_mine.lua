@@ -25,6 +25,7 @@ unitDef = {
 
   customParams           = {
     dontCount = [[1]],
+	mobilebuilding = [[1]],
   },
 
   defaultmissiontype     = [[Standby_Mine]],
