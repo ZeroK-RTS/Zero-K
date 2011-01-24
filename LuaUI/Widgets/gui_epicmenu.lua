@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.23 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.24 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -976,19 +976,27 @@ local function HotkeyFromUikey(uikey_hotkey)
 	end
 	
 	local modstring = '' ..
-		(alt and 'a+' or '') ..
-		(ctrl and 'c+' or '') ..
-		(meta and 'm+' or '') ..
-		(shift and 's+' or '')
+		(alt and 'A+' or '') ..
+		(ctrl and 'C+' or '') ..
+		(meta and 'M+' or '') ..
+		(shift and 'S+' or '')
 	return {
 		key = uikey_table[#uikey_table],
 		mod = modstring,
 	}
 end
 
+local function GetReadableHotkeyMod(mod)
+	return (mod:find('A+') and 'Alt+' or '') ..
+		(mod:find('C+') and 'Ctrl+' or '') ..
+		(mod:find('M+') and 'Meta+' or '') ..
+		(mod:find('S+') and 'Shift+' or '') ..
+		''		
+end
+
 
 -- Assign a keybinding to settings and other tables that keep track of related info
-local function AssignKeyBind(hotkey, menukey, itemindex, item)
+local function AssignKeyBind(hotkey, menukey, itemindex, item, verbose)
 	if not (hotkey.key and hotkey.mod) then
 		echo '<EPIC Menu> Wacky assign keybind error #1'
 		return
@@ -1007,7 +1015,20 @@ local function AssignKeyBind(hotkey, menukey, itemindex, item)
 		end
 	end
 	
+	if verbose then
+		local actions = Spring.GetKeyBindings(hotkey.mod .. hotkey.key)
+		if (actions and #actions > 0) then
+			echo( 'Warning: There are other actions bound to this hotkey combo (' .. GetReadableHotkeyMod(hotkey.mod) .. hotkey.key .. '):' )
+			for i,v in ipairs(actions) do
+				for actionCmd, actionExtra in pairs(v) do
+					echo ('  - ' .. actionCmd .. ' ' .. actionExtra)
+				end
+			end
+		end
+	end
+	
 	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
+	
 	--actionName = actionName:lower()
 	settings.keybounditems[actionName] = hotkey
 	AddAction(actionName, kbfunc, nil, "t")
@@ -1330,14 +1351,6 @@ local function MakeKeybindWindow(item, menukey, i, hotkey)
 			Label:New{ y=30, caption = '(Hit "Escape" to clear keybinding)', textColor = color.sub_fg, },
 		}
 	}
-end
-
-local function GetReadableHotkeyMod(mod)
-	return (mod:find('a+') and 'Alt+' or '') ..
-		(mod:find('c+') and 'Ctrl+' or '') ..
-		(mod:find('m+') and 'Meta+' or '') ..
-		(mod:find('s+') and 'Shift+' or '') ..
-		''		
 end
 
 WG.crude.GetHotkey = function(actionName)
@@ -2137,10 +2150,10 @@ function widget:KeyPress(key, modifier, isRepeat)
 	end
 	
 	local modstring = 
-		(modifier.alt and 'a+' or '') ..
-		(modifier.ctrl and 'c+' or '') ..
-		(modifier.meta and 'm+' or '') ..
-		(modifier.shift and 's+' or '')
+		(modifier.alt and 'A+' or '') ..
+		(modifier.ctrl and 'C+' or '') ..
+		(modifier.meta and 'M+' or '') ..
+		(modifier.shift and 'S+' or '')
 	
 	--Set a keybinding 
 	if get_key then
@@ -2150,7 +2163,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		kbval = { key = translatedkey, mod = modstring, }		
 		
 		if key ~= KEYSYMS.ESCAPE then		
-			AssignKeyBind(kbval, kb_mkey, kb_mindex, kb_item)
+			AssignKeyBind(kbval, kb_mkey, kb_mindex, kb_item, true) -- param5 = verbose
 		end
 		
 		if kb_mkey == curSubKey then
