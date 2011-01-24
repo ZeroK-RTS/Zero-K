@@ -489,10 +489,10 @@ local fontHeight 	= 16
 
 local awardDescs = 
 {
-	pwn 	= 'Complete Annihilation', 
+	pwn 	= 'Complete Annihilation Award', 
 	navy 	= 'Fleet Admiral', 
 	air 	= 'Airforce General', 
-	nux 	= 'Apocalyptic Achievement', 
+	nux 	= 'Apocalyptic Achievement Award', 
 	friend 	= 'Friendly Fire Award', 
 	shell 	= 'Turtle Shell Award', 
 	fire 	= 'Master Grill-Chef',
