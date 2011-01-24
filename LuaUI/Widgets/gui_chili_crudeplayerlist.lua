@@ -37,14 +37,13 @@ local window_cpl
 
 local colorNames = {}
 local colors = {}
-local lheight = 14
 
 local green = '\255\0\255\0'
 local red = '\255\0\255\0'
 
 local x_name = 20
-local x_cpu = 130
-local x_ping = 170
+local x_cpu = 140
+local x_ping = 180
 
 pingCpuColors = {
 	{0, 1, 0, 1},
@@ -56,14 +55,42 @@ pingCpuColors = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function SetupPlayerNames() end
+
+options_path = 'Settings/Interface'
+options = {
+	text_height = {
+		name = 'Playerlist Text Size',
+		type = 'number',
+		value = 14,
+		min=8,max=18,step=1,
+		OnChange = function() SetupPlayerNames() end,
+	},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 
 local function AddAllyteamPlayers(row, allyTeam,players)
+	if not players then
+		return
+	end
 	local row = row
+	local localAlliance = Spring.GetLocalAllyTeamID()
+	local aCol = {1,0,0,1}
+	if allyTeam == 'S' then
+		aCol = {1,1,1,1}
+	elseif allyTeam == localAlliance then
+		aCol = {0,1,1,1} 
+	end
 	window_cpl:AddChild(
 		Label:New{
-			y=lheight*row,
+			y=options.text_height.value * row,
 			caption = '[' .. (type(allyTeam) == 'number' and (allyTeam+1) or allyTeam) .. ']',
-			textColor = {1,1,1,1},
+			textColor = aCol,
+			fontsize = options.text_height.value,
+			fontShadow = true,
 		}
 	)
 	--row = row + 1
@@ -82,25 +109,33 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		window_cpl:AddChild(
 			Label:New{
 				x=x_name,
-				y=lheight*row,
+				y=options.text_height.value * row,
+				width=120,
+				autosize=false,
 				caption = (spectator and '' or ((teamID+1).. ') ') )  .. name,
 				textColor = spectator and {1,1,1,1} or {Spring.GetTeamColor(teamID)},
+				fontsize = options.text_height.value,
+				fontShadow = true,
 			}
 		)
 		window_cpl:AddChild(
 			Label:New{
 				x=x_cpu,
-				y=lheight*row,
+				y=options.text_height.value * row,
 				caption = math.round(cpuUsage*100) .. '%',
 				textColor = cpuCol,
+				fontsize = options.text_height.value,
+				fontShadow = true,
 			}
 		)
 		window_cpl:AddChild(
 			Label:New{
 				x=x_ping,
-				y=lheight*row,
+				y=options.text_height.value * row,
 				caption = math.round(pingTime*1000) .. 'ms',
 				textColor = pingCol,
+				fontsize = options.text_height.value,
+				fontShadow = true,
 			}
 		)
 		
@@ -109,13 +144,13 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 	return row
 end
 
-local function SetupPlayerNames()
+SetupPlayerNames = function()
 	window_cpl:ClearChildren()
 	
-	window_cpl:AddChild( Label:New{ x=0, caption = 'A', } )
-	window_cpl:AddChild( Label:New{ x=x_name, caption = 'Name', } )
-	window_cpl:AddChild( Label:New{ x=x_cpu, caption = 'CPU', } )
-	window_cpl:AddChild( Label:New{ x=x_ping, caption = 'Ping', } )
+	window_cpl:AddChild( Label:New{ x=0, 		caption = 'A', 		fontShadow = true, 	fontsize = options.text_height.value, } )
+	window_cpl:AddChild( Label:New{ x=x_name, 	caption = 'ID / Name', 	fontShadow = true,  fontsize = options.text_height.value,} )
+	window_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = options.text_height.value,} )
+	window_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = options.text_height.value,} )
 	
 	local playerroster = Spring.GetPlayerList()
 	
