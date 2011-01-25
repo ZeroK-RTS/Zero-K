@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.24 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.25 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1015,6 +1015,8 @@ local function AssignKeyBind(hotkey, menukey, itemindex, item, verbose)
 		end
 	end
 	
+	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
+	
 	if verbose then
 		local actions = Spring.GetKeyBindings(hotkey.mod .. hotkey.key)
 		if (actions and #actions > 0) then
@@ -1025,9 +1027,8 @@ local function AssignKeyBind(hotkey, menukey, itemindex, item, verbose)
 				end
 			end
 		end
+		echo( 'Hotkey (' .. GetReadableHotkeyMod(hotkey.mod) .. hotkey.key .. ') bound to action: ' .. actionName )
 	end
-	
-	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
 	
 	--actionName = actionName:lower()
 	settings.keybounditems[actionName] = hotkey
@@ -1046,6 +1047,7 @@ end
 -- Unsssign a keybinding from settings and other tables that keep track of related info
 local function UnassignKeyBind(menukey, item)
 	local actionName = 'epic_'.. menukey .. '_' .. item.key
+	
 	if item.action then
 		actionName = item.action
 		local uikey_hotkey_str = GetUikeyHotkeyStr(actionName)
@@ -1061,6 +1063,7 @@ local function UnassignKeyBind(menukey, item)
 		--echo('unassign', "unbindaction " .. actionName)
 		Spring.SendCommands("unbindaction " .. actionName:lower()) -- this only works if lowercased, even if /keyprint says otherwise!
 	end
+	
 	settings.keybounditems[actionName] = nil
 end
 
@@ -2164,6 +2167,12 @@ function widget:KeyPress(key, modifier, isRepeat)
 		
 		if key ~= KEYSYMS.ESCAPE then		
 			AssignKeyBind(kbval, kb_mkey, kb_mindex, kb_item, true) -- param5 = verbose
+		else
+			local actionName = 'epic_'.. kb_mkey .. '_' .. kb_item.key
+			if kb_item.action then
+				actionName = kb_item.action
+			end
+			echo( 'Unbound hotkeys from action: ' .. actionName )
 		end
 		
 		if kb_mkey == curSubKey then

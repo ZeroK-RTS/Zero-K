@@ -9,7 +9,6 @@ function widget:GetInfo()
     date      = "2009-01-27",
     license   = "GNU GPL, v2 or later",
     layer     = -1,
-    handler   = true,
     enabled   = true,
   }
 end
@@ -50,23 +49,14 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
--- Adding functions because of "handler=true"
-local function AddAction(cmd, func, data, types)
-	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
-end
-local function RemoveAction(cmd, types)
-	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
-end
-
-function ResetFireState()
+options.resetfire.OnChange = function()
 	local selUnits = spGetSelectedUnits()
 	spGiveOrderToUnitArray(selUnits, CMD.FIRE_STATE, {0}, {}) 
 	spGiveOrderToUnitArray(selUnits, CMD.STOP, {}, {})
 	return true
 end
 
-function ResetMoveState()
+options.resetmove.OnChange = function()
 	local selUnits = spGetSelectedUnits()
 	spGiveOrderToUnitArray(selUnits, CMD.MOVE_STATE, { 0 }, {})
 	spGiveOrderToUnitArray(selUnits, CMD.STOP, {}, {})
@@ -80,16 +70,7 @@ function widget:Initialize()
 	if Spring.GetSpectatingState() or Spring.IsReplay() then
 		widgetHandler:RemoveWidget()
 		return true
-	end
-
-	AddAction("reset_firestate", ResetFireState, nil, "t")
-	AddAction("reset_movestate", ResetMoveState, nil, "t")
-	
-end
-
-function widget:Shutdown()
-	RemoveAction("reset_firestate")
-	RemoveAction("reset_movestate")
+	end	
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
