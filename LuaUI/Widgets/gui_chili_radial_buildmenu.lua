@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Radial Build Menu",
-    desc      = "v0.08 Radial Build Menu",
+    desc      = "v0.09 Radial Build Menu",
     author    = "CarRepairer",
     date      = "2010-09-15",
     license   = "GNU GPL, v2 or later",
@@ -34,6 +34,7 @@ local grid_menu
 local menu_visible = false
 local orig_color = {1,1,1,0.2}
 local build_color = {0.5,1,1,0.9}
+local hide_color = {0,0,0,0}
 local hotkey_labels = {}
 
 ------------------------------------------------
@@ -112,13 +113,13 @@ end
 local function HotKeyMode(enable)
 	if enable then
 		window_menu.color = build_color
-		window_menu:Invalidate()		
+		window_menu:Invalidate()
 		hotkey_mode = true 
 		for i,v in ipairs(hotkey_labels) do
 			v:SetCaption(green .. v.name)
 		end		
 	else
-		window_menu.color = orig_color
+		window_menu.color = menu_visible and orig_color or hide_color
 		window_menu:Invalidate()
 		hotkey_mode = false
 		for i,v in ipairs(hotkey_labels) do
@@ -217,7 +218,7 @@ local function AddButton(item, index)
 		if angle < 0 then angle = angle + 360 end 
 		local idx = angle / 45
 		local hotkey = keys_display[1 + idx%8]
-		local label_hotkey = Label:New{ name = hotkey, caption = (hotkey_mode and green..hotkey or ''), fontSize = 11, right=0, fontShadow = true, }
+		local label_hotkey = Label:New{ name = hotkey, caption = (hotkey_mode and green..hotkey or ''), fontSize = 11, top = 0, right=0, fontShadow = true, }
 		hotkey_labels[#hotkey_labels +1] = label_hotkey
 		button1:AddChild( label_hotkey )
 	end 
@@ -276,23 +277,27 @@ local function MakeMenu()
 		menu = menu_use[buildername]
 		menu_selected = menu
 		if not menu_visible then
-			menu_visible = true 
-			screen0:AddChild(window_menu)
+			menu_visible = true
+			window_menu.color = orig_color
+			--screen0:AddChild(window_menu)
+                        window_menu:Invalidate()
 		end
 	else
 		if menu_visible then
 			menu_visible = false
-			screen0:RemoveChild(window_menu)
+			--screen0:RemoveChild(window_menu)
+			window_menu.color = hide_color
+                        window_menu:Invalidate()
 		end
 	end
 	
 	UpdateMenu()
+        
 end
 
 Make_KB_Menu = function()
 	NextBuilder()
 	advance_builder = true
-	
 	MakeMenu()
 	
 	if menu then
@@ -402,14 +407,16 @@ function widget:Initialize()
 	window_menu = Window:New{  
 		dockable = true,
 		name = "chiliradialmenu",
-		color = orig_color,
+		color = hide_color,
 		x=0,y=200,
 		width  = 215,
 		height = 215,
 		padding  = {5,5,5,5},
-		--parent = screen0,
-		draggable = true,
-		--resizable = false,
+		parent = screen0,
+		draggable = false,
+		tweakDraggable = true,
+		resizable = false,
+		tweakResizable = true,
 		dragUseGrip = true,
 		fixedRatio = true,
 		children = {

@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections",
-    desc      = "v0.17 Chili Selections.",
+    desc      = "v0.171 Chili Selections.",
     author    = "jK & CarRepairer",
     date      = "@2009,2010",
     license   = "GNU GPL, v2 or later",
@@ -908,6 +908,7 @@ end
 --
 
 local cycle, timer = 1, 0
+local tweakShow = false
 function widget:Update(dt)
 	--UpdateDynamicGroupInfo()
 	timer = timer + dt
@@ -920,6 +921,14 @@ function widget:Update(dt)
 	end
 	--if cycle == 1 then
 	--end
+	
+	if widgetHandler:InTweakMode() then
+	  tweakShow = true
+	  Show(window_corner)
+	elseif tweakShow then
+	  tweakShow = false
+	  widget:SelectionChanged(Spring.GetSelectedUnits())
+	end
 end
 
 function widget:SelectionChanged(newSelection)
