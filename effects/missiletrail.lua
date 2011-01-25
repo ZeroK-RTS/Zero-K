@@ -1,6 +1,10 @@
 -- missiletrailredsmall
 -- missiletrailred
 -- missiletrailyellow
+-- missiletrailblue
+-- missiletrailbluebig
+-- chainsawtrail
+-- screamertrail
 
 return {
   ["missiletrailredsmall"] = {
@@ -149,8 +153,116 @@ return {
     },
 
  },
-
+ 
   ["missiletrailbluebig"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    largeflash = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = [[0.5 0.2 0.9 0.01 0.6 0.2 0.4 0.01 0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[muzzlefront]],
+        length             = -20,
+        sidetexture        = [[muzzleside]],
+        size               = -18,
+        sizegrowth         = 0.75,
+        ttl                = 1,
+      },
+    },
+
+    spikes = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 4,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.3,
+        color              = [[0.6, 0.6, 0.9]],
+        dir                = [[-6 r12,-6 r12,-6 r12]],
+        length             = 8,
+        width              = 8,
+      },
+    },
+ },
+ 
+  ["chainsawtrail"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    largeflash = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = [[0.5 0.2 0.9 0.01 0.6 0.2 0.4 0.01 0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[muzzlefront]],
+        length             = -20,
+        sidetexture        = [[muzzleside]],
+        size               = -9,
+        sizegrowth         = 0.75,
+        ttl                = 1,
+      },
+    },
+
+    spikes = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 4,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.3,
+        color              = [[0.6, 0.6, 0.9]],
+        dir                = [[-6 r12,-6 r12,-6 r12]],
+        length             = 4,
+        width              = 4,
+      },
+    },
+	
+    smoketrail = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.9,
+        colormap           = [[0.65 0.65 0.85 0.4    0.3 0.2 0.5 0.3     1 1 1 0.1  0 0 0 0]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 2,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 10,
+        particlelifespread = 5,
+        particlesize       = 4,
+        particlesizespread = 4,
+        particlespeed      = 20,
+        particlespeedspread = 0,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 1,
+        sizemod            = 1,
+        texture            = [[smokesmall]],
+      },
+    },
+  },
+ 
+["screamertrail"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
     largeflash = {
@@ -196,25 +308,26 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        airdrag            = 0.9,
-        colormap           = [[1 0.8 0.8 0.6  1 1 1 0.4  1 1 1 0.2  0 0 0 0]],
-        directional        = true,
+        airdrag            = 0.95,
+        colormap           = [[0.65 0.65 0.85 0.4    0.3 0.2 0.5 0.2     1 1 1 0.03  0 0 0 0]],
+        directional        = false,
         emitrot            = 0,
-        emitrotspread      = 15,
+        emitrotspread      = 10,
         emitvector         = [[dir]],
-        gravity            = [[0, 0, 0]],
-        numparticles       = 1,
+        gravity            = [[0, -0.1, 0]],
+        numparticles       = 2,
         particlelife       = 20,
-        particlelifespread = 5,
-        particlesize       = 2,
-        particlesizespread = 3,
+        particlelifespread = 40,
+        particlesize       = 4,
+        particlesizespread = 6,
         particlespeed      = 5,
-        particlespeedspread = 10,
-        pos                = [[0, 0, 0]],
-        sizegrowth         = 0.15,
+        particlespeedspread = 5,
+        pos                = [[r5, r5, r5]],
+        sizegrowth         = 1.6,
         sizemod            = 1,
-        texture            = [[smokesmall]],
+        texture            = [[smoke]],
       },
     },
- },
+  },
+
 }
