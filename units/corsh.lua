@@ -88,9 +88,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 60,
-        planes  = 60,
-        subs    = 3,
+        default = 90,
+        planes  = 90,
+        subs    = 4.5,
       },
 
       explosionGenerator      = [[custom:gauss_hit_l]],
@@ -114,14 +114,15 @@ unitDef = {
       soundHit                = [[weapon/gauss_hit]],
       soundHitVolume          = 2.5,
       soundStart              = [[weapon/gauss_fire]],
+	  soundTrigger            = true,
       soundStartVolume        = 2,
-      sprayangle              = 800,
+      sprayangle              = 400,
       stages                  = 32,
       startsmoke              = [[1]],
       turret                  = true,
       waterbounce             = 1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 1000,
+      weaponVelocity          = 2200,
     },
 
   },

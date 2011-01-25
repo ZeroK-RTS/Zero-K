@@ -309,7 +309,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.95,
-        colormap           = [[0.65 0.65 0.85 0.4    0.3 0.2 0.5 0.2     1 1 1 0.03  0 0 0 0]],
+        colormap           = [[0.65 0.65 0.85 0.4    0.3 0.2 0.5 0.2     1 1 1 0.1  0 0 0 0]],
         directional        = false,
         emitrot            = 0,
         emitrotspread      = 10,
