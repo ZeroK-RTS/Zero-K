@@ -86,6 +86,7 @@ unitDef = {
       areaOfEffect            = 64,
       burnblow                = true,
       canattackground         = false,
+      cegTag                  = [[flak_trail]],
       color                   = 1,
       craterBoost             = 0,
       craterMult              = 0,
@@ -98,7 +99,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.85,
-      explosionGenerator      = [[custom:FLAK_HIT_24]],
+      explosionGenerator      = [[custom:FLAK_HIT_16]],
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,

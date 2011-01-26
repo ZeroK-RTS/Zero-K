@@ -2,6 +2,7 @@
 -- flak_burst_16
 -- flak_hit_24
 -- flak_burst_24
+-- flak_trail
 
 return {
   ["flak_hit_16"] = {
@@ -87,7 +88,37 @@ return {
         particlespeed      = 0.1,
         particlespeedspread = 0,
         pos                = [[0, 0, 0]],
-        sizegrowth         = [[6 r12]],
+        sizegrowth         = [[8 r16]],
+        sizemod            = 0.5,
+        texture            = [[smokesmall]],
+      },
+    },
+  },
+  
+  ["flak_trail"] = {
+    burst = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.5,
+        colormap           = [[0 0 0 0.75  0 0 0 0.75  0 0 0 0]],
+        directional        = false,
+        emitrot            = 0,
+        emitrotspread      = 0,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 5,
+        particlelifespread = 5,
+        particlesize       = 0.1,
+        particlesizespread = 0,
+        particlespeed      = 0.3,
+        particlespeedspread = 0.3,
+        pos                = [[5 r10, 5 r10, 5 r10]],
+        sizegrowth         = [[3 r3]],
         sizemod            = 0.5,
         texture            = [[smokesmall]],
       },
