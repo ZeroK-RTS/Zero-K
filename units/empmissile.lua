@@ -16,10 +16,10 @@ unitDef = {
   canGuard               = true,
   canstop                = [[1]],
   category               = [[SINK UNARMED]],
-  collisionVolumeOffsets = [[0 35 0]],
-  collisionVolumeScales  = [[20 80 20]],
-  collisionVolumeTest    = 1,
-  collisionVolumeType    = [[CylY]],
+  collisionVolumeOffsets = [[0 15 0]],
+  collisionVolumeScales  = [[20 50 20]],
+  collisionVolumeTest	 = 1,
+  collisionVolumeType	 = [[CylY]],
 
   customParams           = {
     helptext       = [[The Shockley disables units in a small area for up to 45 seconds.]],

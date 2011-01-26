@@ -20,10 +20,10 @@ unitDef = {
   canGuard                      = true,
   canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
-  collisionVolumeOffsets        = [[0 35 0]],
-  collisionVolumeScales         = [[20 80 20]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[CylY]],
+  collisionVolumeOffsets	    = [[0 15 0]],
+  collisionVolumeScales		    = [[20 60 20]],
+  collisionVolumeTest	        = 1,
+  collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
     helptext = [[The Inferno is a large AoE fire weapon. Its direct damage is modest, but the cloud of fire it creates lasts for a very long time.]],

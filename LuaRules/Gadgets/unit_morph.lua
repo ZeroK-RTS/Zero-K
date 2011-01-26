@@ -324,15 +324,9 @@ local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef, teamTech, un
   else
     tt = tt .. 'Morph into a ' .. ud.humanName .. '\n'
   end
-  if (morphDef.time > 0) then
-    tt = tt .. GreenStr  .. 'time: '   .. morphDef.time     .. '\n'
-  end
-  if (morphDef.metal > 0) then
-    tt = tt .. CyanStr   .. 'metal: '  .. morphDef.metal    .. '\n'
-  end
-  if (morphDef.energy > 0) then
-    tt = tt .. YellowStr .. 'energy: ' .. morphDef.energy   .. '\n'
-  end
+  tt = tt .. GreenStr  .. 'time: '   .. morphDef.time     .. '\n'
+  tt = tt .. CyanStr   .. 'metal: '  .. morphDef.metal    .. '\n'
+  tt = tt .. YellowStr .. 'energy: ' .. morphDef.energy   .. '\n'
   if (morphDef.tech > teamTech) or
      (morphDef.xp > unitXP) or
      (morphDef.rank > unitRank) or

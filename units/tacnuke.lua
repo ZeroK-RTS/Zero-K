@@ -20,10 +20,10 @@ unitDef = {
   canGuard                      = true,
   canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
-  collisionVolumeOffsets        = [[0 35 0]],
-  collisionVolumeScales         = [[20 80 20]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[CylY]],
+  collisionVolumeOffsets        = [[0 25 0]],
+  collisionVolumeScales         = [[20 60 20]],
+  collisionVolumeTest	        = 1,
+  collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
     description_fr = [[Lance Missile Nucléaire Tactique]],

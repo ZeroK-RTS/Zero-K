@@ -128,6 +128,14 @@ local sounds = {
 			[1] = "spider_select",
 		},
 	},
+	spideraa = {
+		ok = {
+			[1] = "spider_move",
+		},
+		select = {
+			[1] = "spider_select",
+		},
+	},
 
 	armcrabe = {
 		ok = {
@@ -241,6 +249,14 @@ local sounds = {
 		},
 	},
 	corsumo = {
+		ok = {
+			[1] = "heavy_bot_move",
+		},
+		select = {
+			[1] = "bot_select",
+		},
+	},
+	firewalker = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -390,6 +406,14 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
+	gorg = {
+		ok = {
+			[1] = "turret_select",
+		},
+		select = {
+			[1] = "turret_select",
+		},
+	},
 	armbanth = {
 		ok = {
 			[1] = "turret_select",
@@ -485,6 +509,14 @@ local sounds = {
 		},
 	},
 	panther = {
+		ok = {
+			[1] = "light_tank_move2",
+		},
+		select = {
+			[1] = "tank_select",
+		},
+	},
+	logkoda = {
 		ok = {
 			[1] = "light_tank_move2",
 		},
@@ -916,7 +948,7 @@ local sounds = {
 			[1] = "cloaker_select",
 		},
 	},
-	armaser = {
+	spherecloaker = {
 		ok = {
 			[1] = "bot_move",
 		},

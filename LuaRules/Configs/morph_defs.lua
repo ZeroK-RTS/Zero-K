@@ -135,21 +135,21 @@ local morphDefs = {
    -- jammer
    armjamt = {
       into = 'spherecloaker',
-      time = 25,
+      time = 30,
     }, 
 	spherecloaker = {
       into = 'armjamt',
-      time = 25,
+      time = 30,
     }, 
 	
 	-- shield
 	corjamt = {
       into = 'core_spectre',
-      time = 25,
+      time = 30,
     }, 
 	core_spectre = {
       into = 'corjamt',
-      time = 25,
+      time = 30,
     }, 
 
 	-- radar
