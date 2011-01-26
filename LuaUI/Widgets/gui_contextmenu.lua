@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Context Menu",
-    desc      = "v0.08 Chili Context Menu\nPress [Space] while clicking for a context menu.",
+    desc      = "v0.081 Chili Context Menu\nPress [Space] while clicking for a context menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -149,18 +149,24 @@ local function numformat(num)
 	return comma_value(num)
 end
 
-local function AdjustWindow(x,y, width, height)
-	if x + width > scrW * (.75) then
-		x = x - width - 20
-	else
-		x = x + 20
+local function AdjustWindow(window)
+	local nx
+	if (0 > window.x) then
+		nx = 0
+	elseif (window.x + window.width > screen0.width) then
+		nx = screen0.width - window.width
 	end
-	if y + height > scrH * (.75) then
-		y = y - height - 20
-	else
-		y = y + 20
+
+	local ny
+	if (0 > window.y) then
+		ny = 0
+	elseif (window.y + window.height > screen0.height) then
+		ny = screen0.height - window.height
 	end
-	return x,y
+
+	if (nx or ny) then
+		window:SetPos(nx,ny)
+	end
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -558,6 +564,7 @@ end
 
 local function MakeStatsWindow(ud, x,y)
 	hideWindow(window_unitcontext)
+
 	local y = scrH-y
 	local x = x
 	
@@ -589,8 +596,6 @@ local function MakeStatsWindow(ud, x,y)
 		}
 	}
 
-	x,y = AdjustWindow(x,y, window_width, window_height)
-
 	if window_unitstats then
 		window_unitstats:Dispose()
 	end
@@ -598,8 +603,8 @@ local function MakeStatsWindow(ud, x,y)
 	statswindows[num] = Window:New{  
 		x = x,  
 		y = y,  
-		clientWidth  = window_width,
-		clientHeight = window_height,
+		width  = window_width,
+		height = window_height,
 		resizable = true,
 		parent = screen0,
 		backgroundColor = color.stats_bg, 
@@ -610,6 +615,7 @@ local function MakeStatsWindow(ud, x,y)
 		
 		children = children,
 	}
+	AdjustWindow(statswindows[num])
 	
 end
 
@@ -678,7 +684,6 @@ local function PriceWindow(unitID, action)
 	children[#children+1] =  CloseButton(window_width)
 	
 	local window_height = (B_HEIGHT) * (#children-1) + grid_height
-	--echo ('winheight',window_height)
 		
 	local stack1 = StackPanel:New{
 		centerItems = false,
@@ -765,7 +770,6 @@ local function MakeUnitContextMenu(unitID,x,y)
 	end
 
 	
-	--echo(window_height)
 	if ceasefires and myAlliance ~= alliance then
 		window_height = window_height + B_HEIGHT*2
 		children[#children+1] = Button:New{ caption = 'Vote for ceasefire', OnMouseUp = { function() spSendLuaRulesMsg('cf:y'..alliance) end }, width=window_width}
@@ -775,7 +779,6 @@ local function MakeUnitContextMenu(unitID,x,y)
 	
 	local window_height = (B_HEIGHT)* #children
 	
-	x,y = AdjustWindow(x,y,window_width, window_height)
 	if window_unitcontext then
 		window_unitcontext:Dispose()
 	end
@@ -802,6 +805,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 		backgroundColor = color.context_bg, 
 		children = {stack1},
 	}
+	AdjustWindow(window_unitcontext)
 end
 
 --------------------------------------------------------------------------------
