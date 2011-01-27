@@ -1,14 +1,14 @@
--- comgate_teleport_smoke
--- comgate_teleport
--- comgate_teleport_circle_lightning
--- comgate_teleport_glow
--- comgate_teleport_rgroundflash
--- comgate_teleport_circle_lightning_single
--- comgate
--- comgate_teleport_ygroundflash
+-- gate_teleport_smoke
+-- gate_teleport
+-- gate_teleport_circle_lightning
+-- gate_teleport_glow
+-- gate_teleport_rgroundflash
+-- gate_teleport_circle_lightning_single
+-- gate
+-- gate_teleport_ygroundflash
 
 return {
-  ["comgate_teleport_smoke"] = {
+  ["gate_teleport_smoke"] = {
     wezels = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -38,7 +38,7 @@ return {
     },
   },
 
-  ["comgate_teleport"] = {
+  ["gate_teleport"] = {
     boom = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -46,92 +46,20 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        delay              = 85,
+        delay              = 0,
         explosiongenerator = [[custom:PARIS]],
         pos                = [[0, 0, 0]],
-      },
-    },
-    ["electric circle0"] = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 30,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[21 r106]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_CIRCLE_LIGHTNING]],
-        pos                = [[300 r-600, 0, 300 r-600]],
-      },
-    },
-    ["electric circle1"] = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 60,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[22 r140]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_CIRCLE_LIGHTNING]],
-        pos                = [[200 r-400, 0, 200 r-400]],
-      },
-    },
-    ["electric circle2"] = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 120,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[06 r162]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_CIRCLE_LIGHTNING]],
-        pos                = [[120 r-240, 0, 120 r-240]],
-      },
-    },
-    ["electric circle3"] = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 180,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[0 r195]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_CIRCLE_LIGHTNING]],
-        pos                = [[72 r-144, 0, 72 r-144]],
-      },
-    },
-    ["electric circle4"] = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 33,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[195 r110]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_CIRCLE_LIGHTNING]],
-        pos                = [[72 r-144, 0, 72 r-144]],
-      },
-    },
-    ["electric circle5"] = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 33,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[305 r600]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_CIRCLE_LIGHTNING]],
-        pos                = [[72 r-144, 0, 72 r-144]],
       },
     },
     glow = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 5,
+      count              = 2,
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[0 i5]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_GLOW]],
+        delay              = [[0 i2]],
+        explosiongenerator = [[custom:GATE_TELEPORT_GLOW]],
         pos                = [[0, 0, 0]],
       },
     },
@@ -142,38 +70,38 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[210 i20]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_RGROUNDFLASH]],
+        delay              = [[110 i20]],
+        explosiongenerator = [[custom:GATE_TELEPORT_RGROUNDFLASH]],
         pos                = [[0, 0, 0]],
       },
     },
     smoke = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 200,
+      count              = 30,
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[180r162]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_SMOKE]],
+        delay              = [[80r62]],
+        explosiongenerator = [[custom:GATE_TELEPORT_SMOKE]],
         pos                = [[120 r-240, 0, 120 r-240]],
       },
     },
     ycircle = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 2,
+      count              = 1,
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[160 r20]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_YGROUNDFLASH]],
+        delay              = [[60 r20]],
+        explosiongenerator = [[custom:GATE_TELEPORT_YGROUNDFLASH]],
         pos                = [[0, 0, 0]],
       },
     },
   },
 
-  ["comgate_teleport_circle_lightning"] = {
+  ["gate_teleport_circle_lightning"] = {
     ["electric circle5"] = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -182,7 +110,7 @@ return {
       water              = true,
       properties = {
         delay              = 0,
-        explosiongenerator = [[custom:COMGATE_TELEPORT_CIRCLE_LIGHTNING_SINGLE]],
+        explosiongenerator = [[custom:GATE_TELEPORT_CIRCLE_LIGHTNING_SINGLE]],
         pos                = [[26 r-52, 0, 26 r-52]],
       },
     },
@@ -200,7 +128,7 @@ return {
     },
   },
 
-  ["comgate_teleport_glow"] = {
+  ["gate_teleport_glow"] = {
     glow = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -242,7 +170,7 @@ return {
     },
   },
 
-  ["comgate_teleport_rgroundflash"] = {
+  ["gate_teleport_rgroundflash"] = {
     groundflash = {
       circlealpha        = 1,
       circlegrowth       = 0,
@@ -257,7 +185,7 @@ return {
     },
   },
 
-  ["comgate_teleport_circle_lightning_single"] = {
+  ["gate_teleport_circle_lightning_single"] = {
     wezels = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -287,7 +215,7 @@ return {
     },
   },
 
-  ["comgate"] = {
+  ["gate"] = {
     boom = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -296,37 +224,13 @@ return {
       water              = true,
       properties = {
         delay              = 0,
-        explosiongenerator = [[custom:COMGATE_TELEPORT]],
+        explosiongenerator = [[custom:GATE_TELEPORT]],
         pos                = [[0, 0, 0]],
-      },
-    },
-    ["electric circle4"] = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 0,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[0 r7]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_CIRCLE_LIGHTNING]],
-        pos                = [[r-40, 0, r-40]],
-      },
-    },
-    ["electric circle5"] = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 0,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = [[50 r17]],
-        explosiongenerator = [[custom:COMGATE_TELEPORT_CIRCLE_LIGHTNING]],
-        pos                = [[40 r-40, 0,12 r-40]],
       },
     },
   },
 
-  ["comgate_teleport_ygroundflash"] = {
+  ["gate_teleport_ygroundflash"] = {
     groundflash = {
       circlealpha        = 1,
       circlegrowth       = 0,

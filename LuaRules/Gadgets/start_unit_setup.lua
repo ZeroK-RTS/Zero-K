@@ -141,7 +141,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 			energyCost = 1
 		})
 		local x,y,z = Spring.GetUnitPosition(unitID)
-		Spring.SpawnCEG("riotball", x, y, z)
+		Spring.SpawnCEG("gate", x, y, z)
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
 		facplopsrunning[unitID] = true
 	end
@@ -315,7 +315,7 @@ local function SpawnStartUnit(teamID, playerID)
 	--else
 		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
 	--end
-	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("comgate", x, y, z) end
+	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("gate", x, y, z) end
 	Spring.SetGameRulesParam("commSpawned"..teamID, 1)
 	--commSpawned[teamID] = true
 	

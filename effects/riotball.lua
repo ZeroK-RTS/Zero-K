@@ -5,7 +5,7 @@ return {
       alwaysvisible      = true,
       circlealpha        = 0.4,
       circlegrowth       = 7,
-      flashalpha         = 0.1,
+      flashalpha         = 0.2,
       flashsize          = 256,
       ttl                = 45,
       color = {
@@ -21,7 +21,7 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        alpha              = 0.05,
+        alpha              = 0.7,
         color              = [[0.3,0,0.4]],
         expansionspeed     = 6,
         ttl                = 32,

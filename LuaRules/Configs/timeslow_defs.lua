@@ -19,7 +19,7 @@ local UPDATE_PERIOD = 15 -- I'd preffer if this was not changed
 
 local weapons = {
 	slowmort_slowbeam = { slowDamage = 300, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
-	cormak_blast = { slowDamage = 12, noDeathBlast = true, scaleSlow = true },
+	cormak_blast = { slowDamage = 36, noDeathBlast = true, scaleSlow = true },
 	slowmissile_weapon = { slowDamage = 1, onlySlow = true, scaleSlow = true },
 }
 

@@ -116,9 +116,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 30,
-        planes  = 30,
-        subs    = 0.3,
+        default = 90,
+        planes  = 90,
+        subs    = 0.9,
       },
 
       edgeeffectiveness       = 0.75,
@@ -130,7 +130,7 @@ unitDef = {
       myGravity               = 10,
       noSelfDamage            = true,
       range                   = 120,
-      reloadtime              = 0.3,
+      reloadtime              = 0.9,
       renderType              = 4,
       soundHitVolume          = 1,
       startsmoke              = [[1]],
@@ -158,7 +158,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 32,
-      reloadtime              = 0.3,
+      reloadtime              = 0.9,
       size                    = 1E-06,
       smokeTrail              = false,
 
@@ -195,7 +195,7 @@ unitDef = {
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 256,
-      reloadtime              = 0.3,
+      reloadtime              = 0.9,
       size                    = 1E-06,
       smokeTrail              = false,
 
