@@ -1197,7 +1197,7 @@ function widget:Initialize()
 	
 	local VFSMODE      = VFS.RAW_FIRST
 	_, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFSMODE)
-	local confdata = VFS.Include(LUAUI_DIRNAME .. "Configs/crudemenu_conf.lua", nil, VFSMODE)
+	local confdata = VFS.Include(LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua", nil, VFSMODE)
 	color = confdata.color
 
 	-- setup Chili

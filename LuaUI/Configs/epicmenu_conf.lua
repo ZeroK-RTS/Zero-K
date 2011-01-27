@@ -1,5 +1,6 @@
 local confdata = {}
-confdata.title = 'C.A.'
+confdata.title = 'Z.K.'
+confdata.title_image = LUAUI_DIRNAME .. 'Images/ZK_logo.png'
 local color = {
 	white = {1,1,1,1},
 	yellow = {1,1,0,1},

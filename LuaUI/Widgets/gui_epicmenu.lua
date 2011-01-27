@@ -25,12 +25,13 @@ local echo = Spring.Echo
 
 -- Config file data
 local VFSMODE      = VFS.RAW_FIRST
-local file = LUAUI_DIRNAME .. "Configs/crudemenu_conf.lua"
+local file = LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua"
 local confdata = VFS.Include(file, nil, VFSMODE)
 local menu_tree = confdata.menu_tree
 local game_menu_tree = confdata.game_menu_tree 
 local color = confdata.color
 local title_text = confdata.title
+local title_image = confdata.title_image
 local help_menu_tree = confdata.help_tree
 local menu_tree2 = {}
 local game_menu_tree2 = {}
@@ -1764,7 +1765,7 @@ local function MakeCrudeMenu()
 						
 				children = {
 					--GAME LOGO GOES HERE
-					Image:New{ tooltip = title_text, file = LUAUI_DIRNAME .. 'Images/ZK_logo.png', height=B_HEIGHT, width=B_HEIGHT, },
+					Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
 					
 					-- odd-number button width keeps image centered
 					Button:New{
