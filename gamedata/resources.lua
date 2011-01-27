@@ -134,6 +134,7 @@ local resources = {
       redlight= "other/light_red.png",
       sakexplo= "saktoths/sakexplo.tga",
       shell= "pd/shell.tga",
+	  shield= "pd/shield.png",
       smallflare= "gpl/smallflare.tga",
       smoke= "pd/smokesmall.tga",
       smokesmall= "pd/smokesmall.tga",

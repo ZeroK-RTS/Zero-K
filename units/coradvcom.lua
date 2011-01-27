@@ -67,7 +67,7 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:COMGATE]],
+      [[custom:GATE]],
       [[custom:RAIDMUZZLE]],
       [[custom:LEVLRMUZZLE]],
     },
