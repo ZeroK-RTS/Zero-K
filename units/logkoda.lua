@@ -45,7 +45,7 @@ unitDef = {
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   side                = [[CORE]],
-  sightDistance       = 440,
+  sightDistance       = 520,
   smoothAnim          = true,
   steeringmode        = [[1]],
   TEDClass            = [[TANK]],
@@ -78,9 +78,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 60,
-        planes  = 60,
-        subs    = 5,
+        default = 65,
+        planes  = 65,
+        subs    = 3.25,
       },
 
       explosionGenerator      = [[custom:NAPALM_Expl]],
