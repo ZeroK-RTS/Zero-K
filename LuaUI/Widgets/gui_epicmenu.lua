@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.25 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.251 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1611,7 +1611,6 @@ MakeSubWindow = function(fwkey)
 	local backButton 
 	--back button
 	if parent_key then
-		window_height = window_height + B_HEIGHT
 		window_children[#window_children+1] = Button:New{ caption = 'Back', OnMouseUp = { KillSubWindow, function() MakeSubWindow(parent_key) end,  }, 
 			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT, }
 	end
@@ -1637,7 +1636,7 @@ MakeSubWindow = function(fwkey)
 		x = settings.sub_pos_x,  
 		y = settings.sub_pos_y, 
 		clientWidth = window_width,
-		clientHeight = window_height+30,
+		clientHeight = window_height+B_HEIGHT*4,
 		minimumSize = {250,350},		
 		--resizable = false,
 		parent = settings.show_crudemenu and screen0 or nil,
