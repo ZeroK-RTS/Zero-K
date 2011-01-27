@@ -52,7 +52,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[puppy.s3o]],
-  pushResistant          = 1,
   seismicSignature       = 4,
   selfDestructAs         = [[TINY_BUILDINGEX]],
   selfDestructCountdown  = 0,
