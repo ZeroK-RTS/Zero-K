@@ -1,8 +1,6 @@
-#define TA			// This is a TA script
 //linear 65536
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece	base, 
 		tracks1, tracks2, tracks3, tracks4, 
@@ -140,7 +138,7 @@ RestoreAfterDelay()
 	return (1);
 }
 
-AimWeapon2(heading, pitch)
+AimWeapon1(heading, pitch)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
@@ -152,7 +150,7 @@ AimWeapon2(heading, pitch)
 	return (1);
 }
 
-FireWeapon2()
+FireWeapon1()
 {
 	gun_2 = !gun_2;
 	if( gun_2 ) {
@@ -169,19 +167,14 @@ FireWeapon2()
 
 }
 
-AimFromWeapon2(piecenum) {
+AimFromWeapon1(piecenum) {
 	piecenum = aim;
 }
 
-QueryWeapon2(piecenum)
+QueryWeapon1(piecenum)
 {
 	if (gun_2) piecenum = flare1;
 	else piecenum = flare2;
-}
-
-SweetSpot(piecenum)
-{
-	piecenum = turret;
 }
 
 Killed(severity, corpsetype)
@@ -199,7 +192,7 @@ Killed(severity, corpsetype)
 		explode barrel1 type BITMAPONLY | BITMAP5;
 		explode barrel2 type BITMAPONLY | BITMAP4;
 	} else if (severity < 50) {
-		corpsetype = 2;
+		corpsetype = 1;
 		explode base type BITMAPONLY | BITMAP5;
 		explode a1 type BITMAPONLY | BITMAP4;
 		explode a2 type BITMAPONLY | BITMAP3;
@@ -208,7 +201,7 @@ Killed(severity, corpsetype)
 		explode barrel1 type FALL | BITMAP5;
 		explode barrel2 type FALL | BITMAP4;
 	} else {
-		corpsetype = 3;
+		corpsetype = 2;
 		explode base type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
 		explode a1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 		explode a2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;

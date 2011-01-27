@@ -593,6 +593,14 @@ local behaviourConfig = {
 		fleeDistance = 100,
 		minFleeRange = 500,
 	},
+	["corsent"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+	},
 }
 
 return behaviourConfig

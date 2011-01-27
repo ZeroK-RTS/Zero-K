@@ -85,7 +85,7 @@ unitDef = {
 
   weapons                = {
 
-    [3] = {
+    {
       def                = [[AA_LASER]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
@@ -178,7 +178,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 550,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -191,28 +191,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Jethro]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 550,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 40,
-      object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 40,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Jethro]],

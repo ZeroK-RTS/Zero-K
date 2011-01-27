@@ -1,7 +1,7 @@
+//linear constant 65536
 //modified from Argh's PURE Artillery Shell Script
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece	base, hips, torso, launcher, rflare, rblast, lflare, lblast, cflare, cblast,
 		rshoulder, ruarm, rlarm, lshoulder, luarm, llarm,
@@ -190,12 +190,12 @@ RestoreAfterDelay()
 	turn launcher to x-axis <0.000000> speed <47.500000>;
 }
 
-AimFromWeapon2(piecenum)
+AimFromWeapon1(piecenum)
 {
 	piecenum = torso;
 }
 
-AimWeapon2(heading,pitch)
+AimWeapon1(heading,pitch)
 {		
 	wait-for-turn torso around y-axis;
 	wait-for-turn launcher around x-axis;
@@ -203,7 +203,7 @@ AimWeapon2(heading,pitch)
 	return (1);
 }
 
-QueryWeapon2(piecenum)
+QueryWeapon1(piecenum)
 {
 	if(gun_1 == 0)
 	{
@@ -215,7 +215,7 @@ QueryWeapon2(piecenum)
 	}
 }
 
-FireWeapon2()
+FireWeapon1()
 {
 	if( gun_1 == 0 )
 	{
@@ -234,17 +234,17 @@ FireWeapon2()
 	}
 }
 
-QueryWeapon3(piecenum)
+QueryWeapon2(piecenum)
 {
         piecenum = cflare;
 }
 
-AimFromWeapon3(piecenum)
+AimFromWeapon2(piecenum)
 {
         piecenum = torso;
 }
 
-AimWeapon3(heading,pitch)
+AimWeapon2(heading,pitch)
 {	
 	signal SIG_AIM1;
 	set-signal-mask SIG_AIM1;
@@ -280,7 +280,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode lfoot type FALL | BITMAP4;
 		explode lshin type FALL | BITMAP5;
 		explode llarm type FALL | BITMAP1;
@@ -297,7 +297,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode lfoot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 		explode lshin type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
 		explode llarm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
@@ -312,7 +312,7 @@ Killed(severity, corpsetype)
 		explode torso type SHATTER | BITMAP1;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode lfoot type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 	explode lshin type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
 	explode llarm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;

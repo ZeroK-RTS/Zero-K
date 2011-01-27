@@ -55,14 +55,13 @@ unitDef = {
 
   weapons             = {
 
-    [2] = {
+    {
       def                = [[LASER]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
-
-    [3] = {
+    {
       def                = [[EMG]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
@@ -72,35 +71,6 @@ unitDef = {
 
 
   weaponDefs          = {
-
-    BOGUS_MISSILE = {
-      name                    = [[Missiles]],
-      areaOfEffect            = 48,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 0,
-      },
-
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
-      metalpershot            = 0,
-      range                   = 800,
-      reloadtime              = 0.5,
-      renderType              = 1,
-      startVelocity           = 450,
-      tolerance               = 9000,
-      turnRate                = 33000,
-      turret                  = true,
-      weaponAcceleration      = 101,
-      weaponTimer             = 0.1,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 650,
-    },
-
 
     EMG           = {
       name                    = [[Anti-Air Autocannon]],
@@ -201,7 +171,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 1020,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
@@ -209,27 +179,6 @@ unitDef = {
       hitdensity       = [[100]],
       metal            = 220,
       object           = [[wreck2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 220,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
-    DEAD2 = {
-      description      = [[Debris - Archangel]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 1020,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 220,
-      object           = [[debris4x4c.s3o]],
       reclaimable      = true,
       reclaimTime      = 220,
       seqnamereclamate = [[TREE1RECLAMATE]],

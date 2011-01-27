@@ -1,3 +1,5 @@
+//linear constant 65536
+
 piece head,hips,lshoulder,lbcover,ltcover,rshoulder,rbcover,rtcover,chest,rthigh,lthigh,lshin,rshin,rfoot,lfoot,lmissile,rmissile,rmuzzle,rexhaust,lmuzzle,lexhaust;
 
 static-var isMoving, isAiming, shooting_num, gun;
@@ -159,17 +161,7 @@ Create()
 	start-script DamageControl();
 }
 	
-SweetSpot(piecenum)
-{
-	piecenum=chest;
-}	
-	
-AimFromWeapon3(piecenum)
-{
-	piecenum=chest;
-}
-
-QueryWeapon3(piecenum)
+QueryWeapon1(piecenum)
 {
 	if( gun == 0 )
 	{
@@ -181,15 +173,6 @@ QueryWeapon3(piecenum)
 	}
 }
 
-AimFromWeapon1(piecenum)
-{
-	piecenum=chest;
-}
-	
-AimFromWeapon2(piecenum)
-{
-	piecenum=chest;
-}		
 //---------------------------------------------------------------------
 //gun functions;
 //---------------------------------------------------------------------	
@@ -204,7 +187,7 @@ RestoreAfterDelay()
 	isAiming = FALSE;
 }
 
-AimWeapon3(heading,pitch)
+AimWeapon1(heading,pitch)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
@@ -225,7 +208,7 @@ AimWeapon3(heading,pitch)
 	return(TRUE);
 }
 	
-FireWeapon3()
+FireWeapon1()
 {
 	if (gun == 1)
 	{
@@ -251,31 +234,31 @@ Killed( severity, corpsetype )
 	if (severity <= 25)
 	{
 		corpsetype = 1;
-		explode hips type		SHATTER;
-		explode chest type		SHATTER;
-		explode lshoulder type	SHATTER;
-		explode rshoulder type	SHATTER;
-		explode head type		FALL | FIRE | BITMAP2;
+		explode hips type		BITMAPONLY;
+		explode chest type		BITMAPONLY;
+		explode lshoulder type	BITMAPONLY;
+		explode rshoulder type	BITMAPONLY;
+		explode head type		FALL | FIRE;
 		return( 0 );
 	}
 
 	if (severity <= 50)
 	{
-		corpsetype = 2;
-		explode hips type		SHATTER;
-		explode chest type		SHATTER;
-		explode lshoulder type	FALL | FIRE | BITMAP2;
-		explode rshoulder type	FALL | FIRE | BITMAP2;
-		explode head type		FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		corpsetype = 1;
+		explode hips type		BITMAPONLY;
+		explode chest type		BITMAPONLY;
+		explode lshoulder type	FALL | FIRE;
+		explode rshoulder type	FALL | FIRE;
+		explode head type		FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		return( 0 );
 	}
 
-	corpsetype = 3;
+	corpsetype = 2;
 	explode hips type		SHATTER;
 	explode chest type		SHATTER;
 	explode lshoulder type	SHATTER;
 	explode rshoulder type	SHATTER;
-	explode head type		FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode head type		FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 	
 	return( 0 );
 }
