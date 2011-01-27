@@ -76,7 +76,6 @@ local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
 local push        = table.insert
 
 local CMD_PAGES = 60
-local CMD_MORPH = 31210
 
 local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
 
@@ -92,8 +91,6 @@ local function CapCase(str)
 end
 
 local function AddHotkeyOptions()
-
-	
 	local options_order_tmp_cmd = {}
 	local options_order_tmp_states = {}
 	for cmdname, number in pairs(custom_cmd_actions) do 
@@ -156,11 +153,8 @@ local Label
 local Colorbars
 local Checkbox
 local Window
-local ScrollPanel
+local Panel
 local StackPanel
-local LayoutPanel
-local Grid
-local Trackbar
 local TextBox
 local Image
 local Progressbar
@@ -987,11 +981,7 @@ function widget:Initialize()
 	Checkbox = Chili.Checkbox
 	Window = Chili.Window
 	Panel = Chili.Panel
-	ScrollPanel = Chili.ScrollPanel
 	StackPanel = Chili.StackPanel
-	LayoutPanel = Chili.LayoutPanel
-	Grid = Chili.Grid
-	Trackbar = Chili.Trackbar
 	TextBox = Chili.TextBox
 	Image = Chili.Image
 	Progressbar = Chili.Progressbar

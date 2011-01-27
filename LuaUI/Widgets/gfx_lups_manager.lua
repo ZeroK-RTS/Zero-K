@@ -236,7 +236,6 @@ local function UnitEnteredLos(_,unitID)
   local effects   = UnitEffects[unitDefID]
   if (effects) then
     for _,fx in ipairs(effects) do
-	  Spring.Echo(fx.class)
       if (fx.class=="GroundFlash") then
         fx.options.pos = { Spring.GetUnitBasePosition(unitID) }
       end

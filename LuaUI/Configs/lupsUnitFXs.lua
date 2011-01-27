@@ -67,71 +67,26 @@ effectUnitDefs = {
     {class='StaticParticles', options=MergeTable(radarBlink,{piece="head", delay=15})},
   },
 
-  armmex = {
-    {class='AirJet', options={color={1.0,0.1,0.1}, width=1, length=30, piece="emit", onActive=false, emitVector={0,1,0}}},
-  },
-  
   spherepole = {
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="blade", onActive=false}},
   },
 
-  --// SEA PLANES //----------------------------
-  armsaber = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.7, length=25, piece="nozzle", onActive=true}},
-  },
-  armseap = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.7, length=30, piece="nozzle", onActive=true}},
-  },
-  armsehak = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.7, length=30, piece="nozzle", onActive=true}},
-  },
-  armsfig = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.3, length=30, piece="nozzle", onActive=true}},
-  },
-  armsb = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.7, length=70, piece="emit1", onActive=true}},
-  },
-  corsfig = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=32, piece="nozzle", onActive=true}},
-  },
-  corhunt = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=6.25, length=40, piece="nozzle", onActive=true}},
-  },
-  corseap = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="nozzle1", onActive=true}},
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="nozzle2", onActive=true}},
-  },
-  corsb = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=36, piece="emit1", onActive=true}},
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=36, piece="emit2", onActive=true}},
-  },
-  corcut = {
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=6, length=25, piece="rthrust1", onActive=true}},
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=6, length=25, piece="rthrust2", onActive=true}},
-  },
-
   --// PLANES //----------------------------
-  armfig = {
-    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=35, piece="ljet", onActive=true}},
-    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=35, piece="rjet", onActive=true}},
-    {class='Ribbon', options={width=1, size=8, piece="lwingtip"}},
-    {class='Ribbon', options={width=1, size=8, piece="rwingtip"}},
-  },
   armhawk = {
-    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=35, piece="ljet", onActive=true}},
-    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=35, piece="rjet", onActive=true}},
-    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=35, piece="mjet", onActive=true}},
+    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=30, piece="ljet", onActive=true}},
+    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=30, piece="rjet", onActive=true}},
+    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=30, piece="mjet", onActive=true}},
     {class='Ribbon', options={width=1, size=8, piece="lwingtip"}},
     {class='Ribbon', options={width=1, size=8, piece="rwingtip"}},
     {class='Ribbon', options={width=1, size=8, piece="mwingtip"}},
   },
   armcybr = {
-    {class='AirJet', options={color={0.5,0.1,0.0}, width=3.5, length=25, piece="nozzle1", onActive=true}},
-    {class='AirJet', options={color={0.5,0.1,0.0}, width=3.5, length=25, piece="nozzle2", onActive=true}},
+    {class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle1", onActive=true}},
+    {class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle2", onActive=true}},
    },
   armhawk2 = {
-    {class='AirJet', options={color={0.6,0.2,0.0}, width=2.8, length=12, piece="enginel", onActive=true}},
-    {class='AirJet', options={color={0.6,0.2,0.0}, width=2.8, length=12, piece="enginer", onActive=true}},
+    {class='AirJet', options={color={0.2,0.2,1.0}, width=2.8, length=25, piece="enginel", onActive=true}},
+    {class='AirJet', options={color={0.2,0.2,1.0}, width=2.8, length=25, piece="enginer", onActive=true}},
     {class='Ribbon', options={width=1, size=12, piece="wingtip1"}},
     {class='Ribbon', options={width=1, size=12, piece="wingtip2"}},
   },
@@ -145,10 +100,6 @@ effectUnitDefs = {
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="rjet"}},
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="ljet"}},
   },
-  corgripn = {
-    {class='AirJet', options={color={0.5,0.1,0.0}, width=3.5, length=35, piece="nozzle", onActive=true}},
-  },
-
   armstiletto_laser = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=17, piece="jet1", onActive=true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=17, piece="jet2", onActive=true}},
@@ -181,19 +132,14 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, size=10, piece="wingtipl"}},
     {class='Ribbon', options={width=1, size=10, piece="wingtipr"}},  
   },
-  armthund = {
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=15, piece="nozzle1", onActive=true}},
-    {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=15, piece="nozzle2", onActive=true}},
-  },
-
   armdfly = {
     {class='AirJet', options={color={0.1,0.5,0.3}, width=3.2, length=22, piece="jet1", onActive=true}},
     {class='AirJet', options={color={0.1,0.5,0.3}, width=3.2, length=22, piece="jet2", onActive=true}},
   },
 
   corshad = {
-    {class='AirJet', options={color={0.8,0.1,0.0}, width=4, length=25, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
-    {class='AirJet', options={color={0.8,0.1,0.0}, width=4, length=25, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
+    {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
+    {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
 	{class='Ribbon', options={width=1, piece="wingtipl"}},
     {class='Ribbon', options={width=1, piece="wingtipr"}},
   },

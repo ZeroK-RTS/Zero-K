@@ -106,6 +106,8 @@ local shuffledStartPosition = {}
 local playerSides = {} -- sides selected ingame from widget  - per players
 local teamSides = {} -- sides selected ingame from widgets - per teams 
 
+_G.facplops = facplops
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -626,6 +628,10 @@ end
 else
 
 local teamID = Spring.GetLocalTeamID()
+local spGetUnitDefID = Spring.GetUnitDefID
+local spGetUnitLosState = Spring.GetUnitLosState
+local spValidUnitID = Spring.ValidUnitID 
+
 local boost = {}
 local boostMax = {}
 
@@ -675,5 +681,31 @@ function gadget:DrawWorldPreUnit()
 	end
 end
 
+local function DrawUnitFunc(yshift)
+	gl.Translate(0,yshift,0)
+	gl.Billboard()
+	gl.TexRect(-10, -10, 10, 10)
+end
+
+local facplopTexture = 'LuaUI/Images/gift.png'
+
+function gadget:DrawWorld()
+	if Spring.IsGUIHidden() then return end
+	local facplops = SYNCED.facplops
+	local spec, fullview = Spring.GetSpectatingState()
+	local myAllyID = Spring.GetMyAllyTeamID()
+
+	spec = spec or fullview
+	gl.Texture(facplopTexture )	
+	
+	for id,_ in spairs(facplops) do
+		local los = spGetUnitLosState(id, myAllyID, false)
+		if spValidUnitID(id) and spGetUnitDefID(id) and ((los and los.los) or spec) then
+			gl.DrawFuncAtUnit(id, false, DrawUnitFunc,  UnitDefs[spGetUnitDefID(id)].height+30)
+		end
+		gl.Texture("")
+	end
+	
+end
 
 end

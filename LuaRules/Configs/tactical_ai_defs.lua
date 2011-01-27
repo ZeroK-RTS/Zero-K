@@ -152,6 +152,10 @@ local fleeables = {
 	["corsumo"] = true,
 }
 
+local armedLand = {}
+for name,data in pairs(UnitDefNames) do
+	if data.canAttack and not data.canFly then armedLand[name] = true end
+end
 
 -- searchRange(defaults to 800): max range of GetNearestEnemy for the unit.
 -- defaultAIState (defaults to 1): (1 or 0) state of AI when unit is initialised
@@ -547,7 +551,48 @@ local behaviourConfig = {
 		minFleeRange = 500,
 	},
 	--]]
-	
+
+	-- mobile AA
+	["armjeth"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+	},
+	["corcrash"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+	},
+	["armaak"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+	},
+	["hoveraa"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+	},
+	["spideraa"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+	},
 }
 
 return behaviourConfig
