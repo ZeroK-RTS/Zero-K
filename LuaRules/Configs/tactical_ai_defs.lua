@@ -1,329 +1,155 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function merge(t1, t2)
+	for i, v in pairs(t2) do
+		t1[i] = v
+	end
+end
 
 -- swarm arrays
 -- these are not strictly required they just help with inputting the units
 
-
-local lowRangeSwarmieeArray = { 
-	"armrock",
-	"armham",
-	"corstorm",
-	"corthud",
-	"spiderassault",
-  
-	"armstump",
-	"corraid",
-  
-	"armsptk",
-	"armzeus",
-	"armcrabe",
-	"cormort",
-	"cormortgold",
-	"punisher",
-	"firewalker",
-  
-	"armbull",
-	"armmanni",
-	"correap",
-	"corgol",
-	"cormart",
-  
-	"armanac",
-	"corseal",
-	
-	"hoverartillery",
-	"hoverassault",
-	
-	"chickenr",
-	"chickenblobber",
-	
-	"armroy",
-	"armsub",
-	"corsub",
-	
-	"chickens",
+local longRangeSwarmieeArray = { 
+	["cormart"] = true,
+	["firewalker"] = true,
+	["armsptk"] = true,
+	["corstorm"] = true,
+	["armroy"] = true,
+	["armham"] = true,
+	["armpb"] = true,
 }
 
 local medRangeSwarmieeArray = { 
-	"armrock",
-	"armham",
-	"corstorm",
-	"armsptk",
-	"cormort",
-	"cormortgold",
-	"punisher",
-	"firewalker",
-  
-	"cormart",
-	"hoverartillery",
-	"hoverassault",
-	
-	"chickenr",
-	"chickenblobber",
-	
-	"armroy",
-	"armsub",
-	"corsub",
-	
-	"chickens",
+	["armrock"] = true,
+	["chickens"] = true,
 }
 
-local longRangeSwarmieeArray = { 
-	"cormart",
+local lowRangeSwarmieeArray = {
+	["corthud"] = true,
+	["spiderassault"] = true,
+	["corraid"] = true,
+	["armzeus"] = true,
+	["logkoda"] = true,
 	
-	"hoverartillery",
-	"hoverassault",
+	["correap"] = true,
+	["corgol"] = true,
+	
+	["armcrabe"] = true,
+	["armmanni"] = true,
+	
+	["chickenr"] = true,
+	["chickenblobber"] = true,
 }
+
+merge(medRangeSwarmieeArray,longRangeSwarmieeArray)
+merge(lowRangeSwarmieeArray,medRangeSwarmieeArray)
+
 
 -- skirm arrays
 -- these are not strictly required they just help with inputting the units
 
-local artyRangeSkirmieeArray = {
-	"corcan",
-	"armtick",
-	"corroach",
-	"chicken",
-	"chickena",
-	"chicken_tiamat",
-	
-	"armpw",
-	"spherepole",
-	"corak",
-	"armfav",
-	"corfav",
-	"armflash",
-	"corgator",
-	"corpyro",
-	"panther",
-	"armst",
-	"logkoda",
-	
-	"armcom",
-	"armcomdgun",
-	"corcom",
-	"corcomdgun",
-	
-	"armwar",
-	"armzeus",
-	"arm_venom",
-	"cormak",
-	"corlevlr",
-	"capturecar",
-	"armwar",
-	"armstump",
-	"corraid",
-	"tawf003", -- mumbo
-	"tawf114", -- banisher
-	"corthud",
-	"spiderassault",
-	"corsumo",
-	
-	"armrock",
-	"corstorm",
-	"armjanus",
-	"chickens",
-	"chickenc",
-	
-	"armsptk",
-	"cormort",
-	"armsnipe",
-	
-	"armmist",
-	"cormist",
-	"chicken_sporeshooter",
-	
-	"hoverriot",
-	"hoverassault",
-	"nsaclash",
-	"corsh",
-	
-	"decade",
-	"coresupp",
+local veryShortRangeSkirmieeArray = {
+	["corcan"] = true,
+	["spherepole"] = true,
+	["armtick"] = true,
+	["puppy"] = true,
+	["corroach"] = true,
+	["chicken"] = true,
+	["chickena"] = true,
+	["chicken_tiamat"] = true,
 }
 
-local longRangeSkirmieeArray = {
-	"corcan",
-	"armtick",
-	"corroach",
-	"chicken",
-	"chickena",
-	"chicken_tiamat",
-	
-	"armpw",
-	"corak",
-	"armfav",
-	"corfav",
-	"armflash",
-	"corgator",
-	"corpyro",
-	"panther",
-	"armst",
-	"logkoda",
-	
-	"armcom",
-	"armcomdgun",
-	"corcom",
-	"corcomdgun",
-	
-	"armwar",
-	"armzeus",
-	"arm_venom",
-	"cormak",
-	"corlevlr",
-	"capturecar",
-	"armwar",
-	"armstump",
-	"armbull",
-	"correap",
-	"corgol",
-	"corraid",
-	"tawf003", -- mumbo
-	"tawf114", -- banisher
-	"corthud",
-	"spiderassault",
-	"corsumo",
-	
-	"armrock",
-	"corstorm",
-	"armjanus",
-	"chickens",
-	"chickenc",
-	
-	"hoverriot",
-	"hoverassault",
-	"nsaclash",
-	"corsh",
-	
-	"decade",
-	"coresupp",
-}
-
-local medRangeSkirmieeArray = {
-	"corcan",
-	"armtick",
-	"corroach",
-	"chicken",
-	"chickena",
-	"chicken_tiamat",
-	
-	"armpw",
-	"spherepole",
-	"corak",
-	"armfav",
-	"corfav",
-	"armflash",
-	"corgator",
-	"corpyro",
-	"panther",
-	"armst",
-	"logkoda",
-	
-	"armcom",
-	"armcomdgun",
-	"corcom",
-	"corcomdgun",
-	
-	"armwar",
-	"armzeus",
-	"arm_venom",
-	"cormak",
-	"corlevlr",
-	"capturecar",
-	"tawf003", -- mumbo
-	"tawf114", -- banisher
-	"corthud",
-	"spiderassault",
-	"corsumo",
-
-	"armstump",
-	"corraid",
-	"armbull",
-	"correap",
-	"corgol",
-	
-	"hoverriot",
-	"hoverassault",
-	"corsh",
-	
-	"decade",
-	"coresupp",
+local shortRangeSkirmieeArray = {
+	["armflea"] = true,
+	["armpw"] = true,
+	["corfav"] = true,
+	["corgator"] = true,
+	["corpyro"] = true,
+	["logkoda"] = true,
+	["corsumo"] = true,
 }
 
 local riotRangeSkirmieeArray = {
-	"corcan",
-	"armtick",
-	"corroach",
-	"chicken",
-	"chickena",
-	"chicken_tiamat",
-	
-	"armcom",
-	"armcomdgun",
-	"corcom",
-	"corcomdgun",
-	
-	"armpw",
-	"spherepole",
-	"corak",
-	"armfav",
-	"corfav",
-	"armflash",
-	"corgator",
-	"corpyro",
-	"panther",
-	"armst",
-	"logkoda",
-	
-	"corsumo",
-	
-	"corsh",
+	["corak"] = true,
+	["panther"] = true,
+	["corsh"] = true,
+	["coresupp"] = true,
+	["armcomdgun"] = true,
 }
 
-local raiderRangeSkirmieeArray = {
-	"corcan",
-	"armtick",
-	"corroach",
-	"chicken",
-	"chickena",
-	"chicken_tiamat",
+local medRangeSkirmieeArray = {
+	["armcom"] = true,
+	["armadvcom"] = true,
+	["corcom"] = true,
+	["coradvcom"] = true,
+	["commsupport"] = true,
+	["commadvsupport"] = true,
+	
+	["armwar"] = true,
+	["armzeus"] = true,
+	
+	["arm_venom"] = true,
+	["spiderassault"] = true,
+	
+	["corraid"] = true,
+	["corlevlr"] = true,
+	
+	
+	["hoverriot"] = true,
+	["hoverassault"] = true,
+	
+	["cormak"] = true,
+	["corthud"] = true,
+
+	["correap"] = true,
+	["corgol"] = true,
+	["tawf114"] = true, -- banisher
 }
+
+local longRangeSkirmieeArray = {
+	["armrock"] = true,
+	["nsclash"] = true, -- hover janus
+	["capturecar"] = true,
+	["chickenc"] = true,
+}
+
+local artyRangeSkirmieeArray = {
+	["armsptk"] = true,
+	["corstorm"] = true,
+	["chicken_sporeshooter"] = true,
+}
+
+merge(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
+merge(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
+merge(medRangeSkirmieeArray,riotRangeSkirmieeArray)
+merge(longRangeSkirmieeArray,medRangeSkirmieeArray)
+
+-- Things that are fled by some things
 
 local fleeables = {
-	"armllt",
-	"corllt",
-	"armdeva",
-	"armartic",
-	"corgrav",
-	"corpre",
-	"armwar",
-	"armzeus",
-	"arm_venom",
-	"cormak",
-	"corlevlr",
-	"capturecar",
-	"armwar",
-	"armstump",
-	"armbull",
-	"correap",
-	"corgol",
-	"corraid",
-	"tawf003", -- mumbo
-	"tawf114", -- banisher
-	"corthud",
-	"spiderassault",
-	"armcom",
-	"armcomdgun",
-	"corcom",
-	"corcomdgun",
-	"commrecon",
-	"commsupport",
-	"decade",
-	"coresupp",
-	"armcrus",
-	"corcrus",
-	"corsumo",
+	["corllt"] = true,
+	["armdeva"] = true,
+	["armartic"] = true,
+	["corgrav"] = true,
+	
+	["armcom"] = true,
+	["armadvcom"] = true,
+	["corcom"] = true,
+	["coradvcom"] = true,
+	
+	["armwar"] = true,
+	["armzeus"] = true,
+	
+	["arm_venom"] = true,
+	
+	["cormak"] = true,
+	
+	["corlevlr"] = true,
+	["capturecar"] = true,
+
+	["hoverriot"] = true, -- mumbo
+	["corsumo"] = true,
 }
 
 
@@ -409,7 +235,7 @@ local behaviourConfig = {
 	},
   
 	["armpw"] = {
-		skirms = raiderRangeSkirmieeArray, 
+		skirms = veryShortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		circleStrafe = true, 
@@ -420,7 +246,7 @@ local behaviourConfig = {
 	},
 	
 	["armflea"] = {
-		skirms = raiderRangeSkirmieeArray, 
+		skirms = veryShortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = fleeables,
 		circleStrafe = true, 
@@ -432,21 +258,8 @@ local behaviourConfig = {
 		fleeLeeway = 150,
 		fleeDistance = 150,
 	},
-	
-	["corak"] = {
-		skirms = raiderRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		circleStrafe = true, 
-		maxSwarmLeeway = 35, 
-		swarmLeeway = 30, 
-		jinkTangentLength = 140, 
-		stoppingDistance = 15,
-		minCircleStrafeDistance = 10,
-	},
-
 	["corfav"] = { -- weasel
-		skirms = raiderRangeSkirmieeArray, 
+		skirms = veryShortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = fleeables,
 		circleStrafe = true, 
@@ -459,20 +272,33 @@ local behaviourConfig = {
 		fleeDistance = 150,
 	},
   
-	["corgator"] = {
-		skirms = raiderRangeSkirmieeArray, 
+	-- longer ranged swarmers
+	["corak"] = {
+		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		circleStrafe = true, 
-		strafeOrderLength = 180,
+		maxSwarmLeeway = 35, 
+		swarmLeeway = 30, 
+		jinkTangentLength = 140, 
+		stoppingDistance = 15,
+		minCircleStrafeDistance = 10,
+	},
+	["corgator"] = {
+		skirms = shortRangeSkirmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true, 
+		strafeOrderLength = 120,
 		skirmLeeway = 60,
-		maxSwarmLeeway = 100, 
+		maxSwarmLeeway =180, 
+		minSwarmLeeway = 300, 
 		swarmLeeway = 40, 
 		stoppingDistance = 8
 	},
 	
 	["corsh"] = {
-		skirms = raiderRangeSkirmieeArray, 
+		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		circleStrafe = true, 
@@ -483,17 +309,18 @@ local behaviourConfig = {
 	},
   
 	["corpyro"] = {
-		skirms = raiderRangeSkirmieeArray, 
+		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		circleStrafe = true, 
-		maxSwarmLeeway = 160, 
+		maxSwarmLeeway = 100, 
+		minSwarmLeeway = 200, 
 		swarmLeeway = 30, 
 		stoppingDistance = 8
 	},
 	
 	["logkoda"] = {
-		skirms = raiderRangeSkirmieeArray, 
+		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		circleStrafe = true, 
@@ -503,7 +330,7 @@ local behaviourConfig = {
 	},
   
 	["panther"] = {
-		skirms = raiderRangeSkirmieeArray, 
+		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		circleStrafe = true, 
@@ -514,7 +341,7 @@ local behaviourConfig = {
 	},
 
 	["armpt"] = { -- scout boat
-		skirms = raiderRangeSkirmieeArray, 
+		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		circleStrafe = true, 
@@ -575,7 +402,7 @@ local behaviourConfig = {
 	--assaults
 	["armzeus"] = {
 		skirms = riotRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
+		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 90, 
@@ -583,7 +410,7 @@ local behaviourConfig = {
 	},
 	["corthud"] = {
 		skirms = riotRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
+		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 50, 
 		minSwarmLeeway = 120, 
@@ -591,29 +418,17 @@ local behaviourConfig = {
 	},
 	["spiderassault"] = {
 		skirms = riotRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
+		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 50, 
 		minSwarmLeeway = 120, 
 		skirmLeeway = 40, 
 	},
-	["armraz"] = {
-		skirms = riotRangeSkirmieeArray, 
-		swarms = {}, 
-		flees = {},
-		skirmLeeway = 40, 
-	},	
 	["dante"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
 		skirmLeeway = 40, 
-	},	
-	["armbanth"] = {
-		skirms = medRangeSkirmieeArray, 
-		swarms = {}, 
-		flees = {},
-		skirmLeeway = 120, 
 	},	
 	["coresupp"] = {
 		skirms = riotRangeSkirmieeArray, 
@@ -625,15 +440,14 @@ local behaviourConfig = {
 	},		
 	
 	-- med range skirms
-	["armrock"] = {
+	["armbanth"] = {
 		skirms = medRangeSkirmieeArray, 
-		swarms = medRangeSwarmieeArray, 
+		swarms = {}, 
 		flees = {},
-		maxSwarmLeeway = 30, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
-	},
-	["corstorm"] = {
+		skirmLeeway = 120, 
+	},	
+	
+	["armrock"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
@@ -649,41 +463,18 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 30, 
 	},
-	["capturecar"] = {
-		skirms = medRangeSkirmieeArray, 
-		swarms = medRangeSwarmieeArray, 
+	
+	
+	-- long range skirms
+	["corstorm"] = {
+		skirms = longRangeSkirmieeArray, 
+		swarms = longRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 30, 
+		skirmLeeway = 10, 
 	},
-	
-	-- long range skirms
 	["armsptk"] = {
-		skirms = longRangeSkirmieeArray, 
-		swarms = longRangeSwarmieeArray, 
-		flees = {},
-		maxSwarmLeeway = 10, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
-	},
-	["armsnipe"] = {
-		skirms = longRangeSkirmieeArray, 
-		swarms = longRangeSwarmieeArray, 
-		flees = {},
-		maxSwarmLeeway = 10,
-		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
-	},
-	["cormort"] = {
-		skirms = longRangeSkirmieeArray, 
-		swarms = longRangeSwarmieeArray, 
-		flees = {},
-		maxSwarmLeeway = 10, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
-	},
-	["cormortgold"] = {
 		skirms = longRangeSkirmieeArray, 
 		swarms = longRangeSwarmieeArray, 
 		flees = {},
@@ -699,19 +490,28 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
-	["corgarp"] = {
+	["capturecar"] = {
 		skirms = longRangeSkirmieeArray, 
+		swarms = longRangeSwarmieeArray, 
+		flees = {},
+		maxSwarmLeeway = 30, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 30, 
+	},
+	
+	-- arty range skirms
+	["armsnipe"] = {
+		skirms = artyRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
-		maxSwarmLeeway = 10, 
+		maxSwarmLeeway = 10,
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
 	
-	-- arty range skirms
-	["corhrk"] = {
+	["corgarp"] = {
 		skirms = artyRangeSkirmieeArray, 
-		swarms = longRangeSwarmieeArray, 
+		swarms = {}, 
 		flees = {},
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
@@ -719,16 +519,7 @@ local behaviourConfig = {
 	},
 	["armham"] = {
 		skirms = artyRangeSkirmieeArray, 
-		swarms = longRangeSwarmieeArray, 
-		flees = {},
-		skirmRadar = true,
-		maxSwarmLeeway = 10, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 40, 
-	},
-	["punisher"] = {
-		skirms = artyRangeSkirmieeArray, 
-		swarms = longRangeSwarmieeArray, 
+		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
 		maxSwarmLeeway = 10, 
@@ -745,7 +536,8 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},	
 	-- cowardly support units
-	["arm_marky"] = {
+	--[[
+	["example"] = {
 		skirms = {}, 
 		swarms = {}, 
 		flees = {},
@@ -754,16 +546,7 @@ local behaviourConfig = {
 		fleeDistance = 100,
 		minFleeRange = 500,
 	},
-	
-	["corvrad"] = {
-		skirms = {}, 
-		swarms = {}, 
-		flees = {},
-		fleeCombat = true,
-		fleeLeeway = 100,
-		fleeDistance = 100,
-		minFleeRange = 500,
-	},
+	--]]
 	
 }
 

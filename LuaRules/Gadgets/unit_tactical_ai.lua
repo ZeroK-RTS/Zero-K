@@ -520,7 +520,7 @@ local function LoadBehaviour(unitConfigArray)
 			unitAIBehaviour[ud.id].minFleeRange = unitAIBehaviour[ud.id].minFleeRange - unitAIBehaviour[ud.id].fleeLeeway
 			
 			if behaviourData.skirms then
-				for _,skirmDef  in pairs(behaviourData.skirms) do
+				for skirmDef,_  in pairs(behaviourData.skirms) do
 					local skirmName = UnitDefNames[skirmDef]
 					if skirmName then
 						unitAIBehaviour[ud.id].skirms[skirmName.id] = true
@@ -529,7 +529,7 @@ local function LoadBehaviour(unitConfigArray)
 			end
 			
 			if behaviourData.swarms then
-				for _,swarmDef  in pairs(behaviourData.swarms) do
+				for swarmDef,_  in pairs(behaviourData.swarms) do
 					local swarmName = UnitDefNames[swarmDef]
 					if swarmName then
 						unitAIBehaviour[ud.id].swarms[swarmName.id] = true
@@ -538,7 +538,7 @@ local function LoadBehaviour(unitConfigArray)
 			end
 			
 			if behaviourData.flees then
-				for _,fleeDef  in pairs(behaviourData.flees) do
+				for fleeDef,_  in pairs(behaviourData.flees) do
 					local fleeName = UnitDefNames[fleeDef]
 					if fleeName then
 						unitAIBehaviour[ud.id].flees[fleeName.id] = true
