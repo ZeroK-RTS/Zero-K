@@ -125,6 +125,17 @@ function gl.Utilities.DrawGroundCircle(x,z,radius)
   gl.PopMatrix()
 end
 
+local box = gl.CreateList(gl.Utilities.DrawMyBox,0,0,0,1,1,1)
+function gl.Utilities.DrawGroundRectangle(x1,z1,x2,z2)
+  local minheight, maxheight = Spring.GetGroundExtremes()
+
+  gl.PushMatrix()
+  gl.Translate(x1, minheight, z1)
+  gl.Scale(x2-x1, (maxheight-minheight)*3 , z2-z1)
+  gl.Utilities.DrawVolume(box)
+  gl.PopMatrix()
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 

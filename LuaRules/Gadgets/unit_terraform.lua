@@ -16,10 +16,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if (not gadgetHandler:IsSyncedCode()) then
-  return false  --  no unsynced code
-end
-
+if (gadgetHandler:IsSyncedCode()) then -- SYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
   
@@ -134,6 +131,9 @@ costMult = costMult * volumeCost
 --------------------------------------------------------------------------------
 -- Arrays
 --------------------------------------------------------------------------------
+
+local drawPositions			= {count = 0, data = {}}
+local drawPosMap			= {}
 
 local structure          	= {}
 local structureTable		= {}
@@ -571,6 +571,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					smooth = false, 
 					intercepts = 0, 
 					intercept = {}, 
+					interceptMap = {},
 					decayTime = terraformDecayFrames, 
 					allyTeam = unitAllyTeam,
 					team = team,
@@ -620,17 +621,17 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	mPoint[1].z = floor((mPoint[1].z+8)/16)*16
 	point[1] = mPoint[1]
 	-- update border
-	if point[points].x < border.left then
-		border.left = point[points].x 
+	if point[points].x-16 < border.left then
+		border.left = point[points].x-16
 	end
-	if point[points].x > border.right then
-		border.right = point[points].x 
+	if point[points].x+16 > border.right then
+		border.right = point[points].x+16
 	end
-	if point[points].z < border.top then
-		border.top = point[points].z
+	if point[points].z-16 < border.top then
+		border.top = point[points].z-16
 	end
-	if point[points].z > border.bottom then
-		border.bottom = point[points].z 
+	if point[points].z+16 > border.bottom then
+		border.bottom = point[points].z+16
 	end
 	
 	
@@ -647,17 +648,17 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			points = points + 1
 			point[points] = {x = mPoint[i].x, z = mPoint[i].z}
 			-- update border
-			if point[points].x < border.left then
-				border.left = point[points].x 
+			if point[points].x-16 < border.left then
+				border.left = point[points].x-16
 			end
-			if point[points].x > border.right then
-				border.right = point[points].x 
+			if point[points].x+16 > border.right then
+				border.right = point[points].x+16
 			end
-			if point[points].z < border.top then
-				border.top = point[points].z
+			if point[points].z-16 < border.top then
+				border.top = point[points].z-16
 			end
-			if point[points].z > border.bottom then
-				border.bottom = point[points].z 
+			if point[points].z+16 > border.bottom then
+				border.bottom = point[points].z+16
 			end
 		else
 			-- interpolate between far apart points to prevent wall holes.
@@ -668,17 +669,17 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					points = points + 1
 					point[points] = {x = mPoint[i-1].x + j*sign, z = floor((mPoint[i-1].z + j*m*sign)/16)*16}
 					-- update border
-					if point[points].x < border.left then
-						border.left = point[points].x 
+					if point[points].x-16 < border.left then
+						border.left = point[points].x-16
 					end
-					if point[points].x > border.right then
-						border.right = point[points].x 
+					if point[points].x+16 > border.right then
+						border.right = point[points].x+16
 					end
-					if point[points].z < border.top then
-						border.top = point[points].z
+					if point[points].z-16 < border.top then
+						border.top = point[points].z-16
 					end
-					if point[points].z > border.bottom then
-						border.bottom = point[points].z 
+					if point[points].z+16 > border.bottom then
+						border.bottom = point[points].z+16
 					end
 				end
 			else
@@ -688,17 +689,17 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					points = points + 1
 					point[points] = {x = floor((mPoint[i-1].x + j*m*sign)/16)*16, z = mPoint[i-1].z + j*sign}
 					-- update border
-					if point[points].x < border.left then
-						border.left = point[points].x 
+					if point[points].x-16 < border.left then
+						border.left = point[points].x-16
 					end
-					if point[points].x > border.right then
-						border.right = point[points].x 
+					if point[points].x+16 > border.right then
+						border.right = point[points].x+16
 					end
-					if point[points].z < border.top then
-						border.top = point[points].z
+					if point[points].z-16 < border.top then
+						border.top = point[points].z-16
 					end
-					if point[points].z > border.bottom then
-						border.bottom = point[points].z 
+					if point[points].z+16 > border.bottom then
+						border.bottom = point[points].z+16
 					end
 				end
 			end
@@ -717,7 +718,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	-- area checks for overlap
 	local area = {}
 	
-	for i = border.left-16,border.right+16,8 do
+	for i = border.left,border.right,8 do
 		area[i] = {}
 	end
 	
@@ -751,17 +752,17 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 								segment[n].point[pc] = {x = point[j].x+lx, z = point[j].z+lz}
 								area[point[j].x+lx][point[j].z+lz] = true
 								-- update border
-								if segment[n].point[pc].x < segment[n].border.left then
-									segment[n].border.left = segment[n].point[pc].x 
+								if segment[n].point[pc].x-16 < segment[n].border.left then
+									segment[n].border.left = segment[n].point[pc].x-16
 								end
-								if segment[n].point[pc].x > segment[n].border.right then
-									segment[n].border.right = segment[n].point[pc].x 
+								if segment[n].point[pc].x+16 > segment[n].border.right then
+									segment[n].border.right = segment[n].point[pc].x+16 
 								end
-								if segment[n].point[pc].z < segment[n].border.top then
-									segment[n].border.top = segment[n].point[pc].z
+								if segment[n].point[pc].z-16 < segment[n].border.top then
+									segment[n].border.top = segment[n].point[pc].z-16
 								end
-								if segment[n].point[pc].z > segment[n].border.bottom then
-									segment[n].border.bottom = segment[n].point[pc].z 
+								if segment[n].point[pc].z+16 > segment[n].border.bottom then
+									segment[n].border.bottom = segment[n].point[pc].z+16 
 								end
 								local currHeight = spGetGroundHeight(segment[n].point[pc].x, segment[n].point[pc].z)
 								segment[n].point[pc].orHeight = currHeight
@@ -977,6 +978,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					smooth = false, 
 					intercepts = 0, 
 					intercept = {}, 
+					interceptMap = {},
 					decayTime = terraformDecayFrames, 
 					allyTeam = unitAllyTeam,
 					team = team,
@@ -1495,6 +1497,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					smooth = false, 
 					intercepts = 0, 
 					intercept = {}, 
+					interceptMap = {},
 					decayTime = terraformDecayFrames, 
 					allyTeam = unitAllyTeam,
 					team = team,
@@ -1648,7 +1651,7 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 
 	
 	-- remove from intercepts tables
-	for j = 1, terraformUnit[id].intercepts do -- CRASH ON THIS LINE
+	for j = 1, terraformUnit[id].intercepts do -- CRASH ON THIS LINE -- not for a while though
 		local oid = terraformUnit[id].intercept[j].id
 		local oindex = terraformUnit[id].intercept[j].index
 		if oindex < terraformUnit[oid].intercepts then
@@ -1657,6 +1660,7 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 		end
 		terraformUnit[oid].intercept[terraformUnit[oid].intercepts] = nil
 		terraformUnit[oid].intercepts = terraformUnit[oid].intercepts - 1
+		terraformUnit[oid].interceptMap[id] = nil
 	end
 		
 	-- remove from order table
@@ -1800,7 +1804,6 @@ local function updateTerraformCost(id)
 		else
 			point.diffHeight = point.aimHeight - height 
 		end
-		
 		totalCost = totalCost + abs(point.diffHeight) 
 	end
 	
@@ -1818,38 +1821,93 @@ local function updateTerraformCost(id)
 	terraformUnit[id].lastHealth = 0
 	terraformUnit[id].progress = 0
 	terraformUnit[id].cost = totalCost*costMult
+	terraformUnit[id].totalCost = terraformUnit[id].cost + terraformUnit[id].baseCost
 	
 	return true
 	
 end
 
-local function finishInitialisingTerraformUnit(id)
+
+local function checkTerraformIntercepts(id)
 
 	for i = 1, terraformOrders do
-		
-		if (terraformOrder[i].border.left < terraformOrder[terraformUnit[id].order].border.right and 
-			terraformOrder[i].border.right > terraformOrder[terraformUnit[id].order].border.left and
-			terraformOrder[i].border.top < terraformOrder[terraformUnit[id].order].border.bottom and
-			terraformOrder[i].border.bottom > terraformOrder[terraformUnit[id].order].border.top) then
+		--Spring.MarkerAddLine(terraformOrder[i].border.left,0,terraformOrder[i].border.top,terraformOrder[i].border.right,0,terraformOrder[i].border.top)
+		--Spring.MarkerAddLine(terraformOrder[i].border.left,0,terraformOrder[i].border.bottom,terraformOrder[i].border.right,0,terraformOrder[i].border.bottom)
+		--Spring.MarkerAddLine(terraformOrder[i].border.left,0,terraformOrder[i].border.top,terraformOrder[i].border.left,0,terraformOrder[i].border.bottom)
+		--Spring.MarkerAddLine(terraformOrder[i].border.right,0,terraformOrder[i].border.top,terraformOrder[i].border.right,0,terraformOrder[i].border.bottom)
+		if (terraformOrder[i].border.left <= terraformOrder[terraformUnit[id].order].border.right and 
+			terraformOrder[i].border.right >= terraformOrder[terraformUnit[id].order].border.left and
+			terraformOrder[i].border.top <= terraformOrder[terraformUnit[id].order].border.bottom and
+			terraformOrder[i].border.bottom >= terraformOrder[terraformUnit[id].order].border.top) then
 			
 			for j = 1, terraformOrder[i].indexes do
 				local oid = terraformUnitTable[terraformOrder[i].index[j]] 
-				if oid ~= id then
+				if oid ~= id and not terraformUnit[id].interceptMap[oid] and terraformUnit[oid].fullyInitialised then
 					if (terraformUnit[id].border.left <= terraformUnit[oid].border.right and 
 						terraformUnit[id].border.right >= terraformUnit[oid].border.left and
 						terraformUnit[id].border.top <= terraformUnit[oid].border.bottom and
 						terraformUnit[id].border.bottom >= terraformUnit[oid].border.top) then
-							
+						
 						terraformUnit[oid].intercepts = terraformUnit[oid].intercepts + 1				
 						terraformUnit[id].intercepts = terraformUnit[id].intercepts + 1
 					
 						terraformUnit[oid].intercept[terraformUnit[oid].intercepts] = {index = terraformUnit[id].intercepts, id = id}
 						terraformUnit[id].intercept[terraformUnit[id].intercepts] = {index = terraformUnit[oid].intercepts, id = oid}
+						
+						terraformUnit[oid].interceptMap[id] = true
+						terraformUnit[id].interceptMap[oid] = true
 					end
 				end
 			end
 		end
 	end
+
+end
+
+local function updateTerraformBorder(id,x,z) -- updates border for edge point x,z
+	
+	local change = false
+	
+	if x < terraformUnit[id].border.left then
+		terraformUnit[id].border.left = x
+		change = true
+	end
+	if x > terraformUnit[id].border.right then
+		terraformUnit[id].border.right = x
+		change = true
+	end
+	if z < terraformUnit[id].border.top then
+		terraformUnit[id].border.top = z
+		change = true
+	end
+	if z > terraformUnit[id].border.bottom then
+		terraformUnit[id].border.bottom = z
+		change = true
+	end
+	
+	if change then
+		local border = terraformOrder[terraformUnit[id].order].border
+		if x < border.left then
+			border.left = x
+		end
+		if x > border.right then
+			border.right = x
+		end
+		if z < border.top then
+			border.top = z
+		end
+		if z > border.bottom then
+			border.bottom = z
+		end
+		
+		checkTerraformIntercepts(id)
+	end
+
+end
+
+local function finishInitialisingTerraformUnit(id)
+	
+	checkTerraformIntercepts(id)
 	
 	updateTerraformEdgePoints(id)
 	updateTerraformCost(id)
@@ -1858,7 +1916,7 @@ local function finishInitialisingTerraformUnit(id)
 
 end
 
-local function updateTerraform(diffProgress,health,id,index,costDiff)
+local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	
 	local terra = terraformUnit[id]
 	if terra.baseCostSpent then
@@ -1876,6 +1934,25 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 		else
 			costDiff = costDiff - (terra.baseCost-terra.baseCostSpent)
 			terra.baseCostSpent = false
+			--[[
+			something pertaining to drawing would go here
+			for i = 1, terra.points do
+				local x = terra.point[i].x
+				local z = terra.point[i].z
+				if terra.area[x+8] and terra.area[x+8][z+8] then 
+					if drawPosMap[x] and drawPosMap[x][z] then
+						drawPositions.data[drawPosMap[x][z] ].r = 0.5
+						drawPositions.data[drawPosMap[x][z] ].g = 0
+						drawPositions.data[drawPosMap[x][z] ].b = 0
+						drawPositions.data[drawPosMap[x][z] ].a = 0.5
+					else
+						drawPositions.count = drawPositions.count + 1
+						drawPositions.data[drawPositions.count] = {x1 = x, z1 = z, x2 = x+8, z2 = z+8, r = 0.5, g = 0, b = 0, a = 0.5}
+						drawPosMap[x] = drawPosMap[x] or {}
+						drawPosMap[x][z] = drawPositions.count
+					end
+				end
+			end--]]
 		end
 	end
 	
@@ -1910,8 +1987,20 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 				local diffHeight = newHeight - edgeHeight
 				if diffHeight > maxHeightDifference then
 				
-					extraPoints = extraPoints + 1
-					extraPoint[extraPoints] = {
+					local index = extraPoints + 1
+					if overlap then
+						if not extraPoint[overlap].pyramid then
+							CallAsTeam(terra.team, function () return Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"Terraform cancelled due to steepness") end)
+							deregisterTerraformUnit(id,arrayIndex,2)			
+							spDestroyUnit(id,{reclaimed = true})
+							return 0
+						end
+						index = overlap
+					else
+						extraPoints = extraPoints + 1
+					end
+
+					extraPoint[index] = {
 						x = x, z = z, 
 						orHeight = groundHeight, 
 						heightDiff = newHeight - maxHeightDifference - groundHeight, 
@@ -1921,7 +2010,9 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						supportH = newHeight,
 						supportID = i,
 						check = terra.point[i].edge[j].check,
+						pyramid = true, -- pyramid = rising up, not pyramid = ditch
 					}
+					updateTerraformBorder(id,x,z)
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[terra.point[i].x] and terra.area[terra.point[i].x][terra.point[i].z] then
@@ -1932,16 +2023,29 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						return -1
 					end
 						
-					addedCost = addedCost + extraPoint[extraPoints].cost - overlapCost
+					addedCost = addedCost + extraPoint[index].cost - overlapCost
 					
 					if not extraPointArea[x] then
 						extraPointArea[x] = {}
 					end
-					extraPointArea[x][z] = extraPoints
+					extraPointArea[x][z] = index
 
 				elseif diffHeight < -maxHeightDifference then
-					extraPoints = extraPoints + 1
-					extraPoint[extraPoints] = {
+					
+					local index = extraPoints + 1
+					if overlap then
+						if extraPoint[overlap].pyramid then
+							CallAsTeam(terra.team, function () return Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"Terraform cancelled due to steepness") end)
+							deregisterTerraformUnit(id,arrayIndex,2)			
+							spDestroyUnit(id,{reclaimed = true})
+							return 0
+						end
+						index = overlap
+					else
+						extraPoints = extraPoints + 1
+					end
+					
+					extraPoint[index] = {
 						x = x, 
 						z = z, 
 						orHeight = groundHeight, 
@@ -1952,7 +2056,9 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						supportH = newHeight,
 						supportID = i,
 						check = terra.point[i].edge[j].check,
+						pyramid = false, -- pyramid = rising up, not pyramid = ditch
 					}
+					updateTerraformBorder(id,x,z)
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[terra.point[i].x] and terra.area[terra.point[i].x][terra.point[i].z] then
@@ -1963,12 +2069,12 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						return -1
 					end
 					
-					addedCost = addedCost + extraPoint[extraPoints].cost - overlapCost
+					addedCost = addedCost + extraPoint[index].cost - overlapCost
 					
 					if not extraPointArea[x] then
 						extraPointArea[x] = {}
 					end
-					extraPointArea[x][z] = extraPoints
+					extraPointArea[x][z] = index
 
 				end
 				
@@ -2003,6 +2109,12 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 				if diffHeight > maxHeightDifferenceLocal then
 					local index = extraPoints + 1
 					if overlap then
+						if not extraPoint[overlap].pyramid then
+							CallAsTeam(terra.team, function () return Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"Terraform cancelled due to steepness") end)
+							deregisterTerraformUnit(id,arrayIndex,2)			
+							spDestroyUnit(id,{reclaimed = true})
+							return 0
+						end
 						index = overlap
 					else
 						extraPoints = extraPoints + 1
@@ -2018,7 +2130,9 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						supportH = extraPoint[i].supportH,
 						supportID = extraPoint[i].supportID,
 						check =  extraPoint[i].check,
+						pyramid = true, -- pyramid = rising up, not pyramid = ditch
 					}
+					updateTerraformBorder(id,x,z)
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
@@ -2039,6 +2153,12 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 				elseif diffHeight < -maxHeightDifferenceLocal then
 					local index = extraPoints + 1
 					if overlap then
+						if extraPoint[overlap].pyramid then
+							CallAsTeam(terra.team, function () return Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"Terraform cancelled due to steepness") end)
+							deregisterTerraformUnit(id,index,2)			
+							spDestroyUnit(id,{reclaimed = true})
+							return 0
+						end
 						index = overlap
 					else
 						extraPoints = extraPoints + 1
@@ -2054,7 +2174,9 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 						supportH = extraPoint[i].supportH,
 						supportID = extraPoint[i].supportID,
 						check =  extraPoint[i].check,
+						pyramid = false, -- pyramid = rising up, not pyramid = ditch
 					}
+					updateTerraformBorder(id,x,z)
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
@@ -2146,7 +2268,7 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 			Spring.Echo("Terraform:")
 			Spring.Echo("Strange pyramid construction")
 			Spring.Echo("Destroying Terraform Unit")
-			deregisterTerraformUnit(id,index,2)			
+			deregisterTerraformUnit(id,arrayIndex,2)			
 			spDestroyUnit(id,{reclaimed = true})
 			return 0
 		end
@@ -2171,7 +2293,6 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 	Spring.Echo("actual terra cost " .. test3*costMult)
 --]]
 	--spAdjustHeightMap(terra.border.left-16, terra.border.top-16, terra.border.right+16, terra.border.bottom+16, 0)
-
 	if terraformUnit[id].intercepts ~= 0 then
 		local i = 1
 		while i <= terra.intercepts  do
@@ -2183,7 +2304,7 @@ local function updateTerraform(diffProgress,health,id,index,costDiff)
 	end
 	
 	if terra.progress > 1 then
-		deregisterTerraformUnit(id,index,2)			
+		deregisterTerraformUnit(id,arrayIndex,2)			
 		spDestroyUnit(id,{reclaimed = true})
 		return 0
 	end
@@ -2867,6 +2988,7 @@ end
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
 	
+	_G.drawPositions = drawPositions
 	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
 		RaiseWater(modOptions.waterlevel)
 	end
@@ -2880,3 +3002,25 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+else -- UNSYNCED
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function gadget:DrawWorldPreUnit()
+	local drawPositions = SYNCED.drawPositions
+	--[[
+	--gl.DepthTest(true)
+	for i = 1, drawPositions.count do
+		local point = drawPositions.data[i]
+		--gl.Texture('Luaui/Images/energy.png' )
+		--gl.Texture('LuaRules/Images/trophy_kam.png' )
+		gl.Color(0.5,0,0,0.5)
+		--gl.DrawGroundQuad(point.x1,point.z1,point.x2,point.z2)
+		--gl.Utilities.DrawGroundRectangle(point.x1,point.z1,point.x2,point.z2)
+	end--]]
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+end
