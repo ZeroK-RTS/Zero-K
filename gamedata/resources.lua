@@ -62,6 +62,7 @@ local resources = {
 			randdots='randdots.tga',
 			smoketrail='PD/smoketrail.tga',
 			wake='GPL/wake.png',
+			wakelarge='GPL/wakeLarge.png',
 			flare='flare.tga',
 			flame='GPL/flame.tga',
 			explofade='explofade.tga',
