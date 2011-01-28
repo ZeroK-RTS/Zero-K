@@ -1567,7 +1567,7 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 		Spring.Echo("Tell Google Frog")
 		return
 	end
-	Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Spent " .. terraformUnit[id].totalSpent)
+	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Spent " .. terraformUnit[id].totalSpent)
 	
 	-- remove from intercepts tables
 	for j = 1, terraformUnit[id].intercepts do -- CRASH ON THIS LINE -- not for a while though
