@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.251 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.252 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1209,7 +1209,11 @@ local function flattenTree(tree, parent)
 						end
 						
 						if option.springsetting then
-							Spring.SetConfigInt( option.springsetting, option.value )
+							if not option.value then
+								echo ('<EPIC Menu> Error #444', fullkey)
+							else
+								Spring.SetConfigInt( option.springsetting, option.value )
+							end
 						end
 						settings.config[fullkey] = option.value
 					end
