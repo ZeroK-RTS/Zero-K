@@ -23,15 +23,7 @@ unitDef = {
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
-    description_bp = [[Bomba rastejante]],
-    description_es = [[Bomba móvil]],
-    description_fr = [[Bombe Rampante]],
-    description_it = [[Bomba mobile]],
     helptext       = [[This fast-moving suicide unit is good for raiding and sniping lightly-armored targets. When standing next to wreckages, it automatically draws metal from them to replicate itself, grey goo style.]],
-    helptext_bp    = [[Essa rápida unidade suicida é muito boa contra unidades agrupadas, particularmente tanques de assalto. Explode em cadeia com muita facilidade, ent?o é melhor n?o agrupalas. Defenda-se com defenders ou caminh?es de mísseis, ou com uma única unidade barata para ativar uma explos?o pre-matura.]],
-    helptext_es    = [[Esta rápida unidad suicaida es buena contra masas de unidades, especialmente carros armados de asalte. Explotan a cadena terribilmente, asi que es mejor no amasarlas. Contrastalas con torres o carros de misil o síngolas unidades baratas para causar detonaciones inmaduras.]],
-    helptext_fr    = [[Le Roach est une unité suicide ultra-rapide. Il est indispensable de savoir la manier pour se débarrasser rapidement des nuées ennemies. Des unités lance-missiles ou tirant avec précision pouront cependant le faire exploser prématurément.]],
-    helptext_it    = [[Questa veloce unitá suicida é buona contro unitá ammassate, specialmente carri armati d'assalto. Esplode a catena terribilmente, sicche é meglio non ammassarle. Contrastale con carri o torri lancia-razzi o singole unitá economiche per provocare una detonazione prematura.]],
   },
 
   defaultmissiontype     = [[Standby]],
@@ -43,7 +35,7 @@ unitDef = {
   idleTime               = 1800,
   maneuverleashlength    = [[640]],
   mass                   = 66,
-  maxDamage              = 120,
+  maxDamage              = 60,
   maxSlope               = 36,
   maxVelocity            = 3.6,
   maxWaterDepth          = 15,
