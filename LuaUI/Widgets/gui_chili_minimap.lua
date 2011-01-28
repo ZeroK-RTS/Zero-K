@@ -20,6 +20,8 @@ local glResetMatrices = gl.ResetMatrices
 
 local iconsize = 20
 
+local tabbedMode = false
+
 local function AdjustToMapAspectRatio(w,h)
 	if (Game.mapX > Game.mapY) then
 		return w, w*Game.mapY/Game.mapX+iconsize
@@ -180,6 +182,19 @@ MakeMinimapWindow = function()
 		},
 	}
 end
+
+function widget:Update(dt)
+	local mode = Spring.GetCameraState()["mode"]
+	if mode == 7 and not tabbedMode then
+		tabbedMode = true
+		Chili.Screen0:RemoveChild(window_minimap)
+	end
+	if mode ~= 7 and tabbedMode then
+		Chili.Screen0:AddChild(window_minimap)
+		tabbedMode = false
+	end
+end
+
 
 function widget:Initialize()
 	if (Spring.GetMiniMapDualScreen()) then
