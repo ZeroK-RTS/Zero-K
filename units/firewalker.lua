@@ -81,7 +81,7 @@ unitDef = {
   weaponDefs             = {
 
     NAPALM_MORTAR = {
-      name                    = [[Immolation Mortar]],
+      name                    = [[Napalm Mortar]],
       accuracy                = 320,
       areaOfEffect            = 256,
       craterBoost             = 1,
