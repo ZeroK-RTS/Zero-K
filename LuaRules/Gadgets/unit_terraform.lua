@@ -237,6 +237,10 @@ local function pointHeight(xs, ys, zs, x, z, m, h, xdis)
 end
 
 local function checkPointCreation(terraform_type, volumeSelection, orHeight, newHeight, startHeight)
+	
+	if math.abs(orHeight-newHeight) < 0.1 then
+		return false -- don't waste base cost.
+	end
 
 	if volumeSelection == 0 or terraform_type == 2 or terraform_type == 3 then
 		return true
@@ -248,6 +252,21 @@ local function checkPointCreation(terraform_type, volumeSelection, orHeight, new
 		return (volumeSelection == 1 and orHeight < newHeight) or (volumeSelection == 2 and orHeight > newHeight)
 	end
 	
+end
+
+local function updateBorderWithPoint(border, x, z)
+	if x < border.left then
+		border.left = x
+	end
+	if x > border.right then
+		border.right = x
+	end
+	if z < border.top then
+		border.top = z
+	end
+	if z > border.bottom then
+		border.bottom = z
+	end
 end
 
 local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift)
@@ -620,20 +639,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	mPoint[1].x = floor((mPoint[1].x+8)/16)*16
 	mPoint[1].z = floor((mPoint[1].z+8)/16)*16
 	point[1] = mPoint[1]
-	-- update border
-	if point[points].x-16 < border.left then
-		border.left = point[points].x-16
-	end
-	if point[points].x+16 > border.right then
-		border.right = point[points].x+16
-	end
-	if point[points].z-16 < border.top then
-		border.top = point[points].z-16
-	end
-	if point[points].z+16 > border.bottom then
-		border.bottom = point[points].z+16
-	end
-	
+	updateBorderWithPoint(border, point[points].x, point[points].z)
 	
 	for i = 2, mPoints, 1 do
 		mPoint[i].x = floor((mPoint[i].x+8)/16)*16
@@ -647,19 +653,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		if a_diffX <= 16 and a_diffZ <= 16 then
 			points = points + 1
 			point[points] = {x = mPoint[i].x, z = mPoint[i].z}
-			-- update border
-			if point[points].x-16 < border.left then
-				border.left = point[points].x-16
-			end
-			if point[points].x+16 > border.right then
-				border.right = point[points].x+16
-			end
-			if point[points].z-16 < border.top then
-				border.top = point[points].z-16
-			end
-			if point[points].z+16 > border.bottom then
-				border.bottom = point[points].z+16
-			end
+			updateBorderWithPoint(border, point[points].x, point[points].z)
 		else
 			-- interpolate between far apart points to prevent wall holes.
 			if a_diffX > a_diffZ then
@@ -668,19 +662,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				for j = 0, a_diffX, 16 do	
 					points = points + 1
 					point[points] = {x = mPoint[i-1].x + j*sign, z = floor((mPoint[i-1].z + j*m*sign)/16)*16}
-					-- update border
-					if point[points].x-16 < border.left then
-						border.left = point[points].x-16
-					end
-					if point[points].x+16 > border.right then
-						border.right = point[points].x+16
-					end
-					if point[points].z-16 < border.top then
-						border.top = point[points].z-16
-					end
-					if point[points].z+16 > border.bottom then
-						border.bottom = point[points].z+16
-					end
+					updateBorderWithPoint(border, point[points].x, point[points].z)
 				end
 			else
 				local m = diffX/diffZ
@@ -688,24 +670,17 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				for j = 0, a_diffZ, 16 do	
 					points = points + 1
 					point[points] = {x = floor((mPoint[i-1].x + j*m*sign)/16)*16, z = mPoint[i-1].z + j*sign}
-					-- update border
-					if point[points].x-16 < border.left then
-						border.left = point[points].x-16
-					end
-					if point[points].x+16 > border.right then
-						border.right = point[points].x+16
-					end
-					if point[points].z-16 < border.top then
-						border.top = point[points].z-16
-					end
-					if point[points].z+16 > border.bottom then
-						border.bottom = point[points].z+16
-					end
+					updateBorderWithPoint(border, point[points].x, point[points].z)
 				end
 			end
 			
 		end
 	end
+	
+	border.left = border.left - 16
+	border.top = border.top - 16
+	border.right = border.right + 16
+	border.bottom = border.bottom + 16
 	
 	if points > maxWallPoints then
 		-- cancel command if the wall is too big, anti-slowdown
@@ -752,7 +727,8 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 								segment[n].point[pc] = {x = point[j].x+lx, z = point[j].z+lz}
 								area[point[j].x+lx][point[j].z+lz] = true
 								-- update border
-								if segment[n].point[pc].x-16 < segment[n].border.left then
+								updateBorderWithPoint(segment[n].border, segment[n].point[pc].x, segment[n].point[pc].z)
+								--[[if segment[n].point[pc].x-16 < .left then
 									segment[n].border.left = segment[n].point[pc].x-16
 								end
 								if segment[n].point[pc].x+16 > segment[n].border.right then
@@ -763,7 +739,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 								end
 								if segment[n].point[pc].z+16 > segment[n].border.bottom then
 									segment[n].border.bottom = segment[n].point[pc].z+16 
-								end
+								end--]]
 								local currHeight = spGetGroundHeight(segment[n].point[pc].x, segment[n].point[pc].z)
 								segment[n].point[pc].orHeight = currHeight
 								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(segment[n].point[pc].x, segment[n].point[pc].z)) then
@@ -1034,20 +1010,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	mPoint[1].x = floor(mPoint[1].x/16)*16
 	mPoint[1].z = floor(mPoint[1].z/16)*16
 	point[1] = mPoint[1]
-	
-	-- update border
-	if point[points].x < border.left then
-		border.left = point[points].x 
-	end
-	if point[points].x > border.right then
-		 border.right = point[points].x 
-	end
-	if point[points].z < border.top then
-		 border.top = point[points].z
-	end
-	if point[points].z > border.bottom then
-		 border.bottom = point[points].z 
-	end
+	updateBorderWithPoint(border, point[points].x, point[points].z)
 	
 	for i = 2, mPoints, 1 do
 		-- snap mouse to grid
@@ -1063,19 +1026,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		if a_diffX <= 16 and a_diffZ <= 16 then
 			points = points + 1
 			point[points] = {x = mPoint[i].x, z = mPoint[i].z}
-			-- update border
-			if point[points].x < border.left then
-				border.left = point[points].x 
-			end
-			if point[points].x > border.right then
-				 border.right = point[points].x 
-			end
-			if point[points].z < border.top then
-				 border.top = point[points].z
-			end
-			if point[points].z > border.bottom then
-				 border.bottom = point[points].z 
-			end
+			updateBorderWithPoint(border, point[points].x, point[points].z)
 		else
 			-- interpolate between far apart points to prevent loop holes.
 			if a_diffX > a_diffZ then
@@ -1084,19 +1035,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				for j = 0, a_diffX, 16 do	
 					points = points + 1
 					point[points] = {x = mPoint[i].x - j*sign, z = floor((mPoint[i].z - j*m*sign)/16)*16}
-					-- update border
-					if point[points].x < border.left then
-						 border.left = point[points].x 
-					end
-					if point[points].x > border.right then
-						 border.right = point[points].x 
-					end
-					if point[points].z < border.top then
-						 border.top = point[points].z
-					end
-					if point[points].z > border.bottom then
-						 border.bottom = point[points].z 
-					end
+					updateBorderWithPoint(border, point[points].x, point[points].z)
 				end
 			else
 				local m = diffX/diffZ
@@ -1104,19 +1043,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				for j = 0, a_diffZ, 16 do	
 					points = points + 1
 					point[points] = {x = floor((mPoint[i].x - j*m*sign)/16)*16, z = mPoint[i].z - j*sign}
-					-- update border
-					if point[points].x < border.left then
-						border.left = point[points].x 
-					end
-					if point[points].x > border.right then
-						 border.right = point[points].x 
-					end
-					if point[points].z < border.top then
-						 border.top = point[points].z
-					end
-					if point[points].z > border.bottom then
-						 border.bottom = point[points].z 
-					end
+					updateBorderWithPoint(border, point[points].x, point[points].z)
 				end
 			end
 			
@@ -1231,79 +1158,72 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			local totalZ = 0
 			-- totalX/Z is used to find the average position of the segment
 			local m = 1 -- number of points in the segment
-			for lx = border.left + floor(width * i/8)*8 + addX, border.left + floor(width * (i+1)/8)*8, 8 do
-				for lz = border.top + floor(height * j/8)*8 + addZ, border.top + floor(height * (j+1)/8)*8, 8 do
-					-- lx/lz steps though all points within a segment area
+			for lx = border.left + floor(width * i/8)*8 + addX, border.left + floor(width * (i+1)/8)*8, 16 do
+				for lz = border.top + floor(height * j/8)*8 + addZ, border.top + floor(height * (j+1)/8)*8, 16 do
+					-- lx/lz steps though all 16x16 points
 					if area[floor(lx/16)*16][floor(lz/16)*16] then
+						--Spring.MarkerAddLine(floor(lx/16)*16-2,0,floor(lz/16)*16-2, floor(lx/16)*16+2,0,floor(lz/16)*16+2)
+						--Spring.MarkerAddLine(floor(lx/16)*16-2,0,floor(lz/16)*16+2, floor(lx/16)*16+2,0,floor(lz/16)*16-2)
+						
+						-- fill in the top, left and middle
+						for x = lx, lx+8, 8 do
+							for z = lz, lz+8, 8 do
+								local currHeight = spGetGroundHeight(x, z)
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, z)) then
+									segment[n].point[m] = {x = x, z = z}
+									segment[n].point[m].orHeight = currHeight
+									m = m + 1
+									totalX = totalX + x
+									totalZ = totalZ + z
+									updateBorderWithPoint(segment[n].border, x, z)
+								end
+							end
+						end
 						
 						local right = not area[floor(lx/16)*16+16][floor(lz/16)*16]
 						local bottom = not area[floor(lx/16)*16][floor(lz/16)*16+16]
-						if right or bottom then
-							-- fill the edges of the 16 elmo grid
-							segment[n].point[m] = {x = lx+8, z = lz+8}
-							local currHeight = spGetGroundHeight(segment[n].point[m].x, segment[n].point[m].z)
-							segment[n].point[m].orHeight = currHeight
-							if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(segment[n].point[m].x, segment[n].point[m].z)) then
+						
+						-- fill in bottom right if it is missing
+						if right and bottom then
+							local currHeight = spGetGroundHeight(lx+16, lz+16)
+							if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, lz+16)) then
+								segment[n].point[m] = {x = lx+16, z = lz+16}
+								segment[n].point[m].orHeight = currHeight
 								m = m + 1
-								totalX = totalX + lx + 8
-								totalZ = totalZ + lz + 8
+								totalX = totalX + lx+16
+								totalZ = totalZ + lz+16
+								updateBorderWithPoint(segment[n].border, lx+16, lz+16)
 							end
-							if segment[n].border.left > lx + 8 then	
-								segment[n].border.left = lx + 8
-							end
-							if segment[n].border.right < lx + 8 then	
-								segment[n].border.right = lx + 8
-							end
-							if segment[n].border.top > lz + 8 then	
-								segment[n].border.top = lz + 8
-							end
-							if segment[n].border.bottom < lz + 8 then	
-								segment[n].border.bottom = lz + 8
-							end
-							if right then
-								segment[n].point[m] = {x = lx+8, z = lz}
-								local currHeight = spGetGroundHeight(segment[n].point[m].x, segment[n].point[m].z)
-								segment[n].point[m].orHeight = currHeight
-								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(segment[n].point[m].x, segment[n].point[m].z)) then
+						end
+							
+						if right then
+							for z = lz, lz+8, 8 do
+								local currHeight = spGetGroundHeight(lx+16, z)
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, z)) then
+									segment[n].point[m] = {x = lx+16, z = z}
+									segment[n].point[m].orHeight = currHeight
 									m = m + 1
-									totalX = totalX + lx + 8
-									totalZ = totalZ + lz
-								end
-							end
-							if bottom then
-								segment[n].point[m] = {x = lx, z = lz+8}
-								local currHeight = spGetGroundHeight(segment[n].point[m].x, segment[n].point[m].z)
-								segment[n].point[m].orHeight = currHeight
-								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(segment[n].point[m].x, segment[n].point[m].z)) then
-									m = m + 1
-									totalX = totalX + lx + 8
-									totalZ = totalZ + lz
+									totalX = totalX + lx+16
+									totalZ = totalZ + z
+									updateBorderWithPoint(segment[n].border, lx+16, z)
 								end
 							end
 						end
 						
-						segment[n].point[m] = {x = lx, z = lz}
-						local currHeight = spGetGroundHeight(segment[n].point[m].x, segment[n].point[m].z)
-						segment[n].point[m].orHeight = currHeight
-						if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(segment[n].point[m].x, segment[n].point[m].z)) then
-							m = m + 1
-							totalX = totalX + lx
-							totalZ = totalZ + lz
+						if bottom then
+							for x = lx, lx+8, 8 do
+								local currHeight = spGetGroundHeight(x, lz+16)
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, lz+16)) then
+									segment[n].point[m] = {x = x, z = lz+16}
+									segment[n].point[m].orHeight = currHeight
+									m = m + 1
+									totalX = totalX + x
+									totalZ = totalZ + lz+16
+									updateBorderWithPoint(segment[n].border, x, lz+16)
+								end
+							end
 						end
 						
-						-- update segment border. used when forcing repath
-						if segment[n].border.left > lx then	
-							segment[n].border.left = lx
-						end
-						if segment[n].border.right < lx then	
-							segment[n].border.right = lx
-						end
-						if segment[n].border.top > lz then	
-							segment[n].border.top = lz
-						end
-						if segment[n].border.bottom < lz then	
-							segment[n].border.bottom = lz
-						end
 					end
 				end
 				
@@ -1647,8 +1567,7 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 		Spring.Echo("Tell Google Frog")
 		return
 	end
-	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Cost " .. math.floor(terraformUnit[id].totalSpent))
-
+	Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Spent " .. terraformUnit[id].totalSpent)
 	
 	-- remove from intercepts tables
 	for j = 1, terraformUnit[id].intercepts do -- CRASH ON THIS LINE -- not for a while though
@@ -1789,7 +1708,7 @@ end
 
 local function updateTerraformCost(id)
 
-	local totalCost = 0
+	local volume = 0
 	for i = 1, terraformUnit[id].points do
 		local point = terraformUnit[id].point[i]
 		local x = point.x
@@ -1804,7 +1723,7 @@ local function updateTerraformCost(id)
 		else
 			point.diffHeight = point.aimHeight - height 
 		end
-		totalCost = totalCost + abs(point.diffHeight) 
+		volume = volume + abs(point.diffHeight) 
 	end
 	
 	spSetUnitHealth(id, {
@@ -1812,15 +1731,15 @@ local function updateTerraformCost(id)
 		build  = 0
 	})
 	
-	if totalCost == 0 then
-		totalCost = 0.01
+	if volume == 0 then
+		volume = 0.01
 		-- deregistering here causes crash bug
 	end
 
 	terraformUnit[id].lastProgress = 0
 	terraformUnit[id].lastHealth = 0
 	terraformUnit[id].progress = 0
-	terraformUnit[id].cost = totalCost*costMult
+	terraformUnit[id].cost = volume*costMult
 	terraformUnit[id].totalCost = terraformUnit[id].cost + terraformUnit[id].baseCost
 	
 	return true
@@ -1912,6 +1831,9 @@ local function finishInitialisingTerraformUnit(id)
 	updateTerraformEdgePoints(id)
 	updateTerraformCost(id)
 	
+	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Base " .. terraformUnit[id].baseCost)
+	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Cost " .. terraformUnit[id].cost)
+	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Points " .. terraformUnit[id].points)
 	terraformUnit[id].fullyInitialised = true
 
 end

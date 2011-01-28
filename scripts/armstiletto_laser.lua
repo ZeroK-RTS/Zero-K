@@ -5,7 +5,8 @@ local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, L
 local smokePiece = {base, jet1, jet2}
 
 --cob values
-local firing
+local CRASHING = 97
+local Static_Var_1, firing
 local sound_index = 0
 
 function script.Create()
@@ -40,6 +41,20 @@ function script.Deactivate()
 	Turn(LwingTip, z_axis, math.rad(-30), 2) -- -30
 	Turn(RwingTip, z_axis, math.rad(30), 2) --30
 end
+--[[
+function script.MoveRate(moveRate)
+	if moveRate == 2 then
+		if  not Static_Var_1   then
+			Static_Var_1 = 1
+			Turn( base , z_axis, math.rad(-(240.000000)), 120.000000 )
+			WaitForTurn(base, z_axis)
+			Turn( base , z_axis, math.rad(-(120.000000)), 180.000000 )
+			WaitForTurn(base, z_axis)
+			Turn( base , z_axis, math.rad(-(0.000000)), 120.000000 )
+			Static_Var_1 = 0
+		end
+	end
+end--]]
 
 local function FireLoop()
 	while(firing) do
@@ -72,32 +87,31 @@ local function FireLoop()
 end
 
 function script.FireWeapon1()
-	if GG.BomberRearm_CanBomberFire(unitID) then
-		GG.BomberRearm_AddBomberToRearm(unitID, 0)
-		
-		Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
-		firing = true
-		StartThread(FireLoop)
-		Sleep( 3000 ) -- Duration of burst. The number of frames is roughly (time - 30) * 1000 / 30.
-		firing = false
-		Sleep( 500) --delay before fuel runs out, to let it retreat a little
+	if Spring.GetUnitFuel(unitID) < 1 then
+		return
 	end
+	Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
+	firing = true
+	StartThread(FireLoop)
+	Sleep( 3000 ) -- Duration of burst. The number of frames is roughly (time - 30) * 1000 / 30.
+	firing = false
+	Sleep( 500) --delay before fuel runs out, to let it retreat a little
+	Spring.SetUnitFuel(unitID,0)
 end
 
 function script.QueryWeapon1()
 	return drop
 end
 
-function script.AimFromWeapon1() 
-	return drop 
-end
+function script.AimFromWeapon1() return drop end
 
 function script.AimWeapon1(heading, pitch)
-	return GG.BomberRearm_CanBomberFire(unitID) and not (GetUnitValue(CRASHING) == 1)
+	if (GetUnitValue(CRASHING) == 1) then return false end
+	return true
 end
 
 function script.BlockShot1()
-	return (GetUnitValue(CRASHING) == 1) and not GG.BomberRearm_CanBomberFire(unitID)
+	return (GetUnitValue(CRASHING) == 1)
 end
 
 function script.Killed(recentDamage, maxHealth)
