@@ -56,7 +56,7 @@ end
 local function RestorePuppy(unitID, x, y, z)
   Spring.SetUnitCloak(unitID, false)
   Spring.MoveCtrl.SetPosition(unitID, x, y, z)
-  Spring.SetUnitBlocking(unitID, true, false)	-- allows it to clip into wrecks (workaround for puppies staying in heaven)
+  Spring.SetUnitBlocking(unitID, false, false)	-- allows it to clip into wrecks (workaround for puppies staying in heaven)
   Spring.MoveCtrl.Disable(unitID)
   Spring.SetUnitBlocking(unitID, true, true)	-- restores normal state once they land
   -- Spring.SetUnitSensorRadius(unitID, "los", puppyLosRadius)

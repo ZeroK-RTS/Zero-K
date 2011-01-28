@@ -21,6 +21,7 @@ unitDef = {
   collisionVolumeScales         = [[100 80 100]],
   collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
+  corpse                        = [[DEAD]],
 
   customParams                  = {
     pylonrange = 600,
@@ -62,7 +63,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 1750,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
@@ -75,28 +76,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Moho Geothermal Powerplant]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 1750,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 600,
-      object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 600,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Moho Geothermal Powerplant]],

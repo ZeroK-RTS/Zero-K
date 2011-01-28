@@ -1,7 +1,6 @@
-#define TA			// This is a TA script
+//linear constant 65536
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, ground, head;
 
@@ -109,19 +108,19 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode ground type BITMAPONLY | BITMAP1;
 		explode head type FALL | EXPLODE_ON_HIT | BITMAP1;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode ground type BITMAPONLY | BITMAP1;
 		explode head type FALL | EXPLODE_ON_HIT | BITMAP1;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 		explode ground type BITMAPONLY | BITMAP1;
 		explode head type FALL | EXPLODE_ON_HIT | BITMAP1;
 }
