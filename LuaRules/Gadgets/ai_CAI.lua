@@ -45,7 +45,7 @@ local spGetTeamUnits		= Spring.GetTeamUnits
 local jumpDefNames  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 local jumpDefs = {}
 for name, data in pairs(jumpDefNames) do
-  jumpDefs[UnitDefNames[name].id] = data
+	jumpDefs[UnitDefNames[name].id] = data
 end
 
 
@@ -74,29 +74,29 @@ if (not gadgetHandler:IsSyncedCode()) then
 end
 
 local function CopyTable(original)   -- Warning: circular table references lead to
-  local copy = {}               -- an infinite loop.
-  for k, v in pairs(original) do
-    if (type(v) == "table") then
-      copy[k] = CopyTable(v)
-    else
-      copy[k] = v
-    end
-  end
-  return copy
+	local copy = {}               -- an infinite loop.
+	for k, v in pairs(original) do
+		if (type(v) == "table") then
+			copy[k] = CopyTable(v)
+		else
+			copy[k] = v
+		end
+	end
+	return copy
 end
 
 --unused
 local function ModifyTable(original, modify)   -- Warning: circular table references lead to an infinite loop.
-  for k, v in pairs(modify) do
-	--Spring.Echo("Original entry: "..original[k])
-	--Spring.Echo("Modifier entry: "..k)
-	--if not (original and modify) then return end
-    if (type(v) == "table") then
-      ModifyTable(original[k], v)
-    else
-      original[k] = v
-    end
-  end
+	for k, v in pairs(modify) do
+		--Spring.Echo("Original entry: "..original[k])
+		--Spring.Echo("Modifier entry: "..k)
+		--if not (original and modify) then return end
+		if (type(v) == "table") then
+			ModifyTable(original[k], v)
+		else
+			original[k] = v
+		end
+	end
 end
 
 -- *** Config

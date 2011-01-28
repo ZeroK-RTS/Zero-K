@@ -39,6 +39,7 @@ UnitJitter.Default = {
   unit       = -1,
   unitDefID  = 0,
   team       = -1,
+  allyTeam   = -1,
 
   repeatEffect = false,
   dieGameFrame = math.huge
@@ -261,7 +262,7 @@ function UnitJitter:CreateParticle()
 end
 
 function UnitJitter:Visible()
-  if Spring.AreTeamsAllied(self.team,LocalAllyTeamID) then
+  if self.allyTeam == LocalAllyTeamID then
     return Spring.IsUnitVisible(self.unit)
   end
 

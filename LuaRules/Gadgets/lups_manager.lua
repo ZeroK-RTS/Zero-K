@@ -179,6 +179,7 @@ local function UnitCloaked(_,unitID,unitDefID,teamID)
       fx.options.unit      = unitID
       fx.options.unitDefID = unitDefID
       fx.options.team      = teamID
+	  fx.options.allyTeam  = allyTeamID
 	  tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
     end
   else
@@ -187,6 +188,7 @@ local function UnitCloaked(_,unitID,unitDefID,teamID)
       fx.options.unit      = unitID
       fx.options.unitDefID = unitDefID
       fx.options.team      = teamID
+	  fx.options.allyTeam  = allyTeamID
 	  tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
     end
   end
@@ -217,6 +219,7 @@ local function UnitDecloaked(_,unitID,unitDefID,teamID)
       fx.options.unit      = unitID
       fx.options.unitDefID = unitDefID
       fx.options.team      = teamID
+	  fx.options.allyTeam  = allyTeamID
 	  tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
     end
   else
@@ -225,6 +228,7 @@ local function UnitDecloaked(_,unitID,unitDefID,teamID)
       fx.options.unit      = unitID
       fx.options.unitDefID = unitDefID
       fx.options.team      = teamID
+	  fx.options.allyTeam  = allyTeamID
 	  tinsert( particleIDs[unitID],Lups.AddParticles(fx.class,fx.options) )
     end
   end
