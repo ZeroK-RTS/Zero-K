@@ -4,7 +4,7 @@ function widget:GetInfo()
 		desc = "Makes neat team color scheme - you teal, allies blueish, enemies reddish",
 		author = "Licho",
 		date = "February, 2010",
-		license = "GPL like rest of CA",
+		license = "GPL v3",
 		layer = -10000,
 		enabled = true,
 	}

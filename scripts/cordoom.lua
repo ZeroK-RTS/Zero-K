@@ -133,10 +133,7 @@ function script.QueryWeapon2()
 	end
 end
 
-function script.AimFromWeapon2()
-	if heat then return flare2
-	else return flare3 end
-end
+function script.AimFromWeapon2() return heatraybase end
 
 function script.AimWeapon2( heading, pitch )
 if not on then return false end
