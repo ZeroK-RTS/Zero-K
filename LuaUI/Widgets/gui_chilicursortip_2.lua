@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.091 Chili Cursor Tooltips.",
+    desc      = "v0.092 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -703,7 +703,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 				local width = (leftbar and 50 or 230) - rightmargin
 				
 				--controls[ttname][item.name] = Label:New{ autosize=false, name=item.name, caption = itemtext, fontSize=curFontSize, valign='center', height=icon_size+5, width = width }
-				controls[ttname][item.name] = Label:New{ defaultHeight=0, autosize=true, name=item.name, caption = itemtext, fontSize=curFontSize, valign='center', height=icon_size+5, x=icon_size+5, right=1,}
+				controls[ttname][item.name] = Label:New{ fontShadow=true, defaultHeight=0, autosize=true, name=item.name, caption = itemtext, fontSize=curFontSize, valign='center', height=icon_size+5, x=icon_size+5, right=1,}
 				stack_children[#stack_children+1] = controls[ttname][item.name]
 			end
 			

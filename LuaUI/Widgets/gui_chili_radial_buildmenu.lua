@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Radial Build Menu",
-    desc      = "v0.09 Radial Build Menu",
+    desc      = "v0.091 Radial Build Menu",
     author    = "CarRepairer",
     date      = "2010-09-15",
     license   = "GNU GPL, v2 or later",
@@ -218,7 +218,7 @@ local function AddButton(item, index)
 		if angle < 0 then angle = angle + 360 end 
 		local idx = angle / 45
 		local hotkey = keys_display[1 + idx%8]
-		local label_hotkey = Label:New{ name = hotkey, caption = (hotkey_mode and green..hotkey or ''), fontSize = 11, top = 0, right=0, fontShadow = true, }
+		local label_hotkey = Label:New{ name = hotkey, caption = (hotkey_mode and green..hotkey or ''), fontSize = 11, y = 0, right=0, fontShadow = true, }
 		hotkey_labels[#hotkey_labels +1] = label_hotkey
 		button1:AddChild( label_hotkey )
 	end 
