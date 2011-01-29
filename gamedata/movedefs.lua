@@ -65,7 +65,7 @@ local moveDefs = {
 		footprintx = 1,
 		footprintz = 1,
 		maxwaterdepth = 15,
-		maxslope = 55,
+		maxslope = 70,
 		crushstrength = 5,
 	},
 
@@ -73,7 +73,7 @@ local moveDefs = {
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 22,
-		maxslope = 55,
+		maxslope = 70,
 		crushstrength = 150,
 	},
 	
@@ -81,7 +81,7 @@ local moveDefs = {
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 22,
-		maxslope = 55,
+		maxslope = 70,
 		crushstrength = 500,
 	},
 
@@ -89,7 +89,7 @@ local moveDefs = {
 		footprintx = 3,
 		footprintz = 3,
 		maxwaterdepth = 5000,
-		maxslope = 55,
+		maxslope = 70,
 		crushstrength = 150,
 	},
 	
