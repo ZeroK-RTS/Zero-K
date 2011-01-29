@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base;
 
@@ -38,35 +35,30 @@ Create()
 	start-script SmokeUnit();
 }
 
-SweetSpot(piecenum)
-{
-	piecenum = base;
-}
-
 Killed(severity, corpsetype)
 {
 	if( severity <= 25 )
 	{
 		corpsetype = 1;
-		explode base type BITMAPONLY | BITMAP1;
+		explode base type BITMAPONLY;
 //		explode texture type BITMAPONLY | BITMAP2;
 		return (0);
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
-		explode base type BITMAPONLY | BITMAP1;
+		corpsetype = 1;
+		explode base type BITMAPONLY;
 //		explode texture type SHATTER | BITMAP2;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
-		explode base type BITMAPONLY | BITMAP1;
+		corpsetype = 2;
+		explode base type SHATTER;
 //		explode texture type SHATTER | BITMAP2;
 		return (0);
 	}
-	corpsetype = 3;
-	explode base type BITMAPONLY | BITMAP1;
+	corpsetype = 2;
+	explode base type SHATTER;
 //	explode texture type SHATTER | EXPLODE_ON_HIT | BITMAP2;
 }

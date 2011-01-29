@@ -20,11 +20,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_bp = [[Robô escaramuçador]],
-    description_fr = [[Marcheur Tirailleur]],
-    helptext       = [[The Moderator's slow-ray reduces enemy speed and rate of fire by up to two-thirds. Though doing no damage themselves, Morties are effective against almost all targets.]],
-    helptext_bp    = [[Moderator é um escaramuçador barato e rápido. Tem maior alcançe que defesas leves com torres de laser leves, mas é vulnerável a grupos de agressores.]],
-    helptext_fr    = [[Le Moderator offre des capacités de tirailleur idéales pour un prix réduit. Son canon plasma lui permet une longue portée pour une cadence de tir honorable. Il pourra détruire la plupart des tourelles sans risquer d'y laisser sa carcasse. ]],
+    helptext       = [[The Moderator's slow-ray reduces enemy speed and rate of fire by up to two-thirds. Though doing no damage themselves, Moderators are effective against almost all targets.]],
   },
 
   defaultmissiontype  = [[Standby]],
