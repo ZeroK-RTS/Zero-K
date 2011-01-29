@@ -40,7 +40,7 @@ unitDef = {
   maneuverleashlength = [[1380]],
   mass                = 238,
   maxAcc              = 0.5,
-  maxDamage           = 850,
+  maxDamage           = 1100,
   maxFuel             = 1000,
   maxVelocity         = 10,
   minCloakDistance    = 75,
@@ -81,7 +81,7 @@ unitDef = {
 
     ARMBOMBLIGHTNING = {
       name                    = [[BombLightning]],
-      areaOfEffect            = 64,
+      areaOfEffect            = 96,
       avoidFeature            = false,
       avoidFriendly           = false,
       beamlaser               = 1,

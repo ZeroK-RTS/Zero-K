@@ -44,10 +44,6 @@ local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 local attritionWeaponDefs, MAX_SLOW_FACTOR, DEGRADE_TIMER, DEGRADE_FACTOR, UPDATE_PERIOD = include("LuaRules/Configs/timeslow_defs.lua")
 local slowedUnits = {}
 
-if not GG.attUnits then
-	GG.attUnits = {}
-end
-
 Spring.SetGameRulesParam("slowState",1)
 
 function gadget:Initialize()

@@ -116,13 +116,17 @@ if (modOptions and modOptions.cratermult and modOptions.cratermult ~= 1) then
   end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- because the way lua access to unitdefs and weapondefs is setup is insane
+--
  for _, weaponDef in pairs(WeaponDefs) do
     if weaponDef.mygravity then
 		if not weaponDef.customparams then
 			weaponDef.customparams = {}
 		end
-		weaponDef.customparams.mygravity = weaponDef.mygravity
+		weaponDef.customparams.mygravity = weaponDef.mygravity -- For attack AOE widget
     end
  end
 

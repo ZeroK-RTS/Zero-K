@@ -36,8 +36,6 @@ local unitKillSubordinatesCmdDesc = {
 --SYNCED
 if gadgetHandler:IsSyncedCode() then
 
-Spring.SetGameRulesParam("cantfire",1)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetUnitDefID        = Spring.GetUnitDefID
@@ -50,7 +48,8 @@ local spSetUnitHealth		= Spring.SetUnitHealth
 local captureWeaponDefs, captureUnitDefs = include("LuaRules/Configs/capture_defs.lua")
 
 local capturedUnits = {}
-controllers = {}
+local controllers = {}
+local reloading = {}
 
 -- updates capture bar for controllers
 local function updateControllerBar(unitID)
@@ -185,6 +184,17 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		
 		controllers[attackerID].unitCount = controllers[attackerID].unitCount + 1
 		controllers[attackerID].units[unitID] = true
+		
+		if controllers[attackerID].postCaptureReload then
+			local frame = Spring.GetGameFrame() + controllers[attackerID].postCaptureReload
+			Spring.SetUnitRulesParam(attackerID, "captureReloadMult", 0, {inlos = true})
+			Spring.SetUnitRulesParam(attackerID, "captureRechargeFrame", frame, {inlos = true})
+			GG.UpdateUnitAttributes(attackerID)
+			reloading[frame] = reloading[frame] or {count = 0, data = {}}
+			reloading[frame].count = reloading[frame].count + 1
+			reloading[frame].data[reloading[frame].count] = attackerID
+			GG.attUnits[attackerID] = true
+		end
 	
 		-- give the unit
 		Spring.TransferUnit(unitID, attackerTeam, false)
@@ -237,6 +247,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	
 	controllers[unitID] = {
 		unitMax = captureUnitDefs[unitDefID].unitLimit,
+		postCaptureReload = captureUnitDefs[unitDefID].postCaptureReload,
 		units = {},
 		unitCount = 0,
 		killSubordinates = false,
@@ -267,6 +278,17 @@ function gadget:GameFrame(f)
 			end
         end
     end
+	
+	if reloading[f] then
+		for i = 1, reloading[f].count do
+			local unitID = reloading[f].data[i]
+			Spring.SetUnitRulesParam(unitID,"captureReloadMult",1, {inlos = true})
+			Spring.SetUnitRulesParam(unitID, "captureRechargeFrame", 0, {inlos = true})
+			GG.UpdateUnitAttributes(unitID)
+		end
+		reloading[f] = false
+	end
+	
 end
 
 function gadget:UnitDestroyed(unitID)

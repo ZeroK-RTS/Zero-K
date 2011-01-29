@@ -218,8 +218,12 @@ local function getWeaponInfo(weaponDef, unitDef)
 	else
 		retData = {type = "direct", scatter = scatter, range = weaponDef.range}
 	end
-  
-	retData.aoe = aoe
+	
+	if not weaponDef.impactOnly then
+		retData.aoe = aoe
+	else
+		retData.aoe = 0
+	end
 	retData.cost = cost
 	retData.mobile = mobile
 	retData.waterWeapon = waterWeapon
@@ -240,11 +244,9 @@ local function SetupUnitDef(unitDefID, unitDef)
       if (weaponDef) then
         if (num == 3 and unitDef.canDGun) then
           dgunInfo[unitDefID] = getWeaponInfo(weaponDef, unitDef)
-        elseif (weaponDef.canAttackGround
-                and not weaponDef.isShield 
+        elseif (not weaponDef.isShield 
                 and not ToBool(weaponDef.interceptor)
-                and (weaponDef.areaOfEffect > maxSpread or weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle) > maxSpread )
-                and not string.find(weaponDef.name, "flak")) then
+                and (weaponDef.areaOfEffect > maxSpread or weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle) > maxSpread )) then
           maxSpread = max(weaponDef.areaOfEffect, weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle))
           maxWeaponDef = weaponDef
         end

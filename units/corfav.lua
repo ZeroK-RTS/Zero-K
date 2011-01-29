@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[corfav]],
-  name                   = [[Weasel]],
+  name                   = [[Dart]],
   description            = [[Raider/Scout Vehicle]],
   acceleration           = 0.14,
   bmcode                 = [[1]],
@@ -25,9 +25,9 @@ unitDef = {
   customParams           = {
     description_bp = [[Veículo batedor/agressor]],
     description_fr = [[Véicule Pilleur/Éclaireur]],
-    helptext       = [[Cheap and fast, the Weasel is deadly in the first minutes of the game if your opponent is caught off-guard. Use missile towers, LLTs or any quick units to stop them.]],
-    helptext_bp    = [[Weasel é um rápido e barato agressor ou batedor. ? letal nos primeiros minutos do jogo se o inimigo for pego de surpresa. Defenda-se deles com torres de laser leves ou torres de misseis ou suas própias unidades.]],
-    helptext_fr    = [[Le Weasel est rapide, aussi bien r construire qu'r rejoindre la base ennemie. Faiblement armée la moindre résistance le réduira en miettes, mais capable de surprendre assez tôt un ennemi non préparé.]],
+    helptext       = [[Cheap and fast, the Dart is deadly in the first minutes of the game if your opponent is caught off-guard. Use missile towers, LLTs or any quick units to stop them.]],
+    helptext_bp    = [[Dart é um rápido e barato agressor ou batedor. ? letal nos primeiros minutos do jogo se o inimigo for pego de surpresa. Defenda-se deles com torres de laser leves ou torres de misseis ou suas própias unidades.]],
+    helptext_fr    = [[Le Dart est rapide, aussi bien r construire qu'r rejoindre la base ennemie. Faiblement armée la moindre résistance le réduira en miettes, mais capable de surprendre assez tôt un ennemi non préparé.]],
   },
 
   defaultmissiontype     = [[Standby]],

@@ -59,6 +59,9 @@ local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 				burstRate = WeaponDefs[ud.weapons[i+1].weaponDef].salvoDelay,
 				oldReloadFrames = math.floor(reload*30),
 			}
+			if WeaponDefs[ud.weapons[i+1].weaponDef].type == "BeamLaser" then
+				state.weapon[i].burstRate = false -- beamlasers go screwy if you mess with their burst length
+			end
 		end
 		
 	end
@@ -81,7 +84,11 @@ local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 		else
 			local newReload = w.reload/speedFactor
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
-			spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/speedFactor})
+			if w.burstRate then
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/speedFactor})
+			else
+				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+			end
 		end
 	end
 	
@@ -146,40 +153,47 @@ local function removeUnit(unitID)
 	origUnitReload[unitID] = nil
 end
 
+function GG.UpdateUnitAttributes(unitID, frame)
+	if not Spring.ValidUnitID(unitID) then
+		removeUnit(unitID)
+	end
+	
+	local udid = spGetUnitDefID(unitID)
+	if not udid then 
+		return 
+	end
+		
+	frame = frame or Spring.GetGameFrame()
+	
+	local ud = UnitDefs[udid]
+	local changedAtt = false
+	
+	-- Increased reload from CAPTURE --
+	local captureMult = spGetUnitRulesParam(unitID,"captureReloadMult")
+	-- SLOW --
+	local slowState = spGetUnitRulesParam(unitID,"slowState")
+	
+	if slowState or captureMult then
+		updateReloadSpeed(unitID, ud, (1-(slowState or 0))*(captureMult or 1), frame)
+		updateMovementSpeed(unitID,ud,1-(slowState or 0))
+		
+		if slowState ~= 0 and captureMult ~= 1 then
+			changedAtt = true
+			
+		end
+	end
+
+	-- remove the attributes if nothing is being changed
+	if not changedAtt then
+		removeUnit(unitID)
+	end
+end
+
 function gadget:GameFrame(f)
 	
 	if f % UPDATE_PERIOD == 1 then
 		for unitID, teamID in pairs(GG.attUnits) do
-		
-			if not Spring.ValidUnitID(unitID) then
-				removeUnit(unitID)
-			end
-		
-			local udid = spGetUnitDefID(unitID)
-			if not udid then 
-				return 
-			end
-				
-			local ud = UnitDefs[udid]
-			local changedAtt = false
-			
-			-- SLOW --
-			local slowState = spGetUnitRulesParam(unitID,"slowState")
-			if slowState then
-				updateReloadSpeed(unitID, ud, 1-slowState, f)
-				updateMovementSpeed(unitID,ud,1-slowState)
-				
-				if slowState ~= 0 then
-					changedAtt = true
-				end
-			end
-			--end slow
-			
-			-- remove the attributes if nothing is being changed
-			if not changedAtt then
-				removeUnit(unitID)
-			end
-			
+			GG.UpdateUnitAttributes(unitID, f)
 		end
 	end
 	

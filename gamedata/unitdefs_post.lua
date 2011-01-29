@@ -58,6 +58,21 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- because the way lua access to unitdefs and weapondefs is setup is insane
+--
+--[[
+for _, ud in pairs(UnitDefs) do
+    if ud.collisionVolumeOffsets then
+		if not ud.customparams then
+			ud.customparams = {}
+		end
+		ud.customparams.collisionVolumeOffsets = ud.collisionVolumeOffsets  -- For ghost site
+    end
+ end--]]
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Convert all CustomParams to strings
 --
 
@@ -436,6 +451,7 @@ for name, ud in pairs(UnitDefs) do
 	ud.canRestore = false
   end
 end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

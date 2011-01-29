@@ -96,6 +96,7 @@ unitDef = {
       range                   = 1000,
       reloadtime              = 0.5,
       renderType              = 4,
+	  size                    = 0.01,
       soundHit                = [[weapon/flak_hit]],
       soundStart              = [[weapon/flak_fire]],
       startsmoke              = [[1]],

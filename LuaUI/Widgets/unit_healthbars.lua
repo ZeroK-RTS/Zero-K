@@ -57,6 +57,8 @@ local walls = {dragonsteeth=true,dragonsteeth_core=true,fortification=true,forti
 local stockpileH = 24
 local stockpileW = 12
 
+local captureReloadTime = 150
+
 --------------------------------------------------------------------------------
 -- OPTIONS
 --------------------------------------------------------------------------------
@@ -644,9 +646,16 @@ do
         AddBar("paralyze",emp,empcolor_index,infotext)
       end
 
-      --// CAPTURE
+      --// CAPTURE (set by capture gadget)
       if ((capture or -1)>0) then
         AddBar("capture",capture,"capture",(fullText and floor(capture*100)..'%') or '')
+      end
+	  
+	  --// CAPTURE RECHARGE
+	  local captureReloadState = GetUnitRulesParam(unitID,"captureRechargeFrame")
+      if (captureReloadState and captureReloadState > 0) then
+		local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
+        AddBar("capture reload",capture,"reload",(fullText and floor(capture*100)..'%') or '')
       end
 
       --// RELOAD
