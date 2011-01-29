@@ -91,6 +91,7 @@ function widget:DrawWorld()
 end
 
 function widget:UnitEnteredLos(unitID, allyTeam)
+	
 	if ( spIsUnitAllied( unitID ) ) then
 		return
 	end
@@ -98,11 +99,11 @@ function widget:UnitEnteredLos(unitID, allyTeam)
 	local _,_,_,_,buildProgress = spGetUnitHealth( unitID )
 	local udef = udefTab[spGetUnitDefID(unitID)]
 		
-	if ( allyTeam == 0 and ( udef.isBuilding == true or udef.isFactory == true) and buildProgress ~= 1 ) then
+	if ( udef.isBuilding == true or udef.isFactory == true) and buildProgress ~= 1  then
 		printDebug( "Ghost added")
 		
 		local x, y, z = spGetUnitPosition(unitID)
-		ghostSites[unitID] = { unitDefId = spGetUnitDefID(unitID), pos = {x, y, z}, teamId = allyTeam }
+		ghostSites[unitID] = { unitDefId = spGetUnitDefID(unitID), pos = {x, y+udef.losHeight, z}, teamId = allyTeam }
 	end
 end
 
