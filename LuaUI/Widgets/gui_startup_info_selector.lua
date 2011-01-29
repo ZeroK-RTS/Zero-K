@@ -179,8 +179,8 @@ function CreateWindow()
     local cbWidth = posterx*actived*0.75-- calculate width of close button depending of number or posters
     local closeButton = Button:New{
       parent = mainWindow,
-      caption = "CLOSE  (defaults to Strike Commander)",
-	  tooltip = "CLOSE\nNo commander selection made, will use Strike Commander",
+      caption = "CLOSE  (make no selection)",
+	  tooltip = "CLOSE\nNo commander selection made\nTo choose your commander later, open the Esc menu and go to Game Actions -> Select Comm",
       width = cbWidth,
       height = 30,
       x = (posterx*actived - cbWidth)/2,
@@ -194,33 +194,32 @@ end
 
 function Close(commPicked)
 	printDebug("<gui_startup_info_selector DEBUG >: closing")
-	if not commPicked then Spring.SendLuaRulesMsg("faction:nova") end
+	--if not commPicked then Spring.SendLuaRulesMsg("faction:nova") end
 	--Spring_SendCommands("say: a:I chose " .. option.button})
 	mainWindow:Dispose()
 end
  
  
 function widget:Shutdown()
-
   if mainWindow then
     mainWindow:Dispose()
   end
-
   widgetHandler:RemoveAction(actionShow)
-
 end
 
 -- keep the window open, we want to be able to pick later
+--[[
 function widget:GameStart()
   if mainWindow then
     --mainWindow:Dispose()
   end
 end
+]]--
 
 function UpdateCallins()
   --why is this called twice?
   widgetHandler:UpdateCallIn('DrawScreen')
-  widgetHandler:UpdateCallIn('DrawScreen')
+  -- widgetHandler:UpdateCallIn('DrawScreen')
 end
 
 function BindCallins()

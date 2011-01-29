@@ -246,7 +246,7 @@ function ChickenEvent(chickenEventArgs)
     UpdateRules()
   elseif (chickenEventArgs.type == "miniQueen") then
     waveMessage    = {}
-    waveMessage[1] = "Dragons are here!"
+    waveMessage[1] = "Here be dragons!"
 	waveTime = Spring.GetTimer()
   elseif (chickenEventArgs.type == "queen") then
     waveMessage    = {}

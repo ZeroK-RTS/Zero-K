@@ -65,7 +65,7 @@ confdata.game_menu_tree = {
 	{},
 	{'Share Dialog...', 'sharedialog' },	
 	{'Last Message Position', 'lastmsgpos' },	
-	
+	{'Select Comm', function() spSendCommands{"luaui showstartupinfoselector"} end },
 	{},
 	{'Screenshots|Take screenshots.',
 		{
@@ -74,8 +74,6 @@ confdata.game_menu_tree = {
 		}
 	},
 	{'Factory Guard', function() spSendCommands{"luaui togglewidget FactoryGuard"} end },
-	
-
 }
 
 confdata.help_tree = {
