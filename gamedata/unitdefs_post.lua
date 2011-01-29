@@ -388,7 +388,8 @@ if (modOptions and tobool(modOptions.xmas)) then
   for name, ud in pairs(UnitDefs) do
 	if (type(ud.weapondefs) == "table") then
       for wname,wd in pairs(ud.weapondefs) do
-        if (wd.weapontype == "AircraftBomb") then
+        if (wd.weapontype == "AircraftBomb" or ( wd.name:lower() ):find("bomb")) and not wname:find("bogus") then
+		  --Spring.Echo(wname)
           wd.model = gifts[ GetRandom(wname,#gifts) ]
         end
       end
