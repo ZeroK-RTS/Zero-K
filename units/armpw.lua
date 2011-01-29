@@ -44,7 +44,7 @@ unitDef = {
   footprintZ             = 2,
   iconType               = [[kbotraider]],
   idleAutoHeal           = 20,
-  idleTime               = 300,
+  idleTime               = 150,
   leaveTracks            = true,
   maneuverleashlength    = [[640]],
   mass                   = 79,
@@ -108,8 +108,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 11,
-        planes  = 11,
+        default = 11.5,
+        planes  = 11.5,
         subs    = 0.55,
       },
 
