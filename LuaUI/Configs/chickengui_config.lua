@@ -28,7 +28,8 @@ configs.colorSet = {
   chickenc       = "\255\100\255\255",
   chickenr       = "\255\100\100\255",
   chickenblobber       = "\255\100\255\100",
-  chicken_shield = "\255\100\100\120",
+  chicken_blimpy       = "\255\255\100\255",
+  --chicken_shield = "\255\100\100\120",
   chicken_tiamat = "\255\25\25\25",
 }
 

@@ -187,8 +187,7 @@ for i=1, #humanTeamsOrdered do
 	end
 end
 
-if (luaAI == 0) then return false
-else GG.chicken = true end
+if (luaAI == 0) then return false end
 
 
 --------------------------------------------------------------------------------
@@ -210,6 +209,7 @@ SetGlobals(luaAI or defaultDifficulty) -- set difficulty
 -- adjust for player and chicken bot count
 local playerCount = SetCount(humanTeams)
 local malus     = playerCount^playerMalus
+Spring.SetGameRulesParam("malus", malus)
 GG.malus = malus
 
 echo("Chicken configured for "..playerCount.." players")
@@ -247,6 +247,7 @@ end
 
 
 Spring.SetGameRulesParam("lagging",           0)
+Spring.SetGameRulesParam("techTimeReduction", 0)
 Spring.SetGameRulesParam("queenTime",        queenTime)
 
 for unitName in pairs(chickenTypes) do
@@ -736,6 +737,8 @@ local function Wave()
   --reduce all chicken appearance times
   local timeReduction = math.ceil((burrowTechTime * burrowCount)/playerCount)
   totalTimeReduction = totalTimeReduction + timeReduction
+  Spring.SetGameRulesParam("techTimeReduction", totalTimeReduction)
+  
   for chickenName, c in pairs(chickenTypes) do
 	c.time = c.time - timeReduction
 	if c.obsolete then c.obsolete = c.obsolete - timeReduction end
@@ -842,7 +845,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:GameStart()
-    DisableComputerUnits()
+    --DisableComputerUnits()	-- unneeded
 	if pvp then Spring.Echo("Chicken: PvP mode initialized") end
 	waveSchedule[gracePeriod*30] = true	-- schedule first wave
 end
@@ -998,13 +1001,14 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   end
   if (burrows[unitID]) then
     burrows[unitID] = nil
-	queenTime = queenTime - (burrowQueenTime/malus)
+	queenTime = math.max(queenTime - (burrowQueenTime/malus), 1)
 	waveBonus = waveBonus + (burrowWaveBonus/playerCount)
 	waveBonusDelta = waveBonusDelta + (burrowWaveBonus/playerCount)
 	Spring.SetGameRulesParam("queenTime", queenTime)
 	
 	local timeIncrease = (burrowTechTime/playerCount) * 4
 	totalTimeReduction = totalTimeReduction - timeIncrease
+	Spring.SetGameRulesParam("techTimeReduction", totalTimeReduction)
 	for chickenName, c in pairs(chickenTypes) do
 		c.time = c.time + timeIncrease
 		if c.obsolete then c.obsolete = c.obsolete + timeIncrease end

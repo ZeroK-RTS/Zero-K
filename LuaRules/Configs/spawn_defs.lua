@@ -52,7 +52,7 @@ burrowTechTime		= 10		-- how many seconds each burrow deducts from the tech time
 burrowRespawnChance = 0.15
 
 
-gameMode		= Spring.GetModOption("camode")
+gameMode		= true	--Spring.GetModOption("camode")
 tooltipMessage	= "Kill chickens and collect their eggs to get metal."
 mexes = {
   "cormex", 
@@ -261,7 +261,7 @@ difficulties['Chicken Eggs: Easy']   = Copy(difficulties['Chicken: Easy'])
 difficulties['Chicken Eggs: Normal'] = Copy(difficulties['Chicken: Normal'])
 difficulties['Chicken Eggs: Hard']   = Copy(difficulties['Chicken: Hard'])
 
-difficulties['Chicken: Very Easy'].chickenTypes.chicken_tiamat = nil
+difficulties['Chicken: Very Easy'].chickenTypes.chicken_tiamat.time = 999999
 
 --for i,v in pairs(difficulties) do v.eggs = true end
 
