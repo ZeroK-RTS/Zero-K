@@ -99,11 +99,11 @@ function widget:UnitEnteredLos(unitID, allyTeam)
 	local _,_,_,_,buildProgress = spGetUnitHealth( unitID )
 	local udef = udefTab[spGetUnitDefID(unitID)]
 		
-	if ( udef.isBuilding == true or udef.isFactory == true) and buildProgress ~= 1  then
+	if ( udef.isBuilding == true or udef.isFactory == true or udef.speed == 0) and buildProgress ~= 1  then
 		printDebug( "Ghost added")
-		
-		local x, y, z = spGetUnitPosition(unitID)
-		ghostSites[unitID] = { unitDefId = spGetUnitDefID(unitID), pos = {x, y+udef.losHeight, z}, teamId = allyTeam }
+		local x, _, z = spGetUnitPosition(unitID)
+		local y = Spring.GetGroundHeight(x,z) + 16 -- every single model is offset by 16, pretty retarded if you ask me.
+		ghostSites[unitID] = { unitDefId = spGetUnitDefID(unitID), pos = {x, y, z}, teamId = allyTeam }
 	end
 end
 
@@ -155,7 +155,7 @@ function DrawGhostSites()
 		local a, b, c = spGetPositionLosState(x, y, z)
 		local losState = b
 	
-		if ( losState == false ) then
+		if ( losState == false) then
 			--glow effect?
 			--gl.Blending(GL.SRC_ALPHA, GL.ONE)
 			    
