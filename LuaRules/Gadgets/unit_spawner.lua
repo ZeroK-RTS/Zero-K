@@ -1006,7 +1006,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	waveBonusDelta = waveBonusDelta + (burrowWaveBonus/playerCount)
 	Spring.SetGameRulesParam("queenTime", queenTime)
 	
-	local timeIncrease = (burrowTechTime/playerCount) * 4
+	local timeIncrease = (burrowTechTime/playerCount) * burrowRegressMult
 	totalTimeReduction = totalTimeReduction - timeIncrease
 	Spring.SetGameRulesParam("techTimeReduction", totalTimeReduction)
 	for chickenName, c in pairs(chickenTypes) do
@@ -1045,7 +1045,7 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if unitID == queenID then	--spSetUnitHealth(u, { health = spGetUnitHealth(u) + (damage * queenArmor) })
-		damage = damage/malus
+		damage = damage/(malus/2)
 		--spEcho("Damage reduced to "..damage)
 	end
 	return damage

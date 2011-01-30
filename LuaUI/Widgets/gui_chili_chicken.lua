@@ -165,7 +165,7 @@ local function WriteTooltipsOnce()
 	
 	local techTimePerBurrow = GetDifficultyValue('burrowTechTime')/gameInfo.malus
 	label_tech.tooltip = "Each burrow alive accelerates chicken tech progress by "..("%.1f"):format(techTimePerBurrow).. " seconds/wave\n"..
-		"Each burrow killed reduces chicken tech progress by "..("%.1f"):format(techTimePerBurrow * 4).. " seconds"
+		"Each burrow killed reduces chicken tech progress by "..("%.1f"):format(techTimePerBurrow * GetDifficultyValue("burrowRegressMult") ).. " seconds"
 end
 
 -- generates breakdown of kills and deaths for each chicken type, sorted by appearance order ingame
