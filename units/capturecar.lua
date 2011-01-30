@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[capturecar]],
-  name                = [[Dominator]],
+  name                = [[Dominatrix]],
   description         = [[Capture Vehicle]],
   acceleration        = 0.0444,
   bmcode              = [[1]],
@@ -19,7 +19,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Dominator captures enemies, turning then against their former allies. Multiple Dreamweavers can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominator cannot fire for 5 seconds. If a Dominator is destroyed all units it controls are freed.]],
+    helptext = [[The Dominatrix captures enemies, turning then against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 5 seconds. If a Dominatrix is destroyed all units it controls are freed.]],
   },
 
   defaultmissiontype  = [[Standby]],

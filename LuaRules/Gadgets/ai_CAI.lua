@@ -3457,7 +3457,8 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 		end
 	end
 	
-	local stratIndex = SelectRandomStrat(team)
+	local player = select(2, Spring.GetTeamInfo(team))
+	local stratIndex = SelectRandomStrat(player, team)
 	--Spring.Echo(a.buildConfig)
 	--ModifyTable(a.buildConfig, buildTasksMods)
 	strategies[stratIndex].buildTasksMods(aiTeamData[team].buildConfig)

@@ -306,14 +306,15 @@ local function SpawnStartUnit(teamID, playerID)
   -- get start unit
   
   -- no getting double comms now!
-  --[[
-  if Spring.GetGameRulesParam("commSpawned"..teamID) == 1 then return end
-  if (coop and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]) then
+  if (coop == 1 and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
+  or (coop == 0 and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
 	return 
-  end	
-  ]]--
-  local allyTeam = select(6, Spring.GetTeamInfo(teamID))
-  if not (commQuota[allyTeam] and commQuota[allyTeam] > 0) then return end
+  end
+  --if (coop == 1 and commSpawnedPlayer[playerID]) or (coop == 0 and commSpawnedTeam[teamID]) then
+	--return 
+  --end	
+  --local allyTeam = select(6, Spring.GetTeamInfo(teamID))
+  --if not (commQuota[allyTeam] and commQuota[allyTeam] > 0) then return end
   
   local startUnit = GetStartUnit(teamID, playerID)
 
@@ -332,12 +333,11 @@ local function SpawnStartUnit(teamID, playerID)
 		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
 	--end
 	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("gate", x, y, z) end
-	--[[
-	Spring.SetGameRulesParam("commSpawned"..teamID, 1)
-	commSpawnedTeam[teamID] = true
-	if playerID then commSpawnedPlayer[playerID] = true end
-	--]]
-	commQuota[allyTeam] = commQuota[allyTeam] - 1
+	Spring.SetGameRulesParam("commSpawnedTeam"..teamID, 1)
+	if playerID then Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1) end
+	--commSpawnedTeam[teamID] = true
+	--if playerID then commSpawnedPlayer[playerID] = true end
+	--commQuota[allyTeam] = commQuota[allyTeam] - 1
 	
     -- set the *team's* lineage root
     if Spring.SetUnitLineage then
@@ -563,9 +563,9 @@ function gadget:GameStart()
         playerlist = workAroundSpecsInTeamZero(playerlist, team)
         if playerlist and (#playerlist > 0) then
           for i=1,#playerlist do
-            local _,_,spec,_,allyTeam = Spring.GetPlayerInfo(playerlist[i])
-			commQuota[allyTeam] = commQuota[allyTeam] + 1
             if (not spec) then
+			  local _,_,spec,_,allyTeam = Spring.GetPlayerInfo(playerlist[i])
+			  commQuota[allyTeam] = commQuota[allyTeam] + 1
               SpawnStartUnit(team, playerlist[i])
             end
           end
@@ -605,52 +605,26 @@ function gadget:RecvLuaMsg(msg, playerID)
 	end
 end
 
-local function SetFaction(side, teamID)
+-- used by CAI
+local function SetFaction(side, playerID, teamID)
     teamSides[teamID] = side
+	playerSides[playerID] = side
 end
 GG.SetFaction = SetFaction
 
 function gadget:GameFrame(n)
-  -- reset resources in frame 33 because of pre 0.82 engine
-  --[[
-  if (n == 33) then
-	local teamIDs = Spring.GetTeamList()
-	for i=1,#teamIDs do
-		local teamID = teamIDs[i]
-		local gaiaID = Spring.GetGaiaTeamID()
-		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
-		if	teamID ~= gaiaID 
-			and ((not teamLuaAI) or teamLuaAI == "" or teamLuaAI == "CAI")
-			and (
-				startMode == "boost" 
-				or startMode == "limitboost" 
-				or startMode == "facplopboost"
-			)
-		then
-
-			Spring.SetTeamResource(teamID, 'energy', 0)
-			Spring.SetTeamResource(teamID, 'metal', 0)
-
-    else
-
-      if startMode == "classic" then
-        Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC)
-        Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC)
-      else
-        Spring.SetTeamResource(teamID, "energy", START_STORAGE)
-        Spring.SetTeamResource(teamID, "metal", START_STORAGE)
-      end
-
-    end
-
-	end
-  end
-  ]]--
   if scheduledSpawn[n] then
 	for _, spawnData in pairs(scheduledSpawn[n]) do
 		SpawnStartUnit(spawnData[1], spawnData[2])
 	end
   end
+end
+
+function gadget:Shutdown()
+	for i=1, 256 do
+		Spring.SetGameRulesParam("commPickedPlayer"..i, 0)
+		Spring.SetGameRulesParam("commPickedTeam"..i, 0)
+	end
 end
 
 --------------------------------------------------------------------

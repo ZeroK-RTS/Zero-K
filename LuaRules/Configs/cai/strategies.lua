@@ -166,7 +166,7 @@ strategies = {
 	},
 }
 
-local function SelectComm(team, strat)
+local function SelectComm(player, team, strat)
 	local count = strategies[strat].commanders.count
 	local rand = math.random()
 	
@@ -176,14 +176,14 @@ local function SelectComm(team, strat)
 		total = total + strategies[strat].commanders[i].chance
 		if rand < total then
 			commName = strategies[strat].commanders[i].ID
-			GG.SetFaction(commName, team)
+			GG.SetFaction(commName, player, team)
 			Spring.Echo("CAI: team "..team.." has selected strategy: "..strategies[strat].name..", using commander "..commName)
 			break
 		end
 	end
 end
 
-function SelectRandomStrat(team)
+function SelectRandomStrat(player, team)
 	local count = #strategies
 	local rand = math.random()
 	
@@ -192,7 +192,7 @@ function SelectRandomStrat(team)
 	for i = 1, count do
 		total = total + strategies[i].chance
 		if rand < total then
-			SelectComm(team, i)
+			SelectComm(player, team, i)
 			stratIndex = i
 			break
 		end
