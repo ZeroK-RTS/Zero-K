@@ -1,5 +1,5 @@
 hotspot center
-frame  anims/bold/cursorattack_0.png  0.05
+frame  anims/bold/cursorattack_0.png  0.4
 frame  anims/bold/cursorattack_1.png  0.05
 frame  anims/bold/cursorattack_2.png  0.05
 frame  anims/bold/cursorattack_3.png  0.05

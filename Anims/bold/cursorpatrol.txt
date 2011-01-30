@@ -1,0 +1,15 @@
+hotspot topleft
+frame  cursorpatrol_1.png  0.2
+frame  cursorpatrol_2.png  0.05
+frame  cursorpatrol_3.png  0.05
+frame  cursorpatrol_4.png  0.05
+frame  cursorpatrol_5.png  0.05
+frame  cursorpatrol_6.png  0.05
+frame  cursorpatrol_7.png  0.05
+frame  cursorpatrol_8.png  0.05
+frame  cursorpatrol_9.png  0.05
+frame  cursorpatrol_10.png  0.05
+frame  cursorpatrol_11.png  0.05
+frame  cursorpatrol_12.png  0.05
+frame  cursorpatrol_13.png  0.05
+frame  cursorpatrol_14.png  0.2
