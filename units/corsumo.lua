@@ -162,8 +162,8 @@ unitDef = {
 
       edgeEffectiveness       = 0,
       explosionGenerator      = [[custom:FLASH64]],
-      impulseBoost            = 0,
-      impulseFactor           = 0,
+      impulseBoost            = 1,
+      impulseFactor           = 0.7,
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,

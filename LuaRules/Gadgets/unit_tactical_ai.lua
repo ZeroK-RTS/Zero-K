@@ -241,7 +241,7 @@ local function swarmEnemy(unitID, enemy, enemyUnitDef, los, move, cQueue,n)
 	
 		if (#cQueue > 0 and cQueue[1].id == CMD_FIGHT) or move then
 			local ex,ey,ez -- enemy position
-			if move and #cQueue > 1 then
+			if move and #cQueue > 1 and cQueue[2].params[3] then
 				ex,ey,ez = cQueue[2].params[1],cQueue[2].params[2],cQueue[2].params[3]
 			else
 				ex,ey,ez = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3] 
