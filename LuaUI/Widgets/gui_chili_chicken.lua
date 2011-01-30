@@ -20,7 +20,6 @@ if (not Spring.GetGameRulesParam("difficulty")) then
   return false
 end
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -30,7 +29,6 @@ local widgetHandler   = widgetHandler
 local math            = math
 local table           = table
 
-local displayList
 local panelFont		  = "LuaUI/Fonts/komtxt__.ttf"
 local waveFont        = LUAUI_DIRNAME.."Fonts/Skrawl_40"
 local panelTexture    = ":n:"..LUAUI_DIRNAME.."Images/panel_small.png"
@@ -48,9 +46,9 @@ local waveTime
 local red             = "\255\255\001\001"
 local white           = "\255\255\255\255"
 
-local VFSMODE      		= VFS.RAW_FIRST
+-- include the unsynced (widget) config data
 local file 				= LUAUI_DIRNAME .. 'Configs/chickengui_config.lua'
-local configs 			= VFS.Include(file, nil, VFSMODE)
+local configs 			= VFS.Include(file, nil, VFS.RAW_FIRST)
 --local difficulties 		= configs.difficulties
 local roostName 		= configs.roostName
 local chickenColorSet 	= configs.colorSet
@@ -60,7 +58,7 @@ for chickenName, color in pairs(chickenColorSet) do
 	chickenNamesPlural[chickenName] = color..UnitDefNames[chickenName].humanName.."s\008"
 end
 
--- include the synced config data
+-- include the synced (gadget) config data
 VFS.Include("LuaRules/Configs/spawn_defs.lua", nil, VFS.ZIP)
 
 -- totally broken: claims it changes the data but doesn't!
@@ -70,6 +68,8 @@ for key, value in pairs(widget.difficulties[modes[Spring.GetGameRulesParam("diff
 end
 widget.difficulties = nil
 ]]--
+
+local difficulty = widget.difficulties[modes[Spring.GetGameRulesParam("difficulty")]]
 
 local rules = {
   "queenTime",
@@ -139,13 +139,20 @@ end
 
 -- explanation for string.char: http://springrts.com/phpbb/viewtopic.php?f=23&t=24952
 local function GetColor(percent)
-	local r = math.floor(32 + 223*percent/100)
-	local g = math.ceil(32 + 223*(100-percent)/100)
+	local midpt = (percent > 50)
+	local r, g
+	if midpt then 
+		r = 255
+		g = math.floor(255*(100-percent)/50)
+	else
+		r = math.floor(255*percent/50)
+		g = 255
+	end
 	return string.char(255,r,g,0)
 end
 
+-- gets the synced config setting for current difficulty
 local function GetDifficultyValue(value)
-	local difficulty = widget.difficulties[modes[Spring.GetGameRulesParam("difficulty")]]
 	return difficulty[value] or widget[value]
 end
 
@@ -163,7 +170,7 @@ end
 
 -- generates breakdown of kills and deaths for each chicken type, sorted by appearance order ingame
 local function MakeChickenBreakdown()
-  local chickenTypes = widget.difficulties[modes[Spring.GetGameRulesParam("difficulty")]].chickenTypes
+  local chickenTypes = difficulty.chickenTypes
   local t = {}
   local tNames = {}	-- reverse direction: get chicken name from final string
   for chickenName,colorInfo in pairs(chickenColorSet) do
@@ -202,7 +209,7 @@ local function UpdateRules()
 
 	-- anger tooltip
 	local tooltip = "Each burrow killed reduces time remaining by ".. ("%.1f"):format(GetDifficultyValue('burrowQueenTime')/gameInfo.malus) .." seconds"
-	local miniQueenTime = widget.difficulties[modes[Spring.GetGameRulesParam("difficulty")]].miniQueenTime[1]
+	local miniQueenTime = difficulty.miniQueenTime and difficulty.miniQueenTime[1]
 	if miniQueenTime then tooltip = tooltip .. "\nDragons arrive at ".. FormatTime(gameInfo.queenTime * miniQueenTime) end
 	label_anger.tooltip = tooltip
 	
