@@ -161,10 +161,7 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.5,0.1,0.0}, width=3.5, length=25, piece="nozzle2", onActive=true}},
    },
   corhurc2 = {
-    {class='AirJet', options={color={0.7,0.3,0.1}, width=3, length=25, piece="exhaustl1", onActive=true}},
-    {class='AirJet', options={color={0.7,0.3,0.1}, width=3, length=25, piece="exhaustr1", onActive=true}},
-    {class='AirJet', options={color={0.7,0.3,0.1}, width=3, length=25, piece="exhaustl2", onActive=true}},
-    {class='AirJet', options={color={0.7,0.3,0.1}, width=3, length=25, piece="exhaustr2", onActive=true}},
+    {class='AirJet', options={color={0.7,0.3,0.1}, width=5, length=40, piece="exhaust", onActive=true}},
     {class='Ribbon', options={width=1, piece="wingtipl"}},
     {class='Ribbon', options={width=1, piece="wingtipr"}},
   },

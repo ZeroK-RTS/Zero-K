@@ -27,7 +27,7 @@ unitDef = {
     helptext = [[The Pit Bull is a compact, resilent turret with a medium-range rocket launcher. When popped down, it is very difficult to destroy, making it a good choice when the enemy is using artillery.]],
   },
 
-  damageModifier                = 0.2,
+  damageModifier                = 0.15,
   defaultmissiontype            = [[GUARD_NOMOVE]],
   digger                        = [[1]],
   explodeAs                     = [[SMALL_BUILDINGEX]],

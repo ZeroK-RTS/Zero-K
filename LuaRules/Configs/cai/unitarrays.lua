@@ -102,8 +102,14 @@ local arty = {
 	"chickenblobber",
 }
 
+local counteredByAssaults = {
+	"puppy",
+	"cormist",
+}
+
 local prioritySos = {
 	"armfus",
+	"cafus",
 	"factoryshield",
     "factorycloak",
     "factoryveh",
@@ -127,6 +133,7 @@ jumperArray = {}
 skirmArray = {}
 riotArray = {}
 artyArray = {}
+counteredByAssaultsArray = {}
 prioritySosArray = {}
 
 local function CreateArray(source, target)
@@ -142,4 +149,5 @@ CreateArray(jumper, jumperArray)
 CreateArray(skirm, skirmArray)
 CreateArray(riot, riotArray)
 CreateArray(arty, artyArray)
+CreateArray(counteredByAssaults, counteredByAssaultsArray)
 CreateArray(prioritySos, prioritySosArray)
