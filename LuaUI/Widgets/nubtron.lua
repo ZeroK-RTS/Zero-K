@@ -1,3 +1,6 @@
+local playerID = Spring.GetMyPlayerID()
+local rank = playerID and select(9, Spring.GetPlayerInfo(playerID))
+
 -------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -10,7 +13,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 1, 
 --[[before enabling, read commit message 5482]]
-    enabled   = false  --  loaded by default?
+    enabled   = (rank and rank == 1) or true,
   }
 end
 

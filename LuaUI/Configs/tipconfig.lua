@@ -32,8 +32,8 @@ generalTips = {
 }
 
 unitTips = {
-	corclog = {"The \255\255\64\0Dirtbag\008 leaves a mound of earth when it dies, obstructing units (especially vehicles).", 3, 5},
-	capturecar = {"The \255\255\64\0Dreamweaver\008 capture vehicle can capture a single enemy unit, but control is lost if the capturing Dreamweaver dies.", 3, 5},
+	corclog = {"The \255\255\64\0Dirtbag\008 leaves a mound of earth when it dies, obstructing units (especially vehicles) and weapons.", 3, 5},
+	capturecar = {"The \255\255\64\0Dominatrix\008 capture vehicle can capture enemy units (with a 5 second cooldown between captures), but control is lost if the capturing Dominatrix dies.", 3, 5},
 	armcrabe = {"The \255\255\64\0Crabe\008 outranges basic defenses. It curls up into armored form when stationary, becoming a formidable defense turret.", 3, 5},
 	firewalker = {"The \255\255\64\0Firewalker\008 creates large clouds of fire which can seriously harm units - friend or foe - standing in them.", 3, 5},
 	

@@ -52,7 +52,6 @@ local myTeam = spGetMyTeamID()
 -- 2 = a bit of experience with ZK
 -- 3 = up to intermediate
 local helpLevel = rank and math.min(rank, 3) or 1
-Spring.Echo(rank)
 
 -- Chili classes
 local Chili

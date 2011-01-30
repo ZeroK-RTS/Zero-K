@@ -84,6 +84,7 @@ confdata.help_tree = {
 		'There is much more to come. Please enjoy using Crude Menu!'
 	},			
 	{'Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end },
+	{'Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end },
 }
 
 --[[

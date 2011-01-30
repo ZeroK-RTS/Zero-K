@@ -264,8 +264,8 @@ function widget:Initialize()
 		--padding = {2,2,2,2},
 		dockable = true,
 		name = "crudeplayerlist",
-		x = 300,  
-		y = 0,
+		right = 0,  
+		y = 50,
 		width  = 350,
 		height = 250,
 		autosize   = true;
