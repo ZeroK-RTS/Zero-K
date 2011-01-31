@@ -439,7 +439,6 @@ else  -- UNSYNCED
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local hostName = nil --planetwars hostname
 
 local spGetGameFrame 	= Spring.GetGameFrame
 local spGetMouseState 	= Spring.GetMouseState
@@ -524,15 +523,6 @@ function gadget:Initialize()
 	end
 	spSendCommands({'endgraph 0'})
 
-	-- planetwars init
-	local modOptions = Spring.GetModOptions()
-	if (modOptions) and modOptions.planetwars and modOptions.planetwars ~= '' then
-		local optionsRaw = modOptions.planetwars
-		optionsRaw = string.gsub(optionsRaw, '_', '=')
-		optionsRaw = Spring.Utilities.Base64Decode(optionsRaw)
-		options = assert(loadstring(optionsRaw))()
-		hostName = options.hostname
-	end
 
 	gadgetHandler:AddSyncAction("aw_GameOver", gadget.GameOver)
 end
@@ -671,9 +661,9 @@ function gadget:DrawScreen_()
 			local awardCount = 0
 			for awardType, record in spairs(awards) do
 				awardCount = awardCount + 1
-				if not sentToPlanetWars and hostName ~= nil then
+				if not sentToPlanetWars then
 					local planetWarsData = teamNames[team] ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
-					Spring.SendCommands("w "..hostName.." pwaward:".. planetWarsData)
+					Spring.SendCommands("wbynum 255 pwaward:".. planetWarsData)
 					Spring.Echo(planetWarsData)
 				end
 			end
