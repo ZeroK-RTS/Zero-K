@@ -316,7 +316,7 @@ local function printWeapons(unitDef)
 						wsTemp.bestTypeDamage = val
 					end
 					
-					wsTemp.burst = weaponDef.burst or 1
+					wsTemp.burst = weaponDef.salvoSize or 1
 					wsTemp.projectiles = weaponDef.projectiles or 1
 					wsTemp.dam = 0
 					wsTemp.damw = 0
