@@ -78,6 +78,10 @@ local startUnits = {
 	supportcomm = 'commsupport',
 	reconcomm = 'commrecon',
 }
+local altCommNames = {
+	corcom = 'commbattle',
+	armcom = 'commstrike',
+}
 
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, Spring.GetTeamInfo(gaiateam))
@@ -306,8 +310,8 @@ local function SpawnStartUnit(teamID, playerID)
   -- get start unit
   
   -- no getting double comms now!
-  if (coop == 1 and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
-  or (coop == 0 and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
+  if (coop == '1' and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1 )
+  or (coop == '0' and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) > 0.5) then 
 	return 
   end
   --if (coop == 1 and commSpawnedPlayer[playerID]) or (coop == 0 and commSpawnedTeam[teamID]) then
