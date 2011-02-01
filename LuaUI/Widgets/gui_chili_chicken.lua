@@ -160,9 +160,6 @@ end
 --------------------------------------------------------------------------------
 
 local function WriteTooltipsOnce()
-	label_burrows.tooltip = "Burrows spawn every ".. ("%.1f"):format(GetDifficultyValue('burrowSpawnRate')/gameInfo.malus) .." seconds\n"..
-		"When killed, each burrow has a ".. math.floor(GetDifficultyValue('burrowRespawnChance')*100) .."% chance of respawning"
-	
 	local techTimePerBurrow = GetDifficultyValue('burrowTechTime')/gameInfo.malus
 	label_tech.tooltip = "Each burrow alive accelerates chicken tech progress by "..("%.1f"):format(techTimePerBurrow).. " seconds/wave\n"..
 		"Each burrow killed reduces chicken tech progress by "..("%.1f"):format(techTimePerBurrow * GetDifficultyValue("burrowRegressMult") ).. " seconds"
@@ -207,11 +204,14 @@ local function UpdateRules()
 	label_tech:SetCaption("Tech time reduction : "..FormatTime(gameInfo["techTimeReduction"]))
 	label_chickens.tooltip = "Chickens spawn every ".. GetDifficultyValue('chickenSpawnRate') .." seconds\n"..MakeChickenBreakdown()
 
-	-- anger tooltip
+	-- tooltips, antilag
 	local tooltip = "Each burrow killed reduces time remaining by ".. ("%.1f"):format(GetDifficultyValue('burrowQueenTime')/gameInfo.malus) .." seconds"
 	local miniQueenTime = difficulty.miniQueenTime and difficulty.miniQueenTime[1]
-	if miniQueenTime then tooltip = tooltip .. "\nDragons arrive at ".. FormatTime(gameInfo.queenTime * miniQueenTime) end
+	if miniQueenTime then tooltip = tooltip .. "\nDragons arrive at ".. FormatTime(math.floor(gameInfo.queenTime * miniQueenTime)) end
 	label_anger.tooltip = tooltip
+	
+	label_burrows.tooltip = "Burrows spawn every ".. ("%.1f"):format(GetDifficultyValue('burrowSpawnRate')*0.25*(gameInfo[roostName.."Count"] + 1)/gameInfo.malus) .." seconds\n"..
+		"When killed, each burrow has a ".. math.floor(GetDifficultyValue('burrowRespawnChance')*100) .."% chance of respawning"
 	
 	if (gameInfo.lagging == 1) then label_mode:SetCaption(red.."Anti-Lag Enabled")
 	else label_mode:SetCaption("Mode: " .. configs.difficulties[gameInfo.difficulty]) end

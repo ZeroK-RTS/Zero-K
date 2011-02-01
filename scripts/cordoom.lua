@@ -106,7 +106,7 @@ function script.QueryWeapon1() return flare1 end
 function script.AimFromWeapon1() return cannon end
 
 function script.AimWeapon1( heading, pitch )
-if not on then return false end
+	if not on then return false end
 	Signal( aim )
 	SetSignalMask( aim )
 
@@ -119,8 +119,8 @@ if not on then return false end
 end
 
 function script.FireWeapon1()
-if not on then return false end
-	Show(flare1)
+--if not on then return false end
+	EmitSfx(flare1, 1024)
 	Move(cannon, z_axis, -24)
 	Move(cannon, z_axis, 0, 10)
 	Sleep(20)
@@ -136,7 +136,7 @@ end
 function script.AimFromWeapon2() return heatraybase end
 
 function script.AimWeapon2( heading, pitch )
-if not on then return false end
+	if not on then return false end
 	Signal( aim2 )
 	SetSignalMask( aim2 )
 	Turn( heatraybase, y_axis, heading, 3 )

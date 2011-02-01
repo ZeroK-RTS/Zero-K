@@ -54,6 +54,15 @@ unitDef = {
   script                        = [[cordoom.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDING]],
+
+  sfxtypes            = {
+
+    explosiongenerators = {
+      [[custom:LARGE_MUZZLE_FLASH_FX]],
+    },
+
+  },  
+  
   side                          = [[CORE]],
   sightDistance                 = 780,
   smoothAnim                    = true,
@@ -144,7 +153,7 @@ unitDef = {
       explosionGenerator      = [[custom:FLASHSMALLBUILDINGEX]],
       fireStarter             = 99,
       impulseBoost            = 0,
-      impulseFactor           = 0.65,
+      impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       proximityPriority       = 6,

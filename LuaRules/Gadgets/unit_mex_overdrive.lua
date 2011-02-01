@@ -1372,6 +1372,7 @@ function gadget:DrawWorld()
 		local myAllyID = Spring.GetMyAllyTeamID()
 
 		spec = spec or fullview
+		gl.Color(1,1,1,1)
 		gl.Texture(powerTexture )
 		for i = 1, lowPowerUnits.count do
 			local los = Spring.GetUnitLosState(lowPowerUnits.units[i], myAllyID, false)

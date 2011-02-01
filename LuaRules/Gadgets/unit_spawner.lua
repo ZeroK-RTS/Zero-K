@@ -215,9 +215,6 @@ GG.malus = malus
 echo("Chicken configured for "..playerCount.." players")
 
 burrowSpawnRate = burrowSpawnRate/malus/SetCount(computerTeams)
-minBurrowsIncrease = minBurrowsIncrease * malus
-minBurrowsMax	   = minBurrowsMax * malus
-if minBurrowsMax > maxBurrows then minBurrowsMax = maxBurrows end
 gracePeriod = math.max(gracePeriod - gracePenalty*(playerCount - 1), gracePeriodMin)
 
 local function DisableBuildButtons(unitID, buildNames)
@@ -749,16 +746,6 @@ local function Wave()
   end
   echo(burrowCount .. " burrows have reduced tech time by " .. math.ceil(timeReduction) .. " seconds")
   echo("Lifetime tech time reduction: " .. math.ceil(totalTimeReduction) .. " seconds")
-  
-  --minburrow handling
-  minBurrows = minBurrows + minBurrowsIncrease
-  if minBurrows > minBurrowsMax then minBurrows = minBurrowsMax end
-  if burrowCount < math.floor(minBurrows) then
-	local moreBurrows = math.min(minBurrows - burrowCount, malus)
-	moreBurrows = math.floor(moreBurrows/2)
-	if moreBurrows < 1 then moreBurrows = 1 end
-	for i=1,moreBurrows do SpawnBurrow() end
-  end
   
   local chicken1Name, chicken2Name = ChooseChicken(chickenTypes)
   local turret = ChooseChicken(defenders)

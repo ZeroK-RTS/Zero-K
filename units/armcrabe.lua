@@ -66,7 +66,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:ARMCRABE_FLARE]],
+    --  [[custom:ARMCRABE_FLARE]],
+	  [[custom:LARGE_MUZZLE_FLASH_FX]],
       [[custom:ARMCRABE_FLASH]],
       [[custom:ARMCRABE_WhiteLight]],
     },

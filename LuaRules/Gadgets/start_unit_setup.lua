@@ -705,6 +705,7 @@ function gadget:DrawWorld()
 	local myAllyID = Spring.GetMyAllyTeamID()
 
 	spec = spec or fullview
+	gl.Color(1,1,1,1)
 	gl.Texture(facplopTexture )
 	for id,_ in spairs(facplops) do
 		local los = spGetUnitLosState(id, myAllyID, false)

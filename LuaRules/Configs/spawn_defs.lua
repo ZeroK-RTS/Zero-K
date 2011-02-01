@@ -24,9 +24,6 @@ waveRatio            = 0.6       -- waves are composed by two types of chicken, 
 defenderChance       = 0.1       -- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
 quasiAttackerChance  = 0.6		-- subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
 maxBurrows           = 40
-minBurrows			 = 0		-- extra burrows (half of deficit or half of malus, whichever is lower) spawn each wave if there are presently fewer than this
-minBurrowsIncrease	 = 0.15		-- increase each wave (multiplied by malus)
-minBurrowsMax		 = 3.5    	-- multiplied by malus
 burrowEggs           = 15       -- number of eggs each burrow spawns
 --forceBurrowRespawn	 = false	-- burrows always respawn even if the modoption is set otherwise        
 queenSpawnMult       = 4         -- how many times bigger is a queen hatch than a normal burrow hatch
@@ -48,9 +45,9 @@ endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 burrowQueenTime		= 120		-- how much killing a burrow shaves off the queen timer, seconds (divided by malus)
 burrowWaveBonus		= 0.2		-- size of temporary bonus to add to next wave (divided by playercount)
 waveBonusDecay		= 0.05		-- linear rate at which burrow wave bonus decreases
-burrowTechTime		= 15		-- how many seconds each burrow deducts from the tech time per wave (divided by playercount)
+burrowTechTime		= 10		-- how many seconds each burrow deducts from the tech time per wave (divided by playercount)
 burrowRespawnChance = 0.15
-burrowRegressMult	= 5			-- multiply by burrowTechTime to get how much killing a burrow sets back chicken timer (divided by playercount)
+burrowRegressMult	= 6			-- multiply by burrowTechTime to get how much killing a burrow sets back chicken timer (divided by playercount)
 
 
 gameMode		= true	--Spring.GetModOption("camode")
@@ -168,8 +165,6 @@ difficulties = {
 	queenMorphName	 = '',
 	miniQueenName	 = "chicken_tiamat",
 	maxBurrows       = 12,	
-	minBurrows		 = 0,
-	minBurrowsIncrease = 0,
   },
 
   ['Chicken: Easy'] = {
