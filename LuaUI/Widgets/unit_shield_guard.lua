@@ -51,12 +51,12 @@ local shieldRangeSafety = 20 -- how close to the edge shields should wait at
 local shieldReactivateRange = 100 -- how far from the edge shields should reactivate at
 local shieldieeStopDis = 120 -- how far from the shield the shieldiees should stop
 
-local shieldRadius = {core_spectre = 300}
+local shieldRadius = {core_spectre = 300, corthud = 80}
+local shieldWait = {core_spectre = true, corthud = false}
 
 local shieldArray = { 
-
   "core_spectre",
-
+  "corthud",
 }
 
 
@@ -70,50 +70,50 @@ local shieldArray = {
 
 local function updateShields()
     
-  for unit, i in pairs(shields) do
+	for unit, i in pairs(shields) do
      
-    i.ux,i.uy,i.uz = spGetUnitPosition(unit)
+		i.ux,i.uy,i.uz = spGetUnitPosition(unit)
  
-    spGiveOrderToUnit(unit, CMD_REMOVE, {1}, {"alt"} )
-    spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, {"alt"} )
+		if i.waits then
+			spGiveOrderToUnit(unit, CMD_REMOVE, {1}, {"alt"} )
+			spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, {"alt"} )
   
-    local cQueue = spGetCommandQueue(unit) 
+			local cQueue = spGetCommandQueue(unit) 
 
-    if (#cQueue ~= 0) and (i.folCount ~= 0) then
-  
-      local wait = (cQueue[1].id == CMD_WAIT)
+			if (#cQueue ~= 0) and (i.folCount ~= 0) then
+			
+				local wait = (cQueue[1].id == CMD_WAIT)
 	
-	  if wait then
+				if wait then
 	  
-		wait = false
-		for cid, j in pairs(i.shieldiees) do
-		  local dis = spGetUnitSeparation(unit,cid)
-		  if dis > i.reactiveRange then
-			wait = true
-		  end
+					wait = false
+					for cid, j in pairs(i.shieldiees) do
+						local dis = spGetUnitSeparation(unit,cid)
+						if dis > i.reactiveRange then
+							wait = true
+						end
+					end
+	  
+					if (not wait) then
+						spGiveOrderToUnit(unit,CMD_WAIT,{},CMD_OPT_RIGHT)
+					end
+				else
+	
+					wait = false
+					for cid, j in pairs(i.shieldiees) do
+						local dis = spGetUnitSeparation(unit,cid)
+						if dis > i.range then
+							wait = true
+						end
+					end
+			
+					if wait then
+						spGiveOrderToUnit(unit,CMD_WAIT,{},CMD_OPT_RIGHT)
+					end
+				end
+			end
 		end
-	  
-	    if (not wait) then
-	      spGiveOrderToUnit(unit,CMD_WAIT,{},CMD_OPT_RIGHT)
-	    end
-      else
-	
-        wait = false
-        for cid, j in pairs(i.shieldiees) do
-		  local dis = spGetUnitSeparation(unit,cid)
-	      if dis > i.range then
-	        wait = true
-	      end
-	    end
-	  
-	    if wait then
-	      spGiveOrderToUnit(unit,CMD_WAIT,{},CMD_OPT_RIGHT)
-	    end
-	  end
-	  
 	end
-	
-  end
   
 end
 
@@ -124,7 +124,7 @@ end
 local function updateFollowers()
 
   for unit, v in pairs(follower) do
-  
+
 	if (v.fol) then -- give move orders to shieldiees
 	  local dis = spGetUnitSeparation(unit,v.fol)
 	  if dis > v.range then
@@ -233,11 +233,13 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 		local ux,uy,uz = spGetUnitPosition(unitID)
 		local speed = ud.speed/30
 		local shieldRange = shieldRadius[ud.name]
+		local waits = shieldWait[ud.name]
 		shields[unitID] = {id = unitID, ux = ux, uy = uy, uz = uz, 
 		range = shieldRange-shieldRangeSafety, 
 		reactiveRange = shieldRange-shieldReactivateRange, 
 		shieldiees = {},
 		folCount = 0,
+		waits = waits,
 		selfVel = speed, 
 		maxVel = speed,
 		maxVelID = -1
