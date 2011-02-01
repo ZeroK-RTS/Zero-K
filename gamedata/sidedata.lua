@@ -17,10 +17,10 @@ local sideData = {
     name      = 'Robots',
     startunit = 'armcom',
   },
-  [2] = {
-    name      = 'Chicken (Robots if disabled)',
-    startunit = 'chickenbroodqueen',
-  },
+--  [2] = {
+--    name      = 'Chicken (Robots if disabled)',
+--    startunit = 'chickenbroodqueen',
+--  },
 }
 
 --------------------------------------------------------------------------------
