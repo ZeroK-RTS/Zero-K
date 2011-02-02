@@ -370,6 +370,17 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 --]]
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Min Build Range back to what it used to be
+-- 
+for name, ud in pairs(UnitDefs) do
+	if ud.builddistance and ud.builddistance < 128 and name ~= "armasp" then
+		ud.builddistance = 128 
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --  No leveling ground
