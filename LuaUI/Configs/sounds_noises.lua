@@ -930,6 +930,17 @@ local sounds = {
 			[1] = "sonar_select",
 		},
 	},
+	corrad = {
+		select = {
+			[1] = "radar_select",
+		},
+	},
+	armarad = {
+		select = {
+			[1] = "radar_select",
+		},
+	},
+	
 	corjamt = {
 		select = {
 			[1] = "shield_select",

@@ -434,7 +434,11 @@ function widget:Update()
 		local unitID = visibleSelected[i]
 		dirx, _, dirz = spGetUnitDirection(unitID)
 		if (dirz ~= nil) then
-			degrot[unitID] = 180 - math_acos(dirz) * rad_con
+			if dirx < 0 then
+				degrot[unitID] = 180 - math_acos(dirz) * rad_con
+			else
+				degrot[unitID] = 180 + math_acos(dirz) * rad_con
+			end
 		end
 	end
 end

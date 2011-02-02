@@ -71,4 +71,5 @@ sub_select.wav - Nanoblobs
 light_something_select.wav - Nanoblobs
 
 windmill.wav - Golgotha and PD sound from OpenGameArt
+radar_select.wav - freeloops PD
 
