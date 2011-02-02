@@ -54,11 +54,6 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   vsy = viewSizeY
 end
 
-local function printDebug( value )
-	if ( debug ) then Echo( value )
-	end
-end
-
 --local gameDate = os.date(t)
 --if (gameDate.month == 4) and (gameDate.day == 1) then optionData.communism.sound = "LuaUI/Sounds/communism/tetris.wav" end
 
@@ -85,6 +80,11 @@ local function posterSize(num)
 end
 
 -- needs to be a global so chili can reach out and call it?
+function printDebug( value )
+	if ( debug ) then Echo( value )
+	end
+end
+
 function Close(commPicked)
 	printDebug("<gui_startup_info_selector DEBUG >: closing")
 	if not commPicked then Spring.SendLuaRulesMsg("faction:nova") end

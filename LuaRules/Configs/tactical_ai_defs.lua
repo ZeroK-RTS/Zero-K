@@ -154,7 +154,10 @@ local fleeables = {
 
 local armedLand = {}
 for name,data in pairs(UnitDefNames) do
-	if data.canAttack and not data.canFly then armedLand[name] = true end
+	if data.canAttack and (not data.canFly) 
+	and data.weapons[1] and data.weapons[1].onlyTargets.land then
+		armedLand[name] = true 
+	end
 end
 
 -- searchRange(defaults to 800): max range of GetNearestEnemy for the unit.

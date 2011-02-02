@@ -12,26 +12,7 @@ end
 
 
 -- partially based on Spring's unit spawn gadget
-
--- storage
-local START_STORAGE_CLASSIC=1000
-local START_STORAGE=500
-local START_STORAGE_FACPLOP=1000
-
-local BOOST_RATE = 2.0
-local START_BOOST=600
-
-local START_ENERGY_FACPLOP=500
-local START_METAL_FACPLOP=500
-
-local OVERDRIVE_BUFFER=10000
-
-local EXCLUDED_UNITS = {
-  [ UnitDefNames['terraunit'].id ] = true,
-}
-
-local DEFAULT_UNIT = "armcom"		--FIXME: hardcodey until I cba to identify precise source of problem
-
+include "LuaRules/Configs/start_setup.lua"
 
 if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage
   if not gadgetHandler:IsSyncedCode() then
@@ -68,20 +49,8 @@ end
 local shuffleMode = Spring.GetModOption("shuffle", false, "off")
 
 local coop = false
-coop = Spring.GetModOption("coop", false, false)
-
-include "LuaRules/Configs/start_setup.lua"
-
-local startUnits = {
-	nova = 'armcom',
-	logos = 'corcom',
-	supportcomm = 'commsupport',
-	reconcomm = 'commrecon',
-}
-local altCommNames = {
-	corcom = 'commbattle',
-	armcom = 'commstrike',
-}
+coop = tonumber(Spring.GetModOption("coop", false, false))
+--Spring.Echo(coop == 1, coop == 0)
 
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, Spring.GetTeamInfo(gaiateam))
@@ -310,8 +279,8 @@ local function SpawnStartUnit(teamID, playerID)
   -- get start unit
   
   -- no getting double comms now!
-  if (coop == '1' and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1 )
-  or (coop == '0' and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) > 0.5) then 
+  if (coop == 1 and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
+  or (coop == 0 and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1) then 
 	return 
   end
   --if (coop == 1 and commSpawnedPlayer[playerID]) or (coop == 0 and commSpawnedTeam[teamID]) then
@@ -561,7 +530,7 @@ function gadget:GameStart()
 	
 
     if team ~= gaiateam then
-      if coop then
+      if coop == 1 then
         -- 1 start unit per player
         local playerlist = Spring.GetPlayerList(team, true)
         playerlist = workAroundSpecsInTeamZero(playerlist, team)
