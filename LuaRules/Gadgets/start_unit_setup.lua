@@ -30,6 +30,8 @@ local EXCLUDED_UNITS = {
   [ UnitDefNames['terraunit'].id ] = true,
 }
 
+local fakeunitDefID = UnitDefNames["fakeunit"].id
+
 local DEFAULT_UNIT = "armcom"		--FIXME: hardcodey until I cba to identify precise source of problem
 
 
@@ -329,12 +331,20 @@ local function SpawnStartUnit(teamID, playerID)
     -- get facing direction
     local facing = GetFacingDirection(x, z, teamID)
 
+	-- CREATE FAKE UNIT
+	local fakeUnitID = Spring.CreateUnit(fakeunitDefID, 0, 0, 0, 0, teamID)
+	Spring.SetUnitNoSelect(fakeUnitID,true)
+	Spring.MoveCtrl.Enable(fakeUnitID)
+	Spring.SetUnitNoDraw(fakeUnitID, true)
+	Spring.MoveCtrl.SetPosition(fakeUnitID, -20000, 20000, -20000)
+	Spring.MoveCtrl.Disable(fakeUnitID)
+	
     -- CREATE UNIT
 	local unitID
     --if Spring.GetGameFrame() <= 1 then
 	--	unitID = Spring.CreateUnit(startUnit, x, y, z, facing, teamID)
 	--else
-		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
+	unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
 	--end
 	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("gate", x, y, z) end
 	Spring.SetGameRulesParam("commSpawnedTeam"..teamID, 1)
