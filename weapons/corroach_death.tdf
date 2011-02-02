@@ -8,7 +8,7 @@
   explosiongenerator=custom:ROACHPLOSION;
   explosionSpeed=10000;
   impulseboost=0;
-  impulsefactor=0.4;
+  impulsefactor=0.3;
   interceptedbyshieldtype=1;
   range=450;
   reloadtime=3.6;

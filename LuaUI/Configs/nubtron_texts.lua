@@ -50,16 +50,16 @@ return {
 			guardFac = [[Have the constructor guard your Bot Lab by right clicking on the Lab. The constructor will assist it until you give it a different order.]],
 			tutorialEnd = [[This is the end of the tutorial. It is now safe to shut off Nubtron. Goodbye! (Click next to restart tutorial)]],
 			
-			selectBuild_m = [[Select the #replace# from your build menu (build-icon shown here).]],
+			selectBuild_m = [[Select the #replace# from your build menu (build-icon shown here)]],
 			build_m = [[You are now building a #replace#. <Wait for it to finish.>]],
 			
 			finish = [[You have an unfinished #replace# shown by the red circles. <Right click on it to finish building>. ]],
-			selectBuild = [[Select the #replace# from your build menu (build-icon shown here). ]],
+			selectBuild = [[Select the #replace# from your build menu (build-icon shown here)]],
 			start = [[<Place it near your other structures.> It will turn red if you try to place it on uneven terrain.]],
 			build = [[Good work! You are now building a #replace#. <Wait for it to finish.>]],
 			
 			startMex = [[Place it on a green patch.]],
-			selectBuildMex = [[The build-icon for the mex is shown to the right. Select it in your build menu on the left.]],
+			selectBuildMex = [[The build-icon for the mex is shown to the right. Select it in your build menu on the left under the Econ tab.]],
 			startBotLab = [[Before placing it, you can rotate the structure with the <[> and <]> keys. <Turn it and place it so that units can easily exit the front>. It will turn red if you try to place it on uneven terrain.]],
 		}
 	}, --end en

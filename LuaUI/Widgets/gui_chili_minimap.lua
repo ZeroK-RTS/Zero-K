@@ -145,7 +145,9 @@ MakeMinimapWindow = function()
 		window_minimap:Dispose()
 	end
 	
-	local w,h = 300,200+iconsize
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	
+	local w,h = screenWidth*0.32,screenHeight*0.4+iconsize
 	if (options.use_map_ratio.value) then
 		w,h = AdjustToMapAspectRatio(w,h)
 	end

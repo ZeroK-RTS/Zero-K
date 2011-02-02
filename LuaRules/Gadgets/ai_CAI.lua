@@ -4,7 +4,7 @@
 function gadget:GetInfo()
   return {
     name      = "CAI",
-    desc      = "AI that plays normal ZK sides",
+    desc      = "AI that plays normal ZK",
     author    = "Google Frog",
     date      = "June 8 2010",
     license   = "GNU GPL, v2 or later",

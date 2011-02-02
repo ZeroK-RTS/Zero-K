@@ -459,6 +459,8 @@ function widget:Initialize()
 	
 	local inputsize = 33
 	
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	
 	stack_console = StackPanel:New{
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
@@ -505,10 +507,10 @@ function widget:Initialize()
 		padding = {0,0,0,0},
 		dockable = true,
 		name = "chat",
-		x = 300,  
+		x = screenWidth*0.3,  
 		y = 0,
-		width  = 350,
-		height = 250,
+		width  = screenWidth*0.35,
+		height = screenHeight*0.25,
 		--parent = screen0,
 		--visible = false,
 		--backgroundColor = settings.col_bg,

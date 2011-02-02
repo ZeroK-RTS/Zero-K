@@ -1000,7 +1000,7 @@ function widget:Initialize()
 		parent = screen0,
 		name   = 'integralwindow';
 		color = {0, 0, 0, 0},
-		width = 420;
+		width = 450;
 		height = 200; -- keep an aspect ratio regardless of screen ratio
 		x = 0; 
 		bottom = 0;

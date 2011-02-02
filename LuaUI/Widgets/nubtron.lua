@@ -122,6 +122,9 @@ local lang = 'en'
 
 local classesByUnit = {}
 local unitClasses, unitClassNames, mClasses, steps, tasks = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_config.lua", nil, VFS.RAW_FIRST)
+
+local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -377,6 +380,19 @@ local function remUnfinishedUnit(unitClass, unitID)
 	end
 end
 
+local function addTabText(unitDefID)
+	if factory_commands[-unitDefID] then
+		return " under the Factory tab."
+	elseif econ_commands[-unitDefID] then
+		return " under the Econ tab."
+	elseif defense_commands[-unitDefID] then
+		return " under the Defense tab."
+	elseif special_commands[-unitDefID] then
+		return " under the Special tab."
+	end
+	return " under the Units tab."
+end
+
 local function setup_text(lang)
 	local texts = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_texts.lua", nil, VFS.RAW_FIRST)
 	local texts_lang = texts[lang]
@@ -396,11 +412,11 @@ local function setup_text(lang)
 	for unitClass, units in pairs(unitClasses) do
 		unitClassName = unitClassNames[unitClass]
 		if mClasses[unitClass] then
-			steps['selectBuild'.. unitClass].message 	= texts_lang.steps.selectBuild_m:gsub('#replace#', unitClassName) 
+			steps['selectBuild'.. unitClass].message 	= texts_lang.steps.selectBuild_m:gsub('#replace#', unitClassName) .. addTabText(UnitDefNames[units[1]].id)
 			steps['build'.. unitClass].message 			= texts_lang.steps.build_m:gsub('#replace#', unitClassName)
 		else
 			steps['finish'.. unitClass].message			= texts_lang.steps.finish:gsub('#replace#', unitClassName)
-			steps['selectBuild'.. unitClass].message	= texts_lang.steps.selectBuild:gsub('#replace#', unitClassName)
+			steps['selectBuild'.. unitClass].message	= texts_lang.steps.selectBuild:gsub('#replace#', unitClassName) .. addTabText(UnitDefNames[units[1]].id)
 			steps['start'.. unitClass].message			= texts_lang.steps.start:gsub('#replace#', unitClassName)
 			steps['build'.. unitClass].message			= texts_lang.steps.build:gsub('#replace#', unitClassName)
 		end
@@ -507,7 +523,7 @@ local function SetupNubtronWindow()
 		--color = {0, 0, 0, 0},
 		width = 550;
 		height = imgsize+20; 
-		x = 430; 
+		x = 450; 
 		bottom = 0;
 		dockable = false;
 		draggable = true,

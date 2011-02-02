@@ -1004,7 +1004,7 @@ function widget:Initialize()
 		name   = 'unitinfo';
 		x      = 0;
 		bottom = 200;
-		clientHeight = window_height;
+		clientHeight = 120;
 		clientWidth  = 400;
 		dockable = true,
 		--autosize    = true;

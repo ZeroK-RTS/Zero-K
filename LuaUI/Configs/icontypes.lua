@@ -428,6 +428,10 @@ local icontypes = {
     bitmap='icons/t3generic.dds',
     size=2.5,
   },
+  t3special = {
+    bitmap='icons/t3special.png',
+    size=2.5,
+  },
   t3arty = {
     bitmap='icons/t3arty.dds',
     size=2.5,
