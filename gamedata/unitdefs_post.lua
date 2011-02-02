@@ -358,6 +358,18 @@ for name, ud in pairs(UnitDefs) do
   end
 end --for
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Cost Checking
+-- 
+--[[
+for name, ud in pairs(UnitDefs) do
+	if ud.buildcostmetal ~= ud.buildcostenergy or ud.buildtime ~= ud.buildcostenergy then
+		Spring.Echo("Inconsistent Cost for " .. ud.name)
+	end
+end
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --  No leveling ground

@@ -231,6 +231,16 @@ local function normaliseImportance(array)
 	end
 end
 
+-- is the enemy unitID position knowable to an allyteam
+local function isUnitVisible(unitID, allyTeam)
+	if spValidUnitID(unitID) then
+		local state = Spring.GetUnitLosState(unitID,allyTeam)
+		return state.los or state.radar --(state.radar and state.typed) -- typed for has unit icon
+	else
+		return false
+	end
+end
+
 -- updates the economy information of the team. Averaged over a few queries
 local function updateTeamResourcing(team)
 
@@ -1465,7 +1475,6 @@ local function gatherBattlegroupNeededAA(team, index)
 		end
 	end
 
-
 end
 
 local function battleGroupHandler(team, frame, slowUpdate)
@@ -1546,16 +1555,15 @@ local function battleGroupHandler(team, frame, slowUpdate)
 		for unitID,_ in pairs(data.aa) do
 			spGiveOrderToUnit(unitID, CMD_MOVE , {averageX,gy,averageZ}, {})
 		end
-		
+
 		if data.tempTarget then
-			if spValidUnitID(data.tempTarget) then
+			if spValidUnitID(data.tempTarget) and isUnitVisible(data.tempTarget,at.aTeamOnThisTeam) then
 				local x, y, z = spGetUnitPosition(data.tempTarget)
 				for unitID,_ in pairs(data.unit) do
 					if not data.aa[unitID] then
 						spGiveOrderToUnit(unitID, CMD_FIGHT , {x,y,z}, {})
 					end
 				end
-				return
 			else
 				data.tempTarget = false
 			end
@@ -2441,7 +2449,7 @@ local function callForMobileDefence(team ,unitID, attackerID, callRange, priorit
 		end
 		local battleGroup = a.battleGroup
 		for i = 1, battleGroup.count do
-			if battleGroup[i].respondToSOSpriority <= priority then
+			if battleGroup[i].respondToSOSpriority <= priority and disSQ(dx, battleGroup[i].aX, dz, battleGroup[i].aZ) < callRange^2 then
 				battleGroup[i].tempTarget = attackerID
 			end
 		end

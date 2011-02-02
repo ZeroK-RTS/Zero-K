@@ -181,9 +181,8 @@ factionBuildConfig = {
 				
 				[3] = { -- raider
 					importanceMult = 1,
-					count = 2,
-					[1] = {ID = UnitDefNames['armflea'].id, chance = 0.7},
-					[2] = {ID = UnitDefNames['arm_venom'].id, chance = 0.3},
+					count = 1,
+					[1] = {ID = UnitDefNames['armflea'].id, chance = 1},
 				},
 				
 				[4] = { -- arty
@@ -199,13 +198,13 @@ factionBuildConfig = {
 				},
 				
 				[6] = { -- skirm
-					importanceMult = 1.2,
+					importanceMult = 1.5,
 					count = 1,
 					[1] = {ID = UnitDefNames['armsptk'].id, chance = 1},
 				},
 				
 				[7] = { -- riot
-					importanceMult = 1,
+					importanceMult = 0.3,
 					count = 1,
 					[1] = {ID = UnitDefNames['arm_venom'].id, chance = 1},
 				},
@@ -290,8 +289,9 @@ factionBuildConfig = {
 				
 				[2] = { -- scout
 					importanceMult = 2,
-					count = 1,
-					[1] = {ID = UnitDefNames['corclog'].id, chance = 1},
+					count = 2,
+					[1] = {ID = UnitDefNames['corclog'].id, chance = 0.4},
+					[2] = {ID = UnitDefNames['corak'].id, chance = 0.6},
 				},
 				
 				[3] = { -- raid
@@ -307,13 +307,13 @@ factionBuildConfig = {
 				},
 				
 				[5] = { --assault
-					importanceMult = 1,
+					importanceMult = 1.2,
 					count = 1,
 					[1] = {ID = UnitDefNames['corthud'].id, chance = 1},
 				},	
 				
 				[6] = { -- skirm
-					importanceMult = 1.2,
+					importanceMult = 1.3,
 					count = 1,
 					[1] = {ID = UnitDefNames['corstorm'].id, chance = 1},
 				},

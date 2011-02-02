@@ -299,7 +299,7 @@ function StaticParticles:Visible()
   if (self.unit and not self.worldspace) then
     local ux,uy,uz = spGetUnitViewPosition(self.unit)
     pos[1],pos[2],pos[3] = pos[1]+ux,pos[2]+uy,pos[3]+uz
-    radius = radius + spGetUnitRadius(self.unit)
+    radius = radius + (spGetUnitRadius(self.unit) or 0)
     losState = spGetUnitLosState(self.unit, LocalAllyTeamID)
   end
   if (losState==nil) then
