@@ -49,6 +49,7 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 local spGetUnitDefID	  = Spring.GetUnitDefID
 local spGetUnitSeparation = Spring.GetUnitSeparation
 local spGetGameFrame	  = Spring.GetGameFrame
+local spSetUnitHealth	  = Spring.SetUnitHealth
 
 local echo = Spring.Echo
 
@@ -713,7 +714,6 @@ local function SpawnMiniQueen()
 end
 
 local function Wave()
-  
   local t = spGetGameSeconds()
   
   if (Spring.GetTeamUnitCount(chickenTeamID) > maxChicken or lagging) then
@@ -767,6 +767,50 @@ local function Wave()
   if (waveBonus < 0.05) and (waveBonus > -0.05) then waveBonus = 0 end
   waveBonusDelta = 0
   return chicken1Name, chicken2Name, chicken1Number, chicken2Number
+end
+
+local function MorphQueen()
+	--store values to be copied
+	local tempID = queenID
+	local x, y, z = spGetUnitPosition(tempID)
+	local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(tempID)
+	local xp = Spring.GetUnitExperience(tempID)
+	local heading = Spring.GetUnitHeading(tempID)
+	local cmdQueue = spGetUnitCommands(tempID)
+	
+	--perform switcheroo
+	queenID = nil
+	Spring.DestroyUnit(tempID, false, true)
+	if morphed == true then
+		queenID = spCreateUnit(queenName, x, y, z, "n", chickenTeamID)
+	else
+		queenID = spCreateUnit(queenMorphName, x, y, z, "n", chickenTeamID)
+	end
+	morphed = not morphed
+	SetMorphFrame()
+	
+	--copy values
+	--position
+	Spring.MoveCtrl.Enable(queenID)
+	--Spring.MoveCtrl.SetPosition(queenID, x, y, z)	--needed to reset y-axis position
+	--Spring.SpawnCEG("dirt", x, y, z)	--helps mask the transition
+	Spring.MoveCtrl.SetHeading(queenID, heading)
+	Spring.MoveCtrl.Disable(queenID)
+	local env = Spring.UnitScript.GetScriptEnv(queenID)
+	Spring.UnitScript.CallAsUnit(queenID, env.MorphFunc)
+	--health handling
+	local _,newMaxHealth         = Spring.GetUnitHealth(queenID)
+	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
+	local hpercent = newHealth/newMaxHealth
+	--if newHealth <= 1 then newHealth = 1 end
+	spSetUnitHealth(queenID, {health = newHealth, build = buildProgress})
+	--orders, XP
+	Spring.SetUnitExperience(queenID, xp)
+	if (cmdQueue and cmdQueue[1]) then		--copy order queue
+		for i=1,#cmdQueue do
+			spGiveOrderToUnit(queenID, cmdQueue[i].id, cmdQueue[i].params, cmdQueue[i].options)
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -918,45 +962,7 @@ function gadget:GameFrame(n)
 	--morphs queen
 	if n == morphFrame then
 		--Spring.Echo("Morphing queen")
-		--store values to be copied
-		local tempID = queenID
-		local x, y, z = spGetUnitPosition(tempID)
-		local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(tempID)
-		local xp = Spring.GetUnitExperience(tempID)
-		local heading = Spring.GetUnitHeading(tempID)
-		local cmdQueue = spGetUnitCommands(tempID)
-		
-		--perform switcheroo
-		queenID = nil
-		Spring.DestroyUnit(tempID, false, true)
-		if morphed == true then
-			queenID = spCreateUnit(queenName, x, y, z, "n", chickenTeamID)
-		else
-			queenID = spCreateUnit(queenMorphName, x, y, z, "n", chickenTeamID)
-		end
-		morphed = not morphed
-		SetMorphFrame()
-		
-		--copy values
-		--position
-		Spring.MoveCtrl.Enable(queenID)
-		--Spring.MoveCtrl.SetPosition(queenID, x, y, z)	--needed to reset y-axis position
-		--Spring.SpawnCEG("dirt", x, y, z)	--helps mask the transition
-		Spring.MoveCtrl.SetHeading(queenID, heading)
-		Spring.MoveCtrl.Disable(queenID)
-		local env = Spring.UnitScript.GetScriptEnv(queenID)
-		Spring.UnitScript.CallAsUnit(queenID, env.MorphFunc)
-		--health handling
-		local _,newMaxHealth         = Spring.GetUnitHealth(queenID)
-		local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
-		local hpercent = newHealth/newMaxHealth
-		--if newHealth <= 1 then newHealth = 1 end
-		Spring.SetUnitHealth(queenID, {health = newHealth, build = buildProgress})
-		--orders, XP
-		Spring.SetUnitExperience(queenID, xp)
-		if (cmdQueue and cmdQueue[1]) then		--copy order queue
-			spGiveOrderToUnit(queenID, cmdQueue[1].id, cmdQueue[1].params, cmdQueue[1].options)
-		end
+		MorphQueen()
 	end
 end
 
