@@ -107,7 +107,7 @@ unitDef = {
 
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:flash1red]],
-	  heightMod				  = 0.5,
+	  --heightMod				  = 0.5,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
