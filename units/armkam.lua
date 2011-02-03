@@ -98,6 +98,7 @@ unitDef = {
       coreThickness           = 0.3,
       craterBoost             = 0,
       craterMult              = 0,
+	  --cylinderTargetting	  = 1,
 
       damage                  = {
         default = 6,
@@ -106,6 +107,7 @@ unitDef = {
 
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:flash1red]],
+	  heightMod				  = 0.5,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
