@@ -50,6 +50,7 @@ local shuffleMode = Spring.GetModOption("shuffle", false, "off")
 
 local coop = false
 coop = tonumber(Spring.GetModOption("coop", false, false))
+if coop == nil then coop = 0 end
 --Spring.Echo(coop == 1, coop == 0)
 
 local gaiateam = Spring.GetGaiaTeamID()

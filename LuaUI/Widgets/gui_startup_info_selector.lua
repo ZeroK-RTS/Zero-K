@@ -32,7 +32,7 @@ local Echo	= Spring.Echo
 local spGetSpectatingState	= Spring.GetSpectatingState()
 local spIsReplay			= Spring.IsReplay()
 
-local coop = Spring.GetModOptions().coop
+local coop = Spring.GetModOptions().coop or 0
 
 local Chili
 local Window
