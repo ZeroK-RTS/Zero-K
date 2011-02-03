@@ -76,6 +76,7 @@ local riotRangeSkirmieeArray = {
 	["corsh"] = true,
 	["coresupp"] = true,
 	["armcomdgun"] = true,
+	["dante"] = true,
 }
 
 local medRangeSkirmieeArray = {
@@ -112,6 +113,8 @@ local longRangeSkirmieeArray = {
 	["nsclash"] = true, -- hover janus
 	["capturecar"] = true,
 	["chickenc"] = true,
+	["armbanth"] = true,
+	["gorg"] = true,
 }
 
 local artyRangeSkirmieeArray = {
