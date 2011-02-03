@@ -1,2 +1,14 @@
 hotspot topleft
-frame  cursorrepair_0.png  5
+frame  anims/bold/cursorrepair_0.png  0.4
+frame  anims/bold/cursorrepair_1.png  0.1
+frame  anims/bold/cursorrepair_2.png  0.1
+frame  anims/bold/cursorrepair_3.png  0.1
+frame  anims/bold/cursorrepair_4.png  0.1
+frame  anims/bold/cursorrepair_5.png  0.1
+frame  anims/bold/cursorrepair_6.png  0.1
+frame  anims/bold/cursorrepair_7.png  0.1
+frame  anims/bold/cursorrepair_8.png  0.1
+frame  anims/bold/cursorrepair_9.png  0.1
+frame  anims/bold/cursorrepair_10.png  0.1
+frame  anims/bold/cursorrepair_11.png  0.1
+frame  anims/bold/cursorrepair_12.png  0.1
