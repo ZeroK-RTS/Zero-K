@@ -988,7 +988,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   end
   if (burrows[unitID]) then
     burrows[unitID] = nil
-	queenTime = math.max(queenTime - (burrowQueenTime/malus), 1)
+	queenTime = math.max(queenTime - (burrowQueenTime/playerCount), 1)
 	waveBonus = waveBonus + (burrowWaveBonus/playerCount)
 	waveBonusDelta = waveBonusDelta + (burrowWaveBonus/playerCount)
 	Spring.SetGameRulesParam("queenTime", queenTime)
@@ -1032,7 +1032,7 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if unitID == queenID then	--spSetUnitHealth(u, { health = spGetUnitHealth(u) + (damage * queenArmor) })
-		local divisor = (malus/2) + 0.5
+		local divisor = (malus*3/4) + 0.25
 		damage = damage/divisor
 		--spEcho("Damage reduced to "..damage)
 	end

@@ -42,7 +42,7 @@ queenMorphTime		 = {60*30, 120*30}	--lower and upper bounds for delay between mo
 miniQueenTime		= {}		-- times at which miniqueens are spawned (multiplier of queentime)
 endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 
-burrowQueenTime		= 120		-- how much killing a burrow shaves off the queen timer, seconds (divided by malus)
+burrowQueenTime		= 120		-- how much killing a burrow shaves off the queen timer, seconds (divided by playercount)
 burrowWaveBonus		= 0.2		-- size of temporary bonus to add to next wave (divided by playercount)
 waveBonusDecay		= 0.05		-- linear rate at which burrow wave bonus decreases
 burrowTechTime		= 10		-- how many seconds each burrow deducts from the tech time per wave (divided by playercount)
