@@ -571,19 +571,28 @@ local function BackPathFunc(origin, len)
 end 
 
 
-local function DrawMenuItem(item, x,y, size, alpha, displayLabel, angle)
+local function DrawMenuItem(item, x,y, size, alpha, displayLabel, angle, cmdDesc)
   if not alpha then alpha = 1 end 
   if displayLabel == nil then displayLabel = true end
   if item then 
     local ud = UnitDefNames[item.unit]
-    if (ud)  then
+	if (ud)  then
       if (displayLabel and item.label) then 
         glColor(1,1,1,alpha)
         local wid = gl.GetTextWidth(item.label)*12
         gl.Text(item.label,x-wid*0.5, y+size,12,"")
       end 
 
-      glColor(1*alpha,1*alpha,1,alpha)
+	  local isEnabled = false
+	  for _, desc in ipairs(cmdDesc) do 
+		if desc.id == -ud.id and not desc.disabled then 
+			isEnabled = true 
+		end 
+	  end 
+	  
+	  if isEnabled then 
+		glColor(1*alpha,1*alpha,1,alpha)
+	  else glColor(0.3,0.3,0.3,alpha) end 
       gl.Texture(WG.GetBuildIconFrame(ud)) 
       gl.TexRect(x-size, y-size, x+size, y+size)
       gl.Texture("#"..ud.id)
@@ -632,6 +641,8 @@ function widget:DrawScreen()
   if (menu == nil or menu_invisible) then return end  -- get out if menu not visible
 
   
+  cmdDesc = Spring.GetActiveCmdDescs()
+  
   -- render back path
   gl.Texture(false)
   glColor(0,0,0,1)
@@ -640,7 +651,7 @@ function widget:DrawScreen()
   for i=level,1,-1 do
     local menu,angle = unpack(levels[i])
     sx,sy= GetPos(sx,sy, angle, MINDIST+SMALL_ICON_SIZE)
-    DrawMenuItem(menu, sx,sy, SMALL_ICON_SIZE, 0.5, true, angle)
+    DrawMenuItem(menu, sx,sy, SMALL_ICON_SIZE, 0.5, true, angle, cmdDesc)
     glColor(0,0,0,1)
     gl.Rect(sx-4,sy-4,sx+4,sy+4)
     glColor(1,1,1,1)
@@ -654,9 +665,9 @@ function widget:DrawScreen()
 
   glColor(1,1,1,1)  
   if (menu == menu_selected) then 
-    DrawMenuItem(menu, origin[1], origin[2], BIG_ICON_SIZE, 1, false, menu.angle) 
+    DrawMenuItem(menu, origin[1], origin[2], BIG_ICON_SIZE, 1, false, menu.angle, cmdDesc) 
   else 
-    DrawMenuItem(menu, origin[1], origin[2], SMALL_ICON_SIZE, 0.8, true, menu.angle) 
+    DrawMenuItem(menu, origin[1], origin[2], SMALL_ICON_SIZE, 0.8, true, menu.angle, cmdDesc) 
   end 
   
 
@@ -665,9 +676,9 @@ function widget:DrawScreen()
       local x,y = GetPos(origin[1], origin[2], i.angle, MINDIST + SMALL_ICON_SIZE)
       
       if (i == menu_selected) then 
-        DrawMenuItem(i, x,y, BIG_ICON_SIZE, 1, true, i.angle)
+        DrawMenuItem(i, x,y, BIG_ICON_SIZE, 1, true, i.angle, cmdDesc)
       else 
-        DrawMenuItem(i, x,y, SMALL_ICON_SIZE, 0.8, true, i.angle)
+        DrawMenuItem(i, x,y, SMALL_ICON_SIZE, 0.8, true, i.angle, cmdDesc)
       end 
     end 
   end 
