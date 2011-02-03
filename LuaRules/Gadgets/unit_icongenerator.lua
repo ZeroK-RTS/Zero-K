@@ -642,14 +642,16 @@ local function DrawIcon(udid,teamID,uid)
 
   if (uid) then
     if (UnitDefs[udid].model.type ~= "3do") then
-      gl.Texture(0, "%" .. udid .. ":0");
+      gl.Texture(0, "%" .. udid .. ":2");
     else
       gl.Texture(0, "$units");
     end;
     gl.UnitRaw(uid,true,-1);
     gl.Texture(0,false);
   else
+	gl.Texture(0, "%" .. udid .. ":0");
     gl.UnitShape(udid, teamID);
+	gl.Texture(0,false);
   end
 
   gl.ActiveTexture(0,gl.MatrixMode,GL.TEXTURE);
