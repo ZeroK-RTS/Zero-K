@@ -25,7 +25,7 @@ local function Open()
 	Turn(door2, z_axis, math.rad(90), math.rad(30))
 	WaitForTurn(door1, z_axis)
 	
-	Turn(brace, x_axis, math.rad(90), math.rad(20))
+	Turn(brace, x_axis, math.rad(90), math.rad(30))
 	WaitForTurn(brace, x_axis)
 	open = true
 end
@@ -33,12 +33,14 @@ end
 local function Close()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
-	Turn(brace, x_axis, 0, math.rad(20))
+	Turn(brace, x_axis, 0, math.rad(30))
 	WaitForTurn(brace, x_axis)
+	Show(missile)
+	open = false
 	Turn(door1, z_axis, 0, math.rad(30))
 	Turn(door2, z_axis, 0, math.rad(30))
 	WaitForTurn(door1, z_axis)
-	open = false
+
 end
 
 function script.Create()
@@ -46,7 +48,7 @@ function script.Create()
 end
 
 local function RestoreAfterDelay()
-	Sleep(6000)
+	Sleep(12000)
 	if open then Close() end
 end
 
@@ -54,7 +56,6 @@ function script.AimFromWeapon(weaponNum)	return aimpoint end
 function script.QueryWeapon(weaponNum) return missile end
 
 function script.AimWeapon(weaponNum, heading, pitch)
-	Show(missile)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	if not open then Open() end
@@ -65,9 +66,8 @@ end
 
 function script.FireWeapon(weaponNum)
 	Hide(missile)
-	Sleep(1500)
+	Sleep(150)
 	if open then Close() end
-	Show(missile)
 end
 
 function script.Killed(recentDamage, maxHealth)
