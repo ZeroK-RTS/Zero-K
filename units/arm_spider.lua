@@ -35,6 +35,7 @@ unitDef = {
     description_fr = [[Araign?e de Construction, Construit ? 6 m/s]],
     description_it = [[Ragno do costruzione occultante, costruisce a 6 m/s]],
     description_pl = [[Paj?k konstruktor, buduje z pr?dko?ci? 6m/s]],
+    description_de = [[Konstruierende Spinne, baut mit 6 m/s]],
     helptext       = [[The Weaver is a constructor that can climb over any obstacle and build defenses on high ground.]],
     helptext_bp    = [[Weaver é o construtor escalador camuflável de NOVA. Pode subir qualquer obstáculo, mas constrói mais devagar que construtores normais.]],
     helptext_es    = [[El Weaver es el constructor que puede treparse sobre qualquier obstáculo y construir defensas en terreno alto]],
@@ -42,6 +43,7 @@ unitDef = {
     helptext_fr    = [[Le weaver est un robot de construction tout terrain qui peut batir des d?fenses en terrain ?lev?.]],
     helptext_it    = [[Il Weaver é un costruttore che puo arrampicarsi su qualunque ostacolo e costruire difese nel terreno alto]],
     helptext_pl    = [[Weaver jest konstruktorem mog?cym wspina? si? po ka?dej powierzchni oraz posiadaj?cym mo?liwo?? maskowania si?]],
+    helptext_de    = [[Der Weaver ist eine bauende Einheit, die Hindernisse überwinden und somit Verteidigungsanlagen auf Erhöhungen bauen kann.]],
   },
 
   defaultmissiontype     = [[Standby]],
