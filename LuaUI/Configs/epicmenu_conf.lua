@@ -211,23 +211,23 @@ confdata.menu_tree = {
 					name = 'Cursor Sets',
 					type = 'list',
 					OnChange = function (self) 
-						if self.value == 'ca' then
+						if self.value == 'zk' then
 							WG.crude.RestoreCursor()
 						else
 							WG.crude.SetCursor( self.value ); 
 						end
 					end,
 					items = {
-						{ key = 'ca', name = 'Complete Annihilation', },
+						{ key = 'zk', name = 'Animated', },
+						{ key = 'zk_static', name = 'Static', },
+						{ key = 'ca', name = 'CA Classic', },
 						{ key = 'ca_static', name = 'CA Static', },
-						{ key = 'bold', name = 'Bold', },
-						{ key = 'bold_static', name = 'Bold Static', },
 						{ key = 'erom', name = 'Erom', },
 						{ key = 'masse', name = 'Masse', },
 						{ key = 'Lathan', name = 'Lathan', },
 						{ key = 'k_haos_girl', name = 'K_haos_girl', },
 					},
-					value = 'ca',
+					value = 'zk',
 				}
 			},
 			{},
