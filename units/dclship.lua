@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Hunter]],
   description         = [[Torpedo Frigate]],
   acceleration        = 0.048,
+  activateWhenBuilt   = true,
   bmcode              = [[1]],
   brakeRate           = 0.043,
   buildCostEnergy     = 450,
