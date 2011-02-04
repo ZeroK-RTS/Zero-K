@@ -12,26 +12,7 @@ end
 
 
 -- partially based on Spring's unit spawn gadget
-
--- storage
-local START_STORAGE_CLASSIC=1000
-local START_STORAGE=500
-local START_STORAGE_FACPLOP=1000
-
-local BOOST_RATE = 2.0
-local START_BOOST=600
-
-local START_ENERGY_FACPLOP=500
-local START_METAL_FACPLOP=500
-
-local OVERDRIVE_BUFFER=10000
-
-local EXCLUDED_UNITS = {
-  [ UnitDefNames['terraunit'].id ] = true,
-}
-
-local DEFAULT_UNIT = "armcom"		--FIXME: hardcodey until I cba to identify precise source of problem
-
+include "LuaRules/Configs/start_setup.lua"
 
 if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage
   if not gadgetHandler:IsSyncedCode() then
@@ -68,16 +49,9 @@ end
 local shuffleMode = Spring.GetModOption("shuffle", false, "off")
 
 local coop = false
-coop = Spring.GetModOption("coop", false, false)
-
-include "LuaRules/Configs/start_setup.lua"
-
-local startUnits = {
-	nova = 'armcom',
-	logos = 'corcom',
-	supportcomm = 'commsupport',
-	reconcomm = 'commrecon',
-}
+coop = tonumber(Spring.GetModOption("coop", false, false))
+if coop == nil then coop = 0 end
+--Spring.Echo(coop == 1, coop == 0)
 
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, Spring.GetTeamInfo(gaiateam))
@@ -98,13 +72,18 @@ local ploppableDefs = {}
 local facplopsrunning = {}
 
 local gamestart = false
-local commSpawned = {}
 local createBeforeGameStart = {}
 local scheduledSpawn = {}
 local startPosition = {} -- [teamID] = {x, y, z}
 local shuffledStartPosition = {}
 local playerSides = {} -- sides selected ingame from widget  - per players
 local teamSides = {} -- sides selected ingame from widgets - per teams 
+
+local commQuota = {} -- [allyTeamID] = number
+
+-- deprecated
+local commSpawnedTeam = {}
+local commSpawnedPlayer = {}
 
 _G.facplops = facplops
 
@@ -299,8 +278,18 @@ end
 
 local function SpawnStartUnit(teamID, playerID)
   -- get start unit
-  if Spring.GetGameRulesParam("commSpawned"..teamID) == 1 then return end
-  --if commSpawned[teamID] then return end	-- no getting double comms now!
+  
+  -- no getting double comms now!
+  if (coop == 1 and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
+  or (coop == 0 and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1) then 
+	return 
+  end
+  --if (coop == 1 and commSpawnedPlayer[playerID]) or (coop == 0 and commSpawnedTeam[teamID]) then
+	--return 
+  --end	
+  --local allyTeam = select(6, Spring.GetTeamInfo(teamID))
+  --if not (commQuota[allyTeam] and commQuota[allyTeam] > 0) then return end
+  
   local startUnit = GetStartUnit(teamID, playerID)
 
   if startUnit then
@@ -318,8 +307,11 @@ local function SpawnStartUnit(teamID, playerID)
 		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
 	--end
 	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("gate", x, y, z) end
-	Spring.SetGameRulesParam("commSpawned"..teamID, 1)
-	--commSpawned[teamID] = true
+	Spring.SetGameRulesParam("commSpawnedTeam"..teamID, 1)
+	if playerID then Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1) end
+	--commSpawnedTeam[teamID] = true
+	--if playerID then commSpawnedPlayer[playerID] = true end
+	--commQuota[allyTeam] = commQuota[allyTeam] - 1
 	
     -- set the *team's* lineage root
     if Spring.SetUnitLineage then
@@ -352,19 +344,23 @@ local function SpawnStartUnit(teamID, playerID)
         end
 
       else
+		-- the adding of existing resources is necessary for handling /take and spawn
+		local metal = Spring.GetTeamResources(teamID, "metal")
+		local energy = Spring.GetTeamResources(teamID, "energy")
+		
         if startMode == "classic" then
           Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC)
-          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC)
-          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC)
+          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy)
+          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal)
         elseif startMode == "facplop" then
           Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP)
-          Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP)
-          Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP)		  
+          Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP + energy)
+          Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP + metal)		  
         else
-          Spring.SetTeamResource(teamID, "energy", START_STORAGE)
-          Spring.SetTeamResource(teamID, "metal", START_STORAGE)
+          Spring.SetTeamResource(teamID, "energy", START_STORAGE + energy)
+          Spring.SetTeamResource(teamID, "metal", START_STORAGE + metal)
         end
 
       end
@@ -520,6 +516,10 @@ function gadget:GameStart()
   Shuffle()
 
   -- spawn units
+  for i,allyTeam in ipairs(Spring.GetAllyTeamList()) do
+	commQuota[allyTeam] = 0
+  end
+  
   for i,team in ipairs(Spring.GetTeamList()) do
 
     -- clear resources
@@ -531,22 +531,27 @@ function gadget:GameStart()
 	
 
     if team ~= gaiateam then
-      if coop then
+      if coop == 1 then
         -- 1 start unit per player
         local playerlist = Spring.GetPlayerList(team, true)
         playerlist = workAroundSpecsInTeamZero(playerlist, team)
         if playerlist and (#playerlist > 0) then
           for i=1,#playerlist do
-            local _,_,spec = Spring.GetPlayerInfo(playerlist[i])
-            if (not spec) then 
+          	local _,_,spec,_,allyTeam = Spring.GetPlayerInfo(playerlist[i])
+            if (not spec) then
+			  commQuota[allyTeam] = commQuota[allyTeam] + 1
               SpawnStartUnit(team, playerlist[i])
             end
           end
         else
           -- AI etc.
+		  local allyTeam = select(6, Spring.GetTeamInfo(team))
+		  commQuota[allyTeam] = commQuota[allyTeam] + 1
           SpawnStartUnit(team)
         end
       else -- no coop
+		local allyTeam = select(6, Spring.GetTeamInfo(team))
+		commQuota[allyTeam] = commQuota[allyTeam] + 1
         SpawnStartUnit(team)
       end
     end
@@ -574,52 +579,26 @@ function gadget:RecvLuaMsg(msg, playerID)
 	end
 end
 
-local function SetFaction(side, teamID)
+-- used by CAI
+local function SetFaction(side, playerID, teamID)
     teamSides[teamID] = side
+	playerSides[playerID] = side
 end
 GG.SetFaction = SetFaction
 
 function gadget:GameFrame(n)
-  -- reset resources in frame 33 because of pre 0.82 engine
-  --[[
-  if (n == 33) then
-	local teamIDs = Spring.GetTeamList()
-	for i=1,#teamIDs do
-		local teamID = teamIDs[i]
-		local gaiaID = Spring.GetGaiaTeamID()
-		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
-		if	teamID ~= gaiaID 
-			and ((not teamLuaAI) or teamLuaAI == "" or teamLuaAI == "CAI")
-			and (
-				startMode == "boost" 
-				or startMode == "limitboost" 
-				or startMode == "facplopboost"
-			)
-		then
-
-			Spring.SetTeamResource(teamID, 'energy', 0)
-			Spring.SetTeamResource(teamID, 'metal', 0)
-
-    else
-
-      if startMode == "classic" then
-        Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC)
-        Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC)
-      else
-        Spring.SetTeamResource(teamID, "energy", START_STORAGE)
-        Spring.SetTeamResource(teamID, "metal", START_STORAGE)
-      end
-
-    end
-
-	end
-  end
-  ]]--
   if scheduledSpawn[n] then
 	for _, spawnData in pairs(scheduledSpawn[n]) do
 		SpawnStartUnit(spawnData[1], spawnData[2])
 	end
   end
+end
+
+function gadget:Shutdown()
+	for i=1, 256 do
+		Spring.SetGameRulesParam("commPickedPlayer"..i, 0)
+		Spring.SetGameRulesParam("commPickedTeam"..i, 0)
+	end
 end
 
 --------------------------------------------------------------------

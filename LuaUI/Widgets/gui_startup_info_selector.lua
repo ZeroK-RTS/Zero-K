@@ -32,6 +32,8 @@ local Echo	= Spring.Echo
 local spGetSpectatingState	= Spring.GetSpectatingState()
 local spIsReplay			= Spring.IsReplay()
 
+local coop = Spring.GetModOptions().coop or 0
+
 local Chili
 local Window
 local screen0
@@ -44,15 +46,12 @@ local selectorShown = false
 local mainWindow
 local actionShow = "showstartupinfoselector"
 local optionData = include("Configs/startup_info_selector.lua")
+
+local noComm = false
 ---------------------------------------------
 function widget:ViewResize(viewSizeX, viewSizeY)
   vsx = viewSizeX
   vsy = viewSizeY
-end
-
-function printDebug( value )
-	if ( debug ) then Echo( value )
-	end
 end
 
 --local gameDate = os.date(t)
@@ -80,40 +79,20 @@ local function posterSize(num)
 	end
 end
 
-function widget:Initialize()
-	if ((not WG.Chili) and IsSpec()) then
-		printDebug("<gui_startup_info_selector DEBUG >: Or not using Chili, exiting.")
-		widgetHandler:RemoveWidget()
-	end
-
-	-- chili setup
-	Chili = WG.Chili
-	Window = Chili.Window
-	screen0 = Chili.Screen0
-	Image = Chili.Image
-	Button = Chili.Button
-
-	vsx, vsy = widgetHandler:GetViewSizes()
-
-	BindCallins()
-
-	widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
-
-	-- create the window if debug = true and not already shown, shortcut _DrawScreen
-	if debug and not selectorShown then
-		Echo( "<gui_startup_info_selector DEBUG >: Selector shown due to debug.")
-		CreateWindow()
+-- needs to be a global so chili can reach out and call it?
+function printDebug( value )
+	if ( debug ) then Echo( value )
 	end
 end
 
-function IsSpec()
-	if spGetSpectatingState() or spIsReplay() then
-		printDebug("<gui_startup_info_selector DEBUG >: You're spec or playing demo.")
-		return true
-	end
+function Close(commPicked)
+	printDebug("<gui_startup_info_selector DEBUG >: closing")
+	if not commPicked then Spring.SendLuaRulesMsg("faction:nova") end
+	--Spring_SendCommands("say: a:I chose " .. option.button})
+	mainWindow:Dispose()
 end
 
-function CreateWindow()
+local function CreateWindow()
 	selectorShown = true
 	printDebug("<gui_startup_info_selector DEBUG >: create window.")
 	-- count options
@@ -179,8 +158,10 @@ function CreateWindow()
     local cbWidth = posterx*actived*0.75-- calculate width of close button depending of number or posters
     local closeButton = Button:New{
       parent = mainWindow,
-      caption = "CLOSE  (defaults to Strike Commander)",
+	  caption = "CLOSE  (defaults to Strike Commander)",
 	  tooltip = "CLOSE\nNo commander selection made, will use Strike Commander",
+      --caption = "CLOSE  (make no selection)",
+	  --tooltip = "CLOSE\nNo commander selection made\nTo choose your commander later, open the Esc menu and go to Game Actions -> Select Comm",
       width = cbWidth,
       height = 30,
       x = (posterx*actived - cbWidth)/2,
@@ -192,35 +173,66 @@ function CreateWindow()
   end
 end
 
-function Close(commPicked)
-	printDebug("<gui_startup_info_selector DEBUG >: closing")
-	if not commPicked then Spring.SendLuaRulesMsg("faction:nova") end
-	--Spring_SendCommands("say: a:I chose " .. option.button})
-	mainWindow:Dispose()
+local function IsSpec()
+	if spGetSpectatingState() or spIsReplay() then
+		printDebug("<gui_startup_info_selector DEBUG >: You're spec or playing demo.")
+		return true
+	end
 end
- 
+
+function widget:Initialize()
+	if ((not WG.Chili) and IsSpec()) then
+		printDebug("<gui_startup_info_selector DEBUG >: Or not using Chili, exiting.")
+		widgetHandler:RemoveWidget()
+	end
+	
+	local playerID, teamID = Spring.GetMyPlayerID(), Spring.GetMyTeamID()
+	if (coop == 1 and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
+	or (coop == 0 and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
+		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
+	end
+	
+	-- chili setup
+	Chili = WG.Chili
+	Window = Chili.Window
+	screen0 = Chili.Screen0
+	Image = Chili.Image
+	Button = Chili.Button
+
+	vsx, vsy = widgetHandler:GetViewSizes()
+
+	BindCallins()
+
+	widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
+
+	-- create the window if debug = true and not already shown, shortcut _DrawScreen
+	if debug and not selectorShown then
+		Echo( "<gui_startup_info_selector DEBUG >: Selector shown due to debug.")
+		CreateWindow()
+	end
+end
+
  
 function widget:Shutdown()
-
   if mainWindow then
     mainWindow:Dispose()
   end
-
   widgetHandler:RemoveAction(actionShow)
-
 end
 
 -- keep the window open, we want to be able to pick later
+--[[
 function widget:GameStart()
   if mainWindow then
     --mainWindow:Dispose()
   end
 end
+]]--
 
 function UpdateCallins()
   --why is this called twice?
   widgetHandler:UpdateCallIn('DrawScreen')
-  widgetHandler:UpdateCallIn('DrawScreen')
+  -- widgetHandler:UpdateCallIn('DrawScreen')
 end
 
 function BindCallins()
@@ -235,12 +247,12 @@ end
 
 -- use to play communism (always enabled) sound only at game start
 function _DrawScreen()
-  if (((Spring.GetGameSeconds() < 0.1) or Spring.IsCheatingEnabled())) then --create window in pregame and if not already shown
+  if (Spring.GetGameSeconds() < 0.1) then --create window in pregame and if not already shown
     --if (Spring.GetModOption('communism',true,true)) then Spring.PlaySoundFile("LuaUI/Sounds/communism/sovnat1.wav", 1) 
 	--else Spring.PlaySoundFile("LuaUI/Sounds/communism/cash-register-01.wav", 1) end 
 	printDebug("<gui_startup_info_selector DEBUG >: it's _DrawScreen")
   end
-  if not (selectorShown) then CreateWindow() end
+  if (not selectorShown) and (not noComm) then CreateWindow() end
   UnbindCallins()
 end
 
