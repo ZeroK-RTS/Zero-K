@@ -810,6 +810,11 @@ local sounds = {
 			[1] = "fusion_select",
 		},
 	},
+	armestor = {
+		select = {
+			[1] = "fusion_select",
+		},
+	},
 	cafus = {
 		select = {
 			[1] = "adv_fusion_select",
