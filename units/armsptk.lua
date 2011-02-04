@@ -88,8 +88,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 140,
-        planes  = 140,
+        default = 135,
+        planes  = 135,
         subs    = 7,
       },
 
@@ -103,7 +103,7 @@ unitDef = {
       lineOfSight             = true,
       model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
-      range                   = 550,
+      range                   = 540,
       reloadtime              = 4,
       renderType              = 1,
       selfprop                = true,

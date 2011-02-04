@@ -697,14 +697,13 @@ function gadget:DrawWorld()
 
 	spec = spec or fullview
 	gl.Texture(facplopTexture )	
-	
 	for id,_ in spairs(facplops) do
 		local los = spGetUnitLosState(id, myAllyID, false)
 		if spValidUnitID(id) and spGetUnitDefID(id) and ((los and los.los) or spec) then
 			gl.DrawFuncAtUnit(id, false, DrawUnitFunc,  UnitDefs[spGetUnitDefID(id)].height+30)
 		end
-		gl.Texture("")
 	end
+	gl.Texture("")
 	
 end
 

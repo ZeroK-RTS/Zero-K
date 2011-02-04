@@ -3,7 +3,7 @@ local unitArray = {}
 
 -- various weapons on a unit can deal different damages
 local weapons = {
-	capturecar_captureray = {captureDamage = 2.7, scaleDamage = false},
+	capturecar_captureray = {captureDamage = 2.6, scaleDamage = false},
 }
 
 -- capture damage	- how much damage capture damage is dealt to the unit per hit
@@ -13,7 +13,7 @@ local weapons = {
 local units = {
 	capturecar = { 
 		unitLimit = false,
-		postCaptureReload = 150, 
+		postCaptureReload = 240, 
 		},
 }
 -- unitLimit			- the max number of units it can control. False for infinite
