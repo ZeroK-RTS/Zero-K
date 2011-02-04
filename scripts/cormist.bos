@@ -260,17 +260,23 @@ QueryWeapon1(piecenum)
 
 AimWeapon1 (heading, pitch)
 {
-	if (deployed == 0 || moving == 1) return (0);
 	signal SIG_AIM1;
 	set-signal-mask SIG_AIM1;
-
-	turn turret to y-axis (heading) speed TURRET_TURN_SPEED;
-	turn gun to x-axis (0-pitch) speed GUN_TURN_SPEED;
-	wait-for-turn turret around y-axis;
-	wait-for-turn gun around y-axis;
-	start-script RestoreAfterDelay(RESTORE_DELAY);
 	
-	return (TRUE);
+	if (deployed == 0 || moving == 1)
+	{
+		return (0);
+	}
+	else
+	{
+		turn turret to y-axis (heading) speed TURRET_TURN_SPEED;
+		turn gun to x-axis (0-pitch) speed GUN_TURN_SPEED;
+		wait-for-turn turret around y-axis;
+		wait-for-turn gun around y-axis;
+		start-script RestoreAfterDelay(RESTORE_DELAY);
+
+		return (TRUE);
+	}
 }
 
 Shot1(placeholder)
