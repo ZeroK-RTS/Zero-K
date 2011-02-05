@@ -44,7 +44,7 @@ unitDef = {
   energyMake             = 0.3,
   energyUse              = 0,
   explodeAs              = [[LARGE_BUILDINGEX]],
-  footprintX             = 4,
+  footprintX             = 5,
   footprintZ             = 14,
   iconType               = [[facship]],
   idleAutoHeal           = 5,
@@ -69,7 +69,7 @@ unitDef = {
   turnRate               = 0,
   waterline              = 0,
   workerTime             = 6,
-  yardMap                = [[oYYY oYYY oYYY oYYY oYYY oYYY oYYY oYYY oYYY oYYY oYYY oYYY oYYY oYYY]],
+  yardMap                = [[ooCCC ooCCC ooCCC ooCCC ooCCC ooCCC ooCCC ooCCC ooCCC ooCCC ooCCC ooCCC ooCCC ooCCC]],
 
   featureDefs            = {
 
@@ -79,7 +79,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 4000,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 7,
       footprintZ       = 7,
       height           = [[4]],
@@ -92,25 +92,6 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-
-    DEAD2 = {
-      description      = [[Debris - Shipyard]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 4000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 8,
-      footprintZ       = 8,
-      hitdensity       = [[100]],
-      metal            = 220,
-      object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 220,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
 
 
     HEAP  = {

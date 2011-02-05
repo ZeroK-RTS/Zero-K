@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, turret, arm_1, arm_2, arm_3, nanobase, nanoemit, pad;
 
@@ -195,17 +192,37 @@ Killed(severity, corpsetype)
 	if( severity <= 25 )
 	{
 		corpsetype = 1;
+		explode base type BITMAPONLY;
+		explode turret type BITMAPONLY;
+		explode arm_1 type BITMAPONLY;
+		explode arm_2 type BITMAPONLY;
+		explode arm_3 type BITMAPONLY;
 		return (0);
 	}
 	if( severity <= 50 )
 	{
 		corpsetype = 2;
+		explode base type BITMAPONLY;
+		explode turret type BITMAPONLY;
+		explode arm_1 type BITMAPONLY;
+		explode arm_2 type BITMAPONLY;
+		explode arm_3 type BITMAPONLY;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
+		explode base type SHATTER;
+		explode turret type SHATTER;
+		explode arm_1 type FALL | SMOKE;
+		explode arm_2 type FALL | SMOKE;
+		explode arm_3 type FALL | SMOKE;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
+	explode base type SHATTER;
+	explode turret type SHATTER;
+	explode arm_1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode arm_2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+	explode arm_3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 }

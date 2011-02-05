@@ -17,11 +17,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-if (not gadgetHandler:IsSyncedCode()) then
-  return false  --  no unsynced code
-end
+if (gadgetHandler:IsSyncedCode()) then
 
 --------------------------------------------------------------------------------
+-- SYNCED
 --------------------------------------------------------------------------------
   
 -- Speedups
@@ -38,12 +37,18 @@ local min = math.min
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local customSettings = {
+	corsy = {xsize = 32, zsize = 8, dispFacing = 0, dispRAngle = 32, reorient = true}
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local lab = {}
+_G.lab = lab
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 function checkLabs()
   for Lid,Lv in pairs(lab) do  
     local units = spGetUnitsInBox(Lv.minx, Lv.miny, Lv.minz, Lv.maxx, Lv.maxy, Lv.maxz)
@@ -103,18 +108,35 @@ function gadget:UnitCreated(unitID, unitDefID)
   local ud = UnitDefs[unitDefID]
   local name = ud.name
   if (ud.isFactory == true) and not (name == "factoryplane" or name == "factorygunship") then
+	local customData = customSettings[name] or {}
 	local ux, uy, uz  = spGetUnitPosition(unitID)
 	local face = spGetUnitBuildFacing(unitID)
-	local xsize = ud.xsize*4
-	local ysize = (ud.ysize or ud.zsize)*4
+	local xsize = (customData.xsize or ud.xsize)*4
+	local zsize = (customData.zsize or ud.ysize or ud.zsize)*4
 	local team = spGetUnitAllyTeam(unitID)
 	
-	if ((face == 0) or(face == 2)) then
-	  lab[unitID] = { team = team, face = 0,
-	  minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize}
+	local dispF = (customData.dispFacing or 0)
+	local dispR = (customData.dispRAngle or 0)
+	if face == 0 then
+		uz = uz + dispF
+		ux = ux + dispR
+	elseif face == 1 then
+		uz = uz - dispR
+		ux = ux - dispF
+	elseif face == 2 then
+		uz = uz - dispF
+		ux = ux - dispR
 	else
-	  lab[unitID] = { team = team, face = 1,
-	  minx = ux-ysize, minz = uz-xsize, maxx = ux+ysize, maxz = uz+xsize}
+		uz = uz + dispR
+		ux = ux + dispF
+	end
+	
+	if ((face == 0) or (face == 2))  then
+	  lab[unitID] = { team = team, face = 1 - (customData.reorient and 0 or 1),
+	  minx = ux-zsize, minz = uz-xsize, maxx = ux+zsize, maxz = uz+xsize}
+	else
+	  lab[unitID] = { team = team, face = 1 - (customData.reorient and 1 or 0),
+	  minx = ux-xsize, minz = uz-zsize, maxx = ux+xsize, maxz = uz+zsize}
 	end
 	
 	lab[unitID].miny = spGetGroundHeight(ux,uz)
@@ -145,5 +167,31 @@ function gadget:GameFrame(n)
   end
   --]]
 end
+
+function gadget:Initialize()
+	local units = Spring.GetAllUnits()
+	for i=1, #units do
+		local udid = Spring.GetUnitDefID(units[i])
+		gadget:UnitCreated(units[i], udid)
+	end
+end
+
+else
 --------------------------------------------------------------------------------
+-- UNSYNCED
 --------------------------------------------------------------------------------
+local debugMode = false
+
+local lab = SYNCED.lab
+
+function gadget:DrawWorld()
+	if not debugMode then return end
+	gl.Color(1,0,0,0.75)
+	for i,v in spairs(lab) do
+		gl.DrawGroundQuad(v.minx, v.minz, v.maxx, v.maxz )
+	end
+	gl.Color(1,1,1,1)
+end
+
+
+end

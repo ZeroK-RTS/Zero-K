@@ -1,8 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
-
+#include "constants.h"
 piece  base, pad, emit01, emit02, emit03, emit04, emit05, emit06, emit07, emit08, emit09, emit010, emit011, emit012, emit013, emit014, emit015, emit016, emit017, emit018;
 
 static-var  spray, statechg_DesiredState, statechg_StateChanging;
@@ -170,21 +166,21 @@ Killed(severity, corpsetype)
 	if( severity <= 25 )
 	{
 		corpsetype = 1;
-		explode base type BITMAPONLY | BITMAP1;
+		explode base type BITMAPONLY;
 		return (0);
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
-		explode base type SHATTER | BITMAP1;
+		corpsetype = 1;
+		explode base type BITMAPONLY;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
-		explode base type SHATTER | BITMAP1;
+		corpsetype = 2;
+		explode base type SHATTER;
 		return (0);
 	}
-	corpsetype = 3;
-	explode base type SHATTER | EXPLODE_ON_HIT | BITMAP1;
+	corpsetype = 2;
+	explode base type SHATTER;
 }
