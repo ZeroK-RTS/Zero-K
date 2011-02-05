@@ -29,8 +29,8 @@ function Spring.GetModOption(s,bool,default)
 end
 
 
-if (Spring.GetModOption("camode")=="deploy")or
-   (Spring.GetModOption("camode")=="tactics")
+if (Spring.GetModOption("zkmode")=="deploy")or
+   (Spring.GetModOption("zkmode")=="tactics")
 then
 
   -----------------------------

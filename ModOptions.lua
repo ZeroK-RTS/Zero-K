@@ -27,10 +27,11 @@
 --
 --  Example ModOptions.lua
 --
---+ TO DOI : change CAMODE to ZKMODE once ZK name will be enforced to all files.
+
 local options = {
+-- do deployment and tactics even work?
   {
-    key    = 'camode',
+    key    = 'zkmode',
     name   = 'Game Mode',
     desc   = 'Change the game mode.',
     type   = 'list',
@@ -53,9 +54,9 @@ local options = {
         desc = 'Players select a limited number of units before the game starts (without any factories)',
       },
       {
-    key  = 'kingofthehill',
-    name = 'King of the Hill',
-    desc = 'Control the hill for a set amount of time to win! See King of the Hill section.',
+		key  = 'kingofthehill',
+		name = 'King of the Hill',
+		desc = 'Control the hill for a set amount of time to win! See King of the Hill section.',
       },
     },
 
@@ -374,13 +375,6 @@ local options = {
     section= 'fun',
     def    = false,
   },
-  {
-    key    = 'planetwars',
-    name   = 'Planet Wars Options',
-    desc   = 'A string is put here by the Planet Wars server to set up ingame conditions.',
-    type   = 'string',
-    def    = false,
-  },
   --[[{
 	key    = 'communism',
     name   = 'Communism - resource sharing',
@@ -427,6 +421,20 @@ local options = {
     section= "startconds",
     def    = true,
   },
+  {
+    key    = 'planetwars',
+    name   = 'Planet Wars Options',
+    desc   = 'A string is put here by the Planet Wars server to set up ingame conditions.',
+    type   = 'string',
+    def    = false,
+  },
+  {
+    key    = 'unlocks',
+    name   = 'Unlocks',
+    desc   = 'A string is put here by Springie to determine unlocks.',
+    type   = 'string',
+    def    = false,
+  },
 --[[
 	{
 		key		= "perkcount",
@@ -460,7 +468,7 @@ local options = {
   {
     key    = 'burrowspawnrate',
     name   = 'Burrow Spawn Rate',
-    desc   = 'Sets the frequency of burrow spawns in seconds.',
+    desc   = 'Sets the frequency of burrow spawns in seconds (modified by playercount and number of existing burrows).',
     type   = 'number',
     section= 'chicken',
     def    = 45,

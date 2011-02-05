@@ -54,7 +54,7 @@ if(not gadgetHandler:IsSyncedCode()) then
 	
 	
 	function gadget:Initialize()
-		if(Spring.GetModOptions().camode ~= "kingofthehill") then
+		if(Spring.GetModOptions().zkmode ~= "kingofthehill") then
 			gadgetHandler:RemoveGadget()
 		end
 		gadgetHandler:AddSyncAction("changeColor", setBoxColor)
@@ -126,7 +126,7 @@ if(gadgetHandler:IsSyncedCode()) then
 
 	
 	function gadget:Initialize()
-		if(Spring.GetModOptions().camode ~= "kingofthehill") then
+		if(Spring.GetModOptions().zkmode ~= "kingofthehill") then
 			gadgetHandler:RemoveGadget()
 		end
 		goalTime = (Spring.GetModOptions().hilltime or 0) * 60

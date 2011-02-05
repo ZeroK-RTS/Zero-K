@@ -50,7 +50,7 @@ burrowRespawnChance = 0.15
 burrowRegressMult	= 10			-- multiply by burrowTechTime to get how much killing a burrow sets back chicken timer (divided by playercount)
 
 
-gameMode		= true	--Spring.GetModOption("camode")
+gameMode		= true	--Spring.GetModOption("zkmode")
 tooltipMessage	= "Kill chickens and collect their eggs to get metal."
 mexes = {
   "cormex", 

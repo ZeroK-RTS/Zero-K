@@ -102,7 +102,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID)
   local ud = UnitDefs[unitDefID]
   local name = ud.name
-  if (ud.isFactory == true) and not (name == "armap" or name == "armaap" or name == "corap" or name == "coraap") then
+  if (ud.isFactory == true) and not (name == "factoryplane" or name == "factorygunship") then
 	local ux, uy, uz  = spGetUnitPosition(unitID)
 	local face = spGetUnitBuildFacing(unitID)
 	local xsize = ud.xsize*4

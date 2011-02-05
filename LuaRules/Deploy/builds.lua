@@ -13,7 +13,7 @@
 --------------------------------------------------------------------------------
 
 local options
-if (Spring.GetModOption("camode")=="tactics") then
+if (Spring.GetModOption("zkmode")=="tactics") then
   options = VFS.Include("LuaRules/Configs/tactics.lua")
 else
   options = VFS.Include("LuaRules/Configs/deployment.lua")

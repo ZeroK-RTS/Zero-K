@@ -222,7 +222,7 @@ end
 -- Tactics GameMode
 --
 
-if (modOptions and (modOptions.camode == "tactics")) then
+if (modOptions and (modOptions.zkmode == "tactics")) then
   -- remove all build options
   Game = { gameSpeed = 30 };  --  required by tactics.lua
   local options = VFS.Include("LuaRules/Configs/tactics.lua")

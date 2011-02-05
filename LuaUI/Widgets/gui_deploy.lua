@@ -12,7 +12,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-if (Spring.GetModOptions().camode~="deploy") then
+if (Spring.GetModOptions().zkmode~="deploy") then
   return false --//remove widget quietly
 end
 

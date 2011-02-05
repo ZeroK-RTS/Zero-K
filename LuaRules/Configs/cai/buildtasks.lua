@@ -545,7 +545,8 @@ factionBuildConfig = {
 			count = 3,
 			[1] = {ID = UnitDefNames['armfus'].id}, 
 			[2] = {ID = UnitDefNames['armsolar'].id}, 
-			[3] = {ID = UnitDefNames['armwin'].id}, 
+			[3] = {ID = UnitDefNames['armwin'].id},
+			[4] = {ID = UnitDefNames['cafus'].id}, 
 		},
 		econByDefId = {
 			[UnitDefNames['armfus'].id] = {
@@ -559,6 +560,20 @@ factionBuildConfig = {
 				defenceRange = 600,
 				airDefenceQuota = {2,1,0.1},
 				index = 2,
+				energy = true,
+			},
+			
+			[UnitDefNames['cafus'].id] = {
+				energyGreaterThan = 120, 
+				energySpacing = 900,
+				whileStall = false,
+				makeNearFactory = false,
+				chance = 0.3,
+				minEtoMratio = 1.5,
+				defenceQuota = {3,2,2},
+				defenceRange = 800,
+				airDefenceQuota = {3,2,1},
+				index = 4,
 				energy = true,
 			},
 			
