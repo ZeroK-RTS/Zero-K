@@ -31,8 +31,8 @@ unitDef = {
   canPatrol              = true,
   canStop                = true,
   category               = [[UNARMED FLOAT]],
-  collisionVolumeOffsets = [[0 20 0]],
-  collisionVolumeScales  = [[60 70 260]],
+  collisionVolumeOffsets = [[-3 6 1]],
+  collisionVolumeScales  = [[47 60 252]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[Box]],
   corpse                 = [[DEAD]],
@@ -69,7 +69,7 @@ unitDef = {
   turnRate               = 0,
   waterline              = 0,
   workerTime             = 6,
-  yardMap                = [[oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY]],
+  yardMap                = [[oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY oYYYYYY]],
 
   featureDefs            = {
 
