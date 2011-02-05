@@ -11,7 +11,7 @@ strikecomm = {
 	selector = "Strike Comm",--will be used as option.selector
 	tooltip = "Strike Commander\nUses beam laser, has a greater speed but less health.\nADV Strike Commander\nGain DGUN, even greater speed, cloak field, and personal cloak cost halved.",--will be used as option.tooltip
 	button = function()
-	Spring.SendLuaRulesMsg("faction:nova")
+	Spring.SendLuaRulesMsg("faction:strikecomm")
 	printDebug("strike com")
 	Spring.SendCommands({'say a: I choose: Strike Commander !'})
 	Close(true)
@@ -24,7 +24,7 @@ battlecomm = {
 	selector ="Battle Comm",
 	tooltip = "Battle Commander\nUses a pulse autocannon and has more health but slower speed.\nADV Battle Commander\nGain AoE cluster bombs, an high power area shield and double health gains.\n\* BOTH HAVE NO CLOAK \*",
 	button = function() 
-	Spring.SendLuaRulesMsg("faction:logos")
+	Spring.SendLuaRulesMsg("faction:battlecomm")
 	Spring.SendCommands({'say a:I choose: Battle Commander !'})
 	Close(true)
 	end 

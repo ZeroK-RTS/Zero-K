@@ -231,7 +231,7 @@ local function GetStartUnit(teamID, playerID)
   end
  
   startUnitAlt = altCommNames[startunit] or startUnit
-  if playerID and UnitDefNames[(startUnitAlt.."1_"..playerID)] then
+  if startUnitAlt and playerID and UnitDefNames[(startUnitAlt.."1_"..playerID)] then
 	startUnit = (startUnitAlt.."1_"..playerID)
 	--Spring.Echo("Using alt comm: "..startUnit)
   end

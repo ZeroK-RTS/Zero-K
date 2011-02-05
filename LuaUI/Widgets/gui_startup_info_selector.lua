@@ -87,7 +87,7 @@ end
 
 function Close(commPicked)
 	printDebug("<gui_startup_info_selector DEBUG >: closing")
-	if not commPicked then Spring.SendLuaRulesMsg("faction:nova") end
+	if not commPicked then Spring.SendLuaRulesMsg("faction:strikecomm") end
 	--Spring_SendCommands("say: a:I chose " .. option.button})
 	mainWindow:Dispose()
 end

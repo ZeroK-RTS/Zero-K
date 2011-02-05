@@ -299,7 +299,7 @@ function gadgetHandler:Initialize()
 
     local name = g.ghInfo.name
     local basename = g.ghInfo.basename
-    Spring.Echo(string.format("Loaded gadget:  %-18s  <%s>", name, basename))
+    print(string.format("Loaded gadget:  %-18s  <%s>", name, basename))
   end
 end
 

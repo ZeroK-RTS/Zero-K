@@ -429,25 +429,21 @@ local options = {
     def    = false,
   },
   {
-    key    = 'unlocks',
-    name   = 'Unlocks',
-    desc   = 'A string is put here by Springie to determine unlocks.',
+    key    = 'commandertypes',
+    name   = 'Commander Types',
+    desc   = 'A string is put here by Springie to determine number and types of custom commanders.',
     type   = 'string',
     def    = false,
+	section	= "experimental",
   },
---[[
-	{
-		key		= "perkcount",
-		name	= "Number of perks",
-		desc	= "Sets the number of perks each player is allowed to pick. 0 disables, -1 disables and grants all perk unlocks for free.",
-		type	= "number",
-		def		= -1,
-		min		= -1,
-		max		= 12,
-		step	= 1,
-		section	= "experimental",
-	},
-]]--
+  {
+	key		= "enableunlocks",
+	name	= "Enable unlocks",
+	desc	= "Enables the experimental unlock system (disabling will enable all units by default)",
+	type	= "bool",
+	def		= true,
+	section	= "experimental",
+  },
   {
     key    = 'chicken',
     name   = 'Chicken',

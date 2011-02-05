@@ -1,6 +1,6 @@
 startUnits = {
-	nova = 'armcom',
-	logos = 'corcom',
+	strikecomm = 'armcom',
+	battlecomm = 'corcom',
 	supportcomm = 'commsupport',
 	reconcomm = 'commrecon',
 }
