@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.252 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.253 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -988,10 +988,10 @@ local function HotkeyFromUikey(uikey_hotkey)
 end
 
 local function GetReadableHotkeyMod(mod)
-	return (mod:find('A+') and 'Alt+' or '') ..
-		(mod:find('C+') and 'Ctrl+' or '') ..
-		(mod:find('M+') and 'Meta+' or '') ..
-		(mod:find('S+') and 'Shift+' or '') ..
+	return (mod:lower():find('a+') and 'Alt+' or '') ..
+		(mod:lower():find('c+') and 'Ctrl+' or '') ..
+		(mod:lower():find('m+') and 'Meta+' or '') ..
+		(mod:lower():find('s+') and 'Shift+' or '') ..
 		''		
 end
 
@@ -1296,7 +1296,7 @@ local function flattenTree(tree, parent)
 				if hotkey then
 					if uikey_hotkey then
 						UnassignKeyBind(curkey, option)
-					end					
+					end
 					AssignKeyBind(hotkey, curkey, option.key, option)
 				end					
 				
