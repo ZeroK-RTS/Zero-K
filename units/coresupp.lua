@@ -97,15 +97,15 @@ unitDef = {
     EMG = {
       name                    = [[Medium Pulse MG]],
       areaOfEffect            = 64,
-      burst                   = 2,
-      burstrate               = 0.2,
+      burst                   = 4,
+      burstrate               = 0.1,
       craterBoost             = 0.15,
       craterMult              = 0.3,
 
       damage                  = {
-        default = 20,
-        planes  = 20,
-        subs    = 10,
+        default = 10,
+        planes  = 10,
+        subs    = 5,
       },
 
       edgeEffectiveness       = 0.5,
