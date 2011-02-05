@@ -35,8 +35,8 @@ unitDef = {
   energyMake       = 0.225,
   energyUse        = 0,
   explodeAs        = [[LARGE_BUILDINGEX]],
-  footprintX       = 6,
-  footprintZ       = 6,
+  footprintX       = 8,
+  footprintZ       = 8,
   iconType         = [[fachover]],
   idleAutoHeal     = 5,
   idleTime         = 1800,
@@ -58,7 +58,7 @@ unitDef = {
   turnRate         = 0,
   waterline        = 1,
   workerTime       = 6,
-  yardMap          = [[occccooccccooccccooccccooccccoocccco]],
+  yardMap          = [[xoccccoxooccccooooccccooooccccooooccccooooccccooooccccooxoccccox]],
 
   featureDefs      = {
 

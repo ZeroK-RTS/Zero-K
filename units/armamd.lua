@@ -28,8 +28,8 @@ unitDef = {
 
   damageModifier                = 0.5,
   explodeAs                     = [[LARGE_BUILDINGEX]],
-  footprintX                    = 4,
-  footprintZ                    = 6,
+  footprintX                    = 5,
+  footprintZ                    = 7,
   iconType                      = [[antinuke]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
