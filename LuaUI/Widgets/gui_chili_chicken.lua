@@ -360,7 +360,7 @@ function widget:Initialize()
 		y=0;
 		x=0;
 		keepAspect = true,
-		file = "LuaUI/Images/panel.tga";
+		file = panelTexture;
 		parent = window;
 		disableChildrenHitTest = false,
 	}
