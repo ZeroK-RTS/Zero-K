@@ -92,8 +92,6 @@ end
 -- Modular commander handling
 --
 
-VFS.Include("gamedata/modularcomms/moduledefs.lua")
-VFS.Include("gamedata/modularcomms/testdata.lua")
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 
 --------------------------------------------------------------------------------
@@ -103,7 +101,7 @@ VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 --
 
 local function TagTree(unit, faction, newbuildoptions)
-  local morphDefs = VFS.Include"LuaRules/Configs/morph_defs.lua"
+ -- local morphDefs = VFS.Include"LuaRules/Configs/morph_defs.lua"
   
   local function Tag(unit)
     if (not UnitDefs[unit] or UnitDefs[unit].faction) then
@@ -119,6 +117,7 @@ local function TagTree(unit, faction, newbuildoptions)
 	    ud.buildoptions = newbuildoptions
 	  end
     end
+--[[	
     if (morphDefs[unit]) then
       if (morphDefs[unit].into) then
         Tag(morphDefs[unit].into)
@@ -128,8 +127,9 @@ local function TagTree(unit, faction, newbuildoptions)
         end
       end        
     end
+]]--  
   end
-  
+
   Tag(unit)
 end
 

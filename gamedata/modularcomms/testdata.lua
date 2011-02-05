@@ -1,23 +1,35 @@
+Spring.Utilities = Spring.Utilities or {}
+VFS.Include("LuaRules/Utilities/base64.lua")
+
 --indexed by playerID
 testdata = {
 	[0] = {
+		--indexed by level
+		strike = {
+			[1] = {
+				name = "Ms. Amazing",
+				upgrades = {},
+				allowMorph = true
+			},
+		},
 	},
 	[1] = {
-		--indexed by level
 		recon = {
-			[1] = {"adv_composite_armor"},
-			[2] = {"adv_composite_armor", "focusing_prism"},
+			[1] = {
+				name = "Jumping Jack Flash",
+				upgrades = {"adv_composite_armor"},
+			},
+			[2] = {
+				upgrades = {"adv_composite_armor", "focusing_prism"},
+			},
 		},
-		strike = {
-			[1] = {"radarmodule"},
-		},
-		battle = {
-			all = {"adv_nano",},
-		},
-		support = {
-			[1] = {"adv_composite_armor"},
-			[2] = {"adv_composite_armor", "high_power_servos"},
-		},
+		unlocks = { "spherepole" },
 	},
+	[3] = {
+		unlocks = { "armmerl" },
+	}
 }
+
+return testdata
+--return Spring.Utilities.Base64Encode(tostring(testdata))
 

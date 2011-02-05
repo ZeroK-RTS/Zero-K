@@ -4,15 +4,25 @@
 
 local devolution = false
 
+--deep not safe with circular tables! defaults To false
+function CopyTable(tableToCopy, deep)
+  local copy = {}
+  for key, value in pairs(tableToCopy) do
+    if (deep and type(value) == "table") then
+      copy[key] = CopyTable(value, true)
+    else
+      copy[key] = value
+    end
+  end
+  return copy
+end
 
 local morphDefs = {
-
  
   blastwing = {
     into = 'cormine1',
     time = 25,
   }, 
-  
 
   --[[ // sample definition1 with multiple possible morphs... you nest arrays inside the definition
   armcom = {
@@ -524,13 +534,27 @@ local morphDefs = {
   }, 
 }
 
--- currently unused
 local comMorph = {
-	metal = 600,
-	energy = 600,
-	time = 60,
+	[1] = {
+		metal = 750,
+		energy = 750,
+		time = 75,
+	},
+	[2] = {
+		metal = 1200,
+		energy = 1200,
+		time = 120,
+	},
 }
 
+for name,data in pairs(UnitDefNames) do
+	if data.customParams and data.customParams.comm_morph_target then
+		--local name = data.name
+		local level = tonumber(data.customParams.comm_level)
+		morphDefs[name] = CopyTable(comMorph[level], true)
+		morphDefs[name].into = data.customParams.comm_morph_target
+	end
+end
 
 --
 -- Here's an example of why active configuration

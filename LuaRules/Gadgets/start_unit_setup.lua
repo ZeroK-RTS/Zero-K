@@ -219,18 +219,25 @@ end
 local function GetStartUnit(teamID, playerID)
   local side = select(5, Spring.GetTeamInfo(teamID))
   local sideCase = select(2, Spring.GetSideData(side)) -- case pls
-  local startUnit = Spring.GetSideData(side)
+  local startUnit, startUnitAlt
   local chickens = modOptions and tobool(modOptions.chickens)
 	
   if (playerID and playerSides[playerID]) then 
-	return startUnits[playerSides[playerID]]
+	startUnit = startUnits[playerSides[playerID]]
   end 
   
   if (teamID and teamSides[teamID]) then 
-	return startUnits[teamSides[teamID]]
+	startUnit = startUnits[teamSides[teamID]]
   end
+ 
+  startUnitAlt = altCommNames[startunit] or startUnit
+  if playerID and UnitDefNames[(startUnitAlt.."1_"..playerID)] then
+	startUnit = (startUnitAlt.."1_"..playerID)
+	--Spring.Echo("Using alt comm: "..startUnit)
+  end
+  
   --didn't pick a comm, wait for user to pick
-  return nil	-- startUnit or DEFAULT_UNIT
+  return startUnit or nil	-- startUnit or DEFAULT_UNIT
 end
 
 

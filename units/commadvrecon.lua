@@ -176,7 +176,6 @@ unitDef = {
         timeslow_preset = [[commrecon2_slowbomb]],
       },
 
-
       damage                  = {
         default = 300,
         planes  = 300,
@@ -189,7 +188,7 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 2,
       lineOfSight             = true,
-      model                   = [[bomb]],
+      model                   = [[wep_b_fabby.s3o]],
       noSelfDamage            = true,
       range                   = 450,
       reloadtime              = 12,
@@ -199,8 +198,10 @@ unitDef = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/cannon/cannon_fire3]],
       startsmoke              = [[1]],
+	  startVelocity			  = 350,
+	  trajectoryHeight		  = 0.3,
       turret                  = true,
-      weaponType              = [[Cannon]],
+      weaponType              = [[MissileLauncher]],
       weaponVelocity          = 350,
     },
 

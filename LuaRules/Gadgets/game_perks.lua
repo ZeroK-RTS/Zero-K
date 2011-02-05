@@ -27,11 +27,17 @@ end
 
 if (gadgetHandler:IsSyncedCode()) then
 
+--------------------------------------------------------------------------------
 --SYNCED
-
+--------------------------------------------------------------------------------
 local perks = {}
 
-local unlocks = {} -- indexed by allyTeamID, value is a table of key unitDefID and value true or nil
+local unlocks = {} -- indexed by teamID, value is a table of key unitDefID and value true or nil
+
+local playerData = Spring.GetModOptions().unlocks
+playerData = VFS.Include("gamedata/modularcomms/testdata.lua")
+--if playerData then playerData = Spring.Utilities.Base64Decode(playerData) end
+
 
 local unlockUnits = {
 	"spherepole",
@@ -45,6 +51,7 @@ local unlockUnits = {
 	"cafus",
 	"corcrw",
 	"armcarry",
+	"mahlazer",
 	
 	"factoryjump",
 	"armcsa",
@@ -55,9 +62,20 @@ for i=1,#unlockUnits do
 	if UnitDefNames[unlockUnits[i]] then unlockUnitsMap[UnitDefNames[unlockUnits[i]].id] = true end
 end
 
-local unlock={}
-
 local luaTeam = {}
+
+for id, data in pairs(playerData) do -- per player; uses pairs because ipairs breaks for some inane reason
+	if data.unlocks then
+		for index, name in pairs(unlocks) do
+			local team = select(4, Spring.GetPlayerInfo(id))
+			local udid = UnitDefNames[name] and UnitDefNames[name].id
+			if udid then unlocks[team][udid] = true end
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function UnlockUnit(unitID, lockDefID, team)
     local cmdDescID = Spring.FindUnitCmdDesc(unitID, -lockDefID)
