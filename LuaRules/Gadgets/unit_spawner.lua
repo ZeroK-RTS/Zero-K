@@ -744,8 +744,8 @@ local function Wave()
 	c.time = c.time - timeReduction
 	if c.obsolete then c.obsolete = c.obsolete - timeReduction end
   end
-  echo(burrowCount .. " burrows have reduced tech time by " .. math.ceil(timeReduction) .. " seconds")
-  echo("Lifetime tech time reduction: " .. math.ceil(totalTimeReduction) .. " seconds")
+  --echo(burrowCount .. " burrows have reduced tech time by " .. math.ceil(timeReduction) .. " seconds")
+  --echo("Lifetime tech time reduction: " .. math.ceil(totalTimeReduction) .. " seconds")
   
   local chicken1Name, chicken2Name = ChooseChicken(chickenTypes)
   local turret = ChooseChicken(defenders)

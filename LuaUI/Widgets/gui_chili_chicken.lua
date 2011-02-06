@@ -31,7 +31,7 @@ local table           = table
 
 local panelFont		  = "LuaUI/Fonts/komtxt__.ttf"
 local waveFont        = LUAUI_DIRNAME.."Fonts/Skrawl_40"
-local panelTexture    = ":n:"..LUAUI_DIRNAME.."Images/panel_small.png"
+local panelTexture    = ":n:"..LUAUI_DIRNAME.."Images/panel.tga"
 
 local viewSizeX, viewSizeY = 0,0
 

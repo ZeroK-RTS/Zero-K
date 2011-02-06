@@ -37,7 +37,7 @@ gracePeriod          = 150       -- no chicken spawn in this period, seconds
 gracePenalty		 = 10		-- reduced grace per player over one, seconds
 gracePeriodMin		 = 90
 
-queenTime            = 50*60    -- time at which the queen appears, seconds
+queenTime            = 60*60    -- time at which the queen appears, seconds
 queenMorphTime		 = {60*30, 120*30}	--lower and upper bounds for delay between morphs, gameframes
 miniQueenTime		= {}		-- times at which miniqueens are spawned (multiplier of queentime)
 endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
@@ -215,7 +215,7 @@ difficulties = {
 	burrowTechTime	 = 15,
 	burrowRespawnChance = 0.25,
 	queenSpawnMult   = 5,
-	queenTime		 = 45*60,
+	queenTime		 = 50*60,
 	miniQueenTime	 = {0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
   },
