@@ -625,6 +625,7 @@ local function MakeFlags()
 		
 	local country_langs = {
 		br='bp',
+		de='de',
 		es='es',
 		fi='fi', 
 		fr='fr',
