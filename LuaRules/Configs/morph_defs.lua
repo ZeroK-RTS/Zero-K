@@ -5,7 +5,7 @@
 local devolution = false
 
 --deep not safe with circular tables! defaults To false
-function CopyTable(tableToCopy, deep)
+local function CopyTable(tableToCopy, deep)
   local copy = {}
   for key, value in pairs(tableToCopy) do
     if (deep and type(value) == "table") then
@@ -547,15 +547,119 @@ local comMorph = {
 	},
 }
 
-for name,data in pairs(UnitDefNames) do
-	if data.customParams and data.customParams.comm_morph_target then
-		--local name = data.name
-		local level = tonumber(data.customParams.comm_level)
-		morphDefs[name] = CopyTable(comMorph[level], true)
-		morphDefs[name].into = data.customParams.comm_morph_target
+--[[
+local comMorphTree = {
+	strike = {armcom, armadvcom},
+	battle = {corcom, coradvcom},
+	recon = {commrecon, commadvrecon},
+	support = {commsupport, commadvsupport},
+}
+]]--
+
+local customComms = {}
+
+local function InitUnsafe()
+	for name, id in pairs(Spring.GetPlayerList()) do	-- pairs(playerIDsByName) do
+		-- copied from PlanetWars
+		local commData, success
+		local customKeys = select(10, Spring.GetPlayerInfo(id))
+		local commDataRaw = customKeys and customKeys.commanders
+		if not (commDataRaw and type(commDataRaw) == 'string') then
+			err = "Comm data entry for player "..id.." is empty or in invalid format"
+			commData = {}
+		else
+			commDataRaw = string.gsub(commDataRaw, '_', '=')
+			commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
+			--Spring.Echo(commDataRaw)
+			local commDataFunc, err = loadstring("return "..commDataRaw)
+			if commDataFunc then 
+				success, commData = pcall(commDataFunc)
+				if not success then
+					err = commData
+					commData = {}
+				end
+			end
+		end
+		if err then 
+			Spring.Echo('Comm Morph error: ' .. err)
+		end
+
+		for chassis, subdata in pairs(commData) do
+			customComms[id] = customComms[id] or {}
+			customComms[id][chassis] = subdata
+		end
+		
+		-- this method makes no sense, it's not like any given generated def will be used for more than one replacement/player!
+		-- would be more logical to use replacee as key and replacement as value in player customkeys
+		--[[
+		customComms[id] = customComms[id] or {}
+		for replacementComm, replacees in pairs(commData) do
+			for _,name in pairs(replacees) do
+				customComms[id][name] = replacementComm
+			end
+		end
+		]]--
 	end
 end
 
+local function CheckForExistingMorph(morphee, target)
+	local array = morphDefs[morphee]
+	if not array then return false end
+	if array.into then
+		if array.into == target then return true
+		else return false end
+	end
+	for index,morphOpts in pairs(array) do
+		if morphOpts.into and morphOpts.into == target then return true end
+	end
+	return false
+end
+
+InitUnsafe()
+for id, playerData in pairs(customComms) do
+	Spring.Echo("Setting morph for custom comms for player: "..id)
+	for chassisName, array in pairs(playerData) do
+		for i=1,#array do
+			Spring.Echo(array[i], array[i+1])
+			local targetDef = array[i+1] and UnitDefNames[array[i+1]]
+			local originDef = UnitDefNames[array[i]] or UnitDefNames[array[i]]
+			if targetDef and originDef then
+				Spring.Echo("Configuring morph")
+				local sourceName, targetName = originDef.name, targetDef.name
+				local morphCost
+				local morphOption = CopyTable(comMorph[i], true)
+				morphOption.into = array[i+1]
+				-- set cost
+				morphCost = (targetDef.customParams and targetDef.customParams.morphCost) or 0
+				morphTime = (targetDef.customParams and targetDef.customParams.morphTime) or 0
+				morphCostDiscount = (originDef.customParams and originDef.customParams.morphCost) or 0
+				morphTimeDiscount = (originDef.customParams and originDef.customParams.morphTime) or 0
+				morphOption.metal = morphOption.metal + morphCost - morphCostDiscount
+				morphOption.energy = morphOption.energy + morphCost - morphCostDiscount
+				morphOption.time = morphOption.time + morphTime - morphTimeDiscount
+				
+				-- copy, checking that this morph isn't already defined
+				morphDefs[sourceName] = morphDefs[sourceName]  or {}
+				if not CheckForExistingMorph(sourceName, targetName) then
+					morphDefs[sourceName][#(morphDefs[sourceName]) + 1] = morphOption
+				else
+					Spring.Echo("Duplicate morph, exiting")
+				end
+			end
+		end
+	end
+end
+
+--check that the morphs were actually inserted
+--[[
+for i,v in pairs(morphDefs) do
+	Spring.Echo(i)
+	if v.into then Spring.Echo("\t"..v.into)
+	else
+		for a,b in pairs(v) do Spring.Echo("\t"..b.into) end
+	end
+end
+]]--
 --
 -- Here's an example of why active configuration
 -- scripts are better then static TDF files...

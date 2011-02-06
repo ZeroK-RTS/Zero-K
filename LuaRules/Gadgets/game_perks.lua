@@ -9,7 +9,7 @@ local spGetTeamList          = Spring.GetTeamList
 local spGetTeamUnits         = Spring.GetTeamUnits
 local spSetUnitCOBValue      = Spring.SetUnitCOBValue
 local spGetUnitDefID         = Spring.GetUnitDefID
-local spGetTeamUnits             = Spring.GetTeamUnits
+local spGetUnitTeam		     = Spring.GetUnitTeam
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -21,8 +21,12 @@ function gadget:GetInfo()
 		date = "2008-03-04",
 		license = "Public Domain",
 		layer = 1,
-		enabled = false,
+		enabled = true,
 	}
+end
+
+if tobool(Spring.GetModOptions().enableunlocks) == false then
+	return
 end
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -31,30 +35,66 @@ if (gadgetHandler:IsSyncedCode()) then
 --SYNCED
 --------------------------------------------------------------------------------
 local perks = {}
+local playerIDsByName = {}
 
 local unlocks = {} -- indexed by teamID, value is a table of key unitDefID and value true or nil
 
-local playerData = Spring.GetModOptions().unlocks
-playerData = VFS.Include("gamedata/modularcomms/testdata.lua")
---if playerData then playerData = Spring.Utilities.Base64Decode(playerData) end
-
-
 local unlockUnits = {
+	-- units
 	"spherepole",
-    "armmerl",
-    "armbrawl",
-    "corgrav",
-    "armpb",
-    "screamer",
-	"gorg",
-	"armcybr",
-	"cafus",
-	"corcrw",
-	"armcarry",
-	"mahlazer",
+	"spherecloaker",
 	
+	"corclog",
+	"core_spectre",
+	
+    "armmerl",
+	"capturecar",
+	
+	"armspy",
+	"armcrabe",
+	
+	"corsumo",
+	
+	"panther",
+	"corgol",
+	"trem",
+	
+    "blackdawn",
+	"corcrw",
+	
+	"armcybr",
+	
+	"armcarry",
+	"corbats",
+	"cornukesub",
+	
+	"dante",
+	"armraven",
+	"armbanth",
+	"gorg",
+	"armorco",
+	
+	-- defenses and superweapons
+    --"corgrav",
+    --"armpb",
+    "screamer",
+	"armanni",
+	"cordoom",
+	"corbhmth",
+	--"empmissile",	
+	"armbrtha",
+	"mahlazer",
+
+	"cafus",
+	
+	-- factories
+	"factoryspider",
 	"factoryjump",
+	"factorytank",
+	"factorygunship",
+	"factoryplane",
 	"armcsa",
+	"missilesilo",
 }
 
 local unlockUnitsMap = {}
@@ -63,16 +103,6 @@ for i=1,#unlockUnits do
 end
 
 local luaTeam = {}
-
-for id, data in pairs(playerData) do -- per player; uses pairs because ipairs breaks for some inane reason
-	if data.unlocks then
-		for index, name in pairs(unlocks) do
-			local team = select(4, Spring.GetPlayerInfo(id))
-			local udid = UnitDefNames[name] and UnitDefNames[name].id
-			if udid then unlocks[team][udid] = true end
-		end
-	end
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -147,9 +177,49 @@ function gadget:AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z)
 end
 ]]--
 
-function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam)
-	SetBuildOptions(unitID, unitDefID, newTeam)
-	return true
+local function InitUnsafe()
+	-- for name, id in pairs(playerIDsByName) do
+	for index, id in pairs(Spring.GetPlayerList()) do	
+		-- copied from PlanetWars
+		local unlockData, success
+		local customKeys = select(10, Spring.GetPlayerInfo(id))
+		local unlocksRaw = customKeys and customKeys.unlocks
+		if not (unlocksRaw and type(unlocksRaw) == 'string') then
+			err = "Unlock data entry for player "..id.." is empty or in invalid format"
+			unlockData = {}
+		else
+			unlocksRaw = string.gsub(unlocksRaw, '_', '=')
+			unlocksRaw = Spring.Utilities.Base64Decode(unlocksRaw)
+			local unlockFunc, err = loadstring("return "..unlocksRaw)
+			if unlockFunc then 
+				success, unlockData = pcall(unlockFunc)
+				if not success then
+					err = unlockData
+					unlockData = {}
+				end
+			end
+		end
+		if err then 
+			Spring.Echo('Unlock system error: ' .. err)
+		end
+
+		for index, name in pairs(unlockData) do
+			local team = select(4, Spring.GetPlayerInfo(id))
+			local udid = UnitDefNames[name] and UnitDefNames[name].id
+			if udid then
+				unlocks[team] = unlocks[team] or {}
+				unlocks[team][udid] = true
+			end
+		end
+		
+		-- /luarules reload compatibility
+		local units = Spring.GetAllUnits()
+		for i=1,#units do
+			local udid = spGetUnitDefID(units[i])
+			local teamID = spGetUnitTeam(units[i])
+			gadget:UnitCreated(units[i], udid, teamID)
+		end
+	end
 end
 
 function gadget:Initialize()
@@ -159,16 +229,35 @@ function gadget:Initialize()
 		if (teamLuaAI and teamLuaAI ~= "") then
 			luaTeam[teamID] = true
 		end
-		
-		-- /luarules reload compatibility
-		local units = spGetTeamUnits(teamID)
-		for i=1,#units do
-			local udid = spGetUnitDefID(units[i])
-			gadget:UnitCreated(units[i], udid, teamID)
+	end
+	
+	InitUnsafe()
+	local allUnits = Spring.GetAllUnits()
+	for _, unitID in pairs(allUnits) do
+		local udid = Spring.GetUnitDefID(unitID)
+		if udid then
+			gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
 		end
 	end
 end
-
+--[[
+function gadget:RecvLuaMsg(msg, playerID)
+	if (msg:find("<perks>playername:",1,true)) then
+		local name = msg:gsub('.*:([^=]*)=.*', '%1')
+		local id = msg:gsub('.*:.*=(.*)', '%1')
+		playerIDsByName[name] = tonumber(id)
+	elseif (msg:find("<perks>playernames",1,true)) then
+		InitUnsafe()
+		local allUnits = Spring.GetAllUnits()
+		for _, unitID in pairs(allUnits) do
+			local udid = Spring.GetUnitDefID(unitID)
+			if udid then
+				gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
+			end
+		end
+	end	
+end
+]]--
 else
 
 --UNSYNCED
@@ -207,6 +296,21 @@ function gadget:DrawScreen(vsx, vsy)
                 n=n+1
         end
         glTexture(false)
+end
+]]--
+
+--[[
+function gadget:Initialize()
+--  gadgetHandler:AddSyncAction('PWCreate',WrapToLuaUI)
+--  gadgetHandler:AddSyncAction("whisper", whisper)
+  
+	local playerroster = Spring.GetPlayerList()
+	local playercount = #playerroster
+	for i=1,playercount do
+		local name = Spring.GetPlayerInfo(playerroster[i])
+		Spring.SendLuaRulesMsg('<perks>playername:'..name..'='..playerroster[i])
+	end
+	Spring.SendLuaRulesMsg('<perks>playernames')
 end
 ]]--
 

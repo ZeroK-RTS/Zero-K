@@ -81,6 +81,9 @@ local teamSides = {} -- sides selected ingame from widgets - per teams
 
 local commQuota = {} -- [allyTeamID] = number
 
+local playerIDsByName = {}
+local customComms = {}
+
 -- deprecated
 local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
@@ -190,6 +193,55 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	return true
 end
 
+
+local function InitUnsafe()
+	-- for name, id in pairs(playerIDsByName) do
+	for index, id in pairs(Spring.GetPlayerList()) do	
+		-- copied from PlanetWars
+		local commData, success
+		local customKeys = select(10, Spring.GetPlayerInfo(id))
+		local commDataRaw = customKeys and customKeys.commanders
+		if not (commDataRaw and type(commDataRaw) == 'string') then
+			err = "Comm data entry for player "..id.." is empty or in invalid format"
+			commData = {}
+		else
+			commDataRaw = string.gsub(commDataRaw, '_', '=')
+			commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
+			--Spring.Echo(commDataRaw)
+			local commDataFunc, err = loadstring("return "..commDataRaw)
+			if commDataFunc then 
+				success, commData = pcall(commDataFunc)
+				if not success then
+					err = commData
+					commData = {}
+				end
+			end
+		end
+		if err then 
+			Spring.Echo('Start Unit Setup error: ' .. err)
+		end
+
+		-- record the player's first-level comm def for each chassis
+		for chassis, subdata in pairs(commData) do
+			customComms[id] = customComms[id] or {}
+			customComms[id][("comm"..chassis)] = subdata[1]
+			--Spring.Echo(id,"comm"..chassis, subdata[1])
+		end
+		
+		-- this method makes no sense, it's not like any given generated def will be used for more than one replacement/player!
+		-- would be more logical to use replacee as key and replacement as value in player customkeys
+		--[[
+		customComms[id] = customComms[id] or {}
+		for replacementComm, replacees in pairs(commData) do
+			for _,name in pairs(replacees) do
+				customComms[id][name] = replacementComm
+			end
+		end
+		]]--
+	end
+end
+
+
 function gadget:Initialize()
   -- self linking
   GG['boostHandler'] = {}
@@ -213,6 +265,15 @@ function gadget:Initialize()
     gamestart = true
 	Shuffle()
   end
+  
+  InitUnsafe()
+  local allUnits = Spring.GetAllUnits()
+  for _, unitID in pairs(allUnits) do
+	local udid = Spring.GetUnitDefID(unitID)
+		if udid then
+			gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
+		end
+	end 
 end
 
 
@@ -221,22 +282,27 @@ local function GetStartUnit(teamID, playerID)
   local sideCase = select(2, Spring.GetSideData(side)) -- case pls
   local startUnit, startUnitAlt
   local chickens = modOptions and tobool(modOptions.chickens)
-	
-  if (playerID and playerSides[playerID]) then 
-	startUnit = startUnits[playerSides[playerID]]
-  end 
   
   if (teamID and teamSides[teamID]) then 
 	startUnit = startUnits[teamSides[teamID]]
   end
- 
-  startUnitAlt = altCommNames[startunit] or startUnit
-  if startUnitAlt and playerID and UnitDefNames[(startUnitAlt.."1_"..playerID)] then
-	startUnit = (startUnitAlt.."1_"..playerID)
-	--Spring.Echo("Using alt comm: "..startUnit)
+
+  if (playerID and playerSides[playerID]) then 
+	startUnit = startUnits[playerSides[playerID]]
+  end
+
+  -- if a replacement def is available, use it  
+  playerID = playerID or (teamID and select(2, Spring.GetTeamInfo(teamID)) )
+  local altName = altCommNames[startUnit] or startUnit
+  --Spring.Echo(altName)
+  local altComm = customComms[playerID] and customComms[playerID][altName]
+  --Spring.Echo(altComm)
+  if altComm and (not defaultComms[altComm]) and UnitDefNames[altComm] then
+	startUnit = altComm
+	Spring.Echo("Using alt comm: "..startUnit)
   end
   
-  --didn't pick a comm, wait for user to pick
+  --if didn't pick a comm, wait for user to pick
   return startUnit or nil	-- startUnit or DEFAULT_UNIT
 end
 
@@ -583,7 +649,21 @@ function gadget:RecvLuaMsg(msg, playerID)
 			if not scheduledSpawn[frame] then scheduledSpawn[frame] = {} end
 			scheduledSpawn[frame][#scheduledSpawn[frame] + 1] = {teamID, playerID}
 		end
-	end
+	--[[
+	elseif (msg:find("<startsetup>playername:",1,true)) then
+		local name = msg:gsub('.*:([^=]*)=.*', '%1')
+		local id = msg:gsub('.*:.*=(.*)', '%1')
+		playerIDsByName[name] = tonumber(id)
+	elseif (msg:find("<startsetup>playernames",1,true)) then
+		InitUnsafe()
+		local allUnits = Spring.GetAllUnits()
+		for _, unitID in pairs(allUnits) do
+			local udid = Spring.GetUnitDefID(unitID)
+			if udid then
+				gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
+			end
+		end]]--
+	end	
 end
 
 -- used by CAI
@@ -602,7 +682,7 @@ function gadget:GameFrame(n)
 end
 
 function gadget:Shutdown()
-	for i=1, 256 do
+	for i=0, 255 do
 		Spring.SetGameRulesParam("commPickedPlayer"..i, 0)
 		Spring.SetGameRulesParam("commPickedTeam"..i, 0)
 	end
@@ -690,7 +770,20 @@ function gadget:DrawWorld()
 		end
 	end
 	gl.Texture("")
-	
 end
 
+--[[
+function gadget:Initialize()
+--  gadgetHandler:AddSyncAction('PWCreate',WrapToLuaUI)
+--  gadgetHandler:AddSyncAction("whisper", whisper)
+  
+	local playerroster = Spring.GetPlayerList()
+	local playercount = #playerroster
+	for i=1,playercount do
+		local name = Spring.GetPlayerInfo(playerroster[i])
+		Spring.SendLuaRulesMsg('<startsetup>playername:'..name..'='..playerroster[i])
+	end
+	Spring.SendLuaRulesMsg('<startsetup>playernames')
+end
+]]--
 end

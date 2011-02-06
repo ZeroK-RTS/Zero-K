@@ -1,3 +1,4 @@
+--[[
 commTypes = {
 	recon = {
 		[1] = CopyTable(UnitDefs.commrecon),
@@ -16,6 +17,7 @@ commTypes = {
 		[2] = CopyTable(UnitDefs.commadvsupport),
 	},
 }
+]]--
 
 upgrades = {
 	adv_composite_armor = {

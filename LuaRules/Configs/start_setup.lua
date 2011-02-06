@@ -9,6 +9,9 @@ altCommNames = {
 	armcom = 'commstrike',
 }
 
+defaultComms = {}
+for i,v in pairs(startUnits) do defaultComms[v] = true end
+
 ploppables = {
   "factoryhover",
   "factoryveh",
