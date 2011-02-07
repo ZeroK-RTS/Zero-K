@@ -54,15 +54,45 @@ if not commData then commData = {} end
 --------------------------------------------------------------------------------
 commDefs = {}	--holds precedurally generated comm defs
 
-for name, config in pairs(commData) do
+local function ApplyWeapon(unitDef, weapon)
+	local wcp = weapons[weapon].customparams
+	local slot = tonumber(wcp and wcp.slot) or 1
+	unitDef.weapons[slot] = {
+		def = weapon,
+		badtargetcategory = wcp.badtargetcategory,
+		onlytargetcategory = wcp.onlytargetcategory,
+	}
+	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
+end
+
+local function ProcessComm(name, config)
 	if config.chassis and UnitDefs[config.chassis] then
 		Spring.Echo("Processing comm: "..name)
 		local name = name
-		commDefs[name] = CopyTable(UnitDefs[config.chassis])
+		commDefs[name] = CopyTable(UnitDefs[config.chassis], true)
+		local cp = commDefs[name].customparams
+		cp.morphCost = cp.morphCost or "0"
+		cp.morphTime = cp.moprhTime or "0"
 		if config.modules then
-			for _,upgradeName in pairs(config.modules) do
-				upgrades[upgradeName].func(commDefs[name])	--apply upgrade function
-				Spring.Echo("\tApplying upgrade: "..upgradeName)
+			-- process weapons first
+			for _,moduleName in pairs(config.modules) do
+				if moduleName:find("commweapon_",1,true) then
+					if weapons[moduleName] then
+						ApplyWeapon(commDefs[name], moduleName)
+						Spring.Echo("\tApplying weapon: "..moduleName)
+					else
+						Spring.Echo("\tERROR: Weapon "..moduleName.." not found")
+					end
+				end
+			end
+			-- process other modules
+			for _,moduleName in pairs(config.modules) do
+				if upgrades[moduleName] then
+					upgrades[moduleName].func(commDefs[name])	--apply upgrade function
+					Spring.Echo("\tApplying upgrade: "..moduleName)
+				else
+					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
+				end
 			end
 		end
 		if config.name then
@@ -71,8 +101,25 @@ for name, config in pairs(commData) do
 	end
 end
 
+for name, config in pairs(commData) do
+	ProcessComm(name, config)
+end
+
+
+--stress test: try every possible module to make sure it doesn't crash
+local stressTestDef = {
+	chassis = "armcom",
+	name = "Quality Assurance",
+	modules = {},
+}
+for name in pairs(upgrades) do
+	stressTestDef.modules[#stressTestDef.modules+1] = name
+end
+ProcessComm("testDef", stressTestDef)
+commDefs.testDef = nil
+
+
 --set weapon1 range	- may need exception list in future depending on what weapons we add
---[[
 for name, data in pairs(commDefs) do
 	Spring.Echo("\tPostprocessing commtype: ".. name)
 	if data.weapondefs then
@@ -81,13 +128,16 @@ for name, data in pairs(commDefs) do
 			if weaponData.range < minRange then minRange = weaponData.range end
 		end
 		if data.weapons and data.weapondefs then
-			local wepName = data.weapondefs[1].def
-			wepName = string.lower(wepName)
-			data.weapondefs[wepName].range = minRange
+			local wepName = data.weapondefs[1] and data.weapondefs[1].def
+			if wepName then
+				wepName = string.lower(wepName)
+				data.weapondefs[wepName].range = minRange
+			end
 		end
 	end
 end
---]]
+
+
 
 -- splice back into unitdefs
 for name, data in pairs(commDefs) do

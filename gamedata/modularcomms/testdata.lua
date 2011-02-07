@@ -39,7 +39,11 @@ return testdata
 --[[
 -- modoption
 {
-  strike = { chassis = "armcom", name = "Fair Maiden", },
+  strike = { 
+	chassis = "armcom", 
+	name = "Fair Maiden",
+	modules = { "commweapon_shotgun", }
+  },
   advstrike = {
     chassis = "armadvcom",
     modules = { "adv_composite_armor", "high_power_servos" }
@@ -50,7 +54,7 @@ return testdata
   }
 }
 
-ew0KICBzdHJpa2UgPSB7IGNoYXNzaXMgPSAiYXJtY29tIiwgbmFtZSA9ICJGYWlyIE1haWRlbiIsIH0sDQogIGFkdnN0cmlrZSA9IHsNCiAgICBjaGFzc2lzID0gImFybWFkdmNvbSIsDQogICAgbW9kdWxlcyA9IHsgImFkdl9jb21wb3NpdGVfYXJtb3IiLCAiaGlnaF9wb3dlcl9zZXJ2b3MiIH0NCiAgfSwNCiAgYmF0dGxlID0gew0KICAgIGNoYXNzaXMgPSAiY29yY29tIiwNCiAgICBtb2R1bGVzID0geyAicmFkYXJtb2R1bGUiLCAiaGlnaF9wb3dlcl9zZXJ2b3MiIH0NCiAgfQ0KfQ==
+ew0KICBzdHJpa2UgPSB7IA0KCWNoYXNzaXMgPSAiYXJtY29tIiwgDQoJbmFtZSA9ICJGYWlyIE1haWRlbiIsDQoJbW9kdWxlcyA9IHsgImNvbW13ZWFwb25fc2hvdGd1biIsIH0NCiAgfSwNCiAgYWR2c3RyaWtlID0gew0KICAgIGNoYXNzaXMgPSAiYXJtYWR2Y29tIiwNCiAgICBtb2R1bGVzID0geyAiYWR2X2NvbXBvc2l0ZV9hcm1vciIsICJoaWdoX3Bvd2VyX3NlcnZvcyIgfQ0KICB9LA0KICBiYXR0bGUgPSB7DQogICAgY2hhc3NpcyA9ICJjb3Jjb20iLA0KICAgIG1vZHVsZXMgPSB7ICJyYWRhcm1vZHVsZSIsICJoaWdoX3Bvd2VyX3NlcnZvcyIgfQ0KICB9DQp9
 
 -- player data
 {

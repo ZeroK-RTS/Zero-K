@@ -110,23 +110,6 @@ return {
         [3]  = 0,
       },
     },
-    mainhit = {
-      air                = true,
-      class              = [[heatcloud]],
-      count              = 2,
-      ground             = true,
-      water              = true,
-      properties = {
-        heat               = 16,
-        heatfalloff        = 1,
-        maxheat            = 16,
-        pos                = [[0, 1, 0]],
-        size               = 1,
-        sizegrowth         = 4,
-        speed              = [[0, 1, 0]],
-        texture            = [[yellownovaexplo]],
-      },
-    },
     pikes = {
       air                = true,
       class              = [[CExpGenSpawner]],
@@ -167,6 +150,7 @@ return {
         texture            = [[plasma]],
       },
     },
+	
     steam = {
       class              = [[CExpGenSpawner]],
       count              = 16,
@@ -178,6 +162,8 @@ return {
         pos                = [[0, 0, 0]],
       },
     },
+	
+
   },
 
   ["beamweapon_hit_yellow_steam"] = {

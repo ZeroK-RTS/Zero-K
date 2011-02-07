@@ -1,3 +1,19 @@
+local function lowerkeys(t)
+  local tn = {}
+  for i,v in pairs(t) do
+    local typ = type(i)
+    if type(v)=="table" then
+      v = lowerkeys(v)
+    end
+    if typ=="string" then
+      tn[i:lower()] = v
+    else
+      tn[i] = v
+    end
+  end
+  return tn
+end
+
 --[[
 commTypes = {
 	recon = {
@@ -19,7 +35,21 @@ commTypes = {
 }
 ]]--
 
+weapons = {}
+
+local weaponsList = VFS.DirList("gamedata/modularcomms/weapons", "*.lua") or {}
+for i=1,#weaponsList do
+	local name, array = VFS.Include(weaponsList[i])
+	weapons[name] = lowerkeys(array)
+end
+
 upgrades = {
+	commweapon_shotgun = {
+		name = "Shotgun",
+		description = "SHAWTGUN",
+		func = function(unitDef)
+			end,	
+	},
 	adv_composite_armor = {
 		name = "Advanced Composite Armor",
 		description = "Improved armor increases commander health by 20%",
