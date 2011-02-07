@@ -420,12 +420,12 @@ StopMoving()
 	bMoving = FALSE;
 }
 
-AimFromWeapon1(piecenum)
+AimFromWeapon4(piecenum)
 {
 	piecenum = armhold; //better angle
 }
 
-QueryWeapon1(piecenum)
+QueryWeapon4(piecenum)
 {
 	piecenum = flare;
 }
@@ -448,7 +448,7 @@ if (gun1 == 1)
 }
 
 
-AimWeapon1(Func_Var_1, Func_Var_2)
+AimWeapon4(Func_Var_1, Func_Var_2)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
@@ -512,7 +512,7 @@ AimWeapon1(Func_Var_1, Func_Var_2)
 	}
 }
 
-Shot1()
+Shot4()
 {
 	//recoil
 	//set 76 to 0; //turn off cloak for fliker

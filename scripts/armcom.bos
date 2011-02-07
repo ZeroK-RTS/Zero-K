@@ -1,8 +1,6 @@
-#define TA			// This is a TA script
+//linear constant 163840
 
-#include "sfxtype.h"
-#include "exptype.h"
-
+#include "constants.h"
 
 piece  torso, ruparm, luparm, rbigflash, nanospray, pelvis, lfirept, head,
        lthigh, rthigh, nanolath, biggun, rleg, lleg, ground;

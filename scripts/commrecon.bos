@@ -19,44 +19,44 @@ Static_Var_6, aimer, swing, dead;
 
 RestoreAfterDelay()
 {
-sleep 6000;
-if (dead == 0)
+	sleep 6000;
+	if (dead == 0)
    {
-turn turret to x-axis <0.000000> speed <150.000000>;
-turn turret to y-axis <0.000000> speed <150.000000>;
-//torso	
-turn torso to x-axis <0.000000> speed <250.000000>;
-turn torso to y-axis <0.000000> speed <250.000000>;
-turn torso to z-axis <0.000000> speed <250.000000>;	
-//head	
-turn head to x-axis <0.000000> speed <250.000000>;
-turn head to y-axis <0.000000> speed <250.000000>;
-turn head to z-axis <0.000000> speed <250.000000>;
-
-// at ease pose
-turn armhold to x-axis <-45.000000> speed <250.000000>; //upspring at -45
-turn ruparm to x-axis <0.000000> speed <250.000000>; 
-turn ruparm to y-axis <0.000000> speed <250.000000>; 
-turn ruparm to z-axis <0.000000> speed <250.000000>; 
-turn rarm to x-axis <2.000000> speed <250.000000>;      //up 2
-turn rarm to y-axis <0.000000> speed <250.000000>;  
-turn rarm to z-axis <-12.000000> speed <250.000000>;    //up -12
-turn rloarm to x-axis <47.000000> speed <250.000000>;   //up 47
-turn rloarm to y-axis <76.000000> speed <250.000000>;   //up 76
-turn rloarm to z-axis <-47.000000> speed <250.000000>;   //up -47
-turn luparm to x-axis <-9.000000> speed <250.000000>;       //up -9
-turn luparm to y-axis <0.000000> speed <250.000000>;  
-turn luparm to z-axis <0.000000> speed <250.000000>;  
-turn larm to x-axis <5.000000> speed <250.000000>;       //up 5
-turn larm to y-axis <-3.000000> speed <250.000000>;       //up -3
-turn larm to z-axis <22.000000> speed <250.000000>;       //up 22
-turn lloarm to x-axis <92.000000> speed <250.000000>;    // up 82
-turn lloarm to y-axis <0.000000> speed <250.000000>;  
-turn lloarm to z-axis <94.000000> speed <250.000000>;  //upspring 94
-// done at ease
-sleep 100;
-swing = 1; //clean for sword setup
-bAiming = 0;
+		turn turret to x-axis <0.000000> speed <150.000000>;
+		turn turret to y-axis <0.000000> speed <150.000000>;
+		//torso	
+		turn torso to x-axis <0.000000> speed <250.000000>;
+		turn torso to y-axis <0.000000> speed <250.000000>;
+		turn torso to z-axis <0.000000> speed <250.000000>;	
+		//head	
+		turn head to x-axis <0.000000> speed <250.000000>;
+		turn head to y-axis <0.000000> speed <250.000000>;
+		turn head to z-axis <0.000000> speed <250.000000>;
+		
+		// at ease pose
+		turn armhold to x-axis <-45.000000> speed <250.000000>; //upspring at -45
+		turn ruparm to x-axis <0.000000> speed <250.000000>; 
+		turn ruparm to y-axis <0.000000> speed <250.000000>; 
+		turn ruparm to z-axis <0.000000> speed <250.000000>; 
+		turn rarm to x-axis <2.000000> speed <250.000000>;      //up 2
+		turn rarm to y-axis <0.000000> speed <250.000000>;  
+		turn rarm to z-axis <-12.000000> speed <250.000000>;    //up -12
+		turn rloarm to x-axis <47.000000> speed <250.000000>;   //up 47
+		turn rloarm to y-axis <76.000000> speed <250.000000>;   //up 76
+		turn rloarm to z-axis <-47.000000> speed <250.000000>;   //up -47
+		turn luparm to x-axis <-9.000000> speed <250.000000>;       //up -9
+		turn luparm to y-axis <0.000000> speed <250.000000>;  
+		turn luparm to z-axis <0.000000> speed <250.000000>;  
+		turn larm to x-axis <5.000000> speed <250.000000>;       //up 5
+		turn larm to y-axis <-3.000000> speed <250.000000>;       //up -3
+		turn larm to z-axis <22.000000> speed <250.000000>;       //up 22
+		turn lloarm to x-axis <92.000000> speed <250.000000>;    // up 82
+		turn lloarm to y-axis <0.000000> speed <250.000000>;  
+		turn lloarm to z-axis <94.000000> speed <250.000000>;  //upspring 94
+		// done at ease
+		sleep 100;
+		swing = 1; //clean for sword setup
+		bAiming = 0;
 	}
 }
 
@@ -487,12 +487,12 @@ FireWeapon3()
 	emit-sfx 1027 from grenade;
 }
 
-AimFromWeapon1(piecenum)
+AimFromWeapon4(piecenum)
 {
 	piecenum = armhold;
 }
 
-QueryWeapon1(piecenum)
+QueryWeapon4(piecenum)
 {
 	piecenum = flare;
 }
@@ -507,7 +507,7 @@ QueryWeapon2(piecenum)
 	piecenum = stab;
 }
 
-Shot1()
+Shot4()
 {
   //triple flash
 		//emit-sfx 1024 from flare;
@@ -515,7 +515,7 @@ Shot1()
 	return (1);
 }
 
-AimWeapon1(Func_Var_1, Func_Var_2)
+AimWeapon4(Func_Var_1, Func_Var_2)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;

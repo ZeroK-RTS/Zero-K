@@ -92,23 +92,65 @@ unitDef = {
 
   weapons             = {
 
-    [1] = {
-      def                = [[GAUSS]],
+	[1] = {
+      def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],	
+	},   
+  
     [3] = {
       def                = [[CONCUSSION_GAUSS]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
+
+    [4] = {
+      def                = [[GAUSS]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },	
 
   },
 
 
   weaponDefs          = {
 
+    FAKELASER     = {
+      name                    = [[Fake Laser]],
+      areaOfEffect            = 12,
+      beamlaser               = 1,
+      beamTime                = 0.1,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 0,
+      },
+
+      duration                = 0.11,
+      explosionGenerator      = [[custom:flash1green]],
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      laserFlareSize          = 5.53,
+      lineOfSight             = true,
+      minIntensity            = 1,
+      range                   = 500,
+      reloadtime              = 0.11,
+      renderType              = 0,
+      rgbColor                = [[0 1 0]],
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 5.53,
+      tolerance               = 10000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 900,
+    },  
+  
     CONCUSSION_GAUSS = {
       name                    = [[Gauss Rifle (Concussion Shot)]],
       alphaDecay              = 0.12,

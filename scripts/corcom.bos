@@ -1,3 +1,5 @@
+//linear constant 163840
+
 #include "constants.h"
 
 //Note: normal script/model setup has the comm lasering and nanoing out of the same hand, and dgunning with the other.
