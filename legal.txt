@@ -1,20 +1,13 @@
 Legal.
 
-Complete Annihilation a game for the Spring engine.
-Copyright © 2008-2010 the Complete Annihilation developer team.
+Zeor-K a game for the Spring engine.
+Copyright © 2008-2010 the 0K development team.
 
-This project contains (and links to) content from the game Total Annihilation
-which is Copyright © 1997 Humongous. So you should own a copy of the game
-Total Annihilation to play this game.
-
-Except this content of the game Total Annihilation everything in this
-project is released under the GNU General Public License or Public Domain;
-you can redistribute it and/or modify it under the terms of the
-GNU General Public License as published by the Free Software Foundation;
-either version 2 of the License, or any later version.
-
-And as soon as all dependencies to the content of the game Total Annihilation
-are removed the project itself is released under the GNU General Public License.
+Unless otherwise specified everything in this project is released under
+the GNU General Public License or Public Domain; you can redistribute it
+and/or modify it under the terms of the GNU General Public License as 
+published by the Free Software Foundation; either version 2 of the License,
+or any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
