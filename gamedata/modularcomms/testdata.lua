@@ -41,43 +41,43 @@ return testdata
 {
   strike = { 
 	chassis = "armcom", 
-	name = "Fair Maiden",
-	modules = { "commweapon_shotgun", }
+	name = "Her Royal Majesty",
+	modules = { "commweapon_rocketlauncher", }
   },
   advstrike = {
     chassis = "armadvcom",
+	name = "The Empress",
     modules = { "adv_composite_armor", "high_power_servos" }
   },
   battle = {
     chassis = "corcom",
-    modules = { "radarmodule", "high_power_servos" }
-  }
+	name = "Mr. Amazing",
+    modules = { "commweapon_shotgun", "radarmodule", "high_power_servos" }
+  },
+  heavyrecon = {
+    chassis = "commrecon",
+	name = "John Q. Rambo",
+    modules = { "commweapon_heavymachinegun", "radarmodule", "high_power_servos" }
+  },
 }
 
-ew0KICBzdHJpa2UgPSB7IA0KCWNoYXNzaXMgPSAiYXJtY29tIiwgDQoJbmFtZSA9ICJGYWlyIE1haWRlbiIsDQoJbW9kdWxlcyA9IHsgImNvbW13ZWFwb25fc2hvdGd1biIsIH0NCiAgfSwNCiAgYWR2c3RyaWtlID0gew0KICAgIGNoYXNzaXMgPSAiYXJtYWR2Y29tIiwNCiAgICBtb2R1bGVzID0geyAiYWR2X2NvbXBvc2l0ZV9hcm1vciIsICJoaWdoX3Bvd2VyX3NlcnZvcyIgfQ0KICB9LA0KICBiYXR0bGUgPSB7DQogICAgY2hhc3NpcyA9ICJjb3Jjb20iLA0KICAgIG1vZHVsZXMgPSB7ICJyYWRhcm1vZHVsZSIsICJoaWdoX3Bvd2VyX3NlcnZvcyIgfQ0KICB9DQp9
+ew0KICBzdHJpa2UgPSB7IA0KCWNoYXNzaXMgPSAiYXJtY29tIiwgDQoJbmFtZSA9ICJIZXIgUm95YWwgTWFqZXN0eSIsDQoJbW9kdWxlcyA9IHsgImNvbW13ZWFwb25fcm9ja2V0bGF1bmNoZXIiLCB9DQogIH0sDQogIGFkdnN0cmlrZSA9IHsNCiAgICBjaGFzc2lzID0gImFybWFkdmNvbSIsDQoJbmFtZSA9ICJUaGUgRW1wcmVzcyIsDQogICAgbW9kdWxlcyA9IHsgImFkdl9jb21wb3NpdGVfYXJtb3IiLCAiaGlnaF9wb3dlcl9zZXJ2b3MiIH0NCiAgfSwNCiAgYmF0dGxlID0gew0KICAgIGNoYXNzaXMgPSAiY29yY29tIiwNCgluYW1lID0gIk1yLiBBbWF6aW5nIiwNCiAgICBtb2R1bGVzID0geyAiY29tbXdlYXBvbl9zaG90Z3VuIiwgInJhZGFybW9kdWxlIiwgImhpZ2hfcG93ZXJfc2Vydm9zIiB9DQogIH0sDQogIGhlYXZ5cmVjb24gPSB7DQogICAgY2hhc3NpcyA9ICJjb21tcmVjb24iLA0KCW5hbWUgPSAiSm9obiBRLiBSYW1ibyIsDQogICAgbW9kdWxlcyA9IHsgImNvbW13ZWFwb25faGVhdnltYWNoaW5lZ3VuIiwgInJhZGFybW9kdWxlIiwgImhpZ2hfcG93ZXJfc2Vydm9zIiB9DQogIH0sDQp9
 
 -- player data
 {
-  strike = {
+  mystrike = {
     "strike",
     "advstrike",
   },
-  battle = {
+  mybattle = {
     "battle",
   },
-  recon = {
-    "commrecon",
+  myrecon = {
+    "heavyrecon",
     "commadvrecon",
   },
-  support = {
-    "commsupport",
-    "armadvcom",
-  },
 }
-ew0KICBzdHJpa2UgPSB7DQogICAgInN0cmlrZSIsDQogICAgImFkdnN0cmlrZSIsDQogIH0sDQog
-IGJhdHRsZSA9IHsNCiAgICAiYmF0dGxlIiwNCiAgfSwNCiAgcmVjb24gPSB7DQogICAgImNvbW1y
-ZWNvbiIsDQogICAgImNvbW1hZHZyZWNvbiIsDQogIH0sDQogIHN1cHBvcnQgPSB7DQogICAgImNv
-bW1zdXBwb3J0IiwNCiAgICAiYXJtYWR2Y29tIiwNCiAgfSwNCn0=
+ew0KICBteXN0cmlrZSA9IHsNCiAgICAic3RyaWtlIiwNCiAgICAiYWR2c3RyaWtlIiwNCiAgfSwNCiAgbXliYXR0bGUgPSB7DQogICAgImJhdHRsZSIsDQogIH0sDQogIG15cmVjb24gPSB7DQogICAgImhlYXZ5cmVjb24iLA0KICAgICJjb21tYWR2cmVjb24iLA0KICB9LA0KfQ==
 
 ]]--
 

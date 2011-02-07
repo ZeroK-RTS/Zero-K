@@ -44,12 +44,26 @@ for i=1,#weaponsList do
 end
 
 upgrades = {
+	-- weapons
 	commweapon_shotgun = {
 		name = "Shotgun",
 		description = "SHAWTGUN",
 		func = function(unitDef)
 			end,	
 	},
+	commweapon_heavymachinegun = {
+		name = "Heavy Machine Gun",
+		description = "HEVY MASHEENGAN",
+		func = function(unitDef)
+			end,	
+	},
+	commweapon_rocketlauncher = {
+		name = "Rocket Launcher",
+		description = "RAWKET LAWNCHAIR",
+		func = function(unitDef)
+			end,	
+	},
+	
 	adv_composite_armor = {
 		name = "Advanced Composite Armor",
 		description = "Improved armor increases commander health by 20%",
