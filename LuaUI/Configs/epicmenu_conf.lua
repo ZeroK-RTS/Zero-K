@@ -65,7 +65,7 @@ confdata.game_menu_tree = {
 	{},
 	{'Share Dialog...', 'sharedialog' },	
 	{'Last Message Position', 'lastmsgpos' },	
-	{'Select Comm', function() spSendCommands{"luaui showstartupinfoselector"} end },
+	{'Choose Commander Type', function() spSendCommands{"luaui showstartupinfoselector"} end },
 	{},
 	{'Screenshots|Take screenshots.',
 		{

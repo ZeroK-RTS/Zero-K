@@ -22,6 +22,7 @@ options_order = {
 	'select_all',
 	'select_half',
 	'select_one',
+	'selectcomm',
 	
 	'lbl_idle',
 	'select_idleb',
@@ -76,6 +77,10 @@ options = {
 	selectairw = { type = 'button',
 		name = 'Armed Flying Units In View',
 		action = 'select Visible+_Not_Building_Not_Commander_Not_Transport_Aircraft_Weapons+_ClearSelection_SelectAll+',
+	},
+	selectcomm = { type = 'button',
+		name = 'Select Commander',
+		action = 'select AllMap+_Commander+_ClearSelection_SelectOne+',
 	},
 	
 	
