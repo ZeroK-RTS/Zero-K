@@ -123,24 +123,26 @@ function Ribbon:Draw()
     local x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
 	if x and y and z then 
 		glUniform( oldPosUniform[quads0+1] , x,y,z )
+		
+		if (self.blendfactor<1) then
+			local clr = self.color
+			glColor(clr[1],clr[2],clr[3],clr[4]*self.blendfactor)
+		else
+			glColor(self.color)
+		end
+
+		glCallList(DLists[quads0])
 	else
-		local dir = self.oldPos[j]
-		glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
+		--local dir = self.oldPos[j]
+		--glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
 	end
   else
-    local dir = self.oldPos[j]
-    glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
+    --local dir = self.oldPos[j]
+    --glUniform( oldPosUniform[quads0+1] , dir[1], dir[2], dir[3] )
   end
 
   --// define color and add speed blending (don't show ribbon for slow/landing units!)
-  if (self.blendfactor<1) then
-    local clr = self.color
-    glColor(clr[1],clr[2],clr[3],clr[4]*self.blendfactor)
-  else
-    glColor(self.color)
-  end
-
-  glCallList(DLists[quads0])
+  
 end
 
 -----------------------------------------------------------------------------------------------------------------
