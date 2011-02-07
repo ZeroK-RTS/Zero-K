@@ -31,7 +31,7 @@ local table           = table
 
 local panelFont		  = "LuaUI/Fonts/komtxt__.ttf"
 local waveFont        = LUAUI_DIRNAME.."Fonts/Skrawl_40"
-local panelTexture    = ":n:"..LUAUI_DIRNAME.."Images/panel.tga"
+local panelTexture    = LUAUI_DIRNAME.."Images/panel.tga"
 
 local viewSizeX, viewSizeY = 0,0
 
@@ -124,6 +124,7 @@ end
 -- I'm sure there's something to do this automatically but ehhh...
 local function FormatTime(s)
 	if not s then return '' end
+	s = math.floor(s)
 	local neg = (s < 0)
 	if neg then s = -s end	-- invert it here and add the minus sign later, since it breaks if we try to work on it directly
 	local m = math.floor(s/60)
@@ -359,7 +360,7 @@ function widget:Initialize()
 		height=189;
 		y=0;
 		x=0;
-		keepAspect = true,
+		keepAspect = false,
 		file = panelTexture;
 		parent = window;
 		disableChildrenHitTest = false,
