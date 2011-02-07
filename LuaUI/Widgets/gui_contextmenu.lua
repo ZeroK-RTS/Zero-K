@@ -353,6 +353,7 @@ local function printWeapons(unitDef)
 			if not wsTemp.wname 
 				or wsTemp.wname:find('fake')
 				or wsTemp.wname:find('Fake')
+				or wsTemp.wname:find('NoWeapon')
 				then 
 				weaponStats[i] = false
 			else
