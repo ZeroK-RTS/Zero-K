@@ -490,14 +490,19 @@ local morphDefs = {
 
 local comMorph = {
 	[1] = {
+		metal = 300,
+		energy = 300,
+		time = 30,
+	},
+	[2] = {
 		metal = 750,
 		energy = 750,
 		time = 75,
 	},
-	[2] = {
-		metal = 1200,
-		energy = 1200,
-		time = 120,
+	[3] = {
+		metal = 1000,
+		energy = 1000,
+		time = 100,
 	},
 }
 
@@ -574,30 +579,35 @@ for id, playerData in pairs(customComms) do
 	Spring.Echo("Setting morph for custom comms for player: "..id)
 	for chassisName, array in pairs(playerData) do
 		for i=1,#array do
-			Spring.Echo(array[i], array[i+1])
+			--Spring.Echo(array[i], array[i+1])
 			local targetDef = array[i+1] and UnitDefNames[array[i+1]]
 			local originDef = UnitDefNames[array[i]] or UnitDefNames[array[i]]
 			if targetDef and originDef then
-				Spring.Echo("Configuring morph")
+				Spring.Echo("Configuring comm morph: "..(array[i]) , array[i+1])
 				local sourceName, targetName = originDef.name, targetDef.name
 				local morphCost
-				local morphOption = CopyTable(comMorph[i], true)
-				morphOption.into = array[i+1]
-				-- set cost
-				morphCost = (targetDef.customParams and targetDef.customParams.morphCost) or 0
-				morphTime = (targetDef.customParams and targetDef.customParams.morphTime) or 0
-				morphCostDiscount = (originDef.customParams and originDef.customParams.morphCost) or 0
-				morphTimeDiscount = (originDef.customParams and originDef.customParams.morphTime) or 0
-				morphOption.metal = morphOption.metal + morphCost - morphCostDiscount
-				morphOption.energy = morphOption.energy + morphCost - morphCostDiscount
-				morphOption.time = morphOption.time + morphTime - morphTimeDiscount
+				local morphOption = comMorph[i] and CopyTable(comMorph[i], true)
+				if morphOption then
+					morphOption.into = array[i+1]
+					-- set cost
+					morphCost = (targetDef.customParams and targetDef.customParams.morphCost) or 0
+					morphTime = (targetDef.customParams and targetDef.customParams.morphTime) or 0
+					morphCostDiscount = (originDef.customParams and originDef.customParams.morphCost) or 0
+					morphTimeDiscount = (originDef.customParams and originDef.customParams.morphTime) or 0
+					morphOption.metal = morphOption.metal + morphCost - morphCostDiscount
+					morphOption.energy = morphOption.energy + morphCost - morphCostDiscount
+					morphOption.time = morphOption.time + morphTime - morphTimeDiscount
 				
-				-- copy, checking that this morph isn't already defined
-				morphDefs[sourceName] = morphDefs[sourceName]  or {}
-				if not CheckForExistingMorph(sourceName, targetName) then
-					morphDefs[sourceName][#(morphDefs[sourceName]) + 1] = morphOption
+					-- copy, checking that this morph isn't already defined
+					morphDefs[sourceName] = morphDefs[sourceName]  or {}
+					if not CheckForExistingMorph(sourceName, targetName) then
+						morphDefs[sourceName][#(morphDefs[sourceName]) + 1] = morphOption
+					else
+						Spring.Echo("Duplicate morph, exiting")
+					end
 				else
-					Spring.Echo("Duplicate morph, exiting")
+					Spring.Echo("Comm Morph error: no setting for level "..i.."->"..i+1 .. " transition")
+					break
 				end
 			end
 		end
