@@ -73,6 +73,7 @@ local SHARED_MODE = true --Spring.GetModOption('communism',true,true)
 -------------------------------------------------------------------------------------
 
 local GetUnitIsActive = Spring.GetUnitIsActive
+local spValidUnitID = Spring.ValidUnitID
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -723,13 +724,15 @@ function gadget:GameFrame(n)
 			
 			--// check if pylons changed their active status (emp, reverse-build, ..)
 			for unitID, pylonData in pairs(pylon[allyTeamID]) do
-				local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
-				local states = Spring.GetUnitStates(unitID)
-				local currentlyActive = (not stunned_or_inbuld) and states and states.active
-				if (currentlyActive) and (not pylonData.active) then
-					ReactivatePylon(unitID)
-				elseif (not currentlyActive) and (pylonData.active) then
-					DeactivatePylon(unitID)
+				if spValidUnitID(unitID) then
+					local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
+					local states = Spring.GetUnitStates(unitID)
+					local currentlyActive = (not stunned_or_inbuld) and states and states.active
+					if (currentlyActive) and (not pylonData.active) then
+						ReactivatePylon(unitID)
+					elseif (not currentlyActive) and (pylonData.active) then
+						DeactivatePylon(unitID)
+					end
 				end
 			end
 			
