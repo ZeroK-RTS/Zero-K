@@ -83,6 +83,7 @@ local commQuota = {} -- [allyTeamID] = number
 
 local playerIDsByName = {}
 local customComms = {}
+local commChoice = {}
 
 -- deprecated
 local commSpawnedTeam = {}
@@ -222,9 +223,9 @@ local function InitUnsafe()
 		end
 
 		-- record the player's first-level comm def for each chassis
-		for chassis, subdata in pairs(commData) do
+		for commSeries, subdata in pairs(commData) do
 			customComms[id] = customComms[id] or {}
-			customComms[id][("comm"..chassis)] = subdata[1]
+			customComms[id][commSeries] = subdata[1]
 			--Spring.Echo(id,"comm"..chassis, subdata[1])
 		end
 		
@@ -278,10 +279,7 @@ end
 
 
 local function GetStartUnit(teamID, playerID)
-  local side = select(5, Spring.GetTeamInfo(teamID))
-  local sideCase = select(2, Spring.GetSideData(side)) -- case pls
   local startUnit, startUnitAlt
-  local chickens = modOptions and tobool(modOptions.chickens)
   
   if (teamID and teamSides[teamID]) then 
 	startUnit = startUnits[teamSides[teamID]]
@@ -290,9 +288,18 @@ local function GetStartUnit(teamID, playerID)
   if (playerID and playerSides[playerID]) then 
 	startUnit = startUnits[playerSides[playerID]]
   end
-
+  
   -- if a replacement def is available, use it  
   playerID = playerID or (teamID and select(2, Spring.GetTeamInfo(teamID)) )
+  if (playerID and commChoice[playerID]) then
+	--Spring.Echo("Attempting to load alternate comm")
+	Spring.Echo(commChoice[playerID])
+	local altComm = customComms[playerID][(commChoice[playerID])]
+	Spring.Echo(altComm)
+	startUnit = (altComm and UnitDefNames[altComm] and altComm) or startUnit
+  end
+  
+  --[[
   local altName = altCommNames[startUnit] or startUnit
   --Spring.Echo(altName)
   local altComm = customComms[playerID] and customComms[playerID][altName]
@@ -301,6 +308,7 @@ local function GetStartUnit(teamID, playerID)
 	startUnit = altComm
 	Spring.Echo("Using alt comm: "..startUnit)
   end
+  ]]--
   
   --if didn't pick a comm, wait for user to pick
   return startUnit or nil	-- startUnit or DEFAULT_UNIT
@@ -642,6 +650,17 @@ function gadget:RecvLuaMsg(msg, playerID)
 		playerSides[playerID] = side
 		local _,_,_,teamID = Spring.GetPlayerInfo(playerID)
 		teamSides[teamID] = side
+		if gamestart then
+			-- picked commander after game start, prep for orbital drop
+			-- can't do it directly because that's an unsafe change
+			local frame = Spring.GetGameFrame() + 3
+			if not scheduledSpawn[frame] then scheduledSpawn[frame] = {} end
+			scheduledSpawn[frame][#scheduledSpawn[frame] + 1] = {teamID, playerID}
+		end
+	elseif msg:find("customcomm:",1,true) then
+		local name = msg:sub(12)
+		commChoice[playerID] = name
+		local _,_,_,teamID = Spring.GetPlayerInfo(playerID)
 		if gamestart then
 			-- picked commander after game start, prep for orbital drop
 			-- can't do it directly because that's an unsafe change

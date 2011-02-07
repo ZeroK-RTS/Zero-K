@@ -45,90 +45,44 @@ local morphDefs = {
   }
   ]]--
 
-  --[[armdecom = {
-    into = 'armcom',
-    time   = 20,    -- game seconds
-    metal  = 10000, -- metal cost
-    energy = 60000, -- energy cost
-		tech = 2,				-- tech level
-		xp = 0.5,				-- required unit XP
-  },
-
-  cordecom = {
-    into = 'corcom',
-    time   = 20,    -- game seconds
-    metal  = 10000, -- metal cost
-    energy = 60000, -- energy cost
-		tech = 2,				-- tech level
-  },]]--
-
+  --// commanders
 --[[
   armcom = {
-    {
-      into = 'armcom_riot',
-      time = 10,
-      metal = 0,
-      energy = 0,
-      tech = 1,
-      xp = 0,
-    },
-    {
-      into = 'armcom_armored',
-      time = 10,
-      metal = 0,
-      energy = 0,
-      tech = 0,
-      xp = 0,
-    },
-  },
-  corcom = {
-    {
-      into = 'corcom_riot',
-      time = 10,
-      metal = 0,
-      energy = 0,
-      tech = 1,
-      xp = 0,
-    },
-    {
-      into = 'corcom_armored',
-      time = 10,
-      metal = 0,
-      energy = 0,
-      tech = 0,
-      xp = 0,
-    },
-  },
---]]
-
-  --// commanders
-  armcom = {
-    into = 'armadvcom',
-	metal = 750,
-	energy = 750,
-    time = 75,
+	{
+		into = 'armadvcom',
+		metal = 750,
+		energy = 750,
+		time = 75,
+	},
   },
   
   corcom = {
-    into = 'coradvcom',
-	metal = 750,
-	energy = 750,
-    time = 75,
+	{
+		into = 'coradvcom',
+		metal = 750,
+		energy = 750,
+		time = 75,
+	},
   },
   
   commrecon = {
-    into = 'commadvrecon',
-	metal = 750,
-	energy = 750,
-    time = 75,
+	{
+		into = 'commadvrecon',
+		metal = 750,
+		energy = 750,
+		time = 75,
+	},
   },
 
   commsupport = {
-    into = 'commadvsupport',
-	metal = 750,
-	energy = 750,
-    time = 75,
+	{
+		into = 'commadvsupport',
+		metal = 750,
+		energy = 750,
+		time = 75,
+	},
   },  
+--]]
   
   --// geos
   geo = {

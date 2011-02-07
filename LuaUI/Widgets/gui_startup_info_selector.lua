@@ -89,7 +89,7 @@ function Close(commPicked)
 	printDebug("<gui_startup_info_selector DEBUG >: closing")
 	if not commPicked then Spring.SendLuaRulesMsg("faction:strikecomm") end
 	--Spring_SendCommands("say: a:I chose " .. option.button})
-	mainWindow:Dispose()
+	if mainWindow then mainWindow:Dispose() end
 end
 
 local function CreateWindow()
@@ -108,69 +108,69 @@ local function CreateWindow()
 	-- create window if necessary
 	if actived > 0 then
 
-	mainWindow = Window:New{
-		resizable = false,
-		draggable = false,
-		clientWidth  = posterx*actived,
-		clientHeight = postery + buttonspace +12 ,--there is a title (caption below), height is not just poster+buttons
-		x = (vsx - posterx*actived)/2,
-		y = ((vsy - postery - buttonspace)/2),
-		parent = screen0,
-		caption = "STARTUP SELECTOR",
-		}
-
-	-- add posters
-	local i = 0
-	for name,option in pairs(optionData) do
-		if option:enabled() then
-			local image = Image:New{
-				parent = mainWindow,
-				file = option.poster,--lookup Configs/startup_info_selector.lua to get optiondata
-				tooltip = option.tooltip,
-				caption = option.selector,
-				width = posterx,
-				height = postery,
-				x = (i*posterx),
-				padding = {1,1,1,1},
-				OnClick = {option.button},
-				--OnMouseUp = {option.button},
-				y = 9 
-				}
-			local buttonWidth = posterx*2/3
-				if (option.button ~= nil) then 
-					local button = Button:New {
-						parent = mainWindow,
-						x = i*posterx + (posterx - buttonWidth)/2, --placement of comms names' buttons @ the middle of each poster
-						y = postery+12,
-						caption = option.selector,
-						tooltip = option.tooltip, --added comm name under cursor on tooltip too, like for posters
-						width = buttonWidth,
-						height = 30,
-						padding={1,1,1,1},
+		mainWindow = Window:New{
+			resizable = false,
+			draggable = false,
+			clientWidth  = posterx*actived,
+			clientHeight = postery + buttonspace +12 ,--there is a title (caption below), height is not just poster+buttons
+			x = (vsx - posterx*actived)/2,
+			y = ((vsy - postery - buttonspace)/2),
+			parent = screen0,
+			caption = "STARTUP SELECTOR",
+			}
+		
+		-- add posters
+		local i = 0
+		for name,option in pairs(optionData) do
+			if option:enabled() then
+				local image = Image:New{
+					parent = mainWindow,
+					file = option.poster,--lookup Configs/startup_info_selector.lua to get optiondata
+					tooltip = option.tooltip,
+					caption = option.selector,
+					width = posterx,
+					height = postery,
+					x = (i*posterx),
+					padding = {1,1,1,1},
+					OnClick = {option.button},
 					--OnMouseUp = {option.button},
-						OnClick = {option.button},-- used onclick in case people change their mind, mouseup register the option you were when pressed on, even if you moved somewhere else while still hold mouse button. onclick register it only if you're still on it (even if you moved to another part of the comm button).
-						}
-				end 
-			i = i + 1
-      end
-    end
-
-    local cbWidth = posterx*actived*0.75-- calculate width of close button depending of number or posters
-    local closeButton = Button:New{
-      parent = mainWindow,
-	  caption = "CLOSE  (defaults to Strike Commander)",
-	  tooltip = "CLOSE\nNo commander selection made, will use Strike Commander",
-      --caption = "CLOSE  (make no selection)",
-	  --tooltip = "CLOSE\nNo commander selection made\nTo choose your commander later, open the Esc menu and go to Game Actions -> Select Comm",
-      width = cbWidth,
-      height = 30,
-      x = (posterx*actived - cbWidth)/2,
-      y = postery + (buttonspace)/2+14,
-      --OnMouseUp = {Close}
-	  OnClick = {function() Close(false) end}
-	}
-
-  end
+					y = 9 
+					}
+				local buttonWidth = posterx*2/3
+					if (option.button ~= nil) then 
+						local button = Button:New {
+							parent = mainWindow,
+							x = i*posterx + (posterx - buttonWidth)/2, --placement of comms names' buttons @ the middle of each poster
+							y = postery+12,
+							caption = option.selector,
+							tooltip = option.tooltip, --added comm name under cursor on tooltip too, like for posters
+							width = buttonWidth,
+							height = 30,
+							padding={1,1,1,1},
+						--OnMouseUp = {option.button},
+							OnClick = {option.button},-- used onclick in case people change their mind, mouseup register the option you were when pressed on, even if you moved somewhere else while still hold mouse button. onclick register it only if you're still on it (even if you moved to another part of the comm button).
+							}
+					end 
+				i = i + 1
+			end
+		end
+		local cbWidth = posterx*actived*0.75-- calculate width of close button depending of number or posters
+		local closeButton = Button:New{
+			parent = mainWindow,
+			caption = "CLOSE  (defaults to baseline commander)",
+			tooltip = "CLOSE\nNo commander selection made, will use a basic Strike Commander",
+			--caption = "CLOSE  (make no selection)",
+			--tooltip = "CLOSE\nNo commander selection made\nTo choose your commander later, open the Esc menu and go to Game Actions -> Select Comm",
+			width = cbWidth,
+			height = 30,
+			x = (posterx*actived - cbWidth)/2,
+			y = postery + (buttonspace)/2+14,
+			--OnMouseUp = {Close}
+			OnClick = {function() Close(false) end}
+		}
+	else
+		Close(false)
+	end
 end
 
 local function IsSpec()
