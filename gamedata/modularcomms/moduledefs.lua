@@ -82,18 +82,19 @@ upgrades = {
 				unitDef.maxvelocity = (unitDef.maxvelocity or 0) + unitDef.customparams.basespeed*0.15
 			end,
 	},	
-	module_radar_extender = {
-		name = "Radar Extender",
-		description = "Extends radar range by 1000 elmos",
+	module_fieldradar = {
+		name = "Field Radar Module",
+		description = "Basic radar system with 1800 range",
 		func = function(unitDef)
-				unitDef.radardistance = (unitDef.radardistance or 0) + 1000
+				unitDef.radardistance = (unitDef.radardistance or 0)
+				if unitDef.radardistance < 1800 then unitDef.radardistance = 1800 end
 			end,
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Repairs 5 HP/s",
+		description = "Self-repairs 10 HP/s",
 		func = function(unitDef)
-				unitDef.autoheal = (unitDef.autoheal or 0) + 5
+				unitDef.autoheal = (unitDef.autoheal or 0) + 10
 			end,
 	},
 	module_adv_nano = {

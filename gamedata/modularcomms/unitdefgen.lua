@@ -74,8 +74,8 @@ local function ProcessComm(name, config)
 		cp.morphCost = cp.morphCost or "0"
 		cp.morphTime = cp.moprhTime or "0"
 		if config.modules then
-			-- process weapons first
-			for _,moduleName in pairs(config.modules) do
+			-- add weapons first
+			for _,moduleName in ipairs(config.modules) do
 				if moduleName:find("commweapon_",1,true) then
 					if weapons[moduleName] then
 						ApplyWeapon(commDefs[name], moduleName)
@@ -85,8 +85,8 @@ local function ProcessComm(name, config)
 					end
 				end
 			end
-			-- process other modules
-			for _,moduleName in pairs(config.modules) do
+			-- process all modules (including weapons)
+			for _,moduleName in ipairs(config.modules) do
 				if upgrades[moduleName] then
 					upgrades[moduleName].func(commDefs[name])	--apply upgrade function
 					Spring.Echo("\tApplying upgrade: "..moduleName)
@@ -125,7 +125,7 @@ for name, data in pairs(commDefs) do
 	if data.weapondefs then
 		local minRange = 999999
 		for name, weaponData in pairs(data.weapondefs) do
-			if weaponData.range < minRange then minRange = weaponData.range end
+			if (weaponData.range or 999999) < minRange then minRange = weaponData.range end
 		end
 		if data.weapons and data.weapondefs then
 			local wepName = data.weapondefs[1] and data.weapondefs[1].def

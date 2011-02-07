@@ -13,9 +13,9 @@ local weaponDef = {
 	},
 	
 	damage                  = {
-		default = 250,
-		planes  = 250,
-		subs    = 12.5,
+		default = 350,
+		planes  = 350,
+		subs    = 17.5,
 	},
 	
 	fireStarter             = 70,
@@ -29,7 +29,7 @@ local weaponDef = {
 	noSelfDamage            = true,
 	predictBoost            = 1,
 	range                   = 430,
-	reloadtime              = 2.5,
+	reloadtime              = 2,
 	renderType              = 1,
 	selfprop                = true,
 	smokedelay              = [[.1]],
