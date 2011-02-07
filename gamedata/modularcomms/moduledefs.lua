@@ -43,6 +43,7 @@ for i=1,#weaponsList do
 	weapons[name] = lowerkeys(array)
 end
 
+-- name and description don't actually matter ATM, only the keyname and function do
 upgrades = {
 	-- weapons
 	commweapon_shotgun = {
@@ -64,6 +65,46 @@ upgrades = {
 			end,	
 	},
 	
+	-- modules
+	module_ablative_armor = {
+		name = "Ablative Armor Plates",
+		description = "Adds 500 HP",
+		func = function(unitDef)
+				unitDef.maxdamage = unitDef.maxdamage + 500
+			end,
+	},	
+	module_high_power_servos = {
+		name = "High Power Servos",
+		description = "More powerful leg servos increase speed by 15% (cumulative)",
+		func = function(unitDef)
+				unitDef.customparams = unitDef.customparams or {}
+				unitDef.customparams.basespeed = unitDef.customparams.basespeed or tostring(unitDef.maxvelocity)
+				unitDef.maxvelocity = (unitDef.maxvelocity or 0) + unitDef.customparams.basespeed*0.15
+			end,
+	},	
+	module_radar_extender = {
+		name = "Radar Extender",
+		description = "Extends radar range by 1000 elmos",
+		func = function(unitDef)
+				unitDef.radardistance = (unitDef.radardistance or 0) + 1000
+			end,
+	},
+	module_autorepair = {
+		name = "Autorepair System",
+		description = "Repairs 5 HP/s",
+		func = function(unitDef)
+				unitDef.autoheal = (unitDef.autoheal or 0) + 5
+			end,
+	},
+	module_adv_nano = {
+		name = "CarRepairer's Nanolathe",
+		description = "Used by a mythical mechanic/coder, this improved nanolathe adds +3 metal/s build speed",
+		func = function(unitDef)
+				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 3 end
+			end,
+	},	
+	
+	-- some old stuff
 	adv_composite_armor = {
 		name = "Advanced Composite Armor",
 		description = "Improved armor increases commander health by 20%",
@@ -79,27 +120,6 @@ upgrades = {
 				local wepName = (unitDef.weapons[4] and unitDef.weapons[4].def) or (unitDef.weapons[1] and unitDef.weapons[1].def)
 				wepName = string.lower(wepName)
 				unitDef.weapondefs[wepName].range = unitDef.weapondefs[wepName].range * 1.2
-			end,
-	},
-	high_power_servos = {
-		name = "High Power Servos",
-		description = "More powerful leg servos increase speed by 20%",
-		func = function(unitDef)
-				unitDef.maxvelocity = unitDef.maxvelocity * 1.2
-			end,
-	},
-	radarmodule = {
-		name = "Radar Module",
-		description = "Basic radar module with 1200 range",
-		func = function(unitDef)
-				if unitDef.radardistance == nil or unitDef.radardistance < 1200 then unitDef.radardistance = 1200 end
-			end,
-	},
-	adv_nano = {
-		name = "CarRepairer's Nanolathe",
-		description = "Used by a mythical mechanic/coder, this improved nanolathe adds +3 metal/s build speed",
-		func = function(unitDef)
-				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 3 end
 			end,
 	},
 }

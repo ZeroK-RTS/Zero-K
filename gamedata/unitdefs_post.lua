@@ -89,6 +89,30 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- some comm stuff - placeholder really
+--
+local toCopy = {
+	armcom = {'armcom1', 'armcom2'},
+	corcom = {'corcom1', 'corcom2'},
+	commrecon = {'commrecon1', 'commrecon2'},
+	commsupport = {'commsupport1', 'commsupport2'},
+
+	armadvcom = {'armcom3', 'armcom4'},
+	coradvcom = {'corcom3', 'corcom4'},
+	commadvrecon = {'commrecon3', 'commrecon4'},
+	commadvsupport = {'commsupport3', 'commsupport4'},
+}
+
+for origin, targets in pairs(toCopy) do
+	for index, name in pairs(targets) do
+		UnitDefs[name] = CopyTable(UnitDefs[origin], true)
+	end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Modular commander handling
 --
 
