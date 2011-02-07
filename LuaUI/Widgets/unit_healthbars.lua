@@ -662,6 +662,7 @@ do
       if (ci.reloadTime>=minReloadTime) then
         _,reloaded,reloadFrame = GetUnitWeaponState(unitID,ci.primaryWeapon)
         if (reloaded==false) then
+		  local slowState = 1-(GetUnitRulesParam(unitID,"slowState") or 0)
 		  local reloadTime = Spring.GetUnitWeaponState(unitID, ci.primaryWeapon , 'reloadTime')
 		  ci.reloadTime = reloadTime
           reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
