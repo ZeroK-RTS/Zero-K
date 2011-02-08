@@ -151,11 +151,11 @@ Killed(severity, corpsetype)
 	if( severity <= 99 )
 	{
 		corpsetype = 2;
-		explode body type FALL | SMOKE | FIRE;
+		explode body type SHATTER;
 		explode jet type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		return (0);
 	}
 	corpsetype = 2;
-	explode body type FALL | SMOKE | FIRE;
+	explode body type SHATTER;
 	explode jet type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 }

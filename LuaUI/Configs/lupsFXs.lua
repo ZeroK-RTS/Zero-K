@@ -240,19 +240,6 @@ radarBlink = {
 -- OverDrive FXs -----------------------------------------------------------
 ----------------------------------------------------------------------------
 
-armmexJet = {
-  color={0,0,0},
-  emitVector={0,-1,0},
-  width=7,
-  length=100,
-  animSpeed=0.5,
-  distortion=0.01,
-  jitterWidthScale=1.7,
-  jitterLengthScale=1.5,
-  piece="exhaust",
-  onActive=true
-}
-
 cormexGlow = {
   layer       = -5,
   delay       = 0,
