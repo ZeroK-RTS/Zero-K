@@ -50,6 +50,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[chickenflyerqueen.s3o]],
   power               = 30000,
+  script              = [[chickenflyerqueen.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
   separation          = [[0.2]],
