@@ -63,6 +63,8 @@ unitDef = {
 
   customParams        = {
     description_fr = [[ADAV de Construcion Furtif Camouflable, Construit r 6 m/s]],
+	description_de = [[Fliegender SpecOps Bauleiter, Baut mit 9 m/s]],
+	helptext_de    = [[Athene ist die Spitze der Tarnungsschlagkraft. Ausgerüstet mit einem Verhüllungsgeräte und einem Radarstörer kann es durch gegnerische Verteidigungslinien fliegen und Truppen aus Angreifern zusammenstellen, die dann Verwüstung nachsichziehen werden und die gegnerische Logistik vernichten können.]],
     helptext       = [[The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics.]],
     helptext_fr    = [[Le Athena est un ingénieur de combat non armé. Équipé d'un brouilleur radar et d'un camouflage optique il peut construire certaines infrastructures et des unités nimporte ou, et ainsi surprendre l'enneme.]],
   },

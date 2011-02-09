@@ -26,6 +26,8 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Batterie de Missiles Anti-Air ? Moyenne Port?e]],
+	description_de = [[Weitreichende Anti-Air Raketenbatterie]],
+	helptext_de    = [[Der Chainsaw ist eine weitreichendes Anit-Air Geschütz, welches massiv Schaden austeilt und sogar Bomber vom Himmel holen kann. Dennoch kann es nicht viel Schaden einstecken und versagt kläglich, wenn es direkt angegriffen wird.]],
     helptext       = [[The Chainsaw is a long range anti-air turret, dealing out massive damage, able to knock bombers out of the sky very quickly. It can't take very much damage in return, though, and does poorly when attacked directly.]],
     helptext_fr    = [[Cette batterie de missile ultra v?loce permet d'abattre des cibles aeriennes lourdes - comme les bombardiers - avant qu'elles ne puissent passer ? l'attaque. Il n?cessite d'?tre plac? en terrain d?gag? pour utiliser pleinement son potentiel. Reste assez fragile et ? prot?ger.]],
   },

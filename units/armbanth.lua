@@ -24,6 +24,8 @@ unitDef = {
 
   customParams           = {
     description_fr = [[Mechwarrior d'Assaut Lourd]],
+	description_de = [[Schwerer Kampfstreicher]],
+	helptext_de    = [[Der Bantha ist die Lösung für eine besonders schwierig zu knackende Verteidigungslinie. Dazu besitzt er einen Tachyonen Beschleuniger und Marschflugkörper für Pattsituationen, blitzschnelle Handfeuerwaffen für den normalen Kampf und haufenweise Munition. Dennoch gib Acht darauf, dass er gegen Luftangriffe fast schutzlos ist.]],
     helptext       = [[The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and cruise missiles for stand-off engagements, lightning hand cannons for general purpose combat, and plenty of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own.]],
     helptext_fr    = [[Supérieur au Razorback en taille, en blindage, en prix, en portée, en armement mais pas en vitesse. Le Bantha est aussi cher et lent qu'il est inarretable. Il dispose de canons lasers, d'un canon accelerateur tachyon et de missiles. Courez.]],
   },

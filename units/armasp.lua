@@ -23,6 +23,8 @@ unitDef = {
 
   customParams        = {
     helptext = [[The Air Repair Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
+	description_de = [[Repariert automatisch eigene/verbündete Lufteinheiten]],
+	helptext_de    = [[Das Air Repair Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber.]],
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],
