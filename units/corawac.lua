@@ -19,6 +19,10 @@ unitDef = {
   canSubmerge         = false,
   category            = [[UNARMED FIXEDWING]],
   collide             = false,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[60 20 70]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
   cruiseAlt           = 250,
 
