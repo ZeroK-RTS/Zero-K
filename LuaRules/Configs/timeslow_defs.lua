@@ -33,6 +33,8 @@ local presets = {
 	
 	commrecon3_slowbeam = { slowDamage = 750, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
 	commrecon3_slowbomb = { slowDamage = 1500, scaleSlow = true },
+	
+	module_disruptorbeam = { slowDamage = 450, smartRetarget = 0.5, scaleSlow = true},
 }
 
 ------------------------

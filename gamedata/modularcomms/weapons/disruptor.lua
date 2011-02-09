@@ -12,7 +12,7 @@ local weaponDef = {
 
 	customParams			= {
 		slot = [[4]],
-		timeslow_preset = [[commrecon_slowbeam]],
+		timeslow_preset = [[module_disruptorbeam]],
 	},
 	
     damage                  = {
