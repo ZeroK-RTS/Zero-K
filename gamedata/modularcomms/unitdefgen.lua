@@ -21,6 +21,15 @@ VFS.Include("LuaRules/Utilities/base64.lua")
 --	TODO:
 --		Figure out how modstats should handle procedurally generated comms
 --			* Teach gadget to treat them as baseline comms
+--
+--------------------------------------------------------------------------------
+--	PROPOSED SPECS FOR TEMPLATE UNITDEFS
+--	Weapon 1: fake laser
+--	Weapon 2: shield
+--	Weapon 3: special weapon (uses second CEG)
+--	Weapon 4: main weapon (no CEG)
+--	Weapon 5: main weapon (uses first CEG)
+--	Weapon 6: flamethrower only?
 --------------------------------------------------------------------------------
 VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
@@ -54,15 +63,30 @@ if not commData then commData = {} end
 --------------------------------------------------------------------------------
 commDefs = {}	--holds precedurally generated comm defs
 
+local mapWeaponToCEG = {
+	[5] = 1,
+}
+
+-- todo: CEG change handling
 local function ApplyWeapon(unitDef, weapon)
-	local wcp = weapons[weapon].customparams
-	local slot = tonumber(wcp and wcp.slot) or 1
+	local wcp = weapons[weapon].customparams or {}
+	local slot = tonumber(wcp and wcp.slot) or 4
 	unitDef.weapons[slot] = {
 		def = weapon,
-		badtargetcategory = wcp.badtargetcategory,
-		onlytargetcategory = wcp.onlytargetcategory,
+		badtargetcategory = wcp.badtargetcategory or [[FIXEDWING]],
+		onlytargetcategory = wcp.onlytargetcategory or [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
 	}
 	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
+	for i=4,6 do	-- subject to change
+		if unitDef.weapons[i] and i ~= slot then
+			unitDef.weapons[i] = nil
+		end
+	end
+	--Spring.Echo(wcp.muzzleeffect)
+	if mapWeaponToCEG[slot] and unitDef.sfxtypes and unitDef.sfxtypes.explosiongenerators then
+		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot]] = wcp.muzzleeffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot]] or [[custom:NONE]]
+		--Spring.Echo(unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot]])
+	end
 end
 
 local function ProcessComm(name, config)
@@ -70,16 +94,17 @@ local function ProcessComm(name, config)
 		Spring.Echo("Processing comm: "..name)
 		local name = name
 		commDefs[name] = CopyTable(UnitDefs[config.chassis], true)
+		commDefs[name].customparams = commDefs[name].customparams or {}
 		local cp = commDefs[name].customparams
 		cp.morphCost = cp.morphCost or "0"
-		cp.morphTime = cp.moprhTime or "0"
+		cp.morphTime = cp.morphTime or "0"
 		if config.modules then
 			-- add weapons first
 			for _,moduleName in ipairs(config.modules) do
 				if moduleName:find("commweapon_",1,true) then
 					if weapons[moduleName] then
-						ApplyWeapon(commDefs[name], moduleName)
 						Spring.Echo("\tApplying weapon: "..moduleName)
+						ApplyWeapon(commDefs[name], moduleName)
 					else
 						Spring.Echo("\tERROR: Weapon "..moduleName.." not found")
 					end
@@ -88,8 +113,8 @@ local function ProcessComm(name, config)
 			-- process all modules (including weapons)
 			for _,moduleName in ipairs(config.modules) do
 				if upgrades[moduleName] then
-					upgrades[moduleName].func(commDefs[name])	--apply upgrade function
 					Spring.Echo("\tApplying upgrade: "..moduleName)
+					upgrades[moduleName].func(commDefs[name])	--apply upgrade function
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end
@@ -124,19 +149,27 @@ for name, data in pairs(commDefs) do
 	Spring.Echo("\tPostprocessing commtype: ".. name)
 	if data.weapondefs then
 		local minRange = 999999
-		for name, weaponData in pairs(data.weapondefs) do
-			if (weaponData.range or 999999) < minRange then minRange = weaponData.range end
+		local weaponNames = {}
+		local wep1Name
+		-- first check if the comm is actually using the weapon
+		if data.weapons then
+			for index, weaponData in pairs(data.weapons) do
+				weaponNames[string.lower(weaponData.def)] = true
+			end
 		end
-		if data.weapons and data.weapondefs then
-			local wepName = data.weapondefs[1] and data.weapondefs[1].def
-			if wepName then
-				wepName = string.lower(wepName)
-				data.weapondefs[wepName].range = minRange
+		for name, weaponData in pairs(data.weapondefs) do
+			if (weaponData.range or 999999) < minRange and weaponNames[name] and not (string.lower(weaponData.name):find('fake')) then
+				minRange = weaponData.range 
+			end
+		end
+		-- lame-ass hack, because the obvious methods don't work
+		for name, weaponData in pairs(data.weapondefs) do
+			if string.lower(weaponData.name):find('fake') then
+				weaponData.range = minRange
 			end
 		end
 	end
 end
-
 
 
 -- splice back into unitdefs

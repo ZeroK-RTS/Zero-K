@@ -58,16 +58,15 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
   objectName          = [[corcom.s3o]],
-  script              = [[corcom.cob]],
+  script              = [[corcom.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:GATE]],
       [[custom:RAIDMUZZLE]],
-      [[custom:LEVLRMUZZLE]],
+      [[custom:RAIDMUZZLE]],
     },
 
   },
@@ -94,7 +93,7 @@ unitDef = {
     },
 
 
-    [4] = {
+    [5] = {
       def                = [[SHOCK_CANNON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],

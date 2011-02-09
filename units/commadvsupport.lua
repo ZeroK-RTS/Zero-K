@@ -34,7 +34,7 @@ unitDef = {
   customParams        = {
     fireproof         = [[1]],
     repairaura_preset = [[commsupport2]],
-	cloakstealth = [[1]],
+	cloakstealth	  = [[1]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -63,16 +63,14 @@ unitDef = {
   norestrict          = [[1]],
   objectName          = [[commsupport.s3o]],
   radarDistance       = 1250,
-  script              = [[commsupport.cob]],
+  script              = [[commsupport.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:HLTRADIATE0]],
-      [[custom:VINDIBACK]],
-      [[custom:FLASH64]],
+		[[custom:flashmuzzle1]],
     },
 
   },
@@ -161,9 +159,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 550,
-        planes  = 550,
-        subs    = 27.5,
+        default = 650,
+        planes  = 650,
+        subs    = 32.5,
       },
 
       explosionGenerator      = [[custom:100rlexplode]],
@@ -175,7 +173,7 @@ unitDef = {
       noExplode               = false,
       noSelfDamage            = true,
       range                   = 500,
-      reloadtime              = 10,
+      reloadtime              = 8,
       renderType              = 4,
       rgbColor                = [[0 1 0.5]],
       separation              = 0.5,
@@ -203,9 +201,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 75,
-        planes  = 75,
-        subs    = 3.75,
+        default = 105,
+        planes  = 105,
+        subs    = 5.25,
       },
 
       explosionGenerator      = [[custom:gauss_hit_m]],

@@ -48,6 +48,13 @@ unitDef = {
   objectName                    = [[ARMPB]],
   seismicSignature              = 16,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
+ 
+  sfxtypes               = {
+    explosiongenerators = {
+      [[custom:STORMMUZZLE]],
+    },
+  }, 
+  
   side                          = [[ARM]],
   sightDistance                 = 660,
   smoothAnim                    = true,

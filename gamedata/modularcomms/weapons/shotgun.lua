@@ -8,9 +8,7 @@ local weaponDef = {
 	craterMult              = 0,
 	
 	customParams			= {
-		slot = [[4]],
-		badTargetCategory  = [[FIXEDWING]],
-		onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+		slot = [[5]],
 	},
 	
 	damage                  = {
@@ -37,7 +35,7 @@ local weaponDef = {
 	soundStart              = [[weapon/cannon/cannon_fire4]],
 	soundStartVolume		= 1,
 	soundTrigger            = true,
-	sprayangle				= 1280,
+	sprayangle				= 1600,
 	targetMoveError         = 0.15,
 	thickness               = 2,
 	tolerance               = 10000,

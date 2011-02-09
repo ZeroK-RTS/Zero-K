@@ -113,14 +113,14 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict             = [[1]],
   objectName             = [[ARMCOM]],
-  script                 = [[armcom.cob]],
+  script                 = [[armcom.lua]],
   seismicSignature       = 16,
   selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:GATE]],
+    	[[custom:WARMUZZLE]],
     },
 
   },
@@ -157,40 +157,6 @@ unitDef = {
 
 
   weaponDefs             = {
-
-    DISINTEGRATOR = {
-      name                    = [[Disintegrator]],
-      areaOfEffect            = 36,
-      avoidFeature            = false,
-      avoidFriendly           = false,
-      avoidNeutral            = false,
-      commandfire             = true,
-      craterBoost             = 1,
-      craterMult              = 6,
-
-      damage                  = {
-        default    = 99999,
-        commanders = [[1]],
-      },
-
-      energypershot           = 300,
-      explosionGenerator      = [[custom:DGUNTRACE]],
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      noExplode               = true,
-      noSelfDamage            = true,
-      range                   = 250,
-      reloadtime              = 1,
-      renderType              = 3,
-      soundTrigger            = true,
-      tolerance               = 10000,
-      turret                  = true,
-      weaponTimer             = 4.2,
-      weaponType              = [[DGun]],
-      weaponVelocity          = 300,
-    },
-
 
     FAKELASER     = {
       name                    = [[Fake Laser]],

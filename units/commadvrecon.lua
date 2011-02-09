@@ -65,19 +65,18 @@ unitDef = {
   onoffable           = true,
   radarDistance       = 1400,
   radarDistanceJam    = 550,
-  script              = [[commrecon.cob]],
+  script              = [[commrecon.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:HLTRADIATE0]],
-      [[custom:VINDIBACK]],
-      [[custom:FLASH64]],
-      [[custom:RAIDMUZZLE]],
+	  [1] = [[custom:NONE]],
+      [2] = [[custom:RAIDMUZZLE]],
+      [3] = [[custom:VINDIBACK]],
+      [4] = [[custom:FLASH64]],
     },
-
   },
 
   showNanoSpray       = false,

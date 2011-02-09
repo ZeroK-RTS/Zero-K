@@ -14,6 +14,9 @@ local function lowerkeys(t)
   return tn
 end
 
+local function noFunc()
+end
+
 --[[
 commTypes = {
 	recon = {
@@ -46,23 +49,46 @@ end
 -- name and description don't actually matter ATM, only the keyname and function do
 upgrades = {
 	-- weapons
-	commweapon_shotgun = {
-		name = "Shotgun",
-		description = "SHAWTGUN",
-		func = function(unitDef)
-			end,	
+	-- it is important that they are prefixed with "commweapon_" in order to get the special handling!
+	commweapon_beamlaser = {
+		name = "Beam Laser",
+		description = "An effective short-range cutting tool",
+		func = noFunc,	
 	},
 	commweapon_heavymachinegun = {
 		name = "Heavy Machine Gun",
-		description = "HEVY MASHEENGAN",
-		func = function(unitDef)
-			end,	
+		description = "Close-in weapon with AoE",
+		func = noFunc,	
+	},
+	commweapon_heatray = {
+		name = "Heat Ray",
+		description = "Close-in weapon with AoE",
+		func = noFunc,	
+	},
+	commweapon_gaussrifle = {
+		name = "Gauss Rifle",
+		description = "Precise armor-piercing weapon",
+		func = noFunc,	
 	},
 	commweapon_rocketlauncher = {
 		name = "Rocket Launcher",
-		description = "RAWKET LAWNCHAIR",
-		func = function(unitDef)
-			end,	
+		description = "Medium-range hitter",
+		func = noFunc,	
+	},
+	commweapon_shockrifle = {
+		name = "Shock Rifle",
+		description = "Slows an enemy's movement and firing rate; non-lethal",
+		func = noFunc,	
+	},
+	commweapon_shotgun = {
+		name = "Shotgun",
+		description = "Can hammer a single large target or shred many small ones",
+		func = noFunc,
+	},
+	commweapon_slowbeam = {
+		name = "Slowing Beam",
+		description = "Slows an enemy's movement and firing rate; non-lethal",
+		func = noFunc,	
 	},
 	
 	-- modules

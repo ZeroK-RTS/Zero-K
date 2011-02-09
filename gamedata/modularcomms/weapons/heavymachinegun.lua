@@ -1,7 +1,7 @@
 local name = "commweapon_heavymachinegun"
 local weaponDef = { 
 	name                    = [[Pulse Autocannon]],
-	accuracy                = 2300,
+	accuracy                = 1024,
 	alphaDecay              = 0.7,
 	areaOfEffect            = 96,
 	burnblow                = true,
@@ -9,9 +9,8 @@ local weaponDef = {
 	craterMult              = 0.3,
 
 	customParams			= {
-		slot = [[4]],
-		badTargetCategory  = [[FIXEDWING]],
-		onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+		slot = [[5]],
+		muzzleEffect = [[custom:WARMUZZLE]],
 	},
 	
 	damage                  = {

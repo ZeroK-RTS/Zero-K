@@ -7,9 +7,10 @@ local weaponDef = {
 	craterMult              = 0,
 
 	customParams			= {
-		slot = [[4]],
+		slot = [[5]],
 		badTargetCategory  = [[FIXEDWING]],
 		onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+		muzzleEffect = [[custom:STORMMUZZLE]],
 	},
 	
 	damage                  = {

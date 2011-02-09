@@ -67,14 +67,14 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
   objectName          = [[ARMCOM]],
-  script              = [[armcom.cob]],
+  script              = [[armcom.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:GATE]],
+    	[[custom:WARMUZZLE]],
     },
 
   },
@@ -139,7 +139,7 @@ unitDef = {
       noExplode               = true,
       noSelfDamage            = true,
       range                   = 250,
-      reloadtime              = 15,
+      reloadtime              = 12,
       renderType              = 3,
 	  size					  = 6,
       soundHit                = [[explosion/ex_med6]],

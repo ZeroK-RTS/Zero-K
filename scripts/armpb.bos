@@ -1,5 +1,6 @@
-#include "sfxtype.h"
-#include "exptype.h"
+//linear constant 65536
+
+#include "constants.h"
 
 piece  base, turret, dome, post, gun, barrel, flare, aimpoint;
 
@@ -107,12 +108,6 @@ RestoreAfterDelay()
 	start-script RequestState(1);
 }
 
-
-SetMaxReloadTime(Func_Var_1)
-{
-	restore_delay = Func_Var_1 * 2;
-}
-
 Create()
 {
 	hide flare;
@@ -171,21 +166,14 @@ AimPrimary(heading, pitch)
 	return (1);
 }
 
-//FirePrimary()
-//{
-	//show flare;
-	//sleep 150;
-	//hide flare;
-//}
+FirePrimary()
+{
+	emit-sfx 1024 from flare;
+}
 
 QueryPrimary(piecenum)
 {
 	piecenum = flare;
-}
-
-SweetSpot(piecenum)
-{
-	piecenum = turret;
 }
 
 AimFromPrimary(piecenum)
@@ -209,7 +197,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode barrel type FALL | BITMAP1;
 		explode post type BITMAPONLY | BITMAP3;
 		explode gun type BITMAPONLY | BITMAP3;
@@ -220,7 +208,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
 		explode base type BITMAPONLY | BITMAP5;
 		explode post type BITMAPONLY | BITMAP3;
@@ -229,7 +217,7 @@ Killed(severity, corpsetype)
 		explode turret type BITMAPONLY | BITMAP2;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
 	explode base type BITMAPONLY | BITMAP5;
 	explode post type BITMAPONLY | BITMAP3;

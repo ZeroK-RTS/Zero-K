@@ -60,16 +60,14 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
   objectName          = [[commsupport.s3o]],
-  script              = [[commsupport.cob]],
+  script              = [[commsupport.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:HLTRADIATE0]],
-      [[custom:VINDIBACK]],
-      [[custom:FLASH64]],
+      [[custom:flashmuzzle1]],
     },
 
   },
@@ -154,9 +152,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 60,
-        planes  = 60,
-        subs    = 3,
+        default = 90,
+        planes  = 90,
+        subs    = 4.5,
       },
 
       explosionGenerator      = [[custom:gauss_hit_l]],

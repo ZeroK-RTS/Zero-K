@@ -31,11 +31,11 @@ jumpCategory = {
 	-- iammissingstuff ={
 	-- 	reload	= 10, aaShootMe	= false, },	
 	commrecon1 = {
-		range = 400, height = 200, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},
+		range = 400, height = 200, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},
 	commrecon2 = {
-		range = 450, height = 220, speed = 6,  reload = 14,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},
+		range = 450, height = 220, speed = 6,  reload = 14,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},
 	commrecon3 = {
-		range = 500, height = 240, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},			
+		range = 500, height = 240, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},			
 }
 
 jumpClassGroups = {
@@ -147,12 +147,12 @@ for groupId,groupcluster in pairs(jumpClassGroups) do
 					Spring.Echo("   Jump Jet Defs error: (Unit: " .. name .. " missing required parameter delay)")	
 					IsBadDef = true			
 				end
-				
+				--[[
 				if ( not jumpCategory[groupId].cobscript ) then
 					Spring.Echo("   Jump Jet Defs error: (Unit: " .. name .. " missing required parameter cobscript)")	
 					IsBadDef = true			
 				end
-				
+				]]--
 				if ( not jumpCategory[groupId].rotateMidAir ) then
 					Spring.Echo("   Jump Jet Defs error: (Unit: " .. name .. " missing required parameter rotateMidAir)")	
 					IsBadDef = true			

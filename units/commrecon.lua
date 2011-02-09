@@ -62,16 +62,17 @@ unitDef = {
   norestrict          = [[1]],
   objectName          = [[commrecon.s3o]],
   radarDistance       = 1250,
-  script              = [[commrecon.cob]],
+  script              = [[commrecon.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:HLTRADIATE0]],
-      [[custom:VINDIBACK]],
-      [[custom:FLASH64]],
+	  [1] = [[custom:NONE]],
+      [2] = [[custom:RAIDMUZZLE]],
+      [3] = [[custom:VINDIBACK]],
+      [4] = [[custom:FLASH64]],
     },
 
   },
@@ -159,7 +160,6 @@ unitDef = {
       customParams            = {
         timeslow_preset = [[commrecon_slowbeam]],
       },
-
 
       damage                  = {
         default = 120,
