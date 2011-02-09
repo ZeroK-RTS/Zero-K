@@ -26,9 +26,9 @@ VFS.Include("LuaRules/Utilities/base64.lua")
 --	PROPOSED SPECS FOR TEMPLATE UNITDEFS
 --	Weapon 1: fake laser
 --	Weapon 2: shield
---	Weapon 3: special weapon (uses second CEG)
+--	Weapon 3: special weapon (uses CEG 3 and 4)
 --	Weapon 4: main weapon (no CEG)
---	Weapon 5: main weapon (uses first CEG)
+--	Weapon 5: main weapon (uses CEG 1 and 2)
 --	Weapon 6: flamethrower only?
 --------------------------------------------------------------------------------
 VFS.Include("gamedata/modularcomms/moduledefs.lua")
@@ -64,10 +64,10 @@ if not commData then commData = {} end
 commDefs = {}	--holds precedurally generated comm defs
 
 local mapWeaponToCEG = {
-	[5] = 1,
+	[3] = {3,4},
+	[5] = {1,2},
 }
 
--- todo: CEG change handling
 local function ApplyWeapon(unitDef, weapon)
 	local wcp = weapons[weapon].customparams or {}
 	local slot = tonumber(wcp and wcp.slot) or 4
@@ -77,15 +77,18 @@ local function ApplyWeapon(unitDef, weapon)
 		onlytargetcategory = wcp.onlytargetcategory or [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
 	}
 	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
-	for i=4,6 do	-- subject to change
-		if unitDef.weapons[i] and i ~= slot then
-			unitDef.weapons[i] = nil
+	-- clear other weapons
+	if slot > 3 then
+		for i=4,6 do	-- subject to change
+			if unitDef.weapons[i] and i ~= slot then
+				unitDef.weapons[i] = nil
+			end
 		end
 	end
-	--Spring.Echo(wcp.muzzleeffect)
+	-- add CEGs
 	if mapWeaponToCEG[slot] and unitDef.sfxtypes and unitDef.sfxtypes.explosiongenerators then
-		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot]] = wcp.muzzleeffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot]] or [[custom:NONE]]
-		--Spring.Echo(unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot]])
+		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] = wcp.muzzleeffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] or [[custom:NONE]]
+		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] = wcp.misceffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] or [[custom:NONE]]
 	end
 end
 

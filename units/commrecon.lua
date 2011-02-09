@@ -69,10 +69,12 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-	  [1] = [[custom:NONE]],
-      [2] = [[custom:RAIDMUZZLE]],
-      [3] = [[custom:VINDIBACK]],
-      [4] = [[custom:FLASH64]],
+	  [[custom:NONE]],
+	  [[custom:NONE]],
+      [[custom:RAIDMUZZLE]],
+	  [[custom:NONE]],
+      [[custom:VINDIBACK]],
+      [[custom:FLASH64]],
     },
 
   },

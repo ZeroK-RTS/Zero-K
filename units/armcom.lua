@@ -120,7 +120,7 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-    	[[custom:WARMUZZLE]],
+    	[[custom:NONE]],
     },
 
   },

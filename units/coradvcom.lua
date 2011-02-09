@@ -68,6 +68,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
+	  [[custom:LEVLERMUZZLE]],
       [[custom:RAIDMUZZLE]],
     },
 

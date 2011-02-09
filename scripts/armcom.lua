@@ -363,6 +363,7 @@ function script.Create()
 	Hide( lfirept)
 	Hide( nanospray)
 	StartThread(MotionControl)
+	Turn(lfirept, x_axis, math.rad(145))
 end
 
 function script.StartMoving() 
@@ -428,6 +429,7 @@ end
 function script.FireWeapon(num)
 	if num == 5 then
 		EmitSfx(lfirept, 1024)
+		EmitSfx(lfirept, 1025)
 	end
 end
 

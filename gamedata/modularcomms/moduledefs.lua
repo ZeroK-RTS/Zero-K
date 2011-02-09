@@ -55,6 +55,11 @@ upgrades = {
 		description = "An effective short-range cutting tool",
 		func = noFunc,	
 	},
+	commweapon_disruptor = {
+		name = "Disruptor Beam",
+		description = "Damages and slows a target",
+		func = noFunc,	
+	},
 	commweapon_heavymachinegun = {
 		name = "Heavy Machine Gun",
 		description = "Close-in weapon with AoE",
@@ -62,12 +67,17 @@ upgrades = {
 	},
 	commweapon_heatray = {
 		name = "Heat Ray",
-		description = "Close-in weapon with AoE",
+		description = "Rapidly melts anything at short range; loses damage over distance",
 		func = noFunc,	
 	},
 	commweapon_gaussrifle = {
 		name = "Gauss Rifle",
 		description = "Precise armor-piercing weapon",
+		func = noFunc,	
+	},
+	commweapon_riotcannon = {
+		name = "Riot Cannon",
+		description = "The weapon of choice for crowd control",
 		func = noFunc,	
 	},
 	commweapon_rocketlauncher = {
@@ -77,7 +87,7 @@ upgrades = {
 	},
 	commweapon_shockrifle = {
 		name = "Shock Rifle",
-		description = "Slows an enemy's movement and firing rate; non-lethal",
+		description = "A sniper weapon that inflicts heavy damage to a single target",
 		func = noFunc,	
 	},
 	commweapon_shotgun = {
@@ -94,9 +104,9 @@ upgrades = {
 	-- modules
 	module_ablative_armor = {
 		name = "Ablative Armor Plates",
-		description = "Adds 500 HP",
+		description = "Adds 600 HP",
 		func = function(unitDef)
-				unitDef.maxdamage = unitDef.maxdamage + 500
+				unitDef.maxdamage = unitDef.maxdamage + 600
 			end,
 	},	
 	module_high_power_servos = {
@@ -129,7 +139,25 @@ upgrades = {
 		func = function(unitDef)
 				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 3 end
 			end,
-	},	
+	},
+	module_jammer = {
+		name = "Radar Jammer",
+		description = "Masks radar signals of all units within 600 elmos",
+		func = function(unitDef)
+				unitDef.radardistancejam = 600
+				unitDef.activatewhenbuilt = true
+				unitDef.onoffable = true
+			end,
+	},
+	module_energy_cell = {
+		name = "Energy Cell",
+		description = "Compact fuel cells that produce +4 energy",
+		func = function(unitDef)
+				unitDef.energymake = (unitDef.energymake or 0) + 4
+			end,
+	},		
+	
+	--add current comm aura abilities as modules later
 	
 	-- some old stuff
 	adv_composite_armor = {

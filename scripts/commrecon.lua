@@ -423,15 +423,15 @@ function script.QueryWeapon(num)
 end
 
 function script.FireWeapon(num)
-	if num == 3 then EmitSfx( grenade, 1025 )
+	if num == 3 then EmitSfx( grenade, 1026 )
 	elseif num == 5 then EmitSfx( flare, 1024)
 	end
 end
 
 local function JumpExhaust()
 	while bJumping do 
-		EmitSfx( jx1,  1026 )
-		EmitSfx( jx2,  1026 )
+		EmitSfx( jx1,  1028 )
+		EmitSfx( jx2,  1028 )
 		Sleep(33)
 	end
 end
@@ -452,7 +452,7 @@ end
 
 function endJump() 
 	bJumping = false
-	EmitSfx( base,  1027 )
+	EmitSfx( base,  1029 )
 end
 
 function script.StopBuilding()
