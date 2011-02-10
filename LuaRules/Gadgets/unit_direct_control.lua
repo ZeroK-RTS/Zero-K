@@ -49,6 +49,8 @@ local badUnits = {
 	"cormist",
 	"tawf114",
 	"puppy",
+	"dante",
+	"hoverassault"
 }
 
 local badUnitDefs = {}
@@ -57,10 +59,12 @@ local badUnitDefs = {}
 --------------------------------------------------------------------------------
 
 local function AllowAction(playerID)
+--[[
   if (playerID ~= 0) then
     Spring.SendMessageToPlayer(playerID, "Must be the host player")
     return false
   end
+]]--
   if (not Spring.IsCheatingEnabled()) then
     Spring.SendMessageToPlayer(playerID, "Cheating must be enabled")
     return false

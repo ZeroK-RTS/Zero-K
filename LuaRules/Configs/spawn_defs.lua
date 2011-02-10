@@ -31,7 +31,7 @@ alwaysVisible        = false     -- chicken are always visible
 burrowSpawnRate      = 60        -- higher in games with many players, seconds
 chickenSpawnRate     = 59
 minBaseDistance      = 700      
-maxBaseDistance      = 4500
+maxBaseDistance      = 4000
 
 gracePeriod          = 150       -- no chicken spawn in this period, seconds
 gracePenalty		 = 10		-- reduced grace per player over one, seconds

@@ -701,10 +701,10 @@ function gadget:GameFrame(n)
 end
 
 function gadget:Shutdown()
-	for i=0, 255 do
-		Spring.SetGameRulesParam("commPickedPlayer"..i, 0)
-		Spring.SetGameRulesParam("commPickedTeam"..i, 0)
-	end
+	--for i=0, 255 do
+	--	Spring.SetGameRulesParam("commPickedPlayer"..i, 0)
+	--	Spring.SetGameRulesParam("commPickedTeam"..i, 0)
+	--end
 end
 
 --------------------------------------------------------------------
@@ -782,6 +782,7 @@ function gadget:DrawWorld()
 
 	spec = spec or fullview
 	gl.Texture(facplopTexture )	
+	gl.Color(1,1,1,1)
 	for id,_ in spairs(facplops) do
 		local los = spGetUnitLosState(id, myAllyID, false)
 		if spValidUnitID(id) and spGetUnitDefID(id) and ((los and los.los) or spec) then

@@ -82,7 +82,7 @@ upgrades = {
 	},
 	commweapon_rocketlauncher = {
 		name = "Rocket Launcher",
-		description = "Medium-range hitter",
+		description = "Medium-range low-velocity hitter",
 		func = noFunc,	
 	},
 	commweapon_shockrifle = {
