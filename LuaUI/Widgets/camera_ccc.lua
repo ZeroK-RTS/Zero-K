@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Complete Control Camera",
-    desc      = "v0.251 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
+    desc      = "v0.252 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
     author    = "CarRepairer (smoothscroll code by trepan)",
     date      = "2009-12-15",
     license   = "GNU GPL, v2 or later",
@@ -687,7 +687,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 				
 		spSetCameraState(cs, 0)
 		if not (lockSpot) then
-			spWarpMouse(msx, msy)
+			--spWarpMouse(msx, msy)
 		end
 		
 	end
@@ -696,7 +696,7 @@ end
 
 function widget:MousePress(x, y, button)
 	if lockspringscroll then
-		spWarpMouse(msx, msy)
+		--spWarpMouse(msx, msy)
 		lockspringscroll = false
 		return true
 	end
@@ -758,7 +758,7 @@ function widget:MouseRelease(x, y, button)
 	if (button == 2) then
 		rotate = nil
 		if not (lockSpot or lockspringscroll) then
-			spWarpMouse(msx, msy)
+			--spWarpMouse(msx, msy)
 		end
 		lockSpot = nil
 		smoothscroll = false
@@ -854,7 +854,7 @@ function widget:DrawScreen()
 		glBeginEnd(GL_LINES, DrawLine, x, y, green, cx, cy, red)
 		glLineWidth(1)
 		
-	    DrawPoint(cx, cy, black, 14)
+		DrawPoint(cx, cy, black, 14)
 		DrawPoint(cx, cy, white, 11)
 		DrawPoint(cx, cy, black,  8)
 		DrawPoint(cx, cy, red,    5)
@@ -885,7 +885,9 @@ function widget:DrawScreen()
 		
 		glAlphaTest(GL_GREATER, 0)
 		
-		spSetMouseCursor('none')
+		if not (springscroll and not lockspringscroll) then
+		    spSetMouseCursor('none')
+		end
 		if smoothscroll then
 			local icon_size2 = icon_size
 			glTexRect(x-icon_size, y-icon_size2, x+icon_size, y+icon_size2)
