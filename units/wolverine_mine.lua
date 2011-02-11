@@ -32,6 +32,7 @@ unitDef = {
   explodeAs              = [[NOWEAPON]],
   footprintX             = 1,
   footprintZ             = 1,
+  levelGround            = false,
   iconType               = [[mine]],
   idleAutoHeal           = 10,
   idleTime               = 300,
