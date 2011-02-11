@@ -41,35 +41,19 @@ local unlocks = {} -- indexed by teamID, value is a table of key unitDefID and v
 
 local unlockUnits = {
 	-- units
-	"spherepole",
-	"spherecloaker",
+--	"spherepole",
+
+--  "armmerl",
 	
-	"corclog",
-	"core_spectre",
-	
-    "armmerl",
-	"capturecar",
-	
-	"armspy",
-	"armcrabe",
-	
-	"corsumo",
-	
-	"panther",
 	"corgol",
-	"trem",
 	
-    "blackdawn",
+--  "blackdawn",
 	"corcrw",
 	
 	"armcybr",
 	
 	"armcarry",
-	"corbats",
-	"cornukesub",
 	
-	"dante",
-	"armraven",
 	"armbanth",
 	"gorg",
 	"armorco",
@@ -77,7 +61,7 @@ local unlockUnits = {
 	-- defenses and superweapons
     --"corgrav",
     --"armpb",
-    "screamer",
+	"screamer",
 	"armanni",
 	"cordoom",
 	"corbhmth",
@@ -94,7 +78,7 @@ local unlockUnits = {
 	"factorygunship",
 	"factoryplane",
 	"armcsa",
-	"missilesilo",
+--	"missilesilo",
 }
 
 local unlockUnitsMap = {}
