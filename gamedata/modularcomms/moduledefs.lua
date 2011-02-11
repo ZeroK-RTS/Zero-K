@@ -17,6 +17,41 @@ end
 local function noFunc()
 end
 
+--------------------------------------------------------------------------------
+-- system functions
+--------------------------------------------------------------------------------
+mapWeaponToCEG = {
+	[3] = {3,4},
+	[5] = {1,2},
+}
+
+function ApplyWeapon(unitDef, weapon)
+	local wcp = weapons[weapon].customparams or {}
+	local slot = tonumber(wcp and wcp.slot) or 4
+	unitDef.weapons[slot] = {
+		def = weapon,
+		badtargetcategory = wcp.badtargetcategory or [[FIXEDWING]],
+		onlytargetcategory = wcp.onlytargetcategory or [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+	}
+	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
+	-- clear other weapons
+	if slot > 3 then
+		for i=4,6 do	-- subject to change
+			if unitDef.weapons[i] and i ~= slot then
+				unitDef.weapons[i] = nil
+			end
+		end
+	end
+	-- add CEGs
+	if mapWeaponToCEG[slot] and unitDef.sfxtypes and unitDef.sfxtypes.explosiongenerators then
+		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] = wcp.muzzleeffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] or [[custom:NONE]]
+		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] = wcp.misceffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] or [[custom:NONE]]
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 --[[
 commTypes = {
 	recon = {
@@ -140,6 +175,30 @@ upgrades = {
 				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 3 end
 			end,
 	},
+	module_energy_cell = {
+		name = "Energy Cell",
+		description = "Compact fuel cells that produce +4 energy",
+		func = function(unitDef)
+				unitDef.energymake = (unitDef.energymake or 0) + 4
+			end,
+	},		
+	
+	module_cloak_field = {
+		name = "Cloaking Field",
+		description = "Cloaks all friendly units within 350 elmos",
+		func = function(unitDef)
+				unitDef.customparams = unitDef.customparams or {}
+				unitDef.customparams.cloakshield_preset = "module_cloakfield"
+			end,
+	},
+	module_repair_field = {
+		name = "Repair Field",
+		description = "Passively repairs all friendly units within 450 elmos",
+		func = function(unitDef)
+				unitDef.customparams = unitDef.customparams or {}
+				unitDef.customparams.repairaura_preset = "module_repairfield"
+			end,
+	},
 	module_jammer = {
 		name = "Radar Jammer",
 		description = "Masks radar signals of all units within 600 elmos",
@@ -149,15 +208,15 @@ upgrades = {
 				unitDef.onoffable = true
 			end,
 	},
-	module_energy_cell = {
-		name = "Energy Cell",
-		description = "Compact fuel cells that produce +4 energy",
+	module_areashield = {
+		name = "Area Shield",
+		description = "Bubble shield that protects surrounding units within 300 elmos",
 		func = function(unitDef)
-				unitDef.energymake = (unitDef.energymake or 0) + 4
+				ApplyWeapon(unitDef, "commweapon_areashield")
+				unitDef.activatewhenbuilt = true
+				unitDef.onoffable = true
 			end,
-	},		
-	
-	--add current comm aura abilities as modules later
+	},
 	
 	-- some old stuff
 	adv_composite_armor = {

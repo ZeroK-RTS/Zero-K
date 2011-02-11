@@ -37,7 +37,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    cloakshield_preset = [[commstrike2]],
+    --cloakshield_preset = [[module_cloakfield]],
 	cloakstealth = [[1]],
     fireproof          = [[1]],
   },
@@ -56,7 +56,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 992,
-  maxDamage           = 5300,
+  maxDamage           = 5200,
   maxSlope            = 36,
   maxVelocity         = 1.4,
   maxWaterDepth       = 5000,

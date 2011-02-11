@@ -95,9 +95,9 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-    [2] = {
-      def = [[COR_SHIELD_COM]],
-    },
+--    [2] = {
+--      def = [[COR_SHIELD_COM]],
+--    },
 
 
     [3] = {

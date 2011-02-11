@@ -43,35 +43,36 @@ return testdata
   strike = { 
 	chassis = "armcom", 
 	name = "Her Royal Majesty",
-	modules = { "commweapon_shotgun", }
+	modules = { "commweapon_shotgun", "module_areashield", }
   },
   advstrike = {
     chassis = "armadvcom",
 	name = "The Empress",
-    modules = { "commweapon_gaussrifle", "module_ablative_armor" }
+    modules = { "commweapon_gaussrifle", "module_ablative_armor", "module_jammer", }
   },
   battle = {
     chassis = "corcom",
 	name = "Mr. Amazing",
-    modules = { "commweapon_rocketlauncher", "module_fieldradar"}
+    modules = { "commweapon_slowbeam", "module_fieldradar", "module_cloak_field", }
   },
   heavyrecon = {
     chassis = "commrecon",
 	name = "John Q. Rambo",
-    modules = { "commweapon_heavymachinegun", "module_autorepair",  }
+    modules = { "commweapon_riotcannon", "module_autorepair", "module_repair_field",  }
   },
 }
 
 ew0KICBzdHJpa2UgPSB7IA0KCWNoYXNzaXMgPSAiYXJtY29tIiwgDQoJbmFtZSA9ICJIZXIgUm95
-YWwgTWFqZXN0eSIsDQoJbW9kdWxlcyA9IHsgImNvbW13ZWFwb25fc2hvdGd1biIsIH0NCiAgfSwN
-CiAgYWR2c3RyaWtlID0gew0KICAgIGNoYXNzaXMgPSAiYXJtYWR2Y29tIiwNCgluYW1lID0gIlRo
-ZSBFbXByZXNzIiwNCiAgICBtb2R1bGVzID0geyAiY29tbXdlYXBvbl9nYXVzc3JpZmxlIiwgIm1v
-ZHVsZV9hYmxhdGl2ZV9hcm1vciIgfQ0KICB9LA0KICBiYXR0bGUgPSB7DQogICAgY2hhc3NpcyA9
-ICJjb3Jjb20iLA0KCW5hbWUgPSAiTXIuIEFtYXppbmciLA0KICAgIG1vZHVsZXMgPSB7ICJjb21t
-d2VhcG9uX3JvY2tldGxhdW5jaGVyIiwgIm1vZHVsZV9maWVsZHJhZGFyIn0NCiAgfSwNCiAgaGVh
+YWwgTWFqZXN0eSIsDQoJbW9kdWxlcyA9IHsgImNvbW13ZWFwb25fc2hvdGd1biIsICJtb2R1bGVf
+YXJlYXNoaWVsZCIsIH0NCiAgfSwNCiAgYWR2c3RyaWtlID0gew0KICAgIGNoYXNzaXMgPSAiYXJt
+YWR2Y29tIiwNCgluYW1lID0gIlRoZSBFbXByZXNzIiwNCiAgICBtb2R1bGVzID0geyAiY29tbXdl
+YXBvbl9nYXVzc3JpZmxlIiwgIm1vZHVsZV9hYmxhdGl2ZV9hcm1vciIsICJtb2R1bGVfamFtbWVy
+IiwgfQ0KICB9LA0KICBiYXR0bGUgPSB7DQogICAgY2hhc3NpcyA9ICJjb3Jjb20iLA0KCW5hbWUg
+PSAiTXIuIEFtYXppbmciLA0KICAgIG1vZHVsZXMgPSB7ICJjb21td2VhcG9uX3Nsb3diZWFtIiwg
+Im1vZHVsZV9maWVsZHJhZGFyIiwgIm1vZHVsZV9jbG9ha19maWVsZCIsIH0NCiAgfSwNCiAgaGVh
 dnlyZWNvbiA9IHsNCiAgICBjaGFzc2lzID0gImNvbW1yZWNvbiIsDQoJbmFtZSA9ICJKb2huIFEu
-IFJhbWJvIiwNCiAgICBtb2R1bGVzID0geyAiY29tbXdlYXBvbl9oZWF2eW1hY2hpbmVndW4iLCAi
-bW9kdWxlX2F1dG9yZXBhaXIiLCAgfQ0KICB9LA0KfQ==
+IFJhbWJvIiwNCiAgICBtb2R1bGVzID0geyAiY29tbXdlYXBvbl9yaW90Y2Fubm9uIiwgIm1vZHVs
+ZV9hdXRvcmVwYWlyIiwgIm1vZHVsZV9yZXBhaXJfZmllbGQiLCAgfQ0KICB9LA0KfQ==
 
 -- player data
 {

@@ -34,14 +34,9 @@ repairerDefs = {
 }
 
 local presets = {
-	commsupport2 = {
+	module_repairfield = {
 		range = 450,
-		rate = 12,
-		ignoreDelay = true,
-	},
-	commsupport3 = {
-		range = 500,
-		rate = 18,
+		rate = 24,
 		ignoreDelay = true,
 	},
 }

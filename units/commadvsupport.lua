@@ -33,7 +33,7 @@ unitDef = {
 
   customParams        = {
     fireproof         = [[1]],
-    repairaura_preset = [[commsupport2]],
+    --repairaura_preset = [[module_repairfield]],
 	cloakstealth	  = [[1]],
   },
 

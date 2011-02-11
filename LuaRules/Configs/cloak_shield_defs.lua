@@ -70,7 +70,7 @@ local cloakShieldDefs = {
 -- reads from customParams and copies to cloakShieldDefs as appropriate - needed for procedurally generated comms
 -- as always, need better way to handle if upgrades are desired!
 local presets = {
-  commstrike2 = {
+  module_cloakfield = {
     init = true,
     draw = true,
     energy = 8,

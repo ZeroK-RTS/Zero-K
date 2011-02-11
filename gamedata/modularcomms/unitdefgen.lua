@@ -63,35 +63,6 @@ if not commData then commData = {} end
 --------------------------------------------------------------------------------
 commDefs = {}	--holds precedurally generated comm defs
 
-local mapWeaponToCEG = {
-	[3] = {3,4},
-	[5] = {1,2},
-}
-
-local function ApplyWeapon(unitDef, weapon)
-	local wcp = weapons[weapon].customparams or {}
-	local slot = tonumber(wcp and wcp.slot) or 4
-	unitDef.weapons[slot] = {
-		def = weapon,
-		badtargetcategory = wcp.badtargetcategory or [[FIXEDWING]],
-		onlytargetcategory = wcp.onlytargetcategory or [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	}
-	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
-	-- clear other weapons
-	if slot > 3 then
-		for i=4,6 do	-- subject to change
-			if unitDef.weapons[i] and i ~= slot then
-				unitDef.weapons[i] = nil
-			end
-		end
-	end
-	-- add CEGs
-	if mapWeaponToCEG[slot] and unitDef.sfxtypes and unitDef.sfxtypes.explosiongenerators then
-		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] = wcp.muzzleeffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] or [[custom:NONE]]
-		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] = wcp.misceffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] or [[custom:NONE]]
-	end
-end
-
 local function ProcessComm(name, config)
 	if config.chassis and UnitDefs[config.chassis] then
 		Spring.Echo("Processing comm: "..name)
