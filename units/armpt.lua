@@ -24,8 +24,10 @@ unitDef = {
 
   customParams           = {
     description_fr = [[Navire de Patrouille Éclaireur et Anti-Air]],
+	description_de = [[Wachboot (Scout/Raider)]],
     helptext       = [[Cheap, fast, and fragile, this Patrol Boat is good as a raider and spotting for longer-ranged ships. It lacks the firepower or armor for brawling.]],
     helptext_fr    = [[Pas cher, rapide et peu solide, voici venir le Skeeter et ses canons laser. Utile en début de conflit ou en tant qu'éclaireur son blindage le rends trcs vite obsolcte.]],
+	helptext_de    = [[Günstig, schnell und gebrechlich. Dieses Wachboot eignet sich gut als Raider und zum Auskundschaften von Schiffen mit größerer Reichweite. Es fehlt ihm an Feuerkraft und Verteidigung zum Kämpfen.]],
   },
 
   defaultmissiontype     = [[Standby]],

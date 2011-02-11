@@ -24,8 +24,10 @@ unitDef = {
 
   customParams           = {
     description_fr = [[Mechwarrior d'Assaut]],
+	description_de = [[Sturm/Riot Läufer]],
     helptext       = [[The lightest of Nova's heavy striders, the Razorback features twin multi-barelled pulse cannons for extreme crowd control, as well as a head-mounted short-range laser for close in work. Don't use recklessly - its short range can be a real liability.]],
     helptext_fr    = [[Le Razorback est un Robot au blindage lourd arm? de deux Miniguns et d'un canon laser continu ind?pendant. Son blindage et sa pr?cision le rendent utile contre nimporte quel type d'arm?e, ? l'exception des unit?s longues port?e. V?ritable rouleau compresseur, il est pourtant le moins cher et le plus faible des Mechs.]],
+	helptext_de    = [[Der Razorback ist der leichteste der Novaläufer, ausgerüstet mit doppelläufien Impulskanonen als Gegenwehr gegen viele Einheiten, sowie einen, am Kopf befestigten, Laser für den Nahbereich. Nutze ihn nicht unbesonnen - seine kurze Reichweite erzeugt eine große Anfälligkeit.]],
   },
 
   defaultmissiontype     = [[Standby]],

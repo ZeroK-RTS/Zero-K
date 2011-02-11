@@ -24,7 +24,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    helptext = [[The Pit Bull is a compact, resilent turret with a medium-range rocket launcher. When popped down, it is very difficult to destroy, making it a good choice when the enemy is using artillery.]],
+    description_de = [[Versteckter Raketenturm]],
+    helptext 	   = [[The Pit Bull is a compact, resilent turret with a medium-range rocket launcher. When popped down, it is very difficult to destroy, making it a good choice when the enemy is using artillery.]],
+	helptext_de	   = [[Der Pit Bull ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
   },
 
   damageModifier                = 0.15,

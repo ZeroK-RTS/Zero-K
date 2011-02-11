@@ -22,7 +22,7 @@ unitDef = {
   customParams                  = {
     pylonrange = 500,
 	description_de = [[Erweitert den Bereich des Overdrive-Energienetzes]],
-	helptext_de    = [[Durch das Energy Pylon wird es ermöglicht, weitere Energiequellen oder Metallextraktoren an ein bestehendes Overdrive-Energienetz anzuschließen.]],
+	helptext_de    = [[Durch das Energy Pylon wird es dir ermöglicht, weitere Energiequellen oder Metallextraktoren an ein bestehendes Overdrive-Energienetz anzuschließen.]],
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],

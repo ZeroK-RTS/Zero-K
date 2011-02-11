@@ -45,7 +45,7 @@ unitDef = {
   yardMap                       = [[ooo ooo ooo]],
 
   customParams                  = {
-    description_de 	= [[Lager Energie und Metall (500)]],
+    description_de 	= [[Lagert Energie und Metall (500)]],
 	helptext_de 	= [[Dieser Energie- und Metallspeicher erweitert deine Lagermöglichkeiten um 500.]],
   }, 	
   

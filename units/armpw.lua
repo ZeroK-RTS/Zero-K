@@ -29,6 +29,7 @@ unitDef = {
     description_fr = [[Robot Pilleur]],
     description_it = [[Robot d'invasione]],
     description_pl = [[Bot Naje?d?ca]],
+	description_de = [[Leichter Raider Roboter]],
     helptext       = [[Light and cheap, the Glaive can be built by the dozen, but dies just as fast and is rarely of much use versus serious opposition. Counter with riot units or LLTs.]],
     helptext_bp    = [[Glaive é um leve e barato robô agressor. Embora vo?e possa faze-lo em dezenas, ele morre igualmente rápido, e raramente é muito útil contra oposiç?o séria. Defenda-se dele com Torres de laser leves ou unidades dispersadoras.]],
     helptext_es    = [[Ligero y barato, el Glaive puede ser construido a docenas, pero muere r?pidamente y raramente es ?til contra enemigos serios.  Se contrastan con unidades de alboroto y llt.]],
@@ -36,6 +37,7 @@ unitDef = {
     helptext_fr    = [[L?ger et peut couteux, le Glaive peut ?tre produit en masse , mais meurt tres rapidement et n'offre aucune r?sistance face ? des opposants s?rieux. A contrer avec des ?meutiers ou des LLTs]],
     helptext_it    = [[Leggero ed economico, il Glave pu? essere costruito a dozzina, ma muore velocemente ed e raramente utile contro nemici seri. Si contrastano con unita da rissa ed llt.]],
     helptext_pl    = [[Glaive jest lekki, tani i szybki. Mo?e by? budowany dziesi?tkami, ale ginie bardzo szybko w kontakcie z podstawowymi nawet jednostkami obronnymi.]],
+	helptext_de    = [[Leicht und billig, der Glaive kann in Massen gebaut werden, stirbt aber genauso schnell und ist kaum von Nützlichkeit gegen ernsthafte Gegenwehr. Mit Riot Einheiten oder leichten Lasertürmen kontern.]],
   },
 
   defaultmissiontype     = [[Standby]],
