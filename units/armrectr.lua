@@ -43,7 +43,7 @@ unitDef = {
     helptext_fi    = [[Pystyy rakentamisen lis?ksi kaappaamaan yksik?t koodaamalla ne nurin.]],
     helptext_fr    = [[]],
 	helptext_de    = [[Der Rector besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können.]],
-  }
+  },
 
   defaultmissiontype     = [[Standby]],
   energyMake             = 0.15,
