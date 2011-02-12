@@ -1,7 +1,7 @@
 unitDef = {
   unitname         = [[factoryhover]],
   name             = [[Amphibious Operations Platform]],
-  description      = [[Produces Hovercraft and Amphibious units, Builds at 6 m/s]],
+  description      = [[Produces Hovercraft, Builds at 6 m/s]],
   acceleration     = 0,
   bmcode           = [[0]],
   brakeRate        = 0,

@@ -72,6 +72,7 @@ local function RestorePuppy(unitID, x, y, z)
   --Spring.SetUnitStealth(unitID, false)
   Spring.SetUnitNoDraw(unitID, false)
   cannotBeDamage[unitID] = false
+  Spring.AddUnitDamage(unitID, 15) -- prevent puppy fountain
   -- Spring.SetUnitNoSelect(unitID, false)
   Spring.SetUnitNoMinimap(unitID, false)
   --Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
