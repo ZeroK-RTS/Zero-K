@@ -37,11 +37,13 @@ unitDef = {
     description_fi = [[Rakentaja/kaappaajarobotti, rakentaa 6m/s  nopeudella]],
     description_fr = [[Robot de Construction/Capture, Construit ? 6 m/s]],
     description_it = [[Robot da Costruzzione/Cattura, Costruisce a 6 m/s]],
+	description_de = [[Getarnter Konstruktionsroboter, Baut mit 6 M/s]],
     helptext       = [[The Rector packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance.]],
     helptext_bp    = [[]],
     helptext_fi    = [[Pystyy rakentamisen lis?ksi kaappaamaan yksik?t koodaamalla ne nurin.]],
     helptext_fr    = [[]],
-  },
+	helptext_de    = [[Der Rector besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können.]],
+  }
 
   defaultmissiontype     = [[Standby]],
   energyMake             = 0.15,
