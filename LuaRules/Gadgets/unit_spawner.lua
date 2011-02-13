@@ -74,7 +74,7 @@ local kills               = {}
 local idleQueue           = {}
 local turrets             = {}
 local timeOfLastSpawn     = 0    -- when the last burrow was spawned
-local waveSchedule		  = {}	-- indexed by gameframe, true/nil
+local waveSchedule		  = math.huge	--{}	-- indexed by gameframe, true/nil
 
 local eggDecay = {}	-- indexed by featureID, value = game second
 local targets = {}	--indexed by unitID, value = teamID
@@ -878,20 +878,24 @@ end
 function gadget:GameStart()
     --DisableComputerUnits()	-- unneeded
 	if pvp then Spring.Echo("Chicken: PvP mode initialized") end
-	waveSchedule[gracePeriod*30] = true	-- schedule first wave
+	--waveSchedule[gracePeriod*30] = true	-- schedule first wave
+	waveSchedule = gracePeriod * 30
 end
 
 function gadget:GameFrame(n)
   --if ((n+19 - gracePeriod*30) % (30 * chickenSpawnRate) < 0.1) and (n - gracePeriod*30 > 0) then
-  if waveSchedule[n] then
+  --if waveSchedule[n] then
+  if n > waveSchedule then
     local args = {Wave()}
     if (args[1]) then
       _G.chickenEventArgs = {type="wave", unpack(args)}
       SendToUnsynced("ChickenEvent")
       _G.chickenEventArgs = nil
-	  waveSchedule[n + (30 * chickenSpawnRate)] = true
+	  --waveSchedule[n + (30 * chickenSpawnRate)] = true
+	  waveSchedule = n + (30 * chickenSpawnRate)
+	  Spring.Echo(waveSchedule)
     end
-	waveSchedule[n] = nil	-- just to be sure
+	--waveSchedule[n] = nil	-- just to be sure
   end
 
   if ((n+17) % 30 < 0.1) then

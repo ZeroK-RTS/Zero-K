@@ -120,24 +120,30 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	if plop and ploppableDefs[unitDefID] and facplops[builderID] then
 		facplops[builderID] = nil
 		-- 3 seconds to build with commander
+		--[[
 		Spring.SetUnitCosts(unitID, {
 			buildTime = 1,
 			metalCost = 1,
 			energyCost = 1
 		})
+		]]--
+		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
+		--Spring.SetUnitHealth(unitID, maxHealth-1)	-- can't be full health; else if you stop the construction you can't resume it!
+		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
-		facplopsrunning[unitID] = true
+		--facplopsrunning[unitID] = true
 	end
 end
 
 
 function gadget:UnitDestroyed(unitID)
-	if plop and facplopsrunning[unitID] then
-		facplopsrunning[unitID] = nil
+	if plop then
+		facplops[unitID] = nil
+		--facplopsrunning[unitID] = nil
 	end
-
+	
 	if (boost[unitID] == nil) then return end
 
 	if gamestart then disableBoost(unitID) end
@@ -156,6 +162,13 @@ function gadget:UnitFinished(unitID, unitDefID)
 	end
 end
 
+-- invulnerable facplopee
+--[[
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+	if plop and facplopsrunning[unitID] then return 0 end
+	return damage	
+end
+]]--
 
 function disableBoost(unitID) 
 	boost[unitID] = nil
