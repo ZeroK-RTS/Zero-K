@@ -165,6 +165,7 @@ Create()
 	start-script MotionControl();	
 	start-script DamageControl();
 	Turn chest to y-axis <-20> now;
+	Turn gun to x-axis <20> now;
 }
 	
 SweetSpot(piecenum)
@@ -189,7 +190,7 @@ RestoreAfterDelay()
 {
 	sleep 2000;
 	turn turner to y-axis <0> speed <100>;
-	turn gun to x-axis <0> speed <100>;
+	Turn gun to x-axis <20> speed <50>;
 	isAiming = FALSE;
 }
 
@@ -201,7 +202,7 @@ AimWeapon1(heading,pitch)
 	turn hips to x-axis <0> now;
 	turn turner to x-axis <0> now; 
 	turn turner to y-axis heading speed <180>;
-	turn gun to x-axis <0> - pitch speed <70>;
+	turn gun to x-axis <0> - pitch speed <90>;
 	wait-for-turn turner around y-axis;
 	wait-for-turn gun around x-axis;
 	start-script RestoreAfterDelay();

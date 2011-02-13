@@ -64,6 +64,7 @@ unitDef = {
     explosiongenerators = {
       [[custom:zeusmuzzle]],
       [[custom:zeusgroundflash]],
+	  [[custom:lightningplosion_stormbolt]],
     },
 
   },

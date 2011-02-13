@@ -5,6 +5,7 @@
 -- lightningplosion_bluebolts1
 -- lightningplosion_stormbolt
 -- zeusgroundflash
+-- zeusgroundflash
 
 return {
   ["lightningplosion_yellowbolts"] = {
@@ -293,27 +294,28 @@ return {
       },
     },
     lightningballs = {
+
       air                = true,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
       water              = true,
       properties = {
-        airdrag            = 1,
-        colormap           = [[0 0 0 0.01 1 1 1 0.01 0 0 0 0.01]],
+        airdrag            = 0.1,
+        colormap           = [[1 1 1 0.01  1 1 1 0.01   1 1 1 0.01  1 1 1 0.01  1 1 1 0.01 0 0 0 0.01]],
         directional        = true,
-        emitrot            = 80,
-        emitrotspread      = 0,
+        emitrot            = 20,
+        emitrotspread      = 20,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, 0, 0]],
         numparticles       = 1,
-        particlelife       = 3,
-        particlelifespread = 0,
-        particlesize       = 2,
-        particlesizespread = 20,
-        particlespeed      = 0.01,
-        particlespeedspread = 0,
-        pos                = [[-10 r20, 1.0, -10 r20]],
+        particlelife       = 8,
+        particlelifespread = 4,
+        particlesize       = 15,
+        particlesizespread = 15,
+        particlespeed      = 1,
+        particlespeedspread = 1,
+        pos                = [[0, 1.0, 0]],
         sizegrowth         = 0,
         sizemod            = 1.0,
         texture            = [[lightb]],
@@ -332,6 +334,36 @@ return {
         [1]  = 0.5,
         [2]  = 0.5,
         [3]  = 1,
+      },
+    },
+  },
+
+  ["lightningplosion_smallbolts"] = {
+    ["electric thingies2"] = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.1,
+        colormap           = [[1 1 1 0.01  1 1 1 0.01   1 1 1 0.01  1 1 1 0.01  1 1 1 0.01 0 0 0 0.01]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 80,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 8,
+        particlelifespread = 4,
+        particlesize       = 15,
+        particlesizespread = 15,
+        particlespeed      = 20,
+        particlespeedspread = 20,
+        pos                = [[0, 1.0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[lightb]],
       },
     },
   },

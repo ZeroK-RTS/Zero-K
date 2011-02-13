@@ -2,7 +2,7 @@
 
 #include "constants.h"
 
-piece  base, chest, flare, hips, lthigh, rthigh, head, lforearm, rforearm, rshoulder, lshoulder, rshin, rfoot, lshin, lfoot;
+piece  base, chest, flare, hips, lthigh, rthigh, head, lforearm, rforearm, rshoulder, lshoulder, rshin, rfoot, lshin, lfoot, zap1, zap2;
 
 static-var  bMoving, bAiming, Static_Var_3;
 
@@ -555,6 +555,21 @@ MotionControl(moving, aiming, justmoved)
 	}
 }
 
+Zap()
+{
+	while(1)
+	{
+		sleep Rand(0, 3000);
+		emit-sfx 1024 + 2 from zap1;
+		sleep Rand(0, 3000);
+		emit-sfx 1024 + 2 from zap2;
+		sleep Rand(0, 6000);
+		emit-sfx 1024 + 2 from zap1;
+		sleep Rand(0, 6000);
+		emit-sfx 1024 + 2 from zap2;
+	}
+}
+
 Create()
 {
 	bMoving = FALSE;
@@ -562,6 +577,7 @@ Create()
 	Static_Var_3 = 1;
 	start-script MotionControl();
 	start-script SmokeUnit();
+	start-script Zap();
 }
 
 StartMoving()
@@ -604,7 +620,7 @@ FirePrimary()
 {
 	emit-sfx 1024 + 0 from flare;
 	emit-sfx 1024 + 1 from flare;
-	//emit-sfx 2048 + 1 from muzzle;
+	//emit-sfx 2048 + 1 from flare;
 	sleep 100;
 }
 
