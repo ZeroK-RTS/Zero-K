@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Complete Control Camera",
-    desc      = "v0.252 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
+    desc      = "v0.253 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
     author    = "CarRepairer (smoothscroll code by trepan)",
     date      = "2009-12-15",
     license   = "GNU GPL, v2 or later",
@@ -663,6 +663,7 @@ function widget:Update(dt)
 end
 
 function widget:MouseMove(x, y, dx, dy, button)
+    if fpsmode then return end
 	if rotate then
 		if abs(dx) > 0 or abs(dy) > 0 then
 			RotateCamera(x, y, dx, dy, false)
@@ -695,6 +696,7 @@ end
 
 
 function widget:MousePress(x, y, button)
+    if fpsmode then return end
 	if lockspringscroll then
 		--spWarpMouse(msx, msy)
 		lockspringscroll = false
@@ -769,6 +771,7 @@ function widget:MouseRelease(x, y, button)
 end
 
 function widget:MouseWheel(up, value)
+    if fpsmode then return end
 	local a,c,m,s = spGetModKeyState()
 	
 	if options.invertzoom.value then
