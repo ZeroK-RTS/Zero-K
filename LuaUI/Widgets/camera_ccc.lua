@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Complete Control Camera",
-    desc      = "v0.253 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
+    desc      = "v0.254 Camera featuring 6 actions. Type \255\90\90\255/luaui ccc help\255\255\255\255 for help.",
     author    = "CarRepairer (smoothscroll code by trepan)",
     date      = "2009-12-15",
     license   = "GNU GPL, v2 or later",
@@ -24,7 +24,7 @@ local init = true
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/View/Complete Control Camera'
+options_path = 'Settings/Camera/Complete Control Camera'
 options_order = { 
 	'helpwindow', 
 	
@@ -151,7 +151,7 @@ options = {
 		desc = "Follow the cursor of the player you're spectating (needs Ally Cursor widget to be on).",
 		type = 'bool',
 		value = false,
-		path = 'Settings/View',
+		path = 'Settings/Camera',
 	},	
 	rotfactor = {
 		name = 'Rotation speed',

@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.86 Chili Minimap",
+    desc      = "v0.861 Chili Minimap",
     author    = "Licho, tweaked by CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -53,7 +53,7 @@ options = {
 	simplecolors = {
 		name = 'Simple Radar Blip Colors',
 		type = 'bool',
-		desc = 'Show radar blips in the color of their team.', 
+		desc = 'Show radar blips as green for yours, teal for allies and red for enemies.', 
 		springsetting = 'SimpleMiniMapColors',
 		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
 	},

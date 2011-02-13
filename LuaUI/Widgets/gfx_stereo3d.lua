@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Stereo3D",
-    desc      = "v0.12 Stereo 3D rendering.",
+    desc      = "v0.121 Stereo 3D rendering.",
     author    = "CarRepairer, with assistance of jK",
     date      = "2009",
     license   = "GNU GPL, v2 or later",
@@ -262,7 +262,7 @@ local function UpdateConvSep()
 	conv = options.conv.value * swap
 end
 
-options_path = 'Settings/Effects/Stereo3D'
+options_path = 'Settings/View/Effects/Stereo3D'
 options_order = { 'toggle3d', 'helpwindow', 'lblblank1', 'lblsettings', 'swapeyes', 'lasersight', 'hidecursor', 'sep', 'conv', 'lblblank2', 's3dmode', 'lblblank3',  }
 options = {
 	

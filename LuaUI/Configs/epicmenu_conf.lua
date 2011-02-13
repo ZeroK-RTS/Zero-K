@@ -103,7 +103,6 @@ confdata.menu_tree = {
 						"maxparticles 100",
 						"advshading 0",
 						"grounddecals 0",
-						"water 0",
 						'luaui disablewidget LupsManager',
 						"luaui disablewidget Display DPS",
 						"luaui disablewidget SelectionHalo",
@@ -126,25 +125,19 @@ confdata.menu_tree = {
 		}
 	},
 	{},
-	{'Effects|Graphical effects.',
+	{'Camera|Camera Settings.',
 		{
-			{'Night', 
-				{	
-					{'Toggles'},
-					{'Night View', function() spSendCommands{'luaui togglewidget Night'} end },
-					{},
-					{'Night Colored Units', function() spSendCommands{'luaui night_preunit'} end },
-					{'Beam', function() spSendCommands{'luaui night_beam'} end },
-					{'Cycle', function() spSendCommands{'luaui night_cycle'} end },
-					{'Searchlight Base Types'},
-					{'None', function() spSendCommands{'luaui night_basetype 0'} end },
-					{'Simple', function() spSendCommands{'luaui night_basetype 1'} end },
-					{'Full', function() spSendCommands{'luaui night_basetype 2'} end },	
-				}
-			},
-			{'Toggle Camera Shake', function() spSendCommands{'luaui togglewidget CameraShake'} end },
+			{'Camera Type'},
+			{'Total Annihilation', "viewta" },
+			{'FPS', "viewfps" },
+			{'Free', "viewfree" },
+			{'Rotatable Overhead', "viewrot" },
+			{'Total War', "viewtw" },
+			{'Flip the TA Camera', "viewtaflip" },
+	
 		}
 	},
+	
 	{'Interface|Settings relating to the GUI', 
 		{
 			--[[
@@ -268,8 +261,8 @@ confdata.menu_tree = {
 				} 
 			},
 			{'View Radius'},
-			{'Increase Radius', "increaseViewRadius" },	
-			{'Decrease Radius', "decreaseViewRadius" },
+			{'Increase Radius', "increaseviewradius" },	
+			{'Decrease Radius', "decreaseviewradius" },
 			
 			{'Trees'},
 			{'Toggle View', 'drawtrees' },	
@@ -293,23 +286,14 @@ confdata.menu_tree = {
 			--{'Extreme Detail Shadows', function() spSendCommands{"Shadows 1 8192"} end },
 		}
 	},
-	{'View|Settings such as camera modes.',
+	{'View|View Settings.',
 		{
-			
 			
 			{'Spectator View/Selection'},
 			{'View Chosen Player', function() spSendCommands{"specfullview 0"} end },
 			{'View All', function() spSendCommands{"specfullview 1"} end },
 			{'Select Any Unit', function() spSendCommands{"specfullview 2"} end },
 			{'View All & Select Any', function() spSendCommands{"specfullview 3"} end },
-			
-			{'Camera Type'},
-			{'Total Annihilation', function() spSendCommands{"viewta"} end },
-			{'FPS', function() spSendCommands{"viewfps"} end },
-			{'Free', function() spSendCommands{"viewfree"} end },
-			{'Rotatable Overhead', function() spSendCommands{"viewrot"} end },
-			{'Total War', function() spSendCommands{"viewtw"} end },
-			{'Flip the TA Camera', function() spSendCommands{"viewtaflip"} end },
 			
 			{'Other settings'},
 			{'lh', 
@@ -341,10 +325,29 @@ confdata.menu_tree = {
 			{'Toggle DPS Display|Shows RPG-style damage', function() spSendCommands{"luaui togglewidget Display DPS"} end },
 			
 			--{'Hide Interface', function(self) spSendCommands{'hideinterface'} end },	
-			--{'showshadowmap', function(self) spSendCommands{'showshadowmap'} end },	
+			--{'showshadowmap', function(self) spSendCommands{'showshadowmap'} end },
+			{'Effects|Graphical effects.',
+				{
+					{'Night', 
+						{	
+							{'Toggles'},
+							{'Night View', function() spSendCommands{'luaui togglewidget Night'} end },
+							{},
+							{'Night Colored Units', function() spSendCommands{'luaui night_preunit'} end },
+							{'Beam', function() spSendCommands{'luaui night_beam'} end },
+							{'Cycle', function() spSendCommands{'luaui night_cycle'} end },
+							{'Searchlight Base Types'},
+							{'None', function() spSendCommands{'luaui night_basetype 0'} end },
+							{'Simple', function() spSendCommands{'luaui night_basetype 1'} end },
+							{'Full', function() spSendCommands{'luaui night_basetype 2'} end },	
+						}
+					},
+					{'Toggle Camera Shake', function() spSendCommands{'luaui togglewidget CameraShake'} end },
+				}
+			},
 		}
 	},
-
+	
 }
 
 return confdata
