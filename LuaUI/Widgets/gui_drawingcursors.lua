@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Drawing Cursors",
-    desc      = "v0.01 Shows drawing cursors and indicator.",
+    desc      = "v0.02 Shows drawing cursors and instructions.",
     author    = "CarRepairer",
     date      = "2011-02-12",
     license   = "GNU GPL, v2 or later",
@@ -31,7 +31,12 @@ local glTexture 	= gl.Texture
 local glTexRect 	= gl.TexRect
 
 local tildepressed, drawing, erasing
+
+-- pencil and eraser
 local icon_size = 24
+
+-- instructional image
+local icon_size2 = 100
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -58,13 +63,13 @@ function widget:DrawScreen()
 	erasing = rmb
 	
 	local filefound
-	local icon_size2 = icon_size
+	local icon_size_cur = icon_size
 	if drawing then
 		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/pencil.png')
 	elseif erasing then
 		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/eraser.png')
 	else
-		icon_size2 = 100
+		icon_size_cur = icon_size2
 		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/drawing.png')
 	end
 	
@@ -77,7 +82,7 @@ function widget:DrawScreen()
 			Spring.SetMouseCursor('none')
 		end
 		
-		glTexRect(x, y-icon_size2, x+icon_size2, y)
+		glTexRect(x, y-icon_size_cur, x+icon_size_cur, y)
 		glTexture(false)
 
 		--glColor(1,1,1,1)
