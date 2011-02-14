@@ -40,7 +40,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(turret, sfxShatter)
 		Explode(cylinder, sfxShatter )
 		return 1
-	elseif  severity <= 99  then
+	elseif  severity <= .99  then
 		Explode(base, sfxShatter)
 		Explode(turret, SFX.FIRE  + SFX.EXPLODE_ON_HIT )
 		Explode(cylinder, SFX.FALL + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
