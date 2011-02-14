@@ -88,6 +88,7 @@ local function CommSelectTemplate(num, seriesName, comm1Name)
 		tooltip = "Select comm config number "..num.." ("..seriesName..")",
 		button = function()
 			Spring.SendLuaRulesMsg("customcomm:"..seriesName)
+			Spring.SendCommands({'say a:I choose: '..seriesName..'!'})
 			Close(true)
 		end
 	}

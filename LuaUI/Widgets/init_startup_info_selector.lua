@@ -29,8 +29,8 @@ _ Make each player broadcast their choice to their team in a way it can be used 
 ----------------------------------------------
 local debug	= false --generates debug message
 local Echo	= Spring.Echo
-local spGetSpectatingState	= Spring.GetSpectatingState()
-local spIsReplay			= Spring.IsReplay()
+local spGetSpectatingState	= Spring.GetSpectatingState
+local spIsReplay			= Spring.IsReplay
 
 local coop = Spring.GetModOptions().coop or 0
 
@@ -87,7 +87,10 @@ end
 
 function Close(commPicked)
 	printDebug("<gui_startup_info_selector DEBUG >: closing")
-	if not commPicked then Spring.SendLuaRulesMsg("faction:strikecomm") end
+	if not commPicked then
+		Spring.Echo("Requesting baseline comm")
+		Spring.SendLuaRulesMsg("faction:strikecomm")
+	end
 	--Spring_SendCommands("say: a:I chose " .. option.button})
 	if mainWindow then mainWindow:Dispose() end
 end
@@ -178,10 +181,11 @@ local function IsSpec()
 		printDebug("<gui_startup_info_selector DEBUG >: You're spec or playing demo.")
 		return true
 	end
+	return false
 end
 
 function widget:Initialize()
-	if ((not WG.Chili) and IsSpec()) then
+	if ((not WG.Chili) or IsSpec()) then
 		printDebug("<gui_startup_info_selector DEBUG >: Or not using Chili, exiting.")
 		widgetHandler:RemoveWidget()
 	end

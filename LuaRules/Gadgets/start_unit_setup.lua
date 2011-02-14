@@ -661,7 +661,8 @@ function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("faction:",1,true) then
 		local side = msg:sub(9)
 		playerSides[playerID] = side
-		local _,_,_,teamID = Spring.GetPlayerInfo(playerID)
+		local _,_,spec,teamID = Spring.GetPlayerInfo(playerID)
+		if spec then return end
 		teamSides[teamID] = side
 		if gamestart then
 			-- picked commander after game start, prep for orbital drop
@@ -673,7 +674,8 @@ function gadget:RecvLuaMsg(msg, playerID)
 	elseif msg:find("customcomm:",1,true) then
 		local name = msg:sub(12)
 		commChoice[playerID] = name
-		local _,_,_,teamID = Spring.GetPlayerInfo(playerID)
+		local _,_,spec,teamID = Spring.GetPlayerInfo(playerID)
+		if spec then return end
 		if gamestart then
 			-- picked commander after game start, prep for orbital drop
 			-- can't do it directly because that's an unsafe change
@@ -710,6 +712,7 @@ function gadget:GameFrame(n)
 	for _, spawnData in pairs(scheduledSpawn[n]) do
 		SpawnStartUnit(spawnData[1], spawnData[2])
 	end
+	scheduledSpawn[n] = nil
   end
 end
 
