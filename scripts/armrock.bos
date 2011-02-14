@@ -165,7 +165,7 @@ Create()
 	start-script MotionControl();	
 	start-script DamageControl();
 	Turn chest to y-axis <-20> now;
-	Turn gun to x-axis <20> now;
+	Turn gun to x-axis <5> now;
 }
 	
 SweetSpot(piecenum)

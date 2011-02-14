@@ -1,11 +1,10 @@
 #define TAK
 #include "constants.h"
 
-piece		base, swivel, turret, arm, wrist, gun, barrel, muzzle, breech, eject, 
-			tracks1, tracks2, tracks3, tracks4,
-			wheels1, wheels2, wheels3, wheels4, wheels5, wheels6;
+piece		base, swivel, turret, arm, wrist, gun, barrel, muzzle, breech, eject, steering,
+			wheel1r, wheel2r, wheel1l, wheel2l, wheelb;
 
-static-var	tracks, isMoving, gun_1_yaw;
+static-var	isMoving, gun_1_yaw;
 
 // Signal definitions
 #define SIG_AIM_1					2
@@ -22,8 +21,6 @@ static-var	tracks, isMoving, gun_1_yaw;
 #define WHEEL_SPIN_SPEED		<360>
 #define WHEEL_SPIN_ACCEL		<10>
 #define WHEEL_SPIN_DECEL		<30>
-
-#define TRACK_PERIOD			50
 
 #define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
 #define SIG_TILT_Z				8		//Signal to prevent multiple tilting. REPLACE!
@@ -42,6 +39,12 @@ static-var	tracks, isMoving, gun_1_yaw;
 #define TILT_Z_DIST				[14]	//Typically half the width of the unit. Keeps the unit's edges from sinking into the ground.
 #define TILT_Z_SPEED			7		//Number of half-cycles per second around z-axis
 
+//steering
+#define ANIM_PERIOD				50
+#define PIVOT_MOD				11 //appox. equal to MAX_PIVOT / turnrate
+#define MAX_PIVOT				<32>
+#define MIN_PIVOT				<-32>
+#define PIVOT_SPEED				<60>
 #include "tiltz.h"
 
 #include "rockx.h"
@@ -53,6 +56,26 @@ RestoreAfterDelay()
 	turn arm to z-axis 0 speed TURRET_SPEED;
 	turn wrist to z-axis 0 speed TURRET_SPEED;
 	turn gun to x-axis 0 speed TURRET_SPEED;
+}
+
+AnimControl() {
+	var lastHeading, currHeading, diffHeading, pivotAngle;
+	lastHeading = GET HEADING;
+	while (1) {
+	
+		//pivot
+		currHeading = GET HEADING;
+		diffHeading = currHeading - lastHeading;
+		if (diffHeading > 0x7fff) diffHeading = diffHeading - 0x10000;
+		if (diffHeading < -0x8000) diffHeading = diffHeading + 0x10000;
+		pivotAngle = diffHeading * PIVOT_MOD;
+		if (pivotAngle > MAX_PIVOT) pivotAngle = MAX_PIVOT;
+		if (pivotAngle < MIN_PIVOT) pivotAngle = MIN_PIVOT;
+		turn steering to y-axis 0 - pivotAngle speed PIVOT_SPEED;
+		
+		lastHeading = currHeading;
+		sleep ANIM_PERIOD;
+	}
 }
 
 DamageControl()
@@ -74,49 +97,25 @@ DamageControl()
 	}
 }
 
-TrackControl() {
-	while (isMoving) {
-		++tracks;
-		if (tracks == 2) {
-			hide tracks1;
-			show tracks2;
-		} else if (tracks == 3) {
-			hide tracks2;
-			show tracks3;
-		} else if (tracks == 4) {
-			hide tracks3;
-			show tracks4;
-		} else {
-			tracks = 1;
-			hide tracks4;
-			show tracks1;
-		}
-		sleep TRACK_PERIOD;
-	}
-}
-
 StartMoving()
 {
 	isMoving = 1;
-	start-script TrackControl();
-	spin wheels1 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
-	spin wheels2 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
-	spin wheels3 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
-	spin wheels4 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
-	spin wheels5 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
-	spin wheels6 around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheel1r around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheel2r around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheel1l around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheel2l around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
+	spin wheelb around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
 }
 
 StopMoving()
 {
 	isMoving = 0;
 
-	stop-spin wheels1 around x-axis decelerate WHEEL_SPIN_DECEL;
-	stop-spin wheels2 around x-axis decelerate WHEEL_SPIN_DECEL;
-	stop-spin wheels3 around x-axis decelerate WHEEL_SPIN_DECEL;
-	stop-spin wheels4 around x-axis decelerate WHEEL_SPIN_DECEL;
-	stop-spin wheels5 around x-axis decelerate WHEEL_SPIN_DECEL;
-	stop-spin wheels6 around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheel1r around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheel2r around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheel1l around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheel2l around x-axis decelerate WHEEL_SPIN_DECEL;
+	stop-spin wheelb around x-axis decelerate WHEEL_SPIN_DECEL;
 }
 
 // Weapons
@@ -207,12 +206,9 @@ Killed(severity, corpsetype)
 Create()
 {
 	isMoving = 0;
-	tracks = 1;
-	hide tracks2;
-	hide tracks3;
-	hide tracks4;
 	
 	call-script RockXInit();
+	start-script AnimControl();
 
 	while (get BUILD_PERCENT_LEFT)
 		sleep 250;
