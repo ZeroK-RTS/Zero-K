@@ -104,7 +104,7 @@ colorConfig["ally"] = colorConfig["enemy"]
 --end of DEFAULT COLOR CONFIG
 
 local Chili
-options_path = 'Settings/Interface/Defence Ranges'
+options_path = 'Game/Settings/Defense Ranges'
 
 options = { 
 	allyground = {name = 'Show Ally Ground Defence', type = 'bool', value = false},
