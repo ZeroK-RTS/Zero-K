@@ -23,10 +23,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Aranha anti-aérea e torpedeira]],
+    description_bp = [[Aranha anti-aérea]],
     description_fr = [[Araign?e AA]],
-    helptext       = [[An all terrain AA unit. Can support other spiders against air and when crossing the sea.]],
-    helptext_bp    = [[Uma unidade escaladora anti-aérea e torpedeira. Use para proteger outras aranhas contra ataques aéreos ou marítimos.]],
+    helptext       = [[An all-terrain AA unit that supports other spiders against air with its medium-range missiles.]],
+    helptext_bp    = [[Uma unidade escaladora anti-aérea. Use para proteger outras aranhas contra ataques aéreos.]],
     helptext_fr    = [[Un unit? anti air et torpille tout terrain. Peut prot?ger ses alli?s des attaques marines et a?riennes. ]],
   },
 

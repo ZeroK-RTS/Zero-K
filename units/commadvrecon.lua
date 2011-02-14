@@ -35,6 +35,7 @@ unitDef = {
     canjump   = [[1]],
     fireproof = [[1]],
 	jumpclass = [[commrecon2]],
+	helptext = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. Its base weapon is a slowing beam, while its special is a disruptor bomb with a wide AoE. It also features jumpjets.]],
   },
 
   defaultmissiontype  = [[Standby]],

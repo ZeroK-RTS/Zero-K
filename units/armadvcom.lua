@@ -40,6 +40,7 @@ unitDef = {
     --cloakshield_preset = [[module_cloakfield]],
 	cloakstealth = [[1]],
     fireproof          = [[1]],
+	helptext = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
   },
 
   defaultmissiontype  = [[Standby]],

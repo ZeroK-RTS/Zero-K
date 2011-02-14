@@ -35,6 +35,7 @@ unitDef = {
     fireproof         = [[1]],
     --repairaura_preset = [[module_repairfield]],
 	cloakstealth	  = [[1]],
+	helptext = [[The esoteric Support Commander uses a more unorthodox weapon set, which is by default a gauss rifle that can fire concussion shots when sufficiently upgraded. Though lacking armor or speed, this chassis is still favored due to its intrinsic income bonus.]],
   },
 
   defaultmissiontype  = [[Standby]],

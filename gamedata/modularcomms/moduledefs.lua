@@ -85,6 +85,11 @@ end
 upgrades = {
 	-- weapons
 	-- it is important that they are prefixed with "commweapon_" in order to get the special handling!
+	commweapon_autoflechette = {
+		name = "Autoflechette",
+		description = "For when a regular shotgun isn't enough",
+		func = noFunc,	
+	},
 	commweapon_beamlaser = {
 		name = "Beam Laser",
 		description = "An effective short-range cutting tool",

@@ -179,8 +179,15 @@ end
 --TagTree("corcom", "core", UnitDefs["corcom"].buildoptions)
 
 for name, ud in pairs(UnitDefs) do
-    if ud.faction ~= "thunderbirds" then ud.faction = "arm" end
+	Spring.Echo(name, ud.faction)
+    --if ud.faction ~= "THUNDERBIRDS" then ud.faction = "arm" end
+	if not name:find("chicken") then
+		ud.faction = "arm"
+	else
+		ud.faction = "chicken"
+	end
 end 
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

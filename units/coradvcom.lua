@@ -32,6 +32,7 @@ unitDef = {
 
   customParams        = {
     fireproof = [[1]],
+	helptext = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment. Its base weapon is a riot cannon, while its special weapon fires cluster bombs in a line ahead.]],
   },
 
   defaultmissiontype  = [[Standby]],
