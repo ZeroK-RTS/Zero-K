@@ -893,7 +893,7 @@ function gadget:GameFrame(n)
       _G.chickenEventArgs = nil
 	  --waveSchedule[n + (30 * chickenSpawnRate)] = true
 	  waveSchedule = n + (30 * chickenSpawnRate)
-	  Spring.Echo(waveSchedule)
+	  --Spring.Echo(waveSchedule)
     end
 	--waveSchedule[n] = nil	-- just to be sure
   end
@@ -939,8 +939,8 @@ function gadget:GameFrame(n)
         _G.chickenEventArgs = nil
 		for i=1,playerCount do SpawnMiniQueen() end
 		miniQueenNum = miniQueenNum + 1
-		waveBonus = waveBonus - 3*(burrowWaveBonus/playerCount)
-		--waveBonusDelta = waveBonusDelta - 3*(burrowWaveBonus/playerCount)		--used by defences - will increase quasiAttacker chance
+		--waveBonus = waveBonus - 3*(burrowWaveBonus/ (burrowCount/playerCount) )
+		--waveBonusDelta = waveBonusDelta - 3*(burrowWaveBonus/(burrowCount/playerCount) )	--used by defences - will increase quasiAttacker chance
 	end
   end
   
@@ -997,10 +997,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
     end
   end
   if (burrows[unitID]) then
+	local count = SetCount(burrows)
     burrows[unitID] = nil
 	queenTime = math.max(queenTime - (burrowQueenTime/playerCount), 1)
-	waveBonus = waveBonus + (burrowWaveBonus/playerCount)
-	waveBonusDelta = waveBonusDelta + (burrowWaveBonus/playerCount)
+	waveBonus = waveBonus + (burrowWaveBonus/ (count/playerCount) )
+	waveBonusDelta = waveBonusDelta + (burrowWaveBonus/ (count/ playerCount) )
 	Spring.SetGameRulesParam("queenTime", queenTime)
 	
 	local timeIncrease = (burrowTechTime/playerCount) * burrowRegressMult
@@ -1018,7 +1019,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		SpawnBurrow()
 	end
 	if pvp and endgame then
-		local count = SetCount(burrows)
 		if count == 0 then KillAllComputerUnits() end
 	end
   end
