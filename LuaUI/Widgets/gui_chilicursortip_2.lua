@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.10 Chili Cursor Tooltips.",
+    desc      = "v0.101 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1074,7 +1074,7 @@ local function MakeToolTip_Draw()
 		main = {
 			{ name='lmb', 		icon = LUAUI_DIRNAME .. 'Images/drawingcursors/pencil.png', 		text = 'Left Mouse Button', },
 			{ name='rmb', 		icon = LUAUI_DIRNAME .. 'Images/drawingcursors/eraser.png', 		text = 'Right Mouse Button', },
-			{ name='mmb', 		icon = LUAUI_DIRNAME .. 'Images/advplayerslist/point.png', 			text = 'Right Mouse Button', },
+			{ name='mmb', 		icon = LUAUI_DIRNAME .. 'Images/advplayerslist/point.png', 			text = 'Middle Mouse Button', },
 			{ name='dblclick', 	icon = LUAUI_DIRNAME .. 'Images/Crystal_Clear_action_flag.png', 	text = 'Double Click', },
 			
 		},
@@ -1309,11 +1309,17 @@ end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if key == KEYSYMS.BACKQUOTE then
+		if not tildepressed then
+			changeNow = true
+		end	
 		tildepressed = true
 	end
 end
 function widget:KeyRelease(key)
 	if key == KEYSYMS.BACKQUOTE then
+		if tildepressed then
+			changeNow = true
+		end
 		tildepressed = false
 	end
 end
