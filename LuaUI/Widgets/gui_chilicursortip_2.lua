@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.092 Chili Cursor Tooltips.",
+    desc      = "v0.10 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -46,6 +46,22 @@ local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local color = {}
+
+
+
+
+include("keysym.h.lua")
+local tildepressed, drawing, erasing
+local glColor		= gl.Color
+--local glAlphaTest	= gl.AlphaTest
+local glTexture 	= gl.Texture
+local glTexRect 	= gl.TexRect
+
+-- pencil and eraser
+local cursor_size = 24
+
+-- instructional image
+local cursor_size2 = 100
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1052,8 +1068,26 @@ local function CreateHpBar(name)
 		},
 	}
 end
+
+local function MakeToolTip_Draw()
+	local tt_structure = {
+		main = {
+			{ name='lmb', 		icon = LUAUI_DIRNAME .. 'Images/drawingcursors/pencil.png', 		text = 'Left Mouse Button', },
+			{ name='rmb', 		icon = LUAUI_DIRNAME .. 'Images/drawingcursors/eraser.png', 		text = 'Right Mouse Button', },
+			{ name='mmb', 		icon = LUAUI_DIRNAME .. 'Images/advplayerslist/point.png', 			text = 'Right Mouse Button', },
+			{ name='dblclick', 	icon = LUAUI_DIRNAME .. 'Images/Crystal_Clear_action_flag.png', 	text = 'Double Click', },
+			
+		},
+	}
+	BuildTooltip2('drawing', tt_structure)
+end
 	
 local function MakeTooltip()
+	if tildepressed and not (drawing or erasing) then
+		MakeToolTip_Draw()
+		return
+	end
+	
 	local cur_ttstr = screen0.currentTooltip or spGetCurrentTooltip()
 	local type, data = spTraceScreenRay(mx, my)
 	if (not changeNow) and cur_ttstr ~= '' and old_ttstr == cur_ttstr and old_data == data then
@@ -1268,5 +1302,48 @@ function widget:Shutdown()
 	spSendCommands({"tooltip 1"})
 	if (window_tooltip2) then
 		window_tooltip2:Dispose()
+	end
+end
+
+
+
+function widget:KeyPress(key, modifier, isRepeat)
+	if key == KEYSYMS.BACKQUOTE then
+		tildepressed = true
+	end
+end
+function widget:KeyRelease(key)
+	if key == KEYSYMS.BACKQUOTE then
+		tildepressed = false
+	end
+end
+
+function widget:DrawScreen()
+	if not tildepressed then return end
+	local x, y, lmb, mmb, rmb = Spring.GetMouseState()
+	drawing = lmb
+	erasing = rmb
+	
+	local filefound
+	local cursor_size_cur = cursor_size
+	if drawing then
+		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/pencil.png')
+	elseif erasing then
+		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/eraser.png')
+	else
+		cursor_size_cur = cursor_size2
+		--filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/drawing.png')
+	end
+	
+	if filefound then
+		--do teamcolor?
+		--glColor(0,1,1,1) 
+		if drawing or erasing then
+			Spring.SetMouseCursor('none')
+		end
+		glTexRect(x, y-cursor_size_cur, x+cursor_size_cur, y)
+		glTexture(false)
+		--glColor(1,1,1,1)
+		--glAlphaTest(false)		
 	end
 end
