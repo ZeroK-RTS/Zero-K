@@ -890,7 +890,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 				
 				if diffX >= 10 or diffZ >= 10 then
 					points = points + 1
-					point[points] = {x = pos[1], y = pos[2], z = pos[3]}
+					point[points] = {x = pos[1], y = spGetGroundHeight(pos[1],pos[3]), z = pos[3]}
 				end
 			end
 		end
@@ -997,7 +997,7 @@ function widget:Update(n)
 			if c then
 				local _, pos = spTraceScreenRay(mx, my, true)
 				if pos then	
-					terraformHeight = pos[2]
+					terraformHeight = spGetGroundHeight(pos[1],pos[3])
 					storedHeight = terraformHeight
 					mouseX = mx
 					mouseY = my
@@ -1087,7 +1087,7 @@ function widget:MouseRelease(mx, my, button)
 				local diffZ = abs(point[points].z - pos[3])
 				if diffX >= 10 or diffZ >= 10 then
 					points = points + 1
-					point[points] = {x = pos[1], y = pos[2], z = pos[3]}
+					point[points] = {x = pos[1], y = spGetGroundHeight(pos[1],pos[3]), z = pos[3]}
 				end
 			end
 			
@@ -1395,7 +1395,7 @@ function widget:KeyRelease(key)
 				
 			if diffX >= 10 or diffZ >= 10 then
 				points = points + 1
-				point[points] = {x = pos[1], y = pos[2], z = pos[3]}
+				point[points] = {x = pos[1], y = spGetGroundHeight(pos[1],pos[3]), z = pos[3]}
 			end
 		end
 		return true
@@ -1417,7 +1417,7 @@ function widget:KeyRelease(key)
 				
 			if diffX >= 10 or diffZ >= 10 then
 				points = points + 1
-				point[points] = {x = pos[1], y = pos[2], z = pos[3]}
+				point[points] = {x = pos[1], y = spGetGroundHeight(pos[1],pos[3]), z = pos[3]}
 			end
 		end
 		return true
