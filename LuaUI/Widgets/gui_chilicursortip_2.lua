@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Cursor Tip 2",
-    desc      = "v0.101 Chili Cursor Tooltips.",
+    desc      = "v0.102 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -47,7 +47,8 @@ local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local color = {}
 
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 
 include("keysym.h.lua")
@@ -59,9 +60,6 @@ local glTexRect 	= gl.TexRect
 
 -- pencil and eraser
 local cursor_size = 24
-
--- instructional image
-local cursor_size2 = 100
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -124,7 +122,7 @@ end
 --]]
 options_path = 'Settings/Interface/Tooltip'
 --options_order = { 'tooltip_delay',  'statictip', 'fontsize', 'staticfontsize', 'hpshort'}
-options_order = { 'tooltip_delay',  'fontsize', 'hpshort', 'featurehp', 'hide_for_unreclaimable', }
+options_order = { 'tooltip_delay',  'fontsize', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip',  }
 
 options = {
 	tooltip_delay = {
@@ -183,6 +181,12 @@ options = {
 		advanced = true,
 		value = true,
 		desc = 'Don\'t show the tooltip for unreclaimable features.',
+	},
+	showdrawtooltip = {
+		name = "Show Map-drawing Tooltip",
+		type = 'bool',
+		value = true,
+		desc = 'Show map-drawing tooltip when holding down ~.',
 	},
 	
 }
@@ -1083,7 +1087,7 @@ local function MakeToolTip_Draw()
 end
 	
 local function MakeTooltip()
-	if tildepressed and not (drawing or erasing) then
+	if options.showdrawtooltip.value and  tildepressed and not (drawing or erasing) then
 		MakeToolTip_Draw()
 		return
 	end
@@ -1331,14 +1335,10 @@ function widget:DrawScreen()
 	erasing = rmb
 	
 	local filefound
-	local cursor_size_cur = cursor_size
 	if drawing then
 		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/pencil.png')
 	elseif erasing then
 		filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/eraser.png')
-	else
-		cursor_size_cur = cursor_size2
-		--filefound = glTexture(LUAUI_DIRNAME .. 'Images/drawingcursors/drawing.png')
 	end
 	
 	if filefound then
@@ -1347,9 +1347,8 @@ function widget:DrawScreen()
 		if drawing or erasing then
 			Spring.SetMouseCursor('none')
 		end
-		glTexRect(x, y-cursor_size_cur, x+cursor_size_cur, y)
+		glTexRect(x, y-cursor_size, x+cursor_size, y)
 		glTexture(false)
 		--glColor(1,1,1,1)
-		--glAlphaTest(false)		
 	end
 end
