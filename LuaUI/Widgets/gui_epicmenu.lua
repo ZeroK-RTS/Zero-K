@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.253 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.254 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1730,6 +1730,10 @@ local function MakeCrudeMenu()
 	
 	local menu_tree3 		= AddCustomPaths(menu_tree2, 'Settings')
 	local game_menu_tree3 	= AddCustomPaths(game_menu_tree2, 'Game')
+	
+	for actionName, _ in pairs( settings.keybounditems ) do
+		RemoveAction(actionName)
+	end
 	
 	main_menu_index = flattenTree(menu_tree3, '')
 	game_menu_index = flattenTree(game_menu_tree3, '' )
