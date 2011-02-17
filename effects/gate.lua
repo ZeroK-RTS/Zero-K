@@ -37,20 +37,22 @@ return {
       },
     },
   },
+  
 
-  ["gate_teleport"] = {
-    boom = {
-      air                = true,
-      class              = [[CExpGenSpawner]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        delay              = 0,
-        explosiongenerator = [[custom:PARIS]],
-        pos                = [[0, 0, 0]],
-      },
-    },
+["gate_teleport"] = {
+--    boom = {
+--      air                = true,
+--      class              = [[CExpGenSpawner]],
+--      count              = 1,
+--      ground             = true,
+--      water              = true,
+--      properties = {
+--        delay              = 0,
+--        explosiongenerator = [[custom:PARIS]],
+--        pos                = [[0, 0, 0]],
+--      },
+--    },
+
     glow = {
       air                = true,
       class              = [[CExpGenSpawner]],
