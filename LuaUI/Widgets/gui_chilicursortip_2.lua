@@ -1078,8 +1078,8 @@ local function MakeToolTip_Draw()
 		main = {
 			{ name='lmb', 		icon = LUAUI_DIRNAME .. 'Images/drawingcursors/pencil.png', 		text = 'Left Mouse Button', },
 			{ name='rmb', 		icon = LUAUI_DIRNAME .. 'Images/drawingcursors/eraser.png', 		text = 'Right Mouse Button', },
-			{ name='mmb', 		icon = LUAUI_DIRNAME .. 'Images/advplayerslist/point.png', 			text = 'Middle Mouse Button', },
-			{ name='dblclick', 	icon = LUAUI_DIRNAME .. 'Images/Crystal_Clear_action_flag.png', 	text = 'Double Click', },
+			{ name='mmb', 		icon = LUAUI_DIRNAME .. 'Images/Crystal_Clear_action_flag.png', 	text = 'Middle Mouse Button', },
+			{ name='dblclick', 	icon = LUAUI_DIRNAME .. 'Images/drawingcursors/flagtext.png', 		text = 'Double Click', },
 			
 		},
 	}
