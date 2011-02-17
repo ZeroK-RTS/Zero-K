@@ -12,6 +12,8 @@ local weaponDef = {
 	customParams			= {
 		slot = [[5]],
 		muzzleEffect = [[custom:flashmuzzle1]],
+		rangeperlevel = [[50]],
+		damageperlevel = [[10]],
 	},
 	
     damage                  = {

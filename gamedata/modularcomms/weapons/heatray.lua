@@ -9,6 +9,12 @@ local weaponDef = {
     craterBoost             = 0,
     craterMult              = 0,
 
+	customParams			= {
+		slot = [[4]],
+		rangeperlevel = [[30]],
+		damageperlevel = [[4]],
+	},	
+	
     damage                  = {
       default = 35,
       planes  = 35,

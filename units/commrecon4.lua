@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[commadvrecon]],
+  unitname            = [[commrecon4]],
   name                = [[Advanced Recon Commander]],
   description         = [[High Mobility Commander, Builds at 12 m/s]],
   acceleration        = 0.25,
@@ -36,7 +36,7 @@ unitDef = {
     fireproof = [[1]],
 	jumpclass = [[commrecon2]],
 	helptext = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. Its base weapon is a slowing beam, while its special is a disruptor bomb with a wide AoE. It also features jumpjets.]],
-	level = [[3]],
+	level = [[4]],
 	statsname = [[commadvrecon]],
   },
 
@@ -54,7 +54,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 983,
-  maxDamage           = 3600,
+  maxDamage           = 4800,
   maxSlope            = 36,
   maxVelocity         = 1.55,
   maxWaterDepth       = 5000,
@@ -285,6 +285,7 @@ unitDef = {
     },
 
 
+
     HEAP      = {
       description      = [[Debris - Recon Commander]],
       blocking         = false,
@@ -307,4 +308,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ commadvrecon = unitDef })
+return lowerkeys({ commrecon4 = unitDef })

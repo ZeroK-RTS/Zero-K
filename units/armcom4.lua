@@ -1,13 +1,13 @@
 unitDef = {
-  unitname            = [[commadvrecon]],
-  name                = [[Advanced Recon Commander]],
-  description         = [[High Mobility Commander, Builds at 12 m/s]],
-  acceleration        = 0.25,
+  unitname            = [[armcom4]],
+  name                = [[Advanced Strike Commander]],
+  description         = [[Mobile Assault Commander, Builds at 12 m/s]],
+  acceleration        = 0.18,
   activateWhenBuilt   = true,
   amphibious          = [[1]],
   autoHeal            = 5,
   bmcode              = [[1]],
-  brakeRate           = 0.45,
+  brakeRate           = 0.375,
   buildCostEnergy     = 2400,
   buildCostMetal      = 2400,
   buildDistance       = 120,
@@ -16,9 +16,10 @@ unitDef = {
   buildoptions        = {
   },
 
-  buildPic            = [[commrecon.png]],
+  buildPic            = [[armcom.png]],
   buildTime           = 2400,
   canAttack           = true,
+  canCloak            = true,
   canDGun             = true,
   canGuard            = true,
   canMove             = true,
@@ -26,22 +27,26 @@ unitDef = {
   canreclamate        = [[1]],
   canstop             = [[1]],
   category            = [[LAND FIREPROOF]],
-  cloakCost           = 3,
-  cloakCostMoving     = 12,
+  cloakCost           = 5,
+  cloakCostMoving     = 25,
   commander           = true,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[50 50 50]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
-    canjump   = [[1]],
-    fireproof = [[1]],
-	jumpclass = [[commrecon2]],
-	helptext = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. Its base weapon is a slowing beam, while its special is a disruptor bomb with a wide AoE. It also features jumpjets.]],
-	level = [[3]],
-	statsname = [[commadvrecon]],
+    --cloakshield_preset = [[module_cloakfield]],
+	cloakstealth = [[1]],
+    fireproof          = [[1]],
+	helptext = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
+	level = [[4]],
+	statsname = [[armadvcom]],
   },
 
   defaultmissiontype  = [[Standby]],
-  energyMake          = 3,
+  energyMake          = 3.5,
   energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
@@ -53,35 +58,28 @@ unitDef = {
   idleTime            = 1800,
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
-  mass                = 983,
-  maxDamage           = 3600,
+  mass                = 992,
+  maxDamage           = 5500,
   maxSlope            = 36,
-  maxVelocity         = 1.55,
+  maxVelocity         = 1.4,
   maxWaterDepth       = 5000,
-  metalMake           = 3,
+  metalMake           = 3.5,
   metalStorage        = 0,
   minCloakDistance    = 100,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
-  objectName          = [[commrecon.s3o]],
-  onoffable           = true,
-  radarDistance       = 1400,
-  --radarDistanceJam    = 550,
-  script              = [[commrecon.lua]],
+  objectName          = [[ARMCOM]],
+  script              = [[armcom.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
-	  [[custom:NONE]],
-	  [[custom:NONE]],
-      [[custom:RAIDMUZZLE]],
-	  [[custom:NONE]],
-      [[custom:VINDIBACK]],
-      [[custom:FLASH64]],
+    	[[custom:NONE]],
     },
+
   },
 
   showNanoSpray       = false,
@@ -90,29 +88,30 @@ unitDef = {
   sightDistance       = 500,
   smoothAnim          = true,
   sonarDistance       = 300,
-  stealth             = true,
   steeringmode        = [[2]],
   TEDClass            = [[COMMANDER]],
   terraformSpeed      = 600,
-  turnRate            = 1350,
+  turnRate            = 1148,
   upright             = true,
   workerTime          = 12,
 
   weapons             = {
 
-	[1] = {
+    [1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],	
-	},
-
-    [3] = {
-      def                = [[SLOWBOMB]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-	
+
+
+    [3] = {
+      def                = [[DISINTEGRATOR]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+
+
     [4] = {
-      def                = [[SLOWBEAM]],
+      def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -121,6 +120,41 @@ unitDef = {
 
 
   weaponDefs          = {
+
+    DISINTEGRATOR = {
+      name                    = [[Disintegrator]],
+      areaOfEffect            = 48,
+      avoidFeature            = false,
+      avoidFriendly           = false,
+      avoidNeutral            = false,
+      commandfire             = true,
+      craterBoost             = 1,
+      craterMult              = 6,
+
+      damage                  = {
+        default    = 1200,
+      },
+
+      explosionGenerator      = [[custom:DGUNTRACE]],
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      noExplode               = true,
+      noSelfDamage            = true,
+      range                   = 250,
+      reloadtime              = 12,
+      renderType              = 3,
+	  size					  = 6,
+      soundHit                = [[explosion/ex_med6]],
+      soundStart              = [[weapon/laser/heavy_laser4]],
+      soundTrigger            = true,
+      tolerance               = 10000,
+      turret                  = true,
+      weaponTimer             = 4.2,
+      weaponType              = [[DGun]],
+      weaponVelocity          = 300,
+    },
+
 
     FAKELASER     = {
       name                    = [[Fake Laser]],
@@ -149,7 +183,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 350,
+      range                   = 250,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
@@ -165,98 +199,52 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
-    },  
-  
-    SLOWBEAM = {
-      name                    = [[Slowing Beam]],
-      areaOfEffect            = 8,
-      beamDecay               = 0.9,
+    },
+
+
+    LASER         = {
+      name                    = [[Commander Laser]],
+      areaOfEffect            = 12,
       beamlaser               = 1,
       beamTime                = 0.1,
-      beamttl                 = 50,
-      coreThickness           = 0,
+      coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
-      customParams            = {
-        timeslow_preset = [[commrecon2_slowbeam]],
-      },
-
-
       damage                  = {
-        default = 150,
+        default = 20,
+        subs    = 10,
       },
 
-      explosionGenerator      = [[custom:flash2purple]],
-      fireStarter             = 30,
+      duration                = 0.11,
+      edgeEffectiveness       = 0.99,
+      explosionGenerator      = [[custom:flash1blue]],
+      fireStarter             = 70,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
-      laserFlareSize          = 6,
+      laserFlareSize          = 3,
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 350,
-      reloadtime              = 1.5,
+      range                   = 375,
+      reloadtime              = 0.11,
       renderType              = 0,
-      rgbColor                = [[0.4 0 0.5]],
-      soundStart              = [[weapon/laser/pulse_laser2]],
-      soundStartVolume        = 0.9,
+      rgbColor                = [[0 1 1]],
+      soundStart              = [[weapon/laser/pulse_laser3]],
       soundTrigger            = true,
-      sweepfire               = false,
+      targetMoveError         = 0.05,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
       texture4                = [[smallflare]],
-      thickness               = 8,
-      tolerance               = 18000,
+      thickness               = 3,
+      tolerance               = 10000,
       turret                  = true,
       weaponType              = [[BeamLaser]],
-      weaponVelocity          = 500,
-    },
-
-
-    SLOWBOMB = {
-      name                    = [[Disruptor Bomb]],
-      accuracy                = 256,
-      areaOfEffect            = 512,
-      commandFire             = true,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      customParams            = {
-        timeslow_preset = [[commrecon2_slowbomb]],
-      },
-
-      damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 15,
-      },
-
-      explosionGenerator      = [[custom:riotballplus]],
-      fireStarter             = 100,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 2,
-      lineOfSight             = true,
-      model                   = [[wep_b_fabby.s3o]],
-      noSelfDamage            = true,
-      range                   = 450,
-      reloadtime              = 12,
-      renderType              = 4,
-      smokeTrail              = true,
-      soundHit                = [[weapon/aoe_aura]],
-      soundHitVolume          = 8,
-      soundStart              = [[weapon/cannon/cannon_fire3]],
-      startsmoke              = [[1]],
-	  startVelocity			  = 350,
-	  trajectoryHeight		  = 0.3,
-      turret                  = true,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 350,
+      weaponVelocity          = 900,
     },
 
   },
@@ -265,10 +253,10 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Recon Commander]],
+      description      = [[Wreckage - Advanced Strike Commander]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 2400,
+      damage           = 2650,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -276,29 +264,49 @@ unitDef = {
       footprintZ       = 2,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 960,
-      object           = [[commrecon_dead.s3o]],
+      metal            = 720,
+      object           = [[wreck2x2b.s3o]],
       reclaimable      = true,
-      reclaimTime      = 960,
+      reclaimTime      = 720,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
 
 
     HEAP      = {
-      description      = [[Debris - Recon Commander]],
+      description      = [[Debris - Strike Commander]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2400,
+      damage           = 2650,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
       hitdensity       = [[100]],
-      metal            = 480,
+      metal            = 360,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 480,
+      reclaimTime      = 360,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    RIOT_HEAP = {
+      description      = [[Commander Debris]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 20000,
+      energy           = 0,
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      height           = [[4]],
+      hitdensity       = [[100]],
+      metal            = 500,
+      object           = [[debris2x2c.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 500,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -307,4 +315,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ commadvrecon = unitDef })
+return lowerkeys({ armcom4 = unitDef })

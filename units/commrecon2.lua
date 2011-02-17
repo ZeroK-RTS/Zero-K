@@ -1,6 +1,6 @@
 unitDef = {
-  unitname            = [[commadvrecon]],
-  name                = [[Advanced Recon Commander]],
+  unitname            = [[commrecon2]],
+  name                = [[Recon Commander]],
   description         = [[High Mobility Commander, Builds at 12 m/s]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
@@ -8,8 +8,8 @@ unitDef = {
   autoHeal            = 5,
   bmcode              = [[1]],
   brakeRate           = 0.45,
-  buildCostEnergy     = 2400,
-  buildCostMetal      = 2400,
+  buildCostEnergy     = 1800,
+  buildCostMetal      = 1800,
   buildDistance       = 120,
   builder             = true,
 
@@ -17,31 +17,30 @@ unitDef = {
   },
 
   buildPic            = [[commrecon.png]],
-  buildTime           = 2400,
+  buildTime           = 1800,
   canAttack           = true,
-  canDGun             = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
   canreclamate        = [[1]],
   canstop             = [[1]],
   category            = [[LAND FIREPROOF]],
-  cloakCost           = 3,
-  cloakCostMoving     = 12,
+  cloakCost           = 6,
+  cloakCostMoving     = 24,
   commander           = true,
   corpse              = [[DEAD]],
 
   customParams        = {
     canjump   = [[1]],
     fireproof = [[1]],
-	jumpclass = [[commrecon2]],
+	jumpclass = [[commrecon1]],
 	helptext = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. Its base weapon is a slowing beam, while its special is a disruptor bomb with a wide AoE. It also features jumpjets.]],
-	level = [[3]],
-	statsname = [[commadvrecon]],
+	level = [[2]],
+	statsname = [[commrecon]],
   },
 
   defaultmissiontype  = [[Standby]],
-  energyMake          = 3,
+  energyMake          = 2.7,
   energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
@@ -53,21 +52,19 @@ unitDef = {
   idleTime            = 1800,
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
-  mass                = 983,
-  maxDamage           = 3600,
+  mass                = 848,
+  maxDamage           = 2750,
   maxSlope            = 36,
-  maxVelocity         = 1.55,
+  maxVelocity         = 1.45,
   maxWaterDepth       = 5000,
-  metalMake           = 3,
+  metalMake           = 2.7,
   metalStorage        = 0,
   minCloakDistance    = 100,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
   objectName          = [[commrecon.s3o]],
-  onoffable           = true,
-  radarDistance       = 1400,
-  --radarDistanceJam    = 550,
+  radarDistance       = 1250,
   script              = [[commrecon.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
@@ -82,6 +79,7 @@ unitDef = {
       [[custom:VINDIBACK]],
       [[custom:FLASH64]],
     },
+
   },
 
   showNanoSpray       = false,
@@ -90,7 +88,6 @@ unitDef = {
   sightDistance       = 500,
   smoothAnim          = true,
   sonarDistance       = 300,
-  stealth             = true,
   steeringmode        = [[2]],
   TEDClass            = [[COMMANDER]],
   terraformSpeed      = 600,
@@ -99,18 +96,13 @@ unitDef = {
   workerTime          = 12,
 
   weapons             = {
-
+  
 	[1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],	
 	},
-
-    [3] = {
-      def                = [[SLOWBOMB]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-	
+  
     [4] = {
       def                = [[SLOWBEAM]],
       badTargetCategory  = [[FIXEDWING]],
@@ -133,29 +125,21 @@ unitDef = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.11,
-      edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:flash1green]],
-      fireStarter             = 70,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      largeBeamLaser          = true,
       laserFlareSize          = 5.53,
       lineOfSight             = true,
       minIntensity            = 1,
-      noSelfDamage            = true,
-      range                   = 350,
+      range                   = 300,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
-      soundStart              = [[weapon/laser/laser_burn5]],
-      soundTrigger            = true,
-      targetMoveError         = 0.05,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
@@ -165,7 +149,7 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
-    },  
+    },
   
     SLOWBEAM = {
       name                    = [[Slowing Beam]],
@@ -179,12 +163,11 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        timeslow_preset = [[commrecon2_slowbeam]],
+        timeslow_preset = [[commrecon_slowbeam]],
       },
 
-
       damage                  = {
-        default = 150,
+        default = 120,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -198,7 +181,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 350,
+      range                   = 300,
       reloadtime              = 1.5,
       renderType              = 0,
       rgbColor                = [[0.4 0 0.5]],
@@ -217,48 +200,6 @@ unitDef = {
       weaponVelocity          = 500,
     },
 
-
-    SLOWBOMB = {
-      name                    = [[Disruptor Bomb]],
-      accuracy                = 256,
-      areaOfEffect            = 512,
-      commandFire             = true,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      customParams            = {
-        timeslow_preset = [[commrecon2_slowbomb]],
-      },
-
-      damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 15,
-      },
-
-      explosionGenerator      = [[custom:riotballplus]],
-      fireStarter             = 100,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 2,
-      lineOfSight             = true,
-      model                   = [[wep_b_fabby.s3o]],
-      noSelfDamage            = true,
-      range                   = 450,
-      reloadtime              = 12,
-      renderType              = 4,
-      smokeTrail              = true,
-      soundHit                = [[weapon/aoe_aura]],
-      soundHitVolume          = 8,
-      soundStart              = [[weapon/cannon/cannon_fire3]],
-      startsmoke              = [[1]],
-	  startVelocity			  = 350,
-	  trajectoryHeight		  = 0.3,
-      turret                  = true,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 350,
-    },
-
   },
 
 
@@ -268,7 +209,7 @@ unitDef = {
       description      = [[Wreckage - Recon Commander]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 2400,
+      damage           = 2250,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -276,10 +217,10 @@ unitDef = {
       footprintZ       = 2,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 960,
+      metal            = 720,
       object           = [[commrecon_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 960,
+      reclaimTime      = 720,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -289,16 +230,16 @@ unitDef = {
       description      = [[Debris - Recon Commander]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2400,
+      damage           = 2250,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
       hitdensity       = [[100]],
-      metal            = 480,
+      metal            = 360,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 480,
+      reclaimTime      = 360,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -307,4 +248,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ commadvrecon = unitDef })
+return lowerkeys({ commrecon2 = unitDef })

@@ -34,6 +34,17 @@ function ApplyWeapon(unitDef, weapon)
 		onlytargetcategory = wcp.onlytargetcategory or [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
 	}
 	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
+	
+	-- upgrade by level
+	local level = (tonumber(unitDef.customparams.level) - 1) or 0
+	local wd = unitDef.weapondefs[weapon]
+	if wd.range then
+		wd.range = wd.range + (wd.customparams.rangeperlevel or 0) * level
+	end
+	if wd.damage then
+		wd.damage.default = wd.damage.default + (wd.customparams.damageperlevel or 0) * level
+	end
+	
 	-- clear other weapons
 	if slot > 3 then
 		for i=4,6 do	-- subject to change

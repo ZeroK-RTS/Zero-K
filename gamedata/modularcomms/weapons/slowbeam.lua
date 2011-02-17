@@ -13,6 +13,8 @@ local weaponDef = {
     customParams            = {
 		slot = [[4]],
 		timeslow_preset = [[commrecon_slowbeam]],
+		rangeperlevel = [[50]],
+		damageperlevel = [[12]],
     },
 
     damage                  = {

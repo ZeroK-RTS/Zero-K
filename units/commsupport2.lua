@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[commsupport]],
+  unitname            = [[commsupport2]],
   name                = [[Support Commander]],
   description         = [[Econ/Support Commander, Builds at 12 m/s]],
   acceleration        = 0.25,
@@ -34,7 +34,7 @@ unitDef = {
     fireproof = [[1]],
 	cloakstealth = [[1]],
 	helptext = [[The esoteric Support Commander uses a more unorthodox weapon set, which is by default a gauss rifle that can fire concussion shots when sufficiently upgraded. Though lacking armor or speed, this chassis is still favored due to its intrinsic income bonus.]],
-	level = [[1]],
+	level = [[2]],
 	statsname = [[commsupport]],
   },
 
@@ -52,7 +52,7 @@ unitDef = {
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
   mass                = 839,
-  maxDamage           = 2000,
+  maxDamage           = 2500,
   maxSlope            = 36,
   maxVelocity         = 1.2,
   maxWaterDepth       = 5000,
@@ -236,4 +236,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ commsupport = unitDef })
+return lowerkeys({ commsupport2 = unitDef })

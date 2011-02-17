@@ -87,6 +87,8 @@ unitDef = {
     fireproof = [[1]],
 	cloakstealth = [[1]],
 	helptext = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
+	level = [[1]],
+	statsname = [[armcom]],
   },
 
   defaultmissiontype     = [[Standby]],
@@ -261,7 +263,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 2250,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -274,27 +276,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2     = {
-      description      = [[Debris - Strike Commander]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 2250,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      hitdensity       = [[100]],
-      metal            = 720,
-      object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 720,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP      = {
       description      = [[Debris - Strike Commander]],
@@ -314,25 +295,6 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-
-    RIOT_HEAP = {
-      description      = [[Commander Debris]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 20000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 500,
-      object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 500,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
 
   },
 

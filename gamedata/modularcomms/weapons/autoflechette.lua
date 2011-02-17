@@ -11,6 +11,8 @@ local weaponDef = {
 		slot = [[5]],
 		muzzleEffect = [[custom:RAIDMUZZLE]],
 		--miscEffect = [[custom:LEVLRMUZZLE]],
+		rangeperlevel = [[30]],
+		damageperlevel = [[3]],
 	},
 	
 	damage                  = {

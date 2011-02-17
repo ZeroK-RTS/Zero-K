@@ -8,9 +8,9 @@ local weaponDef = {
 
 	customParams			= {
 		slot = [[5]],
-		badTargetCategory  = [[FIXEDWING]],
-		onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
 		muzzleEffect = [[custom:STORMMUZZLE]],
+		rangeperlevel = [[50]],
+		damageperlevel = [[30]],
 	},
 	
 	damage                  = {

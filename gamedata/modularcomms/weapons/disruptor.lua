@@ -13,6 +13,8 @@ local weaponDef = {
 	customParams			= {
 		slot = [[4]],
 		timeslow_preset = [[module_disruptorbeam]],
+		rangeperlevel = [[40]],
+		damageperlevel = [[25]],
 	},
 	
     damage                  = {
