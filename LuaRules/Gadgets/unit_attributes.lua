@@ -56,6 +56,7 @@ local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 			local reload = WeaponDefs[ud.weapons[i+1].weaponDef].reload
 			state.weapon[i] = {
 				reload = reload,
+				prevReload = reload,
 				burstRate = WeaponDefs[ud.weapons[i+1].weaponDef].salvoDelay,
 				oldReloadFrames = math.floor(reload*30),
 			}
@@ -76,18 +77,25 @@ local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 			local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
 			if reloadState < 0 then -- unit is already reloaded, so set unit to almost reloaded
 				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = gameFrame+UPDATE_PERIOD+1})
+				w.prevReload = newReload
 			else
 				local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
 				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
+				w.prevReload = newReload
 			end
 			-- add UPDATE_PERIOD so that the reload time never advances past what it is now
 		else
 			local newReload = w.reload/speedFactor
+			if ud.name == "corstorm" then
+				Spring.Echo(reloadTime - w.prevReload)
+			end
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
 			if w.burstRate then
 				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload, burstRate = w.burstRate/speedFactor})
+				w.prevReload = newReload
 			else
 				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
+				w.prevReload = newReload
 			end
 		end
 	end
