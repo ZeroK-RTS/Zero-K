@@ -24,9 +24,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Verh?llender Turm / St?rsender]],
-    helptext       = [[Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight.]],
-    helptext_de    = [[St?rsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgel?sten, Radarechos. Sneaky Pete bietet au?erdem noch ein Deckmantel, um Einheiten in der N?he vor dem Gegner zu verstecken.]],
+	description_de = [[Verhüllender Turm / Störsender]],
+    helptext	   = [[Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight.]],
+	helptext_de    = [[Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Sneaky Pete bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken.]],
   },
 
   energyUse                     = 1.5,
@@ -62,7 +62,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD = {
+    DEAD  = {
       description      = [[Wreckage - Sneaky Pete]],
       blocking         = true,
       category         = [[corpses]],
@@ -82,8 +82,7 @@ unitDef = {
       world            = [[all]],
     },
 
-
-    HEAP = {
+    HEAP  = {
       description      = [[Debris - Sneaky Pete]],
       blocking         = false,
       category         = [[heaps]],

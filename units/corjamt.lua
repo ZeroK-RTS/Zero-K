@@ -4,6 +4,7 @@ unitDef = {
   description                   = [[Light Shield Device]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
+  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 9821,
   buildCostEnergy               = 480,
@@ -51,6 +52,16 @@ unitDef = {
   workerTime                    = 0,
   yardMap                       = [[oooo]],
 
+  customParams        = {
+    description_bp = [[]],
+    description_fr = [[]],
+	description_de = [[Leichte Abschirmeinrichtung]],
+    helptext       = [[]],
+    helptext_bp    = [[]],
+    helptext_fr    = [[]],
+	helptext_de    = [[Aegis schützt deine Einheiten in mit seinem Schild vor Angriffen, die durch den Schild absorbiert werden können, aber nur solange die nötige Energieversorgung gewährleistet ist und der Beschuss nicht zu stark wird.]],
+  },  
+  
   weapons                       = {
 
     {

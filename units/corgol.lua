@@ -1,52 +1,57 @@
 unitDef = {
-  unitname         = [[corgol]],
-  name             = [[Goliath]],
-  description      = [[Very Heavy Tank Buster]],
-  acceleration     = 0.0282,
-  brakeRate        = 0.052,
-  buildCostEnergy  = 1900,
-  buildCostMetal   = 1900,
-  builder          = false,
-  buildPic         = [[corgol.png]],
-  buildTime        = 1900,
-  canAttack        = true,
-  canGuard         = true,
-  canMove          = true,
-  canPatrol        = true,
-  canstop          = [[1]],
-  category         = [[LAND FIREPROOF]],
-  corpse           = [[DEAD]],
+  unitname            = [[corgol]],
+  name                = [[Goliath]],
+  description         = [[Very Heavy Tank Buster]],
+  acceleration        = 0.0282,
+  bmcode              = [[1]],
+  brakeRate           = 0.052,
+  buildCostEnergy     = 1900,
+  buildCostMetal      = 1900,
+  builder             = false,
+  buildPic            = [[corgol.png]],
+  buildTime           = 1900,
+  canAttack           = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canstop             = [[1]],
+  category            = [[LAND FIREPROOF]],
+  corpse              = [[DEAD]],
 
-  customParams     = {
+  customParams        = {
     description_bp = [[Tanque dispersador pesado]],
     description_fr = [[Tank Émeutier Lourd]],
+	description_de = [[Sehr schwerer Panzerknacker]],
     fireproof      = [[1]],
     helptext       = [[The Goliath is the single heaviest tank on the field. Its main gun is a hefty cannon designed to smash lesser tanks into oblivion, while mounted on the turret is a light flamethrower which quickly cooks anything that invades the Golly's privacy. However, it turns like a tub of water, and its short range makes it easy prey for advanced skirmishers, or air attacks.]],
     helptext_bp    = [[Goliath é o tanque mais pesado do jogo, uma prova do poder de fogo de Logos. Sua arma principal é um grande canh?o que acaba facilmente com unidades pequenas, e seu lança chamas pode destruir rapidamente qualquer coisa que se aproxime demais. Porém, ele manobra lentamente e seu curto alcançe o torna presa fácil para escaramuçadores e ataques aéreos.]],
     helptext_fr    = [[Le Goliath est tout simplement le plus gros tank jamais construit. Un blindage lourd, un énorme canon plasma r moyenne portée fera voler en éclat les ennemis apeurés tandis que son lance flamme s'occupera des plus téméraires. Le Goliath est facile r repérer, il ne laisse que des ruines derricre lui.]],
+	helptext_de    = [[Der Goliath ist der stärkste Panzer auf dem Platz. Seine mächtige Hauptkanone wurde entwickelt, um kleinere Panzer ins Nirvana zu schicken, während der aufgesetzte Flammenwerfer alle Einheiten, die dem Goliath zu nahe kommen, kurz und schmervoll verbrennt. Trotzdem bewegt sich der Panzer wie eine Wasserwanne und seine kurze Reichweite macht ihn zur einfachen Beute von hochentwickelten Skirmishern oder Luftattacken.]],
   },
 
-  explodeAs        = [[BIG_UNITEX]],
-  footprintX       = 4,
-  footprintZ       = 4,
-  iconType         = [[tankskirm]],
-  idleAutoHeal     = 5,
-  idleTime         = 1800,
-  leaveTracks      = true,
-  mass             = 613,
-  maxDamage        = 12000,
-  maxSlope         = 18,
-  maxVelocity      = 2.05,
-  maxWaterDepth    = 22,
-  minCloakDistance = 75,
-  movementClass    = [[TANK4]],
-  noAutoFire       = false,
-  noChaseCategory  = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName       = [[corgol_512.s3o]],
-  seismicSignature = 4,
-  selfDestructAs   = [[BIG_UNITEX]],
+  defaultmissiontype  = [[Standby]],
+  explodeAs           = [[BIG_UNITEX]],
+  footprintX          = 4,
+  footprintZ          = 4,
+  iconType            = [[tankskirm]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  leaveTracks         = true,
+  maneuverleashlength = [[640]],
+  mass                = 613,
+  maxDamage           = 12000,
+  maxSlope            = 18,
+  maxVelocity         = 2.05,
+  maxWaterDepth       = 22,
+  minCloakDistance    = 75,
+  movementClass       = [[TANK4]],
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
+  objectName          = [[corgol_512.s3o]],
+  seismicSignature    = 4,
+  selfDestructAs      = [[BIG_UNITEX]],
 
-  sfxtypes         = {
+  sfxtypes            = {
 
     explosiongenerators = {
       [[custom:LARGE_MUZZLE_FLASH_FX]],
@@ -54,20 +59,21 @@ unitDef = {
 
   },
 
-  side             = [[CORE]],
-  sightDistance    = 605,
-  smoothAnim       = true,
-  TEDClass         = [[TANK]],
-  trackOffset      = 8,
-  trackStrength    = 10,
-  trackStretch     = 1,
-  trackType        = [[StdTank]],
-  trackWidth       = 45,
-  turninplace      = 0,
-  turnRate         = 312,
-  workerTime       = 0,
+  side                = [[CORE]],
+  sightDistance       = 605,
+  smoothAnim          = true,
+  steeringmode        = [[1]],
+  TEDClass            = [[TANK]],
+  trackOffset         = 8,
+  trackStrength       = 10,
+  trackStretch        = 1,
+  trackType           = [[StdTank]],
+  trackWidth          = 45,
+  turninplace         = 0,
+  turnRate            = 312,
+  workerTime          = 0,
 
-  weapons          = {
+  weapons             = {
 
     {
       def                = [[COR_GOL]],
@@ -84,7 +90,7 @@ unitDef = {
   },
 
 
-  weaponDefs       = {
+  weaponDefs          = {
 
     COR_GOL             = {
       name                    = [[Tankbuster Cannon]],
@@ -155,7 +161,7 @@ unitDef = {
   },
 
 
-  featureDefs      = {
+  featureDefs         = {
 
     DEAD       = {
       description      = [[Wreckage - Goliath]],

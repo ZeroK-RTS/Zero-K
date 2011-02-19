@@ -1,69 +1,75 @@
 unitDef = {
-  unitname          = [[commsupport2]],
-  name              = [[Support Commander]],
-  description       = [[Econ/Support Commander, Builds at 12 m/s]],
-  acceleration      = 0.25,
-  activateWhenBuilt = true,
-  amphibious        = [[1]],
-  autoHeal          = 5,
-  brakeRate         = 0.45,
-  buildCostEnergy   = 1800,
-  buildCostMetal    = 1800,
-  buildDistance     = 250,
-  builder           = true,
+  unitname            = [[commsupport2]],
+  name                = [[Support Commander]],
+  description         = [[Econ/Support Commander, Builds at 12 m/s]],
+  acceleration        = 0.25,
+  activateWhenBuilt   = true,
+  amphibious          = [[1]],
+  autoHeal            = 5,
+  bmcode              = [[1]],
+  brakeRate           = 0.45,
+  buildCostEnergy     = 1800,
+  buildCostMetal      = 1800,
+  buildDistance       = 250,
+  builder             = true,
 
-  buildoptions      = {
+  buildoptions        = {
   },
 
-  buildPic          = [[commsupport.png]],
-  buildTime         = 1800,
-  canAttack         = true,
-  canGuard          = true,
-  canMove           = true,
-  canPatrol         = true,
-  canstop           = [[1]],
-  category          = [[LAND FIREPROOF]],
-  cloakCost         = 10,
-  cloakCostMoving   = 50,
-  commander         = true,
-  corpse            = [[DEAD]],
+  buildPic            = [[commsupport.png]],
+  buildTime           = 1800,
+  canAttack           = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canreclamate        = [[1]],
+  canstop             = [[1]],
+  category            = [[LAND FIREPROOF]],
+  cloakCost           = 10,
+  cloakCostMoving     = 50,
+  commander           = true,
+  corpse              = [[DEAD]],
 
-  customParams      = {
-    cloakstealth = [[1]],
-    fireproof    = [[1]],
-    helptext     = [[The esoteric Support Commander uses a more unorthodox weapon set, which is by default a gauss rifle that can fire concussion shots when sufficiently upgraded. Though lacking armor or speed, this chassis is still favored due to its intrinsic income bonus.]],
-    level        = [[2]],
-    statsname    = [[commsupport]],
+  customParams        = {
+    fireproof = [[1]],
+	cloakstealth = [[1]],
+	description_de = [[Ökonomie/Untersützung Kommandant, Baut mit 15 M/s]],
+	helptext       = [[The esoteric Support Commander uses a more unorthodox weapon set, which is by default a gauss rifle that can fire concussion shots when sufficiently upgraded. Though lacking armor or speed, this chassis is still favored due to its intrinsic income bonus.]],
+	helptext_de    = [[Der geheimnisvolle Support Commander nutzt ein eher unothodoxes Waffenset, welches standardmäßig aus einem Gaußgewehr, das Erschütterungen abfeuert sobald es ausreichend aufgebessert wurde, besteht. Jedoch fehlt es ihm an Rüstung und Geschwindigkeit, darum macht sich dieser Unterbau vor allem durch den inhärenten Einkommensbonus beliebt.]],
+	level = [[2]],
+	statsname = [[commsupport]],
   },
 
-  energyMake        = 4,
-  energyStorage     = 100,
-  energyUse         = 0,
-  explodeAs         = [[ESTOR_BUILDINGEX]],
-  footprintX        = 2,
-  footprintZ        = 2,
-  hideDamage        = true,
-  iconType          = [[armcommander]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
-  immunetoparalyzer = [[1]],
-  mass              = 839,
-  maxDamage         = 2500,
-  maxSlope          = 36,
-  maxVelocity       = 1.2,
-  maxWaterDepth     = 5000,
-  metalMake         = 4,
-  metalStorage      = 100,
-  minCloakDistance  = 100,
-  movementClass     = [[AKBOT2]],
-  noChaseCategory   = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  norestrict        = [[1]],
-  objectName        = [[commsupport.s3o]],
-  script            = [[commsupport.lua]],
-  seismicSignature  = 16,
-  selfDestructAs    = [[ESTOR_BUILDINGEX]],
+  defaultmissiontype  = [[Standby]],
+  energyMake          = 4,
+  energyStorage       = 100,
+  energyUse           = 0,
+  explodeAs           = [[ESTOR_BUILDINGEX]],
+  footprintX          = 2,
+  footprintZ          = 2,
+  hideDamage          = true,
+  iconType            = [[armcommander]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  immunetoparalyzer   = [[1]],
+  maneuverleashlength = [[640]],
+  mass                = 839,
+  maxDamage           = 2500,
+  maxSlope            = 36,
+  maxVelocity         = 1.2,
+  maxWaterDepth       = 5000,
+  metalMake           = 4,
+  metalStorage        = 100,
+  minCloakDistance    = 100,
+  movementClass       = [[AKBOT2]],
+  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
+  norestrict          = [[1]],
+  objectName          = [[commsupport.s3o]],
+  script              = [[commsupport.lua]],
+  seismicSignature    = 16,
+  selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
-  sfxtypes          = {
+  sfxtypes            = {
 
     explosiongenerators = {
       [[custom:flashmuzzle1]],
@@ -71,27 +77,27 @@ unitDef = {
 
   },
 
-  showNanoSpray     = false,
-  showPlayerName    = true,
-  side              = [[ARM]],
-  sightDistance     = 500,
-  smoothAnim        = true,
-  sonarDistance     = 300,
-  TEDClass          = [[COMMANDER]],
-  terraformSpeed    = 600,
-  turnRate          = 1350,
-  upright           = true,
-  workerTime        = 12,
+  showNanoSpray       = false,
+  showPlayerName      = true,
+  side                = [[ARM]],
+  sightDistance       = 500,
+  smoothAnim          = true,
+  sonarDistance       = 300,
+  steeringmode        = [[2]],
+  TEDClass            = [[COMMANDER]],
+  terraformSpeed      = 600,
+  turnRate            = 1350,
+  upright             = true,
+  workerTime          = 12,
 
-  weapons           = {
+  weapons             = {
 
-    [1] = {
+	[1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],	
+	}, 
+  
     [4] = {
       def                = [[GAUSS]],
       badTargetCategory  = [[FIXEDWING]],
@@ -101,11 +107,12 @@ unitDef = {
   },
 
 
-  weaponDefs        = {
+  weaponDefs          = {
 
-    FAKELASER = {
+    FAKELASER     = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
+      beamlaser               = 1,
       beamTime                = 0.1,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -138,9 +145,8 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
     },
-
-
-    GAUSS     = {
+	
+    GAUSS = {
       name                    = [[Gauss Rifle]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
@@ -188,9 +194,9 @@ unitDef = {
   },
 
 
-  featureDefs       = {
+  featureDefs         = {
 
-    DEAD = {
+    DEAD      = {
       description      = [[Wreckage - Support Commander]],
       blocking         = true,
       category         = [[corpses]],
@@ -210,8 +216,7 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-
-    HEAP = {
+    HEAP      = {
       description      = [[Debris - Support Commander]],
       blocking         = false,
       category         = [[heaps]],

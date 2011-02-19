@@ -1,116 +1,159 @@
 unitDef = {
-  unitname          = [[commsupport4]],
-  name              = [[Advanced Support Commander]],
-  description       = [[Econ/Support Commander, Builds at 15 m/s]],
-  acceleration      = 0.25,
-  activateWhenBuilt = true,
-  amphibious        = [[1]],
-  autoHeal          = 5,
-  brakeRate         = 0.45,
-  buildCostEnergy   = 2400,
-  buildCostMetal    = 2400,
-  buildDistance     = 325,
-  builder           = true,
+  unitname            = [[commsupport4]],
+  name                = [[Advanced Support Commander]],
+  description         = [[Econ/Support Commander, Builds at 15 m/s]],
+  acceleration        = 0.25,
+  activateWhenBuilt   = true,
+  amphibious          = [[1]],
+  autoHeal            = 5,
+  bmcode              = [[1]],
+  brakeRate           = 0.45,
+  buildCostEnergy     = 2400,
+  buildCostMetal      = 2400,
+  buildDistance       = 325,
+  builder             = true,
 
-  buildoptions      = {
+  buildoptions        = {
   },
 
-  buildPic          = [[commsupport.png]],
-  buildTime         = 2400,
-  canAttack         = true,
-  canDGun           = true,
-  canGuard          = true,
-  canMove           = true,
-  canPatrol         = true,
-  canstop           = [[1]],
-  category          = [[LAND FIREPROOF]],
-  cloakCost         = 10,
-  cloakCostMoving   = 50,
-  commander         = true,
-  corpse            = [[DEAD]],
+  buildPic            = [[commsupport.png]],
+  buildTime           = 2400,
+  canAttack           = true,
+  canDGun             = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canreclamate        = [[1]],
+  canstop             = [[1]],
+  category            = [[LAND FIREPROOF]],
+  cloakCost           = 10,
+  cloakCostMoving     = 50,
+  commander           = true,
+  corpse              = [[DEAD]],
 
-  customParams      = {
-    cloakstealth = [[1]],
-    fireproof    = [[1]],
-    helptext     = [[The esoteric Support Commander uses a more unorthodox weapon set, which is by default a gauss rifle that can fire concussion shots when sufficiently upgraded. Though lacking armor or speed, this chassis is still favored due to its intrinsic income bonus.]],
-    level        = [[4]],
-    statsname    = [[commadvsupport]],
+  customParams        = {
+    fireproof         = [[1]],
+    --repairaura_preset = [[module_repairfield]],
+	cloakstealth	  = [[1]],
+	description_de = [[Ökonomie/Untersützung Kommandant, Baut mit 15 M/s]],
+	helptext       = [[The esoteric Support Commander uses a more unorthodox weapon set, which is by default a gauss rifle that can fire concussion shots when sufficiently upgraded. Though lacking armor or speed, this chassis is still favored due to its intrinsic income bonus.]],
+	helptext_de    = [[Der geheimnisvolle Support Commander nutzt ein eher unothodoxes Waffenset, welches standardmäßig aus einem Gaußgewehr, das Erschütterungen abfeuert sobald es ausreichend aufgebessert wurde, besteht. Jedoch fehlt es ihm an Rüstung und Geschwindigkeit, darum macht sich dieser Unterbau vor allem durch den inhärenten Einkommensbonus beliebt.]],
+	level = [[4]],
+	statsname = [[commadvsupport]],
   },
 
-  energyMake        = 4.5,
-  energyStorage     = 100,
-  energyUse         = 0,
-  explodeAs         = [[ESTOR_BUILDINGEX]],
-  footprintX        = 2,
-  footprintZ        = 2,
-  hideDamage        = true,
-  iconType          = [[armcommander]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
-  immunetoparalyzer = [[1]],
-  mass              = 976,
-  maxDamage         = 4400,
-  maxSlope          = 36,
-  maxVelocity       = 1.25,
-  maxWaterDepth     = 5000,
-  metalMake         = 4.5,
-  metalStorage      = 100,
-  minCloakDistance  = 100,
-  movementClass     = [[AKBOT2]],
-  noChaseCategory   = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  norestrict        = [[1]],
-  objectName        = [[commsupport.s3o]],
-  radarDistance     = 1250,
-  script            = [[commsupport.lua]],
-  seismicSignature  = 16,
-  selfDestructAs    = [[ESTOR_BUILDINGEX]],
+  defaultmissiontype  = [[Standby]],
+  energyMake          = 4.5,
+  energyStorage       = 100,
+  energyUse           = 0,
+  explodeAs           = [[ESTOR_BUILDINGEX]],
+  footprintX          = 2,
+  footprintZ          = 2,
+  hideDamage          = true,
+  iconType            = [[armcommander]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  immunetoparalyzer   = [[1]],
+  maneuverleashlength = [[640]],
+  mass                = 976,
+  maxDamage           = 4400,
+  maxSlope            = 36,
+  maxVelocity         = 1.25,
+  maxWaterDepth       = 5000,
+  metalMake           = 4.5,
+  metalStorage        = 100,
+  minCloakDistance    = 100,
+  movementClass       = [[AKBOT2]],
+  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
+  norestrict          = [[1]],
+  objectName          = [[commsupport.s3o]],
+  radarDistance       = 1250,
+  script              = [[commsupport.lua]],
+  seismicSignature    = 16,
+  selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
-  sfxtypes          = {
+  sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:flashmuzzle1]],
+		[[custom:flashmuzzle1]],
     },
 
   },
 
-  showNanoSpray     = false,
-  showPlayerName    = true,
-  side              = [[ARM]],
-  sightDistance     = 660,
-  smoothAnim        = true,
-  sonarDistance     = 300,
-  TEDClass          = [[COMMANDER]],
-  terraformSpeed    = 600,
-  turnRate          = 1350,
-  upright           = true,
-  workerTime        = 15,
+  showNanoSpray       = false,
+  showPlayerName      = true,
+  side                = [[ARM]],
+  sightDistance       = 660,
+  smoothAnim          = true,
+  sonarDistance       = 300,
+  steeringmode        = [[2]],
+  TEDClass            = [[COMMANDER]],
+  terraformSpeed      = 600,
+  turnRate            = 1350,
+  upright             = true,
+  workerTime          = 15,
 
-  weapons           = {
+  weapons             = {
 
-    [1] = {
+	[1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],	
+	},   
+  
     [3] = {
       def                = [[CONCUSSION_GAUSS]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
     [4] = {
       def                = [[GAUSS]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
+    },	
 
   },
 
 
-  weaponDefs        = {
+  weaponDefs          = {
 
+    FAKELASER     = {
+      name                    = [[Fake Laser]],
+      areaOfEffect            = 12,
+      beamlaser               = 1,
+      beamTime                = 0.1,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 0,
+      },
+
+      duration                = 0.11,
+      explosionGenerator      = [[custom:flash1green]],
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      laserFlareSize          = 5.53,
+      lineOfSight             = true,
+      minIntensity            = 1,
+      range                   = 500,
+      reloadtime              = 0.11,
+      renderType              = 0,
+      rgbColor                = [[0 1 0]],
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 5.53,
+      tolerance               = 10000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 900,
+    },  
+  
     CONCUSSION_GAUSS = {
       name                    = [[Gauss Rifle (Concussion Shot)]],
       alphaDecay              = 0.12,
@@ -149,43 +192,6 @@ unitDef = {
       waterbounce             = 1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1000,
-    },
-
-
-    FAKELASER        = {
-      name                    = [[Fake Laser]],
-      areaOfEffect            = 12,
-      beamTime                = 0.1,
-      coreThickness           = 0.5,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 0,
-      },
-
-      duration                = 0.11,
-      explosionGenerator      = [[custom:flash1green]],
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      laserFlareSize          = 5.53,
-      lineOfSight             = true,
-      minIntensity            = 1,
-      range                   = 500,
-      reloadtime              = 0.11,
-      renderType              = 0,
-      rgbColor                = [[0 1 0]],
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
-      thickness               = 5.53,
-      tolerance               = 10000,
-      turret                  = true,
-      weaponType              = [[BeamLaser]],
-      weaponVelocity          = 900,
     },
 
 
@@ -235,9 +241,9 @@ unitDef = {
   },
 
 
-  featureDefs       = {
+  featureDefs         = {
 
-    DEAD = {
+    DEAD      = {
       description      = [[Wreckage - Support Commander]],
       blocking         = true,
       category         = [[corpses]],
@@ -258,7 +264,7 @@ unitDef = {
     },
 
 
-    HEAP = {
+    HEAP      = {
       description      = [[Debris - Support Commander]],
       blocking         = false,
       category         = [[heaps]],
@@ -275,6 +281,7 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
+
 
   },
 

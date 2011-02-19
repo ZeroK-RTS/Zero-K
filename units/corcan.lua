@@ -1,52 +1,57 @@
 unitDef = {
-  unitname         = [[corcan]],
-  name             = [[Jack]],
-  description      = [[Melee Assault Jumper]],
-  acceleration     = 0.12,
-  brakeRate        = 0.1942,
-  buildCostEnergy  = 650,
-  buildCostMetal   = 650,
-  builder          = false,
-  buildPic         = [[CORCAN.png]],
-  buildTime        = 650,
-  canAttack        = true,
-  canGuard         = true,
-  canMove          = true,
-  canPatrol        = true,
-  canstop          = [[1]],
-  category         = [[LAND]],
-  corpse           = [[DEAD]],
+  unitname            = [[corcan]],
+  name                = [[Jack]],
+  description         = [[Melee Assault Jumper]],
+  acceleration        = 0.12,
+  bmcode              = [[1]],
+  brakeRate           = 0.1942,
+  buildCostEnergy     = 650,
+  buildCostMetal      = 650,
+  builder             = false,
+  buildPic            = [[CORCAN.png]],
+  buildTime           = 650,
+  canAttack           = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canstop             = [[1]],
+  category            = [[LAND]],
+  corpse              = [[DEAD]],
 
-  customParams     = {
+  customParams        = {
     canjump        = [[1]],
     description_bp = [[Robô de assaulto]],
     description_fr = [[Robot d'Assaut]],
+	description_de = [[Melee Sturmangriff Springer]],
     helptext       = [[The Jack is a melee assault walker with jumpjets. A few Jacks can easily level most fortification lines. Its small range and very low speed make it very vulnerable to skirmishers.]],
     helptext_bp    = [[Can é o principal robô de assaulto de Logos. Alguns podem facilmente destruir a maioria das linhas de defesa, e n?o podem ser "sufocados" por agressores devido a sua rápida velocidade de disparo. Sua velocidade e principalmente alcançe s?o muito baixos, tornando-o um alvo fácil, embora resistente, a escaramuçadores.]],
     helptext_fr    = [[Le Jack est un robot extr?mement bien blind? ?quip? d'un jetpack et d'un lance a syst?me hydrolique. Il ne frappe qu'au corps ? corps, mais il frappe fort. ]],
+	helptext_de    = [[Der Jack ist ein Melee Sturmangriff Roboter mit Sprungdüsen. Ein paar Jacks können schnell die meisten Verteidigungslinien egalisieren. Seine kleine Reichweite und die Langsamkeit machen ihn aber sehr verwundbar gegen Skirmisher.]],
   },
 
-  explodeAs        = [[BIG_UNITEX]],
-  footprintX       = 2,
-  footprintZ       = 2,
-  iconType         = [[jumpjetassault]],
-  idleAutoHeal     = 5,
-  idleTime         = 1800,
-  leaveTracks      = true,
-  mass             = 362,
-  maxDamage        = 5000,
-  maxSlope         = 36,
-  maxVelocity      = 1.81,
-  maxWaterDepth    = 22,
-  minCloakDistance = 75,
-  movementClass    = [[KBOT2]],
-  noAutoFire       = false,
-  noChaseCategory  = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName       = [[corcan.s3o]],
-  seismicSignature = 4,
-  selfDestructAs   = [[BIG_UNITEX]],
+  defaultmissiontype  = [[Standby]],
+  explodeAs           = [[BIG_UNITEX]],
+  footprintX          = 2,
+  footprintZ          = 2,
+  iconType            = [[jumpjetassault]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  leaveTracks         = true,
+  maneuverleashlength = [[640]],
+  mass                = 362,
+  maxDamage           = 5000,
+  maxSlope            = 36,
+  maxVelocity         = 1.81,
+  maxWaterDepth       = 22,
+  minCloakDistance    = 75,
+  movementClass       = [[KBOT2]],
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
+  objectName          = [[corcan.s3o]],
+  seismicSignature    = 4,
+  selfDestructAs      = [[BIG_UNITEX]],
 
-  sfxtypes         = {
+  sfxtypes            = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
@@ -55,22 +60,23 @@ unitDef = {
 
   },
 
-  side             = [[CORE]],
-  sightDistance    = 350,
-  smoothAnim       = true,
-  sonarDistance    = 400,
-  TEDClass         = [[KBOT]],
-  trackOffset      = 0,
-  trackStrength    = 8,
-  trackStretch     = 1,
-  trackType        = [[ComTrack]],
-  trackWidth       = 22,
-  turninplace      = 0,
-  turnRate         = 982,
-  upright          = true,
-  workerTime       = 0,
+  side                = [[CORE]],
+  sightDistance       = 350,
+  smoothAnim          = true,
+  sonarDistance       = 400,
+  steeringmode        = [[2]],
+  TEDClass            = [[KBOT]],
+  trackOffset         = 0,
+  trackStrength       = 8,
+  trackStretch        = 1,
+  trackType           = [[ComTrack]],
+  trackWidth          = 22,
+  turninplace         = 0,
+  turnRate            = 982,
+  upright             = true,
+  workerTime          = 0,
 
-  weapons          = {
+  weapons             = {
 
     {
       def                = [[Spike]],
@@ -80,7 +86,7 @@ unitDef = {
   },
 
 
-  weaponDefs       = {
+  weaponDefs          = {
 
     Spike = {
       name                    = [[Spike]],
@@ -127,7 +133,7 @@ unitDef = {
   },
 
 
-  featureDefs      = {
+  featureDefs         = {
 
     DEAD  = {
       description      = [[Wreckage - Jack]],

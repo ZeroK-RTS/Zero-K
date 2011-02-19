@@ -4,6 +4,7 @@ unitDef = {
   description           = [[Chicken Bomb]],
   acceleration          = 6,
   activateWhenBuilt     = true,
+  bmcode                = [[1]],
   brakeRate             = 0.205,
   buildCostEnergy       = 0,
   buildCostMetal        = 0,
@@ -19,10 +20,13 @@ unitDef = {
 
   customParams          = {
     description_fr = [[Chicken kamikaze]],
+	description_de = [[Chicken Bombe]],
     helptext       = [[The Dodo's body contains a volatile mixture of organic explosives. At the slightest provocation, it explodes spectacularly, with the resulting shockwave throwing nearby units into the air. Beware as its flying limbs and spikes will do residual damage.]],
     helptext_fr    = [[Le corps du Dodo renferme un m?lange hautement volatile d'explosifs organiques. Au moindre choc il explose spectaculairement en produisant une onde de choc repoussant avec force les unit?s ? proximit?. Attention en explosant il ?parpille divers restes solides provoquant des dommages supl?mentaires.]],
+	helptext_de    = [[Dodos Körper besteht aus einer impulsiven Mixtur von organichen Sprengstoffen. Die kleinste Penetration und Dodo explodiert spektakulär mit einer Schockwelle, die nahegelegene Einheiten zurück schleudert. Hüte dich vor den fliegenden Gliedmaßen, die bleibende Schäden hinterlassen können.]],
   },
 
+  defaultmissiontype    = [[Standby]],
   explodeAs             = [[DODO_DEATH]],
   floater               = false,
   footprintX            = 2,
@@ -33,6 +37,7 @@ unitDef = {
   kamikaze              = true,
   kamikazeDistance      = 80,
   leaveTracks           = true,
+  maneuverleashlength   = [[640]],
   mass                  = 117,
   maxDamage             = 200,
   maxSlope              = 36,
@@ -62,6 +67,7 @@ unitDef = {
   side                  = [[THUNDERBIRDS]],
   sightDistance         = 256,
   smoothAnim            = true,
+  steeringmode          = [[2]],
   TEDClass              = [[KBOT]],
   trackOffset           = 1,
   trackStrength         = 6,

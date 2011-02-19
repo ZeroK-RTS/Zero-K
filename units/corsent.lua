@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Copperhead]],
   description            = [[Flak Tank]],
   acceleration           = 0.05952,
+  bmcode                 = [[1]],
   brakeRate              = 0.14875,
   buildCostEnergy        = 550,
   buildCostMetal         = 550,
@@ -24,11 +25,14 @@ unitDef = {
   customParams           = {
     description_bp = [[Tanque de flak]],
     description_fr = [[Tank Anti-Air r Canons Flak]],
+	description_de = [[Flakpanzer]],
     helptext       = [[The Copperhead's flak cannon makes quick work of enemy gunships, and is also fairly effective against planes.]],
     helptext_bp    = [[]],
     helptext_fr    = [[Le Copperhead est doté d'un double canon Flak envoyant des balles explosives en l'air. Il compense son imprécision par les dégâts de zones qu'elles provoquent. Peut efficace contre les cibles rapides, il s'occupera parfaitement des cibles aeriennes groupées en essaim.]],
+	helptext_de    = [[Copperheads Flakkanone macht kurzen Prozess mit feindlichen Hubschraubern, aber auch gegen Flugzeuge erweist sie sich als nützlich.]],
   },
 
+  defaultmissiontype     = [[Standby]],
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
@@ -36,6 +40,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
+  maneuverleashlength    = [[30]],
   mass                   = 242,
   maxDamage              = 1200,
   maxSlope               = 18,
@@ -52,6 +57,7 @@ unitDef = {
   side                   = [[CORE]],
   sightDistance          = 660,
   smoothAnim             = true,
+  steeringmode           = [[2]],
   TEDClass               = [[TANK]],
   trackOffset            = 6,
   trackStrength          = 5,
@@ -83,6 +89,7 @@ unitDef = {
       burnblow                = true,
       canattackground         = false,
       cegTag                  = [[flak_trail]],
+      color                   = 1,
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargetting      = 1,
@@ -119,7 +126,7 @@ unitDef = {
 
   featureDefs            = {
 
-    DEAD = {
+    DEAD  = {
       description      = [[Wreckage - Copperhead]],
       blocking         = true,
       category         = [[corpses]],
@@ -140,7 +147,7 @@ unitDef = {
     },
 
 
-    HEAP = {
+    HEAP  = {
       description      = [[Debris - Copperhead]],
       blocking         = false,
       category         = [[heaps]],

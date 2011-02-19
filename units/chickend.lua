@@ -4,6 +4,7 @@ unitDef = {
   description                   = [[Defense and energy source]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
+  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 0,
   buildCostMetal                = 0,
@@ -20,10 +21,13 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Defense d'antres]],
+	description_de = [[Verteidigung und Energiequelle]],
     helptext       = [[The Tube is the chicken's only defense structure, firing deadly spores at air and ground targets alike.]],
     helptext_fr    = [[La d?fense basique des antres de poulets, employant des spores ? grande dur?e de vie poursuivant l'adversaire avant de le percuter brutalement.]],
+	helptext_de    = [[Tube ist die einzige Verteidigungsanlage der Chicken und verschießt tödliche Sporen gleichermaßen gegen Luft- und Bodenziele.]],
   },
 
+  defaultmissiontype            = [[GUARD_NOMOVE]],
   energyMake                    = 2,
   explodeAs                     = [[NOWEAPON]],
   footprintX                    = 3,
@@ -98,6 +102,7 @@ unitDef = {
       fireStarter             = 0,
       flightTime              = 5,
       groundbounce            = 1,
+      guidance                = true,
       heightmod               = 0.5,
       impactOnly              = true,
       impulseBoost            = 0,
@@ -110,6 +115,7 @@ unitDef = {
       range                   = 460,
       reloadtime              = 12,
       renderType              = 1,
+      selfprop                = true,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
       startsmoke              = [[1]],

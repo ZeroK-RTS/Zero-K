@@ -1,95 +1,101 @@
 unitDef = {
-  unitname               = [[armcom4]],
-  name                   = [[Advanced Strike Commander]],
-  description            = [[Mobile Assault Commander, Builds at 12 m/s]],
-  acceleration           = 0.18,
-  activateWhenBuilt      = true,
-  amphibious             = [[1]],
-  autoHeal               = 5,
-  brakeRate              = 0.375,
-  buildCostEnergy        = 2400,
-  buildCostMetal         = 2400,
-  buildDistance          = 120,
-  builder                = true,
+  unitname            = [[armcom4]],
+  name                = [[Advanced Strike Commander]],
+  description         = [[Mobile Assault Commander, Builds at 12 m/s]],
+  acceleration        = 0.18,
+  activateWhenBuilt   = true,
+  amphibious          = [[1]],
+  autoHeal            = 5,
+  bmcode              = [[1]],
+  brakeRate           = 0.375,
+  buildCostEnergy     = 2400,
+  buildCostMetal      = 2400,
+  buildDistance       = 120,
+  builder             = true,
 
-  buildoptions           = {
+  buildoptions        = {
   },
 
-  buildPic               = [[armcom.png]],
-  buildTime              = 2400,
-  canAttack              = true,
-  canCloak               = true,
-  canDGun                = true,
-  canGuard               = true,
-  canMove                = true,
-  canPatrol              = true,
-  canstop                = [[1]],
-  category               = [[LAND FIREPROOF]],
-  cloakCost              = 5,
-  cloakCostMoving        = 25,
+  buildPic            = [[armcom.png]],
+  buildTime           = 2400,
+  canAttack           = true,
+  canCloak            = true,
+  canDGun             = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canreclamate        = [[1]],
+  canstop             = [[1]],
+  category            = [[LAND FIREPROOF]],
+  cloakCost           = 5,
+  cloakCostMoving     = 25,
+  commander           = true,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[50 50 50]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  commander              = true,
-  corpse                 = [[DEAD]],
+  corpse              = [[DEAD]],
 
-  customParams           = {
-    cloakstealth = [[1]],
-    fireproof    = [[1]],
-    helptext     = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
-    level        = [[4]],
-    statsname    = [[armadvcom]],
+  customParams        = {
+    --cloakshield_preset = [[module_cloakfield]],
+	cloakstealth = [[1]],
+    fireproof          = [[1]],
+	helptext = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
+	level = [[4]],
+	statsname = [[armadvcom]],
   },
 
-  energyMake             = 3.5,
-  energyStorage          = 0,
-  energyUse              = 0,
-  explodeAs              = [[ESTOR_BUILDINGEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
-  hideDamage             = true,
-  iconType               = [[armcommander]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
-  immunetoparalyzer      = [[1]],
-  mass                   = 992,
-  maxDamage              = 5500,
-  maxSlope               = 36,
-  maxVelocity            = 1.4,
-  maxWaterDepth          = 5000,
-  metalMake              = 3.5,
-  metalStorage           = 0,
-  minCloakDistance       = 100,
-  movementClass          = [[AKBOT2]],
-  noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  norestrict             = [[1]],
-  objectName             = [[ARMCOM]],
-  script                 = [[armcom.lua]],
-  seismicSignature       = 16,
-  selfDestructAs         = [[ESTOR_BUILDINGEX]],
+  defaultmissiontype  = [[Standby]],
+  energyMake          = 3.5,
+  energyStorage       = 0,
+  energyUse           = 0,
+  explodeAs           = [[ESTOR_BUILDINGEX]],
+  footprintX          = 2,
+  footprintZ          = 2,
+  hideDamage          = true,
+  iconType            = [[armcommander]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  immunetoparalyzer   = [[1]],
+  maneuverleashlength = [[640]],
+  mass                = 992,
+  maxDamage           = 5500,
+  maxSlope            = 36,
+  maxVelocity         = 1.4,
+  maxWaterDepth       = 5000,
+  metalMake           = 3.5,
+  metalStorage        = 0,
+  minCloakDistance    = 100,
+  movementClass       = [[AKBOT2]],
+  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
+  norestrict          = [[1]],
+  objectName          = [[ARMCOM]],
+  script              = [[armcom.lua]],
+  seismicSignature    = 16,
+  selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
-  sfxtypes               = {
+  sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:NONE]],
+    	[[custom:NONE]],
     },
 
   },
 
-  showNanoSpray          = false,
-  showPlayerName         = true,
-  side                   = [[ARM]],
-  sightDistance          = 500,
-  smoothAnim             = true,
-  sonarDistance          = 300,
-  TEDClass               = [[COMMANDER]],
-  terraformSpeed         = 600,
-  turnRate               = 1148,
-  upright                = true,
-  workerTime             = 12,
+  showNanoSpray       = false,
+  showPlayerName      = true,
+  side                = [[ARM]],
+  sightDistance       = 500,
+  smoothAnim          = true,
+  sonarDistance       = 300,
+  steeringmode        = [[2]],
+  TEDClass            = [[COMMANDER]],
+  terraformSpeed      = 600,
+  turnRate            = 1148,
+  upright             = true,
+  workerTime          = 12,
 
-  weapons                = {
+  weapons             = {
 
     [1] = {
       def                = [[FAKELASER]],
@@ -113,7 +119,7 @@ unitDef = {
   },
 
 
-  weaponDefs             = {
+  weaponDefs          = {
 
     DISINTEGRATOR = {
       name                    = [[Disintegrator]],
@@ -126,7 +132,7 @@ unitDef = {
       craterMult              = 6,
 
       damage                  = {
-        default = 1200,
+        default    = 1200,
       },
 
       explosionGenerator      = [[custom:DGUNTRACE]],
@@ -138,7 +144,7 @@ unitDef = {
       range                   = 250,
       reloadtime              = 12,
       renderType              = 3,
-      size                    = 6,
+	  size					  = 6,
       soundHit                = [[explosion/ex_med6]],
       soundStart              = [[weapon/laser/heavy_laser4]],
       soundTrigger            = true,
@@ -153,6 +159,7 @@ unitDef = {
     FAKELASER     = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
+      beamlaser               = 1,
       beamTime                = 0.1,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -198,6 +205,7 @@ unitDef = {
     LASER         = {
       name                    = [[Commander Laser]],
       areaOfEffect            = 12,
+      beamlaser               = 1,
       beamTime                = 0.1,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -242,7 +250,7 @@ unitDef = {
   },
 
 
-  featureDefs            = {
+  featureDefs         = {
 
     DEAD      = {
       description      = [[Wreckage - Advanced Strike Commander]],

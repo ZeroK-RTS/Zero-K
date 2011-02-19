@@ -4,6 +4,7 @@ unitDef = {
   description                   = [[Static Artillery]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
+  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 0,
   buildCostMetal                = 0,
@@ -24,10 +25,13 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Artillerie statique]],
+	description_de = [[Stationäre Artillerie]],
     helptext       = [[Long range static artillery.]],
     helptext_fr    = [[La terreur verte projette des amas commpos?s de d'acides corrosifs et de germes sur de tr?s longues distances.]],
+	helptext_de    = [[Weitreichende, stationäre Artillerie.]],
   },
 
+  defaultmissiontype            = [[GUARD_NOMOVE]],
   energyMake                    = 1,
   explodeAs                     = [[NOWEAPON]],
   floater                       = true,
@@ -99,6 +103,7 @@ unitDef = {
       fireStarter             = 0,
       flightTime              = 30,
       groundbounce            = 1,
+      guidance                = true,
       heightmod               = 0.5,
       impactOnly              = false,
       impulseBoost            = 0,
@@ -111,6 +116,7 @@ unitDef = {
       range                   = 3500,
       reloadtime              = 10,
       renderType              = 1,
+      selfprop                = true,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
       startsmoke              = [[1]],

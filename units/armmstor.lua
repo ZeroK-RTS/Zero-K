@@ -4,6 +4,7 @@ unitDef = {
   description                   = [[Stores Metal and Energy (500)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
+  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 4096,
   buildCostEnergy               = 100,
@@ -17,12 +18,6 @@ unitDef = {
   buildTime                     = 100,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
-
-  customParams                  = {
-    description_de = [[Lagert Energie und Metall (500)]],
-    helptext_de    = [[Dieser Energie- und Metallspeicher erweitert deine Lagerm?glichkeiten um 500.]],
-  },
-
   energyStorage                 = 500,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 3,
@@ -49,6 +44,11 @@ unitDef = {
   workerTime                    = 0,
   yardMap                       = [[ooo ooo ooo]],
 
+  customParams                  = {
+    description_de 	= [[Lagert Energie und Metall (500)]],
+	helptext_de 	= [[Dieser Energie- und Metallspeicher erweitert deine Lagermöglichkeiten um 500.]],
+  }, 	
+  
   featureDefs                   = {
 
     DEAD  = {

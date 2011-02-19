@@ -1,50 +1,55 @@
 unitDef = {
-  unitname          = [[hoverassault]],
-  name              = [[Halberd]],
-  description       = [[Blockade Runner Hover]],
-  acceleration      = 0.048,
-  activateWhenBuilt = true,
-  brakeRate         = 0.043,
-  buildCostEnergy   = 240,
-  buildCostMetal    = 240,
-  builder           = false,
-  buildPic          = [[hoverassault.png]],
-  buildTime         = 240,
-  canAttack         = true,
-  canGuard          = true,
-  canHover          = true,
-  canMove           = true,
-  canPatrol         = true,
-  canstop           = [[1]],
-  category          = [[HOVER]],
-  corpse            = [[DEAD]],
+  unitname            = [[hoverassault]],
+  name                = [[Halberd]],
+  description         = [[Blockade Runner Hover]],
+  acceleration        = 0.048,
+  activateWhenBuilt   = true,
+  bmcode              = [[1]],
+  brakeRate           = 0.043,
+  buildCostEnergy     = 240,
+  buildCostMetal      = 240,
+  builder             = false,
+  buildPic            = [[hoverassault.png]],
+  buildTime           = 240,
+  canAttack           = true,
+  canGuard            = true,
+  canHover            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canstop             = [[1]],
+  category            = [[HOVER]],
+  corpse              = [[DEAD]],
 
-  customParams      = {
+  customParams        = {
     description_fr = [[Hovecraft d'Assaut Lourd]],
+	description_de = [[Blockadebrecher Gleiter]],
     helptext       = [[The Halberd buttons down into its armored hull when not firing, offering excellent damage resistance. Its slow, short-ranged weapon is unsuitable for use against highly mobile targets.]],
+	helptext_de    = [[Der Halberd zieht sich in seine gepanzerte Hülle zurück, sobald er nicht mehr feuert, was ihm einen exzellenten Schadenswiderstand bietet. Seine langsame, kurzreichweitige Waffe ist ungeeignet für den Einsatz gegen hochmobile Ziele.]],
   },
 
-  damageModifier    = 0.25,
-  explodeAs         = [[BIG_UNITEX]],
-  footprintX        = 3,
-  footprintZ        = 3,
-  iconType          = [[hoverassault]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
-  mass              = 184,
-  maxDamage         = 1200,
-  maxSlope          = 36,
-  maxVelocity       = 3.2,
-  minCloakDistance  = 75,
-  movementClass     = [[HOVER3]],
-  noAutoFire        = false,
-  noChaseCategory   = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName        = [[hoverassault.s3o]],
-  onoffable         = true,
-  seismicSignature  = 4,
-  selfDestructAs    = [[BIG_UNITEX]],
+  damageModifier      = 0.25,
+  defaultmissiontype  = [[Standby]],
+  explodeAs           = [[BIG_UNITEX]],
+  footprintX          = 3,
+  footprintZ          = 3,
+  iconType            = [[hoverassault]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  maneuverleashlength = [[640]],
+  mass                = 184,
+  maxDamage           = 1200,
+  maxSlope            = 36,
+  maxVelocity         = 3.2,
+  minCloakDistance    = 75,
+  movementClass       = [[HOVER3]],
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName          = [[hoverassault.s3o]],
+  onoffable           = true,
+  seismicSignature    = 4,
+  selfDestructAs      = [[BIG_UNITEX]],
 
-  sfxtypes          = {
+  sfxtypes            = {
 
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
@@ -53,15 +58,16 @@ unitDef = {
 
   },
 
-  side              = [[CORE]],
-  sightDistance     = 385,
-  smoothAnim        = true,
-  TEDClass          = [[TANK]],
-  turninplace       = 0,
-  turnRate          = 616,
-  workerTime        = 0,
+  side                = [[CORE]],
+  sightDistance       = 385,
+  smoothAnim          = true,
+  steeringmode        = [[1]],
+  TEDClass            = [[TANK]],
+  turninplace         = 0,
+  turnRate            = 616,
+  workerTime          = 0,
 
-  weapons           = {
+  weapons             = {
 
     {
       def                = [[ROCKET]],
@@ -72,7 +78,7 @@ unitDef = {
   },
 
 
-  weaponDefs        = {
+  weaponDefs          = {
 
     ROCKET = {
       name                    = [[Rocket]],
@@ -89,6 +95,7 @@ unitDef = {
 
       fireStarter             = 70,
       flightTime              = 2.2,
+      guidance                = false,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -99,6 +106,7 @@ unitDef = {
       range                   = 270,
       reloadtime              = 1.2,
       renderType              = 1,
+      selfprop                = true,
       smokedelay              = [[.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/missile/sabot_hit]],
@@ -120,7 +128,7 @@ unitDef = {
   },
 
 
-  featureDefs       = {
+  featureDefs         = {
 
     DEAD  = {
       description      = [[Wreckage - Halberd]],

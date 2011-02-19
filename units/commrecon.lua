@@ -1,104 +1,110 @@
 unitDef = {
-  unitname          = [[commrecon]],
-  name              = [[Recon Commander]],
-  description       = [[High Mobility Commander, Builds at 12 m/s]],
-  acceleration      = 0.25,
-  activateWhenBuilt = true,
-  amphibious        = [[1]],
-  autoHeal          = 5,
-  brakeRate         = 0.45,
-  buildCostEnergy   = 1800,
-  buildCostMetal    = 1800,
-  buildDistance     = 120,
-  builder           = true,
+  unitname            = [[commrecon]],
+  name                = [[Recon Commander]],
+  description         = [[High Mobility Commander, Builds at 12 m/s]],
+  acceleration        = 0.25,
+  activateWhenBuilt   = true,
+  amphibious          = [[1]],
+  autoHeal            = 5,
+  bmcode              = [[1]],
+  brakeRate           = 0.45,
+  buildCostEnergy     = 1800,
+  buildCostMetal      = 1800,
+  buildDistance       = 120,
+  builder             = true,
 
-  buildoptions      = {
+  buildoptions        = {
   },
 
-  buildPic          = [[commrecon.png]],
-  buildTime         = 1800,
-  canAttack         = true,
-  canGuard          = true,
-  canMove           = true,
-  canPatrol         = true,
-  canstop           = [[1]],
-  category          = [[LAND FIREPROOF]],
-  cloakCost         = 6,
-  cloakCostMoving   = 24,
-  commander         = true,
-  corpse            = [[DEAD]],
+  buildPic            = [[commrecon.png]],
+  buildTime           = 1800,
+  canAttack           = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canreclamate        = [[1]],
+  canstop             = [[1]],
+  category            = [[LAND FIREPROOF]],
+  cloakCost           = 6,
+  cloakCostMoving     = 24,
+  commander           = true,
+  corpse              = [[DEAD]],
 
-  customParams      = {
+  customParams        = {
     canjump   = [[1]],
     fireproof = [[1]],
-    helptext  = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. Its base weapon is a slowing beam, while its special is a disruptor bomb with a wide AoE. It also features jumpjets.]],
-    jumpclass = [[commrecon1]],
-    level     = [[1]],
-    statsname = [[commrecon]],
+	jumpclass = [[commrecon1]],
+	description_de = [[Hochmobiler Kommandant, Baut mit 12 M/s]],
+	helptext       = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. Its base weapon is a slowing beam, while its special is a disruptor bomb with a wide AoE. It also features jumpjets.]],
+	helptext_de    = [[Bei dem Recon Commander dreht sich alles um Mobilität und List. Dieser schwach gepanzerte Grundsatz kann um viele Spezialwaffen und -module erweitert werden. Seine Basiswaffe ist ein langsamer Strahl und seine Spezialwaffe besteht aus einer zerstörerischen Bombe mit einer weitreichenden AoE. Er besitzt außerdem einen Düsenstrahl zum Springen.]],
+	level = [[1]],
+	statsname = [[commrecon]],
   },
 
-  energyMake        = 2.7,
-  energyStorage     = 0,
-  energyUse         = 0,
-  explodeAs         = [[ESTOR_BUILDINGEX]],
-  footprintX        = 2,
-  footprintZ        = 2,
-  hideDamage        = true,
-  iconType          = [[armcommander]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
-  immunetoparalyzer = [[1]],
-  mass              = 848,
-  maxDamage         = 2250,
-  maxSlope          = 36,
-  maxVelocity       = 1.45,
-  maxWaterDepth     = 5000,
-  metalMake         = 2.7,
-  metalStorage      = 0,
-  minCloakDistance  = 100,
-  movementClass     = [[AKBOT2]],
-  noChaseCategory   = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  norestrict        = [[1]],
-  objectName        = [[commrecon.s3o]],
-  radarDistance     = 1250,
-  script            = [[commrecon.lua]],
-  seismicSignature  = 16,
-  selfDestructAs    = [[ESTOR_BUILDINGEX]],
+  defaultmissiontype  = [[Standby]],
+  energyMake          = 2.7,
+  energyStorage       = 0,
+  energyUse           = 0,
+  explodeAs           = [[ESTOR_BUILDINGEX]],
+  footprintX          = 2,
+  footprintZ          = 2,
+  hideDamage          = true,
+  iconType            = [[armcommander]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  immunetoparalyzer   = [[1]],
+  maneuverleashlength = [[640]],
+  mass                = 848,
+  maxDamage           = 2250,
+  maxSlope            = 36,
+  maxVelocity         = 1.45,
+  maxWaterDepth       = 5000,
+  metalMake           = 2.7,
+  metalStorage        = 0,
+  minCloakDistance    = 100,
+  movementClass       = [[AKBOT2]],
+  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
+  norestrict          = [[1]],
+  objectName          = [[commrecon.s3o]],
+  radarDistance       = 1250,
+  script              = [[commrecon.lua]],
+  seismicSignature    = 16,
+  selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
-  sfxtypes          = {
+  sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:NONE]],
-      [[custom:NONE]],
+	  [[custom:NONE]],
+	  [[custom:NONE]],
       [[custom:RAIDMUZZLE]],
-      [[custom:NONE]],
+	  [[custom:NONE]],
       [[custom:VINDIBACK]],
       [[custom:FLASH64]],
     },
 
   },
 
-  showNanoSpray     = false,
-  showPlayerName    = true,
-  side              = [[ARM]],
-  sightDistance     = 500,
-  smoothAnim        = true,
-  sonarDistance     = 300,
-  TEDClass          = [[COMMANDER]],
-  terraformSpeed    = 600,
-  turnRate          = 1350,
-  upright           = true,
-  workerTime        = 12,
+  showNanoSpray       = false,
+  showPlayerName      = true,
+  side                = [[ARM]],
+  sightDistance       = 500,
+  smoothAnim          = true,
+  sonarDistance       = 300,
+  steeringmode        = [[2]],
+  TEDClass            = [[COMMANDER]],
+  terraformSpeed      = 600,
+  turnRate            = 1350,
+  upright             = true,
+  workerTime          = 12,
 
-  weapons           = {
-
-    [1] = {
+  weapons             = {
+  
+	[1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],	
+	},
+  
     [4] = {
       def                = [[SLOWBEAM]],
       badTargetCategory  = [[FIXEDWING]],
@@ -108,11 +114,12 @@ unitDef = {
   },
 
 
-  weaponDefs        = {
+  weaponDefs          = {
 
-    FAKELASER = {
+    FAKELASER     = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
+      beamlaser               = 1,
       beamTime                = 0.1,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -145,12 +152,12 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
     },
-
-
-    SLOWBEAM  = {
+  
+    SLOWBEAM = {
       name                    = [[Slowing Beam]],
       areaOfEffect            = 8,
       beamDecay               = 0.9,
+      beamlaser               = 1,
       beamTime                = 0.1,
       beamttl                 = 50,
       coreThickness           = 0,
@@ -160,7 +167,6 @@ unitDef = {
       customParams            = {
         timeslow_preset = [[commrecon_slowbeam]],
       },
-
 
       damage                  = {
         default = 120,
@@ -199,9 +205,9 @@ unitDef = {
   },
 
 
-  featureDefs       = {
+  featureDefs         = {
 
-    DEAD = {
+    DEAD      = {
       description      = [[Wreckage - Recon Commander]],
       blocking         = true,
       category         = [[corpses]],
@@ -222,7 +228,7 @@ unitDef = {
     },
 
 
-    HEAP = {
+    HEAP      = {
       description      = [[Debris - Recon Commander]],
       blocking         = false,
       category         = [[heaps]],

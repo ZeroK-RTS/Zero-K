@@ -4,6 +4,7 @@ unitDef = {
   description         = [[Automatically Repairs Aircraft]],
   acceleration        = 0,
   activateWhenBuilt   = true,
+  bmcode              = [[0]],
   brakeRate           = 0,
   buildAngle          = 0,
   buildCostEnergy     = 350,
@@ -21,9 +22,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Repariert automatisch eigene/verb?ndete Lufteinheiten]],
-    helptext       = [[The Air Repair Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
-    helptext_de    = [[Das Air Repair Pad repariert bis zu vier Flugzeuge gleichzeitig. Es bef?llt und betankt au?erdem die Bomber.]],
+    helptext = [[The Air Repair Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
+	description_de = [[Repariert automatisch eigene/verbündete Lufteinheiten]],
+	helptext_de    = [[Das Air Repair Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber.]],
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],

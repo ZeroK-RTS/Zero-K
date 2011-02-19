@@ -3,6 +3,7 @@ unitDef = {
   name                          = [[Gunship Plant]],
   description                   = [[Produces Gunships, Builds at 6 m/s]],
   acceleration                  = 0,
+  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
@@ -38,6 +39,8 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    description_de = [[Produziert Kampfhubschrauber, Baut mit 6 M/s]],
+	helptext_de    = [[Kampfhubschrauber bieten aufgrund ihrer Beweglichkeit eine enorme Bandbreite an Einsetzbarkeit.]],
     sortName = [[3]],
   },
 

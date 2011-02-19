@@ -3,6 +3,7 @@ unitDef = {
   name                          = [[Spider Factory]],
   description                   = [[Produces Spiders, Builds at 6 m/s]],
   acceleration                  = 0,
+  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
@@ -33,8 +34,10 @@ unitDef = {
 
   customParams                  = {
     description_fi = [[Taktinen robottitehdas. Rakentaa erikoistuneita robotteja 6m/s nopeudella]],
+	description_de = [[Produziert Spinnen, Baut mit 6 M/s]],
     helptext       = [[Optimized for rough terrain, the Spider Factory relies primarily on range and maneuverability rather than brute force. Key units: Flea, Recluse, Cudgel, Crabe]],
     helptext_fi    = [[Tuottaa pitk?lti erikoistuneita tai jalkav?kirobotteja raskaampia yksik?it?. Esimerkiksi EMP, n?kym?tt?myys ja maastokelpoisuus ovat joidenkin t?m?n tehtaan tuotoksien erikoisuuksia.]],
+	helptext_de    = [[Ideal für unwegsames Gelände, liegt der Fokus der Spider Factory eher auf Einheiten mit großer Reichweite und Wendigkeit und weniger auf roher Gewalt. Wichtigste Einheiten: Flea, Recluse, Cudgel, Crabe]],
     sortName       = [[5]],
   },
 

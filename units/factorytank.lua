@@ -3,6 +3,7 @@ unitDef = {
   name                          = [[Heavy Tank Factory]],
   description                   = [[Produces Heavy and Specialized Vehicles, Builds at 6 m/s]],
   acceleration                  = 0,
+  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
@@ -34,7 +35,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    helptext = [[The Heavy Tank Factory is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath]],
+    description_de = [[Produziert schwere und speziallisierte Fahrzeuge, Baut mit 6 M/s]],
+    helptext       = [[The Heavy Tank Factory is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath]],
+	helptext_de    = [[Die Heavy Tank Factory ist das Ultimum für brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoß mit den größten Panzern auf dem Feld. Wichtigste Einheiten: Pillager, Reaper, Banisher, Goliath]],
     sortName = [[6]],
   },
 

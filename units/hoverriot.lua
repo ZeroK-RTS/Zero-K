@@ -1,51 +1,56 @@
 unitDef = {
-  unitname         = [[hoverriot]],
-  name             = [[Mace]],
-  description      = [[Riot Hover]],
-  acceleration     = 0.03,
-  brakeRate        = 0.043,
-  buildCostEnergy  = 400,
-  buildCostMetal   = 400,
-  builder          = false,
-  buildPic         = [[hoverriot.png]],
-  buildTime        = 400,
-  canAttack        = true,
-  canGuard         = true,
-  canHover         = true,
-  canMove          = true,
-  canPatrol        = true,
-  canstop          = [[1]],
-  category         = [[HOVER]],
-  corpse           = [[DEAD]],
+  unitname            = [[hoverriot]],
+  name                = [[Mace]],
+  description         = [[Riot Hover]],
+  acceleration        = 0.03,
+  bmcode              = [[1]],
+  brakeRate           = 0.043,
+  buildCostEnergy     = 400,
+  buildCostMetal      = 400,
+  builder             = false,
+  buildPic            = [[hoverriot.png]],
+  buildTime           = 400,
+  canAttack           = true,
+  canGuard            = true,
+  canHover            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canstop             = [[1]],
+  category            = [[HOVER]],
+  corpse              = [[DEAD]],
 
-  customParams     = {
+  customParams        = {
     description_bp = [[Hover dispersador]],
     description_fr = [[Hover ?meutier]],
+	description_de = [[Riotgleiter]],
     helptext       = [[The Mace is a mobile laser tower. Its high firepower is useful for killing light enemy units. It is perfectly accurate and is good against gunships and fast units. However, its thin armor makes it vulnerable when targetted directly, especially by skirmishers.]],
     helptext_bp    = [[Mace ? uma torre de laser m?vel. Seu alto poder de fogo e precis?o s?o ?teis para matar unidades pequenas e r?pidas e aeronaves de voo baixo.]],
     helptext_fr    = [[Le Mace est une tour laser mobile. Sa forte puissance de feu et sa pr?cision parfaite sont appreciable pour se debarrasser de petites unit?s.]],
+	helptext_de    = [[Der Mace ist ein mobiler Laserturm. Seine hohe Feuerkraft ist nützlich, um leichte, feindliche Einheiten zu töten. Er schießt höchst präzise und erweist sich gegen Hubschrauber und schnelle Einheiten als nützlich. Trotzdem macht ihn seine einfache Verteidigung anfällig für direkte Angriffe, vor allem durch Skirmisher.]],
   },
 
-  explodeAs        = [[BIG_UNITEX]],
-  footprintX       = 3,
-  footprintZ       = 3,
-  iconType         = [[hoverriot]],
-  idleAutoHeal     = 5,
-  idleTime         = 1800,
-  mass             = 215,
-  maxDamage        = 1200,
-  maxSlope         = 36,
-  maxVelocity      = 2.2,
-  minCloakDistance = 75,
-  movementClass    = [[HOVER3]],
-  noAutoFire       = false,
-  noChaseCategory  = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName       = [[hoverriot.s3o]],
-  onoffable        = true,
-  seismicSignature = 4,
-  selfDestructAs   = [[BIG_UNITEX]],
+  defaultmissiontype  = [[Standby]],
+  explodeAs           = [[BIG_UNITEX]],
+  footprintX          = 3,
+  footprintZ          = 3,
+  iconType            = [[hoverriot]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  maneuverleashlength = [[640]],
+  mass                = 215,
+  maxDamage           = 1200,
+  maxSlope            = 36,
+  maxVelocity         = 2.2,
+  minCloakDistance    = 75,
+  movementClass       = [[HOVER3]],
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName          = [[hoverriot.s3o]],
+  onoffable           = true,
+  seismicSignature    = 4,
+  selfDestructAs      = [[BIG_UNITEX]],
 
-  sfxtypes         = {
+  sfxtypes            = {
 
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
@@ -54,15 +59,16 @@ unitDef = {
 
   },
 
-  side             = [[CORE]],
-  sightDistance    = 407,
-  smoothAnim       = true,
-  TEDClass         = [[TANK]],
-  turninplace      = 0,
-  turnRate         = 616,
-  workerTime       = 0,
+  side                = [[CORE]],
+  sightDistance       = 407,
+  smoothAnim          = true,
+  steeringmode        = [[1]],
+  TEDClass            = [[TANK]],
+  turninplace         = 0,
+  turnRate            = 616,
+  workerTime          = 0,
 
-  weapons          = {
+  weapons             = {
 
     {
       def                = [[LASER1]],
@@ -72,11 +78,12 @@ unitDef = {
   },
 
 
-  weaponDefs       = {
+  weaponDefs          = {
 
     LASER1 = {
       name                    = [[High Intensity Laserbeam]],
       areaOfEffect            = 8,
+      beamlaser               = 1,
       beamTime                = 0.1,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -120,7 +127,7 @@ unitDef = {
   },
 
 
-  featureDefs      = {
+  featureDefs         = {
 
     DEAD  = {
       description      = [[Wreckage - Mace]],

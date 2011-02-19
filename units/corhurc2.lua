@@ -1,57 +1,61 @@
 unitDef = {
-  unitname               = [[corhurc2]],
-  name                   = [[Firestorm]],
-  description            = [[Napalm Bomber]],
-  amphibious             = true,
-  buildCostEnergy        = 350,
-  buildCostMetal         = 350,
-  builder                = false,
-  buildPic               = [[corhurc2.png]],
-  buildTime              = 350,
-  canAttack              = true,
-  canFly                 = true,
-  canGuard               = true,
-  canMove                = true,
-  canPatrol              = true,
-  canstop                = true,
-  canSubmerge            = false,
-  category               = [[FIXEDWING]],
-  collide                = false,
+  unitname            = [[corhurc2]],
+  name                = [[Firestorm]],
+  description         = [[Napalm Bomber]],
+  amphibious          = true,
+  buildCostEnergy     = 350,
+  buildCostMetal      = 350,
+  builder             = false,
+  buildPic            = [[corhurc2.png]],
+  buildTime           = 350,
+  canAttack           = true,
+  canFly              = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canstop             = true,
+  canSubmerge         = false,
+  category            = [[FIXEDWING]],
+  collide             = false,
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[60 20 70]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse                 = [[DEAD]],
-  cruiseAlt              = 180,
+  corpse              = [[DEAD]],
+  cruiseAlt           = 180,
 
-  customParams           = {
+  customParams        = {
     description_bp = [[Bombardeiro de Napalm]],
     description_fr = [[Bombardier Napalm]],
+	description_de = [[Napalmbomber]],
     helptext       = [[The Firestorm's napalm bombs decimate large clumps of units and light structures.]],
     helptext_bp    = [[Este avi?o lança várias bombas de napalm sobre o alvo, incendiando uma grande área. Foi projetado para atacar grandes números de pequenas unidades, móveis ou n?o, mas em números suficientes pode destruir bases inteiras.]],
     helptext_fr    = [[Une escardre de Firestorm est une des pires chose qui puisse apparaître sur les radars ennemis. Rapides et efficaces, le Firestorm tapisse le sol de bombes au napalm faisant des dégâts r l'impact et sur la durée.]],
+	helptext_de    = [[Die Napalmbomben des Firestorms dezimieren große Haufen an Einheiten und leichten Bauwerken.]],
   },
 
-  explodeAs              = [[GUNSHIPEX]],
-  floater                = true,
-  footprintX             = 4,
-  footprintZ             = 4,
-  iconType               = [[bomberraider]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
-  mass                   = 179,
-  maxAcc                 = 0.5,
-  maxDamage              = 525,
-  maxFuel                = 1000,
-  maxVelocity            = 10,
-  minCloakDistance       = 75,
-  noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[firestorm.s3o]],
-  seismicSignature       = 0,
-  selfDestructAs         = [[GUNSHIPEX]],
+  defaultmissiontype  = [[VTOL_standby]],
+  explodeAs           = [[GUNSHIPEX]],
+  floater             = true,
+  footprintX          = 4,
+  footprintZ          = 4,
+  iconType            = [[bomberraider]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  maneuverleashlength = [[1380]],
+  mass                = 179,
+  maxAcc              = 0.5,
+  maxDamage           = 525,
+  maxFuel             = 1000,
+  maxVelocity         = 10,
+  minCloakDistance    = 75,
+  noAutoFire          = false,
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName          = [[firestorm.s3o]],
+  seismicSignature    = 0,
+  selfDestructAs      = [[GUNSHIPEX]],
 
-  sfxtypes               = {
+  sfxtypes            = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
@@ -61,13 +65,13 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
-  sightDistance          = 660,
-  smoothAnim             = true,
-  TEDClass               = [[VTOL]],
-  workerTime             = 0,
+  side                = [[CORE]],
+  sightDistance       = 660,
+  smoothAnim          = true,
+  TEDClass            = [[VTOL]],
+  workerTime          = 0,
 
-  weapons                = {
+  weapons             = {
 
     {
       def                = [[NAPALM]],
@@ -78,7 +82,7 @@ unitDef = {
   },
 
 
-  weaponDefs             = {
+  weaponDefs          = {
 
     LASER  = {
       name                    = [[Laser]],
@@ -139,6 +143,7 @@ unitDef = {
         subs    = 2.5,
       },
 
+      dropped                 = true,
       edgeEffectiveness       = 0.7,
       explosionGenerator      = [[custom:NAPALM_Expl]],
       fireStarter             = 250,
@@ -162,7 +167,7 @@ unitDef = {
   },
 
 
-  featureDefs            = {
+  featureDefs         = {
 
     DEAD  = {
       description      = [[Wreckage - Firestorm]],

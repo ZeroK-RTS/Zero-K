@@ -4,6 +4,7 @@ unitDef = {
   description                   = [[Produces Energy (35)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
+  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 4096,
   buildCostEnergy               = 1000,
@@ -24,10 +25,10 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Produziert Energie (35)]],
+	description_de = [[Produziert Energie (35)]],
     helptext       = [[Fusion reactors provide a good amount of steady energy output at a fair price. They are attractive targets and not very well-armored, so keep them well-protected. When killed, fusion reactors will cause heavy damage to nearby units.]],
-    helptext_de    = [[Der Fusionsreaktor liefert eine gute Menge an konstanter Energie zu einem fairen Preis. Sie sind aber attraktive Ziele und schlecht gepanzert, also besch?tze sie gut. Sobald ein Reaktor zerst?rt wird, werden Einheiten in der N?he besch?digt.]],
-    pylonrange     = 450,
+	helptext_de    = [[Der Fusionsreaktor liefert eine gute Menge an konstanter Energie zu einem fairen Preis. Sie sind aber attraktive Ziele und schlecht gepanzert, also beschütze sie gut. Sobald ein Reaktor zerstört wird, werden Einheiten in der Nähe beschädigt.]],
+    pylonrange = 450,
   },
 
   energyMake                    = 35,

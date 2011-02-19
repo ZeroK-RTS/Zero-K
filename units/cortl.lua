@@ -4,6 +4,7 @@ unitDef = {
   description       = [[Torpedo Launcher]],
   acceleration      = 0,
   activateWhenBuilt = true,
+  bmcode            = [[0]],
   brakeRate         = 0,
   buildAngle        = 16384,
   buildCostEnergy   = 260,
@@ -18,8 +19,10 @@ unitDef = {
 
   customParams      = {
     description_fr = [[Lance Torpille]],
+	description_de = [[Torpedoabschuß]],
     helptext       = [[This Torpedo Launcher provides defense against both surface and submerged vessels. Remember to build sonar so that the Torpedo Launcher can hit submerged targets. The Torpedo Launcher cannot hit hovercraft.]],
     helptext_fr    = [[Ce lance torpille permet de torpiller les unit?s flottantes ou immerg?es. Construisez un sonar afin de d?tecter le plus t?t possible les cibles potentielles du Harpoon. Attention, le Harpoon est inefficace contre les Hovercraft.]],
+	helptext_de    = [[Dieser Abschuß für Torpedos ermöglicht die Verteidigung gegen oberirdische und Unterwasserschiffe. Achte darauf, dass du ein Sonar baust, damit der Torpedo Launcher Unterwasserziele lokalisieren kann. Luftkissenboote können nicht getroffen werden.]],
   },
 
   explodeAs         = [[MEDIUM_BUILDINGEX]],
@@ -77,6 +80,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
       groundbounce            = 1,
+      guidance                = true,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -89,6 +93,7 @@ unitDef = {
       range                   = 600,
       reloadtime              = 2,
       renderType              = 1,
+      selfprop                = true,
       soundHit                = [[explosion/ex_underwater]],
       soundStart              = [[weapon/torpedo]],
       startVelocity           = 150,

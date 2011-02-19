@@ -27,6 +27,7 @@ unitDef = {
   canGuard                      = true,
   canMove                       = false,
   canPatrol                     = true,
+  canreclamate                  = [[1]],
   canstop                       = [[1]],
   cantBeTransported             = true,
   category                      = [[FLOAT UNARMED]],
@@ -37,9 +38,12 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    helptext = [[The Strider Hub deploys striders, the "humoungous mecha" that inspire awe and fear on the battlefield. Unlike a normal factory, the hub is only required to start a project, not to finish it.]],
+    description_de = [[Erzeugt Strider, Baut mit 6 M/s]],
+    helptext       = [[The Strider Hub deploys striders, the "humoungous mecha" that inspire awe and fear on the battlefield. Unlike a normal factory, the hub is only required to start a project, not to finish it.]],
+	helptext_de    = [[Das Strider Hub erzeugt Strider, welche sehr gefürchtet sind auf dem Schlachtfeld. Anders als normale Fabriken, wird dieser Hub nur benötigt, um ein Projekt zu starten, nicht, um es zu vollenden.]],
   },
 
+  defaultmissiontype            = [[Standby]],
   energyMake                    = 0.3,
   explodeAs                     = [[ESTOR_BUILDINGEX]],
   floater                       = true,
@@ -49,6 +53,7 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   levelGround                   = false,
+  maneuverleashlength           = [[380]],
   mass                          = 100000,
   maxDamage                     = 2000,
   maxSlope                      = 15,
@@ -65,6 +70,7 @@ unitDef = {
   side                          = [[ARM]],
   sightDistance                 = 380,
   smoothAnim                    = true,
+  steeringmode                  = [[1]],
   TEDClass                      = [[CNSTR]],
   terraformSpeed                = 600,
   turnRate                      = 1,

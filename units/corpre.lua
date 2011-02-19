@@ -2,6 +2,7 @@ unitDef = {
   unitname                      = [[corpre]],
   name                          = [[Scorcher]],
   description                   = [[Anti-Swarm Heat Ray (weaker at range)]],
+  bmcode                        = [[0]],
   buildCostEnergy               = 220,
   buildCostMetal                = 220,
   builder                       = false,
@@ -19,10 +20,13 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Rayon ? Chaleur Anti-Nu?e]],
+	description_de = [[Anti-Schwarm Heat Ray]],
     helptext       = [[The Scorcher is armed with the Heat Ray. It is incredibly powerful close up, but unfortunately the beam gradually dissipates as it travels and loses most of its lethality at long range.]],
     helptext_fr    = [[Le Scorcheur est une tourelle ?quip?e d'un rayon ? chaleur dense. Une pr?cision instantan?e pour des d?g?ts croissant avec la proximit?, il est la d?fense absolue contre les nu?es de petits (et moins petit) ennemis.]],
+	helptext_de    = [[Der Scorcher ist mit einem Heat Ray ausgerüstet, welcher auf kurze Distanz extremst wirksam ist, aber auf längere Distanz von seiner Kraft einbüßt.]],
   },
 
+  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,

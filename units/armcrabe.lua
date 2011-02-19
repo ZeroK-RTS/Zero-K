@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Crabe]],
   description            = [[Heavy Riot/Skirmish Spider - Curls into Armored Form When Stationary]],
   acceleration           = 0.12,
+  bmcode                 = [[1]],
   brakeRate              = 0.1375,
   buildCostEnergy        = 1600,
   buildCostMetal         = 1600,
@@ -23,14 +24,14 @@ unitDef = {
 
   customParams           = {
     description_bp = [[Robô dispersador pesado.]],
-    description_de = [[Schwere Riot/Skirmish Spinne - Zieht sich bei Stillstand in seine Panzerung zurück]],
     description_es = [[Unidad pesante de alborote/escaramuzador]],
     description_fi = [[Raskas mellakka/kahakoitsijarobotti]],
     description_fr = [[Marcheur Émeutier Lourd]],
     description_it = [[Unita pesante da rissa/scaramucciatore]],
+	description_de = [[Schwere Riot/Skirmish Spinne - Zieht sich bei Stillstand in seine Panzerung zurück]],
+	helptext_de    = [[Die große Panzerung kann auch große Gruppen von billigen Einheiten wegstecken, sowie grundlegende Verteidigung. Sobald die Spinne zum Stillstand kommt, zieht sie sich in die gepanzerte Form zurück: ein gewaltiger Verteidigungsturm. Der Nachteil ist die große Bewegungseinschränkung.]],
     helptext       = [[The Crabe's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crabe curls up into armored form, becoming a formidable defense turret. The Crabe's main weakness is its lack of mobility.]],
     helptext_bp    = [[]],
-    helptext_de    = [[Die große Panzerung kann auch große Gruppen von billigen Einheiten wegstecken, sowie grundlegende Verteidigung. Sobald die Spinne zum Stillstand kommt, zieht sie sich in die gepanzerte Form zurück: ein gewaltiger Verteidigungsturm. Der Nachteil ist die große Bewegungseinschränkung.]],
     helptext_es    = [[Las balas enormes del Crabe arrasan pelotones de unidades baratas enemigas, y tienes alcance mayor que muchas defensas básicas. Cuando para de caminar, Crabe se enrosca en su forma acorazada. La debilidad principal del Crabe es su falta de movilidad.]],
     helptext_fi    = [[Craben massiiviset plasma-ammukset vahingoittavat yksik?it? laajalla alueella. Pys?htyess??n Crabe linnoittautuu v?hent?en itseens? kohdistuvaa vahinkoa.]],
     helptext_fr    = [[Les gros obus du Crabe peuvent erradiqués les hordes d'unités enemies légere. Lorsqu'il s'arrete de marcher, le Crabe se replie sur lui meme et devient blindé.]],
@@ -38,6 +39,8 @@ unitDef = {
   },
 
   damageModifier         = 0.33,
+  defaultmissiontype     = [[Standby]],
+  designation            = [[ARM-CRABE]],
   energyUse              = 1.5,
   explodeAs              = [[BIG_UNIT]],
   footprintX             = 4,
@@ -45,6 +48,7 @@ unitDef = {
   iconType               = [[t3spiderriot]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
+  maneuverleashlength    = [[640]],
   mass                   = 445,
   maxDamage              = 4000,
   maxSlope               = 36,
@@ -64,7 +68,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:LARGE_MUZZLE_FLASH_FX]],
+    --  [[custom:ARMCRABE_FLARE]],
+	  [[custom:LARGE_MUZZLE_FLASH_FX]],
       [[custom:ARMCRABE_FLASH]],
       [[custom:ARMCRABE_WhiteLight]],
     },
@@ -75,6 +80,7 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 660,
   smoothAnim             = true,
+  steeringmode           = [[1]],
   TEDClass               = [[KBOT]],
   threed                 = [[1]],
   turninplace            = 0,

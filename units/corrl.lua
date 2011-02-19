@@ -3,6 +3,7 @@ unitDef = {
   name                          = [[Defender]],
   description                   = [[Light Missile Tower (AA/Skirmish)]],
   acceleration                  = 0,
+  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 80,
   buildCostMetal                = 80,
@@ -24,10 +25,13 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Tourelle Lance-Missile Légcre]],
+	description_de = [[Leichter Raketenturm (Flugabwehr/Skirmish)]],
     helptext       = [[The Defender is a light multi-purpose missile tower. It is good for sniping units from a distance, providing some degree of anti-air protection, and skirmishing enemy LLTs from outside their range. However, it breaks when you sneeze on it.]],
     helptext_fr    = [[Le Defender est une tourelle légcre mais r plus longue portée que la LLT, il peut de plus attaquer les unité aeriennes avec précision grâce r ses roquettes r tete chercheuse. C'est la meilleure parade contre les bombes rampantes. Son blindage et son temps de rechargement la rendent rapidement obsolcte.]],
+	helptext_de    = [[Der Defender ist ein leichter, multifunktionaler Raketenturm. Er eignet sich gut, um Einheiten aus der Distanz zu töten und bietet ein wenig Flugabwehr. Außerdem zerlegt er feindliche LLT aufgrund seiner größeren Reichweite. Dennoch ist er extrem schwach gepanzert und zerbricht durch jedes Niesen.]],
   },
 
+  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[BIG_UNITEX]],
   floater                       = true,
   footprintX                    = 2,
@@ -95,6 +99,7 @@ unitDef = {
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
       flightTime              = 4,
+      guidance                = true,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -106,6 +111,7 @@ unitDef = {
       range                   = 610,
       reloadtime              = 1.2,
       renderType              = 1,
+      selfprop                = true,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[explosion/ex_small13]],

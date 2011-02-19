@@ -2,6 +2,7 @@ unitDef = {
   unitname                      = [[missiletower]],
   name                          = [[Hacksaw]],
   description                   = [[SAM Tower (Anti-Bomber)]],
+  bmcode                        = [[0]],
   buildAngle                    = 8192,
   buildCostEnergy               = 300,
   buildCostMetal                = 300,
@@ -19,7 +20,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    helptext = [[The Hacksaw's twin missiles can drop even the most heavily armored bomber in one pair of hits, but take a considerable amount of time to reload, making them less than ideal against light targets.]],
+    description_de = [[Flugabwehrraketenturm]],
+    helptext       = [[The Hacksaw's twin missiles can drop even the most heavily armored bomber in one pair of hits, but take a considerable amount of time to reload, making them less than ideal against light targets.]],
+	helptext_de    = [[Seine Zwillingsraketen können sogar die schwersten Bomber mit einem Schuss vom Himmel holen, brauchen aber eine beachtliche Zeit zum Nachladen, was sie gegen leichtere Ziele nicht sehr effektiv macht.]],
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],
@@ -88,6 +91,7 @@ unitDef = {
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
       flightTime              = 3,
+      guidance                = true,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -99,6 +103,7 @@ unitDef = {
       range                   = 850,
       reloadtime              = 13,
       renderType              = 1,
+      selfprop                = true,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],

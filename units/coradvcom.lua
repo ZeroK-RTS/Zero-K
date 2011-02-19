@@ -1,97 +1,108 @@
 unitDef = {
-  unitname          = [[coradvcom]],
-  name              = [[Advanced Battle Commander]],
-  description       = [[Heavy Combat Commander, Builds at 12 m/s]],
-  acceleration      = 0.18,
-  activateWhenBuilt = true,
-  amphibious        = [[1]],
-  autoHeal          = 5,
-  brakeRate         = 0.375,
-  buildCostEnergy   = 2400,
-  buildCostMetal    = 2400,
-  buildDistance     = 120,
-  builder           = true,
+  unitname            = [[coradvcom]],
+  name                = [[Advanced Battle Commander]],
+  description         = [[Heavy Combat Commander, Builds at 12 m/s]],
+  acceleration        = 0.18,
+  activateWhenBuilt   = true,
+  amphibious          = [[1]],
+  autoHeal            = 5,
+  bmcode              = [[1]],
+  brakeRate           = 0.375,
+  buildCostEnergy     = 2400,
+  buildCostMetal      = 2400,
+  buildDistance       = 120,
+  builder             = true,
 
-  buildoptions      = {
+  buildoptions        = {
   },
 
-  buildPic          = [[corcom.png]],
-  buildTime         = 2400,
-  canAttack         = true,
-  canCloak          = false,
-  canDGun           = true,
-  canGuard          = true,
-  canMove           = true,
-  canPatrol         = true,
-  canstop           = [[1]],
-  category          = [[LAND FIREPROOF]],
-  commander         = true,
-  corpse            = [[DEAD]],
+  buildPic            = [[corcom.png]],
+  buildTime           = 2400,
+  canAttack           = true,
+  canCloak            = false,
+  canDGun             = true,
+  canGuard            = true,
+  canMove             = true,
+  canPatrol           = true,
+  canreclamate        = [[1]],
+  canstop             = [[1]],
+  category            = [[LAND FIREPROOF]],
+  commander           = true,
+  corpse              = [[DEAD]],
 
-  customParams      = {
+  customParams        = {
     fireproof = [[1]],
-    helptext  = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment. Its base weapon is a riot cannon, while its special weapon fires cluster bombs in a line ahead.]],
-    level     = [[3]],
-    statsname = [[coradvcom]],
+	description_de = [[Schwerer Kampfkommandant, Baut mit 12 M/s]],
+	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment. Its base weapon is a riot cannon, while its special weapon fires cluster bombs in a line ahead.]],
+	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
+	level = [[3]],
+	statsname = [[coradvcom]],
   },
 
-  energyMake        = 3.5,
-  energyStorage     = 0,
-  energyUse         = 0,
-  explodeAs         = [[ESTOR_BUILDINGEX]],
-  footprintX        = 2,
-  footprintZ        = 2,
-  hideDamage        = true,
-  iconType          = [[corcommander]],
-  idleAutoHeal      = 5,
-  idleTime          = 1800,
-  immunetoparalyzer = [[1]],
-  mass              = 1027,
-  maxDamage         = 5000,
-  maxSlope          = 36,
-  maxVelocity       = 1.3,
-  maxWaterDepth     = 5000,
-  metalMake         = 3.5,
-  metalStorage      = 0,
-  minCloakDistance  = 100,
-  movementClass     = [[AKBOT2]],
-  noChaseCategory   = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  norestrict        = [[1]],
-  objectName        = [[corcom.s3o]],
-  onoffable         = true,
-  script            = [[corcom.lua]],
-  seismicSignature  = 16,
-  selfDestructAs    = [[ESTOR_BUILDINGEX]],
+  defaultmissiontype  = [[Standby]],
+  energyMake          = 3.5,
+  energyStorage       = 0,
+  energyUse           = 0,
+  explodeAs           = [[ESTOR_BUILDINGEX]],
+  footprintX          = 2,
+  footprintZ          = 2,
+  hideDamage          = true,
+  iconType            = [[corcommander]],
+  idleAutoHeal        = 5,
+  idleTime            = 1800,
+  immunetoparalyzer   = [[1]],
+  maneuverleashlength = [[640]],
+  mass                = 1027,
+  maxDamage           = 5000,
+  maxSlope            = 36,
+  maxVelocity         = 1.3,
+  maxWaterDepth       = 5000,
+  metalMake           = 3.5,
+  metalStorage        = 0,
+  minCloakDistance    = 100,
+  movementClass       = [[AKBOT2]],
+  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
+  norestrict          = [[1]],
+  objectName          = [[corcom.s3o]],
+  onoffable           = true,
+  script              = [[corcom.lua]],
+  seismicSignature    = 16,
+  selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
-  sfxtypes          = {
+  sfxtypes            = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
-      [[custom:LEVLRMUZZLE]],
+	  [[custom:LEVLRMUZZLE]],
       [[custom:RAIDMUZZLE]],
     },
 
   },
 
-  showNanoSpray     = false,
-  showPlayerName    = true,
-  side              = [[CORE]],
-  sightDistance     = 500,
-  smoothAnim        = true,
-  sonarDistance     = 300,
-  TEDClass          = [[COMMANDER]],
-  terraformSpeed    = 600,
-  turnRate          = 1148,
-  upright           = true,
-  workerTime        = 12,
+  showNanoSpray       = false,
+  showPlayerName      = true,
+  side                = [[CORE]],
+  sightDistance       = 500,
+  smoothAnim          = true,
+  sonarDistance       = 300,
+  steeringmode        = [[2]],
+  TEDClass            = [[COMMANDER]],
+  terraformSpeed      = 600,
+  turnRate            = 1148,
+  upright             = true,
+  workerTime          = 12,
 
-  weapons           = {
+  weapons             = {
 
     [1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
+
+--    [2] = {
+--      def = [[COR_SHIELD_COM]],
+--    },
 
 
     [3] = {
@@ -109,7 +120,7 @@ unitDef = {
   },
 
 
-  weaponDefs        = {
+  weaponDefs          = {
 
     CLUSTERBOMB    = {
       name                    = [[Cluster Bomb]],
@@ -184,6 +195,7 @@ unitDef = {
     FAKELASER      = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
+      beamlaser               = 1,
       beamTime                = 0.1,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -263,9 +275,9 @@ unitDef = {
   },
 
 
-  featureDefs       = {
+  featureDefs         = {
 
-    DEAD = {
+    DEAD      = {
       description      = [[Wreckage - Advanced Battle Commander]],
       blocking         = true,
       category         = [[corpses]],
@@ -286,7 +298,7 @@ unitDef = {
     },
 
 
-    HEAP = {
+    HEAP      = {
       description      = [[Debris - Advanced Battle Commander]],
       blocking         = false,
       category         = [[heaps]],
