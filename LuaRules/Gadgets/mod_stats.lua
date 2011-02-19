@@ -40,6 +40,15 @@ local spAreTeamsAllied = Spring.AreTeamsAllied
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- drones are counted as parent for damage done, ignored for damage received
+-- key = drone, value = parent
+local drones = {
+	carrydrone = "armcarry",
+	wolverine_mine = "corgarp",
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
 
@@ -53,19 +62,25 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		return
 	end
 	
-	--Spring.Echo(attackerDefID)
+	
+	-- treat as different unit as needed
+	if drones[UnitDefs[unitDefID].name] then
+		return
+	end
+	if drones[UnitDefs[attackerDefID].name] then
+		local name = drones[UnitDefs[attackerDefID].name]
+		attackerDefID = (UnitDefNames[name] and UnitDefNames[name].id) or attackerDefID
+	end	
 	local attackerAlias = UnitDefs[attackerDefID].customParams.statsname
 	if attackerAlias and UnitDefNames[attackerAlias] then
 		attackerDefID = UnitDefNames[attackerAlias].id
 	end
-	--Spring.Echo(attackerDefID)
-	--Spring.Echo(unitDefID)
 	local defenderAlias = UnitDefs[unitDefID].customParams.statsname
 	if defenderAlias and UnitDefNames[defenderAlias] then
 		unitDefID = UnitDefNames[defenderAlias].id
 	end
-	--Spring.Echo(unitDefID)
-			
+	
+	
 	local hp, maxHp, paraDam, capture, build = spGetUnitHealth(unitID)		
 	
 	if build >= 1 then 
