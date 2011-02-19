@@ -26,9 +26,11 @@ unitDef = {
   customParams           = {
     description_bp = [[Caça básico]],
     description_fr = [[Chasseur Multirôle]],
+	description_de = [[Mehrzweck-Tarnkappenjäger]],
     helptext       = [[The Avenger can hit both land and air. It protects well again air units, but enemy AA and air superiority fighters will kill it quickly. In numbers it can harass land units.]],
     helptext_bp    = [[Este caça pode atacar unidades aéreas e terrestres e protege bem outras unidades contra unidades aéreas, mas é morto rapidamente por fogo anti-aéreo e caças de superioridade aérea. Funciona melhor contra unidades terrestres quando em grandes números.]],
     helptext_fr    = [[Capable de tirer en l'air ou au sol le Avenger n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
+	helptext_de    = [[Der Avenger kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen.]],
   },
 
   defaultmissiontype     = [[VTOL_standby]],

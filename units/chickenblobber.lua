@@ -19,8 +19,10 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Artillery Lourde poulet]],
+	description_de = [[Schwere Artillerie]],
     helptext       = [[The Lobber's big brother, the Blobber hurls a wide-scatter rain of acid goo. It can pummel even the toughest shield network very quickly, but remains relatively prone to direct attack.]],
     helptext_fr    = [[Grand fr?re du Lobber, le Blobber projette ? longue distance une v?ritable pluie d'acide sur une zone importante. Il peut ainsi rapidement annihiler m?me les d?fenses prot?g?es par un important r?seau de boucliers mais il reste tr?s vuln?rable aux attaques raproch?es.]],
+	helptext_de    = [[Der groﬂe Bruder vom Lobber, der Blobber, schleudert eine weite Streuung an ‰tzender Schmiere. Er kann sogar die st‰krsten Schildnetze sehr schnell einschlagen, doch gegen direkte Attacken wirkt er sehr anf‰llig.]],
   },
 
   defaultmissiontype  = [[Standby]],

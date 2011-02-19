@@ -22,9 +22,11 @@ unitDef = {
   customParams        = {
     description_bp = [[Veículo radar]],
     description_fr = [[Véhicule Radar]],
+	description_de = [[Radarfahrzeug]],
     helptext       = [[The Informant provides radar coverage on the battlefield.]],
     helptext_bp    = [[]],
     helptext_fr    = [[Le Informant est un peu comme tous les radars mobiles, aussi indispensable que faible.]],
+	helptext_de    = [[Der Informant bietet Radarerfassung eines bestimmten Bereiches auf dem Schlachtfeld.]],
   },
 
   defaultmissiontype  = [[Standby]],

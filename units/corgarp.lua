@@ -21,9 +21,11 @@ unitDef = {
   customParams        = {
     description_bp = [[Tanque de artilharia]],
     description_fr = [[Tank Artilleur]],
+	description_de = [[Artillerie Minenleger Fahrzeug]],
     helptext       = [[The Wolverine lays mines which are fairly effective but have a limited lifespan (30s) from a distance (rather haphazardly). The Wolverine outranges most defenses comfortably, but is lightly armored and cannot flee easily so keep it screened with friendly units, possibly assisted by your own mines.]],
     helptext_bp    = [[Wolverine é o veículo de artilharia leve de Logos. Seus tiros s?o de alta trajetória ent?o n?o funciona bem contra unidades móveis. Seu alcançe supera com folga o de torres de laser pesadas, mas é pouco ágil e n?o pode atirar para trás, devendo ser protegido de agressores por linhas de unidades dispesadoras ou de assalto.]],
     helptext_fr    = [[Le Wolverine est l'arme idéale pour prendre d'assaut les zones fortifiées. Une grande portée, des tirs en cloche et une cadence de tir respectable en font une artillerie trcs bon marché. Peu rapide et ne pouvant pas tirer en arricre, il faudra cependant la protéger.]],
+	helptext_de    = [[Der Wolverine legt Minen aus der Ferne, die ziemlich effektiv sind, aber nur eine begrenzte Lebensdauer (30s) besitzen. Er bedindet sich meist außerhalb der Reichweiten der Verteidigung, aber ist nur schwach gepanzert und kann nicht allzu schnell fliehen. Von daher begleite ihn lieber mit ein paar deiner Einheiten.]],
   },
 
   defaultmissiontype  = [[Standby]],

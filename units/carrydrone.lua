@@ -45,7 +45,13 @@ unitDef = {
   script              = [[carrydrone.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[TINY_BUILDINGEX]],
-
+  
+  customParams        = {
+	description_de = [[Trägerdrohne]],
+	helptext_de    = [[]],
+  },
+  
+  
   sfxtypes            = {
 
     explosiongenerators = {

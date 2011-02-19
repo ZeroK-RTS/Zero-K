@@ -44,7 +44,14 @@ unitDef = {
   waterLine         = 0,
   workerTime        = 0,
   yardMap           = [[oooo]],
+  
+  
+  customParams                  = {
+    description_de = [[Ortet Einheiten unter Wasser]],
+	helptext_de    = [[Das Sonar ortet nach dem Echoprinzip von Radaranlagen feindliche Einheiten unter Wasser. Dazu strahlen sie selbst ein Signal aus und empfangen das entsprechende Echo, aus dessen Laufzeit auf die Entfernung zu den Einheiten geschlossen wird.]],
+  },
 
+  
   featureDefs       = {
 
     DEAD  = {

@@ -52,6 +52,16 @@ unitDef = {
   workerTime                    = 0,
   yardMap                       = [[oooo]],
 
+  customParams        = {
+    description_bp = [[]],
+    description_fr = [[]],
+	description_de = [[Leichte Abschirmeinrichtung]],
+    helptext       = [[]],
+    helptext_bp    = [[]],
+    helptext_fr    = [[]],
+	helptext_de    = [[Aegis schützt deine Einheiten in mit seinem Schild vor Angriffen, die durch den Schild absorbiert werden können, aber nur solange die nötige Energieversorgung gewährleistet ist und der Beschuss nicht zu stark wird.]],
+  },  
+  
   weapons                       = {
 
     {

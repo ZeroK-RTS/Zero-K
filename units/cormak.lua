@@ -27,7 +27,9 @@ unitDef = {
     description_es = [[Robot de alboroto]],
     description_fr = [[Robot ?meurier]],
     description_it = [[Robot da rissa]],
+	description_de = [[Riot Roboter]],
     helptext       = [[The Outlaw emits an electromagnetic disruption pulse in a wide circle around it that damages and slows enemy units. Friendly units are unaffected.]],
+	helptext_de    = [[Der Outlaw stößt einen elektromagnetischen Störungspuls, in einem weiten Kreis um sich herum, aus, welcher feindliche Einheiten schädigt und verlangsamt. Freundliche Einheiten sind davon aber nicht betroffen.]],
     nofriendlyfire = 1,
   },
 

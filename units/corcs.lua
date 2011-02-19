@@ -29,8 +29,10 @@ unitDef = {
 
   customParams           = {
     description_fr = [[Navire de Construction, Construit r 12 m/s]],
+	description_de = [[Konstruktionsschiff, Baut mit 12 M/s]],
     helptext       = [[Although expensive, the Construction Ship boasts extremely high nano power, combined with tough armor and good speed.]],
     helptext_fr    = [[Meme si il est couteux, le Shipcon construit plus vite qu'un constructeur terrestre et est aussi rapide que solide.]],
+	helptext_de    = [[Obwohl teuer, bietet diese Konstruktionseinheit extrem hohe Nanoleistung, kombiniert mit robuster Panzerung und Schnelligkeit.]],
   },
 
   defaultmissiontype     = [[Standby]],

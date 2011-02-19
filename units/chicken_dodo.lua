@@ -20,8 +20,10 @@ unitDef = {
 
   customParams          = {
     description_fr = [[Chicken kamikaze]],
+	description_de = [[Chicken Bombe]],
     helptext       = [[The Dodo's body contains a volatile mixture of organic explosives. At the slightest provocation, it explodes spectacularly, with the resulting shockwave throwing nearby units into the air. Beware as its flying limbs and spikes will do residual damage.]],
     helptext_fr    = [[Le corps du Dodo renferme un m?lange hautement volatile d'explosifs organiques. Au moindre choc il explose spectaculairement en produisant une onde de choc repoussant avec force les unit?s ? proximit?. Attention en explosant il ?parpille divers restes solides provoquant des dommages supl?mentaires.]],
+	helptext_de    = [[Dodos Körper besteht aus einer impulsiven Mixtur von organichen Sprengstoffen. Die kleinste Penetration und Dodo explodiert spektakulär mit einer Schockwelle, die nahegelegene Einheiten zurück schleudert. Hüte dich vor den fliegenden Gliedmaßen, die bleibende Schäden hinterlassen können.]],
   },
 
   defaultmissiontype    = [[Standby]],

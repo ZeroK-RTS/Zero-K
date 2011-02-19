@@ -25,9 +25,11 @@ unitDef = {
   customParams           = {
     description_bp = [[Aranha anti-aérea]],
     description_fr = [[Araign?e AA]],
+	description_de = [[Flugabwehr Spinne]],
     helptext       = [[An all-terrain AA unit that supports other spiders against air with its medium-range missiles.]],
     helptext_bp    = [[Uma unidade escaladora anti-aérea. Use para proteger outras aranhas contra ataques aéreos.]],
     helptext_fr    = [[Un unit? anti air et torpille tout terrain. Peut prot?ger ses alli?s des attaques marines et a?riennes. ]],
+	helptext_de    = [[Eine geländegängige Flugabwehreinheit, die andere Spinnen mit ihren mittellangen Raketen gegen Luftangriffe verteidigt.]],
   },
 
   defaultmissiontype     = [[Standby]],

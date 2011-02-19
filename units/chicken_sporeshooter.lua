@@ -19,8 +19,10 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Lanceur de spores tout terrain (AA/Skirm)]],
+	description_de = [[Geländegängige Sporen (Luftabwehr/Skirmish)]],
     helptext       = [[The Sporeshooter shoots spores to drop aircraft and hit land targets from a distance. Can climb walls for surprise attacks.]],
     helptext_fr    = [[Le Sporeshooter lance des salves de spores ? t?te chercheuse sur les unit?s adverses, tant terrestres qu'a?riennes, tout en ?tant tr?s mobile et pouvant grimper m?me les parois les plus escarp?es afin de surprendre l'adversaire.]],
+	helptext_de    = [[Der Sporeshooter verschießt Sporen, um Flugzeuge und Landziele aus der Distanz zu vernichten. Kann auch Wände erklimmen und somit überraschende Angriffe ausführen.]],
   },
 
   defaultmissiontype  = [[Standby]],

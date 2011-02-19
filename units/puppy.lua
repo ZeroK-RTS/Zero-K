@@ -23,7 +23,9 @@ unitDef = {
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
+    description_de = [[Wandernde Rakete]],
     helptext       = [[This fast-moving suicide unit is good for raiding and sniping lightly-armored targets. When standing next to wreckages, it automatically draws metal from them to replicate itself, grey goo style.]],
+	helptext_de    = [[Diese flinke Kamikazeinheit ist ideal, um schlecht gepanzerte Ziele zu überfallen. Sobald sie neben Wracks steht, zieht sie automatisch Metall aus diesen, um sich selbst zu vervielfältigen.]],
   },
 
   defaultmissiontype     = [[Standby]],

@@ -22,10 +22,13 @@ unitDef = {
   collisionVolumeTest	    = 1,
   collisionVolumeType	    = [[ellipsoid]],
   corpse              = [[DEAD]],
+  
   customParams        = {
     description_fr = [[Mechwarrior d'Assaut]],
+	description_de = [[Sturm/Riotroboter]],
     helptext       = [[The Dante is a heavy frontal assault unit for when conventional means don't cut it. Its flamethrower and twin heatrays aren't extraordinary, but its incendiary rockets can be fired in a salvo of twenty that devastates a wide swath of terrain.]],
     helptext_fr    = [[]],
+	helptext_de    = [[Der Dante ist eine schwere Sturmeinheit für den Fronteinsatz, wenn herkömmliche Mittel versagen. Sein Flammenwerfer und doppelläufiger Heat Ray sind zwar nichts besonderes, doch seine Brandraketen können in 20-Schuss Salven breite Schneisen in das Gelände schlagen.]],
   },
 
   defaultmissiontype  = [[Standby]],

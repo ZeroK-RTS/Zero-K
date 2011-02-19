@@ -20,7 +20,9 @@ unitDef = {
   cloakCost             = 0,
 
   customParams          = {
-    dontCount = [[1]],
+    description_de = [[Landmine]],
+	helptext_de    = [[Sobald sich feindliche Einheiten in die Reichweite dieser Mine begeben, explodiert diese und reiﬂt gegebenenfalls dutzend Feinde mit in die Luft.]],
+    dontCount      = [[1]],
   },
 
   defaultmissiontype    = [[Standby_Mine]],

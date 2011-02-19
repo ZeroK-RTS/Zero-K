@@ -54,6 +54,16 @@ unitDef = {
   workerTime                    = 0,
   yardMap                       = [[oooo]],
 
+  customParams = {
+    description_bp = [[]],
+    description_fr = [[]],
+	description_de = [[Frühwarn System]],
+    helptext       = [[]],
+    helptext_bp    = [[]],
+    helptext_fr    = [[]],
+	helptext_de    = [[Dieser Radarturm ermöglicht die frühzeitige Lokalisierung von feindlichen Einheiten in der entsprechenden Reichweite. Für den Betrieb wird Energie benötigt.]],
+  },  
+  
   featureDefs                   = {
 
     DEAD  = {

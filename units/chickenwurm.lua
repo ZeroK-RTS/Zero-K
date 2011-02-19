@@ -19,9 +19,11 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Assaut souterrain]],
+	description_de = [[Grabender Flammenwerfer (Sturm/Riot)]],
 	fireproof	   = 1,
     helptext       = [[The Wurm "burrows" under the surface of the ground, revealing itself to hurl a ball of fire that immolates a large swathe of terrain. It can climb cliffs and surprise defense turrets, but is weak to assaults.]],
     helptext_fr    = [[Ces poulets tenant partiellement de la taupe ont une particularit? : ils savent mettre le feu o? qu'ils aillent.]],
+	helptext_de    = [[Der Wurm "gr‰bt" sich unter die Bodenoberfl‰che und zeigt sich nur, wenn er Feuerb‰lle, die groﬂe Schneisen in das Gel‰nde brennen, schleudert.]],
   },
 
   defaultmissiontype  = [[Standby]],

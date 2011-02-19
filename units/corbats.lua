@@ -25,8 +25,10 @@ unitDef = {
 
   customParams           = {
     description_fr = [[Navire de Guerre Lourd]],
+	description_de = [[Schlachtschiff (Bombardierung)]],
     helptext       = [[A single salvo from one of these will pummel almost any surface target into submission. The psychological effects of the muzzle flash and the ship recoiling in the water are impressive enough, to say nothing of the effects of a direct hit. Be warned--battleships are not meant to be used on their own, lacking in anti-air and anti-submarine protection as they are.]],
     helptext_fr    = [[Le Warlord est le seigneur des mers. Sa quadruple batterie de canon plasma lourd peut pilonner ind?finiment une position, sachant qu'un seul tir peut venir ? bout de la plupart des unit?s. L'effet psychologique est aussi d?vastateur que son bombardement. Il n'est cependant pas fait pour ?tre utilis? seul, malgr? son lourd blindage, il est vuln?rable aux attaques rapides, sousmarines ou aeriennes.]],
+	helptext_de    = [[Eine einzige Salve wird einfach jedes Oberflächenziel in Einzelteile zerschmettern. Die psychologischen Auswirkungen der Mündungsfeuer und die Rückstöße des Schiffes sind beeindruckend genug, ganz zu schweigen von den Auswirkungen, die ein Volltreffer erzeugt. Sei gewarnt - Schlachtschiffe sind nicht dazu gedacht, alleine, auf eigene Faust zu agieren, da ihnen dazu die nötige Luft- und U-Boot-Abwehr fehlt.]],
   },
 
   defaultmissiontype     = [[Standby]],

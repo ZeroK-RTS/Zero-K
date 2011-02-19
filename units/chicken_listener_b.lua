@@ -19,6 +19,8 @@ unitDef = {
 
   customParams        = {
     helptext = [[YOU'RE NOT SUPPOSE TO BE IN HERE]],
+	description_de = [[Grabender, mobiler Körperschallmelder]],
+	helptext_de    = [[Der Listener ist eine weiterentwickelte Form des Diggers. Zwar hat er seine Kampffertigkeiten verloren, doch im Gegenzug eine einzigartige Sinnesempfindung im Hören erhalten, was es ihm erlaubt gegnerische Bodentruppen haargenau zu lokalisieren.]],
   },
 
   defaultmissiontype  = [[Standby]],

@@ -23,6 +23,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    description_de = [[Tarn-/Störsenderroboter]],
     description_bp = [[Robô camuflador e gerador de interfer?ncia.]],
     description_fi = [[N?kym?tt?myyskent?n luova tutkanh?iritsij?robotti]],
     description_fr = [[Marcheur Brouille/Camoufleur]],
@@ -32,6 +33,7 @@ unitDef = {
     helptext_fi    = [[Eraser kykenee piilottamaan muut yksikk?si vastustajaltasi h?iritsem?ll? t?m?n tutkasignaalia ja luomalla pienen n?kym?tt?myyskent?n ymp?rilleen.]],
     helptext_fr    = [[L'Eraser est munis d'un brouilleur d'onde qui permet de cacher vos unités des radars enemis. Il est aussi munis d'un petit bouclier de camouflage qui permet de cacher vos unités du champ de vision enemis]],
     helptext_pl    = [[Eraser wyposa?ony jest w urz?dzenie zak?ucaj?ce, które pozwala ukry? twoje jednostki przed wrogim radarem. Posiada tak?e ma?? tarcz? maskuj?c?, która ukrywa pobliskie jednostki przed wzrokiem wroga.]],
+	helptext_de    = [[Der Eraser besitzt ein Gerät zum Stören feindlicher Radarwellen. Des Weiteren ist er mit einem kleinen Tarnschild ausgestattet, um nahe, freundliche Einheiten zu tarnen.]],
   },
 
   defaultmissiontype     = [[Standby]],

@@ -39,10 +39,12 @@ unitDef = {
     description_fi = [[Jalkav?kirobottitehdas. Rakentaa jalkav?kirobotteja 6m/s nopeudella]],
     description_fr = [[Produit des Robots d'Infanterie L. une vitesse de 6 m/s]],
     description_it = [[Produce robot d'infanteria. Costruisce a 6 m/s]],
+	description_de = [[Produziert zähe Roboter, Baut mit 6 M/s]],
     helptext       = [[The Shield Bot Fac is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Roach, Clogger]],
     helptext_es    = [[El Infantry Bot Factory es una f?brica ideal para maniobras t?cticas en terreno dif?cil, con una selecci?n diversa de unidades invasoras, escaramuzadoras, y para alboroto. Lo que no tiene en feurza lo compensa con mobilidad y n?mero.]],
     helptext_fi    = [[Soveltuu hyvin taktisten ja vaikeassa maastossa p?rj??vien, joskin kest?vyydelt??n suhteellisen heikkojen robottien rakentamiseen.]],
     helptext_it    = [[L'Infantry Bot Factory ? una fabbrica ideale per manovre tattiche in terreno difficile, con una selezione diversa di unit? da invasione, da scaramuccia, e da rissa. Quello che gli manca in forza lo recupera in mobilit? e numeri.]],
+	helptext_de    = [[Die Shield Bot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Roach, Clogger]],
     sortName       = [[1]],
   },
 

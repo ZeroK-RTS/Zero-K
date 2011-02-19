@@ -24,7 +24,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    helptext   = [[The Singularity Reactor generates massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the resulting release of energy is equivalent to a nuclear explosion. An entire continent on which this is built should be considered unsafe ground.]],
+    description_de = [[Erzeugt Energie (225) - GEFÄHRLICH]],
+    helptext       = [[The Singularity Reactor generates massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the resulting release of energy is equivalent to a nuclear explosion. An entire continent on which this is built should be considered unsafe ground.]],
+	helptext_de    = [[Dieser singuläre Reaktor erzeugt eine riesige Menge an Energie, wozu er ein kontrolliertes Schwarzes Loch nutzt - was genauso sicher ist, wie es sich anhört. Wird der Reaktor zerstört, wird eine riesige Menge an Energie frei, die sich in einer Explosion ungeheuren Ausmaßes, vergleichbar mit einer Atomexplosion, äußert. Ein ganzer Kontinent, auf dem der Reaktor gebaut wird, sollte von nun an als unsicherer Boden betrachtet werden.]],
     pylonrange = 800,
   },
 

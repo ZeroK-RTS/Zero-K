@@ -22,9 +22,11 @@ unitDef = {
   customParams        = {
     description_bp = [[Hover dispersador]],
     description_fr = [[Hover ?meutier]],
+	description_de = [[Riotgleiter]],
     helptext       = [[The Mace is a mobile laser tower. Its high firepower is useful for killing light enemy units. It is perfectly accurate and is good against gunships and fast units. However, its thin armor makes it vulnerable when targetted directly, especially by skirmishers.]],
     helptext_bp    = [[Mace ? uma torre de laser m?vel. Seu alto poder de fogo e precis?o s?o ?teis para matar unidades pequenas e r?pidas e aeronaves de voo baixo.]],
     helptext_fr    = [[Le Mace est une tour laser mobile. Sa forte puissance de feu et sa pr?cision parfaite sont appreciable pour se debarrasser de petites unit?s.]],
+	helptext_de    = [[Der Mace ist ein mobiler Laserturm. Seine hohe Feuerkraft ist nützlich, um leichte, feindliche Einheiten zu töten. Er schießt höchst präzise und erweist sich gegen Hubschrauber und schnelle Einheiten als nützlich. Trotzdem macht ihn seine einfache Verteidigung anfällig für direkte Angriffe, vor allem durch Skirmisher.]],
   },
 
   defaultmissiontype  = [[Standby]],

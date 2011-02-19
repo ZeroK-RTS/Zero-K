@@ -38,6 +38,8 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    description_de = [[Produziert Spezial- und Sprungdüsenroboter]],
+    helptext_de    = [[Hier werden außergewöhnliche Einheiten erzeugt, die durch spezielle Fähigkeiten Distanzen schnell überbrücken können, um in den Nahkampf zu treten oder auch, um Hindernisse schnell zu überbrücken. Wichtigste Einheiten: Pyro, Moderator, Jack, Firewalker, Sumo]],
     canjump  = [[1]],
     helptext = [[The esoteric Jumpjet/Specialist Plant offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Sumo]],
     sortName = [[5]],

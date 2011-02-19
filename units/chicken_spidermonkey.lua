@@ -19,8 +19,10 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Lanceur de filet tout terrain]],
+	description_de = [[Gelandegängige Luftabwehr]],
     helptext       = [[The Spidermonkey is a very unusual support chicken. As the name suggests, it can climb walls, however it can also spin thick webs to ensnare aircraft like a spider catching insects.]],
     helptext_fr    = [[Le spidermonkey est une unit? de soutien tr?s inhabituelle parmis les poulets. Comme le nom l'indique il peut grimper les parois les plus escarp?es mais peut en plus projetter comme une fronde un filet pour bloquer au sol les unit?s a?riennes, ? la mani?re d'une araign?e attrappant des insectes.]],
+	helptext_de    = [[Der Spidermonkey ist ein sehr ungewöhnliches Chicken. Wie der Name verrät, kann er Wände hochklettern und schließlich auch wie eine Spinne per Netz seine Fliegen, bzw. Flugzeuge Luft fangen.]],
   },
 
   defaultmissiontype  = [[Standby]],

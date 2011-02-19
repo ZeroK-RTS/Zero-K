@@ -19,7 +19,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Punisher's medium range mortars have a considerable AoE and decent damage output. However, the bot itself is somewhat clumsy and slow to maneuver.]],
+    description_de = [[Feuerunterstützungs Roboter (Artillerie/Skirmish)]],
+    helptext       = [[The Punisher's medium range mortars have a considerable AoE and decent damage output. However, the bot itself is somewhat clumsy and slow to maneuver.]],
+	helptext_de    = [[Seine mittelweitreichenden Mörser haben eine annehmbare AoE und dezenten Schadenausstoß. Dennoch, der Roboter selber ist relativ schwerfällig und langsam beim Manövrieren.]],
   },
 
   defaultmissiontype  = [[Standby]],

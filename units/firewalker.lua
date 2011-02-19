@@ -23,7 +23,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
+    description_de = [[Roboter mit Feuerunterstützung (Artillerie/Skrimish)]],
+    helptext       = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
+	helptext_de    = [[Der Firewalk verschießt seine Mörser auf mittlerer Distanz und erzeugt in den betroffenen Arealen eine Unbrauchbarkeit des Geländes für kurze Zeiträume. Die Einheit selber ist etwas schwerfällig und langsam im Manövrieren.]],
   },
 
   defaultmissiontype     = [[Standby]],

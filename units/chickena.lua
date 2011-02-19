@@ -19,8 +19,10 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Unit? lourde de m?l?e]],
+	description_de = [[Sturm/Anti-Panzerung]],
     helptext       = [[The Cockatrice is truly a beast. Seemingly impervious to enemy fire, it casually walks up to its target and dismembers it with its incredibly powerful jaws. Fortunately, it is not fast or particularly intelligent, and can be destroyed with skirmishers or swarmers easily.]],
     helptext_fr    = [[Le Cockatrice est un v?ritale monstre. Apparament insensible aux feu adverse it charge sans ralentir sa cible et la d?membre avec ses lentes mais puissantes machoires d?mesur?es. Heuresement il n'est pas tr?s rapide ni intelligent et peut dont ?tre abattu relativement ais?ment par des essaims ou des unit?s ? longue port?e.]],
+	helptext_de    = [[Der Cockatrice ist wahrlich eine Bestie. Scheinbar unverletzlich, bewegt es sich einfach auf seine Ziele zu und zerstückelt sie vor Ort mit seinem unglaublich starken Kiefer. Glücklicherweise ist er nicht besonders schnell und intelligent und kann somit von Skirmishern und Schwärmen leicht zerstört werden.]],
   },
 
   defaultmissiontype  = [[Standby]],

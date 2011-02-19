@@ -26,7 +26,9 @@ unitDef = {
   collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
+    description_de = [[Seismische Rakete]],
     helptext       = [[The Quake creates a powerful sonic shockwave that leaves massive craters in soil, while causing minimal harm to units made of metal and carbon nanotubes.]],
+	helptext_de    = [[Die Rakete Quake erzeugt eine akustische Schockwelle, welche massive Krater im Boden hinerlässt, aber nur minimale Schäden an Einheiten aus Metall und Kohlenstoff-Nanoröhrchen verursacht.]],
     mobilebuilding = [[1]],
   },
 

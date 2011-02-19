@@ -26,12 +26,14 @@ unitDef = {
 
   customParams           = {
     description_bp = [[Robô agressor]],
+	description_de = [[Getarnter Raider Roboter]],
     description_es = [[Robot de invasi?n]],
     description_fi = [[Hy?kk??j?robotti]],
     description_fr = [[Robot Pilleur]],
     description_it = [[Robot d'invasione]],
     description_pl = [[Bot Naje?d?ca]],
     helptext       = [[The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defenses to stab at the enemy's economy.]],
+	helptext_de    = [[Der Scythe ist nicht sehr zäh im Standkampf, aber seine Tarnfähigkeit ermöglicht es ihm hinter die feindliche Verteidigung zu gelangen und so die gegnerische Ökonomie zu beeinträchtigen.]],
   },
 
   defaultmissiontype     = [[Standby]],

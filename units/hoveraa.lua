@@ -20,7 +20,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
+    description_de = [[Fulgabwehrgleiter]],
+    helptext       = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
+	helptext_de    = [[Der Flail verschieﬂt ein einzige, groﬂe SAM auf mittlerer Distanz, die wirklich groﬂen Schaden anrichtet.]],
   },
 
   defaultmissiontype  = [[Standby]],

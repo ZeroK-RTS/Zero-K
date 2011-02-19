@@ -21,9 +21,11 @@ unitDef = {
   customParams        = {
     description_bp = [[Tanque de assalto]],
     description_fr = [[Tank d'Assaut]],
+	description_de = [[Sturmpanzer]],
     helptext       = [[A heavy duty battle tank. The Reaper excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of manuverability.]],
     helptext_bp    = [[Reaper é um tanque de batalha pesado que excede em absorver danos e servir de escudo para unidades mais fracas, mas sua baixa velocidade de disparo e agilidade o tornam pouco eficiente contra grandes grupos de pequenas unidades inimigas.]],
     helptext_fr    = [[Le Reaper est un tank d'assaut lourd. Lourd par le blindage, lourd par les dégâts. La lente cadence de tir de son double canon plasma ne conviendra pas aux situations d'encerclement et aux nuées d'ennemis et son blindage le rends peu maniable.]],
+	helptext_de    = [[Der Reaper ist ein schwerer Kampfpanzer, der sich durch die Absorbtion von Schaden auszeichnet. Seine niedrige Feuerrate führt dazu, dass er mit großen Gruppen von Einheiten nicht gut klar kommt und seine schwere Panzerung wirkt sich negativ auf die Manövrierfähigkeit aus.]],
   },
 
   defaultmissiontype  = [[Standby]],

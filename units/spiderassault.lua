@@ -23,6 +23,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    description_de = [[Geländegängige Sturmspinne]],
     description_bp = [[Robô assaltante]],
     description_es = [[Robot de Asalto]],
     description_fr = [[Robot d'Assaut]],
@@ -32,6 +33,7 @@ unitDef = {
     helptext_es    = [[El Thud es increiblemente resistente, y es útil como esudo para los Recluse que hacen más da?o]],
     helptext_fr    = [[Le Thug est extraordinairement r?sistant pour sa taille. Si ses canons ? plasma n'ont pas la pr?cision requise pour abattre les cibles rapides, il reste n?anmoins un bouclier parfait pour des unit?s moins solides telles que les Recluses.]],
     helptext_it    = [[Il Thud é incredibilmente resistente, ed e utile come scudo per i Recluse che fanno piú danno]],
+	helptext_de    = [[Der Cudgel kann unglaublich viel Prügel einstecken und ist als Schutzschild für schwächere, oder zu schonende Einheiten, hervorragend geeignet.]],
   },
 
   defaultmissiontype     = [[Standby]],

@@ -36,6 +36,8 @@ unitDef = {
   commander                     = false,
 
   customParams                  = {
+    description_de = [[Erzeugt groﬂe Chicken]],
+	helptext_de    = [[M‰chtige Kreaturen werden hier erzeugt und auf die Menschheit losgelassen.]],
     chickenFac = [[true]],
   },
 

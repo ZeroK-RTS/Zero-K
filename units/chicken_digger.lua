@@ -20,8 +20,10 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Taupe Scout/Raider]],
+	description_de = [[Eingrabender Scout/Raider]],
     helptext       = [[The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can burrow and travel underground (very slowly), where the only way to locate it is with sesimic detection equipment.]],
     helptext_fr    = [[Les griffes puissantes du Digger lui permettent de creuser avec facilit? m?me dans les sols les plus durs. Cela lui permet donc de s'enterrer et de creuser des galeries sous terre, bien que tr?s lentement, mais n?cessitant alors pour le localiser un ?quipement de d?tection sismique.]],
+	helptext_de    = [[Der Digger gräbt sich mit seinen scharfen Klauen auch durch das härteste Gestein. So kann er sich eingraben und sich im Untergrund sehr langsam fortbewegen, wo man ihn nur mit seismischen Detektionsgeräten entdecken kann.]],
   },
 
   defaultmissiontype  = [[Standby]],

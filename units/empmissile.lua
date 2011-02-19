@@ -22,7 +22,9 @@ unitDef = {
   collisionVolumeType	 = [[CylY]],
 
   customParams           = {
+    description_de = [[EMP Rakete]],
     helptext       = [[The Shockley disables units in a small area for up to 45 seconds.]],
+	helptext_de    = [[Der Shockley paralysiert Einheiten in seiner kleinen Reichweite für bis zu 45 Sekunden.]],
     mobilebuilding = [[1]],
   },
 

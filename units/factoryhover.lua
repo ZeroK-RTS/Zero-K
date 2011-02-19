@@ -28,7 +28,9 @@ unitDef = {
   corpse           = [[DEAD]],
 
   customParams     = {
-    helptext = [[The Amphibious Operations Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Halberd, Mace, Penetrator]],
+    description_de = [[Produziert Aerogleiter, Baut mit 6 M/s]],
+    helptext       = [[The Amphibious Operations Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Halberd, Mace, Penetrator]],
+	helptext_de    = [[Die Amphibious Operations Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Halberd, Mace, Penetrator]],
     sortName = [[8]],
   },
 

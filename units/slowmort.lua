@@ -20,7 +20,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    description_de = [[Kurzstrahl Roboter]],
     helptext       = [[The Moderator's slow-ray reduces enemy speed and rate of fire by up to two-thirds. Though doing no damage themselves, Moderators are effective against almost all targets.]],
+	helptext_de    = [[Seine verlangsamender Strahl reduziert die Geschwindigkeit feindlicher Einheiten und die Feuerrate um bis zu 2/3. Obwohl Moderatoren kein Schaden machen, sind sie effektiv gegen fast alle Ziele.]],
   },
 
   defaultmissiontype  = [[Standby]],

@@ -29,11 +29,13 @@ unitDef = {
     description_es = [[Constructor jumpjet, construye a 9 m/s]],
     description_fr = [[Constructeur r Jetpack, Construit r 9 m/s]],
     description_it = [[Costruttore jumpjet, costruisce a 9 m/s]],
+	description_de = [[Konstruktionsjumpjet, Baut mit 9 M/s]],
     helptext       = [[Fast and capable of jumping over short distances or heights, the Freaker is the ideal constructor for rapid expansion.]],
     helptext_bp    = [[Rápido e capaz de saltar por sobre distâncias curtas ou pequenos obstáculos, Freaker é ideal para expans?o rápida.]],
     helptext_es    = [[Rápido y capaz de brincar sobre cortas distancias o alturas, el Freaker es el constructor ideal para la expansión rápida]],
     helptext_fr    = [[R la fois rapide et capable de sauter sur de courtes distances grâce r son jetpack, le Freaker est un superbe outil pour favoriser son expansion.]],
     helptext_it    = [[Veloce e capace di saltare per corte distanze o altezze, il Freaker é il costruttore ideale per l'espanzione rapida]],
+	helptext_de    = [[Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Freaker als ideale Konstruktionseinheit für rasche Expansion.]],
   },
 
   defaultmissiontype  = [[Standby]],

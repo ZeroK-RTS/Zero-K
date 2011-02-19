@@ -21,9 +21,11 @@ unitDef = {
   customParams        = {
     description_bp = [[Veículo dispersador.]],
     description_fr = [[V?hicule ?meutier]],
+	description_de = [[Riotfahrzeug]],
     helptext       = [[The Leveler's riot cannon is effective at destroying swarms of raiders and halting enemy advances. The projectile does not arc, so Levelers should avoid clumping and be arranged in a line formation wherever possible. Due to their lack of speed and range, most skirmishers are effective against them.]],
     helptext_bp    = [[Leveler é um tanque dispesador. com um canh?o poderoso e agilidade decente, é excelente em uma situaç?o de combate. Seus tiros tem área de efeito portanto embora sejam eficientes contra inimigos agrupados, o Leveler tamb?m tomara dano se atirar de muito perto.]],
     helptext_fr    = [[Le Leveler est un tank ?meutier. Tr?s efficace en situation de combat, il se distingue par sa manoeuvrabilit? et le tir imm?diat de son canon principal. Attention cependant, le canon ? une zone d'effet ? l'impact, le Leveler s'inflige donc parfois des d?g?ts ? lui m?me.]],
+	helptext_de    = [[Seine Riotkanone ist sehr effektiv gegen größere Gruppen von Raidern und, um den gegnerischen Fortschritt aufzuhalten. Die Projektile können nicht bogenförmig abgeschoßen werden, weshalb sie nicht in einem Haufen, sondern entlang einer Frontlinie, ausgerichtet werden sollten. Durch ihren Mangel an Geschwindigkeit und Reichweite, sind sie für die meisten Skirmisher ein gefundenes Fressen.]],
   },
 
   defaultmissiontype  = [[Standby]],

@@ -39,6 +39,8 @@ unitDef = {
   commander                     = false,
 
   customParams                  = {
+    description_de = [[Erzeugt Chicken]],
+	helptext_de    = [[In den Nestern der Chicken wird die Brut herangezogen und nach einer gewissen Zeit auf die restliche Welt losgelassen.]],
     chickenFac = [[true]],
   },
 

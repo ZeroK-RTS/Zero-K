@@ -31,11 +31,13 @@ unitDef = {
     description_es = [[vehículo para Construcción, construye a 6 m/s]],
     description_fr = [[V?hicule de Construction, Construit ? 6 m/s]],
     description_it = [[Veicolo da Costruzzione, costruisce a 6 m/s]],
+	description_de = [[Konstruktionsfahrzeug, Baut mir 6 M/s]],
     helptext       = [[Highly mobile and capable of taking a beating, the Mason can quickly expand over a large area.]],
     helptext_bp    = [[Altamente móvel e capaz de suportar uma boa surra, o veículo de construç?o permite ao jogar expandir rapidamente por uma grande área.]],
     helptext_es    = [[Altamente móbil y capaz de recibir una paliza, el Mason puede ampliar tu territorio sobre una vasta área rápidamente]],
     helptext_fr    = [[Alliant rapidit? et blindage important, le Mason permet de s'?tendre rapidement en s?curit?.]],
     helptext_it    = [[Altamente mobile e capace di prendere parecchi colpi, il Mason pu? rapidamente espandere il tuo territorio in una grande area]],
+	helptext_de    = [[Hochmobiles, bewaffnetes Konstruktionsfahrzeug, das sich ideal für schnelle Expansionen über große Flächen eignet.]],
   },
 
   defaultmissiontype     = [[Standby]],

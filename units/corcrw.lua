@@ -33,9 +33,11 @@ unitDef = {
   customParams           = {
     description_bp = [[Fortaleza voadora]],
     description_fr = [[Forteresse Volante]],
+	description_de = [[Fliegendes Bollwerk]],
     helptext       = [[The Krow may be expensive and ponderous, but its incredible armor allows it do fly into all but the thickest anti-air defenses and cut down everything in sight with its three laser cannons. It can even shoot down enemy fighters.]],
     helptext_bp    = [[Aeronave flutuante armada com lasers para ataque terrestre. Muito cara e muito poderosa.]],
     helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
+	helptext_de    = [[Der Krow scheint teuer und schwerfällig, aber seine unglaubliche Panzerung erlaubt ihm auch durch die größe Flugabwehr zu kommen und alles abzuholzen, was in Sichtweite seiner drei Laserkanonen kommt. Er kann sogar feindliche Jäger vom Himmel holen.]],
   },
 
   defaultmissiontype     = [[VTOL_standby]],

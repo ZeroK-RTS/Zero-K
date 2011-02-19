@@ -21,7 +21,9 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-    helptext = [[Sleek, fast and able to take a beating, the Stiletto drops EMP bombs that can paralyze an entire column of tanks in a single pass, rendering them helpless before allied forces.]],
+    description_de = [[EMP Bomber]],
+    helptext       = [[Sleek, fast and able to take a beating, the Stiletto drops EMP bombs that can paralyze an entire column of tanks in a single pass, rendering them helpless before allied forces.]],
+	helptext_de    = [[Geschmeidig, schnell, der Stiletto wirft Bomben mit dem Elektromagnetischer Puls ab, die ganze Reihen von Panzern in einem einzigen Abwurf paralysieren können.]],
   },
 
   defaultmissiontype  = [[VTOL_standby]],

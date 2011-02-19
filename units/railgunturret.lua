@@ -20,7 +20,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    helptext = [[The Splinter's high velocity gauss cannon slices through enemy armor like a chainsaw through butter.]],
+    description_de = [[Schienenkanoneturm (Panzerbrechend)]],
+    helptext       = [[The Splinter's high velocity gauss cannon slices through enemy armor like a chainsaw through butter.]],
+	helptext_de    = [[Seine Hochgeschwindigkeits-Gauﬂkanone schneidet sich durch die feindliche Panzerung wie eine Kettens‰ge durch Butter.]],
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],

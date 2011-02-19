@@ -39,6 +39,8 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    description_de = [[Produziert Kampfhubschrauber, Baut mit 6 M/s]],
+	helptext_de    = [[Kampfhubschrauber bieten aufgrund ihrer Beweglichkeit eine enorme Bandbreite an Einsetzbarkeit.]],
     sortName = [[3]],
   },
 

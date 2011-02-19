@@ -25,9 +25,11 @@ unitDef = {
   customParams           = {
     description_bp = [[Tanque agressor]],
     description_fr = [[Tank Pilleur]],
+	description_de = [[Blitzschlag Raider Panzer]],
     helptext       = [[The Panther is a high-tech raider. Its main weapon, a lightning gun, deals mostly paralyze damage. This way, the Panther can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base.]],
     helptext_bp    = [[Panther é um agressor de alta tecnologia. sua arma de raios cause principalmente dano PEM, permitindo ao Panther paralizar as defesas inimigas e ent?o passar direto por elas para destruir a infra-estrutura inimiga.]],
     helptext_fr    = [[Le Panther est un pilleur high-tech. Son canon principal sert ? paralyser l'ennemi, lui permettant de traverser les d?fenses afin de s'attaquer au coeur ?conomique d'une base]],
+	helptext_de    = [[Der Panther ist ein hoch entwickelter Raider, dessen Hauptwaffe, eine Blitzkanone, hauptsächlich paralysierenden Schaden austeilt. Auf diesem Wege kann der Panther Türme ausschalten und sich so durch die feindlichen Verteidigungslinien walzen, bis zur Egalisierung der feindlichen, ökonimischen Grundversorgung.]],
   },
 
   defaultmissiontype     = [[Standby]],
