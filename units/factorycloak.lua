@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Cloaky Bot Plant]],
   description                   = [[Produces Cloaky Robots, Builds at 6 m/s]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
@@ -36,9 +35,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Produziert Tarnroboter, Baut mit 6 M/s]],
-    helptext       = [[Emphasizing guile over brute force, the Cloaky Bot Plant makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Tick, Zeus, Sharpshooter]],
-	helptext_de    = [[List statt pure Gewalt lautet hier das Motto. Die Cloaky Bot Plant ermöglicht die Nutzung von Tarnung, Mobilität und EMP-Waffen, um die feindlichen Schwachstellen empfindlich zu treffen. Wichtigste Einheiten: Glaive, Rocko, Tick, Zeus, Sharpshooter]],
+    helptext = [[Emphasizing guile over brute force, the Cloaky Bot Plant makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Tick, Zeus, Sharpshooter]],
     sortName = [[1]],
   },
 

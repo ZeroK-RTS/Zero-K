@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Plasma Battery - Requires 50 Power CONNECTED VIA A POWER GRID to fire]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 8192,
   buildCostEnergy               = 3000,
@@ -26,15 +25,12 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Plasmabatterie - Benötigt ein angeschlossenes Stromnetz von 50 Energie, um feuern zu können.]],
-    helptext       = [[The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly.]],
-	helptext_de    = [[Der Behemoth besitzt eine weitreichende (Erwiderungs-)Artilleriefähigkeit, um Zugang zu größeren Arealen zu verhindern. Er wurde nicht als Verteidigungsturm entwickelt und wird bei direktem Angriff in die Knie gezwungen.]],
+    helptext    = [[The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly.]],
     keeptooltip = [[any string I want]],
     neededlink  = 50,
     pylonrange  = 50,
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 5,
   footprintZ                    = 5,

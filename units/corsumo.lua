@@ -1,57 +1,52 @@
 unitDef = {
-  unitname            = [[corsumo]],
-  name                = [[Sumo]],
-  description         = [[Jumping Assault/Riot Walker]],
-  acceleration        = 0.0552,
-  bmcode              = [[1]],
-  brakeRate           = 0.1375,
-  buildCostEnergy     = 2200,
-  buildCostMetal      = 2200,
-  builder             = false,
-  buildPic            = [[CORSUMO.png]],
-  buildTime           = 2200,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  corpse              = [[DEAD]],
+  unitname         = [[corsumo]],
+  name             = [[Sumo]],
+  description      = [[Jumping Assault/Riot Walker]],
+  acceleration     = 0.0552,
+  brakeRate        = 0.1375,
+  buildCostEnergy  = 2200,
+  buildCostMetal   = 2200,
+  builder          = false,
+  buildPic         = [[CORSUMO.png]],
+  buildTime        = 2200,
+  canAttack        = true,
+  canGuard         = true,
+  canMove          = true,
+  canPatrol        = true,
+  canstop          = [[1]],
+  category         = [[LAND]],
+  corpse           = [[DEAD]],
 
-  customParams        = {
+  customParams     = {
     canjump        = [[1]],
     description_bp = [[Robô dispersador]],
     description_fr = [[Robot Émeutier]],
-	description_de = [[Springender Sturm/Riot Roboter]],
     helptext       = [[The Sumos heatray is immensely powerful at point blank, but unfortunately it gradually dissipates as it travels and loses most of its power at long range. The heat ray's high rate of fire makes it ideal to fight large swarms of cheap units. Remarkably, the Sumo can even jump into the air and stomp on units.]],
     helptext_bp    = [[O raio de calor do Sumo é muito poderoso a curto alcançe, mas se dissipa com a distância e é bem mais fraca de longe. A velocidade alta de disparo o torna ideal para lutar contra grandes grupos de unidades baratas. ]],
     helptext_fr    = [[Le rayon r chaleur du Sumo est capable de délivrer une puissance de feu important sur un point précis. Plus la cible est proche, plus les dégâts seront importants. La précision du rayon est idéale pour lutter contre de larges vagues d'ennemis, mais l'imposant blindage du Sumo le restreint r une vitesse réduite.]],
-	helptext_de    = [[Der Sumo nutzt seinen mächtigen Heat Ray in nächster Nähe, auf größerer Entfernung aber verliert es entsprechend an Feuerkraft. Es eignet sich ideal, um größere Gruppen von billigen, feindlichen Einheiten zu vernichten. Bemerkenswert ist es, dass der Sumo in die Luft springen kann und schließlich auf feindlichen Einheiten landet, was diesen enormen Schaden zufügt.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[t3jumpjetriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 621,
-  maxDamage           = 11000,
-  maxSlope            = 36,
-  maxVelocity         = 1.2,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT4]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[m-9.s3o]],
-  script              = [[corsumo.lua]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  explodeAs        = [[BIG_UNITEX]],
+  footprintX       = 4,
+  footprintZ       = 4,
+  iconType         = [[t3jumpjetriot]],
+  idleAutoHeal     = 5,
+  idleTime         = 1800,
+  mass             = 621,
+  maxDamage        = 11000,
+  maxSlope         = 36,
+  maxVelocity      = 1.2,
+  maxWaterDepth    = 22,
+  minCloakDistance = 75,
+  movementClass    = [[KBOT4]],
+  noAutoFire       = false,
+  noChaseCategory  = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName       = [[m-9.s3o]],
+  script           = [[corsumo.lua]],
+  seismicSignature = 4,
+  selfDestructAs   = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes         = {
 
     explosiongenerators = {
       [[custom:sumosmoke]],
@@ -60,17 +55,16 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 605,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turninplace         = 0,
-  turnRate            = 416,
-  upright             = false,
-  workerTime          = 0,
+  side             = [[CORE]],
+  sightDistance    = 605,
+  smoothAnim       = true,
+  TEDClass         = [[KBOT]],
+  turninplace      = 0,
+  turnRate         = 416,
+  upright          = false,
+  workerTime       = 0,
 
-  weapons             = {
+  weapons          = {
 
     {
       def                = [[HEATRAY]],
@@ -101,7 +95,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs       = {
 
     HEATRAY = {
       name                    = [[Heat Ray]],
@@ -184,7 +178,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs      = {
 
     DEAD = {
       description      = [[Wreckage - Sumo]],

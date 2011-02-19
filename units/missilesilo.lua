@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Missile Silo]],
   description                   = [[Produces Missiles, Builds at 12 m/s]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 1200,
   buildCostMetal                = 1200,
@@ -31,9 +30,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Produziert Raketen, Baut mit 12 M/s]],
-    helptext       = [[The Missile Silo constructs and holds up to four different cruise missiles, each with a unique warhead. It offers excellent standoff strike capability for offensive and defensive purposes.]],
-	helptext_de    = [[Das Raketensilo erzeugt und lagert bis zu vier verschiedene Marschflugkörper, jede mit einem einzigartigen Sprengkopf. Das Silo bietet hervorragende Schlagkraft in Pattsituationen, sowohl für offensive, als auch defensive Zwecke.]],
+    helptext = [[The Missile Silo constructs and holds up to four different cruise missiles, each with a unique warhead. It offers excellent standoff strike capability for offensive and defensive purposes.]],
   },
 
   energyMake                    = 0.3,

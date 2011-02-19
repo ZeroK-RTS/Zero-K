@@ -1,54 +1,49 @@
 unitDef = {
-  unitname            = [[slowmort]],
-  name                = [[Moderator]],
-  description         = [[Slowbeam Walker]],
-  acceleration        = 0.132,
-  activateWhenBuilt   = true,
-  bmcode              = [[1]],
-  brakeRate           = 0.2275,
-  buildCostEnergy     = 280,
-  buildCostMetal      = 280,
-  builder             = false,
-  buildPic            = [[CORMORT.png]],
-  buildTime           = 280,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  corpse              = [[DEAD]],
+  unitname          = [[slowmort]],
+  name              = [[Moderator]],
+  description       = [[Slowbeam Walker]],
+  acceleration      = 0.132,
+  activateWhenBuilt = true,
+  brakeRate         = 0.2275,
+  buildCostEnergy   = 280,
+  buildCostMetal    = 280,
+  builder           = false,
+  buildPic          = [[CORMORT.png]],
+  buildTime         = 280,
+  canAttack         = true,
+  canGuard          = true,
+  canMove           = true,
+  canPatrol         = true,
+  canstop           = [[1]],
+  category          = [[LAND]],
+  corpse            = [[DEAD]],
 
-  customParams        = {
-    description_de = [[Kurzstrahl Roboter]],
-    helptext       = [[The Moderator's slow-ray reduces enemy speed and rate of fire by up to two-thirds. Though doing no damage themselves, Moderators are effective against almost all targets.]],
-	helptext_de    = [[Seine verlangsamender Strahl reduziert die Geschwindigkeit feindlicher Einheiten und die Feuerrate um bis zu 2/3. Obwohl Moderatoren kein Schaden machen, sind sie effektiv gegen fast alle Ziele.]],
+  customParams      = {
+    helptext = [[The Moderator's slow-ray reduces enemy speed and rate of fire by up to two-thirds. Though doing no damage themselves, Moderators are effective against almost all targets.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[walkersupport]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 164,
-  maxDamage           = 550,
-  maxSlope            = 36,
-  maxVelocity         = 2,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  moveState           = 0,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[CORMORT.s3o]],
-  onoffable           = true,
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  explodeAs         = [[BIG_UNITEX]],
+  footprintX        = 2,
+  footprintZ        = 2,
+  iconType          = [[walkersupport]],
+  idleAutoHeal      = 5,
+  idleTime          = 1800,
+  mass              = 164,
+  maxDamage         = 550,
+  maxSlope          = 36,
+  maxVelocity       = 2,
+  maxWaterDepth     = 22,
+  minCloakDistance  = 75,
+  movementClass     = [[KBOT2]],
+  moveState         = 0,
+  noAutoFire        = false,
+  noChaseCategory   = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName        = [[CORMORT.s3o]],
+  onoffable         = true,
+  seismicSignature  = 4,
+  selfDestructAs    = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes          = {
 
     explosiongenerators = {
       [[custom:RAIDMUZZLE]],
@@ -56,17 +51,16 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turninplace         = 0,
-  turnRate            = 1099,
-  upright             = true,
-  workerTime          = 0,
+  side              = [[CORE]],
+  sightDistance     = 660,
+  smoothAnim        = true,
+  TEDClass          = [[KBOT]],
+  turninplace       = 0,
+  turnRate          = 1099,
+  upright           = true,
+  workerTime        = 0,
 
-  weapons             = {
+  weapons           = {
 
     {
       def                = [[SLOWBEAM]],
@@ -77,13 +71,12 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs        = {
 
     SLOWBEAM = {
       name                    = [[Slowing Beam]],
       areaOfEffect            = 8,
       beamDecay               = 0.9,
-      beamlaser               = 1,
       beamTime                = 0.1,
       beamttl                 = 40,
       coreThickness           = 0,
@@ -127,7 +120,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs       = {
 
     DEAD  = {
       description      = [[Wreckage - Morty]],

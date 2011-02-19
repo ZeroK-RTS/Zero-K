@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Produces Energy]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 35,
   buildCostMetal                = 35,
@@ -23,9 +22,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Produziert Energie (variabel)]],
-    helptext       = [[Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully.]],
-	helptext_de    = [[Windräder produzieren eine variable Menge an Energie, je nach Höhenlage und Windgeschwindigkeit. Sie sind extrem verletzlich und explodieren in einer Kettenreaktion, sobald sie zerstört werden. Platziere sie also mit Bedacht.]],
+    helptext   = [[Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully.]],
     pylonrange = 50,
     windgen    = true,
   },
@@ -60,7 +57,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Wind Generator]],
       blocking         = true,
       category         = [[corpses]],
@@ -81,7 +78,7 @@ unitDef = {
     },
 
 
-    HEAP  = {
+    HEAP = {
       description      = [[Debris - Wind Generator]],
       blocking         = false,
       category         = [[heaps]],

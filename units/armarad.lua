@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Long-Range Radar, decreases radar wobble]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 8192,
   buildCostEnergy               = 500,
@@ -56,7 +55,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Advanced Radar Tower]],
       blocking         = true,
       category         = [[corpses]],
@@ -77,7 +76,7 @@ unitDef = {
     },
 
 
-    HEAP  = {
+    HEAP = {
       description      = [[Debris - Advanced Radar Tower]],
       blocking         = false,
       category         = [[heaps]],

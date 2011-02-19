@@ -6,7 +6,6 @@ unitDef = {
   activateWhenBuilt      = true,
   amphibious             = [[1]],
   autoHeal               = 5,
-  bmcode                 = [[1]],
   brakeRate              = 0.375,
   buildCostEnergy        = 1800,
   buildCostMetal         = 1800,
@@ -71,7 +70,6 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canreclamate           = [[1]],
   canstop                = [[1]],
   category               = [[LAND FIREPROOF]],
   cloakCost              = 10,
@@ -84,14 +82,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    fireproof = [[1]],
-	cloakstealth = [[1]],
-	helptext = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
-	level = [[1]],
-	statsname = [[armcom]],
+    cloakstealth = [[1]],
+    fireproof    = [[1]],
+    helptext     = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
+    level        = [[1]],
+    statsname    = [[armcom]],
   },
 
-  defaultmissiontype     = [[Standby]],
   energyMake             = 3.2,
   energyStorage          = 0,
   energyUse              = 0,
@@ -103,7 +100,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   immunetoparalyzer      = [[1]],
-  maneuverleashlength    = [[640]],
   mass                   = 858,
   maxDamage              = 2450,
   maxSlope               = 36,
@@ -123,7 +119,7 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-    	[[custom:NONE]],
+      [[custom:NONE]],
     },
 
   },
@@ -134,7 +130,6 @@ unitDef = {
   sightDistance          = 500,
   smoothAnim             = true,
   sonarDistance          = 300,
-  steeringmode           = [[2]],
   TEDClass               = [[COMMANDER]],
   terraformSpeed         = 600,
   turnRate               = 1148,
@@ -161,10 +156,9 @@ unitDef = {
 
   weaponDefs             = {
 
-    FAKELASER     = {
+    FAKELASER = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
-      beamlaser               = 1,
       beamTime                = 0.1,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -207,10 +201,9 @@ unitDef = {
     },
 
 
-    LASER         = {
+    LASER     = {
       name                    = [[Commander Laser]],
       areaOfEffect            = 12,
-      beamlaser               = 1,
       beamTime                = 0.1,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -257,7 +250,7 @@ unitDef = {
 
   featureDefs            = {
 
-    DEAD      = {
+    DEAD = {
       description      = [[Wreckage - Strike Commander]],
       blocking         = true,
       category         = [[corpses]],
@@ -277,7 +270,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP      = {
+
+    HEAP = {
       description      = [[Debris - Strike Commander]],
       blocking         = false,
       category         = [[heaps]],
@@ -294,7 +288,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
 
   },
 

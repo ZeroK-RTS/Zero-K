@@ -3,7 +3,6 @@ unitDef = {
   name             = [[Amphibious Operations Platform]],
   description      = [[Produces Hovercraft, Builds at 6 m/s]],
   acceleration     = 0,
-  bmcode           = [[0]],
   brakeRate        = 0,
   buildCostEnergy  = 550,
   buildCostMetal   = 550,
@@ -28,9 +27,7 @@ unitDef = {
   corpse           = [[DEAD]],
 
   customParams     = {
-    description_de = [[Produziert Aerogleiter, Baut mit 6 M/s]],
-    helptext       = [[The Amphibious Operations Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Halberd, Mace, Penetrator]],
-	helptext_de    = [[Die Amphibious Operations Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Halberd, Mace, Penetrator]],
+    helptext = [[The Amphibious Operations Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Halberd, Mace, Penetrator]],
     sortName = [[8]],
   },
 

@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Very Long-Range AA Missile Tower]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 2400,
   buildCostMetal                = 2400,
@@ -26,13 +25,10 @@ unitDef = {
 
   customParams                  = {
     description_fr = [[Tourelle Lance Missile Anti-Air Longue Portée]],
-	description_de = [[Extrem weitreichender Flugabwehrraketenturm]],
     helptext       = [[The Screamer is an extremely long-ranging first strike anti-air weapon that sends a clear message to enemy aircraft - can't go here, sonny. Each shot must be stockpiled at the cost of resources, but this is well worth the price, for a quick salvo of missiles will wipe out almost any air attack without fuss.]],
     helptext_fr    = [[Leest un lance missile trcs longue portée. Ses missiles r tete chercheuse ultra rapides peuvent abattre r peu prcs nimporte quel avion d'un seul tir. L'ultime défense Anti-Air, de tous points de vue, met necessite de programmer la production de missiles Sol/Air dans son interface avant d'etre apte r faire feu.]],
-	helptext_de    = [[Der Screamer ist eine extrem weitreichende Flugabwehrwaffe, die eine klare Botschaft an die feindlichen Lufteinheiten sendet - hier kommst du nicht rein, Kleiner. Jeder Schuss muss auf Kosten der Ressourcen bevorratet werden. Dennoch ist all dies seinen Preis wert, denn mit ein paar schnellen Salven wird fast jeder Luftangriff zunichtegemacht.]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[BIG_UNITEX]],
   footprintX                    = 4,
   footprintZ                    = 4,
@@ -94,7 +90,6 @@ unitDef = {
       fireStarter             = 90,
       flightTime              = 4,
       groundbounce            = 1,
-      guidance                = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -105,7 +100,6 @@ unitDef = {
       range                   = 2400,
       reloadtime              = 1.8,
       renderType              = 1,
-      selfprop                = true,
       smokedelay              = [[0]],
       smokeTrail              = false,
       soundHit                = [[weapon/missile/heavy_aa_hit]],

@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Increases extent of overdrive energy grid]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 4096,
   buildCostEnergy               = 200,
@@ -20,9 +19,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    pylonrange = 500,
-	description_de = [[Erweitert den Bereich des Overdrive-Energienetzes]],
-	helptext_de    = [[Durch das Energy Pylon wird es dir ermöglicht, weitere Energiequellen oder Metallextraktoren an ein bestehendes Overdrive-Energienetz anzuschließen.]],
+    description_de = [[Erweitert den Bereich des Overdrive-Energienetzes]],
+    helptext_de    = [[Durch das Energy Pylon wird es dir erm?glicht, weitere Energiequellen oder Metallextraktoren an ein bestehendes Overdrive-Energienetz anzuschlie?en.]],
+    pylonrange     = 500,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],
@@ -52,7 +51,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Energy Storage]],
       blocking         = true,
       category         = [[corpses]],
@@ -73,7 +72,7 @@ unitDef = {
     },
 
 
-    HEAP  = {
+    HEAP = {
       description      = [[Debris - Energy Storage]],
       blocking         = false,
       category         = [[heaps]],

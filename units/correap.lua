@@ -1,56 +1,51 @@
 unitDef = {
-  unitname            = [[correap]],
-  name                = [[Reaper]],
-  description         = [[Assault Tank]],
-  acceleration        = 0.0237,
-  bmcode              = [[1]],
-  brakeRate           = 0.04786,
-  buildCostEnergy     = 900,
-  buildCostMetal      = 900,
-  builder             = false,
-  buildPic            = [[correap.png]],
-  buildTime           = 900,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  corpse              = [[DEAD]],
+  unitname         = [[correap]],
+  name             = [[Reaper]],
+  description      = [[Assault Tank]],
+  acceleration     = 0.0237,
+  brakeRate        = 0.04786,
+  buildCostEnergy  = 900,
+  buildCostMetal   = 900,
+  builder          = false,
+  buildPic         = [[correap.png]],
+  buildTime        = 900,
+  canAttack        = true,
+  canGuard         = true,
+  canMove          = true,
+  canPatrol        = true,
+  canstop          = [[1]],
+  category         = [[LAND]],
+  corpse           = [[DEAD]],
 
-  customParams        = {
+  customParams     = {
     description_bp = [[Tanque de assalto]],
     description_fr = [[Tank d'Assaut]],
-	description_de = [[Sturmpanzer]],
     helptext       = [[A heavy duty battle tank. The Reaper excels at absorbing damage in pitched battles, but its low rate of fire means it is not so good at dealing with swarms, and its heavy armor comes at the price of manuverability.]],
     helptext_bp    = [[Reaper é um tanque de batalha pesado que excede em absorver danos e servir de escudo para unidades mais fracas, mas sua baixa velocidade de disparo e agilidade o tornam pouco eficiente contra grandes grupos de pequenas unidades inimigas.]],
     helptext_fr    = [[Le Reaper est un tank d'assaut lourd. Lourd par le blindage, lourd par les dégâts. La lente cadence de tir de son double canon plasma ne conviendra pas aux situations d'encerclement et aux nuées d'ennemis et son blindage le rends peu maniable.]],
-	helptext_de    = [[Der Reaper ist ein schwerer Kampfpanzer, der sich durch die Absorbtion von Schaden auszeichnet. Seine niedrige Feuerrate führt dazu, dass er mit großen Gruppen von Einheiten nicht gut klar kommt und seine schwere Panzerung wirkt sich negativ auf die Manövrierfähigkeit aus.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[tankassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 430,
-  maxDamage           = 6800,
-  maxSlope            = 18,
-  maxVelocity         = 2.45,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[TANK4]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[correap.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  explodeAs        = [[BIG_UNITEX]],
+  footprintX       = 4,
+  footprintZ       = 4,
+  iconType         = [[tankassault]],
+  idleAutoHeal     = 5,
+  idleTime         = 1800,
+  leaveTracks      = true,
+  mass             = 430,
+  maxDamage        = 6800,
+  maxSlope         = 18,
+  maxVelocity      = 2.45,
+  maxWaterDepth    = 22,
+  minCloakDistance = 75,
+  movementClass    = [[TANK4]],
+  noAutoFire       = false,
+  noChaseCategory  = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName       = [[correap.s3o]],
+  seismicSignature = 4,
+  selfDestructAs   = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes         = {
 
     explosiongenerators = {
       [[custom:LARGE_MUZZLE_FLASH_FX]],
@@ -58,21 +53,20 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 506,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  trackOffset         = 8,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[StdTank]],
-  trackWidth          = 33,
-  turninplace         = 0,
-  turnRate            = 364,
-  workerTime          = 0,
+  side             = [[CORE]],
+  sightDistance    = 506,
+  smoothAnim       = true,
+  TEDClass         = [[TANK]],
+  trackOffset      = 8,
+  trackStrength    = 8,
+  trackStretch     = 1,
+  trackType        = [[StdTank]],
+  trackWidth       = 33,
+  turninplace      = 0,
+  turnRate         = 364,
+  workerTime       = 0,
 
-  weapons             = {
+  weapons          = {
 
     {
       def                = [[COR_REAP]],
@@ -83,7 +77,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs       = {
 
     COR_REAP = {
       name                    = [[Medium Plasma Cannon]],
@@ -119,7 +113,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs      = {
 
     DEAD  = {
       description      = [[Wreckage - Reaper]],

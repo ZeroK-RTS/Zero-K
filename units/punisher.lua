@@ -1,52 +1,47 @@
 unitDef = {
-  unitname            = [[punisher]],
-  name                = [[Punisher]],
-  description         = [[Fire Support Walker (Artillery/Skirmish)]],
-  acceleration        = 0.0984,
-  bmcode              = [[1]],
-  brakeRate           = 0.2392,
-  buildCostEnergy     = 520,
-  buildCostMetal      = 520,
-  builder             = false,
-  buildPic            = [[punisher.png]],
-  buildTime           = 520,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  corpse              = [[DEAD]],
+  unitname          = [[punisher]],
+  name              = [[Punisher]],
+  description       = [[Fire Support Walker (Artillery/Skirmish)]],
+  acceleration      = 0.0984,
+  brakeRate         = 0.2392,
+  buildCostEnergy   = 520,
+  buildCostMetal    = 520,
+  builder           = false,
+  buildPic          = [[punisher.png]],
+  buildTime         = 520,
+  canAttack         = true,
+  canGuard          = true,
+  canMove           = true,
+  canPatrol         = true,
+  canstop           = [[1]],
+  category          = [[LAND]],
+  corpse            = [[DEAD]],
 
-  customParams        = {
-    description_de = [[Feuerunterstützungs Roboter (Artillerie/Skirmish)]],
-    helptext       = [[The Punisher's medium range mortars have a considerable AoE and decent damage output. However, the bot itself is somewhat clumsy and slow to maneuver.]],
-	helptext_de    = [[Seine mittelweitreichenden Mörser haben eine annehmbare AoE und dezenten Schadenausstoß. Dennoch, der Roboter selber ist relativ schwerfällig und langsam beim Manövrieren.]],
+  customParams      = {
+    helptext = [[The Punisher's medium range mortars have a considerable AoE and decent damage output. However, the bot itself is somewhat clumsy and slow to maneuver.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[walkerarty]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  immunetoparalyzer   = [[0]],
-  maneuverleashlength = [[640]],
-  mass                = 217,
-  maxDamage           = 650,
-  maxSlope            = 36,
-  maxVelocity         = 1.7,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT4]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[punisher.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  explodeAs         = [[BIG_UNITEX]],
+  footprintX        = 3,
+  footprintZ        = 3,
+  iconType          = [[walkerarty]],
+  idleAutoHeal      = 5,
+  idleTime          = 1800,
+  immunetoparalyzer = [[0]],
+  mass              = 217,
+  maxDamage         = 650,
+  maxSlope          = 36,
+  maxVelocity       = 1.7,
+  maxWaterDepth     = 22,
+  minCloakDistance  = 75,
+  movementClass     = [[KBOT4]],
+  noAutoFire        = false,
+  noChaseCategory   = [[TERRAFORM SATELLITE SUB]],
+  objectName        = [[punisher.s3o]],
+  seismicSignature  = 4,
+  selfDestructAs    = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes          = {
 
     explosiongenerators = {
       [[custom:shellshockflash]],
@@ -56,16 +51,15 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turnRate            = 538,
-  upright             = true,
-  workerTime          = 0,
+  side              = [[CORE]],
+  sightDistance     = 660,
+  smoothAnim        = true,
+  TEDClass          = [[KBOT]],
+  turnRate          = 538,
+  upright           = true,
+  workerTime        = 0,
 
-  weapons             = {
+  weapons           = {
 
     {
       def                = [[PLASMA]],
@@ -75,7 +69,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs        = {
 
     PLASMA = {
       name                    = [[Plasma Mortar]],
@@ -111,7 +105,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs       = {
 
     DEAD  = {
       description      = [[Wreckage - Punisher]],

@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Produces Airplanes, Builds at 6 m/s]],
   acceleration                  = 0,
   activateWhenBuilt             = false,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 550,
   buildCostMetal                = 550,
@@ -35,9 +34,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Produziert Flugzeuge]],
-    helptext       = [[The Airplane Plant offers a variety of fixed-wing aircraft to suit your needs. Choose between multirole fighters that can double as light attackers or specialized interceptors, and between precision bombers for taking down specific targets or their saturation counterparts for destroying swarms.]],
-	helptext_de    = [[Das Airplane Plant ermöglicht den Bau vielfältiger Starrflügelflugzeuge, um deine Bedürfnisse zu stillen. Wähle zwischen Allzweckjägern, die sowohl leichte Attacken fliegen können, als auch als Abfangjäger fungieren, und präzisen Bombern, um spezielle Ziele zu vernichten.]],
+    helptext = [[The Airplane Plant offers a variety of fixed-wing aircraft to suit your needs. Choose between multirole fighters that can double as light attackers or specialized interceptors, and between precision bombers for taking down specific targets or their saturation counterparts for destroying swarms.]],
     sortName = [[4]],
   },
 

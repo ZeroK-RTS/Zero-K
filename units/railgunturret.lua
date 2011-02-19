@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Splinter]],
   description                   = [[Railgun Turret (Anti-Armor)]],
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   buildCostEnergy               = 700,
   buildCostMetal                = 700,
   builder                       = false,
@@ -20,12 +19,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Schienenkanoneturm (Panzerbrechend)]],
-    helptext       = [[The Splinter's high velocity gauss cannon slices through enemy armor like a chainsaw through butter.]],
-	helptext_de    = [[Seine Hochgeschwindigkeits-Gauﬂkanone schneidet sich durch die feindliche Panzerung wie eine Kettens‰ge durch Butter.]],
+    helptext = [[The Splinter's high velocity gauss cannon slices through enemy armor like a chainsaw through butter.]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[LARGE_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 4,

@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Roost]],
   description                   = [[Spawns Big Chickens]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 4096,
   buildCostEnergy               = 0,
@@ -36,8 +35,6 @@ unitDef = {
   commander                     = false,
 
   customParams                  = {
-    description_de = [[Erzeugt groﬂe Chicken]],
-	helptext_de    = [[M‰chtige Kreaturen werden hier erzeugt und auf die Menschheit losgelassen.]],
     chickenFac = [[true]],
   },
 

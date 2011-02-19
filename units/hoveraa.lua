@@ -1,52 +1,47 @@
 unitDef = {
-  unitname            = [[hoveraa]],
-  name                = [[Flail]],
-  description         = [[AA Hover]],
-  acceleration        = 0.048,
-  bmcode              = [[1]],
-  brakeRate           = 0.043,
-  buildCostEnergy     = 300,
-  buildCostMetal      = 300,
-  builder             = false,
-  buildPic            = [[hoveraa.png]],
-  buildTime           = 300,
-  canAttack           = true,
-  canGuard            = true,
-  canHover            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[HOVER]],
-  corpse              = [[DEAD]],
+  unitname         = [[hoveraa]],
+  name             = [[Flail]],
+  description      = [[AA Hover]],
+  acceleration     = 0.048,
+  brakeRate        = 0.043,
+  buildCostEnergy  = 300,
+  buildCostMetal   = 300,
+  builder          = false,
+  buildPic         = [[hoveraa.png]],
+  buildTime        = 300,
+  canAttack        = true,
+  canGuard         = true,
+  canHover         = true,
+  canMove          = true,
+  canPatrol        = true,
+  canstop          = [[1]],
+  category         = [[HOVER]],
+  corpse           = [[DEAD]],
 
-  customParams        = {
-    description_de = [[Fulgabwehrgleiter]],
-    helptext       = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
-	helptext_de    = [[Der Flail verschieﬂt ein einzige, groﬂe SAM auf mittlerer Distanz, die wirklich groﬂen Schaden anrichtet.]],
+  customParams     = {
+    helptext = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[hoveraa]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 200,
-  maxDamage           = 1300,
-  maxSlope            = 36,
-  maxVelocity         = 3.54,
-  minCloakDistance    = 75,
-  movementClass       = [[HOVER3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName          = [[hoveraa.s3o]],
-  onoffable           = true,
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  explodeAs        = [[BIG_UNITEX]],
+  footprintX       = 3,
+  footprintZ       = 3,
+  iconType         = [[hoveraa]],
+  idleAutoHeal     = 5,
+  idleTime         = 1800,
+  mass             = 200,
+  maxDamage        = 1300,
+  maxSlope         = 36,
+  maxVelocity      = 3.54,
+  minCloakDistance = 75,
+  movementClass    = [[HOVER3]],
+  noAutoFire       = false,
+  noChaseCategory  = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
+  objectName       = [[hoveraa.s3o]],
+  onoffable        = true,
+  seismicSignature = 4,
+  selfDestructAs   = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes         = {
 
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
@@ -55,16 +50,15 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  turninplace         = 0,
-  turnRate            = 616,
-  workerTime          = 0,
+  side             = [[CORE]],
+  sightDistance    = 660,
+  smoothAnim       = true,
+  TEDClass         = [[TANK]],
+  turninplace      = 0,
+  turnRate         = 616,
+  workerTime       = 0,
 
-  weapons             = {
+  weapons          = {
 
     {
       def                = [[WEAPON]],
@@ -74,7 +68,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs       = {
 
     WEAPON = {
       name                    = [[Medium SAM]],
@@ -96,7 +90,6 @@ unitDef = {
       fireStarter             = 100,
       fixedlauncher           = true,
       flighttime              = 6,
-      guidance                = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -108,7 +101,6 @@ unitDef = {
       range                   = 800,
       reloadtime              = 5,
       renderType              = 1,
-      selfprop                = true,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/missile/vlaunch_hit]],
@@ -120,7 +112,6 @@ unitDef = {
       tracks                  = true,
       turnRate                = 64000,
       twoPhase                = true,
-      vlaunch                 = true,
       weaponAcceleration      = 300,
       weaponTimer             = 1,
       weaponType              = [[StarburstLauncher]],
@@ -130,7 +121,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs      = {
 
     DEAD  = {
       description      = [[Wreckage - Flail]],

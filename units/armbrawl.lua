@@ -1,65 +1,61 @@
 unitDef = {
-  unitname            = [[armbrawl]],
-  name                = [[Brawler]],
-  description         = [[Close Air Support Gunship]],
-  acceleration        = 0.24,
-  amphibious          = true,
-  bankscale           = [[1]],
-  bmcode              = [[1]],
-  brakeRate           = 4.41,
-  buildCostEnergy     = 850,
-  buildCostMetal      = 850,
-  builder             = false,
-  buildPic            = [[ARMBRAWL.png]],
-  buildTime           = 850,
-  canAttack           = true,
-  canFly              = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  canSubmerge         = false,
-  category            = [[GUNSHIP]],
-  collide             = true,
+  unitname               = [[armbrawl]],
+  name                   = [[Brawler]],
+  description            = [[Close Air Support Gunship]],
+  acceleration           = 0.24,
+  amphibious             = true,
+  bankscale              = [[1]],
+  brakeRate              = 4.41,
+  buildCostEnergy        = 850,
+  buildCostMetal         = 850,
+  builder                = false,
+  buildPic               = [[ARMBRAWL.png]],
+  buildTime              = 850,
+  canAttack              = true,
+  canFly                 = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  canSubmerge            = false,
+  category               = [[GUNSHIP]],
+  collide                = true,
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[60 20 60]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
-  cruiseAlt           = 210,
+  corpse                 = [[DEAD]],
+  cruiseAlt              = 210,
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Aeronave de ataque terrestre]],
+    description_de = [[Luftnaher Unterstützungskampfhubschrauber]],
     description_fr = [[ADAV d'Assaut Terrestre]],
-	description_de = [[Luftnaher Unterstützungskampfhubschrauber]],
-	helptext_de    = [[Der Brawler ist eine Angriffseinheit, die den meisten Bodenrakten ausweichen kann. Der Brawler besitzt genug Munition, um begrenztes Anti-Air Feuer zu überleben und seine Zwillings-EMGs zerfetzen die Panzerung als wäre es Papier.]],
     helptext       = [[The Brawler is an assault gunship that flies out of the reach of most ground mobiles. It has enough armor to survive limited anti-air fire, and its twin EMGs chew through composite armor as if it were paper.]],
     helptext_bp    = [[Brawler é a aeronave de assalto de Nova. Pode resistir fogo anti-aéreo considerável e destruir rapidamente o inimigo com suas metralhadoras de energia, mas ainda é aconselhável n?o envia-lá diretamente contra fogo anti-aéreo pesado.]],
+    helptext_de    = [[Der Brawler ist eine Angriffseinheit, die den meisten Bodenrakten ausweichen kann. Der Brawler besitzt genug Munition, um begrenztes Anti-Air Feuer zu überleben und seine Zwillings-EMGs zerfetzen die Panzerung als wäre es Papier.]],
     helptext_fr    = [[Le Brawler est un ADAV lourd, de par son blondage comme de par le calibre de ses mitrailleuses. Il peut donc résister r des défenses anti air assez longtemps pour s'en débarrasser. Un redoutable ADAV, mais cependant sans défense contre l'air.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
-  explodeAs           = [[GUNSHIPEX]],
-  floater             = true,
-  footprintX          = 3,
-  footprintZ          = 3,
-  hoverAttack         = true,
-  iconType            = [[heavygunship]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[1280]],
-  mass                = 322,
-  maxDamage           = 2400,
-  maxVelocity         = 4.7,
-  minCloakDistance    = 75,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName          = [[stingray.s3o]],
-  scale               = [[1]],
-  seismicSignature    = 0,
-  selfDestructAs      = [[GUNSHIPEX]],
+  explodeAs              = [[GUNSHIPEX]],
+  floater                = true,
+  footprintX             = 3,
+  footprintZ             = 3,
+  hoverAttack            = true,
+  iconType               = [[heavygunship]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  mass                   = 322,
+  maxDamage              = 2400,
+  maxVelocity            = 4.7,
+  minCloakDistance       = 75,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
+  objectName             = [[stingray.s3o]],
+  seismicSignature       = 0,
+  selfDestructAs         = [[GUNSHIPEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:brawlermuzzle]],
@@ -68,15 +64,14 @@ unitDef = {
 
   },
 
-  side                = [[ARM]],
-  sightDistance       = 480,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[VTOL]],
-  turnRate            = 792,
-  workerTime          = 0,
+  side                   = [[ARM]],
+  sightDistance          = 480,
+  smoothAnim             = true,
+  TEDClass               = [[VTOL]],
+  turnRate               = 792,
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[EMG]],
@@ -88,7 +83,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     EMG = {
       name                    = [[Heavy Pulse MG]],
@@ -134,7 +129,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Brawler]],

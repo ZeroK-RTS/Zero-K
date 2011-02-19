@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Pit Bull]],
   description                   = [[Ambush Rocket Turret]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 400,
   buildCostMetal                = 400,
@@ -25,12 +24,11 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Versteckter Raketenturm]],
-    helptext 	   = [[The Pit Bull is a compact, resilent turret with a medium-range rocket launcher. When popped down, it is very difficult to destroy, making it a good choice when the enemy is using artillery.]],
-	helptext_de	   = [[Der Pit Bull ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
+    helptext       = [[The Pit Bull is a compact, resilent turret with a medium-range rocket launcher. When popped down, it is very difficult to destroy, making it a good choice when the enemy is using artillery.]],
+    helptext_de    = [[Der Pit Bull ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zur?ckgezogen hat, ist es sehr schwer ihn zu zerst?ren, was ihn effektive gegen gegnerische Artillerie macht.]],
   },
 
   damageModifier                = 0.15,
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   digger                        = [[1]],
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 2,
@@ -50,13 +48,15 @@ unitDef = {
   objectName                    = [[ARMPB]],
   seismicSignature              = 16,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
- 
-  sfxtypes               = {
+
+  sfxtypes                      = {
+
     explosiongenerators = {
       [[custom:STORMMUZZLE]],
     },
-  }, 
-  
+
+  },
+
   side                          = [[ARM]],
   sightDistance                 = 660,
   smoothAnim                    = true,
@@ -93,7 +93,6 @@ unitDef = {
 
       fireStarter             = 70,
       flightTime              = 3,
-      guidance                = false,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -104,7 +103,6 @@ unitDef = {
       range                   = 560,
       reloadtime              = 1.5,
       renderType              = 1,
-      selfprop                = true,
       smokedelay              = [[.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/missile/sabot_hit]],

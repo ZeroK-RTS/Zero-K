@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Produces Energy (25)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 2048,
   buildCostEnergy               = 500,
@@ -24,9 +23,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Erzeugt Energie (25)]],
-    helptext       = [[Geothermal plants are highly efficient energy sources that can only be build on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent.]],
-	helptext_de    = [[Geothermische Anlagen sind hocheffiziente Energiequellen, die nur auf Thermalquellen auf der Karte gebaut werden können. Sie explodieren heftig, wenn sie zerstört werden. Von daher vermeide es, sie in unmittelbarer Nähe zu deiner Basis zu bauen.]],
+    helptext   = [[Geothermal plants are highly efficient energy sources that can only be build on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent.]],
     pylonrange = 250,
   },
 

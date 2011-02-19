@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Shipyard]],
   description            = [[Produces Ships, Builds at 6 m/s]],
   acceleration           = 0,
-  bmcode                 = [[0]],
   brakeRate              = 0,
   buildCostEnergy        = 550,
   buildCostMetal         = 550,
@@ -38,8 +37,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Produziert Schiffe, Baut mit 6 M/s]],
-	helptext_de    = [[Im Shipyard kannst du Schiffe jeder Art und für jeden Zweck bauen.]],
     sortName = [[7]],
   },
 
@@ -75,7 +72,7 @@ unitDef = {
 
   featureDefs            = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Shipyard]],
       blocking         = false,
       category         = [[corpses]],
@@ -95,8 +92,7 @@ unitDef = {
     },
 
 
-
-    HEAP  = {
+    HEAP = {
       description      = [[Debris - Shipyard]],
       blocking         = false,
       category         = [[heaps]],

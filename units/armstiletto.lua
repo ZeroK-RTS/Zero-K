@@ -1,62 +1,57 @@
 unitDef = {
-  unitname            = [[armstiletto]],
-  name                = [[Stiletto]],
-  description         = [[EMP Bomber]],
-  amphibious          = true,
-  buildCostEnergy     = 600,
-  buildCostMetal      = 600,
-  buildPic            = [[CORGRIPN.png]],
-  buildTime           = 600,
-  canAttack           = true,
-  canDropFlare        = false,
-  canFly              = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  canSubmerge         = false,
-  category            = [[FIXEDWING]],
-  collide             = false,
-  corpse              = [[DEAD]],
-  cruiseAlt           = 250,
+  unitname          = [[armstiletto]],
+  name              = [[Stiletto]],
+  description       = [[EMP Bomber]],
+  amphibious        = true,
+  buildCostEnergy   = 600,
+  buildCostMetal    = 600,
+  buildPic          = [[CORGRIPN.png]],
+  buildTime         = 600,
+  canAttack         = true,
+  canDropFlare      = false,
+  canFly            = true,
+  canGuard          = true,
+  canMove           = true,
+  canPatrol         = true,
+  canstop           = [[1]],
+  canSubmerge       = false,
+  category          = [[FIXEDWING]],
+  collide           = false,
+  corpse            = [[DEAD]],
+  cruiseAlt         = 250,
 
-  customParams        = {
-    description_de = [[EMP Bomber]],
-    helptext       = [[Sleek, fast and able to take a beating, the Stiletto drops EMP bombs that can paralyze an entire column of tanks in a single pass, rendering them helpless before allied forces.]],
-	helptext_de    = [[Geschmeidig, schnell, der Stiletto wirft Bomben mit dem Elektromagnetischer Puls ab, die ganze Reihen von Panzern in einem einzigen Abwurf paralysieren können.]],
+  customParams      = {
+    helptext = [[Sleek, fast and able to take a beating, the Stiletto drops EMP bombs that can paralyze an entire column of tanks in a single pass, rendering them helpless before allied forces.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
-  explodeAs           = [[GUNSHIPEX]],
-  floater             = true,
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[bomberriot]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  immunetoparalyzer   = [[1]],
-  maneuverleashlength = [[1380]],
-  mass                = 248,
-  maxAcc              = 0.5,
-  maxDamage           = 1130,
-  maxFuel             = 1000,
-  maxVelocity         = 12,
-  minCloakDistance    = 75,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName          = [[Stiletto.s3o]],
-  script              = [[Stiletto.lua]],
-  seismicSignature    = 0,
-  selfDestructAs      = [[GUNSHIPEX]],
-  side                = [[ARM]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  stealth             = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[VTOL]],
-  turnRate            = 396,
+  explodeAs         = [[GUNSHIPEX]],
+  floater           = true,
+  footprintX        = 3,
+  footprintZ        = 3,
+  iconType          = [[bomberriot]],
+  idleAutoHeal      = 5,
+  idleTime          = 1800,
+  immunetoparalyzer = [[1]],
+  mass              = 248,
+  maxAcc            = 0.5,
+  maxDamage         = 1130,
+  maxFuel           = 1000,
+  maxVelocity       = 12,
+  minCloakDistance  = 75,
+  noAutoFire        = false,
+  noChaseCategory   = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName        = [[Stiletto.s3o]],
+  script            = [[Stiletto.lua]],
+  seismicSignature  = 0,
+  selfDestructAs    = [[GUNSHIPEX]],
+  side              = [[ARM]],
+  sightDistance     = 660,
+  smoothAnim        = true,
+  stealth           = true,
+  TEDClass          = [[VTOL]],
+  turnRate          = 396,
 
-  weapons             = {
+  weapons           = {
 
     {
       def                = [[CORGRIPN_BOMB]],
@@ -68,7 +63,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs        = {
 
     CORGRIPN_BOMB = {
       name                    = [[EMPbomb]],
@@ -88,7 +83,6 @@ unitDef = {
         planes         = 1500,
       },
 
-      dropped                 = true,
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:ELECTRIC_EXPLOSION]],
       fireStarter             = 0,
@@ -112,7 +106,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs       = {
 
     DEAD  = {
       description      = [[Wreckage - Stiletto]],

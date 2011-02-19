@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Firewalker]],
   description            = [[Fire Support Walker (Artillery/Skirmish)]],
   acceleration           = 0.0984,
-  bmcode                 = [[1]],
   brakeRate              = 0.2392,
   buildCostEnergy        = 1300,
   buildCostMetal         = 1300,
@@ -23,12 +22,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Roboter mit Feuerunterstützung (Artillerie/Skrimish)]],
-    helptext       = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
-	helptext_de    = [[Der Firewalk verschießt seine Mörser auf mittlerer Distanz und erzeugt in den betroffenen Arealen eine Unbrauchbarkeit des Geländes für kurze Zeiträume. Die Einheit selber ist etwas schwerfällig und langsam im Manövrieren.]],
+    helptext = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
   },
 
-  defaultmissiontype     = [[Standby]],
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 4,
   footprintZ             = 4,
@@ -36,7 +32,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   immunetoparalyzer      = [[0]],
-  maneuverleashlength    = [[640]],
   mass                   = 347,
   maxDamage              = 1250,
   maxSlope               = 36,
@@ -64,7 +59,6 @@ unitDef = {
   side                   = [[CORE]],
   sightDistance          = 660,
   smoothAnim             = true,
-  steeringmode           = [[2]],
   TEDClass               = [[KBOT]],
   turnRate               = 538,
   upright                = true,

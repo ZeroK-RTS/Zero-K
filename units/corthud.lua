@@ -1,58 +1,53 @@
 unitDef = {
-  unitname            = [[corthud]],
-  name                = [[Thug]],
-  description         = [[Shielded Assault Bot]],
-  acceleration        = 0.114,
-  activateWhenBuilt   = true,
-  bmcode              = [[1]],
-  brakeRate           = 0.2275,
-  buildCostEnergy     = 160,
-  buildCostMetal      = 160,
-  builder             = false,
-  buildPic            = [[CORTHUD.png]],
-  buildTime           = 160,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
-  corpse              = [[DEAD]],
+  unitname          = [[corthud]],
+  name              = [[Thug]],
+  description       = [[Shielded Assault Bot]],
+  acceleration      = 0.114,
+  activateWhenBuilt = true,
+  brakeRate         = 0.2275,
+  buildCostEnergy   = 160,
+  buildCostMetal    = 160,
+  builder           = false,
+  buildPic          = [[CORTHUD.png]],
+  buildTime         = 160,
+  canAttack         = true,
+  canGuard          = true,
+  canMove           = true,
+  canPatrol         = true,
+  canstop           = [[1]],
+  category          = [[LAND]],
+  corpse            = [[DEAD]],
 
-  customParams        = {
+  customParams      = {
     description_bp = [[Robô assaltante]],
     description_fr = [[Robot d'Assaut]],
-	description_de = [[Sturmroboter mit Schild]],
     helptext       = [[Weak on its own, the Thug makes an excellent screen for Outlaws and Rogues. The linking shield gives Thugs strength in numbers, but can be defeated by AoE weapons or focus fire.]],
     helptext_bp    = [[Thug é um robô assaultante. Pode resistir muito dano, e é útil como um escudo para os mais fracos porém mais potentes Rogues.]],
     helptext_fr    = [[Le Thug est extraordinairement r?sistant pour sa taille. Si ses canons ? plasma n'ont pas la pr?cision requise pour abattre les cibles rapides, il reste n?anmoins un bouclier parfait pour des unit?s moins solides telles que les Rogues.]],
-	helptext_de    = [[Der Thug ist zwar für sich alleine ziemlich schwach, doch bietet er für Rogues und Outlaws eine gute Abschirmung. Der sich verbindende Schild erzeugt mehr Stärke, sobald sich mehrere Thugs zusammenschließen, kann aber durch AoE Waffen oder fokusiertes Feuer geschlagen werden.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[walkerassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  leaveTracks         = true,
-  maneuverleashlength = [[640]],
-  mass                = 147,
-  maxDamage           = 800,
-  maxSlope            = 36,
-  maxVelocity         = 1.925,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[thud.s3o]],
-  onoffable           = true,
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  explodeAs         = [[BIG_UNITEX]],
+  footprintX        = 2,
+  footprintZ        = 2,
+  iconType          = [[walkerassault]],
+  idleAutoHeal      = 5,
+  idleTime          = 1800,
+  leaveTracks       = true,
+  mass              = 147,
+  maxDamage         = 800,
+  maxSlope          = 36,
+  maxVelocity       = 1.925,
+  maxWaterDepth     = 22,
+  minCloakDistance  = 75,
+  movementClass     = [[KBOT2]],
+  noAutoFire        = false,
+  noChaseCategory   = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName        = [[thud.s3o]],
+  onoffable         = true,
+  seismicSignature  = 4,
+  selfDestructAs    = [[BIG_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes          = {
 
     explosiongenerators = {
       [[custom:THUDMUZZLE]],
@@ -62,22 +57,21 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 420,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  trackOffset         = 0,
-  trackStrength       = 8,
-  trackStretch        = 1,
-  trackType           = [[ComTrack]],
-  trackWidth          = 22,
-  turninplace         = 0,
-  turnRate            = 1099,
-  upright             = true,
-  workerTime          = 0,
+  side              = [[CORE]],
+  sightDistance     = 420,
+  smoothAnim        = true,
+  TEDClass          = [[KBOT]],
+  trackOffset       = 0,
+  trackStrength     = 8,
+  trackStretch      = 1,
+  trackType         = [[ComTrack]],
+  trackWidth        = 22,
+  turninplace       = 0,
+  turnRate          = 1099,
+  upright           = true,
+  workerTime        = 0,
 
-  weapons             = {
+  weapons           = {
 
     {
       def                = [[THUD_WEAPON]],
@@ -93,7 +87,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs        = {
 
     SHIELD      = {
       name                    = [[Energy Shield]],
@@ -158,7 +152,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs       = {
 
     DEAD  = {
       description      = [[Wreckage - Thug]],

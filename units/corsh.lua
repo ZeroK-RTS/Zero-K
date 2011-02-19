@@ -1,53 +1,48 @@
 unitDef = {
-  unitname            = [[corsh]],
-  name                = [[Scrubber]],
-  description         = [[Fast Attack Hovercraft]],
-  acceleration        = 0.066,
-  bmcode              = [[1]],
-  brakeRate           = 0.0835,
-  buildCostEnergy     = 90,
-  buildCostMetal      = 90,
-  builder             = false,
-  buildPic            = [[CORSH.png]],
-  buildTime           = 90,
-  canAttack           = true,
-  canGuard            = true,
-  canHover            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[HOVER]],
-  corpse              = [[DEAD]],
+  unitname         = [[corsh]],
+  name             = [[Scrubber]],
+  description      = [[Fast Attack Hovercraft]],
+  acceleration     = 0.066,
+  brakeRate        = 0.0835,
+  buildCostEnergy  = 90,
+  buildCostMetal   = 90,
+  builder          = false,
+  buildPic         = [[CORSH.png]],
+  buildTime        = 90,
+  canAttack        = true,
+  canGuard         = true,
+  canHover         = true,
+  canMove          = true,
+  canPatrol        = true,
+  canstop          = [[1]],
+  category         = [[HOVER]],
+  corpse           = [[DEAD]],
 
-  customParams        = {
+  customParams     = {
     description_fr = [[Hovercraft d'Attaque Éclair]],
-	description_de = [[Schnellangriff Luftkissenboot]],
     helptext       = [[The Scrubber is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of oppurtunity.]],
     helptext_fr    = [[Le Scrubber est petit, maniable, rapide et n'a qu'une faible puissance de feu. Idéal pour les attaques surprises depuis la mer, il surprendra bien des ennemis. Son blindage est cependant trop faible pour faire face r une quelquonque résistance. ]],
-	helptext_de    = [[Der Scrubber ist der Aufklärer unter den Luftkissenbooten. Es bietet dir eine kostengünstige, entbehrliche Möglichkeit deinen Feind frühzeitig um seine Rohstoffquellen zu bringen.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[SMALL_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[hoverraider]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 97,
-  maxDamage           = 300,
-  maxSlope            = 36,
-  maxVelocity         = 4.8,
-  minCloakDistance    = 75,
-  movementClass       = [[HOVER3]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[CORSH.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[SMALL_UNITEX]],
+  explodeAs        = [[SMALL_UNITEX]],
+  footprintX       = 2,
+  footprintZ       = 2,
+  iconType         = [[hoverraider]],
+  idleAutoHeal     = 5,
+  idleTime         = 1800,
+  mass             = 97,
+  maxDamage        = 300,
+  maxSlope         = 36,
+  maxVelocity      = 4.8,
+  minCloakDistance = 75,
+  movementClass    = [[HOVER3]],
+  noAutoFire       = false,
+  noChaseCategory  = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName       = [[CORSH.s3o]],
+  seismicSignature = 4,
+  selfDestructAs   = [[SMALL_UNITEX]],
 
-  sfxtypes            = {
+  sfxtypes         = {
 
     explosiongenerators = {
       [[custom:HOVERS_ON_GROUND]],
@@ -56,16 +51,15 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 450,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
-  turninplace         = 0,
-  turnRate            = 673,
-  workerTime          = 0,
+  side             = [[CORE]],
+  sightDistance    = 450,
+  smoothAnim       = true,
+  TEDClass         = [[TANK]],
+  turninplace      = 0,
+  turnRate         = 673,
+  workerTime       = 0,
 
-  weapons             = {
+  weapons          = {
 
     {
       def                = [[GAUSS]],
@@ -76,7 +70,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs       = {
 
     GAUSS = {
       name                    = [[Gauss Cannon]],
@@ -116,8 +110,8 @@ unitDef = {
       soundHit                = [[weapon/gauss_hit]],
       soundHitVolume          = 2.5,
       soundStart              = [[weapon/gauss_fire]],
-	  soundTrigger            = true,
       soundStartVolume        = 2,
+      soundTrigger            = true,
       sprayangle              = 400,
       stages                  = 32,
       startsmoke              = [[1]],
@@ -130,7 +124,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs      = {
 
     DEAD  = {
       description      = [[Wreckage - Scrubber]],

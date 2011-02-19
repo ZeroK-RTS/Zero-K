@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Produces Energy (100) - HAZARDOUS]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 0,
   buildCostEnergy               = 1500,
@@ -24,9 +23,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Erzeugt Energie (100) - RISKANT]],	
-    helptext_de    = [[Das  Moho Geothermisches Kraftwerk erzeugt eine groﬂe Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar.]],
-    pylonrange = 600,
+    description_de = [[Erzeugt Energie (100) - RISKANT]],
+    helptext_de    = [[Das  Moho Geothermisches Kraftwerk erzeugt eine gro?e Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar.]],
+    pylonrange     = 600,
   },
 
   energyMake                    = 100,
@@ -59,7 +58,7 @@ unitDef = {
 
   featureDefs                   = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Moho Geothermal Powerplant]],
       blocking         = true,
       category         = [[corpses]],
@@ -79,7 +78,8 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-    HEAP  = {
+
+    HEAP = {
       description      = [[Debris - Moho Geothermal Powerplant]],
       blocking         = false,
       category         = [[heaps]],

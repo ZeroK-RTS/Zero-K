@@ -1,66 +1,63 @@
 unitDef = {
-  unitname            = [[armaak]],
-  name                = [[Archangel]],
-  description         = [[Heavy Anti-Air Walker]],
-  acceleration        = 0.12,
-  bmcode              = [[1]],
-  brakeRate           = 0.1942,
-  buildCostEnergy     = 550,
-  buildCostMetal      = 550,
-  buildPic            = [[ARMAAK.png]],
-  buildTime           = 550,
-  canMove             = true,
-  category            = [[LAND]],
-  corpse              = [[DEAD]],
+  unitname         = [[armaak]],
+  name             = [[Archangel]],
+  description      = [[Heavy Anti-Air Walker]],
+  acceleration     = 0.12,
+  brakeRate        = 0.1942,
+  buildCostEnergy  = 550,
+  buildCostMetal   = 550,
+  buildPic         = [[ARMAAK.png]],
+  buildTime        = 550,
+  canMove          = true,
+  category         = [[LAND]],
+  corpse           = [[DEAD]],
 
-  customParams        = {
+  customParams     = {
     canjump        = [[1]],
     description_bp = [[Robô anti-ar pesado]],
     description_fi = [[Korkeatehoinen ilmatorjuntarobotti]],
     description_fr = [[Marcheur Anti-Air Lourd]],
     helptext       = [[The Archangel packs twin AA lasers and an autocannon for slaying enemy aircraft rapidly.]],
-	helptext_de    = [[Der Archangel besitzt ein Doppel-Anti-Air-Laser und eine automatische Kanone, um gegnerische Lufteinheiten zu zerstören.]],
     helptext_bp    = [[]],
+    helptext_de    = [[Der Archangel besitzt ein Doppel-Anti-Air-Laser und eine automatische Kanone, um gegnerische Lufteinheiten zu zerstören.]],
     helptext_fi    = [[Archangel:in kaksoislaserit sek? automaattitykki tuhoavat vihollisen ilma-alukset tehokkaasti ja nopeasti.]],
     helptext_fr    = [[L'Archangel est munis d'un laser double anti air et d'un autocannon similaire au packo pour pouvoir an?antire les avions enemis.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
-  footprintX          = 2,
-  footprintZ          = 2,
-  iconType            = [[jumpjetaa]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[640]],
-  mass                = 236,
-  maxDamage           = 1020,
-  maxSlope            = 36,
-  maxVelocity         = 2.017,
-  maxWaterDepth       = 22,
-  minCloakDistance    = 75,
-  movementClass       = [[KBOT2]],
-  moveState           = 0,
-  noChaseCategory     = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName          = [[hunchback.s3o]],
-  seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[ARM]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turninplace         = 0,
-  turnRate            = 1026,
-  upright             = true,
+  explodeAs        = [[BIG_UNITEX]],
+  footprintX       = 2,
+  footprintZ       = 2,
+  iconType         = [[jumpjetaa]],
+  idleAutoHeal     = 5,
+  idleTime         = 1800,
+  mass             = 236,
+  maxDamage        = 1020,
+  maxSlope         = 36,
+  maxVelocity      = 2.017,
+  maxWaterDepth    = 22,
+  minCloakDistance = 75,
+  movementClass    = [[KBOT2]],
+  moveState        = 0,
+  noChaseCategory  = [[TERRAFORM LAND SINK SHIP SATELLITE SWIM FLOAT SUB HOVER]],
+  objectName       = [[hunchback.s3o]],
+  seismicSignature = 4,
+  selfDestructAs   = [[BIG_UNITEX]],
+  side             = [[ARM]],
+  sightDistance    = 660,
+  smoothAnim       = true,
+  TEDClass         = [[KBOT]],
+  turninplace      = 0,
+  turnRate         = 1026,
+  upright          = true,
 
-  weapons             = {
+  weapons          = {
 
     {
       def                = [[LASER]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
+
 
     {
       def                = [[EMG]],
@@ -71,9 +68,9 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs       = {
 
-    EMG           = {
+    EMG   = {
       name                    = [[Anti-Air Autocannon]],
       accuracy                = 512,
       alphaDecay              = 0.7,
@@ -119,11 +116,10 @@ unitDef = {
     },
 
 
-    LASER         = {
+    LASER = {
       name                    = [[Anti-Air Laser Battery]],
       areaOfEffect            = 12,
       beamDecay               = 0.736,
-      beamlaser               = 1,
       beamTime                = 0.01,
       beamttl                 = 15,
       canattackground         = false,
@@ -164,9 +160,9 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs      = {
 
-    DEAD  = {
+    DEAD = {
       description      = [[Wreckage - Archangel]],
       blocking         = true,
       category         = [[corpses]],
@@ -187,7 +183,7 @@ unitDef = {
     },
 
 
-    HEAP  = {
+    HEAP = {
       description      = [[Debris - Archangel]],
       blocking         = false,
       category         = [[heaps]],

@@ -1,54 +1,49 @@
 unitDef = {
-  unitname            = [[chicken_leaper]],
-  name                = [[Leaper]],
-  description         = [[Raider]],
-  acceleration        = 0.5,
-  bmcode              = [[1]],
-  brakeRate           = 0.205,
-  buildCostEnergy     = 0,
-  buildCostMetal      = 0,
-  builder             = false,
-  buildPic            = [[chicken_leaper.png]],
-  buildTime           = 100,
-  canAttack           = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  category            = [[LAND]],
+  unitname         = [[chicken_leaper]],
+  name             = [[Leaper]],
+  description      = [[Raider]],
+  acceleration     = 0.5,
+  brakeRate        = 0.205,
+  buildCostEnergy  = 0,
+  buildCostMetal   = 0,
+  builder          = false,
+  buildPic         = [[chicken_leaper.png]],
+  buildTime        = 100,
+  canAttack        = true,
+  canGuard         = true,
+  canMove          = true,
+  canPatrol        = true,
+  canstop          = [[1]],
+  category         = [[LAND]],
 
-  customParams        = {
+  customParams     = {
     description_fr = [[Sauteur de combat]],
-	description_de = [[Raider]],
     helptext       = [[The Leaper is the chicken's fast attack unit, running down enemies and leaping over obstacles.]],
     helptext_fr    = [[Le Leaper est l'unit? d'attaque rapide des poulets, plongeant sur l'enemi et sautant les obstacles sur sa route.]],
-	helptext_de    = [[Der Leaper ist die am schnellsten angreifende Chickeneinheit. Er überrennt die Gegner und kann Hindernisse überspringen.]],
   },
 
-  defaultmissiontype  = [[Standby]],
-  explodeAs           = [[NOWEAPON]],
-  floater             = false,
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[chickenleaper]],
-  idleAutoHeal        = 20,
-  idleTime            = 300,
-  leaveTracks         = false,
-  maneuverleashlength = [[640]],
-  mass                = 115,
-  maxDamage           = 520,
-  maxSlope            = 36,
-  maxVelocity         = 5.2,
-  minCloakDistance    = 75,
-  movementClass       = [[AKBOT2]],
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
-  objectName          = [[chicken_leaper.s3o]],
-  power               = 100,
-  seismicSignature    = 4,
-  selfDestructAs      = [[NOWEAPON]],
+  explodeAs        = [[NOWEAPON]],
+  floater          = false,
+  footprintX       = 3,
+  footprintZ       = 3,
+  iconType         = [[chickenleaper]],
+  idleAutoHeal     = 20,
+  idleTime         = 300,
+  leaveTracks      = false,
+  mass             = 115,
+  maxDamage        = 520,
+  maxSlope         = 36,
+  maxVelocity      = 5.2,
+  minCloakDistance = 75,
+  movementClass    = [[AKBOT2]],
+  noAutoFire       = false,
+  noChaseCategory  = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
+  objectName       = [[chicken_leaper.s3o]],
+  power            = 100,
+  seismicSignature = 4,
+  selfDestructAs   = [[NOWEAPON]],
 
-  sfxtypes            = {
+  sfxtypes         = {
 
     explosiongenerators = {
       [[custom:blood_spray]],
@@ -58,16 +53,15 @@ unitDef = {
 
   },
 
-  side                = [[THUNDERBIRDS]],
-  sightDistance       = 256,
-  smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
-  turnRate            = 1600,
-  upright             = true,
-  workerTime          = 0,
+  side             = [[THUNDERBIRDS]],
+  sightDistance    = 256,
+  smoothAnim       = true,
+  TEDClass         = [[KBOT]],
+  turnRate         = 1600,
+  upright          = true,
+  workerTime       = 0,
 
-  weapons             = {
+  weapons          = {
 
     {
       def                = [[WEAPON]],
@@ -79,7 +73,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs       = {
 
     WEAPON = {
       name                    = [[Kick]],

@@ -4,7 +4,6 @@ unitDef = {
   description           = [[Trap Mine]],
   acceleration          = 0,
   activateWhenBuilt     = false,
-  bmcode                = [[0]],
   brakeRate             = 0,
   buildCostEnergy       = 200,
   buildCostMetal        = 200,
@@ -20,12 +19,9 @@ unitDef = {
   cloakCost             = 0,
 
   customParams          = {
-    description_de = [[Landmine]],
-	helptext_de    = [[Sobald sich feindliche Einheiten in die Reichweite dieser Mine begeben, explodiert diese und reiﬂt gegebenenfalls dutzend Feinde mit in die Luft.]],
-    dontCount      = [[1]],
+    dontCount = [[1]],
   },
 
-  defaultmissiontype    = [[Standby_Mine]],
   explodeAs             = [[MINE_CORE]],
   footprintX            = 1,
   footprintZ            = 1,

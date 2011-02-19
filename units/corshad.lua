@@ -1,61 +1,57 @@
 unitDef = {
-  unitname            = [[corshad]],
-  name                = [[Shadow]],
-  description         = [[Precision Bomber]],
-  amphibious          = true,
-  buildCostEnergy     = 500,
-  buildCostMetal      = 500,
-  builder             = false,
-  buildPic            = [[CORSHAD.png]],
-  buildTime           = 500,
-  canAttack           = true,
-  canFly              = true,
-  canGuard            = true,
-  canMove             = true,
-  canPatrol           = true,
-  canstop             = [[1]],
-  canSubmerge         = false,
-  category            = [[FIXEDWING]],
-  collide             = false,
+  unitname               = [[corshad]],
+  name                   = [[Shadow]],
+  description            = [[Precision Bomber]],
+  amphibious             = true,
+  buildCostEnergy        = 500,
+  buildCostMetal         = 500,
+  builder                = false,
+  buildPic               = [[CORSHAD.png]],
+  buildTime              = 500,
+  canAttack              = true,
+  canFly                 = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  canSubmerge            = false,
+  category               = [[FIXEDWING]],
+  collide                = false,
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[85 20 40]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
-  corpse              = [[DEAD]],
-  cruiseAlt           = 200,
+  corpse                 = [[DEAD]],
+  cruiseAlt              = 200,
 
-  customParams        = {
+  customParams           = {
     description_bp = [[Bombardeiro de precis?o]],
     description_fr = [[Bombardier de Précision]],
-	description_de = [[Präzisionsbomber]],
     helptext       = [[The Shadow drops a single high damage, low AoE bomb. Cost for cost, nothing quite matches it for taking out that antinuke or Reaper, but you should look elsewhere for something to use against smaller mobiles.]],
     helptext_bp    = [[Shadow lança uma única bomba a cada ataque, com pouca área de efeito mas grande poder. Em matéria de custo-benefício, é eficiente contra alvos caros e imóveis, mas funciona mal contra unidades móveis principalmente devido a dificuldade de acertar um alvo móvel com uma única bomba.]],
     helptext_fr    = [[Le Shadow largue des bombes de haute précision, parfait pour les frappes chirurgicales comme une défense antimissile ou une tourelle genante, mais peu efficace contre une armée massive.]],
-	helptext_de    = [[Der Shadow wirft eine einzige Bombe mit hohem Schaden ab. Ideal fungiert er dazu, einzelne, strategisch wichtige Gebäude wie z.B. Anti-Atom zu zerstören, um dann mit seinen Haupteinheiten einzufallen. Kleinere Einheiten werden aber nur schwelich getroffen und sollten von daher auf anderem Wege bekämpft werden.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
-  explodeAs           = [[GUNSHIPEX]],
-  floater             = true,
-  footprintX          = 3,
-  footprintZ          = 3,
-  iconType            = [[bomberassault]],
-  idleAutoHeal        = 5,
-  idleTime            = 1800,
-  maneuverleashlength = [[1380]],
-  mass                = 231,
-  maxAcc              = 0.5,
-  maxDamage           = 1125,
-  maxFuel             = 1000,
-  maxVelocity         = 9,
-  minCloakDistance    = 75,
-  noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName          = [[spirit.s3o]],
-  seismicSignature    = 0,
-  selfDestructAs      = [[GUNSHIPEX]],
+  explodeAs              = [[GUNSHIPEX]],
+  floater                = true,
+  footprintX             = 3,
+  footprintZ             = 3,
+  iconType               = [[bomberassault]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  mass                   = 231,
+  maxAcc                 = 0.5,
+  maxDamage              = 1125,
+  maxFuel                = 1000,
+  maxVelocity            = 9,
+  minCloakDistance       = 75,
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  objectName             = [[spirit.s3o]],
+  seismicSignature       = 0,
+  selfDestructAs         = [[GUNSHIPEX]],
 
-  sfxtypes            = {
+  sfxtypes               = {
 
     explosiongenerators = {
       [[custom:light_red]],
@@ -64,13 +60,13 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
-  sightDistance       = 660,
-  smoothAnim          = true,
-  TEDClass            = [[VTOL]],
-  workerTime          = 0,
+  side                   = [[CORE]],
+  sightDistance          = 660,
+  smoothAnim             = true,
+  TEDClass               = [[VTOL]],
+  workerTime             = 0,
 
-  weapons             = {
+  weapons                = {
 
     {
       def                = [[BOGUS_BOMB]],
@@ -89,7 +85,7 @@ unitDef = {
   },
 
 
-  weaponDefs          = {
+  weaponDefs             = {
 
     BOGUS_BOMB = {
       name                    = [[Fake Bomb]],
@@ -102,7 +98,6 @@ unitDef = {
         default = 0,
       },
 
-      dropped                 = true,
       edgeEffectiveness       = 0,
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
@@ -141,7 +136,6 @@ unitDef = {
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
       flightTime              = 2,
-      guidance                = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -151,7 +145,6 @@ unitDef = {
       range                   = 600,
       reloadtime              = 5,
       renderType              = 1,
-      selfprop                = true,
       smokedelay              = [[0.1]],
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
@@ -173,7 +166,7 @@ unitDef = {
   },
 
 
-  featureDefs         = {
+  featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Shadow]],
