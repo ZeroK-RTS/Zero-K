@@ -198,6 +198,16 @@ upgrades = {
 				unitDef.energymake = (unitDef.energymake or 0) + 4
 			end,
 	},		
+	module_adv_targeting = {
+		name = "Advanced Targeting System",
+		description = "Extends range of all weapons by 10%",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					if v.range then v.range = v.range * 1.1 end
+				end
+			end,	
+	},
 	
 	module_cloak_field = {
 		name = "Cloaking Field",

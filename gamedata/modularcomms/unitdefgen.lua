@@ -89,6 +89,8 @@ local function ProcessComm(name, config)
 				if upgrades[moduleName] then
 					Spring.Echo("\tApplying upgrade: "..moduleName)
 					upgrades[moduleName].func(commDefs[name])	--apply upgrade function
+					cp.morphCost = tostring(cp.morphCost + (upgrades[moduleName].morphCost or 0))
+					cp.morphTime = tostring(cp.morphTime + (upgrades[moduleName].morphTime or 0))
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end
@@ -117,6 +119,13 @@ end
 ProcessComm("testDef", stressTestDef)
 commDefs.testDef = nil
 
+-- for easy testing; creates a comm with unitName testcomm
+local testDef = {
+	chassis = "armcom",
+	name = "Skunkworker",
+	modules = {"commweapon_shotgun", "module_adv_targeting"},
+}
+ProcessComm("testcomm", testDef)
 
 --set weapon1 range	- may need exception list in future depending on what weapons we add
 for name, data in pairs(commDefs) do
