@@ -39,7 +39,7 @@ local RESTORE_DELAY_DGUN = 1000
 
 local function WalkArms()
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -1  )
+		Move( pelvis , y_axis, -1*2.5  )
 		Move( bigflsh , x_axis, 0  )
 		Move( mlasflsh , y_axis, 0  )
 		Move( mlasflsh , z_axis, 0  )
@@ -232,7 +232,7 @@ end
 
 local function WalkNoArms()
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -1  )
+		Move( pelvis , y_axis, -1*2.5  )
 		Move( bigflsh , x_axis, 0  )
 		Move( mlasflsh , y_axis, 0  )
 		Move( mlasflsh , z_axis, 0  )

@@ -1,4 +1,6 @@
-piece hips,gun,chest,rthigh,lthigh,lshin,rshin,rfoot,lfoot,muzzle, exhaust, turner;
+//linear constant 163840
+
+piece hips,gun,chest,rthigh,lthigh,lshin,rshin,rfoot,lfoot,muzzle, exhaust, turner, aimpoint;
 
 static-var isMoving, isAiming, shooting_num;
 
@@ -7,8 +9,7 @@ static-var isMoving, isAiming, shooting_num;
 #define SIG_AIM_2			4
 #define SIG_MOVE			16
 
-#include "sfxtype.h"
-#include "exptype.h"		
+#include "constants.h"		
 
 DamageControl()
 {
@@ -165,17 +166,12 @@ Create()
 	start-script MotionControl();	
 	start-script DamageControl();
 	Turn chest to y-axis <-20> now;
-	Turn gun to x-axis <5> now;
+	//Turn gun to x-axis <5> now;
 }
-	
-SweetSpot(piecenum)
-{
-	piecenum=turner;
-}	
 	
 AimFromWeapon1(piecenum)
 {
-	piecenum=turner;
+	piecenum=aimpoint;
 }
 
 QueryWeapon1(piecenum)
@@ -201,7 +197,7 @@ AimWeapon1(heading,pitch)
 	isAiming = TRUE;
 	turn hips to x-axis <0> now;
 	turn turner to x-axis <0> now; 
-	turn turner to y-axis heading speed <180>;
+	turn turner to y-axis heading + <5> speed <180>;
 	turn gun to x-axis <0> - pitch speed <90>;
 	wait-for-turn turner around y-axis;
 	wait-for-turn gun around x-axis;

@@ -37,8 +37,8 @@ end
 
 local function WalkArms()
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.700000  )
-		Move( head , y_axis, -0.000006  )
+		Move( pelvis , y_axis, -0.700000*2.5  )
+		Move( head , y_axis, -0.000006*2.5  )
 		Turn( pelvis , x_axis, math.rad(6.681319) )
 		Turn( lthigh , x_axis, math.rad(-41.846154) )
 		Turn( rthigh , x_axis, math.rad(17.582418) )
@@ -56,7 +56,7 @@ local function WalkArms()
 		Sleep(40)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.550000  )
+		Move( pelvis , y_axis, -0.550000*2.5  )
 		Turn( pelvis , x_axis, math.rad(5.274725) )
 		Turn( lthigh , x_axis, math.rad(-29.538462) )
 		Turn( rthigh , x_axis, math.rad(8.791209) )
@@ -68,7 +68,7 @@ local function WalkArms()
 		Sleep(100)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.300000  )
+		Move( pelvis , y_axis, -0.300000*2.5  )
 		Turn( pelvis , x_axis, math.rad(4.571429) )
 		Turn( lthigh , x_axis, math.rad(-16.175824) )
 		Turn( rthigh , x_axis, 0 )
@@ -80,7 +80,7 @@ local function WalkArms()
 		Sleep(90)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0.000000  )
+		Move( pelvis , y_axis, 0.000000*2.5  )
 		Turn( pelvis , x_axis, math.rad(3.516484) )
 		Turn( lthigh , x_axis, math.rad(7.032967) )
 		Turn( rthigh , x_axis, math.rad(-6.329670) )
@@ -92,7 +92,7 @@ local function WalkArms()
 		Sleep(90)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.200000  )
+		Move( pelvis , y_axis, -0.200000*2.5  )
 		Turn( pelvis , x_axis, math.rad(4.571429) )
 		Turn( lthigh , x_axis, math.rad(10.901099) )
 		Turn( rthigh , x_axis, math.rad(-34.461538) )
@@ -104,7 +104,7 @@ local function WalkArms()
 		Sleep(80)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.300000  )
+		Move( pelvis , y_axis, -0.300000*2.5  )
 		Turn( lthigh , x_axis, math.rad(13.010989) )
 		Turn( rthigh , x_axis, math.rad(-42.901099) )
 		Turn( torso , y_axis, math.rad(-2.461538) )
@@ -114,7 +114,7 @@ local function WalkArms()
 		Sleep(70)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.400000  )
+		Move( pelvis , y_axis, -0.400000*2.5  )
 		Turn( pelvis , x_axis, math.rad(5.274725) )
 		Turn( lthigh , x_axis, math.rad(16.879121) )
 		Turn( rthigh , x_axis, math.rad(-48.175824) )
@@ -126,7 +126,7 @@ local function WalkArms()
 		Sleep(80)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.700000  )
+		Move( pelvis , y_axis, -0.700000*2.5  )
 		Turn( pelvis , x_axis, math.rad(6.681319) )
 		Turn( lthigh , x_axis, math.rad(15.472527) )
 		Turn( rthigh , x_axis, math.rad(-40.439560) )
@@ -143,7 +143,7 @@ local function WalkArms()
 		Sleep(40)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.550000  )
+		Move( pelvis , y_axis, -0.550000*2.5  )
 		Turn( pelvis , x_axis, math.rad(5.274725) )
 		Turn( lthigh , x_axis, math.rad(9.489011) )
 		Turn( rthigh , x_axis, math.rad(-34.461538) )
@@ -154,7 +154,7 @@ local function WalkArms()
 		Sleep(100)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.300000  )
+		Move( pelvis , y_axis, -0.300000*2.5  )
 		Turn( pelvis , x_axis, math.rad(4.571429) )
 		Turn( lthigh , x_axis, math.rad(0.703297) )
 		Turn( rthigh , x_axis, math.rad(-26.373626) )
@@ -177,7 +177,7 @@ local function WalkArms()
 		Sleep(80)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.200000  )
+		Move( pelvis , y_axis, -0.200000*2.5  )
 		Turn( pelvis , x_axis, math.rad(4.571429) )
 		Turn( lthigh , x_axis, math.rad(-29.538462) )
 		Turn( rthigh , x_axis, math.rad(10.192308) )
@@ -189,7 +189,7 @@ local function WalkArms()
 		Sleep(80)
 	end
 	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.300000  )
+		Move( pelvis , y_axis, -0.300000*2.5  )
 		Turn( lthigh , x_axis, math.rad(-43.950549) )
 		Turn( rthigh , x_axis, math.rad(12.302198) )
 		Turn( torso , y_axis, math.rad(2.461538) )
@@ -198,7 +198,7 @@ local function WalkArms()
 		Turn( lleg , x_axis, math.rad(55.912088) )
 		Sleep(70)
 	end
-	Move( pelvis , y_axis, -0.400000  )
+	Move( pelvis , y_axis, -0.400000*2.5  )
 	Turn( pelvis , x_axis, math.rad(5.274725) )
 	Turn( lthigh , x_axis, math.rad(-43.950549) )
 	Turn( rthigh , x_axis, math.rad(14.412088) )
@@ -212,8 +212,8 @@ end
 local function WalkNoArms()
 	if (isLasering or isDgunning) and isMoving  then
 	
-		Move( pelvis , y_axis, -0.700000  )
-		Move( head , y_axis, -0.000006  )
+		Move( pelvis , y_axis, -0.700000*2.5  )
+		Move( head , y_axis, -0.000006*2.5  )
 		Turn( pelvis , x_axis, math.rad(6.681319) )
 		Turn( lthigh , x_axis, math.rad(-41.846154) )
 		Turn( rthigh , x_axis, math.rad(17.582418) )
@@ -225,7 +225,7 @@ local function WalkNoArms()
 		Sleep(40)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.550000  )
+		Move( pelvis , y_axis, -0.550000*2.5  )
 		Turn( pelvis , x_axis, math.rad(5.274725) )
 		Turn( lthigh , x_axis, math.rad(-29.538462) )
 		Turn( rthigh , x_axis, math.rad(8.791209) )
@@ -234,7 +234,7 @@ local function WalkNoArms()
 		Sleep(100)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.300000  )
+		Move( pelvis , y_axis, -0.300000*2.5  )
 		Turn( pelvis , x_axis, math.rad(4.571429) )
 		Turn( lthigh , x_axis, math.rad(-16.175824) )
 		Turn( rthigh , x_axis, 0 )
@@ -243,7 +243,7 @@ local function WalkNoArms()
 		Sleep(90)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0.000000  )
+		Move( pelvis , y_axis, 0.000000*2.5  )
 		Turn( pelvis , x_axis, math.rad(3.516484) )
 		Turn( lthigh , x_axis, math.rad(7.032967) )
 		Turn( rthigh , x_axis, math.rad(-6.329670) )
@@ -252,7 +252,7 @@ local function WalkNoArms()
 		Sleep(90)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.200000  )
+		Move( pelvis , y_axis, -0.200000*2.5  )
 		Turn( pelvis , x_axis, math.rad(4.571429) )
 		Turn( lthigh , x_axis, math.rad(10.901099) )
 		Turn( rthigh , x_axis, math.rad(-34.461538) )
@@ -261,14 +261,14 @@ local function WalkNoArms()
 		Sleep(80)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.300000  )
+		Move( pelvis , y_axis, -0.300000*2.5  )
 		Turn( lthigh , x_axis, math.rad(13.010989) )
 		Turn( rthigh , x_axis, math.rad(-42.901099) )
 		Turn( rleg , x_axis, math.rad(54.505495) )
 		Sleep(70)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.400000  )
+		Move( pelvis , y_axis, -0.400000*2.5  )
 		Turn( pelvis , x_axis, math.rad(5.274725) )
 		Turn( lthigh , x_axis, math.rad(16.879121) )
 		Turn( rthigh , x_axis, math.rad(-48.175824) )
@@ -277,7 +277,7 @@ local function WalkNoArms()
 		Sleep(80)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.700000  )
+		Move( pelvis , y_axis, -0.700000*2.5  )
 		Turn( pelvis , x_axis, math.rad(6.681319) )
 		Turn( lthigh , x_axis, math.rad(15.472527) )
 		Turn( rthigh , x_axis, math.rad(-40.439560) )
@@ -289,7 +289,7 @@ local function WalkNoArms()
 		Sleep(40)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.550000  )
+		Move( pelvis , y_axis, -0.550000*2.5  )
 		Turn( pelvis , x_axis, math.rad(5.274725) )
 		Turn( lthigh , x_axis, math.rad(9.489011) )
 		Turn( rthigh , x_axis, math.rad(-34.461538) )
@@ -297,7 +297,7 @@ local function WalkNoArms()
 		Sleep(100)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.300000  )
+		Move( pelvis , y_axis, -0.300000*2.5  )
 		Turn( pelvis , x_axis, math.rad(4.571429) )
 		Turn( lthigh , x_axis, math.rad(0.703297) )
 		Turn( rthigh , x_axis, math.rad(-26.373626) )
@@ -305,7 +305,7 @@ local function WalkNoArms()
 		Sleep(90)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0.000000  )
+		Move( pelvis , y_axis, 0.000000*2.5  )
 		Turn( pelvis , x_axis, math.rad(3.516484) )
 		Turn( lthigh , x_axis, math.rad(-16.879121) )
 		Turn( rthigh , x_axis, math.rad(3.862637) )
@@ -314,7 +314,7 @@ local function WalkNoArms()
 		Sleep(80)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.200000  )
+		Move( pelvis , y_axis, -0.200000*2.5  )
 		Turn( pelvis , x_axis, math.rad(4.571429) )
 		Turn( lthigh , x_axis, math.rad(-29.538462) )
 		Turn( rthigh , x_axis, math.rad(10.192308) )
@@ -323,13 +323,13 @@ local function WalkNoArms()
 		Sleep(80)
 	end
 	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, -0.300000  )
+		Move( pelvis , y_axis, -0.300000*2.5  )
 		Turn( lthigh , x_axis, math.rad(-43.950549) )
 		Turn( rthigh , x_axis, math.rad(12.302198) )
 		Turn( lleg , x_axis, math.rad(55.912088) )
 		Sleep(70)
 	end
-	Move( pelvis , y_axis, -0.400000  )
+	Move( pelvis , y_axis, -0.400000*2.5  )
 	Turn( pelvis , x_axis, math.rad(5.274725) )
 	Turn( lthigh , x_axis, math.rad(-43.950549) )
 	Turn( rthigh , x_axis, math.rad(14.412088) )
@@ -338,7 +338,7 @@ local function WalkNoArms()
 end
 
 local function RestoreLegs() 
-	Move( pelvis , y_axis, 0.000000 , 1.000000 )
+	Move( pelvis , y_axis, 0.000000*2.5 , 1.000000 )
 	Turn( rthigh , x_axis, 0, math.rad(200.043956) )
 	Turn( rleg , x_axis, 0, math.rad(200.043956) )
 	Turn( lthigh , x_axis, 0, math.rad(200.043956) )

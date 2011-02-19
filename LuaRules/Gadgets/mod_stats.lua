@@ -52,6 +52,19 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		end
 		return
 	end
+	
+	--Spring.Echo(attackerDefID)
+	local attackerAlias = UnitDefs[attackerDefID].customParams.statsname
+	if attackerAlias and UnitDefNames[attackerAlias] then
+		attackerDefID = UnitDefNames[attackerAlias].id
+	end
+	--Spring.Echo(attackerDefID)
+	--Spring.Echo(unitDefID)
+	local defenderAlias = UnitDefs[unitDefID].customParams.statsname
+	if defenderAlias and UnitDefNames[defenderAlias] then
+		unitDefID = UnitDefNames[defenderAlias].id
+	end
+	--Spring.Echo(unitDefID)
 			
 	local hp, maxHp, paraDam, capture, build = spGetUnitHealth(unitID)		
 	
@@ -91,6 +104,11 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	lastPara[unitID] = nil
+
+	local unitAlias = UnitDefs[unitDefID].customParams.statsname
+	if unitAlias and UnitDefNames[unitAlias] then
+		unitDefID = UnitDefNames[unitAlias].id
+	end	
 	
 	if (builderID == nil) then 
 		local tab = unitCounts[unitDefID]
@@ -105,6 +123,11 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	lastPara[unitID] = nil
+
+	local unitAlias = UnitDefs[unitDefID].customParams.statsname
+	if unitAlias and UnitDefNames[unitAlias] then
+		unitDefID = UnitDefNames[unitAlias].id
+	end	
 	
 	local tab = unitCounts[unitDefID]
 	if (tab == nil) then
@@ -117,6 +140,11 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	lastPara[unitID] = nil	
+
+	local unitAlias = UnitDefs[unitDefID].customParams.statsname
+	if unitAlias and UnitDefNames[unitAlias] then
+		unitDefID = UnitDefNames[unitAlias].id
+	end
 	
 	local tab = unitCounts[unitDefID]
 	if (tab == nil) then

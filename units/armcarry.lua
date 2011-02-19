@@ -69,7 +69,7 @@ unitDef = {
   TEDClass               = [[SHIP]],
   turninplace            = 0,
   turnRate               = 233,
-  waterline              = 8,
+  waterline              = 10,
   workerTime             = 12,
 
   weapons                = {
@@ -119,7 +119,7 @@ unitDef = {
       interceptedByShieldType = 2,
       lineOfSight             = true,
       metalpershot            = 0,
-      model                   = [[rocket]],
+      model                   = [[wep_m_kickback.s3o]],
       noautorange             = [[1]],
       noSelfDamage            = true,
       range                   = 1550,
