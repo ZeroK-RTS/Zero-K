@@ -770,7 +770,7 @@ local function Wave()
 end
 
 local function MorphQueen()
-	--store values to be copied
+	-- store values to be copied
 	local tempID = queenID
 	local x, y, z = spGetUnitPosition(tempID)
 	local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(tempID)
@@ -778,7 +778,7 @@ local function MorphQueen()
 	local heading = Spring.GetUnitHeading(tempID)
 	local cmdQueue = spGetUnitCommands(tempID)
 	
-	--perform switcheroo
+	-- perform switcheroo
 	queenID = nil
 	Spring.DestroyUnit(tempID, false, true)
 	if morphed == true then
@@ -789,8 +789,8 @@ local function MorphQueen()
 	morphed = not morphed
 	SetMorphFrame()
 	
-	--copy values
-	--position
+	-- copy values
+	-- position
 	Spring.MoveCtrl.Enable(queenID)
 	--Spring.MoveCtrl.SetPosition(queenID, x, y, z)	--needed to reset y-axis position
 	--Spring.SpawnCEG("dirt", x, y, z)	--helps mask the transition
@@ -801,10 +801,9 @@ local function MorphQueen()
 	--health handling
 	local _,newMaxHealth         = Spring.GetUnitHealth(queenID)
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
-	local hpercent = newHealth/newMaxHealth
-	--if newHealth <= 1 then newHealth = 1 end
+	-- if newHealth >= 1 then newHealth = 1 end
 	spSetUnitHealth(queenID, {health = newHealth, build = buildProgress})
-	--orders, XP
+	-- orders, XP
 	Spring.SetUnitExperience(queenID, xp)
 	if (cmdQueue and cmdQueue[1]) then		--copy order queue
 		for i=1,#cmdQueue do
@@ -876,7 +875,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:GameStart()
-    --DisableComputerUnits()	-- unneeded
+    DisableComputerUnits()	-- just to be sure
 	if pvp then Spring.Echo("Chicken: PvP mode initialized") end
 	--waveSchedule[gracePeriod*30] = true	-- schedule first wave
 	waveSchedule = gracePeriod * 30

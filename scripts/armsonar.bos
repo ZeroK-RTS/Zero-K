@@ -1,3 +1,5 @@
+//linear constant 65536
+
 #include "constants.h"
 
 piece  base, float, body, head, ball, wing1, wing2, wing3, wing4;
@@ -24,10 +26,10 @@ BobAnim()
 	move base to y-axis [0] speed <250>;
 	if (isActive)
 	{
-		turn wing1 to x-axis <0> speed <20>;
-		turn wing2 to z-axis <0> speed <20>;
-		turn wing3 to x-axis <0> speed <20>;
-		turn wing4 to z-axis <0> speed <20>;
+		turn wing1 to x-axis <-25> speed <20>;
+		turn wing2 to z-axis <-25> speed <20>;
+		turn wing3 to x-axis <25> speed <20>;
+		turn wing4 to z-axis <25> speed <20>;
 	}
 	wait-for-move base along y-axis;
 	sleep 500;
@@ -55,7 +57,7 @@ RotateAndTilt()
 	}
 }
 
-closeWings()
+CloseWings()
 {
 	turn wing1 to x-axis <0> speed <20>;
 	turn wing2 to z-axis <0> speed <20>;
@@ -63,7 +65,7 @@ closeWings()
 	turn wing4 to z-axis <0> speed <20>;
 }
 
-Go()
+Activate()
 {
 	spin float around y-axis speed <30>;
 	spin head around y-axis speed <-90>;
@@ -71,63 +73,20 @@ Go()
 	return (0);
 }
 
-Stop()
+Deactivate()
 {
 	stop-spin float around y-axis;
 	stop-spin head around y-axis;
 	isActive = FALSE;
-	start-script closeWings();
+	start-script CloseWings();
 	return (0);
-}
-
-InitState()
-{
-	statechg_DesiredState = TRUE;
-	statechg_StateChanging = FALSE;
-}
-
-RequestState(requestedstate, currentstate)
-{
-	if( statechg_StateChanging )
-	{
-		statechg_DesiredState = requestedstate;
-		return (0);
-	}
-	statechg_StateChanging = TRUE;
-	currentstate = statechg_DesiredState;
-	statechg_DesiredState = requestedstate;
-	while( statechg_DesiredState != currentstate )
-	{
-		if( statechg_DesiredState == 0 )
-		{
-			call-script Go();
-			currentstate = 0;
-		}
-		if( statechg_DesiredState == 1 )
-		{
-			call-script Stop();
-			currentstate = 1;
-		}
-	}
-	statechg_StateChanging = FALSE;
 }
 
 Create()
 {
 	isActive = TRUE;
-	call-script InitState();
 	start-script BobAnim();
 	start-script RotateAndTilt();
-}
-
-Activate()
-{
-	start-script RequestState(0);
-}
-
-Deactivate()
-{
-	start-script RequestState(1);
 }
 
 Killed(severity, corpsetype)
