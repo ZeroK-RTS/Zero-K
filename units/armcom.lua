@@ -86,7 +86,9 @@ unitDef = {
   customParams           = {
     fireproof = [[1]],
 	cloakstealth = [[1]],
-	helptext = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
+	description_de = [[Mobiler Sturmkommandant, Baut mit 12 M/s]],
+	helptext       = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
+	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufrüstung erhält er eine Disintegratorkanone.]],
 	level = [[1]],
 	statsname = [[armcom]],
   },

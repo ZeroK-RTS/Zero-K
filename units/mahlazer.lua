@@ -31,7 +31,7 @@ unitDef = {
 	description_de = [[Planetarischer Energiemeißel]],
     helptext       = [[This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases.]],
     helptext_fr    = [[Le MAH Lazer est un b?timent abritant un puissant g?n?rateur de faisceau laser ?liptique, dont l'impact est param?trable. Sa puissance est telle qu'il coupe tout sur son passage, y compris les alli?s. Pensez ? pr?voir un espace d?gag? autour de lui pour ?viter que le laser ne coupe votre base en deux en d?marrant.]],
-	helptext_de    = [[Dieses große Werkzeug wird dazu genutzt, Gelände für das Terraforming auszubilden. Ebenfalls als Bereiniger von Hindernissen, wie nervtötende feindliche Enheiten und Basen, sehr nützlich.]],
+	helptext_de    = [[Diese gigantische Waffe nutzt ihren energetischen Strahl, um große Gräben im Terrain zu hinterlassen und dabei alles, was sich ihr in den Weg stellt, auszulöschen. Ebenfalls als Auslöscher von störenden Hindernissen, wie zum Beispiel nervtötende feindliche Enheiten und Basen, sehr nützlich.]],
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],
