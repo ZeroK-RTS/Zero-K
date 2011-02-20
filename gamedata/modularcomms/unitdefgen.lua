@@ -89,8 +89,6 @@ local function ProcessComm(name, config)
 				if upgrades[moduleName] then
 					Spring.Echo("\tApplying upgrade: "..moduleName)
 					upgrades[moduleName].func(commDefs[name])	--apply upgrade function
-					cp.morphCost = tostring(cp.morphCost + (upgrades[moduleName].morphCost or 0))
-					cp.morphTime = tostring(cp.morphTime + (upgrades[moduleName].morphTime or 0))
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end
@@ -98,7 +96,11 @@ local function ProcessComm(name, config)
 		end
 		if config.name then
 			commDefs[name].name = config.name
-		end		
+		end
+		config.cost = config.cost or 0
+		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
+		commDefs[name].buildcostenergy = commDefs[name].buildcostenergy + config.cost
+		commDefs[name].buildtime = commDefs[name].buildtime + config.cost
 	end
 end
 
@@ -127,9 +129,12 @@ local testDef = {
 }
 ProcessComm("testcomm", testDef)
 
---set weapon1 range	- may need exception list in future depending on what weapons we add
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- postprocessing
 for name, data in pairs(commDefs) do
 	Spring.Echo("\tPostprocessing commtype: ".. name)
+	-- set weapon1 range	- may need exception list in future depending on what weapons we add
 	if data.weapondefs then
 		local minRange = 999999
 		local weaponNames = {}
@@ -151,6 +156,14 @@ for name, data in pairs(commDefs) do
 				weaponData.range = minRange
 			end
 		end
+	end
+	-- set wreck values
+	for featureName,array in pairs(data.featuredefs or {}) do
+		local mult = 0.4
+		if featureName == "HEAP" then mult = 0.2 end
+		array.metal = data.buildcostmetal * mult
+		array.reclaimtime = data.buildcostmetal * mult
+		array.damage = data.maxdamage
 	end
 end
 

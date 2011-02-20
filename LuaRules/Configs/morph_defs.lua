@@ -499,18 +499,12 @@ local morphDefs = {
 --------------------------------------------------------------------------------
 local comMorph = {
 	[1] = {
-		metal = 300,
-		energy = 300,
 		time = 30,
 	},
 	[2] = {
-		metal = 650,
-		energy = 650,
 		time = 65,
 	},
 	[3] = {
-		metal = 500,
-		energy = 500,
 		time = 50,
 	},
 }
@@ -599,13 +593,7 @@ for id, playerData in pairs(customComms) do
 				if morphOption then
 					morphOption.into = array[i+1]
 					-- set cost
-					morphCost = (targetDef.customParams and targetDef.customParams.morphCost) or 0
-					morphTime = (targetDef.customParams and targetDef.customParams.morphTime) or 0
-					morphCostDiscount = (originDef.customParams and originDef.customParams.morphCost) or 0
-					morphTimeDiscount = (originDef.customParams and originDef.customParams.morphTime) or 0
-					morphOption.metal = morphOption.metal + morphCost - morphCostDiscount
-					morphOption.energy = morphOption.energy + morphCost - morphCostDiscount
-					morphOption.time = morphOption.time + morphTime - morphTimeDiscount
+					--morphOption.time = morphOption.time + morphTime - morphTimeDiscount
 				
 					-- copy, checking that this morph isn't already defined
 					morphDefs[sourceName] = morphDefs[sourceName]  or {}

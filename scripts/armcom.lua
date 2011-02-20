@@ -18,6 +18,18 @@ local ground = piece 'ground'
 
 local isMoving, isLasering, isDgunning = false, false, false
 
+local function GetFlamer()
+	local weaponID = UnitDefs[unitDefID].weapons and UnitDefs[unitDefID].weapons[5] and UnitDefs[unitDefID].weapons[5].weaponDef
+	if weaponID then
+		return (WeaponDefs[weaponID].type == "Flame")
+	end
+	return false
+end
+
+--local hasFlamer = (GG.LUPS and GG.LUPS.FlameShot) and GetFlamer()
+
+
+
 -- Signal definitions
 local SIG_LASER = 2
 local SIG_DGUN = 4
@@ -430,6 +442,7 @@ function script.FireWeapon(num)
 	if num == 5 then
 		EmitSfx(lfirept, 1024)
 		EmitSfx(lfirept, 1025)
+		if hasFlamer then GG.LUPS.FlameShot(unitID, unitDefID, _, 5) end
 	end
 end
 
