@@ -42,8 +42,16 @@ return {
     desc = 'Watch you eggs! Easter bunny is coming!'
   },
   {
+    name = 'Chicken Eggs: Suicidal',
+    desc = 'Devilled eggs! It burns! It burns!'
+  },
+  {
     name = 'Chicken: Custom',
-    desc = 'A customizable chicken experience using modoptions'
+    desc = 'A chicken experience customizable using modoptions'
+  },
+  {
+    name = 'Chicken Eggs: Custom',
+    desc = 'A chicken experience customizable using modoptions WITH EGGS!'
   },
   {
 	-- to be recognised as a CAI there must be an entry with this name in -> need changes to be renamed to ZK AI ?

@@ -22,7 +22,7 @@ queenMorphName		 = "chickenlandqueen"
 miniQueenName		 = "chicken_dragon"
 waveRatio            = 0.6       -- waves are composed by two types of chicken, waveRatio% of one and (1-waveRatio)% of the other
 defenderChance       = 0.1       -- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
-quasiAttackerChance  = 0.6		-- subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
+quasiAttackerChance  = 0.65		-- subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
 maxBurrows           = 40
 burrowEggs           = 15       -- number of eggs each burrow spawns
 --forceBurrowRespawn	 = false	-- burrows always respawn even if the modoption is set otherwise        
@@ -44,11 +44,12 @@ endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 
 burrowQueenTime		= 100		-- how much killing a burrow shaves off the queen timer, seconds (divided by playercount)
 burrowWaveBonus		= 0.8		-- size of temporary bonus to add to subsequent waves (divided by (number of burrows/playerCount) )
-waveBonusDecay		= 0.05		-- linear rate at which burrow wave bonus decreases
+waveBonusDecay		= 0.05		-- linear rate at which burrow wave bonus decreases (divided by playerCount)
 burrowTechTime		= 12		-- how many seconds each burrow deducts from the tech time per wave (divided by playercount)
 burrowRespawnChance = 0.15
 burrowRegressMult	= 10			-- multiply by burrowTechTime to get how much killing a burrow sets back chicken timer (divided by playercount)
 
+scoreMult			= 1
 
 gameMode		= true	--Spring.GetModOption("zkmode")
 tooltipMessage	= "Kill chickens and collect their eggs to get metal."
@@ -81,11 +82,13 @@ modes = {
     [2] = 'Chicken: Easy',
     [3] = 'Chicken: Normal',
     [4] = 'Chicken: Hard',
-    [5] = 'Chicken Eggs: Easy',
-    [6] = 'Chicken Eggs: Normal',
-    [7] = 'Chicken Eggs: Hard',
-	[8] = 'Chicken: Suicidal',
-	[9] = 'Chicken: Custom',
+	[5] = 'Chicken: Suicidal',
+    [6] = 'Chicken Eggs: Easy',
+    [7] = 'Chicken Eggs: Normal',
+    [8] = 'Chicken Eggs: Hard',
+    [9] = 'Chicken Eggs: Suicidal',
+	[10] = 'Chicken: Custom',
+	[11] = 'Chicken Eggs: Custom',
 }
 defaultDifficulty = modes[2]
 testBuilding 	= UnitDefNames["armestor"].id	--testing to place burrow
@@ -164,7 +167,8 @@ difficulties = {
 	queenName        = "chicken_dragon",
 	queenMorphName	 = '',
 	miniQueenName	 = "chicken_tiamat",
-	maxBurrows       = 12,	
+	maxBurrows       = 12,
+	scoreMult		 = 0.25,
   },
 
   ['Chicken: Easy'] = {
@@ -177,6 +181,7 @@ difficulties = {
 	queenMorphName	 = "chickenqueenlite2",
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
+	scoreMult		 = 0.66,
   },
 
   ['Chicken: Normal'] = {
@@ -199,14 +204,15 @@ difficulties = {
 	burrowWaveBonus	 = 1,
 	burrowTechTime	 = 12,
 	queenSpawnMult   = 5,     
-	miniQueenTime	 = {0.5},		
+	miniQueenTime	 = {0.5},
+	scoreMult		 = 1.25,
   },
   
   ['Chicken: Suicidal'] = {
     chickenSpawnRate = 45, 
     burrowSpawnRate  = 40,
     firstSpawnSize   = 2.2,
-    timeSpawnBonus   = .05,
+    timeSpawnBonus   = .06,
 	gracePeriod		 = 120,
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
@@ -218,6 +224,7 @@ difficulties = {
 	queenTime		 = 50*60,
 	miniQueenTime	 = {0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
+	scoreMult		 = 1.5,
   },
 
   ['Chicken: Custom'] = {
@@ -235,6 +242,7 @@ difficulties = {
 	--burrowWaveBonus	 = 0.15,
 	--burrowTechTime	 = 20,
 	--burrowRespawnChance = 0.2,
+	scoreMult		= 0,
   },
 }
 
@@ -256,14 +264,18 @@ difficulties['Chicken Eggs: Very Easy']   = Copy(difficulties['Chicken: Very Eas
 difficulties['Chicken Eggs: Easy']   = Copy(difficulties['Chicken: Easy'])
 difficulties['Chicken Eggs: Normal'] = Copy(difficulties['Chicken: Normal'])
 difficulties['Chicken Eggs: Hard']   = Copy(difficulties['Chicken: Hard'])
+difficulties['Chicken Eggs: Suicidal']   = Copy(difficulties['Chicken: Suicidal'])
+difficulties['Chicken Eggs: Custom']   = Copy(difficulties['Chicken: Custom'])
 
 difficulties['Chicken: Very Easy'].chickenTypes.chicken_tiamat.time = 999999
 
 --for i,v in pairs(difficulties) do v.eggs = true end
 
-difficulties['Chicken Eggs: Easy'].eggs   = true
-difficulties['Chicken Eggs: Normal'].eggs = true
-difficulties['Chicken Eggs: Hard'].eggs   = true
+difficulties['Chicken Eggs: Easy'].eggs   	= true
+difficulties['Chicken Eggs: Normal'].eggs 	= true
+difficulties['Chicken Eggs: Hard'].eggs   	= true
+difficulties['Chicken Eggs: Suicidal'].eggs	= true
+difficulties['Chicken Eggs: Custom'].eggs	= true
 
 defaultDifficulty = 'Chicken: Normal'
 

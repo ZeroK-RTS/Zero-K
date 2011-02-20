@@ -86,6 +86,7 @@ local totalTimeReduction = 0
 
 local pvp = false
 local endgame = false
+local victory = false
 local endMiniQueenNum = 0
 
 local morphFrame = -1
@@ -217,6 +218,7 @@ echo("Chicken configured for "..playerCount.." players")
 
 burrowSpawnRate = burrowSpawnRate/malus/SetCount(computerTeams)
 gracePeriod = math.max(gracePeriod - gracePenalty*(playerCount - 1), gracePeriodMin)
+waveBonusDecay = waveBonusDecay/playerCount
 
 local function DisableBuildButtons(unitID, buildNames)
   for _, unitName in ipairs(buildNames) do
@@ -361,6 +363,7 @@ end
 
 
 local function KillAllComputerUnits()
+  victory = true
   for teamID in pairs(computerTeams) do
     local teamUnits = spGetTeamUnits(teamID)
     for i=1,#teamUnits do
@@ -1054,6 +1057,7 @@ function gadget:TeamDied(teamID)
   computerTeams[teamID] = nil
 end
 
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   if (eggs) then
     for _, mexName in pairs(mexes) do
@@ -1064,6 +1068,21 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
   end
   return true  -- command was not used
 end
+
+
+function gadget:GameOver()
+	local time = Spring.GetGameSeconds()
+	local score = math.min(time/queenTime, 1) * 1000	-- 1000 points * queen anger %
+	if endgame then
+		score = score + 250		-- +250 points for making it to endgame
+	end
+	if victory then
+		score = score + math.max(60*60 - time, 0) + 250	-- +250 points for winning, +1 point for each second under par
+	end
+	score = math.floor(score * scoreMult)	-- multiply by mult
+	print("ID: "..Spring.Utilities.Base64Encode(tostring(Spring.GetGameFrame()).."/"..tostring(math.floor(score))))
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 else
