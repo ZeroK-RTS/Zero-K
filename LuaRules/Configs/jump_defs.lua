@@ -98,19 +98,6 @@ overCategory = {
 	-- range = 400, height = 200, speed = 6,  reload = 10, },	
 }
 
-------------------------------------------------------------------------------------------------------------------------------------------------
--- apply for procedurally generated comms - really need a better way to do this if we ever want jumpjet-related upgrades...
-------------------------------------------------------------------------------------------------------------------------------------------------
-
-local numPlayers = #Spring.GetPlayerList()
-
-for i=0, numPlayers-1 do
-	for v=1,2 do
-		local name = "commrecon"..v.."_"..i
-		local array = jumpClassGroups["commrecon"..v]
-		--array[#array + 1] = name
-	end
-end
 
 ------------------------------------------------------------------------------------------------------------------------------------------------
 -- this is just an error checking block, not our configuration area
@@ -125,7 +112,7 @@ for groupId,groupcluster in pairs(jumpClassGroups) do
 		
 		if (UnitDefNames[name]) then -- I am half awake, hey at least someone did some kind of error checking...
 			if ( not jumpCategory[groupId] ) then 
-				Spring.Echo("   Jump Jet Defs error: (bad jumpjet category: " .. groupId .. " missing required parameter range)")
+				Spring.Echo("   Jump Jet Defs error: (bad jumpjet category: " .. groupId .. " does not exist)")
 				IsBadDef = true
 			else
 				if ( not jumpCategory[groupId].range ) then
@@ -147,13 +134,11 @@ for groupId,groupcluster in pairs(jumpClassGroups) do
 					Spring.Echo("   Jump Jet Defs error: (Unit: " .. name .. " missing required parameter delay)")	
 					IsBadDef = true			
 				end
-				--[[
-				if ( not jumpCategory[groupId].cobscript ) then
+				if ( jumpCategory[groupId].cobscript == nil ) then
 					Spring.Echo("   Jump Jet Defs error: (Unit: " .. name .. " missing required parameter cobscript)")	
 					IsBadDef = true			
 				end
-				]]--
-				if ( not jumpCategory[groupId].rotateMidAir ) then
+				if ( jumpCategory[groupId].rotateMidAir == nil ) then
 					Spring.Echo("   Jump Jet Defs error: (Unit: " .. name .. " missing required parameter rotateMidAir)")	
 					IsBadDef = true			
 				end

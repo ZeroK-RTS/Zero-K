@@ -88,6 +88,7 @@ local function ProcessComm(name, config)
 			for _,moduleName in ipairs(config.modules) do
 				if upgrades[moduleName] then
 					Spring.Echo("\tApplying upgrade: "..moduleName)
+					upgrades[moduleName].func = upgrades[moduleName].func or function() end
 					upgrades[moduleName].func(commDefs[name])	--apply upgrade function
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
@@ -123,9 +124,9 @@ commDefs.testDef = nil
 
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = {
-	chassis = "armcom",
+	chassis = "commrecon",
 	name = "Skunkworker",
-	modules = {"commweapon_shotgun", "module_adv_targeting"},
+	modules = {"commweapon_shotgun", "commweapon_autoflechette", "commweapon_disruptorbomb", "module_adv_targeting"},
 }
 ProcessComm("testcomm", testDef)
 

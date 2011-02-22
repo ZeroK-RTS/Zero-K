@@ -14,7 +14,7 @@ local DEGRADE_TIMER = 0.5
 local DEGRADE_FACTOR = 0.04
 -- Units will lose DEGRADE_FACTOR*(current health) slow damage per second
 
-local UPDATE_PERIOD = 15 -- I'd preffer if this was not changed
+local UPDATE_PERIOD = 15 -- I'd prefer if this was not changed
 
 
 local weapons = {
@@ -35,6 +35,7 @@ local presets = {
 	commrecon3_slowbomb = { slowDamage = 1500, scaleSlow = true },
 	
 	module_disruptorbeam = { slowDamage = 450, smartRetarget = 0.5, scaleSlow = true},
+	module_disruptorbomb = { slowDamage = 1250, scaleSlow = true },
 }
 
 ------------------------

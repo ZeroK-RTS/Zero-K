@@ -29,6 +29,10 @@ function ApplyWeapon(unitDef, weapon)
 	}
 	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
 	
+	if slot == 3 then
+		unitDef.candgun = true
+	end
+	
 	-- upgrade by level
 	local level = (tonumber(unitDef.customparams.level) - 1) or 0
 	local wd = unitDef.weapondefs[weapon]

@@ -8,7 +8,7 @@ local weaponDef = {
     craterMult              = 0,
 	
 	customParams			= {
-		slot = [[6]],
+		slot = [[5]],
 		muzzleEffect = [[custom:RAIDMUZZLE]],
 	},
 

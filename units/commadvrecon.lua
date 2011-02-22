@@ -229,7 +229,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        timeslow_preset = [[commrecon2_slowbomb]],
+        timeslow_preset = [[module_disruptorbomb]],
       },
 
       damage                  = {

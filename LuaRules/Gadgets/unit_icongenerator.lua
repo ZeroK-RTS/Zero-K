@@ -82,7 +82,9 @@ if (gadgetHandler:IsSyncedCode()) then
 
 		local env = Spring.UnitScript.GetScriptEnv(uid)
 		if env then lus = true end
-		if lus and env.Activate then Spring.UnitScript.CallAsUnit(uid, env.Activate)
+		
+		if lus then
+			if env.Activate then Spring.UnitScript.CallAsUnit(uid, env.Activate) end
         else Spring.CallCOBScript(uid,"Activate",0) end
 
         if (cunit.move) then
@@ -90,7 +92,7 @@ if (gadgetHandler:IsSyncedCode()) then
           else Spring.CallCOBScript(uid,"StartMoving",0) end
         end;
 
-        if (cunit.attack) then
+        if (cunit.attack and not lus) then
           local angle = (cunit.shotAngle / 180) * 32768
 
           Spring.CallCOBScript(uid,"AimPrimary",0,Spring.GetHeadingFromVector(0,1),angle);
