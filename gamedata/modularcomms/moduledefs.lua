@@ -158,6 +158,8 @@ upgrades = {
 		description = "Cloaks all friendly units within 350 elmos",
 		func = function(unitDef)
 				unitDef.customparams = unitDef.customparams or {}
+				unitDef.onoffable = true
+				unitDef.radarDistanceJam = (unitDef.radarDistanceJam and unitDef.radarDistanceJam < 350 and 350 or unitDef.radarDistanceJam)
 				unitDef.customparams.cloakshield_preset = "module_cloakfield"
 			end,
 	},
