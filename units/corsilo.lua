@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[corsilo]],
   name                          = [[Silencer]],
-  description                   = [[Nuclear ICBM Launcher, Drains 19.2 m/s, 3 minute stockpile]],
+  description                   = [[Nuclear ICBM Launcher, Drains 18 m/s, 3 minute stockpile]],
   acceleration                  = 0,
   antiweapons                   = [[1]],
   bmcode                        = [[0]],
