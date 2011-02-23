@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[corcrash]],
-  name                   = [[Crasher]],
+  name                   = [[Vandal]],
   description            = [[Anti-air Bot]],
   acceleration           = 0.384,
   bmcode                 = [[1]],
@@ -28,12 +28,12 @@ unitDef = {
     description_fr = [[Robot Anti-Air]],
     description_it = [[Robot da contraerea]],
 	description_de = [[Flugabwehr Roboter]],
-    helptext       = [[The Crasher is a cheap dedicated anti-air bot, it gives bots a definite advantage vs air. Defenseless vs. land forces.]],
-    helptext_bp    = [[O Crasher é um robô anti-ar barato. Dá aos robôs uma vantagem definitiva contra aeronaves. N?o pode ser defender de unidades terrestres.]],
-    helptext_es    = [[El crasher es un robot antiaéreo barato. Ofrece una ventaja definitiva para los kbots contra aviones. No tiene defensas contra unidades de tierra.]],
-    helptext_fr    = [[Le Crasher est l'unit? anti-air de base, il tire des missiles guid?s ? une cadence peu rapide. Redoutable en groupe, il sert ? prot?ger bases et troupes.]],
-    helptext_it    = [[Il crasher é un economico robot da contraerea. Offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],
-	helptext_de    = [[Der Crasher ist ein billiger, dedizierter Flugabwehr Roboter, der den Robotern einen bestimmten Vorteil gegenüber Flugzeugen bringt. Schutzlos gegenüber Landstreitkräften.]],
+    helptext       = [[The Vandal is a cheap dedicated anti-air bot, it gives bots a definite advantage vs air. Defenseless vs. land forces.]],
+    helptext_bp    = [[O Vandal é um robô anti-ar barato. Dá aos robôs uma vantagem definitiva contra aeronaves. N?o pode ser defender de unidades terrestres.]],
+    helptext_es    = [[El Vandal es un robot antiaéreo barato. Ofrece una ventaja definitiva para los kbots contra aviones. No tiene defensas contra unidades de tierra.]],
+    helptext_fr    = [[Le Vandal est l'unit? anti-air de base, il tire des missiles guid?s ? une cadence peu rapide. Redoutable en groupe, il sert ? prot?ger bases et troupes.]],
+    helptext_it    = [[Il Vandal é un economico robot da contraerea. Offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],
+	helptext_de    = [[Der Vandal ist ein billiger, dedizierter Flugabwehr Roboter, der den Robotern einen bestimmten Vorteil gegenüber Flugzeugen bringt. Schutzlos gegenüber Landstreitkräften.]],
   },
 
   defaultmissiontype     = [[Standby]],
@@ -144,7 +144,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Crasher]],
+      description      = [[Wreckage - Vandal]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 650,
@@ -165,7 +165,7 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Crasher]],
+      description      = [[Debris - Vandal]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 650,
