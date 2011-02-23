@@ -25,11 +25,6 @@ local exhaust2 = piece "exhaust2"
 
 smokePiece = {body, pelvis}
 
-local points = {
-	{missile = m_1, exhaust = exhaust1},
-	{missile = m_2, exhaust = exhaust2},
-}
-
 local missile = 1
 
 --constants
@@ -77,7 +72,7 @@ local function Walk()
 		Turn( lfoot, x_axis, -0.8, 2 )
 		
 		Turn( rthigh, x_axis, 0.6, 2 )
-		Turn( r_eg, x_axis, 0.6, 1.75 )
+		Turn( rleg, x_axis, 0.6, 1.75 )
 		
 		Sleep( 280 )
 		
@@ -123,16 +118,16 @@ local function RestoreAfterDelay()
 end
 
 ----[[
-function script.QueryWeapon1() return points[missile].missile end
+function script.QueryWeapon1() 
+	return exhaust1 end
 
 function script.AimFromWeapon1() return body end
 
 function script.AimWeapon1( heading, pitch )
 	Signal( SIG_Aim )
 	SetSignalMask( SIG_Aim )
-	pitch = math.max(pitch, math.rad(20))	-- results in a minimum pod angle of 20° above horizontal
 	Turn( body, y_axis, heading, 3 )
-	Turn( turret, x_axis, -pitch, 3 )
+	Turn( turret, x_axis, -1.5, 3 )
 	WaitForTurn( body, y_axis )
 	WaitForTurn( turret, x_axis )
 	StartThread(RestoreAfterDelay)
@@ -141,7 +136,7 @@ end
 
 function script.FireWeapon1()
 	missile = missile + 1
-	if missile > 2 then missile = 1 end
+	if missile > 1 then missile = 0 end
 end
 
 function script.Killed(recentDamage, maxHealth)

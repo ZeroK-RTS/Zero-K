@@ -88,7 +88,7 @@ unitDef = {
 	EMP_ROCKET = {
       name                    = [[EMP Cruise Missile]],
       areaOfEffect            = 16,
-      cegTag                  = [[raventrail]],
+      cegTag                  = [[yellow_lightning_stormbolt]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
@@ -102,7 +102,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
-      explosionGenerator      = [[custom:STARFIRE]],
+      explosionGenerator      = [[custom:yellow_lightningplosion]],
       fireStarter             = 100,
       flighttime              = 10,
       impactOnly              = true,
