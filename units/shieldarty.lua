@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[shieldarty]],
-  name                   = [[Racketeeer]],
+  name                   = [[Racketeer]],
   description            = [[EMP Artillery]],
   acceleration           = 0.12,
   bmcode                 = [[1]],
@@ -52,8 +52,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:zeusmuzzle]],
-      [[custom:zeusgroundflash]],
+      [[custom:STORMMUZZLE]],
+      [[custom:STORMBACK]],
     },
 
   },
@@ -88,7 +88,7 @@ unitDef = {
 	EMP_ROCKET = {
       name                    = [[EMP Cruise Missile]],
       areaOfEffect            = 16,
-      cegTag                  = [[yellow_lightning_stormbolt]],
+      cegTag                  = [[raventrail]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
@@ -102,7 +102,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
-      explosionGenerator      = [[custom:yellow_lightningplosion]],
+      explosionGenerator      = [[custom:YELLOW_LIGHTNINGPLOSION]],
       fireStarter             = 100,
       flighttime              = 10,
       impactOnly              = true,

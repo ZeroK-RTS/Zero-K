@@ -446,7 +446,7 @@ local behaviourConfig = {
 		flees = {},
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 90, 
-		skirmLeeway = 20, 
+		skirmLeeway = 60, 
 	},		
 	
 	-- med range skirms
@@ -473,7 +473,14 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 30, 
 	},
-	
+	["dclship"] = {
+		skirms = medRangeSkirmieeArray, 
+		swarms = medRangeSwarmieeArray, 
+		flees = {},
+		maxSwarmLeeway = 30, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 30, 
+	},	
 	
 	-- long range skirms
 	["corstorm"] = {
@@ -537,6 +544,15 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},
 	["firewalker"] = {
+		skirms = artyRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 40, 
+	},	
+	["shieldarty"] = {
 		skirms = artyRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},

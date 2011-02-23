@@ -3,10 +3,11 @@
 
 include "constants.lua"
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- pieces
 local base = piece "base"
 
--- missile rack
 local turret = piece "turret"
 local pelvis = piece "pelvis"
 
@@ -20,20 +21,24 @@ local rthigh = piece "rthigh"
 local rleg = piece "rleg"
 local rfoot = piece "rfoot"
 
-local exhaust1 = piece "exhaust1"
-local exhaust2 = piece "exhaust2"
+local missl, exhaustl = piece("missl", "exhaustl")
+local missr, exhaustr = piece("missr", "exhaustr")
 
 smokePiece = {body, pelvis}
 
+local points = {
+	{missile = missl, exhaust = exhaustl},
+	{missile = missr, exhaust = exhaustr},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local missile = 1
 
 --constants
 local missilespeed = 850 --fixme
 local mfront = 10 --fixme
 local pause = 600
-
---effects
-local smokeblast = 1024
 
 --signals
 local SIG_Restore = 1
@@ -46,42 +51,33 @@ end
 
 local function Walk()
 	SetSignalMask( SIG_Walk )
-	while ( true ) do -- needs major fixing. 
+	while ( true ) do
 		Move(base, y_axis, 3.6, 6)
-		
 		Turn( lthigh, x_axis, 0.6, 2 )
 		Turn( lleg, x_axis, 0.6, 1.75 )
-		
 		Turn( rthigh, x_axis, -1, 2.5 )
 		Turn( rleg, x_axis, -0.4, 3 )
 		Turn( lfoot, x_axis, -0.8, 2 )
-		
 		Sleep( 280 )
-		Move(base, y_axis, 0, 5)
 		
+		Move(base, y_axis, 0, 5)
 		Turn( rthigh, x_axis, -1, 1 )
 		Turn( rleg, x_axis, 0.4, 3 )
 		Turn( rfoot, x_axis, 0, 1.75 )
-		
 		Sleep( 280 )
 		
 		Move(base, y_axis, 3.6, 6)
-		
 		Turn( lthigh, x_axis, -1, 2.5 )
 		Turn( lleg, x_axis, -0.4, 3 )
 		Turn( lfoot, x_axis, -0.8, 2 )
-		
 		Turn( rthigh, x_axis, 0.6, 2 )
 		Turn( rleg, x_axis, 0.6, 1.75 )
-		
 		Sleep( 280 )
 		
 		Move(base, y_axis, 0, 5)
-		
 		Turn( lthigh, x_axis, -1, 1 )
 		Turn( lleg, x_axis, 0.4, 3 )
 		Turn( lfoot, x_axis, 0, 1.75 )
-		
 		Sleep(  280 )
 	end
 end
@@ -113,13 +109,11 @@ local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
 	Sleep(2000)
-	Turn( body, y_axis, 0, 3 )
-	Turn( turret, x_axis, 0, 3 )
+	Turn( body, y_axis, 0, 2 )
+	Turn( turret, x_axis, 0, math.rad(30) )
 end
 
-----[[
-function script.QueryWeapon1() 
-	return exhaust1 end
+function script.QueryWeapon1() return points[missile].missile end
 
 function script.AimFromWeapon1() return body end
 
@@ -127,7 +121,7 @@ function script.AimWeapon1( heading, pitch )
 	Signal( SIG_Aim )
 	SetSignalMask( SIG_Aim )
 	Turn( body, y_axis, heading, 3 )
-	Turn( turret, x_axis, -1.5, 3 )
+	Turn( turret, x_axis, math.rad(-90), math.rad(60) )
 	WaitForTurn( body, y_axis )
 	WaitForTurn( turret, x_axis )
 	StartThread(RestoreAfterDelay)
@@ -136,7 +130,9 @@ end
 
 function script.FireWeapon1()
 	missile = missile + 1
-	if missile > 1 then missile = 0 end
+	if missile > 2 then missile = 1 end
+	EmitSfx(points[missile].missile, 1024)
+	EmitSfx(points[missile].exhaust, 1025)
 end
 
 function script.Killed(recentDamage, maxHealth)

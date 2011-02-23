@@ -824,9 +824,10 @@ end
 local function DisableUnit(unitID)
   Spring.MoveCtrl.Enable(unitID)
   Spring.MoveCtrl.SetNoBlocking(unitID, true)
-  Spring.MoveCtrl.SetPosition(unitID, Game.mapSizeX+4000, 0, Game.mapSizeZ+4000)
+  Spring.MoveCtrl.SetPosition(unitID, -4000, -1000, -4000)
   Spring.SetUnitHealth(unitID, {paralyze=99999999})
   Spring.SetUnitNoDraw(unitID, true)
+  Spring.SetUnitCloak(unitID, 4)
   Spring.SetUnitStealth(unitID, true)
   Spring.SetUnitNoSelect(unitID, true)
   commanders[unitID] = nil
