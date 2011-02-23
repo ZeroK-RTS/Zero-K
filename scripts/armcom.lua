@@ -421,6 +421,7 @@ function script.AimWeapon(num, heading, pitch)
 			Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
 		end
 		Turn( luparm , x_axis, math.rad(-50) - pitch, ARM_SPEED_PITCH )
+		WaitForTurn(torso, y_axis)
 		WaitForTurn(luparm, x_axis)
 		StartThread(RestoreLaser)
 		return true

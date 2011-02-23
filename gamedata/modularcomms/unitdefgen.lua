@@ -119,8 +119,8 @@ local stressTestDef = {
 for name in pairs(upgrades) do
 	stressTestDef.modules[#stressTestDef.modules+1] = name
 end
-ProcessComm("testDef", stressTestDef)
-commDefs.testDef = nil
+ProcessComm("stresstestdef", stressTestDef)
+commDefs.stresstestdef = nil
 
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = {
