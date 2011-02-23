@@ -28,7 +28,6 @@ local weaponDef = {
     noSelfDamage            = true,
     range                   = 700,
     reloadtime              = 15,
-    renderType              = 4,
     rgbColor                = [[1 0.2 0.2]],
     separation              = 0.5,
     size                    = 5,

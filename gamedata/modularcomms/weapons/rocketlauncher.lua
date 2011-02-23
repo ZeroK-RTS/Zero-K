@@ -21,7 +21,6 @@ local weaponDef = {
 	
 	fireStarter             = 70,
 	flightTime              = 3,
-	guidance                = false,
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 2,
@@ -31,8 +30,6 @@ local weaponDef = {
 	predictBoost            = 1,
 	range                   = 430,
 	reloadtime              = 2,
-	renderType              = 1,
-	selfprop                = true,
 	smokedelay              = [[.1]],
 	smokeTrail              = true,
 	soundHit                = [[weapon/missile/sabot_hit]],

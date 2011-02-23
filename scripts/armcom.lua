@@ -376,6 +376,7 @@ function script.Create()
 	Hide( nanospray)
 	StartThread(MotionControl)
 	Turn(lfirept, x_axis, math.rad(145))
+	Turn(rbigflash, x_axis, math.rad(145))
 end
 
 function script.StartMoving() 
@@ -444,6 +445,9 @@ function script.FireWeapon(num)
 		EmitSfx(lfirept, 1024)
 		EmitSfx(lfirept, 1025)
 		if hasFlamer then GG.LUPS.FlameShot(unitID, unitDefID, _, 5) end
+	elseif num == 3 then
+		EmitSfx(rbigflash, 1026)
+		EmitSfx(rbigflash, 1027)
 	end
 end
 

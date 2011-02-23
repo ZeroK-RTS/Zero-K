@@ -1,15 +1,15 @@
-local name = "commweapon_disruptorbomb"
+local name = "commweapon_napalmgrenade"
 local weaponDef = {
-    name                    = [[Disruptor Bomb]],
+    name                    = [[Hellfire Grenade]],
     accuracy                = 256,
-    areaOfEffect            = 512,
+    areaOfEffect            = 256,
     commandFire             = true,
     craterBoost             = 0,
     craterMult              = 0,
 
     customParams            = {
 		slot = [[3]],
-        timeslow_preset = [[module_disruptorbomb]],
+        areadamage_preset = [[module_napalmgrenade]],
     },
 
     damage                  = {
@@ -18,22 +18,24 @@ local weaponDef = {
 		subs    = 15,
     },
 
-    explosionGenerator      = [[custom:riotballplus]],
-    fireStarter             = 100,
+    explosionGenerator      = [[custom:firewalker_impact]],
+    firestarter             = 40,
     impulseBoost            = 0,
     impulseFactor           = 0,
     interceptedByShieldType = 2,
+    lineOfSight             = true,
     model                   = [[wep_b_fabby.s3o]],
     noSelfDamage            = true,
     range                   = 450,
-    reloadtime              = 12,
+    reloadtime              = 8,
+    renderType              = 4,
     smokeTrail              = true,
-    soundHit                = [[weapon/aoe_aura]],
+    soundHit                = [[weapon/cannon/wolverine_hit]],
     soundHitVolume          = 8,
     soundStart              = [[weapon/cannon/cannon_fire3]],
     startsmoke              = [[1]],
-	startVelocity			= 350,
-	trajectoryHeight		= 0.3,
+	startVelocity			  = 350,
+	trajectoryHeight		  = 0.3,
     turret                  = true,
     weaponType              = [[MissileLauncher]],
     weaponVelocity          = 350,

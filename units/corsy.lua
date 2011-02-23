@@ -22,7 +22,7 @@ unitDef = {
     [[armcarry]],
     [[corbats]],
     [[corarch]],
-    --[[armtboat]],
+--    [[armtboat]],
   },
 
   buildPic               = [[CORSY.png]],

@@ -31,7 +31,6 @@ local weaponDef = {
     noSelfDamage            = true,
     range                   = 290,
     reloadtime              = 2,
-    renderType              = 4,
     soundHit                = [[weapon/cannon/generic_cannon]],
     soundStart              = [[weapon/cannon/outlaw_gun]],
     soundStartVolume        = 3,

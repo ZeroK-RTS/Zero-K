@@ -32,7 +32,6 @@ local weaponDef = {
 	noSelfDamage            = true,
 	range                   = 270,
 	reloadtime              = 0.2,
-	renderType              = 4,
 	rgbColor                = [[1 0.95 0.4]],
 	separation              = 1.5,
 	soundHit                = [[weapon/cannon/emg_hit]],

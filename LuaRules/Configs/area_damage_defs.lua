@@ -15,13 +15,34 @@ local weapons = {
 -- rangeFall	- the proportion of damage not dealt increases linearly with distance from 0 to rangeFall at the radius
 -- timeFall		- the proportion of damage not dealt increases linearly with elapsed time from 0 to timeFall at the duration
 
-for i=1,#WeaponDefs do
-	for weapon, data in pairs(weapons) do
-		if WeaponDefs[i].name == weapon then 
-			data.damage = data.damage*DAMAGE_PERIOD/30
-			data.timeLoss = data.damage*data.timeFall*DAMAGE_PERIOD/data.duration
-			array[i] = data 
+local presets = {
+	module_napalmgrenade = { radius = 128, damage = 40, duration = 450, rangeFall = 0.6, timeFall = 0.5 },
+}
+
+------------------------
+-- Send the Config
+
+--deep not safe with circular tables! defaults To false
+function CopyTable(tableToCopy, deep)
+	local copy = {}
+		for key, value in pairs(tableToCopy) do
+		if (deep and type(value) == "table") then
+			copy[key] = CopyTable(value, true)
+		else
+			copy[key] = value
 		end
+	end
+	return copy
+end
+
+for name,data in pairs(WeaponDefNames) do
+	if data.customParams.areadamage_preset then
+		weapons[name] = CopyTable(presets[data.customParams.areadamage_preset])
+	end
+	if weapons[name] then
+		weapons[name].damage = weapons[name].damage *DAMAGE_PERIOD/30
+		weapons[name].timeLoss = weapons[name].damage*weapons[name].timeFall*DAMAGE_PERIOD/weapons[name].duration
+		array[data.id] = weapons[name]
 	end
 end
 

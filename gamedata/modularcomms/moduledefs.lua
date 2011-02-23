@@ -84,7 +84,15 @@ upgrades = {
 	commweapon_disruptorbomb = {
 		name = "Disruptor Bomb",
 		description = "Damages and slows units in a large area",
-	},	
+	},
+	commweapon_napalmgrenade = {
+		name = "Hellfire Grenade",
+		description = "Sets a moderate area alight",
+	},		
+	commweapon_sunburst = {
+		name = "Sunburst Cannon",
+		description = "Ruins a single target's day with a medium-range high-energy burst",
+	},
 	
 	-- modules
 	module_ablative_armor = {
