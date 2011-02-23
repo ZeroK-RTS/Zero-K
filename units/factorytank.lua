@@ -15,8 +15,8 @@ unitDef = {
 
   buildoptions                  = {
     [[coracv]],
-    [[panther]],
     [[logkoda]],
+	[[panther]],
     [[cormart]],
     [[correap]],
     [[trem]],
