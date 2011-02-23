@@ -76,7 +76,6 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 400,
   smoothAnim             = true,
-  stealth                = true,
   steeringmode           = [[2]],
   TEDClass               = [[KBOT]],
   turninplace            = 0,

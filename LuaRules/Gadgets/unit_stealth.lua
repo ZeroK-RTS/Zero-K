@@ -22,7 +22,7 @@ function gadget:GetInfo()
     date      = "May 02, 2007",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -420,6 +420,8 @@ end
 --------------------------------------------------------------------------------
 
 
+--[[
+Uncomment this bit if anything draws when stealthed
 
 function gadget:DrawWorld()
   if (not next(drawUnits)) then
@@ -455,7 +457,7 @@ function gadget:DrawWorld()
 
   glCallList(resetMatList)
 end
-
+--]]
 
 function gadget:UpdateFIXME() -- testing "stealth" RulesParam
   for _,unitID in ipairs(Spring.GetSelectedUnits()) do

@@ -3,7 +3,7 @@
 --------------------------------------------------------------------------------
 
 local passiveStealth = {
-	draw   = true,
+	draw   = false,
     init   = false,
     energy = 0,
     delay  = 0,
@@ -11,6 +11,19 @@ local passiveStealth = {
 }
 
 local stealthDefs = {
+
+  spherepole = {
+    draw   = true,
+    init   = false,
+    energy = 20,
+    delay  = 30,
+  },
+  armsnipe = {
+    draw   = true,
+    init   = false,
+    energy = 20,
+    delay  = 30,
+  },
 
   armcom = {
     draw   = true,
