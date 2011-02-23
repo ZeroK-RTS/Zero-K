@@ -20,7 +20,6 @@ unitDef = {
   buildTime           = 1600,
   canAttack           = true,
   canCloak            = false,
-  canDGun             = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -33,7 +32,7 @@ unitDef = {
   customParams        = {
     fireproof = [[1]],
 	description_de = [[Schwerer Kampfkommandant, Baut mit 12 M/s]],
-	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment. Its base weapon is a riot cannon, while its special weapon fires cluster bombs in a line ahead.]],
+	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment. Its base weapon is a riot cannon.]],
 	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
 	level = [[4]],
 	statsname = [[coradvcom]],
@@ -55,7 +54,7 @@ unitDef = {
   mass                = 1027,
   maxDamage           = 7200,
   maxSlope            = 36,
-  maxVelocity         = 1.3,
+  maxVelocity         = 1.55,
   maxWaterDepth       = 5000,
   metalMake           = 3.5,
   metalStorage        = 0,
@@ -100,17 +99,6 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
---    [2] = {
---      def = [[COR_SHIELD_COM]],
---    },
-
-
-    [3] = {
-      def                = [[CLUSTERBOMB]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
     [5] = {
       def                = [[SHOCK_CANNON]],
       badTargetCategory  = [[FIXEDWING]],
@@ -121,76 +109,6 @@ unitDef = {
 
 
   weaponDefs          = {
-
-    CLUSTERBOMB    = {
-      name                    = [[Cluster Bomb]],
-      accuracy                = 200,
-      areaOfEffect            = 160,
-      commandFire             = true,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 15,
-      },
-
-      explosionGenerator      = [[custom:MEDMISSILE_EXPLOSION]],
-      fireStarter             = 100,
-      impulseBoost            = 0,
-      impulseFactor           = 0.2,
-      interceptedByShieldType = 2,
-      lineOfSight             = true,
-      metalpershot            = 15,
-      model                   = [[wep_b_fabby.s3o]],
-      noSelfDamage            = true,
-      projectiles             = 8,
-      range                   = 320,
-      reloadtime              = 12,
-      renderType              = 4,
-      smokeTrail              = true,
-      soundHit                = [[explosion/ex_med6]],
-      soundHitVolume          = 8,
-      soundStart              = [[weapon/cannon/cannon_fire3]],
-      soundStartVolume        = 2,
-      sprayangle              = 2048,
-      startsmoke              = [[1]],
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 400,
-    },
-
-
-    COR_SHIELD_COM = {
-      name                    = [[Energy Shield]],
-      craterMult              = 0,
-
-      damage                  = {
-        default = 10,
-      },
-
-      exteriorShield          = true,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      isShield                = true,
-      shieldAlpha             = 0.4,
-      shieldBadColor          = [[1 0.1 0.1]],
-      shieldGoodColor         = [[0.1 0.1 1]],
-      shieldInterceptType     = 3,
-      shieldPower             = 3500,
-      shieldPowerRegen        = 60,
-      shieldPowerRegenEnergy  = 6,
-      shieldRadius            = 300,
-      shieldRepulser          = false,
-      smartShield             = true,
-      texture1                = [[wakelarge]],
-      visibleShield           = true,
-      visibleShieldHitFrames  = 4,
-      visibleShieldRepulse    = true,
-      weaponType              = [[Shield]],
-    },
-
 
     FAKELASER      = {
       name                    = [[Fake Laser]],
@@ -219,7 +137,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 320,
+      range                   = 290,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
@@ -238,8 +156,8 @@ unitDef = {
     },
 
 
-    SHOCK_CANNON   = {
-      name                    = [[Shock Cannon]],
+    SHOCK_CANNON = {
+      name                    = [[Riot Cannon]],
       areaOfEffect            = 144,
       avoidFeature            = true,
       avoidFriendly           = true,
@@ -248,9 +166,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 15,
+        default = 250,
+        planes  = 250,
+        subs    = 12.5,
       },
 
       edgeEffectiveness       = 0.75,
@@ -260,7 +178,7 @@ unitDef = {
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,
-      range                   = 330,
+      range                   = 290,
       reloadtime              = 2,
       renderType              = 4,
       soundHit                = [[weapon/cannon/generic_cannon]],

@@ -19,7 +19,6 @@ unitDef = {
   buildPic            = [[commrecon.png]],
   buildTime           = 1600,
   canAttack           = true,
-  canDGun             = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -36,7 +35,7 @@ unitDef = {
     fireproof = [[1]],
 	jumpclass = [[commrecon2]],
 	description_de = [[Hochmobiler Kommandant, Baut mit 12 M/s]],
-	helptext       = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. Its base weapon is a slowing beam, while its special is a disruptor bomb with a wide AoE. It also features jumpjets.]],
+	helptext       = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. In addition to its basic slowing beam, it also features jumpjets.]],
 	helptext_de    = [[Bei dem Recon Commander dreht sich alles um Mobilität und List. Dieser schwach gepanzerte Grundsatz kann um viele Spezialwaffen und -module erweitert werden. Seine Basiswaffe ist ein langsamer Strahl und seine Spezialwaffe besteht aus einer zerstörerischen Bombe mit einer weitreichenden AoE. Er besitzt außerdem einen Düsenstrahl zum Springen.]],
 	level = [[4]],
 	statsname = [[commadvrecon]],
@@ -58,7 +57,7 @@ unitDef = {
   mass                = 983,
   maxDamage           = 4800,
   maxSlope            = 36,
-  maxVelocity         = 1.55,
+  maxVelocity         = 1.85,
   maxWaterDepth       = 5000,
   metalMake           = 3,
   metalStorage        = 0,
@@ -108,11 +107,6 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],	
 	},
 
-    [3] = {
-      def                = [[SLOWBOMB]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-	
     [4] = {
       def                = [[SLOWBEAM]],
       badTargetCategory  = [[FIXEDWING]],
@@ -151,7 +145,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 350,
+      range                   = 300,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
@@ -181,12 +175,11 @@ unitDef = {
       craterMult              = 0,
 
       customParams            = {
-        timeslow_preset = [[commrecon2_slowbeam]],
+        timeslow_preset = [[commrecon_slowbeam]],
       },
 
-
       damage                  = {
-        default = 150,
+        default = 120,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -200,7 +193,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 350,
+      range                   = 300,
       reloadtime              = 1.5,
       renderType              = 0,
       rgbColor                = [[0.4 0 0.5]],
@@ -217,48 +210,6 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
-    },
-
-
-    SLOWBOMB = {
-      name                    = [[Disruptor Bomb]],
-      accuracy                = 256,
-      areaOfEffect            = 512,
-      commandFire             = true,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      customParams            = {
-        timeslow_preset = [[commrecon2_slowbomb]],
-      },
-
-      damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 15,
-      },
-
-      explosionGenerator      = [[custom:riotballplus]],
-      fireStarter             = 100,
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 2,
-      lineOfSight             = true,
-      model                   = [[wep_b_fabby.s3o]],
-      noSelfDamage            = true,
-      range                   = 450,
-      reloadtime              = 12,
-      renderType              = 4,
-      smokeTrail              = true,
-      soundHit                = [[weapon/aoe_aura]],
-      soundHitVolume          = 8,
-      soundStart              = [[weapon/cannon/cannon_fire3]],
-      startsmoke              = [[1]],
-	  startVelocity			  = 350,
-	  trajectoryHeight		  = 0.3,
-      turret                  = true,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 350,
     },
 
   },

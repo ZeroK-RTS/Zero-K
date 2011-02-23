@@ -20,7 +20,6 @@ unitDef = {
   buildTime           = 1600,
   canAttack           = true,
   canCloak            = true,
-  canDGun             = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -40,7 +39,7 @@ unitDef = {
     --cloakshield_preset = [[module_cloakfield]],
 	cloakstealth = [[1]],
     fireproof          = [[1]],
-	helptext = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser, and when sufficiently upgraded receives a disintegrator cannon.]],
+	helptext = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser.]],
 	level = [[3]],
 	statsname = [[armadvcom]],
   },
@@ -61,7 +60,7 @@ unitDef = {
   mass                = 992,
   maxDamage           = 4000,
   maxSlope            = 36,
-  maxVelocity         = 1.4,
+  maxVelocity         = 1.5,
   maxWaterDepth       = 5000,
   metalMake           = 3.5,
   metalStorage        = 0,
@@ -103,13 +102,6 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
-    [3] = {
-      def                = [[DISINTEGRATOR]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
     [4] = {
       def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
@@ -120,41 +112,6 @@ unitDef = {
 
 
   weaponDefs          = {
-
-    DISINTEGRATOR = {
-      name                    = [[Disintegrator]],
-      areaOfEffect            = 48,
-      avoidFeature            = false,
-      avoidFriendly           = false,
-      avoidNeutral            = false,
-      commandfire             = true,
-      craterBoost             = 1,
-      craterMult              = 6,
-
-      damage                  = {
-        default    = 1200,
-      },
-
-      explosionGenerator      = [[custom:DGUNTRACE]],
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      noExplode               = true,
-      noSelfDamage            = true,
-      range                   = 250,
-      reloadtime              = 12,
-      renderType              = 3,
-	  size					  = 6,
-      soundHit                = [[explosion/ex_med6]],
-      soundStart              = [[weapon/laser/heavy_laser4]],
-      soundTrigger            = true,
-      tolerance               = 10000,
-      turret                  = true,
-      weaponTimer             = 4.2,
-      weaponType              = [[DGun]],
-      weaponVelocity          = 300,
-    },
-
 
     FAKELASER     = {
       name                    = [[Fake Laser]],
@@ -183,7 +140,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 250,
+      range                   = 300,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
@@ -201,7 +158,6 @@ unitDef = {
       weaponVelocity          = 900,
     },
 
-
     LASER         = {
       name                    = [[Commander Laser]],
       areaOfEffect            = 12,
@@ -212,8 +168,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 20,
-        subs    = 10,
+        default = 16.5,
+        subs    = 8.25,
       },
 
       duration                = 0.11,
@@ -229,7 +185,7 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 375,
+      range                   = 300,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 1]],
