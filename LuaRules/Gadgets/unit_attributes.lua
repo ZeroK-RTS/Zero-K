@@ -128,7 +128,7 @@ local function updateMovementSpeed( unitID, ud, speedFactor)
 	
 	local state = origUnitSpeed[unitID]
 	local decFactor = speedFactor
-	if speedFactor < 0 then
+	if speedFactor <= 0 then
 		speedFactor = 0
 		decFactor = 100000 -- a unit with 0 decRate will not deccelerate down to it's 0 maxVelocity
 	end
@@ -136,12 +136,12 @@ local function updateMovementSpeed( unitID, ud, speedFactor)
 	if Spring.MoveCtrl.GetTag(unitID) == nil then
 		if state.movetype == 0 then
 			Spring.MoveCtrl.SetAirMoveTypeData(unitID, {maxSpeed = state.origSpeed*speedFactor})
-			Spring.MoveCtrl.SetAirMoveTypeData (unitID, {maxAcc = state.origMaxAcc*decFactor})
+			Spring.MoveCtrl.SetAirMoveTypeData (unitID, {maxAcc = state.origMaxAcc*(speedFactor > 0.001 and speedFactor or 0.001)})
 		elseif state.movetype == 1 then
 			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {maxSpeed = state.origSpeed*speedFactor})
 			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {turnRate = state.origTurnRate*speedFactor})
-			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {accRate = state.origMaxAcc*speedFactor})
-			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {decRate = state.origMaxDec*decFactor})
+			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {accRate = state.origMaxAcc*(speedFactor > 0.001 and speedFactor or 0.001)})
+			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {decRate = state.origMaxDec*(speedFactor > 0.01 and speedFactor or 0.01)})
 		elseif state.movetype == 2 then
 			Spring.MoveCtrl.SetGroundMoveTypeData(unitID, {maxSpeed = state.origSpeed*speedFactor})
 			Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {turnRate = state.origTurnRate*speedFactor})
