@@ -87,7 +87,7 @@ upgrades = {
 	},
 	commweapon_napalmgrenade = {
 		name = "Hellfire Grenade",
-		description = "Sets a moderate area alight",
+		description = "Sets a moderate area ablaze",
 	},		
 	commweapon_sunburst = {
 		name = "Sunburst Cannon",
