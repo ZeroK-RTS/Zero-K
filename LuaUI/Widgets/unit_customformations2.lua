@@ -7,7 +7,7 @@ function widget:GetInfo()
 		version   = "v3.3",
 		date      = "Mar, 2010",
 		license   = "GNU GPL, v2 or later",
-		layer     = 10000,
+		layer     = 1000000,
 		enabled   = true,
 		handler   = true,
 	}
@@ -32,21 +32,6 @@ local unitIncreaseThresh	= 0.85 -- We only increase maxUnits if the units are gr
 
 -- Alpha loss per second after releasing mouse
 local lineFadeRate = 2.0
-
-local menu_use = include("Configs/marking_menu_menus.lua")
-
--- GESTURE MENU CHANGE
-options_section = 'Interface'
-options = {
-	
-	disableForBuilders = {
-		name = "Disable for groups of builders",
-		type = 'bool',
-		value = true,
-		desc = 'This is needed to allow gesture menu for groups of builders. If you want to put workers into formation, use M + left mouse',
-	},
-}
--- END GESTURE MENU CHANGE
 
 -- What commands are eligible for custom formations
 local formationCmds = {
@@ -353,32 +338,6 @@ function widget:MousePress(mx, my, mButton)
 	-- Where did we click
 	inMinimap = spIsAboveMiniMap(mx, my)
 	if inMinimap and not MiniMapFullProxy then return false end
-	
-	-- GESTURE MENU CHANGE
-	
-	local _,activeid = spGetActiveCommand()
-	local _,defid    = spGetDefaultCommand()
-	cmdTag = activeid or defid   --// CMD.MOVE or CMD.FIGHT
-	
-	if options.disableForBuilders.value then 
-		if (defid == CMD_MOVE and activeid == nil) then  -- this is needed for gestures
-			local units = Spring.GetSelectedUnitsSorted()
-			units.n = nil
-			local allWorkers = true
-			for udefID,_ in pairs(units) do 
-				local ud = UnitDefs[udefID]
-				if (not (ud.builder and menu_use[ud.name])) and ud.canMove then  -- if worker is selected dont handle it
-					allWorkers = false
-					break
-				end 
-			end 
-			if allWorkers then
-				return false
-			end
-		end 
-	end
-	
-	-- END GESTURE MENU CHANGE
 	
 	-- Get command that would've been issued
 	local _, activeCmdID = spGetActiveCommand()
