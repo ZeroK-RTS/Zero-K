@@ -18,7 +18,7 @@ local weaponDef = {
 		default    = 2500,
     },
 
-    explosionGenerator      = [[custom:DGUNTRACE]],
+    explosionGenerator      = [[custom:blue_explosion]],
     impulseBoost            = 0,
     impulseFactor           = 0.4,
     interceptedByShieldType = 1,

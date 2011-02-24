@@ -80,6 +80,7 @@ local resources = {
 	  bluelight = "other/light_blue.png",
       bluenovaexplo= "cc/bluenovaexplo.tga",
       bluering= "cc/bluering.tga",
+	  brightblueexplo='CC/brightblueexplo.tga',
       corelaser= "gpl/corelaser.png",
       darksmoketrail= "darksmoketrail.tga",
       debris2= "other/debris2.tga",

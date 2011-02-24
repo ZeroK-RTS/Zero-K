@@ -126,7 +126,7 @@ commDefs.stresstestdef = nil
 local testDef = {
 	chassis = "armcom",
 	name = "Skunkworker",
-	modules = {"commweapon_rocketlauncher", "commweapon_napalmgrenade", "module_adv_targeting"},
+	modules = {"commweapon_rocketlauncher", "commweapon_sunburst", "module_adv_targeting"},
 }
 ProcessComm("testcomm", testDef)
 
