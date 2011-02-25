@@ -116,7 +116,7 @@ return {
        emitrot            = 0,
        emitrotspread      = 60,
        emitvector         = [[0, 1, 0]],
-       gravity            = [[0, -0.2, 0]],
+       gravity            = [[0, 0, 0]],
        numparticles       = 40,
        particlelife       = 20,
        particlelifespread = 5,
