@@ -417,7 +417,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 		
 	if ud.speed > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.speed,2), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.speed/Game.gameSpeed,2), textColor = color.stats_fg, }
 	end
 	
 	if ud.energyMake > 0 then
