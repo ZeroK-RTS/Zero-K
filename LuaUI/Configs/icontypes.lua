@@ -562,12 +562,18 @@ local icontypes = {
     size=2.4,
   },
 
-  --Annihilator and Doomsday Machine
+  --Annihilator
   fixedtachyon = {
     bitmap='icons/fixedtachyon.dds',
     size=2,
   },
-
+  
+  -- DDM
+  staticassaultriot = {
+    bitmap='icons/staticassaultriot.png',
+    size=2,
+  },
+  
   --Penetrator
   mobiletachyon = {
     bitmap='icons/mobiletachyon.dds',
