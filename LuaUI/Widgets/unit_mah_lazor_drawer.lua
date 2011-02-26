@@ -59,11 +59,12 @@ function widget:GameFrame(frame)
 			local cmd = Spring.GetUnitCommands(mahLazor)
 			if cmd and #cmd > 2 and cmd[1].id == CMD_ATTACK and #cmd[1].params == 3 and cmd[2].id == CMD_ATTACK then
 				if mahLazors.data[i].height then
-					if mahLazors.data[i].height ~= Spring.GetGroundHeight(cmd[1].params[1],cmd[1].params[3]) then
-						Spring.GiveOrderToUnit(mahLazor, CMD_ATTACK, cmd[1].params, CMD.OPT_SHIFT)
+					local c1height = Spring.GetGroundHeight(cmd[1].params[1],cmd[1].params[3])
+					if mahLazors.data[i].height ~= c1height or math.abs(c1height - cmd[1].params[2]) > 32 then
 						mahLazors.data[i].height = Spring.GetGroundHeight(cmd[2].params[1],cmd[2].params[3])
+						Spring.GiveOrderToUnit(mahLazor, CMD_ATTACK, cmd[1].params, CMD.OPT_SHIFT)
 						if Spring.GetUnitStates(mahLazor)["repeat"] then
-							Spring.GiveOrderToUnit(mahLazor, CMD_ATTACK, cmd[1].params, CMD.OPT_SHIFT)
+							Spring.GiveOrderToUnit(mahLazor, CMD_ATTACK, {cmd[1].params[1], mahLazors.data[i].height, cmd[1].params[3]}, CMD.OPT_SHIFT)
 						end
 					end
 				else
