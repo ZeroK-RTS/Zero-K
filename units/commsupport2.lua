@@ -10,7 +10,7 @@ unitDef = {
   brakeRate           = 0.45,
   buildCostEnergy     = 1600,
   buildCostMetal      = 1600,
-  buildDistance       = 250,
+  buildDistance       = 275,
   builder             = true,
 
   buildoptions        = {
@@ -39,7 +39,7 @@ unitDef = {
   },
 
   defaultmissiontype  = [[Standby]],
-  energyMake          = 4,
+  energyMake          = 4.25,
   energyStorage       = 100,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
@@ -56,7 +56,7 @@ unitDef = {
   maxSlope            = 36,
   maxVelocity         = 1.25,
   maxWaterDepth       = 5000,
-  metalMake           = 4,
+  metalMake           = 4.25,
   metalStorage        = 100,
   minCloakDistance    = 100,
   movementClass       = [[AKBOT2]],

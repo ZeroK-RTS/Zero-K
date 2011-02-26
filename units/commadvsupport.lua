@@ -10,7 +10,7 @@ unitDef = {
   brakeRate           = 0.45,
   buildCostEnergy     = 1600,
   buildCostMetal      = 1600,
-  buildDistance       = 325,
+  buildDistance       = 300,
   builder             = true,
 
   buildoptions        = {
@@ -41,7 +41,7 @@ unitDef = {
 
   defaultmissiontype  = [[Standby]],
   energyMake          = 4.5,
-  energyStorage       = 100,
+  energyStorage       = 200,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
@@ -58,7 +58,7 @@ unitDef = {
   maxVelocity         = 1.325,
   maxWaterDepth       = 5000,
   metalMake           = 4.5,
-  metalStorage        = 100,
+  metalStorage        = 200,
   minCloakDistance    = 100,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
