@@ -398,6 +398,7 @@ local function AimRifle(heading, pitch)
 	Turn( turret , y_axis, heading, math.rad(350) )
 	Turn( armhold , x_axis, - pitch, math.rad(250) )
 	WaitForTurn(turret, y_axis)
+	WaitForTurn(armhold, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end

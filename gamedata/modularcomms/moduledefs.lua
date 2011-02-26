@@ -114,16 +114,17 @@ upgrades = {
 	},
 	module_adv_nano = {
 		name = "CarRepairer's Nanolathe",
-		description = "Used by a mythical mechanic/coder, this improved nanolathe adds +3 metal/s build speed",
+		description = "Adds +6 metal/s build speed and +100 build distance",
 		func = function(unitDef)
-				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 3 end
+				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 6 end
+				if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 100 end
 			end,
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 10 HP/s",
+		description = "Self-repairs 20 HP/s",
 		func = function(unitDef)
-				unitDef.autoheal = (unitDef.autoheal or 0) + 10
+				unitDef.autoheal = (unitDef.autoheal or 0) + 20
 			end,
 	},
 	module_energy_cell = {
@@ -141,12 +142,18 @@ upgrades = {
 				if unitDef.radardistance < 1800 then unitDef.radardistance = 1800 end
 			end,
 	},
+	module_heavy_armor = {
+		name = "High Density Plating",
+		description = "Increases commander HP by 30% of base, reduces speed by 10% of base",
+		func = function(unitDef)
+				unitDef.maxdamage = unitDef.maxdamage + unitDef.customparams.basehp * 0.3
+				unitDef.maxvelocity = unitDef.maxvelocity - unitDef.customparams.basespeed * 0.1
+			end,
+	},
 	module_high_power_servos = {
 		name = "High Power Servos",
-		description = "More powerful leg servos increase speed by 15% (cumulative)",
+		description = "More powerful leg servos increase speed by 15% of base",
 		func = function(unitDef)
-				unitDef.customparams = unitDef.customparams or {}
-				unitDef.customparams.basespeed = unitDef.customparams.basespeed or tostring(unitDef.maxvelocity)
 				unitDef.maxvelocity = (unitDef.maxvelocity or 0) + unitDef.customparams.basespeed*0.15
 			end,
 	},
@@ -160,7 +167,6 @@ upgrades = {
 				if unitDef.cloakcostmoving > 20 then unitDef.cloakcostmoving = 20 end
 			end,
 	},
-	
 	module_cloak_field = {
 		name = "Cloaking Field",
 		description = "Cloaks all friendly units within 350 elmos",
@@ -195,15 +201,6 @@ upgrades = {
 				ApplyWeapon(unitDef, "commweapon_areashield")
 				unitDef.activatewhenbuilt = true
 				unitDef.onoffable = true
-			end,
-	},
-	
-	-- some old stuff
-	adv_composite_armor = {
-		name = "Advanced Composite Armor",
-		description = "Improved armor increases commander health by 20%",
-		func = function(unitDef)
-				unitDef.maxdamage = unitDef.maxdamage * 1.2
 			end,
 	},
 }

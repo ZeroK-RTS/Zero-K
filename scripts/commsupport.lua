@@ -385,7 +385,7 @@ local function AimRifle(heading, pitch)
 	Turn( turret , y_axis, heading, math.rad(350) )
 	Turn( armhold , x_axis, -pitch, math.rad(250) )
 	WaitForTurn(turret, y_axis)
-	WaitForTurn(armhold, x_axis)  --need to make surenot 
+	WaitForTurn(armhold, x_axis)  --need to make sure not 
 	WaitForTurn(lloarm, x_axis) --stil setting up
 	StartThread(RestoreAfterDelay)
 	return true
@@ -408,7 +408,11 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	EmitSfx(flare, 1024)
+	if num == 5 then
+		EmitSfx(flare, 1024)
+	elseif num == 3 then
+		EmitSfx(flare, 1026)
+	end
 	--recoil
 	Sleep(50)
 	Turn( gun , x_axis, math.rad(-2), math.rad(1250) )

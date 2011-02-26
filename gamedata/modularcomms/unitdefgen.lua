@@ -70,8 +70,8 @@ local function ProcessComm(name, config)
 		commDefs[name] = CopyTable(UnitDefs[config.chassis], true)
 		commDefs[name].customparams = commDefs[name].customparams or {}
 		local cp = commDefs[name].customparams
-		cp.morphCost = cp.morphCost or "0"
-		cp.morphTime = cp.morphTime or "0"
+		cp.basespeed = tostring(commDefs[name].maxvelocity)
+		cp.basehp = tostring(commDefs[name].maxdamage)
 		if config.modules then
 			-- add weapons first
 			for _,moduleName in ipairs(config.modules) do
@@ -88,8 +88,7 @@ local function ProcessComm(name, config)
 			for _,moduleName in ipairs(config.modules) do
 				if upgrades[moduleName] then
 					Spring.Echo("\tApplying upgrade: "..moduleName)
-					upgrades[moduleName].func = upgrades[moduleName].func or function() end
-					upgrades[moduleName].func(commDefs[name])	--apply upgrade function
+					if upgrades[moduleName].func then upgrades[moduleName].func(commDefs[name]) end	--apply upgrade function
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end
@@ -124,9 +123,9 @@ commDefs.stresstestdef = nil
 
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = {
-	chassis = "armcom",
+	chassis = "commsupport4",
 	name = "Skunkworker",
-	modules = {"commweapon_rocketlauncher", "commweapon_sunburst", "module_adv_targeting"},
+	modules = {"commweapon_gaussrifle", "commweapon_sunburst", "module_ablative_armor", "module_heavy_armor", "module_adv_nano"},
 }
 ProcessComm("testcomm", testDef)
 

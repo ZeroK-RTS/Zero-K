@@ -407,17 +407,20 @@ local function SpawnStartUnit(teamID, playerID)
                 or startMode == "limitboost"
                 or startMode == "facplopboost")
 
+	local commCost = udef.metalCost or BASE_COMM_COST			
+				
     if validTeam then
 
       if boost then
         Spring.SetTeamResource(teamID, 'energy', 0)
         Spring.SetTeamResource(teamID, 'metal', 0)
-
+		local boostAmount = START_BOOST + BASE_COMM_COST - commCost
+		
         if (udef.isCommander and udef.name ~= "chickenbroodqueen") then
           if (startMode == "facplopboost") then
-            AddBoost(unitID, START_BOOST, START_BOOST)
+            AddBoost(unitID, boostAmount, boostAmount)
           elseif (startMode == "boost") then
-            AddBoost(unitID, START_BOOST, START_BOOST)
+            AddBoost(unitID, boostAmount, boostAmount)
           else
             AddBoost(unitID)
           end
@@ -431,16 +434,16 @@ local function SpawnStartUnit(teamID, playerID)
         if startMode == "classic" then
           Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC)
-          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy)
-          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal)
+          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy + BASE_COMM_COST - commCost)
+          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal + BASE_COMM_COST - commCost)
         elseif startMode == "facplop" then
           Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP)
-          Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP + energy)
-          Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP + metal)		  
+          Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP + energy + BASE_COMM_COST - commCost)
+          Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP + metal + BASE_COMM_COST - commCost)		  
         else
-          Spring.SetTeamResource(teamID, "energy", START_STORAGE + energy)
-          Spring.SetTeamResource(teamID, "metal", START_STORAGE + metal)
+          Spring.SetTeamResource(teamID, "energy", START_STORAGE + energy + BASE_COMM_COST - commCost)
+          Spring.SetTeamResource(teamID, "metal", START_STORAGE + metal + BASE_COMM_COST - commCost)
         end
 
       end

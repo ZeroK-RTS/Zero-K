@@ -39,6 +39,8 @@ START_METAL_FACPLOP=500
 
 OVERDRIVE_BUFFER=10000
 
+BASE_COMM_COST = 1600
+
 EXCLUDED_UNITS = {
   [ UnitDefNames['terraunit'].id ] = true,
 }
