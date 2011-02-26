@@ -879,7 +879,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:GameStart()
-    DisableComputerUnits()	-- just to be sure
+    --DisableComputerUnits()
 	if pvp then Spring.Echo("Chicken: PvP mode initialized") end
 	--waveSchedule[gracePeriod*30] = true	-- schedule first wave
 	waveSchedule = gracePeriod * 30

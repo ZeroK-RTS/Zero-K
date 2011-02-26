@@ -79,8 +79,6 @@ local shuffledStartPosition = {}
 local playerSides = {} -- sides selected ingame from widget  - per players
 local teamSides = {} -- sides selected ingame from widgets - per teams 
 
-local commQuota = {} -- [allyTeamID] = number
-
 local playerIDsByName = {}
 local customComms = {}
 local commChoice = {}
@@ -306,22 +304,13 @@ local function GetStartUnit(teamID, playerID)
   playerID = playerID or (teamID and select(2, Spring.GetTeamInfo(teamID)) )
   if (playerID and commChoice[playerID]) then
 	--Spring.Echo("Attempting to load alternate comm")
-	Spring.Echo(commChoice[playerID])
 	local altComm = customComms[playerID][(commChoice[playerID])]
-	Spring.Echo(altComm)
 	startUnit = (altComm and UnitDefNames[altComm] and altComm) or startUnit
   end
   
-  --[[
-  local altName = altCommNames[startUnit] or startUnit
-  --Spring.Echo(altName)
-  local altComm = customComms[playerID] and customComms[playerID][altName]
-  --Spring.Echo(altComm)
-  if altComm and (not defaultComms[altComm]) and UnitDefNames[altComm] then
-	startUnit = altComm
-	Spring.Echo("Using alt comm: "..startUnit)
-  end
-  ]]--
+  -- hack workaround for chicken
+  local luaAI = Spring.GetTeamLuaAI(teamID)
+  if luaAI and string.find(string.lower(luaAI), "chicken") then startUnit = nil end
   
   --if didn't pick a comm, wait for user to pick
   return startUnit or nil	-- startUnit or DEFAULT_UNIT
@@ -381,8 +370,6 @@ local function SpawnStartUnit(teamID, playerID)
   --if (coop == 1 and commSpawnedPlayer[playerID]) or (coop == 0 and commSpawnedTeam[teamID]) then
 	--return 
   --end	
-  --local allyTeam = select(6, Spring.GetTeamInfo(teamID))
-  --if not (commQuota[allyTeam] and commQuota[allyTeam] > 0) then return end
   
   local startUnit = GetStartUnit(teamID, playerID)
 
@@ -405,7 +392,6 @@ local function SpawnStartUnit(teamID, playerID)
 	if playerID then Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1) end
 	--commSpawnedTeam[teamID] = true
 	--if playerID then commSpawnedPlayer[playerID] = true end
-	--commQuota[allyTeam] = commQuota[allyTeam] - 1
 	
     -- set the *team's* lineage root
     if Spring.SetUnitLineage then
@@ -610,10 +596,6 @@ function gadget:GameStart()
   Shuffle()
 
   -- spawn units
-  for i,allyTeam in ipairs(Spring.GetAllyTeamList()) do
-	commQuota[allyTeam] = 0
-  end
-  
   for i,team in ipairs(Spring.GetTeamList()) do
 
     -- clear resources
@@ -633,19 +615,16 @@ function gadget:GameStart()
           for i=1,#playerlist do
           	local _,_,spec,_,allyTeam = Spring.GetPlayerInfo(playerlist[i])
             if (not spec) then
-			  commQuota[allyTeam] = commQuota[allyTeam] + 1
               SpawnStartUnit(team, playerlist[i])
             end
           end
         else
           -- AI etc.
 		  local allyTeam = select(6, Spring.GetTeamInfo(team))
-		  commQuota[allyTeam] = commQuota[allyTeam] + 1
           SpawnStartUnit(team)
         end
       else -- no coop
 		local allyTeam = select(6, Spring.GetTeamInfo(team))
-		commQuota[allyTeam] = commQuota[allyTeam] + 1
         SpawnStartUnit(team)
       end
     end
