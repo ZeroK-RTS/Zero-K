@@ -114,10 +114,10 @@ upgrades = {
 	},
 	module_adv_nano = {
 		name = "CarRepairer's Nanolathe",
-		description = "Adds +6 metal/s build speed and +100 build distance",
+		description = "Adds +6 metal/s build speed and +60 build distance",
 		func = function(unitDef)
 				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 6 end
-				if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 100 end
+				if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 60 end
 			end,
 	},
 	module_autorepair = {
@@ -171,7 +171,6 @@ upgrades = {
 		name = "Cloaking Field",
 		description = "Cloaks all friendly units within 350 elmos",
 		func = function(unitDef)
-				unitDef.customparams = unitDef.customparams or {}
 				unitDef.onoffable = true
 				unitDef.radarDistanceJam = (unitDef.radarDistanceJam and unitDef.radarDistanceJam < 350 and 350 or unitDef.radarDistanceJam)
 				unitDef.customparams.cloakshield_preset = "module_cloakfield"
@@ -181,7 +180,6 @@ upgrades = {
 		name = "Repair Field",
 		description = "Passively repairs all friendly units within 450 elmos",
 		func = function(unitDef)
-				unitDef.customparams = unitDef.customparams or {}
 				unitDef.customparams.repairaura_preset = "module_repairfield"
 			end,
 	},
