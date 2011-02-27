@@ -1,8 +1,8 @@
-#define TA			// This is a TA script
+//linear constant 65536
 
 #include "constants.h"
 
-piece  base, Left_Back_Leg, Left_Back_Foot, Right_Back_Leg, Righ_Back_Foot, Left_Front_Leg, Left_Front_Foot, Right_Front_Leg,
+piece  base, Left_Back_Leg, Left_Back_Foot, Right_Back_Leg, Right_Back_Foot, Left_Front_Leg, Left_Front_Foot, Right_Front_Leg,
        Right_Front_Foot, Hump, Tail;
 
 static-var  bMoving;
@@ -62,11 +62,6 @@ StopMoving()
 	sleep 150;
 }
 
-SweetSpot(piecenum)
-{
-	piecenum = base;
-}
-
 AimWeapon1(heading,pitch)
 {
 	return (1);
@@ -94,7 +89,7 @@ Killed(severity, corpsetype)
 	explode Left_Back_Leg type SHATTER | EXPLODE_ON_HIT | BITMAP2;
 	explode Left_Back_Foot type SHATTER | EXPLODE_ON_HIT | BITMAP3;
 	explode Right_Back_Leg type SHATTER | EXPLODE_ON_HIT | BITMAP4;
-	explode Righ_Back_Foot type SHATTER | EXPLODE_ON_HIT | BITMAP5;
+	explode Right_Back_Foot type SHATTER | EXPLODE_ON_HIT | BITMAP5;
 	explode Left_Front_Leg type SHATTER | EXPLODE_ON_HIT | BITMAP2;
 	explode Left_Front_Foot type SHATTER | EXPLODE_ON_HIT | BITMAP3;
 	explode Right_Front_Foot type SHATTER | EXPLODE_ON_HIT | BITMAP4;

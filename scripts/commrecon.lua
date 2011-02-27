@@ -493,6 +493,7 @@ function script.Killed(recentDamage, maxHealth)
 	if  severity <= .98  then
 		Turn( base , x_axis, math.rad(80), math.rad(80) )
 		Turn( turret , x_axis, math.rad(-16), math.rad(50) )
+		Turn( turret , y_axis, 0, math.rad(90) )
 		Turn( rloleg , x_axis, math.rad(9), math.rad(250) )	
 		Turn( rloleg , y_axis, math.rad(-73), math.rad(250) )	
 		Turn( rloleg , z_axis, math.rad(-(3)), math.rad(250) )	
@@ -506,7 +507,7 @@ function script.Killed(recentDamage, maxHealth)
 		Turn( luparm , y_axis, math.rad(47), math.rad(350) )	
 		Turn( luparm , z_axis, math.rad(-(50)), math.rad(350) )
 		Sleep(600)
-		EmitSfx( turret,  1034 ) --impact
+		EmitSfx( turret,  1027 ) --impact
 		--StartThread(burn)
     	--Sleep((1000 * rand (2 , 5))) 
 		Sleep(100)
