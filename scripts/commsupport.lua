@@ -462,7 +462,7 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = 1
 	--Turn( turret , y_axis, 0, math.rad(500) )
-	if  severity <= .98  then
+	if  severity <= .5  then
 	
 		Turn( base , x_axis, math.rad(79), math.rad(80) )
 		Turn( rloleg , x_axis, math.rad(25), math.rad(250) )	
@@ -491,7 +491,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(torso)
 ]]--
 		return 1
-	elseif  severity >= .99  then  --over killed
+	else
 		Explode(gun, sfxFall + sfxFire  + sfxSmoke  + sfxExplode )
 		Explode(head, sfxFall + sfxFire  + sfxSmoke  + sfxExplode )
 		Explode(pelvis, sfxFall + sfxFire  + sfxSmoke  + sfxExplode )

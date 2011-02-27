@@ -520,3 +520,33 @@ end
 function script.Deactivate()
 	shieldOn = false
 end
+
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity < 0.5 then
+		Explode(chest, sfxNone)
+		Explode(l_sho, sfxNone)
+		Explode(r_sho, sfxNone)
+		Explode(pelvis, sfxNone)
+		Explode(l_upleg, sfxNone)
+		Explode(r_upleg, sfxNone)
+		Explode(nanospray, sfxNone)
+		Explode(r_dgun, sfxNone)
+		Explode(l_lowleg, sfxNone)
+		Explode(r_lowleg, sfxNone)
+		return 1
+	else
+		Explode(chest, sfxShatter)
+		Explode(l_sho, sfxSmoke + sfxFire + sfxExplode)
+		Explode(r_sho, sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, sfxShatter)
+		Explode(l_upleg, sfxShatter)
+		Explode(r_upleg, sfxShatter)
+		Explode(nanospray, sfxSmoke + sfxFire + sfxExplode)
+		Explode(r_gun, sfxSmoke + sfxFire + sfxExplode)
+		Explode(l_lowleg, sfxShatter)
+		Explode(r_lowleg, sfxShatter)
+		Explode(head, sfxSmoke + sfxFire)
+		return 2
+	end
+end

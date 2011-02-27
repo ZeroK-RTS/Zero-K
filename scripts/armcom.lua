@@ -469,3 +469,32 @@ function script.QueryNanoPiece()
 	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),nanospray)
 	return nanospray
 end
+
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity < 0.5 then
+		Explode(torso, sfxNone)
+		Explode(luparm, sfxNone)
+		Explode(ruparm, sfxNone)
+		Explode(pelvis, sfxNone)
+		Explode(lthigh, sfxNone)
+		Explode(rthigh, sfxNone)
+		Explode(nanolath, sfxNone)
+		Explode(biggun, sfxNone)
+		Explode(rleg, sfxNone)
+		Explode(lleg, sfxNone)
+		return 1
+	else
+		Explode(torso, sfxShatter)
+		Explode(luparm, sfxSmoke + sfxFire + sfxExplode)
+		Explode(ruparm, sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, sfxShatter)
+		Explode(lthigh, sfxShatter)
+		Explode(rthigh, sfxShatter)
+		Explode(nanolath, sfxSmoke + sfxFire + sfxExplode)
+		Explode(biggun, sfxSmoke + sfxFire + sfxExplode)
+		Explode(rleg, sfxShatter)
+		Explode(lleg, sfxShatter)
+		return 2
+	end
+end
