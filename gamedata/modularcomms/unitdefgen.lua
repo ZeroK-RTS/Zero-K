@@ -38,7 +38,7 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua")
 local commDataRaw = Spring.GetModOptions().commandertypes
 local commDataFunc, err, success, commData
 if not (commDataRaw and type(commDataRaw) == 'string') then
-	err = "Comm data entry in modoption is empty"
+	err = "Comm data entry in modoption is empty or in invalid format"
 	commData = {}
 else
 	commDataRaw = string.gsub(commDataRaw, '_', '=')

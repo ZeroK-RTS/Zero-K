@@ -80,26 +80,35 @@ local optionData = {
 	}
 }
 
-local function CommSelectTemplate(num, seriesName, comm1Name)
-	local option = {
-		enabled = function() return true end,
-		poster = "LuaUI/Images/startup_info_selector/customcomm"..num..".png",
-		selector = seriesName,
-		tooltip = "Select comm config number "..num.." ("..seriesName..")",
-		button = function()
-			Spring.SendLuaRulesMsg("customcomm:"..seriesName)
-			Spring.SendCommands({'say a:I choose: '..seriesName..'!'})
-			Close(true)
-		end
-	}
-	-- TODO: put chassis and module info in here
-	
-	return option
-end	
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local success, err
 
+local commDataGlobal
+local commDataGlobalRaw = Spring.GetModOptions().commandertypes
+if not (commDataGlobalRaw and type(commDataGlobalRaw) == 'string') then
+	err = "Comm data entry in modoption is empty or in invalid format"
+	commDataGlobal = {}
+else
+	commDataGlobalRaw = string.gsub(commDataGlobalRaw, '_', '=')
+	commDataGlobalRaw = Spring.Utilities.Base64Decode(commDataGlobalRaw)
+	--Spring.Echo(commDataRaw)
+	local commDataGlobalFunc, err = loadstring("return "..commDataGlobalRaw)
+	if commDataGlobalFunc then 
+		success, commDataGlobal = pcall(commDataGlobalFunc)
+		if not success then
+			err = commDataGlobal
+			commData = {}
+		end
+	end
+end
+
+if err then 
+	Spring.Echo('Startup Info & Selector error: ' .. err)
+end
 
 local myID = Spring.GetMyPlayerID()
-local commData, success
+local commData
 local customKeys = select(10, Spring.GetPlayerInfo(myID))
 local commDataRaw = customKeys and customKeys.commanders
 if not (commDataRaw and type(commDataRaw) == 'string') then
@@ -121,6 +130,70 @@ end
 if err then 
 	Spring.Echo('Startup Info & Selector error: ' .. err)
 end
+
+VFS.Include("gamedata/modularcomms/moduledefs.lua")
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local function RemoveDuplicates(base, delete)
+	for i1,v1 in pairs(base) do
+		for i2,v2 in pairs(delete) do
+			if v1 == v2 then base[i1] = nil end
+			break
+		end
+	end
+end
+
+local function GetSeriesInfo(seriesName)
+	local data = {}
+	local commList = commData[seriesName]
+	for i=1,#commList do
+		data[i] = {name = commList[i]}
+	end
+	for i=1,#data do
+		data[i].modules = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].modules or {}
+		data[i].cost = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].cost or 0
+	end
+	-- remove reference to modules already in previous levels
+	for i = #data, 2, -1 do
+		RemoveDuplicates(data[i].modules, data[i-1].modules)
+	end
+	return data
+end
+
+local function WriteTooltip(seriesName)
+	local data = GetSeriesInfo(seriesName)
+	local str = ''
+	for i=1,#data do
+		str = str .. "\nLEVEL "..i.. " ("..data[i].cost.." metal)\n\tModules:"
+		for j=1,#(data[i].modules) do
+			if upgrades[data[i].modules[j]] then
+				str = str.."\n\t\t"..upgrades[data[i].modules[j]].name
+			end
+		end
+	end
+	return str
+end
+
+local function CommSelectTemplate(num, seriesName, comm1Name)
+	local option = {
+		enabled = function() return true end,
+		poster = "LuaUI/Images/startup_info_selector/customcomm"..num..".png",
+		selector = seriesName,
+		tooltip = "Select comm config number "..num.." ("..seriesName..")"..WriteTooltip(seriesName),
+		button = function()
+			Spring.SendLuaRulesMsg("customcomm:"..seriesName)
+			Spring.SendCommands({'say a:I choose: '..seriesName..'!'})
+			Close(true)
+		end
+	}
+	-- TODO: put chassis and module info in here
+	
+	return option
+end	
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local i = 0
 for seriesName, comms in pairs(commData) do
