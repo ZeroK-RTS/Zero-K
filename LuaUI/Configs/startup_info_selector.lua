@@ -135,11 +135,14 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- yeah, yeah, n^2
 local function RemoveDuplicates(base, delete)
 	for i1,v1 in pairs(base) do
 		for i2,v2 in pairs(delete) do
-			if v1 == v2 then base[i1] = nil end
-			break
+			if v1 == v2 then
+				base[i1] = nil
+				break
+			end
 		end
 	end
 end
@@ -157,6 +160,7 @@ local function GetSeriesInfo(seriesName)
 	-- remove reference to modules already in previous levels
 	for i = #data, 2, -1 do
 		RemoveDuplicates(data[i].modules, data[i-1].modules)
+		data[i].cost = data[i].cost - data[i-1].cost
 	end
 	return data
 end
