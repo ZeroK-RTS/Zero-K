@@ -8,8 +8,8 @@ local weaponDef = {
 
 	customParams			= {
 		slot = [[4]],
-		rangeperlevel = [[50]],
-		damageperlevel = [[150]],
+		rangeperlevel = [[25]],
+		damageperlevel = [[75]],
 	},
 
       damage                  = {

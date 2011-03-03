@@ -56,4 +56,11 @@ function ApplyWeapon(unitDef, weapon)
 		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] = wcp.muzzleeffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] or [[custom:NONE]]
 		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] = wcp.misceffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] or [[custom:NONE]]
 	end
+	
+	--base customparams
+	wcp.baserange = tostring(wd.range)
+	for armorname,dmg in pairs(wd.damage) do
+		wcp["basedamage_"..armorname] = tostring(dmg)
+		--Spring.Echo(armorname, v.customparams["basedamage_"..armorname])
+	end
 end

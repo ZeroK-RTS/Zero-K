@@ -127,6 +127,18 @@ upgrades = {
 				unitDef.autoheal = (unitDef.autoheal or 0) + 20
 			end,
 	},
+	module_dmg_booster = {
+		name = "Damage Booster",
+		description = "Increases damage of all weapons by 10%",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					for armorname, dmg in pairs(v.damage) do
+						v.damage[armorname] = dmg + (v.customparams["basedamage_"..armorname] or 0) * 0.1
+					end
+				end
+			end,	
+	},
 	module_energy_cell = {
 		name = "Energy Cell",
 		description = "Compact fuel cells that produce +4 energy",

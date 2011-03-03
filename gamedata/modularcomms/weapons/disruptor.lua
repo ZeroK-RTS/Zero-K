@@ -11,9 +11,10 @@ local weaponDef = {
 
 	customParams			= {
 		slot = [[4]],
-		timeslow_preset = [[module_disruptorbeam]],
-		rangeperlevel = [[40]],
-		damageperlevel = [[25]],
+		--timeslow_preset = [[module_disruptorbeam]],
+		rangeperlevel = [[20]],
+		damageperlevel = [[12.5]],
+		timeslow_damagefactor = [[1.8]],
 	},
 	
     damage                  = {
@@ -33,8 +34,8 @@ local weaponDef = {
     range                   = 350,
     reloadtime              = 2,
     rgbColor                = [[0.2 1 1]],
-    soundStart              = [[weapon/laser/heavy_laser4]],
-    soundStartVolume        = 2,
+    soundStart              = [[weapon/laser/heavy_laser5]],
+    soundStartVolume        = 3,
     soundTrigger            = true,
     sweepfire               = false,
     texture1                = [[largelaser]],

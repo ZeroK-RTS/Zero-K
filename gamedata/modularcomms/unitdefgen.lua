@@ -72,6 +72,15 @@ local function ProcessComm(name, config)
 		local cp = commDefs[name].customparams
 		cp.basespeed = tostring(commDefs[name].maxvelocity)
 		cp.basehp = tostring(commDefs[name].maxdamage)
+		for i,v in pairs(commDefs[name].weapondefs or {}) do
+			v.customparams = v.customparams or {}
+			v.customparams.baserange = tostring(v.range)
+			for armorname,dmg in pairs(v.damage) do
+				v.customparams["basedamage_"..armorname] = tostring(dmg)
+				--Spring.Echo(armorname, v.customparams["basedamage_"..armorname])
+			end
+		end
+		
 		if config.modules then
 			-- add weapons first
 			for _,moduleName in ipairs(config.modules) do
@@ -123,9 +132,9 @@ commDefs.stresstestdef = nil
 
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = {
-	chassis = "commsupport4",
+	chassis = "commrecon",
 	name = "Skunkworker",
-	modules = {"commweapon_gaussrifle", "commweapon_sunburst", "module_ablative_armor", "module_heavy_armor", "module_adv_nano"},
+	modules = {"commweapon_disruptor", "commweapon_disruptorbomb", "module_ablative_armor", "module_dmg_booster", "module_adv_nano"},
 }
 ProcessComm("testcomm", testDef)
 
