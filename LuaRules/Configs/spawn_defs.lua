@@ -1,9 +1,10 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local modoptions = Spring.GetModOptions() or {}
 
 local hardModifier   = 0.9	--0.75
 local suicidalModifier = 0.8
-local customModifier = Spring.GetModOptions().techtimemult or 1
+local customModifier = modoptions.techtimemult or 1
 
 local eggsModifier = 0.8	--unused
 alwaysEggs = true			--spawn limited-lifespan eggs when not in Eggs mode?
@@ -13,7 +14,6 @@ spawnSquare          = 150       -- size of the chicken spawn square centered on
 spawnSquareIncrement = 1         -- square size increase for each unit spawned
 burrowName           = "roost"   -- burrow unit name
 playerMalus          = 1         -- how much harder it becomes for each additional player, exponential (playercount^playerMalus = malus)
-maxChicken           = 1000
 lagTrigger           = 0.6       -- average cpu usage after which lag prevention mode triggers
 triggerTolerance     = 0.05      -- increase if lag prevention mode switches on and off too fast
 maxAge               = 5*60      -- chicken die at this age, seconds
@@ -148,9 +148,9 @@ local defenders = {
 }
 
 local function SetCustomMiniQueenTime()
-	if Spring.GetModOptions().miniqueentime then
-		if Spring.GetModOptions().miniqueentime == 0 then return nil
-		else return Spring.GetModOptions().miniqueentime end
+	if modoptions.miniqueentime then
+		if modoptions.miniqueentime == 0 then return nil
+		else return modoptions.miniqueentime end
 	else return 0.6 end
 end    
     
@@ -228,20 +228,19 @@ difficulties = {
   },
 
   ['Chicken: Custom'] = {
-    chickenSpawnRate = Spring.GetModOptions().chickenspawnrate or 50, 
-    burrowSpawnRate  = Spring.GetModOptions().burrowspawnrate or 45,
+    chickenSpawnRate = modoptions.chickenspawnrate or 50, 
+    burrowSpawnRate  = modoptions.burrowspawnrate or 45,
     firstSpawnSize   = 1.4,
     timeSpawnBonus   = .04,
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
-	queenTime		 = (Spring.GetModOptions().queentime or 50)*60,
+	queenTime		 = (modoptions.queentime or 60)*60,
 	miniQueenTime	= {	SetCustomMiniQueenTime() },
-	gracePeriod		= (Spring.GetModOptions().graceperiod and Spring.GetModOptions().graceperiod * 60) or 150,
+	gracePeriod		= (modoptions.graceperiod and modoptions.graceperiod * 60) or 150,
 	gracePenalty	= 0,
 	gracePeriodMin	= 30,
-	--burrowWaveBonus	 = 0.15,
-	--burrowTechTime	 = 20,
-	--burrowRespawnChance = 0.2,
+	burrowQueenTime	= (modoptions.burrowqueentime and modoptions.burrowqueentime) or 100,
+	burrowTechTime	= (modoptions.burrowtechtime and modoptions.burrowtechtime) or 12,
 	scoreMult		= 0,
   },
 }

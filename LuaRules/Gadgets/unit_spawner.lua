@@ -719,7 +719,7 @@ end
 local function Wave()
   local t = spGetGameSeconds()
   
-  if (Spring.GetTeamUnitCount(chickenTeamID) > maxChicken or lagging) then
+  if lagging then
     return
   end
   
@@ -1070,8 +1070,19 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
   return true  -- command was not used
 end
 
-
 function gadget:GameOver()
+	local function ExceedsOne(num)
+		num = tonumber(num) or 1
+		return num > 1
+	end
+	local modopts = Spring.GetModOptions()
+	local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
+	local energymult = tonumber(Spring.GetModOptions().energymult) or 1
+	if ExceedsOne(modopts.metalmult) or ExceedsOne(modopts.metalmult) or (not ExceedsOne(modopts.terracostmult + 0.001)) or ExceedsOne(modopts.wreckagemult) or (not ExceedsOne(modopts.factorycostmult + 0.001)) then
+		Spring.Echo("<Chicken> Cheating modoptions, no score sent")
+		return
+	end
+	
 	local time = Spring.GetGameSeconds()
 	local score = math.min(time/queenTime, 1) * 1000	-- 1000 points * queen anger %
 	if endgame then
