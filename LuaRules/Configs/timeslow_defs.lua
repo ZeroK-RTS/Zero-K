@@ -41,24 +41,11 @@ local presets = {
 ------------------------
 -- Send the Config
 
---deep not safe with circular tables! defaults To false
-function CopyTable(tableToCopy, deep)
-	local copy = {}
-		for key, value in pairs(tableToCopy) do
-		if (deep and type(value) == "table") then
-			copy[key] = CopyTable(value, true)
-		else
-			copy[key] = value
-		end
-	end
-	return copy
-end
-
 for name,data in pairs(WeaponDefNames) do
 	local custom = {scaleSlow = true}
 	local cp = data.customParams
 	if cp.timeslow_preset then
-		weapons[name] = CopyTable(presets[cp.timeslow_preset])
+		weapons[name] = Spring.Utilities.CopyTable(presets[cp.timeslow_preset])
 	elseif cp.timeslow_damagefactor then
 		custom.slowDamage = cp.timeslow_damagefactor * (data.damages and data.damages[0] or 0)
 		custom.onlySlow = (cp.timeslow_onlyslow == "1") or false

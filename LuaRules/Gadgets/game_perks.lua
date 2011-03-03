@@ -41,13 +41,14 @@ local unlocks = {} -- indexed by teamID, value is a table of key unitDefID and v
 
 local unlockUnits = {
 	-- units
---	"spherepole",
+	"spherepole",
 
---  "armmerl",
+	"armmerl",
 	
+	"panther",
 	"corgol",
 	
---  "blackdawn",
+	"blackdawn",
 	"corcrw",
 	
 	"armcybr",
@@ -59,13 +60,14 @@ local unlockUnits = {
 	"armorco",
 	
 	-- defenses and superweapons
-    --"corgrav",
+    "corgrav",
     --"armpb",
+    "armcir",
 	"screamer",
 	"armanni",
 	"cordoom",
 	"corbhmth",
-	--"empmissile",	
+	"empmissile",	
 	"armbrtha",
 	"mahlazer",
 
@@ -78,7 +80,7 @@ local unlockUnits = {
 	"factorygunship",
 	"factoryplane",
 	"armcsa",
---	"missilesilo",
+	"missilesilo",
 }
 
 local unlockUnitsMap = {}

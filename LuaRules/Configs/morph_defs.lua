@@ -4,19 +4,6 @@
 
 local devolution = false
 
---deep not safe with circular tables! defaults To false
-local function CopyTable(tableToCopy, deep)
-  local copy = {}
-  for key, value in pairs(tableToCopy) do
-    if (deep and type(value) == "table") then
-      copy[key] = CopyTable(value, true)
-    else
-      copy[key] = value
-    end
-  end
-  return copy
-end
-
 local morphDefs = {
  
   blastwing = {
@@ -589,7 +576,7 @@ for id, playerData in pairs(customComms) do
 				Spring.Echo("Configuring comm morph: "..(array[i]) , array[i+1])
 				local sourceName, targetName = originDef.name, targetDef.name
 				local morphCost
-				local morphOption = comMorph[i] and CopyTable(comMorph[i], true)
+				local morphOption = comMorph[i] and Spring.Utilities.CopyTable(comMorph[i], true)
 				if morphOption then
 					morphOption.into = array[i+1]
 					-- set cost
