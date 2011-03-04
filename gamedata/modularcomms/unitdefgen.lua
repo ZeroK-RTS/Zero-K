@@ -136,13 +136,8 @@ ProcessComm("stresstestdef", stressTestDef)
 commDefs.stresstestdef = nil
 
 -- for easy testing; creates a comm with unitName testcomm
-local testDef = {
-	chassis = "armcom",
-	name = "Skunkworker",
-	modules = {"commweapon_riotcannon", "commweapon_concussion", "weaponmod_napalm_warhead", "weaponmod_high_caliber_barrel", "module_resurrect", "module_improved_optics"},
-}
+local testDef = VFS.Include("gamedata/modularcomms/testdata.lua")
 ProcessComm("testcomm", testDef)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- postprocessing

@@ -39,6 +39,10 @@ upgrades = {
 		name = "Gauss Rifle",
 		description = "Precise armor-piercing weapon",
 	},
+	commweapon_partillery = {
+		name = "Plasma Artillery",
+		description = "Long-range artillery gun",
+	},
 	commweapon_riotcannon = {
 		name = "Riot Cannon",
 		description = "The weapon of choice for crowd control",
@@ -113,7 +117,11 @@ upgrades = {
 		name = "Disruptor Ammo",
 		description = "Shotgun/Gauss Rifle/Heavy Machine Gun: +40% slow damage",
 		func = function(unitDef)
-				local permitted = {commweapon_shotgun = true, commweapon_gaussrifle = true, commweapon_heavymachinegun = true}
+				local permitted = {
+					commweapon_shotgun = true,
+					commweapon_gaussrifle = true,
+					commweapon_heavymachinegun = true,
+				}
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					local wcp = v.customparams
@@ -128,8 +136,13 @@ upgrades = {
 		description = "Beam Laser/Slow Beam/Disruptor Beam: +15% damage and range",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
+				local permitted = {
+					commweapon_beamlaser = true,
+					commweapon_slowbeam = true,
+					commweapon_disruptor = true,
+				}
 				for i,v in pairs(weapons) do
-					if i == "commweapon_beamlaser" or i == "commweapon_slowbeam" or i == "commweapon_disruptor" then
+					if permitted[i] then then
 						v.range = v.range * 1.15
 						v.customparams.baserange = v.range
 						for armorname, dmg in pairs(v.damage) do
@@ -142,13 +155,13 @@ upgrades = {
 	},
 	weaponmod_high_caliber_barrel = {
 		name = "High Caliber Barrel",
-		description = "Shotgun/Riot Cannon/Gauss Rifle/Rocket Launcher: +150% damage, +100% reload time",
+		description = "Shotgun/Riot Cannon/Gauss Rifle/Plasma Artillery: +150% damage, +100% reload time",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {
 					commweapon_shotgun = true,
 					commweapon_gaussrifle = true,
-					commweapon_rocketlauncher = true,
+					commweapon_partillery = true,
 					commweapon_riotcannon = true,
 				}
 				for i,v in pairs(weapons) do
@@ -163,15 +176,26 @@ upgrades = {
 				end
 			end,		
 	},
-	weaponmod_hvrocket = {
-		name = "High Velocity Rocket",
-		description = "Rocket Launcher: +40% velocity",
+	weaponmod_standoff_rocket = {
+		name = "Standoff Rocket",
+		description = "Rocket Launcher: +50% range, +20% damage, +50% reload",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_rocketlauncher" then
-						v.weaponvelocity = v.weaponvelocity * 1.4
-						v.startvelocity = v.startvelocity * 1.4
+						v.range = v.range * 1.5
+						v.customparams.baserange = v.range
+						v.reloadtime = v.reloadtime * 1.5
+						v.customparams.basereload = v.reloadtime
+						for armorname, dmg in pairs(v.damage) do
+							v.damage[armorname] = dmg * 1.2
+							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+						end						
+						v.model = [[wep_m_havoc.s3o]]
+						v.soundhit = [[explosion/ex_med4]]
+						v.soundhitvolume = 8
+						v.soundstart = [[weapon/missile/missile2_fire_bass]]
+						v.soundstartvolume = 7					
 						break
 					end
 				end
@@ -179,26 +203,28 @@ upgrades = {
 	},
 	weaponmod_napalm_warhead = {
 		name = "Napalm Warhead",
-		description = "Riot Cannon/Rocket Launcher: Reduced direct damage, sets target on fire",
+		description = "Riot Cannon/Plasma Artillery/Rocket Launcher: Reduced direct damage, sets target on fire",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {
+					commweapon_partillery = true,
 					commweapon_rocketlauncher = true,
 					commweapon_riotcannon = true,
 				}
 				for i,v in pairs(weapons) do
 					if permitted[i] then
-						if i == "commweapon_riotcannon" then	-- -33% damage
+						if not (i == "commweapon_rocketlauncher") then	-- -33% damage
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 2/3
 								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 							end
-						else	-- -50% damage, 160 AoE
+							v.rgbcolor = [[1 0.3 0.1]]
+						else	-- -50% damage, 128 AoE
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 0.5
 								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 							end
-							v.areaofeffect = 160
+							v.areaofeffect = 128
 						end
 						v.explosiongenerator = [[custom:NAPALM_Expl]]
 						v.customparams.burnfactor = "0.5"
