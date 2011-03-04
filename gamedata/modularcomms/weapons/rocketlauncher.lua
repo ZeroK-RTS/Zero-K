@@ -29,7 +29,7 @@ local weaponDef = {
 	noSelfDamage            = true,
 	predictBoost            = 1,
 	range                   = 430,
-	reloadtime              = 2,
+	reloadtime              = 4,
 	smokedelay              = [[.1]],
 	smokeTrail              = true,
 	soundHit                = [[weapon/missile/sabot_hit]],
@@ -37,14 +37,14 @@ local weaponDef = {
 	soundStart              = [[weapon/missile/sabot_fire]],
 	soundStartVolume        = 7,
 	startsmoke              = [[1]],
-	startVelocity           = 300,
+	startVelocity           = 200,
 	texture2                = [[darksmoketrail]],
 	tracks                  = false,
 	trajectoryHeight        = 0.05,
 	turret                  = true,
 	weaponAcceleration      = 100,
 	weaponType              = [[MissileLauncher]],
-	weaponVelocity          = 400,
+	weaponVelocity          = 250,
 }
 
 return name, weaponDef

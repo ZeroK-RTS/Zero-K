@@ -414,13 +414,15 @@ function script.FireWeapon(num)
 		EmitSfx(flare, 1026)
 	end
 	--recoil
-	Sleep(50)
-	Turn( gun , x_axis, math.rad(-2), math.rad(1250) )
-	Sleep(250)
-	Turn( gun , x_axis, 0, math.rad(250) )
-	Sleep(800)
-	if ( math.random() < 0.33) then
-		Turn(armhold, x_axis, math.rad(15), math.rad(150)) --check the sexy shot
+	if num ~= 4 then
+		Sleep(50)
+		Turn( gun , x_axis, math.rad(-2), math.rad(1250) )
+		Sleep(250)
+		Turn( gun , x_axis, 0, math.rad(250) )
+		Sleep(800)
+		if ( math.random() < 0.33) then
+			Turn(armhold, x_axis, math.rad(15), math.rad(150)) --check the sexy shot
+		end
 	end
 end
 

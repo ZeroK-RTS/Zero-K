@@ -63,7 +63,6 @@ local luaAI
 local chickenTeamID
 local burrows             = {}
 local burrowSpawnProgress = 0
-local commanders          = {}
 local maxTries            = 100
 local computerTeams       = {}
 local humanTeams          = {}
@@ -830,7 +829,6 @@ local function DisableUnit(unitID)
   Spring.SetUnitCloak(unitID, 4)
   Spring.SetUnitStealth(unitID, true)
   Spring.SetUnitNoSelect(unitID, true)
-  commanders[unitID] = nil
 end
 
 local function DisableComputerUnits()
@@ -851,7 +849,6 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   local name = UnitDefs[unitDefID].name
-  if commnames[name] then commanders[unitID] = true end
   if ( chickenTeamID == unitTeam and not commnames[name] ) then
     local n = Spring.GetGameRulesParam(name.."Count") or 0
     Spring.SetGameRulesParam(name.."Count", n+1)
@@ -976,7 +973,6 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   chickenBirths[unitID] = nil
-  commanders[unitID] = nil
   turrets[unitID] = nil
   if targets[unitID] then
 	targets[unitID] = nil

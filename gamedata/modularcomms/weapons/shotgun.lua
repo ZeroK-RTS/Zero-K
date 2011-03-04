@@ -27,7 +27,6 @@ local weaponDef = {
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 1,
-	lineOfSight             = true,
 	noSelfDamage            = true,
 	projectiles				= 12,
 	range                   = 280,

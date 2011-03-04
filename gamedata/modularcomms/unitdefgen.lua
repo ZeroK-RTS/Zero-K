@@ -82,7 +82,14 @@ local function ProcessComm(name, config)
 		end
 		
 		if config.modules then
-			-- add weapons first
+			-- sort: weapons first, weapon mods next, regular modules last
+			table.sort(config.modules,
+				function(a,b)
+					return (a:find("commweapon_") and (not b:find("commweapon"))
+					or (a:find("weaponmod_") and b:find("module_")) )
+				end )
+
+			-- process all modules (including weapons)
 			for _,moduleName in ipairs(config.modules) do
 				if moduleName:find("commweapon_",1,true) then
 					if weapons[moduleName] then
@@ -92,11 +99,8 @@ local function ProcessComm(name, config)
 						Spring.Echo("\tERROR: Weapon "..moduleName.." not found")
 					end
 				end
-			end
-			-- process all modules (including weapons)
-			for _,moduleName in ipairs(config.modules) do
 				if upgrades[moduleName] then
-					Spring.Echo("\tApplying upgrade: "..moduleName)
+					--Spring.Echo("\tApplying upgrade: "..moduleName)
 					if upgrades[moduleName].func then upgrades[moduleName].func(commDefs[name]) end	--apply upgrade function
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
@@ -134,7 +138,7 @@ commDefs.stresstestdef = nil
 local testDef = {
 	chassis = "commsupport",
 	name = "Skunkworker",
-	modules = {"commweapon_heavymachinegun", "commweapon_concussion", "module_disruptor_ammo", "module_repair_field"},
+	modules = {"commweapon_rocketlauncher", "commweapon_concussion", "weaponmod_autoflechette", "module_repair_field"},
 }
 ProcessComm("testcomm", testDef)
 

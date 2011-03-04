@@ -34,14 +34,17 @@ function ApplyWeapon(unitDef, weapon)
 	end
 	
 	-- upgrade by level
+	
 	local level = (tonumber(unitDef.customparams.level) - 1) or 0
 	local wd = unitDef.weapondefs[weapon]
+	--[[
 	if wd.range then
 		wd.range = wd.range + (wd.customparams.rangeperlevel or 0) * level
 	end
 	if wd.damage then
 		wd.damage.default = wd.damage.default + (wd.customparams.damageperlevel or 0) * level
 	end
+	]]--
 	
 	-- clear other weapons
 	if slot > 3 then
@@ -62,5 +65,21 @@ function ApplyWeapon(unitDef, weapon)
 	for armorname,dmg in pairs(wd.damage) do
 		wcp["basedamage_"..armorname] = tostring(dmg)
 		--Spring.Echo(armorname, v.customparams["basedamage_"..armorname])
+	end
+end
+
+function ModifyWeaponRange(unitDef, factor)
+	local weapons = unitDef.weapondefs or {}
+	for i,v in pairs(weapons) do
+		v.range = v.range * factor
+	end
+end
+
+function ModifyWeaponDamage(unitDef, factor)
+	local weapons = unitDef.weapondefs or {}
+	for i,v in pairs(weapons) do
+		for armorname, dmg in pairs(v.damage) do
+			v.damage[armorname] = dmg * factor
+		end
 	end
 end
