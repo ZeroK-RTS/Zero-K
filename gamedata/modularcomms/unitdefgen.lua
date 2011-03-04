@@ -132,9 +132,9 @@ commDefs.stresstestdef = nil
 
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = {
-	chassis = "commrecon",
+	chassis = "commsupport",
 	name = "Skunkworker",
-	modules = {"commweapon_disruptorbomb", "module_cloak_field", "module_dmg_booster", "module_repair_field"},
+	modules = {"commweapon_heavymachinegun", "commweapon_concussion", "module_disruptor_ammo", "module_repair_field"},
 }
 ProcessComm("testcomm", testDef)
 

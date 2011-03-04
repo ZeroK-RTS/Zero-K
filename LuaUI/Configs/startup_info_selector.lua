@@ -80,10 +80,19 @@ local optionData = {
 	}
 }
 
+local chassisImages = {
+	armcom = "LuaUI/Images/startup_info_selector/chassis_strike.png",
+	corcom = "LuaUI/Images/startup_info_selector/chassis_battle.png",
+	commrecon = "LuaUI/Images/startup_info_selector/chassis_recon.png",
+	commsupport = "LuaUI/Images/startup_info_selector/chassis_support.png",
+}
+
 --------------------------------------------------------------------------------
+-- load data
 --------------------------------------------------------------------------------
 local success, err
 
+-- global comm data (from the modoption)
 local commDataGlobal
 local commDataGlobalRaw = Spring.GetModOptions().commandertypes
 if not (commDataGlobalRaw and type(commDataGlobalRaw) == 'string') then
@@ -107,6 +116,7 @@ if err then
 	Spring.Echo('Startup Info & Selector error: ' .. err)
 end
 
+-- player comm data (from customkeys)
 local myID = Spring.GetMyPlayerID()
 local commData
 local customKeys = select(10, Spring.GetPlayerInfo(myID))
@@ -147,6 +157,7 @@ local function RemoveDuplicates(base, delete)
 	end
 end
 
+-- gets modules and costs
 local function GetSeriesInfo(seriesName)
 	local data = {}
 	local commList = commData[seriesName]
@@ -182,7 +193,8 @@ end
 local function CommSelectTemplate(num, seriesName, comm1Name)
 	local option = {
 		enabled = function() return true end,
-		poster = "LuaUI/Images/startup_info_selector/customcomm"..num..".png",
+		poster = chassisImages[UnitDefNames[comm1Name].customParams.statsname],
+		poster2 = "LuaUI/Images/startup_info_selector/customcomm"..num..".png",
 		selector = seriesName,
 		tooltip = "Select comm config number "..num.." ("..seriesName..")"..WriteTooltip(seriesName),
 		button = function()
@@ -191,7 +203,6 @@ local function CommSelectTemplate(num, seriesName, comm1Name)
 			Close(true)
 		end
 	}
-	-- TODO: put chassis and module info in here
 	
 	return option
 end	

@@ -129,6 +129,7 @@ local function CreateWindow()
 				local image = Image:New{
 					parent = mainWindow,
 					file = option.poster,--lookup Configs/startup_info_selector.lua to get optiondata
+					file2 = option.poster2,
 					tooltip = option.tooltip,
 					caption = option.selector,
 					width = posterx,

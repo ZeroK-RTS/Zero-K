@@ -73,6 +73,7 @@ unitDef = {
 
     explosiongenerators = {
 		[[custom:flashmuzzle1]],
+		[[custom:NONE]],
     },
 
   },

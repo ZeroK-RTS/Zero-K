@@ -15,7 +15,7 @@ for i=1,#weaponsList do
 	weapons[name] = lowerkeys(array)
 end
 
--- name and description don't actually matter ATM, only the keyname and function do
+-- name is needed for widget; description is currently unused
 upgrades = {
 	-- weapons
 	-- it is important that they are prefixed with "commweapon_" in order to get the special handling!
@@ -135,6 +135,23 @@ upgrades = {
 				for i,v in pairs(weapons) do
 					for armorname, dmg in pairs(v.damage) do
 						v.damage[armorname] = dmg + (v.customparams["basedamage_"..armorname] or 0) * 0.1
+					end
+				end
+			end,	
+	},
+	module_disruptor_ammo = {
+		name = "Disruptor Ammo",
+		description = "Reduces primary weapon damage by 50% (cumulative), adds 250% slow damage",
+		func = function(unitDef)
+				local exemptions = {commweapon_beamlaser = true, commweapon_heatray = true}
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					local wcp = v.customparams
+					if (not wcp.timeslow_damagefactor) and (not exemptions[i]) and (wcp.slot ~= "3") then
+						for armorname, dmg in pairs(v.damage) do
+							v.damage[armorname] = dmg * 0.5
+						end
+						wcp.timeslow_damagefactor = "2.5"
 					end
 				end
 			end,	
