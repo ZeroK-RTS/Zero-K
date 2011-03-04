@@ -75,6 +75,7 @@ unitDef = {
 
     explosiongenerators = {
     	[[custom:NONE]],
+		[[custom:NONE]],
     },
 
   },

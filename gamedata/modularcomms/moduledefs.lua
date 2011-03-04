@@ -82,11 +82,22 @@ upgrades = {
 		description = "Ruins a single target's day with a medium-range high-energy burst",
 	},
 	
+	-- substitution mods - use commweapon handling to make sure they go first
+	commweapon_disruptor = {
+		name = "Disruptor Beam",
+		description = "Slow Beam: +33% reload time, +250 real damage",
+	},
+	commweapon_shockrifle = {
+		name = "Shock Rifle",
+		description = "Gauss Rifle: Convert to a long-range sniper rifle",
+	},	
+	
 	-- weapon mods
 	weaponmod_autoflechette = {
 		name = "Autoflechette Mod",
 		description = "Shotgun: -25% projectiles, -50% reload time",
 		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_shotgun" then
 						v.name = "Autoflechette"
@@ -98,17 +109,42 @@ upgrades = {
 				end
 			end,	
 	},
-	weaponmod_disruptorbeam = {
-		name = "Disruptor Beam",
-		description = "Slow Beam: +33% reload time, +250 real damage",
+	module_disruptor_ammo = {
+		name = "Disruptor Ammo",
+		description = "Shotgun/Gauss Rifle/Heavy Machine Gun: +40% slow damage",
 		func = function(unitDef)
-				ApplyWeapon(unitDef, "commweapon_disruptor")
+				local permitted = {commweapon_shotgun = true, commweapon_gaussrifle = true, commweapon_heavymachinegun = true}
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					local wcp = v.customparams
+					if permitted[i] then
+						wcp.timeslow_damagefactor = "0.4"
+					end
+				end
 			end,	
+	},
+	weaponmod_high_frequency_beam = {
+		name = "High Frequency Beam",
+		description = "Beam Laser/Slow Beam: +15% damage and range",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					if i == "commweapon_beamlaser" or i == "commweapon_slowbeam" or i == "commweapon_disruptor" then
+						v.range = v.range * 1.15
+						v.customparams.baserange = v.range
+						for armorname, dmg in pairs(v.damage) do
+							v.damage[armorname] = dmg * 1.15
+							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+						end
+					end
+				end
+			end,		
 	},
 	weaponmod_hvrocket = {
 		name = "High Velocity Rocket",
 		description = "Rocket Launcher: +40% velocity",
 		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_rocketlauncher" then
 						v.weaponvelocity = v.weaponvelocity * 1.4
@@ -120,22 +156,18 @@ upgrades = {
 	},
 	weaponmod_plasma_containment = {
 		name = "Plasma Containment Field",
-		description = "Heat Ray: +50% range; Riot Cannon: +25% range",
+		description = "Heat Ray: +50% range; Heavy Machine Gun/Riot Cannon: +25% range",
 		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_heatray" then
 						v.range = v.range * 1.5
-					elseif i == "commweapon_riotcannon" then
+						v.customparams.baserange = tostring(v.range)
+					elseif i == "commweapon_riotcannon" or i == "commweapon_heavymachinegun" then
 						v.range = v.range * 1.25
+						v.customparams.baserange = tostring(v.range)
 					end
 				end
-			end,	
-	},	
-	weaponmod_shockrifle = {
-		name = "Shock Rifle",
-		description = "Gauss Rifle: Convert to a long-range sniper rifle",
-		func = function(unitDef)
-				ApplyWeapon(unitDef, "commweapon_shockrifle")
 			end,	
 	},	
 	
@@ -153,7 +185,7 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					if v.range then v.range = v.range * 1.2 end
+					if v.range then v.range = v.range + v.customparams.baserange * 0.2 end
 				end
 			end,	
 	},
@@ -179,7 +211,7 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					for armorname, dmg in pairs(v.damage) do
-						v.damage[armorname] = dmg + (v.customparams["basedamage_"..armorname] or 0) * 0.1
+						v.damage[armorname] = dmg + (v.customparams["basedamage_"..armorname] or dmg) * 0.1
 					end
 				end
 			end,	
@@ -275,22 +307,5 @@ upgrades = {
 	},
 	
 	-- deprecated
-	module_disruptor_ammo = {
-		name = "Disruptor Ammo",
-		description = "Reduces primary weapon damage by 50% (cumulative), adds 250% slow damage",
-		func = function(unitDef)
-				local exemptions = {commweapon_beamlaser = true, commweapon_heatray = true}
-				local weapons = unitDef.weapondefs or {}
-				for i,v in pairs(weapons) do
-					local wcp = v.customparams
-					if (not wcp.timeslow_damagefactor) and (not exemptions[i]) and (wcp.slot ~= "3") then
-						for armorname, dmg in pairs(v.damage) do
-							v.damage[armorname] = dmg * 0.5
-						end
-						wcp.timeslow_damagefactor = "2.5"
-					end
-				end
-			end,	
-	},
 }
 
