@@ -118,6 +118,19 @@ upgrades = {
 				end
 			end,	
 	},
+	weaponmod_plasma_containment = {
+		name = "Plasma Containment Field",
+		description = "Heat Ray: +50% range; Riot Cannon: +25% range",
+		func = function(unitDef)
+				for i,v in pairs(weapons) do
+					if i == "commweapon_heatray" then
+						v.range = v.range * 1.5
+					elseif i == "commweapon_riotcannon" then
+						v.range = v.range * 1.25
+					end
+				end
+			end,	
+	},	
 	weaponmod_shockrifle = {
 		name = "Shock Rifle",
 		description = "Gauss Rifle: Convert to a long-range sniper rifle",
@@ -196,9 +209,16 @@ upgrades = {
 	},
 	module_high_power_servos = {
 		name = "High Power Servos",
-		description = "More powerful leg servos increase speed by 15% of base",
+		description = "More powerful leg actuators increase speed by 15% of base",
 		func = function(unitDef)
 				unitDef.maxvelocity = (unitDef.maxvelocity or 0) + unitDef.customparams.basespeed*0.15
+			end,
+	},
+	module_improved_optics = {
+		name = "Improved Optics",
+		description = "Increases sight distance by 100 m",
+		func = function(unitDef)
+				unitDef.sightdistance = unitDef.sightdistance + 100
 			end,
 	},
 	module_personal_cloak = {
@@ -211,6 +231,14 @@ upgrades = {
 				if unitDef.cloakcostmoving > 20 then unitDef.cloakcostmoving = 20 end
 			end,
 	},
+	module_resurrect = {
+		name = "Lazarus Device",
+		description = "Enables resurrection of wrecks",
+		func = function(unitDef)
+				unitDef.canresurrect = true
+			end,
+	},
+	
 	module_cloak_field = {
 		name = "Cloaking Field",
 		description = "Cloaks all friendly units within 350 elmos",

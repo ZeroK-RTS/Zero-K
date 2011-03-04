@@ -43,7 +43,7 @@ if not (commDataRaw and type(commDataRaw) == 'string') then
 else
 	commDataRaw = string.gsub(commDataRaw, '_', '=')
 	commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
-	Spring.Echo(commDataRaw)
+	--Spring.Echo(commDataRaw)
 	commDataFunc, err = loadstring("return "..commDataRaw)
 	if commDataFunc then
 		success, commData = pcall(commDataFunc)
@@ -93,7 +93,7 @@ local function ProcessComm(name, config)
 			for _,moduleName in ipairs(config.modules) do
 				if moduleName:find("commweapon_",1,true) then
 					if weapons[moduleName] then
-						Spring.Echo("\tApplying weapon: "..moduleName)
+						--Spring.Echo("\tApplying weapon: "..moduleName)
 						ApplyWeapon(commDefs[name], moduleName)
 					else
 						Spring.Echo("\tERROR: Weapon "..moduleName.." not found")
@@ -136,9 +136,9 @@ commDefs.stresstestdef = nil
 
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = {
-	chassis = "commsupport",
+	chassis = "corcom",
 	name = "Skunkworker",
-	modules = {"commweapon_rocketlauncher", "commweapon_concussion", "weaponmod_autoflechette", "module_repair_field"},
+	modules = {"commweapon_riotcannon", "commweapon_concussion", "weaponmod_plasma_containment", "module_resurrect", "module_improved_optics"},
 }
 ProcessComm("testcomm", testDef)
 
@@ -178,6 +178,8 @@ for name, data in pairs(commDefs) do
 		array.reclaimtime = data.buildcostmetal * mult
 		array.damage = data.maxdamage
 	end
+	-- misc
+	if data.canresurrect then data.resurrectspeed = data.workertime * 5/6 end
 end
 
 
