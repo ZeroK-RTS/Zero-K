@@ -19,7 +19,7 @@ local weaponDef = {
 		subs    = 17.5,
 	},
 	
-	fireStarter             = 70,
+	fireStarter             = 180,
 	flightTime              = 3,
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,

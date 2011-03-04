@@ -24,6 +24,7 @@ local weaponDef = {
 
     edgeEffectiveness       = 0.75,
     explosionGenerator      = [[custom:FLASH64]],
+	fireStarter				= 150,
     impulseBoost            = 0,
     impulseFactor           = 0.4,
     interceptedByShieldType = 1,

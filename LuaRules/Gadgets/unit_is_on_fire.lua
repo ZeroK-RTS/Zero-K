@@ -48,10 +48,15 @@ local flamerWeaponDefs = {}
 for i=1,#WeaponDefs do
   if (WeaponDefs[i].type=="Flame" or 
       WeaponDefs[i].fireStarter >=100 or 
-      WeaponDefs[i].name:lower():find("napalm")) then --// == flamethrower or napalm
+      WeaponDefs[i].name:lower():find("napalm")) or
+	  WeaponDefs[i].customParams.burnfactor then --// == flamethrower or napalm
      --// 0.5 cus we want to differ trees an metal/tanks 
      --// (fireStarter-tag: 1.0->always flame trees, 2.0->always flame units/buildings too)
-    flamerWeaponDefs[i]=WeaponDefs[i].fireStarter
+	local wcp = WeaponDefs[i].customParams or {}
+    flamerWeaponDefs[i] = {
+		burnTime = (wcp.burnfactor and wcp.burnfactor * WeaponDefs[i].damages[0] * 0.01) or WeaponDefs[i].fireStarter,
+		burnChance = (wcp.burnchance and wcp.burnchance/10) or WeaponDefs[i].fireStarter,
+	}
   end
 end
 
@@ -64,15 +69,15 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
                             attackerID, attackerDefID, attackerTeam)
   if (flamerWeaponDefs[weaponID]) then
     if (UnitDefs[unitDefID].customParams.fireproof~="1") then
-      local fireStarter = flamerWeaponDefs[weaponID]
-      if ((random()*10*(2-allyBonus))<fireStarter) then
+      local burnChance = flamerWeaponDefs[weaponID].burnChance
+      if ((random()*10*(2-allyBonus)) < burnChance) then
         local mult = 1
         if (not attackerTeam)or(AreTeamsAllied(unitTeam, attackerTeam)) then
           mult = allyBonus
         end
         unitsOnFire[unitID] = {
           startFrame = gameFrame, 
-          fireLength = fireStarter*450*(random()*0.3+0.7)*mult, 
+          fireLength = flamerWeaponDefs[weaponID].burnTime*450*(random()*0.3+0.7)*mult, 
           fireDmg    = fireDmg,
           attackerID = attackerID,
 		  --attackerDefID = attackerDefID,

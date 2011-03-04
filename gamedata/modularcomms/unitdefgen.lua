@@ -75,6 +75,7 @@ local function ProcessComm(name, config)
 		for i,v in pairs(commDefs[name].weapondefs or {}) do
 			v.customparams = v.customparams or {}
 			v.customparams.baserange = tostring(v.range)
+			v.customparams.basereload = tostring(v.reloadtime)
 			for armorname,dmg in pairs(v.damage) do
 				v.customparams["basedamage_"..armorname] = tostring(dmg)
 				--Spring.Echo(armorname, v.customparams["basedamage_"..armorname])
@@ -138,7 +139,7 @@ commDefs.stresstestdef = nil
 local testDef = {
 	chassis = "armcom",
 	name = "Skunkworker",
-	modules = {"commweapon_disruptor", "commweapon_concussion", "weaponmod_high_frequency_beam", "module_resurrect", "module_improved_optics"},
+	modules = {"commweapon_riotcannon", "commweapon_concussion", "weaponmod_napalm_warhead", "weaponmod_high_caliber_barrel", "module_resurrect", "module_improved_optics"},
 }
 ProcessComm("testcomm", testDef)
 

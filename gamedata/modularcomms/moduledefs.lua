@@ -125,7 +125,7 @@ upgrades = {
 	},
 	weaponmod_high_frequency_beam = {
 		name = "High Frequency Beam",
-		description = "Beam Laser/Slow Beam: +15% damage and range",
+		description = "Beam Laser/Slow Beam/Disruptor Beam: +15% damage and range",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -134,6 +134,29 @@ upgrades = {
 						v.customparams.baserange = v.range
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.15
+							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+						end
+					end
+				end
+			end,		
+	},
+	weaponmod_high_caliber_barrel = {
+		name = "High Caliber Barrel",
+		description = "Shotgun/Riot Cannon/Gauss Rifle/Rocket Launcher: +150% damage, +100% reload time",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				local permitted = {
+					commweapon_shotgun = true,
+					commweapon_gaussrifle = true,
+					commweapon_rocketlauncher = true,
+					commweapon_riotcannon = true,
+				}
+				for i,v in pairs(weapons) do
+					if permitted[i] then
+						v.reloadtime = v.reloadtime * 2
+						v.customparams.basereload = v.reloadtime
+						for armorname, dmg in pairs(v.damage) do
+							v.damage[armorname] = dmg * 2.5
 							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 						end
 					end
@@ -153,6 +176,37 @@ upgrades = {
 					end
 				end
 			end,	
+	},
+	weaponmod_napalm_warhead = {
+		name = "Napalm Warhead",
+		description = "Riot Cannon/Rocket Launcher: Reduced direct damage, sets target on fire",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				local permitted = {
+					commweapon_rocketlauncher = true,
+					commweapon_riotcannon = true,
+				}
+				for i,v in pairs(weapons) do
+					if permitted[i] then
+						if i == "commweapon_riotcannon" then	-- -33% damage
+							for armorname, dmg in pairs(v.damage) do
+								v.damage[armorname] = dmg * 2/3
+								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+							end
+						else	-- -50% damage, 160 AoE
+							for armorname, dmg in pairs(v.damage) do
+								v.damage[armorname] = dmg * 0.5
+								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+							end
+							v.areaofeffect = 160
+						end
+						v.explosiongenerator = [[custom:NAPALM_Expl]]
+						v.customparams.burnfactor = "0.5"
+						v.customparams.burnchance = "100"
+						v.soundhit = [[weapon/burn_mixed]]
+					end
+				end
+			end,		
 	},
 	weaponmod_plasma_containment = {
 		name = "Plasma Containment Field",
@@ -185,7 +239,7 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					if v.range then v.range = v.range + v.customparams.baserange * 0.2 end
+					if v.range then v.range = v.range + (v.customparams.baserange or v.range) * 0.2 end
 				end
 			end,	
 	},
