@@ -57,13 +57,6 @@ mexes = {
   "cormex", 
   "armmex"
 }
-commnames = {
-	armcom=true,
-	corcom=true,
-	commrecon=true,
-	commsupport=true,
-	chickenbroodqueen=true,
-}
 noTarget = {
 	terraunit=true,
 	armmine1=true,

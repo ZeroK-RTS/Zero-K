@@ -113,7 +113,7 @@ upgrades = {
 				end
 			end,	
 	},
-	module_disruptor_ammo = {
+	weaponmod_disruptor_ammo = {
 		name = "Disruptor Ammo",
 		description = "Shotgun/Gauss Rifle/Heavy Machine Gun: +40% slow damage",
 		func = function(unitDef)
@@ -328,13 +328,6 @@ upgrades = {
 				attributeMods.speed = attributeMods.speed + 0.1
 			end,
 	},
-	module_improved_optics = {
-		name = "Improved Optics",
-		description = "Increases sight distance by 100 m",
-		func = function(unitDef)
-				unitDef.sightdistance = unitDef.sightdistance + 100
-			end,
-	},
 	module_personal_cloak = {
 		name = "Personal Cloak",
 		description = "Cloaks the comm",
@@ -352,7 +345,6 @@ upgrades = {
 				unitDef.canresurrect = true
 			end,
 	},
-	
 	module_cloak_field = {
 		name = "Cloaking Field",
 		description = "Cloaks all friendly units within 350 m",
@@ -389,5 +381,12 @@ upgrades = {
 	},
 	
 	-- deprecated
+	module_improved_optics = {
+		name = "Improved Optics",
+		description = "Increases sight distance by 100 m",
+		func = function(unitDef)
+				unitDef.sightdistance = unitDef.sightdistance + 100
+			end,
+	},
 }
 

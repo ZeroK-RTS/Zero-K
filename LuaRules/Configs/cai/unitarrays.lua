@@ -120,10 +120,10 @@ local prioritySos = {
     "factoryjump",
     "factorytank",
     "corsy",
-	"armcom",
-	"corcom",
-	"commrecon",
-	"commsupport",
+	"armcom1",
+	"corcom1",
+	"commrecon1",
+	"commsupport1",
 }
 
 --global versions
