@@ -502,6 +502,20 @@ local function MinimapMouseToWorld(mx, my)
 	end
 end
 
+local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
+	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
+		return
+	end
+	Spring.GiveOrder(cmdID, cmdParams, cmdOpts)
+end
+
+local function GiveNotifyingInsertOrder(cmdID, cmdParams, cmdOpts)
+	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
+		return
+	end
+	WG.CommandInsert(cmdID, cmdParams, cmdOpts)
+end
+
 
 function widget:MouseRelease(x,y,button)
 	if button ~= 3 then return end 
@@ -528,9 +542,9 @@ function widget:MouseRelease(x,y,button)
 			if shift then tinsert(keyState, "shift") end
     
 			if meta and WG.CommandInsert then 
-				WG.CommandInsert(CMD.MOVE,pos,keyState)
+				GiveNotifyingInsertOrder(CMD.MOVE,pos,keyState)
 			else 
-				Spring.GiveOrder(CMD.MOVE, pos, keyState)
+				GiveNotifyingOrder(CMD.MOVE, pos, keyState)
 			end 
 		end 
 	end 
