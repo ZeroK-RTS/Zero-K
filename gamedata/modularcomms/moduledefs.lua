@@ -142,7 +142,7 @@ upgrades = {
 					commweapon_disruptor = true,
 				}
 				for i,v in pairs(weapons) do
-					if permitted[i] then then
+					if permitted[i] then
 						v.range = v.range * 1.15
 						v.customparams.baserange = v.range
 						for armorname, dmg in pairs(v.damage) do
