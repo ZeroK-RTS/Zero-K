@@ -311,6 +311,7 @@ local function GetCmdOpts(alt, ctrl, meta, shift, right)
 	opts.coded = coded
 	return opts
 end
+
 local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
 	
 	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
@@ -319,6 +320,11 @@ local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
 	
 	spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
 end
+
+local function GiveNonNotifyingOrder(cmdID, cmdParams, cmdOpts)
+	spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
+end
+
 local function GiveNotifyingOrderToUnit(uID, cmdID, cmdParams, cmdOpts)
 	
 	for _, w in ipairs(widgetHandler.widgets) do
@@ -450,7 +456,7 @@ function widget:MouseMove(mx, my, dx, dy, mButton)
 				
 				local alt, ctrl, meta, shift = GetModKeys()
 				local cmdOpts = GetCmdOpts(false, ctrl, meta, true, usingRMB) -- using alt uses springs box formation, so we set it off always
-				GiveNotifyingOrder(usingCmd, pos, cmdOpts)
+				GiveNonNotifyingOrder(usingCmd, pos, cmdOpts)
 				lastPathPos = pos
 			end
 		end
