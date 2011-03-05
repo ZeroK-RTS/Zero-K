@@ -81,11 +81,6 @@ for i=1,#WeaponDefs do
 		}
 	
 		flamerWeaponDefs[i].maxDamage = flamerWeaponDefs[i].burnDamage*flamerWeaponDefs[i].burnTime
-	 
-		Spring.Echo("name: " .. WeaponDefs[i].name)
-		Spring.Echo(WeaponDefs[i].fireStarter)
-		Spring.Echo(flamerWeaponDefs[i].burnTime)
-		Spring.Echo(flamerWeaponDefs[i].burnChance)
 	end
 end
 
