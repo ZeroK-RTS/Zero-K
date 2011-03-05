@@ -66,23 +66,6 @@ local copy = {
 			customparams = {damagebonus = "0.3"},
 		},
 	},
-	corcom1 = {
-		corcom2 = {
-			level = 2,
-			mainstats = {maxdamage = 3600},
-			customparams = {damagebonus = "0.1"},
-		},
-		corcom3 = {
-			level = 3,
-			mainstats = {maxdamage = 5000},
-			customparams = {damagebonus = "0.2"},
-		},
-		corcom4 = {
-			level = 4,
-			mainstats = {maxdamage = 7200},
-			customparams = {damagebonus = "0.3"},
-		},
-	},
 	commrecon1 = {
 		commrecon2 = {
 			level = 2,

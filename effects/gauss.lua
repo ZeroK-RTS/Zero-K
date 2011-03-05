@@ -9,6 +9,8 @@
 -- gauss_ring_m
 -- gauss_hit_m
 -- gauss_ring_snipe
+-- gauss_hit_l_purple
+-- gauss_hit_m_purple
 
 return {
   ["gauss_hit_h"] = {
@@ -289,5 +291,50 @@ return {
     },
   },
 
+  ["gauss_hit_l_purple"] = {
+    sphere = {
+      air                = true,
+      class              = [[CSpherePartSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 0.5,
+        color              = [[0.9,0.1,0.9]],
+        expansionspeed     = 4,
+        ttl                = 8,
+      },
+    },
+  },  
+  
+  ["gauss_hit_m_purple"] = {
+    inner = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        dir                = [[dir]],
+        explosiongenerator = [[custom:GAUSS_HIT_L_PURPLE]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+    sphere = {
+      air                = true,
+      class              = [[CSpherePartSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 0.5,
+        color              = [[0.9,0.1,0.9]],
+        expansionspeed     = 6,
+        ttl                = 8,
+      },
+    },
+  },  
+  
 }
 

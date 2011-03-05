@@ -1,7 +1,7 @@
 return {
 	chassis = "armcom4",
 	name = "Skunkworker",
-	modules = {"commweapon_rocketlauncher", "commweapon_napalmgrenade", "module_resurrect", "weaponmod_standoff_rocket"},
+	modules = {"commweapon_gaussrifle", "commweapon_napalmgrenade", "module_resurrect", "weaponmod_disruptor_ammo"},
 }
 
 -- just some stuff

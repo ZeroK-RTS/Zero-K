@@ -94,7 +94,11 @@ upgrades = {
 	commweapon_shockrifle = {
 		name = "Shock Rifle",
 		description = "Gauss Rifle: Convert to a long-range sniper rifle",
-	},	
+	},
+	commweapon_partillery = {
+		name = "Plasma Artillery",
+		description = "Riot Cannon: Convert to a medium artillery gun",
+	},		
 	
 	-- weapon mods
 	weaponmod_autoflechette = {
@@ -127,6 +131,12 @@ upgrades = {
 					local wcp = v.customparams
 					if permitted[i] then
 						wcp.timeslow_damagefactor = "0.4"
+					end
+					v.rgbcolor = [[0.9 0.1 0.9]]
+					if i == "commweapon_shotgun" or i == "commweapon_heavymachinegun" then
+						v.explosiongenerator = [[custom:BEAMWEAPON_HIT_PURPLE]]
+					elseif i == "commweapon_gaussrifle" then
+						v.explosiongenerator = [[custom:GAUSS_HIT_M_PURPLE]]
 					end
 				end
 			end,	
