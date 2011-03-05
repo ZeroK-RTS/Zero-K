@@ -197,8 +197,8 @@ AimWeapon1(heading,pitch)
 	isAiming = TRUE;
 	turn hips to x-axis <0> now;
 	turn turner to x-axis <0> now; 
-	turn turner to y-axis heading + <5> speed <180>;
 	turn gun to x-axis <0> - pitch speed <90>;
+	turn turner to y-axis heading + <1> speed <180>;
 	wait-for-turn turner around y-axis;
 	wait-for-turn gun around x-axis;
 	start-script RestoreAfterDelay();
