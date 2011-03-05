@@ -147,7 +147,7 @@ MotionControl()
 			}
                 else
 			{
-				CALL-SCRIPT walk();
+				CALL-SCRIPT shootwalk();
 			}
 		}
 		else
@@ -196,8 +196,9 @@ AimWeapon1(heading,pitch)
 	set-signal-mask SIG_AIM;
 	isAiming = TRUE;
 	turn hips to x-axis <0> now;
+	turn chest to x-axis <0> now;
 	turn gun to x-axis <0> - pitch speed <90>;
-	turn turner to y-axis heading  speed <180>;
+	turn turner to y-axis heading + <4> speed <180>;
 	wait-for-turn turner around y-axis;
 	wait-for-turn gun around x-axis;
 	start-script RestoreAfterDelay();
