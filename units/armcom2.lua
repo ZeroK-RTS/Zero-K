@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[armcom2]],
-  name                   = [[Strike Commander]],
+  name                   = [[Strike Commander - Level 2]],
   description            = [[Mobile Assault Commander, Builds at 12 m/s]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
@@ -40,7 +40,7 @@ unitDef = {
 	helptext       = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser.]],
 	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufrüstung erhält er eine Disintegratorkanone.]],
 	level = [[2]],
-	statsname = [[armcom]],
+	statsname = [[armcom2]],
   },
 
   defaultmissiontype     = [[Standby]],
@@ -211,7 +211,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Strike Commander]],
+      description      = [[Wreckage - Strike Commander - Level 2]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 2250,
@@ -232,7 +232,7 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Strike Commander]],
+      description      = [[Debris - Strike Commander - Level 2]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2250,

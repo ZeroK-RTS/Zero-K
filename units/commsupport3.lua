@@ -1,6 +1,6 @@
 unitDef = {
-  unitname            = [[commadvsupport]],
-  name                = [[Advanced Support Commander]],
+  unitname            = [[commsupport3]],
+  name                = [[Support Commander - Level 3]],
   description         = [[Econ/Support Commander, Builds at 15 m/s]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
@@ -36,7 +36,7 @@ unitDef = {
 	helptext       = [[The esoteric Support Commander uses a more unorthodox weapon set, which is by default a gauss rifle that can fire concussion shots when sufficiently upgraded. Though lacking armor or speed, this chassis is still favored due to its intrinsic income bonus.]],
 	helptext_de    = [[Der geheimnisvolle Support Commander nutzt ein eher unothodoxes Waffenset, welches standardmäßig aus einem Gaußgewehr, das Erschütterungen abfeuert sobald es ausreichend aufgebessert wurde, besteht. Jedoch fehlt es ihm an Rüstung und Geschwindigkeit, darum macht sich dieser Unterbau vor allem durch den inhärenten Einkommensbonus beliebt.]],
 	level = [[3]],
-	statsname = [[commadvsupport]],
+	statsname = [[commsupport3]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -239,4 +239,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ commadvsupport = unitDef })
+return lowerkeys({ commsupport3 = unitDef })

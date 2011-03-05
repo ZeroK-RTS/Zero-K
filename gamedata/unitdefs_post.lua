@@ -92,15 +92,6 @@ end
 --
 
 local toCopy = {
-	armcom = {'armcom1'},
-	corcom = {'corcom1'},
-	commrecon = {'commrecon1'},
-	commsupport = {'commsupport1'},
-
-	armadvcom = {'armcom3'},
-	coradvcom = {'corcom3'},
-	commadvrecon = {'commrecon3'},
-	commadvsupport = {'commsupport3'},
 }
 
 
@@ -159,14 +150,25 @@ local function TagTree(unit, faction, newbuildoptions)
 end
 
 local commanders = {
-	"armcom",
-	"armadvcom",
-	"corcom",
-	"coradvcom",
-	"commrecon",
-	"commadvrecon",
-	"commsupport",
-	"commadvsupport",
+	"armcom1",
+	"armcom2",
+	"armcom3",
+	"armcom4",
+
+	"corcom1",
+	"corcom2",
+	"corcom3",
+	"corcom4",
+
+	"commrecon1",
+	"commrecon2",
+	"commrecon3",
+	"commrecon4",
+
+	"commsupport1",
+	"commsupport2",
+	"commsupport3",
+	"commsupport4",
 }
 
 --add procedural comms
@@ -175,9 +177,8 @@ for name in pairs(commDefs) do
 end
 
 for _,name in pairs(commanders) do
-	TagTree(name, "arm", UnitDefs["armcom"].buildoptions)
+	TagTree(name, "arm", UnitDefs["armcom1"].buildoptions)
 end
---TagTree("corcom", "core", UnitDefs["corcom"].buildoptions)
 
 for name, ud in pairs(UnitDefs) do
 	--Spring.Echo(name, ud.faction)

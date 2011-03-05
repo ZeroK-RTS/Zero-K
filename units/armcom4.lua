@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[armcom4]],
-  name                = [[Advanced Strike Commander]],
+  name                = [[Strike Commander - Level 4]],
   description         = [[Mobile Assault Commander, Builds at 12 m/s]],
   acceleration        = 0.18,
   activateWhenBuilt   = true,
@@ -41,7 +41,7 @@ unitDef = {
 	helptext       = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser.]],
 	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufrüstung erhält er eine Disintegratorkanone.]],
 	level = [[4]],
-	statsname = [[armadvcom]],
+	statsname = [[armcom4]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -211,7 +211,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Advanced Strike Commander]],
+      description      = [[Wreckage - Strike Commander - Level 4]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 2650,
@@ -232,7 +232,7 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Strike Commander]],
+      description      = [[Debris - Strike Commander - Level 4]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2650,

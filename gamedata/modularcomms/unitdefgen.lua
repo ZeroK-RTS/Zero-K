@@ -137,7 +137,7 @@ end
 
 --stress test: try every possible module to make sure it doesn't crash
 local stressTestDef = {
-	chassis = "armcom",
+	chassis = "armcom1",
 	name = "Quality Assurance",
 	modules = {},
 }

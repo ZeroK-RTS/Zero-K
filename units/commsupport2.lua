@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[commsupport2]],
-  name                = [[Support Commander]],
+  name                = [[Support Commander - Level 2]],
   description         = [[Econ/Support Commander, Builds at 12 m/s]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
@@ -35,7 +35,7 @@ unitDef = {
 	helptext       = [[The esoteric Support Commander uses a more unorthodox weapon set, which is by default a gauss rifle that can fire concussion shots when sufficiently upgraded. Though lacking armor or speed, this chassis is still favored due to its intrinsic income bonus.]],
 	helptext_de    = [[Der geheimnisvolle Support Commander nutzt ein eher unothodoxes Waffenset, welches standardmäßig aus einem Gaußgewehr, das Erschütterungen abfeuert sobald es ausreichend aufgebessert wurde, besteht. Jedoch fehlt es ihm an Rüstung und Geschwindigkeit, darum macht sich dieser Unterbau vor allem durch den inhärenten Einkommensbonus beliebt.]],
 	level = [[2]],
-	statsname = [[commsupport]],
+	statsname = [[commsupport2]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -196,7 +196,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Support Commander]],
+      description      = [[Wreckage - Support Commander - Level 2]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 2000,
@@ -216,7 +216,7 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Support Commander]],
+      description      = [[Debris - Support Commander - Level 2]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2000,

@@ -1,13 +1,13 @@
 unitDef = {
-  unitname            = [[corcom]],
-  name                = [[Battle Commander]],
-  description         = [[Heavy Combat Commander, Builds at 12 m/s]],
-  acceleration        = 0.18,
+  unitname            = [[commrecon1]],
+  name                = [[Recon Commander]],
+  description         = [[High Mobility Commander, Builds at 12 m/s]],
+  acceleration        = 0.25,
   activateWhenBuilt   = true,
   amphibious          = [[1]],
   autoHeal            = 5,
   bmcode              = [[1]],
-  brakeRate           = 0.375,
+  brakeRate           = 0.45,
   buildCostEnergy     = 1600,
   buildCostMetal      = 1600,
   buildDistance       = 120,
@@ -16,10 +16,9 @@ unitDef = {
   buildoptions        = {
   },
 
-  buildPic            = [[corcom.png]],
+  buildPic            = [[commrecon.png]],
   buildTime           = 1600,
   canAttack           = true,
-  canCloak            = false,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -30,77 +29,82 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    canjump   = [[1]],
     fireproof = [[1]],
-	description_de = [[Schwerer Kampfkommandant, Baut mit 12 M/s]],
-	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment. Its base weapon is a riot cannon.]],
-	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
+	jumpclass = [[commrecon1]],
+	description_de = [[Hochmobiler Kommandant, Baut mit 12 M/s]],
+	helptext       = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. In addition to its basic slowing beam, it also features jumpjets.]],
+	helptext_de    = [[Bei dem Recon Commander dreht sich alles um Mobilität und List. Dieser schwach gepanzerte Grundsatz kann um viele Spezialwaffen und -module erweitert werden. Seine Basiswaffe ist ein langsamer Strahl und seine Spezialwaffe besteht aus einer zerstörerischen Bombe mit einer weitreichenden AoE. Er besitzt außerdem einen Düsenstrahl zum Springen.]],
 	level = [[1]],
-	statsname = [[corcom]],
+	statsname = [[commrecon1]],
   },
 
   defaultmissiontype  = [[Standby]],
-  energyMake          = 3.2,
+  energyMake          = 2.7,
   energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
   footprintZ          = 2,
   hideDamage          = true,
-  iconType            = [[corcommander]],
+  iconType            = [[armcommander]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
-  mass                = 881,
-  maxDamage           = 3000,
+  mass                = 848,
+  maxDamage           = 2250,
   maxSlope            = 36,
-  maxVelocity         = 1.25,
+  maxVelocity         = 1.45,
   maxWaterDepth       = 5000,
-  metalMake           = 3.2,
+  metalMake           = 2.7,
   metalStorage        = 0,
   minCloakDistance    = 100,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
-  objectName          = [[corcom.s3o]],
-  script              = [[corcom.lua]],
+  objectName          = [[commrecon.s3o]],
+  radarDistance       = 1250,
+  script              = [[commrecon.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
+	  [[custom:NONE]],
+	  [[custom:NONE]],
       [[custom:RAIDMUZZLE]],
-	  [[custom:LEVLRMUZZLE]],
-      [[custom:RAIDMUZZLE]],
+	  [[custom:NONE]],
+      [[custom:VINDIBACK]],
+      [[custom:FLASH64]],
     },
 
   },
 
   showNanoSpray       = false,
   showPlayerName      = true,
-  side                = [[CORE]],
+  side                = [[ARM]],
   sightDistance       = 500,
   smoothAnim          = true,
   sonarDistance       = 300,
   steeringmode        = [[2]],
   TEDClass            = [[COMMANDER]],
   terraformSpeed      = 600,
-  turnRate            = 1148,
+  turnRate            = 1350,
   upright             = true,
   workerTime          = 12,
 
   weapons             = {
-
-    [1] = {
+  
+	[1] = {
       def                = [[FAKELASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
-    [5] = {
-      def                = [[SHOCK_CANNON]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],	
+	},
+  
+    [4] = {
+      def                = [[SLOWBEAM]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -110,7 +114,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    FAKELASER    = {
+    FAKELASER     = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
       beamlaser               = 1,
@@ -121,29 +125,21 @@ unitDef = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
       duration                = 0.11,
-      edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:flash1green]],
-      fireStarter             = 70,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      largeBeamLaser          = true,
       laserFlareSize          = 5.53,
       lineOfSight             = true,
       minIntensity            = 1,
-      noSelfDamage            = true,
-      range                   = 290,
+      range                   = 300,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
-      soundStart              = [[weapon/laser/pulse_laser3]],
-      soundTrigger            = true,
-      targetMoveError         = 0.05,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
@@ -154,40 +150,54 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 900,
     },
+  
+    SLOWBEAM = {
+      name                    = [[Slowing Beam]],
+      areaOfEffect            = 8,
+      beamDecay               = 0.9,
+      beamlaser               = 1,
+      beamTime                = 0.1,
+      beamttl                 = 50,
+      coreThickness           = 0,
+      craterBoost             = 0,
+      craterMult              = 0,
 
-
-    SHOCK_CANNON = {
-      name                    = [[Riot Cannon]],
-      areaOfEffect            = 144,
-      avoidFeature            = true,
-      avoidFriendly           = true,
-      burnblow                = true,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 250,
-        planes  = 250,
-        subs    = 12.5,
+      customParams            = {
+        timeslow_preset = [[commrecon_slowbeam]],
       },
 
-      edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:FLASH64]],
+      damage                  = {
+        default = 120,
+      },
+
+      explosionGenerator      = [[custom:flash2purple]],
+      fireStarter             = 30,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 6,
       lineOfSight             = true,
+      minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 290,
-      reloadtime              = 2,
-      renderType              = 4,
-      soundHit                = [[weapon/cannon/generic_cannon]],
-      soundStart              = [[weapon/cannon/outlaw_gun]],
-      soundStartVolume        = 3,
-      startsmoke              = [[1]],
+      range                   = 300,
+      reloadtime              = 1.5,
+      renderType              = 0,
+      rgbColor                = [[0.4 0 0.5]],
+      soundStart              = [[weapon/laser/pulse_laser2]],
+      soundStartVolume        = 0.9,
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 8,
+      tolerance               = 18000,
       turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 750,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,
     },
 
   },
@@ -196,10 +206,10 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Battle Commander]],
+      description      = [[Wreckage - Recon Commander]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 2800,
+      damage           = 2250,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -208,7 +218,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 640,
-      object           = [[corcom_dead.s3o]],
+      object           = [[commrecon_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 640,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -217,10 +227,10 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Battle Commander]],
+      description      = [[Debris - Recon Commander]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2800,
+      damage           = 2250,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
@@ -238,4 +248,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corcom = unitDef })
+return lowerkeys({ commrecon1 = unitDef })

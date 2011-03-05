@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[corcom4]],
-  name                = [[Advanced Battle Commander]],
+  name                = [[Battle Commander - Level 4]],
   description         = [[Heavy Combat Commander, Builds at 12 m/s]],
   acceleration        = 0.18,
   activateWhenBuilt   = true,
@@ -35,7 +35,7 @@ unitDef = {
 	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment. Its base weapon is a riot cannon.]],
 	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
 	level = [[4]],
-	statsname = [[coradvcom]],
+	statsname = [[corcom4]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -196,7 +196,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Advanced Battle Commander]],
+      description      = [[Wreckage - Battle Commander - Level 4]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 3600,
@@ -217,7 +217,7 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Advanced Battle Commander]],
+      description      = [[Debris - Battle Commander - Level 4]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 3600,

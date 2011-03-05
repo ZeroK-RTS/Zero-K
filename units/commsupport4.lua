@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[commsupport4]],
-  name                = [[Advanced Support Commander]],
+  name                = [[Support Commander - Level 4]],
   description         = [[Econ/Support Commander, Builds at 15 m/s]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
@@ -198,10 +198,10 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Support Commander]],
+      description      = [[Wreckage - Support Commander - Level 4]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 2200,
+      damage           = 4400,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -219,10 +219,10 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Support Commander]],
+      description      = [[Debris - Support Commander - Level 4]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2200,
+      damage           = 4400,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,

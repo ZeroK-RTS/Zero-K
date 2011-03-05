@@ -1,12 +1,8 @@
 startUnits = {
-	strikecomm = 'armcom',
-	battlecomm = 'corcom',
-	supportcomm = 'commsupport',
-	reconcomm = 'commrecon',
-}
-altCommNames = {
-	corcom = 'commbattle',
-	armcom = 'commstrike',
+	strikecomm = 'armcom1',
+	battlecomm = 'corcom1',
+	supportcomm = 'commsupport1',
+	reconcomm = 'commrecon1',
 }
 
 defaultComms = {}
@@ -45,4 +41,4 @@ EXCLUDED_UNITS = {
   [ UnitDefNames['terraunit'].id ] = true,
 }
 
-DEFAULT_UNIT = "armcom"		--FIXME: hardcodey until I cba to identify precise source of problem
+DEFAULT_UNIT = "armcom1"		--FIXME: hardcodey until I cba to identify precise source of problem

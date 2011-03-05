@@ -1,7 +1,7 @@
 unitDef = {
-  unitname            = [[coradvcom]],
-  name                = [[Advanced Battle Commander]],
-  description         = [[Heavy Combat Commander, Builds at 12 m/s]],
+  unitname            = [[armcom3]],
+  name                = [[Strike Commander - Level 3]],
+  description         = [[Mobile Assault Commander, Builds at 12 m/s]],
   acceleration        = 0.18,
   activateWhenBuilt   = true,
   amphibious          = [[1]],
@@ -16,10 +16,10 @@ unitDef = {
   buildoptions        = {
   },
 
-  buildPic            = [[corcom.png]],
+  buildPic            = [[armcom.png]],
   buildTime           = 1600,
   canAttack           = true,
-  canCloak            = false,
+  canCloak            = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -27,15 +27,19 @@ unitDef = {
   canstop             = [[1]],
   category            = [[LAND FIREPROOF]],
   commander           = true,
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[50 50 50]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
-    fireproof = [[1]],
-	description_de = [[Schwerer Kampfkommandant, Baut mit 12 M/s]],
-	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment. Its base weapon is a riot cannon.]],
-	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
+    --cloakshield_preset = [[module_cloakfield]],
+	cloakstealth = [[1]],
+    fireproof          = [[1]],
+	helptext = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor. Its base weapon is a general-purpose laser.]],
 	level = [[3]],
-	statsname = [[coradvcom]],
+	statsname = [[armcom3]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -46,15 +50,15 @@ unitDef = {
   footprintX          = 2,
   footprintZ          = 2,
   hideDamage          = true,
-  iconType            = [[corcommander]],
+  iconType            = [[armcommander]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
   immunetoparalyzer   = [[1]],
   maneuverleashlength = [[640]],
-  mass                = 1027,
-  maxDamage           = 4800,
+  mass                = 992,
+  maxDamage           = 4000,
   maxSlope            = 36,
-  maxVelocity         = 1.4,
+  maxVelocity         = 1.5,
   maxWaterDepth       = 5000,
   metalMake           = 3.5,
   metalStorage        = 0,
@@ -62,25 +66,23 @@ unitDef = {
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
-  objectName          = [[corcom.s3o]],
-  onoffable           = true,
-  script              = [[corcom.lua]],
+  objectName          = [[ARMCOM]],
+  script              = [[armcom.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:RAIDMUZZLE]],
-	  [[custom:LEVLRMUZZLE]],
-      [[custom:RAIDMUZZLE]],
+    	[[custom:NONE]],
+		[[custom:NONE]],
     },
 
   },
 
   showNanoSpray       = false,
   showPlayerName      = true,
-  side                = [[CORE]],
+  side                = [[ARM]],
   sightDistance       = 500,
   smoothAnim          = true,
   sonarDistance       = 300,
@@ -99,8 +101,8 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-    [5] = {
-      def                = [[SHOCK_CANNON]],
+    [4] = {
+      def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -110,7 +112,7 @@ unitDef = {
 
   weaponDefs          = {
 
-    FAKELASER      = {
+    FAKELASER     = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
       beamlaser               = 1,
@@ -137,11 +139,11 @@ unitDef = {
       lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 290,
+      range                   = 300,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
-      soundStart              = [[weapon/laser/pulse_laser3]],
+      soundStart              = [[weapon/laser/laser_burn5]],
       soundTrigger            = true,
       targetMoveError         = 0.05,
       texture1                = [[largelaser]],
@@ -155,39 +157,49 @@ unitDef = {
       weaponVelocity          = 900,
     },
 
-	
-    SHOCK_CANNON = {
-      name                    = [[Riot Cannon]],
-      areaOfEffect            = 144,
-      avoidFeature            = true,
-      avoidFriendly           = true,
-      burnblow                = true,
-      craterBoost             = 1,
-      craterMult              = 2,
+    LASER         = {
+      name                    = [[Commander Laser]],
+      areaOfEffect            = 12,
+      beamlaser               = 1,
+      beamTime                = 0.1,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
 
       damage                  = {
-        default = 250,
-        planes  = 250,
-        subs    = 12.5,
+        default = 16.5,
+        subs    = 8.25,
       },
 
-      edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:FLASH64]],
+      duration                = 0.11,
+      edgeEffectiveness       = 0.99,
+      explosionGenerator      = [[custom:flash1blue]],
+      fireStarter             = 70,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 3,
       lineOfSight             = true,
+      minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 290,
-      reloadtime              = 2,
-      renderType              = 4,
-      soundHit                = [[weapon/cannon/generic_cannon]],
-      soundStart              = [[weapon/cannon/outlaw_gun]],
-      soundStartVolume        = 3,
-      startsmoke              = [[1]],
+      range                   = 300,
+      reloadtime              = 0.11,
+      renderType              = 0,
+      rgbColor                = [[0 1 1]],
+      soundStart              = [[weapon/laser/pulse_laser3]],
+      soundTrigger            = true,
+      targetMoveError         = 0.05,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 3,
+      tolerance               = 10000,
       turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 750,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 900,
     },
 
   },
@@ -196,10 +208,10 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Advanced Battle Commander]],
+      description      = [[Wreckage - Strike Commander - Level 3]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 3600,
+      damage           = 2650,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -208,7 +220,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 640,
-      object           = [[corcom_dead.s3o]],
+      object           = [[wreck3x3b.s3o]],
       reclaimable      = true,
       reclaimTime      = 640,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -217,10 +229,10 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Advanced Battle Commander]],
+      description      = [[Debris - Strike Commander - Level 3]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 3600,
+      damage           = 2650,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
@@ -238,4 +250,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ coradvcom = unitDef })
+return lowerkeys({ armcom3 = unitDef })

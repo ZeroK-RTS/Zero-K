@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[commrecon2]],
-  name                = [[Recon Commander]],
+  name                = [[Recon Commander - Level 2]],
   description         = [[High Mobility Commander, Builds at 12 m/s]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
@@ -36,7 +36,7 @@ unitDef = {
 	helptext       = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules. In addition to its basic slowing beam, it also features jumpjets.]],
 	helptext_de    = [[Bei dem Recon Commander dreht sich alles um Mobilität und List. Dieser schwach gepanzerte Grundsatz kann um viele Spezialwaffen und -module erweitert werden. Seine Basiswaffe ist ein langsamer Strahl und seine Spezialwaffe besteht aus einer zerstörerischen Bombe mit einer weitreichenden AoE. Er besitzt außerdem einen Düsenstrahl zum Springen.]],
 	level = [[2]],
-	statsname = [[commrecon]],
+	statsname = [[commrecon2]],
   },
 
   defaultmissiontype  = [[Standby]],
@@ -206,7 +206,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Recon Commander]],
+      description      = [[Wreckage - Recon Commander - Level 2]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 2250,
@@ -227,7 +227,7 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Recon Commander]],
+      description      = [[Debris - Recon Commander - Level 2]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2250,
