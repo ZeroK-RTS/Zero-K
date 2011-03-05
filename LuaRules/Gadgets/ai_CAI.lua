@@ -2824,7 +2824,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	local allyTeam = spGetUnitAllyTeam(unitID)
 	local ud = UnitDefs[unitDefID]
 
-	
 	if (aiTeamData[unitTeam]) then
 		
 		local a = aiTeamData[unitTeam]
@@ -3045,8 +3044,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			controlledUnit.any.cost = controlledUnit.any.cost + ud.metalCost
 			controlledUnit.any.count = controlledUnit.any.count + 1
 			controlledUnit.anyByID[unitID] = {ud = ud, cost = ud.metalCost, finished = false, 
-				isScout = (builderID and controlledUnit.factoryByID[builderID] and controlledUnit.factoryByID[builderID].producingScout),
-				isRaider = (builderID and controlledUnit.factoryByID[builderID] and controlledUnit.factoryByID[builderID].producingRaider)}
+			isScout = (builderID and controlledUnit.factoryByID[builderID] and controlledUnit.factoryByID[builderID].producingScout),
+			isRaider = (builderID and controlledUnit.factoryByID[builderID] and controlledUnit.factoryByID[builderID].producingRaider)}
 			
 			if unitDefID == buildDefs.airpadDefID then
 				controlledUnit.airpad.cost = controlledUnit.airpad.cost + ud.metalCost

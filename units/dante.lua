@@ -111,6 +111,10 @@ unitDef = {
       collideFeature          = false,
       craterBoost             = 0,
       craterMult              = 0,
+	  
+	  customParams        	  = {
+	    setunitsonfire = "1",
+	  },
 
       damage                  = {
         default = 12,
@@ -197,6 +201,10 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
 
+	  customParams        	  = {
+	    setunitsonfire = "1",
+	  },
+	  
       damage                  = {
         default = 120,
         subs    = 6,
@@ -252,6 +260,10 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
 
+	  customParams        	  = {
+	    setunitsonfire = "1",
+	  },
+	  
       damage                  = {
         default = 120,
         subs    = 6,

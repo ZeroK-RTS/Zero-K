@@ -79,6 +79,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+	    setunitsonfire = "1",
+	  },
+	  
       damage                  = {
         default = 65,
         planes  = 65,

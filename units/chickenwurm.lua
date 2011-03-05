@@ -92,6 +92,10 @@ unitDef = {
       burstrate               = 0.01,
       craterBoost             = 0,
       craterMult              = 0,
+	  
+	  customParams        	  = {
+	    setunitsonfire = "1",
+	  },
 
       damage                  = {
         default = 50,

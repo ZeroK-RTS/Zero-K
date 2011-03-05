@@ -102,6 +102,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+	    setunitsonfire = "1",
+	  },
+	  
       damage                  = {
         default = 7,
         planes  = 7,
@@ -130,7 +134,6 @@ unitDef = {
       weaponType              = [[Flame]],
       weaponVelocity          = 800,
     },
-
   },
 
 
