@@ -323,7 +323,7 @@ upgrades = {
 	module_high_power_servos = {
 		name = "High Power Servos",
 		description = "More powerful leg actuators increase speed by 10% of base",
-		func = function(unitDef)
+		func = function(unitDef, attributeMods)
 				attributeMods.speed = attributeMods.speed + 0.1
 			end,
 	},
