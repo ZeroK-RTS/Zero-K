@@ -213,22 +213,24 @@ upgrades = {
 				}
 				for i,v in pairs(weapons) do
 					if permitted[i] then
-						if not (i == "commweapon_rocketlauncher") then	-- -33% damage
+						if not (i == "commweapon_rocketlauncher") then	-- -25% damage
+							for armorname, dmg in pairs(v.damage) do
+								v.damage[armorname] = dmg * 0.75
+								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+								v.customparams.burntime = "360"
+							end
+							v.rgbcolor = [[1 0.3 0.1]]
+						else	-- -33% damage, 128 AoE
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 2/3
 								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
-							end
-							v.rgbcolor = [[1 0.3 0.1]]
-						else	-- -50% damage, 128 AoE
-							for armorname, dmg in pairs(v.damage) do
-								v.damage[armorname] = dmg * 0.5
-								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+								v.customparams.burntime = "450"
 							end
 							v.areaofeffect = 128
 						end
 						v.explosiongenerator = [[custom:NAPALM_Expl]]
-						v.customparams.burnfactor = "0.5"
-						v.customparams.burnchance = "100"
+						v.customparams.setunitsonfire = "1"
+						v.customparams.burnchance = "1"
 						v.soundhit = [[weapon/burn_mixed]]
 					end
 				end
@@ -261,11 +263,11 @@ upgrades = {
 	},
 	module_adv_targeting = {
 		name = "Advanced Targeting System",
-		description = "Extends range of all weapons by 20%",
+		description = "Extends range of all weapons by 10%",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					if v.range then v.range = v.range + (v.customparams.baserange or v.range) * 0.2 end
+					if v.range then v.range = v.range + (v.customparams.baserange or v.range) * 0.1 end
 				end
 			end,	
 	},
@@ -282,7 +284,6 @@ upgrades = {
 		description = "Self-repairs 20 HP/s",
 		func = function(unitDef)
 				unitDef.autoheal = (unitDef.autoheal or 0) + 20
-				unitDef.idleTime = 0 -- autoheal timer
 			end,
 	},
 	module_dmg_booster = {
@@ -354,7 +355,7 @@ upgrades = {
 	
 	module_cloak_field = {
 		name = "Cloaking Field",
-		description = "Cloaks all friendly units within 350 elmos",
+		description = "Cloaks all friendly units within 350 m",
 		func = function(unitDef)
 				unitDef.onoffable = true
 				unitDef.radarDistanceJam = (unitDef.radarDistanceJam and unitDef.radarDistanceJam < 350 and 350 or unitDef.radarDistanceJam)
@@ -363,23 +364,23 @@ upgrades = {
 	},
 	module_repair_field = {
 		name = "Repair Field",
-		description = "Passively repairs all friendly units within 450 elmos",
+		description = "Passively repairs all friendly units within 450 m",
 		func = function(unitDef)
 				unitDef.customparams.repairaura_preset = "module_repairfield"
 			end,
 	},
 	module_jammer = {
 		name = "Radar Jammer",
-		description = "Masks radar signals of all units within 600 elmos",
+		description = "Masks radar signals of all units within 500 m",
 		func = function(unitDef)
-				unitDef.radardistancejam = 600
+				unitDef.radardistancejam = 500
 				unitDef.activatewhenbuilt = true
 				unitDef.onoffable = true
 			end,
 	},
 	module_areashield = {
 		name = "Area Shield",
-		description = "Bubble shield that protects surrounding units within 300 elmos",
+		description = "Bubble shield that protects surrounding units within 300 m",
 		func = function(unitDef)
 				ApplyWeapon(unitDef, "commweapon_areashield")
 				unitDef.activatewhenbuilt = true

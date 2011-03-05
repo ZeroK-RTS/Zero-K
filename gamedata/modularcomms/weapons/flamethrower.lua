@@ -10,6 +10,7 @@ local weaponDef = {
 	customParams			= {
 		slot = [[5]],
 		muzzleEffect = [[custom:RAIDMUZZLE]],
+		setunitsonfire = "1",
 	},
 
     damage                  = {

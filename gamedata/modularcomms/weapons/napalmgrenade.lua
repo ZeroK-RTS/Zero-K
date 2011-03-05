@@ -10,6 +10,7 @@ local weaponDef = {
     customParams            = {
 		slot = [[3]],
         areadamage_preset = [[module_napalmgrenade]],
+		setunitsonfire = "1",
     },
 
     damage                  = {
