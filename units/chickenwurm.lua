@@ -95,6 +95,7 @@ unitDef = {
 	  
 	  customParams        	  = {
 	    setunitsonfire = "1",
+		burntime = 180,
 	  },
 
       damage                  = {
@@ -105,7 +106,7 @@ unitDef = {
 
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:firewalker_impact]],
-      fireStarter             = 40,
+      fireStarter             = 120,
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       intensity               = 0.7,

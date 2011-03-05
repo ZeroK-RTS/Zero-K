@@ -31,6 +31,112 @@ VFS.Include("LuaRules/Utilities/base64.lua")
 --	Weapon 5: main weapon (uses CEG 1 and 2)
 --	Weapon 6: flamethrower only?
 --------------------------------------------------------------------------------
+local copy = {
+	armcom1 = {
+		armcom2 = {
+			level = 2,
+			mainstats = {maxdamage = 3000},
+			customparams = {rangebonus = "0.05"},
+		},
+		armcom3 = {
+			level = 3,
+			mainstats = {maxdamage = 4000},
+			customparams = {rangebonus = "0.1"},
+		},
+		armcom4 = {
+			level = 4,
+			mainstats = {maxdamage = 6000},
+			customparams = {rangebonus = "0.2"},
+		},
+	},
+	corcom1 = {
+		corcom2 = {
+			level = 2,
+			mainstats = {maxdamage = 3600},
+			customparams = {damagebonus = "0.1"},
+		},
+		corcom3 = {
+			level = 3,
+			mainstats = {maxdamage = 5000},
+			customparams = {damagebonus = "0.2"},
+		},
+		corcom4 = {
+			level = 4,
+			mainstats = {maxdamage = 7200},
+			customparams = {damagebonus = "0.3"},
+		},
+	},
+	corcom1 = {
+		corcom2 = {
+			level = 2,
+			mainstats = {maxdamage = 3600},
+			customparams = {damagebonus = "0.1"},
+		},
+		corcom3 = {
+			level = 3,
+			mainstats = {maxdamage = 5000},
+			customparams = {damagebonus = "0.2"},
+		},
+		corcom4 = {
+			level = 4,
+			mainstats = {maxdamage = 7200},
+			customparams = {damagebonus = "0.3"},
+		},
+	},
+	commrecon1 = {
+		commrecon2 = {
+			level = 2,
+			mainstats = {maxdamage = 2750, maxvelocity = 1.55},
+			customparams = {damagebonus = "0.05"},
+		},
+		commrecon3 = {
+			level = 3,
+			mainstats = {maxdamage = 3600, maxvelocity = 1.7},
+			customparams = {damagebonus = "0.1"},
+		},
+		commrecon4 = {
+			level = 4,
+			mainstats = {maxdamage = 5000, maxvelocity = 1.9},
+			customparams = {damagebonus = "0.15"},
+		},
+	},
+	commsupport1 = {
+		commsupport2 = {
+			level = 2,
+			mainstats = {maxdamage = 2500, workertime = 15, description = "Econ/Support Commander, Builds at 15 m/s"},
+			customparams = {rangebonus = "0.1"},
+		},
+		commsupport3 = {
+			level = 3,
+			mainstats = {maxdamage = 3200, workertime = 18, description = "Econ/Support Commander, Builds at 18 m/s"},
+			customparams = {rangebonus = "0.2"},
+		},
+		commsupport4 = {
+			level = 4,
+			mainstats = {maxdamage = 4500, workertime = 24, description = "Econ/Support Commander, Builds at 24 m/s"},
+			customparams = {rangebonus = "0.3"},
+		},
+	},
+}
+
+for sourceName, copyTable in pairs(copy) do
+	for cloneName, stats in pairs(copyTable) do
+		UnitDefs[cloneName] = CopyTable(UnitDefs[sourceName], true)
+		UnitDefs[cloneName].unitname = cloneName
+		for statName, value in pairs(stats.mainstats) do
+			UnitDefs[cloneName][statName] = value
+		end
+		for statName, value in pairs(stats.customparams) do
+			UnitDefs[cloneName].customparams[statName] = value
+		end
+		UnitDefs[cloneName].customparams.level = stats.level
+		UnitDefs[cloneName].name = (UnitDefs[cloneName].name) .. " - Level " .. stats.level
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
 --------------------------------------------------------------------------------
@@ -150,11 +256,20 @@ commDefs.stresstestdef = nil
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = VFS.Include("gamedata/modularcomms/testdata.lua")
 ProcessComm("testcomm", testDef)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- postprocessing
 for name, data in pairs(commDefs) do
 	Spring.Echo("\tPostprocessing commtype: ".. name)
+	-- apply intrinsic bonuses
+	if data.customparams.damagebonus then
+		ModifyWeaponDamage(data, data.customparams.damagebonus + 1)
+	end
+	if data.customparams.rangebonus then
+		ModifyWeaponRange(data, data.customparams.rangebonus + 1)
+	end	
+	
 	-- set weapon1 range	- may need exception list in future depending on what weapons we add
 	if data.weapondefs then
 		local minRange = 999999

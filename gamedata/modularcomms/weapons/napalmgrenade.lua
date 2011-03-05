@@ -11,6 +11,8 @@ local weaponDef = {
 		slot = [[3]],
         areadamage_preset = [[module_napalmgrenade]],
 		setunitsonfire = "1",
+		burntime = 180,
+		muzzleEffect = [[custom:RAIDMUZZLE]],
     },
 
     damage                  = {
@@ -20,7 +22,7 @@ local weaponDef = {
     },
 
     explosionGenerator      = [[custom:firewalker_impact]],
-    firestarter             = 40,
+    firestarter             = 120,
     impulseBoost            = 0,
     impulseFactor           = 0,
     interceptedByShieldType = 2,
