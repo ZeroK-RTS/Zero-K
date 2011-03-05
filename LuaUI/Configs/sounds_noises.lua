@@ -1168,6 +1168,25 @@ local sounds = {
 	
 }
 
+for udid, ud in pairs(UnitDefs) do
+	if ud.customParams then
+		if ud.customParams.soundok then
+			if sounds[ud.name] then
+				sounds[ud.name].ok = {[1] = ud.customParams.soundok}
+			else
+				sounds[ud.name] = {ok = {[1] = ud.customParams.soundok}}
+			end
+		end
+		if ud.customParams.soundselect then
+			if sounds[ud.name] then
+				sounds[ud.name].select = {[1] = ud.customParams.soundselect}
+			else
+				sounds[ud.name] = {select = {[1] = ud.customParams.soundselect}}
+			end
+		end
+	end
+end
+
 local underAttackSounds = {
 --	[1] = "udamaged_1",
 	[1] = "udamaged_2",
