@@ -102,7 +102,19 @@ local function ProcessComm(name, config)
 				end
 				if upgrades[moduleName] then
 					--Spring.Echo("\tApplying upgrade: "..moduleName)
-					if upgrades[moduleName].func then upgrades[moduleName].func(commDefs[name]) end	--apply upgrade function
+					local attributeMods = { -- add a mod for everythings that can have a negative adjustment
+						speed = 0,
+						reload = 0,
+					}
+					if upgrades[moduleName].func then --apply upgrade function
+						upgrades[moduleName].func(commDefs[name], attributeMods) 
+					end	
+					if attributeMods.speed > 0 then
+						commDefs[name].maxvelocity = commDefs[name].customparams.basespeed*(1+attributeMods.speed)
+					else
+						commDefs[name].maxvelocity = commDefs[name].customparams.basespeed/(1-attributeMods.speed)
+					end
+					
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end

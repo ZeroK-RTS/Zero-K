@@ -282,6 +282,7 @@ upgrades = {
 		description = "Self-repairs 20 HP/s",
 		func = function(unitDef)
 				unitDef.autoheal = (unitDef.autoheal or 0) + 20
+				unitDef.idleTime = 0 -- autoheal timer
 			end,
 	},
 	module_dmg_booster = {
@@ -298,9 +299,9 @@ upgrades = {
 	},
 	module_energy_cell = {
 		name = "Energy Cell",
-		description = "Compact fuel cells that produce +4 energy",
+		description = "Compact fuel cells that produce +6 energy",
 		func = function(unitDef)
-				unitDef.energymake = (unitDef.energymake or 0) + 4
+				unitDef.energymake = (unitDef.energymake or 0) + 6
 			end,
 	},
 	module_fieldradar = {
@@ -313,17 +314,17 @@ upgrades = {
 	},
 	module_heavy_armor = {
 		name = "High Density Plating",
-		description = "Increases commander HP by 30% of base, reduces speed by 10% of base",
-		func = function(unitDef)
-				unitDef.maxdamage = unitDef.maxdamage + unitDef.customparams.basehp * 0.3
-				unitDef.maxvelocity = unitDef.maxvelocity - unitDef.customparams.basespeed * 0.1
+		description = "Adds 1600 HP, slows comm by +10%",
+		func = function(unitDef, attributeMods)
+				unitDef.maxdamage = unitDef.maxdamage + 600
+				attributeMods.speed = attributeMods.speed - 0.1
 			end,
 	},
 	module_high_power_servos = {
 		name = "High Power Servos",
-		description = "More powerful leg actuators increase speed by 15% of base",
+		description = "More powerful leg actuators increase speed by 10% of base",
 		func = function(unitDef)
-				unitDef.maxvelocity = (unitDef.maxvelocity or 0) + unitDef.customparams.basespeed*0.15
+				attributeMods.speed = attributeMods.speed + 0.1
 			end,
 	},
 	module_improved_optics = {
