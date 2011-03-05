@@ -1,5 +1,3 @@
-#define TA			// This is a TA script
-
 #include "constants.h"
 
 piece  base, body, turret, launcher1, launcher2, firepoint1, firepoint2;
@@ -71,13 +69,12 @@ RestoreAfterDelay()
 
 AimPrimary(heading, pitch)
 {
-	sleep 10;
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
 	aiming = TRUE;
-	turn turret to y-axis heading speed <350.000000>;
-	turn launcher1 to x-axis <0.000000> - pitch speed <350.000000>;
-	turn launcher2 to x-axis <0.000000> - pitch speed <350.000000>;
+	turn turret to y-axis heading speed <300.000000>;
+	turn launcher1 to x-axis <0.000000> - pitch speed <150.000000>;
+	turn launcher2 to x-axis <0.000000> - pitch speed <150.000000>;
 	wait-for-turn turret around y-axis;
 	wait-for-turn launcher1 around x-axis;
 	
@@ -115,11 +112,6 @@ QueryPrimary(piecenum)
 	}
 }
 
-SweetSpot(piecenum)
-{
-	piecenum = base;
-}
-
 Create()
 {
 	gun = TRUE;
@@ -132,33 +124,33 @@ Killed(severity, corpsetype)
 	if( severity <= 25 )
 	{
 		corpsetype = 1;
-		explode launcher1 type BITMAPONLY | BITMAP1;
-		explode launcher2 type BITMAPONLY | BITMAP1;
-		explode base type BITMAPONLY | BITMAP2;
-		explode turret type BITMAPONLY | BITMAP5;
+		explode launcher1 type BITMAPONLY;
+		explode launcher2 type BITMAPONLY;
+		explode base type BITMAPONLY;
+		explode turret type BITMAPONLY ;
 		return (0);
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
-		explode launcher1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode launcher2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode base type BITMAPONLY | BITMAP2;
-		explode turret type BITMAPONLY | BITMAP2;
+		corpsetype = 1;
+		explode launcher1 type BITMAPONLY;
+		explode launcher2 type BITMAPONLY;
+		explode base type BITMAPONLY;
+		explode turret type BITMAPONLY;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
-		explode launcher1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode launcher2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode base type BITMAPONLY | BITMAP2;
-		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		corpsetype = 2;
+		explode launcher1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode launcher2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode base type BITMAPONLY;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		return (0);
 	}
-	corpsetype = 3;
-		explode launcher1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode launcher2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode base type BITMAPONLY | BITMAP2;
-		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	corpsetype = 2;
+		explode launcher1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode launcher2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
+		explode base type BITMAPONLY;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 }

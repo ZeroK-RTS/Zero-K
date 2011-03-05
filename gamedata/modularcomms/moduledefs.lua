@@ -191,7 +191,7 @@ upgrades = {
 							v.damage[armorname] = dmg * 1.2
 							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 						end						
-						v.model = [[wep_m_havoc.s3o]]
+						v.model = [[wep_m_dragonsfang.s3o]]
 						v.soundhit = [[explosion/ex_med4]]
 						v.soundhitvolume = 8
 						v.soundstart = [[weapon/missile/missile2_fire_bass]]
