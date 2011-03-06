@@ -171,6 +171,8 @@ local function ProcessComm(name, config)
 			end
 		end
 		
+		ApplyWeapon(commDefs[name], "commweapon_peashooter")
+		
 		if config.modules then
 			-- sort: weapons first, weapon mods next, regular modules last
 			table.sort(config.modules,
@@ -284,8 +286,18 @@ for name, data in pairs(commDefs) do
 		array.reclaimtime = data.buildcostmetal * mult
 		array.damage = data.maxdamage
 	end
-	-- misc
+	-- rez speed
 	if data.canresurrect then data.resurrectspeed = data.workertime * 5/6 end
+	-- make sure weapons can hit their max range
+	if data.weapondefs then
+		for name, weaponData in pairs(data.weapondefs) do
+			if weaponData.weapontype == "MissileLauncher" then
+				weaponData.flighttime = math.min(weaponData.flighttime, 1.2 * weaponData.range/weaponData.weaponvelocity)
+			elseif weaponData.weapontype == "Cannon" then
+				weaponData.weaponvelocity = math.min(weaponData.weaponvelocity, math.sqrt(weaponData.range * 140))
+			end
+		end
+	end
 end
 
 

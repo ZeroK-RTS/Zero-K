@@ -19,6 +19,12 @@ end
 upgrades = {
 	-- weapons
 	-- it is important that they are prefixed with "commweapon_" in order to get the special handling!
+	
+	commweapon_peashooter = {
+		name = "Peashooter",
+		description = "Basic self-defense weapon",
+	},	
+	
 	commweapon_beamlaser = {
 		name = "Beam Laser",
 		description = "An effective short-range cutting tool",
@@ -100,6 +106,12 @@ upgrades = {
 		description = "Riot Cannon: Convert to a medium artillery gun",
 	},		
 	
+	-- shield
+	commweapon_areashield = {
+		name = "Area Shield",
+		description = '',
+	},
+	
 	-- weapon mods
 	weaponmod_autoflechette = {
 		name = "Autoflechette Mod",
@@ -131,12 +143,12 @@ upgrades = {
 					local wcp = v.customparams
 					if permitted[i] then
 						wcp.timeslow_damagefactor = "0.4"
-					end
-					v.rgbcolor = [[0.9 0.1 0.9]]
-					if i == "commweapon_shotgun" or i == "commweapon_heavymachinegun" then
-						v.explosiongenerator = [[custom:BEAMWEAPON_HIT_PURPLE]]
-					elseif i == "commweapon_gaussrifle" then
-						v.explosiongenerator = [[custom:GAUSS_HIT_M_PURPLE]]
+						v.rgbcolor = [[0.9 0.1 0.9]]
+						if i == "commweapon_shotgun" or i == "commweapon_heavymachinegun" then
+							v.explosiongenerator = [[custom:BEAMWEAPON_HIT_PURPLE]]
+						elseif i == "commweapon_gaussrifle" then
+							v.explosiongenerator = [[custom:GAUSS_HIT_M_PURPLE]]
+						end
 					end
 				end
 			end,	
@@ -188,7 +200,7 @@ upgrades = {
 	},
 	weaponmod_standoff_rocket = {
 		name = "Standoff Rocket",
-		description = "Rocket Launcher: +50% range, +20% damage, +50% reload",
+		description = "Rocket Launcher: +50% range, +20% damage, +50% reload time",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do

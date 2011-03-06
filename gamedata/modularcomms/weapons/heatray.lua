@@ -12,13 +12,13 @@ local weaponDef = {
 	customParams			= {
 		slot = [[4]],
 		rangeperlevel = [[15]],
-		damageperlevel = [[1]],
+		damageperlevel = [[1.5]],
 	},		  
 	  
 	damage                  = {
-		default = 25,
-		planes  = 25,
-		subs    = 12.5,
+		default = 30,
+		planes  = 30,
+		subs    = 15,
 	},
 	
 	duration                = 0.3,
@@ -36,7 +36,7 @@ local weaponDef = {
 	lodDistance             = 10000,
 	noSelfDamage            = true,
 	proximityPriority       = 4,
-	range                   = 310,
+	range                   = 320,
 	reloadtime              = 0.1,
 	renderType              = 0,
 	rgbColor                = [[1 0.1 0]],

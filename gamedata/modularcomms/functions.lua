@@ -56,8 +56,8 @@ function ApplyWeapon(unitDef, weapon)
 	end
 	-- add CEGs
 	if mapWeaponToCEG[slot] and unitDef.sfxtypes and unitDef.sfxtypes.explosiongenerators then
-		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] = wcp.muzzleeffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] or [[custom:NONE]]
-		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] = wcp.misceffect or unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] or [[custom:NONE]]
+		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] = wcp.muzzleeffect or [[custom:NONE]]
+		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] = wcp.misceffect or [[custom:NONE]]
 	end
 	
 	--base customparams
