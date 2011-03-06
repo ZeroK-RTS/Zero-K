@@ -447,6 +447,7 @@ function script.FireWeapon(num)
 		EmitSfx( mlasflsh,  1025 )
 	elseif num == 3 then
 		EmitSfx( mlasflsh,  1026 )
+		EmitSfx( mlasflsh,  1027 )
 	end
 end
 

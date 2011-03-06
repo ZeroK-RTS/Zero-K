@@ -410,8 +410,10 @@ end
 function script.FireWeapon(num)
 	if num == 5 then
 		EmitSfx(flare, 1024)
+		EmitSfx(flare, 1025)
 	elseif num == 3 then
 		EmitSfx(flare, 1026)
+		EmitSfx(flare, 1027)
 	end
 	--recoil
 	if num ~= 4 then

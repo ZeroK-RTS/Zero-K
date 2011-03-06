@@ -424,8 +424,12 @@ function script.QueryWeapon(num)
 end
 
 function script.FireWeapon(num)
-	if num == 3 then EmitSfx( grenade, 1026 )
-	elseif num == 5 then EmitSfx( flare, 1024)
+	if num == 3 then
+		EmitSfx( grenade, 1026 )
+		EmitSfx( grenade, 1027 )
+	elseif num == 5 then
+		EmitSfx( flare, 1024)
+		EmitSfx( flare, 1025)
 	end
 end
 
