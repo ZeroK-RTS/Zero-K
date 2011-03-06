@@ -50,7 +50,11 @@ local badUnits = {
 	"tawf114",
 	"puppy",
 	"dante",
-	"hoverassault"
+	"hoverassault",
+	"armmerl",
+	"shieldarty",
+	"armcarry",
+	"cornukesub",
 }
 
 local badUnitDefs = {}
@@ -96,9 +100,9 @@ function gadget:Initialize()
   end
   for udid, ud in pairs(UnitDefs) do
     --if ((not ud.isCommander) and (ud.techLevel < 6)) then
-    if (ud.isBuilding) or badUnitDefs[ud.name] then
+    if (ud.isBuilding) or badUnitDefs[ud.name] or ud.customParams.nofps then
       badUnitDefs[udid] = ud.humanName
-    end
+	end
   end
   
   local cmd  = "fpsctrl"

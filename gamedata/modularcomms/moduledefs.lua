@@ -56,6 +56,9 @@ upgrades = {
 	commweapon_rocketlauncher = {
 		name = "Rocket Launcher",
 		description = "Medium-range low-velocity hitter",
+		func = function(unitDef)
+				unitDef.customparams.nofps = "1"
+			end,	
 	},
 	commweapon_shotgun = {
 		name = "Shotgun",
@@ -82,10 +85,16 @@ upgrades = {
 	commweapon_disruptorbomb = {
 		name = "Disruptor Bomb",
 		description = "Damages and slows units in a large area",
+		func = function(unitDef)
+				unitDef.customparams.nofps = "1"
+			end,	
 	},
 	commweapon_napalmgrenade = {
 		name = "Hellfire Grenade",
 		description = "Sets a moderate area ablaze",
+		func = function(unitDef)
+				unitDef.customparams.nofps = "1"
+			end,	
 	},		
 	commweapon_sunburst = {
 		name = "Sunburst Cannon",
