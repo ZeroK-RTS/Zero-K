@@ -269,7 +269,7 @@ for name, data in pairs(commDefs) do
 			end
 		end
 		for name, weaponData in pairs(data.weapondefs) do
-			if (weaponData.range or 999999) < minRange and weaponNames[name] and not (string.lower(weaponData.name):find('fake')) then
+			if (weaponData.range or 999999) < minRange and weaponNames[name] and not (string.lower(weaponData.name):find('fake')) and not weaponData.commandfire then
 				minRange = weaponData.range 
 			end
 		end
