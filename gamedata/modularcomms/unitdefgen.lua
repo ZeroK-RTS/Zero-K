@@ -177,8 +177,9 @@ local function ProcessComm(name, config)
 			-- sort: weapons first, weapon mods next, regular modules last
 			table.sort(config.modules,
 				function(a,b)
-					return (a:find("commweapon_") and (not b:find("commweapon"))
-					or (a:find("weaponmod_") and b:find("module_")) )
+					return (a:find("commweapon_") and not b:find("commweapon_"))
+					or (a:find("conversion_") and not (b:find("commweapon_") or b:find("conversion_")) )
+					or (a:find("weaponmod_") and b:find("module_")) 
 				end )
 
 			-- process all modules (including weapons)
@@ -204,8 +205,7 @@ local function ProcessComm(name, config)
 						commDefs[name].maxvelocity = commDefs[name].customparams.basespeed*(1+attributeMods.speed)
 					else
 						commDefs[name].maxvelocity = commDefs[name].customparams.basespeed/(1-attributeMods.speed)
-					end
-					
+					end		
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end

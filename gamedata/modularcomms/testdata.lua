@@ -1,7 +1,7 @@
 return {
-	chassis = "commsupport4",
+	chassis = "corcom3",
 	name = "Skunkworker",
-	modules = {"module_adv_targeting", "module_adv_targeting", "module_adv_targeting", "module_adv_targeting", "module_adv_targeting", "module_adv_targeting", "module_adv_targeting", "module_adv_targeting", "commweapon_partillery"},
+	modules = {"module_ablative_armor", "weaponmod_napalm_warhead", "conversion_partillery", "commweapon_napalmgrenade"},
 }
 
 -- just some stuff

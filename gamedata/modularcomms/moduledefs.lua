@@ -92,25 +92,46 @@ upgrades = {
 		description = "Ruins a single target's day with a medium-range high-energy burst",
 	},
 	
-	-- substitution mods - use commweapon handling to make sure they go first
-	commweapon_disruptor = {
+	-- conversion kits
+	conversion_disruptor = {
 		name = "Disruptor Beam",
 		description = "Slow Beam: +33% reload time, +250 real damage",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					if i == "commweapon_slowbeam" then
+						ApplyWeapon(unitDef, "commweapon_disruptor")
+						break
+					end
+				end
+			end,	
 	},
-	commweapon_shockrifle = {
+	conversion_shockrifle = {
 		name = "Shock Rifle",
 		description = "Gauss Rifle: Convert to a long-range sniper rifle",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					if i == "commweapon_gaussrifle" then
+						ApplyWeapon(unitDef, "commweapon_shockrifle")
+						break
+					end
+				end
+			end,	
 	},
-	commweapon_partillery = {
+	conversion_partillery = {
 		name = "Plasma Artillery",
 		description = "Riot Cannon: Convert to a medium artillery gun",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					if i == "commweapon_riotcannon" then
+						ApplyWeapon(unitDef, "commweapon_partillery")
+						break
+					end
+				end
+			end,	
 	},		
-	
-	-- shield
-	commweapon_areashield = {
-		name = "Area Shield",
-		description = '',
-	},
 	
 	-- weapon mods
 	weaponmod_autoflechette = {
@@ -120,10 +141,10 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_shotgun" then
-						v.name = "Autoflechette"
 						v.customparams.misceffect = nil
 						v.projectiles = 9
 						v.reloadtime = v.reloadtime * 0.5
+						v.customparams.basereload = v.reloadtime
 						break
 					end
 				end
