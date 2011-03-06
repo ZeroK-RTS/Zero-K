@@ -236,7 +236,6 @@ for name in pairs(upgrades) do
 	stressTestDef.modules[#stressTestDef.modules+1] = name
 end
 ProcessComm("stresstestdef", stressTestDef)
-commDefs.stresstestdef = nil
 
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = VFS.Include("gamedata/modularcomms/testdata.lua")
@@ -292,14 +291,15 @@ for name, data in pairs(commDefs) do
 	if data.weapondefs then
 		for name, weaponData in pairs(data.weapondefs) do
 			if weaponData.weapontype == "MissileLauncher" then
-				weaponData.flighttime = math.min(weaponData.flighttime, 1.2 * weaponData.range/weaponData.weaponvelocity)
+				weaponData.flighttime = math.max(weaponData.flighttime or 3, 1.2 * weaponData.range/weaponData.weaponvelocity)
 			elseif weaponData.weapontype == "Cannon" then
-				weaponData.weaponvelocity = math.min(weaponData.weaponvelocity, math.sqrt(weaponData.range * 140))
+				weaponData.weaponvelocity = math.max(weaponData.weaponvelocity, math.sqrt(weaponData.range * 140))
 			end
 		end
 	end
 end
 
+commDefs.stresstestdef = nil
 
 -- splice back into unitdefs
 for name, data in pairs(commDefs) do
