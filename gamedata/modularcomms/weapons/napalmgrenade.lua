@@ -21,7 +21,7 @@ local weaponDef = {
 		subs    = 15,
     },
 
-    explosionGenerator      = [[custom:firewalker_impact]],
+    explosionGenerator      = [[custom:firewalkernapalm]],
     firestarter             = 120,
     impulseBoost            = 0,
     impulseFactor           = 0,

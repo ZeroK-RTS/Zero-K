@@ -1,8 +1,221 @@
-return {
-	chassis = "corcom3",
-	name = "Skunkworker",
-	modules = {"module_ablative_armor", "weaponmod_napalm_warhead", "conversion_partillery", "commweapon_napalmgrenade"},
+--[[
+
+local moduleSetCount = 21
+local moduleSet = { -- alphebetical
+	[1] = {count = 8, sn = "aa", name = "module_ablative_armor"},
+	[2] = {count = 1, sn = "af", name = "weaponmod_autoflechette"},
+	[3] = {count = 8, sn = "an", name = "module_adv_nano"},
+	[4] = {count = 8, sn = "ar", name = "module_autorepair"},
+	[5] = {count = 1, sn = "as", name = "module_areashield"},
+	[6] = {count = 8, sn = "at", name = "module_adv_targeting"},
+	[7] = {count = 1, sn = "cf", name = "module_cloak_field"},
+	[8] = {count = 1, sn = "cl", name = "module_personal_cloak"},
+	[9] = {count = 1, sn = "da", name = "weaponmod_disruptor_ammo"},
+	[10] = {count = 8, sn = "db", name = "module_dmg_booster"},
+	[11] = {count = 8, sn = "ec", name = "module_energy_cell"},
+	[12] = {count = 1, sn = "fr", name = "module_fieldradar"},
+	[13] = {count = 8, sn = "ha", name = "module_heavy_armor"},
+	[14] = {count = 1, sn = "hc", name = "weaponmod_high_caliber_barrel"},
+	[15] = {count = 1, sn = "hf", name = "weaponmod_high_frequency_beam"},
+	[16] = {count = 1, sn = "ja", name = "module_jammer"},
+	[17] = {count = 1, sn = "nw", name = "weaponmod_napalm_warhead"},
+	[18] = {count = 1, sn = "pc", name = "weaponmod_plasma_containment"},
+	[19] = {count = 8, sn = "ps", name = "module_high_power_servos"},
+	[20] = {count = 1, sn = "re", name = "module_resurrect"},
+	[21] = {count = 1, sn = "sr", name = "weaponmod_standoff_rocket"},
 }
+
+local function orderedTableCopyAndConcat(oldTable, value)
+	local newTable = {count = oldTable.count+1, data = {}, text = oldTable.text .. moduleSet[value].sn}
+	for i = 1, oldTable.count do
+		newTable.data[i] = oldTable.data[i]
+	end
+	newTable.data[newTable.count] = value
+	return newTable
+end
+
+local function orderedTableCopy(oldTable)
+	local newTable = {count = oldTable.count, data = {}, text = oldTable.text}
+	for i = 1, oldTable.count do
+		newTable.data[i] = oldTable.data[i]
+	end
+	return newTable
+end
+
+local function chooseNextElement(picksLeft, bound, setSoFar, picksOfThisIndex)
+	
+	if picksLeft == 0 then
+		--Spring.Echo(setSoFar.text)
+		return {count = 1, data = {[1] = setSoFar}} -- if there are no picks left simply return the set so far
+	end
+	
+	local returnSets = {count = 1, data = {[1] = orderedTableCopy(setSoFar)}} -- return sets initially contains this set as sets must not be of max size
+	
+	-- add another of the most recent element if there is one to choose from
+	if picksOfThisIndex < moduleSet[bound].count then
+		local setSet = chooseNextElement(picksLeft-1, bound, orderedTableCopyAndConcat(setSoFar, bound), picksOfThisIndex + 1)
+		for i = 1, setSet.count do
+			returnSets.count = returnSets.count + 1
+			returnSets.data[returnSets.count] = setSet.data[i]
+		end
+	end
+	
+	-- each element greater than this one can be added as well
+	for element = bound+1, moduleSetCount do
+		local setSet = chooseNextElement(picksLeft-1, element, orderedTableCopyAndConcat(setSoFar, element), 1)
+		for i = 1, setSet.count do
+			returnSets.count = returnSets.count + 1
+			returnSets.data[returnSets.count] = setSet.data[i]
+		end
+	end
+
+	return returnSets
+end
+
+local massiveSetSet = chooseNextElement(8, 1, {count = 0, data = {}, text = ""}, 0)
+
+Spring.Echo(massiveSetSet.count)
+
+for i = 1, massiveSetSet.count do
+	Spring.Echo(massiveSetSet.data[i].text)
+end
+
+
+
+local weaponSet = {
+	commweapon_beamlaser = 1,
+	commweapon_heavymachinegun = 1,
+	commweapon_heatray = 1,
+	commweapon_gaussrifle = 1,
+	commweapon_partillery = 1,
+	commweapon_riotcannon = 1,
+	commweapon_rocketlauncher = 1,
+	commweapon_shotgun = 1,
+	commweapon_slowbeam = 1,
+	
+	commweapon_concussion = 3,
+	commweapon_clusterbomb = 3,
+	commweapon_disintegrator = 3,
+	commweapon_disruptorbomb = 3,
+	commweapon_napalmgrenade = 3,
+	commweapon_sunburst = 3,
+	commweapon_disruptor = 3,
+	commweapon_shockrifle = 3,
+}
+
+local comSet = {
+	armcom1 = "strike_",
+	corcom1 = "bat_",
+	commsupport1 = "sup_",
+	commrecon1 = "recon_",
+}
+	
+local fullModuleSet = {}
+
+--]]
+
+
+
+return {
+	count = 6,
+	[1] = {
+		chassis = "commsupport4",
+		name = "rocketcom",
+		modules = {
+			"commweapon_rocketlauncher", 
+			"commweapon_sunburst",
+			"weaponmod_standoff_rocket", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting"
+		}
+	},
+	[2] = {
+		chassis = "commsupport4",
+		name = "beamcom",
+		modules = {
+			"commweapon_beamlaser", 
+			"commweapon_concussion",
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting"
+		}
+	},
+	[3] = {
+		chassis = "commsupport4",
+		name = "gcom",
+		modules = {
+			"commweapon_gaussrifle", 
+			"commweapon_clusterbomb",
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting"
+		}
+	},
+	[4] = {
+		chassis = "commsupport4",
+		name = "artcom",
+		modules = {
+			"commweapon_partillery", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting"
+		}
+	},
+	[5] = {
+		chassis = "commsupport4",
+		name = "riotcom",
+		modules = {
+			"commweapon_riotcannon", 
+			"commweapon_disintegrator",
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting"
+		}
+	},
+	[6] = {
+		chassis = "commsupport4",
+		name = "shotcom",
+		modules = {
+			"commweapon_shotgun", 
+			"commweapon_disruptorbomb",
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting"
+		}
+	},
+}
+
+
 
 -- just some stuff
 

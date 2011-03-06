@@ -129,7 +129,8 @@ if modOptions.terracostmult then
 	costMult = modOptions.terracostmult
 end
 
-costMult = costMult * volumeCost
+volumeCost = volumeCost * costMult
+pointBaseCost = pointBaseCost * costMult
 
 --------------------------------------------------------------------------------
 -- Arrays
@@ -556,7 +557,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		
 		if totalCost ~= 0 then
 			baseCost = baseCost*pointBaseCost
-			totalCost = totalCost*costMult + baseCost
+			totalCost = totalCost*volumeCost + baseCost
 		
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
 			if id then
@@ -927,7 +928,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		
 		if totalCost ~= 0 then
 			baseCost = baseCost*pointBaseCost
-			totalCost = totalCost*costMult + baseCost
+			totalCost = totalCost*volumeCost + baseCost
 		
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
 			if id then
@@ -1395,7 +1396,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		
 		if totalCost ~= 0 then
 			baseCost = baseCost*pointBaseCost
-			totalCost = totalCost*costMult + baseCost
+			totalCost = totalCost*volumeCost + baseCost
 		
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
 			if id then
@@ -1758,7 +1759,7 @@ local function updateTerraformCost(id)
 	terraformUnit[id].lastProgress = 0
 	terraformUnit[id].lastHealth = 0
 	terraformUnit[id].progress = 0
-	terraformUnit[id].cost = volume*costMult
+	terraformUnit[id].cost = volume*volumeCost
 	terraformUnit[id].totalCost = terraformUnit[id].cost + terraformUnit[id].baseCost
 	
 	return true
@@ -2160,7 +2161,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 				costDiff = (1 - terra.progress)*terra.cost
 			end
 				
-			addedCost = addedCost*costMult
+			addedCost = addedCost*volumeCost
 			
 			local edgeTerraCost = (costDiff*addedCost/(costDiff+addedCost))
 			terra.progress = terra.progress + (costDiff-edgeTerraCost)/terra.cost
@@ -2230,8 +2231,8 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	spSetHeightMapFunc(func)
 --[[
 	Spring.Echo("costDiff " .. oldCostDiff)
-	Spring.Echo("actual edge cost " .. test2*costMult)
-	Spring.Echo("actual terra cost " .. test3*costMult)
+	Spring.Echo("actual edge cost " .. test2*volumeCost)
+	Spring.Echo("actual terra cost " .. test3*volumeCost)
 --]]
 	--spAdjustHeightMap(terra.border.left-16, terra.border.top-16, terra.border.right+16, terra.border.bottom+16, 0)
 	if terraformUnit[id].intercepts ~= 0 then
@@ -2259,6 +2260,10 @@ function gadget:GameFrame(n)
 	--if n % 300 == 0 then
 	--	RaiseWater(-20)
 	--end
+	
+	if n == 60 and costMult ~= 1 then
+		Spring.Echo("Terraform cost multipler = " .. costMult)
+	end
 	
 	local i = 1
 	while i <= terraformUnitCount do

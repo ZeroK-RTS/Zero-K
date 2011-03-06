@@ -239,7 +239,10 @@ ProcessComm("stresstestdef", stressTestDef)
 
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = VFS.Include("gamedata/modularcomms/testdata.lua")
-ProcessComm("testcomm", testDef)
+for i = 1, testDef.count do
+	ProcessComm(testDef[i].name, testDef[i])
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
