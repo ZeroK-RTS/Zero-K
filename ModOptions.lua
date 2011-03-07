@@ -268,7 +268,15 @@ local options = {
 	section= 'experimental',
 	def    = true,
   },
-    {
+  {
+    key    = 'animation',
+    name   = 'Animation Mode',
+    desc   = 'Enables the animation control panel.',
+    type   = 'bool',
+    section= 'experimental',
+    def    = false,
+  },
+  {
     key    = 'terracostmult',
     name   = 'Terraform Cost Multiplier',
     desc   = 'Multiplies the cost of terraform.',
