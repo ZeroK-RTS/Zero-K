@@ -9,9 +9,9 @@ return {
   ["napalm_expl"] = {
     usedefaultexplosions = false,
     groundflash = {
-      flashalpha         = 0.8,
-      flashsize          = 140,
-      ttl                = 150,
+      flashalpha         = 1,
+      flashsize          = 80,
+      ttl                = 330,
       color = {
         [1]  = 0.7,
         [2]  = 0.3,
@@ -21,13 +21,13 @@ return {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 1,
+      count              = 3,
       ground             = true,
       water              = true,
       properties = {
-        delay              = 0,
+        delay              = [[0 i40]],
         explosiongenerator = [[custom:NAPALMFIREBALL_piece3]],
-        pos                = [[0, 0, 0]],
+        pos                = [[-10 r20, 0, -10 r20]],
       },
     },
   },
@@ -54,7 +54,7 @@ return {
         particlesizespread = 10,
         particlespeed      = 0.5,
         particlespeedspread = 1.0,
-        pos                = [[10 r10, 30, -10 r10]],
+        pos                = [[-10 r20, 10, -10 r20]],
         sizegrowth         = 0,
         sizemod            = 1.0,
         texture            = [[fireball]],
