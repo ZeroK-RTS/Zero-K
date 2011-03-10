@@ -849,7 +849,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   local name = UnitDefs[unitDefID].name
-  if ( chickenTeamID == unitTeam and not commnames[name] ) then
+  if ( chickenTeamID == unitTeam ) then
     local n = Spring.GetGameRulesParam(name.."Count") or 0
     Spring.SetGameRulesParam(name.."Count", n+1)
   end
