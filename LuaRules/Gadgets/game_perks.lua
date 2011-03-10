@@ -69,11 +69,14 @@ local unlockUnits = {
 	"corbhmth",
 	"empmissile",	
 	"armbrtha",
+	"corsilo",
 	"mahlazer",
 
 	"cafus",
 	
 	-- factories
+	"factorycloak",
+	"factoryhover",
 	"factoryspider",
 	"factoryjump",
 	"factorytank",
