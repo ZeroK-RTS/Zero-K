@@ -36,6 +36,9 @@ unitDef = {
 	helptext_de    = [[Der geheimnisvolle Support Commander nutzt ein eher unothodoxes Waffenset, welches standardmäßig aus einem Gaußgewehr, das Erschütterungen abfeuert sobald es ausreichend aufgebessert wurde, besteht. Jedoch fehlt es ihm an Rüstung und Geschwindigkeit, darum macht sich dieser Unterbau vor allem durch den inhärenten Einkommensbonus beliebt.]],
 	level = [[1]],
 	statsname = [[commsupport1]],
+	soundok = [[heavy_bot_move]],
+	soundselect = [[bot_select]],
+	soundbuild = [[builder_start]],
   },
 
   defaultmissiontype  = [[Standby]],

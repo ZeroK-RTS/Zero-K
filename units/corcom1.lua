@@ -36,6 +36,9 @@ unitDef = {
 	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
 	level = [[1]],
 	statsname = [[corcom1]],
+	soundok = [[heavy_bot_move]],
+	soundselect = [[bot_select]],
+	soundbuild = [[builder_start]],
   },
 
   defaultmissiontype  = [[Standby]],

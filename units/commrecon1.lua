@@ -37,6 +37,9 @@ unitDef = {
 	helptext_de    = [[Bei dem Recon Commander dreht sich alles um Mobilität und List. Dieser schwach gepanzerte Grundsatz kann um viele Spezialwaffen und -module erweitert werden. Seine Basiswaffe ist ein langsamer Strahl und seine Spezialwaffe besteht aus einer zerstörerischen Bombe mit einer weitreichenden AoE. Er besitzt außerdem einen Düsenstrahl zum Springen.]],
 	level = [[1]],
 	statsname = [[commrecon1]],
+	soundok = [[heavy_bot_move]],
+	soundselect = [[bot_select]],
+	soundbuild = [[builder_start]],
   },
 
   defaultmissiontype  = [[Standby]],

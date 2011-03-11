@@ -1184,6 +1184,13 @@ for udid, ud in pairs(UnitDefs) do
 				sounds[ud.name] = {select = {[1] = ud.customParams.soundselect}}
 			end
 		end
+		if ud.customParams.soundbuild then
+			if sounds[ud.name] then
+				sounds[ud.name].build = ud.customParams.soundbuild
+			else
+				sounds[ud.name] = {build = ud.customParams.soundbuild}
+			end
+		end
 	end
 end
 
@@ -1191,11 +1198,6 @@ local underAttackSounds = {
 --	[1] = "udamaged_1",
 	[1] = "udamaged_2",
 }
-
-sounds.coradvcom = sounds.corcom
-sounds.armadvcom = sounds.armcom
-sounds.commadvrecon = sounds.commrecon
-sounds.commadvsupport = sounds.commsupport
 
 for i,v in pairs(sounds) do
 	if not v.underattack then

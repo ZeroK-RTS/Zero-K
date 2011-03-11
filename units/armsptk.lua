@@ -55,8 +55,7 @@ unitDef = {
   movementClass          = [[TKBOT3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
-  objectName             = [[recluse.s3o]],
-  script                 = [[armsptk.lua]],
+  objectName             = [[ARMSPTK]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   side                   = [[ARM]],
@@ -84,16 +83,16 @@ unitDef = {
     ADV_ROCKET = {
       name                    = [[Rocket Volley]],
       areaOfEffect            = 48,
-      burst                   = 4,
-      burstrate               = 0.2,
+      burst                   = 3,
+      burstrate               = 0.3,
       cegTag                  = [[missiletrailredsmall]],
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 100,
-        planes  = 100,
-        subs    = 5,
+        default = 135,
+        planes  = 135,
+        subs    = 7,
       },
 
       edgeEffectiveness       = 0.5,

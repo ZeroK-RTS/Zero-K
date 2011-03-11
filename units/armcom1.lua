@@ -89,6 +89,9 @@ unitDef = {
 	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufrüstung erhält er eine Disintegratorkanone.]],
 	level = [[1]],
 	statsname = [[armcom1]],
+	soundok = [[heavy_bot_move]],
+	soundselect = [[bot_select]],
+	soundbuild = [[builder_start]],
   },
 
   defaultmissiontype     = [[Standby]],
