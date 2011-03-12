@@ -64,7 +64,7 @@ function widget:Initialize()
 end
 
 function checkUnits(unitID,unitDefID,unitTeam)
-	--local ud = UnitDefs[unitDefID]
+	local ud = UnitDefs[unitDefID]
 	--printDebug("<unit_auto_retreat60>: checking " .. " with ID " .. unitID .. " in team " .. unitTeam)
 	if ((unitTeam == MyTeam) and ((ud ~= nil) and not (ud.isBuilding or not ud.canMove))) then -- test if exist and (is mobile and not a building) [I know buildings can't move but you never know]
 			WG['retreat'].addRetreatCommand(unitID, unitDefID, 2)
@@ -83,10 +83,11 @@ function widget:UnitCreated(unitID,unitDefID,unitTeam)-- needed for resurrected 
 	--printDebug("<unit_auto_retreat60>: " .. ud.humanName .. " with ID " .. unitID .. " and team " .. unitTeam .. " created detected !")
 	local health = spGetUnitHealth(unitID)
 	--printDebug("<unit_auto_retreat60>: " .. ud.humanName .. " with ID " .. unitID .. " just created have a health of " .. health)
-	if health <= 0.3 then
-	--printDebug("<unit_auto_retreat60>: " .. ud.humanName .. " with ID " .. unitID .. " is  being built :  do not touch yet.")
-		return end
+	if health >= 0.3 then
 	checkUnits(unitID,unitDefID,unitTeam)
+	else
+		--printDebug("<unit_auto_retreat60>: " .. ud.humanName .. " with ID " .. unitID .. " is  being built :  do not touch yet.")
+		return end
 end
 
 function widget:UnitFinished(unitID,unitDefID,unitTeam)--  every 'from factory' is also finished after being created BUT autoretreat makes them retreat if retreat is set while they are built.
@@ -101,14 +102,6 @@ function widget:UnitTaken(unitID,unitDefID,unitTeam)-- needed for taken units
 	checkUnits(unitID,unitDefID,unitTeam)
 end
 
---[[
-
-function widget:UnitIdle()-- test, check if executed every frame -> bad
-	printDebug("<unit_auto_retreat60>: unit idle detected !")
-	checkUnits()
-end
-	]]--
-	
 function printDebug( value )
 	if ( debug ) then Echo( value )
 	end
