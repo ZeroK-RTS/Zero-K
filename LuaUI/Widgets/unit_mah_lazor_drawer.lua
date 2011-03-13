@@ -18,8 +18,7 @@ end
 
 local mahLazorUnitDefID = UnitDefNames["mahlazer"].id
 
-local mahLazors = {data = {}, count = 0}
-local mahLazorIDs = {}
+local mahLazors = {}
 
 local MAH_UPDATE_FREQUENCY = 5
 
@@ -36,39 +35,32 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if Spring.GetMyTeamID() == unitTeam and mahLazorUnitDefID == unitDefID then
-		mahLazors.count = mahLazors.count + 1
-		mahLazors.data[mahLazors.count] = {id = unitID, height = false }
-		mahLazorIDs[unitID] = mahLazors.count
+		mahLazors[unitID] = {height = false }
 	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if mahLazorIDs[unitID] then
-		mahLazors.data[mahLazorIDs[unitID]] = mahLazors.data[mahLazors.count]
-		mahLazors.data[mahLazors.count] = nil
-		mahLazorIDs[mahLazors.data[mahLazorIDs[unitID]]] = mahLazorIDs[unitID]
-		mahLazors.count = mahLazors.count - 1
-		mahLazorIDs[unitID] = nil
+	if mahLazors[unitID] then
+		mahLazors[unitID] = nil
 	end
 end
 
 function widget:GameFrame(frame)
 	if frame%MAH_UPDATE_FREQUENCY == 0 then
-		for i = 1, mahLazors.count do
-			local mahLazor = mahLazors.data[i].id
-			local cmd = Spring.GetUnitCommands(mahLazor)
+		for unitID, data in pairs(mahLazors) do
+			local cmd = Spring.GetUnitCommands(unitID)
 			if cmd and #cmd > 2 and cmd[1].id == CMD_ATTACK and #cmd[1].params == 3 and cmd[2].id == CMD_ATTACK then
-				if mahLazors.data[i].height then
+				if data.height then
 					local c1height = Spring.GetGroundHeight(cmd[1].params[1],cmd[1].params[3])
-					if mahLazors.data[i].height ~= c1height or math.abs(c1height - cmd[1].params[2]) > 32 then
-						mahLazors.data[i].height = Spring.GetGroundHeight(cmd[2].params[1],cmd[2].params[3])
-						Spring.GiveOrderToUnit(mahLazor, CMD_ATTACK, cmd[1].params, CMD.OPT_SHIFT)
-						if Spring.GetUnitStates(mahLazor)["repeat"] then
-							Spring.GiveOrderToUnit(mahLazor, CMD_ATTACK, {cmd[1].params[1], mahLazors.data[i].height, cmd[1].params[3]}, CMD.OPT_SHIFT)
+					if data[i].height ~= c1height or math.abs(c1height - cmd[1].params[2]) > 32 then
+						data.height = Spring.GetGroundHeight(cmd[2].params[1],cmd[2].params[3])
+						Spring.GiveOrderToUnit(unitID, CMD_ATTACK, cmd[1].params, CMD.OPT_SHIFT)
+						if Spring.GetUnitStates(unitID)["repeat"] then
+							Spring.GiveOrderToUnit(unitID, CMD_ATTACK, {cmd[1].params[1], data.height, cmd[1].params[3]}, CMD.OPT_SHIFT)
 						end
 					end
 				else
-					mahLazors.data[i].height = Spring.GetGroundHeight(cmd[1].params[1],cmd[1].params[3])
+					data.height = Spring.GetGroundHeight(cmd[1].params[1],cmd[1].params[3])
 				end
 			end
 		end

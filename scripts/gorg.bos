@@ -1,7 +1,10 @@
+#include "constants.h"
+
 #define TA			// This is a TA script
 
 #include "sfxtype.h"
 #include "exptype.h"
+
 
 piece  rflare, lflare, body, turret, feetparent, FLFoot, FRFoot, RLFoot,
        RRFoot, rightchunk, leftchunk, faceguard, Lgun, Rgun, Rbarrel, Lbarrel,
