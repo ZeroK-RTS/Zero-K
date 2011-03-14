@@ -153,7 +153,7 @@ end
 
 function widget:GameFrame(n)
 
-	if (n%32 ~= 3) then return end
+	if (n%32 ~= 2) then return end
 
 	if not window then return end
 
@@ -162,7 +162,7 @@ function widget:GameFrame(n)
 	local teams = Spring.GetTeamList(myAllyTeamID)
 	
 	local totalConstruction = 0
-	local totalExpense = (-WG.baseExpense or 0)
+	local totalExpense = 0
 	local teamMInco = 0
 	local teamFreeStorage = 0
 	for i = 1, #teams do
@@ -248,6 +248,7 @@ function widget:GameFrame(n)
 	local energyInc = Format(eInco - math.max(0, (WG.change or 0)))
 	local energyShare =  Format(WG.change or 0)
 	local otherE = Format(-eExpe - math.min(0, (WG.change or 0)) + mExpe)
+	
 	local teamIncome = Format(WG.teamIncome or 0)
 	local totalODE = Format(-(WG.energyForOverdrive or 0))
 	local totalODM = Format(WG.metalFromOverdrive or 0)
@@ -577,22 +578,16 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- changes have a 1 second delay to actual income
-local previousChange = 0 
-local previousBaseExpense = 0
-
-function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, change, teamIncome, baseExpense)
+-- note works only in communism mode
+function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, change, teamIncome)
   if (Spring.GetLocalTeamID() == teamID) then 
   	WG.energyWasted = energyWasted
 	WG.energyForOverdrive = energyForOverdrive
-	WG.change = previousChange -- energy change by OD - substract that from income 
-	previousChange = change
+	WG.change = change -- energy change by OD - substract that from income 
 	WG.mexIncome = totalIncome-metalFromOverdrive
 	WG.metalFromOverdrive = metalFromOverdrive
 	WG.teamIncome = teamIncome
 	WG.allies = allies
-	WG.baseExpense = previousBaseExpense
-	previousBaseExpense = baseExpense
   end
 end
 
