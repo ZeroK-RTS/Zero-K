@@ -281,14 +281,12 @@ local function MotionControl(moving, aiming, justmoved)
 			if aiming  then
 				armsFree = true
 				WalkLegs()
-			end
-			if not aiming  then
+			else
 				armsFree = false
 				Walk()
 			end
 			justmoved = true
-		end
-		if not moving  then
+		else
 			armsFree = true
 			if justmoved  then
 				Turn( rupleg , x_axis, 0, math.rad(200.071429) )

@@ -263,16 +263,15 @@ local function MotionControl(moving, aiming, justmoved)
 		aiming = bAiming
 		if  moving  then
 			if aiming  then
-				armsFree = 1
+				armsFree = true
 				WalkLegs()
 			else
-				armsFree = 0
+				armsFree = false
 				Walk()
 			end
 			justmoved = true
-		end
-		if  not moving  then
-			armsFree = 1
+		else
+			armsFree = true
 			if  justmoved  then
 				Turn( rupleg , x_axis, 0, math.rad(200.071429) )
 				Turn( rloleg , x_axis, 0, math.rad(200.071429) )
@@ -288,7 +287,7 @@ local function MotionControl(moving, aiming, justmoved)
 				end
 				justmoved = false
 			end
-		Sleep(100)
+			Sleep(100)
 		end
 	end
 end
@@ -416,6 +415,7 @@ function script.FireWeapon(num)
 		EmitSfx(flare, 1027)
 	end
 	--recoil
+	--[[
 	if num ~= 4 then
 		Sleep(50)
 		Turn( gun , x_axis, math.rad(-2), math.rad(1250) )
@@ -426,6 +426,7 @@ function script.FireWeapon(num)
 			Turn(armhold, x_axis, math.rad(15), math.rad(150)) --check the sexy shot
 		end
 	end
+	]]--
 end
 
 function script.QueryNanoPiece()
