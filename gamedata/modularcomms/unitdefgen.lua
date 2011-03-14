@@ -132,7 +132,7 @@ if not (commDataRaw and type(commDataRaw) == 'string') then
 else
 	commDataRaw = string.gsub(commDataRaw, '_', '=')
 	commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
-	--Spring.Echo(commDataRaw)
+	Spring.Echo(commDataRaw)
 	commDataFunc, err = loadstring("return "..commDataRaw)
 	if commDataFunc then
 		success, commData = pcall(commDataFunc)
