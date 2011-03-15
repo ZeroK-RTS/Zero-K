@@ -15,7 +15,7 @@ function widget:GetInfo()
 end
 
 
-local CONST_IGNORE_BUILDERS = true -- should automated factory transport ignore builders?
+local CONST_IGNORE_BUILDERS = false -- should automated factory transport ignore builders?
 local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height difference when evaluating distance
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
 local CONST_PRIORITY_BENEFIT = 10000 -- how much more important are priority transfers
@@ -63,7 +63,7 @@ options = {
 	ignoreBuilders = {
 		name = "Transport AI: Ignore Builders",
 		type = "bool",
-		value = true,
+		value = false,
 		desc = "Do not pick up builders.",
 		OnChange = IgBuilderChanged,
 	},
