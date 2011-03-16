@@ -19,8 +19,19 @@ mapWeaponToCEG = {
 	[5] = {1,2},
 }
 
+function RemoveWeapons(unitDef) 
+-- because for some reason comms have a default weapon with no purpose and I don't want to screw with that
+	if unitDef.weapons then
+		for i=3,6 do
+			if unitDef.weapons[i] then
+				unitDef.weapons[i] = nil
+			end
+		end
+	end
+end
+
 function ApplyWeapon(unitDef, weapon, replace, forceslot)
-	local wcp = weapons[weapon].customparams or {}
+	local wcp = (weapons[weapon] and weapons[weapon].customparams) or {}
 	local slot = tonumber(wcp.slot) or 4
 	local altslot = tonumber(wcp.altslot or 3)
 	local dualwield = false
@@ -31,6 +42,8 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	end
 	
 	slot = forceslot or slot
+	
+	--Spring.Echo(weapons[weapon].name .. " into slot " .. slot)
 	
 	unitDef.weapons[slot] = {
 		def = weapon,
@@ -79,6 +92,18 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	
 	if slot ~=3 and not dualwield then
 		unitDef.customparams.alreadyhasweapon = true
+	end
+end
+
+function ReplaceWeapon(unitDef, oldWeapon, newWeapon)
+
+	local weapons = unitDef.weapons or {}
+	for i,v in pairs(weapons) do
+		if v.def == oldWeapon then
+			Spring.Echo("replacing " .. oldWeapon .. " with " .. newWeapon)
+			ApplyWeapon(unitDef, newWeapon, false, i)
+			break -- one conversion, one weapon changed. Get 2 if you want 2
+		end
 	end
 end
 

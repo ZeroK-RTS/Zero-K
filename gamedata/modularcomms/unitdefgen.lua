@@ -171,9 +171,9 @@ local function ProcessComm(name, config)
 			end
 		end
 		
-		ApplyWeapon(commDefs[name], "commweapon_peashooter", true)
-		
 		if config.modules then
+			local hasWeapon = false
+			RemoveWeapons(commDefs[name])
 			-- sort: weapons first, weapon mods next, regular modules last
 			table.sort(config.modules,
 				function(a,b)
@@ -188,6 +188,7 @@ local function ProcessComm(name, config)
 					if weapons[moduleName] then
 						--Spring.Echo("\tApplying weapon: "..moduleName)
 						ApplyWeapon(commDefs[name], moduleName)
+						hasWeapon = true
 					else
 						Spring.Echo("\tERROR: Weapon "..moduleName.." not found")
 					end
@@ -201,7 +202,7 @@ local function ProcessComm(name, config)
 					if upgrades[moduleName].func then --apply upgrade function
 						upgrades[moduleName].func(commDefs[name], attributeMods) 
 					end	
-					if attributeMods.speed > 0 then
+					if attributeMods.speed ~= 0 then
 						commDefs[name].maxvelocity = commDefs[name].customparams.basespeed*(1+attributeMods.speed)
 					else
 						commDefs[name].maxvelocity = commDefs[name].customparams.basespeed/(1-attributeMods.speed)
@@ -209,6 +210,9 @@ local function ProcessComm(name, config)
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end
+			end
+			if not hasWeapon then
+				ApplyWeapon(commDefs[name], "commweapon_peashooter", true)
 			end
 		end
 		if config.name then
@@ -259,7 +263,8 @@ for name, data in pairs(commDefs) do
 	
 	-- set weapon1 range	- may need exception list in future depending on what weapons we add
 	if data.weapondefs then
-		local minRange = 999999
+		local maxRange = 0
+		local weaponRanges = {}
 		local weaponNames = {}
 		local wep1Name
 		-- first check if the comm is actually using the weapon
@@ -269,15 +274,23 @@ for name, data in pairs(commDefs) do
 			end
 		end
 		for name, weaponData in pairs(data.weapondefs) do
-			if (weaponData.range or 999999) < minRange and weaponNames[name] and not (string.lower(weaponData.name):find('fake')) and not weaponData.commandfire then
-				minRange = weaponData.range 
+			if weaponNames[name] and not (string.lower(weaponData.name):find('fake')) and not weaponData.commandfire then
+				if (weaponData.range or 0) > maxRange then
+					maxRange = weaponData.range 
+				end
+				weaponRanges[name] = weaponData.range 
 			end
 		end
 		-- lame-ass hack, because the obvious methods don't work
 		for name, weaponData in pairs(data.weapondefs) do
 			if string.lower(weaponData.name):find('fake') then
-				weaponData.range = minRange
+				weaponData.range = maxRange
 			end
+		end
+		for name, range in pairs(weaponRanges) do -- only works for 2 weapons max
+			if maxRange ~= range then
+				data.customparams.extradrawrange = range
+			end 
 		end
 	end
 	-- set wreck values

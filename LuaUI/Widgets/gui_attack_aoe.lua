@@ -38,9 +38,11 @@ local aoeUnitDefID
 local dgunUnitDefID
 local aoeUnitID
 local dgunUnitID
+local selUnitID
 local circleList
 local secondPart = 0
 local mouseDistance = 1000
+local extraDrawRange
 
 --------------------------------------------------------------------------------
 --speedups
@@ -285,6 +287,9 @@ local function UpdateSelection()
   aoeUnitID = nil
   
   for unitDefID, unitIDs in pairs(sel) do
+	if unitDefID == "n" then
+	  break
+	end
     if (dgunInfo[unitDefID]) then 
       dgunUnitDefID = unitDefID
       dgunUnitID = unitIDs[1]
@@ -298,7 +303,11 @@ local function UpdateSelection()
         aoeUnitID = GetRepUnitID(unitIDs)
       end
     end
-  end
+	extraDrawRange = UnitDefs[unitDefID] and UnitDefs[unitDefID].customParams and UnitDefs[unitDefID].customParams.extradrawrange
+	if extraDrawRange then
+		selUnitID = GetRepUnitID(unitIDs)
+	end
+ end
 end
 
 --------------------------------------------------------------------------------
@@ -606,6 +615,16 @@ function widget:DrawWorld()
   local _, cmd, _ = GetActiveCommand()
   local info, unitID
   
+  if extraDrawRange and selUnitID and cmd == CMD_ATTACK then
+    local fx, fy, fz = GetUnitPosition(selUnitID)
+	if fx then
+		glColor(1, 0, 0, 0.75)
+		glLineWidth(1)
+		glDrawGroundCircle(fx, fy, fz, extraDrawRange, circleDivs)
+		glColor(1,1,1,1)
+	end
+  end
+  
   if (cmd == CMD_ATTACK and aoeUnitDefID) then 
     info = aoeDefInfo[aoeUnitDefID]
 	unitID = aoeUnitID
@@ -617,6 +636,7 @@ function widget:DrawWorld()
   end
   
   local fx, fy, fz = GetUnitPosition(unitID)
+  
   if (not fx) then return end
   if (not info.mobile) then fy = fy + GetUnitRadius(unitID) end
   

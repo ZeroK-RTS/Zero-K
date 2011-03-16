@@ -40,6 +40,7 @@ local lowRangeSwarmieeArray = {
 	
 	["chickenr"] = true,
 	["chickenblobber"] = true,
+	["armsnipe"] = true, -- only worth swarming sniper at low range, too accurate otherwise.
 }
 
 merge(medRangeSwarmieeArray,longRangeSwarmieeArray)

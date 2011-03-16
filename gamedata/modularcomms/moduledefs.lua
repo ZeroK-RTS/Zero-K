@@ -19,6 +19,7 @@ end
 upgrades = {
 	-- weapons
 	-- it is important that they are prefixed with "commweapon_" in order to get the special handling!
+	-- it is important that they are prefixed with "commweapon_" in order to get the special handling!
 	
 	commweapon_peashooter = {
 		name = "Peashooter",
@@ -106,39 +107,22 @@ upgrades = {
 		name = "Disruptor Beam",
 		description = "Slow Beam: +33% reload time, +250 real damage",
 		func = function(unitDef)
-				local weapons = unitDef.weapondefs or {}
-				for i,v in pairs(weapons) do
-					if i == "commweapon_slowbeam" then
-						ApplyWeapon(unitDef, "commweapon_disruptor", true, i)
-						--break
-					end
-				end
+				ReplaceWeapon(unitDef, "commweapon_slowbeam", "commweapon_disruptor")
+				
 			end,	
 	},
 	conversion_shockrifle = {
 		name = "Shock Rifle",
 		description = "Gauss Rifle: Convert to a long-range sniper rifle",
 		func = function(unitDef)
-				local weapons = unitDef.weapondefs or {}
-				for i,v in pairs(weapons) do
-					if i == "commweapon_gaussrifle" then
-						ApplyWeapon(unitDef, "commweapon_shockrifle", true, i)
-						--break
-					end
-				end
+				ReplaceWeapon(unitDef, "commweapon_gaussrifle", "commweapon_shockrifle")
 			end,	
 	},
 	conversion_partillery = {
 		name = "Plasma Artillery",
 		description = "Riot Cannon: Convert to a medium artillery gun",
 		func = function(unitDef)
-				local weapons = unitDef.weapondefs or {}
-				for i,v in pairs(weapons) do
-					if i == "commweapon_riotcannon" then
-						ApplyWeapon(unitDef, "commweapon_partillery", true, i)
-						--break
-					end
-				end
+				ReplaceWeapon(unitDef, "commweapon_riotcannon", "commweapon_partillery")
 			end,	
 	},		
 	

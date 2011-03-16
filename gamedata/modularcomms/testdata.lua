@@ -117,13 +117,13 @@ local fullModuleSet = {}
 
 
 return {
-	count = 6,
+	count = 7,
 	[1] = {
 		chassis = "commsupport4",
 		name = "rocketcom",
 		modules = {
 			"commweapon_rocketlauncher", 
-			"commweapon_sunburst",
+			"commweapon_heatray",
 			"weaponmod_standoff_rocket", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
@@ -138,7 +138,7 @@ return {
 		chassis = "commsupport4",
 		name = "beamcom",
 		modules = {
-			"commweapon_beamlaser", 
+			"commweapon_riotcannon", 
 			"commweapon_concussion",
 			"module_adv_targeting", 
 			"module_adv_targeting", 
@@ -157,22 +157,15 @@ return {
 			"commweapon_gaussrifle",
 			"commweapon_gaussrifle",
 			"conversion_shockrifle", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting"
 		}
 	},
 	[4] = {
 		chassis = "commsupport4",
 		name = "artcom",
 		modules = {
-			"commweapon_partillery", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
+			"conversion_partillery", 
+			"commweapon_riotcannon", 
+			"commweapon_shotgun", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
@@ -211,6 +204,16 @@ return {
 			"module_adv_targeting", 
 			"module_adv_targeting", 
 			"module_adv_targeting"
+		}
+	},
+	[7] = {
+		chassis = "armcom2",
+		name = "dgcom",
+		modules = {
+			"commweapon_gaussrifle",
+			"commweapon_gaussrifle",
+			"conversion_shockrifle", 
+			"conversion_shockrifle", 
 		}
 	},
 }

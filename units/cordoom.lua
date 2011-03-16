@@ -34,6 +34,7 @@ unitDef = {
     keeptooltip    = [[any string I want]],
     neededlink     = 50,
     pylonrange     = 50,
+	extradrawrange = 430,
   },
 
   damageModifier                = 0.25,
