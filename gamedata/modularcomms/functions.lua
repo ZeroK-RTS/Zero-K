@@ -19,9 +19,19 @@ mapWeaponToCEG = {
 	[5] = {1,2},
 }
 
-function ApplyWeapon(unitDef, weapon)
+function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	local wcp = weapons[weapon].customparams or {}
-	local slot = tonumber(wcp and wcp.slot) or 4
+	local slot = tonumber(wcp.slot) or 4
+	local altslot = tonumber(wcp.altslot or 3)
+	local dualwield = false
+	
+	if unitDef.customparams.alreadyhasweapon and not replace then	-- dual wield
+		slot = altslot
+		dualwield = true
+	end
+	
+	slot = forceslot or slot
+	
 	unitDef.weapons[slot] = {
 		def = weapon,
 		badtargetcategory = wcp.badtargetcategory or [[FIXEDWING]],
@@ -29,7 +39,7 @@ function ApplyWeapon(unitDef, weapon)
 	}
 	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
 	
-	if slot == 3 then
+	if slot == 3 and not (dualwield) then
 		unitDef.candgun = true
 	end
 	
@@ -47,13 +57,13 @@ function ApplyWeapon(unitDef, weapon)
 	]]--
 	
 	-- clear other weapons
-	if slot > 3 then
-		for i=4,6 do	-- subject to change
-			if unitDef.weapons[i] and i ~= slot then
-				unitDef.weapons[i] = nil
-			end
+	--[[
+	for i=4,6 do	-- subject to change
+		if unitDef.weapons[i] and i ~= slot then
+			unitDef.weapons[i] = nil
 		end
 	end
+	]]--
 	-- add CEGs
 	if mapWeaponToCEG[slot] and unitDef.sfxtypes and unitDef.sfxtypes.explosiongenerators then
 		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][1]] = wcp.muzzleeffect or [[custom:NONE]]
@@ -65,6 +75,10 @@ function ApplyWeapon(unitDef, weapon)
 	for armorname,dmg in pairs(wd.damage) do
 		wcp["basedamage_"..armorname] = tostring(dmg)
 		--Spring.Echo(armorname, v.customparams["basedamage_"..armorname])
+	end
+	
+	if slot ~=3 and not dualwield then
+		unitDef.customparams.alreadyhasweapon = true
 	end
 end
 

@@ -109,8 +109,8 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_slowbeam" then
-						ApplyWeapon(unitDef, "commweapon_disruptor")
-						break
+						ApplyWeapon(unitDef, "commweapon_disruptor", true, i)
+						--break
 					end
 				end
 			end,	
@@ -122,8 +122,8 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_gaussrifle" then
-						ApplyWeapon(unitDef, "commweapon_shockrifle")
-						break
+						ApplyWeapon(unitDef, "commweapon_shockrifle", true, i)
+						--break
 					end
 				end
 			end,	
@@ -135,8 +135,8 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_riotcannon" then
-						ApplyWeapon(unitDef, "commweapon_partillery")
-						break
+						ApplyWeapon(unitDef, "commweapon_partillery", true, i)
+						--break
 					end
 				end
 			end,	
@@ -154,7 +154,7 @@ upgrades = {
 						v.projectiles = 9
 						v.reloadtime = v.reloadtime * 0.5
 						v.customparams.basereload = v.reloadtime
-						break
+						--break
 					end
 				end
 			end,	
@@ -248,7 +248,7 @@ upgrades = {
 						v.soundhitvolume = 8
 						v.soundstart = [[weapon/missile/missile2_fire_bass]]
 						v.soundstartvolume = 7					
-						break
+						--break
 					end
 				end
 			end,	

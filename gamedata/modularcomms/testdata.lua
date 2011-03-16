@@ -151,12 +151,12 @@ return {
 		}
 	},
 	[3] = {
-		chassis = "commsupport4",
+		chassis = "armcom2",
 		name = "gcom",
 		modules = {
-			"commweapon_gaussrifle", 
-			"commweapon_clusterbomb",
-			"module_adv_targeting", 
+			"commweapon_gaussrifle",
+			"commweapon_gaussrifle",
+			"conversion_shockrifle", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
@@ -202,7 +202,7 @@ return {
 		name = "shotcom",
 		modules = {
 			"commweapon_shotgun", 
-			"commweapon_disruptorbomb",
+			"commweapon_shotgun",
 			"module_adv_targeting", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
