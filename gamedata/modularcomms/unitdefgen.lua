@@ -171,7 +171,7 @@ local function ProcessComm(name, config)
 			end
 		end
 		
-		ApplyWeapon(commDefs[name], "commweapon_peashooter")
+		ApplyWeapon(commDefs[name], "commweapon_peashooter", true)
 		
 		if config.modules then
 			-- sort: weapons first, weapon mods next, regular modules last
