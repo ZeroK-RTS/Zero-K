@@ -31,7 +31,6 @@ unitDef = {
   iconType            = [[walkerarty]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  immunetoparalyzer   = [[0]],
   maneuverleashlength = [[640]],
   mass                = 217,
   maxDamage           = 650,

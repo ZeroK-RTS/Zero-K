@@ -41,7 +41,6 @@ unitDef = {
   iconType            = [[smallgunship]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  immunetoparalyzer   = [[1]],
   maneuverleashlength = [[1240]],
   mass                = 73,
   maxDamage           = 90,

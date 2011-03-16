@@ -35,7 +35,6 @@ unitDef = {
   footprintX                    = 2,
   footprintZ                    = 2,
   iconType                      = [[defensespecial]],
-  immunetoparalyzer             = true,
   levelGround                   = false,
   mass                          = 159,
   maxDamage                     = 1000,

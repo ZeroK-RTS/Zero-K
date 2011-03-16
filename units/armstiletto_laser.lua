@@ -42,7 +42,6 @@ unitDef = {
   iconType            = [[bomberriot]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  immunetoparalyzer   = [[1]],
   maneuverleashlength = [[1380]],
   mass                = 238,
   maxAcc              = 0.5,
