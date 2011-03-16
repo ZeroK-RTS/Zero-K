@@ -179,7 +179,7 @@ return {
 		name = "riotcom",
 		modules = {
 			"commweapon_riotcannon", 
-			"commweapon_disintegrator",
+			"commweapon_sunburst",
 			"module_adv_targeting", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 

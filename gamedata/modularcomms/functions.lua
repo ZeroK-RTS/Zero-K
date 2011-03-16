@@ -36,7 +36,7 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	local altslot = tonumber(wcp.altslot or 3)
 	local dualwield = false
 	
-	if unitDef.customparams.alreadyhasweapon and not replace then	-- dual wield
+	if slot ~= 3 and unitDef.customparams.alreadyhasweapon and not replace then	-- dual wield
 		slot = altslot
 		dualwield = true
 	end
@@ -52,7 +52,7 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	}
 	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
 	
-	if slot == 3 and not (dualwield) then
+	if slot == 3 then
 		unitDef.candgun = true
 	end
 	
