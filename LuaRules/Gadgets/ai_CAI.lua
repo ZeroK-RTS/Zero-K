@@ -2882,7 +2882,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 					controlledUnit.conByID[unitID] = nil
 				else -- nano turret
 					controlledUnit.nano.cost = controlledUnit.nano.cost - ud.metalCost
-					controlledUnit.nano.count = controlledUnit.nano.count - 1
 					local index = controlledUnit.nanoByID[unitID].index
 					closestFactory = controlledUnit.nanoByID[unitID].closestFactory
 					if a.controlledUnit.factoryByID[closestFactory] then
