@@ -235,7 +235,7 @@ end
 local function isUnitVisible(unitID, allyTeam)
 	if spValidUnitID(unitID) then
 		local state = Spring.GetUnitLosState(unitID,allyTeam)
-		return state.los or state.radar --(state.radar and state.typed) -- typed for has unit icon
+		return state and (state.los or state.radar) --(state.radar and state.typed) -- typed for has unit icon
 	else
 		return false
 	end
