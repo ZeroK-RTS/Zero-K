@@ -25,7 +25,7 @@ local blastColor = { 1.0, 0.0, 0.0 }
 local expBlastAlphaValue = 1.0
 local expBlastColor = { 1.0, 0.0, 0.0}
 
-local lastTimeUpdate = 0
+--local lastTimeUpdate = 0
 local lastColorChangeTime = 0.0
 local selfdCycleDir = false
 local selfdCycleTime = 0.3
@@ -77,14 +77,14 @@ function widget:Update()
 	local time = floor(timef)
 	
 	-- update timers once every <updateInt> seconds
-	if (time % updateInt == 0 and time ~= lastTimeUpdate) then	
-		lastTimeUpdate = time
-		--do update stuff:
-		
-		if ( CheckSpecState() == false ) then
-			return false
-		end
-	end
+	--if (time % updateInt == 0 and time ~= lastTimeUpdate) then	
+	--	lastTimeUpdate = time
+	--	--do update stuff:
+	--	
+	--	if ( CheckSpecState() == false ) then
+	--		return false
+	--	end
+	--end
 end
 
 function widget:DrawWorld()
@@ -301,6 +301,7 @@ function ResetGl()
 	glTexture(false)
 end
 
+--[[
 function CheckSpecState()
 	local playerID = spGetMyPlayerID()
 	local _, _, spec, _, _, _, _, _ = spGetPlayerInfo(playerID)
@@ -313,6 +314,7 @@ function CheckSpecState()
 	
 	return true	
 end
+--]]
 
 function printDebug( value )
 	if ( debug ) then
