@@ -353,7 +353,7 @@ upgrades = {
 		name = "High Density Plating",
 		description = "Adds 1600 HP, slows comm by +10%",
 		func = function(unitDef, attributeMods)
-				unitDef.maxdamage = unitDef.maxdamage + 600
+				unitDef.maxdamage = unitDef.maxdamage + 1600
 				attributeMods.speed = attributeMods.speed - 0.1
 			end,
 	},

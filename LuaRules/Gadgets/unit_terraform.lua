@@ -501,6 +501,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	terraformOrders = terraformOrders + 1
 	terraformOrder[terraformOrders] = {border = border, index = {}, indexes = 0}
 	
+	local frame = Spring.GetGameFrame()
+	
 	for i = 1,n-1 do
 		
 		-- detect overlapping buildings
@@ -599,7 +601,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					intercepts = 0, 
 					intercept = {}, 
 					interceptMap = {},
-					decayTime = terraformDecayFrames, 
+					decayTime = frame + terraformDecayFrames, 
 					allyTeam = unitAllyTeam,
 					team = team,
 					order = terraformOrders,
@@ -800,6 +802,8 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	terraformOrder[terraformOrders] = {border = border, index = {}, indexes = 0}
 	
 	local otherTerraformUnitCount = terraformUnitCount
+	
+	local frame = Spring.GetGameFrame()
 
 	for i = 1,n-1 do
 	
@@ -970,7 +974,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					intercepts = 0, 
 					intercept = {}, 
 					interceptMap = {},
-					decayTime = terraformDecayFrames, 
+					decayTime = frame + terraformDecayFrames, 
 					allyTeam = unitAllyTeam,
 					team = team,
 					order = terraformOrders,
@@ -1279,6 +1283,8 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	terraformOrders = terraformOrders + 1
 	terraformOrder[terraformOrders] = {border = border, index = {}, indexes = 0}
 
+	local frame = Spring.GetGameFrame()
+	
 	for i = 1,n-1 do
 	
 		-- detect overlapping buildings
@@ -1438,7 +1444,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					intercepts = 0, 
 					intercept = {}, 
 					interceptMap = {},
-					decayTime = terraformDecayFrames, 
+					decayTime = frame + terraformDecayFrames, 
 					allyTeam = unitAllyTeam,
 					team = team,
 					order = terraformOrders,
@@ -1898,7 +1904,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		end
 	end
 	
-	local newProgress = terra.progress + costDiff/terra.cost
+	local newProgress = terra.progress + costDiff/terra.totalCost
 	if newProgress> 1 then
 		newProgress = 1
 	end
@@ -2152,7 +2158,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	local edgeTerraMult = 1
 	if costDiff ~= 0 then
 		if addedCost == 0 then
-			terra.progress = terra.progress + costDiff/terra.cost
+			terra.progress = terra.progress + costDiff/terra.totalCost
 		else
 			local extraCost = 0
 			
@@ -2194,7 +2200,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		edgeTerraMult = 1
 	end
 
-	local newBuild = (terra.progress*terra.cost+terra.baseCost)/terra.totalCost
+	local newBuild = terra.progress
 	
 	spSetUnitHealth(id, {
 		health = newBuild*terraUnitHP,
@@ -2274,18 +2280,9 @@ function gadget:GameFrame(n)
 			local diffProgress = health/terraUnitHP - terraformUnit[id].progress
 			
 			if diffProgress == 0 then
-			
-				if n % decayCheckFrequency == 0 then
-					if terraformUnit[id].decayTime < decayCheckFrequency then
-						
-						deregisterTerraformUnit(id,i,3)
-						
-						spDestroyUnit(id,{reclaimed = true})
-					
-					else
-						terraformUnit[id].decayTime = terraformUnit[id].decayTime - decayCheckFrequency
-						i = i + 1
-					end
+				if n % decayCheckFrequency == 0 and terraformUnit[id].decayTime < n then
+					deregisterTerraformUnit(id,i,3)
+					spDestroyUnit(id,{reclaimed = true})
 				else
 					i = i + 1
 				end
@@ -2343,7 +2340,7 @@ function gadget:GameFrame(n)
 						if #cQueue[i].params == 1 then
 							-- target unit command
 							if terraformUnit[cQueue[i].params[1]] then
-								terraformUnit[cQueue[i].params[1]].decayTime = terraformDecayFrames
+								terraformUnit[cQueue[i].params[1]].decayTime = n + terraformDecayFrames
 							end
 						else
 							-- area command
@@ -2356,7 +2353,7 @@ function gadget:GameFrame(n)
 									if terra.allyTeam == allyTeam then
 										local disSQ = (terra.position.x - cX)^2 + (terra.position.z - cZ)^2
 										if disSQ < radSQ then
-											terra.decayTime = terraformDecayFrames
+											terra.decayTime = n + terraformDecayFrames
 										end
 									end
 								end
