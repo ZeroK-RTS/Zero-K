@@ -415,6 +415,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		while j*segWidth < terraform_width do
 		
 			segment[n] = {}
+			segment[n].along = i
 			segment[n].point = {}
 			segment[n].area = {}
 			segment[n].border = {
@@ -501,6 +502,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	terraformOrders = terraformOrders + 1
 	terraformOrder[terraformOrders] = {border = border, index = {}, indexes = 0}
 	
+	local rampLevels = {count = 0, data = {[0] = {along = false}}}
+	
 	local frame = Spring.GetGameFrame()
 	
 	for i = 1,n-1 do
@@ -563,6 +566,13 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
 			if id then
+				if segment[i].along ~= rampLevels.data[rampLevels.count].along then
+					rampLevels.count = rampLevels.count + 1
+					rampLevels.data[rampLevels.count] = {along = segment[i].along, count = 0, data = {}}
+				end
+				rampLevels.data[rampLevels.count].count = rampLevels.data[rampLevels.count].count + 1
+				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
+				
 				local allyTeamList = spGetAllyTeamList()
 				local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
 				for _,allyID in ipairs (allyTeamList) do
@@ -618,22 +628,64 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		
 	end
 	--** Give repair order for each block to all selected units **
+  	if rampLevels.count == 0 then
+		return
+	end
 		
-	for i = 1, units do
-	
+	local unitsX = 0
+	local unitsZ = 0
+	local i = 1
+	while i <= units do
 		if (spValidUnitID(unit[i])) then
-			if shift then
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[1]},CMD_OPT_SHIFT)
-			else
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[1]},CMD_OPT_RIGHT)
-			end
-			
-			for j = 2, blocks do
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[j]},CMD_OPT_SHIFT)
-			end
+			local x,_,z = Spring.GetUnitPosition(unit[i])
+			unitsX = unitsX + x
+			unitsZ = unitsZ + z
+			i = i + 1
+		else
+			unit[i] = unit[units]
+			unit[units] = nil
+			units = units - 1
 		end
 	end
-  
+		
+	if units == 0 then 
+		return
+	end
+	
+	unitsX = unitsX/units
+	unitsZ = unitsZ/units	
+	
+	local orderList = {data = {}, count = 0}
+	
+	local zig = 0
+	if linearEquation(unitsX,m,x1,z1) < unitsZ then
+		zig = 1
+	end
+	
+	for i = 1, rampLevels.count do
+		for j = 1 + rampLevels.data[i].count*zig, (rampLevels.data[i].count-1)*(1-zig) + 1, 1-zig*2 do
+			orderList.count = orderList.count + 1
+			orderList.data[orderList.count] = rampLevels.data[i].data[j]
+		end
+		zig = 1-zig
+	end
+	
+	if orderList.count == 0 then
+		return
+	end
+	
+	for i = 1, units do
+		if shift then
+			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_SHIFT)
+		else
+			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_RIGHT)
+		end
+		
+		for j = 2, orderList.count do
+			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[j]},CMD_OPT_SHIFT)
+		end
+	end
+	
 end
 
 local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,units,team,volumeSelection,shift)
@@ -1159,17 +1211,18 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	
 	local otherTerraformUnitCount = terraformUnitCount
 	
-	local wCount = ceil((border.right-border.left)/areaSegMaxSize)
-	local hCount = ceil((border.bottom-border.top)/areaSegMaxSize)
+	local wCount = ceil((border.right-border.left)/areaSegMaxSize) - 1
+	local hCount = ceil((border.bottom-border.top)/areaSegMaxSize) - 1
 	-- w/hCount is the number of segments that fit into the width/height
 	local addX = 0
 	-- addX and addZ prevent overlap
 	local n = 1 -- segment count
-	for i = 0, wCount-1 do
+	for i = 0, wCount do
 		local addZ = 0
-		for j = 0, hCount-1 do
+		for j = 0, hCount do
 			-- i and j step through possible segments based on splitting the rectangular area into rectangles
 			segment[n] = {}
+			segment[n].grid = {x = i, z = j}
 			segment[n].point = {}
 			segment[n].area = {}
 			segment[n].border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
@@ -1284,6 +1337,10 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	terraformOrder[terraformOrders] = {border = border, index = {}, indexes = 0}
 
 	local frame = Spring.GetGameFrame()
+	
+	local unitIdGrid = {}
+	local aveX = 0
+	local aveZ = 0
 	
 	for i = 1,n-1 do
 	
@@ -1406,6 +1463,12 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
 			if id then
+				unitIdGrid[segment[i].grid.x] = unitIdGrid[segment[i].grid.x] or {}
+				unitIdGrid[segment[i].grid.x][segment[i].grid.z] = id
+				
+				aveX = aveX + segment[i].position.x
+				aveZ = aveZ + segment[i].position.z
+				
 				local allyTeamList = spGetAllyTeamList()
 				local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
 				for _,allyID in ipairs (allyTeamList) do
@@ -1463,16 +1526,113 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	
 	--** Give repair order for each block to all selected units **
 	
-	for i = 1, units do
+	if terraformOrder[terraformOrders].indexes == 0 then
+		return
+	end
 	
+	aveX = aveX/terraformOrder[terraformOrders].indexes
+	aveZ = aveZ/terraformOrder[terraformOrders].indexes
+	
+	local unitsX = 0
+	local unitsZ = 0
+	local i = 1
+	while i <= units do
 		if (spValidUnitID(unit[i])) then
-			if not shift then
-				spGiveOrderToUnit(unit[i],CMD_STOP,{},{})
+			local x,_,z = Spring.GetUnitPosition(unit[i])
+			unitsX = unitsX + x
+			unitsZ = unitsZ + z
+			i = i + 1
+		else
+			unit[i] = unit[units]
+			unit[units] = nil
+			units = units - 1
+		end
+	end
+		
+	if units == 0 then 
+		return
+	end
+	
+	unitsX = unitsX/units
+	unitsZ = unitsZ/units
+	
+	local orderList = {data = {}, count = 0}
+	
+	if unitsX < unitsZ - aveZ + aveX then -- left or top
+		if unitsX < -unitsZ + aveZ + aveX then -- left
+			local zig = 0
+			if unitsZ > aveZ then  -- 4th octant
+				zig = 1
 			end
-			
-			for j = 1, blocks do
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[j]},CMD_OPT_SHIFT)
+			for gx = 0, wCount do
+				for gz = 0 + hCount*zig, hCount*(1-zig), 1-zig*2 do
+					if unitIdGrid[gx] and unitIdGrid[gx][gz] then
+						orderList.count = orderList.count + 1
+						orderList.data[orderList.count] = unitIdGrid[gx][gz]
+					end
+				end
+				zig = 1 - zig
 			end
+		else -- top
+			local zig = 0
+			if unitsX > aveX then  -- 2nd octant
+				zig = 1
+			end
+			for gz = hCount, 0, -1 do
+				for gx = 0 + wCount*zig, wCount*(1-zig), 1-zig*2 do
+					if unitIdGrid[gx] and unitIdGrid[gx][gz] then
+						orderList.count = orderList.count + 1
+						orderList.data[orderList.count] = unitIdGrid[gx][gz]
+					end
+				end
+				zig = 1 - zig
+			end
+		end
+	else -- bottom or right
+		if unitsX < -unitsZ + aveZ + aveX then -- bottom
+			local zig = 0
+			if unitsX > aveX then  -- 7th octant
+				zig = 1
+			end
+			for gz = 0, hCount do
+				for gx = 0 + wCount*zig, wCount*(1-zig), 1-zig*2 do
+					if unitIdGrid[gx] and unitIdGrid[gx][gz] then
+						orderList.count = orderList.count + 1
+						orderList.data[orderList.count] = unitIdGrid[gx][gz]
+					end
+				end
+				zig = 1 - zig
+			end
+		else -- right
+			local zig = 0
+			if unitsZ > aveZ then  -- 1st octant
+				zig = 1
+			end
+			for gx = wCount, 0, -1  do
+				for gz = 0 + hCount*zig, hCount*(1-zig), 1-zig*2 do
+					if unitIdGrid[gx] and unitIdGrid[gx][gz] then
+						orderList.count = orderList.count + 1
+						orderList.data[orderList.count] = unitIdGrid[gx][gz]
+					end
+				end
+				zig = 1 - zig
+			end
+		end
+	end
+	
+	if orderList.count == 0 then
+		return
+	end
+	
+	for i = 1, units do
+		if shift then
+			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_SHIFT)
+		else
+			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_RIGHT)
+		end
+		
+		for j = 2, orderList.count do
+			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[j]},CMD_OPT_SHIFT)
 		end
 	end
 	
@@ -2342,7 +2502,7 @@ function gadget:GameFrame(n)
 							if terraformUnit[cQueue[i].params[1]] then
 								terraformUnit[cQueue[i].params[1]].decayTime = n + terraformDecayFrames
 							end
-						else
+						elseif #cQueue[i].params == 4 then -- there is a command with 5 params that I do not want 
 							-- area command
 							local radSQ = cQueue[i].params[4]^2
 							local cX, _, cZ = cQueue[i].params[1],cQueue[i].params[2],cQueue[i].params[3]
@@ -2353,6 +2513,7 @@ function gadget:GameFrame(n)
 									if terra.allyTeam == allyTeam then
 										local disSQ = (terra.position.x - cX)^2 + (terra.position.z - cZ)^2
 										if disSQ < radSQ then
+											--Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"saved " .. cX)
 											terra.decayTime = n + terraformDecayFrames
 										end
 									end
