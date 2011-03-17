@@ -47,10 +47,10 @@ end
 
 function gadget:GameFrame(f)
 	for i,c in pairs(createList) do
-		local u = Spring.CreateUnit(c.name , c.x, c.y, c.z, 0, Spring.GetUnitTeam(c.owner))
-    if (c.expire > 0) then 
-      expireList[u] = f + c.expire * 32
-    end
+		local unitID = Spring.CreateUnit(c.name , c.x, c.y, c.z, 0, Spring.GetUnitTeam(c.owner))
+		if (c.expire > 0) then 
+			expireList[unitID] = f + c.expire * 32
+		end
 		createList[i]=nil
 	end
   if ((f+6)%64<0.1) then 
