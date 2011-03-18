@@ -489,10 +489,10 @@ local comMorph = {
 		time = 20,
 	},
 	[2] = {
-		time = 35,
+		time = 50,
 	},
 	[3] = {
-		time = 45,
+		time = 50,
 	},
 }
 

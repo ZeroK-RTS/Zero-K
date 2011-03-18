@@ -43,7 +43,8 @@ local unlockUnits = {
 	-- units
 	"spherepole",
 
-	"armmerl",
+	--"armmerl",
+	"capturecar",
 	
 	"panther",
 	"corgol",
@@ -62,28 +63,29 @@ local unlockUnits = {
 	-- defenses and superweapons
     "corgrav",
     --"armpb",
-    "armcir",
+    --"armcir",
 	"screamer",
 	"armanni",
 	"cordoom",
 	"corbhmth",
-	"empmissile",	
+	--"empmissile",	
 	"armbrtha",
-	"corsilo",
+	--"corsilo",
 	"mahlazer",
 
 	"cafus",
 	
 	-- factories
-	"factorycloak",
-	"factoryhover",
-	"factoryspider",
+	--"factorycloak",
+	"factoryshield",
+	--"factoryhover",
+	--"factoryspider",
 	"factoryjump",
 	"factorytank",
-	"factorygunship",
+	--"factorygunship",
 	"factoryplane",
 	"armcsa",
-	"missilesilo",
+	--"missilesilo",
 }
 
 local unlockUnitsMap = {}
