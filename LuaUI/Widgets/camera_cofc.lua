@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera",
-    desc      = "v0.01 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.011 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -837,6 +837,15 @@ function widget:MousePress(x, y, button)
 	end
 	-- Rotate World --
 	if c then
+		if options.targetmouse.value then
+			
+			local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
+			if gx then
+				SetLockSpot2(cs,x,y)
+				local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
+				spSetCameraTarget(gx,gy,gz, 1)
+			end
+		end
 		spWarpMouse(cx, cy)
 		SetLockSpot2(cs)
 		rotate = true
