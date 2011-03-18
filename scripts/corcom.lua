@@ -371,39 +371,6 @@ local function RestoreLegs()
 	Sleep(200)
 end
 
-local function BigFire()
---	gunLockOut = true
-	Move( l_sho , z_axis, 0  )
-	Move( l_sho , z_axis, -3 , 250 )
-	Move( l_nano , z_axis, 0  )
-	Move( l_nano , z_axis, -5 , 520 )
---	Move( bigflsh , x_axis, 0  )		--unnecessary lines?
---	Move( mlasflsh , y_axis, 0  )
---	Move( mlasflsh , z_axis, 0  )
-	Turn( l_sho , x_axis, 0 )
-	Turn( l_sho , x_axis, math.rad(-1), math.rad(113) )
-	Sleep(10)
-
-	Move( l_sho , z_axis, -1 , 16 )
-	Move( l_nano , z_axis, -3 , 30 )
-	Turn( l_sho , x_axis, 0, math.rad(14) )
-	Sleep(80)
-	Move( l_sho , z_axis, 0 , 14 )
-	Move( l_nano , z_axis, -2 , 15 )
-	Turn( l_sho , x_axis, 0, 0 )
-	Sleep(70)
-
-	Move( l_sho , z_axis, 0 , 1 )
-	Turn( l_sho , x_axis, math.rad(1), math.rad(15) )
-	Turn( l_sho , z_axis, math.rad(-(0)), math.rad(8) )
-	Sleep(50)
-	Move( l_sho , z_axis, 0 , 5 )
-	Move( l_nano , z_axis, 0 , 44 )
-	Turn( l_sho , x_axis, 0, math.rad(19) )
-	Turn( l_sho , z_axis, math.rad(-(0)), math.rad(9) )
-	Sleep(50)
---	gunLockOut = false
-end
 
 local function MotionControl()
 	while true do 
@@ -433,12 +400,20 @@ function script.StopMoving()
 	isMoving = false
 end
 
-function script.AimFromWeapon4(num)
-	return chest
+function script.AimFromWeapon1(num)
+	if num == 3 then
+		return r_sho
+	else
+		return f_sho
+	end
 end
 
 function script.QueryWeapon(num)
-	return mlasflsh
+	if num == 3 then
+		return bigflsh
+	else
+		return mlasflsh
+	end
 end
 
 function script.FireWeapon(num) 
@@ -446,8 +421,8 @@ function script.FireWeapon(num)
 		EmitSfx( mlasflsh,  1024 )
 		EmitSfx( mlasflsh,  1025 )
 	elseif num == 3 then
-		EmitSfx( mlasflsh,  1026 )
-		EmitSfx( mlasflsh,  1027 )
+		EmitSfx( bigflsh,  1026 )
+		EmitSfx( bigflsh,  1027 )
 	end
 end
 
@@ -462,8 +437,8 @@ local function RestoreDgun()
 	SetSignalMask( SIG_DGUN)
 	Sleep(RESTORE_DELAY_DGUN)
 	isDgunning = false
-	Turn( l_sho , x_axis, 0, ARM_SPEED_PITCH )
-	Turn( l_nano , x_axis, math.rad(36), ARM_SPEED_PITCH )
+	Turn( r_sho , x_axis, 0, ARM_SPEED_PITCH )
+	Turn( r_nano , x_axis, math.rad(0), ARM_SPEED_PITCH )
 	if not isLasering then Turn( chest , y_axis, 0, TORSO_SPEED_YAW) end
 end
 
@@ -475,7 +450,7 @@ function script.AimWeapon(num, heading, pitch)
 		if not isDgunning then 
 			Turn( chest , y_axis, heading, TORSO_SPEED_YAW )
 		end
-		Turn( l_sho , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
+		Turn( l_sho , x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH )
 		WaitForTurn(chest, y_axis)
 		WaitForTurn(l_sho, x_axis)
 		StartThread(RestoreLaser)
@@ -485,9 +460,9 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask( SIG_DGUN)
 		isDgunning = true
 		Turn( chest , y_axis, heading, TORSO_SPEED_YAW )
-		Turn( l_nano , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
+		Turn( r_sho , x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH )
 		WaitForTurn(chest, y_axis)
-		WaitForTurn(l_nano, x_axis)
+		WaitForTurn(r_sho, x_axis)
 		StartThread(RestoreDgun)
 		return true
 	elseif num == 2 then
