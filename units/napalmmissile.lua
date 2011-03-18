@@ -80,6 +80,7 @@ unitDef = {
 
     WEAPON = {
       name                    = [[Napalm Missile]],
+	  cegTag                  = [[tactrail]],
       areaOfEffect            = 512,
       avoidFriendly           = false,
       collideFriendly         = false,
@@ -116,7 +117,7 @@ unitDef = {
       shakeduration           = [[1.5]],
       shakemagnitude          = [[32]],
       smokedelay              = [[0.1]],
-      smokeTrail              = true,
+      smokeTrail              = false,
       soundHit                = [[weapon/missile/nalpalm_missile_hit]],
       soundStart              = [[weapon/missile/tacnuke_launch]],
       startsmoke              = [[1]],

@@ -56,8 +56,8 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:SLASHMUZZLE]],
-      [[custom:SLASHREARMUZZLE]],
+      [[custom:rockomuzzle]],
+      [[custom:rockomuzzle]],
       [[custom:RAIDMUZZLE]],
     },
   },
@@ -203,6 +203,7 @@ unitDef = {
       areaOfEffect            = 228,
       burst                   = 2,
       burstrate               = 0.1,
+	  cegTag                  = [[missiletrailredsmall]],
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -240,6 +241,7 @@ unitDef = {
       sprayAngle              = 1000,
       startsmoke              = [[1]],
       startVelocity           = 150,
+	  texture2                = [[darksmoketrail]],
       tolerance               = 6500,
       tracks                  = false,
       turnRate                = 8000,
@@ -261,6 +263,7 @@ unitDef = {
       avoidNeutral            = false,
       burst                   = 20,
       burstrate               = 0.1,
+	  cegTag                  = [[missiletrailredsmall]],
       commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
@@ -300,6 +303,7 @@ unitDef = {
       sprayAngle              = 2000,
       startsmoke              = [[1]],
       startVelocity           = 150,
+      texture2                = [[darksmoketrail]],
       tolerance               = 6500,
       tracks                  = false,
       turnRate                = 5000,
