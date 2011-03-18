@@ -33,17 +33,18 @@ end
 function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	local wcp = (weapons[weapon] and weapons[weapon].customparams) or {}
 	local slot = tonumber(wcp.slot) or 4
+	local isDgun = (tonumber(wcp.slot) == 3)
 	local altslot = tonumber(wcp.altslot or 3)
 	local dualwield = false
 	
-	if slot ~= 3 and unitDef.customparams.alreadyhasweapon and not replace then	-- dual wield
+	if (not isDgun) and unitDef.customparams.alreadyhasweapon and not replace then	-- dual wield
 		slot = altslot
 		dualwield = true
 	end
 	
 	slot = forceslot or slot
 	
-	--Spring.Echo(weapons[weapon].name .. " into slot " .. slot)
+	Spring.Echo(weapons[weapon].name .. " into slot " .. slot)
 	
 	unitDef.weapons[slot] = {
 		def = weapon,
@@ -52,7 +53,7 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	}
 	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
 	
-	if slot == 3 then
+	if isDgun then
 		unitDef.candgun = true
 	end
 	
@@ -90,7 +91,7 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 		--Spring.Echo(armorname, v.customparams["basedamage_"..armorname])
 	end
 	
-	if slot ~=3 and not dualwield then
+	if (not isDgun) and not dualwield then
 		unitDef.customparams.alreadyhasweapon = true
 	end
 end

@@ -114,13 +114,10 @@ local fullModuleSet = {}
 
 --]]
 
-
-
-return {
+local base = {
 	count = 7,
 	[1] = {
-		chassis = "commsupport4",
-		name = "rocketcom",
+		name = "rocket",
 		modules = {
 			"commweapon_rocketlauncher", 
 			"commweapon_heatray",
@@ -135,8 +132,7 @@ return {
 		}
 	},
 	[2] = {
-		chassis = "commsupport4",
-		name = "beamcom",
+		name = "riot",
 		modules = {
 			"commweapon_riotcannon", 
 			"commweapon_concussion",
@@ -151,8 +147,7 @@ return {
 		}
 	},
 	[3] = {
-		chassis = "armcom2",
-		name = "gcom",
+		name = "gauss",
 		modules = {
 			"commweapon_gaussrifle",
 			"commweapon_gaussrifle",
@@ -160,7 +155,6 @@ return {
 		}
 	},
 	[4] = {
-		chassis = "commsupport4",
 		name = "artcom",
 		modules = {
 			"conversion_partillery", 
@@ -175,8 +169,7 @@ return {
 		}
 	},
 	[5] = {
-		chassis = "commsupport4",
-		name = "riotcom",
+		name = "sun",
 		modules = {
 			"commweapon_riotcannon", 
 			"commweapon_sunburst",
@@ -191,8 +184,7 @@ return {
 		}
 	},
 	[6] = {
-		chassis = "commsupport4",
-		name = "shotcom",
+		name = "dshot",
 		modules = {
 			"commweapon_shotgun", 
 			"commweapon_shotgun",
@@ -207,8 +199,7 @@ return {
 		}
 	},
 	[7] = {
-		chassis = "armcom2",
-		name = "dgcom",
+		name = "dgauss",
 		modules = {
 			"commweapon_gaussrifle",
 			"commweapon_gaussrifle",
@@ -218,7 +209,39 @@ return {
 	},
 }
 
+local ret = {count = 0}
 
+local chassis = {
+	count = 4,
+	[1] = {
+		name = "c4_",
+		value = "corcom4",
+	},
+	[2] = {
+		name = "a4_",
+		value = "armcom4",
+	},
+	[3] = {
+		name = "s4_",
+		value = "commsupport4",
+	},
+	[4] = {
+		name = "r4_",
+		value = "commrecon4",
+	},
+}
+
+for i = 1, chassis.count do
+	for j = 1, base.count do
+		ret.count = ret.count + 1
+		ret[ret.count] = {}
+		ret[ret.count].modules = base[j].modules
+		ret[ret.count].chassis = chassis[i].value
+		ret[ret.count].name = "test_" .. chassis[i].name .. base[j].name
+	end
+end
+
+return ret
 
 -- just some stuff
 
