@@ -24,13 +24,6 @@ include "constants.lua"
 
 local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
 
--- Signal definitions
-local SIG_LASER = 2
-local SIG_DGUN = 4
-
-local ACT_DGUN = 4
-local ACT_LASER = 2
-
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
@@ -434,33 +427,30 @@ local function RestoreLaser()
 end
 
 local function RestoreDgun()
-	SetSignalMask( SIG_DGUN)
 	Sleep(RESTORE_DELAY_DGUN)
 	isDgunning = false
 	Turn( r_sho , x_axis, 0, ARM_SPEED_PITCH )
-	Turn( r_nano , x_axis, math.rad(0), ARM_SPEED_PITCH )
+	Turn( nanospray , x_axis, math.rad(0), ARM_SPEED_PITCH )
 	if not isLasering then Turn( chest , y_axis, 0, TORSO_SPEED_YAW) end
 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num >=4 then
-		Signal( SIG_LASER)
-		SetSignalMask( SIG_LASER)
 		isLasering = true
 		if not isDgunning then 
 			Turn( chest , y_axis, heading, TORSO_SPEED_YAW )
 		end
 		Turn( l_sho , x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH )
+		Turn( l_nano , x_axis, math.rad(0) , ARM_SPEED_PITCH )
 		WaitForTurn(chest, y_axis)
 		WaitForTurn(l_sho, x_axis)
 		StartThread(RestoreLaser)
 		return true
 	elseif num == 3 then
-		Signal( SIG_DGUN)
-		SetSignalMask( SIG_DGUN)
 		isDgunning = true
 		Turn( chest , y_axis, heading, TORSO_SPEED_YAW )
 		Turn( r_sho , x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH )
+		Turn( r_dgun , x_axis, math.rad(0) , ARM_SPEED_PITCH )
 		WaitForTurn(chest, y_axis)
 		WaitForTurn(r_sho, x_axis)
 		StartThread(RestoreDgun)

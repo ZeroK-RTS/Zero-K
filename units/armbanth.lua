@@ -149,6 +149,7 @@ unitDef = {
     CORKROG_ROCKET = {
       name                    = [[Heavy Rockets]],
       areaOfEffect            = 96,
+	  cegTag                  = [[raventrail]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,

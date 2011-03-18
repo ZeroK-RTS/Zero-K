@@ -56,8 +56,8 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:rockomuzzle]],
-      [[custom:rockomuzzle]],
+      [[custom:SLASHMUZZLE]],
+      [[custom:SLASHREARMUZZLE]],
       [[custom:RAIDMUZZLE]],
     },
   },
@@ -241,7 +241,6 @@ unitDef = {
       sprayAngle              = 1000,
       startsmoke              = [[1]],
       startVelocity           = 150,
-	  texture2                = [[darksmoketrail]],
       tolerance               = 6500,
       tracks                  = false,
       turnRate                = 8000,
@@ -303,7 +302,6 @@ unitDef = {
       sprayAngle              = 2000,
       startsmoke              = [[1]],
       startVelocity           = 150,
-      texture2                = [[darksmoketrail]],
       tolerance               = 6500,
       tracks                  = false,
       turnRate                = 5000,

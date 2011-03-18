@@ -76,7 +76,7 @@ local function FireLoop()
 		EmitSfx( drop,  FIRE_W2 )
 		if sound_index == 0 then
 			local px, py, pz = Spring.GetUnitPosition(unitID)
-			Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 8, px, py, pz)
+			Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)
 		end
 		sound_index = sound_index + 1
 		if sound_index >= 6 then

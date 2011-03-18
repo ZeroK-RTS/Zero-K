@@ -6,6 +6,7 @@
 -- chainsawtrail
 -- cruisetrail
 -- tactrail
+-- bigemptrail
 -- emptrail
 -- raventrail
 -- banishertrail
@@ -471,6 +472,72 @@ return {
     },
   },
   
+  ["bigemptrail"] = {
+	alwaysvisible      = false,
+    usedefaultexplosions = false,
+    largeflash = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      count              = 1,
+      ground             = true,
+      underwater         = 1,
+      water              = true,
+      properties = {
+        colormap           = [[1 1 0.25 0.01  0.5 0.5 0.1 0.01  0 0 0 0.01]],
+        dir                = [[dir]],
+        frontoffset        = 0,
+        fronttexture       = [[muzzlefront]],
+        length             = -42,
+        sidetexture        = [[muzzleside]],
+        size               = -7,
+        sizegrowth         = 0.75,
+        ttl                = 5,
+      },
+    },
+	smoke_front = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.8,
+        colormap           = [[0.6 0.7 0.7 0.8  0.4 0.5 0.5 0.7  0.0 0.0 0.0 0.01]],
+        directional        = false,
+        emitrot            = 0,
+        emitrotspread      = 50,
+        emitvector         = [[dir]],
+        gravity            = [[0.05 r-0.1, 0.05 r-0.1, 0.05 r-0.1]],
+        numparticles       = 3,
+        particlelife       = 15,
+        particlelifespread = 0,
+        particlesize       = 7,
+        particlesizespread = 3,
+        particlespeed      = 8,
+        particlespeedspread = -4,
+        pos                = [[0, 1, 3]],
+        sizegrowth         = 1.03,
+        sizemod            = 1.1,
+        texture            = [[smoke]],
+      },
+    },
+	spikes = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 4,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.25,
+        color              = [[0.7, 0.2, 0.1]],
+        dir                = [[-6 r12,-6 r12,-6 r12]],
+        length             = 22,
+        width              = 12,
+      },
+    },
+  },
+  
   ["emptrail"] = {
     alwaysvisible      = false,
     usedefaultexplosions = false,
@@ -493,8 +560,7 @@ return {
         ttl                = 5,
       },
     },
-
-    smoke_front = {
+	smoke_front = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
@@ -502,7 +568,7 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.8,
-        colormap           = [[0.6 0.6 0.1 0.8   0.2 0.2 0.2 0.7  0.2 0.2 0.2 0.6  0.0 0.0 0.0 0.01]],
+        colormap           = [[0.6 0.7 0.7 0.8  0.4 0.5 0.5 0.7  0.0 0.0 0.0 0.01]],
         directional        = false,
         emitrot            = 0,
         emitrotspread      = 50,
@@ -521,31 +587,19 @@ return {
         texture            = [[smoke]],
       },
     },
-   electricity = {
+	spikes = {
       air                = true,
-      class              = [[CSimpleParticleSystem]],
-      count              = 1,
+      class              = [[explspike]],
+      count              = 4,
       ground             = true,
       water              = true,
       properties = {
-        airdrag            = 0.95,
-        colormap           = [[1 1 0.25 0.01  1 1 0.25 0.01 0.5 0.5 1 0.01  1 1 0.25 0.01   0 0 0 0.01]],
-        directional        = true,
-        emitrot            = 0,
-        emitrotspread      = 180,
-        emitvector         = [[0, 1, 0]],
-        gravity            = [[0, 0, 0]],
-        numparticles       = 1,
-        particlelife       = 2,
-        particlelifespread = 5,
-        particlesize       = 40,
-        particlesizespread = 0,
-        particlespeed      = 5,
-        particlespeedspread = 0,
-        pos                = [[0, 1.0, 0]],
-        sizegrowth         = 0,
-        sizemod            = 1.0,
-        texture            = [[whitelightb]],
+        alpha              = 1,
+        alphadecay         = 0.25,
+        color              = [[0.7, 0.2, 0.1]],
+        dir                = [[-6 r12,-6 r12,-6 r12]],
+        length             = 28,
+        width              = 14,
       },
     },
   },

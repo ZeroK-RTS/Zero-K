@@ -190,6 +190,7 @@ unitDef = {
     ORCONE_ROCKET = {
       name                    = [[Medium-Range Missiles]],
       areaOfEffect            = 160,
+	  cegTag                  = [[raventrail]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
