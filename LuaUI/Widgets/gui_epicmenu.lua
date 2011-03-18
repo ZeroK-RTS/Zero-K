@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.254 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.26 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1017,7 +1017,9 @@ local function AssignKeyBind(hotkey, menukey, itemindex, item, verbose)
 		end
 	end
 	
-	local actionName = item.action or ('epic_'.. menukey .. '_' .. item.key)
+	local fullkey = ('epic_'.. menukey .. '_' .. item.key)
+	fullkey = fullkey:gsub(' ', '_')
+	local actionName = item.action or fullkey
 	
 	if verbose then
 		local actions = Spring.GetKeyBindings(hotkey.mod .. hotkey.key)
@@ -1049,6 +1051,7 @@ end
 -- Unsssign a keybinding from settings and other tables that keep track of related info
 local function UnassignKeyBind(menukey, item)
 	local actionName = 'epic_'.. menukey .. '_' .. item.key
+	actionName = actionName:gsub(' ', '_')
 	
 	if item.action then
 		actionName = item.action
@@ -1141,6 +1144,7 @@ local function flattenTree(tree, parent)
 			end
 			
 			local fullkey = curkey .. '_' .. option.key
+			fullkey = fullkey:gsub(' ', '_')
 			
 			--get spring config setting
 			local valuechanged = false
@@ -1372,7 +1376,10 @@ end
 --Get hotkey action and readable hotkey string
 local function GetHotkeyData(key, item)
 	local itemkey = item.key
-	local actionName = item.action or ('epic_' .. key .. '_' .. itemkey)
+	local fullkey = ('epic_' .. key .. '_' .. itemkey)
+	fullkey = fullkey:gsub(' ', '_')
+	local actionName = item.action or fullkey
+	
 	local hotkey = settings.keybounditems[actionName]
 	if hotkey then
 		return hotkey, GetReadableHotkeyMod(hotkey.mod) .. hotkey.key
@@ -1474,7 +1481,7 @@ MakeSubWindow = function(fwkey)
 			data.desc = ''
 		end
 		
-		if data.advanced and not settings.config['Settings_lhShow Advanced Settings'] then
+		if data.advanced and not settings.config['Settings_lhShow_Advanced_Settings'] then
 			--do nothing
 		elseif data.type == 'button' then	
 			local button = Button:New{
@@ -2178,6 +2185,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			AssignKeyBind(kbval, kb_mkey, kb_mindex, kb_item, true) -- param5 = verbose
 		else
 			local actionName = 'epic_'.. kb_mkey .. '_' .. kb_item.key
+			actionName = actionName:gsub(' ', '_')
 			if kb_item.action then
 				actionName = kb_item.action
 			end
