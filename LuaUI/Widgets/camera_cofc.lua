@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera",
-    desc      = "v0.014 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.04 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -42,19 +42,25 @@ options_order = {
 	
 	'lblZoom',
 	'invertzoom', 
+	'invertalt', 
 	'zoomintocursor', 
 	'zoomoutfromcursor', 
 	'zoominfactor', 
 	'zoomoutfactor', 
 	
 	'lblMisc',
+	'overviewmode', 
 	'follow', 
 	'smoothness',
 	'fov',
-	'restrictangle',
-	'mingrounddist',
+	--'restrictangle',
+	--'mingrounddist',
+	'freemode',
 
 }
+
+local OverviewAction = function() end
+
 options = {
 	
 	lblblank1 = {name='', type='label'},
@@ -130,9 +136,15 @@ options = {
 	},
 	invertzoom = {
 		name = 'Invert zoom',
-		desc = 'Invert the scroll wheel direction for zooming and altitude.',
+		desc = 'Invert the scroll wheel direction for zooming.',
 		type = 'bool',
 		value = true,
+	},
+	invertalt = {
+		name = 'Invert altitude',
+		desc = 'Invert the scroll wheel direction for altitude.',
+		type = 'bool',
+		value = false,
 	},
 	zoomoutfromcursor = {
 		name = 'Zoom out from cursor',
@@ -192,16 +204,33 @@ options = {
 		type = 'bool',
 		advanced = true,
 		value = true,
+		OnChange = function(self) init = true; end
+	},
+	freemode = {
+		name = "FreeMode (RISKY)",
+		desc = "Be free. (USE AT YOUR OWN RISK!)",
+		type = 'bool',
+		advanced = true,
+		value = false,
+		OnChange = function(self) init = true; end,
 	},
 	mingrounddist = {
 		name = 'Minimum Ground Distance',
 		desc = 'Getting too close to the ground allows strange camera positioning.',
 		type = 'number',
 		advanced = true,
-		min = 0, max = 500, step = 1,
-		value = 100,
-		OnChange = function(self) init = true; end
+		min = 0, max = 100, step = 1,
+		value = 1,
+		OnChange = function(self) init = true; end,
 	},
+	
+	overviewmode = {
+		name = "Overview",
+		desc = "Go to overview mode, then restore view to cursor position.",
+		type = 'button',
+		OnChange = function(self) OverviewAction() end,
+	},
+	
 }
 
 --------------------------------------------------------------------------------
@@ -255,6 +284,7 @@ local helpText = {}
 local ls_x, ls_y, ls_z
 local ls_dist, ls_have, ls_onmap
 local tilting
+local overview_mode, last_rx, last_ls_dist
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -385,18 +415,21 @@ local function VirtTraceRay(x,y, cs)
 	
 	
 	if gpos then
-		return true, gpos[1], gpos[2], gpos[3]
+		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
+		if gx < 0 or gx > mwidth or gz < 0 or gz > mheight then
+			return false, gx, gy, gz	
+		else
+			return true, gx, gy, gz
+		end
 	end
 	
-	if not cs.dy or cs.dy == 0 then
+	if not cs or not cs.dy or cs.dy == 0 then
 		return false, false
 	end
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz
 	
 	return false, gx, gy, gz
-
-	
 end
 
 local function SetLockSpot2(cs, x, y)
@@ -427,7 +460,8 @@ end
 local function UpdateCam(cs)
 	local cs = cs
 	if not (cs.rx and cs.ry and ls_dist) then
-		return cs
+		--return cs
+		return false
 	end
 	
 	local opp = sin(cs.rx) * ls_dist
@@ -435,6 +469,11 @@ local function UpdateCam(cs)
 	cs.px = ls_x - sin(cs.ry) * alt
 	cs.py = ls_y - opp
 	cs.pz = ls_z - cos(cs.ry) * alt
+	
+	if not options.freemode.value and cs.py < Spring.GetGroundHeight(cs.px, cs.pz)+5 then
+		return false
+	end
+	
 	return cs
 end
 
@@ -468,6 +507,10 @@ local function Zoom(zoomin, s)
 			cs.py = cs.py + dy * sp
 			cs.pz = cs.pz + dz * sp
 			
+			if not options.freemode.value and cs.py < Spring.GetGroundHeight(cs.px, cs.pz)+5 then
+				return true
+			end
+			
 			spSetCameraState(cs, options.smoothness.value)
 			ls_have = false
 			return
@@ -491,7 +534,8 @@ local function Zoom(zoomin, s)
 
 	ls_dist = math.max(ls_dist, 20)
 	
-	cs = UpdateCam(cs)
+	local cstemp = UpdateCam(cs)
+	if cstemp then cs = cstemp; end
 	if zoomin or ls_dist < maxDistY then
 		spSetCameraState(cs, options.smoothness.value)
 	end
@@ -503,10 +547,19 @@ end
 local function Altitude(up, s)
 	ls_have = false
 	
+	local up = up
+	if options.invertalt.value then
+		up = not up
+	end
+	
 	local cs = spGetCameraState()
 	local py = max(1, abs(cs.py) )
 	local dy = py * (up and 1 or -1) * (s and 0.3 or 0.1)
-	spSetCameraState({ py = py + dy, }, options.smoothness.value)
+	cs.py = py + dy
+	if not options.freemode.value and cs.py < Spring.GetGroundHeight(cs.px, cs.pz)+5  then
+		return true
+	end
+	spSetCameraState(cs, options.smoothness.value)
 	return true
 end
 
@@ -521,17 +574,52 @@ local function ResetCam()
 	spSetCameraState(cs, 1)
 end
 
+OverviewAction = function()
+	if not overview_mode then
+		
+		local cs = spGetCameraState()
+		SetLockSpot2(cs)
+		last_ls_dist = ls_dist
+		last_rx = cs.rx
+		
+		cs.px = Game.mapSizeX/2
+		cs.py = maxDistY
+		cs.pz = Game.mapSizeZ/2
+		cs.rx = -HALFPI
+		spSetCameraState(cs, 1)
+	else
+		mx, my = spGetMouseState()
+		local onmap, gx, gy, gz = VirtTraceRay(mx,my)
+		if gx and onmap then
+			local cs = spGetCameraState()			
+			cs.rx = last_rx
+			ls_dist = last_ls_dist 
+			ls_x = gx
+			ls_z = gz
+			ls_y = Spring.GetGroundHeight(ls_x, ls_z)
+			ls_have = true
+			local cstemp = UpdateCam(cs)
+			if cstemp then cs = cstemp; end
+			spSetCameraState(cs, 1)
+		end
+	end
+	
+	overview_mode = not overview_mode
+end
+
 
 
 
 local function RotateCamera(x, y, dx, dy, smooth, lock)
 	local cs = spGetCameraState()
+	local cs1 = cs
 	if cs.rx then
 		
 		cs.rx = cs.rx + dy * options.rotfactor.value
 		cs.ry = cs.ry - dx * options.rotfactor.value
 		
-		local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
+		--local max_rx = options.restrictangle.value and -0.1 or HALFPIMINUS
+		local max_rx = HALFPIMINUS
 		
 		if cs.rx < -HALFPIMINUS then
 			cs.rx = -HALFPIMINUS
@@ -541,7 +629,12 @@ local function RotateCamera(x, y, dx, dy, smooth, lock)
 		
 		
 		if lock and ls_onmap then
-			cs = UpdateCam(cs)
+			local cstemp = UpdateCam(cs)
+			if cstemp then
+				cs = cstemp;
+			else
+				return
+			end
 		else
 			ls_have = false
 		end
@@ -603,7 +696,8 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	
 	ls_y = Spring.GetGroundHeight(ls_x, ls_z)
 	
-	local cs = UpdateCam(cs)
+	local cstemp = UpdateCam(cs)
+	if cstemp then cs = cstemp; end
 	
 	spSetCameraState(cs, smoothlevel)
 	
@@ -766,7 +860,8 @@ function widget:Update(dt)
 		local cs = spGetCameraState()
 		cs.tiltSpeed = 0
 		cs.scrollSpeed = 0
-		cs.gndOffset = options.mingrounddist.value
+		--cs.gndOffset = options.mingrounddist.value
+		cs.gndOffset = options.freemode.value and 0 or 1
 		spSetCameraState(cs,0)
 	end
 	
@@ -800,6 +895,7 @@ end
 
 function widget:MousePress(x, y, button)
 	ls_have = false
+	overview_mode = false
     if fpsmode then return end
 	if lockspringscroll then
 		lockspringscroll = false
@@ -841,12 +937,13 @@ function widget:MousePress(x, y, button)
 	end
 	-- Rotate World --
 	if c then
+	
 		if options.targetmouse.value then
 			
 			local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
-			if gx then
+			if gx and onmap then
 				SetLockSpot2(cs,x,y)
-				local onmap, gx, gy, gz = VirtTraceRay(x,y, cs)
+				
 				spSetCameraTarget(gx,gy,gz, 1)
 			end
 		end
@@ -898,7 +995,6 @@ end
 function widget:KeyPress(key, modifier, isRepeat)
 	--ls_have = false
 	tilting = false
-	
 	
 	if fpsmode then return end
 	if keys[key] then
@@ -1034,6 +1130,8 @@ function widget:Initialize()
 	helpText = explode( '\n', options.helpwindow.value )
 	cx = vsx * 0.5
 	cy = vsy * 0.5
+	
+	Spring.SendCommands( 'unbindaction toggleoverview' )
 end
 
 function widget:Shutdown()
