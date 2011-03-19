@@ -60,7 +60,8 @@ end
 
 -- in event of shield impact, gets data about both units and passes it to UnitPreDamaged
 function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile)
-	if proOwnerID and shieldCarrierUnitID then
+	if proOwnerID and shieldCarrierUnitID and Spring.ValidUnitID(proOwnerID) 
+			and Spring.ValidUnitID(shieldCarrierUnitID) then
 		local udid = Spring.GetUnitDefID(proOwnerID)
 		if udid and shieldCollide_id[udid] then
 			local shieldOn,shieldCharge = Spring.GetUnitShieldState(shieldCarrierUnitID)
