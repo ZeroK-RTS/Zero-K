@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera",
-    desc      = "v0.013 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.014 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -426,6 +426,10 @@ end
 
 local function UpdateCam(cs)
 	local cs = cs
+	if not (cs.rx and cs.ry and ls_dist) then
+		return cs
+	end
+	
 	local opp = sin(cs.rx) * ls_dist
 	local alt = sqrt(ls_dist * ls_dist - opp * opp)
 	cs.px = ls_x - sin(cs.ry) * alt
