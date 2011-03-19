@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera",
-    desc      = "v0.012 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.013 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -67,7 +67,7 @@ options = {
 		name = 'COFCam Help',
 		type = 'text',
 		value = [[
-			Complete Control Camera has six main actions...
+			Complete Overhead/Free Camera has six main actions...
 			
 			Zoom..... <Mousewheel>
 			Tilt World..... <Ctrl> + <Mousewheel>
@@ -481,7 +481,7 @@ local function Zoom(zoomin, s)
 		return
 	end
 	
-	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (s and 1.1 or 1.01)
+	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (s and 3 or 1)
 	
 	ls_dist = ls_dist + ls_dist*sp
 
