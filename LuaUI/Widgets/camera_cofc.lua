@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera",
-    desc      = "v0.011 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.012 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -468,7 +468,7 @@ local function Zoom(zoomin, s)
 			ls_have = false
 			return
 		end
-		echo('not onmap')
+		
 	end
 	--]]
 	ls_have = false
@@ -568,7 +568,7 @@ end
 local function ScrollCam(cs, mxm, mym, smoothlevel)
 	SetLockSpot2(cs)
 	if not cs.dy or not ls_have then
-		echo "<COFC> scrollcam fcn fail"
+		--echo "<COFC> scrollcam fcn fail"
 		return cs	
 	end
 
