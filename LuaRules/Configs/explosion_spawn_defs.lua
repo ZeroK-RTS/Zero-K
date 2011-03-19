@@ -16,6 +16,10 @@ local spawn_defs = {
 	chickenflyerqueen_tiamatbomb = {name = "chicken_tiamat", cost=0, expire=0},
 }
 
-return spawn_defs
+local shieldCollide = { -- unitDefs as the shield hit callin is setup really strangely
+	corgarp = {damage = 220, gadgetDamage = 200}, -- gadgetDamage = damage - weapon default damage
+}
+
+return spawn_defs, shieldCollide
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
