@@ -191,7 +191,7 @@ local function GetSeriesInfo(seriesName)
 end
 
 local colorWeapon = "\255\255\32\32"
-local colorConversion = "\255\32\255\32"
+local colorConversion = "\255\255\96\0"
 local colorWeaponMod = "\255\255\0\255"
 local colorModule = "\255\128\128\255"
 
