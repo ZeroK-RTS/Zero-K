@@ -10,9 +10,14 @@ local function ReturnFalse()
 	return false
 end
 
+local noCustomComms = (Spring.GetModOptions().commandertypes and false) or true
+local function ReturnNoCustomComms()
+	return false --noCustomComms
+end
+
 local optionData = {
 	strikecomm = {
-		enabled = ReturnFalse, --function() return (not Spring.GetSpectatingState()) end, -- enabled = true is not spec
+		enabled = ReturnNoCustomComms, --function() return (not Spring.GetSpectatingState()) end, -- enabled = true is not spec
 		poster = "LuaUI/Images/startup_info_selector/armcom.jpg",--will be used as option.poster
 		selector = "Strike Comm",--will be used as option.selector
 		tooltip = "Strike Commander\nUses beam laser, has a greater speed but less health.\nADV Strike Commander\nGain DGUN, even greater speed, cloak field, and personal cloak cost halved.",--will be used as option.tooltip
@@ -24,7 +29,7 @@ local optionData = {
 	},
 
 	battlecomm = {
-		enabled = ReturnFalse,	-- function() return (not Spring.GetSpectatingState()) end,
+		enabled = ReturnNoCustomComms,	-- function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/corcom.jpg",
 		selector ="Battle Comm",
 		tooltip = "Battle Commander\nUses a pulse autocannon and has more health but slower speed.\nADV Battle Commander\nGain AoE cluster bombs, an high power area shield and double health gains.\n\* BOTH HAVE NO CLOAK \*",
@@ -36,7 +41,7 @@ local optionData = {
 	},
 
 	reconcomm = {
-		enabled = ReturnFalse,	--function() return (not Spring.GetSpectatingState()) end,
+		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/commrecon.jpg",
 		selector ="Recon Comm",
 		tooltip = "Recon Commander\nUses a slow-ray, has low cost cloak and high mobility but with lower income and reduced health.\nADV Recon Commander\nGain AoE slow bombs, higher mobility suit and an ULTRA LOW cost cloak.\n\* BOTH CAN JUMP \*",
@@ -48,7 +53,7 @@ local optionData = {
 	},
 
 	supportcomm = {
-		enabled = ReturnFalse,	--function() return (not Spring.GetSpectatingState()) end,
+		enabled = ReturnNoCustomComms,	--function() return (not Spring.GetSpectatingState()) end,
 		poster = "LuaUI/Images/startup_info_selector/commsupport.jpg",
 		selector = "Support Comm",--because of the way spring handle font this text ("pp") is a shown few pixels higher than expected, nothing lethal.
 		tooltip = "Support Commander\nUses a railgun (pierces units), has increased income and build range but low health and speed. Comes with free storage.\nADV Support Commander\nGain better build power and radar range, wide healing aura, increased income, and can fire a concussion shot (AoE + impulse).",
@@ -62,29 +67,29 @@ local optionData = {
 	communism = {
 		enabled = ReturnFalse, -- always enabled - so we hide it
 		poster = "LuaUI/Images/startup_info_selector/communism.jpg",
-		selector = "Communism Mode",-- set here for futur modifications, even is unused at the moment
+		selector = "Communism Mode",-- set here for future modifications, even is unused at the moment
 		tooltip = "Communism Mode",
 		sound = "LuaUI/Sounds/communism/sovnat1.wav" -- only for communism -- effective sound play in LuaUI\Widgets\gui_startup_info_selector.lua
 	},
 	shuffle = {
 		enabled = ReturnFalse, -- Reminder panel now dedicated to commander selection.
 		poster = "LuaUI/Images/startup_info_selector/shuffle.png",
-		selector = "Commander Shuffle",-- set here for futur modifications, even is unused at the moment
+		selector = "Commander Shuffle",-- set here for future modifications, even is unused at the moment
 		tooltip = "Commander Shuffle",
 	},
 	planetwars = {
 		enabled = ReturnFalse,
 		poster = "LuaUI/Images/startup_info_selector/planetwars.png",
-		selector = "PlanetWars",-- set here for futur modifications, even is unused at the moment
+		selector = "PlanetWars",-- set here for future modifications, even is unused at the moment
 		tooltip = "PlanetWars",
 	}
 }
 
 local chassisImages = {
-	armcom = "LuaUI/Images/startup_info_selector/chassis_strike.png",
-	corcom = "LuaUI/Images/startup_info_selector/chassis_battle.png",
-	commrecon = "LuaUI/Images/startup_info_selector/chassis_recon.png",
-	commsupport = "LuaUI/Images/startup_info_selector/chassis_support.png",
+	armcom1 = "LuaUI/Images/startup_info_selector/chassis_strike.png",
+	corcom1 = "LuaUI/Images/startup_info_selector/chassis_battle.png",
+	commrecon1 = "LuaUI/Images/startup_info_selector/chassis_recon.png",
+	commsupport1 = "LuaUI/Images/startup_info_selector/chassis_support.png",
 }
 
 --------------------------------------------------------------------------------
@@ -140,6 +145,15 @@ end
 if err then 
 	Spring.Echo('Startup Info & Selector error: ' .. err)
 end
+
+local commDataOrdered = {}
+local numComms = 0
+for seriesName, comms in pairs(commData) do
+	numComms = numComms + 1
+	commDataOrdered[numComms] = comms
+	commDataOrdered[numComms].seriesName = seriesName
+end
+table.sort(commDataOrdered, function(a,b) return a[1] < b[1] end)
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
@@ -211,10 +225,8 @@ end
 --------------------------------------------------------------------------------
 
 local i = 0
-for seriesName, comms in pairs(commData) do
-	i = i+1
-	if i > 4 then break end
-	local option = CommSelectTemplate(i, seriesName, comms[1])
+for i = 1, numComms do
+	local option = CommSelectTemplate(i, commDataOrdered[i].seriesName, commDataOrdered[i][1])
 	optionData[#optionData+1] = option
 end
 
