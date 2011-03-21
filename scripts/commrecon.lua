@@ -36,6 +36,7 @@ local dead = false
 local bMoving = false
 local bAiming = false
 local armsFree = true
+local shieldOn = true
 bJumping = false
 
 local SIG_AIM = 2
@@ -413,7 +414,19 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask( SIG_AIM_2)
 		bAiming = true
 		return AimRifle(heading, pitch)
+	elseif num == 2 then
+		Sleep(100)
+		return (shieldOn)
 	end
+	return false
+end
+
+function script.Activate()
+	shieldOn = true
+end
+
+function script.Deactivate()
+	shieldOn = false
 end
 
 function script.QueryWeapon(num)

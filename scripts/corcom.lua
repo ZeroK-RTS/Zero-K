@@ -18,17 +18,13 @@ local head = piece 'head'
 
 include "constants.lua"
 
---Note: normal script/model setup has the comm lasering and nanoing out of the same hand, and dgunning with the other.
---This has been fixed here so that he attacks with one hand and nanos with the other
---but the piece choices will look a bit odd as a result.
-
 local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
 
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
-local RESTORE_DELAY_LASER = 2000
-local RESTORE_DELAY_DGUN = 1000
+local RESTORE_DELAY_LASER = 4000
+local RESTORE_DELAY_DGUN = 2500
 
 local function WalkArms()
 	if not (isLasering or isDgunning) and isMoving  then
@@ -382,6 +378,12 @@ function script.Create()
 	Hide( mlasflsh)
 	Hide( bigflsh)
 	Hide( nanospray)
+	
+	Turn( l_sho , x_axis, math.rad(30) )
+	Turn( r_sho , x_axis, math.rad(-10) )
+	Turn( r_dgun , x_axis, math.rad(41) )
+	Turn( l_nano , x_axis, math.rad(36) )	
+	
 	StartThread(MotionControl)
 end
 
@@ -393,12 +395,8 @@ function script.StopMoving()
 	isMoving = false
 end
 
-function script.AimFromWeapon1(num)
-	if num == 3 then
-		return r_sho
-	else
-		return f_sho
-	end
+function script.AimFromWeapon(num)
+	return chest
 end
 
 function script.QueryWeapon(num)

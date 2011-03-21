@@ -16,7 +16,7 @@ local rleg = piece 'rleg'
 local lleg = piece 'lleg' 
 local ground = piece 'ground' 
 
-local isMoving, isLasering, isDgunning = false, false, false
+local isMoving, isLasering, isDgunning, shieldOn = false, false, false, true
 
 local function GetFlamer()
 	local weaponID = UnitDefs[unitDefID].weapons and UnitDefs[unitDefID].weapons[5] and UnitDefs[unitDefID].weapons[5].weaponDef
@@ -40,12 +40,8 @@ local ACT_LASER = 2
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
-local RESTORE_DELAY_LASER = 2000
-local RESTORE_DELAY_DGUN = 2000
-
-local function lua_QueryNanoPiece() 
-  return 0
-end
+local RESTORE_DELAY_LASER = 4000
+local RESTORE_DELAY_DGUN = 2500
 
 local function WalkArms()
 	if not (isLasering or isDgunning) and isMoving  then
@@ -436,6 +432,9 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(ruparm, x_axis)
 		StartThread(RestoreDgun)
 		return true
+	elseif num == 2 then
+		Sleep(100)
+		return (shieldOn)
 	end
 	return false
 end

@@ -282,10 +282,10 @@ function gadget:Initialize()
   local allUnits = Spring.GetAllUnits()
   for _, unitID in pairs(allUnits) do
 	local udid = Spring.GetUnitDefID(unitID)
-		if udid then
-			gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
-		end
-	end 
+	if udid then
+		gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
+	end
+  end 
 end
 
 

@@ -171,7 +171,7 @@ local base = {
 	[5] = {
 		name = "sun",
 		modules = {
-			"commweapon_riotcannon", 
+			"commweapon_heavymachinegun", 
 			"commweapon_sunburst",
 			"module_adv_targeting", 
 			"module_adv_targeting", 

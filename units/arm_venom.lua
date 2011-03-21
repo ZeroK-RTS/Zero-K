@@ -147,7 +147,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 750,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -160,28 +160,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Venom]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 750,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 80,
-      object           = [[ARMSPTK_DEAD]],
-      reclaimable      = true,
-      reclaimTime      = 80,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Venom]],

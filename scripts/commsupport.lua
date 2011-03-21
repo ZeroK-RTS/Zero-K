@@ -28,7 +28,7 @@ local ac2 = piece 'ac2'
 local nanospray = piece 'nanospray' 
 
 -- variables
-local iscloak = false
+local shieldOn = false
 local dead = false
 local bMoving = false
 local bAiming = false
@@ -403,7 +403,19 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask( SIG_AIM_2)
 		bAiming = true
 		return AimRifle(heading, pitch)
+	elseif num == 2 then
+		Sleep(100)
+		return (shieldOn)
 	end
+	return false
+end
+
+function script.Activate()
+	shieldOn = true
+end
+
+function script.Deactivate()
+	shieldOn = false
 end
 
 function script.FireWeapon(num)

@@ -97,7 +97,6 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 end
 
 function ReplaceWeapon(unitDef, oldWeapon, newWeapon)
-
 	local weapons = unitDef.weapons or {}
 	for i,v in pairs(weapons) do
 		if v.def == oldWeapon then
@@ -111,7 +110,7 @@ end
 function ModifyWeaponRange(unitDef, factor)
 	local weapons = unitDef.weapondefs or {}
 	for i,v in pairs(weapons) do
-		v.range = v.range * factor
+		if v.range then v.range = v.range * factor end
 	end
 end
 
