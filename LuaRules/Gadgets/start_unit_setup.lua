@@ -98,6 +98,14 @@ local function AddBoost(unitID, newBoost, newBoostMax)
 	SendToUnsynced("UpdateBoost", unitID, boost[unitID], boostMax[unitID])   
 end
 
+-- TODO: do for boost
+function GG.HasFacplop(unitID)
+	return plop and facplops[unitID]
+end
+
+function GG.GiveFacplop(unitID)
+	facplops[unitID] = 1
+end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	if not gamestart then
@@ -134,6 +142,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		--facplopsrunning[unitID] = true
 	end
 end
+
 
 
 function gadget:UnitDestroyed(unitID)

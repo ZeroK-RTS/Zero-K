@@ -619,7 +619,7 @@ local function FinishMorph(unitID, morphData)
   Spring.SetUnitLineage(newUnit,lineage,true)
 
   --// copy facplop
-  if facplop then GG.GiveFacplop(unitID) end
+  if facplop then GG.GiveFacplop(newUnit) end
   
   --// FIXME: - re-attach to current transport?
   --// update selection
