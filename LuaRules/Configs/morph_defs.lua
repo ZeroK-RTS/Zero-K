@@ -489,10 +489,10 @@ local comMorph = {
 		time = 20,
 	},
 	[2] = {
-		time = 50,
+		time = 45,
 	},
 	[3] = {
-		time = 50,
+		time = 40,
 	},
 }
 
@@ -579,8 +579,8 @@ for id, playerData in pairs(customComms) do
 				local morphOption = comMorph[i] and Spring.Utilities.CopyTable(comMorph[i], true)
 				if morphOption then
 					morphOption.into = array[i+1]
-					-- set cost
-					--morphOption.time = morphOption.time + morphTime - morphTimeDiscount
+					-- set time
+					morphOption.time = (targetDef.metalCost - originDef.metalCost)/10 or morphOption.time
 				
 					-- copy, checking that this morph isn't already defined
 					morphDefs[sourceName] = morphDefs[sourceName]  or {}

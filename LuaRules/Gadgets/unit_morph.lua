@@ -497,6 +497,7 @@ local function FinishMorph(unitID, morphData)
   if buildProgress < 1 then
     isBeingBuilt = true
   end
+  local facplop = GG.HasFacplop(unitID)
 
   local newUnit
 
@@ -617,6 +618,9 @@ local function FinishMorph(unitID, morphData)
   local lineage = Spring.GetUnitLineage(unitID)
   Spring.SetUnitLineage(newUnit,lineage,true)
 
+  --// copy facplop
+  if facplop then GG.GiveFacplop(unitID) end
+  
   --// FIXME: - re-attach to current transport?
   --// update selection
   SendToUnsynced("unit_morph_finished", unitID, newUnit)
