@@ -12,7 +12,7 @@ end
 
 local noCustomComms = (Spring.GetModOptions().commandertypes and false) or true
 local function ReturnNoCustomComms()
-	return false --noCustomComms
+	return noCustomComms
 end
 
 local optionData = {
