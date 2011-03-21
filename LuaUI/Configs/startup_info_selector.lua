@@ -10,7 +10,7 @@ local function ReturnFalse()
 	return false
 end
 
-local noCustomComms = (Spring.GetModOptions().commandertypes and false) or true
+local noCustomComms = ((Spring.GetModOptions().commandertypes == nil or Spring.GetModOptions().commandertypes == '') and true) or false
 local function ReturnNoCustomComms()
 	return noCustomComms
 end
@@ -190,6 +190,11 @@ local function GetSeriesInfo(seriesName)
 	return data
 end
 
+local colorWeapon = "\255\255\32\32"
+local colorConversion = "\255\32\255\32"
+local colorWeaponMod = "\255\255\0\255"
+local colorModule = "\255\128\128\255"
+
 local function WriteTooltip(seriesName)
 	local data = GetSeriesInfo(seriesName)
 	local str = ''
@@ -197,7 +202,18 @@ local function WriteTooltip(seriesName)
 		str = str .. "\nLEVEL "..i.. " ("..data[i].cost.." metal)\n\tModules:"
 		for j=1,#(data[i].modules) do
 			if upgrades[data[i].modules[j]] then
-				str = str.."\n\t\t"..upgrades[data[i].modules[j]].name
+				local substr = upgrades[data[i].modules[j]].name
+				-- assign color
+				if (data[i].modules[j]):find("commweapon_") then
+					substr = colorWeapon..substr
+				elseif (data[i].modules[j]):find("conversion_") then
+					substr = colorConversion..substr
+				elseif (data[i].modules[j]):find("weaponmod_") then
+					substr = colorWeaponMod..substr
+				else
+					substr = colorModule..substr
+				end
+				str = str.."\n\t\t"..substr.."\008"
 			end
 		end
 	end

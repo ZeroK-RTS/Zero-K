@@ -27,10 +27,12 @@ VFS.Include("LuaRules/Utilities/base64.lua")
 --	Weapon 1: fake laser
 --	Weapon 2: shield
 --	Weapon 3: special weapon (uses CEG 3 and 4)
---	Weapon 4: main weapon (no CEG)
+--	Weapon 4: main weapon (no CEG) --> change to something else, such as second shield
 --	Weapon 5: main weapon (uses CEG 1 and 2)
 --	Weapon 6: flamethrower only?
 --------------------------------------------------------------------------------
+
+-- just some comm cloning stuff (to avoid having to maintain multiple unitdefs)
 local copy = {
 	armcom1 = {
 		armcom2 = {
