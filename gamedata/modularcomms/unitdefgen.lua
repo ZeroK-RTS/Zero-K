@@ -231,17 +231,25 @@ for name, config in pairs(commData) do
 	ProcessComm(name, config)
 end
 
-
 --stress test: try every possible module to make sure it doesn't crash
-local stressTestDef = {
-	chassis = "armcom1",
-	name = "Quality Assurance",
+local stressDefs = {}
+local stressChassis = {
+	"armcom3", "corcom3", "commrecon3", "commsupport3"
+}
+local stressTemplate = {
+	name = "st",
 	modules = {},
 }
 for name in pairs(upgrades) do
-	stressTestDef.modules[#stressTestDef.modules+1] = name
+	stressTemplate.modules[#stressTemplate.modules+1] = name
 end
-ProcessComm("stresstestdef", stressTestDef)
+for index,name in pairs(stressChassis) do
+	local def = stressTemplate
+	def.chassis = name
+	def.name = def.name..name
+	ProcessComm("stresstest"..index, def)
+	stressDefs["stresstest"..index] = true
+end
 
 -- for easy testing; creates a comm with unitName testcomm
 local testDef = VFS.Include("gamedata/modularcomms/testdata.lua")
@@ -317,7 +325,10 @@ for name, data in pairs(commDefs) do
 	end
 end
 
-commDefs.stresstestdef = nil
+-- remove stress test defs
+for key,_ in pairs(stressDefs) do
+	commDefs[key] = nil
+end
 
 -- splice back into unitdefs
 for name, data in pairs(commDefs) do
