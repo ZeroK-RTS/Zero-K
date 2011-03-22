@@ -49,6 +49,16 @@ local optionData = include("Configs/startup_info_selector.lua")
 
 local noComm = false
 ---------------------------------------------
+local function playSound(filename, ...)
+	local path = filename..".WAV"
+	if (VFS.FileExists(path)) then
+		Spring.PlaySoundFile(path, ...)
+	else
+	--Spring.Echo(filename)
+		Spring.Echo("<snd_noises.lua>: Error file "..path.." doesn't exist.")
+	end
+end
+
 function widget:ViewResize(viewSizeX, viewSizeY)
   vsx = viewSizeX
   vsy = viewSizeY
@@ -196,7 +206,7 @@ function widget:Initialize()
 	or (coop == 0 and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
 	end
-	
+	playSound("LuaUI/Sounds/Voices/initialized_core_1")
 	-- chili setup
 	Chili = WG.Chili
 	Window = Chili.Window

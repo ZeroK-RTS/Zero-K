@@ -1194,14 +1194,28 @@ for udid, ud in pairs(UnitDefs) do
 	end
 end
 
+local commanderUnderAttack = "comdying_core_1"
+
+for udid, ud in pairs(UnitDefs) do
+	if ud.isCommander then
+		if sounds[ud.name] then
+			sounds[ud.name].underattack = commanderUnderAttack
+			sounds[ud.name].attackdelay = function(hp) return 20*hp+2 end
+			sounds[ud.name].attackonscreen = true 
+		else
+			sounds[ud.name] = {underattack = commanderUnderAttack, attackDelay = function(hp) return 20*hp+2 end, attackonscreen = true }
+		end
+	end
+end
+
+
 local underAttackSounds = {
 --	[1] = "udamaged_1",
 	[1] = "udamaged_2",
 }
-
 for i,v in pairs(sounds) do
 	if not v.underattack then
-		v.underattack = { underAttackSounds[math.random(1,#underAttackSounds)] }
+		v.underattack = underAttackSounds[math.random(1,#underAttackSounds)] 
 	end
 end
 

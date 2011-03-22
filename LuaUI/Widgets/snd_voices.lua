@@ -491,11 +491,11 @@ function widget:Update(dt)
     
     local _, _, isPaused = GetGameSpeed()  
     if (isPaused and (not saidPause)) then
-      Play("paused")
+      --Play("paused")
       saidPause = true
     end
     if ((not isPaused) and saidPause) then
-      Play("unpaused")
+      --Play("unpaused")
       saidPause = nil
     end
     

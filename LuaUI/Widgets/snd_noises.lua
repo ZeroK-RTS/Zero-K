@@ -41,6 +41,7 @@ local GetGameSeconds	= Spring.GetGameSeconds
 local GetUnitHealth		= Spring.GetUnitHealth
 local spInView			= Spring.IsUnitInView
 local PlaySoundFile		= Spring.PlaySoundFile
+local spGetUnitHealth	= Spring.GetUnitHealth
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -117,12 +118,17 @@ function widget:CommandNotify(cmdID)
 end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam)
-	if (unitTeam == myTeamID) and (not spInView(unitID)) then
+	if (unitTeam == myTeamID) then
 		local unitDefID = GetUnitDefID(unitID)
 		local unitName = UnitDefs[unitDefID].name
 		local sounds = soundTable[unitName] or soundTable[default]
-		if sounds and sounds.underattack then
-			CoolNoisePlay(sounds.underattack[1], 40)
+		if sounds and sounds.underattack and (sounds.attackonscreen or not spInView(unitID)) then
+			if sounds.attackdelay then
+				local health, maxhealth = spGetUnitHealth(unitID)
+				CoolNoisePlay(sounds.underattack, sounds.attackdelay(health/maxhealth))
+			else
+				CoolNoisePlay(sounds.underattack, 40)
+			end
 		end
 	end
 end

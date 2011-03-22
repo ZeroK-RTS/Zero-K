@@ -75,8 +75,34 @@ local lineOffset = nil
 local yCenter = nil
 local xCut = nil
 local mouseOverClose = false
-local forceHideWindow = false
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+options_path = 'Settings/Interface/Pause Screen'
+
+options = { 
+	hideimage = {name='Disable Image', type='bool', value=false},
+	disablesound = {name='Disable Sound', type='bool', value=false},
+}
+
+local SOUND_DIRNAME = 'LuaUI/Sounds/Voices/'
+
+local pauseSound = "paused_core_1"
+local unpauseSound = "unpaused_core_1"
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function playSound(filename, ...)
+	local path = SOUND_DIRNAME..filename..".WAV"
+	if (VFS.FileExists(path)) then
+		Spring.PlaySoundFile(path, ...)
+	else
+	--Spring.Echo(filename)
+		Spring.Echo("<snd_noises.lua>: Error file "..path.." doesn't exist.")
+	end
+end
 
 
 function widget:Initialize()
@@ -103,12 +129,19 @@ function widget:DrawScreen()
 	
 	if ( paused and not lastPause ) then
 		--new pause
+		if not options.disablesound.value then
+			playSound(pauseSound)
+		end
 		clickTimestamp = nil
+	elseif ( not paused and lastPause ) then
+		if not options.disablesound.value then
+			playSound(unpauseSound)
+		end
 	end
 
 	lastPause = paused
 		
-	if ( paused or ( ( now - pauseTimestamp) <= slideTime ) ) then
+	if ( (paused or ( ( now - pauseTimestamp) <= slideTime )) and not options.hideimage.value) then
 		drawPause()
 	end
 	
@@ -124,16 +157,16 @@ function isOverWindow(x, y)
  end
 
 function widget:MousePress(x, y, button)
-  if ( not clickTimestamp and not forceHideWindow ) then
+  if ( not clickTimestamp and not options.hideimage.value ) then
 	if ( isOverWindow(x, y)) then	
 		--do not update clickTimestamp any more after right mouse button click
-		if ( not forceHideWindow ) then
+		if ( not options.hideimage.value ) then
 			clickTimestamp = osClock()
 		end
 		
 		--hide window for the rest of the game if it was a right mouse button
 		if ( button == 3 ) then
-			forceHideWindow = true
+			options.hideimage.value = true
 		end
 		
 		return true
@@ -145,7 +178,7 @@ end
 
 function widget:IsAbove(x,y)
 	local _, _, paused = spGetGameSpeed()
-	if ( paused and not forceHideWindow and not clickTimestamp and isOverWindow( x, y ) ) then
+	if ( paused and not options.hideimage.value and not clickTimestamp and isOverWindow( x, y ) ) then
 		return true
 	end
 	return false
@@ -161,8 +194,8 @@ function widget:Update()
 end
 
 function widget:GetTooltip(x, y)
-	if ( ( clickTimestamp == nil and forceHideWindow == false ) and isOverWindow(x, y) ) then
-		return "Click left mouse button to hide pause window.\nClick right mouse button to hide pause window for the rest of the game."
+	if ( ( clickTimestamp == nil and options.hideimage.value == false ) and isOverWindow(x, y) ) then
+		return "Click left mouse button to hide pause window.\nClick right mouse button to hide forever (reenable in settings)."
 	end
 end
 
@@ -180,16 +213,16 @@ function drawPause()
 	local mouseOverColor = { 1.0, 1.0, 0.0, 1.0 }
 
 	--adjust transparency when clicked
-	if ( clickTimestamp ~= nil or forceHideWindow ) then
+	if ( clickTimestamp ~= nil or options.hideimage.value) then
 		local factor = 0.0
 		if ( clickTimestamp ) then		
 			factor = ( 1.0 - ( now - clickTimestamp ) / fadeTime )
 		end
 		factor = max( factor, minTransparency )
     
-    if factor == 0 then
-      return
-    end
+		if factor == 0 then
+			return
+		end
     
 		colorWnd[4] = colorWnd[4] * factor
 		text[4] = text[4] * factor
@@ -223,7 +256,7 @@ function drawPause()
 	
 	--draw close icon
 	glColor(  iconColor )
-	if ( mouseOverClose and clickTimestamp == nil and forceHideWindow == false ) then
+	if ( mouseOverClose and clickTimestamp == nil and options.hideimage.value == false) then
 		glColor( mouseOverColor )
 	end
 	
