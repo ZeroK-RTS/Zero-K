@@ -637,7 +637,6 @@ local function ResetMaterial()
   gl.ClipPlane(1, false) -- invisible in water
 end
 
-
 local function BackMaterial()
   gl.Material({
     ambient  = { 0, 0, 0 },

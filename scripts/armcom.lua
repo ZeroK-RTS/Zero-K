@@ -390,7 +390,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if num == 3 then return rbigflash end
+	if num == 3 then zreturn rbigflash end
 	return lfirept
 end
 

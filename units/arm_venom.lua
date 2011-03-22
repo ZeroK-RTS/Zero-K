@@ -160,7 +160,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
     HEAP  = {
       description      = [[Debris - Venom]],
       blocking         = false,

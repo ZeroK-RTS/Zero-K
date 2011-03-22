@@ -115,7 +115,7 @@ local fullModuleSet = {}
 --]]
 
 local base = {
-	count = 7,
+	count = 8,
 	[1] = {
 		name = "rocket",
 		modules = {
@@ -205,6 +205,21 @@ local base = {
 			"commweapon_gaussrifle",
 			"conversion_shockrifle", 
 			"conversion_shockrifle", 
+		}
+	},
+	[8] = {
+		name = "crash",
+		modules = {
+			"commweapon_gaussrifle",
+			"commweapon_disruptorbomb",
+			"module_ablative_armor",
+			"module_heavy_armor",
+			"weaponmod_disruptor_ammo",
+			"conversion_shockrifle",
+			"module_areashield",
+			"module_heavy_armor",
+			"weaponmod_high_caliber_barrel",
+			"module_cloak_field",
 		}
 	},
 }
