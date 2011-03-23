@@ -2007,7 +2007,7 @@ local function combatJobHandler(team)
 	local enemyEconomy = at.enemyEconomy
 	
 	local unitInBattleGroupByID = a.unitInBattleGroupByID
-	
+
 	if combat.count == 0 then
 		return
 	end
@@ -2020,7 +2020,7 @@ local function combatJobHandler(team)
 	local averageX = 0
 	local averageZ = 0
 	local averageCount = 0
-	
+
 	for unitID,data in pairs(combatByID) do
 		local cQueue = spGetCommandQueue(unitID)
 		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
@@ -2038,7 +2038,7 @@ local function combatJobHandler(team)
 		averageZ = averageZ/averageCount
 		local aX,aZ
 		local idleFactor = idleCost/combat.cost
-		
+
 		if a.combatBattlegroupCondition(idleFactor, idleCost) then
 			local minTargetDistance = false
 			
@@ -2098,6 +2098,7 @@ local function combatJobHandler(team)
 				aa = {}, 
 				neededAA = idleCost/5,
 			}
+			--Spring.MarkerAddPoint(averageX,0,averageZ,"battlegroup created")
 			gatherBattlegroupNeededAA(team,battleGroup.count)
 			--wipeSquareData(team,aX, aZ)
 		end
@@ -2743,7 +2744,7 @@ function gadget:GameFrame(n)
 			battleGroupHandler(team, n, n%200 == 15)
 		end
 		
-		if n%40 == 35 + team then
+		if n%40 == (35 + team)%40 then
 			raiderJobHandler(team)
 			combatJobHandler(team)
 			artyJobHandler(team)
@@ -2819,8 +2820,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 	end
 end
 
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-
+local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 	local allyTeam = spGetUnitAllyTeam(unitID)
 	local ud = UnitDefs[unitDefID]
 
@@ -2966,7 +2966,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end	
 	
-	if (ud ~= nil) then
+	if (ud ~= nil) and changeAlly then
 		local units = allyTeamData[allyTeam].units
 		
 		units.cost = units.cost - ud.metalCost
@@ -3022,10 +3022,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 			end--]]
 		end
 	end
-	
 end
 
-function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, changeAlly)
 
 	local allyTeam = spGetUnitAllyTeam(unitID)
 	local ud = UnitDefs[unitDefID]
@@ -3191,7 +3190,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 	end
 	
-	if (ud ~= nil) then
+	if (ud ~= nil) and changeAlly then
 		local units = allyTeamData[allyTeam].units
 	
 		units.cost = units.cost + ud.metalCost
@@ -3220,6 +3219,14 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 	end
 	
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	ProcessUnitDestroyed(unitID, unitDefID, unitTeam, false)
+end
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, true)
 end
 
 -- adds some things that can only be done on unit completion
@@ -3303,6 +3310,38 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 		end
 	end
 
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	ProcessUnitDestroyed(unitID, unitDefID, unitTeam, true)
+end
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, true)
+end
+
+function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID) -- add unit
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
+	for team,_ in pairs(aiTeamData) do
+		if teamID == team then
+			ProcessUnitCreated(unitID, unitDefID, teamID, nil, newAllyTeam ~= oldAllyTeam)
+			local _,_,_,_,build  = spGetUnitHealth(unitID)
+			if build == 1 then
+				gadget:UnitFinished(unitID, unitDefID, team)
+			end
+		end
+	end 
+end
+
+function gadget:UnitTaken(unitID, unitDefID, teamID, newTeamID) -- remove unit
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(newTeamID)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(teamID)
+	for team,_ in pairs(aiTeamData) do
+		if teamID == team then
+			ProcessUnitDestroyed(unitID, unitDefID, teamID, newAllyTeam ~= oldAllyTeam)
+		end
+	end
 end
 
 local function initialiseAiTeam(team, allyteam, aiConfig)

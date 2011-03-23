@@ -164,11 +164,13 @@ function widget:GameFrame(n)
 	local totalConstruction = 0
 	local totalExpense = 0
 	local teamMInco = 0
+	local teamMSpent = 0
 	local teamFreeStorage = 0
 	for i = 1, #teams do
 		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(teams[i], "metal")
 		totalConstruction = totalConstruction + mExpe
 		teamMInco = teamMInco + mInco
+		teamMSpent = teamMSpent + mExpe
 		teamFreeStorage = teamFreeStorage + mStor - mCurr
 		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(teams[i], "energy")
 		totalExpense = totalExpense + eExpe
@@ -242,7 +244,7 @@ function widget:GameFrame(n)
 	local teamMexInc = Format(WG.mexIncome or 0)
 	local teamODInc = Format(WG.metalFromOverdrive or 0)
 	local teamOtherM = Format(teamMInco - (WG.metalFromOverdrive or 0) - (WG.mexIncome or 0))
-	local teamWasteM = Format(math.min(teamFreeStorage - teamMInco,0))
+	local teamWasteM = Format(math.min(teamFreeStorage - teamMInco - teamMSpent,0))
 	local totalMetalIncome = Format(teamMInco)
 	
 	local energyInc = Format(eInco - math.max(0, (WG.change or 0)))

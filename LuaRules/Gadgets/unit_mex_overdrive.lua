@@ -60,14 +60,14 @@ Spring.SetGameRulesParam("lowpower",1)
 
 local HIDDEN_STORAGE = 10000 -- hidden storage: it will spend all energy above (storage - hidden_storage)
 
+local MEX_DIAMETER = Game.extractorRadius*2
+
 --local PYLON_ENERGY_RANGESQ = 160000
 --local PYLON_LINK_RANGESQ = 40000
 --local PYLON_MEX_RANGESQ = 10000
 --local PYLON_MEX_LIMIT = 100
 
 --local CMD_MEXE = 30666
-
-local SHARED_MODE = true --Spring.GetModOption('communism',true,true)
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -81,6 +81,7 @@ local spValidUnitID = Spring.ValidUnitID
 local takenMexId = {} -- mex ids that are taken by disabled pylons
 
 local mexes = {}   -- mexes[teamID][gridID][unitID] == mexMetal
+local mexByID = {}
 local mexesToAdd = {}
 
 local lowPowerUnits = {inner = {count = 0, units = {}}}
@@ -281,6 +282,7 @@ local function AddPylonToGrid(unitID)
 				pylonData.gridID = newGridID
 				for mid,_ in pairs(pylonData.mex) do
 					mexes[allyTeamID][newGridID][mid] = mexes[allyTeamID][oldGridID][mid]
+					mexByID[mid].gridID = newGridID
 					mexes[allyTeamID][oldGridID][mid] = nil
 				end
 				ai.grid[newGridID].pylon[pid] = true
@@ -308,6 +310,7 @@ local function AddPylonToGrid(unitID)
 		ai.grid[newGridID].mexSquaredSum = ai.grid[newGridID].mexSquaredSum + (orgMetal * orgMetal)
 		
 		mexes[allyTeamID][newGridID][mid] = orgMetal
+		mexByID[mid].gridID = newGridID
 		mexes[allyTeamID][0][mid] = nil
 	end
 	
@@ -382,6 +385,7 @@ local function DestoryGrid(allyTeamID,oldGridID)
 			local orgMetal = mexes[allyTeamID][oldGridID][mid]
 			mexes[allyTeamID][oldGridID][mid] = nil
 			mexes[allyTeamID][0][mid] = orgMetal
+			mexByID[mid].gridID = 0
 
 			ai.mexCount = ai.mexCount - 1
 			ai.mexMetal = ai.mexMetal - orgMetal
@@ -509,6 +513,7 @@ local function RemovePylon(unitID)
 	for mid,_ in pairs(mexList) do
 		local orgMetal = mexes[allyTeamID][0][mid]
 		mexes[allyTeamID][0][mid] = nil
+		mexByID[mid] = nil
 		local mexGridID = 0
 		takenMexId[mid] = false
 		
@@ -525,6 +530,7 @@ local function RemovePylon(unitID)
 		end
 		
 		mexes[allyTeamID][mexGridID][mid] = orgMetal
+		mexByID[mid].gridID = mexGridID
 		if mexGridID ~= 0 then
 			local ai = allyTeamInfo[allyTeamID]
 			ai.mexCount = ai.mexCount + 1
@@ -556,6 +562,7 @@ local function AddNewMexes(n)
 					local mm, mu = Spring.GetUnitResources(unitID)
 					local metalMake = (mm or 0) - (mu or 0)
 					metalMake = metalMake * 20
+					mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 					
 					Spring.CallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
 					local mexGridID = 0
@@ -570,6 +577,7 @@ local function AddNewMexes(n)
 						end
 					end
 					mexes[allyTeamID][mexGridID][unitID] = metalMake
+					mexByID[unitID].gridID = mexGridID
 					if mexGridID ~= 0 then
 						local ai = allyTeamInfo[allyTeamID]
 						ai.mexCount = ai.mexCount + 1
@@ -645,10 +653,6 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								allyMetalSquared = allyMetalSquared - orgMetal * orgMetal
 								gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
 								
-								if (not SHARED_MODE) then 
-									Spring.AddTeamResource(Spring.GetUnitTeam(unitID), "m", thisMexM)
-								end 
-
 								local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 								if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
 									if unitDef then
@@ -668,10 +672,6 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedOverdriveMetal = summedOverdriveMetal + orgMetal * metalMult
-					
-					if (not SHARED_MODE) then 
-						Spring.AddTeamResource(Spring.GetUnitTeam(unitID), "m", thisMexM)
-					end 
 					
 					gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
 					local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
@@ -742,38 +742,37 @@ function gadget:GameFrame(n)
 			local teamEnergy = {}
 			local teamIncome = 0
 
-			if (SHARED_MODE) then 
-				-- calcullate total income - tax 95% of energy income 
-				local sumInc = 0
-				for i = 1, allyTeamData.teams do 
-					local teamID = allyTeamData.team[i]
-					teamEnergy[teamID] = {totalChange = 0}
-					local te = teamEnergy[teamID]
-					te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = Spring.GetTeamResources(teamID, "energy")
-					teamIncome = teamIncome + te.eInc
-					if (te.eCur ~= nil) then 
-						te.eTax = te.eInc * (te.eCur) / (te.eMax - HIDDEN_STORAGE) 
-						--Spring.Echo(teamID .. ",   Tax: " .. te.eTax .. ",   Inc: " .. te.eInc .. ",   Cur: " .. te.eCur)
-						if (te.eTax > 0) then 
-							sumInc = sumInc + te.eTax 
-						end 
+			-- calcullate total income - tax 95% of energy income 
+			local sumInc = 0
+			for i = 1, allyTeamData.teams do 
+				local teamID = allyTeamData.team[i]
+				teamEnergy[teamID] = {totalChange = 0}
+				local te = teamEnergy[teamID]
+				te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = Spring.GetTeamResources(teamID, "energy")
+				teamIncome = teamIncome + te.eInc
+				if (te.eCur ~= nil) then 
+					te.eTax = te.eInc * (te.eCur) / (te.eMax - HIDDEN_STORAGE) 
+					--Spring.Echo(teamID .. ",   Tax: " .. te.eTax .. ",   Inc: " .. te.eInc .. ",   Cur: " .. te.eCur)
+					if (te.eTax > 0) then 
+						sumInc = sumInc + te.eTax 
 					end 
 				end 
-				--Spring.Echo("sumInc: " .. sumInc)
-				-- distribute taxes evenly - apply "change" on individual teams 
-				local share = sumInc / allyTeamData.teams
-				for i = 1, allyTeamData.teams do 
-					local teamID = allyTeamData.team[i]
-					local te = teamEnergy[teamID]
-					if (te.eCur ~= nil) then 
-						if (te.eTax < 0) then te.eTax = 0 end 
-						
-						local change = share - te.eTax 
-						--Spring.Echo(teamID .. ",   Change: " .. change)
-						changeTeamEnergy(te, change)
-					end 
+			end 
+			--Spring.Echo("sumInc: " .. sumInc)
+			-- distribute taxes evenly - apply "change" on individual teams 
+			local share = sumInc / allyTeamData.teams
+			for i = 1, allyTeamData.teams do 
+				local teamID = allyTeamData.team[i]
+				local te = teamEnergy[teamID]
+				if (te.eCur ~= nil) then 
+					if (te.eTax < 0) then te.eTax = 0 end 
+					
+					local change = share - te.eTax 
+					--Spring.Echo(teamID .. ",   Change: " .. change)
+					changeTeamEnergy(te, change)
 				end 
-			end
+			end 
+			
 			-- calculate overdrive energy excess 
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
@@ -920,10 +919,8 @@ function gadget:GameFrame(n)
 			--// Share Overdrive Metal
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
-				if (SHARED_MODE) then 
-					Spring.AddTeamResource(teamID, "m", summedMetalProduction / allyTeamData.teams)
-					SendToUnsynced("MexEnergyEvent", teamID, allyTeamData.teams, energyWasted, ODenergy,summedMetalProduction,summedOverdriveMetal, teamEnergy[teamID].totalChange, teamIncome) 
-				end
+				Spring.AddTeamResource(teamID, "m", summedMetalProduction / allyTeamData.teams)
+				SendToUnsynced("MexEnergyEvent", teamID, allyTeamData.teams, energyWasted, ODenergy,summedMetalProduction,summedOverdriveMetal, teamEnergy[teamID].totalChange, teamIncome) 
 			end 
 		end
 	end
@@ -939,35 +936,58 @@ local function SetupMex(unitID, unitDefID, unitTeam)
 	mexesToAdd[unitID] = 3 -- 3 seconds left for the income to stabilize
 end
 
-local function RemoveMex(unitID, teamID)
+local function RemoveMex(unitID)
 	Spring.SetUnitResourcing(unitID, 'cmm', 0)
 	Spring.SetUnitResourcing(unitID, 'cue', 0)
 	local gridID = 0
+	local mex = mexByID[unitID]
+	
+	if mex and mexes[mex.allyTeamID][mex.gridID][unitID] then
+				
+		local orgMetal = mexes[mex.allyTeamID][mex.gridID][unitID]
+		local ai = allyTeamInfo[mex.allyTeamID]
+		local g = ai.grid[mex.gridID]
+		
+		if mex.gridID ~= 0 then
+			g.mexMetal = g.mexMetal - orgMetal
+			g.mexSquaredSum = g.mexSquaredSum - (orgMetal * orgMetal)
+			ai.mexCount = ai.mexCount - 1
+			ai.mexMetal = ai.mexMetal - orgMetal
+			ai.mexSquaredSum = ai.mexSquaredSum - (orgMetal * orgMetal)
+		end
+		
+		for pid, pylonData in pairs(pylon[mex.allyTeamID]) do
+			if (pylonData.mex[unitID] ~= nil) then
+				--pylonData.mexes = pylonData.mexes - 1
+				pylonData.mex[unitID] = nil
+			end
+		end
+		mexes[mex.allyTeamID][mex.gridID][unitID] = nil
+		mexByID[unitID] = nil
+	else
+		local x,_,z = Spring.GetUnitPosition(unitID)
+		Spring.MarkerAddPoint(x,0,z,"inconsistent mex entry 124125_1")
+	end
+	
 	for allyTeam, _ in pairs(mexes) do
 		for i = 0, allyTeamInfo[allyTeam].grids do
 			if (mexes[allyTeam][i][unitID] ~= nil) then
-				
-				local orgMetal = mexes[allyTeam][i][unitID]
-				gridID = i
-				local ai = allyTeamInfo[allyTeam]
-				local g = ai.grid[i]
-				
-				if i ~= 0 then
-					g.mexMetal = g.mexMetal - orgMetal
-					g.mexSquaredSum = g.mexSquaredSum - (orgMetal * orgMetal)
-					ai.mexCount = ai.mexCount - 1
-					ai.mexMetal = ai.mexMetal - orgMetal
-					ai.mexSquaredSum = ai.mexSquaredSum - (orgMetal * orgMetal)
-				end
-				
-				for pid, pylonData in pairs(pylon[allyTeam]) do
-					if (pylonData.mex[unitID] ~= nil) then
-						--pylonData.mexes = pylonData.mexes - 1
-						pylonData.mex[unitID] = nil
-					end
-				end
-				mexes[allyTeam][i][unitID] = nil
+				local x,_,z = Spring.GetUnitPosition(unitID)
+				Spring.MarkerAddPoint(x,0,z,"inconsistent mex entry 124125_0")
 			end
+		end
+	end
+
+end
+
+local function RemoveMexesAroundUnit(unitID)
+	local x,_,z = Spring.GetUnitPosition(unitID)
+	local units = Spring.GetUnitsInCylinder(x,z,MEX_DIAMETER)
+	
+	for i = 1, #units do
+		if mexByID[units[i]] and units[i] ~= unitID then
+			RemoveMex(units[i])
+			mexesToAdd[units[i]] = 3
 		end
 	end
 end
@@ -1070,8 +1090,8 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
 	
 	if (newAllyTeam ~= oldAllyTeam) then
-		if (mexDefs[unitDefID]) then 
-			RemoveMex(unitID, oldTeamID)
+		if (mexDefs[unitDefID] and mexByID[unitID]) then 
+			RemoveMex(unitID)
 		end
 		
 		if (pylonDefs[unitDefID]) then
@@ -1085,8 +1105,9 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if (mexDefs[unitDefID]) then  
-		RemoveMex(unitID, unitTeam)
+	if (mexDefs[unitDefID] and mexByID[unitID]) then  
+		RemoveMex(unitID)
+		RemoveMexesAroundUnit(unitID)
 	end
 	if (pylonDefs[unitDefID]) then
 		RemovePylon(unitID)
