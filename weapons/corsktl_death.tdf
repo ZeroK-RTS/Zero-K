@@ -20,6 +20,6 @@
   weaponvelocity=400;
   [DAMAGE]
   {
-    default=10000;
+    default=8000;
   }
 }
