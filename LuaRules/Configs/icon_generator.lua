@@ -287,11 +287,11 @@ unitConfigs = {
     scale    = 3,
     attempts = 10,
   },
-  [UnitDefNames.commrecon.id] = {
+  [UnitDefNames.commrecon1.id] = {
     unfold = true,
     --attack = true,
   },
-  [UnitDefNames.commsupport.id] = {
+  [UnitDefNames.commsupport1.id] = {
 	unfold = true,
     --attack = true,
   },

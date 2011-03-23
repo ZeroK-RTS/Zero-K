@@ -1,4 +1,4 @@
-include("constants.lua")
+include "constants.lua"
 
 --------------------------------------------------------------------------------
 -- pieces
@@ -27,6 +27,7 @@ end
 
 function script.Create()
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
+	StartThread(SmokeUnit)
 	StartThread(IdleAnim)
 end
 
