@@ -514,10 +514,11 @@ local drawUnits = {}
 local sphereList = 0
 local negSphereList = 0
 
-local setupMatList = 0
-local resetMatList = 0
-local backMatList  = 0
-local frontMatList = 0
+local setupMatList  = 0
+local resetMatList  = 0
+local backMatList   = 0
+local frontMatList  = 0
+local atiFixMatList = 0
 
 local shieldList = 0
 
@@ -657,7 +658,15 @@ local function FrontMaterial()
   })
 end
 
-
+local function AtiBugFixMaterial()
+  gl.Material({
+    ambient  = { 0, 0, 0 },
+    diffuse  = { 0, 0, 0, 0 },
+    emission = { 0, 0, 0 },
+    specular = { 0, 0, 0 },
+    shininess = 0
+  })
+end
 
 local function ShieldList()
   gl.Culling(GL.FRONT)
@@ -744,6 +753,7 @@ function gadget:DrawWorld()
   end
 
   glCallList(resetMatList)
+  gl.CallList(atiFixMatList)
 end
 
 
@@ -800,6 +810,7 @@ function gadget:Initialize()
   resetMatList  = gl.CreateList(ResetMaterial)
   backMatList   = gl.CreateList(BackMaterial)
   frontMatList  = gl.CreateList(FrontMaterial)
+  atiFixMatList = gl.CreateList(AtiBugFixMaterial)
   shieldList    = gl.CreateList(ShieldList)
   miniMapXformList = gl.CreateList(MiniMapXform)
 end
