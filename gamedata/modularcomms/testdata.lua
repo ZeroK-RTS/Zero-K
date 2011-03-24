@@ -115,7 +115,7 @@ local fullModuleSet = {}
 --]]
 
 local base = {
-	count = 8,
+	count = 9,
 	[1] = {
 		name = "rocket",
 		modules = {
@@ -135,15 +135,6 @@ local base = {
 		name = "riot",
 		modules = {
 			"commweapon_riotcannon", 
-			"commweapon_concussion",
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting"
 		}
 	},
 	[3] = {
@@ -169,33 +160,15 @@ local base = {
 		}
 	},
 	[5] = {
-		name = "sun",
+		name = "hmg",
 		modules = {
 			"commweapon_heavymachinegun", 
-			"commweapon_sunburst",
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting"
 		}
 	},
 	[6] = {
-		name = "dshot",
+		name = "shotty",
 		modules = {
 			"commweapon_shotgun", 
-			"commweapon_shotgun",
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting"
 		}
 	},
 	[7] = {
@@ -219,6 +192,15 @@ local base = {
 			"module_areashield",
 			"module_heavy_armor",
 			"weaponmod_high_caliber_barrel",
+			"module_cloak_field",
+		}
+	},
+	[9] = {
+	name = "shield",
+		modules = {
+			"commweapon_shotgun",
+			"commweapon_heavymachinegun",
+			"module_areashield",
 			"module_cloak_field",
 		}
 	},

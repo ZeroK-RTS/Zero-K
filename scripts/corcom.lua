@@ -297,6 +297,8 @@ end
 function script.QueryWeapon(num)
 	if num == 3 then
 		return bigflsh
+	elseif num == 2 then
+		return chest
 	else
 		return mlasflsh
 	end

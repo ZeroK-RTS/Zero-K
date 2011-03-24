@@ -386,7 +386,7 @@ upgrades = {
 		description = "Cloaks all friendly units within 350 m",
 		func = function(unitDef)
 				unitDef.onoffable = true
-				unitDef.radarDistanceJam = (unitDef.radarDistanceJam and unitDef.radarDistanceJam < 350 and 350 or unitDef.radarDistanceJam)
+				unitDef.radarDistanceJam = (unitDef.radarDistanceJam and unitDef.radarDistanceJam > 350 and unitDef.radarDistanceJam) or 350
 				unitDef.customparams.cloakshield_preset = "module_cloakfield"
 			end,
 	},
@@ -410,7 +410,7 @@ upgrades = {
 		name = "Area Shield",
 		description = "Bubble shield that protects surrounding units within 300 m",
 		func = function(unitDef)
-				ApplyWeapon(unitDef, "commweapon_areashield")
+				ApplyWeapon(unitDef, "commweapon_areashield", 2)
 				unitDef.activatewhenbuilt = true
 				unitDef.onoffable = true
 			end,

@@ -392,6 +392,8 @@ end
 function script.QueryWeapon(num)
 	if num == 3 then 
 		return rbigflash 
+	elseif num == 2 then
+		return torso
 	end
 	return lfirept
 end

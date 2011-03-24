@@ -430,7 +430,11 @@ function script.Deactivate()
 end
 
 function script.QueryWeapon(num)
-	if num == 3 then return grenade end
+	if num == 3 then 
+		return grenade 
+	elseif num == 2 then
+		return pelvis
+	end
 	return flare
 end
 

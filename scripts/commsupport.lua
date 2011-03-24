@@ -336,6 +336,9 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
+	if num == 2 then
+		return pelvis
+	end
 	return flare
 end
 
