@@ -69,11 +69,9 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
 		return 1 -- corpsetype
-
 	elseif (severity <= .5) then
-		return 2 -- corpsetype
-
+		return 1 -- corpsetype
 	else		
-		return 3 -- corpsetype
+		return 2 -- corpsetype
 	end
 end

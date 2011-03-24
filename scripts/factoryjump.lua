@@ -42,16 +42,16 @@ local function Close()
 	SetUnitValue(COB.BUGGER_OFF, 0)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 
-	Move(center1, z_axis, 10, 10)
-	Move(center2, z_axis, 10, 10)
-	Move(side1, z_axis, 10, 10)
+	Move(center1, z_axis, 20, 10)
+	Move(center2, z_axis, 20, 10)
+	Move(side1, z_axis, 20, 10)
 	Move(side2, z_axis, 10, 10)
 end
 
 function script.Create()
-	Move(center1, z_axis, 10)
-	Move(center2, z_axis, 10)
-	Move(side1, z_axis, 10)
+	Move(center1, z_axis, 20)
+	Move(center2, z_axis, 20)
+	Move(side1, z_axis, 20)
 	Move(side2, z_axis, 10)
 	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
 	StartThread(SmokeUnit)

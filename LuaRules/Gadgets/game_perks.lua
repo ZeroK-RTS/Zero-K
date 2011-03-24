@@ -66,6 +66,7 @@ local unlockUnits = {
 	"cordoom",
 	"corbhmth",
 	"armbrtha",
+	"corsilo",
 	"mahlazer",
 
 	"cafus",

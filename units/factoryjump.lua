@@ -73,7 +73,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 6,
-  yardMap                       = [[ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc]],
+  yardMap                       = [[ooooooo ooooooo ooooooo yocccoy yycccyy yycccyy yycccyy]],
 
   featureDefs                   = {
 
