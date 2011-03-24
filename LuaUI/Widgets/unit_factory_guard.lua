@@ -227,10 +227,10 @@ end
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_FACTORY_GUARD then 
 		local selectedUnits = Spring.GetSelectedUnits()
-		local newState = false
+		local newState = nil
 		for _, unitID in ipairs(selectedUnits) do
 			if factories[unitID] then
-				if not newState then
+				if newState == nil then
 					newState = not factories[unitID].assist
 				end
 				factories[unitID].assist = newState
