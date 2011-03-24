@@ -250,6 +250,8 @@ local function MakeButton(container, cmd, insertItem)
 		text = cmd.name 
 	end
 	
+	
+	
 	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action):upper() or ''
 	
 	

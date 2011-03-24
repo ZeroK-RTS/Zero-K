@@ -37,37 +37,6 @@ walk()
 {
 	turn rthigh 	to y-axis <0> 		speed <135>;
 	turn lthigh 	to y-axis <0> 		speed <130>;
-	
-	turn hips		to x-axis <20>		speed <125>;
-	
-	turn rthigh 	to z-axis <0> 		speed <135>;
-	turn lthigh 	to z-axis <0> 		speed <130>;
-	turn lfoot 	to z-axis <0> 		speed <130>;
-	turn rfoot 	to z-axis <0> 		speed <130>;
-			
-	if (isMoving)
-	{
-			Turn rshin to x-axis <85> speed<540>;	
-			Turn rthigh to x-axis <-100> speed<270>;
-			Turn lthigh to x-axis <30> speed<270>;
-			wait-for-turn lthigh around x-axis;
-			turn rshin to x-axis <10> speed <630>;
-	}
-	if (isMoving)
-	{
-			Turn lshin to x-axis <85> speed<540>;
-			Turn lthigh to x-axis <-100> speed<270>;
-			turn rthigh to x-axis <30> speed <270>;
-			wait-for-turn rthigh around x-axis;
-			turn lshin to x-axis <10> speed <630>;
-	}
-}
-
-
-shootwalk()
-{
-	turn rthigh 	to y-axis <0> 		speed <135>;
-	turn lthigh 	to y-axis <0> 		speed <130>;
 	turn hips		to x-axis <0>		speed <125>;
 	
 	turn rthigh 	to z-axis <0> 		speed <135>;
@@ -131,14 +100,7 @@ MotionControl()
 	{              
 		IF (isMoving)
 		{
-			IF (isAiming)
-			{
-				CALL-SCRIPT shootwalk();
-			}
-                else
-			{
-				CALL-SCRIPT walk();
-			}
+			CALL-SCRIPT walk();
 		}
 		else
 		{
@@ -187,12 +149,16 @@ RestoreAfterDelay()
 	isAiming = FALSE;
 }
 
+AimFromPrimary(piecenum)
+{
+	piecenum = head;
+}
+
 AimWeapon1(heading,pitch)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
 	isAiming = TRUE;
-	turn hips to x-axis <0> now;
 	turn chest to x-axis <0> now; 
 	turn chest to y-axis heading speed <450>;
 	turn lshoulder to x-axis <0> - pitch speed <500>;
