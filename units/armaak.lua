@@ -64,8 +64,8 @@ unitDef = {
 
     {
       def                = [[LASER]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
+      --badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },
 
     {

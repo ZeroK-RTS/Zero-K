@@ -86,8 +86,8 @@ unitDef = {
 
     {
       def                = [[ARMKBOT_MISSILE]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
+      --badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },
 
   },

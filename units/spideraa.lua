@@ -72,8 +72,8 @@ unitDef = {
 
     {
       def                = [[AA]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
+      --badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },
 
   },

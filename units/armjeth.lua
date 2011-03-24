@@ -89,8 +89,8 @@ unitDef = {
 
     {
       def                = [[AA_LASER]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
+      --badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },
 
   },
