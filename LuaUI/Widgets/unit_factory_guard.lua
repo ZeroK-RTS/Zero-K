@@ -44,16 +44,16 @@ local spGetTeamUnits	   = Spring.GetTeamUnits
 local CMD_FACTORY_GUARD = 13921
 
 local factoryDefs = {
-	[UnitDefNames["factorycloak"].id] = false,
-	[UnitDefNames["factoryshield"].id] = false,
-	[UnitDefNames["factoryspider"].id] = false,
-	[UnitDefNames["factoryjump"].id] = false,
-	[UnitDefNames["factoryveh"].id] = false,
-	[UnitDefNames["factoryhover"].id] = false,
-	[UnitDefNames["factorytank"].id] = false,
-	[UnitDefNames["factoryplane"].id] = false,
-	[UnitDefNames["factorygunship"].id] = false,
-	[UnitDefNames["corsy"].id] = false,
+	[UnitDefNames["factorycloak"].id] = 0,
+	[UnitDefNames["factoryshield"].id] = 0,
+	[UnitDefNames["factoryspider"].id] = 0,
+	[UnitDefNames["factoryjump"].id] = 0,
+	[UnitDefNames["factoryveh"].id] = 0,
+	[UnitDefNames["factoryhover"].id] = 0,
+	[UnitDefNames["factorytank"].id] = 0,
+	[UnitDefNames["factoryplane"].id] = 0,
+	[UnitDefNames["factorygunship"].id] = 0,
+	[UnitDefNames["corsy"].id] = 0,
 }
 
 local factories = {}
@@ -62,11 +62,15 @@ local factories = {}
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Unit AI/Auto Assist'
-
-options = {label = {name="label", type='label', value="Set the default Auto Assist for each type\n of factory"}}
+options_order = { 'inheritcontrol', 'label'}
+options = {
+	inheritcontrol = {name = "Inherit Factory Control Group", type = 'bool', value = false},
+	label = {name = "label", type = 'label', value = "Set the default Auto Assist for each type\n of factory"}
+}
 
 for id,value in pairs(factoryDefs) do
-	options[id] = {name=UnitDefs[id].humanName, type='bool', value=value}
+	options[id] = {name = UnitDefs[id].humanName, type = 'bool', value = (value ~= 0) }
+	options_order[#options_order+1] = id
 end
 
 --------------------------------------------------------------------------------
@@ -187,19 +191,33 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam,
 	if (unitTeam ~= spGetMyTeamID()) then
 		return -- not my unit
 	end
-	ClearGroup(unitID, factID)
+	if not options.inheritcontrol.value then
+		ClearGroup(unitID, factID)
+	end
 	if (userOrders) then
 		return -- already has user assigned orders
 	end
-	if factories[factID].assist then
+	if factories[factID] and factories[factID].assist then
 		GuardFactory(unitID, unitDefID, factID, factDefID)
 	end
 end
 
 function widget:Initialize() 
-	local units = spGetTeamUnits(spGetMyTeamID())
-	for i, id in ipairs(units) do 
-		widget:UnitCreated(id, spGetUnitDefID(id),spGetMyTeamID())
+	initFrame = Spring.GetGameFrame()+1 -- init units after epic menu loads, it might have the massive negative layer for a good reason
+end
+
+function widget:GameFrame(frame)
+	if frame == initFrame then
+		local units = spGetTeamUnits(spGetMyTeamID())
+		for i, id in ipairs(units) do 
+			widget:UnitCreated(id, spGetUnitDefID(id),spGetMyTeamID())
+		end
+	end
+end 
+
+function widget:UnitDestroyed( unitID,  unitDefID,  unitTeam)
+	if factories[unitID] then
+		factories[unitID] = nil
 	end
 end
 
