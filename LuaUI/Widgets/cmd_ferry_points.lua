@@ -7,7 +7,7 @@ function widget:GetInfo()
     date      = "24 Nov 2010",
     license   = "GNU GPL, v2 or later",
 	handler   = true,
-    layer     = 1,
+    layer     = 0,
     enabled   = true  --  loaded by default?
   }
 end
@@ -25,6 +25,7 @@ local COMMAND_MOVE_RADIUS = 80
 local CMD_SET_FERRY	= 11000
 local CMD_MOVE 		= CMD.MOVE
 local CMD_FIGHT		= CMD.FIGHT
+local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 
 local ferryRoutes = {count = 0, route = {}}
 
@@ -112,7 +113,6 @@ local function removeTransportFromRoute(unitID)
 	trans.waypoint = 0
 	
 	WG.FerryUnits[unitID] = false
-	
 end
 
 -- it is assumed that the transport is not part of a route
@@ -128,7 +128,6 @@ local function addTransportToRoute(unitID, routeID)
 	trans.routeTransportIndex = route.transportCount
 	
 	WG.FerryUnits[unitID] = true
-
 end
 
 local function removeRoute(routeID)
@@ -177,6 +176,10 @@ end
 
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+	
+	if cmdID == CMD_SET_WANTED_MAX_SPEED then
+		return false
+	end
 	
 	if cmdID == CMD_SET_FERRY then
 		
@@ -329,10 +332,9 @@ function widget:MousePress(mx, my, button)
 	end
 end
 
-function widget:MouseMove(x,y,dx,dy,button)
-	Spring.Echo(x)
-	
-end
+--function widget:MouseMove(x,y,dx,dy,button)
+	--Spring.Echo(x)
+--end
 
 function widget:Update()
 	if (placedRoute or movingPoint) and Spring.GetActiveCommand() ~= Spring.GetCmdDescIndex(CMD_SET_FERRY) then
@@ -391,7 +393,6 @@ function widget:GameFrame(frame)
 					end
 				end
 			end
-		
 			for tid = 1, route.transportCount do
 				local unitID = route.transporters[tid]
 				local trans = transport[unitID]
