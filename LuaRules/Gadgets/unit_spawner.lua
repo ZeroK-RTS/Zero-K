@@ -732,7 +732,7 @@ local function Wave()
   
   local burrowCount = SetCount(burrows)
   --echo("Wave bonus delta this round: "..waveBonusDelta)
-  --echo("Wave bonus this round: "..waveBonus)
+  echo("Wave bonus this round: "..waveBonus)
   --reduce all chicken appearance times
   local timeReduction = math.ceil((burrowTechTime * burrowCount)/playerCount)
   totalTimeReduction = totalTimeReduction + timeReduction
@@ -999,8 +999,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	local count = SetCount(burrows)
     burrows[unitID] = nil
 	queenTime = math.max(queenTime - (burrowQueenTime/playerCount), 1)
-	waveBonus = waveBonus + (burrowWaveBonus/ (count/playerCount) )
-	waveBonusDelta = waveBonusDelta + (burrowWaveBonus/ (count/ playerCount) )
+	waveBonus = waveBonus + (burrowWaveBonus * (playerCount/count) )
+	waveBonusDelta = waveBonusDelta + (burrowWaveBonus * (playerCount/count) )
 	Spring.SetGameRulesParam("queenTime", queenTime)
 	
 	local timeIncrease = (burrowTechTime/playerCount) * burrowRegressMult
