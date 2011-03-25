@@ -43,7 +43,7 @@ miniQueenTime		= {}		-- times at which miniqueens are spawned (multiplier of que
 endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 
 burrowQueenTime		= 100		-- how much killing a burrow shaves off the queen timer, seconds (divided by playercount)
-burrowWaveBonus		= 0.6		-- size of temporary bonus to add to subsequent waves (divided by (number of burrows/playerCount) )
+burrowWaveBonus		= 0.8		-- size of temporary bonus to add to subsequent waves (divided by (number of burrows/playerCount) )
 waveBonusDecay		= 0.05		-- linear rate at which burrow wave bonus decreases (divided by playerCount)
 burrowTechTime		= 12		-- how many seconds each burrow deducts from the tech time per wave (divided by playercount)
 burrowRespawnChance = 0.15
@@ -121,7 +121,7 @@ local chickenTypes = {
   chicken        =  {time =  -5,  squadSize =   3, obsolete = 30},
   chicken_pigeon =  {time =  7,  squadSize =   1.4, obsolete = 50},
   chickens       =  {time = 14,  squadSize =   1, obsolete = 45},
-  chickena       =  {time = 21,   squadSize = 0.5, obsolete = 45},
+  chickena       =  {time = 20,   squadSize = 0.5, obsolete = 45},
   chickenwurm       =  {time = 25,  squadSize =   0.7},
   chickenr       =  {time = 30,  squadSize = 1.2, obsolete = 60},
   chicken_sporeshooter =  {time = 35,  squadSize =   0.5},
@@ -194,7 +194,7 @@ difficulties = {
     timeSpawnBonus   = .05,
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
-	burrowWaveBonus	 = 0.8,
+	burrowWaveBonus	 = 1,
 	burrowTechTime	 = 12,
 	queenSpawnMult   = 5,     
 	miniQueenTime	 = {0.5},
@@ -210,7 +210,7 @@ difficulties = {
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
 	burrowQueenTime	 = 120,
-	burrowWaveBonus	 = 1,
+	burrowWaveBonus	 = 1.25,
 	burrowTechTime	 = 15,
 	burrowRespawnChance = 0.25,
 	queenSpawnMult   = 5,
