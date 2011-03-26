@@ -599,7 +599,13 @@ local function DrawSphere(divs, arcs, neg)
       SphereVertex(sin(a) * minRad, -cos(divRads), cos(a) * minRad, neg)
     end
   end)
-
+  gl.Material({
+	ambient  = { 0, 0, 0 },
+	diffuse  = { 0, 0, 0, 1.0 },
+	emission = { 0.05, 0.10, 0.15 },
+	specular = { 0.25, 0.75, 1.0 },
+	shininess = 4
+  })
   -- lines
   gl.LineWidth(2.0)
   gl.BeginEnd(GL.LINES, function()
@@ -760,7 +766,14 @@ function gadget:DrawWorld()
   end
 
   glCallList(resetMatList)
-  gl.CallList(atiFixMatList)
+  gl.Material({
+    ambient  = { 0, 0, 0 },
+    diffuse  = { 0, 0, 0, 0 },
+    emission = { 0, 0, 0 },
+    specular = { 0, 0, 0 },
+    shininess = 0
+  })
+  --gl.CallList(atiFixMatList)
 end
 
 
