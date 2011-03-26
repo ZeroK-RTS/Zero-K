@@ -751,7 +751,7 @@ local function Wave()
   
   local chicken1Name, chicken2Name = ChooseChicken(chickenTypes)
   local turret = ChooseChicken(defenders)
-  local squadNumber = t*timeSpawnBonus+firstSpawnSize+waveBonus
+  local squadNumber = t*timeSpawnBonus+firstSpawnSize+(waveBonus*0.5)	-- secret hardcoded mult :)
   --if queenID then squadNumber = squadNumber/2 end
   local chicken1Number = math.ceil(waveRatio * squadNumber * chickenTypes[chicken1Name].squadSize)
   local chicken2Number = math.floor((1-waveRatio) * squadNumber * chickenTypes[chicken2Name].squadSize)
