@@ -446,7 +446,7 @@ local options = {
   },
   {
 	key		= "enableunlocks",
-	name	= "Enable unlocks",
+	name	= "Enable unlock system",
 	desc	= "Enables the experimental unlock system (disabling will enable all units by default)",
 	type	= "bool",
 	def		= true,
