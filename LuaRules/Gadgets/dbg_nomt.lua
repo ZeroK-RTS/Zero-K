@@ -21,7 +21,7 @@ else
 ----------------------------------------------------------------
 -- global variables
 ----------------------------------------------------------------
-local delay = 10
+local delay = 20
 local endTime
 local key
 local esc = 27	-- key number
