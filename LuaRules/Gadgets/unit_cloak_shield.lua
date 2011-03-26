@@ -546,16 +546,6 @@ local function DrawSphere(divs, arcs, neg)
   local divRads = math.pi / divs
   local minRad = sin(divRads)
 
-
-  -- bottom
-  gl.BeginEnd(GL.TRIANGLE_FAN, function()
-    SphereVertex(0, -1, 0, neg)
-    for i = 0, arcs do
-      local a = -i * (2.0 * math.pi) / arcs
-      SphereVertex(sin(a) * minRad, -cos(divRads), cos(a) * minRad, neg)
-    end
-  end)
-
   -- sides
   for d = 4, (divs - 2) do
     gl.BeginEnd(GL.QUAD_STRIP, function()
@@ -570,6 +560,15 @@ local function DrawSphere(divs, arcs, neg)
 	    gl.Material({
 		  ambient  = { 0, 0, 0 },
 		  diffuse  = { 0, 0, 0, trans[d-3]},
+		  emission = { 0.05, 0.10, 0.15 },
+		  specular = { 0.25, 0.75, 1 },
+		  shininess = 4
+		  })
+	  elseif (d > 10) then
+		Spring.Echo(15-d)
+	    gl.Material({
+		  ambient  = { 0, 0, 0 },
+		  diffuse  = { 0, 0, 0, trans[15-d]},
 		  emission = { 0.05, 0.10, 0.15 },
 		  specular = { 0.25, 0.75, 1 },
 		  shininess = 4
@@ -592,6 +591,15 @@ local function DrawSphere(divs, arcs, neg)
       end
     end) 
   end
+  
+  -- bottom
+  gl.BeginEnd(GL.TRIANGLE_FAN, function()
+    SphereVertex(0, -1, 0, neg)
+    for i = 0, arcs do
+      local a = -i * (2.0 * math.pi) / arcs
+      SphereVertex(sin(a) * minRad, -cos(divRads), cos(a) * minRad, neg)
+    end
+  end)
 
   -- lines
   gl.LineWidth(2.0)
