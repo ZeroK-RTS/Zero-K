@@ -72,7 +72,8 @@ local unlockUnits = {
 	"cafus",
 	
 	-- factories
-	"factorycloak",
+	--"factorycloak",
+	"factoryshield",
 	"factoryjump",
 	"factorytank",
 	"factoryplane",
