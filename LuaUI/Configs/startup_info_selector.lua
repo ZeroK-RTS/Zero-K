@@ -161,8 +161,8 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua")
 --------------------------------------------------------------------------------
 -- yeah, yeah, n^2
 local function RemoveDuplicates(base, delete)
-	for i1,v1 in pairs(base) do
-		for i2,v2 in pairs(delete) do
+	for i1,v1 in ipairs(base) do
+		for i2,v2 in ipairs(delete) do
 			if v1 == v2 then
 				base[i1] = nil
 				break
@@ -200,15 +200,15 @@ local function WriteTooltip(seriesName)
 	local str = ''
 	for i=1,#data do
 		str = str .. "\nLEVEL "..i.. " ("..data[i].cost.." metal)\n\tModules:"
-		for j=1,#(data[i].modules) do
-			if upgrades[data[i].modules[j]] then
-				local substr = upgrades[data[i].modules[j]].name
+		for j, modulename in pairs(data[i].modules) do
+			if upgrades[modulename] then
+				local substr = upgrades[modulename].name
 				-- assign color
-				if (data[i].modules[j]):find("commweapon_") then
+				if (modulename):find("commweapon_") then
 					substr = colorWeapon..substr
-				elseif (data[i].modules[j]):find("conversion_") then
+				elseif (modulename):find("conversion_") then
 					substr = colorConversion..substr
-				elseif (data[i].modules[j]):find("weaponmod_") then
+				elseif (modulename):find("weaponmod_") then
 					substr = colorWeaponMod..substr
 				else
 					substr = colorModule..substr

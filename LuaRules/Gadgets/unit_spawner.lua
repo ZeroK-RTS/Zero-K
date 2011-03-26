@@ -762,7 +762,7 @@ local function Wave()
   for burrowID in pairs(burrows) do
       SpawnChicken(burrowID, chicken1Number, chicken1Name)
       SpawnChicken(burrowID, chicken2Number, chicken2Name)
-      if not queenID then SpawnTurret(burrowID, turret) end
+      if not endgame then SpawnTurret(burrowID, turret) end
   end
   if waveBonus > 0 then waveBonus = waveBonus - waveBonusDecay
   elseif waveBonus < 0 then waveBonus = waveBonus + waveBonusDecay end
