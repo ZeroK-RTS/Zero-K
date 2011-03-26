@@ -46,7 +46,7 @@ local modrules  = {
   
   
   paralyze = {
-    paralyzeOnMaxHealth = true, -- defaults to true
+    paralyzeOnMaxHealth = false, -- defaults to true
   },
 
   sensors = {
