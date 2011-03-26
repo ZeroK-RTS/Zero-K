@@ -266,14 +266,20 @@ function UnitCloaker:CreateParticle()
 end
 
 function UnitCloaker:Visible()
-  local _, specFullView = Spring.GetSpectatingState()
-  if Spring.AreTeamsAllied(self.team,LocalAllyTeamID) or specFullView then
+  if self.allyTeam == LocalAllyTeamID then
     return Spring.IsUnitVisible(self.unit)
   end
 
   local losState = Spring.GetUnitLosState(self.unit, LocalAllyTeamID) or {}
-  local losState = (losState)and(losState.los)
-  return losState
+  return losState and losState.los
+  --local _, specFullView = Spring.GetSpectatingState()
+  --if Spring.AreTeamsAllied(self.team,LocalAllyTeamID) or specFullView then
+  --  return Spring.IsUnitVisible(self.unit)
+  --end
+  --
+  --local losState = Spring.GetUnitLosState(self.unit, LocalAllyTeamID) or {}
+  --local losState = (losState)and(losState.los)
+  --return losState
 end
 
 -----------------------------------------------------------------------------------------------------------------

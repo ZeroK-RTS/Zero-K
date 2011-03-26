@@ -565,7 +565,6 @@ local function DrawSphere(divs, arcs, neg)
 		  shininess = 4
 		  })
 	  elseif (d > 10) then
-		Spring.Echo(15-d)
 	    gl.Material({
 		  ambient  = { 0, 0, 0 },
 		  diffuse  = { 0, 0, 0, trans[15-d]},
