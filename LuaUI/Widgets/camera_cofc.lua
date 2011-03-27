@@ -228,6 +228,7 @@ options = {
 		name = "Overview",
 		desc = "Go to overview mode, then restore view to cursor position.",
 		type = 'button',
+		hotkey = {key='tab', mod=''},
 		OnChange = function(self) OverviewAction() end,
 	},
 	
