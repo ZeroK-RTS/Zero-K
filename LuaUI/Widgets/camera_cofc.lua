@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera",
-    desc      = "v0.04 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.041 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -308,7 +308,6 @@ local HALFPIMINUS	= HALFPI-0.01
 local fpsmode = false
 local mx, my = 0,0
 local msx, msy = 0,0
-local cx, cy
 local smoothscroll = false
 local springscroll = false
 local lockspringscroll = false
