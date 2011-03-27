@@ -1131,11 +1131,12 @@ function widget:Initialize()
 	cx = vsx * 0.5
 	cy = vsy * 0.5
 	
-	Spring.SendCommands( 'unbindaction toggleoverview' )
+	spSendCommands( 'unbindaction toggleoverview' )
 end
 
 function widget:Shutdown()
 	spSendCommands{"viewta"}
+	spSendCommands( 'bind any+tab toggleoverview' )
 end
 
 function widget:TextCommand(command)
