@@ -580,7 +580,7 @@ for id, playerData in pairs(customComms) do
 				if morphOption then
 					morphOption.into = array[i+1]
 					-- set time
-					morphOption.time = (targetDef.metalCost - originDef.metalCost) / (5 * (i+1)) or morphOption.time
+					--morphOption.time = (targetDef.metalCost - originDef.metalCost) / (5 * (i+1)) or morphOption.time
 					morphOption.time = (targetDef.metalCost - originDef.metalCost)/20 or morphOption.time
 				
 					-- copy, checking that this morph isn't already defined
