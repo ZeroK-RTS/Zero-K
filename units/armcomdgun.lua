@@ -71,7 +71,6 @@ unitDef = {
   },
 
   showNanoSpray          = false,
-  showPlayerName         = true,
   side                   = [[ARM]],
   sightDistance          = 500,
   smoothAnim             = true,

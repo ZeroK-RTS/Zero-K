@@ -907,8 +907,7 @@ function gadget:GameFrame(n)
     local timeSinceLastSpawn = t - timeOfLastSpawn
     local burrowSpawnTime = burrowSpawnRate*0.25*(burrowCount+1)
     
-    if (burrowSpawnTime < timeSinceLastSpawn and 
-        not lagging and burrowCount < maxBurrows) then
+    if (burrowSpawnTime < timeSinceLastSpawn and burrowCount < maxBurrows) then
       SpawnBurrow()
       timeOfLastSpawn = t
       _G.chickenEventArgs = {type="burrowSpawn"}

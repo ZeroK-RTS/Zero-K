@@ -14,7 +14,7 @@ spawnSquare          = 150       -- size of the chicken spawn square centered on
 spawnSquareIncrement = 1         -- square size increase for each unit spawned
 burrowName           = "roost"   -- burrow unit name
 playerMalus          = 1         -- how much harder it becomes for each additional player, exponential (playercount^playerMalus = malus)
-lagTrigger           = 0.6       -- average cpu usage after which lag prevention mode triggers
+lagTrigger           = 0.7       -- average cpu usage after which lag prevention mode triggers
 triggerTolerance     = 0.05      -- increase if lag prevention mode switches on and off too fast
 maxAge               = 5*60      -- chicken die at this age, seconds
 queenName            = "chickenflyerqueen"
