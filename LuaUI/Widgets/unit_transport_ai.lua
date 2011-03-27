@@ -440,7 +440,7 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
   end
   storedQueue[unitID] = nil
   local queue = GetCommandQueue(unitID)
-  if (queue and queue[1].id == CMD.WAIT) then GiveOrderToUnit(unitID, CMD.WAIT, {}, {}) end -- clears wait order if STOP fails to do so
+  if (queue and queue[1] and queue[1].id == CMD.WAIT) then GiveOrderToUnit(unitID, CMD.WAIT, {}, {}) end -- workaround: clears wait order if STOP fails to do so
 end
 
 

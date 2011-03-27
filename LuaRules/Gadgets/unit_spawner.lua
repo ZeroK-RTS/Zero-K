@@ -764,9 +764,7 @@ local function Wave()
       SpawnChicken(burrowID, chicken2Number, chicken2Name)
       if not endgame then SpawnTurret(burrowID, turret) end
   end
-  if waveBonus > 0 then waveBonus = waveBonus - waveBonusDecay
-  elseif waveBonus < 0 then waveBonus = waveBonus + waveBonusDecay end
-  if (waveBonus < 0.05) and (waveBonus > -0.05) then waveBonus = 0 end
+  waveBonus = math.max(waveBonus - waveBonusDecay, 0)
   waveBonusDelta = 0
   return chicken1Name, chicken2Name, chicken1Number, chicken2Number
 end

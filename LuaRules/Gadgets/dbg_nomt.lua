@@ -21,7 +21,7 @@ else
 ----------------------------------------------------------------
 -- global variables
 ----------------------------------------------------------------
-local delay = 20
+local delay = 30
 local endTime
 local key
 local esc = 27	-- key number
@@ -47,7 +47,7 @@ function gadget:Initialize()
 	Spring.Echo("<No Multithread> MT not detected, exiting")
 	gadgetHandler:RemoveGadget()
   else
-	  SendCommands("luaui disable")
+	  --SendCommands("luaui disable")
 	  endTime = GetTimer()
 	  key=nil
 	  Echo("<No Multithread> Automatically exiting in " .. delay .. " seconds. Press Escape to cancel.")
