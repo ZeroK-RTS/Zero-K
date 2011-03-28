@@ -170,7 +170,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 
-function gadget:GameOver()		
+function gadget:GameOver()	
+	if GG.chicken then
+		Spring.Echo("Chicken game; unit stats disabled")
+		return	-- don't report stats in chicken
+	end
 	for atk, victims in pairs(damages) do
 		for victim, dam in pairs(victims) do
 			Echo("STATS:dmg,"..UnitDefs[atk].name .. ",".. UnitDefs[victim].name .. "," .. dam[1] .. "," .. dam[2])
@@ -200,14 +204,6 @@ function gadget:GameOver()
 	for _,_ in pairs(humanAlly) do allycount = allycount + 1 end
 
 	Echo("STATS:teams,"..players .. ",".. allycount)
-end
-
--- need to use GameFrame because GameStart breaks other gadgets for no comprehensible reason whatsoever
-function gadget:GameFrame(n)
-	if n > 1 and Spring.GetGameRulesParam("difficulty") then
-		Spring.Echo("Chicken game detected - disabling mod stats")
-		gadgetHandler:RemoveGadget()
-	end
 end
 
 --------------------------------------------------------------------------------
