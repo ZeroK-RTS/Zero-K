@@ -23,6 +23,11 @@ unitDef = {
   collisionVolumeTest           = 1,
   collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
+ 
+  customParams                  = {
+	helptext		= [[The advanced Radar Tower has a considerably greater range than the basic version, and reduces the waver of all radar dots across the map. It is also quite pricey.]],
+  }, 
+  
   energyUse                     = 3,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,
