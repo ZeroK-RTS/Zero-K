@@ -1,133 +1,113 @@
 local menu_armcsa = {
-  items = {
-  {
-    angle = 0,
-    unit = "cormex",
-    label = "Economy",
-    items = {
-      {
-        angle= -90,
-        unit = "armsolar",
-      },
-      {
-        angle= -135,
-        unit = "armwin",
-      },
-    }
-  },
-  {
-    angle = -45,
-    unit = "armrectr",
-	label = "Bots",
-    items = {
-      {
-        angle= -90,
-        unit = "armflea",
-      },
-	  { 
-		angle = -135,
-		unit = "armpw",
-	  },
-	  { 
-		angle = -180,
-		unit = "spherepole",
-	  },
-	  { 
-		angle = -270,
-		unit = "armsnipe",
-	  },
- 	  { 
-		angle = -315,
-		unit = "armrock",
-	  },
-	  { 
+	items = {
+	  {
 		angle = 0,
-		unit = "armjeth",
+		unit = "cormex",
+		label = "Economy",
+		items = {
+		  {
+			angle= -90,
+			unit = "armsolar",
+		  },
+		  {
+			angle= -135,
+			unit = "armwin",
+		  },
+		}
 	  },
+	  {
+		angle = -90,
+		unit = "armrectr",
+		label = "Bots",
+		items = {
+		  {
+			angle= -45,
+			unit = "armflea",
+		  },
+		  { 
+			angle = -135,
+			unit = "corak",
+		  },
+		  { 
+			angle = -180,
+			unit = "spherepole",
+		  },
+		  { 
+			angle = 0,
+			unit = "corcrash",
+		  },
 
-    }
-  },
---[[  {
-    angle = -90,
-    unit = "armpw",
-    label = "Units",
-    items = {
-      {
-        angle = 45,
-        unit = "armfast"
-      },
-      {
-        angle = 0,
-        unit = "armsptk"
-      },
-      {
-        angle = -45,
-        unit = "armzeus"
-      },
-      {
-        angle = -135,
-        unit = "armsnipe"
-      },
-      {
-        angle = -180,
-        unit = "armtick"
-      },
-      {
-        angle = 135,
-        unit = "armspy"
-      }
-    }
-  },]]--
-  {
-    angle = 180,
-    unit = "corllt",
-    label = "Defense",
-    items = {
-      {
-        angle = 45,
-        unit = "corrl"
-      },
-      {
-        angle = 135,
-        unit = "armartic"
-      },
-      {
-        angle = -45,
-        unit = "corhlt"
-      },
-      {
-        angle = -135,
-        unit = "armdeva"
-      },
-      {
-        angle = 90,
-        unit = "corgrav"
-      },
-      {
-        angle = -90,
-        unit = "cortl"
-      },	  	  
-    }
-  },
-  {
-    angle = 90,
-    unit = "corrad",
-    label = "Auxillary",
-    items = {
-      {
-        angle = -135,
-        unit = "armjamt"
-      },
-      {
-        angle = 0,
-        unit = "armnanotc"
-      },
-      {
-        angle = 45,
-        unit = "armsonar"
-      },
-    }
-  },
+		}
+	  },
+	{
+		angle = -45,
+		unit = "armsptk",
+		label = "Walkers",
+		items = {
+		  { 
+			angle = -90,
+			unit = "armsnipe",
+		  },
+		  {
+			angle = 0,
+			unit = "armspy"
+		  },
+		  {
+			angle = 90,
+			unit = "slowmort"
+		  },
+		}
+	  },
+	  {
+		angle = 180,
+		unit = "corllt",
+		label = "Defense",
+		items = {
+		  {
+			angle = 45,
+			unit = "corrl"
+		  },
+		  {
+			angle = 135,
+			unit = "armartic"
+		  },
+		  {
+			angle = -45,
+			unit = "corhlt"
+		  },
+		  {
+			angle = -135,
+			unit = "armdeva"
+		  },
+		  {
+			angle = 90,
+			unit = "corgrav"
+		  },
+		  {
+			angle = -90,
+			unit = "cortl"
+		  },	  	  
+		}
+	  },
+	  {
+		angle = 90,
+		unit = "corrad",
+		label = "Auxillary",
+		items = {
+		  {
+			angle = -135,
+			unit = "armjamt"
+		  },
+		  {
+			angle = 0,
+			unit = "armnanotc"
+		  },
+		  {
+			angle = 45,
+			unit = "armsonar"
+		  },
+		}
+	  },
   {
     angle = -135,
     unit = "armcomdgun",
@@ -159,7 +139,7 @@ local menu_armcsa = {
       },
     }
   },
-  }
+	}
 }
 
 return menu_armcsa

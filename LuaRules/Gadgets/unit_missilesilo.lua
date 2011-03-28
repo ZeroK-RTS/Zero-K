@@ -22,7 +22,7 @@ function gadget:GetInfo()
   return {
     name      = "Missile Silo Controller",
     desc      = "Handles missile silos",
-    author    = "KingRaptor (L.J. Lim))",
+    author    = "KingRaptor (L.J. Lim)",
     date      = "31 August 2010",
     license   = "Public domain",
     layer     = 0,
