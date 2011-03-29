@@ -112,10 +112,10 @@ unitDef = {
       cylinderTargetting      = 0,
 
       damage                  = {
-        default        = 750,
-        commanders     = 75,
-        empresistant75 = 187.5,
-        empresistant99 = 7.5,
+        default        = 600,
+        commanders     = 60,
+        empresistant75 = 150,
+        empresistant99 = 6,
       },
 
       duration                = 10,
