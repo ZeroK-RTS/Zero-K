@@ -208,9 +208,9 @@ end
 
 
 local function DrawPoint(x, y, c, s)
-  glPointSize(s)
+  --glPointSize(s)
   glColor(c)
-  glBeginEnd(GL_POINTS, glVertex, x, y)
+  --glBeginEnd(GL_POINTS, glVertex, x, y)
 end
 
 
@@ -241,7 +241,7 @@ function widget:DrawScreen()
 
     DrawPoint(x, y, { 0, 1, 0 },  5)
 
-    glPointSize(1)
+    --glPointSize(1)
   end
 end
 
