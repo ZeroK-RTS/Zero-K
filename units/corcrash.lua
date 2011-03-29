@@ -105,9 +105,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 6.75,
-        planes  = 67.5,
-        subs    = 4.375,
+        default = 7.5,
+        planes  = 75,
+        subs    = 4.25,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -119,7 +119,7 @@ unitDef = {
       lineOfSight             = true,
       model                   = [[wep_m_fury.s3o]],
       noSelfDamage            = true,
-      range                   = 760,
+      range                   = 850,
       reloadtime              = 2,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
