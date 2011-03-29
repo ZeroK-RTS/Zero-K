@@ -58,7 +58,7 @@ unitDef = {
 
     DEAD  = {
       description      = [[Wreckage - Air Repair Pad]],
-      blocking         = false,
+      blocking         = true,
       category         = [[corpses]],
       damage           = 1860,
       energy           = 0,
