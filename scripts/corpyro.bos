@@ -1,4 +1,5 @@
 //by Chris Mackey
+//linear constant 163840
 
 #include "constants.h"
 
@@ -420,15 +421,28 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
-		//yadda yadda
+		corpsetype = 1;
+		explode base type BITMAPONLY | BITMAP1;
+		explode l_foot type BITMAPONLY | BITMAP2;
+		explode l_leg type BITMAPONLY | BITMAP3;
+		explode r_foot type BITMAPONLY | BITMAP2;
+		explode r_leg type BITMAPONLY | BITMAP3;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
-		//yadda yadda
+		corpsetype = 2;
+		explode base type SHATTER;
+		explode l_foot type SHATTER;
+		explode l_leg type SHATTER;
+		explode r_foot type SHATTER;
+		explode r_leg type SHATTER;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
+	explode base type SHATTER;
+	explode l_foot type SHATTER;
+	explode l_leg type SHATTER;
+	explode r_foot type SHATTER;
+	explode r_leg type SHATTER;
 }

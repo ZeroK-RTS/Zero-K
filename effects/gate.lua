@@ -72,7 +72,7 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[110 i20]],
+        delay              = [[55 i10]], -- [[110 i20]],
         explosiongenerator = [[custom:GATE_TELEPORT_RGROUNDFLASH]],
         pos                = [[0, 0, 0]],
       },
@@ -96,7 +96,7 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[60 r20]],
+        delay              = [[30 r10]], -- [[60 r20]],
         explosiongenerator = [[custom:GATE_TELEPORT_YGROUNDFLASH]],
         pos                = [[0, 0, 0]],
       },
@@ -163,7 +163,7 @@ return {
       circlegrowth       = 0,
       flashalpha         = 1,
       flashsize          = 200,
-      ttl                = 180,
+      ttl                = 90, --180,
       color = {
         [1]  = 0.80000001192093,
         [2]  = 0.80000001192093,
@@ -178,7 +178,7 @@ return {
       circlegrowth       = 0,
       flashalpha         = 1,
       flashsize          = 150,
-      ttl                = 120,
+      ttl                = 60, --120,
       color = {
         [1]  = 1,
         [2]  = 0.20000000298023,
@@ -238,7 +238,7 @@ return {
       circlegrowth       = 0,
       flashalpha         = 1,
       flashsize          = 150,
-      ttl                = 150,
+      ttl                = 75, --150,
       color = {
         [1]  = 1,
         [2]  = 1,
