@@ -582,7 +582,7 @@ for id, playerData in pairs(customComms) do
 					-- set time
 					--morphOption.time = (targetDef.metalCost - originDef.metalCost) / (5 * (i+1)) or morphOption.time
 					morphOption.time = (targetDef.metalCost - originDef.metalCost)/20 or morphOption.time
-				
+					morphOption.combatMorph = true
 					-- copy, checking that this morph isn't already defined
 					morphDefs[sourceName] = morphDefs[sourceName]  or {}
 					if not CheckForExistingMorph(sourceName, targetName) then
