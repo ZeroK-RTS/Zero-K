@@ -1110,10 +1110,13 @@ local glRotate       = gl.Rotate
 local glUnitShape    = gl.UnitShape
 local glPopMatrix    = gl.PopMatrix
 local glText         = gl.Text
+local glCulling		 = gl.Culling
 local glPushAttrib   = gl.PushAttrib
 local glPopAttrib    = gl.PopAttrib
+local glPolygonOffset= gl.PolygonOffset
 local glBlending     = gl.Blending
 local glDepthTest    = gl.DepthTest
+local glUnit		 = gl.Unit
 
 local GL_LEQUAL      = GL.LEQUAL
 local GL_ONE         = GL.ONE
@@ -1327,6 +1330,26 @@ local function DrawMorphUnit(unitID, morphData, localTeamID)
   end
 end
 
+local phase = 0
+local function DrawCombatMorphUnit(unitID, morphData, localTeamID)
+	local c1=math.sin(phase)*.2 + .2
+	local c2=math.sin(phase+ math.pi)*.2 + .2
+	local mult = 2
+
+	glBlending(GL_ONE, GL_ONE)
+	glDepthTest(GL_LEQUAL)
+	--glLighting(true)
+	glPolygonOffset(-10, -10)
+	glCulling(GL.BACK)
+	glColor(c1*mult,0,c2*mult,1)
+	glUnit(unitID, true)
+	
+	glColor(1,1,1,1)
+	glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+	glPolygonOffset(false)
+	glCulling(false)
+	glDepthTest(false)
+end
 
 function gadget:DrawWorld()
   if (not morphUnits) then
@@ -1355,12 +1378,17 @@ function gadget:DrawWorld()
   CallAsTeam({ ['read'] = readTeam }, function()
     for unitID, morphData in spairs(morphUnits) do
       if (unitID and morphData)and(IsUnitVisible(unitID)) then
-        DrawMorphUnit(unitID, morphData,readTeam)
+		if morphData.combatMorph then
+		  DrawCombatMorphUnit(unitID, morphData,readTeam)	
+		else
+          DrawMorphUnit(unitID, morphData,readTeam)
+		end
       end
     end
   end)
   glDepthTest(false)
   glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+  phase = phase + .06
 end
 
 local function split(msg,sep)

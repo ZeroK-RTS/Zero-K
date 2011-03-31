@@ -33,6 +33,8 @@ local pipes = piece "pipes"
 local blink_1 = piece "blink_1"
 local blink_2 = piece "blink_2"
 
+local pad = piece "pad"
+
 
 --local vars
 local nanoPieces = {emit_1,emit_2,emit_3}
@@ -139,6 +141,10 @@ end
 
 function script.Deactivate ( )
 	StartThread( Close )
+end
+
+function script.QueryBuildInfo()
+	return pad
 end
 
 --death and wrecks

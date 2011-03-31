@@ -143,10 +143,7 @@ function script.Create()
 end
 
 function script.QueryBuildInfo()
-	local buildinfo = build
-
-	return buildinfo
-
+	return build
 end
 
 function script.QueryNanoPiece()
