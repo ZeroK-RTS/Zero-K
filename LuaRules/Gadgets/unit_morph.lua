@@ -243,6 +243,7 @@ local function BuildMorphDef(udSrc, morphData)
     newData.increment = (1 / (30 * newData.time))
     newData.metal  = morphData.metal  or DefCost('metalCost',  udSrc, udDst)
     newData.energy = morphData.energy or DefCost('energyCost', udSrc, udDst)
+	newData.combatMorph = morphData.combatMorph or false
     newData.resTable = {
       m = (newData.increment * newData.metal),
       e = (newData.increment * newData.energy)
@@ -450,6 +451,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
     increment = morphDef.increment,
     morphID = morphID,
     teamID = teamID,
+	combatMorph = morphDef.combatMorph,
   }
 
   local cmdDescID = Spring.FindUnitCmdDesc(unitID, morphDef.cmd)
@@ -589,7 +591,7 @@ local function FinishMorph(unitID, morphData)
 
   --//copy command queue
   local cmds = Spring.GetUnitCommands(unitID)
-  for i = 2, cmds.n do  -- skip the first command (CMD_MORPH)
+  for i = 1, cmds.n do
     local cmd = cmds[i]
     Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
   end
@@ -971,110 +973,99 @@ end
 
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-  local morphData = morphUnits[unitID]
-  if (morphData) then
-    if (cmdID==morphData.def.stopCmd)or(cmdID==CMD.STOP and not morphData.def.combatMorph)or(cmdID==CMD_MORPH_STOP) then
-      if not Spring.GetUnitTransporter(unitID) then
-        StopMorph(unitID, morphData)
-        morphUnits[unitID] = nil
-        return false
-      end
-    elseif (cmdID == CMD.ONOFF) then
-      return false
-    elseif cmdID == CMD.SELFD then
-      StopMorph(unitID, morphData)
-      morphUnits[unitID] = nil
-    --else --// disallow ANY command to units in morph
-    --  return false
-    end
-  elseif (cmdID >= CMD_MORPH and cmdID <= CMD_MORPH+MAX_MORPH) then
-    local morphDef = nil
-    if cmdID==CMD_MORPH then
-      if type(GG.MorphInfo[unitDefID])~="table" then
-        --Spring.Echo('Morph gadget: AllowCommand generic morph on non morphable unit')
-        return false
-      elseif #cmdParams==0 then
-        --Spring.Echo('Morph gadget: AllowCommand generic morph, default target')
-        --return true
-        for _,md in pairs(morphDefs[unitDefID]) do
-          morphDef=md
-          break
-        end
-      elseif GG.MorphInfo[unitDefID][cmdParams[1]] then
-        --Spring.Echo('Morph gadget: AllowCommand generic morph, target valid')
-        --return true
-        morphDef=(morphDefs[unitDefID] or {})[GG.MorphInfo[unitDefID][cmdParams[1]]]
-      else
-        --Spring.Echo('Morph gadget: AllowCommand generic morph, invalid target')
-        return false
-      end
-      --Spring.Echo('Morph gadget: AllowCommand morph cannot be here!')
-    elseif (cmdID > CMD_MORPH and cmdID <= CMD_MORPH+MAX_MORPH) then
-      --Spring.Echo('Morph gadget: AllowCommand specific morph')
-      morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
-    end
-    if ((morphDef)and
-        (morphDef.tech<=teamTechLevel[teamID])and
-        (morphDef.rank<=GetUnitRank(unitID))and
-        (morphDef.xp<=Spring.GetUnitExperience(unitID))and
-        (UnitReqCheck(teamID, morphDef.require)) )
-    then
-      if (isFactory(unitDefID)) then
-        --// the factory cai is broken and doesn't call CommandFallback(),
-        --// so we have to start the morph here
-        -- dont start directly to break recursion
-        --StartMorph(unitID, unitDefID, teamID, morphDef)
-        morphToStart[unitID] = {unitDefID, teamID, morphDef}
-        return false
-      else
-        return true
-      end
-    end
-    return false
-  end
+	local morphData = morphUnits[unitID]
+	if (morphData) then
+		if (cmdID==morphData.def.stopCmd)or(cmdID==CMD.STOP and not morphData.def.combatMorph)or(cmdID==CMD_MORPH_STOP) then
+			if not Spring.GetUnitTransporter(unitID) then
+				StopMorph(unitID, morphData)
+				morphUnits[unitID] = nil
+				return false
+			end
+		elseif (cmdID == CMD.ONOFF) then
+			return morphData.combatMorph
+		elseif cmdID == CMD.SELFD then
+			StopMorph(unitID, morphData)
+			morphUnits[unitID] = nil
+		--else --// disallow ANY command to units in morph
+		--	return false
+		end
+	elseif (cmdID >= CMD_MORPH and cmdID <= CMD_MORPH+MAX_MORPH) then
+		local morphDef = nil
+		if cmdID==CMD_MORPH then
+			if type(GG.MorphInfo[unitDefID])~="table" then
+				--Spring.Echo('Morph gadget: AllowCommand generic morph on non morphable unit')
+				return false
+			elseif #cmdParams==0 then
+				--Spring.Echo('Morph gadget: AllowCommand generic morph, default target')
+				--return true
+				for _,md in pairs(morphDefs[unitDefID]) do
+					morphDef=md
+					break
+				end
+			elseif GG.MorphInfo[unitDefID][cmdParams[1]] then
+				--Spring.Echo('Morph gadget: AllowCommand generic morph, target valid')
+				--return true
+				morphDef=(morphDefs[unitDefID] or {})[GG.MorphInfo[unitDefID][cmdParams[1]]]
+			else
+				--Spring.Echo('Morph gadget: AllowCommand generic morph, invalid target')
+				return false
+			end
+			--Spring.Echo('Morph gadget: AllowCommand morph cannot be here!')
+		elseif (cmdID > CMD_MORPH and cmdID <= CMD_MORPH+MAX_MORPH) then
+			--Spring.Echo('Morph gadget: AllowCommand specific morph')
+			morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+		end
+		if ((morphDef)and
+				(morphDef.tech<=teamTechLevel[teamID])and
+				(morphDef.rank<=GetUnitRank(unitID))and
+				(morphDef.xp<=Spring.GetUnitExperience(unitID))and
+				(UnitReqCheck(teamID, morphDef.require)) )
+				then
+			if (isFactory(unitDefID)) then
+				--// the factory cai is broken and doesn't call CommandFallback(),
+				--// so we have to start the morph here
+				-- dont start directly to break recursion
+				--StartMorph(unitID, unitDefID, teamID, morphDef)
+				morphToStart[unitID] = {unitDefID, teamID, morphDef}
+				return false
+			else
+				--// morph allowed, process it
+				local morphDef = nil
+				if cmdID == CMD_MORPH then
+					if type(GG.MorphInfo[unitDefID])~="table" then
+						--Spring.Echo('Morph gadget: CommandFallback generic morph on non morphable unit')
+						return false
+					end
+					if cmdParams[1] then
+						--Spring.Echo('Morph gadget: CommandFallback generic morph with target provided')
+						morphDef=(morphDefs[unitDefID] or {})[GG.MorphInfo[unitDefID][cmdParams[1]]]
+					else
+						--Spring.Echo('Morph gadget: CommandFallback generic morph, default target')
+						for _,md in pairs(morphDefs[unitDefID]) do
+							morphDef=md
+							break
+						end
+					end
+				else
+					--Spring.Echo('Morph gadget: CommandFallback specific morph')
+					morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+				end
+				if (morphDef) then
+					local morphData = morphUnits[unitID]
+					if (not morphData) then
+						-- dont start directly to break recursion
+						--StartMorph(unitID, unitDefID, teamID, morphDef)
+						morphToStart[unitID] = {unitDefID, teamID, morphDef}
+					end
+				end
+				return false
+			end
+		end
+		return false
+	end
 
-  return true
+	return true
 end
-
-
-function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-  if (cmdID < CMD_MORPH or cmdID > CMD_MORPH+MAX_MORPH) then
-    return false  --// command was not used
-  end
-  local morphDef = nil
-  if cmdID == CMD_MORPH then
-    if type(GG.MorphInfo[unitDefID])~="table" then
-      --Spring.Echo('Morph gadget: CommandFallback generic morph on non morphable unit')
-      return true,true
-    end
-    if cmdParams[1] then
-      --Spring.Echo('Morph gadget: CommandFallback generic morph with target provided')
-      morphDef=(morphDefs[unitDefID] or {})[GG.MorphInfo[unitDefID][cmdParams[1]]]
-    else
-      --Spring.Echo('Morph gadget: CommandFallback generic morph, default target')
-      for _,md in pairs(morphDefs[unitDefID]) do
-        morphDef=md
-        break
-      end
-    end
-  else
-    --Spring.Echo('Morph gadget: CommandFallback specific morph')
-    morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
-  end
-  if (not morphDef) then
-    return true, true  --// command was used, remove it
-  end
-  local morphData = morphUnits[unitID]
-  if (not morphData) then
-    -- dont start directly to break recursion
-    --StartMorph(unitID, unitDefID, teamID, morphDef)
-    morphToStart[unitID] = {unitDefID, teamID, morphDef}
-    return true, true
-  end
-  return true, false  --// command was used, do not remove it
-end
-
-
 
 --------------------------------------------------------------------------------
 --  END SYNCED

@@ -84,7 +84,7 @@ unitDef = {
     {
       def                = [[CORGOL_FLAMETHROWER]],
       badTargetCategory  = [[FIREPROOF]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
   },
@@ -159,7 +159,7 @@ unitDef = {
       tolerance               = 2500,
       turret                  = true,
       weaponType              = [[Flame]],
-      weaponVelocity          = 150,
+      weaponVelocity          = 800,
     },
 
   },

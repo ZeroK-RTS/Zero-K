@@ -101,7 +101,7 @@ unitDef = {
     {
       def                = [[DANTE_FLAMER]],
       badTargetCategory  = [[FIREPROOF]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
   },

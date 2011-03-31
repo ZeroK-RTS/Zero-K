@@ -5,11 +5,6 @@
 local devolution = false
 
 local morphDefs = {
- 
-  blastwing = {
-    into = 'cormine1',
-    time = 25,
-  }, 
 
   --[[ // sample definition1 with multiple possible morphs... you nest arrays inside the definition
   armcom = {
