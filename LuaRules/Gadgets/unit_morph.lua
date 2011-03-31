@@ -971,6 +971,41 @@ function gadget:GameFrame(n)
   end
 end
 
+local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
+	local morphDef = nil
+	if cmdID == CMD_MORPH then
+		if type(GG.MorphInfo[unitDefID])~="table" then
+			--Spring.Echo('Morph gadget: CommandFallback generic morph on non morphable unit')
+			return true
+		end
+		if cmdParams[1] then
+			--Spring.Echo('Morph gadget: CommandFallback generic morph with target provided')
+			morphDef=(morphDefs[unitDefID] or {})[GG.MorphInfo[unitDefID][cmdParams[1]]]
+		else
+			--Spring.Echo('Morph gadget: CommandFallback generic morph, default target')
+			for _,md in pairs(morphDefs[unitDefID]) do
+				morphDef=md
+				break
+			end
+		end
+	else
+		--Spring.Echo('Morph gadget: CommandFallback specific morph')
+		morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+	end
+	if (not morphDef) then
+		return true
+	end
+	if (morphDef) then
+		local morphData = morphUnits[unitID]
+		if (not morphData) then
+			-- dont start directly to break recursion
+			--StartMorph(unitID, unitDefID, teamID, morphDef)
+			morphToStart[unitID] = {unitDefID, teamID, morphDef}
+			return true
+		end
+	end
+	return false
+end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	local morphData = morphUnits[unitID]
@@ -1029,42 +1064,26 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				morphToStart[unitID] = {unitDefID, teamID, morphDef}
 				return false
 			else
-				--// morph allowed, process it
-				local morphDef = nil
-				if cmdID == CMD_MORPH then
-					if type(GG.MorphInfo[unitDefID])~="table" then
-						--Spring.Echo('Morph gadget: CommandFallback generic morph on non morphable unit')
-						return false
-					end
-					if cmdParams[1] then
-						--Spring.Echo('Morph gadget: CommandFallback generic morph with target provided')
-						morphDef=(morphDefs[unitDefID] or {})[GG.MorphInfo[unitDefID][cmdParams[1]]]
-					else
-						--Spring.Echo('Morph gadget: CommandFallback generic morph, default target')
-						for _,md in pairs(morphDefs[unitDefID]) do
-							morphDef=md
-							break
-						end
-					end
+				--// morph allowed
+				if morphDef.combatMorph then -- process now, no shift queue for combat morph to preserve command queue
+					processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
+					return false
 				else
-					--Spring.Echo('Morph gadget: CommandFallback specific morph')
-					morphDef = (morphDefs[unitDefID] or {})[cmdID] or extraUnitMorphDefs[unitID]
+					return true
 				end
-				if (morphDef) then
-					local morphData = morphUnits[unitID]
-					if (not morphData) then
-						-- dont start directly to break recursion
-						--StartMorph(unitID, unitDefID, teamID, morphDef)
-						morphToStart[unitID] = {unitDefID, teamID, morphDef}
-					end
-				end
-				return false
 			end
 		end
 		return false
 	end
 
 	return true
+end
+
+function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if (cmdID < CMD_MORPH or cmdID > CMD_MORPH+MAX_MORPH) then
+		return false	--// command was not used
+	end
+	return true, processMorph(unitID, unitDefID, teamID, cmdID, cmdParams) -- command was used, process decides if to remove
 end
 
 --------------------------------------------------------------------------------
@@ -1444,4 +1463,3 @@ end
 --------------------------------------------------------------------------------
 --  COMMON
 --------------------------------------------------------------------------------
-

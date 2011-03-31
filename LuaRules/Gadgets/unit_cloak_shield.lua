@@ -601,7 +601,7 @@ local function DrawSphere(divs, arcs, neg)
   end)
   gl.Material({
 	ambient  = { 0, 0, 0 },
-	diffuse  = { 0, 0, 0, 1.0 },
+	diffuse  = { 0, 0, 0, 0.5 },
 	emission = { 0.05, 0.10, 0.15 },
 	specular = { 0.25, 0.75, 1.0 },
 	shininess = 4
