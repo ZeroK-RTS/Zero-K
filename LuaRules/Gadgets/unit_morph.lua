@@ -438,9 +438,11 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
   -- do not allow morph for unfinsihed units
   if not isFinished(unitID) then return true end
 
-  Spring.SetUnitHealth(unitID, { paralyze = 1.0e9 })    --// turns mexes and mm off (paralyze the unit)
-  Spring.SetUnitResourcing(unitID,"e",0)                --// turns solars off
-  Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { 0 }, { "alt" }) --// turns radars/jammers off
+  if not morphDef.combatMorph then 
+	Spring.SetUnitHealth(unitID, { paralyze = 1.0e9 })    --// turns mexes and mm off (paralyze the unit)
+	Spring.SetUnitResourcing(unitID,"e",0)                --// turns solars off
+	Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { 0 }, { "alt" }) --// turns radars/jammers off
+  end
 
   morphUnits[unitID] = {
     def = morphDef,
@@ -971,7 +973,7 @@ end
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   local morphData = morphUnits[unitID]
   if (morphData) then
-    if (cmdID==morphData.def.stopCmd)or(cmdID==CMD.STOP)or(cmdID==CMD_MORPH_STOP) then
+    if (cmdID==morphData.def.stopCmd)or(cmdID==CMD.STOP and not morphData.def.combatMorph)or(cmdID==CMD_MORPH_STOP) then
       if not Spring.GetUnitTransporter(unitID) then
         StopMorph(unitID, morphData)
         morphUnits[unitID] = nil
