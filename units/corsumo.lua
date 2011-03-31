@@ -34,7 +34,7 @@ unitDef = {
   },
 
   defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
+  explodeAs           = [[BIG_UNIT]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[t3jumpjetriot]],
@@ -54,7 +54,7 @@ unitDef = {
   objectName          = [[m-9.s3o]],
   script              = [[corsumo.lua]],
   seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  selfDestructAs      = [[BIG_UNIT]],
 
   sfxtypes            = {
 

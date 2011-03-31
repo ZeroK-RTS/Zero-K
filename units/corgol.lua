@@ -30,7 +30,7 @@ unitDef = {
   },
 
   defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
+  explodeAs           = [[BIG_UNIT]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[tankskirm]],
@@ -49,7 +49,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[corgol_512.s3o]],
   seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  selfDestructAs      = [[BIG_UNIT]],
 
   sfxtypes            = {
 
