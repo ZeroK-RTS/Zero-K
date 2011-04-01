@@ -2565,10 +2565,10 @@ local SeismicWeapon = {}
 
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
-	if (wd.description == "Heavy Plasma Cannon") then
+	if (wd.description == "Very Heavy Plasma Cannon") then
 		Script.SetWatchWeapon(wd.id,true)
 		BBweapon[wd.id] = true
-	elseif (wd.description == "Seismic") then
+	elseif (wd.description == "Seismic" or wd.description == "Green Stamper") then
 		Script.SetWatchWeapon(wd.id,true)
 		SeismicWeapon[wd.id] = true
 	end
