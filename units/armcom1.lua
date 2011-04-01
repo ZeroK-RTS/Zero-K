@@ -159,7 +159,7 @@ unitDef = {
     },
 
 
-    [4] = {
+    [5] = {
       def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],

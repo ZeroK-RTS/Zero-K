@@ -392,7 +392,7 @@ end
 function script.QueryWeapon(num)
 	if num == 3 then 
 		return rbigflash 
-	elseif num == 2 then
+	elseif num == 2 or num == 4 then
 		return torso
 	end
 	return lfirept
@@ -414,7 +414,7 @@ local function RestoreDgun()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num >= 4 then
+	if num >= 5 then
 		Signal( SIG_LASER)
 		SetSignalMask( SIG_LASER)
 		isLasering = true
@@ -436,7 +436,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(ruparm, x_axis)
 		StartThread(RestoreDgun)
 		return true
-	elseif num == 2 then
+	elseif num == 2 or num == 4 then
 		Sleep(100)
 		return (shieldOn)
 	end

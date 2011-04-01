@@ -121,6 +121,15 @@ function getMaxVal(valList)
 	return winTeam, floor(maxVal)
 end
 
+function getMeanMetalIncome()
+	local num, sum = 0, 0
+	for _,team in pairs(totalTeamList) do
+		sum = sum + select(2, Spring.GetTeamResourceStats(team, "metal"))
+		num = num + 1
+	end
+	return (sum/num)
+end
+
 function awardAward(team, awardType, record)
 	awardList[team][awardType] = record
 	
@@ -183,12 +192,9 @@ function gadget:Initialize()
 	end
 	--]]
 	for i=1,#WeaponDefs do
-		if (WeaponDefs[i].type=="Flame" or 
-			WeaponDefs[i].fireStarter >=100 or 
-			WeaponDefs[i].name:lower():find("napalm")) then --// == flamethrower or napalm
-			--// 0.5 cus we want to differ trees an metal/tanks 
-			--// (fireStarter-tag: 1.0->always flame trees, 2.0->always flame units/buildings too)
-			flamerWeaponDefs[i]=WeaponDefs[i].fireStarter
+		local wcp = WeaponDefs[i].customParams or {}
+		if (wcp.setunitsonfire) then
+			flamerWeaponDefs[i] = true
 		end
 	end
 
@@ -372,6 +378,7 @@ function gadget:GameFrame(n)
 		local easyFactor = 0.5
 		local veryEasyFactor = 0.3
 		local minFriendRatio = 0.25
+		local minReclaimRatio = 0.15
 		
 		if pwnTeam then
 			awardAward(pwnTeam, 'pwn', 'Damage: '.. comma_value(maxDamage))
@@ -406,8 +413,8 @@ function gadget:GameFrame(n)
 		if terraTeam then
 			awardAward(terraTeam, 'terra', 'Terraform: '.. comma_value(maxTerra) .. " spent")
 		end
-		if reclaimTeam then
-			Spring.Echo("Reclaim Awarded")
+		Spring.Echo(maxReclaim, getMeanMetalIncome())
+		if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
 			awardAward(reclaimTeam , 'reclaim', comma_value(maxReclaim) .. "m from wreckage")
 		end
 		if friendTeam and maxFriendlyDamageRatio > minFriendRatio then

@@ -132,9 +132,9 @@ local base = {
 		}
 	},
 	[2] = {
-		name = "riot",
+		name = "beam",
 		modules = {
-			"commweapon_riotcannon", 
+			"commweapon_beamlaser", 
 		}
 	},
 	[3] = {
@@ -142,7 +142,8 @@ local base = {
 		modules = {
 			"commweapon_gaussrifle",
 			"commweapon_gaussrifle",
-			"conversion_shockrifle", 
+			"conversion_shockrifle",
+			"module_personal_shield",
 		}
 	},
 	[4] = {

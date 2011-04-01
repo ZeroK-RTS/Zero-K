@@ -336,8 +336,8 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if num == 2 then
-		return pelvis
+	if num == 2 or num == 4 then
+		return torso
 	end
 	return flare
 end
@@ -395,7 +395,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	inBuildAnim = false
-	if num >= 4 then
+	if num >= 5 then
 		Signal( SIG_AIM)
 		SetSignalMask( SIG_AIM)
 		bAiming = true
@@ -406,7 +406,7 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask( SIG_AIM_2)
 		bAiming = true
 		return AimRifle(heading, pitch)
-	elseif num == 2 then
+	elseif num == 2 or num == 4 then
 		Sleep(100)
 		return (shieldOn)
 	end

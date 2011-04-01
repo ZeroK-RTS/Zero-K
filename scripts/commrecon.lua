@@ -398,12 +398,13 @@ local function AimRifle(heading, pitch)
 	Turn( armhold , x_axis, - pitch, math.rad(250) )
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(armhold, x_axis)
+	WaitForTurn(lloarm, z_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num >= 4 then
+	if num >= 5 then
 		Signal( SIG_AIM)
 		SetSignalMask( SIG_AIM)
 		bAiming = true
@@ -414,7 +415,7 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask( SIG_AIM_2)
 		bAiming = true
 		return AimRifle(heading, pitch)
-	elseif num == 2 then
+	elseif num == 2 or num == 4 then
 		Sleep(100)
 		return (shieldOn)
 	end
@@ -432,8 +433,8 @@ end
 function script.QueryWeapon(num)
 	if num == 3 then 
 		return grenade 
-	elseif num == 2 then
-		return pelvis
+	elseif num == 2 or num == 4 then
+		return torso
 	end
 	return flare
 end

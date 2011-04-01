@@ -317,9 +317,9 @@ upgrades = {
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 20 HP/s",
+		description = "Self-repairs 25 HP/s",
 		func = function(unitDef)
-				unitDef.autoheal = (unitDef.autoheal or 0) + 20
+				unitDef.autoheal = (unitDef.autoheal or 0) + 25
 			end,
 	},
 	module_dmg_booster = {
@@ -366,12 +366,21 @@ upgrades = {
 	},
 	module_personal_cloak = {
 		name = "Personal Cloak",
-		description = "Cloaks the comm",
+		description = "Cloaks the commander",
 		func = function(unitDef)
 				unitDef.cloakcost = unitDef.cloakcost or 10
 				if unitDef.cloakcost > 10 then unitDef.cloakcost = 10 end
 				unitDef.cloakcostmoving = unitDef.cloakcostmoving or 20
 				if unitDef.cloakcostmoving > 20 then unitDef.cloakcostmoving = 20 end
+			end,
+	},
+	module_personal_shield = {
+		name = "Personal Shield",
+		description = "Generates a small bubble shield",
+		func = function(unitDef)
+				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
+				unitDef.activatewhenbuilt = true
+				unitDef.onoffable = true
 			end,
 	},
 	module_resurrect = {

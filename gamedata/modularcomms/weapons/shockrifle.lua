@@ -7,7 +7,7 @@ local weaponDef = {
     craterMult              = 0,
 
 	customParams			= {
-		slot = [[4]],
+		slot = [[5]],
 		rangeperlevel = [[25]],
 		damageperlevel = [[75]],
 	},

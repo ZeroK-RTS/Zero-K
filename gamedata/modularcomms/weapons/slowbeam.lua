@@ -10,7 +10,7 @@ local weaponDef = {
     craterMult              = 0,
 
     customParams            = {
-		slot = [[4]],
+		slot = [[5]],
 		--timeslow_preset = [[commrecon_slowbeam]],
 		rangeperlevel = [[25]],
 		damageperlevel = [[6]],
