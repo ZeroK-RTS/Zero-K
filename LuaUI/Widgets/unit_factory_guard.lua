@@ -69,8 +69,8 @@ options = {
 }
 
 for id,value in pairs(factoryDefs) do
-	options[id] = {name = UnitDefs[id].humanName, type = 'bool', value = (value ~= 0) }
-	options_order[#options_order+1] = id
+	options[UnitDefs[id].name] = {name = UnitDefs[id].humanName, type = 'bool', value = (value ~= 0) }
+	options_order[#options_order+1] = UnitDefs[id].name
 end
 
 --------------------------------------------------------------------------------
