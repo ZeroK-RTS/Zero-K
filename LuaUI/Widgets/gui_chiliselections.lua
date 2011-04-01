@@ -9,7 +9,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
@@ -185,6 +185,40 @@ local function numformat(x, displayPlusMinus)
 	end 
 end
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function AdjustWindow(window)
+	local nx
+	if (0 > window.x) then
+		nx = 0
+	elseif (window.x + window.width > screen0.width) then
+		nx = screen0.width - window.width
+	end
+
+	local ny
+	if (0 > window.y) then
+		ny = 0
+	elseif (window.y + window.height > screen0.height) then
+		ny = screen0.height - window.height
+	end
+
+	if (nx or ny) then
+		window:SetPos(nx,ny)
+	end
+end
+
+local function Show(obj)
+	if (not obj:IsDescendantOf(screen0)) then
+		screen0:AddChild(obj)
+	end
+end
+
+local function Hide(obj)
+	obj:ClearChildren()
+	screen0:RemoveChild(obj)
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
