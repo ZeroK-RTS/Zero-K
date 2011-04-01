@@ -89,7 +89,6 @@ unitDef = {
         commanders     = 3000,
         empresistant75 = 7500,
         empresistant99 = 300,
-        planes         = 30000,
       },
 
       edgeEffectiveness       = 1,

@@ -481,10 +481,10 @@ local morphDefs = {
 --------------------------------------------------------------------------------
 local comMorph = {
 	[1] = {
-		time = 10,
+		time = 20,
 	},
 	[2] = {
-		time = 22.5,
+		time = 30,
 	},
 	[3] = {
 		time = 20,
@@ -575,8 +575,8 @@ for id, playerData in pairs(customComms) do
 				if morphOption then
 					morphOption.into = array[i+1]
 					-- set time
-					--morphOption.time = (targetDef.metalCost - originDef.metalCost) / (5 * (i+1)) or morphOption.time
-					morphOption.time = (targetDef.metalCost - originDef.metalCost)/20 or morphOption.time
+					morphOption.time = math.floor( (targetDef.metalCost - originDef.metalCost) / (5 * (i+1)) ) or morphOption.time
+					--morphOption.time = (targetDef.metalCost - originDef.metalCost)/10 or morphOption.time
 					morphOption.combatMorph = true
 					-- copy, checking that this morph isn't already defined
 					morphDefs[sourceName] = morphDefs[sourceName]  or {}

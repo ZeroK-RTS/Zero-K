@@ -136,7 +136,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(antenna, sfxFall)
 		Explode(door1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(door2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		return 3
+		return 2
 	else
 		Explode(base, sfxNone)
 		Explode(arm, sfxNone)
@@ -149,6 +149,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(antenna, sfxFall)
 		Explode(door1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(door2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		return 3
+		return 2
 	end
 end
