@@ -2611,6 +2611,12 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 					for j = sz-smoothradius, sz+smoothradius,8 do
 						local disSQ = (i - x)^2 + (j - z)^2
 						if disSQ <= smoothradiusSQ then
+							if not origHeight[i] then
+								origHeight[i] = {}
+							end
+							if not origHeight[i][j] then
+								origHeight[i][j] = spGetGroundHeight(i,j)
+							end
 							spSetHeightMap(i, j, origHeight[i][j] + (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/smoothradiusSQ))
 						end
 					end
