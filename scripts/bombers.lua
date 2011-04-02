@@ -1,4 +1,5 @@
 -- scripts common to bombers
+local CMD_REARM = 32768
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local function ReloadQueue(queue, cmdTag, id)
@@ -16,15 +17,15 @@ local function ReloadQueue(queue, cmdTag, id)
 		end
 	end
 
-	-- workaround for STOP not clearing attack order
+	-- workaround for STOP not clearing attack order due to auto-attack
+	-- we set it to hold fire temporarily, revert once commands have been reset
 	local firestate = Spring.GetUnitStates(unitID).firestate
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
 	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
 	for i=start,#queue do
 		local cmd = queue[i]
 		local cmdOpt = cmd.options
-		local opts = {}	--{"shift"} -- appending
-		if i > start then opts = {"shift"} end
+		local opts = {"shift"} -- appending
 		if (cmdOpt.alt)   then opts[#opts+1] = "alt"   end
 		if (cmdOpt.ctrl)  then opts[#opts+1] = "ctrl"  end
 		if (cmdOpt.right) then opts[#opts+1] = "right" end
@@ -41,8 +42,9 @@ local function ReinsertAttackOrder(cmd, param)
 	local queue = Spring.GetUnitCommands(unitID) or {}
 	local index = #queue + 1
 	for i=1, #queue do
-		if queue[i].id == CMD_REARM then	-- already have manually set rearm point, we have nothing left to do here
+		if queue[i].id == CMD_REARM then
 			index = i
+			break
 		end
 	end
 	spGiveOrderToUnit(unitID, CMD.INSERT, {index, cmd, 0, unpack(param)}, {"alt"})
