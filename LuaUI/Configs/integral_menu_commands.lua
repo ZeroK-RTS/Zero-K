@@ -73,12 +73,13 @@ local aux = {	--merged into special
 }
 
 local super = {	--merged into special
-	armamd = {order = 0, row = 2},
+	armamd = {order = 15, row = 1},
 	missilesilo = {order = 1, row = 2},
 	corbhmth = {order = 2, row = 2},
 	armbrtha = {order = 3, row = 2},
 	corsilo = {order = 4, row = 2},
 	mahlazer = {order = 5, row = 2},
+	raveparty = {order = 6, row = 2},
 }
 
 --manual entries not needed; menu has autodetection

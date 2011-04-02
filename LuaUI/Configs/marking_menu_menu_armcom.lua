@@ -226,6 +226,10 @@ local menu_armcom = {
         angle = -90,
         unit = "mahlazer"
        },  
+	   {
+        angle = 180,
+        unit = "raveparty"
+       }, 
     },
   },
   },

@@ -617,14 +617,14 @@ local function DrawSphere(divs, arcs, neg)
 
   -- points  
   -- FIXME ATIBUG gl.PointSize(10.0)
-  gl.BeginEnd(GL.POINTS, function()
+  --[[gl.BeginEnd(GL.POINTS, function()
     SphereVertex( 1,  0,  0)
     SphereVertex(-1,  0,  0)
     SphereVertex(0,   1,  0)
     SphereVertex(0,  -1,  0)
     SphereVertex(0,   0,  1)
     SphereVertex(0,   0, -1)
-  end)
+  end)--]]
   -- FIXME ATIBUG gl.PointSize(1.0)
 end
 

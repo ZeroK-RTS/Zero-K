@@ -63,7 +63,6 @@ local reloading = false
 function script.Create()
 	StartThread(SmokeUnit)
 	Turn(fakespindle, x_axis, math.rad(60))
-	
 	for i=1,6 do
 		Turn(guns[i].flare, x_axis, (math.rad(-60)* i+1))
 	end
@@ -107,7 +106,7 @@ end
 
 
 function script.Shot(num)
-	EmitSfx(guns[gunNum].flare, 1024)
+	--EmitSfx(base, 1024) BASE IS NOT CENTRAL
 	EmitSfx(guns[gunNum].flare, 1025)
 	EmitSfx(guns[gunNum].flare, 1026)
 	StartThread(gunFire, gunNum)
@@ -117,10 +116,9 @@ function script.FireWeapon(num)
 	reloading = true
 	gunNum = gunNum + 1
 	if gunNum > 6 then gunNum = 1 end
-	Sleep(133)
-	Turn(fakespindle, x_axis, math.rad(60)*(gunNum), math.rad(120))
-	--WaitForTurn(fakespindle, x_axis)
-	Sleep(366)	-- sums to 2 shots per second
+	Sleep(120)
+	Turn(fakespindle, x_axis, math.rad(60)*(gunNum), math.rad(100))
+	WaitForTurn(fakespindle, x_axis)
 	reloading = false
 	if randomize then
 		weaponNum = math.random(1,6)

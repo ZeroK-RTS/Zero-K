@@ -1,6 +1,7 @@
 -- napalm_expl
 -- napalmfireball_piece3
 -- napalmmissile
+-- napalmmissilehalfduration
 -- napalmfireball_missile
 -- firewalker_impact
 -- napalmfireball_firewalker
@@ -95,6 +96,44 @@ return {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_missile]],
+        pos                = [[0 r200 r-200, 0 r200 r-200, 0 r200 r-200]],
+      },
+    },
+  },
+  
+  ["napalmlargeshort"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 0.8,
+      flashsize          = 512,
+      ttl                = 500,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 30,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:NAPALMFIREBALL_piece3]],
+        pos                = [[0 r200 r-200, 0, 0 r200 r-200]], 	--random(0, 200) - random (0, 200)
+      },
+    },
+	redploom_long = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 100,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:napalmfireball_missile_small]],
         pos                = [[0 r200 r-200, 0 r200 r-200, 0 r200 r-200]],
       },
     },

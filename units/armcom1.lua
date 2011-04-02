@@ -60,6 +60,7 @@ unitDef = {
     [[missilesilo]],
     [[corsilo]],
     [[mahlazer]],
+	[[raveparty]],
     [[armcsa]],
     [[cormine1]],
   },
