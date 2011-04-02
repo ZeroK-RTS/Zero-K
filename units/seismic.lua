@@ -85,7 +85,7 @@ unitDef = {
       avoidFriendly           = false,
 	  cegTag                  = [[tactrail]],
       collideFriendly         = false,
-      craterBoost             = 32000,
+      craterBoost             = 32,
       craterMult              = 1,
 
 	  customParams            = {

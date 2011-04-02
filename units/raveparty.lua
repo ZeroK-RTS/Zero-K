@@ -204,8 +204,8 @@ unitDef = {
       name                    = [[Green Stamper]],
       accuracy                = 750,
       areaOfEffect            = 300,
-      craterBoost             = 10000,
-      craterMult              = 2,
+      craterBoost             = 32,
+      craterMult              = 1,
 
 	  customParams            = {
 	    gatherradius = [[225]],
