@@ -109,6 +109,12 @@ local medRangeSkirmieeArray = {
 	["tawf114"] = true, -- banisher
 }
 
+for name,data in pairs(UnitDefNames) do -- add all comms to mid range skirm
+	if data.isCommander then
+		medRangeSkirmieeArray[name] = true
+	end
+end
+
 local longRangeSkirmieeArray = {
 	["armrock"] = true,
 	["nsclash"] = true, -- hover janus

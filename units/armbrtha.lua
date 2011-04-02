@@ -91,6 +91,11 @@ unitDef = {
       craterBoost             = 0.25,
       craterMult              = 0.5,
 
+	  customParams            = {
+	    smoothradius = [[96]],
+		smoothmult   = [[0.4]],
+	  },
+	  
       damage                  = {
         default = 2000,
         planes  = 2000,

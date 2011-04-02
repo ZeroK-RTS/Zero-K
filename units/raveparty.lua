@@ -206,11 +206,16 @@ unitDef = {
     GREEN_STAMPER = {
       name                    = [[Green Stamper]],
       accuracy                = 750,
-      areaOfEffect            = 512,
+      areaOfEffect            = 256,
       cegTag                  = [[vulcanfx]],
       craterBoost             = 0.25,
       craterMult              = 0.5,
 
+	  customParams            = {
+	    smoothradius = [[128]],
+		smoothmult   = [[0.6]],
+	  },
+	  
       damage                  = {
         default = 500,
         planes  = 500,

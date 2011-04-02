@@ -2559,186 +2559,62 @@ end
 -- Weapon Terraform
 --------------------------------------------------------------------------------
 
-
-local BBweapon = {}
 local SeismicWeapon = {}
+local DEFAULT_SMOOTH = 0.5
 
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
-	if (wd.description == "Very Heavy Plasma Cannon") then
+	if wd.customParams and wd.customParams.smoothradius or wd.customParams.smoothmult then
 		Script.SetWatchWeapon(wd.id,true)
-		BBweapon[wd.id] = true
-	elseif (wd.description == "Seismic" or wd.description == "Green Stamper") then
-		Script.SetWatchWeapon(wd.id,true)
-		SeismicWeapon[wd.id] = true
-	end
-end
-
-local seismicPoints = 0
-local seismicTerra = {}
-local seismicRadSQ = seismicRad^2
-local gravity = Game.gravity
-
-for i = -seismicRad, seismicRad,8 do
-	for j = -seismicRad, seismicRad,8 do
-		if ((i^2 + j^2) < seismicRadSQ) then
-			seismicPoints = seismicPoints + 1
-			seismicTerra[seismicPoints] = {x = i, z = j}
-		end
+		SeismicWeapon[wd.id] = {
+			smooth = wd.customParams.smoothmult or DEFAULT_SMOOTH,
+			radius = wd.customParams.smoothradius or wd.areaOfEffect,
+		}
 	end
 end
 
 function gadget:Explosion(weaponID, x, y, z, owner)
 	
-	if BBweapon[weaponID] then
-	
-		local radius = 96
-		local radius2 = 64
-		
-		local area = {}
-		local area2 = {}
-		local radiusSQ = radius^2
-		local radius2SQ = radius2^2
-		local point = {}
-		local points = 0
+	if SeismicWeapon[weaponID] then
+		local radius = SeismicWeapon[weaponID].radius
+		local maxSmooth = SeismicWeapon[weaponID].smooth
 		
 		local sx = floor((x+4)/8)*8
 		local sz = floor((z+4)/8)*8
-			
-		for i = sx-radius-16, sx+radius+16,8 do
-			area[i] = {}
-			for j = sz-radius-16, sz+radius+16,8 do
-				area[i][j] = spGetGroundHeight(i,j)
-			end
-		end
 		
-		for i = sx-radius2-16, sx+radius2+16,8 do
-			area2[i] = {}
-			for j = sz-radius2-16, sz+radius2+16,8 do
-				area2[i][j] = (area[i][j]+area[i+8][j]+area[i][j+8]+area[i-8][j]+area[i][j-8]+area[i+8][j+8]+area[i+8][j-8]+area[i+8][j+8]+area[i-8][j+8]+area[i+16][j]+area[i][j+16]+area[i-16][j]+area[i][j-16])/13
-			end
-		end
+		local groundPoints = 0
+		local groundHeight = 0
+		local radiusSQ = radius^2
 		
-		for i = sx-radius2-16, sx+radius2+16,8 do
-			for j = sz-radius2-16, sz+radius2+16,8 do
+		local origHeight = {} -- just to not read the heightmap twice
+		
+		for i = sx-radius, sx+radius,8 do
+			origHeight[i] = {}
+			for j = sz-radius, sz+radius,8 do
 				local disSQ = (i - x)^2 + (j - z)^2
-				if disSQ <= radius2SQ then
-					points = points + 1
-					point[points] = {
-						x = i, 
-						y = (area2[i][j]+area2[i+8][j]+area2[i][j+8]+area2[i-8][j]+area2[i][j-8]+area2[i+8][j+8]+area2[i+8][j-8]+area2[i+8][j+8]+area2[i-8][j+8]+area2[i+16][j]+area2[i][j+16]+area2[i-16][j]+area2[i][j-16])/13,
-						z = j
-					}
-				elseif disSQ <= radiusSQ then
-					points = points + 1
-					point[points] = {
-						x = i, 
-						y = area2[i][j],
-						z = j
-					}
+				if disSQ <= radiusSQ then
+					origHeight[i][j] = spGetGroundHeight(i,j)
+					groundPoints = groundPoints + 1
+					groundHeight = groundHeight + origHeight[i][j]
 				end
 			end
 		end
 		
-		local func = function()
-				for i = 1, points do	
-					spSetHeightMap(point[i].x,point[i].z,point[i].y)
-				end   
-			end
-		spSetHeightMapFunc(func)
-		
-	elseif SeismicWeapon[weaponID] then
-		-- SMOOTHING
-		local radius = 512
-		local radius2 = 448
-		
-		local area = {}
-		local area2 = {}
-		local radiusSQ = radius^2
-		local radius2SQ = radius2^2
-		local point = {}
-		local points = 0
-		
-		local sx = floor((x+4)/8)*8
-		local sz = floor((z+4)/8)*8
+		if groundPoints > 0 then
+			groundHeight = groundHeight/groundPoints
 			
-		for i = sx-radius-24, sx+radius+24,8 do
-			area[i] = {}
-			for j = sz-radius-24, sz+radius+24,8 do
-				area[i][j] = spGetGroundHeight(i,j)
+			local func = function()
+				for i = sx-radius, sx+radius,8 do
+					for j = sz-radius, sz+radius,8 do
+						local disSQ = (i - x)^2 + (j - z)^2
+						if disSQ <= radiusSQ then
+							spSetHeightMap(i, j, origHeight[i][j] + (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/radiusSQ))
+						end
+					end
+				end 
 			end
+			spSetHeightMapFunc(func)
 		end
-		
-		for i = sx-radius2-24, sx+radius2+24,8 do
-			area2[i] = {}
-			for j = sz-radius2-24, sz+radius2+24,8 do
-				area2[i][j] = (
-					area[i-8][j-24]+area[i][j-24]+area[i+8][j-24]
-					+area[i-16][j-16]+area[i-8][j-16]+area[i][j-16]+area[i+8][j-16]+area[i-16][j-16]
-					+area[i-24][j-8]+area[i-16][j-8]+area[i-8][j-8]+area[i][j-8]+area[i+8][j-8]+area[i+16][j-8]+area[i+24][j-8]
-					+area[i-24][j]+area[i-16][j]+area[i-8][j]+area[i][j]+area[i+8][j]+area[i+16][j]+area[i+24][j]
-					+area[i-24][j+8]+area[i-16][j+8]+area[i-8][j+8]+area[i][j+8]+area[i+8][j+8]+area[i+16][j+8]+area[i+24][j+8]
-					+area[i-16][j+16]+area[i-8][j+16]+area[i][j+16]+area[i+8][j+16]+area[i+16][j+16]
-					+area[i-8][j+24]+area[i][j+24]+area[i+8][j+24]
-				)/37
-			end
-		end
-		
-		for i = sx-radius2-24, sx+radius2+24,8 do
-			for j = sz-radius2-24, sz+radius2+24,8 do
-				local disSQ = (i - x)^2 + (j - z)^2
-				if disSQ <= radius2SQ then
-					points = points + 1
-					point[points] = {
-						x = i, 
-						y = (
-							area2[i-8][j-24]+area2[i][j-24]+area2[i+8][j-24]
-							+area2[i-16][j-16]+area2[i-8][j-16]+area2[i][j-16]+area2[i+8][j-16]+area2[i-16][j-16]
-							+area2[i-24][j-8]+area2[i-16][j-8]+area2[i-8][j-8]+area2[i][j-8]+area2[i+8][j-8]+area2[i+16][j-8]+area2[i+24][j-8]
-							+area2[i-24][j]+area2[i-16][j]+area2[i-8][j]+area2[i][j]+area2[i+8][j]+area2[i+16][j]+area2[i+24][j]
-							+area2[i-24][j+8]+area2[i-16][j+8]+area2[i-8][j+8]+area2[i][j+8]+area2[i+8][j+8]+area2[i+16][j+8]+area2[i+24][j+8]
-							+area2[i-16][j+16]+area2[i-8][j+16]+area2[i][j+16]+area2[i+8][j+16]+area2[i+16][j+16]
-							+area2[i-8][j+24]+area2[i][j+24]+area2[i+8][j+24]
-						)/37,
-						z = j
-					}
-				elseif disSQ <= radiusSQ then
-					points = points + 1
-					point[points] = {
-						x = i, 
-						y = area2[i][j],
-						z = j
-					}
-				end
-			end
-		end
-
-		local func = function()
-				for i = 1, points do	
-					spSetHeightMap(point[i].x,point[i].z,point[i].y)
-				end   
-			end
-		spSetHeightMapFunc(func)
-		
-		local units = Spring.GetUnitsInCylinder(sx,sz,seismicRad)
-		
-		for i = 1, #units do
-			local mass = UnitDefs[Spring.GetUnitDefID(units[i])].mass
-			--Spring.AddUnitImpulse(units[i],0,(mass^0.5)*gravity/100,0)
-		end
-		
-		--[[ LEVELING
-		local sx = floor((x+4)/8)*8
-		local sz = floor((z+4)/8)*8
-		
-		spSetHeightMapFunc(
-			function()
-				for i = 1, seismicPoints do	
-					spSetHeightMap(seismicTerra[i].x+sx,seismicTerra[i].z+sz,y)
-				end   
-			end
-		)
-		--]]
 	end
 
 end
