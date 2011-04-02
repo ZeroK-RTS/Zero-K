@@ -52,6 +52,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName          = [[spirit.s3o]],
+  script			  = [[corshad.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
@@ -80,7 +81,6 @@ unitDef = {
 
     {
       def                = [[BOMBSABOT]],
-      fuelUsage          = 999,
       mainDir            = [[0 -1 0]],
       maxAngleDif        = 60,
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER SUB]],

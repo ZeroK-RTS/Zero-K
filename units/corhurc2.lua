@@ -52,6 +52,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[firestorm.s3o]],
+  script			  = [[corhurc2.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 

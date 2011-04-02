@@ -1,5 +1,6 @@
 include "constants.lua"
 include "fakeUpright.lua"
+include "bombers.lua"
 
 local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","z","x","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
 local smokePiece = {base, jet1, jet2}
@@ -87,7 +88,7 @@ local function FireLoop()
 end
 
 function script.FireWeapon1()
-	if Spring.GetUnitFuel(unitID) < 1 then
+	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
 		return
 	end
 	Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
@@ -96,7 +97,8 @@ function script.FireWeapon1()
 	Sleep( 3000 ) -- Duration of burst. The number of frames is roughly (time - 30) * 1000 / 30.
 	firing = false
 	Sleep( 500) --delay before fuel runs out, to let it retreat a little
-	Spring.SetUnitFuel(unitID,0)
+	Reload()
+	--Spring.SetUnitFuel(unitID,0)
 end
 
 function script.QueryWeapon1()
