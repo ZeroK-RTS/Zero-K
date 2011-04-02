@@ -212,6 +212,7 @@ unitDef = {
       craterMult              = 0.5,
 
 	  customParams            = {
+	    gatherradius = [[196]],
 	    smoothradius = [[128]],
 		smoothmult   = [[0.6]],
 	  },

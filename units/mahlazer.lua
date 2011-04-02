@@ -35,7 +35,6 @@ unitDef = {
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],
-  energyUse                     = 300,
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 8,
   footprintZ                    = 8,

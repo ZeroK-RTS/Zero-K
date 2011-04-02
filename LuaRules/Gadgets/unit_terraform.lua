@@ -2568,7 +2568,8 @@ for i=1,#WeaponDefs do
 		Script.SetWatchWeapon(wd.id,true)
 		SeismicWeapon[wd.id] = {
 			smooth = wd.customParams.smoothmult or DEFAULT_SMOOTH,
-			radius = wd.customParams.smoothradius or wd.areaOfEffect,
+			smoothradius = wd.customParams.smoothradius or wd.areaOfEffect*0.5,
+			gatherradius = wd.customParams.gatherradius or wd.areaOfEffect*0.75,
 		}
 	end
 end
@@ -2576,7 +2577,10 @@ end
 function gadget:Explosion(weaponID, x, y, z, owner)
 	
 	if SeismicWeapon[weaponID] then
-		local radius = SeismicWeapon[weaponID].radius
+		local smoothradius = SeismicWeapon[weaponID].smoothradius
+		local gatherradius = SeismicWeapon[weaponID].gatherradius
+		local smoothradiusSQ = smoothradius^2
+		local gatherradiusSQ = gatherradius^2
 		local maxSmooth = SeismicWeapon[weaponID].smooth
 		
 		local sx = floor((x+4)/8)*8
@@ -2584,15 +2588,14 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		
 		local groundPoints = 0
 		local groundHeight = 0
-		local radiusSQ = radius^2
 		
 		local origHeight = {} -- just to not read the heightmap twice
 		
-		for i = sx-radius, sx+radius,8 do
+		for i = sx-gatherradius, sx+gatherradius,8 do
 			origHeight[i] = {}
-			for j = sz-radius, sz+radius,8 do
+			for j = sz-gatherradius, sz+gatherradius,8 do
 				local disSQ = (i - x)^2 + (j - z)^2
-				if disSQ <= radiusSQ then
+				if disSQ <= gatherradiusSQ then
 					origHeight[i][j] = spGetGroundHeight(i,j)
 					groundPoints = groundPoints + 1
 					groundHeight = groundHeight + origHeight[i][j]
@@ -2604,11 +2607,11 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 			groundHeight = groundHeight/groundPoints
 			
 			local func = function()
-				for i = sx-radius, sx+radius,8 do
-					for j = sz-radius, sz+radius,8 do
+				for i = sx-smoothradius, sx+smoothradius,8 do
+					for j = sz-smoothradius, sz+smoothradius,8 do
 						local disSQ = (i - x)^2 + (j - z)^2
-						if disSQ <= radiusSQ then
-							spSetHeightMap(i, j, origHeight[i][j] + (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/radiusSQ))
+						if disSQ <= smoothradiusSQ then
+							spSetHeightMap(i, j, origHeight[i][j] + (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/smoothradiusSQ))
 						end
 					end
 				end 
