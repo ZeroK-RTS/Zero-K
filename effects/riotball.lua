@@ -59,14 +59,14 @@ return {
     },
   },
   
-  ["riotballpluspurple"] = {
+  ["riotballplus2_purple"] = {
     usedefaultexplosions = false,
     groundflash = {
       alwaysvisible      = true,
       circlealpha        = 0.4,
       circlegrowth       = 7,
       flashalpha         = 0.5,
-      flashsize          = 256,
+      flashsize          = 320,
       ttl                = 45,
       color = {
         [1]  = 1,
@@ -84,7 +84,7 @@ return {
         alpha              = 0.5,
         color              = [[1,0,1]],
         expansionspeed     = 6,
-        ttl                = 32,
+        ttl                = 40,
       },
     },
   },

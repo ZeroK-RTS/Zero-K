@@ -117,9 +117,10 @@ function script.FireWeapon(num)
 	reloading = true
 	gunNum = gunNum + 1
 	if gunNum > 6 then gunNum = 1 end
-	Sleep(120)
+	Sleep(133)
 	Turn(fakespindle, x_axis, math.rad(60)*(gunNum), math.rad(120))
-	WaitForTurn(fakespindle, x_axis)
+	--WaitForTurn(fakespindle, x_axis)
+	Sleep(366)	-- sums to 2 shots per second
 	reloading = false
 	if randomize then
 		weaponNum = math.random(1,6)

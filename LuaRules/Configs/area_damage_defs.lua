@@ -7,7 +7,7 @@ local weapons = {
 	slowmissile_weapon = { radius = 512, damage = 3000, duration = 1800, rangeFall = 0, timeFall = 0},
 	firewalker_napalm_mortar = { radius = 128, damage = 40, duration = 450, rangeFall = 0.6, timeFall = 0.5 },
 	chickenwurm_napalm = { radius = 128, damage = 40, duration = 450, rangeFall = 0.6, timeFall = 0.5 },
-	raveparty_orange_roaster = { radius = 128, damage = 45, duration = 450, rangeFall = 0.6, timeFall = 0.5 },
+	raveparty_orange_roaster = { radius = 256, damage = 60, duration = 900, rangeFall = 0.6, timeFall = 0.5 },
 	logkoda_napalm_bomblet = { radius = 64, damage = 60, duration = 200, rangeFall = 0.6, timeFall = 0.5 },
 }
 
