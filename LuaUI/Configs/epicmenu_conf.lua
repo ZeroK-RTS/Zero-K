@@ -225,6 +225,39 @@ confdata.menu_tree = {
 			},
 			{},
 			{'Toggle Grab Input|Mouse cursor won\'t be able to leave the window.', function() spSendCommands{"grabinput"} end },
+			--[[
+			Currently spring does not allow scrollwheelspeed changes. This is code for when it works
+			Check here for recent advances https://github.com/spring/spring/blob/master/rts/Game/UnsyncedGameCommands.cpp
+			{'lh' , 
+				{ 
+					name = 'Scrollwheel Speed',
+					type = 'number',
+					min = 1, 
+					max = 100, 
+					step = 1,
+					value = 25,
+					OnChange=function(self) 
+						local speed = Spring.GetConfigInt( "ScrollWheelSpeed", 0 )
+						local sign = (speed or -1) / (speed or 1) 
+						spSendCommands{"scrollwheelspeed " .. (self.value or 25)*sign}
+					end, 
+				} 
+			},
+			{'lh' , 
+				{ 
+					name = 'Invert Zoom',
+					type = 'bool',
+					value = false,
+					OnChange=function(self) 
+						local speed = Spring.GetConfigInt( "ScrollWheelSpeed", 0 ) or 25
+						Spring.Echo(Spring.GetConfigInt( "ScrollWheelSpeed", 0 ))
+						if speed > 0 ~= self.value then
+							spSendCommands{"scrollwheelspeed " .. speed*-1]
+						end
+					end, 
+				} 
+			},
+			--]]
 		},
 	},
 	{'Video|These settings strongly affect the balance of quality of graphics vs. the speed of the gameplay', 
