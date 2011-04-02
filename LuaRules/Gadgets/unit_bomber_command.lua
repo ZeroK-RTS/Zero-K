@@ -254,6 +254,9 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 	end
 ]]
 	if cmdID == CMD_REARM then	-- return to pad
+		if Spring.GetUnitRulesParam(unitID, "noammo") ~= 1 then
+			return true, true -- attempting to rearm while already armed, abort
+		end
 		--Spring.Echo("Returning to base")
 		local targetPad = cmdParams[1]
 		bomberToPad[unitID] = targetPad
@@ -270,13 +273,15 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 	return false -- command not used
 end
 
--- FIXME: allow insertion of attack commands after refuel command
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
-		if (combatCommands[cmdID] and not cmdOptions.shift)
-		or (cmdID == CMD.INSERT and combatCommands[cmdParams[2]]) then
+		if (combatCommands[cmdID] and not cmdOptions.shift) then
 			return false
+		elseif (cmdID == CMD.INSERT and combatCommands[cmdParams[2]]) then
+			-- FIXME: allow insertion of attack commands after refuel command, block otherwise
 		end
+	else
+		if (cmdID == CMD_REARM and not cmdOptions.shift) then return false end	-- don't allow rearming when already armed
 	end
 	if bomberToPad[unitID] then
 		if cmdID ~= CMD_REARM and not cmdOptions.shift then
