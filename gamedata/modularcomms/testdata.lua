@@ -144,6 +144,7 @@ local base = {
 			"commweapon_gaussrifle",
 			"conversion_shockrifle",
 			"module_personal_shield",
+			"module_areashield",
 		}
 	},
 	[4] = {

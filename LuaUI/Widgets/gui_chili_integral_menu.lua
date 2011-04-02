@@ -546,7 +546,6 @@ end
 local function BuildRowButtonFunc(num, cmdid, left, right)
 	buildQueue = spGetFullBuildQueue(selectedFac)
 	local alt,ctrl,meta,shift = Spring.GetModKeyState()
-	local order = CMD.INSERT
 	local pos = 1
 	local numInput = 1	--number of times to send the order
 	
@@ -589,7 +588,7 @@ local function BuildRowButtonFunc(num, cmdid, left, right)
 	--Spring.Echo(cmdid)
 	if not right then
 		for i = 1, numInput do
-			Spring.GiveOrderToUnit(selectedFac, order, {pos, cmdid, 0 }, {"alt", "ctrl"})
+			Spring.GiveOrderToUnit(selectedFac, CMD.INSERT, {pos, cmdid, 0 }, {"alt", "ctrl"})
 		end
 	else
 		-- delete from back so that the order is not canceled while under construction

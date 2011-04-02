@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, body, land1, land2, land3, land4, radar;
 
@@ -35,14 +32,19 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 	// Build by COBBLER Ver4.0 Copyright @1998 DIGITAL CONCEPT SOFTWARE (MANU@inext.fr) / http://www.annihilationcenter.com/DCS/  
 }
 
+SpinRadar()
+{
+	while( get BUILD_PERCENT_LEFT )
+	{
+		sleep 400;
+	}
+	spin radar around y-axis speed <90>;
+}
+
 Create()
 {
 	start-script SmokeUnit();
-}
-
-SweetSpot(piecenum)
-{
-	piecenum = radar;
+	start-script SpinRadar();
 }
 
 QueryLandingPad(Func_Var_1, Func_Var_2, Func_Var_3, Func_Var_4)
