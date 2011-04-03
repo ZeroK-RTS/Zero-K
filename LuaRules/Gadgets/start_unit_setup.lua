@@ -77,7 +77,8 @@ local scheduledSpawn = {}
 local startPosition = {} -- [teamID] = {x, y, z}
 local shuffledStartPosition = {}
 local playerSides = {} -- sides selected ingame from widget  - per players
-local teamSides = {} -- sides selected ingame from widgets - per teams 
+local teamSides = {} -- sides selected ingame from widgets - per teams
+local teamSidesAI = {} 
 
 local playerIDsByName = {}
 local customComms = {}
@@ -298,8 +299,12 @@ function gadget:Initialize()
 end
 
 
-local function GetStartUnit(teamID, playerID)
+local function GetStartUnit(teamID, playerID, isAI)
   local startUnit, startUnitAlt
+  
+  if isAI then 
+	startUnit = startUnits[teamSidesAI[teamID]]
+  end
   
   if (teamID and teamSides[teamID]) then 
 	startUnit = startUnits[teamSides[teamID]]
@@ -368,7 +373,7 @@ local function GetFacingDirection(x, z, teamID)
 end
 
 
-local function SpawnStartUnit(teamID, playerID)
+local function SpawnStartUnit(teamID, playerID, isAI)
   -- get start unit
   
   -- no getting double comms now!
@@ -380,7 +385,7 @@ local function SpawnStartUnit(teamID, playerID)
 	--return 
   --end	
   
-  local startUnit = GetStartUnit(teamID, playerID)
+  local startUnit = GetStartUnit(teamID, playerID, isAI)
 
   if startUnit then
     -- replace with shuffled position
@@ -633,7 +638,7 @@ function gadget:GameStart()
         else
           -- AI etc.
 		  local allyTeam = select(6, Spring.GetTeamInfo(team))
-          SpawnStartUnit(team)
+          SpawnStartUnit(team, nil, true)
         end
       else -- no coop
 		local allyTeam = select(6, Spring.GetTeamInfo(team))
@@ -693,8 +698,11 @@ end
 
 -- used by CAI
 local function SetFaction(side, playerID, teamID)
-    teamSides[teamID] = side
-	playerSides[playerID] = side
+    teamSidesAI[teamID] = side
+	if coop == 0 then
+		teamSides[teamID] = side
+		playerSides[playerID] = side
+	end
 end
 GG.SetFaction = SetFaction
 
