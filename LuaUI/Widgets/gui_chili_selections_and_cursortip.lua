@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.01 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.02 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -234,6 +234,15 @@ options.fontsize.OnChange = FontChanged
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function round(num, idp)
+  if (not idp) then
+    return math.floor(num+.5)
+  else
+    local mult = 10^(idp or 0)
+    return math.floor(num * mult + 0.5) / mult
+  end
+end
 
 --from rooms widget by quantum
 local function ToSI(num)
@@ -861,7 +870,7 @@ local function KillTooltip(force)
 	end
 end
 
-local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
+local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 
 	local stack_children = {}
 
@@ -939,8 +948,8 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip, fontSize)
 		return
 	end
 	
-	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal, true), autosize=true, fontSize=fontSize, valign='center' }
-	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy, true), autosize=true, fontSize=fontSize, valign='center'  }
+	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal, true), autosize=true, fontSize=ttFontSize, valign='center' }
+	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy, true), autosize=true, fontSize=ttFontSize, valign='center'  }
 	
 	globalitems[resource_tt_name] = StackPanel:New{
 		centerItems = false,
@@ -1258,14 +1267,14 @@ end
 
 
 local function MakeToolTip_Text(text)
-	BuildTooltip2('tt_text',{
+	BuildTooltip2('tt_text2',{
 		main = {
 			{ name='text', text = text, wrap=true },
 		}
 	})
 end
 
-local function UpdateBuildpic( ud, globalitem_name )
+local function UpdateBuildpic( ud, globalitem_name, unitID )
 	if not ud then return end
 	
 	if not globalitems[globalitem_name] then
@@ -1275,7 +1284,17 @@ local function UpdateBuildpic( ud, globalitem_name )
 			keepAspect = false,
 			height  = 55*(4/5),
 			width   = 55,
+			
 		}
+		if globalitem_name == 'buildpic_selunit' then
+			globalitems[globalitem_name].OnClick = {function(_,_,_,button)
+				if (button==2) then
+					--button2 (middle)
+					local x,y,z = Spring.GetUnitPosition( unitID )
+					Spring.SetCameraTarget(x,y,z, 1)
+				end
+			end}
+		end
 		return
 	end
 	globalitems[globalitem_name].file = "#" .. ud.id
@@ -1314,10 +1333,10 @@ local function MakeToolTip_UD(tt_table)
 		UpdateBuildpic( tt_table.unitDef, 'buildpic_morph' )
 		UpdateMorphControl( tt_table.morph_data )
 		
-		BuildTooltip2('morph', tt_structure)
+		BuildTooltip2('morph2', tt_structure)
 	else
 		UpdateBuildpic( tt_table.unitDef, 'buildpic_ud' )
-		BuildTooltip2('ud', tt_structure)
+		BuildTooltip2('ud2', tt_structure)
 	end
 	
 end
@@ -1344,7 +1363,7 @@ local function MakeToolTip_Unit(data, tooltip)
 	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	UpdateResourceStack( 'unit', unitID, tt_ud, tooltip, ttFontSize )
+	UpdateResourceStack( 'unit', unitID, tt_ud, tooltip )
 	
 	local tt_structure = {
 		leftbar = {
@@ -1361,7 +1380,7 @@ local function MakeToolTip_Unit(data, tooltip)
 	}
 	
 	UpdateBuildpic( tt_ud, 'buildpic_unit' )
-	BuildTooltip2('unit', tt_structure)
+	BuildTooltip2('unit2', tt_structure)
 end
 
 
@@ -1381,7 +1400,9 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	local iconPath		= GetUnitIcon(stt_ud)
 	
-	UpdateResourceStack( 'selunit', unitID, stt_ud, tooltip, ttFontSize )
+	UpdateResourceStack( 'selunit', unitID, stt_ud, tooltip )
+	
+	
 	
 	local tt_structure = {
 		leftbar = {
@@ -1392,13 +1413,13 @@ local function MakeToolTip_SelUnit(data, tooltip)
 			{ name='uname', icon = iconPath, text = fullname, fontSize=2, },
 			{ name='utt', text = unittooltip, wrap=true },
 			{ name='hp', directcontrol = 'hp_selunit', },
+			stt_ud.builder and { name='bp', directcontrol = 'bp_selunit', } or {},
 			{ name='res', directcontrol = 'resources_selunit' },
-			{ name='help', text = green .. 'Space+click: Show unit stats', },
 		},
 	}
 	
-	UpdateBuildpic( stt_ud, 'buildpic_selunit' )
-	return BuildTooltip2('selunit', tt_structure, true)
+	UpdateBuildpic( stt_ud, 'buildpic_selunit', stt_unitID )
+	return BuildTooltip2('selunit2', tt_structure, true)
 end
 
 local function MakeToolTip_Feature(data, tooltip)
@@ -1440,7 +1461,7 @@ local function MakeToolTip_Feature(data, tooltip)
 	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	UpdateResourceStack( tt_ud and 'corpse' or 'feature', featureID, tt_ud or tt_fd, tooltip, ttFontSize )
+	UpdateResourceStack( tt_ud and 'corpse' or 'feature', featureID, tt_ud or tt_fd, tooltip )
 	
 	local tt_structure = {
 		leftbar =
@@ -1464,9 +1485,9 @@ local function MakeToolTip_Feature(data, tooltip)
 	
 	if tt_ud then
 		UpdateBuildpic( tt_ud, 'buildpic_feature' )
-		BuildTooltip2('corpse', tt_structure)
+		BuildTooltip2('corpse2', tt_structure)
 	else
-		BuildTooltip2('feature', tt_structure)
+		BuildTooltip2('feature2', tt_structure)
 	end
 	return true
 end
@@ -1491,6 +1512,25 @@ local function CreateHpBar(name)
 	}
 end
 
+local function CreateBpBar(name)
+	globalitems[name] = Progressbar:New {
+		name = name,
+		width = '100%',
+		height = icon_size+2,
+		itemMargin    = {0,0,0,0},
+		itemPadding   = {0,0,0,0},	
+		padding = {0,0,0,0},
+		color = {0.8,0.8,0.2,1};
+		max=1,
+		caption = 'a',
+
+		children = {
+			Image:New{file='LuaUI/Images/commands/Bold/buildsmall.png',height= icon_size,width= icon_size,  x=0,y=0},
+		},
+	}
+end
+
+
 local function MakeToolTip_Draw()
 	local tt_structure = {
 		main = {
@@ -1501,7 +1541,7 @@ local function MakeToolTip_Draw()
 			
 		},
 	}
-	BuildTooltip2('drawing', tt_structure)
+	BuildTooltip2('drawing2', tt_structure)
 end
 	
 local function MakeTooltip()
@@ -1649,6 +1689,25 @@ function widget:Update(dt)
 		WriteGroupInfo()
 		
 		SetHealthbars()
+		if stt_unitID then
+			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
+			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
+			UpdateResourceStack( 'selunit', stt_unitID, stt_ud, tooltip )
+			
+			local nanobar = globalitems['bp_selunit']
+			if (nanobar) then
+				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(stt_unitID)
+			
+				if metalUse then
+					nanobar:SetValue(metalUse/stt_ud.buildSpeed,true)
+					nanobar:SetCaption(round(100*metalUse/stt_ud.buildSpeed)..'%')
+				else
+					nanobar:SetValue(1)
+					nanobar:SetCaption('??? / ' .. numformat(stt_ud.buildSpeed))
+				end
+			end
+			
+		end
 		changeNow = true
 		timer = 0
 	end
@@ -1692,6 +1751,7 @@ function widget:Initialize()
 	CreateHpBar('hp_feature')
 	CreateHpBar('hp_corpse')
 	
+	CreateBpBar('bp_selunit')
 	
 	stack_main = StackPanel:New{
 		width=300, -- needed for initial tooltip
