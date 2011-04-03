@@ -7,6 +7,10 @@
 --
 --	See also: scripts/bombers.lua
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- TODO:
+-- Handle planes waiting around if no airpads exist at all - send to pad once one is built
+--------------------------------------------------------------------------------
 
 function gadget:GetInfo()
   return {
@@ -27,6 +31,8 @@ local spGetUnitTeam		= Spring.GetUnitTeam
 local spGetUnitAllyTeam	= Spring.GetUnitAllyTeam
 local spGetUnitDefID	= Spring.GetUnitDefID
 local spGetUnitIsDead	= Spring.GetUnitIsDead
+local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+local spGetUnitFuel		= Spring.GetUnitFuel
 
 
 include "LuaRules/Configs/customcmds.h.lua"
@@ -39,6 +45,7 @@ local bomberNames = {
 }
 
 local airpadNames = {
+	factoryplane = {mobile = false, cap = 1},
 	armasp = {mobile = false, cap = 4},
 	armcarry = {mobile = true, cap = 9},
 }
@@ -215,7 +222,7 @@ end
 
 local function RequestRearm(unitID, team)
 	team = team or spGetUnitTeam(unitID)
-	if Spring.GetUnitRulesParam(unitID, "noammo") ~= 1 then return end
+	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then return end
 	--Spring.Echo(unitID.." requesting rearm")
 	local queue = Spring.GetUnitCommands(unitID) or {}
 	local index = #queue + 1
@@ -311,7 +318,7 @@ function gadget:GameFrame(n)
 		end
 		
 		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!!
-			if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
+			if spGetUnitRulesParam(unitID, "noammo") == 1 then
 				local queue = Spring.GetUnitCommands(unitID)
 				if queue and #queue > 0 and combatCommands[queue[1].id] then
 					RequestRearm(unitID)
@@ -335,7 +342,7 @@ end
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_REARM then	-- return to pad
-		if Spring.GetUnitRulesParam(unitID, "noammo") ~= 1 then
+		if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
 			return true, true -- attempting to rearm while already armed, abort
 		end
 		--Spring.Echo("Returning to base")
@@ -356,7 +363,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	
-	if Spring.GetUnitRulesParam(unitID, "noammo") == 0 then
+	if spGetUnitRulesParam(unitID, "noammo") == 0 then
 		if (cmdID == CMD_REARM and not cmdOptions.shift) then -- don't allow rearming when already armed
 			return false 
 		end	
@@ -420,7 +427,7 @@ function gadget:DrawWorld()
 	local units = Spring.GetVisibleUnits()
 	for i=1,#units do
 		local id = units[i]
-		if Spring.ValidUnitID(id) and spGetUnitDefID(id) and Spring.GetUnitRulesParam(id, "noammo") == 1 then
+		if Spring.ValidUnitID(id) and spGetUnitDefID(id) and spGetUnitRulesParam(id, "noammo") == 1 then
 			gl.DrawFuncAtUnit(id, false, DrawUnitFunc, UnitDefs[spGetUnitDefID(id)].height + 30)
 		end
 	end

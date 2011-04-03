@@ -39,7 +39,6 @@ unitDef = {
   maxSlope            = 18,
   maxVelocity         = 0,
   minCloakDistance    = 150,
-  noAutoFire          = false,
   objectName          = [[airpad.s3o]],
   onoffable           = true,
   seismicSignature    = 4,
@@ -50,7 +49,7 @@ unitDef = {
   smoothAnim          = true,
   sortbias            = [[0]],
   turnRate            = 0,
-  waterline           = 1,
+  waterline           = 8,
   workerTime          = 12,
   yardMap             = [[ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
