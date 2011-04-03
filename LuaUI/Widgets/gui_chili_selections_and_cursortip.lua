@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.02 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.03 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -126,6 +126,11 @@ local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local tildepressed, drawing, erasing
+
+local windTooltips = {
+	["armwin"] = true,
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- group info
@@ -443,14 +448,26 @@ end
 
 local function GetUnitDesc(unitID, ud)
 	local lang = WG.lang or 'en'
-	if lang == 'en' then 
-		return unitID and spGetUnitTooltip(unitID) or ud.tooltip
+	if lang == 'en' then
+		if unitID then
+			local tooltip = spGetUnitTooltip(unitID)
+			if windTooltips[ud.name] then
+				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(unitID,"minWind")) .. " - " .. Spring.GetGameRulesParam("WindMax")
+			end
+			return tooltip
+		end
+		return ud.tooltip
 	end
 	local suffix = ('_' .. lang)
 	local desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'
 	if unitID then
 		local endesc = ud.tooltip
-		return spGetUnitTooltip(unitID):gsub(endesc, desc)
+		
+		local tooltip = spGetUnitTooltip(unitID):gsub(endesc, desc)
+		if windTooltips[ud.name] then
+			tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(unitID,"minWind")) .. " - " .. Spring.GetGameRulesParam("WindMax")
+		end
+		return tooltip
 	end
 	return desc
 end
@@ -712,22 +729,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local function GetUnitDesc(unitID, ud)
-	if not (unitID or ud) then return '' end
-	
-	local lang = WG.lang or 'en'
-	if lang == 'en' then 
-		return unitID and spGetUnitTooltip(unitID) or ud.tooltip
-	end
-	local suffix = ('_' .. lang)
-	local desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'
-	if unitID then
-		local endesc = ud.tooltip
-		return spGetUnitTooltip(unitID):gsub(endesc, desc)
-	end
-	return desc
-end
 
 local UnitDefByHumanName_cache = {}
 local function GetUnitDefByHumanName(humanName)
@@ -1104,7 +1105,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 					name=item.name, 				
 					autosize=false,
 					text = itemtext , 
-					width='100%', 
+					width='100%',
 					valign="ascender", 
 					font={ size=curFontSize }, 
 					fontShadow=true,
@@ -1777,11 +1778,11 @@ function widget:Initialize()
 	local y = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100 - window_height)) .. "%"
 
 	window_corner = Window:New{
-		name   = 'unitinfo';
+		name   = 'unitinfo2';
 		x      = 0;
 		bottom = 200;
 		clientHeight = 120;
-		clientWidth  = 400;
+		clientWidth  = 460;
 		dockable = true,
 		--autosize    = true;
 		resizable   = false;
@@ -1790,7 +1791,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		--padding = {3, 3, 15, 3}
 		--color       = {Spring.GetTeamColor(Spring.GetLocalTeamID())};
-		minimumSize = {120, 40},
+		minimumSize = {460, 130},
 	}
 
 	windMin = Spring.GetGameRulesParam("WindMin")
