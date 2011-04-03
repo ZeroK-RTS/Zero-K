@@ -173,6 +173,9 @@ function gadget:Initialize()
   groundMin, groundMax = Spring.GetGroundExtremes()
   groundMin, groundMax = math.max(groundMin,0), math.max(groundMax,1)
   groundExtreme = groundMax - groundMin
+  if groundExtreme < 1 then
+    groundExtreme = 1
+  end
 
   --this is a function defined between 0 and 1, so we can adjust the gadget 
   -- effect between 0% (flat maps) and 100% (mountained maps)
