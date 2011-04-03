@@ -787,7 +787,7 @@ local function UpdateSelectedUnitsTooltip()
 				if pylonTooltips[ud.name] then 
 					local tooltip = spGetUnitTooltip(selectedUnits[1])
 					if windTooltips[ud.name] then
-						tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(selectedUnits[1],"minWind")) .. " - " .. Spring.GetGameRulesParam("WindMax")
+						tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(selectedUnits[1],"minWind")) .. " - " .. string.format("%.1f", Spring.GetGameRulesParam("WindMax"))
 					end
 					window_corner.childrenByName['tooltip']:SetCaption(tooltip)
 				end
