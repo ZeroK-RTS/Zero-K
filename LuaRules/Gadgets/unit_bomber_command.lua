@@ -1,12 +1,11 @@
 ------------------------------------------------------------------------------
 -- HOW IT WORKS:
 -- 	After firing, set ammo to 0 and look for a pad
---	Find first non-combat order and queue rearm order before it
+--	Find first combat order and queue rearm order before it
 --	If bomber idle and out of ammo (UnitIdle), give it rearm order
 -- 	When bomber is in range of airpad (GameFrame), set fuel to zero	
---------------------------------------------------------------------------------
--- TODO
--- 	Redirect bombers if closest pad is already full (and clear the waiting line as needed)
+--
+--	See also: scripts/bombers.lua
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
@@ -36,7 +35,7 @@ local bomberNames = {
 	"armstiletto_laser",
 	"corshad",
 	"corhurc2",
-	--"armcybr",
+	"armcybr",
 }
 
 local airpadNames = {
@@ -53,6 +52,7 @@ end
 for name,data in pairs(airpadNames) do
 	if UnitDefNames[name] then airpadDefs[UnitDefNames[name].id] = data end
 end
+
 
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
@@ -72,12 +72,10 @@ local combatCommands = {	-- commands that require ammo to execute
 	[CMD.DGUN] = true,
 }
 
-local padRadius = 500 -- land if pad is within this range
+local padRadius = 750 -- land if pad is within this range
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
---local CMD_REARM = CMD.MOVE
 
 local rearmCMD = {
     id      = CMD_REARM,
@@ -380,7 +378,7 @@ else
 function gadget:DefaultCommand(type, targetID)
 	if (type == 'unit') then
 		if not (Spring.IsUnitAllied(targetID)) then
-			return  -- capture allied units? na
+			return
 		end
 
 		local selUnits = Spring.GetSelectedUnits()
