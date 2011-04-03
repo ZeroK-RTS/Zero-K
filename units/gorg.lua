@@ -16,18 +16,18 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[65 65 65]],
+  collisionVolumeOffsets = [[0 -5 3]],
+  collisionVolumeScales  = [[70 60 65]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     description_fr = [[Mechwarrior d'Assaut]],
 	description_de = [[Schwerer Sturmroboter]],
-    helptext       = [[The Juggernaut is the big daddy to the Sumo. Where its smaller cousin sported the exotic heatray, the Jugg is even more bizzare with its three gravity guns complementing a standard laser cannon. This beast is slow and expensive, but seemingly impervious to enemy fire.]],
-    helptext_fr    = [[Le Juggernaut est un quadrip?de lourd et lent, mais ?xtr?mement solide. Il est ?quip? de deux canons laser ? haute fr?quence, et d'un double laser anti gravit? de technologie Newton. Il d?cole les unit?s ennemies du sol et les ?jecte en arri?re tout en les bombardant de ses tirs. Difficilement arr?table, voire la silhouette d'un Juggernaut ? l'horizon est une des pires chose que l'on puisse apercevoir.]],
-	helptext_de    = [[Der Juggernaut ist der große Bruder des Sumos. Er besitzt im Gegensatz zu diesem keinen exotischen Heat Ray, sondern drei nicht weniger verrückte Gravitationskanonen und eine einfache Laserkanone. Dieses Biest ist langsam und teuer, aber scheinbar völlig unbeeindruckt vom feindlichen Feuer.]],
+    helptext       = [[The Jugglenaut is the big daddy to the Sumo. Where its smaller cousin sported the exotic heatray, the Jugg is even more bizzare with its three gravity guns complementing a standard laser cannon. This beast is slow and expensive, but seemingly impervious to enemy fire.]],
+    helptext_fr    = [[Le Jugglenaut est un quadrip?de lourd et lent, mais ?xtr?mement solide. Il est ?quip? de deux canons laser ? haute fr?quence, et d'un double laser anti gravit? de technologie Newton. Il d?cole les unit?s ennemies du sol et les ?jecte en arri?re tout en les bombardant de ses tirs. Difficilement arr?table, voire la silhouette d'un Juggernaut ? l'horizon est une des pires chose que l'on puisse apercevoir.]],
+	helptext_de    = [[Der Jugglenaut ist der große Bruder des Sumos. Er besitzt im Gegensatz zu diesem keinen exotischen Heat Ray, sondern drei nicht weniger verrückte Gravitationskanonen und eine einfache Laserkanone. Dieses Biest ist langsam und teuer, aber scheinbar völlig unbeeindruckt vom feindlichen Feuer.]],
   },
 
   defaultmissiontype     = [[Standby]],
@@ -71,7 +71,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[juggle]],
-  trackWidth             = 58,
+  trackWidth             = 64,
   turnRate               = 233,
   workerTime             = 0,
 
@@ -84,7 +84,6 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
     {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
@@ -108,6 +107,10 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
     },
 
+    {
+      def                = [[PARTICLEBEAM]],
+    },		
+	
   },
 
 
@@ -160,9 +163,7 @@ unitDef = {
     LASER       = {
       name                    = [[Heavy Laser Blaster]],
       areaOfEffect            = 24,
-      beamWeapon              = true,
       canattackground         = true,
-      cegTag                  = [[redlaser_llt]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -181,16 +182,12 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
       lodDistance             = 10000,
       noSelfDamage            = true,
       range                   = 430,
       reloadtime              = 0.17,
       renderType              = 0,
       rgbColor                = [[1 0 0]],
-      soundHit                = [[weapon/laser/lasercannon_hit]],
-      soundStart              = [[weapon/laser/lasercannon_fire]],
-      soundTrigger            = true,
       sweepfire               = false,
       targetMoveError         = 0.1,
       thickness               = 4.03112887414927,
@@ -199,6 +196,49 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 1720,
     },
+	
+    PARTICLEBEAM = {
+      name                    = [[Particle Beam]],
+      areaOfEffect            = 8,
+      beamTime                = 0.1,
+	  beamttl				  = 30,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 5,
+        planes  = 5,
+        subs    = 0.25,
+      },
+
+      explosionGenerator      = [[custom:flash1orange]],
+      fireStarter             = 30,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 3.5,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 430,
+      reloadtime              = 0.03,
+      renderType              = 0,
+      rgbColor                = [[1 0.3 0.1]],
+      soundStart              = [[weapon/laser/laser_burn10]],
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 3,
+      tolerance               = 18000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,
+    },	
 
   },
 
@@ -206,12 +246,12 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Juggernaut]],
+      description      = [[Wreckage - Jugglenaut]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 100000,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -226,29 +266,8 @@ unitDef = {
     },
 
 
-    DEAD2 = {
-      description      = [[Debris - Juggernaut]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 100000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[2]],
-      hitdensity       = [[100]],
-      metal            = 4800,
-      object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 4800,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
     HEAP  = {
-      description      = [[Debris - Juggernaut]],
+      description      = [[Debris - Jugglenaut]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 100000,
