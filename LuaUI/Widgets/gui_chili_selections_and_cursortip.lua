@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.03 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.031 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -447,12 +447,14 @@ end
 
 
 local function GetUnitDesc(unitID, ud)
+	if not (unitID or ud) then return '' end
+	
 	local lang = WG.lang or 'en'
 	if lang == 'en' then
 		if unitID then
 			local tooltip = spGetUnitTooltip(unitID)
 			if windTooltips[ud.name] then
-				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(unitID,"minWind")) .. " - " .. Spring.GetGameRulesParam("WindMax")
+				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", Spring.GetGameRulesParam("WindMax") )
 			end
 			return tooltip
 		end
@@ -952,6 +954,8 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal, true), autosize=true, fontSize=ttFontSize, valign='center' }
 	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy, true), autosize=true, fontSize=ttFontSize, valign='center'  }
 	
+	local lbl_empty = Label:New{ name='blank', caption = '  ', autosize=true, fontSize=ttFontSize, valign='center'  }
+	
 	globalitems[resource_tt_name] = StackPanel:New{
 		centerItems = false,
 		autoArrangeV = true,
@@ -965,6 +969,7 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 		children = {
 			Image:New{file='LuaUI/images/ibeam.png',height= icon_size,width= icon_size, fontSize=ttFontSize,},
 			lbl_metal2,
+			lbl_empty,
 			Image:New{file='LuaUI/images/energy.png',height= icon_size,width= icon_size, fontSize=ttFontSize,},
 			lbl_energy2,
 		},
@@ -1108,7 +1113,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 					width='100%',
 					valign="ascender", 
 					font={ size=curFontSize }, 
-					fontShadow=true,
+					--fontShadow=true,
 				}
 				stack_children[#stack_children+1] = controls[ttname][item.name]
 			else
@@ -1138,7 +1143,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 				width = '100%',
 				autosize=true,
 				padding = {1,1,1,1},
-				itemPadding = {0,0,0,0},
+				itemPadding = {1,1,0,0},
 				itemMargin = {4,0,0,0},
 				children = stack_children,
 			}
@@ -1397,7 +1402,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		--fixme
 		return false
 	end
-	
+	if not stt_ud then return end
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	local iconPath		= GetUnitIcon(stt_ud)
 	
