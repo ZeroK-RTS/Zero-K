@@ -410,7 +410,7 @@ function gadget:GameFrame(n)
 		if capTeam and maxCap > 1000 then
 			awardAward(capTeam, 'cap', 'Captured value: '.. comma_value(maxCap))
 		end
-		if terraTeam then
+		if terraTeam and maxTerra > 1000 then
 			awardAward(terraTeam, 'terra', 'Terraform: '.. comma_value(maxTerra) .. " spent")
 		end
 		Spring.Echo(maxReclaim, getMeanMetalIncome())
