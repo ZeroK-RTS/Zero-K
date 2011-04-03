@@ -33,9 +33,12 @@ local function ReloadQueue(queue, cmdTag, id)
 	end
 	
 	if re and start == 2 then
-		spGiveOrderToUnit(unitID, id, params, {"shift"} )
+		local cmd = queue[1]
+		spGiveOrderToUnit(unitID, cmd.id, cmd.params, {"shift"} )
 	end
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
+	
+	return re
 end
 
 local function ReinsertAttackOrder(cmd, param)
@@ -47,12 +50,14 @@ local function ReinsertAttackOrder(cmd, param)
 			break
 		end
 	end
-	spGiveOrderToUnit(unitID, CMD.INSERT, {index, cmd, 0, unpack(param)}, {"alt"})
+	--spGiveOrderToUnit(unitID, CMD.INSERT, {index, cmd, 0, unpack(param)}, {"alt"})
+	GG.InsertCommand(unitID, index, cmd, param)
 end
 
 function Reload()
 	local queue = Spring.GetUnitCommands(unitID)
 	local id, target
+	local re = false
 	if queue then
 		local tag = queue[1].tag
 		id = queue[1].id
@@ -61,11 +66,11 @@ function Reload()
 		elseif id == CMD.ATTACK and #(queue[1].params) == 1 then
 			target = {queue[1].params[1]}
 		end
-		ReloadQueue(queue, tag, id)
+		re = ReloadQueue(queue, tag, id)
 	end
 	Spring.SetUnitRulesParam(unitID, "noammo", 1)
 	GG.RequestRearm(unitID)
-	if target then
+	if target and not re then
 		ReinsertAttackOrder(id, target)
 	end
 end

@@ -88,6 +88,7 @@ local rearmCMD = {
 	tooltip = "Select an airpad to return to for rearm",
 }
 
+local bomberUnitIDs = {}
 local bomberToPad = {}	-- [bomberID] = detination pad ID
 local airpads = {}	-- stores data
 local airpadsPerAllyTeam = {}	-- [allyTeam] = {[pad1ID] = true, [pad2ID] = true, ..}
@@ -108,6 +109,81 @@ function gadget:Initialize()
 		gadget:UnitFinished(unitList[i], ud, team)
 	end
 end
+
+local function MakeOptsWithShift(cmdOpt)
+	local opts = {"shift"} -- appending
+	if (cmdOpt.alt)   then opts[#opts+1] = "alt"   end
+	if (cmdOpt.ctrl)  then opts[#opts+1] = "ctrl"  end
+	if (cmdOpt.right) then opts[#opts+1] = "right" end
+	return opts
+end
+
+--[[
+local function InsertCommandAfter(unitID, afterCmd, cmdID, params, opts)
+	-- workaround for STOP not clearing attack order due to auto-attack
+	-- we set it to hold fire temporarily, revert once commands have been reset
+	local queue = Spring.GetUnitCommands(unitID)
+	local firestate = Spring.GetUnitStates(unitID).firestate
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
+	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	if queue then
+		opts = opts or {}
+		local i = 1
+		local toInsert = nil
+		local commands = #queue
+		while i <= commands do
+			
+			if toInsert then
+				Spring.GiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
+				toInsert = false
+			else
+				local cmd = queue[i]
+				Spring.GiveOrderToUnit(unitID, cmd.id, cmd.params, MakeOptsWithShift(cmd.options))
+				if cmd.id == afterCmd and toInsert == nil then
+					toInsert = true
+				end
+				i = i + 1
+			end
+			--local cq = Spring.GetUnitCommands(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
+		end
+		if toInsert then
+			Spring.GiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
+		end
+	end
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
+end
+--]]
+
+local function InsertCommand(unitID, index, cmdID, params, opts)
+	-- workaround for STOP not clearing attack order due to auto-attack
+	-- we set it to hold fire temporarily, revert once commands have been reset
+	local queue = Spring.GetUnitCommands(unitID)
+	local firestate = Spring.GetUnitStates(unitID).firestate
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {})
+	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	if queue then
+		opts = opts or {}
+		local i = 1
+		local toInsert = (index >= 0)
+		local commands = #queue
+		while i <= commands do
+			if i-1 == index and toInsert then
+				Spring.GiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
+				toInsert = false
+			else
+				local cmd = queue[i]
+				Spring.GiveOrderToUnit(unitID, cmd.id, cmd.params, MakeOptsWithShift(cmd.options))
+				i = i + 1
+			end
+			--local cq = Spring.GetUnitCommands(unitID) for i = 1, #cq do Spring.Echo(cq[i].id) end
+		end
+		if toInsert or index < 0 then
+			Spring.GiveOrderToUnit(unitID, cmdID, params, MakeOptsWithShift(opts))
+		end
+	end
+	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {})
+end
+GG.InsertCommand = InsertCommand
 
 local function FindNearestAirpad(unitID, team)
 	--Spring.Echo(unitID.." checking for closest pad")
@@ -156,7 +232,8 @@ local function RequestRearm(unitID, team)
 	local targetPad = FindNearestAirpad(unitID, team)
 	if targetPad then
 		--Spring.Echo(unitID.." directed to airpad "..targetPad)
-		spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, 0, targetPad}, {"alt"})
+		InsertCommand(unitID, index, CMD_REARM, {targetPad})
+		--spGiveOrderToUnit(unitID, CMD.INSERT, {index, CMD_REARM, 0, targetPad}, {"alt"})
 		return targetPad
 	end
 end
@@ -165,6 +242,7 @@ GG.RequestRearm = RequestRearm
 function gadget:UnitCreated(unitID, unitDefID, team)
 	if bomberDefs[unitDefID] then
 		Spring.InsertUnitCmdDesc(unitID, 400, rearmCMD)
+		bomberUnitIDs[unitID] = true
 	end
 end
 
@@ -204,6 +282,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, team)
 		airpads[unitID] = nil
 	elseif bomberDefs[unitDefID] then
 		CancelAirpadReservation(unitID)
+		bomberUnitIDs[unitID] = nil
 	end
 end
 
@@ -232,6 +311,15 @@ function gadget:GameFrame(n)
 				Spring.SetUnitRulesParam(bomberID, "noammo", 0)	-- plane can fire again once it's refuelled
 			end
 		end
+		
+		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!!
+			if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
+				local queue = Spring.GetUnitCommands(unitID)
+				if queue and #queue > 0 and combatCommands[queue[1].id] then
+					RequestRearm(unitID)
+				end
+			end
+		end
 	end
 end
 
@@ -248,11 +336,6 @@ end
 ]]--
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
---[[	-- this part dinnae work
-	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 and combatCommands[cmdID]  then
-		return true, true	-- command used, clear it so we can get on with the rearming
-	end
-]]
 	if cmdID == CMD_REARM then	-- return to pad
 		if Spring.GetUnitRulesParam(unitID, "noammo") ~= 1 then
 			return true, true -- attempting to rearm while already armed, abort
@@ -274,14 +357,11 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
-		if (combatCommands[cmdID] and not cmdOptions.shift) then
-			return false
-		elseif (cmdID == CMD.INSERT and combatCommands[cmdParams[2]]) then
-			-- FIXME: allow insertion of attack commands after refuel command, block otherwise
-		end
-	else
-		if (cmdID == CMD_REARM and not cmdOptions.shift) then return false end	-- don't allow rearming when already armed
+	
+	if Spring.GetUnitRulesParam(unitID, "noammo") == 0 then
+		if (cmdID == CMD_REARM and not cmdOptions.shift) then -- don't allow rearming when already armed
+			return false 
+		end	
 	end
 	if bomberToPad[unitID] then
 		if cmdID ~= CMD_REARM and not cmdOptions.shift then

@@ -5,7 +5,7 @@
 function gadget:GetInfo()
   return {
     name      = "Prevent Range Hax",
-    desc      = "Prevent Range Hax",
+    desc      = "Prevents Range Hax",
     author    = "TheFatController",
     date      = "Jul 24, 2007",
     license   = "GNU GPL, v2 or later",
@@ -29,6 +29,9 @@ local CMD_INSERT = CMD.INSERT
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--[[
+Does this gadget do anything at all?
+"LuaRules::RunCallIn: error = 2, AllowCommand, [string "LuaRules/Gadgets/unit_prevent_range_hax.lua"]:45: GiveOrderToUnit() recursion is not permitted"
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions, cmdTag, synced)
   if synced then return true end
@@ -48,6 +51,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
   end
   return true
 end
-
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
