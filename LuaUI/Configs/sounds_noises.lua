@@ -797,6 +797,105 @@ local sounds = {
 		},
 	},
 	
+	-- Sea
+	corcs = {
+		build = "builder_start",
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "rumble1",
+		},
+	},
+	armpt = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "rumble1",
+		},
+	},
+	coresupp = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "rumble1",
+		},
+	},
+	dclship = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "rumble1",
+		},
+	},
+	corsub = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "sub_select",
+		},
+	},
+	armroy = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "rumble1",
+		},
+	},
+	corroy = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "rumble1",
+		},
+	},
+	serpent = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "sub_select",
+		},
+	},
+	cornukesub = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "sub_select",
+		},
+	},
+	armcarry = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "rumble1",
+		},
+	},
+	corbats = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "rumble1",
+		},
+	},
+	corarch = {
+		ok = {
+			[1] = "rumble2",
+		},
+		select = {
+			[1] = "rumble1",
+		},
+	},
+	
 	-- Economy
 	cormex = {
 		select = {

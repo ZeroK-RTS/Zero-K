@@ -83,9 +83,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 27,
-        planes  = 270,
-        subs    = 13.5,
+        default = 25,
+        planes  = 250,
+        subs    = 12.5,
       },
 
       explosionGenerator      = [[custom:MISSILE_HIT_PIKES_160]],

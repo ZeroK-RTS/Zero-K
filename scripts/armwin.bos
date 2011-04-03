@@ -52,6 +52,13 @@ Create()
 	turn base to y-axis base_dir now;
 	start-script SmokeUnit();
 	start-script SpinWind();
+	//if (GET GROUND_HEIGHT(GET UNIT_XZ))
+	//{
+	//}
+	//else
+	//{
+	//	turn base to x-axis <180.000000> now;
+	//}
 }
 
 SweetSpot(piecenum)

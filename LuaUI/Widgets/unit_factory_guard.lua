@@ -177,7 +177,7 @@ end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 	if factoryDefs[unitDefID] and unitTeam == spGetMyTeamID() then
-		factories[unitID] = {assist = options[unitDefID].value}
+		factories[unitID] = {assist = options[UnitDefs[unitDefID].name].value}
 	end
 end
 
