@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.041 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.05 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -20,6 +20,7 @@ include("keysym.h.lua")
 --------------------------------------------------------------------------------
 
 local init = true
+local trackmode = false --before options
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -56,6 +57,8 @@ options_order = {
 	--'restrictangle',
 	--'mingrounddist',
 	'freemode',
+	
+	'trackmode',
 
 }
 
@@ -232,6 +235,13 @@ options = {
 		OnChange = function(self) OverviewAction() end,
 	},
 	
+	trackmode = {
+		name = "Enter Trackmode",
+		desc = "Track the selected unit (midclick to cancel)",
+		type = 'button',
+		OnChange = function(self) trackmode = true; end,
+	},
+	
 }
 
 --------------------------------------------------------------------------------
@@ -331,6 +341,7 @@ local keys = {
 local icon_size = 20
 local cycle = 1
 local camcycle = 1
+local trackcycle = 1
 
 
 local mwidth, mheight = Game.mapSizeX, Game.mapSizeZ
@@ -477,7 +488,7 @@ local function UpdateCam(cs)
 	return cs
 end
 
-local function Zoom(zoomin, s)
+local function Zoom(zoomin, s, forceCenter)
 	local zoomin = zoomin
 	if options.invertzoom.value then
 		zoomin = not zoomin
@@ -486,8 +497,11 @@ local function Zoom(zoomin, s)
 	local cs = spGetCameraState()
 	-- [[
 	if
-		(zoomin and options.zoomintocursor.value)
-		or ((not zoomin) and options.zoomoutfromcursor.value)
+		(not forceCenter) and
+		(
+			(zoomin and options.zoomintocursor.value)
+			or ((not zoomin) and options.zoomoutfromcursor.value)
+		)
 		then
 		
 		local onmap, gx,gy,gz = VirtTraceRay(mx, my, cs)
@@ -746,6 +760,16 @@ function widget:Update(dt)
 	if cycle == 1 then
 		PeriodicWarning()
 	end
+	
+	trackcycle = trackcycle %(8) + 1
+	if trackcycle == 1 and trackmode then
+		local selUnits = Spring.GetSelectedUnits()
+		if selUnits and selUnits[1] then
+			local x,y,z = Spring.GetUnitPosition( selUnits[1] )
+			Spring.SetCameraTarget(x,y,z, 1)
+		end
+	end
+	
 
 	local cs = spGetCameraState()
 	
@@ -907,6 +931,8 @@ function widget:MousePress(x, y, button)
 		return false
 	end
 	
+	trackmode = false
+	
 	local a,c,m,s = spGetModKeyState()
 	
 	-- Reset --
@@ -1027,7 +1053,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			Altitude(true, modifier.shift)
 			return
 		else
-			Zoom(true, modifier.shift)
+			Zoom(true, modifier.shift, true)
 			return
 		end
 	elseif key == key_code.pagedown then
@@ -1038,7 +1064,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			Altitude(false, modifier.shift)
 			return
 		else
-			Zoom(false, modifier.shift)
+			Zoom(false, modifier.shift, true)
 			return
 		end
 	end
