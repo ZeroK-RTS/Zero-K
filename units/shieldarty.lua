@@ -94,11 +94,11 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default        = 1400,
-        commanders     = 140,
-        empresistant75 = 350,
-        empresistant99 = 14,
-        planes         = 1400,
+        default        = 1600,
+        commanders     = 160,
+        empresistant75 = 400,
+        empresistant99 = 16,
+        planes         = 1600,
       },
 
       edgeEffectiveness       = 0.2,
