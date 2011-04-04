@@ -91,6 +91,17 @@ local rearmCMD = {
 	cursor  = 'Repair',
     type    = CMDTYPE.ICON_UNIT,
 	tooltip = "Select an airpad to return to for rearm",
+	hidden	= true,
+}
+
+local findPadCMD = {
+    id      = CMD_FIND_PAD,
+    name    = "Rearm",
+    action  = "rearm",
+	cursor  = 'Repair',
+    type    = CMDTYPE.ICON,
+	tooltip = "Search for nearest available airpad to return to for rearm",
+	hidden	= false,
 }
 
 local bomberUnitIDs = {}
@@ -104,7 +115,8 @@ end
 local scheduleRearmRequest = {} -- [bomberID] = true	(used to avoid recursion in UnitIdle)
 
 function gadget:Initialize()
-	Spring.SetCustomCommandDrawData(CMD_REARM, "Guard", {0, 1, 1, 1})
+	Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 1})
+	Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 1})
 	gadgetHandler:RegisterCMDID(CMD_REARM)
 	local unitList = Spring.GetAllUnits()
 	for i=1,#(unitList) do
@@ -220,7 +232,7 @@ local function FindNearestAirpad(unitID, team)
 	return closestPad
 end
 
-local function RequestRearm(unitID, team)
+local function RequestRearm(unitID, team, forceNow)
 	team = team or spGetUnitTeam(unitID)
 	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then return end
 	--Spring.Echo(unitID.." requesting rearm")
@@ -230,9 +242,12 @@ local function RequestRearm(unitID, team)
 		if combatCommands[queue[i].id] then
 			index = i-1
 			break
-		elseif queue[i].id == CMD_REARM then	-- already have manually set rearm point, we have nothing left to do here
+		elseif queue[i].id == CMD_REARM or queue[i].id == CMD_FIND_PAD then	-- already have manually set rearm point, we have nothing left to do here
 			return
 		end
+	end
+	if forceNow then
+		index = 1
 	end
 	local targetPad = FindNearestAirpad(unitID, team)
 	if targetPad then
@@ -247,8 +262,20 @@ GG.RequestRearm = RequestRearm
 function gadget:UnitCreated(unitID, unitDefID, team)
 	if bomberDefs[unitDefID] then
 		Spring.InsertUnitCmdDesc(unitID, 400, rearmCMD)
+		Spring.InsertUnitCmdDesc(unitID, 401, findPadCMD)
 		bomberUnitIDs[unitID] = true
 	end
+	--[[
+	local id = Spring.FindUnitCmdDesc(unitID, CMD.WAIT)
+	local desc = Spring.GetUnitCmdDescs(unitID, id, id)
+	for i,v in ipairs(desc) do
+		if type(v) == "table" then
+			for a,b in pairs(v) do
+				Spring.Echo(a,b)
+			end
+		end
+	end
+	]]--
 end
 
 function gadget:UnitFinished(unitID, unitDefID, team)
@@ -301,12 +328,12 @@ function gadget:GameFrame(n)
 	-- track proximity to bombers
 	if n%10 == 0 then
 		for bomberID in pairs(scheduleRearmRequest) do
-			RequestRearm(bomberID)
+			RequestRearm(bomberID, nil, true)
 		end
 		scheduleRearmRequest = {}
 		for bomberID, padID in pairs(bomberToPad) do
 			local queue = Spring.GetUnitCommands(bomberID)
-			if (queue and queue[1] and queue[1].id == CMD_REARM) and Spring.GetUnitSeparation(bomberID, padID, true) < padRadius then
+			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < padRadius) then
 				local tag = queue[1].tag
 				--Spring.Echo("Bomber "..bomberID.." cleared for landing")
 				CancelAirpadReservation(bomberID)
@@ -357,6 +384,9 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		local x, y, z = Spring.GetUnitPosition(targetPad)
 		Spring.SetUnitMoveGoal(unitID, x, y, z)
 		return true, false	-- command used, don't remove
+	elseif cmdID == CMD_FIND_PAD then
+		scheduleRearmRequest[unitID] = true
+		return true, true	-- command used, remove
 	end
 	return false -- command not used
 end

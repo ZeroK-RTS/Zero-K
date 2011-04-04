@@ -26,6 +26,7 @@ CMD_STEALTH = 32100
 CMD_CLOAK_SHIELD = 32101
 CMD_MINE = 32105	-- easymetal2
 CMD_REARM = 32768	-- bomber control
+CMD_FIND_PAD = 32769	-- bomber control
 CMD_PRIORITY= 34220
 CMD_AP_FLY_STATE = 34569	-- unit_air_plants
 CMD_AP_AUTOREPAIRLEVEL = 34570	-- unit_air_plants
