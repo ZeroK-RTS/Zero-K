@@ -271,6 +271,17 @@ for name, data in pairs(commDefs) do
 		ModifyWeaponRange(data, data.customparams.rangebonus + 1)
 	end	
 	
+	-- calc lightning real damage based on para damage
+	-- TODO: use for slow-beams
+	if data.weapondefs then
+		for name, weaponData in pairs(data.weapondefs) do
+			if weaponData.customparams.extra_damage_mult then
+				weaponData.customparams.extra_damage = weaponData.customparams.extra_damage_mult * weaponData.damage.default
+				weaponData.customparams.extra_damage_mult = nil
+			end
+		end
+	end	
+	
 	-- set weapon1 range	- may need exception list in future depending on what weapons we add
 	if data.weapondefs then
 		local maxRange = 0

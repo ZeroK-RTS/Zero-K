@@ -34,6 +34,10 @@ upgrades = {
 --		name = "Flamethrower",
 --		description = "Perfect for well-done barbecues",
 --	},
+	commweapon_gaussrifle = {
+		name = "Gauss Rifle",
+		description = "Precise armor-piercing weapon",
+	},
 	commweapon_heavymachinegun = {
 		name = "Heavy Machine Gun",
 		description = "Close-in weapon with AoE",
@@ -42,9 +46,9 @@ upgrades = {
 		name = "Heat Ray",
 		description = "Rapidly melts anything at short range; loses damage over distance",
 	},
-	commweapon_gaussrifle = {
-		name = "Gauss Rifle",
-		description = "Precise armor-piercing weapon",
+	commweapon_lightninggun = {
+		name = "Lightning Gun",
+		description = "Paralyzes and damages annoying bugs",
 	},
 	commweapon_partillery = {
 		name = "Plasma Artillery",

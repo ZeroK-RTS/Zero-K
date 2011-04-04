@@ -183,18 +183,9 @@ local base = {
 		}
 	},
 	[8] = {
-		name = "crash",
+		name = "lightning",
 		modules = {
-			"commweapon_gaussrifle",
-			"commweapon_disruptorbomb",
-			"module_ablative_armor",
-			"module_heavy_armor",
-			"weaponmod_disruptor_ammo",
-			"conversion_shockrifle",
-			"module_areashield",
-			"module_heavy_armor",
-			"weaponmod_high_caliber_barrel",
-			"module_cloak_field",
+			"commweapon_lightninggun",
 		}
 	},
 	[9] = {
