@@ -372,10 +372,10 @@ upgrades = {
 		name = "Personal Cloak",
 		description = "Cloaks the commander",
 		func = function(unitDef)
-				unitDef.cloakcost = unitDef.cloakcost or 10
-				if unitDef.cloakcost > 10 then unitDef.cloakcost = 10 end
-				unitDef.cloakcostmoving = unitDef.cloakcostmoving or 20
-				if unitDef.cloakcostmoving > 20 then unitDef.cloakcostmoving = 20 end
+				unitDef.cloakcost = unitDef.cloakcost or 5
+				if unitDef.cloakcost > 5 then unitDef.cloakcost = 5 end
+				unitDef.cloakcostmoving = unitDef.cloakcostmoving or 10
+				if unitDef.cloakcostmoving > 10 then unitDef.cloakcostmoving = 10 end
 			end,
 	},
 	module_personal_shield = {
