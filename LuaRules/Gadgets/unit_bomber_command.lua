@@ -114,6 +114,8 @@ for i=1,#allyteams do
 end
 local scheduleRearmRequest = {} -- [bomberID] = true	(used to avoid recursion in UnitIdle)
 
+_G.airpads = airpads
+
 function gadget:Initialize()
 	Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 1})
 	Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 1})
@@ -304,7 +306,7 @@ local function CancelAirpadReservation(unitID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, team)
-	if airpadDefs[unitDefID] then
+	if airpads[unitID] then
 		local allyTeam = spGetUnitAllyTeam(unitID)
 		--Spring.Echo("Removing unit "..unitID.." from airpad list")
 		airpadsPerAllyTeam[allyTeam][unitID] = nil
@@ -374,6 +376,9 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		end
 		--Spring.Echo("Returning to base")
 		local targetPad = cmdParams[1]
+		if not airpads[targetPad] then
+			return true, true	-- trying to land on an unregistered (probably under construction) pad, abort
+		end
 		bomberToPad[unitID] = targetPad
 		if not airpads[targetPad] then return false end
 		local reservations = airpads[targetPad].reservations
@@ -406,11 +411,22 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	return true
 end
 
+-- not worth the system resources until bombers using reverse built pads is fixed for real
+--[[
+function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
+	if step < 0 and airpads[unitID] and select(5,Spring.GetUnitHealth(unitID)) == 1 then
+		gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	end
+	return true
+end
+]]--
 
 else
 --------------------------------------------------------------------------------
 -- UNSYNCED
 --------------------------------------------------------------------------------
+
+local airpads = SYNCED.airpads
 
 function gadget:DefaultCommand(type, targetID)
 	if (type == 'unit') then
@@ -433,7 +449,7 @@ function gadget:DefaultCommand(type, targetID)
 		end
 
 		local targetDefID = spGetUnitDefID(targetID)
-		if airpadDefs[targetDefID] then
+		if airpads[unitID] then
 			return CMD_REARM
 		end
 		return
