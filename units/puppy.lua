@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[corroach]],
+  unitname               = [[puppy]],
   name                   = [[Puppy]],
   description            = [[Walking Missile]],
   acceleration           = 0.12,
@@ -38,9 +38,9 @@ unitDef = {
   leaveTracks            = true,
   maneuverleashlength    = [[640]],
   mass                   = 66,
-  maxDamage              = 110,
+  maxDamage              = 60,
   maxSlope               = 36,
-  maxVelocity            = 3.6,
+  maxVelocity            = 3.5,
   maxWaterDepth          = 15,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
@@ -97,7 +97,7 @@ unitDef = {
       damage                  = {
         default = 410,
         planes  = 410,
-        subs    = 15,
+        subs    = 20,
       },
 
       fireStarter             = 70,
@@ -110,7 +110,7 @@ unitDef = {
       lineOfSight             = true,
       model                   = [[puppymissile.s3o]],
       noSelfDamage            = true,
-      range                   = 190,
+      range                   = 120,
       reloadtime              = 1,
       renderType              = 1,
       selfprop                = true,
