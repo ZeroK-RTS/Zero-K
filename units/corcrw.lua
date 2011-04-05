@@ -41,7 +41,7 @@ unitDef = {
   },
 
   defaultmissiontype     = [[VTOL_standby]],
-  explodeAs              = [[SMALL_BUILDING]],
+  explodeAs              = [[BIG_UNIT]],
   floater                = true,
   footprintX             = 4,
   footprintZ             = 4,
@@ -60,7 +60,7 @@ unitDef = {
   objectName             = [[CORCRW]],
   scale                  = [[1]],
   seismicSignature       = 0,
-  selfDestructAs         = [[SMALL_BUILDING]],
+  selfDestructAs         = [[BIG_UNIT]],
 
   sfxtypes               = {
 

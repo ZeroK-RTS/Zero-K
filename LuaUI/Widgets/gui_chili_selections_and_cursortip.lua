@@ -453,7 +453,7 @@ local function GetUnitDesc(unitID, ud)
 	if lang == 'en' then
 		if unitID then
 			local tooltip = spGetUnitTooltip(unitID)
-			if windTooltips[ud.name] then
+			if windTooltips[ud.name] and not Spring.GetUnitRulesParam(unitID,"NotWindmill") then
 				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", Spring.GetGameRulesParam("WindMax") )
 			end
 			return tooltip
@@ -466,7 +466,7 @@ local function GetUnitDesc(unitID, ud)
 		local endesc = ud.tooltip
 		
 		local tooltip = spGetUnitTooltip(unitID):gsub(endesc, desc)
-		if windTooltips[ud.name] then
+		if windTooltips[ud.name] and not Spring.GetUnitRulesParam(unitID,"NotWindmill") then
 			tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", Spring.GetUnitRulesParam(unitID,"minWind")) .. " - " .. Spring.GetGameRulesParam("WindMax")
 		end
 		return tooltip

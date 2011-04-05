@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[armwin]],
-  name                          = [[Wind Generator]],
+  name                          = [[Wind/Tidal Generator]],
   description                   = [[Produces Energy]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
@@ -46,6 +46,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[arm_wind_generator.s3o]],
+  script                        = [[armwin.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   side                          = [[ARM]],

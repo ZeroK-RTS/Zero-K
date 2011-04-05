@@ -70,46 +70,40 @@ end
 
 
 function gadget:GameFrame(n)
-  if (((n+16) % 32) < 0.1) then
-    if (n==48) then
-	  local windMinStr = windMin .. ''
-	  local windMaxStr = windMax .. ''
-      Spring.SendMessage('Wind Range: '.. windMinStr:sub(1,5) ..' - '.. windMaxStr:sub(1,5) ..'. Max Windmill altitude bonus is: ' .. string.format('%.2f',slope)*100 .. '%' )
-    end
-    if (next(windmills)) then
+	if (((n+16) % 32) < 0.1) then
+		if (n==48) then
+			local windMinStr = windMin .. ''
+			local windMaxStr = windMax .. ''
+			Spring.SendMessage('Wind Range: '.. windMinStr:sub(1,5) ..' - '.. windMaxStr:sub(1,5) ..'. Max Windmill altitude bonus is: ' .. string.format('%.2f',slope)*100 .. '%' )
+		end
+		if (next(windmills)) then
       
-	  if step_count > 0 then
-		strength = strength + strength_step
-		step_count = step_count - 1
-	  end	  
-	  local _, _, _, strength2, x, _, z = GetWind()
-      local heading = GetHeadingFromVector(x, z) - 16384
-
-	  local teamEnergy = {}
+			if step_count > 0 then
+				strength = strength + strength_step
+				step_count = step_count - 1
+			end	  
+			local _, _, _, windStrength, x, _, z = GetWind()
+			local windHeading = Spring.GetHeadingFromVector(x,z)/2^15*math.pi+math.pi
+			
+			Spring.SetGameRulesParam("WindHeading", windHeading)
+			Spring.SetGameRulesParam("WindStrength", strength/windMax)
 	  
-      SetUnitCOBValue(next(windmills), 4096, heading)
-      for unitID, entry in pairs(windmills) do
-        local de = (windMax - strength)*entry[1].alt + strength
-        local paralyzed = GetUnitIsStunned(unitID)
-        local speed = 0
-        if (not paralyzed) then
-          local tid = entry[2]
-		  teamEnergy[tid] = (teamEnergy[tid] or 0) + de -- monitor team energy
-		  AddUnitResource(unitID, "e", de)
-          speed = de * COBSCALE 
-        end
-    
-        SetUnitCOBValue(unitID, 1024, speed)
-      end
-	  
-	  for teamID, energy in pairs(teamEnergy) do 
-		SendToUnsynced("SendWindProduction", teamID, energy)   
-	  
-	  end 
-    end
-  end
+			local teamEnergy = {}
+			for unitID, entry in pairs(windmills) do
+				local de = (windMax - strength)*entry[1].alt + strength
+				local paralyzed = GetUnitIsStunned(unitID)
+				if (not paralyzed) then
+					local tid = entry[2]
+					teamEnergy[tid] = (teamEnergy[tid] or 0) + de -- monitor team energy
+					AddUnitResource(unitID, "e", de)
+				end
+			end
+			for teamID, energy in pairs(teamEnergy) do 
+				SendToUnsynced("SendWindProduction", teamID, energy)   
+			end 
+		end
+	end
   
-    
 	if (windMin10 < windMax10) and (((n+16) % (32*30)) < 0.1) then
 		next_strength = rand(windMin10, windMax10) / 10
 		strength_step = (next_strength - strength) * 0.1
@@ -120,35 +114,41 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function SetupUnit(unitID,unitDefID, teamID)
+local function SetupUnit(unitID)
+  if not windMin then
+    gadget:Initialize()
+  end
+  
+  local unitDefID = Spring.GetUnitDefID(unitID)
+  
   local scriptIDs = {}
 
-  local _, y = GetUnitBasePosition(unitID)
-  if (groundMax<=0) then
-    scriptIDs.alt = 0.0
-  else
-    local altitude = (y - groundMin)/groundExtreme
-    scriptIDs.alt = altitude*slope
+  local x, y, z = GetUnitBasePosition(unitID)
+  
+  if Spring.GetGroundHeight(x,z) <= -10 then
+	Spring.SetUnitResourcing(unitID, "cme", 1.2)
+	Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
+	Spring.SetUnitMaxHealth(unitID, 400)
+	Spring.SetUnitCollisionVolumeData(unitID, 56, 46, 54, 0, -14, 0, 0, 1, 0)
+	return false
   end
+  
+  local altitude = (y - groundMin)/groundExtreme
+  scriptIDs.alt = altitude*slope
 
-  local unitDef   = UnitDefs[unitDefID]
+  local unitDef = UnitDefs[unitDefID]
   Spring.SetUnitRulesParam(unitID,"minWind",windMin+(windMax-windMin)*scriptIDs.alt, {inlos = true})
   SetUnitTooltip(unitID, --Spring.GetUnitTooltip(unitID)..
     unitDef.humanName .. " - " .. unitDef.tooltip ..
     " (E " .. round(windMin+(windMax-windMin)*scriptIDs.alt,1) .. "-" .. round(windMax,1) .. ")"
   )
-  windmills[unitID] = {scriptIDs, teamID}
-
-  --// initialize spinning
-  --local _, _, _, strength = GetWind()
-  local de = (windMax - strength)*scriptIDs.alt + strength
-  local paralyzed = GetUnitIsStunned(unitID)
-  local speed = 0
-  if (not paralyzed) then
-    speed = de * COBSCALE * 0.1
-  end
-  SetUnitCOBValue(unitID, 1024, speed)
+  windmills[unitID] = {scriptIDs, Spring.GetUnitTeam(unitID)}
+  
+  return true, windMin+(windMax-windMin)*scriptIDs.alt, windMax - windMin+(windMax-windMin)*scriptIDs.alt
+  
 end
+
+GG.SetupWindmill = SetupUnit
 
 
 function gadget:Initialize()
@@ -169,6 +169,8 @@ function gadget:Initialize()
 
   Spring.SetGameRulesParam("WindMin",windMin)
   Spring.SetGameRulesParam("WindMax",windMax)
+  Spring.SetGameRulesParam("WindHeading", 0)
+  Spring.SetGameRulesParam("WindStrength", 0)
 	
   groundMin, groundMax = Spring.GetGroundExtremes()
   groundMin, groundMax = math.max(groundMin,0), math.max(groundMax,1)
@@ -181,29 +183,33 @@ function gadget:Initialize()
   -- effect between 0% (flat maps) and 100% (mountained maps)
   slope = 1/(1+math.exp(4 - groundExtreme/105))
 
+  --[[
   for _, unitID in ipairs(Spring.GetAllUnits()) do
     local unitDefID = Spring.GetUnitDefID(unitID)
     if (windDefs[unitDefID]) then
       SetupUnit(unitID,unitDefID, Spring.GetUnitTeam(unitID))
     end
-  end
+  end--]]
   strength = windMax
   if windMin10 < windMax10 then
 	strength = rand(windMin10, windMax10) / 10
   end
+  
 end
 
-
+--[[
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   if (windDefs[unitDefID]) then
     SetupUnit(unitID,unitDefID, unitTeam)
   end
 end
-
+--]]
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)
-  if (windDefs[unitDefID]) then 
-    SetupUnit(unitID,unitDefID, unitTeam)
-  end
+	if (windDefs[unitDefID]) then 
+		if windmills[unitID] then
+			windmills[unitID].teamID = unitTeam
+		end
+	end
 end
 
 

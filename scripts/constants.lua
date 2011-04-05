@@ -15,12 +15,14 @@ SFXTYPE_REVERSEWAKE2 = 5
 --SFXTYPE_POINTBASED		256
 --TBD
 
-sfxNone = SFX.NONE
-sfxExplode = SFX.EXPLODE
-sfxShatter = SFX.SHATTER
-sfxFall	  = SFX.FALL
-sfxSmoke   = SFX.SMOKE
-sfxFire    = SFX.FIRE
+sfxNone 		= SFX.NONE
+sfxExplode 		= SFX.EXPLODE
+sfxBitmap 		= SFX.BITMAP_ONLY
+sfxShatter		= SFX.SHATTER
+sfxFall	  		= SFX.FALL
+sfxSmoke   		= SFX.SMOKE
+sfxFire    		= SFX.FIRE
+sfxExplodeOnHit = SFX.EXPLODE_ON_HIT
 
 -- Explosion generators
 UNIT_SFX1 = 1024
