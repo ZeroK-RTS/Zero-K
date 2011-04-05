@@ -135,6 +135,7 @@ local base = {
 		name = "beam",
 		modules = {
 			"commweapon_beamlaser", 
+			"module_personal_shield",
 		}
 	},
 	[3] = {

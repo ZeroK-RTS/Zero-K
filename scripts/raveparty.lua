@@ -12,8 +12,15 @@ for i=1,6 do
 	}
 end
 
+local tau = math.pi*2
+local pi = math.pi
+local hpi = math.pi*0.5
+
 local headingSpeed = math.rad(4)
-local pitchSpeed = math.rad(90)
+local pitchSpeed = math.rad(100)
+
+local spindleOffset = math.rad(60)
+local spindlePitch = 0
 
 guns[5].y = 11
 guns[5].z = 7
@@ -62,7 +69,7 @@ local reloading = false
 
 function script.Create()
 	StartThread(SmokeUnit)
-	Turn(fakespindle, x_axis, math.rad(60))
+	Turn(spindle, x_axis, spindleOffset + spindlePitch)
 	for i=1,6 do
 		Turn(guns[i].flare, x_axis, (math.rad(-60)* i+1))
 	end
@@ -77,14 +84,32 @@ function script.Deactivate()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if weaponNum ~= num then return false end
+	if weaponNum ~= num then 
+		return false 
+	end
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
+	
+	local _,curHead, _ = Spring.UnitScript.GetPieceRotation(turret)
+	local headDiff = heading-curHead
+	if math.abs(headDiff) > pi then
+		headDiff = headDiff - math.abs(headDiff)/headDiff*2*pi
+	end
+	--Spring.Echo(headDiff*180/math.pi)
+	
+	if math.abs(headDiff) > hpi then
+		heading = (heading+pi)%tau
+		pitch = -pitch+pi
+	end
+	spindlePitch = -pitch
+	
 	Turn( turret , y_axis, heading,  headingSpeed)
-	Turn( spindle , x_axis, 0 - pitch, pitchSpeed )
+	Turn( spindle , x_axis, spindlePitch+spindleOffset, pitchSpeed )
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(spindle, x_axis)
-	while reloading do Sleep(30) end
+	while reloading do 
+		Sleep(10) 
+	end
 	return true
 end
 
@@ -97,8 +122,8 @@ function script.QueryWeapon(num)
 end
 
 function gunFire(num)
-	Move( guns[num].barrel , z_axis, guns[num].z , 8*guns[num].zs )
-	Move( guns[num].barrel , y_axis, guns[num].y , 8*guns[num].ys )
+	Move( guns[num].barrel , z_axis, guns[num].z*1.2 , 8*guns[num].zs )
+	Move( guns[num].barrel , y_axis, guns[num].y*1.2 , 8*guns[num].ys )
 	WaitForMove(guns[num].barrel, y_axis)
 	Move( guns[num].barrel , z_axis, 0 , 0.2*guns[num].zs )
 	Move( guns[num].barrel , y_axis, 0 , 0.2*guns[num].ys )
@@ -117,8 +142,7 @@ function script.FireWeapon(num)
 	gunNum = gunNum + 1
 	if gunNum > 6 then gunNum = 1 end
 	Sleep(120)
-	Turn(fakespindle, x_axis, math.rad(60)*(gunNum), math.rad(100))
-	WaitForTurn(fakespindle, x_axis)
+	spindleOffset = math.rad(60)*(gunNum)
 	reloading = false
 	if randomize then
 		weaponNum = math.random(1,6)
