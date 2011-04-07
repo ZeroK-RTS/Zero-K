@@ -397,9 +397,8 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	
 	if spGetUnitRulesParam(unitID, "noammo") == 0 then
-		if (cmdID == CMD_REARM and not cmdOptions.shift) then -- don't allow rearming when already armed
+		if ((cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift) then -- don't allow rearming when already armed
 			return false 
 		end	
 	end
@@ -425,7 +424,6 @@ else
 --------------------------------------------------------------------------------
 -- UNSYNCED
 --------------------------------------------------------------------------------
-
 local airpads = SYNCED.airpads
 
 function gadget:DefaultCommand(type, targetID)
@@ -448,8 +446,7 @@ function gadget:DefaultCommand(type, targetID)
 			end
 		end
 
-		local targetDefID = spGetUnitDefID(targetID)
-		if airpads[unitID] then
+		if airpads[targetID] then
 			return CMD_REARM
 		end
 		return
