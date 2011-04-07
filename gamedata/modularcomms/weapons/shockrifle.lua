@@ -1,6 +1,6 @@
 local name = "commweapon_shockrifle"
 local weaponDef = {
-	name                    = [[Pulsed Particle Projector]],
+	name                    = [[Shock Rifle]],
     areaOfEffect            = 16,
     colormap                = [[0 0 0 0   0 0 0.2 0.2   0 0 0.5 0.5   0 0 0.7 0.7   0 0 1 1   0 0 1 1]],
     craterBoost             = 0,
@@ -27,7 +27,7 @@ local weaponDef = {
     lineOfSight             = true,
     noSelfDamage            = true,
     range                   = 700,
-    reloadtime              = 15,
+    reloadtime              = 12,
     rgbColor                = [[1 0.2 0.2]],
     separation              = 0.5,
     size                    = 5,

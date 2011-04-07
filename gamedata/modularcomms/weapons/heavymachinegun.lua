@@ -1,6 +1,6 @@
 local name = "commweapon_heavymachinegun"
 local weaponDef = { 
-	name                    = [[Pulse Autocannon]],
+	name                    = [[Heavy Machine Gun]],
 	accuracy                = 1024,
 	alphaDecay              = 0.7,
 	areaOfEffect            = 96,

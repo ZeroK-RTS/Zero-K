@@ -1,6 +1,6 @@
 local name = "commweapon_concussion"
 local weaponDef = {
-    name                    = [[Concussion Shot]],
+    name                    = [[Concussion Shell]],
     alphaDecay              = 0.12,
     areaOfEffect            = 160,
     cegTag                  = [[gauss_tag_m]],
