@@ -169,6 +169,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	tab[2] = tab[2] + 1
 end
 
+function SendData(statsData) 
+	Spring.SendCommands("wbynum 255 STATS:".. statsData)
+end 
+
 
 function gadget:GameOver()	
 	if GG.chicken then
@@ -177,12 +181,12 @@ function gadget:GameOver()
 	end
 	for atk, victims in pairs(damages) do
 		for victim, dam in pairs(victims) do
-			Echo("STATS:dmg,"..UnitDefs[atk].name .. ",".. UnitDefs[victim].name .. "," .. dam[1] .. "," .. dam[2])
+			SendData("dmg,"..UnitDefs[atk].name .. ",".. UnitDefs[victim].name .. "," .. dam[1] .. "," .. dam[2])
 		end
 	end
 
 	for unit, counts in pairs(unitCounts) do
-		Echo("STATS:unit,"..UnitDefs[unit].name .. ",".. UnitDefs[unit].metalCost ..",".. counts[1] .. "," .. counts[2] .. "," .. UnitDefs[unit].health)
+		SendData("unit,"..UnitDefs[unit].name .. ",".. UnitDefs[unit].metalCost ..",".. counts[1] .. "," .. counts[2] .. "," .. UnitDefs[unit].health)
 	end
 
 	local teams = Spring.GetTeamList()
@@ -203,7 +207,7 @@ function gadget:GameOver()
 	local allycount = 0
 	for _,_ in pairs(humanAlly) do allycount = allycount + 1 end
 
-	Echo("STATS:teams,"..players .. ",".. allycount)
+	SendData("teams,"..players .. ",".. allycount)
 end
 
 --------------------------------------------------------------------------------
