@@ -176,7 +176,9 @@ end
 --------------------------------------------------------------------------------
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
-	factories[unitID] = {assist = options[UnitDefs[unitDefID].name].value}
+	if factoryDefs[unitDefID] then
+		factories[unitID] = {assist = options[UnitDefs[unitDefID].name].value}
+	end
 end
 
 --function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
