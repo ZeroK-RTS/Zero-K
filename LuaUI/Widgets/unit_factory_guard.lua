@@ -181,9 +181,9 @@ function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 	end
 end
 
---function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
---	widget:UnitCreated( unitID,  unitDefID,  unitTeam)
---end
+function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
+  widget:UnitCreated(unitID, unitDefID, newTeamID)
+end
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam,
                                 factID, factDefID, userOrders)
