@@ -1,14 +1,14 @@
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Chili Cursor Tip 2",
+    name      = "Chili Cursor Tip 3",
     desc      = "v0.102 Chili Cursor Tooltips.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
