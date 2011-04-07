@@ -176,14 +176,12 @@ end
 --------------------------------------------------------------------------------
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
-	if factoryDefs[unitDefID] and unitTeam == spGetMyTeamID() then
-		factories[unitID] = {assist = options[UnitDefs[unitDefID].name].value}
-	end
+	factories[unitID] = {assist = options[UnitDefs[unitDefID].name].value}
 end
 
-function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
-	widget:UnitCreated( unitID,  unitDefID,  unitTeam)
-end
+--function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
+--	widget:UnitCreated( unitID,  unitDefID,  unitTeam)
+--end
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam,
                                 factID, factDefID, userOrders)
