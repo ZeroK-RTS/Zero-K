@@ -134,7 +134,7 @@ confdata.menu_tree = {
 			{'Rotatable Overhead', "viewrot" },
 			{'Total War', "viewtw" },
 			{'Flip the TA Camera', "viewtaflip" },
-	
+			{'Combo Overhead/Free Camera', "luaui togglewidget Combo Overhead/Free Camera (experimental)"},
 		}
 	},
 	
