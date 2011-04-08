@@ -134,6 +134,8 @@ merge(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
 merge(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
 merge(medRangeSkirmieeArray,riotRangeSkirmieeArray)
 merge(longRangeSkirmieeArray,medRangeSkirmieeArray)
+merge(artyRangeSkirmieeArray,longRangeSkirmieeArray)
+
 
 -- Things that are fled by some things
 
