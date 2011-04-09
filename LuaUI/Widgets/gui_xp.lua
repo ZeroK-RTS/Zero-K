@@ -216,6 +216,7 @@ function widget:DrawWorld()
     return -- avoid unnecessary GL calls
   end
 
+  gl.Color(1,1,1,1)
   glDepthMask(true)
   glDepthTest(true)
   glAlphaTest(GL_GREATER, 0.001)
