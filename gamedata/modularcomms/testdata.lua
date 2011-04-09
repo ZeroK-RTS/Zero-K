@@ -134,7 +134,8 @@ local base = {
 	[2] = {
 		name = "beam",
 		modules = {
-			"commweapon_beamlaser", 
+			"commweapon_beamlaser",
+			"commweapon_sunburst",
 			"module_personal_shield",
 		}
 	},
@@ -165,13 +166,15 @@ local base = {
 	[5] = {
 		name = "hmg",
 		modules = {
-			"commweapon_heavymachinegun", 
+			"commweapon_heavymachinegun",
+			"commweapon_disruptorbomb",
 		}
 	},
 	[6] = {
 		name = "shotty",
 		modules = {
 			"commweapon_shotgun", 
+			"commweapon_napalmgrenade",
 		}
 	},
 	[7] = {
