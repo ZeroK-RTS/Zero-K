@@ -323,8 +323,13 @@ for name, data in pairs(commDefs) do
 		array.reclaimtime = data.buildcostmetal * mult
 		array.damage = data.maxdamage
 	end
+	-- set mass
+	data.mass = ((data.buildtime/2 + data.maxdamage/10)^0.55)*9
+	--Spring.Echo("mass " .. (data.mass or "nil") .. " BT/HP " .. (data.buildtime or "nil") .. "  " .. (data.maxdamage or "nil"))
 	-- rez speed
-	if data.canresurrect then data.resurrectspeed = data.workertime * 5/6 end
+	if data.canresurrect then 
+		data.resurrectspeed = data.workertime * 5/6 
+	end
 	-- make sure weapons can hit their max range
 	if data.weapondefs then
 		for name, weaponData in pairs(data.weapondefs) do

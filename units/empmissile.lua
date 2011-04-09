@@ -86,7 +86,6 @@ unitDef = {
 
       damage                  = {
         default        = 30000,
-        commanders     = 3000,
         empresistant75 = 7500,
         empresistant99 = 300,
       },

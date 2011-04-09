@@ -153,8 +153,7 @@ unitDef = {
       damage                  = {
         default    = 10,
         chicken    = 0.001,
-        commanders = 1,
-        planes     = 10,
+  
         subs       = 5,
       },
 

@@ -98,10 +98,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default        = 15000,
-        commanders     = 1200,
-        empresistant75 = 3000,
-        empresistant99 = 120,
+        default        = 8000,
+        empresistant75 = 2000,
+        empresistant99 = 80,
       },
 
       duration                = 8,

@@ -95,7 +95,6 @@ unitDef = {
 
       damage                  = {
         default        = 1500,
-        commanders     = 150,
         empresistant75 = 375,
         empresistant99 = 15,
         planes         = 1500,
