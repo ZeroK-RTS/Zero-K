@@ -217,7 +217,7 @@ echo("Chicken configured for "..playerCount.." players")
 
 burrowSpawnRate = burrowSpawnRate/malus/SetCount(computerTeams)
 gracePeriod = math.max(gracePeriod - gracePenalty*(playerCount - 1), gracePeriodMin)
-waveBonusDecay = waveBonusDecay/playerCount
+--waveBonusDecay = waveBonusDecay/playerCount
 
 local function DisableBuildButtons(unitID, buildNames)
   for _, unitName in ipairs(buildNames) do
