@@ -11,12 +11,14 @@ function gadget:GetInfo()
   }
 end
 
-local testMode = false
+local TESTMODE = false
 
 local spGetAllyTeamList		= Spring.GetAllyTeamList
 local spIsGameOver			= Spring.IsGameOver
 
 local gaiaTeamID			= Spring.GetGaiaTeamID()
+
+local echo = Spring.Echo
 
 local totalTeams = 0
 local totalTeamList = {}
@@ -54,6 +56,7 @@ local reclaimList		= {}
 local terraformList		= {}
 local ouchDamageList	= {}
 local kamDamageList		= {}
+local shareList			= {}
 
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 
@@ -133,7 +136,7 @@ end
 function awardAward(team, awardType, record)
 	awardList[team][awardType] = record
 	
-	if testMode then
+	if TESTMODE then
 		for _,curTeam in pairs(totalTeamList) do
 			if curTeam ~= team then	
 				awardList[curTeam][awardType] = nil
@@ -167,6 +170,7 @@ function gadget:Initialize()
 		terraformList[team] 	= 0
 		ouchDamageList[team]	= 0
 		kamDamageList[team]		= 0
+		shareList[team]			= 0
 		
 		awardList[team] = {}
 		
@@ -202,10 +206,19 @@ end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	-- Units given to neutral?
-	if not spAreTeamsAllied(oldTeam,newTeam) and captureList[newTeam] then
-		local ud = UnitDefs[unitDefID]
-		local mCost = ud and ud.metalCost
-		captureList[newTeam] = captureList[newTeam] + mCost
+	if not spAreTeamsAllied(oldTeam,newTeam) then
+		if captureList[newTeam] then
+			local ud = UnitDefs[unitDefID]
+			local mCost = ud and ud.metalCost
+			captureList[newTeam] = captureList[newTeam] + mCost
+		end
+	else -- teams are allied
+		if shareList[oldTeam] and shareList[newTeam] then
+			local ud = UnitDefs[unitDefID]
+			local mCost = ud and ud.metalCost
+			shareList[oldTeam] = shareList[oldTeam] + mCost
+			shareList[newTeam] = shareList[newTeam] - mCost
+		end
 	end
 end
 
@@ -293,7 +306,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 end
 
 function gadget:GameFrame(n)
-	if testMode then
+	if TESTMODE then
 		local frame32 = (n) % 32
 		if (frame32 < 0.1) then
 			sentAwards = false
@@ -327,6 +340,7 @@ function gadget:GameFrame(n)
 		local ouchTeam, maxOuchDamage 	= getMaxVal(ouchDamageList)
 		
 		local capTeam, 	maxCap	 		= getMaxVal(captureList)
+		local shareTeam, maxShare 		= getMaxVal(shareList)
 		
 		local friendTeam
 		local maxFriendlyDamageRatio = 0
@@ -343,8 +357,9 @@ function gadget:GameFrame(n)
 	
 		
 		--test values
-		if testMode then
+		if TESTMODE then
 			local testteam = 0
+			shareTeam, 	maxShare 			= testteam+0	,144
 			--[[				
 			pwnTeam, 	maxDamage 			= testteam+0	,1
 			navyTeam, 	maxNavyDamage 		= testteam+1	,1
@@ -410,10 +425,15 @@ function gadget:GameFrame(n)
 		if capTeam and maxCap > 1000 then
 			awardAward(capTeam, 'cap', 'Captured value: '.. comma_value(maxCap))
 		end
+		
+		if shareTeam and maxShare > 5000 then
+			awardAward(shareTeam, 'share', 'Shared value: '.. comma_value(maxShare))
+		end
+		
 		if terraTeam and maxTerra > 250 then
 			awardAward(terraTeam, 'terra', 'Terraform: '.. comma_value(maxTerra) .. " spent")
 		end
-		Spring.Echo(maxReclaim, getMeanMetalIncome())
+		--Spring.Echo(maxReclaim, getMeanMetalIncome())
 		if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
 			awardAward(reclaimTeam , 'reclaim', comma_value(maxReclaim) .. "m from wreckage")
 		end
@@ -505,6 +525,7 @@ local awardDescs =
 	emp 	= 'EMP Wizard',
 	t3 		= 'Experimental Engineer',
 	cap 	= 'Capture Award',
+	share 	= 'Share Bear',
 	terra	= 'Legendary Landscaper',
 	reclaim = 'Spoils of War',
 	vet 	= 'Decorated Veteran',
@@ -532,6 +553,9 @@ function gadget:Initialize()
 
 
 	gadgetHandler:AddSyncAction("aw_GameOver", gadget.GameOver)
+	if TESTMODE then
+		gadget:GameOver()
+	end
 end
 
 function gadget:GameOver()
