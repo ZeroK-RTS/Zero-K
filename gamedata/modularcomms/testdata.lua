@@ -188,9 +188,9 @@ local base = {
 		}
 	},
 	[8] = {
-		name = "lightning",
+		name = "heatray",
 		modules = {
-			"commweapon_lightninggun",
+			"commweapon_heatray",
 		}
 	},
 	[9] = {

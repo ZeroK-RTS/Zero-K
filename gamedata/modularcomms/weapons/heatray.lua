@@ -14,11 +14,12 @@ local weaponDef = {
 		rangeperlevel = [[15]],
 		damageperlevel = [[1.5]],
 	},		  
-	  
+	
+	-- nominal DPS is a lie, actual value is over 30% higher
 	damage                  = {
-		default = 30,
-		planes  = 30,
-		subs    = 15,
+		default = 24,
+		planes  = 24,
+		subs    = 1.2,
 	},
 	
 	duration                = 0.3,
