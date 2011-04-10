@@ -321,9 +321,9 @@ upgrades = {
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 25 HP/s",
+		description = "Self-repairs 20 HP/s",
 		func = function(unitDef)
-				unitDef.autoheal = (unitDef.autoheal or 0) + 25
+				unitDef.autoheal = (unitDef.autoheal or 0) + 20
 			end,
 	},
 	module_dmg_booster = {
