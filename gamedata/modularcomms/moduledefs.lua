@@ -283,10 +283,10 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_heatray" then
-						v.range = v.range * 1.5
+						v.range = v.range * 1.4
 						v.customparams.baserange = tostring(v.range)
 					elseif i == "commweapon_riotcannon" or i == "commweapon_heavymachinegun" then
-						v.range = v.range * 1.25
+						v.range = v.range * 1.4
 						v.customparams.baserange = tostring(v.range)
 					end
 				end
