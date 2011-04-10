@@ -14,13 +14,13 @@ local weaponDef = {
 		--timeslow_preset = [[commrecon_slowbeam]],
 		rangeperlevel = [[25]],
 		damageperlevel = [[6]],
-		timeslow_damagefactor = [[3.75]],
+		timeslow_damagefactor = [[1]],
 		timeslow_onlyslow = [[1]],
 		timeslow_smartretarget = [[0.5]],
     },
 
     damage                  = {
-		default = 120,
+		default = 450,
     },
 
     explosionGenerator      = [[custom:flash2purple]],

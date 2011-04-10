@@ -278,15 +278,15 @@ upgrades = {
 	},
 	weaponmod_plasma_containment = {
 		name = "Plasma Containment Field",
-		description = "Heat Ray: +50% range; Heavy Machine Gun/Riot Cannon: +25% range",
+		description = "Heat Ray/Heavy Machine Gun/Riot Cannon: +30% range",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_heatray" then
-						v.range = v.range * 1.4
+						v.range = v.range * 1.3
 						v.customparams.baserange = tostring(v.range)
 					elseif i == "commweapon_riotcannon" or i == "commweapon_heavymachinegun" then
-						v.range = v.range * 1.4
+						v.range = v.range * 1.3
 						v.customparams.baserange = tostring(v.range)
 					end
 				end

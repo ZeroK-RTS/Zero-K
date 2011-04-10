@@ -283,11 +283,14 @@ local function MakeButton(container, cmd, insertItem)
 	else 
 		tooltip = cmd.tooltip
 	end
-	
-	if hotkey ~= '' then
-		tooltip = tooltip .. ' (\255\0\255\0' .. hotkey .. '\008)'
+	if isBuild then
+		local ud = UnitDefs[-cmd.id]
+		tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"	-- for special options
 	end
 	
+	if hotkey ~= '' then
+		tooltip = tooltip .. ' (\255\0\255\0' .. hotkey .. '\008)'	
+	end
 	
 	-- get cached menu item 
 	local item = commandButtons[cmd.id]
