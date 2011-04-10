@@ -18,18 +18,14 @@ VFS.Include("LuaRules/Utilities/base64.lua")
 --
 --	Comms are later assigned to players in start_unit_setup.lua.
 --
---	TODO:
---		Figure out how modstats should handle procedurally generated comms
---			* Teach gadget to treat them as baseline comms
---
 --------------------------------------------------------------------------------
 --	PROPOSED SPECS FOR TEMPLATE UNITDEFS
 --	Weapon 1: fake laser
---	Weapon 2: shield
+--	Weapon 2: area shield
 --	Weapon 3: special weapon (uses CEG 3 and 4)
---	Weapon 4: main weapon (no CEG) --> change to something else, such as second shield
+--	Weapon 4: personal shield
 --	Weapon 5: main weapon (uses CEG 1 and 2)
---	Weapon 6: flamethrower only?
+--	Weapon 6: unused
 --------------------------------------------------------------------------------
 
 -- just some comm cloning stuff (to avoid having to maintain multiple unitdefs)

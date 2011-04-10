@@ -174,6 +174,7 @@ local base = {
 		name = "shotty",
 		modules = {
 			"commweapon_shotgun", 
+			"weaponmod_autoflechette",
 			"commweapon_napalmgrenade",
 		}
 	},

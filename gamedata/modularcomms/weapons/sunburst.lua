@@ -1,7 +1,7 @@
 local name = "commweapon_sunburst"
 local weaponDef = {
     name                    = [[Sunburst Cannon]],
-    areaOfEffect            = 128,
+    areaOfEffect            = 32,
     avoidFriendly           = true,
     commandfire             = true,
     craterBoost             = 1,
@@ -17,6 +17,7 @@ local weaponDef = {
     },
 
     explosionGenerator      = [[custom:blue_explosion]],
+	impactOnly				= true,
     impulseBoost            = 0,
     impulseFactor           = 0.2,
     interceptedByShieldType = 1,

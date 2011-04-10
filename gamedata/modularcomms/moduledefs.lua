@@ -132,15 +132,15 @@ upgrades = {
 	
 	-- weapon mods
 	weaponmod_autoflechette = {
-		name = "Autoflechette Mod",
-		description = "Shotgun: -25% projectiles, -50% reload time",
+		name = "Autoflechette",
+		description = "Shotgun: -25% projectiles, -40% reload time",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					if i == "commweapon_shotgun" then
 						v.customparams.misceffect = nil
 						v.projectiles = 9
-						v.reloadtime = v.reloadtime * 0.5
+						v.reloadtime = v.reloadtime * 0.6
 						v.customparams.basereload = v.reloadtime
 						--break
 					end
@@ -403,13 +403,6 @@ upgrades = {
 				unitDef.customparams.cloakshield_preset = "module_cloakfield"
 			end,
 	},
-	module_repair_field = {
-		name = "Repair Field",
-		description = "Passively repairs all friendly units within 450 m",
-		func = function(unitDef)
-				unitDef.customparams.repairaura_preset = "module_repairfield"
-			end,
-	},
 	module_jammer = {
 		name = "Radar Jammer",
 		description = "Masks radar signals of all units within 500 m",
@@ -435,6 +428,13 @@ upgrades = {
 		description = "Increases sight distance by 100 m",
 		func = function(unitDef)
 				unitDef.sightdistance = unitDef.sightdistance + 100
+			end,
+	},
+	module_repair_field = {
+		name = "Repair Field",
+		description = "Passively repairs all friendly units within 450 m",
+		func = function(unitDef)
+				unitDef.customparams.repairaura_preset = "module_repairfield"
 			end,
 	},
 }
