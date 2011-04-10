@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.031 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.032 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1297,7 +1297,9 @@ local function UpdateBuildpic( ud, globalitem_name, unitID )
 				if (button==2) then
 					--button2 (middle)
 					local x,y,z = Spring.GetUnitPosition( unitID )
-					Spring.SetCameraTarget(x,y,z, 1)
+					if x then
+						Spring.SetCameraTarget(x,y,z, 1)
+					end
 				end
 			end}
 		end
