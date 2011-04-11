@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Context Menu",
-    desc      = "v0.081 Chili Context Menu\nPress [Space] while clicking for a context menu.",
+    desc      = "v0.082 Chili Context Menu\nPress [Space] while clicking for a context menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -466,7 +466,9 @@ local function printunitinfo(ud, lang, buttonWidth)
 	local stack_stats = Grid:New{
 		columns=2,
 		autoArrangeV  = false,
+		--height = (#statschildren/2)*statschildren[1].height,
 		height = (#statschildren/2)*15,
+		
 		width = '100%',
 		children = statschildren,
 		y = 1,
@@ -484,7 +486,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 		right = 60,
 		x = 1,
 		--width = 200,
-		height = '100%',
+		--height = '100%',
+		autosize=true,
 		resizeItems = false,
 		children = { helptextbox, stack_stats, },
 	}
@@ -499,7 +502,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 				padding = {1,1,1,1},
 				itemPadding = {1,1,1,1},
 				itemMargin = {1,1,1,1},
-				height = 400 ,
+				--height = 400 ,
+				autosize=true,
 				y = 1,
 				width = '100%',
 				children = { helptext_stack, stack_icons, },
