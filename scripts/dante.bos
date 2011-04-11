@@ -1,3 +1,5 @@
+//linear constant 163840
+
 #include "constants.h"
 
 piece  base, pelvis, torso, tail, flagellum, ruparm, rarm, rshield,
@@ -12,6 +14,7 @@ aimer, gun1, gun2, dead, reloading;
 #define SIG_AIM_2			4
 #define SIG_AIM_3			8
 #define SIG_AIM_4			16
+#define SIG_RESTORE			32
 #define RELOADTIME			20000
 #define SALVO_TIME			2000
 //#define SIG_AIM_4			//16 //repair?
@@ -27,6 +30,8 @@ lua_FlameShot(weapon) //flame effect
 
 RestoreAfterDelay()
 {
+	signal SIG_RESTORE;
+	set-signal-mask SIG_RESTORE;
 	sleep 8000;
 	//torso	
 	if (dead ==0)

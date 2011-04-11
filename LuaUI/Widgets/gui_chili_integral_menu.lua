@@ -283,7 +283,7 @@ local function MakeButton(container, cmd, insertItem)
 	else 
 		tooltip = cmd.tooltip
 	end
-	if isBuild then
+	if isBuild and selectedFac then
 		local ud = UnitDefs[-cmd.id]
 		tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"	-- for special options
 	end

@@ -153,9 +153,9 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 end
 
 -- blocks command - prevent widget hax
-function gadget:AllowCommand(unitID, unitDefID, team, cmdID)
+function gadget:AllowCommand(unitID, unitDefID, team, cmdID, cmdParams, cmdOpts)
 	if unlockUnitsMap[-cmdID] then
-		if not (unlocks[team] and unlocks[team][-cmdID]) then 
+		if not (unlocks[team] and unlocks[team][-cmdID]) and (not cmdOpts.right) then 
 			return false
 		end
 	end
