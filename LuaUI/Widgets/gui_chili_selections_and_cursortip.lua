@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.032 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.04 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -844,21 +844,26 @@ local function SetHealthbars()
 		then 
 		return 'err' 
 	end
+	local tt_healthbar_stack, tt_healthbar
 	
 	local health, maxhealth
 	if tt_unitID then
 		health, maxhealth = spGetUnitHealth(tt_unitID)
-		tt_healthbar = globalitems.hp_unit
+		--tt_healthbar = globalitems.hp_unit
+		tt_healthbar = globalitems.hp_unit:GetChildByName('bar')
 		SetHealthbar(tt_healthbar,health, maxhealth)
 	elseif tt_fid then
 		health, maxhealth = Spring.GetFeatureHealth(tt_fid)
-		tt_healthbar = tt_ud and globalitems.hp_corpse or globalitems.hp_feature
+		--tt_healthbar = tt_ud and globalitems.hp_corpse or globalitems.hp_feature
+		tt_healthbar_stack = tt_ud and globalitems.hp_corpse or globalitems.hp_feature
+		tt_healthbar = tt_healthbar_stack:GetChildByName('bar')
 		SetHealthbar(tt_healthbar,health, maxhealth)
 	end
 	
 	if stt_unitID then
 		health, maxhealth = spGetUnitHealth(stt_unitID)
-		tt_healthbar = globalitems.hp_selunit
+		--tt_healthbar = globalitems.hp_selunit
+		tt_healthbar = globalitems.hp_selunit:GetChildByName('bar')
 		SetHealthbar(tt_healthbar,health, maxhealth)
 	end
 end
@@ -938,6 +943,7 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 			color_e = {1,0,0,1}
 		end
 	end
+	local displayPlusMinus = tooltip_type ~= 'feature' and tooltip_type ~= 'corpse' 
 	
 	if globalitems[resource_tt_name] then
 		local metalcontrol 	= globalitems[resource_tt_name]:GetChildByName('metal')
@@ -946,13 +952,13 @@ local function UpdateResourceStack(tooltip_type, unitID, ud, tooltip)
 		metalcontrol.font:SetColor(color_m)
 		energycontrol.font:SetColor(color_e)
 		
-		metalcontrol:SetCaption( numformat(metal, true) )
-		energycontrol:SetCaption( numformat(energy, true) )
+		metalcontrol:SetCaption( numformat(metal, displayPlusMinus) )
+		energycontrol:SetCaption( numformat(energy, displayPlusMinus) )
 		return
 	end
 	
-	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal, true), autosize=true, fontSize=ttFontSize, valign='center' }
-	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy, true), autosize=true, fontSize=ttFontSize, valign='center'  }
+	local lbl_metal2 = Label:New{ name='metal', caption = numformat(metal, displayPlusMinus), autosize=true, fontSize=ttFontSize, valign='center' }
+	local lbl_energy2 = Label:New{ name='energy', caption = numformat(energy, displayPlusMinus), autosize=true, fontSize=ttFontSize, valign='center'  }
 	
 	local lbl_empty = Label:New{ name='blank', caption = '  ', autosize=true, fontSize=ttFontSize, valign='center'  }
 	
@@ -1121,7 +1127,18 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 				local width = (leftbar and 50 or 230) - rightmargin
 				
 				--controls[ttname][item.name] = Label:New{ autosize=false, name=item.name, caption = itemtext, fontSize=curFontSize, valign='center', height=icon_size+5, width = width }
-				controls[ttname][item.name] = Label:New{ fontShadow=true, defaultHeight=0, autosize=true, name=item.name, caption = itemtext, fontSize=curFontSize, valign='center', height=icon_size+5, x=icon_size+5, right=1,}
+				controls[ttname][item.name] = Label:New{
+					fontShadow=true,
+					defaultHeight=0,
+					autosize=false,
+					name=item.name,
+					caption = itemtext,
+					fontSize=curFontSize,
+					valign='center',
+					height=icon_size+5,
+					x=icon_size+5,
+					right=1,
+				}
 				stack_children[#stack_children+1] = controls[ttname][item.name]
 			end
 			
@@ -1237,7 +1254,7 @@ local function BuildTooltip2(ttname, ttdata, sel)
 			y = 0,
 			orientation='vertical',
 			centerItems = false,
-			width = 240,
+			width = 220,
 			padding = {0,0,0,0},
 			itemPadding = {1,0,0,0},
 			itemMargin = {0,0,0,0},
@@ -1379,7 +1396,7 @@ local function MakeToolTip_Unit(data, tooltip)
 			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0') },
 		},
 		main = {
-			{ name='uname', icon = iconPath, text = fullname .. ' (' .. teamColor .. playerName .. white ..')', fontSize=2, },
+			{ name='uname', icon = iconPath, text = fullname .. '\n(' .. teamColor .. playerName .. white ..')', fontSize=2, },
 			{ name='utt', text = unittooltip, wrap=true },
 			{ name='hp', directcontrol = 'hp_unit', },
 			{ name='res', directcontrol = 'resources_unit' },
@@ -1503,6 +1520,7 @@ end
 
 
 local function CreateHpBar(name)
+	--[[
 	globalitems[name] = Progressbar:New {
 		name = name,
 		width = '100%',
@@ -1518,9 +1536,41 @@ local function CreateHpBar(name)
 			Image:New{file='LuaUI/images/commands/bold/health.png',height= icon_size,width= icon_size,  x=0,y=0},
 		},
 	}
+	--]]
+	globalitems[name] = Panel:New {
+		orientation='horizontal',
+		name = name,
+		width = '100%',
+		height = icon_size+2,
+		itemMargin    = {0,0,0,0},
+		itemPadding   = {0,0,0,0},	
+		padding = {0,0,0,0},
+		backgroundColor = {0,0,0,0},
+		
+		children = {
+			Image:New{file='LuaUI/images/commands/bold/health.png',height= icon_size,width= icon_size,  x=0,y=0},
+			Progressbar:New {
+				name = 'bar',
+				x=icon_size,
+				right=0,
+				--width = '100%',
+				height = icon_size+2,
+				itemMargin    = {0,0,0,0},
+				itemPadding   = {0,0,0,0},	
+				padding = {0,0,0,0},
+				color = {0,1,0,1},
+				max=1,
+				caption = 'a',
+			},
+
+			
+		},
+	}
+	
 end
 
 local function CreateBpBar(name)
+	--[[
 	globalitems[name] = Progressbar:New {
 		name = name,
 		width = '100%',
@@ -1534,6 +1584,36 @@ local function CreateBpBar(name)
 
 		children = {
 			Image:New{file='LuaUI/Images/commands/Bold/buildsmall.png',height= icon_size,width= icon_size,  x=0,y=0},
+		},
+	}
+	--]]
+	globalitems[name] = Panel:New {
+		orientation='horizontal',
+		name = name,
+		width = '100%',
+		height = icon_size+2,
+		itemMargin    = {0,0,0,0},
+		itemPadding   = {0,0,0,0},	
+		padding = {0,0,0,0},
+		backgroundColor = {0,0,0,0},
+		
+		children = {
+			Image:New{file='LuaUI/Images/commands/Bold/buildsmall.png',height= icon_size,width= icon_size,  x=0,y=0},
+			Progressbar:New {
+				name = 'bar',
+				x=icon_size,
+				right=0,
+				--width = '100%',
+				height = icon_size+2,
+				itemMargin    = {0,0,0,0},
+				itemPadding   = {0,0,0,0},	
+				padding = {0,0,0,0},
+				color = {0.8,0.8,0.2,1};
+				max=1,
+				caption = 'a',
+			},
+
+			
 		},
 	}
 end
@@ -1702,7 +1782,8 @@ function widget:Update(dt)
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
 			UpdateResourceStack( 'selunit', stt_unitID, stt_ud, tooltip )
 			
-			local nanobar = globalitems['bp_selunit']
+			local nanobar_stack = globalitems['bp_selunit']
+			local nanobar = nanobar_stack:GetChildByName('bar')
 			if (nanobar) then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(stt_unitID)
 			
@@ -1788,7 +1869,7 @@ function widget:Initialize()
 		name   = 'unitinfo2';
 		x      = 0;
 		bottom = 200;
-		clientHeight = 120;
+		clientHeight = 130;
 		clientWidth  = 460;
 		dockable = true,
 		--autosize    = true;
