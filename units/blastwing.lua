@@ -40,7 +40,7 @@ unitDef = {
 
   defaultmissiontype     = [[VTOL_standby]],
   explodeAs              = [[BLASTWING_EXPLOSION]],
-  fireState              = 0,
+  --fireState              = 0,
   floater                = true,
   footprintX             = 2,
   footprintZ             = 2,
