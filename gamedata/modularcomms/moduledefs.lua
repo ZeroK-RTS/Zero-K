@@ -321,9 +321,10 @@ upgrades = {
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 20 HP/s",
+		description = "Self-repairs 25 HP/s when out of combat",
 		func = function(unitDef)
-				unitDef.autoheal = (unitDef.autoheal or 0) + 20
+				unitDef.idleautoheal = (unitDef.idleautoheal or 0) + 25
+				unitDef.idletime = 150
 			end,
 	},
 	module_dmg_booster = {

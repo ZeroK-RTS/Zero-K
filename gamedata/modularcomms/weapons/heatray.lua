@@ -17,9 +17,9 @@ local weaponDef = {
 	
 	-- nominal DPS is a lie, actual value is over 30% higher
 	damage                  = {
-		default = 24,
-		planes  = 24,
-		subs    = 1.2,
+		default = 25,
+		planes  = 25,
+		subs    = 1.25,
 	},
 	
 	duration                = 0.3,

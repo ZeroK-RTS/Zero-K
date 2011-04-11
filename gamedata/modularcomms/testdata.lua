@@ -120,7 +120,7 @@ local base = {
 		name = "rocket",
 		modules = {
 			"commweapon_rocketlauncher", 
-			"commweapon_heatray",
+			"commweapon_rocktlauncher",
 			"weaponmod_standoff_rocket", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
@@ -154,7 +154,7 @@ local base = {
 		modules = {
 			"conversion_partillery", 
 			"commweapon_riotcannon", 
-			"commweapon_shotgun", 
+			"commweapon_concussion", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
@@ -168,6 +168,14 @@ local base = {
 		modules = {
 			"commweapon_heavymachinegun",
 			"commweapon_disruptorbomb",
+			"module_autorepair",
+			"module_autorepair",
+			"module_autorepair",
+			"module_autorepair",
+			"module_autorepair",
+			"module_autorepair",
+			"module_autorepair",
+			"module_autorepair",
 		}
 	},
 	[6] = {
@@ -238,7 +246,7 @@ end
 
 return ret
 
--- just some stuff
+-- deprecated stuff
 
 --[[
 
