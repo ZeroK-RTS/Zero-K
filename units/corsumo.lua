@@ -81,7 +81,13 @@ unitDef = {
   workerTime          = 0,
 
   weapons             = {
-
+  
+    {
+      def                = [[FAKELASER]],
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 30,
+    },  
+  
     {
       def                = [[HEATRAY]],
       badTargetCategory  = [[FIXEDWING]],
@@ -90,7 +96,6 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
     {
       def                = [[HEATRAY]],
       badTargetCategory  = [[FIXEDWING]],
@@ -99,7 +104,6 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
     {
       def                = [[LANDING]],
       badTargetCategory  = [[]],
@@ -107,12 +111,56 @@ unitDef = {
       maxAngleDif        = 0,
       onlyTargetCategory = [[]],
     },
-
   },
 
 
   weaponDefs          = {
+  
+    FAKELASER     = {
+      name                    = [[Fake Laser]],
+      areaOfEffect            = 12,
+      beamlaser               = 1,
+      beamTime                = 0.1,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
 
+      damage                  = {
+        default = 0,
+        subs    = 0,
+      },
+
+      duration                = 0.11,
+      edgeEffectiveness       = 0.99,
+      explosionGenerator      = [[custom:flash1green]],
+      fireStarter             = 70,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 5.53,
+      lineOfSight             = true,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 300,
+      reloadtime              = 0.11,
+      renderType              = 0,
+      rgbColor                = [[0 1 0]],
+      soundStart              = [[weapon/laser/laser_burn5]],
+      soundTrigger            = true,
+      targetMoveError         = 0.05,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 5.53,
+      tolerance               = 10000,
+      turret                  = false,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 900,
+    },
+	
     HEATRAY = {
       name                    = [[Heat Ray]],
       accuracy                = 512,
@@ -186,7 +234,7 @@ unitDef = {
       soundStart              = [[krog_stomp]],
       soundStartVolume        = 3,
       startsmoke              = [[1]],
-      turret                  = true,
+      turret                  = false,
       weaponType              = [[Cannon]],
       weaponVelocity          = 5,
     },

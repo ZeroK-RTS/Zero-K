@@ -50,6 +50,13 @@ local rb_foot = piece "rb_foot"
 
 local smokePieces = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
 
+local weaponPieces = {
+	[1] = {turret = b_eye, sleeve = b_eye, flare = b_eye},
+	[2] = {turret = l_turret, sleeve = l_pivot, flare = l_barrel},
+	[3] = {turret = r_turret, sleeve = r_pivot, flare = r_barrel},
+	[4] = {turret = b_eye, sleeve = b_eye, flare = b_eye}
+}
+
 --constants
 local sp1 = 1.2
 local sp2 = 1
@@ -67,16 +74,15 @@ local drop = .8
 
 local dirtfling = 1024
 local muzzle_flash = 1025
-local crater = 4098
+local crater = 4099
 
 --variables
 
 --signals
 local walk = 2
-local aim  = 4
+local SIG_Aim = { [2] = 4, [3] = 8 }
 
 local function Walk()
-
 	SetSignalMask( walk )
 	
 	Turn( lf_pump, x_axis, -p_angle, 1.4 )
@@ -212,7 +218,6 @@ end
 
 -- Jumping
 function preJump(turn,distance)
-
 	local radians = turn*2*math.pi/2^16
 	local x = math.cos(radians)
 	local z = -math.sin(radians)
@@ -300,7 +305,6 @@ function jumping()
 end
 
 function halfJump()
-	
 	Turn( lf_thigh, x_axis, 0, 2 )
 	Turn( rf_thigh, x_axis, 0, 2 )
 	Turn( lb_thigh, x_axis, 0, 2 )
@@ -320,7 +324,6 @@ end
 
 
 function endJump()
-	
 	EmitSfx( b_dome, crater )
 	
 	EmitSfx( rf_foot, dirtfling )
@@ -346,7 +349,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-
 	Signal( walk )
 	StartThread( RAD )
 	Move( t_dome, y_axis, 0, 10 )
@@ -390,39 +392,26 @@ function script.StopMoving()
 	Turn( rb_foot, x_axis, 0, sp1 )
 end
 
-function script.QueryWeapon1() return l_barrel end
+function script.QueryWeapon(num) 
+	return weaponPieces[num].flare
+end
 
-function script.AimFromWeapon1() return l_turret end
+function script.AimFromWeapon(num) return weaponPieces[num].turret end
 
-function script.AimWeapon1( heading, pitch )
-	Signal( aim )
-	SetSignalMask( aim )
-	Turn( l_turret, y_axis, heading, 5 )
-	Turn( l_pivot,  x_axis, math.sin(heading) * .1/math.sin(pitch), 10 ) 
-	-- if someone could make this better, please do :)
+function script.AimWeapon(num, heading, pitch )
+	Signal( SIG_Aim[num] )
+	SetSignalMask( SIG_Aim[num])
+	Turn( weaponPieces[num].turret, y_axis, heading, 5 )
+	Turn( weaponPieces[num].sleeve,  x_axis, pitch, 10 ) 
 	return true
 end
 
-function script.FireWeapon1()
-	--effects
-	EmitSfx( l_barrel, muzzle_flash )
+function script.BlockShot(num)
+	return num == 1	-- don't allow weapon 1 to fire
 end
 
-function script.QueryWeapon2() return r_barrel end
-
-function script.AimFromWeapon2() return r_turret end
-
-function script.AimWeapon2( heading, pitch )
-	Signal( aim )
-	SetSignalMask( aim )
-	Turn( r_turret, y_axis, heading, 5 )
-	Turn( r_pivot,  x_axis, math.sin(heading) * -.1/math.sin(pitch), 10 )
-	return true
-end
-
-function script.FireWeapon2()
-	--effects
-	EmitSfx( r_barrel, muzzle_flash )
+function script.FireWeapon(num)
+	EmitSfx( weaponPieces[num].flare, muzzle_flash )
 end
 
 function script.Killed(recentDamage, maxHealth)
