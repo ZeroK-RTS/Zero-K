@@ -441,6 +441,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 
   if not morphDef.combatMorph then 
 	Spring.SetUnitHealth(unitID, { paralyze = 1.0e9 })    --// turns mexes and mm off (paralyze the unit)
+	Spring.SetUnitRulesParam(unitID, "morphing", 1)
 	Spring.SetUnitResourcing(unitID,"e",0)                --// turns solars off
 	Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { 0 }, { "alt" }) --// turns radars/jammers off
   end
@@ -467,6 +468,7 @@ local function StopMorph(unitID, morphData)
   morphUnits[unitID] = nil
 
   Spring.SetUnitHealth(unitID, { paralyze = -1})
+  Spring.SetUnitRulesParam(unitID, "morphing", 0)
   local scale = morphData.progress * stopPenalty
   local unitDefID = Spring.GetUnitDefID(unitID)
 
@@ -497,6 +499,8 @@ local function FinishMorph(unitID, morphData)
   morphUnits[unitID] = nil
 
   local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(unitID)
+  local oldParaDamage = Spring.GetUnitRulesParam(unitID, "paralysis")
+  
   local isBeingBuilt = false
   if buildProgress < 1 then
     isBeingBuilt = true
@@ -604,14 +608,21 @@ local function FinishMorph(unitID, morphData)
   local _,newMaxHealth         = Spring.GetUnitHealth(newUnit)
   local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
   local hpercent = newHealth/newMaxHealth
-  if newHealth<=1 then newHealth = 1 end
-
+  if newHealth<=1 then 
+    newHealth = 1 
+  end
+  
   -- prevent conflict with rezz gadget
   if hpercent > 0.045 and hpercent < 0.055 then
     newHealth = newMaxHealth * 0.056 + 1
   end
 
   Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress})
+  if oldParaDamage then
+    local newParaDamage = (oldParaDamage - Spring.GetGameFrame())/1200*oldHealth -- DECAY_FRAMES
+	GG.addParalysisDamageToUnit(newUnit, newParaDamage, false)
+  end
+  
 
   --// copy shield power
   local enabled,oldShieldState = Spring.GetUnitShieldState(unitID)
