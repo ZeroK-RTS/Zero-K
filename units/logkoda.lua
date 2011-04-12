@@ -74,7 +74,7 @@ unitDef = {
   weaponDefs          = {
 
     NAPALM_BOMBLET = {
-      name                    = [[Flame Bomblets]],
+      name                    = [[Flame Bomb]],
       areaOfEffect            = 64,
       craterBoost             = 0,
       craterMult              = 0,

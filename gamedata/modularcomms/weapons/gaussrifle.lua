@@ -5,7 +5,7 @@ local weaponDef = {
     areaOfEffect            = 16,
     bouncerebound           = 0.15,
     bounceslip              = 1,
-    cegTag                  = [[gauss_tag_l]],
+    cegTag                  = [[gauss_tag_m]],
     craterBoost             = 0,
     craterMult              = 0,
 
@@ -17,12 +17,12 @@ local weaponDef = {
 	},
 	
     damage                  = {
-		default = 90,
-		planes  = 90,
-		subs    = 4.5,
+		default = 135,
+		planes  = 135,
+		subs    = 67.5,
     },
 
-    explosionGenerator      = [[custom:gauss_hit_l]],
+    explosionGenerator      = [[custom:gauss_hit_m]],
     groundbounce            = 1,
     impactOnly              = true,
     impulseBoost            = 0,
@@ -46,7 +46,7 @@ local weaponDef = {
     turret                  = true,
     waterbounce             = 1,
     weaponType              = [[Cannon]],
-    weaponVelocity          = 1000,
+    weaponVelocity          = 2200,
 }
 
 return name, weaponDef

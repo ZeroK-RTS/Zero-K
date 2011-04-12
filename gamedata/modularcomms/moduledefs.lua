@@ -253,25 +253,41 @@ upgrades = {
 				}
 				for i,v in pairs(weapons) do
 					if permitted[i] then
-						if not (i == "commweapon_rocketlauncher") then	-- -25% damage
+						if (i == "commweapon_riotcannon") then	-- -20% damage
+							for armorname, dmg in pairs(v.damage) do
+								v.damage[armorname] = dmg * 0.8
+								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+							end
+							v.customparams.burntime = "420"
+							v.rgbcolor = [[1 0.3 0.1]]
+						elseif (i == "commweapon_partillery") then	-- -90% damage, 256 AoE, firewalker effect
+							for armorname, dmg in pairs(v.damage) do
+								v.damage[armorname] = dmg * 0.1
+								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+							end
+							v.customparams.areadamage_preset = [[module_napalmgrenade]]
+							v.customparams.burntime = "180"
+							v.explosiongenerator = [[custom:firewalkernapalm]]
+							v.soundhit = [[weapon/cannon/wolverine_hit]]
+							v.size = 8
+							v.areaofeffect = 256
+							v.rgbcolor = [[1 0.5 0.2]]
+							v.firestarter = 120
+						else	-- -25% damage, 128 AoE
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 0.75
 								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
-								v.customparams.burntime = "360"
 							end
-							v.rgbcolor = [[1 0.3 0.1]]
-						else	-- -33% damage, 128 AoE
-							for armorname, dmg in pairs(v.damage) do
-								v.damage[armorname] = dmg * 2/3
-								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
-								v.customparams.burntime = "450"
-							end
+							v.customparams.burntime = "450"
 							v.areaofeffect = 128
 						end
-						v.explosiongenerator = [[custom:NAPALM_Expl]]
+						
+						if (i ~= "commweapon_partillery") then
+							v.explosiongenerator = [[custom:NAPALM_Expl]]
+							v.customparams.burnchance = "1"
+							v.soundhit = [[weapon/burn_mixed]]
+						end
 						v.customparams.setunitsonfire = "1"
-						v.customparams.burnchance = "1"
-						v.soundhit = [[weapon/burn_mixed]]
 					end
 				end
 			end,		

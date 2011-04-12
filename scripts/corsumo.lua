@@ -407,7 +407,7 @@ function script.AimWeapon(num, heading, pitch )
 end
 
 function script.BlockShot(num)
-	return num == 1	-- don't allow weapon 1 to fire
+	return (num == 1) or (num == 4)	-- don't allow weapon 1 or 4 to fire
 end
 
 function script.FireWeapon(num)

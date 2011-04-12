@@ -160,7 +160,8 @@ local base = {
 			"module_adv_targeting", 
 			"module_adv_targeting", 
 			"module_adv_targeting", 
-			"module_adv_targeting"
+			"module_adv_targeting",
+			"weaponmod_napalm_warhead"
 		}
 	},
 	[5] = {

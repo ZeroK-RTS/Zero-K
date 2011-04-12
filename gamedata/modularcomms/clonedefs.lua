@@ -9,13 +9,13 @@ local copy = {
 		armcom3 = {
 			level = 3,
 			mainstats = {maxdamage = 4000, objectname = "armcom3.3do",
-				explodeas = "atomic_blastsml", selfdas = "atomic_blastsml"},
+				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {rangebonus = "0.1"},
 		},
 		armcom4 = {
 			level = 4,
 			mainstats = {maxdamage = 6000, objectname = "armcom4.3do",
-				explodeas = "atomic_blastsml", selfdas = "atomic_blastsml"},
+				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {rangebonus = "0.2"},
 		},
 	},
@@ -28,13 +28,13 @@ local copy = {
 		corcom3 = {
 			level = 3,
 			mainstats = {maxdamage = 5000, objectname = "corcom3.s3o",
-				explodeas = "atomic_blastsml", selfdas = "atomic_blastsml"},
+				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {damagebonus = "0.2"},
 		},
 		corcom4 = {
 			level = 4,
 			mainstats = {maxdamage = 7200, objectname = "corcom4.s3o",
-				explodeas = "atomic_blastsml", selfdas = "atomic_blastsml"},
+				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {damagebonus = "0.3"},
 		},
 	},
@@ -47,13 +47,13 @@ local copy = {
 		commrecon3 = {
 			level = 3,
 			mainstats = {maxdamage = 3600, objectname = "commrecon3.s3o",
-				explodeas = "atomic_blastsml", selfdas = "atomic_blastsml"},
+				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {speedbonus = "0.15"},
 		},
 		commrecon4 = {
 			level = 4,
 			mainstats = {maxdamage = 5000, objectname = "commrecon4.s3o",
-				explodeas = "atomic_blastsml", selfdas = "atomic_blastsml"},
+				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {speedbonus = "0.3"},
 		},
 	},
@@ -66,13 +66,13 @@ local copy = {
 		commsupport3 = {
 			level = 3,
 			mainstats = {maxdamage = 3200, workertime = 18, description = "Econ/Support Commander, Builds at 18 m/s", objectname = "commsupport3.s3o",
-				explodeas = "atomic_blastsml", selfdas = "atomic_blastsml"},
+				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {rangebonus = "0.2"},
 		},
 		commsupport4 = {
 			level = 4,
 			mainstats = {maxdamage = 4500, workertime = 24, description = "Econ/Support Commander, Builds at 24 m/s", objectname = "commsupport4.s3o",
-				explodeas = "atomic_blastsml", selfdas = "atomic_blastsml"},
+				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {rangebonus = "0.3"},
 		},
 	},

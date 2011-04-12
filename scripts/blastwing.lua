@@ -19,10 +19,6 @@ local RIGHT_ANGLE = math.rad(90)
 local smokePieces = { base, l_wing, r_wing }
 local burrowed = false
 
---cob values
-local cloaked = COB.CLOAKED
-local stealth = COB.STEALTH
-local firestate = COB.STANDINGFIREORDERS
 
 local function Burrow()
 	burrowed = true
@@ -33,16 +29,14 @@ local function Burrow()
 	Turn( r_wing, side, RIGHT_ANGLE, 5 )
 	Move( base, up, 8, 8 )
 	--Move( base, forward, -4, 5 )
-	if burrowed then
-		Spring.UnitScript.SetUnitValue( cloaked, 1 )
-		Spring.UnitScript.SetUnitValue( stealth, 1 )
-	end
+	Spring.SetUnitCloak(unitID, 2)
+	Spring.SetUnitStealth(unitID, true)
 end
 
 local function UnBurrow()
 	burrowed = false
-	Spring.UnitScript.SetUnitValue( cloaked, 0 )
-	Spring.UnitScript.SetUnitValue( stealth, 0 )
+	Spring.SetUnitCloak(unitID, 0)
+	Spring.SetUnitStealth(unitID, false)
 	--Spring.UnitScript.SetUnitValue( firestate, 2 )
 	Turn( base, side, 0, 5 )
 	Turn( l_wing, side,0, 5 )

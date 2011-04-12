@@ -76,9 +76,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 15,
+        default = 450,
+        planes  = 450,
+        subs    = 22.5,
       },
 
       explosionGenerator      = [[custom:gauss_hit_l]],
@@ -107,7 +107,7 @@ unitDef = {
       turret                  = true,
       waterbounce             = 1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 900,
+      weaponVelocity          = 2400,
     },
 
   },
