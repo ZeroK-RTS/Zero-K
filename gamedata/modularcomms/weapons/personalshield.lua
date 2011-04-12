@@ -1,6 +1,6 @@
 local name = "commweapon_personal_shield"
 local weaponDef = {
-	name                    = [[Energy Shield]],
+	name                    = [[Personal Shield]],
 	craterMult              = 0,
 	  
 	customParams			= {

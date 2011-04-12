@@ -196,9 +196,9 @@ local base = {
 		}
 	},
 	[8] = {
-		name = "heatray",
+		name = "peashooter",
 		modules = {
-			"commweapon_heatray",
+			"module_high_power_servos",
 		}
 	},
 	[9] = {

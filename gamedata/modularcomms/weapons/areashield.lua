@@ -1,6 +1,6 @@
 local name = "commweapon_areashield"
 local weaponDef = {
-    name                    = [[Energy Shield]],
+    name                    = [[Area Shield]],
     craterMult              = 0,
 
 	customParams			= {

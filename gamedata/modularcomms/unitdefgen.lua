@@ -28,92 +28,7 @@ VFS.Include("LuaRules/Utilities/base64.lua")
 --	Weapon 6: unused
 --------------------------------------------------------------------------------
 
--- just some comm cloning stuff (to avoid having to maintain multiple unitdefs)
-local copy = {
-	armcom1 = {
-		armcom2 = {
-			level = 2,
-			mainstats = {maxdamage = 3000, objectname = "armcom2.3do"},
-			customparams = {rangebonus = "0.05"},
-		},
-		armcom3 = {
-			level = 3,
-			mainstats = {maxdamage = 4000, objectname = "armcom3.3do"},
-			customparams = {rangebonus = "0.1"},
-		},
-		armcom4 = {
-			level = 4,
-			mainstats = {maxdamage = 6000, objectname = "armcom4.3do"},
-			customparams = {rangebonus = "0.2"},
-		},
-	},
-	corcom1 = {
-		corcom2 = {
-			level = 2,
-			mainstats = {maxdamage = 3600, objectname = "corcom2.s3o"},
-			customparams = {damagebonus = "0.1"},
-		},
-		corcom3 = {
-			level = 3,
-			mainstats = {maxdamage = 5000, objectname = "corcom3.s3o"},
-			customparams = {damagebonus = "0.2"},
-		},
-		corcom4 = {
-			level = 4,
-			mainstats = {maxdamage = 7200, objectname = "corcom4.s3o"},
-			customparams = {damagebonus = "0.3"},
-		},
-	},
-	commrecon1 = {
-		commrecon2 = {
-			level = 2,
-			mainstats = {maxdamage = 2750, maxvelocity = 1.55, objectname = "commrecon2.s3o"},
-			customparams = {damagebonus = "0.05"},
-		},
-		commrecon3 = {
-			level = 3,
-			mainstats = {maxdamage = 3600, maxvelocity = 1.7, objectname = "commrecon3.s3o"},
-			customparams = {damagebonus = "0.1"},
-		},
-		commrecon4 = {
-			level = 4,
-			mainstats = {maxdamage = 5000, maxvelocity = 1.9, objectname = "commrecon4.s3o"},
-			customparams = {damagebonus = "0.15"},
-		},
-	},
-	commsupport1 = {
-		commsupport2 = {
-			level = 2,
-			mainstats = {maxdamage = 2500, workertime = 15, description = "Econ/Support Commander, Builds at 15 m/s", objectname = "commsupport2.s3o"},
-			customparams = {rangebonus = "0.1"},
-		},
-		commsupport3 = {
-			level = 3,
-			mainstats = {maxdamage = 3200, workertime = 18, description = "Econ/Support Commander, Builds at 18 m/s", objectname = "commsupport3.s3o"},
-			customparams = {rangebonus = "0.2"},
-		},
-		commsupport4 = {
-			level = 4,
-			mainstats = {maxdamage = 4500, workertime = 24, description = "Econ/Support Commander, Builds at 24 m/s", objectname = "commsupport4.s3o"},
-			customparams = {rangebonus = "0.3"},
-		},
-	},
-}
-
-for sourceName, copyTable in pairs(copy) do
-	for cloneName, stats in pairs(copyTable) do
-		UnitDefs[cloneName] = CopyTable(UnitDefs[sourceName], true)
-		UnitDefs[cloneName].unitname = cloneName
-		for statName, value in pairs(stats.mainstats) do
-			UnitDefs[cloneName][statName] = value
-		end
-		for statName, value in pairs(stats.customparams) do
-			UnitDefs[cloneName].customparams[statName] = value
-		end
-		UnitDefs[cloneName].customparams.level = stats.level
-		UnitDefs[cloneName].name = (UnitDefs[cloneName].name) .. " - Level " .. stats.level
-	end
-end
+VFS.Include("gamedata/modularcomms/clonedefs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -169,6 +84,11 @@ local function ProcessComm(name, config)
 				--Spring.Echo(armorname, v.customparams["basedamage_"..armorname])
 			end
 		end
+
+		local attributeMods = { -- add a mod for everythings that can have a negative adjustment
+			speed = 0,
+			reload = 0,
+		}
 		
 		if config.modules then
 			local hasWeapon = false
@@ -194,18 +114,9 @@ local function ProcessComm(name, config)
 				end
 				if upgrades[moduleName] then
 					--Spring.Echo("\tApplying upgrade: "..moduleName)
-					local attributeMods = { -- add a mod for everythings that can have a negative adjustment
-						speed = 0,
-						reload = 0,
-					}
 					if upgrades[moduleName].func then --apply upgrade function
 						upgrades[moduleName].func(commDefs[name], attributeMods) 
-					end	
-					if attributeMods.speed ~= 0 then
-						commDefs[name].maxvelocity = commDefs[name].customparams.basespeed*(1+attributeMods.speed)
-					else
-						commDefs[name].maxvelocity = commDefs[name].customparams.basespeed/(1-attributeMods.speed)
-					end		
+					end
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end
@@ -214,6 +125,11 @@ local function ProcessComm(name, config)
 				ApplyWeapon(commDefs[name], "commweapon_peashooter", true)
 			end
 		end
+		if attributeMods.speed > 0 then
+			commDefs[name].maxvelocity = commDefs[name].customparams.basespeed*(1+attributeMods.speed)
+		else
+			commDefs[name].maxvelocity = commDefs[name].customparams.basespeed/(1-attributeMods.speed)
+		end	
 		if config.name then
 			commDefs[name].name = config.name
 		end
@@ -267,6 +183,9 @@ for name, data in pairs(commDefs) do
 	if data.customparams.rangebonus then
 		ModifyWeaponRange(data, data.customparams.rangebonus + 1)
 	end	
+	if data.customparams.speedbonus then
+		commDefs[name].maxvelocity = commDefs[name].maxvelocity + (commDefs[name].customparams.basespeed*data.customparams.speedbonus)
+	end	
 	
 	-- calc lightning real damage based on para damage
 	-- TODO: use for slow-beams
@@ -310,7 +229,9 @@ for name, data in pairs(commDefs) do
 				data.customparams.extradrawrange = range
 			end 
 		end
+		data.sightdistance = math.max(math.min(maxRange * 1.1, 600), data.sightdistance)
 	end
+	
 	-- set wreck values
 	for featureName,array in pairs(data.featuredefs or {}) do
 		local mult = 0.4
@@ -319,13 +240,16 @@ for name, data in pairs(commDefs) do
 		array.reclaimtime = data.buildcostmetal * mult
 		array.damage = data.maxdamage
 	end
+	
 	-- set mass
 	data.mass = ((data.buildtime/2 + data.maxdamage/10)^0.55)*9
 	--Spring.Echo("mass " .. (data.mass or "nil") .. " BT/HP " .. (data.buildtime or "nil") .. "  " .. (data.maxdamage or "nil"))
+	
 	-- rez speed
 	if data.canresurrect then 
 		data.resurrectspeed = data.workertime * 5/6 
 	end
+	
 	-- make sure weapons can hit their max range
 	if data.weapondefs then
 		for name, weaponData in pairs(data.weapondefs) do
