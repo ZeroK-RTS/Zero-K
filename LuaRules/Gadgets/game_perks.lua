@@ -162,14 +162,14 @@ function gadget:AllowCommand(unitID, unitDefID, team, cmdID, cmdParams, cmdOpts)
 	return true
 end
 
---[[
 function gadget:AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z)
-	if unlockUnitsMap[unitDefID] and not (unlocks[team] and unlocks[team][buildoptionID]) then 
-		return false
+	if unlockUnitsMap[unitDefID] then
+		if not (unlocks[builderTeam] and unlocks[builderTeam][unitDefID]) then 
+			return false
+		end
 	end
 	return true
 end
-]]--
 
 local function InitUnsafe()
 	-- for name, id in pairs(playerIDsByName) do

@@ -38,7 +38,6 @@ unitDef = {
 	helptext_de    = [[Der Blastwing macht sehr wenig Schaden, ideal, um etwa Metallextraktoren, Soloranlagen, Leichte Lasertürme, Windanlagen und Nanotürme auszumerzen. Dennoch können Blastwings in Massen durchaus ordentlich Schaden anrichten. Beachte die Geschwindigkeit und Richtung, in die die Drohnen fliegen, denn der größte Schaden wird durch das Schrapnell erzielt, das nach dem Tod der Drohne weiter in Flugrichtung fliegen wird. Auf diese Weise kannst du deinen Gegner trotzdem mit Metallsplittern überhäufen, obwohl deine Blastwings schon vorher abgeschossen wurden. Vermeide, dass du die Blastwings zu nah aneinander stationiert, da sie in einer Kettenreaktion explodieren können. Kann sich zur Mine entwickeln.]],
   },
 
-  defaultmissiontype     = [[VTOL_standby]],
   explodeAs              = [[BLASTWING_EXPLOSION]],
   --fireState              = 0,
   floater                = true,
@@ -60,7 +59,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[f-1.s3o]],
-  scale                  = [[1]],
   script                 = [[blastwing.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[BLASTWING_EXPLOSION]],
@@ -69,10 +67,8 @@ unitDef = {
   sightDistance          = 380,
   smoothAnim             = true,
   steeringmode           = [[1]],
-  TEDClass               = [[VTOL]],
   turnRate               = 1144,
   workerTime             = 0,
-  wpri_badtargetcategory = [[VTOL]],
 }
 
 return lowerkeys({ blastwing = unitDef })
