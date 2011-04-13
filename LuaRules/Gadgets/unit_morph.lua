@@ -499,7 +499,6 @@ local function FinishMorph(unitID, morphData)
   morphUnits[unitID] = nil
 
   local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(unitID)
-  local oldParaDamage = Spring.GetUnitRulesParam(unitID, "paralysis")
   
   local isBeingBuilt = false
   if buildProgress < 1 then
@@ -618,11 +617,6 @@ local function FinishMorph(unitID, morphData)
   end
 
   Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress})
-  if oldParaDamage then
-    local newParaDamage = (oldParaDamage - Spring.GetGameFrame())/1200*oldHealth -- DECAY_FRAMES
-	GG.addParalysisDamageToUnit(newUnit, newParaDamage, false)
-  end
-  
 
   --// copy shield power
   local enabled,oldShieldState = Spring.GetUnitShieldState(unitID)

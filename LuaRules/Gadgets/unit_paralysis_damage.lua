@@ -25,15 +25,43 @@ local spGetUnitDefID  = Spring.GetUnitDefID
 
 local extraNormalDamageList = {}
 
-local FRAMES_PER_SECOND = 30
-
-local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0
-
 for i=1,#WeaponDefs do
 	if WeaponDefs[i].customParams and WeaponDefs[i].customParams.extra_damage then 
 		extraNormalDamageList[i] = WeaponDefs[i].customParams.extra_damage
 	end
-end  
+end 
+
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
+                            weaponID, attackerID, attackerDefID, attackerTeam)
+	
+	if paralyzer then -- the weapon deals paralysis damage
+		
+		local health, maxHealth = Spring.GetUnitHealth(unitID)
+		if extraNormalDamageList[weaponID] then
+			attackerID = attackerID or -1
+			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponID], 0, attackerID)
+		end
+		if health and maxHealth then -- taking no chances.
+			return damage*maxHealth/health
+		else
+			return damage
+		end
+	end
+	
+	return damage
+end
+
+
+--[[
+Below is code that entirely replaces the inbuilt paralysis system with a new one.
+It can stay here as SVN can be a pain and we may want to change EMP behaviour in 
+the future. It can also be reused for any other status effect with sharp state 
+changes as that is what it is good for. Check 2346 for other changes.
+
+
+local FRAMES_PER_SECOND = 30
+
+local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 
 
 local partialUnits = {}
 local paraUnits = {}
@@ -182,3 +210,4 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		removeUnitID(unitID, paraUnits, paraUnitID)
 	end
 end
+--]]

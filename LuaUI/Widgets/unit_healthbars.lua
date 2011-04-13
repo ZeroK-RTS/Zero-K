@@ -627,7 +627,6 @@ do
       end
 
       --// PARALYZE
-      --[[
 	  if (emp>0.01)and(hp>0.01)and(not morph)and(emp<1e8) then
         local stunned = GetUnitIsStunned(unitID)
         local infotext = ""
@@ -644,22 +643,8 @@ do
           end
         end
         local empcolor_index = (stunned and ((blink and "emp_b") or "emp_p")) or ("emp")
-        AddBar("otherpara",emp,empcolor_index,infotext .. " old para")
+        AddBar("paralyze",emp,empcolor_index,infotext)
       end
-	  --]]
-	  
-	  local para = Spring.GetUnitRulesParam(unitID, "paralysis")
-	  if para and para > 0 and not morph then
-        para = para - gameFrame
-		local FRAMES_PER_SECOND = 30
-        local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 DECAY_FRAMES
-		if para > DECAY_FRAMES then
-		  paraUnits[#paraUnits+1]=unitID
-		  AddBar("paralyze",1,((blink and "emp_b") or "emp_p"),(fullText and math.floor((para-DECAY_FRAMES)/FRAMES_PER_SECOND) .. 's') or '')
-		else
-		  AddBar("paralyze",para/DECAY_FRAMES,"emp",(fullText and floor(para/DECAY_FRAMES*100) .. '%') or '')
-		end
-	  end
 
       --// CAPTURE (set by capture gadget)
       if ((capture or -1)>0) then
