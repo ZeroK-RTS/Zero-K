@@ -44,7 +44,7 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	
 	slot = forceslot or slot
 	
-	Spring.Echo(weapons[weapon].name .. " into slot " .. slot)
+	--Spring.Echo(weapons[weapon].name .. " into slot " .. slot)
 	
 	unitDef.weapons[slot] = {
 		def = weapon,
@@ -100,7 +100,7 @@ function ReplaceWeapon(unitDef, oldWeapon, newWeapon)
 	local weapons = unitDef.weapons or {}
 	for i,v in pairs(weapons) do
 		if v.def == oldWeapon then
-			Spring.Echo("replacing " .. oldWeapon .. " with " .. newWeapon)
+			--Spring.Echo("replacing " .. oldWeapon .. " with " .. newWeapon)
 			ApplyWeapon(unitDef, newWeapon, false, i)
 			break -- one conversion, one weapon changed. Get 2 if you want 2
 		end

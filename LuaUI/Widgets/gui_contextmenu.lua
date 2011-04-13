@@ -408,12 +408,23 @@ local function printunitinfo(ud, lang, buttonWidth)
 		} 
 	
 	local statschildren = {}
+
+	-- stuff for modular commanders
+	local commModules, commCost
+	if ud.isCommander then
+		commModules = WG.GetCommModules and WG.GetCommModules(ud.id)
+		commCost = WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost
+	end
+	local cost = numformat(ud.metalCost)
+	if commCost then
+		cost = cost .. ' (' .. numformat(commCost) .. ')'
+	end
 	
 	statschildren[#statschildren+1] = Label:New{ caption = 'STATS', textColor = color.stats_header, }
 	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 
 	statschildren[#statschildren+1] = Label:New{ caption = 'Cost: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.metalCost), textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = cost, textColor = color.stats_fg, }
 	
 	statschildren[#statschildren+1] = Label:New{ caption = 'Max HP: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.health), textColor = color.stats_fg, }
@@ -435,6 +446,18 @@ local function printunitinfo(ud, lang, buttonWidth)
 	if ud.buildSpeed > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Buildpower: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.buildSpeed,2), textColor = color.stats_fg, }
+	end
+	
+
+	if commModules then
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		for i,v in ipairs(commModules) do
+			statschildren[#statschildren+1] = Label:New{ caption = v, textColor = color.stats_fg,}
+			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg,}
+		end	
 	end
 	
 	

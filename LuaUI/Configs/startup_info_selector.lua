@@ -3,9 +3,6 @@
 -- versus666	(30oct2010)	:	Added selector to remplace tooltip which is now shown by chili_selection.
 --								Added long description of commanders strengths et weakness to tooltip.
 --								Commented a lot for easier modification.
-Spring.Utilities = Spring.Utilities or {}
-VFS.Include("LuaRules/Utilities/base64.lua")
-
 local function ReturnFalse()
 	return false
 end
@@ -85,6 +82,19 @@ local optionData = {
 	}
 }
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- most of the data processing was moved to api_modularcomms.lua
+
+local commDataOrdered = {}
+local numComms = 0
+for seriesName, comms in pairs(WG.commData) do
+	numComms = numComms + 1
+	commDataOrdered[numComms] = comms
+	commDataOrdered[numComms].seriesName = seriesName
+end
+table.sort(commDataOrdered, function(a,b) return a[1] < b[1] end)
+
 local chassisImages = {
 	armcom1 = "LuaUI/Images/startup_info_selector/chassis_strike.png",
 	corcom1 = "LuaUI/Images/startup_info_selector/chassis_battle.png",
@@ -92,112 +102,15 @@ local chassisImages = {
 	commsupport1 = "LuaUI/Images/startup_info_selector/chassis_support.png",
 }
 
---------------------------------------------------------------------------------
--- load data
---------------------------------------------------------------------------------
-local success, err
-
--- global comm data (from the modoption)
-local commDataGlobal
-local commDataGlobalRaw = Spring.GetModOptions().commandertypes
-if not (commDataGlobalRaw and type(commDataGlobalRaw) == 'string') then
-	err = "Comm data entry in modoption is empty or in invalid format"
-	commDataGlobal = {}
-else
-	commDataGlobalRaw = string.gsub(commDataGlobalRaw, '_', '=')
-	commDataGlobalRaw = Spring.Utilities.Base64Decode(commDataGlobalRaw)
-	--Spring.Echo(commDataRaw)
-	local commDataGlobalFunc, err = loadstring("return "..commDataGlobalRaw)
-	if commDataGlobalFunc then 
-		success, commDataGlobal = pcall(commDataGlobalFunc)
-		if not success then
-			err = commDataGlobal
-			commData = {}
-		end
-	end
-end
-
-if err then 
-	Spring.Echo('Startup Info & Selector error: ' .. err)
-end
-
--- player comm data (from customkeys)
-local myID = Spring.GetMyPlayerID()
-local commData
-local customKeys = select(10, Spring.GetPlayerInfo(myID))
-local commDataRaw = customKeys and customKeys.commanders
-if not (commDataRaw and type(commDataRaw) == 'string') then
-	err = "Your comm data entry is empty or in invalid format"
-	commData = {}
-else
-	commDataRaw = string.gsub(commDataRaw, '_', '=')
-	commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
-	--Spring.Echo(commDataRaw)
-	local commDataFunc, err = loadstring("return "..commDataRaw)
-	if commDataFunc then 
-		success, commData = pcall(commDataFunc)
-		if not success then
-			err = commData
-			commData = {}
-		end
-	end
-end
-if err then 
-	Spring.Echo('Startup Info & Selector error: ' .. err)
-end
-
-local commDataOrdered = {}
-local numComms = 0
-for seriesName, comms in pairs(commData) do
-	numComms = numComms + 1
-	commDataOrdered[numComms] = comms
-	commDataOrdered[numComms].seriesName = seriesName
-end
-table.sort(commDataOrdered, function(a,b) return a[1] < b[1] end)
-
-VFS.Include("gamedata/modularcomms/moduledefs.lua")
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- yeah, yeah, n^2
-local function RemoveDuplicates(base, delete)
-	for i1,v1 in ipairs(base) do
-		for i2,v2 in ipairs(delete) do
-			if v1 == v2 then
-				base[i1] = nil
-				break
-			end
-		end
-	end
-end
-
--- gets modules and costs
-local function GetSeriesInfo(seriesName)
-	local data = {}
-	local commList = commData[seriesName]
-	for i=1,#commList do
-		data[i] = {name = commList[i]}
-	end
-	for i=1,#data do
-		data[i].modules = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].modules or {}
-		data[i].cost = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].cost or 0
-	end
-	-- remove reference to modules already in previous levels
-	for i = #data, 2, -1 do
-		RemoveDuplicates(data[i].modules, data[i-1].modules)
-		data[i].cost = data[i].cost - data[i-1].cost
-	end
-	return data
-end
-
 local colorWeapon = "\255\255\32\32"
 local colorConversion = "\255\255\96\0"
 local colorWeaponMod = "\255\255\0\255"
 local colorModule = "\255\128\128\255"
 
 local function WriteTooltip(seriesName)
-	local data = GetSeriesInfo(seriesName)
+	local data = WG.GetCommSeriesInfo(seriesName, true)
 	local str = ''
+	local upgrades = WG.GetCommUpgradeList()
 	for i=1,#data do
 		str = str .. "\nLEVEL "..i.. " ("..data[i].cost.." metal)\n\tModules:"
 		for j, modulename in pairs(data[i].modules) do
