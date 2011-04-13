@@ -80,6 +80,9 @@ local copy = {
 
 for sourceName, copyTable in pairs(copy) do
 	for cloneName, stats in pairs(copyTable) do
+		-- some further modification
+		stats.mainstats.mincloakdistance = 75 + (25 * (stats.level - 1))
+	
 		UnitDefs[cloneName] = CopyTable(UnitDefs[sourceName], true)
 		UnitDefs[cloneName].unitname = cloneName
 		for statName, value in pairs(stats.mainstats) do
