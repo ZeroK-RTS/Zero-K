@@ -61,6 +61,14 @@ local options = {
     },
 
   },
+  {
+    key    = 'commends',
+    name   = 'Commander Ends',
+    desc   = 'Causes an allyteam to lose if they have no commanders left on their team',
+    type   = 'bool',
+    def    = true,
+    section= 'modifiers',
+  },
     {
     key    = 'koth',
     name   = 'King of the Hill Settings',
