@@ -1553,7 +1553,7 @@ function widgetHandler:GameStart()
 			end	
 		end
 	end
-	Spring.Echo("STATS:plist"..plist)
+	Spring.SendCommands("wbynum 255 STATS:plist".. plist)
   return
 end
 
