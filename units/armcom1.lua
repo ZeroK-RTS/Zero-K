@@ -62,7 +62,6 @@ unitDef = {
     [[mahlazer]],
 	[[raveparty]],
     [[armcsa]],
-    [[cormine1]],
   },
 
   buildPic               = [[armcom.png]],

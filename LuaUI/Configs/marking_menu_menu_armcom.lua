@@ -219,13 +219,9 @@ local menu_armcom = {
   },
   {
     angle = 45,
-    unit = "cormine1",
-    label = "Misc.",
+    unit = "mahlazer",
+    label = "Costly",
     items = {
-	   {
-        angle = -90,
-        unit = "mahlazer"
-       },  
 	   {
         angle = 180,
         unit = "raveparty"
