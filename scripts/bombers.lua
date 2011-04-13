@@ -58,7 +58,7 @@ function Reload()
 	local queue = Spring.GetUnitCommands(unitID)
 	local id, target
 	local re = false
-	if queue and queue[1] then then
+	if queue and queue[1] then
 		local tag = queue[1].tag
 		id = queue[1].id
 		if id == CMD.AREA_ATTACK then
