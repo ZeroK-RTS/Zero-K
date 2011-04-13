@@ -81,8 +81,9 @@ unitDef = {
     {
       def                = [[EMG]],
       mainDir            = [[0 -0.35 1]],
-      maxAngleDif        = 60,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      maxAngleDif        = 50,
+	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK FLOAT GUNSHIP FIXEDWING HOVER]],
     },
 
   },

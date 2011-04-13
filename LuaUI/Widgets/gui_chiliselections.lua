@@ -492,7 +492,7 @@ local function MakeUnitToolTip(unitid)
 		color   = {0,0.8,0,1};
 	}
 
-	if (windTooltips[ud.name] and not Spring.GetUnitRulesParam(unitid,"NotWindmill") then
+	if (windTooltips[ud.name] and not Spring.GetUnitRulesParam(unitid,"NotWindmill")) then
 		Image:New{
 			parent  = barGrid;
 			file    = 'LuaUI/Images/commands/Bold/wind.png';

@@ -76,7 +76,8 @@ unitDef = {
 
     {
       def                = [[COR_GOL]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
 
