@@ -55,10 +55,10 @@ local function ReinsertAttackOrder(cmd, param)
 end
 
 function Reload()
-	local queue = Spring.GetUnitCommands(unitID) or {}
+	local queue = Spring.GetUnitCommands(unitID)
 	local id, target
 	local re = false
-	if queue then
+	if queue and queue[1] then then
 		local tag = queue[1].tag
 		id = queue[1].id
 		if id == CMD.AREA_ATTACK then
