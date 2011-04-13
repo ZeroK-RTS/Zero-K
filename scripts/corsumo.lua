@@ -433,7 +433,8 @@ function script.AimWeapon(num, heading, pitch )
 	local direction = {math.cos(heading)*math.cos(pitch), math.sin(heading)*math.cos(pitch), math.sin(pitch)}
 	local phi = hpi - math.acos(dot(direction,normal))
 	local orthagonal = add(direction,mult(-dot(direction,normal),normal))
-	local theta = math.acos(dot(radial,orthagonal)/modulus(orthagonal))
+	local modOtho = modulus(orthagonal)
+	local theta = (modOtho > 0 and math.acos(dot(radial,orthagonal)/modOtho)) or hpi
 	
 	if direction[2] < direction[3] then
 		theta = -theta*weaponPieces[num].invert
@@ -442,7 +443,7 @@ function script.AimWeapon(num, heading, pitch )
 	end
 	
 	Turn( weaponPieces[num].turret, y_axis, theta*invert, 12 )
-	Turn( weaponPieces[num].sleeve,  x_axis, -phi*invert, 20 ) 
+	Turn( weaponPieces[num].sleeve,  x_axis, -phi*invert, 6 ) 
 	WaitForTurn(weaponPieces[num].turret, y_axis)
 	WaitForTurn(weaponPieces[num].sleeve, x_axis)
 	return true
