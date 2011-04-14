@@ -10,14 +10,14 @@ local weaponDef = {
     customParams            = {
 		slot = [[3]],
         --timeslow_preset = [[module_disruptorbomb]],
-		timeslow_damagefactor = [[2]],
+		timeslow_damagefactor = [[4]],
 		muzzleEffect = [[custom:RAIDMUZZLE]],
     },
 
     damage                  = {
-		default = 600,
-		planes  = 600,
-		subs    = 30,
+		default = 300,
+		planes  = 300,
+		subs    = 15,
     },
 
     explosionGenerator      = [[custom:riotballplus]],
