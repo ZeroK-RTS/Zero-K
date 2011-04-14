@@ -173,7 +173,7 @@ unitDef = {
       },
 
       damage                  = {
-        default = 120,
+        default = 225,
       },
 
       explosionGenerator      = [[custom:flash2purple]],

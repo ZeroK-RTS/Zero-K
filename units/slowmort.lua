@@ -97,7 +97,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 300,
+        default = 150,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -105,7 +105,7 @@ unitDef = {
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      interceptedByShieldType = 0,
+      interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 4,
       lineOfSight             = true,
