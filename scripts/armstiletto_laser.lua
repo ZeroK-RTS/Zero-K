@@ -58,7 +58,15 @@ function script.MoveRate(moveRate)
 end--]]
 
 local function FireLoop()
-	while(firing) do
+	
+end
+
+function script.FireWeapon1()
+	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
+		return
+	end
+	Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
+	for i = 1, 120 do
 		local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
 		local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
 		local bx, by, bz = Spring.GetUnitPiecePosDir(unitID,base)
@@ -85,17 +93,6 @@ local function FireLoop()
 		end
 		Sleep(25) -- fire density
 	end
-end
-
-function script.FireWeapon1()
-	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
-		return
-	end
-	Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
-	firing = true
-	StartThread(FireLoop)
-	Sleep( 3000 ) -- Duration of burst. The number of frames is roughly (time - 30) * 1000 / 30.
-	firing = false
 	Sleep( 500) --delay before fuel runs out, to let it retreat a little
 	Reload()
 	--Spring.SetUnitFuel(unitID,0)

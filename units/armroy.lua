@@ -32,6 +32,7 @@ unitDef = {
     helptext_fr    = [[Ce Destroyer embarque un puissant canon longue port?e et un lance grenade sous marines. Utile pour se d?barrasser de menaces sous marines ou de positions fixes, son canon est cependant trop peu pr?cis pour d?truire des menaces rapides.]],
     helptext_pl    = [[Crusader posiada pot?n? armat? ?redniego zasi?gu idealn? do bombardowania nieruchomych wie?yczek broni?cych wybrze?y. Jego drug? broni? jest wyrzutnia ?adunk?w g??binowych przeciwko ?odziom podwodnym. ?atwo pada ofiar? jednostek lataj?cych i Korwet, gdy? nie posiada broni skutecznym przeciwko szybkim celom.]],
 	helptext_de    = [[Der Crusader kombiniert eine kraftvolle, weitreichende Hauptkanone, nützlich für das Bombadieren von festen Standorten und Küstenzielen, mit einem Wasserbombenwerfer gegen U-Boote. Hüte dich vor Flugzeugen und Corvettes - Destroyers Waffe hat einige Probleme damit, sich schnell bewegende Ziele zu treffen.]],
+    extradrawrange = 300,
   },
 
   defaultmissiontype     = [[Standby]],

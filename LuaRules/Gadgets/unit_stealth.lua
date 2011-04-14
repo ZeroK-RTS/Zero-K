@@ -125,7 +125,9 @@ end
 
 
 local function AddStealthUnit(unitID, stealthDef)
-  if not stealthDef.tieToCloak then AddStealthCmdDesc(unitID, stealthDef) end
+  if not stealthDef.tieToCloak then 
+	AddStealthCmdDesc(unitID, stealthDef) 
+  end
 
   local stealthData = {
     id      = unitID,
@@ -161,12 +163,13 @@ function gadget:Initialize()
   gadgetHandler:RegisterCMDID(CMD_STEALTH)
 
   stealthDefs = ValidateStealthDefs(stealthDefs)
-
+ Spring.Echo("ASDASD")
   -- add the Stealth command to existing units
   for _,unitID in ipairs(Spring.GetAllUnits()) do
     local unitDefID = Spring.GetUnitDefID(unitID)
     local stealthDef = stealthDefs[unitDefID]
     if (stealthDef) then
+	  Spring.Echo(UnitDefs[unitDefID].name)
       AddStealthUnit(unitID, stealthDef)
     end
   end

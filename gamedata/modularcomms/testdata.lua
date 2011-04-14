@@ -204,12 +204,12 @@ local base = {
 		}
 	},
 	[9] = {
-	name = "shield",
+	name = "cloak",
 		modules = {
 			"commweapon_shotgun",
 			"commweapon_heavymachinegun",
-			"module_areashield",
-			"module_cloak_field",
+			--"module_areashield",
+			"module_personal_cloak",
 		}
 	},
 }
