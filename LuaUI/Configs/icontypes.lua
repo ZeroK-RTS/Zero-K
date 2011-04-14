@@ -266,7 +266,7 @@ local icontypes = {
   },
   walkeraa = {
     bitmap='icons/walkeraa.dds',
-    size=1.8,
+    size=1.6,
   },
   walkerscout = {
     bitmap='icons/walkerscout.dds',

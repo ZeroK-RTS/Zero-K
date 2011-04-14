@@ -25,7 +25,7 @@
 --  Example EngineOptions.lua 
 --
 
-local options = 
+local options =
 {
   {
     key    = 'startconds',
