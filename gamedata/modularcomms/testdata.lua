@@ -147,6 +147,7 @@ local base = {
 			"conversion_shockrifle",
 			"module_personal_shield",
 			"module_areashield",
+			"module_adv_targeting",
 		}
 	},
 	[4] = {

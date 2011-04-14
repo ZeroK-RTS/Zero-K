@@ -66,7 +66,7 @@ local options = {
     name   = 'Commander Ends',
     desc   = 'Causes an allyteam to lose if they have no commanders left on their team',
     type   = 'bool',
-    def    = true,
+    def    = false,
     section= 'modifiers',
   },
     {
@@ -217,7 +217,7 @@ local options = {
   {
     key    = 'MetalMult',
     name   = 'Metal Extraction Multiplier',
-    desc   = 'Multiplies metal extraction rate. For use in large team games when there is less mexes by player.',
+    desc   = 'Multiplies metal extraction rate. For use in large team games when there are fewer mexes per player.',
     type   = 'number',
     section= 'mapsettings',
     def    = 1,

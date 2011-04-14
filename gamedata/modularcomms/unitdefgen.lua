@@ -178,10 +178,10 @@ for name, data in pairs(commDefs) do
 	Spring.Echo("\tPostprocessing commtype: ".. name)
 	-- apply intrinsic bonuses
 	if data.customparams.damagebonus then
-		ModifyWeaponDamage(data, data.customparams.damagebonus + 1)
+		ModifyWeaponDamage(data, data.customparams.damagebonus)
 	end
 	if data.customparams.rangebonus then
-		ModifyWeaponRange(data, data.customparams.rangebonus + 1)
+		ModifyWeaponRange(data, data.customparams.rangebonus)
 	end	
 	if data.customparams.speedbonus then
 		commDefs[name].maxvelocity = commDefs[name].maxvelocity + (commDefs[name].customparams.basespeed*data.customparams.speedbonus)

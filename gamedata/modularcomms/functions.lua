@@ -110,7 +110,7 @@ end
 function ModifyWeaponRange(unitDef, factor)
 	local weapons = unitDef.weapondefs or {}
 	for i,v in pairs(weapons) do
-		if v.range then v.range = v.range * factor end
+		if v.range then v.range = v.range + (v.customparams.baserange or v.range) * factor end
 	end
 end
 
@@ -118,7 +118,7 @@ function ModifyWeaponDamage(unitDef, factor)
 	local weapons = unitDef.weapondefs or {}
 	for i,v in pairs(weapons) do
 		for armorname, dmg in pairs(v.damage) do
-			v.damage[armorname] = dmg * factor
+			v.damage[armorname] = dmg + (v.customparams['basedamage_'..armorname] or dmg) * factor
 		end
 	end
 end

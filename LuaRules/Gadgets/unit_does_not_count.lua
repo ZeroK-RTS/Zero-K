@@ -100,16 +100,11 @@ local function GetUnitDefIdByName(defName)
 end
 
 local doesNotCountList = {
-	[GetUnitDefIdByName("chicken_digger_b")] = true,
-	[GetUnitDefIdByName("chicken_listener_b")] = true,
-	[GetUnitDefIdByName("armmine1")] = true,
-	[GetUnitDefIdByName("armmine2")] = true,
-	[GetUnitDefIdByName("armmine3")] = true,
-	[GetUnitDefIdByName("cormine1")] = true,
-	[GetUnitDefIdByName("cormine2")] = true,
-	[GetUnitDefIdByName("cormine3")] = true,
-	[GetUnitDefIdByName("backupunit")] = true,
 	[GetUnitDefIdByName("armflea")] = true,
+	[GetUnitDefIdByName("corroach")] = true,
+	[GetUnitDefIdByName("armtick")] = true,
+	[GetUnitDefIdByName("spherepole")] = true,
+	[GetUnitDefIdByName("terraunit")] = true,
 }
 
 -- auto detection of doesnotcount units
