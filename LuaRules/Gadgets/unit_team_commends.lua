@@ -13,7 +13,7 @@ return {
 end
 
 function gadget:Initialize()
-	if (not Spring.GetModOptions()) or (not Spring.GetModOptions().commends) then
+	if (not Spring.GetModOptions()) or (not tobool(Spring.GetModOptions().commends)) then
 		gadgetHandler:RemoveGadget()
 	end
 end
