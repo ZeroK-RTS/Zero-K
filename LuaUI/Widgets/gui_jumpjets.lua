@@ -247,12 +247,14 @@ end
 
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
-  local cmd = spGetCommandQueue(unitID)[2] 
-  if (cmd and cmd.id == CMD_JUMP) then
-      lastJump[unitID] = {
-        pos = {spGetUnitPosition(unitID)}, 
-        frame = spGetGameFrame(),
-      }
+  if jumpDefs[unitDefID] then
+    local cmd = spGetCommandQueue(unitID)[2] 
+    if (cmd and cmd.id == CMD_JUMP) then
+        lastJump[unitID] = {
+          pos = {spGetUnitPosition(unitID)}, 
+          frame = spGetGameFrame(),
+        }
+    end
   end
 end
 

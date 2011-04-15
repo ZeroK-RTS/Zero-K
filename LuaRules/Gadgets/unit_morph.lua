@@ -437,11 +437,14 @@ end
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
 
   -- do not allow morph for unfinsihed units
-  if not isFinished(unitID) then return true end
+  if not isFinished(unitID) then 
+	return true 
+  end
 
+  
+  Spring.SetUnitRulesParam(unitID, "morphing", 1)
   if not morphDef.combatMorph then 
 	Spring.SetUnitHealth(unitID, { paralyze = 1.0e9 })    --// turns mexes and mm off (paralyze the unit)
-	Spring.SetUnitRulesParam(unitID, "morphing", 1)
 	Spring.SetUnitResourcing(unitID,"e",0)                --// turns solars off
 	Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { 0 }, { "alt" }) --// turns radars/jammers off
   end
@@ -466,9 +469,11 @@ end
 
 local function StopMorph(unitID, morphData)
   morphUnits[unitID] = nil
-
-  Spring.SetUnitHealth(unitID, { paralyze = -1})
-  Spring.SetUnitRulesParam(unitID, "morphing", 0)
+Spring.Echo( morphData.combatMorph)
+  if not morphData.combatMorph then 
+    Spring.SetUnitHealth(unitID, { paralyze = -1})
+    Spring.SetUnitRulesParam(unitID, "morphing", 0)
+  end
   local scale = morphData.progress * stopPenalty
   local unitDefID = Spring.GetUnitDefID(unitID)
 
@@ -596,7 +601,24 @@ local function FinishMorph(unitID, morphData)
   local cmds = Spring.GetUnitCommands(unitID)
   for i = 1, cmds.n do
     local cmd = cmds[i]
-    Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
+	if i == 1 and cmd.id < 0 then -- repair case for construction
+		local units = Spring.GetUnitsInRectangle(cmd.params[1]-32, cmd.params[3]-32,cmd.params[1]+32, cmd.params[3]+32)
+		local allyTeam = Spring.GetUnitAllyTeam(unitID)
+		local notFound = true
+		for j = 1, #units do
+			local areaUnitID = units[j]
+			if allyTeam == Spring.GetUnitAllyTeam(areaUnitID) and Spring.GetUnitDefID(areaUnitID) == -cmd.id then
+				Spring.GiveOrderToUnit(newUnit, CMD.REPAIR, {areaUnitID}, cmd.options.coded)
+				notFound = false
+				break
+			end
+		end
+		if notFound then
+			Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
+		end
+	else
+		Spring.GiveOrderToUnit(newUnit, cmd.id, cmd.params, cmd.options.coded)
+	end
   end
 
   --//reassign assist commands to new unit
@@ -611,12 +633,17 @@ local function FinishMorph(unitID, morphData)
     newHealth = 1 
   end
   
+  local newPara = 0
+  if morphData.combatMorph then
+	newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
+  end
+  
   -- prevent conflict with rezz gadget
   if hpercent > 0.045 and hpercent < 0.055 then
     newHealth = newMaxHealth * 0.056 + 1
   end
 
-  Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress})
+  Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
 
   --// copy shield power
   local enabled,oldShieldState = Spring.GetUnitShieldState(unitID)
@@ -1002,7 +1029,8 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 	end
 	if (morphDef) then
 		local morphData = morphUnits[unitID]
-		if (not morphData) then
+		local health, maxHealth, paralyzeDamage, captureProgress, buildProgress = Spring.GetUnitHealth(unitID)
+		if (not morphData) and buildProgress == 1 then
 			-- dont start directly to break recursion
 			--StartMorph(unitID, unitDefID, teamID, morphDef)
 			morphToStart[unitID] = {unitDefID, teamID, morphDef}
@@ -1264,7 +1292,7 @@ function gadget:Update()
         CallAsTeam({ ['read'] = readTeam }, function()
           for unitID, morphData in spairs(SYNCED.morphUnits) do
             if (unitID and morphData)and(IsUnitVisible(unitID)) then
-              morphTable[unitID] = {progress=morphData.progress, into=morphData.def.into}
+              morphTable[unitID] = {progress=morphData.progress, into=morphData.def.into, combatMorph = morphData.combatMorph}
             end
           end
         end)
@@ -1369,10 +1397,10 @@ local function DrawCombatMorphUnit(unitID, morphData, localTeamID)
 	glUnit(unitID, true)
 	
 	glColor(1,1,1,1)
-	glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-	glPolygonOffset(false)
-	glCulling(false)
-	glDepthTest(false)
+	--glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+	--glPolygonOffset(false)
+	--glCulling(false)
+	--glDepthTest(false)
 end
 
 function gadget:DrawWorld()

@@ -54,6 +54,9 @@ local myTeamID
 local cooldown = {}
 local previousSelection
 
+local unitInSelection = {}
+local doNotPlayNextSelection = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -88,8 +91,16 @@ function widget:Shutdown()
 end
 
 function widget:SelectionChanged(selection)
+	if doNotPlayNextSelection then
+		doNotPlayNextSelection = false
+		return
+	end
 	if (not selection[1]) then
 		return
+	end
+	unitInSelection = {}
+	for i = 1, #selection do
+		unitInSelection[selection[i]] = true
 	end
 	local unitName = UnitDefs[GetUnitDefID(selection[1])].name
 	if (unitName and soundTable[unitName]) then
@@ -130,6 +141,12 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam)
 				CoolNoisePlay(sounds.underattack, 40)
 			end
 		end
+	end
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	if unitInSelection[unitID] then
+		doNotPlayNextSelection = true
 	end
 end
 --------------------------------------------------------------------------------
