@@ -1,8 +1,13 @@
 -- queen_trail
+-- queen_trail_fire
 -- large_green_goo
 -- green_goo
 -- small_green_goo
 -- spire_trail
+-- blobber_goo
+-- lobber_goo
+-- small_red_goo
+-- red_goo
 
 return {
   ["queen_trail"] = {
@@ -367,5 +372,101 @@ return {
     },
   },
 
+  ["small_red_goo"] = {
+    splashes = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.9,
+        colormap           = [[1 0 0 1   1 0 0 1   0 0 0 0]],
+        directional        = true,
+        emitrot            = 1,
+        emitrotspread      = -2,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 5,
+        particlelifespread = 5,
+        particlesize       = 4,
+        particlesizespread = 4,
+        particlespeed      = 0.05,
+        particlespeedspread = 0,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 2,
+        sizemod            = 1,
+        texture            = [[blooddropwhite]],
+      },
+    },
+  },
+  
+  ["red_goo"] = {
+    groundflash = {
+      circlealpha        = .4,
+      circlegrowth       = 0,
+      flashalpha         = .3,
+      flashsize          = 32,
+      ttl                = 128,
+      color = {
+        [1]  = 1,
+        [2]  = 0,
+        [3]  = 0,
+      },
+    },
+    pop = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      ground             = true,
+      properties = {
+        airdrag            = .9,
+        colormap           = [[1 0 0 1   1 0 0 1   0 0 0 0]],
+        directional        = false,
+        emitrot            = 45,
+        emitrotspread      = 30,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 16,
+        particlelifespread = 0,
+        particlesize       = 12,
+        particlesizespread = 8,
+        particlespeed      = 0,
+        particlespeedspread = 0,
+        pos                = [[0, 1.0, 0]],
+        size               = 0.2,
+        sizegrowth         = 3,
+        sizemod            = 1,
+        texture            = [[bloodblastwhite]],
+      },
+    },
+    splashes = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      ground             = true,
+      properties = {
+        airdrag            = .96,
+        colormap           = [[1 0 0 1   1 0 0 1   0 0 0 0]],
+        directional        = true,
+        emitrot            = 180,
+        emitrotspread      = 80,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 5,
+        particlelife       = 12,
+        particlelifespread = 8,
+        particlesize       = 12,
+        particlesizespread = 8,
+        particlespeed      = 1.5,
+        particlespeedspread = 3,
+        pos                = [[0, 1.0, 0]],
+        size               = 0.1,
+        sizegrowth         = -.1,
+        sizemod            = 1,
+        texture            = [[blooddropwhite]],
+      },
+    },  
+  }
 }
 

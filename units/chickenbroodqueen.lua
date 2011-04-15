@@ -116,7 +116,7 @@ unitDef = {
       def                = [[MELEE]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
-      onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
 
 

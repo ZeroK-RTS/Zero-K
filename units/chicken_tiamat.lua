@@ -35,7 +35,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  maneuverleashlength = [[640]],
   mass                = 287,
   maxDamage           = 3650,
   maxSlope            = 37,
@@ -64,8 +63,6 @@ unitDef = {
   side                = [[THUNDERBIRDS]],
   sightDistance       = 256,
   smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
   trackOffset         = 7,
   trackStrength       = 9,
   trackStretch        = 1,
@@ -82,7 +79,7 @@ unitDef = {
       def                = [[JAWS]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
 
 
@@ -155,7 +152,7 @@ unitDef = {
 
 
     JAWS         = {
-      name                    = [[Claws]],
+      name                    = [[Jaws]],
       areaOfEffect            = 8,
       craterBoost             = 0,
       craterMult              = 0,
