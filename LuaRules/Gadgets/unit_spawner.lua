@@ -732,7 +732,7 @@ local function Wave()
   
   local burrowCount = SetCount(burrows)
   --echo("Wave bonus delta this round: "..waveBonusDelta)
-  echo("Wave bonus this round: "..waveBonus)
+  --echo("Wave bonus this round: "..waveBonus)
   --reduce all chicken appearance times
   local timeReduction = math.ceil((burrowTechTime * burrowCount)/playerCount)
   totalTimeReduction = totalTimeReduction + timeReduction

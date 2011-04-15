@@ -105,14 +105,14 @@ end
 local function DropBasiliskLoop()
 	while true do
 		local health, maxHealth = spGetUnitHealth(unitID)
-		if (health/maxHealth) < healthBasiliskDrop and (health/maxHealth) > healthTiamatDrop then
-			for i=1,malus do
-				EmitSfx(body,2048+5)
-				Sleep(1000)
-			end
-		elseif (health/maxHealth) < healthTiamatDrop then
+		if (health/maxHealth) < healthTiamatDrop then
 			for i=1,malus do
 				EmitSfx(body,2048+6)
+				Sleep(1000)
+			end
+		elseif (health/maxHealth) < healthBasiliskDrop then
+			for i=1,malus do
+				EmitSfx(body,2048+5)
 				Sleep(1000)
 			end		
 		end

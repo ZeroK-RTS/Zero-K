@@ -1,3 +1,5 @@
+//linear constant 163840
+
 piece body,head,tail,lthighf,lkneef,lshinf,lfootf,rthighf,rkneef,rshinf,rfootf,lthighb,lkneeb,lshinb,lfootb,rthighb,rkneeb,rshinb,rfootb,lforearml,lbladel,rforearml,rbladel,lforearmu,lbladeu,rforearmu,rbladeu,spike1,spike2,spike3,firepoint;
 
 static-var bMoving, gun_1;
@@ -6,7 +8,6 @@ static-var bMoving, gun_1;
 #define SIG_AIM				2
 #define SIG_AIM_2			4
 #define SIG_MOVE			16
-#define SIG_BUILD;
 	
 #include "constants.h"
 
@@ -169,16 +170,6 @@ StopMoving()
 	start-script stopwalk();
 }
 
-StartBuilding(Func_Var_1)
-{
-	set INBUILDSTANCE to 1;
-}
-
-StopBuilding()
-{
-	set INBUILDSTANCE to 0;
-}
-
 QueryNanoPiece(piecenum)
 {
 	piecenum = firepoint;
@@ -255,7 +246,7 @@ AimWeapon4()
 Shot1()
 	{
 	++gun_1;
-	if (gun_1 > 4)
+	if (gun_1 > 2)
 		{
 		gun_1 = 1;
 		}
@@ -263,31 +254,23 @@ Shot1()
 		{
 		turn lforearmu to y-axis <-140> speed <600>;
 		turn lbladeu to y-axis <140> speed <600>;
+		turn rforearmu to y-axis <140> speed <600>;
+		turn rbladeu to y-axis <-140> speed <600>;
 		wait-for-turn lbladeu around y-axis;
 		turn lforearmu to y-axis <0> speed <120>;
 		turn lbladeu to y-axis <0> speed <120>;
+		turn rforearmu to y-axis <0> speed <120>;
+		turn rbladeu to y-axis <0> speed <120>;
 		}
 	if (gun_1 == 2)
 		{
 		turn lforearml to y-axis <-140> speed <600>;
 		turn lbladel to y-axis <140> speed <600>;
-		wait-for-turn lbladel around y-axis;
-		turn lforearml to y-axis <0> speed <120>;
-		turn lbladel to y-axis <0> speed <120>;
-		}
-	if (gun_1 == 3)
-		{
-		turn rforearmu to y-axis <140> speed <600>;
-		turn rbladeu to y-axis <-140> speed <600>;
-		wait-for-turn rbladeu around y-axis;
-		turn rforearmu to y-axis <0> speed <120>;
-		turn rbladeu to y-axis <0> speed <120>;
-		}
-	if (gun_1 == 4)
-		{
 		turn rforearml to y-axis <140> speed <600>;
 		turn rbladel to y-axis <-140> speed <600>;
 		wait-for-turn rbladel around y-axis;
+		turn lforearml to y-axis <0> speed <120>;
+		turn lbladel to y-axis <0> speed <120>;
 		turn rforearml to y-axis <0> speed <120>;
 		turn rbladel to y-axis <0> speed <120>;
 		}
