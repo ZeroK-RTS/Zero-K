@@ -252,7 +252,7 @@ confdata.menu_tree = {
 						local speed = Spring.GetConfigInt( "ScrollWheelSpeed", 0 ) or 25
 						Spring.Echo(Spring.GetConfigInt( "ScrollWheelSpeed", 0 ))
 						if speed > 0 ~= self.value then
-							spSendCommands{"scrollwheelspeed " .. speed*-1]
+							spSendCommands{"scrollwheelspeed " .. speed*-1}
 						end
 					end, 
 				} 
