@@ -49,6 +49,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[scoutboat.s3o]],
+  script				 = [[armpt.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   side                   = [[ARM]],
@@ -61,7 +62,13 @@ unitDef = {
   workerTime             = 0,
 
   weapons                = {
-
+  
+    {
+      def                = [[FAKEWEAPON]],
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 60,
+    },
+	
     {
       def                = [[MISSILE]],
       badTargetCategory  = [[FIXEDWING]],
@@ -73,11 +80,12 @@ unitDef = {
 
   weaponDefs             = {
 
-    MINESWEEP = {
-      name                    = [[MineSweep]],
+	FAKEWEAPON = {
+      name                    = [[Fake Weapon]],
       areaOfEffect            = 512,
       avoidFeature            = false,
       avoidFriendly           = false,
+	  canAttackGround		  = true,
       collideFeature          = false,
       collideFriendly         = false,
       craterBoost             = 0,
@@ -92,15 +100,14 @@ unitDef = {
       impulseFactor           = 0,
       intensity               = 0,
       interceptedByShieldType = 0,
-      lineOfSight             = false,
       noSelfDamage            = true,
       paralyzer               = true,
       paralyzeTime            = 10,
-      range                   = 300,
+      range                   = 270,
       reloadtime              = 3,
       renderType              = 4,
       tolerance               = 32367,
-      turret                  = false,
+      turret                  = true,
       weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1024,
@@ -115,9 +122,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 80,
-        planes  = 80,
-        subs    = 4,
+        default = 100,
+        planes  = 100,
+        subs    = 5,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -135,7 +142,7 @@ unitDef = {
       model                   = [[wep_m_fury.s3o]],
       noSelfDamage            = true,
       range                   = 270,
-      reloadtime              = 1.6,
+      reloadtime              = 2,
       renderType              = 1,
       selfprop                = true,
       smokedelay              = [[0.1]],

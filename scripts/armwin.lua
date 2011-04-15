@@ -72,7 +72,7 @@ function script.Create()
 		Move( fan, z_axis, 14)
 		Move( fan, y_axis, 18)
 		--]]
-		Spin( fan , z_axis, math.rad(15))
+		Spin( fan , z_axis, math.rad(30))
 	end
 end
 

@@ -44,6 +44,7 @@ function script.StopMoving()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	if num == 1 then return end
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
 	Turn( turret , x_axis, math.rad(-20), math.rad(150) )
