@@ -102,7 +102,7 @@ local jumpCmdDesc = {
   id      = CMD_JUMP,
   type    = CMDTYPE.ICON_MAP,
   name    = 'Jump',
-  cursor  = 'Attack',  -- add with LuaUI?
+  cursor  = 'Jump',  -- add with LuaUI?
   action  = 'jump',
   tooltip = 'Jump to selected position.',
 }
@@ -353,7 +353,8 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:Initialize()
-  Spring.SetCustomCommandDrawData(CMD_JUMP, "Attack", {0, 1, 0, 1})
+  Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, 1})
+  Spring.AssignMouseCursor("Jump", "cursorJump", true, true)
   gadgetHandler:RegisterCMDID(CMD_JUMP)
   for _, unitID in pairs(Spring.GetAllUnits()) do
     gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))

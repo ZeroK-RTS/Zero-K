@@ -187,7 +187,7 @@ local overrides = {
 	[CMD.RECLAIM] = {text= '\255\0\255\0E', texture = imageDir .. 'Bold/reclaim.png'},
 	[CMD.RESURRECT] = {text= '\255\0\255\0S', texture = imageDir .. 'Bold/resurrect.png'},
 	[CMD_BUILD] = {text = '\255\0\255\0B', texture = imageDir .. 'Bold/build.png'},
-	[CMD.DGUN] = { texture = imageDir .. 'dgun.png', text= '\255\0\255\0D'},
+	[CMD.DGUN] = { texture = imageDir .. 'Bold/dgun.png', text= '\255\0\255\0D'},
 
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png', text= '\255\0\255\0L'},
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png', text= '\255\0\255\0U'},
