@@ -125,7 +125,7 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-    	[[custom:NONE]],
+    	[[custom:BEAMWEAPON_MUZZLE_BLUE]],
 		[[custom:NONE]],
     },
 

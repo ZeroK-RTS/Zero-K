@@ -170,6 +170,11 @@ local morphDefs = {
       time = 45,
       rank = 3,
     },
+    {
+      into = 'armraven',
+      time = 45,
+      rank = 3,
+    },
   },
   dante = {
     into = 'armbanth',
@@ -201,6 +206,11 @@ local morphDefs = {
     time = 20,
     rank = 3,
   },
+  shieldarty = {
+    into = 'firewalker',
+    time = 20,
+    rank = 3,
+  },
   corcan = {
     into = 'corsumo',
     time = 20,
@@ -209,11 +219,6 @@ local morphDefs = {
   corsumo = {
     {
       into = 'dante',
-      time = 45,
-      rank = 3,
-    },
-    {
-      into = 'armraven',
       time = 45,
       rank = 3,
     },
@@ -241,11 +246,6 @@ local morphDefs = {
     time = 20,
     rank = 3,
   },
-  cormort = {
-    into = 'cormortgold',
-    time = 20,
-    rank = 3,
-  },
 
   -- // vehicles
   corfav = {
@@ -255,14 +255,14 @@ local morphDefs = {
   },
   corgator = {
     {
-    into = 'corraid',
-    time = 10,
-    rank = 3,
+	  into = 'corraid',
+      time = 10,
+      rank = 3,
     },
     {
-    into = 'logkoda',
-    time = 10,
-    rank = 3,
+      into = 'logkoda',
+      time = 10,
+      rank = 3,
     },
   },
   corraid = {
@@ -484,10 +484,10 @@ local comMorph = {
 		time = 20,
 	},
 	[2] = {
-		time = 45,
+		time = 25,
 	},
 	[3] = {
-		time = 40,
+		time = 30,
 	},
 }
 

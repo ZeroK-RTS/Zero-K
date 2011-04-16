@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armanni]],
   name                          = [[Annihilator]],
-  description                   = [[Tachyon Accelerator - Requires 50 Power CONNECTED VIA A POWER GRID to fire]],
+  description                   = [[Tachyon Accelerator - Requires 50 Power]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   bmcode                        = [[0]],

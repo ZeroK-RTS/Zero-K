@@ -32,7 +32,7 @@ unitDef = {
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],
-  energyMake                    = 1,
+  energyMake                    = 0,
   explodeAs                     = [[NOWEAPON]],
   floater                       = true,
   footprintX                    = 4,

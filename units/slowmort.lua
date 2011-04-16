@@ -43,7 +43,7 @@ unitDef = {
   movementClass       = [[KBOT2]],
   moveState           = 0,
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB UNARMED]],
   objectName          = [[CORMORT.s3o]],
   onoffable           = true,
   seismicSignature    = 4,
@@ -52,7 +52,7 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:RAIDMUZZLE]],
+      [[custom:NONE]],
     },
 
   },
@@ -76,7 +76,7 @@ unitDef = {
 
     {
       def                = [[SLOWBEAM]],
-      badTargetCategory  = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING UNARMED]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 

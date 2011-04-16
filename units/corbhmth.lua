@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[corbhmth]],
   name                          = [[Behemoth]],
-  description                   = [[Plasma Battery - Requires 50 Power CONNECTED VIA A POWER GRID to fire]],
+  description                   = [[Plasma Battery - Requires 50 Power]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   bmcode                        = [[0]],

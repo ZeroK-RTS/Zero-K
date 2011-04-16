@@ -1,6 +1,6 @@
 //ARM CRABRE SCRIPT BY TA-FOREVER (Sephiroth) (http://www.planetannihilation.com/taforever, http://www.planetannihilation.com/taan)
 
-//linear constant 65536
+//linear constant 78643.2 (65536*1.2)
 
 piece base, ground, turret, blight, canon, barrel1, barrel2,
       flare1, flare2, flare3, flare4, flare5, flare6, flare7, rocket, leg1, leg2, leg3, leg4, gflash ;
