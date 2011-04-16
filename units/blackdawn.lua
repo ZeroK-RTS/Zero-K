@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[blackdawn]],
   name                = [[Black Dawn]],
-  description         = [[Ground Assault Gunship]],
+  description         = [[Riot/Skirmish Gunship]],
   acceleration        = 0.135,
   amphibious          = true,
   brakeRate           = 2.838,
