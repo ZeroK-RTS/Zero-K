@@ -8,7 +8,7 @@
   explosiongenerator=custom:NUKE_150;
   explosionSpeed=10000;
   impulseboost=0;
-  impulsefactor=0.4;
+  impulsefactor=0.1;
   interceptedbyshieldtype=1;
   noselfdamage=1;
   range=480;
