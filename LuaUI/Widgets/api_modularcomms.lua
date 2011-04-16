@@ -17,6 +17,7 @@ end
 
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/base64.lua")
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
 --------------------------------------------------------------------------------
 -- load data
@@ -79,14 +80,15 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- yeah, yeah, n^2
 local function RemoveDuplicates(base, delete)
-	for i1,v1 in ipairs(base) do
-		for i2,v2 in ipairs(delete) do
-			if v1 == v2 then
-				base[i1] = nil
-				break
-			end
+	local count = {}
+	for i,v in ipairs(delete) do
+		count[v] = (count[v] or 0) + 1
+	end	
+	for i,v in ipairs(base) do
+		if count[v] and count[v] > 0 then
+			base[i] = nil
+			count[v] = count[v] - 1
 		end
 	end
 end
@@ -99,8 +101,8 @@ local function GetCommSeriesInfo(seriesName, purgeDuplicates)
 		data[i] = {name = commList[i]}
 	end
 	for i=1,#data do
-		data[i].modules = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].modules or {}
-		data[i].cost = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].cost or 0
+		data[i].modules = commDataGlobal[data[i].name] and Spring.Utilities.CopyTable(commDataGlobal[data[i].name].modules) or {}
+		data[i].cost = commDataGlobal[data[i].name] and Spring.Utilities.CopyTable(commDataGlobal[data[i].name].cost) or 0
 	end
 	-- remove reference to modules already in previous levels
 	if purgeDuplicates then
@@ -130,7 +132,7 @@ local function GetCommModules(unitDef)
 	if type(unitDef) == "number" then unitDef = UnitDefs[unitDef].name end
 	if commDataGlobal[unitDef] then
 		local modules = {}
-		for i,v in ipairs(commDataGlobal[unitDef] and commDataGlobal[unitDef].modules) do
+		for i,v in pairs(commDataGlobal[unitDef] and commDataGlobal[unitDef].modules) do
 			local modulename = v
 			modules[i] = upgrades[modulename].name
 		end

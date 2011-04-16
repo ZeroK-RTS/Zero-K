@@ -419,7 +419,7 @@ function gadget:GameFrame(n)
 		if fireTeam and maxFireDamage > getMeanDamageExcept(fireTeam) * easyFactor then
 			awardAward(fireTeam, 'fire', 'Damage: '.. comma_value(maxFireDamage))
 		end
-		if empTeam and maxEmpDamage/10 > getMeanDamageExcept(empTeam) * easyFactor then
+		if empTeam and maxEmpDamage/4 > getMeanDamageExcept(empTeam) * easyFactor then
 			awardAward(empTeam, 'emp', 'Damage: '.. comma_value(maxEmpDamage))
 		end
 		if capTeam and maxCap > 1000 then
