@@ -211,12 +211,12 @@ local function UpdateRules()
 
 	-- tooltips, antilag
 	local miniQueenTime = difficulty.miniQueenTime and difficulty.miniQueenTime[1]
-	if miniQueenTime then label_anger.tooltip = tooltipAnger .. "\nDragons arrive at ".. FormatTime(math.floor(gameInfo.queenTime * miniQueenTime)) end
+	if miniQueenTime then label_anger.tooltip = tooltipAnger .. "\nDragons arrive at ".. FormatTime(math.floor(gameInfo.queenTime * miniQueenTime)) .. " (".. math.floor(miniQueenTime*100) .."%)" end
 	
 	label_burrows.tooltip = "Burrows spawn every ".. ("%.1f"):format(GetDifficultyValue('burrowSpawnRate')*0.25*(gameInfo[roostName.."Count"] + 1)/gameInfo.malus) .." seconds\n"..
 		tooltipBurrowRespawn
 	
-	if (gameInfo.lagging == 1) then label_mode:SetCaption(red.."Anti-Lag Enabled")
+	if (gameInfo.lagging == 1) then label_mode:SetCaption(red.."Anti-Lag Enabled\008")
 	else label_mode:SetCaption("Mode: " .. configs.difficulties[gameInfo.difficulty]) end
 end
 
