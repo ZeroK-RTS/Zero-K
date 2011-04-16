@@ -101,8 +101,8 @@ local function GetCommSeriesInfo(seriesName, purgeDuplicates)
 		data[i] = {name = commList[i]}
 	end
 	for i=1,#data do
-		data[i].modules = commDataGlobal[data[i].name] and Spring.Utilities.CopyTable(commDataGlobal[data[i].name].modules) or {}
-		data[i].cost = commDataGlobal[data[i].name] and Spring.Utilities.CopyTable(commDataGlobal[data[i].name].cost) or 0
+		data[i].modules = commDataGlobal[data[i].name] and Spring.Utilities.CopyTable(commDataGlobal[data[i].name].modules, true) or {}
+		data[i].cost = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].cost or 0
 	end
 	-- remove reference to modules already in previous levels
 	if purgeDuplicates then
