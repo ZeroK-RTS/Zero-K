@@ -63,7 +63,8 @@ local luaAI
 local chickenTeamID
 local burrows             = {}
 local burrowSpawnProgress = 0
-local maxTries            = 100
+local maxTries            = 500
+local maxTriesSmall		  = 100
 local computerTeams       = {}
 local humanTeams          = {}
 local lagging             = false
@@ -543,7 +544,7 @@ local function SpawnChicken(burrowID, spawnNumber, chickenName)
       z = random(bz - s, bz + s)
       s = s + spawnSquareIncrement
       tries = tries + 1
-    until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTries)
+    until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
     local unitID = spCreateUnit(chickenName, x, 0, z, "n", chickenTeamID)
     spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, emptyTable) --// set moveState to roam
     if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable) end
@@ -585,7 +586,7 @@ local function SpawnTurret(burrowID, turret)
       z = random(bz - s, bz + s)
       s = s + spawnSquareIncrement
       tries = tries + 1
-    until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTries)
+    until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
     
     local unitID = spCreateUnit(turret, x, 0, z, "n", chickenTeamID) -- FIXME
 	turretDef = UnitDefs[spGetUnitDefID(unitID)]
@@ -646,7 +647,7 @@ local function SpawnBurrow(number)
         blocking = 1
       end
     end
-  until (blocking == 2 or tries > maxTries)
+  until (blocking == 2 or tries > maxTriesSmall)
 
     local unitID = spCreateUnit(burrowName, x, 0, z, "n", chickenTeamID)
     burrows[unitID] = {targetID = unitID, targetDistance = 100000}
