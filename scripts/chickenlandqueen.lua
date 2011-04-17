@@ -8,7 +8,7 @@ local leftThigh, leftKnee, leftShin, leftFoot, rightThigh, rightKnee, rightShin,
 local lforearml,lbladel,rforearml,rbladel,lforearmu,lbladeu,rforearmu,rbladeu = piece("lforearml", "lbladel", "rforearml", "rbladel", "lforearmu", "lbladeu", "rforearmu", "rbladeu")
 local spike1, spike2, spike3, firepoint, spore1, spore2, spore3 = piece("spike1", "spike2", "spike3", "firepoint", "spore1", "spore2", "spore3")
 
-local smokePiece = {}
+smokePiece = {}
 
 local turretIndex = {
 }
@@ -42,6 +42,9 @@ local malus = GG.malus or 1
 --maximum HP for additional weapons
 local healthSpore3 = 0.55
 local healthStomp = 0.7
+local healthDodoDrop = 0.6
+local healthBasiliskDrop = 0.45
+local healthTiamatDrop = 0.2
 
 --signals
 local SIG_Aim = {
@@ -54,6 +57,37 @@ local SIG_Move = 16
 ----------------------------------------------------------
 local function RestoreAfterDelay()
 	Sleep(1000)
+end
+
+local function DropDodoLoop()
+	while true do
+		local health, maxHealth = spGetUnitHealth(unitID)
+		if (health/maxHealth) < healthDodoDrop then
+			for i=1,malus do
+				EmitSfx(tail, 2048+6)
+				Sleep(500)
+			end
+		end
+		Sleep(6000)
+	end
+end
+
+local function DropBasiliskLoop()
+	while true do
+		local health, maxHealth = spGetUnitHealth(unitID)
+		 if (health/maxHealth) < healthTiamatDrop then
+			for i=1,malus do
+				EmitSfx(tail, 2048+8)
+				Sleep(1000)
+			end
+		elseif (health/maxHealth) < healthBasiliskDrop then
+			for i=1,malus do
+				EmitSfx(tail, 2048+7)
+				Sleep(1000)
+			end		
+		end
+		Sleep(8000)
+	end
 end
 
 -- used for queen morph
@@ -87,7 +121,7 @@ local function Walk()
 		Move( body , y_axis, 10, 20 )			
 		Turn( tail , y_axis, math.rad(20), math.rad(40) )
 		Turn( head , x_axis, math.rad(-10), math.rad(20) )
-		Turn( tail , x_axis, math.rad(20), math.rad(20) )
+		Turn( tail , y_axis, math.rad(20), math.rad(20) )
 		WaitForTurn(leftThigh, x_axis)
 		Sleep(0)	-- needed to prevent anim breaking, DO NOT REMOVE
 		
@@ -102,7 +136,7 @@ local function Walk()
 		Turn( rightFoot , x_axis, math.rad(35), math.rad(145) * PACE)
 		Move( body , y_axis, 0, 20 )
 		Turn( head , x_axis, math.rad(10), math.rad(20) )
-		Turn( tail , x_axis, math.rad(-20), math.rad(20) )
+		Turn( tail , y_axis, math.rad(-20), math.rad(20) )
 		WaitForTurn(leftShin, x_axis)
 		Sleep(0)
 			
@@ -120,7 +154,7 @@ local function Walk()
 		Turn( rightThigh , z_axis, math.rad(-(5)), math.rad(20) * PACE)
 		Move( body , y_axis, 10, 20 )
 		Turn( head , x_axis, math.rad(-10), math.rad(20) )
-		Turn( tail , x_axis, math.rad(20), math.rad(20) )
+		Turn( tail , y_axis, math.rad(20), math.rad(20) )
 		WaitForTurn(rightThigh, x_axis)
 		Sleep(0)
 		
@@ -135,7 +169,7 @@ local function Walk()
 		Turn( leftFoot , x_axis, math.rad(35), math.rad(145) * PACE)
 		Move( body , y_axis, 0, 20 )
 		Turn( head , x_axis, math.rad(10), math.rad(20) )
-		Turn( tail , x_axis, math.rad(-20), math.rad(20) )
+		Turn( tail , y_axis, math.rad(-20), math.rad(20) )
 		WaitForTurn(rightShin, x_axis)
 		Sleep(0)
 	end
@@ -183,6 +217,9 @@ function script.Create()
 	Turn(spore1, x_axis, math.rad(90))
 	Turn(spore2, x_axis, math.rad(90))
 	Turn(spore3, x_axis, math.rad(90))
+	
+	StartThread(DropDodoLoop)
+	StartThread(DropBasiliskLoop)
 end
 
 --weapon code

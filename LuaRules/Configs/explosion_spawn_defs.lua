@@ -14,6 +14,9 @@ local spawn_defs = {
 	chickenflyerqueen_dodobomb = {name = "chicken_dodo", cost=0, expire=30},
 	chickenflyerqueen_basiliskbomb = {name = "chickenc", cost=0, expire=0},
 	chickenflyerqueen_tiamatbomb = {name = "chicken_tiamat", cost=0, expire=0},
+	chickenlandqueen_dodobomb = {name = "chicken_dodo", cost=0, expire=30},
+	chickenlandqueen_basiliskbomb = {name = "chickenc", cost=0, expire=0},
+	chickenlandqueen_tiamatbomb = {name = "chicken_tiamat", cost=0, expire=0},
 }
 
 local shieldCollide = { -- unitDefs as the shield hit callin is setup really strangely
