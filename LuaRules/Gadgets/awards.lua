@@ -57,6 +57,8 @@ local terraformList		= {}
 local ouchDamageList	= {}
 local kamDamageList		= {}
 local shareList			= {}
+local shareListTemp1	= {}
+local shareListTemp2	= {}
 
 local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 
@@ -64,6 +66,11 @@ local expUnitTeam, expUnitDefID, expUnitExp = 0,0,0
 local awardList = {}
 local sentAwards = false
 local teamCount = 0
+
+local five_minute_frames = 32*60*5
+local shareList_update = five_minute_frames
+--shareList_update = 32*20
+
 
 local boats, t3Units = {}, {}
 
@@ -145,6 +152,27 @@ function awardAward(team, awardType, record)
 	end
 end
 
+
+local function CopyTable(original)   -- Warning: circular table references lead to
+	local copy = {}               -- an infinite loop.
+	for k, v in pairs(original) do
+		if (type(v) == "table") then
+			copy[k] = CopyTable(v)
+		else
+			copy[k] = v
+		end
+	end
+	return copy
+end
+
+local function UpdateShareList()
+	shareList = CopyTable(shareListTemp2)
+	shareListTemp2 = CopyTable(shareListTemp1)
+end
+
+-------------------
+-- Callins
+
 function gadget:Initialize()
 	local tempTeamList = Spring.GetTeamList()
 	for _, team in ipairs(tempTeamList) do
@@ -171,6 +199,8 @@ function gadget:Initialize()
 		ouchDamageList[team]	= 0
 		kamDamageList[team]		= 0
 		shareList[team]			= 0
+		shareListTemp1[team]	= 0
+		shareListTemp2[team]	= 0
 		
 		awardList[team] = {}
 		
@@ -213,11 +243,11 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 			captureList[newTeam] = captureList[newTeam] + mCost
 		end
 	else -- teams are allied
-		if shareList[oldTeam] and shareList[newTeam] then
+		if shareListTemp1[oldTeam] and shareListTemp1[newTeam] then
 			local ud = UnitDefs[unitDefID]
 			local mCost = ud and ud.metalCost
-			shareList[oldTeam] = shareList[oldTeam] + mCost
-			shareList[newTeam] = shareList[newTeam] - mCost
+			shareListTemp1[oldTeam] = shareListTemp1[oldTeam] + mCost
+			shareListTemp1[newTeam] = shareListTemp1[newTeam] - mCost
 		end
 	end
 end
@@ -306,6 +336,11 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 end
 
 function gadget:GameFrame(n)
+
+	if n % shareList_update == 1 and not spIsGameOver() then
+		UpdateShareList()
+	end
+
 	if TESTMODE then
 		local frame32 = (n) % 32
 		if (frame32 < 0.1) then
@@ -359,7 +394,7 @@ function gadget:GameFrame(n)
 		--test values
 		if TESTMODE then
 			local testteam = 0
-			shareTeam, 	maxShare 			= testteam+0	,144
+			--shareTeam, 	maxShare 			= testteam+0	,5144
 			--[[				
 			pwnTeam, 	maxDamage 			= testteam+0	,1
 			navyTeam, 	maxNavyDamage 		= testteam+1	,1
