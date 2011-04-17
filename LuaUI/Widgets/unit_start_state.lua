@@ -106,8 +106,22 @@ local function addUnit(defName, path)
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_personal_cloak"
-	
+	--
 	end
+	if ud.canBuild then
+		options[defName .. "_priority"] = {
+			name = "Priority",
+			desc = "Values: low, normal, high",
+			type = 'number',
+			value = 1,
+			min = 0,
+			max = 2,
+			step = 1,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_priority"
+	end
+	--
 end
 
 local function AddFactoryOfUnits(defName)
@@ -136,6 +150,11 @@ addUnit("armraven","Mech")
 addUnit("armbanth","Mech")
 addUnit("gorg","Mech")
 addUnit("armorco","Mech")
+
+addUnit("screamer","Heavy") --add test about buildings, not built units
+
+--addUnit("comrecon1","Heavy") crash, maybe because unfound
+
 
 local CMD_UNIT_AI = 36214
 
@@ -183,7 +202,23 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			if options[name .. "_personal_cloak"] and options[name .. "_personal_cloak"].value ~= nil then
 				Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {options[name .. "_personal_cloak"].value and 1 or 0}, 0)
 			end
-			
+			--
+			if options[name .. "_priority"] and options[name .. "_priority"].value then
+				if options[name .. "_priority"].value == -1 then --will it fuX ?
+					if builderID then
+						local bdid = Spring.GetUnitDefID(builderID)
+						--if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
+							local priority = Spring.GetUnitStates(builderID).priority
+							if priority then
+								Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, 0)
+							end
+						--end
+					end
+				else
+					Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_priority"].value}, 0)
+				end
+			end
+			--
 		end
 	end
 end
