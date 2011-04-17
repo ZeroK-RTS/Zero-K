@@ -25,6 +25,5 @@
     default=4000;
     empresistant99=40;
     empresistant75=1000;
-    commanders=400;
   }
 }
