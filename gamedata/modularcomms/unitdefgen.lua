@@ -167,7 +167,7 @@ for index,name in pairs(stressChassis) do
 	stressDefs["stresstest"..index] = true
 end
 
--- for easy testing; creates a comm with unitName testcomm
+-- for easy testing; creates test commanders with specific loadouts
 local testDef = VFS.Include("gamedata/modularcomms/testdata.lua")
 for i = 1, testDef.count do
 	ProcessComm(testDef[i].name, testDef[i])
@@ -238,7 +238,12 @@ for name, data in pairs(commDefs) do
 	-- set wreck values
 	for featureName,array in pairs(data.featuredefs or {}) do
 		local mult = 0.4
-		if featureName == "HEAP" then mult = 0.2 end
+		local typeName = "Wreckage"
+		if featureName == "HEAP" then
+			typeName = "Debris"
+			mult = 0.2 
+		end
+		array.description = typeName .. " - " .. data.name
 		array.metal = data.buildcostmetal * mult
 		array.reclaimtime = data.buildcostmetal * mult
 		array.damage = data.maxdamage
