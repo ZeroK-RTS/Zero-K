@@ -394,6 +394,8 @@ function gadget:GameFrame(n)
 		--test values
 		if TESTMODE then
 			local testteam = 0
+			--expUnitTeam, expUnitExp			= testteam+0	,113.59444
+			--expUnitDefID = 2
 			--shareTeam, 	maxShare 			= testteam+0	,5144
 			--[[				
 			pwnTeam, 	maxDamage 			= testteam+0	,1
@@ -480,8 +482,9 @@ function gadget:GameFrame(n)
 		end
 		if expUnitExp >= 3.0 then
 			local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
-			local expUnitExpRounded = ''..floor(expUnitExp * 10)/10
-			expUnitExpRounded = expUnitExpRounded:sub(1,3)
+			--local expUnitExpRounded = ''..floor(expUnitExp * 10)/10
+			local expUnitExpRounded = ''..floor(expUnitExp * 10)
+			expUnitExpRounded = expUnitExpRounded:sub(1,-2) .. '.' .. expUnitExpRounded:sub(-1) 
 			awardAward(expUnitTeam, 'vet', vetName ..', '.. expUnitExpRounded ..' XP')
 		end
 			
