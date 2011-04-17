@@ -132,7 +132,7 @@ local function ProcessComm(name, config)
 		end	
 		if config.name then
 			commDefs[name].name = config.name
-			if commDefs[name].customparams.level > 1 then
+			if tonumber(commDefs[name].customparams.level) > 1 then
 				commDefs[name].name = commDefs[name].name .. " - Level " .. commDefs[name].customparams.level
 			end
 		end
@@ -239,7 +239,7 @@ for name, data in pairs(commDefs) do
 	for featureName,array in pairs(data.featuredefs or {}) do
 		local mult = 0.4
 		local typeName = "Wreckage"
-		if featureName == "HEAP" then
+		if featureName == "heap" then
 			typeName = "Debris"
 			mult = 0.2 
 		end
@@ -247,6 +247,8 @@ for name, data in pairs(commDefs) do
 		array.metal = data.buildcostmetal * mult
 		array.reclaimtime = data.buildcostmetal * mult
 		array.damage = data.maxdamage
+		array.customparams = {}
+		array.customparams.unit = data.unitname
 	end
 	
 	-- set mass
