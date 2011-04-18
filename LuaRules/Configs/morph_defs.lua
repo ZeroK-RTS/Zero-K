@@ -384,9 +384,16 @@ local morphDefs = {
     },
   }, 
   corhlt = {
+  {
     into = 'armanni',
     time = 90,
     rank = 3,
+	},
+	{
+    into = 'cordoom',
+    time = 90,
+    rank = 3,
+	}
   },
   armpb = {
     into = 'cordoom',
