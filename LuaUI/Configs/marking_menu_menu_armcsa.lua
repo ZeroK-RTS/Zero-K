@@ -13,6 +13,10 @@ local menu_armcsa = {
 			angle= -135,
 			unit = "armwin",
 		  },
+        {
+			angle = -45,
+			unit = "armnanotc"
+		  },
 		}
 	  },
 	  {
@@ -97,10 +101,6 @@ local menu_armcsa = {
 		  {
 			angle = -135,
 			unit = "armjamt"
-		  },
-		  {
-			angle = 0,
-			unit = "armnanotc"
 		  },
 		  {
 			angle = 45,
