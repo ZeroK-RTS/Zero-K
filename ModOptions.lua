@@ -194,8 +194,9 @@ local options = {
     desc='Choose which map Speed Boost to use',
     type='list',
     section= 'mapsettings',
-    def='keepequal',
+    def='auto',
     items = {
+      { key='auto', name="Automatic", desc='Use one of the other options based on a mod-defined list, defaulting to Keep Equal' },
       { key='mapdefault', name="Map Default", desc='Use map speed boost' },
 	  { key='average', name="Average", desc='Each terrain types speed boost is averaged' },
 	  { key='keepequal', name="Keep Equal", desc='Non-equal speedboost removed' },

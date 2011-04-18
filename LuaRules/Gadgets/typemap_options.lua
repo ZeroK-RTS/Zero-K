@@ -28,6 +28,8 @@ if (not gadgetHandler:IsSyncedCode()) then
 end
 
 local modOptions = Spring.GetModOptions()
+local maplist = include "LuaRules/Configs/typemap_options_maps.lua"
+
 function gadget:Initialize()
 	
 	--[[
@@ -37,12 +39,14 @@ function gadget:Initialize()
 		Spring.Echo(name .. " " .. i)
 	end
 	--]]
-	
 	if spGetGameFrame() > 0 then
 		gadgetHandler:RemoveGadget()
 		return
 	end
 	if modOptions.typemapsetting then
+		if modOptions.typemapsetting == "auto" then
+			modOptions.typemapsetting = maplist[Game.mapName] or "keepequal"
+		end
 	
 		if modOptions.typemapsetting == "alloff" then
 			for i = 0,256,1  do
@@ -111,9 +115,7 @@ function gadget:Initialize()
 		end
 		
 	end
-	
 	gadgetHandler:RemoveGadget()
-	
 end
 
 --------------------------------------------------------------------------------
