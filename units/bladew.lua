@@ -44,7 +44,7 @@ unitDef = {
   maneuverleashlength = [[1240]],
   mass                = 73,
   maxDamage           = 90,
-  maxVelocity         = 10,
+  maxVelocity         = 8,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
@@ -91,9 +91,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default        = 400,
-        empresistant75 = 100,
-        empresistant99 = 4,
+        default        = 360,
+        empresistant75 = 90,
+        empresistant99 = 3.6,
       },
 
       duration                = 0.01,
@@ -108,7 +108,7 @@ unitDef = {
       minbarrelangle          = [[0]],
       noSelfDamage            = true,
       paralyzer               = true,
-      paralyzeTime            = 7,
+      paralyzeTime            = 6,
       range                   = 220,
       reloadtime              = 1.2,
       renderType              = 7,
