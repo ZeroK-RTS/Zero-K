@@ -132,9 +132,6 @@ local function ProcessComm(name, config)
 		end	
 		if config.name then
 			commDefs[name].name = config.name
-			if tonumber(commDefs[name].customparams.level) > 1 then
-				commDefs[name].name = commDefs[name].name .. " - Level " .. commDefs[name].customparams.level
-			end
 		end
 		config.cost = config.cost or 0
 		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost

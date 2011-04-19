@@ -52,8 +52,8 @@ function gadget:Initialize()
 			for i = 0,256,1  do
 				spSetTerrainTypeData(i,1,1,1,1)
 			end
+			
 		elseif modOptions.typemapsetting == "keepequal" then
-		
 			local override = {}
 			
 			for i = 0,256,1 do
@@ -73,7 +73,6 @@ function gadget:Initialize()
 			end
 		
 		elseif modOptions.typemapsetting == "average" then
-		
 			local override = {}
 			
 			for i = 0,256,1 do
@@ -93,7 +92,6 @@ function gadget:Initialize()
 			end
 			
 		elseif modOptions.typemapsetting == "onlyimpassable" then
-		
 			local override = {}
 			
 			for i = 0,256,1 do
