@@ -91,9 +91,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default        = 360,
-        empresistant75 = 90,
-        empresistant99 = 3.6,
+        default        = 320,
+        empresistant75 = 80,
+        empresistant99 = 3.2,
       },
 
       duration                = 0.01,
