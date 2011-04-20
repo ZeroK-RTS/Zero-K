@@ -39,7 +39,7 @@ gracePeriodMin		 = 90
 
 queenTime            = 60*60    -- time at which the queen appears, seconds
 queenMorphTime		 = {60*30, 120*30}	--lower and upper bounds for delay between morphs, gameframes
-queenDamageMod		 = 1
+queenHealthMod		 = 1
 miniQueenTime		= {}		-- times at which miniqueens are spawned (multiplier of queentime)
 endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 
@@ -198,7 +198,6 @@ difficulties = {
 	burrowWaveBonus	 = 0.5,
 	burrowTechTime	 = 15,
 	queenSpawnMult   = 5,
-	queenDamageMod	 = 0.9,
 	miniQueenTime	 = {0.5},
 	scoreMult		 = 1.25,
   },
@@ -216,9 +215,9 @@ difficulties = {
 	burrowTechTime	 = 18,
 	burrowRespawnChance = 0.25,
 	queenSpawnMult   = 5,
-	queenTime		 = 50*60,
-	queenDamageMod	 = 0.8,
-	miniQueenTime	 = {0.45}, --{0.37, 0.75},
+	queenTime		 = 10, --50*60,
+	queenHealthMod	 = 1.2,
+	miniQueenTime	 = {}, --{0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
 	scoreMult		 = 1.5,
   },

@@ -801,6 +801,7 @@ local function MorphQueen()
 	Spring.UnitScript.CallAsUnit(queenID, env.MorphFunc)
 	--health handling
 	local _,newMaxHealth         = Spring.GetUnitHealth(queenID)
+	newMaxHealth = newMaxHealth * queenHealthMod * ((playerCount/2) + 0.5)
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
 	-- if newHealth >= 1 then newHealth = 1 end
 	spSetUnitHealth(queenID, {health = newHealth, build = buildProgress})
@@ -923,6 +924,10 @@ function gadget:GameFrame(n)
 			queenID = SpawnQueen()
 			local xp = (malus or 1) - 1
 			Spring.SetUnitExperience(queenID, xp)
+			local _, maxHealth = Spring.GetUnitHealth(queenID)
+			maxHealth = maxHealth * queenHealthMod * ((playerCount/2) + 0.5)
+			Spring.SetUnitMaxHealth(queenID, maxHealth)
+			Spring.SetUnitHealth(queenID, maxHealth)
 		else
 			--chickenSpawnRate = chickenSpawnRate/2
 			for i=1,playerCount do SpawnMiniQueen() end
@@ -1036,15 +1041,16 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 	return true
 end
 
-
+--[[
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if unitID == queenID then	--spSetUnitHealth(u, { health = spGetUnitHealth(u) + (damage * queenArmor) })
-		local divisor = (malus*3/4) + 0.25
+		local divisor = (malus*1/2) + 0.5
 		damage = (damage/divisor) * queenDamageMod
 		--spEcho("Damage reduced to "..damage)
 	end
 	return damage
 end
+]]--
 
 
 function gadget:TeamDied(teamID)
