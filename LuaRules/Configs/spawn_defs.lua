@@ -39,15 +39,16 @@ gracePeriodMin		 = 90
 
 queenTime            = 60*60    -- time at which the queen appears, seconds
 queenMorphTime		 = {60*30, 120*30}	--lower and upper bounds for delay between morphs, gameframes
+queenDamageMod		 = 1
 miniQueenTime		= {}		-- times at which miniqueens are spawned (multiplier of queentime)
 endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 
 burrowQueenTime		= 100		-- how much killing a burrow shaves off the queen timer, seconds (divided by playercount)
-burrowWaveBonus		= 0.6		-- size of temporary bonus to add to subsequent waves (divided by (number of burrows/playerCount) )
-waveBonusDecay		= 0.3		-- linear rate at which burrow wave bonus decreases
-burrowTechTime		= 12		-- how many seconds each burrow deducts from the tech time per wave (divided by playercount)
+burrowWaveBonus		= 0.4		-- size of temporary bonus to add to subsequent waves (divided by (number of burrows/playerCount) )
+waveBonusDecay		= 0.2		-- linear rate at which burrow wave bonus decreases
+burrowTechTime		= 15		-- how many seconds each burrow deducts from the tech time per wave (divided by playercount)
 burrowRespawnChance = 0.15
-burrowRegressMult	= 10			-- multiply by burrowTechTime to get how much killing a burrow sets back chicken timer (divided by playercount)
+burrowRegressMult	= 12			-- multiply by burrowTechTime to get how much killing a burrow sets back chicken timer (divided by playercount)
 
 scoreMult			= 1
 
@@ -194,9 +195,10 @@ difficulties = {
     timeSpawnBonus   = .05,
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
-	burrowWaveBonus	 = 0.8,
-	burrowTechTime	 = 12,
-	queenSpawnMult   = 5,     
+	burrowWaveBonus	 = 0.5,
+	burrowTechTime	 = 15,
+	queenSpawnMult   = 5,
+	queenDamageMod	 = 0.9,
 	miniQueenTime	 = {0.5},
 	scoreMult		 = 1.25,
   },
@@ -210,11 +212,12 @@ difficulties = {
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
 	burrowQueenTime	 = 120,
-	burrowWaveBonus	 = 1,
-	burrowTechTime	 = 15,
+	burrowWaveBonus	 = 0.65,
+	burrowTechTime	 = 18,
 	burrowRespawnChance = 0.25,
 	queenSpawnMult   = 5,
 	queenTime		 = 50*60,
+	queenDamageMod	 = 0.8,
 	miniQueenTime	 = {0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
 	scoreMult		 = 1.5,

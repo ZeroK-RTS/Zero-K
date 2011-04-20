@@ -1040,7 +1040,7 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if unitID == queenID then	--spSetUnitHealth(u, { health = spGetUnitHealth(u) + (damage * queenArmor) })
 		local divisor = (malus*3/4) + 0.25
-		damage = damage/divisor
+		damage = (damage/divisor) * queenDamageMod
 		--spEcho("Damage reduced to "..damage)
 	end
 	return damage

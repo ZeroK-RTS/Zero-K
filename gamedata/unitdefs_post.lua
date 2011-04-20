@@ -418,15 +418,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- No reclaiming of live units
--- 
-
---for name, ud in pairs(UnitDefs) do
---  ud.reclaimable = false
---end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Festive units mod option (CarRepairer's WIP)
 -- 
 
@@ -508,5 +499,15 @@ for name, ud in pairs(UnitDefs) do
   if (ud.unitname:sub(1,7) == "chicken") then
 	--ud.buildcostmetal = ud.buildtime
 	--ud.buildcostenergy = ud.buildtime
+  end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Category changes
+-- 
+for name, ud in pairs(UnitDefs) do
+  if (ud.maxvelocity or 0 > 0) then
+	ud.category = ud.category .. " MOBILE"
   end
 end

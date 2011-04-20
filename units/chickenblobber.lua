@@ -43,7 +43,7 @@ unitDef = {
   minCloakDistance    = 75,
   movementClass       = [[BHOVER3]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB MOBILE]],
   objectName          = [[chickenblobber.s3o]],
   power               = 400,
   seismicSignature    = 4,
@@ -78,7 +78,7 @@ unitDef = {
 
     {
       def                = [[WEAPON]],
-      badTargetCategory  = [[SWIM SHIP HOVER]],
+      badTargetCategory  = [[SWIM SHIP HOVER MOBILE]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
@@ -112,7 +112,7 @@ unitDef = {
       lineOfSight             = true,
       mygravity               = 0.1,
       noSelfDamage            = true,
-      range                   = 1250,
+      range                   = 1350,
       reloadtime              = 8,
       renderType              = 4,
       rgbColor                = [[0.2 0.6 0.0]],

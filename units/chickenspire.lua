@@ -77,8 +77,8 @@ unitDef = {
   weapons                       = {
 
     {
-      def                = [[SEEKERS]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      def                = [[SLAMSPORE]],
+      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER]],
     },
 
   },
@@ -86,8 +86,8 @@ unitDef = {
 
   weaponDefs                    = {
 
-    SEEKERS = {
-      name                    = [[Seekers]],
+    SLAMSPORE = {
+      name                    = [[Slammer Spore]],
       areaOfEffect            = 128,
       avoidFriendly           = false,
       collideFriendly         = false,
@@ -111,7 +111,7 @@ unitDef = {
       interceptedByShieldType = 2,
       lineOfSight             = true,
       metalpershot            = 0,
-      model                   = [[chickenegggreen.s3o]],
+      model                   = [[chickenegggreen_big.s3o]],
       noSelfDamage            = true,
       range                   = 4500,
       reloadtime              = 10,
@@ -132,7 +132,6 @@ unitDef = {
       weaponAcceleration      = 40,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
-      wobble                  = 24000,
     },
 
   },
