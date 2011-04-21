@@ -280,18 +280,6 @@ local morphDefs = {
     time = 20,
     rank = 3,   
   },
-  corgarp = {
-    {
-      into = 'cormart',
-      time = 20,
-      rank = 3,   
-    },
-    {
-      into = 'armmerl',
-      time = 20,
-      rank = 3,   
-    },
-  },
   cormart = {
     {
       into = 'trem',
@@ -317,6 +305,13 @@ local morphDefs = {
     {
       into = 'hoverriot',
       time = 15,
+      rank = 3,   
+    },
+  },
+  nsaclash = {
+    {
+      into = 'armmanni',
+      time = 20,
       rank = 3,   
     },
   },
