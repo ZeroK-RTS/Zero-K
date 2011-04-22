@@ -992,6 +992,13 @@ local function MakeToolTip_Feature(data, tooltip)
 	local fdid = spGetFeatureDefID(featureID)
 	tt_fd = fdid and FeatureDefs[fdid or -1]
 	local feature_name = tt_fd and tt_fd.name
+
+	local live_name
+	if tt_fd and tt_fd.customParams and tt_fd.customParams.unit then
+		live_name = tt_fd.customParams.unit
+	else
+		live_name = feature_name:gsub('([^_]*).*', '%1')
+	end
 	
 	local desc = ''
 	if feature_name:find('dead2') or feature_name:find('heap') then
@@ -999,7 +1006,6 @@ local function MakeToolTip_Feature(data, tooltip)
 	elseif feature_name:find('dead') then
 		desc = ' (wreckage)'
 	end
-	local live_name = feature_name:gsub('([^_]*).*', '%1')
 	tt_ud = UnitDefNames[live_name]
 	
 	fullname = ((tt_ud and tt_ud.humanName .. desc) or tt_fd.tooltip or "")

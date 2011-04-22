@@ -137,6 +137,7 @@ local function ProcessComm(name, config)
 		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
 		commDefs[name].buildcostenergy = commDefs[name].buildcostenergy + config.cost
 		commDefs[name].buildtime = commDefs[name].buildtime + config.cost
+		commDefs[name].unitname = name
 	end
 end
 
