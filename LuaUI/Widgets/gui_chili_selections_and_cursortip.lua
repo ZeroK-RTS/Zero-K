@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.04 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.041 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1458,15 +1458,21 @@ local function MakeToolTip_Feature(data, tooltip)
 	tt_fd = fdid and FeatureDefs[fdid or -1]
 	local feature_name = tt_fd and tt_fd.name
 	
+	local live_name
+	
+	if tt_fd and tt_fd.customParams and tt_fd.customParams.unit then
+		live_name = tt_fd.customParams.unit
+	else
+		live_name = feature_name:gsub('([^_]*).*', '%1')
+	end
+	
 	local desc = ''
 	if feature_name:find('dead2') or feature_name:find('heap') then
 		desc = ' (debris)'
 	elseif feature_name:find('dead') then
 		desc = ' (wreckage)'
 	end
-	local live_name = feature_name:gsub('([^_]*).*', '%1')
 	tt_ud = UnitDefNames[live_name]
-	
 	fullname = ((tt_ud and tt_ud.humanName .. desc) or tt_fd.tooltip or "")
 	
 	if not (tt_fd) then
@@ -1503,7 +1509,7 @@ local function MakeToolTip_Feature(data, tooltip)
 					and { name='hp', directcontrol = (tt_ud and 'hp_corpse' or 'hp_feature'), } 
 					or {}),
 			{ name='res', directcontrol = tt_ud and 'resources_corpse' or 'resources_feature' },
-			{ name='help', text = green .. 'Space+click: Show unit stats', },
+			{ name='help', text = tt_ud and (green .. 'Space+click: Show unit stats') or '', },
 		},
 	}
 	

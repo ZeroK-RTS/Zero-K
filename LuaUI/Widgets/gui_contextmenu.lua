@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Context Menu",
-    desc      = "v0.082 Chili Context Menu\nPress [Space] while clicking for a context menu.",
+    desc      = "v0.083 Chili Context Menu\nPress [Space] while clicking for a context menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -875,7 +875,14 @@ function widget:MousePress(x,y,button)
 			local fd = fdid and FeatureDefs[fdid]
 			local feature_name = fd and fd.name
 			if feature_name then
-				local live_name = feature_name:gsub('([^_]*).*', '%1')
+				
+				local live_name
+				if fd and fd.customParams and fd.customParams.unit then
+					live_name = fd.customParams.unit
+				else
+					live_name = feature_name:gsub('([^_]*).*', '%1')
+				end
+				
 				local ud = UnitDefNames[live_name]
 				if ud then
 					MakeStatsWindow(ud,x,y)
