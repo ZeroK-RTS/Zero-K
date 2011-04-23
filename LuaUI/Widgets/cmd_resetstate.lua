@@ -32,13 +32,11 @@ options = {
 		name = 'Hold Fire & Stop',
 		desc = 'Set the unit to hold fire, then stop all commands.',
 		type = 'button',
-		action = 'reset_firestate',
 	},
 	resetmove = {
 		name = 'Hold Position & Stop',
 		desc = 'Set the unit to hold position, then stop all commands.',
 		type = 'button',
-		action = 'reset_movestate',
 	},
 	
 	lblspace = { type = 'label', name = '', },
