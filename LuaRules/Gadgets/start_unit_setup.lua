@@ -48,9 +48,8 @@ end
 
 local shuffleMode = Spring.GetModOption("shuffle", false, "off")
 
-local coop = false
-coop = tonumber(Spring.GetModOption("coop", false, false))
-if coop == nil then coop = 0 end
+local coop = Spring.Utilities.tobool(Spring.GetModOption("coop", false, false))
+
 --Spring.Echo(coop == 1, coop == 0)
 
 local gaiateam = Spring.GetGaiaTeamID()
@@ -84,6 +83,8 @@ local playerIDsByName = {}
 local customComms = {}
 local commChoice = {}
 
+local waitingForComm = {}
+
 -- deprecated
 local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
@@ -106,6 +107,22 @@ end
 
 function GG.GiveFacplop(unitID)
 	facplops[unitID] = 1
+end
+
+local function CheckForShutdown()
+	local cnt = 0
+	for _,_ in pairs(boost) do
+		cnt = cnt+1
+	end
+	for _,_ in pairs(facplops) do
+		cnt = cnt+1
+	end
+	for team,_ in pairs(waitingForComm) do
+		cnt = cnt+1
+	end
+	if (cnt == 0) and Spring.GetGameSeconds() > 5 then
+		gadgetHandler.RemoveGadget(self)
+	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
@@ -141,6 +158,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		Spring.SpawnCEG("gate", x, y, z)
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
 		--facplopsrunning[unitID] = true
+		CheckForShutdown()
 	end
 end
 
@@ -180,16 +198,7 @@ end
 
 function disableBoost(unitID) 
 	boost[unitID] = nil
-	local cnt = 0
-	for _,_ in pairs(boost) do
-		cnt = cnt+1
-	end
-	for _,_ in pairs(facplops) do
-		cnt = cnt+1
-	end
-	if (cnt == 0) and Spring.GetGameSeconds() > 5 then
-		gadgetHandler.RemoveGadget(self)
-	end
+	CheckForShutdown()
 end
 
 
@@ -295,7 +304,7 @@ function gadget:Initialize()
 	if udid then
 		gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
 	end
-  end 
+  end
 end
 
 
@@ -377,8 +386,8 @@ local function SpawnStartUnit(teamID, playerID, isAI)
   -- get start unit
   
   -- no getting double comms now!
-  if (coop == 1 and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
-  or (coop == 0 and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1) then 
+  if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
+  or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1) then 
 	return 
   end
   --if (coop == 1 and commSpawnedPlayer[playerID]) or (coop == 0 and commSpawnedTeam[teamID]) then
@@ -412,6 +421,8 @@ local function SpawnStartUnit(teamID, playerID, isAI)
       Spring.SetUnitLineage(unitID, teamID, true)
     end
 
+	waitingForComm[teamID] = nil
+	
     -- add boost and facplop
     local teamLuaAI = Spring.GetTeamLuaAI(teamID)
     local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
@@ -624,7 +635,8 @@ function gadget:GameStart()
 	
 
     if team ~= gaiateam then
-      if coop == 1 then
+	  waitingForComm[team] = true
+      if coop then
         -- 1 start unit per player
         local playerlist = Spring.GetPlayerList(team, true)
         playerlist = workAroundSpecsInTeamZero(playerlist, team)
@@ -637,11 +649,9 @@ function gadget:GameStart()
           end
         else
           -- AI etc.
-		  local allyTeam = select(6, Spring.GetTeamInfo(team))
           SpawnStartUnit(team, nil, true)
         end
       else -- no coop
-		local allyTeam = select(6, Spring.GetTeamInfo(team))
         SpawnStartUnit(team)
       end
     end
@@ -699,14 +709,24 @@ end
 -- used by CAI
 local function SetFaction(side, playerID, teamID)
     teamSidesAI[teamID] = side
-	if coop == 0 then
+	if not coop then
 		teamSides[teamID] = side
-		playerSides[playerID] = side
+		if playerID then
+			playerSides[playerID] = side
+		end
 	end
 end
 GG.SetFaction = SetFaction
 
 function gadget:GameFrame(n)
+	if n == 30*30 then
+  --if n == 30 * 60 * 2 then
+	for team in pairs(waitingForComm) do
+		teamSides[team] = "strikecomm"
+		scheduledSpawn[n] = scheduledSpawn[n] or {}
+		scheduledSpawn[n][#scheduledSpawn[n] + 1] = {team}
+	end
+  end
   if scheduledSpawn[n] then
 	for _, spawnData in pairs(scheduledSpawn[n]) do
 		SpawnStartUnit(spawnData[1], spawnData[2])
@@ -720,6 +740,7 @@ function gadget:Shutdown()
 	--	Spring.SetGameRulesParam("commPickedPlayer"..i, 0)
 	--	Spring.SetGameRulesParam("commPickedTeam"..i, 0)
 	--end
+	Spring.Echo("<Start Unit Setup> Going to sleep...")
 end
 
 --------------------------------------------------------------------
