@@ -337,7 +337,7 @@ AimWeapon2(heading, pitch)
 	set-signal-mask SIG_AIM2;
 	turn gun1 to y-axis heading speed <300>;
 	turn gun1 to x-axis <0> - pitch speed <200>;
-	wait-for-turn stand1 around y-axis;
+	wait-for-turn gun1 around y-axis;
 	wait-for-turn gun1 around x-axis;
 	return (1);
 }
@@ -349,12 +349,12 @@ FireWeapon2()
 
 AimFromWeapon2(piecenum)
 {
-	piecenum = gun3;
+	piecenum = gun1;
 }
 
 QueryWeapon2(piecenum)
 {
-	piecenum = flare3;
+	piecenum = flare1;
 }
 
 AimWeapon3(heading, pitch)
@@ -363,7 +363,7 @@ AimWeapon3(heading, pitch)
 	set-signal-mask SIG_AIM3;
 	turn gun2 to y-axis heading speed <300>;
 	turn gun2 to x-axis <0> - pitch speed <200>;
-	wait-for-turn stand2 around y-axis;
+	wait-for-turn gun2 around y-axis;
 	wait-for-turn gun2 around x-axis;
 	return (1);
 }
@@ -375,21 +375,21 @@ FireWeapon3()
 
 AimFromWeapon3(piecenum)
 {
-	piecenum = gun1;
+	piecenum = gun2;
 }
 
 QueryWeapon3(piecenum)
 {
-	piecenum = flare1;
+	piecenum = flare2;
 }
 
 AimWeapon4(Func_Var_1, Func_Var_2)
 {
-	signal SIG_AIM3;
-	set-signal-mask SIG_AIM3;
-	turn gun3 to y-axis Func_Var_1 speed <300.071429>;
-	turn gun3 to x-axis <0> - Func_Var_2 speed <200.038462>;
-	wait-for-turn stand3 around y-axis;
+	signal SIG_AIM4;
+	set-signal-mask SIG_AIM4;
+	turn gun3 to y-axis Func_Var_1 speed <300>;
+	turn gun3 to x-axis <0> - Func_Var_2 speed <200>;
+	wait-for-turn gun3 around y-axis;
 	wait-for-turn gun3 around x-axis;
 	return (1);
 }
@@ -401,12 +401,12 @@ FireWeapon4()
 
 AimFromWeapon4(piecenum)
 {
-	piecenum = gun2;
+	piecenum = gun3;
 }
 
 QueryWeapon4(piecenum)
 {
-	piecenum = flare2;
+	piecenum = flare3;
 }
 
 Killed(severity, corpsetype)

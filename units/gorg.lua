@@ -87,8 +87,18 @@ unitDef = {
     {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
-      mainDir            = [[0 0 1]],
-      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
+      mainDir            = [[0.2 0 1]],
+	  maxAngleDif		 = 60,
+      onlyTargetCategory = [[MOBILE]],
+    },
+
+
+    {
+      def                = [[GRAVITY_NEG]],
+      badTargetCategory  = [[FIXEDWING]],
+      mainDir            = [[-0.2 0 1]],
+	  maxAngleDif		 = 60,
+      onlyTargetCategory = [[MOBILE]],
     },
 
 
@@ -96,15 +106,7 @@ unitDef = {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
-    },
-
-
-    {
-      def                = [[GRAVITY_NEG]],
-      badTargetCategory  = [[FIXEDWING]],
-      mainDir            = [[0 0 1]],
-      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
+      onlyTargetCategory = [[MOBILE]],
     },
 
     {
