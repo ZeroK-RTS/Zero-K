@@ -67,8 +67,8 @@ unitDef = {
 
     {
       def                = [[ARM_PIDR]],
-	  badTargetCategory	 = [[GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP]],
+	  badTargetCategory	 = [[GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
   },
@@ -81,6 +81,7 @@ unitDef = {
       areaOfEffect            = 384,
       avoidFeature            = false,
       avoidFriendly           = false,
+	  burnblow                = true,
       collideFriendly         = false,
       commandfire             = true,
       craterBoost             = 1,

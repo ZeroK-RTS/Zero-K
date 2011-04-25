@@ -115,7 +115,7 @@ local fullModuleSet = {}
 --]]
 
 local base = {
-	count = 9,
+	count = 10,
 	[1] = {
 		name = "rocket",
 		modules = {
@@ -212,12 +212,18 @@ local base = {
 			"module_personal_cloak",
 		}
 	},
+	[10] = {
+	name = "only_riot",
+		modules = {
+			"commweapon_riotcannon",
+		}
+	},
 }
 
 local ret = {count = 0}
 
 local chassis = {
-	count = 4,
+	count = 8,
 	[1] = {
 		name = "c4_",
 		value = "corcom4",
@@ -233,6 +239,22 @@ local chassis = {
 	[4] = {
 		name = "r4_",
 		value = "commrecon4",
+	},
+	[5] = {
+		name = "c1_",
+		value = "corcom1",
+	},
+	[6] = {
+		name = "a1_",
+		value = "armcom1",
+	},
+	[7] = {
+		name = "s1_",
+		value = "commsupport1",
+	},
+	[8] = {
+		name = "r1_",
+		value = "commrecon1",
 	},
 }
 
