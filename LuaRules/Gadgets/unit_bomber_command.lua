@@ -425,10 +425,15 @@ else
 -- UNSYNCED
 --------------------------------------------------------------------------------
 local airpads = SYNCED.airpads
+local spGetUnitTeam = Spring.GetUnitTeam
+local spGetLocalTeamID = Spring.GetLocalTeamID
+local spAreTeamsAllied = Spring.AreTeamsAllied
 
 function gadget:DefaultCommand(type, targetID)
 	if (type == 'unit') then
-		if not (Spring.IsUnitAllied(targetID)) then
+		local targetTeam = spGetUnitTeam(targetID)
+		local selfTeam = spGetLocalTeamID()
+		if not (spAreTeamsAllied(targetTeam, selfTeam)) then
 			return
 		end
 
