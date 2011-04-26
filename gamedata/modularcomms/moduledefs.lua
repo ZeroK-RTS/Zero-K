@@ -397,7 +397,8 @@ upgrades = {
 				if unitDef.cloakcostmoving > 10 then 
 					unitDef.cloakcostmoving = 10 
 				end
-			end,
+			end
+		,
 	},
 	module_personal_shield = {
 		name = "Personal Shield",

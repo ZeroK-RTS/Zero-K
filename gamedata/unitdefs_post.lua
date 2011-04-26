@@ -211,7 +211,6 @@ for name, ud in pairs(UnitDefs) do
 	local hasShield = false
 	if ud.weapondefs then
 		for _, wd in pairs(ud.weapondefs) do      
-			Spring.Echo(wd.isshield)
 			if wd.isshield then
 				hasShield = true
 				break
@@ -224,9 +223,8 @@ for name, ud in pairs(UnitDefs) do
 		end
 		ud.customparams.cannotcloak = 1
 		ud.mincloakdistance = 0
-		ud.cloakcost = 0
-		ud.cloakcostmoving = 0
-		ud.cancloak = 0
+		ud.cloakcost = nil
+		ud.cloakcostmoving = nil
 	end
 end
 
