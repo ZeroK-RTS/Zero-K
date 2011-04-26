@@ -64,8 +64,8 @@ unitDef = {
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
-  objectName          = [[corcom.s3o]],
-  script              = [[corcom.lua]],
+  objectName          = [[corcomAlt.s3o]],
+  script              = [[corcom_alt.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
