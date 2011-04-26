@@ -436,7 +436,7 @@ local options = {
     desc   = "Cooperation Mode",
     type   = "bool",
     section= "startconds",
-    def    = true,
+    def    = false,
   },
   {
     key    = 'planetwars',

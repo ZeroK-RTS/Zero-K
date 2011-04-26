@@ -32,7 +32,7 @@ local Echo	= Spring.Echo
 local spGetSpectatingState	= Spring.GetSpectatingState
 local spIsReplay			= Spring.IsReplay
 
-local coop = Spring.GetModOptions().coop or 0
+local coop = (Spring.GetModOptions().coop == 1) or false
 
 local Chili
 local Window
@@ -202,8 +202,8 @@ function widget:Initialize()
 	end
 	
 	local playerID, teamID = Spring.GetMyPlayerID(), Spring.GetMyTeamID()
-	if (coop == 1 and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
-	or (coop == 0 and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
+	if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
+	or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
 	end
 	playSound("LuaUI/Sounds/Voices/initialized_core_1")

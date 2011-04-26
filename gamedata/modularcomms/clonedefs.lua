@@ -22,18 +22,18 @@ local copy = {
 	corcom1 = {
 		corcom2 = {
 			level = 2,
-			mainstats = {maxdamage = 3600, objectname = "corcom2.s3o"},
+			mainstats = {maxdamage = 3600, objectname = "corcomAlt2.s3o"},
 			customparams = {damagebonus = "0.1"},
 		},
 		corcom3 = {
 			level = 3,
-			mainstats = {maxdamage = 5000, objectname = "corcom3.s3o",
+			mainstats = {maxdamage = 5000, objectname = "corcomAlt3.s3o",
 				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {damagebonus = "0.2"},
 		},
 		corcom4 = {
 			level = 4,
-			mainstats = {maxdamage = 7200, objectname = "corcom4.s3o",
+			mainstats = {maxdamage = 7200, objectname = "corcomAlt4.s3o",
 				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {damagebonus = "0.3"},
 		},

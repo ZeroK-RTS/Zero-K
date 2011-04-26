@@ -386,13 +386,15 @@ local function SpawnStartUnit(teamID, playerID, isAI)
   -- get start unit
   
   -- no getting double comms now!
+  --[[
   if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
   or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1) then 
 	return 
   end
-  --if (coop == 1 and commSpawnedPlayer[playerID]) or (coop == 0 and commSpawnedTeam[teamID]) then
-	--return 
-  --end	
+  ]]--
+  if (coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]) then
+	return 
+  end	
   
   local startUnit = GetStartUnit(teamID, playerID, isAI)
 
@@ -413,8 +415,8 @@ local function SpawnStartUnit(teamID, playerID, isAI)
 	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("gate", x, y, z) end
 	Spring.SetGameRulesParam("commSpawnedTeam"..teamID, 1)
 	if playerID then Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1) end
-	--commSpawnedTeam[teamID] = true
-	--if playerID then commSpawnedPlayer[playerID] = true end
+	commSpawnedTeam[teamID] = true
+	if playerID then commSpawnedPlayer[playerID] = true end
 	
     -- set the *team's* lineage root
     if Spring.SetUnitLineage then
@@ -683,8 +685,6 @@ function gadget:RecvLuaMsg(msg, playerID)
 		local _,_,spec,teamID = Spring.GetPlayerInfo(playerID)
 		if spec then return end
 		if gamestart then
-			-- picked commander after game start, prep for orbital drop
-			-- can't do it directly because that's an unsafe change
 			local frame = Spring.GetGameFrame() + 3
 			if not scheduledSpawn[frame] then scheduledSpawn[frame] = {} end
 			scheduledSpawn[frame][#scheduledSpawn[frame] + 1] = {teamID, playerID}
@@ -719,8 +719,7 @@ end
 GG.SetFaction = SetFaction
 
 function gadget:GameFrame(n)
-	if n == 30*30 then
-  --if n == 30 * 60 * 2 then
+  if n == 30 * 60 * 2 then
 	for team in pairs(waitingForComm) do
 		teamSides[team] = "strikecomm"
 		scheduledSpawn[n] = scheduledSpawn[n] or {}

@@ -1,5 +1,3 @@
-
---local ground = piece 'ground' removed object on xta model, pelvis on ca model was child of ground.
 local torso = piece 'torso' 
 local lfirept = piece 'lfirept' 
 local rbigflash = piece 'rbigflash' 
@@ -16,344 +14,226 @@ local l_foot = piece 'l_foot'
 local rleg = piece 'rleg' 
 local r_foot = piece 'r_foot' 
 local head = piece 'head' 
-local orbit = piece 'orbit' --empty
-local orbitfire = piece 'orbitfire' --empty 
-
 
 include "constants.lua"
 
---Note: normal script/model setup has the comm lasering and nanoing out of the same hand, and dgunning with the other.
---This has been fixed here so that he attacks with one hand and nanos with the other
---but the piece choices will look a bit odd as a result.
-
 local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
 
--- Signal definitions
 local SIG_LASER = 2
 local SIG_DGUN = 4
-
-local ACT_DGUN = 4
-local ACT_LASER = 2
 
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
-local RESTORE_DELAY_LASER = 2000
-local RESTORE_DELAY_DGUN = 1000
+local RESTORE_DELAY_LASER = 4000
+local RESTORE_DELAY_DGUN = 2500
 
-local function WalkArms()
-	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
+local function Walk()
+	
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Move( rbigflash , x_axis, 0  )
 		Move( lfirept , y_axis, 0  )
 		Move( lfirept , z_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(17) )
-		Turn( lthigh , x_axis, math.rad(-41) )
 		Turn( torso , y_axis, math.rad(6) )
 		Turn( luparm , x_axis, math.rad(30) )
 		Turn( ruparm , x_axis, math.rad(-10) )
 		Turn( biggun , x_axis, math.rad(41) )
 		Turn( nanolathe , x_axis, math.rad(36) )
-		Turn( lleg , x_axis, math.rad(42) )
-		Turn( l_foot , x_axis, math.rad(-5) )
-		Turn( rleg , x_axis, math.rad(27) )
-		Turn( r_foot , x_axis, math.rad(-28) )
-		Sleep(120)
 	end
-	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(5) )
-		Turn( rthigh , x_axis, math.rad(7) )
-		Turn( lthigh , x_axis, math.rad(-33) )
+	Move( pelvis , y_axis, 0 )
+	Turn( pelvis , x_axis, math.rad(4) )
+	Turn( rthigh , x_axis, math.rad(17) )
+	Turn( lthigh , x_axis, math.rad(-41) )
+	Turn( lleg , x_axis, math.rad(42) )
+	Turn( l_foot , x_axis, math.rad(-5) )
+	Turn( rleg , x_axis, math.rad(27) )
+	Turn( r_foot , x_axis, math.rad(-28) )
+	Sleep(120)
+	
+	if not isMoving then return end
+	if not (isLasering or isDgunning)  then
 		Turn( torso , y_axis, math.rad(3) )
 		Turn( luparm , x_axis, math.rad(25) )
 		Turn( ruparm , x_axis, math.rad(-5) )
 		Turn( biggun , x_axis, math.rad(41) )
 		Turn( nanolathe , x_axis, math.rad(36) )
-		Turn( lleg , x_axis, math.rad(32) )
-		Turn( l_foot , x_axis, math.rad(-5) )
-		Turn( rleg , x_axis, math.rad(39) )
-		Turn( r_foot , x_axis, math.rad(-27) )
-		Sleep(110)
 	end
-	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(5) )
-		Turn( rthigh , x_axis, math.rad(-11) )
-		Turn( lthigh , x_axis, math.rad(-26) )
+	Move( pelvis , y_axis, 0  )
+	Turn( pelvis , x_axis, math.rad(5) )
+	Turn( rthigh , x_axis, math.rad(7) )
+	Turn( lthigh , x_axis, math.rad(-33) )
+	Turn( lleg , x_axis, math.rad(32) )
+	Turn( l_foot , x_axis, math.rad(-5) )
+	Turn( rleg , x_axis, math.rad(39) )
+	Turn( r_foot , x_axis, math.rad(-27) )
+	Sleep(110)
+	
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Turn( torso , y_axis, 0 )
 		Turn( luparm , x_axis, math.rad(20) )
 		Turn( ruparm , x_axis, 0 )
 		Turn( biggun , x_axis, math.rad(41) )
-		Turn( l_foot , x_axis, math.rad(-10) )
-		Turn( rleg , x_axis, math.rad(51) )
-		Sleep(100)
 	end
-	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(-19) )
-		Turn( lthigh , x_axis, math.rad(1) )
+	Move( pelvis , y_axis, 0  )
+	Turn( pelvis , x_axis, math.rad(5) )
+	Turn( rthigh , x_axis, math.rad(-11) )
+	Turn( lthigh , x_axis, math.rad(-26) )
+	Turn( l_foot , x_axis, math.rad(-10) )
+	Turn( rleg , x_axis, math.rad(51) )
+	Sleep(100)
+		
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Turn( torso , y_axis, math.rad(-3) )
 		Turn( luparm , x_axis, math.rad(10) )
 		Turn( ruparm , x_axis, math.rad(10) )
 		Turn( biggun , x_axis, math.rad(41) )
 		Turn( nanolathe , x_axis, math.rad(36) )
-		Turn( lleg , x_axis, math.rad(6) )
-		Turn( l_foot , x_axis, math.rad(-9) )
-		Turn( rleg , x_axis, math.rad(52) )
-		Turn( r_foot , x_axis, math.rad(-23) )
-		Sleep(90)
+	
 	end
-	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(-42) )
-		Turn( lthigh , x_axis, math.rad(8) )
+	Move( pelvis , y_axis, 0  )
+	Turn( pelvis , x_axis, math.rad(4) )
+	Turn( rthigh , x_axis, math.rad(-19) )
+	Turn( lthigh , x_axis, math.rad(1) )
+	Turn( lleg , x_axis, math.rad(6) )
+	Turn( l_foot , x_axis, math.rad(-9) )
+	Turn( rleg , x_axis, math.rad(52) )
+	Turn( r_foot , x_axis, math.rad(-23) )
+	Sleep(90)
+		
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Turn( torso , y_axis, math.rad(-6) )
 		Turn( luparm , x_axis, 0 )
 		Turn( ruparm , x_axis, math.rad(20) )
 		Turn( biggun , x_axis, math.rad(41) )
 		Turn( nanolathe , x_axis, math.rad(36) )
-		Turn( lleg , x_axis, math.rad(10) )
-		Turn( l_foot , x_axis, math.rad(-16) )
-		Turn( rleg , x_axis, math.rad(51) )
-		Turn( r_foot , x_axis, math.rad(-6) )
-		Sleep(100)
 	end
-	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(3) )
-		Turn( rthigh , x_axis, math.rad(-49) )
-		Turn( lthigh , x_axis, math.rad(11) )
+	Move( pelvis , y_axis, 0  )
+	Turn( pelvis , x_axis, math.rad(4) )
+	Turn( rthigh , x_axis, math.rad(-42) )
+	Turn( lthigh , x_axis, math.rad(8) )
+	Turn( lleg , x_axis, math.rad(10) )
+	Turn( l_foot , x_axis, math.rad(-16) )
+	Turn( rleg , x_axis, math.rad(51) )
+	Turn( r_foot , x_axis, math.rad(-6) )
+	Sleep(100)
+	
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Turn( torso , y_axis, math.rad(-9) )
 		Turn( luparm , x_axis, math.rad(-5) )
 		Turn( ruparm , x_axis, math.rad(25) )
 		Turn( biggun , x_axis, math.rad(41) )
-		Turn( lleg , x_axis, math.rad(19) )
-		Turn( l_foot , x_axis, math.rad(-23) )
-		Turn( rleg , x_axis, math.rad(33) )
-		Sleep(110)
 	end
-	if not (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(-44) )
-		Turn( lthigh , x_axis, math.rad(19) )
+	Move( pelvis , y_axis, 0  )
+	Turn( pelvis , x_axis, math.rad(3) )
+	Turn( rthigh , x_axis, math.rad(-49) )
+	Turn( lthigh , x_axis, math.rad(11) )
+	Turn( lleg , x_axis, math.rad(19) )
+	Turn( l_foot , x_axis, math.rad(-23) )
+	Turn( rleg , x_axis, math.rad(33) )
+	Sleep(110)
+	
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Turn( torso , y_axis, math.rad(-6) )
 		Turn( luparm , x_axis, math.rad(-10) )
 		Turn( ruparm , x_axis, math.rad(30) )
 		Turn( biggun , x_axis, math.rad(41) )
 		Turn( nanolathe , x_axis, math.rad(36) )
-		Turn( lleg , x_axis, math.rad(23) )
-		Turn( l_foot , x_axis, math.rad(-26) )
-		Turn( rleg , x_axis, math.rad(49) )
-		Turn( r_foot , x_axis, math.rad(-8) )
-		Sleep(120)
 	end
-	if not (isLasering or isDgunning) and isMoving  then
+	Move( pelvis , y_axis, 0  )
+	Turn( pelvis , x_axis, math.rad(4) )
+	Turn( rthigh , x_axis, math.rad(-44) )
+	Turn( lthigh , x_axis, math.rad(19) )
+	Turn( lleg , x_axis, math.rad(23) )
+	Turn( l_foot , x_axis, math.rad(-26) )
+	Turn( rleg , x_axis, math.rad(49) )
+	Turn( r_foot , x_axis, math.rad(-8) )
+	Sleep(120)
 	
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(5) )
-		Turn( rthigh , x_axis, math.rad(-33) )
-		Turn( lthigh , x_axis, math.rad(3) )
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Turn( torso , y_axis, math.rad(-3) )
 		Turn( luparm , x_axis, math.rad(-5) )
 		Turn( ruparm , x_axis, math.rad(25) )
 		Turn( biggun , x_axis, math.rad(41) )
 		Turn( nanolathe , x_axis, math.rad(36) )
-		Turn( lleg , x_axis, math.rad(44) )
-		Turn( l_foot , x_axis, math.rad(-27) )
-		Turn( rleg , x_axis, math.rad(41) )
-		Turn( r_foot , x_axis, math.rad(-13) )
-		Sleep(110)
 	end
-	if not (isLasering or isDgunning) and isMoving  then
+	Move( pelvis , y_axis, 0  )
+	Turn( pelvis , x_axis, math.rad(5) )
+	Turn( rthigh , x_axis, math.rad(-33) )
+	Turn( lthigh , x_axis, math.rad(3) )
+	Turn( lleg , x_axis, math.rad(44) )
+	Turn( l_foot , x_axis, math.rad(-27) )
+	Turn( rleg , x_axis, math.rad(41) )
+	Turn( r_foot , x_axis, math.rad(-13) )
+	Sleep(110)
 	
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(5) )
-		Turn( rthigh , x_axis, math.rad(-26) )
-		Turn( lthigh , x_axis, math.rad(-12) )
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Turn( torso , y_axis, 0 )
 		Turn( luparm , x_axis, 0 )
 		Turn( ruparm , x_axis, math.rad(20) )
 		Turn( biggun , x_axis, math.rad(41) )
 		Turn( nanolathe , x_axis, math.rad(36) )
-		Turn( lleg , x_axis, math.rad(62) )
-		Turn( rleg , x_axis, math.rad(36) )
-		Turn( r_foot , x_axis, math.rad(-15) )
-		Sleep(100)
 	end
-	if not (isLasering or isDgunning) and isMoving  then
-	
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(6) )
-		Turn( lthigh , x_axis, math.rad(-26) )
+	Move( pelvis , y_axis, 0  )
+	Turn( pelvis , x_axis, math.rad(5) )
+	Turn( rthigh , x_axis, math.rad(-26) )
+	Turn( lthigh , x_axis, math.rad(-12) )
+	Turn( lleg , x_axis, math.rad(62) )
+	Turn( rleg , x_axis, math.rad(36) )
+	Turn( r_foot , x_axis, math.rad(-15) )
+	Sleep(100)
+		
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Turn( torso , y_axis, math.rad(3) )
 		Turn( luparm , x_axis, math.rad(10) )
 		Turn( ruparm , x_axis, math.rad(10) )
 		Turn( biggun , x_axis, math.rad(41) )
 		Turn( nanolathe , x_axis, math.rad(36) )
-		Turn( lleg , x_axis, math.rad(72) )
-		Turn( l_foot , x_axis, math.rad(-26) )
-		Turn( rleg , x_axis, math.rad(3) )
-		Turn( r_foot , x_axis, math.rad(-12) )
-		Sleep(90)
 	end
-	if not (isLasering or isDgunning) and isMoving  then
-	
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(16) )
-		Turn( lthigh , x_axis, math.rad(-39) )
+	Move( pelvis , y_axis, 0  )
+	Turn( pelvis , x_axis, math.rad(4) )
+	Turn( rthigh , x_axis, math.rad(6) )
+	Turn( lthigh , x_axis, math.rad(-26) )
+	Turn( lleg , x_axis, math.rad(72) )
+	Turn( l_foot , x_axis, math.rad(-26) )
+	Turn( rleg , x_axis, math.rad(3) )
+	Turn( r_foot , x_axis, math.rad(-12) )
+	Sleep(90)
+
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
 		Turn( torso , y_axis, math.rad(6) )
 		Turn( luparm , x_axis, math.rad(21) )
 		Turn( ruparm , x_axis, 0 )
 		Turn( biggun , x_axis, math.rad(41) )
 		Turn( nanolathe , x_axis, math.rad(36) )
-		Turn( lleg , x_axis, math.rad(55) )
-		Turn( l_foot , x_axis, math.rad(-23) )
-		Turn( rleg , x_axis, math.rad(8) )
-		Turn( r_foot , x_axis, math.rad(-19) )
-		Sleep(100)
 	end
 	Move( pelvis , y_axis, 0  )
-	Turn( pelvis , x_axis, math.rad(3) )
-	Turn( rthigh , x_axis, math.rad(22) )
-	Turn( lthigh , x_axis, math.rad(-48) )
-	Turn( torso , y_axis, math.rad(9) )
-	Turn( luparm , x_axis, math.rad(25) )
-	Turn( ruparm , x_axis, math.rad(-5) )
-	Turn( biggun , x_axis, math.rad(41) )
-	Turn( lleg , x_axis, math.rad(40) )
-	Turn( l_foot , x_axis, math.rad(-8) )
-	Turn( rleg , x_axis, math.rad(11) )
-	Turn( r_foot , x_axis, math.rad(-23) )
-	Sleep(110)
-end
-
-local function WalkNoArms()
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Move( rbigflash , x_axis, 0  )
-		Move( lfirept , y_axis, 0  )
-		Move( lfirept , z_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(17) )
-		Turn( lthigh , x_axis, math.rad(-41) )
-		Turn( lleg , x_axis, math.rad(42) )
-		Turn( l_foot , x_axis, math.rad(-5) )
-		Turn( rleg , x_axis, math.rad(27) )
-		Turn( r_foot , x_axis, math.rad(-28) )
-		Sleep(120)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(5) )
-		Turn( rthigh , x_axis, math.rad(7) )
-		Turn( lthigh , x_axis, math.rad(-33) )
-		Turn( lleg , x_axis, math.rad(32) )
-		Turn( l_foot , x_axis, math.rad(-5) )
-		Turn( rleg , x_axis, math.rad(39) )
-		Turn( r_foot , x_axis, math.rad(-27) )
-		Sleep(110)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(5) )
-		Turn( rthigh , x_axis, math.rad(-11) )
-		Turn( lthigh , x_axis, math.rad(-26) )
-		Turn( l_foot , x_axis, math.rad(-10) )
-		Turn( rleg , x_axis, math.rad(51) )
-		Sleep(100)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(-19) )
-		Turn( lthigh , x_axis, math.rad(1) )
-		Turn( lleg , x_axis, math.rad(6) )
-		Turn( l_foot , x_axis, math.rad(-9) )
-		Turn( rleg , x_axis, math.rad(52) )
-		Turn( r_foot , x_axis, math.rad(-23) )
-		Sleep(90)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(-42) )
-		Turn( lthigh , x_axis, math.rad(8) )
-		Turn( lleg , x_axis, math.rad(10) )
-		Turn( l_foot , x_axis, math.rad(-16) )
-		Turn( rleg , x_axis, math.rad(51) )
-		Turn( r_foot , x_axis, math.rad(-6) )
-		Sleep(100)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(3) )
-		Turn( rthigh , x_axis, math.rad(-49) )
-		Turn( lthigh , x_axis, math.rad(11) )
-		Turn( lleg , x_axis, math.rad(19) )
-		Turn( l_foot , x_axis, math.rad(-23) )
-		Turn( rleg , x_axis, math.rad(33) )
-		Sleep(110)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(-44) )
-		Turn( lthigh , x_axis, math.rad(19) )
-		Turn( lleg , x_axis, math.rad(23) )
-		Turn( l_foot , x_axis, math.rad(-26) )
-		Turn( rleg , x_axis, math.rad(49) )
-		Turn( r_foot , x_axis, math.rad(-8) )
-		Sleep(120)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(5) )
-		Turn( rthigh , x_axis, math.rad(-33) )
-		Turn( lthigh , x_axis, math.rad(3) )
-		Turn( lleg , x_axis, math.rad(44) )
-		Turn( l_foot , x_axis, math.rad(-27) )
-		Turn( rleg , x_axis, math.rad(41) )
-		Turn( r_foot , x_axis, math.rad(-13) )
-		Sleep(110)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(5) )
-		Turn( rthigh , x_axis, math.rad(-26) )
-		Turn( lthigh , x_axis, math.rad(-12) )
-		Turn( lleg , x_axis, math.rad(62) )
-		Turn( rleg , x_axis, math.rad(36) )
-		Turn( r_foot , x_axis, math.rad(-15) )
-		Sleep(100)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(6) )
-		Turn( lthigh , x_axis, math.rad(-26) )
-		Turn( lleg , x_axis, math.rad(72) )
-		Turn( l_foot , x_axis, math.rad(-26) )
-		Turn( rleg , x_axis, math.rad(3) )
-		Turn( r_foot , x_axis, math.rad(-12) )
-		Sleep(90)
-	end
-	if (isLasering or isDgunning) and isMoving  then
-		Move( pelvis , y_axis, 0  )
-		Turn( pelvis , x_axis, math.rad(4) )
-		Turn( rthigh , x_axis, math.rad(16) )
-		Turn( lthigh , x_axis, math.rad(-39) )
-		Turn( lleg , x_axis, math.rad(55) )
-		Turn( l_foot , x_axis, math.rad(-23) )
-		Turn( rleg , x_axis, math.rad(8) )
-		Turn( r_foot , x_axis, math.rad(-19) )
-		Sleep(100)
+	Turn( pelvis , x_axis, math.rad(4) )
+	Turn( rthigh , x_axis, math.rad(16) )
+	Turn( lthigh , x_axis, math.rad(-39) )
+	Turn( lleg , x_axis, math.rad(55) )
+	Turn( l_foot , x_axis, math.rad(-23) )
+	Turn( rleg , x_axis, math.rad(8) )
+	Turn( r_foot , x_axis, math.rad(-19) )
+	Sleep(100)
+	
+	if not isMoving then return end
+	if not (isLasering or isDgunning) then
+		Turn( rthigh , x_axis, math.rad(22) )
+		Turn( lthigh , x_axis, math.rad(-48) )
+		Turn( torso , y_axis, math.rad(9) )
+		Turn( luparm , x_axis, math.rad(25) )
+		Turn( ruparm , x_axis, math.rad(-5) )
+		Turn( biggun , x_axis, math.rad(41) )
 	end
 	Move( pelvis , y_axis, 0  )
 	Turn( pelvis , x_axis, math.rad(3) )
@@ -375,45 +255,11 @@ local function RestoreLegs()
 	Sleep(200)
 end
 
-local function BigFire()
---	gunLockOut = true
-	Move( luparm , z_axis, 0  )
-	Move( luparm , z_axis, -3 , 250 )
-	Move( nanolathe , z_axis, 0  )
-	Move( nanolathe , z_axis, -5 , 520 )
---	Move( rbigflash , x_axis, 0  )		--unnecessary lines?
---	Move( lfirept , y_axis, 0  )
---	Move( lfirept , z_axis, 0  )
-	Turn( luparm , x_axis, 0 )
-	Turn( luparm , x_axis, math.rad(-1), math.rad(113) )
-	Sleep(10)
-
-	Move( luparm , z_axis, -1 , 16 )
-	Move( nanolathe , z_axis, -3 , 30 )
-	Turn( luparm , x_axis, 0, math.rad(14) )
-	Sleep(80)
-	Move( luparm , z_axis, 0 , 14 )
-	Move( nanolathe , z_axis, -2 , 15 )
-	Turn( luparm , x_axis, 0, 0 )
-	Sleep(70)
-
-	Move( luparm , z_axis, 0 , 1 )
-	Turn( luparm , x_axis, math.rad(1), math.rad(15) )
-	Turn( luparm , z_axis, math.rad(-(0)), math.rad(8) )
-	Sleep(50)
-	Move( luparm , z_axis, 0 , 5 )
-	Move( nanolathe , z_axis, 0 , 44 )
-	Turn( luparm , x_axis, 0, math.rad(19) )
-	Turn( luparm , z_axis, math.rad(-(0)), math.rad(9) )
-	Sleep(50)
---	gunLockOut = false
-end
 
 local function MotionControl()
 	while true do 
 		if isMoving then 
-			if isLasering or isDgunning then WalkNoArms()
-			else WalkArms() end
+			Walk()
 		else 
 			RestoreLegs()
 			Sleep(100)
@@ -422,10 +268,15 @@ local function MotionControl()
 end
 
 function script.Create()
-	--Hide( ground) removed object on xta model, pelvis on ca model was child of ground.
 	Hide( lfirept)
 	Hide( rbigflash)
 	Hide( nanospray)
+	
+	Turn( luparm , x_axis, math.rad(30) )
+	Turn( ruparm , x_axis, math.rad(-10) )
+	Turn( biggun , x_axis, math.rad(41) )
+	Turn( nanolathe , x_axis, math.rad(36) )	
+	
 	StartThread(MotionControl)
 end
 
@@ -437,12 +288,18 @@ function script.StopMoving()
 	isMoving = false
 end
 
-function script.AimFromWeapon4(num)
+function script.AimFromWeapon(num)
 	return torso
 end
 
 function script.QueryWeapon(num)
-	return lfirept
+	if num == 3 then
+		return rbigflash
+	elseif num == 2 or num == 4 then
+		return torso
+	else
+		return lfirept
+	end
 end
 
 function script.FireWeapon(num) 
@@ -450,8 +307,8 @@ function script.FireWeapon(num)
 		EmitSfx( lfirept,  1024 )
 		EmitSfx( lfirept,  1025 )
 	elseif num == 3 then
-		EmitSfx( lfirept,  1026 )
-		EmitSfx( lfirept,  1027 )
+		EmitSfx( rbigflash,  1026 )
+		EmitSfx( rbigflash,  1027 )
 	end
 end
 
@@ -459,27 +316,31 @@ local function RestoreLaser()
 	Sleep(RESTORE_DELAY_LASER)
 	isLasering = false
 	Turn( luparm , x_axis, 0, ARM_SPEED_PITCH )
-	if not isDgunning then Turn( torso , y_axis, 0, TORSO_SPEED_YAW) end
+	if not isDgunning then 
+		Turn( torso , y_axis, 0, TORSO_SPEED_YAW) 
+	end
 end
 
 local function RestoreDgun()
-	SetSignalMask( SIG_DGUN)
 	Sleep(RESTORE_DELAY_DGUN)
 	isDgunning = false
-	Turn( luparm , x_axis, 0, ARM_SPEED_PITCH )
-	Turn( nanolathe , x_axis, math.rad(36), ARM_SPEED_PITCH )
-	if not isLasering then Turn( torso , y_axis, 0, TORSO_SPEED_YAW) end
+	Turn( ruparm , x_axis, 0, ARM_SPEED_PITCH )
+	Turn( nanospray , x_axis, math.rad(0), ARM_SPEED_PITCH )
+	if not isLasering then 
+		Turn( torso , y_axis, 0, TORSO_SPEED_YAW) 
+	end
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num >=4 then
+	if num >= 5 then
 		Signal( SIG_LASER)
 		SetSignalMask( SIG_LASER)
 		isLasering = true
 		if not isDgunning then 
 			Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
 		end
-		Turn( luparm , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
+		Turn( luparm , x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH )
+		Turn( nanolathe , x_axis, math.rad(0) , ARM_SPEED_PITCH )
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(luparm, x_axis)
 		StartThread(RestoreLaser)
@@ -489,12 +350,13 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask( SIG_DGUN)
 		isDgunning = true
 		Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
-		Turn( nanolathe , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
+		Turn( ruparm , x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH )
+		Turn( biggun , x_axis, math.rad(0) , ARM_SPEED_PITCH )
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(nanolathe, x_axis)
+		WaitForTurn(ruparm, x_axis)
 		StartThread(RestoreDgun)
 		return true
-	elseif num == 2 then
+	elseif num == 2 or num == 4 then
 		Sleep(100)
 		return (shieldOn)
 	end

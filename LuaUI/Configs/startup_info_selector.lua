@@ -20,7 +20,7 @@ local optionData = {
 		tooltip = "Strike Commander\nUses beam laser, has a greater speed but less health.",--will be used as option.tooltip
 		button = function()
 			Spring.SendLuaRulesMsg("faction:strikecomm")
-			Spring.SendCommands({'say a: I choose: Strike Commander !'})
+			Spring.SendCommands({'say a:I choose: Strike Commander !'})
 			Close(true)
 		end 
 	},
