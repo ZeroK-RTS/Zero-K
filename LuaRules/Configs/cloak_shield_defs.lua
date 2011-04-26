@@ -75,18 +75,6 @@ for name, ud in pairs(UnitDefNames) do
 	end
 end
 
-local uncloakables = {}
-
-
---[[
-for k,v in pairs(UnitDefNames) do
-  if (v.isBuilding) then
-    uncloakables[k] = true
-  end
-end
---]]
-
-
 if (Spring.IsDevLuaEnabled()) then
   for name, ud in pairs(UnitDefNames) do
     if (cloakShieldDefs[name] == nil) then
@@ -103,6 +91,14 @@ if (Spring.IsDevLuaEnabled()) then
         level = 4,
       }
     end
+  end
+end
+
+local uncloakables = {}
+
+for k,v in pairs(UnitDefNames) do
+  if (v.customParams.cannotcloak) then
+    uncloakables[k] = true
   end
 end
 

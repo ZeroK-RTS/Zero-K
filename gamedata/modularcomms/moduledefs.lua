@@ -390,9 +390,13 @@ upgrades = {
 		func = function(unitDef) 
 				unitDef.cloakcost = unitDef.cloakcost or 5
 				unitDef.mincloakdistance = math.max(150, unitDef.mincloakdistance or 0)
-				if unitDef.cloakcost > 5 then unitDef.cloakcost = 5 end
+				if unitDef.cloakcost > 5 then 
+					unitDef.cloakcost = 5 
+				end
 				unitDef.cloakcostmoving = unitDef.cloakcostmoving or 10
-				if unitDef.cloakcostmoving > 10 then unitDef.cloakcostmoving = 10 end
+				if unitDef.cloakcostmoving > 10 then 
+					unitDef.cloakcostmoving = 10 
+				end
 			end,
 	},
 	module_personal_shield = {

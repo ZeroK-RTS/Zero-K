@@ -204,6 +204,34 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Units with shields cannot cloak
+--
+Spring.Echo("Shield Weapon Def")
+for name, ud in pairs(UnitDefs) do
+	local hasShield = false
+	if ud.weapondefs then
+		for _, wd in pairs(ud.weapondefs) do      
+			Spring.Echo(wd.isshield)
+			if wd.isshield then
+				hasShield = true
+				break
+			end
+		end
+	end
+	if (hasShield) then
+		if not ud.customparams then
+			ud.customparams = {}
+		end
+		ud.customparams.cannotcloak = 1
+		ud.mincloakdistance = 0
+		ud.cloakcost = 0
+		ud.cloakcostmoving = 0
+		ud.cancloak = 0
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Disable smoothmesh
 -- 
 
