@@ -1,5 +1,5 @@
 --by Chris Mackey
-local spGetUnitHealth = Spring.GetUnitHealth
+local spSetUnitShieldState = Spring.SetUnitShieldState
 
 --pieces
 local base = piece "base"
@@ -46,7 +46,6 @@ local function hover()
 end
 
 local function initialize()
-
 	Move( lf_ball, y_axis, -10, 5 )
 	Move( rf_ball, y_axis, -10, 5 )
 	Move( lb_ball, y_axis, -10, 5 )
@@ -63,7 +62,6 @@ local function initialize()
 	Sleep( 100 )
 	
 	StartThread( hover )
-	
 end
 	
 	
@@ -83,6 +81,8 @@ function script.Activate()
 	
 	Turn( rb_leaf, x_axis, -l_angle, l_speed )
 	Turn( rb_leaf, z_axis, l_angle, l_speed )
+	
+	--spSetUnitShieldState(unitID, 1, true)
 end
 
 function script.Deactivate()
@@ -97,12 +97,8 @@ function script.Deactivate()
 	
 	Turn( rb_leaf, x_axis, 0, 1 )
 	Turn( rb_leaf, z_axis, 0, 1 )
-end
-
-function script.HitByWeapon(x, z, weaponID, damage)
-	--workaround for immortal unit
-	local health = spGetUnitHealth(unitID)
-	if health <= 0 then Spring.DestroyUnit(unitID, false) end
+	
+	--spSetUnitShieldState(unitID, 1, false)
 end
 
 function script.Killed(recentDamage, maxHealth)

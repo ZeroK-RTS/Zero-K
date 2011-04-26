@@ -1,3 +1,7 @@
+include "constants.lua"
+
+local spSetUnitShieldState = Spring.SetUnitShieldState
+
 local torso = piece 'torso' 
 local lfirept = piece 'lfirept' 
 local rbigflash = piece 'rbigflash' 
@@ -14,8 +18,6 @@ local l_foot = piece 'l_foot'
 local rleg = piece 'rleg' 
 local r_foot = piece 'r_foot' 
 local head = piece 'head' 
-
-include "constants.lua"
 
 local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
 
@@ -381,11 +383,11 @@ function script.QueryNanoPiece()
 end
 
 function script.Activate()
-	shieldOn = true
+	--spSetUnitShieldState(unitID, 2, true)
 end
 
 function script.Deactivate()
-	shieldOn = false
+	--spSetUnitShieldState(unitID, 2, false)
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -57,7 +57,7 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:RED_STROBE]],
+      [[custom:NONE]],
     },
 
   },

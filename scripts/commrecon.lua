@@ -1,5 +1,7 @@
 include "constants.lua"
 
+local spSetUnitShieldState = Spring.SetUnitShieldState
+
 local base = piece 'base' 
 local pelvis = piece 'pelvis' 
 local turret = piece 'turret' 
@@ -423,11 +425,11 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Activate()
-	shieldOn = true
+	--spSetUnitShieldState(unitID, true)
 end
 
 function script.Deactivate()
-	shieldOn = false
+	--spSetUnitShieldState(unitID, false)
 end
 
 function script.QueryWeapon(num)
