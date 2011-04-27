@@ -71,7 +71,7 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num)
-	return (GetUnitValue(COB.CRASHING) == 1) or false
+	return (GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitFuel(unitID) < 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1) 
 end
 
 function script.Killed(recentDamage, maxHealth)
