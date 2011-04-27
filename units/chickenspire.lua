@@ -78,6 +78,7 @@ unitDef = {
 
     {
       def                = [[SLAMSPORE]],
+	  badTargetCategory	 = [[MOBILE]],
       onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER]],
     },
 
@@ -128,7 +129,7 @@ unitDef = {
       weaponAcceleration      = 40,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
-	  wobble				  = 10000,
+	  wobble				  = 24000,
     },
 
   },

@@ -547,7 +547,7 @@ local icontypes = {
   
   --clogger icon
   clogger = {
-    bitmap='icons/clogger.png',
+    bitmap='icons/clogger.dds',
     size=2,
   },
   

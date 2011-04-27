@@ -115,7 +115,7 @@ end
 
 function script.QueryWeapon1() return points[missile].missile end
 
-function script.AimFromWeapon1() return body end
+function script.AimFromWeapon1() return pelvis end
 
 function script.AimWeapon1( heading, pitch )
 	Signal( SIG_Aim )
