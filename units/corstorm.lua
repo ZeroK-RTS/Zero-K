@@ -92,7 +92,7 @@ unitDef = {
 
     STORM_ROCKET = {
       name                    = [[Heavy Rocket]],
-      areaOfEffect            = 68,
+      areaOfEffect            = 75,
       cegTag                  = [[missiletrailred]],
       craterBoost             = 0,
       craterMult              = 2,
