@@ -350,7 +350,7 @@ local function UpdateDynamicGroupInfo()
 							
 						s = tooltip:match("Energy: ([^ ]+)")
 						if s ~= nil then 
-							gi_energydrain = gi_energydrain - tonumber(s) 
+							gi_energydrain = gi_energydrain - (tonumber(s) or 0)
 						end 
 					else
 						gi_metalincome = gi_metalincome + mm

@@ -636,6 +636,10 @@ local function FinishMorph(unitID, morphData)
   local newPara = 0
   if morphData.combatMorph then
 	newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
+	local slowDamage = GG.getSlowDamage(unitID)
+	if slowDamage then
+	  GG.addSlowDamage(newUnit, slowDamage)
+	end
   end
   
   -- prevent conflict with rezz gadget

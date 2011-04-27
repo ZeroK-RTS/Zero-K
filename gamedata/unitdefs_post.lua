@@ -93,6 +93,8 @@ end
 
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 
+VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --

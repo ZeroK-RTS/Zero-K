@@ -24,7 +24,7 @@ unitDef = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
-	canjump		   = [[1]],
+    canjump        = [[1]],
     description_bp = [[]],
     description_es = [[Caja de tierra]],
     description_fr = [[]],

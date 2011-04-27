@@ -151,6 +151,34 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 end
 
+
+local function addSlowDamage(unitID, damage)
+	
+	-- add stats that the unit requires for this gadget
+	if not slowedUnits[unitID] then
+		slowedUnits[unitID] = {
+			slowDamage = 0, 
+			degradeTimer = DEGRADE_TIMER,
+		}
+		GG.attUnits[unitID] = true -- unit with attribute change to be handled by unit_attributes
+	end
+
+	-- add slow damage
+	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + damage
+	slowedUnits[unitID].degradeTimer = DEGRADE_TIMER
+end
+
+local function getSlowDamage(unitID)
+	if slowedUnits[unitID] then
+		return slowedUnits[unitID].slowDamage
+	end
+	return false
+end
+
+-- morph uses this
+GG.getSlowDamage = getSlowDamage 
+GG.addSlowDamage = addSlowDamage
+
 local function removeUnit(unitID)
 	slowedUnits[unitID] = nil
 end
