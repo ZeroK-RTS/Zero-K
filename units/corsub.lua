@@ -38,7 +38,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 240,
-  maxDamage              = 1150,
+  maxDamage              = 1100,
   maxVelocity            = 2.9,
   minCloakDistance       = 75,
   minWaterDepth          = 15,
@@ -95,9 +95,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 400,
-        planes  = 400,
-        subs    = 400,
+        default = 410,
+        subs    = 410,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],

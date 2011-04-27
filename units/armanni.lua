@@ -40,7 +40,7 @@ unitDef = {
 
   damageModifier                = 0.25,
   defaultmissiontype            = [[GUARD_NOMOVE]],
-  explodeAs                     = [[CRAWL_BLASTSML]],
+  explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[fixedtachyon]],
@@ -57,7 +57,7 @@ unitDef = {
   onoffable                     = true,
   script                        = [[armanni.lua]],
   seismicSignature              = 4,
-  selfDestructAs                = [[CRAWL_BLASTSML]],
+  explodeAs                     = [[ESTOR_BUILDING]],
   side                          = [[ARM]],
   sightDistance                 = 780,
   smoothAnim                    = true,
