@@ -145,7 +145,7 @@ local moveDefs = {
 	BOAT4 = {
 		footprintx = 4,
 		footprintz = 4,
-		minwaterdepth = 10,
+		minwaterdepth = 5,
 		crushstrength = 500,
 	},
 	
