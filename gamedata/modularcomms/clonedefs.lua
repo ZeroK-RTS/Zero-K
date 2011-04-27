@@ -41,18 +41,18 @@ local copy = {
 	commrecon1 = {
 		commrecon2 = {
 			level = 2,
-			mainstats = {maxdamage = 2750, objectname = "commrecon2.s3o"},
+			mainstats = {maxdamage = 2400, objectname = "commrecon2.s3o"},
 			customparams = {speedbonus = "0.075"},
 		},
 		commrecon3 = {
 			level = 3,
-			mainstats = {maxdamage = 3600, objectname = "commrecon3.s3o",
+			mainstats = {maxdamage = 3150, objectname = "commrecon3.s3o",
 				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {speedbonus = "0.15"},
 		},
 		commrecon4 = {
 			level = 4,
-			mainstats = {maxdamage = 5000, objectname = "commrecon4.s3o",
+			mainstats = {maxdamage = 4000, objectname = "commrecon4.s3o",
 				explodeas = "estor_building", selfdas = "estor_building"},
 			customparams = {speedbonus = "0.3"},
 		},
