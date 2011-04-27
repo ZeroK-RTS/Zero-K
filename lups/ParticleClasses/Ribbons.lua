@@ -232,12 +232,14 @@ function Ribbon:Update(n)
 
   if (self.isvalid) then
     local x,y,z = spGetUnitPiecePosDir(self.unit,self.piecenum)
-    if (x) then
+    if x and y and z then
       self.posIdx = (self.posIdx % self.size)+1
       self.oldPos[self.posIdx] = {x,y,z}
 
       local vx,vy,vz = spGetUnitVelocity(self.unit)
-      self.blendfactor = (vx*vx+vz*vz)/30
+	  if vx and vy and vz then
+	    self.blendfactor = (vx*vx+vz*vz)/30
+	  end
     end
   else
     self.blendfactor = self.blendfactor - n * 0.01
