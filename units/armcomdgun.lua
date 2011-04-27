@@ -41,7 +41,6 @@ unitDef = {
   explodeAs              = [[ESTOR_BUILDINGEX]],
   footprintX             = 2,
   footprintZ             = 2,
-  hideDamage             = true,
   iconType               = [[corcommander]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
