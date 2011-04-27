@@ -27,14 +27,11 @@ local armorDefs = {
   },
 
   EMPRESISTANT99 = {
-    "armtick",
   },
   
   EMPRESISTANT75 = {
     "corcomlite",
     "armcomlite",
-    "arm_venom",
-    "armartic",
   },
 
   --automatically populated
