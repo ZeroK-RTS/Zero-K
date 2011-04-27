@@ -66,7 +66,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:BEAMWEAPON_MUZZLE_RED]],
-      [[custom:BEAMWEAPON_MUZZLE_ORANGE]],
+      [[custom:BEAMWEAPON_MUZZLE_RED]],
     },
 
   },
@@ -83,13 +83,6 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[KROWLASER2]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-
-    {
       def                = [[KROWLASER]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
@@ -102,6 +95,17 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
+
+    {
+      def                = [[KROWLASER]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+
+    {
+      def                = [[PARTICLEBEAM]],
+    },		
+	
   },
 
 
@@ -111,7 +115,6 @@ unitDef = {
       name                    = [[Laser]],
       areaOfEffect            = 8,
       avoidFeature            = false,
-      beamWeapon              = true,
       collideFriendly         = false,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -129,17 +132,15 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
-      noSelfDamage            = true,
       range                   = 400,
       reloadtime              = 0.2,
-      renderType              = 0,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/heavylaser_fire2]],
+	  soundStartVolume		  = 0.7,
       soundTrigger            = true,
       targetMoveError         = 0.2,
-      thickness               = 3.16227766016838,
+      thickness               = 3.16,
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
@@ -147,12 +148,44 @@ unitDef = {
     },
 
 
-    KROWLASER2 = {
-      name                    = [[Heavy Laser]],
+    FAKELASER  = {
+      name                    = [[Laser]],
       areaOfEffect            = 8,
       avoidFeature            = false,
-      beamWeapon              = true,
       collideFriendly         = false,
+      coreThickness           = 0,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = -0.001,
+        subs    = -0.001,
+      },
+
+      duration                = 0.02,
+      explosionGenerator      = [[custom:NONE]],
+      fireStarter             = 0,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      range                   = 400,
+      reloadtime              = 8,
+      rgbColor                = [[0 0 0]],
+      soundTrigger            = true,
+      targetMoveError         = 0.2,
+      thickness               = 0.001,
+      tolerance               = 1000,
+      turret                  = true,
+      weaponType              = [[LaserCannon]],
+      weaponVelocity          = 2300,
+    },
+
+    PARTICLEBEAM = {
+      name                    = [[Particle Beam]],
+      areaOfEffect            = 8,
+      beamTime                = 0.03,
+	  beamttl				  = 6,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -162,30 +195,33 @@ unitDef = {
         subs    = 1,
       },
 
-      duration                = 0.03,
-      explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],
-      fireStarter             = 90,
+      explosionGenerator      = [[custom:flash1orange]],
+      fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
-      lodDistance             = 10000,
-      noSelfDamage            = true,
-      range                   = 350,
-      reloadtime              = 0.2,
+      largeBeamLaser          = true,
+      laserFlareSize          = 3.5,
+      minIntensity            = 1,
+      range                   = 430,
+      reloadtime              = 0.03,
       renderType              = 0,
-      rgbColor                = [[1 0.25 0]],
-      soundHit                = [[weapon/laser/lasercannon_hit]],
-      soundStart              = [[weapon/laser/heavylaser_fire2]],
-      targetMoveError         = 0.2,
-      thickness               = 3.16227766016838,
-      tolerance               = 10000,
+      rgbColor                = [[1 0.3 0.1]],
+      soundStart              = [[weapon/laser/laser_burn10]],
+      soundTrigger            = true,
+      sweepfire               = true,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 3,
+      tolerance               = 18000,
       turret                  = true,
-      weaponType              = [[LaserCannon]],
-      weaponVelocity          = 2100,
-    },
-
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,
+    },		
+	
   },
 
 
@@ -205,27 +241,6 @@ unitDef = {
       hitdensity       = [[100]],
       metal            = 2000,
       object           = [[wreck3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 2000,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
-    DEAD2 = {
-      description      = [[Debris - Krow]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 17000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 2000,
-      object           = [[debris4x4a.s3o]],
       reclaimable      = true,
       reclaimTime      = 2000,
       seqnamereclamate = [[TREE1RECLAMATE]],

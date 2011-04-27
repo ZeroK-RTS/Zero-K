@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, body, ring, Turret1, Turret2, Turret3, bladestop, bladesbottom,
        wing1, wing2, wing3, wing2top, wing3top, sphere1, sphere2, sphere3,
@@ -12,6 +9,7 @@ piece  base, body, ring, Turret1, Turret2, Turret3, bladestop, bladesbottom,
 #define SIG_AIM_2			8
 #define SIG_AIM_3			16
 #define SIG_MOV				2
+#define SIG_PBEAM			32
 
 #define RESTORE_DELAY		3000
 
@@ -45,6 +43,7 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 Create()
 {
 	start-script SmokeUnit();
+	turn flash1 to x-axis <170> now;
 	sleep 1500;
 	hide flash1;
 	hide flash2;
@@ -108,8 +107,8 @@ AimPrimary(heading, pitch)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
-	turn Turret1 to y-axis heading speed <200.000000>;
-	turn Turret1 to x-axis 0 - pitch speed <200.000000>;
+	turn Turret1 to y-axis heading speed <30>;
+	turn Turret1 to x-axis 0 - pitch speed <30>;
 	return (1);
 }
 
@@ -131,9 +130,21 @@ AimTertiary(heading, pitch)
 	return (1);
 }
 
+ParticleBeam()
+{
+	signal SIG_PBEAM;
+	set-signal-mask SIG_PBEAM;
+	var i;
+	for (i = 0; i < 30; ++i){
+		emit-sfx 2051 from flash1;
+		sleep 132;
+	}
+}
+
 FirePrimary()
 {
 	emit-sfx 1025 from flash1;
+	//start-script ParticleBeam();
 }
 
 FireSecondary()

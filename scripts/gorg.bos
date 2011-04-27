@@ -288,10 +288,10 @@ ParticleBeam()
 	signal SIG_PARTICLE;
 	set-signal-mask SIG_PARTICLE;
 	var i;
-	for (i=0;i<90;++i) {
-		sleep 30;
+	for (i=0;i<25;++i) {
 		emit-sfx 2052 from rflare;
 		emit-sfx 2052 from lflare;
+		sleep 132;
 	}
 }
 
