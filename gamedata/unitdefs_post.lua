@@ -474,8 +474,7 @@ if (modOptions and tobool(modOptions.xmas)) then
         end
       end
     end
-
-  end --for
+  end
 end
 
 
