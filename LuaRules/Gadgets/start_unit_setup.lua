@@ -739,7 +739,7 @@ function gadget:Shutdown()
 	--	Spring.SetGameRulesParam("commPickedPlayer"..i, 0)
 	--	Spring.SetGameRulesParam("commPickedTeam"..i, 0)
 	--end
-	Spring.Echo("<Start Unit Setup> Going to sleep...")
+	--Spring.Echo("<Start Unit Setup> Going to sleep...")
 end
 
 --------------------------------------------------------------------
