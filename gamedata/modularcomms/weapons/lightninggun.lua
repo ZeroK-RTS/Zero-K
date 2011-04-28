@@ -16,7 +16,7 @@ local weaponDef = {
 	
 	damage                  = {
 		default        = 640,
-		commanders     = 64,
+		commanders     = 640,
 		empresistant75 = 160,
 		empresistant99 = 6.4,
 	},
