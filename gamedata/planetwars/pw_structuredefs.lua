@@ -18,7 +18,7 @@ structureConfig = {
 	pw_artefact = function(unitDef)
 			unitDef.maxdamage = 100000
 			unitDef.name = "Ancient Artefact"
-			unitDef.description = "Mysterious relic"
+			unitDef.description = "Mysterious Relic"
 			unitDef.objectname = "pw_artefact.obj"
 			unitDef.script = "pw_artefact.lua"
 			
@@ -43,7 +43,7 @@ structureConfig = {
 	pw_dropdepot = function(unitDef)
 			unitDef.maxdamage = 40000
 			unitDef.name = "Dropship Hangar"
-			unitDef.description = "Stores 1 extra dropship"
+			unitDef.description = "Increases dropship capacity by 1"
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
 			
@@ -125,7 +125,7 @@ structureConfig = {
 	pw_warpgate = function(unitDef)
 			unitDef.maxdamage = 30000
 			unitDef.name = "Warpgate"
-			unitDef.description = "Allows the owner to send drops to any point in the galaxy"
+			unitDef.description = "Allows planet owner to send drops to any point in the galaxy"
 			unitDef.objectname = "pw_warpgate.obj"
 			unitDef.script = "pw_warpgate.lua"
 			

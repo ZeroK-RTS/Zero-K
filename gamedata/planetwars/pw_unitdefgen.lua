@@ -57,7 +57,7 @@ local function makeTechStructure(def, name)
 	techName = UnitDefs[techName]
 	if techName then
 		def.name = techName.name .. " Technology Facility"
-		def.description = "Gives the owner the ability to construct " .. techName.name 
+		def.description = "Gives planet owner the ability to construct " .. techName.name 
 		structureConfig["generic_tech"](def)
 	end
 end
