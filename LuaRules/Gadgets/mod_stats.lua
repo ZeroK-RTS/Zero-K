@@ -36,6 +36,8 @@ local Echo = Spring.Echo
 local spGameOver = Spring.IsGameOver
 local spGetUnitHealth = Spring.GetUnitHealth
 local spAreTeamsAllied = Spring.AreTeamsAllied
+
+local gaiaTeamID = Spring.GetGaiaTeamID()
   
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -52,6 +54,10 @@ local drones = {
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
 
+	if unitTeam == gaiaTeamID then
+		return
+	end	
+							
 	if (attackerID == nil or  unitDefID == nil or damage == nil) or (not attackerTeam) or (attackerTeam == unitTeam) or (damage < 0)  or spAreTeamsAllied(attackerTeam, unitTeam) then 
 		if (paralyzer) then 
 			local hp, maxHp, paraDam = spGetUnitHealth(unitID)	
