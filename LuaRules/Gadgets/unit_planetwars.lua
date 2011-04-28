@@ -144,6 +144,7 @@ function gadget:Initialize()
 	local spawningAnything = false
 	for i,v in pairs(unitData) do
 		spawningAnything = true
+		break
 	end
 	
 	if not spawningAnything then
@@ -157,6 +158,6 @@ end
 
 function gadget:GameOver()	
 	for i =1, stuffToReport.count do
-		Spring.SendCommands("wbynum 255 PW:structurekilled".. stuffToReport.data[i])
+		Spring.SendCommands("wbynum 255 PW:structurekilled,".. stuffToReport.data[i])
 	end
 end
