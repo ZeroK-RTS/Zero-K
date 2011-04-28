@@ -732,7 +732,7 @@ function gadget:DrawScreen_()
 				awardCount = awardCount + 1
 				if not sentToPlanetWars then
 					local planetWarsData = teamNames[team] ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
-					Spring.SendCommands("wbynum 255 pwaward:".. planetWarsData)
+					Spring.SendCommands("wbynum 255 SPRINGIE:award,".. planetWarsData)
 					Spring.Echo(planetWarsData)
 				end
 			end

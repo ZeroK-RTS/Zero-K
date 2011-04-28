@@ -170,7 +170,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function SendData(statsData) 
-	Spring.SendCommands("wbynum 255 STATS:".. statsData)
+	Spring.SendCommands("wbynum 255 SPRINGIE:stats,".. statsData)
 end 
 
 

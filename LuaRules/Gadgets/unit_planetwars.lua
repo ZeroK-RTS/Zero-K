@@ -158,6 +158,6 @@ end
 
 function gadget:GameOver()	
 	for i =1, stuffToReport.count do
-		Spring.SendCommands("wbynum 255 PW:structurekilled,".. stuffToReport.data[i])
+		Spring.SendCommands("wbynum 255 SPRINGIE:structurekilled,".. stuffToReport.data[i])
 	end
 end
