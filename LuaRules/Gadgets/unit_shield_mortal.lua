@@ -33,22 +33,39 @@ local shields = {
 
 local shieldUnits = {}
 for _,name in pairs(shields) do
-	if UnitDefNames[name] then shieldUnits[UnitDefNames[name].id] = true end
+	if UnitDefNames[name] then 
+		shieldUnits[UnitDefNames[name].id] = true 
+	end
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local stuffToDestroy = {count = 0, data = {}}
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if shieldUnits[unitDefID] then
 		local health = spGetUnitHealth(unitID)
 		if health < 0.1 then
-			Spring.DestroyUnit(unitID)
+			stuffToDestroy.count = stuffToDestroy.count + 1
+			stuffToDestroy.data[stuffToDestroy.count] = unitID
+			
 		end
 	end	
 end
 
-
+function gadget:GameFrame(n)
+	if stuffToDestroy.count ~= 0 then
+		for i = 1, stuffToDestroy.count do
+			local unitID = stuffToDestroy.data[i]
+			if Spring.ValidUnitID(unitID) then
+				Spring.DestroyUnit(unitID)
+			end
+		end
+		stuffToDestroy.count = 0
+		stuffToDestroy.data = {}
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
