@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		date = "2008-10-05",
 		license = "Public Domain",
 		layer = -5,
-		enabled = true
+		enabled = false
 	}
 end
 
