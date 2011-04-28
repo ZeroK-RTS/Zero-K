@@ -68,22 +68,23 @@ local function spawnStructures(left, top, right, bottom)
 	local gaiaID = Spring.GetGaiaTeamID()
 	local xBase = mapWidth*left
 	local xRand = mapWidth*(right-left)
-	local zBase = mapWidth*top
-	local zRand = mapWidth*(bottom-top)
+	local zBase = mapHeight*top
+	local zRand = mapHeight*(bottom-top)
 	
 	for _,name in pairs(unitData) do
 		local giveUp = 0
 		local x = xBase + math.random()*xRand
 		local z = zBase + math.random()*zRand
+		local direction = math.floor(math.random()*4)
 		local defID = UnitDefNames[name].id
 		
-		while Spring.TestBuildOrder(defID, x, 0 ,z, 0) == 0 and giveUp < 20 do
+		while Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 and giveUp < 20 do
 			x = xBase + math.random()*xRand
 			z = zBase + math.random()*zRand
 			giveUp = giveUp + 1
 		end
 		
-		local unitID = Spring.CreateUnit(name, x, 0, z, 0, gaiaID)
+		local unitID = Spring.CreateUnit(name, x, 0, z, direction, gaiaID)
 		Spring.SetUnitNeutral(unitID,true)
 		unitsByID[unitID] = {name = name, teamDamages = {}}
 	end

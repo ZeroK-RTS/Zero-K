@@ -65,6 +65,7 @@ end
 --for name in pairs(unitData) do
 for _, name in pairs(unitData) do
 	structureDefs[name] = CopyTable(genericStructure, true)
+	structureDefs[name].customparams = structureDefs[name].customparams or {}
 	Spring.Echo(name)
 	if structureConfig[name] then
 		structureConfig[name](structureDefs[name])
@@ -73,6 +74,10 @@ for _, name in pairs(unitData) do
 		makeTechStructure(structureDefs[name], name)
 		structureDefs[name].unitname = name
 	end
+	
+	structureDefs[name].buildcostmetal = structureDefs[name].maxdamage
+	structureDefs[name].buildcostenergy = structureDefs[name].maxdamage
+	structureDefs[name].buildtime = structureDefs[name].maxdamage
 end
 
 -- splice back into unitdefs
