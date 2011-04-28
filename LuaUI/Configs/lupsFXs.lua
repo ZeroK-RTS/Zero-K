@@ -235,6 +235,18 @@ radarBlink = {
   repeatEffect= true,
 }
 
+warpgateCorona = {
+  pos         = {0,58.9,0},
+  life        = math.huge,
+  lifeSpread  = 0,
+  size        = 210,
+  sizeGrowth  = 0,
+  --colormap    = { {0.7, 0.6, 0.5, 0.01} },
+  colormap    = { {0.1, 0.3, 0.8, 0.01} },
+  texture     = 'bitmaps/GPL/groundflash.tga',
+  count       = 1,
+  repeatEffect = true,
+}
 
 ----------------------------------------------------------------------------
 -- OverDrive FXs -----------------------------------------------------------

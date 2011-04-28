@@ -238,7 +238,7 @@ return {
       ground             = true,
       properties = {
         airdrag            = 0.95,
-        colormap           = [[0 0 0 0  0.5 0.4 0.3 1  0.6 0.4 0.2 0.75  0.5 0.4 0.3 0.5  0 0 0 0]],
+        colormap           = [[0 0 0 0  0.05 0.05 0.05 1  0.05 0.05 0.05 0.75  0 0 0 0 0.5  0 0 0 0]],
         directional        = false,
         emitrot            = 85,
         emitrotspread      = 5,
@@ -266,7 +266,7 @@ return {
       properties = {
         alpha              = 0.2,
         alphadecay         = 0.001,
-        color              = [[0.5,0.0,0.5]],
+        color              = [[0.05, 0.05, 0.05]],
         dir                = [[-8 r16, -8 r16, -8 r16]],
         length             = 1,
         lengthgrowth       = 1,
@@ -292,7 +292,7 @@ return {
       water              = true,
       properties = {
         alpha              = 0.5,
-        color              = [[1,0.5,1]],
+        color              = [[0.05 ,0.05, 0.05]],
         expansionspeed     = 5,
         ttl                = 150,
       },

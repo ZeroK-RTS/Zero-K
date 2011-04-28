@@ -75,6 +75,11 @@ effectUnitDefs = {
   spherepole = {
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="blade", onActive=false}},
   },
+  
+  pw_warpgate = {
+    {class='StaticParticles', options=warpgateCorona},
+--    {class='GroundFlash', options=groundFlashOrange},
+  },  
 
   --// PLANES //----------------------------
   armhawk = {

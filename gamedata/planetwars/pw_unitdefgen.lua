@@ -43,13 +43,14 @@ if err then
 end
 
 if not unitData then 
-	unitData = {} 
+	unitData = {}
 end
 
+--unitData = CopyTable(structureConfig, true)
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 structureDefs = {}	--holds precedurally generated structure defs
-genericStructure = UnitDefs["planetwars_generic"]
+genericStructure = UnitDefs["pw_generic"]
 
 local function makeTechStructure(def, name)
 	local techName = string.sub(name,4)
@@ -61,12 +62,16 @@ local function makeTechStructure(def, name)
 	end
 end
 
+--for name in pairs(unitData) do
 for _, name in pairs(unitData) do
 	structureDefs[name] = CopyTable(genericStructure, true)
+	Spring.Echo(name)
 	if structureConfig[name] then
 		structureConfig[name](structureDefs[name])
+		structureDefs[name].unitname = name
 	else
 		makeTechStructure(structureDefs[name], name)
+		structureDefs[name].unitname = name
 	end
 end
 
