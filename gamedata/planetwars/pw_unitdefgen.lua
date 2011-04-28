@@ -20,7 +20,7 @@ VFS.Include("gamedata/planetwars/pw_structuredefs.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-local pwDataRaw = modOptions.planetwars
+local pwDataRaw = modOptions.pwstructures
 local pwDataFunc, err, success, unitData
 
 if not (pwDataRaw and type(pwDataRaw) == 'string') then
@@ -54,7 +54,7 @@ genericStructure = UnitDefs["pw_generic"]
 
 local function makeTechStructure(def, name)
 	local techName = string.sub(name,4)
-	local techName = UnitDefs[techName]
+	techName = UnitDefs[techName]
 	if techName then
 		def.name = techName.name .. " Technology Facility"
 		def.description = "Gives the owner the ability to construct " .. techName.name 

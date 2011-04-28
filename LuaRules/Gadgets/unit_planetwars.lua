@@ -115,7 +115,7 @@ end
 function gadget:Initialize()
 	
 	local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-	local pwDataRaw = modOptions.planetwars
+	local pwDataRaw = modOptions.pwstructures
 	local pwDataFunc, err, success
 	
 	if not (pwDataRaw and type(pwDataRaw) == 'string') then

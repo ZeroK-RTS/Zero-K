@@ -420,21 +420,6 @@ local options = {
     def    = false,
   },
   {
-    key    = 'planetwars',
-    name   = 'Planet Wars Options',
-    desc   = 'A string is put here by the Planet Wars server to set up ingame conditions.',
-    type   = 'string',
-    def    = false,
-  },
-  {
-    key    = 'commandertypes',
-    name   = 'Commander Types',
-    desc   = 'A string is put here by Springie to determine number and types of custom commanders.',
-    type   = 'string',
-    def    = false,
-	section	= "experimental",
-  },
-  {
 	key		= "enableunlocks",
 	name	= "Enable unlock system",
 	desc	= "Enables the experimental unlock system (disabling will enable all units by default)",
