@@ -96,7 +96,7 @@ local function getUnitState(unitID,data,cQueue)
 			if los then
 				los = los.los
 			end
-			if los and not (cQueue[1].id == CMD_FIGHT or cQueue[1].options.internal) then -- only skirm single target when given the order manually
+			if not (cQueue[1].id == CMD_FIGHT or cQueue[1].options.internal) then -- only skirm single target when given the order manually
 				return target,false
 			else
 				return -1,false
@@ -116,7 +116,7 @@ local function getUnitState(unitID,data,cQueue)
 					if los then 
 						los = los.los
 					end
-					if los and not (cQueue[2].id == CMD_FIGHT or cQueue[2].options.internal) then -- only skirm single target when given the order manually
+					if not (cQueue[2].id == CMD_FIGHT or cQueue[2].options.internal) then -- only skirm single target when given the order manually
 						return target,true
 					else
 						return -1,true
