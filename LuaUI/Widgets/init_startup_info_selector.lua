@@ -55,7 +55,7 @@ local function playSound(filename, ...)
 		Spring.PlaySoundFile(path, ...)
 	else
 	--Spring.Echo(filename)
-		Spring.Echo("<snd_noises.lua>: Error file "..path.." doesn't exist.")
+		Spring.Echo("<Startup Info Selector>: Error - file "..path.." doesn't exist.")
 	end
 end
 

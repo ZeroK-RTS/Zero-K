@@ -44,16 +44,6 @@ local options = {
         desc = 'Normal game mode',
       },
       {
-        key  = 'deploy',
-        name = 'Deployment',
-        desc = 'Players deploy a limited number of units before the game starts',
-      },
-      {
-        key  = 'tactics',
-        name = 'Tactics',
-        desc = 'Players select a limited number of units before the game starts (without any factories)',
-      },
-      {
 		key  = 'kingofthehill',
 		name = 'King of the Hill',
 		desc = 'Control the hill for a set amount of time to win! See King of the Hill section.',
@@ -335,7 +325,7 @@ local options = {
     desc   = "Does Not Count mode.",
     type   = 'list',
     section= 'experimental',
-    def    ='debug',
+    def    = 'destroy',
     items = {
       { key='debug', name="Debug", desc='Does nothing.' },
       { key='destroy', name="Destroy Alliance", desc='Destroys the alliance if they have only "doesnotcount units."' },
@@ -361,19 +351,10 @@ local options = {
     section= 'experimental',
     def    = false,
   },
-
   {
     key    = 'specialpower',
     name   = 'Special Advanced Powerplants',
     desc   = 'Rather than explode like a nuke, Adv Fusion do a massive implosion.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
-  {
-    key    = 'specialdecloak',
-    name   = 'Special Decloak Behavior',
-    desc   = 'Overrides engine\'s decloak. Shows cloaked units only to team that reveals them, also fixes cloak behavior in FFA games with ceasefires.',
     type   = 'bool',
     section= 'experimental',
     def    = false,

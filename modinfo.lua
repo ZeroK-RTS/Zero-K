@@ -1,5 +1,5 @@
 return {
-  name='Zero-K $VERSION',
+  name='Zero-K',
   description='Zero-K',
   shortname='ZK',
   version='$VERSION',

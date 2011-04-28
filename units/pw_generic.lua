@@ -33,6 +33,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[pw_techlab.obj]],
+  power							= 100,
   script                		= [[nullscript.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
