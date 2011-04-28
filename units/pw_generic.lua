@@ -4,6 +4,7 @@ unitDef = {
   description                   = [[Blank]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
+  autoHeal                      = 40,
   brakeRate                     = 0,
   buildAngle                    = 4096,
   buildCostEnergy               = 1000,
