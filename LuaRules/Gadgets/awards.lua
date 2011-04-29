@@ -236,6 +236,9 @@ end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	-- Units given to neutral?
+	if oldTeam == gaiaTeamID or newTeam == gaiaTeamID  then
+		return
+	end
 	if not spAreTeamsAllied(oldTeam,newTeam) then
 		if captureList[newTeam] then
 			local ud = UnitDefs[unitDefID]
