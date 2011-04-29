@@ -1,7 +1,7 @@
 Legal.
 
-Zeor-K a game for the Spring engine.
-Copyright © 2008-2010 the 0K development team.
+Zero-K a game for the Spring engine.
+Copyright Â© 2008-2010 the 0K development team.
 
 Unless otherwise specified everything in this project is released under
 the GNU General Public License or Public Domain; you can redistribute it
