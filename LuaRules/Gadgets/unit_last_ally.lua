@@ -21,14 +21,15 @@ if (gadgetHandler:IsSyncedCode()) then
 
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local gaiaTeamID = Spring.GetGaiaTeamID()
+local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(gaiaTeamID))
 
 function gadget:GameFrame(n)
-
   -- check for last ally:
   -- end condition: only 1 ally with human players, no AIs in other ones
   if n % 37 < 0.1 then
 
     if Spring.IsCheatingEnabled() then
+	  Spring.Echo("<Last Ally> Cheating mode. Gadget removed.")
       gadgetHandler:RemoveGadget()
 	  return
     end
@@ -38,7 +39,7 @@ function gadget:GameFrame(n)
     local lastActive = nil
     for _,a in ipairs(allylist) do
       repeat
-	if (a == gaiaTeamID) then break end -- continue
+	  if (a == gaiaAllyTeamID) then break end -- continue
       local teamlist = Spring.GetTeamList(a)
       if (not teamlist) then break end -- continue
       local activeTeams = 0
@@ -68,7 +69,7 @@ function gadget:GameFrame(n)
     if activeAllies < 2 then
       -- remove every unit except for last active alliance
       for _,a in ipairs(allylist) do
-        if (a ~= lastActive)and(a ~= gaiaTeamID) then
+        if (a ~= lastActive)and(a ~= gaiaAllyTeamID) then
           repeat
           local teamlist = Spring.GetTeamList(a)
           if not teamlist then break end -- continue

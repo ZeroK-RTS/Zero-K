@@ -83,9 +83,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 60,
+        default = 65,
         planes  = 650,
-        subs    = 30,
+        subs    = 32.5,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -130,7 +130,7 @@ unitDef = {
       description      = [[Wreckage - Hacksaw]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 2200,
+      damage           = 1500,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
@@ -150,7 +150,7 @@ unitDef = {
       description      = [[Debris - Hacksaw]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2200,
+      damage           = 1500,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,

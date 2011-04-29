@@ -12,6 +12,8 @@ return {
 	}
 end
 
+local gaiaTeamID = Spring.GetGaiaTeamID()
+
 function gadget:Initialize()
 	if (not Spring.GetModOptions()) or (not tobool(Spring.GetModOptions().commends)) then
 		gadgetHandler:RemoveGadget()
@@ -34,6 +36,9 @@ local function checkForComm(allyTeamID, exceptionUnitID)
 	local teamList = Spring.GetTeamList(allyTeamID)
 	if teamList then
 		for i = 1,#teamList do
+			if teamList[i] == gaiaTeamID then
+				return true
+			end
 			local teamUnits = Spring.GetTeamUnits(teamList[i]) 
 			for j = 1,#teamUnits do
 				local ud = Spring.GetUnitDefID(teamUnits[j]) and UnitDefs[Spring.GetUnitDefID(teamUnits[j])]

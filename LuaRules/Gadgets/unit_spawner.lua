@@ -470,12 +470,9 @@ local function AttackNearestEnemy(unitID)
 end
 
 local function ChooseTarget(unitID)
-  local teamID
+  local teamID = unitID and spGetUnitTeam(unitID)
   local tries = 0
-  if unitID then
-	teamID = spGetUnitTeam(unitID)
-	--targetID = unitID
-  else
+  if (not unitID) or (teamID == gaiaTeamID) then
 	local humanTeamList = SetToList(humanTeams)
 	if (not humanTeamList[1]) then
 	  return
