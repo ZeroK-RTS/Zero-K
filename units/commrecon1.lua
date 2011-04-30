@@ -30,6 +30,7 @@ unitDef = {
 
   customParams        = {
     canjump   = [[1]],
+	cloakstealth = [[1]],
 	jumpclass = [[commrecon1]],
 	description_de = [[Hochmobiler Kommandant, Baut mit 12 M/s]],
 	helptext       = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules.]],
