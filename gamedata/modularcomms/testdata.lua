@@ -208,7 +208,6 @@ local base = {
 		modules = {
 			"commweapon_shotgun",
 			"commweapon_heavymachinegun",
-			"module_areashield",
 			"module_personal_cloak",
 		}
 	},
