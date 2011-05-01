@@ -43,7 +43,7 @@ structureConfig = {
 	pw_dropdepot = function(unitDef)
 			unitDef.maxdamage = 40000
 			unitDef.name = "Dropship Hangar"
-			unitDef.description = "Increases dropship capacity by 1"
+			unitDef.description = "Increases dropship capacity by 3"
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
 			
@@ -56,7 +56,7 @@ structureConfig = {
 	pw_mine = function(unitDef)
 			unitDef.maxdamage = 20000
 			unitDef.name = "Mining Outpost"
-			unitDef.description = "Produces 300 credits/turn" 
+			unitDef.description = "Produces 50 credits/turn" 
 			unitDef.objectname = "pw_mine.obj"
 			unitDef.script = "pw_mine.lua"
 			
@@ -72,7 +72,7 @@ structureConfig = {
 	pw_mine2 = function(unitDef)
 			unitDef.maxdamage = 32000
 			unitDef.name = "Automated Mines"
-			unitDef.description = "Produces 600 credits/turn" 
+			unitDef.description = "Produces 150 credits/turn" 
 			unitDef.objectname = "pw_mine2.obj"
 			unitDef.script = "pw_mine2.lua"
 			
@@ -85,7 +85,7 @@ structureConfig = {
 	pw_mine3 = function(unitDef)
 			unitDef.maxdamage = 45000
 			unitDef.name = "Planetary Mining Complex"
-			unitDef.description = "Produces 900 credits/turn" 
+			unitDef.description = "Produces 450 credits/turn" 
 			unitDef.objectname = "pw_mine3.obj"
 			unitDef.script = "pw_mine3.lua"
 			
