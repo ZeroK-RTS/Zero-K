@@ -404,6 +404,20 @@ end --for
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Avoid neutral	-- breaks explicit attack orders
+--
+--[[
+for name, ud in pairs(UnitDefs) do
+  if (ud.weapondefs) then
+    for wName,wDef in pairs(ud.weapondefs) do      
+      wDef.avoidneutral = true
+    end
+  end
+end
+]]--
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Set mass
 -- 
 for name, ud in pairs(UnitDefs) do
@@ -474,7 +488,8 @@ if (modOptions and tobool(modOptions.xmas)) then
         end
       end
     end
-  end
+
+  end --for
 end
 
 
@@ -521,14 +536,14 @@ end
 --------------------------------------------------------------------------------
 -- Set chicken cost
 -- 
-
+--[[
 for name, ud in pairs(UnitDefs) do
   if (ud.unitname:sub(1,7) == "chicken") then
-	--ud.buildcostmetal = ud.buildtime
-	--ud.buildcostenergy = ud.buildtime
+	ud.buildcostmetal = ud.buildtime
+	ud.buildcostenergy = ud.buildtime
   end
 end
-
+]]--
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Category changes

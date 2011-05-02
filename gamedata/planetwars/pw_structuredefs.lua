@@ -26,6 +26,7 @@ structureConfig = {
 			unitDef.footprintz = 4
 			
 			unitDef.customparams.soundselect = "cloaker_select"
+			unitDef.canselfdestruct = false
 		end,		
 		
 	pw_dropfac = function(unitDef)

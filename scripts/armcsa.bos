@@ -1,3 +1,5 @@
+//linear constant 65536
+
 piece  fuselage, head, wingl, wingr, enginel, enginer, arm, lathe, jaw1, jaw2, nanopoint;
 
 static-var  Static_Var_1, statechg_DesiredState, statechg_StateChanging;
@@ -12,74 +14,21 @@ lua_QueryNanoPiece()
   return 0;
 }
 
-activatescr()
-{
-	if( TRUE )
-	{
-		turn arm to x-axis <-80> speed <200>;
-		turn lathe to x-axis <-80> speed <200>;
-		sleep 996;
-	}
-	sleep 6;
-}
-
-deactivatescr()
-{
-	if( TRUE )
-	{
-		turn arm to x-axis <0> speed <200>;
-		turn lathe to x-axis <0> speed <200>;
-		sleep 823;
-	}
-	sleep 7;
-}
-
-InitState()
-{
-	statechg_DesiredState = TRUE;
-	statechg_StateChanging = FALSE;
-}
-
-RequestState(requestedstate, currentstate)
-{
-	if( statechg_StateChanging )
-	{
-		statechg_DesiredState = requestedstate;
-		return (0);
-	}
-	statechg_StateChanging = TRUE;
-	currentstate = statechg_DesiredState;
-	statechg_DesiredState = requestedstate;
-	while( statechg_DesiredState != currentstate )
-	{
-		if( statechg_DesiredState == 0 )
-		{
-			call-script activatescr();
-			currentstate = 0;
-		}
-		if( statechg_DesiredState == 1 )
-		{
-			call-script deactivatescr();
-			currentstate = 1;
-		}
-	}
-	statechg_StateChanging = FALSE;
-}
-
 Create()
 {
-	call-script InitState();
 	start-script SmokeUnit();
 }
 
 Activate()
 {
-	start-script RequestState(0);
+	turn arm to x-axis <-80> speed <200>;
+	turn lathe to x-axis <-80> speed <200>;
 }
 
 Deactivate()
 {
-	start-script RequestState(1);
+	turn arm to x-axis <0> speed <200>;
+	turn lathe to x-axis <0> speed <200>;
 }
 
 StartMoving()
@@ -99,7 +48,7 @@ StopMoving()
 
 StartBuilding()
 {
-	set CLOAKED to 0;
+	//set CLOAKED to 0;
 	set INBUILDSTANCE to 1;
 	turn jaw1 to x-axis <-30> speed <150>;
 	turn jaw2 to x-axis <30> speed <150>;

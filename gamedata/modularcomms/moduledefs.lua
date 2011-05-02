@@ -149,12 +149,13 @@ upgrades = {
 	},
 	weaponmod_disruptor_ammo = {
 		name = "Disruptor Ammo",
-		description = "Shotgun/Gauss Rifle/Heavy Machine Gun: +40% slow damage",
+		description = "Shotgun/Gauss Rifle/Heavy Machine Gun/Shock Rifle: +40% slow damage",
 		func = function(unitDef)
 				local permitted = {
 					commweapon_shotgun = true,
 					commweapon_gaussrifle = true,
 					commweapon_heavymachinegun = true,
+					commweapon_shockrifle = true,
 				}
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -166,6 +167,9 @@ upgrades = {
 							v.explosiongenerator = [[custom:BEAMWEAPON_HIT_PURPLE]]
 						elseif i == "commweapon_gaussrifle" then
 							v.explosiongenerator = [[custom:GAUSS_HIT_M_PURPLE]]
+						elseif i == "commweapon_shockrifle" then
+							--v.rgbcolor = [[0.1 0.65 0.9]]
+							--v.explosiongenerator = [[custom:BURNTEAL]]
 						end
 					end
 				end
@@ -237,6 +241,23 @@ upgrades = {
 						v.soundstart = [[weapon/missile/missile2_fire_bass]]
 						v.soundstartvolume = 7					
 						--break
+					end
+				end
+			end,	
+	},
+	weaponmod_stun_booster = {
+		name = "Flux Amplifier",
+		description = "Lightning Gun: +25% paralyze damage, +2s paralyzetime",
+		func = function(unitDef)
+				local weapons = unitDef.weapondefs or {}
+				for i,v in pairs(weapons) do
+					if i == "commweapon_lightninggun" then
+						for armorname, dmg in pairs(v.damage) do
+							v.damage[armorname] = dmg * 1.25
+							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+						end
+						v.customparams["extra_damage_mult"] = 0.32	-- same real damage
+						v.paralyzetime = 3
 					end
 				end
 			end,	

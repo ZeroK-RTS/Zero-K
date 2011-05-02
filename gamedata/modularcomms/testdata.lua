@@ -148,6 +148,7 @@ local base = {
 			"module_personal_shield",
 			"module_areashield",
 			"module_adv_targeting",
+			"weaponmod_disruptor_ammo",
 		}
 	},
 	[4] = {
@@ -198,16 +199,17 @@ local base = {
 		}
 	},
 	[8] = {
-		name = "peashooter",
+		name = "lightning",
 		modules = {
+			"commweapon_lightninggun",
 			"module_high_power_servos",
+			"weaponmod_stun_booster",
 		}
 	},
 	[9] = {
 	name = "cloak",
 		modules = {
-			"commweapon_shotgun",
-			"commweapon_heavymachinegun",
+			"commweapon_lightninggun",
 			"module_personal_cloak",
 		}
 	},
