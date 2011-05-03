@@ -88,7 +88,7 @@ unitDef = {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0.2 0 1]],
-	  maxAngleDif		 = 60,
+	  maxAngleDif		 = 150,
       onlyTargetCategory = [[MOBILE]],
     },
 
@@ -97,7 +97,7 @@ unitDef = {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[-0.2 0 1]],
-	  maxAngleDif		 = 60,
+	  maxAngleDif		 = 150,
       onlyTargetCategory = [[MOBILE]],
     },
 
@@ -139,7 +139,7 @@ unitDef = {
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 35,
-      impulseFactor           = -120,
+      impulseFactor           = -125,
       intensity               = 0.7,
       interceptedByShieldType = 0,
       noSelfDamage            = true,
