@@ -1,3 +1,5 @@
+//linear constant 65536
+
 #include "constants.h"
 
 piece  base, pelvis, torso,
@@ -233,28 +235,6 @@ StopMoving()
 	bMoving = FALSE;
 }
 
-AimWeapon4(heading, pitch)
-{
-	signal SIG_AIM;
-	set-signal-mask SIG_AIM;
-	return (1);
-}
-
-FireWeapon4()
-{
-	emit-sfx 1027 from emit;
-}
-
-QueryWeapon4(piecenum)
-{
-	piecenum = emit;
-}
-
-AimFromWeapon4(piecenum)
-{
-	piecenum = torso;
-}
-
 FireWeapon3()
 {
 	emit-sfx 2049 from emit;
@@ -273,11 +253,6 @@ AimWeapon3(heading, pitch)
 QueryWeapon3(piecenum)
 {
 	piecenum = emit;
-}
-
-SweetSpot(piecenum)
-{
-	piecenum = torso;
 }
 
 Killed(severity, corpsetype)
@@ -310,7 +285,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode base type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
 		explode torso type BITMAPONLY | BITMAP2;
 
@@ -322,7 +297,7 @@ Killed(severity, corpsetype)
 		explode Lfoot type BITMAPONLY | BITMAP4;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode base type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
 	explode torso type BITMAPONLY | BITMAP2;
 

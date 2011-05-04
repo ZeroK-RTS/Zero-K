@@ -1,5 +1,5 @@
 -- $Id$
--- CA Version
+-- ZK Version
 
 -- King of the Hill for ModOptions -------------------------------------
 -- Set up an empty box on Spring Lobby (other clients might crash) ------
@@ -21,7 +21,7 @@ end
 
 local blockedDefs = {
 	[ UnitDefNames['terraunit'].id ] = true,
-	[ UnitDefNames['cormine1'].id ] = true,
+	[ UnitDefNames['wolverine_mine'].id ] = true,
 }
 
 ---------------------------------------------------------------------------------
