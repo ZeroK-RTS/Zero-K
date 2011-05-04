@@ -261,11 +261,11 @@ local options = {
   },
   {
 	key    = 'marketandbounty',
-	name   = 'Enable MarketPlace and Bounties',
+	name   = 'Enable MarketPlace and Bounties (dysfunctional)',
 	desc   = 'Adds option to sell your units, buy units from allies (including temporary allies). Also allows you to place a bounty on a unit.',
 	type   = 'bool',
 	section= 'experimental',
-	def    = true,
+	def    = false,
   },
   {
     key    = 'animation',
