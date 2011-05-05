@@ -133,9 +133,9 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 160,
-        planes  = 160,
-        subs    = 8,
+        default = 150,
+        planes  = 150,
+        subs    = 7.5,
       },
 
       explosionGenerator      = [[custom:MARY_SUE]],
@@ -144,7 +144,7 @@ unitDef = {
       interceptedByShieldType = 1,
       minbarrelangle          = [[-35]],
       noSelfDamage            = true,
-      range                   = 320,
+      range                   = 280,
       reloadtime              = 4,
       renderType              = 4,
       soundHit                = [[explosion/ex_med5]],
