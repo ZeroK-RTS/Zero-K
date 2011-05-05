@@ -74,7 +74,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode base type BITMAPONLY | BITMAP1;
 		explode body type SHATTER | BITMAP5;
 		explode land1 type BITMAPONLY | BITMAP3;
@@ -86,7 +86,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode base type BITMAPONLY | BITMAP1;
 		explode body type SHATTER | BITMAP5;
 		explode land1 type BITMAPONLY | BITMAP3;
@@ -96,7 +96,7 @@ Killed(severity, corpsetype)
 		explode radar type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode base type BITMAPONLY | BITMAP1;
 	explode body type SHATTER | BITMAP5;
 	explode land1 type BITMAPONLY | BITMAP3;

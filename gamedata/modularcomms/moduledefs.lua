@@ -90,16 +90,10 @@ upgrades = {
 	commweapon_disruptorbomb = {
 		name = "Disruptor Bomb",
 		description = "Damages and slows units in a large area",
-		func = function(unitDef)
-				unitDef.customparams.nofps = "1"
-			end,	
 	},
 	commweapon_napalmgrenade = {
 		name = "Hellfire Grenade",
 		description = "Sets a moderate area ablaze",
-		func = function(unitDef)
-				unitDef.customparams.nofps = "1"
-			end,	
 	},		
 	commweapon_sunburst = {
 		name = "Sunburst Cannon",
@@ -112,7 +106,6 @@ upgrades = {
 		description = "Slow Beam: +33% reload time, +250 real damage",
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_slowbeam", "commweapon_disruptor")
-				
 			end,	
 	},
 	conversion_shockrifle = {

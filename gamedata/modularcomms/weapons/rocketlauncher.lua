@@ -14,9 +14,9 @@ local weaponDef = {
 	},
 	
 	damage                  = {
-		default = 350,
-		planes  = 350,
-		subs    = 17.5,
+		default = 360,
+		planes  = 360,
+		subs    = 18,
 	},
 	
 	fireStarter             = 180,
@@ -24,12 +24,10 @@ local weaponDef = {
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 2,
-	lineOfSight             = true,
 	model                   = [[wep_m_hailstorm.s3o]],
-	noSelfDamage            = true,
 	predictBoost            = 1,
 	range                   = 430,
-	reloadtime              = 3.5,
+	reloadtime              = 3.2,
 	smokedelay              = [[.1]],
 	smokeTrail              = true,
 	soundHit                = [[weapon/missile/sabot_hit]],
