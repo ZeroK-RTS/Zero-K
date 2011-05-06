@@ -71,12 +71,12 @@ local function spawnStructures(left, top, right, bottom)
 	local zBase = mapHeight*top
 	local zRand = mapHeight*(bottom-top)
 	
-	for _,name in pairs(unitData) do
+	for _,info in pairs(unitData) do
 		local giveUp = 0
 		local x = xBase + math.random()*xRand
 		local z = zBase + math.random()*zRand
 		local direction = math.floor(math.random()*4)
-		local defID = UnitDefNames[name].id
+		local defID = UnitDefNames[info.unitname].id
 		
 		while Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 and giveUp < 20 do
 			x = xBase + math.random()*xRand
@@ -84,9 +84,9 @@ local function spawnStructures(left, top, right, bottom)
 			giveUp = giveUp + 1
 		end
 		
-		local unitID = Spring.CreateUnit(name, x, 0, z, direction, gaiaID)
+		local unitID = Spring.CreateUnit(info.unitname, x, 0, z, direction, gaiaID)
 		Spring.SetUnitNeutral(unitID,true)
-		unitsByID[unitID] = {name = name, teamDamages = {}}
+		unitsByID[unitID] = {info.unitname = info.unitname, teamDamages = {}}
 	end
 end
 
@@ -115,7 +115,7 @@ end
 function gadget:Initialize()
 	
 	local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-	local pwDataRaw = modOptions.pwstructures
+	local pwDataRaw = modOptions.planetwarsStructures
 	local pwDataFunc, err, success
 	
 	if not (pwDataRaw and type(pwDataRaw) == 'string') then
@@ -143,8 +143,10 @@ function gadget:Initialize()
 	
 	local spawningAnything = false
 	for i,v in pairs(unitData) do
-		spawningAnything = true
-		break
+		if (v.isDestroyed~=1) then 
+			spawningAnything = true
+			break
+		end
 	end
 	
 	if not spawningAnything then

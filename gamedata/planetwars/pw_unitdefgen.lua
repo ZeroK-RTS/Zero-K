@@ -20,7 +20,7 @@ VFS.Include("gamedata/planetwars/pw_structuredefs.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-local pwDataRaw = modOptions.pwstructures
+local pwDataRaw = modOptions.planetwarsStructures
 local pwDataFunc, err, success, unitData
 
 if not (pwDataRaw and type(pwDataRaw) == 'string') then
@@ -63,21 +63,25 @@ local function makeTechStructure(def, name)
 end
 
 --for name in pairs(unitData) do
-for _, name in pairs(unitData) do
-	structureDefs[name] = CopyTable(genericStructure, true)
-	structureDefs[name].customparams = structureDefs[name].customparams or {}
-	Spring.Echo(name)
-	if structureConfig[name] then
-		structureConfig[name](structureDefs[name])
-		structureDefs[name].unitname = name
+for _, info in pairs(unitData) do
+	if info.isDestroyed ~= 1 then 
+	structureDefs[info.unitname] = CopyTable(genericStructure, true)
+	structureDefs[info.unitname].customparams = structureDefs[info.unitname].customparams or {}
+	Spring.Echo(info.unitname)
+	if structureConfig[info.unitname] then
+		structureConfig[info.unitname](structureDefs[info.unitname])
+		structureDefs[info.unitname].unitname = info.unitname
 	else
-		makeTechStructure(structureDefs[name], name)
-		structureDefs[name].unitname = name
+		makeTechStructure(structureDefs[info.unitname], info.unitname)
+		structureDefs[info.unitname].unitname = info.unitname
 	end
+	structureDefs[info.unitname].name = info.name
+	structureDefs[info.unitname].description = info.description
 	
-	structureDefs[name].buildcostmetal = structureDefs[name].maxdamage
-	structureDefs[name].buildcostenergy = structureDefs[name].maxdamage
-	structureDefs[name].buildtime = structureDefs[name].maxdamage
+	structureDefs[info.unitname].buildcostmetal = structureDefs[info.unitname].maxdamage
+	structureDefs[info.unitname].buildcostenergy = structureDefs[info.unitname].maxdamage
+	structureDefs[info.unitname].buildtime = structureDefs[info.unitname].maxdamage
+	end 
 end
 
 -- splice back into unitdefs
