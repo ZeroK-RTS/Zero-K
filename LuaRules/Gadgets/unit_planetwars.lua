@@ -86,7 +86,7 @@ local function spawnStructures(left, top, right, bottom)
 		
 		local unitID = Spring.CreateUnit(info.unitname, x, 0, z, direction, gaiaID)
 		Spring.SetUnitNeutral(unitID,true)
-		unitsByID[unitID] = {info.unitname = info.unitname, teamDamages = {}}
+		unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
 	end
 end
 
