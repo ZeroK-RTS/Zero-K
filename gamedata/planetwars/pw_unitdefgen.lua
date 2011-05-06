@@ -20,7 +20,7 @@ VFS.Include("gamedata/planetwars/pw_structuredefs.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-local pwDataRaw = modOptions.planetwarsStructures
+local pwDataRaw = modOptions.planetwarsstructures
 local pwDataFunc, err, success, unitData
 
 if not (pwDataRaw and type(pwDataRaw) == 'string') then
