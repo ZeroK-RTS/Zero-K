@@ -14,7 +14,7 @@ unitDef = {
   buildingGroundDecalSizeY      = 5,
   buildingGroundDecalType       = [[corflak_aoplane.dds]],
   buildPic                      = [[CORFLAK.png]],
-  buildTime                     = 800,
+  buildTime                     = 500,
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[FLOAT]],
@@ -29,7 +29,7 @@ unitDef = {
 	description_de = [[Flugabwehrflak]],
 	helptext		= [[The Cobra is a flak cannon with good AoE and a high damage output, letting it swiftly cut enemy gunships to ribbons.]],
     helptext_fr    = [[Le Cobra est une d?fense Anti-Air de moyenne port?e projetant des balles a fragmentation en l'air. Assez impr?cis mais tirant en zone, il est parfait pour les attaques aeriennes mass?es.]],
-	helptext_de    = [[Die Cobraflak verteidigt deine Basis vor groﬂen Gruppen gegnerischer Lufteinheiten, ermˆglicht durch die schnelle Schussfrequenz der Flak. F¸r Bomber oder andere grˆﬂere Flugeinheiten eignet sich diese Flak nur bedingt, da der Schaden nicht besonders groﬂ ist.]],
+	helptext_de    = [[Die Cobraflak verteidigt deine Basis vor gro√üen Gruppen gegnerischer Lufteinheiten, erm√∂glicht durch die schnelle Schussfrequenz der Flak. F√ºr Bomber oder andere gr√∂√üere Flugeinheiten eignet sich diese Flak nur bedingt, da der Schaden nicht besonders gro√ü ist.]],
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],
