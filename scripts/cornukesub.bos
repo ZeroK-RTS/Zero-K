@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, door1, door2, missile, firepoint;
 
@@ -111,7 +108,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode base type BITMAPONLY | BITMAP1;
 		explode door1 type BITMAPONLY | BITMAP4;
 		explode door2 type BITMAPONLY | BITMAP5;
@@ -119,13 +116,13 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode base type BITMAPONLY | BITMAP1;
 		explode door1 type BITMAPONLY | BITMAP4;
 		explode door2 type BITMAPONLY | BITMAP5;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode base type BITMAPONLY | BITMAP1;
 	explode door1 type BITMAPONLY | BITMAP4;
 	explode door2 type BITMAPONLY | BITMAP5;

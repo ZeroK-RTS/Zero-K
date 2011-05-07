@@ -320,24 +320,6 @@ MotionControl(moving, aiming, justmoved)
 	}
 }
 
-Toggle(t,value) 
-{
-	if(t==1)
-	{
-		if(value==0)
-		{
-		sleep 100;  //10th second
-		aimer = 1;  //normaly 1
-		}
-		
-		if(value==1)
-		{
-		sleep 100;  //10th second
-		aimer = 2;  //normaly 2
-		}
-	}
-}
-
 Create()
 {
 //alert to dirt
