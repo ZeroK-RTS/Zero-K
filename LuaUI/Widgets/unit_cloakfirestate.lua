@@ -35,11 +35,23 @@ local exceptionList = {	--add exempt units here
 
 local exceptionArray = {}	--used by the widget code; don't mess with this kthx
 
+for _,name in pairs(exceptionList) do
+	local ud = UnitDefNames[name]
+	if ud then
+		exceptionArray[ud.id] = true
+	end
+end
+-- auto-add to exceptionArray
+for id,ud in pairs(UnitDefs) do
+	if (not ud.canMove) or ud.isFactory or (not ud.canCloak) then
+		exceptionArray[id] = true
+	end
+end
+
 local cloakUnit = {}	--stores the desired fire state when decloaked of each unitID
 
 function widget:UnitCloaked(unitID, unitDefID, teamID)
-	local ud = UnitDefs[unitDefID]
-	if (teamID ~= team) or (not ud.canMove) or exceptionArray[ud.name] or ud.isFactory or not (ud.canCloak) then return end	--only affects units with intrinsic cloak, i.e. not just anything under a field
+	if (teamID ~= team) or exceptionArray[unitDefID] then return end	--only affects units with intrinsic cloak, i.e. not just anything under a field
 	local states = GetUnitStates(unitID)
 	cloakUnit[unitID] = states.firestate	--store last state
 	if states.firestate ~= 0 then
@@ -49,8 +61,7 @@ function widget:UnitCloaked(unitID, unitDefID, teamID)
 end
 
 function widget:UnitDecloaked(unitID, unitDefID, teamID)
-	local ud = UnitDefs[unitDefID]
-	if (teamID ~= team) or not ud.canMove or exceptionArray[ud.name] then return end
+	if (teamID ~= team) or exceptionArray[unitDefID] then return end
 	local states = GetUnitStates(unitID)
 	if states.firestate == 0 then
 		local targetState = cloakUnit[unitID] or 2
@@ -76,9 +87,6 @@ function widget:Initialize()
   if Spring.GetSpectatingState() or Spring.IsReplay() then
     widgetHandler:RemoveWidget()
     return true
-  end
-  for i, v in pairs(exceptionList) do
-    exceptionArray[v] = true
   end
 end
 
