@@ -1,7 +1,6 @@
 -- $Id: ModOptions.lua 4642 2009-05-22 05:32:36Z carrepairer $
 
 --  Custom Options Definition Table format
-
 --  NOTES:
 --  - using an enumerated table lets you specify the options order
 
