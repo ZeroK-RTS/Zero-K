@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[missiletower]],
   name                          = [[Hacksaw]],
   description                   = [[SAM Tower (Anti-Bomber)]],
-  bmcode                        = [[0]],
   buildAngle                    = 8192,
   buildCostEnergy               = 300,
   buildCostMetal                = 300,
@@ -16,7 +15,10 @@ unitDef = {
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[FLOAT]],
-  collisionVolumeTest           = 1,
+  collisionVolumeOffsets        = [[0 12 0]],
+  collisionVolumeScales         = [[50 62 50]],
+  collisionVolumeTest	        = 1,
+  collisionVolumeType	        = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -50,11 +52,10 @@ unitDef = {
 
   },
 
-  shootme                       = [[1]],
   side                          = [[CORE]],
   sightDistance                 = 660,
-  TEDClass                      = [[FORT]],
   useBuildingGroundDecal        = true,
+  waterline						= 10,
   workerTime                    = 0,
   yardMap                       = [[ooooooooo]],
 

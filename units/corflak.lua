@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Cobra]],
   description                   = [[Anti-Air Flak Gun]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 8192,
   buildCostEnergy               = 500,
@@ -18,10 +17,10 @@ unitDef = {
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[FLOAT]],
-  collisionVolumeOffsets        = [[0 20 0]],
-  collisionVolumeScales         = [[50 80 50]],
+  collisionVolumeOffsets        = [[0 11 -4]],
+  collisionVolumeScales         = [[50 86 50]],
   collisionVolumeTest	        = 1,
-  collisionVolumeType	        = [[ellipsoid]],
+  collisionVolumeType	        = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -32,7 +31,6 @@ unitDef = {
 	helptext_de    = [[Die Cobraflak verteidigt deine Basis vor großen Gruppen gegnerischer Lufteinheiten, ermöglicht durch die schnelle Schussfrequenz der Flak. Für Bomber oder andere größere Flugeinheiten eignet sich diese Flak nur bedingt, da der Schaden nicht besonders groß ist.]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,
@@ -55,7 +53,6 @@ unitDef = {
   side                          = [[CORE]],
   sightDistance                 = 660,
   smoothAnim                    = true,
-  TEDClass                      = [[FORT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
