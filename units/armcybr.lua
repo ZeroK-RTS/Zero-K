@@ -35,7 +35,6 @@ unitDef = {
 	helptext_de    = [[Licho ist ein mächtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher für Angriffe auf einzelne Ziele prädestiniert.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 3,
@@ -46,7 +45,7 @@ unitDef = {
   maneuverleashlength = [[1280]],
   mass                = 460,
   maxAcc              = 0.75,
-  maxDamage           = 2800,
+  maxDamage           = 2750,
   maxFuel             = 1000000,
   maxVelocity         = 9,
   minCloakDistance    = 75,
@@ -59,8 +58,6 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 660,
   smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[VTOL]],
   workerTime          = 0,
 
   weapons             = {
@@ -78,7 +75,7 @@ unitDef = {
 
     ARM_PIDR = {
       name                    = [[Implosion Bomb]],
-      areaOfEffect            = 384,
+      areaOfEffect            = 256,
       avoidFeature            = false,
       avoidFriendly           = false,
 	  burnblow                = true,
@@ -102,7 +99,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_deathblow.s3o]],
       pitchtolerance          = [[16000]],
-      range                   = 700,
+      range                   = 650,
       reloadtime              = 8,
       renderType              = 1,
       shakeduration           = [[2]],

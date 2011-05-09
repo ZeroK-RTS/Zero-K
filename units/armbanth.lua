@@ -40,9 +40,9 @@ unitDef = {
   leaveTracks            = true,
   maneuverleashlength    = [[640]],
   mass                   = 1387,
-  maxDamage              = 35000,
+  maxDamage              = 36000,
   maxSlope               = 36,
-  maxVelocity            = 1.718,
+  maxVelocity            = 1.72,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT4]],
@@ -156,7 +156,7 @@ unitDef = {
 
       damage                  = {
         default = 850,
-        subs    = 12,
+        subs    = 42.5,
       },
 
       explosionGenerator      = [[custom:STARFIRE]],
@@ -218,7 +218,7 @@ unitDef = {
       lineOfSight             = true,
       noSelfDamage            = true,
       paralyzer               = true,
-      paralyzeTime            = 1,
+      paralyzeTime            = 1.5,
       range                   = 465,
       reloadtime              = 1,
       renderType              = 7,
