@@ -32,6 +32,7 @@ end
 
 local modOptions = Spring.GetModOptions()
 local startMode = Spring.GetModOption("startingresourcetype",false,"facplop")
+local planetwars = modOptions.planetwarsstructures
 
 if (startMode == "limitboost") then
 	for udid, ud in pairs(UnitDefs) do
@@ -123,6 +124,26 @@ local function CheckForShutdown()
 	if (cnt == 0) and Spring.GetGameSeconds() > 5 then
 		gadgetHandler.RemoveGadget(self)
 	end
+end
+
+local function GetWeakerAllyTeam()
+	if not planetwars then return end
+	local allyTeams = Spring.GetAllyTeamList()
+	local teamcount = {}
+	local weakerAT, diff
+	for _,atid in pairs(allyTeams) do
+		teamcount[atid] = Spring.GetTeamList(atid)
+	end
+	if teamcount[1] and teamcount[2] then
+		diff = teamcount[1] - teamcount[2]
+		if diff > 0 then
+			weakerAT = 2
+		elseif diff < 0 then
+			weakerAT = 1
+			diff = -diff
+		end
+	end
+	return weakerAT, diff
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
@@ -310,9 +331,9 @@ end
 
 local function GetStartUnit(teamID, playerID, isAI)
   local startUnit, startUnitAlt
-  
+
   if isAI then 
-	startUnit = startUnits[teamSidesAI[teamID]]
+	return startUnits[teamSidesAI[teamID]]
   end
   
   if (teamID and teamSides[teamID]) then 
@@ -382,7 +403,7 @@ local function GetFacingDirection(x, z, teamID)
 end
 
 
-local function SpawnStartUnit(teamID, playerID, isAI)
+local function SpawnStartUnit(teamID, playerID, isAI, forceDefault)
   -- get start unit
   
   -- no getting double comms now!
@@ -397,6 +418,9 @@ local function SpawnStartUnit(teamID, playerID, isAI)
   end	
   
   local startUnit = GetStartUnit(teamID, playerID, isAI)
+  if forceDefault then
+  	startUnit = DEFAULT_UNIT
+  end
 
   if startUnit then
     -- replace with shuffled position
@@ -457,12 +481,13 @@ local function SpawnStartUnit(teamID, playerID, isAI)
 		-- the adding of existing resources is necessary for handling /take and spawn
 		local metal = Spring.GetTeamResources(teamID, "metal")
 		local energy = Spring.GetTeamResources(teamID, "energy")
+		local bonus = 0	-- FIXME
 		
         if startMode == "classic" then
           Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC)
-          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy + BASE_COMM_COST - commCost)
-          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal + BASE_COMM_COST - commCost)
+          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy + BASE_COMM_COST - commCost + bonus)
+          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal + BASE_COMM_COST - commCost + bonus)
         elseif startMode == "facplop" then
           Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP)
@@ -657,6 +682,16 @@ function gadget:GameStart()
         SpawnStartUnit(team)
       end
     end
+  end
+  
+  local weakerAllyTeam, diff = GetWeakerAllyTeam()
+  
+  -- extra PW comms
+  if weakerAllyTeam then then
+    local teamlist = Spring.GetTeamList(weakerTeam)
+	for i=1, diff do
+		SpawnStartUnit(teamlist[math.random(#teamlist)], nil, false, true)
+	end
   end
 
   -- kill units if engine spawned

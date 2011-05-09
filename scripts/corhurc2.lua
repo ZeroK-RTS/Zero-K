@@ -4,7 +4,7 @@ local jet = piece 'jet'
 local wingtipl = piece 'wingtipl' 
 local wingtipr = piece 'wingtipr' 
 
-smokePiece = {fuselage, enginel, enginer}
+smokePiece = {body, jet}
 
 include "constants.lua"
 include "bombers.lua"
@@ -34,6 +34,7 @@ function script.BlockShot(num)
 end
 
 function script.FireWeapon(num)
+	Sleep(200)	-- delay turn back a bit
 	Reload()
 end
 

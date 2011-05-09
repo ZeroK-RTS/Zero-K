@@ -735,14 +735,12 @@ StartMoving()
 {   
 	ISMOVING = TRUE;
 	signal SIG_IDLE;
-	CALL-SCRIPT shootwalk();
 }
 
 StopMoving()
 {	
 	ISMOVING = FALSE;
 	start-script IdleAnim();
-	CALL-SCRIPT stopwalk();
 }
 
 MotionControl(pheh)
@@ -803,7 +801,7 @@ Create()
 	}
 	
 AimFromPrimary(piecenum)
-	{	piecenum=barrel;	}
+	{	piecenum=shoulderr;	}
 
 QueryPrimary(piecenum)
 	{	piecenum=flare; }

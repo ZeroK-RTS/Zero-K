@@ -549,7 +549,7 @@ end
 -- Category changes
 -- 
 for name, ud in pairs(UnitDefs) do
-  if (ud.maxvelocity or 0 > 0) then
+  if ((ud.maxvelocity or 0) > 0) then
 	ud.category = ud.category .. " MOBILE"
   end
 end
