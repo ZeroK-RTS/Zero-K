@@ -458,7 +458,15 @@ upgrades = {
 				unitDef.onoffable = true
 			end,
 	},
-	
+
+	module_radarnet = {
+		name = "Integrated Radar Network",
+		description = "Reduces radar wobble for all units",
+		func = function(unitDef)
+				unitDef.isTargetingUpgrade = true
+				unitDef.activatewhenbuilt = true
+			end,
+	},	
 	-- deprecated
 	module_improved_optics = {
 		name = "Improved Optics",

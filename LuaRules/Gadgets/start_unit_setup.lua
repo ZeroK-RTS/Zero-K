@@ -403,7 +403,7 @@ local function GetFacingDirection(x, z, teamID)
 end
 
 
-local function SpawnStartUnit(teamID, playerID, isAI, forceDefault)
+local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   -- get start unit
   
   -- no getting double comms now!
@@ -413,12 +413,13 @@ local function SpawnStartUnit(teamID, playerID, isAI, forceDefault)
 	return 
   end
   ]]--
-  if (coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]) then
+  if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]))
+  and not bonusSpawn then
 	return 
-  end	
+  end
   
   local startUnit = GetStartUnit(teamID, playerID, isAI)
-  if forceDefault then
+  if bonusSpawn then
   	startUnit = DEFAULT_UNIT
   end
 
@@ -437,10 +438,13 @@ local function SpawnStartUnit(teamID, playerID, isAI, forceDefault)
 		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
 	--end
 	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("gate", x, y, z) end
-	Spring.SetGameRulesParam("commSpawnedTeam"..teamID, 1)
-	if playerID then Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1) end
-	commSpawnedTeam[teamID] = true
-	if playerID then commSpawnedPlayer[playerID] = true end
+	
+	if not bonusSpawn then
+		Spring.SetGameRulesParam("commSpawnedTeam"..teamID, 1)
+		if playerID then Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1) end
+		commSpawnedTeam[teamID] = true
+		if playerID then commSpawnedPlayer[playerID] = true end
+	end
 	
     -- set the *team's* lineage root
     if Spring.SetUnitLineage then
@@ -687,7 +691,7 @@ function gadget:GameStart()
   local weakerAllyTeam, diff = GetWeakerAllyTeam()
   
   -- extra PW comms
-  if weakerAllyTeam then then
+  if weakerAllyTeam then
     local teamlist = Spring.GetTeamList(weakerTeam)
 	for i=1, diff do
 		SpawnStartUnit(teamlist[math.random(#teamlist)], nil, false, true)

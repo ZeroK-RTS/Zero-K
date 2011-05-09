@@ -53,7 +53,7 @@ unitDef = {
  
   sfxtypes               = {
     explosiongenerators = {
-      [[custom:STORMMUZZLE]],
+      [[custom:flashmuzzle1]],
     },
   }, 
   
