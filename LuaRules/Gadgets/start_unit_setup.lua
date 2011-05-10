@@ -134,8 +134,8 @@ local function GetWeakerAllyTeam()
 	for _,atid in pairs(allyTeams) do
 		teamcount[atid] = Spring.GetTeamList(atid)
 	end
-	if teamcount[1] and teamcount[2] then
-		diff = teamcount[1] - teamcount[2]
+	if teamcount[0] and teamcount[1] then
+		diff = teamcount[0] - teamcount[1]
 		if diff > 0 then
 			weakerAT = 2
 		elseif diff < 0 then
@@ -688,9 +688,9 @@ function gadget:GameStart()
     end
   end
   
+  -- extra PW comms
   local weakerAllyTeam, diff = GetWeakerAllyTeam()
   
-  -- extra PW comms
   if weakerAllyTeam then
     local teamlist = Spring.GetTeamList(weakerTeam)
 	for i=1, diff do

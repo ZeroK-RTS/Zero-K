@@ -26,7 +26,7 @@ local messages = {
 		"Team%i (%s) lost their mojo",
 		"Team%i (%s) was unworthy of continued existence",
 		--"Team%i (%s) made like Noize's pants, and split",
-		"Team%i (%s) couldn't even handle a few AKs",
+		"Team%i (%s) couldn't even handle a few Bandits",
 		"Team%i (%s) has been played out",
 		"Team%i (%s) has been conquered",
 		"Team%i (%s) is toast",
