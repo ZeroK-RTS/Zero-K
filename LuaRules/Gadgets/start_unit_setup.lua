@@ -126,26 +126,6 @@ local function CheckForShutdown()
 	end
 end
 
-local function GetWeakerAllyTeam()
-	if not planetwars then return end
-	local allyTeams = Spring.GetAllyTeamList()
-	local teamcount = {}
-	local weakerAT, diff
-	for _,atid in pairs(allyTeams) do
-		teamcount[atid] = Spring.GetTeamList(atid)
-	end
-	if teamcount[0] and teamcount[1] then
-		diff = teamcount[0] - teamcount[1]
-		if diff > 0 then
-			weakerAT = 2
-		elseif diff < 0 then
-			weakerAT = 1
-			diff = -diff
-		end
-	end
-	return weakerAT, diff
-end
-
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	if not gamestart then
 		createBeforeGameStart[#createBeforeGameStart + 1] = unitID
@@ -444,6 +424,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 		if playerID then Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1) end
 		commSpawnedTeam[teamID] = true
 		if playerID then commSpawnedPlayer[playerID] = true end
+		waitingForComm[teamID] = nil
 	end
 	
     -- set the *team's* lineage root
@@ -451,8 +432,6 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
       Spring.SetUnitLineage(unitID, teamID, true)
     end
 
-	waitingForComm[teamID] = nil
-	
     -- add boost and facplop
     local teamLuaAI = Spring.GetTeamLuaAI(teamID)
     local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
@@ -685,19 +664,22 @@ function gadget:GameStart()
       else -- no coop
         SpawnStartUnit(team)
       end
+	  
+	  -- extra PW comms
+	  local playerlist = Spring.GetPlayerList(team, true)
+      playerlist = workAroundSpecsInTeamZero(playerlist, team)
+      if playerlist and (#playerlist > 0) then
+        for i=1,#playerlist do
+        	local customkeys = select(10, Spring.GetPlayerInfo(playerlist[i]))
+			if customkeys and customkeys.extracomm then
+				SpawnStartUnit(team, playerlist[i], false, true)
+			end
+        end
+      end
     end
-  end
-  
-  -- extra PW comms
-  local weakerAllyTeam, diff = GetWeakerAllyTeam()
-  
-  if weakerAllyTeam then
-    local teamlist = Spring.GetTeamList(weakerTeam)
-	for i=1, diff do
-		SpawnStartUnit(teamlist[math.random(#teamlist)], nil, false, true)
-	end
-  end
 
+  end
+  
   -- kill units if engine spawned
   for i,u in ipairs(createBeforeGameStart) do
     Spring.DestroyUnit(u, false, true) -- selfd = false, reclaim = true
