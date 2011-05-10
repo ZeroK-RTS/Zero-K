@@ -1021,7 +1021,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		if count == 0 then KillAllComputerUnits() end
 	end
   end
-  if (chickenTypes[name] and not chickenTypes[name].noegg) or (defenders[name] and not defenders[name].noegg) then
+  if (chickenTypes[name] and not chickenTypes[name].noegg) or (defenders[name] and not defenders[name].noegg) or (miniQueenName == name) then
     local x, y, z = spGetUnitPosition(unitID)
     if alwaysEggs then
 		local eggID = Spring.CreateFeature(name.."_egg", x, y, z, random(-32000, 32000))

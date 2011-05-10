@@ -217,7 +217,7 @@ difficulties = {
 	queenSpawnMult   = 5,
 	queenTime		 = 50*60,
 	queenHealthMod	 = 1.2,
-	miniQueenTime	 = {0.45}, --{0.37, 0.75},
+	miniQueenTime	 = {0.01}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
 	scoreMult		 = 1.5,
   },

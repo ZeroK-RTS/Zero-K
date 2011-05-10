@@ -113,7 +113,7 @@ eggDefs.chicken_leaper_egg = MergeTable(defaultEgg, {
 eggDefs.chickenspire_egg = MergeTable(defaultEgg, {
   metal       = 300,
   reclaimTime = 300,
-  object      = [[chickenegggreen.s3o]],
+  object      = [[chickenegggreen_big.s3o]],
 })
 
 eggDefs.chicken_blimpy_egg = MergeTable(defaultEgg, {
@@ -137,7 +137,7 @@ eggDefs.chickenwurm_egg = MergeTable(defaultEgg, {
 eggDefs.chicken_shield_egg = MergeTable(defaultEgg, {
   metal       = 150,
   reclaimTime = 150,
-  object      = [[chickenegggreen.s3o]],
+  object      = [[chickenegggreen_big.s3o]],
 })
 
 eggDefs.chicken_tiamat_egg = MergeTable(defaultEgg, {
@@ -146,6 +146,19 @@ eggDefs.chicken_tiamat_egg = MergeTable(defaultEgg, {
   object      = [[chickeneggwhite.s3o]],
 })
 
+eggDefs.chicken_dragon_egg = MergeTable(defaultEgg, {
+  metal       = 1000,
+  reclaimTime = 1000,
+  object      = [[chickeneggblue_huge.s3o]],
+})
+
+-- specify origin unit (for tooltip/contextmenu)
+for name,data in pairs(eggDefs) do
+	local unitname = name
+	local truncate = unitname:find("_egg")
+	unitname = unitname:sub(1, truncate)
+	data.customParams.unit = unitname
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
