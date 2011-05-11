@@ -113,7 +113,7 @@ for name, ud in pairs(UnitDefs) do
 		doesNotCountList[ud.id] = tobool(ud.customParams.doesntcount) or nil
 	elseif (ud.isFeature) then
 		doesNotCountList[ud.id] = true
-	elseif (not ud.canAttack)and(not ud.speed)and(not ud.isFactory) then
+	elseif (not ud.canAttack) and (not ud.speed) and (not ud.isFactory) then
 		doesNotCountList[ud.id] = true
 	end
 end

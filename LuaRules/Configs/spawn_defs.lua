@@ -86,7 +86,7 @@ modes = {
 }
 defaultDifficulty = modes[2]
 testBuilding 	= UnitDefNames["armestor"].id	--testing to place burrow
-testBuildingQ 	= UnitDefNames["mahlazer"].id	--testing to place queen
+testBuildingQ 	= UnitDefNames["chicken_dragon"].id	--testing to place queen
 
 
 --------------------------------------------------------------------------------
