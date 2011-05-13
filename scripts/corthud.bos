@@ -1,3 +1,4 @@
+// linear constant 163840
 // By Chris Mackey
 
 #include "constants.h"
@@ -184,13 +185,6 @@ AimWeapon2()
 	return(1);
 }
 
-//workaround for immortal thug
-HitByWeaponId()
-{
-	if ((get HEALTH) <= 0) get KILL_UNIT;
-	return 100;
-}
-
 Killed(severity, corpsetype)
 {
 	if( severity <= 25 )
@@ -215,7 +209,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode head type BITMAPONLY | BITMAP2;
 		explode l_gun type BITMAPONLY | BITMAP2;
 		explode r_gun type FALL | EXPLODE_ON_HIT | BITMAP3;
@@ -235,7 +229,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode head type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
 		explode l_gun type BITMAPONLY | BITMAP2;
 		explode r_gun type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
@@ -253,7 +247,7 @@ Killed(severity, corpsetype)
 		explode r_heeltoe type BITMAPONLY | BITMAP4;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode head type SHATTER | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
 	explode l_gun type BITMAPONLY | BITMAP2;
 	explode r_gun type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;

@@ -776,7 +776,7 @@ local function MorphQueen()
 	local heading = Spring.GetUnitHeading(tempID)
 	local cmdQueue = spGetUnitCommands(tempID)
 	
-	if paralyzeDamage >= oldHealth then	-- postpone morph
+	if (paralyzeDamage or 0) >= (oldHealth or 0) then	-- postpone morph
 		morphFrame = morphFrame + 60
 		return
 	end
