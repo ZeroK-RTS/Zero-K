@@ -776,6 +776,11 @@ local function MorphQueen()
 	local heading = Spring.GetUnitHeading(tempID)
 	local cmdQueue = spGetUnitCommands(tempID)
 	
+	if paralyzeDamage >= oldHealth then	-- postpone morph
+		morphFrame = morphFrame + 60
+		return
+	end
+	
 	-- perform switcheroo
 	queenID = nil
 	Spring.DestroyUnit(tempID, false, true)
@@ -801,7 +806,7 @@ local function MorphQueen()
 	newMaxHealth = newMaxHealth * queenHealthMod * ((playerCount/2) + 0.5)
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
 	-- if newHealth >= 1 then newHealth = 1 end
-	spSetUnitHealth(queenID, {health = newHealth, build = buildProgress})
+	spSetUnitHealth(queenID, {health = newHealth, capture = captureProgress, paralyze = paralyzeDamage, build = buildProgress, })
 	-- orders, XP
 	Spring.SetUnitExperience(queenID, xp)
 	if (cmdQueue and cmdQueue[1]) then		--copy order queue

@@ -441,7 +441,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
                 or startMode == "limitboost"
                 or startMode == "facplopboost")
 
-	local commCost = udef.metalCost or BASE_COMM_COST			
+	local commCost = (udef.metalCost or BASE_COMM_COST) - BASE_COMM_COST			
 				
     if validTeam then
 
@@ -469,16 +469,16 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
         if startMode == "classic" then
           Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC)
-          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy + BASE_COMM_COST - commCost + bonus)
-          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal + BASE_COMM_COST - commCost + bonus)
+          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy - commCost + bonus)
+          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal - commCost + bonus)
         elseif startMode == "facplop" then
           Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP)
-          Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP + energy + BASE_COMM_COST - commCost)
-          Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP + metal + BASE_COMM_COST - commCost)		  
+          Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP + energy - commCost + bonus)
+          Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP + metal - commCost + bonus)		  
         else
-          Spring.SetTeamResource(teamID, "energy", START_STORAGE + energy + BASE_COMM_COST - commCost)
-          Spring.SetTeamResource(teamID, "metal", START_STORAGE + metal + BASE_COMM_COST - commCost)
+          Spring.SetTeamResource(teamID, "energy", START_STORAGE + energy - commCost + bonus)
+          Spring.SetTeamResource(teamID, "metal", START_STORAGE + metal - commCost + bonus)
         end
 
       end
