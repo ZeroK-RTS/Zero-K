@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armpb]],
   name                          = [[Pit Bull]],
-  description                   = [[Ambush Rocket Turret]],
+  description                   = [[Ambush Gauss Turret]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,
@@ -25,7 +25,7 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Versteckter Raketenturm]],
-    helptext 	   = [[The Pit Bull is a compact, resilent turret with a medium-range rocket launcher. When popped down, it is very difficult to destroy, making it a good choice when the enemy is using artillery.]],
+    helptext 	   = [[The Pit Bull is a compact, resilent turret with a medium-range gauss cannon. When popped down, it is very difficult to destroy, making it a good choice when the enemy is using artillery.]],
 	helptext_de	   = [[Der Pit Bull ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
   },
 
