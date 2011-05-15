@@ -57,8 +57,9 @@ unitDef = {
   modelCenterOffset      = [[0 -12 0]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[CORCRW]],
+  objectName          	 = [[krow.s3o]],
   scale                  = [[1]],
+  script			     = [[krow.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[BIG_UNIT]],
 
