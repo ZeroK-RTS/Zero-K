@@ -1,6 +1,12 @@
 include 'constants.lua'
 -- by MergeNine
 
+-- shortcuts
+local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
+local GetUnitPosition = Spring.GetUnitPosition
+local SpawnCEG = Spring.SpawnCEG
+local GetGroundHeight = Spring.GetGroundHeight
+
 --pieces
 local Base = piece "Base"
 local RearTurretSeat = piece "RearTurretSeat"
@@ -35,6 +41,29 @@ local rearTurretMinPitch = math.rad(20)
 local turretSpeed = 5
 
 local tiltAngle = math.rad(30)
+local isLanded = true
+
+
+
+function script.Activate()
+  isLanded = false
+end
+
+function script.Deactivate()
+  isLanded = true
+end
+
+function EmitDust()
+  while true do
+    if not isLanded then
+      local x, _, z = GetUnitPosition(unitID)
+      local y = GetGroundHeight(x, z) + 30
+      SpawnCEG("krowdust", x, y, z, 0, 0, 0, 1, 1)
+    end
+    Sleep(10)
+  end
+end
+
 
 function script.Create()
 	--set starting positions for turrets
@@ -54,7 +83,7 @@ function script.Create()
 	--Move(LeftTurretSeat,x_axis,-2)
 	--Move(LeftTurretSeat,y_axis,-1.1)
 	--Move(LeftTurretSeat,z_axis,17)
-	
+	StartThread(EmitDust)
 end
 
 function TiltBody(heading)
