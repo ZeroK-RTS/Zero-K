@@ -146,11 +146,15 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.5,0.3}, width=3.2, length=22, piece="jet1", onActive=true}},
     {class='AirJet', options={color={0.1,0.5,0.3}, width=3.2, length=22, piece="jet2", onActive=true}},
   },
-
+  corcrw = {
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetrear", onActive=true}},
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetleft", onActive=true}},
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetright", onActive=true}},
+  },
   corshad = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
-	{class='Ribbon', options={width=1, piece="wingtipl"}},
+    {class='Ribbon', options={width=1, piece="wingtipl"}},
     {class='Ribbon', options={width=1, piece="wingtipr"}},
   },
   fighter = {
