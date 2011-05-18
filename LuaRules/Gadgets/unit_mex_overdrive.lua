@@ -897,20 +897,16 @@ function gadget:GameFrame(n)
 				pylonData.color = GetGridColor(conversion, false)
 				
 				if not pylonData.overdrive then
-					if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
-						if grid ~= 0 then
-							local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
-							if unitDef then
+					local unitDefID = Spring.GetUnitDefID(unitID)
+					local unitDef = unitDefID and UnitDefs[unitDefID]
+					if not unitDef then
+						Spring.Echo("unitDefID missing for pylon")
+					else
+						if not pylonDefs[unitDefID].keeptooltip then
+							if grid ~= 0 then
 								Spring.SetUnitTooltip(unitID,"GRID: "  .. math.round(gridEnergySpent[grid],2) .. "/" .. math.round(maxGridCapacity[grid],2) .. "E => " .. math.round(gridMetalGain[grid],2).."M")
 							else
-								Spring.Echo("unitDefID missing for pylon")
-							end
-						else
-							local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
-							if unitDef then
 								Spring.SetUnitTooltip(unitID,unitDef.humanName .. " - Currently Disabled")
-							else
-								Spring.Echo("unitDefID missing for pylon")
 							end
 						end
 					end
