@@ -39,7 +39,7 @@ local options =
     desc   = 'Set up ingame conditions.',
     type   = 'section',
   },      
-  
+  --[[  
   {
     key    = 'GameMode',
     name   = 'Game end condition',
@@ -66,7 +66,7 @@ local options =
       },
     },
   },
-  --[[  
+
   {
     key    = 'StartMetal',
     name   = 'Starting metal',

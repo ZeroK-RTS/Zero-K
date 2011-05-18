@@ -89,8 +89,6 @@ local function RestoreAfterDelay()
 end
 
 local function Walk()
-	Signal(SIG_WALK)
-	SetSignalMask(SIG_WALK)
 	if not bAiming then
 		Turn( torso , x_axis, math.rad(12) ) --tilt forward
 		Turn( torso , y_axis, math.rad(3.335165) )

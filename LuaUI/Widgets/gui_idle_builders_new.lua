@@ -30,6 +30,18 @@ local CONDENSE = false -- show one icon for all builders of same type
 local POSITION_X = 0.5 -- horizontal centre of screen
 local POSITION_Y = 0.05 -- near bottom
 local NEAR_IDLE = 8 -- this means that factories with only 8 build items left will be shown as idle
+
+local exceptionList = {
+	armasp = true,
+	armcarry = true,
+}
+local exceptionArray = {}
+for name in pairs(exceptionList) do
+	if UnitDefNames[name] then
+		exceptionArray[UnitDefNames[name].id] = true
+	end
+end
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
@@ -47,6 +59,7 @@ local QCount = {}
 
 local function IsIdleBuilder(unitID)
   local udef = Spring.GetUnitDefID(unitID)
+  if exceptionArray[udef] then return end
   local ud = UnitDefs[udef] 
   local qCount = 0
   if ud.buildSpeed > 0 then  --- can build

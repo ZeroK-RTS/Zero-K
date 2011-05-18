@@ -52,7 +52,7 @@ local options = {
   },
   {
     key    = 'commends',
-    name   = 'Commander Ends',
+    name   = 'Team Commander Ends',
     desc   = 'Causes an allyteam to lose if they have no commanders left on their team',
     type   = 'bool',
     def    = false,
