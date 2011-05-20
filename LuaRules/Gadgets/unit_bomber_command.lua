@@ -426,6 +426,7 @@ else
 --------------------------------------------------------------------------------
 local airpads = SYNCED.airpads
 local spGetUnitTeam = Spring.GetUnitTeam
+local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spGetLocalTeamID = Spring.GetLocalTeamID
 local spAreTeamsAllied = Spring.AreTeamsAllied
 
@@ -475,7 +476,7 @@ function gadget:DrawWorld()
 	local units = Spring.GetVisibleUnits()
 	for i=1,#units do
 		local id = units[i]
-		if Spring.ValidUnitID(id) and spGetUnitDefID(id) and spGetUnitRulesParam(id, "noammo") == 1 then
+		if Spring.ValidUnitID(id) and spGetUnitDefID(id) and spGetUnitRulesParam(id, "noammo") == 1 and spGetUnitAllyTeam(id) == myAllyID then
 			gl.DrawFuncAtUnit(id, false, DrawUnitFunc, UnitDefs[spGetUnitDefID(id)].height + 30)
 		end
 	end

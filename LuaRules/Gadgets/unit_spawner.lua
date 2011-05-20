@@ -250,6 +250,8 @@ Spring.SetGameRulesParam("lagging",           0)
 Spring.SetGameRulesParam("techTimeReduction", 0)
 Spring.SetGameRulesParam("queenTime",        queenTime)
 
+local baseQueenTime = queenTime
+
 for unitName in pairs(chickenTypes) do
   SetupUnit(unitName)
 end
@@ -680,6 +682,8 @@ local function SpawnQueen()
       end
     end
   until (blocking == 2 or tries > maxTries)
+  
+  queenHealthMod = queenHealthMod * (queenTime/baseQueenTime)
   
   if queenMorphName ~= '' then SetMorphFrame() end
   return spCreateUnit(queenName, x, 0, z, "n", chickenTeamID)
