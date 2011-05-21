@@ -171,10 +171,9 @@ difficulties = {
     gracePeriod      = 180,
     firstSpawnSize   = 1.2,
     timeSpawnBonus   = .03,
-    queenName        = "chickenqueenlite",
-	queenMorphName	 = "chickenqueenlite2",
     chickenTypes     = Copy(chickenTypes),
     defenders        = Copy(defenders),
+	queenHealthMod	 = 0.75,
 	scoreMult		 = 0.66,
   },
 
