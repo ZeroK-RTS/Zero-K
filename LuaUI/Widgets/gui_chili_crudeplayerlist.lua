@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.0000000 Chili Crude Player List.",
+    desc      = "v1.00000000 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -145,7 +145,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 					y=options.text_height.value * row,
 					height = options.text_height.value,
 					width = options.text_height.value,
-					tooltip = 'Double click to share selected units to this player.',
+					tooltip = 'Double click to share selected units to ' .. name,
 					caption = '',
 					padding ={0,0,0,0},
 					OnDblClick = { function(self) ShareUnits(name, teamID) end, },
