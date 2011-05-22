@@ -76,17 +76,21 @@ local function spawnStructures(left, top, right, bottom)
 		local x = xBase + math.random()*xRand
 		local z = zBase + math.random()*zRand
 		local direction = math.floor(math.random()*4)
-		local defID = UnitDefNames[info.unitname].id
+		local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
 		
-		while Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 and giveUp < 20 do
-			x = xBase + math.random()*xRand
-			z = zBase + math.random()*zRand
-			giveUp = giveUp + 1
+		if not defID then
+			Spring.Echo('Planetwars error: Missing structure def ' .. info.unitname)
+		else
+			while Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 and giveUp < 20 do
+				x = xBase + math.random()*xRand
+				z = zBase + math.random()*zRand
+				giveUp = giveUp + 1
+			end
+			
+			local unitID = Spring.CreateUnit(info.unitname, x, 0, z, direction, gaiaID)
+			Spring.SetUnitNeutral(unitID,true)
+			unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
 		end
-		
-		local unitID = Spring.CreateUnit(info.unitname, x, 0, z, direction, gaiaID)
-		Spring.SetUnitNeutral(unitID,true)
-		unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
 	end
 end
 
