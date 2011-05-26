@@ -393,6 +393,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 	return 
   end
   ]]--
+ 
   if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]))
   and not bonusSpawn then
 	return 

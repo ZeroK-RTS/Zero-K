@@ -411,7 +411,7 @@ local function SpawnEggs(x, y, z)
     local choice = choices[random(choisesN)]
     local rx, rz = random(-30, 30), random(-30, 30)
 	local eggID = Spring.CreateFeature(choice.."_egg", x+rx, y, z+rz, random(-32000, 32000))
-	if (eggID and (not eggs)) then eggDecay[eggID] = spGetGameSeconds() + eggDecayTime end
+	--if (eggID and (not eggs)) then eggDecay[eggID] = spGetGameSeconds() + eggDecayTime end
   end
 end
 
