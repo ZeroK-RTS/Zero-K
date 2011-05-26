@@ -186,14 +186,14 @@ unitDef = {
       name                    = [[Particle Beam]],
       areaOfEffect            = 8,
       beamTime                = 0.03,
-	  beamttl				  = 6,
+	  --beamttl				  = 6,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 20,
-        subs    = 1,
+        default = 10,
+        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:flash1orange]],
