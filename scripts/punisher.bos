@@ -380,7 +380,7 @@ Killed(severity, corpsetype)
 		explode lfoot type BITMAPONLY;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode base type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 	explode pelvis type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 	explode torso type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;

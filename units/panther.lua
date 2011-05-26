@@ -1,9 +1,8 @@
 unitDef = {
   unitname               = [[panther]],
   name                   = [[Panther]],
-  description            = [[Lightning Raider Tank]],
+  description            = [[Lightning Assault/Raider Tank]],
   acceleration           = 0.125,
-  bmcode                 = [[1]],
   brakeRate              = 0.1375,
   buildCostEnergy        = 320,
   buildCostMetal         = 320,
@@ -32,7 +31,6 @@ unitDef = {
 	helptext_de    = [[Der Panther ist ein hoch entwickelter Raider, dessen Hauptwaffe, eine Blitzkanone, hauptsächlich paralysierenden Schaden austeilt. Auf diesem Wege kann der Panther Türme ausschalten und sich so durch die feindlichen Verteidigungslinien walzen, bis zur Egalisierung der feindlichen, ökonimischen Grundversorgung.]],
   },
 
-  defaultmissiontype     = [[Standby]],
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
@@ -42,7 +40,7 @@ unitDef = {
   leaveTracks            = true,
   maneuverleashlength    = [[640]],
   mass                   = 198,
-  maxDamage              = 1000,
+  maxDamage              = 1050,
   maxSlope               = 18,
   maxVelocity            = 3.9,
   maxWaterDepth          = 22,
@@ -65,8 +63,6 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 450,
   smoothAnim             = true,
-  steeringmode           = [[1]],
-  TEDClass               = [[TANK]],
   trackOffset            = 6,
   trackStrength          = 5,
   trackStretch           = 1,
@@ -104,7 +100,6 @@ unitDef = {
 
       damage                  = {
         default        = 800,
-
         empresistant75 = 200,
         empresistant99 = 8,
       },
