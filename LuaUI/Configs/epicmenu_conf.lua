@@ -140,6 +140,23 @@ confdata.menu_tree = {
 	
 	{'Interface|Settings relating to the GUI', 
 		{
+			{'Interface Skin|Customize your interface here',
+				{
+					{'lh',
+						{
+							name = 'Skin Sets',
+							type = 'list',
+							OnChange = function (self)
+								WG.crude.SetSkin( self.value );
+							end,
+							items = {
+								{ key = 'Robocracy', name = 'Robocracy', },
+								{ key = 'Carbon', name = 'Carbon', },
+							},
+						}
+					},
+				}
+			},
 			--[[
 			{'Command Menu',
 				{
