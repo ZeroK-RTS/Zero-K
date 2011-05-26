@@ -1,6 +1,6 @@
 local name = "commweapon_rocketlauncher"
 local weaponDef = { 
-	name                    = [[Rocket]],
+	name                    = [[Rocket Launcher]],
 	areaOfEffect            = 48,
 	cegTag                  = [[missiletrailred]],
 	craterBoost             = 0,
