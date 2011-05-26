@@ -2263,7 +2263,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					if overlap then
 						if extraPoint[overlap].pyramid then
 							CallAsTeam(terra.team, function () return Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"Terraform cancelled due to steepness") end)
-							deregisterTerraformUnit(id,index,2)			
+							deregisterTerraformUnit(id,arrayIndex,2)			
 							spDestroyUnit(id,{reclaimed = true})
 							return 0
 						end
