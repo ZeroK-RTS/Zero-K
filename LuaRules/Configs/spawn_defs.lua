@@ -119,7 +119,7 @@ end
 
 -- times in minutes
 local chickenTypes = {
-  chicken        =  {time =  -5,  squadSize =   3, obsolete = 30},
+  chicken        =  {time =  -60,  squadSize =   3, obsolete = 30},
   chicken_pigeon =  {time =  7,  squadSize =   1.4, obsolete = 50},
   chickens       =  {time = 14,  squadSize =   1, obsolete = 45},
   chickena       =  {time = 20,   squadSize = 0.5, obsolete = 45},
