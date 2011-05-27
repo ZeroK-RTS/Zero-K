@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.041 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.042 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1819,6 +1819,8 @@ function widget:Initialize()
 		return
 	end
 	
+	Spring.SetDrawSelectionInfo(false)
+	
 	local VFSMODE      = VFS.RAW_FIRST
 	_, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFSMODE)
 	local confdata = VFS.Include(LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua", nil, VFSMODE)
@@ -1909,6 +1911,7 @@ function widget:Shutdown()
 	if (window_tooltip2) then
 		window_tooltip2:Dispose()
 	end
+	Spring.SetDrawSelectionInfo(true)
 end
 
 
