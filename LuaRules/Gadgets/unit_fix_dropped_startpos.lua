@@ -14,7 +14,7 @@ end
 if gadgetHandler:IsSyncedCode() then
 
 local modOptions = Spring.GetModOptions()
-local fudgeFactor = 32 -- added to max to solve edge-of-startpos problem
+local fudgeFactor = 128 -- added to max to solve edge-of-startpos problem
 
 function gadget:GameFrame(n)
 
@@ -37,6 +37,8 @@ function gadget:GameFrame(n)
         if not allyid then break end
         local xmin, zmin, xmax, zmax = Spring.GetAllyTeamStartBox(allyid)
         if not xmin then break end
+        xmin = xmin - fudgeFactor
+        zmin = zmin - fudgeFactor
 		xmax = xmax + fudgeFactor
 		zmax = zmax + fudgeFactor
         local x, y, z = Spring.GetUnitPosition(unitid)

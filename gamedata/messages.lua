@@ -185,7 +185,7 @@ local messages = {
 		--KingRaptor
 		"Team%i (%s) has been vanquished",
 		--"Team%i (%s) is even more noob than Peet",
-		"Team%i (%s) confused the H2-O with H2-SO4",
+		"Team%i (%s) confused H2-O with H2-SO4",
 		"Team%i (%s) is lulz",
 		"Team%i (%s) PHAILED at life",
 		"Team%i (%s) must construct additional pylons",
@@ -244,6 +244,9 @@ local messages = {
 		--"Team%i (%s) refused to accept Saktoth's godhood",
 		"Team%i (%s) beheld Satan as he fell from heaven LIKE LIGHTNING!",
 		"Team%i (%s) is out of existence",
+		
+		--Tribulex
+		--"Team%i (%s) met the Lol",
 	},
 	[ [[Team%i is no more]] ] = {
 	},
