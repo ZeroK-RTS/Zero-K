@@ -187,6 +187,8 @@ local base = {
 			"commweapon_shotgun", 
 			"weaponmod_autoflechette",
 			"commweapon_napalmgrenade",
+			"module_radarnet",
+			"module_companion_drone",
 		}
 	},
 	[7] = {

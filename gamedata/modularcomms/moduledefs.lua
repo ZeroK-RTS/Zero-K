@@ -356,6 +356,13 @@ upgrades = {
 				unitDef.autoheal = (unitDef.autoheal or 0) + 20
 			end,
 	},
+	module_companion_drone = {
+		name = "Companion Drone",
+		description = "Spawns two attack drones",
+		func = function(unitDef)
+				unitDef.customparams.drone_preset = "module_companion_drone"
+			end,
+	},	
 	module_dmg_booster = {
 		name = "Damage Booster",
 		description = "Increases damage of all weapons by 10%",
@@ -430,6 +437,16 @@ upgrades = {
 				unitDef.canresurrect = true
 			end,
 	},
+	
+	module_areashield = {
+		name = "Area Shield",
+		description = "Bubble shield that protects surrounding units within 300 m",
+		func = function(unitDef)
+				ApplyWeapon(unitDef, "commweapon_areashield", 2)
+				unitDef.activatewhenbuilt = true
+				unitDef.onoffable = true
+			end,
+	},	
 	module_cloak_field = {
 		name = "Cloaking Field",
 		description = "Cloaks all friendly units within 350 m",
@@ -449,15 +466,6 @@ upgrades = {
 				unitDef.onoffable = true
 			end,
 	},
-	module_areashield = {
-		name = "Area Shield",
-		description = "Bubble shield that protects surrounding units within 300 m",
-		func = function(unitDef)
-				ApplyWeapon(unitDef, "commweapon_areashield", 2)
-				unitDef.activatewhenbuilt = true
-				unitDef.onoffable = true
-			end,
-	},
 
 	module_radarnet = {
 		name = "Integrated Radar Network",
@@ -466,7 +474,8 @@ upgrades = {
 				unitDef.isTargetingUpgrade = true
 				unitDef.activatewhenbuilt = true
 			end,
-	},	
+	},
+	
 	-- deprecated
 	module_improved_optics = {
 		name = "Improved Optics",

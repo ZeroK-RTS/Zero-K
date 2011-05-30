@@ -8,7 +8,7 @@ local carrierDefNames = {
 }
 
 local presets = {
-	companiondrone = {drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 2, spawnSize = 1, range = 900},
+	module_companion_drone = {drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 2, spawnSize = 1, range = 900},
 }
 
 --[[
@@ -19,8 +19,8 @@ for name, ud in pairs(UnitDefNames) do
 end
 ]]--
 for id, ud in pairs(UnitDefs) do
-	if ud.customParams and ud.customParams.dronepreset then
-		carrierDefs[id] = Spring.Utilities.CopyTable(presets[ud.customParams.dronepreset])
+	if ud.customParams and ud.customParams.drone_preset then
+		carrierDefs[id] = Spring.Utilities.CopyTable(presets[ud.customParams.drone_preset])
 	end
 end
 
