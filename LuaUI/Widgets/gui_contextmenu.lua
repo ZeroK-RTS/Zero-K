@@ -223,11 +223,24 @@ local function getDescription(unitDef, lang)
 	return unitDef.customParams and unitDef.customParams['description' .. suffix] or unitDef.tooltip or 'Description error'
 end	
 
-
 local function weapons2Table(cells, weaponStats, ws, merw, index)
 	local cells = cells
 	local mainweapon = merw and merw[index]
-	if not ws.slaveTo then
+	if ws.isShield then
+		cells[#cells+1] = ws.wname
+		cells[#cells+1] = ''
+		cells[#cells+1] = ' - Strength:'
+		cells[#cells+1] = ws.power
+		cells[#cells+1] = ' - Regen:'
+		cells[#cells+1] = ws.regen
+		cells[#cells+1] = ' - Energy/second:'
+		cells[#cells+1] = ws.regenE
+		cells[#cells+1] = ' - Radius:'
+		cells[#cells+1] = ws.radius
+		
+		cells[#cells+1] = ''
+		cells[#cells+1] = ''
+	elseif not ws.slaveTo then
 		if mainweapon then
 			for _,index2 in ipairs(mainweapon) do
 				wsm = weaponStats[index2]
@@ -289,68 +302,76 @@ local function printWeapons(unitDef)
 		local weaponName = weaponDef.description
 		
 		if (weaponName) then
-			
 			local wsTemp = {}
-			wsTemp.slaveTo = (weapon.slavedTo ~= 0) and weapon.slavedTo or nil
+			if weaponDef.isShield then
+				wsTemp.wname = weaponDef.description or 'NoName Weapon'
+				wsTemp.isShield = true
+				wsTemp.radius = weaponDef.shieldRadius
+				wsTemp.power = weaponDef.shieldPower
+				wsTemp.regen = weaponDef.shieldPowerRegen
+				wsTemp.regenE = weaponDef.shieldPowerRegenEnergy
+			else
+				wsTemp.slaveTo = (weapon.slavedTo ~= 0) and weapon.slavedTo or nil
 
-			if wsTemp.slaveTo then
-				merw[wsTemp.slaveTo] = merw[wsTemp.slaveTo] or {}
-				merw[wsTemp.slaveTo][#(merw[wsTemp.slaveTo])+1] = i
-			end
-			wsTemp.bestTypeDamage = 0
-			wsTemp.bestTypeDamagew = 0
-			wsTemp.paralyzer = weaponDef.paralyzer	
-			for key, val in pairs(weaponDef.damages) do
-				--[[
-				if (wsTemp.bestTypeDamage <= (damage+0) and not wsTemp.paralyzer)
-					or (wsTemp.bestTypeDamagew <= (damage+0) and wsTemp.paralyzer)
-					then
+				if wsTemp.slaveTo then
+					merw[wsTemp.slaveTo] = merw[wsTemp.slaveTo] or {}
+					merw[wsTemp.slaveTo][#(merw[wsTemp.slaveTo])+1] = i
+				end
+				wsTemp.bestTypeDamage = 0
+				wsTemp.bestTypeDamagew = 0
+				wsTemp.paralyzer = weaponDef.paralyzer	
+				for key, val in pairs(weaponDef.damages) do
+					--[[
+					if (wsTemp.bestTypeDamage <= (damage+0) and not wsTemp.paralyzer)
+						or (wsTemp.bestTypeDamagew <= (damage+0) and wsTemp.paralyzer)
+						then
 
-					if wsTemp.paralyzer then
-						wsTemp.bestTypeDamagew = (damage+0)
-					else
-						wsTemp.bestTypeDamage = (damage+0)
-					end
-				--]]
-				if key == 0 then
-					if wsTemp.paralyzer then
-						wsTemp.bestTypeDamagew = val 
-					else
-						wsTemp.bestTypeDamage = val
-					end
-					
-					wsTemp.burst = weaponDef.salvoSize or 1
-					wsTemp.projectiles = weaponDef.projectiles or 1
-					wsTemp.dam = 0
-					wsTemp.damw = 0
-					if wsTemp.paralyzer then
-						wsTemp.damw = wsTemp.bestTypeDamagew * wsTemp.burst * wsTemp.projectiles
-					else
-						wsTemp.dam = wsTemp.bestTypeDamage * wsTemp.burst * wsTemp.projectiles
-					end
-					wsTemp.reloadtime = weaponDef.reload or ''
-					wsTemp.airWeapon = weaponDef.toAirWeapon or false
-					wsTemp.range = weaponDef.range or ''
-					wsTemp.wname = weaponDef.description or 'NoName Weapon'
-					wsTemp.dps = 0
-					wsTemp.dpsw = 0
-					if  wsTemp.reloadtime ~= '' and wsTemp.reloadtime > 0 then
 						if wsTemp.paralyzer then
-							wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
+							wsTemp.bestTypeDamagew = (damage+0)
 						else
-							wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
+							wsTemp.bestTypeDamage = (damage+0)
 						end
+					--]]
+					if key == 0 then
+						if wsTemp.paralyzer then
+							wsTemp.bestTypeDamagew = val 
+						else
+							wsTemp.bestTypeDamage = val
+						end
+						
+						wsTemp.burst = weaponDef.salvoSize or 1
+						wsTemp.projectiles = weaponDef.projectiles or 1
+						wsTemp.dam = 0
+						wsTemp.damw = 0
+						if wsTemp.paralyzer then
+							wsTemp.damw = wsTemp.bestTypeDamagew * wsTemp.burst * wsTemp.projectiles
+						else
+							wsTemp.dam = wsTemp.bestTypeDamage * wsTemp.burst * wsTemp.projectiles
+						end
+						wsTemp.reloadtime = weaponDef.reload or ''
+						wsTemp.airWeapon = weaponDef.toAirWeapon or false
+						wsTemp.range = weaponDef.range or ''
+						wsTemp.wname = weaponDef.description or 'NoName Weapon'
+						wsTemp.dps = 0
+						wsTemp.dpsw = 0
+						if  wsTemp.reloadtime ~= '' and wsTemp.reloadtime > 0 then
+							if wsTemp.paralyzer then
+								wsTemp.dpsw = math.floor(wsTemp.damw/wsTemp.reloadtime + 0.5)
+							else
+								wsTemp.dps = math.floor(wsTemp.dam/wsTemp.reloadtime + 0.5)
+							end
+						end
+						--echo('test', unitDef.unitname, wsTemp.wname, wsTemp.bestTypeDamage, i)
+						if wsTemp.dam > bestDamage then
+							bestDamage = wsTemp.dam	
+							bestDamageIndex = i
+						end
+						if wsTemp.damw > bestDamage then
+							bestDamage = wsTemp.damw
+							bestDamageIndex = i
+						end
+						
 					end
-					--echo('test', unitDef.unitname, wsTemp.wname, wsTemp.bestTypeDamage, i)
-					if wsTemp.dam > bestDamage then
-						bestDamage = wsTemp.dam	
-						bestDamageIndex = i
-					end
-					if wsTemp.damw > bestDamage then
-						bestDamage = wsTemp.damw
-						bestDamageIndex = i
-					end
-					
 				end
 			end
 			if not wsTemp.wname 
@@ -374,7 +395,6 @@ local function printWeapons(unitDef)
 		end
 		--end
 	end
-		
 	
 	return cells
 end
