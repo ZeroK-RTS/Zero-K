@@ -1,5 +1,5 @@
 -- corpyro_blast_fx
-
+--[[
 return {
   ["corpyro_blast_fx"] = {
     air                = true,
@@ -30,4 +30,4 @@ return {
   },
 
 }
-
+]]--

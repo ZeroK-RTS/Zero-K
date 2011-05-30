@@ -80,6 +80,8 @@ local function spawnStructures(left, top, right, bottom)
 		
 		if not defID then
 			Spring.Echo('Planetwars error: Missing structure def ' .. info.unitname)
+		elseif info.isDestroyed then
+			--do nothing
 		else
 			while Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 and giveUp < 20 do
 				x = xBase + math.random()*xRand

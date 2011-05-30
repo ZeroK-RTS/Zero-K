@@ -15,6 +15,7 @@ unitDef = {
   buildPic               = [[CORCRW.png]],
   buildTime              = 5000,
   canAttack              = true,
+  canDgun				 = true,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,
@@ -95,7 +96,10 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-
+	
+    {
+      def                = [[SINGULARITY]],
+    },		
 
     {
       def                = [[KROWLASER]],
@@ -103,9 +107,9 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-    {
-      def                = [[PARTICLEBEAM]],
-    },		
+--    {
+--      def                = [[PARTICLEBEAM]],
+--    },		
 	
   },
 
@@ -222,7 +226,50 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 500,
     },		
-	
+
+    SINGULARITY = {
+      name                    = [[Singularity Beam]],
+      beamTime                = 2,
+      coreThickness           = 0.1,
+      areaOfEffect            = 300,
+      canattackground         = true,
+	  commandFire			  = true,
+	  craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 100,
+        planes  = 100,
+        subs    = 5,
+      },
+
+      edgeEffectiveness       = 0,
+      explosionGenerator      = [[custom:grav]],
+      impulseBoost            = 10,
+      impulseFactor           = -4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 10,
+      minIntensity            = 1,
+      range                   = 450,
+      reloadtime              = 5,
+      rgbColor                = [[0.1 0.1 0.1]],
+	  rgbColor2               = [[0.3 0.1 0.5]],
+      scrollSpeed             = 5,
+      soundStart              = [[weapon/laser/heavy_laser3]],
+      sweepfire               = false,
+      targetMoveError         = 0.2,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 10,
+      tileLength              = 300,
+      tolerance               = 10000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 2250,
+    },
   },
 
 
