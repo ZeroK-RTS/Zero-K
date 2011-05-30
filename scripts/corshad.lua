@@ -52,7 +52,10 @@ end
 
 function script.FireWeapon(num)
 	if num == 2 then
+		GG.Bomber_Dive_fired(unitID)
 		Reload()
+	elseif num == 3 then
+		GG.Bomber_Dive_fake_fired(unitID)
 	end
 end
 

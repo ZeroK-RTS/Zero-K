@@ -85,6 +85,11 @@ unitDef = {
       maxAngleDif        = 60,
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
+	
+	{
+      def                = [[SHIELD_CHECK]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+    },
 
   },
 
@@ -168,6 +173,38 @@ unitDef = {
       weaponTimer             = 0.1,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 300,
+    },
+	
+	SHIELD_CHECK = {
+      name                    = [[Fake Poker For Shields]],
+      areaOfEffect            = 0,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 0,
+        planes  = 0,
+        subs    = 0,
+      },
+
+	  explosionGenerator      = [[custom:NONE]],
+      groundbounce            = 0,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      lineOfSight             = true,
+      noExplode               = true,
+      noSelfDamage            = true,
+      range                   = 750,
+      reloadtime              = 2,
+      renderType              = 0,
+      rgbColor                = [[0.5 1 1]],
+      size                    = 0,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 3000,
+	  waterWeapon             = true,
     },
 
   },
