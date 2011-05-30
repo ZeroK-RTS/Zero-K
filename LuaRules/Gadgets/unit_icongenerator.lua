@@ -88,7 +88,8 @@ if (gadgetHandler:IsSyncedCode()) then
         else Spring.CallCOBScript(uid,"Activate",0) end
 
         if (cunit.move) then
-		  if lus then Spring.UnitScript.CallAsUnit(uid, env.StartMoving)
+		  if lus then
+			if env.StartMoving then Spring.UnitScript.CallAsUnit(uid, env.StartMoving) end
           else Spring.CallCOBScript(uid,"StartMoving",0) end
         end;
 

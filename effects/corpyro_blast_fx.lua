@@ -1,4 +1,5 @@
 -- corpyro_blast_fx
+return {}
 --[[
 return {
   ["corpyro_blast_fx"] = {

@@ -1,7 +1,7 @@
 unitDef = {
-  unitname            = [[carrydrone]],
-  name                = [[Gull]],
-  description         = [[Carrier Drone]],
+  unitname            = [[attackdrone]],
+  name                = [[Firefly]],
+  description         = [[Attack Drone]],
   acceleration        = 0.3,
   airHoverFactor      = 4,
   amphibious          = true,
@@ -11,7 +11,7 @@ unitDef = {
   buildCostEnergy     = 75,
   buildCostMetal      = 75,
   builder             = false,
-  buildPic            = [[carrydrone.png]],
+  buildPic            = [[attackdrone.png]],
   buildTime           = 75,
   canAttack           = true,
   canFly              = true,
@@ -24,9 +24,9 @@ unitDef = {
   collide             = false,
   
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[18 14 28]],
+  collisionVolumeScales         = [[28 12 26]],
   collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],  
+  collisionVolumeType           = [[ellipsoid]],    
   
   cruiseAlt           = 100,
   defaultmissiontype  = [[VTOL_standby]],
@@ -36,19 +36,18 @@ unitDef = {
   footprintZ          = 2,
   hideDamage          = true,
   hoverAttack         = true,
-  iconType            = [[smallgunship]],
+  iconType            = [[fighter]],
   maneuverleashlength = [[900]],
   mass                = 84,
-  maxDamage           = 200,
-  maxfuel             = 70,
-  maxVelocity         = 8.56,
+  maxDamage           = 160,
+  maxVelocity         = 7,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[carrydrone.s3o]],
+  objectName          = [[attackdrone.s3o]],
   RefuelTime          = 10,
   scale               = [[1]],
-  script              = [[carrydrone.lua]],
+  script              = [[attackdrone.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
@@ -61,8 +60,6 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:brawlermuzzle]],
-      [[custom:emg_shells_m]],
     },
 
   },
@@ -79,7 +76,7 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[ARM_DRONE_WEAPON]],
+      def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 90,
@@ -91,43 +88,48 @@ unitDef = {
 
   weaponDefs          = {
 
-    ARM_DRONE_WEAPON = {
-      name                    = [[Drone EMG]],
-      areaOfEffect            = 8,
-      burst                   = 3,
-      burstrate               = 0.1,
+    LASER      = {
+      name                    = [[Laser]],
+      areaOfEffect            = 12,
+      beamDecay               = 0.736,
+      beamlaser               = 1,
+      beamTime                = 0.01,
+      beamttl                 = 15,
+      coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
+      cylinderTargetting      = 1,
 
       damage                  = {
-        default = 8,
-        subs    = 0.4,
+        default = 1.6,
+        planes  = 16,
+        subs    = 0.8,
       },
 
-      endsmoke                = [[0]],
-      explosionGenerator      = [[custom:EMG_HIT]],
-      fireStarter             = 30,
+      explosionGenerator      = [[custom:flash_teal7]],
+      fireStarter             = 100,
       impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      intensity               = 0.7,
+      impulseFactor           = 0,
       interceptedByShieldType = 1,
-      range                   = 360,
-      reloadtime              = 0.3,
-      rgbColor                = [[1 0.95 0.4]],
-      size                    = 1.75,
-      soundStart              = [[weapon/emg]],
-      soundStartVolume        = 2,
-      sprayAngle              = 512,
-      startsmoke              = [[0]],
+      laserFlareSize          = 3.25,
+      lineOfSight             = true,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      pitchtolerance          = 8192,
+      range                   = 400,
+      reloadtime              = 0.4,
+      renderType              = 0,
+      rgbColor                = [[0 1 0]],
+      soundStart              = [[weapon/laser/rapid_laser]],
+      soundStartVolume        = 4,
+      thickness               = 2.165,
+      tolerance               = 8192,
       turret                  = true,
-      weaponTimer             = 0.1,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 1000,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 2200,
     },
-
   },
 
 }
 
-return lowerkeys({ carrydrone = unitDef })
+return lowerkeys({ attackdrone = unitDef })
