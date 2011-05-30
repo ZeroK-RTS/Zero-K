@@ -50,10 +50,9 @@ local signals = {
 local restoreDelay = 3000
 local attacking = 0
 
-local blockAim = {false, false, false}
+--local blockAim = {false, false, false, false}
 
-local minPitch = {
-	math.rad(35), math.rad(35), 0,  math.rad(20)}
+local minPitch = {math.rad(35), math.rad(35), 0,  math.rad(20)}
 local headingMod = {math.rad(45), math.rad(-45), 0,  math.rad(180) }
 local pitchMod = {math.rad(-25), math.rad(-25), 0, math.rad(-15) }
 
@@ -188,7 +187,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= 50 then
+	if severity <= .5 then
 		Explode( Base, sfxNone )
 		Explode( RightTurret, sfxNone )
 		Explode( LeftTurret, sfxNone )

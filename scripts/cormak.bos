@@ -237,7 +237,7 @@ StopMoving()
 
 FireWeapon3()
 {
-	emit-sfx 2049 from emit;
+	emit-sfx 4097 from emit;
 }
 
 AimFromWeapon3(piecenum)
