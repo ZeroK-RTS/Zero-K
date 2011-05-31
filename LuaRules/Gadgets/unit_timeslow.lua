@@ -35,6 +35,7 @@ local CMD_MOVE	 = CMD.MOVE
 local CMD_FIGHT	 = CMD.FIGHT
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 
+local gaiaTeamID			= Spring.GetGaiaTeamID()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -123,7 +124,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			-- if attack is a non-player command
 			if #cmd == 0 or cmd[1].id ~= CMD_ATTACK or (cmd[1].id == CMD_ATTACK and cmd[1].options.internal) then
 				local newTargetID = Spring.GetUnitNearestEnemy(attackerID,UnitDefs[attackerDefID].range, true)
-				if newTargetID ~= unitID and spValidUnitID(attackerID) and spValidUnitID(newTargetID) then
+				local team = Spring.GetUnitTeam(newTargetID)
+				if newTargetID ~= unitID and spValidUnitID(attackerID) and spValidUnitID(newTargetID) and ((not team) or team ~= gaiaTeamID) then
 					Spring.SetUnitTarget(attackerID,newTargetID)
 					if #cmd > 0 and cmd[1].id == CMD_ATTACK then
 						if #cmd > 1 and cmd[2].id == CMD_SET_WANTED_MAX_SPEED then
