@@ -18,10 +18,23 @@ local icontypes = {
     radiusadjust=1,
   },
 
-  armcommander = {
+-- commanders
+  commander1 = {
     bitmap='icons/armcommander.dds',
     size=2,
   },
+  commander2 = {
+    bitmap='icons/armcommander.dds',
+    size=2.2,
+  },
+  commander3 = {
+    bitmap='icons/armcommander.dds',
+    size=2.5,
+  },
+  commander4 = {
+    bitmap='icons/armcommander.dds',
+    size=2.9,
+  },  
 
   corcommander = {
     bitmap='icons/corcommander.dds',

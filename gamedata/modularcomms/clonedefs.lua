@@ -132,5 +132,6 @@ for sourceName, copyTable in pairs(copy) do
 		
 		UnitDefs[cloneName].customparams.level = stats.level
 		UnitDefs[cloneName].name = (UnitDefs[cloneName].name) .. " - Level " .. stats.level
+		UnitDefs[cloneName].icontype = "commander"..stats.level
 	end
 end
