@@ -92,7 +92,6 @@ unitDef = {
   objectName          = [[selene.s3o]],
   radarDistanceJam    = 300,
   scale               = [[0.8]],
-  seismicDistance     = 300,
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,

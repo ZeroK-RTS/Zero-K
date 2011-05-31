@@ -49,7 +49,6 @@ unitDef = {
   power                  = 60,
   reclaimable            = false,
   script                 = [[wolverine_mine.lua]],
-  seismicDistance        = 80,
   seismicSignature       = 16,
   selfDestructAs         = [[NOWEAPON]],
   selfDestructCountdown  = 0,
