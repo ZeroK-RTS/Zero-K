@@ -292,7 +292,7 @@ return {
       water              = true,
       properties = {
         alpha              = 0.5,
-        color              = [[0.05 ,0.05, 0.05]],
+        color              = [[0.05, 0.05, 0.05]],
         expansionspeed     = 5,
         ttl                = 150,
       },

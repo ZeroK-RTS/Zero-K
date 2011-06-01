@@ -655,6 +655,10 @@ local icontypes = {
     bitmap='icons/airtransport.dds',
     size=2.3,
   },
+  airtransportbig = {
+    bitmap='icons/airtransport.dds',
+    size=3,
+  },  
   airbomb = {
     bitmap='icons/airbomb.dds',
     size=1.6,

@@ -76,9 +76,9 @@ return {
 --	},
 --    groundflash = {
 --      air                = true,
---      circlealpha        = 1,
+--      circlealpha        = 0.8,
 --      circlegrowth       = 8,
---      flashalpha         = 0.01,
+--      flashalpha         = 0.8,
 --      flashsize          = 140,
 --      ground             = true,
 --      ttl                = 17,
