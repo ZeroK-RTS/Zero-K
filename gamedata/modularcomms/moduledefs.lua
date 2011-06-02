@@ -215,7 +215,7 @@ upgrades = {
 	},
 	weaponmod_standoff_rocket = {
 		name = "Standoff Rocket",
-		description = "Rocket Launcher: +50% range, +20% damage, +50% reload time",
+		description = "Rocket Launcher: +50% range, +25% damage, +50% reload time",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -225,11 +225,10 @@ upgrades = {
 						v.reloadtime = v.reloadtime * 1.5
 						v.customparams.basereload = v.reloadtime
 						for armorname, dmg in pairs(v.damage) do
-							v.damage[armorname] = dmg * 1.2
+							v.damage[armorname] = dmg * 1.25
 							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 						end						
 						v.model = [[wep_m_dragonsfang.s3o]]
-						v.soundhit = [[explosion/ex_med4]]
 						v.soundhitvolume = 8
 						v.soundstart = [[weapon/missile/missile2_fire_bass]]
 						v.soundstartvolume = 7					

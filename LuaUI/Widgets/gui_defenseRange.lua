@@ -49,23 +49,23 @@ modConfig["ZK"]["unitList"] =
 	armartic = { weapons = { 1 } },		--faraday
 	armanni = { weapons = { 1 } },		--annihilator
 	armbrtha = { weapons = { 1 } },		--bertha
-	armarch = { weapons = { 2 } },		--packo
+	armarch = { weapons = { 2 } },		--packo (unused)
 	armcir = { weapons = { 2 } },		--chainsaw
-	armdl = { weapons = { 1 } },		--anemone
+	armdl = { weapons = { 1 } },		--anemone (unused)
 	corrl = { weapons = { 4 } },		--pulveriser
 	corllt = { weapons = { 1 } },		--LLT
 	corhlt = { weapons = { 1 } },		--HLT
-	corpre = { weapons = { 1 } },		--scorcher -> unused now but I still hope for a return.
-	corvipe = { weapons = { 1 } },		--viper -> unused now but I still hope for a return.
-	cordoom = { weapons = { 1 } },	--doomsday
-	cordl = { weapons = { 1 } },		--jellyfish
+	corpre = { weapons = { 1 } },		--scorcher (unused)
+	corvipe = { weapons = { 1 } },		--viper (unused)
+	cordoom = { weapons = { 1 } },		--doomsday
+	cordl = { weapons = { 1 } },		--jellyfish (unused)
 	corrazor = { weapons = { 2 } },		--razorkiss
 	corflak = { weapons = { 2 } },		--flak
 	screamer = { weapons = { 2 } },		--screamer
-	hacksaw = { weapons = { 2 } },		--hacksaw
+	missiletower = { weapons = { 2 } },	--hacksaw
 	corbhmth = { weapons = { 1 } },		--behemoth
 	cortl = { weapons = { 1 } },		--torpedo launcher
-	coratl = { weapons = { 1 } },		--adv torpedo launcher
+	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
 }
 
 --uncomment this if you want dps-depending ring-colors
