@@ -64,20 +64,22 @@ GG.Bomber_Dive_fake_fired = Bomber_Dive_fake_fired
 
 function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile)
 
-	if proOwnerID and Spring.ValidUnitID(proOwnerID) and bombers[proOwnerID] and bombers[proOwnerID].diveState == 1 and proID and bomberWeaponNamesDefs[Spring.GetProjectileName(proID)] then
-		if shieldCarrierUnitID and Spring.ValidUnitID(shieldCarrierUnitID) and shieldEmitterWeaponNum then
-			local wid = UnitDefs[Spring.GetUnitDefID(shieldCarrierUnitID)].weapons[shieldEmitterWeaponNum+1].weaponDef
-			if WeaponDefs[wid] and WeaponDefs[wid].shieldPower >= bombers[proOwnerID].diveDamage then
-				temporaryDive(proOwnerID, 150)
+	if proID and bomberWeaponNamesDefs[Spring.GetProjectileName(proID)] then
+		if proOwnerID and Spring.ValidUnitID(proOwnerID) and bombers[proOwnerID] and bombers[proOwnerID].diveState == 1 then
+			if shieldCarrierUnitID and Spring.ValidUnitID(shieldCarrierUnitID) and shieldEmitterWeaponNum then
+				local wid = UnitDefs[Spring.GetUnitDefID(shieldCarrierUnitID)].weapons[shieldEmitterWeaponNum+1].weaponDef
+				if WeaponDefs[wid] and WeaponDefs[wid].shieldPower >= bombers[proOwnerID].diveDamage then
+					temporaryDive(proOwnerID, 150)
+				end
 			end
 		end
-		return false
+		return 0
 	end
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if weaponID and bomberWeaponDefs[weaponID] then
-		return 0
+		return -0.0001
 	end
 end
 

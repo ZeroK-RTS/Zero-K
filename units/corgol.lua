@@ -26,6 +26,7 @@ unitDef = {
     helptext_bp    = [[Goliath é o tanque mais pesado do jogo, uma prova do poder de fogo de Logos. Sua arma principal é um grande canh?o que acaba facilmente com unidades pequenas, e seu lança chamas pode destruir rapidamente qualquer coisa que se aproxime demais. Porém, ele manobra lentamente e seu curto alcançe o torna presa fácil para escaramuçadores e ataques aéreos.]],
     helptext_fr    = [[Le Goliath est tout simplement le plus gros tank jamais construit. Un blindage lourd, un énorme canon plasma r moyenne portée fera voler en éclat les ennemis apeurés tandis que son lance flamme s'occupera des plus téméraires. Le Goliath est facile r repérer, il ne laisse que des ruines derricre lui.]],
 	helptext_de    = [[Der Goliath ist der stärkste Panzer auf dem Platz. Seine mächtige Hauptkanone wurde entwickelt, um kleinere Panzer ins Nirvana zu schicken, während der aufgesetzte Flammenwerfer alle Einheiten, die dem Goliath zu nahe kommen, kurz und schmervoll verbrennt. Trotzdem bewegt sich der Panzer wie eine Wasserwanne und seine kurze Reichweite macht ihn zur einfachen Beute von hochentwickelten Skirmishern oder Luftattacken.]],
+	extradrawrange = 240,
   },
 
   defaultmissiontype  = [[Standby]],
