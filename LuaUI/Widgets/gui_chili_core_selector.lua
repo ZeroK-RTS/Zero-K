@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Core Selector",
-    desc      = "v0.1 Manage your boi, idle cons, and factories.",
+    desc      = "v0.3 Manage your boi, idle cons, and factories.",
     author    = "KingRaptor",
     date      = "2011-6-2",
     license   = "GNU GPL, v2 or later",
@@ -20,7 +20,7 @@ WhiteStr   = "\255\255\255\255"
 GreyStr    = "\255\210\210\210"
 GreenStr   = "\255\092\255\092"
 
-local buttonColor = {1,1,1,0.7}
+local buttonColor = {1, 1, 1, 0.7}
 local buttonColorDisabled = {0.2,0.2,0.2,1}
 local imageColor = {1,1,1,1}
 local imageColorDisabled = {0.3, 0.3, 0.3, 1}
@@ -40,13 +40,14 @@ local screen0
 -------------------------------------------------------------------------------
 
 local window_selector, stack_main
-local commButton, conButton = {}, {}
+local commButton, conButton = {}, {}	-- {[button], [image], [healthbar/label]}
 
 local echo = Spring.Echo
 
 local BUTTON_WIDTH = 64
-local BUTTON_HEIGHT = 64
-local MAX_COLUMNS = 8
+local BUTTON_HEIGHT = 51
+local BASE_COLUMNS = 8
+local NUM_FAC_COLUMNS = BASE_COLUMNS - 2
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -70,16 +71,16 @@ for name in pairs(exceptionList) do
 	end
 end
 
-
 -- list and interface vars
-local facs = {}
-local facButtons = {}
+local facsByID = {}	-- [unitID] = index of facs[]
+local facs = {}	-- [ordered index] = {[facID], [facDefID], [buildeeDefID], [repeat], [button], [image], [buildProgress]}
 local comms = {}
-local currentComm
-local defaultCommDefID = UnitDefNames.armcom1.id
-local idleCons = {}
+local currentComm	--unitID
+local commDefID = UnitDefNames.armcom1.id
+local idleCons = {}	-- [unitID] = true
 local idleBuilderDefID = UnitDefNames.armrectr.id
 
+local gamestart = Spring.GetGameFrame() > 1
 local myTeamID = 0
 --local inTweak  = false
 --local leftTweak, enteredTweak = false, false
@@ -124,15 +125,6 @@ local push        = table.insert
 
 -------------------------------------------------------------------------------
 
-local function GetBuildQueueFirstItem(unitID)
-  local queue = GetFullBuildQueue(unitID)
-  if (queue ~= nil) then
-    for udid, count in ipairs(queue) do
-		return udid
-	end
-  end
-end
-
 local function SetCount(set)
   local count = 0
   for k in pairs(set) do
@@ -158,8 +150,152 @@ local function GetHealthColor(fraction, returnType)
 end
 
 -------------------------------------------------------------------------------
+local function UpdateFac(unitID, index)
+	local progress
+	local buildeeDefID
+	local buildeeID = GetUnitIsBuilding(unitID)
+	if buildeeID then
+		progress = select(5, GetUnitHealth(buildeeID))
+		buildeeDefID = GetUnitDefID(buildeeID)
+	end
+	--Spring.Echo(progress)
+	facs[index].buildProgress:SetValue(progress or 0)
+
+	--repeat icon
+	local rep = GetUnitStates(unitID)["repeat"]
+	if rep and not facs[index]["repeat"] then
+		facs[index].image:AddChild(facs[index].repeatImage)
+		facs[index]["repeat"] = true
+	elseif (not rep) and facs[index]["repeat"] then
+		facs[index].image:RemoveChild(facs[index].repeatImage)
+		facs[index]["repeat"] = false
+	end
+	
+	-- write tooltip
+	local queue = GetFullBuildQueue(unitID) or {}
+	local count = 0
+	for i=1, #queue do
+		for udid, num in pairs(queue[i]) do
+			count = count + num
+			break
+		end
+	end
+
+	local tooltip = "Factory: "..UnitDefs[facs[index].facDefID].humanName
+	tooltip = tooltip .. "\n" .. count .. " item(s) in queue"
+	if rep then
+		tooltip = tooltip .. "\255\0\255\255 (repeating)\008"
+	end
+	if buildeeDefID then
+		local buildeeDef = UnitDefs[buildeeDefID]
+		tooltip = tooltip .. "\nCurrent project: "..buildeeDef.humanName.." ("..math.floor(progress*100).."% done)"
+	end
+	facs[index].button.tooltip = tooltip .. "\n\255\0\255\0Left-click: Select and go to"..
+										"\nRight-click: Select\008"
+	
+	-- change image if needed
+	if buildeeDefID and (buildeeDefID~= facs[index].buildeeDefID) then
+		facs[index].image.file = '#'..buildeeDefID
+		facs[index].image:Invalidate()
+		facs[index].buildeeDefID = buildeeDefID
+	elseif (not buildeeDefID) and (facs[index].buildeeDefID) then
+		facs[index].image.file = '#'..facs[index].facDefID
+		facs[index].image:Invalidate()
+		facs[index].buildeeDefID = nil
+	end
+end
+
+local function GenerateFacButton(i, unitID, unitDefID)
+	facs[i].button = Button:New{
+		name = "facbutton_"..i,
+		parent = stack_main;
+		--x = (i+1)*(100/BASE_COLUMNS).."%",
+		y = 0,
+		width = (100/BASE_COLUMNS).."%",
+		height = "100%",
+		caption = '',
+		OnMouseDown = {	function () 
+				local _,_,left,_,right = Spring.GetMouseState()
+				Spring.SelectUnitArray({unitID}, false)
+				if left then
+					local x, y, z = Spring.GetUnitPosition(unitID)
+					Spring.SetCameraTarget(x, y, z)
+				end
+			end},
+		padding = {1,1,1,1},
+		--keepAspect = true,
+		backgroundColor = {0.6, 0.6, 0.6, 0.3}
+	}
+	facs[i].image = Image:New {
+		parent = facs[i].button,
+		width="91%";
+		height="91%";
+		x="5%";
+		y="5%";
+		file = '#'..(facs[i].buildeeDefID or unitDefID),
+		file2 = "bitmaps/icons/frame_cons.png",
+		keepAspect = false,
+	}
+	facs[i].buildProgress = Progressbar:New{
+		parent = facs[i].image,
+		width = "85%",
+		height = "85%",
+		x = "8%",
+		y = "8%",
+		max     = 1;
+		caption = "";
+		color = {0.7, 0.7, 0.4, 0.6},
+		backgroundColor = {1, 1, 1, 0.01},
+		skin=nil,
+		skinName='default',		
+	}
+	facs[i].repeatImage = Image:New {
+		width="40%";
+		height="40%";
+		x="55%";
+		y="10%";
+		file = image_repeat,
+		keepAspect = true,
+	}
+end
+
+--shifts facs when one of their kind is removed
+local function ShiftFacRow()
+	for i in ipairs(facs) do
+		facs[i].button:Dispose()
+		GenerateFacButton(i, facs[i].facID, facs[i].facDefID)
+		UpdateFac(facs[i].facID, i)
+	end
+end
+
+local function AddFac(unitID, unitDefID)
+	local i = #facs + 1
+	facs[i] = {facID = unitID, facDefID = unitDefID}
+	GenerateFacButton(i, unitID, unitDefID)
+	facsByID[unitID] = i
+	UpdateFac(unitID, i)
+end
+
+local function RemoveFac(unitID)
+	local index = facsByID[unitID]
+	facs[index].button:Dispose()
+	-- move everything to the left
+	local shift = false
+	table.remove(facs, index)
+	for facID,i in pairs(facsByID) do
+		if i > index then
+			facsByID[facID] = i - 1
+			shift = true
+		end
+	end
+	facs[unitID] = nil
+	if shift then
+		ShiftFacRow()
+	end
+end
+
 local function UpdateCommButton()
-	local commDefID = currentComm and GetUnitDefID(currentComm) or defaultCommDefID
+	local commDefID = currentComm and GetUnitDefID(currentComm) or commDefID
 	commButton.image = Image:New {
 		parent = commButton.button,
 		width="90%";
@@ -170,41 +306,34 @@ local function UpdateCommButton()
 		keepAspect = false,
 		color = (not currentComm and imageColorDisabled) or nil,
 	}
-	commButton.button.backgroundColor = (currentComm and buttonColor) or buttonColorDisabled
-	commButton.button:Invalidate()
 	if currentComm then
 		commButton.image:AddChild(commButton.healthbar)
 	else
 		commButton.image:RemoveChild(commButton.healthbar)
 	end
-end
-
-local function UpdateFac(unitID)
-end
-
-local function AddFac(unitID)
-	
-end
-
-local function RemoveFac(unitID)
+	commButton.button.backgroundColor = (currentComm and buttonColor) or buttonColorDisabled
+	commButton.button:Invalidate()
 end
 
 local function UpdateComm()	-- just health
-	if not currentComm then return end
+	if not currentComm then
+		if gamestart then
+			commButton.button.tooltip = "Your commander is dead...sorry..."
+		else
+			commButton.button.tooltip = "Waiting for commander spawn..."
+		end
+		return
+	end
 	local health, maxHealth = GetUnitHealth(currentComm)
 	commButton.healthbar:SetValue(health/maxHealth)
 	commButton.healthbar.color = GetHealthColor(health/maxHealth)
 	commButton.healthbar:Invalidate()
 	
-	if not currentComm then
-		commButton.button.tooltip = "Your commander is dead...sorry..."
-	else
-		local commDefID = GetUnitDefID(currentComm)
-		commButton.button.tooltip = "Commander: "..UnitDefs[commDefID].humanName ..
-									"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
-									"\n\255\0\255\0Left-click: Select and go to"..
-									"\nRight-click: Cycle commander (if available)\008"
-	end	
+	local commDefID = GetUnitDefID(currentComm)
+	commButton.button.tooltip = "Commander: "..UnitDefs[commDefID].humanName ..
+								"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
+								"\n\255\0\255\0Left-click: Select and go to"..
+								"\nRight-click: Cycle commander (if available)\008"
 end
 
 local function UpdateCommFull()	-- regenerates image etc.
@@ -213,11 +342,11 @@ local function UpdateCommFull()	-- regenerates image etc.
 	UpdateComm()
 end
 
-local function AddComm(unitID)
+local function AddComm(unitID, unitDefID)
 	comms[unitID] = true
 	if not currentComm then
 		currentComm = unitID
-		defaultCommDefID = GetUnitDefID(unitID)
+		commDefID = unitDefID
 		UpdateCommFull()
 	end
 end
@@ -266,20 +395,12 @@ local function UpdateCons()
 	end
 	
 	if (idleBuilderDefID ~= maxDefID or total == 0 or prevTotal == 0) then
-		conButton.image:Dispose()
-		conButton.image = Image:New {
-			parent = conButton.button,
-			width="90%";
-			height="90%";
-			x="5%";
-			y="5%";
-			file = '#'..maxDefID,
-			keepAspect = false,
-			color = (total == 0 and imageColorDisabled) or nil,
-		}
+		conButton.image.file = '#'..maxDefID
+		conButton.image.color = (total == 0 and imageColorDisabled) or nil
+		conButton.image:Invalidate()
 		idleBuilderDefID = maxDefID
 	end
-	conButton.button.tooltip = "You have ".. total .. " idle cons, of "..numTypes.." different types."..
+	conButton.button.tooltip = "You have ".. total .. " idle con(s), of "..numTypes.." different type(s)."..
 								"\n\255\0\255\0Left-click: Select one and go to"..
 								"\nRight-click: Select all\008"
 	idleCons.count = total
@@ -334,15 +455,19 @@ end
 -------------------------------------------------------------------------------
 -- engine funcs
 
+function widget:GameStart()
+	gamestart = true
+end
+
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
   if (unitTeam ~= myTeamID) then
     return
   end
 
   if UnitDefs[unitDefID].isFactory then
-  
+	AddFac(unitID, unitDefID)
   elseif UnitDefs[unitDefID].isCommander then
-	AddComm(unitID)
+	AddComm(unitID, unitDefID)
   end
 end
 
@@ -355,8 +480,8 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		return
 	end
 	idleCons[unitID] = nil  
-	if UnitDefs[unitDefID].isFactory then
-	
+	if facsByID[unitID] then
+		RemoveFac(unitID)
 	elseif comms[unitID] then
 		comms[unitID] = nil
 		if unitID == currentComm then
@@ -383,6 +508,9 @@ function widget:Update(dt)
 		return
 	end	
 	UpdateComm()
+	for i=1,#facs do
+		UpdateFac(facs[i].facID, i)
+	end
 	timer = 0
 end
 
@@ -421,10 +549,8 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 
 	stack_main = StackPanel:New{
-		x = 0,
-		y = 0,
 		padding = {0,0,0,0},
-		itemPadding = {0, 0, 0, 0},
+		--itemPadding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0},
 		width= '100%',
 		height = '100%',
@@ -433,13 +559,13 @@ function widget:Initialize()
 	}
 	window_selector = Window:New{
 		padding = {0,0,0,0},
-		itemPadding = {0, 0, 0, 0},
+		itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "selector_window",
 		x = 0, 
 		y = "30%",
-		width  = 512,
-		height = 64,
+		width  = BUTTON_WIDTH * BASE_COLUMNS,
+		height = BUTTON_HEIGHT,
 		parent = Chili.Screen0,
 		draggable = false,
 		tweakDraggable = true,
@@ -454,9 +580,7 @@ function widget:Initialize()
 	}
 	commButton.button = Button:New{
 		parent = stack_main;
-		y = 0,
-		width = tostring(100/MAX_COLUMNS).."%",
-		height = "100%",
+		width = (100/BASE_COLUMNS).."%",
 		caption = '',
 		OnMouseDown = {	function () 
 				local _,_,left,_,right = Spring.GetMouseState()
@@ -470,7 +594,6 @@ function widget:Initialize()
 				end
 			end},
 		padding = {1,1,1,1},
-		disabled = true,
 		keepAspect = true,
 		backgroundColor = (not currentComm and buttonColorDisabled) or nil,
 	}
@@ -486,13 +609,10 @@ function widget:Initialize()
 	}	
 	UpdateCommButton()
 
-	
 	conButton.button = Button:New{
 		parent = stack_main;
-		x = tostring(100/MAX_COLUMNS).."%",
-		y = 0,
-		width = tostring(100/MAX_COLUMNS).."%",
-		height = "100%",
+		--x = (100/BASE_COLUMNS).."%",
+		width = (100/BASE_COLUMNS).."%",
 		caption = '',
 		OnMouseDown = {	function () 
 				local _,_,left,_,right = Spring.GetMouseState()
@@ -503,8 +623,7 @@ function widget:Initialize()
 				end
 			end},
 		padding = {1,1,1,1},
-		disabled = true,
-		keepAspect = true,
+		--keepAspect = true,
 	}
 	conButton.image = Image:New {
 		parent = conButton.button,
@@ -513,13 +632,14 @@ function widget:Initialize()
 		x="5%";
 		y="5%";
 		file = '#'..idleBuilderDefID,
+		--file2 = "bitmaps/icons/frame_cons.png",
 		keepAspect = false,
+		color = (total == 0 and imageColorDisabled) or nil,
 	}
 	UpdateCons()
-	
+
 	myTeamID = Spring.GetMyTeamID()
 
-	--UpdateFactoryList()
 
 	local viewSizeX, viewSizeY = widgetHandler:GetViewSizes()
 	self:ViewResize(viewSizeX, viewSizeY)

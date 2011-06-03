@@ -647,9 +647,9 @@ local function ManageBuildRow()
 			else caption = '' end
 			buttonArray.button = Button:New{
 				parent = buildRow;
-				x = tostring((i-1)*(100/MAX_COLUMNS)).."%",
+				x = (i-1)*(100/MAX_COLUMNS).."%",
 				y = 0,
-				width = tostring(100/MAX_COLUMNS).."%",
+				width = (100/MAX_COLUMNS).."%",
 				height = "100%",
 				--caption = '',
 				OnMouseDown = {	function () 
@@ -817,7 +817,7 @@ end
 local function MakeMenuTab(i, alpha)
 	local button = Button:New{
 		parent = menuTabRow;
-		x = tostring((16.5*i)-16.5).."%",
+		x = ((16.5*i)-16.5).."%",
 		y = 0,
 		width = "16%",
 		height = "100%",
@@ -1082,7 +1082,7 @@ function widget:Initialize()
 		resizeItems = true;
 		orientation   = "vertical";
 		height = "98%";
-		width = tostring(COMMAND_SECTION_WIDTH).."%";
+		width = COMMAND_SECTION_WIDTH.."%";
 		x = "1.5%";
 		y = "1.5%";
 		padding = {0, 0, 0, 0},
@@ -1093,10 +1093,10 @@ function widget:Initialize()
 			parent = commands_main,
 			resizeItems = true;
 			orientation   = "horizontal";
-			height = tostring(math.floor(100/numRows)).."%";
+			height = math.floor(100/numRows).."%";
 			width = "100%";
 			x = "0%";
-			y = tostring(math.floor(100/numRows))*(i-1).."%";
+			y = math.floor(100/numRows)*(i-1).."%";
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
 		}
@@ -1108,7 +1108,7 @@ function widget:Initialize()
 		resizeItems = true;
 		orientation   = "horizontal";
 		height = "96%";
-		width = tostring(STATE_SECTION_WIDTH).."%";
+		width = (STATE_SECTION_WIDTH).."%";
 		--x = tostring(100-STATE_SECTION_WIDTH).."%";
 		right = 4;
 		y = "3%";
@@ -1121,8 +1121,8 @@ function widget:Initialize()
 			resizeItems = true;
 			orientation   = "vertical";
 			height = "100%";
-			width = tostring(math.floor(100/numStateColumns)).."%";
-			x = tostring(100 - (math.floor(100/numStateColumns))*i).."%";
+			width = math.floor(100/numStateColumns).."%";
+			x = (100 - (math.floor(100/numStateColumns))*i).."%";
 			y = "0%";
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
@@ -1133,10 +1133,10 @@ function widget:Initialize()
 		parent = commands_main,
 		resizeItems = true;
 		orientation   = "horizontal";
-		height = tostring(math.floor(100/numRows)).."%";
+		height = (math.floor(100/numRows)).."%";
 		width = "100%";
 		x = "0%";
-		y = tostring(math.floor(100/numRows))*(numRows-1).."%";
+		y = (math.floor(100/numRows))*(numRows-1).."%";
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 		backgroundColor = {0.2, 0.2, 0.2, 0.6}
@@ -1189,7 +1189,9 @@ function widget:GameFrame()
 	if menuChoice == 6 and selectedFac and buildRowButtons[1] and buildRowButtons[1].image then
 		local progress
 		local unitBuildID      = spGetUnitIsBuilding(selectedFac)
-		if unitBuildID then _, _, _, _, progress = spGetUnitHealth(unitBuildID) end
+		if unitBuildID then 
+			progress = select(4, spGetUnitHealth(unitBuildID))
+		end
 		--Spring.Echo(progress)
 		buildProgress:SetValue(progress or 0)
 	end
