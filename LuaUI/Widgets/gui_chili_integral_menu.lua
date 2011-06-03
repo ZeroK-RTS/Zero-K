@@ -939,12 +939,38 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
 end 
 
+local function ScrollTabRight()
+	menuChoice = menuChoice + 1
+	if menuChoice > #menuChoices then menuChoice = 1 end
+	if menuChoice >= 2 and menuChoice <= 5 then lastBuildChoice = menuChoice end
+	Update(true)
+	ColorTabs()
+	return
+end
+
+local function ScrollTabLeft()
+	menuChoice = menuChoice - 1
+	if menuChoice < 1 then menuChoice = #menuChoices end
+	if menuChoice >= 2 and menuChoice <= 5 then lastBuildChoice = menuChoice end
+	Update(true)
+	ColorTabs()
+	return
+end
+
+local function AddAction(cmd, func, data, types)
+	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
+end
+local function RemoveAction(cmd, types)
+	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
+end
+
 -- INITS 
 function widget:Initialize()
 	widgetHandler:ConfigLayoutHandler(LayoutHandler)
 	Spring.ForceLayoutUpdate()
 
-
+	AddAction("nextmenu", ScrollTabRight, nil, "t")
+	AddAction("prevmenu", ScrollTabLeft, nil, "t")
 	--[[local f,it,isFile = nil,nil,false
 	f  = io.open('cmdcolors.txt','r')
 	if f then
@@ -1189,43 +1215,11 @@ function widget:SelectionChanged(newSelection)
 	SmartTabSelect()
 end
 
-local function ScrollTabs(key)
-	return false
-	--[[
-	local delta
-	if key == KEYSYMS.COMMA then delta = -1
-	elseif key == KEYSYMS.PERIOD then delta = 1 end
-	if not delta then return end
-	
-	menuChoice = menuChoice + delta
-	if menuChoice <= 0 then menuChoice = #menuChoices
-	elseif menuChoice > #menuChoices then menuChoice = 1 end
-	if menuChoice >= 2 and menuChoice <= 5 then lastBuildChoice = menuChoice end
-	Update(true)
-	ColorTabs()
-	return	--returning true "eats" the keypress so nothing else registers it
-	--]]
-end
-
---[[
-local function AddAction(cmd, func, data, types)
-	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
-end
-local function RemoveAction(cmd, types)
-	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
-end
-
-AddAction(nextMenu, ScrollTabs, {KEYSYMS.PERIOD}, "t")
-AddAction(prevMenu, ScrollTabs, {KEYSYMS.COMMA}, "t")
---]]
-
-function widget:KeyPress(key)
-	return ScrollTabs(key)
-end
-
 function widget:Shutdown()
   widgetHandler:ConfigLayoutHandler(nil)
   Spring.ForceLayoutUpdate()
+  RemoveAction("nextmenu", "t")
+  RemoveAction("prevmenu", "t")
 end
 
 options.hidetabs.OnChange = function(self) 

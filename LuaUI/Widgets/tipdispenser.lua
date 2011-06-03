@@ -366,7 +366,7 @@ end
 function widget:Update(dt)
 	timer = timer + dt
 	if timer > updateFrequency then
---		myTeam = spGetMyTeamID()	-- just refresh for fun
+		myTeam = spGetMyTeamID()	-- just refresh for fun
 		SetTip()
 		timer = 0
 	end
