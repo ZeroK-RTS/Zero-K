@@ -2,7 +2,7 @@ local name = "commweapon_concussion"
 local weaponDef = {
     name                    = [[Concussion Shell]],
     alphaDecay              = 0.12,
-    areaOfEffect            = 160,
+    areaOfEffect            = 192,
     --cegTag                  = [[gauss_tag_m]],
     commandfire             = true,
     craterBoost             = 1,
@@ -19,10 +19,11 @@ local weaponDef = {
 		subs    = 37.5,
     },
 
+	edgeEffectiveness		= 0.5,
     explosionGenerator      = [[custom:100rlexplode]],
     impactOnly              = false,
-    impulseBoost            = 0.25,
-    impulseFactor           = 0.5,
+    impulseBoost            = 0.4,
+    impulseFactor           = 0.75,
     interceptedByShieldType = 0,
     noExplode               = false,
     noSelfDamage            = true,
