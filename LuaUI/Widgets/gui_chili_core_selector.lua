@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Core Selector",
-    desc      = "v0.3 Manage your boi, idle cons, and factories.",
+    desc      = "v0.35 Manage your boi, idle cons, and factories.",
     author    = "KingRaptor",
     date      = "2011-6-2",
     license   = "GNU GPL, v2 or later",
@@ -15,12 +15,26 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+local GetUnitDefID      = Spring.GetUnitDefID
+local GetUnitHealth     = Spring.GetUnitHealth
+local GetUnitStates     = Spring.GetUnitStates
+local DrawUnitCommands  = Spring.DrawUnitCommands
+local GetSelectedUnits  = Spring.GetSelectedUnits
+local GetFullBuildQueue = Spring.GetFullBuildQueue
+local GetUnitIsBuilding = Spring.GetUnitIsBuilding
+local GetGameSeconds	= Spring.GetGameSeconds
+local GetGameFrame 		= Spring.GetGameFrame
 
+local push        = table.insert
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 WhiteStr   = "\255\255\255\255"
 GreyStr    = "\255\210\210\210"
 GreenStr   = "\255\092\255\092"
 
-local buttonColor = {1, 1, 1, 0.7}
+local buttonColor = {1, 1, 1, 1}
+local buttonColorWarning = {1, 0.2, 0.1, 1}
 local buttonColorDisabled = {0.2,0.2,0.2,1}
 local imageColor = {1,1,1,1}
 local imageColorDisabled = {0.3, 0.3, 0.3, 1}
@@ -80,8 +94,10 @@ local commDefID = UnitDefNames.armcom1.id
 local idleCons = {}	-- [unitID] = true
 local idleBuilderDefID = UnitDefNames.armrectr.id
 
-local gamestart = Spring.GetGameFrame() > 1
+local gamestart = GetGameFrame() > 1
 local myTeamID = 0
+local commWarningTime		= 2*30 --gameframes
+local commWarningTimeLeft	= -1
 --local inTweak  = false
 --local leftTweak, enteredTweak = false, false
 --local cycle_half_s = 1
@@ -108,20 +124,6 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   vsx = viewSizeX
   vsy = viewSizeY
 end
-
-
--------------------------------------------------------------------------------
-
-local GetUnitDefID      = Spring.GetUnitDefID
-local GetUnitHealth     = Spring.GetUnitHealth
-local GetUnitStates     = Spring.GetUnitStates
-local DrawUnitCommands  = Spring.DrawUnitCommands
-local GetSelectedUnits  = Spring.GetSelectedUnits
-local GetFullBuildQueue = Spring.GetFullBuildQueue
-local GetUnitIsBuilding = Spring.GetUnitIsBuilding
-
-local push        = table.insert
-
 
 -------------------------------------------------------------------------------
 
@@ -209,7 +211,7 @@ local function GenerateFacButton(i, unitID, unitDefID)
 	facs[i].button = Button:New{
 		name = "facbutton_"..i,
 		parent = stack_main;
-		--x = (i+1)*(100/BASE_COLUMNS).."%",
+		x = (i+1)*(100/BASE_COLUMNS).."%",
 		y = 0,
 		width = (100/BASE_COLUMNS).."%",
 		height = "100%",
@@ -355,6 +357,7 @@ local function CycleComm()
 	if SetCount(comms) == 0 then
 		return
 	end
+	local newComm
 	local savedPos = 1
 	local commsOrdered = {}
 	
@@ -368,10 +371,16 @@ local function CycleComm()
 		end
 	end
 	if #commsOrdered == savedPos then
-		currentComm = commsOrdered[1]
+		newComm = commsOrdered[1]
 	else
-		currentComm = commsOrdered[savedPos+1]
+		newComm = commsOrdered[savedPos+1]
 	end
+	--clear warning if needed
+	if newComm ~= currentComm then
+		commWarningTimeLeft = -1
+	end
+	
+	currentComm = newComm
 end
 
 local function UpdateCons()
@@ -485,6 +494,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	elseif comms[unitID] then
 		comms[unitID] = nil
 		if unitID == currentComm then
+			commWarningTimeLeft = -1
 			commButton.healthbar:SetValue(0)
 			currentComm = nil
 			CycleComm()
@@ -499,6 +509,7 @@ end
 
 
 local timer = 0
+local warningColorPhase = false
 function widget:Update(dt)
 	if myTeamID~=Spring.GetMyTeamID() then
 		myTeamID = Spring.GetMyTeamID()
@@ -511,7 +522,31 @@ function widget:Update(dt)
 	for i=1,#facs do
 		UpdateFac(facs[i].facID, i)
 	end
+	warningColorPhase = not warningColorPhase
 	timer = 0
+end
+
+-- for "under attack" achtung sign
+function widget:UnitDamaged(unitID, unitDefID, unitTeam)
+	if unitID == currentComm then
+		commWarningTimeLeft = commWarningTime
+	end
+end
+function widget:DrawScreen()
+	if commWarningTimeLeft > 0 then
+		commButton.button.backgroundColor = (warningColorPhase and buttonColorWarning) or buttonColor
+		commButton.button:Invalidate()
+	end
+end
+
+function widget:GameFrame(n)
+	if (n%10 < 0.1) and commWarningTimeLeft > 0 then
+		commWarningTimeLeft = commWarningTimeLeft - 10
+		if (commWarningTimeLeft <= 0) and currentComm then
+			commButton.button.backgroundColor = buttonColor
+			commButton.button:Invalidate()
+		end
+	end
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
@@ -528,6 +563,9 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdOpts, cmdPara
 		UpdateCons()
 	end
 end
+
+
+
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -556,6 +594,8 @@ function widget:Initialize()
 		height = '100%',
 		resizeItems = true,
 		orientation = 'horizontal',
+		--autoArrangeH = true,
+		centerItems = false,
 	}
 	window_selector = Window:New{
 		padding = {0,0,0,0},
@@ -611,7 +651,7 @@ function widget:Initialize()
 
 	conButton.button = Button:New{
 		parent = stack_main;
-		--x = (100/BASE_COLUMNS).."%",
+		x = (100/BASE_COLUMNS).."%",
 		width = (100/BASE_COLUMNS).."%",
 		caption = '',
 		OnMouseDown = {	function () 
