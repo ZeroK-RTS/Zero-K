@@ -167,6 +167,10 @@ local terraunitDefID = UnitDefNames["terraunit"].id
 local corclogDefID = UnitDefNames["corclog"].id
 --local novheavymineDefID = UnitDefNames["novheavymine"].id
 
+local exceptionArray = {
+	[UnitDefNames["armcarry"].id] = true,
+}
+
 --------------------------------------------------------------------------------
 -- Custom Commands
 --------------------------------------------------------------------------------
@@ -2858,7 +2862,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
-	if ud.isBuilder and not ud.isFactory then
+	if ud.isBuilder and not ud.isFactory and not exceptionArray[unitDefID] then
 		spInsertUnitCmdDesc(unitID, rampCmdDesc)
 		spInsertUnitCmdDesc(unitID, levelCmdDesc)
 		spInsertUnitCmdDesc(unitID, raiseCmdDesc)

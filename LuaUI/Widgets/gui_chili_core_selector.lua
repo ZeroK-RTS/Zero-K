@@ -438,21 +438,7 @@ local function InitializeUnits()
 			--Spring.Echo(unitID, unitDefID)
 			if unitDefID then
 				widget:UnitCreated(unitID, unitDefID, myTeamID)
-				local ud = UnitDefs[unitDefID]
-				if ud.buildSpeed > 0 then  --- can build
-					local bQueue = GetFullBuildQueue(unitID)
-					if not bQueue[1] then  --- has no build queue
-						local _, _, _, _, buildProg = GetUnitHealth(unitID)
-						if buildProg == 1 then  --- isnt under construction
-							if not ud.isFactory then
-								local cQueue = Spring.GetCommandQueue(unitID)
-								if not cQueue[1] then
-									widget:UnitIdle(unitID, unitDefID, myTeamID)
-								end
-							end
-						end
-					end
-				end
+				widget:UnitFinished(unitID, unitDefID, myTeamID)
 			end
 		end
 	end
@@ -469,15 +455,34 @@ function widget:GameStart()
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-  if (unitTeam ~= myTeamID) then
-    return
-  end
+	if (unitTeam ~= myTeamID) then
+		return
+	end
 
-  if UnitDefs[unitDefID].isFactory then
-	AddFac(unitID, unitDefID)
-  elseif UnitDefs[unitDefID].isCommander then
-	AddComm(unitID, unitDefID)
-  end
+	if UnitDefs[unitDefID].isFactory and (not exceptionArray[unitDefID]) then
+		AddFac(unitID, unitDefID)
+	elseif UnitDefs[unitDefID].isCommander then
+		AddComm(unitID, unitDefID)
+	end
+end
+
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
+	if (unitTeam ~= myTeamID) or exceptionArray[unitDefID] then
+		return
+	end
+	local ud = UnitDefs[unitDefID]
+	if ud.buildSpeed > 0 then  --- can build
+		local bQueue = GetFullBuildQueue(unitID)
+		if not bQueue[1] then  --- has no build queue
+			local _, _, _, _, buildProg = GetUnitHealth(unitID)
+			if not ud.isFactory then
+				local cQueue = Spring.GetCommandQueue(unitID)
+				if not cQueue[1] then
+					widget:UnitIdle(unitID, unitDefID, myTeamID)
+				end
+			end
+		end
+	end  
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
