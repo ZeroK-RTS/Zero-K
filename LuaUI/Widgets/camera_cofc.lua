@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.05 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.06 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -674,13 +674,14 @@ local function Tilt(s, dir)
 	return true
 end
 
-
-
 local function ScrollCam(cs, mxm, mym, smoothlevel)
 	SetLockSpot2(cs)
 	if not cs.dy or not ls_have then
 		--echo "<COFC> scrollcam fcn fail"
 		return cs	
+	end
+	if not ls_onmap then
+		smoothlevel = 0.5
 	end
 
 	-- forward, up, right, top, bottom, left, right
@@ -708,7 +709,7 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	ls_z = math.min(ls_z, mheight)
 	ls_z = math.max(ls_z, 0)
 	
-	ls_y = Spring.GetGroundHeight(ls_x, ls_z)
+	ls_y = Spring.GetGroundHeight(ls_x, ls_z) or 0
 	
 	local cstemp = UpdateCam(cs)
 	if cstemp then cs = cstemp; end
