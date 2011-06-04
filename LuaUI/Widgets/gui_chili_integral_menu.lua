@@ -1057,7 +1057,7 @@ function widget:Initialize()
 		resizable = false,
 		padding = {0, 0, 0, 0},
 		--backgroundColor = {0.1, 0.1, 0.1, 1},
-		skinName  = "DarkGlass",
+--		skinName  = "DarkGlass",
 	}
 
 	menuTabRow = StackPanel:New{

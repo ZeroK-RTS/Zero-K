@@ -113,7 +113,7 @@ local function MakeMinimapButton(file, pos, option )
 --		file=file,
 		caption="",
 		margin={0,0,0,0},
-		padding={2,2,0,0},
+		padding={4,3,2,2},
 		bottom=0, 
 		right=iconsize*pos+5, 
 		
@@ -131,8 +131,8 @@ local function MakeMinimapButton(file, pos, option )
 		children={
 			Chili.Image:New{
 				file=file,
-				width="90%";
-				height="90%";
+				width="100%";
+				height="100%";
 				x="0%";
 				y="0%";
 			}
@@ -171,7 +171,8 @@ MakeMinimapWindow = function()
 		minimumSize = {iconsize*9,50},
 		children = {
 			
-			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},
+--			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			
+			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}},
 			
 			MakeMinimapButton( 'LuaUI/images/map/standard.png', 1, 'viewstandard' ),
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 2, 'viewheightmap' ),

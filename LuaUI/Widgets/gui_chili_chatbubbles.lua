@@ -232,7 +232,7 @@ function widget:AddChatMessage(player, msg, type)
 		autosize  = true;
 		resizable = false;
 		draggable = false;
-		skinName  = "DarkGlass";
+--		skinName  = "DarkGlass";
 		color     = teamcolor;
 		padding   = {16, 16, 16, 16};
 
