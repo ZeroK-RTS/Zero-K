@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Context Menu",
-    desc      = "v0.083 Chili Context Menu\nPress [Space] while clicking for a context menu.",
+    desc      = "v0.084 Chili Context Menu\nPress [Space] while clicking for a context menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -887,7 +887,10 @@ function widget:MousePress(x,y,button)
 		local type, data = spTraceScreenRay(x, y)
 		if (type == 'unit') then
 			local unitID = data
-			MakeStatsWindow(UnitDefs[Spring.GetUnitDefID(unitID)],x,y)
+			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+			if ud then
+				MakeStatsWindow(ud,x,y)
+			end
 			-- FIXME enable later when does not show useless info MakeUnitContextMenu(unitID,x,y)
 			return true
 		elseif (type == 'feature') then
