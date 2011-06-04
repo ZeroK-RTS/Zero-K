@@ -408,7 +408,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		autosize  = true;
 		resizable = false;
 		--draggable = false;
-		skinName  = "DarkGlass";
+--		skinName  = "DarkGlass";
 		color     = teamcolor;
 		padding   = {16, 16, 16, 16};
 
@@ -506,7 +506,7 @@ function widget:AddWarning(text)
 		height    = options.window_height.value;
 		resizable = false;
 		draggable = false;
-		skinName  = "DarkGlass";
+--		skinName  = "DarkGlass";
 		color     = teamcolor;
 		padding   = {16, 16, 16, 16};
 

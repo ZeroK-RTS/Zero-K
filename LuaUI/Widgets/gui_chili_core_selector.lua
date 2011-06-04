@@ -404,7 +404,7 @@ local function UpdateCons()
 	end
 	
 	if (idleBuilderDefID ~= maxDefID or total == 0 or prevTotal == 0) then
-		conButton.image.file = '#'..maxDefID
+		conButton.image.file = 'LuaUI/Images/idlecon.png'
 		conButton.image.color = (total == 0 and imageColorDisabled) or nil
 		conButton.image:Invalidate()
 		idleBuilderDefID = maxDefID
