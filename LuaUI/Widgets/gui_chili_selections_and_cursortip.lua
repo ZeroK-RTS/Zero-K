@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.042 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.05 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1307,13 +1307,14 @@ local function UpdateBuildpic( ud, globalitem_name, unitID )
 			keepAspect = false,
 			height  = 55*(4/5),
 			width   = 55,
+			unitID = unitID,
 			
 		}
 		if globalitem_name == 'buildpic_selunit' then
-			globalitems[globalitem_name].OnClick = {function(_,_,_,button)
+			globalitems[globalitem_name].OnClick = {function(self,_,_,button)
 				if (button==2) then
 					--button2 (middle)
-					local x,y,z = Spring.GetUnitPosition( unitID )
+					local x,y,z = Spring.GetUnitPosition( self.unitID )
 					if x then
 						Spring.SetCameraTarget(x,y,z, 1)
 					end
@@ -1322,6 +1323,8 @@ local function UpdateBuildpic( ud, globalitem_name, unitID )
 		end
 		return
 	end
+	
+	globalitems[globalitem_name].unitID = unitID
 	globalitems[globalitem_name].file = "#" .. ud.id
 	globalitems[globalitem_name].file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud))
 	globalitems[globalitem_name]:Invalidate()
