@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.05 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.051 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -94,7 +94,7 @@ local controls_icons = {}
 local stack_main, stack_leftbar
 local globalitems = {}
 
-local ttFontSize = 2
+local ttFontSize = 10
 
 local green = '\255\1\255\1'
 local cyan = '\255\1\255\255'
@@ -176,6 +176,7 @@ options = {
 		min=0,max=4,step=0.1,
 		value = 0,
 	},
+	--[[ This is causing it so playername is not always visible, too difficult to maintain.
 	fontsize = {
 		name = 'Font Size (10-20)',
 		desc = 'Resizes the font of the tip',
@@ -184,6 +185,7 @@ options = {
 		value = 10,
 		OnChange = FontChanged,
 	},
+	--]]
 	hpshort = {
 		name = "HP Short Notation",
 		type = 'bool',
@@ -227,15 +229,15 @@ options = {
 	},
 }
 
-
+--[[
 local function FontChanged() 
 	controls = {}
 	controls_icons = {}
 	ttFontSize = options.fontsize.value
 end
+--]]
 
-
-options.fontsize.OnChange = FontChanged
+--options.fontsize.OnChange = FontChanged
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1869,7 +1871,7 @@ function widget:Initialize()
 		backgroundColor = color.tooltip_bg, 
 		children = { stack_leftbar, stack_main, }
 	}
-	FontChanged()
+	--FontChanged()
 	spSendCommands({"tooltip 0"})
 	
 	
