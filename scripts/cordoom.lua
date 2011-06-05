@@ -35,7 +35,7 @@ local function Open()
 	
 	--Spring.Echo(Spring.GetUnitArmored(unitID))
 	Spring.SetUnitArmored(unitID,false)
-	Spring.SetUnitCOBValue(unitID,20,0)
+	--SetUnitValue(COB.ARMORED,0)	
 	--Spring.Echo(Spring.GetUnitArmored(unitID))
 
 	Signal(close) --kill the closing animation if it is in process
@@ -81,11 +81,10 @@ local function Close()
 
 	--Spring.Echo(Spring.GetUnitArmored(unitID))
 	Spring.SetUnitArmored(unitID,true)
-	Spring.SetUnitCOBValue(unitID,20,1)
+	--SetUnitValue(COB.ARMORED,1)	
 	--Spring.Echo(Spring.GetUnitArmored(unitID))
 
 end
-
 
 function script.Activate ( )
 	StartThread( Open )

@@ -19,7 +19,46 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+options_path = 'Settings/View/Effects/Night'
+options_order = {"coloredUnits", "cycle", "beam", "bases"}
+options = {
+	--[[
+	night = {
+		name = 'Night View',
+		desc = 'Turns night widget on/off.',
+		type = 'bool',
+		value = 0,
+	},
+	]]--
+	coloredUnits = {
+		name = "Night Colored Units",
+		type = 'bool',
+		value = false,
+		desc = 'Bright units even at night',
+	},
+	cycle = {
+		name = "Day/night cycle",
+		type = 'bool',
+		value = true,
+		desc = 'Enable day/night cycle',
+	},		
+	beam = {
+		name = "Searchlight Beams",
+		type = 'bool',
+		value = true,
+		desc = 'Display searchlight beams',
+	},
+	bases = {
+		name = "Searchlight Bases",
+		type = 'list',
+		items = {
+			{ key = 'none', name = 'None', },
+			{ key = 'simple', name = 'Simple', },
+			{ key = 'full', name = 'Full', },
+		},
+		value = 'simple',
+	},
+}
 --------------------------------------------------------------------------------
 --config
 --------------------------------------------------------------------------------
@@ -266,10 +305,10 @@ local function DrawSearchlights()
 		  glBlending(GL_DST_COLOR, GL_ONE)
 		  glColor(currColorInverse)
 		  
-		  if (baseType == 2) then
+		  if (options.bases.value == "full") then
 			glDepthTest(true)
 			glBeginEnd(GL_TRIANGLE_FAN, ConeVertices, baseX, baseZ, radius, ecc, heading, cx, cy, cz, groundy)
-		  elseif (baseType == 1) then
+		  elseif (options.bases.value == "simple") then
 			glDepthTest(false)
 			glBeginEnd(GL_POLYGON, BaseVertices, baseX, baseZ, radius, ecc, heading)
 		  end
@@ -277,7 +316,7 @@ local function DrawSearchlights()
 		  --beam
 		  glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 		  
-		  if (drawBeam) then
+		  if (options.beam.value) then
 			glColor(searchlightBeamColor)
 			glDepthTest(true)
 			glBeginEnd(GL_TRIANGLE_FAN, BeamVertices, baseX, baseZ, radius, ecc, heading, px, py, pz)
@@ -355,20 +394,24 @@ function widget:Initialize()
       noLightList[unitDefID] = true
     end
   end
-  
+
+  --[[  
   widgetHandler:AddAction("night_preunit", TogglePreUnit, nil, "t")
   widgetHandler:AddAction("night_basetype", SetBaseType, nil, "t")
   widgetHandler:AddAction("night_beam", ToggleBeam, nil, "t")
   widgetHandler:AddAction("night_setsearchlight", SetSearchlightStrength, nil, "t")
   widgetHandler:AddAction("night_cycle", ToggleDayNightCycle, nil, "t")
+  ]]--
 end
 
 function widget:Shutdown()
+  --[[
   widgetHandler:RemoveAction("night_preunit")
   widgetHandler:RemoveAction("night_basetype")
   widgetHandler:RemoveAction("night_beam")
   widgetHandler:RemoveAction("night_setsearchlight")
   widgetHandler:RemoveAction("night_cycle")
+  ]]--
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)
@@ -380,7 +423,7 @@ function widget:Update(dt)
   local _, speedFactor, paused = GetGameSpeed()
   if (not paused) then
     searchlightBuildingAngle = searchlightBuildingAngle + dt * speedFactor
-    if (dayNightCycle) then
+    if (options.cycle.value) then
       currDayTime = currDayTime + dt * speedFactor / secondsPerDay
       currDayTime = currDayTime - math.floor(currDayTime)
       UpdateColors()
@@ -389,13 +432,13 @@ function widget:Update(dt)
 end
 
 function widget:DrawWorldPreUnit()
-  if (preUnit) then
+  if (options.coloredUnits.value) then
     DrawNight()
   end
 end
 
 function widget:DrawWorld()
-  if (not preUnit) then
+  if (not options.coloredUnits.value) then
     DrawNight()
   end
   if (searchlightStrength > 0 and math.abs(currDayTime - 0.5) > 0.25) then

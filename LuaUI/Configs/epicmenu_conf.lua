@@ -277,7 +277,7 @@ confdata.menu_tree = {
 			--]]
 		},
 	},
-	{'Video|These settings strongly affect the balance of quality of graphics vs. the speed of the gameplay', 
+	{'Video|These settings strongly affect the balance of quality of graphics vs. the framerate', 
 		{
 			{'Lups (Lua Particle System)'},
 			{'Toggle Lups', function() spSendCommands{'luaui togglewidget LupsManager'} end },	
@@ -378,6 +378,8 @@ confdata.menu_tree = {
 			--{'showshadowmap', function(self) spSendCommands{'showshadowmap'} end },
 			{'Effects|Graphical effects.',
 				{
+					{'Night View', function() spSendCommands{'luaui togglewidget Night'} end },
+					--[[
 					{'Night', 
 						{	
 							{'Toggles'},
@@ -392,6 +394,7 @@ confdata.menu_tree = {
 							{'Full', function() spSendCommands{'luaui night_basetype 2'} end },	
 						}
 					},
+					]]--
 					{'Toggle Camera Shake', function() spSendCommands{'luaui togglewidget CameraShake'} end },
 				}
 			},
