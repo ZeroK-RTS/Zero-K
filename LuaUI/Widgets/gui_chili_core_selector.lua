@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Core Selector",
-    desc      = "v0.35 Manage your boi, idle cons, and factories.",
+    desc      = "v0.36 Manage your boi, idle cons, and factories.",
     author    = "KingRaptor",
     date      = "2011-6-2",
     license   = "GNU GPL, v2 or later",
@@ -54,7 +54,7 @@ local screen0
 -------------------------------------------------------------------------------
 
 local window_selector, stack_main
-local commButton, conButton = {}, {}	-- {[button], [image], [healthbar/label]}
+local commButton, conButton = {}, {}	-- {button, image, healthbar/label}
 
 local echo = Spring.Echo
 
@@ -87,7 +87,7 @@ end
 
 -- list and interface vars
 local facsByID = {}	-- [unitID] = index of facs[]
-local facs = {}	-- [ordered index] = {[facID], [facDefID], [buildeeDefID], [repeat], [button], [image], [buildProgress]}
+local facs = {}	-- [ordered index] = {facID, facDefID, buildeeDefID, repeat, button, image, [buildProgress] = ProgressBar,}
 local comms = {}
 local currentComm	--unitID
 local commDefID = UnitDefNames.armcom1.id
@@ -96,7 +96,7 @@ local idleBuilderDefID = UnitDefNames.armrectr.id
 
 local gamestart = GetGameFrame() > 1
 local myTeamID = 0
-local commWarningTime		= 2*30 --gameframes
+local commWarningTime		= 2*30 -- gameframes
 local commWarningTimeLeft	= -1
 --local inTweak  = false
 --local leftTweak, enteredTweak = false, false
@@ -104,7 +104,8 @@ local commWarningTimeLeft	= -1
 --local cycle_2_s = 1
 
 -------------------------------------------------------------------------------
-local image_repeat    = LUAUI_DIRNAME .. 'Images/repeat.png'
+local image_repeat = LUAUI_DIRNAME .. 'Images/repeat.png'
+local buildIcon = "LuaUI/Images/idlecon.png" --LUAUI_DIRNAME .. 'Images/commands/Bold/build.png'
 
 local teamColors = {}
 local GetTeamColor = Spring.GetTeamColor or function (teamID)
@@ -387,7 +388,7 @@ local function UpdateCons()
 	-- get con type with highest number of idlers (as well as number of types total)
 	local prevTotal = idleCons.count
 	idleCons.count = nil
-	local maxDefID = idleBuilderDefID
+	--local maxDefID = idleBuilderDefID
 	local maxCount, total = 0, 0
 	local types = {}
 	for unitID in pairs(idleCons) do
@@ -396,18 +397,23 @@ local function UpdateCons()
 		total = total + 1
 	end
 	local numTypes = SetCount(types)
+	
+	-- this deprecated stuff is for making the button image change to reflect which con unit type has the most idlers
+	--[[
 	for defID, num in pairs(types) do
 		if num > maxCount then
 			maxDefID = defID
 			maxCount = num
 		end
 	end
+	]]--
 	
-	if (idleBuilderDefID ~= maxDefID or total == 0 or prevTotal == 0) then
-		conButton.image.file = 'LuaUI/Images/idlecon.png'
+	--if (idleBuilderDefID ~= maxDefID or total == 0 or prevTotal == 0) then
+	if (total == 0 or prevTotal == 0) then
+		--conButton.image.file = '#'..maxDefID
 		conButton.image.color = (total == 0 and imageColorDisabled) or nil
 		conButton.image:Invalidate()
-		idleBuilderDefID = maxDefID
+		--idleBuilderDefID = maxDefID
 	end
 	conButton.button.tooltip = "You have ".. total .. " idle con(s), of "..numTypes.." different type(s)."..
 								"\n\255\0\255\0Left-click: Select one and go to"..
@@ -672,11 +678,11 @@ function widget:Initialize()
 	}
 	conButton.image = Image:New {
 		parent = conButton.button,
-		width="90%";
-		height="90%";
-		x="5%";
-		y="5%";
-		file = '#'..idleBuilderDefID,
+		width="91%";
+		height="91%";
+		x="6%";
+		y="6%";
+		file = buildIcon,	--'#'..idleBuilderDefID,
 		--file2 = "bitmaps/icons/frame_cons.png",
 		keepAspect = false,
 		color = (total == 0 and imageColorDisabled) or nil,
