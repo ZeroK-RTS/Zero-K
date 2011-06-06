@@ -6,6 +6,10 @@ local dish2 = piece 'dish2'
 local dish3 = piece 'dish3' 
 local dish4 = piece 'dish4' 
 
+local bomberWeaponDefs = {
+	[WeaponDefNames["corshad_shield_check"].id] = true,
+}
+
 include "constants.lua"
 
 smokePiece = {base}
@@ -66,7 +70,9 @@ local function DefensiveManeuver()
 end
 
 function script.HitByWeapon(x, z, weaponDefID, damage)
-	StartThread(DefensiveManeuver)
+	if not bomberWeaponDefs[weaponDefID] then
+		StartThread(DefensiveManeuver)
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)
