@@ -1,4 +1,6 @@
 include 'constants.lua'
+include 'letsNotFailAtTrig.lua'
+
 -- by MergeNine
 
 -- shortcuts
@@ -27,10 +29,10 @@ local subpoint = piece "subpoint"
 local jetleft, jetright, jetrear = piece('jetleft', 'jetright', 'jetrear')
 
 local gunpoints = {
-	[1] = {aim = RightTurret, pitch = RightGun, fire = RightFlashPoint},
-	[2] = {aim = LeftTurret, pitch = LeftGun, fire = LeftFlashPoint},
+	[1] = {aim = RightTurretSeat, rot = RightTurret, pitch = RightGun, fire = RightFlashPoint},
+	[2] = {aim = LeftTurretSeat, rot = LeftTurret, pitch = LeftGun, fire = LeftFlashPoint},
 	[3] = {aim = subpoint, pitch = subpoint, fire = subpoint},
-	[4] = {aim = RearTurret, pitch = RearGun, fire = RearFlashPoint},
+	[4] = {aim = RearTurretSeat, rot = RearTurret, pitch = RearGun, fire = RearFlashPoint},
 	[5] = {aim = Base, pitch = Base, fire = Base},
 }
 
@@ -52,13 +54,9 @@ local attacking = 0
 
 --local blockAim = {false, false, false, false}
 
-local minPitch = {math.rad(35), math.rad(35), 0,  math.rad(20)}
-local headingMod = {math.rad(45), math.rad(-45), 0,  math.rad(180) }
-local pitchMod = {math.rad(-25), math.rad(-25), 0, math.rad(-15) }
+local turretSpeed = 8
 
-local turretSpeed = 5
-
-local tiltAngle = math.rad(30)
+--local tiltAngle = math.rad(30)
 local isLanded = true
 
 
@@ -81,19 +79,48 @@ function EmitDust()
   end
 end
 
+local function updateVectors(num)
+	Turn(gunpoints[num].rot,y_axis,0)
+	Turn(gunpoints[num].pitch,x_axis,0)
+	
+	Turn(gunpoints[num].pitch,x_axis,math.rad(-90))
+	local _, _, _, x, y, z = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
+	gunpoints[num].radial = hat({x, y, z})
+	
+	Turn(gunpoints[num].rot,y_axis,math.rad(90))
+	Turn(gunpoints[num].pitch,x_axis,math.rad(90))
+	local _, _, _, x, y, z = Spring.UnitScript.GetPiecePosDir(gunpoints[num].pitch)
+	gunpoints[num].right = hat({x, y, z})
+	
+	gunpoints[num].normal = cross(gunpoints[num].radial,gunpoints[num].right)
+end
 
-function script.Create()
+function script.Create()	
+	Turn(Base,y_axis, math.pi)	
+
+	Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"bankingAllowed",false)
+	--Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"turnRate",0)
+	
 	--set starting positions for turrets
-	Turn(RightTurretSeat,y_axis,math.rad(-45),100)
-	Turn(RightTurretSeat,x_axis,math.rad(17))	--15
-	Turn(RightTurretSeat,z_axis,math.rad(2)) -- -4
+	Turn(RightTurretSeat,x_axis,math.rad(17)) -- 17
+	Turn(RightTurretSeat,z_axis,math.rad(2)) -- 2
+	Turn(RightTurretSeat,y_axis,math.rad(-45)) -- -45
 	
-	Turn(LeftTurretSeat,y_axis,math.rad(45),100)
-	Turn(LeftTurretSeat,x_axis,math.rad(17)) --15
-	Turn(LeftTurretSeat,z_axis,math.rad(-2))-- 4
+	Turn(LeftTurretSeat,x_axis,math.rad(17)) -- 17
+	Turn(LeftTurretSeat,z_axis,math.rad(-2)) -- -2
+	Turn(LeftTurretSeat,y_axis,math.rad(45)) -- 45
 	
-	Turn(RearTurretSeat,y_axis,math.rad(180),100)
-	Turn(RearTurretSeat,x_axis,math.rad(14.5),100)
+	Turn(RearTurretSeat,y_axis,math.rad(180))
+	Turn(RearTurretSeat,x_axis,math.rad(14.5))
+	
+	updateVectors(1)
+	updateVectors(2)
+	updateVectors(4)
+	
+	-- idk why they must be swapped
+	gunpoints[1].normal,gunpoints[2].normal = gunpoints[2].normal,gunpoints[1].normal
+	gunpoints[1].radial,gunpoints[2].radial = gunpoints[2].radial,gunpoints[1].radial
+	gunpoints[1].right,gunpoints[2].right = gunpoints[2].right,gunpoints[1].right
 	
 	Turn(jetleft, x_axis, math.rad(90))
 	Turn(jetright, x_axis, math.rad(90))
@@ -105,6 +132,7 @@ function script.Create()
 	StartThread(EmitDust)
 end
 
+--[[
 function TiltBody(heading)
 	Signal( signals.tilt )
 	SetSignalMask( signals.tilt )	
@@ -113,21 +141,22 @@ function TiltBody(heading)
 			local amountz = -math.sin(heading)
 			local amountx = math.cos(heading)
 					
-			Turn(Base,x_axis, amountx * tiltAngle,1)							
-			Turn(Base,z_axis, amountz * tiltAngle,1)
+			--Turn(Base,x_axis, amountx * tiltAngle,1)							
+			--Turn(Base,z_axis, amountz * tiltAngle,1)
 			WaitForTurn ( Base , x_axis )
 			WaitForTurn ( Base , z_axis )
 		end
 		
 end
+--]]
 
 local function RestoreAfterDelay()
 	Sleep(restoreDelay)
 	attacking = false
-	Turn(Base,x_axis, math.rad(0),1) --default tilt
-	WaitForTurn ( Base , x_axis )
-	Turn(Base,z_axis, math.rad(0),1) --default tilt
-	WaitForTurn ( Base , z_axis )
+	--Turn(Base,x_axis, math.rad(0),1) --default tilt
+	--WaitForTurn ( Base , x_axis )
+	--Turn(Base,z_axis, math.rad(0),1) --default tilt
+	--WaitForTurn ( Base , z_axis )
 	--Signal( tiltSignal )
 end
 
@@ -158,22 +187,17 @@ function script.AimWeapon( num, heading, pitch )
 	Signal( signals[num] )
 	SetSignalMask( signals[num] )
 	attacking = true	
+
+	--StartThread(TiltBody, heading)	
 	
-	if (-pitch -math.rad(25) > minPitch[num]) then
-		--Spring.Echo("stop pitch " .. math.deg(-pitch) - 25)
-		return false
-	end
-	StartThread(TiltBody, heading)	
+	local theta, phi = getTheActuallyCorrectHeadingAndPitch(heading, pitch, gunpoints[num].normal, gunpoints[num].radial, gunpoints[num].right)
 	
-	Turn(gunpoints[num].aim, y_axis, heading + headingMod[num], turretSpeed)
-	WaitForTurn (gunpoints[num].aim , y_axis )
-	
-	Turn(gunpoints[num].pitch, x_axis, -pitch + pitchMod[num] ,turretSpeed)	
+	Turn(gunpoints[num].rot, y_axis, theta, turretSpeed)
+	Turn(gunpoints[num].pitch, x_axis, phi ,turretSpeed)	
 	WaitForTurn (gunpoints[num].pitch, x_axis ) 
-		
+	WaitForTurn (gunpoints[num].rot , y_axis )
+	
 	StartThread(RestoreAfterDelay)
-	--StartThread(ParticleBeam, num)
-	--return false
 	return true
 end
 

@@ -60,7 +60,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          	 = [[krow.s3o]],
   scale                  = [[1]],
-  script			     = [[krow.lua]],
+  script			     = [[corcrw.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
 
@@ -78,14 +78,16 @@ unitDef = {
   smoothAnim             = true,
   steeringmode           = [[1]],
   TEDClass               = [[VTOL]],
-  turnRate               = 297,
+  turnRate               = 250,
   upright                = true,
   workerTime             = 0,
-
+  
   weapons                = {
 
     {
       def                = [[KROWLASER]],
+	  mainDir            = [[-0.38 1 0]],
+	  maxAngleDif        = 250,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -93,6 +95,8 @@ unitDef = {
 
     {
       def                = [[KROWLASER]],
+	  mainDir            = [[0.38 1 0]],
+	  maxAngleDif        = 250,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -100,9 +104,10 @@ unitDef = {
     {
       def                = [[SINGULARITY]],
     },		
-
     {
       def                = [[KROWLASER]],
+	  mainDir            = [[0 1 0.38]],
+	  maxAngleDif        = 250,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -137,7 +142,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      range                   = 400,
+      range                   = 450,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],

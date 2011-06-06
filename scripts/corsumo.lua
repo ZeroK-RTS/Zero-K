@@ -1,6 +1,7 @@
 
 --by Chris Mackey
 include "smokeunit.lua"
+include 'letsNotFailAtTrig.lua'
 
 --pieces
 local b_dome = piece "b_dome"
@@ -51,10 +52,10 @@ local rb_foot = piece "rb_foot"
 local smokePieces = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
 
 local weaponPieces = {
-	[1] = {turret = b_eye, sleeve = b_eye, flare = b_eye, invert = 1},
-	[2] = {turret = l_turret, sleeve = l_pivot, flare = l_barrel, invert = 1},
-	[3] = {turret = r_turret, sleeve = r_pivot, flare = r_barrel, invert = -1},
-	[4] = {turret = b_eye, sleeve = b_eye, flare = b_eye, invert = 1}
+	[1] = {turret = b_eye, sleeve = b_eye, flare = b_eye},
+	[2] = {turret = l_turret, sleeve = l_pivot, flare = l_barrel, normal = {1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), -1/math.sqrt(2), 0} },
+	[3] = {turret = r_turret, sleeve = r_pivot, flare = r_barrel, normal = {-1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), 1/math.sqrt(2), 0}},
+	[4] = {turret = b_eye, sleeve = b_eye, flare = b_eye}
 }
 
 --constants
@@ -400,52 +401,22 @@ function script.AimFromWeapon(num) return
 	weaponPieces[num].turret 
 end
 
-local tau = math.pi*2
-local pi = math.pi
-local hpi = math.pi*0.5
-
-local function dot(v1, v2)
-	return v1[1]*v2[1] + v1[2]*v2[2] + v1[3]*v2[3]
-end
-
-local function add(v1, v2)
-	return {v1[1]+v2[1], v1[2]+v2[2], v1[3]+v2[3]}
-end
-
-local function modulus(v)
-	return math.sqrt(v[1]^2 + v[2]^2 + v[3]^2)
-end
-
-local function mult(s, v)
-	return {v[1]*s, v[2]*s, v[3]*s}
-end
-
 local normal = {0, 1/math.sqrt(2), 1/math.sqrt(2)}
 local radial = {1,0,0} 
 
 function script.AimWeapon(num, heading, pitch )
 	Signal( SIG_Aim[num] )
 	SetSignalMask( SIG_Aim[num])
-
-	local invert = weaponPieces[num].invert
 	
-	pitch = pitch*invert
-	local direction = {math.cos(heading)*math.cos(pitch), math.sin(heading)*math.cos(pitch), math.sin(pitch)}
-	local phi = hpi - math.acos(dot(direction,normal))
-	local orthagonal = add(direction,mult(-dot(direction,normal),normal))
-	local modOtho = modulus(orthagonal)
-	local theta = (modOtho > 0 and math.acos(dot(radial,orthagonal)/modOtho)) or hpi
-	
-	if direction[2] < direction[3] then
-		theta = -theta*weaponPieces[num].invert
-	else
-		theta = theta*weaponPieces[num].invert
+	if num == 2 or num == 3 then
+		local theta, phi = getTheActuallyCorrectHeadingAndPitch(heading, pitch, weaponPieces[num].normal, weaponPieces[num].radial, weaponPieces[num].right)
+		
+		Turn( weaponPieces[num].turret, y_axis, theta, 12 )
+		Turn( weaponPieces[num].sleeve,  x_axis, phi, 6 )
+		
+		WaitForTurn(weaponPieces[num].turret, y_axis)
+		WaitForTurn(weaponPieces[num].sleeve, x_axis)
 	end
-	
-	Turn( weaponPieces[num].turret, y_axis, theta*invert, 12 )
-	Turn( weaponPieces[num].sleeve,  x_axis, -phi*invert, 6 ) 
-	WaitForTurn(weaponPieces[num].turret, y_axis)
-	WaitForTurn(weaponPieces[num].sleeve, x_axis)
 	return true
 end
 
