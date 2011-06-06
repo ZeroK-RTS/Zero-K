@@ -3,12 +3,12 @@
 function widget:GetInfo()
   return {
     name      = "Chili Core Selector",
-    desc      = "v0.36 Manage your boi, idle cons, and factories.",
+    desc      = "v0.4 Manage your boi, idle cons, and factories.",
     author    = "KingRaptor",
     date      = "2011-6-2",
     license   = "GNU GPL, v2 or later",
     layer     = 1001,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
@@ -34,6 +34,7 @@ GreyStr    = "\255\210\210\210"
 GreenStr   = "\255\092\255\092"
 
 local buttonColor = {1, 1, 1, 1}
+local buttonColorFac = {0.6, 0.6, 0.6, 0.3}
 local buttonColorWarning = {1, 0.2, 0.1, 1}
 local buttonColorDisabled = {0.2,0.2,0.2,1}
 local imageColor = {1,1,1,1}
@@ -59,8 +60,8 @@ local commButton, conButton = {}, {}	-- {button, image, healthbar/label}
 local echo = Spring.Echo
 
 local BUTTON_WIDTH = 64
-local BUTTON_HEIGHT = 51
-local BASE_COLUMNS = 8
+local BUTTON_HEIGHT = 52
+local BASE_COLUMNS = 10
 local NUM_FAC_COLUMNS = BASE_COLUMNS - 2
 
 -------------------------------------------------------------------------------
@@ -88,7 +89,8 @@ end
 -- list and interface vars
 local facsByID = {}	-- [unitID] = index of facs[]
 local facs = {}	-- [ordered index] = {facID, facDefID, buildeeDefID, repeat, button, image, [buildProgress] = ProgressBar,}
-local comms = {}
+local commsByID = {} -- [unitID] = index of comms[]	
+local comms = {} -- [ordered index] = {commID, commDefID, warningTime, button, image, [healthbar] = ProgressBar,}
 local currentComm	--unitID
 local commDefID = UnitDefNames.armcom1.id
 local idleCons = {}	-- [unitID] = true
@@ -97,7 +99,7 @@ local idleBuilderDefID = UnitDefNames.armrectr.id
 local gamestart = GetGameFrame() > 1
 local myTeamID = 0
 local commWarningTime		= 2*30 -- gameframes
-local commWarningTimeLeft	= -1
+--local commWarningTimeLeft	= -1
 --local inTweak  = false
 --local leftTweak, enteredTweak = false, false
 --local cycle_half_s = 1
@@ -128,12 +130,18 @@ end
 
 -------------------------------------------------------------------------------
 
-local function SetCount(set)
-  local count = 0
-  for k in pairs(set) do
-    count = count + 1
-  end
-  return count
+local function SetCount(set, numOnly)
+	local count = 0
+	if numOnly then
+		for k in ipairs(set) do
+			count = count + 1
+		end
+	else
+		for k in pairs(set) do
+			count = count + 1
+		end	
+	end
+	return count
 end
 
 local function GetHealthColor(fraction, returnType)
@@ -208,11 +216,15 @@ local function UpdateFac(unitID, index)
 	end
 end
 
-local function GenerateFacButton(i, unitID, unitDefID)
-	facs[i].button = Button:New{
-		name = "facbutton_"..i,
+-- makes fac and comm buttons
+local function GenerateButton(array, i, unitID, unitDefID)
+	local pos = i
+	if array == facs then
+		 pos = pos + SetCount(comms, true)
+	end
+	array[i].button = Button:New{
 		parent = stack_main;
-		x = (i+1)*(100/BASE_COLUMNS).."%",
+		x = (pos)*(100/BASE_COLUMNS).."%",
 		y = 0,
 		width = (100/BASE_COLUMNS).."%",
 		height = "100%",
@@ -227,46 +239,59 @@ local function GenerateFacButton(i, unitID, unitDefID)
 			end},
 		padding = {1,1,1,1},
 		--keepAspect = true,
-		backgroundColor = {0.6, 0.6, 0.6, 0.3}
+		backgroundColor = (array == facs and buttonColorFac) or buttonColor,
 	}
-	facs[i].image = Image:New {
-		parent = facs[i].button,
+	array[i].image = Image:New {
+		parent = array[i].button,
 		width="91%";
 		height="91%";
 		x="5%";
 		y="5%";
-		file = '#'..(facs[i].buildeeDefID or unitDefID),
-		file2 = "bitmaps/icons/frame_cons.png",
+		file = '#'..((array == facs and array[i].buildeeDefID) or unitDefID),
+		file2 = (array == facs) and "bitmaps/icons/frame_cons.png",
 		keepAspect = false,
 	}
-	facs[i].buildProgress = Progressbar:New{
-		parent = facs[i].image,
-		width = "85%",
-		height = "85%",
-		x = "8%",
-		y = "8%",
-		max     = 1;
-		caption = "";
-		color = {0.7, 0.7, 0.4, 0.6},
-		backgroundColor = {1, 1, 1, 0.01},
-		skin=nil,
-		skinName='default',		
-	}
-	facs[i].repeatImage = Image:New {
-		width="40%";
-		height="40%";
-		x="55%";
-		y="10%";
-		file = image_repeat,
-		keepAspect = true,
-	}
+	if array == facs then
+		array[i].buildProgress = Progressbar:New{
+			parent = array[i].image,
+			width = "85%",
+			height = "85%",
+			x = "8%",
+			y = "8%",
+			max     = 1;
+			caption = "";
+			color = {0.7, 0.7, 0.4, 0.6},
+			backgroundColor = {1, 1, 1, 0.01},
+			skin=nil,
+			skinName='default',		
+		}	
+		array[i].repeatImage = Image:New {
+			width="40%";
+			height="40%";
+			x="55%";
+			y="10%";
+			file = image_repeat,
+			keepAspect = true,
+		}
+	elseif array == comms then
+		array[i].healthbar = Progressbar:New{
+			parent  = array[i].image,
+			x		= 0,
+			width   = "100%";
+			height	= "15%",
+			y = "85%",
+			max     = 1;
+			caption = "";
+			color   = {0,0.8,0,1};
+		}	
+	end
 end
 
 --shifts facs when one of their kind is removed
 local function ShiftFacRow()
 	for i in ipairs(facs) do
 		facs[i].button:Dispose()
-		GenerateFacButton(i, facs[i].facID, facs[i].facDefID)
+		GenerateButton(facs, i, facs[i].facID, facs[i].facDefID)
 		UpdateFac(facs[i].facID, i)
 	end
 end
@@ -274,7 +299,7 @@ end
 local function AddFac(unitID, unitDefID)
 	local i = #facs + 1
 	facs[i] = {facID = unitID, facDefID = unitDefID}
-	GenerateFacButton(i, unitID, unitDefID)
+	GenerateButton(facs, i, unitID, unitDefID)
 	facsByID[unitID] = i
 	UpdateFac(unitID, i)
 end
@@ -297,6 +322,7 @@ local function RemoveFac(unitID)
 	end
 end
 
+--[[	--used by old "one comm button" system
 local function UpdateCommButton()
 	local commDefID = currentComm and GetUnitDefID(currentComm) or commDefID
 	commButton.image = Image:New {
@@ -317,8 +343,10 @@ local function UpdateCommButton()
 	commButton.button.backgroundColor = (currentComm and buttonColor) or buttonColorDisabled
 	commButton.button:Invalidate()
 end
+]]--
 
-local function UpdateComm()	-- just health
+local function UpdateComm(unitID, index)
+	--[[
 	if not currentComm then
 		if gamestart then
 			commButton.button.tooltip = "Your commander is dead...sorry..."
@@ -327,6 +355,7 @@ local function UpdateComm()	-- just health
 		end
 		return
 	end
+	
 	local health, maxHealth = GetUnitHealth(currentComm)
 	commButton.healthbar:SetValue(health/maxHealth)
 	commButton.healthbar.color = GetHealthColor(health/maxHealth)
@@ -337,25 +366,65 @@ local function UpdateComm()	-- just health
 								"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
 								"\n\255\0\255\0Left-click: Select and go to"..
 								"\nRight-click: Cycle commander (if available)\008"
+	]]--
+	local health, maxHealth = GetUnitHealth(unitID)
+	comms[index].healthbar:SetValue(health/maxHealth)
+	comms[index].healthbar.color = GetHealthColor(health/maxHealth)
+	comms[index].healthbar:Invalidate()
+	
+	comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
+								"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
+								"\n\255\0\255\0Left-click: Select and go to"..
+								"\nRight-click: Select\008"	
 end
 
+--[[
 local function UpdateCommFull()	-- regenerates image etc.
 	commButton.image:Dispose()
 	UpdateCommButton()
 	UpdateComm()
 end
+]]--
 
 local function AddComm(unitID, unitDefID)
-	comms[unitID] = true
-	if not currentComm then
-		currentComm = unitID
-		commDefID = unitDefID
-		UpdateCommFull()
+	local i = #comms + 1
+	comms[i] = {commID = unitID, commDefID = unitDefID, warningTime = -1}
+	GenerateButton(comms, i, unitID, unitDefID)
+	commsByID[unitID] = i
+	UpdateComm(unitID, i)
+	ShiftFacRow()
+end
+
+local function ShiftCommRow()
+	for i in ipairs(comms) do
+		comms[i].button:Dispose()
+		GenerateButton(comms, i, comms[i].commID, comms[i].commDefID)
+		UpdateComm(comms[i].commID, i)
 	end
 end
 
+local function RemoveComm(unitID, unitDefID)
+	local index = commsByID[unitID]
+	comms[index].button:Dispose()
+	local shift = false
+	-- move everything to the left
+	table.remove(comms, index)
+	for commID,i in pairs(commsByID) do
+		if i > index then
+			commsByID[commID] = i - 1
+			shift = true
+		end
+	end
+	comms[unitID] = nil
+	if shift then
+		ShiftCommRow()
+	end
+	ShiftFacRow()
+end
+
+--[[
 local function CycleComm()
-	if SetCount(comms) == 0 then
+	if SetCount(commsByID) == 0 then
 		return
 	end
 	local newComm
@@ -364,7 +433,7 @@ local function CycleComm()
 	
 	-- ipairs breaks for some inane reason
 	-- thankfully pairs preserves a constant order as long as the table remains constant, so we can use it
-	for unitID in pairs(comms) do	
+	for unitID in pairs(commsByID) do	
 		local i = #commsOrdered+1
 		commsOrdered[i] = unitID
 		if unitID == currentComm then
@@ -383,6 +452,7 @@ local function CycleComm()
 	
 	currentComm = newComm
 end
+]]--
 
 local function UpdateCons()
 	-- get con type with highest number of idlers (as well as number of types total)
@@ -502,15 +572,8 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	idleCons[unitID] = nil  
 	if facsByID[unitID] then
 		RemoveFac(unitID)
-	elseif comms[unitID] then
-		comms[unitID] = nil
-		if unitID == currentComm then
-			commWarningTimeLeft = -1
-			commButton.healthbar:SetValue(0)
-			currentComm = nil
-			CycleComm()
-			UpdateCommFull()
-		end
+	elseif commsByID[unitID] then
+		RemoveComm(unitID)
 	end
 end
 
@@ -529,33 +592,43 @@ function widget:Update(dt)
 	if timer < UPDATE_FREQUENCY then
 		return
 	end	
-	UpdateComm()
 	for i=1,#facs do
 		UpdateFac(facs[i].facID, i)
 	end
+	for i=1,#comms do
+		UpdateComm(comms[i].commID, i)
+	end	
 	warningColorPhase = not warningColorPhase
 	timer = 0
 end
 
 -- for "under attack" achtung sign
 function widget:UnitDamaged(unitID, unitDefID, unitTeam)
-	if unitID == currentComm then
-		commWarningTimeLeft = commWarningTime
+	if commsByID[unitID] then
+		comms[commsByID[unitID]].warningTime = commWarningTime
 	end
 end
 function widget:DrawScreen()
-	if commWarningTimeLeft > 0 then
-		commButton.button.backgroundColor = (warningColorPhase and buttonColorWarning) or buttonColor
-		commButton.button:Invalidate()
+	for i=1,#comms do
+		local comm = comms[i]
+		if comm.warningTime > 0 then
+			comms[i].button.backgroundColor = (warningColorPhase and buttonColorWarning) or buttonColor
+			comms[i].button:Invalidate()
+		end
 	end
 end
 
 function widget:GameFrame(n)
-	if (n%10 < 0.1) and commWarningTimeLeft > 0 then
-		commWarningTimeLeft = commWarningTimeLeft - 10
-		if (commWarningTimeLeft <= 0) and currentComm then
-			commButton.button.backgroundColor = buttonColor
-			commButton.button:Invalidate()
+	if (n%10 < 0.1) then
+		for i = 1, #comms do
+			local comm = comms[i]
+			if comm.warningTime > 0 then
+				comm.warningTime = comm.warningTime - 10
+				if (comm.warningTime <= 0) then
+					comms[i].button.backgroundColor = buttonColor
+					comms[i].button:Invalidate()
+				end
+			end
 		end
 	end
 end
@@ -574,8 +647,6 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdOpts, cmdPara
 		UpdateCons()
 	end
 end
-
-
 
 
 -------------------------------------------------------------------------------
@@ -613,8 +684,8 @@ function widget:Initialize()
 		itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "selector_window",
-		x = 0, 
-		y = "30%",
+		x = 450,	-- integral width 
+		bottom = 0,
 		width  = BUTTON_WIDTH * BASE_COLUMNS,
 		height = BUTTON_HEIGHT,
 		parent = Chili.Screen0,
@@ -629,6 +700,9 @@ function widget:Initialize()
 			stack_main,
 		},
 	}
+
+	-- for old single comm button system; deprecated
+	--[[
 	commButton.button = Button:New{
 		parent = stack_main;
 		width = (100/BASE_COLUMNS).."%",
@@ -659,10 +733,11 @@ function widget:Initialize()
 		color   = {0,0.8,0,1};
 	}	
 	UpdateCommButton()
+	]]--
 
 	conButton.button = Button:New{
 		parent = stack_main;
-		x = (100/BASE_COLUMNS).."%",
+		x = 0,
 		width = (100/BASE_COLUMNS).."%",
 		caption = '',
 		OnMouseDown = {	function () 
