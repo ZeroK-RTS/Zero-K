@@ -180,17 +180,17 @@ unitDef = {
       areaOfEffect            = 0,
 	  avoidFeature            = false,
       avoidFriendly           = false,
+      collideFeature          = false,
 	  collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 1E-06,
+        default = -1E-06,
       },
 
 	  explosionGenerator      = [[custom:NONE]],
       flightTime              = 2,
-      guidance                = true,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
@@ -198,7 +198,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 850,
       reloadtime              = 2,
-      renderType              = 0,
       rgbColor                = [[0.5 1 1]],
       size                    = 1E-06,
 	  startVelocity           = 2000,

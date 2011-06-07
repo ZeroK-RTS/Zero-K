@@ -138,7 +138,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitNoDraw(unitID, true)
 		Spring.SetUnitNoSelect(unitID, true)
 		Spring.SetUnitNoMinimap(unitID, true)
-
 		return
 	end
 
@@ -156,7 +155,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		--Spring.SetUnitHealth(unitID, maxHealth-1)	-- can't be full health; else if you stop the construction you can't resume it!
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
-		Spring.SpawnCEG("teleport_huge", x, y, z)
+		Spring.SpawnCEG("gate", x, y, z)
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
 		--facplopsrunning[unitID] = true
 		CheckForShutdown()
