@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Core Selector",
-    desc      = "v0.4 Manage your boi, idle cons, and factories.",
+    desc      = "v0.5 Manage your boi, idle cons, and factories.",
     author    = "KingRaptor",
     date      = "2011-6-2",
     license   = "GNU GPL, v2 or later",
@@ -24,6 +24,9 @@ local GetFullBuildQueue = Spring.GetFullBuildQueue
 local GetUnitIsBuilding = Spring.GetUnitIsBuilding
 local GetGameSeconds	= Spring.GetGameSeconds
 local GetGameFrame 		= Spring.GetGameFrame
+local GetMouseState		= Spring.GetMouseState
+local GetModKeyState	= Spring.GetModKeyState
+local SelectUnitArray	= Spring.SelectUnitArray
 
 local push        = table.insert
 
@@ -143,6 +146,16 @@ local function SetCount(set, numOnly)
 	return count
 end
 
+local function CountButtons(set)
+	local count = 0
+	for _,data in pairs(set) do
+		if data.button then
+			count = count + 1
+		end
+	end
+	return count
+end
+
 local function GetHealthColor(fraction, returnType)
 	local midpt = (fraction > .5)
 	local r, g
@@ -163,6 +176,9 @@ end
 -- core functions
 
 local function UpdateFac(unitID, index)
+	if not facs[index].button then
+		return
+	end
 	local progress
 	local buildeeDefID
 	local buildeeID = GetUnitIsBuilding(unitID)
@@ -203,8 +219,9 @@ local function UpdateFac(unitID, index)
 		tooltip = tooltip .. "\nCurrent project: "..buildeeDef.humanName.." ("..math.floor(progress*100).."% done)"
 	end
 	facs[index].button.tooltip = tooltip .. "\n\255\0\255\0Left-click: Select and go to"..
-										"\nRight-click: Select\008"
-	
+										"\nRight-click: Select"..
+										"\nShift: Append to current selection\008"
+										
 	-- change image if needed
 	if buildeeDefID and (buildeeDefID~= facs[index].buildeeDefID) then
 		facs[index].image.file = '#'..buildeeDefID
@@ -219,9 +236,14 @@ end
 
 -- makes fac and comm buttons
 local function GenerateButton(array, i, unitID, unitDefID)
+	-- don't display surplus buttons
+	if CountButtons(comms) + (array == facs and CountButtons(facs) or 0) > BASE_COLUMNS - 1 then
+		return
+	end
+	
 	local pos = i
 	if array == facs then
-		 pos = pos + SetCount(comms, true)
+		pos = pos + CountButtons(comms)
 	end
 	array[i].button = Button:New{
 		parent = stack_main;
@@ -231,8 +253,9 @@ local function GenerateButton(array, i, unitID, unitDefID)
 		height = "100%",
 		caption = '',
 		OnMouseDown = {	function () 
-				local _,_,left,_,right = Spring.GetMouseState()
-				Spring.SelectUnitArray({unitID}, false)
+				local _,_,left,_,right = GetMouseState()
+				local shift = select(4, GetModKeyState())
+				SelectUnitArray({unitID}, shift)
 				if left then
 					local x, y, z = Spring.GetUnitPosition(unitID)
 					Spring.SetCameraTarget(x, y, z)
@@ -291,10 +314,15 @@ end
 --shifts facs when one of their kind is removed
 local function ShiftFacRow()
 	for i in ipairs(facs) do
-		facs[i].button:Dispose()
+		if facs[i].button then
+			facs[i].button:Dispose()
+			facs[i].button = nil
+		end
+	end
+	for i in ipairs(facs) do
 		GenerateButton(facs, i, facs[i].facID, facs[i].facDefID)
 		UpdateFac(facs[i].facID, i)
-	end
+	end	
 end
 
 local function AddFac(unitID, unitDefID)
@@ -307,9 +335,12 @@ end
 
 local function RemoveFac(unitID)
 	local index = facsByID[unitID]
-	facs[index].button:Dispose()
 	-- move everything to the left
 	local shift = false
+	if facs[index].button then
+		facs[index].button:Dispose()
+		facs[index].button = nil
+	end		
 	table.remove(facs, index)
 	for facID,i in pairs(facsByID) do
 		if i > index then
@@ -317,7 +348,7 @@ local function RemoveFac(unitID)
 			shift = true
 		end
 	end
-	facs[unitID] = nil
+	facsByID[unitID] = nil
 	if shift then
 		ShiftFacRow()
 	end
@@ -347,6 +378,9 @@ end
 ]]--
 
 local function UpdateComm(unitID, index)
+	if not comms[index].button then
+		return
+	end
 	--[[
 	if not currentComm then
 		if gamestart then
@@ -369,6 +403,9 @@ local function UpdateComm(unitID, index)
 								"\nRight-click: Cycle commander (if available)\008"
 	]]--
 	local health, maxHealth = GetUnitHealth(unitID)
+	if not health then
+		return
+	end
 	comms[index].healthbar:SetValue(health/maxHealth)
 	comms[index].healthbar.color = GetHealthColor(health/maxHealth)
 	comms[index].healthbar:Invalidate()
@@ -376,7 +413,8 @@ local function UpdateComm(unitID, index)
 	comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
 								"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
 								"\n\255\0\255\0Left-click: Select and go to"..
-								"\nRight-click: Select\008"	
+								"\nRight-click: Select"..
+								"\nShift: Append to current selection\008"	
 end
 
 --[[
@@ -398,28 +436,32 @@ end
 
 local function ShiftCommRow()
 	for i in ipairs(comms) do
-		comms[i].button:Dispose()
+		if comms[i].button then
+			comms[i].button:Dispose()
+			comms[i].button = nil
+		end
+	end
+	for i in ipairs(comms) do
 		GenerateButton(comms, i, comms[i].commID, comms[i].commDefID)
 		UpdateComm(comms[i].commID, i)
-	end
+	end	
 end
 
 local function RemoveComm(unitID, unitDefID)
 	local index = commsByID[unitID]
-	comms[index].button:Dispose()
-	local shift = false
 	-- move everything to the left
+	if comms[index].button then
+		comms[index].button:Dispose()
+		comms[index].button = nil
+	end		
 	table.remove(comms, index)
 	for commID,i in pairs(commsByID) do
 		if i > index then
 			commsByID[commID] = i - 1
-			shift = true
 		end
 	end
-	comms[unitID] = nil
-	if shift then
-		ShiftCommRow()
-	end
+	commsByID[unitID] = nil
+	ShiftCommRow()
 	ShiftFacRow()
 end
 
@@ -615,7 +657,7 @@ end
 function widget:DrawScreen()
 	for i=1,#comms do
 		local comm = comms[i]
-		if comm.warningTime > 0 then
+		if comm.button and comm.warningTime > 0 then
 			comms[i].button.backgroundColor = (warningColorPhase and buttonColorWarning) or buttonColor
 			comms[i].button:Invalidate()
 		end
@@ -626,7 +668,7 @@ function widget:GameFrame(n)
 	if (n%10 < 0.1) then
 		for i = 1, #comms do
 			local comm = comms[i]
-			if comm.warningTime > 0 then
+			if comm.button and comm.warningTime > 0 then
 				comm.warningTime = comm.warningTime - 10
 				if (comm.warningTime <= 0) then
 					comms[i].button.backgroundColor = buttonColor
