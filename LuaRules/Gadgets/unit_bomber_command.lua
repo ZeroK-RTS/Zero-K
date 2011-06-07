@@ -429,6 +429,8 @@ local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spGetLocalTeamID = Spring.GetLocalTeamID
 local spAreTeamsAllied = Spring.AreTeamsAllied
+local spGetSpectatingState = Spring.GetSpectatingState
+local spValidUnitID = Spring.ValidUnitID
 
 function gadget:DefaultCommand(type, targetID)
 	if (type == 'unit') then
@@ -470,13 +472,14 @@ end
 function gadget:DrawWorld()
 	if Spring.IsGUIHidden() then return end
 	local myAllyID = Spring.GetMyAllyTeamID()
+	local isSpec, fullView = spGetSpectatingState()
 
 	gl.Texture(noAmmoTexture)	
 	gl.Color(1,1,1,1)
 	local units = Spring.GetVisibleUnits()
 	for i=1,#units do
 		local id = units[i]
-		if Spring.ValidUnitID(id) and spGetUnitDefID(id) and spGetUnitRulesParam(id, "noammo") == 1 and spGetUnitAllyTeam(id) == myAllyID then
+		if spValidUnitID(id) and spGetUnitDefID(id) and spGetUnitRulesParam(id, "noammo") == 1 and ((isSpec and fullView) or spGetUnitAllyTeam(id) == myAllyID) then
 			gl.DrawFuncAtUnit(id, false, DrawUnitFunc, UnitDefs[spGetUnitDefID(id)].height + 30)
 		end
 	end
