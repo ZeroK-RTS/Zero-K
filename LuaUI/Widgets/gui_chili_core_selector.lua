@@ -55,14 +55,15 @@ local screen0
 -------------------------------------------------------------------------------
 
 local window_selector, stack_main
-local commButton, conButton = {}, {}	-- {button, image, healthbar/label}
+local conButton = {}	-- {button, image, healthbar/label}
+local commButton = {}	-- unused
 
 local echo = Spring.Echo
 
 local BUTTON_WIDTH = 64
 local BUTTON_HEIGHT = 52
 local BASE_COLUMNS = 10
-local NUM_FAC_COLUMNS = BASE_COLUMNS - 2
+local NUM_FAC_COLUMNS = BASE_COLUMNS - 1	-- unused
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -88,7 +89,7 @@ end
 
 -- list and interface vars
 local facsByID = {}	-- [unitID] = index of facs[]
-local facs = {}	-- [ordered index] = {facID, facDefID, buildeeDefID, repeat, button, image, [buildProgress] = ProgressBar,}
+local facs = {}	-- [ordered index] = {facID, facDefID, buildeeDefID, ["repeat"] = boolean, button, image, repeatImage, ["buildProgress"] = ProgressBar,}
 local commsByID = {} -- [unitID] = index of comms[]	
 local comms = {} -- [ordered index] = {commID, commDefID, warningTime, button, image, [healthbar] = ProgressBar,}
 local currentComm	--unitID
@@ -96,18 +97,15 @@ local commDefID = UnitDefNames.armcom1.id
 local idleCons = {}	-- [unitID] = true
 local idleBuilderDefID = UnitDefNames.armrectr.id
 
-local gamestart = GetGameFrame() > 1
+--local gamestart = GetGameFrame() > 1
 local myTeamID = 0
-local commWarningTime		= 2*30 -- gameframes
+local commWarningTime		= 2*30 -- how long to flash button frame, gameframes
 --local commWarningTimeLeft	= -1
---local inTweak  = false
---local leftTweak, enteredTweak = false, false
---local cycle_half_s = 1
---local cycle_2_s = 1
 
 -------------------------------------------------------------------------------
 local image_repeat = LUAUI_DIRNAME .. 'Images/repeat.png'
-local buildIcon = "LuaUI/Images/idlecon.png" --LUAUI_DIRNAME .. 'Images/commands/Bold/build.png'
+local buildIcon = LUAUI_DIRNAME .. 'Images/idlecon.png' --LUAUI_DIRNAME .. 'Images/commands/Bold/build.png'
+local buildIcon_bw = LUAUI_DIRNAME .. 'Images/idlecon_bw.png'
 
 local teamColors = {}
 local GetTeamColor = Spring.GetTeamColor or function (teamID)
@@ -129,6 +127,7 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 -------------------------------------------------------------------------------
+-- helper funcs
 
 local function SetCount(set, numOnly)
 	local count = 0
@@ -161,6 +160,8 @@ local function GetHealthColor(fraction, returnType)
 end
 
 -------------------------------------------------------------------------------
+-- core functions
+
 local function UpdateFac(unitID, index)
 	local progress
 	local buildeeDefID
@@ -481,6 +482,7 @@ local function UpdateCons()
 	--if (idleBuilderDefID ~= maxDefID or total == 0 or prevTotal == 0) then
 	if (total == 0 or prevTotal == 0) then
 		--conButton.image.file = '#'..maxDefID
+		conButton.image.file = (total > 0 and buildIcon) or buildIcon_bw
 		conButton.image.color = (total == 0 and imageColorDisabled) or nil
 		conButton.image:Invalidate()
 		--idleBuilderDefID = maxDefID
@@ -526,9 +528,11 @@ end
 -------------------------------------------------------------------------------
 -- engine funcs
 
+--[[
 function widget:GameStart()
 	gamestart = true
 end
+]]--
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (unitTeam ~= myTeamID) then

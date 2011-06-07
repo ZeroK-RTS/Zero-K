@@ -5,7 +5,7 @@
 return {
   ["hovers_on_ground"] = {
     clouds0 = {
-      air                = true,
+      air                = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
@@ -36,7 +36,7 @@ return {
 
   ["heavyhovers_on_ground"] = {
     clouds0 = {
-      air                = true,
+      air                = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
@@ -67,7 +67,7 @@ return {
 
   ["transport_hovers_on_ground"] = {
     clouds0 = {
-      air                = true,
+      air                = false,
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
