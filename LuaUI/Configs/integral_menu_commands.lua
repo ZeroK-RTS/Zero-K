@@ -203,6 +203,11 @@ local overrides = {
 	
 	[CMD_JUMP] = {text = ' ', texture = imageDir .. 'Bold/jump.png'},	
 	
+	[CMD_FIND_PAD] = {text = ' ', texture = imageDir .. 'Bold/rearm.png'},
+	
+	[CMD_EMBARK] = {text = ' ', texture = imageDir .. 'Bold/embark.png'},	
+	[CMD_DISEMBARK] = {text = ' ', texture = imageDir .. 'Bold/disembark.png'},
+	
 	-- states
 	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, text=''},
 	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, text=''},
@@ -266,6 +271,9 @@ local custom_cmd_actions = {
 	cloak_shield=1,
 	mine=1,
 	jump=1,
+	find_pad=1,
+	embark=1,
+	disembark=1,
 	
 	-- terraform
 	rampground=1,
