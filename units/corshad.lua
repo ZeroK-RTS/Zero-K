@@ -178,6 +178,9 @@ unitDef = {
 	SHIELD_CHECK = {
       name                    = [[Fake Poker For Shields]],
       areaOfEffect            = 0,
+	  avoidFeature            = false,
+      avoidFriendly           = false,
+	  collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 

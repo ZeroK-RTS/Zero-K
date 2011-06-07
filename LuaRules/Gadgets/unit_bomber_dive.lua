@@ -56,7 +56,8 @@ end
 GG.Bomber_Dive_fired = Bomber_Dive_fired
 
 function Bomber_Dive_fake_fired(unitID)
-	if unitID and Spring.ValidUnitID(unitID) and bombers[unitID] and bombers[unitID].diveState == 2 then 
+	if unitID and Spring.ValidUnitID(unitID) and bombers[unitID] and bombers[unitID].diveState == 2 
+			and ((not Spring.GetUnitRulesParam(unitID, "noammo")) or Spring.GetUnitRulesParam(unitID, "noammo") ~= 1) then 
 		temporaryDive(unitID, 150)
 	end
 end
@@ -68,7 +69,8 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 		if proOwnerID and Spring.ValidUnitID(proOwnerID) and bombers[proOwnerID] and bombers[proOwnerID].diveState == 1 then
 			if shieldCarrierUnitID and Spring.ValidUnitID(shieldCarrierUnitID) and shieldEmitterWeaponNum then
 				local wid = UnitDefs[Spring.GetUnitDefID(shieldCarrierUnitID)].weapons[shieldEmitterWeaponNum+1].weaponDef
-				if WeaponDefs[wid] and WeaponDefs[wid].shieldPower >= bombers[proOwnerID].diveDamage then
+				if WeaponDefs[wid] and WeaponDefs[wid].shieldPower >= bombers[proOwnerID].diveDamage 
+						and ((not Spring.GetUnitRulesParam(proOwnerID, "noammo")) or Spring.GetUnitRulesParam(proOwnerID, "noammo") ~= 1) then
 					temporaryDive(proOwnerID, 150)
 				end
 			end
@@ -79,7 +81,7 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if weaponID and bomberWeaponDefs[weaponID] then
-		return -0.0001
+		return 0
 	end
 end
 
@@ -113,6 +115,8 @@ local function ToggleDiveCommand(unitID, cmdParams, cmdOptions)
 			Spring.MoveCtrl.SetAirMoveTypeData(unitID, "wantedHeight", bombers[unitID].diveHeight)
 			bombers[unitID].resetTime = false
 		elseif state == 0 then
+			Spring.MoveCtrl.SetAirMoveTypeData(unitID, "wantedHeight", bombers[unitID].orgHeight)
+		elseif bombers[unitID].resetTime == false then
 			Spring.MoveCtrl.SetAirMoveTypeData(unitID, "wantedHeight", bombers[unitID].orgHeight)
 		end
 	end
