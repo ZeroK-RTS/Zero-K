@@ -281,6 +281,7 @@ upgrades = {
 							v.customparams.areadamage_preset = [[module_napalmgrenade]]
 							v.customparams.burntime = "180"
 							v.explosiongenerator = [[custom:firewalkernapalm]]
+							v.soundstart = [[weapon/cannon/wolverine_fire]]
 							v.soundhit = [[weapon/cannon/wolverine_hit]]
 							v.size = 8
 							v.areaofeffect = 256

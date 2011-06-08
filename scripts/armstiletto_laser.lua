@@ -66,7 +66,7 @@ function script.FireWeapon1()
 		return
 	end
 	Sleep( 1300) -- Delay before fire. For a burst 2, bursttime 5 bogus bomb, the target point is reached at about 2300.
-	for i = 1, 120 do
+	for i = 1, 80 do
 		local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
 		local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
 		local bx, by, bz = Spring.GetUnitPiecePosDir(unitID,base)
