@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Radial Build Menu",
-    desc      = "v0.091 Radial Build Menu",
+    desc      = "v0.092 Radial Build Menu",
     author    = "CarRepairer",
     date      = "2010-09-15",
     license   = "GNU GPL, v2 or later",
@@ -417,7 +417,7 @@ function widget:Initialize()
 		tweakDraggable = true,
 		resizable = false,
 		tweakResizable = true,
-		dragUseGrip = true,
+		dragUseGrip = false,
 		fixedRatio = true,
 		children = {
 			grid_menu,

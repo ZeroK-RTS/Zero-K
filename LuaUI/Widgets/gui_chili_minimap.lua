@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.861 Chili Minimap",
+    desc      = "v0.862 Chili Minimap",
     author    = "Licho, tweaked by CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -167,7 +167,7 @@ MakeMinimapWindow = function()
 		tweakDraggable = true,
 		resizable = true,
 		fixedRatio = options.use_map_ratio.value,
-		dragUseGrip = true,
+		dragUseGrip = false,
 		minimumSize = {iconsize*9,50},
 		children = {
 			
