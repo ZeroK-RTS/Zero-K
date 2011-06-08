@@ -1,8 +1,8 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.862 Chili Minimap",
-    author    = "Licho, tweaked by CarRepairer",
+    desc      = "v0.87 Chili Minimap",
+    author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
     layer     = -100000,
@@ -81,6 +81,12 @@ options = {
 		desc = 'Shows concentration of metal',
 		type = 'button',
 		action = 'showmetalmap',
+	},
+	
+	lastmsgpos = {
+		name = 'Last Message Position',
+		type = 'button',
+		action = 'lastmsgpos',
 	},
 	
 	lblLos = { type = 'label', name = 'Line of Sight', },
@@ -168,18 +174,19 @@ MakeMinimapWindow = function()
 		resizable = true,
 		fixedRatio = options.use_map_ratio.value,
 		dragUseGrip = false,
-		minimumSize = {iconsize*9,50},
+		minimumSize = {iconsize*10,50},
 		children = {
 			
 --			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			
 			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}},
 			
-			MakeMinimapButton( 'LuaUI/images/map/standard.png', 1, 'viewstandard' ),
-			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 2, 'viewheightmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 3, 'viewblockmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 4, 'viewmetalmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/radar.png', 6, 'viewradar' ),
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow' ),
+			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 1, 'lastmsgpos' ),
+			MakeMinimapButton( 'LuaUI/images/map/standard.png', 3, 'viewstandard' ),
+			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 4, 'viewheightmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 5, 'viewblockmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 6, 'viewmetalmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/radar.png', 8, 'viewradar' ),
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 9, 'viewfow' ),
 			
 			
 		},
