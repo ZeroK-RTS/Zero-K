@@ -76,24 +76,26 @@ local function GetVotes(line)
 end
 
 function widget:AddConsoleLine(line,priority)
-	if line:sub(1,springieName:len()) ~= springieName then
+	if line:sub(1,springieName:len()) ~= springieName then	-- no spoofing messages
 		return
 	end
-	if line:find(string_success) or line:find(string_fail) or line:find(string_endvote) then
+	if line:find(string_success) or line:find(string_fail) or line:find(string_endvote) then	--terminate existing vote
 		pollActive = false
 		screen0:RemoveChild(window)
-		voteCount[1] = 0
-		voteCount[2] = 0
-		voteMax[1] = 1	-- protection against div0
-		voteMax[2] = 1
-	elseif line:find(string_votetopic) and line:find(string_titleEnd) then
+		for i=1,2 do
+			voteCount[i] = 0
+			voteMax[i] = 1	-- protection against div0
+			progress_vote[i]:SetCaption('?/?')
+			progress_vote[i]:SetValue(0)
+		end
+	elseif line:find(string_votetopic) and line:find(string_titleEnd) then	--start new vote
 		pollActive = true
 		screen0:AddChild(window)
 		local indexStart = select(2, line:find(string_votetopic))
 		local indexEnd = line:find(string_titleEnd)
 		local title = line:sub(indexStart, indexEnd - 1)
 		label_title:SetCaption("Poll: "..title)
-	elseif line:find(string_vote1) or line:find(string_vote2) then
+	elseif line:find(string_vote1) or line:find(string_vote2) then	--apply a vote
 		GetVotes(line)
 	end
 end
@@ -204,7 +206,7 @@ function widget:Initialize()
 		}
 		progress_vote[i]:SetValue(0)
 		voteCount[i] = 0
-		voteMax[i] = 0		
+		voteMax[i] = 1	-- protection against div0		
 	end
 end
 
