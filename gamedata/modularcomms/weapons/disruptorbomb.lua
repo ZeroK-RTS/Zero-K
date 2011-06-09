@@ -16,9 +16,9 @@ local weaponDef = {
     },
 
     damage                  = {
-		default = 300,
-		planes  = 300,
-		subs    = 15,
+		default = 350,
+		planes  = 350,
+		subs    = 17.5,
     },
 
     explosionGenerator      = [[custom:riotballplus]],
