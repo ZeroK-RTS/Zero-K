@@ -28,7 +28,7 @@ return {
         pos                = [[0, 1, 0]],
         sizegrowth         = [[3 i3]],
         sizemod            = 1.0,
-        texture            = [[kE1_0011]],
+        texture            = [[kfoam]],
       },
     },
     muzzlesmoke = {
