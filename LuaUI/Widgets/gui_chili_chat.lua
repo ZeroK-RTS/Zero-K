@@ -507,10 +507,10 @@ function widget:Initialize()
 		padding = {0,0,0,0},
 		dockable = true,
 		name = "chat",
-		x = screenWidth*0.3,  
 		y = 0,
-		width  = screenWidth*0.35,
-		height = screenHeight*0.25,
+		right = 425, -- epic/resbar width
+		width  = screenWidth*0.30,
+		height = screenHeight*0.20,
 		--parent = screen0,
 		--visible = false,
 		--backgroundColor = settings.col_bg,

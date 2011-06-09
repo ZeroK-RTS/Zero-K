@@ -144,7 +144,7 @@ local settings = {
 	versionmin = 50,
 	lang = 'en',
 	widgets = {},
-	show_crudemenu = false,
+	show_crudemenu = true,
 	music_volume = 0.5,
 }
 
@@ -1759,8 +1759,8 @@ local function MakeCrudeMenu()
 	
 	window_crude = Window:New{
 		name='epicmenubar',
-		x = 420,  
-		bottom = 0,
+		right = 0,  
+		y = 50, -- resbar height
 		dockable = true,
 		clientWidth = crude_width,
 		clientHeight = crude_height,

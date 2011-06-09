@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Crude Player List",
+    name      = "Chili Crude Player List2",
     desc      = "v1.00000000 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
@@ -264,8 +264,8 @@ function widget:Initialize()
 		--padding = {2,2,2,2},
 		dockable = true,
 		name = "crudeplayerlist",
-		right = 0,  
-		y = 50,
+		x = 100,  
+		bottom = 0,
 		width  = 350,
 		height = 250,
 		autosize   = true;

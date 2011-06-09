@@ -23,7 +23,7 @@ options = {
 		name = "Docking distance",
 		type = 'number',
 		advanced = true,
-		value = 20,
+		value = 5,
 		min=1,max=50,step=1,
 		OnChange = {function() 
 			forceUpdate = true

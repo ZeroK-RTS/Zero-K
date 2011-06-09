@@ -7,7 +7,7 @@ function widget:GetInfo()
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    experimental = true,
+    experimental = false,
     enabled   = true,
   }
 end
@@ -1881,9 +1881,9 @@ function widget:Initialize()
 	window_corner = Window:New{
 		name   = 'unitinfo2';
 		x      = 0;
-		bottom = 200;
+		bottom = 180;
 		clientHeight = 130;
-		clientWidth  = 460;
+		width  = 450;
 		dockable = true,
 		--autosize    = true;
 		resizable   = false;
@@ -1892,7 +1892,7 @@ function widget:Initialize()
 		tweakResizable = true,
 		--padding = {3, 3, 15, 3}
 		--color       = {Spring.GetTeamColor(Spring.GetLocalTeamID())};
-		minimumSize = {460, 130},
+		minimumSize = {450, 130},
 	}
 
 	windMin = Spring.GetGameRulesParam("WindMin")
