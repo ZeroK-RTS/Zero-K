@@ -84,9 +84,9 @@ options = {
 		name = 'Screen Height of First Bubble',
 		desc = 'How high up the first bubble should start on the right of the screen.',
 		type = 'number',
-		min = 100,
+		min = 0,
 		max = 600,
-		value = 180,
+		value = 120,
 	},
 	
 }
@@ -167,11 +167,14 @@ end
 
 function PushWindow(window)
 	window:Realign() --// else `window.height` wouldn't give the desired value
-	for i=1,#windows do
-		local w = windows[i]
-		w:SetPos(w.x, w.y - (window.height + options.window_margin.value))
-	end
 	windows[#windows+1] = window
+	local w = windows[1]
+	w:SetPos(w.x, options.firstbubble_y.value)
+	for i=2,#windows do
+		windows[i]:SetPos(w.x, w.y + (w.height + options.window_margin.value))
+		w = windows[i]
+	end
+	
 end
 
 
@@ -224,7 +227,7 @@ function widget:AddChatMessage(player, msg, type)
 	local w = Chili.Window:New{
 		parent    = Chili.Screen0;
 		x         = vsx-options.window_width.value;
-		bottom    = options.firstbubble_y.value;
+		y    = options.firstbubble_y.value;
 		width     = options.window_width.value;
 		height    = options.window_height.value;
 		minWidth  = options.window_width.value;
@@ -232,6 +235,7 @@ function widget:AddChatMessage(player, msg, type)
 		autosize  = true;
 		resizable = false;
 		draggable = false;
+		
 --		skinName  = "DarkGlass";
 		color     = teamcolor;
 		padding   = {16, 16, 16, 16};
@@ -251,6 +255,7 @@ function widget:AddChatMessage(player, msg, type)
 		return self
 	end 
 
+	
 	Chili.Image:New{
 		parent = w;
 		file   = (WG.Avatar) and (WG.Avatar.GetAvatar(playerName)) or avatar_fallback;
@@ -375,6 +380,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local lastPoint = nil
+
 
 function widget:AddMapPoint(player, caption, px, py, pz)
 
@@ -395,16 +402,16 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 	if (not active or isSpec) then
 		teamcolor = {1,0,0,0.7}
 	end
-
+	
 	local custom_timeadded = GetTimer()
-  local window_id = newWindowID()
+	local window_id = newWindowID()
 
 	windows_points[window_id] = {x = px, y = py, z = pz}
 
 	local w = Chili.Window:New{
 		parent    = Chili.Screen0;
 		x         = vsx-options.window_width.value;
-		bottom    = options.firstbubble_y.value;
+		y    = options.firstbubble_y.value;
 		width     = options.window_width.value;
 		height    = options.window_height.value;
 		autosize  = true;
@@ -503,7 +510,7 @@ function widget:AddWarning(text)
 	local w = Chili.Window:New{
 		parent    = Chili.Screen0;
 		x         = vsx-options.window_width.value;
-		bottom    = options.firstbubble_y.value;
+		y   = options.firstbubble_y.value;
 		width     = options.window_width.value;
 		height    = options.window_height.value;
 		resizable = false;
