@@ -3,8 +3,8 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Poll Display",
-    desc      = "GUI for polls",
+    name      = "Chili Vote Display",
+    desc      = "GUI for votes",
     author    = "KingRaptor",
     date      = "May 04, 2008",
     license   = "GNU GPL, v2 or later",
@@ -39,9 +39,11 @@ local string_success = " vote successful"
 local string_fail = " not enough votes"
 local string_vote1 = " option 1 has "
 local string_vote2 = " option 2 has "
-local string_votetopic = " do you want to "
+local string_votetopic = " Do you want to "
 local string_endvote = " poll cancelled"
 local string_titleEnd = "? !vote 1 = yes, !vote 2 = no"
+
+local springieName = Spring.GetModOptions().springiename or ''
 
 --[[
 local index_votesHave = 14
@@ -74,13 +76,16 @@ local function GetVotes(line)
 end
 
 function widget:AddConsoleLine(line,priority)
+	if line:sub(1,springieName:len()) ~= springieName then
+		return
+	end
 	if line:find(string_success) or line:find(string_fail) or line:find(string_endvote) then
 		pollActive = false
 		screen0:RemoveChild(window)
 		voteCount[1] = 0
 		voteCount[2] = 0
-		voteMax[1] = 0
-		voteMax[2] = 0
+		voteMax[1] = 1	-- protection against div0
+		voteMax[2] = 1
 	elseif line:find(string_votetopic) and line:find(string_titleEnd) then
 		pollActive = true
 		screen0:AddChild(window)
@@ -197,7 +202,7 @@ function widget:Initialize()
 			padding = {1,1,1,1},
 			--keepAspect = true,
 		}
-
+		progress_vote[i]:SetValue(0)
 		voteCount[i] = 0
 		voteMax[i] = 0		
 	end
