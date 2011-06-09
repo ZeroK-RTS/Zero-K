@@ -371,7 +371,7 @@ local function addLine(msg)
 	lines[lines_count] = line
 	GenerateTextControl(line)
 	
-	if (line.mtype=="allymessage" or playername == myName) then  -- if ally message make sound
+	if (line.mtype=="allymessage") then  -- if ally message make sound
 		Spring.PlaySoundFile('sounds/talk.wav')
 	end 
 

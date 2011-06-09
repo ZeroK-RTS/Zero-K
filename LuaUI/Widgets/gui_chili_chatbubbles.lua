@@ -367,7 +367,9 @@ function widget:AddConsoleLine(msg)
 		mesg = msg:sub(3)
 		type = 'l'
 	end
-	widget:AddChatMessage(playerID,mesg,type)
+	if (type == 'a' or type=='p') then 
+		widget:AddChatMessage(playerID,mesg,type)
+	end 
 end
 
 --------------------------------------------------------------------------------
