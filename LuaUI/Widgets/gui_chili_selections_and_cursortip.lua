@@ -158,7 +158,7 @@ local gi_label	--group info Chili label
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Tooltip'
-options_order = { 'tooltip_delay',  'fontsize', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip',
+options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip',
   'groupalways', 'showgroupinfo', 'squarepics',
 }
 
