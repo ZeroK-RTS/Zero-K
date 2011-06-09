@@ -34,18 +34,24 @@ local grenade = piece 'grenade'
 
 
 --variables
+local canDgun = UnitDefs[unitDefID].canDgun
+
 local dead = false
 local bMoving = false
 local bAiming = false
 local armsFree = true
 local shieldOn = true
+local dgunning = false
 bJumping = false
 
+local SIG_RESTORE = 1
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
 --local SIG_AIM_3 = 8 --step on
 
 local function RestoreAfterDelay()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(6000)
 	if not dead then
 		Turn( turret , x_axis, 0, math.rad(150) )
@@ -288,10 +294,16 @@ function script.AimFromWeapon(num)
 	return armhold
 end
 
-local function AimRifle(heading, pitch)
+local function AimRifle(heading, pitch, isDgun)
+	if isDgun then dgunning = true end
 	while not armsFree do
-		Sleep(33)  --smooth animation?
+		Sleep(33)
 	end
+	--[[
+	if dgunning and not isDgun then
+		return false
+	end
+	]]--
 	--torso	
 	Turn( torso , x_axis, math.rad(15), math.rad(250) )
 	Turn( torso , y_axis, math.rad(-25), math.rad(250) )
@@ -336,6 +348,7 @@ local function AimRifle(heading, pitch)
 	WaitForTurn(armhold, x_axis)
 	WaitForTurn(lloarm, z_axis)
 	StartThread(RestoreAfterDelay)
+	if isDgun then dgunning = false end	
 	return true
 end
 
@@ -350,7 +363,7 @@ function script.AimWeapon(num, heading, pitch)
 		Signal( SIG_AIM_2)
 		SetSignalMask( SIG_AIM_2)
 		bAiming = true
-		return AimRifle(heading, pitch)
+		return AimRifle(heading, pitch, canDgun)		
 	elseif num == 2 or num == 4 then
 		Sleep(100)
 		return (shieldOn)

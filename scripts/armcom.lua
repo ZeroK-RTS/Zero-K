@@ -33,11 +33,13 @@ end
 
 
 -- Signal definitions
+local SIG_RESTORE = 1
 local SIG_LASER = 2
 local SIG_DGUN = 4
 
-local ACT_DGUN = 4
-local ACT_LASER = 2
+-- what are these for?
+--local ACT_DGUN = 4
+--local ACT_LASER = 2
 
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
@@ -221,7 +223,6 @@ end
 
 local function WalkNoArms()
 	if (isLasering or isDgunning) and isMoving  then
-	
 		Move( pelvis , y_axis, -0.700000*2.5  )
 		Move( head , y_axis, -0.000006*2.5  )
 		Turn( pelvis , x_axis, math.rad(6.681319) )
@@ -401,15 +402,21 @@ function script.QueryWeapon(num)
 end
 
 local function RestoreLaser()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(RESTORE_DELAY_LASER)
 	isLasering = false
+	isDgunning = false
 	Turn( luparm , x_axis, 0, ARM_SPEED_PITCH )
 	if (not isDgunning) then Turn(torso, y_axis, 0, TORSO_SPEED_YAW) end
 end
 
 local function RestoreDgun()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	SetSignalMask(SIG_DGUN)
 	Sleep(RESTORE_DELAY_DGUN)
+	isLasering = false
 	isDgunning = false
 	Turn( ruparm , x_axis, 0, ARM_SPEED_PITCH )
 	if (not isLasering) then Turn(torso, y_axis, 0, TORSO_SPEED_YAW) end

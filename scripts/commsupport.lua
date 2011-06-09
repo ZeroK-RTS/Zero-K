@@ -31,19 +31,25 @@ local ac2 = piece 'ac2'
 local nanospray = piece 'nanospray' 
 
 -- variables
+local canDgun = UnitDefs[unitDefID].canDgun
+
 local shieldOn = false
 local dead = false
 local bMoving = false
 local bAiming = false
 local armsFree = true
 local inBuildAnim = false
+local dgunning = false
 
+local SIG_RESTORE = 16
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
 local SIG_WALK = 1
 --local SIG_AIM_3 = 8 --step on
 
 local function RestoreAfterDelay()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(6000)
 	if not dead then
 		Turn( turret , x_axis, 0, math.rad(150) )
@@ -298,10 +304,16 @@ function script.QueryWeapon(num)
 	return flare
 end
 
-local function AimRifle(heading, pitch)
- 	while not armsFree do
+local function AimRifle(heading, pitch, isDgun)
+	if isDgun then dgunning = true end
+	while not armsFree do
 		Sleep(33)
 	end
+	--[[
+	if dgunning and not isDgun then
+		return false
+	end
+	]]--
 	--torso	
 	Turn( torso , x_axis, math.rad(5), math.rad(250) )
 	Turn( torso , y_axis, 0, math.rad(250) )
@@ -346,6 +358,7 @@ local function AimRifle(heading, pitch)
 	WaitForTurn(armhold, x_axis)  --need to make sure not 
 	WaitForTurn(lloarm, x_axis) --stil setting up
 	StartThread(RestoreAfterDelay)
+	if isDgun then dgunning = false end
 	return true
 end
 
@@ -361,7 +374,7 @@ function script.AimWeapon(num, heading, pitch)
 		Signal( SIG_AIM_2)
 		SetSignalMask( SIG_AIM_2)
 		bAiming = true
-		return AimRifle(heading, pitch)
+		return AimRifle(heading, pitch, canDgun)
 	elseif num == 2 or num == 4 then
 		Sleep(100)
 		return (shieldOn)

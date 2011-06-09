@@ -20,6 +20,7 @@ include "constants.lua"
 
 local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
 
+local SIG_RESTORE = 1
 local SIG_LASER = 2
 local SIG_DGUN = 4
 
@@ -30,7 +31,6 @@ local RESTORE_DELAY_LASER = 4000
 local RESTORE_DELAY_DGUN = 2500
 
 local function Walk()
-	
 	if not isMoving then return end
 	if not (isLasering or isDgunning) then
 		Move( bigflsh , x_axis, 0  )
@@ -315,8 +315,11 @@ function script.FireWeapon(num)
 end
 
 local function RestoreLaser()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(RESTORE_DELAY_LASER)
 	isLasering = false
+	isDgunning = false
 	Turn( l_sho , x_axis, 0, ARM_SPEED_PITCH )
 	if not isDgunning then 
 		Turn( chest , y_axis, 0, TORSO_SPEED_YAW) 
@@ -324,13 +327,17 @@ local function RestoreLaser()
 end
 
 local function RestoreDgun()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(RESTORE_DELAY_DGUN)
 	isDgunning = false
+	isLasering = false
 	Turn( r_sho , x_axis, 0, ARM_SPEED_PITCH )
 	Turn( nanospray , x_axis, math.rad(0), ARM_SPEED_PITCH )
 	if not isLasering then 
 		Turn( chest , y_axis, 0, TORSO_SPEED_YAW) 
 	end
+
 end
 
 function script.AimWeapon(num, heading, pitch)
