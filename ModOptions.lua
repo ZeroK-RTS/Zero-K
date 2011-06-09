@@ -359,6 +359,14 @@ local options = {
     def    = false,
   },
   {
+    key    = 'specialdecloak',
+    name   = 'Special Decloak Behavior (buggy)',
+    desc   = 'Overrides engine\'s decloak. Shows cloaked units only to team that reveals them, also fixes cloak behavior in FFA games with ceasefires.',
+    type   = 'bool',
+    section= 'experimental',
+    def    = false,
+  },  
+  {
     key    = 'fun',
     name   = 'Fun Stuff',
     desc   = 'Fun stuff.',
@@ -421,7 +429,7 @@ local options = {
   {
 	key		= "enableunlocks",
 	name	= "Enable unlock system",
-	desc	= "Enables the experimental unlock system (disabling will enable all units by default)",
+	desc	= "Enables the unlock system (disabling will enable all units by default)",
 	type	= "bool",
 	def		= true,
 	section	= "experimental",
