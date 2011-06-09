@@ -4,7 +4,8 @@
 local Sounds = {
    SoundItems = {
       IncomingChat = {
-         file = "sounds/talk.wav",
+         --file = "sounds/talk.wav",
+		 file = nil,
       },
       --MultiSelect = {
       --   file = "sounds/button9.wav",

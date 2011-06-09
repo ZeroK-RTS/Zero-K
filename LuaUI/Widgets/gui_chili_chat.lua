@@ -371,6 +371,11 @@ local function addLine(msg)
 	lines[lines_count] = line
 	GenerateTextControl(line)
 	
+	if (line.mtype=="allymessage" or playername == myName) then  -- if ally message make sound
+		Spring.PlaySoundFile('sounds/talk.wav')
+	end 
+
+	
 	if lines_count >= options.max_lines.value then
 		stack_console:RemoveChild(stack_console.children[1])
 		lines_count = lines_count - 1
