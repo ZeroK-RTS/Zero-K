@@ -505,8 +505,12 @@ local function UpdateCons()
 	local maxCount, total = 0, 0
 	local types = {}
 	for unitID in pairs(idleCons) do
+		--[[
 		local def = GetUnitDefID(unitID)
-		types[def] = (types[def] or 0) + 1
+		if def then	-- because GetUnitDefID can never be trusted to work
+			types[def] = (types[def] or 0) + 1
+		end
+		]]--
 		total = total + 1
 	end
 	local numTypes = SetCount(types)

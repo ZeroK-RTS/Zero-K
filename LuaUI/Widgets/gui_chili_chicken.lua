@@ -17,7 +17,7 @@ end
 --------------------------------------------------------------------------------
 
 if (not Spring.GetGameRulesParam("difficulty")) then
-  --return false
+  return false
 end
 
 --------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ local function WriteTooltipsOnce()
 	label_tech.tooltip = "Each burrow alive accelerates chicken tech progress by "..("%.1f"):format(techTimePerBurrow).. " seconds/wave\n"..
 		"Each burrow killed reduces chicken tech progress by "..("%.1f"):format(techTimePerBurrow * GetDifficultyValue("burrowRegressMult") ).. " seconds"
 		
-	tooltipAnger = "Each burrow killed reduces time remaining by ".. ("%.1f"):format(GetDifficultyValue('burrowQueenTime')/gameInfo.malus) .." seconds"
+	--tooltipAnger = "Each burrow killed reduces time remaining by ".. ("%.1f"):format(GetDifficultyValue('burrowQueenTime')/gameInfo.malus) .." seconds"
 	tooltipBurrowRespawn = "When killed, each burrow has a ".. math.floor(GetDifficultyValue('burrowRespawnChance')*100) .."% chance of respawning"
 end
 
@@ -211,10 +211,11 @@ local function UpdateRules()
 
 	-- tooltips, antilag
 	local miniQueenTime = difficulty.miniQueenTime and difficulty.miniQueenTime[1]
-	if miniQueenTime then label_anger.tooltip = tooltipAnger .. "\nDragons arrive at ".. FormatTime(math.floor(gameInfo.queenTime * miniQueenTime)) .. " (".. math.floor(miniQueenTime*100) .."%)" end
+	if miniQueenTime then label_anger.tooltip = "Killing a burrow now reduces time remaining by ".. ("%.1f"):format(GetDifficultyValue('burrowQueenTime')/gameInfo[roostName .. "Count"]) .." seconds" .. 
+												"\nDragons arrive at ".. FormatTime(math.floor(gameInfo.queenTime * miniQueenTime)) .. " (".. math.floor(miniQueenTime*100) .."%)" end
 	
-	label_burrows.tooltip = "Burrows spawn every ".. ("%.1f"):format(GetDifficultyValue('burrowSpawnRate')*0.25*(gameInfo[roostName.."Count"] + 1)/gameInfo.malus) .." seconds\n"..
-		tooltipBurrowRespawn
+	label_burrows.tooltip = "Current burrow spawn time: ".. ("%.1f"):format(GetDifficultyValue('burrowSpawnRate')*0.25*(gameInfo[roostName.."Count"] + 1)/gameInfo.malus) .." seconds\n"..
+							tooltipBurrowRespawn
 	
 	if (gameInfo.lagging == 1) then label_mode:SetCaption(red.."Anti-Lag Enabled\008")
 	else label_mode:SetCaption("Mode: " .. configs.difficulties[gameInfo.difficulty]) end
@@ -418,9 +419,9 @@ function widget:Initialize()
 	}
 	
 	widgetHandler:RegisterGlobal("ChickenEvent", ChickenEvent)
-	--UpdateRules()
-	--WriteTooltipsOnce()
-	--UpdateAnger()
+	UpdateRules()
+	WriteTooltipsOnce()
+	UpdateAnger()
 
 	-- Activate tooltips for labels, they do not have them in default chili
 	function label_anger:HitTest(x,y) return self end
@@ -435,9 +436,9 @@ function widget:Shutdown()
 end
 
 function widget:GameFrame(n)
-  --if (n%60< 1) then UpdateRules() end
+  if (n%60< 1) then UpdateRules() end
   -- every second for smoother countdown
-  --if (n%30< 1) then UpdateAnger() end
+  if (n%30< 1) then UpdateAnger() end
 end
 
 --------------------------------------------------------------------------------

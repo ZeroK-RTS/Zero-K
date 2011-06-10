@@ -10,14 +10,12 @@ local weaponDef = {
 		slot = [[5]],
 		muzzleEffect = [[custom:RAIDMUZZLE]],
 		miscEffect = [[custom:LEVLRMUZZLE]],
-		rangeperlevel = [[45]],
-		damageperlevel = [[30]],
 	},	  
 	  
 	damage                  = {
 		default = 600,
 		planes  = 600,
-		subs    = 35,
+		subs    = 30,
 	},
 	
 	edgeEffectiveness       = 0.5,
@@ -26,10 +24,8 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	minbarrelangle          = [[-10]],
 	myGravity               = 0.1,
-	noSelfDamage            = true,
 	range                   = 900,
 	reloadtime              = 7,
-	renderType              = 4,
 	soundHit                = [[weapon/cannon/arty_hit]],
 	soundStart              = [[weapon/cannon/pillager_fire]],
 	startsmoke              = [[1]],
