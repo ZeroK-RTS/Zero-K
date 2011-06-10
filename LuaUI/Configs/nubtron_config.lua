@@ -4,11 +4,11 @@ local unitClasses = {
 	Mex	= { 'cormex' },
 	Solar	= { 'armsolar' },
 	LLT	= { 'corllt' },
-	BotLab	= { 'factoryshield' },
+	BotLab	= { 'factorycloak' },
 	Radar	= { 'corrad' },
 
-	Con	= { 'cornecro' },
-	Raider	= { 'corak' },
+	Con	= { 'armrectr' },
+	Raider	= { 'armpw' },
 }
 local unitClassNames = {
 	Mex	= 'Mex',
