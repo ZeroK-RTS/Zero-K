@@ -17,7 +17,7 @@ end
 --------------------------------------------------------------------------------
 
 if (not Spring.GetGameRulesParam("difficulty")) then
-  return false
+  --return false
 end
 
 --------------------------------------------------------------------------------
@@ -331,8 +331,8 @@ function widget:Initialize()
 		color = {0, 0, 0, 0},
 		width = 270;
 		height = 189;
-		right = 32; 
-		y = 200;
+		right = 240; 
+		bottom = 0;
 		dockable = true;
 		draggable = false,
 		resizable = false,
@@ -418,9 +418,9 @@ function widget:Initialize()
 	}
 	
 	widgetHandler:RegisterGlobal("ChickenEvent", ChickenEvent)
-	UpdateRules()
-	WriteTooltipsOnce()
-	UpdateAnger()
+	--UpdateRules()
+	--WriteTooltipsOnce()
+	--UpdateAnger()
 
 	-- Activate tooltips for labels, they do not have them in default chili
 	function label_anger:HitTest(x,y) return self end
@@ -435,9 +435,9 @@ function widget:Shutdown()
 end
 
 function widget:GameFrame(n)
-  if (n%60< 1) then UpdateRules() end
+  --if (n%60< 1) then UpdateRules() end
   -- every second for smoother countdown
-  if (n%30< 1) then UpdateAnger() end
+  --if (n%30< 1) then UpdateAnger() end
 end
 
 --------------------------------------------------------------------------------
