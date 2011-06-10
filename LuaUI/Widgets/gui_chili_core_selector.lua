@@ -65,7 +65,7 @@ local echo = Spring.Echo
 
 local BUTTON_WIDTH = 64
 local BUTTON_HEIGHT = 52
-local BASE_COLUMNS = 10
+local BASE_COLUMNS = 8
 local NUM_FAC_COLUMNS = BASE_COLUMNS - 1	-- unused
 
 -------------------------------------------------------------------------------
