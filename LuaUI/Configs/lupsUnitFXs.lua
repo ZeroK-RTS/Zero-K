@@ -146,11 +146,6 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.5,0.3}, width=3.2, length=22, piece="jet1", onActive=true}},
     {class='AirJet', options={color={0.1,0.5,0.3}, width=3.2, length=22, piece="jet2", onActive=true}},
   },
-  corcrw = {
-    {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetrear", onActive=true}},
-    {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetleft", onActive=true}},
-    {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetright", onActive=true}},
-  },
   corshad = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
@@ -178,31 +173,24 @@ effectUnitDefs = {
   },
   corvamp = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust1", onActive=true}},
-	{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust2", onActive=true}},
-	{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust3", onActive=true}},
+    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust2", onActive=true}},
+    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust3", onActive=true}},
     {class='Ribbon', options={width=1, size=8, piece="wingtip1"}},
     {class='Ribbon', options={width=1, size=8, piece="wingtip2"}},
   },
   corawac = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=25, piece="thrust", onActive=true}},
-	{class='Ribbon', options={width=1, size=8, piece="wingtipl"}},
+    {class='Ribbon', options={width=1, size=8, piece="wingtipl"}},
     {class='Ribbon', options={width=1, size=8, piece="wingtipr"}},
   },
   blackdawn = {
     {class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Lengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Rengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
   },
-
   corcrw = {
-    {class='AirJet', options={color={0.6,0.15,0.0}, width=4.5, length=20, distortion=0.01, piece="engine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
-
-    {class='AirJet', options={color={0.5,0.05,0.0}, width=3.5, length=19, distortion=0.01, piece="leftengine1", onActive=true}},
-    {class='AirJet', options={color={0.5,0.05,0.0}, width=3.5, length=16, distortion=0.01, piece="leftengine2", onActive=true}},
-    {class='AirJet', options={color={0.5,0.05,0.0}, width=3.5, length=13, distortion=0.01, piece="leftengine3", onActive=true}},
-
-    {class='AirJet', options={color={0.5,0.05,0.0}, width=3.5, length=19, distortion=0.01, piece="rightengine1", onActive=true}},
-    {class='AirJet', options={color={0.5,0.05,0.0}, width=3.5, length=16, distortion=0.01, piece="rightengine2", onActive=true}},
-    {class='AirJet', options={color={0.5,0.05,0.0}, width=3.5, length=13, distortion=0.01, piece="rightengine3", onActive=true}},
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetrear", onActive=true, emitVector = {0, 0, 1}}},
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetleft", onActive=true, emitVector = {0, 0, 1}}},
+    {class='AirJet', options={color={0.0,0.5,1.0}, width=10, length=20, piece="jetright", onActive=true, emitVector = {0, 0, 1}}},
   },
  }
 

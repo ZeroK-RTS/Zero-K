@@ -28,7 +28,7 @@ return {
         pos                = [[0, 0, 0]],
         sizegrowth         = 0.2,
         sizemod            = 1.0,
-        texture            = [[fire2]],
+        texture            = [[fireball]],
       },
     },
   },
