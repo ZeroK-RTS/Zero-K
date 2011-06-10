@@ -26,6 +26,7 @@ options_order = {
 	
 	'lbl_idle',
 	'select_idleb',
+	'select_idleallb',
 	'select_nonidle',
 	
 	'lbl_same',
@@ -48,8 +49,13 @@ options = {
 	},
 	select_idleb = { type = 'button',
 		name = 'Select An Idle Builder',
-		action = 'select AllMap+_Builder_Idle+_ClearSelection_SelectOne+',
+		action = 'select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+',
 	},
+	select_idleallb = { type = 'button',
+		name = 'Select All Idle Builders',
+		action = 'select AllMap+_Builder_Not_Building_Not_Transport+_ClearSelection_SelectAll+',
+	},
+	
 	select_vissame = { type = 'button',
 		name = 'In-View Units of Same Type as Selected',
 		action = 'select Visible+_InPrevSel+_ClearSelection_SelectAll+',

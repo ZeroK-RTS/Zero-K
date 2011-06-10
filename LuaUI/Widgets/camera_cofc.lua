@@ -25,7 +25,7 @@ local trackmode = false --before options
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Camera/Combo Overhead-Free Camera'
+options_path = 'Settings/Camera/Advanced Camera Config'
 options_order = { 
 	'helpwindow', 
 	

@@ -235,7 +235,7 @@ local function UpdateFac(unitID, index)
 end
 
 -- makes fac and comm buttons
-local function GenerateButton(array, i, unitID, unitDefID)
+local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 	-- don't display surplus buttons
 	if CountButtons(comms) + (array == facs and CountButtons(facs) or 0) > BASE_COLUMNS - 1 then
 		return
@@ -265,6 +265,22 @@ local function GenerateButton(array, i, unitID, unitDefID)
 		--keepAspect = true,
 		backgroundColor = (array == facs and buttonColorFac) or buttonColor,
 	}
+	if (hotkey ~= nil) then 
+		Label:New {
+				width="100%";
+				height="100%";
+				autosize=false;
+				x=2,
+				y=3,
+				align="left";
+				valign="top";
+				caption = '\255\0\255\0'..hotkey,
+				fontSize = 11;
+				fontShadow = true;
+				parent = array[i].button
+		}
+	end 
+	
 	array[i].image = Image:New {
 		parent = array[i].button,
 		width="91%";
@@ -428,7 +444,7 @@ end
 local function AddComm(unitID, unitDefID)
 	local i = #comms + 1
 	comms[i] = {commID = unitID, commDefID = unitDefID, warningTime = -1}
-	GenerateButton(comms, i, unitID, unitDefID)
+	GenerateButton(comms, i, unitID, unitDefID, WG.crude.GetHotkey("select AllMap+_Commander+_ClearSelection_SelectOne+"):upper() or '')
 	commsByID[unitID] = i
 	UpdateComm(unitID, i)
 	ShiftFacRow()
@@ -785,11 +801,13 @@ function widget:Initialize()
 	UpdateCommButton()
 	]]--
 
+	
+	
 	conButton.button = Button:New{
 		parent = stack_main;
 		x = 0,
-		width = (100/BASE_COLUMNS).."%",
 		caption = '',
+		width = (100/BASE_COLUMNS).."%",
 		OnMouseDown = {	function () 
 				local _,_,left,_,right = Spring.GetMouseState()
 				if left then
@@ -799,6 +817,21 @@ function widget:Initialize()
 				end
 			end},
 		padding = {1,1,1,1},
+		children = {
+			Label:New {
+				width="100%";
+				height="100%";
+				autosize=false;
+				x=2,
+				y=3,
+				align="left";
+				valign="top";
+				caption = '\255\0\255\0'..WG.crude.GetHotkey("select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+"):upper() or '',
+				fontSize = 11;
+				fontShadow = true;
+				parent = button;
+			}
+		}
 		--keepAspect = true,
 	}
 	conButton.image = Image:New {

@@ -134,7 +134,7 @@ confdata.menu_tree = {
 			{'Rotatable Overhead', "viewrot" },
 			{'Total War', "viewtw" },
 			{'Flip the TA Camera', "viewtaflip" },
-			{'Combo Overhead/Free Camera', "luaui togglewidget Combo Overhead/Free Camera (experimental)"},
+			{'Toggle advanced COFC camera', "luaui togglewidget Combo Overhead/Free Camera (experimental)"},
 		}
 	},
 	
@@ -214,7 +214,7 @@ confdata.menu_tree = {
 			--]]
 		}
 	},
-	{'Mouse Settings|Change your cursor and other mouse settings',
+	{'Mouse Cursor|Change your cursor and other mouse settings',
 		{
 			{'lh',
 				{
