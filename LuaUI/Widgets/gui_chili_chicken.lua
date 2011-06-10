@@ -326,6 +326,7 @@ function widget:Initialize()
 	local labelHeight = 24
 	local fontSize = 16
 
+	
 	window = Window:New{
 		parent = screen0,
 		name   = 'chickenpanel';

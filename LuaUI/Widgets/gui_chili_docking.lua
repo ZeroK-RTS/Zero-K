@@ -114,7 +114,9 @@ local function GetBoxRelation(boxa, boxb)
 	
 	if axis ~= nil then return axis, dist 
 	else return nil, nil end
-end 
+end
+
+ 
 
 
 -- returns closest axis to snap to existing windows or screen edges - first parameter is axis (L/R/T/D) second is snap distance 
@@ -178,6 +180,9 @@ local function SnapBox(wp, a,d)
 end 
 
 local lastCount = 0
+local lastWidth = 0
+local lastHeight= 0
+
 
 function widget:DrawScreen() 
 	frameCounter = frameCounter +1
@@ -186,6 +191,12 @@ function widget:DrawScreen()
 	
 	local posChanged = false -- has position changed since last check
 
+	if (screen0.width ~= lastWidth or screen0.height ~= lastHeight) then 
+		forceUpdate = true
+		lastWidth = screen0.width
+		lastHeight = screen0.height
+	end 
+	
 	local present = {}
 	for _, win in ipairs(screen0.children) do 
 		if (win.dockable) then 
@@ -264,6 +275,13 @@ function widget:DrawScreen()
 	end 
 end 
 
+
+
+
+function widget:ViewResize(vsx, vsy)
+	scrW = vsx
+	scrH = vsy
+end
 
 
 

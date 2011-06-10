@@ -130,7 +130,10 @@ function widget:MouseWheel(up,value)
 end
 
 
-
+function widget:ViewResize(vsx, vsy) 
+	screen0.width = vsx 
+	screen0.height= vsy
+end 
 
 widget.TweakIsAbove      = widget.IsAbove
 widget.TweakMousePress   = widget.MousePress
