@@ -333,7 +333,7 @@ function widget:Initialize()
 		color = {0, 0, 0, 0},
 		width = 270;
 		height = 189;
-		right = 240; 
+		right = 0; 
 		bottom = 0;
 		dockable = true;
 		draggable = false,
