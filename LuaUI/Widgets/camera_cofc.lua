@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.06 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.061 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -239,6 +239,7 @@ options = {
 		name = "Enter Trackmode",
 		desc = "Track the selected unit (midclick to cancel)",
 		type = 'button',
+        hotkey = {key='t', mod=''},
 		OnChange = function(self) trackmode = true; end,
 	},
 	
@@ -1159,11 +1160,15 @@ function widget:Initialize()
 	cy = vsy * 0.5
 	
 	spSendCommands( 'unbindaction toggleoverview' )
+	spSendCommands( 'unbindaction trackmode' )
+	spSendCommands( 'unbindaction track' )
 end
 
 function widget:Shutdown()
 	spSendCommands{"viewta"}
 	spSendCommands( 'bind any+tab toggleoverview' )
+	spSendCommands( 'bind any+t track' )
+	spSendCommands( 'bind ctrl+t trackmode' )
 end
 
 function widget:TextCommand(command)
