@@ -53,7 +53,7 @@ options = {
 	},
 	select_idleallb = { type = 'button',
 		name = 'Select All Idle Builders',
-		action = 'select AllMap+_Builder_Not_Building_Not_Transport+_ClearSelection_SelectAll+',
+		action = 'select AllMap+_Builder_Not_Building_Not_Transport_Idle+_ClearSelection_SelectAll+',
 	},
 	
 	select_vissame = { type = 'button',
