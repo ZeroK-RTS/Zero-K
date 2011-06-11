@@ -134,6 +134,7 @@ local function UpdateCarrierTarget(carrierID)
 		else
 			px,py,pz = unpack(params)
 		end
+		if not px then return end
 		-- check range
 		local dist = GetDistance(ox,px,oz,pz)
 		if dist > carrierDefs[carrierList[carrierID].unitDefID].range then
