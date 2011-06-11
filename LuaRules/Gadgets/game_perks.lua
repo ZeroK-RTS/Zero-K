@@ -172,7 +172,25 @@ function gadget:AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z)
 end
 
 local function InitUnsafe()
-	-- for name, id in pairs(playerIDsByName) do
+--[[
+	local noUnlocks = true
+	
+	for index, id in pairs(Spring.GetPlayerList())
+		local customKeys = select(10, Spring.GetPlayerInfo(id))
+		if customKeys and customKeys.unlocks then
+			noUnlocks = false
+			break
+		end
+	end
+	
+	if noUnlocks then
+		--nobody has unlocks, don't bother
+		gadgetHandler:RemoveGadget()
+		return
+	end
+]]--
+	
+	-- for name, id in pairs(playerIDsByName) do	
 	for index, id in pairs(Spring.GetPlayerList()) do	
 		-- copied from PlanetWars
 		local unlockData, success
@@ -205,15 +223,16 @@ local function InitUnsafe()
 				unlocks[team][udid] = true
 			end
 		end
-		
-		-- /luarules reload compatibility
-		local units = Spring.GetAllUnits()
-		for i=1,#units do
-			local udid = spGetUnitDefID(units[i])
-			local teamID = spGetUnitTeam(units[i])
-			gadget:UnitCreated(units[i], udid, teamID)
-		end
 	end
+
+	
+	-- /luarules reload compatibility
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local udid = spGetUnitDefID(units[i])
+		local teamID = spGetUnitTeam(units[i])
+		gadget:UnitCreated(units[i], udid, teamID)
+	end	
 end
 
 function gadget:Initialize()

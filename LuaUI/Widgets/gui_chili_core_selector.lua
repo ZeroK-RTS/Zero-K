@@ -521,12 +521,10 @@ local function UpdateCons()
 	local maxCount, total = 0, 0
 	local types = {}
 	for unitID in pairs(idleCons) do
-		--[[
 		local def = GetUnitDefID(unitID)
 		if def then	-- because GetUnitDefID can never be trusted to work
 			types[def] = (types[def] or 0) + 1
 		end
-		]]--
 		total = total + 1
 	end
 	local numTypes = SetCount(types)
@@ -700,6 +698,9 @@ function widget:GameFrame(n)
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
+	if (unitTeam ~= myTeamID) then
+		return
+	end
 	local ud = UnitDefs[unitDefID]
 	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory) then
 		idleCons[unitID] = true
@@ -708,6 +709,9 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdOpts, cmdParams)
+	if (unitTeam ~= myTeamID) then
+		return
+	end
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
 		UpdateCons()

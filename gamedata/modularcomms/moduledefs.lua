@@ -120,6 +120,7 @@ upgrades = {
 		description = "Riot Cannon: Convert to a medium artillery gun",
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_riotcannon", "commweapon_partillery")
+				--unitDef.hightrajectory = 1
 			end,	
 	},		
 	

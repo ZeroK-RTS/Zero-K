@@ -6,9 +6,7 @@ local versionNumber = "v1.5.4"
 function widget:GetInfo()
   return {
     name      = "Night",
-    desc      = versionNumber .. " Makes map appear as nighttime and gives units searchlights.\n"
-                              .. "toggles: /luaui [night_preunit | night_beam | night_cycle] \n"
-                              .. "searchlight strength: /luaui night_setsearchlight [number]; base type: /luaui night_basetype [0-2]",
+    desc      = versionNumber .. " Makes map appear as nighttime and gives units searchlights.\n",
     author    = "Evil4Zerggin; based on jK's darkening widget",
     date      = "28 September 2008",
     license   = "GNU LGPL, v2.1 or later",
@@ -255,7 +253,7 @@ local function DrawSearchlights()
   for _, unitID in pairs(visibleUnits) do
 	if GetUnitPosition(unitID) and not GetUnitIsDead(unitID) then
 		local _, _, _, _, buildProgress = GetUnitHealth(unitID)
-		local unitRadius = GetUnitRadius(unitID)
+		local unitRadius = GetUnitRadius(unitID) or 10
 		local px, py, pz = GetUnitPosition(unitID)
 		py = py + searchlightHeightOffset * unitRadius
 		local groundy = math.max(GetGroundHeight(px, pz), 0)
