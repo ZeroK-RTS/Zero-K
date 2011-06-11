@@ -1,4 +1,4 @@
-local versionNum = '3.01'
+local versionNum = '3.02'
 
 function widget:GetInfo()
   return {
@@ -42,7 +42,7 @@ local helpText =
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
 options_order = { 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'verbose', 'immediate', 'groupnumbers', }
-options_path = 'Game/AutoGroup'
+options_path = 'Game/Settings/AutoGroup'
 options = {
 	loadgroups = {
 		name = 'Preserve Auto Groups',

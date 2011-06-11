@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "ResetState",
-    desc      = 'v2.00 Set hotkeys for "holdfire,stop" and "holdposition,stop" in the menu',
+    desc      = 'v2.01 Set hotkeys for "holdfire,stop" and "holdposition,stop" in the menu',
     author    = "CarRepairer",
     date      = "2009-01-27",
     license   = "GNU GPL, v2 or later",
@@ -23,7 +23,7 @@ local spGetSelectedUnits 		= Spring.GetSelectedUnits
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-options_path = 'Game/Hotkeys/Commands'
+options_path = 'Game/Commands'
 
 options_order = {'resetfire', 'resetmove', 'lblspace', }
 

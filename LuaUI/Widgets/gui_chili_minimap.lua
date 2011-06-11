@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.87 Chili Minimap",
+    desc      = "v0.871 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -32,7 +32,7 @@ end
 local function MakeMinimapWindow()
 end
 
-options_path = 'Game'
+options_path = 'Game/Settings/Map'
 options_order = { 'use_map_ratio', 'hidebuttons', 'simplecolors', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', }
 options = {
 	

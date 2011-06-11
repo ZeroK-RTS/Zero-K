@@ -8,7 +8,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Integral Menu",
-    desc      = "v0.351 Integral Command Menu",
+    desc      = "v0.352 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
@@ -101,7 +101,7 @@ local function AddHotkeyOptions()
 			name = cmdname_disp,
 			type = 'button',
 			action = cmdnamel,
-			path = 'Game/Hotkeys/Commands',
+			path = 'Game/Commands',
 		}
 		if number == 2 then
 			options_order_tmp_states[#options_order_tmp_states+1] = cmdnamel
@@ -110,8 +110,8 @@ local function AddHotkeyOptions()
 		end
 	end
 
-	options.lblcmd 			= { type='label', name='Instant Commands', path = 'Game/Hotkeys/Commands',}
-	options['lblstate'] 	= { type='label', name='State Commands', path = 'Game/Hotkeys/Commands',}
+	options.lblcmd 			= { type='label', name='Instant Commands', path = 'Game/Commands',}
+	options['lblstate'] 	= { type='label', name='State Commands', path = 'Game/Commands',}
 	
 	
 	table.sort(options_order_tmp_cmd)

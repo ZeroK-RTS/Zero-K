@@ -61,7 +61,7 @@ local factories = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Unit AI/Auto Assist'
+options_path = 'Game/Unit AI/Auto Assist'
 options_order = { 'inheritcontrol', 'label'}
 options = {
 	inheritcontrol = {name = "Inherit Factory Control Group", type = 'bool', value = false},

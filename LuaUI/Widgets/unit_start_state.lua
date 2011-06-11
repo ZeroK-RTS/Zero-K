@@ -14,7 +14,7 @@ function widget:GetInfo()
   }
 end
 
-options_path = 'Settings/Unit AI/Initial States'
+options_path = 'Game/Unit AI/Initial States'
 options_order = {}
 options = {}
 
@@ -29,7 +29,7 @@ end
 local unitAlreadyAdded = {}
 
 local function addLabel(text, path) -- doesn't work with order
-        path = (path and "Settings/Unit AI/Initial States/" .. path) or "Settings/Unit AI/Initial States"
+        path = (path and "Game/Unit AI/Initial States/" .. path) or "Game/Unit AI/Initial States"
         options[text .. "_label"] = {
                 name = "label", 
                 type = 'label', 
@@ -47,7 +47,7 @@ local function addUnit(defName, path)
 
         unitAlreadyAdded[defName] = true
         
-        path = "Settings/Unit AI/Initial States/" .. path
+        path = "Game/Unit AI/Initial States/" .. path
         local ud = UnitDefNames[defName]
         
         options[defName .. "_label"] = {

@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Select Keys",
-    desc      = "v0.031 Common SelectKey Hotkeys for EPIC Menu.",
+    desc      = "v0.032 Common SelectKey Hotkeys for EPIC Menu.",
     author    = "CarRepairer",
     date      = "2010-09-23",
     license   = "GNU GPL, v2 or later",
@@ -16,7 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Game/Hotkeys/Selections'
+options_path = 'Game/Selections'
 options_order = {
 	'lbl_main',
 	'select_all',
