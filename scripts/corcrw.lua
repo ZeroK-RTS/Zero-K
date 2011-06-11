@@ -93,6 +93,9 @@ local function updateVectors(num)
 	gunpoints[num].right = hat({x, y, z})
 	
 	gunpoints[num].normal = cross(gunpoints[num].radial,gunpoints[num].right)
+	
+	Turn(gunpoints[num].rot,y_axis,0)
+	Turn(gunpoints[num].pitch,x_axis,0)
 end
 
 function script.Create()	
