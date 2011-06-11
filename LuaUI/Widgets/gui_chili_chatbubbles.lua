@@ -78,7 +78,7 @@ options = {
 		type = 'number',
 		min = 5,
 		max = 50,
-		value = 15,
+		value = 20,
 	},
 	firstbubble_y = {
 		name = 'Screen Height of First Bubble',
