@@ -190,7 +190,12 @@ local function UpdateFac(unitID, index)
 	facs[index].buildProgress:SetValue(progress or 0)
 
 	--repeat icon
-	local rep = GetUnitStates(unitID)["repeat"]
+	local states = GetUnitStates(unitID)
+	if not states then
+		return
+	end
+	
+	local rep = states["repeat"]
 	if rep and not facs[index]["repeat"] then
 		facs[index].image:AddChild(facs[index].repeatImage)
 		facs[index]["repeat"] = true
@@ -633,7 +638,10 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (unitTeam ~= myTeamID) then
 		return
 	end
-	idleCons[unitID] = nil  
+	if idleCons[unitID] then
+		idleCons[unitID] = nil
+		UpdateCons()
+	end	
 	if facsByID[unitID] then
 		RemoveFac(unitID)
 	elseif commsByID[unitID] then
@@ -645,6 +653,26 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
   widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
+function widget:UnitIdle(unitID, unitDefID, unitTeam)
+	if (unitTeam ~= myTeamID) then
+		return
+	end
+	local ud = UnitDefs[unitDefID]
+	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory) then
+		idleCons[unitID] = true
+		UpdateCons()
+	end
+end
+
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdOpts, cmdParams)
+	if (unitTeam ~= myTeamID) then
+		return
+	end
+	if idleCons[unitID] then
+		idleCons[unitID] = nil
+		UpdateCons()
+	end
+end
 
 local timer = 0
 local warningColorPhase = false
@@ -661,7 +689,7 @@ function widget:Update(dt)
 	end
 	for i=1,#comms do
 		UpdateComm(comms[i].commID, i)
-	end	
+	end
 	warningColorPhase = not warningColorPhase
 	timer = 0
 end
@@ -696,28 +724,6 @@ function widget:GameFrame(n)
 		end
 	end
 end
-
-function widget:UnitIdle(unitID, unitDefID, unitTeam)
-	if (unitTeam ~= myTeamID) then
-		return
-	end
-	local ud = UnitDefs[unitDefID]
-	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory) then
-		idleCons[unitID] = true
-		UpdateCons()
-	end
-end
-
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdOpts, cmdParams)
-	if (unitTeam ~= myTeamID) then
-		return
-	end
-	if idleCons[unitID] then
-		idleCons[unitID] = nil
-		UpdateCons()
-	end
-end
-
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
