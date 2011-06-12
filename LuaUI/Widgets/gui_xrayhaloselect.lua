@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "XrayHaloSelections2",
+    name      = "XrayHaloSelections",
     desc      = "v0.02 XraySelections & HaloSelections",
     author    = "CarRepairer - Xray by trepan & Halo by jK",
     date      = "2011-06-11",
