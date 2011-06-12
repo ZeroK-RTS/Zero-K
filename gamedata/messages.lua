@@ -232,6 +232,7 @@ local messages = {
 		"Team%i (%s) started air",
 		"Team%i (%s) didn't read the Newbie Guide",
 		"Team%i (%s) was assimilated by the Borg",
+		"Team%i (%s) has failed the Emperor",
 		--"Team%i (%s) needs to take funny lessons from CarRepairer",
 		"Team%i (%s) underwent mass extinction",
 		"Team%i (%s) won't be back",
@@ -246,7 +247,7 @@ local messages = {
 		"Team%i (%s) is out of existence",
 		
 		--Tribulex
-		--"Team%i (%s) met the Lol",
+		--"Team%i (%s) met the lol",
 	},
 	[ [[Team%i is no more]] ] = {
 	},

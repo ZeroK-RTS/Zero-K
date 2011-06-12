@@ -550,6 +550,8 @@ local function UpdateCons()
 		conButton.image.file = (total > 0 and buildIcon) or buildIcon_bw
 		conButton.image.color = (total == 0 and imageColorDisabled) or nil
 		conButton.image:Invalidate()
+		conButton.button.backgroundColor = (total == 0 and buttonColorDisabled) or buttonColor
+		conButton.button:Invalidate()
 		--idleBuilderDefID = maxDefID
 	end
 	conButton.button.tooltip = "You have ".. total .. " idle con(s), of "..numTypes.." different type(s)."..

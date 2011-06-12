@@ -206,6 +206,7 @@ local base = {
 			"module_high_power_servos",
 			"weaponmod_stun_booster",
 			"commweapon_sunburst",
+			"module_adv_targeting",
 		}
 	},
 	[9] = {
