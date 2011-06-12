@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.062 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.064 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -239,7 +239,7 @@ options = {
 		name = "Enter Trackmode",
 		desc = "Track the selected unit (midclick to cancel)",
 		type = 'button',
-        hotkey = {key='t', mod='a'},
+        hotkey = {key='t', mod='a+'},
 		OnChange = function(self) trackmode = true; end,
 	},
 	
@@ -763,12 +763,12 @@ function widget:Update(dt)
 		PeriodicWarning()
 	end
 	
-	trackcycle = trackcycle %(8) + 1
+	trackcycle = trackcycle %(4) + 1
 	if trackcycle == 1 and trackmode then
 		local selUnits = Spring.GetSelectedUnits()
 		if selUnits and selUnits[1] then
 			local x,y,z = Spring.GetUnitPosition( selUnits[1] )
-			Spring.SetCameraTarget(x,y,z, 1)
+			Spring.SetCameraTarget(x,y,z, 0.2)
 		end
 	end
 	
