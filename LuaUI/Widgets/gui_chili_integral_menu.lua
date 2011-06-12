@@ -172,7 +172,7 @@ local states_main	--parent row of state buttons
 local sp_states = {}	--buttons
 local buildRow	--row of build queue buttons
 local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
-local buildProgress = {}	--Progressbar, child of buildRowButtons[1].image; updates every gameframe
+local buildProgress	--Progressbar, child of buildRowButtons[1].image; updates every gameframe
 
 local buildRow_visible = false
 local buildQueue = {}	--build order table of selectedFac
@@ -1190,9 +1190,8 @@ function widget:GameFrame()
 		local progress
 		local unitBuildID      = spGetUnitIsBuilding(selectedFac)
 		if unitBuildID then 
-			progress = select(4, spGetUnitHealth(unitBuildID))
+			progress = select(5, spGetUnitHealth(unitBuildID))
 		end
-		--Spring.Echo(progress)
 		buildProgress:SetValue(progress or 0)
 	end
 end

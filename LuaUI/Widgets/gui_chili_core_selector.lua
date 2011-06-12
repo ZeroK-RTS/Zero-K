@@ -468,7 +468,7 @@ local function ShiftCommRow()
 	end	
 end
 
-local function RemoveComm(unitID, unitDefID)
+local function RemoveComm(unitID)
 	local index = commsByID[unitID]
 	-- move everything to the left
 	if comms[index].button then
@@ -587,6 +587,16 @@ local function InitializeUnits()
 	end
 end
 
+local function ClearData()
+	for i=1,#facs do
+		RemoveFac(facs[i].facID)
+	end
+	for i=1,#comms do
+		RemoveComm(comms[i].commID)
+	end
+	idleCons = {}
+	UpdateCons()
+end
 -------------------------------------------------------------------------------
 
 
@@ -679,6 +689,8 @@ local warningColorPhase = false
 function widget:Update(dt)
 	if myTeamID~=Spring.GetMyTeamID() then
 		myTeamID = Spring.GetMyTeamID()
+		ClearData()
+		InitializeUnits()
 	end
 	timer = timer + dt
 	if timer < UPDATE_FREQUENCY then
