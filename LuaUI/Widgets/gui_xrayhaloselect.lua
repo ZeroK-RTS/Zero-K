@@ -3,8 +3,8 @@
 
 function widget:GetInfo()
   return {
-    name      = "XrayHaloSelections",
-    desc      = "v0.01 XraySelections & HaloSelections",
+    name      = "XrayHaloSelections2",
+    desc      = "v0.02 XraySelections & HaloSelections",
     author    = "CarRepairer - Xray by trepan & Halo by jK",
     date      = "2011-06-11",
     license   = "GNU GPL, v2 or later",
@@ -154,6 +154,8 @@ local circleOffset = 0
 
 local visibleAllySelUnits = {}
 local visibleSelected = {}
+
+local uCycle = 1
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -317,7 +319,8 @@ function widget:Update()
     type, data = TraceScreenRay(mx, my)
 
     --visibleUnits, visibleSelected = GetVisibleUnits()
-    if spGetGameFrame() % 4 == 0 then
+    uCycle = (uCycle + 1) % 4
+    if uCycle == 1 then
         visibleAllySelUnits, visibleSelected = GetVisibleUnits()
     end
 end
