@@ -45,6 +45,9 @@ local string_titleEnd = "? !vote 1 = yes, !vote 2 = no"
 
 local springieName = Spring.GetModOptions().springiename or ''
 
+local voteAntiSpam = false
+local VOTE_SPAM_DELAY = 1	--seconds
+
 --[[
 local index_votesHave = 14
 local index_checkDoubleDigits = 17
@@ -98,6 +101,19 @@ function widget:AddConsoleLine(line,priority)
 	elseif line:find(string_vote1) or line:find(string_vote2) then	--apply a vote
 		GetVotes(line)
 	end
+end
+
+local timer = 0
+function widget:Update(dt)
+	if not voteAntiSpam then
+		return
+	end
+	timer = timer + dt
+	if timer < VOTE_SPAM_DELAY then
+		return
+	end
+	voteAntiSpam = false
+	timer = 0
 end
 
 --------------------------------------------------------------------------------
@@ -199,7 +215,11 @@ function widget:Initialize()
 			height = "100%",
 			caption = (i==1) and 'Yes' or 'No',
 			OnMouseDown = {	function () 
-					Spring.SendCommands({'say !vote '..i})	
+					if voteAntiSpam then
+						return
+					end
+					Spring.SendCommands({'say !vote '..i})
+					voteAntiSpam = true
 				end},
 			padding = {1,1,1,1},
 			--keepAspect = true,
