@@ -19,6 +19,7 @@ end
 
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
+local lava = (Game.waterDamage > 0)
 
 local unitData = {}
 local unitsByID = {}
@@ -83,7 +84,7 @@ local function spawnStructures(left, top, right, bottom)
 		elseif info.isDestroyed then
 			--do nothing
 		else
-			while Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 and giveUp < 20 do
+			while Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 and (lava and Spring.GetGroundHeight(x,z) <= 0) and giveUp < 25 do
 				x = xBase + math.random()*xRand
 				z = zBase + math.random()*zRand
 				giveUp = giveUp + 1
