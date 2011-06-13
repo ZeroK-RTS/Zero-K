@@ -34,7 +34,6 @@ unitDef = {
 	helptext_de    = [[Der Vamp ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt.]],
   },
 
-  defaultmissiontype     = [[VTOL_standby]],
   explodeAs              = [[GUNSHIPEX]],
   fireState              = 2,
   floater                = true,
@@ -44,7 +43,6 @@ unitDef = {
   iconType               = [[stealthfighter]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maneuverleashlength    = [[1280]],
   mass                   = 187,
   maxAcc                 = 0.14,
   maxDamage              = 975,
@@ -60,7 +58,6 @@ unitDef = {
   sightDistance          = 790,
   smoothAnim             = true,
   speedToFront           = 0.5,
-  TEDClass               = [[VTOL]],
 
   weapons                = {
 
@@ -105,17 +102,14 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       laserFlareSize          = 2.9,
-      lineOfSight             = true,
       minIntensity            = 1,
-      noSelfDamage            = true,
       pitchtolerance          = 8192,
       range                   = 800,
       reloadtime              = 0.1,
-      renderType              = 0,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],
       soundStartVolume        = 3,
-      thickness               = 1.93649167310371,
+      thickness               = 1.95,
       tolerance               = 8192,
       turret                  = true,
       weaponType              = [[BeamLaser]],

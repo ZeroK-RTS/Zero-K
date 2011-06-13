@@ -38,7 +38,6 @@ unitDef = {
 	helptext_de    = [[Durch seine Fähigkeit mobile Kräft vor Luftangriffen zu beschützen, gibt der Jethro den entsprechenden Einheiten einen wichtigen Vorteil gegenüber Lufteinheiten. Verteidigungslos gegenüber Landeinheiten.]],
   },
 
-  defaultmissiontype     = [[Standby]],
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
@@ -46,7 +45,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maneuverleashlength    = [[640]],
   mass                   = 117,
   maxDamage              = 550,
   maxSlope               = 36,
@@ -73,8 +71,6 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 660,
   smoothAnim             = true,
-  steeringmode           = [[2]],
-  TEDClass               = [[KBOT]],
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -112,9 +108,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 1.5,
-        planes  = 15,
-        subs    = 0.75,
+        default = 1.6,
+        planes  = 16,
+        subs    = 0.8,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],

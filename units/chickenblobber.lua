@@ -12,6 +12,7 @@ unitDef = {
   buildTime           = 900,
   canAttack           = true,
   canGuard            = true,
+  canHover            = true,  
   canMove             = true,
   canPatrol           = true,
   canstop             = [[1]],
