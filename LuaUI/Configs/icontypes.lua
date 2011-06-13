@@ -29,11 +29,11 @@ local icontypes = {
   },
   commander3 = {
     bitmap='icons/armcommander.dds',
-    size=2.5,
+    size=2.4,
   },
   commander4 = {
     bitmap='icons/armcommander.dds',
-    size=2.9,
+    size=2.6,
   },  
 
   corcommander = {
