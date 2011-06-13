@@ -44,8 +44,8 @@ local moveDefs = {
 	},
 	
 	AKBOT3 = {		--amphib
-		footprintx = 2,
-		footprintz = 2,
+		footprintx = 3,
+		footprintz = 3,
 		maxwaterdepth = 5000,
 		depthmod = 0,
 		maxslope = 36,
