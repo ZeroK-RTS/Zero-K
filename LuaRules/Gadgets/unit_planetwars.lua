@@ -73,6 +73,7 @@ local function spawnStructures(left, top, right, bottom)
 	local zRand = mapHeight*(bottom-top)
 	
 	for _,info in pairs(unitData) do
+		Spring.Echo("Processing PW structure: "..info.unitname)
 		local giveUp = 0
 		local x = xBase + math.random()*xRand
 		local z = zBase + math.random()*zRand
@@ -81,7 +82,7 @@ local function spawnStructures(left, top, right, bottom)
 		
 		if not defID then
 			Spring.Echo('Planetwars error: Missing structure def ' .. info.unitname)
-		elseif info.isDestroyed then
+		elseif info.isDestroyed == 1 then
 			--do nothing
 		else
 			while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or (lava and Spring.GetGroundHeight(x,z) <= 0)) and giveUp < 25 do
