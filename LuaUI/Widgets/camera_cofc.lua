@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.064 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.07 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -59,6 +59,7 @@ options_order = {
 	'freemode',
 	
 	'trackmode',
+	'resetcam',
 
 }
 
@@ -242,6 +243,13 @@ options = {
         hotkey = {key='t', mod='a+'},
 		OnChange = function(self) trackmode = true; end,
 	},
+    
+	resetcam = {
+		name = "Reset Camera",
+		desc = "Reset the camera position and orientation. Map a hotkey or use <Ctrl> + <Alt> + <Shift> + <Middleclick>",
+		type = 'button',
+        -- OnChange defined later
+	},
 	
 }
 
@@ -421,7 +429,8 @@ local function MoveRotatedCam(cs, mxm, mym)
 	return cs
 end
 
-
+--Note: If the x,y is not pointing at an onmap point, this function traces a virtual ray to an
+--          offmap position using the camera direction and disregards the x,y parameters. Fixme.
 local function VirtTraceRay(x,y, cs)
 	local _, gpos = spTraceScreenRay(x, y, true)
 	
@@ -588,6 +597,7 @@ local function ResetCam()
 	cs.ry = PI
 	spSetCameraState(cs, 1)
 end
+options.resetcam.OnChange = ResetCam
 
 OverviewAction = function()
 	if not overview_mode then
@@ -679,7 +689,7 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	SetLockSpot2(cs)
 	if not cs.dy or not ls_have then
 		--echo "<COFC> scrollcam fcn fail"
-		return cs	
+		return
 	end
 	if not ls_onmap then
 		smoothlevel = 0.5
@@ -704,18 +714,18 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	ls_x = ls_x + ddx
 	ls_z = ls_z + ddz
 	
-	ls_x = math.min(ls_x, mwidth)
-	ls_x = math.max(ls_x, 0)
+	ls_x = math.min(ls_x, mwidth-3)
+	ls_x = math.max(ls_x, 3)
 	
-	ls_z = math.min(ls_z, mheight)
-	ls_z = math.max(ls_z, 0)
+	ls_z = math.min(ls_z, mheight-3)
+	ls_z = math.max(ls_z, 3)
 	
 	ls_y = Spring.GetGroundHeight(ls_x, ls_z) or 0
 	
-	local cstemp = UpdateCam(cs)
-	if cstemp then cs = cstemp; end
-	
-	spSetCameraState(cs, smoothlevel)
+	local csnew = UpdateCam(cs)
+	if csnew then
+        spSetCameraState(csnew, smoothlevel)
+    end
 	
 end
 
