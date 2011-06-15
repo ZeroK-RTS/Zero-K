@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.871 Chili Minimap",
+    desc      = "v0.88 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -114,6 +114,12 @@ options = {
 }
 			
 local function MakeMinimapButton(file, pos, option )
+	local desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
+	local hotkey = WG.crude.GetHotkey(options[option].action)
+	if hotkey ~= '' then
+		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
+	end
+		
 	return Chili.Button:New{ 
 		height=iconsize, width=iconsize, 
 --		file=file,
@@ -123,14 +129,7 @@ local function MakeMinimapButton(file, pos, option )
 		bottom=0, 
 		right=iconsize*pos+5, 
 		
-		tooltip = (
-			options[option].name
-				.. ( options[option].desc 
-					and (' (' .. options[option].desc .. ')') 
-					or '' )
-				.. ' (\255\0\255\0' .. WG.crude.GetHotkey(options[option].action) .. '\008)' 
-			),
-		
+		tooltip = ( options[option].name .. desc .. hotkey ),
 		
 		--OnClick={ function(self) options[option].OnChange() end }, 
 		OnClick={ function(self) Spring.SendCommands( options[option].action ); end },
