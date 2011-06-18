@@ -72,6 +72,10 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	end
 end
 
+function GG.DestroyMissile(unitID, unitDefID)
+	gadget:UnitDestroyed(unitID, unitDefID)
+end
+
 function gadget:UnitCreated(unitID, unitDefID)
 	if unitDefID == siloDefID then silos[unitID] = true end
 end

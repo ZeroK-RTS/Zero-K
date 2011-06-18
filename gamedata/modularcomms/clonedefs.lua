@@ -122,6 +122,7 @@ for sourceName, copyTable in pairs(copy) do
 		for statName, value in pairs(stats.customparams) do
 			UnitDefs[cloneName].customparams[statName] = value
 		end
+		UnitDefs[cloneName].trackwidth = UnitDefs[cloneName].trackwidth * (0.9 + 0.1*(stats.level))
 		-- features
 		UnitDefs[cloneName].featuredefs.dead.object = stats.wreckmodel
 		UnitDefs[cloneName].featuredefs.dead.footprintx = UnitDefs[cloneName].footprintx
