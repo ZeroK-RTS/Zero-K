@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.07 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.08 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -32,7 +32,8 @@ options_order = {
 	'lblRotate',
 	'targetmouse', 
 	'rotateonedge', 
-	'rotfactor', 
+	'rotfactor',
+    'inverttilt',
 	
 	'lblScroll',
 	'edgemove', 
@@ -150,6 +151,13 @@ options = {
 		type = 'bool',
 		value = false,
 	},
+    inverttilt = {
+		name = 'Invert tilt',
+		desc = 'Invert the tilt direction when using ctrl+mousewheel.',
+		type = 'bool',
+		value = false,
+	},
+    
 	zoomoutfromcursor = {
 		name = 'Zoom out from cursor',
 		desc = 'Zoom out from the cursor rather than center of the screen.',
@@ -181,6 +189,7 @@ options = {
 		type = 'bool',
 		value = false,
 	},
+    
 	smoothness = {
 		name = 'Smoothness',
 		desc = "Controls how smooth the camera moves.",
@@ -524,17 +533,32 @@ local function Zoom(zoomin, s, forceCenter)
 			else
 				return false
 			end
+            
+			local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (s and 3 or 1)
 			
-			local sp = (zoomin and options.zoominfactor.value or -options.zoomoutfactor.value) * (s and 4 or 1)
+			local new_px = cs.px + dx * sp
+			local new_py = cs.py + dy * sp
+			local new_pz = cs.pz + dz * sp
 			
-			cs.px = cs.px + dx * sp
-			cs.py = cs.py + dy * sp
-			cs.pz = cs.pz + dz * sp
+			if not options.freemode.value then
+                if new_py < Spring.GetGroundHeight(cs.px, cs.pz)+5 then
+                    sp = (Spring.GetGroundHeight(cs.px, cs.pz)+5 - cs.py) / dy
+                    new_px = cs.px + dx * sp
+                    new_py = cs.py + dy * sp
+                    new_pz = cs.pz + dz * sp
+                elseif (not zoomin) and new_py > maxDistY then
+                    sp = (maxDistY - cs.py) / dy
+                    new_px = cs.px + dx * sp
+                    new_py = cs.py + dy * sp
+                    new_pz = cs.pz + dz * sp
+                end
+                
+            end
 			
-			if not options.freemode.value and cs.py < Spring.GetGroundHeight(cs.px, cs.pz)+5 then
-				return true
-			end
-			
+            cs.px = new_px
+            cs.py = new_py
+            cs.pz = new_pz
+            
 			spSetCameraState(cs, options.smoothness.value)
 			ls_have = false
 			return
@@ -547,11 +571,11 @@ local function Zoom(zoomin, s, forceCenter)
 	if not ls_have then
 		return
 	end
-	
+    
 	if zoomin and not ls_onmap then
 		return
 	end
-	
+    
 	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (s and 3 or 1)
 	
 	ls_dist = ls_dist + ls_dist*sp
@@ -579,10 +603,15 @@ local function Altitude(up, s)
 	local cs = spGetCameraState()
 	local py = max(1, abs(cs.py) )
 	local dy = py * (up and 1 or -1) * (s and 0.3 or 0.1)
-	cs.py = py + dy
-	if not options.freemode.value and cs.py < Spring.GetGroundHeight(cs.px, cs.pz)+5  then
-		return true
+	local new_py = py + dy
+	if not options.freemode.value then
+        if new_py < Spring.GetGroundHeight(cs.px, cs.pz)+5  then
+            new_py = Spring.GetGroundHeight(cs.px, cs.pz)+5  
+        elseif new_py > maxDistY then
+            new_py = maxDistY 
+        end
 	end
+    cs.py = new_py
 	spSetCameraState(cs, options.smoothness.value)
 	return true
 end
@@ -678,6 +707,8 @@ local function Tilt(s, dir)
 	if not ls_have then
 		return
 	end
+    local dir = dir * (options.inverttilt.value and -1 or 1)
+    
 
 	local speed = dir * (s and 30 or 10)
 	RotateCamera(vsx * 0.5, vsy * 0.5, 0, speed, true, true) --smooth, lock
