@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List2",
-    desc      = "v1.03 Chili Crude Player List.",
+    desc      = "v1.031 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -77,7 +77,6 @@ options = {
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
-			echo 'test'
 			window_cpl.color = {1,1,1,self.value}
 			window_cpl:Invalidate() 
 		end,
