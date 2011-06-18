@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List2",
-    desc      = "v1.01 Chili Crude Player List.",
+    desc      = "v1.02 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -115,22 +115,19 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			fontShadow = true,
 		}
 	)
-	--row = row + 1
-	table.sort(players)
-	for _, playerID in ipairs( players ) do
+	
+	table.sort(players, function(a,b)
+			return a[2]:lower() < b[2]:lower() ;
+		end)
+	
+	--for _, playerID in ipairs( players ) do
+	for _, pdata in ipairs( players ) do
+		local playerID = pdata[1]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
 	
-		
-		
 		local min_pingTime = math.min(pingTime, 1)
-		
 		local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
-		
-		
 		local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
-		
-		
-		
 		local pingTime_readable = pingTime < 1 and (math.round(pingTime*1000) ..'ms') or ( (''..pingTime):sub(1,4) .. 's')
 	
 		window_cpl:AddChild(
@@ -139,7 +136,8 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				y=options.text_height.value * row,
 				width=120,
 				autosize=false,
-				caption = (spectator and '' or ((teamID+1).. ') ') )  .. name,
+				--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name,
+				caption = name,
 				textColor = spectator and {1,1,1,1} or {Spring.GetTeamColor(teamID)},
 				fontsize = options.text_height.value,
 				fontShadow = true,
@@ -197,7 +195,7 @@ SetupPlayerNames = function()
 	window_cpl:ClearChildren()
 	
 	window_cpl:AddChild( Label:New{ x=0, 		caption = 'A', 		fontShadow = true, 	fontsize = options.text_height.value, } )
-	window_cpl:AddChild( Label:New{ x=x_name, 	caption = 'ID / Name', 	fontShadow = true,  fontsize = options.text_height.value,} )
+	window_cpl:AddChild( Label:New{ x=x_name, 	caption = 'Name', 	fontShadow = true,  fontsize = options.text_height.value,} )
 	window_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = options.text_height.value,} )
 	window_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = options.text_height.value,} )
 	
@@ -213,7 +211,8 @@ SetupPlayerNames = function()
 		if not allyTeams[allyTeamID2] then
 			allyTeams[allyTeamID2] = {}
 		end
-		table.insert( allyTeams[allyTeamID2], playerroster[i] )
+		
+		table.insert( allyTeams[allyTeamID2], {playerroster[i],name} )
 	end
 	
 	local allyTeams_i = {}
