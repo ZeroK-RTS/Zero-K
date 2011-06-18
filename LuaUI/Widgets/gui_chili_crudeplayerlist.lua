@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List2",
-    desc      = "v1.00000000 Chili Crude Player List.",
+    desc      = "v1.01 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -56,6 +56,8 @@ pingCpuColors = {
 }
 
 local sharePic        = ":n:"..LUAUI_DIRNAME.."Images/advplayerslist/units.png"
+
+local show_spec = true
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -114,6 +116,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		}
 	)
 	--row = row + 1
+	table.sort(players)
 	for _, playerID in ipairs( players ) do
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
 	
@@ -124,7 +127,11 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
 		
 		
-		local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ] 
+		local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
+		
+		
+		
+		local pingTime_readable = pingTime < 1 and (math.round(pingTime*1000) ..'ms') or ( (''..pingTime):sub(1,4) .. 's')
 	
 		window_cpl:AddChild(
 			Label:New{
@@ -142,7 +149,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			window_cpl:AddChild(
 				Button:New{
 					x=x_share,
-					y=options.text_height.value * row,
+					y=options.text_height.value * (row+0.5),
 					height = options.text_height.value,
 					width = options.text_height.value,
 					tooltip = 'Double click to share selected units to ' .. name,
@@ -174,7 +181,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			Label:New{
 				x=x_ping,
 				y=options.text_height.value * row,
-				caption = math.round(pingTime*1000) .. 'ms',
+				caption = pingTime_readable ,
 				textColor = pingCol,
 				fontsize = options.text_height.value,
 				fontShadow = true,
@@ -202,22 +209,45 @@ SetupPlayerNames = function()
 	
 	for i,v in ipairs(playerroster) do
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerroster[i])
-		if not allyTeams[spectator and 'S' or allyTeamID] then
-			allyTeams[spectator and 'S' or allyTeamID] = {}
+		local allyTeamID2 = spectator and 'S' or allyTeamID
+		if not allyTeams[allyTeamID2] then
+			allyTeams[allyTeamID2] = {}
 		end
-		table.insert( allyTeams[spectator and 'S' or allyTeamID], playerroster[i] )
+		table.insert( allyTeams[allyTeamID2], playerroster[i] )
 	end
 	
+	local allyTeams_i = {}
+	for allyTeam,players in pairs(allyTeams) do
+		allyTeams_i[#allyTeams_i+1] = {allyTeam,players}
+	end
+	
+	table.sort(allyTeams_i,
+		function(a,b)
+			local av = (type(a[1]) == 'string') and 999 or a[1]
+			local bv = (type(b[1]) == 'string') and 999 or b[1]
+			return av < bv
+		end)
 	
 	local row = 1
-	for allyTeam,players in pairs(allyTeams) do
+	--for allyTeam,players in pairs(allyTeams) do
+	for _,adata in ipairs(allyTeams_i) do
+		local allyTeam,players = adata[1], adata[2]
+		
 		if allyTeam ~= 'S' then
 			row = AddAllyteamPlayers(row, allyTeam,players)
 		end
 		
 	end
-	row = AddAllyteamPlayers(row,'S',allyTeams.S)
+	if show_spec then
+		row = AddAllyteamPlayers(row,'S',allyTeams.S)
+	end
 	
+	window_cpl:AddChild( Button:New{
+		x=5, y=options.text_height.value * (row + 0.5),
+		height=options.text_height.value * 2, width=150,
+		caption = 'Spectators',
+		OnClick = { function() show_spec = not show_spec; SetupPlayerNames(); end }
+	} )
 	
 end
 
