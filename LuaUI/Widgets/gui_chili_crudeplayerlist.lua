@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List2",
-    desc      = "v1.02 Chili Crude Player List.",
+    desc      = "v1.03 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -63,14 +63,24 @@ local show_spec = true
 
 function SetupPlayerNames() end
 
-options_path = 'Settings/Interface'
+options_path = 'Settings/Interface/PlayerList'
 options = {
 	text_height = {
-		name = 'Playerlist Text Size',
+		name = 'Font Size',
 		type = 'number',
 		value = 14,
 		min=8,max=18,step=1,
 		OnChange = function() SetupPlayerNames() end,
+	},
+	backgroundOpacity = {
+		name = "Background opacity",
+		type = "number",
+		value = 0, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			echo 'test'
+			window_cpl.color = {1,1,1,self.value}
+			window_cpl:Invalidate() 
+		end,
 	},
 }
 
@@ -95,7 +105,7 @@ end
 
 local function AddAllyteamPlayers(row, allyTeam,players)
 	if not players then
-		return
+		return row
 	end
 	local row = row
 	local localAlliance = Spring.GetLocalAllyTeamID()
@@ -293,6 +303,7 @@ function widget:Initialize()
 		--padding = {2,2,2,2},
 		dockable = true,
 		name = "crudeplayerlist",
+		color = {1,1,1,options.backgroundOpacity.value},
 		x = 100,  
 		bottom = 0,
 		width  = 350,
