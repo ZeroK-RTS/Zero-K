@@ -529,7 +529,7 @@ local function SetupNubtronWindow()
 		width = 550;
 		height = imgsize+20; 
 		x = 450; 
-		bottom = 0;
+		bottom = 52;
 		dockable = false;
 		draggable = true,
 		resizable = false,
