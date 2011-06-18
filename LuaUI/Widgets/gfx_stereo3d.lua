@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Stereo3D",
-    desc      = "v0.121 Stereo 3D rendering.",
+    desc      = "v0.122 Stereo 3D rendering.",
     author    = "CarRepairer, with assistance of jK",
     date      = "2009",
     license   = "GNU GPL, v2 or later",
@@ -267,7 +267,7 @@ options_order = { 'toggle3d', 'helpwindow', 'lblblank1', 'lblsettings', 'swapeye
 options = {
 	
 	toggle3d = {
-		name = 'Toggle Stereo 3D',
+		name = 'Enable Stereo 3D',
 		type = 'bool',
 		value = false,
 		desc = 'Turn Stereo3D vision on or off.'
