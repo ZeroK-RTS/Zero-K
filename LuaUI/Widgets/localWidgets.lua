@@ -80,17 +80,17 @@ function CreateWindow()
   })
   window0:AddChild(contentPane)
   local label = Chili.TextBox:New{
-    text = "\255\255\1\1Enabling local widgets might break CA's interface.\nDon't do it unless you know what you are doing.\nTo take effect you need to reload LuaUI.",
+    text = "\255\255\1\1Enabling local widgets might break ZK's interface.\nDon't do it unless you know what you are doing.\nTo take effect you need to reload LuaUI.",
     fontsize = 14,
     weight = 1.5,
   }
   contentPane:AddChild(label)
   check1 = Chili.Checkbox:New{
-    caption = "enable local widgets",
+    caption = "Enable local widgets",
     checked = settings.localWidgets,
   }
   check2 = Chili.Checkbox:New{
-    caption = "load local widgets first",
+    caption = "Load local widgets first",
     checked = settings.localWidgetsFirst,
   }
   contentPane:AddChild(check1)

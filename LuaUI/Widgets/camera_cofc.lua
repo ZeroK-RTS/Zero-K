@@ -90,7 +90,7 @@ options = {
 			Additional actions:
 			Keyboard: <arrow keys> replicate middlebutton drag while <pgup/pgdn> replicate mousewheel. You can use these with ctrl, alt & shift to replicate mouse camera actions.
 			Use <Shift> to speed up camera movements.
-			Reset Camera..... <Ctrl> + <Alt> + <Shift> + <Middleclick> or /luaui cofc reset
+			Reset Camera..... <Ctrl> + <Alt> + <Shift> + <Middleclick>
 		]],
 	},
 	smoothscroll = {

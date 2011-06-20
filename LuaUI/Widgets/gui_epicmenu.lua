@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.26 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.27 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -27,17 +27,11 @@ local echo = Spring.Echo
 local VFSMODE      = VFS.RAW_FIRST
 local file = LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua"
 local confdata = VFS.Include(file, nil, VFSMODE)
-local menu_tree = confdata.menu_tree
-local game_menu_tree = confdata.game_menu_tree 
+local epic_options = confdata.eopt
 local color = confdata.color
 local title_text = confdata.title
 local title_image = confdata.title_image
-local help_menu_tree = confdata.help_tree
-local menu_tree2 = {}
-local game_menu_tree2 = {}
-local help_menu_tree2 = {}
-local game_menu_index = -1
-local main_menu_index = -1
+
 local flatwindowlist = {}
 
 --------------------------------------------------------------------------------
@@ -733,6 +727,40 @@ local function MakeHelp(caption, text)
 	}
 end
 
+local function AddOption(path, wname, option)
+	custompaths_i[#custompaths_i+1] = path --number indexed so that paths are added to menu in the order they appear in the widget
+	if not custompathsettings[path] then
+		custompathsettings[path] = {}
+	end
+	if not custompathsettings[path][wname] then
+		custompathsettings[path][wname] = {}
+	end
+	local custompathwidget = custompathsettings[path][wname]
+	local length = #custompathwidget
+	if option then
+		custompathsettings[path][wname][#custompathwidget+1] = option
+	end
+end
+
+local function RemPath(path, wname)
+	--If a widget disables itself in widget:Initialize it will run the removewidget before the insertwidget is complete. 
+	if not custompathsettings[path] then
+		return
+	end
+	
+	custompathsettings[path][wname] = nil
+	local deletepath = true
+	for k,v in pairs(custompathsettings[path]) do
+		deletepath = false
+	end
+	if deletepath then
+		--custompaths[path] = nil
+		custompaths_i = tableremove(custompaths_i, path) --number indexed so that paths are added to menu in the order they appear in the widget
+		--custompathsettings[path] = nil --causes strange error
+		custompathsettings[path] = {}
+	end
+end
+
 --(Un)Store custom widget settings for a widget
 local function IntegrateWidget(w, addoptions, index)
 	local options = w.options
@@ -810,34 +838,9 @@ local function IntegrateWidget(w, addoptions, index)
 		local path = option.path or defaultpath
 		
 		if not addoptions then
-			--If a widget disables itself in widget:Initialize it will run the removewidget before the insertwidget is complete. 
-			if not custompathsettings[path] then
-				return
-			end
-			
-			custompathsettings[path][wname] = nil
-			local deletepath = true
-			for k,v in pairs(custompathsettings[path]) do
-				deletepath = false
-			end
-			if deletepath then
-				--custompaths[path] = nil
-				custompaths_i = tableremove(custompaths_i, path) --number indexed so that paths are added to menu in the order they appear in the widget
-				--custompathsettings[path] = nil --causes strange error
-				custompathsettings[path] = {}
-			end
+			RemPath(path, wname)
 		else
-			--custompaths[path] = true
-			custompaths_i[#custompaths_i+1] = path --number indexed so that paths are added to menu in the order they appear in the widget
-			if not custompathsettings[path] then
-				custompathsettings[path] = {}
-			end
-			if not custompathsettings[path][wname] then
-				custompathsettings[path][wname] = {}
-			end
-			local custompathwidget = custompathsettings[path][wname]
-			local length = #custompathwidget
-			custompathsettings[path][wname][#custompathwidget+1] = option
+			AddOption(path, wname, option)
 		end
 	end
 	
@@ -850,115 +853,6 @@ local function AddAllCustSettings()
 	for i,widget in ipairs(widgetHandler.widgets) do
 		IntegrateWidget(widget, true, i)
 	end
-end
-
--- Convert shorthand settings tree (from crudemenu_conf file) 
--- to longhand (IceUI style) settings tree
-local function ShorthandTree2Long(tree, name)
-	local rettree = {}
-	
-	local name = name or ''
-	
-	local tooltip_start = name and name:find('|')
-	local tooltip = ''
-	if tooltip_start then
-		tooltip = name:sub(tooltip_start+1)
-		name 	= name:sub(1,tooltip_start-1)
-	end
-	local advanced = false
-	if name:sub(1,1) == '@' then
-		name = name:sub(2)
-		advanced = true
-	end
-						
-	rettree.desc = tooltip
-	
-	if type(tree) == 'table'  and #tree > 0 and type(tree[1]) == 'table' then
-		rettree.name = name
-		rettree.type = 'menu'
-		
-		local subtree = {}
-		local order = {}
-		for _,data in ipairs( tree ) do
-			local subname = ''
-			if #data == 2 then
-				if type(data[1]) == 'string' and type(data[2]) == 'string' then
-					subname = data[1]
-					
-					local tooltip_start = subname and subname:find('|')
-					local tooltip = ''
-					if tooltip_start then
-						tooltip 	= subname:sub(tooltip_start+1)
-						subname 	= subname:sub(1,tooltip_start-1)
-					end
-					
-					
-					if data[2]:sub(1,1) == '=' then
-						subtree[ subname ] = {
-							type = 'text',
-							name = subname,
-							desc = tooltip,
-							value = data[2]:sub(2),
-						}
-					else
-						local advanced = false
-						local action = data[2]
-						if subname:sub(1,1) == '@' then
-							subname = subname:sub(2)
-							advanced = true
-						end
-						
-						subtree[ subname ] = {
-							type = 'button',
-							name = subname,
-							--OnChange = function(self) end,
-							desc = tooltip,
-							action = action,
-							advanced = advanced,
-						}
-					end
-				else
-					subname = data[1]
-					if subname == 'lh' then
-						subname = 'lh' .. data[2].name
-						subtree[ subname ] = data[2]
-					else
-						local subsubtree = ShorthandTree2Long( data[2], data[1] )
-						subname = subsubtree.name
-						subtree[ subname ] = subsubtree
-					end
-				end
-			elseif #data == 1 then
-				subname = 'lbl'.. data[1]
-				subtree[ subname ] = {
-					type = 'label',
-					name = data[1],
-					value = data[1],
-				}
-			elseif #data == 0 then
-				subname = 'lblempty' .. (math.random()) 
-				subtree[ subname ] = {
-					type = 'label',
-					name = 'empty',
-					value = '',
-				}
-			end
-			order[#order+1] = subname
-			subtree[subname].key = subname
-		end
-		
-		rettree.order = order
-		rettree.value = subtree
-
-	-- TERMINAL
-	else
-		rettree.type = 'button'
-		rettree.name = name
-		rettree.OnChange = tree
-		rettree.advanced = advanced
-	end
-	--rettree.key = rettree.name
-	return rettree
 end
 
 -- Make submenu window based on index from flat window list
@@ -1126,10 +1020,8 @@ local function flattenTree(tree, parent)
 		local thispath = custompathsettings[curkey]
 		for w, options in pairs(thispath) do
 			for _,option in ipairs(options) do
-				if true then
-					tree2.order[#(tree2.order)+1] = option.key
-					tree2.value[option.key] = option
-				end
+				tree2.order[#(tree2.order)+1] = option.key
+				tree2.value[option.key] = option
 			end
 		end	
 	end
@@ -1147,6 +1039,7 @@ local function flattenTree(tree, parent)
 			--set keys to index by
 			if not option.key then
 				option.key = option.name
+				--option.key = i or option.name
 			end
 			
 			local fullkey = curkey .. '_' .. option.key
@@ -1272,7 +1165,6 @@ local function flattenTree(tree, parent)
 					elseif not widgetHandler.widgets[option.windex].options[option.key] then
 						echo('<EPIC Menu> Error #77', option.windex, option.key)
 					else
-						echo '22'
 						widgetHandler.widgets[option.windex].options[option.key].OnChange = function(self)
 							controlfunc(self)
 							--origOnChange(option)
@@ -1479,7 +1371,6 @@ MakeSubWindow = function(fwkey)
 	
 	for i, optionkey in ipairs(windowdata.order) do
 		local data = tree[optionkey]
-		
 		if not data.OnChange then
 			data.OnChange = function(self) end
 		end
@@ -1487,7 +1378,7 @@ MakeSubWindow = function(fwkey)
 			data.desc = ''
 		end
 		
-		if data.advanced and not settings.config['Settings_lhShow_Advanced_Settings'] then
+		if data.advanced and not settings.config['Settings_Show_Advanced_Settings'] then
 			--do nothing
 		elseif data.type == 'button' then	
 			local button = Button:New{
@@ -1712,9 +1603,8 @@ end
 
 
 
-local function AddCustomPaths(menutree, menuname)
+local function AddCustomPaths(menuname)
 	local menutreeret = {}
-	CopyTable(menutreeret, menutree)
 	local custompathtree = {}
 	--for pathstring, _ in pairs(custompaths) do
 	for _, pathstring in ipairs(custompaths_i) do --number indexed so that paths are added to menu in the order they appear in the widget
@@ -1741,16 +1631,17 @@ local function MakeCrudeMenu()
 	local crude_width = 425
 	local crude_height = B_HEIGHT+10
 	
-	local menu_tree3 		= AddCustomPaths(menu_tree2, 'Settings')
-	local game_menu_tree3 	= AddCustomPaths(game_menu_tree2, 'Game')
+	local menu_tree3 		= AddCustomPaths('Settings')
+	local game_menu_tree3 	= AddCustomPaths('Game')
+	local help_menu_tree3 	= AddCustomPaths('Help')
 	
 	for actionName, _ in pairs( settings.keybounditems ) do
 		RemoveAction(actionName)
 	end
 	
-	main_menu_index = flattenTree(menu_tree3, '')
-	game_menu_index = flattenTree(game_menu_tree3, '' )
-	help_menu_index = flattenTree(help_menu_tree2, 'Help' )
+	local main_menu_index = flattenTree(menu_tree3, '')
+	local game_menu_index = flattenTree(game_menu_tree3, '' )
+	local help_menu_index = flattenTree(help_menu_tree3, '' )
 	
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header,  }
 	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', textColor = color.sub_header, align="center" }
@@ -1791,14 +1682,14 @@ local function MakeCrudeMenu()
 					
 					-- odd-number button width keeps image centered
 					Button:New{
-						caption = "", OnMouseUp = { function() MakeSubWindow(game_menu_index) end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						caption = "", OnMouseUp = { function() MakeSubWindow('Game') end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin,	tooltip = 'Game Actions',
 						children = {
 							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/game.png', height=B_HEIGHT-2,width=B_HEIGHT-2},
 						},
 					},
 					Button:New{
-						caption = "", OnMouseUp = { function() MakeSubWindow(main_menu_index) end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						caption = "", OnMouseUp = { function() MakeSubWindow('Settings') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin,	tooltip = 'Settings', 
 						children = {
 							Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
@@ -1904,7 +1795,7 @@ local function MakeCrudeMenu()
 					},
 					
 					Button:New{
-						caption = "", OnMouseUp = { function() MakeSubWindow(help_menu_index) end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						caption = "", OnMouseUp = { function() MakeSubWindow('Help') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin, tooltip = 'Help', 
 						children = {
 							Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/questionmark.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  },
@@ -1999,10 +1890,24 @@ function widget:Initialize()
 	-- add custom widget settings to crudemenu
 	AddAllCustSettings()
 	
-	menu_tree2 = ShorthandTree2Long(menu_tree, 'Settings')
-	game_menu_tree2 = ShorthandTree2Long(game_menu_tree, 'Game')
-	help_menu_tree2 = ShorthandTree2Long(help_menu_tree, 'Help Menu')
-
+	AddOption('Settings', 'epic')
+	AddOption('Settings/Reset Settings', 'epic')
+	AddOption('Settings/Camera', 'epic')
+	AddOption('Settings/Interface', 'epic')
+	AddOption('Settings/Misc', 'epic')
+	AddOption('Settings/Mouse Cursor', 'epic')
+	AddOption('Settings/Video', 'epic')
+	AddOption('Settings/View', 'epic')
+	AddOption('Game', 'epic')
+	AddOption('Help', 'epic')
+	
+	local options_temp ={}
+	CopyTable(options_temp , epic_options);
+	for i,option in ipairs(options_temp ) do
+		AddOption(option.path, 'epic', option)
+	end
+	
+	
 	widget:ViewResize(Spring.GetViewGeometry())
 	
 	-- Set default positions of windows on first run
