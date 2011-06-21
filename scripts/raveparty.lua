@@ -16,8 +16,8 @@ local tau = math.pi*2
 local pi = math.pi
 local hpi = math.pi*0.5
 
-local headingSpeed = math.rad(4)
-local pitchSpeed = math.rad(100)
+local headingSpeed = math.rad(5)
+local pitchSpeed = math.rad(140)
 
 local spindleOffset = math.rad(60)
 local spindlePitch = 0

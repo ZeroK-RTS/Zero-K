@@ -100,123 +100,122 @@ local function Walk()
 		Turn( torso , y_axis, math.rad(3.335165) )
 	end
 	Move( pelvis , y_axis, 0  )
-	Turn( rupleg , x_axis, math.rad(5.670330) )
-	Turn( lupleg , x_axis, math.rad(-26.467033) )
-	Turn( lloleg , x_axis, math.rad(26.967033) )
-	Turn( rloleg , x_axis, math.rad(26.967033) )
-	Turn( rfoot , x_axis, math.rad(-19.824176) )
-	Sleep(90) --had to + 20 to all sleeps in walk
+	Turn( rupleg , x_axis, math.rad(5.670330), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(-26.467033), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(26.967033), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(26.967033), math.rad(75) )
+	Turn( rfoot , x_axis, math.rad(-19.824176), math.rad(75) )
+	Sleep(180) --had to + 20 to all sleeps in walk
 	
 	if not bAiming then
 		Turn( torso , y_axis, math.rad(1.681319) )
 	end
-	Turn( rupleg , x_axis, math.rad(-5.269231) )
-	Turn( lupleg , x_axis, math.rad(-20.989011) )
-	Turn( lloleg , x_axis, math.rad(20.945055) )
-	Turn( rloleg , x_axis, math.rad(41.368132) )
+	Turn( rupleg , x_axis, math.rad(-5.269231), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(-20.989011), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(20.945055), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(41.368132), math.rad(75) )
 	Turn( rfoot , x_axis, math.rad(-15.747253) )
-	Sleep(70)
+	Sleep(160)
 	
 	if not bAiming then
 		Turn( torso , y_axis, 0 )
 	end
-	Turn( rupleg , x_axis, math.rad(-9.071429) )
-	Turn( lupleg , x_axis, math.rad(-12.670330) )
-	Turn( lloleg , x_axis, math.rad(12.670330) )
-	Turn( rloleg , x_axis, math.rad(43.571429) )
-	Turn( rfoot , x_axis, math.rad(-12.016484) )
-	Sleep(50)
+	Turn( rupleg , x_axis, math.rad(-9.071429), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(-12.670330), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(12.670330), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(43.571429), math.rad(75) )
+	Turn( rfoot , x_axis, math.rad(-12.016484), math.rad(75) )
+	Sleep(140)
 	
 	if not bAiming then
 		Turn( torso , y_axis, math.rad(-1.77) )
 	end
-	Turn( rupleg , x_axis, math.rad(-21.357143) )
-	Turn( lupleg , x_axis, math.rad(2.824176) )
-	Turn( lloleg , x_axis, math.rad(3.560440) )
-	Turn( lfoot , x_axis, math.rad(-4.527473) )
-	Turn( rloleg , x_axis, math.rad(52.505495) )
+	Turn( rupleg , x_axis, math.rad(-21.357143), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(2.824176), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(3.560440), math.rad(75) )
+	Turn( lfoot , x_axis, math.rad(-4.527473), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(52.505495), math.rad(75) )
 	Turn( rfoot , x_axis, 0 )
-	Sleep(40)
+	Sleep(140)
 	
 	if not bAiming then
 		Turn( torso , y_axis, math.rad(3.15) )
 	end
-	Turn( rupleg , x_axis, math.rad(-35.923077) )
-	Turn( lupleg , x_axis, math.rad(7.780220) )
-	Turn( lloleg , x_axis, math.rad(8.203297) )
-	Turn( lfoot , x_axis, math.rad(-12.571429) )
-	Turn( rloleg , x_axis, math.rad(54.390110) )
-	Sleep(50)
+	Turn( rupleg , x_axis, math.rad(-35.923077), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(7.780220), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(8.203297), math.rad(75) )
+	Turn( lfoot , x_axis, math.rad(-12.571429), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(54.390110), math.rad(75) )
+	Sleep(140)
 	
 	if not bAiming then
 		Turn( torso , y_axis, math.rad(-4.21) )
 	end
-	Turn( rupleg , x_axis, math.rad(-37.780220) )
-	Turn( lupleg , x_axis, math.rad(10.137363) )
-	Turn( lloleg , x_axis, math.rad(13.302198) )
-	Turn( lfoot , x_axis, math.rad(-16.714286) )
-	Turn( rloleg , x_axis, math.rad(32.582418) )
-	Sleep(50)
+	Turn( rupleg , x_axis, math.rad(-37.780220), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(10.137363), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(13.302198), math.rad(75) )
+	Turn( lfoot , x_axis, math.rad(-16.714286), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(32.582418), math.rad(75) )
+	Sleep(140)
 	
 	if not bAiming then
 		Turn( torso , y_axis, math.rad(-3.15) )
 	end
-	Turn( rupleg , x_axis, math.rad(-28.758242) )
-	Turn( lupleg , x_axis, math.rad(12.247253) )
-	Turn( lloleg , x_axis, math.rad(19.659341) )
-	Turn( lfoot , x_axis, math.rad(-19.659341) )
-	Turn( rloleg , x_axis, math.rad(28.758242) )
-	Sleep(90)
+	Turn( rupleg , x_axis, math.rad(-28.758242), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(12.247253), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(19.659341), math.rad(75) )
+	Turn( lfoot , x_axis, math.rad(-19.659341), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(28.758242), math.rad(75) )
+	Sleep(160)
 	
 	if not bAiming then
 		Turn( torso , y_axis, math.rad(-1.88) )
 	end
-	Turn( rupleg , x_axis, math.rad(-22.824176) )
-	Turn( lupleg , x_axis, math.rad(2.824176) )
-	Turn( lloleg , x_axis, math.rad(34.060440) )
-	Turn( rfoot , x_axis, math.rad(-6.313187) )
-	Sleep(70)
+	Turn( rupleg , x_axis, math.rad(-22.824176), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(2.824176), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(34.060440), math.rad(75) )
+	Turn( rfoot , x_axis, math.rad(-6.313187), math.rad(75) )
+	Sleep(160)
 	
 	if not bAiming then
 		Turn( torso , y_axis, 0 )
 	end
-	Turn( rupleg , x_axis, math.rad(-11.604396) )
-	Turn( lupleg , x_axis, math.rad(-6.725275) )
-	Turn( lloleg , x_axis, math.rad(39.401099) )
-	Turn( lfoot , x_axis, math.rad(-13.956044) )
-	Turn( rloleg , x_axis, math.rad(19.005495) )
-	Turn( rfoot , x_axis, math.rad(-7.615385) )
-	Sleep(50)
+	Turn( rupleg , x_axis, math.rad(-11.604396), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(-6.725275), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(39.401099), math.rad(75) )
+	Turn( lfoot , x_axis, math.rad(-13.956044), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(19.005495), math.rad(75) )
+	Turn( rfoot , x_axis, math.rad(-7.615385), math.rad(75) )
+	Sleep(140)
 	
 	if not bAiming then
 		Turn( torso , y_axis, math.rad(1.88) )
 	end
-	Turn( rupleg , x_axis, math.rad(1.857143) )
-	Turn( lupleg , x_axis, math.rad(-24.357143) )
-	Turn( lloleg , x_axis, math.rad(45.093407) )
-	Turn( lfoot , x_axis, math.rad(-7.703297) )
-	Turn( rloleg , x_axis, math.rad(3.560440) )
-	Turn( rfoot , x_axis, math.rad(-4.934066) )
-	Sleep(40)
+	Turn( rupleg , x_axis, math.rad(1.857143), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(-24.357143), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(45.093407), math.rad(75) )
+	Turn( lfoot , x_axis, math.rad(-7.703297), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(3.560440), math.rad(75) )
+	Turn( rfoot , x_axis, math.rad(-4.934066), math.rad(75) )
+	Sleep(140)
 	
 	if not bAiming then
 		Turn( torso , y_axis, math.rad(3.15) )
 	end
-	Turn( rupleg , x_axis, math.rad(7.148352) )
-	Turn( lupleg , x_axis, math.rad(-28.181319) )
-	Turn( rfoot , x_axis, math.rad(-9.813187) )
-	Sleep(50)
+	Turn( rupleg , x_axis, math.rad(7.148352), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(-28.181319), math.rad(75) )
+	Sleep(140)
 	
 	if not bAiming then
 		Turn( torso , y_axis, math.rad(4.20) )
 	end
-	Turn( rupleg , x_axis, math.rad(8.423077) )
-	Turn( lupleg , x_axis, math.rad(-32.060440) )
-	Turn( lloleg , x_axis, math.rad(27.527473) )
-	Turn( lfoot , x_axis, math.rad(-2.857143) )
-	Turn( rloleg , x_axis, math.rad(24.670330) )
-	Turn( rfoot , x_axis, math.rad(-33.313187) )
-	Sleep(70)
+	Turn( rupleg , x_axis, math.rad(8.423077), math.rad(75) )
+	Turn( lupleg , x_axis, math.rad(-32.060440), math.rad(75) )
+	Turn( lloleg , x_axis, math.rad(27.527473), math.rad(75) )
+	Turn( lfoot , x_axis, math.rad(-2.857143), math.rad(75) )
+	Turn( rloleg , x_axis, math.rad(24.670330), math.rad(75) )
+	Turn( rfoot , x_axis, math.rad(-33.313187), math.rad(75) )
+	Sleep(160)
 end
 
 local function MotionControl(moving, aiming, justmoved)
@@ -407,7 +406,7 @@ function script.FireWeapon(num)
 		Turn( gun , x_axis, 0, math.rad(250) )
 		Sleep(800)
 		if ( math.random() < 0.33) then
-			Turn(armhold, x_axis, math.rad(15), math.rad(150)) --check the sexy shot
+			Turn(armhold, x_axis, math.rad(15), math.rad(75)) --check the sexy shot
 		end
 	end
 	]]--
