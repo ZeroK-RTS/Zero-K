@@ -269,16 +269,10 @@ local custom_cmd_actions = {
 	      
 	--CUSTOM COMMANDS
 
-	retreat=1,
-	--retreat_zone=1,
 	sethaven=1,
-	['luaui noretreat']=1,
 	--build=1,
 	areamex=1,
-	embark=1,
 	disembark=1,
-	stealth=1,
-	cloak_shield=1,
 	mine=1,
 	jump=1,
 	find_pad=1,
@@ -294,6 +288,10 @@ local custom_cmd_actions = {
 	--terraform_internal=1,
 	
 	--states
+	stealth=2,
+	cloak_shield=2,
+	retreat=2,
+	['luaui noretreat']=2,
 	priority=2,
 	ap_fly_state=2,
 	ap_autorepairlevel=2,
