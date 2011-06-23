@@ -89,7 +89,7 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0.2 0 1]],
 	  maxAngleDif		 = 150,
-      onlyTargetCategory = [[MOBILE]],
+      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
     },
 
 
@@ -98,7 +98,7 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[-0.2 0 1]],
 	  maxAngleDif		 = 150,
-      onlyTargetCategory = [[MOBILE]],
+      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
     },
 
 
