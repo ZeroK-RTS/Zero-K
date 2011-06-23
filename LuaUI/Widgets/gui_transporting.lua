@@ -79,7 +79,7 @@ local rectMaxY = 0
 
 local function SortedTransportedUnits()
   local selUnits = Spring.GetSelectedUnits()
-  if (selUnits.n ~= 1) then
+  if (#selUnits ~= 1) then
     return { n = 0 }
   end
   local units = Spring.GetUnitIsTransporting(selUnits[1])
@@ -352,7 +352,6 @@ function widget:MouseRelease(x, y, button)
   if (units.n ~= unitTypes) then
     return -1  -- discard this click
   end
-  units.n = nil
 
   local unitDefID = -1
   local index = 0

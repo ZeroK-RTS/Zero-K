@@ -318,7 +318,7 @@ local function DrawVisibleUnitsLimited()
   for _,teamID in ipairs(teams) do
     glColor(Spring.GetTeamColor(teamID))
     teamUnits = Spring.GetTeamUnitsSorted(teamID)
-    teamUnits.n = nil
+	teamUnits.n = nil -- REMOVE IN 0.83
     for unitDefID,unitIDs in pairs(teamUnits) do
       local UnitDef = UnitDefs[unitDefID]
 

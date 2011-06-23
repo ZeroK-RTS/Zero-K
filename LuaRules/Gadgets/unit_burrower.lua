@@ -74,7 +74,7 @@ function DuplicateUnit(unitID, unitDefID, unitTeam, destUnitName)
   })
 
   local cmds = GetUnitCommands(unitID)
-  for i = 1, cmds.n do
+  for i = 1, #cmds do
     local cmd = cmds[i]
     GiveOrderToUnit(newUnitID, cmd.id, cmd.params, cmd.options.coded)
   end

@@ -939,7 +939,7 @@ function widget:SelectionChanged(newSelection)
 		UpdateStaticGroupInfo()
 		UpdateDynamicGroupInfo()
 		selectedUnitsByDef       = spGetSelectedUnitsByDef()
-		selectedUnitsByDef.n     = nil
+		selectedUnitsByDef.n     = nil -- REMOVE IN 0.83
 		selectedUnitsByDefCounts = {}
 		for i,v in pairs(selectedUnitsByDef) do
 			selectedUnitsByDefCounts[i] = #v

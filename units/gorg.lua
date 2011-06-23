@@ -106,7 +106,7 @@ unitDef = {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      onlyTargetCategory = [[MOBILE]],
+      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
     },
 
     {

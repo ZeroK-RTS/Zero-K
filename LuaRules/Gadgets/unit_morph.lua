@@ -599,7 +599,7 @@ local function FinishMorph(unitID, morphData)
 
   --//copy command queue
   local cmds = Spring.GetUnitCommands(unitID)
-  for i = 1, cmds.n do
+  for i = 1, #cmds do
     local cmd = cmds[i]
 	if i == 1 and cmd.id < 0 then -- repair case for construction
 		local units = Spring.GetUnitsInRectangle(cmd.params[1]-32, cmd.params[3]-32,cmd.params[1]+32, cmd.params[3]+32)

@@ -38,7 +38,7 @@ function gadget:GameFrame(n)
         selfDunits[#selfDunits + 1] = u
       end
     end
-    if #selfDunits / teamUnits.n > 0.8 then
+    if #selfDunits / #teamUnits > 0.8 then
       Spring.GiveOrderToUnitArray(selfDunits, CMD.SELFD, {}, {})
       SendToUnsynced('resignteam', team)
     end
