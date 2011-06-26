@@ -114,7 +114,7 @@ function Font:GetAscenderHeight(size)
 end
 
 function Font:GetTextWidth(text, size)
-  return (self._font):GetTextWidth(text) * (size or self.size)
+  return (self._font and (self._font):GetTextWidth(text) * (size or self.size)) or 0
 end
 
 function Font:GetTextHeight(text, size)
