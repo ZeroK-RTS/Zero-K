@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List2",
-    desc      = "v1.04 Chili Crude Player List.",
+    desc      = "v1.05 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -40,10 +40,19 @@ local window_cpl
 local colorNames = {}
 local colors = {}
 
-local green = '\255\0\255\0'
-local red = '\255\0\255\0'
 
-local x_name 	= 20
+local green		= ''
+local red		= ''
+local orange	= ''
+local yellow	= ''
+local cyan		= ''
+local white		= ''
+	
+
+local cf = Spring.GetGameRulesParam('cf') == 1
+
+local x_cf 		= cf and 20 or 0
+local x_name 	= x_cf + 30
 local x_share 	= x_name + 140 
 local x_cpu 	= x_share + 20
 local x_ping 	= x_cpu + 40
@@ -59,6 +68,10 @@ pingCpuColors = {
 local sharePic        = ":n:"..LUAUI_DIRNAME.."Images/advplayerslist/units.png"
 
 local show_spec = true
+local localTeam = 0
+local localAlliance = 0
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -70,7 +83,7 @@ options = {
 		name = 'Font Size',
 		type = 'number',
 		value = 14,
-		min=8,max=18,step=1,
+		min=10,max=18,step=1,
 		OnChange = function() SetupPlayerNames() end,
 	},
 	backgroundOpacity = {
@@ -113,19 +126,61 @@ local function PingTimeOut(pingTime)
 	return ('' .. (math.floor(pingTime*100)/100)):sub(1,4) .. 's' --needed due to rounding errors.
 end
 
+local function CfTooltip(allyTeam)
+	local tooltip = ''
+	
+	tooltip = tooltip .. 'Check this box to vote for a ceasefire with <Alliance ' .. (allyTeam+1) .. '>. '
+		..'If everyone votes Yes, an offer will be made. If you are in a ceasefire, '
+		..'unchecking the box will break it.\n\n'
+	
+	tooltip = tooltip .. 'Your team\'s votes: \n'
+	local teamList = Spring.GetTeamList(localAlliance)
+	for _,teamID in ipairs(teamList) do
+		local _,playerID = Spring.GetTeamInfo(teamID)
+		local name = Spring.GetPlayerInfo(playerID)
+		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
+		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
+		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote .. '\n'
+	end
+	
+	if Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeam) == 1 then
+		tooltip = tooltip .. '\n\n' .. green .. 'Ceasefire in effect.' .. white
+	else
+		local theyOffer = Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1
+		local youOffer = Spring.GetGameRulesParam('cf_offer_' .. allyTeam.. '_' .. localAlliance) == 1
+		if theyOffer then
+			tooltip = tooltip .. '\n\n' .. yellow .. 'They have offered a ceasefire.' .. white
+		end
+		if youOffer then
+			tooltip = tooltip .. '\n\n' .. cyan .. 'Your team has offered a ceasefire.' .. white
+		end
+		
+		tooltip = tooltip .. '\n\n' .. red .. 'No ceasefire in effect.' .. white
+		
+	end
+	
+	return tooltip
+end
+
+
 local function AddAllyteamPlayers(row, allyTeam,players)
 	if not players then
 		return row
 	end
 	local row = row
-	local localAlliance = Spring.GetLocalAllyTeamID()
-	local localTeam = Spring.GetLocalTeamID()
+	localAlliance = Spring.GetLocalAllyTeamID()
+	localTeam = Spring.GetLocalTeamID()
 	local aCol = {1,0,0,1}
 	if allyTeam == 'S' then
 		aCol = {1,1,1,1}
 	elseif allyTeam == localAlliance then
-		aCol = {0,1,1,1} 
+		aCol = {0,1,1,1}
+	elseif Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeam) == 1 then
+		aCol = {0,1,0,1}
+	elseif Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1 then
+		aCol = {1,0.5,0,1}
 	end
+	
 	window_cpl:AddChild(
 		Label:New{
 			y=options.text_height.value * row,
@@ -135,6 +190,17 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			fontShadow = true,
 		}
 	)
+	if cf and allyTeam ~= 'S' and allyTeam ~= localAlliance then
+		window_cpl:AddChild( Checkbox:New{
+			x=x_cf,y=options.text_height.value * row + 3,width=20,
+			caption='',
+			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
+			tooltip = CfTooltip(allyTeam),
+			OnChange = { function(self)
+				Spring.SendLuaRulesMsg('ceasefire:'..allyTeam)
+			end },
+		} )
+	end
 	
 	table.sort(players, function(a,b)
 			return a.name:lower() < b.name:lower()
@@ -221,6 +287,9 @@ SetupPlayerNames = function()
 	window_cpl:ClearChildren()
 	
 	window_cpl:AddChild( Label:New{ x=0, 		caption = 'A', 		fontShadow = true, 	fontsize = options.text_height.value, } )
+	if cf then
+		window_cpl:AddChild( Label:New{ x=x_cf,		caption = 'CF',		fontShadow = true, 	fontsize = options.text_height.value, } )
+	end
 	window_cpl:AddChild( Label:New{ x=x_name, 	caption = 'Name', 	fontShadow = true,  fontsize = options.text_height.value,} )
 	window_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = options.text_height.value,} )
 	window_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = options.text_height.value,} )
@@ -365,6 +434,13 @@ function widget:Initialize()
 	color2incolor = Chili.color2incolor
 	incolor2color = Chili.incolor2color
 	
+	green 	= color2incolor(0,1,0,1)
+	red 	= color2incolor(1,0,0,1)
+	orange 	= color2incolor(1,0.4,0,1)
+	yellow 	= color2incolor(1,1,0,1)
+	cyan 	= color2incolor(0,1,1,1)
+	white 	= color2incolor(1,1,1,1)
+
 	
 	window_cpl = Window:New{  
 		--margin = {2,2,2,2},

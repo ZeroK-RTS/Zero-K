@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.051 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.052 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1105,6 +1105,10 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 
 		elseif item.text or item.icon then
 			local curFontSize = ttFontSize + (item.fontSize or 0)
+			if ttname == 'tt_text2' then
+				curFontSize = curFontSize +2
+			end
+			
 			local itemtext =  item.text or ''
 			local stackchildren = {}
 
