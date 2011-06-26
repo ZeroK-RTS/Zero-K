@@ -137,7 +137,7 @@ local function CfTooltip(allyTeam)
 	local teamList = Spring.GetTeamList(localAlliance)
 	for _,teamID in ipairs(teamList) do
 		local _,playerID = Spring.GetTeamInfo(teamID)
-		local name = Spring.GetPlayerInfo(playerID)
+		local name = Spring.GetPlayerInfo(playerID) or '-'
 		local vote = Spring.GetTeamRulesParam(teamID, 'cf_vote_' ..allyTeam)==1 and green..'Y'..white or red..'N'..white
 		local teamColor = color2incolor(Spring.GetTeamColor(teamID))
 		tooltip = tooltip .. teamColor .. ' <' .. name .. '> ' .. white.. vote .. '\n'
