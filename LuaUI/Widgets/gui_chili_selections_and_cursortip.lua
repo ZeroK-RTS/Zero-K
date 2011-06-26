@@ -1426,7 +1426,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		--fixme
 		return false
 	end
-	if not stt_ud then return end
+	
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	local iconPath		= GetUnitIcon(stt_ud)
 	

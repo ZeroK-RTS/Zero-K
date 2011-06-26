@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List2",
-    desc      = "v1.031 Chili Crude Player List.",
+    desc      = "v1.04 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -22,6 +22,7 @@ local echo = Spring.Echo
 local Chili
 local Image
 local Button
+local Checkbox
 local Window
 local ScrollPanel
 local StackPanel
@@ -43,7 +44,7 @@ local green = '\255\0\255\0'
 local red = '\255\0\255\0'
 
 local x_name 	= 20
-local x_share 	= x_name + 120 
+local x_share 	= x_name + 140 
 local x_cpu 	= x_share + 20
 local x_ping 	= x_cpu + 40
 
@@ -102,6 +103,16 @@ local function ShareUnits(playername, team)
 	end
 end
 
+local function PingTimeOut(pingTime)
+	if pingTime < 1 then
+		return (math.floor(pingTime*1000) ..'ms')
+	elseif pingTime > 100 then
+		return '>100s'
+	end
+	--return (math.floor(pingTime*100))/100
+	return ('' .. (math.floor(pingTime*100)/100)):sub(1,4) .. 's' --needed due to rounding errors.
+end
+
 local function AddAllyteamPlayers(row, allyTeam,players)
 	if not players then
 		return row
@@ -126,33 +137,39 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 	)
 	
 	table.sort(players, function(a,b)
-			return a[2]:lower() < b[2]:lower() ;
+			return a.name:lower() < b.name:lower()
 		end)
 	
 	--for _, playerID in ipairs( players ) do
 	for _, pdata in ipairs( players ) do
-		local playerID = pdata[1]
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
+		local name_out = pdata.name
+		local teamID = pdata.team
+		local playerID = pdata.player
+		
+		local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
+	
+		pingTime = pingTime or 0
+		cpuUsage = cpuUsage or 0
 	
 		local min_pingTime = math.min(pingTime, 1)
 		local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
 		local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
-		local pingTime_readable = pingTime < 1 and (math.round(pingTime*1000) ..'ms') or ( (''..pingTime):sub(1,4) .. 's')
+		local pingTime_readable = PingTimeOut(pingTime)
 	
 		window_cpl:AddChild(
 			Label:New{
 				x=x_name,
 				y=options.text_height.value * row,
-				width=120,
+				width=150,
 				autosize=false,
-				--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name,
-				caption = name,
-				textColor = spectator and {1,1,1,1} or {Spring.GetTeamColor(teamID)},
+				--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
+				caption = name_out,
+				textColor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1},
 				fontsize = options.text_height.value,
 				fontShadow = true,
 			}
 		)
-		if allyTeam == localAlliance and teamID ~= localTeam then
+		if active and allyTeam == localAlliance and teamID ~= localTeam then
 			window_cpl:AddChild(
 				Button:New{
 					x=x_share,
@@ -208,21 +225,73 @@ SetupPlayerNames = function()
 	window_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = options.text_height.value,} )
 	window_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = options.text_height.value,} )
 	
-	local playerroster = Spring.GetPlayerList()
+	local playerroster	= Spring.GetPlayerList()
+	local teams 		= Spring.GetTeamList()
 	
 	myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 	
 	local allyTeams = {}
 	
+	local specNames = {}
+	
+	--Specs
 	for i,v in ipairs(playerroster) do
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerroster[i])
-		local allyTeamID2 = spectator and 'S' or allyTeamID
-		if not allyTeams[allyTeamID2] then
-			allyTeams[allyTeamID2] = {}
+		local playerID = playerroster[i]
+		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
+		--if spectator then
+		if spectator and active then
+			if not allyTeams.S then
+				allyTeams.S = {}
+			end
+			table.insert( allyTeams.S, {name=name,team=nil,player=playerID} )
+			specNames[name]=true
 		end
-		
-		table.insert( allyTeams[allyTeamID2], {playerroster[i],name} )
 	end
+	
+	for i,teamID in ipairs(teams) do
+		if teamID ~= Spring.GetGaiaTeamID() then
+			local _,playerID,_,isAI,_,allyTeamID_out = Spring.GetTeamInfo(teamID)
+			local name_out = ''
+			if isAI then
+				local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
+				name_out = '<'.. name ..'> '.. shortName
+			else
+				--local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
+				local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
+			
+				
+				if allyTeamID then
+					allyTeamID_out = allyTeamID
+				end
+				
+				name_out = name or ''
+				if
+					name_out == ''
+					or #(Spring.GetPlayerList(teamID,true)) == 0
+					or specNames[name]
+				then
+				
+					if Spring.GetGameSeconds() < 0.1 then
+						name_out = "<Waiting> " ..(name or '')
+					elseif Spring.GetTeamUnitCount(teamID) > 0  then
+						name_out = "<Aband. units> " ..(name or '')
+					else
+						name_out = "<Dead> " ..(name or '')
+					end
+				end
+			end
+			
+			if allyTeamID_out then
+				if not allyTeams[allyTeamID_out] then
+					allyTeams[allyTeamID_out] = {}
+				end
+				
+				table.insert( allyTeams[allyTeamID_out], {name=name_out,team=teamID,player=playerID} )
+			end
+			
+		end --if teamID ~= Spring.GetGaiaTeamID() 
+	end --for each team
+	
 	
 	local allyTeams_i = {}
 	for allyTeam,players in pairs(allyTeams) do
@@ -240,21 +309,20 @@ SetupPlayerNames = function()
 	--for allyTeam,players in pairs(allyTeams) do
 	for _,adata in ipairs(allyTeams_i) do
 		local allyTeam,players = adata[1], adata[2]
-		
 		if allyTeam ~= 'S' then
 			row = AddAllyteamPlayers(row, allyTeam,players)
 		end
-		
 	end
 	if show_spec then
 		row = AddAllyteamPlayers(row,'S',allyTeams.S)
 	end
 	
-	window_cpl:AddChild( Button:New{
+	window_cpl:AddChild( Checkbox:New{
 		x=5, y=options.text_height.value * (row + 0.5),
-		height=options.text_height.value * 2, width=150,
-		caption = 'Spectators',
-		OnClick = { function() show_spec = not show_spec; SetupPlayerNames(); end }
+		height=options.text_height.value * 1.5, width=140,
+		caption = 'Show Spectators',
+		checked = show_spec,
+		OnChange = { function(self) show_spec = not self.checked; SetupPlayerNames(); end },
 	} )
 	
 end
@@ -288,6 +356,7 @@ function widget:Initialize()
 	Chili = WG.Chili
 	Image = Chili.Image
 	Button = Chili.Button
+	Checkbox = Chili.Checkbox
 	Window = Chili.Window
 	ScrollPanel = Chili.ScrollPanel
 	StackPanel = Chili.StackPanel
