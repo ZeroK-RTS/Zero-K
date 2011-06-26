@@ -3,13 +3,13 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Crude Player List2",
+    name      = "Chili Crude Player List",
     desc      = "v1.05 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
