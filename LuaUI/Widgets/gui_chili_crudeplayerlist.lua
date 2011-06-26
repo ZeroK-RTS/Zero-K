@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.05 Chili Crude Player List.",
+    desc      = "v1.051 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -197,7 +197,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
 			tooltip = CfTooltip(allyTeam),
 			OnChange = { function(self)
-				Spring.SendLuaRulesMsg('ceasefire:'..allyTeam)
+				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. allyTeam)
 			end },
 		} )
 	end

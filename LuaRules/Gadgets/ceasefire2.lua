@@ -236,9 +236,11 @@ function gadget:RecvLuaMsg(msg, playerID)
 	local msg_token_len = msg_token:len()
 	if msg:find(msg_token,1,true) then
 		local _,_,_,teamID, allianceID = spGetPlayerInfo(playerID)
-		local actionAlliance = tonumber( msg:sub(msg_token_len+1,msg_token_len+1) ) --fixme, alliance might be larger than 2 chars
+		local vote = msg:sub(msg_token_len+1,msg_token_len+1)
+		local actionAlliance = tonumber( msg:sub(msg_token_len+2,msg_token_len+2) ) --fixme, alliance might be larger than 2 chars
 		if cfData[allianceID] and cfData[allianceID][actionAlliance] then
-			SetVote(allianceID, actionAlliance, teamID, not cfData[allianceID][actionAlliance].votes[teamID] )
+			--SetVote(allianceID, actionAlliance, teamID, not cfData[allianceID][actionAlliance].votes[teamID] )
+			SetVote(allianceID, actionAlliance, teamID, vote=='y')
 		end
 	end
 end
