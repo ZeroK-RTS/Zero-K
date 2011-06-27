@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.27 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.28 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1344,6 +1344,9 @@ local function ResetWinSettings(windowdata)
 			elseif data.type == 'list' then
 				data.value = data.default
 				data.OnChange(data.default)
+			elseif data.type == 'colors' then
+				data.color = data.default
+				data.OnChange(data)
 			end
 		else
 			echo ('<EPIC Menu> Error #627', data.name)
@@ -1471,12 +1474,12 @@ MakeSubWindow = function(fwkey)
 			tree_children[#tree_children+1] = button
 		
 		elseif data.type == 'colors' then
-			settings_height = settings_height + B_HEIGHT*2
+			settings_height = settings_height + B_HEIGHT*2.5
 			tree_children[#tree_children+1] = Label:New{ caption = data.name, textColor = color.sub_fg, }
 			tree_children[#tree_children+1] = 
 				Colorbars:New{
 					width = "100%",
-					height = B_HEIGHT*1.5,
+					height = B_HEIGHT*2,
 					tooltip=data.desc,
 					color = data.value or {1,1,1,1},
 					OnMouseUp = { data.OnChange, },

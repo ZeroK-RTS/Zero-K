@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat",
-    desc      = "v0.41 Chili Chat Console.",
+    desc      = "v0.42 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -77,7 +77,7 @@ end
 
 options_path = "Settings/Interface/Chat/Console"
 options_order = { 'autoHideChat', 'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
-		'backgroundOpacity', 'col_text', 'col_ally', 'col_othertext', 'col_dup', 
+		'col_back','col_text', 'col_ally', 'col_othertext', 'col_dup', 
 		}
 options = {
 	
@@ -166,14 +166,14 @@ options = {
 		value = {1,0.2,0.2,1},
 		OnChange = option_remakeConsole,
 	},
-	backgroundOpacity = {
-		name = "Background opacity",
-		type = "number",
-		value = 0, min = 0, max = 1, step = 0.01,
+	col_back = {
+		name = "Background color",
+		type = "colors",
+		value = {0,0,0,0},
 		OnChange = function(self) 
-			scrollpanel1.backgroundColor = {1,1,1,self.value}
+			scrollpanel1.backgroundColor = self.value
 			scrollpanel1:Invalidate() 
-			inputspace.backgroundColor = {1,1,1,self.value}
+			inputspace.backgroundColor = self.value
 			inputspace:Invalidate()
 		end,
 	},
@@ -484,7 +484,7 @@ function widget:Initialize()
 		bottom = 0,
 		right=5,
 		height = inputsize,
-		backgroundColor = {1,1,1,options.backgroundOpacity.value},
+		backgroundColor = options.col_back.value,
 		--backgroundColor = {1,1,1,1},
 	}
 	
@@ -500,7 +500,7 @@ function widget:Initialize()
 		disableChildrenHitTest = true,
 		--skinName="EmptyScrollbar",
 		--color = {0,0,0,0},
-		backgroundColor = {1,1,1,options.backgroundOpacity.value},
+		backgroundColor = options.col_back.value,
 		noMouseWheel = not options.mousewheel.value,
 		children = {
 			stack_console,
