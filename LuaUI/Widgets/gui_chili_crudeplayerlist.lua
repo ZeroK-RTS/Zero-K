@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List",
-    desc      = "v1.051 Chili Crude Player List.",
+    desc      = "v1.052 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -129,8 +129,8 @@ end
 local function CfTooltip(allyTeam)
 	local tooltip = ''
 	
-	tooltip = tooltip .. 'Check this box to vote for a ceasefire with <Alliance ' .. (allyTeam+1) .. '>. '
-		..'If everyone votes Yes, an offer will be made. If you are in a ceasefire, '
+	tooltip = tooltip .. 'Check this box to vote for a ceasefire with '.. yellow ..'<Team ' .. (allyTeam+1) .. '>'..white..'. '
+		..'If everyone votes Yes, an offer will be made. If there is a ceasefire, '
 		..'unchecking the box will break it.\n\n'
 	
 	tooltip = tooltip .. 'Your team\'s votes: \n'
@@ -286,7 +286,7 @@ end
 SetupPlayerNames = function()
 	window_cpl:ClearChildren()
 	
-	window_cpl:AddChild( Label:New{ x=0, 		caption = 'A', 		fontShadow = true, 	fontsize = options.text_height.value, } )
+	window_cpl:AddChild( Label:New{ x=0, 		caption = 'T', 		fontShadow = true, 	fontsize = options.text_height.value, } )
 	if cf then
 		window_cpl:AddChild( Label:New{ x=x_cf,		caption = 'CF',		fontShadow = true, 	fontsize = options.text_height.value, } )
 	end
