@@ -121,7 +121,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdParams) 
-	if cmdID == CMD_PATROL and IsImmobileBuilder(UnitDefs[unitDefID]) then
+	if cmdID == CMD_PATROL and IsImmobileBuilder(UnitDefs[unitDefID]) and (math.bit_and(cmdOptions,CMD.OPT_SHIFT) <= 0) then
 		local x, y, z = spGetUnitPosition(unitID)
 		if math.abs(x - cmdParams[1]) > 30 or math.abs(z - cmdParams[3]) > 30 then
 			SetupUnit(unitID)

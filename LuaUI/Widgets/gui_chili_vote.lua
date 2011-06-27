@@ -129,7 +129,6 @@ function widget:Initialize()
 	StackPanel = Chili.StackPanel
 	Image = Chili.Image
 	Progressbar = Chili.Progressbar
-	Font = Chili.Font
 	Control = Chili.Control
 	screen0 = Chili.Screen0
 	

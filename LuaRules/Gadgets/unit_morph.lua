@@ -655,8 +655,8 @@ local function FinishMorph(unitID, morphData)
     Spring.SetUnitShieldState(newUnit, enabled,oldShieldState)
   end
 
-  local lineage = Spring.GetUnitLineage(unitID)
-  Spring.SetUnitLineage(newUnit,lineage,true)
+  --local lineage = Spring.GetUnitLineage(unitID)
+  --Spring.SetUnitLineage(newUnit,lineage,true)
 
   --// copy facplop
   if facplop then GG.GiveFacplop(newUnit) end
