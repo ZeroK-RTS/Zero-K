@@ -158,7 +158,6 @@ function widget:Initialize()
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
 	}
-	
 	stack_main = StackPanel:New{
 		parent = window,
 		resizeItems = true;
@@ -206,7 +205,7 @@ function widget:Initialize()
 			height	= "100%",
 			max     = 1;
 			caption = "?/?";
-			color   = (i == 1 and {0,1,1,1}) or {1,1,0,1};
+			color   = (i == 1 and {0.2,0.9,0.3,1}) or {0.9,0.15,0.2,1};
 		}
 		button_vote[i] = Button:New{
 			parent = stack_vote[i],
