@@ -250,7 +250,6 @@ unitConfigs = {
     border = defaults.border,
   }, 
 
-
   [UnitDefNames.chickenq.id] = {
     rot    = 29,
     angle  = 10,
