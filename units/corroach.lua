@@ -2,10 +2,10 @@ unitDef = {
   unitname               = [[corroach]],
   name                   = [[Roach]],
   description            = [[Crawling Bomb]],
-  acceleration           = 0.12,
+  acceleration           = 0.25,
   activateWhenBuilt      = true,
   bmcode                 = [[1]],
-  brakeRate              = 0.16,
+  brakeRate              = 0.4,
   buildCostEnergy        = 160,
   buildCostMetal         = 160,
   builder                = false,
@@ -80,8 +80,7 @@ unitDef = {
   smoothAnim             = true,
   steeringmode           = [[1]],
   TEDClass               = [[KBOT]],
-  turninplace            = 0,
-  turnRate               = 1507,
+  turnRate               = 3000,
   workerTime             = 0,
 }
 
