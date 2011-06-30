@@ -1,7 +1,7 @@
 -- $Id: BloomShader.lua 3171 2008-11-06 09:06:29Z det $
 function widget:GetInfo()
 	return {
-		name      = "BloomShader (v0.3) (unstable)",
+		name      = "BloomShader (v0.31) (unstable)",
 		desc      = "Sets Spring In Bloom (do not use with < 7xxx geforce series or non-latest ATI cards!)",
 		author    = "Kloot",
 		date      = "28-5-2008",
@@ -12,14 +12,42 @@ function widget:GetInfo()
 end
 
 
+-- CarRepairer: v0.31 has configurable settings in the menu.
+
+options_path = 'Settings/View/Effects/Bloom'
+options = {
+
+	dbgDraw 		= { type='bool', 	name='Draw Only Bloom Mask', 	value=false,		},
+	dilatePass 		= { type='bool', 	name='Dilate Pass', 			value=true, 		},
+	
+	glowAmplifier 	= { type='number', 		name='Glow Amplifier', 			value=1,		min=1, max=3,step=0.001, 	},
+	blurAmplifier 	= { type='number', 		name='Blur Amplifier', 			value=1.0625, 	min=1, max=1.5,step=0.001, 	},
+	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.5, 		min=0, max=1,step=0.001, 	},
+	blurPasses 		= { type='number', 		name='Blur Passes', 			value=1, 		min=0, max=10,step=1,  		},
+}
 
 -- config params
 local dbgDraw = 0					-- draw only the bloom-mask? [0 | 1]
-local glowAmplifier = 0.260			-- intensity multiplier when filtering a glow source fragment [1, n]
-local blurAmplifier = 0.8210		-- intensity multiplier when applying a blur pass [1, n] (should be set close to 1)
-local illumThreshold = 0.35  	-- how bright does a fragment need to be before being considered a glow source? [0, 1]
-local blurPasses = 1				-- how many iterations of (7x7) Gaussian blur should be applied to the glow sources?
-local dilatePass = 0.8				-- dilate the glow sources after blurring? [0 | 1]
+local glowAmplifier = 1.0			-- intensity multiplier when filtering a glow source fragment [1, n]
+local blurAmplifier = 1.0625		-- intensity multiplier when applying a blur pass [1, n] (should be set close to 1)
+local illumThreshold = 0.5			-- how bright does a fragment need to be before being considered a glow source? [0, 1]
+local blurPasses = 2				-- how many iterations of (7x7) Gaussian blur should be applied to the glow sources?
+local dilatePass = 1				-- dilate the glow sources after blurring? [0 | 1]
+
+local function OnchangeFunc()
+	dbgDraw 		= options.dbgDraw.value and 1 or 0
+	dilatePass 		= options.dilatePass.value and 1 or 0
+	
+	glowAmplifier 	= options.glowAmplifier.value
+	blurAmplifier 	= options.blurAmplifier.value
+	illumThreshold 	= options.illumThreshold.value
+	blurPasses 		= options.blurPasses.value
+	dilatePass 		= options.dilatePass.value
+end
+for key,option in pairs(options) do
+	option.OnChange = OnchangeFunc
+end
+OnchangeFunc()
 
 -- non-editables
 local vsx = 1						-- current viewport width
@@ -509,7 +537,7 @@ end
 function widget:DrawScreenEffects() Bloom() end
 
 
-
+--[[
 function widget:TextCommand(command)
 	if (string.find(command, "+illumthres") == 1) then illumThreshold = illumThreshold + 0.02 end
 	if (string.find(command, "-illumthres") == 1) then illumThreshold = illumThreshold - 0.02 end
@@ -539,3 +567,4 @@ function widget:TextCommand(command)
 	Spring.Echo("   blurPasses:     " .. blurPasses)
 	Spring.Echo("   dilatePass:     " .. dilatePass)
 end
+--]]
