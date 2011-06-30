@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.052 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.053 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -215,7 +215,7 @@ options = {
 		name = "Show Map-drawing Tooltip",
 		type = 'bool',
 		value = true,
-		desc = 'Show map-drawing tooltip when holding down ~.',
+		desc = 'Show map-drawing tooltip when holding down the tilde (~).',
 	},
 
 	groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect,
@@ -477,7 +477,6 @@ local function GetUnitDesc(unitID, ud)
 end
 
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -620,9 +619,6 @@ local function MakeUnitGroupSelectionToolTip()
 		end
 	end
 end
-
-
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -843,20 +839,18 @@ end
 local function SetHealthbars()
 	if 
 		not ( tt_unitID or tt_fid or stt_unitID )
-		then 
-		return 'err' 
+		then
+		return
 	end
 	local tt_healthbar_stack, tt_healthbar
 	
 	local health, maxhealth
 	if tt_unitID then
 		health, maxhealth = spGetUnitHealth(tt_unitID)
-		--tt_healthbar = globalitems.hp_unit
 		tt_healthbar = globalitems.hp_unit:GetChildByName('bar')
 		SetHealthbar(tt_healthbar,health, maxhealth)
 	elseif tt_fid then
 		health, maxhealth = Spring.GetFeatureHealth(tt_fid)
-		--tt_healthbar = tt_ud and globalitems.hp_corpse or globalitems.hp_feature
 		tt_healthbar_stack = tt_ud and globalitems.hp_corpse or globalitems.hp_feature
 		tt_healthbar = tt_healthbar_stack:GetChildByName('bar')
 		SetHealthbar(tt_healthbar,health, maxhealth)
@@ -864,7 +858,6 @@ local function SetHealthbars()
 	
 	if stt_unitID then
 		health, maxhealth = spGetUnitHealth(stt_unitID)
-		--tt_healthbar = globalitems.hp_selunit
 		tt_healthbar = globalitems.hp_selunit:GetChildByName('bar')
 		SetHealthbar(tt_healthbar,health, maxhealth)
 	end
@@ -1749,42 +1742,6 @@ function widget:Update(dt)
 		widget:SelectionChanged(Spring.GetSelectedUnits())
 	end
 	
-	
-	old_mx, old_my = mx,my
-	alt,_,meta,_ = spGetModKeyState()
-	mx,my = spGetMouseState()
-	local mousemoved = (mx ~= old_mx or my ~= old_my)
-	
-	local show_cursortip = true
-	if meta then
-		if not showExtendedTip then changeNow = true end
-		showExtendedTip = true
-	
-	else
-		if options.tooltip_delay.value > 0 then
-			if not mousemoved then
-				stillCursorTime = stillCursorTime + dt
-			else
-				stillCursorTime = 0 
-			end
-			show_cursortip = stillCursorTime > options.tooltip_delay.value
-		end
-		
-		if showExtendedTip then changeNow = true end
-		showExtendedTip = false
-	
-	end
-
-	if mousemoved or changeNow then
-		if not show_cursortip then
-			KillTooltip()
-			return
-		end
-		MakeTooltip()
-		changeNow = false
-	end
-	
-	
 	timer = timer + dt
 	if timer >= updateFrequency  then
 		UpdateSelectedUnitsTooltip()
@@ -1799,7 +1756,7 @@ function widget:Update(dt)
 			
 			local nanobar_stack = globalitems['bp_selunit']
 			local nanobar = nanobar_stack:GetChildByName('bar')
-			if (nanobar) then
+			if nanobar then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(stt_unitID)
 			
 				if metalUse then
@@ -1815,6 +1772,43 @@ function widget:Update(dt)
 		changeNow = true
 		timer = 0
 	end
+	
+	old_mx, old_my = mx,my
+	alt,_,meta,_ = spGetModKeyState()
+	mx,my = spGetMouseState()
+	local mousemoved = (mx ~= old_mx or my ~= old_my)
+	
+	local show_cursortip = true
+	if meta then
+		if not showExtendedTip then changeNow = true end
+		showExtendedTip = true
+	
+	else
+		if (options.tooltip_delay.value > 0) and not tildepressed then
+			if not mousemoved then
+				stillCursorTime = stillCursorTime + dt
+			else
+				stillCursorTime = 0 
+			end
+			show_cursortip = stillCursorTime > options.tooltip_delay.value
+		end
+		
+		if showExtendedTip then changeNow = true end
+		showExtendedTip = false
+	
+	end
+
+	if mousemoved or changeNow then
+		if not show_cursortip and not tildepressed then
+			KillTooltip()
+			return
+		end
+		MakeTooltip()
+		changeNow = false
+	end
+	
+	
+	
 end
 
 function widget:ViewResize(vsx, vsy)
@@ -2004,9 +1998,6 @@ function widget:SelectionChanged(newSelection)
 		end
 
 		if (numSelectedUnits == 1) then
-			--MakeUnitToolTip(selectedUnits[1])
-			
-			
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
 			
@@ -2017,10 +2008,12 @@ function widget:SelectionChanged(newSelection)
 				window_corner:AddChild(cur2)
 			end
 		else
+			stt_unitID = nil
 			MakeUnitGroupSelectionToolTip()
 		end
 		Show(window_corner)
 	else
+		stt_unitID = nil
 		Hide(window_corner)
 	end
 end
