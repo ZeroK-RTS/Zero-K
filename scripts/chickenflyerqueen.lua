@@ -38,7 +38,7 @@ local healthTiamatDrop = 0.2
 --signals
 local SIG_Aim = 1
 local SIG_Aim2 = 2
-local SIG_Move = 16
+local SIG_Fly = 16
 
 --cob values
 
@@ -53,29 +53,37 @@ function MorphFunc()
 end
 
 local function Fly()
-	if (isMoving) then
+	Signal(SIG_Fly)
+	SetSignalMask(SIG_Fly)
+	while true do
+		--Spring.Echo("Wings down (before Turn)", Spring.GetGameFrame(), Spring.UnitScript.IsInTurn(leftWing1, z_axis))
 		Turn(leftWing1, z_axis, -wingAngle, wingSpeed)
 		Turn(rightWing1, z_axis, wingAngle, wingSpeed)
 		Turn(leftWing2, z_axis, -wingAngle/3, wingSpeed)
 		Turn(rightWing2, z_axis, wingAngle/3, wingSpeed)
 		Turn(tail, x_axis, tailAngle, math.rad(40))
 		Move(body, y_axis, -60, 45)
+		--Spring.Echo("Wings down (after Turn)", Spring.GetGameFrame(), Spring.UnitScript.IsInTurn(leftWing1, z_axis))
+		--Sleep(0)
 		WaitForTurn(leftWing1, z_axis)
+		--Spring.Echo("Wings up (before Turn)", Spring.GetGameFrame(), Spring.UnitScript.IsInTurn(leftWing1, z_axis))
 		Turn(leftWing1, z_axis, wingAngle, wingSpeed)
 		Turn(rightWing1, z_axis, -wingAngle, wingSpeed)
 		Turn(leftWing2, z_axis, wingAngle/3, wingSpeed*2)
 		Turn(rightWing2, z_axis, -wingAngle/3, wingSpeed*2)
 		Turn(tail, x_axis, -tailAngle, math.rad(40))
 		Move(body, y_axis, 0, 45)
---		EmitSfx(body, 4096+5) --Queen Crush
+		--Sleep(0)
+		--Spring.Echo("Wings up (after Turn)", Spring.GetGameFrame(), Spring.UnitScript.IsInTurn(leftWing1, z_axis))
 		WaitForTurn(leftWing1, z_axis)
-		Fly()
 	end
 end
 
 local function StopFly()
-	Turn(leftWing1, z_axis, 0, 200)
-	Turn(rightWing1, z_axis, 0, 200)
+	Signal(SIG_Fly)
+	SetSignalMask(SIG_Fly)
+	Turn(leftWing1, z_axis, 0, wingSpeed)
+	Turn(rightWing1, z_axis, 0, wingSpeed)
 end
 
 local function DropDodoLoop()

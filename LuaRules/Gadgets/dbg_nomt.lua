@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "22 Jan 2011",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = not tobool(Game.version:find("0.83") or Game.version:find("0.82+"))  --  loaded by default?
   }
 end
 

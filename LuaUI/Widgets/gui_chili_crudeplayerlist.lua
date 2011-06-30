@@ -448,7 +448,7 @@ function widget:Initialize()
 		dockable = true,
 		name = "crudeplayerlist",
 		color = {1,1,1,options.backgroundOpacity.value},
-		x = 100,  
+		right = 0,  
 		bottom = 0,
 		width  = 350,
 		height = 250,
