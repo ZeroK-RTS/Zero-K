@@ -728,6 +728,10 @@ end
 -- Mouse/keyboard Callins
 --------------------------------------------------------------------------------
 
+local function legalPos(pos)
+	return pos and pos[1] > 0 and pos[3] > 0 and pos[1] < Game.mapSizeX and pos[3] < Game.mapSizeZ
+end
+
 local function completelyStopCommand()
 	spSetActiveCommand(-1)
 	originalCommandGiven = false
@@ -770,7 +774,7 @@ function widget:MousePress(mx, my, button)
 			if not spIsAboveMiniMap(mx, my) then
 		
 				local _, pos = spTraceScreenRay(mx, my, true)
-				if pos then	
+				if legalPos(pos) then	
 					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 					orHeight = spGetGroundHeight(pos[1],pos[3])
 					
@@ -823,7 +827,7 @@ function widget:MousePress(mx, my, button)
 			if not spIsAboveMiniMap(mx, my) then
 		
 				local _, pos = spTraceScreenRay(mx, my, true)
-				if pos then	
+				if legalPos(pos) then	
 				
 					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 					orHeight = spGetGroundHeight(pos[1],pos[3])
@@ -883,7 +887,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 		if button == 1 then
 			local _, pos = spTraceScreenRay(mx, my, true)
 			local a,c,m,s = spGetModKeyState()
-			if pos and not c then
+			if legalPos(pos) and not c then
 				
 				local diffX = abs(point[points].x - pos[1])
 				local diffZ = abs(point[points].z - pos[3])
@@ -902,7 +906,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 		if button == 1 then
 			local _, pos = spTraceScreenRay(mx, my, true)
 		
-			if pos then
+			if legalPos(pos) then
 			
 				local x = floor((pos[1])/16)*16
 				local z = floor((pos[3])/16)*16
@@ -996,7 +1000,7 @@ function widget:Update(n)
 			local a,c,m,s = spGetModKeyState()
 			if c then
 				local _, pos = spTraceScreenRay(mx, my, true)
-				if pos then	
+				if legalPos(pos) then	
 					terraformHeight = spGetGroundHeight(pos[1],pos[3])
 					storedHeight = terraformHeight
 					mouseX = mx
@@ -1047,7 +1051,7 @@ function widget:Update(n)
 	elseif drawingRamp == 2 then
 		local mx,my = Spring.GetMouseState()
 		local _, pos = spTraceScreenRay(mx, my, true)
-		if pos then
+		if legalPos(pos) then
 			local dis = sqrt((point[1].x-pos[1])^2 + (point[1].z-pos[3])^2)
 			if dis ~= 0 then
 				orHeight = spGetGroundHeight(pos[1],pos[3])
@@ -1082,7 +1086,7 @@ function widget:MouseRelease(mx, my, button)
 			--spSetActiveCommand(-1)
 			
 			local _, pos = spTraceScreenRay(mx, my, true)
-			if pos then
+			if legalPos(pos) then
 				local diffX = abs(point[points].x - pos[1])
 				local diffZ = abs(point[points].z - pos[3])
 				if diffX >= 10 or diffZ >= 10 then
@@ -1169,7 +1173,7 @@ function widget:MouseRelease(mx, my, button)
 				local x,z
 				
 				local _, pos = spTraceScreenRay(mx, my, true)
-				if pos then
+				if legalPos(pos) then
 					
 					if mouseUnit.id and point[1].x == point[2].x and point[1].z == point[2].z then
 						local ty, id = spTraceScreenRay(mx, my, false)
@@ -1254,7 +1258,7 @@ function widget:MouseRelease(mx, my, button)
 			
 				local _, pos = spTraceScreenRay(mx, my, true)
 				local x,z
-				if pos then
+				if legalPos(pos) then
 				
 					if mouseUnit.id and point[1].x == point[2].x and point[1].z == point[2].z then
 						local ty, id = spTraceScreenRay(mx, my, false)
@@ -1388,7 +1392,7 @@ function widget:KeyRelease(key)
 	if key == keyCtrl and drawingLasso then
 		local mx,my = Spring.GetMouseState()
 		local _, pos = spTraceScreenRay(mx, my, true)
-		if pos then
+		if legalPos(pos) then
 				
 			local diffX = abs(point[points].x - pos[1])
 			local diffZ = abs(point[points].z - pos[3])
@@ -1410,7 +1414,7 @@ function widget:KeyRelease(key)
 	if ((key == KEYSYMS.LCTRL) or (key == KEYSYMS.RCTRL)) and drawingLasso then
 		local mx,my = Spring.GetMouseState()
 		local _, pos = spTraceScreenRay(mx, my, true)
-		if pos then
+		if legalPos(pos) then
 				
 			local diffX = abs(point[points].x - pos[1])
 			local diffZ = abs(point[points].z - pos[3])
@@ -1450,7 +1454,7 @@ local function DrawLine()
 	
 	local mx,my = Spring.GetMouseState()
 	local _, pos = spTraceScreenRay(mx, my, true)
-	if pos then
+	if legalPos(pos) then
 		glVertex(pos[1],pos[2],pos[3])
 	end
 	
