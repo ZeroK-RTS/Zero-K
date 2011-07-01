@@ -94,6 +94,7 @@ unitDef = {
     CORTRUCK_MISSILE = {
       name                    = [[Homing Missiles]],
       areaOfEffect            = 48,
+	  avoidFeature            = true,
       cegTag                  = [[missiletrailyellow]],
       craterBoost             = 1,
       craterMult              = 2,

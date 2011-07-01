@@ -85,6 +85,7 @@ unitDef = {
     ARMRL_MISSILE = {
       name                    = [[Homing Missiles]],
       areaOfEffect            = 8,
+	  avoidFeature            = true,
       cegTag                  = [[missiletrailyellow]],
       craterBoost             = 0,
       craterMult              = 0,
