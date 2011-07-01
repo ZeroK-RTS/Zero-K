@@ -97,9 +97,9 @@ end
 
 path='Game'
 
-	ShButton( 'Pause/Unpause', 'pause' ) 
+	ShButton( 'Pause/Unpause', 'pause' )
 	ShLabel('') 
-	
+	ShButton( 'Last Message Position', 'lastmsgpos' )
 	ShButton( 'Share Dialog...', 'sharedialog' ) 
 	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
 
