@@ -388,11 +388,22 @@ SetupPlayerNames = function()
 	
 	window_cpl:AddChild( Checkbox:New{
 		x=5, y=options.text_height.value * (row + 0.5),
-		height=options.text_height.value * 1.5, width=140,
+		height=options.text_height.value * 1.5, width=160,
 		caption = 'Show Spectators',
 		checked = show_spec,
 		OnChange = { function(self) show_spec = not self.checked; SetupPlayerNames(); end },
 	} )
+	row = row + 1
+	
+	if cf then
+		window_cpl:AddChild( Checkbox:New{
+			x=5, y=options.text_height.value * (row + 0.5),
+			height=options.text_height.value * 1.5, width=160,
+			caption = 'Place Restricted Zones',
+			checked = WG.rzones.rZonePlaceMode,
+			OnChange = { function(self) WG.rzones.rZonePlaceMode = not WG.rzones.rZonePlaceMode; end },
+		} )	
+	end
 	
 end
 

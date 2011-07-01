@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local testMode = false
+local TESTMODE = false
 local testOnce = true
 
 if tobool(Spring.GetModOptions().noceasefire) or Spring.FixedAllies() then
@@ -25,7 +25,6 @@ local spAreTeamsAllied	= Spring.AreTeamsAllied
 local spGetAllUnits     = Spring.GetAllUnits
 local spGetUnitDefID    = Spring.GetUnitDefID
 
-local rzRadius			= 200
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 if (gadgetHandler:IsSyncedCode()) then 
@@ -121,7 +120,7 @@ function clearVotes(alliance, enAlliance)
 	local teamList = cfData[alliance][enAlliance].votes
 	for teamID,_ in pairs(teamList) do
 		SetVote(alliance, enAlliance, teamID, false)
-		if testMode and alliance == 2 and testOnce then	
+		if TESTMODE and alliance == 2 and testOnce then	
 			testOnce = false
 			SetVote(alliance, enAlliance, teamID, true)
 		end
@@ -278,7 +277,7 @@ function gadget:Initialize()
 					local teamList = spGetTeamList(alliance)
 					for _,teamID in ipairs(teamList) do
 						cfData[alliance][enAlliance].votes[teamID] = false
-						if testMode and alliance == 2 then
+						if TESTMODE and alliance == 2 then
 							cfData[alliance][enAlliance].votes[teamID] = true
 						end
 					end
