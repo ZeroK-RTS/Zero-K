@@ -21,6 +21,7 @@ unitDef = {
   canRepair              = false,
   canRestore             = false,
   canstop                = [[1]],
+  cantBeTransported      = true,
   category               = [[SHIP]],
   CollisionSphereScale   = 0.6,
   collisionVolumeOffsets = [[-1 -10 20]],

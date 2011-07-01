@@ -64,7 +64,7 @@ local modrules  = {
   transportability = {
     transportGround = 1;   -- defaults to 1
     transportHover  = 1;   -- defaults to 0
-    transportShip   = 0;  -- defaults to 0
+    transportShip   = 1;  -- defaults to 0
     transportAir    = 0;  -- defaults to 0
   },
 
