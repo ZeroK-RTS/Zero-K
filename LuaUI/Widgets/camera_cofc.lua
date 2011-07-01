@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.08 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.09 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -60,6 +60,7 @@ options_order = {
 	'freemode',
 	
 	'trackmode',
+	'thirdpersontrack',
 	'resetcam',
 
 }
@@ -252,6 +253,17 @@ options = {
         hotkey = {key='t', mod='a+'},
 		OnChange = function(self) trackmode = true; end,
 	},
+    
+    thirdpersontrack = {
+		name = "Enter 3rd Person Trackmode",
+		desc = "Track the selected unit (midclick to cancel)",
+		type = 'button',
+		OnChange = function(self)
+            Spring.SendCommands('viewfps')
+            Spring.SendCommands('track')
+        end,
+	},
+    
     
 	resetcam = {
 		name = "Reset Camera",
@@ -681,7 +693,13 @@ local function RotateCamera(x, y, dx, dy, smooth, lock)
 			cs.rx = max_rx 
 		end
 		
-		
+        -- [[
+        if trackmode then
+            lock = true
+            ls_have = false
+            SetLockSpot2(cs)
+        end
+		--]]
 		if lock and ls_onmap then
 			local cstemp = UpdateCam(cs)
 			if cstemp then
@@ -857,18 +875,21 @@ function widget:Update(dt)
 		
 		local heightFactor = (cs.py/1000)
 		if smoothscroll then
-			local speed = dt * options.speedFactor.value * heightFactor 
+			--local speed = dt * options.speedFactor.value * heightFactor 
+			local speed = math.max( dt * options.speedFactor.value * heightFactor, 0.005 )
 			mxm = speed * (x - cx)
 			mym = speed * (y - cy)
 		elseif use_lockspringscroll then
-			local speed = options.speedFactor.value * heightFactor / 10
+			--local speed = options.speedFactor.value * heightFactor / 10
+			local speed = math.max( options.speedFactor.value * heightFactor / 10, 0.05 )
 			local dir = options.invertscroll.value and -1 or 1
 			mxm = speed * (x - mx) * dir
 			mym = speed * (y - my) * dir
 			
 			spWarpMouse(cx, cy)		
 		else
-			local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
+			--local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
+			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor, 1 )
 			
 			if move.right then
 				mxm = speed
@@ -963,7 +984,7 @@ end
 function widget:MousePress(x, y, button)
 	ls_have = false
 	overview_mode = false
-    if fpsmode then return end
+    --if fpsmode then return end
 	if lockspringscroll then
 		lockspringscroll = false
 		return true
@@ -973,7 +994,8 @@ function widget:MousePress(x, y, button)
 	if (button ~= 2) then
 		return false
 	end
-	
+	Spring.SendCommands('track 0')
+    spSendCommands('viewfree')
 	trackmode = false
 	
 	local a,c,m,s = spGetModKeyState()
