@@ -285,6 +285,9 @@ local function setupTerraunit(unitID, team, x, y, z)
 	Spring.MoveCtrl.Enable(unitID)
 	Spring.MoveCtrl.SetPosition(unitID, x, y, z)
 	
+	spSetUnitSensorRadius(unitID,"los",0)
+	spSetUnitSensorRadius(unitID,"airLos",0)
+	
 	local allyTeamList = spGetAllyTeamList()
 	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
 	for _,allyID in ipairs (allyTeamList) do
@@ -586,11 +589,13 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
 		end
 		
+		local x,y,z = Spring.GetUnitPosition(unit[1])
+		
 		if totalCost ~= 0 then
 			baseCost = baseCost*pointBaseCost
 			totalCost = totalCost*volumeCost + baseCost
 		
-			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
+			local id = spCreateUnit(terraunitDefID, x, y, z, 0, team, true)
 			if id then
 				
 				if segment[i].along ~= rampLevels.data[rampLevels.count].along then
@@ -999,11 +1004,13 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			end
 		end
 		
+		local x,y,z = Spring.GetUnitPosition(unit[1])
+		
 		if totalCost ~= 0 then
 			baseCost = baseCost*pointBaseCost
 			totalCost = totalCost*volumeCost + baseCost
 		
-			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
+			local id = spCreateUnit(terraunitDefID, x, y, z, 0, team, true)
 			if id then
 			
 				setupTerraunit(id, team, segment[i].position.x, 0, segment[i].position.z)
@@ -1465,11 +1472,13 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			end
 		end
 		
+		local x,y,z = Spring.GetUnitPosition(unit[1])
+		
 		if totalCost ~= 0 then
 			baseCost = baseCost*pointBaseCost
 			totalCost = totalCost*volumeCost + baseCost
 		
-			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
+			local id = spCreateUnit(terraunitDefID, x, y, z, 0, team, true)
 			if id then
 				unitIdGrid[segment[i].grid.x] = unitIdGrid[segment[i].grid.x] or {}
 				unitIdGrid[segment[i].grid.x][segment[i].grid.z] = id
@@ -1653,15 +1662,21 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 				point[j] = {x = cmdParams[i], z = cmdParams[i+1]}
 				i = i + 2
 			end
+			local unitCount = 0
 			for j = 1, cmdParams[6] do
-				unit[j] = cmdParams[i]
+				if spValidUnitID(cmdParams[i]) and Spring.GetUnitDefID(cmdParams[i]) ~= terraunitDefID then
+					unit[j] = cmdParams[i]
+					unitCount = unitCount + 1
+				end
 				i = i + 1
 			end
 			
-			if cmdParams[3] == 0 then
-				TerraformWall(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], cmdOptions.shift)
-			else
-				TerraformArea(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], cmdOptions.shift)
+			if unitCount ~= 0 then
+				if cmdParams[3] == 0 then
+					TerraformWall(terraform_type, point, cmdParams[5], cmdParams[4], unit, unitCount, cmdParams[2], cmdParams[7], cmdOptions.shift)
+				else
+					TerraformArea(terraform_type, point, cmdParams[5], cmdParams[4], unit, unitCount, cmdParams[2], cmdParams[7], cmdOptions.shift)
+				end
 			end
 			
 			return false
@@ -1675,12 +1690,18 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 				point[j] = {x = cmdParams[i], y = cmdParams[i+1],z = cmdParams[i+2]}
 				i = i + 3
 			end
+			local unitCount = 0
 			for j = 1, cmdParams[6] do
-				unit[j] = cmdParams[i]
+				if spValidUnitID(cmdParams[i]) and Spring.GetUnitDefID(cmdParams[i]) ~= terraunitDefID then
+					unit[j] = cmdParams[i]
+					unitCount = unitCount + 1
+				end
 				i = i + 1
 			end
 			
-			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,cmdParams[4]*2,unit, cmdParams[6],cmdParams[2], cmdParams[7], cmdOptions.shift)
+			if unitCount ~= 0 then
+				TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,cmdParams[4]*2,unit, unitCount,cmdParams[2], cmdParams[7], cmdOptions.shift)
+			end
 		
 			return false
 			
