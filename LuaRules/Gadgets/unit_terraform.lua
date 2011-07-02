@@ -285,9 +285,6 @@ local function setupTerraunit(unitID, team, x, y, z)
 	Spring.MoveCtrl.Enable(unitID)
 	Spring.MoveCtrl.SetPosition(unitID, x, y, z)
 	
-	spSetUnitSensorRadius(unitID,"los",0)
-	spSetUnitSensorRadius(unitID,"airLos",0)
-	
 	local allyTeamList = spGetAllyTeamList()
 	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
 	for _,allyID in ipairs (allyTeamList) do
@@ -2892,6 +2889,11 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID)
+
+	if unitDefID == terraunitDefID then
+		spSetUnitSensorRadius(unitID,"los",0)
+		spSetUnitSensorRadius(unitID,"airLos",0)
+	end
 
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
