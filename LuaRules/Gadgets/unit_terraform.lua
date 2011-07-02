@@ -162,6 +162,10 @@ local currentCon 			= 0
 
 local checkInterval 		= 0 
 
+local unitOrderList 		= {count = 0, data = {}} 
+-- workaround: if order is given on the same frame as terraunit creation the order temporarilly
+-- points to the ground location
+
 local terraunitDefID = UnitDefNames["terraunit"].id
 
 local corclogDefID = UnitDefNames["corclog"].id
@@ -275,6 +279,24 @@ local function updateBorderWithPoint(border, x, z)
 	if z > border.bottom then
 		border.bottom = z
 	end
+end
+
+local function setupTerraunit(unitID, team, x, y, z)
+	Spring.MoveCtrl.Enable(unitID)
+	Spring.MoveCtrl.SetPosition(unitID, x, y, z)
+	
+	local allyTeamList = spGetAllyTeamList()
+	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
+	for _,allyID in ipairs (allyTeamList) do
+		if allyID ~= unitAllyTeam then
+			spSetUnitLosMask(unitID, allyID, {los=true, radar=true, prevLos=true, contRadar=true } )
+		end
+	end
+
+	spSetUnitHealth(unitID, {
+		health = 0,
+		build  = 0
+	})
 end
 
 local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift)
@@ -570,27 +592,15 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
 			if id then
+				
 				if segment[i].along ~= rampLevels.data[rampLevels.count].along then
 					rampLevels.count = rampLevels.count + 1
 					rampLevels.data[rampLevels.count] = {along = segment[i].along, count = 0, data = {}}
 				end
 				rampLevels.data[rampLevels.count].count = rampLevels.data[rampLevels.count].count + 1
 				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
-				
-				local allyTeamList = spGetAllyTeamList()
-				local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
-				for _,allyID in ipairs (allyTeamList) do
-					if allyID ~= unitAllyTeam then
-						spSetUnitLosMask(id, allyID, {los=true, radar=true, prevLos=true, contRadar=true } )
-					end
-				end
 			
-				spSetUnitSensorRadius(id,"los",0)
-				spSetUnitSensorRadius(id,"airLos",0)
-				spSetUnitHealth(id, {
-					health = 0,
-					build  = 0
-				})
+				setupTerraunit(id, team, segment[i].position.x, 0, segment[i].position.z)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -678,6 +688,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		return
 	end
 	
+	unitOrderList.count = unitOrderList.count + 1
+	unitOrderList.data[unitOrderList.count] = {units = {count = units, data = unit}, orders = orderList, shift = shift}
+	--[[
 	for i = 1, units do
 		if shift then
 			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_SHIFT)
@@ -688,7 +701,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		for j = 2, orderList.count do
 			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[j]},CMD_OPT_SHIFT)
 		end
-	end
+	end--]]
 	
 end
 
@@ -992,20 +1005,8 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
 			if id then
-				local allyTeamList = spGetAllyTeamList()
-				local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
-				for _,allyID in ipairs (allyTeamList) do
-					if allyID ~= unitAllyTeam then
-						spSetUnitLosMask(id, allyID, {los=true, radar=true, prevLos=true, contRadar=true } )
-					end
-				end
 			
-				spSetUnitSensorRadius(id,"los",0)
-				spSetUnitSensorRadius(id,"airLos",0)
-				spSetUnitHealth(id, {
-					health = 0,
-					build  = 0
-				})
+				setupTerraunit(id, team, segment[i].position.x, 0, segment[i].position.z)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -1048,7 +1049,10 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	end
 	
 	--** Give repair order for each block to all selected units **
-		
+	
+	unitOrderList.count = unitOrderList.count + 1
+	unitOrderList.data[unitOrderList.count] = {units = {count = units, data = unit}, orders = {count = blocks, data = block}, shift = shift}
+	--[[	
 	for i = 1, units do
 	
 		if (spValidUnitID(unit[i])) then
@@ -1063,7 +1067,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			end
 		end
 	end
-	
+	--]]
 
 end
 
@@ -1473,20 +1477,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				aveX = aveX + segment[i].position.x
 				aveZ = aveZ + segment[i].position.z
 				
-				local allyTeamList = spGetAllyTeamList()
-				local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
-				for _,allyID in ipairs (allyTeamList) do
-					if allyID ~= unitAllyTeam then
-						spSetUnitLosMask(id, allyID, {los=true, radar=true, prevLos=true, contRadar=true } )
-					end
-				end
-			
-				spSetUnitSensorRadius(id,"los",0)
-				spSetUnitSensorRadius(id,"airLos",0)
-				spSetUnitHealth(id, {
-					health = 0,
-					build  = 0
-				})
+				setupTerraunit(id, team, segment[i].position.x, 0, segment[i].position.z)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -1627,7 +1618,9 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	if orderList.count == 0 then
 		return
 	end
-	
+	unitOrderList.count = unitOrderList.count + 1
+	unitOrderList.data[unitOrderList.count] = {units = {count = units, data = unit}, orders = orderList, shift = shift}
+	--[[
 	for i = 1, units do
 		if shift then
 			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_SHIFT)
@@ -1639,7 +1632,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[j]},CMD_OPT_SHIFT)
 		end
 	end
-	
+	--]]
 	
 end
 
@@ -2077,6 +2070,22 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	local extraPoint = {}
 	local extraPoints = 0
 	local extraPointArea = {}
+	
+	--[[
+	for i = 1, terra.points do
+		if terra.point[i].edges then
+			for j = 1, terra.point[i].edges do
+			
+				local x = terra.point[i].edge[j].x
+				local z = terra.point[i].edge[j].z
+				
+				Spring.MarkerAddLine(x-2,0,z-2, x+2,0,z+2)
+				Spring.MarkerAddLine(x-2,0,z+2, x+2,0,z-2)
+				
+			end
+		end
+	end
+	--]]
 	
 	for i = 1, terra.points do
 		if terra.point[i].edges then
@@ -2548,7 +2557,28 @@ function gadget:GameFrame(n)
 		end
 	end	
 	
-end
+	-- give orders to the contructors, workaround for order location bug.
+	if unitOrderList.count ~= 0 then
+		for i = 1, unitOrderList.count do
+			local units = unitOrderList.data[i].units
+			local orders = unitOrderList.data[i].orders
+			local shift = unitOrderList.data[i].shift
+			
+			for j = 1, units.count do
+				if shift then
+					spGiveOrderToUnit(units.data[j],CMD_REPAIR,{orders.data[1]},CMD_OPT_SHIFT)
+				else
+					spGiveOrderToUnit(units.data[j],CMD_REPAIR,{orders.data[1]},CMD_OPT_RIGHT)
+				end
+				
+				for k = 2, orders.count do
+					spGiveOrderToUnit(units.data[j],CMD_REPAIR,{orders.data[k]},CMD_OPT_SHIFT)
+				end
+			end
+		end
+		unitOrderList = {count = 0, data = {}}
+	end
+end	
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)

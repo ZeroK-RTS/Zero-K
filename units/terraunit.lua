@@ -40,6 +40,7 @@ unitDef = {
   selfDestructCountdown  = 1,
   side                   = [[ARM]],
   sightDistance          = 0,
+  airSightDistance		 = 0,
   stealth                = true,
   turnRate               = 0,
   upright                = false,
