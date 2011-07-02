@@ -29,7 +29,7 @@ for i=1,#UnitDefs do
 	if (udef.extractsMetal > 0) then
 		mexDefs[i] = true
 	end
-	if (udef.type == "Building")or(udef.extractsMetal > 0) then
+	if (udef.speed == 0)or(udef.extractsMetal > 0) then
 		if (udef.energyMake > 0)
 			or(udef.energyUpkeep < 0)
 			or(udef.tidalGenerator > 0)
