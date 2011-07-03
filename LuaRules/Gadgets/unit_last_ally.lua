@@ -6,7 +6,7 @@ return {
 	date      = "2009",
 	license   = "GPL",
 	layer     = 0,
-	enabled   = true  --  loaded by default?
+	enabled   = false  --  loaded by default?
 	}
 end
 
