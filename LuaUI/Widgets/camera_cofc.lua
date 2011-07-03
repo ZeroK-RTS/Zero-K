@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.09 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.091 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -994,7 +994,7 @@ function widget:MousePress(x, y, button)
 	if (button ~= 2) then
 		return false
 	end
-	Spring.SendCommands('track 0')
+	Spring.SendCommands('trackoff')
     spSendCommands('viewfree')
 	trackmode = false
 	

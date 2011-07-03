@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "XrayHaloSelections",
-    desc      = "v0.02 XraySelections & HaloSelections",
+    desc      = "v0.021 XraySelections & HaloSelections (Halo on cloaked)",
     author    = "CarRepairer - Xray by trepan & Halo by jK",
     date      = "2011-06-11",
     license   = "GNU GPL, v2 or later",
