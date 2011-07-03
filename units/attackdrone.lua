@@ -43,7 +43,7 @@ unitDef = {
   maxVelocity         = 7,
   minCloakDistance    = 75,
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[attackdrone.s3o]],
   RefuelTime          = 10,
   scale               = [[1]],
@@ -89,19 +89,19 @@ unitDef = {
   weaponDefs          = {
 
     LASER      = {
-      name                    = [[Laser]],
-      beamDecay               = 0.736,
+      name                    = [[Light Particle Beam]],
+      beamDecay               = 0.9,
       beamlaser               = 1,
       beamTime                = 0.01,
-      beamttl                 = 15,
-      coreThickness           = 0.5,
+      beamttl                 = 60,
+      coreThickness           = 0.25,
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 16,
-        subs    = 0.8,
+        default = 32,
+        subs    = 1.6,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],
@@ -115,7 +115,7 @@ unitDef = {
       noSelfDamage            = true,
       pitchtolerance          = 8192,
       range                   = 400,
-      reloadtime              = 0.4,
+      reloadtime              = 0.8,
       renderType              = 0,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/mini_laser]],
