@@ -58,6 +58,7 @@ local skirm = {
 	"nsaclash",
 	
 	"chickens",
+	"chicken_sporeshooter",
 }
 
 local jumper = { -- uses jump for offense. IE do not put commander or AA here.
@@ -79,6 +80,8 @@ local riot = {
 	
 	"armraz",
 	"dante",
+	
+	"chickenwurm",
 }
 
 local arty = {

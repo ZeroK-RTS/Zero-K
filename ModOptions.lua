@@ -506,6 +506,7 @@ local options = {
     max    = 5,
     step   = 0.05,
   },
+--[[  
   {
 	key    = 'burrowtechtime',
 	name   = 'Burrow Tech Time',
@@ -517,6 +518,7 @@ local options = {
 	max    = 60,
 	step   = 1,  
   },
+]]--  
   {
 	key    = 'burrowqueentime',
 	name   = 'Burrow Queen Time',

@@ -21,7 +21,9 @@ queenName            = "chickenflyerqueen"
 queenMorphName		 = "chickenlandqueen"
 miniQueenName		 = "chicken_dragon"
 waveRatio            = 0.6       -- waves are composed by two types of chicken, waveRatio% of one and (1-waveRatio)% of the other
-defenderChance       = 0.1       -- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
+baseWaveSize		 = 2.5		 -- multiplied by malus, 1 = 1 squadSize of chickens
+waveSizeMult		 = 1
+defenderChance       = 0.05		-- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
 quasiAttackerChance  = 0.65		-- subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
 maxBurrows           = 40
 burrowEggs           = 15       -- number of eggs each burrow spawns
@@ -33,8 +35,8 @@ chickenSpawnRate     = 59
 minBaseDistance      = 700      
 maxBaseDistance      = 4000
 
-gracePeriod          = 150       -- no chicken spawn in this period, seconds
-gracePenalty		 = 10		-- reduced grace per player over one, seconds
+gracePeriod          = 180       -- no chicken spawn in this period, seconds
+gracePenalty		 = 15		-- reduced grace per player over one, seconds
 gracePeriodMin		 = 90
 
 queenTime            = 60*60    -- time at which the queen appears, seconds
@@ -43,12 +45,21 @@ queenHealthMod		 = 1
 miniQueenTime		= {}		-- times at which miniqueens are spawned (multiplier of queentime)
 endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 
-burrowQueenTime		= 120		-- how much killing a burrow shaves off the queen timer, seconds (divided by playercount)
-burrowWaveBonus		= 0.3		-- size of temporary bonus to add to subsequent waves (divided by (number of burrows/playerCount) )
-waveBonusDecay		= 0.2		-- linear rate at which burrow wave bonus decreases
-burrowTechTime		= 15		-- how many seconds each burrow deducts from the tech time per wave (divided by playercount)
+burrowQueenTime		= 15		-- how much killing a burrow shaves off the queen timer, seconds (divided by playercount)
+burrowWaveSize		= 1.2		-- size of contribution each burrow makes to wave size (1 = 1 squadSize of chickens)
 burrowRespawnChance = 0.15
-burrowRegressMult	= 12			-- multiply by burrowTechTime to get how much killing a burrow sets back chicken timer (divided by playercount)
+burrowRegressTime	= 60		-- direct tech time regress from killing a burrow, divided by playercount
+
+humanAggroPerBurrow	= 1			-- divided by playercount
+humanAggroDecay		= 0.25		-- linear rate at which aggro decreases
+humanAggroWaveFactor = 0.5
+humanAggroDefenseFactor = 0.5	-- multiplies aggro for defender spawn chance
+humanAggroSupportFactor	= 0.5	-- multiplies aggro for supporter spawn chance
+humanAggroTechTimeProgress = 20	-- how much to increase chicken tech progress (* aggro), seconds
+humanAggroTechTimeRegress = 0	-- how much to reduce chicken tech progress (* aggro), seconds
+humanAggroQueenTimeFactor = 1	-- burrow queen time is multiplied by this and aggro (after clamping)
+humanAggroQueenTimeMin = 0	-- min value of aggro for queen time calc
+humanAggroQueenTimeMax = 8
 
 scoreMult			= 1
 
@@ -123,22 +134,38 @@ local chickenTypes = {
   chicken_pigeon =  {time =  7,  squadSize =   1.4, obsolete = 50},
   chickens       =  {time = 14,  squadSize =   1, obsolete = 45},
   chickena       =  {time = 20,   squadSize = 0.5, obsolete = 45},
-  chickenwurm       =  {time = 25,  squadSize =   0.7},
-  chickenr       =  {time = 30,  squadSize = 1.2, obsolete = 60},
+  chickenr       =  {time = 25,  squadSize = 1.2, obsolete = 60},
+  chickenwurm    =  {time = 30,  squadSize =   0.7},  
   chicken_sporeshooter =  {time = 35,  squadSize =   0.5},
+  chicken_roc	 =  {time = 35,  squadSize =   0.6},
   chicken_dodo   =  {time = 40,  squadSize =   1.8, obsolete = 70},
   chickenf       =  {time = 45,  squadSize = 0.5},
   chickenc       =  {time = 50,  squadSize = 0.5},
   chickenblobber =  {time = 55,  squadSize = 0.3},
   chicken_blimpy =  {time = 60,  squadSize = 0.2},
   chicken_tiamat =  {time = 70,  squadSize = 0.2},
+  
+  --chicken_shield =  {time = 99999,  squadSize = 0.01},	--workaround to get it into a list
 }
 
 local defenders = {
   chickend =  {time = 20, squadSize = 0.65 },
-  chickenspire =  {time = 50, squadSize = 0.2, quasiAttacker = true, },
-  chicken_shield =  {time = 30, squadSize = 0.6, quasiAttacker = true, },
   --chicken_rafflesia =  {time = 30, squadSize = 0.4 },
+}
+
+local supporters = {
+  --chickenspire =  {time = 50, squadSize = 0.2, quasiAttacker = true, },
+  chicken_shield =  {time = 30, squadSize = 0.6, quasiAttacker = true, },
+}
+
+-- TODO
+-- cooldown is in waves
+local specialPowers = {
+	{name = "Digger Ambush", maxAggro = -3, time = 20, obsolete = 40, unit = "chicken_digger", burrowRatio = 1, minDist = 100, maxDist = 450, cooldown = 2, targetHuman = true},
+	--{name = "Wurmsign", maxAggro = -5, time = 40, unit = "chickenwurm", burrowRatio = 0.2, cooldown = 4},
+	{name = "Spire Sprout", maxAggro = -8, time = 30, unit = "chickenspire", tieToBurrow = true, cooldown = 2},
+	{name = "Rising Dragon", maxAggro = -12, time = 40, unit = "chicken_dragon", burrowRatio = 0.1, minDist = 250, maxDist = 1200, cooldown = 3, targetHuman = true},
+	--{name = "Dino Killer", maxAggro = -18, time = 40, unit = "chicken_silo", minDist = 1500},
 }
 
 local function SetCustomMiniQueenTime()
@@ -153,15 +180,14 @@ difficulties = {
     chickenSpawnRate = 120, 
     burrowSpawnRate  = 60,
     gracePeriod      = 300,
-    firstSpawnSize   = 0.8,
+	waveSizeMult	 = 0.9,
     timeSpawnBonus   = .02,     -- how much each time level increases spawn size
-    chickenTypes     = Copy(chickenTypes),
-    defenders        = Copy(defenders),
 	queenTime		 = 40*60,
 	queenName        = "chicken_dragon",
 	queenMorphName	 = '',
 	miniQueenName	 = "chicken_tiamat",
 	maxBurrows       = 12,
+	specialPowers	 = {},
 	scoreMult		 = 0.25,
   },
 
@@ -169,10 +195,8 @@ difficulties = {
     chickenSpawnRate = 60, 
     burrowSpawnRate  = 50,
     gracePeriod      = 180,
-    firstSpawnSize   = 1.2,
+	waveSizeMult	 = 0.9,
     timeSpawnBonus   = .03,
-    chickenTypes     = Copy(chickenTypes),
-    defenders        = Copy(defenders),
 	queenHealthMod	 = 0.75,
 	scoreMult		 = 0.66,
   },
@@ -180,23 +204,17 @@ difficulties = {
   ['Chicken: Normal'] = {
     chickenSpawnRate = 50, 
     burrowSpawnRate  = 45,
-    firstSpawnSize   = 1.4,
     timeSpawnBonus   = .04,
-    chickenTypes     = Copy(chickenTypes),
-    defenders        = Copy(defenders),
 	miniQueenTime		= {0.6},	
   },
 
   ['Chicken: Hard'] = {
     chickenSpawnRate = 45, 
     burrowSpawnRate  = 45,
-    firstSpawnSize   = 1.8,
+	waveSizeMult	 = 1.2,
     timeSpawnBonus   = .05,
-    chickenTypes     = Copy(chickenTypes),
-    defenders        = Copy(defenders),
-	burrowWaveBonus	 = 0.4,
-	burrowTechTime	 = 15,
-	queenHealthMod	 = 1.25,
+	burrowWaveSize	 = 1.4,
+	queenHealthMod	 = 1.5,
 	queenSpawnMult   = 5,
 	miniQueenTime	 = {0.5},
 	scoreMult		 = 1.25,
@@ -204,55 +222,60 @@ difficulties = {
   
   ['Chicken: Suicidal'] = {
     chickenSpawnRate = 45, 
+	waveSizeMult	 = 1.5,
     burrowSpawnRate  = 40,
-    firstSpawnSize   = 2.2,
     timeSpawnBonus   = .06,
-	gracePeriod		 = 120,
-    chickenTypes     = Copy(chickenTypes),
-    defenders        = Copy(defenders),
-	burrowQueenTime	 = 150,
-	burrowWaveBonus	 = 0.5,
-	burrowTechTime	 = 18,
+	burrowWaveSize	 = 1.6,	
+	gracePeriod		 = 150,
+	gracePeriodMin	 = 30,
 	burrowRespawnChance = 0.25,
+	burrowRegressTime	= 50,
 	queenSpawnMult   = 5,
 	queenTime		 = 50*60,
-	queenHealthMod	 = 1.5,
+	queenHealthMod	 = 2,
 	miniQueenTime	 = {0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
-	scoreMult		 = 1.5,
+	scoreMult		 = 2,
   },
 
   ['Chicken: Custom'] = {
     chickenSpawnRate = modoptions.chickenspawnrate or 50, 
     burrowSpawnRate  = modoptions.burrowspawnrate or 45,
-    firstSpawnSize   = 1.4,
     timeSpawnBonus   = .04,
-    chickenTypes     = Copy(chickenTypes),
-    defenders        = Copy(defenders),
+--    chickenTypes     = Copy(chickenTypes),
+--    defenders        = Copy(defenders),
 	queenTime		 = (modoptions.queentime or 60)*60,
 	miniQueenTime	= {	SetCustomMiniQueenTime() },
-	gracePeriod		= (modoptions.graceperiod and modoptions.graceperiod * 60) or 150,
+	gracePeriod		= (modoptions.graceperiod and modoptions.graceperiod * 60) or 180,
 	gracePenalty	= 0,
 	gracePeriodMin	= 30,
-	burrowQueenTime	= (modoptions.burrowqueentime and modoptions.burrowqueentime) or 100,
-	burrowTechTime	= (modoptions.burrowtechtime and modoptions.burrowtechtime) or 12,
+	burrowQueenTime	= (modoptions.burrowqueentime and modoptions.burrowqueentime) or 30,
 	scoreMult		= 0,
   },
 }
 
+TimeModifier(chickenTypes, 60)
+TimeModifier(defenders, 60)
+TimeModifier(supporters, 60)
+TimeModifier(specialPowers, 60)
 -- minutes to seconds
 for _, d in pairs(difficulties) do
   d.timeSpawnBonus = d.timeSpawnBonus/60
-  TimeModifier(d.chickenTypes, 60)
-  TimeModifier(d.defenders, 60)
+  d.chickenTypes = Copy(chickenTypes)
+  d.defenders = Copy(defenders)
+  d.supporters = Copy(supporters)
+  d.specialPowers = Copy(specialPowers)
 end
 
 TimeModifier(difficulties['Chicken: Hard'].chickenTypes, hardModifier)
 TimeModifier(difficulties['Chicken: Hard'].defenders,    hardModifier)
+TimeModifier(difficulties['Chicken: Hard'].supporters,    hardModifier)
 TimeModifier(difficulties['Chicken: Suicidal'].chickenTypes, suicidalModifier)
 TimeModifier(difficulties['Chicken: Suicidal'].defenders,    suicidalModifier)
+TimeModifier(difficulties['Chicken: Suicidal'].supporters,    hardModifier)
 TimeModifier(difficulties['Chicken: Custom'].chickenTypes, customModifier)
 TimeModifier(difficulties['Chicken: Custom'].defenders,    customModifier)
+TimeModifier(difficulties['Chicken: Custom'].supporters,    customModifier)
 
 difficulties['Chicken Eggs: Very Easy']   = Copy(difficulties['Chicken: Very Easy'])
 difficulties['Chicken Eggs: Easy']   = Copy(difficulties['Chicken: Easy'])

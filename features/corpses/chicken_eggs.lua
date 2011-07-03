@@ -134,6 +134,12 @@ eggDefs.chickenwurm_egg = MergeTable(defaultEgg, {
   object      = [[chickeneggbrown.s3o]],
 })
 
+eggDefs.chicken_roc_egg = MergeTable(defaultEgg, {
+  metal       = 175,
+  reclaimTime = 175,
+  object      = [[chickenegggreen.s3o]],
+})
+
 eggDefs.chicken_shield_egg = MergeTable(defaultEgg, {
   metal       = 150,
   reclaimTime = 150,

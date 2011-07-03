@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Static Artillery]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 0,
   buildCostMetal                = 0,
@@ -31,7 +30,6 @@ unitDef = {
 	helptext_de    = [[Weitreichende, stationäre Artillerie.]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   energyMake                    = 0,
   explodeAs                     = [[NOWEAPON]],
   floater                       = true,

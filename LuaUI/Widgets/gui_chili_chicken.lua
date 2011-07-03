@@ -73,6 +73,7 @@ local difficulty = widget.difficulties[modes[Spring.GetGameRulesParam("difficult
 
 local rules = {
   "queenTime",
+  "humanAggro",
   "lagging",
   "difficulty",
   "techTimeReduction",
@@ -99,7 +100,7 @@ local Font
 
 -- elements
 local window, labelStack, background
-local label_anger, label_chickens, label_burrows, label_tech, label_mode
+local label_anger, label_chickens, label_burrows, label_aggro, label_tech, label_mode
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -159,15 +160,15 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local tooltipAnger, tooltipBurrowRespawn = '', ''
+local tooltipAnger, tooltipBurrowRespawn, tooltipBurrowTech = '', '', ''
 
 local function WriteTooltipsOnce()
-	local techTimePerBurrow = GetDifficultyValue('burrowTechTime')/gameInfo.malus
-	label_tech.tooltip = "Each burrow alive accelerates chicken tech progress by "..("%.1f"):format(techTimePerBurrow).. " seconds/wave\n"..
-		"Each burrow killed reduces chicken tech progress by "..("%.1f"):format(techTimePerBurrow * GetDifficultyValue("burrowRegressMult") ).. " seconds"
-		
+	local regressTime = GetDifficultyValue('burrowRegressTime')/gameInfo.malus
 	--tooltipAnger = "Each burrow killed reduces time remaining by ".. ("%.1f"):format(GetDifficultyValue('burrowQueenTime')/gameInfo.malus) .." seconds"
 	tooltipBurrowRespawn = "When killed, each burrow has a ".. math.floor(GetDifficultyValue('burrowRespawnChance')*100) .."% chance of respawning"
+	label_aggro.tooltip = "Each burrow killed increases aggression rating by "..("%.1f"):format(GetDifficultyValue('humanAggroPerBurrow')/gameInfo.malus).."\n"..
+		"Aggression rating decreases by "..("%.2f"):format(GetDifficultyValue('humanAggroDecay')).." per wave"
+	tooltipBurrowTech = "Each burrow killed reduces chicken tech progress by "..("%.1f"):format(regressTime).. " seconds"
 end
 
 -- generates breakdown of kills and deaths for each chicken type, sorted by appearance order ingame
@@ -206,13 +207,28 @@ local function UpdateRules()
 	local chickenCount, chickenKills = GetCount("Count"), GetCount("Kills")
 	label_chickens:SetCaption("Chickens alive/killed : \255\0\255\0"..chickenCount.."\008/\255\255\0\0"..chickenKills)
 	label_burrows:SetCaption("Burrows alive/killed : \255\0\255\0"..gameInfo[roostName .. "Count"].."\008/\255\255\0\0"..gameInfo[roostName .. "Kills"])
+	label_aggro:SetCaption("Player aggression rating: "..gameInfo["humanAggro"])
 	label_tech:SetCaption("Tech time reduction : "..FormatTime(gameInfo["techTimeReduction"]))
 	label_chickens.tooltip = "Chickens spawn every ".. GetDifficultyValue('chickenSpawnRate') .." seconds\n"..MakeChickenBreakdown()
 
 	-- tooltips, antilag
 	local miniQueenTime = difficulty.miniQueenTime and difficulty.miniQueenTime[1]
-	if miniQueenTime then label_anger.tooltip = "Killing a burrow now reduces time remaining by ".. ("%.1f"):format(GetDifficultyValue('burrowQueenTime')/gameInfo[roostName .. "Count"]) .." seconds" .. 
-												"\nDragons arrive at ".. FormatTime(math.floor(gameInfo.queenTime * miniQueenTime)) .. " (".. math.floor(miniQueenTime*100) .."%)" end
+	local aggro = math.max(gameInfo["humanAggro"], GetDifficultyValue('humanAggroQueenTimeMin'))
+	aggro = math.min(aggro, GetDifficultyValue('humanAggroQueenTimeMax'))
+	local queenTimeReduction = GetDifficultyValue('burrowQueenTime')*GetDifficultyValue('humanAggroQueenTimeFactor')*aggro
+	queenTimeReduction = math.max(queenTimeReduction, 0)
+	
+	local tooltipAnger = "Killing a burrow now reduces time remaining by ".. ("%.1f"):format(queenTimeReduction) .." seconds"
+	if miniQueenTime then tooltipAnger = tooltipAnger .. "\nDragons arrive at ".. FormatTime(math.floor(gameInfo.queenTime * miniQueenTime)) .. " (".. math.floor(miniQueenTime*100) .."%)" end
+	label_anger.tooltip = tooltipAnger
+		
+	local techTime = gameInfo["humanAggro"]
+	if techTime > 0 then
+		techTime = techTime * -GetDifficultyValue('humanAggroTechTimeRegress')
+	else
+		techTime = techTime * GetDifficultyValue('humanAggroTechTimeProgress')
+	end
+	label_tech.tooltip = tooltipBurrowTech.."\nTech time change next wave: "..("%.1f"):format(techTime) .." seconds"	
 	
 	label_burrows.tooltip = "Current burrow spawn time: ".. ("%.1f"):format(GetDifficultyValue('burrowSpawnRate')*0.25*(gameInfo[roostName.."Count"] + 1)/gameInfo.malus) .." seconds\n"..
 							tooltipBurrowRespawn
@@ -323,7 +339,7 @@ function widget:Initialize()
 	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
 	local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
 	
-	local labelHeight = 24
+	local labelHeight = 22
 	local fontSize = 16
 
 	
@@ -398,6 +414,16 @@ function widget:Initialize()
 		width = "100%";
 		font = {font = panelFont, size = fontSize, shadow = true, outline = true,},
 	}
+	label_aggro = Label:New{
+		parent = labelStack,
+		autosize=false;
+		align="left";
+		valign="center";
+		caption = '';
+		height = labelHeight,
+		width = "100%";
+		font = {font = panelFont, size = fontSize, shadow = true, outline = true,},
+	}	
 	label_tech = Label:New{
 		parent = labelStack,
 		autosize=false;
@@ -428,6 +454,7 @@ function widget:Initialize()
 	function label_anger:HitTest(x,y) return self end
 	function label_chickens:HitTest(x,y) return self end
 	function label_burrows:HitTest(x,y) return self end
+	function label_aggro:HitTest(x,y) return self end
 	function label_tech:HitTest(x,y) return self end
 end
 

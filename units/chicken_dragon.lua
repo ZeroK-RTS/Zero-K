@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[chicken_dragon]],
   name                   = [[White Dragon]],
-  description            = [[Uber Assault Chicken]],
+  description            = [[Über Assault Chicken]],
   acceleration           = 1,
   autoHeal               = 0,
   brakeRate              = 1,
@@ -41,7 +41,7 @@ unitDef = {
   leaveTracks            = true,
   maneuverleashlength    = [[640]],
   mass                   = 1284,
-  maxDamage              = 30000,
+  maxDamage              = 32000,
   maxSlope               = 36,
   maxVelocity            = 2.1,
   minCloakDistance       = 225,
