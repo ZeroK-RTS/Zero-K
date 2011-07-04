@@ -264,7 +264,7 @@ for _, d in pairs(difficulties) do
   d.chickenTypes = Copy(chickenTypes)
   d.defenders = Copy(defenders)
   d.supporters = Copy(supporters)
-  d.specialPowers = Copy(specialPowers)
+  d.specialPowers = d.specialPowers or Copy(specialPowers)
 end
 
 TimeModifier(difficulties['Chicken: Hard'].chickenTypes, hardModifier)
