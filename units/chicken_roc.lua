@@ -81,13 +81,13 @@ unitDef = {
 
     {
       def                = [[AEROSPORES]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
 
     {
       def                = [[AEROSPORES]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
   },
