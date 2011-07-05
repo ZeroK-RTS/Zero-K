@@ -788,7 +788,7 @@ local function ProcessSpecialPowers()
 	local time = spGetGameSeconds()
 	for i=#specialPowers, 1, -1 do
 		--Spring.Echo(specialPowers[i].name)
-		if (specialPowers[i].time < time) and (specialPowers[i].obsolete > time) and (specialPowers[i].maxAggro > humanAggro) then
+		if (specialPowers[i].time < time) and ((specialPowers[i].obsolete or math.huge) > time) and (specialPowers[i].maxAggro > humanAggro) then
 			selection = specialPowers[i]
 			break
 		end
