@@ -29,26 +29,15 @@ for i=1,#UnitDefs do
 	if (udef.extractsMetal > 0) then
 		mexDefs[i] = true
 	end
-	if (udef.speed == 0)or(udef.extractsMetal > 0) then
-		if (udef.energyMake > 0)
-			or(udef.energyUpkeep < 0)
-			or(udef.tidalGenerator > 0)
-			or(udef.windGenerator > 0)
-			or(udef.customParams.windgen)
-			or(udef.extractsMetal > 0)
-			or(tonumber(udef.customParams.pylonrange) or 0 > 0) then
-			pylonDefs[i] = {
-				range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE,
-				extractor = (udef.extractsMetal > 0),
-				neededLink = tonumber(udef.customParams.neededlink) or false,
-				keeptooltip = udef.customParams.keeptooltip or false,
-			}
-		end
-		
-		--if (udef.customParams.ispylon) then
-		--	pylonDefs[i] = (udef.customParams.isoverdrivepylon and 1) or 0
-		--end
+	if (tonumber(udef.customParams.pylonrange) or 0 > 0) then
+		pylonDefs[i] = {
+			range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE,
+			extractor = (udef.extractsMetal > 0),
+			neededLink = tonumber(udef.customParams.neededlink) or false,
+			keeptooltip = udef.customParams.keeptooltip or false,
+		}
 	end
+		
 end
 
 -------------------------------------------------------------------------------------
@@ -1027,6 +1016,13 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:Initialize()
+
+	for i=1,#UnitDefs do
+		local udef = UnitDefs[i]
+		Spring.Echo(udef.name)
+		Spring.Echo(tonumber(udef.customParams.pylonrange))
+	end
+	
 	_G.pylon = pylon
 	_G.lowPowerUnits = lowPowerUnits
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
