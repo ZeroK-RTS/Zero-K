@@ -576,7 +576,7 @@ local function SpawnTurret(burrowID, turret, number, force)
 		defenderChance = defenderChance + math.max(aggro*humanAggroDefenseFactor, 0)
 	end
 	if defenderChance < 0 then defenderChance = 0 end	
-	--defenderChance = math.min(defenderChance * defenders[turret].squadSize, 0.8)
+	defenderChance = defenderChance * (defenders[turret].squadSize or supporters[turret].squadSize or 1)
   end
   
   if (random() > defenderChance and defenderChance < 1)  or (not turret) or Spring.GetUnitIsDead(burrowID) then
