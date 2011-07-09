@@ -67,8 +67,6 @@ options = {
 --------------------------------------------------------------------------------
 --config
 
-local KF_SECONDS = 2 -- key frame period in seconds
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -93,7 +91,7 @@ local cos	= math.cos
 
 local echo = Spring.Echo
 
-local KF_FRAMES = KF_SECONDS * 32
+local KF_FRAMES = 1
 local recording = false
 local recData = {}
 local filename
@@ -256,7 +254,7 @@ end
 
 
 local function IsKeyframe(frame)
-    return frame % KF_FRAMES == 1
+    return frame % KF_FRAMES == 0
 end
 
 
@@ -337,7 +335,7 @@ function widget:GameFrame()
     if playing then
         if recData[frame] then
             --echo ('playing frame', frame)
-            spSetCameraState(recData[frame], KF_SECONDS)
+            spSetCameraState(recData[frame], KF_FRAMES / 32)
         end
     end
   
