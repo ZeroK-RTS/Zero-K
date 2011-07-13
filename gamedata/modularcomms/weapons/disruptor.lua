@@ -10,7 +10,6 @@ local weaponDef = {
     craterMult              = 0,
 
 	customParams			= {
-		slot = [[5]],
 		--timeslow_preset = [[module_disruptorbeam]],
 		rangeperlevel = [[20]],
 		damageperlevel = [[12.5]],
@@ -31,7 +30,7 @@ local weaponDef = {
     laserFlareSize          = 4.33,
     minIntensity            = 1,
     noSelfDamage            = true,
-    range                   = 350,
+    range                   = 300,
     reloadtime              = 2,
     rgbColor                = [[0.2 1 1]],
     soundStart              = [[weapon/laser/heavy_laser5]],
