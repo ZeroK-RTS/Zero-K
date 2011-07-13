@@ -154,7 +154,6 @@ local base = {
 	[4] = {
 		name = "artcom",
 		modules = {
-			"conversion_partillery", 
 			"commweapon_riotcannon", 
 			"commweapon_concussion", 
 			"module_adv_targeting", 
@@ -163,7 +162,8 @@ local base = {
 			"module_adv_targeting", 
 			"module_adv_targeting", 
 			"module_adv_targeting",
-			"weaponmod_napalm_warhead"
+			--"weaponmod_napalm_warhead",
+			"conversion_partillery", 			
 		}
 	},
 	[5] = {
@@ -191,12 +191,13 @@ local base = {
 		}
 	},
 	[7] = {
-		name = "dgauss",
+		name = "artcom2",
 		modules = {
-			"commweapon_gaussrifle",
-			"commweapon_gaussrifle",
-			"conversion_shockrifle", 
-			"conversion_shockrifle", 
+			"conversion_partillery", 
+			"commweapon_riotcannon", 
+			"commweapon_concussion", 
+			"weaponmod_high_caliber_barrel",			
+			--"weaponmod_napalm_warhead",
 		}
 	},
 	[8] = {

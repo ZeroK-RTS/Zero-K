@@ -1,34 +1,36 @@
-local name = "commweapon_partillery"
+local name = "commweapon_partillery_napalm"
 local weaponDef = {
-	name                    = [[Light Plasma Artillery]],
+	name                    = [[Light Napalm Artillery]],
     accuracy                = 350,
-    areaOfEffect            = 64,
-
+    areaOfEffect            = 128,
+    
     customParams			= {
     	muzzleEffect = [[custom:THUDMUZZLE]],
 		miscEffect = [[custom:THUDDUST]],
+		burnchance = [[1]],
     },
     
     craterBoost             = 0,
     craterMult              = 0,
 
     damage                  = {
-		default = 320,
-		planes  = 320,
-		subs    = 16,
+		default = 240,
+		planes  = 240,
+		subs    = 12,
     },
 
     edgeEffectiveness       = 0.5,
-    explosionGenerator      = [[custom:PLASMA_HIT_32]],
+    explosionGenerator      = [[custom:NAPALM_Expl]],
     impulseBoost            = 0,
     impulseFactor           = 0.4,
     interceptedByShieldType = 1,
     minbarrelangle          = [[-35]],
-    movingAccuracy          = 850,
+    movingAccuracy          = 800,
     noSelfDamage            = true,
-    range                   = 900,
+    range                   = 850,
     reloadtime              = 4,
-    soundHit                = [[explosion/ex_med5]],
+    size					= 4,
+    soundHit                = [[weapon/burn_mixed]],
     soundStart              = [[weapon/cannon/cannon_fire1]],
     startsmoke              = [[1]],
     targetMoveError         = 0.3,

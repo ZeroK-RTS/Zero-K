@@ -19,7 +19,6 @@ end
 upgrades = {
 	-- weapons
 	-- it is important that they are prefixed with "commweapon_" in order to get the special handling!
-	-- it is important that they are prefixed with "commweapon_" in order to get the special handling!
 	
 	commweapon_peashooter = {
 		name = "Peashooter",
@@ -204,11 +203,19 @@ upgrades = {
 				}
 				for i,v in pairs(weapons) do
 					if permitted[i] then
-						v.reloadtime = v.reloadtime * 2
-						v.customparams.basereload = v.reloadtime
-						for armorname, dmg in pairs(v.damage) do
-							v.damage[armorname] = dmg * 2.5
-							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+						if not (i == "commweapon_partillery" or i == "commweapon_partillery_napalm") then
+							v.reloadtime = v.reloadtime * 2
+							v.customparams.basereload = v.reloadtime
+							v.customparams.highcaliber = true
+							for armorname, dmg in pairs(v.damage) do
+								v.damage[armorname] = dmg * 2.5
+								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+							end
+						else
+							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_hpartillery")
+							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_hpartillery")
+							ReplaceWeapon(unitDef, "commweapon_partillery_napalm", "commweapon_hpartillery_napalm")
+							ReplaceWeapon(unitDef, "commweapon_partillery_napalm", "commweapon_hpartillery_napalm")						
 						end
 					end
 				end
@@ -262,6 +269,7 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {
 					commweapon_partillery = true,
+					commweapon_hpartillery = true,
 					commweapon_rocketlauncher = true,
 					commweapon_riotcannon = true,
 				}
@@ -274,20 +282,10 @@ upgrades = {
 							end
 							v.customparams.burntime = "420"
 							v.rgbcolor = [[1 0.3 0.1]]
-						elseif (i == "commweapon_partillery") then	-- -90% damage, 256 AoE, firewalker effect
-							for armorname, dmg in pairs(v.damage) do
-								v.damage[armorname] = dmg * 0.1
-								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
-							end
-							v.customparams.areadamage_preset = [[module_napalmgrenade]]
-							v.customparams.burntime = "180"
-							v.explosiongenerator = [[custom:firewalkernapalm]]
-							v.soundstart = [[weapon/cannon/wolverine_fire]]
-							v.soundhit = [[weapon/cannon/wolverine_hit]]
-							v.size = 8
-							v.areaofeffect = 256
-							v.rgbcolor = [[1 0.5 0.2]]
-							v.firestarter = 120
+						elseif (i == "commweapon_hpartillery") then	-- -90% damage, 256 AoE, firewalker effect
+							ReplaceWeapon(unitDef, "commweapon_hpartillery", "commweapon_hpartillery_napalm")
+						elseif (i == "commweapon_partillery") then	-- -25% damage, 128 AoE
+							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_partillery_napalm")
 						else	-- -25% damage, 128 AoE
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 0.75
@@ -297,7 +295,7 @@ upgrades = {
 							v.areaofeffect = 128
 						end
 						
-						if (i ~= "commweapon_partillery") then
+						if (i == "commweapon_riotcannon") or (i == "commweapon_rocketlauncher") then
 							v.explosiongenerator = [[custom:NAPALM_Expl]]
 							v.customparams.burnchance = "1"
 							v.soundhit = [[weapon/burn_mixed]]
