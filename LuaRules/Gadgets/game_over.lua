@@ -22,6 +22,11 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 local is83 = tobool(Game.version:find("0.83") or Game.version:find("0.82+"))
 --if not is83 then return end
+
+if not Spring.GetModOptions() then
+	return
+end
+
 local function nullFunc() end
 
 local spGetTeamInfo     = Spring.GetTeamInfo
