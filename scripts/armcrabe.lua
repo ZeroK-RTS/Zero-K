@@ -1,5 +1,3 @@
---ARM CRABRE SCRIPT BY TA-FOREVER (Sephiroth) (http:--www.planetannihilation.com/taforever, http:--www.planetannihilation.com/taan)
-
 include 'constants.lua'
 
 --------------------------------------------------------------------------------
@@ -39,9 +37,9 @@ local legRaiseSpeed = math.rad(45)*PACE
 local legRaiseAngle = math.rad(20)
 local legLowerSpeed = math.rad(50)*PACE
 
-local legForwardSpeed = math.rad(45)*PACE
+local legForwardSpeed = math.rad(40)*PACE
 local legForwardAngle = -math.rad(20)
-local legBackwardSpeed = math.rad(40)*PACE
+local legBackwardSpeed = math.rad(35)*PACE
 local legBackwardAngle = math.rad(25)
 local legBackwardAngleMinor = math.rad(10)
 
@@ -55,16 +53,14 @@ local nocurl = true
 
 local gun_0 = 0
 
-local SIG_MOVE = 1	
-local SIG_AIM1 = 2
-local SIG_AIM2 = 4
-local SIG_CURL = 8
+local SIG_MOVE = 2	
+local SIG_AIM1 = 4
+local SIG_AIM2 = 8
+local SIG_CURL = 16
 
 smokePiece = {base, turret}
 
 local function Walk()
-	Signal(SIG_MOVE)
-	SetSignalMask(SIG_MOVE)
 	while bCurled or bCurling do Sleep(100) end
 	SetUnitValue(COB.MAX_SPEED, base_speed)
 	while true do
@@ -86,8 +82,8 @@ local function Walk()
 		-- Spring.Echo("lower left fore and right back")
 		Turn(leg4, z_axis, 0, legLowerSpeed)	-- LF leg down		
 		Turn(leg2, z_axis, 0, legLowerSpeed)	-- RB leg down
+		Sleep(0)
 		WaitForTurn(leg4, z_axis)
-		--Sleep(0)
 		
 		-- Spring.Echo("left back and right fore move, left fore and right back anchor")
 		--Turn(leg4, z_axis, 0, legLowerSpeed)	-- LF leg down
@@ -105,9 +101,9 @@ local function Walk()
 
 		-- Spring.Echo("lower left back and right fore")
 		Turn(leg3, z_axis, 0, legLowerSpeed)	-- LB leg down		
-		Turn(leg1, z_axis, 0, legLowerSpeed)	-- RF leg down		
+		Turn(leg1, z_axis, 0, legLowerSpeed)	-- RF leg down
+		Sleep(0)
 		WaitForTurn(leg3, z_axis)
-		--Sleep(0)
 	end
 end
 
@@ -121,7 +117,7 @@ local function Curl()
 	bCurling = true
 	SetUnitValue(COB.MAX_SPEED, 1)
 
-	Move( canon , y_axis, 4 , 2.5 )
+	Move( canon , y_axis, 5 , 2.5 )
 	Move( base , y_axis, -5 , 2.5 )
 	Move( base , z_axis, -5 , 2.5 )
 	
@@ -184,20 +180,21 @@ local function ResetLegs()
 	Turn(leg3 , x_axis, math.rad(90), math.rad(95))
 	Turn(leg1 , x_axis, math.rad(-90), math.rad(95))
 	Turn(leg4 , x_axis, math.rad(-90), math.rad(95))
-	Sleep(100)	
+	Sleep(100)
 	Turn( leg1 , x_axis, 0, math.rad(95) )
 	Turn( leg2 , x_axis, 0, math.rad(95) )
 	Turn( leg3 , x_axis, 0, math.rad(95) )
-	Turn( leg4 , x_axis, 0, math.rad(95) )	
+	Turn( leg4 , x_axis, 0, math.rad(95) )
+	Spring.SetUnitArmored(unitID,false)
 end
 
 local function Uncurl()
+	if not bMoving then return end
 	--Spring.Echo("Initiating uncurl")
 	Signal( SIG_CURL) 
 	SetSignalMask( SIG_CURL)
 	bCurled = false
 	bCurling = true
-	Spring.SetUnitArmored(unitID,false)
 	
 	ResetLegs()
 	
@@ -259,19 +256,22 @@ function script.Create()
 	StartThread(CurlDelay)
 end
 
-local function Move()
+local function Motion()
+	Signal(SIG_MOVE)
+	SetSignalMask(SIG_MOVE)
 	bMoving = true
-	StartThread(Uncurl)
 	Sleep(66)
-	StartThread(Walk)
+	Uncurl()
+	Walk()
 end
 
 function script.StartMoving()
-	StartThread(Move)
+	--Spring.Echo("Moving")
+	StartThread(Motion)
 end
 
 function script.StopMoving()
-	--Spring.Echo("Unit stopped moving")
+	--Spring.Echo("Stopped moving")
 	bMoving = false
 	Signal(SIG_MOVE)
 	StartThread(Curl)
