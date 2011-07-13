@@ -1198,12 +1198,9 @@ end
 
 function widget:SelectionChanged(newSelection)
 	--get new selected fac, if any
-	local function IsFactory(udid)
-		return (UnitDefs[udid].TEDClass == "PLANT") or UnitDefs[udid].isFactory
-	end
 	for i=1,#newSelection do
 		local id = newSelection[i]
-		if IsFactory((spGetUnitDefID(id))) then
+		if UnitDefs[spGetUnitDefID(id)].isFactory then
 			if selectedFac ~= id then
 				alreadyRemovedTag = {}
 			end

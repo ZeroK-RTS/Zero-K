@@ -58,7 +58,6 @@ local index_voteTitle = 15
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function GetVotes(line)
-	local doubleDigits = true
 	local voteNum = 1
 	if line:find(string_vote2) then
 		voteNum = 2
@@ -68,7 +67,6 @@ local function GetVotes(line)
 	local index_votesNeeded = line:find("%s%d[%s%d]", index_votesHave + 1)
 	--Spring.Echo(index_init, index_votesHave, index_votesNeeded)
 	local numVotes = tonumber(line:sub(index_votesHave, index_votesHave + 2))
-	local add = (doubleDigits and 1) or 0
 	local maxVotes = tonumber(line:sub(index_votesNeeded, index_votesNeeded + 2))
 	voteCount[voteNum] = numVotes
 	for i=1, 2 do
