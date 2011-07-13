@@ -34,7 +34,7 @@ local function StartsWith(s, startString)
 end
 
 
-function GG.DropUnit(unitDefName, x, y, z, facing, teamID)
+function GG.DropUnit(unitDefName, x, y, z, facing, teamID, teleport)
   local unitID = Spring.CreateUnit(unitDefName, x, 0, z, facing, teamID)
   if StartsWith(unitDefName, "chicken") then -- don't drop chickens, make them appear in a cloud of dirt instead
     local y = Spring.GetGroundHeight(x, z)
@@ -68,14 +68,18 @@ function gadget:GameFrame(frame)
       elseif y < h + unitBrakeHeight then
         -- unit is braking
         Spring.MoveCtrl.SetGravity(unitID, brakeGravity)
-        Spring.SpawnCEG("vindiback", x, y - 20, z) -- black dust
-        Spring.SpawnCEG("banishertrail", x + 10, y - 40, z + 10) -- braking thrusters
-        Spring.SpawnCEG("banishertrail", x - 10, y - 40, z + 10)
-        Spring.SpawnCEG("banishertrail", x + 10, y - 40, z - 10)
-        Spring.SpawnCEG("banishertrail", x - 10, y - 40, z - 10)
+		if frame % 2 == 0 then
+			Spring.SpawnCEG("vindiback", x, y - 20, z) -- black dust
+			Spring.SpawnCEG("banishertrail", x + 10, y - 40, z + 10) -- braking thrusters
+			Spring.SpawnCEG("banishertrail", x - 10, y - 40, z + 10)
+			Spring.SpawnCEG("banishertrail", x + 10, y - 40, z - 10)
+			Spring.SpawnCEG("banishertrail", x - 10, y - 40, z - 10)
+		end
       else
-        -- unit is falling
-        Spring.SpawnCEG("raventrail", x, y - 40, z) -- meteor trail
+	  	-- unit is falling
+		if frame % 2 == 0 then
+			Spring.SpawnCEG("raventrail", x, y - 40, z) -- meteor trail
+		end
       end
     else
       units[unitID] = nil
