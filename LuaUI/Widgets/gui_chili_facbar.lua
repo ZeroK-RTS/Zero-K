@@ -54,8 +54,8 @@ options = {
 		type = 'number',
 		name = 'Visible Units in Que',
 		desc = "The maximum units to show in the factory's queue",
-		min = 2, max = 8,
-		value = 3,
+		min = 2, max = 14,
+		value = 5,
 	},	
 	
 	buttonsize = {
