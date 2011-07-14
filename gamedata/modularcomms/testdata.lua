@@ -155,14 +155,9 @@ local base = {
 		name = "artcom",
 		modules = {
 			"commweapon_riotcannon", 
-			"commweapon_concussion", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting",
-			--"weaponmod_napalm_warhead",
+			"commweapon_riotcannon", 
+			"weaponmod_napalm_warhead",
+			"conversion_partillery", 
 			"conversion_partillery", 			
 		}
 	},
@@ -194,10 +189,11 @@ local base = {
 		name = "artcom2",
 		modules = {
 			"conversion_partillery", 
+			"commweapon_riotcannon",
 			"commweapon_riotcannon", 
-			"commweapon_concussion", 
+			"conversion_partillery",
 			"weaponmod_high_caliber_barrel",			
-			--"weaponmod_napalm_warhead",
+			"weaponmod_napalm_warhead",
 		}
 	},
 	[8] = {
@@ -207,7 +203,12 @@ local base = {
 			"module_high_power_servos",
 			"weaponmod_stun_booster",
 			"commweapon_sunburst",
-			"module_adv_targeting",
+			"module_high_power_servos",
+			"module_high_power_servos",
+			"module_high_power_servos",
+			"module_high_power_servos",
+			"module_high_power_servos",
+			"module_high_power_servos",
 		}
 	},
 	[9] = {
