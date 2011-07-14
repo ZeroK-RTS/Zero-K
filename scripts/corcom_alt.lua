@@ -169,6 +169,7 @@ local function RestoreLaser()
 	Sleep(RESTORE_DELAY_LASER)
 	isLasering = false
 	Turn( luparm , x_axis, 0, ARM_SPEED_PITCH )
+	Turn( biggun , x_axis, math.rad(41), ARM_SPEED_PITCH  )
 	if not isDgunning then 
 		Turn( torso , y_axis, 0, TORSO_SPEED_YAW) 
 	end
@@ -180,7 +181,7 @@ local function RestoreDgun()
 	Sleep(RESTORE_DELAY_DGUN)
 	isDgunning = false
 	Turn( ruparm , x_axis, 0, ARM_SPEED_PITCH )
-	Turn( nanospray , x_axis, math.rad(0), ARM_SPEED_PITCH )
+	Turn( nanolathe , x_axis, math.rad(36), ARM_SPEED_PITCH )
 	if not isLasering then 
 		Turn( torso , y_axis, 0, TORSO_SPEED_YAW) 
 	end
