@@ -60,9 +60,7 @@ local function SetNewTeamColors()
 	local a, e = 0, 0
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID)
-		if (teamID == myTeam) then 
-			Spring.SetTeamColor(teamID, unpack(myColor))
-		elseif (allyID == myAlly) then
+		if (allyID == myAlly) then
 			a = (a % #allyColors) + 1
 			Spring.SetTeamColor(teamID, unpack(allyColors[a]))
 		else
@@ -70,6 +68,7 @@ local function SetNewTeamColors()
 			Spring.SetTeamColor(teamID, unpack(enemyColors[e]))
 		end
 	end
+	Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
 end
 
 
