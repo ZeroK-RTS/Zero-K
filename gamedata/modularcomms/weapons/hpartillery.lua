@@ -2,7 +2,7 @@ local name = "commweapon_hpartillery"
 local weaponDef = {
 	name                    = [[Plasma Artillery]],
 	accuracy                = 600,
-	areaOfEffect            = 96,
+	areaOfEffect            = 72,
 	craterBoost             = 1,
 	craterMult              = 2,
 

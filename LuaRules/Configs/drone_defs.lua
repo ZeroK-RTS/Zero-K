@@ -8,7 +8,7 @@ local carrierDefNames = {
 }
 
 local presets = {
-	module_companion_drone = {drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 2, spawnSize = 1, range = 900},
+	module_companion_drone = {drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 2, spawnSize = 1, range = 450},
 }
 
 --[[

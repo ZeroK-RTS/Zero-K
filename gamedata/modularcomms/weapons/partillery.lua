@@ -2,7 +2,7 @@ local name = "commweapon_partillery"
 local weaponDef = {
 	name                    = [[Light Plasma Artillery]],
     accuracy                = 350,
-    areaOfEffect            = 64,
+    areaOfEffect            = 48,
 
     customParams			= {
     	muzzleEffect = [[custom:THUDMUZZLE]],
