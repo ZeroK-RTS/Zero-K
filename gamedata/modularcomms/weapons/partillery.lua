@@ -13,9 +13,9 @@ local weaponDef = {
     craterMult              = 0,
 
     damage                  = {
-		default = 320,
-		planes  = 320,
-		subs    = 16,
+		default = 300,
+		planes  = 300,
+		subs    = 15,
     },
 
     edgeEffectiveness       = 0.5,

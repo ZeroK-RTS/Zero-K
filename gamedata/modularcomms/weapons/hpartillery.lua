@@ -12,9 +12,9 @@ local weaponDef = {
 	},	  
 	  
 	damage                  = {
-		default = 800,
-		planes  = 800,
-		subs    = 4,
+		default = 750,
+		planes  = 750,
+		subs    = 37.5,
 	},
 	
 	edgeEffectiveness       = 0.5,
