@@ -118,7 +118,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       minbarrelangle          = [[-35]],
-      movingAccuracy          = 1400,
+	  myGravity               = 0.1,
       noSelfDamage            = true,
       range                   = 860,
       reloadtime              = 6,
@@ -129,7 +129,7 @@ unitDef = {
       targetMoveError         = 0.3,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 350,
+      weaponVelocity          = 300,
     },
 
   },

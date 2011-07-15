@@ -84,7 +84,7 @@ unitDef = {
 
     NAPALM_MORTAR = {
       name                    = [[Napalm Mortar]],
-      accuracy                = 320,
+      accuracy                = 400,
       areaOfEffect            = 256,
       craterBoost             = 1,
       craterMult              = 2,
@@ -105,7 +105,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      movingAccuracy          = 1200,
       myGravity               = 0.1,
       noSelfDamage            = true,
       projectiles             = 2,
@@ -120,7 +119,7 @@ unitDef = {
       startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 350,
+      weaponVelocity          = 320,
     },
 
   },

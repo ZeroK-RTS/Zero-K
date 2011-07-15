@@ -21,10 +21,9 @@ local weaponDef = {
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 1,
-	minbarrelangle          = [[-10]],
-    movingAccuracy          = 800,	
+	minbarrelangle          = [[-10]],	
 	myGravity               = 0.1,
-	range                   = 850,
+	range                   = 750,
 	reloadtime              = 8,
 	soundHit                = [[weapon/cannon/arty_hit]],
 	soundStart              = [[weapon/cannon/pillager_fire]],
@@ -32,7 +31,7 @@ local weaponDef = {
 	targetMoveError			= 0.3,
 	turret                  = true,
 	weaponType              = [[Cannon]],
-	weaponVelocity          = 330,
+	weaponVelocity          = 320,
 }
 
 return name, weaponDef
