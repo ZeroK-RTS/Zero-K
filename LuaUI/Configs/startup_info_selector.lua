@@ -20,7 +20,7 @@ local optionData = {
 		tooltip = "Strike Commander\nUses beam laser, has a greater speed but less health.",--will be used as option.tooltip
 		button = function()
 			Spring.SendLuaRulesMsg("faction:strikecomm")
-			--Spring.SendCommands({'say a:I choose: Strike Commander !'})
+			Spring.SendCommands({'say a:I choose: Strike Commander !'})
 			Close(true)
 		end 
 	},
@@ -32,7 +32,7 @@ local optionData = {
 		tooltip = "Battle Commander\nUses a riot cannon; has more health but slower speed.",
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:battlecomm")
-			--Spring.SendCommands({'say a:I choose: Battle Commander !'})
+			Spring.SendCommands({'say a:I choose: Battle Commander !'})
 			Close(true)
 		end 
 	},
@@ -44,7 +44,7 @@ local optionData = {
 		tooltip = "Recon Commander\nUses a slow-ray, has high mobility but with lower income and reduced health.",
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:reconcomm")
-			--Spring.SendCommands({'say a:I choose: Recon Commander !'})
+			Spring.SendCommands({'say a:I choose: Recon Commander !'})
 			Close(true)
 		end 
 	},
@@ -56,7 +56,7 @@ local optionData = {
 		tooltip = "Support Commander\nUses a railgun (pierces units), has increased income and build range but low health and speed. Comes with free storage.",
 		button = function() 
 			Spring.SendLuaRulesMsg("faction:supportcomm")
-			--Spring.SendCommands({'say a:I choose: Support Commander !'})
+			Spring.SendCommands({'say a:I choose: Support Commander !'})
 			Close(true)
 		end 
 	},
@@ -142,7 +142,7 @@ local function CommSelectTemplate(num, seriesName, comm1Name)
 		tooltip = "Select comm config number "..num.." ("..seriesName..")"..WriteTooltip(seriesName),
 		button = function()
 			Spring.SendLuaRulesMsg("customcomm:"..seriesName)
-			--Spring.SendCommands({'say a:I choose: '..seriesName..'!'})
+			Spring.SendCommands({'say a:I choose: '..seriesName..'!'})
 			Close(true)
 		end
 	}
