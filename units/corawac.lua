@@ -64,6 +64,7 @@ unitDef = {
   sonarDistance       = 1200,
   stealth             = true,
   TEDClass            = [[VTOL]],
+  turnRadius          = 1,
   workerTime          = 0,
 
   featureDefs         = {

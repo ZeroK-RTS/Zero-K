@@ -70,6 +70,7 @@ unitDef = {
   sightDistance       = 660,
   smoothAnim          = true,
   TEDClass            = [[VTOL]],
+  turnRadius          = 350,
   workerTime          = 0,
 
   weapons             = {
