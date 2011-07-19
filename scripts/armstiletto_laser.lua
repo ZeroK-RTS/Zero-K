@@ -57,10 +57,52 @@ function script.MoveRate(moveRate)
 	end
 end--]]
 
-local function FireLoop()
+function Hacky_Stiletto_Workaround_stiletto_func(count)
+
+	local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
+	local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
+	local bx, by, bz = Spring.GetUnitPiecePosDir(unitID,base)
+	local xdx = xx - bx
+	local xdy = xy - by
+	local xdz = xz - bz
+	local zdx = zx - bx
+	local zdy = zy - by
+	local zdz = zz - bz
+	local angle_x = math.atan2(xdy, math.sqrt(xdx^2 + xdz^2))
+	local angle_z = math.atan2(zdy, math.sqrt(zdx^2 + zdz^2))
+
+	Turn( preDrop , x_axis, angle_x)
+	Turn( preDrop , z_axis, -angle_z)
+
+	EmitSfx( drop,  FIRE_W2 )
+	
+	if sound_index == 0 then
+		local px, py, pz = Spring.GetUnitPosition(unitID)
+		Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)
+	end
+	sound_index = sound_index + 1
+	if sound_index >= 6 then
+		sound_index = 0
+	end
+	
+	if count < 80 then
+		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 1, count + 1)
+	else
+		Reload()
+	end
 	
 end
 
+function script.FireWeapon1()
+	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
+		return
+	end
+	GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 43, 1)
+end
+
+-- What the fire func should look like in a hax free world
+-- The sleeps cause the script to crash if the EmitSfx hits any units
+--[[
 function script.FireWeapon1()
 	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
 		return
@@ -91,12 +133,13 @@ function script.FireWeapon1()
 		if sound_index >= 6 then
 			sound_index = 0
 		end
-		Sleep(25) -- fire density
+		Sleep(35) -- fire density
 	end
 	Sleep( 500) --delay before fuel runs out, to let it retreat a little
 	Reload()
 	--Spring.SetUnitFuel(unitID,0)
 end
+--]]
 
 function script.QueryWeapon1()
 	return drop

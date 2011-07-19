@@ -1016,12 +1016,6 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:Initialize()
-
-	for i=1,#UnitDefs do
-		local udef = UnitDefs[i]
-		Spring.Echo(udef.name)
-		Spring.Echo(tonumber(udef.customParams.pylonrange))
-	end
 	
 	_G.pylon = pylon
 	_G.lowPowerUnits = lowPowerUnits
