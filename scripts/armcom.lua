@@ -40,9 +40,18 @@ local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
 local PACE = 2
-local BASE_VELOCITY = UnitDefNames.armcom1.speed or 1.375
+local BASE_VELOCITY = UnitDefNames.armcom1.speed or 1.375*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 PACE = PACE * VELOCITY/BASE_VELOCITY
+
+--[[
+local baseHeight = UnitDefNames.armcom1.modelHeight
+local height = UnitDefs[unitDefID].modelHeight
+if height and baseHeight then
+	PACE = PACE * baseHeight/height
+	Spring.Echo("Stride length compensation")
+end
+]]--
 
 local THIGH_FRONT_ANGLE = -math.rad(50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE

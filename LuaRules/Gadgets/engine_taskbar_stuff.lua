@@ -26,7 +26,6 @@ local SetWMCaption = Spring.SetWMCaption or noFunc
 
 function gadget:Initialize()
 	local name = Game.modName
-	Spring.Echo("ping")
 	SetWMIcon("LuaUI/Images/ZK_logo.png")
 	SetWMCaption(name .. " (Spring" .. Game.version .. ")", name)
 	gadgetHandler:RemoveGadget()

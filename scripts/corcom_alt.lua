@@ -36,7 +36,7 @@ local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
 local PACE = 1.6
-local BASE_VELOCITY = UnitDefNames.corcom1.speed or 1.25
+local BASE_VELOCITY = UnitDefNames.corcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 PACE = PACE * VELOCITY/BASE_VELOCITY
 
