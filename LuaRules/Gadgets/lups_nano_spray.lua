@@ -256,12 +256,12 @@ end
 
 local factionsNanoFx = {
   default = {
-    fxtype      = "NanoParticles",
-    delaySpread = 30,
-    size        = 3,
-    sizeSpread  = 5,
-    sizeGrowth  = 0.25,
-    texture     = "bitmaps/PD/nano.tga"
+    fxtype          = "NanoLasers",
+    alpha           = "0.2+count/30",
+    corealpha       = "0.2+count/120",
+    corethickness   = "limcount",
+    streamThickness = "0.5+5*limcount",
+    streamSpeed     = "limcount*0.05",
   },
   ["default_high_quality"] = {
     fxtype      = "NanoParticles",
@@ -280,7 +280,7 @@ local factionsNanoFx = {
     size        = 3,
     sizeSpread  = 5,
     sizeGrowth  = 0.25,
-    texture     = "bitmaps/PD/nano.tga"
+    texture     = "bitmaps/PD/nano.png"
   },
   ["arm_high_quality"] = {
     fxtype      = "NanoParticles",
@@ -404,8 +404,8 @@ function gadget:Update()
     return
   end
 
-  --// enable freaky arm nano fx when quality>4
-  if ((Lups.Config["quality"] or 4)>=4) then
+  --// enable freaky arm nano fx when quality>3
+  if ((Lups.Config["quality"] or 3)>=3) then
     factionsNanoFx.default = factionsNanoFx["default_high_quality"]
   end
 
