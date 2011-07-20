@@ -32,9 +32,11 @@ for i=1,#subdirs do
   local gf = curdir .. "main.lua"
   if (VFS.FileExists(gf)) then
     local g = gh:LoadGadget(gf)
-    gh:InsertGadget(g)
-    local name = g.ghInfo.name
-    print(string.format("Loaded gadget:  %-18s  <%s>", name, gf))
+	if g then
+      gh:InsertGadget(g)
+      local name = g.ghInfo.name
+      print(string.format("Loaded gadget:  %-18s  <%s>", name, gf))
+	end
   end
 end
 
