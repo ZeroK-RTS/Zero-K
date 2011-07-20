@@ -98,16 +98,16 @@ unitDef = {
   
     GOO          = {
       name                    = [[Blob]],
-      areaOfEffect            = 200,
+      areaOfEffect            = 96,
       burst                   = 6,
       burstrate               = 0.01,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 250,
-        planes  = 250,
-        subs    = 1.25,
+        default = 200,
+        planes  = 200,
+        subs    = 1,
       },
 
       endsmoke                = [[0]],
@@ -165,7 +165,7 @@ unitDef = {
       metalpershot            = 0,
       model                   = [[chickeneggblue.s3o]],
       range                   = 500,
-      reloadtime              = 3,
+      reloadtime              = 5,
       selfprop                = true,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
