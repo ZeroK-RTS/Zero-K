@@ -22,6 +22,7 @@ local rleg = piece 'rleg'
 local r_foot = piece 'r_foot' 
 local head = piece 'head' 
 
+smokePiece = {torso}
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
@@ -125,7 +126,9 @@ function script.Create()
 	Turn( luparm , x_axis, math.rad(30) )
 	Turn( ruparm , x_axis, math.rad(-10) )
 	Turn( biggun , x_axis, math.rad(41) )
-	Turn( nanolathe , x_axis, math.rad(36) )	
+	Turn( nanolathe , x_axis, math.rad(36) )
+	
+	StartThread(SmokeUnit)
 end
 
 function script.StartMoving() 

@@ -21,6 +21,8 @@ local rleg = piece 'rleg'
 local lleg = piece 'lleg' 
 local ground = piece 'ground' 
 
+smokePiece = {torso}
+
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
@@ -140,6 +142,8 @@ function script.Create()
 	Hide( nanospray)
 	Turn(lfirept, x_axis, math.rad(145))
 	Turn(rbigflash, x_axis, math.rad(145))
+	
+	StartThread(SmokeUnit)
 end
 
 function script.StartMoving() 

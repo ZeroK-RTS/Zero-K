@@ -32,6 +32,7 @@ local stab = piece 'stab'
 local nanospray = piece 'nanospray' 
 local grenade = piece 'grenade' 
 
+smokePiece = {torso}
 
 --variables
 local canDgun = UnitDefs[unitDefID].canDgun
@@ -280,6 +281,7 @@ function script.Create()
 
 	StartThread(MotionControl)
 	StartThread(RestoreAfterDelay)
+	StartThread(SmokeUnit)
 end
 
 function script.StartMoving()
