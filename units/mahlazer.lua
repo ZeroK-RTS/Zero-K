@@ -112,7 +112,6 @@ unitDef = {
       damage                  = {
         default = 3000,
         planes  = 3000,
-        subs    = 150,
       },
 
       explosionGenerator      = [[custom:megapartgun]],
@@ -159,7 +158,6 @@ unitDef = {
       damage                  = {
         default = 100,
         planes  = 100,
-        subs    = 5,
       },
 
       endsmoke                = [[0]],
@@ -209,7 +207,6 @@ unitDef = {
       damage                  = {
         default = 100,
         planes  = 100,
-        subs    = 5,
       },
 
       explosionGenerator      = [[custom:FLASHLAZER]],
