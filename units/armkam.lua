@@ -5,7 +5,6 @@ unitDef = {
   acceleration           = 0.154,
   amphibious             = true,
   bankscale              = [[1]],
-  bmcode                 = [[1]],
   brakeRate              = 3.75,
   buildCostEnergy        = 220,
   buildCostMetal         = 220,
@@ -38,7 +37,6 @@ unitDef = {
 	helptext_de    = [[Der Banshee ist ein leichter Kampfhubschrauber. Er besitzt nur wenig Ausdauer und macht wenig DPS. Er ist gut für direkte Attacken auf die Verteidiger (z.B. um Luftabwehr auszuschalten). Er trifft bewegte Einheiten sehr gut und erweist sich auch bei Verteidigung gegen Gegner ohne Luftabwehr als sehr nützlich.]],
   },
 
-  defaultmissiontype     = [[VTOL_standby]],
   explodeAs              = [[GUNSHIPEX]],
   floater                = true,
   footprintX             = 2,
@@ -47,12 +45,10 @@ unitDef = {
   iconType               = [[gunship]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maneuverleashlength    = [[1280]],
   mass                   = 164,
   maxDamage              = 860,
   maxVelocity            = 6.5,
   minCloakDistance       = 75,
-  moverate1              = [[3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[banshee.s3o]],
@@ -71,8 +67,6 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 500,
   smoothAnim             = true,
-  steeringmode           = [[1]],
-  TEDClass               = [[VTOL]],
   turnRate               = 693,
   workerTime             = 0,
 
@@ -81,7 +75,7 @@ unitDef = {
     {
       def                = [[LASER]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 120,
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -161,28 +155,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Banshee]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 1100,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 100,
-      object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Banshee]],

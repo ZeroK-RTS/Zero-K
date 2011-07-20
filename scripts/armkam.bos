@@ -1,15 +1,14 @@
-piece  base, body, rfx, rjet, lfx, ljet,
-       emit, gun;
+piece  base, body, rfx, rjet, lfx, ljet,emit, gun;
        
 static-var	moving;
 			
 // Signal definitions
 #define SIG_MOVE			2
+#define SIG_RESTORE			4
 
 #define SMOKEPIECE1 body
 
 #include "smokeunit.h"
-
 #include "sfxtype.h"
 #include "exptype.h"
 
@@ -43,7 +42,9 @@ TurnJets()
 
 RestoreAfterDelay()
 {
-	sleep 50;
+	signal SIG_RESTORE;
+	set-signal-mask SIG_RESTORE;
+	sleep 3000;
 	turn gun to y-axis <0> speed <20>;
 	turn gun to x-axis <0> speed <20>;
 }
@@ -90,23 +91,18 @@ QueryWeapon1(piecenum)
 
 AimWeapon1 (heading, pitch)
 {
-	turn gun to y-axis heading speed <2000>;
-	turn gun to x-axis <0> - pitch speed <2000>;
+	turn gun to y-axis heading speed <360>;
+	turn gun to x-axis <0> - pitch speed <360>;
 	start-script RestoreAfterDelay();
 	return (TRUE);
 }
 
 FireWeapon1()
 {
-	turn rjet to x-axis <0.000000> speed <70.000000>;
-	turn ljet to x-axis <0.000000> speed <70.000000>;
-	sleep 20;
+	turn rjet to x-axis <0> speed <70>;
+	turn ljet to x-axis <0> speed <70>;
 }
 
-SweetSpot(piecenum)
-{
-	piecenum = base;
-}
 
 StartMoving()
 {
