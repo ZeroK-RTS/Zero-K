@@ -99,6 +99,7 @@ local currentComm	--unitID
 local commDefID = UnitDefNames.armcom1.id
 local idleCons = {}	-- [unitID] = true
 local idleBuilderDefID = UnitDefNames.armrectr.id
+local wantUpdateCons = false
 
 --local gamestart = GetGameFrame() > 1
 local myTeamID = 0
@@ -652,7 +653,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	end
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
-		UpdateCons()
+		wantUpdateCons = true
 	end	
 	if facsByID[unitID] then
 		RemoveFac(unitID)
@@ -672,7 +673,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	local ud = UnitDefs[unitDefID]
 	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory) then
 		idleCons[unitID] = true
-		UpdateCons()
+		wantUpdateCons = true
 	end
 end
 
@@ -682,7 +683,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdOpts, cmdPara
 	end
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
-		UpdateCons()
+		wantUpdateCons = true
 	end
 end
 
@@ -694,6 +695,11 @@ function widget:Update(dt)
 		ClearData()
 		InitializeUnits()
 	end
+	if wantUpdateCons then
+		UpdateCons()
+		wantUpdateCons = false
+	end
+	
 	timer = timer + dt
 	if timer < UPDATE_FREQUENCY then
 		return
