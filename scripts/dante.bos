@@ -577,6 +577,8 @@ AimWeapon3(Func_Var_1, Func_Var_2)
 
 FireWeapon3()
 {
+	signal SIG_AIM;
+	signal SIG_AIM_3;
 	start-script ReloadRockets();
 	dgunning = TRUE;
 	sleep SALVO_TIME;
