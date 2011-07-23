@@ -128,10 +128,9 @@ structureConfig = {
 			unitDef.name = "Warpgate"
 			unitDef.description = "Allows planet owner to send drops to any point in the galaxy"
 			unitDef.objectname = "pw_warpgate.obj"
-			unitDef.script = "pw_warpgate.lua"
 			
-			unitDef.footprintx = 10
-			unitDef.footprintz = 10
+			unitDef.footprintx = 4
+			unitDef.footprintz = 4
 			
 			unitDef.explodeas = "GRAV_BLAST"
 			unitDef.selfdestructas = "GRAV_BLAST"

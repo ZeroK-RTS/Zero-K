@@ -1,30 +1,22 @@
-pw_warpgate = {
+uar_longrangeradar = {
 	pieces = {
 		base = {
-			offset = {0.00, 0.00, 0.00},
-
-			gen2 = {
-				offset = {0.00, 0.00, 0.00},
-
-			},
-			gen1 = {
-				offset = {0.00, 0.00, 0.00},
-
-			},
+			radars = {},
+			turret = {},
+			cylinder = {},
 		},
 	},
 
-	radius = 75.00,
-	height = 100.00,
-	midpos = {0.00, 40.00, 0.00},
-
+	radius = 30,
+	height = 70,
+	midpos = {0, 35, 0},
 	tex1 = "pw_warpgate_1.dds",
 	tex2 = "pw_warpgate_2.dds",
+	numpieces = 4,
 
-	numpieces = 3, -- includes the root and empty pieces
+        globalvertexoffsets = false, -- vertices in global space?
+        localpieceoffsets = true, -- offsets in local space?
 
-	globalvertexoffsets = false, -- vertices in global space?
-	localpieceoffsets = true, -- offsets in local space?
 }
 
-return pw_warpgate
+return uar_longrangeradar
