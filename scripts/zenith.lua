@@ -4,10 +4,11 @@ local base = piece "base"
 local gen1 = piece "gen1"
 local gen2 = piece "gen2"
 
-smokePiece = {gen1, gen2}
+smokePiece = {gen1}
 
 function script.Create()
-	Move( gen2, y_axis, 9001, 10000 )
+	Move( gen2, y_axis, 9001)
+	StartThread(SmokeUnit)
 end
 
 function script.Activate ( )
@@ -33,4 +34,13 @@ function script.AimWeapon1()
 end
 
 function script.FireWeapon1()
+end
+
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity < 0.5 then
+		return 1
+	else
+		return 2
+	end
 end

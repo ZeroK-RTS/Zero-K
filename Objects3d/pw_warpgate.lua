@@ -1,4 +1,4 @@
-uar_longrangeradar = {
+pw_warpgate = {
 	pieces = {
 		base = {
 			radars = {},
@@ -19,4 +19,4 @@ uar_longrangeradar = {
 
 }
 
-return uar_longrangeradar
+return pw_warpgate

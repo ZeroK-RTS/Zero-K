@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[asteroid]],
-  name                          = [[asteroid]],
-  description                   = [[rock]],
+  name                          = [[Asteroid]],
+  description                   = [[Space Rock]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostEnergy               = 0,
@@ -36,7 +36,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[asteroid]],
+      description      = [[Asteroid]],
       blocking         = true,
       category         = [[dragonteeth]],
       damage           = 500,
