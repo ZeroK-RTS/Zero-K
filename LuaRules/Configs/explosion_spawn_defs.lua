@@ -10,7 +10,7 @@ local spawn_defs = {
 	cormine_cortruck_missile = {name = "corareamine", cost=0, expire=0},
 	chicken_blimpy_dodobomb = {name = "chicken_dodo", cost=0, expire=30},
 	corgarp_mine = {name = "wolverine_mine", cost=0, expire=60},
-	meteor = {name = "asteroid", cost=0, expire=0},
+	zenith_meteor = {name = "asteroid", cost=0, expire=0},
 
 	chickenflyerqueen_dodobomb = {name = "chicken_dodo", cost=0, expire=30},
 	chickenflyerqueen_basiliskbomb = {name = "chickenc", cost=0, expire=0},
