@@ -924,6 +924,7 @@ local function MorphQueen()
 	newMaxHealth = newMaxHealth * queenHealthMod * ((playerCount/2) + 0.5)
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
 	-- if newHealth >= 1 then newHealth = 1 end
+	Spring.SetUnitMaxHealth(queenID, newMaxHealth)
 	spSetUnitHealth(queenID, {health = newHealth, capture = captureProgress, paralyze = paralyzeDamage, build = buildProgress, })
 	-- orders, XP
 	Spring.SetUnitExperience(queenID, xp)
@@ -1047,7 +1048,7 @@ function gadget:GameFrame(n)
 			local _, maxHealth = Spring.GetUnitHealth(queenID)
 			maxHealth = maxHealth * queenHealthMod * ((playerCount/2) + 0.5)
 			Spring.SetUnitMaxHealth(queenID, maxHealth)
-			Spring.SetUnitHealth(queenID, maxHealth)
+			spSetUnitHealth(queenID, maxHealth)
 		else
 			--chickenSpawnRate = chickenSpawnRate/2
 			for i=1,playerCount do SpawnMiniQueen() end

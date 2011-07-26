@@ -207,7 +207,7 @@ local function UpdateRules()
 	local chickenCount, chickenKills = GetCount("Count"), GetCount("Kills")
 	label_chickens:SetCaption("Chickens alive/killed : \255\0\255\0"..chickenCount.."\008/\255\255\0\0"..chickenKills)
 	label_burrows:SetCaption("Burrows alive/killed : \255\0\255\0"..gameInfo[roostName .. "Count"].."\008/\255\255\0\0"..gameInfo[roostName .. "Kills"])
-	label_aggro:SetCaption("Player aggression rating: "..gameInfo["humanAggro"])
+	label_aggro:SetCaption("Player aggression rating: "..("%.2f"):format(gameInfo["humanAggro"]))
 	label_tech:SetCaption("Tech time reduction : "..FormatTime(gameInfo["techTimeReduction"]))
 	label_chickens.tooltip = "Chickens spawn every ".. GetDifficultyValue('chickenSpawnRate') .." seconds\n"..MakeChickenBreakdown()
 

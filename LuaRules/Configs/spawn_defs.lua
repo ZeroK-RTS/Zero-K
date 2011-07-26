@@ -23,7 +23,7 @@ miniQueenName		 = "chicken_dragon"
 waveRatio            = 0.6       -- waves are composed by two types of chicken, waveRatio% of one and (1-waveRatio)% of the other
 baseWaveSize		 = 2.5		 -- multiplied by malus, 1 = 1 squadSize of chickens
 waveSizeMult		 = 1
-defenderChance       = 0.05		-- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
+defenderChance       = 0.1		-- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
 quasiAttackerChance  = 0.65		-- subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
 maxBurrows           = 40
 burrowEggs           = 15       -- number of eggs each burrow spawns
@@ -45,7 +45,7 @@ queenHealthMod		 = 1
 miniQueenTime		= {}		-- times at which miniqueens are spawned (multiplier of queentime)
 endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 
-burrowQueenTime		= 15		-- how much killing a burrow shaves off the queen timer, seconds (divided by playercount)
+burrowQueenTime		= 15		-- how much killing a burrow shaves off the queen timer, seconds
 burrowWaveSize		= 1.2		-- size of contribution each burrow makes to wave size (1 = 1 squadSize of chickens)
 burrowRespawnChance = 0.15
 burrowRegressTime	= 60		-- direct tech time regress from killing a burrow, divided by playercount
@@ -161,11 +161,11 @@ local supporters = {
 -- TODO
 -- cooldown is in waves
 local specialPowers = {
-	{name = "Digger Ambush", maxAggro = -3, time = 20, obsolete = 40, unit = "chicken_digger", burrowRatio = 1, minDist = 100, maxDist = 450, cooldown = 2, targetHuman = true},
-	--{name = "Wurmsign", maxAggro = -5, time = 40, unit = "chickenwurm", burrowRatio = 0.2, cooldown = 4},
-	{name = "Spire Sprout", maxAggro = -8, time = 30, unit = "chickenspire", burrowRatio = 0.15, tieToBurrow = true, cooldown = 2},
-	{name = "Rising Dragon", maxAggro = -12, time = 40, unit = "chicken_dragon", burrowRatio = 0.1, minDist = 250, maxDist = 1200, cooldown = 3, targetHuman = true},
-	--{name = "Dino Killer", maxAggro = -18, time = 40, unit = "chicken_silo", minDist = 1500},
+	{name = "Digger Ambush", maxAggro = -2.5, time = 20, obsolete = 40, unit = "chicken_digger", burrowRatio = 1, minDist = 100, maxDist = 450, cooldown = 2, targetHuman = true},
+	--{name = "Wurmsign", maxAggro = -3.5, time = 40, unit = "chickenwurm", burrowRatio = 0.2, cooldown = 4},
+	{name = "Spire Sprout", maxAggro = -4, time = 30, unit = "chickenspire", burrowRatio = 0.15, tieToBurrow = true, cooldown = 2},
+	{name = "Rising Dragon", maxAggro = -8, time = 40, unit = "chicken_dragon", burrowRatio = 0.1, minDist = 250, maxDist = 1200, cooldown = 3, targetHuman = true},
+	--{name = "Dino Killer", maxAggro = -12, time = 40, unit = "chicken_silo", minDist = 1500},
 }
 
 local function SetCustomMiniQueenTime()
@@ -270,12 +270,15 @@ end
 TimeModifier(difficulties['Chicken: Hard'].chickenTypes, hardModifier)
 TimeModifier(difficulties['Chicken: Hard'].defenders,    hardModifier)
 TimeModifier(difficulties['Chicken: Hard'].supporters,    hardModifier)
+TimeModifier(difficulties['Chicken: Hard'].specialPowers,    hardModifier)
 TimeModifier(difficulties['Chicken: Suicidal'].chickenTypes, suicidalModifier)
 TimeModifier(difficulties['Chicken: Suicidal'].defenders,    suicidalModifier)
-TimeModifier(difficulties['Chicken: Suicidal'].supporters,    hardModifier)
+TimeModifier(difficulties['Chicken: Suicidal'].supporters,    suicidalModifier)
+TimeModifier(difficulties['Chicken: Suicidal'].specialPowers,    suicidalModifier)
 TimeModifier(difficulties['Chicken: Custom'].chickenTypes, customModifier)
 TimeModifier(difficulties['Chicken: Custom'].defenders,    customModifier)
 TimeModifier(difficulties['Chicken: Custom'].supporters,    customModifier)
+TimeModifier(difficulties['Chicken: Custom'].specialPowers,    customModifier)
 
 difficulties['Chicken Eggs: Very Easy']   = Copy(difficulties['Chicken: Very Easy'])
 difficulties['Chicken Eggs: Easy']   = Copy(difficulties['Chicken: Easy'])
