@@ -86,18 +86,18 @@ deactivatescr()
 }
 Go()
 {
-    SET MAX_SPEED to base_speed / 3;
+    //SET MAX_SPEED to base_speed / 3;
 	call-script activatescr();
-	SET MAX_SPEED to base_speed;
+	//SET MAX_SPEED to base_speed;
 }
 
 Stop()
 {	
-    SET MAX_SPEED to base_speed / 3;
+    //SET MAX_SPEED to base_speed / 3;
 	call-script deactivatescr();
 	
-	call-script lua_Surface();
-	call-script lua_ReplaceMe();
+	//call-script lua_Surface();
+	//call-script lua_ReplaceMe();
 }
 
 #define ACTIVATECMD	    call-script Go();
@@ -291,7 +291,7 @@ Create()
 	bStayAbove = GET ACTIVATION;
 	
 	base_speed = GET MAX_SPEED;
-	SET MAX_SPEED to base_speed / 3;
+	//SET MAX_SPEED to base_speed / 3;
 	
 	start-script MotionControl();
 	

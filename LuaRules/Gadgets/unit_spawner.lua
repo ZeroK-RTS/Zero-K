@@ -804,7 +804,7 @@ local function ProcessSpecialPowers()
 	
 	if selection.tieToBurrow then
 		local burrowsOrdered = {}
-		for _,id in pairs(burrows) do
+		for id in pairs(burrows) do
 			burrowsOrdered[#burrowsOrdered + 1] = id
 		end
 		local burrowID = burrowsOrdered[math.random(#burrowsOrdered)]

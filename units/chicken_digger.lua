@@ -28,7 +28,6 @@ unitDef = {
 
   defaultmissiontype  = [[Standby]],
   explodeAs           = [[SMALL_UNITEX]],
-  fireState           = 1,
   floater             = false,
   footprintX          = 2,
   footprintZ          = 2,

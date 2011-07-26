@@ -54,7 +54,7 @@ humanAggroPerBurrow	= 1			-- divided by playercount
 humanAggroDecay		= 0.25		-- linear rate at which aggro decreases
 humanAggroWaveFactor = 0.5
 humanAggroDefenseFactor = 0.25	-- multiplies aggro for defender spawn chance
-humanAggroSupportFactor	= 0.25	-- multiplies aggro for supporter spawn chance
+humanAggroSupportFactor	= 0.1	-- multiplies aggro for supporter spawn chance
 humanAggroTechTimeProgress = 20	-- how much to increase chicken tech progress (* aggro), seconds
 humanAggroTechTimeRegress = 0	-- how much to reduce chicken tech progress (* aggro), seconds
 humanAggroQueenTimeFactor = 1	-- burrow queen time is multiplied by this and aggro (after clamping)
@@ -162,9 +162,9 @@ local supporters = {
 -- cooldown is in waves
 local specialPowers = {
 	{name = "Digger Ambush", maxAggro = -2.5, time = 15, obsolete = 40, unit = "chicken_digger", burrowRatio = 1, minDist = 100, maxDist = 450, cooldown = 2, targetHuman = true},
-	--{name = "Wurmsign", maxAggro = -3.5, time = 40, unit = "chickenwurm", burrowRatio = 0.2, cooldown = 4},
-	{name = "Spire Sprout", maxAggro = -4, time = 20, unit = "chickenspire", burrowRatio = 0.15, tieToBurrow = true, cooldown = 2},
-	{name = "Rising Dragon", maxAggro = -8, time = 30, unit = "chicken_dragon", burrowRatio = 0.1, minDist = 250, maxDist = 1200, cooldown = 3, targetHuman = true},
+	--{name = "Wurmsign", maxAggro = -4, time = 40, unit = "chickenwurm", burrowRatio = 0.2, cooldown = 4},
+	{name = "Spire Sprout", maxAggro = -5, time = 20, unit = "chickenspire", burrowRatio = 0.15, tieToBurrow = true, cooldown = 2},
+	{name = "Rising Dragon", maxAggro = -10, time = 30, unit = "chicken_dragon", burrowRatio = 0.1, minDist = 250, maxDist = 1200, cooldown = 3, targetHuman = true},
 	--{name = "Dino Killer", maxAggro = -12, time = 40, unit = "chicken_silo", minDist = 1500},
 }
 
