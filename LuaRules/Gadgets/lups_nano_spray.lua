@@ -434,7 +434,7 @@ function gadget:Update()
     local factionNanoFx = factionsNanoFx[faction]
     factionNanoFx.delaySpread = 30
     factionNanoFx.fxtype = factionNanoFx.fxtype:lower()
-    if ((Lups.Config["quality"] or 3)>=3)and((factionNanoFx.fxtype=="nanolasers")or(factionNanoFx.fxtype=="nanolasersshader")) then
+    if ((Lups.Config["quality"] or 2)>=2)and((factionNanoFx.fxtype=="nanolasers")or(factionNanoFx.fxtype=="nanolasersshader")) then
       factionNanoFx.flare = true
     end
 
