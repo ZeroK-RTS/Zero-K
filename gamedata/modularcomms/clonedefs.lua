@@ -4,14 +4,14 @@ local copy = {
 	armcom1 = {
 		armcom2 = {
 			level = 2,
-			mainstats = {maxdamage = 3000, objectname = "armcom2.3do"},
+			mainstats = {maxdamage = 3000, objectname = "armcom2.3do", collisionvolumescales  = [[55 55 55]],},
 			customparams = {rangebonus = "0.05"},
 			wreckmodel = "armcom2_dead",
 			heapmodel = "debris3x3b.s3o",
 		},
 		armcom3 = {
 			level = 3,
-			mainstats = {maxdamage = 4000, objectname = "armcom3.3do",
+			mainstats = {maxdamage = 4000, objectname = "armcom3.3do", collisionvolumescales  = [[60 60 60]],
 				explodeas = "estor_building", selfdas = "estor_building",
 				movementclass = [[AKBOT3]], footprintx = 3, footprintz = 3},
 			customparams = {rangebonus = "0.1"},
@@ -20,10 +20,10 @@ local copy = {
 		},
 		armcom4 = {
 			level = 4,
-			mainstats = {maxdamage = 6000, objectname = "armcom4.3do",
+			mainstats = {maxdamage = 6000, objectname = "armcom4.3do", collisionvolumescales  = [[65 65 65]],
 				explodeas = "estor_building", selfdas = "estor_building",
 				movementclass = [[AKBOT3]], footprintx = 3, footprintz = 3},
-			customparams = {rangebonus = "0.2"},
+			customparams = {rangebonus = "0.15"},
 			wreckmodel = "armcom4_dead",
 			heapmodel = "debris4x4b.s3o",
 		},
@@ -109,6 +109,33 @@ local copy = {
 			heapmodel = "debris4x4b.s3o",
 		},
 	},
+	cremcom1 = {
+		cremom2 = {
+			level = 2,
+			mainstats = {maxdamage = 3000, objectname = "cremcom2.s3o", collisionvolumescales  = [[55 55 55]],},
+			customparams = {rangebonus = "0.05"},
+			wreckmodel = "armcom2_dead",
+			heapmodel = "debris3x3b.s3o",
+		},
+		cremcom3 = {
+			level = 3,
+			mainstats = {maxdamage = 4000, objectname = "cremcom3.s3o", collisionvolumescales  = [[60 60 60]],
+				explodeas = "estor_building", selfdas = "estor_building",
+				movementclass = [[AKBOT3]], footprintx = 3, footprintz = 3},
+			customparams = {rangebonus = "0.1"},
+			wreckmodel = "armcom3_dead",
+			heapmodel = "debris3x3c.s3o",
+		},
+		cremcom4 = {
+			level = 4,
+			mainstats = {maxdamage = 6000, objectname = "cremcom4.s3o", collisionvolumescales  = [[65 65 65]],
+				explodeas = "estor_building", selfdas = "estor_building",
+				movementclass = [[AKBOT3]], footprintx = 3, footprintz = 3},
+			customparams = {rangebonus = "0.15"},
+			wreckmodel = "armcom4_dead",
+			heapmodel = "debris4x4b.s3o",
+		},
+	},	
 }
 
 for sourceName, copyTable in pairs(copy) do

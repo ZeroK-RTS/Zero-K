@@ -111,12 +111,12 @@ local function TagTree(unit, faction, newbuildoptions)
 	local ud = UnitDefs[unit]
     ud.faction = faction
     if (UnitDefs[unit].buildoptions) then
+	  if (ud.maxvelocity > 0) and unit ~= "armcsa" then
+	    ud.buildoptions = newbuildoptions
+	  end	
 	  for _, buildoption in ipairs(ud.buildoptions) do
         Tag(buildoption)
       end
-	  if (ud.maxvelocity > 0) and unit ~= "armcsa" then
-	    ud.buildoptions = newbuildoptions
-	  end
     end
 --[[	
     if (morphDefs[unit]) then
@@ -134,36 +134,29 @@ local function TagTree(unit, faction, newbuildoptions)
   Tag(unit)
 end
 
-local commanders = {
-	"armcom1",
-	"armcom2",
-	"armcom3",
-	"armcom4",
+local function ProcessCommBuildOpts()
+	local chassisList = {"armcom", "corcom", "commrecon", "commsupport", "cremcom"}
+	local commanders = {}
+	local numLevels = 4
+	
+	local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+	
+	for _, name in pairs(chassisList) do
+		for i=1, numLevels do
+			commanders[#commanders + 1] = name..i
+		end
+	end
+	
+	--add procedural comms
+	for name in pairs(commDefs) do
+		commanders[#commanders + 1] = name
+	end
 
-	"corcom1",
-	"corcom2",
-	"corcom3",
-	"corcom4",
-
-	"commrecon1",
-	"commrecon2",
-	"commrecon3",
-	"commrecon4",
-
-	"commsupport1",
-	"commsupport2",
-	"commsupport3",
-	"commsupport4",
-}
-
---add procedural comms
-for name in pairs(commDefs) do
-	commanders[#commanders + 1] = name
+	for _,name in pairs(commanders) do
+		TagTree(name, "arm", buildOpts)
+	end
 end
-
-for _,name in pairs(commanders) do
-	TagTree(name, "arm", UnitDefs["armcom1"].buildoptions)
-end
+ProcessCommBuildOpts()
 
 for name, ud in pairs(UnitDefs) do
 	--Spring.Echo(name, ud.faction)

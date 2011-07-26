@@ -359,7 +359,7 @@ upgrades = {
 	},
 	module_companion_drone = {
 		name = "Companion Drone",
-		description = "Spawns two attack drones",
+		description = "Spawns a pair of attack drones",
 		func = function(unitDef)
 				unitDef.customparams.drone_preset = "module_companion_drone"
 			end,

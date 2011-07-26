@@ -115,8 +115,7 @@ local fullModuleSet = {}
 --]]
 
 local base = {
-	count = 10,
-	[1] = {
+	{
 		name = "rocket",
 		modules = {
 			"commweapon_rocketlauncher", 
@@ -131,7 +130,7 @@ local base = {
 			"module_adv_targeting"
 		}
 	},
-	[2] = {
+	{
 		name = "beam",
 		modules = {
 			"commweapon_beamlaser",
@@ -139,7 +138,7 @@ local base = {
 			"module_personal_shield",
 		}
 	},
-	[3] = {
+	{
 		name = "gauss",
 		modules = {
 			"commweapon_gaussrifle",
@@ -151,7 +150,7 @@ local base = {
 			"weaponmod_disruptor_ammo",
 		}
 	},
-	[4] = {
+	{
 		name = "artcom",
 		modules = {
 			"commweapon_riotcannon", 
@@ -161,7 +160,7 @@ local base = {
 			"conversion_partillery", 			
 		}
 	},
-	[5] = {
+	{
 		name = "hmg",
 		modules = {
 			"commweapon_heavymachinegun",
@@ -176,7 +175,7 @@ local base = {
 			"module_autorepair",
 		}
 	},
-	[6] = {
+	{
 		name = "shotty",
 		modules = {
 			"commweapon_shotgun", 
@@ -185,7 +184,7 @@ local base = {
 			"module_companion_drone",
 		}
 	},
-	[7] = {
+	{
 		name = "artcom2",
 		modules = {
 			"conversion_partillery", 
@@ -196,7 +195,7 @@ local base = {
 			"weaponmod_napalm_warhead",
 		}
 	},
-	[8] = {
+	{
 		name = "lightning",
 		modules = {
 			"commweapon_lightninggun",
@@ -211,62 +210,55 @@ local base = {
 			"module_high_power_servos",
 		}
 	},
-	[9] = {
-	name = "cloak",
-		modules = {
-			"commweapon_heatray",
-			"module_personal_cloak",
-			"commweapon_disintegrator",
-		}
-	},
-	[10] = {
-	name = "only_riot",
-		modules = {
-			"commweapon_riotcannon",
-		}
-	},
 }
 
 local ret = {count = 0}
 
 local chassis = {
-	count = 8,
-	[1] = {
+	{
 		name = "c4_",
 		value = "corcom4",
 	},
-	[2] = {
+	{
 		name = "a4_",
 		value = "armcom4",
 	},
-	[3] = {
+	{
 		name = "s4_",
 		value = "commsupport4",
 	},
-	[4] = {
+	{
 		name = "r4_",
 		value = "commrecon4",
 	},
-	[5] = {
+	{
 		name = "c1_",
 		value = "corcom1",
 	},
-	[6] = {
+	{
 		name = "a1_",
 		value = "armcom1",
 	},
-	[7] = {
+	{
 		name = "s1_",
 		value = "commsupport1",
 	},
-	[8] = {
+	{
 		name = "r1_",
 		value = "commrecon1",
 	},
+	{
+		name = "cr1_",
+		value = "cremcom1",
+	},
+	{
+		name = "cr4_",
+		value = "cremcom4",
+	},		
 }
 
-for i = 1, chassis.count do
-	for j = 1, base.count do
+for i = 1, #chassis do
+	for j = 1, #base do
 		ret.count = ret.count + 1
 		ret[ret.count] = {}
 		ret[ret.count].modules = base[j].modules

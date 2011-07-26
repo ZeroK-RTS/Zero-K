@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[armcom1]],
+  unitname               = [[cremcom1]],
   name                   = [[Strike Commander]],
   description            = [[Mobile Assault Commander, Builds at 12 m/s]],
   acceleration           = 0.18,
@@ -16,7 +16,7 @@ unitDef = {
   buildoptions           = {
   },
 
-  buildPic               = [[armcom.png]],
+  buildPic               = [[cremcom.png]],
   buildTime              = 1200,
   canAttack              = true,
   canCloak               = true,
@@ -67,8 +67,8 @@ unitDef = {
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict             = [[1]],
-  objectName             = [[ARMCOM]],
-  script                 = [[armcom.lua]],
+  objectName             = [[cremcom.s3o]],
+  script                 = [[cremcom.lua]],
   seismicSignature       = 16,
   selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
@@ -142,12 +142,10 @@ unitDef = {
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 5.53,
-      lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 300,
       reloadtime              = 0.11,
-      renderType              = 0,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn5]],
       soundTrigger            = true,
@@ -188,12 +186,10 @@ unitDef = {
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 3,
-      lineOfSight             = true,
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 300,
       reloadtime              = 0.11,
-      renderType              = 0,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/pulse_laser3]],
       soundTrigger            = true,
@@ -257,4 +253,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armcom1 = unitDef })
+return lowerkeys({ cremcom1 = unitDef })
