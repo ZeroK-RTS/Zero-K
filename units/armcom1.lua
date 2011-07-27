@@ -27,9 +27,9 @@ unitDef = {
   canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[50 50 50]],
+  collisionVolumeScales  = [[45 50 45]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[CylY]],
   commander              = true,
   corpse                 = [[DEAD]],
 
