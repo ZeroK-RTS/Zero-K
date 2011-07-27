@@ -282,8 +282,12 @@ local function updateBorderWithPoint(border, x, z)
 end
 
 local function setupTerraunit(unitID, team, x, y, z)
+
+	local y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
+
 	Spring.MoveCtrl.Enable(unitID)
 	Spring.MoveCtrl.SetPosition(unitID, x, y, z)
+	Spring.MoveCtrl.Disable(unitID)
 	
 	local allyTeamList = spGetAllyTeamList()
 	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
@@ -600,7 +604,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				rampLevels.data[rampLevels.count].count = rampLevels.data[rampLevels.count].count + 1
 				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
 			
-				setupTerraunit(id, team, segment[i].position.x, 0, segment[i].position.z)
+				setupTerraunit(id, team, segment[i].position.x, false, segment[i].position.z)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -1006,7 +1010,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
 			if id then
 			
-				setupTerraunit(id, team, segment[i].position.x, 0, segment[i].position.z)
+				setupTerraunit(id, team, segment[i].position.x, false, segment[i].position.z)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -1477,7 +1481,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				aveX = aveX + segment[i].position.x
 				aveZ = aveZ + segment[i].position.z
 				
-				setupTerraunit(id, team, segment[i].position.x, 0, segment[i].position.z)
+				setupTerraunit(id, team, segment[i].position.x, false, segment[i].position.z)
 			
 				blocks = blocks + 1
 				block[blocks] = id
