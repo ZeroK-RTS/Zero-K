@@ -68,6 +68,7 @@ function widget:UnitDecloaked(unitID, unitDefID, teamID)
 		GiveOrderToUnit(unitID, CMD.FIRE_STATE, {targetState}, {})	--revert to last state
 		--Spring.Echo("Unit compromised - weapons free!")
 	end
+	cloakUnit[unitID] = nil
 end
 
 local function CheckSpecState()
