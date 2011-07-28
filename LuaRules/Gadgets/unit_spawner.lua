@@ -566,14 +566,13 @@ end
 -- also used for supporters
 local function SpawnTurret(burrowID, turret, number, force)
   local temp = defenderChance
-  local aggro = humanAggro
   
   if turret and (not force) then
 	if supporters[turret] then
 		--echo("Quasi attacker selected")
-		defenderChance = quasiAttackerChance - defenderChance - math.min(aggro*humanAggroSupportFactor, 0)
+		defenderChance = quasiAttackerChance - defenderChance - math.min(humanAggro*humanAggroSupportFactor, 0)
 	elseif defenders[turret] then
-		defenderChance = defenderChance + math.max(aggro*humanAggroDefenseFactor, 0)
+		defenderChance = defenderChance + math.max(humanAggroDelta*humanAggroDefenseFactor, 0)
 	end
 	if defenderChance < 0 then defenderChance = 0 end
 	
