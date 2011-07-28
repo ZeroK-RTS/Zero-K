@@ -1,6 +1,22 @@
 --[[There is actually a hidden parameter for shieldjitter called "Strength". It can be adjusted by adding "strength   = 0.015," to the line. For example {class='ShieldJitter', options={delay=0,life=math.huge, pos={0,40.5,0.0}, size=10, precision=22, strength = 0.015, repeatEffect=true}},  Defaults to the value of 0.015 ]]--
 
 effectUnitDefs = {
+  cremcom1 = {
+    {class='StaticParticles', options=commandCoronaRed},
+    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true},groundFlashRed)},
+  },  
+  cremcom2 = {
+    {class='StaticParticles', options=commandCoronaOrange},
+    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true},groundFlashOrange)},
+  },  
+  cremcom3 = {
+    {class='StaticParticles', options=commandCoronaGreen},
+    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true},groundFlashGreen)},
+  },  
+  cremcom4 = {
+    {class='StaticParticles', options=commandCoronaBlue},
+    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true},groundFlashBlue)},
+  },
   --// FUSIONS //--------------------------
   cafus = {
     {class='Bursts', options=cafusBursts},

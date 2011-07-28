@@ -1,4 +1,4 @@
--- $Id: lupsFXs.lua 3485 2008-12-19 23:06:30Z jk $
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
 ----------------------------------------------------------------------------
 -- GROUNDFLASHES -----------------------------------------------------------
@@ -10,11 +10,27 @@ groundFlash = {
   colormap   = { {1, 1, 0.5, 0.3},{1, 1, 0, 0.04},{1, 0.3, 0, 0} }
 }
 
+groundFlashRed = {
+  life       = 20,
+  size       = 100,
+  texture    = "bitmaps/GPL/Lups/groundflash.png",
+  colormap   = { {1, 0.2, 0.2, 0.3},{1, 0.2, 0.2, 0.4},{1, 0.2, 0.2, 0.4},{1, 0.2, 0.2, 0.3}, },
+  repeatEffect = true,
+}
+
 groundFlashOrange = {
   life       = 20,
   size       = 100,
   texture    = "bitmaps/GPL/Lups/groundflash.png",
-  colormap   = { {0.7, 0.5, 0.2, 0.3},{0.7, 0.5, 0.2, 0.4},{0.7, 0.5, 0.2, 0.4},{0.7, 0.5, 0.2, 0.3}, },
+  colormap   = { {0.85, 0.5, 0.25, 0.3},{0.85, 0.5, 0.25, 0.4},{0.85, 0.5, 0.25, 0.4},{0.85, 0.5, 0.25, 0.3}, },
+  repeatEffect = true,
+}
+
+groundFlashGreen = {
+  life       = 20,
+  size       = 100,
+  texture    = "bitmaps/GPL/Lups/groundflash.png",
+  colormap   = { {0.3, 1.0, 0.3, 0.3},{0.3, 1.0, 0.3, 0.4},{0.3, 1.0, 0.3, 0.4},{0.3, 1.0, 0.3, 0.3}, },
   repeatEffect = true,
 }
 
@@ -248,6 +264,31 @@ warpgateCorona = {
   repeatEffect = true,
 }
 
+commandCoronaWhite = {
+  heightFactor = 0.75,
+  life        = math.huge,
+  lifeSpread  = 0,
+  radiusFactor = 6,
+  sizeGrowth  = 0,
+  colormap    = { {1, 1, 1, 0.01} },
+  texture     = 'bitmaps/GPL/groundflash.tga',
+  count       = 1,
+  repeatEffect = true,
+}
+
+local commandCoronaColors = {
+	Red = {0.9, 0.1, 0.1, 0.01},
+	Blue = {0.1, 0.1, 0.9, 0.01},
+	Green = {0.05, 0.75, 0.05, 0.01},
+	Orange = {0.6, 0.25, 0.05, 0.01},
+}
+for name, color in pairs(commandCoronaColors) do
+	local key = "commandCorona"..name
+	widget[key] = Spring.Utilities.CopyTable(commandCoronaWhite, true)
+	widget[key]["colormap"] = {color}
+end
+
+
 ----------------------------------------------------------------------------
 -- OverDrive FXs -----------------------------------------------------------
 ----------------------------------------------------------------------------
@@ -353,3 +394,8 @@ sparks1 = {
   count        = 6,
   repeatEffect = true,
 }
+
+----------------------------------------------------------------------------
+-- Ribbons
+----------------------------------------------------------------------------
+--commandTrailRed = {color={1,0.1,0.1,1}, width=10, piece="torso"}

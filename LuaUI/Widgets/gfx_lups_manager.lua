@@ -202,6 +202,13 @@ local function UnitFinished(_,unitID,unitDefID)
       if (fx.class=="GroundFlash") then
         fx.options.pos = { Spring.GetUnitBasePosition(unitID) }
       end
+      if (fx.options.heightFactor) then
+		local pos = fx.options.pos or {0, 0, 0}
+        fx.options.pos = { pos[1], Spring.GetUnitHeight(unitID)*fx.options.heightFactor, pos[3] }
+      end
+	  if (fx.options.radiusFactor) then
+		fx.options.size = Spring.GetUnitRadius(unitID)*fx.options.radiusFactor
+	  end
       fx.options.unit = unitID
       AddFxs( unitID,LupsAddFX(fx.class,fx.options) )
       fx.options.unit = nil
