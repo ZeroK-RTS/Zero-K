@@ -476,7 +476,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				
 					if zmin <= lz then
 						local h = pointHeight(x1, y1, z1, lx, lz, m, heightDiff, xdis)		  
-						segment[n].point[pc] = {x = lx, y = h ,z = lz, orHeight = spGetGroundHeight(lx,lz)}
+						segment[n].point[pc] = {x = lx, y = h ,z = lz, orHeight = spGetGroundHeight(lx,lz), prevHeight = spGetGroundHeight(lx,lz)}
 						
 						if checkPointCreation(4, volumeSelection, segment[n].point[pc].orHeight, h, 0) then
 							pc = pc + 1
@@ -825,6 +825,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 								end--]]
 								local currHeight = spGetGroundHeight(segment[n].point[pc].x, segment[n].point[pc].z)
 								segment[n].point[pc].orHeight = currHeight
+								segment[n].point[pc].prevHeight = currHeight
 								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(segment[n].point[pc].x, segment[n].point[pc].z)) then
 									pc = pc + 1
 								end
@@ -1254,8 +1255,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 							for z = lz, lz+8, 8 do
 								local currHeight = spGetGroundHeight(x, z)
 								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, z)) then
-									segment[n].point[m] = {x = x, z = z}
-									segment[n].point[m].orHeight = currHeight
+									segment[n].point[m] = {x = x, z = z, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + x
 									totalZ = totalZ + z
@@ -1271,8 +1271,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 						if right and bottom then
 							local currHeight = spGetGroundHeight(lx+16, lz+16)
 							if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, lz+16)) then
-								segment[n].point[m] = {x = lx+16, z = lz+16}
-								segment[n].point[m].orHeight = currHeight
+								segment[n].point[m] = {x = lx+16, z = lz+16, orHeight = currHeight, prevHeight = currHeight}
 								m = m + 1
 								totalX = totalX + lx+16
 								totalZ = totalZ + lz+16
@@ -1284,8 +1283,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 							for z = lz, lz+8, 8 do
 								local currHeight = spGetGroundHeight(lx+16, z)
 								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, z)) then
-									segment[n].point[m] = {x = lx+16, z = z}
-									segment[n].point[m].orHeight = currHeight
+									segment[n].point[m] = {x = lx+16, z = z, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + lx+16
 									totalZ = totalZ + z
@@ -1298,8 +1296,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 							for x = lx, lx+8, 8 do
 								local currHeight = spGetGroundHeight(x, lz+16)
 								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, lz+16)) then
-									segment[n].point[m] = {x = x, z = lz+16}
-									segment[n].point[m].orHeight = currHeight
+									segment[n].point[m] = {x = x, z = lz+16, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + x
 									totalZ = totalZ + lz+16
@@ -1748,26 +1745,27 @@ local function deregisterTerraformUnit(id,terraformIndex,origin)
 		return
 	end
 	
-	if not terraformUnit[id].intercepts then
-		Spring.Echo("Terraform:")
-		Spring.Echo("Attempted to index terraformUnit with wrong id")
-		Spring.Echo("Tell Google Frog")
-		return
-	end
-	--Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Spent " .. terraformUnit[id].totalSpent)
-	
-	-- remove from intercepts tables
-	for j = 1, terraformUnit[id].intercepts do -- CRASH ON THIS LINE -- not for a while though
-		local oid = terraformUnit[id].intercept[j].id
-		local oindex = terraformUnit[id].intercept[j].index
-		if oindex < terraformUnit[oid].intercepts then
-			terraformUnit[terraformUnit[oid].intercept[terraformUnit[oid].intercepts].id].intercept[terraformUnit[oid].intercept[terraformUnit[oid].intercepts].index].index = oindex
-			terraformUnit[oid].intercept[oindex] = terraformUnit[oid].intercept[terraformUnit[oid].intercepts]
-		end
-		terraformUnit[oid].intercept[terraformUnit[oid].intercepts] = nil
-		terraformUnit[oid].intercepts = terraformUnit[oid].intercepts - 1
-		terraformUnit[oid].interceptMap[id] = nil
-	end
+	--Removed Intercept Check
+	--if not terraformUnit[id].intercepts then
+	--	Spring.Echo("Terraform:")
+	--	Spring.Echo("Attempted to index terraformUnit with wrong id")
+	--	Spring.Echo("Tell Google Frog")
+	--	return
+	--end
+	----Spring.MarkerAddPoint(terraformUnit[id].position.x,0,terraformUnit[id].position.z,"Spent " .. terraformUnit[id].totalSpent)
+	--
+	-- remove from intercepts tables 
+	--for j = 1, terraformUnit[id].intercepts do -- CRASH ON THIS LINE -- not for a while though
+	--	local oid = terraformUnit[id].intercept[j].id
+	--	local oindex = terraformUnit[id].intercept[j].index
+	--	if oindex < terraformUnit[oid].intercepts then
+	--		terraformUnit[terraformUnit[oid].intercept[terraformUnit[oid].intercepts].id].intercept[terraformUnit[oid].intercept[terraformUnit[oid].intercepts].index].index = oindex
+	--		terraformUnit[oid].intercept[oindex] = terraformUnit[oid].intercept[terraformUnit[oid].intercepts]
+	--	end
+	--	terraformUnit[oid].intercept[terraformUnit[oid].intercepts] = nil
+	--	terraformUnit[oid].intercepts = terraformUnit[oid].intercepts - 1
+	--	terraformUnit[oid].interceptMap[id] = nil
+	--end
 		
 	-- remove from order table
 	local to = terraformOrder[terraformUnit[id].order]
@@ -2013,7 +2011,7 @@ end
 
 local function finishInitialisingTerraformUnit(id)
 	
-	checkTerraformIntercepts(id)
+	--checkTerraformIntercepts(id) --Removed Intercept Check
 	
 	updateTerraformEdgePoints(id)
 	updateTerraformCost(id)
@@ -2062,6 +2060,22 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					end
 				end
 			end--]]
+		end
+	end
+	
+	for i = 1, terra.points do
+		local heightDiff = terra.point[i].prevHeight - spGetGroundHeight(terra.point[i].x, terra.point[i].z)
+		if heightDiff ~= 0 then
+			updateTerraformCost(id)
+			break
+			-- There must be a nicer way to update costs, below is an unstable attempt.
+			--local change = ((1-terra.progress)*terra.point[i].diffHeight + heightDiff)/((1-terra.progress)*terra.point[i].diffHeight)
+			--Spring.Echo(change)
+			--local costChange = (abs(change * terra.point[i].diffHeight) - abs(terra.point[i].diffHeight))*volumeCost
+			--terra.point[i].diffHeight = change * terra.point[i].diffHeight
+			--terra.point[i].orHeight = terra.point[i].aimHeight - terra.point[i].diffHeight
+			--terraformUnit[id].cost = terraformUnit[id].cost + costChange
+			--terraformUnit[id].totalCost = terraformUnit[id].totalCost + costChange
 		end
 	end
 	
@@ -2137,7 +2151,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						check = terra.point[i].edge[j].check,
 						pyramid = true, -- pyramid = rising up, not pyramid = ditch
 					}
-					updateTerraformBorder(id,x,z)
+					--updateTerraformBorder(id,x,z) --Removed Intercept Check
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[terra.point[i].x] and terra.area[terra.point[i].x][terra.point[i].z] then
@@ -2183,7 +2197,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						check = terra.point[i].edge[j].check,
 						pyramid = false, -- pyramid = rising up, not pyramid = ditch
 					}
-					updateTerraformBorder(id,x,z)
+					--updateTerraformBorder(id,x,z) --Removed Intercept Check
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[terra.point[i].x] and terra.area[terra.point[i].x][terra.point[i].z] then
@@ -2257,7 +2271,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						check =  extraPoint[i].check,
 						pyramid = true, -- pyramid = rising up, not pyramid = ditch
 					}
-					updateTerraformBorder(id,x,z)
+					--updateTerraformBorder(id,x,z) --Removed Intercept Check
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
@@ -2301,7 +2315,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						check =  extraPoint[i].check,
 						pyramid = false, -- pyramid = rising up, not pyramid = ditch
 					}
-					updateTerraformBorder(id,x,z)
+					--updateTerraformBorder(id,x,z) --Removed Intercept Check
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
@@ -2399,34 +2413,28 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		end
 	end
 	
-	local test2 = 0
-	local test3 = 0
 	local func = function()
 		for i = 1, terra.points do	
-			test3 = test3 + abs(spGetGroundHeight(terra.point[i].x,terra.point[i].z)-(terra.point[i].orHeight+terra.point[i].diffHeight*progress))
-			spSetHeightMap(terra.point[i].x,terra.point[i].z,terra.point[i].orHeight+terra.point[i].diffHeight*progress)
+			local height = terra.point[i].orHeight+terra.point[i].diffHeight*progress
+			spSetHeightMap(terra.point[i].x,terra.point[i].z, height)
+			terra.point[i].prevHeight = height
 		end 
 		for i = 1, extraPoints do
-			test2 = test2 + abs(spGetGroundHeight(extraPoint[i].x,extraPoint[i].z)-(extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult))
 			spSetHeightMap(extraPoint[i].x,extraPoint[i].z,extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult)
 		end
 	end
 	spSetHeightMapFunc(func)
---[[
-	Spring.Echo("costDiff " .. oldCostDiff)
-	Spring.Echo("actual edge cost " .. test2*volumeCost)
-	Spring.Echo("actual terra cost " .. test3*volumeCost)
---]]
-	--spAdjustHeightMap(terra.border.left-16, terra.border.top-16, terra.border.right+16, terra.border.bottom+16, 0)
-	if terraformUnit[id].intercepts ~= 0 then
-		local i = 1
-		while i <= terra.intercepts  do
-			local test = updateTerraformCost(terra.intercept[i].id)
-			if test then
-				i = i + 1
-			end
-		end
-	end
+
+	--Removed Intercept Check
+	--if terraformUnit[id].intercepts ~= 0 then
+	--	local i = 1
+	--	while i <= terra.intercepts  do
+	--		local test = updateTerraformCost(terra.intercept[i].id)
+	--		if test then
+	--			i = i + 1
+	--		end
+	--	end
+	--end
 	
 	if terra.progress > 1 then
 		deregisterTerraformUnit(id,arrayIndex,2)			
