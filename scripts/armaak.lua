@@ -156,8 +156,50 @@ function script.FireWeapon(num)
 	end
 end
 
+
+-- Jumping
+local turnSpeed
+
+function preJump(turn,distance,airDistance)
+	Signal(SIG_WALK)
+	local radians = turn*2*math.pi/2^16
+	turnSpeed = math.abs(turn*2*math.pi/2^16)
+	Turn( base, y_axis, radians, turnSpeed*1.5)
+	turnSpeed = turnSpeed*airDistance/1300
+	Move( base, y_axis, -12, 18)
+	--Turn( torso, x_axis, math.rad(10), math.rad(80))
+	
+	Turn( rshoulder , x_axis, math.rad(55), math.rad(200) )
+	Turn( rlarm , x_axis, math.rad(-110), math.rad(200) )
+	Turn( lshoulder , x_axis, math.rad(55), math.rad(200) )
+	Turn( llarm , x_axis, math.rad(-110), math.rad(200) )
+	
+	Turn( lthigh , x_axis, math.rad(50),math.rad(300) )
+	Turn( lshin , x_axis, math.rad(-35), math.rad(150) )	
+	Turn( lfoot , x_axis, math.rad(-10), math.rad(80) )		
+
+	Turn( rthigh , x_axis, math.rad(50),math.rad(300) )
+	Turn( rshin , x_axis, math.rad(-35), math.rad(150) )	
+	Turn( rfoot , x_axis, math.rad(-10), math.rad(80) )	
+end
+
 function beginJump() 
+	Turn( base, y_axis, 0, turnSpeed)
 	bJumping = true
+	
+	Turn( rshoulder , x_axis, math.rad(25), math.rad(30) )
+	Turn( rlarm , x_axis, math.rad(-25), math.rad(30) )
+	Turn( lshoulder , x_axis, math.rad(25), math.rad(30) )
+	Turn( llarm , x_axis, math.rad(-25), math.rad(30) )
+	
+	Turn( lthigh , x_axis, math.rad(-10),math.rad(300) )
+	Turn( lshin , x_axis, math.rad(45), math.rad(400) )	
+	Turn( lfoot , x_axis, math.rad(-30), math.rad(80) )		
+
+	Turn( rthigh , x_axis, math.rad(-10),math.rad(300) )
+	Turn( rshin , x_axis, math.rad(45), math.rad(400) )	
+	Turn( rfoot , x_axis, math.rad(-30), math.rad(80) )	
+	
 	--StartThread(JumpExhaust)
 end
 
@@ -165,11 +207,18 @@ function jumping()
 end
 
 function halfJump()
+	--Turn( torso, x_axis, math.rad(0), math.rad(80))
+	Move( base, y_axis, 0, 18)
+	
+	Turn( lshin , x_axis, math.rad(0), math.rad(200) )	
+	Turn( lfoot , x_axis, math.rad(0), math.rad(80) )	
+	
+	Turn( rshin , x_axis, math.rad(0), math.rad(200) )	
+	Turn( rfoot , x_axis, math.rad(0), math.rad(80) )	
 end
 
 function endJump() 
 	bJumping = false
-	EmitSfx( base,  1029 )
 end
 
 function script.Killed(recentDamage, maxHealth)

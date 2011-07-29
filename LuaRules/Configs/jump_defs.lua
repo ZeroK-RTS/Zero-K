@@ -93,8 +93,8 @@ overCategory = {
  chicken_leaper = {
     range = 600, reload = 2, },
 	
- coraak = {
-    cobscript = false},	
+ armaak = {
+    delay = 20, cobscript = false},	
 	
  corsumo = {
     delay = 30, height = 100, range = 300, reload = 13, cobscript = false, rotateMidAir = false},	

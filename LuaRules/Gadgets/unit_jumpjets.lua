@@ -244,7 +244,7 @@ local function Jump(unitID, goal, cmdTag)
 	if cob then
 		spCallCOBScript( unitID, "PreJump", 0)
       else
-		Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist)
+		Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist,flightDist)
 	  end
   end
   spSetUnitRulesParam(unitID,"jumpReload",0)
@@ -347,7 +347,6 @@ local function UpdateCoroutines()
     assert(coroutine.resume(coroutines[i]))
   end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
