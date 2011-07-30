@@ -20,9 +20,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Torpedo Fregatte]],
+    description_de = [[Torpedofregatte]],
     helptext       = [[The Torpedo Frigate is a (relatively) cheap countermeasure to subs, though it can also attack surface targets.]],
-	helptext_de    = [[Die Torpedo Fregatte ist eine relativ günstige Gegenmaßnahme in Bezug auf U-Boote, allerdings können auch oberirdische Ziele getroffen werden.]],
+	helptext_de    = [[Die relativ günstige Torpedofregatte besitzt eine Waffe speziell zur U-Jagd, die auch im Stande ist Schiffe zu treffen.]],
   },
 
   defaultmissiontype  = [[Standby]],
