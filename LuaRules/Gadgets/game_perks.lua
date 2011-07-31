@@ -79,6 +79,10 @@ local unlockUnits = {
 	"factorytank",
 	"factoryplane",
 	"armcsa",
+	
+	-- misc
+	"armarad",
+	"armmstor",
 }
 
 local unlockUnitsMap = {}
