@@ -469,7 +469,6 @@ end
 
 local function StopMorph(unitID, morphData)
   morphUnits[unitID] = nil
-Spring.Echo( morphData.combatMorph)
   if not morphData.combatMorph then 
     Spring.SetUnitHealth(unitID, { paralyze = -1})
     Spring.SetUnitRulesParam(unitID, "morphing", 0)
