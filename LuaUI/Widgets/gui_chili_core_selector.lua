@@ -102,7 +102,7 @@ local idleBuilderDefID = UnitDefNames.armrectr.id
 local wantUpdateCons = false
 
 --local gamestart = GetGameFrame() > 1
-local myTeamID = 0
+local myTeamID = false
 local commWarningTime		= 2*30 -- how long to flash button frame, gameframes
 --local commWarningTimeLeft	= -1
 
@@ -577,7 +577,7 @@ local function UpdateCons()
 end
 
 local function InitializeUnits()
-	if Spring.GetGameFrame() > 1 then
+	if Spring.GetGameFrame() > 1 and myTeamID then
 		local unitList = Spring.GetTeamUnits(myTeamID)
 		for _,unitID in pairs(unitList) do
 			local unitDefID = GetUnitDefID(unitID)
@@ -613,7 +613,7 @@ end
 ]]--
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	if (unitTeam ~= myTeamID) then
+	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
 
@@ -625,7 +625,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if (unitTeam ~= myTeamID) or exceptionArray[unitDefID] then
+	if (not myTeamID or unitTeam ~= myTeamID) or exceptionArray[unitDefID] then
 		return
 	end
 	local ud = UnitDefs[unitDefID]
@@ -648,7 +648,7 @@ function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if (unitTeam ~= myTeamID) then
+	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
 	if idleCons[unitID] then
@@ -678,7 +678,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdOpts, cmdParams)
-	if (unitTeam ~= myTeamID) then
+	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
 	if idleCons[unitID] then
@@ -690,10 +690,16 @@ end
 local timer = 0
 local warningColorPhase = false
 function widget:Update(dt)
-	if myTeamID~=Spring.GetMyTeamID() then
+	if not myTeamID then
 		myTeamID = Spring.GetMyTeamID()
-		ClearData()
-		InitializeUnits()
+	end
+	if myTeamID~=Spring.GetMyTeamID() then
+		Spring.Echo("<Core Selector>: Spectator mode. Widget removed.")
+		widgetHandler:RemoveWidget()
+		return false
+		--myTeamID = Spring.GetMyTeamID()
+		--ClearData()
+		--InitializeUnits()
 	end
 	if wantUpdateCons then
 		UpdateCons()
