@@ -23,6 +23,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    helptext       = [[The Racketeer launches long range EMP missiles that can stun key enemy defenses before assaulting them. Since its missiles do not track or even lead, it is only useful against enemy units that are standing still. Only one Racketeer is needed to keep a target stunned, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields.]],
+
   },
 
   defaultmissiontype     = [[Standby]],
