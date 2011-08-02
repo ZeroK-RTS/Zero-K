@@ -289,6 +289,9 @@ local function setupTerraunit(unitID, team, x, y, z)
 	Spring.MoveCtrl.SetPosition(unitID, x, y, z)
 	Spring.MoveCtrl.Disable(unitID)
 	
+	spSetUnitSensorRadius(unitID,"los",0) -- REMOVE IN 0.83
+	spSetUnitSensorRadius(unitID,"airLos",0) -- REMOVE IN 0.83
+	
 	local allyTeamList = spGetAllyTeamList()
 	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
 	for _,allyID in ipairs (allyTeamList) do
