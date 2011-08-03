@@ -4,7 +4,7 @@
 
 piece  base, imma_chargin, mah_lazer, downbeam, shoop_da_woop, flashpoint;
 
-static-var  on, aim, statechg_DesiredState, statechg_StateChanging;
+static-var  on, statechg_DesiredState, statechg_StateChanging;
 
 // Signal definitions
 #define SIG_AIM				2
@@ -75,7 +75,6 @@ Create()
 	hide downbeam;
 	start-script SmokeUnit();
 	while (GET BUILD_PERCENT_LEFT) sleep 400;
-	aim = 1;
 }
 
 AimWeapon1(heading, pitch)
@@ -84,8 +83,8 @@ AimWeapon1(heading, pitch)
 	{
 		signal SIG_AIM;
 		set-signal-mask SIG_AIM;
-		turn mah_lazer to y-axis heading speed 400;
-		turn mah_lazer to x-axis <0.000000> - pitch speed 200;
+		turn mah_lazer to y-axis heading speed 900;
+		turn mah_lazer to x-axis <0.000000> - pitch speed 300;
 		wait-for-turn mah_lazer around y-axis;
 		wait-for-turn mah_lazer around x-axis;
 		return (1);
@@ -101,10 +100,6 @@ QueryWeapon1(piecenum)
 AimFromWeapon1(piecenum)
 {
 	piecenum = mah_lazer;
-}
-
-FireWeapon1()
-{
 }
 
 Killed(severity, corpsetype)
