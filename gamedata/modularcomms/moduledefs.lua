@@ -378,9 +378,9 @@ upgrades = {
 	},
 	module_energy_cell = {
 		name = "Energy Cell",
-		description = "Compact fuel cells that produce +6 energy",
+		description = "Compact fuel cells that produce +8 energy",
 		func = function(unitDef)
-				unitDef.energymake = (unitDef.energymake or 0) + 6
+				unitDef.energymake = (unitDef.energymake or 0) + 8
 			end,
 	},
 	module_fieldradar = {
