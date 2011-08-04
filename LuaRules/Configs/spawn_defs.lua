@@ -67,7 +67,8 @@ gameMode		= true	--Spring.GetModOption("zkmode")
 tooltipMessage	= "Kill chickens and collect their eggs to get metal."
 mexes = {
   "cormex", 
-  "armmex"
+  "armmex",
+  --"armestor"	--pylon; needed for annis etc.
 }
 noTarget = {
 	terraunit=true,
