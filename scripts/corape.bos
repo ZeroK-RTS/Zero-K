@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  flare1, flare2, base, winga, wingb, gun1, gun2, thrusta,
        thrustb1, thrustb2, muzzle1, muzzle2, rthrust1, rthrust2;
@@ -38,14 +35,14 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 
 Go()
 {
-	turn winga to z-axis <-90.016484> speed <120.000000>;
-	turn wingb to z-axis <90.016484> speed <120.000000>;
+	turn winga to z-axis <-90> speed <120>;
+	turn wingb to z-axis <90> speed <120>;
 }
 
 Stop()
 {
-	turn winga to z-axis <0.000000> speed <120.000000>;
-	turn wingb to z-axis <0.000000> speed <120.000000>;
+	turn winga to z-axis <0> speed <120>;
+	turn wingb to z-axis <0> speed <120>;
 }
 
 InitState()
