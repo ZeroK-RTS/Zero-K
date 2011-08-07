@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[spherepole]],
   name                   = [[Scythe]],
-  description            = [[Stealth Raider Bot]],
+  description            = [[Cloaking Raider Bot]],
   acceleration           = 0.5,
   bmcode                 = [[1]],
   brakeRate              = 0.3,
