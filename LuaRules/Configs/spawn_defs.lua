@@ -23,9 +23,9 @@ miniQueenName		 = "chicken_dragon"
 waveRatio            = 0.6       -- waves are composed by two types of chicken, waveRatio% of one and (1-waveRatio)% of the other
 baseWaveSize		 = 2.5		 -- multiplied by malus, 1 = 1 squadSize of chickens
 waveSizeMult		 = 1
-defenderChance       = 0.1		-- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
+defenderChance       = 0.05		-- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
 quasiAttackerChance  = 0.65		-- subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
-maxBurrows           = 40
+maxBurrows           = 50
 burrowEggs           = 15       -- number of eggs each burrow spawns
 --forceBurrowRespawn	 = false	-- burrows always respawn even if the modoption is set otherwise        
 queenSpawnMult       = 4         -- how many times bigger is a queen hatch than a normal burrow hatch
@@ -138,7 +138,7 @@ local chickenTypes = {
   chickenr       =  {time = 25,  squadSize = 1.2, obsolete = 60},
   chickenwurm    =  {time = 30,  squadSize =   0.7},  
   chicken_sporeshooter =  {time = 35,  squadSize =   0.5},
-  chicken_roc	 =  {time = 35,  squadSize =   0.6},
+  chicken_roc	 =  {time = 35,  squadSize =   0.5},
   chicken_dodo   =  {time = 40,  squadSize =   1.8, obsolete = 70},
   chickenf       =  {time = 45,  squadSize = 0.5},
   chickenc       =  {time = 50,  squadSize = 0.5},
@@ -165,7 +165,7 @@ local specialPowers = {
 	{name = "Digger Ambush", maxAggro = -2.5, time = 15, obsolete = 40, unit = "chicken_digger", burrowRatio = 1, minDist = 100, maxDist = 450, cooldown = 2, targetHuman = true},
 	--{name = "Wurmsign", maxAggro = -4, time = 40, unit = "chickenwurm", burrowRatio = 0.2, cooldown = 4},
 	{name = "Spire Sprout", maxAggro = -5, time = 20, unit = "chickenspire", burrowRatio = 0.15, tieToBurrow = true, cooldown = 2},
-	{name = "Rising Dragon", maxAggro = -10, time = 30, unit = "chicken_dragon", burrowRatio = 0.1, minDist = 250, maxDist = 1200, cooldown = 3, targetHuman = true},
+	{name = "Rising Dragon", maxAggro = -10, time = 30, unit = "chicken_dragon", burrowRatio = 1/12, minDist = 250, maxDist = 1200, cooldown = 3, targetHuman = true},
 	--{name = "Dino Killer", maxAggro = -12, time = 40, unit = "chicken_silo", minDist = 1500},
 }
 

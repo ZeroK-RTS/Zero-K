@@ -683,8 +683,8 @@ local function SpawnUnit(unitName, number, minDist, maxDist, target)
 			x = random(spawnSquare, Game.mapSizeX - spawnSquare)
 			z = random(spawnSquare, Game.mapSizeZ - spawnSquare)
 		else
-			x = random(target[1] - maxDist, target[3] + maxDist)
-			z = random(target[1] - maxDist, target[3] + maxDist)			
+			x = random(target[1] - maxDist, target[1] + maxDist)
+			z = random(target[3] - maxDist, target[3] + maxDist)			
 		end
 		tries = tries + 1
 		block = false
