@@ -56,7 +56,7 @@ unitDef = {
   movementClass          = [[TKBOT3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[ARMSPID]],
+  objectName             = [[venom.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 

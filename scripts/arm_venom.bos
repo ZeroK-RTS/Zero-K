@@ -1,14 +1,16 @@
-//linear constant 65536
+#define TA			// This is a TA script
 
-#include "constants.h"
+#include "sfxtype.h"
+#include "exptype.h"
 
-piece  base, turret, barrel1, barrel2, flare1, flare2, leg1, leg2,
+piece  base, turret, gun, flare, leg1, leg2,
        leg3, leg4, leg5, leg6;
 
 static-var  bMoving, restore_delay, gun_1;
 
 // Signal definitions
 #define SIG_AIM				2
+
 
 walklegs()
 {
@@ -36,47 +38,47 @@ walklegs()
 			turn leg5 to z-axis <0.000000> speed <0.000000>;
 			turn leg6 to y-axis <0.000000> now;
 			turn leg6 to y-axis <-30.412088> speed <152.060440>;
-			turn leg6 to z-axis <-45.010989> now;
+			turn leg6 to z-axis <-45.005495> now;
 			sleep 200;
 		}
 		if( bMoving )
 		{
-			turn leg1 to z-axis <31.615385> speed <158.131868>;
-			turn leg2 to y-axis <34.670330> speed <173.351648>;
+			turn leg1 to z-axis <31.615385> speed <158.126374>;
+			turn leg2 to y-axis <34.670330> speed <173.346154>;
 			turn leg2 to z-axis <31.005495> speed <0.000000>;
-			turn leg3 to y-axis <0.000000> speed <170.307692>;
+			turn leg3 to y-axis <0.000000> speed <170.302198>;
 			turn leg3 to z-axis <0.000000> speed <3.027473>;
-			turn leg4 to y-axis <0.000000> speed <200.719780>;
+			turn leg4 to y-axis <0.000000> speed <200.714286>;
 			turn leg5 to z-axis <-31.005495> speed <155.104396>;
-			turn leg6 to z-axis <2.423077> speed <237.219780>;
+			turn leg6 to z-axis <2.423077> speed <237.214286>;
 			sleep 200;
 		}
 		if( bMoving )
 		{
-			turn leg1 to y-axis <55.950549> speed <279.785714>;
+			turn leg1 to y-axis <55.945055> speed <279.780220>;
 			turn leg1 to z-axis <31.005495> speed <3.027473>;
 			turn leg2 to y-axis <34.670330> speed <0.000000>;
 			turn leg2 to z-axis <0.604396> speed <152.060440>;
-			turn leg3 to z-axis <31.615385> speed <158.131868>;
+			turn leg3 to z-axis <31.615385> speed <158.126374>;
 			turn leg4 to y-axis <-0.604396> speed <3.027473>;
 			turn leg4 to z-axis <-31.005495> speed <152.060440>;
-			turn leg5 to y-axis <-31.615385> speed <158.131868>;
+			turn leg5 to y-axis <-31.615385> speed <158.126374>;
 			turn leg5 to z-axis <-31.005495> speed <0.000000>;
 			turn leg6 to y-axis <3.027473> speed <167.258242>;
 			sleep 200;
 		}
 		turn leg1 to y-axis <43.791209> speed <60.824176>;
 		turn leg1 to z-axis <0.604396> speed <152.060440>;
-		turn leg2 to y-axis <0.000000> speed <173.351648>;
+		turn leg2 to y-axis <0.000000> speed <173.346154>;
 		turn leg2 to z-axis <0.000000> speed <3.027473>;
-		turn leg3 to y-axis <34.670330> speed <173.351648>;
+		turn leg3 to y-axis <34.670330> speed <173.346154>;
 		turn leg3 to z-axis <31.615385> speed <0.000000>;
 		turn leg4 to y-axis <-40.137363> speed <197.681319>;
 		turn leg4 to z-axis <-31.005495> speed <0.000000>;
 		turn leg5 to y-axis <-37.093407> speed <27.368132>;
 		turn leg5 to z-axis <0.000000> speed <155.104396>;
 		turn leg6 to y-axis <0.000000> speed <15.203297>;
-		turn leg6 to z-axis <-45.010989> speed <237.219780>;
+		turn leg6 to z-axis <-45.005495> speed <237.214286>;
 		sleep 200;
 	}
 }
@@ -106,6 +108,7 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 		}
 		sleep sleeptime;
 	}
+	return (0);
 }
 
 MotionControl(Func_Var_1)
@@ -126,8 +129,7 @@ MotionControl(Func_Var_1)
 
 Create()
 {
-	hide flare1;
-	hide flare2;
+	hide flare;
 	bMoving = FALSE;
 	gun_1 = base;
 	restore_delay = 3000;
@@ -159,7 +161,7 @@ RestoreAfterDelay()
 {
 	sleep restore_delay;
 	turn turret to y-axis <0.000000> speed <90.000000>;
-	turn turret to x-axis <0.000000> speed <90.000000>;
+	turn gun to x-axis <0.000000> speed <90.000000>;
 	wait-for-turn turret around y-axis;
 	wait-for-turn turret around x-axis;
 }
@@ -169,7 +171,7 @@ AimPrimary(heading, pitch)
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
 	turn turret to y-axis heading speed <450.000000>;
-	turn turret to x-axis <0.000000> - pitch speed <180.000000>;
+	turn gun to x-axis <0.000000> - pitch speed <180.000000>;
 	wait-for-turn turret around y-axis;
 	wait-for-turn turret around x-axis;
 	start-script RestoreAfterDelay();
@@ -178,22 +180,7 @@ AimPrimary(heading, pitch)
 
 FirePrimary()
 {
-	if( gun_1 == 0 )
-	{
-		move barrel1 to z-axis [-1.250000] speed [500.000000];
-		wait-for-move barrel1 along z-axis;
-		move barrel1 to z-axis [0.000000] speed [3.000000];
-		gun_1 = turret;
-		return (0);
-	}
-	if( gun_1 == 1 )
-	{
-		move barrel2 to z-axis [-1.250000] speed [500.000000];
-		wait-for-move barrel2 along z-axis;
-		move barrel2 to z-axis [0.000000] speed [3.000000];
-		gun_1 = base;
-		return (0);
-	}
+
 }
 
 AimFromPrimary(piecenum)
@@ -203,30 +190,18 @@ AimFromPrimary(piecenum)
 
 QueryPrimary(piecenum)
 {
-	if( gun_1 == 0 )
-	{
-		piecenum = flare1;
-		return (0);
-	}
-	if( gun_1 == 1 )
-	{
-		piecenum = flare2;
-		return (0);
-	}
+		piecenum = flare;
 }
 
 Killed(severity, corpsetype)
 {
-	hide flare1;
-	hide flare2;
+	hide flare;
 	if( severity <= 25 )
 	{
 		corpsetype = 1;
-		explode barrel1 type BITMAPONLY | BITMAP1;
-		explode barrel2 type BITMAPONLY | BITMAP2;
+		explode gun type BITMAPONLY | BITMAP1;
 		explode base type BITMAPONLY | BITMAP3;
-		explode flare1 type BITMAPONLY | BITMAP4;
-		explode flare2 type BITMAPONLY | BITMAP5;
+		explode flare type BITMAPONLY | BITMAP5;
 		explode leg1 type BITMAPONLY | BITMAP1;
 		explode leg2 type BITMAPONLY | BITMAP2;
 		explode leg3 type BITMAPONLY | BITMAP3;
@@ -239,11 +214,9 @@ Killed(severity, corpsetype)
 	if( severity <= 50 )
 	{
 		corpsetype = 1;
-		explode barrel1 type FALL | BITMAP1;
-		explode barrel2 type FALL | BITMAP2;
+		explode gun type FALL | BITMAP2;
 		explode base type BITMAPONLY | BITMAP3;
-		explode flare1 type FALL | BITMAP4;
-		explode flare2 type FALL | BITMAP5;
+		explode flare type FALL | BITMAP4;
 		explode leg1 type FALL | BITMAP1;
 		explode leg2 type FALL | BITMAP2;
 		explode leg3 type FALL | BITMAP3;
@@ -256,11 +229,9 @@ Killed(severity, corpsetype)
 	if( severity <= 99 )
 	{
 		corpsetype = 2;
-		explode barrel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode barrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+		explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 		explode base type BITMAPONLY | BITMAP3;
-		explode flare1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
-		explode flare2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 		explode leg1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 		explode leg2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 		explode leg3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
@@ -271,11 +242,9 @@ Killed(severity, corpsetype)
 		return (0);
 	}
 	corpsetype = 2;
-	explode barrel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-	explode barrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
+	explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 	explode base type BITMAPONLY | BITMAP3;
-	explode flare1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
-	explode flare2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+	explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 	explode leg1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 	explode leg2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 	explode leg3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
