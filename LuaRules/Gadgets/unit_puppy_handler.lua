@@ -141,7 +141,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 end
 
 function gadget:UnitDestroyed(unitID)
-	cannotBeDamage[unitID] = false
+	cannotBeDamage[unitID] = nil
+end
+
+function gadget:UnitCreated(unitID)
+	cannotBeDamage[unitID] = nil
 end
 
 function gadget:GameFrame(frame)

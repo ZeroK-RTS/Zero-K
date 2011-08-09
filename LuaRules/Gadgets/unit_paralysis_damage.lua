@@ -40,11 +40,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		if extraNormalDamageList[weaponID] then
 			attackerID = attackerID or -1
 			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponID], 0, attackerID)
-		end
-		if health and maxHealth then -- taking no chances.
+		else if health and maxHealth and health ~= 0 then -- taking no chances.
 			return damage*maxHealth/health
-		else
-			return damage
 		end
 	end
 	
