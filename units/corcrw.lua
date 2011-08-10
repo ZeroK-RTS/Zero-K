@@ -15,7 +15,7 @@ unitDef = {
   buildPic               = [[CORCRW.png]],
   buildTime              = 5000,
   canAttack              = true,
-  canDgun				 = true,
+  canDgun				 = false,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,
@@ -204,7 +204,7 @@ unitDef = {
       coreThickness           = 0.1,
       areaOfEffect            = 300,
       canattackground         = true,
-	  commandFire			  = true,
+	  commandFire			  = false,
 	  craterBoost             = 0,
       craterMult              = 0,
 
