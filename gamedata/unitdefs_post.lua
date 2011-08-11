@@ -151,6 +151,8 @@ local function ProcessCommBuildOpts()
 	for name in pairs(commDefs) do
 		commanders[#commanders + 1] = name
 	end
+	
+	commanders[#commanders + 1] = "neebcomm"
 
 	for _,name in pairs(commanders) do
 		TagTree(name, "arm", buildOpts)

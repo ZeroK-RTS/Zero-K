@@ -42,3 +42,5 @@ EXCLUDED_UNITS = {
 }
 
 DEFAULT_UNIT = "armcom1"		--FIXME: hardcodey until I cba to identify precise source of problem
+
+JOKE_UNIT = "neebcomm"

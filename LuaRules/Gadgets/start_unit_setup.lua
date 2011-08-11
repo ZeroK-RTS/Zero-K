@@ -29,10 +29,16 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
   return
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local spGetTeamInfo 		= Spring.GetTeamInfo
+local spGetPlayerInfo 		= Spring.GetPlayerInfo
+local spGetSpectatingState 	= Spring.GetSpectatingState
 
 local modOptions = Spring.GetModOptions()
 local startMode = Spring.GetModOption("startingresourcetype",false,"facplop")
 local planetwars = modOptions.planetwarsstructures
+
 
 if (startMode == "limitboost") then
 	for udid, ud in pairs(UnitDefs) do
@@ -54,7 +60,7 @@ local coop = Spring.Utilities.tobool(Spring.GetModOption("coop", false, false))
 --Spring.Echo(coop == 1, coop == 0)
 
 local gaiateam = Spring.GetGaiaTeamID()
-local gaiaally = select(6, Spring.GetTeamInfo(gaiateam))
+local gaiaally = select(6, spGetTeamInfo(gaiateam))
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -230,7 +236,7 @@ local function InitUnsafe()
 	for index, id in pairs(Spring.GetPlayerList()) do	
 		-- copied from PlanetWars
 		local commData, success
-		local customKeys = select(10, Spring.GetPlayerInfo(id))
+		local customKeys = select(10, spGetPlayerInfo(id))
 		local commDataRaw = customKeys and customKeys.commanders
 		if not (commDataRaw and type(commDataRaw) == 'string') then
 			err = "Comm data entry for player "..id.." is empty or in invalid format"
@@ -324,7 +330,7 @@ local function GetStartUnit(teamID, playerID, isAI)
   end
   
   -- if a replacement def is available, use it  
-  playerID = playerID or (teamID and select(2, Spring.GetTeamInfo(teamID)) )
+  playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID)) )
   if (playerID and commChoice[playerID]) then
 	--Spring.Echo("Attempting to load alternate comm")
 	local altComm = customComms[playerID][(commChoice[playerID])]
@@ -350,7 +356,7 @@ local function GetFacingDirection(x, z, teamID)
 			and ((x>Game.mapSizeX/2) and "west" or "east")
 			or ((z>Game.mapSizeZ/2) and "north" or "south")
 	else
-		local allyID = select(6, Spring.GetTeamInfo(teamID))
+		local allyID = select(6, spGetTeamInfo(teamID))
 		local enemyAllyID = gaiaally
 
 		-- detect enemy allyid
@@ -402,7 +408,12 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   if bonusSpawn then
   	startUnit = DEFAULT_UNIT
   end
-
+  
+  local customkeys = select(10, spGetPlayerInfo(playerID or select(2, spGetTeamInfo(teamID))))
+  if customkeys and customkeys.jokecomm then
+	startUnit = JOKE_UNIT	
+  end    
+  
   if startUnit then
     -- replace with shuffled position
     local x,y,z = unpack(shuffledStartPosition[teamID])
@@ -617,7 +628,7 @@ local function workAroundSpecsInTeamZero(playerlist, team)
     local specs = 0
     -- count specs
     for i=1,#playerlist do
-      local _,_,spec = Spring.GetPlayerInfo(playerlist[i])
+      local _,_,spec = spGetPlayerInfo(playerlist[i])
       if spec then specs = specs + 1 end
     end
     if players == specs then
@@ -652,7 +663,7 @@ function gadget:GameStart()
         playerlist = workAroundSpecsInTeamZero(playerlist, team)
         if playerlist and (#playerlist > 0) then
           for i=1,#playerlist do
-          	local _,_,spec,_,allyTeam = Spring.GetPlayerInfo(playerlist[i])
+          	local _,_,spec,_,allyTeam = spGetPlayerInfo(playerlist[i])
             if (not spec) then
               SpawnStartUnit(team, playerlist[i])
             end
@@ -670,9 +681,11 @@ function gadget:GameStart()
       playerlist = workAroundSpecsInTeamZero(playerlist, team)
       if playerlist and (#playerlist > 0) then
         for i=1,#playerlist do
-        	local customkeys = select(10, Spring.GetPlayerInfo(playerlist[i]))
+        	local customkeys = select(10, spGetPlayerInfo(playerlist[i]))
 			if customkeys and customkeys.extracomm then
-				SpawnStartUnit(team, playerlist[i], false, true)
+				for i=1, tonumber(customkeys.extracomm) do
+					SpawnStartUnit(team, playerlist[i], false, true)
+				end
 			end
         end
       end
@@ -690,7 +703,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("faction:",1,true) then
 		local side = msg:sub(9)
 		playerSides[playerID] = side
-		local _,_,spec,teamID = Spring.GetPlayerInfo(playerID)
+		local _,_,spec,teamID = spGetPlayerInfo(playerID)
 		if spec then return end
 		teamSides[teamID] = side
 		if gamestart then
@@ -703,7 +716,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 	elseif msg:find("customcomm:",1,true) then
 		local name = msg:sub(12)
 		commChoice[playerID] = name
-		local _,_,spec,teamID = Spring.GetPlayerInfo(playerID)
+		local _,_,spec,teamID = spGetPlayerInfo(playerID)
 		if spec then return end
 		if gamestart then
 			local frame = Spring.GetGameFrame() + 3
@@ -768,10 +781,12 @@ end
 --------------------------------------------------------------------
 else
 
-local teamID = Spring.GetLocalTeamID()
-local spGetUnitDefID = Spring.GetUnitDefID
+local teamID 			= Spring.GetLocalTeamID()
+local spGetUnitDefID 	= Spring.GetUnitDefID
 local spGetUnitLosState = Spring.GetUnitLosState
-local spValidUnitID = Spring.ValidUnitID 
+local spValidUnitID 	= Spring.ValidUnitID
+local spAreTeamsAllied 	= Spring.AreTeamsAllied
+local spGetUnitTeam 	= Spring.GetUnitTeam
 
 local boost = {}
 local boostMax = {}
@@ -800,11 +815,11 @@ end
 function gadget:DrawWorldPreUnit()
 	if Spring.IsGUIHidden() then return end
 	teamID = Spring.GetLocalTeamID()
-	local spec, fullview = Spring.GetSpectatingState()
+	local spec, fullview = spGetSpectatingState()
 	spec = spec or fullview
 	for unitID, value in pairs(boost) do
-		local ut = Spring.GetUnitTeam(unitID)
-		if (ut ~= nil and (spec or Spring.AreTeamsAllied(teamID, ut))) then
+		local ut = spGetUnitTeam(unitID)
+		if (ut ~= nil and (spec or spAreTeamsAllied(teamID, ut))) then
 			if (value > 0 and boostMax[unitID] ~= nil) then 
 				gl.DepthTest(false)
 				gl.LineWidth(6.5)
@@ -856,7 +871,7 @@ function gadget:Initialize()
 	local playerroster = Spring.GetPlayerList()
 	local playercount = #playerroster
 	for i=1,playercount do
-		local name = Spring.GetPlayerInfo(playerroster[i])
+		local name = spGetPlayerInfo(playerroster[i])
 		Spring.SendLuaRulesMsg('<startsetup>playername:'..name..'='..playerroster[i])
 	end
 	Spring.SendLuaRulesMsg('<startsetup>playernames')
