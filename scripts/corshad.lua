@@ -5,7 +5,8 @@ local enginel = piece 'enginel'
 local enginer = piece 'enginer' 
 local finl = piece 'finl' 
 local finr = piece 'finr' 
-local bombcent = piece 'bombcent' 
+local predrop = piece 'predrop' 
+local drop = piece 'drop' 
 local thrustl = piece 'thrustl' 
 local thrustr = piece 'thrustr' 
 local wingtipl = piece 'wingtipl' 
@@ -43,7 +44,7 @@ function script.Create()
 end
 
 function script.QueryWeapon(num)
-	return bombcent
+	return drop
 end
 
 function script.AimWeapon(num, heading, pitch)
