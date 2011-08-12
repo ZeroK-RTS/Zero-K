@@ -1,3 +1,4 @@
+local base = piece 'base'
 local fuselage = piece 'fuselage' 
 local wingl = piece 'wingl' 
 local wingr = piece 'wingr' 
@@ -11,10 +12,13 @@ local thrustl = piece 'thrustl'
 local thrustr = piece 'thrustr' 
 local wingtipl = piece 'wingtipl' 
 local wingtipr = piece 'wingtipr' 
+local xp,zp = piece("x","z")
+
 
 smokePiece = {fuselage, enginel, enginer}
 
 include "bombers.lua"
+include "fakeUpright.lua"
 include "constants.lua"
 
 function script.StartMoving()
@@ -39,11 +43,13 @@ local function Lights()
 end
 
 function script.Create()
+	--FakeUprightInit(xp, zp, drop)
 	StartThread(SmokeUnit)
 	StartThread(Lights)
 end
 
 function script.QueryWeapon(num)
+	--FakeUprightTurn(unitID, xp, zp, base, predrop)
 	return drop
 end
 
@@ -53,6 +59,7 @@ end
 
 function script.FireWeapon(num)
 	if num == 2 then
+		--FakeUprightTurn(unitID, xp, zp, base, predrop)
 		GG.Bomber_Dive_fired(unitID)
 		Reload()
 	elseif num == 3 then

@@ -2,7 +2,7 @@ include "constants.lua"
 include "fakeUpright.lua"
 include "bombers.lua"
 
-local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","z","x","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
+local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","x","z","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
 local smokePiece = {base, jet1, jet2}
 
 --cob values
@@ -14,18 +14,12 @@ function script.Create()
 	Hide( preDrop)
 	Hide( drop)
 	
-	-- upright
-	-- Someone bugged the piece positions so I offset them by a large amout to counteract the buggering
-	Move (xp,z_axis,5000)
-	Move (zp,x_axis,5000)
-	--
+	FakeUprightInit(xp, zp, drop)
 	
 	Turn(Lwing, z_axis, math.rad(90))
 	Turn(Rwing, z_axis, math.rad(-90))	
 	Turn(LwingTip, z_axis, math.rad(-165))
 	Turn(RwingTip, z_axis, math.rad(165))
-	
-	Turn( drop , x_axis,  math.rad(90))
 end
 
 function script.Activate()
@@ -59,20 +53,7 @@ end--]]
 
 function Hacky_Stiletto_Workaround_stiletto_func(count)
 
-	local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
-	local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
-	local bx, by, bz = Spring.GetUnitPiecePosDir(unitID,base)
-	local xdx = xx - bx
-	local xdy = xy - by
-	local xdz = xz - bz
-	local zdx = zx - bx
-	local zdy = zy - by
-	local zdz = zz - bz
-	local angle_x = math.atan2(xdy, math.sqrt(xdx^2 + xdz^2))
-	local angle_z = math.atan2(zdy, math.sqrt(zdx^2 + zdz^2))
-
-	Turn( preDrop , x_axis, angle_x)
-	Turn( preDrop , z_axis, -angle_z)
+	FakeUprightTurn(unitID, xp, zp, base, preDrop)
 
 	EmitSfx( drop,  FIRE_W2 )
 	
