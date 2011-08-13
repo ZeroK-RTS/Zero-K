@@ -241,7 +241,7 @@ end
 
 function gadget:Initialize()
 	if (GG.chicken) then
-		gadgetHandler:RemoveGadget()
+		--gadgetHandler:RemoveGadget()
 	end
 	local teams = Spring.GetTeamList()
 	for _, teamID in ipairs(teams) do
