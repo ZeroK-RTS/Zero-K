@@ -25,7 +25,7 @@ function gadget:GetInfo()
 	}
 end
 
-if (tobool(Spring.GetModOptions().enableunlocks) == false) or (GG.chicken) then
+if (tobool(Spring.GetModOptions().enableunlocks) == false) then
 	return
 end
 
@@ -240,7 +240,9 @@ local function InitUnsafe()
 end
 
 function gadget:Initialize()
-	if
+	if (GG.chicken) then
+		gadgetHandler:RemoveGadget()
+	end
 	local teams = Spring.GetTeamList()
 	for _, teamID in ipairs(teams) do
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
