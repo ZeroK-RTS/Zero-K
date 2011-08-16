@@ -15,7 +15,7 @@ local sideData = {
 --  },
   [1] = {
     name      = 'Robots',
-    startunit = 'armcom',
+    startunit = 'update_your_damn_engine',
   },
 --  [2] = {
 --    name      = 'Chicken (Robots if disabled)',
