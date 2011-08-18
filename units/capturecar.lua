@@ -103,7 +103,6 @@ unitDef = {
       laserFlareSize          = 0,
       lineOfSight             = true,
       minIntensity            = 1,
-      noSelfDamage            = true,
       range                   = 450,
       reloadtime              = 0.1,
       renderType              = 0,

@@ -312,7 +312,6 @@ unitDef = {
 
 
     MELEE      = {
-      [1                      ] = 6,
       name                    = [[ChickenClaws]],
       areaOfEffect            = 32,
       craterBoost             = 1,
@@ -328,7 +327,7 @@ unitDef = {
       explosionGenerator      = [[custom:NONE]],
       impulseBoost            = 0,
       impulseFactor           = 1,
-      interceptedByShieldType = 1,
+      interceptedByShieldType = 0,
       lineOfSight             = true,
       noSelfDamage            = true,
       range                   = 200,

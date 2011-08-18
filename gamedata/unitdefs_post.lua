@@ -247,6 +247,7 @@ for name, ud in pairs(UnitDefs) do
 		Spring.Echo(name)
 		ud.turnrate = ud.turnrate * VEHICLE_TURNRATE_MULT
 		ud.acceleration = ud.acceleration * VEHICLE_ACCEL_MULT
+		ud.brakerate = ud.brakerate * VEHICLE_ACCEL_MULT
 	end
 end
 
