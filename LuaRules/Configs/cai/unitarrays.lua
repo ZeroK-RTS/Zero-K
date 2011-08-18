@@ -78,7 +78,6 @@ local riot = {
 
 	"hoverriot",
 	
-	"armraz",
 	"dante",
 	
 	"chickenwurm",
