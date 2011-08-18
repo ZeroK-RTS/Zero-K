@@ -124,6 +124,7 @@ local deployment = {
     		"armanac",
     		"armah",
     		"armbanth",
+    		"armraz",
     		"armshock",
     		"armorco"
       },

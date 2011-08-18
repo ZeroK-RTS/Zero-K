@@ -390,6 +390,14 @@ local sounds = {
 	},
 	
 	-- Mech
+	armraz = {
+		ok = {
+			[1] = "heavy_bot_move",
+		},
+		select = {
+			[1] = "heavy_bot_move",
+		},
+	},
 	dante = {
 		ok = {
 			[1] = "heavy_bot_move",

@@ -269,6 +269,11 @@ unitConfigs = {
     angle  = 10,
     unfold = true,
   },
+  [UnitDefNames.armraz.id] = {
+    rot    = 28,
+    angle  = 10,
+    border = 0.09,
+  },
   [UnitDefNames.dante.id] = {
     rot    = 28,
     angle  = 10,

@@ -115,6 +115,7 @@ riotDefs = {
 
 	"hoverriot",
 	
+	"armraz",
 	"dante",
 }
 
