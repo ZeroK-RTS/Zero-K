@@ -753,7 +753,7 @@ end
 GG.SetFaction = SetFaction
 
 function gadget:GameFrame(n)
-  if n == 30 * 60 * 2 then
+  if n == (COMM_SELECT_TIMEOUT) then
 	for team in pairs(waitingForComm) do
 		teamSides[team] = "strikecomm"
 		scheduledSpawn[n] = scheduledSpawn[n] or {}
