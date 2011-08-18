@@ -344,10 +344,10 @@ upgrades = {
 	},
 	module_adv_nano = {
 		name = "CarRepairer's Nanolathe",
-		description = "Adds +6 metal/s build speed and +60 build distance",
+		description = "Adds +6 metal/s build speed",
 		func = function(unitDef)
 				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 6 end
-				if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 60 end
+				--if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 60 end
 			end,
 	},
 	module_autorepair = {
@@ -378,7 +378,7 @@ upgrades = {
 	},
 	module_energy_cell = {
 		name = "Energy Cell",
-		description = "Compact fuel cells that produce +8 energy",
+		description = "Compact fuel cells that produce +6 energy",
 		func = function(unitDef)
 				unitDef.energymake = (unitDef.energymake or 0) + 6
 			end,

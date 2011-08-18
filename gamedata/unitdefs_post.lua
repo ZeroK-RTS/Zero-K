@@ -236,6 +236,22 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Vehicle buff
+-- 
+
+local VEHICLE_TURNRATE_MULT = 1
+local VEHICLE_ACCEL_MULT = 1
+
+for name, ud in pairs(UnitDefs) do
+	if ud.movementclass and ud.movementclass:find("TANK") then
+		Spring.Echo(name)
+		ud.turnrate = ud.turnrate * VEHICLE_TURNRATE_MULT
+		ud.acceleration = ud.acceleration * VEHICLE_ACCEL_MULT
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Special Air
 --
 --[[
