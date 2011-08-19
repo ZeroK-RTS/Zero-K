@@ -1,7 +1,7 @@
 local name = "commweapon_disintegrator"
 local weaponDef = {
     name                    = [[Disintegrator]],
-    areaOfEffect            = 48,
+    areaOfEffect            = 64,
     avoidFeature            = false,
     avoidFriendly           = false,
     avoidNeutral            = false,
@@ -14,7 +14,7 @@ local weaponDef = {
 	},
 
     damage                  = {
-		default    = 1200,
+		default    = 1400,
     },
 
     explosionGenerator      = [[custom:DGUNTRACE]],
