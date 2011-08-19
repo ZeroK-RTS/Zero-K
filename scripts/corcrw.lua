@@ -25,7 +25,7 @@ local RightTurret = piece "RightTurret"
 local RightGun = piece "RightGun"
 local RightFlashPoint = piece "RightFlashPoint"
 
-local subpoint = piece "subpoint"
+local subpoint, emit = piece("subpoint", "emit")
 local jetleft, jetright, jetrear = piece('jetleft', 'jetright', 'jetrear')
 
 local gunpoints = {
@@ -58,7 +58,9 @@ local turretSpeed = 8
 
 --local tiltAngle = math.rad(30)
 local isLanded = true
+local LIGHTNING_DELAY = 1	--gameframes
 
+local sound_index = 0
 
 function script.Activate()
   isLanded = false
@@ -68,7 +70,7 @@ function script.Deactivate()
   isLanded = true
 end
 
-function EmitDust()
+local function EmitDust()
   while true do
     if not isLanded then
       local x, _, z = GetUnitPosition(unitID)
@@ -77,6 +79,16 @@ function EmitDust()
     end
     Sleep(33)
   end
+end
+
+local function SetDGunCMD()
+	local cmd = Spring.FindUnitCmdDesc(unitID, CMD.DGUN)
+	local desc = {
+		name = "Cluster Bomb",
+		tooltip = "Drop a huge number of bombs in a circle under the Krow",
+		type = CMDTYPE.ICON_MAP,
+	}
+	if cmd then Spring.EditUnitCmdDesc(unitID, cmd, desc) end
 end
 
 local function updateVectors(num)
@@ -99,7 +111,7 @@ local function updateVectors(num)
 end
 
 function script.Create()	
-	Turn(Base,y_axis, math.pi)	
+	--Turn(Base,y_axis, math.pi)	
 
 	Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"bankingAllowed",false)
 	--Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"turnRate",0)
@@ -115,6 +127,8 @@ function script.Create()
 	
 	Turn(RearTurretSeat,y_axis,math.rad(180))
 	Turn(RearTurretSeat,x_axis,math.rad(14.5))
+	
+	Turn(emit, x_axis, math.rad(90))
 	
 	updateVectors(1)
 	updateVectors(2)
@@ -132,6 +146,7 @@ function script.Create()
 	--Move(LeftTurretSeat,x_axis,-2)
 	--Move(LeftTurretSeat,y_axis,-1.1)
 	--Move(LeftTurretSeat,z_axis,17)
+	SetDGunCMD()
 	StartThread(EmitDust)
 end
 
@@ -171,12 +186,18 @@ function script.AimFromWeapon(num)
 	return gunpoints[num].aim
 end
 
-local function ParticleBeam(num)
-	Signal(signals.particle[num])
-	SetSignalMask(signals.particle[num])
-	for i=1, 30 do
-		EmitSfx(gunpoints[num].fire, 2048 + 4)
-		Sleep(33)
+function Hacky_Stiletto_Workaround_stiletto_func(count)
+	EmitSfx( emit,  FIRE_W5 )
+	if sound_index == 0 then
+		local px, py, pz = Spring.GetUnitPosition(unitID)
+		--Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)
+	end
+	sound_index = sound_index + 1
+	if sound_index >= 6 then
+		sound_index = 0
+	end
+	if count < 80 then
+		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 2, count + 1)
 	end
 end
 
@@ -208,6 +229,8 @@ function script.FireWeapon(num)
 	--Sleep( 1000 )
 	if num ~= 3 then
 		EmitSfx(gunpoints[num].fire, 1024)
+	else
+		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, LIGHTNING_DELAY, 1)
 	end
 end
 
