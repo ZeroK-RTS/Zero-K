@@ -3,7 +3,7 @@
   name=BigKbot;
   areaofeffect=64;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   explosiongenerator=custom:FLASHBIGUNITEX;
   impulseboost=0;
   impulsefactor=0.4;

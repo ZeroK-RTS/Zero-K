@@ -3,7 +3,7 @@
   name=Largebuilding;
   areaofeffect=340;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   explosiongenerator=custom:EXP_MEDIUM_BUILDING_SMALL;
   impulseboost=0;
   impulsefactor=0.4;

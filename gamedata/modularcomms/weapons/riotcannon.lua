@@ -1,7 +1,7 @@
 local name = "commweapon_riotcannon"
 local weaponDef = {
 	name                    = [[Riot Cannon]],
-    areaOfEffect            = 136,
+    areaOfEffect            = 128,
     avoidFeature            = true,
     avoidFriendly           = true,
     burnblow                = true,
@@ -17,8 +17,8 @@ local weaponDef = {
 	},
 
     damage                  = {
-      default = 250,
-      planes  = 250,
+      default = 240,
+      planes  = 240,
       subs    = 12.5,
     },
 
@@ -30,7 +30,7 @@ local weaponDef = {
     interceptedByShieldType = 1,
     lineOfSight             = true,
     noSelfDamage            = true,
-    range                   = 290,
+    range                   = 270,
     reloadtime              = 2.2,
     soundHit                = [[weapon/cannon/generic_cannon]],
     soundStart              = [[weapon/cannon/outlaw_gun]],

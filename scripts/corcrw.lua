@@ -199,7 +199,8 @@ function Hacky_Stiletto_Workaround_stiletto_func(count)
 		sound_index = 0
 	end
 	if count < 80 then
-		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 2, count + 1)
+		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(2/slowState), count + 1)
 	end
 end
 

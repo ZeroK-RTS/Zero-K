@@ -4,7 +4,7 @@ return {
     name                    = [[Napalm Blast]],
     areaofeffect            = 256,
     craterboost             = 1,
-    cratermult              = 4,
+    cratermult              = 3.5,
     
 	customParams        	  = {
 	  setunitsonfire = "1",

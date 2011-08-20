@@ -3,7 +3,7 @@
   name=CrawlingBomb;
   areaofeffect=384;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   edgeeffectiveness=0.4;
   explosiongenerator=custom:ROACHPLOSION;
   explosionSpeed=10000;

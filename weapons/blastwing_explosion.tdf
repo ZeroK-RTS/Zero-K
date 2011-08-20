@@ -3,7 +3,7 @@
   name=Blastwing;
   areaofeffect=256;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   edgeeffectiveness=0.7;
   explosiongenerator=custom:FLASHBIGBUILDINGEX;
   explosionSpeed=10000;

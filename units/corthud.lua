@@ -111,7 +111,7 @@ unitDef = {
       shieldGoodColor         = [[0.1 0.1 1]],
       shieldInterceptType     = 3,
       shieldPower             = 1000,
-      shieldPowerRegen        = 12,
+      shieldPowerRegen        = 14,
       shieldPowerRegenEnergy  = 0,
       shieldRadius            = 80,
       shieldRepulser          = false,
@@ -134,7 +134,7 @@ unitDef = {
       damage                  = {
         default = 150,
         planes  = 150,
-        subs    = 7.5,
+        subs    = 8,
       },
 
       explosionGenerator      = [[custom:MARY_SUE]],

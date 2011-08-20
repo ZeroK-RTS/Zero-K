@@ -67,7 +67,8 @@ function Hacky_Stiletto_Workaround_stiletto_func(count)
 	end
 	
 	if count < 80 then
-		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 1, count + 1)
+		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(1/slowState), count + 1)
 	else
 		Reload()
 	end

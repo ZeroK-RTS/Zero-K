@@ -3,7 +3,7 @@
   name=MEX;
   areaofeffect=128;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   edgeeffectiveness=0.75;
   explosionart=explode2;
   explosiongaf=fx;

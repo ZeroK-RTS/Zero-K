@@ -3,7 +3,7 @@
   name=AtomicBlastWeapon;
   areaofeffect=320;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   explosiongenerator=custom:FLASHNUKE320;
   impulseboost=0;
   impulsefactor=0.4;

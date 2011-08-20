@@ -4,7 +4,7 @@ local oneClickWepDefs = {}
 
 local oneClickWepDefNames = {
 	corcrw = {
-		{ functionToCall = "ClusterBomb", reloadTime = 20*30, name = "Cluster Bomb", tooltip = "Drop a huge number of bombs in a circle under the Krow", weaponToReload = 2,},
+		{ functionToCall = "ClusterBomb", reloadTime = 569, name = "Cluster Bomb", tooltip = "Drop a huge number of bombs in a circle under the Krow", weaponToReload = 2,},
 	},
 }
 

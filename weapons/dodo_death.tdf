@@ -3,7 +3,7 @@
   name=CrawlingBomb;
   areaofeffect=300;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   edgeeffectiveness=0.4;
   impulseboost=0;
   impulsefactor=0.4;

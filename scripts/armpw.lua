@@ -133,8 +133,10 @@ function script.QueryWeapon1() return flare end
 function script.AimFromWeapon1() return chest end
 
 function script.AimWeapon1( heading, pitch )
+	
 	Signal( SIG_Aim )
 	SetSignalMask( SIG_Aim )
+	--[[ Gun Hugger
 	Turn( chest, y_axis, 1.1 + heading, 12 )
 	Turn( lshoulder, x_axis, -1 -pitch, 12 )
 	Turn( rshoulder, x_axis, -0.9 -pitch, 12 )
@@ -143,10 +145,16 @@ function script.AimWeapon1( heading, pitch )
 	Turn( lshoulder, z_axis, -0.3, 9 )
 	
 	Turn( head, y_axis, -0.8, 9  )
-	Turn( head, x_axis, -pitch, 9 )
+	Turn( head, x_axis, -pitch, 9 )--]]
 	
---	WaitForTurn( chest, y_axis )
---	WaitForTurn( lshoulder, x_axis )
+	-- Outstreched Arm
+	Turn( chest, y_axis, heading, 12 )
+	Turn( lforearm, z_axis, 0, 5 )
+	Turn( lshoulder, x_axis, -pitch - 1.5, 12 )
+	
+	
+	WaitForTurn( chest, y_axis )
+	WaitForTurn( lshoulder, x_axis )
 	StartThread(RestoreAfterDelay)
 	return true
 end

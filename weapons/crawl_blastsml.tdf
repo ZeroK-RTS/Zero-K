@@ -3,7 +3,7 @@
   name=WimpyCrawlingBomb;
   areaofeffect=256;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   edgeeffectiveness=0.35;
   explosiongenerator=custom:FLASHNUKE280;
   impulseboost=0;

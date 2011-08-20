@@ -3,7 +3,7 @@
   name=Smalltank;
   areaofeffect=32;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   explosiongenerator=custom:FLASHSMALLUNITEX;
   impulseboost=0;
   impulsefactor=0.4;

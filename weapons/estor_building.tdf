@@ -3,7 +3,7 @@
   name=Smallbuilding;
   areaofeffect=520;
   craterboost=1;
-  cratermult=4;
+  cratermult=3.5;
   explosiongenerator=custom:FLASHNUKE480;
   impulseboost=0;
   impulsefactor=0.4;
