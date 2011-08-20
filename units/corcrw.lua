@@ -14,7 +14,7 @@ unitDef = {
   buildPic               = [[CORCRW.png]],
   buildTime              = 5000,
   canAttack              = true,
-  canDgun				 = true,
+  canDgun				 = false,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,
@@ -38,6 +38,7 @@ unitDef = {
     helptext_bp    = [[Aeronave flutuante armada com lasers para ataque terrestre. Muito cara e muito poderosa.]],
     helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
 	helptext_de    = [[Der Krow scheint teuer und schwerfällig, aber seine unglaubliche Panzerung erlaubt ihm auch durch die größe Flugabwehr zu kommen und alles abzuholzen, was in Sichtweite seiner drei Laserkanonen kommt. Er kann sogar feindliche Jäger vom Himmel holen.]],
+	specialreloadtime = tostring(20*30),
   },
 
   defaultmissiontype     = [[VTOL_standby]],
@@ -85,7 +86,7 @@ unitDef = {
 
     {
       def                = [[KROWLASER]],
-	  mainDir            = [[0.38 0 0.2]],
+	  mainDir            = [[0.38 0.1 0.2]],
 	  maxAngleDif        = 180,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
@@ -94,7 +95,7 @@ unitDef = {
 
     {
       def                = [[KROWLASER]],
-	  mainDir            = [[-0.38 0 0.2]],
+	  mainDir            = [[-0.38 0.1 0.2]],
 	  maxAngleDif        = 180,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
@@ -108,7 +109,7 @@ unitDef = {
 	
     {
       def                = [[KROWLASER]],
-	  mainDir            = [[0 0 -0.38]],
+	  mainDir            = [[0 0.1 -0.38]],
 	  maxAngleDif        = 180,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],

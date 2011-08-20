@@ -81,6 +81,7 @@ local function EmitDust()
   end
 end
 
+--[[
 local function SetDGunCMD()
 	local cmd = Spring.FindUnitCmdDesc(unitID, CMD.DGUN)
 	local desc = {
@@ -90,6 +91,7 @@ local function SetDGunCMD()
 	}
 	if cmd then Spring.EditUnitCmdDesc(unitID, cmd, desc) end
 end
+]]--
 
 local function updateVectors(num)
 	Turn(gunpoints[num].rot,y_axis,0)
@@ -146,7 +148,7 @@ function script.Create()
 	--Move(LeftTurretSeat,x_axis,-2)
 	--Move(LeftTurretSeat,y_axis,-1.1)
 	--Move(LeftTurretSeat,z_axis,17)
-	SetDGunCMD()
+	--SetDGunCMD()
 	StartThread(EmitDust)
 end
 
@@ -201,6 +203,10 @@ function Hacky_Stiletto_Workaround_stiletto_func(count)
 	end
 end
 
+function ClusterBomb()
+	Hacky_Stiletto_Workaround_stiletto_func(1)
+end
+
 function script.AimWeapon( num, heading, pitch )
 	if num == 5 then
 		return false
@@ -230,7 +236,7 @@ function script.FireWeapon(num)
 	if num ~= 3 then
 		EmitSfx(gunpoints[num].fire, 1024)
 	else
-		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, LIGHTNING_DELAY, 1)
+		--ClusterBomb()
 	end
 end
 
