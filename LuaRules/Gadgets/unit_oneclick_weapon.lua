@@ -99,16 +99,19 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 	if cmdID == CMD_ONECLICK_WEAPON then
 		local num = cmdParams[1] or 1
 		local frame = Spring.GetGameFrame()
-		if not (spGetUnitIsDead(unitID) or (reloadFrame[unitID][num] > frame)) then
+		local currentReload = Spring.GetUnitWeaponState(unitID, defs[unitDefID][(cmdParams[1] or 1)].weaponToReload, "reloadState")
+		--if not (spGetUnitIsDead(unitID) or (reloadFrame[unitID][num] > frame)) then
+		if not (spGetUnitIsDead(unitID) or (currentReload > frame)) then
 			local env = Spring.UnitScript.GetScriptEnv(unitID)
 			local func = env[defs[unitDefID][(cmdParams[1] or 1)].functionToCall]
 			Spring.UnitScript.CallAsUnit(unitID, func)
 			
 			-- reload
 			local reloadFrameVal = frame + defs[unitDefID][num].reloadTime
-			reloadFrame[unitID][num] = reloadFrameVal
-			scheduledReloadByUnitID[unitID] = math.max(reloadFrameVal, scheduledReloadByUnitID[unitID] or 0)
-			Spring.SetUnitRulesParam(unitID, "specialReloadFrame", scheduledReloadByUnitID[unitID], {inlos = true})	-- for healthbar
+			--reloadFrame[unitID][num] = reloadFrameVal
+			--scheduledReloadByUnitID[unitID] = math.max(reloadFrameVal, scheduledReloadByUnitID[unitID] or 0)
+			--Spring.SetUnitRulesParam(unitID, "specialReloadFrame", scheduledReloadByUnitID[unitID], {inlos = true})	-- for healthbar
+			Spring.SetUnitWeaponState(unitID, defs[unitDefID][(cmdParams[1] or 1)].weaponToReload, "reloadState", reloadFrameVal)
 			return true, true	-- command used, remove
 		end
 		return true, false	-- command used, don't remove (hasn't executed yet)

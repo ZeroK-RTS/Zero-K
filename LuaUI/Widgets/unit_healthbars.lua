@@ -660,11 +660,13 @@ do
       end
 
 	  --// SPECIAL WEAPON
+	  --[[
 	  local specialReloadState = GetUnitRulesParam(unitID,"specialReloadFrame")
       if (specialReloadState and specialReloadState > gameFrame) then
 		local special = 1-(specialReloadState-gameFrame)/(ud.customParams.specialreloadtime or 1*30)
         AddBar("special reload",special,"reload2",(fullText and floor(special*100)..'%') or '')
       end	  
+	  ]]--
 	  
       --// RELOAD
       if (ci.reloadTime>=minReloadTime) then
