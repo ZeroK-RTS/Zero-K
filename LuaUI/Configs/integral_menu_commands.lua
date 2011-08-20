@@ -209,6 +209,8 @@ local overrides = {
 	[CMD_EMBARK] = {text = ' ', texture = imageDir .. 'Bold/embark.png'},	
 	[CMD_DISEMBARK] = {text = ' ', texture = imageDir .. 'Bold/disembark.png'},
 	
+	[CMD_ONECLICK_WEAPON] = {text = ' ', texture = imageDir .. 'Bold/action.png'},
+	
 	-- states
 	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, text=''},
 	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, text=''},
