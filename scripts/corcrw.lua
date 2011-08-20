@@ -213,7 +213,7 @@ function script.AimWeapon( num, heading, pitch )
 		return false
 	elseif num == 3 then
 		--EmitSfx(Base, 2048 + 2)
-		return true
+		return false
 	end
 	Signal( signals[num] )
 	SetSignalMask( signals[num] )

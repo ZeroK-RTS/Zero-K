@@ -117,9 +117,6 @@ local scheduleRearmRequest = {} -- [bomberID] = true	(used to avoid recursion in
 _G.airpads = airpads
 
 function gadget:Initialize()
-	Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 1})
-	Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 1})
-	gadgetHandler:RegisterCMDID(CMD_REARM)
 	local unitList = Spring.GetAllUnits()
 	for i=1,#(unitList) do
 		local ud = spGetUnitDefID(unitList[i])
@@ -484,6 +481,12 @@ function gadget:DrawWorld()
 		end
 	end
 	gl.Texture("")
+end
+
+function gadget:Initialize()
+	gadgetHandler:RegisterCMDID(CMD_REARM)
+	Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 1})
+	Spring.SetCustomCommandDrawData(CMD_FIND_PAD, "Guard", {0, 1, 1, 1})
 end
 
 end

@@ -44,15 +44,13 @@ local INITIAL_CMD_DESC_ID = 500
 
 local defs = include "LuaRules/Configs/oneclick_weapon_defs.lua"
 
-local reloadFrame = {}
-local scheduledReload = {}
-local scheduledReloadByUnitID = {}
+--local reloadFrame = {}
+--local scheduledReload = {}
+--local scheduledReloadByUnitID = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function gadget:Initialize()
-	--gadgetHandler:RegisterCMDID(CMD_ONECLICK_WEAPON)	-- donut work
-	--Spring.AssignMouseCursor("oneclickwep", "cursordgun", true, true)
 	local unitList = Spring.GetAllUnits()
 	for i=1,#(unitList) do
 		local ud = spGetUnitDefID(unitList[i])
@@ -63,26 +61,30 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, team)
 	if defs[unitDefID] then
-		reloadFrame[unitID] = {}
+		--reloadFrame[unitID] = {}
 		-- add oneclick weapon commands
 		for i=1, #defs[unitDefID] do
 			local desc = Spring.Utilities.CopyTable(oneClickWepCMD)
 			desc.name = defs[unitDefID][i].name
 			desc.tooltip = defs[unitDefID][i].tooltip
 			desc.texture = defs[unitDefID][i].texture
+			desc.params = {i}
 			
 			Spring.InsertUnitCmdDesc(unitID, INITIAL_CMD_DESC_ID + (i-1), desc)
-			reloadFrame[unitID][i] = -1000
+			--reloadFrame[unitID][i] = -1000
 		end		
 	end
 end
 
+--[[
 function gadget:UnitDestroyed(unitID)
 	reloadFrame[unitID] = nil
-	--scheduledReload[scheduledReloadByUnitID[unitID]][unitID] = nil
-	--scheduledReloadByUnitID[unitID] = nil
+	scheduledReload[ scheduledReloadByUnitID[unitID] ][unitID] = nil
+	scheduledReloadByUnitID[unitID] = nil
 end
+]]--
 
+--[[
 function gadget:GameFrame(n)
 	if scheduledReload[n] then
 		for unitID in pairs(scheduledReload[n]) do
@@ -93,6 +95,7 @@ function gadget:GameFrame(n)
 		scheduledReload[n] = nil
 	end	
 end
+]]--
 
 local function doTheCommand(unitID, unitDefID, num)
 	local frame = Spring.GetGameFrame()
@@ -141,5 +144,10 @@ else
 --------------------------------------------------------------------------------
 -- UNSYNCED
 --------------------------------------------------------------------------------
+function gadget:Initialize()
+	gadgetHandler:RegisterCMDID(CMD_ONECLICK_WEAPON)
+	Spring.SetCustomCommandDrawData(CMD_ONECLICK_WEAPON, "dgun", {1, 1, 1, 1})
+	Spring.AssignMouseCursor("oneclickwep", "cursordgun", true, true)
+end
 
 end
