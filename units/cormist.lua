@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Slasher]],
   description            = [[Ranged Support/AA Truck (must stop to fire)]],
   acceleration           = 0.0354,
-  bmcode                 = [[1]],
   brakeRate              = 0.0358,
   buildCostEnergy        = 125,
   buildCostMetal         = 125,
@@ -40,7 +39,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maneuverleashlength    = [[640]],
   mass                   = 120,
   maxDamage              = 500,
   maxSlope               = 18,
@@ -68,8 +66,6 @@ unitDef = {
   side                   = [[CORE]],
   sightDistance          = 660,
   smoothAnim             = true,
-  steeringmode           = [[1]],
-  TEDClass               = [[TANK]],
   trackOffset            = -6,
   trackStrength          = 5,
   trackStretch           = 1,
@@ -100,8 +96,8 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 30,
-        subs    = 1.5,
+        default = 32,
+        subs    = 1.6,
       },
 
       explosionGenerator      = [[custom:FLASH2]],

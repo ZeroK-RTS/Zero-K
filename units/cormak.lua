@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Outlaw]],
   description            = [[Riot Bot]],
   acceleration           = 0.22,
-  bmcode                 = [[1]],
   brakeRate              = 0.22,
   buildCostEnergy        = 250,
   buildCostMetal         = 250,
@@ -33,7 +32,6 @@ unitDef = {
     nofriendlyfire = 1,
   },
 
-  defaultmissiontype     = [[Standby]],
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
@@ -41,7 +39,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maneuverleashlength    = [[500]],
   mass                   = 177,
   maxDamage              = 1050,
   maxSlope               = 36,
@@ -66,13 +63,9 @@ unitDef = {
 
   },
 
-  shootme                = [[1]],
   side                   = [[CORE]],
   sightDistance          = 347,
   smoothAnim             = true,
-  steeringmode           = [[2]],
-  TEDClass               = [[KBOT]],
-  threed                 = [[1]],
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -81,7 +74,6 @@ unitDef = {
   turnRate               = 2000,
   upright                = true,
   workerTime             = 0,
-  zbuffer                = [[1]],
 
   weapons                = {
 
@@ -117,9 +109,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 90,
-        planes  = 90,
-        subs    = 0.9,
+        default = 100,
+        planes  = 100,
+        subs    = 5,
       },
 
       edgeeffectiveness       = 0.75,
