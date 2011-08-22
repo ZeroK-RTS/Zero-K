@@ -97,6 +97,8 @@ local morphFrame = -1
 local morphed = false
 local specialPowerCooldown = 0
 
+local lava = (Game.waterDamage > 0)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -636,6 +638,10 @@ local function SpawnBurrow(number, burrowLevel, loc)	-- last two args are curren
 	  tries = tries + 1
 	  local blocking = Spring.TestBuildOrder(testBuilding, x, y, z, 1)
 	  if (blocking == 2) then
+		if (lava and Spring.GetGroundHeight(x,z) <= 0) then
+			blocking = 1
+		end
+	  
 	    local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
 	    local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
 	    local humanUnitsInVicinity = false

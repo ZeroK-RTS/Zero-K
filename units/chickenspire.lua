@@ -35,6 +35,7 @@ unitDef = {
   floater                       = true,
   footprintX                    = 4,
   footprintZ                    = 4,
+  highTrajectory				= 1, 
   iconType                      = [[staticarty]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -65,11 +66,9 @@ unitDef = {
   side                          = [[THUNDERBIRDS]],
   sightDistance                 = 512,
   smoothAnim                    = true,
-  TEDClass                      = [[METAL]],
   turnRate                      = 0,
   upright                       = false,
   useBuildingGroundDecal        = true,
-  workerTime                    = 0,
   yardMap                       = [[oooooooooooooooo]],
 
   weapons                       = {
@@ -85,16 +84,54 @@ unitDef = {
 
   weaponDefs                    = {
 
+    LRBLOBBER = {
+      name                    = [[Scatterblob]],
+      areaOfEffect            = 96,
+      burst                   = 11,
+      burstrate               = 0.01,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 180,
+        planes  = 180,
+        subs    = 8,
+      },
+
+      endsmoke                = [[0]],
+      explosionGenerator      = [[custom:blobber_goo]],
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      intensity               = 0.7,
+      interceptedByShieldType = 1,
+      mygravity               = 0.1,
+      range                   = 3500,
+      reloadtime              = 10,
+      rgbColor                = [[0.2 0.6 0.0]],
+      size                    = 8,
+      sizeDecay               = 0,
+      soundHit                = [[chickens/acid_hit]],
+      soundStart              = [[chickens/acid_fire]],
+      sprayAngle              = 512,
+      startsmoke              = [[0]],
+      tolerance               = 5000,
+      turret                  = true,
+      waterweapon             = true,	  
+      weaponTimer             = 0.2,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 550,
+    },  
+  
     SLAMSPORE = {
       name                    = [[Slammer Spore]],
-      areaOfEffect            = 128,
+      areaOfEffect            = 160,
       avoidFriendly           = false,
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
-        default = 1000,
+        default = 1250,
       },
 
       dance                   = 60,
@@ -103,15 +140,12 @@ unitDef = {
       flightTime              = 30,
       groundbounce            = 1,
       heightmod               = 0.5,
-      impactOnly              = false,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      metalpershot            = 0,
       model                   = [[chickenegggreen_big.s3o]],
       range                   = 4500,
       reloadtime              = 10,
-      renderType              = 1,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
       startsmoke              = [[1]],
