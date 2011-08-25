@@ -108,7 +108,11 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
-  if (droneList[unitID] ~= nil) then 
+  if (droneList[unitID]) then 
+	if capture then
+		gadget:UnitDestroyed(unitID, unitDefID, oldTeam)
+		return true
+	end
     return false
   else
     if (carrierList[unitID] ~= nil) then

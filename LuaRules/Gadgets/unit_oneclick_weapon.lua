@@ -1,7 +1,7 @@
 ------------------------------------------------------------------------------
 -- HOW IT WORKS:
 -- 	Just calls a function in the unit script (to emit-sfx the weapon etc.)
---	and implements reload time! Simple!
+--	and sets reload time for one of the unit's weapons
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
   return {
