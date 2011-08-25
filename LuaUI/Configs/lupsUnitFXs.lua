@@ -95,7 +95,11 @@ effectUnitDefs = {
   pw_warpgate = {
     {class='StaticParticles', options=warpgateCorona},
 --    {class='GroundFlash', options=groundFlashOrange},
-  },  
+  },
+
+  zenith = {
+    {class='StaticParticles', options=zenithCorona},
+  },    
 
   --// PLANES //----------------------------
   armhawk = {

@@ -3,10 +3,6 @@ include "constants.lua"
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
 local base = piece 'base' 
-local fanbox = piece 'fanbox' 
-local vent1 = piece 'vent1' 
-local vent2 = piece 'vent2' 
-local fan = piece 'fan' 
 local turret = piece 'turret' 
 local sleeve = piece 'sleeve' 
 local barrel1 = piece 'barrel1' 
@@ -18,6 +14,12 @@ local flare3 = piece 'flare3'
 
 local gun_1 = 1
 
+local gunPieces = {
+	{ barrel = barrel1, flare = flare1 },
+	{ barrel = barrel2, flare = flare2 },
+	{ barrel = barrel3, flare = flare3 }
+}
+
 -- Signal definitions
 local SIG_AIM = 2
 
@@ -27,9 +29,6 @@ local RECOIL_RESTORE_SPEED = 1
 smokePiece = {base, turret}
 
 function script.Create()
-	Hide( flare1)
-	Hide( flare2)
-	Hide( flare3)
 	StartThread(SmokeUnit)
 end
 
@@ -44,24 +43,15 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot(num) 
+	EmitSfx( gunPieces[gun_1].flare, 1024)
+	Move( gunPieces[gun_1].barrel , z_axis, RECOIL_DISTANCE  )
+	Move( gunPieces[gun_1].barrel , z_axis, 0 , RECOIL_RESTORE_SPEED )
 	gun_1 = gun_1 + 1
 	if gun_1 > 3 then gun_1 = 1 end
-	if gun_1 == 1 then 
-		Move( barrel1 , z_axis, RECOIL_DISTANCE  )
-		Move( barrel1 , z_axis, 0 , RECOIL_RESTORE_SPEED )
-	elseif gun_1 == 2 then 
-		Move( barrel2 , z_axis, RECOIL_DISTANCE  )
-		Move( barrel2 , z_axis, 0 , RECOIL_RESTORE_SPEED )
-	else 
-		Move( barrel3 , z_axis, RECOIL_DISTANCE  )
-		Move( barrel3 , z_axis, 0 , RECOIL_RESTORE_SPEED )
-	end
 end
 
 function script.QueryWeapon(num)
-	if gun_1 == 1 then return flare1
-	elseif gun_1 == 2 then return flare2
-	else return flare3 end
+	return gunPieces[gun_1].flare
 end
 
 function script.AimFromWeapon(num)
@@ -71,11 +61,7 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if  severity <= .25  then
-		Explode(base, sfxShatter)
-		Explode(fanbox, sfxNone)
-		Explode(vent1, sfxNone)
-		Explode(vent2, sfxNone)
-		Explode(fan, sfxFall)
+		Explode(base, sfxNone)
 		Explode(turret, sfxNone)
 		Explode(barrel1, sfxNone)
 		Explode(barrel2, sfxNone)
@@ -83,10 +69,6 @@ function script.Killed(recentDamage, maxHealth)
 		return 1
 	elseif  severity <= .50  then
 		Explode(base, sfxShatter)
-		Explode(fanbox, sfxNone)
-		Explode(vent1, sfxNone)
-		Explode(vent2, sfxNone)
-		Explode(fan, sfxFall)
 		Explode(turret, sfxFall + sfxSmoke )
 		Explode(barrel1, sfxNone)
 		Explode(barrel2, sfxNone)
@@ -94,25 +76,17 @@ function script.Killed(recentDamage, maxHealth)
 		return 1
 	elseif severity <= .99  then
 		Explode(base, sfxShatter)
-		Explode(fanbox, sfxNone)
-		Explode(vent1, sfxNone)
-		Explode(vent2, sfxNone)
-		Explode(fan, sfxFall)
 		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(barrel1, sfxNone)
-		Explode(barrel2, sfxNone)
-		Explode(barrel3, sfxNone)
+		Explode(barrel1, sfxFall + sfxSmoke)
+		Explode(barrel2, sfxFall + sfxSmoke)
+		Explode(barrel3, sfxFall + sfxSmoke)
 		return 2
 	else
 		Explode(base, sfxShatter)
-		Explode(fanbox, sfxNone)
-		Explode(vent1, sfxNone)
-		Explode(vent2, sfxNone)
-		Explode(fan, sfxFall)
 		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(barrel1, sfxNone)
-		Explode(barrel2, sfxNone)
-		Explode(barrel3, sfxNone)
+		Explode(barrel1, sfxFall + sfxSmoke  + sfxFire)
+		Explode(barrel2, sfxFall + sfxSmoke  + sfxFire)
+		Explode(barrel3, sfxFall + sfxSmoke  + sfxFire)
 		return 2
 	end
 end

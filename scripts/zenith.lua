@@ -1,46 +1,51 @@
 include "constants.lua"
 
-local base = piece "base"
-local gen1 = piece "gen1"
-local gen2 = piece "gen2"
+local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
-smokePiece = {gen1}
+local base = piece "base"
+local flare = piece "flare"
+local firept = piece "firept"
+
+smokePiece = {base}
+
+local function LaserEmit()
+	while true do
+		if (spGetUnitRulesParam(unitID, "lowpower") == 0) then
+			EmitSfx(flare, 2049)
+		end
+		Sleep(1000)
+	end
+end
 
 function script.Create()
-	Move( gen2, y_axis, 9001)
+	Move( firept, y_axis, 9001)
+	Turn( flare, x_axis, math.rad(-90))
 	StartThread(SmokeUnit)
+	StartThread(LaserEmit)
 end
 
-function script.Activate ( )
-	Spin(gen1, y_axis, 1, 0.01)
-	Spin(gen2, y_axis, -1, 0.01)
+function script.QueryWeapon(num) 
+	return firept
 end
 
-function script.Deactivate ( )
-	StopSpin(gen1, y_axis, 0.1)
-	StopSpin(gen2, y_axis, 0.1)
+function script.AimFromWeapon(num)
+	return firept
 end
 
-function script.QueryWeapon1() 
-	return gen2
+function script.AimWeapon(num, heading, pitch)
+	return (num ~= 2) and (spGetUnitRulesParam(unitID, "lowpower") == 0)
 end
 
-function script.AimFromWeapon1()
-	return gen2
-end
-
-function script.AimWeapon1()
-	return true
-end
-
-function script.FireWeapon1()
+function script.FireWeapon(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
+		Explode(base, sfxNone)
 		return 1
 	else
+		Explode(base, sfxShatter)
 		return 2
 	end
 end

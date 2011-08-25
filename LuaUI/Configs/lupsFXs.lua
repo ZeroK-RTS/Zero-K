@@ -264,6 +264,18 @@ warpgateCorona = {
   repeatEffect = true,
 }
 
+zenithCorona = {
+  pos         = {0,130,0},
+  life        = math.huge,
+  lifeSpread  = 0,
+  size        = 160,
+  sizeGrowth  = 0,
+  colormap    = { {0.4, 0.2, 0.9, 0.01} },
+  texture     = 'bitmaps/GPL/groundflash.tga',
+  count       = 1,
+  repeatEffect = true,
+}
+
 commandCoronaWhite = {
   heightFactor = 0.75,
   life        = math.huge,
@@ -277,10 +289,10 @@ commandCoronaWhite = {
 }
 
 local commandCoronaColors = {
-	Red = {0.9, 0.1, 0.1, 0.01},
-	Blue = {0.1, 0.1, 0.9, 0.01},
-	Green = {0.05, 0.75, 0.05, 0.01},
-	Orange = {0.6, 0.25, 0.05, 0.01},
+	Red = {0.6, 0.05, 0.05, 0.01},
+	Blue = {0.05, 0.05, 0.6, 0.01},
+	Green = {0.05, 0.5, 0.05, 0.01},
+	Orange = {0.4, 0.15, 0.05, 0.01},
 }
 for name, color in pairs(commandCoronaColors) do
 	local key = "commandCorona"..name

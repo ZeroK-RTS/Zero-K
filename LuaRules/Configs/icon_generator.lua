@@ -294,9 +294,9 @@ unitConfigs = {
 	unfold = true,
     --attack = true,
   },
-  [UnitDefNames.railgunturret.id] = {
-    attempts = 200,
-  },
+  [UnitDefNames.zenith.id] = {
+    wait   = 50,
+  },  
   [UnitDefNames.fakeunit.id] = {
     empty  = true,
   },
