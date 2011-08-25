@@ -89,6 +89,7 @@ local teamSidesAI = {}
 local playerIDsByName = {}
 local customComms = {}
 local commChoice = {}
+local customKeys = {}	-- [playerID] = {}
 
 local waitingForComm = {}
 
@@ -236,8 +237,8 @@ local function InitUnsafe()
 	for index, id in pairs(Spring.GetPlayerList()) do	
 		-- copied from PlanetWars
 		local commData, success
-		local customKeys = select(10, spGetPlayerInfo(id))
-		local commDataRaw = customKeys and customKeys.commanders
+		customKeys[id] = select(10, spGetPlayerInfo(id))
+		local commDataRaw = customKeys[id] and customKeys[id].commanders
 		if not (commDataRaw and type(commDataRaw) == 'string') then
 			err = "Comm data entry for player "..id.." is empty or in invalid format"
 			commData = {}
@@ -409,8 +410,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   	startUnit = DEFAULT_UNIT
   end
   
-  local customkeys = select(10, spGetPlayerInfo(playerID or select(2, spGetTeamInfo(teamID))))
-  if customkeys and customkeys.jokecomm then
+  local keys = customKeys[playerID] or customKeys[select(2, spGetTeamInfo(teamID))]
+  if keys and keys.jokecomm then
 	startUnit = JOKE_UNIT	
   end    
   
@@ -475,16 +476,16 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 		-- the adding of existing resources is necessary for handling /take and spawn
 		local metal = Spring.GetTeamResources(teamID, "metal")
 		local energy = Spring.GetTeamResources(teamID, "energy")
-		local bonus = 0	-- FIXME
+		local bonus = (keys and tonumber(keys.bonusresources)) or 0
 		
         if startMode == "classic" then
-          Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER)
-          Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC)
+          Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER + bonus)
+          Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC + bonus)
           Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy - commCost + bonus)
           Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal - commCost + bonus)
         elseif startMode == "facplop" then
-          Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER)
-          Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP)
+          Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER + bonus)
+          Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP + bonus)
           Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP + energy - commCost + bonus)
           Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP + metal - commCost + bonus)		  
         else
@@ -681,16 +682,14 @@ function gadget:GameStart()
       playerlist = workAroundSpecsInTeamZero(playerlist, team)
       if playerlist and (#playerlist > 0) then
         for i=1,#playerlist do
-        	local customkeys = select(10, spGetPlayerInfo(playerlist[i]))
-			if customkeys and customkeys.extracomm then
-				for i=1, tonumber(customkeys.extracomm) do
+			if customKeys[playerlist[i]] and customKeys[playerlist[i]].extracomm then
+				for i=1, tonumber(customKeys[playerlist[i]].extracomm) do
 					SpawnStartUnit(team, playerlist[i], false, true)
 				end
 			end
         end
       end
     end
-
   end
   
   -- kill units if engine spawned
