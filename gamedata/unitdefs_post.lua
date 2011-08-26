@@ -244,7 +244,6 @@ local VEHICLE_ACCEL_MULT = 1
 
 for name, ud in pairs(UnitDefs) do
 	if ud.movementclass and ud.movementclass:find("TANK") then
-		Spring.Echo(name)
 		ud.turnrate = ud.turnrate * VEHICLE_TURNRATE_MULT
 		ud.acceleration = ud.acceleration * VEHICLE_ACCEL_MULT
 		ud.brakerate = ud.brakerate * VEHICLE_ACCEL_MULT
@@ -510,12 +509,8 @@ end
 -- Special Power plants
 -- 
 if (modOptions and not tobool(modOptions.specialpower)) then
-	for name, ud in pairs(UnitDefs) do
-		if name == 'cafus' or name == 'aafus' then
-			ud.explodeas 		= "NUCLEAR_MISSILE"
-			ud.selfdestructas 	= "NUCLEAR_MISSILE"
-		end
-	end
+	UnitDefs.cafus.explodeas 		= "NUCLEAR_MISSILE"
+	UnitDefs.cafus.selfdestructas 	= "NUCLEAR_MISSILE"
 end
 
 --------------------------------------------------------------------------------
