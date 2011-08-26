@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.053 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.06 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -99,6 +99,7 @@ local ttFontSize = 10
 local green = '\255\1\255\1'
 local cyan = '\255\1\255\255'
 local white = '\255\255\255\255'
+local yellow = '\255\255\255\1'
 
 local windMin = 0
 local windMax = 2.5
@@ -131,6 +132,15 @@ local windTooltips = {
 	["armwin"] = true,
 }
 
+local terraCmds = {
+	Ramp=1,
+	Level=1,
+	Raise=1,
+	Smooth=1,
+	Restore=1,
+}
+local terraTips = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- group info
@@ -158,7 +168,7 @@ local gi_label	--group info Chili label
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Tooltip'
-options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip',
+options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip',
   'groupalways', 'showgroupinfo', 'squarepics',
 }
 
@@ -216,6 +226,12 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = 'Show map-drawing tooltip when holding down the tilde (~).',
+	},
+	showterratooltip = {
+		name = "Show Terra Tooltip",
+		type = 'bool',
+		value = true,
+		desc = 'Show terraform tooltip when performing terraform commands.',
 	},
 
 	groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect,
@@ -1639,12 +1655,34 @@ local function MakeToolTip_Draw()
 	}
 	BuildTooltip2('drawing2', tt_structure)
 end
+
+local function MakeToolTip_Terra(cmdName)
 	
+	local tt_structure = {
+		main = {
+			{ name='cmdName', text = cyan..cmdName, wrap=false},
+			{ name='tips', text = terraTips[cmdName], wrap=true },
+		},
+	}
+	
+	BuildTooltip2('terra', tt_structure)
+end
+
 local function MakeTooltip()
-	if options.showdrawtooltip.value and  tildepressed and not (drawing or erasing) then
+	if options.showdrawtooltip.value and tildepressed and not (drawing or erasing) then
 		MakeToolTip_Draw()
 		return
 	end
+	
+	local index, cmd_id, cmd_type, cmd_name = Spring.GetActiveCommand()
+	local cmdDesc = Spring.GetActiveCmdDesc( index )
+	if options.showterratooltip.value and cmdDesc then
+		if terraCmds[ cmdDesc.name ] then
+			MakeToolTip_Terra(cmdDesc.name)
+			return
+		end
+	end
+	
 	
 	local cur_ttstr = screen0.currentTooltip or spGetCurrentTooltip()
 	local type, data = spTraceScreenRay(mx, my)
@@ -1728,6 +1766,55 @@ local function MakeTooltip()
 	return
 	
 end --function MakeTooltip
+
+local function SetupTerraTips()
+	terraTips = {
+	
+	}
+	
+	for cmdName, _ in pairs( terraCmds ) do
+		terraTips[cmdName] =
+			green.. 'Click&Drag'..white..': Free draw terraform. \n'..
+			green.. 'Alt+Click&Drag'..white..': Box terraform. \n'..
+			green.. 'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
+			'\n'..
+			''
+	end
+	
+	terraTips.Ramp =
+		green.. 'Step 1'..white..': Click to start ramp OR click&drag to start a ramp at desired height. \n'..
+		green.. 'Step 2'..white..': Click to set end of ramp. OR click&drag to set end of ramp at desired height. Hold '..green..'Alt'..white..' to snap to certain levels of pathability. \n'..
+		green.. 'Step 3'..white..': Move mouse to set ramp width, click to complete. \n'..
+		'\n'..
+		green.. 'Space'..white..': Cycle through only raise/lower \n'..
+		''
+		
+	
+	terraTips.Level = terraTips.Level ..
+		yellow..'[During Terraform Draw]\n'..
+		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
+		'\n'..
+		yellow..'[After Terraform Draw]\n'..
+		green.. 'Alt'..white..': Snap to starting height / below water level (prevent ships) / below water level (prevent land units). \n'..
+		green.. 'Ctrl'..white..': Hold and point at terrain to level to height pointed at.\n'..
+		green.. 'Space'..white..': Cycle through only raise/lower \n'..
+		''
+	
+	terraTips.Raise = terraTips.Raise ..
+		yellow..'[During Terraform Draw]\n'..
+		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
+		'\n'..
+		yellow..'[After Terraform Draw]\n'..
+		green.. 'Alt'..white..': Snap to steps of 15 height. \n'..
+		green.. 'Ctrl'..white..': Snap to 0 height. \n'..
+		''
+	
+	terraTips.Restore = terraTips.Restore ..
+		yellow..'[After Terraform Draw]\n'..
+		green.. 'Space'..white..': Limit to only raise/lower \n'..
+		''
+		
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1821,6 +1908,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
+	
+	SetupTerraTips()
 	
 	Spring.SetDrawSelectionInfo(false)
 	
@@ -2024,4 +2113,3 @@ end
 function widget:Shutdown()
 	Spring.SetDrawSelectionInfo(true) 
 end
-
