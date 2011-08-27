@@ -88,7 +88,7 @@ local function getUnitState(unitID,data,cQueue)
 		return false -- set to hold position and not given a user command
 	end
 	
-	if (cQueue[1].id == CMD_ATTACK) or (cQueue[1].id == CMD_FIGHT) then -- if I attack 
+	if (cQueue[1].id == CMD_ATTACK and movestate ~= 0) or (cQueue[1].id == CMD_FIGHT) then -- if I attack 
 		
 		local target,check = cQueue[1].params[1],cQueue[1].params[2]
 		if not check then -- if I target a unit
@@ -109,7 +109,7 @@ local function getUnitState(unitID,data,cQueue)
 	
 		local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
 		if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
-			if (cQueue[2].id == CMD_ATTACK) or (cQueue[2].id == CMD_FIGHT) then -- if the next command is attack, patrol or fight
+			if (cQueue[2].id == CMD_ATTACK and movestate ~= 0) or (cQueue[2].id == CMD_FIGHT) then -- if the next command is attack, patrol or fight
 				local target,check = cQueue[2].params[1],cQueue[2].params[2]
 				if not check then -- if I target a unit
 					local los = spGetUnitLosState(target,data.allyTeam,false)

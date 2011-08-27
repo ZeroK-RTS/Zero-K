@@ -85,6 +85,19 @@ local terraUnitHP = 1000000 --hp of terraunit, must be the same as on unitdef
 -- Configuration
 --------------------------------------------------------------------------------
 
+local bumpyMap = {}
+
+for i = 0, 64, 8 do
+	bumpyMap[i] = {}
+	for j = 0, 64, 8 do
+		if math.abs(i-32) > math.abs(j-32) then
+			bumpyMap[i][j] = 32 - math.abs(i-32)
+		else
+			bumpyMap[i][j] = 32 - math.abs(j-32)
+		end
+	end
+end
+
 local maxAreaSize = 2000 -- max X or Z bound of area terraform
 local updateFrequency = 30 -- how many frames to update
 local areaSegMaxSize = 200 -- max width and height of terraform squares
@@ -226,6 +239,15 @@ local restoreCmdDesc = {
   tooltip = 'Restores the ground to origional height',
 }
 
+local bumpyCmdDesc = {
+  id      = CMD_BUMPY,
+  type    = CMDTYPE.ICON_MAP,
+  name    = 'Bumpify',
+  cursor  = 'Repair', 
+  action  = 'bumpifyground',
+  tooltip = 'Makes the ground bumpy',
+}
+
 --------------------------------------------------------------------------------
 -- Terraform Calculation Functions
 --------------------------------------------------------------------------------
@@ -248,22 +270,48 @@ local function pointHeight(xs, ys, zs, x, z, m, h, xdis)
 
 end
 
-local function checkPointCreation(terraform_type, volumeSelection, orHeight, newHeight, startHeight)
+local function bumpyFunc(x,z,bumpyType)
+	local sign = math.pow(-1,((x - x%64)/64 + (z - z%64)/64))
+	--return math.pow(-1,((x - x%8)/8 + (z - z%8)/8))*3*(bumpyType + 1)
+	return bumpyMap[x%64][z%64]*sign*(bumpyType + 1)
+end
+
+local function checkPointCreation(terraform_type, volumeSelection, orHeight, newHeight, startHeight, x, z)
+	
+	if terraform_type == 6 then
+		local _, ny, _ = Spring.GetGroundNormal(x,z)
+		if ny > select(2,Spring.GetGroundNormal(x+8,z)) then
+			ny = select(2,Spring.GetGroundNormal(x+8,z))
+		end
+		if ny > select(2,Spring.GetGroundNormal(x-8,z)) then
+			ny = select(2,Spring.GetGroundNormal(x-8,z))
+		end
+		if ny > select(2,Spring.GetGroundNormal(x,z+8)) then
+			ny = select(2,Spring.GetGroundNormal(x,z+8))
+		end
+		if ny > select(2,Spring.GetGroundNormal(x,z-8)) then
+			ny = select(2,Spring.GetGroundNormal(x,z-8))
+		end
+		--if (volumeSelection == 1 and ny > 0.595) or ny > 0.894 then
+		--	Spring.MarkerAddLine(x,0,z,x+8,0,z+8)
+		--	Spring.MarkerAddLine(x+8,0,z,x,0,z+8)
+		--end
+		return (volumeSelection == 1 and ny > 0.595) or ny > 0.894
+	end
+	
+	if volumeSelection == 0 or terraform_type == 2 or terraform_type == 3 then
+		return true
+	end
 	
 	if math.abs(orHeight-newHeight) == 0 then
 		return false
 	end
 
-	if volumeSelection == 0 or terraform_type == 2 or terraform_type == 3 then
-		return true
-	end
-	
 	if terraform_type == 5 then
 		return (volumeSelection == 1 and orHeight < startHeight) or (volumeSelection == 2 and orHeight > startHeight)
 	else
 		return (volumeSelection == 1 and orHeight < newHeight) or (volumeSelection == 2 and orHeight > newHeight)
 	end
-	
 end
 
 local function updateBorderWithPoint(border, x, z)
@@ -481,7 +529,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 						local h = pointHeight(x1, y1, z1, lx, lz, m, heightDiff, xdis)		  
 						segment[n].point[pc] = {x = lx, y = h ,z = lz, orHeight = spGetGroundHeight(lx,lz), prevHeight = spGetGroundHeight(lx,lz)}
 						
-						if checkPointCreation(4, volumeSelection, segment[n].point[pc].orHeight, h, 0) then
+						if checkPointCreation(4, volumeSelection, segment[n].point[pc].orHeight, h, 0, lx, lz) then
 							pc = pc + 1
 						end
 					end
@@ -829,7 +877,8 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 								local currHeight = spGetGroundHeight(segment[n].point[pc].x, segment[n].point[pc].z)
 								segment[n].point[pc].orHeight = currHeight
 								segment[n].point[pc].prevHeight = currHeight
-								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(segment[n].point[pc].x, segment[n].point[pc].z)) then
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,
+										spGetGroundOrigHeight(segment[n].point[pc].x, segment[n].point[pc].z),segment[n].point[pc].x, segment[n].point[pc].z) then
 									pc = pc + 1
 								end
 							end
@@ -994,6 +1043,24 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				end
 				currHeight = segment[i].point[j].orHeight
 				segment[i].point[j].aimHeight = spGetGroundOrigHeight(segment[i].point[j].x, segment[i].point[j].z)
+				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
+					segment[i].point[j].diffHeight = 0.0001
+					segment[i].point[j].structure = true
+					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
+				else
+					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
+					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
+				end
+				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
+				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+			end
+		elseif terraform_type == 6 then
+			for j = 1, segment[i].points do
+				if not segment[i].area[segment[i].point[j].x] then
+					segment[i].area[segment[i].point[j].x] = {}
+				end
+				currHeight = segment[i].point[j].orHeight
+				segment[i].point[j].aimHeight = currHeight + bumpyFunc(segment[i].point[j].x,segment[i].point[j].z,volumeSelection)
 				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
 					segment[i].point[j].diffHeight = 0.0001
 					segment[i].point[j].structure = true
@@ -1257,7 +1324,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 						for x = lx, lx+8, 8 do
 							for z = lz, lz+8, 8 do
 								local currHeight = spGetGroundHeight(x, z)
-								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, z)) then
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, z), x, z) then
 									segment[n].point[m] = {x = x, z = z, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + x
@@ -1273,7 +1340,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 						-- fill in bottom right if it is missing
 						if right and bottom then
 							local currHeight = spGetGroundHeight(lx+16, lz+16)
-							if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, lz+16)) then
+							if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, lz+16), lx+16, lz+16) then
 								segment[n].point[m] = {x = lx+16, z = lz+16, orHeight = currHeight, prevHeight = currHeight}
 								m = m + 1
 								totalX = totalX + lx+16
@@ -1285,7 +1352,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 						if right then
 							for z = lz, lz+8, 8 do
 								local currHeight = spGetGroundHeight(lx+16, z)
-								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, z)) then
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, z), lx+16, z) then
 									segment[n].point[m] = {x = lx+16, z = z, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + lx+16
@@ -1298,7 +1365,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 						if bottom then
 							for x = lx, lx+8, 8 do
 								local currHeight = spGetGroundHeight(x, lz+16)
-								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, lz+16)) then
+								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, lz+16), x, lz+16) then
 									segment[n].point[m] = {x = x, z = lz+16, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + x
@@ -1467,6 +1534,25 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
 				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
 			end
+		elseif terraform_type == 6 then
+			for j = 1, segment[i].points do
+				if not segment[i].area[segment[i].point[j].x] then
+					segment[i].area[segment[i].point[j].x] = {}
+				end
+				local currHeight = segment[i].point[j].orHeight
+				segment[i].point[j].aimHeight = currHeight + bumpyFunc(segment[i].point[j].x,segment[i].point[j].z,volumeSelection)
+				if segment[i].structureArea[segment[i].point[j].x] and segment[i].structureArea[segment[i].point[j].x][segment[i].point[j].z] then
+					segment[i].point[j].diffHeight = 0.0001
+					segment[i].point[j].structure = true
+					--segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = true}
+				else
+					segment[i].point[j].diffHeight = segment[i].point[j].aimHeight-currHeight
+					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
+				end
+				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
+				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+			end
+			
 		end
 		
 		if totalCost ~= 0 then
@@ -1649,7 +1735,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
   if (cmdID == CMD_TERRAFORM_INTERNAL) then
 
 		local terraform_type = cmdParams[1]
-		if terraform_type == 1 or terraform_type == 2 or terraform_type == 3 or terraform_type == 5 then --level or raise or smooth or restore
+		--level or raise or smooth or restore or bumpify
+		if terraform_type == 1 or terraform_type == 2 or terraform_type == 3 or terraform_type == 5 then --or terraform_type == 6 then 
 			local point = {}
 			local unit = {}
 			local i = 8
@@ -2913,6 +3000,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 		spInsertUnitCmdDesc(unitID, raiseCmdDesc)
 		spInsertUnitCmdDesc(unitID, smoothCmdDesc)
 		spInsertUnitCmdDesc(unitID, restoreCmdDesc)
+		--spInsertUnitCmdDesc(unitID, bumpyCmdDesc)
 		
 		local aTeam = spGetUnitAllyTeam(unitID)
 		

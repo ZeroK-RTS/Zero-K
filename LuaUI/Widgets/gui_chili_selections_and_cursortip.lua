@@ -1777,6 +1777,7 @@ local function SetupTerraTips()
 			green.. 'Click&Drag'..white..': Free draw terraform. \n'..
 			green.. 'Alt+Click&Drag'..white..': Box terraform. \n'..
 			green.. 'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
+			green.. 'Alt+Click on unit' ..white..': Terraform around unit. \n'..
 			'\n'..
 			''
 	end
@@ -1786,6 +1787,7 @@ local function SetupTerraTips()
 		green.. 'Step 2'..white..': Click to set end of ramp. OR click&drag to set end of ramp at desired height. Hold '..green..'Alt'..white..' to snap to certain levels of pathability. \n'..
 		green.. 'Step 3'..white..': Move mouse to set ramp width, click to complete. \n'..
 		'\n'..
+		yellow..'[Any Time]\n'..
 		green.. 'Space'..white..': Cycle through only raise/lower \n'..
 		''
 		
@@ -1797,6 +1799,8 @@ local function SetupTerraTips()
 		yellow..'[After Terraform Draw]\n'..
 		green.. 'Alt'..white..': Snap to starting height / below water level (prevent ships) / below water level (prevent land units). \n'..
 		green.. 'Ctrl'..white..': Hold and point at terrain to level to height pointed at.\n'..
+		'\n'..
+		yellow..'[Any Time]\n'..
 		green.. 'Space'..white..': Cycle through only raise/lower \n'..
 		''
 	
@@ -1810,7 +1814,8 @@ local function SetupTerraTips()
 		''
 	
 	terraTips.Restore = terraTips.Restore ..
-		yellow..'[After Terraform Draw]\n'..
+		'\n'..
+		yellow..'[Any Time]\n'..
 		green.. 'Space'..white..': Limit to only raise/lower \n'..
 		''
 		

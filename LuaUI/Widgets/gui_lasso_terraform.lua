@@ -79,6 +79,7 @@ local CMD_LEVEL = 39736
 local CMD_RAISE = 39737
 local CMD_SMOOTH = 39738
 local CMD_RESTORE = 39739
+local CMD_BUMPY = 39740
 local CMD_TERRAFORM_INTERNAL = 39801
 
 local Grid = 16 -- grid size, do not change without other changes.
@@ -142,7 +143,7 @@ local drawingLasso = false
 local drawingRectangle = false
 local drawingRamp = false
 local setHeight = false
-local terraform_type = 1 -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore
+local terraform_type = 0 -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore, 6 = bump
 
 local volumeSelection = 0
 
@@ -471,12 +472,7 @@ local function calculateLinePoints(mPoint, mPoints)
 	
 	if gPoints > maxWallPoints then
 		Spring.Echo("Terraform Command Too Large")
-		setHeight = false
-		drawingLoop = false
-		volumeDraw = false
-		groundGridDraw = false
-		mouseGridDraw = false
-		points = 0
+		stopCommand()
 		return
 	end
 	
@@ -620,12 +616,7 @@ local function calculateAreaPoints(mPoint, mPoints)
 	
 	if border.right-border.left > maxAreaSize or border.bottom-border.top > maxAreaSize then
 		Spring.Echo("Terraform Command Too Large")
-		setHeight = false
-		drawingLoop = false
-		volumeDraw = false
-		groundGridDraw = false
-		mouseGridDraw = false
-		points = 0
+		stopCommand()
 		return
 	end
 	
@@ -732,6 +723,18 @@ local function legalPos(pos)
 	return pos and pos[1] > 0 and pos[3] > 0 and pos[1] < Game.mapSizeX and pos[3] < Game.mapSizeZ
 end
 
+local function stopCommand()
+	drawingLasso = false
+	drawingRectangle = false
+	setHeight = false
+	volumeDraw = false
+	groundGridDraw = false
+	mouseGridDraw = false
+	volumeSelection = 0
+	points = 0
+	terraform_type = 0
+end
+
 local function completelyStopCommand()
 	spSetActiveCommand(-1)
 	originalCommandGiven = false
@@ -744,6 +747,7 @@ local function completelyStopCommand()
 	drawingRamp = false
 	volumeSelection = 0
 	points = 0
+	terraform_type = 0
 end
 
 local function snapToHeight(heightArray, snapHeight, arrayCount)
@@ -768,7 +772,8 @@ function widget:MousePress(mx, my, button)
 
 	local activeCmdIndex, activeid = spGetActiveCommand()
 	
-	if ((activeid == CMD_LEVEL) or (activeid == CMD_RAISE) or (activeid == CMD_SMOOTH) or (activeid == CMD_RESTORE)) and not (setHeight or drawingRectangle or drawingLasso or drawingRamp) then
+	if ((activeid == CMD_LEVEL) or (activeid == CMD_RAISE) or (activeid == CMD_SMOOTH) or (activeid == CMD_RESTORE) or (activeid == CMD_BUMPY)) 
+			and not (setHeight or drawingRectangle or drawingLasso or drawingRamp) then
 	
 		if button == 1 then
 			if not spIsAboveMiniMap(mx, my) then
@@ -811,6 +816,8 @@ function widget:MousePress(mx, my, button)
 						terraform_type = 3
 					elseif (activeid == CMD_RESTORE) then
 						terraform_type = 5
+					elseif (activeid == CMD_BUMPY) then
+						terraform_type = 6
 					end
 					
 					return true
@@ -852,14 +859,7 @@ function widget:MousePress(mx, my, button)
 	if setHeight and button == 1 then
 		
 		SendCommand()
-		volumeSelection = 0
-		setHeight = false
-		drawingLoop = false
-		volumeDraw = false
-		groundGridDraw = false
-		mouseGridDraw = false
-		drawingRamp = false
-		points = 0
+		stopCommand()
 		return true
 	end
 	
@@ -1120,7 +1120,7 @@ function widget:MouseRelease(mx, my, button)
 					volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeRaise)
 					mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 				end
-			elseif terraform_type == 3 or terraform_type == 5 then
+			elseif terraform_type == 3 or terraform_type == 5 or terraform_type == 6 then
 			
 				local disSQ = (point[1].x-point[points].x)^2 + (point[1].z-point[points].z)^2
 			
@@ -1136,26 +1136,12 @@ function widget:MouseRelease(mx, my, button)
 				if points ~= 0 then
 					SendCommand()
 				end
-				volumeSelection = 0
-				drawingLasso = false
-				drawingRectangle = false
-				setHeight = false
-				volumeDraw = false
-				groundGridDraw = false
-				mouseGridDraw = false
-				points = 0
+				stopCommand()
 			end
 			
 			return true
 		elseif button == 4 or button == 5 then
-			drawingLasso = false
-			drawingRectangle = false
-			setHeight = false
-			volumeDraw = false
-			groundGridDraw = false
-			mouseGridDraw = false
-			volumeSelection = 0
-			points = 0
+			stopCommand()
 		else
 			return true
 		end
@@ -1254,7 +1240,7 @@ function widget:MouseRelease(mx, my, button)
 					mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 				end
 				
-			elseif terraform_type == 3 or terraform_type == 5 then
+			elseif terraform_type == 3 or terraform_type == 5 or terraform_type == 6 then
 			
 				local _, pos = spTraceScreenRay(mx, my, true)
 				local x,z
@@ -1284,14 +1270,7 @@ function widget:MouseRelease(mx, my, button)
 							point[5] = {x =point[1].x, z = point[1].z}			
 							
 							SendCommand()
-							drawingLasso = false
-							drawingRectangle = false
-							setHeight = false
-							volumeDraw = false
-							groundGridDraw = false
-							mouseGridDraw = false
-							mouseUnit.id = false
-							points = 0
+							stopCommand()
 							return true
 						end
 					end
@@ -1328,26 +1307,13 @@ function widget:MouseRelease(mx, my, button)
 				if points ~= 0 then
 					SendCommand()
 				end
-				drawingLasso = false
-				drawingRectangle = false
-				setHeight = false
-				volumeDraw = false
-				groundGridDraw = false
-				mouseGridDraw = false
-				points = 0
+				stopCommand()
 				
 			end
 			
 			return true
 		elseif button == 4 or button == 5 then
-			drawingLasso = false
-			drawingRectangle = false
-			setHeight = false
-			volumeDraw = false
-			groundGridDraw = false
-			mouseGridDraw = false
-			volumeSelection = 0
-			points = 0
+			stopCommand()
 		else
 			return true
 		end
@@ -1437,6 +1403,14 @@ function widget:KeyPress(key)
 	) then
 		volumeSelection = volumeSelection+1
 		if volumeSelection > 2 then
+			volumeSelection = 0
+		end
+		return true
+	end
+	
+	if key == KEYSYMS.SPACE and terraform_type == 6 then
+		volumeSelection = volumeSelection+1
+		if volumeSelection > 1 then
 			volumeSelection = 0
 		end
 		return true
@@ -1586,11 +1560,17 @@ function widget:DrawScreen()
 		end
 	end
 	
-	if terraform_type == 1 or terraform_type == 4  or terraform_type == 5 then
+	if terraform_type == 1 or terraform_type == 4 or terraform_type == 5 then
 		if volumeSelection == 1 then
 			drawMouseText(-30,"Only raise")
 		elseif volumeSelection == 2 then
 			drawMouseText(-30,"Only lower")
+		end
+	elseif terraform_type == 6 then
+		if volumeSelection == 0 then
+			drawMouseText(-30,"Blocks Vehicles")
+		elseif volumeSelection == 1 then
+			drawMouseText(-30,"Blocks Bots")
 		end
 	end
 
