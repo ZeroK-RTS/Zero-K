@@ -24,6 +24,8 @@ local leg3 = piece 'leg3' 	-- back left
 local leg4 = piece 'leg4' 	-- front left
 local gflash = piece 'gflash' 
 
+smokePiece = {base, turret}
+
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
@@ -57,8 +59,6 @@ local bCurling = false
 local nocurl = true
 
 local gun_0 = 0
-
-smokePiece = {base, turret}
 
 -- four-stroke tetrapedal walkscript
 local function Walk()
