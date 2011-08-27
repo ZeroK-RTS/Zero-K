@@ -1,4 +1,5 @@
 include "constants.lua"
+include "spider_walking.lua"
 
 --------------------------------------------------------------------------------
 -- pieces
@@ -7,12 +8,12 @@ local body = piece 'body'
 local turret = piece 'turret' 
 local gun = piece 'gun' 
 local flare = piece 'flare' 
-local leg1 = piece 'leg1'	-- back right
-local leg2 = piece 'leg2' 	-- middle right
-local leg3 = piece 'leg3' 	-- front right
-local leg4 = piece 'leg4' 	-- back left
-local leg5 = piece 'leg5' 	-- middle left
-local leg6 = piece 'leg6' 	-- front left
+local br = piece 'leg1'	-- back right
+local mr = piece 'leg2' 	-- middle right
+local fr = piece 'leg3' 	-- front right
+local bl = piece 'leg4' 	-- back left
+local ml = piece 'leg5' 	-- middle left
+local fl = piece 'leg6' 	-- front left
 
 smokePiece = {body, turret}
 
@@ -23,18 +24,28 @@ smokePiece = {body, turret}
 local SIG_WALK = 1
 local SIG_AIM = 2
 
-local PACE = 2.5
+local PERIOD = 0.15
 
-local legRaiseSpeed = math.rad(67.5)*PACE
+local sleepTime = PERIOD*1000
+
 local legRaiseAngle = math.rad(30)
-local legLowerSpeed = math.rad(75)*PACE
+local legRaiseSpeed = legRaiseAngle/PERIOD
+local legLowerSpeed = legRaiseAngle/PERIOD
 
-local legForwardSpeed = math.rad(40)*PACE
-local legForwardAngle = -math.rad(20)
-local legMiddleSpeed = math.rad(40)*PACE
+local legForwardAngle = math.rad(20)
+local legForwardTheta = math.rad(25)
+local legForwardOffset = -math.rad(20)
+local legForwardSpeed = legForwardAngle/PERIOD
+
 local legMiddleAngle = math.rad(20)
-local legBackwardSpeed = math.rad(35)*PACE
+local legMiddleTheta = 0
+local legMiddleOffset = 0
+local legMiddleSpeed = legMiddleAngle/PERIOD
+
 local legBackwardAngle = math.rad(20)
+local legBackwardTheta = -math.rad(25)
+local legBackwardOffset = math.rad(20)
+local legBackwardSpeed = legBackwardAngle/PERIOD
 
 local restore_delay = 3000
 
@@ -44,131 +55,32 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		Turn(leg6, z_axis, legRaiseAngle, legRaiseSpeed)	-- LF leg up
-		Turn(leg6, y_axis, legForwardAngle, legForwardSpeed)	-- LF leg forward
-		Turn(leg2, z_axis, -legRaiseAngle, legRaiseSpeed)	-- RM leg up
-		Turn(leg2, y_axis, legMiddleAngle, legMiddleSpeed)	-- RM leg forward
-		Turn(leg4, z_axis, legRaiseAngle, legRaiseSpeed)	-- LB leg up
-		Turn(leg4, y_axis, -legBackwardAngle, legBackwardSpeed)	-- LB leg forward		
 		
-		Turn(leg3, y_axis, legForwardAngle, legForwardSpeed)	-- RF leg back
-		Turn(leg5, y_axis, legMiddleAngle, legMiddleSpeed)	-- LM leg down
-		Turn(leg1, y_axis, -legBackwardAngle, legBackwardSpeed)	-- RB leg back	
-	
-		WaitForTurn(leg6, z_axis)
-		WaitForTurn(leg6, y_axis)
-		Sleep(0)		
-		
-		Turn(leg6, z_axis, 0, legLowerSpeed)	-- LF leg down
-		Turn(leg2, z_axis, 0, legLowerSpeed)	-- RM leg down
-		Turn(leg4, z_axis, 0, legLowerSpeed)	-- LB leg down	
-		Sleep(0)		
-		WaitForTurn(leg6, z_axis)
-
-		
-		Turn(leg3, z_axis, -legRaiseAngle, legRaiseSpeed)	-- RF leg up
-		Turn(leg3, y_axis, -legForwardAngle, legForwardSpeed)	-- RF leg forward
-		Turn(leg5, z_axis, legRaiseAngle, legRaiseSpeed)	-- LM leg up
-		Turn(leg5, y_axis, -legMiddleAngle, legMiddleSpeed)	-- LM leg forward
-		Turn(leg1, z_axis, -legRaiseAngle, legRaiseSpeed)	-- RB leg up
-		Turn(leg1, y_axis, legBackwardAngle, legBackwardSpeed)	-- RB leg forward		
-		
-		
-		Turn(leg6, y_axis, -legForwardAngle, legForwardSpeed)	-- LF leg back
-		Turn(leg2, y_axis, -legMiddleAngle, legMiddleSpeed)	-- RM leg down
-		Turn(leg4, y_axis, legBackwardAngle, legBackwardSpeed)	-- LB leg back	
-
-		WaitForTurn(leg3, z_axis)
-		WaitForTurn(leg3, y_axis)
-		Sleep(0)				
-		
-		Turn(leg3, z_axis, 0, legLowerSpeed)	-- RF leg down
-		Turn(leg5, z_axis, 0, legLowerSpeed)	-- LM leg down
-		Turn(leg1, z_axis, 0, legLowerSpeed)	-- RB leg down
-		Sleep(0)	
-		WaitForTurn(leg6, z_axis)	
-		
-	-- old shitty walkscript kept here for posterity
-	--[[
-		Turn( leg1 , y_axis, math.rad(43.8) )
-		Turn( leg1 , y_axis, 0, math.rad(219) )
-		Turn( leg1 , z_axis, math.rad(0.6) )
-		Turn( leg1 , z_axis, 0, math.rad(3) )
-		Turn( leg2 , z_axis, 0 )
-		Turn( leg2 , z_axis, math.rad(-(31)), math.rad(155) )
-		Turn( leg3 , y_axis, math.rad(35) )
-		Turn( leg3 , y_axis, math.rad(34), math.rad(3) )
-		Turn( leg3 , z_axis, math.rad(32) )
-		Turn( leg3 , z_axis, math.rad(-0.6), math.rad(155) )
-		Turn( leg4 , y_axis, math.rad(-40) )
-		Turn( leg4 , y_axis, math.rad(-40), 0 )
-		Turn( leg4 , z_axis, math.rad(-31) )
-		Turn( leg4 , z_axis, math.rad(0.6), math.rad(152) )
-		Turn( leg5 , y_axis, math.rad(-37) )
-		Turn( leg5 , y_axis, 0, math.rad(186) )
-		Turn( leg5 , z_axis, 0 )
-		Turn( leg5 , z_axis, 0, 0 )
-		Turn( leg6 , y_axis, 0 )
-		Turn( leg6 , y_axis, math.rad(-30.5), math.rad(152) )
-		Turn( leg6 , z_axis, math.rad(-45) )
-		Sleep(200)
-
-		
-		Turn( leg1 , z_axis, math.rad(-32), math.rad(158) )
-		Turn( leg2 , y_axis, math.rad(35), math.rad(173) )
-		Turn( leg2 , z_axis, math.rad(-(31)), 0 )
-		Turn( leg3 , y_axis, 0, math.rad(170) )
-		Turn( leg3 , z_axis, 0, math.rad(3) )
-		Turn( leg4 , y_axis, 0, math.rad(200) )
-		Turn( leg5 , z_axis, math.rad(31), math.rad(155) )
-		Turn( leg6 , z_axis, math.rad(-2.4), math.rad(237) )
-		Sleep(200)
-
-		Turn( leg1 , y_axis, math.rad(56), math.rad(280) )
-		Turn( leg1 , z_axis, math.rad(-(31)), math.rad(3) )
-		Turn( leg2 , y_axis, math.rad(35), 0 )
-		Turn( leg2 , z_axis, math.rad(-0.6), math.rad(152) )
-		Turn( leg3 , z_axis, math.rad(-32), math.rad(158) )
-		Turn( leg4 , y_axis, math.rad(-0.6), math.rad(3) )
-		Turn( leg4 , z_axis, math.rad(31), math.rad(152) )
-		Turn( leg5 , y_axis, math.rad(-32), math.rad(158) )
-		Turn( leg5 , z_axis, math.rad(31), 0 )
-		Turn( leg6 , y_axis, math.rad(3), math.rad(167) )
-		Sleep(200)
-
-		Turn( leg1 , y_axis, math.rad(43.8), math.rad(60) )
-		Turn( leg1 , z_axis, math.rad(-0.6), math.rad(152) )
-		Turn( leg2 , y_axis, 0, math.rad(173) )
-		Turn( leg2 , z_axis, 0, math.rad(3) )
-		Turn( leg3 , y_axis, math.rad(35), math.rad(173) )
-		Turn( leg3 , z_axis, math.rad(-32), 0 )
-		Turn( leg4 , y_axis, math.rad(-40), math.rad(198) )
-		Turn( leg4 , z_axis, math.rad(31), 0 )
-		Turn( leg5 , y_axis, math.rad(-37), math.rad(27) )
-		Turn( leg5 , z_axis, 0, math.rad(155) )
-		Turn( leg6 , y_axis, 0, math.rad(15) )
-		Turn( leg6 , z_axis, math.rad(45), math.rad(237) )
-		Sleep(200)
-	]]--
+		walk(br, mr, fr, bl, ml, fl,
+			legRaiseAngle, legRaiseSpeed, legLowerSpeed,
+			legForwardAngle, legForwardOffset, legForwardSpeed, legForwardTheta,
+			legMiddleAngle, legMiddleOffset, legMiddleSpeed, legMiddleTheta,
+			legBackwardAngle, legBackwardOffset, legBackwardSpeed, legBackwardTheta,
+			sleepTime)
 	end
 end
 
 local function RestoreLegs()
 	SetSignalMask(SIG_WALK)
 
-	Turn(leg1, z_axis, 0, legRaiseSpeed)	-- LF leg up
-	Turn(leg1, y_axis, 0, legForwardSpeed)	-- LF leg forward
-	Turn(leg4, z_axis, 0, legRaiseSpeed)	-- RM leg up
-	Turn(leg4, y_axis, 0, legMiddleSpeed)	-- RM leg forward
-	Turn(leg5, z_axis, 0, legRaiseSpeed)	-- LB leg up
-	Turn(leg5, y_axis, 0, legBackwardSpeed)	-- LB leg forward		
+	Turn(br, z_axis, 0, legRaiseSpeed)	-- LF leg up
+	Turn(br, y_axis, 0, legForwardSpeed)	-- LF leg forward
+	Turn(bl, z_axis, 0, legRaiseSpeed)	-- RM leg up
+	Turn(bl, y_axis, 0, legMiddleSpeed)	-- RM leg forward
+	Turn(ml, z_axis, 0, legRaiseSpeed)	-- LB leg up
+	Turn(ml, y_axis, 0, legBackwardSpeed)	-- LB leg forward		
 	
-	Turn(leg2, z_axis, 0, legRaiseSpeed)	-- LF leg up
-	Turn(leg2, y_axis, 0, legForwardSpeed)	-- LF leg forward
-	Turn(leg3, z_axis, 0, legRaiseSpeed)	-- RM leg up
-	Turn(leg3, y_axis, 0, legMiddleSpeed)	-- RM leg forward
-	Turn(leg6, z_axis, 0, legRaiseSpeed)	-- LB leg up
-	Turn(leg6, y_axis, 0, legBackwardSpeed)	-- LB leg forward			
+	Turn(mr, z_axis, 0, legRaiseSpeed)	-- LF leg up
+	Turn(mr, y_axis, 0, legForwardSpeed)	-- LF leg forward
+	Turn(fr, z_axis, 0, legRaiseSpeed)	-- RM leg up
+	Turn(fr, y_axis, 0, legMiddleSpeed)	-- RM leg forward
+	Turn(fl, z_axis, 0, legRaiseSpeed)	-- LB leg up
+	Turn(fl, y_axis, 0, legBackwardSpeed)	-- LB leg forward			
 end
 
 function script.Create()
@@ -215,48 +127,48 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(gun, sfxNone)
 		Explode(body, sfxNone)
 		Explode(flare, sfxNone)
-		Explode(leg1, sfxNone)
-		Explode(leg2, sfxNone)
-		Explode(leg3, sfxNone)
-		Explode(leg4, sfxNone)
-		Explode(leg5, sfxNone)
-		Explode(leg6, sfxNone)
+		Explode(br, sfxNone)
+		Explode(mr, sfxNone)
+		Explode(fr, sfxNone)
+		Explode(bl, sfxNone)
+		Explode(ml, sfxNone)
+		Explode(fl, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
 	elseif  severity <= .50  then
 		Explode(gun, sfxFall)
 		Explode(body, sfxNone)
 		Explode(flare, sfxFall)
-		Explode(leg1, sfxFall)
-		Explode(leg2, sfxFall)
-		Explode(leg3, sfxFall)
-		Explode(leg4, sfxFall)
-		Explode(leg5, sfxFall)
-		Explode(leg6, sfxFall)
+		Explode(br, sfxFall)
+		Explode(mr, sfxFall)
+		Explode(fr, sfxFall)
+		Explode(bl, sfxFall)
+		Explode(ml, sfxFall)
+		Explode(fl, sfxFall)
 		Explode(turret, sfxShatter)
 		return 1
 	elseif severity <= .99  then
 		Explode(gun, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(body, sfxNone)
 		Explode(flare, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg3, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg4, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg5, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg6, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(br, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(mr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(fr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(bl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(ml, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(fl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(turret, sfxShatter)
 		return 2
 	else
 		Explode(gun, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(body, sfxNone)
 		Explode(flare, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg3, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg4, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg5, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg6, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(br, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(mr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(fr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(bl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(ml, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(fl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(turret, sfxShatter + sfxExplode )
 		return 2
 	end

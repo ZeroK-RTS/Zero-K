@@ -1,3 +1,4 @@
+include "spider_walking.lua"
 include "constants.lua"
 
 --------------------------------------------------------------------------------
@@ -23,18 +24,28 @@ smokePiece = {base, turret}
 local SIG_WALK = 1
 local SIG_AIM = 2
 
-local PACE = 2.4
+local PERIOD = 0.2
 
-local legRaiseSpeed = math.rad(67.5)*PACE
+local sleepTime = PERIOD*1000
+
 local legRaiseAngle = math.rad(30)
-local legLowerSpeed = math.rad(75)*PACE
+local legRaiseSpeed = legRaiseAngle/PERIOD
+local legLowerSpeed = legRaiseAngle/PERIOD
 
-local legForwardSpeed = math.rad(40)*PACE
-local legForwardAngle = -math.rad(20)
-local legMiddleSpeed = math.rad(40)*PACE
+local legForwardAngle = math.rad(20)
+local legForwardTheta = math.rad(45)
+local legForwardOffset = 0
+local legForwardSpeed = legForwardAngle/PERIOD
+
 local legMiddleAngle = math.rad(20)
-local legBackwardSpeed = math.rad(35)*PACE
+local legMiddleTheta = 0
+local legMiddleOffset = 0
+local legMiddleSpeed = legMiddleAngle/PERIOD
+
 local legBackwardAngle = math.rad(20)
+local legBackwardTheta = -math.rad(45)
+local legBackwardOffset = 0
+local legBackwardSpeed = legBackwardAngle/PERIOD
 
 local restore_delay = 3000
 
@@ -44,49 +55,13 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		Turn(leg6, z_axis, legRaiseAngle, legRaiseSpeed)	-- LF leg up
-		Turn(leg6, y_axis, legForwardAngle, legForwardSpeed)	-- LF leg forward
-		Turn(leg2, z_axis, -legRaiseAngle, legRaiseSpeed)	-- RM leg up
-		Turn(leg2, y_axis, legMiddleAngle, legMiddleSpeed)	-- RM leg forward
-		Turn(leg4, z_axis, legRaiseAngle, legRaiseSpeed)	-- LB leg up
-		Turn(leg4, y_axis, -legBackwardAngle, legBackwardSpeed)	-- LB leg forward		
 		
-		Turn(leg3, y_axis, legForwardAngle, legForwardSpeed)	-- RF leg back
-		Turn(leg5, y_axis, legMiddleAngle, legMiddleSpeed)	-- LM leg down
-		Turn(leg1, y_axis, -legBackwardAngle, legBackwardSpeed)	-- RB leg back	
-	
-		WaitForTurn(leg6, z_axis)
-		WaitForTurn(leg6, y_axis)
-		Sleep(0)		
-		
-		Turn(leg6, z_axis, 0, legLowerSpeed)	-- LF leg down
-		Turn(leg2, z_axis, 0, legLowerSpeed)	-- RM leg down
-		Turn(leg4, z_axis, 0, legLowerSpeed)	-- LB leg down	
-		Sleep(0)		
-		WaitForTurn(leg6, z_axis)
-
-		
-		Turn(leg3, z_axis, -legRaiseAngle, legRaiseSpeed)	-- RF leg up
-		Turn(leg3, y_axis, -legForwardAngle, legForwardSpeed)	-- RF leg forward
-		Turn(leg5, z_axis, legRaiseAngle, legRaiseSpeed)	-- LM leg up
-		Turn(leg5, y_axis, -legMiddleAngle, legMiddleSpeed)	-- LM leg forward
-		Turn(leg1, z_axis, -legRaiseAngle, legRaiseSpeed)	-- RB leg up
-		Turn(leg1, y_axis, legBackwardAngle, legBackwardSpeed)	-- RB leg forward		
-		
-		
-		Turn(leg6, y_axis, -legForwardAngle, legForwardSpeed)	-- LF leg back
-		Turn(leg2, y_axis, -legMiddleAngle, legMiddleSpeed)	-- RM leg down
-		Turn(leg4, y_axis, legBackwardAngle, legBackwardSpeed)	-- LB leg back	
-
-		WaitForTurn(leg3, z_axis)
-		WaitForTurn(leg3, y_axis)
-		Sleep(0)				
-		
-		Turn(leg3, z_axis, 0, legLowerSpeed)	-- RF leg down
-		Turn(leg5, z_axis, 0, legLowerSpeed)	-- LM leg down
-		Turn(leg1, z_axis, 0, legLowerSpeed)	-- RB leg down
-		Sleep(0)	
-		WaitForTurn(leg6, z_axis)	
+		walk(leg1, leg2, leg3, leg4, leg5, leg6,
+			legRaiseAngle, legRaiseSpeed, legLowerSpeed,
+			legForwardAngle, legForwardOffset, legForwardSpeed, legForwardTheta,
+			legMiddleAngle, legMiddleOffset, legMiddleSpeed, legMiddleTheta,
+			legBackwardAngle, legBackwardOffset, legBackwardSpeed, legBackwardTheta,
+			sleepTime)
 	end
 end
 
