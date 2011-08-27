@@ -706,8 +706,7 @@ Killed(severity, corpsetype)
 	dead = 1;
 	turn torso to y-axis <0> speed <200>;
 	
-	if( severity <= 50 ) { corpsetype = 1; }
-	if( severity <= 98 )
+	if( severity <= 50 )
 	{
 		turn base to x-axis <71> speed <70>;
 		turn torso to x-axis <-31> speed <50>;
@@ -741,9 +740,9 @@ Killed(severity, corpsetype)
 		explode ruparm type BITMAPONLY;
 		explode rupleg type BITMAPONLY;
 		explode torso type BITMAPONLY;
-    	corpsetype = 2;
+		corpsetype = 1;
 	}
-	if( severity >= 99 )
+	else
 	{
 		explode pelvis type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP4;
 		explode luparm type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP1;

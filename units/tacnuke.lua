@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Tactical Nuke]],
   acceleration                  = 1,
   antiweapons                   = [[1]],
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 8192,
   buildCostEnergy               = 600,
@@ -61,8 +60,6 @@ unitDef = {
 
   side                          = [[CORE]],
   sightDistance                 = 200,
-  smoothAnim                    = true,
-  TEDClass                      = [[SPECIAL]],
   turnRate                      = 0,
   useBuildingGroundDecal        = false,
   workerTime                    = 0,
@@ -83,7 +80,7 @@ unitDef = {
 
     WEAPON = {
       name                    = [[Tactical Nuke]],
-      areaOfEffect            = 128,
+      areaOfEffect            = 192,
       avoidFriendly           = false,
 	  cegTag                  = [[tactrail]],
       collideFriendly         = false,
@@ -92,26 +89,21 @@ unitDef = {
 
       damage                  = {
         default = 3500,
-        planes  = 3500,
         subs    = 175,
       },
 
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:NUKE_150]],
       fireStarter             = 0,
-      guidance                = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       levelGround             = false,
-      lineOfSight             = true,
       model                   = [[wep_tacnuke.s3o]],
       noautorange             = [[1]],
-      noSelfDamage            = true,
       propeller               = [[1]],
       range                   = 3500,
       reloadtime              = 10,
-      renderType              = 1,
       selfprop                = true,
       shakeduration           = [[1.5]],
       shakemagnitude          = [[32]],

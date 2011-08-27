@@ -16,9 +16,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local RETAKING_DEGRADE_TIMER = 5
-local GENERAL_DEGRADE_TIMER = 2
-local DEGRADE_FACTOR = 0.05
+local RETAKING_DEGRADE_TIMER = 15
+local GENERAL_DEGRADE_TIMER = 5
+local DEGRADE_FACTOR = 0.04
 
 include("LuaRules/Configs/customcmds.h.lua")
 local CMD_STOP = CMD.STOP
