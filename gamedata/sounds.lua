@@ -54,11 +54,11 @@ local Sounds = {
 local VFSUtils = VFS.Include('gamedata/VFSUtils.lua')
 
 local defaultOpts = {
-	pitchMod = 0.1,
+	pitchMod = 0.04,
 	gainMod = 0.1,
 }
 local replyOpts = {
-	pitchMod = 0.2,
+	pitchMod = 0.08,
 	gainMod = 0.1,
 }
 
