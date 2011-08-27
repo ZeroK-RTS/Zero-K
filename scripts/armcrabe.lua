@@ -31,6 +31,11 @@ local gflash = piece 'gflash'
 local restore_delay = 3000
 local base_speed = 100
 
+local SIG_MOVE = 2	
+local SIG_AIM1 = 4
+local SIG_AIM2 = 8
+local SIG_CURL = 16
+
 local PACE = 1.2
 
 local legRaiseSpeed = math.rad(45)*PACE
@@ -53,13 +58,9 @@ local nocurl = true
 
 local gun_0 = 0
 
-local SIG_MOVE = 2	
-local SIG_AIM1 = 4
-local SIG_AIM2 = 8
-local SIG_CURL = 16
-
 smokePiece = {base, turret}
 
+-- four-stroke tetrapedal walkscript
 local function Walk()
 	while bCurled or bCurling do Sleep(100) end
 	SetUnitValue(COB.MAX_SPEED, base_speed)

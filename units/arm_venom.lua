@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Venom]],
   description            = [[Riot EMP Spider]],
   acceleration           = 0.26,
-  bmcode                 = [[1]],
   brakeRate              = 0.26,
   buildCostEnergy        = 200,
   buildCostMetal         = 200,
@@ -38,7 +37,6 @@ unitDef = {
 	helptext_de    = [[Venom ist eine geländeunabhängige Einheit, welche Gegner paralysieren kann, damit andere Einheiten diese einfach zerstören können. Venom besitzt eine AoE und ist nützlich, um gengerische Schwärme in Schach zu halten.]],
   },
 
-  defaultmissiontype     = [[Standby]],
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
@@ -46,7 +44,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maneuverleashlength    = [[640]],
   mass                   = 155,
   maxDamage              = 750,
   maxSlope               = 72,
@@ -57,6 +54,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[venom.s3o]],
+  script				 = [[arm_venom.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
@@ -71,9 +69,6 @@ unitDef = {
 
   side                   = [[ARM]],
   sightDistance          = 440,
-  smoothAnim             = true,
-  steeringmode           = [[1]],
-  TEDClass               = [[TANK]],
   trackOffset            = 0,
   trackStrength          = 10,
   trackStretch           = 1,
