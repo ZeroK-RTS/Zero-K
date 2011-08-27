@@ -14,7 +14,7 @@ local units = {
 	capturecar = { 
 		unitLimit = false,
 		postCaptureReload = 240, 
-		},
+	},
 }
 -- unitLimit			- the max number of units it can control. False for infinite
 -- postCaptureReload 	- reload time after capturing
