@@ -47,6 +47,7 @@ local spGetUnitHealth	= Spring.GetUnitHealth
 --------------------------------------------------------------------------------
 
 local SOUND_DIRNAME = 'Sounds/reply/'
+local SOUND_DIRNAME_SHORT = 'reply/'
 local LUAUI_DIRNAME = 'LuaUI/'
 local SOUNDTABLE_FILENAME = LUAUI_DIRNAME.."Configs/sounds_noises.lua"
 local soundTable = VFS.Include(SOUNDTABLE_FILENAME, nil, VFS.RAW_FIRST)
@@ -63,7 +64,7 @@ local doNotPlayNextSelection = false
 local function playSound(filename, ...)
 	local path = SOUND_DIRNAME..filename..".WAV"
 	if (VFS.FileExists(path)) then
-		PlaySoundFile(path, ...)
+		PlaySoundFile(SOUND_DIRNAME_SHORT .. filename, ...)
 	else
 	--Spring.Echo(filename)
 		Spring.Echo("<snd_noises.lua>: Error file "..path.." doesn't exist.")
@@ -106,7 +107,7 @@ function widget:SelectionChanged(selection)
 	if (unitName and soundTable[unitName]) then
 		local sound = soundTable[unitName].select[1]
 		if (sound) then
-			CoolNoisePlay(string.upper(sound), 0.5)
+			CoolNoisePlay((sound), 0.5)
 		end
 	end
 end
