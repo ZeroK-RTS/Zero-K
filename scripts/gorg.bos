@@ -14,7 +14,7 @@ static-var  bMoving, gun_1;
 #define SIG_AIM2	4
 #define SIG_AIM3	8
 #define	SIG_AIM4	16
-#define	SIG_PARTICLE	32
+#define	SIG_GRASER	32
 
 
 walk()
@@ -283,10 +283,10 @@ RestoreAfterDelay()
 	turn gun3 to y-axis <0> speed <30>;
 }
 
-ParticleBeam()
+GraserLoop()
 {
-	signal SIG_PARTICLE;
-	set-signal-mask SIG_PARTICLE;
+	signal SIG_GRASER;
+	set-signal-mask SIG_GRASER;
 	var i;
 	for (i=0;i<25;++i) {
 		emit-sfx 2052 from rflare;
@@ -322,7 +322,7 @@ AimWeapon1(heading, pitch)
 
 FireWeapon1()
 {
-	//start-script ParticleBeam();
+	//start-script GraserLoop();
 	if (gun_1) emit-sfx 1024 from rflare;
 	else emit-sfx 1024 from lflare;
 }
