@@ -94,7 +94,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.7,
-      explosionGenerator      = [[custom:100rlexplode]],
+      --explosionGenerator      = [[custom:330rlexplode]],
       fireStarter             = 120,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
