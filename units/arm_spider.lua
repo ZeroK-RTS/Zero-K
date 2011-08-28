@@ -67,7 +67,6 @@ unitDef = {
   movementClass          = [[TKBOT3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  objectName             = [[ARMMLSPD]],
   objectName             = [[weaver.s3o]],
   script                 = [[arm_spider.lua]],
   seismicSignature       = 16,
