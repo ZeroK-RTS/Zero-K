@@ -14,11 +14,14 @@ function walk(br, mr, fr, bl, ml, fl,
 		sleepTime)
 		
 	local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
-	legRaiseSpeed = legRaiseSpeed * slowState
-	legForwardSpeed = legForwardSpeed * slowState
-	legMiddleSpeed = legMiddleSpeed * slowState
-	legBackwardSpeed = legBackwardSpeed * slowState
-	sleepTime = sleepTime/slowState
+	if slowState ~= 1 then
+		legRaiseSpeed = legRaiseSpeed * slowState
+		legLowerSpeed = legLowerSpeed * slowState
+		legForwardSpeed = legForwardSpeed * slowState
+		legMiddleSpeed = legMiddleSpeed * slowState
+		legBackwardSpeed = legBackwardSpeed * slowState
+		sleepTime = sleepTime/slowState
+	end
 	
 	raise(fl, legRaiseAngle, legRaiseSpeed, -legForwardTheta)
 	raise(mr, -legRaiseAngle, legRaiseSpeed, legMiddleTheta)
@@ -59,5 +62,28 @@ function walk(br, mr, fr, bl, ml, fl,
 	raise(br, 0, legLowerSpeed, legBackwardTheta)
 	
 	Sleep(sleepTime)	
+end
 
+function restoreLegs(br, mr, fr, bl, ml, fl,
+		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)	
+
+	Turn(br, x_axis, 0, legRaiseSpeed)
+	Turn(br, z_axis, 0, legRaiseSpeed)	-- LF leg up
+	Turn(br, y_axis, 0, legForwardSpeed)	-- LF leg forward
+	Turn(mr, x_axis, 0, legRaiseSpeed)
+	Turn(mr, z_axis, 0, legRaiseSpeed)	-- RM leg up
+	Turn(mr, y_axis, 0, legMiddleSpeed)	-- RM leg forward
+	Turn(fr, x_axis, 0, legRaiseSpeed)
+	Turn(fr, z_axis, 0, legRaiseSpeed)	-- LB leg up
+	Turn(fr, y_axis, 0, legBackwardSpeed)	-- LB leg forward		
+	
+	Turn(bl, x_axis, 0, legRaiseSpeed)
+	Turn(bl, z_axis, 0, legRaiseSpeed)	-- LF leg up
+	Turn(bl, y_axis, 0, legForwardSpeed)	-- LF leg forward
+	Turn(ml, x_axis, 0, legRaiseSpeed)
+	Turn(ml, z_axis, 0, legRaiseSpeed)	-- RM leg up
+	Turn(ml, y_axis, 0, legMiddleSpeed)	-- RM leg forward
+	Turn(fl, x_axis, 0, legRaiseSpeed)
+	Turn(fl, z_axis, 0, legRaiseSpeed)	-- LB leg up
+	Turn(fl, y_axis, 0, legBackwardSpeed)	-- LB leg forward	
 end

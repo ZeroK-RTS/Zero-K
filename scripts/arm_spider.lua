@@ -69,20 +69,8 @@ end
 
 local function RestoreLegs()
 	SetSignalMask(SIG_WALK)
-
-	Turn(leg1, z_axis, 0, legRaiseSpeed)	-- LF leg up
-	Turn(leg1, y_axis, 0, legForwardSpeed)	-- LF leg forward
-	Turn(leg4, z_axis, 0, legRaiseSpeed)	-- RM leg up
-	Turn(leg4, y_axis, 0, legMiddleSpeed)	-- RM leg forward
-	Turn(leg5, z_axis, 0, legRaiseSpeed)	-- LB leg up
-	Turn(leg5, y_axis, 0, legBackwardSpeed)	-- LB leg forward		
-	
-	Turn(leg2, z_axis, 0, legRaiseSpeed)	-- LF leg up
-	Turn(leg2, y_axis, 0, legForwardSpeed)	-- LF leg forward
-	Turn(leg3, z_axis, 0, legRaiseSpeed)	-- RM leg up
-	Turn(leg3, y_axis, 0, legMiddleSpeed)	-- RM leg forward
-	Turn(leg6, z_axis, 0, legRaiseSpeed)	-- LB leg up
-	Turn(leg6, y_axis, 0, legBackwardSpeed)	-- LB leg forward			
+	restoreLegs(leg1, leg2, leg3, leg4, leg5, leg6,
+		legRaiseSpeed, legForwardSpeed, legMiddleSpeed,legBackwardSpeed)		
 end
 
 function script.Create()
@@ -104,9 +92,9 @@ function script.StartBuilding(heading, pitch)
 		SetUnitValue(COB.INBUILDSTANCE, 1)
 		SetSignalMask(SIG_BUILD)
 		
-		Move(elevator,y_axis, 6, 20)
-		Move(elevator2,y_axis, 6, 20)
-		Move(gun,y_axis, 6, 20)
+		Move(elevator,y_axis, 4.5, 15)
+		Move(elevator2,y_axis, 4.5, 15)
+		Move(gun,y_axis, 4.5, 15)
 		Turn(cover_r,z_axis,-math.rad(120), math.rad(250))
 		Turn(cover_l,z_axis,math.rad(120), math.rad(250))
 		Turn(panel_r,y_axis,math.rad(80), math.rad(250))
@@ -126,9 +114,9 @@ function script.StopBuilding()
 		Turn(panel_r,y_axis,0, math.rad(250))
 		Turn(panel_l,y_axis,0, math.rad(250))
 		WaitForTurn(platform,y_axis)
-		Move(elevator,y_axis, 0, 20)
-		Move(elevator2,y_axis, 0, 20)
-		Move(gun,y_axis, 0, 20)
+		Move(elevator,y_axis, 0, 15)
+		Move(elevator2,y_axis, 0, 15)
+		Move(gun,y_axis, 0, 15)
 		WaitForMove(gun, y_axis)
 		Turn(cover_r,z_axis,0, math.rad(250))
 		Turn(cover_l,z_axis,0, math.rad(250))
