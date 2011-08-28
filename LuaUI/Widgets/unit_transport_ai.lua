@@ -393,18 +393,21 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
   local cnt = 0
   for k, v in ipairs(queue) do
     if (not v.options.internal) then 
-      if ((v.id == CMD.MOVE or (v.id==CMD.WAIT and cnt == 0) or v.id == CMD.SET_WANTED_MAX_SPEED) and not ender) then
+      if ((v.id == CMD.MOVE or (v.id==CMD.WAIT) or v.id == CMD.SET_WANTED_MAX_SPEED) and not ender) then
         cnt = cnt +1
         if (v.id == CMD.MOVE) then 
           GiveOrderToUnit(transportID, CMD.MOVE, v.params, {"shift"})      
           table.insert(torev, {v.params[1], v.params[2], v.params[3]+20})
           vl = v.params 
         end
+		if (IsDisembark(v)) then 
+			ender = true
+		end
       else
         if (not ender) then 
           ender = true
         end
-        if (not IsDisembark(v) and not IsEmbark(v)) then
+        if (v.ID ~= CMD.WAIT) then
           local opts = {}
           table.insert(opts, "shift") -- appending
           if (v.options.alt)   then table.insert(opts, "alt")   end
@@ -416,6 +419,8 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
     end
   end
 
+  GiveOrderToUnit(unitID, CMD.STOP, {}, {})
+  
   if (vl ~= nil) then 
     GiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {vl[1], vl[2], vl[3], CONST_UNLOAD_RADIUS}, {"shift"})
     
