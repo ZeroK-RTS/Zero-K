@@ -24,7 +24,7 @@ local SIG_AIM = 2
 local SIG_BUILD = 3
 local SIG_STOPBUILD = 4
 
-local PERIOD = 0.2
+local PERIOD = 0.22
 
 local sleepTime = PERIOD*1000
 
