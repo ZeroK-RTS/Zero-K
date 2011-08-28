@@ -22,7 +22,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit)
-	StartThread(Lights)
+	--StartThread(Lights)
 end
 
 function script.QueryWeapon(num)

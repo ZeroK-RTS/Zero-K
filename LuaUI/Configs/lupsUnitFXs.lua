@@ -17,6 +17,7 @@ effectUnitDefs = {
     {class='StaticParticles', options=commandCoronaBlue},
     {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true},groundFlashBlue)},
   },
+  
   --// FUSIONS //--------------------------
   cafus = {
     {class='Bursts', options=cafusBursts},
@@ -88,6 +89,10 @@ effectUnitDefs = {
     {class='StaticParticles', options=MergeTable(radarBlink,{piece="head", delay=15})},
   },
 
+  corcan = {
+	--{class='StaticParticles', options=MergeTable(jackGlow, {piece="point"}) },
+  },  
+  
   spherepole = {
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="blade", onActive=false}},
   },
@@ -102,14 +107,6 @@ effectUnitDefs = {
   },    
 
   --// PLANES //----------------------------
-  armhawk = {
-    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=30, piece="ljet", onActive=true}},
-    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=30, piece="rjet", onActive=true}},
-    {class='AirJet', options={color={0.2,0.1,0.5}, width=5, length=30, piece="mjet", onActive=true}},
-    {class='Ribbon', options={width=1, size=8, piece="lwingtip"}},
-    {class='Ribbon', options={width=1, size=8, piece="rwingtip"}},
-    {class='Ribbon', options={width=1, size=8, piece="mwingtip"}},
-  },
   armcybr = {
     {class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle1", onActive=true}},
     {class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle2", onActive=true}},
@@ -135,6 +132,8 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=20, piece="Jet2", onActive=true}},
     {class='Ribbon', options={width=1, size=6, piece="LWingTip"}},
     {class='Ribbon', options={width=1, size=6, piece="RWingTip"}},
+	--{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="LWingTip"}) },
+	--{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="RWingTip"}) },	
   },
   armcsa = {
     {class='AirJet', options={color={0.45,0.45,0.9}, width=2.8, length=15, piece="enginel", onActive=true}},
@@ -162,15 +161,13 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, size=10, piece="wingtipl"}},
     {class='Ribbon', options={width=1, size=10, piece="wingtipr"}},  
   },
-  armdfly = {
-    {class='AirJet', options={color={0.1,0.5,0.3}, width=3.2, length=22, piece="jet1", onActive=true}},
-    {class='AirJet', options={color={0.1,0.5,0.3}, width=3.2, length=22, piece="jet2", onActive=true}},
-  },
   corshad = {
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustr", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='AirJet', options={color={0.2,0.4,0.8}, width=4, length=30, piece="thrustl", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='Ribbon', options={width=1, piece="wingtipl"}},
     {class='Ribbon', options={width=1, piece="wingtipr"}},
+	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipl"}) },
+	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipr"}) },
   },
   fighter = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
@@ -182,14 +179,12 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="rthrust1", onActive=true}},
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="rthrust2", onActive=true}},
   },
-  corhurc = {
-    {class='AirJet', options={color={0.5,0.1,0.0}, width=3.5, length=25, piece="nozzle1", onActive=true}},
-    {class='AirJet', options={color={0.5,0.1,0.0}, width=3.5, length=25, piece="nozzle2", onActive=true}},
-   },
   corhurc2 = {
     {class='AirJet', options={color={0.7,0.3,0.1}, width=5, length=40, piece="exhaust", onActive=true}},
     {class='Ribbon', options={width=1, piece="wingtipl"}},
     {class='Ribbon', options={width=1, piece="wingtipr"}},
+	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
+	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },	
   },
   corvamp = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust1", onActive=true}},

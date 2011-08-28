@@ -180,7 +180,6 @@ corfusCorona = {
   repeatEffect = true,
 }
 
-
 corfusNova = {
   layer       = 1,
   pos         = {0,40.5,0},
@@ -278,28 +277,79 @@ zenithCorona = {
 
 commandCoronaWhite = {
   heightFactor = 0.75,
-  life        = math.huge,
+  life        = 60,
   lifeSpread  = 0,
   radiusFactor = 6,
   sizeGrowth  = 0,
-  colormap    = { {1, 1, 1, 0.01} },
+  colormap    = { {1, 1, 1, 0.01}, {0.8, 0.8, 0.8, 0.01}, {1, 1, 1, 0.01}, },
   texture     = 'bitmaps/GPL/groundflash.tga',
   count       = 1,
   repeatEffect = true,
 }
 
 local commandCoronaColors = {
-	Red = {0.6, 0.05, 0.05, 0.01},
-	Blue = {0.05, 0.05, 0.6, 0.01},
-	Green = {0.05, 0.5, 0.05, 0.01},
-	Orange = {0.4, 0.15, 0.05, 0.01},
+	Red = { {0.6, 0.05, 0.05, 0.01}, {0.48, 0.04, 0.04, 0.01}, {0.6, 0.05, 0.05, 0.01}, },
+	Blue = { {0.05, 0.05, 0.6, 0.01}, {0.04, 0.04, 0.48, 0.01}, {0.05, 0.05, 0.6, 0.01}, },
+	Green = { {0.05, 0.5, 0.05, 0.01}, {0.04, 0.4, 0.04, 0.01}, {0.05, 0.5, 0.05, 0.01}, },
+	Orange = { {0.4, 0.15, 0.05, 0.01}, {0.32, 0.12, 0.04, 0.01}, {0.4, 0.15, 0.05, 0.01}, },
 }
-for name, color in pairs(commandCoronaColors) do
-	local key = "commandCorona"..name
-	widget[key] = Spring.Utilities.CopyTable(commandCoronaWhite, true)
-	widget[key]["colormap"] = {color}
+
+local function InterpolateColors(startColor, endColor, steps)
+	local output = { startColor }
+	local alpha = startColor[4]
+	for i=1,steps do
+		output[i+1] = {}
+		for j=1,3 do
+			local stepSize = (endColor[j] - startColor[j])/steps
+			output[i+1][j] = output[i][j] + stepSize
+		end
+		output[i+1][4] = alpha
+	end
+	output[#output+1] = endColor
+	return output
 end
 
+--commandCoronaWhite.colorMap = InterpolateColors(commandCoronaWhite.colormap[1], commandCoronaWhite.colormap[2], 3)
+
+for name, color in pairs(commandCoronaColors) do
+	--color = InterpolateColors(color[1], color[2], 5)
+	local key = "commandCorona"..name
+	widget[key] = Spring.Utilities.CopyTable(commandCoronaWhite, true)
+	widget[key]["colormap"] = color
+end
+
+jackGlow = {
+  life        = 60,
+  lifeSpread  = 0,
+  size        = 60,
+  sizeSpread  = 5,
+  colormap    = { {1.0, 0.6, 0.2, 0.02}, {0.66, 0.4, 0.133, 0.02}, {1.0, 0.6, 0.2, 0.02} },
+  texture     = 'bitmaps/GPL/smallflare.tga',
+  count       = 1,
+  repeatEffect = true,
+}
+
+blinkyLightGreen = {
+  life        = 60,
+  lifeSpread  = 0,
+  size        = 20,
+  sizeSpread  = 0,
+  colormap    = { {0, 1, 0.2, 0.02}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} },
+  texture     = 'bitmaps/GPL/smallflare.tga',
+  count       = 1,
+  repeatEffect = true,
+}
+
+blinkyLightRed = {
+  life        = 60,
+  lifeSpread  = 0,
+  size        = 20,
+  sizeSpread  = 0,
+  colormap    = { {1, 0.1, 0.1, 0.02}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} },
+  texture     = 'bitmaps/GPL/smallflare.tga',
+  count       = 1,
+  repeatEffect = true,
+}
 
 ----------------------------------------------------------------------------
 -- OverDrive FXs -----------------------------------------------------------
