@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.06 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.061 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -228,7 +228,7 @@ options = {
 		desc = 'Show map-drawing tooltip when holding down the tilde (~).',
 	},
 	showterratooltip = {
-		name = "Show Terra Tooltip",
+		name = "Show Terraform Tooltip",
 		type = 'bool',
 		value = true,
 		desc = 'Show terraform tooltip when performing terraform commands.',
@@ -1782,13 +1782,23 @@ local function SetupTerraTips()
 			''
 	end
 	
+	terraTips.Smooth = terraTips.Smooth ..
+		yellow..'[During Terraform Draw]\n'..
+		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
+		''
+	
 	terraTips.Ramp =
-		green.. 'Step 1'..white..': Click to start ramp OR click&drag to start a ramp at desired height. \n'..
-		green.. 'Step 2'..white..': Click to set end of ramp. OR click&drag to set end of ramp at desired height. Hold '..green..'Alt'..white..' to snap to certain levels of pathability. \n'..
+		green.. 'Step 1'..white..': Click to start ramp \n    OR click&drag to start a ramp at desired height. \n'..
+		green.. 'Step 2'..white..': Click to set end of ramp \n    OR click&drag to set end of ramp at desired height. \n    Hold '..green..'Alt'..white..' to snap to certain levels of pathability. \n'..
 		green.. 'Step 3'..white..': Move mouse to set ramp width, click to complete. \n'..
 		'\n'..
 		yellow..'[Any Time]\n'..
 		green.. 'Space'..white..': Cycle through only raise/lower \n'..
+		'\n'..
+		yellow..'[Wireframe indicator colors]\n'..
+		green.. 'Green'..white..': All units can traverse. \n'..
+		green.. 'Yellow'..white..': Vehicles cannot traverse. \n'..
+		green.. 'Red'..white..': Only all-terrain / spiders can traverse. \n'..
 		''
 		
 	
