@@ -784,14 +784,18 @@ function widget:MousePress(mx, my, button)
 					orHeight = spGetGroundHeight(pos[1],pos[3])
 					
 					local a,c,m,s = spGetModKeyState()
-					if a then
-						local ty, id = spTraceScreenRay(mx, my, false)
-						if ty == "unit" then
-							local ud = UnitDefs[spGetUnitDefID(id)]
-							--if (ud.isBuilding == true or ud.maxAcc == 0) then
-								mouseUnit = {id = id, ud = ud}
-							--end
-						end
+					local ty, id = spTraceScreenRay(mx, my, false)
+					if c and ty == "unit" and c then
+						local ud = UnitDefs[spGetUnitDefID(id)]
+						--if (ud.isBuilding == true or ud.maxAcc == 0) then
+							mouseUnit = {id = id, ud = ud}
+						drawingRectangle = true
+						drawingLasso = false
+						point[1] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
+						point[2] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
+						point[3] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
+						--end
+					elseif a then
 						drawingRectangle = true
 						drawingLasso = false
 						point[1] = {x = floor((pos[1])/16)*16, y = spGetGroundHeight(pos[1],pos[3]), z = floor((pos[3])/16)*16}
