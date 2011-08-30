@@ -547,6 +547,11 @@ local icontypes = {
     size=2,
   },
   
+   sonar = {
+    bitmap='icons/sonar.dds',
+    size=2,
+  }, 
+  
   --now only covers snipers
   sniper = {
     bitmap='icons/sniper.dds',
