@@ -181,6 +181,7 @@ local icontypes = {
     bitmap='icons/kbotscout.dds',
     size=1.8,
   },
+  --puppy
   kbotbomb = {
     bitmap='icons/kbotbomb.dds',
     size=1.8,
@@ -285,8 +286,10 @@ local icontypes = {
     bitmap='icons/walkerscout.dds',
     size=2,
   },
+  --roach
   walkerbomb = {
     bitmap='icons/walkerbomb.png',
+	distance=0.5,
     size=1.8,
   },
   walkersupport = {
@@ -379,6 +382,7 @@ local icontypes = {
   },
   spiderscout = {
     bitmap='icons/spiderscout.dds',
+	distance=0.75,
     size=1.8,
   },
   spiderraider = {
@@ -401,8 +405,10 @@ local icontypes = {
     bitmap='icons/spideraa.dds',
     size=1.8,
   },
+  --tick
   spiderbomb = {
     bitmap='icons/spiderbomb.dds',
+	distance=0.5,
     size=1.8,
   },
   
@@ -419,8 +425,10 @@ local icontypes = {
     bitmap='icons/jumpjetassault.dds',
     size=1.8,
   },
+  --skuttle
   jumpjetbomb = {
     bitmap='icons/jumpjetbomb.dds',
+	distance=0.5,
     size=1.8,
   },
   jumpjetraider = {
@@ -666,6 +674,7 @@ local icontypes = {
   },  
   airbomb = {
     bitmap='icons/airbomb.dds',
+	distance=0.5,
     size=1.6,
   },
 
@@ -726,7 +735,7 @@ local icontypes = {
     size=2.5,
   },    
 
-  --icon for energy buildings of various tiers
+  --icon for energy buildings of various tiers, including pylon
   energy1 = {
     bitmap='icons/energy1.dds',
     size=1.8,
@@ -738,6 +747,10 @@ local icontypes = {
   energy3 = {
     bitmap='icons/energy3.dds',
     size=3.0,
+  },
+  pylon = {
+    bitmap='icons/pylon.dds',
+    size=1.8,
   },
 
   --icon for cruise missiles such as Detonator and Catalyst
@@ -786,6 +799,7 @@ local icontypes = {
   --landmines
   mine = {
     bitmap='icons/mine.dds',
+	distance=0.75,
     size=1.5,
   },
 
