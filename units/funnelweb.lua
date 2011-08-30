@@ -1,0 +1,292 @@
+unitDef = {
+  unitname               = [[funnelweb]],
+  name                   = [[Funnelweb]],
+  description            = [[Very Heavy Support Spider]],
+  acceleration           = 0.0552,
+  autoheal				 = 40,
+  brakeRate              = 0.1375,
+  buildCostEnergy        = 6000,
+  buildCostMetal         = 6000,
+  buildPic               = [[funnelweb.png]],
+  buildTime              = 6000,
+  canAttack              = true,
+  canGuard               = true,
+  canMove                = true,
+  canPatrol              = true,
+  canstop                = [[1]],
+  category               = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[70 60 65]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[box]],
+  corpse                 = [[DEAD]],
+
+  customParams           = {
+    helptext       = [[The slow all-terrain Funnelweb is only (relatively) modestly armed and can only fire forwards, but features a powerful area shield and an autorepair system.]],
+  },
+
+  explodeAs              = [[ESTOR_BUILDINGEX]],
+  footprintX             = 4,
+  footprintZ             = 4,
+  iconType               = [[t3special]],
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
+  leaveTracks            = true,
+  mass                   = 1848,
+  maxDamage              = 14000,
+  maxSlope               = 36,
+  maxVelocity            = 1.5,
+  maxWaterDepth          = 22,
+  minCloakDistance       = 150,
+  movementClass          = [[TKBOT4]],
+  noAutoFire             = false,
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  objectName             = [[funnelweb.s3o]],
+  pieceTrailCEGRange     = 1,
+  pieceTrailCEGTag       = [[trail_huge]],
+  seismicSignature       = 4,
+  selfDestructAs         = [[ESTOR_BUILDINGEX]],
+
+  sfxtypes               = {
+
+    explosiongenerators = {
+      [[custom:RAIDMUZZLE]],
+      [[custom:RAIDDUST]],
+    },
+
+  },
+  script				 = [[funnelweb.lua]],
+  side                   = [[CORE]],
+  sightDistance          = 650,
+  trackOffset            = 0,
+  trackStrength          = 8,
+  trackStretch           = 1,
+  trackType              = [[ChickenTrackPointy]],
+  trackWidth             = 64,
+  turnRate               = 240,
+  workerTime             = 0,
+
+  weapons                = {
+
+    {
+      def                = [[CANNON]],
+      badTargetCategory  = [[FIXEDWING]],
+      mainDir            = [[0 0 1]],
+	  maxAngleDif		 = 40,
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+
+    {
+      def                = [[GRASERTRIGGER]],
+      badTargetCategory  = [[FIXEDWING]],
+      mainDir            = [[0 0 1]],
+	  maxAngleDif		 = 90,
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },  	
+	
+    {
+      def                = [[GRASER]],
+    },		
+
+    {
+      def                = [[SHIELD]],
+    },	
+	
+  },
+
+
+  weaponDefs             = {
+
+    GRASERTRIGGER  = {
+      name                    = [[Fake Weapon]],
+      areaOfEffect            = 8,
+      avoidFeature            = false,
+      collideFriendly         = false,
+      coreThickness           = 0,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = -0.001,
+        subs    = -0.001,
+      },
+
+      duration                = 0.02,
+      explosionGenerator      = [[custom:NONE]],
+      fireStarter             = 0,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      range                   = 400,
+      reloadtime              = 8,
+      rgbColor                = [[0 0 0]],
+      soundTrigger            = true,
+      targetMoveError         = 0.2,
+      thickness               = 0.001,
+      tolerance               = 0,
+      turret                  = true,
+      weaponType              = [[LaserCannon]],
+      weaponVelocity          = 2300,
+    },
+
+    CANNON = {
+      name                    = [[Heavy Pulse Cannon]],
+	  accuracy				  = 400,
+      alphaDecay              = 0.1,
+      areaOfEffect            = 64,
+      colormap                = [[1 0.95 0.4 1   1 0.95 0.4 1    0 0 0 0.01    1 0.7 0.2 1]],
+      craterBoost             = 0.15,
+      craterMult              = 0.3,
+
+      damage                  = {
+        default = 200,
+        planes  = 200,
+        subs    = 10,
+      },
+
+      endsmoke                = [[0]],
+      explosionGenerator      = [[custom:babette]],
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      intensity               = 0.7,
+      interceptedByShieldType = 1,
+      noGap                   = false,
+      range                   = 480,
+      reloadtime              = 0.4,
+      rgbColor                = [[1 0.95 0.4]],
+      separation              = 1.5,
+      sizeDecay               = 0,
+      soundStart              = [[weapon/cannon/cannon_fire8]],
+      soundStartVolume        = 4,
+      stages                  = 10,
+      tolerance               = 5000,
+      turret                  = true,
+      weaponTimer             = 0.1,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 860,
+    },
+	
+    GRASER = {
+      name                    = [[Light Graser]],
+      areaOfEffect			  = 8,
+      beamTime                = 0.01,
+	  beamDecay				  = 0.8,
+	  beamttl				  = 15,
+	  burst					  = 60,
+	  burstRate				  = 0.03,
+	  canAttackGround		  = false,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 20,
+        planes  = 20,
+        subs    = 1,
+      },
+
+      explosionGenerator      = [[custom:flash1orange]],
+      fireStarter             = 120,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 3.5,
+      minIntensity            = 1,
+      range                   = 300,
+      reloadtime              = 8,
+      rgbColor                = [[1 0.3 0]],
+      --soundStart              = [[weapon/laser/laser_burn10]],
+      --soundTrigger            = true,
+      --sweepfire               = true,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 3,
+      tolerance               = 18000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+    },	
+
+    SHIELD = {
+      name                    = [[Energy Shield]],
+      craterMult              = 0,
+
+      damage                  = {
+        default = 10,
+      },
+
+      exteriorShield          = true,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      isShield                = true,
+      shieldAlpha             = 0.4,
+      shieldBadColor          = [[1 0.1 0.1]],
+      shieldGoodColor         = [[0.1 0.1 1]],
+      shieldInterceptType     = 3,
+      shieldPower             = 10500,
+      shieldPowerRegen        = 120,
+      shieldPowerRegenEnergy  = 24,
+      shieldRadius            = 400,
+      shieldRepulser          = false,
+      smartShield             = true,
+      texture1                = [[wakelarge]],
+      visibleShield           = true,
+      visibleShieldHitFrames  = 4,
+      visibleShieldRepulse    = true,
+      weaponType              = [[Shield]],
+    },	
+	
+  },
+
+
+  featureDefs            = {
+
+    DEAD  = {
+      description      = [[Wreckage - Funnelweb]],
+      blocking         = true,
+      category         = [[corpses]],
+      damage           = 14000,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 4,
+      footprintZ       = 4,
+      height           = [[8]],
+      hitdensity       = [[100]],
+      metal            = 2400,
+      object           = [[GORG_DEAD]],
+      reclaimable      = true,
+      reclaimTime      = 2400,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+
+    HEAP  = {
+      description      = [[Debris - Jugglenaut]],
+      blocking         = false,
+      category         = [[heaps]],
+      damage           = 14000,
+      energy           = 0,
+      featurereclamate = [[SMUDGE01]],
+      footprintX       = 4,
+      footprintZ       = 4,
+      height           = [[2]],
+      hitdensity       = [[100]],
+      metal            = 1200,
+      object           = [[debris4x4a.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 1200,
+      seqnamereclamate = [[TREE1RECLAMATE]],
+      world            = [[All Worlds]],
+    },
+
+  },
+
+}
+
+return lowerkeys({ funnelweb = unitDef })
