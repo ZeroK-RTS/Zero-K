@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Weaver]],
   description            = [[Construction Spider, Builds at 9 m/s]],
   acceleration           = 0.2,
-  bmcode                 = [[1]],
   brakeRate              = 0.2,
   buildCostEnergy        = 200,
   buildCostMetal         = 200,
@@ -46,8 +45,6 @@ unitDef = {
     helptext_de    = [[Der Weaver ist eine bauende Einheit, die Hindernisse überwinden und somit Verteidigungsanlagen auf Erhöhungen bauen kann.]],
   },
 
-  defaultmissiontype     = [[Standby]],
-  designation            = [[ARM-MLSPD]],
   energyMake             = 0.15,
   energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
@@ -75,8 +72,6 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 295,
   smoothAnim             = true,
-  steeringmode           = [[1]],
-  TEDClass               = [[CNSTR]],
   trackOffset            = 0,
   trackStrength          = 10,
   trackStretch           = 1,
@@ -86,7 +81,6 @@ unitDef = {
   threed                 = [[1]],
   turnRate               = 1400,
   workerTime             = 9,
-  zbuffer                = [[1]],
 
   featureDefs            = {
 
@@ -108,27 +102,6 @@ unitDef = {
       seqnamereclamate = [[tree1reclamate]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Weaver]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 850,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[smudge01]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 92,
-      object           = [[debris3x3b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 92,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Weaver]],

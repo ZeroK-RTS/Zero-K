@@ -11,8 +11,6 @@ local weaponDef = {
 	
 	customParams			= {
 		slot = [[5]],
-		rangeperlevel = [[15]],
-		damageperlevel = [[1.5]],
 	},		  
 	
 	-- nominal DPS is a lie, actual value is over 30% higher
