@@ -78,8 +78,8 @@ local moveDefs = {
 	},
 	
 	TKBOT4 = {		--allterrain
-		footprintx = 3,
-		footprintz = 3,
+		footprintx = 4,
+		footprintz = 4,
 		maxwaterdepth = 22,
 		maxslope = 70,
 		crushstrength = 500,
