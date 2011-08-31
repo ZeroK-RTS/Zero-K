@@ -124,8 +124,8 @@ function script.StopBuilding()
 end
 
 function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),flare)
-	return flare
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),gun)
+	return gun
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -177,23 +177,3 @@ function script.Killed(recentDamage, maxHealth)
 		return 2
 	end
 end
------------
-
-
-
-function script.StartBuilding(heading, pitch) 
-	if GetUnitValue(COB.INBUILDSTANCE) == 0 then
-		SetUnitValue(COB.INBUILDSTANCE, 1)
-	end
-end
-
-function script.StopBuilding()
-	if GetUnitValue(COB.INBUILDSTANCE) == 1 then
-		SetUnitValue(COB.INBUILDSTANCE, 0)
-	end
-end
-
-function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),turret)
-	return turret
-end
