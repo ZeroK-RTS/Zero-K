@@ -124,9 +124,9 @@ local function HideMissile(num)
 end
 
 function script.Shot(num)
-	StartThread(HideMissile, gun_1)
 	gun_1 = gun_1 + 1
 	if gun_1 > 3 then gun_1 = 1 end
+	StartThread(HideMissile, gun_1)
 end
 
 function script.Killed(recentDamage, maxHealth)
