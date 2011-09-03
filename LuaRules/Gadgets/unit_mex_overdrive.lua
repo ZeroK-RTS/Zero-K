@@ -23,6 +23,7 @@ local pylonDefs = {}
 local linkdefs = {}
 
 local DEFAULT_PYLON_RANGE = 200 -- mex range, link = range*2
+local MEX_OWNER_SHARE = 0.5 -- 50% to owner
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
@@ -550,7 +551,7 @@ local function AddNewMexes(n)
 				if (allyTeamID) then
 					local mm, mu = Spring.GetUnitResources(unitID)
 					local metalMake = (mm or 0) - (mu or 0)
-					metalMake = metalMake * 20
+					metalMake = metalMake / MEX_OWNER_SHARE
 					mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 					
 					Spring.CallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
@@ -635,7 +636,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								local mexE = gridE*(orgMetal * orgMetal)/ gridMetalSquared 
 								local metalMult = energyToExtraM(mexE)
 								Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
-								local thisMexM = orgMetal + orgMetal * metalMult
+								local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
 								Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
 								maxedMetalProduction = maxedMetalProduction + thisMexM
 								maxedOverdriveMetal = maxedOverdriveMetal + orgMetal * metalMult
@@ -657,7 +658,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					
 					local metalMult = energyToExtraM(mexE)
 					Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
-					local thisMexM = orgMetal + orgMetal * metalMult
+					local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
 					Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedOverdriveMetal = summedOverdriveMetal + orgMetal * metalMult

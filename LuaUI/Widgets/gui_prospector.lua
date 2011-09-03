@@ -13,7 +13,10 @@ function widget:GetInfo()
 	}
 end
 
+local MEX_OWNER_SHARE = 0.5
+
 local textSize = 16
+
 
 ------------------------------------------------
 --speedups
@@ -167,7 +170,7 @@ local function IntegrateMetal(mexDefInfo, x, z, forceUpdate)
 	startX, startZ = max(startX, 0), max(startZ, 0)
 	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
 	
-	local mult = mexDefInfo[1] * 20 -- multiplied to show correct value due to overdrive system which sets extraction to 5%
+	local mult = mexDefInfo[1] / MEX_OWNER_SHARE -- multiplied to show correct value due to overdrive system which sets extraction to 5%
 	local square = mexDefInfo[2]
 	local result = 0
 	
