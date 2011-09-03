@@ -518,6 +518,7 @@ end --//end do
 --------------------------------------------------------------------------------
 
 local DrawUnitInfos
+local JustGetOverlayInfos
 
 do
   --//speedup
@@ -543,6 +544,34 @@ do
 
   local customInfo = {}
   local ci
+  
+  function JustGetOverlayInfos(unitID,unitDefID, ud)
+    
+	ux, uy, uz = GetUnitViewPosition(unitID)
+    dx, dy, dz = ux-cx, uy-cy, uz-cz
+    dist = dx*dx + dy*dy + dz*dz
+	
+	if (dist > 9000000) then
+      return
+    end
+   
+    local empHP = (not paralyzeOnMaxHealth) and health or maxHealth
+    emp = (paralyzeDamage or 0)/empHP
+    hp  = (health or 0)/maxHealth
+    morph = UnitMorphs[unitID]
+  
+    if (drawUnitsOnFire)and(GetUnitRulesParam(unitID,"on_fire")==1) then
+      onFireUnits[#onFireUnits+1]=unitID
+    end
+  
+    --// PARALYZE
+	  if (emp>0.01)and(hp>0.01)and((not morph) or morph.combatMorph)and(emp<1e8) then
+        local stunned = GetUnitIsStunned(unitID)
+        if (stunned) then
+          paraUnits[#paraUnits+1]=unitID
+		end
+	end
+  end
 
   function DrawUnitInfos(unitID,unitDefID, ud)
     if (not customInfo[unitDefID]) then
@@ -906,51 +935,62 @@ do
   local glDepthMask          = gl.DepthMask
 
   function widget:DrawWorld()
-	if Spring.IsGUIHidden() then return end
-    if (#visibleUnits+#visibleFeatures==0) then
-      return
-    end
-
-    --gl.Fog(false)
-    --gl.DepthTest(true)
-    glDepthMask(true)
-
-    cx, cy, cz = GetCameraPosition()
-
-    if (barShader) then gl.UseShader(barShader); glMyText(0); end
-
-    --// draw bars of units
-    local unitID,unitDefID,unitDef
-    for i=1,#visibleUnits do
-      unitID    = visibleUnits[i]
-      unitDefID = GetUnitDefID(unitID)
-      unitDef   = UnitDefs[unitDefID or -1]
-      if (unitDef) then
-        DrawUnitInfos(unitID, unitDefID, unitDef)
+	if not Spring.IsGUIHidden() then 
+      if (#visibleUnits+#visibleFeatures==0) then
+        return
       end
-    end
-
-    --// draw bars for features
-    local wx, wy, wz, dx, dy, dz, dist
-    local featureInfo
-    for i=1,#visibleFeatures do
-      featureInfo = visibleFeatures[i]
-      wx, wy, wz = featureInfo[1],featureInfo[2],featureInfo[3]
-      dx, dy, dz = wx-cx, wy-cy, wz-cz
-      dist = dx*dx + dy*dy + dz*dz
-      if (dist < 6000000) then
-        if (dist < infoDistance) then
-          DrawFeatureInfos(featureInfo[4], featureInfo[5], true, wx,wy,wz)
-        else
-          DrawFeatureInfos(featureInfo[4], featureInfo[5], false, wx,wy,wz)
+      
+      --gl.Fog(false)
+      --gl.DepthTest(true)
+      glDepthMask(true)
+      
+      cx, cy, cz = GetCameraPosition()
+      
+      if (barShader) then gl.UseShader(barShader); glMyText(0); end
+      
+      --// draw bars of units
+      local unitID,unitDefID,unitDef
+      for i=1,#visibleUnits do
+        unitID    = visibleUnits[i]
+        unitDefID = GetUnitDefID(unitID)
+        unitDef   = UnitDefs[unitDefID or -1]
+        if (unitDef) then
+          DrawUnitInfos(unitID, unitDefID, unitDef)
         end
       end
-    end
+      
+      --// draw bars for features
+      local wx, wy, wz, dx, dy, dz, dist
+      local featureInfo
+      for i=1,#visibleFeatures do
+        featureInfo = visibleFeatures[i]
+        wx, wy, wz = featureInfo[1],featureInfo[2],featureInfo[3]
+        dx, dy, dz = wx-cx, wy-cy, wz-cz
+        dist = dx*dx + dy*dy + dz*dz
+        if (dist < 6000000) then
+          if (dist < infoDistance) then
+            DrawFeatureInfos(featureInfo[4], featureInfo[5], true, wx,wy,wz)
+          else
+            DrawFeatureInfos(featureInfo[4], featureInfo[5], false, wx,wy,wz)
+          end
+        end
+      end
+	else
+	  local unitID,unitDefID,unitDef
+      for i=1,#visibleUnits do
+        unitID    = visibleUnits[i]
+        unitDefID = GetUnitDefID(unitID)
+        unitDef   = UnitDefs[unitDefID or -1]
+        if (unitDef) then
+          JustGetOverlayInfos(unitID, unitDefID, unitDef)
+        end
+      end
+	end
 
     if (barShader) then gl.UseShader(0) end
     glDepthMask(false)
-
-    DrawOverlays()
+	
+	DrawOverlays()
 
     glColor(1,1,1,1)
     --gl.DepthTest(false)
