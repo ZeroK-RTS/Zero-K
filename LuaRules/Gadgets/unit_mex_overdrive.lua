@@ -23,7 +23,7 @@ local pylonDefs = {}
 local linkdefs = {}
 
 local DEFAULT_PYLON_RANGE = 200 -- mex range, link = range*2
-local MEX_OWNER_SHARE = 0.5 -- 50% to owner
+local MEX_OWNER_SHARE = 0.05 -- 5% to owner
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
