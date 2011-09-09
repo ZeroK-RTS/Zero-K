@@ -945,7 +945,6 @@ local function ScrollTabRight()
 	if menuChoice >= 2 and menuChoice <= 5 then lastBuildChoice = menuChoice end
 	Update(true)
 	ColorTabs()
-	return
 end
 
 local function ScrollTabLeft()
@@ -954,7 +953,6 @@ local function ScrollTabLeft()
 	if menuChoice >= 2 and menuChoice <= 5 then lastBuildChoice = menuChoice end
 	Update(true)
 	ColorTabs()
-	return
 end
 
 local function AddAction(cmd, func, data, types)
@@ -969,8 +967,8 @@ function widget:Initialize()
 	widgetHandler:ConfigLayoutHandler(LayoutHandler)
 	Spring.ForceLayoutUpdate()
 
-	AddAction("nextmenu", ScrollTabRight, nil, "t")
-	AddAction("prevmenu", ScrollTabLeft, nil, "t")
+	AddAction("nexttab", ScrollTabRight)
+	AddAction("prevtab", ScrollTabLeft)
 	--[[local f,it,isFile = nil,nil,false
 	f  = io.open('cmdcolors.txt','r')
 	if f then
@@ -1216,8 +1214,8 @@ end
 function widget:Shutdown()
   widgetHandler:ConfigLayoutHandler(nil)
   Spring.ForceLayoutUpdate()
-  RemoveAction("nextmenu", "t")
-  RemoveAction("prevmenu", "t")
+  RemoveAction("nexttab")
+  RemoveAction("prevtab")
 end
 
 options.hidetabs.OnChange = function(self) 
