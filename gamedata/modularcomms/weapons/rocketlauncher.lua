@@ -9,8 +9,6 @@ local weaponDef = {
 	customParams			= {
 		slot = [[5]],
 		muzzleEffect = [[custom:STORMMUZZLE]],
-		rangeperlevel = [[24]],
-		damageperlevel = [[18]],
 	},
 	
 	damage                  = {

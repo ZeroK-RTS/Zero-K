@@ -9,8 +9,6 @@ local weaponDef = {
 	
 	customParams			= {
 		slot = [[5]],
-		rangeperlevel = [[20]],
-		damageperlevel = [[0.75]],
 		muzzleEffect = [[custom:BEAMWEAPON_MUZZLE_BLUE]],
 	},
 	
