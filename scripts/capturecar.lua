@@ -69,7 +69,6 @@ local function AnimControl()
 			Show( tracks1)
 		end
 		--pivot
-		--[[
 		currHeading = GetUnitValue(COB.HEADING)
 		diffHeading = currHeading - lastHeading
 		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then diffHeading = 0 end
@@ -83,7 +82,6 @@ local function AnimControl()
 		Turn( rear , y_axis, (0 - pivotAngle ),PIVOT_SPEED )
 		
 		lastHeading = currHeading
-		]]--
 		Sleep( ANIM_PERIOD)
 	end
 end
