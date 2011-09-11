@@ -140,6 +140,7 @@ local resources = {
       shell= "pd/shell.tga",
 	  shield= "pd/shield.png",
 	  shield2= "pd/shield2.png",
+	  shield3= "pd/shield3.png",
       smallflare= "gpl/smallflare.tga",
       smoke= "pd/smokesmall.tga",
       smokesmall= "pd/smokesmall.tga",
@@ -156,7 +157,6 @@ local resources = {
       uglynovaexplo= "cc/uglynovaexplo.tga",
       whitelightb= "pd/whitelightningball.tga",
 	  whitelightgpl = 'GPL/lightw.png',
-
 	  },
 	},
 }
