@@ -398,7 +398,7 @@ return {
         pos                = [[10 r-20, 0, 10 r-20]],
         sizegrowth         = 0,
         sizemod            = 1.0,
-        texture            = [[flame]],
+        texture            = [[fireball]],
       },
     },
   },
