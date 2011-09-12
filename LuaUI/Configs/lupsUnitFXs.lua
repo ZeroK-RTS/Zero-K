@@ -45,20 +45,19 @@ effectUnitDefs = {
   },
 
   --// SHIELDS //---------------------------
-  --[[
   corjamt = {
-    {class='Bursts', options=corjamtBursts},
-    {class='ShieldSphere', options={life=math.huge, piece="glow", size=13, colormap1 = {{0.8, 0.1, 0.8, 0.5}}, repeatEffect=true}},
-	{class='ShieldSphere', options={piece="base", life=math.huge, size=350, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
-    {class='GroundFlash', options=groundFlashViolett},
-	{class='GroundFlash', options=groundFlashShield},
+   {class='Bursts', options=corjamtBursts},
+    {class='ShieldSphere', options={life=math.huge, piece="glow", size=11, colormap1 = {{0.8, 0.1, 0.8, 0.5}}, repeatEffect=true}},
+--	{class='ShieldSphere', options={piece="base", life=math.huge, size=350, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
+--  {class='GroundFlash', options=groundFlashViolett},
+--	{class='GroundFlash', options=groundFlashShield},
+--	{class='UnitPieceLight', options={piece="glow", colormap = {{0,0,1,0.2}},},},
   },
   core_spectre = {
     {class='Bursts', options=MergeTable({piece="glow"},corjamtBursts)},
     {class='ShieldSphere', options={piece="glow", life=math.huge, size=11, colormap1 = {{0.95, 0.1, 0.95, 0.9}}, repeatEffect=true}},
-	{class='ShieldSphere', options={piece="base", life=math.huge, size=350, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
+--	{class='ShieldSphere', options={piece="base", life=math.huge, size=360, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
   },
-  --]]
 
   --// ENERGY STORAGE //--------------------
   corestor = {
