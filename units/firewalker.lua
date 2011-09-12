@@ -34,7 +34,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maneuverleashlength    = [[640]],
   mass                   = 347,
   maxDamage              = 1250,
   maxSlope               = 36,
@@ -92,6 +91,20 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burntime = 180,
+--		lups_napalm_settings = [[ {
+--				count = 400,
+--				partpos = "r*sin(alpha),-60+2*r,r*cos(alpha) | r=rand()*75, alpha=rand()*2*pi",
+--				delay = 0,
+--				delaySpread = 390,
+--			} ]],
+		lups_heat_settings = [[ {
+				life = 1600,
+				size = 350,
+				lifeSpread = 300,
+				speed           = 0.025,
+				speedSpread     = 0.01,
+				sizeGrowth		= 0.06,
+			} ]],			
 	  },
 	  
       damage                  = {
@@ -106,11 +119,9 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       myGravity               = 0.1,
-      noSelfDamage            = true,
       projectiles             = 2,
       range                   = 900,
       reloadtime              = 18,
-      renderType              = 4,
       rgbColor                = [[1 0.5 0.2]],
       size                    = 8,
       soundHit                = [[weapon/cannon/wolverine_hit]],

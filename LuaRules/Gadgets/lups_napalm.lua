@@ -20,7 +20,7 @@ if (gadgetHandler:IsSyncedCode()) then
   --// find napalms
   for i=1,#WeaponDefs do
     local wd = WeaponDefs[i]
-    if (wd.description:find("Napalm")) then
+    if (wd.description:find("Napalm") or (wd.customParams and wd.customParams.setunitsonfire)) then
       Script.SetWatchWeapon(wd.id,true)
       napalmWeapons[wd.id] = true
     end
@@ -33,7 +33,7 @@ if (gadgetHandler:IsSyncedCode()) then
 
   function gadget:Explosion(weaponID, px, py, pz)
     if (napalmWeapons[weaponID]) then
-      napalmExplosions[#napalmExplosions+1] = {px, py, pz}
+      napalmExplosions[#napalmExplosions+1] = {weaponID, px, py, pz}
     end
     return false
   end
@@ -49,6 +49,9 @@ if (gadgetHandler:IsSyncedCode()) then
 
 else
 
+  local CopyTable = Spring.Utilities.CopyTable
+  local MergeTable = Spring.Utilities.MergeTable
+  
   local napalmFX = {
     colormap        = { {0, 0, 0, 0.01}, {0.75, 0.75, 0.9, 0.02}, {0.45, 0.2, 0.3, 0.1}, {0.4, 0.16, 0.1, 0.12}, {0.3, 0.15, 0.01, 0.15},  {0.3, 0.15, 0.01, 0.15}, {0.3, 0.15, 0.01, 0.15}, {0.1, 0.035, 0.01, 0.15}, {0, 0, 0, 0.01} },
     count           = 4,
@@ -77,7 +80,6 @@ else
     layer           = 1,
     texture         = "bitmaps/GPL/flame.png",
   }
-
 
   local heatFX = {
     count         = 1,
@@ -109,11 +111,22 @@ else
   local LupsAddParticles 
   local SYNCED = SYNCED
 
-  local function SpawnNapalmFX(pos)
-    napalmFX.pos = {pos[1],pos[2],pos[3]}
-    Lups.AddParticles('SimpleParticles2',napalmFX)
-    heatFX.pos = napalmFX.pos
-    Lups.AddParticles('JitterParticles2',heatFX)
+  local function SpawnNapalmFX(data)
+	local nFX = CopyTable(napalmFX, true)
+	local hFX = CopyTable(heatFX, true)
+	local nFX2func = WeaponDefs[data[1]].customParams and WeaponDefs[data[1]].customParams.lups_napalm_settings and loadstring("return "..(WeaponDefs[data[1]].customParams.lups_napalm_settings))
+	local hFX2func = WeaponDefs[data[1]].customParams and WeaponDefs[data[1]].customParams.lups_heat_settings and loadstring("return "..(WeaponDefs[data[1]].customParams.lups_heat_settings))
+	local nFX2 = nFX2func and nFX2func() or {}
+	local hFX2 = hFX2func and hFX2func() or {}
+	
+	for i,v in pairs(nFX2) do nFX[i] = v end
+	for i,v in pairs(hFX2) do hFX[i] = v end
+	--for i,v in pairs(nFX) do Spring.Echo(i,v) end	
+	
+    nFX.pos = {data[2],data[3],data[4]}
+    Lups.AddParticles('SimpleParticles2',nFX)
+    hFX.pos = nFX.pos
+    Lups.AddParticles('JitterParticles2',hFX)
   end
 
   local function GameFrame()
