@@ -100,7 +100,7 @@ unitDef = {
         subs    = 4,
       },
 
-      explosionGenerator      = [[custom:firewalkernapalm]],
+      explosionGenerator      = [[custom:firewalker_impact]],
       firestarter             = 180,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -109,7 +109,7 @@ unitDef = {
       noSelfDamage            = true,
       projectiles             = 2,
       range                   = 900,
-      reloadtime              = 12,
+      reloadtime              = 18,
       renderType              = 4,
       rgbColor                = [[1 0.5 0.2]],
       size                    = 8,

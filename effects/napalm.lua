@@ -239,35 +239,118 @@ return {
 
   ["firewalker_impact"] = {
     usedefaultexplosions = false,
+    balls = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 3,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.5,
+        colormap           = [[0 0 0 0.01   .6 .6 .6 0.1     .6 .6 .6 0.1     0 0 0 0.01]],
+        directional        = false,
+        emitrot            = 90,
+        emitrotspread      = 90,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0.001 r-0.002, 0.03 r-0.06, 0.001 r-0.002]],
+        numparticles       = 1,
+        particlelife       = 500,	--minimum particle lifetime in frames
+        particlelifespread = 100,	--max value of random lifetime added to each particle's lifetime
+        particlesize       = 90,
+        particlesizespread = 10,
+        particlespeed      = 0.8,
+        particlespeedspread = 1.2,
+        pos                = [[50 r-100, 50 r-50, 50 r-100]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[fireball]],
+      },
+    },
 	redground = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 22,
+      count              = 30,
       ground             = true,
       water              = true,
       properties = {
         delay              = [[0 r20 i20]],
-        explosiongenerator = [[custom:redground]],
-        pos                = [[20 r-40, -100, 20 r-40]],
+        explosiongenerator = [[custom:redground128]],
+        pos                = [[20 r-40, -80, 20 r-40]],
       },
     },
 	redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 50,
+      count              = 75,
       ground             = true,
       water              = true,
       properties = {
-        delay              = [[0 i9]],
-        explosiongenerator = [[custom:NAPALMFIREBALL_firewalker]],
-        pos                = [[100 r-200, 5, 100 r-200]],
+        delay              = [[0 i8]],
+        explosiongenerator = [[custom:NAPALMFIREBALL]],
+        pos                = [[100 r-200, 100 r-200, 100 r-200]],
       },
     },
   },
-  ["redground"] = {
+  
+  ["napalmmissile_impact"] = {
+  usedefaultexplosions = false,
+    balls = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 9,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.5,
+        colormap           = [[0 0 0 0.01   .6 .6 .6 0.1     .6 .6 .6 0.1     0 0 0 0.01]],
+        directional        = false,
+        emitrot            = 90,
+        emitrotspread      = 90,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0.001 r-0.002, 0.03 r-0.06, 0.001 r-0.002]],
+        numparticles       = 1,
+        particlelife       = 1000,	--minimum particle lifetime in frames
+        particlelifespread = 200,	--max value of random lifetime added to each particle's lifetime
+        particlesize       = 90,
+        particlesizespread = 10,
+        particlespeed      = 0.8,
+        particlespeedspread = 1.2,
+        pos                = [[100 r-200, 100 r-100, 100 r-200]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[fireball]],
+      },
+    },
+	redground = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 66,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 r20 i20]],
+        explosiongenerator = [[custom:redground256]],
+        pos                = [[20 r-40, -80, 20 r-40]],
+      },
+    },
+	redploom_long = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 320,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i4]],
+        explosiongenerator = [[custom:NAPALMFIREBALL]],
+        pos                = [[200 r-400, 100 r-200, 200 r-400]],
+      },
+    },
+  },
+  
+  ["redground128"] = {
       groundflash = {
       flashalpha         = 0.7,
-      flashsize          = 200,
+      flashsize          = 150,
       ttl                = 100,
       color = {
         [1]  = 0.7,
@@ -276,7 +359,21 @@ return {
       },
     },
   },
-  ["napalmfireball_firewalker"] = {
+  
+  ["redground256"] = {
+      groundflash = {
+      flashalpha         = 0.7,
+      flashsize          = 300,
+      ttl                = 100,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+  },
+  
+  ["napalmfireball"] = {
     rocks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -291,7 +388,7 @@ return {
         emitrotspread      = 90,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0.001 r-0.002, 0.3 r0.6, 0.001 r-0.002]],
-        numparticles       = 2,
+        numparticles       = 1,
         particlelife       = 50,	--minimum particle lifetime in frames
         particlelifespread = 50,	--max value of random lifetime added to each particle's lifetime
         particlesize       = 30,
@@ -301,7 +398,7 @@ return {
         pos                = [[10 r-20, 0, 10 r-20]],
         sizegrowth         = 0,
         sizemod            = 1.0,
-        texture            = [[fireball]],
+        texture            = [[flame]],
       },
     },
   },
