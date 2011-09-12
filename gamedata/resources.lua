@@ -141,6 +141,7 @@ local resources = {
 	  shield= "pd/shield.png",
 	  shield2= "pd/shield2.png",
 	  shield3= "pd/shield3.png",
+	  shield3alt= "pd/shield3alt.png",
       smallflare= "gpl/smallflare.tga",
       smoke= "pd/smokesmall.tga",
       smokesmall= "pd/smokesmall.tga",
