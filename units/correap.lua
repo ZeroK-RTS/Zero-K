@@ -76,7 +76,7 @@ unitDef = {
 
     {
       def                = [[COR_REAP]],
-      badTargetCategory  = [[FIXEDWING]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
