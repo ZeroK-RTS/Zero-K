@@ -29,11 +29,11 @@ local TURRET_SPEED = math.rad(60)
 local TURRET_ACCEL = math.rad(2)
 
 local ANIM_PERIOD = 66
-local PIVOT_MOD = 11 --appox. equal to MAX_PIVOT / turnrate
-local MAX_PIVOT = math.rad(14)
-local MIN_PIVOT = math.rad(-14)
+local PIVOT_MOD = 1--appox. equal to MAX_PIVOT / turnrate
+local MAX_PIVOT = math.rad(15)
+local MIN_PIVOT = math.rad(-15)
 local PIVOT_SPEED = math.rad(60)
-local MIN_DIFF = math.rad(3)
+local MIN_DIFF = 3
 
 smokePiece = {base, turret}
 
@@ -70,7 +70,7 @@ local function AnimControl()
 		end
 		--pivot
 		currHeading = GetUnitValue(COB.HEADING)
-		diffHeading = currHeading - lastHeading
+		diffHeading = (currHeading - lastHeading)/15
 		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then diffHeading = 0 end
 		--hexadecimal wtf?
 		--if diffHeading > 0x7fff then diffHeading = diffHeading - 0x10000

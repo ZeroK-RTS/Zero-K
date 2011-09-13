@@ -17,8 +17,10 @@ local armr1 = piece 'armr1'
 local arml1 = piece 'arml1'
 local gunr = piece 'gunr'
 local gunl = piece 'gunl'
-local barrel1r = piece 'barrel1r'
-local barrel1l = piece 'barrel1l'
+local barrel1r, barrel2r, barrel3r = piece('barrel1r', 'barrel2r', 'barrel3r')
+local barrel1l, barrel2l, barrel3l = piece('barrel1l', 'barrel2l', 'barrel3l')
+local flare1r, flare2r, flare3r = piece('flare1r', 'flare2r', 'flare3r')
+local flare1l, flare2l, flare3l = piece('flare1l', 'flare2l', 'flare3l')
 
 local tail1 = piece 'tail1'
 local tail2 = piece 'tail2'
@@ -26,19 +28,27 @@ local tail3 = piece 'tail3'
 local tail4 = piece 'tail4'
 local tail5 = piece 'tail5'
 local tailgun = piece 'tailgun'
-
 local flare1 = piece 'flare1'
 
+local tailPieces = {tail1, tail2, tail3, tail4, tail5, tailgun}
+
 smokePiece = {base, tailgun}
+
+local weaponPieces = {
+	[1] = {aimFrom = tailgun, flare = {flare1} },
+	[2] = {pivot = gunl, pitch = arml1, aimFrom = gunl, flare = {flare1l, flare2l, flare3l} },
+	[3] = {pivot = gunr, pitch = armr1, aimFrom = gunr, flare = {flare1r, flare2r, flare3r} },
+}
+
+local gun_cycle = {[1] = 1, [2] = 1, [3] = 1}
 
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
 -- Signal definitions
 local SIG_WALK = 1
-local SIG_AIM1 = 2
-local SIG_AIM2 = 3
-local SIG_AIM3 = 4
+local SIG_AIM = {2, 4, 8}
+local SIG_RESTORE = 16
 
 local PERIOD = 0.135
 
@@ -63,8 +73,10 @@ local legBackwardTheta = -math.rad(25)
 local legBackwardOffset = math.rad(20)
 local legBackwardSpeed = legBackwardAngle/PERIOD
 
-local restore_delay = 3000
+local restore_delay = 5000
 
+local tailTurnSpeed = math.rad(20)
+local tailPitchSpeed = math.rad(10)
 
 -- four-stroke hexapedal walkscript
 local function Walk()
@@ -104,84 +116,58 @@ function script.StopMoving()
 end
 
 local function RestoreAfterDelay()
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(restore_delay)
-	Turn( tail1 , x_axis, 0, math.rad(50) )
-	Turn( tail2 , x_axis, 0, math.rad(50) )
-	Turn( tail3 , x_axis, 0, math.rad(50) )
-	Turn( tail4 , x_axis, 0, math.rad(50) )
-	Turn( tail5 , x_axis, 0, math.rad(50) )
-	Turn( tailgun , x_axis, 0, math.rad(50) )
-	Turn( tail1 , y_axis, 0, math.rad(50) )
-	Turn( tail2 , y_axis, 0, math.rad(50) )
-	Turn( tail3 , y_axis, 0, math.rad(50) )
-	Turn( tail4 , y_axis, 0, math.rad(50) )
-	Turn( tail5 , y_axis, 0, math.rad(50) )
-	Turn( tailgun , y_axis, 0, math.rad(50) )
+	local turnSpeed = tailTurnSpeed/2
+	local pitchSpeed = tailPitchSpeed/2
+	for i=1, #tailPieces do
+		Turn( tailPieces[i], x_axis, 0, pitchSpeed )
+		Turn( tailPieces[i], y_axis, 0, turnSpeed )
+	end
+	
+	for i=2,3 do
+		Turn( weaponPieces[i].pivot, y_axis, 0, math.rad(60) )
+		Turn( weaponPieces[i].pitch, x_axis, 0, math.rad(45) )
+	end
 end
 
-function script.AimWeapon1(heading, pitch)
-	Signal( SIG_AIM1)
-	SetSignalMask( SIG_AIM1)
-	Turn( tail1 , x_axis, (-pitch/6), math.rad(50) )
-	Turn( tail2 , x_axis, (-pitch/6), math.rad(50) )
-	Turn( tail3 , x_axis, (-pitch/6), math.rad(50) )
-	Turn( tail4 , x_axis, (-pitch/6), math.rad(50) )
-	Turn( tail5 , x_axis, (-pitch/6), math.rad(50) )
-	Turn( tailgun , x_axis, -(pitch/6), math.rad(50) )
-	Turn( tail1 , y_axis, (heading/6), math.rad(50) )
-	Turn( tail2 , y_axis, (heading/6), math.rad(50) )
-	Turn( tail3 , y_axis, (heading/6), math.rad(50) )
-	Turn( tail4 , y_axis, (heading/6), math.rad(50) )
-	Turn( tail5 , y_axis, (heading/6), math.rad(50) )
-	Turn( tailgun , y_axis, (heading/6), math.rad(50) )
-	WaitForTurn(tailgun, y_axis)
-	WaitForTurn(tailgun, x_axis)
-	StartThread(RestoreAfterDelay)
-	return true
+function script.AimWeapon(num, heading, pitch)
+	Signal( SIG_AIM[num])
+	SetSignalMask( SIG_AIM[num])
+	if num == 1 then
+		if heading > math.pi then heading = -(2 * math.pi - heading) end
+		for i=1, #tailPieces do
+			Turn( tailPieces[i], x_axis, -pitch/6, tailPitchSpeed )
+			Turn( tailPieces[i], y_axis, heading/6, tailTurnSpeed )
+		end
+		WaitForTurn(tailgun, y_axis)
+		WaitForTurn(tailgun, x_axis)
+		StartThread(RestoreAfterDelay)
+		return true
+	else
+		Turn( weaponPieces[num].pivot, y_axis, heading, math.rad(120) )
+		Turn( weaponPieces[num].pitch , x_axis, -pitch, math.rad(90) )
+		WaitForTurn(weaponPieces[num].pivot, y_axis)
+		WaitForTurn(weaponPieces[num].pitch, x_axis)
+		StartThread(RestoreAfterDelay)
+		return true	
+	end
 end
 
-function script.AimFromWeapon1()
-	return tailgun
+function script.AimFromWeapon(num)
+	return weaponPieces[num].aimFrom
 end
 
-function script.QueryWeapon1()
-	return flare1
+function script.QueryWeapon(num)
+	return weaponPieces[num].flare[gun_cycle[num]]
 end
 
-function script.AimWeapon2(heading, pitch)
-	Signal( SIG_AIM2)
-	SetSignalMask( SIG_AIM2)
-	Turn( gunl , y_axis, heading, math.rad(50) )
-	Turn( arml1 , x_axis, -pitch, math.rad(50) )
-	WaitForTurn(gunl, y_axis)
-	WaitForTurn(arml1, x_axis)
-	return true
-end
-
-function script.AimFromWeapon2()
-	return gunl
-end
-
-function script.QueryWeapon2()
-	return barrel1l
-end
-
-function script.AimWeapon3(heading, pitch)
-	Signal( SIG_AIM3)
-	SetSignalMask( SIG_AIM3)
-	Turn( gunr , y_axis, heading, math.rad(50) )
-	Turn( armr1 , x_axis, -pitch, math.rad(50) )
-	WaitForTurn(gunr, y_axis)
-	WaitForTurn(armr1, x_axis)
-	return true
-end
-
-function script.AimFromWeapon3()
-	return gunr
-end
-
-function script.QueryWeapon3()
-	return barrel1r
+function script.Shot(num)
+	if num > 1 then
+		gun_cycle[num] = gun_cycle[num] + 1
+		if gun_cycle[num] > 3 then gun_cycle[num] = 1 end
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -139,8 +139,9 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		return true
 	else
-		Turn( shieldArm , y_axis, heading, math.rad(75) )
-		--Turn( shield , y_axis, heading, math.rad(75) )
+		if heading > math.pi then heading = -(2 * math.pi - heading) end
+		Turn( shieldArm , y_axis, heading/2, math.rad(75) )
+		Turn( shield , y_axis, heading/2, math.rad(75) )
 		Turn( shield, x_axis, -pitch, math.rad(60) )
 		WaitForTurn(shieldArm, y_axis)
 		WaitForTurn(shield, y_axis)

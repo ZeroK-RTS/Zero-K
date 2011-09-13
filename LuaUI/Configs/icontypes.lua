@@ -443,23 +443,27 @@ local icontypes = {
   --striders (aka tier 3)
   t3riot = {
     bitmap='icons/t3riot.dds',
-    size=2.8,
+    size=2.7,
   },
   t3generic = {
     bitmap='icons/t3generic.dds',
-    size=2.5,
+    size=2.7,
   },
+  t3genericbig = {
+    bitmap='icons/t3generic.dds',
+    size=3,
+  },  
   t3special = {
     bitmap='icons/t3special.png',
-    size=2.5,
+    size=3,
   },
   t3arty = {
     bitmap='icons/t3arty.dds',
-    size=2.5,
+    size=2.7,
   },
   t3skirm = {
     bitmap='icons/t3skirm.dds',
-    size=2.5,
+    size=2.7,
   },
 
   
