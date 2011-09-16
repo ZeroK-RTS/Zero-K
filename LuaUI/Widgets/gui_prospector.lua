@@ -13,7 +13,7 @@ function widget:GetInfo()
 	}
 end
 
-local MEX_OWNER_SHARE = 0.5
+local MEX_OWNER_SHARE = 0.05
 
 local textSize = 16
 
