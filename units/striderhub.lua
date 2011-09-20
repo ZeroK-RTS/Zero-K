@@ -15,6 +15,7 @@ unitDef = {
 
   buildoptions                  = {
     [[armcomdgun]],
+	[[scorpion]],
     [[dante]],
     [[armraven]],
     [[armbanth]],

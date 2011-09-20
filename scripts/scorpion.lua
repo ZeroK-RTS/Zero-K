@@ -167,6 +167,9 @@ function script.Shot(num)
 	if num > 1 then
 		gun_cycle[num] = gun_cycle[num] + 1
 		if gun_cycle[num] > 3 then gun_cycle[num] = 1 end
+	else
+		EmitSfx(flare1, 1024)
+		EmitSfx(flare1, 1025)
 	end
 end
 
