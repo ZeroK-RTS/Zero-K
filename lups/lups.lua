@@ -553,7 +553,7 @@ local function Draw(extension,layer)
               --// render effects
               for i=1,#UnitEffects do
                 local fx = UnitEffects[i]
-                if (fx.visible) then
+                if (fx.alwaysVisible or fx.visible) then
                   if (fx.piecenum) then
                     --// enter piece space
                     glPushMatrix()
@@ -578,7 +578,7 @@ local function Draw(extension,layer)
               ------------------------------------------------------------------------------------
               for i=1,#UnitEffects do
                 local fx = UnitEffects[i]
-                if (fx.visible) then
+                if (fx.alwaysVisible or fx.visible) then
                   drawfunc(fx)
                 end
               end
@@ -720,7 +720,9 @@ local function CreateVisibleFxList()
             end
 
             if (not fx.onActive)or(unitActive) then
-              if (fx.Visible) then
+			  if fx.alwaysVisible then
+				fx.visible = true
+              elseif (fx.Visible) then
                 fx.visible = fx:Visible()
               else
                 unitRadius = unitRadius or (spGetUnitRadius(unitID) + 40)
@@ -742,7 +744,8 @@ local function CreateVisibleFxList()
                 anyDistortionsVisible = anyDistortionsVisible or partClass.pi.distortion
               end
             else
-              fx.visible = false
+              fx.visible = fx.alwaysVisible
+			  if (not anyFXVisible) then anyFXVisible = fx.alwaysVisible end
             end
           end
 
@@ -750,9 +753,12 @@ local function CreateVisibleFxList()
 
           for i=1,#UnitEffects do
             local fx = UnitEffects[i]
-            fx.visible = false
+            fx.visible = fx.alwaysVisible
 
-            if (fx.Visible) then
+			if fx.alwaysVisible then
+				if (not anyFXVisible) then anyFXVisible = true end
+                anyDistortionsVisible = anyDistortionsVisible or partClass.pi.distortion
+            elseif (fx.Visible) then
               if (fx:Visible()) then
                 fx.visible = true
                 if (not anyFXVisible) then anyFXVisible = true end
