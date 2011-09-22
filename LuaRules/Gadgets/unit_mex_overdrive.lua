@@ -670,7 +670,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							if (metalMult < 1.5) then
 								Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2))
 							else
-								Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2) .. " \nConstruct Additional Pylons")
+								Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2) .. " \nConnect more energy sources to produce additional metal")
 							end
 						else
 							Spring.Echo("unitDefID missing for metal extractor")
