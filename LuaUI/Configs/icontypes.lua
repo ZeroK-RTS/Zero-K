@@ -730,6 +730,10 @@ local icontypes = {
     bitmap='icons/submarine.dds',
     size=4,
   },
+  missilesub = {
+    bitmap='icons/missilesub.dds',
+    size=4,
+  },  
   carrier = {
     bitmap='icons/carrier.dds',
     size=3.6,
