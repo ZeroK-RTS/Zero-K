@@ -62,7 +62,7 @@ unitDef = {
 
     {
       def                = [[CAPTURERAY]],
-      badTargetCategory  = [[FIXEDWING]],
+      badTargetCategory  = [[UNARMED FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
