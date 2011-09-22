@@ -27,6 +27,7 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
+	helptext		= [[The Licho drops a single powerful bomb that can send units flying. It is sturdy enough to penetrate moderate AA and escape to repair, but should not be used recklessly - it's too expensive for that.]],
     description_bp = [[Bombardeiro de implos?o]],
     description_fr = [[Bombardier r Implosion]],
 	description_de = [[Implosion Bomber]],

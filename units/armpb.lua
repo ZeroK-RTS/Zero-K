@@ -30,8 +30,6 @@ unitDef = {
   },
 
   damageModifier                = 0.15,
-  defaultmissiontype            = [[GUARD_NOMOVE]],
-  digger                        = [[1]],
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,
@@ -61,7 +59,6 @@ unitDef = {
   sightDistance                 = 660,
   smoothAnim                    = true,
   stealth                       = true,
-  TEDClass                      = [[FORT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
 

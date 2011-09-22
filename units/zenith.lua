@@ -70,7 +70,7 @@ unitDef = {
   weaponDefs                    = {
 
     GRAVITY_NEG = {
-      name                    = [[Attractive Gravity]],
+      name                    = [[Attractive Gravity (fake)]],
       avoidFriendly           = false,
 	  canAttackGround		  = false,
       coreThickness           = 0.5,
