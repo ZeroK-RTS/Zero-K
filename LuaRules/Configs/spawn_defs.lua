@@ -158,8 +158,9 @@ local defenders = {
 }
 
 local supporters = {
-  --chickenspire =  {time = 50, squadSize = 0.2, quasiAttacker = true, },
+  --chickenspire =  {time = 50, squadSize = 0.1, quasiAttacker = true, },
   chicken_shield =  {time = 30, squadSize = 0.6, quasiAttacker = true, },
+  chicken_spidermonkey =  {time = 20, squadSize = 0.7, quasiAttacker = true, },
 }
 
 -- TODO

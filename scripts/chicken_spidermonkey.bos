@@ -1,3 +1,5 @@
+//linear constant 163840
+
 piece body,head,tail1,tail2,firepoint, lthighf,lkneef,lshinf,lfootf,rthighf,rkneef,rshinf,rfootf,rblade,lblade,lthighb,lkneeb,lshinb,lfootb,rthighb,rkneeb,rshinb,rfootb,ospike,uspike,rspike,lspike;
 
 static-var bMoving;
@@ -184,17 +186,20 @@ QuerySecondary(piecenum)
 
 
 RestoreAfterDelay()
-	{
+{
+	sleep 5000;
     turn head to x-axis 0 speed <20>;
-	sleep 1000;
-	}
+    turn head to y-axis 0 speed <20>;
+}
 
-AimPrimary(heading,pitch)
+AimWeapon1(heading, pitch)
 	{
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
-	turn head to x-axis 60 speed <200>;
+	turn head to y-axis heading speed <200>;
+	turn head to x-axis 0 - pitch speed <200>;
 	
+	wait-for-turn head around x-axis;
 	wait-for-turn head around y-axis;
 	start-script RestoreAfterDelay();
 	
