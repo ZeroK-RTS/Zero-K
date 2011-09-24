@@ -31,8 +31,28 @@ local ac2 = piece 'ac2'
 local nanospray = piece 'nanospray' 
 
 smokePiece = {torso}
+--------------------------------------------------------------------------------
+-- constants
+--------------------------------------------------------------------------------
+local SIG_RESTORE = 16
+local SIG_AIM = 2
+local SIG_AIM_2 = 4
+local SIG_WALK = 1
+--local SIG_AIM_3 = 8 --step on
 
--- variables
+--------------------------------------------------------------------------------
+-- vars
+--------------------------------------------------------------------------------
+local flamers = {}
+local wepTable = UnitDefs[unitDefID].weapons
+wepTable.n = nil
+for index, weapon in pairs(wepTable) do
+	local weaponDef = WeaponDefs[weapon.weaponDef]
+	if weaponDef.type == "Flame" then
+		flamers[index] = true
+	end
+end
+
 local canDgun = UnitDefs[unitDefID].canDgun
 
 local shieldOn = false
@@ -43,11 +63,7 @@ local armsFree = true
 local inBuildAnim = false
 local dgunning = false
 
-local SIG_RESTORE = 16
-local SIG_AIM = 2
-local SIG_AIM_2 = 4
-local SIG_WALK = 1
---local SIG_AIM_3 = 8 --step on
+
 
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
@@ -419,6 +435,9 @@ function script.Shot(num)
 	elseif num == 3 then
 		EmitSfx(flare, 1027)
 	end
+	if flamers[num] then
+		GG.LUPS.FlameShot(unitID, unitDefID, _, num)
+	end	
 end
 
 function script.QueryNanoPiece()

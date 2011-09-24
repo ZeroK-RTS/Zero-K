@@ -71,6 +71,16 @@ local RESTORE_DELAY_DGUN = 2500
 --------------------------------------------------------------------------------
 local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
 
+local flamers = {}
+local wepTable = UnitDefs[unitDefID].weapons
+wepTable.n = nil
+for index, weapon in pairs(wepTable) do
+	local weaponDef = WeaponDefs[weapon.weaponDef]
+	if weaponDef.type == "Flame" then
+		flamers[index] = true
+	end
+end
+wepTable = nil
 
 --------------------------------------------------------------------------------
 -- funcs
@@ -170,6 +180,9 @@ function script.Shot(num)
 	elseif num == 3 then
 		EmitSfx( rbigflash,  1027 )
 	end
+	if flamers[num] then
+		GG.LUPS.FlameShot(unitID, unitDefID, _, num)
+	end	
 end
 
 local function RestoreLaser()

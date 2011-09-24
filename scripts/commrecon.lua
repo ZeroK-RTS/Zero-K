@@ -2,6 +2,9 @@ include "constants.lua"
 
 local spSetUnitShieldState = Spring.SetUnitShieldState
 
+--------------------------------------------------------------------------------
+-- pieces
+--------------------------------------------------------------------------------
 local base = piece 'base' 
 local pelvis = piece 'pelvis' 
 local turret = piece 'turret' 
@@ -34,7 +37,27 @@ local grenade = piece 'grenade'
 
 smokePiece = {torso}
 
---variables
+--------------------------------------------------------------------------------
+-- constants
+--------------------------------------------------------------------------------
+local SIG_RESTORE = 1
+local SIG_AIM = 2
+local SIG_AIM_2 = 4
+--local SIG_AIM_3 = 8 --step on
+
+--------------------------------------------------------------------------------
+-- vars
+--------------------------------------------------------------------------------
+local flamers = {}
+local wepTable = UnitDefs[unitDefID].weapons
+wepTable.n = nil
+for index, weapon in pairs(wepTable) do
+	local weaponDef = WeaponDefs[weapon.weaponDef]
+	if weaponDef.type == "Flame" then
+		flamers[index] = true
+	end
+end
+wepTable = nil
 local canDgun = UnitDefs[unitDefID].canDgun
 
 local dead = false
@@ -45,11 +68,9 @@ local shieldOn = true
 local dgunning = false
 bJumping = false
 
-local SIG_RESTORE = 1
-local SIG_AIM = 2
-local SIG_AIM_2 = 4
---local SIG_AIM_3 = 8 --step on
-
+--------------------------------------------------------------------------------
+-- funcs
+--------------------------------------------------------------------------------
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
@@ -404,6 +425,9 @@ function script.Shot(num)
 	elseif num == 5 then
 		EmitSfx( flare, 1025)
 	end
+	if flamers[num] then
+		GG.LUPS.FlameShot(unitID, unitDefID, _, num)
+	end	
 end
 
 local function JumpExhaust()

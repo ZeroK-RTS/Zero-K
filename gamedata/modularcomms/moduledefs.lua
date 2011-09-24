@@ -29,10 +29,10 @@ upgrades = {
 		name = "Beam Laser",
 		description = "An effective short-range cutting tool",
 	},
---	commweapon_flamethrower = {
---		name = "Flamethrower",
---		description = "Perfect for well-done barbecues",
---	},
+	commweapon_flamethrower = {
+		name = "Flamethrower",
+		description = "Perfect for well-done barbecues",
+	},
 	commweapon_gaussrifle = {
 		name = "Gauss Rifle",
 		description = "Precise armor-piercing weapon",

@@ -210,6 +210,14 @@ local base = {
 			"module_high_power_servos",
 		}
 	},
+	{
+		name = "flame",
+		modules = {
+			"commweapon_flamethrower",
+			"commweapon_flamethrower",
+		}
+	},
+	
 }
 
 local ret = {count = 0}

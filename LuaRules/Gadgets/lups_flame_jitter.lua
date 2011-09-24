@@ -14,11 +14,6 @@ function gadget:GetInfo()
   }
 end
 
-if (Game.version=="0.76b1") then
-	return false
-end
-
-
 if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -- -> SYNCED
@@ -39,7 +34,9 @@ if (gadgetHandler:IsSyncedCode()) then
       SendToUnsynced("flame_FlameShot", unitID, unitDefID, weapon)
     end
   end
-
+  
+  GG.LUPS = GG.LUPS or {}
+  GG.LUPS.FlameShot = FlameShot
 
   function gadget:GameFrame(n)
     thisGameFrame = n
