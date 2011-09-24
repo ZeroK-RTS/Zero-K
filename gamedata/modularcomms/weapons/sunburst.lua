@@ -9,7 +9,7 @@ local weaponDef = {
 	
 	customParams			= {
 		slot = [[3]],
-		muzzleEffect = [[custom:ARMBRTHA_FLARE]],
+		muzzleEffectFire = [[custom:ARMBRTHA_FLARE]],
 	},
 
     damage                  = {

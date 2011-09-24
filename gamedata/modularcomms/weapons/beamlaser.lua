@@ -9,7 +9,7 @@ local weaponDef = {
 	
 	customParams			= {
 		slot = [[5]],
-		muzzleEffect = [[custom:BEAMWEAPON_MUZZLE_BLUE]],
+		muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_BLUE]],
 	},
 	
     damage                  = {

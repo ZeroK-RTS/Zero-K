@@ -10,7 +10,8 @@ local weaponDef = {
 
 	customParams			= {
 		slot = [[5]],
-		muzzleEffect = [[custom:WARMUZZLE]],
+		muzzleEffectShot = [[custom:WARMUZZLE]],
+		miscEffectShot = [[custom:DEVA_SHELLS]],		
 	},
 	
 	damage                  = {

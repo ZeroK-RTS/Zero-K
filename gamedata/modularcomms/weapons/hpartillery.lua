@@ -7,8 +7,8 @@ local weaponDef = {
 	craterMult              = 2,
 
 	customParams			= {
-		muzzleEffect = [[custom:RAIDMUZZLE]],
-		miscEffect = [[custom:LEVLRMUZZLE]],
+		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
+		miscEffectFire = [[custom:RIOT_SHELL_H]],
 	},	  
 	  
 	damage                  = {

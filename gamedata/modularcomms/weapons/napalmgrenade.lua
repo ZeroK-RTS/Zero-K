@@ -13,7 +13,7 @@ local weaponDef = {
         areadamage_preset = [[module_napalmgrenade]],
 		setunitsonfire = "1",
 		burntime = 180,
-		muzzleEffect = [[custom:RAIDMUZZLE]],
+		muzzleEffectFire = [[custom:RAIDMUZZLE]],
     },
 
     damage                  = {

@@ -243,10 +243,16 @@ end
 function script.FireWeapon(num)
 	if num == 5 then
 		EmitSfx(lfirept, 1024)
+	elseif num == 3 then
+		EmitSfx(rbigflash, 1026)
+	end
+end
+
+function script.Shot(num)
+	if num == 5 then
 		EmitSfx(lfirept, 1025)
 		if hasFlamer then GG.LUPS.FlameShot(unitID, unitDefID, _, 5) end
 	elseif num == 3 then
-		EmitSfx(rbigflash, 1026)
 		EmitSfx(rbigflash, 1027)
 	end
 end

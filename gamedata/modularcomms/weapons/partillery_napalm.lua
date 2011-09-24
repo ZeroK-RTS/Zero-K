@@ -5,8 +5,7 @@ local weaponDef = {
     areaOfEffect            = 128,
     
     customParams			= {
-    	muzzleEffect = [[custom:THUDMUZZLE]],
-		miscEffect = [[custom:THUDDUST]],
+    	muzzleEffectFire = [[custom:thud_fire_fx]],
 		burnchance = [[1]],
     },
     

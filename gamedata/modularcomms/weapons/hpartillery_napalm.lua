@@ -7,8 +7,7 @@ local weaponDef = {
 	craterMult              = 2,
 
 	customParams			= {
-		muzzleEffect = [[custom:RAIDMUZZLE]],
-		miscEffect = [[custom:LEVLRMUZZLE]],
+		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 		areadamage_preset = [[module_napalmgrenade]],
 		burntime = [[180]],
 	},	  

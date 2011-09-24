@@ -5,7 +5,7 @@
 -- lightningplosion_bluebolts1
 -- lightningplosion_stormbolt
 -- zeusgroundflash
--- zeusgroundflash
+-- lightningplosion_smallbolts
 
 return {
   ["lightningplosion_yellowbolts"] = {
@@ -367,6 +367,35 @@ return {
       },
     },
   },
-
+  
+  -- muzzle and groundflash as a single reference
+  ["zeus_fire_fx"] = {
+	muzzle = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:zeusmuzzle]],
+        pos                = [[0, 0, 0]],
+		dir				   = [[dir]],
+      },
+    },
+	dust = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:zeusgroundflash]],
+        pos                = [[0, 0, 0]],
+		dir				   = [[dir]],
+      },
+    },	
+  }, 
 }
 

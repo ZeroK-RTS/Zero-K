@@ -393,9 +393,15 @@ end
 function script.FireWeapon(num)
 	if num == 3 then
 		EmitSfx( grenade, 1026 )
-		EmitSfx( grenade, 1027 )
 	elseif num == 5 then
 		EmitSfx( flare, 1024)
+	end
+end
+
+function script.Shot(num)
+	if num == 3 then
+		EmitSfx( grenade, 1027 )
+	elseif num == 5 then
 		EmitSfx( flare, 1025)
 	end
 end

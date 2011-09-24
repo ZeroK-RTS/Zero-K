@@ -10,8 +10,8 @@ local weaponDef = {
 	
 	customParams			= {
 		slot = [[5]],
-		muzzleEffect = [[custom:RAIDMUZZLE]],
-		miscEffect = [[custom:LEVLRMUZZLE]],
+		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
+		miscEffectFire = [[custom:RIOT_SHELL_L]],
 	},
 
     damage                  = {

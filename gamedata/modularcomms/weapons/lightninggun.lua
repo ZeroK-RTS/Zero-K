@@ -8,8 +8,7 @@ local weaponDef = {
 	customParams            = {
 		extra_damage_mult = [[0.4]],
 		slot = [[5]],
-		muzzleEffect = [[custom:zeusmuzzle]],
-		miscEffect = [[custom:zeusgroundflash]],
+		muzzleEffectFire = [[custom:zeus_fire_fx]],
 	},
 	
 	cylinderTargetting      = 0,

@@ -1,6 +1,7 @@
 -- thudmuzzle
 -- thudshells
 -- thuddust
+-- thud_fire_fx
 
 return {
   ["thudmuzzle"] = {
@@ -124,6 +125,35 @@ return {
       },
     },
   },
-
+  
+  -- muzzle and dust as a single reference
+  ["thud_fire_fx"] = {
+	muzzle = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:thudmuzzle]],
+        pos                = [[0, 0, 0]],
+		dir				   = [[dir]],
+      },
+    },
+	dust = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:thuddust]],
+        pos                = [[0, 0, 0]],
+		dir				   = [[dir]],
+      },
+    },	
+  }, 
 }
 

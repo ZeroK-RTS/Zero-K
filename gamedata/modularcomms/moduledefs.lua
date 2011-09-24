@@ -132,7 +132,7 @@ upgrades = {
 				for i,v in pairs(weapons) do
 					if i == "commweapon_shotgun" then
 						v.customparams.misceffect = nil
-						v.projectiles = 9
+						v.projectiles = v.projectiles * 0.75
 						v.reloadtime = v.reloadtime * 0.6
 						v.customparams.basereload = v.reloadtime
 						--break

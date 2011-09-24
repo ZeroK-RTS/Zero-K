@@ -159,9 +159,15 @@ end
 function script.FireWeapon(num) 
 	if num == 5 then
 		EmitSfx( lfirept,  1024 )
-		EmitSfx( lfirept,  1025 )
 	elseif num == 3 then
 		EmitSfx( rbigflash,  1026 )
+	end
+end
+
+function script.Shot(num) 
+	if num == 5 then
+		EmitSfx( lfirept,  1025 )
+	elseif num == 3 then
 		EmitSfx( rbigflash,  1027 )
 	end
 end
