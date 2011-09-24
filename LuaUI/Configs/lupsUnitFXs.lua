@@ -1,5 +1,3 @@
---[[There is actually a hidden parameter for shieldjitter called "Strength". It can be adjusted by adding "strength   = 0.015," to the line. For example {class='ShieldJitter', options={delay=0,life=math.huge, pos={0,40.5,0.0}, size=10, precision=22, strength = 0.015, repeatEffect=true}},  Defaults to the value of 0.015 ]]--
-
 effectUnitDefs = {
   cremcom1 = {
     {class='StaticParticles', options=commandCoronaRed},
@@ -23,7 +21,7 @@ effectUnitDefs = {
     {class='Bursts', options=cafusBursts},
     {class='StaticParticles', options=cafusCorona},
     --{class='ShieldSphere', options=cafusShieldSphere},
-    --{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,-4.5}, size=24.5, precision=22, repeatEffect=true}},
+    --{class='ShieldJitter', options={layer=-16, life=math.huge, pos={0,58.9,0}, size=100, precision=22, strength = 0.001, repeatEffect=true}},
     {class='GroundFlash', options=groundFlashOrange},
   },
   corfus = {
@@ -45,17 +43,19 @@ effectUnitDefs = {
   },
 
   --// SHIELDS //---------------------------
+  -- Don't raise strength of ShieldJitter recklessly, it can really distort things (including unit icons) under it!
   corjamt = {
    {class='Bursts', options=corjamtBursts},
     {class='ShieldSphere', options={life=math.huge, piece="glow", size=11, colormap1 = {{0.8, 0.1, 0.8, 0.5}}, repeatEffect=true}},
+	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=350, strength = .001, precision=50, repeatEffect=true}},
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=350, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
---  {class='GroundFlash', options=groundFlashViolett},
 --	{class='GroundFlash', options=groundFlashShield},
 --	{class='UnitPieceLight', options={piece="glow", colormap = {{0,0,1,0.2}},},},
   },
   core_spectre = {
     {class='Bursts', options=MergeTable({piece="glow"},corjamtBursts)},
     {class='ShieldSphere', options={piece="glow", life=math.huge, size=11, colormap1 = {{0.95, 0.1, 0.95, 0.9}}, repeatEffect=true}},
+	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=350, strength = .001, precision=50, repeatEffect=true}},
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=360, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
   },
 
