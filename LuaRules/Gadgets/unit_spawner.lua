@@ -82,7 +82,7 @@ local eggDecay = {}	-- indexed by featureID, value = game second
 local targets = {}	--indexed by unitID, value = teamID
 
 local respawnBurrows = false	--the always respawn, not % respawn chance
-local totalTimeReduction = 0
+local totalTechAccel = 0
 
 local humanAggro = 0		--decreases linearly
 local humanAggroDelta = 0		--resets to zero every wave
@@ -256,7 +256,7 @@ local function SetupUnit(unitName)
 end
 
 Spring.SetGameRulesParam("lagging",           0)
-Spring.SetGameRulesParam("techTimeReduction", 0)
+Spring.SetGameRulesParam("techAccel", 0)
 Spring.SetGameRulesParam("queenTime",        queenTime)
 Spring.SetGameRulesParam("humanAggro", 0)
 
@@ -516,7 +516,7 @@ local function ChooseChicken(units)
   local units = units or chickenTypes
   local choices,choisesN = {},0
   for chickenName, c in pairs(units) do
-    if (c.time <= s and (c.obsolete or math.huge) > s) then   
+    if (c.time - totalTechAccel <= s and (c.obsolete or math.huge) - totalTechAccel > s) then   
       local chance = math.floor((c.initialChance or 1) + 
                                 (s-c.time) * (c.chanceIncrease or 0))
       for i=1, chance do
@@ -751,7 +751,7 @@ local function SpawnQueen()
     end
   until (blocking == 2 or tries > maxTries)
   
-  --queenHealthMod = queenHealthMod * (queenTime/baseQueenTime)
+  queenHealthMod = queenHealthMod * (0.5*(queenTime/baseQueenTime) + 0.5)
   
   if queenMorphName ~= '' then SetMorphFrame() end
   return spCreateUnit(queenName, x, 0, z, "n", chickenTeamID)
@@ -786,7 +786,6 @@ local function SpawnMiniQueen()
 end
 
 
--- TODO
 local function ProcessSpecialPowers()
 	if specialPowerCooldown > 0 then
 		return
@@ -847,30 +846,33 @@ local function Wave()
   --echo("Wave bonus delta this round: "..humanAggroDelta)
   --echo("Wave bonus this round: "..humanAggro)
   --reduce all chicken appearance times
-  local timeIncrease = 0
+  local techDecel = 0
   if humanAggro > 0 then
-	timeIncrease = humanAggro * humanAggroTechTimeRegress
+	techDecel = humanAggro * humanAggroTechTimeRegress
   else
-	timeIncrease = humanAggro * humanAggroTechTimeProgress
+	techDecel = humanAggro * humanAggroTechTimeProgress
   end
-  totalTimeReduction = totalTimeReduction - timeIncrease
-  Spring.SetGameRulesParam("techTimeReduction", totalTimeReduction)
+  totalTechAccel = totalTechAccel - techDecel
+  totalTechAccel = math.max(totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
+  Spring.SetGameRulesParam("techAccel", totalTechAccel)
   
+  --[[
   for chickenName, c in pairs(chickenTypes) do
-  	c.time = c.time + timeIncrease
-  	if c.obsolete then c.obsolete = c.obsolete + timeIncrease end
+  	c.time = c.time + techDecel
+  	if c.obsolete then c.obsolete = c.obsolete + techDecel end
   end
   for chickenName, c in pairs(supporters) do
-  	c.time = c.time + timeIncrease
-  	if c.obsolete then c.obsolete = c.obsolete + timeIncrease end
+  	c.time = c.time + techDecel
+  	if c.obsolete then c.obsolete = c.obsolete + techDecel end
   end
+  ]]--
   --echo(burrowCount .. " burrows have reduced tech time by " .. math.ceil(timeReduction) .. " seconds")
-  --echo("Lifetime tech time reduction: " .. math.ceil(totalTimeReduction) .. " seconds")
+  --echo("Lifetime tech time reduction: " .. math.ceil(totalTechAccel) .. " seconds")
   
   local chicken1Name, chicken2Name = ChooseChicken(chickenTypes)
   local turret = ChooseChicken(defenders)
   local support = ChooseChicken(supporters)
-  local squadNumber = (t*timeSpawnBonus+waveSizeMult)*(baseWaveSize + math.max(humanAggro, 0)  + burrowCount*burrowWaveSize)/math.max(burrowCount, 1)
+  local squadNumber = (t*timeSpawnBonus+waveSizeMult) * (baseWaveSize + math.min(math.max(humanAggro*humanAggroWaveFactor, 0), humanAggroWaveMax)  + burrowCount*burrowWaveSize) / math.max(burrowCount, 1)
   --if queenID then squadNumber = squadNumber/2 end
   local chicken1Number = math.ceil(waveRatio * squadNumber * chickenTypes[chicken1Name].squadSize)
   local chicken2Number = math.floor((1-waveRatio) * squadNumber * chickenTypes[chicken2Name].squadSize)
@@ -1144,18 +1146,21 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	Spring.SetGameRulesParam("queenTime", queenTime)
 	Spring.SetGameRulesParam("humanAggro", humanAggro)
 	
-	local timeIncrease = burrowRegressTime
-	totalTimeReduction = totalTimeReduction - timeIncrease
-	Spring.SetGameRulesParam("techTimeReduction", totalTimeReduction)
+	local techDecel = burrowRegressTime
+	totalTechAccel = totalTechAccel - techDecel
+	totalTechAccel = math.min(totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
+	Spring.SetGameRulesParam("techAccel", totalTechAccel)
 	
+	--[[
 	for chickenName, c in pairs(chickenTypes) do
-		c.time = c.time + timeIncrease
-		if c.obsolete then c.obsolete = c.obsolete + timeIncrease end
+		c.time = c.time + techDecel
+		if c.obsolete then c.obsolete = c.obsolete + techDecel end
 	end
 	for chickenName, c in pairs(supporters) do
-		c.time = c.time + timeIncrease
-		if c.obsolete then c.obsolete = c.obsolete + timeIncrease end
+		c.time = c.time + techDecel
+		if c.obsolete then c.obsolete = c.obsolete + techDecel end
 	end
+	]]--
 	
 	-- spawn turrets
 	--[[

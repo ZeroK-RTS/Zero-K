@@ -52,7 +52,8 @@ burrowRegressTime	= 60		-- direct tech time regress from killing a burrow, divid
 
 humanAggroPerBurrow	= 1			-- divided by playercount
 humanAggroDecay		= 0.25		-- linear rate at which aggro decreases
-humanAggroWaveFactor = 0.5
+humanAggroWaveFactor = 1
+humanAggroWaveMax	= 5
 humanAggroDefenseFactor = 1		-- multiplies aggro for defender spawn chance	-- this one uses per-wave delta rather than listed value
 humanAggroSupportFactor	= 0.1	-- multiplies aggro for supporter spawn chance
 humanAggroTechTimeProgress = 20	-- how much to increase chicken tech progress (* aggro), seconds
@@ -60,6 +61,8 @@ humanAggroTechTimeRegress = 0	-- how much to reduce chicken tech progress (* agg
 humanAggroQueenTimeFactor = 1	-- burrow queen time is multiplied by this and aggro (after clamping)
 humanAggroQueenTimeMin = 0	-- min value of aggro for queen time calc
 humanAggroQueenTimeMax = 8
+
+techTimeFloorFactor	= 0.5 -- tech timer can never be less than this * real time
 
 scoreMult			= 1
 
@@ -255,11 +258,24 @@ difficulties = {
   },
 }
 
+-- minutes to seconds
 TimeModifier(chickenTypes, 60)
 TimeModifier(defenders, 60)
 TimeModifier(supporters, 60)
 TimeModifier(specialPowers, 60)
--- minutes to seconds
+
+--[[
+for chicken, t in pairs(chickenTypes) do
+    t.timeBase = t.time
+end
+for chicken, t in pairs(supporters) do
+    t.timeBase = t.time
+end
+for chicken, t in pairs(defenders) do
+    t.timeBase = t.time
+end
+]]--
+
 for _, d in pairs(difficulties) do
   d.timeSpawnBonus = d.timeSpawnBonus/60
   d.chickenTypes = Copy(chickenTypes)
