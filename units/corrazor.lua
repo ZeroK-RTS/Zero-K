@@ -41,6 +41,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[aapopup.s3o]],
+  power                         = 50,
   seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 

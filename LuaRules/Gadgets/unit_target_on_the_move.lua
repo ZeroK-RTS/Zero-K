@@ -22,6 +22,7 @@ local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetGroundHeight     = Spring.GetGroundHeight
 
 --------------------------------------------------------------------------------
 -- Globals
@@ -87,6 +88,9 @@ local function validUnit(unitDefID)
 end
 
 local function addUnit(unitID, data)
+    if spValidUnitID(unitID) then
+        spSetUnitTarget(unitID, 0)
+    end
     if setTarget(data) then
         if unitById[unitID] then
             unit.data[unitById[unitID]] = data
@@ -170,7 +174,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
         if #cmdParams == 3 then
             addUnit(unitID, {
                 id = unitID, 
-                x = cmdParams[1], y = cmdParams[2], z = cmdParams[3], 
+                x = cmdParams[1], 
+                y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
+                z = cmdParams[3], 
                 allyTeam = spGetUnitAllyTeam(unitID), 
                 range = UnitDefs[unitDefID].maxWeaponRange
             })
@@ -224,12 +230,14 @@ local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetUnitLosState 	= Spring.GetUnitLosState
 local spValidUnitID 		= Spring.ValidUnitID
 local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID 	
+local spGetMyTeamID         = Spring.GetMyTeamID
 
-local myTeam = spGetMyAllyTeamID()
+local myAllyTeam = spGetMyAllyTeamID()
+local myTeam = spGetMyTeamID()
 
 local function unitDraw(u1, u2)
 	glVertex(spGetUnitPosition(u1))
-	glVertex(spGetUnitPosition(u2))
+	glVertex(CallAsTeam(myTeam, function () return spGetUnitPosition(u2) end))
 end
 
 local function terrainDraw(u, x, y, z)
@@ -250,12 +258,12 @@ function gadget:DrawWorld()
          gl.Color(1, 0.3, 0.2, 1)
         for i = 1, SYNCED.unit.count do
             local u = SYNCED.unit.data[i]
-            if u.allyTeam == myTeam and spValidUnitID(u.id) then
+            if u.allyTeam == myAllyTeam and spValidUnitID(u.id) then
                 if not u.targetID then
                     gl.BeginEnd(GL.LINES, terrainDraw, u.id, u.x, u.y, u.z)
                 elseif spValidUnitID(u.targetID) then
-                    local los = spGetUnitLosState(u.targetID, myTeam, false)
-                    if (los and los.los) then
+                    local los = spGetUnitLosState(u.targetID, myAllyTeam, false)
+                    if los and (los.los or los.radar) then
                         gl.BeginEnd(GL.LINES, unitDraw, u.id, u.targetID)
                     end
                 end
