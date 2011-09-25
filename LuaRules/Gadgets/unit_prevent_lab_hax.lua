@@ -38,7 +38,7 @@ local min = math.min
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local customSettings = {
-	corsy = {xsize = 32, zsize = 8, dispFacing = 0, dispRAngle = 32, reorient = true}
+	corsy = {xsize = 32, zsize = 12, dispFacing = 0, dispRAngle = 4, reorient = false}
 }
 
 --------------------------------------------------------------------------------
