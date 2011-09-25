@@ -66,7 +66,14 @@ effectUnitDefs = {
   armestor = {
     {class='GroundFlash', options=groundFlashArmestor},
   },
-  
+
+  --// FACTORIES //----------------------------
+  corsy= {
+  	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="flash01"}) },
+	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="flash03", delay = 20,}) },
+	{class='StaticParticles', options=MergeTable(blinkyLightBlue, {piece="flash05", delay = 40,}) },	
+  },
+
   --// PYLONS // ----------------------------------
   mexpylon = {
     {class='GroundFlash', options=groundFlashCorestor},
@@ -78,6 +85,16 @@ effectUnitDefs = {
     {class='SimpleParticles', options=MergeTable({delay=60},roostDirt)},
     {class='SimpleParticles', options=MergeTable({delay=120},roostDirt)},
   },
+  
+  armasp= {
+  	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="light1"}) },
+	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light2"}) },
+  },
+  
+  armarad = {
+    {class='StaticParticles', options=MergeTable(blinkyLightWhite,{piece="point"})},
+    --{class='StaticParticles', options=MergeTable(blinkyLightBlue,{piece="point", delay=15})},
+  },  
   corarad = {
     {class='StaticParticles', options=radarBlink},
     {class='StaticParticles', options=MergeTable(radarBlink,{pos={-1.6,25,0.0},delay=15})},

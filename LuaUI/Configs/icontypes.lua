@@ -558,7 +558,10 @@ local icontypes = {
     bitmap='icons/radar.dds',
     size=2,
   },
-  
+  advradar = {
+    bitmap='icons/radar.dds',
+    size=3,
+  },  
    sonar = {
     bitmap='icons/sonar.dds',
     size=2,
