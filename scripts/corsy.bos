@@ -1,5 +1,5 @@
 #include "constants.h"
-piece  base, pad, emit01, emit02, emit03, emit04, emit05, emit06, emit07, emit08, emit09, emit010, emit011, emit012, emit013, emit014, emit015, emit016, emit017, emit018;
+piece  base, pad, emit04, emit012, pontoon;
 
 static-var  spray, statechg_DesiredState, statechg_StateChanging;
 
@@ -167,20 +167,24 @@ Killed(severity, corpsetype)
 	{
 		corpsetype = 1;
 		explode base type BITMAPONLY;
+		explode pontoon type BITMAPONLY;
 		return (0);
 	}
 	if( severity <= 50 )
 	{
 		corpsetype = 1;
 		explode base type BITMAPONLY;
+		explode pontoon type BITMAPONLY;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
 		corpsetype = 2;
 		explode base type SHATTER;
+		explode pontoon type SHATTER;
 		return (0);
 	}
 	corpsetype = 2;
 	explode base type SHATTER;
+	explode pontoon type SHATTER;
 }
