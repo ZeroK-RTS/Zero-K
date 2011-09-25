@@ -134,6 +134,7 @@ local function CheckForShutdown()
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+	--[[
 	if not gamestart then
 		createBeforeGameStart[#createBeforeGameStart + 1] = unitID
 
@@ -147,6 +148,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitNoMinimap(unitID, true)
 		return
 	end
+	]]--
 
 	if plop and ploppableDefs[unitDefID] and facplops[builderID] then
 		facplops[builderID] = nil
@@ -693,9 +695,11 @@ function gadget:GameStart()
   end
   
   -- kill units if engine spawned
+  --[[
   for i,u in ipairs(createBeforeGameStart) do
     Spring.DestroyUnit(u, false, true) -- selfd = false, reclaim = true
   end
+  ]]--
 end
 
 function gadget:RecvLuaMsg(msg, playerID)
