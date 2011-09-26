@@ -110,6 +110,7 @@ local timer = 0
 local tweakShow = false
 
 local window_height = 130
+local real_window_corner
 local window_corner
 local numSelectedUnits = 0
 local selectedUnitsByDefCounts = {}
@@ -456,11 +457,6 @@ local function Show(obj)
 	if (not obj:IsDescendantOf(screen0)) then
 		screen0:AddChild(obj)
 	end
-end
-
-local function Hide(obj)
-	obj:ClearChildren()
-	screen0:RemoveChild(obj)
 end
 
 
@@ -1838,7 +1834,7 @@ end
 function widget:Update(dt)
 	if widgetHandler:InTweakMode() then
 		tweakShow = true
-		Show(window_corner)
+		Show(real_window_corner)
 	elseif tweakShow then
 		tweakShow = false
 		widget:SelectionChanged(Spring.GetSelectedUnits())
@@ -1980,21 +1976,32 @@ function widget:Initialize()
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local y = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100 - window_height)) .. "%"
 
-	window_corner = Window:New{
-		name   = 'unitinfo2';
-		x      = 0;
+    real_window_corner = Window:New{
+		name   = 'real_window_corner';
+		color = {0, 0, 0, 0},
+		x = 0; 
 		bottom = 180;
-		clientHeight = 130;
-		width  = 450;
-		dockable = true,
-		--autosize    = true;
-		resizable   = false;
+        width = 450;
+		height = 130;
+		dockable = true;
 		draggable = false,
+		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		--padding = {3, 3, 15, 3}
-		--color       = {Spring.GetTeamColor(Spring.GetLocalTeamID())};
-		minimumSize = {450, 130},
+		padding = {0, 0, 0, 0},
+        minimumSize = {450, 130},
+	}
+    
+	window_corner = Panel:New{
+		parent = real_window_corner,
+        name   = 'unitinfo2';
+		x = 0,
+		y = 0,
+		width = "100%";
+		height = "100%";
+		dockable = false,
+		resizable   = false;
+		draggable = false,
 	}
 
 	windMin = Spring.GetGameRulesParam("WindMin")
@@ -2115,10 +2122,11 @@ function widget:SelectionChanged(newSelection)
 			stt_unitID = nil
 			MakeUnitGroupSelectionToolTip()
 		end
-		Show(window_corner)
+		Show(real_window_corner)
 	else
 		stt_unitID = nil
-		Hide(window_corner)
+		window_corner:ClearChildren()
+        screen0:RemoveChild(real_window_corner)
 	end
 end
 --------------------------------------------------------------------------------
