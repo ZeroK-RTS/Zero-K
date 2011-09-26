@@ -18,6 +18,7 @@ local spSetUnitBlocking = Spring.SetUnitBlocking
 
 local noEject = {
 	[UnitDefNames["missilesilo"].id] = true,
+	[UnitDefNames["corsy"].id] = true,
 	[UnitDefNames["factoryplane"].id] = true,
 	[UnitDefNames["factorygunship"].id] = true,
 }
@@ -37,7 +38,7 @@ function gadget:GameFrame(n)
 	end
 end
 
-function gadget:UnitFromFactory(unitID, unitDefID, teamID, builderID, builderDefID, _)
+function gadget:UnitFromFactory(unitID, unitDefID, teamID, builderID, builderDefID)
 	if not noEject[builderDefID] then
 		--Spring.Echo("Ejecting unit")
 		local frame = spGetGameFrame() + ghostFrames
@@ -47,5 +48,14 @@ function gadget:UnitFromFactory(unitID, unitDefID, teamID, builderID, builderDef
 	end
 end
 
+--[[
+function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+	if not builderID then return end
+	local builderDefID = spGetUnitDefID(builderID)
+	if UnitDefs[builderDefID].isFactory and not noEject[builderDefID] then
+		gadget:UnitFromFactory(unitID, unitDefID, teamID, builderID, builderDefID)
+	end
+end
+]]--
 
 end
