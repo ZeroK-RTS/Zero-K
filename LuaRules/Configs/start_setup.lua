@@ -37,7 +37,7 @@ OVERDRIVE_BUFFER=10000
 
 BASE_COMM_COST = UnitDefNames.armcom1.metalCost or 1200
 
-COMM_SELECT_TIMEOUT = 30 * 60 * 2 -- 2 minutes
+COMM_SELECT_TIMEOUT = 30 * 60 * 0.5 -- half a minute
 
 EXCLUDED_UNITS = {
   [ UnitDefNames['terraunit'].id ] = true,
