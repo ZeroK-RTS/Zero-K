@@ -14,7 +14,7 @@ local CMD_UNIT_SET_TARGET = 34923
 local CMD_UNIT_CANCEL_TARGET = 34924
 
 function widget:CommandNotify(id, params, options)
-    if (id == CMD.ATTACK) then
+    if id == CMD.ATTACK and #params == 1 then
         local units = Spring.GetSelectedUnits()
         for i = 1, #units do
             Spring.GiveOrderToUnit(units[i],CMD_UNIT_SET_TARGET,params,{})

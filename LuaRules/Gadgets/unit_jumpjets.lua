@@ -406,6 +406,10 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 	goalSet[unitID] = false
 	return false  -- command was not used                     -- order
   end
+  
+  if not Spring.ValidUnitID(unitID) then
+    return true, true
+  end
 
   if (jumping[unitID]) then
     return true, false -- command was used but don't remove it
