@@ -535,6 +535,7 @@ local fhDraw    		= fontHandler.Draw
 local fhDrawCentered	= fontHandler.DrawCentered
 
 local caught, windowCaught, buttonHover
+local gameOver = false
 local showGameOverWin 	= true
 local sentToPlanetWars	= false
 
@@ -600,18 +601,21 @@ function gadget:Initialize()
 end
 
 function gadget:GameOver()
-
+	gameOver = true
+	--Spring.Echo("Game over (unsynced)")
 	-- reassign colors in case they have been changed locally
 	for _,team in pairs(totalTeamList) do
                 teamColors[team]  = {Spring.GetTeamColor(team)}
                 teamColorsDim[team]  = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
         end
 
+	--[[
 	gadget.IsAbove = gadget.IsAbove_
 	gadget.MouseMove = gadget.MouseMove_
 	gadget.MousePress = gadget.MousePress_
 	gadget.MouseRelease = gadget.MouseRelease_
 	gadget.DrawScreen = gadget.DrawScreen_
+
 
 	function UC(name)
 		--// bug in gadgetHandler workaround
@@ -624,6 +628,7 @@ function gadget:GameOver()
 	UC("MousePress")
 	UC("MouseRelease")
 	UC("DrawScreen")
+	]]--
 end
 
 
@@ -632,7 +637,8 @@ function gadget:IsAboveCloseButton(x,y)
 end
 
 
-function gadget:IsAbove_(x,y)
+function gadget:IsAbove(x,y)
+	if not gameOver then return false end
 	local above = (x > bx) and (x < bx+w) and (y > by) and (y < by+h) 
 
 	if (above)and(self:IsAboveCloseButton(x,y)) then
@@ -645,9 +651,11 @@ function gadget:IsAbove_(x,y)
 end
 
 
-function gadget:MousePress_(x,y,button)
+function gadget:MousePress(x,y,button)
   if (button==1) then
+	--Spring.Echo(self:IsAbove(x,y))
     if (self:IsAbove(x,y)) then
+	  --Spring.Echo(self:IsAboveCloseButton(x,y))
       if (self:IsAboveCloseButton(x,y)) then
         --// close button clicked
         if showGameOverWin then
@@ -669,7 +677,7 @@ function gadget:MousePress_(x,y,button)
 end
 
 
-function gadget:MouseRelease_(x,y,button)
+function gadget:MouseRelease(x,y,button)
 	if (button==1) then
 		if (windowCaught) then
 			windowCaught = false
@@ -682,7 +690,7 @@ function gadget:MouseRelease_(x,y,button)
 end
 
 
-function gadget:MouseMove_(x,y,button)
+function gadget:MouseMove(x,y,button)
 	if (windowCaught) then
 		bx = x-cx
 		by = y-cy
@@ -693,116 +701,69 @@ function gadget:MouseMove_(x,y,button)
 end
 
 
-function gadget:DrawScreen_()
-	if (not awardList) and SYNCED.awardList then
-		awardList = SYNCED.awardList
-	end
+function gadget:DrawScreen()
+	if gameOver then
+		if (not awardList) and SYNCED.awardList then
+			awardList = SYNCED.awardList
+		end
+		--Spring.Echo("Drawing awards")
+			
+		fontHandler.UseFont(smallFont)
+		glPushMatrix()
+		-- Main Box
+		glTranslate(bx,by, 0)
+		glColor(0.2, 0.2, 0.2, 0.4)
+		gl.Rect(0,0,w,h)
 		
-	fontHandler.UseFont(smallFont)
-	glPushMatrix()
-	-- Main Box
-	glTranslate(bx,by, 0)
-	glColor(0.2, 0.2, 0.2, 0.4)
-	gl.Rect(0,0,w,h)
-	
-	-- Title
-	glColor(1, 1, 0, 0.8)
-	glPushMatrix()
-	glTranslate(colSpacing,h-fontHeight*2,0)
-	glScale(1.5, 1.5, 1.5)
-	fhDraw('Awards', 0,0)
-	glPopMatrix()
-	
-	-- Button
-	if buttonHover then
-		glColor(0.4, 0.4, 0.9, 0.85)
-	else
-		glColor(0.9, 0.9, 0.9, 0.85)
-	end
-	gl.Rect(exitX1,exitY1,exitX2,exitY2)
-	fhDrawCentered('Show/Hide Stats Window', (exitX1 + exitX2)/2,(exitY1 + exitY2)/2 - fontHeight/2)
-	
-	glTranslate(margin, h - (tHeight + margin)*2, 0)
-	local row, col = 0,0
-	if awardList then
+		-- Title
+		glColor(1, 1, 0, 0.8)
+		glPushMatrix()
+		glTranslate(colSpacing,h-fontHeight*2,0)
+		glScale(1.5, 1.5, 1.5)
+		fhDraw('Awards', 0,0)
+		glPopMatrix()
 		
-		local teamCount = 0
+		-- Button
+		if buttonHover then
+			glColor(0.4, 0.4, 0.9, 0.85)
+		else
+			glColor(0.9, 0.9, 0.9, 0.85)
+		end
+		gl.Rect(exitX1,exitY1,exitX2,exitY2)
+		fhDrawCentered('Show/Hide Stats Window', (exitX1 + exitX2)/2,(exitY1 + exitY2)/2 - fontHeight/2)
 		
-		for team,awards in spairs(awardList) do
-		
-			local awardCount = 0
-			for awardType, record in spairs(awards) do
-				awardCount = awardCount + 1
-				if not sentToPlanetWars then
-					local planetWarsData = teamNames[team] ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
-					Spring.SendCommands("wbynum 255 SPRINGIE:award,".. planetWarsData)
-					Spring.Echo(planetWarsData)
-				end
-			end
-		
-			if awardCount > 0 then
-				teamCount = teamCount + 1
-				
-				if row == maxRow-1 then
-					row = 0
-					col = col + 1
-					glTranslate(margin+colSpacing, (tHeight+margin)*(maxRow-1) , 0)
-				end
-				
-				glColor( teamColorsDim[team] )
-				gl.Rect(0-margin/2, 0-margin/2, colSpacing-margin/2, tHeight+margin/2)
-				
-				glColor(1,1,1,1)	
-				fhDraw(teamNames[team] , 0, fontHeight )
-				
-				row = row + 1
-				glTranslate( 0, 0 - (tHeight+margin), 0)
-				if row == maxRow then
-					row = 0
-					col = col + 1
-					glTranslate(margin+colSpacing, (tHeight+margin)*maxRow , 0)
-				end
-				
+		glTranslate(margin, h - (tHeight + margin)*2, 0)
+		local row, col = 0,0
+		if awardList then
+			
+			local teamCount = 0
+			
+			for team,awards in spairs(awardList) do
+			
+				local awardCount = 0
 				for awardType, record in spairs(awards) do
-				
-					glColor(teamColorsDim[team] )
-					gl.Rect(0-margin/2, 0-margin/2, colSpacing-margin/2, tHeight+margin/2)
-					glColor(1,1,1,1)	
+					awardCount = awardCount + 1
+					if not sentToPlanetWars then
+						local planetWarsData = teamNames[team] ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
+						Spring.SendCommands("wbynum 255 SPRINGIE:award,".. planetWarsData)
+						Spring.Echo(planetWarsData)
+					end
+				end
+			
+				if awardCount > 0 then
+					teamCount = teamCount + 1
 					
-					glPushMatrix()
-						
-						local border = 2
-						glColor(0,0,0,1)
-						gl.Rect(0-border, 0-border, tWidth+border, tHeight+border)
-						glColor(1,1,1,1)	
-						glTexture('LuaRules/Images/awards/trophy_'.. awardType ..'.png')
-						glTexRect(0, 0, tWidth, tHeight )
-						
-						glTranslate(tWidth+margin,(fontHeight+margin),0)
-						glColor(1,1,0,1)
-						glPushMatrix()
-							if awardDescs[awardType]:len() > 35 then
-								glScale(0.6,1,1)
-							elseif awardDescs[awardType]:len() > 20 then
-								glScale(0.8,1,1)
-							end
-							--fhDraw(awardCount ..') '.. awardDescs[awardType], 0,0) 
-							fhDraw(awardDescs[awardType], 0,0) 
-						glPopMatrix()
-						
-						glTranslate(0,0-(fontHeight/2+margin),0)
-						glColor(1,1,1,1)
-						glPushMatrix()
-							if record:len() > 35 then
-								glScale(0.6,1,1)
-							elseif record:len() > 20 then
-								glScale(0.8,1,1)
-							end
-							
-							fhDraw('  '..record, 0,0)
-						glPopMatrix()
-						
-					glPopMatrix()
+					if row == maxRow-1 then
+						row = 0
+						col = col + 1
+						glTranslate(margin+colSpacing, (tHeight+margin)*(maxRow-1) , 0)
+					end
+					
+					glColor( teamColorsDim[team] )
+					gl.Rect(0-margin/2, 0-margin/2, colSpacing-margin/2, tHeight+margin/2)
+					
+					glColor(1,1,1,1)	
+					fhDraw(teamNames[team] , 0, fontHeight )
 					
 					row = row + 1
 					glTranslate( 0, 0 - (tHeight+margin), 0)
@@ -811,14 +772,64 @@ function gadget:DrawScreen_()
 						col = col + 1
 						glTranslate(margin+colSpacing, (tHeight+margin)*maxRow , 0)
 					end
-				end
-			end --if at least 1 award
+					
+					for awardType, record in spairs(awards) do
+					
+						glColor(teamColorsDim[team] )
+						gl.Rect(0-margin/2, 0-margin/2, colSpacing-margin/2, tHeight+margin/2)
+						glColor(1,1,1,1)	
+						
+						glPushMatrix()
+							
+							local border = 2
+							glColor(0,0,0,1)
+							gl.Rect(0-border, 0-border, tWidth+border, tHeight+border)
+							glColor(1,1,1,1)	
+							glTexture('LuaRules/Images/awards/trophy_'.. awardType ..'.png')
+							glTexRect(0, 0, tWidth, tHeight )
+							
+							glTranslate(tWidth+margin,(fontHeight+margin),0)
+							glColor(1,1,0,1)
+							glPushMatrix()
+								if awardDescs[awardType]:len() > 35 then
+									glScale(0.6,1,1)
+								elseif awardDescs[awardType]:len() > 20 then
+									glScale(0.8,1,1)
+								end
+								--fhDraw(awardCount ..') '.. awardDescs[awardType], 0,0) 
+								fhDraw(awardDescs[awardType], 0,0) 
+							glPopMatrix()
+							
+							glTranslate(0,0-(fontHeight/2+margin),0)
+							glColor(1,1,1,1)
+							glPushMatrix()
+								if record:len() > 35 then
+									glScale(0.6,1,1)
+								elseif record:len() > 20 then
+									glScale(0.8,1,1)
+								end
+								
+								fhDraw('  '..record, 0,0)
+							glPopMatrix()
+							
+						glPopMatrix()
+						
+						row = row + 1
+						glTranslate( 0, 0 - (tHeight+margin), 0)
+						if row == maxRow then
+							row = 0
+							col = col + 1
+							glTranslate(margin+colSpacing, (tHeight+margin)*maxRow , 0)
+						end
+					end
+				end --if at least 1 award
+			end
+			
+			sentToPlanetWars = true
 		end
-		
-		sentToPlanetWars = true
+		glPopMatrix()
+		glColor(0,0,0,0)
 	end
-	glPopMatrix()
-	glColor(0,0,0,0)
 end
 
 function gadget:ViewResize(vsx, vsy)
