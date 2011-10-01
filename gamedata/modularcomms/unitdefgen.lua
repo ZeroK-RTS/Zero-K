@@ -171,6 +171,11 @@ for i = 1, testDef.count do
 	ProcessComm(testDef[i].name, testDef[i])
 end
 
+-- for use by AI, in missions, etc.
+local staticComms = VFS.Include("gamedata/modularcomms/staticcomms.lua")
+for name,data in pairs(staticComms) do
+	ProcessComm(name, data)
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
