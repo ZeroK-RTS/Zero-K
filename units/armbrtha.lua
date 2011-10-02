@@ -88,6 +88,7 @@ unitDef = {
       accuracy                = 500,
       areaOfEffect            = 192,
       cegTag                  = [[vulcanfx]],
+	  commandfire             = true,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 
