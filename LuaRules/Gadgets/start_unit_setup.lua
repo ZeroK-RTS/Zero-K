@@ -318,10 +318,10 @@ end
 
 
 local function GetStartUnit(teamID, playerID, isAI)
-  local startUnit
+  local startUnit, startUnitAlt
 
   if isAI then 
-	return teamSidesAI[teamID]
+	return startUnits[teamSidesAI[teamID]]
   end
   
   if (teamID and teamSides[teamID]) then 
@@ -450,7 +450,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
     local teamLuaAI = Spring.GetTeamLuaAI(teamID)
     local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
 
-    local validTeam = (teamID ~= gaiateam and ((not teamLuaAI) or (not teamLuaAI:find("Chicken")) ))
+    local validTeam = (teamID ~= gaiateam and ((not teamLuaAI) or teamLuaAI == "" or teamLuaAI == "CAI"))
     local boost = (startMode == "boost"
                 or startMode == "limitboost"
                 or startMode == "facplopboost")
@@ -676,7 +676,7 @@ function gadget:GameStart()
           SpawnStartUnit(team, nil, true)
         end
       else -- no coop
-        SpawnStartUnit(team, nil, Spring.GetTeamLuaAI(team))	-- FIXME: handle engine AIs
+        SpawnStartUnit(team)
       end
 	  
 	  -- extra PW comms

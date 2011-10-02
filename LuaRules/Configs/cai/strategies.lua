@@ -6,6 +6,9 @@ example buildTasksMods
 			buildConfig.robots.factoryByDefId[UnitDefNames['factoryveh'].id].importance = 0
 			buildConfig.robots.factoryByDefId[UnitDefNames['factoryspider'].id].importance = 0
 		end,
+
+strikecomm = armcom
+battlecomm = corcom
 --]]
 local function noFunc()
 end
@@ -138,8 +141,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "comm_guardian", chance = 0.5},
-			[2] = {ID = "comm_marine", chance = 0.5},
+			[1] = {ID = "strikecomm", chance = 0.5},
+			[2] = {ID = "battlecomm", chance = 0.5},
 		},
 		buildTasksMods = noFunc,
 		conAndEconHandlerMods = {},
@@ -149,9 +152,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "comm_recon", chance = 0.35},
-			[2] = {ID = "comm_hunter", chance = 0.3},
-			[3] = {ID = "comm_flamer", chance = 0.35},
+			[1] = {ID = "strikecomm", chance = 0.5},
+			[2] = {ID = "battlecomm", chance = 0.5},
 		},
 		buildTasksMods = BuildTasksMod_Blitz,
 		conAndEconHandlerMods = {},
@@ -161,9 +163,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "comm_marine", chance = 0.35},
-			[2] = {ID = "comm_rocketeer", chance = 0.35},
-			[3] = {ID = "comm_marksman", chance = 0.3},			
+			[1] = {ID = "strikecomm", chance = 0.5},
+			[2] = {ID = "battlecomm", chance = 0.5},
 		},
 		buildTasksMods = BuildTasksMod_Pusher,
 		conAndEconHandlerMods = {},
@@ -173,8 +174,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "comm_riot", chance = 0.6},
-			[2] = {ID = "comm_guardian", chance = 0.4},
+			[1] = {ID = "strikecomm", chance = 0.4},
+			[2] = {ID = "battlecomm", chance = 0.6},
 		},
 		buildTasksMods =  BuildTasksMod_Defensive,
 		conAndEconHandlerMods = {},
@@ -184,8 +185,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "comm_flamer", chance = 0.5},
-			[2] = {ID = "comm_marksman", chance = 0.5},
+			[1] = {ID = "strikecomm", chance = 0.7},
+			[2] = {ID = "battlecomm", chance = 0.3},
 		},
 		buildTasksMods = noFunc,
 		conAndEconHandlerMods = {},
@@ -195,7 +196,7 @@ strategies = {
 		chance = 0,
 		commanders = {
 			count = 1,
-			[1] = {ID = "comm_special", chance = 1},
+			[1] = {ID = "strikecomm", chance = 1},
 		},
 		buildTasksMods = BuildTasksMod_Lolz,
 		conAndEconHandlerMods = {},
