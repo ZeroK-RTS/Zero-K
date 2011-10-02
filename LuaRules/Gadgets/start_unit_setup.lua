@@ -676,7 +676,7 @@ function gadget:GameStart()
           SpawnStartUnit(team, nil, true)
         end
       else -- no coop
-        SpawnStartUnit(team, nil, Spring.GetTeamLuaAI(team) or Spring.GetAIInfo(team))
+        SpawnStartUnit(team, nil, Spring.GetTeamLuaAI(team))	-- FIXME: handle engine AIs
       end
 	  
 	  -- extra PW comms

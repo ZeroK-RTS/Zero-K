@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Lobber]],
   description         = [[Artillery]],
   acceleration        = 0.36,
-  bmcode              = [[1]],
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -12,7 +11,7 @@ unitDef = {
   buildTime           = 200,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,  
+  canHover            = false,  
   canMove             = true,
   canPatrol           = true,
   canstop             = [[1]],
@@ -26,7 +25,6 @@ unitDef = {
 	helptext_de    = [[Eine Form organischer Artillerie. Der Lobber schleudert Giftbälle in einer hohen Flugkurve über lange Distanzen. Er stellt eine Problem für diejenigen dar, die sich auf stationäre Verteidigungsanlagen verlassen. Relativ hilflos ist er, sobald er direkt angegriffen wird.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[NOWEAPON]],
   footprintX          = 2,
   footprintZ          = 2,
@@ -61,11 +59,9 @@ unitDef = {
   },
 
   side                = [[THUNDERBIRDS]],
-  sightDistance       = 2000,
+  sightDistance       = 1000,
   smoothAnim          = true,
   sonarDistance       = 450,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
   trackOffset         = 6,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -73,6 +69,7 @@ unitDef = {
   trackWidth          = 30,
   turnRate            = 806,
   upright             = false,
+  waterline			  = 16,
   workerTime          = 0,
 
   weapons             = {

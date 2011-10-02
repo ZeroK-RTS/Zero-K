@@ -2,8 +2,8 @@
 --------------------------------------------------------------------------------
 local modoptions = Spring.GetModOptions() or {}
 
-local hardModifier   = 0.9	--0.75
-local suicidalModifier = 0.8
+local hardModifier   = 0.875
+local suicidalModifier = 0.75
 local customModifier = modoptions.techtimemult or 1
 
 local eggsModifier = 0.8	--unused

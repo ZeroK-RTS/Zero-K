@@ -582,7 +582,7 @@ local function SpawnTurret(burrowID, turret, number, force)
 	defenderChance = defenderChance * (squadSize or 1)
   end
   
-  if (random() > defenderChance and defenderChance < 1)  or (not turret) or Spring.GetUnitIsDead(burrowID) then
+  if ((not force) and random() > defenderChance and defenderChance < 1)  or (not turret) or Spring.GetUnitIsDead(burrowID) then
     return
   end
   

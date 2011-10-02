@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Blobber]],
   description         = [[Heavy Artillery]],
   acceleration        = 0.36,
-  bmcode              = [[1]],
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -12,7 +11,7 @@ unitDef = {
   buildTime           = 900,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,  
+  canHover            = false,  
   canMove             = true,
   canPatrol           = true,
   canstop             = [[1]],
@@ -26,7 +25,6 @@ unitDef = {
 	helptext_de    = [[Der groﬂe Bruder vom Lobber, der Blobber, schleudert eine weite Streuung an ‰tzender Schmiere. Er kann sogar die st‰krsten Schildnetze sehr schnell einschlagen, doch gegen direkte Attacken wirkt er sehr anf‰llig.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[NOWEAPON]],
   footprintX          = 4,
   footprintZ          = 4,
@@ -35,7 +33,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  maneuverleashlength = [[640]],
   mass                = 328,
   maxDamage           = 2400,
   maxSlope            = 36,
@@ -49,6 +46,7 @@ unitDef = {
   power               = 400,
   seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
+  
 
   sfxtypes            = {
 
@@ -61,11 +59,9 @@ unitDef = {
   },
 
   side                = [[THUNDERBIRDS]],
-  sightDistance       = 1000,
+  sightDistance       = 1200,
   smoothAnim          = true,
   sonarDistance       = 450,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
   trackOffset         = 6,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -73,6 +69,7 @@ unitDef = {
   trackWidth          = 30,
   turnRate            = 806,
   upright             = false,
+  waterline           = 24,
   workerTime          = 0,
 
   weapons             = {
@@ -110,12 +107,9 @@ unitDef = {
       impulseFactor           = 0.4,
       intensity               = 0.7,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
       mygravity               = 0.1,
-      noSelfDamage            = true,
       range                   = 1350,
       reloadtime              = 8,
-      renderType              = 4,
       rgbColor                = [[0.2 0.6 0.0]],
       size                    = 8,
       sizeDecay               = 0,
