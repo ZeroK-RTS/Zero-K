@@ -821,10 +821,9 @@ local function MakeMenuTab(i, alpha)
 		y = 0,
 		width = "16%",
 		height = "100%",
-		font = {
-			shadow = true
-		},
-		
+--		font = {
+--			shadow = true
+--		},
 		
 		caption = menuChoices[i].name,
 		OnClick = {

@@ -50,7 +50,7 @@ local spSetUnitWeaponState	= Spring.SetUnitWeaponState
 local spSetUnitStockpile	= Spring.SetUnitStockpile
 local spGiveOrderToUnit		= Spring.GiveOrderToUnit
 
-local cmdTypeIconModeOrNumber = {	-- only those that will have one param need apply
+local cmdTypeIconModeOrNumber = {
 	[CMD.AUTOREPAIRLEVEL] = true,
 	[CMD.SET_WANTED_MAX_SPEED] = true,
 }
