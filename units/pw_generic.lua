@@ -11,11 +11,16 @@ unitDef = {
   buildCostMetal                = 1000,
   builder                       = false,
   buildTime                     = 1000,
+  canSelfDestruct				= false,
   category                      = [[SINK UNARMED]],
-  collisionVolumeTest           = 1,
+  collisionVolumeOffsets 		= [[0 0 0]],
+  collisionVolumeScales  		= [[120 100 130]],
+  collisionVolumeTest    		= 1,
+  collisionVolumeType    		= [[Box]],
   --corpse                        = [[DEAD]],
 
   customParams                  = {
+  	dontcount = [[1]],
   },
 
   energyUse                     = 0,
@@ -31,6 +36,7 @@ unitDef = {
   maxSlope                      = 18,
   maxVelocity                   = 0,
   minCloakDistance              = 150,
+  modelCenterOffsets			= [[0 0 0]],
   noAutoFire                    = false,
   objectName                    = [[pw_techlab.obj]],
   power							= 100,

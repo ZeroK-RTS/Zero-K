@@ -12,6 +12,7 @@ end
 
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
+local defender = nil
 
 if (not gadgetHandler:IsSyncedCode()) then
 	return
@@ -65,102 +66,123 @@ local function normaliseBoxes(box)
 	box.bottom = box.bottom/mapHeight
 end
 
-local function spawnStructures(left, top, right, bottom)
-	local gaiaID = Spring.GetGaiaTeamID()
+local function spawnStructures(left, top, right, bottom, team)
+	local teamID = team or Spring.GetGaiaTeamID()
 	local xBase = mapWidth*left
 	local xRand = mapWidth*(right-left)
 	local zBase = mapHeight*top
 	local zRand = mapHeight*(bottom-top)
 	
 	for _,info in pairs(unitData) do
-		Spring.Echo("Processing PW structure: "..info.unitname)
-		local giveUp = 0
-		local x = xBase + math.random()*xRand
-		local z = zBase + math.random()*zRand
-		local direction = math.floor(math.random()*4)
-		local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
-		
-		if not defID then
-			Spring.Echo('Planetwars error: Missing structure def ' .. info.unitname)
-		elseif info.isDestroyed == 1 then
-			--do nothing
-		else
-			while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or (lava and Spring.GetGroundHeight(x,z) <= 0)) and giveUp < 25 do
-				x = xBase + math.random()*xRand
-				z = zBase + math.random()*zRand
-				giveUp = giveUp + 1
-			end
+		if type(info) == "table" then
+			Spring.Echo("Processing PW structure: "..info.unitname)
+			local giveUp = 0
+			local x = xBase + math.random()*xRand
+			local z = zBase + math.random()*zRand
+			local direction = math.floor(math.random()*4)
+			local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
 			
-			local unitID = Spring.CreateUnit(info.unitname, x, 0, z, direction, gaiaID)
-			Spring.SetUnitNeutral(unitID,true)
-			unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
+			if not defID then
+				Spring.Echo('Planetwars error: Missing structure def ' .. info.unitname)
+			elseif info.isDestroyed == 1 then
+				--do nothing
+			else
+				while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or (lava and Spring.GetGroundHeight(x,z) <= 0)) and giveUp < 25 do
+					x = xBase + math.random()*xRand
+					z = zBase + math.random()*zRand
+					giveUp = giveUp + 1
+				end
+				
+				local unitID = Spring.CreateUnit(info.unitname, x, 0, z, direction, teamID)
+				Spring.SetUnitNeutral(unitID,true)
+				unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
+			end
 		end
 	end
 end
 
+--[[
 function gadget:GameStart()
-
-	local box = {[0] = {}, [1] = {}}
-	box[0].left, box[0].top, box[0].right, box[0].bottom  = Spring.GetAllyTeamStartBox(0)
-	box[1].left, box[1].top, box[1].right, box[1].bottom = Spring.GetAllyTeamStartBox(1)
-	
-	if not (box[0].right and box[1].right) then
-		spawnStructures(0.35,0.35,0.65,0.65)
-	end
-	
-	normaliseBoxes(box[0])
-	normaliseBoxes(box[1])
-	
-	if box[0].right - box[0].left >= 0.9 and box[1].right - box[1].left >= 0.9 then -- north vs south
-		spawnStructures(0.1,0.44,0.9,0.56)
-	elseif box[0].bottom - box[0].top >= 0.9 and box[1].bottom - box[1].top >= 0.9 then -- east vs west
-		spawnStructures(0.44,0.1,0.56,0.9)
-	else -- random idk boxes
-		spawnStructures(0.35,0.35,0.65,0.65)
-	end
 end
+]]--
 
 function gadget:Initialize()
-	
-	local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-	local pwDataRaw = modOptions.planetwarsstructures
-	local pwDataFunc, err, success
-	
-	if not (pwDataRaw and type(pwDataRaw) == 'string') then
-		err = "Planetwars data entry in modoption is empty or in invalid format"
-		unitData = {}
-	else
-		pwDataRaw = string.gsub(pwDataRaw, '_', '=')
-		pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
-		pwDataFunc, err = loadstring("return "..pwDataRaw)
-		if pwDataFunc then
-			success, unitData = pcall(pwDataFunc)
-			if not success then	-- execute Borat
-				err = unitData
-				unitData = {}
+	if Spring.GetGameFrame() > 0 then	--game has started
+		local units = Spring.GetAllUnits()
+		for i=1,#units do
+			local unitID = units[i]
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			local unitDef = UnitDefs[unitDefID]
+			if unitDef.name:find("pw_") then	-- is PW
+				unitsByID[unitID] = {name = unitDef.name, teamDamages = {}}
 			end
 		end
-	end
-	if err then 
-		Spring.Echo('Planetwars error: ' .. err)
-	end
-
-	if not unitData then 
-		unitData = {} 
-	end
+		
+	else
 	
-	local spawningAnything = false
-	for i,v in pairs(unitData) do
-		if (v.isDestroyed~=1) then 
-			spawningAnything = true
-			break
+		local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
+		local pwDataRaw = modOptions.planetwarsstructures
+		local pwDataFunc, err, success
+		
+		if not (pwDataRaw and type(pwDataRaw) == 'string') then
+			err = "Planetwars data entry in modoption is empty or in invalid format"
+			unitData = {}
+		else
+			pwDataRaw = string.gsub(pwDataRaw, '_', '=')
+			pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
+			pwDataFunc, err = loadstring("return "..pwDataRaw)
+			if pwDataFunc then
+				success, unitData = pcall(pwDataFunc)
+				if not success then	-- execute Borat
+					err = unitData
+					unitData = {}
+				end
+			end
 		end
+		if err then 
+			Spring.Echo('Planetwars error: ' .. err)
+		end
+
+		if not unitData then 
+			unitData = {} 
+		end
+		
+		defender = unitData.defender or defender
+		
+		local spawningAnything = false
+		for i,v in pairs(unitData) do
+			if (v.isDestroyed~=1) then 
+				spawningAnything = true
+				break
+			end
+		end
+		
+		if not spawningAnything then
+			gadgetHandler:RemoveGadget()
+		end
+
+		local box = {[0] = {}, [1] = {}}
+		box[0].left, box[0].top, box[0].right, box[0].bottom  = Spring.GetAllyTeamStartBox(0)
+		box[1].left, box[1].top, box[1].right, box[1].bottom = Spring.GetAllyTeamStartBox(1)
+		
+		if not (box[0].right and box[1].right) then
+			spawnStructures(0.35,0.35,0.65,0.65)
+		end
+		
+		normaliseBoxes(box[0])
+		normaliseBoxes(box[1])
+		
+		if defender then
+			local n = select(6, Spring.GetTeamInfo(defender))
+			spawnStructures(box[n].left, box[n].top, box[n].right, box[n].bottom)	-- warning: will break with FFAs (see box var initialization above)
+		elseif box[0].right - box[0].left >= 0.9 and box[1].right - box[1].left >= 0.9 then -- north vs south
+			spawnStructures(0.1,0.44,0.9,0.56)
+		elseif box[0].bottom - box[0].top >= 0.9 and box[1].bottom - box[1].top >= 0.9 then -- east vs west
+			spawnStructures(0.44,0.1,0.56,0.9)
+		else -- random idk boxes
+			spawnStructures(0.35,0.35,0.65,0.65)
+		end	
 	end
-	
-	if not spawningAnything then
-		gadgetHandler:RemoveGadget()
-	end
-	
 end
 
 ------------------------------------------------------------------------

@@ -26,25 +26,31 @@ structureConfig = {
 			unitDef.footprintz = 4
 			
 			unitDef.customparams.soundselect = "cloaker_select"
-			unitDef.canselfdestruct = false
+			
+			unitDef.collisionvolumescales = [[60 70 60]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[CylY]]					
 		end,		
 		
 	pw_dropfac = function(unitDef)
 			unitDef.maxdamage = 50000
-			unitDef.name = "Dropship Factory"
-			unitDef.description = "Produces 1 free dropship per turn"
+			unitDef.name = "Ship Factory"
+			unitDef.description = "Produces 0.25 free ships per turn"
 			unitDef.objectname = "pw_dropfac.obj"
 			
 			unitDef.footprintx = 20			
 			unitDef.footprintz = 16
 			
 			unitDef.customparams.soundselect = "building_select1"
+			
+			unitDef.collisionvolumescales = [[315 130 244]]
+			unitDef.modelcenteroffset = [[0 10 0]]	
 		end,
 		
 	pw_dropdepot = function(unitDef)
 			unitDef.maxdamage = 40000
-			unitDef.name = "Dropship Hangar"
-			unitDef.description = "Increases dropship capacity by 3"
+			unitDef.name = "Fleet Command"
+			unitDef.description = "Increases ship capacity by 3"
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
 			
@@ -52,6 +58,9 @@ structureConfig = {
 			unitDef.footprintz = 11
 			
 			unitDef.customparams.soundselect = "building_select1"
+			
+			unitDef.collisionvolumescales = [[245 220 145]]
+			unitDef.modelcenteroffset = [[15 40 0]]			
 		end,
 		
 	pw_mine = function(unitDef)
@@ -68,6 +77,10 @@ structureConfig = {
 			unitDef.selfdestructas = "ESTOR_BUILDING"
 			
 			unitDef.customparams.soundselect = "building_select2"
+			
+			unitDef.collisionvolumescales = [[65 120 65]]
+			unitDef.modelcenteroffset = [[0 10 0]]
+			unitDef.collisionvolumetype	= [[CylY]]		
 		end,
 		
 	pw_mine2 = function(unitDef)
@@ -81,12 +94,15 @@ structureConfig = {
 			unitDef.footprintz = 7
 			
 			unitDef.customparams.soundselect = "building_select2"
+			
+			unitDef.collisionvolumescales = [[110 125 110]]
+			unitDef.modelcenteroffset = [[0 10 0]]			
 		end,
 		
 	pw_mine3 = function(unitDef)
 			unitDef.maxdamage = 45000
 			unitDef.name = "Planetary Mining Complex"
-			unitDef.description = "Produces 450 credits/turn" 
+			unitDef.description = "Produces 250 credits/turn" 
 			unitDef.objectname = "pw_mine3.obj"
 			unitDef.script = "pw_mine3.lua"
 			
@@ -97,6 +113,8 @@ structureConfig = {
 			unitDef.selfdestructas = "NUCLEAR_MISSILE"
 			
 			unitDef.customparams.soundselect = "building_select2"
+			unitDef.collisionvolumescales = [[130 130 130]]
+			unitDef.modelcenteroffset = [[0 10 0]]					
 		end,
 		
 	pw_wormhole = function(unitDef)
@@ -109,6 +127,8 @@ structureConfig = {
 			unitDef.footprintz = 6
 			
 			unitDef.customparams.soundselect = "shield_select"
+			unitDef.collisionvolumescales = [[160 65 80]]
+			unitDef.modelcenteroffset = [[0 30 0]]					
 		end,
 		
 	pw_wormhole2 = function(unitDef)
@@ -121,6 +141,10 @@ structureConfig = {
 			unitDef.footprintz = 9
 			
 			unitDef.customparams.soundselect = "shield_select"
+			
+			unitDef.collisionvolumescales = [[100 90 100]]
+			unitDef.modelcenteroffset = [[0 20 0]]
+			unitDef.collisionvolumetype	= [[CylY]]				
 		end,
 		
 	pw_warpgate = function(unitDef)
@@ -136,6 +160,93 @@ structureConfig = {
 			unitDef.selfdestructas = "GRAV_BLAST"
 			
 			unitDef.customparams.soundselect = "cloaker_select"
+			
+			unitDef.collisionvolumescales = [[120 100 120]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[CylY]]					
 		end,
 }
+
+-- test data here
+--[[
+{
+  defender = 0,
+  s1 = {
+    unitname = "pw_mine",
+    name = "Mining outpost",
+    description = "Produces 50 credits each turn"
+  },
+  s2 = {
+    unitname = "pw_mine2",
+    name = "Automated mines",
+    description = "Produces 150 credits each turn"
+  },
+  s3 = {
+    unitname = "pw_mine3",
+    name = "Automated mines",
+    description = "Produces 150 credits each turn"
+  },
+  s4 = {
+    unitname = "pw_dropfac",
+    name = "Ship factory",
+    description = "Produces 0.25 dropships each turn"
+  },
+  s5 = {
+    unitname = "pw_dropdepot",
+    name = "Fleet command",
+    description = "Produces 0.25 dropships each turn"
+  }, 
+  s9 = {
+    unitname = "pw_warpgate",
+    name = "Warpgate",
+    description = "Teleports 1 ship anywhere in the galaxy"
+  },
+  s10 = {
+    unitname = "pw_generictech",
+    name = "Tech building",
+    description = "Produces ze research"
+  },      
+  s18 = {
+    unitname = "pw_wormhole",
+    name = "Wormhole generator",
+    description = "Links planets with 25% of influence"
+  },
+  s19 = {
+    unitname = "pw_wormhole2",
+    name = "Improved wormhole stabilizer",
+    description = "Improves link strength up to 50% of influence"
+  },
+  s99 = {
+    unitname = "pw_artefact",
+    name = "Ancient artefacts",
+    description = "Capture all such planets and all technologies to win, prevents buying influence from locals"
+  },  
+}
+
+ew0KICBkZWZlbmRlciA9IDAsDQogIHMxID0gew0KICAgIHVuaXRuYW1lID0gInB3X21pbmUiLA0K
+ICAgIG5hbWUgPSAiTWluaW5nIG91dHBvc3QiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2Vz
+IDUwIGNyZWRpdHMgZWFjaCB0dXJuIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJw
+d19taW5lMiIsDQogICAgbmFtZSA9ICJBdXRvbWF0ZWQgbWluZXMiLA0KICAgIGRlc2NyaXB0aW9u
+ID0gIlByb2R1Y2VzIDE1MCBjcmVkaXRzIGVhY2ggdHVybiINCiAgfSwNCiAgczMgPSB7DQogICAg
+dW5pdG5hbWUgPSAicHdfbWluZTMiLA0KICAgIG5hbWUgPSAiQXV0b21hdGVkIG1pbmVzIiwNCiAg
+ICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyAxNTAgY3JlZGl0cyBlYWNoIHR1cm4iDQogIH0sDQog
+IHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2Ryb3BmYWMiLA0KICAgIG5hbWUgPSAiU2hpcCBm
+YWN0b3J5IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyAwLjI1IGRyb3BzaGlwcyBlYWNo
+IHR1cm4iDQogIH0sDQogIHM1ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2Ryb3BkZXBvdCIsDQog
+ICAgbmFtZSA9ICJGbGVldCBjb21tYW5kIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyAw
+LjI1IGRyb3BzaGlwcyBlYWNoIHR1cm4iDQogIH0sIA0KICBzOSA9IHsNCiAgICB1bml0bmFtZSA9
+ICJwd193YXJwZ2F0ZSIsDQogICAgbmFtZSA9ICJXYXJwZ2F0ZSIsDQogICAgZGVzY3JpcHRpb24g
+PSAiVGVsZXBvcnRzIDEgc2hpcCBhbnl3aGVyZSBpbiB0aGUgZ2FsYXh5Ig0KICB9LA0KICBzMTAg
+PSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ2VuZXJpY3RlY2giLA0KICAgIG5hbWUgPSAiVGVjaCBi
+dWlsZGluZyIsDQogICAgZGVzY3JpcHRpb24gPSAiUHJvZHVjZXMgemUgcmVzZWFyY2giDQogIH0s
+ICAgICAgDQogIHMxOCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193b3JtaG9sZSIsDQogICAgbmFt
+ZSA9ICJXb3JtaG9sZSBnZW5lcmF0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIHBsYW5l
+dHMgd2l0aCAyNSUgb2YgaW5mbHVlbmNlIg0KICB9LA0KICBzMTkgPSB7DQogICAgdW5pdG5hbWUg
+PSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIHdvcm1ob2xlIHN0YWJpbGl6
+ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkltcHJvdmVzIGxpbmsgc3RyZW5ndGggdXAgdG8gNTAl
+IG9mIGluZmx1ZW5jZSINCiAgfSwNCiAgczk5ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2FydGVm
+YWN0IiwNCiAgICBuYW1lID0gIkFuY2llbnQgYXJ0ZWZhY3RzIiwNCiAgICBkZXNjcmlwdGlvbiA9
+ICJDYXB0dXJlIGFsbCBzdWNoIHBsYW5ldHMgYW5kIGFsbCB0ZWNobm9sb2dpZXMgdG8gd2luLCBw
+cmV2ZW50cyBidXlpbmcgaW5mbHVlbmNlIGZyb20gbG9jYWxzIg0KICB9LCAgDQp9
+]]--
 
