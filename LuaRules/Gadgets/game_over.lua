@@ -66,8 +66,8 @@ local doesNotCountList = {
 
 -- auto detection of doesnotcount units
 for name, ud in pairs(UnitDefs) do
-	if (ud.customParams.doesntcount) then
-		doesNotCountList[ud.id] = tobool(ud.customParams.doesntcount) or nil
+	if (ud.customParams.dontcount) then
+		doesNotCountList[ud.id] = tobool(ud.customParams.dontcount) or nil
 	elseif (ud.isFeature) then
 		doesNotCountList[ud.id] = true
 	elseif (not ud.canAttack) and (not ud.speed) and (not ud.isFactory) then

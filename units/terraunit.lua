@@ -18,7 +18,7 @@ unitDef = {
   collisionVolumeType    = [[box]],
 
   customParams           = {
-    dontCount      = [[1]],
+    dontcount      = [[1]],
     mobilebuilding = [[1]],
   },
 
