@@ -171,7 +171,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 3300,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
       height           = [[4]],
@@ -184,27 +184,7 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-
-    DEAD2 = {
-      description      = [[Debris - Crusader]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 3300,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      hitdensity       = [[100]],
-      metal            = 280,
-      object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 280,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
+    
     HEAP  = {
       description      = [[Debris - Crusader]],
       blocking         = false,

@@ -203,7 +203,7 @@ end
 --------------------------------------------------------------------------------
 -- Units with shields cannot cloak
 --
-Spring.Echo("Shield Weapon Def")
+--Spring.Echo("Shield Weapon Def")
 for name, ud in pairs(UnitDefs) do
 	local hasShield = false
 	if ud.weapondefs then

@@ -11,6 +11,7 @@ local weaponDef = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
 		setunitsonfire = "1",
+		burntime = [[450]],
 	},
 
     damage                  = {
@@ -20,7 +21,7 @@ local weaponDef = {
     },
 
     explosionGenerator      = [[custom:SMOKE]],
-    fireStarter             = 100,
+    fireStarter             = 150,
     flameGfxTime            = 1.6,
     impulseBoost            = 0,
     impulseFactor           = 0,
