@@ -14,6 +14,7 @@
 --	- handle features
 --	- handle rulesparams, fac command queues
 --	- handle gadget data (CAI and chicken are particularly important)
+--	- handle nonexistent unitDefs
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -109,11 +110,12 @@ function gadget:Load(zip)
 	-- prep units
 	for oldID, data in pairs(unitData) do
 		local px, py, pz = unpack(data.pos)
-		if (not UnitDefs[data.unitDefID].canMove) then
+		local unitDefID = UnitDefNames[data.unitDefName].id
+		if (not UnitDefs[unitDefID].canMove) then
 			py = Spring.GetGroundHeight(px, pz)
 		end
 		local isNanoFrame = data.buildProgress < 1
-		local newID = spCreateUnit(data.unitDefID, px, py, pz, 0, data.unitTeam, isNanoFrame)
+		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame)
 		data.newID = newID
 		-- position and velocity
 		spSetUnitVelocity(newID, unpack(data.vel))
@@ -226,6 +228,8 @@ local function WriteTable(array, numIndents, endOfFile)
 			str = str .. WriteTable(v, numIndents + 1)
 		elseif type(v) == "boolean" then
 			str = str .. tostring(v) .. ",\n"
+		elseif type(v) == "string" then
+			str = str .. [["]] .. v .. [["]] .. ",\n"
 		else
 			str = str .. v .. ",\n"
 		end
@@ -252,44 +256,44 @@ local function SaveUnits()
 	for i=1,#units do
 		local unitID = units[i]
 		data[unitID] = {}
-		local unitData = data[unitID]
+		local unitInfo = data[unitID]
 		
 		-- basic unit information
 		local unitDefID = spGetUnitDefID(unitID)
-		unitData.unitDefID = unitDefID
+		unitInfo.unitDefName = UnitDefs[unitDefID].name
 		local unitTeam = spGetUnitTeam(unitID)
-		unitData.unitTeam = unitTeam
+		unitInfo.unitTeam = unitTeam
 		local neutral = spGetUnitNeutral(unitID)
 		-- save position/velocity
-		unitData.pos = {spGetUnitBasePosition(unitID)}
-		unitData.dir = {spGetUnitDirection(unitID)}
-		unitData.vel = {spGetUnitVelocity(unitID)}		
+		unitInfo.pos = {spGetUnitBasePosition(unitID)}
+		unitInfo.dir = {spGetUnitDirection(unitID)}
+		unitInfo.vel = {spGetUnitVelocity(unitID)}		
 		-- save health
-		unitData.health, unitData.maxHealth, unitData.paralyzeDamage, unitData.captureProgress, unitData.buildProgress = spGetUnitHealth(unitID)
+		unitInfo.health, unitInfo.maxHealth, unitInfo.paralyzeDamage, unitInfo.captureProgress, unitInfo.buildProgress = spGetUnitHealth(unitID)
 		-- save weapons
 		local weapons = UnitDefs[unitDefID].weapons
-		unitData.weapons = {}
-		unitData.shield = {}
+		unitInfo.weapons = {}
+		unitInfo.shield = {}
 		for i=1,#weapons do
-			unitData.weapons[i] = {}
-			unitData.weapons[i].reloadState = spGetUnitWeaponState(unitID, i, reloadState)
+			unitInfo.weapons[i] = {}
+			unitInfo.weapons[i].reloadState = spGetUnitWeaponState(unitID, i, reloadState)
 			local enabled, power = Spring.GetUnitShieldState(unitID, i)
 			if power then
-				unitData.shield[i] = {enabled = enabled, power = power}
+				unitInfo.shield[i] = {enabled = enabled, power = power}
 			end
 		end
-		unitData.stockpile = {}
-		unitData.stockpile.num, _, unitData.stockpile.progress = spGetUnitStockpile(unitID)
+		unitInfo.stockpile = {}
+		unitInfo.stockpile.num, _, unitInfo.stockpile.progress = spGetUnitStockpile(unitID)
 		
 		-- save commands and states
 		local commands = spGetUnitCommands(unitID)
 		for i,v in pairs(commands) do
 			if (type(v) == "table" and v.params) then v.params.n = nil end
 		end
-		unitData.commands = commands
-		unitData.states = spGetUnitStates(unitID)
+		unitInfo.commands = commands
+		unitInfo.states = spGetUnitStates(unitID)
 		-- save experience
-		unitData.experience = spGetUnitExperience(unitID)
+		unitInfo.experience = spGetUnitExperience(unitID)
 		-- save rulesparams (TBD)
 
 	end
