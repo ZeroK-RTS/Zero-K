@@ -29,7 +29,7 @@ unitDef = {
 	helptext_de	   = [[Der Pit Bull ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
   },
 
-  damageModifier                = 0.15,
+  damageModifier                = 0.25,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,
@@ -38,7 +38,7 @@ unitDef = {
   idleTime                      = 1800,
   levelGround                   = false,
   mass                          = 252,
-  maxDamage                     = 2250,
+  maxDamage                     = 3000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,

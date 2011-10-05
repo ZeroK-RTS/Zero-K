@@ -27,7 +27,7 @@ unitDef = {
 	helptext_de    = [[Der Razor's Kiss ist ein abgehärteter Flugabwehrturm, dessen hohe Trefferpunkte und Panzerungsbonus es für Gegner, sobald geschlossen, enorm schwer macht, ihn zu zerstören.]],
   },
 
-  damageModifier                = 0.2,
+  damageModifier                = 0.25,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,
