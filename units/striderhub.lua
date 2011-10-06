@@ -18,6 +18,7 @@ unitDef = {
 	[[scorpion]],
     [[dante]],
     [[armraven]],
+	[[funnelweb]],
     [[armbanth]],
     [[gorg]],
     [[armorco]],
