@@ -9,7 +9,13 @@
 --
 
 return {
-   {
+  {
+	-- to be recognised as a CAI there must be an entry with this name in -> need changes to be renamed to ZK AI ?
+	-- LuaRules\Configs\cai\configCoordinator.lua
+    name = 'CAI',
+    desc = 'AI that plays regular Zero-K'
+  },
+  {
     name = 'Chicken: Very Easy',
     desc = 'For PvE in PvP games'
   },
@@ -52,12 +58,6 @@ return {
   {
     name = 'Chicken Eggs: Custom',
     desc = 'A chicken experience customizable using modoptions WITH EGGS!'
-  },
-  {
-	-- to be recognised as a CAI there must be an entry with this name in -> need changes to be renamed to ZK AI ?
-	-- LuaRules\Configs\cai\configCoordinator.lua
-    name = 'CAI',
-    desc = 'AI that plays regular Zero-K'
   },
 }
 

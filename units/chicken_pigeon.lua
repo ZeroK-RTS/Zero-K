@@ -43,7 +43,7 @@ unitDef = {
   maxVelocity         = 10,
   moverate1           = [[32]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[chicken_pigeon.s3o]],
   power               = 50,
   seismicSignature    = 0,
@@ -79,7 +79,7 @@ unitDef = {
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SUB SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },
