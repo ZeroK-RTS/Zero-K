@@ -294,7 +294,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Metal and Energy Bonus
+-- Metal and Energy Bonus; fac cost mult
 --
 
 if (modOptions and modOptions.metalmult) then
@@ -320,6 +320,16 @@ if (modOptions and modOptions.energymult) then
   end
 end
 
+-- FIXME: doesn't change wreck cost
+if (modOptions and modOptions.factorycostmult) then
+  for name, def in pairs(UnitDefs) do
+    if def.unitname:find("factory") or def.unitname == "corsy" or def.unitname == "armcsa" then
+		def.buildcostmetal = def.buildcostmetal * modOptions.factorycostmult
+		def.buildcostenergy = def.buildcostenergy * modOptions.factorycostmult
+		def.buildtime = def.buildtime * modOptions.factorycostmult
+	end
+  end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- OD mex divide by 20
