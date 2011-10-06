@@ -21,6 +21,7 @@ end
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
+local TRANSLOCATION_MULT = 0.66		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
 
 local unitData = {}
 local unitsByID = {}
@@ -107,7 +108,7 @@ end
 ]]--
 
 function gadget:Initialize()
-	if Spring.GetGameFrame() > 0 then	--game has started
+	if false then	--game has started
 		local units = Spring.GetAllUnits()
 		for i=1,#units do
 			local unitID = units[i]
@@ -147,8 +148,15 @@ function gadget:Initialize()
 			unitData = {} 
 		end
 		
-		defender = unitData.defender or defender
+		for _,teamID in pairs(Spring.GetTeamList()) do
+			local keys = select(7, Spring.GetTeamInfo(teamID))
+			if keys and keys.defender then
+				defender = teamID
+				break
+			end
+		end
 		
+		-- spawning code
 		local spawningAnything = false
 		for i,v in pairs(unitData) do
 			if (v.isDestroyed~=1) then 
@@ -172,9 +180,18 @@ function gadget:Initialize()
 		normaliseBoxes(box[0])
 		normaliseBoxes(box[1])
 		
+		local x1,y1,x2,y2 = 0.35, 0.35, 0.65, 0.65
 		if defender then
 			local n = select(6, Spring.GetTeamInfo(defender))
-			spawnStructures(box[n].left, box[n].top, box[n].right, box[n].bottom)	-- warning: will break with FFAs (see box var initialization above)
+			local x1,y1,x2,y2 = box[n].left, box[n].top, box[n].right, box[n].bottom
+			Spring.Echo(x1,x2,y1,y2)
+			local midX, midY = (x1 + x2)/2, (y1+y2)/2
+			-- displace towards middle
+			x1 = math.max(x1 + TRANSLOCATION_MULT*(0.5 - midX), 0.1)
+			y1 = math.max(y1 - TRANSLOCATION_MULT*(0.5 - midY), 0.1)
+			x2 = math.min(x2 + TRANSLOCATION_MULT*(0.5 - midX), 0.9)
+			y2 = math.min(y2 - TRANSLOCATION_MULT*(0.5 - midY), 0.9)
+			spawnStructures(x1, y1, x2, y2)	-- warning: will break with FFAs (see box var initialization above)
 		elseif box[0].right - box[0].left >= 0.9 and box[1].right - box[1].left >= 0.9 then -- north vs south
 			spawnStructures(0.1,0.44,0.9,0.56)
 		elseif box[0].bottom - box[0].top >= 0.9 and box[1].bottom - box[1].top >= 0.9 then -- east vs west

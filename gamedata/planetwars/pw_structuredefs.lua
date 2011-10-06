@@ -37,6 +37,7 @@ structureConfig = {
 			unitDef.name = "Ship Factory"
 			unitDef.description = "Produces 0.25 free ships per turn"
 			unitDef.objectname = "pw_dropfac.obj"
+			unitDef.selfdestructcountdown = 180
 			
 			unitDef.footprintx = 20			
 			unitDef.footprintz = 16
@@ -53,6 +54,7 @@ structureConfig = {
 			unitDef.description = "Increases ship capacity by 3"
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
+			unitDef.selfdestructcountdown = 180
 			
 			unitDef.footprintx = 16			
 			unitDef.footprintz = 11
@@ -69,6 +71,7 @@ structureConfig = {
 			unitDef.description = "Produces 50 credits/turn" 
 			unitDef.objectname = "pw_mine.obj"
 			unitDef.script = "pw_mine.lua"
+			unitDef.selfdestructcountdown = 60
 			
 			unitDef.footprintx = 4		
 			unitDef.footprintz = 4
@@ -95,7 +98,7 @@ structureConfig = {
 			
 			unitDef.customparams.soundselect = "building_select2"
 			
-			unitDef.collisionvolumescales = [[110 125 110]]
+			unitDef.collisionvolumescales = [[90 125 90]]
 			unitDef.modelcenteroffset = [[0 10 0]]			
 		end,
 		
@@ -105,6 +108,7 @@ structureConfig = {
 			unitDef.description = "Produces 250 credits/turn" 
 			unitDef.objectname = "pw_mine3.obj"
 			unitDef.script = "pw_mine3.lua"
+			unitDef.selfdestructcountdown = 240
 			
 			unitDef.footprintx = 12		
 			unitDef.footprintz = 12
@@ -122,6 +126,7 @@ structureConfig = {
 			unitDef.name = "Basic Wormhole Generator"
 			unitDef.description = "Links this planet to nearby planets with 25% influence"
 			unitDef.objectname = "pw_wormhole.obj"
+			unitDef.selfdestructcountdown = 90
 			
 			unitDef.footprintx = 11
 			unitDef.footprintz = 6
@@ -152,6 +157,8 @@ structureConfig = {
 			unitDef.name = "Warpgate"
 			unitDef.description = "Allows planet owner to send drops to any point in the galaxy"
 			unitDef.objectname = "pw_warpgate.obj"
+			unitDef.script = "pw_warpgate.lua"
+			unitDef.selfdestructcountdown = 180
 			
 			unitDef.footprintx = 4
 			unitDef.footprintz = 4

@@ -476,21 +476,23 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 
       else
 		-- the adding of existing resources is necessary for handling /take and spawn
-		local metal = Spring.GetTeamResources(teamID, "metal")
-		local energy = Spring.GetTeamResources(teamID, "energy")
+		local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
+		local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 		local bonus = (keys and tonumber(keys.bonusresources)) or 0
 		
         if startMode == "classic" then
-          Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER + bonus)
-          Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC + bonus)
+          Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER + energyStore + bonus)
+          Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC + metalStore + bonus)
           Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy - commCost + bonus)
           Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal - commCost + bonus)
         elseif startMode == "facplop" then
-          Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER + bonus)
-          Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP + bonus)
+          Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER + energyStore  + bonus)
+          Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP + metalStore + bonus)
           Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP + energy - commCost + bonus)
           Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP + metal - commCost + bonus)		  
         else
+		  Spring.SetTeamResource(team, "es", START_STORAGE + OVERDRIVE_BUFFER)
+		  Spring.SetTeamResource(team, "ms", START_STORAGE)		
           Spring.SetTeamResource(teamID, "energy", START_STORAGE + energy - commCost + bonus)
           Spring.SetTeamResource(teamID, "metal", START_STORAGE + metal - commCost + bonus)
         end
@@ -652,8 +654,8 @@ function gadget:GameStart()
 
     -- clear resources
     -- actual resources are set depending on spawned unit and setup
-    Spring.SetTeamResource(team, "es", START_STORAGE + OVERDRIVE_BUFFER)
-    Spring.SetTeamResource(team, "ms", START_STORAGE)
+    Spring.SetTeamResource(team, "es", 0)
+    Spring.SetTeamResource(team, "ms", 0)
     Spring.SetTeamResource(team, "energy", 0)
     Spring.SetTeamResource(team, "metal", 0)
 	
