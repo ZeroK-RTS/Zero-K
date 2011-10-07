@@ -15,7 +15,7 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   canstop             = [[1]],
-  category            = [[HOVER]],
+  category            = [[SWIM]],
 
   customParams        = {
     description_fr = [[Cracheur de piques]],
