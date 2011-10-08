@@ -330,7 +330,7 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 		AddRefusal(oldTeam, "Unit sharing has been disabled.")
 		return false
 	end
-
+	
 	-- AreTeamsAllied includes temporary alliances
 	local _,_,_,_,_,oldAlliance = spGetTeamInfo(oldTeam)
 	local _,_,_,_,_,newAlliance = spGetTeamInfo(newTeam)
@@ -338,6 +338,11 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 		return true
 	end
 
+	-- can give PW buildings to gaia
+	if (newTeam == Spring.GetGaiaTeamID()) and GG.pwUnitsByID[unitID] then
+		return true
+	end
+	
 	if (unitShareCeasefired and Spring.AreTeamsAllied(oldTeam, newTeam)) then
 		return true
 	end

@@ -128,7 +128,8 @@ local function ProcessComm(name, config)
 		if attributeMods.speed > 0 then
 			commDefs[name].maxvelocity = commDefs[name].customparams.basespeed*(1+attributeMods.speed)
 		else
-			commDefs[name].maxvelocity = commDefs[name].customparams.basespeed/(1-attributeMods.speed)
+			commDefs[name].maxvelocity = commDefs[name].customparams.basespeed*(1+attributeMods.speed)
+			--commDefs[name].maxvelocity = commDefs[name].customparams.basespeed/(1-attributeMods.speed)
 		end	
 		if config.name then
 			commDefs[name].name = config.name
@@ -181,7 +182,7 @@ end
 --------------------------------------------------------------------------------
 -- postprocessing
 for name, data in pairs(commDefs) do
-	Spring.Echo("\tPostprocessing commtype: ".. name)
+	--Spring.Echo("\tPostprocessing commtype: ".. name)
 	-- apply intrinsic bonuses
 	if data.customparams.damagebonus then
 		ModifyWeaponDamage(data, data.customparams.damagebonus)

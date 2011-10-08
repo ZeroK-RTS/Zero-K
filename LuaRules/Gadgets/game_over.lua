@@ -38,6 +38,7 @@ local spGetUnitDefID    = Spring.GetUnitDefID
 local spGetUnitIsStunned= Spring.GetUnitIsStunned
 local spGetUnitHealth   = Spring.GetUnitHealth
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
+local spTransferUnit	= Spring.TransferUnit
 
 local spKillTeam = Spring.KillTeam or nullFunc
 local spGameOver = Spring.GameOver or nullFunc
@@ -150,7 +151,7 @@ function DestroyAlliance(allianceID)
 	destroyedAlliances[allianceID] = true
 		if destroy_type == 'debug' then
 			Spring.Echo("Game Over: DEBUG")
-			Spring.Echo("Game Over: Ally " .. allianceID .. " has met the game over conditions.")
+			Spring.Echo("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			Spring.Echo("Game Over: If this is true, then please resign.")
 		elseif destroy_type == 'destroy' then	-- kaboom
 			local teamList = spGetTeamList(allianceID)
@@ -158,7 +159,11 @@ function DestroyAlliance(allianceID)
 				for _,t in ipairs(teamList) do
 					local teamUnits = spGetTeamUnits(t) 
 					for _,u in ipairs(teamUnits) do
-						spDestroyUnit(u, true)
+						if GG.pwUnitsByID[u] then
+							spTransferUnit(u, gaiaTeam, true)
+						else
+							spDestroyUnit(u, true)
+						end
 					end
 					spKillTeam(t)
 				end

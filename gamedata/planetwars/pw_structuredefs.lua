@@ -28,7 +28,6 @@ structureConfig = {
 			unitDef.customparams.soundselect = "cloaker_select"
 			
 			unitDef.collisionvolumescales = [[60 70 60]]
-			unitDef.modelcenteroffset = [[0 0 0]]
 			unitDef.collisionvolumetype	= [[CylY]]					
 		end,		
 		
