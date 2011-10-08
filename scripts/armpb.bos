@@ -4,10 +4,12 @@
 
 piece  base, turret, dome, post, gun, barrel, flare, aimpoint;
 
-static-var  Static_Var_1, restore_delay, statechg_DesiredState, statechg_StateChanging;
+static-var  opened, restore_delay;
 
 // Signal definitions
-#define SIG_AIM				2
+#define SIG_AIM		2
+#define SIG_OPEN	4
+#define	SIG_CLOSE	8		
 
 
 SmokeUnit(healthpercent, sleeptime, smoketype)
@@ -39,8 +41,12 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 	// Build by COBBLER Ver4.0 Copyright @1998 DIGITAL CONCEPT SOFTWARE (MANU@inext.fr) / http://www.annihilationcenter.com/DCS/  
 }
 
-Go()
+Open()
 {
+	signal SIG_CLOSE;
+	signal SIG_OPEN;
+	set-signal-mask SIG_OPEN;
+	
 	set ARMORED to 0;
 	turn dome to x-axis <-135.032967> speed <550.000000>;
 	wait-for-turn dome around x-axis;
@@ -50,12 +56,16 @@ Go()
 	wait-for-move post along y-axis;
 	wait-for-move barrel along z-axis;
 	wait-for-move gun along x-axis;
-	Static_Var_1 = 1;
+	opened = 1;
 }
 
-Stop()
+Close()
 {
-	Static_Var_1 = 0;
+	signal SIG_CLOSE;
+	signal SIG_OPEN;
+	set-signal-mask SIG_CLOSE;
+	
+	opened = 0;
 	turn gun to x-axis <0.000000> speed <90.000000>;
 	move barrel to z-axis [-13.7500000] speed [40.000000];
 	move gun to x-axis [0.000000] speed [12.500000];
@@ -69,43 +79,10 @@ Stop()
 	set ARMORED to 1;
 }
 
-InitState()
-{
-	statechg_DesiredState = TRUE;
-	statechg_StateChanging = FALSE;
-}
-
-RequestState(requestedstate, currentstate)
-{
-	if( statechg_StateChanging )
-	{
-		statechg_DesiredState = requestedstate;
-		return (0);
-	}
-	statechg_StateChanging = TRUE;
-	currentstate = statechg_DesiredState;
-	statechg_DesiredState = requestedstate;
-	while( statechg_DesiredState != currentstate )
-	{
-		if( statechg_DesiredState == 0 )
-		{
-			call-script Go();
-			currentstate = 0;
-		}
-		if( statechg_DesiredState == 1 )
-		{
-			call-script Stop();
-			currentstate = 1;
-		}
-	}
-	statechg_StateChanging = FALSE;
-}
-
 RestoreAfterDelay()
 {
 	sleep restore_delay;
-	set-signal-mask 0;
-	start-script RequestState(1);
+	start-script Close();
 }
 
 Create()
@@ -125,10 +102,8 @@ Create()
 	dont-shade barrel;
 	dont-shade flare;
 	restore_delay = 2000;
-	Static_Var_1 = 1;
-	call-script InitState();
+	opened = 1;
 	start-script SmokeUnit();
-	start-script RequestState(0);
 	turn dome to x-axis <-135.032967> now;
 	move gun to x-axis [1.500000] now;
 	while( get BUILD_PERCENT_LEFT )
@@ -138,23 +113,12 @@ Create()
 	start-script RestoreAfterDelay();
 }
 
-Activate()
-{
-	start-script RequestState(0);
-}
-
-Deactivate()
-{
-	start-script RequestState(1);
-}
-
-
 AimPrimary(heading, pitch)
 {
-	start-script RequestState(0);
+	start-script Open();
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
-	while( !Static_Var_1 )
+	while( !opened )
 	{
 		sleep 250;
 	}
