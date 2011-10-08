@@ -30,6 +30,8 @@ local spGetGroundHeight     = Spring.GetGroundHeight
 local unitById = {} -- unitById[unitID] = position of unitID in unit
 local unit = {count = 0, data = {}} -- data holds all unitID data
 
+local drawPlayerAlways = {}
+
 --------------------------------------------------------------------------------
 -- Commands
 
@@ -123,6 +125,7 @@ end
 function gadget:Initialize()
 
     _G.unit = unit
+    _G.drawPlayerAlways = drawPlayerAlways
     
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_SET_TARGET)
@@ -221,6 +224,17 @@ function gadget:GameFrame(n)
 end
 
 --------------------------------------------------------------------------------
+-- Drawing toggle goes through synced for no good reason
+
+function gadget:RecvLuaMsg(msg, playerID)
+    if msg == "target_on_the_move_draw_always" then
+        drawPlayerAlways[playerID] = true
+    elseif msg == "target_on_the_move_draw_normal" then
+        drawPlayerAlways[playerID] = false
+    end
+end
+
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 else -- UNSYNCED
 --------------------------------------------------------------------------------
@@ -236,6 +250,7 @@ local spGetMyTeamID         = Spring.GetMyTeamID
 
 local myAllyTeam = spGetMyAllyTeamID()
 local myTeam = spGetMyTeamID()
+local myPlayerID = Spring.GetMyPlayerID()
 
 local function unitDraw(u1, u2)
 	glVertex(spGetUnitPosition(u1))
@@ -248,19 +263,21 @@ local function terrainDraw(u, x, y, z)
 end
 
 function gadget:DrawWorld()
-	if Spring.IsGUIHidden() then 
+    if Spring.IsGUIHidden() then 
         return 
     end
     
     if SYNCED.unit then
-		gl.PushAttrib(GL.LINE_BITS)
+		local alt,ctrl,meta,shift = Spring.GetModKeyState()
+        
+        gl.PushAttrib(GL.LINE_BITS)
         gl.LineStipple(1, 2047)
 		gl.DepthTest(false)
 		gl.LineWidth(1.4)
-         gl.Color(1, 0.3, 0.2, 1)
+        gl.Color(1, 0.75, 0, 1)
         for i = 1, SYNCED.unit.count do
             local u = SYNCED.unit.data[i]
-            if u.allyTeam == myAllyTeam and spValidUnitID(u.id) then
+            if (SYNCED.drawPlayerAlways[myPlayerID] or shift or Spring.IsUnitSelected(u.id)) and u.allyTeam == myAllyTeam and spValidUnitID(u.id) then
                 if not u.targetID then
                     gl.BeginEnd(GL.LINES, terrainDraw, u.id, u.x, u.y, u.z)
                 elseif spValidUnitID(u.targetID) then

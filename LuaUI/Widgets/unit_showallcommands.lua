@@ -66,9 +66,14 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
+    Spring.SendLuaRulesMsg("target_on_the_move_draw_always")
 	local units = spGetAllUnits()
 	for i, id in pairs(units) do
 		widget:UnitCreated(id)
 	end
+end
+
+function widget:Shutdown()
+    Spring.SendLuaRulesMsg("target_on_the_move_draw_normal")
 end
 
