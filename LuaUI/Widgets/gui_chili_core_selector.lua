@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Core Selector",
-    desc      = "v0.5 Manage your boi, idle cons, and factories.",
+    desc      = "v0.6 Manage your boi, idle cons, and factories.",
     author    = "KingRaptor",
     date      = "2011-6-2",
     license   = "GNU GPL, v2 or later",
@@ -90,6 +90,8 @@ for name in pairs(exceptionList) do
 	end
 end
 
+local nano_name = UnitDefNames.armnanotc.humanName
+
 -- list and interface vars
 local facsByID = {}	-- [unitID] = index of facs[]
 local facs = {}	-- [ordered index] = {facID, facDefID, buildeeDefID, ["repeat"] = boolean, button, image, repeatImage, ["buildProgress"] = ProgressBar,}
@@ -119,6 +121,25 @@ local GetTeamColor = Spring.GetTeamColor or function (teamID)
   teamColors[teamID] = {r,g,b}
   return r,g,b
 end
+
+local function RefreshConsList() end	-- redefined later
+
+options_path = 'Settings/Interface/Core Selector'
+options_order = { 'monitoridlecomms', 'monitoridlenano'}
+options = {
+	monitoridlecomms = {
+		name = 'Track idle comms',
+		type = 'bool',
+		value = true,
+		OnChange = function() RefreshConsList() end,		
+	},
+	monitoridlenano = {
+		name = 'Track idle nanotowers',
+		type = 'bool',
+		value = true,
+		OnChange = function() RefreshConsList() end,		
+	},
+}
 
 -------------------------------------------------------------------------------
 -- SCREENSIZE FUNCTIONS
@@ -519,9 +540,9 @@ local function CycleComm()
 end
 ]]--
 
-local function UpdateCons()
+local function UpdateConsButton()
 	-- get con type with highest number of idlers (as well as number of types total)
-	local prevTotal = idleCons.count
+	local prevTotal = idleCons.count or 0
 	idleCons.count = nil
 	--local maxDefID = idleBuilderDefID
 	local maxCount, total = 0, 0
@@ -576,6 +597,20 @@ local function UpdateCons()
 	}
 end
 
+RefreshConsList = function()
+	idleCons = {}
+	if Spring.GetGameFrame() > 1 and myTeamID then
+		local unitList = Spring.GetTeamUnits(myTeamID)
+		for _,unitID in pairs(unitList) do
+			local unitDefID = GetUnitDefID(unitID)
+			if unitDefID then
+				widget:UnitFinished(unitID, unitDefID, myTeamID)
+			end
+		end
+		UpdateConsButton()
+	end
+end
+
 local function InitializeUnits()
 	if Spring.GetGameFrame() > 1 and myTeamID then
 		local unitList = Spring.GetTeamUnits(myTeamID)
@@ -598,13 +633,28 @@ local function ClearData()
 		RemoveComm(comms[i].commID)
 	end
 	idleCons = {}
-	UpdateCons()
+	UpdateConsButton()
 end
--------------------------------------------------------------------------------
 
-
+-- FIXME: donut work?
+-- removes nanos from current selection
+--[[
+local function StripNanos()
+	local units = Spring.GetSelectedUnits()
+	local units2 = {}
+	for i=1,#units do
+		local udID = GetUnitDefID(units[i])
+		if not(nanos[udID]) then
+			Spring.Echo(#units2+1)
+			units2[#units2 + 1] = units[i]
+		end
+	end
+	SelectUnitArray(units2, false)
+end
+]]--
 -------------------------------------------------------------------------------
--- engine funcs
+-------------------------------------------------------------------------------
+-- engine callins
 
 --[[
 function widget:GameStart()
@@ -671,7 +721,9 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 		return
 	end
 	local ud = UnitDefs[unitDefID]
-	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory) then
+	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory)
+	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].isCommander)
+	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
@@ -702,7 +754,7 @@ function widget:Update(dt)
 		--InitializeUnits()
 	end
 	if wantUpdateCons then
-		UpdateCons()
+		UpdateConsButton()
 		wantUpdateCons = false
 	end
 	
@@ -847,7 +899,15 @@ function widget:Initialize()
 		OnMouseDown = {	function () 
 				local _,_,left,_,right = Spring.GetMouseState()
 				if left then
-					Spring.SendCommands({"select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+"})
+					if options.monitoridlecomms.value and options.monitoridlenano.value then
+						Spring.SendCommands({"select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+"})
+					elseif options.monitoridlenano.value then
+						Spring.SendCommands({"select AllMap+_Builder_Not_Commander_Not_Building_Idle+_ClearSelection_SelectOne+"})
+					elseif options.monitoridlecomms.value then
+						Spring.SendCommands({"select AllMap+_Builder_Not_Building_Not_NameContain_" .. nano_name .. "_Idle+_ClearSelection_SelectOne+"})
+					else
+						Spring.SendCommands({"select AllMap+_Builder_Not_Commander_Not_Building_Not_NameContain_" .. nano_name .. "_Idle+_ClearSelection_SelectOne+"})
+					end
 				elseif right and idleCons.count > 0 then
 					Spring.SelectUnitMap(idleCons, false)
 				end
@@ -881,7 +941,7 @@ function widget:Initialize()
 		keepAspect = false,
 		color = (total == 0 and imageColorDisabled) or nil,
 	}
-	UpdateCons()
+	UpdateConsButton()
 
 	myTeamID = Spring.GetMyTeamID()
 
