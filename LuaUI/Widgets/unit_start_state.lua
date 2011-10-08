@@ -136,7 +136,7 @@ addUnit("armraven","Mech")
 addUnit("armbanth","Mech")
 addUnit("gorg","Mech")
 addUnit("armorco","Mech")
-addUnit("armnanotc","Misc")
+addUnit("armnanotc","Static")
 
 local CMD_UNIT_AI = 36214
 

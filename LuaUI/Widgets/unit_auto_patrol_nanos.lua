@@ -79,7 +79,7 @@ local function IsImmobileBuilder(ud)
 end
 
 
-local function SetupUnit(unitID, firstTime)
+local function SetupUnit(unitID)
   -- set immobile builders (nanotowers?) to the ROAM movestate,
   -- and give them a PATROL order (does not matter where, afaict)
   local x, y, z = spGetUnitPosition(unitID)
@@ -91,7 +91,6 @@ local function SetupUnit(unitID, firstTime)
     x = x + vx*25/abs(vx)
     z = z + vz*25/abs(vz)
 
-    if firstTime then spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 2 }, {}) end
     spGiveOrderToUnit(unitID, CMD_PATROL, { x, y, z }, {})
   end
 end
@@ -116,7 +115,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
     return
   end
   if (IsImmobileBuilder(UnitDefs[unitDefID])) then
-    SetupUnit(unitID, true)
+    SetupUnit(unitID)
   end
 end
 

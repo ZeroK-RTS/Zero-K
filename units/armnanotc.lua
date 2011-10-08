@@ -55,6 +55,7 @@ unitDef = {
   metalMake                     = 0.3,
   minCloakDistance              = 150,
   movementClass                 = [[KBOT1]],
+  moveState                     = 2,
   noAutoFire                    = false,
   objectName                    = [[armsenan.s3o]],
   script                        = [[armnanotc.lua]],
