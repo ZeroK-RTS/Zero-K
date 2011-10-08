@@ -131,7 +131,7 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 1250,
+        default = 1000,
       },
 
       dance                   = 60,

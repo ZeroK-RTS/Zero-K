@@ -109,7 +109,7 @@ path='Game/Screenshots'
 	ShButton( 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots' ) 
 	
 path='Game'
-	ShButton( 'Factory Guard', function() spSendCommands{"luaui togglewidget FactoryGuard"} end ) 
+	ShButton( 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end ) 
 
 
 path='Settings/Camera'

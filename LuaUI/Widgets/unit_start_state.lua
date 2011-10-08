@@ -8,8 +8,8 @@ function widget:GetInfo()
     author    = "GoogleFrog",
     date      = "13 April 2011",
     license   = "GNU GPL, v2 or later",
-        handler   = true,
-    layer     = 0,
+	handler   = true,
+    layer     = 1,
     enabled   = true  --  loaded by default?
   }
 end
@@ -72,7 +72,7 @@ local function addUnit(defName, path)
                 options_order[#options_order+1] = defName .. "_firestate"
         end
 
-        if ud.canMove then
+        if ud.canMove or ud.canPatrol then
                 options[defName .. "_movestate"] = {
                         name = "Movestate",
                         desc = "Values: inherit from factory, hold positon, manuver, roam",
@@ -136,6 +136,7 @@ addUnit("armraven","Mech")
 addUnit("armbanth","Mech")
 addUnit("gorg","Mech")
 addUnit("armorco","Mech")
+addUnit("armnanotc","Misc")
 
 local CMD_UNIT_AI = 36214
 
