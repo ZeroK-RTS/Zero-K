@@ -89,7 +89,6 @@ unitDef = {
 
       damage                  = {
         default = 39,
-        planes  = 39,
         subs    = 1.95,
       },
 
@@ -103,7 +102,7 @@ unitDef = {
       lineOfSight             = true,
       noSelfDamage            = true,
       range                   = 410,
-      reloadtime              = 0.15,
+      reloadtime              = 0.12,
       renderType              = 4,
       rgbColor                = [[1 0.95 0.4]],
       separation              = 1.5,

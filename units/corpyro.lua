@@ -102,9 +102,9 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 7,
-        planes  = 7,
-        subs    = 0.0015,
+        default = 8.75,
+        planes  = 8.75,
+        subs    = 0.0875,
       },
 
       explosionGenerator      = [[custom:SMOKE]],

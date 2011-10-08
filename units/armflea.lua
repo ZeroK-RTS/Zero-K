@@ -89,7 +89,7 @@ unitDef = {
   weaponDefs          = {
 
     LASER = {
-      name                    = [[Tiny Laser]],
+      name                    = [[Micro Laser]],
       areaOfEffect            = 8,
       beamlaser               = 1,
       beamTime                = 0.1,
@@ -99,9 +99,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 8,
-        planes  = 8,
-        subs    = 0.4,
+        default = 10,
+        planes  = 10,
+        subs    = 0.5,
       },
 
       explosionGenerator      = [[custom:FLASH1yellow2]],

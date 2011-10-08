@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[corrazor]],
   name                          = [[Razor's Kiss]],
   description                   = [[Hardened Anti-Air Laser]],
-  bmcode                        = [[0]],
   buildAngle                    = 8192,
   buildCostEnergy               = 280,
   buildCostMetal                = 280,
@@ -53,10 +52,8 @@ unitDef = {
 
   },
 
-  shootme                       = [[1]],
   side                          = [[CORE]],
   sightDistance                 = 660,
-  TEDClass                      = [[FORT]],
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[ooooooooo]],
@@ -64,7 +61,7 @@ unitDef = {
   weapons                       = {
 
     {
-      def                = [[corrazor_WEAPON]],
+      def                = [[AAGUN]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
@@ -74,11 +71,10 @@ unitDef = {
 
   weaponDefs                    = {
 
-    corrazor_WEAPON = {
+    AAGUN = {
       name                    = [[Anti-Air Laser]],
       accuracy                = 50,
       areaOfEffect            = 8,
-      beamWeapon              = true,
       canattackground         = false,
       collideFriendly         = false,
       coreThickness           = 0.5,
@@ -87,9 +83,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 1,
-        planes  = 10,
-        subs    = 0.1,
+        default = 1.4,
+        planes  = 14,
+        subs    = 0.7,
       },
 
       duration                = 0.02,
@@ -99,14 +95,12 @@ unitDef = {
       impactOnly              = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
-      lineOfSight             = true,
       lodDistance             = 10000,
       pitchtolerance          = [[1000]],
       predictBoost            = 1,
       proximityPriority       = 4,
       range                   = 1040,
       reloadtime              = 0.1,
-      renderType              = 0,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/lasercannon_fire]],

@@ -42,8 +42,8 @@ unitDef = {
 
   explodeAs              = [[LARGE_BUILDINGEX]],
   floater                = true,
-  footprintX             = 4,
-  footprintZ             = 4,
+  footprintX             = 5,
+  footprintZ             = 5,
   hoverAttack            = true,
   iconType               = [[supergunship]],
   idleAutoHeal           = 5,
@@ -65,8 +65,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:BEAMWEAPON_MUZZLE_RED]],
-      [[custom:BEAMWEAPON_MUZZLE_RED]],
+      [[custom:BEAMWEAPON_MUZZLE_TEAL]],
+      [[custom:BEAMWEAPON_MUZZLE_TEAL]],
     },
 
   },
@@ -130,12 +130,12 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 30,
-        subs    = 1.5,
+        default = 36,
+        subs    = 1.8,
       },
 
       duration                = 0.02,
-      explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
+      explosionGenerator      = [[custom:BEAMWEAPON_HIT_TEAL]],
       fireStarter             = 50,
       impactOnly              = true,
       impulseBoost            = 0,
@@ -143,7 +143,7 @@ unitDef = {
       interceptedByShieldType = 1,
       range                   = 450,
       reloadtime              = 0.2,
-      rgbColor                = [[1 0 0]],
+      rgbColor                = [[0 0.4 0.8]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/heavylaser_fire2]],
 	  soundStartVolume		  = 0.7,
@@ -269,12 +269,12 @@ unitDef = {
       description      = [[Wreckage - Krow]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 17000,
+      damage           = 17500,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
+      footprintX       = 5,
+      footprintZ       = 5,
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 2000,
@@ -290,7 +290,7 @@ unitDef = {
       description      = [[Debris - Krow]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 17000,
+      damage           = 17500,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,

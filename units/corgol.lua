@@ -126,13 +126,13 @@ unitDef = {
 	  
 	  customParams        	  = {
 	    setunitsonfire = "1",
-		burntime = [[450]],
+		burntime = [[360]],
 	  },
 
       damage                  = {
-        default = 4,
-        planes  = 4,
-        subs    = 0.002,
+        default = 5,
+        planes  = 5,
+        subs    = 0.05,
       },
 
       explosionGenerator      = [[custom:SMOKE]],

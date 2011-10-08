@@ -71,14 +71,12 @@ unitDef = {
   smoothAnim             = true,
   speedToFront           = 0,
   stealth                = true,
-  steeringmode           = [[1]],
-  TEDClass               = [[VTOL]],
   turnRate               = 839,
 
   weapons                = {
 
     {
-      def                = [[AVENGER_WEAPON]],
+      def                = [[AVENGER_GUN]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 60,
@@ -87,7 +85,7 @@ unitDef = {
 
 
     {
-      def                = [[CORVENG_MISSILE]],
+      def                = [[MISSILE]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
@@ -97,7 +95,7 @@ unitDef = {
 
   weaponDefs             = {
 
-    AVENGER_WEAPON  = {
+    AVENGER_GUN  = {
       name                    = [[Mini Laser Blaster]],
       areaOfEffect            = 8,
       beamWeapon              = true,
@@ -107,8 +105,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 6,
-        subs    = 0.3,
+        default = 7.2,
+        subs    = 0.36,
       },
 
       duration                = 0.012,
@@ -138,7 +136,7 @@ unitDef = {
     },
 
 
-    CORVENG_MISSILE = {
+    MISSILE = {
       name                    = [[Guided Missiles]],
       areaOfEffect            = 48,
       avoidFriendly           = true,

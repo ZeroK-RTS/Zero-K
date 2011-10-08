@@ -458,6 +458,74 @@ return {
     },
   },
 
+  ["beamweapon_hit_teal"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      circlealpha        = 1,
+      circlegrowth       = 0.125,
+      flashalpha         = 0.5,
+      flashsize          = 8,
+      ttl                = 64,
+      color = {
+        [1]  = 0,
+        [2]  = 0.4,
+        [3]  = 0.8,
+      },
+    },
+    pikes = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        dir                = [[dir]],
+        explosiongenerator = [[custom:BEAMWEAPON_MUZZLE_TEAL]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+    sparks = {
+      class              = [[CSimpleParticleSystem]],
+      count              = 1,
+      ground             = true,
+      unit               = 1,
+      properties = {
+        airdrag            = 0.97,
+        alwaysvisible      = false,
+        colormap           = [[1 1 0.5 0.01   0.01 0.01 0.005 0.01]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 80,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, -0.4, 0]],
+        numparticles       = 64,
+        particlelife       = 15,
+        particlelifespread = 0,
+        particlesize       = 3,
+        particlesizespread = 2,
+        particlespeed      = 6,
+        particlespeedspread = 4,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[plasma]],
+      },
+    },
+	
+    steam = {
+      class              = [[CExpGenSpawner]],
+      count              = 16,
+      nounit             = 1,
+      properties = {
+        delay              = [[i1]],
+        dir                = [[dir]],
+        explosiongenerator = [[custom:BEAMWEAPON_HIT_YELLOW_STEAM]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+  },  
+  
   ["beamweapon_muzzle_red"] = {
     usedefaultexplosions = false,
     glow = {
@@ -685,6 +753,44 @@ return {
       },
     },
   },
-  
+ 
+  ["beamweapon_muzzle_teal"] = {
+    usedefaultexplosions = false,
+    glow = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 12,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.125,
+        alwaysvisible      = false,
+        color              = [[0,0.4,0.8]],
+        dir                = [[-4 r8, -4 r8, -4 r8]],
+        length             = 1,
+        lengthgrowth       = 1,
+        width              = 4,
+      },
+    },
+    white = {
+      air                = true,
+      class              = [[explspike]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = 0.125,
+        alwaysvisible      = false,
+        color              = [[1,1,1]],
+        dir                = [[-2 r4, -2 r4, -2 r4]],
+        length             = 1,
+        lengthgrowth       = 1,
+        width              = 2,
+      },
+    },
+  },
+ 
 }
 
