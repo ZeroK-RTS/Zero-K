@@ -65,8 +65,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:BEAMWEAPON_MUZZLE_TEAL]],
-      [[custom:BEAMWEAPON_MUZZLE_TEAL]],
+      [[custom:BEAMWEAPON_MUZZLE_RED]],
+      [[custom:BEAMWEAPON_MUZZLE_RED]],
     },
 
   },
@@ -135,7 +135,7 @@ unitDef = {
       },
 
       duration                = 0.02,
-      explosionGenerator      = [[custom:BEAMWEAPON_HIT_TEAL]],
+      explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
       fireStarter             = 50,
       impactOnly              = true,
       impulseBoost            = 0,
@@ -143,13 +143,13 @@ unitDef = {
       interceptedByShieldType = 1,
       range                   = 450,
       reloadtime              = 0.2,
-      rgbColor                = [[0 0.4 0.8]],
+      rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/laser/heavylaser_fire2]],
 	  soundStartVolume		  = 0.7,
       soundTrigger            = true,
       targetMoveError         = 0.2,
-      thickness               = 3.16,
+      thickness               = 3.25,
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[LaserCannon]],
