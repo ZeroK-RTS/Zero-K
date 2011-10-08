@@ -93,7 +93,7 @@ end
 
 function AddAllianceUnit(u, ud, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
-	aliveCount[allianceID] = aliveCount[allianceID] + 1 
+	aliveCount[allianceID] = aliveCount[allianceID] + 1
 	--Spring.Echo("added alliance=" .. teamID, 'count='..aliveCount[allianceID])
 	if UnitDefs[ud].isCommander then
 		commsAlive[allianceID][u] = true
