@@ -49,6 +49,10 @@ upgrades = {
 		name = "Lightning Gun",
 		description = "Paralyzes and damages annoying bugs",
 	},
+	commweapon_lparticlebeam = {
+		name = "Light Particle Beam",
+		description = "Medium-range pulse weapon",
+	},	
 	commweapon_partillery = {
 		name = "Plasma Artillery",
 		description = "Long-range artillery gun",
@@ -466,6 +470,13 @@ upgrades = {
 				unitDef.activatewhenbuilt = true
 				unitDef.onoffable = true
 			end,
+	},
+	module_jump_booster = {
+		name = "Dragonfly Booster",
+		description = "Increases jump range and height",
+		func = function(unitDef)
+				unitDef.customparams.jumpclass = "commrecon2"
+			end,	
 	},
 	module_radarnet = {
 		name = "Integrated Radar Network",

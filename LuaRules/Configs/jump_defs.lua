@@ -35,9 +35,9 @@ jumpCategory = {
 	commrecon1 = {
 		range = 400, height = 200, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},
 	commrecon2 = {
-		range = 450, height = 220, speed = 6,  reload = 14,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},
+		range = 500, height = 240, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},
 	commrecon3 = {
-		range = 500, height = 240, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},			
+		range = 600, height = 280, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},			
 }
 
 jumpClassGroups = {
@@ -54,14 +54,9 @@ jumpClassGroups = {
 	"factoryjump",
 	-- "pizzathehut",--bad unit left for testing purposes
 	},
-	commrecon1 = {
-		--"commrecon",
-	},
-	commrecon2 = {
-		--"commadvrecon",
-	},
-	commrecon3 = {
-	},
+	commrecon1 = {},
+	commrecon2 = {},
+	commrecon3 = {},
 	-- iammissingstuff = {--bad category
 	-- "puffthemagic",--bad unit left for testing purposes
 	-- },

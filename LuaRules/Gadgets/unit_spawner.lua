@@ -751,7 +751,7 @@ local function SpawnQueen()
     end
   until (blocking == 2 or tries > maxTries)
   
-  queenHealthMod = queenHealthMod * (0.5*(queenTime/baseQueenTime) + 0.5)
+  queenHealthMod = queenHealthMod * (0.5*(queenTime/baseQueenTime) + 0.5) * ((playerCount/2) + 0.5)
   
   if queenMorphName ~= '' then SetMorphFrame() end
   return spCreateUnit(queenName, x, 0, z, "n", chickenTeamID)
@@ -928,7 +928,7 @@ local function MorphQueen()
 	Spring.UnitScript.CallAsUnit(queenID, env.MorphFunc)
 	--health handling
 	local _,newMaxHealth         = Spring.GetUnitHealth(queenID)
-	newMaxHealth = newMaxHealth * queenHealthMod * ((playerCount/2) + 0.5)
+	newMaxHealth = newMaxHealth * queenHealthMod
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
 	-- if newHealth >= 1 then newHealth = 1 end
 	Spring.SetUnitMaxHealth(queenID, newMaxHealth)
@@ -1053,7 +1053,7 @@ function gadget:GameFrame(n)
 			local xp = (malus or 1) - 1
 			Spring.SetUnitExperience(queenID, xp)
 			local _, maxHealth = Spring.GetUnitHealth(queenID)
-			maxHealth = maxHealth * queenHealthMod * ((playerCount/2) + 0.5)
+			maxHealth = maxHealth * queenHealthMod
 			Spring.SetUnitMaxHealth(queenID, maxHealth)
 			spSetUnitHealth(queenID, maxHealth)
 		else

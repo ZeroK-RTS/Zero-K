@@ -185,14 +185,9 @@ local base = {
 		}
 	},
 	{
-		name = "artcom2",
+		name = "partbeam",
 		modules = {
-			"conversion_partillery", 
-			"commweapon_riotcannon",
-			"commweapon_riotcannon", 
-			"conversion_partillery",
-			"weaponmod_high_caliber_barrel",			
-			"weaponmod_napalm_warhead",
+			"commweapon_lparticlebeam",
 		}
 	},
 	{
