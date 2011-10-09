@@ -91,20 +91,7 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burntime = 180,
---		lups_napalm_settings = [[ {
---				count = 400,
---				partpos = "r*sin(alpha),-60+2*r,r*cos(alpha) | r=rand()*75, alpha=rand()*2*pi",
---				delay = 0,
---				delaySpread = 390,
---			} ]],
-		lups_heat_settings = [[ {
-				life = 1600,
-				size = 350,
-				lifeSpread = 300,
-				speed           = 0.025,
-				speedSpread     = 0.01,
-				sizeGrowth		= 0.06,
-			} ]],			
+		lups_heat_fx = [[firewalker]],
 	  },
 	  
       damage                  = {

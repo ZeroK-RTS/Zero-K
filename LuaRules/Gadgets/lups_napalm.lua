@@ -20,7 +20,7 @@ if (gadgetHandler:IsSyncedCode()) then
   --// find napalms
   for i=1,#WeaponDefs do
     local wd = WeaponDefs[i]
-    if (wd.description:find("Napalm") or (wd.customParams and wd.customParams.setunitsonfire)) then
+    if (wd.description:find("Napalm") or (wd.customParams and (wd.customParams.lups_napalm_fx or wd.customParams.lups_heat_fx))) then
       Script.SetWatchWeapon(wd.id,true)
       napalmWeapons[wd.id] = true
     end
@@ -49,79 +49,18 @@ if (gadgetHandler:IsSyncedCode()) then
 
 else
 
-  local CopyTable = Spring.Utilities.CopyTable
-  local MergeTable = Spring.Utilities.MergeTable
-  
-  local napalmFX = {
-    colormap        = { {0, 0, 0, 0.01}, {0.75, 0.75, 0.9, 0.02}, {0.45, 0.2, 0.3, 0.1}, {0.4, 0.16, 0.1, 0.12}, {0.3, 0.15, 0.01, 0.15},  {0.3, 0.15, 0.01, 0.15}, {0.3, 0.15, 0.01, 0.15}, {0.1, 0.035, 0.01, 0.15}, {0, 0, 0, 0.01} },
-    count           = 4,
-    life            = 175,
-    lifeSpread      = 40,
-    emitVector      = {0,1,0},
-    emitRotSpread   = 90,
-    force           = {0,0.3,0},
-
-    partpos         = "r*sin(alpha),0,r*cos(alpha) | r=rand()*15, alpha=rand()*2*pi",
-
-    rotSpeed        = 0.25,
-    rotSpeedSpread  = -0.5,
-    rotSpread       = 360,
-    rotExp          = 1.5,
-
-    speed           = 0.225,
-    speedSpread     = 0.05,
-    speedExp        = 7,
-
-    size            = 40,
-    sizeSpread      = 10,
-    sizeGrowth      = 0.15,
-    sizeExp         = 2.5,
-
-    layer           = 1,
-    texture         = "bitmaps/GPL/flame.png",
-  }
-
-  local heatFX = {
-    count         = 1,
-    emitVector    = {0,1,0},
-    emitRotSpread = 60,
-    force         = {0,0.5,0},
-
-    life          = 270,
-    lifeSpread    = 70,
-
-    speed           = 0.25,
-    speedSpread     = 0.25,
-    speedExp        = 7,
-
-    size            = 100,
-    sizeSpread      = 40,
-    sizeGrowth      = 0.3,
-    sizeExp         = 2.5,
-
-    strength      = 0.75,
-    scale         = 5.0,
-    animSpeed     = 0.25,
-    heat          = 6.5,
-
-    texture       = 'bitmaps/GPL/Lups/mynoise2.png',
-  }
+  local napalmFX, heatFX = include("LuaRules/Configs/lupsNapalmFXs.lua")
 
   local Lups
   local LupsAddParticles 
   local SYNCED = SYNCED
 
   local function SpawnNapalmFX(data)
-	local nFX = CopyTable(napalmFX, true)
-	local hFX = CopyTable(heatFX, true)
-	local nFX2func = WeaponDefs[data[1]].customParams and WeaponDefs[data[1]].customParams.lups_napalm_settings and loadstring("return "..(WeaponDefs[data[1]].customParams.lups_napalm_settings))
-	local hFX2func = WeaponDefs[data[1]].customParams and WeaponDefs[data[1]].customParams.lups_heat_settings and loadstring("return "..(WeaponDefs[data[1]].customParams.lups_heat_settings))
-	local nFX2 = nFX2func and nFX2func() or {}
-	local hFX2 = hFX2func and hFX2func() or {}
+	local nFXkey = WeaponDefs[data[1]].customParams and WeaponDefs[data[1]].customParams.lups_napalm_fx or "default"
+	local hFXkey = WeaponDefs[data[1]].customParams and WeaponDefs[data[1]].customParams.lups_heat_fx or "default"
 	
-	for i,v in pairs(nFX2) do nFX[i] = v end
-	for i,v in pairs(hFX2) do hFX[i] = v end
-	--for i,v in pairs(nFX) do Spring.Echo(i,v) end	
+	local nFX = napalmFX[nFXkey]
+	local hFX = heatFX[hFXkey]
 	
     nFX.pos = {data[2],data[3],data[4]}
     Lups.AddParticles('SimpleParticles2',nFX)
