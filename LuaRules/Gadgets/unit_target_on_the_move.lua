@@ -61,12 +61,12 @@ local unitCancelTargetCmdDesc = {
 
 local function unitInRange(unitID, targetID, range)
     local dis = Spring.GetUnitSeparation(unitID, targetID) -- 2d range
-    return dis < range
+    return dis and range and dis < range
 end
 
 local function locationInRange(unitID, x, y, z, range)
     local ux, uy, uz = spGetUnitPosition(unitID)
-    return math.sqrt((ux - x)^2 + (uz - z)^2) < range
+    return range and math.sqrt((ux - x)^2 + (uz - z)^2) < range
 end
 
 local function setTarget(data)
@@ -177,29 +177,32 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	
-	if cmdID == CMD_UNIT_SET_TARGET and UnitDefs[unitDefID] then
-        if #cmdParams == 3 then
-            addUnit(unitID, {
-                id = unitID, 
-                x = cmdParams[1], 
-                y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
-                z = cmdParams[3], 
-                allyTeam = spGetUnitAllyTeam(unitID), 
-                range = UnitDefs[unitDefID].maxWeaponRange
-            })
-        elseif #cmdParams == 1 then
-            addUnit(unitID, {
-                id = unitID, 
-                targetID = cmdParams[1], 
-                allyTeam = spGetUnitAllyTeam(unitID), 
-                range = UnitDefs[unitDefID].maxWeaponRange
-            })
+    
+    if cmdID == CMD_UNIT_SET_TARGET  then
+        if UnitDefs[unitDefID] and not UnitDefs[unitDefID].canFly and UnitDefs[unitDefID].maxWeaponRange and UnitDefs[unitDefID].maxWeaponRange > 0 then
+            if #cmdParams == 3 then
+                addUnit(unitID, {
+                    id = unitID, 
+                    x = cmdParams[1], 
+                    y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
+                    z = cmdParams[3], 
+                    allyTeam = spGetUnitAllyTeam(unitID), 
+                    range = UnitDefs[unitDefID].maxWeaponRange
+                })
+            elseif #cmdParams == 1 then
+                addUnit(unitID, {
+                    id = unitID, 
+                    targetID = cmdParams[1], 
+                    allyTeam = spGetUnitAllyTeam(unitID), 
+                    range = UnitDefs[unitDefID].maxWeaponRange
+                })
+            end
         end
-		return false  -- command was used
+        return false  -- command was used
     elseif cmdID == CMD_UNIT_CANCEL_TARGET then
         removeUnit(unitID)
         return false  -- command was used
-	end
+    end
 	return true  -- command was not used
 end
 
