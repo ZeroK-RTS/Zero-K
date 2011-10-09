@@ -108,9 +108,9 @@ unitDef = {
       cylinderTargetting      = 0,
 
       damage                  = {
-        default        = 800,
-        empresistant75 = 200,
-        empresistant99 = 8,
+        default        = 960,
+        empresistant75 = 240,
+        empresistant99 = 9.6,
       },
 
       duration                = 10,
@@ -122,7 +122,7 @@ unitDef = {
       intensity               = 12,
       interceptedByShieldType = 1,
       paralyzer               = true,
-      paralyzeTime            = 1,
+      paralyzeTime            = 2,
       range                   = 420,
       reloadtime              = 2,
       rgbColor                = [[0.5 0.5 1]],
@@ -147,8 +147,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 40,
-        subs    = 2,
+        default = 48,
+        subs    = 2.4,
       },
 
       explosionGenerator      = [[custom:flash1red]],
@@ -156,7 +156,7 @@ unitDef = {
       impactOnly              = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
-      laserFlareSize          = 4.5,
+      laserFlareSize          = 6,
       minIntensity            = 1,
       pitchtolerance          = 8192,
       range                   = 480,
@@ -164,7 +164,7 @@ unitDef = {
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/mini_laser]],
       soundStartVolume        = 5,
-      thickness               = 4,
+      thickness               = 4.5,
       tolerance               = 8192,
       turret                  = true,
       weaponType              = [[BeamLaser]],
