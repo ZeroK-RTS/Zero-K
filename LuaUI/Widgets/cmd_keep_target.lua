@@ -15,7 +15,7 @@ local CMD_UNIT_CANCEL_TARGET = 34924
 
 function widget:CommandNotify(id, params, options)
     --[[if id == CMD.SET_WANTED_MAX_SPEED then
-        return false -- screw CMD.SET_WANTED_MAX_SPEED
+        return false -- FUCK CMD.SET_WANTED_MAX_SPEED
     end
     if id == CMD.MOVE then
         local units = Spring.GetSelectedUnits()
