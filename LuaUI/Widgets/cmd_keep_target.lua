@@ -14,10 +14,14 @@ local CMD_UNIT_SET_TARGET = 34923
 local CMD_UNIT_CANCEL_TARGET = 34924
 
 function widget:CommandNotify(id, params, options)
+    if id == CMD.SET_WANTED_MAX_SPEED then
+        return true -- screw CMD.SET_WANTED_MAX_SPEED
+    end
     if id == CMD.MOVE then
         local units = Spring.GetSelectedUnits()
         for i = 1, #units do
             local unitID = units[i]
+            Spring.Echo(unitID)
             if Spring.ValidUnitID(unitID) then
                 local cmd = Spring.GetCommandQueue(unitID)
                 if cmd and #cmd ~= 0 and cmd[1].id == CMD.ATTACK and #cmd[1].params == 1 and not cmd[1].options.internal then

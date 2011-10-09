@@ -70,16 +70,18 @@ local function locationInRange(unitID, x, y, z, range)
 end
 
 local function setTarget(data)
-    if not data.targetID then
-        if locationInRange(data.id, data.x, data.y, data.z, data.range) then
-            spSetUnitTarget(data.id, data.x, data.y, data.z)
+    if spValidUnitID(data.id) then
+        if not data.targetID then
+            if locationInRange(data.id, data.x, data.y, data.z, data.range) then
+                spSetUnitTarget(data.id, data.x, data.y, data.z)
+            end
+        elseif spValidUnitID(data.targetID) and spGetUnitAllyTeam(data.targetID) ~= data.allyTeam then
+            if unitInRange(data.id, data.targetID, data.range) then
+                spSetUnitTarget(data.id, data.targetID)
+            end
+        else
+            return false
         end
-    elseif spValidUnitID(data.targetID) and spGetUnitAllyTeam(data.targetID) ~= data.allyTeam then
-        if unitInRange(data.id, data.targetID, data.range) then
-            spSetUnitTarget(data.id, data.targetID)
-        end
-    else
-        return false
     end
     return true
 end
@@ -94,14 +96,14 @@ end
 local function addUnit(unitID, data)
     if spValidUnitID(unitID) then
         spSetUnitTarget(unitID, 0)
-    end
-    if setTarget(data) then
-        if unitById[unitID] then
-            unit.data[unitById[unitID]] = data
-        else
-            unit.count = unit.count + 1
-            unit.data[unit.count] = data
-            unitById[unitID] = unit.count
+        if setTarget(data) then
+            if unitById[unitID] then
+                unit.data[unitById[unitID]] = data
+            else
+                unit.count = unit.count + 1
+                unit.data[unit.count] = data
+                unitById[unitID] = unit.count
+            end
         end
     end
 end
