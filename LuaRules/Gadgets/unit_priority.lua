@@ -47,6 +47,7 @@ local StateCount = #CommandDesc.params-1
 local UnitPriority = {}  --  UnitPriority[unitID] = 0,1,2     priority of the unit
 local TeamPriorityUnits = {}  -- TeamPriorityUnits[TeamID][UnitID] = 0,2    which units are low/high priority builders
 local TeamScale = {}  -- TeamScale[TeamID]= {0.1, 0.4}   how much to scale down production of lnormal and low prirotity units
+local TeamReserved = {} -- how much metal is reserved for high priority in each team
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
 
 
@@ -68,6 +69,11 @@ if (gadgetHandler:IsSyncedCode()) then
 --  SYNCED
 --------------------------------------------------------------------------------
 
+local function ChangeReserved(teamID, change) 
+	TeamReserved[teamID] = (TeamReserved[teamID] or 0) + change
+end 
+
+
 local function SetPriorityState(unitID, state) 
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_PRIORITY)
 	if (cmdDescID) then
@@ -83,6 +89,9 @@ function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_PRIORITY)
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local teamID = Spring.GetUnitTeam(unitID)
+		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+		if (ud.metalStorage >0) then ChangeReserved(teamID, ud.metalStorage) end
 		Spring.InsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
 	end
 
@@ -91,7 +100,6 @@ end
 
 function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID) 
 	local prio  = DefaultState
-	
 	if (builderID ~= nil)  then
 		local unitDefID = Spring.GetUnitDefID(builderID)
 		if (unitDefID ~= nil and UnitDefs[unitDefID].isFactory) then 
@@ -104,8 +112,15 @@ function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID)
 	Spring.InsertUnitCmdDesc(UnitID, CommandOrder, CommandDesc)
 end
 
-function gadget:UnitFinished(unitID, unitDefID) 
+
+
+function gadget:UnitFinished(unitID, unitDefID, teamID) 
 	local ud = UnitDefs[unitDefID]
+	
+	if (ud.metalStorage or 0 > 0) then 
+		ChangeReserved(teamID, ud.metalStorage)
+	end 
+	
 	if ((ud.isFactory or ud.builder) and ud.buildSpeed > 0) then 
 		SetPriorityState(unitID, DefaultState)
 	else  -- not a builder priority makes no sense now
@@ -118,9 +133,30 @@ function gadget:UnitFinished(unitID, unitDefID)
 
 end 
 
-function gadget:UnitDestroyed(UnitID, UnitDefID, TeamID) 
+function gadget:UnitDestroyed(UnitID, unitDefID, teamID) 
 	UnitPriority[UnitID] = nil
 	LastUnitFromFactory[UnitID] = nil
+	
+	local ud = UnitDefs[unitDefID]
+	if (ud.metalStorage or 0 > 0) then 
+		ChangeReserved(teamID, -ud.metalStorage)
+	end 
+end
+
+function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
+	local ud = UnitDefs[unitDefID]
+	if (ud.metalStorage or 0  > 0) then 
+		ChangeReserved(teamID, ud.metalStorage)
+		ChangeReserved(oldTeamID, -ud.metalStorage)
+	end 	
+end
+
+function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
+	local ud = UnitDefs[unitDefID]	
+	if (ud.metalStorage or 0  > 0) then 
+		ChangeReserved(teamID, ud.metalStorage)
+		ChangeReserved(oldTeamID, -ud.metalStorage)
+	end 	
 end
 
 
@@ -210,7 +246,8 @@ function gadget:GameFrame(n)
 	if n % 32 == 15 then 
 		TeamScale = {}
 	
-		for teamID, prioUnits in pairs(TeamPriorityUnits) do 
+		for _,teamID in ipairs(Spring.GetTeamList()) do 
+			prioUnits = TeamPriorityUnits[teamID] or {}
 			local prioSpending = 0
 			local lowPrioSpending = 0
 			for unitID, pri in pairs(prioUnits) do 
@@ -226,10 +263,12 @@ function gadget:GameFrame(n)
 			
 			SendToUnsynced("PriorityStats", teamID,  prioSpending, lowPrioSpending, n)   
 
+			local level, _, pull, income, expense, _, _, recieved = Spring.GetTeamResources(teamID, "metal")
+			local elevel, _, epull, eincome, eexpense, _, _, erecieved = Spring.GetTeamResources(teamID, "energy")
 			
-			if (prioSpending > 0 or lowPrioSpending > 0) then
-				local level, _, pull, income, expense, _, _, recieved = Spring.GetTeamResources(teamID, "metal")
-				local elevel, _, epull, eincome, eexpense, _, _, erecieved = Spring.GetTeamResources(teamID, "energy")
+			if (level < (TeamReserved[teamID] or 0)) then  -- below reserved level, low and normal no spending
+					TeamScale[teamID] = {0,0}
+			elseif (prioSpending > 0 or lowPrioSpending > 0) then
 				
 				local normalSpending = pull - lowPrioSpending
 				
@@ -238,7 +277,6 @@ function gadget:GameFrame(n)
 						(income + recieved - prioSpending) / (pull - prioSpending - lowPrioSpending),  -- m stall  scale
 						(income + recieved - normalSpending) / (lowPrioSpending)  -- m stall low scale
 					}
-					
 					--Spring.Echo ("m_stall" .. TeamScale[teamID])
 				elseif epull > eexpense and elevel < eexpense and prioSpending < epull then 
 					TeamScale[teamID] = {				
@@ -246,8 +284,6 @@ function gadget:GameFrame(n)
 						(eincome + erecieved - normalSpending) / (lowPrioSpending)  -- e stall low scale
 					}
 				end 
-				
-				
 			end
 		end
 
