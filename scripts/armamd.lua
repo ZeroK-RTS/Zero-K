@@ -21,11 +21,11 @@ local open = false
 local function Open()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
-	Turn(door1, z_axis, math.rad(-90), math.rad(30))
-	Turn(door2, z_axis, math.rad(90), math.rad(30))
+	Turn(door1, z_axis, math.rad(-90), math.rad(45))
+	Turn(door2, z_axis, math.rad(90), math.rad(45))
 	WaitForTurn(door1, z_axis)
 	
-	Turn(brace, x_axis, math.rad(90), math.rad(30))
+	Turn(brace, x_axis, math.rad(90), math.rad(45))
 	WaitForTurn(brace, x_axis)
 	open = true
 end
@@ -33,12 +33,12 @@ end
 local function Close()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
-	Turn(brace, x_axis, 0, math.rad(30))
+	Turn(brace, x_axis, 0, math.rad(45))
 	WaitForTurn(brace, x_axis)
 	Show(missile)
 	open = false
-	Turn(door1, z_axis, 0, math.rad(30))
-	Turn(door2, z_axis, 0, math.rad(30))
+	Turn(door1, z_axis, 0, math.rad(45))
+	Turn(door2, z_axis, 0, math.rad(45))
 	WaitForTurn(door1, z_axis)
 
 end
@@ -66,7 +66,7 @@ end
 
 function script.FireWeapon(weaponNum)
 	Hide(missile)
-	Sleep(150)
+	Sleep(500)
 	if open then Close() end
 end
 
