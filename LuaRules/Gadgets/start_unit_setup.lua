@@ -654,7 +654,7 @@ function gadget:GameStart()
 
     -- clear resources
     -- actual resources are set depending on spawned unit and setup
-    Spring.SetTeamResource(team, "es", 0)
+    Spring.SetTeamResource(team, "es", 0 + OVERDRIVE_BUFFER)
     Spring.SetTeamResource(team, "ms", 0)
     Spring.SetTeamResource(team, "energy", 0)
     Spring.SetTeamResource(team, "metal", 0)
