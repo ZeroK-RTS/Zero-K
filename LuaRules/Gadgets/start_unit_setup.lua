@@ -481,18 +481,18 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 		local bonus = (keys and tonumber(keys.bonusresources)) or 0
 		
         if startMode == "classic" then
-          Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + OVERDRIVE_BUFFER + energyStore + bonus)
+          Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + energyStore + bonus)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC + metalStore + bonus)
           Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy - commCost + bonus)
           Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal - commCost + bonus)
         elseif startMode == "facplop" then
-          Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + OVERDRIVE_BUFFER + energyStore  + bonus)
+          Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + energyStore  + bonus)
           Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP + metalStore + bonus)
           Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP + energy - commCost + bonus)
           Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP + metal - commCost + bonus)		  
         else
-		  Spring.SetTeamResource(team, "es", START_STORAGE + OVERDRIVE_BUFFER)
-		  Spring.SetTeamResource(team, "ms", START_STORAGE)		
+		  Spring.SetTeamResource(teamID, "es", START_STORAGE + energyStore)
+		  Spring.SetTeamResource(teamID, "ms", START_STORAGE + metalStore)		
           Spring.SetTeamResource(teamID, "energy", START_STORAGE + energy - commCost + bonus)
           Spring.SetTeamResource(teamID, "metal", START_STORAGE + metal - commCost + bonus)
         end
