@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "CameraRecorder",
-    desc      = "v0.01 Record positions of the camera to a file and repath those positions when loading the replay.",
+    desc      = "v0.011 Record positions of the camera to a file and repath those positions when loading the replay.",
     author    = "CarRepairer",
     date      = "2011-07-04",
     license   = "GNU GPL, v2 or later",
@@ -59,6 +59,23 @@ options = {
 		type = 'button',
         -- OnChange defined later
 	},
+    
+    help = {
+        name = 'Help',
+        type = 'text',
+        value = [[
+            * Start a game (such as a replay).
+            * Type /luaui reload
+            * Push Settings > Camera > Recording > Record
+            * Move your camera around.
+            * Push Record again to stop.
+            * End game.
+            * Start a replay of that game you just recorded the camera in.
+            * Type /luaui reload
+            * Push Settings > Camera > Recording > Play
+            * The camera will follow the path you recorded.
+        ]],
+    }
     
 	
 }
