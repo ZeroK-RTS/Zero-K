@@ -162,7 +162,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		]]--
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
 		--Spring.SetUnitHealth(unitID, maxHealth-1)	-- can't be full health; else if you stop the construction you can't resume it!
-		Spring.SetUnitHealth(unitID, {health = maxHealth*0.999, build = 0.999})
+		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
@@ -459,9 +459,14 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 				
     if validTeam then
 
+	  local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
+	  local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
+		
       if boost then
         Spring.SetTeamResource(teamID, 'energy', 0)
         Spring.SetTeamResource(teamID, 'metal', 0)
+		Spring.SetTeamResource(teamID, "es", START_STORAGE + energyStore)
+		Spring.SetTeamResource(teamID, "ms", START_STORAGE + metalStore)		
 		local boostAmount = START_BOOST + BASE_COMM_COST - commCost
 		
         if (udef.isCommander and udef.name ~= "chickenbroodqueen") then
@@ -476,8 +481,6 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 
       else
 		-- the adding of existing resources is necessary for handling /take and spawn
-		local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
-		local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 		local bonus = (keys and tonumber(keys.bonusresources)) or 0
 		
         if startMode == "classic" then

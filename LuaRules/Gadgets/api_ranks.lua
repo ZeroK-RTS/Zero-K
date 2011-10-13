@@ -40,6 +40,13 @@ local GetAllUnits          = Spring.GetAllUnits
 local floor = math.floor
 local type  = type
 
+-- controls how often Spring.UnitExperience is called
+-- it is based on the following equation:
+-- (int) [exp/(exp+1)] / expGrade
+--  If this integer differs from the one before the experience change
+--  it will call UnitExperience().
+local EXP_GRADE = 0.0005	
+
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 
@@ -66,7 +73,7 @@ function gadget:Initialize()
   GG['rankHandler'].GetUnitRank = GetUnitRank
   if (type(GG.UnitRanked)~="table") then GG.UnitRanked = {} end
 
-  Spring.SetExperienceGrade(0.0005)
+  Spring.SetExperienceGrade(EXP_GRADE)
 
   RecreateList()
 end
