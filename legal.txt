@@ -1,5 +1,6 @@
 Legal.
 
+
 Zero-K a game for the Spring engine.
 Copyright © 2008-2010 the 0K development team.
 
