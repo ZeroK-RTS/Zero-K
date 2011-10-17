@@ -15,7 +15,7 @@ end
 --------------------------------------------------------------------------------
 
 local function SetupTTS(enable)
-	if (enable) then 
+	if (enable and not Spring.GetSpectatingState()) then 
 		Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " ENABLE TTS")
 	else 
 		Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
@@ -23,10 +23,10 @@ local function SetupTTS(enable)
 end 
 
 
-options_path = 'Settings/Interface/Chat'
+options_path = 'Settings/Audio'
 options_order = { 'enable'}
 options = {
-	enable = {name = "Text-To-Speech (Zero-K lobby only)", type = 'bool', value = true, 
+	enable = {name = "Text-To-Speech (with Zero-K lobby only)", type = 'bool', value = true, 
 	
 	OnChange = function(self)
 			SetupTTS(self.value)
