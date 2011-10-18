@@ -52,8 +52,10 @@ local white		= ''
 local cf = Spring.GetGameRulesParam('cf') == 1
 
 local x_cf 		= cf and 20 or 0
-local x_icon    = x_cf + 30
-local x_name 	= x_icon + 16
+local x_icon_country = x_cf + 30
+local x_icon_rank = x_icon_country + 16
+local x_icon_clan = x_icon_rank + 16
+local x_name 	= x_icon_clan + 16
 local x_share 	= x_name + 140 
 local x_cpu 	= x_share + 20
 local x_ping 	= x_cpu + 40
@@ -232,15 +234,41 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 		local pingTime_readable = PingTimeOut(pingTime)
 
-		window_cpl:AddChild(
-			Chili.Image:New{
-				file=icon;
-				width= options.text_height.value + 3;
-				height=options.text_height.value + 3;
-				x=x_icon,
-				y=options.text_height.value * row,
-			}
-		)
+		if not pdata.isAI then 
+		
+			window_cpl:AddChild(
+				Chili.Image:New{
+					file="LuaUI/Images/flags/" .. (country or '') .. ".png";
+					width= options.text_height.value + 3;
+					height=options.text_height.value + 3;
+					x=x_icon_country,
+					y=options.text_height.value * row,
+				}
+			)
+			
+			window_cpl:AddChild(
+				Chili.Image:New{
+					file="LuaUI/Images/Ranks/" .. (1+math.ceil((customKeys.level or 0)/10)) .. ".png";
+					width= options.text_height.value + 3;
+					height=options.text_height.value + 3;
+					x=x_icon_rank,
+					y=options.text_height.value * row,
+				}
+			)
+
+
+			window_cpl:AddChild(
+				Chili.Image:New{
+					file=icon;
+					width= options.text_height.value + 3;
+					height=options.text_height.value + 3;
+					x=x_icon_clan,
+					y=options.text_height.value * row,
+				}
+			)
+
+		end 
+		
 		
 		window_cpl:AddChild(
 			Label:New{
