@@ -335,11 +335,22 @@ function widget:Initialize()
 		end
 	end
 
+	
 	--// send my avatar checksum to all players (so they can request a download if needed)
 	local myAvatar = avatars[myPlayerName]
+
+	local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	
+	if (customKeys ~= nil and customKeys.avatar~=nil) then 
+		myAvatar = { file = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"}
+		
+	end 
+
+	
 	if (myAvatar) then
 		myAvatar.checksum = CalcChecksum(VFS.LoadFile(myAvatar.file))
 		Spring.SendLuaUIMsg(ChecksumMsg .. myAvatar.checksum)
+		SetAvatar(name, myAvatar.file, myAvatar.checksum)
 	end
 
 	WG.Avatar = {
