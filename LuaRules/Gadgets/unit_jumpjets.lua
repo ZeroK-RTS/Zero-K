@@ -72,11 +72,12 @@ local spDestroyUnit        = Spring.DestroyUnit
 local spCreateUnit         = Spring.CreateUnit
 
 local mcSetRotationVelocity = MoveCtrl.SetRotationVelocity
-local mcSetLeaveTracks      = MoveCtrl.SetLeaveTracks
 local mcSetPosition         = MoveCtrl.SetPosition
 local mcSetRotation         = MoveCtrl.SetRotation
 local mcDisable             = MoveCtrl.Disable
 local mcEnable              = MoveCtrl.Enable
+
+local SetLeaveTracks      = Spring.SetUnitLeaveTracks or MoveCtrl.SetLeaveTracks	--0.82 compatiblity
 
 local emptyTable = {}
 
@@ -224,7 +225,7 @@ local function Jump(unitID, goal, cmdTag)
   jumping[unitID] = true
 
   mcEnable(unitID)
-  mcSetLeaveTracks(unitID, false)
+  SetLeaveTracks(unitID, false)
 
   if not cob then
     env = Spring.UnitScript.GetScriptEnv(unitID)
@@ -313,6 +314,7 @@ local function Jump(unitID, goal, cmdTag)
 	end
     lastJump[unitID] = spGetGameSeconds()
     jumping[unitID] = false
+    SetLeaveTracks(unitID, true)
 	mcDisable(unitID)
 	
 		--mcSetPosition(unitID, start[1] + vector[1],start[2] + vector[2]-6,start[3] + vector[3])
