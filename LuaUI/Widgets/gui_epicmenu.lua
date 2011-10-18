@@ -1561,6 +1561,7 @@ end
 
 -- Show or hide menubar
 local function ShowHideCrudeMenu()
+	WG.crude.visible = settings.show_crudemenu -- HACK set it to wg to signal to player list 
 	if settings.show_crudemenu then
 		if window_crude then
 			screen0:AddChild(window_crude)

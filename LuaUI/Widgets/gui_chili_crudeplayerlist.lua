@@ -74,6 +74,7 @@ local show_spec = false
 local localTeam = 0
 local localAlliance = 0
 
+include("keysym.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -458,6 +459,18 @@ SetupPlayerNames = function()
 end
 
 
+function widget:KeyPress(key, modifier, isRepeat)
+	if key == KEYSYMS.ESCAPE and not modifier.alt and not modifier.ctrl and not modifier.shift and not modifier.meta then 
+		if WG.crude.visible and visible then  -- HACK FIXME TODO this is just wrong, it should not rely on escape keypress + crudemenu, crudemenu can be rebinded. Also when this is executed crude visible state is not yet updated 
+			screen0:RemoveChild(window_cpl)
+			visible = false 
+		elseif not visible then 
+			screen0:AddChild(window_cpl)
+			visible = true
+		end 
+	end 
+end 
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -473,6 +486,8 @@ function widget:Update(s)
 	if timer > 5 then
 		timer = 0
 		SetupPlayerNames()
+		window_cpl:SetPos(screen0.width-window_cpl.width, screen0.height-window_cpl.height)
+		
 	end
 end
 
@@ -525,6 +540,12 @@ function widget:Initialize()
 		children = {
 		},
 	}
+	
+	
+	visible = WG.crude.visible -- HACK TODO FIXME this is wrong way to do it
+	if not visible then 
+		screen0:RemoveChild(window_cpl)
+	end 
 	
 	SetupPlayerNames()
 	
