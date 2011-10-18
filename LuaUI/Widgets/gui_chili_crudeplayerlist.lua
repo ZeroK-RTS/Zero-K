@@ -3,13 +3,13 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Crude Player List",
+    name      = "Chili Crude Player List v1.2",
     desc      = "v1.052 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
@@ -52,7 +52,8 @@ local white		= ''
 local cf = Spring.GetGameRulesParam('cf') == 1
 
 local x_cf 		= cf and 20 or 0
-local x_name 	= x_cf + 30
+local x_icon    = x_cf + 30
+local x_name 	= x_icon + 16
 local x_share 	= x_name + 140 
 local x_cpu 	= x_share + 20
 local x_ping 	= x_cpu + 40
@@ -67,7 +68,7 @@ pingCpuColors = {
 
 local sharePic        = ":n:"..LUAUI_DIRNAME.."Images/advplayerslist/units.png"
 
-local show_spec = true
+local show_spec = false
 local localTeam = 0
 local localAlliance = 0
 
@@ -82,7 +83,7 @@ options = {
 	text_height = {
 		name = 'Font Size',
 		type = 'number',
-		value = 14,
+		value = 13,
 		min=10,max=18,step=1,
 		OnChange = function() SetupPlayerNames() end,
 	},
@@ -212,16 +213,35 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		local teamID = pdata.team
 		local playerID = pdata.player
 		
-		local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
-	
+		local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(playerID)
+			
 		pingTime = pingTime or 0
 		cpuUsage = cpuUsage or 0
+		
+		local icon = nil
+		if (not pdata.isAI and customKeys ~= nil) then 
+			if (customKeys.clan~=nil) then 
+				icon = "LuaUI/Configs/Clans/" .. customKeys.clan ..".png"
+			elseif (customKeys.faction~=nil) then
+				icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
+			end 
+		end 
 	
 		local min_pingTime = math.min(pingTime, 1)
 		local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
 		local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 		local pingTime_readable = PingTimeOut(pingTime)
-	
+
+		window_cpl:AddChild(
+			Chili.Image:New{
+				file=icon;
+				width= options.text_height.value + 3;
+				height=options.text_height.value + 3;
+				x=x_icon,
+				y=options.text_height.value * row,
+			}
+		)
+		
 		window_cpl:AddChild(
 			Label:New{
 				x=x_name,
@@ -234,7 +254,9 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				fontsize = options.text_height.value,
 				fontShadow = true,
 			}
-		)
+        )
+
+		
 		if active and allyTeam == localAlliance and teamID ~= localTeam then
 			window_cpl:AddChild(
 				Button:New{
@@ -355,7 +377,7 @@ SetupPlayerNames = function()
 					allyTeams[allyTeamID_out] = {}
 				end
 				
-				table.insert( allyTeams[allyTeamID_out], {name=name_out,team=teamID,player=playerID} )
+				table.insert( allyTeams[allyTeamID_out], {name=name_out,team=teamID,player=playerID, isAI = isAI} )
 			end
 			
 		end --if teamID ~= Spring.GetGaiaTeamID() 
@@ -414,6 +436,7 @@ end
 
 
 function widget:Shutdown()
+	Spring.SendCommands({"info 1"})
 end
 
 local timer = 0
@@ -432,6 +455,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
+	
 
 	Chili = WG.Chili
 	Image = Chili.Image
@@ -461,8 +485,8 @@ function widget:Initialize()
 		color = {1,1,1,options.backgroundOpacity.value},
 		right = 0,  
 		bottom = 0,
-		width  = 350,
-		height = 250,
+		width  = 320,
+		height = 150,
 		autosize   = true;
 		parent = screen0,
 		draggable = false,
@@ -475,5 +499,6 @@ function widget:Initialize()
 	}
 	
 	SetupPlayerNames()
-
+	
+	Spring.SendCommands({"info 0"})
 end
