@@ -11,8 +11,8 @@ local versionName = "v1.12"
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Dynamic Avoidance System ".. versionName,
-    desc      = "Dynamic Collision Avoidance behaviour for all ground unit",
+    name      = "Dynamic Avoidance System ",
+    desc      = versionName .. "Dynamic Collision Avoidance behaviour for all ground units",
     author    = "msafwan (coding)",
     date      = "Sept 18, 2011",
     license   = "GNU GPL, v2 or later",
