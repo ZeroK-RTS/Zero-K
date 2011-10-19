@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armmstor]],
   name                          = [[Storage]],
-  description                   = [[Stores Metal and Energy (500)]],
+  description                   = [[Reserves metal for high prioty construction and morphing, stores Metal and Energy (500)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   bmcode                        = [[0]],
