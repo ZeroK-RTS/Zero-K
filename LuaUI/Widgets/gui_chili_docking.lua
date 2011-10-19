@@ -183,10 +183,9 @@ local lastCount = 0
 local lastWidth = 0
 local lastHeight= 0
 
-
-function widget:DrawScreen() 
-	frameCounter = frameCounter +1
-	if (frameCounter % 88 ~= 87 and #screen0.children == lastCount) then return end 
+function widget:Update() 
+	frameCounter = frameCounter +1	
+	if (frameCounter % 30 ~= 1 and #screen0.children == lastCount) then return end 
 	lastCount = #screen0.children
 	
 	local posChanged = false -- has position changed since last check
@@ -198,11 +197,27 @@ function widget:DrawScreen()
 	end 
 	
 	local present = {}
-	for _, win in ipairs(screen0.children) do 
+	for _, win in ipairs(table.shallowcopy(screen0.children)) do 
 		if (win.dockable) then 
 			present[win] = true
 			local lastWinPos = lastPos[win]
 			if lastWinPos==nil then  -- new window appeared
+				--[[win.visible = true
+				local button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20;label = mini;dockable=false, 		
+					OnClick = {
+						function(self)
+							if win.visible then
+								screen0:RemoveChild(win)
+							else 
+								screen0:AddChild(win)
+							end 
+							win.visible = not win.visible
+						end
+					}
+				}
+				screen0:AddChild(button)
+				button:BringToFront()]]--
+			
 				posChanged = true 
 				local settingsPos = settings[win.name]
 				if settingsPos ~= nil then  -- and we have setings stored for new window, apply it
