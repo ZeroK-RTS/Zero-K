@@ -197,7 +197,7 @@ function widget:Update()
 	end 
 	
 	local present = {}
-	for _, win in ipairs(table.shallowcopy(screen0.children)) do 
+	for _, win in ipairs(screen0.children) do  -- NEEDED FOR MINIMIZE BUTTONS: table.shallowcopy( 
 		if (win.dockable) then 
 			present[win] = true
 			local lastWinPos = lastPos[win]
