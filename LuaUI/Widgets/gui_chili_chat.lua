@@ -3,8 +3,8 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Chat",
-    desc      = "v0.42 Chili Chat Console.",
+    name      = "Chili Chat v0.43",
+    desc      = "v0.43 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -62,6 +62,7 @@ local window_console
 local colorNames = {}
 local colors = {}
 
+local visible = false
 
 local function option_remakeConsole()
 	remakeConsole()
@@ -69,10 +70,10 @@ end
 
 
 local function option_autoHideChanged() 
-	screen0:RemoveChild(window_console)
-	if (WG.enteringText or not options.autoHideChat.value)   then 
+	--[[screen0:RemoveChild(window_console)
+	if (WG.enteringText or not options.autoHideChat.value)  then 
 		screen0:AddChild(window_console)
-	end 
+	end ]]--
 end 
 
 options_path = "Settings/Interface/Chat/Console"
@@ -85,7 +86,7 @@ options = {
 	autoHideChat = {
 		name = "Autohide Console",
 		type = 'bool',
-		value = false, 
+		value = true, 
 		desc = "Auto hides when not typing text",
 		OnChange = option_autoHideChanged,
 	},
@@ -185,6 +186,8 @@ options = {
 	},
 
 }
+
+
 
 
 --------------------------------------------------------------------------------
@@ -301,8 +304,9 @@ end
 
 
 local function hideConsole() 
-	if options.autoHideChat.value then 
+	if options.autoHideChat.value and not WG.crude.visible and visible then 
 		screen0:RemoveChild(window_console)
+		visible = false
 		return true
 	end 
 	return false
@@ -394,11 +398,23 @@ end
 
 
 function widget:KeyPress(key, modifier, isRepeat) 
+	if key == KEYSYMS.ESCAPE and not modifier.alt and not modifier.ctrl and not modifier.shift and not modifier.meta then 
+		if WG.crude.visible and visible then  -- HACK FIXME TODO this is just wrong, it should not rely on escape keypress + crudemenu, crudemenu can be rebinded. Also when this is executed crude visible state is not yet updated 
+			screen0:RemoveChild(window_console)
+			visible = false 
+		elseif not visible then 
+			screen0:AddChild(window_console)
+			visible = true
+		end 
+	end 
+
+
 	if (key == KEYSYMS.RETURN) then
 		if not WG.enteringText then 
 			WG.enteringText = true
-			if options.autoHideChat.value then 
+			if options.autoHideChat.value and not visible then 
 				screen0:AddChild(window_console)
+				visible = true
 			end 
 			MakeInputSpace()
 		end
@@ -539,4 +555,11 @@ function widget:Initialize()
 	end
 	
 	spSendCommands({"console 0"})
+	
+	screen0:AddChild(window_console)
+	visible = WG.crude.visible -- HACK TODO FIXME this is wrong way to do it
+	if not visible then 
+		screen0:RemoveChild(window_console)
+	end 
+
 end
