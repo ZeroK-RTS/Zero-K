@@ -228,6 +228,12 @@ function widget:AddChatMessage(player, msg, type)
 		teamcolor = {1,1,1,0.7}
 	end
 
+	local pp = nil
+	if WG.alliedCursorsPos then 
+		pp = WG.alliedCursorsPos[player]
+	end 
+
+	
 	local w = Chili.Window:New{
 		parent    = Chili.Screen0;
 		x         = vsx-options.window_width.value;
@@ -247,11 +253,8 @@ function widget:AddChatMessage(player, msg, type)
 		custom_timeadded = GetTimer(),
     window_id = newWindowID(),
 		OnMouseDown = {function() 
-			if WG.alliedCursorsPos then 
-				local pp = WG.alliedCursorsPos[player]
-				if pp ~= nil then 
-					Spring.SetCameraTarget(pp[1], 0, pp[2],1)
-				end 
+			if pp ~= nil then 
+				Spring.SetCameraTarget(pp[1], 0, pp[2],1)
 			end 
 		end},
 	}
