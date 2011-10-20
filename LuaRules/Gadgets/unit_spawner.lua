@@ -1217,7 +1217,6 @@ function gadget:TeamDied(teamID)
   computerTeams[teamID] = nil
 end
 
-
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   if (eggs) then
     for _, mexName in pairs(mexes) do
@@ -1227,6 +1226,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
     end
   end
   return true  -- command was not used
+end
+
+function gadget:FeatureDestroyed(featureID, allyTeam)
+	eggDecay[featureID] = nil
 end
 
 function gadget:GameOver()

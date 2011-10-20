@@ -15,7 +15,7 @@
 
 function widget:GetInfo()
 	return {
-		name	= "OnlyFightersPatrol",
+		name	= "Only Fighters Patrol",
 		desc	= "Only fighters go on factory's patrol route after leaving airlab. Reduces lag.",
 		author	= "dizekat",
 		date	= "2008-04-22",
@@ -36,6 +36,13 @@ local GetMyTeamID = Spring.GetMyTeamID
 local GetCommandQueue = Spring.GetCommandQueue
 local GetUnitBuildFacing = Spring.GetUnitBuildFacing
 local GetUnitPosition = Spring.GetUnitPosition
+
+local mustStop = {
+	[UnitDefNames.armcybr.id] = true,
+	[UnitDefNames.armstiletto_laser.id] = true,
+	[UnitDefNames.corhurc2.id] = true,
+	[UnitDefNames.corshad.id] = true,
+}
 
 --[[
 local function WeaponCanTargetAir(weapon)
@@ -72,7 +79,7 @@ local function UnitHasPatrolOrder(unitID)
 end
 local function MustStop(unitID, unitDefID)
 	local ud=UnitDefs[unitDefID]
-	if ud and ud.canFly and (ud.weaponCount==0 or (not (ud.type == "Fighter")) or (ud.name=="armcybr") or ud.noAutoFire) and UnitHasPatrolOrder(unitID) then
+	if ud and mustStop[unitDefID] and UnitHasPatrolOrder(unitID) then
 		if (not opts.stop_builders)and ud and ud.builder then
 			return false
 		end
