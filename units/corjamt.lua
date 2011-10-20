@@ -53,10 +53,10 @@ unitDef = {
     description_bp = [[]],
     description_fr = [[]],
 	description_de = [[Leichte Abschirmeinrichtung]],
-    helptext       = [[The Aspis protects a modest area with its bubble shield that stops incoming projectiles (but not AoE effects). The shield has a significant energy upkeep and does not block gauss shells, flame, or very powerful weapons.]],
+    helptext       = [[The Aegis protects a modest area with its bubble shield that stops incoming projectiles (but not AoE effects). The shield has a significant energy upkeep and does not block gauss shells, flame, or very powerful weapons.]],
     helptext_bp    = [[]],
     helptext_fr    = [[]],
-	helptext_de    = [[Aegis schützt deine Einheiten in mit seinem Schild vor Angriffen, die durch den Schild absorbiert werden können, aber nur solange die nötige Energieversorgung gewährleistet ist und der Beschuss nicht zu stark wird.]],
+	helptext_de    = [[Aegis schÃ¼tzt deine Einheiten in mit seinem Schild vor Angriffen, die durch den Schild absorbiert werden kÃ¶nnen, aber nur solange die nÃ¶tige Energieversorgung gewÃ¤hrleistet ist und der Beschuss nicht zu stark wird.]],
   },  
   
   weapons                       = {
