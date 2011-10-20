@@ -183,9 +183,9 @@ local lastCount = 0
 local lastWidth = 0
 local lastHeight= 0
 
-function widget:Update() 
-	frameCounter = frameCounter +1	
-	if (frameCounter % 30 ~= 1 and #screen0.children == lastCount) then return end 
+function widget:DrawScreen() 
+	frameCounter = frameCounter +1
+	if (frameCounter % 88 ~= 87 and #screen0.children == lastCount) then return end 
 	lastCount = #screen0.children
 	
 	local posChanged = false -- has position changed since last check
