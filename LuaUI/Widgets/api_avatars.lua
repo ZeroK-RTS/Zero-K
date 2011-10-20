@@ -60,11 +60,14 @@ local function SearchFileByChecksum(checksum)
 	local files = VFS.DirList(avatarsDir)
 	for i=1,#files do
 		local file = files[i]
-		local file_checksum = CalcChecksum(VFS.LoadFile(file))
+		  local data = VFS.LoadFile(file)
+		if (data:len()/1024 < maxFileSize) then  
+      local file_checksum = CalcChecksum(data)
 
-		if (file_checksum == checksum) then
-			return file
-		end
+        if (file_checksum == checksum) then
+           return file
+        end
+    end
 	end
 end
 
