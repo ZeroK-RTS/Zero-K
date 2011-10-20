@@ -211,14 +211,18 @@ function widget:AddChatMessage(player, msg, type)
 
 	local playerName,active,isSpec,teamID
 	local teamcolor
+	local avatar = nil
 	if player < 0 then
 		active = false
 		playerName = "Autohost"
 		isSpec = true
 		teamID = 0
 	else
-		playerName,active,isSpec,teamID = Spring.GetPlayerInfo(player)
+		playerName,active,isSpec,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys  = Spring.GetPlayerInfo(player)
 		teamcolor = {Spring.GetTeamColor(teamID)}
+		if (customKeys ~= nil and customKeys.avatar~=nil) then 
+			avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"
+		end 
 	end
 	if (not active or isSpec) then
 		teamcolor = {1,1,1,0.7}
@@ -258,7 +262,7 @@ function widget:AddChatMessage(player, msg, type)
 	
 	Chili.Image:New{
 		parent = w;
-		file   = (WG.Avatar) and (WG.Avatar.GetAvatar(playerName)) or avatar_fallback;
+		file   = avatar or avatar_fallback; -- FIXME fix API later (WG.Avatar) and (WG.Avatar.GetAvatar(playerName)) or avatar_fallback;
 		--file2  = (type=='s') and "LuaUI/Images/tech_progressbar_empty.png";
 		width  = options.window_height.value-36;
 		height = options.window_height.value-36;

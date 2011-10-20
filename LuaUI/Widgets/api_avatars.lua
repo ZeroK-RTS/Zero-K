@@ -3,14 +3,14 @@
 
 function widget:GetInfo()
   return {
-    name      = "Avatars",
+    name      = "Avatars v0",
     desc      = "An API for a per-user avatar-icon system.",
     author    = "jK",
     date      = "2009",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    api       = true,
-    enabled   = true
+    api       = false,
+    enabled   = false
   }
 end
 

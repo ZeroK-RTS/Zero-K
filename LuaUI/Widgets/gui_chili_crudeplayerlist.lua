@@ -222,12 +222,14 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		cpuUsage = cpuUsage or 0
 		
 		local icon = nil
+		local rank = nil 
 		if (not pdata.isAI and customKeys ~= nil) then 
-			if (customKeys.clan~=nil) then 
+			if (customKeys.clan~=nil and customKeys.clan~="") then 
 				icon = "LuaUI/Configs/Clans/" .. customKeys.clan ..".png"
-			elseif (customKeys.faction~=nil) then
+			elseif (customKeys.faction~=nil and customKeys.faction~="") then
 				icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
 			end 
+			rank = "LuaUI/Images/Ranks/" .. (1+math.ceil((customKeys.level or 0)/10)) .. ".png"
 		end 
 	
 		local min_pingTime = math.min(pingTime, 1)
@@ -249,7 +251,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			
 			window_cpl:AddChild(
 				Chili.Image:New{
-					file="LuaUI/Images/Ranks/" .. (1+math.ceil((customKeys.level or 0)/10)) .. ".png";
+					file=rank;
 					width= options.text_height.value + 3;
 					height=options.text_height.value + 3;
 					x=x_icon_rank,
@@ -257,16 +259,17 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				}
 			)
 
-
-			window_cpl:AddChild(
-				Chili.Image:New{
-					file=icon;
-					width= options.text_height.value + 3;
-					height=options.text_height.value + 3;
-					x=x_icon_clan,
-					y=options.text_height.value * row,
-				}
-			)
+			if icon ~= nil then 
+				window_cpl:AddChild(
+					Chili.Image:New{
+						file=icon;
+						width= options.text_height.value + 3;
+						height=options.text_height.value + 3;
+						x=x_icon_clan,
+						y=options.text_height.value * row,
+					}
+				)
+			end
 
 		end 
 		
