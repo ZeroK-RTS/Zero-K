@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List v1.2",
-    desc      = "v1.052 Chili Crude Player List.",
+    desc      = "v1.053 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -123,8 +123,8 @@ end
 local function PingTimeOut(pingTime)
 	if pingTime < 1 then
 		return (math.floor(pingTime*1000) ..'ms')
-	elseif pingTime > 100 then
-		return '>100s'
+	elseif pingTime > 999 then
+		return '>999s'
 	end
 	--return (math.floor(pingTime*100))/100
 	return ('' .. (math.floor(pingTime*100)/100)):sub(1,4) .. 's' --needed due to rounding errors.
