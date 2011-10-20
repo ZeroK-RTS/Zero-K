@@ -50,9 +50,9 @@ local imgTexCoordX = 0.625  --image texture coordinate X -- textures image's dim
 local imgTexCoordY = 0.625	--image texture coordinate Y -- enter values other than 1.0 to use just a region of the texture image
 local fontSizeHeadline = 36
 local fontSizeAddon = 24
-local windowIconPath = "LuaUI/Images/SpringIconmkII.png"
+local windowIconPath = "LuaUI/Images/ZK_logo_pause.png"
 local fontPath = "LuaUI/Fonts/MicrogrammaDBold.ttf"
-local windowClosePath = "LuaUI/Images/closex_32.png"
+local windowClosePath = "LuaUI/Images/quit.png"
 local imgCloseWidth = 32
 local minTransparency = 0 -- transparency after [X] is pressed
 --Color config in drawPause function
