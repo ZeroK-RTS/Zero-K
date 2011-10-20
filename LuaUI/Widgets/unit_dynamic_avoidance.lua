@@ -559,7 +559,6 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					if impatienceTrigger==0 then --zero means that unit is impatient
 						distanceCONSTANT=distanceCONSTANT/2
 					end
-					Spring.Echo(distanceCONSTANT)
 					local ri, wi, di = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT)
 					local fObstacle = ri*wi*di
 					distanceCONSTANT=distanceCONSTANTunitG
