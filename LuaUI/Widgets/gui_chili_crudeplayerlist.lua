@@ -222,14 +222,20 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		cpuUsage = cpuUsage or 0
 		
 		local icon = nil
-		local rank = nil 
+		local icRank = nil 
+		local icCountry = nil
 		if (not pdata.isAI and customKeys ~= nil) then 
 			if (customKeys.clan~=nil and customKeys.clan~="") then 
 				icon = "LuaUI/Configs/Clans/" .. customKeys.clan ..".png"
 			elseif (customKeys.faction~=nil and customKeys.faction~="") then
 				icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
 			end 
-			rank = "LuaUI/Images/Ranks/" .. (1+math.ceil((customKeys.level or 0)/10)) .. ".png"
+			if customKeys.level ~= nil and customKeys.level~="" then 
+				icRank = "LuaUI/Images/Ranks/" .. (1+math.ceil((customKeys.level or 0)/10)) .. ".png"
+			end
+			if customKeys.country ~= nil and customKeys.country ~= "" then 
+				icCountry = "LuaUI/Images/flags/" .. (country or '') .. ".png"
+			end 
 		end 
 	
 		local min_pingTime = math.min(pingTime, 1)
@@ -239,25 +245,29 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 
 		if not pdata.isAI then 
 		
-			window_cpl:AddChild(
-				Chili.Image:New{
-					file="LuaUI/Images/flags/" .. (country or '') .. ".png";
-					width= options.text_height.value + 3;
-					height=options.text_height.value + 3;
-					x=x_icon_country,
-					y=options.text_height.value * row,
-				}
-			)
+			if icCountry ~= nil  then 
+				window_cpl:AddChild(
+					Chili.Image:New{
+						file=icCountry;
+						width= options.text_height.value + 3;
+						height=options.text_height.value + 3;
+						x=x_icon_country,
+						y=options.text_height.value * row,
+					}
+				)
+			end 
 			
-			window_cpl:AddChild(
-				Chili.Image:New{
-					file=rank;
-					width= options.text_height.value + 3;
-					height=options.text_height.value + 3;
-					x=x_icon_rank,
-					y=options.text_height.value * row,
-				}
-			)
+			if icRank ~= nil then 
+				window_cpl:AddChild(
+					Chili.Image:New{
+						file=icRank;
+						width= options.text_height.value + 3;
+						height=options.text_height.value + 3;
+						x=x_icon_rank,
+						y=options.text_height.value * row,
+					}
+				)
+			end 
 
 			if icon ~= nil then 
 				window_cpl:AddChild(
