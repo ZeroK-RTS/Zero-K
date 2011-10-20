@@ -265,7 +265,7 @@ function widget:AddChatMessage(player, msg, type)
 	
 	Chili.Image:New{
 		parent = w;
-		file   = avatar or avatar_fallback; -- FIXME fix API later (WG.Avatar) and (WG.Avatar.GetAvatar(playerName)) or avatar_fallback;
+		file   = (WG.Avatar) and (WG.Avatar.GetAvatar(playerName)) or avatar_fallback;
 		--file2  = (type=='s') and "LuaUI/Images/tech_progressbar_empty.png";
 		width  = options.window_height.value-36;
 		height = options.window_height.value-36;
