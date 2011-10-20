@@ -262,6 +262,10 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--global variable. Store receive list and clearing time
+local spGetGameSeconds = Spring.GetGameSeconds
+local receiveList = {}
+local lastClearingTime = -100
 
 function widget:RecvLuaMsg(msg, playerID)
 	if (msg:sub(1,1) ~= MsgID) then
@@ -271,6 +275,18 @@ function widget:RecvLuaMsg(msg, playerID)
 	if (playerID == Spring.GetMyPlayerID()) then
 		return;
 	end
+   
+  --empty receive list every 1 second. Allow sender to re-send request if previous respond fail  
+  local now = spGetGameSeconds()
+  if now >= 1 +lastClearingTime then
+    receiveList[playerID]=-100
+    lastClearingTime=now
+  end
+
+  --check msg with receive list. Allow the whole function to skip if it receive duplicate content    
+  if receiveList[playerID]~=msg then
+    receiveList[playerID]=msg
+  else return; end
 
 	if (msg:sub(1,2) == ChecksumMsg) then
 		--// check other's checksums
@@ -292,16 +308,16 @@ function widget:RecvLuaMsg(msg, playerID)
 		end
 	elseif (msg:sub(1,2) == RequestMsg) then
 		--// somone doesn't have our icon, so compress and send it
-		if (not alreadySent) then
+		--if (not alreadySent) then
 			local myAvatar = avatars[myPlayerName]
 			if (myAvatar) then
 				local cdata = VFS.ZlibCompress(VFS.LoadFile(myAvatar.file))
 				local filename = ExtractFileName(myAvatar.file)
 
 				Spring.SendLuaUIMsg(DataMsg .. filename .. '$' .. cdata)
-				alreadySent = true
+				--alreadySent = true
 			end
-		end
+		--end
 	elseif (msg:sub(1,2) == DataMsg) then
 		--// received an icon, save it to disk
 		msg = msg:sub(3)
