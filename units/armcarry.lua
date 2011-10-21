@@ -77,14 +77,15 @@ unitDef = {
 
     {
       def                = [[carriertargeting]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+	  badTargetCategory  = [[SINK]],
+      onlyTargetCategory = [[SWIM LAND FLOAT SHIP HOVER]],
     },
 
 
     {
       def                = [[ARMMSHIP_ROCKET]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      badTargetCategory  = [[SWIM LAND SINK SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND FLOAT SHIP HOVER]],
     },
 
 
