@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat v0.43",
-    desc      = "v0.43 Chili Chat Console.",
+    desc      = "v0.44 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -78,7 +78,7 @@ end
 
 options_path = "Settings/Interface/Chat/Console"
 options_order = { 'autoHideChat', 'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
-		'col_back','col_text', 'col_ally', 'col_othertext', 'col_dup', 
+		'col_back','col_text', 'col_ally', 'col_othertext', 'col_dup', 'hideOnEsc',
 		}
 options = {
 	
@@ -183,6 +183,23 @@ options = {
 		type = 'bool',
 		value = false,
 		OnChange = function(self) scrollpanel1.noMouseWheel = not self.value; end,
+	},
+	
+	hideOnEsc = {
+		name = "Hide When Pushing Esc",
+		type = "bool",
+		value = true,
+		
+		OnChange = function(self)
+			--visible = WG.crude.visible
+			if self.value then
+				--showHide()
+			elseif not visible then
+				screen0:AddChild(window_cpl)
+				visible = true
+			end
+		end,
+			
 	},
 
 }
@@ -397,7 +414,10 @@ end
 
 
 
-function widget:KeyPress(key, modifier, isRepeat) 
+function widget:KeyPress(key, modifier, isRepeat)
+	
+	if not options.hideOnEsc.value then return end
+	
 	if key == KEYSYMS.ESCAPE and not modifier.alt and not modifier.ctrl and not modifier.shift and not modifier.meta then 
 		if WG.crude.visible and visible then  -- HACK FIXME TODO this is just wrong, it should not rely on escape keypress + crudemenu, crudemenu can be rebinded. Also when this is executed crude visible state is not yet updated 
 			screen0:RemoveChild(window_console)
@@ -557,9 +577,11 @@ function widget:Initialize()
 	spSendCommands({"console 0"})
 	
 	screen0:AddChild(window_console)
-	visible = WG.crude.visible -- HACK TODO FIXME this is wrong way to do it
-	if not visible then 
-		screen0:RemoveChild(window_console)
-	end 
+	if options.hideOnEsc.value then
+		visible = WG.crude.visible -- HACK TODO FIXME this is wrong way to do it
+		if not visible then 
+			screen0:RemoveChild(window_console)
+		end
+	end
 
 end

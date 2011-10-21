@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List v1.2",
-    desc      = "v1.053 Chili Crude Player List.",
+    desc      = "v1.06 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -35,7 +35,7 @@ local myName -- my console name
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local window_cpl
+local window_cpl, scroll_cpl
 
 local colorNames = {}
 local colors = {}
@@ -73,6 +73,8 @@ local sharePic        = ":n:"..LUAUI_DIRNAME.."Images/playerlist/share.png"
 local show_spec = false
 local localTeam = 0
 local localAlliance = 0
+local visible = true
+local showHide = function() end
 
 include("keysym.h.lua")
 
@@ -96,9 +98,26 @@ options = {
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			window_cpl.color = {1,1,1,self.value}
-			window_cpl:Invalidate() 
+			window_cpl:Invalidate()
 		end,
 	},
+	hideOnEsc = {
+		name = "Hide When Pushing Esc",
+		type = "bool",
+		value = true,
+		
+		OnChange = function(self)
+			--visible = WG.crude.visible
+			if self.value then
+				--showHide()
+			elseif not visible then
+				screen0:AddChild(window_cpl)
+				visible = true
+			end
+		end,
+			
+	},
+	
 }
 
 --------------------------------------------------------------------------------
@@ -185,7 +204,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		aCol = {1,0.5,0,1}
 	end
 	
-	window_cpl:AddChild(
+	scroll_cpl:AddChild(
 		Label:New{
 			y=options.text_height.value * row,
 			caption = '[' .. (type(allyTeam) == 'number' and (allyTeam+1) or allyTeam) .. ']',
@@ -195,7 +214,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		}
 	)
 	if cf and allyTeam ~= 'S' and allyTeam ~= localAlliance then
-		window_cpl:AddChild( Checkbox:New{
+		scroll_cpl:AddChild( Checkbox:New{
 			x=x_cf,y=options.text_height.value * row + 3,width=20,
 			caption='',
 			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
@@ -246,7 +265,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		if not pdata.isAI then 
 		
 			if icCountry ~= nil  then 
-				window_cpl:AddChild(
+				scroll_cpl:AddChild(
 					Chili.Image:New{
 						file=icCountry;
 						width= options.text_height.value + 3;
@@ -258,7 +277,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			end 
 			
 			if icRank ~= nil then 
-				window_cpl:AddChild(
+				scroll_cpl:AddChild(
 					Chili.Image:New{
 						file=icRank;
 						width= options.text_height.value + 3;
@@ -270,7 +289,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			end 
 
 			if icon ~= nil then 
-				window_cpl:AddChild(
+				scroll_cpl:AddChild(
 					Chili.Image:New{
 						file=icon;
 						width= options.text_height.value + 3;
@@ -284,7 +303,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		end 
 		
 		
-		window_cpl:AddChild(
+		scroll_cpl:AddChild(
 			Label:New{
 				x=x_name,
 				y=options.text_height.value * row,
@@ -300,7 +319,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 
 		
 		if active and allyTeam == localAlliance and teamID ~= localTeam then
-			window_cpl:AddChild(
+			scroll_cpl:AddChild(
 				Button:New{
 					x=x_share,
 					y=options.text_height.value * (row+0.5),
@@ -321,7 +340,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				}
 			)
 		end
-		window_cpl:AddChild(
+		scroll_cpl:AddChild(
 			Label:New{
 				x=x_cpu,
 				y=options.text_height.value * row,
@@ -331,7 +350,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				fontShadow = true,
 			}
 		)
-		window_cpl:AddChild(
+		scroll_cpl:AddChild(
 			Label:New{
 				x=x_ping,
 				y=options.text_height.value * row,
@@ -348,15 +367,15 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 end
 
 SetupPlayerNames = function()
-	window_cpl:ClearChildren()
+	scroll_cpl:ClearChildren()
 	
-	window_cpl:AddChild( Label:New{ x=0, 		caption = 'T', 		fontShadow = true, 	fontsize = options.text_height.value, } )
+	scroll_cpl:AddChild( Label:New{ x=0, 		caption = 'T', 		fontShadow = true, 	fontsize = options.text_height.value, } )
 	if cf then
-		window_cpl:AddChild( Label:New{ x=x_cf,		caption = 'CF',		fontShadow = true, 	fontsize = options.text_height.value, } )
+		scroll_cpl:AddChild( Label:New{ x=x_cf,		caption = 'CF',		fontShadow = true, 	fontsize = options.text_height.value, } )
 	end
-	window_cpl:AddChild( Label:New{ x=x_name, 	caption = 'Name', 	fontShadow = true,  fontsize = options.text_height.value,} )
-	window_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = options.text_height.value,} )
-	window_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = options.text_height.value,} )
+	scroll_cpl:AddChild( Label:New{ x=x_name, 	caption = 'Name', 	fontShadow = true,  fontsize = options.text_height.value,} )
+	scroll_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = options.text_height.value,} )
+	scroll_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = options.text_height.value,} )
 	
 	local playerroster	= Spring.GetPlayerList()
 	local teams 		= Spring.GetTeamList()
@@ -450,7 +469,7 @@ SetupPlayerNames = function()
 		row = AddAllyteamPlayers(row,'S',allyTeams.S)
 	end
 	
-	window_cpl:AddChild( Checkbox:New{
+	scroll_cpl:AddChild( Checkbox:New{
 		x=5, y=options.text_height.value * (row + 0.5),
 		height=options.text_height.value * 1.5, width=160,
 		caption = 'Show Spectators',
@@ -460,7 +479,7 @@ SetupPlayerNames = function()
 	row = row + 1
 	
 	if cf then
-		window_cpl:AddChild( Checkbox:New{
+		scroll_cpl:AddChild( Checkbox:New{
 			x=5, y=options.text_height.value * (row + 0.5),
 			height=options.text_height.value * 1.5, width=160,
 			caption = 'Place Restricted Zones',
@@ -471,16 +490,21 @@ SetupPlayerNames = function()
 	
 end
 
+showHide = function()
+	if WG.crude.visible and visible then  -- HACK FIXME TODO this is just wrong, it should not rely on escape keypress + crudemenu, crudemenu can be rebinded. Also when this is executed crude visible state is not yet updated 
+		screen0:RemoveChild(window_cpl)
+		visible = false 
+	elseif not visible then 
+		screen0:AddChild(window_cpl)
+		visible = true
+	end 
+end
 
 function widget:KeyPress(key, modifier, isRepeat)
+	if not options.hideOnEsc.value then return end
+	
 	if key == KEYSYMS.ESCAPE and not modifier.alt and not modifier.ctrl and not modifier.shift and not modifier.meta then 
-		if WG.crude.visible and visible then  -- HACK FIXME TODO this is just wrong, it should not rely on escape keypress + crudemenu, crudemenu can be rebinded. Also when this is executed crude visible state is not yet updated 
-			screen0:RemoveChild(window_cpl)
-			visible = false 
-		elseif not visible then 
-			screen0:AddChild(window_cpl)
-			visible = true
-		end 
+		showHide()
 	end 
 end 
 
@@ -499,7 +523,7 @@ function widget:Update(s)
 	if timer > 5 then
 		timer = 0
 		SetupPlayerNames()
-		window_cpl:SetPos(screen0.width-window_cpl.width, screen0.height-window_cpl.height)
+		--window_cpl:SetPos(screen0.width-window_cpl.width, screen0.height-window_cpl.height)
 		
 	end
 end
@@ -534,8 +558,6 @@ function widget:Initialize()
 
 	
 	window_cpl = Window:New{  
-		--margin = {2,2,2,2},
-		--padding = {2,2,2,2},
 		dockable = true,
 		name = "crudeplayerlist",
 		color = {1,1,1,options.backgroundOpacity.value},
@@ -543,22 +565,30 @@ function widget:Initialize()
 		bottom = 0,
 		width  = 320,
 		height = 150,
-		autosize   = true;
+		--autosize   = true;
 		parent = screen0,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
-		tweakResizable = false,
+		tweakResizable = true,
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
 		children = {
 		},
 	}
-	
-	
-	visible = WG.crude.visible -- HACK TODO FIXME this is wrong way to do it
-	if not visible then 
-		screen0:RemoveChild(window_cpl)
-	end 
+	scroll_cpl = ScrollPanel:New{
+		width = "100%",
+		height = "100%",
+		--padding = {2,2,2,2},
+		backgroundColor  = {0,0,0,0},
+	}
+	window_cpl:AddChild( scroll_cpl )
+
+	if options.hideOnEsc.value then
+		visible = WG.crude.visible -- HACK TODO FIXME this is wrong way to do it
+		if not visible then 
+			screen0:RemoveChild(window_cpl)
+		end
+	end
 	
 	SetupPlayerNames()
 	
