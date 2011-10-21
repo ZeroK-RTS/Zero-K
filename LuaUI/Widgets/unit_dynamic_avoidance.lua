@@ -1,4 +1,4 @@
-local versionName = "v1.13"
+local versionName = "v1.14"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System ",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for all ground units",
     author    = "msafwan (coding)",
-    date      = "Oct 20, 2011",
+    date      = "Oct 21, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
@@ -114,7 +114,7 @@ function widget:Update()
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 	end
 	
-	if (now >=0.37+skippingTimer[2] and cycle==1) then --if now is 0.37 second after last update then do "GetPreliminarySeparation()"
+	if (now >=0.35+skippingTimer[2] and cycle==1) then --if now is 0.35 second after last update then do "GetPreliminarySeparation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 		surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable)
 		cycle=2 --send next cycle to "DoCalculation()" function
@@ -191,7 +191,7 @@ function GetPreliminarySeparation(unitMotion,commandIndexTable)
 				local cQueue = spGetCommandQueue(unitID)
 				if cQueue~=nil then --prevent
 				if cQueue[1]~=nil then --prevent idle unit from executing the system
-					if cQueue[1].id==CMD_MOVE and #cQueue>=2 then  --prevent STOP command from short circuiting the system
+					if (cQueue[1].id==CMD_MOVE or cQueue[1].id<0) and #cQueue>=2 then  --prevent STOP command from short circuiting the system
 					if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
 					if cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						local targetCoordinate, commandIndexTable, newCommand=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
@@ -411,14 +411,14 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		local unitDirection			= GetUnitDirection(unitID) --get unit direction
 		local fTarget				= GetFtarget (aCONSTANT, targetAngle, unitDirection)
 		local fTargetSlope			= GetFtargetSlope (aCONSTANT, targetAngle, unitDirection, fTarget)
-		local targetSubtendedAngle 	= GetTargetSubtendedAngle(unitID, targetCoordinate) --get target 'size' as viewed by the unit
+		--local targetSubtendedAngle 	= GetTargetSubtendedAngle(unitID, targetCoordinate) --get target 'size' as viewed by the unit
 		if (turnOnEcho == 1) then
 			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
 			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
 			Spring.Echo("unitDirection(AvoidanceCalculator) " .. unitDirection)
 			Spring.Echo("fTarget(AvoidanceCalculator) " .. fTarget)
 			Spring.Echo("fTargetSlope(AvoidanceCalculator) " .. fTargetSlope)
-			Spring.Echo("targetSubtendedAngle(AvoidanceCalculator) " .. targetSubtendedAngle)
+			--Spring.Echo("targetSubtendedAngle(AvoidanceCalculator) " .. targetSubtendedAngle)
 		end
 		local wTotal=0
 		local fObstacleSum=0
@@ -553,7 +553,6 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 				if unitSeparation <unitsSeparation[unitRectangleID] then --see if the enemy is maintaining distance
 					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID)
 					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID)
-					local unitDirection		= GetUnitDirection(thisUnitID)
 
 					--get obstacle/ enemy/repulsor wave function
 					if impatienceTrigger==0 then --zero means that unit is impatient
