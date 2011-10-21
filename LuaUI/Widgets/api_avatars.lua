@@ -3,7 +3,7 @@
  
 function widget:GetInfo()
   return {
-    name      = "Avatars",
+    name      = "Avatars (unstable)",
     desc      = "An API for a per-user avatar-icon system.",
     author    = "jK",
     date      = "2009",
