@@ -28,7 +28,7 @@ function gadget:Initialize()
 	for weapon,spawn_def in pairs(spawn_defs_name) do
 		if WeaponDefNames[weapon] then
 			local weaponID = WeaponDefNames[weapon].id
-			if UnitDefNames[spawn_def.name] then
+			if (UnitDefNames[spawn_def.name] and not spawn_def.feature) or (FeatureDefNames[spawn_def.name] and spawn_def.feature) then
 				spawn_defs_id[weaponID] = spawn_def
 				Script.SetWatchWeapon(weaponID, true)
 			end
@@ -47,7 +47,8 @@ function gadget:Explosion(w, x, y, z, owner)
 		if not noCreate[owner] then
 			--if not Spring.GetGroundBlocked(x,z) then
 			if UseUnitResource(owner, "m", spawn_defs_id[w].cost) then
-				table.insert(createList, {name = spawn_defs_id[w].name, owner = owner, x=x,y=y,z=z, expire=spawn_defs_id[w].expire})
+				table.insert(createList, 
+                    {name = spawn_defs_id[w].name, owner = owner, x=x,y=y,z=z, expire=spawn_defs_id[w].expire, feature = spawn_defs_id[w].feature})
 				return true
 			end
 		else
@@ -79,10 +80,14 @@ end
 
 function gadget:GameFrame(f)
 	for i,c in pairs(createList) do
-		local unitID = Spring.CreateUnit(c.name , c.x, c.y, c.z, 0, Spring.GetUnitTeam(c.owner))
-		if (c.expire > 0) then 
-			expireList[unitID] = f + c.expire * 32
-		end
+		if c.feature then
+            Spring.CreateFeature(c.name , c.x, c.y, c.z, 0, Spring.GetUnitTeam(c.owner))
+        else
+            local unitID = Spring.CreateUnit(c.name , c.x, c.y, c.z, 0, Spring.GetUnitTeam(c.owner))
+            if (c.expire > 0) then 
+                expireList[unitID] = f + c.expire * 32
+            end
+        end
 		createList[i]=nil
 	end
   if ((f+6)%64<0.1) then 

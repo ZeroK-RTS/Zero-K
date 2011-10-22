@@ -61,10 +61,10 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 440,
   trackOffset            = 0,
-  trackStrength          = 20,
+  trackStrength          = 10,
   trackStretch           = 1,
   trackType				 = [[crossFoot]],
-  trackWidth             = 66,
+  trackWidth             = 76,
   turnRate               = 400,
   workerTime             = 0,
 
