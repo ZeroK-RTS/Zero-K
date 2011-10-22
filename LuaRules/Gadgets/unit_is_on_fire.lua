@@ -77,7 +77,7 @@ for i=1,#WeaponDefs do
 			burnTimeRand = cpv(wcp.burntimerand) or DEFAULT_BURN_TIME_RANDOMNESS,
 			burnTimeBase = 1 - (cpv(wcp.burntimerand) or DEFAULT_BURN_TIME_RANDOMNESS),
 			burnChance = cpv(wcp.burnchance) or WeaponDefs[i].fireStarter/10,
-			burnDamage = cpv(wcp.burndamange) or DEFAULT_BURN_DAMAGE,
+			burnDamage = cpv(wcp.burndamage) or DEFAULT_BURN_DAMAGE,
 		}
 		
 		flamerWeaponDefs[i].maxDamage = flamerWeaponDefs[i].burnDamage*flamerWeaponDefs[i].burnTime
