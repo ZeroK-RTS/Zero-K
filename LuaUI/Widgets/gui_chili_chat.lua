@@ -427,10 +427,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 	else
 		if WG.enteringText then
 			WG.enteringText = false
-			return hideConsole()
+            return hideConsole()
 		end
 	end 
-	return false
 end
 
 
@@ -483,7 +482,7 @@ function widget:Initialize()
 	incolor2color = Chili.incolor2color
 
 	hideConsole = function()
-		if options.autoHideChat.value and not WG.crude.visible and visible then 
+		if options.hideOnEsc.value and options.autoHideChat.value and not WG.crude.visible and visible then 
 			screen0:RemoveChild(window_console)
 			visible = false
 			return true
