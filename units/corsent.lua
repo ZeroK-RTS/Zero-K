@@ -73,7 +73,7 @@ unitDef = {
 
     {
       def                = [[FLAK]],
-      badTargetCategory  = [[FIXEDWING]],
+      --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 

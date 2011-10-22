@@ -126,16 +126,16 @@ function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
-		Turn( torso , y_axis, heading, math.rad(130) )
-		Turn( launcher , x_axis, -pitch, math.rad(95) )		
+		Turn( torso , y_axis, heading, math.rad(600) )
+		Turn( launcher , x_axis, -pitch, math.rad(300) )		
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(launcher, x_axis)
 		return true
 	else
 		Signal( SIG_AIM2)
 		SetSignalMask( SIG_AIM2)
-		Turn( torso , y_axis, heading, math.rad(130) )
-		Turn( launcher , x_axis, -pitch, math.rad(95) )
+		Turn( torso , y_axis, heading, math.rad(600) )
+		Turn( launcher , x_axis, -pitch, math.rad(300) )
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(launcher, x_axis)
 		StartThread(RestoreAfterDelay)
@@ -161,31 +161,32 @@ end
 -- Jumping
 local turnSpeed
 
-function preJump(turn,distance,airDistance)
-	Signal(SIG_WALK)
-	local radians = turn*2*math.pi/2^16
-	turnSpeed = math.abs(turn*2*math.pi/2^16)
-	Turn( base, y_axis, radians, turnSpeed*1.5)
-	turnSpeed = turnSpeed*airDistance/1300
-	Move( base, y_axis, -12, 18)
-	--Turn( torso, x_axis, math.rad(10), math.rad(80))
-	
-	Turn( rshoulder , x_axis, math.rad(55), math.rad(200) )
-	Turn( rlarm , x_axis, math.rad(-110), math.rad(200) )
-	Turn( lshoulder , x_axis, math.rad(55), math.rad(200) )
-	Turn( llarm , x_axis, math.rad(-110), math.rad(200) )
-	
-	Turn( lthigh , x_axis, math.rad(50),math.rad(300) )
-	Turn( lshin , x_axis, math.rad(-35), math.rad(150) )	
-	Turn( lfoot , x_axis, math.rad(-10), math.rad(80) )		
-
-	Turn( rthigh , x_axis, math.rad(50),math.rad(300) )
-	Turn( rshin , x_axis, math.rad(-35), math.rad(150) )	
-	Turn( rfoot , x_axis, math.rad(-10), math.rad(80) )	
-end
+--function preJump(turn,distance,airDistance)
+--	Signal(SIG_WALK)
+--	local radians = turn*2*math.pi/2^16
+--	turnSpeed = math.abs(turn*2*math.pi/2^16)
+--	Turn( base, y_axis, radians, turnSpeed*1.5)
+--	turnSpeed = turnSpeed*airDistance/1300
+--	Move( base, y_axis, -12, 18)
+--	--Turn( torso, x_axis, math.rad(10), math.rad(80))
+--	
+--	Turn( rshoulder , x_axis, math.rad(55), math.rad(200) )
+--	Turn( rlarm , x_axis, math.rad(-110), math.rad(200) )
+--	Turn( lshoulder , x_axis, math.rad(55), math.rad(200) )
+--	Turn( llarm , x_axis, math.rad(-110), math.rad(200) )
+--	
+--	Turn( lthigh , x_axis, math.rad(50),math.rad(300) )
+--	Turn( lshin , x_axis, math.rad(-35), math.rad(150) )	
+--	Turn( lfoot , x_axis, math.rad(-10), math.rad(80) )		
+--
+--	Turn( rthigh , x_axis, math.rad(50),math.rad(300) )
+--	Turn( rshin , x_axis, math.rad(-35), math.rad(150) )	
+--	Turn( rfoot , x_axis, math.rad(-10), math.rad(80) )	
+--end
 
 function beginJump() 
-	Turn( base, y_axis, 0, turnSpeed)
+	Signal(SIG_WALK)
+    --Turn( base, y_axis, 0, turnSpeed)
 	bJumping = true
 	
 	Turn( rshoulder , x_axis, math.rad(25), math.rad(30) )
@@ -193,11 +194,11 @@ function beginJump()
 	Turn( lshoulder , x_axis, math.rad(25), math.rad(30) )
 	Turn( llarm , x_axis, math.rad(-25), math.rad(30) )
 	
-	Turn( lthigh , x_axis, math.rad(-10),math.rad(300) )
+	Turn( lthigh , x_axis, math.rad(-20),math.rad(300) )
 	Turn( lshin , x_axis, math.rad(45), math.rad(400) )	
 	Turn( lfoot , x_axis, math.rad(-30), math.rad(80) )		
 
-	Turn( rthigh , x_axis, math.rad(-10),math.rad(300) )
+	Turn( rthigh , x_axis, math.rad(-20),math.rad(300) )
 	Turn( rshin , x_axis, math.rad(45), math.rad(400) )	
 	Turn( rfoot , x_axis, math.rad(-30), math.rad(80) )	
 	

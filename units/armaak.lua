@@ -32,7 +32,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   mass                = 236,
-  maxDamage           = 1020,
+  maxDamage           = 1500,
   maxSlope            = 36,
   maxVelocity         = 2.017,
   maxWaterDepth       = 22,
@@ -64,7 +64,7 @@ unitDef = {
 
     {
       def                = [[EMG]],
-      badTargetCategory  = [[FIXEDWING]],
+      --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 

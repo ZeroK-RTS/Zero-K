@@ -89,7 +89,7 @@ overCategory = {
     range = 600, reload = 2, },
 	
  armaak = {
-    delay = 20, cobscript = false},	
+    cobscript = false},	
 	
  corsumo = {
     delay = 30, height = 100, range = 300, reload = 13, cobscript = false, rotateMidAir = false},	
