@@ -77,8 +77,8 @@ local function option_autoHideChanged()
 end 
 
 options_path = "Settings/Interface/Chat/Console"
-options_order = { 'autoHideChat', 'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
-		'col_back','col_text', 'col_ally', 'col_othertext', 'col_dup', 'hideOnEsc',
+options_order = { 'autoHideChat', 'hideOnEsc', 'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
+		'col_back','col_text', 'col_ally', 'col_othertext', 'col_dup', 
 		}
 options = {
 	
