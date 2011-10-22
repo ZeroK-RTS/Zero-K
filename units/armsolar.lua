@@ -22,7 +22,7 @@ unitDef = {
     description_de = [[Erzeugt Energie (2)]],
     helptext       = [[Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form, which offers excellent protection against raiders.]],
 	helptext_de    = [[Solaranlagen sind von den Energiestrukturen die mit der geringsten Kosteneffizienz, aber sie sind auch die verlässlichsten und stabilsten unter ihnen. Sobald sie angegriffen werden ziehen sie sich in eine gepanzerte Form zurück, die als exzellenter Schutz gegen Raider fungiert.]],
-    pylonrange = 90,
+    pylonrange = 100,
   },
 
   damageModifier                = 0.25,

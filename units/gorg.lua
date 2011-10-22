@@ -104,9 +104,9 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
     },
 
-    {
-      def                = [[GRASER]],
-    },		
+    --{
+    --  def                = [[GRASER]],
+    --},		
 	
   },
 
