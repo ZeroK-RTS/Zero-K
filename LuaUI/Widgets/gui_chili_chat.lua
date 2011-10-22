@@ -195,7 +195,7 @@ options = {
 			if self.value then
 				--showHide()
 			elseif not visible then
-				screen0:AddChild(window_cpl)
+				screen0:AddChild(window_console)
 				visible = true
 			end
 		end,
