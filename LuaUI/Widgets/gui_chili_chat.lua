@@ -41,6 +41,8 @@ local scrollpanel1
 local inputspace
 WG.enteringText = false
 
+WG.chat = WG.chat or {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -319,16 +321,11 @@ local function RemoveInputSpace()
 	ReshapeConsole() -- ****** THIS ONE WORKS!
 end
 
-
-local function hideConsole() 
-	if options.autoHideChat.value and not WG.crude.visible and visible then 
-		screen0:RemoveChild(window_console)
-		visible = false
-		return true
-	end 
-	return false
-end 
-
+-- redefined in Initialize()
+local function showConsole() end
+local function hideConsole() end
+WG.chat.hideConsole = hideConsole
+WG.chat.showConsole = showConsole
 
 local function addLine(msg)
 	if Game.version == "0.82.7.0 (0.82.7)" then msg = msg:sub(13) end	-- truncate framenumber (workaround for 0.82.7.0)
@@ -418,17 +415,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 	
 	if not options.hideOnEsc.value then return end
 	
-	if key == KEYSYMS.ESCAPE and not modifier.alt and not modifier.ctrl and not modifier.shift and not modifier.meta then 
-		if WG.crude.visible and visible then  -- HACK FIXME TODO this is just wrong, it should not rely on escape keypress + crudemenu, crudemenu can be rebinded. Also when this is executed crude visible state is not yet updated 
-			screen0:RemoveChild(window_console)
-			visible = false 
-		elseif not visible then 
-			screen0:AddChild(window_console)
-			visible = true
-		end 
-	end 
-
-
 	if (key == KEYSYMS.RETURN) then
 		if not WG.enteringText then 
 			WG.enteringText = true
@@ -495,7 +481,26 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 	color2incolor = Chili.color2incolor
 	incolor2color = Chili.incolor2color
-	
+
+	hideConsole = function()
+		if options.autoHideChat.value and not WG.crude.visible and visible then 
+			screen0:RemoveChild(window_console)
+			visible = false
+			return true
+		end 
+		return false
+	end
+
+	-- only used by Crude
+	showConsole = function()
+		if not visible then
+			screen0:AddChild(window_console)
+			visible = true
+		end
+	end
+	WG.chat.hideConsole = hideConsole
+	WG.chat.showConsole = showConsole	
+
 	Spring.SendCommands("bind Any+enter  chat")
 	
 	local inputsize = 33
@@ -578,7 +583,7 @@ function widget:Initialize()
 	
 	screen0:AddChild(window_console)
 	if options.hideOnEsc.value then
-		visible = WG.crude.visible -- HACK TODO FIXME this is wrong way to do it
+		visible = WG.crude.visible
 		if not visible then 
 			screen0:RemoveChild(window_console)
 		end

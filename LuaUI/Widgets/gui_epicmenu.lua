@@ -1565,6 +1565,7 @@ local function ShowHideCrudeMenu()
 	if settings.show_crudemenu then
 		if window_crude then
 			screen0:AddChild(window_crude)
+			WG.chat.showConsole()
 			window_crude:UpdateClientArea()
 		end
 		if window_sub_cur then
@@ -1573,6 +1574,7 @@ local function ShowHideCrudeMenu()
 	else
 		if window_crude then
 			screen0:RemoveChild(window_crude)
+			WG.chat.hideConsole()
 		end
 		if window_sub_cur then
 			screen0:RemoveChild(window_sub_cur)
