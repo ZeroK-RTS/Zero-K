@@ -404,6 +404,7 @@ local function IsPlayerUnitNear(x, z, r)
   end
 end
 
+-- used to generate eggs from burrows
 local function SpawnEggs(x, y, z)
   local choices,choisesN = {},0
   local now = spGetGameSeconds()
@@ -444,6 +445,7 @@ end
 HOW BURROW TARGETING WORKS
 In normal mode, burrows will send chickens after a random unit of the owner of the enemy unit closest to the burrow.
 In PvP mode, each burrow caches a target ID: that of the nearest enemy structure (but not mines or terraform). This cache is updated every UnitCreated and UnitDestroyed.
+	The chickens will attack a random unit belonging to cached target owner.
 Idle chickens are automatically set to attack a random target (in GameFrame).
 ]]--
 

@@ -21,7 +21,7 @@ _ Make a small (2-3 frames) animation when cursor hover comms' posters (like the
 _ Make each player broadcast their choice to their team in a way it can be used by chili_chatbubbles, I had issues with that, left it for later. Use Spring.SendCommands( ?
 
 ---- CHANGELOG -----
--- versus666, 		v1.2	(30oct2010)	:	Placed CreateWindow() @ _DrawScreen() to avoid showing commander selection after game start when DEBUG is FALSE and doing /luiaui reload.
+-- versus666, 		v1.2	(30oct2010)	:	Placed CreateWindow() @ _DrawScreen() to avoid showing commander selection after game start when DEBUG is FALSE and doing /luaui reload.
 --											Thanks to [LCC]Quantum[0K] for spotting the little mistake which was blocking me for 1 complete day.
 -- versus666,		v1.1	(28oct2010)	:	Corrected typos, cosmetic changes and added comments & infos about comm choices.
 -- SirMaverick,		v1.0				:	Creation.
