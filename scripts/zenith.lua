@@ -6,14 +6,17 @@ local base = piece "base"
 local flare = piece "flare"
 local firept = piece "firept"
 
+local SOURCE_RANGE = 2000	-- size of the box which the emit point can be randomly placed in
+
 smokePiece = {base}
 
 local function LaserEmit()
+	while (GetUnitValue(COB.BUILD_PERCENT_LEFT) ~= 0) do Sleep(400) end
 	while true do
-		if (spGetUnitRulesParam(unitID, "lowpower") == 0) then
+		--if (spGetUnitRulesParam(unitID, "lowpower") == 0) then
 			EmitSfx(flare, 2049)
-		end
-		Sleep(1000)
+		--end
+		Sleep(300)
 	end
 end
 
@@ -33,10 +36,12 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return (num ~= 2) and (spGetUnitRulesParam(unitID, "lowpower") == 0)
+	return (num ~= 2) --and (spGetUnitRulesParam(unitID, "lowpower") == 0)
 end
 
 function script.FireWeapon(num)
+	Move(firept, x_axis, math.random(-SOURCE_RANGE, SOURCE_RANGE))
+	Move(firept, z_axis, math.random(-SOURCE_RANGE, SOURCE_RANGE))
 end
 
 function script.Killed(recentDamage, maxHealth)

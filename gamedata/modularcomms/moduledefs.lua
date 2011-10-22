@@ -18,12 +18,12 @@ end
 -- name is needed for widget; description is currently unused
 upgrades = {
 	-- weapons
-	-- it is important that they are prefixed with "commweapon_" in order to get the special handling!
+	-- note that weapons only need to be specified here if you want them to have an effect beyond "is a weapon"
 	
 	commweapon_peashooter = {
 		name = "Peashooter",
 		description = "Basic self-defense weapon",
-	},	
+	},
 	
 	commweapon_beamlaser = {
 		name = "Beam Laser",
@@ -53,6 +53,13 @@ upgrades = {
 		name = "Light Particle Beam",
 		description = "Medium-range pulse weapon",
 	},	
+	commweapon_missilelauncher = {
+		name = "Missile Launcher",
+		description = "Fires light seeker missiles",
+		func = function(unitDef)
+				unitDef.customparams.nofps = "1"
+			end,		
+	},
 	commweapon_partillery = {
 		name = "Plasma Artillery",
 		description = "Long-range artillery gun",
@@ -120,9 +127,9 @@ upgrades = {
 	},
 	conversion_partillery = {
 		name = "Plasma Artillery",
-		description = "Riot Cannon: Convert to a medium artillery gun",
+		description = "Assault Cannon: Convert to a light artillery gun",
 		func = function(unitDef)
-				ReplaceWeapon(unitDef, "commweapon_riotcannon", "commweapon_partillery")
+				ReplaceWeapon(unitDef, "commweapon_assaultcannon", "commweapon_partillery")
 				--unitDef.hightrajectory = 1
 			end,	
 	},		
@@ -227,7 +234,7 @@ upgrades = {
 	},
 	weaponmod_standoff_rocket = {
 		name = "Standoff Rocket",
-		description = "Rocket Launcher: +50% range, +25% damage, +50% reload time",
+		description = "Rocket/Missile Launcher: +50% range, +25% damage, +50% reload time",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -245,6 +252,19 @@ upgrades = {
 						v.soundstart = [[weapon/missile/missile2_fire_bass]]
 						v.soundstartvolume = 7					
 						--break
+					elseif i == "commweapon_missilelauncher" then
+						v.range = v.range * 1.5
+						v.customparams.baserange = v.range
+						v.reloadtime = v.reloadtime * 1.5
+						v.customparams.basereload = v.reloadtime
+						for armorname, dmg in pairs(v.damage) do
+							v.damage[armorname] = dmg * 1.25
+							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
+						end						
+						v.model = [[wep_m_phoenix.s3o]]
+						v.soundhitvolume = 5
+						v.soundstart = [[weapon/missile/missile_fire7]]
+						v.soundstartvolume = 3							
 					end
 				end
 			end,	

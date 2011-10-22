@@ -81,6 +81,7 @@ local super = {	--merged into special
 	corsilo = {order = 4, row = 2},
 	mahlazer = {order = 5, row = 2},
 	raveparty = {order = 6, row = 2},
+	zenith = {order = 1, row = 3},
 }
 
 --manual entries not needed; menu has autodetection

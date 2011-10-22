@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[zenith]],
   name                          = [[Zenith]],
-  description                   = [[Meteor Controller - Requires 150 Power]],
+  description                   = [[Meteor Controller]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   buildCostEnergy               = 30000,
@@ -21,8 +21,8 @@ unitDef = {
   customParams                  = {
     helptext    = [[The Zenith summons down meteorites from the sky, which break things they hit and also provide a reclaimable source of metal.]],
     keeptooltip = [[any string I want]],
-    neededlink  = 150,
-    pylonrange  = 150,
+    --neededlink  = 150,
+    --pylonrange  = 150,
   },  
   
   energyUse                     = 0,

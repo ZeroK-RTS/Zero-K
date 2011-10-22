@@ -50,7 +50,7 @@ unitDef = {
       nodrawundergray  = true,
       object           = [[asteroid.s3o]],
       reclaimable      = true,
-      reclaimTime      = 50,
+      reclaimTime      = 10,
       seqnamereclamate = [[tree1reclamate]],
       world            = [[allworld]],
     },

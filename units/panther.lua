@@ -88,12 +88,11 @@ unitDef = {
     ARMLATNK_WEAPON = {
       name                    = [[Lightning Gun]],
       areaOfEffect            = 8,
-      beamWeapon              = true,
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams            = {
-        extra_damage = [[160]],
+        extra_damage = [[200]],
       },
 
       cylinderTargetting      = 0,
@@ -106,7 +105,7 @@ unitDef = {
 
       duration                = 10,
       explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
-      fireStarter             = 50,
+      fireStarter             = 150,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -139,7 +138,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 1000,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -152,28 +151,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Panther]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 1000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 128,
-      object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 128,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Panther]],

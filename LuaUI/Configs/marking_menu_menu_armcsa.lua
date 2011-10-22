@@ -137,6 +137,10 @@ local menu_armcsa = {
         angle = 135,
         unit = "armraven"
       },
+      {
+        angle = -45,
+        unit = "scorpion"
+      },	  
     }
   },
 	}

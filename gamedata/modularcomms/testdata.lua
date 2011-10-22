@@ -118,7 +118,7 @@ local base = {
 	{
 		name = "rocket",
 		modules = {
-			"commweapon_rocketlauncher", 
+			"commweapon_missilelauncher", 
 			"commweapon_clusterbomb",
 			"weaponmod_standoff_rocket", 
 			"module_adv_targeting", 
@@ -151,12 +151,11 @@ local base = {
 		}
 	},
 	{
-		name = "artcom",
+		name = "arty",
 		modules = {
-			"commweapon_riotcannon", 
-			"commweapon_riotcannon", 
+			"commweapon_assaultcannon", 
+			"commweapon_assaultcannon", 
 			"weaponmod_napalm_warhead",
-			"conversion_partillery", 
 			"conversion_partillery", 			
 		}
 	},

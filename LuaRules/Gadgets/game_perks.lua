@@ -69,6 +69,7 @@ local unlockUnits = {
 	"corsilo",
 	"mahlazer",
 	"raveparty",
+	"zenith",
 
 	"cafus",
 	

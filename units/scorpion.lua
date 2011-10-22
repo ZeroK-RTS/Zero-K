@@ -15,6 +15,8 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
+  cloakCost              = 2,
+  cloakCostMoving        = 10,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[80 60 80]],
   collisionVolumeTest    = 1,
@@ -22,7 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Scorpion paralyzes enemies with its lightning sting and then chews them up with its particle beam claws. Its tough carapace shurgs off most enemy fire.]],
+    helptext       = [[The Scorpion paralyzes enemies with its lightning sting and then chews them up with its particle beam claws. Its tough carapace shrugs off most enemy fire, and can also turn the Scorpion transparent.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -31,13 +33,14 @@ unitDef = {
   iconType               = [[t3generic]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
+  initCloaked			 = true,
   leaveTracks            = true,
   mass                   = 155,
   maxDamage              = 12000,
   maxSlope               = 72,
   maxVelocity            = 2,
   maxWaterDepth          = 22,
-  minCloakDistance       = 75,
+  minCloakDistance       = 150,
   movementClass          = [[TKBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],

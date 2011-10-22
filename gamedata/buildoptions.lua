@@ -46,6 +46,7 @@ local buildOpts = {
 	[[corsilo]],
 	[[mahlazer]],
 	[[raveparty]],
+	[[zenith]],
 	[[armcsa]],
 }
 
