@@ -43,6 +43,7 @@ options = {
 
 local lastPos = {} -- "windows" indexed array of {x,y,x2,y2}
 local settings = {} -- "window name" indexed array of {x,y,x2,y,2}
+local buttons = {} -- "window name" indexed array of minimize buttons
 
 
 function widget:Initialize()
@@ -179,6 +180,7 @@ local function SnapBox(wp, a,d)
 	end 
 end 
 
+
 local lastCount = 0
 local lastWidth = 0
 local lastHeight= 0
@@ -197,27 +199,13 @@ function widget:DrawScreen()
 	end 
 	
 	local present = {}
+	local names = {}
 	for _, win in ipairs(screen0.children) do  -- NEEDED FOR MINIMIZE BUTTONS: table.shallowcopy( 
 		if (win.dockable) then 
+			names[win.name] = win
 			present[win] = true
 			local lastWinPos = lastPos[win]
 			if lastWinPos==nil then  -- new window appeared
-				--[[win.visible = true
-				local button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20;label = mini;dockable=false, 		
-					OnClick = {
-						function(self)
-							if win.visible then
-								screen0:RemoveChild(win)
-							else 
-								screen0:AddChild(win)
-							end 
-							win.visible = not win.visible
-						end
-					}
-				}
-				screen0:AddChild(button)
-				button:BringToFront()]]--
-			
 				posChanged = true 
 				local settingsPos = settings[win.name]
 				if settingsPos ~= nil then  -- and we have setings stored for new window, apply it
@@ -253,6 +241,41 @@ function widget:DrawScreen()
 	for win, _ in pairs(lastPos) do  -- delete those not present atm
 		if not present[win] then lastPos[win] = nil end
 	end 
+
+	-- BUTTONS to minimize stuff
+	for name, win in pairs(names) do 
+		local button = buttons[name]
+		if not button then 
+			button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; caption='mini';dockable=false, 		
+				OnClick = {
+					function(self)
+						if button.winVisible then
+							screen0:RemoveChild(win)
+							win.hidden = true -- todo this is needed for minimap to hide self, remove when windows can detect if its on the sreen or not
+						else 
+							screen0:AddChild(win)
+							win.hidden = false
+						end 
+						button.winVisible = not button.winVisible
+						
+					end
+				}
+			}
+			screen0:AddChild(button)
+			button:BringToFront()
+			buttons[name] = button
+		else
+			button:SetPos(win.x,win.y)
+		end
+		button.winVisible = true
+	end 
+	
+	for name, button in pairs(buttons) do
+		if not names[name] then
+			button.winVisible = false
+		end 
+	end 
+	
 	
 	if forceUpdate or (posChanged and options.dockEnabled.value) then 
 		forceUpdate = false
