@@ -256,6 +256,22 @@ end
 
 --options.fontsize.OnChange = FontChanged
 
+local function GetHealthColor(fraction, returnType)
+	local midpt = (fraction > .5)
+	local r, g
+	if midpt then 
+		r = ((1-fraction)/0.5)
+		g = 1
+	else
+		r = 1
+		g = (fraction)/0.5
+	end
+	if returnType == "char" then
+		return string.char(255,math.floor(255*r),math.floor(255*g),0)
+	end
+	return {r, g*0.8, 0, 1}
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -652,6 +668,7 @@ local function UpdateSelectedUnitsTooltip()
 					if (health) then
 						healthbar:SetValue(health/maxhealth)
 						healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
+						healthbar.color = GetHealthColor(health/maxhealth)
 					end
 				end
 			else
@@ -668,6 +685,7 @@ local function UpdateSelectedUnitsTooltip()
 					local healthbar = unitGroup.childrenByName['health']
 					healthbar:SetValue(health/maxhealth)
 					healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
+					healthbar.color = GetHealthColor(health/maxhealth)
 				end
 			end
 
@@ -826,7 +844,6 @@ end
 
 local function SetHealthbar(tt_healthbar,health, maxhealth)
 	if health then
-		tt_healthbar.color = {0,1,0, 1}
 		
 		tt_health_fraction = health/maxhealth
 		tt_healthbar:SetValue(tt_health_fraction)
@@ -835,6 +852,8 @@ local function SetHealthbar(tt_healthbar,health, maxhealth)
 		else
 			tt_healthbar:SetCaption(math.ceil(health) .. ' / ' .. math.ceil(maxhealth))
 		end
+		
+		tt_healthbar.color = GetHealthColor(tt_health_fraction)
 		
 	else
 		tt_healthbar.color = {0,0,0.5, 1}
