@@ -185,6 +185,41 @@ local lastCount = 0
 local lastWidth = 0
 local lastHeight= 0
 
+local function GetButtonPos(win)
+	local size = 4 -- button thickness
+	local mindist = win.x*5000 + win.height
+	local mode = 'L'
+	
+	local dist = win.y*5000 + win.width
+	if dist < mindist then
+		mindist = dist
+		mode = 'T'
+	end 
+	
+	dist = (screen0.width - win.x - win.width)*5000 + win.height
+	if dist < mindist then
+		mindist = dist
+		mode = 'R'
+	end
+	
+	dist = (screen0.height - win.y - win.height)*5000 + win.width
+	if dist < mindist then
+		mindist = dist
+		mode = 'B'
+	end
+	
+	
+	if mode == 'L' then
+		return {x=win.x-3, y= win.y, width = size, height = win.height}
+	elseif mode =='T' then
+		return {x=win.x, y= win.y-3, width = win.width, height = size}
+	elseif mode =='R' then
+		return {x=win.x + win.width - size-3, y= win.y, width = size, height = win.height}
+	elseif mode=='B' then
+		return {x=win.x, y= win.y + win.height - size-3, width = win.width, height = size}
+	end 
+end 
+
 function widget:DrawScreen() 
 	frameCounter = frameCounter +1
 	if (frameCounter % 88 ~= 87 and #screen0.children == lastCount) then return end 
@@ -246,15 +281,17 @@ function widget:DrawScreen()
 	for name, win in pairs(names) do 
 		local button = buttons[name]
 		if not button then 
-			button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; caption='mini';dockable=false, 		
+			button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; caption='';dockable=false,tooltip='Minimize widget', backgroundColor={0,1,0,1},
 				OnClick = {
 					function(self)
 						if button.winVisible then
 							screen0:RemoveChild(win)
+							button.backgroundColor={1,0,0,1}
 							win.hidden = true -- todo this is needed for minimap to hide self, remove when windows can detect if its on the sreen or not
 						else 
 							screen0:AddChild(win)
 							win.hidden = false
+							button.backgroundColor={0,1,0,1}
 						end 
 						button.winVisible = not button.winVisible
 						
@@ -264,15 +301,16 @@ function widget:DrawScreen()
 			screen0:AddChild(button)
 			button:BringToFront()
 			buttons[name] = button
-		else
-			button:SetPos(win.x,win.y)
 		end
+		local pos = GetButtonPos(win)
+		button:SetPos(pos.x,pos.y, pos.width, pos.height)
 		button.winVisible = true
 	end 
 	
 	for name, button in pairs(buttons) do
 		if not names[name] then
 			button.winVisible = false
+			button.backgroundColor={1,0,0,1}
 		end 
 	end 
 	
