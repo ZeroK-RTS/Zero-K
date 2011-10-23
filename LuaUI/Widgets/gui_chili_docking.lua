@@ -304,13 +304,18 @@ function widget:DrawScreen()
 		end
 		local pos = GetButtonPos(win)
 		button:SetPos(pos.x,pos.y, pos.width, pos.height)
-		button.winVisible = true
+		if not button.winVisible then
+			button.winVisible = true
+			button.backgroundColor={0,1,0,1}
+			button:Invalidate()
+		end
 	end 
 	
 	for name, button in pairs(buttons) do
-		if not names[name] then
+		if not names[name] and button.winVisible then -- widget hid externally
 			button.winVisible = false
 			button.backgroundColor={1,0,0,1}
+			button:Invalidate()
 		end 
 	end 
 	
