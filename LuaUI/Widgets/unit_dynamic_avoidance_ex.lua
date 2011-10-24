@@ -1,4 +1,4 @@
-local versionName = "v1.20"
+local versionName = "v1.22"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -37,6 +37,7 @@ local spGetCommandQueue	= Spring.GetCommandQueue
 local spGetUnitIsDead 	= Spring.GetUnitIsDead
 local spGetGameSeconds	= Spring.GetGameSeconds
 local spGetFeaturePosition = Spring.GetFeaturePosition
+local spValidFeatureID = Spring.ValidFeatureID
 local CMD_STOP			= CMD.STOP
 local CMD_INSERT		= CMD.INSERT
 local CMD_REMOVE		= CMD.REMOVE
@@ -72,9 +73,9 @@ local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command 
 local halfTargetBoxSize = {400, 800} --the distance from a target or move-order where widget should ignore (default: cloak and consc = 400 ie:800x800 box, ground unit =800)
 
 --Angle constant:
-local noiseAngleG =math.pi/16 --(default is pie/16)
-local collisionAngleG=math.pi/8
-local fleeingAngleG=math.pi/6
+local noiseAngleG =math.pi/8 --(default is pie/8)
+local collisionAngleG=math.pi/4
+local fleeingAngleG=math.pi/3
 
 --------------------------------------------------------------------------------
 --Variables:
@@ -312,18 +313,12 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 		elseif cQueue[1].id==90 or cQueue[1].id==125 then
 			-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 			-- Spring.Echo(a[1]["name"])
-			local wreckPosX, wreckPosY, wreckPosZ = 0, 0, 0
-			if cQueue[1].params[1]>4500 then --if command contain value greater then 4500 then reclaim wreck
+			local wreckPosX, wreckPosY, wreckPosZ = nil, nil, nil
+			if cQueue[1].params[1]>4500 then --if command contain value greater then 4500 then it is reclaim wreck
 				local wreckFeatureID= cQueue[1].params[1]-4500 --offset the value
 				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(wreckFeatureID)
-			else --if command has normal signature then reclaim living unit
+			else --if command has normal signature then it is reclaim active unit
 				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[1].params[1])
-			end
-			if wreckPosX==nil then
-				--if wreck not available: eg in persistent area reclaim: use area reclaim's central position
-				wreckPosX = cQueue[1].params[2]
-				wreckPosY = 0
-				wreckPosZ = cQueue[1].params[3]
 			end
 			targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
 			commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
@@ -331,22 +326,16 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 			commandIndexTable[unitID]["backupTargetZ"]=wreckPosZ
 		elseif cQueue[1].id==40 then
 			local unitPosX, unitPosY, unitPosZ = spGetUnitPosition(cQueue[1].params[1])
-			if unitPosX==nil then
-				--if wreck not available: eg in persistent area reclaim: use area reclaim's central position
-				unitPosX = cQueue[1].params[2]
-				unitPosY = 0
-				unitPosZ = cQueue[1].params[3]
-			end
 			targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 			commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
 			commandIndexTable[unitID]["backupTargetY"]=unitPosY
 			commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
 		end
 		commandIndexTable[unitID]["patienceIndexA"]=0
-	elseif cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then
-		targetCoordinate={cQueue[2].params[1], cQueue[2].params[2],cQueue[2].params[3]} --or use second queue for target
+	--elseif cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then
+		--targetCoordinate={cQueue[2].params[1], cQueue[2].params[2],cQueue[2].params[3]} --if not newCommand then use second queue for target
 	else
-		--if cQueue[2] has no content then use these backup value:
+		--if not newCommand then use these backup value as target:
 		targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
 	end
 	return targetCoordinate, commandIndexTable, newCommand --return target coordinate
@@ -357,6 +346,7 @@ function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger)
 	local currentX,_,currentZ = spGetUnitPosition(unitID)
 	local targetX = targetCoordinate[1]
 	local targetZ =targetCoordinate[3]
+	if targetX==nil then return false end  --if target is invalid then assume target not reached
 	local xDistanceToTarget = math.abs(currentX -targetX)
 	local zDistanceToTarget = math.abs(currentZ -targetZ)
 	if (turnOnEcho == 1) then
@@ -447,11 +437,16 @@ end
 function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger)
 	if (targetCoordinate ~= nil) and (unitID~=nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
 		local aCONSTANT 			= aCONSTANTg --attractor constant (amplitude multiplier)
-		local targetAngle			= GetTargetAngleWithRespectToUnit(unitID, targetCoordinate) --get target angle
 		local unitDirection			= GetUnitDirection(unitID) --get unit direction
-		local fTarget				= GetFtarget (aCONSTANT, targetAngle, unitDirection)
-		local fTargetSlope			= GetFtargetSlope (aCONSTANT, targetAngle, unitDirection, fTarget)
-		--local targetSubtendedAngle 	= GetTargetSubtendedAngle(unitID, targetCoordinate) --get target 'size' as viewed by the unit
+		local targetAngle = 0
+		local fTarget = 0
+		local fTargetSlope = 0
+		if targetCoordinate[1]~=nil then --disable target for pure avoidance
+			targetAngle				= GetTargetAngleWithRespectToUnit(unitID, targetCoordinate) --get target angle
+			fTarget					= GetFtarget (aCONSTANT, targetAngle, unitDirection)
+			fTargetSlope			= GetFtargetSlope (aCONSTANT, targetAngle, unitDirection, fTarget)
+			--local targetSubtendedAngle 	= GetTargetSubtendedAngle(unitID, targetCoordinate) --get target 'size' as viewed by the unit
+		end
 		if (turnOnEcho == 1) then
 			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
 			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
@@ -498,7 +493,21 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 	local arrayIndex=1
 	if not newCommand then arrayIndex=2 end
 	for b = arrayIndex, #cQueue,1 do
-		spGiveOrderToUnit(unitID, cQueue[b].id, cQueue[b].params, {"shift"})
+		local options={"shift"}
+		local optionsIndex=1
+		if cQueue[b].options["alt"] then 
+			optionsIndex=optionsIndex+1
+			options[optionsIndex]="alt"
+		end
+		if cQueue[b].options["ctrl"] then 
+			optionsIndex=optionsIndex+1
+			options[optionsIndex]="ctrl"
+		end
+		if cQueue[b].options["right"] then 
+			optionsIndex=optionsIndex+1
+			options[optionsIndex]="right"
+		end
+		spGiveOrderToUnit(unitID, cQueue[b].id, cQueue[b].params, options)
 	end
 	
 	commandIndexTable[unitID]["widgetX"]=newX --update the memory table
