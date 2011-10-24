@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List v1.2",
-    desc      = "v1.061 Chili Crude Player List.",
+    desc      = "v1.06 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -73,6 +73,8 @@ local sharePic        = ":n:"..LUAUI_DIRNAME.."Images/playerlist/share.png"
 local show_spec = false
 local localTeam = 0
 local localAlliance = 0
+local visible = true
+local showHide = function() end
 
 include("keysym.h.lua")
 
@@ -99,6 +101,23 @@ options = {
 			window_cpl:Invalidate()
 		end,
 	},
+	hideOnEsc = {
+		name = "Hide When Pushing Esc",
+		type = "bool",
+		value = true,
+		
+		OnChange = function(self)
+			--visible = WG.crude.visible
+			if self.value then
+				--showHide()
+			elseif not visible then
+				screen0:AddChild(window_cpl)
+				visible = true
+			end
+		end,
+			
+	},
+	
 }
 
 --------------------------------------------------------------------------------
@@ -471,6 +490,23 @@ SetupPlayerNames = function()
 	
 end
 
+showHide = function()
+	if WG.crude.visible and visible then  -- HACK FIXME TODO this is just wrong, it should not rely on escape keypress + crudemenu, crudemenu can be rebinded. Also when this is executed crude visible state is not yet updated 
+		screen0:RemoveChild(window_cpl)
+		visible = false 
+	elseif not visible then 
+		screen0:AddChild(window_cpl)
+		visible = true
+	end 
+end
+
+function widget:KeyPress(key, modifier, isRepeat)
+	if not options.hideOnEsc.value then return end
+	
+	if key == KEYSYMS.ESCAPE and not modifier.alt and not modifier.ctrl and not modifier.shift and not modifier.meta then 
+		showHide()
+	end 
+end 
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -547,6 +583,12 @@ function widget:Initialize()
 	}
 	window_cpl:AddChild( scroll_cpl )
 
+	if options.hideOnEsc.value then
+		visible = WG.crude.visible -- HACK TODO FIXME this is wrong way to do it
+		if not visible then 
+			screen0:RemoveChild(window_cpl)
+		end
+	end
 	
 	SetupPlayerNames()
 	

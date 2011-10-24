@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat v0.43",
-    desc      = "v0.441 Chili Chat Console.",
+    desc      = "v0.44 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -71,8 +71,15 @@ local function option_remakeConsole()
 end
 
 
+local function option_autoHideChanged() 
+	--[[screen0:RemoveChild(window_console)
+	if (WG.enteringText or not options.autoHideChat.value)  then 
+		screen0:AddChild(window_console)
+	end ]]--
+end 
+
 options_path = "Settings/Interface/Chat/Console"
-options_order = { 'autoHideChat', 'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
+options_order = { 'autoHideChat', 'hideOnEsc', 'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
 		'col_back','col_text', 'col_ally', 'col_othertext', 'col_dup', 
 		}
 options = {
@@ -83,6 +90,7 @@ options = {
 		type = 'bool',
 		value = true, 
 		desc = "Auto hides when not typing text",
+		OnChange = option_autoHideChanged,
 	},
 	
 	noColorName = {
@@ -179,6 +187,23 @@ options = {
 		OnChange = function(self) scrollpanel1.noMouseWheel = not self.value; end,
 	},
 	
+	hideOnEsc = {
+		name = "Hide When Pushing Esc",
+		type = "bool",
+		value = true,
+		
+		OnChange = function(self)
+			--visible = WG.crude.visible
+			if self.value then
+				--showHide()
+			elseif not visible then
+				screen0:AddChild(window_console)
+				visible = true
+			end
+		end,
+			
+	},
+
 }
 
 
@@ -262,11 +287,15 @@ end
 
 
 local function UpdateConsole()
+
+
 	stack_console:ClearChildren()
 	for i = 1, lines_count do
 		local line = lines[i]
 		GenerateTextControl(line, true)
 	end	
+	
+	option_autoHideChanged() 
 end
 
 function remakeConsole()
@@ -384,6 +413,8 @@ end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	
+	if not options.hideOnEsc.value then return end
+	
 	if (key == KEYSYMS.RETURN) then
 		if not WG.enteringText then 
 			WG.enteringText = true
@@ -451,7 +482,7 @@ function widget:Initialize()
 	incolor2color = Chili.incolor2color
 
 	hideConsole = function()
-		if options.autoHideChat.value and not WG.crude.visible and visible then 
+		if options.hideOnEsc.value and options.autoHideChat.value and not WG.crude.visible and visible then 
 			screen0:RemoveChild(window_console)
 			visible = false
 			return true
@@ -550,5 +581,11 @@ function widget:Initialize()
 	spSendCommands({"console 0"})
 	
 	screen0:AddChild(window_console)
-	
+	if options.hideOnEsc.value then
+		visible = WG.crude.visible
+		if not visible then 
+			screen0:RemoveChild(window_console)
+		end
+	end
+
 end

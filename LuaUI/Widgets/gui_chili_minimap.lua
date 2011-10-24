@@ -242,7 +242,6 @@ end
 local lx, ly, lw, lh
 
 function widget:DrawScreen() 
-	if (window_minimap.hidden) then return end
 	if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) then 
 		local cx,cy,cw,ch = Chili.unpack4(window_minimap.clientArea)
 		ch = ch-iconsize	
