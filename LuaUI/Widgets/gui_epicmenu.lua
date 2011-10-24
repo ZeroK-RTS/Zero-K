@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.281 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.282 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -1600,16 +1600,7 @@ local function AddCustomPaths(menuname)
 end
 
 -- Make menubar
-local function MakeCrudeMenu()
-	local btn_padding = {4,3,2,2}
-	local btn_margin = {0,0,0,0}
-	if window_crude then
-		window_crude:Dispose()
-		window_crude = nil
-	end
-		
-	local crude_width = 425
-	local crude_height = B_HEIGHT+10
+local function BuildMenuTree()
 	
 	local menu_tree3 		= AddCustomPaths('Settings')
 	local game_menu_tree3 	= AddCustomPaths('Game')
@@ -1623,6 +1614,16 @@ local function MakeCrudeMenu()
 	local game_menu_index = flattenTree(game_menu_tree3, '' )
 	local help_menu_index = flattenTree(help_menu_tree3, '' )
 	
+end
+
+local function MakeMenuBar()
+	local btn_padding = {4,3,2,2}
+	local btn_margin = {0,0,0,0}
+		
+	local crude_width = 425
+	local crude_height = B_HEIGHT+10
+	
+
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header,  }
 	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', textColor = color.sub_header, align="center" }
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 35, height=5, textColor = color.main_fg, autosize=false, }
@@ -1799,7 +1800,7 @@ end
 RemakeEpicMenu = function()
 	local lastSubKey = curSubKey
 	KillSubWindow()
-	MakeCrudeMenu()
+	BuildMenuTree()
 	if lastSubKey ~= '' then	
 		MakeSubWindow(lastSubKey)
 	end
@@ -1929,7 +1930,8 @@ function widget:Initialize()
 	Spring.SendCommands("bind esc crudemenu")
 	Spring.SendCommands("bind f11 crudewidgetlist")
 
-	MakeCrudeMenu()
+	BuildMenuTree()
+	MakeMenuBar()
 	
 	-- Override widgethandler functions for the purposes of alerting crudemenu 
 	-- when widgets are loaded, unloaded or toggled
