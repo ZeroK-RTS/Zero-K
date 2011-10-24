@@ -278,10 +278,11 @@ function widget:DrawScreen()
 	end 
 
 	-- BUTTONS to minimize stuff
+	-- FIXME HACK use object:IsDescendantOf(screen0) from chili to detect visibility, not this silly hack stuff with button.winVisible
 	for name, win in pairs(names) do 
 		local button = buttons[name]
 		if not button then 
-			button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; caption='';dockable=false,tooltip='Minimize widget', backgroundColor={0,1,0,1},
+			button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; caption='';dockable=false,tooltip='Minimize widget ' .. win.name, backgroundColor={0,1,0,1},
 				OnClick = {
 					function(self)
 						if button.winVisible then
@@ -305,7 +306,7 @@ function widget:DrawScreen()
 		local pos = GetButtonPos(win)
 		button:SetPos(pos.x,pos.y, pos.width, pos.height)
 		if not button.winVisible then
-			button.winVisible = true
+			button.winVisible = true 
 			button.backgroundColor={0,1,0,1}
 			button:Invalidate()
 		end

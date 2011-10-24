@@ -2141,7 +2141,9 @@ function widget:SelectionChanged(newSelection)
 			stt_unitID = nil
 			MakeUnitGroupSelectionToolTip()
 		end
-		Show(real_window_corner)
+		if not real_window_corner.hidden then  -- hack for docking windows
+			Show(real_window_corner)
+		end 
 	else
 		stt_unitID = nil
 		window_corner:ClearChildren()
