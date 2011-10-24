@@ -1,4 +1,4 @@
-local versionName = "v1.14"
+local versionName = "v1.20"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -12,9 +12,9 @@ local versionName = "v1.14"
 function widget:GetInfo()
   return {
     name      = "Dynamic Avoidance System (experimental)",
-    desc      = versionName .. "Dynamic Collision Avoidance behaviour for all ground units",
+    desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Oct 21, 2011",
+    date      = "Oct 24, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -36,6 +36,7 @@ local spGetUnitsInRectangle =Spring.GetUnitsInRectangle
 local spGetCommandQueue	= Spring.GetCommandQueue
 local spGetUnitIsDead 	= Spring.GetUnitIsDead
 local spGetGameSeconds	= Spring.GetGameSeconds
+local spGetFeaturePosition = Spring.GetFeaturePosition
 local CMD_STOP			= CMD.STOP
 local CMD_INSERT		= CMD.INSERT
 local CMD_REMOVE		= CMD.REMOVE
@@ -46,7 +47,7 @@ local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
 -- Switches:
 local turnOnEcho =0 --Echo out all numbers for debugging the system
 local activateAutoReverseG=1 --set to auto-reverse when unit is about to collide with an enemy
-local activateImpatienceG=1 --auto disable auto-reverse after 6 continuous auto-avoidance (3 second). In case the unit stuck
+local activateImpatienceG=0 --auto disable auto-reverse after 6 continuous auto-avoidance (3 second). In case the unit stuck
 
 -- Graph constant:
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
@@ -107,7 +108,7 @@ function widget:Update()
 	skippingTimer = skippingTimerG
 	-----
 	local now=spGetGameSeconds()
-	if (now >=1.0+skippingTimer[1]) then --if now is 1 second after last update then do "RefreshUnitList()"
+	if (now >=1.1+skippingTimer[1]) then --if "now" is 1.1 second after last update then do "RefreshUnitList()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 		unitInMotion=RefreshUnitList() --add relevant unit to unitlist/unitInMotion
 		skippingTimer[1]=spGetGameSeconds()
@@ -162,9 +163,9 @@ function RefreshUnitList()
 				if (unitDef["builder"] or unitDef["canCloak"]) then --include only cloakies and constructor
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed}
-				elseif not unitDef["canFly"] then
-					arrayIndex=arrayIndex+1
-					relevantUnit[arrayIndex]={unitID, 2, unitSpeed}
+				--elseif not unitDef["canFly"] then
+					--arrayIndex=arrayIndex+1
+					--relevantUnit[arrayIndex]={unitID, 2, unitSpeed}
 				end
 			end
 		end
@@ -191,7 +192,7 @@ function GetPreliminarySeparation(unitMotion,commandIndexTable)
 				local cQueue = spGetCommandQueue(unitID)
 				if cQueue~=nil then --prevent
 				if cQueue[1]~=nil then --prevent idle unit from executing the system
-					if (cQueue[1].id==CMD_MOVE or cQueue[1].id<0) and #cQueue>=2 then  --prevent STOP command from short circuiting the system
+					if (cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and #cQueue>=2 then  -- only repair (40), build (<0), reclaim (90), ressurect(125) or move(10) command. prevent STOP command from short circuiting the system
 					if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
 					if cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						local targetCoordinate, commandIndexTable, newCommand=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
@@ -251,7 +252,12 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 				
 				--do sync test. Ensure command not changed during last delay
 				local cQueueSyncTest = spGetCommandQueue(unitID)
-				if cQueue[1].params[1]~=cQueueSyncTest[1].params[1] and cQueue[1].params[3]~=cQueueSyncTest[1].params[3] then 
+				if #cQueueSyncTest>=2 then
+					if cQueue[1].params[1]~=cQueueSyncTest[1].params[1] and cQueue[1].params[3]~=cQueueSyncTest[1].params[3] then 
+						newCommand=true
+						cQueue=cQueueSyncTest
+					end
+				elseif cQueueSyncTest[1]==nil then
 					newCommand=true
 					cQueue=cQueueSyncTest
 				end
@@ -298,15 +304,49 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 		end
 	end
 	if newCommand then	--user or widget command?
-		targetCoordinate={cQueue[1].params[1], cQueue[1].params[2],cQueue[1].params[3]} --use first queue as target
-		commandIndexTable[unitID]["backupTargetX"]=cQueue[1].params[1] --backup the target
-		commandIndexTable[unitID]["backupTargetY"]=cQueue[1].params[2]
-		commandIndexTable[unitID]["backupTargetZ"]=cQueue[1].params[3]
+		if (cQueue[1].id==10 or cQueue[1].id<0) then 
+			targetCoordinate={cQueue[1].params[1], cQueue[1].params[2],cQueue[1].params[3]} --use first queue as target
+			commandIndexTable[unitID]["backupTargetX"]=cQueue[1].params[1] --backup the target
+			commandIndexTable[unitID]["backupTargetY"]=cQueue[1].params[2]
+			commandIndexTable[unitID]["backupTargetZ"]=cQueue[1].params[3]
+		elseif cQueue[1].id==90 or cQueue[1].id==125 then
+			-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
+			-- Spring.Echo(a[1]["name"])
+			local wreckPosX, wreckPosY, wreckPosZ = 0, 0, 0
+			if cQueue[1].params[1]>4500 then --if command contain value greater then 4500 then reclaim wreck
+				local wreckFeatureID= cQueue[1].params[1]-4500 --offset the value
+				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(wreckFeatureID)
+			else --if command has normal signature then reclaim living unit
+				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[1].params[1])
+			end
+			if wreckPosX==nil then
+				--if wreck not available: eg in persistent area reclaim: use area reclaim's central position
+				wreckPosX = cQueue[1].params[2]
+				wreckPosY = 0
+				wreckPosZ = cQueue[1].params[3]
+			end
+			targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
+			commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
+			commandIndexTable[unitID]["backupTargetY"]=wreckPosY
+			commandIndexTable[unitID]["backupTargetZ"]=wreckPosZ
+		elseif cQueue[1].id==40 then
+			local unitPosX, unitPosY, unitPosZ = spGetUnitPosition(cQueue[1].params[1])
+			if unitPosX==nil then
+				--if wreck not available: eg in persistent area reclaim: use area reclaim's central position
+				unitPosX = cQueue[1].params[2]
+				unitPosY = 0
+				unitPosZ = cQueue[1].params[3]
+			end
+			targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
+			commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
+			commandIndexTable[unitID]["backupTargetY"]=unitPosY
+			commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
+		end
 		commandIndexTable[unitID]["patienceIndexA"]=0
 	elseif cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then
 		targetCoordinate={cQueue[2].params[1], cQueue[2].params[2],cQueue[2].params[3]} --or use second queue for target
 	else
-		--if for some reason cQueue has no content then use these backup value:
+		--if cQueue[2] has no content then use these backup value:
 		targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
 	end
 	return targetCoordinate, commandIndexTable, newCommand --return target coordinate
@@ -493,8 +533,8 @@ end
 
 function GetTargetAngleWithRespectToUnit(unitID, targetCoordinate)
 	local x,y,z = spGetUnitPosition(unitID)
-	local tx,ty,tz = targetCoordinate[1],targetCoordinate[2],targetCoordinate[3]
-	local dX, dY, dZ = tx- x, ty-y, tz-z 
+	local tx, tz = targetCoordinate[1], targetCoordinate[3]
+	local dX, dZ = tx- x, tz-z 
 	local targetAngle = math.atan2(dZ, dX)
 	return targetAngle
 end
@@ -521,8 +561,8 @@ end
 
 --target angular size
 function GetTargetSubtendedAngle(unitID, targetCoordinate)
-	local tx,ty,tz = targetCoordinate[1],targetCoordinate[2],targetCoordinate[3]
-	local x,y,z = spGetUnitPosition(unitID)
+	local tx,tz = targetCoordinate[1],targetCoordinate[3]
+	local x,_,z = spGetUnitPosition(unitID)
 	local unitDefID= spGetUnitDefID(unitID)
 	local unitDef= UnitDefs[unitDefID]
 	local unitSize =32--arbitrary value, size of a com
@@ -802,5 +842,7 @@ end
 --3
 --"Initial Queue" widget, "Allows you to queue buildings before game start" (unit_initial_queue.lua), author = "Niobium",
 --4
+--"unit_smart_nanos.lua" widget, "Enables auto reclaim & repair for idle nano turrets , author = Owen Martindell
+--5
 --Gaussian noise, Box-Muller method, http://www.dspguru.com/dsp/howtos/how-to-generate-white-gaussian-noise
 --http://springrts.com/wiki/Lua_Scripting
