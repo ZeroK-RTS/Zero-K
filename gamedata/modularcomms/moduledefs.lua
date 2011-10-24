@@ -18,13 +18,17 @@ end
 -- name is needed for widget; description is currently unused
 upgrades = {
 	-- weapons
-	-- note that weapons only need to be specified here if you want them to have an effect beyond "is a weapon"
+	-- note that context menu CRASHES if you don't put them here!
 	
 	commweapon_peashooter = {
 		name = "Peashooter",
 		description = "Basic self-defense weapon",
 	},
-	
+
+	commweapon_assaultcannon = {
+		name = "Assault Cannon",
+		description = "Conventional plasma cannon with decent range",
+	},	
 	commweapon_beamlaser = {
 		name = "Beam Laser",
 		description = "An effective short-range cutting tool",
