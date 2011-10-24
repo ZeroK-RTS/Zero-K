@@ -543,7 +543,7 @@ function widget:Initialize()
 		width = "100%",
 		height = "100%",
 		--padding = {2,2,2,2},
-		--backgroundColor  = {0,0,0,0},
+		backgroundColor  = {0,0,0,0},
 	}
 	window_cpl:AddChild( scroll_cpl )
 
