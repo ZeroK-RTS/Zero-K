@@ -132,7 +132,7 @@ local function GetCommModules(unitDef)
 	if type(unitDef) == "number" then unitDef = UnitDefs[unitDef].name end
 	if commDataGlobal[unitDef] then
 		local modules = {}
-		for i,v in pairs(commDataGlobal[unitDef] and commDataGlobal[unitDef].modules) do
+		for i,v in ipairs(commDataGlobal[unitDef] and commDataGlobal[unitDef].modules) do
 			local modulename = v
 			modules[i] = upgrades[modulename].name
 		end
