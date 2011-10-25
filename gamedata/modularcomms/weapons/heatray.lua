@@ -36,7 +36,6 @@ local weaponDef = {
 	rgbColor                = [[1 0.1 0]],
 	rgbColor2               = [[1 1 0.25]],
 	soundStart              = [[weapon/heatray_fire]],
-	targetMoveError         = 0.25,
 	thickness               = 3,
 	tolerance               = 5000,
 	turret                  = true,

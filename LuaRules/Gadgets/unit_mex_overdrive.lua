@@ -702,6 +702,7 @@ local function changeTeamEnergy(team, energy)
 end
 
 local lastTeamNe = {}
+local lastTeamWaste = {}
 
 function gadget:GameFrame(n)
 	AddNewMexes(n)
@@ -736,7 +737,7 @@ function gadget:GameFrame(n)
 			local sumInc = 0
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
-				teamEnergy[teamID] = {totalChange = 0, num = teamID}
+				teamEnergy[teamID] = {totalChange = 0}
 				local te = teamEnergy[teamID]
 				te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = Spring.GetTeamResources(teamID, "energy")
 				teamIncome = teamIncome + te.eInc
@@ -768,7 +769,16 @@ function gadget:GameFrame(n)
 				local teamID = allyTeamData.team[i]
 				local te = teamEnergy[teamID]
 				if (te.eCur ~= nil) then 
-                    local inc = te.eInc - te.eExp + ((lastTeamNe[teamID] and lastTeamNe[teamID] < 0 and lastTeamNe[teamID]) or 0)  -- increment - based on income-expenses without last team OD usage 
+                    -- Disregared spending last step can never exceed actual spending
+                    local inc = - te.eExp
+                    if lastTeamNe[teamID] and lastTeamNe[teamID] > 0 then
+                        inc = math.min(inc + lastTeamNe[teamID], 0)
+                    end
+                    if lastTeamWaste[teamID] then
+                        inc = math.min(inc + lastTeamWaste[teamID], 0)
+                    end
+                    inc = te.eInc + inc
+                    
 					local ne = 0 
 					if (inc > 0) then  
 						local fillRatio = (te.eCur) / (te.eMax - HIDDEN_STORAGE) 
@@ -832,7 +842,8 @@ function gadget:GameFrame(n)
 					--Spring.Echo(teamID .. ",   Refund: " .. energyWasted*( te.eMax - HIDDEN_STORAGE - te.eCur)/totalFreeStorage)
 					changeTeamEnergy(te, energyWasted*( te.eMax - HIDDEN_STORAGE - te.eCur)/totalFreeStorage)
 					--Spring.AddTeamResource(teamID, "e", energyWasted*( eMax - HIDDEN_STORAGE - eCur)/totalFreeStorage)
-				end
+                    lastTeamWaste[teamID] = 0
+                end
 				energyWasted = 0
 			else
 				for i = 1, allyTeamData.teams do 
@@ -843,6 +854,10 @@ function gadget:GameFrame(n)
 					--Spring.AddTeamResource(teamID, "e", ( eMax - HIDDEN_STORAGE - eCur))
 				end
 				energyWasted = energyWasted - totalFreeStorage
+                for i = 1, allyTeamData.teams do 
+                    local teamID = allyTeamData.team[i]
+                    lastTeamWaste[teamID] = energyWasted/allyTeamData.teams
+                end
 			end	
 			
 			--// change team energy
