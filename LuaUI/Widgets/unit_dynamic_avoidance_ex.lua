@@ -1,4 +1,4 @@
-local versionName = "v1.22"
+local versionName = "v1.24"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System (experimental)",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Oct 24, 2011",
+    date      = "Oct 25, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -70,12 +70,13 @@ local velocityScalingCONSTANTg=1 --decrease/increase command lenght. (default= 1
 local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command lenght (default = 0 meter/second)
 
 --Move Command constant:
-local halfTargetBoxSize = {400, 800} --the distance from a target or move-order where widget should ignore (default: cloak and consc = 400 ie:800x800 box, ground unit =800)
+--local halfTargetBoxSize = {400, 800} --the distance from a target or move-order where widget should ignore (default: cloak and consc = 400 ie:800x800 box, ground unit =800)
+local halfTargetBoxSize = {400, 200, 300} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=200, repair=300)
 
 --Angle constant:
-local noiseAngleG =math.pi/8 --(default is pie/8)
-local collisionAngleG=math.pi/4
-local fleeingAngleG=math.pi/3
+local noiseAngleG =math.pi/8 --(default is pie/8); add random angle (range 0 to this) to new angle
+local collisionAngleG=math.pi/4 --angle of enemy (range 0 to this) where auto-reverse will activate 
+local fleeingAngleG=math.pi/3 --angle of enemy (range 0 to this) where fleeing enemy is considered
 
 --------------------------------------------------------------------------------
 --Variables:
@@ -164,7 +165,7 @@ function RefreshUnitList()
 				if (unitDef["builder"] or unitDef["canCloak"]) then --include only cloakies and constructor
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed}
-				--elseif not unitDef["canFly"] then
+				--elseif not unitDef["canFly"] then --if enabled: include all ground unit
 					--arrayIndex=arrayIndex+1
 					--relevantUnit[arrayIndex]={unitID, 2, unitSpeed}
 				end
@@ -196,8 +197,8 @@ function GetPreliminarySeparation(unitMotion,commandIndexTable)
 					if (cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and #cQueue>=2 then  -- only repair (40), build (<0), reclaim (90), ressurect(125) or move(10) command. prevent STOP command from short circuiting the system
 					if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
 					if cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
-						local targetCoordinate, commandIndexTable, newCommand=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
 						local boxSizeTrigger= unitInMotion[i][2]
+						local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
 						local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger) --check if widget should ignore command
 						local losRadius	= GetUnitLOSRadius(unitID) --get LOS
 						local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius) --catalogue enemy
@@ -283,6 +284,7 @@ end
 --check if widget's command or user's command
 function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 	local targetCoordinate = {}
+	local boxSizeTrigger=0
 	local newCommand=true -- immediately assume user's command
 	if commandIndexTable[unitID]==nil then --memory was empty, so fill it with zeros
 		commandIndexTable[unitID]={widgetX=0, widgetZ=0 ,backupTargetX=0, backupTargetY=0, backupTargetZ=0, patienceIndexA=0}
@@ -295,6 +297,7 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 			Spring.Echo("newCommand(IdentifyTargetOnCommandQueue):")
 			Spring.Echo(newCommand)
 			Spring.Echo("cQueue[1].params[1](IdentifyTargetOnCommandQueue):" .. cQueue[1].params[1])
+			Spring.Echo("cQueue[1].params[2](IdentifyTargetOnCommandQueue):" .. cQueue[1].params[2])
 			Spring.Echo("cQueue[1].params[3](IdentifyTargetOnCommandQueue):" .. cQueue[1].params[3])
 			if cQueue[2]~=nil then
 				Spring.Echo("cQueue[2].params[1](IdentifyTargetOnCommandQueue):")
@@ -305,40 +308,16 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 		end
 	end
 	if newCommand then	--user or widget command?
-		if (cQueue[1].id==10 or cQueue[1].id<0) then 
-			targetCoordinate={cQueue[1].params[1], cQueue[1].params[2],cQueue[1].params[3]} --use first queue as target
-			commandIndexTable[unitID]["backupTargetX"]=cQueue[1].params[1] --backup the target
-			commandIndexTable[unitID]["backupTargetY"]=cQueue[1].params[2]
-			commandIndexTable[unitID]["backupTargetZ"]=cQueue[1].params[3]
-		elseif cQueue[1].id==90 or cQueue[1].id==125 then
-			-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
-			-- Spring.Echo(a[1]["name"])
-			local wreckPosX, wreckPosY, wreckPosZ = nil, nil, nil
-			if cQueue[1].params[1]>4500 then --if command contain value greater then 4500 then it is reclaim wreck
-				local wreckFeatureID= cQueue[1].params[1]-4500 --offset the value
-				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(wreckFeatureID)
-			else --if command has normal signature then it is reclaim active unit
-				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[1].params[1])
-			end
-			targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
-			commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
-			commandIndexTable[unitID]["backupTargetY"]=wreckPosY
-			commandIndexTable[unitID]["backupTargetZ"]=wreckPosZ
-		elseif cQueue[1].id==40 then
-			local unitPosX, unitPosY, unitPosZ = spGetUnitPosition(cQueue[1].params[1])
-			targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
-			commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
-			commandIndexTable[unitID]["backupTargetY"]=unitPosY
-			commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
-		end
+		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate)
 		commandIndexTable[unitID]["patienceIndexA"]=0
-	--elseif cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then
-		--targetCoordinate={cQueue[2].params[1], cQueue[2].params[2],cQueue[2].params[3]} --if not newCommand then use second queue for target
+	elseif cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then
+		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate)	
 	else
-		--if not newCommand then use these backup value as target:
-		targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
+		--if for some reason cQueue is still not newCommand, but command queue[2] is already empty then use these backup value as target:
+		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
+		targetCoordinate={-1, -1, -1}
 	end
-	return targetCoordinate, commandIndexTable, newCommand --return target coordinate
+	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger --return target coordinate
 end
 
 --ignore command set on this box
@@ -346,7 +325,7 @@ function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger)
 	local currentX,_,currentZ = spGetUnitPosition(unitID)
 	local targetX = targetCoordinate[1]
 	local targetZ =targetCoordinate[3]
-	if targetX==nil then return false end  --if target is invalid then assume target not reached
+	if targetX==-1 then return false end  --if target is invalid then assume target never reached
 	local xDistanceToTarget = math.abs(currentX -targetX)
 	local zDistanceToTarget = math.abs(currentZ -targetZ)
 	if (turnOnEcho == 1) then
@@ -435,13 +414,13 @@ function GetImpatience(newCommand, unitID, commandIndexTable)
 end
 
 function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger)
-	if (targetCoordinate ~= nil) and (unitID~=nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
+	if (unitID~=nil) and (targetCoordinate ~= nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
 		local aCONSTANT 			= aCONSTANTg --attractor constant (amplitude multiplier)
 		local unitDirection			= GetUnitDirection(unitID) --get unit direction
 		local targetAngle = 0
 		local fTarget = 0
 		local fTargetSlope = 0
-		if targetCoordinate[1]~=nil then --disable target for pure avoidance
+		if targetCoordinate[1]~=-1 then --disable target for pure avoidance
 			targetAngle				= GetTargetAngleWithRespectToUnit(unitID, targetCoordinate) --get target angle
 			fTarget					= GetFtarget (aCONSTANT, targetAngle, unitDirection)
 			fTargetSlope			= GetFtargetSlope (aCONSTANT, targetAngle, unitDirection, fTarget)
@@ -491,12 +470,18 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 	
 	spGiveOrderToUnit(unitID, CMD_MOVE, {newX, newY, newZ}, {} )
 	local arrayIndex=1
-	if not newCommand then arrayIndex=2 end
-	for b = arrayIndex, #cQueue,1 do
-		local options={"shift"}
-		local optionsIndex=1
+	if not newCommand then arrayIndex=2 end --skip old widget command
+	if #cQueue>=2 then --try to identify unique signature of area reclaim/repair
+		if (cQueue[1].id==40 or cQueue[1].id==90 or cQueue[1].id==125) then
+			if (cQueue[2].id==40 or cQueue[2].id==90 or cQueue[2].id==125) and (not Spring.ValidFeatureID(cQueue[2].params[1]-4500) and not Spring.ValidUnitID(cQueue[2].params[1])) then 
+				arrayIndex=arrayIndex+1 --skip the target:wreck/units. Allow constant command reset
+			end
+		end
+	end
+	for b = arrayIndex, #cQueue,1 do --re-do user's command
+		local options={"shift",nil,nil,nil}
+		local optionsIndex=2
 		if cQueue[b].options["alt"] then 
-			optionsIndex=optionsIndex+1
 			options[optionsIndex]="alt"
 		end
 		if cQueue[b].options["ctrl"] then 
@@ -531,17 +516,60 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 end
 ---------------------------------Level2
 ---------------------------------Level3 (low-level function)
+function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate)
+	local boxSizeTrigger=0
+	if (cQueue[queueIndex].id==10 or cQueue[queueIndex].id<0) then 
+		targetCoordinate={cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]} --use first queue as target
+		commandIndexTable[unitID]["backupTargetX"]=cQueue[queueIndex].params[1] --backup the target
+		commandIndexTable[unitID]["backupTargetY"]=cQueue[queueIndex].params[2]
+		commandIndexTable[unitID]["backupTargetZ"]=cQueue[queueIndex].params[3]
+		boxSizeTrigger=1
+	elseif cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125 then
+		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
+		-- Spring.Echo(a[queueIndex]["name"])
+		local wreckPosX, wreckPosY, wreckPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
+		local targetFeatureID=-1
+		if cQueue[queueIndex].params[1]>4500 then --if command contain value greater then 4500 then it is suppose to be a wreck
+			targetFeatureID= cQueue[queueIndex].params[1]-4500 --offset the value
+			wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
+		else --if command has normal signature then it is reclaim active unit
+			targetFeatureID=cQueue[queueIndex].params[1]
+			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
+		end
+		if not Spring.ValidFeatureID(targetFeatureID) and not Spring.ValidUnitID(targetFeatureID) then -- and not Spring.ValidUnitID(cQueue[queueIndex].params[1]) then
+			wreckPosX, wreckPosY,wreckPosZ = -1, -1, -1
+		end
+		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
+		commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
+		commandIndexTable[unitID]["backupTargetY"]=wreckPosY
+		commandIndexTable[unitID]["backupTargetZ"]=wreckPosZ
+		boxSizeTrigger=2
+	elseif cQueue[queueIndex].id==40 then
+		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
+		local targetUnitID=cQueue[queueIndex].params[1]
+		unitPosX, unitPosY, unitPosZ = spGetUnitPosition(targetUnitID)
+		if not Spring.ValidUnitID(cQueue[queueIndex].params[1]) then
+			unitPosX, unitPosY,unitPosZ = -1, -1, -1
+		end
+		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
+		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
+		commandIndexTable[unitID]["backupTargetY"]=unitPosY
+		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
+		boxSizeTrigger=3
+	end
+	return commandIndexTable, targetCoordinate, boxSizeTrigger
+end
 
 function GetUnitRelativeAngle (unitIDmain, unitID2)
-	local x,y,z = spGetUnitPosition(unitIDmain)
-	local rX, rY, rZ= spGetUnitPosition(unitID2)
-	local cX, cY, cZ = rX-x, rY-y, rZ-z --in case unit destroyed
+	local x,_,z = spGetUnitPosition(unitIDmain)
+	local rX, _, rZ= spGetUnitPosition(unitID2)
+	local cX, _, cZ = rX-x, _, rZ-z 
 	local relativeAngle = math.atan2 (cZ, cX)
 	return relativeAngle
 end
 
 function GetTargetAngleWithRespectToUnit(unitID, targetCoordinate)
-	local x,y,z = spGetUnitPosition(unitID)
+	local x,_,z = spGetUnitPosition(unitID)
 	local tx, tz = targetCoordinate[1], targetCoordinate[3]
 	local dX, dZ = tx- x, tz-z 
 	local targetAngle = math.atan2(dZ, dX)
@@ -549,7 +577,7 @@ function GetTargetAngleWithRespectToUnit(unitID, targetCoordinate)
 end
 
 function GetUnitDirection(unitID)
-	local dx,dy,dz= spGetUnitDirection(unitID)
+	local dx,_,dz= spGetUnitDirection(unitID)
 	local unitDirection = math.atan2(dz, dx)
 	return unitDirection
 end
