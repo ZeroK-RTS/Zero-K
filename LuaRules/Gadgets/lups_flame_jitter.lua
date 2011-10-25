@@ -14,6 +14,8 @@ function gadget:GetInfo()
   }
 end
 
+local MIN_EFFECT_INTERVAL = 20
+
 if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -- -> SYNCED
@@ -29,8 +31,9 @@ if (gadgetHandler:IsSyncedCode()) then
   local lastLupsSpawn = {}
 
   function FlameShot(unitID,unitDefID,_, weapon)
-    if ( ((lastLupsSpawn[unitID] or 0) - thisGameFrame) <= -15 ) then
-      lastLupsSpawn[unitID] = thisGameFrame
+    lastLupsSpawn[unitID] = lastLupsSpawn[unitID] or {}
+    if ( ((lastLupsSpawn[unitID][weapon] or 0) - thisGameFrame) <= -MIN_EFFECT_INTERVAL ) then
+      lastLupsSpawn[unitID][weapon] = thisGameFrame
       SendToUnsynced("flame_FlameShot", unitID, unitDefID, weapon)
     end
   end
@@ -69,11 +72,15 @@ else
   local lastShoot = {}
 
   function FlameShot(_,unitID, unitDefID, weapon)
+	-- why is this even needed? we limited frequency of fire FX back in synced
+	--[[
     local n = Spring.GetGameFrame()
-    if ((lastShoot[unitID] or 0) > (n-10) ) then
+	lastShoot[unitID] = lastShoot[unitID] or {}
+    if ((lastShoot[unitID][weapon] or 0) > (n-MIN_EFFECT_INTERVAL) ) then
       return
     end
-    lastShoot[unitID] = n
+    lastShoot[unitID][weapon] = n
+	]]--
 
     local posx,posy,posz, dirx,diry,dirz = Spring.GetUnitWeaponVectors(unitID,weapon-1)
     local wd  = WeaponDefs[UnitDefs[unitDefID].weapons[weapon].weaponDef]
