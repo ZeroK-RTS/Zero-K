@@ -270,7 +270,7 @@ for name, data in pairs(commDefs) do
 			if weaponData.weapontype == "MissileLauncher" then
 				weaponData.flighttime = math.max(weaponData.flighttime or 3, 1.2 * weaponData.range/weaponData.weaponvelocity)
 			elseif weaponData.weapontype == "Cannon" then
-				weaponData.weaponvelocity = math.max(weaponData.weaponvelocity, math.sqrt(weaponData.range * 140))
+				weaponData.weaponvelocity = math.max(weaponData.weaponvelocity, math.sqrt(weaponData.range * (weaponData.mygravity or 0.14)*1000))
 			end
 		end
 	end

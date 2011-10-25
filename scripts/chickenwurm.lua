@@ -72,6 +72,7 @@ local function Dig()
 end
 
 local function StopDig()
+	Spring.SetUnitCloak(unitID, 2)	--free cloak
 end
 
 function script.StartMoving()
@@ -81,7 +82,7 @@ end
 
 function script.StopMoving()
 	isMoving = false
-	--StartThread(StopDig)
+	StartThread(StopDig)
 end
 
 function script.Create()

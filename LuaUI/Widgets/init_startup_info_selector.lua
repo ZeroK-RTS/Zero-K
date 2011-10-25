@@ -200,6 +200,9 @@ function widget:Initialize()
 		printDebug("<gui_startup_info_selector DEBUG >: Or not using Chili, exiting.")
 		widgetHandler:RemoveWidget()
 	end
+	if (VFS.FileExists("mission.lua")) then
+		widgetHandler:RemoveWidget()
+	end
 	
 	local playerID, teamID = Spring.GetMyPlayerID(), Spring.GetMyTeamID()
 	if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)

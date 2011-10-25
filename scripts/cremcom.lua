@@ -213,9 +213,11 @@ function script.AimWeapon(num, heading, pitch)
 		armsFree = false
 		Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
 		Turn( uparmL , x_axis, -pitch, ARM_SPEED_PITCH )
-		Turn( uparmR , x_axis, -pitch, ARM_SPEED_PITCH )
 		Turn( forearmL , x_axis, -rightAngle, FOREARM_SPEED_PITCH )
-		Turn( forearmR , x_axis, -rightAngle, FOREARM_SPEED_PITCH )
+		if not doubleWep then
+			Turn( uparmR , x_axis, -pitch, ARM_SPEED_PITCH )
+			Turn( forearmR , x_axis, -rightAngle, FOREARM_SPEED_PITCH )
+		end
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(uparmL, x_axis)
 		StartThread(RestoreAfterDelay)

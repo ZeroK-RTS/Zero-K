@@ -43,7 +43,7 @@ upgrades = {
 	},
 	commweapon_heavymachinegun = {
 		name = "Heavy Machine Gun",
-		description = "Close-in weapon with AoE",
+		description = "Close-in automatic weapon with AoE",
 	},
 	commweapon_heatray = {
 		name = "Heat Ray",
@@ -55,7 +55,7 @@ upgrades = {
 	},
 	commweapon_lparticlebeam = {
 		name = "Light Particle Beam",
-		description = "Medium-range pulse weapon",
+		description = "Fires rapid medium-range pulses",
 	},	
 	commweapon_missilelauncher = {
 		name = "Missile Launcher",

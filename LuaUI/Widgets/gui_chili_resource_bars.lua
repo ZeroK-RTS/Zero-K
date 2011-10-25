@@ -272,7 +272,9 @@ function widget:GameFrame(n)
 	"\nOverdrive: " .. teamODInc ..
 	"\nReclaim and Cons: " .. teamOtherM ..
 	"\nConstruction: " .. totalConstruction ..
-	"\nWaste: " .. teamWasteM
+	"\nWaste: " .. teamWasteM ..
+	"\n" ..
+	"\nClick to set reserved metal"
 	
 	bar_energy.tooltip = "Local Energy Economy" ..
 	"\nIncome: " .. energyInc ..
@@ -375,6 +377,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
+	Spring.SendLuaRulesMsg("mreserve:0")	-- reset reserve
 	Chili = WG.Chili
 
 	if (not Chili) then
@@ -395,6 +398,7 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
+	Spring.SendLuaRulesMsg("mreserve:0")	-- reset reserve
 	window:Dispose()
 	Spring.SendCommands("resbar 1")
 end
@@ -426,6 +430,7 @@ function CreateWindow()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
+		minimizable = false,
 	}
 
 	--// METAL
@@ -455,7 +460,7 @@ function CreateWindow()
                 y      = p(100/bars),		
 		--caption = data.name, 
 		value = 0,
-		backgroundColor = {0, 0, 0, 0},	-- donut work
+		color = {0, 0, 0, 0},	-- donut work
 		trackColor = col_metal,
 		min=0, 
 		max=1, 

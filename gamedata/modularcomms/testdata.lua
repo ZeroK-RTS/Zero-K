@@ -155,8 +155,13 @@ local base = {
 		modules = {
 			"commweapon_assaultcannon", 
 			"commweapon_assaultcannon", 
-			"weaponmod_napalm_warhead",
-			"conversion_partillery", 			
+			"conversion_partillery",
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting", 
+			"module_adv_targeting"		
 		}
 	},
 	{
