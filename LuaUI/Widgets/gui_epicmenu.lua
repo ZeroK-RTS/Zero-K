@@ -138,7 +138,7 @@ local settings = {
 	versionmin = 50,
 	lang = 'en',
 	widgets = {},
-	--show_crudemenu = true,
+	show_crudemenu = true,
 	music_volume = 0.5,
 }
 
@@ -1552,11 +1552,37 @@ MakeSubWindow = function(fwkey)
 		clientHeight = window_height+B_HEIGHT*4,
 		minimumSize = {250,350},		
 		--resizable = false,
-		parent = screen0,
+		parent = settings.show_crudemenu and screen0 or nil,
 		backgroundColor = color.sub_bg,
 		children = window_children,
 	}
 	AdjustWindow(window_sub_cur)
+end
+
+-- Show or hide menubar
+local function ShowHideCrudeMenu()
+	WG.crude.visible = settings.show_crudemenu -- HACK set it to wg to signal to player list 
+	if settings.show_crudemenu then
+		if window_crude then
+			screen0:AddChild(window_crude)
+			--WG.chat.showConsole()
+			window_crude:UpdateClientArea()
+		end
+		if window_sub_cur then
+			screen0:AddChild(window_sub_cur)
+		end
+	else
+		if window_crude then
+			screen0:RemoveChild(window_crude)
+			--WG.chat.hideConsole()
+		end
+		if window_sub_cur then
+			screen0:RemoveChild(window_sub_cur)
+		end
+	end
+	if window_sub_cur then
+		AdjustWindow(window_sub_cur)
+	end
 end
 
 local function MakePath(path)
@@ -1639,11 +1665,11 @@ local function MakeMenuBar()
 		draggable = false,
 		tweakDraggable = true,
 		resizable = false,
+		minimizable = false,
 		backgroundColor = color.main_bg,
 		color = {1,1,1,0.5},
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
-		parent = screen0,
 		
 		children = {
 			StackPanel:New{
@@ -1794,6 +1820,7 @@ local function MakeMenuBar()
 			}
 		}
 	}
+	ShowHideCrudeMenu()
 end
 
 --Remakes crudemenu and remembers last submenu open
@@ -1919,7 +1946,7 @@ function widget:Initialize()
 	end
 	
 	-- Add actions for keybinds
-	--AddAction("crudemenu", ActionMenu, nil, "t")
+	AddAction("crudemenu", ActionMenu, nil, "t")
 	AddAction("crudewidgetlist", ActionWidgetList, nil, "t")
 	-- replace default key binds
 	Spring.SendCommands({
@@ -2092,6 +2119,11 @@ function widget:KeyPress(key, modifier, isRepeat)
 		return true
 	end
 	
+end
+
+function ActionMenu()
+	settings.show_crudemenu = not settings.show_crudemenu
+	ShowHideCrudeMenu()
 end
 
 function ActionWidgetList()

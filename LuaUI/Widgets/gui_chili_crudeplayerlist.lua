@@ -535,6 +535,7 @@ function widget:Initialize()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
+		minimizable = true,
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
 		children = {
 		},

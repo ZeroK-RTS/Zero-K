@@ -171,6 +171,7 @@ MakeMinimapWindow = function()
 		draggable = false,
 		tweakDraggable = true,
 		resizable = true,
+		minimizable = true,
 		fixedRatio = options.use_map_ratio.value,
 		dragUseGrip = false,
 		minimumSize = {iconsize*10,50},
