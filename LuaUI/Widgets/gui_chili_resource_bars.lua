@@ -50,6 +50,7 @@ local col_buildpower = {0.8, 0.8, 0.2, 1}
 --------------------------------------------------------------------------------
 
 local window
+local trkbar_metal
 local bar_metal
 local bar_energy
 local bar_buildpower
@@ -446,6 +447,22 @@ function CreateWindow()
 		tooltip = "This shows your current metal reserves",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
+	trkbar_metal = 	Chili.Trackbar:New{
+		parent = window,
+		height = p(100/bars),
+		right  = 26,
+                x      = 110,
+                y      = p(100/bars),		
+		--caption = data.name, 
+		value = 0,
+		backgroundColor = {0, 0, 0, 0},	-- donut work
+		trackColor = col_metal,
+		min=0, 
+		max=1, 
+		step=0.1, 
+		OnMouseUp = { function() Spring.SendLuaRulesMsg("mreserve:"..trkbar_metal.value) end }, 
+		--tooltip=data.desc 
+	}
 	
 	lbl_metal = Chili.Label:New{
 		parent = window,
@@ -549,7 +566,7 @@ function CreateWindow()
 	}
 	
 	-- Activate tooltips for lables and bars, they do not have them in default chili
-	function bar_metal:HitTest(x,y) return self end
+	function bar_metal:HitTest(x,y) return self	end
 	function bar_energy:HitTest(x,y) return self end
 	function lbl_energy:HitTest(x,y) return self end
 	function lbl_metal:HitTest(x,y) return self end

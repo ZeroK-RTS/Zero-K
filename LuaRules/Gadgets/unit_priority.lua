@@ -73,6 +73,10 @@ local function ChangeReserved(teamID, change)
 	TeamReserved[teamID] = (TeamReserved[teamID] or 0) + change
 end 
 
+local function SetReserved(teamID, value)
+	TeamReserved[teamID] = value or 0
+end
+
 
 local function SetPriorityState(unitID, state) 
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_PRIORITY)
@@ -90,13 +94,20 @@ function gadget:Initialize()
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local teamID = Spring.GetUnitTeam(unitID)
-		local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		if (ud.metalStorage >0) then ChangeReserved(teamID, ud.metalStorage) end
 		Spring.InsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
 	end
 
 end
 
+function gadget:RecvLuaMsg(msg, playerID)
+	if msg:find("mreserve:",1,true) then
+		local _,_,spec,teamID = Spring.GetPlayerInfo(playerID)
+		local amount = msg:sub(10)
+		if spec then return end
+		local storage = select(2,Spring.GetTeamResources(teamID, "metal"))
+		SetReserved(teamID, storage*amount)
+	end	
+end
 
 function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID) 
 	local prio  = DefaultState
@@ -117,10 +128,6 @@ end
 function gadget:UnitFinished(unitID, unitDefID, teamID) 
 	local ud = UnitDefs[unitDefID]
 	
-	if (ud.metalStorage or 0 > 0) then 
-		ChangeReserved(teamID, ud.metalStorage)
-	end 
-	
 	if ((ud.isFactory or ud.builder) and ud.buildSpeed > 0) then 
 		SetPriorityState(unitID, DefaultState)
 	else  -- not a builder priority makes no sense now
@@ -136,30 +143,7 @@ end
 function gadget:UnitDestroyed(UnitID, unitDefID, teamID) 
 	UnitPriority[UnitID] = nil
 	LastUnitFromFactory[UnitID] = nil
-	
-	local ud = UnitDefs[unitDefID]
-	if (ud.metalStorage or 0 > 0) then 
-		ChangeReserved(teamID, -ud.metalStorage)
-	end 
 end
-
-function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-	local ud = UnitDefs[unitDefID]
-	if (ud.metalStorage or 0  > 0) then 
-		ChangeReserved(teamID, ud.metalStorage)
-		ChangeReserved(oldTeamID, -ud.metalStorage)
-	end 	
-end
-
-function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	local ud = UnitDefs[unitDefID]	
-	if (ud.metalStorage or 0  > 0) then 
-		ChangeReserved(teamID, ud.metalStorage)
-		ChangeReserved(oldTeamID, -ud.metalStorage)
-	end 	
-end
-
-
 
 
 function PriorityCommand(unitID, cmdParams, cmdOptions)
