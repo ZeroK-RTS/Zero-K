@@ -465,6 +465,20 @@ local icontypes = {
     bitmap='icons/t3skirm.dds',
     size=2.7,
   },
+  
+  t3spiderriot = {
+    bitmap='icons/t3spiderriot.png',
+    size=2.4,
+  },
+  t3spidergeneric = {
+    bitmap='icons/t3spidergeneric.png',
+    size=2.7,
+  },
+  
+  t3jumpjetriot = {
+    bitmap='icons/t3jumpjetriot.png',
+    size=2.4,
+  },
 
   
   --icon for construction units and field engineers
@@ -584,17 +598,6 @@ local icontypes = {
     size=2,
   },
   
-  --only used for Crabe icon
-  t3spiderriot = {
-    bitmap='icons/t3spiderriot.png',
-    size=2.4,
-  },
-  
-  t3jumpjetriot = {
-    bitmap='icons/t3jumpjetriot.png',
-    size=2.4,
-  },
-
   --Annihilator
   fixedtachyon = {
     bitmap='icons/fixedtachyon.dds',
