@@ -96,13 +96,16 @@ end
 local isMoving, armsFree, shieldOn = false, true, true
 local gun_num = 0
 
-local function GetFlamer()
-	local weaponID = UnitDefs[unitDefID].weapons and UnitDefs[unitDefID].weapons[5] and UnitDefs[unitDefID].weapons[5].weaponDef
-	if weaponID then
-		return (WeaponDefs[weaponID].type == "Flame")
+local flamers = {}
+local wepTable = UnitDefs[unitDefID].weapons
+wepTable.n = nil
+for index, weapon in pairs(wepTable) do
+	local weaponDef = WeaponDefs[weapon.weaponDef]
+	if weaponDef.type == "Flame" then
+		flamers[index] = true
 	end
-	return false
 end
+wepTable = nil
 
 --local hasFlamer = (GG.LUPS and GG.LUPS.FlameShot) and GetFlamer()
 
@@ -245,18 +248,27 @@ function script.Deactivate()
 	--spSetUnitShieldState(unitID, false)
 end
 
-function script.FireWeapon(num)
+function script.Shot(num)
 	if not doubleWep then
-		EmitSfx(flares[gun_num], 1024)
 		EmitSfx(flares[gun_num], 1025)
 		gun_num = 1 - gun_num
 	elseif num == 5 then
-		EmitSfx(flareL, 1024)
 		EmitSfx(flareL, 1025)
-		if hasFlamer then GG.LUPS.FlameShot(unitID, unitDefID, _, 5) end
+	elseif num == 3 then
+		EmitSfx(flareR, 1027)
+	end
+	if flamers[num] then
+		GG.LUPS.FlameShot(unitID, unitDefID, _, num)
+	end	
+end
+
+function script.FireWeapon(num)
+	if not doubleWep then
+		EmitSfx(flares[gun_num], 1024)
+	elseif num == 5 then
+		EmitSfx(flareL, 1024)
 	elseif num == 3 then
 		EmitSfx(flareR, 1026)
-		EmitSfx(flareR, 1027)
 	end
 end
 
