@@ -69,10 +69,6 @@ if (gadgetHandler:IsSyncedCode()) then
 --  SYNCED
 --------------------------------------------------------------------------------
 
-local function ChangeReserved(teamID, change) 
-	TeamReserved[teamID] = (TeamReserved[teamID] or 0) + change
-end 
-
 local function SetReserved(teamID, value)
 	TeamReserved[teamID] = value or 0
 end
@@ -104,8 +100,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		local _,_,spec,teamID = Spring.GetPlayerInfo(playerID)
 		local amount = msg:sub(10)
 		if spec then return end
-		local storage = select(2,Spring.GetTeamResources(teamID, "metal"))
-		SetReserved(teamID, storage*amount)
+		SetReserved(teamID, amount*1)
 	end	
 end
 
@@ -143,6 +138,13 @@ end
 function gadget:UnitDestroyed(UnitID, unitDefID, teamID) 
 	UnitPriority[UnitID] = nil
 	LastUnitFromFactory[UnitID] = nil
+    local ud = UnitDefs[unitDefID]
+    if ud and ud.metalStorage and ud.metalStorage > 0 and TeamReserved[teamID] then
+        local _, sto = Spring.GetTeamResources(teamID, "metal")
+        if sto and TeamReserved[teamID] > sto - ud.metalStorage then
+            SetReserved(teamID, sto - ud.metalStorage)
+        end
+    end
 end
 
 
@@ -183,8 +185,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
   PriorityCommand(unitID, cmdParams, cmdOptions)  
   return true, true  -- command was used, remove it
 end
-
-
 
 function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
 	if (step<0) then
@@ -250,8 +250,45 @@ function gadget:GameFrame(n)
 			local level, _, pull, income, expense, _, _, recieved = Spring.GetTeamResources(teamID, "metal")
 			local elevel, _, epull, eincome, eexpense, _, _, erecieved = Spring.GetTeamResources(teamID, "energy")
 			
-			if (level < (TeamReserved[teamID] or 0)) then  -- below reserved level, low and normal no spending
-					TeamScale[teamID] = {0,0}
+            if TeamReserved[teamID] and (level < TeamReserved[teamID] or elevel < TeamReserved[teamID]) then -- below reserved level, low and normal no spending
+                TeamScale[teamID] = {0,0}
+			elseif TeamReserved[teamID] and TeamReserved[teamID] > 0 and -- approach reserved level, less low and normal spending
+                    (level < TeamReserved[teamID] + pull or elevel < TeamReserved[teamID] + epull) then 
+                    
+                -- both these values are positive and at least one is less than 1
+                local mRatio = (level - TeamReserved[teamID])/pull
+                local eRatio = (elevel - TeamReserved[teamID])/epull
+              
+                local spare
+                if mRatio < eRatio then 
+                    spare = (income + recieved + level) - TeamReserved[teamID] - prioSpending
+                else
+                    spare = (eincome + erecieved + elevel) - TeamReserved[teamID] - prioSpending
+                end
+                
+                local normalSpending = pull - lowPrioSpending - prioSpending
+                
+                if spare > 0 then
+                    if normalSpending <= 0 then
+                        if lowPrioSpending ~= 0 then
+                            TeamScale[teamID] = {0,spare/lowPrioSpending}
+                        else
+                            TeamScale[teamID] = {0,0}
+                        end
+                    elseif spare > normalSpending then
+                        spare = spare - normalSpending
+                        if spare > 0 and lowPrioSpending ~= 0 then
+                            TeamScale[teamID] = {1,spare/lowPrioSpending}
+                        else
+                            TeamScale[teamID] = {1,0}
+                        end
+                    elseif spare > 0 then
+                        TeamScale[teamID] = {spare/normalSpending,0}
+                    end
+                else
+                    TeamScale[teamID] = {0,0}
+                end
+                
 			elseif (prioSpending > 0 or lowPrioSpending > 0) then
 				
 				local normalSpending = pull - lowPrioSpending
@@ -269,6 +306,8 @@ function gadget:GameFrame(n)
 					}
 				end 
 			end
+            
+            SendToUnsynced("MetalReserveState", teamID, TeamReserved[teamID] or 0) 
 		end
 
 		TeamPriorityUnits = {}
@@ -293,24 +332,26 @@ else
 local last_sent_in_frame = 0
 
 function gadget:Initialize()
-  gadgetHandler:AddSyncAction('PriorityStats',WrapToLuaUI)
+    gadgetHandler:AddSyncAction('MetalReserveState',WrapMetalReserveStateToLuaUI)
+    gadgetHandler:AddSyncAction('PriorityStats',WrapPriorityStatsToLuaUI)
 end
 
-function WrapToLuaUI(_,teamID, highPriorityBP, lowPriorityBP, gameFrame)
-  if (teamID == nil and last_sent_in_frame ~= gameFrame) then 
-	if (Script.LuaUI('PriorityStats')) then
-		Script.LuaUI.PriorityStats(Spring.GetLocalTeamID(), 0, 0)
-	end
-	last_sent_in_frame = gameFrame
-  else 
-	if (teamID ~= Spring.GetLocalTeamID()) then return end
-	if (Script.LuaUI('PriorityStats')) then
-		Script.LuaUI.PriorityStats(teamID, highPriorityBP, lowPriorityBP)
-	end
-	last_sent_in_frame = gameFrame
-  end 
+function WrapPriorityStatsToLuaUI(_,teamID, highPriorityBP, lowPriorityBP, gameFrame)
+    if (teamID == Spring.GetLocalTeamID() and Script.LuaUI('PriorityStats')) then
+        if last_sent_in_frame ~= gameFrame then
+            Script.LuaUI.PriorityStats(Spring.GetLocalTeamID(), 0, 0)
+            last_sent_in_frame = gameFrame
+        else
+            Script.LuaUI.PriorityStats(teamID, highPriorityBP, lowPriorityBP)
+        end
+    end
 end
 
+function WrapMetalReserveStateToLuaUI(_,teamID, reserve)
+    if (teamID == Spring.GetLocalTeamID() and Script.LuaUI('MetalReserveState')) then
+        Script.LuaUI.MetalReserveState(teamID, reserve)
+    end
+end
 
 --------------------------------------------------------------------------------
 --  UNSYNCED

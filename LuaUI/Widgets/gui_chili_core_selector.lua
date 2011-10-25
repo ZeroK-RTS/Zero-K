@@ -191,7 +191,7 @@ local function GetHealthColor(fraction, returnType)
 	if returnType == "char" then
 		return string.char(255,math.floor(255*r),math.floor(255*g),0)
 	end
-	return {r, g*0.8, 0, 1}
+	return {r, g, 0, 1}
 end
 
 -------------------------------------------------------------------------------

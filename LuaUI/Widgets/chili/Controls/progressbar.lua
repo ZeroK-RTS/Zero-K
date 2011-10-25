@@ -59,7 +59,6 @@ function Progressbar:SetColor(...)
   end
 end
 
-
 function Progressbar:SetMinMax(min,max)
   self.min = tonumber(min) or 0
   self.max = tonumber(max) or 1

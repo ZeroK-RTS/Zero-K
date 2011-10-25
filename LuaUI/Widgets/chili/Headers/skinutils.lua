@@ -563,12 +563,14 @@ function DrawProgressbar(obj)
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
   gl.Color(1,1,1,1)
-  TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
+  if not obj.noSkin then
+    TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-  --gl.Texture(0,false)
+    --gl.Texture(0,false)
+  end
 
   gl.Color(obj.color)
   TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
@@ -599,12 +601,15 @@ function DrawTrackbar(self)
   local pdLeft,pdTop,pdRight,pdBottom = unpack4(self.hitpadding)
 
   gl.Color(1,1,1,1)
-  TextureHandler.LoadTexture(0,self.TileImage,self)
+  if not self.noDrawBar then
+    TextureHandler.LoadTexture(0,self.TileImage,self)
     local texInfo = gl.TextureInfo(self.TileImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
-
-  TextureHandler.LoadTexture(0,self.StepImage,self)
+  end
+    
+  if not self.noDrawStep then
+    TextureHandler.LoadTexture(0,self.StepImage,self)
     local texInfo = gl.TextureInfo(self.StepImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
@@ -641,6 +646,7 @@ function DrawTrackbar(self)
         mx = mx+stepWidth
       end
     end
+  end
 
   TextureHandler.LoadTexture(0,self.ThumbImage,self)
     local texInfo = gl.TextureInfo(self.ThumbImage) or {xsize=1, ysize=1}
