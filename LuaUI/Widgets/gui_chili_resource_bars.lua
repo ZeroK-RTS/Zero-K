@@ -641,14 +641,24 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- 1 second lag as energy update will be included in next resource update, not this one
+local lastChange = 0
+local lastEnergyForOverdrive = 0
+local lastEnergyWasted = 0
+local lastMetalFromOverdrive = 0
+
 -- note works only in communism mode
 function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, change, teamIncome)
   if (Spring.GetLocalTeamID() == teamID) then 
-  	WG.energyWasted = energyWasted
-	WG.energyForOverdrive = energyForOverdrive
-	WG.change = change -- energy change by OD - substract that from income 
-	WG.mexIncome = totalIncome-metalFromOverdrive
-	WG.metalFromOverdrive = metalFromOverdrive
+  	WG.energyWasted = lastEnergyWasted
+    lastEnergyWasted = energyWasted
+	WG.energyForOverdrive = lastEnergyForOverdrive
+    lastEnergyForOverdrive = energyForOverdrive
+	WG.change = lastChange
+    lastChange = change
+	WG.mexIncome = totalIncome-lastMetalFromOverdrive
+	WG.metalFromOverdrive = lastMetalFromOverdrive
+    lastMetalFromOverdrive = metalFromOverdrive
 	WG.teamIncome = teamIncome
 	WG.allies = allies
   end

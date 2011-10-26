@@ -876,6 +876,7 @@ function gadget:GameFrame(n)
 				local teamID = allyTeamData.team[i]
 				local te = teamEnergy[teamID]
                 lastTeamNe[teamID] = te.totalChange - (te.taxChange or 0)
+                --teamEcho(teamID, teamID .. ",   Real E Change: " .. te.totalChange)
 				if te.totalChange > 0 then
 					Spring.AddTeamResource(teamID, "e", te.totalChange)
 				elseif te.totalChange < 0 then
