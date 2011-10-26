@@ -696,13 +696,27 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 		gridMetalGain;
 end
 
+local function teamEcho(team, st)
+    if team == 0 then
+        Spring.Echo(st)
+    end
+end
+
 local function changeTeamEnergy(team, energy)
     team.totalChange = team.totalChange + energy
 	team.eCur = team.eCur + energy
 end
 
+local function keepTeamEnergyBelowMax(team)
+    if team.eCur > team.eMax - HIDDEN_STORAGE then
+        local change = (team.eMax - HIDDEN_STORAGE) - team.eCur
+        changeTeamEnergy(team, change)
+        return -change
+    end
+    return 0
+end
+
 local lastTeamNe = {}
-local lastTeamWaste = {}
 
 function gadget:GameFrame(n)
 	AddNewMexes(n)
@@ -737,16 +751,20 @@ function gadget:GameFrame(n)
 			local sumInc = 0
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
-				teamEnergy[teamID] = {totalChange = 0}
+				teamEnergy[teamID] = {totalChange = 0, num = teamID}
 				local te = teamEnergy[teamID]
 				te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = Spring.GetTeamResources(teamID, "energy")
-				teamIncome = teamIncome + te.eInc
+				local incTakeNE = (lastTeamNe[teamID] and lastTeamNe[teamID] > 0 and te.eInc -lastTeamNe[teamID]) or te.eInc
+                teamIncome = teamIncome + incTakeNE
 				if (te.eCur ~= nil) then 
-					te.eTax = te.eInc * (te.eCur) / (te.eMax - HIDDEN_STORAGE) 
-					--Spring.Echo(teamID .. ",   Tax: " .. te.eTax .. ",   Inc: " .. te.eInc .. ",   Cur: " .. te.eCur)
-					if (te.eTax > 0) then 
+					te.eTax = incTakeNE * math.max(0, math.min(1, (te.eCur - te.eInc) / (te.eMax - HIDDEN_STORAGE))) -- don't take more than you make!
+					if te.eCur - te.eTax > te.eMax - HIDDEN_STORAGE then
+                        te.eTax = te.eCur - (te.eMax - HIDDEN_STORAGE)
+                    end
+                    if (te.eTax > 0) then 
 						sumInc = sumInc + te.eTax 
 					end 
+                    --teamEcho(teamID, teamID .. ",   Tax: " .. te.eTax .. ",   Inc: " .. incTakeNE .. ",   Cur: " .. te.eCur)
 				end 
 			end 
 			--Spring.Echo("sumInc: " .. sumInc)
@@ -756,11 +774,14 @@ function gadget:GameFrame(n)
 				local teamID = allyTeamData.team[i]
 				local te = teamEnergy[teamID]
 				if (te.eCur ~= nil) then 
-					if (te.eTax < 0) then te.eTax = 0 end 
+					if (te.eTax < 0) then 
+                        te.eTax = 0 
+                    end 
 					
-					local change = share - te.eTax 
-					--Spring.Echo(teamID .. ",   Change: " .. change)
-					changeTeamEnergy(te, change)
+					te.taxChange = share - te.eTax 
+					--teamEcho(teamID, teamID .. ",   taxChange: " .. te.taxChange)
+					changeTeamEnergy(te, te.taxChange)
+                    allyEExcess = allyEExcess + keepTeamEnergyBelowMax(te)
 				end 
 			end 
 			
@@ -770,25 +791,18 @@ function gadget:GameFrame(n)
 				local te = teamEnergy[teamID]
 				if (te.eCur ~= nil) then 
                     -- Disregared spending last step can never exceed actual spending
-                    local inc = - te.eExp
-                    if lastTeamNe[teamID] and lastTeamNe[teamID] > 0 then
-                        inc = math.min(inc + lastTeamNe[teamID], 0)
-                    end
-                    if lastTeamWaste[teamID] then
-                        inc = math.min(inc + lastTeamWaste[teamID], 0)
-                    end
-                    inc = te.eInc + inc
-                    
-					local ne = 0 
+                    local inc = te.eInc - te.eExp - (lastTeamNe[teamID] or 0)
+                    --teamEcho(teamID, teamID .. ",   NE: " .. (lastTeamNe[teamID] or 0))
+                    --teamEcho(teamID, teamID .. ",   REAL: " .. te.eInc .. "   -" .. te.eExp)
+                    --teamEcho(teamID, teamID .. ",   INC: " .. inc)
 					if (inc > 0) then  
-						local fillRatio = (te.eCur) / (te.eMax - HIDDEN_STORAGE) 
-						ne = inc * fillRatio   -- actual energy used for overdrive depends on fill ratio. At 50% of storage, 50% of income is used 
-						allyEExcess  = allyEExcess + ne
+						local fillRatio = math.max(0, (te.eCur - te.eInc) / (te.eMax - HIDDEN_STORAGE))
+						local ne = inc * fillRatio   -- actual energy used for overdrive depends on fill ratio. At 50% of storage, 50% of income is used 
+                        --teamEcho(teamID, teamID .. ",   CUR: " .. te.eCur .. ",   MAX: " .. te.eMax  .. ",   HIDE: " .. HIDDEN_STORAGE)
+                        --teamEcho(teamID, teamID .. ",   INC: " .. inc .. ",   FR: " .. fillRatio )
+                        allyEExcess  = allyEExcess + ne
 						changeTeamEnergy(te, -ne)
-						--Spring.Echo(teamID .. ",   To OD: " .. ne)
-						--Spring.UseTeamResource(teamID, "e", ne) -- spend the extra energy
 					end 
-					lastTeamNe[teamID] = ne 
 				end 			
 			end 
 
@@ -842,28 +856,26 @@ function gadget:GameFrame(n)
 					--Spring.Echo(teamID .. ",   Refund: " .. energyWasted*( te.eMax - HIDDEN_STORAGE - te.eCur)/totalFreeStorage)
 					changeTeamEnergy(te, energyWasted*( te.eMax - HIDDEN_STORAGE - te.eCur)/totalFreeStorage)
 					--Spring.AddTeamResource(teamID, "e", energyWasted*( eMax - HIDDEN_STORAGE - eCur)/totalFreeStorage)
-                    lastTeamWaste[teamID] = 0
                 end
 				energyWasted = 0
 			else
+                local totalRealInc = 0
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
+                    totalRealInc = totalRealInc + te.eInc
 					--Spring.Echo(teamID .. ",   Refund fill: " .. te.eMax - HIDDEN_STORAGE - te.eCur)
                     changeTeamEnergy(te, te.eMax - HIDDEN_STORAGE - te.eCur)
 					--Spring.AddTeamResource(teamID, "e", ( eMax - HIDDEN_STORAGE - eCur))
 				end
 				energyWasted = energyWasted - totalFreeStorage
-                for i = 1, allyTeamData.teams do 
-                    local teamID = allyTeamData.team[i]
-                    lastTeamWaste[teamID] = energyWasted/allyTeamData.teams
-                end
 			end	
 			
 			--// change team energy
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
 				local te = teamEnergy[teamID]
+                lastTeamNe[teamID] = te.totalChange - (te.taxChange or 0)
 				if te.totalChange > 0 then
 					Spring.AddTeamResource(teamID, "e", te.totalChange)
 				elseif te.totalChange < 0 then
@@ -920,8 +932,9 @@ function gadget:GameFrame(n)
 			--// Share Overdrive Metal
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
+                local te = teamEnergy[teamID]
 				Spring.AddTeamResource(teamID, "m", summedMetalProduction / allyTeamData.teams)
-				SendToUnsynced("MexEnergyEvent", teamID, allyTeamData.teams, energyWasted, ODenergy,summedMetalProduction,summedOverdriveMetal, teamEnergy[teamID].totalChange, teamIncome) 
+				SendToUnsynced("MexEnergyEvent", teamID, allyTeamData.teams, energyWasted, ODenergy,summedMetalProduction,summedOverdriveMetal, te.totalChange, teamIncome) 
 			end 
 		end
 	end

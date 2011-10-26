@@ -402,7 +402,7 @@ function gadget:GameFrame(frameNum)
       ShrinkRadius(data)
     else
 	  local activeState = Spring.GetUnitStates(unitID)
-	  local newState = UseUnitResource(unitID, 'e', data.energy) and activeState and activeState["active"]
+	  local newState = activeState and activeState["active"] and UseUnitResource(unitID, 'e', data.energy)
       if (newState) then
         GrowRadius(data)
       else

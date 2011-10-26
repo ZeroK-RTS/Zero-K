@@ -157,9 +157,9 @@ end
 
 function widget:GameFrame(n)
 
-	if (n%32 ~= 2) then return end
-
-	if not window then return end
+	if (n%32 ~= 2) or not window then 
+        return 
+    end
 
 	local myTeamID = GetMyTeamID()
 	local myAllyTeamID = Spring.GetMyAllyTeamID()
