@@ -16,55 +16,14 @@ function widget:GetInfo()
 end
 
 --------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-options_path = 'Settings/View/Effects/Night'
-options_order = {"coloredUnits", "cycle", "beam", "bases"}
-options = {
-	--[[
-	night = {
-		name = 'Night View',
-		desc = 'Turns night widget on/off.',
-		type = 'bool',
-		value = 0,
-	},
-	]]--
-	coloredUnits = {
-		name = "Night Colored Units",
-		type = 'bool',
-		value = false,
-		desc = 'Bright units even at night',
-	},
-	cycle = {
-		name = "Day/night cycle",
-		type = 'bool',
-		value = true,
-		desc = 'Enable day/night cycle',
-	},		
-	beam = {
-		name = "Searchlight Beams",
-		type = 'bool',
-		value = true,
-		desc = 'Display searchlight beams',
-	},
-	bases = {
-		name = "Searchlight Bases",
-		type = 'list',
-		items = {
-			{ key = 'none', name = 'None', },
-			{ key = 'simple', name = 'Simple', },
-			{ key = 'full', name = 'Full', },
-		},
-		value = 'simple',
-	},
-}
---------------------------------------------------------------------------------
 --config
 --------------------------------------------------------------------------------
 
-local nightColorMap        = {{0.4, 0.5, 0.6}, --midnight
-                              {0.4, 0.5, 0.6},
-                              {0.4, 0.5, 0.6},
+local nightColorMap        = {{0.2, 0.25, 0.3}, --midnight
+                              {0.2, 0.25, 0.3},
+                              {0.2, 0.25, 0.3},
                               
+							  {0.4, 0.5, 0.6},
                               {1, 0.8, 0.6},
                               {1, 1, 1},
                               {1, 1, 1},
@@ -75,7 +34,8 @@ local nightColorMap        = {{0.4, 0.5, 0.6}, --midnight
                               
                               {1, 0.8, 0.6},
                               {0.4, 0.5, 0.6},
-                              {0.4, 0.5, 0.6}}
+							  {0.2, 0.25, 0.3},
+                              {0.2, 0.25, 0.3},}
                               
 local searchlightBeamColor = {1, 1, 0.75, 0.05}  --searchlight beam color
 local searchlightStrength  = 0.6                 --searchlight strength; <= 0 to turn off
@@ -110,6 +70,64 @@ local searchlightBuildingAngle = 0
 local noLightList = {}
 
 local vsx, vsy
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local function UpdateColors() end	-- redefined below
+
+options_path = 'Settings/View/Effects/Night'
+options_order = {"coloredUnits", "cycle", "time", "beam", "bases"}
+options = {
+	--[[
+	night = {
+		name = 'Night View',
+		desc = 'Turns night widget on/off.',
+		type = 'bool',
+		value = 0,
+	},
+	]]--
+	coloredUnits = {
+		name = "Night Colored Units",
+		type = 'bool',
+		value = false,
+		desc = 'Bright units even at night',
+	},
+	cycle = {
+		name = "Day/night cycle",
+		type = 'bool',
+		value = true,
+		desc = 'Enable day/night cycle',
+	},
+	time = {
+		name = "Time of day",
+		type = 'number',
+		min = 0, 
+		max = 0.9, 
+		step = 0.1,
+		value = 0,
+		desc = 'Starting time of day',
+		OnChange = function(self)
+			currDayTime = self.value
+			UpdateColors()
+		end, 
+	},			
+	beam = {
+		name = "Searchlight Beams",
+		type = 'bool',
+		value = true,
+		desc = 'Display searchlight beams',
+	},
+	bases = {
+		name = "Searchlight Bases",
+		type = 'list',
+		items = {
+			{ key = 'none', name = 'None', },
+			{ key = 'simple', name = 'Simple', },
+			{ key = 'full', name = 'Full', },
+		},
+		value = 'simple',
+	},
+}
 
 --------------------------------------------------------------------------------
 -- speedups and constants
@@ -162,7 +180,7 @@ local RADIANS_PER_COBANGLE = math.pi / 32768
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local function UpdateColors()
+UpdateColors = function()
   local currHour = math.floor(currDayTime * hoursPerDay) + 1
   local currHourPart = currDayTime * hoursPerDay - currHour + 1
   local startColor = nightColorMap[currHour]

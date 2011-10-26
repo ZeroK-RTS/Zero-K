@@ -237,8 +237,8 @@ path='Settings/Video'
 	ShLabel('Water Settings')
 	ShButton('Basic', function() spSendCommands{"water 0"} end )
 	ShButton('Reflective', function() spSendCommands{"water 1"} end )
-	ShButton('Reflective and Refractive', function() spSendCommands{"water 2"} end )
-	ShButton('Dynamic', function() spSendCommands{"water 3"} end )
+	ShButton('Reflective and Refractive', function() spSendCommands{"water 3"} end )
+	ShButton('Dynamic', function() spSendCommands{"water 2"} end )
 	ShButton('Bumpmapped', function() spSendCommands{"water 4"} end )
 
 	ShLabel('Shadow Settings')
