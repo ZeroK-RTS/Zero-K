@@ -253,7 +253,10 @@ local glLineWidth   = gl.LineWidth
 local glColor       = gl.Color
 local glBeginEnd    = gl.BeginEnd
 local glPopAttrib   = gl.PopAttrib
-
+local glCreateList  = gl.CreateList
+local glCallList    = gl.CallList
+local glDeleteList  = gl.DeleteList
+local GL_LINES      = GL.LINES
 
 local spIsUnitInView 		= Spring.IsUnitInView
 local spGetUnitPosition 	= Spring.GetUnitPosition
@@ -264,6 +267,7 @@ local spGetMyTeamID         = Spring.GetMyTeamID
 local spIsUnitSelected      = Spring.IsUnitSelected
 local spGetModKeyState      = Spring.GetModKeyState
 local spIsGUIHidden         = Spring.IsGUIHidden
+local spGetGameFrame        = Spring.GetGameFrame
 
 local myAllyTeam = spGetMyAllyTeamID()
 local myTeam = spGetMyTeamID()
@@ -295,7 +299,24 @@ local function drawCommands(unit, always)
     end
 end
 
+local drawList = 0
+local drawAnything = false
+
 function gadget:DrawWorld()
+    if drawAnything then
+        glPushAttrib(GL.LINE_BITS)
+        glLineStipple(1, 2047)
+        glDepthTest(false)
+        glLineWidth(1.4)
+        glColor(1, 0.75, 0, 1)
+        glCallList(drawList)
+        glColor(1,1,1,1)
+        glLineStipple(false)
+        glPopAttrib()
+    end
+end
+
+local function gameFrame()
     if spIsGUIHidden() then 
         return 
     end
@@ -305,7 +326,7 @@ function gadget:DrawWorld()
         local always = shift or SYNCED.drawPlayerAlways[myPlayerID]
         local unit = SYNCED.unit
         
-        local drawAnything = false
+        drawAnything = false
         for i = 1, unit.count do
             local u = unit.data[i]
             if u.allyTeam == myAllyTeam and (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
@@ -315,18 +336,22 @@ function gadget:DrawWorld()
         end
         
         if drawAnything then
-            gl.PushAttrib(GL.LINE_BITS)
-            gl.LineStipple(1, 2047)
-            gl.DepthTest(false)
-            gl.LineWidth(1.4)
-            gl.Color(1, 0.75, 0, 1)
-            gl.BeginEnd(GL.LINES, drawCommands, unit, always)
-            gl.Color(1,1,1,1)
-            gl.LineStipple(false)
-            gl.PopAttrib()
+            glDeleteList(drawList)
+            drawList = glCreateList(function () glBeginEnd(GL_LINES, drawCommands, unit, always) end)
+            return
         end
     end
     
+    drawAnything = false
+end
+
+local lastFrame = 0
+function gadget:Update()
+    local f = spGetGameFrame()
+    if lastFrame < f then
+        lastFrame = f
+        gameFrame()
+    end
 end
 
 end
