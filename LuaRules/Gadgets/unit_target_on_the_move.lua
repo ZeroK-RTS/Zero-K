@@ -7,7 +7,7 @@ function gadget:GetInfo()
 	date	= "September 25 2011",
 	license	= "GNU GPL, v2 or later",
 	layer	= 0,
-	enabled = false,
+	enabled = true,
   }
 end
 
@@ -66,7 +66,7 @@ end
 
 local function locationInRange(unitID, x, y, z, range)
     local ux, uy, uz = spGetUnitPosition(unitID)
-    return range and math.sqrt((ux - x)^2 + (uz - z)^2) < range
+    return range and ((ux - x)^2 + (uz - z)^2) < range^2
 end
 
 local function setTarget(data)
@@ -245,13 +245,25 @@ else -- UNSYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local glVertex 				= gl.Vertex
+local glVertex 		= gl.Vertex
+local glPushAttrib  = gl.PushAttrib
+local glLineStipple = gl.LineStipple
+local glDepthTest   = gl.DepthTest
+local glLineWidth   = gl.LineWidth
+local glColor       = gl.Color
+local glBeginEnd    = gl.BeginEnd
+local glPopAttrib   = gl.PopAttrib
+
+
 local spIsUnitInView 		= Spring.IsUnitInView
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetUnitLosState 	= Spring.GetUnitLosState
 local spValidUnitID 		= Spring.ValidUnitID
 local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID 	
 local spGetMyTeamID         = Spring.GetMyTeamID
+local spIsUnitSelected      = Spring.IsUnitSelected
+local spGetModKeyState      = Spring.GetModKeyState
+local spIsGUIHidden         = Spring.IsGUIHidden
 
 local myAllyTeam = spGetMyAllyTeamID()
 local myTeam = spGetMyTeamID()
@@ -267,36 +279,52 @@ local function terrainDraw(u, x, y, z)
 	glVertex(x,y,z)
 end
 
+local function drawCommands(unit, always)
+    for i = 1, unit.count do
+        local u = unit.data[i]
+        if u.allyTeam == myAllyTeam and (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
+            if not u.targetID then
+                terrainDraw(u.id, u.x, u.y, u.z)
+            elseif spValidUnitID(u.targetID) then
+                local los = spGetUnitLosState(u.targetID, myAllyTeam, false)
+                if los and (los.los or los.radar) then
+                    unitDraw(u.id, u.targetID)
+                end
+            end
+        end
+    end
+end
+
 function gadget:DrawWorld()
-    if Spring.IsGUIHidden() then 
+    if spIsGUIHidden() then 
         return 
     end
     
     if SYNCED.unit then
-		local alt,ctrl,meta,shift = Spring.GetModKeyState()
+		local alt,ctrl,meta,shift = spGetModKeyState()
+        local always = shift or SYNCED.drawPlayerAlways[myPlayerID]
+        local unit = SYNCED.unit
         
-        gl.PushAttrib(GL.LINE_BITS)
-        gl.LineStipple(1, 2047)
-		gl.DepthTest(false)
-		gl.LineWidth(1.4)
-        gl.Color(1, 0.75, 0, 1)
-        for i = 1, SYNCED.unit.count do
-            local u = SYNCED.unit.data[i]
-            if (SYNCED.drawPlayerAlways[myPlayerID] or shift or Spring.IsUnitSelected(u.id)) and u.allyTeam == myAllyTeam and spValidUnitID(u.id) then
-                if not u.targetID then
-                    gl.BeginEnd(GL.LINES, terrainDraw, u.id, u.x, u.y, u.z)
-                elseif spValidUnitID(u.targetID) then
-                    local los = spGetUnitLosState(u.targetID, myAllyTeam, false)
-                    if los and (los.los or los.radar) then
-                        gl.BeginEnd(GL.LINES, unitDraw, u.id, u.targetID)
-                    end
-                end
+        local drawAnything = false
+        for i = 1, unit.count do
+            local u = unit.data[i]
+            if u.allyTeam == myAllyTeam and (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
+                drawAnything = true
+                break
             end
         end
         
-        gl.Color(1,1,1,1)
-		gl.LineStipple(false)
-		gl.PopAttrib()
+        if drawAnything then
+            gl.PushAttrib(GL.LINE_BITS)
+            gl.LineStipple(1, 2047)
+            gl.DepthTest(false)
+            gl.LineWidth(1.4)
+            gl.Color(1, 0.75, 0, 1)
+            gl.BeginEnd(GL.LINES, drawCommands, unit, always)
+            gl.Color(1,1,1,1)
+            gl.LineStipple(false)
+            gl.PopAttrib()
+        end
     end
     
 end

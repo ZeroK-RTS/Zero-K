@@ -14,7 +14,7 @@ local CMD_UNIT_SET_TARGET = 34923
 local CMD_UNIT_CANCEL_TARGET = 34924
 
 function widget:CommandNotify(id, params, options)
-    --[[if id == CMD.SET_WANTED_MAX_SPEED then
+    if id == CMD.SET_WANTED_MAX_SPEED then
         return false -- FUCK CMD.SET_WANTED_MAX_SPEED
     end
     if id == CMD.MOVE then
@@ -36,6 +36,6 @@ function widget:CommandNotify(id, params, options)
                 Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,{})
             end
         end
-    end--]]
+    end
     return false
 end 
