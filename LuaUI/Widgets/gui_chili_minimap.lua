@@ -159,7 +159,7 @@ MakeMinimapWindow = function()
 	
 	window_minimap = Chili.Window:New{  
 		dockable = true,
-		name = "minimap",
+		name = "Minimap",
 		x = 0,  
 		y = 0,
 		color = {0,0,0,0},

@@ -64,7 +64,7 @@ local window_console
 local colorNames = {}
 local colors = {}
 
-local visible = false
+local visible = true
 
 local function option_remakeConsole()
 	remakeConsole()
@@ -72,18 +72,10 @@ end
 
 
 options_path = "Settings/Interface/Chat/Console"
-options_order = { 'autoHideChat', 'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
+options_order = {'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
 		'col_back','col_text', 'col_ally', 'col_othertext', 'col_dup', 
 		}
 options = {
-	
-	
-	autoHideChat = {
-		name = "Autohide Console",
-		type = 'bool',
-		value = true, 
-		desc = "Auto hides when not typing text",
-	},
 	
 	noColorName = {
 		name = "Don't Color Name",
@@ -387,7 +379,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if (key == KEYSYMS.RETURN) then
 		if not WG.enteringText then 
 			WG.enteringText = true
-			if options.autoHideChat.value and not visible then 
+			if window_console.hidden and not visible then 
 				screen0:AddChild(window_console)
 				visible = true
 			end 
@@ -451,7 +443,7 @@ function widget:Initialize()
 	incolor2color = Chili.incolor2color
 
 	hideConsole = function()
-		if options.autoHideChat.value and not WG.crude.visible and visible then 
+		if window_console.hidden and visible then 
 			screen0:RemoveChild(window_console)
 			visible = false
 			return true
@@ -520,7 +512,7 @@ function widget:Initialize()
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		dockable = true,
-		name = "chat",
+		name = "Chat",
 		y = 0,
 		right = 425, -- epic/resbar width
 		width  = screenWidth*0.30,
@@ -533,6 +525,14 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
+        selfImplementedMinimizable = 
+            function (show)
+                if show then
+                    showConsole()
+                else
+                    hideConsole()
+                end
+            end,
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
 		color = {0,0,0,0},
 		children = {
@@ -551,5 +551,6 @@ function widget:Initialize()
 	spSendCommands({"console 0"})
 	
 	screen0:AddChild(window_console)
+    visible = true
 	
 end

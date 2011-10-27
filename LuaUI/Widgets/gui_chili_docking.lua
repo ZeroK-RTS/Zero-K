@@ -186,7 +186,7 @@ local lastWidth = 0
 local lastHeight= 0
 
 local function GetButtonPos(win)
-	local size = 4 -- button thickness
+	local size = 5 -- button thickness
 	local mindist = win.x*5000 + win.height
 	local mode = 'L'
 	
@@ -283,20 +283,30 @@ function widget:DrawScreen()
 		if win.minimizable then
 			local button = buttons[name]
 			if not button then 
-				button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; caption='';dockable=false,tooltip='Minimize widget ' .. win.name, backgroundColor={0,1,0,1},
+				button = Chili.Button:New{x = win.x, y = win.y; width=50; height=20; 
+                    caption='';dockable=false,winName = win.name, tooltip='Minimize ' .. win.name, backgroundColor={0,1,0,1},
 					OnClick = {
 						function(self)
 							if button.winVisible then
-								screen0:RemoveChild(win)
-								button.backgroundColor={1,0,0,1}
 								win.hidden = true -- todo this is needed for minimap to hide self, remove when windows can detect if its on the sreen or not
-							else 
-								screen0:AddChild(win)
+                                button.tooltip = 'Expand ' .. button.winName
+                                button.backgroundColor={1,0,0,1}
+                                if not win.selfImplementedMinimizable then
+                                    screen0:RemoveChild(win)
+                                else
+                                    win.selfImplementedMinimizable(false)
+                                end
+                            else 
 								win.hidden = false
+                                button.tooltip = 'Minimize ' .. button.winName
 								button.backgroundColor={0,1,0,1}
+                                if not win.selfImplementedMinimizable then
+                                    screen0:AddChild(win)
+                                else
+                                    win.selfImplementedMinimizable(true)
+                                end
 							end 
 							button.winVisible = not button.winVisible
-							
 						end
 					}
 				}
@@ -308,6 +318,7 @@ function widget:DrawScreen()
 			button:SetPos(pos.x,pos.y, pos.width, pos.height)
 			if not button.winVisible then
 				button.winVisible = true 
+                button.tooltip = 'Minimize ' .. button.winName
 				button.backgroundColor={0,1,0,1}
 				button:Invalidate()
 			end
@@ -317,6 +328,7 @@ function widget:DrawScreen()
 	for name, button in pairs(buttons) do
 		if not names[name] and button.winVisible then -- widget hid externally
 			button.winVisible = false
+            button.tooltip = 'Expand ' .. button.winName
 			button.backgroundColor={1,0,0,1}
 			button:Invalidate()
 		end 

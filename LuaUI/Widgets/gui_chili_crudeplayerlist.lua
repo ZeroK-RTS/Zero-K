@@ -523,7 +523,7 @@ function widget:Initialize()
 	
 	window_cpl = Window:New{  
 		dockable = true,
-		name = "crudeplayerlist",
+		name = "Player List",
 		color = {1,1,1,options.backgroundOpacity.value},
 		right = 0,  
 		bottom = 0,
