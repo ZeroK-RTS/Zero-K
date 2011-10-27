@@ -71,6 +71,12 @@ unitDef = {
   weapons                = {
 
     {
+      def                = [[FAKELASER]],
+      mainDir            = [[0 0 1]],
+      maxAngleDif        = 30,
+    },  
+    
+    {
       def                = [[LIGHTNING]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
@@ -96,7 +102,52 @@ unitDef = {
 
 
   weaponDefs             = {
+    
+    FAKELASER     = {
+      name                    = [[Fake Laser]],
+      areaOfEffect            = 12,
+      beamlaser               = 1,
+      beamTime                = 0.1,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
 
+      damage                  = {
+        default = 0,
+        subs    = 0,
+      },
+
+      duration                = 0.11,
+      edgeEffectiveness       = 0.99,
+      explosionGenerator      = [[custom:flash1green]],
+      fireStarter             = 70,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 5.53,
+      lineOfSight             = true,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 450,
+      reloadtime              = 0.11,
+      renderType              = 0,
+      rgbColor                = [[0 1 0]],
+      soundStart              = [[weapon/laser/laser_burn5]],
+      soundTrigger            = true,
+      targetMoveError         = 0.05,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 5.53,
+      tolerance               = 10000,
+      turret                  = false,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 900,
+    },
+    
     LIGHTNING = {
       name                    = [[Lightning Gun]],
       areaOfEffect            = 8,
@@ -126,7 +177,7 @@ unitDef = {
       interceptedByShieldType = 1,
       paralyzer               = true,
       paralyzeTime            = 3,
-      range                   = 400,
+      range                   = 470,
       reloadtime              = 2,
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning]],
@@ -162,11 +213,11 @@ unitDef = {
       laserFlareSize          = 7.5,
       minIntensity            = 1,
       pitchtolerance          = 8192,
-      range                   = 520,
+      range                   = 420,
       reloadtime              = 0.33,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/mini_laser]],
-      soundStartVolume        = 5,
+      soundStartVolume        = 6,
       thickness               = 5,
       tolerance               = 8192,
       turret                  = true,

@@ -35,12 +35,13 @@ local tailPieces = {tail1, tail2, tail3, tail4, tail5, tailgun}
 smokePiece = {base, tailgun}
 
 local weaponPieces = {
-	[1] = {aimFrom = tailgun, flare = {flare1} },
-	[2] = {pivot = gunl, pitch = arml1, aimFrom = gunl, flare = {flare1l, flare2l, flare3l} },
-	[3] = {pivot = gunr, pitch = armr1, aimFrom = gunr, flare = {flare1r, flare2r, flare3r} },
+	[1] = {aimFrom = body, flare = {body}},
+    [2] = {aimFrom = tailgun, flare = {flare1} },
+	[3] = {pivot = gunl, pitch = arml1, aimFrom = gunl, flare = {flare1l, flare2l, flare3l} },
+	[4] = {pivot = gunr, pitch = armr1, aimFrom = gunr, flare = {flare1r, flare2r, flare3r} },
 }
 
-local gun_cycle = {[1] = 1, [2] = 1, [3] = 1}
+local gun_cycle = {[1] = 1, [2] = 1, [3] = 1, [4] = 1,}
 
 --------------------------------------------------------------------------------
 -- constants
@@ -126,7 +127,7 @@ local function RestoreAfterDelay()
 		Turn( tailPieces[i], y_axis, 0, turnSpeed )
 	end
 	
-	for i=2,3 do
+	for i=3,4 do
 		Turn( weaponPieces[i].pivot, y_axis, 0, math.rad(60) )
 		Turn( weaponPieces[i].pitch, x_axis, 0, math.rad(45) )
 	end
@@ -135,7 +136,7 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal( SIG_AIM[num])
 	SetSignalMask( SIG_AIM[num])
-	if num == 1 then
+	if num == 2 then
 		if heading > math.pi then heading = -(2 * math.pi - heading) end
 		for i=1, #tailPieces do
 			Turn( tailPieces[i], x_axis, -pitch/6, tailPitchSpeed )
@@ -144,15 +145,14 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(tailgun, y_axis)
 		WaitForTurn(tailgun, x_axis)
 		StartThread(RestoreAfterDelay)
-		return true
-	else
+	elseif num ~= 1 then
 		Turn( weaponPieces[num].pivot, y_axis, heading, math.rad(120) )
 		Turn( weaponPieces[num].pitch , x_axis, -pitch, math.rad(90) )
 		WaitForTurn(weaponPieces[num].pivot, y_axis)
 		WaitForTurn(weaponPieces[num].pitch, x_axis)
 		StartThread(RestoreAfterDelay)
-		return true	
 	end
+    return true	
 end
 
 function script.AimFromWeapon(num)
@@ -160,11 +160,15 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	return weaponPieces[num].flare[gun_cycle[num]]
+    return weaponPieces[num].flare[gun_cycle[num]]
+end
+
+function script.BlockShot(num)
+	return (num == 1) -- weapon 1 fake
 end
 
 function script.Shot(num)
-	if num > 1 then
+	if num > 2 then
 		gun_cycle[num] = gun_cycle[num] + 1
 		if gun_cycle[num] > 3 then gun_cycle[num] = 1 end
 	else
