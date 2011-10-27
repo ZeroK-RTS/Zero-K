@@ -162,7 +162,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		]]--
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
 		--Spring.SetUnitHealth(unitID, maxHealth-1)	-- can't be full health; else if you stop the construction you can't resume it!
-		Spring.SetUnitHealth(unitID, {health = maxHealth*0.999, build = 0.999})
+		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
