@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[chicken_leaper]],
   name                = [[Leaper]],
-  description         = [[Raider]],
+  description         = [[Hopping Raider]],
   acceleration        = 0.5,
   bmcode              = [[1]],
   brakeRate           = 0.205,
@@ -19,13 +19,11 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Sauteur de combat]],
-	description_de = [[Raider]],
     helptext       = [[The Leaper is the chicken's fast attack unit, running down enemies and leaping over obstacles.]],
     helptext_fr    = [[Le Leaper est l'unit? d'attaque rapide des poulets, plongeant sur l'enemi et sautant les obstacles sur sa route.]],
 	helptext_de    = [[Der Leaper ist die am schnellsten angreifende Chickeneinheit. Er überrennt die Gegner und kann Hindernisse überspringen.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[NOWEAPON]],
   floater             = false,
   footprintX          = 3,
@@ -34,13 +32,12 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = false,
-  maneuverleashlength = [[640]],
   mass                = 115,
-  maxDamage           = 520,
+  maxDamage           = 720,
   maxSlope            = 36,
-  maxVelocity         = 5.2,
+  maxVelocity         = 4,
   minCloakDistance    = 75,
-  movementClass       = [[AKBOT2]],
+  movementClass       = [[AKBOT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[chicken_leaper.s3o]],
@@ -61,8 +58,6 @@ unitDef = {
   side                = [[THUNDERBIRDS]],
   sightDistance       = 256,
   smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[KBOT]],
   turnRate            = 1600,
   upright             = true,
   workerTime          = 0,
@@ -92,9 +87,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 10,
-        planes  = 10,
-        subs    = 1,
+        default = 50,
+        planes  = 50,
+        subs    = 2,
       },
 
       duration                = 0.0333,
