@@ -286,7 +286,7 @@ path='Settings/View/Effects'
 					
 	ShButton('Toggle Camera Shake', function() spSendCommands{'luaui togglewidget CameraShake'} end )
 	
-path='Settings/View/Map/'	
+path='Settings/View/Map'	
 
 	ShButton('VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end )
 

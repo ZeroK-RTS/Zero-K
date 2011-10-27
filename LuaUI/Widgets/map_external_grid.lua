@@ -46,7 +46,7 @@ local noFeatureRange = 0
 ]]--
 
 options_path = 'Settings/View/Map/Configure VR Grid'
-options_order = {"mirrorHeightmap","res","range"}
+options_order = {"mirrorHeightMap","res","range"}
 options = {
 	mirrorHeightMap = {
 		name = "Mirror heightmap",
@@ -55,26 +55,26 @@ options = {
 		desc = 'Mirrors heightmap on the grid',
 		OnChange = function(self)
 			DspLst = nil
-			res = self.value
-			InitGroundHeights()
+			mirror = self.value
+			widget:Initialize()
 		end, 		
 	},
 	res = {
-		name = "Resolution",
+		name = "Resolution (50-400)",
 		type = 'number',
 		min = 50, 
 		max = 400, 
 		step = 50,
 		value = 100,
-		desc = 'Sets resolution',
+		desc = 'Sets resolution (lower = more detail)',
 		OnChange = function(self)
 			DspLst = nil
 			res = self.value
-			InitGroundHeights()
+			widget:Initialize()
 		end, 
 	},
 	range = {
-		name = "Range",
+		name = "Range (1200-7200)",
 		type = 'number',
 		min = 1200, 
 		max = 7200, 
@@ -84,7 +84,7 @@ options = {
 		OnChange = function(self)
 			DspLst = nil
 			range = self.value/res
-			InitGroundHeights()
+			widget:Initialize()
 		end, 
 	},		
 }
@@ -127,6 +127,9 @@ local terrainFuncs = {
 ]]--
 
 local function InitGroundHeights()
+	TileMaxX = Game.mapSizeX/res +1
+	TileMaxZ = Game.mapSizeZ/res +1
+
 	for x = (-1-range)*res,Game.mapSizeX+range*res, res do
 		heights[x] = {}
 		for z = (-1-range)*res,Game.mapSizeZ+range*res, res do
