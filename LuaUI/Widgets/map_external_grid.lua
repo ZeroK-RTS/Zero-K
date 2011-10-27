@@ -1,7 +1,7 @@
 --related thread: http://springrts.com/phpbb/viewtopic.php?f=13&t=26732&start=22
 function widget:GetInfo()
   return {
-    name      = "Map External Grid",
+    name      = "External VR Grid",
     desc      = "VR grid around map",
     author    = "knorke, tweaked by KR",
     date      = "Sep 2011",
@@ -21,7 +21,8 @@ local localAllyID = Spring.GetLocalAllyTeamID ()
 local updateFrequency = 120
 local gridTex = "LuaUI/Images/vr_grid.png"
 local range = 7200/res	-- how far out of the map to draw (decreases performance)
-local height = 0	-- how far above ground to draw
+--local height = 0	-- how far above ground to draw
+local mirror = true
 
 ---magical speedups---
 local math = math
@@ -36,11 +37,57 @@ local glTexRect = gl.TexRect
 
 local heights = {}
 
+--[[
 local maxHillSize = 800/res
 local maxPlateauSize = math.floor(maxHillSize*0.6)
 local maxHeight = 300
 local featureChance = 0.01
 local noFeatureRange = 0
+]]--
+
+options_path = 'Settings/View/Map/Configure VR Grid'
+options_order = {"mirrorHeightmap","res","range"}
+options = {
+	mirrorHeightMap = {
+		name = "Mirror heightmap",
+		type = 'bool',
+		value = true,
+		desc = 'Mirrors heightmap on the grid',
+		OnChange = function(self)
+			DspLst = nil
+			res = self.value
+			InitGroundHeights()
+		end, 		
+	},
+	res = {
+		name = "Resolution",
+		type = 'number',
+		min = 50, 
+		max = 400, 
+		step = 50,
+		value = 100,
+		desc = 'Sets resolution',
+		OnChange = function(self)
+			DspLst = nil
+			res = self.value
+			InitGroundHeights()
+		end, 
+	},
+	range = {
+		name = "Range",
+		type = 'number',
+		min = 1200, 
+		max = 7200, 
+		step = 600,
+		value = 7200,
+		desc = 'How far outside the map to draw',
+		OnChange = function(self)
+			DspLst = nil
+			range = self.value/res
+			InitGroundHeights()
+		end, 
+	},		
+}
 
 -- for terrain randomization - kind of primitive
 --[[
@@ -84,7 +131,7 @@ local function InitGroundHeights()
 		heights[x] = {}
 		for z = (-1-range)*res,Game.mapSizeZ+range*res, res do
 			local px, pz
-			if x < 0 or x > Game.mapSizeX then	-- outside X map bounds; mirror true heightmap
+			if (x < 0 or x > Game.mapSizeX) and mirror then	-- outside X map bounds; mirror true heightmap
 				local xAbs = math.abs(x)
 				local xFrac = (Game.mapSizeX ~= xAbs) and x%(Game.mapSizeX) or Game.mapSizeX
 				local xFlip = -1^math.floor(x/Game.mapSizeX)
@@ -94,7 +141,7 @@ local function InitGroundHeights()
 					px = xFrac
 				end
 			end
-			if z < 0 or z > Game.mapSizeZ then	-- outside Z map bounds; mirror true heightmap
+			if (z < 0 or z > Game.mapSizeZ) and mirror  then	-- outside Z map bounds; mirror true heightmap
 				local zAbs = math.abs(z)
 				local zFrac = (Game.mapSizeZ ~= zAbs) and z%(Game.mapSizeZ) or Game.mapSizeZ
 				local zFlip = -1^math.floor(z/Game.mapSizeZ)

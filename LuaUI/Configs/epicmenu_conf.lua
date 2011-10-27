@@ -285,6 +285,10 @@ path='Settings/View/Effects'
 	ShButton('Night View', function() spSendCommands{'luaui togglewidget Night'} end )
 					
 	ShButton('Toggle Camera Shake', function() spSendCommands{'luaui togglewidget CameraShake'} end )
+	
+path='Settings/View/Map/'	
+
+	ShButton('VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end )
 
 path='Help'
 	AddOption({

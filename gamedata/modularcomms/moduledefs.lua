@@ -207,10 +207,11 @@ upgrades = {
 	},
 	weaponmod_high_caliber_barrel = {
 		name = "High Caliber Barrel",
-		description = "Shotgun/Riot Cannon/Gauss Rifle/Plasma Artillery: +150% damage, +100% reload time",
+		description = "Shotgun/Riot Cannon/Gauss Rifle/Assault Cannon/Plasma Artillery: +150% damage, +100% reload time",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {
+					commweapon_assaultcannon = true,
 					commweapon_shotgun = true,
 					commweapon_gaussrifle = true,
 					commweapon_partillery = true,

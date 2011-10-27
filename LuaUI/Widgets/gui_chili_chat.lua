@@ -291,7 +291,7 @@ WG.chat.hideConsole = hideConsole
 WG.chat.showConsole = showConsole
 
 local function addLine(msg)
-	if Game.version == "0.82.7.0 (0.82.7)" then msg = msg:sub(13) end	-- truncate framenumber (workaround for 0.82.7.0)
+	if msg:sub(1,3) == "[f=" then msg = msg:sub(13) end	-- truncate framenumber
 
 	if lines_count>0 and lines[lines_count].msg == msg then
 		lines[lines_count].dup = lines[lines_count].dup + 1
