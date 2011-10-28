@@ -1,4 +1,4 @@
-local versionName = "v1.24"
+local versionName = "v1.26"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System (experimental)",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Oct 25, 2011",
+    date      = "Oct 28, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -38,6 +38,7 @@ local spGetUnitIsDead 	= Spring.GetUnitIsDead
 local spGetGameSeconds	= Spring.GetGameSeconds
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spValidFeatureID = Spring.ValidFeatureID
+local spGetPlayerInfo = Spring.GetPlayerInfo
 local CMD_STOP			= CMD.STOP
 local CMD_INSERT		= CMD.INSERT
 local CMD_REMOVE		= CMD.REMOVE
@@ -74,9 +75,10 @@ local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command 
 local halfTargetBoxSize = {400, 200, 300} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=200, repair=300)
 
 --Angle constant:
-local noiseAngleG =math.pi/8 --(default is pie/8); add random angle (range 0 to this) to new angle
-local collisionAngleG=math.pi/4 --angle of enemy (range 0 to this) where auto-reverse will activate 
-local fleeingAngleG=math.pi/3 --angle of enemy (range 0 to this) where fleeing enemy is considered
+--http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
+local noiseAngleG =math.pi/36 --(default is pie/18); add random angle (from 0 to the current value) to the new angle
+local collisionAngleG=math.pi/6 --angle of enemy (range 0 to current value) where auto-reverse will activate 
+local fleeingAngleG=math.pi/4 --angle of enemy (range 0 to current value) where fleeing enemy is considered
 
 --------------------------------------------------------------------------------
 --Variables:
@@ -84,20 +86,33 @@ local unitInMotionG={} --store unitID
 local skippingTimerG={0,0}
 local commandIndexTableG= {} --store latest widget command for comparison
 local myTeamID=-1
+local myPlayerID=-1
 local surroundingOfActiveUnitG={} --store value for transfer between function. Store obstacle separation, los, and ect.
 local cycleG=1 --first execute "GetPreliminarySeparation()"
+local wreckageID_offset=4500
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
 function widget:Initialize()
-	local _, _, spec = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	myPlayerID=Spring.GetMyPlayerID()
+	local _, _, spec = Spring.GetPlayerInfo(myPlayerID)
 	if spec then widgetHandler:RemoveWidget() return false end
 	myTeamID= spGetMyTeamID()
+	
+	--count players to offset the ID of wreckage
+	local playerIDList= Spring.GetPlayerList()
+	local numberOfPlayers=#playerIDList
+	for i=1,numberOfPlayers do
+		local _,_,spectator,_,_,_,_,_,_=spGetPlayerInfo(playerIDList[i])
+		if spectator then numberOfPlayers=numberOfPlayers-1 end
+	end
+	wreckageID_offset=wreckageID_offset+ (numberOfPlayers-2)*1500
 	if (turnOnEcho == 1) then Spring.Echo("myTeamID(Initialize)" .. myTeamID) end
 end
 
-function widget:TeamDied(teamID)
-	if teamID==myTeamID then widgetHandler:RemoveWidget() end
+function widget:PlayerChanged(playerID)
+	if playerID==myPlayerID then widgetHandler:RemoveWidget() end
+	wreckageID_offset=wreckageID_offset-1500
 end
 
 --execute different function at different timescale
@@ -195,6 +210,9 @@ function GetPreliminarySeparation(unitMotion,commandIndexTable)
 				if cQueue~=nil then --prevent
 				if cQueue[1]~=nil then --prevent idle unit from executing the system
 					if (cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and #cQueue>=2 then  -- only repair (40), build (<0), reclaim (90), ressurect(125) or move(10) command. prevent STOP command from short circuiting the system
+						-- Spring.Echo("cQueue[1].params[1](IdentifyTargetOnCommandQueue):" .. cQueue[1].params[1])
+						-- Spring.Echo("cQueue[1].params[2](IdentifyTargetOnCommandQueue):" .. cQueue[1].params[2])
+						-- Spring.Echo("cQueue[1].params[3](IdentifyTargetOnCommandQueue):" .. cQueue[1].params[3])
 					if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
 					if cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						local boxSizeTrigger= unitInMotion[i][2]
@@ -473,7 +491,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 	if not newCommand then arrayIndex=2 end --skip old widget command
 	if #cQueue>=2 then --try to identify unique signature of area reclaim/repair
 		if (cQueue[1].id==40 or cQueue[1].id==90 or cQueue[1].id==125) then
-			if (cQueue[2].id==40 or cQueue[2].id==90 or cQueue[2].id==125) and (not Spring.ValidFeatureID(cQueue[2].params[1]-4500) and not Spring.ValidUnitID(cQueue[2].params[1])) then 
+			if (cQueue[2].id==40 or cQueue[2].id==90 or cQueue[2].id==125) and (not Spring.ValidFeatureID(cQueue[2].params[1]-wreckageID_offset) and not Spring.ValidUnitID(cQueue[2].params[1])) then 
 				arrayIndex=arrayIndex+1 --skip the target:wreck/units. Allow constant command reset
 			end
 		end
@@ -529,16 +547,18 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		-- Spring.Echo(a[queueIndex]["name"])
 		local wreckPosX, wreckPosY, wreckPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
 		local targetFeatureID=-1
-		if cQueue[queueIndex].params[1]>4500 then --if command contain value greater then 4500 then it is suppose to be a wreck
-			targetFeatureID= cQueue[queueIndex].params[1]-4500 --offset the value
+		if cQueue[queueIndex].params[1]>wreckageID_offset then --if command contain value greater then 'wreckageID_offset' then it is suppose to be a wreck
+			targetFeatureID= cQueue[queueIndex].params[1]-wreckageID_offset --offset the value
 			wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
 		else --if command has normal signature then it is reclaim active unit
 			targetFeatureID=cQueue[queueIndex].params[1]
 			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
 		end
-		if not Spring.ValidFeatureID(targetFeatureID) and not Spring.ValidUnitID(targetFeatureID) then -- and not Spring.ValidUnitID(cQueue[queueIndex].params[1]) then
-			wreckPosX, wreckPosY,wreckPosZ = -1, -1, -1
+		if not Spring.ValidFeatureID(targetFeatureID) and not Spring.ValidUnitID(targetFeatureID) then
+			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		end
+		Spring.Echo(cQueue[queueIndex].params[1])
+		Spring.Echo(wreckageID_offset)
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
 		commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=wreckPosY
@@ -549,7 +569,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		local targetUnitID=cQueue[queueIndex].params[1]
 		unitPosX, unitPosY, unitPosZ = spGetUnitPosition(targetUnitID)
 		if not Spring.ValidUnitID(cQueue[queueIndex].params[1]) then
-			unitPosX, unitPosY,unitPosZ = -1, -1, -1
+			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
@@ -815,7 +835,7 @@ function ConstantInitialize(fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSu
 end
 --
 function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum)
-	local unitAngleDerived= math.abs(wTarget)*fTarget + math.abs(wObstacle)*fObstacleSum + (noiseAngleG)*GaussianNoise() --add both wavefunction plus some noise
+	local unitAngleDerived= math.abs(wTarget)*fTarget + math.abs(wObstacle)*fObstacleSum + (noiseAngleG)*(GaussianNoise()*2-1) --add both wavefunction plus some noise
 	local newUnitAngleDerived= unitDirection +unitAngleDerived --add derived angle into current unit direction
 	if (turnOnEcho == 1) then Spring.Echo("unitAngleDerived(GetNewAngle) " .. newUnitAngleDerived) end
 	return newUnitAngleDerived --sent out derived angle
@@ -849,14 +869,16 @@ end
 
 --Gaussian noise, Box-Muller method
 --from http://www.dspguru.com/dsp/howtos/how-to-generate-white-gaussian-noise
+--output value from -1 to +1 with bigger chance of getting 0
 function GaussianNoise()
 	local v1
+	local v2
 	local s = 0
 	repeat
 		local u1=math.random()   --U1=[0,1]
 		local u2=math.random()  --U2=[0,1]
 		v1= 2 * u1 -1   -- V1=[-1,1]
-		local v2=2 * u2 - 1  -- V2=[-1,1]
+		v2=2 * u2 - 1  -- V2=[-1,1]
 		s=v1 * v1 + v2 * v2
 	until (s<1)
 
@@ -881,5 +903,7 @@ end
 --4
 --"unit_smart_nanos.lua" widget, "Enables auto reclaim & repair for idle nano turrets , author = Owen Martindell
 --5
+--"Chili Crude Player List", "Player List",, author=CarRepairer      
+--6
 --Gaussian noise, Box-Muller method, http://www.dspguru.com/dsp/howtos/how-to-generate-white-gaussian-noise
 --http://springrts.com/wiki/Lua_Scripting
