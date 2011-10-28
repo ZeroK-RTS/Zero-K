@@ -7,7 +7,8 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = -100000,
     experimental = false,
-    enabled   = true --  loaded by default?
+    enabled   = true, --  loaded by default?
+	detailsDefault = Spring.GetConfigInt("widgetDetailLevel", 3) > 0
   }
 end
 

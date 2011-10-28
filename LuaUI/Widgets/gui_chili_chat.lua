@@ -11,6 +11,7 @@ function widget:GetInfo()
     layer     = 50,
     experimental = false,
     enabled   = true,
+	detailsDefault = Spring.GetConfigInt("widgetDetailLevel", 3) > 0,
   }
 end
 

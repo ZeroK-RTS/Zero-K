@@ -9,7 +9,8 @@ function widget:GetInfo()
     date      = "2009 & 2010",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true
+    enabled   = true,
+	detailsDefault = Spring.GetConfigInt("widgetDetailLevel", 3) > 0,
   }
 end
 
