@@ -15,13 +15,13 @@ end
 -- TODO: make res and range settable in options
 
 local DspLst=nil
-local res = 100		-- smaller = higher resolution (decreases performance)
+local res = 64		-- smaller = higher resolution (decreases performance)
 local TileMaxX = Game.mapSizeX/res
 local TileMaxZ = Game.mapSizeZ/res
 local localAllyID = Spring.GetLocalAllyTeamID ()
-local updateFrequency = 120
+--local updateFrequency = 120	-- unused
 local gridTex = "LuaUI/Images/vr_grid.png"
-local range = 7200/res	-- how far out of the map to draw (decreases performance)
+local range = 7680/res	-- how far out of the map to draw (decreases performance)
 --local height = 0	-- how far above ground to draw
 local mirror = true
 
@@ -61,12 +61,12 @@ options = {
 		end, 		
 	},
 	res = {
-		name = "Resolution (50-400)",
+		name = "Resolution (64-512)",
 		type = 'number',
-		min = 50, 
-		max = 400, 
-		step = 50,
-		value = 100,
+		min = 64, 
+		max = 512, 
+		step = 64,
+		value = 128,
 		desc = 'Sets resolution (lower = more detail)',
 		OnChange = function(self)
 			DspLst = nil
@@ -89,6 +89,8 @@ options = {
 		end, 
 	},		
 }
+
+res = options.res.value or res
 
 -- for terrain randomization - kind of primitive
 --[[
