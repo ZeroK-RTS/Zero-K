@@ -28,7 +28,7 @@ return {
       properties = {
         delay              = [[0 i40]],
         explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[-10 r20, 0, -10 r20]],
+        pos                = [[-10 r20, 30, -10 r20]],
       },
     },
   },
@@ -53,19 +53,26 @@ return {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_600]],
-        pos                = [[0 r200 r-200, 0, 0 r200 r-200]], 	--random(0, 200) - random (0, 200)
+        pos                = [[r16 y10 -1 x10x10 y10 256 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
       },
     },
 	redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 120,
+      count              = 180,
       ground             = true,
       water              = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_1400]],
-        pos                = [[0 r200 r-200, 0 r200 r-200, 0 r200 r-200]],
+        pos                = [[r6.3496 y10 -1 x10x10x10 y10 256 a10     y10 r6.2831 y11 -3.1415 a11 y11       r3.1415 y12 -1.570 a12 y12         -0.5x12x12 y0 0.0417x12x12x12x12 y1 -0.00139x12x12x12x12x12x12 y2 0.0000248015x12x12x12x12x12x12x12x12 y3 -0.000000275573x12x12x12x12x12x12x12x12x12x12 y4 0.00000000208768x12x12x12x12x12x12x12x12x12x12x12x12 y5 1 a0 a1 a2 a3 a4 a5 y13         -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,          -0.1667x12x12x12 y0 0.00833x12x12x12x12x12 y1 -0.000198412x12x12x12x12x12x12x12 y2 0.00000275573192x12x12x12x12x12x12x12x12x12 y3 -0.00000002505210838x12x12x12x12x12x12x12x12x12x12x12 y4 0 a12 a0 a1 a2 a3 a4 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
+        -- 6.3496 = 256^(1/3)
+        -- y10 = radius
+        -- y11 = angle
+        -- y12 = pitch
+        -- y13 = cos(pitch)
+        -- cos and sine are the 12th order series expansions
+        --  -0.1667x12x12x12 y0 0.00833x12x12x12x12x12 y1 -0.000198412x12x12x12x12x12x12x12 y2 0.00000275573192x12x12x12x12x12x12x12x12x12 y3 -0.00000002505210838x12x12x12x12x12x12x12x12x12x12x12 y4 0 a12 a0 a1 a2 a3 a4 y12        1.570 x12 y12
       },
     },
   },
@@ -91,7 +98,7 @@ return {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[0 r200 r-200, 0, 0 r200 r-200]], 	--random(0, 200) - random (0, 200)
+        pos                = [[0 r200 r-200, 30, 0 r200 r-200]], 	--random(0, 200) - random (0, 200)
       },
     },
 	redploom_long = {
@@ -102,7 +109,7 @@ return {
       water              = true,
       properties = {
         delay              = 0,
-        explosiongenerator = [[custom:NAPALMFIREBALL_350]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_450]],
         pos                = [[0 r200 r-200, 0 r200 r-200, 0 r200 r-200]],
       },
     },
@@ -129,7 +136,7 @@ return {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[0 r100 r-100, 0, 0 r100 r-100]], 	--random(0, 200) - random (0, 200)
+        pos                = [[0 r100 r-100, 30, 0 r100 r-100]], 	--random(0, 200) - random (0, 200)
       },
     },
 	redploom_long = {
@@ -169,7 +176,7 @@ return {
         particlesizespread = 10,
         particlespeed      = 0.5,
         particlespeedspread = 1.0,
-        pos                = [[-10 r20, 30, -10 r20]],
+        pos                = [[-10 r20, 0, -10 r20]],
         sizegrowth         = 0,
         sizemod            = 1.0,
         texture            = [[fireball]],
@@ -198,14 +205,14 @@ return {
         particlesizespread = 10,
         particlespeed      = 0.5,
         particlespeedspread = 1.0,
-        pos                = [[-10 r20, 30, -10 r20]],
+        pos                = [[-10 r20, 0, -10 r20]],
         sizegrowth         = 0,
         sizemod            = 1.0,
         texture            = [[fireball]],
       },
     },
   },
-  ["napalmfireball_350"] = {
+  ["napalmfireball_450"] = {
     rocks = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -227,7 +234,7 @@ return {
         particlesizespread = 10,
         particlespeed      = 0.5,
         particlespeedspread = 1.0,
-        pos                = [[-10 r20, 30, -10 r20]],
+        pos                = [[-10 r20, 0, -10 r20]],
         sizegrowth         = 0,
         sizemod            = 1.0,
         texture            = [[fireball]],
@@ -256,7 +263,7 @@ return {
         particlesizespread = 10,
         particlespeed      = 0.5,
         particlespeedspread = 1.0,
-        pos                = [[-10 r20, 30, -10 r20]],
+        pos                = [[-10 r20, 0, -10 r20]],
         sizegrowth         = 0,
         sizemod            = 1.0,
         texture            = [[fireball]],
