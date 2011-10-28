@@ -42,7 +42,7 @@ groundFlashBlue = {
   repeatEffect = true,
 }
 
-groundFlashViolett = {
+groundFlashViolet = {
   life       = 50,
   size       = 80,
   texture    = "bitmaps/GPL/Lups/groundflash.png",

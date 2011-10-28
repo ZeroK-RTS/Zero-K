@@ -1,19 +1,19 @@
 effectUnitDefs = {
   cremcom1 = {
     {class='StaticParticles', options=commandCoronaRed},
-    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true},groundFlashRed)},
+    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashRed)},
   },  
   cremcom2 = {
     {class='StaticParticles', options=commandCoronaOrange},
-    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true},groundFlashOrange)},
+    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashOrange)},
   },  
   cremcom3 = {
     {class='StaticParticles', options=commandCoronaGreen},
-    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true},groundFlashGreen)},
+    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashGreen)},
   },  
   cremcom4 = {
     {class='StaticParticles', options=commandCoronaBlue},
-    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true},groundFlashBlue)},
+    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashBlue)},
   },
   
   --// FUSIONS //--------------------------

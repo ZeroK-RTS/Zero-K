@@ -15,8 +15,8 @@ end
 
 local DspLst=nil
 local res = 100		-- smaller = higher resolution (decreases performance)
-local TileMaxX = Game.mapSizeX/res +1
-local TileMaxZ = Game.mapSizeZ/res +1
+local TileMaxX = Game.mapSizeX/res
+local TileMaxZ = Game.mapSizeZ/res
 local localAllyID = Spring.GetLocalAllyTeamID ()
 local updateFrequency = 120
 local gridTex = "LuaUI/Images/vr_grid.png"
