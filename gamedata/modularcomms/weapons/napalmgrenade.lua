@@ -22,7 +22,7 @@ local weaponDef = {
 		subs    = 15,
     },
 
-    explosionGenerator      = [[custom:napalmmissile_impact]],
+    explosionGenerator      = [[custom:napalm_missile]],
     firestarter             = 180,
     impulseBoost            = 0,
     impulseFactor           = 0,

@@ -151,7 +151,7 @@ unitDef = {
         subs    = 15,
       },
 
-      explosionGenerator      = [[custom:napalmlargeshort]],
+      explosionGenerator      = [[custom:napalm_drp]],
       holdtime                = [[1]],
       impulseBoost            = 0.2,
       impulseFactor           = 0.1,

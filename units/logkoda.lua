@@ -84,7 +84,7 @@ unitDef = {
         subs    = 1.25,
       },
 
-      explosionGenerator      = [[custom:NAPALM_Expl]],
+      explosionGenerator      = [[custom:napalm_koda]],
       fireStarter             = 65,
       flameGfxTime            = 0.1,
       impulseBoost            = 0,

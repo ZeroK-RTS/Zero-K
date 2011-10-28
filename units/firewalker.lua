@@ -91,7 +91,7 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 		burntime = 180,
-		lups_heat_fx = [[firewalker]],
+		--lups_heat_fx = [[firewalker]],
 	  },
 	  
       damage                  = {
@@ -100,7 +100,7 @@ unitDef = {
         subs    = 4,
       },
 
-      explosionGenerator      = [[custom:firewalker_impact]],
+      explosionGenerator      = [[custom:napalm_firewalker]],
       firestarter             = 180,
       impulseBoost            = 0,
       impulseFactor           = 0.4,

@@ -105,7 +105,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      explosionGenerator      = [[custom:firewalker_impact]],
+      explosionGenerator      = [[custom:napalm_firewalker]],
       fireStarter             = 120,
       impulseBoost            = 0,
       impulseFactor           = 0.2,
