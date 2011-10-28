@@ -7,7 +7,8 @@ function widget:GetInfo()
     date      = "Sep 2011",
     license   = "PD",
     layer     = -3,
-    enabled   = Spring.GetConfigInt("widgetDetailLevel", 2) >= 2
+    enabled   = Spring.GetConfigInt("widgetDetailLevel", 2) >= 2,
+	detailsDefault = Spring.GetConfigInt("widgetDetailLevel", 2) >= 2
   }
 end
 

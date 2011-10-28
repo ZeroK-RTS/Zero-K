@@ -16,6 +16,7 @@
 
 -- stable release?
 local isStable = false
+local resetWidgetDetailLevel = false -- has widget detail level changed
 
 local ORDER_VERSION = 8 --- change this to reset enabled/disabled widgets
 local DATA_VERSION = 8 -- change this to reset enabled/disabled widgets
@@ -271,6 +272,11 @@ function widgetHandler:LoadOrderList()
 		self.orderList = {}
 		self.orderList.version = ORDER_VERSION
 	end 
+	local detailLevel = Spring.GetConfigInt("widgetDetailLevel", 2)
+	if (self.orderList.lastWidgetDetailLevel ~= detailLevel) then
+		resetWidgetDetailLevel = true
+		self.orderList.lastWidgetDetailLevel = detailLevel
+	end 
   end
 end
 
@@ -308,6 +314,7 @@ end
 
 
 function widgetHandler:SaveConfigData()
+  resetWidgetDetailLevel = false
   self:LoadConfigData()
   for _,w in ipairs(self.widgets) do
     if (w.GetConfigData) then
@@ -482,16 +489,24 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   end
 
   local info  = widget:GetInfo()
-  -- experimental widget, disabled by default in stable
-  if info.experimental and isStable then
-    info.enabled = false
-  end
   local order = self.orderList[name]
-  if (((order ~= nil) and (order > 0)) or
+  
+  local enabled = ((order ~= nil) and (order > 0)) or
       ((order == nil) and  -- unknown widget
        (info.enabled and ((not knownInfo.fromZip) or self.autoModWidgets))) or
-			 info.alwaysStart) then
-    -- this will be an active widget
+			 info.alwaysStart
+
+  -- experimental widget, disabled by default in stable
+  if info.experimental and isStable then
+    enabled = false
+  end
+
+  if resetWidgetDetailLevel and info.detailsDefault ~= nil then 
+	enabled = info.detailsDefault
+  end
+			 
+  if (enabled) then
+	-- this will be an active widget
     if (order == nil) then
       self.orderList[name] = 12345  -- back of the pack
     else
