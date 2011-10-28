@@ -65,7 +65,7 @@ return {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_1400]],
-        pos                = [[0 r200 r-200, 0, 200]],
+        pos                = [[0 r200 r-200, 0 r200 r-200, 0 r200 r-200]],
       },
     },
   },
