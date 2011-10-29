@@ -10,7 +10,7 @@ local tracks = 1
 
 -- Signal definitions
 local SIG_ACTIVATE = 2
-local SIG_MOVE = 4
+local SIG_ANIM = 4
 local SIG_AIM = 1
 local SIG_IDLE = 8
 
@@ -50,6 +50,8 @@ function script.HitByWeapon(x, z)
 end
 
 local function AnimControl() 
+	Signal(SIG_ANIM)
+	SetSignalMask(SIG_ANIM)
 	local lastHeading, currHeading, diffHeading, pivotAngle
 	lastHeading = GetUnitValue(COB.HEADING)
 	while true do
@@ -106,7 +108,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_IDLE)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turret, y_axis, heading, math.rad(180))
+	Turn(turret, y_axis, heading, math.rad(240))
 	--Turn(arm_1, x_axis, math.rad(90) - pitch, math.rad(60))
 	--WaitForTurn(arm_1, x_axis)
 	WaitForTurn(turret, y_axis)
@@ -173,6 +175,7 @@ function script.StartMoving()
 end
 
 function script.StopMoving() 
+	Signal(SIG_ANIM)
 	StopSpin(bigwheel, x_axis, WHEEL_SPIN_DECEL_L)
 
 	StopSpin(wheels1, x_axis, WHEEL_SPIN_DECEL_M)
