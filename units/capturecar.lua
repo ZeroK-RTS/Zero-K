@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Dominatrix]],
   description         = [[Capture Vehicle]],
   acceleration        = 0.0444,
-  bmcode              = [[1]],
   brakeRate           = 0.0385,
   buildCostEnergy     = 400,
   buildCostMetal      = 400,
@@ -24,7 +23,6 @@ unitDef = {
 	helptext_de    = [[Der Dominatrix erobert Einheiten, hetzt sie gegen die ehemaligen Verbündeten auf. Mehrere Dominatrixe können ein Ziel schneller erobern, obwohl nur einer von ihnen der Kontrolleur dieser Einheit wird. Nachdem eine gegnerische Einheit unter Kontrolle gebracht wurde, kann der Dominatrix für fünf Sekunden nicht schießen. Sobald ein Dominatrix zerstört wurde, sind alle Einheiten unter seiner Kontrolle wieder frei.]],
   },
 
-  energyUse           = 1.5,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
@@ -35,7 +33,7 @@ unitDef = {
   mass                = 205,
   maxDamage           = 820,
   maxSlope            = 18,
-  maxVelocity         = 2,
+  maxVelocity         = 2.2,
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
@@ -55,7 +53,7 @@ unitDef = {
   trackType           = [[StdTank]],
   trackWidth          = 26,
   turninplace         = 0,
-  turnRate            = 416,
+  turnRate            = 420,
   workerTime          = 0,
 
   weapons             = {
