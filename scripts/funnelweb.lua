@@ -174,7 +174,11 @@ end
 function script.FireWeapon(num)
 	if num == 2 then
 		GraserLoop()
-	elseif num == 1 then
+	end
+end
+
+function script.Shot(num)
+	if num == 1 then
 		EmitSfx(cannons[gun_1].flare, 1024)
 		EmitSfx(cannons[gun_1].flare, 1025)
 		gun_1 = 1 - gun_1

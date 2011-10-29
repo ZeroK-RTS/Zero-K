@@ -203,6 +203,7 @@ local function RestoreAfterDelay()
 	Turn( forearmL , x_axis, 0, FOREARM_SPEED_PITCH/2 )
 	Turn( forearmR , x_axis, 0, FOREARM_SPEED_PITCH/2 )
 	Turn(torso, y_axis, 0, TORSO_SPEED_YAW/2)
+	WaitForTurn(torso, y_axis)
 	armsFree = true
 end
 
@@ -227,12 +228,11 @@ function script.AimWeapon(num, heading, pitch)
 		SetSignalMask( SIG_DGUN)
 		armsFree = false
 		Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
-		Turn( uparmL , x_axis, -pitch, ARM_SPEED_PITCH )
 		Turn( uparmR , x_axis, -pitch, ARM_SPEED_PITCH )
-		Turn( forearmL , x_axis, -rightAngle, FOREARM_SPEED_PITCH )
 		Turn( forearmR , x_axis, -rightAngle, FOREARM_SPEED_PITCH )
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(uparmR, x_axis)
+		WaitForTurn(forearmR, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 2 or num == 4 then
