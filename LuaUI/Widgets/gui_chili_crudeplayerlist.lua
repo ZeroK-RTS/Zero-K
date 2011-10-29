@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List v1.2",
-    desc      = "v1.061 Chili Crude Player List.",
+    desc      = "v1.2 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -60,6 +60,16 @@ local x_name 	= x_icon_clan + 16
 local x_share 	= x_name + 140 
 local x_cpu 	= x_share + 20
 local x_ping 	= x_cpu + 40
+local x_bound	= x_ping + 40
+
+UPDATE_FREQUENCY = 0.5	-- seconds
+
+local wantsNameRefresh = {}
+
+-- keeps track of labels
+local nameLabels = {}
+local pingLabels = {}
+local cpuLabels = {}
 
 pingCpuColors = {
 	{0, 1, 0, 1},
@@ -77,6 +87,8 @@ local localAlliance = 0
 
 include("keysym.h.lua")
 
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -87,7 +99,7 @@ options = {
 	text_height = {
 		name = 'Font Size',
 		type = 'number',
-		value = 13,
+		value = 12,
 		min=10,max=18,step=1,
 		OnChange = function() SetupPlayerNames() end,
 	},
@@ -99,6 +111,12 @@ options = {
 			window_cpl.color = {1,1,1,self.value}
 			window_cpl:Invalidate()
 		end,
+	},
+	alignToTop = {
+		name = "Align to top",
+		type = 'bool',
+		value = false,
+		desc = "Align list entries to top (i.e. don't push to bottom)",
 	},
 }
 
@@ -167,6 +185,43 @@ local function CfTooltip(allyTeam)
 	return tooltip
 end
 
+local function UpdatePlayerInfo()
+	local players = Spring.GetPlayerList()
+	for i=1,#players do
+		local playerID = players[i]
+		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
+		if not spectator then
+			pingTime = pingTime or 0
+			cpuUsage = cpuUsage or 0
+			local min_pingTime = math.min(pingTime, 1)
+			local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
+			local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
+			local pingTime_readable = PingTimeOut(pingTime)
+			
+			cpuLabels[playerID]:SetCaption(math.round(cpuUsage*100) .. '%')
+			pingLabels[playerID]:SetCaption(pingTime_readable)
+		end
+		-- for <Waiting> bug at start, may be a FIXME
+		if nameLabels[playerID] and wantsNameRefresh[playerID] then
+			wantsNameRefresh[playerID] = nil
+			local name_out = ''
+			name_out = name or ''
+			if	name_out == ''
+				or #(Spring.GetPlayerList(teamID,true)) == 0
+				or spectator
+			then
+				if Spring.GetGameSeconds() < 0.1 then
+					name_out = "<Waiting> " ..(name or '')
+					wantsNameRefresh[playerID] = true
+				elseif Spring.GetTeamUnitCount(teamID) > 0  then
+					name_out = "<Aband. units> " ..(name or '')
+				else
+					name_out = "<Dead> " ..(name or '')
+				end
+			end	
+		end
+	end
+end
 
 local function AddAllyteamPlayers(row, allyTeam,players)
 	if not players then
@@ -189,7 +244,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 	scroll_cpl:AddChild(
 		Label:New{
 			y=options.text_height.value * row,
-			caption = '[' .. (type(allyTeam) == 'number' and (allyTeam+1) or allyTeam) .. ']',
+			caption = (type(allyTeam) == 'number' and (allyTeam+1) or allyTeam),
 			textColor = aCol,
 			fontsize = options.text_height.value,
 			fontShadow = true,
@@ -284,20 +339,19 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 
 		end 
 		
-		
-		scroll_cpl:AddChild(
-			Label:New{
-				x=x_name,
-				y=options.text_height.value * row,
-				width=150,
-				autosize=false,
-				--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
-				caption = name_out,
-				textColor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1},
-				fontsize = options.text_height.value,
-				fontShadow = true,
-			}
-        )
+		local nameLabel = Label:New{
+			x=x_name,
+			y=options.text_height.value * row,
+			width=150,
+			autosize=false,
+			--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
+			caption = name_out,
+			textColor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1},
+			fontsize = options.text_height.value,
+			fontShadow = true,
+		}
+		nameLabels[playerID] = nameLabel
+		scroll_cpl:AddChild(nameLabel)
 
 		
 		if active and allyTeam == localAlliance and teamID ~= localTeam then
@@ -322,26 +376,26 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				}
 			)
 		end
-		scroll_cpl:AddChild(
-			Label:New{
-				x=x_cpu,
-				y=options.text_height.value * row,
-				caption = math.round(cpuUsage*100) .. '%',
-				textColor = cpuCol,
-				fontsize = options.text_height.value,
-				fontShadow = true,
-			}
-		)
-		scroll_cpl:AddChild(
-			Label:New{
-				x=x_ping,
-				y=options.text_height.value * row,
-				caption = pingTime_readable ,
-				textColor = pingCol,
-				fontsize = options.text_height.value,
-				fontShadow = true,
-			}
-		)
+		local cpuLabel = Label:New{
+			x=x_cpu,
+			y=options.text_height.value * row,
+			caption = math.round(cpuUsage*100) .. '%',
+			textColor = cpuCol,
+			fontsize = options.text_height.value,
+			fontShadow = true,
+		}
+		cpuLabels[playerID] = cpuLabel
+		scroll_cpl:AddChild(cpuLabel)
+		local pingLabel = Label:New{
+			x=x_ping,
+			y=options.text_height.value * row,
+			caption = pingTime_readable ,
+			textColor = pingCol,
+			fontsize = options.text_height.value,
+			fontShadow = true,
+		}
+		pingLabels[playerID] = pingLabel
+		scroll_cpl:AddChild(pingLabel)
 		
 		row = row + 1
 	end
@@ -378,7 +432,7 @@ SetupPlayerNames = function()
 				allyTeams.S = {}
 			end
 			table.insert( allyTeams.S, {name=name,team=nil,player=playerID} )
-			specNames[name]=true
+			specNames[name]=playerID
 		end
 	end
 	
@@ -407,6 +461,7 @@ SetupPlayerNames = function()
 				
 					if Spring.GetGameSeconds() < 0.1 then
 						name_out = "<Waiting> " ..(name or '')
+						wantsNameRefresh[playerID] = true
 					elseif Spring.GetTeamUnitCount(teamID) > 0  then
 						name_out = "<Aband. units> " ..(name or '')
 					else
@@ -447,9 +502,11 @@ SetupPlayerNames = function()
 			row = AddAllyteamPlayers(row, allyTeam,players)
 		end
 	end
+	--[[
 	if show_spec then
 		row = AddAllyteamPlayers(row,'S',allyTeams.S)
 	end
+	
 	
 	scroll_cpl:AddChild( Checkbox:New{
 		x=5, y=options.text_height.value * (row + 0.5),
@@ -459,6 +516,7 @@ SetupPlayerNames = function()
 		OnChange = { function(self) show_spec = not self.checked; SetupPlayerNames(); end },
 	} )
 	row = row + 1
+	]]--
 	
 	if cf then
 		scroll_cpl:AddChild( Checkbox:New{
@@ -467,9 +525,29 @@ SetupPlayerNames = function()
 			caption = 'Place Restricted Zones',
 			checked = WG.rzones.rZonePlaceMode,
 			OnChange = { function(self) WG.rzones.rZonePlaceMode = not WG.rzones.rZonePlaceMode; end },
-		} )	
+		} )
+		row = row + 1
 	end
 	
+	local specsSorted = {}
+	for name,id in pairs(specNames) do
+		specsSorted[#specsSorted + 1] = {name = name, id = id}
+	end
+	table.sort(specsSorted, function(a,b)
+		return a.name:lower() < b.name:lower()
+	end)
+	local windowTooltip = "SPECTATORS"
+	for i=1,#specsSorted do
+		windowTooltip = windowTooltip .. "\n\t"..specsSorted[i].name
+	end
+	
+	scroll_cpl.tooltip = windowTooltip
+	
+	scroll_cpl.height = row * (options.text_height.value+4)
+	if not (options.alignToTop.value) then 
+		scroll_cpl.y = window_cpl.height - scroll_cpl.height
+	end
+	scroll_cpl:Invalidate()
 end
 
 
@@ -485,12 +563,18 @@ end
 local timer = 0
 function widget:Update(s)
 	timer = timer + s
-	if timer > 5 then
+	if timer > UPDATE_FREQUENCY then
 		timer = 0
-		SetupPlayerNames()
-		--window_cpl:SetPos(screen0.width-window_cpl.width, screen0.height-window_cpl.height)
-		
+		UpdatePlayerInfo()
 	end
+end
+
+function widget:PlayerChanged(playerID)
+	SetupPlayerNames()
+end
+
+function widget:PlayerRemoved(playerID)
+	SetupPlayerNames()
 end
 
 -----------------------------------------------------------------------
@@ -528,8 +612,9 @@ function widget:Initialize()
 		color = {1,1,1,options.backgroundOpacity.value},
 		right = 0,  
 		bottom = 0,
-		width  = 320,
+		width  = x_bound,
 		height = 150,
+		padding = {8, 2, 8, 2};
 		--autosize   = true;
 		parent = screen0,
 		draggable = false,
@@ -537,18 +622,20 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
-		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
-		children = {
-		},
+		--minimumSize = {MIN_WIDTH, MIN_HEIGHT},
+
 	}
 	scroll_cpl = ScrollPanel:New{
+		parent = window_cpl,	
 		width = "100%",
 		height = "100%",
 		--padding = {2,2,2,2},
 		backgroundColor  = {0,0,0,0},
+		padding = {0, 0, 0, 0};
 	}
-	window_cpl:AddChild( scroll_cpl )
 
+	-- enable scrollpanel tooltip (not in default Chili)
+	function scroll_cpl:HitTest(x,y) return self	end	
 	
 	SetupPlayerNames()
 	
