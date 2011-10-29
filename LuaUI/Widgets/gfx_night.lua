@@ -396,7 +396,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-  currDayTime = startDayTime
+  currDayTime = options.time.value or startDayTime
   UpdateColors()
   vsx, vsy = widgetHandler:GetViewSizes()
   

@@ -98,8 +98,7 @@ function widget:Update()
 end
 
 function widget:MapDrawCmd(playerID, cmdType, px, py, pz, caption)
-  if (cmdType ~= 'point') then return end
-  if (Lups==nil) then return end
+  if (cmdType ~= 'point') or not(Spring.GetGameSeconds()>0) or (Lups==nil) then return end
   --// get wind and random values
   local wx, wy, wz = GetWind()
   wx, wy, wz = wx*0.09, wy*0.09, wz*0.09

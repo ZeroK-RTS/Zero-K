@@ -55,13 +55,14 @@ options = {
 		value = true,
 		desc = 'Mirrors heightmap on the grid',
 		OnChange = function(self)
-			DspLst = nil
+			gl.DeleteList(dspLst)
 			mirror = self.value
 			widget:Initialize()
 		end, 		
 	},
 	res = {
 		name = "Resolution (64-512)",
+		advanced = true,
 		type = 'number',
 		min = 64, 
 		max = 512, 
@@ -69,13 +70,14 @@ options = {
 		value = 128,
 		desc = 'Sets resolution (lower = more detail)',
 		OnChange = function(self)
-			DspLst = nil
+			gl.DeleteList(dspLst)
 			res = self.value
 			widget:Initialize()
 		end, 
 	},
 	range = {
 		name = "Range (1200-7200)",
+		advanced = true,
 		type = 'number',
 		min = 1200, 
 		max = 7200, 
@@ -83,7 +85,7 @@ options = {
 		value = 7200,
 		desc = 'How far outside the map to draw',
 		OnChange = function(self)
-			DspLst = nil
+			gl.DeleteList(dspLst)
 			range = self.value/res
 			widget:Initialize()
 		end, 
@@ -128,6 +130,9 @@ local terrainFuncs = {
 	mesa = function(x, z, args) end,
 }
 ]]--
+local function GetGroundHeight(x, z)
+	return heights[x] and heights[x][z] or spGetGroundHeight(x,z)
+end
 
 local function InitGroundHeights()
 	TileMaxX = Game.mapSizeX/res +1
@@ -157,7 +162,7 @@ local function InitGroundHeights()
 					pz = zFrac
 				end				
 			end
-			heights[x][z] = spGetGroundHeight(px or x, pz or z)	-- 20, 0
+			heights[x][z] = GetGroundHeight(px or x, pz or z)	-- 20, 0
 		end
 	end
 	
@@ -200,17 +205,6 @@ function widget:GameFrame(n)
 end
 ]]--
 
-function widget:Initialize()
-	InitGroundHeights()
-end
-
-local function GetGroundHeight(x, z)
-	if(heights[x] and heights[x][z]) and (heights[x][z] ~=  spGetGroundHeight(x,z)) then
-		--Spring.Echo(heights[x][z] - spGetGroundHeight(x,z))
-	end
-	return heights[x] and heights[x][z] or spGetGroundHeight(x,z)
-end
-
 local function TilesVerticesOutside()
 	for x=-range,TileMaxX+range,1 do
 		for z=-range,TileMaxZ+range,1 do
@@ -248,9 +242,15 @@ local function DrawTiles()
 end
 
 function widget:DrawWorld()
-	if not DspLst then
-		DspLst=glCreateList(DrawTiles)
-	end
 	gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
 	-- Maybe you want Spring.SetDrawGround(false) somewhere
+end
+
+function widget:Initialize()
+	InitGroundHeights()
+	DspLst = glCreateList(DrawTiles)
+end
+
+function widget:Shutdown()
+  gl.DeleteList(dspList)
 end
