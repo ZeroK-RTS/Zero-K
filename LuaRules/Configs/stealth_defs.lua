@@ -24,56 +24,6 @@ local stealthDefs = {
     energy = 20,
     delay  = 30,
   },
-
-  armcom = {
-    draw   = true,
-    init   = false,
-    energy = 20,
-    delay  = 30,
-  },
-  
-  armadvcom = {
-    draw   = true,
-    init   = false,
-    energy = 10,
-    delay  = 30,
-  },
-
-  corcom = {
-    draw   = true,
-    init   = false,
-    energy = 20,
-    delay  = 30,
-  },
-
-  coradvcom = {
-    draw   = true,
-    init   = false,
-    energy = 20,
-    delay  = 30,
-  },
-  
-  commrecon = {
-    draw   = true,
-    init   = false,
-    energy = 10,
-    delay  = 30,
-  },
-
-  commsupport = {
-    draw   = true,
-    init   = false,
-    energy = 20,
-    delay  = 30,
-  },
-
-  commadvsupport = {
-    draw   = true,
-    init   = false,
-    energy = 20,
-    delay  = 30,
-  },
-  
   armcomdgun = {
     draw   = true,
     init   = false,

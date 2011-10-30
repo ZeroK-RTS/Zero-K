@@ -1,21 +1,23 @@
+local presets = {
+	commandAuraRed = {
+		{class='StaticParticles', options=commandCoronaRed},
+		{class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashRed)},
+	},
+	commandAuraOrange = {
+	    {class='StaticParticles', options=commandCoronaOrange},
+		{class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashOrange)},
+	},
+	commandAuraGreen = {
+		{class='StaticParticles', options=commandCoronaGreen},
+		{class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashGreen)},
+	},
+	commandAuraBlue = {
+		{class='StaticParticles', options=commandCoronaBlue},
+		{class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashBlue)},
+	},	
+}
+
 effectUnitDefs = {
-  cremcom1 = {
-    {class='StaticParticles', options=commandCoronaRed},
-    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashRed)},
-  },  
-  cremcom2 = {
-    {class='StaticParticles', options=commandCoronaOrange},
-    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashOrange)},
-  },  
-  cremcom3 = {
-    {class='StaticParticles', options=commandCoronaGreen},
-    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashGreen)},
-  },  
-  cremcom4 = {
-    {class='StaticParticles', options=commandCoronaBlue},
-    {class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashBlue)},
-  },
-  
   --// FUSIONS //--------------------------
   cafus = {
     {class='Bursts', options=cafusBursts},
@@ -236,7 +238,7 @@ effectUnitDefsXmas = {
   corcom = {
     {class='SantaHat', options={pos={0,6,2}, emitVector={0.4,1,0.2}, width=2.7, height=6, ballSize=0.7, piece="head"}},
   },
-   armadvcom = {
+  armadvcom = {
     {class='SantaHat', options={color={0,0.7,0,1}, pos={0,4,0.35}, emitVector={0.3,1,0.2}, width=2.7, height=6, ballSize=1, piece="head"}},
   },
   coradvcom = {
@@ -255,3 +257,22 @@ effectUnitDefsXmas = {
     {class='SantaHat', options={color={0,0.7,0,1}, pos={1.5,4,0.5}, emitVector={0.7,1.6,0.2}, width=2.2, height=6, ballSize=1, piece="head"}},
   },
 }
+
+-- load presets from unitdefs
+for i=1,#UnitDefs do
+	local unitDef = UnitDefs[i]
+	if unitDef.customParams then
+		local fxTableStr = unitDef.customParams.lups_unit_fxs
+		if fxTableStr then
+			local fxTableFunc = loadstring("return "..fxTableStr)
+			local fxTable = fxTableFunc()
+			effectUnitDefs[unitDef.name] = effectUnitDefs[unitDef.name] or {}
+			for i=1,#fxTable do	-- for each item in preset table
+				local toAdd = presets[fxTable[i]]
+				for i=1,#toAdd do
+					table.insert(effectUnitDefs[unitDef.name],toAdd[i])	-- append to unit's lupsFX table
+				end
+			end
+		end
+	end
+end
