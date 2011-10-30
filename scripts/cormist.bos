@@ -21,7 +21,7 @@ static-var	moving, once, animCount, curGun, firepoint, deployed,
 
 #define TURRET_TURN_SPEED				<240>
 #define GUN_TURN_SPEED					<60>
-#define ARMS_MOVE_SPEED					[10]
+#define ARMS_MOVE_SPEED					[12]
 
 #define ANIM_PERIOD				50
 #define PIVOT_MOD				11 //appox. equal to MAX_PIVOT / turnrate

@@ -11,9 +11,9 @@ local weaponDef = {
 		--miscEffectFire = [[custom:RIOT_SHELL_L]],
 	},
 	damage                  = {
-		default = 250,
-		planes  = 250,
-		subs    = 12.5,
+		default = 320,
+		planes  = 320,
+		subs    = 16,
 	},
 	
 	explosionGenerator      = [[custom:INGEBORG]],
@@ -21,7 +21,7 @@ local weaponDef = {
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 1,
 	myGravity				= 0.25,
-	range                   = 340,
+	range                   = 360,
 	reloadtime              = 2,
 	soundHit                = [[weapon/cannon/cannon_hit2]],
 	soundStart              = [[weapon/cannon/medplasma_fire]],
