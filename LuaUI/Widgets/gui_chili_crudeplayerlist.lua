@@ -60,7 +60,8 @@ local x_name 	= x_icon_clan + 16
 local x_share 	= x_name + 140 
 local x_cpu 	= x_share + 20
 local x_ping 	= x_cpu + 40
-local x_bound	= x_ping + 40
+local x_buffer	= x_ping + 10
+local x_bound	= x_buffer + 40
 
 local UPDATE_FREQUENCY = 0.5	-- seconds
 
@@ -99,7 +100,7 @@ options = {
 	text_height = {
 		name = 'Font Size',
 		type = 'number',
-		value = 12,
+		value = 13,
 		min=10,max=18,step=1,
 		OnChange = function() SetupPlayerNames() end,
 	},
@@ -117,6 +118,7 @@ options = {
 		type = 'bool',
 		value = false,
 		desc = "Align list entries to top (i.e. don't push to bottom)",
+		OnChange = function() SetupPlayerNames() end,
 	},
 }
 
@@ -191,6 +193,7 @@ local function UpdatePlayerInfo()
 		local playerID = players[i]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
 		if not spectator then
+			-- update ping and CPU
 			pingTime = pingTime or 0
 			cpuUsage = cpuUsage or 0
 			local min_pingTime = math.min(pingTime, 1)
@@ -224,6 +227,9 @@ local function UpdatePlayerInfo()
 	end
 end
 
+-- adds:	ally team number, ceasefire button if applicable
+--			details of all players in allyteam (icons, name, CPU, ping)
+
 local function AddAllyteamPlayers(row, allyTeam,players)
 	if not players then
 		return row
@@ -242,6 +248,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		aCol = {1,0.5,0,1}
 	end
 	
+	-- allyteam number
 	scroll_cpl:AddChild(
 		Label:New{
 			y=options.text_height.value * row,
@@ -251,6 +258,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			fontShadow = true,
 		}
 	)
+	-- ceasefire button
 	if cf and allyTeam ~= 'S' and allyTeam ~= localAlliance then
 		scroll_cpl:AddChild( Checkbox:New{
 			x=x_cf,y=options.text_height.value * row + 3,width=20,
@@ -281,6 +289,8 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		local icon = nil
 		local icRank = nil 
 		local icCountry = nil
+		
+		-- clan/faction emblems, level, country
 		if (not pdata.isAI and customKeys ~= nil) then 
 			if (customKeys.clan~=nil and customKeys.clan~="") then 
 				icon = "LuaUI/Configs/Clans/" .. customKeys.clan ..".png"
@@ -340,6 +350,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 
 		end 
 		
+		-- name
 		local nameLabel = Label:New{
 			x=x_name,
 			y=options.text_height.value * row,
@@ -357,6 +368,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		nameLabel:UpdateLayout()
 		nameLabel:Invalidate()
 		
+		-- CPU, ping
 		if active and allyTeam == localAlliance and teamID ~= localTeam then
 			scroll_cpl:AddChild(
 				Button:New{
@@ -442,6 +454,7 @@ SetupPlayerNames = function()
 	
 	for i,teamID in ipairs(teams) do
 		if teamID ~= Spring.GetGaiaTeamID() then
+			-- process names
 			local _,playerID,_,isAI,_,allyTeamID_out = Spring.GetTeamInfo(teamID)
 			local name_out = ''
 			if isAI then
@@ -519,6 +532,7 @@ SetupPlayerNames = function()
 	row = row + 1
 	]]--
 	
+	-- ceasefire: restricted zones button
 	if cf then
 		scroll_cpl:AddChild( Checkbox:New{
 			x=5, y=options.text_height.value * (row + 0.5),
@@ -530,6 +544,7 @@ SetupPlayerNames = function()
 		row = row + 1
 	end
 	
+	-- spectators tooltip
 	local specsSorted = {}
 	for name,id in pairs(specNames) do
 		specsSorted[#specsSorted + 1] = {name = name, id = id}
@@ -544,9 +559,12 @@ SetupPlayerNames = function()
 	
 	scroll_cpl.tooltip = windowTooltip
 	
-	scroll_cpl.height = row * (options.text_height.value+4)
+	--push things to bottom of window if needed
+	scroll_cpl.height = math.min(row * (options.text_height.value+4),window_cpl.height - window_cpl.padding[2] - window_cpl.padding[4])
 	if not (options.alignToTop.value) then 
 		scroll_cpl.y = window_cpl.height - scroll_cpl.height
+	else
+		scroll_cpl.y = 0
 	end
 	scroll_cpl:Invalidate()
 end
