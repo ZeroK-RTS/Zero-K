@@ -17,7 +17,7 @@ end
 local useShader = true --when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
                        --when not, the map is drawn mirrored 8 times into a display list
 local wiremap = false
-local gridSize = 64
+local gridSize = 32
 local gridTex = "LuaUI/Images/vr_grid_large.png"
 local realTex = '$grass'
 local tex = realTex

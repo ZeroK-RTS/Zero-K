@@ -14,7 +14,7 @@ end
 -- TODO: make res and range settable in options
 
 local DspLst=nil
-local res = 64		-- smaller = higher resolution (decreases performance)
+local res = 128		-- smaller = higher resolution (decreases performance)
 local TileMaxX = Game.mapSizeX/res
 local TileMaxZ = Game.mapSizeZ/res
 local localAllyID = Spring.GetLocalAllyTeamID ()
@@ -60,12 +60,12 @@ options = {
 		end, 		
 	},
 	res = {
-		name = "Resolution (64-512)",
+		name = "Resolution (32-512)",
 		advanced = true,
 		type = 'number',
-		min = 64, 
+		min = 32, 
 		max = 512, 
-		step = 64,
+		step = 32,
 		value = 128,
 		desc = 'Sets resolution (lower = more detail)',
 		OnChange = function(self)
