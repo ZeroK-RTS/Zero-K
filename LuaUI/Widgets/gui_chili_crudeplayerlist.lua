@@ -62,7 +62,7 @@ local x_cpu 	= x_share + 20
 local x_ping 	= x_cpu + 40
 local x_bound	= x_ping + 40
 
-UPDATE_FREQUENCY = 0.5	-- seconds
+local UPDATE_FREQUENCY = 0.5	-- seconds
 
 local wantsNameRefresh = {}
 
@@ -202,7 +202,7 @@ local function UpdatePlayerInfo()
 			pingLabels[playerID]:SetCaption(pingTime_readable)
 		end
 		-- for <Waiting> bug at start, may be a FIXME
-		if nameLabels[playerID] and wantsNameRefresh[playerID] then
+		if nameLabels[teamID] and wantsNameRefresh[playerID] then
 			wantsNameRefresh[playerID] = nil
 			local name_out = ''
 			name_out = name or ''
@@ -218,7 +218,8 @@ local function UpdatePlayerInfo()
 				else
 					name_out = "<Dead> " ..(name or '')
 				end
-			end	
+			end
+			nameLabels[teamID]:SetCaption(name_out)
 		end
 	end
 end
@@ -350,9 +351,11 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			fontsize = options.text_height.value,
 			fontShadow = true,
 		}
-		nameLabels[playerID] = nameLabel
+		nameLabels[teamID] = nameLabel
 		scroll_cpl:AddChild(nameLabel)
-
+		-- because for some goddamn stupid reason the names won't show otherwise
+		nameLabel:UpdateLayout()
+		nameLabel:Invalidate()
 		
 		if active and allyTeam == localAlliance and teamID ~= localTeam then
 			scroll_cpl:AddChild(
@@ -376,27 +379,28 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				}
 			)
 		end
-		local cpuLabel = Label:New{
-			x=x_cpu,
-			y=options.text_height.value * row,
-			caption = math.round(cpuUsage*100) .. '%',
-			textColor = cpuCol,
-			fontsize = options.text_height.value,
-			fontShadow = true,
-		}
-		cpuLabels[playerID] = cpuLabel
-		scroll_cpl:AddChild(cpuLabel)
-		local pingLabel = Label:New{
-			x=x_ping,
-			y=options.text_height.value * row,
-			caption = pingTime_readable ,
-			textColor = pingCol,
-			fontsize = options.text_height.value,
-			fontShadow = true,
-		}
-		pingLabels[playerID] = pingLabel
-		scroll_cpl:AddChild(pingLabel)
-		
+		if not pdata.isAI then
+			local cpuLabel = Label:New{
+				x=x_cpu,
+				y=options.text_height.value * row,
+				caption = math.round(cpuUsage*100) .. '%',
+				textColor = cpuCol,
+				fontsize = options.text_height.value,
+				fontShadow = true,
+			}
+			cpuLabels[playerID] = cpuLabel
+			scroll_cpl:AddChild(cpuLabel)
+			local pingLabel = Label:New{
+				x=x_ping,
+				y=options.text_height.value * row,
+				caption = pingTime_readable ,
+				textColor = pingCol,
+				fontsize = options.text_height.value,
+				fontShadow = true,
+			}
+			pingLabels[playerID] = pingLabel
+			scroll_cpl:AddChild(pingLabel)
+		end
 		row = row + 1
 	end
 	return row
@@ -453,12 +457,10 @@ SetupPlayerNames = function()
 				end
 				
 				name_out = name or ''
-				if
-					name_out == ''
+				if name_out == ''
 					or #(Spring.GetPlayerList(teamID,true)) == 0
 					or specNames[name]
 				then
-				
 					if Spring.GetGameSeconds() < 0.1 then
 						name_out = "<Waiting> " ..(name or '')
 						wantsNameRefresh[playerID] = true
@@ -477,7 +479,6 @@ SetupPlayerNames = function()
 				
 				table.insert( allyTeams[allyTeamID_out], {name=name_out,team=teamID,player=playerID, isAI = isAI} )
 			end
-			
 		end --if teamID ~= Spring.GetGaiaTeamID() 
 	end --for each team
 	
