@@ -80,6 +80,7 @@ local combatCommands = {	-- commands that require ammo to execute
 }
 
 local padRadius = 750 -- land if pad is within this range
+local MAX_FUEL = 1000000
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -106,6 +107,7 @@ local findPadCMD = {
 
 local bomberUnitIDs = {}
 local bomberToPad = {}	-- [bomberID] = detination pad ID
+local refuelling = {} -- [bomberID] = true
 local airpads = {}	-- stores data
 local airpadsPerAllyTeam = {}	-- [allyTeam] = {[pad1ID] = true, [pad2ID] = true, ..}
 local allyteams = Spring.GetAllyTeamList()
@@ -324,6 +326,16 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldteam, newteam)
 end
 
 function gadget:GameFrame(n)
+	if n%5 == 0 then
+		for bomberID in pairs(refuelling) do
+			local fuel = spGetUnitFuel(bomberID)
+			--if fuel > 0 then Spring.Echo(fuel) end
+			if fuel >= MAX_FUEL then
+				refuelling[bomberID] = nil
+				Spring.SetUnitRulesParam(bomberID, "noammo", 0)	-- ready to go
+			end
+		end	
+	end
 	-- track proximity to bombers
 	if n%10 == 0 then
 		for bomberID in pairs(scheduleRearmRequest) do
@@ -339,7 +351,8 @@ function gadget:GameFrame(n)
 				spGiveOrderToUnit(bomberID, CMD.REMOVE, {tag}, {})	-- clear rearm order
 				Spring.SetUnitFuel(bomberID, 0)	-- set fuel to zero
 				bomberToPad[bomberID] = nil
-				Spring.SetUnitRulesParam(bomberID, "noammo", 0)	-- plane can fire again once it's refuelled
+				refuelling[bomberID] = bomberID
+				Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- refuelling
 			end
 		end
 		
@@ -369,7 +382,7 @@ end
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_REARM then	-- return to pad
 		if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
-			return true, true -- attempting to rearm while already armed, abort
+			return true, true -- attempting to rearm while already armed or refuelling, abort
 		end
 		--Spring.Echo("Returning to base")
 		local targetPad = cmdParams[1]
@@ -394,8 +407,8 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if spGetUnitRulesParam(unitID, "noammo") == 0 then
-		if ((cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift) then -- don't allow rearming when already armed
+	if spGetUnitRulesParam(unitID, "noammo") ~= 1 then
+		if ((cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift) then -- don't allow rearming when already armed or refuelling
 			return false 
 		end	
 	end
@@ -459,6 +472,7 @@ function gadget:DefaultCommand(type, targetID)
 end
 
 local noAmmoTexture = 'LuaUI/Images/noammo.png'
+local refuelTexture = 'LuaUI/Images/noammo.png'
 
 local function DrawUnitFunc(yshift)
 	gl.Translate(0,yshift,0)
@@ -466,21 +480,27 @@ local function DrawUnitFunc(yshift)
 	gl.TexRect(-10, -10, 10, 10)
 end
 
+local phase = 0
+
 function gadget:DrawWorld()
 	if Spring.IsGUIHidden() then return end
 	local myAllyID = Spring.GetMyAllyTeamID()
 	local isSpec, fullView = spGetSpectatingState()
 
-	gl.Texture(noAmmoTexture)	
-	gl.Color(1,1,1,1)
+	gl.Texture(noAmmoTexture)
+	local alpha = (math.sin(phase)*0.3) + 0.7
 	local units = Spring.GetVisibleUnits()
 	for i=1,#units do
 		local id = units[i]
-		if spValidUnitID(id) and spGetUnitDefID(id) and spGetUnitRulesParam(id, "noammo") == 1 and ((isSpec and fullView) or spGetUnitAllyTeam(id) == myAllyID) then
+		local ammoState = spGetUnitRulesParam(id, "noammo") or 0
+		if spValidUnitID(id) and spGetUnitDefID(id) and (ammoState ~= 0) and ((isSpec and fullView) or spGetUnitAllyTeam(id) == myAllyID) then
+			local a = (ammoState == 2) and alpha or 1
+			gl.Color(1,1,1,a)
 			gl.DrawFuncAtUnit(id, false, DrawUnitFunc, UnitDefs[spGetUnitDefID(id)].height + 30)
 		end
 	end
 	gl.Texture("")
+	phase = phase + .1
 end
 
 function gadget:Initialize()

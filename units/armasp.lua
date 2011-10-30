@@ -1,10 +1,9 @@
 unitDef = {
   unitname            = [[armasp]],
-  name                = [[Air Repair Pad]],
-  description         = [[Automatically Repairs Aircraft]],
+  name                = [[Air Repair/Rearm Pad]],
+  description         = [[Repairs and Rearms Aircraft]],
   acceleration        = 0,
   activateWhenBuilt   = true,
-  bmcode              = [[0]],
   brakeRate           = 0,
   buildAngle          = 0,
   buildCostEnergy     = 350,
@@ -22,9 +21,9 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext = [[The Air Repair Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
+    helptext = [[The Air Repair/Rearm Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
 	description_de = [[Repariert automatisch eigene/verbündete Lufteinheiten]],
-	helptext_de    = [[Das Air Repair Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber.]],
+	helptext_de    = [[Das Air Repair/Rearm Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber.]],
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],
@@ -47,7 +46,6 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 273,
   smoothAnim          = true,
-  sortbias            = [[0]],
   turnRate            = 0,
   waterline           = 8,
   workerTime          = 12,
