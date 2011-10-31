@@ -1,15 +1,16 @@
+local versionName = "v2.0"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
- 
+
 function widget:GetInfo()
   return {
-    name      = "Avatars (unstable)",
-    desc      = "An API for a per-user avatar-icon system.",
-    author    = "jK",
-    date      = "2009",
+    name      = "Avatars",
+    desc      = "An API for a per-user avatar-icon system, + Hello/Hi protocol",
+    author    = "jK, +msafwan",
+    date      = "2009, +2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    api       = false,
+    api       = true,
     enabled   = false
   }
 end
@@ -19,10 +20,15 @@ end
 
 local avatars = {}
 
-local MsgID       = "%"
-local ChecksumMsg = MsgID .. "1"
-local RequestMsg  = MsgID .. "2"
-local DataMsg     = MsgID .. "3"
+local msgID       	= "%AAA"
+local hi 			= "1"
+local yes  			= "2"
+local checksumA     = "3"
+local checksumB		= "4"
+local payloadA		= "5"
+local payloadB		= "6"
+local bye			= "7"
+local broadcastA 	= "8"
 
 local maxFileSize = 10 --in kB
 
@@ -33,7 +39,12 @@ local avatarsDir = "LuaUI/Configs/Avatars/"
 local avatar_fallback = avatarsDir .. "Crystal_personal.png"
 
 local myPlayerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
-
+local myPlayerID=Spring.GetMyPlayerID()
+local myTeamID=Spring.GetMyAllyTeamID()
+local playerIDlist={}
+local bufferIndex=0
+local msgRecv={}
+local currentTime=0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -51,7 +62,8 @@ local function SaveToFile(filename, data, hash)
 	local out = assert(io.open(file, "wb"))
 	out:write(data)
 	assert(out:close())
-
+	Spring.Echo(file)
+	
 	return file
 end
 
@@ -60,14 +72,14 @@ local function SearchFileByChecksum(checksum)
 	local files = VFS.DirList(avatarsDir)
 	for i=1,#files do
 		local file = files[i]
-		  local data = VFS.LoadFile(file)
-		if (data:len()/1024 < maxFileSize) then  
-      local file_checksum = CalcChecksum(data)
+		local data = VFS.LoadFile(file)
+		if (data:len()/1024 <= maxFileSize) then
+			local file_checksum = CalcChecksum(data)
 
-        if (file_checksum == checksum) then
-           return file
-        end
-    end
+			if (file_checksum == checksum) then
+				return file
+			end
+		end
 	end
 end
 
@@ -104,7 +116,6 @@ local function SetAvatar(playerName, filename, checksum)
 		checksum = checksum,
 		file = filename,
 	}
-
 	table.save(avatars, configFile)
 end
 
@@ -130,8 +141,7 @@ local function SetMyAvatar(filename)
 
 	local checksum = CalcChecksum(data)
 	SetAvatar(myPlayerName,filename,checksum)
-	Spring.SendLuaUIMsg(ChecksumMsg .. checksum)
-	alreadySent = false
+	Spring.SendLuaUIMsg(msgID .. broadcast) --send 'checkout my new pic!'
 end
 
 
@@ -265,95 +275,258 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---global variable. Store receive list and clearing time
-local spGetGameSeconds = Spring.GetGameSeconds
-local receiveList = {}
-local lastClearingTime = -100
-
-function widget:RecvLuaMsg(msg, playerID)
-	if (msg:sub(1,1) ~= MsgID) then
-		return;
+--communication protocol variables
+local lastWaitingTime =currentTime
+local lastBusyTime=currentTime
+local checklistTable={}
+local waitForTransmission=false
+local lineIsBusy=false
+local openPortForID=-1
+local tableIsCompleted=false
+function widget:Update(n)
+	currentTime=currentTime+n
+	local now=currentTime
+	if now>=1+lastWaitingTime then
+		lastWaitingTime=now
+		waitForTransmission=false
 	end
-
-	if (playerID == Spring.GetMyPlayerID()) then
-		return;
+	if now>=3+lastBusyTime then
+		lastBusyTime=now
+		lineIsBusy=false
 	end
-   
-  --empty receive list every 1 second. Allow sender to re-send request if previous respond fail  
-  local now = spGetGameSeconds()
-  if now >= 1 +lastClearingTime then
-    receiveList[playerID]=-100
-    lastClearingTime=now
-  end
-
-  --check msg with receive list. Allow the whole function to skip if it receive duplicate content    
-  if receiveList[playerID]~=msg then
-    receiveList[playerID]=msg
-  else return; end
-
-	if (msg:sub(1,2) == ChecksumMsg) then
-		--// check other's checksums
-		--// if we don't have an icon or if it got changed send a request
-		local checksum = tonumber(msg:sub(3))
-		local playerName = Spring.GetPlayerInfo(playerID)
-
-		local avatarInfo = avatars[playerName]
-
-		if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-			local file = SearchFileByChecksum(checksum)
-
-			if (file) then
-				--// already downloaded it once, reuse it
-				SetAvatar(playerName,file,checksum)
-			else
-				Spring.SendLuaUIMsg(RequestMsg .. playerID)
+	if not waitForTransmission and not tableIsCompleted then
+		local iteration=1
+		local playerID=playerIDlist[1]
+		local doChecking=true
+		while doChecking and iteration <= #playerIDlist do
+			playerID=playerIDlist[iteration]
+			if playerID~=myPlayerID then --if self, then skip it (don't check self) 
+				if (checklistTable[(playerID+1)].checksum==false and checklistTable[(playerID+1)].payload==false) then --check entry if complete
+					if checklistTable[(playerID+1)].flipflop==1 then --find out if 'send switch' is on
+						doChecking=false
+					end
+				end
 			end
+			iteration=iteration+math.random (0,1)
 		end
-	elseif (msg:sub(1,2) == RequestMsg) then
-		--// somone doesn't have our icon, so compress and send it
-		--if (not alreadySent) then
-			local myAvatar = avatars[myPlayerName]
-			if (myAvatar) then
-				local cdata = VFS.ZlibCompress(VFS.LoadFile(myAvatar.file))
-				local filename = ExtractFileName(myAvatar.file)
+		if doChecking then --last check performed without interruption meaning all entry are complete
+			tableIsCompleted=true
+		else
+			openPortForID=playerID
+			waitForTransmission=true
+			lastWaitingTime=currentTime
+			Spring.SendLuaUIMsg(msgID .. hi .. openPortForID+100) --send 'hi' to colleague
+		end
+	end
 
-				Spring.SendLuaUIMsg(DataMsg .. filename .. '$' .. cdata)
-				--alreadySent = true
+	if bufferIndex>=1 then
+		local playerID=msgRecv[bufferIndex].playerID
+		local msg=msgRecv[bufferIndex].msg
+		msgRecv[bufferIndex]=nil
+		bufferIndex=bufferIndex-1
+		
+		if (msg:sub(1,4) ~= msgID) then
+			return;
+		end
+		destinationID=tonumber(msg:sub(7,8))
+		local myAvatar = avatars[myPlayerName]
+		
+		if openPortForID==playerID and destinationID==myPlayerID and not lineIsBusy then
+			if msg:sub(5,5)==hi then --receive hi from target playerID
+				if myPlayerID>playerID then --only 'low ranking' playerID replied yes
+					--reply with yes
+					Spring.SendLuaUIMsg(msgID .. yes .. openPortForID+100)
+					waitForTransmission=true
+					lastWaitingTime=currentTime
+					lastWaitingTime=lastWaitingTime+2 --extend waitForTransmission				
+				end
+			elseif msg:sub(5,5)==yes then --receive yes
+				Spring.SendLuaUIMsg(msgID .. checksumA .. openPortForID+100 .. "x" .. myAvatar.checksum) --send checksum
+				lastWaitingTime=lastWaitingTime+2 --extend waitForTransmission
+			elseif msg:sub(5,5)==checksumA then --receive checksum
+				checklistTable[(playerID+1)].checksum=true
+				local checksum = tonumber(msg:sub(10))
+				local playerName = Spring.GetPlayerInfo(playerID)
+				local avatarInfo = avatars[playerName]
+				local payloadRequestFlag=0
+				if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
+					local file = SearchFileByChecksum(checksum)
+					if (file) then
+						--// already downloaded it once, reuse it
+						SetAvatar(playerName,file,checksum)
+					else
+						payloadRequestFlag=1
+					end
+				end
+				Spring.SendLuaUIMsg(msgID .. checksumB .. openPortForID+100 .. payloadRequestFlag .. myAvatar.checksum) --send checksum
+			elseif msg:sub(5,5)==checksumB then --receive checksum
+				checklistTable[(playerID+1)].checksum=true
+				local checksum = tonumber(msg:sub(10))
+				local playerName = Spring.GetPlayerInfo(playerID)
+				local avatarInfo = avatars[playerName]
+				local payloadRequestFlag=0
+				if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
+					local file = SearchFileByChecksum(checksum)
+					if (file) then
+						--// already downloaded it once, reuse it
+						SetAvatar(playerName,file,checksum)
+					else
+						payloadRequestFlag=1
+					end
+				end
+				local myAvatar = avatars[myPlayerName]
+				if (msg:sub(9,9)=="1") then
+					local cdata = VFS.ZlibCompress(VFS.LoadFile(myAvatar.file))
+					local filename = ExtractFileName(myAvatar.file)
+					Spring.SendLuaUIMsg(msgID .. payloadA .. openPortForID+100 .. payloadRequestFlag .. "1" .. filename .. '$' .. cdata) --send payload
+				else
+					Spring.SendLuaUIMsg(msgID .. payloadA .. openPortForID+100 .. payloadRequestFlag .. "0") --send "payload package" without payload
+				end
+			elseif msg:sub(5,5)==payloadA then
+				checklistTable[(playerID+1)].payload=true
+				if (msg:sub(10,10)=="1") then --payload "is here!" flag
+					msg = msg:sub(11)
+					local endOfFilename = msg:find('$',1,true)
+					local filename = msg:sub(1,endOfFilename-1)
+					local cdata    = msg:sub(endOfFilename+1)
+
+					local image      = VFS.ZlibDecompress(cdata)
+					local checksum   = CalcChecksum(image)
+
+					local playerName = Spring.GetPlayerInfo(playerID)
+					local avatarInfo = avatars[playerName]
+
+					if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
+						local filename = SaveToFile(filename, image, checksum)
+						SetAvatar(playerName,filename,checksum)
+					end
+				end
+				if (msg:sub(9,9)=="1") then --remote client's payloadRequestFlag
+					local cdata = VFS.ZlibCompress(VFS.LoadFile(myAvatar.file))
+					local filename = ExtractFileName(myAvatar.file)
+					Spring.SendLuaUIMsg(msgID .. payloadB .. openPortForID+100 .. "x" .. "1" .. filename .. '$' .. cdata) --send payload
+				else
+					Spring.SendLuaUIMsg(msgID .. payloadB .. openPortForID+100 .. "x" .. "0") --send "payload package" without payload
+				end
+			elseif (msg:sub(5,5)==payloadB) then
+				checklistTable[(playerID+1)].payload=true
+				if (msg:sub(10,10)=="1") then --payload "is here!" flag
+					msg = msg:sub(11)
+					local endOfFilename = msg:find('$',1,true)
+					local filename = msg:sub(1,endOfFilename-1)
+					local cdata    = msg:sub(endOfFilename+1)
+
+					local image      = VFS.ZlibDecompress(cdata)
+					local checksum   = CalcChecksum(image)
+
+					local playerName = Spring.GetPlayerInfo(playerID)
+					local avatarInfo = avatars[playerName]
+
+					if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
+						local filename = SaveToFile(filename, image, checksum)
+						SetAvatar(playerName,filename,checksum)
+					end
+				end
+				Spring.SendLuaUIMsg(msgID .. bye .. openPortForID+100)
+				waitForTransmission=false
+			elseif (msg:sub(5,5)==bye) then
+				waitForTransmission=false
 			end
-		--end
-	elseif (msg:sub(1,2) == DataMsg) then
-		--// received an icon, save it to disk
-		msg = msg:sub(3)
-		local endOfFilename = msg:find('$',1,true)
-		local filename = msg:sub(1,endOfFilename-1)
-		local cdata    = msg:sub(endOfFilename+1)
+		elseif myPlayerID==destinationID then
+			if msg:sub(5,5)==hi then --receive hi from someone
+				if myPlayerID>playerID or tableIsCompleted then --if I am the'low ranking' playerID then reply yes, else don't
+					--reply with yes
+					openPortForID=playerID
+					waitForTransmission=true
+					lastWaitingTime=currentTime
+					lastWaitingTime=lastWaitingTime+2 --extend waitForTransmission				
+					Spring.SendLuaUIMsg(msgID .. yes .. openPortForID+100)
+				end 
+			end
+		elseif myPlayerID~=destinationID then --if noise
+			if msg:sub(5,5)==yes then --listen hi from someone
+				if myPlayerID>playerID then --if he is the'high ranking' playerID
+					lineIsBusy=true --assume they took command of the communication medium
+					waitForTransmission=true
+					lastBusyTime=currentTime
+					lastWaitingTime=currentTime
+					lastWaitingTime=lastWaitingTime+2 --extend waitForTransmission
+				end 
+			elseif (msg:sub(5,5)==payloadB or msg:sub(5,5)==payloadA) then --snif package transfer and save for our own
+				if (msg:sub(10,10)=="1") then --payload "is here!" flag
+					msg = msg:sub(11)
+					local endOfFilename = msg:find('$',1,true)
+					local filename = msg:sub(1,endOfFilename-1)
+					local cdata    = msg:sub(endOfFilename+1)
 
-		local image      = VFS.ZlibDecompress(cdata)
-		local checksum   = CalcChecksum(image)
+					local image      = VFS.ZlibDecompress(cdata)
+					local checksum   = CalcChecksum(image)
 
-		local playerName = Spring.GetPlayerInfo(playerID)
-		local avatarInfo = avatars[playerName]
+					local playerName = Spring.GetPlayerInfo(playerID)
+					local avatarInfo = avatars[playerName]
 
-		if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-			local filename = SaveToFile(filename, image, checksum)
-			SetAvatar(playerName,filename,checksum)
+					if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
+						local filename = SaveToFile(filename, image, checksum)
+						SetAvatar(playerName,filename,checksum)
+						checklistTable[((playerID+1))].checksum=true
+						checklistTable[((playerID+1))].payload=true
+					end
+				end
+			elseif msg:sub(5,5)==checksumA or msg:sub(5,5)==checksumB then --snif checksum transfer and save it for our own
+				local checksum = tonumber(msg:sub(10))
+				local playerName = Spring.GetPlayerInfo(playerID)
+				local avatarInfo = avatars[playerName]
+				if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
+					local file = SearchFileByChecksum(checksum)
+					if (file) then
+						--// already downloaded it once, reuse it
+						SetAvatar(playerName,file,checksum)
+						checklistTable[((playerID+1))].checksum=true
+						checklistTable[((playerID+1))].payload=true
+					end
+				end
+			elseif (msg:sub(5,5)==bye) then
+				lineIsBusy=false
+				waitForTransmission=false
+			elseif (msg:sub(5,5)==broadcast) then
+				checklistTable[(playerID+1)].payload=false --reset checklist entry for this player
+				checklistTable[(playerID+1)].checksum=false
+				tableIsCompleted=false
+			end
 		end
 	end
 end
 
+function widget:RecvLuaMsg(msg, playerID)
+	bufferIndex=bufferIndex+1
+	msgRecv[bufferIndex]={msg=msg, playerID=playerID}
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+function widget:PlayerChanged(playerID)
+	playerIDlist=Spring.GetPlayerList(myTeamID,true)
+end
 
 function widget:Initialize()
+	playerIDlist=Spring.GetPlayerList(myTeamID)
 	avatars = (VFS.FileExists(configFile) and VFS.Include(configFile)) or {}
-
+	math.randomseed (myPlayerID)
+	--fill checklist with initial value
+	local iteration =1
+	local playerID=playerIDlist[1]
+	while iteration <= #playerIDlist do
+		playerID=playerIDlist[iteration]
+		checklistTable[(playerID+1)]={checksum=false, payload=false} --fill checklist entry with default value
+		iteration=iteration+1
+	end
+	
 	--// remove broken entries
 	for playerName,avInfo in pairs(avatars) do
 		if (not VFS.FileExists(avInfo.file)) then
 			avatars[playerName] = nil
 		end
 	end
-
 	
 	--// send my avatar checksum to all players (so they can request a download if needed)
 	local myAvatar = avatars[myPlayerName]
@@ -361,17 +534,25 @@ function widget:Initialize()
 	local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 	
 	if (customKeys ~= nil and customKeys.avatar~=nil) then 
-		myAvatar = { file = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"}
-		
+		myAvatar = { file = avatarsDir .. customKeys.avatar .. ".png"}
 	end 
-
 	
 	if (myAvatar) then
-		myAvatar.checksum = CalcChecksum(VFS.LoadFile(myAvatar.file))
-		Spring.SendLuaUIMsg(ChecksumMsg .. myAvatar.checksum)
-		SetAvatar(name, myAvatar.file, myAvatar.checksum)
-	end
-
+		local data = VFS.LoadFile(myAvatar.file)
+		if (data:len()/1024 <= maxFileSize) then --if customkey's avatar is less than 10kb:use it
+			myAvatar.file=myAvatar.file
+		elseif (VFS.FileExists(avatars[myPlayerName]))then --else use my local avatar file.
+			myAvatar.file=avatars[myPlayerName]
+		end
+	else --else if none of above then use fallback/default avatar
+		myAvatar={
+			checksum = avatar_fallback_checksum,
+			file = avatar_fallback
+		}  
+	end 
+	myAvatar.checksum = CalcChecksum(VFS.LoadFile(myAvatar.file))
+	SetAvatar(myPlayerName, myAvatar.file, myAvatar.checksum)	
+	
 	WG.Avatar = {
 		GetAvatar   = GetAvatar;
 		SetMyAvatar = SetMyAvatar;
@@ -381,7 +562,7 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	table.save(avatars, configFile)
+	--table.save(avatars, configFile) <--will not save when exiting because if the widget exit too early it will save incomplete table
 
 	WG.Avatar = nil
 	widgetHandler:RemoveAction("setavatar");
@@ -389,3 +570,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+
+
