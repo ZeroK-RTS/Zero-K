@@ -141,7 +141,7 @@ local function SetMyAvatar(filename)
 
 	local checksum = CalcChecksum(data)
 	SetAvatar(myPlayerName,filename,checksum)
-	Spring.SendLuaUIMsg(msgID .. broadcast) --send 'checkout my new pic!'
+	Spring.SendLuaUIMsg(msgID .. broadcastA) --send 'checkout my new pic!'
 end
 
 
@@ -510,6 +510,11 @@ end
 
 function widget:Initialize()
 	playerIDlist=Spring.GetPlayerList(myTeamID)
+	if playerIDlist==nil then
+		local dummy={}
+		playerIDlist=dummy --in case there's no playerlist
+		playerIDlist[1]=myPlayerID
+	end
 	avatars = (VFS.FileExists(configFile) and VFS.Include(configFile)) or {}
 	math.randomseed (myPlayerID)
 	--fill checklist with initial value
@@ -541,8 +546,13 @@ function widget:Initialize()
 		local data = VFS.LoadFile(myAvatar.file)
 		if (data:len()/1024 <= maxFileSize) then --if customkey's avatar is less than 10kb:use it
 			myAvatar.file=myAvatar.file
-		elseif (VFS.FileExists(avatars[myPlayerName]))then --else use my local avatar file.
-			myAvatar.file=avatars[myPlayerName]
+		elseif VFS.FileExists(avatars[myPlayerName].file) then --else use my local avatar file.
+			myAvatar.file=avatars[myPlayerName].file
+		else
+			myAvatar={
+				checksum = avatar_fallback_checksum,
+				file = avatar_fallback
+			} 
 		end
 	else --else if none of above then use fallback/default avatar
 		myAvatar={
@@ -570,6 +580,8 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+
 
 
 
