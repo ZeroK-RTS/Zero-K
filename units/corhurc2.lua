@@ -158,7 +158,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 500,
       reloadtime              = 10,
-      renderType              = 6,
       soundHit                = [[weapon/burn_mixed]],
       soundStart              = [[weapon/bomb_drop_short]],
       sprayangle              = 64000,
