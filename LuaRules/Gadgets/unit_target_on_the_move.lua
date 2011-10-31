@@ -90,7 +90,7 @@ end
 -- Unit adding/removal
 
 local function validUnit(unitDefID)
-    return UnitDefs[unitDefID] and UnitDefs[unitDefID].canAttack and UnitDefs[unitDefID].canMove
+    return UnitDefs[unitDefID] and UnitDefs[unitDefID].canAttack and UnitDefs[unitDefID].canMove and not UnitDefs[unitDefID].canFly and UnitDefs[unitDefID].maxWeaponRange and UnitDefs[unitDefID].maxWeaponRange > 0
 end
 
 local function addUnit(unitID, data)
@@ -179,7 +179,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	
     
     if cmdID == CMD_UNIT_SET_TARGET  then
-        if UnitDefs[unitDefID] and not UnitDefs[unitDefID].canFly and UnitDefs[unitDefID].maxWeaponRange and UnitDefs[unitDefID].maxWeaponRange > 0 then
+        if validUnit(unitDefID) then
             if #cmdParams == 3 then
                 addUnit(unitID, {
                     id = unitID, 
