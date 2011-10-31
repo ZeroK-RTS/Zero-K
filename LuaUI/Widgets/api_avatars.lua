@@ -1,4 +1,4 @@
-local versionName = "v2.0"
+local versionName = "v2.01"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -546,8 +546,10 @@ function widget:Initialize()
 		local data = VFS.LoadFile(myAvatar.file)
 		if (data:len()/1024 <= maxFileSize) then --if customkey's avatar is less than 10kb:use it
 			myAvatar.file=myAvatar.file
-		elseif VFS.FileExists(avatars[myPlayerName].file) then --else use my local avatar file.
-			myAvatar.file=avatars[myPlayerName].file
+		elseif avatars[myPlayerName]~=nil then 
+			if VFS.FileExists(avatars[myPlayerName].file) then --else use my local avatar file.
+				myAvatar.file=avatars[myPlayerName].file
+			end
 		else
 			myAvatar={
 				checksum = avatar_fallback_checksum,
@@ -580,6 +582,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
 
 
 
