@@ -80,7 +80,7 @@ unitDef = {
     {
       def                = [[BOMBSABOT]],
       mainDir            = [[0 -1 0]],
-      maxAngleDif        = 70,
+      maxAngleDif        = 120,
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
 	
@@ -132,6 +132,7 @@ unitDef = {
       commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
+	  cylinderTargetting	  = 1,
 
       damage                  = {
         default = 1200,
@@ -142,12 +143,12 @@ unitDef = {
       explosionGenerator      = [[custom:xamelimpact]],
       fireStarter             = 70,
       flightTime              = 2,
-      guidance                = true,
+	  heightmod				  = 0,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_b_paveway.s3o]],
-      range                   = 600,
+      range                   = 100,
       reloadtime              = 5,
       selfprop                = true,
       smokedelay              = [[0.1]],
