@@ -288,7 +288,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		
 		local icon = nil
 		local icRank = nil 
-		local icCountry = nil
+		local icCountry = country ~= '' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
 		
 		-- clan/faction emblems, level, country
 		if (not pdata.isAI and customKeys ~= nil) then 
@@ -300,9 +300,6 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			if customKeys.level ~= nil and customKeys.level~="" then 
 				icRank = "LuaUI/Images/Ranks/" .. (1+math.ceil((customKeys.level or 0)/10)) .. ".png"
 			end
-			if customKeys.country ~= nil and customKeys.country ~= "" then 
-				icCountry = "LuaUI/Images/flags/" .. (country or '') .. ".png"
-			end 
 		end 
 	
 		local min_pingTime = math.min(pingTime, 1)
