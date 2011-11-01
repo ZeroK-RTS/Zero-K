@@ -250,7 +250,7 @@ options = {
 		name = "Enter Trackmode",
 		desc = "Track the selected unit (midclick to cancel)",
 		type = 'button',
-        hotkey = {key='t', mod='a+'},
+        hotkey = {key='t', mod='alt+'},
 		OnChange = function(self) trackmode = true; end,
 	},
     
