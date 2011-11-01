@@ -1,4 +1,4 @@
-local versionName = "v1.26"
+local versionName = "v1.251"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System (experimental)",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Oct 28, 2011",
+    date      = "Nov 11, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -89,7 +89,7 @@ local myTeamID=-1
 local myPlayerID=-1
 local surroundingOfActiveUnitG={} --store value for transfer between function. Store obstacle separation, los, and ect.
 local cycleG=1 --first execute "GetPreliminarySeparation()"
-local wreckageID_offset=4500
+local wreckageID_offset=0
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
@@ -106,13 +106,20 @@ function widget:Initialize()
 		local _,_,spectator,_,_,_,_,_,_=spGetPlayerInfo(playerIDList[i])
 		if spectator then numberOfPlayers=numberOfPlayers-1 end
 	end
-	wreckageID_offset=wreckageID_offset+ (numberOfPlayers-2)*1500
+	wreckageID_offset=4500+ (numberOfPlayers-2)*1500
 	if (turnOnEcho == 1) then Spring.Echo("myTeamID(Initialize)" .. myTeamID) end
 end
 
 function widget:PlayerChanged(playerID)
-	if playerID==myPlayerID then widgetHandler:RemoveWidget() end
-	wreckageID_offset=wreckageID_offset-1500
+	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end
+	--count players to offset the ID of wreckage
+	local playerIDList= Spring.GetPlayerList()
+	local numberOfPlayers=#playerIDList
+	for i=1,numberOfPlayers do
+		local _,_,spectator,_,_,_,_,_,_=spGetPlayerInfo(playerIDList[i])
+		if spectator then numberOfPlayers=numberOfPlayers-1 end
+	end
+	wreckageID_offset=4500+ (numberOfPlayers-2)*1500
 end
 
 --execute different function at different timescale
@@ -328,12 +335,12 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 	if newCommand then	--user or widget command?
 		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate)
 		commandIndexTable[unitID]["patienceIndexA"]=0
-	elseif cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then
+	elseif not newCommand then --cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then
 		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate)	
-	else
+	--else
 		--if for some reason cQueue is still not newCommand, but command queue[2] is already empty then use these backup value as target:
 		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
-		targetCoordinate={-1, -1, -1}
+		--targetCoordinate={-1, -1, -1}
 	end
 	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger --return target coordinate
 end
@@ -547,18 +554,25 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		-- Spring.Echo(a[queueIndex]["name"])
 		local wreckPosX, wreckPosY, wreckPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
 		local targetFeatureID=-1
-		if cQueue[queueIndex].params[1]>wreckageID_offset then --if command contain value greater then 'wreckageID_offset' then it is suppose to be a wreck
-			targetFeatureID= cQueue[queueIndex].params[1]-wreckageID_offset --offset the value
-			wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
-		else --if command has normal signature then it is reclaim active unit
-			targetFeatureID=cQueue[queueIndex].params[1]
-			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
+		local iterativeTest=1
+		local foundMatch=false
+		targetFeatureID=cQueue[queueIndex].params[1] +1500 +wreckageID_offset
+		while iterativeTest<=3 and not foundMatch do
+			if Spring.ValidFeatureID(targetFeatureID) then
+				foundMatch=true
+				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
+			elseif Spring.ValidUnitID(targetFeatureID) then
+				foundMatch=true
+				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
+			end
+			iterativeTest=iterativeTest+1
+			targetFeatureID=targetFeatureID-1500
 		end
-		if not Spring.ValidFeatureID(targetFeatureID) and not Spring.ValidUnitID(targetFeatureID) then
-			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+		if foundMatch==false then
+			if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
+				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+			end
 		end
-		Spring.Echo(cQueue[queueIndex].params[1])
-		Spring.Echo(wreckageID_offset)
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
 		commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=wreckPosY
@@ -567,8 +581,9 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 	elseif cQueue[queueIndex].id==40 then
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
 		local targetUnitID=cQueue[queueIndex].params[1]
-		unitPosX, unitPosY, unitPosZ = spGetUnitPosition(targetUnitID)
-		if not Spring.ValidUnitID(cQueue[queueIndex].params[1]) then
+		if Spring.ValidUnitID(targetUnitID) then
+			unitPosX, unitPosY, unitPosZ = spGetUnitPosition(targetUnitID)
+		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
