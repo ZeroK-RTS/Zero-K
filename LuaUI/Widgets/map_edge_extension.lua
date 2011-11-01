@@ -8,7 +8,7 @@ function widget:GetInfo()
     license   = "GPL",
     layer     = 0,
     enabled   = true,
-	detailsDefault = Spring.GetConfigInt("widgetDetailLevel", 3) >= 3,
+	detailsDefault = 3
   }
 end
 

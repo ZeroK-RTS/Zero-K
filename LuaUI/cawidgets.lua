@@ -78,6 +78,8 @@ VFSMODE = localWidgetsFirst and VFS.RAW_FIRST
 VFSMODE = VFSMODE or localWidgets and VFS.ZIP_FIRST
 VFSMODE = VFSMODE or VFS.ZIP
 
+local detailLevel = Spring.GetConfigInt("widgetDetailLevel", 3)
+
 --------------------------------------------------------------------------------
 
 -- install bindings for TweakMode and the Widget Selector
@@ -501,8 +503,14 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
     enabled = false
   end
 
-  if resetWidgetDetailLevel and info.detailsDefault ~= nil then 
-	enabled = info.detailsDefault
+  if resetWidgetDetailLevel and info.detailsDefault ~= nil then
+	if type(info.detailsDefault) == "table" then
+		enabled = info.detailsDefault[detailLevel] and true
+	elseif type(info.detailsDefault) == "number" then
+		enabled = detailLevel > info.detailsDefault
+	elseif tonumber(info.detailsDefault) then
+		enabled = detailLevel > info.detailsDefault
+	end
   end
 			 
   if (enabled) then
