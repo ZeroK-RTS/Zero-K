@@ -282,7 +282,7 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		local playerID = pdata.player
 		
 		local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(playerID)
-			
+		
 		pingTime = pingTime or 0
 		cpuUsage = cpuUsage or 0
 		
@@ -560,13 +560,16 @@ SetupPlayerNames = function()
 	scroll_cpl.tooltip = windowTooltip
 	
 	--push things to bottom of window if needed
-	scroll_cpl.height = math.min(row * (options.text_height.value+4),window_cpl.height - window_cpl.padding[2] - window_cpl.padding[4])
+	--scroll_cpl.width = x_bound --window_cpl.width - window_cpl.padding[1] - window_cpl.padding[3]
+	local height = row * (options.text_height.value+4)
+	--window_cpl.minimumSize = {x_bound, height}
+	scroll_cpl.height = math.min(height, window_cpl.height)
 	if not (options.alignToTop.value) then 
-		scroll_cpl.y = window_cpl.height - scroll_cpl.height
+		scroll_cpl.y = (window_cpl.height - window_cpl.padding[2]) - scroll_cpl.height
 	else
 		scroll_cpl.y = 0
 	end
-	scroll_cpl:Invalidate()
+	window_cpl:Invalidate()
 end
 
 
@@ -580,10 +583,17 @@ function widget:Shutdown()
 end
 
 local timer = 0
+local lastSizeX
+local lastSizeY
 function widget:Update(s)
 	timer = timer + s
 	if timer > UPDATE_FREQUENCY then
 		timer = 0
+		if lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height then
+			SetupPlayerNames()	-- size changed; regen everything
+			lastSizeX = window_cpl.width
+			lastSizeY = window_cpl_height
+		end
 		UpdatePlayerInfo()
 	end
 end
@@ -641,7 +651,7 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
-		--minimumSize = {MIN_WIDTH, MIN_HEIGHT},
+		minimumSize = {x_bound, 1},
 
 	}
 	scroll_cpl = ScrollPanel:New{
@@ -650,7 +660,8 @@ function widget:Initialize()
 		height = "100%",
 		--padding = {2,2,2,2},
 		backgroundColor  = {0,0,0,0},
-		padding = {0, 0, 0, 0};
+		padding = {0, 0, 0, 0},
+		--autosize = true,
 	}
 
 	-- enable scrollpanel tooltip (not in default Chili)
@@ -659,4 +670,6 @@ function widget:Initialize()
 	SetupPlayerNames()
 	
 	Spring.SendCommands({"info 0"})
+	lastSizeX = window_cpl.width
+	lastSizeY = window_cpl_height
 end
