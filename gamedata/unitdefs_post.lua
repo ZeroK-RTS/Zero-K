@@ -72,28 +72,35 @@ for _, ud in pairs(UnitDefs) do
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Convert all CustomParams to strings
---
-
-for name, ud in pairs(UnitDefs) do
-  if (ud.customparams) then
-    for tag,v in pairs(ud.customparams) do
-      if (type(v) ~= "string") then
-        ud.customparams[tag] = tostring(v)
-      end
-    end
-  end
-end 
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
 -- Modular commander handling
 --
 
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
 
 VFS.Include('gamedata/planetwars/pw_unitdefgen.lua')
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Convert all CustomParams to strings
+--
+
+for name, ud in pairs(UnitDefs) do
+  if (ud.customparams) then
+    for tag,v in pairs(ud.customparams) do
+      if (type(v) == "table") then
+	    local str = "{"
+		for i=1,#v do
+			str = str .. [["]] .. v[i] .. [[", ]]
+		end
+		str = str .. "}"
+        ud.customparams[tag] = str
+      elseif (type(v) ~= "string") then
+        ud.customparams[tag] = tostring(v)
+      end
+    end
+  end
+end 
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

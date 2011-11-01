@@ -457,7 +457,6 @@ upgrades = {
 		func = function(unitDef)
 				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
 				unitDef.activatewhenbuilt = true
-				unitDef.onoffable = true
 			end,
 	},
 	module_resurrect = {
@@ -474,7 +473,8 @@ upgrades = {
 		func = function(unitDef)
 				ApplyWeapon(unitDef, "commweapon_areashield", 2)
 				unitDef.activatewhenbuilt = true
-				unitDef.onoffable = true
+				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
+				table.insert(unitDef.customparams.lups_unit_fxs, "commShield")
 			end,
 	},	
 	module_cloak_field = {

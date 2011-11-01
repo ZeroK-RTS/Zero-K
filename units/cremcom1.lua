@@ -43,7 +43,7 @@ unitDef = {
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
-	lups_unit_fxs = [[ { "commandAuraRed" } ]],
+	lups_unit_fxs = { "commandAuraRed" },
   },
 
   energyMake             = 3.2,

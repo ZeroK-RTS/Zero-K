@@ -192,7 +192,7 @@ for name, data in pairs(commDefs) do
 	end	
 	if data.customparams.speedbonus then
 		commDefs[name].maxvelocity = commDefs[name].maxvelocity + (commDefs[name].customparams.basespeed*data.customparams.speedbonus)
-	end	
+	end
 	
 	-- calc lightning real damage based on para damage
 	-- TODO: use for slow-beams

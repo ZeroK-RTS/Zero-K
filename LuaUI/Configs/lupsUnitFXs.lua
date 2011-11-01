@@ -15,6 +15,10 @@ local presets = {
 		{class='StaticParticles', options=commandCoronaBlue},
 		{class='GroundFlash', options=MergeTable({radiusFactor=3,mobile=true,life=math.huge},groundFlashBlue)},
 	},	
+	
+	commShield = {
+		{class='ShieldJitter', options={delay=0, life=math.huge, heightFactor = 0.75, size=350, strength = .001, precision=50, repeatEffect=true}},
+	},
 }
 
 effectUnitDefs = {
@@ -273,6 +277,7 @@ for i=1,#UnitDefs do
 					table.insert(effectUnitDefs[unitDef.name],toAdd[i])	-- append to unit's lupsFX table
 				end
 			end
+			Spring.Echo(unitDef.name)
 		end
 	end
 end
