@@ -49,6 +49,7 @@ local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(gaiaTeamID))
 local aliveCount = {}
 local destroyedAlliances = {}
 
+local isTesting == Spring.GetModOption("zkmode",false,nil) == nil
 local destroy_type = 'destroy'
 local commends = false
 
@@ -182,7 +183,7 @@ end
 
 -- check for active players
 local function ProcessLastAlly()	
-    if Spring.IsCheatingEnabled() then
+    if Spring.IsCheatingEnabled() or isTesting then
 	  return
     end
     local allylist = Spring.GetAllyTeamList()

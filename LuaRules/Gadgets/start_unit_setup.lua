@@ -133,6 +133,7 @@ local function CheckForShutdown()
 	end
 end
 
+local buildMult = 0.999
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	--[[
 	if not gamestart then
@@ -162,7 +163,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		]]--
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
 		--Spring.SetUnitHealth(unitID, maxHealth-1)	-- can't be full health; else if you stop the construction you can't resume it!
-		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
+		Spring.SetUnitHealth(unitID, {health = maxHealth*buildMult, build = buildMult })
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
@@ -186,6 +187,7 @@ end
 
 
 function gadget:UnitFinished(unitID, unitDefID)
+	--Spring.Echo(Spring.GetGameFrame())
 	if plop and facplopsrunning[unitID] then
 		facplopsrunning[unitID] = nil
 		-- reset to original costs
