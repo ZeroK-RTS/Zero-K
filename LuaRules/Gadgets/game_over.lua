@@ -49,7 +49,6 @@ local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(gaiaTeamID))
 local aliveCount = {}
 local destroyedAlliances = {}
 
-local isTesting == Spring.GetModOption("zkmode",false,nil) == nil
 local destroy_type = 'destroy'
 local commends = false
 
@@ -183,7 +182,7 @@ end
 
 -- check for active players
 local function ProcessLastAlly()	
-    if Spring.IsCheatingEnabled() or isTesting then
+    if Spring.IsCheatingEnabled() then
 	  return
     end
     local allylist = Spring.GetAllyTeamList()
@@ -271,6 +270,10 @@ function gadget:UnitTaken(u, ud, oldTeam, newTeam)
 end
 
 function gadget:Initialize()
+	if Spring.GetModOption("zkmode",false,nil) == nil then
+		Spring.Echo("Game Over: Testing mode. Gadget removed.").
+		gadgetHandler:RemoveGadget()		
+	end
 	gaiaTeam = Spring.GetGaiaTeamID()
 	_,_,_,_,_, gaiaAlliance = Spring.GetTeamInfo(gaiaTeam)
 	CheckAllUnits()

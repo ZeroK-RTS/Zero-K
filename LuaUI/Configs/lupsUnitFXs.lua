@@ -277,7 +277,6 @@ for i=1,#UnitDefs do
 					table.insert(effectUnitDefs[unitDef.name],toAdd[i])	-- append to unit's lupsFX table
 				end
 			end
-			Spring.Echo(unitDef.name)
 		end
 	end
 end

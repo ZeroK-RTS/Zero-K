@@ -93,6 +93,8 @@ local customKeys = {}	-- [playerID] = {}
 
 local waitingForComm = {}
 
+local toFinish = {}
+
 -- deprecated
 local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
@@ -166,6 +168,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth*buildMult, build = buildMult })
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
+		local frame = Spring.GetGameFrame() + 1
+		toFinish[frame] = toFinish[frame] or {}
+		table.insert(toFinish[frame], unitID)
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
 		--facplopsrunning[unitID] = true
 		CheckForShutdown()
@@ -187,7 +192,6 @@ end
 
 
 function gadget:UnitFinished(unitID, unitDefID)
-	--Spring.Echo(Spring.GetGameFrame())
 	if plop and facplopsrunning[unitID] then
 		facplopsrunning[unitID] = nil
 		-- reset to original costs
@@ -775,6 +779,13 @@ function gadget:GameFrame(n)
 		SpawnStartUnit(spawnData[1], spawnData[2])
 	end
 	scheduledSpawn[n] = nil
+  end
+  if toFinish[n] then
+	for _, unitID in pairs(toFinish[n]) do
+		local maxHealth = select(2, Spring.GetUnitHealth(unitID))
+		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
+	end
+	toFinish[n] = nil  
   end
 end
 
