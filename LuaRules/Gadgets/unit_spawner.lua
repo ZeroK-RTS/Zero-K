@@ -854,7 +854,7 @@ local function Wave()
   else
 	techDecel = humanAggro * humanAggroTechTimeProgress
   end
-  totalTechAccel = totalTechAccel - techDecel
+  totalTechAccel = totalTechAccel - techDecel + techAccelPerPlayer*(playerCount-1)
   totalTechAccel = math.max(totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
   Spring.SetGameRulesParam("techAccel", totalTechAccel)
   

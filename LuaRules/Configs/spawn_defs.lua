@@ -13,7 +13,7 @@ eggDecayTime = 180
 spawnSquare          = 150       -- size of the chicken spawn square centered on the burrow
 spawnSquareIncrement = 1         -- square size increase for each unit spawned
 burrowName           = "roost"   -- burrow unit name
-playerMalus          = 1         -- how much harder it becomes for each additional player, exponential (playercount^playerMalus = malus)
+playerMalus          = 1         -- how much harder it becomes for each additional player, exponential (playercount^playerMalus = malus)	-- used only for burrow spawn rate and queen XP
 lagTrigger           = 0.7       -- average cpu usage after which lag prevention mode triggers
 triggerTolerance     = 0.05      -- increase if lag prevention mode switches on and off too fast
 maxAge               = 5*60      -- chicken die at this age, seconds
@@ -33,7 +33,7 @@ alwaysVisible        = false     -- chicken are always visible
 burrowSpawnRate      = 60        -- higher in games with many players, seconds
 chickenSpawnRate     = 59
 minBaseDistance      = 700      
-maxBaseDistance      = 4000
+maxBaseDistance      = 3500
 
 gracePeriod          = 180       -- no chicken spawn in this period, seconds
 gracePenalty		 = 15		-- reduced grace per player over one, seconds
@@ -62,7 +62,8 @@ humanAggroQueenTimeFactor = 1	-- burrow queen time is multiplied by this and agg
 humanAggroQueenTimeMin = 0	-- min value of aggro for queen time calc
 humanAggroQueenTimeMax = 8
 
-techTimeFloorFactor	= 0.5 -- tech timer can never be less than this * real time
+techAccelPerPlayer	= 5		-- how much tech accel increases per player over one per wave, seconds
+techTimeFloorFactor	= 0.5	-- tech timer can never be less than this * real time
 
 scoreMult			= 1
 
@@ -135,32 +136,34 @@ end
 -- times in minutes
 local chickenTypes = {
   chicken        =  {time =  -60,  squadSize =   3, obsolete = 30},
-  chicken_pigeon =  {time =  7,  squadSize =   1.4, obsolete = 50},
-  chickens       =  {time = 14,  squadSize =   1, obsolete = 45},
-  chickena       =  {time = 20,   squadSize = 0.5, obsolete = 45},
-  chickenr       =  {time = 25,  squadSize = 1.2, obsolete = 60},
-  chickenwurm    =  {time = 30,  squadSize =   0.7},  
-  chicken_sporeshooter =  {time = 35,  squadSize =   0.5},
-  chicken_roc	 =  {time = 35,  squadSize =   0.5},
-  chicken_dodo   =  {time = 40,  squadSize =   1.8, obsolete = 70},
-  chickenf       =  {time = 45,  squadSize = 0.5},
-  chickenc       =  {time = 50,  squadSize = 0.5},
-  chickenblobber =  {time = 55,  squadSize = 0.3},
-  chicken_blimpy =  {time = 60,  squadSize = 0.2},
-  chicken_tiamat =  {time = 70,  squadSize = 0.2},
+  chicken_pigeon =  {time =  6,  squadSize =   1.4, obsolete = 40},
+  chickens       =  {time = 12,  squadSize =   1, obsolete = 40},
+  chickena       =  {time = 18,   squadSize = 0.5, obsolete = 45},
+  chickenr       =  {time = 24,  squadSize = 1.2, obsolete = 50},
+  --chicken_leaper =  {time = 24,  squadSize = 2, obsolete = 45},  
+  chickenwurm    =  {time = 28,  squadSize =   0.7},
+  chicken_roc	 =  {time = 28,  squadSize =   0.5},  
+  chicken_sporeshooter =  {time = 32,  squadSize =   0.5},
+  chickenf       =  {time = 36,  squadSize = 0.5},
+  chickenc       =  {time = 42,  squadSize = 0.5},
+  chickenblobber =  {time = 48,  squadSize = 0.3},
+  chicken_blimpy =  {time = 55,  squadSize = 0.2},
+  chicken_tiamat =  {time = 60,  squadSize = 0.2},
   
   --chicken_shield =  {time = 99999,  squadSize = 0.01},	--workaround to get it into a list
 }
 
 local defenders = {
-  chickend =  {time = 20, squadSize = 0.65 },
+  chickend = {time = 20, squadSize = 0.65 },
+  chicken_dodo = {time = 30,  squadSize = 2}, 
+  chicken_spidermonkey =  {time = 25, squadSize = 0.7},
   --chicken_rafflesia =  {time = 30, squadSize = 0.4 },
 }
 
 local supporters = {
-  --chickenspire =  {time = 50, squadSize = 0.1, quasiAttacker = true, },
-  chicken_shield =  {time = 30, squadSize = 0.6, quasiAttacker = true, },
-  chicken_spidermonkey =  {time = 20, squadSize = 0.7, quasiAttacker = true, },
+  --chickenspire =  {time = 50, squadSize = 0.1},
+  chicken_shield =  {time = 30, squadSize = 0.6},
+  chicken_spidermonkey =  {time = 20, squadSize = 0.7},
 }
 
 -- TODO
@@ -203,6 +206,7 @@ difficulties = {
 	waveSizeMult	 = 0.9,
     timeSpawnBonus   = .03,
 	queenHealthMod	 = 0.75,
+	techAccelPerPlayer = 4,
 	scoreMult		 = 0.66,
   },
 
@@ -222,6 +226,7 @@ difficulties = {
 	queenHealthMod	 = 1.5,
 	queenSpawnMult   = 5,
 	miniQueenTime	 = {0.5},
+	techAccelPerPlayer	= 7.5,
 	scoreMult		 = 1.25,
   },
   
@@ -240,6 +245,7 @@ difficulties = {
 	queenHealthMod	 = 2,
 	miniQueenTime	 = {0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
+	techAccelPerPlayer	= 10,
 	scoreMult		 = 2,
   },
 
