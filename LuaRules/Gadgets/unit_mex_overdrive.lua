@@ -586,9 +586,12 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 	local summedMetalProduction = 0
 	local maxedMetalProduction = 0
 		
-	local summedOverdriveMetal = 0
-	local maxedOverdriveMetal = 0
-	
+	local summedBaseMetal = 0
+	local maxedBaseMetal = 0
+    
+    local summedOverdrive = 0
+	local maxedOverdrive = 0
+    
 	local allyMetal = allyTeamData.mexMetal
 	local allyMetalSquared = allyTeamData.mexSquaredSum
 	
@@ -639,7 +642,8 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
 								Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
 								maxedMetalProduction = maxedMetalProduction + thisMexM
-								maxedOverdriveMetal = maxedOverdriveMetal + orgMetal * metalMult
+								maxedBaseMetal = maxedBaseMetal + orgMetal
+                                maxedOverdrive = summedOverdrive + orgMetal * metalMult
 								allyMetalSquared = allyMetalSquared - orgMetal * orgMetal
 								gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
 								
@@ -661,8 +665,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
 					Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
 					summedMetalProduction = summedMetalProduction + thisMexM
-					summedOverdriveMetal = summedOverdriveMetal + orgMetal * metalMult
-					
+					summedBaseMetal = summedBaseMetal + orgMetal
+                    summedOverdrive = summedOverdrive + orgMetal * metalMult
+                    
 					gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
 					local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 					if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
@@ -691,7 +696,8 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 
 	return energyWasted,
 		summedMetalProduction + maxedMetalProduction,
-		summedOverdriveMetal + maxedOverdriveMetal,
+		summedBaseMetal + maxedBaseMetal,
+        summedOverdrive + maxedOverdrive,
 		gridEnergySpent,
 		gridMetalGain;
 end
@@ -837,7 +843,7 @@ function gadget:GameFrame(n)
 			end
 
 			--// Use the free Grid-Energy for Overdrive
-			local energyWasted, summedMetalProduction, summedOverdriveMetal, gridEnergySpent, gridMetalGain = OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
+			local energyWasted, summedMetalProduction, summedBaseMetal, summedOverdrive, gridEnergySpent, gridMetalGain = OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 			
 			local ODenergy = allyE - energyWasted
 
@@ -890,7 +896,8 @@ function gadget:GameFrame(n)
 				if stunned_or_inbuld then
 					orgMetal = 0
 				end
-				
+				summedBaseMetal =summedBaseMetal + orgMetal
+                
 				Spring.SetUnitRulesParam(unitID, "overdrive", 1)
 				Spring.CallCOBScript(unitID, "SetSpeed", 0, orgMetal * 500) 
 
@@ -935,7 +942,7 @@ function gadget:GameFrame(n)
 				local teamID = allyTeamData.team[i]
                 local te = teamEnergy[teamID]
 				Spring.AddTeamResource(teamID, "m", summedMetalProduction / allyTeamData.teams)
-				SendToUnsynced("MexEnergyEvent", teamID, allyTeamData.teams, energyWasted, ODenergy,summedMetalProduction,summedOverdriveMetal, te.totalChange, teamIncome) 
+				SendToUnsynced("MexEnergyEvent", teamID, allyTeamData.teams, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
 			end 
 		end
 	end
@@ -1174,10 +1181,10 @@ local floor = math.floor
 
 local circlePolys = 0 -- list for circles
 
-function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, EnergyChange, teamIncome)
+function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, EnergyChange, teamIncome)
   if (teamID ~= Spring.GetLocalTeamID()) then return end
   if (Script.LuaUI('MexEnergyEvent')) then
-    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, metalFromOverdrive, EnergyChange, teamIncome)
+    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, EnergyChange, teamIncome)
   end
 end
 
