@@ -1,4 +1,4 @@
-local versionName = "v1.251"
+local versionName = "v1.252"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System (experimental)",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Nov 11, 2011",
+    date      = "Nov 2, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -72,7 +72,7 @@ local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command 
 
 --Move Command constant:
 --local halfTargetBoxSize = {400, 800} --the distance from a target or move-order where widget should ignore (default: cloak and consc = 400 ie:800x800 box, ground unit =800)
-local halfTargetBoxSize = {400, 200, 300} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=200, repair=300)
+local halfTargetBoxSize = {400, -1, 300} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=200, repair=300)
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
@@ -139,13 +139,13 @@ function widget:Update()
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 	end
 	
-	if (now >=0.35+skippingTimer[2] and cycle==1) then --if now is 0.35 second after last update then do "GetPreliminarySeparation()"
+	if (now >=0.40+skippingTimer[2] and cycle==1) then --if now is 0.35 second after last update then do "GetPreliminarySeparation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 		surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable)
 		cycle=2 --send next cycle to "DoCalculation()" function
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 	end
-	if (now >=0.45+skippingTimer[2] and cycle==2) then --if now is 0.45 second after last update then do "DoCalculation()"
+	if (now >=0.50+skippingTimer[2] and cycle==2) then --if now is 0.45 second after last update then do "DoCalculation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
 		commandIndexTable=DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 		cycle=1 --send next cycle back to "GetPreliminarySeparation()" function
@@ -217,9 +217,12 @@ function GetPreliminarySeparation(unitMotion,commandIndexTable)
 				if cQueue~=nil then --prevent
 				if cQueue[1]~=nil then --prevent idle unit from executing the system
 					if (cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and #cQueue>=2 then  -- only repair (40), build (<0), reclaim (90), ressurect(125) or move(10) command. prevent STOP command from short circuiting the system
-						-- Spring.Echo("cQueue[1].params[1](IdentifyTargetOnCommandQueue):" .. cQueue[1].params[1])
-						-- Spring.Echo("cQueue[1].params[2](IdentifyTargetOnCommandQueue):" .. cQueue[1].params[2])
-						-- Spring.Echo("cQueue[1].params[3](IdentifyTargetOnCommandQueue):" .. cQueue[1].params[3])
+						-- Spring.Echo("cQueue[1].params[1](IdentifyTargetOnCommandQueue):")
+						-- Spring.Echo(cQueue[1].params[1])
+						-- Spring.Echo("cQueue[1].params[2](IdentifyTargetOnCommandQueue):")
+						-- Spring.Echo(cQueue[1].params[2])
+						-- Spring.Echo("cQueue[1].params[3](IdentifyTargetOnCommandQueue):")
+						-- Spring.Echo(cQueue[1].params[3])
 					if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
 					if cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						local boxSizeTrigger= unitInMotion[i][2]
@@ -335,7 +338,7 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 	if newCommand then	--user or widget command?
 		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate)
 		commandIndexTable[unitID]["patienceIndexA"]=0
-	elseif not newCommand then --cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then
+	else --cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then
 		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate)	
 	--else
 		--if for some reason cQueue is still not newCommand, but command queue[2] is already empty then use these backup value as target:
@@ -544,7 +547,13 @@ end
 function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate)
 	local boxSizeTrigger=0
 	if (cQueue[queueIndex].id==10 or cQueue[queueIndex].id<0) then 
-		targetCoordinate={cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]} --use first queue as target
+		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
+		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
+			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+		else
+			Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+		end
+		targetCoordinate={targetPosX, targetPosY, targetPosZ } --use first queue as target
 		commandIndexTable[unitID]["backupTargetX"]=cQueue[queueIndex].params[1] --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=cQueue[queueIndex].params[2]
 		commandIndexTable[unitID]["backupTargetZ"]=cQueue[queueIndex].params[3]
@@ -556,21 +565,28 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		local targetFeatureID=-1
 		local iterativeTest=1
 		local foundMatch=false
-		targetFeatureID=cQueue[queueIndex].params[1] +1500 +wreckageID_offset
-		while iterativeTest<=3 and not foundMatch do
-			if Spring.ValidFeatureID(targetFeatureID) then
-				foundMatch=true
-				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
-			elseif Spring.ValidUnitID(targetFeatureID) then
-				foundMatch=true
-				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
+		targetFeatureID=cQueue[queueIndex].params[1] +1500 -wreckageID_offset
+		if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then
+			foundMatch=true
+			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
+		else
+			while iterativeTest<=3 and not foundMatch do
+				if Spring.ValidFeatureID(targetFeatureID) then
+					foundMatch=true
+					wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
+				elseif Spring.ValidUnitID(targetFeatureID) then
+					foundMatch=true
+					wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
+				end
+				iterativeTest=iterativeTest+1
+				targetFeatureID=targetFeatureID-1500
 			end
-			iterativeTest=iterativeTest+1
-			targetFeatureID=targetFeatureID-1500
 		end
 		if foundMatch==false then
 			if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+			else
+				Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 			end
 		end
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
@@ -585,6 +601,8 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			unitPosX, unitPosY, unitPosZ = spGetUnitPosition(targetUnitID)
 		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+		else
+			Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
