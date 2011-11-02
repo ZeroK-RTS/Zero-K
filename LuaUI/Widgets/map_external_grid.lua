@@ -7,7 +7,8 @@ function widget:GetInfo()
     date      = "Sep 2011",
     license   = "PD",
     layer     = -3,
-    enabled   = false,
+    enabled   = true,
+	detailsDefault = 3
   }
 end
 
@@ -46,7 +47,7 @@ local noFeatureRange = 0
 ]]--
 
 options_path = 'Settings/View/Map/Configure VR Grid'
-options_order = {"mirrorHeightMap","res","range"}
+options_order = {"mirrorHeightMap","drawForIslands","res","range"}
 options = {
 	mirrorHeightMap = {
 		name = "Mirror heightmap",
@@ -59,6 +60,12 @@ options = {
 			widget:Initialize()
 		end, 		
 	},
+	drawForIslands = {
+		name = "Draw for islands",
+		type = 'bool',
+		value = Spring.GetConfigInt("ReflectiveWater", 0) ~= 4,
+		desc = "Draws grid for islands",		
+	},	
 	res = {
 		name = "Resolution (32-512)",
 		advanced = true,
@@ -133,33 +140,60 @@ local function GetGroundHeight(x, z)
 	return heights[x] and heights[x][z] or spGetGroundHeight(x,z)
 end
 
+local function IsIsland()
+	local sampleDist = 640
+	for i=1,Game.mapSizeX,sampleDist do
+		-- top edge
+		if GetGroundHeight(i, 0) > 0 then
+			return false
+		end
+		-- bottom edge
+		if GetGroundHeight(i, Game.mapSizeZ) > 0 then
+			return false
+		end
+	end
+	for i=1,Game.mapSizeZ,sampleDist do
+		-- left edge
+		if GetGroundHeight(0, i) > 0 then
+			return false
+		end
+		-- right edge
+		if GetGroundHeight(Game.mapSizeX, i) > 0 then
+			return false
+		end	
+	end
+	return true
+end
+
 local function InitGroundHeights()
 	TileMaxX = Game.mapSizeX/res +1
 	TileMaxZ = Game.mapSizeZ/res +1
-
+	
 	for x = (-1-range)*res,Game.mapSizeX+range*res, res do
 		heights[x] = {}
 		for z = (-1-range)*res,Game.mapSizeZ+range*res, res do
 			local px, pz
-			if (x < 0 or x > Game.mapSizeX) and mirror then	-- outside X map bounds; mirror true heightmap
-				local xAbs = math.abs(x)
-				local xFrac = (Game.mapSizeX ~= xAbs) and x%(Game.mapSizeX) or Game.mapSizeX
-				local xFlip = -1^math.floor(x/Game.mapSizeX)
-				if xFlip == -1 then
-					px = Game.mapSizeX - xFrac
-				else
-					px = xFrac
+			if mirror then
+				if (x < 0 or x > Game.mapSizeX) then	-- outside X map bounds; mirror true heightmap
+					local xAbs = math.abs(x)
+					local xFrac = (Game.mapSizeX ~= xAbs) and x%(Game.mapSizeX) or Game.mapSizeX
+					local xFlip = -1^math.floor(x/Game.mapSizeX)
+					if xFlip == -1 then
+						px = Game.mapSizeX - xFrac
+					else
+						px = xFrac
+					end
 				end
-			end
-			if (z < 0 or z > Game.mapSizeZ) and mirror  then	-- outside Z map bounds; mirror true heightmap
-				local zAbs = math.abs(z)
-				local zFrac = (Game.mapSizeZ ~= zAbs) and z%(Game.mapSizeZ) or Game.mapSizeZ
-				local zFlip = -1^math.floor(z/Game.mapSizeZ)
-				if zFlip == -1 then
-					pz = Game.mapSizeZ - zFrac
-				else
-					pz = zFrac
-				end				
+				if (z < 0 or z > Game.mapSizeZ) and mirror  then	-- outside Z map bounds; mirror true heightmap
+					local zAbs = math.abs(z)
+					local zFrac = (Game.mapSizeZ ~= zAbs) and z%(Game.mapSizeZ) or Game.mapSizeZ
+					local zFlip = -1^math.floor(z/Game.mapSizeZ)
+					if zFlip == -1 then
+						pz = Game.mapSizeZ - zFrac
+					else
+						pz = zFrac
+					end				
+				end
 			end
 			heights[x][z] = GetGroundHeight(px or x, pz or z)	-- 20, 0
 		end
@@ -241,8 +275,10 @@ local function DrawTiles()
 end
 
 function widget:DrawWorld()
-	gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
-	-- Maybe you want Spring.SetDrawGround(false) somewhere
+	if (not IsIsland()) or options.drawForIslands.value then
+		gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
+		-- Maybe you want Spring.SetDrawGround(false) somewhere
+	end	
 end
 
 function widget:Initialize()
