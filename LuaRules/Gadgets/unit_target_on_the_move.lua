@@ -336,22 +336,24 @@ local function gameFrame()
     
     if SYNCED.unit then
 		local alt,ctrl,meta,shift = spGetModKeyState()
-        local always = shift or SYNCED.drawPlayerAlways[myPlayerID]
-        local unit = SYNCED.unit
-        
-        drawAnything = false
-        for i = 1, unit.count do
-            local u = unit.data[i]
-            if (u.allyTeam == myAllyTeam or select(1, spGetSpectatingState())) and (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
-                drawAnything = true
-                break
+        local always = SYNCED.drawPlayerAlways[myPlayerID]
+        if shift or always then
+            local unit = SYNCED.unit
+            
+            drawAnything = false
+            for i = 1, unit.count do
+                local u = unit.data[i]
+                if (u.allyTeam == myAllyTeam or select(1, spGetSpectatingState())) and (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
+                    drawAnything = true
+                    break
+                end
             end
-        end
-        
-        if drawAnything then
-            glDeleteList(drawList)
-            drawList = glCreateList(function () glBeginEnd(GL_LINES, drawCommands, unit, always) end)
-            return
+            
+            if drawAnything then
+                glDeleteList(drawList)
+                drawList = glCreateList(function () glBeginEnd(GL_LINES, drawCommands, unit, always) end)
+                return
+            end
         end
     end
     
