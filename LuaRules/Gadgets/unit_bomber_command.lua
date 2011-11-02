@@ -351,7 +351,7 @@ function gadget:GameFrame(n)
 				spGiveOrderToUnit(bomberID, CMD.REMOVE, {tag}, {})	-- clear rearm order
 				Spring.SetUnitFuel(bomberID, 0)	-- set fuel to zero
 				bomberToPad[bomberID] = nil
-				refuelling[bomberID] = bomberID
+				refuelling[bomberID] = true
 				Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- refuelling
 			end
 		end
@@ -488,19 +488,20 @@ function gadget:DrawWorld()
 	local isSpec, fullView = spGetSpectatingState()
 
 	gl.Texture(noAmmoTexture)
+	gl.Color(1,1,1,1)
 	local alpha = (math.sin(phase)*0.3) + 0.7
 	local units = Spring.GetVisibleUnits()
 	for i=1,#units do
 		local id = units[i]
-		local ammoState = spGetUnitRulesParam(id, "noammo") or 0
-		if spValidUnitID(id) and spGetUnitDefID(id) and (ammoState ~= 0) and ((isSpec and fullView) or spGetUnitAllyTeam(id) == myAllyID) then
-			local a = (ammoState == 2) and alpha or 1
-			gl.Color(1,1,1,a)
-			gl.DrawFuncAtUnit(id, false, DrawUnitFunc, UnitDefs[spGetUnitDefID(id)].height + 30)
+		if spValidUnitID(id) and bomberDefs[spGetUnitDefID(id)] and ((isSpec and fullView) or spGetUnitAllyTeam(id) == myAllyID) then
+			local ammoState = spGetUnitRulesParam(id, "noammo") or 0
+			if (ammoState ~= 0)  then
+				gl.DrawFuncAtUnit(id, false, DrawUnitFunc, UnitDefs[spGetUnitDefID(id)].height + 30)
+			end
 		end
 	end
 	gl.Texture("")
-	phase = phase + .1
+	--phase = phase + .1
 end
 
 function gadget:Initialize()
