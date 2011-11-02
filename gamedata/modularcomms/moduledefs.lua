@@ -327,7 +327,7 @@ upgrades = {
 						end
 						
 						if (i == "commweapon_riotcannon") or (i == "commweapon_rocketlauncher") then
-							v.explosiongenerator = [[custom:NAPALM_Expl]]
+							v.explosiongenerator = [[custom:napalm_koda]]
 							v.customparams.burnchance = "1"
 							v.soundhit = [[weapon/burn_mixed]]
 						end

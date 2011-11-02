@@ -17,6 +17,11 @@ This also is triggered when all others spectate.
 
 if (gadgetHandler:IsSyncedCode()) then
 
+if Spring.GetModOption("zkmode",false,nil) == nil then
+	Spring.Echo("<Game Over> Testing mode. Gadget removed.")
+	return
+end
+
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
@@ -270,10 +275,6 @@ function gadget:UnitTaken(u, ud, oldTeam, newTeam)
 end
 
 function gadget:Initialize()
-	if Spring.GetModOption("zkmode",false,nil) == nil then
-		Spring.Echo("Game Over: Testing mode. Gadget removed.").
-		gadgetHandler:RemoveGadget()		
-	end
 	gaiaTeam = Spring.GetGaiaTeamID()
 	_,_,_,_,_, gaiaAlliance = Spring.GetTeamInfo(gaiaTeam)
 	CheckAllUnits()
