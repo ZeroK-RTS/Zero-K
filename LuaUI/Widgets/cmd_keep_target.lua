@@ -28,7 +28,7 @@ function widget:CommandNotify(id, params, options)
                 end
             end
         end
-    else
+    elseif id ~= CMD_UNIT_SET_TARGET and id ~= CMD_UNIT_CANCEL_TARGET then
         local units = Spring.GetSelectedUnits()
         for i = 1, #units do
             local unitID = units[i]

@@ -23,6 +23,7 @@ local spSetUnitTarget       = Spring.SetUnitTarget
 local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetGroundHeight     = Spring.GetGroundHeight
+local spGetUnitDefID        = Spring.GetUnitDefID
 
 --------------------------------------------------------------------------------
 -- Globals
@@ -31,6 +32,8 @@ local unitById = {} -- unitById[unitID] = position of unitID in unit
 local unit = {count = 0, data = {}} -- data holds all unitID data
 
 local drawPlayerAlways = {}
+
+local deadUnitID = 0 
 
 --------------------------------------------------------------------------------
 -- Commands
@@ -95,7 +98,7 @@ end
 
 local function addUnit(unitID, data)
     if spValidUnitID(unitID) then
-        spSetUnitTarget(unitID, 0)
+        spSetUnitTarget(unitID,deadUnitID)
         if setTarget(data) then
             if unitById[unitID] then
                 unit.data[unitById[unitID]] = data
@@ -109,12 +112,9 @@ local function addUnit(unitID, data)
 end
 
 local function removeUnit(unitID)
-    if spValidUnitID(unitID) then
-        spSetUnitTarget(unitID, 0)
-    end
-    
-    if unitById[unitID] then
-		if unitById[unitID] ~= unit.count then
+    if validUnit(spGetUnitDefID(unitID)) and unitById[unitID] then
+        spSetUnitTarget(unitID,deadUnitID)
+        if unitById[unitID] ~= unit.count then
             unit.data[unitById[unitID]] = unit.data[unit.count]
             unitById[unit.data[unit.count].id] = unitById[unitID]
         end
@@ -143,8 +143,7 @@ function gadget:Initialize()
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
-	-- add those with weapons
-	if validUnit(unitDefID) then -- units that cannot move do not need the target command
+	if validUnit(unitDefID) then
 		spInsertUnitCmdDesc(unitID, unitSetTargetCmdDesc)
         spInsertUnitCmdDesc(unitID, unitCancelTargetCmdDesc)
 	end
@@ -268,6 +267,7 @@ local spIsUnitSelected      = Spring.IsUnitSelected
 local spGetModKeyState      = Spring.GetModKeyState
 local spIsGUIHidden         = Spring.IsGUIHidden
 local spGetGameFrame        = Spring.GetGameFrame
+local spGetSpectatingState  = Spring.GetSpectatingState
 
 local myAllyTeam = spGetMyAllyTeamID()
 local myTeam = spGetMyTeamID()
@@ -278,6 +278,11 @@ local function unitDraw(u1, u2)
 	glVertex(CallAsTeam(myTeam, function () return spGetUnitPosition(u2) end))
 end
 
+local function unitDrawVisible(u1, u2)
+	glVertex(spGetUnitPosition(u1))
+	glVertex(spGetUnitPosition(u2))
+end
+
 local function terrainDraw(u, x, y, z)
     glVertex(spGetUnitPosition(u))
 	glVertex(x,y,z)
@@ -286,7 +291,15 @@ end
 local function drawCommands(unit, always)
     for i = 1, unit.count do
         local u = unit.data[i]
-        if u.allyTeam == myAllyTeam and (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
+        if select(1, spGetSpectatingState()) then
+            if (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
+                if not u.targetID then
+                    terrainDraw(u.id, u.x, u.y, u.z)
+                elseif spValidUnitID(u.targetID) then
+                    unitDrawVisible(u.id, u.targetID)
+                end
+            end
+        elseif u.allyTeam == myAllyTeam and (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
             if not u.targetID then
                 terrainDraw(u.id, u.x, u.y, u.z)
             elseif spValidUnitID(u.targetID) then
@@ -329,7 +342,7 @@ local function gameFrame()
         drawAnything = false
         for i = 1, unit.count do
             local u = unit.data[i]
-            if u.allyTeam == myAllyTeam and (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
+            if (u.allyTeam == myAllyTeam or select(1, spGetSpectatingState())) and (always or spIsUnitSelected(u.id)) and spValidUnitID(u.id) then
                 drawAnything = true
                 break
             end
