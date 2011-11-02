@@ -265,6 +265,9 @@ effectUnitDefsXmas = {
 -- load presets from unitdefs
 for i=1,#UnitDefs do
 	local unitDef = UnitDefs[i]
+	if unitDef.isCommander then
+		--effectUnitDefsXmas[unitDef.name] = {}
+	end
 	if unitDef.customParams then
 		local fxTableStr = unitDef.customParams.lups_unit_fxs
 		if fxTableStr then

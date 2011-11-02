@@ -1,7 +1,7 @@
 local name = "commweapon_riotcannon"
 local weaponDef = {
 	name                    = [[Riot Cannon]],
-    areaOfEffect            = 128,
+    areaOfEffect            = 144,
     avoidFeature            = true,
     avoidFriendly           = true,
     burnblow                = true,

@@ -27,7 +27,6 @@ local weaponDef = {
 	impulseFactor           = 0.2,
 	intensity               = 0.7,
 	interceptedByShieldType = 1,
-	lineOfSight             = true,
 	noSelfDamage            = true,
 	range                   = 290,
 	reloadtime              = 0.167,
