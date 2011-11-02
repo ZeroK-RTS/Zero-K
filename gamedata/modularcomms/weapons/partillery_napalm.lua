@@ -19,7 +19,7 @@ local weaponDef = {
     },
 
     edgeEffectiveness       = 0.5,
-    explosionGenerator      = [[custom:NAPALM_Expl]],
+    explosionGenerator      = [[custom:napalm_koda]],
     impulseBoost            = 0,
     impulseFactor           = 0.4,
     interceptedByShieldType = 1,
