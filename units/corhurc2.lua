@@ -146,7 +146,7 @@ unitDef = {
 
       dropped                 = true,
       edgeEffectiveness       = 0.7,
-      explosionGenerator      = [[custom:NAPALM_Expl]],
+      explosionGenerator      = [[custom:napalm_koda]],
       fireStarter             = 250,
       flameGfxTime            = 2,
       impulseBoost            = 0,
