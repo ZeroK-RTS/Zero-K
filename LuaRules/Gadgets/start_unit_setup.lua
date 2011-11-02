@@ -135,7 +135,7 @@ local function CheckForShutdown()
 	end
 end
 
-local buildMult = 0.999
+local buildMult = 1
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 	--[[
 	if not gamestart then
@@ -168,9 +168,12 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth*buildMult, build = buildMult })
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
-		local frame = Spring.GetGameFrame() + 1
-		toFinish[frame] = toFinish[frame] or {}
-		table.insert(toFinish[frame], unitID)
+		
+		-- workaround stuff - unneeded
+		--local frame = Spring.GetGameFrame() + 1
+		--toFinish[frame] = toFinish[frame] or {}
+		--table.insert(toFinish[frame], unitID)
+		
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
 		--facplopsrunning[unitID] = true
 		CheckForShutdown()
