@@ -90,7 +90,7 @@ unitDef = {
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
-		burntime = 180,
+		burntime = 60,
 		--lups_heat_fx = [[firewalker]],
 	  },
 	  
