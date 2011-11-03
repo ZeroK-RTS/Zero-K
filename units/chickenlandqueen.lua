@@ -284,7 +284,7 @@ unitDef = {
       },
 
       endsmoke                = [[0]],
-      explosionGenerator      = [[custom:napalm_koda]],,
+      explosionGenerator      = [[custom:napalm_koda]],
       firestarter             = 400,
       impulseBoost            = 0,
       impulseFactor           = 0.4,

@@ -18,7 +18,7 @@ return {
     },
     
     edgeeffectiveness       = 0.5,
-    explosionGenerator      = [[custom:napalm_koda]],,
+    explosionGenerator      = [[custom:napalm_koda]],
     fireStarter             = 200,
     impulseboost            = 0,
     impulsefactor           = 0,
