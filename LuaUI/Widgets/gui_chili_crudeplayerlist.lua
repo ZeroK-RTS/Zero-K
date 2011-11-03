@@ -63,7 +63,7 @@ local x_ping 	= x_cpu + 40
 local x_buffer	= x_ping + 10
 local x_bound	= x_buffer + 40
 
-local UPDATE_FREQUENCY = 1	-- seconds
+local UPDATE_FREQUENCY = 0.5	-- seconds
 
 local wantsNameRefresh = {}
 
@@ -591,7 +591,7 @@ function widget:Update(s)
 		if lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height then
 			SetupPlayerNames()	-- size changed; regen everything
 			lastSizeX = window_cpl.width
-			lastSizeY = window_cpl_height
+			lastSizeY = window_cpl.height
 		end
 		UpdatePlayerInfo()
 	end
