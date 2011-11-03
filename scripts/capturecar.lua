@@ -171,7 +171,7 @@ function script.Deactivate()
 end
 
 function script.StartMoving() 
-	StartThread(AnimControl)
+	--StartThread(AnimControl)
 end
 
 function script.StopMoving() 

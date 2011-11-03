@@ -12,7 +12,7 @@ local weaponDef = {
 		slot = [[3]],
         areadamage_preset = [[module_napalmgrenade]],
 		setunitsonfire = "1",
-		burntime = 180,
+		burntime = [[90]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
     },
 

@@ -472,7 +472,6 @@ function gadget:DefaultCommand(type, targetID)
 end
 
 local noAmmoTexture = 'LuaUI/Images/noammo.png'
-local refuelTexture = 'LuaUI/Images/noammo.png'
 
 local function DrawUnitFunc(yshift)
 	gl.Translate(0,yshift,0)
@@ -499,7 +498,6 @@ function gadget:DrawWorld()
 		end
 	end
 	gl.Texture("")
-	--phase = phase + .1
 end
 
 function gadget:Initialize()
