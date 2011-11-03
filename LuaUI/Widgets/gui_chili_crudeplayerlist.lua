@@ -63,7 +63,7 @@ local x_ping 	= x_cpu + 40
 local x_buffer	= x_ping + 10
 local x_bound	= x_buffer + 40
 
-local UPDATE_FREQUENCY = 0.5	-- seconds
+local UPDATE_FREQUENCY = 1	-- seconds
 
 local wantsNameRefresh = {}
 
@@ -82,7 +82,7 @@ pingCpuColors = {
 
 local sharePic        = ":n:"..LUAUI_DIRNAME.."Images/playerlist/share.png"
 
-local show_spec = false
+--local show_spec = false
 local localTeam = 0
 local localAlliance = 0
 
@@ -230,7 +230,8 @@ end
 -- adds:	ally team number, ceasefire button if applicable
 --			details of all players in allyteam (icons, name, CPU, ping)
 
-local function AddAllyteamPlayers(row, allyTeam,players)
+local function AddAllyteamPlayers(row, allyTeam, players)
+	local fontsize = options.text_height.value
 	if not players then
 		return row
 	end
@@ -254,14 +255,14 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			y=options.text_height.value * row,
 			caption = (type(allyTeam) == 'number' and (allyTeam+1) or allyTeam),
 			textColor = aCol,
-			fontsize = options.text_height.value,
+			fontsize = fontsize,
 			fontShadow = true,
 		}
 	)
 	-- ceasefire button
 	if cf and allyTeam ~= 'S' and allyTeam ~= localAlliance then
 		scroll_cpl:AddChild( Checkbox:New{
-			x=x_cf,y=options.text_height.value * row + 3,width=20,
+			x=x_cf,y=fontsize * row + 3,width=20,
 			caption='',
 			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
 			tooltip = CfTooltip(allyTeam),
@@ -313,10 +314,10 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				scroll_cpl:AddChild(
 					Chili.Image:New{
 						file=icCountry;
-						width= options.text_height.value + 3;
-						height=options.text_height.value + 3;
+						width= fontsize + 3;
+						height=fontsize + 3;
 						x=x_icon_country,
-						y=options.text_height.value * row,
+						y=fontsize * row,
 					}
 				)
 			end 
@@ -325,10 +326,10 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				scroll_cpl:AddChild(
 					Chili.Image:New{
 						file=icRank;
-						width= options.text_height.value + 3;
-						height=options.text_height.value + 3;
+						width= fontsize + 3;
+						height=fontsize + 3;
 						x=x_icon_rank,
-						y=options.text_height.value * row,
+						y=fontsize * row,
 					}
 				)
 			end 
@@ -337,10 +338,10 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 				scroll_cpl:AddChild(
 					Chili.Image:New{
 						file=icon;
-						width= options.text_height.value + 3;
-						height=options.text_height.value + 3;
+						width= fontsize + 3;
+						height=fontsize + 3;
 						x=x_icon_clan,
-						y=options.text_height.value * row,
+						y=fontsize * row,
 					}
 				)
 			end
@@ -350,13 +351,13 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		-- name
 		local nameLabel = Label:New{
 			x=x_name,
-			y=options.text_height.value * row,
+			y=fontsize * row,
 			width=150,
 			autosize=false,
 			--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
 			caption = name_out,
 			textColor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1},
-			fontsize = options.text_height.value,
+			fontsize = fontsize,
 			fontShadow = true,
 		}
 		nameLabels[teamID] = nameLabel
@@ -370,9 +371,9 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 			scroll_cpl:AddChild(
 				Button:New{
 					x=x_share,
-					y=options.text_height.value * (row+0.5),
-					height = options.text_height.value,
-					width = options.text_height.value,
+					y=fontsize * (row+0.5),
+					height = fontsize,
+					width = fontsize,
 					tooltip = 'Double click to share selected units to ' .. name,
 					caption = '',
 					padding ={0,0,0,0},
@@ -391,20 +392,20 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 		if not pdata.isAI then
 			local cpuLabel = Label:New{
 				x=x_cpu,
-				y=options.text_height.value * row,
+				y=fontsize * row,
 				caption = math.round(cpuUsage*100) .. '%',
 				textColor = cpuCol,
-				fontsize = options.text_height.value,
+				fontsize = fontsize,
 				fontShadow = true,
 			}
 			cpuLabels[playerID] = cpuLabel
 			scroll_cpl:AddChild(cpuLabel)
 			local pingLabel = Label:New{
 				x=x_ping,
-				y=options.text_height.value * row,
+				y=fontsize * row,
 				caption = pingTime_readable ,
 				textColor = pingCol,
-				fontsize = options.text_height.value,
+				fontsize = fontsize,
 				fontShadow = true,
 			}
 			pingLabels[playerID] = pingLabel
@@ -416,15 +417,16 @@ local function AddAllyteamPlayers(row, allyTeam,players)
 end
 
 SetupPlayerNames = function()
+	local fontsize = options.text_height.value
 	scroll_cpl:ClearChildren()
 	
-	scroll_cpl:AddChild( Label:New{ x=0, 		caption = 'T', 		fontShadow = true, 	fontsize = options.text_height.value, } )
+	scroll_cpl:AddChild( Label:New{ x=0, 		caption = 'T', 		fontShadow = true, 	fontsize = fontsize, } )
 	if cf then
-		scroll_cpl:AddChild( Label:New{ x=x_cf,		caption = 'CF',		fontShadow = true, 	fontsize = options.text_height.value, } )
+		scroll_cpl:AddChild( Label:New{ x=x_cf,		caption = 'CF',		fontShadow = true, 	fontsize = fontsize, } )
 	end
-	scroll_cpl:AddChild( Label:New{ x=x_name, 	caption = 'Name', 	fontShadow = true,  fontsize = options.text_height.value,} )
-	scroll_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = options.text_height.value,} )
-	scroll_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = options.text_height.value,} )
+	scroll_cpl:AddChild( Label:New{ x=x_name, 	caption = 'Name', 	fontShadow = true,  fontsize = fontsize,} )
+	scroll_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = fontsize,} )
+	scroll_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = fontsize,} )
 	
 	local playerroster	= Spring.GetPlayerList()
 	local teams 		= Spring.GetTeamList()
@@ -520,8 +522,8 @@ SetupPlayerNames = function()
 	
 	
 	scroll_cpl:AddChild( Checkbox:New{
-		x=5, y=options.text_height.value * (row + 0.5),
-		height=options.text_height.value * 1.5, width=160,
+		x=5, y=fontsize * (row + 0.5),
+		height=fontsize * 1.5, width=160,
 		caption = 'Show Spectators',
 		checked = show_spec,
 		OnChange = { function(self) show_spec = not self.checked; SetupPlayerNames(); end },
@@ -532,8 +534,8 @@ SetupPlayerNames = function()
 	-- ceasefire: restricted zones button
 	if cf then
 		scroll_cpl:AddChild( Checkbox:New{
-			x=5, y=options.text_height.value * (row + 0.5),
-			height=options.text_height.value * 1.5, width=160,
+			x=5, y=fontsize * (row + 0.5),
+			height=fontsize * 1.5, width=160,
 			caption = 'Place Restricted Zones',
 			checked = WG.rzones.rZonePlaceMode,
 			OnChange = { function(self) WG.rzones.rZonePlaceMode = not WG.rzones.rZonePlaceMode; end },
@@ -558,11 +560,11 @@ SetupPlayerNames = function()
 	
 	--push things to bottom of window if needed
 	--scroll_cpl.width = x_bound --window_cpl.width - window_cpl.padding[1] - window_cpl.padding[3]
-	local height = row * (options.text_height.value+4)
+	local height = row * (fontsize+2)
 	--window_cpl.minimumSize = {x_bound, height}
 	scroll_cpl.height = math.min(height, window_cpl.height)
 	if not (options.alignToTop.value) then 
-		scroll_cpl.y = (window_cpl.height - window_cpl.padding[2]) - scroll_cpl.height
+		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
 	else
 		scroll_cpl.y = 0
 	end
