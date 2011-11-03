@@ -1,4 +1,4 @@
-local versionName = "v1.252"
+local versionName = "v1.253"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -11,10 +11,10 @@ local versionName = "v1.252"
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Dynamic Avoidance System (experimental)",
+    name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Nov 2, 2011",
+    date      = "Nov 3, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -55,7 +55,7 @@ local activateImpatienceG=0 --auto disable auto-reverse after 6 continuous auto-
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
 local safetyMarginCONSTANTunitG = 0.8 --obstacle graph offset (a "safety margin" constant). Add/substract obstacle effect (default = 0.8 radian)
 local smCONSTANTunitG		= 0.8  -- obstacle graph offset (a "safety margin" constant).  Add/substract obstacle effect (default = not stated, perhaps 0.8 radian)
-local aCONSTANTg			= 0.01 -- attractor graph; scale the attractor's strenght. Less equal to additional avoidance (default = 0.2 amplitude)
+local aCONSTANTg			= 0.015 -- attractor graph; scale the attractor's strenght. Less equal to additional avoidance (default = 0.2 amplitude)
 
 -- Obstacle/Target competetive interaction constant:
 local cCONSTANT1g 			= 2 --attractor constant; effect the behaviour. ie: the selection between 4 behaviour state. (default = 2 multiplier)
@@ -72,13 +72,13 @@ local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command 
 
 --Move Command constant:
 --local halfTargetBoxSize = {400, 800} --the distance from a target or move-order where widget should ignore (default: cloak and consc = 400 ie:800x800 box, ground unit =800)
-local halfTargetBoxSize = {400, -1, 300} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=200, repair=300)
+local halfTargetBoxSize = {400, -1, 200} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=-1 or always flee, repair=200)
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
-local noiseAngleG =math.pi/36 --(default is pie/18); add random angle (from 0 to the current value) to the new angle
-local collisionAngleG=math.pi/6 --angle of enemy (range 0 to current value) where auto-reverse will activate 
-local fleeingAngleG=math.pi/4 --angle of enemy (range 0 to current value) where fleeing enemy is considered
+local noiseAngleG =math.pi/36 --(default is pie/36 rad); add random angle (from 0 to the current value) to the new angle
+local collisionAngleG=math.pi/6 --(default is pie/6 rad) angle of enemy (range 0 to current value) where auto-reverse will activate 
+local fleeingAngleG=math.pi/4 --(default is pie/4 rad) angle of enemy (range 0 to current value) where fleeing enemy is considered
 
 --------------------------------------------------------------------------------
 --Variables:
@@ -495,14 +495,17 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 	--if not newCommand then spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) end --delete old command
 	-- if not newCommand then spGiveOrderToUnit(unitID, CMD_MOVE, {cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]}, {"ctrl","shift"} ) end --delete old command
 	-- spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
-	
+	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
 	spGiveOrderToUnit(unitID, CMD_MOVE, {newX, newY, newZ}, {} )
 	local arrayIndex=1
 	if not newCommand then arrayIndex=2 end --skip old widget command
 	if #cQueue>=2 then --try to identify unique signature of area reclaim/repair
 		if (cQueue[1].id==40 or cQueue[1].id==90 or cQueue[1].id==125) then
-			if (cQueue[2].id==40 or cQueue[2].id==90 or cQueue[2].id==125) and (not Spring.ValidFeatureID(cQueue[2].params[1]-wreckageID_offset) and not Spring.ValidUnitID(cQueue[2].params[1])) then 
-				arrayIndex=arrayIndex+1 --skip the target:wreck/units. Allow constant command reset
+			if (cQueue[2].id==40 or cQueue[2].id==90 or cQueue[2].id==125) then 
+				if (not Spring.ValidFeatureID(cQueue[2].params[1]-wreckageID_offset) or not Spring.ValidFeatureID(cQueue[2].params[1])) and not Spring.ValidUnitID(cQueue[2].params[1]) then 
+					spGiveOrderToUnit(unitID, CMD_MOVE, {cQueue[2].params[1], cQueue[2].params[2], cQueue[2].params[3]}, {} ) --divert unit to the center of reclaim/repair command
+					arrayIndex=arrayIndex+1 --skip the target:wreck/units. Allow constant command reset
+				end
 			end
 		end
 	end
@@ -566,11 +569,14 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		local iterativeTest=1
 		local foundMatch=false
 		targetFeatureID=cQueue[queueIndex].params[1] +1500 -wreckageID_offset
-		if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then
+		if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --reclaim own unit
 			foundMatch=true
 			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
+		elseif Spring.ValidFeatureID(cQueue[queueIndex].params[1]) then --reclaim trees and rock
+			foundMatch=true
+			wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
 		else
-			while iterativeTest<=3 and not foundMatch do
+			while iterativeTest<=3 and not foundMatch do --reclaim wreckage (wreckage ID depend on number of players)
 				if Spring.ValidFeatureID(targetFeatureID) then
 					foundMatch=true
 					wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
