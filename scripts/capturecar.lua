@@ -45,8 +45,9 @@ local function ImpactTilt(x,z)
 	Turn( base , z_axis, 0, math.rad(30) )
 	Turn( base , x_axis, 0, math.rad(300) )
 end
+
 function script.HitByWeapon(x, z)
-	StartThread(ImpactTilt, x, z)
+	--StartThread(ImpactTilt, x, z)
 end
 
 local function AnimControl() 
@@ -73,7 +74,7 @@ local function AnimControl()
 		--pivot
 		currHeading = GetUnitValue(COB.HEADING)
 		diffHeading = (currHeading - lastHeading)/15
-		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then diffHeading = 0 end
+		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then diffHeading = 0.01 end	--0.001 to prevent segfaulting perfect alignment
 		--hexadecimal wtf?
 		--if diffHeading > 0x7fff then diffHeading = diffHeading - 0x10000
 		--if diffHeading < -0x8000 then diffHeading = diffHeading + 0x10000
@@ -150,28 +151,28 @@ end
 function script.Deactivate()
 	Signal( SIG_ACTIVATE)
 	SetSignalMask( SIG_ACTIVATE)
-	Turn( turret , y_axis, math.rad(0 ), math.rad(TURRET_SPEED) )
+	Turn( turret , y_axis, 0, math.rad(TURRET_SPEED) )
 	WaitForTurn(turret, y_axis)
 	
-	Turn( panel_a1 , z_axis, math.rad(-(0 )), DEPLOY_SPEED  )
-	Turn( panel_a2 , z_axis, math.rad(-(0 )), DEPLOY_SPEED  )
-	Turn( panel_b1 , z_axis, math.rad(-(0 )), DEPLOY_SPEED  )
-	Turn( panel_b2 , z_axis, math.rad(-(0 )), DEPLOY_SPEED  )
+	Turn( panel_a1 , z_axis, 0, DEPLOY_SPEED  )
+	Turn( panel_a2 , z_axis, 0, DEPLOY_SPEED  )
+	Turn( panel_b1 , z_axis, 0, DEPLOY_SPEED  )
+	Turn( panel_b2 , z_axis, 0, DEPLOY_SPEED  )
 	WaitForTurn(panel_a1, z_axis)
 	WaitForTurn(panel_a2, z_axis)
 	WaitForTurn(panel_b1, z_axis)
 	WaitForTurn(panel_b2, z_axis)
 	
-	Turn( arm_2 , x_axis, math.rad(0 ), DEPLOY_SPEED )
-	Turn( arm_3 , x_axis, math.rad(0 ), DEPLOY_SPEED )
+	Turn( arm_2 , x_axis, 0, DEPLOY_SPEED )
+	Turn( arm_3 , x_axis, 0, DEPLOY_SPEED )
 	WaitForTurn(arm_2, x_axis)
 	WaitForTurn(arm_3, x_axis)
 	
-	Turn( arm_1 , x_axis, math.rad(0 ), DEPLOY_SPEED )
+	Turn( arm_1 , x_axis, 0, DEPLOY_SPEED )
 end
 
 function script.StartMoving() 
-	--StartThread(AnimControl)
+	StartThread(AnimControl)
 end
 
 function script.StopMoving() 
