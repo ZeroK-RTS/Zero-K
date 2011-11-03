@@ -5,7 +5,7 @@ local weaponDef = {
     areaOfEffect            = 16,
     bouncerebound           = 0.15,
     bounceslip              = 1,
-    cegTag                  = [[gauss_tag_m]],
+    cegTag                  = [[gauss_tag_l]],
     craterBoost             = 0,
     craterMult              = 0,
 
@@ -15,9 +15,9 @@ local weaponDef = {
 	},
 	
     damage                  = {
-		default = 135,
-		planes  = 135,
-		subs    = 67.5,
+		default = 140,
+		planes  = 140,
+		subs    = 7,
     },
 
     explosionGenerator      = [[custom:gauss_hit_m]],
@@ -29,7 +29,7 @@ local weaponDef = {
     noExplode               = true,
     noSelfDamage            = true,
     numbounce               = 40,
-    range                   = 415,
+    range                   = 420,
     reloadtime              = 2.5,
     rgbColor                = [[0.5 1 1]],
     separation              = 0.5,
@@ -40,7 +40,6 @@ local weaponDef = {
     soundStart              = [[weapon/gauss_fire]],
     soundStartVolume        = 2.5,
     stages                  = 32,
-    startsmoke              = [[1]],
     turret                  = true,
     waterbounce             = 1,
     weaponType              = [[Cannon]],
