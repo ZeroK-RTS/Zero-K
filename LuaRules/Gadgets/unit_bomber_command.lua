@@ -80,7 +80,7 @@ local combatCommands = {	-- commands that require ammo to execute
 }
 
 local padRadius = 750 -- land if pad is within this range
-local MAX_FUEL = 1000000
+local MAX_FUEL = 1000000 * 0.9	-- not exact to allow some fudge
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -316,6 +316,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, team)
 	elseif bomberDefs[unitDefID] then
 		CancelAirpadReservation(unitID)
 		bomberUnitIDs[unitID] = nil
+		refuelling[unitID] = nil
 	end
 end
 
@@ -326,10 +327,9 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldteam, newteam)
 end
 
 function gadget:GameFrame(n)
-	if n%5 == 0 then
+	if n%10 == 2 then
 		for bomberID in pairs(refuelling) do
-			local fuel = spGetUnitFuel(bomberID)
-			--if fuel > 0 then Spring.Echo(fuel) end
+			local fuel = spGetUnitFuel(bomberID) or 0
 			if fuel >= MAX_FUEL then
 				refuelling[bomberID] = nil
 				Spring.SetUnitRulesParam(bomberID, "noammo", 0)	-- ready to go
@@ -488,8 +488,6 @@ function gadget:DrawWorld()
 	local isSpec, fullView = spGetSpectatingState()
 
 	gl.Texture(noAmmoTexture)
-	gl.Color(1,1,1,1)
-	local alpha = (math.sin(phase)*0.3) + 0.7
 	local units = Spring.GetVisibleUnits()
 	for i=1,#units do
 		local id = units[i]
