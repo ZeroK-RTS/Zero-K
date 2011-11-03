@@ -82,7 +82,7 @@ local function AnimControl()
 		if pivotAngle > MAX_PIVOT then pivotAngle = MAX_PIVOT end
 		if pivotAngle < MIN_PIVOT then pivotAngle = MIN_PIVOT end
 		Turn( front , y_axis, pivotAngle, PIVOT_SPEED )
-		Turn( rear , y_axis, (0 - pivotAngle ),PIVOT_SPEED )
+		Turn( rear , y_axis, (0 - pivotAngle ), PIVOT_SPEED )
 		
 		lastHeading = currHeading
 		Sleep( ANIM_PERIOD)
@@ -123,6 +123,7 @@ function script.QueryWeapon(num) return dish end
 function script.Create()
 	StartThread(SmokeUnit)
 	script.Activate()
+	Turn( rear , y_axis, 0.01, PIVOT_SPEED )
 end
 
 function script.Activate()
