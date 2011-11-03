@@ -266,7 +266,7 @@ function widget:AddChatMessage(player, msg, type)
 	
 	Chili.Image:New{
 		parent = w;
-		file   =   (WG.Avatar) and (WG.Avatar.GetAvatar(playerName)) or avatar_fallback;
+    file   =   ((WG.Avatar and WG.Avatar.GetAvatar(playerName)) or avatar) or avatar_fallback; --get avatar from "api_avatar.lua" or from server, or use the default avatar
 		--file2  = (type=='s') and "LuaUI/Images/tech_progressbar_empty.png";
 		width  = options.window_height.value-36;
 		height = options.window_height.value-36;
