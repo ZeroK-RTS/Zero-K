@@ -83,7 +83,7 @@ local armorDefs = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+local EMP_DAMAGE_MOD = 1/3
 
 local function tobool(val)
   local t = type(val)
@@ -129,7 +129,7 @@ for name, wd in pairs(DEFS.weaponDefs) do
   for categoryName, _ in pairs(armorDefs) do
     wd.damage[categoryName] = wd.damage[categoryName] or wd.damage.default
   end
-  wd.damage.default = wd.paralyzer and max/3 or max
+  wd.damage.default = wd.paralyzer and max*EMP_DAMAGE_MOD or max
 end
 
 --------------------------------------------------------------------------------
