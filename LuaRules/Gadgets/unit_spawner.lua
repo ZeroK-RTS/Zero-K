@@ -1124,7 +1124,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   end
   local name = UnitDefs[unitDefID].name
   if (unitTeam == chickenTeamID) then
-    if (chickenTypes[name] or supporters[name] or (name == burrowName)) then
+    if (chickenTypes[name] or (name == burrowName)) then
       local kills = Spring.GetGameRulesParam(name.."Kills")
       Spring.SetGameRulesParam(name.."Kills", kills + 1)
     end
