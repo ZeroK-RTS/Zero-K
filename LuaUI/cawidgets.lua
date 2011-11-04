@@ -507,9 +507,9 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 	if type(info.detailsDefault) == "table" then
 		enabled = info.detailsDefault[detailLevel] and true
 	elseif type(info.detailsDefault) == "number" then
-		enabled = detailLevel > info.detailsDefault
+		enabled = detailLevel >= info.detailsDefault
 	elseif tonumber(info.detailsDefault) then
-		enabled = detailLevel > info.detailsDefault
+		enabled = detailLevel >= tonumber(info.detailsDefault)
 	end
   end
 			 
