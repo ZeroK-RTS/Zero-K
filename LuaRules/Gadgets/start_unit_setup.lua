@@ -327,10 +327,11 @@ end
 
 
 local function GetStartUnit(teamID, playerID, isAI)
+  Spring.Echo(teamID, teamSidesAI[teamID], teamSides[teamID])
   local startUnit, startUnitAlt
 
-  if isAI then 
-	return startUnits[teamSidesAI[teamID]]
+  if teamSidesAI[teamID] then 
+	return startUnitsAI[teamSidesAI[teamID]]
   end
   
   if (teamID and teamSides[teamID]) then 
@@ -760,11 +761,9 @@ end
 -- used by CAI
 local function SetFaction(side, playerID, teamID)
     teamSidesAI[teamID] = side
-	if not coop then
-		teamSides[teamID] = side
-		if playerID then
-			playerSides[playerID] = side
-		end
+	teamSides[teamID] = side
+	if playerID then
+		playerSides[playerID] = side
 	end
 end
 GG.SetFaction = SetFaction

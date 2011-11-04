@@ -5,8 +5,15 @@ startUnits = {
 	reconcomm = 'commrecon1',
 }
 
-defaultComms = {}
-for i,v in pairs(startUnits) do defaultComms[v] = true end
+startUnitsAI = {}
+
+local aiComms = VFS.Include("gamedata/modularcomms/staticcomms.lua")
+for name in pairs(aiComms) do
+	startUnitsAI[name] = name
+end
+
+--defaultComms = {}
+--for i,v in pairs(startUnits) do defaultComms[v] = true end
 
 ploppables = {
   "factoryhover",

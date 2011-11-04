@@ -59,6 +59,7 @@ local skirm = {
 	
 	"chickens",
 	"chicken_sporeshooter",
+	--"scorpion",
 }
 
 local jumper = { -- uses jump for offense. IE do not put commander or AA here.

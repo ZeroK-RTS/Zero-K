@@ -1,4 +1,4 @@
-return {
+local comms = {
   comm_guardian = { 
 	chassis = "armcom2", 
 	name = "Star Guardian",
@@ -44,5 +44,11 @@ return {
 	name = "Lady of War",
     modules = { "commweapon_heavymachinegun", "commweapon_gaussrifle", "module_ablative_armor", "module_ablative_armor", "module_dmg_booster",
 				"module_adv_targeting", "module_high_power_servos", "weaponmod_disruptor_ammo"},
-  },    
+  },
 }
+
+for name,stats in pairs(comms) do
+	table.insert(stats.modules, "module_econ")
+end
+
+return comms

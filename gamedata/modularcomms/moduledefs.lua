@@ -525,6 +525,16 @@ upgrades = {
 				unitDef.customparams.repairaura_preset = "module_repairfield"
 			end,
 	},
+	
+	-- secret stuff!
+	module_econ = {
+		name = "Economy Module",
+		description = "Produces +2 energy and metal",
+		func = function(unitDef)
+				unitDef.energymake = (unitDef.energymake or 0) + 2
+				unitDef.metalmake = (unitDef.metalmake or 0) + 2
+			end,	
+	}
 }
 
 decorations = {
