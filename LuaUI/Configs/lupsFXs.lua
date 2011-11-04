@@ -73,7 +73,6 @@ groundFlashArmestor = {
   repeatEffect = true,
 }
 
-
 ----------------------------------------------------------------------------
 -- BURSTS ------------------------------------------------------------------
 ----------------------------------------------------------------------------
@@ -149,6 +148,13 @@ corfusShieldSphere = {
   colormap1 = { {0.9, 0.9, 1, 0.75},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 0.75} },
   colormap2 = { {0.05, 0.35, .44, 0.7},{0.05, 0.35, .44, 0.75},{0.05, 0.35, .44, 0.75},{0.05, 0.35, .44, 0.7} },
   repeatEffect=true
+}
+
+commandShieldSphere = {
+  life			= math.huge,
+  heightFactor	= 0.75,
+  radiusFactor	= 1.75, 
+  repeatEffect	= true
 }
 
 ----------------------------------------------------------------------------
@@ -279,7 +285,7 @@ commandCoronaWhite = {
   heightFactor = 0.75,
   life        = 60,
   lifeSpread  = 0,
-  radiusFactor = 6,
+  radiusFactor = 8,
   sizeGrowth  = 0,
   colormap    = { {1, 1, 1, 0.01}, {0.8, 0.8, 0.8, 0.01}, {1, 1, 1, 0.01}, },
   texture     = 'bitmaps/GPL/groundflash.tga',

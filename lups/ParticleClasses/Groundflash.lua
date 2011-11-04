@@ -91,7 +91,10 @@ function GroundFlash:Update(n)
   end
   --cheap hack for mobility
   if self.mobile then
-	self.pos = {Spring.GetUnitPosition(self.unit)}
+	local pos = {Spring.GetUnitPosition(self.unit)}
+	if pos[1] then
+		self.pos = pos
+	end
   end
 end
 

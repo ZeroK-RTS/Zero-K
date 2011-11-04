@@ -73,6 +73,8 @@ local function ProcessComm(name, config)
 		commDefs[name] = CopyTable(UnitDefs[config.chassis], true)
 		commDefs[name].customparams = commDefs[name].customparams or {}
 		local cp = commDefs[name].customparams
+		
+		-- store base values
 		cp.basespeed = tostring(commDefs[name].maxvelocity)
 		cp.basehp = tostring(commDefs[name].maxdamage)
 		for i,v in pairs(commDefs[name].weapondefs or {}) do
@@ -90,6 +92,7 @@ local function ProcessComm(name, config)
 			reload = 0,
 		}
 		
+		-- process modules
 		if config.modules then
 			local hasWeapon = false
 			RemoveWeapons(commDefs[name])
@@ -121,6 +124,7 @@ local function ProcessComm(name, config)
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end
 			end
+			-- give unarmed comms a peashooter
 			if not hasWeapon then
 				ApplyWeapon(commDefs[name], "commweapon_peashooter", true)
 			end
@@ -134,11 +138,27 @@ local function ProcessComm(name, config)
 		if config.name then
 			commDefs[name].name = config.name
 		end
+		
+		-- set name
+		commDefs[name].unitname = name
+		-- set costs
 		config.cost = config.cost or 0
 		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
 		commDefs[name].buildcostenergy = commDefs[name].buildcostenergy + config.cost
 		commDefs[name].buildtime = commDefs[name].buildtime + config.cost
-		commDefs[name].unitname = name
+		
+		-- apply decorations
+		if config.decorations then
+			for _,decName in ipairs(config.decorations) do
+				if decorations[decName] then
+					if decorations[decName].func then --apply upgrade function
+						decorations[decName].func(commDefs[name]) 
+					end
+				else
+					Spring.Echo("\tERROR: Decoration "..decName.." not found")
+				end
+			end
+		end		
 	end
 end
 

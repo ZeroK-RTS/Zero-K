@@ -456,7 +456,6 @@ upgrades = {
 		description = "Generates a small bubble shield",
 		func = function(unitDef)
 				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
-				unitDef.activatewhenbuilt = true
 			end,
 	},
 	module_resurrect = {
@@ -472,9 +471,8 @@ upgrades = {
 		description = "Bubble shield that protects surrounding units within 300 m",
 		func = function(unitDef)
 				ApplyWeapon(unitDef, "commweapon_areashield", 2)
-				unitDef.activatewhenbuilt = true
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
-				table.insert(unitDef.customparams.lups_unit_fxs, "commShield")
+				table.insert(unitDef.customparams.lups_unit_fxs, "commAreaShield")
 			end,
 	},	
 	module_cloak_field = {
@@ -527,5 +525,64 @@ upgrades = {
 				unitDef.customparams.repairaura_preset = "module_repairfield"
 			end,
 	},
+}
+
+decorations = {
+	skin_recon_dark = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commrecon1dark.dds]]
+			end,
+	},
+	skin_recon_red = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commrecon1red.dds]]
+			end,
+	},
+	skin_battle_blue = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/core_commander_1blue.dds]]
+			end,
+	},
+	skin_support_dark = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commsupport1dark.dds]]
+			end,
+	},
+	skin_support_green = {
+		func = function(unitDef)
+				unitDef.customparams.altskin = [[unittextures/commsupport1green.dds]]
+			end,
+	},
+	
+	shield_red = {
+		func = function(unitDef)
+				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
+				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldRed")		
+			end,
+	},
+	shield_green = {
+		func = function(unitDef)
+				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
+				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldGreen")
+			end,
+	},
+	shield_blue = {
+		func = function(unitDef)
+				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
+				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldBlue")
+			end,
+	},
+	shield_orange = {
+		func = function(unitDef)
+				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
+				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldOrange")	
+			end,
+	},
+	shield_violet = {
+		func = function(unitDef)
+				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
+				table.insert(unitDef.customparams.lups_unit_fxs, "commandShieldViolet")	
+			end,
+	}
 }
 
