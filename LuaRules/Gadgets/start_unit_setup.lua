@@ -327,7 +327,6 @@ end
 
 
 local function GetStartUnit(teamID, playerID, isAI)
-  Spring.Echo(teamID, teamSidesAI[teamID], teamSides[teamID])
   local startUnit, startUnitAlt
 
   if teamSidesAI[teamID] then 
