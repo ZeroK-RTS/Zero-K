@@ -554,7 +554,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+			--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 		end
 		targetCoordinate={targetPosX, targetPosY, targetPosZ } --use first queue as target
 		commandIndexTable[unitID]["backupTargetX"]=cQueue[queueIndex].params[1] --backup the target
@@ -592,7 +592,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 			else
-				Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+				--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 			end
 		end
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
@@ -608,7 +608,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+			--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
