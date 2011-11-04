@@ -60,12 +60,14 @@ local x_name 	= x_icon_clan + 16
 local x_share 	= x_name + 140 
 local x_cpu 	= x_share + 20
 local x_ping 	= x_cpu + 40
-local x_buffer	= x_ping + 10
-local x_bound	= x_buffer + 40
+local x_buffer	= x_ping + 40
+
+local x_bound	= x_buffer + 40 + (cf and 0 or 20)
 
 local UPDATE_FREQUENCY = 0.5	-- seconds
 
 local wantsNameRefresh = {}
+local aiTeams = {}
 
 -- keeps track of labels
 local nameLabels = {}
@@ -120,6 +122,13 @@ options = {
 		desc = "Align list entries to top (i.e. don't push to bottom)",
 		OnChange = function() SetupPlayerNames() end,
 	},
+	showSpecs = {
+		name = "Show spectators",
+		type = 'bool',
+		value = false,
+		desc = "Show spectators in main window (rather than confining them to tooltip)",
+		OnChange = function() SetupPlayerNames() end,
+	},	
 }
 
 --------------------------------------------------------------------------------
@@ -141,16 +150,35 @@ local function ShareUnits(playername, team)
 	end
 end
 
+
 local function PingTimeOut(pingTime)
 	if pingTime < 1 then
 		return (math.floor(pingTime*1000) ..'ms')
 	elseif pingTime > 999 then
-		return '>999s'
+		return ('' .. (math.floor(pingTime*100/60)/100)):sub(1,4) .. 'min'
 	end
 	--return (math.floor(pingTime*100))/100
 	return ('' .. (math.floor(pingTime*100)/100)):sub(1,4) .. 's' --needed due to rounding errors.
 end
 
+-- makes a color char from a color table
+-- explanation for string.char: http://springrts.com/phpbb/viewtopic.php?f=23&t=24952
+local function GetColorChar(colorTable)
+	if colorTable == nil then return string.char(255,255,255,255) end
+	local col = {}
+	for i=1,4 do
+		col[i] = math.ceil(colorTable[i]*255)
+	end
+	return string.char(col[4],col[1],col[2],col[3])
+end
+
+--[[
+local function GetColorStr(colorTable)
+	if colorTable == nil then return "\255\255\255\255" end
+end
+]]--
+
+-- ceasefire button tooltip
 local function CfTooltip(allyTeam)
 	local tooltip = ''
 	
@@ -181,18 +209,46 @@ local function CfTooltip(allyTeam)
 		end
 		
 		tooltip = tooltip .. '\n\n' .. red .. 'No ceasefire in effect.' .. white
-		
 	end
 	
 	return tooltip
 end
 
+-- spectator tooltip
+-- not shown if they're in playerlist as well
+local function MakeSpecTooltip()
+	local players = Spring.GetPlayerList()
+	local specsSorted = {}
+	for i=1,#players do
+		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(players[i])
+		if spectator and active then
+			specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = cpuUsage}
+			--specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = cpuUsage}
+		end
+	end
+	table.sort(specsSorted, function(a,b)
+		return a.name:lower() < b.name:lower()
+	end)
+	local windowTooltip = "SPECTATORS"
+	for i=1,#specsSorted do
+		local cpuCol = pingCpuColors[ math.ceil( specsSorted[i].cpu * 5 ) ]
+		cpuCol = GetColorChar(cpuCol)
+		local pingCol = pingCpuColors[ math.ceil( math.min(specsSorted[i].ping,1) * 5 ) ]
+		pingCol = GetColorChar(pingCol)
+		local cpu = math.round(specsSorted[i].cpu*100)
+		windowTooltip = windowTooltip .. "\n\t"..specsSorted[i].name.."\t"..cpuCol..(cpu)..'%\008' .. "\t"..pingCol..PingTimeOut(specsSorted[i].ping).."\008"
+	end
+	scroll_cpl.tooltip = windowTooltip
+end
+
+-- updates ping and CPU for all players; name if needed
 local function UpdatePlayerInfo()
 	local players = Spring.GetPlayerList()
 	for i=1,#players do
 		local playerID = players[i]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
-		if not spectator then
+		
+		if not(aiTeams[teamID]) and ((not spectator) or options.showSpecs.value) then
 			-- update ping and CPU
 			pingTime = pingTime or 0
 			cpuUsage = cpuUsage or 0
@@ -201,8 +257,12 @@ local function UpdatePlayerInfo()
 			local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 			local pingTime_readable = PingTimeOut(pingTime)
 			
+			cpuLabels[playerID].textColor = cpuCol
 			cpuLabels[playerID]:SetCaption(math.round(cpuUsage*100) .. '%')
+			cpuLabels[playerID]:Invalidate()
+			pingLabels[playerID].textColor = pingCol
 			pingLabels[playerID]:SetCaption(pingTime_readable)
+			pingLabels[playerID]:Invalidate()
 		end
 		-- for <Waiting> bug at start, may be a FIXME
 		if nameLabels[teamID] and wantsNameRefresh[playerID] then
@@ -225,6 +285,7 @@ local function UpdatePlayerInfo()
 			nameLabels[teamID]:SetCaption(name_out)
 		end
 	end
+	if not options.showSpecs.value then MakeSpecTooltip() end
 end
 
 -- adds:	ally team number, ceasefire button if applicable
@@ -309,7 +370,7 @@ local function AddAllyteamPlayers(row, allyTeam, players)
 		local pingTime_readable = PingTimeOut(pingTime)
 
 		if not pdata.isAI then 
-		
+			-- flag
 			if icCountry ~= nil  then 
 				scroll_cpl:AddChild(
 					Chili.Image:New{
@@ -321,7 +382,7 @@ local function AddAllyteamPlayers(row, allyTeam, players)
 					}
 				)
 			end 
-			
+			-- level-based rank
 			if icRank ~= nil then 
 				scroll_cpl:AddChild(
 					Chili.Image:New{
@@ -333,7 +394,7 @@ local function AddAllyteamPlayers(row, allyTeam, players)
 					}
 				)
 			end 
-
+			-- clan icon
 			if icon ~= nil then 
 				scroll_cpl:AddChild(
 					Chili.Image:New{
@@ -360,13 +421,13 @@ local function AddAllyteamPlayers(row, allyTeam, players)
 			fontsize = fontsize,
 			fontShadow = true,
 		}
-		nameLabels[teamID] = nameLabel
+		if teamID then nameLabels[teamID] = nameLabel end
 		scroll_cpl:AddChild(nameLabel)
 		-- because for some goddamn stupid reason the names won't show otherwise
 		nameLabel:UpdateLayout()
 		nameLabel:Invalidate()
 		
-		-- CPU, ping
+		-- share button
 		if active and allyTeam == localAlliance and teamID ~= localTeam then
 			scroll_cpl:AddChild(
 				Button:New{
@@ -389,6 +450,7 @@ local function AddAllyteamPlayers(row, allyTeam, players)
 				}
 			)
 		end
+		-- CPU, ping
 		if not pdata.isAI then
 			local cpuLabel = Label:New{
 				x=x_cpu,
@@ -441,7 +503,6 @@ SetupPlayerNames = function()
 	for i,v in ipairs(playerroster) do
 		local playerID = playerroster[i]
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
-		--if spectator then
 		if spectator and active then
 			if not allyTeams.S then
 				allyTeams.S = {}
@@ -459,6 +520,7 @@ SetupPlayerNames = function()
 			if isAI then
 				local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
 				name_out = '<'.. name ..'> '.. shortName
+				aiTeams[teamID] = true
 			else
 				--local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
 				local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
@@ -515,12 +577,14 @@ SetupPlayerNames = function()
 			row = AddAllyteamPlayers(row, allyTeam,players)
 		end
 	end
-	--[[
-	if show_spec then
+
+	if options.showSpecs.value then
 		row = AddAllyteamPlayers(row,'S',allyTeams.S)
+	else
+		MakeSpecTooltip()
 	end
 	
-	
+	--[[
 	scroll_cpl:AddChild( Checkbox:New{
 		x=5, y=fontsize * (row + 0.5),
 		height=fontsize * 1.5, width=160,
@@ -543,21 +607,6 @@ SetupPlayerNames = function()
 		row = row + 1
 	end
 	
-	-- spectators tooltip
-	local specsSorted = {}
-	for name,id in pairs(specNames) do
-		specsSorted[#specsSorted + 1] = {name = name, id = id}
-	end
-	table.sort(specsSorted, function(a,b)
-		return a.name:lower() < b.name:lower()
-	end)
-	local windowTooltip = "SPECTATORS"
-	for i=1,#specsSorted do
-		windowTooltip = windowTooltip .. "\n\t"..specsSorted[i].name
-	end
-	
-	scroll_cpl.tooltip = windowTooltip
-	
 	--push things to bottom of window if needed
 	--scroll_cpl.width = x_bound --window_cpl.width - window_cpl.padding[1] - window_cpl.padding[3]
 	local height = row * (fontsize+2)
@@ -574,7 +623,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 
 
 function widget:Shutdown()
@@ -605,6 +653,13 @@ function widget:PlayerRemoved(playerID)
 	SetupPlayerNames()
 end
 
+function widget:TeamDied(teamID)
+	SetupPlayerNames()
+end
+
+function widget:TeamChanged(teamID)
+	SetupPlayerNames()
+end
 -----------------------------------------------------------------------
 
 function widget:Initialize()
