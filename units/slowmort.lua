@@ -96,7 +96,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 150,
+        default = 100,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
