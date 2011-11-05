@@ -52,7 +52,7 @@ unitDef = {
   },
 
   side                   = [[CORE]],
-  sightDistance          = 200,
+  sightDistance          = 0,
   turnRate               = 0,
   useBuildingGroundDecal = false,
   workerTime             = 0,

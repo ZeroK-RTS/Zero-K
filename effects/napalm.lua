@@ -22,7 +22,7 @@ return {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 4,
+      count              = 6,
       ground             = true,
       water              = true,
       properties = {
@@ -47,32 +47,48 @@ return {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 20,
+      count              = 25,
       ground             = true,
       water              = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_600]],
-        pos                = [[r16 y10 -1 x10x10 y10 256 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
+        pos                = [[r14.1421 y10 -1 x10x10 y10 200 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
+        -- circle
       },
     },
 	redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 180,
+      count              = 200,
       ground             = true,
       water              = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_1400]],
-        pos                = [[r6.3496 y10 -1 x10x10x10 y10 256 a10     y10 r6.2831 y11 -3.1415 a11 y11       r3.1415 y12 -1.570 a12 y12         -0.5x12x12 y0 0.0417x12x12x12x12 y1 -0.00139x12x12x12x12x12x12 y2 0.0000248015x12x12x12x12x12x12x12x12 y3 -0.000000275573x12x12x12x12x12x12x12x12x12x12 y4 0.00000000208768x12x12x12x12x12x12x12x12x12x12x12x12 y5 1 a0 a1 a2 a3 a4 a5 y13         -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,          -0.1667x12x12x12 y0 0.00833x12x12x12x12x12 y1 -0.000198412x12x12x12x12x12x12x12 y2 0.00000275573192x12x12x12x12x12x12x12x12x12 y3 -0.00000002505210838x12x12x12x12x12x12x12x12x12x12x12 y4 0 a12 a0 a1 a2 a3 a4 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
-        -- 6.3496 = 256^(1/3)
-        -- y10 = radius
-        -- y11 = angle
-        -- y12 = pitch
-        -- y13 = cos(pitch)
+        pos                = [[r3.7606 y10 -1 x10x10x10x10 y10 200 a10 y10     r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,              2 x12 y12 -1 a12 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
+        -- RADIUS y10 = 200 + -1 * rand(200^(1/4))^4
+        -- ANGLE  y11 = rand(2 pi) - pi
+        -- A = rand(1)
+        
+        -- theta = ANGLE
+        -- phi = 2 * arcsin(sqrt(A))
+        
+        -- XZMULT = sin(phi) = sin(2 * arcsin(sqrt(A))) = 2*sqrt(1 - A) * sqrt(A)
+        -- X = cos(ANGLE) * RADIUS * XZMULT
+        -- Y = (1 - 2*A) * RADIUS
+        -- Z = sin(ANGLE) * RADIUS * XZMULT
+        
+        -- Old-not-so-good sphere
+        -- [[r6.3496 y10 -1 x10x10x10 y10 256 a10     y10 r6.2831 y11 -3.1415 a11 y11      r1 y12 -0.5 a12 y0 1 x0x0 p0.5 y0 -1 x12 y1 0 a1 a0 y0 -0.5 x0 y0 0.25 a0 p0.5 y0   -1 x12 y1 0.5 a1 y1 1 x1x1 p0.5 y1 0 a12 a1 y1 -0.5 x1 y1 0.75 a1 p0.5 y1 -1 x1 y1 0 a0 a1 y12 2.22144 x12 y12      -0.5x12x12 y0 0.0417x12x12x12x12 y1 -0.00139x12x12x12x12x12x12 y2 0.0000248015x12x12x12x12x12x12x12x12 y3 -0.000000275573x12x12x12x12x12x12x12x12x12x12 y4 0.00000000208768x12x12x12x12x12x12x12x12x12x12x12x12 y5 1 a0 a1 a2 a3 a4 a5 y13         -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,          -0.1667x12x12x12 y0 0.00833x12x12x12x12x12 y1 -0.000198412x12x12x12x12x12x12x12 y2 0.00000275573192x12x12x12x12x12x12x12x12x12 y3 -0.00000002505210838x12x12x12x12x12x12x12x12x12x12x12 y4 0 a12 a0 a1 a2 a3 a4 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
+        -- RADIUS y10 = 256 + -1 * rand(6.3496)^3
+        -- ANGLE  y11 = rand(2 pi) - pi
+        -- PITCH  y12 = sqrt(-0.5*(sqrt((a - 0.5)^2) - a) + 0.25) - (sqrt(-0.5 *(sqrt((-a + 0.5)^2) + a) + 0.75)) * (pi*sqrt(2)/2)
+        -- XZMULT y13 = cos(PITCH)
+        -- X = cos(ANGLE) * RADIUS * XZMULT
+        -- Y = sin(PITCH)
+        -- Z = sin(ANGLE) * RADIUS * XZMULT
         -- cos and sine are the 12th order series expansions
-        --  -0.1667x12x12x12 y0 0.00833x12x12x12x12x12 y1 -0.000198412x12x12x12x12x12x12x12 y2 0.00000275573192x12x12x12x12x12x12x12x12x12 y3 -0.00000002505210838x12x12x12x12x12x12x12x12x12x12x12 y4 0 a12 a0 a1 a2 a3 a4 y12        1.570 x12 y12
       },
     },
   },
@@ -92,25 +108,25 @@ return {
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 30,
+      count              = 25,
       ground             = true,
       water              = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[0 r200 r-200, 30, 0 r200 r-200]], 	--random(0, 200) - random (0, 200)
+        pos                = [[r14.1421 y10 -1 x10x10 y10 200 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
       },
     },
 	redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 100,
+      count              = 200,
       ground             = true,
       water              = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_450]],
-        pos                = [[0 r200 r-200, 0 r200 r-200, 0 r200 r-200]],
+        pos                = [[r3.7606 y10 -1 x10x10x10x10 y10 200 a10 y10     r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,              2 x12 y12 -1 a12 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
       },
     },
   },
@@ -136,19 +152,19 @@ return {
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_200]],
-        pos                = [[0 r100 r-100, 30, 0 r100 r-100]], 	--random(0, 200) - random (0, 200)
+        pos                = [[r10 y10 -1 x10x10 y10 100 a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, 30, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10]],
       },
     },
 	redploom_long = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 40,
+      count              = 45,
       ground             = true,
       water              = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:NAPALMFIREBALL_600]],
-        pos                = [[0 r100 r-100, 0 r100 r-100, 0 r100 r-100]],
+        pos                = [[r4.64159 y10 -1 x10x10x10 y10 100 a10 y10     r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,              2 x12 y12 -1 a12 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
       },
     },
   },
@@ -162,20 +178,20 @@ return {
       ground             = true,
       water              = true,
       properties = {
-        airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   .6 .6 .6 0.06     .6 .6 .6 0.05    .6 .6 .6 0.05   0 0 0 0.01]],
+        airdrag            = 0.98,
+        colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
         directional        = false,
         emitrot            = 60,
         emitrotspread      = 30,
-        emitvector         = [[0, 1, 0]],
+        emitvector         = [[r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x13,              2 x12 y12 -1 a12,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x13]],
         gravity            = [[0.001 r-0.002, -0.001 r0.002, 0.001 r-0.002]],
         numparticles       = 2,
         particlelife       = 500,	--minimum particle lifetime in frames
         particlelifespread = 900,	--max value of random lifetime added to each particle's lifetime
         particlesize       = 30,
         particlesizespread = 10,
-        particlespeed      = 0.5,
-        particlespeedspread = 1.0,
+        particlespeed      = 0.6,
+        particlespeedspread = 1.2,
         pos                = [[-10 r20, 0, -10 r20]],
         sizegrowth         = 0,
         sizemod            = 1.0,
@@ -192,11 +208,11 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   .6 .6 .6 0.06     .6 .6 .6 0.05    .6 .6 .6 0.05   0 0 0 0.01]],
+        colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
         directional        = false,
         emitrot            = 60,
         emitrotspread      = 30,
-        emitvector         = [[0, 1, 0]],
+        emitvector         = [[r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x13,              2 x12 y12 -1 a12,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x13]],
         gravity            = [[0.001 r-0.002, -0.001 r0.002, 0.001 r-0.002]],
         numparticles       = 2,
         particlelife       = 200,	--minimum particle lifetime in frames
@@ -204,7 +220,7 @@ return {
         particlesize       = 30,
         particlesizespread = 10,
         particlespeed      = 0.5,
-        particlespeedspread = 1.0,
+        particlespeedspread = 1.2,
         pos                = [[-10 r20, 0, -10 r20]],
         sizegrowth         = 0,
         sizemod            = 1.0,
@@ -221,11 +237,11 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   .6 .6 .6 0.06     .6 .6 .6 0.05    .6 .6 .6 0.05   0 0 0 0.01]],
+        colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
         directional        = false,
         emitrot            = 60,
         emitrotspread      = 30,
-        emitvector         = [[0, 1, 0]],
+        emitvector         = [[r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x13,              2 x12 y12 -1 a12,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x13]],
         gravity            = [[0.001 r-0.002, -0.001 r0.002, 0.001 r-0.002]],
         numparticles       = 2,
         particlelife       = 100,	--minimum particle lifetime in frames
@@ -250,11 +266,11 @@ return {
       water              = true,
       properties = {
         airdrag            = 0.97,
-        colormap           = [[0 0 0 0.01   .6 .6 .6 0.09     .6 .6 .6 0.08    .6 .6 .6 0.05   0 0 0 0.01]],
+        colormap           = [[0 0 0 0.001   .6 .6 .6 0.03     .6 .6 .6 0.02    .6 .6 .6 0.02   0 0 0 0.01]],
         directional        = false,
         emitrot            = 60,
         emitrotspread      = 30,
-        emitvector         = [[0, 1, 0]],
+        emitvector         = [[r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x13,              2 x12 y12 -1 a12,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x13]],
         gravity            = [[0.001 r-0.002, 0.001 r0.002, 0.001 r-0.002]],
         numparticles       = 2,
         particlelife       = 60,

@@ -57,7 +57,7 @@ unitDef = {
   },
 
   side                          = [[CORE]],
-  sightDistance                 = 200,
+  sightDistance                 = 0,
   smoothAnim                    = true,
   TEDClass                      = [[SPECIAL]],
   turnRate                      = 0,
