@@ -1,4 +1,4 @@
-local versionName = "v2.02"
+local versionName = "v2.03"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ local avatar_fallback_checksum = 13686070
 
 local myPlayerID=-1
 local myPlayerName =-1 
-local myTeamID=-1
+local myAllyTeamID=-1
 local playerIDlist={}
 local bufferIndex=0
 local msgRecv={}
@@ -546,9 +546,9 @@ end
 --------------------------------------------------------------------------------
 function widget:PlayerChanged(playerID) --in case where player status changed (eg: joined)
 	--get new playerlist and update checklist
-	local _,active,spectator,teamID,_,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
-	if teamID == myTeamID then --ally has changed status, so retry his entry
-		playerIDlist=Spring.GetPlayerList(myTeamID,true)
+	local _,active,spectator,teamID,allyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
+	if allyTeamID == myAllyTeamID then --ally has changed status, so retry his entry
+		playerIDlist=Spring.GetPlayerList(myAllyTeamID,true)
 		Spring.Echo(playerIDlist)
 		local iteration =1
 		local playerID=-1
@@ -571,10 +571,10 @@ function widget:Initialize()
 	myPlayerID=Spring.GetMyPlayerID()
 	local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(myPlayerID)
 	myPlayerName =name
-	myTeamID=teamID
+	myAllyTeamID=allyTeamID
 	
 	--get ally player list
-	playerIDlist=Spring.GetPlayerList(myTeamID)
+	playerIDlist=Spring.GetPlayerList(myAllyTeamID)
 	Spring.Echo(playerIDlist)
 	avatars = (VFS.FileExists(configFile) and VFS.Include(configFile)) or {}
 	
