@@ -108,8 +108,6 @@ local useCompleteMinCost = true
 local logDeathInView = true
 local logCompleteInView = true
 
-
-
 --local widgetString = "\255\255\255\255<Unit News> \008"	--ARGB
 
 --------------------------------------------------------------------------------
@@ -125,7 +123,7 @@ local logCompleteInView = true
 local function AddEvent(str, unitDefID, color, sound)
 	local frame = Spring.GetGameFrame()
 	if unitDefID then
-		if lastEventFrame[unitDefID] == frame then return end -- spam protection (sorta)
+		if lastEventFrame[unitDefID] == frame then return end -- FIXME: stupid way of doing spam protection
 		lastEventFrame[unitDefID] = frame
 	end
 	
@@ -235,6 +233,13 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		AddEvent(ud.humanName .. ": construction completed", unitDefID, colorGreen, "structureComplete")
 	else
 		AddEvent(ud.humanName .. ": unit operational", unitDefID, colorGreen, "unitComplete")
+	end
+end
+
+function widget:UnitIdle(unitID, unitDefID, unitTeam)
+	local ud = UnitDefs[unitDefID]
+	if ud.isFactory then
+		AddEvent(ud.humanName .. ": factory idle", unitDefID, colorYellow)
 	end
 end
 
