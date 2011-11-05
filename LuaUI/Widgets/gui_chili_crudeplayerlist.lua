@@ -649,6 +649,10 @@ function widget:PlayerChanged(playerID)
 	SetupPlayerNames()
 end
 
+function widget:PlayerAdded(playerID)
+	SetupPlayerNames()
+end
+
 function widget:PlayerRemoved(playerID)
 	SetupPlayerNames()
 end

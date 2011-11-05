@@ -137,6 +137,7 @@ local flexCallIns = {
   'GameFrame',
   'TeamDied',
   'TeamChanged',
+  'PlayerAdded',
   'PlayerChanged',
   "PlayerRemoved",
   'ShockFront',
@@ -1599,6 +1600,14 @@ end
 function widgetHandler:TeamChanged(teamID)
   for _,w in ipairs(self.TeamChangedList) do
     w:TeamChanged(teamID)
+  end
+  return
+end
+
+
+function widgetHandler:PlayerAdded(playerID, reason)
+  for _,w in ipairs(self.PlayerAddedList) do
+    w:PlayerAdded(playerID, reason)
   end
   return
 end
