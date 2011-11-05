@@ -1,4 +1,4 @@
-local versionName = "v2.03"
+local versionName = "v2.04"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -308,9 +308,9 @@ function widget:Update(n)
 		local doChecking=true
 		while doChecking and iteration <= #playerIDlist do
 			playerID=playerIDlist[iteration]
-			if playerID~=myPlayerID then --if self, then don't check self 
+			if playerID~=myPlayerID and not checklistTable[(playerID+1)].ignore then --don't check self and don't check ignore list
 				if (checklistTable[(playerID+1)].checksumCheck==false and checklistTable[(playerID+1)].payload==false) then --check checklist if complete
-					if checklistTable[(playerID+1)].retry<=numberOfRetry then
+					if checklistTable[(playerID+1)].retry<numberOfRetry then
 						doChecking=false
 						checklistTable[(playerID+1)].retry=checklistTable[(playerID+1)].retry+1 -- ++ retry count
 					end
@@ -544,46 +544,85 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function widget:PlayerChanged(playerID) --in case where player status changed (eg: joined)
-	--get new playerlist and update checklist
-	local _,active,spectator,teamID,allyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
-	if allyTeamID == myAllyTeamID then --ally has changed status, so retry his entry
-		playerIDlist=Spring.GetPlayerList(myAllyTeamID,true)
-		Spring.Echo(playerIDlist)
-		local iteration =1
-		local playerID=-1
-		
-		while iteration <= #playerIDlist do
-			playerID=playerIDlist[iteration]
-			if checklistTable[(playerID+1)]==nil then --if playerID is self and player changed to other team then add missing checklist entry
-				checklistTable[(playerID+1)]={checksumCheck=false, payload=false, retry=0} --fill checklist entry with default value
-			else --only ally changed team (eg: speccing or rejoining), reset all retry 
-				checklistTable[(playerID+1)].retry=0 --reset retry timer
-			end
-			iteration=iteration+1
-		end
-		tableIsCompleted=false --unlock checklist for another check
+function widget:PlayerChanged(playerID) --in case where player status changed (eg: joined, spec)
+	UpdatePlayerList()
+end
+
+function widget:PlayerAdded(playerID) --in case where player status changed (eg: joined, spec)
+	UpdatePlayerList()
+end
+
+function widget:PlayerRemoved(playerID)
+	UpdatePlayerList()
+end
+
+function UpdatePlayerList()
+	--get info on self
+	local iAmSpectator=false
+	if Spring.GetSpectatingState() then 
+		iAmSpectator=true
 	end
+
+	--get all playerID list
+	playerIDlist=Spring.GetPlayerList()
+	Spring.Echo(playerIDlist)	
+	
+	--use playerIDlist to update checklist
+	local iteration =1
+	local playerID=-1
+	while iteration <= #playerIDlist do --update checklist with appropriate value
+		playerID=playerIDlist[iteration]
+		if checklistTable[(playerID+1)]==nil then 
+			checklistTable[(playerID+1)]={checksumCheck=false, payload=false, retry=0, ignore=false} --add empty entry with new value
+		else 
+			checklistTable[(playerID+1)].ignore=false --reset previous ignore list
+			checklistTable[(playerID+1)].retry=0 --reset retry counter
+		end
+		--the following add ignore flag to selective playerID
+		local _,playerIsActive,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
+		if iAmSpectator then --if I am spectator then
+			if not playerIsSpectator or not playerIsActive then --ignore non-specs and inactive player(don't send hi/request file)
+				checklistTable[(playerID+1)].ignore=true 
+			end
+		else
+			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not playerIsActive then --if I am not spectator and player is the enemy or spec then
+				checklistTable[(playerID+1)].ignore=true --ignore enemy & spec and inactive player(don't send hi/request file)
+			end
+		end
+		iteration=iteration+1
+	end
+	tableIsCompleted=false --unlock checklist for another check
 end
 
 function widget:Initialize()
 	--get info on self
 	myPlayerID=Spring.GetMyPlayerID()
-	local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(myPlayerID)
+	local name,_,iAmSpectator,_,allyTeamID,_,_,_,_,customKeys = Spring.GetPlayerInfo(myPlayerID)
 	myPlayerName =name
 	myAllyTeamID=allyTeamID
 	
-	--get ally player list
-	playerIDlist=Spring.GetPlayerList(myAllyTeamID)
+	--get all playerID list
+	playerIDlist=Spring.GetPlayerList()
 	Spring.Echo(playerIDlist)
 	avatars = (VFS.FileExists(configFile) and VFS.Include(configFile)) or {}
-	
+
 	--use player list to build checklist
 	local iteration =1
 	local playerID=-1
 	while iteration <= #playerIDlist do --fill checklist with initial value
 		playerID=playerIDlist[iteration]
-		checklistTable[(playerID+1)]={checksumCheck=false, payload=false, retry=0} --fill checklist entry with default value
+		checklistTable[(playerID+1)]={checksumCheck=false, payload=false, retry=0, ignore=false} --fill checklist with default values (promote communication)
+		--the following add ignore flag to selective playerID
+		local _,_,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
+		if iAmSpectator then --if I am spectator then
+			if not playerIsSpectator then --ignore non-specs (don't send hi/request file)
+				checklistTable[(playerID+1)].ignore=true 
+			end
+		else
+			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator then --if I am not spectator and player is enemy or spec then
+				checklistTable[(playerID+1)].ignore=true --ignore enemy & spec (don't send hi/request file)
+			end
+		end
 		iteration=iteration+1
 	end
 	
@@ -632,4 +671,5 @@ end
 --------------------------------------------------------------------------------
 --Reference:
 --gui_ally_cursors.lua , author: jK
---gui_chili_crudeplayerlist.lua, author: CarRepairer, KingRaptor
+--gui_chili_crudeplayerlist.lua, author: CarRepairer, +KingRaptor
+--cawidgets.lua, author: Dave Rodgers, +jk, quantum, KingRaptor
