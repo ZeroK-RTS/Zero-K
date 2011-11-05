@@ -1,0 +1,323 @@
+function widget:GetInfo()
+	return {
+		name	= "News Ticker",
+		desc	= "v1 Keeps you up to date on important battlefield events",
+		author	= "KingRaptor",
+		date	= "July 26, 2009",
+		license	= "GNU GPL, v2 or later",
+		layer	= 0,
+		enabled	= false  --  loaded by default?
+	}
+end
+
+--[[
+-- Features:
+_ Informs player of unit completion/death events, with sound events depending of incomes ( so no constant 'unit operational unit operational unit operational' when building heaps of peewees).
+
+-- To do:
+_ Maybe fusion this with minimap_events.lua and unit_marker.lua as they have a pretty similar task, maybe even unit_sounds.
+--]]
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local Chili
+local Window
+local Panel
+local Label
+local screen0
+
+local labels = {}
+local window_ticker
+local panel_ticker
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local soundTimeout = 0
+local lastEventFrame = {}
+
+local lastUpdate = 0
+local updatePeriod = 0.02
+local updatePeriodLong = 0.5
+local mIncome = 0
+
+local colorRed = {1,0,0,1}
+local colorOrange = {1,0.5,0,1}
+local colorYellow = {1,1,0,1}
+local colorGreen = {0,1,0,1}
+--------------------------------------------------------------------------------
+--SPEEDUPS
+--------------------------------------------------------------------------------
+local Echo					= Spring.Echo
+local spGetTeam				= Spring.GetUnitTeam
+local spGetGameSeconds		= Spring.GetGameSeconds
+local spInView				= Spring.IsUnitInView
+local spGetTeamRes			= Spring.GetTeamResources
+local spGetLastAttacker		= Spring.GetUnitLastAttacker
+local spGetGameFrame		= Spring.GetGameFrame
+local spGetSpectatingState	= Spring.GetSpectatingState
+local spIsReplay			= Spring.IsReplay
+
+local spPlaySoundFile		= Spring.PlaySoundFile
+local spMarkerAddPoint		= Spring.MarkerAddPoint
+
+local playerID				= Spring.GetMyPlayerID()
+local teamID				= Spring.GetMyTeamID()
+--------------------------------------------------------------------------------
+--CONFIG
+--------------------------------------------------------------------------------
+local fontSize = 12
+local labelSpacing = 15
+local scrollSpeed = math.ceil(60*updatePeriod)
+
+options_path = 'Settings/Interface/News Ticker'
+options = {
+	backgroundOpacity = {
+		name = "Background opacity",
+		type = "number",
+		value = 0, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			panel_ticker.color = {1,1,1,self.value}
+			panel_ticker:Invalidate()
+		end,
+	},
+	minCostMult = {
+		name = "Minimum cost mult",
+		type = "number",
+		value = 10, min = 1, max = 20, step = 1,
+		desc = "Multiplies metal income for minimum cost of newsworthy units",
+	},
+}
+
+local timeoutConstant = 150
+
+local sounds = {
+	unitComplete = {file = "LuaUI/sounds/voices/productionc_arm_1.wav", timeout = timeoutConstant},
+	structureComplete = {file = "LuaUI/sounds/voices/constructionc_arm_1.wav", timeout = timeoutConstant},
+}
+
+local noMonitor = {
+	[UnitDefNames.terraunit.id] = true,
+}
+
+local useSounds = true
+--local mFactor = 10 --multiply by current M income to get the minimum cost for newsworthiness
+local useDeathMinCost = true
+local useCompleteMinCost = true
+local logDeathInView = true
+local logCompleteInView = true
+
+
+
+--local widgetString = "\255\255\255\255<Unit News> \008"	--ARGB
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+--function isSpec()
+--	if (spGetSpectatingState or spIsReplay) then
+--		return true
+--	end
+--end
+
+-- add a news event - makes a label and plays a sound if needed
+local function AddEvent(str, unitDefID, color, sound)
+	local frame = Spring.GetGameFrame()
+	if unitDefID then
+		if lastEventFrame[unitDefID] == frame then return end -- spam protection (sorta)
+		lastEventFrame[unitDefID] = frame
+	end
+	
+	local x = window_ticker.width
+	local lastLabel = labels[#labels]
+	if lastLabel then
+		x = math.max(x, lastLabel.x + lastLabel.width + labelSpacing)
+	end
+	labels[#labels+1] = Label:New{
+		width=string.len(str) * fontSize/2;
+		height="100%";
+		autosize=true;
+		x=x,
+		y=0,
+		align="left";
+		valign="top";
+		caption = str,
+		textColor = color,
+		fontSize = fontSize;
+		fontShadow = true;
+		parent = panel_ticker;
+	}
+	if useSounds and soundTimeout < frame then
+		local soundInfo = sounds[sound]
+		if not soundInfo then return end
+		spPlaySoundFile(soundInfo.file)
+		soundTimeout = frame + soundInfo.timeout
+	end
+end
+
+--WG.AddNewsEvent = AddEvent	-- if we ever want other widgets to use the ticker
+
+-- scrolls labels, removes the ones that run off the edge
+local function ProcessLabels()
+	local toRemove = {}
+	for i=1,#labels do
+		local label = labels[i]
+		label.x = label.x - scrollSpeed
+		label:Invalidate()
+		if label.x + label.width <= 0 then
+			toRemove[#toRemove+1] = i
+		end
+	end
+	for i=1, #toRemove do
+		--Spring.Echo("Removing label "..toRemove[i])
+		labels[toRemove[i]]:Dispose()
+		table.remove(labels, toRemove[i])
+	end
+end
+
+local function CheckSpecState()
+	if (Spring.GetSpectatingState() or Spring.IsReplay()) then
+		Echo("<Unit News> Spectator mode or replay. Widget removed.")
+		widgetHandler:RemoveWidget()
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local timerUpdate = 0
+local timerUpdateLong = 0
+function widget:Update(dt)
+	timerUpdate = timerUpdate + dt
+	if timerUpdate > updatePeriod then
+		ProcessLabels()
+		timerUpdate = 0
+	end
+	timerUpdateLong = timerUpdateLong + dt
+	if timerUpdateLong > updatePeriodLong then
+		--CheckSpecState()
+		mIncome= select(4, spGetTeamRes(teamID, "metal"))
+		timerUpdateLong = 0
+	end
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	--don't report cancelled constructions etc.
+	local killer = spGetLastAttacker(unitID)
+	if killer == nil or killer == -1 or noMonitor[unitDefID] then return end
+	local ud = UnitDefs[unitDefID]
+	--don't bother player with cheap stuff
+	if (spGetTeam(unitID) ~= teamID) or (ud.metalCost < (mIncome * options.minCostMult.value) and useDeathMinCost) then return end
+	--can u c me?
+	if (spInView(unitID)) and (logDeathInView == false) then return end
+	
+	if (ud.canFly) then AddEvent(ud.humanName .. " shot down", unitDefID, colorRed)
+	elseif (ud.isFactory) then AddEvent(ud.humanName .. ": factory destroyed", unitDefID, colorRed)
+	elseif (ud.isCommander) then AddEvent(ud.humanName .. ": commander lost", unitDefID, colorRed)
+	elseif (ud.isBuilding) then AddEvent(ud.humanName .. ": building destroyed", unitDefID, colorRed)
+	elseif (ud.modCategories.ship) or (ud.modCategories.sub) then AddEvent(ud.humanName .. " sunk", unitDefID, colorRed)
+	elseif (ud.isBuilder) then AddEvent(ud.humanName .. ": constructor lost", unitDefID, colorRed)
+	else AddEvent(ud.humanName .. ": unit lost", unitDefID, colorRed)
+	end
+end
+
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
+	--visibility check
+	if (spGetTeam(unitID) ~= teamID) or (spInView(unitID)) and (logCompleteInView == false) then return end
+	local ud = UnitDefs[unitDefID]
+	--for name,param in ud:pairs() do
+	--	Spring.Echo(name,param)
+	--end
+	-- cheap units aren't newsworthy unless they're builders
+	if (not ud.isBuilder and (UnitDefs[unitDefID].metalCost < (mIncome * options.minCostMult.value) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
+	if (not ud.canMove) or (ud.isFactory) then
+		AddEvent(ud.humanName .. ": construction completed", unitDefID, colorGreen, "structureComplete")
+	else
+		AddEvent(ud.humanName .. ": unit operational", unitDefID, colorGreen, "unitComplete")
+	end
+end
+
+function widget:TeamDied(teamID)
+	local player = Spring.GetPlayerList(teamID)[1]
+	-- chicken team has no players (normally)
+	if player then
+		local playerName = Spring.GetPlayerInfo(player)
+		widget:AddWarning(playerName .. ' died')
+	end
+end
+
+--[[
+function widget:TeamChanged(teamID)
+	--// ally changed
+	local playerName = Spring.GetPlayerInfo(Spring.GetPlayerList(teamID)[1])
+	widget:AddWarning(playerName .. ' allied')
+end
+--]]
+
+function widget:PlayerChanged(playerID)
+	local playerName,active,isSpec,teamID = Spring.GetPlayerInfo(playerID)
+  local _,_,isDead = Spring.GetTeamInfo(teamID)
+	if (isSpec) then
+		if not isDead then
+			AddEvent(playerName .. ' resigned', nil, colorOrange)
+		end
+	elseif (Spring.GetDrawFrame()>120) then --// skip `changed status` message flood when entering the game
+		AddEvent(playerName .. ' changed status', nil, colorYellow)
+	end
+end
+
+function widget:PlayerRemoved(playerID, reason)
+	local playerName,active,isSpec = Spring.GetPlayerInfo(playerID)
+	if spec then return end
+	if reason == 0 then
+		AddEvent(playerName .. ' timed out', nil, colorOrange)
+	elseif reason == 1 then
+		AddEvent(playerName .. ' quit', nil, colorOrange)
+	elseif reason == 2 then
+		AddEvent(playerName .. ' got kicked', nil, colorOrange)
+	else
+		AddEvent(playerName .. ' left (unknown reason)', nil, colorOrange)
+	end
+end
+
+function widget:Initialize()
+	if (not WG.Chili) then
+		widgetHandler:RemoveWidget(widget)
+		return
+	end
+
+	-- setup Chili
+	Chili = WG.Chili
+	Label = Chili.Label
+	Window = Chili.Window
+	Panel = Chili.Panel
+	screen0 = Chili.Screen0
+	
+	window_ticker = Window:New{
+		padding = {0,0,0,0},
+		--itemMargin = {0, 0, 0, 0},
+		dockable = true,
+		name = "news_ticker_window",
+		x = 300,
+		y = 200,
+		width  = 450,
+		height = fontSize + 2,
+		parent = Chili.Screen0,
+		draggable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		resizable = false,
+		--autosize = true,
+		minimumSize = {1,fontSize * 2 + 2},
+		minHeight = fontSize * 2 + 2,
+		color = {0, 0, 0, 0}
+	}
+	panel_ticker = Panel:New{
+		x = 0,
+		y = 1,
+		width  = "100%",
+		height = fontSize * 2,
+		parent = window_ticker,
+	}
+end
