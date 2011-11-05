@@ -20,7 +20,7 @@ end
 
 local avatars = {}
 
-local msgID       	= "%AAA"
+local msgID       	= "&AAA"
 local hi 			= "1"
 local yes  			= "2"
 local checksumA     = "3"
@@ -40,9 +40,9 @@ local avatarsDir = "LuaUI/Configs/Avatars/"
 local avatar_fallback = avatarsDir .. "Crystal_personal.png"
 local avatar_fallback_checksum = 13686070
 
-local myPlayerID=Spring.GetMyPlayerID()
-local myPlayerName = Spring.GetPlayerInfo(myPlayerID)
-local myTeamID=Spring.GetMyAllyTeamID()
+local myPlayerID=-1
+local myPlayerName =-1 
+local myTeamID=-1
 local playerIDlist={}
 local bufferIndex=0
 local msgRecv={}
@@ -545,19 +545,21 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:PlayerChanged(playerID) --in case where player status changed (eg: joined)
-	local _,_,_,_,allyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
-	if allyTeamID == myTeamID then --ally has changed status, so retry his entry
-		local tempPlayerIDlist=Spring.GetPlayerList(myTeamID,true)
-		if playerIDlist==nil then
-			local dummy={}
-			playerIDlist=dummy --in case there's no playerlist
-			playerIDlist[1]=myPlayerID
-		end
+	--get new playerlist and update checklist
+	local _,active,spectator,teamID,_,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
+	if teamID == myTeamID then --ally has changed status, so retry his entry
+		playerIDlist=Spring.GetPlayerList(myTeamID,true)
+		Spring.Echo(playerIDlist)
 		local iteration =1
 		local playerID=-1
-		while iteration <= #tempPlayerIDlist do
-			playerID=tempPlayerIDlist[iteration]
-			checklistTable[(playerID+1)].retry=0 --reset retry timer
+		
+		while iteration <= #playerIDlist do
+			playerID=playerIDlist[iteration]
+			if checklistTable[(playerID+1)]==nil then --if playerID is self and player changed to other team then add missing checklist entry
+				checklistTable[(playerID+1)]={checksumCheck=false, payload=false, retry=0} --fill checklist entry with default value
+			else --only ally changed team (eg: speccing or rejoining), reset all retry 
+				checklistTable[(playerID+1)].retry=0 --reset retry timer
+			end
 			iteration=iteration+1
 		end
 		tableIsCompleted=false --unlock checklist for another check
@@ -565,14 +567,18 @@ function widget:PlayerChanged(playerID) --in case where player status changed (e
 end
 
 function widget:Initialize()
+	--get info on self
+	myPlayerID=Spring.GetMyPlayerID()
+	local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(myPlayerID)
+	myPlayerName =name
+	myTeamID=teamID
+	
+	--get ally player list
 	playerIDlist=Spring.GetPlayerList(myTeamID)
-	if playerIDlist==nil then
-		local dummy={}
-		playerIDlist=dummy --in case there's no playerlist
-		playerIDlist[1]=myPlayerID
-	end
+	Spring.Echo(playerIDlist)
 	avatars = (VFS.FileExists(configFile) and VFS.Include(configFile)) or {}
 	
+	--use player list to build checklist
 	local iteration =1
 	local playerID=-1
 	while iteration <= #playerIDlist do --fill checklist with initial value
@@ -594,7 +600,6 @@ function widget:Initialize()
 			file = avatar_fallback
 		}  
 	--initialize own avatar using server assigned avatar
-	local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 	if (customKeys ~= nil and customKeys.avatar~=nil) then 
 		myAvatar.file = avatarsDir .. customKeys.avatar .. ".png"
 		myAvatar.checksum = CalcChecksum(VFS.LoadFile(myAvatar.file))
@@ -625,3 +630,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--Reference:
+--gui_ally_cursors.lua , author: jK
+--gui_chili_crudeplayerlist.lua, author: CarRepairer, KingRaptor
