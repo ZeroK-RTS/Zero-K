@@ -1,4 +1,4 @@
-local versionName = "v1.253"
+local versionName = "v1.255"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Nov 3, 2011",
+    date      = "Nov 7, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -282,14 +282,11 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 				
 				--do sync test. Ensure command not changed during last delay
 				local cQueueSyncTest = spGetCommandQueue(unitID)
-				if #cQueueSyncTest>=2 then
-					if cQueue[1].params[1]~=cQueueSyncTest[1].params[1] and cQueue[1].params[3]~=cQueueSyncTest[1].params[3] then 
+				if #cQueueSyncTest>=2 or cQueueSyncTest[1]==nil then
+					if cQueue~=cQueueSyncTest then 
 						newCommand=true
 						cQueue=cQueueSyncTest
 					end
-				elseif cQueueSyncTest[1]==nil then
-					newCommand=true
-					cQueue=cQueueSyncTest
 				end
 				
 				local unitSpeed= surroundingOfActiveUnit[i][7]
