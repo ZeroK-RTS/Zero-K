@@ -1,4 +1,4 @@
-local versionName = "v2.04"
+local versionName = "v2.10"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -7,7 +7,7 @@ function widget:GetInfo()
     name      = "Avatars",
     desc      = "An API for a per-user avatar-icon system, + Hello/Hi protocol",
     author    = "jK, +msafwan",
-    date      = "2009, +2011 (4 Nov)",
+    date      = "2009, +2011 (7 Nov)",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     api       = true,
@@ -28,7 +28,7 @@ local checksumB		= "4"
 local payloadA		= "5"
 local payloadB		= "6"
 local bye			= "7"
-local broadcastA 	= "8"
+local broadcastID 	= "&AAB"
 
 local maxFileSize = 10 --in kB
 local numberOfRetry = 7 --times to send "hi" until remote computer reply
@@ -87,7 +87,7 @@ local function SearchFileByChecksum(checksum)
 		local file_checksum = CalcChecksum(data)
 
 		if (file_checksum == checksum) then
-			return file
+			return file --return file, or if not found: return nil
 		end
 	end
 end
@@ -151,7 +151,7 @@ local function SetMyAvatar(filename)
 
 	local checksum = CalcChecksum(data)
 	SetAvatar(myPlayerName,filename,checksum)
-	Spring.SendLuaUIMsg(msgID .. broadcastA) --send 'checkout my new pic!'
+	Spring.SendLuaUIMsg(broadcastID) --send 'checkout my new pic!' to everyone
 end
 
 
@@ -241,7 +241,7 @@ local function SetAvatarGUI()
 		}
 	}
 
-	Chili.Button:New{
+	local c = Chili.Button:New{
 		parent     = chili_window;
 		x          = -100;
 		y          = b.y + b.height + 5;
@@ -254,6 +254,23 @@ local function SetAvatarGUI()
 			end
 		}
 	}
+
+	Chili.Button:New{
+		parent     = chili_window;
+		x          = -100;
+		y          = c.y + c.height + 5;
+		width      = 100;
+		caption    = "Default";
+		OnClick    = {
+			function()
+				local _,_,_,_,_,_,_,_,_,customKeys = Spring.GetPlayerInfo(myPlayerID)
+				local myAvatar={}
+				myAvatar=InitializeDefaultAvatar(myAvatar, customKeys)
+				image.file = myAvatar.file
+				image:Invalidate()
+			end
+		}
+	}	
 
 	local control = Chili.ScrollPanel:New{
 		parent = chili_window;
@@ -291,7 +308,7 @@ local waitBusyUntilThisTime=currentTime
 local checklistTable={}
 local waitForTransmission=false
 local lineIsBusy=false
-local openPortForID=-1
+local openPortForID=-1 --used for filtering message
 local tableIsCompleted=false
 function widget:Update(n)
 	currentTime=currentTime+n
@@ -309,7 +326,7 @@ function widget:Update(n)
 		while doChecking and iteration <= #playerIDlist do
 			playerID=playerIDlist[iteration]
 			if playerID~=myPlayerID and not checklistTable[(playerID+1)].ignore then --don't check self and don't check ignore list
-				if (checklistTable[(playerID+1)].checksumCheck==false and checklistTable[(playerID+1)].payload==false) then --check checklist if complete
+				if (checklistTable[(playerID+1)].downloaded==false) then --check checklist if complete
 					if checklistTable[(playerID+1)].retry<numberOfRetry then
 						doChecking=false
 						checklistTable[(playerID+1)].retry=checklistTable[(playerID+1)].retry+1 -- ++ retry count
@@ -335,195 +352,185 @@ function widget:Update(n)
 		msgRecv[bufferIndex]=nil
 		bufferIndex=bufferIndex-1
 		
-		if (msg:sub(1,4) ~= msgID) then
-			return;
-		end
-		destinationID=tonumber(msg:sub(7,8))
-		local myAvatar = avatars[myPlayerName]
-		
-		if openPortForID==playerID and destinationID==myPlayerID and not lineIsBusy then
-			if msg:sub(5,5)==hi then --receive hi from target playerID
-				if myPlayerID>playerID then --if I am 'low ranking' playerID then replied yes
-					--reply with yes
-					Spring.SendLuaUIMsg(msgID .. yes .. openPortForID+100)
-					waitForTransmission=true
+		if (msg:sub(1,4) == msgID) then --if message belong to hello/hi file transfer protocol
+			destinationID=tonumber(msg:sub(7,8))
+			local myAvatar = avatars[myPlayerName]
+			
+			if openPortForID==playerID and destinationID==myPlayerID and not lineIsBusy then
+				if msg:sub(5,5)==hi then --receive hi from target playerID
+					if myPlayerID>playerID then --if I am 'low ranking' playerID then replied yes
+						--reply with yes
+						Spring.SendLuaUIMsg(msgID .. yes .. openPortForID+100)
+						waitForTransmission=true
+						local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
+					end
+				elseif msg:sub(5,5)==yes then --received yes
+					Spring.SendLuaUIMsg(msgID .. checksumA .. openPortForID+100 .. "x" .. myAvatar.checksum) --send checksum, "x" is payload request flag (not available)
 					local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
 					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
-				end
-			elseif msg:sub(5,5)==yes then --received yes
-				Spring.SendLuaUIMsg(msgID .. checksumA .. openPortForID+100 .. "x" .. myAvatar.checksum) --send checksum, "x" is payload request flag (not available)
-				local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-				waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
-			elseif msg:sub(5,5)==checksumA then --receive checksum
-				local checksum = tonumber(msg:sub(10))
-				
-				checklistTable[(playerID+1)].checksumCheck=true --tick 'done' on checksumCheck
-				
-				local playerName = Spring.GetPlayerInfo(playerID)
-				local avatarInfo = avatars[playerName]
-				local payloadRequestFlag=0
-				if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-					local file = SearchFileByChecksum(checksum)
-					if (file) then
-						--// already downloaded it once, reuse it
-						SetAvatar(playerName,file,checksum)
-						checklistTable[(playerID+1)].payload=true --tick 'done' on file downloaded
-					else
-						payloadRequestFlag=1
-					end
-				end
-				Spring.SendLuaUIMsg(msgID .. checksumB .. openPortForID+100 .. payloadRequestFlag .. myAvatar.checksum) --send checksum
-				local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-				waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
-			elseif msg:sub(5,5)==checksumB then --receive checksum
-				local checksum = tonumber(msg:sub(10))
-				checklistTable[(playerID+1)].checksumCheck=true --tick 'done' on checksumCheck
-				local playerName = Spring.GetPlayerInfo(playerID)
-				local avatarInfo = avatars[playerName]
-				local payloadRequestFlag=0
-				if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-					local file = SearchFileByChecksum(checksum)
-					if (file) then
-						--// already downloaded it once, reuse it
-						SetAvatar(playerName,file,checksum)
-						checklistTable[(playerID+1)].payload=true --tick 'done' on file downloaded
-					else
-						payloadRequestFlag=1
-					end
-				end
-				local myAvatar = avatars[myPlayerName]
-				if (msg:sub(9,9)=="1") then --payload request by remote computer
-					local cdata = VFS.LoadFile(myAvatar.file)
-					local filename = ExtractFileName(myAvatar.file)
-					Spring.SendLuaUIMsg(msgID .. payloadA .. openPortForID+100 .. payloadRequestFlag .. "1" .. filename .. '$' .. cdata) --send payload, "1" is payload flag
-				else
-					if payloadRequestFlag~=0 then 
-						Spring.SendLuaUIMsg(msgID .. payloadA .. openPortForID+100 .. payloadRequestFlag .. "0") --send "payload package" without payload
-					else 	
-						Spring.SendLuaUIMsg(msgID .. bye .. openPortForID+100) --skip next protocol if both player don't need payload
-						waitForTransmission=false
-					end
-				end
-				local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-				waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
-			elseif msg:sub(5,5)==payloadA then
-				if (msg:sub(10,10)=="1") then --payload "is here!" flag
-					msg = msg:sub(11)
-					local endOfFilename = msg:find('$',1,true)
-					local filename = msg:sub(1,endOfFilename-1)
-					local cdata    = msg:sub(endOfFilename+1)
-					checklistTable[(playerID+1)].payload=true --tick 'done' on file downloaded
-					
-					local image      = cdata
-					local checksum   = CalcChecksum(image)
-
+				elseif msg:sub(5,5)==checksumA then --receive checksum
+					local checksum = tonumber(msg:sub(10))					
 					local playerName = Spring.GetPlayerInfo(playerID)
 					local avatarInfo = avatars[playerName]
-
+					local payloadRequestFlag=0
 					if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-						local filename = SaveToFile(filename, image, checksum)
-						SetAvatar(playerName,filename,checksum)
+						local file = SearchFileByChecksum(checksum)
+						if (file) then
+							--// already downloaded it once, reuse it
+							SetAvatar(playerName,file,checksum)
+							checklistTable[(playerID+1)].downloaded=true --tick 'done' on file downloaded
+						else
+							payloadRequestFlag=1
+						end
 					end
-				end
-				if (msg:sub(9,9)=="1") then --remote client's payloadRequestFlag
-					local cdata = VFS.LoadFile(myAvatar.file)
-					local filename = ExtractFileName(myAvatar.file)
-					Spring.SendLuaUIMsg(msgID .. payloadB .. openPortForID+100 .. "x" .. "1" .. filename .. '$' .. cdata) --send payload,"x" is payload request flag(unavailable), "1" is payload flag
-				else
-					Spring.SendLuaUIMsg(msgID .. payloadB .. openPortForID+100 .. "x" .. "0") --send "payload package" without payload
-				end
-				local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-				waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg				
-			elseif (msg:sub(5,5)==payloadB) then
-				if (msg:sub(10,10)=="1") then --payload "is here!" flag
-					msg = msg:sub(11)
-					local endOfFilename = msg:find('$',1,true)
-					local filename = msg:sub(1,endOfFilename-1)
-					local cdata    = msg:sub(endOfFilename+1)
-					checklistTable[(playerID+1)].payload=true --tick 'done' on file downloaded					
-
-					local image      = cdata
-					local checksum   = CalcChecksum(image)
-
+					Spring.SendLuaUIMsg(msgID .. checksumB .. openPortForID+100 .. payloadRequestFlag .. myAvatar.checksum) --send checksum
+					local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
+				elseif msg:sub(5,5)==checksumB then --receive checksum
+					local checksum = tonumber(msg:sub(10))
 					local playerName = Spring.GetPlayerInfo(playerID)
 					local avatarInfo = avatars[playerName]
-
+					local payloadRequestFlag=0
 					if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-						local filename = SaveToFile(filename, image, checksum)
-						SetAvatar(playerName,filename,checksum)
+						local file = SearchFileByChecksum(checksum)
+						if (file) then
+							--// already downloaded it once, reuse it
+							SetAvatar(playerName,file,checksum)
+							checklistTable[(playerID+1)].downloaded=true --tick 'done' on file downloaded
+						else
+							payloadRequestFlag=1
+						end
 					end
-				end
-				Spring.SendLuaUIMsg(msgID .. bye .. openPortForID+100)
-				waitForTransmission=false
-			elseif (msg:sub(5,5)==bye) then
-				waitForTransmission=false
-			end
-		elseif myPlayerID==destinationID then
-			if msg:sub(5,5)==hi then --receive hi from someone who target you
-				if myPlayerID>playerID or tableIsCompleted then --if I am the'low ranking' playerID then reply yes, else don't (high rank will not answer to low ranking unless has no work to do)
-					--reply with yes
-					openPortForID=playerID
-					waitForTransmission=true --turn of "hi" sending
+					local myAvatar = avatars[myPlayerName]
+					if (msg:sub(9,9)=="1") then --payload request by remote computer
+						local cdata = VFS.LoadFile(myAvatar.file)
+						local filename = ExtractFileName(myAvatar.file)
+						Spring.SendLuaUIMsg(msgID .. payloadA .. openPortForID+100 .. payloadRequestFlag .. "1" .. filename .. '$' .. cdata) --send payload, "1" is payload flag
+					else
+						if payloadRequestFlag~=0 then 
+							Spring.SendLuaUIMsg(msgID .. payloadA .. openPortForID+100 .. payloadRequestFlag .. "0") --send "payload package" without payload
+						else 	
+							Spring.SendLuaUIMsg(msgID .. bye .. openPortForID+100) --skip next protocol if both player don't need payload
+							waitForTransmission=false
+						end
+					end
+					local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
+				elseif msg:sub(5,5)==payloadA then
+					if (msg:sub(10,10)=="1") then --payload "is here!" flag
+						msg = msg:sub(11)
+						local endOfFilename = msg:find('$',1,true)
+						local filename = msg:sub(1,endOfFilename-1)
+						local cdata    = msg:sub(endOfFilename+1)
+						
+						local image      = cdata
+						local checksum   = CalcChecksum(image)
+						checklistTable[(playerID+1)].downloaded=true --tick 'done' on file downloaded
+
+						local playerName = Spring.GetPlayerInfo(playerID)
+						local avatarInfo = avatars[playerName]
+
+						if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
+							local filename = SaveToFile(filename, image, checksum)
+							SetAvatar(playerName,filename,checksum)
+						end
+					end
+					if (msg:sub(9,9)=="1") then --remote client's payloadRequestFlag
+						local cdata = VFS.LoadFile(myAvatar.file)
+						local filename = ExtractFileName(myAvatar.file)
+						Spring.SendLuaUIMsg(msgID .. payloadB .. openPortForID+100 .. "x" .. "1" .. filename .. '$' .. cdata) --send payload,"x" is payload request flag(unavailable), "1" is payload flag
+					else
+						Spring.SendLuaUIMsg(msgID .. payloadB .. openPortForID+100 .. "x" .. "0") --send "payload package" without payload
+					end
 					local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
 					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg				
-					Spring.SendLuaUIMsg(msgID .. yes .. openPortForID+100)
-				end 
-			end
-		elseif myPlayerID~=destinationID then --if noise (if not my message)
-			if msg:sub(5,5)==yes then --listen hi from someone to someone else
-				if myPlayerID>playerID then --if they are the 'higher ranking' playerID (close your own connection for high ranking player (players with low playerID))
-					lineIsBusy=true --assume they took command of the communication medium, close all protocol/cancel ongoing protocol. lineBusy always triggered by high ranking noise
-					waitForTransmission=true
-					local totalNetworkDelay= retrieveTotalNetworkDelay(destinationID, playerID)
-					waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*2.6
-					waitTransmissionUntilThisTime=currentTime + (aTargetPingTime+bTargetPingTime)*2.6 --wait until it end
-				end 
-			elseif (msg:sub(5,5)==payloadB or msg:sub(5,5)==payloadA) then --snif package transfer and save for our own
-				if (msg:sub(10,10)=="1") then --payload "is here!" flag
-					msg = msg:sub(11)
-					local endOfFilename = msg:find('$',1,true)
-					local filename = msg:sub(1,endOfFilename-1)
-					local cdata    = msg:sub(endOfFilename+1)
+				elseif (msg:sub(5,5)==payloadB) then
+					if (msg:sub(10,10)=="1") then --payload "is here!" flag
+						msg = msg:sub(11)
+						local endOfFilename = msg:find('$',1,true)
+						local filename = msg:sub(1,endOfFilename-1)
+						local cdata    = msg:sub(endOfFilename+1)					
 
-					local image      = cdata
-					local checksum   = CalcChecksum(image)
-					checklistTable[(playerID+1)].checksumCheck=true --tick 'done' on checksumCheck
+						local image      = cdata
+						local checksum   = CalcChecksum(image)
+						checklistTable[(playerID+1)].downloaded=true --tick 'done' on file downloaded
 
+						local playerName = Spring.GetPlayerInfo(playerID)
+						local avatarInfo = avatars[playerName]
+
+						if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
+							local filename = SaveToFile(filename, image, checksum)
+							SetAvatar(playerName,filename,checksum)
+						end
+					end
+					Spring.SendLuaUIMsg(msgID .. bye .. openPortForID+100)
+					waitForTransmission=false
+				elseif (msg:sub(5,5)==bye) then
+					waitForTransmission=false
+				end
+			elseif myPlayerID==destinationID then
+				if msg:sub(5,5)==hi then --receive hi from someone who target you
+					if myPlayerID>playerID or tableIsCompleted then --if I am the'low ranking' playerID then reply yes, else don't (high rank will not answer to low ranking unless has no work to do)
+						--reply with yes
+						openPortForID=playerID
+						waitForTransmission=true --turn of "hi" sending
+						local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg				
+						Spring.SendLuaUIMsg(msgID .. yes .. openPortForID+100)
+					end 
+				end
+			elseif myPlayerID~=destinationID then --if noise (if not my message)
+				if msg:sub(5,5)==yes then --listen hi from someone to someone else
+					if myPlayerID>playerID then --if they are the 'higher ranking' playerID (close your own connection for high ranking player (players with low playerID))
+						lineIsBusy=true --assume they took command of the communication medium, close all protocol/cancel ongoing protocol. lineBusy always triggered by high ranking noise
+						waitForTransmission=true
+						local totalNetworkDelay= retrieveTotalNetworkDelay(destinationID, playerID)
+						waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*2.6
+						waitTransmissionUntilThisTime=currentTime + (aTargetPingTime+bTargetPingTime)*2.6 --wait until it end
+					end 
+				elseif (msg:sub(5,5)==payloadB or msg:sub(5,5)==payloadA) then --snif package transfer and save for our own
+					if (msg:sub(10,10)=="1") then --payload "is here!" flag
+						msg = msg:sub(11)
+						local endOfFilename = msg:find('$',1,true)
+						local filename = msg:sub(1,endOfFilename-1)
+						local cdata    = msg:sub(endOfFilename+1)
+
+						local image      = cdata
+						local checksum   = CalcChecksum(image)
+						local playerName = Spring.GetPlayerInfo(playerID)
+						local avatarInfo = avatars[playerName]
+
+						if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
+							local filename = SaveToFile(filename, image, checksum)
+							SetAvatar(playerName,filename,checksum)
+							checklistTable[(playerID+1)].downloaded=true --mark checklist as complete
+						end
+					end
+				elseif msg:sub(5,5)==checksumA or msg:sub(5,5)==checksumB then --snif checksum transfer and save it for our own
+					local checksum = tonumber(msg:sub(10))
 					local playerName = Spring.GetPlayerInfo(playerID)
 					local avatarInfo = avatars[playerName]
-
-					if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-						local filename = SaveToFile(filename, image, checksum)
-						SetAvatar(playerName,filename,checksum)
-						checklistTable[(playerID+1)].payload=true --mark checklist as complete
+					if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then --check if we have record of this player
+						local file = SearchFileByChecksum(checksum)
+						if (file) then
+							--// already downloaded it once, reuse it
+							SetAvatar(playerName,file,checksum)
+							checklistTable[(playerID+1)].downloaded=true
+						else
+							checklistTable[(playerID+1)].retry=0 --if we have no file yet, but heard this broadcast then reset retry count to continue trying to reach this playerID
+							tableIsCompleted=false --recheck checklist
+						end
 					end
+				elseif (msg:sub(5,5)==bye) then
+					lineIsBusy=false
+					waitForTransmission=false
 				end
-			elseif msg:sub(5,5)==checksumA or msg:sub(5,5)==checksumB then --snif checksum transfer and save it for our own
-				local checksum = tonumber(msg:sub(10))
-				local playerName = Spring.GetPlayerInfo(playerID)
-				local avatarInfo = avatars[playerName]
-				
-				checklistTable[(playerID+1)].checksumCheck=true --tick 'done' on checksumCheck
-				if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then --check if we have record of this player
-					local file = SearchFileByChecksum(checksum)
-					if (file) then
-						--// already downloaded it once, reuse it
-						SetAvatar(playerName,file,checksum)
-						checklistTable[(playerID+1)].payload=true
-					else
-						checklistTable[(playerID+1)].retry=0 --if we have no file yet hear this broadcast then reset retry count to continue trying
-						tableIsCompleted=false --recheck checklist
-					end
-				end
-			elseif (msg:sub(5,5)==bye) then
-				lineIsBusy=false
-				waitForTransmission=false
-			elseif (msg:sub(5,5)==broadcast) then
-				checklistTable[(playerID+1)].payload=false --reset checklist entry for this player
-				checklistTable[(playerID+1)].checksumCheck=true --tick 'done' on checksumCheck
-				checklistTable[(playerID+1)].retry=0
-				tableIsCompleted=false
 			end
+		elseif (msg:sub(1,4) == broadcastID) then --if message is a 'look at my new pic!'.
+			checklistTable[(playerID+1)].downloaded=false --reset checklist entry for this player
+			checklistTable[(playerID+1)].retry=0 --reset retry
+			tableIsCompleted=false --redo checklist check
 		end
 	end
 end
@@ -565,7 +572,7 @@ function UpdatePlayerList()
 
 	--get all playerID list
 	playerIDlist=Spring.GetPlayerList()
-	Spring.Echo(playerIDlist)	
+	--Spring.Echo(playerIDlist)	
 	
 	--use playerIDlist to update checklist
 	local iteration =1
@@ -573,7 +580,7 @@ function UpdatePlayerList()
 	while iteration <= #playerIDlist do --update checklist with appropriate value
 		playerID=playerIDlist[iteration]
 		if checklistTable[(playerID+1)]==nil then 
-			checklistTable[(playerID+1)]={checksumCheck=false, payload=false, retry=0, ignore=false} --add empty entry with new value
+			checklistTable[(playerID+1)]={downloaded=false, retry=0, ignore=false} --add empty entry with new value
 		else 
 			checklistTable[(playerID+1)].ignore=false --reset previous ignore list
 			checklistTable[(playerID+1)].retry=0 --reset retry counter
@@ -584,14 +591,32 @@ function UpdatePlayerList()
 			if not playerIsSpectator or not playerIsActive then --ignore non-specs and inactive player(don't send hi/request file)
 				checklistTable[(playerID+1)].ignore=true 
 			end
-		else
-			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not playerIsActive then --if I am not spectator and player is the enemy or spec then
+		else --if I am not spectator
+			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not playerIsActive then --if player is the enemy or a spec then
 				checklistTable[(playerID+1)].ignore=true --ignore enemy & spec and inactive player(don't send hi/request file)
 			end
 		end
 		iteration=iteration+1
 	end
 	tableIsCompleted=false --unlock checklist for another check
+end
+
+function InitializeDefaultAvatar(myAvatar, customKeys)
+	--initialize own avatar using fallback
+	myAvatar={
+			checksum = avatar_fallback_checksum,
+			file = avatar_fallback
+		}  
+	--initialize own avatar using server assigned avatar
+	if (customKeys ~= nil and customKeys.avatar~=nil) then 
+		local customKeyAvatarDir = avatarsDir .. customKeys.avatar .. ".png" --check if we have that file on disk
+		if (VFS.FileExists(customKeyAvatarDir)) then
+			myAvatar.file = avatarsDir .. customKeys.avatar .. ".png"
+			myAvatar.checksum = CalcChecksum(VFS.LoadFile(myAvatar.file))
+		--if we don't have the file then fallback avatar remains
+		end
+	end
+	return myAvatar
 end
 
 function widget:Initialize()
@@ -603,7 +628,7 @@ function widget:Initialize()
 	
 	--get all playerID list
 	playerIDlist=Spring.GetPlayerList()
-	Spring.Echo(playerIDlist)
+	--Spring.Echo(playerIDlist)
 	avatars = (VFS.FileExists(configFile) and VFS.Include(configFile)) or {}
 
 	--use player list to build checklist
@@ -611,15 +636,15 @@ function widget:Initialize()
 	local playerID=-1
 	while iteration <= #playerIDlist do --fill checklist with initial value
 		playerID=playerIDlist[iteration]
-		checklistTable[(playerID+1)]={checksumCheck=false, payload=false, retry=0, ignore=false} --fill checklist with default values (promote communication)
+		checklistTable[(playerID+1)]={downloaded=false, retry=0, ignore=false} --fill checklist with default values (promote communication)
 		--the following add ignore flag to selective playerID
 		local _,_,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
 		if iAmSpectator then --if I am spectator then
 			if not playerIsSpectator then --ignore non-specs (don't send hi/request file)
 				checklistTable[(playerID+1)].ignore=true 
 			end
-		else
-			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator then --if I am not spectator and player is enemy or spec then
+		else --if I am not spectator
+			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator then --if player is enemy or spec then
 				checklistTable[(playerID+1)].ignore=true --ignore enemy & spec (don't send hi/request file)
 			end
 		end
@@ -633,24 +658,18 @@ function widget:Initialize()
 		end
 	end
 	
-	--initialize own avatar using fallback
-	local myAvatar={
-			checksum = avatar_fallback_checksum,
-			file = avatar_fallback
-		}  
-	--initialize own avatar using server assigned avatar
-	if (customKeys ~= nil and customKeys.avatar~=nil) then 
-		myAvatar.file = avatarsDir .. customKeys.avatar .. ".png"
-		myAvatar.checksum = CalcChecksum(VFS.LoadFile(myAvatar.file))
-	end 
-	--then initialize locally assigned avatar if available
+	local myAvatar={}
+	myAvatar= InitializeDefaultAvatar(myAvatar, customKeys)
+	
+	--initialize locally assigned avatar if available
 	if (avatars[myPlayerName]~=nil) then
-		if VFS.FileExists(avatars[myPlayerName].file) then --if file exist then use it
+		if VFS.FileExists(avatars[myPlayerName].file) then --if selected file exist then use it
 			myAvatar.file=avatars[myPlayerName].file
 			myAvatar.checksum=avatars[myPlayerName].checksum
+		--if we don't have the selective avatar then fallback remains
 		end
 	end 
-	SetAvatar(myPlayerName, myAvatar.file, myAvatar.checksum) --save value into table
+	SetAvatar(myPlayerName, myAvatar.file, myAvatar.checksum) --save value into table and broadcast 'checkout my new avatar' message
 	
 	WG.Avatar = {
 		GetAvatar   = GetAvatar;
