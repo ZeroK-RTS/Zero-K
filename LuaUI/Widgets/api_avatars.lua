@@ -144,10 +144,10 @@ local function SetMyAvatar(filename)
 
 	local data = VFS.LoadFile(filename)
 
-	if (data:len()/1024 > maxFileSize) then --theoretically filesize could go bigger than this, but unknown effect on checksum
-		error('Avatar: selected image file is too large (sizelimit is' .. maxFileSize .. 'kB)')
-		return
-	end
+	--if (data:len()/1024 > maxFileSize) then --theoretically filesize could go bigger than this, but unknown effect on checksum
+		--error('Avatar: selected image file is too large (sizelimit is' .. maxFileSize .. 'kB)')
+		--return
+	--end
 
 	local checksum = CalcChecksum(data)
 	SetAvatar(myPlayerName,filename,checksum)
