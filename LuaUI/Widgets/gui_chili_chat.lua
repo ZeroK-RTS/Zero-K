@@ -66,6 +66,7 @@ local colorNames = {}
 local colors = {}
 
 local visible = true
+local firstEnter=true
 
 local function option_remakeConsole()
 	remakeConsole()
@@ -379,6 +380,12 @@ function widget:KeyPress(key, modifier, isRepeat)
 	
 	if (key == KEYSYMS.RETURN) then
 		if not WG.enteringText then 
+			if firstEnter then
+				if not modifier.Shift and not modifier.Ctrl then
+					Spring.SendCommands("chatally")
+				end
+				firstEnter=false
+			end
 			WG.enteringText = true
 			if window_console.hidden and not visible then 
 				screen0:AddChild(window_console)
