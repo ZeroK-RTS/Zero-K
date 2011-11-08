@@ -266,13 +266,13 @@ local function AnimWindow(unitID)
 	
 	local window = Window:New{
 		caption = "Animation Control",
-		x = scrW/3,  
-		y = scrH/3,
+		x = '33%',  
+		y = '33%',
 		width='20%',
 		--height = '30%',
 		--resizable = true,
 		parent = screen0,
-		dockable = true,
+		dockable = false,
 		autosize = true,
 		children = {
 			scroll1
