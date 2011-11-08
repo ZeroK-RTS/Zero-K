@@ -1,4 +1,4 @@
-local versionName = "v1.255"
+local versionName = "v1.26"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Nov 7, 2011",
+    date      = "Nov 9, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -71,14 +71,13 @@ local velocityScalingCONSTANTg=1 --decrease/increase command lenght. (default= 1
 local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command lenght (default = 0 meter/second)
 
 --Move Command constant:
---local halfTargetBoxSize = {400, 800} --the distance from a target or move-order where widget should ignore (default: cloak and consc = 400 ie:800x800 box, ground unit =800)
-local halfTargetBoxSize = {400, -1, 200} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=-1 or always flee, repair=200)
+local halfTargetBoxSize = {200, -1, 100} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=-1 or always flee, repair=200)
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
-local noiseAngleG =math.pi/36 --(default is pie/36 rad); add random angle (from 0 to the current value) to the new angle
-local collisionAngleG=math.pi/6 --(default is pie/6 rad) angle of enemy (range 0 to current value) where auto-reverse will activate 
-local fleeingAngleG=math.pi/4 --(default is pie/4 rad) angle of enemy (range 0 to current value) where fleeing enemy is considered
+local noiseAngleG =math.pi/36 --(default is pi/36 rad); add random angle (from 0 to the current value) to the new angle
+local collisionAngleG=math.pi/6 --(default is pi/6 rad) angle of enemy (range 0 to current value) where auto-reverse will activate 
+local fleeingAngleG=math.pi/4 --(default is pi/4 rad) angle of enemy (range 0 to current value) where fleeing enemy is considered
 
 --------------------------------------------------------------------------------
 --Variables:
@@ -184,7 +183,7 @@ function RefreshUnitList()
 			end
 			local unitSpeed =unitDef["speed"]
 			if (unitSpeed>0) then 
-				if (unitDef["builder"] or unitDef["canCloak"]) then --include only cloakies and constructor
+				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef["isCommander"] then --include only cloakies and constructor
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed}
 				--elseif not unitDef["canFly"] then --if enabled: include all ground unit
@@ -282,8 +281,10 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 				
 				--do sync test. Ensure command not changed during last delay
 				local cQueueSyncTest = spGetCommandQueue(unitID)
-				if #cQueueSyncTest>=2 or cQueueSyncTest[1]==nil then
-					if cQueue~=cQueueSyncTest then 
+				if #cQueueSyncTest>=2 then
+					if #cQueueSyncTest~=#cQueue or 
+						(cQueueSyncTest[1].params[1]~=cQueue[1].params[1] or cQueueSyncTest[1].params[3]~=cQueue[1].params[3]) or
+						cQueueSyncTest[1]==nil then
 						newCommand=true
 						cQueue=cQueueSyncTest
 					end
