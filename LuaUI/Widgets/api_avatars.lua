@@ -183,7 +183,7 @@ local function SetAvatarGUI()
 		parent     = chili_window;
 		x          = 10;
 		--caption    = "Select your Avatar";
-		caption    = "This feature is Disabled for this release";
+		caption    = "Feature N/A";
 		valign     = "ascender";
 		align      = "left";
 		fontshadow = true;
