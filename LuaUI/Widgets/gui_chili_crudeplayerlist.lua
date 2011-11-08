@@ -718,7 +718,7 @@ function widget:Initialize()
 		backgroundColor  = {0,0,0,0},
 		padding = {0, 0, 0, 0},
 		--autosize = true,
-		emptySpaceTooltip = true
+		hitTestAllowEmpty = true
 	}
 
 	SetupPlayerNames()

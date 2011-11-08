@@ -867,6 +867,9 @@ function Control:HitTest(x,y)
           end
         end
       end
+	  if self.hitTestAllowEmpty then
+		return self
+	  end
     end
   end
 
