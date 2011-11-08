@@ -1798,9 +1798,9 @@ function widgetHandler:UnitEnteredRadar(unitID, unitTeam)
 end
 
 
-function widgetHandler:UnitEnteredLos(unitID, unitDefID, unitTeam)
+function widgetHandler:UnitEnteredLos(unitID, unitTeam)
   for _,w in ipairs(self.UnitEnteredLosList) do
-    w:UnitEnteredLos(unitID, unitDefID, unitTeam)
+    w:UnitEnteredLos(unitID, unitTeam)
   end
   return
 end

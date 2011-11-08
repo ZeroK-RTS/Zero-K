@@ -184,7 +184,7 @@ function widget:Update()
 	end
 end
 
-function widget:UnitEnteredLos(unitID, allyTeam)
+function widget:UnitEnteredLos(unitID, unitTeam)
 	if ( spIsUnitAllied( unitID ) ) then
 		return
 	end

@@ -90,7 +90,7 @@ function widget:DrawWorld()
 	ResetGl()
 end
 
-function widget:UnitEnteredLos(unitID, allyTeam)
+function widget:UnitEnteredLos(unitID, unitTeam)
 	
 	if ( spIsUnitAllied( unitID ) ) then
 		return
@@ -103,7 +103,7 @@ function widget:UnitEnteredLos(unitID, allyTeam)
 		printDebug( "Ghost added")
 		local x, _, z = spGetUnitPosition(unitID)
 		local y = Spring.GetGroundHeight(x,z) + 16 -- every single model is offset by 16, pretty retarded if you ask me.
-		ghostSites[unitID] = { unitDefId = spGetUnitDefID(unitID), pos = {x, y, z}, teamId = allyTeam }
+		ghostSites[unitID] = { unitDefId = spGetUnitDefID(unitID), pos = {x, y, z}, teamId = unitTeam }
 	end
 end
 

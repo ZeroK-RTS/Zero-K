@@ -231,8 +231,8 @@ function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 	UnitDetected( unitID, true )
 end
 
-function widget:UnitEnteredLos(unitID, allyTeam)
-	UnitDetected( unitID, false, allyTeam )
+function widget:UnitEnteredLos(unitID, teamID)
+	UnitDetected( unitID, false, teamID )
 end
 
 function UnitDetected( unitID, allyTeam, teamId )

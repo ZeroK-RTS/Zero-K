@@ -20,12 +20,7 @@ local spGetPlayerInfo   = Spring.GetPlayerInfo
 local spGetMyPlayerID   = Spring.GetMyPlayerID
 
 
-function widget:UnitEnteredLos(unitID, allyTeam)
-	unitDetected( unitID, false, allyTeam )
-end
-
-function unitDetected( unitID, allyTeam, teamId )
-
+function widget:UnitEnteredLos(unitID, unitTeam)
   local playerID = spGetMyPlayerID()
   local _, _, spec, _, _, _, _, _ = spGetPlayerInfo(playerID)
   if ( (spec == true) or (not Game.commEnds) ) then
