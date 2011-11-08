@@ -265,8 +265,7 @@ local function UpdatePlayerInfo()
 			pingLabels[playerID]:Invalidate()
 		end
 		-- for <Waiting> bug at start, may be a FIXME
-		if nameLabels[teamID] and wantsNameRefresh[playerID] then
-			wantsNameRefresh[playerID] = nil
+		if nameLabels[teamID] and (not active) then
 			local name_out = ''
 			name_out = name or ''
 			if	name_out == ''
@@ -524,7 +523,6 @@ SetupPlayerNames = function()
 			else
 				--local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
 				local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
-			
 				
 				if allyTeamID then
 					allyTeamID_out = allyTeamID
@@ -537,7 +535,6 @@ SetupPlayerNames = function()
 				then
 					if Spring.GetGameSeconds() < 0.1 then
 						name_out = "<Waiting> " ..(name or '')
-						wantsNameRefresh[playerID] = true
 					elseif Spring.GetTeamUnitCount(teamID) > 0  then
 						name_out = "<Aband. units> " ..(name or '')
 					else
@@ -640,8 +637,9 @@ function widget:Update(s)
 			SetupPlayerNames()	-- size changed; regen everything
 			lastSizeX = window_cpl.width
 			lastSizeY = window_cpl.height
+		else
+			UpdatePlayerInfo()
 		end
-		UpdatePlayerInfo()
 	end
 end
 
@@ -720,11 +718,9 @@ function widget:Initialize()
 		backgroundColor  = {0,0,0,0},
 		padding = {0, 0, 0, 0},
 		--autosize = true,
+		emptySpaceTooltip = true
 	}
 
-	-- enable scrollpanel tooltip (not in default Chili)
-	function scroll_cpl:HitTest(x,y) return self	end	
-	
 	SetupPlayerNames()
 	
 	Spring.SendCommands({"info 0"})
