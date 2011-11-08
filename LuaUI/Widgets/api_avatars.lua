@@ -4,10 +4,10 @@ local versionName = "v2.10"
 
 function widget:GetInfo()
   return {
-    name      = "Avatars",
+    name      = "AvatarsS",
     desc      = "An API for a per-user avatar-icon system, + Hello/Hi protocol",
     author    = "jK, +msafwan",
-    date      = "2009, +2011 (7 Nov)",
+    date      = "2009, +2011 (9 Nov)",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     api       = true,
@@ -182,7 +182,8 @@ local function SetAvatarGUI()
 	Chili.Label:New{
 		parent     = chili_window;
 		x          = 10;
-		caption    = "Select your Avatar";
+		--caption    = "Select your Avatar";
+		caption    = "This feature is Disabled for this release";
 		valign     = "ascender";
 		align      = "left";
 		fontshadow = true;
@@ -279,23 +280,23 @@ local function SetAvatarGUI()
 		width  = -100;
 		height = -20;
 		children = {    
-			Chili.ImageListView:New{
-				name   = "AvatarSelectImageListView",
-				width  = "100%",
-				height = "100%",
-				dir    = avatarsDir,
-				OnDblClickItem = {
-					function(obj,file,itemIdx)
-						local data = VFS.LoadFile(file)
-						if (data:len()/1024 > maxFileSize) then
-							Spring.Echo('Avatar: selected image file is too large (sizelimit is' .. maxFileSize .. 'kB)')
-							return;
-						end
-						image.file = file
-						image:Invalidate()
-					end,
-				},
-			}
+			-- Chili.ImageListView:New{
+				-- name   = "AvatarSelectImageListView",
+				-- width  = "100%",
+				-- height = "100%",
+				-- dir    = avatarsDir,
+				-- OnDblClickItem = {
+					-- function(obj,file,itemIdx)
+						-- local data = VFS.LoadFile(file)
+						-- if (data:len()/1024 > maxFileSize) then
+							-- Spring.Echo('Avatar: selected image file is too large (sizelimit is' .. maxFileSize .. 'kB)')
+							-- return;
+						-- end
+						-- image.file = file
+						-- image:Invalidate()
+					-- end,
+				-- },
+			-- }
 		}
 	}
 end
@@ -661,14 +662,12 @@ function widget:Initialize()
 	local myAvatar={}
 	myAvatar= InitializeDefaultAvatar(myAvatar, customKeys)
 	
-	--initialize locally assigned avatar if available
-	if (avatars[myPlayerName]~=nil) then
-		if VFS.FileExists(avatars[myPlayerName].file) then --if selected file exist then use it
-			myAvatar.file=avatars[myPlayerName].file
-			myAvatar.checksum=avatars[myPlayerName].checksum
-		--if we don't have the selective avatar then fallback remains
-		end
-	end 
+	-- if (avatars[myPlayerName]~=nil) then --initialize locally assigned avatar if available
+		-- if VFS.FileExists(avatars[myPlayerName].file) then --if selected file exist then use it
+			-- myAvatar.file=avatars[myPlayerName].file
+			-- myAvatar.checksum=avatars[myPlayerName].checksum
+		-- end --if we don't have the selective avatar then fallback remains
+	-- end 
 	SetAvatar(myPlayerName, myAvatar.file, myAvatar.checksum) --save value into table and broadcast 'checkout my new avatar' message
 	
 	WG.Avatar = {
