@@ -38,14 +38,26 @@ local soundTimeout = 0
 local lastEventFrame = {}
 
 local lastUpdate = 0
-local updatePeriod = 0.02
-local updatePeriodLong = 0.5
+local lastMExcessEvent = 0
+local lastEStallEvent = 0
+local airSpotted = false
+local nukeSpotted = false
+
+local UPDATE_PERIOD = 0.02	-- seconds
+local UPDATE_PERIOD_LONG = 0.5	-- seconds
+local UPDATE_PERIOD_RESOURCES = 90	-- gameframes
+local RESOURCE_WARNING_PERIOD = 900	-- gameframes
+local OD_BUFFER = 10000
+
 local mIncome = 0
 
 local colorRed = {1,0,0,1}
 local colorOrange = {1,0.5,0,1}
 local colorYellow = {1,1,0,1}
 local colorGreen = {0,1,0,1}
+
+--local myPlayer				= Spring.GetMyPlayerID()
+local myTeam				= Spring.GetMyTeamID()
 --------------------------------------------------------------------------------
 --SPEEDUPS
 --------------------------------------------------------------------------------
@@ -58,18 +70,16 @@ local spGetLastAttacker		= Spring.GetUnitLastAttacker
 local spGetGameFrame		= Spring.GetGameFrame
 local spGetSpectatingState	= Spring.GetSpectatingState
 local spIsReplay			= Spring.IsReplay
+local spGetMyTeamID			= Spring.GetMyTeamID
 
 local spPlaySoundFile		= Spring.PlaySoundFile
 local spMarkerAddPoint		= Spring.MarkerAddPoint
-
-local playerID				= Spring.GetMyPlayerID()
-local teamID				= Spring.GetMyTeamID()
 --------------------------------------------------------------------------------
 --CONFIG
 --------------------------------------------------------------------------------
 local fontSize = 12
 local labelSpacing = 15
-local scrollSpeed = math.ceil(60*updatePeriod)
+local scrollSpeed = math.ceil(60*UPDATE_PERIOD)
 
 options_path = 'Settings/Interface/News Ticker'
 options = {
@@ -187,16 +197,47 @@ end
 local timerUpdate = 0
 local timerUpdateLong = 0
 function widget:Update(dt)
+	if myTeam ~= spGetMyTeamID() then
+		myTeam = spGetMyTeamID()
+	end
 	timerUpdate = timerUpdate + dt
-	if timerUpdate > updatePeriod then
+	if timerUpdate > UPDATE_PERIOD then
 		ProcessLabels()
 		timerUpdate = 0
 	end
 	timerUpdateLong = timerUpdateLong + dt
-	if timerUpdateLong > updatePeriodLong then
+	if timerUpdateLong > UPDATE_PERIOD_LONG then
 		--CheckSpecState()
-		mIncome= select(4, spGetTeamRes(teamID, "metal"))
 		timerUpdateLong = 0
+	end
+end
+
+function widget:GameFrame(n)
+	if n%UPDATE_PERIOD_RESOURCES == 0 then
+		local mlevel, mstore,mpull,mincome = spGetTeamRes(myTeam, "metal")
+		mIncome = mincome	-- global = our local
+		if mlevel/mstore >= 0.95 and lastMExcessEvent + RESOURCE_WARNING_PERIOD < n then
+			AddEvent("Excessing metal", nil, colorYellow)
+			lastMExcessEvent = n
+		end
+		local elevel,estore,epull,eincome = spGetTeamRes(myTeam, "energy")
+		if elevel/(estore - OD_BUFFER) <= 0.2 and lastEStallEvent + RESOURCE_WARNING_PERIOD < n  then
+			AddEvent("Stalling energy", nil, colorOrange)
+			lastEStallEvent = n
+		end
+	end
+end
+
+function widget:UnitEnteredLos(unitID, unitTeam)
+	if not Spring.AreTeamsAllied(unitTeam, myTeam) then
+		local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
+		if unitDef.canFly and not airSpotted then
+			AddEvent("Enemy aircraft spotted", nil, colorRed)
+			airSpotted = true
+		elseif unitDef.name == "corsilo" and not nukeSpotted then
+			AddEvent("Enemy nuke silo spotted", nil, colorRed)
+			nukeSpotted = true			
+		end
 	end
 end
 
@@ -206,7 +247,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if killer == nil or killer == -1 or noMonitor[unitDefID] then return end
 	local ud = UnitDefs[unitDefID]
 	--don't bother player with cheap stuff
-	if (spGetTeam(unitID) ~= teamID) or (ud.metalCost < (mIncome * options.minCostMult.value) and useDeathMinCost) then return end
+	if (spGetTeam(unitID) ~= myTeam) or (ud.metalCost < (mIncome * options.minCostMult.value) and useDeathMinCost) then return end
 	--can u c me?
 	if (spInView(unitID)) and (logDeathInView == false) then return end
 	
@@ -222,7 +263,7 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	--visibility check
-	if (spGetTeam(unitID) ~= teamID) or (spInView(unitID)) and (logCompleteInView == false) then return end
+	if (spGetTeam(unitID) ~= myTeam) or (spInView(unitID)) and (logCompleteInView == false) then return end
 	local ud = UnitDefs[unitDefID]
 	--for name,param in ud:pairs() do
 	--	Spring.Echo(name,param)

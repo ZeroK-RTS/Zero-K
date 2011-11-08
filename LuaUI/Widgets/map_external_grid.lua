@@ -15,13 +15,9 @@ end
 -- TODO: make res and range settable in options
 
 local DspLst=nil
-local res = 128		-- smaller = higher resolution (decreases performance)
-local TileMaxX = Game.mapSizeX/res
-local TileMaxZ = Game.mapSizeZ/res
 local localAllyID = Spring.GetLocalAllyTeamID ()
 --local updateFrequency = 120	-- unused
 local gridTex = "LuaUI/Images/vr_grid.png"
-local range = 7680/res	-- how far out of the map to draw (decreases performance)
 --local height = 0	-- how far above ground to draw
 local mirror = true
 
@@ -37,6 +33,7 @@ local glTexRect = gl.TexRect
 ----------------------
 
 local heights = {}
+local island = false
 
 --[[
 local maxHillSize = 800/res
@@ -55,8 +52,7 @@ options = {
 		value = true,
 		desc = 'Mirrors heightmap on the grid',
 		OnChange = function(self)
-			gl.DeleteList(dspLst)
-			mirror = self.value
+			gl.DeleteList(DspLst)
 			widget:Initialize()
 		end, 		
 	},
@@ -70,35 +66,31 @@ options = {
 		name = "Resolution (32-512)",
 		advanced = true,
 		type = 'number',
-		min = 32, 
+		min = 64, 
 		max = 512, 
-		step = 32,
+		step = 64,
 		value = 128,
 		desc = 'Sets resolution (lower = more detail)',
 		OnChange = function(self)
-			gl.DeleteList(dspLst)
-			res = self.value
+			gl.DeleteList(DspLst)
 			widget:Initialize()
 		end, 
 	},
 	range = {
-		name = "Range (1200-7200)",
+		name = "Range (1024-8192)",
 		advanced = true,
 		type = 'number',
-		min = 1200, 
-		max = 7200, 
-		step = 600,
-		value = 7200,
+		min = 1024, 
+		max = 8192, 
+		step = 256,
+		value = 8192,
 		desc = 'How far outside the map to draw',
 		OnChange = function(self)
-			gl.DeleteList(dspLst)
-			range = self.value/res
+			gl.DeleteList(DspLst)
 			widget:Initialize()
 		end, 
 	},		
 }
-
-res = options.res.value or res
 
 -- for terrain randomization - kind of primitive
 --[[
@@ -166,12 +158,14 @@ local function IsIsland()
 end
 
 local function InitGroundHeights()
-	TileMaxX = Game.mapSizeX/res +1
-	TileMaxZ = Game.mapSizeZ/res +1
+	local res = options.res.value or 128
+	local range = (options.range.value or 8192)/res
+	local TileMaxX = Game.mapSizeX/res +1
+	local TileMaxZ = Game.mapSizeZ/res +1
 	
-	for x = (-1-range)*res,Game.mapSizeX+range*res, res do
+	for x = (-range)*res,Game.mapSizeX+range*res, res do
 		heights[x] = {}
-		for z = (-1-range)*res,Game.mapSizeZ+range*res, res do
+		for z = (-range)*res,Game.mapSizeZ+range*res, res do
 			local px, pz
 			if mirror then
 				if (x < 0 or x > Game.mapSizeX) then	-- outside X map bounds; mirror true heightmap
@@ -239,6 +233,10 @@ end
 ]]--
 
 local function TilesVerticesOutside()
+	local res = options.res.value or 128
+	local range = (options.range.value or 8192)/res
+	local TileMaxX = Game.mapSizeX/res +1
+	local TileMaxZ = Game.mapSizeZ/res +1	
 	for x=-range,TileMaxX+range,1 do
 		for z=-range,TileMaxZ+range,1 do
 			if (x > 0 and z > 0 and x < TileMaxX and z < TileMaxZ) then 
@@ -261,12 +259,7 @@ local function DrawTiles()
 	gl.DepthTest(true)
 	gl.DepthMask(true)
 	gl.Texture(gridTex)
-	--gl.TexGen(GL.TEXTURE_GEN_MODE, true)
-	--glColor(1,1,1,1)
 	gl.BeginEnd(GL.QUADS,TilesVerticesOutside)
-	--TilesVerticesOutside()
-	--DrawSquares()
-	--gl.TexGen(GL.TEXTURE_GEN_MODE, false)
 	gl.Texture(false)
 	gl.DepthMask(false)
 	gl.DepthTest(false)
@@ -275,17 +268,18 @@ local function DrawTiles()
 end
 
 function widget:DrawWorld()
-	if (not IsIsland()) or options.drawForIslands.value then
+	if (not island) or options.drawForIslands.value then
 		gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
 		-- Maybe you want Spring.SetDrawGround(false) somewhere
 	end	
 end
 
 function widget:Initialize()
+	island = IsIsland()
 	InitGroundHeights()
 	DspLst = glCreateList(DrawTiles)
 end
 
 function widget:Shutdown()
-  gl.DeleteList(dspList)
+	gl.DeleteList(DspList)
 end
