@@ -125,7 +125,6 @@ unitDef = {
       turret                  = true,
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 2250,
-      collideGround = false
     },
 
   },
