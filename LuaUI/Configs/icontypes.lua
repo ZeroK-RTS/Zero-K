@@ -34,7 +34,11 @@ local icontypes = {
   commander4 = {
     bitmap='icons/armcommander.dds',
     size=2.6,
-  },  
+  },
+  commander5 = {
+    bitmap='icons/armcommander.dds',
+    size=2.8,
+  },    
 
   corcommander = {
     bitmap='icons/corcommander.dds',

@@ -134,14 +134,11 @@ local base = {
 		name = "beam",
 		modules = {
 			"commweapon_beamlaser",
-			"commweapon_sunburst",
-			"module_personal_shield",
 		}
 	},
 	{
 		name = "gauss",
 		modules = {
-			"commweapon_gaussrifle",
 			"commweapon_gaussrifle",
 			"conversion_shockrifle",
 			"module_personal_shield",

@@ -94,7 +94,7 @@ local function ProcessComm(name, config)
 		
 		-- process modules
 		if config.modules then
-			local hasWeapon = false
+			local numWeapons = 0
 			RemoveWeapons(commDefs[name])
 			-- sort: weapons first, weapon mods next, regular modules last
 			table.sort(config.modules,
@@ -110,7 +110,7 @@ local function ProcessComm(name, config)
 					if weapons[moduleName] then
 						--Spring.Echo("\tApplying weapon: "..moduleName)
 						ApplyWeapon(commDefs[name], moduleName)
-						hasWeapon = true
+						numWeapons = numWeapons + 1
 					else
 						Spring.Echo("\tERROR: Weapon "..moduleName.." not found")
 					end
@@ -125,8 +125,8 @@ local function ProcessComm(name, config)
 				end
 			end
 			-- give unarmed comms a peashooter
-			if not hasWeapon then
-				ApplyWeapon(commDefs[name], "commweapon_peashooter", true)
+			if (tonumber(cp.level) >= 3 and numWeapons == 1) or numWeapons == 0 then
+				ApplyWeapon(commDefs[name], "commweapon_peashooter")
 			end
 		end
 		if attributeMods.speed > 0 then
