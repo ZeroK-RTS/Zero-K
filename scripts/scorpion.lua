@@ -51,7 +51,7 @@ local SIG_WALK = 1
 local SIG_AIM = {2, 4, 8}
 local SIG_RESTORE = 16
 
-local PERIOD = 0.135
+local PERIOD = 0.22
 
 local sleepTime = PERIOD*1000
 
