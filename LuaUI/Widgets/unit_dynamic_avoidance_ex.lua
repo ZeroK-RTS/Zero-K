@@ -1,4 +1,4 @@
-local versionName = "v1.26"
+local versionName = "v1.28"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Nov 9, 2011",
+    date      = "Nov 14, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -49,13 +49,13 @@ local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
 -- Switches:
 local turnOnEcho =0 --Echo out all numbers for debugging the system
 local activateAutoReverseG=1 --set to auto-reverse when unit is about to collide with an enemy
-local activateImpatienceG=0 --auto disable auto-reverse after 6 continuous auto-avoidance (3 second). In case the unit stuck
+local activateImpatienceG=1 --auto disable auto-reverse after 6 continuous auto-avoidance (3 second). In case the unit stuck
 
 -- Graph constant:
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
 local safetyMarginCONSTANTunitG = 0.8 --obstacle graph offset (a "safety margin" constant). Add/substract obstacle effect (default = 0.8 radian)
 local smCONSTANTunitG		= 0.8  -- obstacle graph offset (a "safety margin" constant).  Add/substract obstacle effect (default = not stated, perhaps 0.8 radian)
-local aCONSTANTg			= 0.015 -- attractor graph; scale the attractor's strenght. Less equal to additional avoidance (default = 0.2 amplitude)
+local aCONSTANTg			= 0.015 -- attractor graph; scale the attractor's strenght. Less equal to additional avoidance (default = 0.01 amplitude)
 
 -- Obstacle/Target competetive interaction constant:
 local cCONSTANT1g 			= 2 --attractor constant; effect the behaviour. ie: the selection between 4 behaviour state. (default = 2 multiplier)
@@ -71,7 +71,7 @@ local velocityScalingCONSTANTg=1 --decrease/increase command lenght. (default= 1
 local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command lenght (default = 0 meter/second)
 
 --Move Command constant:
-local halfTargetBoxSize = {200, -1, 100} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=-1 or always flee, repair=200)
+local halfTargetBoxSize = {400, -1, 200} --the distance from a target where widget should ignore (default: move = 400 ie:800x800 box, reclaim/ressurect=-1 or always flee, repair=200)
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
@@ -129,6 +129,7 @@ function widget:Update()
 	surroundingOfActiveUnit=surroundingOfActiveUnitG
 	cycle = cycleG
 	skippingTimer = skippingTimerG
+	timeToContactCONSTANT=timeToContactCONSTANTg
 	-----
 	local now=spGetGameSeconds()
 	if (now >=1.1+skippingTimer[1]) then --if "now" is 1.1 second after last update then do "RefreshUnitList()"
@@ -138,17 +139,19 @@ function widget:Update()
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 	end
 	
-	if (now >=0.40+skippingTimer[2] and cycle==1) then --if now is 0.35 second after last update then do "GetPreliminarySeparation()"
+	if (now >=skippingTimer[2]-0.1 and cycle==1) then --if now is 0.35 second after last update then do "GetPreliminarySeparation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 		surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable)
 		cycle=2 --send next cycle to "DoCalculation()" function
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 	end
-	if (now >=0.50+skippingTimer[2] and cycle==2) then --if now is 0.45 second after last update then do "DoCalculation()"
+	if (now >=skippingTimer[2] and cycle==2) then --if now is 0.45 second after last update then do "DoCalculation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
 		commandIndexTable=DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 		cycle=1 --send next cycle back to "GetPreliminarySeparation()" function
-		skippingTimer[2]=spGetGameSeconds()
+		local projectedDelay=NetworkDelay(myPlayerID)
+		skippingTimer[2]=now+projectedDelay
+		timeToContactCONSTANT=projectedDelay
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
 	end
 
@@ -162,6 +165,7 @@ function widget:Update()
 	surroundingOfActiveUnitG=surroundingOfActiveUnit
 	cycleG = cycle
 	skippingTimerG = skippingTimer
+	timeToContactCONSTANTg=timeToContactCONSTANT
 	-----
 end
 ---------------------------------Level 0 Top level
@@ -304,6 +308,13 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 		end
 	end
 	return commandIndexTable
+end
+
+function NetworkDelay(playerIDa)
+	local _,_,_,_,_,totalDelay,_,_,_,_= Spring.GetPlayerInfo(playerIDa)
+	if totalDelay==nil or totalDelay<0.5 then return 0.5 
+	else return totalDelay
+	end
 end
 ---------------------------------Level1
 ---------------------------------Level2 (level 1's call-in)
