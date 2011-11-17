@@ -6,11 +6,11 @@ unitDef = {
   activateWhenBuilt   = true,
   bmcode              = [[1]],
   brakeRate           = 0.22,
-  buildCostEnergy     = 320,
-  buildCostMetal      = 320,
+  buildCostEnergy     = 1000,
+  buildCostMetal      = 1000,
   builder             = false,
   buildPic            = [[corthud.png]],
-  buildTime           = 320,
+  buildTime           = 1000,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -20,7 +20,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Felon charges its shield over time, and can release that energy in accurate bursts in all directions. Link it to other shields to increase its rate of fire.]],
+    helptext       = [[The Felon charges its shield over time, and can release that energy in accurate bursts. Link it to other shields to increase its rate of fire.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -31,7 +31,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   mass                = 300,
-  maxDamage           = 400,
+  maxDamage           = 1000,
   maxSlope            = 36,
   maxVelocity         = 1.5,
   maxWaterDepth       = 22,
@@ -41,6 +41,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[shieldfelon.s3o]],
   onoffable           = true,
+  script              = [[sheildfelon.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
@@ -55,7 +56,7 @@ unitDef = {
   },
 
   side                = [[CORE]],
-  sightDistance       = 420,
+  sightDistance       = 600,
   smoothAnim          = true,
   trackOffset         = 0,
   trackStrength       = 8,
@@ -71,61 +72,12 @@ unitDef = {
     {
       def = [[SHIELD]],
     },
-
-    {
-      def                = [[SHIELDGUN]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[0 0.5 1]],
-	  maxAngleDif        = 230,
-    },
 	
     {
       def                = [[SHIELDGUN]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[1 0.5 1]],
-	  maxAngleDif        = 230,
-    },
-
-    {
-      def                = [[SHIELDGUN]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[1 0.5 0]],
-	  maxAngleDif        = 230,
-    },
-	
-    {
-      def                = [[SHIELDGUN]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[1 0.5 -1]],
-	  maxAngleDif        = 230,
-    },
-
-    {
-      def                = [[SHIELDGUN]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[0 0.5 -1]],
-	  maxAngleDif        = 230,
-    },
-	
-    {
-      def                = [[SHIELDGUN]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[-1 0.5 -1]],
-	  maxAngleDif        = 230,
-    },
-
-    {
-      def                = [[SHIELDGUN]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[-1 0.5 0]],
-	  maxAngleDif        = 230,
-    },
-	
-    {
-      def                = [[SHIELDGUN]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[-1 0.5 1]],
-	  maxAngleDif        = 230,
+	  mainDir            = [[0 1 0]],
+	  maxAngleDif        = 270,
     },
 	
   },
@@ -149,10 +101,10 @@ unitDef = {
       shieldBadColor          = [[1 0.1 0.1]],
       shieldGoodColor         = [[0.1 0.1 1]],
       shieldInterceptType     = 3,
-      shieldPower             = 500,
-      shieldPowerRegen        = 10,
+      shieldPower             = 1200,
+      shieldPowerRegen        = 20,
       shieldPowerRegenEnergy  = 0,
-      shieldRadius            = 120,
+      shieldRadius            = 100,
       shieldRepulser          = false,
       shieldStartingPower     = 0,
       smartShield             = true,
@@ -161,7 +113,7 @@ unitDef = {
       visibleShieldHitFrames  = 4,
       visibleShieldRepulse    = true,
       weaponType              = [[Shield]],
-	  range                   = 420,
+	  range                   = 500,
     },
 	
     SHIELDGUN = {
@@ -172,7 +124,7 @@ unitDef = {
       cylinderTargetting      = 0,
 
       damage                  = {
-        default        = 1,
+        default        = 80,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -182,7 +134,7 @@ unitDef = {
       impulseFactor           = 0.4,
       intensity               = 6,
       interceptedByShieldType = 1,
-      range                   = 300,
+      range                   = 480,
       reloadtime              = 0.2,
       rgbColor                = [[0.5 0 0.7]],
       soundStart              = [[weapon/small_lightning]],
