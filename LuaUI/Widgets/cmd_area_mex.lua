@@ -1,4 +1,4 @@
-local versionNumber = "v2.2"
+local versionNumber = "v2.201"
 
 function widget:GetInfo()
   return {
@@ -13,7 +13,7 @@ function widget:GetInfo()
   }
 end
 
-local maxMetalData = 2500000
+local maxMetalData = 250000
 local pathToSave = "LuaUI/Configs/MetalMaps/" -- where to store mexmaps
 
 -----------------
