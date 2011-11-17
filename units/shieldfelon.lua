@@ -41,7 +41,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[shieldfelon.s3o]],
   onoffable           = true,
-  script              = [[sheildfelon.lua]],
+  script              = [[shieldfelon.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
