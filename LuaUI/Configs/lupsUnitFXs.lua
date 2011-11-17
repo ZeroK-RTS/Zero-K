@@ -162,6 +162,7 @@ effectUnitDefs = {
     {class='StaticParticles', options=zenithCorona},
   },    
 
+  -- length tag does nothing
   --// PLANES //----------------------------
   armcybr = {
     {class='AirJet', options={color={0.4,0.1,0.8}, width=3.5, length=30, piece="nozzle1", onActive=true}},

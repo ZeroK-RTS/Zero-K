@@ -118,15 +118,15 @@ local base = {
 	{
 		name = "rocket",
 		modules = {
-			"commweapon_missilelauncher", 
+			"commweapon_missilelauncher",
 			"commweapon_clusterbomb",
-			"weaponmod_standoff_rocket", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
+			"weaponmod_standoff_rocket",
+			"module_adv_targeting",
+			"module_adv_targeting",
+			"module_adv_targeting",
+			"module_adv_targeting",
+			"module_adv_targeting",
+			"module_adv_targeting",
 			"module_adv_targeting"
 		}
 	},
@@ -150,15 +150,15 @@ local base = {
 	{
 		name = "arty",
 		modules = {
-			"commweapon_assaultcannon", 
-			"commweapon_assaultcannon", 
+			"commweapon_assaultcannon",
+			"commweapon_assaultcannon",
 			"conversion_partillery",
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting", 
-			"module_adv_targeting"		
+			"module_adv_targeting",
+			"module_adv_targeting",
+			"module_adv_targeting",
+			"module_adv_targeting",
+			"module_adv_targeting",
+			"module_adv_targeting"
 		}
 	},
 	{

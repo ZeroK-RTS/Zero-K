@@ -162,10 +162,7 @@ function script.QueryNanoPiece()
 end
 
 function script.QueryLandingPads()
-	local landingpad = { land }
-
-	return landingpad
-
+	return { land }
 end
 
 function script.Activate ( )
