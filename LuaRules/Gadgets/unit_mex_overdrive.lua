@@ -628,7 +628,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
                             
 							summedMetalProduction = 0
                             summedBaseMetal = 0
-							summedOverdriveMetal = 0
+							summedOverdrive = 0
                             
 							maxedGrid[i] = true
 							reCalc = true
@@ -647,7 +647,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
                                 
 								maxedMetalProduction = maxedMetalProduction + thisMexM
 								maxedBaseMetal = maxedBaseMetal + orgMetal
-                                maxedOverdrive = summedOverdrive + orgMetal * metalMult
+                                maxedOverdrive = maxedOverdrive + orgMetal * metalMult
                                 
 								allyMetalSquared = allyMetalSquared - orgMetal * orgMetal
 								gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
