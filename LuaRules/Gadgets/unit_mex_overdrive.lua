@@ -625,8 +625,11 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							local gridE = maxGridCapacity[i]
 							local gridMetalSquared = allyTeamData.grid[i].mexSquaredSum
 							gridEnergySpent[i] = maxGridCapacity[i]
+                            
 							summedMetalProduction = 0
+                            summedBaseMetal = 0
 							summedOverdriveMetal = 0
+                            
 							maxedGrid[i] = true
 							reCalc = true
 							allyE = allyE - gridE
@@ -641,9 +644,11 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
 								local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
 								Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
+                                
 								maxedMetalProduction = maxedMetalProduction + thisMexM
 								maxedBaseMetal = maxedBaseMetal + orgMetal
                                 maxedOverdrive = summedOverdrive + orgMetal * metalMult
+                                
 								allyMetalSquared = allyMetalSquared - orgMetal * orgMetal
 								gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
 								
@@ -664,6 +669,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
 					local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
 					Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
+                    
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedBaseMetal = summedBaseMetal + orgMetal
                     summedOverdrive = summedOverdrive + orgMetal * metalMult
@@ -760,7 +766,7 @@ function gadget:GameFrame(n)
 				teamEnergy[teamID] = {totalChange = 0, num = teamID}
 				local te = teamEnergy[teamID]
 				te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = Spring.GetTeamResources(teamID, "energy")
-				local incTakeNE = (lastTeamNe[teamID] and lastTeamNe[teamID] > 0 and te.eInc - lastTeamNe[teamID]) or te.eInc
+				local incTakeNE = (lastTeamNe[teamID] and lastTeamNe[teamID] > 0 and te.eInc -lastTeamNe[teamID]) or te.eInc
                 teamIncome = teamIncome + incTakeNE
 				if (te.eCur ~= nil) then 
 					te.eTax = incTakeNE * math.max(0, math.min(1, (te.eCur - te.eInc) / (te.eMax - HIDDEN_STORAGE))) -- don't take more than you make!
