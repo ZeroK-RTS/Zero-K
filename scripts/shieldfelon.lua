@@ -28,7 +28,7 @@ smokePiece = {pelvis, torso}
 local shotPieces = {shield, shot1, shot2, shot3, shot4}
 
 -- constants
-local DRAIN = 20
+local DRAIN = 40
 local MIN_CHARGE = 50
 local SHIELD_RADIUS = 100
 
