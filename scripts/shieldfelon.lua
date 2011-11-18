@@ -30,6 +30,7 @@ local shotPieces = {shield, shot1, shot2, shot3, shot4}
 -- constants
 local DRAIN = 20
 local MIN_CHARGE = 50
+local SHIELD_RADIUS = 100
 
 --signals
 local SIG_Walk = 1
@@ -103,7 +104,7 @@ end
 
 function script.QueryWeapon(num) return shotPieces[num] end
 
-function script.AimFromWeapon(num) return shotPieces[num] end
+function script.AimFromWeapon(num) return shotcent end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then return false end
@@ -111,6 +112,10 @@ function script.AimWeapon(num, heading, pitch)
 	-- use only for single weapon design plz
 	Turn(shotcent, y_axis, heading)
 	Turn(shotcent, x_axis, -pitch + math.rad(90))
+	--Move(shot1, y_axis, math.sin(pitch)*-SHIELD_RADIUS)
+	--Move(shot1, x_axis, math.sin(heading)*SHIELD_RADIUS)
+	--Move(shot1, z_axis, math.cos(heading)*SHIELD_RADIUS)
+	
 
 	return select(2, GetUnitShieldState(unitID)) > MIN_CHARGE
 end
@@ -126,16 +131,19 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(base, sfxNone)
 		Explode(pelvis, sfxNone)
 		Explode(torso, sfxNone)
+		Explode(shield, sfxShatter)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
 		Explode(base, sfxNone)
 		Explode(pelvis, sfxNone)
 		Explode(torso, sfxShatter)
+		Explode(shield, sfxFall)
 		return 1 -- corpsetype
 	else
 		Explode(base, sfxShatter)
 		Explode(pelvis, sfxSmoke + sfxFire)
 		Explode(torso, sfxSmoke + sfxFire + sfxExplode)
+		Explode(shield, sfxSmoke + sfxFire + sfxExplode)
 		return 2 -- corpsetype
 	end
 end

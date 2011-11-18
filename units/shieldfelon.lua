@@ -76,8 +76,8 @@ unitDef = {
     {
       def                = [[SHIELDGUN]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[0 1 0]],
-	  maxAngleDif        = 270,
+	  --mainDir            = [[0 1 0]],
+	  --maxAngleDif        = 270,
     },
 	
   },
