@@ -648,14 +648,14 @@ local lastEnergyWasted = 0
 local lastMetalFromOverdrive = 0
 
 -- note works only in communism mode
-function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, change, teamIncome)
+function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, EnergyChange, teamIncome)
   if (Spring.GetLocalTeamID() == teamID) then 
   	WG.energyWasted = lastEnergyWasted
     lastEnergyWasted = energyWasted
 	WG.energyForOverdrive = lastEnergyForOverdrive
     lastEnergyForOverdrive = energyForOverdrive
 	WG.change = lastChange
-    lastChange = change
+    lastChange = EnergyChange
 	WG.mexIncome = baseMetal
 	WG.metalFromOverdrive = lastMetalFromOverdrive
     lastMetalFromOverdrive = overdriveMetal

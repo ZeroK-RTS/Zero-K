@@ -760,7 +760,7 @@ function gadget:GameFrame(n)
 				teamEnergy[teamID] = {totalChange = 0, num = teamID}
 				local te = teamEnergy[teamID]
 				te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = Spring.GetTeamResources(teamID, "energy")
-				local incTakeNE = (lastTeamNe[teamID] and lastTeamNe[teamID] > 0 and te.eInc -lastTeamNe[teamID]) or te.eInc
+				local incTakeNE = (lastTeamNe[teamID] and lastTeamNe[teamID] > 0 and te.eInc - lastTeamNe[teamID]) or te.eInc
                 teamIncome = teamIncome + incTakeNE
 				if (te.eCur ~= nil) then 
 					te.eTax = incTakeNE * math.max(0, math.min(1, (te.eCur - te.eInc) / (te.eMax - HIDDEN_STORAGE))) -- don't take more than you make!

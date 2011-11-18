@@ -20,7 +20,7 @@ options = {
 }
 
 function widget:CommandNotify(id, params, cmdOptions)
-	if cmdOptions.right and ((id == CMD.REPAIR and options.repair.value) or 
+	if cmdOptions.right and #params < 4 and ((id == CMD.REPAIR and options.repair.value) or 
 	(id == CMD.RECLAIM and options.reclaim.value) or id == (CMD.RESURRECT and options.resurrect.value)) then
 		local selUnits = Spring.GetSelectedUnits()
 		local replace = false
@@ -28,7 +28,7 @@ function widget:CommandNotify(id, params, cmdOptions)
 			local unitID = selUnits[i]
 			local ud = Spring.GetUnitDefID(unitID)
 			-- assumption here is that everything that can repair or rez can also reclaim
-			if ud and UnitDefs[ud] and UnitDefs[ud].canReclaim and Spring.GetUnitIsCloaked(unitID) then
+			if ud and UnitDefs[ud] and UnitDefs[ud].canReclaim and Spring.GetUnitIsCloaked(unitID) and UnitDefs[ud].speed > 0 then
 				replace = true
 				break
 			end
