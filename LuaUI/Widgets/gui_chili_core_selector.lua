@@ -630,7 +630,7 @@ local function ClearData()
 		RemoveFac(facs[1].facID)
 	end
 	while comms[1] do
-		RemoveComm(comms[i].commID)
+		RemoveComm(comms[1].commID)
 	end
 	idleCons = {}
 	UpdateConsButton()
