@@ -1,4 +1,4 @@
-local versionName = "v3.00"
+local versionName = "v3.01"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -872,7 +872,8 @@ function retrieveTotalNetworkDelay(playerIDa, playerIDb)
 	local _,_,_,_,_,aTargetPingTime,_,_,_,_= Spring.GetPlayerInfo(playerIDa)
 	local _,_,_,_,_,bTargetPingTime,_,_,_,_= Spring.GetPlayerInfo(playerIDb)
 	local totalDelay= aTargetPingTime+bTargetPingTime
-	if totalDelay>=2 then return 2 
+	if totalDelay<0.5 then return 0.5 --if too low delay don't spam message out too quickly
+	elseif totalDelay>=2 then return 2 --if too high delay then don't wait too long, just send until the retry depleted (end connection)
 	else return totalDelay
 	end
 end
