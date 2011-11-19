@@ -10,7 +10,7 @@ local tracks = 1
 
 -- Signal definitions
 local SIG_ACTIVATE = 2
-local SIG_ANIM = 4
+local SIG_MOVE = 4
 local SIG_AIM = 1
 local SIG_IDLE = 8
 
@@ -29,11 +29,11 @@ local TURRET_SPEED = math.rad(60)
 local TURRET_ACCEL = math.rad(2)
 
 local ANIM_PERIOD = 66
-local PIVOT_MOD = 1--appox. equal to MAX_PIVOT / turnrate
-local MAX_PIVOT = math.rad(15)
-local MIN_PIVOT = math.rad(-15)
+local PIVOT_MOD = 11 --appox. equal to MAX_PIVOT / turnrate
+local MAX_PIVOT = math.rad(14)
+local MIN_PIVOT = math.rad(-14)
 local PIVOT_SPEED = math.rad(60)
-local MIN_DIFF = 3
+local MIN_DIFF = math.rad(3)
 
 smokePiece = {base, turret}
 
@@ -45,14 +45,11 @@ local function ImpactTilt(x,z)
 	Turn( base , z_axis, 0, math.rad(30) )
 	Turn( base , x_axis, 0, math.rad(300) )
 end
-
 function script.HitByWeapon(x, z)
-	--StartThread(ImpactTilt, x, z)
+	StartThread(ImpactTilt, x, z)
 end
 
 local function AnimControl() 
-	Signal(SIG_ANIM)
-	SetSignalMask(SIG_ANIM)
 	local lastHeading, currHeading, diffHeading, pivotAngle
 	lastHeading = GetUnitValue(COB.HEADING)
 	while true do
@@ -73,8 +70,8 @@ local function AnimControl()
 		end
 		--pivot
 		currHeading = GetUnitValue(COB.HEADING)
-		diffHeading = (currHeading - lastHeading)/15
-		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then diffHeading = 0.01 end	--0.001 to prevent segfaulting perfect alignment
+		diffHeading = currHeading - lastHeading
+		if (diffHeading > 0 and diffHeading < MIN_DIFF) or (diffHeading < 0 and diffHeading > -MIN_DIFF) then diffHeading = 0 end
 		--hexadecimal wtf?
 		--if diffHeading > 0x7fff then diffHeading = diffHeading - 0x10000
 		--if diffHeading < -0x8000 then diffHeading = diffHeading + 0x10000
@@ -82,7 +79,7 @@ local function AnimControl()
 		if pivotAngle > MAX_PIVOT then pivotAngle = MAX_PIVOT end
 		if pivotAngle < MIN_PIVOT then pivotAngle = MIN_PIVOT end
 		Turn( front , y_axis, pivotAngle, PIVOT_SPEED )
-		Turn( rear , y_axis, (0 - pivotAngle ), PIVOT_SPEED )
+		Turn( rear , y_axis, (0 - pivotAngle ),PIVOT_SPEED )
 		
 		lastHeading = currHeading
 		Sleep( ANIM_PERIOD)
@@ -109,7 +106,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_IDLE)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	Turn(turret, y_axis, heading, math.rad(240))
+	Turn(turret, y_axis, heading, math.rad(180))
 	--Turn(arm_1, x_axis, math.rad(90) - pitch, math.rad(60))
 	--WaitForTurn(arm_1, x_axis)
 	WaitForTurn(turret, y_axis)
@@ -123,7 +120,6 @@ function script.QueryWeapon(num) return dish end
 function script.Create()
 	StartThread(SmokeUnit)
 	script.Activate()
-	Turn( rear , y_axis, 0.01, PIVOT_SPEED )
 end
 
 function script.Activate()
@@ -152,24 +148,24 @@ end
 function script.Deactivate()
 	Signal( SIG_ACTIVATE)
 	SetSignalMask( SIG_ACTIVATE)
-	Turn( turret , y_axis, 0, math.rad(TURRET_SPEED) )
+	Turn( turret , y_axis, math.rad(0 ), math.rad(TURRET_SPEED) )
 	WaitForTurn(turret, y_axis)
 	
-	Turn( panel_a1 , z_axis, 0, DEPLOY_SPEED  )
-	Turn( panel_a2 , z_axis, 0, DEPLOY_SPEED  )
-	Turn( panel_b1 , z_axis, 0, DEPLOY_SPEED  )
-	Turn( panel_b2 , z_axis, 0, DEPLOY_SPEED  )
+	Turn( panel_a1 , z_axis, math.rad(-(0 )), DEPLOY_SPEED  )
+	Turn( panel_a2 , z_axis, math.rad(-(0 )), DEPLOY_SPEED  )
+	Turn( panel_b1 , z_axis, math.rad(-(0 )), DEPLOY_SPEED  )
+	Turn( panel_b2 , z_axis, math.rad(-(0 )), DEPLOY_SPEED  )
 	WaitForTurn(panel_a1, z_axis)
 	WaitForTurn(panel_a2, z_axis)
 	WaitForTurn(panel_b1, z_axis)
 	WaitForTurn(panel_b2, z_axis)
 	
-	Turn( arm_2 , x_axis, 0, DEPLOY_SPEED )
-	Turn( arm_3 , x_axis, 0, DEPLOY_SPEED )
+	Turn( arm_2 , x_axis, math.rad(0 ), DEPLOY_SPEED )
+	Turn( arm_3 , x_axis, math.rad(0 ), DEPLOY_SPEED )
 	WaitForTurn(arm_2, x_axis)
 	WaitForTurn(arm_3, x_axis)
 	
-	Turn( arm_1 , x_axis, 0, DEPLOY_SPEED )
+	Turn( arm_1 , x_axis, math.rad(0 ), DEPLOY_SPEED )
 end
 
 function script.StartMoving() 
@@ -177,7 +173,6 @@ function script.StartMoving()
 end
 
 function script.StopMoving() 
-	Signal(SIG_ANIM)
 	StopSpin(bigwheel, x_axis, WHEEL_SPIN_DECEL_L)
 
 	StopSpin(wheels1, x_axis, WHEEL_SPIN_DECEL_M)

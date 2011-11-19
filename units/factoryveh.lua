@@ -22,7 +22,7 @@ unitDef = {
     [[corraid]],
     [[corgarp]],
     [[armmerl]],
---    [[capturecar]],
+    [[capturecar]],
   },
 
   buildPic                      = [[factoryveh.png]],
