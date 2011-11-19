@@ -70,7 +70,7 @@ unitDef = {
 
     NAPALM_BOMBLET = {
       name                    = [[Flame Bomb]],
-      areaOfEffect            = 128,
+      areaOfEffect            = 72,
       craterBoost             = 0,
       craterMult              = 0,
 
