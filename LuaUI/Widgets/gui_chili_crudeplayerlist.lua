@@ -265,7 +265,7 @@ local function UpdatePlayerInfo()
 			pingLabels[playerID]:Invalidate()
 		end
 		-- for <Waiting> bug at start, may be a FIXME
-		if nameLabels[teamID] and (not active) then
+		if nameLabels[playerID] and (not active) then
 			local name_out = ''
 			name_out = name or ''
 			if	name_out == ''
@@ -281,7 +281,7 @@ local function UpdatePlayerInfo()
 					name_out = "<Dead> " ..(name or '')
 				end
 			end
-			nameLabels[teamID]:SetCaption(name_out)
+			nameLabels[playerID]:SetCaption(name_out)
 		end
 	end
 	if not options.showSpecs.value then MakeSpecTooltip() end
@@ -420,7 +420,8 @@ local function AddAllyteamPlayers(row, allyTeam, players)
 			fontsize = fontsize,
 			fontShadow = true,
 		}
-		if teamID then nameLabels[teamID] = nameLabel end
+		--if teamID then nameLabels[teamID] = nameLabel end
+		nameLabels[playerID] = nameLabel
 		scroll_cpl:AddChild(nameLabel)
 		-- because for some goddamn stupid reason the names won't show otherwise
 		nameLabel:UpdateLayout()
@@ -660,6 +661,11 @@ function widget:TeamDied(teamID)
 end
 
 function widget:TeamChanged(teamID)
+	SetupPlayerNames()
+end
+
+-- workaround for stupidity
+function widget:GameStart()
 	SetupPlayerNames()
 end
 -----------------------------------------------------------------------

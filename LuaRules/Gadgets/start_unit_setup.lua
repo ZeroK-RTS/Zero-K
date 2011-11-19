@@ -329,13 +329,13 @@ function gadget:Initialize()
   local teams = Spring.GetTeamList()
   for i=1,#teams do
 	if Spring.GetGameRulesParam("commSpawnedTeam"..teams[i]) == 1 then
-		commSpawnedTeam[teams[i]] = true
+		commSpawnedTeam[teams[i] ] = true
 	end
   end
   local players = Spring.GetPlayerList()
   for i=1,#players do
 	if Spring.GetGameRulesParam("commSpawnedPlayer"..players[i]) == 1 then
-		commSpawnedPlayer[players[i]] = true
+		commSpawnedPlayer[players[i] ] = true
 	end  
   end
   ]]--
