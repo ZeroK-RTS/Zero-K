@@ -4,14 +4,14 @@ local versionName = "v3.00"
 
 function widget:GetInfo()
   return {
-    name      = "Avatars",
+    name      = "Avatars_1",
     desc      = "An API for a per-user avatar-icon system, + Hello/Hi protocol (experimental)",
     author    = "jK, +msafwan",
     date      = "2009, +2011 (9 Nov)",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    api       = true,
-    enabled   = true
+    api       = false,
+    enabled   = false
   }
 end
 
