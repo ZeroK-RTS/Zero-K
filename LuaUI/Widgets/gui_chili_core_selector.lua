@@ -626,10 +626,10 @@ local function InitializeUnits()
 end
 
 local function ClearData()
-	for i=1,#facs do
-		RemoveFac(facs[i].facID)
+	while facs[1] do
+		RemoveFac(facs[1].facID)
 	end
-	for i=1,#comms do
+	while comms[1] do
 		RemoveComm(comms[i].commID)
 	end
 	idleCons = {}
@@ -742,16 +742,13 @@ end
 local timer = 0
 local warningColorPhase = false
 function widget:Update(dt)
-	if not myTeamID then
-		myTeamID = Spring.GetMyTeamID()
-	end
 	if myTeamID~=Spring.GetMyTeamID() then
-		Spring.Echo("<Core Selector>: Spectator mode. Widget removed.")
-		widgetHandler:RemoveWidget()
-		return false
-		--myTeamID = Spring.GetMyTeamID()
-		--ClearData()
-		--InitializeUnits()
+		--Spring.Echo("<Core Selector>: Spectator mode. Widget removed.")
+		--widgetHandler:RemoveWidget()
+		--return false
+		myTeamID = Spring.GetMyTeamID()
+		ClearData()
+		InitializeUnits()
 	end
 	if wantUpdateCons then
 		UpdateConsButton()
