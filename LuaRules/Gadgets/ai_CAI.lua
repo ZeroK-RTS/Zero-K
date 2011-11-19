@@ -2881,14 +2881,15 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					controlledUnit.con.count = controlledUnit.con.count - 1
 					controlledUnit.conByID[unitID] = nil
 				else -- nano turret
-					controlledUnit.nano.cost = controlledUnit.nano.cost - ud.metalCost
+                    controlledUnit.nano.cost = controlledUnit.nano.cost - ud.metalCost
 					local index = controlledUnit.nanoByID[unitID].index
+                    controlledUnit.nanoByID[controlledUnit.nano[controlledUnit.nano.count]].index = index
 					closestFactory = controlledUnit.nanoByID[unitID].closestFactory
 					if a.controlledUnit.factoryByID[closestFactory] then
 						a.controlledUnit.factoryByID[closestFactory].nanoCount = a.controlledUnit.factoryByID[closestFactory].nanoCount - 1
 					end
 					controlledUnit.nanoByID[unitID] = nil
-					removeIndexFromArray(controlledUnit.nano,index)
+                    removeIndexFromArray(controlledUnit.nano,index)
 				end
 			elseif controlledUnit.anyByID[unitID].isScout then
 				controlledUnit.scout.cost = controlledUnit.scout.cost - ud.metalCost
