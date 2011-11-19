@@ -2,17 +2,19 @@
 --------------------------------------------------------------------------------
 --	HOW TO USE
 --	- see http://springrts.com/wiki/Lua_SaveLoad
---	- tl;dr:	/save -y <filename> to save to Spring/Saves, remove the -y to not overwrite
+--	- tl;dr:	/save -y <filename> to save to Spring/Saves
+--					remove the -y to not overwrite
 --				/savegame to save to Spring/Saves/QuickSave.ssf
 --				open an .ssf with spring.exe to load
---				/reloadgame reloads the save you loaded (doesn't remove existing stuff)
+--				/reloadgame reloads the save you loaded 
+--					(gadget purges existing units and feautres)
 --	NOTES
 --	- heightmap saving is implemented by engine
 --	- gadgets which wish to save/load their data must either submit a table and
 --		filename to save (not implemented), or else handle it themselves
 --	TODO
---	- handle features
---	- handle rulesparams, fac command queues
+--	- handle fac command queues
+--	- handle team data, particularly resources
 --	- handle gadget data (CAI and chicken are particularly important)
 --	- handle nonexistent unitDefs
 --------------------------------------------------------------------------------
@@ -32,6 +34,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local generalFile = "general.lua"
 local unitFile = "units.lua"
 local featureFile = "features.lua"
 
@@ -40,6 +43,8 @@ if (gadgetHandler:IsSyncedCode()) then
 --  SYNCED
 -----------------------------------------------------------------------------------
 -- speedups
+local spSetGameRulesParam	= Spring.SetGameRulesParam
+local spSetTeamRulesParam	= Spring.SetTeamRulesParam
 local spCreateUnit			= Spring.CreateUnit
 local spSetUnitHealth		= Spring.SetUnitHealth
 local spSetUnitMaxHealth	= Spring.SetUnitMaxHealth
@@ -49,7 +54,13 @@ local spSetUnitExperience	= Spring.SetUnitExperience
 local spSetUnitShieldState	= Spring.SetUnitShieldState
 local spSetUnitWeaponState	= Spring.SetUnitWeaponState
 local spSetUnitStockpile	= Spring.SetUnitStockpile
+local spSetUnitNeutral		= Spring.SetUnitNeutral
 local spGiveOrderToUnit		= Spring.GiveOrderToUnit
+local spCreateFeature		= Spring.CreateFeature
+local spSetFeatureDirection	= Spring.SetFeatureDirection
+local spSetFeatureHealth	= Spring.SetFeatureHealth
+local spSetFeatureReclaim	= Spring.SetFeatureReclaim
+
 
 local cmdTypeIconModeOrNumber = {
 	[CMD.AUTOREPAIRLEVEL] = true,
@@ -57,9 +68,49 @@ local cmdTypeIconModeOrNumber = {
 }
 
 -- vars
-local unitDataRaw, unitDataFunc
-local unitData = {}
-local err
+local savedata = {
+	general = {},
+	unit = {},
+	feature = {},
+	gadgets = {}
+}
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+local function ReadFile(zip, name, file, output)
+	name = name or ''
+	if (not file) or (not output) then return end
+	
+	local dataRaw, dataFunc, data, err
+	
+	for i in pairs(output) do
+		output[i] = nil
+	end
+	
+	zip:open(file)
+	dataRaw = zip:read("*all")
+	if not (dataRaw and type(dataRaw) == 'string') then
+		err = name.." save data is empty or in invalid format"
+	else
+		dataFunc, err = loadstring("return "..dataRaw)
+		if dataFunc then
+			success, data = pcall(dataFunc)
+			if not success then	-- execute Borat
+				err = data
+			else
+				-- make tables identical without changing reference
+				for i,v in pairs(data) do
+					output[i] = v
+				end
+			end
+		end
+	end
+	if err then 
+		Spring.Echo('Save/Load error: ' .. err)
+		return false
+	end
+	return true
+end
 
 local function boolToNum(bool)
 	if bool then return 1
@@ -67,7 +118,11 @@ local function boolToNum(bool)
 end
 
 local function GetNewUnitID(oldUnitID)
-	return unitData[oldUnitID] and unitData[oldUnitID].newID
+	return data.unit[oldUnitID] and data.unit[oldUnitID].newID
+end
+
+local function GetNewFeatureID(oldFeatureID)
+	return data.feature[oldFeatureID] and data.feature[oldFeatureID].newID
 end
 
 -- FIXME: autodetection is fairly broken
@@ -83,32 +138,9 @@ local function IsCMDTypeIconModeOrNumber(unitID, cmdID)
 end
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
-function gadget:Load(zip)
-	-- get save data
-	zip:open(unitFile)
-	unitDataRaw = zip:read("*all")
-	if not (unitDataRaw and type(unitDataRaw) == 'string') then
-		err = "Unit save data is empty or in invalid format"
-		unitData = {}
-	else
-		--unitDataRaw = string.gsub(commDataRaw, '_', '=')
-		--unitDataRaw = Spring.Utilities.Base64Decode(unitDataRaw)
-		--Spring.Echo(commDataRaw)
-		unitDataFunc, err = loadstring("return "..unitDataRaw)
-		if unitDataFunc then
-			success, unitData = pcall(unitDataFunc)
-			if not success then	-- execute Borat
-				err = unitData
-				unitData = {}
-			end
-		end
-	end	
-	if err then 
-		Spring.Echo('Save/Load error: ' .. err)
-	end
-	
+local function LoadUnits()
 	-- prep units
-	for oldID, data in pairs(unitData) do
+	for oldID, data in pairs(savedata.unit) do
 		local px, py, pz = unpack(data.pos)
 		local unitDefID = UnitDefNames[data.unitDefName].id
 		if (not UnitDefs[unitDefID].canMove) then
@@ -119,9 +151,12 @@ function gadget:Load(zip)
 		data.newID = newID
 		-- position and velocity
 		spSetUnitVelocity(newID, unpack(data.vel))
-		--spSetUnitRotation(newID, unpack(data.dir))	-- FIXME
-		spSetUnitMaxHealth(newID, data.maxHealth)
+		--spSetUnitDirection(newID, unpack(data.dir))	-- FIXME: callin does not exist
+		Spring.MoveCtrl.Enable(newID)
+		Spring.MoveCtrl.SetHeading(newID, data.heading)	-- workaround?
+		Spring.MoveCtrl.Disable(newID)
 		-- health
+		spSetUnitMaxHealth(newID, data.maxHealth)
 		spSetUnitHealth(newID, {health = data.health, capture = data.captureProgress, paralyze = data.paralyzeDamage, build = data.buildProgress})
 		-- experience
 		spSetUnitExperience(newID, data.experience)
@@ -145,17 +180,27 @@ function gadget:Load(zip)
 		spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
 		spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
 		
-		--TODO: rulesparams
+		-- rulesparams
+		for name,value in pairs(data.rulesParams) do
+			Spring.SetUnitRulesParam(newID, name, value)
+		end
+		-- neutral?
+		spSetUnitNeutral(newID, data.neutral)
 	end
 	
 	-- second pass for orders
-	-- FIXME: updates unitID params to use new unitID, but does not do the same for featureIDs!
-	for oldID, data in pairs(unitData) do
+	for oldID, data in pairs(savedata.unit) do
 		for i=1,#data.commands do
 			local command = data.commands[i]
 			if (#command.params == 1 and not(IsCMDTypeIconModeOrNumber(data.newID, command.id) )) then
-				Spring.Echo(CMD[command.id], command.params[1], GetNewUnitID(command.params[1]))
-				command.params[1] = unitData[command.params[1]].newID
+				local targetID = command.params[1]
+				--Spring.Echo(CMD[command.id], command.params[1], GetNewUnitID(command.params[1]))
+				
+				if savedata.unit[targetID] and savedata.unit[targetID].newID then
+					command.params[1] = savedata.unit[targetID].newID
+				elseif savedata.feature[targetID] and savedata.feature[targetID].newID then
+					command.params[1] = savedata.feature[targetID].newID
+				end
 			end
 			
 			-- workaround for stupid bug where the coordinates are all mixed up
@@ -172,6 +217,59 @@ function gadget:Load(zip)
 	end	
 end
 
+local function LoadFeatures()
+	for oldID, data in pairs(savedata.feature) do
+		local px, py, pz = unpack(data.pos)
+		local featureDefID = FeatureDefNames[data.featureDefName].id
+		local newID = spCreateFeature(data.featureDefName, px, py, pz)
+		data.newID = newID
+		spSetFeatureDirection(newID, unpack(data.dir))
+		-- health
+		spSetFeatureHealth(newID, data.health)
+		-- resources
+		spSetFeatureReclaim(newID, data.reclaimLeft)
+	end
+end
+
+local function LoadGeneralInfo()
+	local gameRulesParams = savedata.general.gameRulesParams or {}
+	for name,value in pairs(gameRulesParams) do
+		Spring.Echo(name,value)
+		spSetGameRulesParam(name, value)
+	end
+	local teamRulesParams = savedata.general.teamRulesParams or {}
+	for name,value in pairs(teamRulesParams) do
+		spSetTeamRulesParam(name, value)
+	end	
+end
+
+
+-----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
+-- callins
+function gadget:Load(zip)
+	-- get save data
+	if ReadFile(zip, "Unit", unitFile, savedata.unit) then
+		local units = Spring.GetAllUnits()
+		for i=1,#units do
+			Spring.DestroyUnit(units[i], false, true)
+		end
+	end
+
+	if ReadFile(zip, "Feature", featureFile, savedata.feature) then
+		local features = Spring.GetAllFeatures()
+		for i=1,#features do
+			Spring.DestroyFeature(features[i])
+		end
+	end	
+	
+	ReadFile(zip, "General", generalFile, savedata.general)
+	
+	LoadGeneralInfo()
+	LoadFeatures()	-- do this first so we can change unit orders involving features to point to new ID
+	LoadUnits()
+end
+
 
 -----------------------------------------------------------------------------------
 --  END SYNCED
@@ -181,6 +279,8 @@ else
 --  UNSYNCED
 -----------------------------------------------------------------------------------
 -- speedups
+local spGetGameRulesParams	= Spring.GetGameRulesParams
+local spGetTeamRulesParams	= Spring.GetTeamRulesParams
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitTeam			= Spring.GetUnitTeam
 local spGetUnitNeutral		= Spring.GetUnitNeutral
@@ -189,14 +289,32 @@ local spGetUnitCommands		= Spring.GetUnitCommands
 local spGetUnitStates		= Spring.GetUnitStates
 local spGetUnitStockpile	= Spring.GetUnitStockpile
 local spGetUnitDirection	= Spring.GetUnitDirection
+local spGetUnitHeading		= Spring.GetUnitHeading
 local spGetUnitBasePosition	= Spring.GetUnitBasePosition
 local spGetUnitVelocity		= Spring.GetUnitVelocity
 local spGetUnitExperience	= Spring.GetUnitExperience
 local spGetUnitWeaponState	= Spring.GetUnitWeaponState
+local spGetFeatureDefID		= Spring.GetFeatureDefID
+local spGetFeatureTeam		= Spring.GetFeatureTeam
+local spGetFeatureHealth	= Spring.GetFeatureHealth
+local spGetFeatureDirection	= Spring.GetFeatureDirection
+local spGetFeaturePosition	= Spring.GetFeaturePosition
+local spGetFeatureHeading	= Spring.GetFeatureHeading
+local spGetFeatureVelocity	= Spring.GetFeatureVelocity
+local spGetFeatureResources	= Spring.GetFeatureResources
+local spGetFeatureNoSelect	= Spring.GetFeatureNoSelect
+
 
 -- vars
-local unitData = {}
-local featureData = {}
+local savedata = {
+	general = {},
+	unit = {},
+	feature = {},
+	gadgets = {},
+}
+
+local autosave = true
+local autosaveFreq = 30*60*10	-- every 10 minutes
 
 -- utility functions
 local function WriteIndents(num)
@@ -267,7 +385,8 @@ local function SaveUnits()
 		-- save position/velocity
 		unitInfo.pos = {spGetUnitBasePosition(unitID)}
 		unitInfo.dir = {spGetUnitDirection(unitID)}
-		unitInfo.vel = {spGetUnitVelocity(unitID)}		
+		unitInfo.vel = {spGetUnitVelocity(unitID)}
+		unitInfo.heading = spGetUnitHeading(unitID)
 		-- save health
 		unitInfo.health, unitInfo.maxHealth, unitInfo.paralyzeDamage, unitInfo.captureProgress, unitInfo.buildProgress = spGetUnitHealth(unitID)
 		-- save weapons
@@ -294,36 +413,85 @@ local function SaveUnits()
 		unitInfo.states = spGetUnitStates(unitID)
 		-- save experience
 		unitInfo.experience = spGetUnitExperience(unitID)
-		-- save rulesparams (TBD)
-
+		-- save rulesparams
+		unitInfo.rulesParams = {}		
+		local params = Spring.GetUnitRulesParams(unitID)
+		for i=1,#params do
+			for name,value in pairs(params[i]) do
+				unitInfo.rulesParams.name = value 
+			end
+		end
 	end
-	unitData = data
+	savedata.unit = data
 end
 
 local function SaveFeatures()
-	-- TBD
+	local data = {}
+	local features = Spring.GetAllFeatures()
+	for i=1,#features do
+		local featureID = features[i]
+		data[featureID] = {}
+		local featureInfo = data[featureID]
+		
+		-- basic feature information
+		local featureDefID = spGetFeatureDefID(featureID)
+		featureInfo.featureDefName = FeatureDefs[featureDefID].name
+		local featureTeam = spGetFeatureTeam(featureID)
+		featureInfo.featureTeam = featureTeam
+		-- save position/velocity
+		featureInfo.pos = {spGetFeaturePosition(featureID)}
+		featureInfo.dir = {spGetFeatureDirection(featureID)}
+		featureInfo.heading = spGetFeatureHeading(featureID)		
+		-- save health
+		featureInfo.health, featureInfo.maxHealth, featureInfo.resurrectProgress = spGetFeatureHealth(featureID)
+		featureInfo.reclaimLeft = select(5, spGetFeatureResources(featureID))
+	end
+	savedata.feature = data
 end
 
+local function SaveGeneralInfo()
+	local data = {}
+	
+	-- gameRulesParams
+	data.gameRulesParams = {}
+	local gameRulesParams = spGetGameRulesParams()
+	for i=1,#gameRulesParams do
+		for name,value in pairs(gameRulesParams[i]) do
+			data.gameRulesParams[name] = value 
+		end
+	end
+	
+	-- team stuff - rulesparams, resources (TBD)
+	savedata.general = data
+end
 
 local function ModifyUnitData(unitID)
-
 end
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 -- callins
 function gadget:Save(zip)
+	SaveGeneralInfo()
 	SaveUnits()
 	SaveFeatures()
-	--[[
-	for i,v in pairs(unitData) do
-		Spring.Echo(i, UnitDefs[v.unitDefID].name, v.unitTeam)
+	WriteSaveData(zip, generalFile, savedata.general)
+	WriteSaveData(zip, unitFile, savedata.unit)
+	WriteSaveData(zip, featureFile, savedata.feature)
+	
+	for _,entry in pairs(savedata.gadgets) do
+		WriteSaveData(zip, entry.filename, entry.data)
 	end
-	]]--
-	WriteSaveData(zip, unitFile, unitData)
 end
 
 function gadget:Initialize()
+
+end
+
+function gadget:GameFrame(n)
+	if n%autosave_frequency < 0.1 then
+		Spring.SendCommands("save -y autosave")
+	end
 end
 -----------------------------------------------------------------------------------
 --  END UNSYNCED
