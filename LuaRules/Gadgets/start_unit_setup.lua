@@ -95,7 +95,7 @@ local waitingForComm = {}
 
 local toFinish = {}
 
--- deprecated
+-- overlaps with the rulesparams; not really needed
 local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
 
@@ -323,6 +323,22 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
 	end
   end
+  
+  -- legacy save/load compat
+  --[[
+  local teams = Spring.GetTeamList()
+  for i=1,#teams do
+	if Spring.GetGameRulesParam("commSpawnedTeam"..teams[i]) == 1 then
+		commSpawnedTeam[teams[i]] = true
+	end
+  end
+  local players = Spring.GetPlayerList()
+  for i=1,#players do
+	if Spring.GetGameRulesParam("commSpawnedPlayer"..players[i]) == 1 then
+		commSpawnedPlayer[players[i]] = true
+	end  
+  end
+  ]]--
 end
 
 
@@ -405,20 +421,27 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   
   -- no getting double comms now!
   --[[
-  if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
-  or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1) then 
+  if playerID then
+	Spring.Echo(Spring.GetGameRulesParam("commSpawnedPlayer"..playerID), commSpawnedPlayer[playerID])
+  end
+  Spring.Echo(Spring.GetGameRulesParam("commSpawnedTeam"..teamID), commSpawnedTeam[teamID])
+  ]]--
+  if ((coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
+  or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1))
+  and not bonusSpawn then 
 	return 
   end
-  ]]--
  
+  --[[ 
   if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]))
   and not bonusSpawn then
 	return 
   end
-  
+  ]]--
+
   local startUnit = GetStartUnit(teamID, playerID, isAI)
   if bonusSpawn then
-  	startUnit = DEFAULT_UNIT
+  	--startUnit = DEFAULT_UNIT
   end
   
   local keys = customKeys[playerID] or customKeys[select(2, spGetTeamInfo(teamID))]
@@ -791,10 +814,6 @@ function gadget:GameFrame(n)
 end
 
 function gadget:Shutdown()
-	--for i=0, 255 do
-	--	Spring.SetGameRulesParam("commPickedPlayer"..i, 0)
-	--	Spring.SetGameRulesParam("commPickedTeam"..i, 0)
-	--end
 	--Spring.Echo("<Start Unit Setup> Going to sleep...")
 end
 
@@ -815,6 +834,19 @@ local boostMax = {}
 
 function gadget:Initialize()
   gadgetHandler:AddSyncAction("UpdateBoost",UpdateBoost)
+--[[
+--  gadgetHandler:AddSyncAction('PWCreate',WrapToLuaUI)
+--  gadgetHandler:AddSyncAction("whisper", whisper)
+  
+	local playerroster = Spring.GetPlayerList()
+	local playercount = #playerroster
+	for i=1,playercount do
+		local name = spGetPlayerInfo(playerroster[i])
+		Spring.SendLuaRulesMsg('<startsetup>playername:'..name..'='..playerroster[i])
+	end
+	Spring.SendLuaRulesMsg('<startsetup>playernames')
+end
+]]--  
 end
   
   
@@ -885,18 +917,4 @@ function gadget:DrawWorld()
 	gl.Texture("")
 end
 
---[[
-function gadget:Initialize()
---  gadgetHandler:AddSyncAction('PWCreate',WrapToLuaUI)
---  gadgetHandler:AddSyncAction("whisper", whisper)
-  
-	local playerroster = Spring.GetPlayerList()
-	local playercount = #playerroster
-	for i=1,playercount do
-		local name = spGetPlayerInfo(playerroster[i])
-		Spring.SendLuaRulesMsg('<startsetup>playername:'..name..'='..playerroster[i])
-	end
-	Spring.SendLuaRulesMsg('<startsetup>playernames')
-end
-]]--
 end

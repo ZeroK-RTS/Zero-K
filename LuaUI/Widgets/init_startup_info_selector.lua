@@ -204,7 +204,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 	end
 	
-	local playerID, teamID = Spring.GetMyPlayerID(), Spring.GetMyTeamID()
+	local playerID = Spring.GetMyPlayerID()
+	local teamID = Spring.GetMyTeamID()
 	if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
 	or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
