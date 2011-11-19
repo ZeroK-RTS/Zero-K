@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
 		name	= "News Ticker",
-		desc	= "v1 Keeps you up to date on important battlefield events",
+		desc	= "v1.01 Keeps you up to date on important battlefield events",
 		author	= "KingRaptor",
 		date	= "July 26, 2009",
 		license	= "GNU GPL, v2 or later",
@@ -86,14 +86,14 @@ options = {
 	backgroundOpacity = {
 		name = "Background opacity",
 		type = "number",
-		value = 0, min = 0, max = 1, step = 0.01,
+		value = 0.8, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
-			panel_ticker.color = {1,1,1,self.value}
+			panel_ticker.backgroundColor = {1,1,1,self.value}
 			panel_ticker:Invalidate()
 		end,
 	},
 	minCostMult = {
-		name = "Minimum cost mult",
+		name = "Minimum cost mult (1-20)",
 		type = "number",
 		value = 10, min = 1, max = 20, step = 1,
 		desc = "Multiplies metal income for minimum cost of newsworthy units",
@@ -365,5 +365,6 @@ function widget:Initialize()
 		width  = "100%",
 		height = fontSize * 2,
 		parent = window_ticker,
+		backgroundColor = {1,1,1,options.backgroundOpacity.value or 0.7}
 	}
 end
