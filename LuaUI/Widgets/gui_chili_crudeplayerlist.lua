@@ -265,9 +265,8 @@ local function UpdatePlayerInfo()
 			pingLabels[playerID]:Invalidate()
 		end
 		-- for <Waiting> bug at start, may be a FIXME
-		if nameLabels[playerID] and (not active) then
-			local name_out = ''
-			name_out = name or ''
+		if nameLabels[playerID] then
+			local name_out = name or ''
 			if	name_out == ''
 				or #(Spring.GetPlayerList(teamID,true)) == 0
 				or spectator
