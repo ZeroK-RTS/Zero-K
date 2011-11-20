@@ -291,11 +291,11 @@ function widget:GameFrame(n)
 	"\nOther: " .. totalOtherE ..
 	"\nWaste: " .. totalWaste
 
-	local mTotal = mInco - mExpe
+	local mTotal
 	if options.onlyShowExpense.value then
-		mTotal = mInco - mExpe
+		mTotal = mInco - mExpe + mReci
 	else
-		mTotal = mInco - mPull
+		mTotal = mInco - mPull + mReci
 	end
 
 	if (mTotal >= 2) then
@@ -346,7 +346,7 @@ function widget:GameFrame(n)
 		lbl_m_expense:SetCaption( ("%.1f"):format(mPull) )
 		lbl_e_expense:SetCaption( ("%.1f"):format(ePull) )
 	end
-	lbl_m_income:SetCaption( ("%.1f"):format(mInco) )
+	lbl_m_income:SetCaption( ("%.1f"):format(mInco+mReci) )
 	lbl_e_income:SetCaption( ("%.1f"):format(eInco) )
 
 
