@@ -257,7 +257,7 @@ local function UpdatePlayerInfo()
 			local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 			local pingTime_readable = PingTimeOut(pingTime)
 			
-			cpuLabels[playerID].textcolor = cpuCol
+    cpuLabels[playerID].font.color = cpuCol
 			cpuLabels[playerID]:SetCaption(math.round(cpuUsage*100) .. '%')
 			cpuLabels[playerID]:Invalidate()
 			pingLabels[playerID].textcolor = pingCol
@@ -455,7 +455,7 @@ local function AddAllyteamPlayers(row, allyTeam, players)
 				x=x_cpu,
 				y=fontsize * row,
 				caption = math.round(cpuUsage*100) .. '%',
-				textColor = cpuCol,
+				--textColor = cpuCol,
 				fontsize = fontsize,
 				fontShadow = true,
 			}
@@ -465,7 +465,7 @@ local function AddAllyteamPlayers(row, allyTeam, players)
 				x=x_ping,
 				y=fontsize * row,
 				caption = pingTime_readable ,
-				textColor = pingCol,
+				--textColor = pingCol,
 				fontsize = fontsize,
 				fontShadow = true,
 			}
