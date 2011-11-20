@@ -257,10 +257,10 @@ local function UpdatePlayerInfo()
 			local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 			local pingTime_readable = PingTimeOut(pingTime)
 			
-    cpuLabels[playerID].font.color = cpuCol
+			cpuLabels[playerID].font.color = cpuCol
 			cpuLabels[playerID]:SetCaption(math.round(cpuUsage*100) .. '%')
 			cpuLabels[playerID]:Invalidate()
-			pingLabels[playerID].textcolor = pingCol
+			pingLabels[playerID].font.color = pingCol
 			pingLabels[playerID]:SetCaption(pingTime_readable)
 			pingLabels[playerID]:Invalidate()
 		end
