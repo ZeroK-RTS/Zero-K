@@ -52,17 +52,17 @@ local white		= ''
 
 local cf = Spring.GetGameRulesParam('cf') == 1
 
-local x_cf 		= cf and 20 or 0
-local x_icon_country = x_cf + 30
-local x_icon_rank = x_icon_country + 16
-local x_icon_clan = x_icon_rank + 16
-local x_name 	= x_icon_clan + 16
-local x_share 	= x_name + 140 
-local x_cpu 	= x_share + 20
-local x_ping 	= x_cpu + 40
-local x_buffer	= x_ping + 40
+local x_cf				= cf and 20 or 0
+local x_icon_country	= x_cf + 30
+local x_icon_rank		= x_icon_country + 16
+local x_icon_clan		= x_icon_rank + 16
+local x_name			= x_icon_clan + 16
+local x_share			= x_name + 140 
+local x_cpu				= x_share + 20
+local x_ping			= x_cpu + 40
+local x_postping		= x_ping + 40
 
-local x_bound	= x_buffer + 40 + (cf and 0 or 20)
+local x_bound	= x_postping + (cf and 0 or 20)
 
 local UPDATE_FREQUENCY = 0.5	-- seconds
 
@@ -536,8 +536,8 @@ SetupPlayerNames = function()
 					if Spring.GetGameSeconds() < 0.1 then
 						name_out = "<Waiting> " ..(name or '')
 						wantsNameRefresh[playerID] = true
-					elseif Spring.GetTeamUnitCount(teamID) > 0  then
-						name_out = "<Aband. units> " ..(name or '')
+					--elseif Spring.GetTeamUnitCount(teamID) > 0  then
+					--	name_out = "<Aband. units> " ..(name or '')
 					else
 						name_out = "<Dead> " ..(name or '')
 					end
