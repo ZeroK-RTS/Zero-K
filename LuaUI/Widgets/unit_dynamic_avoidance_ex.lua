@@ -1,4 +1,4 @@
-local versionName = "v1.41"
+local versionName = "v1.42"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Nov 21, 2011",
+    date      = "Nov 22, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -40,6 +40,7 @@ local spGetGameSeconds	= Spring.GetGameSeconds
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spValidFeatureID = Spring.ValidFeatureID
 local spGetPlayerInfo = Spring.GetPlayerInfo
+local spGetUnitStates = Spring.GetUnitStates
 local CMD_STOP			= CMD.STOP
 local CMD_INSERT		= CMD.INSERT
 local CMD_REMOVE		= CMD.REMOVE
@@ -234,7 +235,11 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable)
 				local cQueue = spGetCommandQueue(unitID)
 				if cQueue~=nil then --prevent ?. Forgot...
 					if (unitInMotion[i].isVisible ~= "yes" and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and is idle/with-singular-mono-command (eg: widget's move order)
-						cQueue={{id = cMD_DummyG, params = {nil ,nil,nil}, options = {}}, {id = CMD_STOP, params = {nil,nil,nil}, options = {}}, nil} --replace with a fake command. Will be used to initiate avoidance on idle unit & non-viewed unit
+						local state=spGetUnitStates(unitID)
+						local movestate= state.movestate
+						if movestate~= 0 then --if not "hold position"
+							cQueue={{id = cMD_DummyG, params = {nil ,nil,nil}, options = {}}, {id = CMD_STOP, params = {nil,nil,nil}, options = {}}, nil} --replace with a fake command. Will be used to initiate avoidance on idle unit & non-viewed unit
+						end
 					end
 				if cQueue[1]~=nil then --prevent idle unit from executing the system
 					if ((cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) and (unitInMotion[i][2] == 1 or unitInMotion[i].isVisible ~= "yes")) then  -- only command: repair (40), build (<0), reclaim (90), ressurect(125) or move(10), and ONLY for unitType=1 OR all units outside player's vision
