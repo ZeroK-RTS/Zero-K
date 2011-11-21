@@ -1,4 +1,4 @@
-local versionName = "v1.31"
+local versionName = "v1.41"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Nov 14, 2011",
+    date      = "Nov 21, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -33,6 +33,7 @@ local spGetUnitDefID 	= Spring.GetUnitDefID
 local spGetUnitSeparation	= Spring.GetUnitSeparation
 local spGetUnitDirection	=Spring.GetUnitDirection
 local spGetUnitsInRectangle =Spring.GetUnitsInRectangle
+local spGetVisibleUnits = Spring.GetVisibleUnits
 local spGetCommandQueue	= Spring.GetCommandQueue
 local spGetUnitIsDead 	= Spring.GetUnitIsDead
 local spGetGameSeconds	= Spring.GetGameSeconds
@@ -56,9 +57,10 @@ local activateImpatienceG=0 --auto disable auto-reverse and half the distanceCON
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
 local safetyMarginCONSTANTunitG = 0.0 --obstacle graph offset (a "safety margin" constant). Offset the obstacle effect -avoid torward more left or right (default = 0.0 radian)
 local smCONSTANTunitG		= 0.0  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect -avoid torward more left or right (default = 0.0 radian)
-local aCONSTANTg			= math.pi/4 -- attractor graph; scale the attractor's strenght. Less equal to a lesser attraction(default = 0.5 amplitude)
---aCONSTANTg Note: 0.5 is equal to about 30 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction.
---an antagonist to aCONSTANg Note: obstacle graph has the similar 0.5 (30 degree left or right) but actual maximum value varies depend on number of enemy.
+local aCONSTANTg			= math.pi/4 -- attractor graph; scale the attractor's strenght. Less equal to a lesser attraction(default = math.pi/4 radian, max math.pi/2)
+local obsCONSTANTg			= math.pi/4 -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser avoidance(default = math.pi/4 radian)
+--aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction.
+--an antagonist to aCONSTANg (obsCONSTANTg) Note: obstacle graph also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy.
 
 -- Obstacle/Target competetive interaction constant:
 local cCONSTANT1g 			= 2 --attractor constant; effect the behaviour. ie: the selection between 4 behaviour state. (default = 2 multiplier)
@@ -75,6 +77,7 @@ local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command 
 
 --Move Command constant:
 local halfTargetBoxSize = {400, 50, 190} --the distance from a target which widget should de-activate (default: move = 400m ie:800x800m box (2x constructor range), reclaim/ressurect=50 (flee if not close enough), repair=190 (1x constructor's range -10))
+local cMD_DummyG = 248 --a fake command ID to flag an idle unit primed for pure avoidance.
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
@@ -128,15 +131,15 @@ end
 --execute different function at different timescale
 function widget:Update()
 	-------retrieve global table, localize global table
-	commandIndexTable=commandIndexTableG
-	unitInMotion = unitInMotionG
-	surroundingOfActiveUnit=surroundingOfActiveUnitG
-	cycle = cycleG
-	skippingTimer = skippingTimerG
-	timeToContactCONSTANT=timeToContactCONSTANTg
+	local commandIndexTable=commandIndexTableG
+	local unitInMotion = unitInMotionG
+	local surroundingOfActiveUnit=surroundingOfActiveUnitG
+	local cycle = cycleG
+	local skippingTimer = skippingTimerG
+	local timeToContactCONSTANT=timeToContactCONSTANTg
 	-----
 	local now=spGetGameSeconds()
-	if (now >=1.1+skippingTimer[1]) then --if "now" is 1.1 second after last update then do "RefreshUnitList()"
+	if (now >= skippingTimer[1]) then --if "now" is 1.1 second after last update then do "RefreshUnitList()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 		unitInMotion=RefreshUnitList() --add relevant unit to unitlist/unitInMotion
 		local projectedDelay=NetworkDelay(myPlayerID, 1.1)
@@ -180,25 +183,32 @@ function RefreshUnitList()
 	local allMyUnits = spGetTeamUnits(myTeamID)
 	local arrayIndex=1
 	local relevantUnit={}
+	
+	local metaForVisibleUnits = {}
+	local visibleUnits=spGetVisibleUnits(myTeamID)
+	for _, unitID in ipairs(visibleUnits) do --memorize units that is in view of camera
+		metaForVisibleUnits[unitID]="yes"
+	end
 	for _, unitID in ipairs(allMyUnits) do
 		if unitID~=nil then --skip end of the table
 			local unitDefID = spGetUnitDefID(unitID)
 			local unitDef = UnitDefs[unitDefID]
+			local unitSpeed =unitDef["speed"]
+			local unitInView = metaForVisibleUnits[unitID]
+			if (unitSpeed>0) then 
+				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef["isCommander"] then --include only cloakies and constructor
+					arrayIndex=arrayIndex+1
+					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView}
+				elseif not unitDef["canFly"] then --if enabled: include all ground unit
+					arrayIndex=arrayIndex+1
+					relevantUnit[arrayIndex]={unitID, 2, unitSpeed, isVisible = unitInView}
+				end
+			end
 			if (turnOnEcho == 1) then --for debugging
 				Spring.Echo("unitID(RefreshUnitList)" .. unitID)
 				Spring.Echo("unitDef[humanName](RefreshUnitList)" .. unitDef["humanName"])
 				Spring.Echo("((unitDef[builder] or unitDef[canCloak]) and unitDef[speed]>0)(RefreshUnitList):")
 				Spring.Echo((unitDef["builder"] or unitDef["canCloak"]) and unitDef["speed"]>0)
-			end
-			local unitSpeed =unitDef["speed"]
-			if (unitSpeed>0) then 
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef["isCommander"] then --include only cloakies and constructor
-					arrayIndex=arrayIndex+1
-					relevantUnit[arrayIndex]={unitID, 1, unitSpeed}
-				-- elseif not unitDef["canFly"] then --if enabled: include all ground unit
-					-- arrayIndex=arrayIndex+1
-					-- relevantUnit[arrayIndex]={unitID, 2, unitSpeed}
-				end
 			end
 		end
 	end
@@ -214,32 +224,47 @@ function RefreshUnitList()
 end
 
 -- detect initial enemy separation to detect "fleeing enemy"  later
-function GetPreliminarySeparation(unitMotion,commandIndexTable)
+function GetPreliminarySeparation(unitInMotion,commandIndexTable)
 	local surroundingOfActiveUnit={}
 	if unitInMotion[1]~=nil then --don't execute if no unit present
 		local arrayIndex=1
-		for i=2,unitInMotion[1], 1 do --array index 1 contain the array's lenght, start from 2
+		for i=2, unitInMotion[1], 1 do --array index 1 contain the array's lenght, start from 2
 			local unitID= unitInMotion[i][1] --get unitID for commandqueue
 			if spGetUnitIsDead(unitID)==false then --prevent execution if unit died during transit
 				local cQueue = spGetCommandQueue(unitID)
-				if cQueue~=nil then --prevent
+				if cQueue~=nil then --prevent ?. Forgot...
+					if (unitInMotion[i].isVisible ~= "yes" and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and is idle/with-singular-mono-command (eg: widget's move order)
+						cQueue={{id = cMD_DummyG, params = {nil ,nil,nil}, options = {}}, {id = CMD_STOP, params = {nil,nil,nil}, options = {}}, nil} --replace with a fake command. Will be used to initiate avoidance on idle unit & non-viewed unit
+					end
 				if cQueue[1]~=nil then --prevent idle unit from executing the system
-					if (cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and #cQueue>=2 then  -- only repair (40), build (<0), reclaim (90), ressurect(125) or move(10) command. prevent STOP command from short circuiting the system
-						-- Spring.Echo("cQueue[1].params[1](IdentifyTargetOnCommandQueue):")
-						-- Spring.Echo(cQueue[1].params[1])
-						-- Spring.Echo("cQueue[1].params[2](IdentifyTargetOnCommandQueue):")
-						-- Spring.Echo(cQueue[1].params[2])
-						-- Spring.Echo("cQueue[1].params[3](IdentifyTargetOnCommandQueue):")
-						-- Spring.Echo(cQueue[1].params[3])
-					if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
+					if ((cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) and (unitInMotion[i][2] == 1 or unitInMotion[i].isVisible ~= "yes")) then  -- only command: repair (40), build (<0), reclaim (90), ressurect(125) or move(10), and ONLY for unitType=1 OR all units outside player's vision
+					if #cQueue>=2 then --prevent STOP command from short circuiting the system
 					if cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
-						local boxSizeTrigger= unitInMotion[i][2]
+						--local boxSizeTrigger= unitInMotion[i][2]
 						local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
-						local reachedTarget, currentX, currentZ = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger) --check if widget should ignore command
+						local currentX,_,currentZ = spGetUnitPosition(unitID)
+						local lastPosition = {currentX, currentZ}
+						local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
 						local losRadius	= GetUnitLOSRadius(unitID) --get LOS
 						local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius) --catalogue enemy
+						if (cQueue[1].id == CMD_MOVE and unitInMotion[i].isVisible ~= "yes") then --if unit has move Command and is outside user's view
+							reachedTarget = false --force unit to do avoidance despite close to target (try to circle over target until seen by user)
+						end
+						if reachedTarget then --empty the commandIndex if reached target
+							commandIndexTable[unitID]=nil 
+						end
 						
-						if reachedTarget then commandIndexTable[unitID]=nil end --reclaim commandIndex memory
+						if surroundingUnits[1]~=nil and not reachedTarget then  --execute when enemy exist and target not reached yet
+							local unitSSeparation=CatalogueMovingObject(surroundingUnits, unitID, lastPosition) --detect initial enemy separation
+							arrayIndex=arrayIndex+1
+							local unitSpeed = unitInMotion[i][3]
+							local impatienceTrigger,commandIndexTable = GetImpatience(newCommand,unitID, commandIndexTable)
+							surroundingOfActiveUnit[arrayIndex]={unitID, unitSSeparation, targetCoordinate, losRadius, cQueue, newCommand, unitSpeed,impatienceTrigger, lastPosition} --store result for next execution
+							if (turnOnEcho == 1) then
+								Spring.Echo("unitsSeparation(GetPreliminarySeparation):")
+								Spring.Echo(unitsSeparation)
+							end
+						end
 						
 						if (turnOnEcho == 1) then --debugging
 							Spring.Echo("i(GetPreliminarySeparation)" .. i)
@@ -252,28 +277,17 @@ function GetPreliminarySeparation(unitMotion,commandIndexTable)
 							Spring.Echo("surroundingUnits~=nil and cQueue[1].id==CMD_MOVE and not reachedTarget(GetPreliminarySeparation):")
 							Spring.Echo((surroundingUnits~=nil and cQueue[1].id==CMD_MOVE and not reachedTarget))
 						end
-						
-						if surroundingUnits[1]~=nil and not reachedTarget then  --execute when enemy exist and target not reached yet
-							local lastPosition = {currentX, currentZ}
-							local unitSSeparation=CatalogueMovingObject(surroundingUnits, unitID, lastPosition) --detect initial enemy separation
-							arrayIndex=arrayIndex+1
-							local unitSpeed = unitInMotion[i][3]
-							local impatienceTrigger,commandIndexTable = GetImpatience(newCommand,unitID, commandIndexTable)
-							surroundingOfActiveUnit[arrayIndex]={unitID, unitSSeparation, targetCoordinate, losRadius, cQueue, newCommand, unitSpeed,impatienceTrigger, lastPosition} --store result for next execution
-							if (turnOnEcho == 1) then
-								Spring.Echo("unitsSeparation(GetPreliminarySeparation):")
-								Spring.Echo(unitsSeparation)
-							end
-						end
-					end
-					end
-				end
-				end
-			end
+					end --if cQueue[2].id~=false
+						if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
+					end --if #cQueue>=2
+					end --if ((cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and (unitInMotion[i][2]==1 or unitInMotion[i].isVisible == nil)
+				end --if cQueue[1]~=nil
+				end --if cQueue~=nil
+			end --if spGetUnitIsDead(unitID)==false
 		end
 		if arrayIndex>1 then surroundingOfActiveUnit[1]=arrayIndex 
 		else surroundingOfActiveUnit[1]=nil end
-	end
+	end --if unitInMotion[1]~=nil
 	return surroundingOfActiveUnit, commandIndexTable --send separation result away
 end
 
@@ -289,7 +303,7 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 				local cQueue=surroundingOfActiveUnit[i][5]
 				local newCommand=surroundingOfActiveUnit[i][6]
 				
-				--do sync test. Ensure command not changed during last delay
+				--do sync test. Ensure stored command not changed during last delay
 				local cQueueSyncTest = spGetCommandQueue(unitID)
 				if #cQueueSyncTest>=2 then
 					if #cQueueSyncTest~=#cQueue or 
@@ -306,11 +320,11 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 				local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius) --get new unit separation for comparison
 				local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition) --calculate move solution
 				local newY=spGetGroundHeight(newX,newZ)
+				commandIndexTable= InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand) --send move solution to unit
 				if (turnOnEcho == 1) then
 					Spring.Echo("newX(Update) " .. newX)
 					Spring.Echo("newZ(Update) " .. newZ)
-				end
-				commandIndexTable= InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand) --send move solution to unit
+				end			
 			end
 		end
 	end
@@ -351,25 +365,21 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 			end
 		end
 	end
-	if newCommand then	--if user's command
+	if newCommand then	--if user's new command
 		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate)
 		commandIndexTable[unitID]["patienceIndexA"]=0
-	else --cQueue[2].params[1]~=nil and cQueue[2].params[3]~=nil then --if widget's command
+	else  --if widget's previous command
 		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate)	
-	--else
-		--if for some reason cQueue is still not newCommand, but command queue[2] is already empty then use these backup value as target:
-		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
-		--targetCoordinate={-1, -1, -1}
 	end
 	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger --return target coordinate
 end
 
 --ignore command set on this box
-function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger)
-	local currentX,_,currentZ = spGetUnitPosition(unitID)
-	local targetX = dNil(targetCoordinate[1]) -- in case target asynchronously/spontaneously disappear: then replace it with -1 
+function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger, lastPosition)
+	local currentX, currentZ = lastPosition[1], lastPosition[2]
+	local targetX = dNil(targetCoordinate[1]) -- use dNil in case target asynchronously/spontaneously disappear: which replace value with -1 
 	local targetZ =targetCoordinate[3]
-	if targetX==-1 then return false end  --if target is invalid then assume target never reached, return false
+	if targetX==-1 then return false end --if target is invalid (-1) then assume target is not reached, return false (default value), and continue avoidance 
 	local xDistanceToTarget = math.abs(currentX -targetX)
 	local zDistanceToTarget = math.abs(currentZ -targetZ)
 	if (turnOnEcho == 1) then
@@ -381,7 +391,7 @@ function TargetBoxReached (targetCoordinate, unitID, boxSizeTrigger)
 		Spring.Echo("(xDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger] and zDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger])(TargetBoxReached):")
 		Spring.Echo((xDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger] and zDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger]))
 	end
-	return (xDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger] and zDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger]), currentX, currentZ --only command greater than this box return false
+	return (xDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger] and zDistanceToTarget<=halfTargetBoxSize[boxSizeTrigger]) --only command greater than this box return false
 end
 
 -- get LOS
@@ -464,20 +474,13 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		local targetAngle = 0
 		local fTarget = 0
 		local fTargetSlope = 0
-		if targetCoordinate[1]~=-1 then --disable target for pure avoidance
+		if targetCoordinate[1]~=-1 then --if target coordinate contain -1 then disable target for pure avoidance
 			targetAngle				= GetTargetAngleWithRespectToUnit(unitID, targetCoordinate) --get target angle
 			fTarget					= GetFtarget (aCONSTANT, targetAngle, unitDirection)
 			fTargetSlope			= GetFtargetSlope (aCONSTANT, targetAngle, unitDirection, fTarget)
 			--local targetSubtendedAngle 	= GetTargetSubtendedAngle(unitID, targetCoordinate) --get target 'size' as viewed by the unit
 		end
-		if (turnOnEcho == 1) then
-			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
-			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
-			Spring.Echo("unitDirection(AvoidanceCalculator) " .. unitDirection)
-			Spring.Echo("fTarget(AvoidanceCalculator) " .. fTarget)
-			Spring.Echo("fTargetSlope(AvoidanceCalculator) " .. fTargetSlope)
-			--Spring.Echo("targetSubtendedAngle(AvoidanceCalculator) " .. targetSubtendedAngle)
-		end
+
 		local wTotal=0
 		local fObstacleSum=0
 		local dFobstacle=0
@@ -491,6 +494,12 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		--convert an angular command into a coordinate command
 		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger)
 		if (turnOnEcho == 1) then
+			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
+			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
+			Spring.Echo("unitDirection(AvoidanceCalculator) " .. unitDirection)
+			Spring.Echo("fTarget(AvoidanceCalculator) " .. fTarget)
+			Spring.Echo("fTargetSlope(AvoidanceCalculator) " .. fTargetSlope)
+			--Spring.Echo("targetSubtendedAngle(AvoidanceCalculator) " .. targetSubtendedAngle)			
 			Spring.Echo("wTotal(AvoidanceCalculator) " .. wTotal)
 			Spring.Echo("dSum(AvoidanceCalculator) " .. dSum)
 			Spring.Echo("fObstacleSum(AvoidanceCalculator) " .. fObstacleSum)
@@ -577,6 +586,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 		end
 	end
 	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_SHIFT, newX, newY, newZ}, {"alt"} ) --insert new command
+	
 	----
 	commandIndexTable[unitID]["widgetX"]=newX --update the memory table
 	commandIndexTable[unitID]["widgetZ"]=newZ
@@ -601,7 +611,7 @@ end
 ---------------------------------Level3 (low-level function)
 function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate)
 	local boxSizeTrigger=0
-	if (cQueue[queueIndex].id==10 or cQueue[queueIndex].id<0) then 
+	if (cQueue[queueIndex].id==CMD_MOVE or cQueue[queueIndex].id<0) then
 		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
@@ -667,6 +677,12 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetY"]=unitPosY
 		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
 		boxSizeTrigger=3
+	elseif cQueue[1].id == cMD_DummyG then
+		targetCoordinate = {-1, -1,-1} --no target (only avoidance)
+	else --if next queue is empty: then use no-target. eg: A case where engine delete the next queues of command.
+		targetCoordinate={-1, -1, -1}
+		--if for some reason command queue[2] is already empty then use these backup value as target:
+		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
 	end
 	return commandIndexTable, targetCoordinate, boxSizeTrigger
 end
@@ -907,7 +923,7 @@ function GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, separationDist
 	local differenceInAngle = unitDirection-relativeAngle
 	local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle))
 	local hI = 4/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
-	local wI = (math.pi/4)* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --limiting window
+	local wI = obsCONSTANTg* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
 	local dI = math.exp(-1*separationDistance/distanceCONSTANT) --distance multiplier
 	return rI, wI, dI
 end
@@ -954,8 +970,6 @@ function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum)
 		Spring.Echo("fTarget (getNewAngle)" .. fTarget)
 		Spring.Echo("fObstacleSum (getNewAngle)" ..fObstacleSum)
 		Spring.Echo("unitAngleDerived (getNewAngle)" ..unitAngleDerived)
-	end
-	if (turnOnEcho == 1) then 
 		Spring.Echo("unitAngleDerived(GetNewAngle) " .. unitAngleDerived) 
 		Spring.Echo("newUnitAngleDerived(GetNewAngle) " .. newUnitAngleDerived)
 	end
@@ -963,18 +977,19 @@ function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum)
 end
 
 function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity)
-	local velocityAddingCONSTANT=velocityAddingCONSTANTg --localize global constant
+	--localize global constant
+	local velocityAddingCONSTANT=velocityAddingCONSTANTg
 	local velocityScalingCONSTANT=velocityScalingCONSTANTg
-	
+	--
 	local x,_,z = spGetUnitPosition(thisUnitID)
+	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT --add multiplier
+	local newX = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + x
+	local newZ = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + z
+	
 	if (turnOnEcho == 1) then
 		Spring.Echo("x(ConvertToXZ) " .. x)
 		Spring.Echo("z(ConvertToXZ) " .. z)
 	end
-	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT --add multiplier
-	local newX = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + x
-	local newZ = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + z
-
 	return newX, newZ
 end
 ---------------------------------Level4
