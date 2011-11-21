@@ -112,6 +112,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:flash_teal7]],
       fireStarter             = 100,
+	  heightMod				  = 0.2,
       impactOnly              = true,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
