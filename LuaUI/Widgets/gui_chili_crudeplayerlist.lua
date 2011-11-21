@@ -75,6 +75,7 @@ local teams = {}	-- [id] = {leaderName = name, roster = {entity1, entity2, ...}}
 -- ordered list; contains isAI, isSpec, playerID, teamID, name, namelabel, cpulabel, pinglabel
 local entities = {}	
 
+local pingMult = 2/3	-- lower = higher ping needed to be red
 pingCpuColors = {
 	{0, 1, 0, 1},
 	{0.7, 1, 0, 1},
@@ -247,7 +248,7 @@ local function MakeSpecTooltip()
 	for i=1,#specsSorted do
 		local cpuCol = pingCpuColors[ math.ceil( specsSorted[i].cpu * 5 ) ]
 		cpuCol = GetColorChar(cpuCol)
-		local pingCol = pingCpuColors[ math.ceil( math.min(specsSorted[i].ping,1) * 5 ) ]
+		local pingCol = pingCpuColors[ math.ceil( math.min(specsSorted[i].ping*pingMult,1) * 5 ) ]
 		pingCol = GetColorChar(pingCol)
 		local cpu = math.round(specsSorted[i].cpu*100)
 		windowTooltip = windowTooltip .. "\n\t"..specsSorted[i].name.."\t"..cpuCol..(cpu)..'%\008' .. "\t"..pingCol..PingTimeOut(specsSorted[i].ping).."\008"
