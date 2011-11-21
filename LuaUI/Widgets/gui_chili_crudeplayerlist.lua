@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List v1.2",
-    desc      = "v1.2 Chili Crude Player List.",
+    desc      = "v1.21 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -265,7 +265,7 @@ local function UpdatePlayerInfo()
 			pingLabels[playerID]:Invalidate()
 		end
 		-- for <Waiting> bug at start, may be a FIXME
-		if nameLabels[playerID] then
+		if nameLabels[playerID] and wantsNameRefresh[playerID] then
 			local name_out = name or ''
 			if	name_out == ''
 				or #(Spring.GetPlayerList(teamID,true)) == 0
@@ -283,7 +283,8 @@ local function UpdatePlayerInfo()
 			nameLabels[playerID]:SetCaption(name_out)
 		end
 	end
-	if not options.showSpecs.value then MakeSpecTooltip() end
+	if not options.showSpecs.value then MakeSpecTooltip()
+	else scroll_cpl.tooltip = nil end
 end
 
 -- adds:	ally team number, ceasefire button if applicable
@@ -521,8 +522,7 @@ SetupPlayerNames = function()
 				name_out = '<'.. name ..'> '.. shortName
 				aiTeams[teamID] = true
 			else
-				--local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
-				local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
+				local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
 				
 				if allyTeamID then
 					allyTeamID_out = allyTeamID
@@ -535,6 +535,7 @@ SetupPlayerNames = function()
 				then
 					if Spring.GetGameSeconds() < 0.1 then
 						name_out = "<Waiting> " ..(name or '')
+						wantsNameRefresh[playerID] = true
 					elseif Spring.GetTeamUnitCount(teamID) > 0  then
 						name_out = "<Aband. units> " ..(name or '')
 					else
