@@ -31,7 +31,6 @@ local Label
 local screen0
 local color2incolor
 local incolor2color
-local myName -- my console name
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -52,27 +51,29 @@ local white		= ''
 
 local cf = Spring.GetGameRulesParam('cf') == 1
 
-local x_cf				= cf and 20 or 0
-local x_icon_country	= x_cf + 30
-local x_icon_rank		= x_icon_country + 16
+local x_icon_country	= 0
+local x_icon_rank		= x_icon_country + 30
 local x_icon_clan		= x_icon_rank + 16
-local x_name			= x_icon_clan + 16
+local x_cf				= x_icon_clan + 16
+local x_team			= x_cf + 20
+local x_name			= x_team + 16
 local x_share			= x_name + 140 
 local x_cpu				= x_share + 20
 local x_ping			= x_cpu + 40
 local x_postping		= x_ping + 40
 
-local x_bound	= x_postping + (cf and 0 or 20)
+local x_bound	= x_postping + 10
 
 local UPDATE_FREQUENCY = 0.5	-- seconds
 
 local wantsNameRefresh = {}
-local aiTeams = {}
 
--- keeps track of labels
-local nameLabels = {}
-local pingLabels = {}
-local cpuLabels = {}
+local allyTeams = {}	-- [id] = {team1, team2, ...}
+local teams = {}	-- [id] = {leaderName = name, roster = {entity1, entity2, ...}}
+
+-- entity = player (including specs) or bot
+-- ordered list; contains isAI, isSpec, playerID, teamID, name, namelabel, cpulabel, pinglabel
+local entities = {}	
 
 pingCpuColors = {
 	{0, 1, 0, 1},
@@ -100,7 +101,7 @@ function SetupPlayerNames() end
 options_path = 'Settings/Interface/PlayerList'
 options = {
 	text_height = {
-		name = 'Font Size',
+		name = 'Font Size (10-18)',
 		type = 'number',
 		value = 13,
 		min=10,max=18,step=1,
@@ -121,12 +122,19 @@ options = {
 		value = false,
 		desc = "Align list entries to top (i.e. don't push to bottom)",
 		OnChange = function() SetupPlayerNames() end,
-	},
+	},	
 	showSpecs = {
 		name = "Show spectators",
 		type = 'bool',
 		value = false,
 		desc = "Show spectators in main window (rather than confining them to tooltip)",
+		OnChange = function() SetupPlayerNames() end,
+	},
+	allyTeamPerTeam = {
+		name = "Display team for each player",
+		type = 'bool',
+		value = true,
+		desc = "Write the team number next to each player's name (rather than only for first player)",
 		OnChange = function() SetupPlayerNames() end,
 	},	
 }
@@ -217,7 +225,13 @@ end
 -- spectator tooltip
 -- not shown if they're in playerlist as well
 local function MakeSpecTooltip()
+	if options.showSpecs.value then
+		scroll_cpl.tooltip = nil
+		return
+	end
+	
 	local players = Spring.GetPlayerList()
+	
 	local specsSorted = {}
 	for i=1,#players do
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(players[i])
@@ -243,246 +257,303 @@ end
 
 -- updates ping and CPU for all players; name if needed
 local function UpdatePlayerInfo()
-	local players = Spring.GetPlayerList()
-	for i=1,#players do
-		local playerID = players[i]
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
-		
-		if not(aiTeams[teamID]) and ((not spectator) or options.showSpecs.value) then
-			-- update ping and CPU
-			pingTime = pingTime or 0
-			cpuUsage = cpuUsage or 0
-			local min_pingTime = math.min(pingTime, 1)
-			local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
-			local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
-			local pingTime_readable = PingTimeOut(pingTime)
+	for i=1,#entities do
+		if not entities[i].isAI then
+			local playerID = entities[i].playerID
+			local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
 			
-			cpuLabels[playerID].font.color = cpuCol
-			cpuLabels[playerID]:SetCaption(math.round(cpuUsage*100) .. '%')
-			cpuLabels[playerID]:Invalidate()
-			pingLabels[playerID].font.color = pingCol
-			pingLabels[playerID]:SetCaption(pingTime_readable)
-			pingLabels[playerID]:Invalidate()
-		end
-		-- for <Waiting> bug at start, may be a FIXME
-		if nameLabels[playerID] and wantsNameRefresh[playerID] then
-			local name_out = name or ''
-			if	name_out == ''
-				or #(Spring.GetPlayerList(teamID,true)) == 0
-				or spectator
-			then
-				if Spring.GetGameSeconds() < 0.1 then
-					name_out = "<Waiting> " ..(name or '')
-					wantsNameRefresh[playerID] = true
-				elseif Spring.GetTeamUnitCount(teamID) > 0  then
-					name_out = "<Aband. units> " ..(name or '')
-				else
-					name_out = "<Dead> " ..(name or '')
-				end
+			if ((not spectator) or options.showSpecs.value) then
+				-- update ping and CPU
+				pingTime = pingTime or 0
+				cpuUsage = cpuUsage or 0
+				local min_pingTime = math.min(pingTime, 1)
+				local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
+				local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
+				local pingTime_readable = PingTimeOut(pingTime)
+				
+				local cpuLabel = entities[i].cpuLabel
+				cpuLabel.font.color = cpuCol
+				cpuLabel:SetCaption(math.round(cpuUsage*100) .. '%')
+				cpuLabel:Invalidate()
+				local pingLabel = entities[i].pingLabel
+				pingLabel.font.color = pingCol
+				pingLabel:SetCaption(pingTime_readable)
+				pingLabel:Invalidate()
 			end
-			nameLabels[playerID]:SetCaption(name_out)
-		end
-	end
-	if not options.showSpecs.value then MakeSpecTooltip()
-	else scroll_cpl.tooltip = nil end
+			if wantsNameRefresh[playerID] then
+				local name_out = name or ''
+				if	name_out == ''
+					or #(Spring.GetPlayerList(teamID,true)) == 0
+					or spectator
+				then
+					if Spring.GetGameSeconds() < 0.1 then
+						name_out = "<Waiting> " ..(name or '')
+						wantsNameRefresh[playerID] = true
+					elseif Spring.GetTeamUnitCount(teamID) > 0  then
+						name_out = "<Aband. units> " ..(name or '')
+					else
+						name_out = "<Dead> " ..(name or '')
+					end
+				end
+				entities[playerID].nameLabel:SetCaption(name_out)
+			end
+		end	-- if not isAI
+	end	-- for entities
+	MakeSpecTooltip()
 end
 
--- adds:	ally team number, ceasefire button if applicable
---			details of all players in allyteam (icons, name, CPU, ping)
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- setting up player names
 
-local function AddAllyteamPlayers(row, allyTeam, players)
+local function 	WriteAllyTeamNumbers(allyTeamID)
 	local fontsize = options.text_height.value
-	if not players then
-		return row
-	end
-	local row = row
-	localAlliance = Spring.GetLocalAllyTeamID()
-	localTeam = Spring.GetLocalTeamID()
 	local aCol = {1,0,0,1}
-	if allyTeam == 'S' then
+	if allyTeamID == -1 then
 		aCol = {1,1,1,1}
-	elseif allyTeam == localAlliance then
+	elseif allyTeamID == localAlliance then
 		aCol = {0,1,1,1}
-	elseif Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeam) == 1 then
+	elseif Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeamID) == 1 then
 		aCol = {0,1,0,1}
-	elseif Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1 then
+	elseif Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeamID) == 1 then
 		aCol = {1,0.5,0,1}
 	end
 	
 	-- allyteam number
 	scroll_cpl:AddChild(
 		Label:New{
+			x=x_team,
 			y=options.text_height.value * row,
-			caption = (type(allyTeam) == 'number' and (allyTeam+1) or allyTeam),
+			caption = (allyTeamID == -1 and 'S' or allyTeamID+1),
 			textColor = aCol,
 			fontsize = fontsize,
 			fontShadow = true,
 		}
 	)
 	-- ceasefire button
-	if cf and allyTeam ~= 'S' and allyTeam ~= localAlliance then
+	if cf and allyTeam ~= -1 and allyTeam ~= localAlliance then
 		scroll_cpl:AddChild( Checkbox:New{
 			x=x_cf,y=fontsize * row + 3,width=20,
 			caption='',
 			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
-			tooltip = CfTooltip(allyTeam),
+			tooltip = CfTooltip(allyTeamID),
 			OnChange = { function(self)
 				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. allyTeam)
 			end },
 		} )
 	end
-	
-	table.sort(players, function(a,b)
-			return a.name:lower() < b.name:lower()
-		end)
-	
-	--for _, playerID in ipairs( players ) do
-	for _, pdata in ipairs( players ) do
-		local name_out = pdata.name
-		local teamID = pdata.team
-		local playerID = pdata.player
-		
-		local name,active,spectator,_,allyTeamID,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(playerID)
-		
-		pingTime = pingTime or 0
-		cpuUsage = cpuUsage or 0
-		
-		local icon = nil
-		local icRank = nil 
-		local icCountry = country and country ~= '' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
-		
-		-- clan/faction emblems, level, country
-		if (not pdata.isAI and customKeys ~= nil) then 
-			if (customKeys.clan~=nil and customKeys.clan~="") then 
-				icon = "LuaUI/Configs/Clans/" .. customKeys.clan ..".png"
-			elseif (customKeys.faction~=nil and customKeys.faction~="") then
-				icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
-			end 
-			if customKeys.level ~= nil and customKeys.level~="" then 
-				icRank = "LuaUI/Images/Ranks/" .. (1+math.ceil((customKeys.level or 0)/10)) .. ".png"
-			end
-		end 
-	
-		local min_pingTime = math.min(pingTime, 1)
-		local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
-		local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
-		local pingTime_readable = PingTimeOut(pingTime)
+end
 
-		if not pdata.isAI then 
-			-- flag
-			if icCountry ~= nil  then 
-				scroll_cpl:AddChild(
-					Chili.Image:New{
-						file=icCountry;
-						width= fontsize + 3;
-						height=fontsize + 3;
-						x=x_icon_country,
-						y=fontsize * row,
-					}
-				)
-			end 
-			-- level-based rank
-			if icRank ~= nil then 
-				scroll_cpl:AddChild(
-					Chili.Image:New{
-						file=icRank;
-						width= fontsize + 3;
-						height=fontsize + 3;
-						x=x_icon_rank,
-						y=fontsize * row,
-					}
-				)
-			end 
-			-- clan icon
-			if icon ~= nil then 
-				scroll_cpl:AddChild(
-					Chili.Image:New{
-						file=icon;
-						width= fontsize + 3;
-						height=fontsize + 3;
-						x=x_icon_clan,
-						y=fontsize * row,
-					}
-				)
-			end
+-- adds all the entity information
+local function AddEntity(entity, teamID, allyTeamID)
+	local fontsize = options.text_height.value
 
+	local deadTeam = false
+	if entity == nil then
+		entity = {}
+		deadTeam = true
+	end	
+	
+	local name,active,spectator,pingTime,cpuUsage,country,rank, customKeys
+	local playerID = entity.playerID or teams[teamID].leader
+	if playerID then
+		name,active,spectator,_,_,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(playerID)
+	end
+
+	local name_out = entity.name or ''
+	if (name_out == '' or deadTeam) and not entity.isAI then
+		if Spring.GetGameSeconds() < 0.1 then
+			name_out = "<Waiting> " ..(name or '')
+			wantsNameRefresh[playerID] = true
+		elseif Spring.GetTeamUnitCount(teamID) > 0  then
+			name_out = "<Aband. units> " ..(name or '')
+		else
+			name_out = "<Dead> " ..(name or '')
+		end
+	end
+	
+	pingTime = pingTime or 0
+	cpuUsage = cpuUsage or 0
+	
+	local icon = nil
+	local icRank = nil 
+	local icCountry = country and country ~= '' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
+	
+	-- clan/faction emblems, level, country
+	if (not entity.isAI and customKeys ~= nil) then 
+		if (customKeys.clan~=nil and customKeys.clan~="") then 
+			icon = "LuaUI/Configs/Clans/" .. customKeys.clan ..".png"
+		elseif (customKeys.faction~=nil and customKeys.faction~="") then
+			icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
 		end 
-		
-		-- name
-		local nameLabel = Label:New{
-			x=x_name,
-			y=fontsize * row,
-			width=150,
-			autosize=false,
-			--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
-			caption = name_out,
-			textColor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1},
-			fontsize = fontsize,
-			fontShadow = true,
-		}
-		--if teamID then nameLabels[teamID] = nameLabel end
-		nameLabels[playerID] = nameLabel
-		scroll_cpl:AddChild(nameLabel)
-		-- because for some goddamn stupid reason the names won't show otherwise
-		nameLabel:UpdateLayout()
-		nameLabel:Invalidate()
-		
-		-- share button
-		if active and allyTeam == localAlliance and teamID ~= localTeam then
+		if customKeys.level ~= nil and customKeys.level~="" then 
+			icRank = "LuaUI/Images/Ranks/" .. (1+math.ceil((customKeys.level or 0)/10)) .. ".png"
+		end
+	end 
+	
+	local min_pingTime = math.min(pingTime, 1)
+	local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
+	local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
+	local pingTime_readable = PingTimeOut(pingTime)
+
+	if not entity.isAI then 
+		-- flag
+		if icCountry ~= nil  then 
 			scroll_cpl:AddChild(
-				Button:New{
-					x=x_share,
-					y=fontsize * (row+0.5),
-					height = fontsize,
-					width = fontsize,
-					tooltip = 'Double click to share selected units to ' .. name,
-					caption = '',
-					padding ={0,0,0,0},
-					OnDblClick = { function(self) ShareUnits(name, teamID) end, },
-					children = 	{
-						Image:New{
-							x=0,y=0,
-							height='100%',
-							width='100%',
-							file = sharePic,
-						},
-					},
+				Chili.Image:New{
+					file=icCountry;
+					width= fontsize + 3;
+					height=fontsize + 3;
+					x=x_icon_country,
+					y=fontsize * row,
+				}
+			)
+		end 
+		-- level-based rank
+		if icRank ~= nil then 
+			scroll_cpl:AddChild(
+				Chili.Image:New{
+					file=icRank;
+					width= fontsize + 3;
+					height=fontsize + 3;
+					x=x_icon_rank,
+					y=fontsize * row,
+				}
+			)
+		end 
+		-- clan icon
+		if icon ~= nil then 
+			scroll_cpl:AddChild(
+				Chili.Image:New{
+					file=icon;
+					width= fontsize + 3;
+					height=fontsize + 3;
+					x=x_icon_clan,
+					y=fontsize * row,
 				}
 			)
 		end
-		-- CPU, ping
-		if not pdata.isAI then
-			local cpuLabel = Label:New{
-				x=x_cpu,
-				y=fontsize * row,
-				caption = math.round(cpuUsage*100) .. '%',
-				--textColor = cpuCol,
-				fontsize = fontsize,
-				fontShadow = true,
+
+	end 
+	
+	-- name
+	local nameLabel = Label:New{
+		x=x_name,
+		y=fontsize * row,
+		width=150,
+		autosize=false,
+		--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
+		caption = name_out,
+		textColor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1},
+		fontsize = fontsize,
+		fontShadow = true,
+	}
+	entity.nameLabel = nameLabel
+	scroll_cpl:AddChild(nameLabel)
+	-- because for some goddamn stupid reason the names won't show otherwise
+	nameLabel:UpdateLayout()
+	nameLabel:Invalidate()
+	
+	-- share button
+	if active and allyTeamID == localAlliance and teamID ~= localTeam then
+		scroll_cpl:AddChild(
+			Button:New{
+				x=x_share,
+				y=fontsize * (row+0.5),
+				height = fontsize,
+				width = fontsize,
+				tooltip = 'Double click to share selected units to ' .. name,
+				caption = '',
+				padding ={0,0,0,0},
+				OnDblClick = { function(self) ShareUnits(name, teamID) end, },
+				children = 	{
+					Image:New{
+						x=0,y=0,
+						height='100%',
+						width='100%',
+						file = sharePic,
+					},
+				},
 			}
-			cpuLabels[playerID] = cpuLabel
-			scroll_cpl:AddChild(cpuLabel)
-			local pingLabel = Label:New{
-				x=x_ping,
-				y=fontsize * row,
-				caption = pingTime_readable ,
-				--textColor = pingCol,
-				fontsize = fontsize,
-				fontShadow = true,
-			}
-			pingLabels[playerID] = pingLabel
-			scroll_cpl:AddChild(pingLabel)
-		end
-		row = row + 1
+		)
 	end
-	return row
+	-- CPU, ping
+	if not (entity.isAI or deadTeam) then
+		local cpuLabel = Label:New{
+			x=x_cpu,
+			y=fontsize * row,
+			caption = math.round(cpuUsage*100) .. '%',
+			--textColor = cpuCol,
+			fontsize = fontsize,
+			fontShadow = true,
+		}
+		entity.cpuLabel = cpuLabel
+		scroll_cpl:AddChild(cpuLabel)
+		local pingLabel = Label:New{
+			x=x_ping,
+			y=fontsize * row,
+			caption = pingTime_readable ,
+			--textColor = pingCol,
+			fontsize = fontsize,
+			fontShadow = true,
+		}
+		entity.pingLabel = pingLabel
+		scroll_cpl:AddChild(pingLabel)
+	end
+	row = row + 1
+end
+
+-- adds:	ally team number if applicable
+local function AddTeam(teamID, allyTeamID)
+	if options.allyTeamPerTeam.value then
+		WriteAllyTeamNumbers(allyTeamID)
+	end
+	
+	-- add each entity in the team
+	local count = #teams[teamID].roster
+	if count == 0 then
+		AddEntity(nil, teamID, allyTeamID)
+		return
+	end
+	for i=1,count do
+		AddEntity(teams[teamID].roster[i], teamID, allyTeamID)
+	end
+end
+
+-- adds:	ally team number if applicable, ceasefire button if applicable
+local function AddAllyTeam(allyTeamID)
+	if #(allyTeams[allyTeamID] or {}) == 0 then
+		return
+	end
+
+	-- sort teams by leader name, putting own team at top
+	--table.sort(allyTeams[allyTeamID], function(a,b)
+	--		if a == localTeam then return true
+	--		elseif b == localTeam then return false end
+	--		return a.name:lower() < b.name:lower()
+	--	end)	
+
+	if not options.allyTeamPerTeam.value then
+		WriteAllyTeamNumbers(allyTeamID)
+	end
+	
+	-- add each team in the allyteam
+	for i=1,#allyTeams[allyTeamID] do
+		AddTeam(allyTeams[allyTeamID][i], allyTeamID)
+	end
 end
 
 SetupPlayerNames = function()
+	entities = {}
+	teams = {}
+	allyTeams = {}
+	
+	local specTeam = {roster = {}}
+
 	local fontsize = options.text_height.value
 	scroll_cpl:ClearChildren()
 	
-	scroll_cpl:AddChild( Label:New{ x=0, 		caption = 'T', 		fontShadow = true, 	fontsize = fontsize, } )
+	scroll_cpl:AddChild( Label:New{ x=x_team, 		caption = 'T', 		fontShadow = true, 	fontsize = fontsize, } )
 	if cf then
 		scroll_cpl:AddChild( Label:New{ x=x_cf,		caption = 'CF',		fontShadow = true, 	fontsize = fontsize, } )
 	end
@@ -490,94 +561,65 @@ SetupPlayerNames = function()
 	scroll_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = fontsize,} )
 	scroll_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = fontsize,} )
 	
-	local playerroster	= Spring.GetPlayerList()
-	local teams 		= Spring.GetTeamList()
+	local playerlist = Spring.GetPlayerList()
+	local teamsSorted = Spring.GetTeamList()
+	local allyTeamsSorted = Spring.GetAllyTeamList()
 	
-	myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	local myID = Spring.GetMyPlayerID()
+	local myName = Spring.GetPlayerInfo(myID)
+	localTeam = Spring.GetMyTeamID()
+	localAlliance = Spring.GetMyAllyTeamID()
 	
-	local allyTeams = {}
-	
-	local specNames = {}
-	
-	--Specs
-	for i,v in ipairs(playerroster) do
-		local playerID = playerroster[i]
-		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
-		if spectator and active then
-			if not allyTeams.S then
-				allyTeams.S = {}
-			end
-			table.insert( allyTeams.S, {name=name,team=nil,player=playerID} )
-			specNames[name]=playerID
-		end
-	end
-	
-	for i,teamID in ipairs(teams) do
+	-- register any AIs as entities, assign teams to allyTeams
+	for i=1,#teamsSorted do
+		local teamID = teamsSorted[i]
 		if teamID ~= Spring.GetGaiaTeamID() then
-			-- process names
-			local _,playerID,_,isAI,_,allyTeamID_out = Spring.GetTeamInfo(teamID)
-			local name_out = ''
+			teams[teamID] = teams[teamID] or {roster = {}}
+			local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
 			if isAI then
 				local skirmishAIID, name, hostingPlayerID, shortName, version, options = Spring.GetAIInfo(teamID)
-				name_out = '<'.. name ..'> '.. shortName
-				aiTeams[teamID] = true
-			else
-				local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
-				
-				if allyTeamID then
-					allyTeamID_out = allyTeamID
-				end
-				
-				name_out = name or ''
-				if name_out == ''
-					or #(Spring.GetPlayerList(teamID,true)) == 0
-					or specNames[name]
-				then
-					if Spring.GetGameSeconds() < 0.1 then
-						name_out = "<Waiting> " ..(name or '')
-						wantsNameRefresh[playerID] = true
-					--elseif Spring.GetTeamUnitCount(teamID) > 0  then
-					--	name_out = "<Aband. units> " ..(name or '')
-					else
-						name_out = "<Dead> " ..(name or '')
-					end
-				end
+				name = '<'.. name ..'> '.. shortName
+				local entityID = #entities + 1
+				entities[entityID] = {name = name, teamID = teamID, isAI = true}
+				local index = #teams[teamID].roster + 1
+				teams[teamID].roster[index] = entities[entityID]
 			end
-			
-			if allyTeamID_out then
-				if not allyTeams[allyTeamID_out] then
-					allyTeams[allyTeamID_out] = {}
-				end
-				
-				table.insert( allyTeams[allyTeamID_out], {name=name_out,team=teamID,player=playerID, isAI = isAI} )
-			end
+			teams[teamID].leader = leader
+			allyTeams[allyTeamID] = allyTeams[allyTeamID] or {}
+			allyTeams[allyTeamID][#allyTeams[allyTeamID]+1] = teamID
 		end --if teamID ~= Spring.GetGaiaTeamID() 
 	end --for each team
-	
-	
-	local allyTeams_i = {}
-	for allyTeam,players in pairs(allyTeams) do
-		allyTeams_i[#allyTeams_i+1] = {allyTeam,players}
-	end
-	
-	table.sort(allyTeams_i,
-		function(a,b)
-			local av = (type(a[1]) == 'string') and 999 or a[1]
-			local bv = (type(b[1]) == 'string') and 999 or b[1]
-			return av < bv
-		end)
-	
-	local row = 1
-	--for allyTeam,players in pairs(allyTeams) do
-	for _,adata in ipairs(allyTeams_i) do
-		local allyTeam,players = adata[1], adata[2]
-		if allyTeam ~= 'S' then
-			row = AddAllyteamPlayers(row, allyTeam,players)
+
+	-- go through all players, register as entities, assign to teams
+	for i=1, #playerlist do
+		local playerID = playerlist[i]
+		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage,country,rank = Spring.GetPlayerInfo(playerID)
+		local entityID = #entities + 1
+		entities[entityID] = {name = name, isSpec = spectator, playerID = playerID, teamID = (not spectator) and teamID or nil}
+		if not spectator then
+			local index = #teams[teamID].roster + 1
+			teams[teamID].roster[index] = entities[entityID]
+		elseif active then
+			specTeam.roster[#specTeam + 1] = entities[entityID]
 		end
 	end
+	
+	-- sort allyteams: own at top, others in order
+	table.sort(allyTeamsSorted, function(a,b)
+			if a == localAlliance then return true
+			elseif b == localAlliance then return false end
+			return a < b
+		end)
+	
+	row = 1
+	for i=1,#allyTeamsSorted do
+		AddAllyTeam(allyTeamsSorted[i])
+	end
 
-	if options.showSpecs.value then
-		row = AddAllyteamPlayers(row,'S',allyTeams.S)
+	if options.showSpecs.value and #specTeam.roster ~= 0 then
+		teams[-1] = specTeam
+		allyTeams[-1] = {-1}
+		AddAllyTeam(-1)
 	else
 		MakeSpecTooltip()
 	end
