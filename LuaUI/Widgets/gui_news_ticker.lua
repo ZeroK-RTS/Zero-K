@@ -279,7 +279,7 @@ end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	local ud = UnitDefs[unitDefID]
-	if ud.isFactory then
+	if ud.isFactory and (spGetTeam(unitID) == myTeam) then
 		AddEvent(ud.humanName .. ": factory idle", unitDefID, colorYellow)
 	end
 end
