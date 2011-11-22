@@ -63,7 +63,7 @@ local function addUnit(defName, path)
                         name = "Firestate",
                         desc = "Values: inherit from factory, hold fire, return fire, fire at will",
                         type = 'number',
-                        value = ud.fireState, -- no set firestate = -1
+                        value = ud.fireState, -- most firestates are -1
                         min = -1,
                         max = 2,
                         step = 1,
@@ -77,7 +77,7 @@ local function addUnit(defName, path)
                         name = "Movestate",
                         desc = "Values: inherit from factory, hold positon, manuver, roam",
                         type = 'number',
-                        value = -1, -- ud.movestate is always 2?
+                        value = ud.moveState,
                         min = -1,
                         max = 2,
                         step = 1,
