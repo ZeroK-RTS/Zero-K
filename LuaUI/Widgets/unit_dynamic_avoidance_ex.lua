@@ -1,4 +1,4 @@
-local versionName = "v1.42"
+local versionName = "v1.43"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -41,6 +41,7 @@ local spGetFeaturePosition = Spring.GetFeaturePosition
 local spValidFeatureID = Spring.ValidFeatureID
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spGetUnitStates = Spring.GetUnitStates
+local spGetUnitTeam = Spring.GetUnitTeam
 local CMD_STOP			= CMD.STOP
 local CMD_INSERT		= CMD.INSERT
 local CMD_REMOVE		= CMD.REMOVE
@@ -94,6 +95,7 @@ local skippingTimerG={0,0}
 local commandIndexTableG= {} --store latest widget command for comparison
 local myTeamID=-1
 local myPlayerID=-1
+local gaiaTeamID = Spring.GetGaiaTeamID()
 local surroundingOfActiveUnitG={} --store value for transfer between function. Store obstacle separation, los, and ect.
 local cycleG=1 --first execute "GetPreliminarySeparation()"
 local wreckageID_offset=0
@@ -424,8 +426,11 @@ function GetAllUnitsInRectangle(unitID, losRadius)
 	for _, rectangleUnitID in ipairs(unitsInRectangle) do
 		local isAlly= spIsUnitAllied(rectangleUnitID)
 		if (rectangleUnitID ~= unitID) and not isAlly then--filter out ally units and self
-			arrayIndex=arrayIndex+1
-			relevantUnit[arrayIndex]=rectangleUnitID
+			local rectangleUnitTeamID = spGetUnitTeam(rectangleUnitID)
+			if (rectangleUnitTeamID ~= gaiaTeamID) then
+				arrayIndex=arrayIndex+1
+				relevantUnit[arrayIndex]=rectangleUnitID
+			end
 		end
 	end
 	if arrayIndex>1 then relevantUnit[1]=arrayIndex --fill index 1 with array lenght
