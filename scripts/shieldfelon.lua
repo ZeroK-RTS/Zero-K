@@ -104,14 +104,14 @@ end
 
 function script.QueryWeapon(num) return shotPieces[num] end
 
-function script.AimFromWeapon(num) return shotcent end
+function script.AimFromWeapon(num) return shot1 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then return false end
 	
 	-- use only for single weapon design plz
-	Turn(shotcent, y_axis, heading)
-	Turn(shotcent, x_axis, -pitch + math.rad(90))
+	--Turn(shotcent, y_axis, heading)
+	--Turn(shotcent, x_axis, -pitch + math.rad(90))
 	--Move(shot1, y_axis, math.sin(pitch)*-SHIELD_RADIUS)
 	--Move(shot1, x_axis, math.sin(heading)*SHIELD_RADIUS)
 	--Move(shot1, z_axis, math.cos(heading)*SHIELD_RADIUS)
