@@ -175,9 +175,16 @@ local function swarmEnemy(unitID, enemy, enemyUnitDef, los, move, cQueue,n)
 					data.jinkDir = data.jinkDir*-1
 					
 					-- jink towards the enemy
-					cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-					cy = uy
-					cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+                    if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
+                        cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+                        cy = uy
+                        cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+                    else
+                        cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+                        cy = ey
+                        cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+                    end
+                    
 					if move then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 						spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
@@ -255,9 +262,16 @@ local function swarmEnemy(unitID, enemy, enemyUnitDef, los, move, cQueue,n)
 			data.jinkDir = data.jinkDir*-1
 			
 			-- jink towards the enemy
-			cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
-			cy = uy
-			cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+            if behaviour.localJinkOrder and behaviour.jinkParallelLength < pointDis then
+                cx = ux+(-(ux-ex)*behaviour.jinkParallelLength-(uz-ez)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+                cy = uy
+                cz = uz+(-(uz-ez)*behaviour.jinkParallelLength+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength)/pointDis
+            else
+                cx = ex+(uz-ez)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+                cy = ey
+                cz = ez+(ux-ex)*data.jinkDir*behaviour.jinkTangentLength/pointDis
+            end
+            
 			if move then
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
@@ -503,6 +517,7 @@ local function LoadBehaviour(unitConfigArray)
 				jinkTangentLength = (behaviourData.jinkTangentLength or unitConfigArray.defaultJinkTangentLength),
 				jinkParallelLength =  (behaviourData.jinkParallelLength or unitConfigArray.defaultJinkParallelLength),
 				alwaysJinkFight = (behaviourData.alwaysJinkFight or false),
+                localJinkOrder = (behaviourData.alwaysJinkFight or unitConfigArray.defaultLocalJinkOrder),
 				stoppingDistance = (behaviourData.stoppingDistance or 0),
 				strafeOrderLength = (behaviourData.strafeOrderLength or unitConfigArray.defaultStrafeOrderLength),
 				fleeCombat = (behaviourData.fleeCombat or false), 

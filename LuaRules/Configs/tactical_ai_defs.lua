@@ -194,6 +194,7 @@ end
 -- swarmLeeway (defaults to 50): adds to enemy range when swarming
 -- swarmEnemyDefaultRange (defaults to 800): range of the enemy used if it cannot be seen.
 -- alwaysJinkFight (defaults to false): If enabled the unit with jink whenever it has a fight command
+-- localJinkOrder (defaults in config): Causes move commands to be given near the unit, otherwise given next to opponent
 
 
 --*** flees(defaults to empty): the table of units that this unit will flee like the coward it is!!!
@@ -209,9 +210,10 @@ end
 local behaviourConfig = { 
 	
 	defaultJinkTangentLength = 80,
-	defaultJinkParallelLength = 150,
+	defaultJinkParallelLength = 200,
 	defaultStrafeOrderLength = 100,
 	defaultMinCircleStrafeDistance = 40,
+    defaultLocalJinkOrder = true,
 	
 	-- swarmers
 	["armtick"] = {
