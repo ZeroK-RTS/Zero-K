@@ -21,7 +21,6 @@ function script.Create()
 end
 
 function script.QueryLandingPads()
-	Spring.Echo("HEY")
 	return {land1, land2, land3, land4}
 end
 
