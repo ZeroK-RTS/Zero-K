@@ -63,7 +63,7 @@ options = {
 		desc = "Draws grid for islands",		
 	},	
 	res = {
-		name = "Resolution (32-512)",
+		name = "Resolution (64-512)",
 		advanced = true,
 		type = 'number',
 		min = 64, 

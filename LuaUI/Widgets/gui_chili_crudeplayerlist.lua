@@ -67,13 +67,14 @@ local x_bound	= x_postping + 10
 local UPDATE_FREQUENCY = 0.5	-- seconds
 
 local wantsNameRefresh = {}
+local cfCheckBoxes = {}
 
 local allyTeams = {}	-- [id] = {team1, team2, ...}
 local teams = {}	-- [id] = {leaderName = name, roster = {entity1, entity2, ...}}
 
 -- entity = player (including specs) or bot
 -- ordered list; contains isAI, isSpec, playerID, teamID, name, namelabel, cpulabel, pinglabel
-local entities = {}	
+local entities = {}
 
 local pingMult = 2/3	-- lower = higher ping needed to be red
 pingCpuColors = {
@@ -301,22 +302,26 @@ local function UpdatePlayerInfo()
 		end	-- if not isAI
 	end	-- for entities
 	MakeSpecTooltip()
+	
+	for allyTeam, cb in pairs(cfCheckBoxes) do
+		cb.tooltip = CfTooltip(allyTeam)
+	end
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- setting up player names
 
-local function 	WriteAllyTeamNumbers(allyTeamID)
+local function 	WriteAllyTeamNumbers(allyTeam)
 	local fontsize = options.text_height.value
 	local aCol = {1,0,0,1}
-	if allyTeamID == -1 then
+	if allyTeam == -1 then
 		aCol = {1,1,1,1}
-	elseif allyTeamID == localAlliance then
+	elseif allyTeam == localAlliance then
 		aCol = {0,1,1,1}
-	elseif Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeamID) == 1 then
+	elseif Spring.GetGameRulesParam('cf_' .. localAlliance .. '_' .. allyTeam) == 1 then
 		aCol = {0,1,0,1}
-	elseif Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeamID) == 1 then
+	elseif Spring.GetGameRulesParam('cf_offer_' .. localAlliance .. '_' .. allyTeam) == 1 then
 		aCol = {1,0.5,0,1}
 	end
 	
@@ -325,7 +330,7 @@ local function 	WriteAllyTeamNumbers(allyTeamID)
 		Label:New{
 			x=x_team,
 			y=options.text_height.value * row,
-			caption = (allyTeamID == -1 and 'S' or allyTeamID+1),
+			caption = (allyTeam == -1 and 'S' or allyTeam+1),
 			textColor = aCol,
 			fontsize = fontsize,
 			fontShadow = true,
@@ -333,15 +338,18 @@ local function 	WriteAllyTeamNumbers(allyTeamID)
 	)
 	-- ceasefire button
 	if cf and allyTeam ~= -1 and allyTeam ~= localAlliance then
-		scroll_cpl:AddChild( Checkbox:New{
+		local cfCheck = Checkbox:New{
 			x=x_cf,y=fontsize * row + 3,width=20,
 			caption='',
 			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
-			tooltip = CfTooltip(allyTeamID),
+			tooltip = CfTooltip(allyTeam),
 			OnChange = { function(self)
 				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. allyTeam)
+				self.tooltip = CfTooltip(allyTeam)
 			end },
-		} )
+		}
+		scroll_cpl:AddChild(cfCheck)
+		cfCheckBoxes[allyTeam] = cfCheck
 	end
 end
 
