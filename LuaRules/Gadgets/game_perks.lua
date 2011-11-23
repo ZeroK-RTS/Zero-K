@@ -84,6 +84,7 @@ local unlockUnits = {
 	-- misc
 	"armarad",
 	"armmstor",
+	"armestor",
 }
 
 local unlockUnitsMap = {}
