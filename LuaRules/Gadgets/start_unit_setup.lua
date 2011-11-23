@@ -62,6 +62,8 @@ local coop = Spring.Utilities.tobool(Spring.GetModOption("coop", false, false))
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, spGetTeamInfo(gaiateam))
 
+local SAVE_FILE = "Gadgets/start_unit_setup.lua"
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -93,13 +95,19 @@ local customKeys = {}	-- [playerID] = {}
 
 local waitingForComm = {}
 
-local toFinish = {}
-
 -- overlaps with the rulesparams; not really needed
 local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
 
+-- allow gadget:Save (unsynced) to reach them
 _G.facplops = facplops
+_G.waitingForComm = waitingForComm
+--_G.scheduledSpawn = scheduledSpawn
+--_G.playerSides = playerSides
+--_G.teamSides = teamSides
+--_G.teamSidesAI = teamSidesAI
+
+local loadGame = false	-- was this loaded from a savegame?
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -168,11 +176,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 		Spring.SetUnitHealth(unitID, {health = maxHealth*buildMult, build = buildMult })
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
-		
-		-- workaround stuff - unneeded
-		--local frame = Spring.GetGameFrame() + 1
-		--toFinish[frame] = toFinish[frame] or {}
-		--table.insert(toFinish[frame], unitID)
 		
 		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
 		--facplopsrunning[unitID] = true
@@ -689,10 +692,12 @@ function gadget:GameStart()
 
     -- clear resources
     -- actual resources are set depending on spawned unit and setup
-    Spring.SetTeamResource(team, "es", 0 + OVERDRIVE_BUFFER)
-    Spring.SetTeamResource(team, "ms", 0)
-    Spring.SetTeamResource(team, "energy", 0)
-    Spring.SetTeamResource(team, "metal", 0)
+	if not loadGame then
+		Spring.SetTeamResource(team, "es", 0 + OVERDRIVE_BUFFER)
+		Spring.SetTeamResource(team, "ms", 0)
+		Spring.SetTeamResource(team, "energy", 0)
+		Spring.SetTeamResource(team, "metal", 0)
+	end
 	
 
     if team ~= gaiateam then
@@ -804,17 +809,41 @@ function gadget:GameFrame(n)
 	end
 	scheduledSpawn[n] = nil
   end
-  if toFinish[n] then
-	for _, unitID in pairs(toFinish[n]) do
-		local maxHealth = select(2, Spring.GetUnitHealth(unitID))
-		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
-	end
-	toFinish[n] = nil  
-  end
 end
 
 function gadget:Shutdown()
 	--Spring.Echo("<Start Unit Setup> Going to sleep...")
+end
+
+
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Echo("ERROR: Start Unit Setup failed to access save/load API")
+		return
+	end
+	loadGame = true
+	local toSave = {
+		boost = boost,
+		facplops = facplops,
+	}
+	local data = GG.SaveLoad.ReadFile(zip, "Start Unit Setup", SAVE_FILE) or {}
+
+	-- load data wholesale
+	waitingForComm = data.waitingForComm or {}
+	scheduledSpawn = data.scheduledSpawn or {}
+	playerSides = data.playerSides or {}
+	teamSides = data.teamSides or {}
+	teamSidesAI = data.teamSidesAI or {}
+	
+	-- these require special handling because they involve unitIDs
+	for oldID in pairs(data.boost) do
+		newID = GG.SaveLoad.GetNewUnitID(oldID)
+		boost[newID] = true
+	end
+	for oldID in pairs(data.facplops) do
+		newID = GG.SaveLoad.GetNewUnitID(oldID)
+		facplops[newID] = true
+	end	
 end
 
 --------------------------------------------------------------------
@@ -915,6 +944,32 @@ function gadget:DrawWorld()
 		end
 	end
 	gl.Texture("")
+end
+
+-- need this because SYNCED.tables are merely proxies, not real tables
+local function MakeRealTable(proxy)
+	local ret = {}
+	for i,v in spairs(proxy) do
+		ret[i] = v
+	end
+	return ret
+end
+
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Echo("ERROR: Start Unit Setup failed to access save/load API")
+		return
+	end
+	local toSave = {
+		boost = boost,
+		facplops = MakeRealTable(SYNCED.facplops),
+		waitingForComm = MakeRealTable(SYNCED.waitingForComm),
+		--scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn),
+		--playerSides = MakeRealTable(SYNCED.playerSides),
+		--teamSides = MakeRealTable(SYNCED.teamSides),
+		--teamSidesAI = MakeRealTable(SYNCED.teamSidesAI),		
+	}
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end
 
 end

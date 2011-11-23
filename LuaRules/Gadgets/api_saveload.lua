@@ -11,7 +11,7 @@
 --	NOTES
 --	- heightmap saving is implemented by engine
 --	- gadgets which wish to save/load their data must either submit a table and
---		filename to save (not implemented), or else handle it themselves
+--		filename to save, or else handle it themselves
 --	TODO
 --	- handle fac command queues
 --	- handle team data, particularly resources
@@ -38,6 +38,8 @@ local generalFile = "general.lua"
 local unitFile = "units.lua"
 local featureFile = "features.lua"
 
+GG.SaveLoad = GG.SaveLoad or {}
+
 if (gadgetHandler:IsSyncedCode()) then
 -----------------------------------------------------------------------------------
 --  SYNCED
@@ -45,6 +47,7 @@ if (gadgetHandler:IsSyncedCode()) then
 -- speedups
 local spSetGameRulesParam	= Spring.SetGameRulesParam
 local spSetTeamRulesParam	= Spring.SetTeamRulesParam
+local spSetTeamResource		= Spring.SetTeamResource
 local spCreateUnit			= Spring.CreateUnit
 local spSetUnitHealth		= Spring.SetUnitHealth
 local spSetUnitMaxHealth	= Spring.SetUnitMaxHealth
@@ -77,15 +80,10 @@ local savedata = {
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
-local function ReadFile(zip, name, file, output)
+local function ReadFile(zip, name, file)
 	name = name or ''
-	if (not file) or (not output) then return end
-	
+	if (not file) then return end
 	local dataRaw, dataFunc, data, err
-	
-	for i in pairs(output) do
-		output[i] = nil
-	end
 	
 	zip:open(file)
 	dataRaw = zip:read("*all")
@@ -97,20 +95,16 @@ local function ReadFile(zip, name, file, output)
 			success, data = pcall(dataFunc)
 			if not success then	-- execute Borat
 				err = data
-			else
-				-- make tables identical without changing reference
-				for i,v in pairs(data) do
-					output[i] = v
-				end
 			end
 		end
 	end
 	if err then 
 		Spring.Echo('Save/Load error: ' .. err)
-		return false
+		return nil
 	end
-	return true
+	return data
 end
+GG.SaveLoad.ReadFile = ReadFile
 
 local function boolToNum(bool)
 	if bool then return 1
@@ -118,12 +112,14 @@ local function boolToNum(bool)
 end
 
 local function GetNewUnitID(oldUnitID)
-	return data.unit[oldUnitID] and data.unit[oldUnitID].newID
+	return savedata.unit[oldUnitID] and savedata.unit[oldUnitID].newID
 end
+GG.SaveLoad.GetNewUnitID = GetNewUnitID
 
 local function GetNewFeatureID(oldFeatureID)
-	return data.feature[oldFeatureID] and data.feature[oldFeatureID].newID
+	return savedata.feature[oldFeatureID] and savedata.feature[oldFeatureID].newID
 end
+GG.SaveLoad.GetNewFeatureID = GetNewFeatureID
 
 -- FIXME: autodetection is fairly broken
 local function IsCMDTypeIconModeOrNumber(unitID, cmdID)
@@ -234,13 +230,22 @@ end
 local function LoadGeneralInfo()
 	local gameRulesParams = savedata.general.gameRulesParams or {}
 	for name,value in pairs(gameRulesParams) do
-		Spring.Echo(name,value)
 		spSetGameRulesParam(name, value)
 	end
-	local teamRulesParams = savedata.general.teamRulesParams or {}
-	for name,value in pairs(teamRulesParams) do
-		spSetTeamRulesParam(name, value)
-	end	
+	
+	-- team data
+	for teamID, teamData in pairs(savedata.general.teams or {}) do
+		-- this bugs with storages - do it at GameStart instead
+		--spSetTeamResource(teamID, "m", teamData.resources.m)
+		--spSetTeamResource(teamID, "ms", teamData.resources.ms)
+		--spSetTeamResource(teamID, "e", teamData.resources.e)
+		--spSetTeamResource(teamID, "es", teamData.resources.es)
+		
+		local rulesParams = teamData.rulesParams or {}
+		for name, value in pairs (rulesParams) do
+			spSetTeamRulesParams(teamID, name, value) 
+		end
+	end
 end
 
 
@@ -249,25 +254,32 @@ end
 -- callins
 function gadget:Load(zip)
 	-- get save data
-	if ReadFile(zip, "Unit", unitFile, savedata.unit) then
-		local units = Spring.GetAllUnits()
-		for i=1,#units do
-			Spring.DestroyUnit(units[i], false, true)
-		end
+	savedata.unit = ReadFile(zip, "Unit", unitFile) 
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		Spring.DestroyUnit(units[i], false, true)
 	end
 
-	if ReadFile(zip, "Feature", featureFile, savedata.feature) then
-		local features = Spring.GetAllFeatures()
-		for i=1,#features do
-			Spring.DestroyFeature(features[i])
-		end
-	end	
+	savedata.feature = ReadFile(zip, "Feature", featureFile) or {}
+	local features = Spring.GetAllFeatures()
+	for i=1,#features do
+		Spring.DestroyFeature(features[i])
+	end
 	
-	ReadFile(zip, "General", generalFile, savedata.general)
+	savedata.general = ReadFile(zip, "General", generalFile)
 	
 	LoadGeneralInfo()
 	LoadFeatures()	-- do this first so we can change unit orders involving features to point to new ID
 	LoadUnits()
+end
+
+function gadget:GameStart(n)
+	for teamID, teamData in pairs(savedata.general.teams or {}) do
+		spSetTeamResource(teamID, "m", teamData.resources.m)
+		spSetTeamResource(teamID, "ms", teamData.resources.ms)
+		spSetTeamResource(teamID, "e", teamData.resources.e)
+		spSetTeamResource(teamID, "es", teamData.resources.es)
+	end
 end
 
 
@@ -316,7 +328,7 @@ local savedata = {
 local autosave = true
 local autosaveFreq = 30*60*10	-- every 10 minutes
 
--- utility functions
+-- I/O utility functions
 local function WriteIndents(num)
 	local str = ""
 	for i=1, num do
@@ -364,6 +376,7 @@ local function WriteSaveData(zip, filename, data)
 	zip:open(filename)
 	zip:write(WriteTable(data, 0, true))
 end
+GG.SaveLoad.WriteSaveData = WriteSaveData
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
@@ -462,6 +475,22 @@ local function SaveGeneralInfo()
 	end
 	
 	-- team stuff - rulesparams, resources (TBD)
+	data.teams = {}
+	local teams = Spring.GetTeamList()
+	for i=1,#teams do
+		local teamID = teams[i]
+		data.teams[teamID] = {}
+		local m, ms = Spring.GetTeamResources(teamID, "metal")
+		local e, es = Spring.GetTeamResources(teamID, "energy")
+		data.teams[teamID].resources = { m = m, e = e, ms = ms, es = es }
+		local rulesParams = spGetTeamRulesParams(teamID) or {}
+		for j=1,#rulesParams do
+			for name,value in pairs(rulesParams[j]) do
+				data.teams[teamID].rulesParams[name] = value 
+			end
+		end
+	end
+	
 	savedata.general = data
 end
 
