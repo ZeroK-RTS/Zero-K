@@ -8,7 +8,7 @@ function widget:GetInfo()
     license   = "PD",
     layer     = -3,
     enabled   = true,
-	detailsDefault = 3
+	detailsDefault = 4
   }
 end
 
