@@ -74,7 +74,7 @@ end
 
 
 options_path = "Settings/Interface/Chat/Console"
-options_order = {'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'text_height', 'max_lines', 
+options_order = {'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel','defaultAllyChat', 'text_height', 'max_lines', 
 		'col_back','col_text', 'col_ally', 'col_othertext', 'col_dup', 
 		}
 options = {
@@ -172,6 +172,12 @@ options = {
 		value = false,
 		OnChange = function(self) scrollpanel1.noMouseWheel = not self.value; end,
 	},
+	defaultAllyChat = {
+		name = "Default ally chat",
+		desc = "Sets default chat mode to allies at start",
+		type = 'bool',
+		value = true,
+	},	
 	
 }
 
@@ -381,7 +387,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if (key == KEYSYMS.RETURN) then
 		if not WG.enteringText then 
 			if firstEnter then
-				if not modifier.Shift and not modifier.Ctrl then
+				if (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
 					Spring.SendCommands("chatally")
 				end
 				firstEnter=false
