@@ -1,4 +1,4 @@
-local versionName = "v1.43"
+local versionName = "v1.50"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Nov 22, 2011",
+    date      = "Nov 23, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -42,6 +42,7 @@ local spValidFeatureID = Spring.ValidFeatureID
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spGetUnitStates = Spring.GetUnitStates
 local spGetUnitTeam = Spring.GetUnitTeam
+local spSendLuaUIMsg = Spring.SendLuaUIMsg
 local CMD_STOP			= CMD.STOP
 local CMD_INSERT		= CMD.INSERT
 local CMD_REMOVE		= CMD.REMOVE
@@ -80,6 +81,7 @@ local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command 
 --Move Command constant:
 local halfTargetBoxSize = {400, 50, 190} --the distance from a target which widget should de-activate (default: move = 400m ie:800x800m box (2x constructor range), reclaim/ressurect=50 (flee if not close enough), repair=190 (1x constructor's range -10))
 local cMD_DummyG = 248 --a fake command ID to flag an idle unit primed for pure avoidance.
+local dummyIDg = "248" --fake id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue)
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
@@ -88,10 +90,14 @@ local collisionAngleG=math.pi/12 --(default is pi/6 rad) a "field of vision" (ra
 local fleeingAngleG=math.pi/4 --(default is pi/4 rad) angle of enemy (range from 0 to +-math.pi/4) where fleeing enemy is considered. Set to 0 to de-activate.
 --pi is 180 degrees
 
+--Network constant:
+local gps_then_DoCalculation_delayG = 0.4
+local doCalculation_then_gps_delayG = 0.1
+
 --------------------------------------------------------------------------------
 --Variables:
 local unitInMotionG={} --store unitID
-local skippingTimerG={0,0}
+local skippingTimerG={0,0, echoTimestamp=0, networkDelay=0, sumOfAllNetworkDelay=0, sumCounter=0}
 local commandIndexTableG= {} --store latest widget command for comparison
 local myTeamID=-1
 local myPlayerID=-1
@@ -99,10 +105,12 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 local surroundingOfActiveUnitG={} --store value for transfer between function. Store obstacle separation, los, and ect.
 local cycleG=1 --first execute "GetPreliminarySeparation()"
 local wreckageID_offset=0
+local roundTripComplete= true --to detect network lag, prevent messy overlapping command queuing
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
 function widget:Initialize()
+	skippingTimerG.echoTimestamp = spGetGameSeconds()
 	myPlayerID=Spring.GetMyPlayerID()
 	local _, _, spec = Spring.GetPlayerInfo(myPlayerID)
 	if spec then widgetHandler:RemoveWidget() return false end
@@ -145,24 +153,33 @@ function widget:Update()
 	if (now >= skippingTimer[1]) then --if "now" is 1.1 second after last update then do "RefreshUnitList()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 		unitInMotion=RefreshUnitList() --add relevant unit to unitlist/unitInMotion
-		local projectedDelay=NetworkDelay(myPlayerID, 1.1)
+		local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --set unit update based on ping or every 1.1 second
 		skippingTimer[1]=now+projectedDelay
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 	end
 	
-	if (now >=skippingTimer[2]-0.4 and cycle==1) then --if now is 0.1 second after last update then do "GetPreliminarySeparation()"
+	if (now >=skippingTimer[2] and cycle==1) and roundTripComplete then --if now is 0.1 second after last update & already unlocked by echo from server then do "GetPreliminarySeparation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 		surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable)
 		cycle=2 --send next cycle to "DoCalculation()" function
+		
+		skippingTimer = ActualNetworkDelay(1, skippingTimer, nil, nil ,now)
+		skippingTimer[2] = now+ gps_then_DoCalculation_delayG --delay next cycle by an additional 0.4 second. This allow reliable unit direction to be derived from unit's speed
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 	end
-	if (now >=skippingTimer[2] and cycle==2) then --if now is 0.5 second after last update then do "DoCalculation()"
+	if (now >=skippingTimer[2] and cycle==2) then --if now is 0.5 second after last update & already executed GetPreliminarySeparation() then do "DoCalculation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
-		commandIndexTable=DoCalculation (surroundingOfActiveUnit,commandIndexTable)
+		commandIndexTable=DoCalculation (surroundingOfActiveUnit,commandIndexTable) --initiate the avoidance
 		cycle=1 --send next cycle back to "GetPreliminarySeparation()" function
-		local projectedDelay=NetworkDelay(myPlayerID, 0.5)
-		skippingTimer[2]=now+projectedDelay
-		timeToContactCONSTANT=projectedDelay
+		
+		--local projectedDelay=ReportedNetworkDelay(myPlayerID, 0.5) --get the reported ping
+		skippingTimer[2]=now+ doCalculation_then_gps_delayG ---set next execution 0.1 second later
+		local networkDelay = ActualNetworkDelay(0, skippingTimer, doCalculation_then_gps_delayG, gps_then_DoCalculation_delayG, nil)
+		timeToContactCONSTANT= networkDelay --extend command lenght by as much as the network delay
+		
+		skippingTimer = ActualNetworkDelay(2, skippingTimer, nil, nil, now)
+		spSendLuaUIMsg(dummyIDg) --send ping to server
+		roundTripComplete = false --lock execution until receive echo from server
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
 	end
 
@@ -240,7 +257,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable)
 						local state=spGetUnitStates(unitID)
 						local movestate= state.movestate
 						if movestate~= 0 then --if not "hold position"
-							cQueue={{id = cMD_DummyG, params = {nil ,nil,nil}, options = {}}, {id = CMD_STOP, params = {nil,nil,nil}, options = {}}, nil} --replace with a fake command. Will be used to initiate avoidance on idle unit & non-viewed unit
+							cQueue={{id = cMD_DummyG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --replace with a fake command. Will be used to initiate avoidance on idle unit & non-viewed unit
 						end
 					end
 				if cQueue[1]~=nil then --prevent idle unit from executing the system
@@ -315,7 +332,7 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 				if #cQueueSyncTest>=2 then
 					if #cQueueSyncTest~=#cQueue or 
 						(cQueueSyncTest[1].params[1]~=cQueue[1].params[1] or cQueueSyncTest[1].params[3]~=cQueue[1].params[3]) or
-						cQueueSyncTest[1]==nil then
+							cQueueSyncTest[1]==nil then
 						newCommand=true
 						cQueue=cQueueSyncTest
 					end
@@ -338,10 +355,39 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 	return commandIndexTable
 end
 
-function NetworkDelay(playerIDa, defaultDelay)
+function widget:RecvLuaMsg(msg, playerID) --receive echo from server
+	if msg:sub(1,3) == dummyIDg and playerID == myPlayerID then
+		roundTripComplete = true
+	end
+end
+
+function ReportedNetworkDelay(playerIDa, defaultDelay)
 	local _,_,_,_,_,totalDelay,_,_,_,_= Spring.GetPlayerInfo(playerIDa)
-	if totalDelay==nil or totalDelay<defaultDelay-0.1 then return defaultDelay 
-	else return totalDelay+0.1 --take account for lag + wait a little bit for any command to properly update
+	if totalDelay==nil or totalDelay<=defaultDelay then return defaultDelay --if ping is too low: set the minimum delay
+	else return totalDelay --take account for lag + wait a little bit for any command to properly update
+	end
+end
+
+function ActualNetworkDelay(reportingIn, skippingTimer,doCalculation_then_gps_delay,gps_then_DoCalculation_delay, now)
+	if reportingIn == 0 then
+		local delay = 0
+		local systemDelay = doCalculation_then_gps_delay+ gps_then_DoCalculation_delay --delay artificially imposed
+		local instantaneousCommandDelay = skippingTimer.networkDelay+ systemDelay --delay at this instant
+		local averageDelay = skippingTimer.sumOfAllNetworkDelay/skippingTimer.sumCounter + systemDelay --delay from previous history (an average)
+		if instantaneousCommandDelay < averageDelay then --prevent random Network fluctuation from shortening command lenght too much
+			delay = averageDelay 
+		else
+			delay = instantaneousCommandDelay
+		end 
+		return delay
+	elseif reportingIn == 1 then
+		skippingTimer.networkDelay = now - skippingTimer.echoTimestamp --get the delay between previous Command and latest unlock
+		skippingTimer.sumOfAllNetworkDelay=skippingTimer.sumOfAllNetworkDelay + skippingTimer.networkDelay
+		skippingTimer.sumCounter = skippingTimer.sumCounter + 1
+		return skippingTimer
+	elseif reportingIn == 2 then
+		skippingTimer.echoTimestamp = now	--remember the current time of sending ping
+		return skippingTimer
 	end
 end
 ---------------------------------Level1
@@ -354,7 +400,11 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 	if commandIndexTable[unitID]==nil then --memory was empty, so fill it with zeros
 		commandIndexTable[unitID]={widgetX=0, widgetZ=0 ,backupTargetX=0, backupTargetY=0, backupTargetZ=0, patienceIndexA=0}
 	else
-		newCommand= (cQueue[1].params[1]~= commandIndexTable[unitID]["widgetX"] and cQueue[1].params[3]~=commandIndexTable[unitID]["widgetZ"])--check current command with memory
+		local a = math.modf(dNil(cQueue[1].params[1])) --using math.modf to remove trailing decimal (using only integer for matching). In case high resolution cause a fail matching with server's numbers... and use dNil incase wreckage suddenly disappear.
+		local b = math.modf(commandIndexTable[unitID]["widgetX"])
+		local c = math.modf(dNil(cQueue[1].params[3])) --dNil: if it is a reclaim or repair order (no z coordinate) then replace it with -1 (has similar effect to the "nil")
+		local d = math.modf(commandIndexTable[unitID]["widgetZ"])
+		newCommand= (a~= b and c~=d)--check current command with memory
 		if (turnOnEcho == 1) then --debugging
 			Spring.Echo("unitID(GetPreliminarySeparation)" .. unitID)
 			Spring.Echo("commandIndexTable[unitID][widgetX](IdentifyTargetOnCommandQueue):" .. commandIndexTable[unitID]["widgetX"])
@@ -575,28 +625,27 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 		-- end
 		-- spGiveOrderToUnit(unitID, cQueue[b].id, cQueue[b].params, options) --replace the rest of the command
 	-- end
-	--Method 4: 
-	local b=1
-	if not newCommand then 
+	--Method 4: with network delay detection won't do any problem
+	local queueIndex=1
+	if not newCommand then  --if widget's command then delete it
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
-		b=2 --to incluce unit with area reclaim/repair that already has this widget's command on it
-	end 
-	if #cQueue==b+2 then --try to identify signature of area reclaim/repair from previous command queue
-		if (cQueue[b].id==40 or cQueue[b].id==90 or cQueue[b].id==125) then --if first queue is reclaim/ressurect/repair something
-			if cQueue[b+1].id==90 or cQueue[b+1].id==125 then --if second queue is also reclaim/ressurect
-				if (not Spring.ValidFeatureID(cQueue[b+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[b+1].params[1]))) and not Spring.ValidUnitID(cQueue[b+1].params[1]) then --if it was an area command
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete old command, skip the target:wreck/units. Allow command reset
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_SHIFT, cQueue[b+1].params[1], cQueue[b+1].params[2], cQueue[b+1].params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
+		queueIndex=2 --skip index 1 of stored command. Skip widget's command
+	end
+	if #cQueue>=queueIndex+2 then --reclaim 1,area reclaim 2,stop 3, or: move 1,reclaim 2, area reclaim 3,stop 4.
+		if (cQueue[queueIndex].id==40 or cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125) then --if first (1) queue is reclaim/ressurect/repair
+			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --if second (2) queue is also reclaim/ressurect
+				if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete old command, skip the target:wreck/units. Allow command reset
+					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_SHIFT, cQueue[queueIndex+1].params[1], cQueue[queueIndex+1].params[2], cQueue[queueIndex+1].params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
 				end
-			elseif cQueue[b+1].id==40 then --if second queue is also repair
-				if (not Spring.ValidFeatureID(cQueue[b+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[b+1].params[1]))) and not Spring.ValidUnitID(cQueue[b+1].params[1]) then --if it was an area command
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete old command, skip the target:units. Allow continuous command reset
+			elseif cQueue[queueIndex+1].id==40 then --if second (2) queue is also repair
+				if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete old command, skip the target:units. Allow continuous command reset
 				end
 			end
 		end
 	end
 	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_SHIFT, newX, newY, newZ}, {"alt"} ) --insert new command
-	
 	----
 	commandIndexTable[unitID]["widgetX"]=newX --update the memory table
 	commandIndexTable[unitID]["widgetZ"]=newZ
@@ -622,7 +671,7 @@ end
 function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate)
 	local boxSizeTrigger=0
 	if (cQueue[queueIndex].id==CMD_MOVE or cQueue[queueIndex].id<0) then
-		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
+		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
@@ -640,15 +689,15 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		local targetFeatureID=-1
 		local iterativeTest=1
 		local foundMatch=false
-		if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --reclaim own unit
+		if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --if reclaim own unit
 			foundMatch=true
 			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
-		elseif Spring.ValidFeatureID(cQueue[queueIndex].params[1]) then --reclaim trees and rock
+		elseif Spring.ValidFeatureID(cQueue[queueIndex].params[1]) then --if reclaim trees and rock
 			foundMatch=true
 			wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
-		else
+		else --if not own unit or trees or rock then
 			targetFeatureID=cQueue[queueIndex].params[1]+1500-wreckageID_offset --remove the inherent offset
-			while iterativeTest<=3 and not foundMatch do --reclaim wreckage (wreckage ID depend on number of players)
+			while iterativeTest<=3 and not foundMatch do --do test of reclaim wreckage (wreckage ID depend on number of players)
 				if Spring.ValidFeatureID(targetFeatureID) then
 					foundMatch=true
 					wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
@@ -660,7 +709,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 				targetFeatureID=targetFeatureID-1500
 			end
 		end
-		if foundMatch==false then --if no unitID
+		if foundMatch==false then --if no wreckage, no trees, no rock, and no unitID then use coordinate
 			if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 			else
@@ -673,11 +722,12 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetZ"]=wreckPosZ
 		boxSizeTrigger=2
 	elseif cQueue[queueIndex].id==40 then
-		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
+		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		local targetUnitID=cQueue[queueIndex].params[1]
-		if Spring.ValidUnitID(targetUnitID) then --if get the unit ID then retrieve coordinate
+	
+		if Spring.ValidUnitID(targetUnitID) then --if has unit ID
 			unitPosX, unitPosY, unitPosZ = spGetUnitPosition(targetUnitID)
-		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --if no unitID
+		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --if no unit then use coordinate
 			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
 			--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
@@ -689,7 +739,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		boxSizeTrigger=3
 	elseif cQueue[1].id == cMD_DummyG then
 		targetCoordinate = {-1, -1,-1} --no target (only avoidance)
-	else --if next queue is empty: then use no-target. eg: A case where engine delete the next queues of command.
+	else --if queue is empty: then use no-target. eg: A case where engine delete the next queues of command and widget expect it to still be there.
 		targetCoordinate={-1, -1, -1}
 		--if for some reason command queue[2] is already empty then use these backup value as target:
 		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
