@@ -97,16 +97,7 @@ local energy = {     --FIXME not used, see line 443 in widget:UnitDestroyed
   "armwin",
   "geo",
 }
-local commanders = {
-	"armcom",
-	"corcom",
-	"commrecon",
-	"commsupport",
-	"armadvcom",
-	"coradvcom",
-	"commadvrecon",
-	"commadvsupport",
-}
+local commanders = {}
 
 local heavies = { --not used yet
 	"correap",
@@ -148,8 +139,10 @@ local seaList = {} --not used yet
 for i,v in pairs (energy) do --not used yet
 	energyList[v] = true
 end
-for i,v in pairs (commanders) do
-	commanderList[v] = true
+for i=1, #UnitDefs do
+	if UnitDefs[i].isCommander then
+		commanderList[UnitDefs[i].name] = true
+	end
 end
 for i,v in pairs (heavies) do --not used yet
 	heaviesList[v] = true
@@ -175,10 +168,11 @@ local function assignSex(unitID)
   else
     sexTable[unitID] = 'm'
   end
-  local defID = GetUnitDefID(unitID)
-  if (UnitDefNames['armcom'].id == defID) or (UnitDefNames['commsupport'].id == defID) or (UnitDefNames['armadvcom'].id == defID) or (UnitDefNames['commadvsupport'].id == defID)  then
+  local def = UnitDefs[GetUnitDefID(unitID)]
+  local statsName = def.customParams and def.customParams.statsname
+  if (statsname == "armcom" or statsname == "commsupport")  then
     sexTable[unitID] = 'f'
-  elseif (UnitDefNames['corcom'].id == defID) or (UnitDefNames['commrecon'].id == defID) or (UnitDefNames['coradvcom'].id == defID) or (UnitDefNames['commadvrecon'].id == defID)  then
+  elseif (statsname == "corcom" or statsname == "commrecon")  then
     sexTable[unitID] = 'm' 
   end
 end
@@ -218,7 +212,7 @@ local function Play(category, sex, side)
     local fullName = SOUND_DIRNAME.."Voices/"..fileName
     local exists = VFS.DirList(fullName, fileSearch, VFSMODE)
     if (exists) then
-      PlaySound(fileName)
+      PlaySound(fileName, 1, 'voice')
     end
   end
 end

@@ -210,7 +210,7 @@ function widget:Initialize()
 	or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
 	end
-	playSound("LuaUI/Sounds/Voices/initialized_core_1")
+	playSound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
 	-- chili setup
 	Chili = WG.Chili
 	Window = Chili.Window
@@ -267,8 +267,8 @@ end
 -- use to play communism (always enabled) sound only at game start
 function _DrawScreen()
   if (Spring.GetGameSeconds() < 0.1) then --create window in pregame and if not already shown
-    --if (Spring.GetModOption('communism',true,true)) then Spring.PlaySoundFile("LuaUI/Sounds/communism/sovnat1.wav", 1) 
-	--else Spring.PlaySoundFile("LuaUI/Sounds/communism/cash-register-01.wav", 1) end 
+    --if (Spring.GetModOption('communism',true,true)) then Spring.PlaySoundFile("LuaUI/Sounds/communism/sovnat1.wav", 1, 'ui') 
+	--else Spring.PlaySoundFile("LuaUI/Sounds/communism/cash-register-01.wav", 1, 'ui') end 
 	printDebug("<gui_startup_info_selector DEBUG >: it's _DrawScreen")
   end
   if (not selectorShown) and (not noComm) then CreateWindow() end

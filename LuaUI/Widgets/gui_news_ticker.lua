@@ -159,7 +159,7 @@ local function AddEvent(str, unitDefID, color, sound)
 	if useSounds and soundTimeout < frame then
 		local soundInfo = sounds[sound]
 		if not soundInfo then return end
-		spPlaySoundFile(soundInfo.file)
+		spPlaySoundFile(soundInfo.file, 1, 'ui')
 		soundTimeout = frame + soundInfo.timeout
 	end
 end

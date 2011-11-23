@@ -190,14 +190,6 @@ end
 
 function Hacky_Stiletto_Workaround_stiletto_func(count)
 	EmitSfx( emit,  FIRE_W5 )
-	if sound_index == 0 then
-		local px, py, pz = Spring.GetUnitPosition(unitID)
-		--Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)
-	end
-	sound_index = sound_index + 1
-	if sound_index >= 6 then
-		sound_index = 0
-	end
 	if count < 80 then
 		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(2/slowState), count + 1)

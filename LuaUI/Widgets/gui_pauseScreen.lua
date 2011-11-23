@@ -130,12 +130,12 @@ function widget:DrawScreen()
 	if ( paused and not lastPause ) then
 		--new pause
 		if not options.disablesound.value then
-			playSound(pauseSound)
+			playSound(pauseSound, 1, 'ui')
 		end
 		clickTimestamp = nil
 	elseif ( not paused and lastPause ) then
 		if not options.disablesound.value then
-			playSound(unpauseSound)
+			playSound(unpauseSound, 1, 'ui')
 		end
 	end
 

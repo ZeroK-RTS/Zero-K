@@ -262,11 +262,11 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 							Spring.SetCameraTarget(x,y,z)
 						elseif button == 3 then
 							Spring.Echo("FactoryBar: Entered easy waypoint mode")
-							Spring.PlaySoundFile(sound_waypoint, 1)
+							Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
 							waypointMode = 2 -- greedy mode
 							waypointFac  = stackname
 						else
-							Spring.PlaySoundFile(sound_click, 1)
+							Spring.PlaySoundFile(sound_click, 1, 'ui')
 							Spring.SelectUnitArray({unitID})
 						end
 					end
@@ -369,9 +369,9 @@ local function MakeButton(unitDefID, facID, facIndex)
 					Spring.GiveOrderToUnit(facID, -(unitDefID), {}, opt)
 					
 					if rb then
-						Spring.PlaySoundFile(sound_queue_rem, 0.97)
+						Spring.PlaySoundFile(sound_queue_rem, 0.97, 'ui')
 					else
-						Spring.PlaySoundFile(sound_queue_add, 0.95)
+						Spring.PlaySoundFile(sound_queue_add, 0.95, 'ui')
 					end
 					
 					--UpdateFac(facIndex, facs[facIndex])

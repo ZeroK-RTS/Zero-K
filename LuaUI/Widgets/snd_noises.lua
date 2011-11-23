@@ -76,7 +76,7 @@ local function CoolNoisePlay(category, cooldownTime)
 	cooldownTime = cooldownTime or 0
 	local t = GetGameSeconds()
 	if ( (not cooldown[category]) or ((t - cooldown[category]) > cooldownTime) ) then
-		playSound(category)
+		playSound(category, 1, 'voice')
 		cooldown[category] = t
 	end
 end

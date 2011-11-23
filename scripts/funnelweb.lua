@@ -164,7 +164,7 @@ local function GraserLoop()
 	Signal(SIG_GRASER)
 	SetSignalMask(SIG_GRASER)
 	local px, py, pz = Spring.GetUnitPosition(unitID)
-	Spring.PlaySoundFile("sounds/weapon/laser/heavy_laser5.wav", 4, px, py, pz)	
+	Spring.PlaySoundFile("sounds/weapon/laser/heavy_laser5.wav", 4, px, py, pz, 'sfx')	
 	for i=1, GRASER_FIRE_TIME do
 		EmitSfx(eyeflare, 2048 + 2)
 		Sleep(33)
