@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
---	file:		gui_music2.lua
+--	file:		gui_music.lua
 --	brief:	yay music
 --	author:	cake
 --
@@ -83,12 +83,11 @@ end
 
 function widget:Update(dt)
 	if not (Spring.GetGameSeconds()>0) then
-		initSeed = initSeed + math.random(-100,100)
-	elseif (Spring.GetGameSeconds()>0) then
 		if not seedInitialized then
-			math.randomseed(initSeed)
+			math.randomseed(os.clock()* 101.01)
 			seedInitialized=true
 		end
+	elseif (Spring.GetGameSeconds()>0) then
 		local _, _, paused = Spring.GetGameSpeed()
 		if (not paused) then
 			timeframetimer = timeframetimer + dt
