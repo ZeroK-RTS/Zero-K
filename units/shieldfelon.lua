@@ -9,7 +9,7 @@ unitDef = {
   buildCostEnergy     = 700,
   buildCostMetal      = 700,
   builder             = false,
-  buildPic            = [[corthud.png]],
+  buildPic            = [[shieldfelon.png]],
   buildTime           = 700,
   canAttack           = true,
   canGuard            = true,
@@ -20,7 +20,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    helptext       = [[The Felon charges its shield over time, and can release that energy in accurate bursts. Link it to other shields to increase its rate of fire.]],
+    helptext       = [[The Felon draws energy from its shield, discharging it in accurate bursts. Link it to other shields to increase its rate of fire.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

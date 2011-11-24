@@ -23,9 +23,16 @@ local r_thigh = piece "r_thigh"
 local r_leg = piece "r_leg"
 local r_foot = piece "l_foot"
 
+local lbarrel, rbarrel = piece("lbarrel", "rbarrel")
+local lpilot, rpilot = piece("lpilot", "rpilot")
+
 smokePiece = {pelvis, torso}
 
-local shotPieces = {shot1, shield}
+local shotPieces = {
+	{lpilot, rpilot},
+	shield
+}
+local gun_1 = 0
 
 -- constants
 local DRAIN = 50
@@ -101,7 +108,10 @@ function script.StopMoving()
 	StartThread( StopWalk )
 end
 
-function script.QueryWeapon(num) return shotPieces[num] end
+function script.QueryWeapon(num) 
+	if num == 1 then return shotPieces[num][gun_1 + 1] end
+	return shotPieces[num] 
+end
 
 function script.AimFromWeapon(num) return shot1 end
 
@@ -131,25 +141,31 @@ function script.BlockShot(num)
     end
 end
 
+function script.FireWeapon(num)
+	if num == 1 then
+		gun_1 = 1 - gun_1
+	end
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(base, sfxNone)
 		Explode(pelvis, sfxNone)
 		Explode(torso, sfxNone)
-		Explode(shield, sfxShatter)
+		Explode(lbarrel, sfxNone)
+		Explode(rbarrel, sfxNone)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(base, sfxNone)
 		Explode(pelvis, sfxNone)
 		Explode(torso, sfxShatter)
-		Explode(shield, sfxFall)
+		Explode(lbarrel, sfxShatter)
+		Explode(rbarrel, sfxShatter)
 		return 1 -- corpsetype
 	else
-		Explode(base, sfxShatter)
 		Explode(pelvis, sfxSmoke + sfxFire)
-		Explode(torso, sfxSmoke + sfxFire + sfxExplode)
-		Explode(shield, sfxSmoke + sfxFire + sfxExplode)
+		Explode(torso, sfxShatter)
+		Explode(lbarrel, sfxSmoke + sfxFire + sfxExplode)
+		Explode(rbarrel, sfxSmoke + sfxFire + sfxExplode)		
 		return 2 -- corpsetype
 	end
 end

@@ -95,6 +95,8 @@ effectUnitDefs = {
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=360, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
   },
   shieldfelon = {
+	{class='Bursts', options=MergeTable({piece="lpilot"},corjamtBursts)},
+	{class='Bursts', options=MergeTable({piece="rpilot"},corjamtBursts)},
 	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=100, strength = .001, precision=50, repeatEffect=true}},
   },
   
@@ -148,6 +150,9 @@ effectUnitDefs = {
     {class='StaticParticles', options=MergeTable(radarBlink,{piece="head", delay=15})},
   },
 
+  armcrabe = {
+	{class='StaticParticles', options=MergeTable(blinkyLightWhite, {piece="blight"}) },
+  },   
   corcan = {
 	--{class='StaticParticles', options=MergeTable(jackGlow, {piece="point"}) },
   },  
