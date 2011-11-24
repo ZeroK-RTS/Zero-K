@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.092 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.093 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -1163,9 +1163,8 @@ local function DrawPoint(x, y, c, s)
 end
 
 function widget:DrawScreen()
-	if not cx then return end
-	
     hideCursor = false
+	if not cx then return end
     
 	local x, y
 	if smoothscroll then
