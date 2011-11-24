@@ -105,7 +105,6 @@ function AddAllianceUnit(u, ud, teamID)
 	if UnitDefs[ud].isCommander then
 		commsAlive[allianceID][u] = true
 	end	
-	finishedUnits[u] = true
 end
 
 function RemoveAllianceUnit(u, ud, teamID)
@@ -115,7 +114,6 @@ function RemoveAllianceUnit(u, ud, teamID)
 	if UnitDefs[ud].isCommander then
 		commsAlive[allianceID][u] = nil
 	end	
-	finishedUnits[u] = nil
 	if (aliveCount[allianceID]<=0) or (commends and HasNoComms(allianceID)) then
 		DestroyAlliance(allianceID)
 	end
@@ -156,8 +154,8 @@ end
 -- purge the alliance!
 function DestroyAlliance(allianceID)
 	if not destroyedAlliances[allianceID] then
-	Spring.Echo("Game Over: Destroying alliance " .. allianceID)
-	destroyedAlliances[allianceID] = true
+		Spring.Echo("Game Over: Destroying alliance " .. allianceID)
+		destroyedAlliances[allianceID] = true
 		if destroy_type == 'debug' then
 			Spring.Echo("Game Over: DEBUG")
 			Spring.Echo("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
@@ -243,8 +241,8 @@ end
 function gadget:UnitFinished(u, ud, team)
 	if (team ~= gaiaTeam)
 	  and(not doesNotCountList[ud])
-	  --and(not select(3,spGetUnitIsStunned(u)))
 	then
+		finishedUnits[u] = true
 		AddAllianceUnit(u, ud, team)
 	end
 end
@@ -254,6 +252,7 @@ function gadget:UnitDestroyed(u, ud, team)
 	  and(not doesNotCountList[ud])
 	  and finishedUnits[u]
 	then
+		finishedUnits[u] = nil
 		RemoveAllianceUnit(u, ud, team)
 	end
 end

@@ -370,20 +370,12 @@ end
 -- Game End Stuff
 --
 
-local function KillAllChicken()
-  local chickenUnits = spGetTeamUnits(chickenTeamID)
-  for i=1,#chickenUnits do
-    Spring.DestroyUnit(chickenUnits[i])
-  end
-end
-
-
 local function KillAllComputerUnits()
   victory = true
   for teamID in pairs(computerTeams) do
     local teamUnits = spGetTeamUnits(teamID)
     for i=1,#teamUnits do
-      if teamUnits[i] ~= queenID then Spring.DestroyUnit(teamUnits[i]) end
+      Spring.DestroyUnit(teamUnits[i])
     end
   end
 end
@@ -1120,7 +1112,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   end
   if (unitID == queenID) then
     KillAllComputerUnits()
-    --KillAllChicken()
   end
   local name = UnitDefs[unitDefID].name
   if (unitTeam == chickenTeamID) then
@@ -1180,7 +1171,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		SpawnBurrow()
 	end
 	
-
 	if pvp and endgame then
 		if count == 0 then KillAllComputerUnits() end
 	end
