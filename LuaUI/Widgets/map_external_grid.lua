@@ -63,14 +63,14 @@ options = {
 		desc = "Draws grid for islands",		
 	},	
 	res = {
-		name = "Resolution (64-512)",
+		name = "Tile size (64-512)",
 		advanced = true,
 		type = 'number',
 		min = 64, 
 		max = 512, 
 		step = 64,
 		value = 128,
-		desc = 'Sets resolution (lower = more detail)',
+		desc = 'Sets tile size (lower = more detail)\nStepsize is 64; recommend factors of 512',
 		OnChange = function(self)
 			gl.DeleteList(DspLst)
 			widget:Initialize()
@@ -133,7 +133,7 @@ local function GetGroundHeight(x, z)
 end
 
 local function IsIsland()
-	local sampleDist = 640
+	local sampleDist = 512
 	for i=1,Game.mapSizeX,sampleDist do
 		-- top edge
 		if GetGroundHeight(i, 0) > 0 then

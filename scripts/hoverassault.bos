@@ -1,7 +1,5 @@
 //linear constant = 65536
 
-#define TA			// This is a TA script
-
 #include "constants.h"
 
 piece  base, shield, turret, gun, flare1, flare2, wake1, wake2, wake3, wake4,
@@ -256,7 +254,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode base type BITMAPONLY | BITMAP2;
 		explode turret type SHATTER | BITMAP3;
 		explode wake1 type FALL | BITMAP4;
@@ -269,7 +267,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode base type BITMAPONLY | BITMAP2;
 		explode turret type SHATTER | BITMAP3;
 		explode wake1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
@@ -280,7 +278,7 @@ Killed(severity, corpsetype)
 		explode wake6 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode base type BITMAPONLY | BITMAP2;
 	explode turret type SHATTER | BITMAP3;
 	explode wake1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
