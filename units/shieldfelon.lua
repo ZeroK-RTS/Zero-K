@@ -6,11 +6,11 @@ unitDef = {
   activateWhenBuilt   = true,
   bmcode              = [[1]],
   brakeRate           = 0.22,
-  buildCostEnergy     = 1000,
-  buildCostMetal      = 1000,
+  buildCostEnergy     = 700,
+  buildCostMetal      = 700,
   builder             = false,
   buildPic            = [[corthud.png]],
-  buildTime           = 1000,
+  buildTime           = 700,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -68,18 +68,15 @@ unitDef = {
   workerTime          = 0,
 
   weapons             = {
-  
-    {
-      def = [[SHIELD]],
-    },
-	
     {
       def                = [[SHIELDGUN]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
 	  --mainDir            = [[0 1 0]],
 	  --maxAngleDif        = 270,
     },
-	
+    {
+      def = [[SHIELD]],
+    },
   },
 
 
@@ -106,14 +103,13 @@ unitDef = {
       shieldPowerRegenEnergy  = 0,
       shieldRadius            = 100,
       shieldRepulser          = false,
-      shieldStartingPower     = 0,
+      shieldStartingPower     = 600,
       smartShield             = true,
       texture1                = [[shield3mist]],
       visibleShield           = true,
       visibleShieldHitFrames  = 4,
       visibleShieldRepulse    = true,
       weaponType              = [[Shield]],
-	  range                   = 500,
     },
 	
     SHIELDGUN = {
@@ -124,7 +120,7 @@ unitDef = {
       cylinderTargetting      = 0,
 
       damage                  = {
-        default        = 80,
+        default        = 75,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -134,8 +130,8 @@ unitDef = {
       impulseFactor           = 0.4,
       intensity               = 6,
       interceptedByShieldType = 1,
-      range                   = 480,
-      reloadtime              = 0.2,
+      range                   = 450,
+      reloadtime              = 0.1,
       rgbColor                = [[0.5 0 0.7]],
       soundStart              = [[weapon/small_lightning]],
       soundTrigger            = true,
@@ -156,7 +152,7 @@ unitDef = {
       description      = [[Wreckage - Thug]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 700,
+      damage           = 1000,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -164,10 +160,10 @@ unitDef = {
       footprintZ       = 2,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 128,
+      metal            = 280,
       object           = [[thug_d.s3o]],
       reclaimable      = true,
-      reclaimTime      = 128,
+      reclaimTime      = 280,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -177,17 +173,17 @@ unitDef = {
       description      = [[Debris - Felon]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 700,
+      damage           = 1000,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
       height           = [[4]],
       hitdensity       = [[100]],
-      metal            = 64,
+      metal            = 140,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 64,
+      reclaimTime      = 140,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },

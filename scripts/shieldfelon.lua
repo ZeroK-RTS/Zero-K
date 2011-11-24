@@ -1,5 +1,5 @@
-GetUnitShieldState = Spring.GetUnitShieldState
-SetUnitShieldState = Spring.SetUnitShieldState
+local spGetUnitShieldState = Spring.GetUnitShieldState
+local spSetUnitShieldState = Spring.SetUnitShieldState
 include "constants.lua"
 
 -- pieces
@@ -25,11 +25,10 @@ local r_foot = piece "l_foot"
 
 smokePiece = {pelvis, torso}
 
-local shotPieces = {shield, shot1, shot2, shot3, shot4}
+local shotPieces = {shot1, shield}
 
 -- constants
-local DRAIN = 40
-local MIN_CHARGE = 50
+local DRAIN = 50
 local SHIELD_RADIUS = 100
 
 --signals
@@ -42,7 +41,7 @@ end
 local function Walk()
 	SetSignalMask( SIG_Walk )
 	while ( true ) do
-		Move(base, y_axis, 3.6, 4)
+		Move(base, y_axis, 3.6, 14)
 		
 		Turn( l_thigh, x_axis, 0.6, 1.33 )
 		Turn( l_leg, x_axis, 0.6, 1.16 )
@@ -52,7 +51,7 @@ local function Walk()
 		Turn( r_foot, x_axis, -0.8, 1.33 )
 		
 		Sleep( 570 )
-		Move(base, y_axis, 0, 10)
+		Move(base, y_axis, 0, 20)
 		
 		Turn( r_thigh, x_axis, -1, 0.66 )
 		Turn( r_leg, x_axis, 0.4, 2 )
@@ -60,7 +59,7 @@ local function Walk()
 		
 		Sleep( 570 )
 		
-		Move(base, y_axis, 3.6, 4)
+		Move(base, y_axis, 3.6, 14)
 		
 		Turn( l_thigh, x_axis, -1, 1.66 )
 		Turn( l_leg, x_axis, -0.4, 2 )
@@ -71,7 +70,7 @@ local function Walk()
 		
 		Sleep( 570 )
 		
-		Move(base, y_axis, 0, 10)
+		Move(base, y_axis, 0, 210)
 		
 		Turn( l_thigh, x_axis, -1, 0.66 )
 		Turn( l_leg, x_axis, 0.4, 2 )
@@ -107,22 +106,29 @@ function script.QueryWeapon(num) return shotPieces[num] end
 function script.AimFromWeapon(num) return shot1 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 1 then return false end
-	
+	if num == 2 then 
+        return false 
+    end
 	-- use only for single weapon design plz
 	--Turn(shotcent, y_axis, heading)
 	--Turn(shotcent, x_axis, -pitch + math.rad(90))
 	--Move(shot1, y_axis, math.sin(pitch)*-SHIELD_RADIUS)
 	--Move(shot1, x_axis, math.sin(heading)*SHIELD_RADIUS)
 	--Move(shot1, z_axis, math.cos(heading)*SHIELD_RADIUS)
-	
-
-	return select(2, GetUnitShieldState(unitID)) > MIN_CHARGE
+	return true
 end
 
-function script.FireWeapon(num)
-	local shieldPow = select(2, GetUnitShieldState(unitID))
-	SetUnitShieldState(unitID, shieldPow - DRAIN)
+function script.BlockShot(num)
+    if num == 2 then
+        return false
+    end
+    local shieldPow = select(2, spGetUnitShieldState(unitID))
+    if shieldPow > DRAIN then
+        spSetUnitShieldState(unitID, shieldPow - DRAIN)
+        return false
+    else
+        return true
+    end
 end
 
 function script.Killed(recentDamage, maxHealth)
