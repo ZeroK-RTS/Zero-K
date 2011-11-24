@@ -82,16 +82,13 @@ function widget:Shutdown()
 end
 
 function widget:Update(dt)
-	if (Spring.GetGameSeconds() < 1) then
+	if not (Spring.GetGameSeconds()>0) then
 		initSeed = initSeed + math.random(-100,100)
-	elseif (Spring.GetGameSeconds() < 2) then
+	elseif (Spring.GetGameSeconds()>0) then
 		if not seedInitialized then
 			math.randomseed(initSeed)
 			seedInitialized=true
 		end
-	elseif (Spring.GetGameSeconds() < 3) then
-		dethklok[1] = 0
-	else
 		local _, _, paused = Spring.GetGameSpeed()
 		if (not paused) then
 			timeframetimer = timeframetimer + dt
