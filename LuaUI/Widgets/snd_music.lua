@@ -178,7 +178,7 @@ function widget:Update(dt)
 				--Spring.SetSoundStreamVolume( playedTime/5)
 			--end
 
-			if ( (musicType ~= previousTrackType and musicType == 'war') or (playedTime == 0 and totalTime == 0)) then	-- both zero means track stopped in 84.0
+			if ( (musicType ~= previousTrackType and musicType == 'war') or (playedTime >= totalTime)) then	-- both zero means track stopped in 8
 				previousTrackType = musicType
 				PlayNewTrack()
 				
