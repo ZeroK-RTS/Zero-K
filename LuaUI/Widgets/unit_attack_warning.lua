@@ -29,7 +29,7 @@ function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, wea
 		local x,y,z = Spring.GetUnitPosition (unitID)
 		if (x and y and z) then
 			Spring.SetLastMessagePosition (x,y,z)
-			WG.AddEvent(x, y, z)
+			WG.AddEventPos(x, y, z)
 		end
 	end
 end
