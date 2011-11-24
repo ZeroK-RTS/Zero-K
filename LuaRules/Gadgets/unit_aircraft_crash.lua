@@ -30,8 +30,6 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- SYNCED
 --------------------------------------------------------------------------------
-Spring.Echo("SPESS MEHREENS")
-
 local recentDamage = {}	-- indexed by unitID
 local gameFrame = 0
 
@@ -49,9 +47,8 @@ function gadget:GameFrame(n)
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if (not aircraftDefIDs[unitDefID]) or select(3, spGetUnitIsStunned(unitID)) then return end
+	if (not recentDamage[unitID]) or select(3, spGetUnitIsStunned(unitID)) then return end
 	--Spring.Echo("Plane damaged")
-	recentDamage[unitID] = recentDamage[unitID] or {}
 	recentDamage[unitID][gameFrame] = (recentDamage[unitID][gameFrame] or 0) + damage
 	
 	if spGetUnitHealth(unitID) < 0 then
@@ -62,7 +59,6 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		end
 		local maxHealth = aircraftDefIDs[unitDefID]
 		local severity = rDam/maxHealth
-		Spring.Echo(severity)
 		if severity < 0.5 then
 			Spring.SetUnitCrashing(unitID, true)
 			Spring.SetUnitNoSelect(unitID, true)
@@ -71,16 +67,17 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 			Spring.SetUnitSensorRadius(unitID, "radar", 0)
 			Spring.SetUnitSensorRadius(unitID, "sonar", 0)
 		end	
+		recentDamage[unitID] = nil	-- no longer need to track this plane
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if (not aircraftDefIDs[unitDefID]) or select(3, spGetUnitIsStunned(unitID)) then return end
-	
-
+	recentDamage[unitID] = nil
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
+	if (not aircraftDefIDs[unitDefID]) or select(3, spGetUnitIsStunned(unitID)) then return end
+	recentDamage[unitID] = {}
 end
 
 
