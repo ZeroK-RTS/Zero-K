@@ -81,6 +81,7 @@ function widget:Shutdown()
 end
 
 local function PlayNewTrack()
+	Spring.StopSoundStream()
 	local newTrack = previousTrack
 	repeat
 		if musicType == 'peace' then
@@ -108,12 +109,11 @@ local function PlayNewTrack()
 end
 
 function widget:Update(dt)
-	if not (Spring.GetGameSeconds()>0) then
+	if (Spring.GetGameSeconds()>0) then
 		if not seedInitialized then
-			math.randomseed(os.clock()* 101.01)
+			math.randomseed(os.clock()* 100)
 			seedInitialized=true
 		end
-	else
 		local _, _, paused = Spring.GetGameSpeed()
 		timeframetimer = timeframetimer + dt
 		if (timeframetimer > 1) then	-- every second
