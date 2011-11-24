@@ -17,10 +17,10 @@ This also is triggered when all others spectate.
 
 if (gadgetHandler:IsSyncedCode()) then
 
-if Spring.GetModOption("zkmode",false,nil) == nil then
-	Spring.Echo("<Game Over> Testing mode. Gadget removed.")
-	return
-end
+--if Spring.GetModOption("zkmode",false,nil) == nil then
+--	Spring.Echo("<Game Over> Testing mode. Gadget removed.")
+--	return
+--end
 
 --------------------------------------------------------------------------------
 -- vars
@@ -53,6 +53,8 @@ local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(gaiaTeamID))
 
 local aliveCount = {}
 local destroyedAlliances = {}
+
+local finishedUnits = {}	-- this stores a list of all units that have ever been completed, so it can distinguish between incomplete and partly reclaimed units
 
 local destroy_type = 'destroy'
 local commends = false
@@ -103,6 +105,7 @@ function AddAllianceUnit(u, ud, teamID)
 	if UnitDefs[ud].isCommander then
 		commsAlive[allianceID][u] = true
 	end	
+	finishedUnits[u] = true
 end
 
 function RemoveAllianceUnit(u, ud, teamID)
@@ -112,6 +115,7 @@ function RemoveAllianceUnit(u, ud, teamID)
 	if UnitDefs[ud].isCommander then
 		commsAlive[allianceID][u] = nil
 	end	
+	finishedUnits[u] = nil
 	if (aliveCount[allianceID]<=0) or (commends and HasNoComms(allianceID)) then
 		DestroyAlliance(allianceID)
 	end
@@ -164,7 +168,7 @@ function DestroyAlliance(allianceID)
 				for _,t in ipairs(teamList) do
 					local teamUnits = spGetTeamUnits(t) 
 					for _,u in ipairs(teamUnits) do
-						if GG.pwUnitsByID[u] then
+						if GG.pwUnitsByID and GG.pwUnitsByID[u] then
 							spTransferUnit(u, gaiaTeam, true)
 						else
 							spDestroyUnit(u, true)
@@ -239,7 +243,7 @@ end
 function gadget:UnitFinished(u, ud, team)
 	if (team ~= gaiaTeam)
 	  and(not doesNotCountList[ud])
-	  and(not select(3,spGetUnitIsStunned(u)))
+	  --and(not select(3,spGetUnitIsStunned(u)))
 	then
 		AddAllianceUnit(u, ud, team)
 	end
@@ -248,7 +252,7 @@ end
 function gadget:UnitDestroyed(u, ud, team)
 	if (team ~= gaiaTeam)
 	  and(not doesNotCountList[ud])
-	  and(not select(3,spGetUnitIsStunned(u)))
+	  and finishedUnits[u]
 	then
 		RemoveAllianceUnit(u, ud, team)
 	end
