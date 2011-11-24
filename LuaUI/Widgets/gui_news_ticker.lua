@@ -289,7 +289,7 @@ function widget:TeamDied(teamID)
 	-- chicken team has no players (normally)
 	if player then
 		local playerName = Spring.GetPlayerInfo(player)
-		AddEvent(playerName .. ' died')
+		AddEvent(playerName .. ' died', nil, colorOrange)
 	end
 end
 
