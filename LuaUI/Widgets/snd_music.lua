@@ -13,12 +13,12 @@
 
 function widget:GetInfo()
 	return {
-		name			= "Music Player",
-		desc			= "Plays music based on situation",
-		author		= "cake, trepan, Smoth, Licho, xponen",
-		date			= "Mar 01, 2008, Aug 20 2009, Nov 23 2011",
+		name	= "Music Player",
+		desc	= "Plays music based on situation",
+		author	= "cake, trepan, Smoth, Licho, xponen",
+		date	= "Mar 01, 2008, Aug 20 2009, Nov 23 2011",
 		license	= "GNU GPL, v2 or later",
-		layer		= 0,
+		layer	= 0,
 		enabled	= true	--	loaded by default?
 	}
 end
@@ -47,8 +47,8 @@ local songText	= "no name"
 local warTracks		=	VFS.DirList('sounds/music/war/', '*.ogg')
 local peaceTracks	=	VFS.DirList('sounds/music/peace/', '*.ogg')
 
-
-local musicIsOn = false
+local firstTime = false
+local wasPaused = false
 local firstFade = true
 local initSeed = 0
 local seedInitialized = false
@@ -72,7 +72,6 @@ function widget:Initialize()
 end
 
 
-
 function widget:Shutdown()
 	Spring.StopSoundStream()
 	
@@ -81,22 +80,48 @@ function widget:Shutdown()
 	end
 end
 
+local function PlayNewTrack()
+	local newTrack = previousTrack
+	repeat
+		if musicType == 'peace' then
+			newTrack = peaceTracks[math.random(1, #peaceTracks)]
+		elseif musicType == 'war' then
+			newTrack = warTracks[math.random(1, #warTracks)]
+		end
+	until newTrack ~= previousTrack
+	-- for key, val in pairs(oggInfo) do
+		-- Spring.Echo(key, val)	
+	-- end
+	firstFade = false
+	previousTrack = newTrack
+	
+	-- if (oggInfo.comments.TITLE and oggInfo.comments.TITLE) then
+		-- Spring.Echo("Song changed to: " .. oggInfo.comments.TITLE .. " By: " .. oggInfo.comments.ARTIST)
+	-- else
+		-- Spring.Echo("Song changed but unable to get the artist and title info")
+	-- end
+	curTrack = newTrack
+	Spring.PlaySoundStream(newTrack,WG.music_volume or 0.5)
+	playing = true
+	
+	WG.music_start_volume = WG.music_volume
+end
+
 function widget:Update(dt)
 	if not (Spring.GetGameSeconds()>0) then
 		if not seedInitialized then
 			math.randomseed(os.clock()* 101.01)
 			seedInitialized=true
 		end
-	elseif (Spring.GetGameSeconds()>0) then
+	else
 		local _, _, paused = Spring.GetGameSpeed()
-		if (not paused) then
-			timeframetimer = timeframetimer + dt
-			if (timeframetimer > 1) then	-- every second
-				timeframetimer = 0
-				newTrackWait = newTrackWait + 1
-				local PlayerTeam = Spring.GetMyTeamID()
-				numVisibleEnemy = 0
-				local doods = Spring.GetVisibleUnits()
+		timeframetimer = timeframetimer + dt
+		if (timeframetimer > 1) then	-- every second
+			timeframetimer = 0
+			newTrackWait = newTrackWait + 1
+			local PlayerTeam = Spring.GetMyTeamID()
+			numVisibleEnemy = 0
+			local doods = Spring.GetVisibleUnits()
 			for _, u in ipairs(doods) do
 				if (Spring.IsUnitAllied(u) ~= true) then
 					numVisibleEnemy = numVisibleEnemy + 1
@@ -127,75 +152,43 @@ function widget:Update(dt)
 				musicType = 'peace'
 			end
 			
-			if (not musicIsOn) then
-				local newTrack = previousTrack
-				repeat
-					if musicType == 'peace' then
-						newTrack = peaceTracks[math.random(1, #peaceTracks)]
-					elseif musicType == 'war' then
-						newTrack = warTracks[math.random(1, #warTracks)]
-					end
-				until newTrack ~= previousTrack
-				previousTrack = newTrack
-				
-				Spring.PlaySoundStream(newTrack,WG.music_volume or 0.5) --init to random
-				WG.music_start_volume = WG.music_volume
-				musicIsOn = true -- pop this cherry	
+			if (not firstTime) then
+				PlayNewTrack()
+				firstTime = true -- pop this cherry	
 			end
 			
 			local playedTime, totalTime = Spring.GetSoundStreamTime()
 			playedTime = math.floor(playedTime)
 			totalTime = math.floor(totalTime)
+			--Spring.Echo(playedTime, totalTime)
 			
 			--Spring.Echo(playedTime, totalTime, newTrackWait)
 			
-				--if((totalTime - playedTime) <= 6 and (totalTime >= 1) ) then
-					--Spring.Echo("time left:", (totalTime - playedTime))
-					--Spring.Echo("volume:", (totalTime - playedTime)/6)
-					--if ((totalTime - playedTime)/6 >= 0) then
-					--	Spring.SetSoundStreamVolume((totalTime - playedTime)/6)
-					--else
-					--	Spring.SetSoundStreamVolume(0.1)
-					--end
-				--elseif(playedTime <= 5 )then--and not firstFade
-					--Spring.Echo("time playing:", playedTime)
-					--Spring.Echo("volume:", playedTime/5)
-					--Spring.SetSoundStreamVolume( playedTime/5)
+			--if((totalTime - playedTime) <= 6 and (totalTime >= 1) ) then
+				--Spring.Echo("time left:", (totalTime - playedTime))
+				--Spring.Echo("volume:", (totalTime - playedTime)/6)
+				--if ((totalTime - playedTime)/6 >= 0) then
+				--	Spring.SetSoundStreamVolume((totalTime - playedTime)/6)
+				--else
+				--	Spring.SetSoundStreamVolume(0.1)
 				--end
-			
+			--elseif(playedTime <= 5 )then--and not firstFade
+				--Spring.Echo("time playing:", playedTime)
+				--Spring.Echo("volume:", playedTime/5)
+				--Spring.SetSoundStreamVolume( playedTime/5)
+			--end
 
-				if ( (musicType ~= previousTrackType and musicType == 'war') or (playedTime > totalTime)	) then
-					previousTrackType = musicType
-					local newTrack = previousTrack
-					repeat
-						if musicType == 'peace' then
-							newTrack = peaceTracks[math.random(1, #peaceTracks)]
-						elseif musicType == 'war' then
-							newTrack = warTracks[math.random(1, #warTracks)]
-						end
-					until newTrack ~= previousTrack
-					-- for key, val in pairs(oggInfo) do
-						-- Spring.Echo(key, val)	
-					-- end
-					firstFade = false
-					previousTrack = newTrack
-					
-					-- if (oggInfo.comments.TITLE and oggInfo.comments.TITLE) then
-						-- Spring.Echo("Song changed to: " .. oggInfo.comments.TITLE .. " By: " .. oggInfo.comments.ARTIST)
-					-- else
-						-- Spring.Echo("Song changed but unable to get the artist and title info")
-					-- end
-					curTrack = newTrack
-					Spring.PlaySoundStream(newTrack,WG.music_volume or 0.5)
-					WG.music_start_volume = WG.music_volume
-					
-					--Spring.Echo("Track: " .. newTrack)
-					newTrackWait = 0
-				end
+			if ( (musicType ~= previousTrackType and musicType == 'war') or (playedTime == 0 and totalTime == 0)) then	-- both zero means track stopped in 84.0
+				previousTrackType = musicType
+				PlayNewTrack()
+				
+				--Spring.Echo("Track: " .. newTrack)
+				newTrackWait = 0
 			end
-		elseif (paused) then
-			Spring.StopSoundStream()
-			musicIsOn = false
+		end
+		if (paused ~= wasPaused) then
+			--Spring.PauseSoundStream()
+			wasPaused = paused
 		end
 	end
 end
