@@ -116,8 +116,7 @@ local function Walk()
 			Turn(ruparm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 		end
 		WaitForTurn(lthigh, x_axis)
-		Sleep(0)
-		
+				
 		--right leg up, left leg back
 		Turn(lthigh, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(lleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
@@ -130,7 +129,6 @@ local function Walk()
 			Turn(ruparm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
 		WaitForTurn(rthigh, x_axis)		
-		Sleep(0)
 	end
 end
 

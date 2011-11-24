@@ -47,7 +47,6 @@ local function Fly()
 		Turn(rightWing2, z_axis, wingAngle/3, wingSpeed)
 		Turn(tail, x_axis, tailAngle, math.rad(40))
 		Move(body, y_axis, -60, 45)
-		Sleep(0)
 		WaitForTurn(leftWing1, z_axis)
 		Turn(leftWing1, z_axis, wingAngle, wingSpeed)
 		Turn(rightWing1, z_axis, -wingAngle, wingSpeed)
@@ -56,7 +55,6 @@ local function Fly()
 		Turn(tail, x_axis, -tailAngle, math.rad(40))
 		Move(body, y_axis, 0, 45)
 --		EmitSfx(body, 4096+5) --Queen Crush
-		Sleep(0)
 		WaitForTurn(leftWing1, z_axis)
 	end
 end
