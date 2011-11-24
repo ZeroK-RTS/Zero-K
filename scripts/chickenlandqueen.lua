@@ -138,7 +138,8 @@ local function Walk()
 		Turn( head , x_axis, math.rad(10), math.rad(20) )
 		Turn( tail , y_axis, math.rad(-20), math.rad(20) )
 		WaitForTurn(leftShin, x_axis)
-					
+		Sleep(0)
+			
 		Turn( rightThigh , x_axis, math.rad(70), math.rad(115) * PACE)
 		Turn( rightKnee , x_axis, math.rad(-40), math.rad(145) * PACE)
 		Turn( rightShin , x_axis, math.rad(20), math.rad(145) * PACE)
@@ -155,7 +156,8 @@ local function Walk()
 		Turn( head , x_axis, math.rad(-10), math.rad(20) )
 		Turn( tail , y_axis, math.rad(20), math.rad(20) )
 		WaitForTurn(rightThigh, x_axis)
-				
+		Sleep(0)
+		
 		Stomp(rightFoot)
 		Turn( rightThigh , x_axis, math.rad(-10), math.rad(160) * PACE)
 		Turn( rightKnee , x_axis, math.rad(15), math.rad(145) * PACE)
@@ -169,6 +171,7 @@ local function Walk()
 		Turn( head , x_axis, math.rad(10), math.rad(20) )
 		Turn( tail , y_axis, math.rad(-20), math.rad(20) )
 		WaitForTurn(rightShin, x_axis)
+		Sleep(0)
 	end
 end
 

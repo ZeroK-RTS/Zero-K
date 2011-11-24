@@ -228,6 +228,14 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
+    shieldfelon = {
+		ok = {
+			[1] = "heavy_bot_move",
+		},
+		select = {
+			[1] = "bot_select",
+		},
+	},
 	
 	-- Jumper
 	corfast = {

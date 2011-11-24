@@ -48,7 +48,8 @@ local function Walk()
 		Turn( rfoot , x_axis, math.rad(0), math.rad(140)*PACE  )	
 		Move( body , y_axis, 0, 12*PACE )
 		WaitForMove(body, y_axis)
-				
+		Sleep(0)
+		
 		--Spring.Echo("Right foot up, Left foot down")		
 		Turn( rthigh , x_axis, math.rad(20), math.rad(120)*PACE  )
 --		Turn( rknee , x_axis, math.rad(-40), math.rad(135)*PACE  )
@@ -63,7 +64,8 @@ local function Walk()
 		Turn( rthigh , z_axis, math.rad(-5), math.rad(20)*PACE  )
 		Move( body , y_axis, 4 , 9*PACE )
 		WaitForMove(body, y_axis)
-				
+		Sleep(0)
+		
 		--Spring.Echo("Left foot middle, right foot middle")
 		Turn( rthigh , x_axis, math.rad(-10), math.rad(160)*PACE  )
 --		Turn( rknee , x_axis, math.rad(15), math.rad(135)*PACE  )
@@ -75,6 +77,7 @@ local function Walk()
 		Turn( lfoot , x_axis, math.rad(0), math.rad(140)*PACE  )
 		Move( body , y_axis, 0, 12*PACE )
 		WaitForMove(body, y_axis)
+		Sleep(0)
 	end
 end
 

@@ -78,10 +78,12 @@ local function Walk()
 		
 		WaitForTurn(leg4, z_axis)
 		WaitForTurn(leg4, y_axis)
-				
+		Sleep(0)
+		
 		-- Spring.Echo("lower left fore and right back")
 		Turn(leg4, z_axis, 0, legLowerSpeed)	-- LF leg down		
 		Turn(leg2, z_axis, 0, legLowerSpeed)	-- RB leg down
+		Sleep(0)
 		WaitForTurn(leg4, z_axis)
 		
 		-- Spring.Echo("left back and right fore move, left fore and right back anchor")
@@ -96,10 +98,12 @@ local function Walk()
 		Turn(leg2, y_axis, -legBackwardAngle, legBackwardSpeed)	-- RB leg back	
 		WaitForTurn(leg1, z_axis)
 		WaitForTurn(leg1, y_axis)
-		
+		Sleep(0)
+
 		-- Spring.Echo("lower left back and right fore")
 		Turn(leg3, z_axis, 0, legLowerSpeed)	-- LB leg down		
 		Turn(leg1, z_axis, 0, legLowerSpeed)	-- RF leg down
+		Sleep(0)
 		WaitForTurn(leg3, z_axis)
 	end
 end

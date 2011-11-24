@@ -21,6 +21,7 @@ unitDef = {
     [[cormak]],
 	[[shieldarty]],
 	[[corcrash]],
+    [[shieldfelon]],
     [[corclog]],
     [[corroach]],
     [[core_spectre]],

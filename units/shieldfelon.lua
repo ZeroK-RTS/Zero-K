@@ -120,7 +120,7 @@ unitDef = {
       cylinderTargetting      = 0,
 
       damage                  = {
-        default        = 75,
+        default        = 100,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -131,9 +131,10 @@ unitDef = {
       intensity               = 6,
       interceptedByShieldType = 1,
       range                   = 450,
-      reloadtime              = 0.1,
+      reloadtime              = 0.15,
       rgbColor                = [[0.5 0 0.7]],
-      soundStart              = [[weapon/small_lightning]],
+      soundStart              = [[weapon/constant_electric]],
+      soundStartVolume        = 9,
       soundTrigger            = true,
       startsmoke              = [[1]],
       targetMoveError         = 0,

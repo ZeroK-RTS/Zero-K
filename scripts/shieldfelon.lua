@@ -17,11 +17,11 @@ local shot5 = piece "shot5"
 
 local l_thigh = piece "l_thigh"
 local l_leg = piece "l_leg"
-local l_foot = piece "r_foot"
+local l_foot = piece "l_foot"
 
 local r_thigh = piece "r_thigh"
 local r_leg = piece "r_leg"
-local r_foot = piece "l_foot"
+local r_foot = piece "r_foot"
 
 local lbarrel, rbarrel = piece("lbarrel", "rbarrel")
 local lpilot, rpilot = piece("lpilot", "rpilot")
@@ -35,8 +35,9 @@ local shotPieces = {
 local gun_1 = 0
 
 -- constants
-local DRAIN = 50
+local DRAIN = 75
 local SHIELD_RADIUS = 100
+local SPEED = 1.2
 
 --signals
 local SIG_Walk = 1
@@ -47,48 +48,62 @@ end
 
 local function Walk()
 	SetSignalMask( SIG_Walk )
-	while ( true ) do
-		Move(base, y_axis, 3.6, 14)
+    
+    while ( true ) do
+        local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
 		
-		Turn( l_thigh, x_axis, 0.6, 1.33 )
-		Turn( l_leg, x_axis, 0.6, 1.16 )
+        Move(pelvis, y_axis, 6.2, 4*speedmult)
+        
+        Turn( l_thigh, x_axis, -1.3, 1.4*speedmult )
+		Turn( l_leg, x_axis, 0.4, 1.4*speedmult )
+		Turn( l_foot, x_axis, 0.8, 1*speedmult )
+        
+		Turn( r_thigh, x_axis, -0.15, 0.9*speedmult )
+		Turn( r_leg, x_axis, 0.8, 0.6*speedmult )
+		Turn( r_foot, x_axis, -0.65, 1.5*speedmult )
 		
-		Turn( r_thigh, x_axis, -1, 1.66 )
-		Turn( r_leg, x_axis, -0.4, 2 )
-		Turn( r_foot, x_axis, -0.8, 1.33 )
+		Sleep( 500/speedmult )
+        
+		Move(pelvis, y_axis, 8.2, 4*speedmult)
 		
-		Sleep( 570 )
-		Move(base, y_axis, 0, 20)
+        Turn( l_thigh, x_axis, -0.6, 1.4*speedmult )
+		Turn( l_leg, x_axis, 0.5, 1*speedmult)
+		Turn( l_foot, x_axis, 0.1, 1.4*speedmult )
+        
+		Turn( r_thigh, x_axis, -0.6, 0.9*speedmult )
+		Turn( r_leg, x_axis, -0.3, 2.2*speedmult )
+		Turn( r_foot, x_axis, 0.3, 1.9*speedmult )
 		
-		Turn( r_thigh, x_axis, -1, 0.66 )
-		Turn( r_leg, x_axis, 0.4, 2 )
-		Turn( r_foot, x_axis, 0, 1.16 )
+		Sleep( 500/speedmult )
 		
-		Sleep( 570 )
+		Move(pelvis, y_axis, 6, 4*speedmult)
 		
-		Move(base, y_axis, 3.6, 14)
+        Turn( l_thigh, x_axis, -0.15, 0.9*speedmult )
+		Turn( l_leg, x_axis, 0.8, 0.6*speedmult )
+		Turn( l_foot, x_axis, -0.65, 1.5*speedmult )
+        
+		Turn( r_thigh, x_axis, -1.3, 1.4*speedmult )
+		Turn( r_leg, x_axis, 0.4, 1.4*speedmult )
+		Turn( r_foot, x_axis, 0.8, 1*speedmult )
 		
-		Turn( l_thigh, x_axis, -1, 1.66 )
-		Turn( l_leg, x_axis, -0.4, 2 )
-		Turn( l_foot, x_axis, -0.8, 1.33 )
+		Sleep( 500/speedmult )
 		
-		Turn( r_thigh, x_axis, 0.6, 1.33 )
-		Turn( r_leg, x_axis, 0.6, 1.16 )
+		Move(pelvis, y_axis, 8.2, 4*speedmult)
+        
+        Turn( l_thigh, x_axis, -0.6, 0.9*speedmult )
+		Turn( l_leg, x_axis, -0.3, 2.2*speedmult )
+		Turn( l_foot, x_axis, 0.3, 1.9*speedmult )
+        
+        Turn( r_thigh, x_axis, -0.6, 1.4*speedmult )
+		Turn( r_leg, x_axis, 0.5, 1*speedmult)
+		Turn( r_foot, x_axis, 0.1, 1.4*speedmult )
 		
-		Sleep( 570 )
-		
-		Move(base, y_axis, 0, 210)
-		
-		Turn( l_thigh, x_axis, -1, 0.66 )
-		Turn( l_leg, x_axis, 0.4, 2 )
-		Turn( l_foot, x_axis, 0, 1.16 )
-		
-		Sleep(  570 )
+		Sleep(  500/speedmult )
 	end
 end
 
 local function StopWalk()
-	Move(base, y_axis, 0, 12)
+	Move(pelvis, y_axis, 0, 8)
 	
 	Turn( l_thigh, x_axis, 0, 2 )
 	Turn( l_leg, x_axis, 0, 2 )
