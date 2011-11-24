@@ -319,16 +319,16 @@ local options = {
     step   = 0.01,
   },
   {
-    key    = 'doesnotcountmode',
-    name   = 'DoesNotCount Mode',
-    desc   = "Does Not Count mode.",
+    key    = 'defeatmode',
+    name   = 'Defeat Mode',
+    desc   = "Method of handling defeated alliances",
     type   = 'list',
     section= 'experimental',
     def    = 'destroy',
     items = {
       { key='debug', name="Debug", desc='Does nothing.' },
-      { key='destroy', name="Destroy Alliance", desc='Destroys the alliance if they have only "doesnotcount units."' },
-      { key='losecontrol', name="Lose Control", desc='Alliance loses control of their units they have only "doesnotcount units" (not yet implemented).' },
+      { key='destroy', name="Destroy Alliance", desc='Destroys the alliance if they are defeated"' },
+      { key='losecontrol', name="Lose Control", desc='Alliance loses control of their units if they are defeated.' },
 
     },
   },

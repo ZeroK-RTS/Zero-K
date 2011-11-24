@@ -75,7 +75,7 @@ local doesNotCountList = {
 -- auto detection of doesnotcount units
 for name, ud in pairs(UnitDefs) do
 	if (ud.customParams.dontcount) then
-		doesNotCountList[ud.id] = tobool(ud.customParams.dontcount) or nil
+		doesNotCountList[ud.id] = true
 	elseif (ud.isFeature) then
 		doesNotCountList[ud.id] = true
 	elseif (not ud.canAttack) and (not ud.speed) and (not ud.isFactory) then
@@ -281,7 +281,7 @@ function gadget:Initialize()
 	gaiaTeam = Spring.GetGaiaTeamID()
 	_,_,_,_,_, gaiaAlliance = Spring.GetTeamInfo(gaiaTeam)
 	CheckAllUnits()
-	destroy_type = Spring.GetModOptions() and Spring.GetModOptions().doesnotcountmode or 'debug'
+	destroy_type = Spring.GetModOptions() and Spring.GetModOptions().defeatmode or 'debug'
 	commends = Spring.GetModOptions() and tobool(Spring.GetModOptions().commends)
     Spring.Echo("Game Over initialized")
 end
