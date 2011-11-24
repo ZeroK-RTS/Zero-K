@@ -187,7 +187,7 @@ function widget:Update(dt)
 			end
 		end
 		if (paused ~= wasPaused) then
-			--Spring.PauseSoundStream()
+			Spring.PauseSoundStream()
 			wasPaused = paused
 		end
 	end
