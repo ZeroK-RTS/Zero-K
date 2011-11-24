@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.091 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.092 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -372,6 +372,7 @@ local icon_size = 20
 local cycle = 1
 local camcycle = 1
 local trackcycle = 1
+local hideCursor = false
 
 
 local mwidth, mheight = Game.mapSizeX, Game.mapSizeZ
@@ -798,10 +799,16 @@ local function PeriodicWarning()
 		echo('<COFCam> *Periodic warning* Please disable other camera widgets: ' .. c_widgets)
 	end
 end
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:Update(dt)
+
+    if hideCursor then
+        spSetMouseCursor('%none%')
+    end
 
 	if options.follow.value then
 		camcycle = camcycle %(32*6) + 1
@@ -1158,6 +1165,8 @@ end
 function widget:DrawScreen()
 	if not cx then return end
 	
+    hideCursor = false
+    
 	local x, y
 	if smoothscroll then
 		x, y = spGetMouseState()
@@ -1201,7 +1210,7 @@ function widget:DrawScreen()
 		glAlphaTest(GL_GREATER, 0)
 		
 		if not (springscroll and not lockspringscroll) then
-		    spSetMouseCursor('none')
+		    hideCursor = true
 		end
 		if smoothscroll then
 			local icon_size2 = icon_size

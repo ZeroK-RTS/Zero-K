@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.282 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.283 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -99,6 +99,7 @@ local transkey = {
 	leftbracket 	= '[',
 	rightbracket 	= ']',
 	--delete 			= 'del',
+	comma 			= ',',
 	
 	kp_multiply		= 'numpad*',
 	kp_divide		= 'numpad/',

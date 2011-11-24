@@ -195,6 +195,13 @@ path='Settings/Mouse Cursor'
 	})
 	ShLabel('')
 	ShButton('Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.' )
+	AddOption({ 	
+		name = 'Hardware Cursor',
+		type = 'bool',
+		springsetting = 'HardwareCursor',
+		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
+	} )
+
 
 path='Settings/Video'
 	ShLabel('Lups (Lua Particle System)')
