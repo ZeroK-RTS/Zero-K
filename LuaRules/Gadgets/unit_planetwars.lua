@@ -18,10 +18,12 @@ if (not gadgetHandler:IsSyncedCode()) then
 	return
 end
 
+local spGetGroundHeight	= Spring.GetGroundHeight
+
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
-local TRANSLOCATION_MULT = 0.8		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
+local TRANSLOCATION_MULT = 0.95		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
 
 local unitData = {}
 local unitsByID = {}
@@ -96,7 +98,7 @@ local function spawnStructures(left, top, right, bottom, team)
 					giveUp = giveUp + 1
 				end
 				
-				local unitID = Spring.CreateUnit(info.unitname, x, 0, z, direction, teamID)
+				local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID)
 				Spring.SetUnitNeutral(unitID,true)
 				unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
 			end
@@ -104,10 +106,40 @@ local function spawnStructures(left, top, right, bottom, team)
 	end
 end
 
---[[
+
 function gadget:GameStart()
+	local box = {[0] = {}, [1] = {}}
+	box[0].left, box[0].top, box[0].right, box[0].bottom  = Spring.GetAllyTeamStartBox(0)
+	box[1].left, box[1].top, box[1].right, box[1].bottom = Spring.GetAllyTeamStartBox(1)
+	
+	if not (box[0].right and box[1].right) then
+		spawnStructures(0.35,0.35,0.65,0.65)
+	end
+	
+	normaliseBoxes(box[0])
+	normaliseBoxes(box[1])
+	
+	local x1,y1,x2,y2 = 0.35, 0.35, 0.65, 0.65
+	if defender then
+		local n = select(6, Spring.GetTeamInfo(defender))
+		local x1,y1,x2,y2 = box[n].left, box[n].top, box[n].right, box[n].bottom
+		--Spring.Echo(x1,x2,y1,y2)
+		local midX, midY = (x1 + x2)/2, (y1+y2)/2
+		-- displace towards middle
+		-- warning: will break with FFAs (see box var initialization above)
+		x1 = math.max(x1 + TRANSLOCATION_MULT*(0.5 - midX), 0.1)
+		y1 = math.max(y1 - TRANSLOCATION_MULT*(0.5 - midY), 0.1)
+		x2 = math.min(x2 + TRANSLOCATION_MULT*(0.5 - midX), 0.9)
+		y2 = math.min(y2 - TRANSLOCATION_MULT*(0.5 - midY), 0.9)
+		spawnStructures(x1, y1, x2, y2, defender)
+	elseif box[0].right - box[0].left >= 0.9 and box[1].right - box[1].left >= 0.9 then -- north vs south
+		spawnStructures(0.1,0.44,0.9,0.56)
+	elseif box[0].bottom - box[0].top >= 0.9 and box[1].bottom - box[1].top >= 0.9 then -- east vs west
+		spawnStructures(0.44,0.1,0.56,0.9)
+	else -- random idk boxes
+		spawnStructures(0.35,0.35,0.65,0.65)
+	end	
 end
-]]--
 
 function gadget:Initialize()
 	if Spring.GetGameFrame() > 0 then	--game has started
@@ -170,38 +202,6 @@ function gadget:Initialize()
 		if not spawningAnything then
 			gadgetHandler:RemoveGadget()
 		end
-
-		local box = {[0] = {}, [1] = {}}
-		box[0].left, box[0].top, box[0].right, box[0].bottom  = Spring.GetAllyTeamStartBox(0)
-		box[1].left, box[1].top, box[1].right, box[1].bottom = Spring.GetAllyTeamStartBox(1)
-		
-		if not (box[0].right and box[1].right) then
-			spawnStructures(0.35,0.35,0.65,0.65)
-		end
-		
-		normaliseBoxes(box[0])
-		normaliseBoxes(box[1])
-		
-		local x1,y1,x2,y2 = 0.35, 0.35, 0.65, 0.65
-		if defender then
-			local n = select(6, Spring.GetTeamInfo(defender))
-			local x1,y1,x2,y2 = box[n].left, box[n].top, box[n].right, box[n].bottom
-			Spring.Echo(x1,x2,y1,y2)
-			local midX, midY = (x1 + x2)/2, (y1+y2)/2
-			-- displace towards middle
-			-- warning: will break with FFAs (see box var initialization above)
-			x1 = math.max(x1 + TRANSLOCATION_MULT*(0.5 - midX), 0.1)
-			y1 = math.max(y1 - TRANSLOCATION_MULT*(0.5 - midY), 0.1)
-			x2 = math.min(x2 + TRANSLOCATION_MULT*(0.5 - midX), 0.9)
-			y2 = math.min(y2 - TRANSLOCATION_MULT*(0.5 - midY), 0.9)
-			spawnStructures(x1, y1, x2, y2, defender)
-		elseif box[0].right - box[0].left >= 0.9 and box[1].right - box[1].left >= 0.9 then -- north vs south
-			spawnStructures(0.1,0.44,0.9,0.56)
-		elseif box[0].bottom - box[0].top >= 0.9 and box[1].bottom - box[1].top >= 0.9 then -- east vs west
-			spawnStructures(0.44,0.1,0.56,0.9)
-		else -- random idk boxes
-			spawnStructures(0.35,0.35,0.65,0.65)
-		end	
 	end
 end
 
