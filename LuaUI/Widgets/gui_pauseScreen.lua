@@ -164,7 +164,7 @@ function widget:MousePress(x, y, button)
 			clickTimestamp = osClock()
 		end
 		
-		--hide window for the rest of the game if it was a right mouse button
+		--hide window for the rest of forever if it was a right mouse button
 		if ( button == 3 ) then
 			options.hideimage.value = true
 		end

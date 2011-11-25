@@ -52,6 +52,12 @@ local wasPaused = false
 local firstFade = true
 local initSeed = 0
 local seedInitialized = false
+
+options_path = 'Settings/Interface/Pause Screen'
+
+options = { 
+	pausemusic = {name='Pause Music', type='bool', value=false},
+}
 	
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -93,6 +99,7 @@ local function PlayNewTrack()
 	-- for key, val in pairs(oggInfo) do
 		-- Spring.Echo(key, val)	
 	-- end
+    Spring.Echo(newTrack)
 	firstFade = false
 	previousTrack = newTrack
 	
@@ -114,7 +121,6 @@ function widget:Update(dt)
 			math.randomseed(os.clock()* 100)
 			seedInitialized=true
 		end
-		local _, _, paused = Spring.GetGameSpeed()
 		timeframetimer = timeframetimer + dt
 		if (timeframetimer > 1) then	-- every second
 			timeframetimer = 0
@@ -186,7 +192,8 @@ function widget:Update(dt)
 				newTrackWait = 0
 			end
 		end
-		if (paused ~= wasPaused) then
+        local _, _, paused = Spring.GetGameSpeed()
+		if (paused ~= wasPaused) and options.pausemusic.value then
 			Spring.PauseSoundStream()
 			wasPaused = paused
 		end

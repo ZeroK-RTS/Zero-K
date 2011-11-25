@@ -37,7 +37,7 @@ local gun_1 = 0
 -- constants
 local DRAIN = 75
 local SHIELD_RADIUS = 100
-local SPEED = 1.2
+local SPEED = 1.4
 
 --signals
 local SIG_Walk = 1

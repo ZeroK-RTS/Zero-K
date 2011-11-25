@@ -100,6 +100,7 @@ local medRangeSkirmieeArray = {
 	
 	
 	["hoverriot"] = true,
+    ["shieldfelon"] = true,
 	["hoverassault"] = true,
 	
 	["cormak"] = true,
@@ -162,6 +163,7 @@ local fleeables = {
 	["capturecar"] = true,
 
 	["hoverriot"] = true, -- mumbo
+    ["shieldfelon"] = true,
 	["corsumo"] = true,
 }
 
@@ -399,6 +401,14 @@ local behaviourConfig = {
 	["corlevlr"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = {}, 
+		flees = {},
+		maxSwarmLeeway = 0, 
+		skirmLeeway = -30, 
+		stoppingDistance = 5
+	},
+    ["shieldfelon"] = {
+		skirms = riotRangeSkirmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 0, 
 		skirmLeeway = -30, 

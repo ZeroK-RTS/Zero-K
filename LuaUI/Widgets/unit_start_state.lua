@@ -14,9 +14,37 @@ function widget:GetInfo()
   }
 end
 
+local holdPosException = { 
+    ["factoryplane"] = true,
+    ["factorygunship"] = true,
+}
+local function IsGround(ud)
+    return (not (ud.canFly or ud.isBuilding or (ud.builder and not ud.canMove and not ud.isFactory) ) )
+end
+
 options_path = 'Game/Unit AI/Initial States'
-options_order = {}
-options = {}
+options_order = { 'presetlabel', 'holdPosition'}
+options = {
+	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
+    
+    holdPosition = {
+		type='button',
+		name= "Hold Position",
+		desc = "Set all land units to hold position",
+		OnChange = function ()
+            for i = 1, #options_order do
+                local opt = options_order[i]
+                local find = string.find(opt, "_movestate")
+                local name = find and string.sub(opt,0,find-1)
+                local ud = name and UnitDefNames[name]
+                if ud and not holdPosException[name] and IsGround(ud) then
+                    Spring.Echo(name .. "  " .. options[opt].value)
+                    options[opt].value = 0
+                end
+            end
+        end,
+	}
+}
 
 local tacticalAIDefs = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
 
@@ -29,14 +57,14 @@ end
 local unitAlreadyAdded = {}
 
 local function addLabel(text, path) -- doesn't work with order
-        path = (path and "Game/Unit AI/Initial States/" .. path) or "Game/Unit AI/Initial States"
-        options[text .. "_label"] = {
-                name = "label", 
-                type = 'label', 
-                value = text,
-                path = path,
-        }
-        options_order[#options_order+1] = text .. "_label"
+    path = (path and "Game/Unit AI/Initial States/" .. path) or "Game/Unit AI/Initial States"
+    options[text .. "_label"] = {
+            name = "label", 
+            type = 'label', 
+            value = text,
+            path = path,
+    }
+    options_order[#options_order+1] = text .. "_label"
 end
 
 local function addUnit(defName, path)

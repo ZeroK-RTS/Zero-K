@@ -264,11 +264,11 @@ local icontypes = {
   },
   walkerassault = {
     bitmap='icons/walkerassault.dds',
-    size=1.6,
+    size=1.7,
   },
   walkerskirm = {
     bitmap='icons/walkerskirm.dds',
-    size=1.6,
+    size=1.7,
   },
   walkerriot = {
     bitmap='icons/walkerriot.dds',
@@ -313,7 +313,7 @@ local icontypes = {
   },
   tankskirm = {
     bitmap='icons/tankskirm.dds',
-    size=2.0,
+    size=2.3,
   },
   tankriot = {
     bitmap='icons/tankriot.dds',
@@ -442,6 +442,17 @@ local icontypes = {
   jumpjetriot = {
     bitmap='icons/jumpjetriot.dds',
     size=2.4,  
+  },
+  
+  
+  -- fatbots (jumpers that don't jump)
+  fatbotarty = {
+    bitmap='icons/fatbotarty.png',
+    size=2.1,  
+  },
+  fatbotsupport = {
+    bitmap='icons/fatbotsupport.png',
+    size=1.8,  
   },
   
   --striders (aka tier 3)
