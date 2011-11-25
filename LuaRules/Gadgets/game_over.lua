@@ -147,7 +147,6 @@ local function CheckForVictory()
     end
 	if count < 2 then
 		spGameOver({lastAllyTeam})
-		gadgetHandler:RemoveGadget()
 	end
 end
 
@@ -186,6 +185,7 @@ function DestroyAlliance(allianceID)
 	end
 	CheckForVictory()
 end
+GG.DestroyAlliance = DestroyAlliance
 
 -- check for active players
 local function ProcessLastAlly()	
