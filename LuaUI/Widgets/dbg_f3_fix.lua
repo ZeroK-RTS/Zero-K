@@ -49,7 +49,7 @@ function widget:MapDrawCmd(playerID, cmdType, px, py, pz, caption)
 end
 
 function widget:AddMapPoint(player, caption, px, py, pz)
-	AddEvent(px, py, pz)
+	AddEventPos(px, py, pz)
 end
 
 function widget:Initialize()
