@@ -59,6 +59,7 @@ local veryShortRangeSkirmieeArray = {
 	["chicken"] = true,
 	["chickena"] = true,
 	["chicken_tiamat"] = true,
+	["chicken_dragon"] = true,
 }
 
 local shortRangeSkirmieeArray = {
@@ -465,7 +466,7 @@ local behaviourConfig = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 120, 
+		skirmLeeway = 60, 
 	},	
 	
 	["armrock"] = {

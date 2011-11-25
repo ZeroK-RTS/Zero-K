@@ -19,8 +19,8 @@ unitDef = {
   cantBeTransported      = true,
   category               = [[LAND]],
   collisionSphereScale   = 1,
-  collisionVolumeOffsets = [[0 0 7.5]],
-  collisionVolumeScales  = [[23 55 60]],
+  collisionVolumeOffsets = [[0 -5 -5]],
+  collisionVolumeScales  = [[30 70 70]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
 
