@@ -34,7 +34,6 @@ unitDef = {
 	helptext_de    = [[Schneller Tarnkappenbomber, der mit einem Stossspannungsgenerator zum Paralysieren großflächiger Gebiete bewaffnet ist.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 3,
@@ -42,7 +41,6 @@ unitDef = {
   iconType            = [[bomberriot]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maneuverleashlength = [[1380]],
   mass                = 238,
   maxAcc              = 0.5,
   maxDamage           = 1100,
@@ -57,10 +55,7 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
   side                = [[ARM]],
   sightDistance       = 660,
-  smoothAnim          = true,
   stealth             = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[VTOL]],
   turnRadius          = 100,
 
   weapons             = {
@@ -71,14 +66,12 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP]],
     },
 
-
     {
       def                = [[ARMBOMBLIGHTNING]],
       mainDir            = [[0 -1 0]],
       maxAngleDif        = 0,
       onlyTargetCategory = [[NONE]],
     },
-
   },
 
 
@@ -135,13 +128,10 @@ unitDef = {
       weaponVelocity          = 2250,
     },
 
-
     BOGUS_BOMB       = {
       name                    = [[Fake Bomb]],
       areaOfEffect            = 80,
-      burst                   = 2,
-      burstrate               = 5,
-      commandfire             = true,
+      commandfire             = false,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -156,16 +146,14 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       manualBombSettings      = true,
-      model                   = [[wep_b_fabby.s3o]],
-      myGravity               = 1000,
-      noSelfDamage            = true,
+      model                   = [[]],
+      myGravity               = 0.15,
       range                   = 10,
       reloadtime              = 10,
-      renderType              = 6,
       scale                   = [[0]],
       weaponType              = [[AircraftBomb]],
     },
-
+	
   },
 
 
