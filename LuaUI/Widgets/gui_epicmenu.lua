@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.283 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.284 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -668,7 +668,7 @@ local function MakeFlags()
 	local window_height = 300
 	local window_width = 170
 	window_flags = Window:New{
-		caption = 'Choose Your Location',
+		caption = 'Choose Your Location...',
 		x = settings.sub_pos_x,  
 		y = settings.sub_pos_y,  
 		clientWidth  = window_width,
@@ -1692,14 +1692,14 @@ local function MakeMenuBar()
 					-- odd-number button width keeps image centered
 					Button:New{
 						caption = "", OnMouseUp = { function() MakeSubWindow('Game') end, }, textColor=color.game_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-						padding = btn_padding, margin = btn_margin,	tooltip = 'Game Actions',
+						padding = btn_padding, margin = btn_margin,	tooltip = 'Game Actions and Settings...',
 						children = {
 							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/game.png', height=B_HEIGHT-2,width=B_HEIGHT-2},
 						},
 					},
 					Button:New{
 						caption = "", OnMouseUp = { function() MakeSubWindow('Settings') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-						padding = btn_padding, margin = btn_margin,	tooltip = 'Settings', 
+						padding = btn_padding, margin = btn_margin,	tooltip = 'General Settings...', 
 						children = {
 							Image:New{ tooltip = 'Settings', file=LUAUI_DIRNAME .. 'Images/epicmenu/settings.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
 						},
@@ -1782,9 +1782,25 @@ local function MakeMenuBar()
 						itemMargin = {0,0,0,0},
 						
 						children = {
-							lbl_gtime,
-							lbl_fps,
 							
+							lbl_fps,
+							StackPanel:New{
+								orientation = 'horizontal',
+								width = 60,
+								height = '100%',
+								resizeItems = false,
+								autoArrangeV = false,
+								autoArrangeH = false,
+								padding = {0,0,0,0},
+								itemMargin = {2,0,0,0},
+								children = {
+									Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
+									lbl_gtime,
+								},
+							},
+							
+							
+							img_flag,
 							StackPanel:New{
 								orientation = 'horizontal',
 								width = 60,
@@ -1799,20 +1815,20 @@ local function MakeMenuBar()
 									lbl_clock,
 								},
 							},
-							img_flag,							
+							
 						},
 					},
 					
 					Button:New{
 						caption = "", OnMouseUp = { function() MakeSubWindow('Help') end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-						padding = btn_padding, margin = btn_margin, tooltip = 'Help', 
+						padding = btn_padding, margin = btn_margin, tooltip = 'Help...', 
 						children = {
 							Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/questionmark.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  },
 						},
 					},
 					Button:New{
 						caption = "", OnMouseUp = { function() spSendCommands{"quitmenu"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-						padding = btn_padding, margin = btn_margin, tooltip = 'Exit the game...,',
+						padding = btn_padding, margin = btn_margin, tooltip = 'Exit the game...',
 						children = {
 							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/quit.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  }, 
 						},
@@ -2061,7 +2077,7 @@ function widget:Update()
 			lbl_fps:SetCaption( 'FPS: ' .. Spring.GetFPS() )
 		end
 		if lbl_gtime then
-			lbl_gtime:SetCaption( '[' .. GetTimeString() ..']' )
+			lbl_gtime:SetCaption( GetTimeString() )
 		end
 		if lbl_clock then
 			--local displaySeconds = true
