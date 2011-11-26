@@ -10,10 +10,11 @@ function gadget:GetInfo()
 	}
 end
 
---[[
-End game (remove units) if only 1 ally with players is left.
-This also is triggered when all others spectate.
-]]
+--------------------------------------------------------------------------------
+--	End game if only one allyteam with players AND units is left.
+--	An allyteam is counted as dead if none of
+--	its active players have units left.
+--------------------------------------------------------------------------------
 
 if (gadgetHandler:IsSyncedCode()) then
 
@@ -37,6 +38,8 @@ local spGetTeamUnits    = Spring.GetTeamUnits
 local spDestroyUnit     = Spring.DestroyUnit
 local spGetAllUnits     = Spring.GetAllUnits
 local spGetAllyTeamList = Spring.GetAllyTeamList
+local spGetPlayerInfo	= Spring.GetPlayerInfo
+local spGetPlayerList	= Spring.GetPlayerList
 local spAreTeamsAllied  = Spring.AreTeamsAllied
 local spGetUnitTeam     = Spring.GetUnitTeam
 local spGetUnitDefID    = Spring.GetUnitDefID
@@ -91,6 +94,16 @@ end
 --------------------------------------------------------------------------------
 -- local funcs
 --------------------------------------------------------------------------------
+local function CountAllianceUnits(allianceID)
+	local teamlist = spGetTeamList(allianceID) or {}
+	local count = 0
+	for i=1,#teamlist do
+		local teamID = teamlist[i]
+		count = count + (aliveCount[teamID] or 0)
+	end
+	return count
+end
+
 local function HasNoComms(allianceID)
 	for unitID in pairs(commsAlive[allianceID]) do
 		return false
@@ -100,7 +113,7 @@ end
 
 function AddAllianceUnit(u, ud, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
-	aliveCount[allianceID] = aliveCount[allianceID] + 1
+	aliveCount[teamID] = aliveCount[teamID] + 1
 	--Spring.Echo("added alliance=" .. teamID, 'count='..aliveCount[allianceID])
 	if UnitDefs[ud].isCommander then
 		commsAlive[allianceID][u] = true
@@ -109,12 +122,12 @@ end
 
 function RemoveAllianceUnit(u, ud, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
-	aliveCount[allianceID] = aliveCount[allianceID] - 1
+	aliveCount[teamID] = aliveCount[teamID] - 1
 	--Spring.Echo("removed alliance=" .. teamID, 'count='..aliveCount[allianceID]) 
 	if UnitDefs[ud].isCommander then
 		commsAlive[allianceID][u] = nil
 	end	
-	if (aliveCount[allianceID]<=0) or (commends and HasNoComms(allianceID)) then
+	if (CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) then
 		DestroyAlliance(allianceID)
 	end
 end
@@ -122,9 +135,9 @@ end
 -- used during initialization
 local function CheckAllUnits()
 	aliveCount = {}
-	for _,allianceID in ipairs(spGetAllyTeamList()) do
-		if allianceID ~= gaiaAlliance then
-			aliveCount[allianceID] = 0
+	for _,teamID in ipairs(spGetTeamList()) do
+		if teamID ~= gaiaTeam then
+			aliveCount[teamID] = 0
 		end
 	end
 	for _, unitID in ipairs(spGetAllUnits()) do
@@ -136,7 +149,7 @@ end
 
 -- if only one allyteam left, declare it the victor
 local function CheckForVictory()
-	local allylist = Spring.GetAllyTeamList()
+	local allylist = spGetAllyTeamList()
 	local count = 0
 	local lastAllyTeam
     for _,a in ipairs(allylist) do
@@ -159,14 +172,17 @@ function DestroyAlliance(allianceID)
 			Spring.Echo("Game Over: DEBUG")
 			Spring.Echo("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			Spring.Echo("Game Over: If this is true, then please resign.")
+			
 		elseif destroy_type == 'destroy' then	-- kaboom
 			local teamList = spGetTeamList(allianceID)
 			if teamList then
-				for _,t in ipairs(teamList) do
+				for i=1,#teamList do
+					local t = teamList[i]
 					local teamUnits = spGetTeamUnits(t) 
-					for _,u in ipairs(teamUnits) do
+					for j=1,#teamUnits do
+						local u = teamUnits[j]
 						if GG.pwUnitsByID and GG.pwUnitsByID[u] then
-							spTransferUnit(u, gaiaTeam, true)
+							spTransferUnit(u, gaiaTeam, true)		-- don't blow up PW buildings
 						else
 							spDestroyUnit(u, true)
 						end
@@ -174,11 +190,12 @@ function DestroyAlliance(allianceID)
 					spKillTeam(t)
 				end
 			end
+			
 		elseif destroy_type == 'losecontrol' then	-- no orders can be issued to team
 			local teamList = spGetTeamList(allianceID)
 			if teamList then
-				for _,t in ipairs(teamList) do
-					spKillTeam(t)
+				for i=1,#teamList do
+					spKillTeam(teamList[i])
 				end
 			end
 		end
@@ -192,36 +209,40 @@ local function ProcessLastAlly()
     if Spring.IsCheatingEnabled() then
 	  return
     end
-    local allylist = Spring.GetAllyTeamList()
+    local allylist = spGetAllyTeamList()
     local activeAllies = 0
     local lastActive = nil
     for _,a in ipairs(allylist) do
-      repeat
-	  if (a == gaiaAllyTeamID) then break end -- continue
-      local teamlist = Spring.GetTeamList(a)
-      if (not teamlist) then break end -- continue
-      local activeTeams = 0
-      for _,t in ipairs(teamlist) do
-        local playerlist = Spring.GetPlayerList(t, true) -- active players
-        if playerlist then
-          for _,p in ipairs(playerlist) do
-            local _,_,spec = Spring.GetPlayerInfo(p)
-            if not spec then
-              activeTeams = activeTeams + 1
-            end
-          end
-        end
-        -- count AI teams as active
-        local _,_,_,isAiTeam = Spring.GetTeamInfo(t)
-        if isAiTeam then
-          activeTeams = activeTeams + 1
-        end
-      end
-      if activeTeams > 0 then
-        activeAllies = activeAllies + 1
-        lastActive = a
-      end
-      until true
+		repeat
+		if (a == gaiaAllyTeamID) then break end -- continue
+		local teamlist = spGetTeamList(a)
+		if (not teamlist) then break end -- continue
+		local activeTeams = 0
+		for i=1,#teamlist do
+			local t = teamlist[i]
+			-- any team without units is dead to us; so only teams who are active AND have units matter
+			if (aliveCount[t] > 0) or GG.waitingForComm[t] then	
+				local playerlist = spGetPlayerList(t, true) -- active players
+				if playerlist then
+					for _,p in ipairs(playerlist) do
+						local _,_,spec = spGetPlayerInfo(p)
+						if not spec then
+							activeTeams = activeTeams + 1
+						end
+					end
+				end
+				-- count AI teams as active
+				local _,_,_,isAiTeam = spGetTeamInfo(t)
+				if isAiTeam then
+					activeTeams = activeTeams + 1
+				end
+			end
+		end
+		if activeTeams > 0 then
+			activeAllies = activeAllies + 1
+			lastActive = a
+		end
+		until true
     end -- for
 
     if activeAllies < 2 then
@@ -279,7 +300,7 @@ end
 
 function gadget:Initialize()
 	gaiaTeam = Spring.GetGaiaTeamID()
-	_,_,_,_,_, gaiaAlliance = Spring.GetTeamInfo(gaiaTeam)
+	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam)
 	CheckAllUnits()
 	destroy_type = Spring.GetModOptions() and Spring.GetModOptions().defeatmode or 'debug'
 	commends = Spring.GetModOptions() and tobool(Spring.GetModOptions().commends)
