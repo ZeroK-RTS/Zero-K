@@ -94,6 +94,7 @@ local commChoice = {}
 local customKeys = {}	-- [playerID] = {}
 
 local waitingForComm = {}
+GG.waitingForComm = waitingForComm
 
 -- overlaps with the rulesparams; not really needed
 local commSpawnedTeam = {}
