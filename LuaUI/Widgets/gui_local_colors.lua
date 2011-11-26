@@ -63,7 +63,7 @@ local function SetNewTeamColors()
 		if (allyID == myAlly) then
 			a = (a % #allyColors) + 1
 			Spring.SetTeamColor(teamID, unpack(allyColors[a]))
-		else
+		elseif (teamID ~= gaia) then
 			e = (e % #enemyColors) + 1
 			Spring.SetTeamColor(teamID, unpack(enemyColors[e]))
 		end
