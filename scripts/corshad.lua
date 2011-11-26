@@ -57,6 +57,10 @@ function script.AimWeapon(num, heading, pitch)
 	return (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
 end
 
+function script.BlockShot(num)
+	return num == 1
+end
+
 function script.FireWeapon(num)
 	if num == 2 then
 		--FakeUprightTurn(unitID, xp, zp, base, predrop)
