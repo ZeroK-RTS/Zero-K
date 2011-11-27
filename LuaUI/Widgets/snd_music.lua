@@ -99,7 +99,6 @@ local function PlayNewTrack()
 	-- for key, val in pairs(oggInfo) do
 		-- Spring.Echo(key, val)	
 	-- end
-    Spring.Echo(newTrack)
 	firstFade = false
 	previousTrack = newTrack
 	
