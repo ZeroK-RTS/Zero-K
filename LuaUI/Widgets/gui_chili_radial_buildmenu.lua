@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Radial Build Menu",
-    desc      = "v0.092 Radial Build Menu",
+    desc      = "v0.093 Radial Build Menu",
     author    = "CarRepairer",
     date      = "2010-09-15",
     license   = "GNU GPL, v2 or later",
@@ -326,8 +326,7 @@ end
 
 local function BuildPrev()
 	if last_cmdid then
-		--(cmdid, _, left, right, alt, ctrl, meta, shift)
-		Spring.SetActiveCommand(last_cmdid, _, true)
+		Spring.SetActiveCommand(last_cmdid)
 	end
 end
 

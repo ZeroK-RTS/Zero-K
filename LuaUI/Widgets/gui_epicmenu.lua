@@ -100,6 +100,8 @@ local transkey = {
 	rightbracket 	= ']',
 	--delete 			= 'del',
 	comma 			= ',',
+	period 			= '.',
+	slash 			= '/',
 	
 	kp_multiply		= 'numpad*',
 	kp_divide		= 'numpad/',
