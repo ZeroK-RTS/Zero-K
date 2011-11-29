@@ -166,37 +166,32 @@ end
 -- purge the alliance!
 function DestroyAlliance(allianceID)
 	if not destroyedAlliances[allianceID] then
-		Spring.Echo("Game Over: Destroying alliance " .. allianceID)
 		destroyedAlliances[allianceID] = true
+		local teamList = spGetTeamList(allianceID)
+		if teamList == nil then return end	-- empty allyteam, don't bother
+		Spring.Echo("Game Over: Destroying alliance " .. allianceID)
+		
 		if destroy_type == 'debug' then
 			Spring.Echo("Game Over: DEBUG")
 			Spring.Echo("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			Spring.Echo("Game Over: If this is true, then please resign.")
-			
 		elseif destroy_type == 'destroy' then	-- kaboom
-			local teamList = spGetTeamList(allianceID)
-			if teamList then
-				for i=1,#teamList do
-					local t = teamList[i]
-					local teamUnits = spGetTeamUnits(t) 
-					for j=1,#teamUnits do
-						local u = teamUnits[j]
-						if GG.pwUnitsByID and GG.pwUnitsByID[u] then
-							spTransferUnit(u, gaiaTeam, true)		-- don't blow up PW buildings
-						else
-							spDestroyUnit(u, true)
-						end
+			for i=1,#teamList do
+				local t = teamList[i]
+				local teamUnits = spGetTeamUnits(t) 
+				for j=1,#teamUnits do
+					local u = teamUnits[j]
+					if GG.pwUnitsByID and GG.pwUnitsByID[u] then
+						spTransferUnit(u, gaiaTeam, true)		-- don't blow up PW buildings
+					else
+						spDestroyUnit(u, true)
 					end
-					spKillTeam(t)
 				end
+				spKillTeam(t)
 			end
-			
 		elseif destroy_type == 'losecontrol' then	-- no orders can be issued to team
-			local teamList = spGetTeamList(allianceID)
-			if teamList then
-				for i=1,#teamList do
-					spKillTeam(teamList[i])
-				end
+			for i=1,#teamList do
+				spKillTeam(teamList[i])
 			end
 		end
 	end
@@ -221,11 +216,11 @@ local function ProcessLastAlly()
 		for i=1,#teamlist do
 			local t = teamlist[i]
 			-- any team without units is dead to us; so only teams who are active AND have units matter
-			if (aliveCount[t] > 0) or GG.waitingForComm[t] then	
+			if (aliveCount[t] > 0) or (GG.waitingForComm or {})[t] then	
 				local playerlist = spGetPlayerList(t, true) -- active players
 				if playerlist then
-					for _,p in ipairs(playerlist) do
-						local _,_,spec = spGetPlayerInfo(p)
+					for j=1,#playerlist do
+						local _,_,spec = spGetPlayerInfo(playerlist[j])
 						if not spec then
 							activeTeams = activeTeams + 1
 						end
@@ -247,7 +242,8 @@ local function ProcessLastAlly()
 
     if activeAllies < 2 then
       -- remove every unit except for last active alliance
-      for _,a in ipairs(allylist) do
+      for i=1, #allylist do
+		local a = allylist[i]
         if (a ~= lastActive)and(a ~= gaiaAllyTeamID) then
 			DestroyAlliance(a)
         end
