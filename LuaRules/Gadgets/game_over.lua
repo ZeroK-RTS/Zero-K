@@ -220,8 +220,8 @@ local function ProcessLastAlly()
 				local playerlist = spGetPlayerList(t, true) -- active players
 				if playerlist then
 					for j=1,#playerlist do
-						local _,_,spec = spGetPlayerInfo(playerlist[j])
-						if not spec then
+						local _,active,spec = spGetPlayerInfo(playerlist[j])
+						if active and not spec then
 							activeTeams = activeTeams + 1
 						end
 					end
