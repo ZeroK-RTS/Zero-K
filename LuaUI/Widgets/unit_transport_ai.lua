@@ -71,7 +71,7 @@ options = {
 
 function IsTransport(unitDefID) 
   ud = UnitDefs[unitDefID]
-  return (ud ~= nil and ud.isTransport and ud.canFly)
+  return (ud ~= nil and (ud.transportCapacity >= 1) and ud.canFly)
 end
 
 function IsTransportable(unitDefID)  
@@ -179,7 +179,9 @@ function widget:Initialize()
 
 
   for _, unitID in ipairs(GetTeamUnits(teamID)) do  -- init existing transports
-    AddTransport(unitID, GetUnitDefID(unitID))
+	if AddTransport(unitID, GetUnitDefID(unitID)) then
+       AssignTransports(unitID, 0)
+    end
   end
 end
 
@@ -241,7 +243,7 @@ end
 function AddTransport(unitID, unitDefID) 
   if (IsTransport(unitDefID)) then -- and IsIdle(unitID)
     idleTransports[unitID] = unitDefID
---    Echo ("transport added " .. unitID)
+    Echo ("transport added " .. unitID)
     return true
   end
   return false
