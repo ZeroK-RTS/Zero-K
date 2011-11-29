@@ -243,7 +243,7 @@ end
 function AddTransport(unitID, unitDefID) 
   if (IsTransport(unitDefID)) then -- and IsIdle(unitID)
     idleTransports[unitID] = unitDefID
-    Echo ("transport added " .. unitID)
+    --Echo ("transport added " .. unitID)
     return true
   end
   return false
