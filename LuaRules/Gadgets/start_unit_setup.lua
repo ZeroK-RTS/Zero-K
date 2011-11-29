@@ -432,7 +432,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   ]]--
   if ((coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
   or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1))
-  and not bonusSpawn then 
+  and not bonusSpawn then
 	return 
   end
  
@@ -702,7 +702,11 @@ function gadget:GameStart()
 	
 
     if team ~= gaiateam then
-	  waitingForComm[team] = true
+	  local luaAI = Spring.GetTeamLuaAI(team)
+	  if luaAI and string.find(string.lower(luaAI), "chicken") then
+	  else
+		waitingForComm[team] = true
+	  end
       if coop then
         -- 1 start unit per player
         local playerlist = Spring.GetPlayerList(team, true)
