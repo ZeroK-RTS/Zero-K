@@ -211,6 +211,7 @@ local function ProcessLastAlly()
     for _,a in ipairs(allylist) do
 		repeat
 		if (a == gaiaAllyTeamID) then break end -- continue
+		if (destroyedAlliances[a]) then break end -- continue
 		local teamlist = spGetTeamList(a)
 		if (not teamlist) then break end -- continue
 		local activeTeams = 0
