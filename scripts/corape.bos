@@ -33,69 +33,27 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 	}
 }
 
-Go()
-{
-	turn winga to z-axis <-90> speed <120>;
-	turn wingb to z-axis <90> speed <120>;
-}
-
-Stop()
-{
-	turn winga to z-axis <0> speed <120>;
-	turn wingb to z-axis <0> speed <120>;
-}
-
-InitState()
-{
-	statechg_DesiredState = TRUE;
-	statechg_StateChanging = FALSE;
-}
-
-RequestState(requestedstate, currentstate)
-{
-	if( statechg_StateChanging )
-	{
-		statechg_DesiredState = requestedstate;
-		return (0);
-	}
-	statechg_StateChanging = TRUE;
-	currentstate = statechg_DesiredState;
-	statechg_DesiredState = requestedstate;
-	while( statechg_DesiredState != currentstate )
-	{
-		if( statechg_DesiredState == 0 )
-		{
-			call-script Go();
-			currentstate = 0;
-		}
-		if( statechg_DesiredState == 1 )
-		{
-			call-script Stop();
-			currentstate = 1;
-		}
-	}
-	statechg_StateChanging = FALSE;
-}
-
 Create()
 {
 	hide flare1;
 	hide flare2;
 	hide muzzle1;
 	hide muzzle2;
-	gun_1 = flare1;
-	call-script InitState();
+	gun_1 = 0;
 	start-script SmokeUnit();
+	turn flare2 to y-axis <180> now;	// because some person of questionable parentage made it point the other way in model
 }
 
 Activate()
 {
-	start-script RequestState(0);
+	turn winga to z-axis <-90> speed <120>;
+	turn wingb to z-axis <90> speed <120>;
 }
 
 Deactivate()
 {
-	start-script RequestState(1);
+	turn winga to z-axis <0> speed <120>;
+	turn wingb to z-axis <0> speed <120>;
 }
 
 QueryPrimary(piecenum)
@@ -121,20 +79,13 @@ Shot1()
 	{
 		emit-sfx 1024 from muzzle1;
 		sleep 150;
-		gun_1 = flare2;
-		return (0);
 	}
-	if( gun_1 == 1 )
+	else if( gun_1 == 1 )
 	{
 		emit-sfx 1024 from muzzle2;
 		sleep 150;
-		gun_1 = flare1;
 	}
-}
-
-SweetSpot(piecenum)
-{
-	piecenum = base;
+	gun_1 = 1 - gun_1;
 }
 
 Killed(severity, corpsetype)
