@@ -152,8 +152,9 @@ local function CheckForVictory()
 	local allylist = spGetAllyTeamList()
 	local count = 0
 	local lastAllyTeam
-    for _,a in ipairs(allylist) do
+    for _,a in pairs(allylist) do
 		if not destroyedAlliances[a] and (a ~= gaiaAllyTeamID) then
+			Spring.Echo("Alliance " .. a .. " remains in the running")
 			count = count + 1
 			lastAllyTeam = a
 		end
@@ -231,6 +232,11 @@ local function ProcessLastAlly()
 				if isAiTeam then
 					activeTeams = activeTeams + 1
 				end
+			end
+			-- chicken is alive even without units
+			local luaAI = Spring.GetTeamLuaAI(t)
+			if luaAI and string.find(string.lower(luaAI), "chicken") then
+				activeTeams = activeTeams + 1
 			end
 		end
 		if activeTeams > 0 then
@@ -313,6 +319,7 @@ end
 
 function gadget:GameOver()
 	Spring.Echo("GAME OVER!!")
+	gadgetHandler:RemoveGadget()
 end
 
 else -- UNSYNCED

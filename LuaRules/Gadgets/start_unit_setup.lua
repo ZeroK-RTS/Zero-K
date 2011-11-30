@@ -370,8 +370,8 @@ local function GetStartUnit(teamID, playerID, isAI)
   end
   
   -- hack workaround for chicken
-  local luaAI = Spring.GetTeamLuaAI(teamID)
-  if luaAI and string.find(string.lower(luaAI), "chicken") then startUnit = nil end
+  --local luaAI = Spring.GetTeamLuaAI(teamID)
+  --if luaAI and string.find(string.lower(luaAI), "chicken") then startUnit = nil end
   
   --if didn't pick a comm, wait for user to pick
   return startUnit or nil	-- startUnit or DEFAULT_UNIT

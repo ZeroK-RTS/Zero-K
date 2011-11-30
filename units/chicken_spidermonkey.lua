@@ -72,6 +72,7 @@ unitDef = {
   weapons             = {
     {
       def                = [[WEB]],
+	  badTargetCategory	 = [[UNARMED]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
 	  mainDir            = [[0 0 1]],
       maxAngleDif        = 180,	  

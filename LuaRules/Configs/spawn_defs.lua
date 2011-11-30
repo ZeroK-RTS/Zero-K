@@ -2,10 +2,6 @@
 --------------------------------------------------------------------------------
 local modoptions = Spring.GetModOptions() or {}
 
-local hardModifier   = 0.875
-local suicidalModifier = 0.75
-local customModifier = modoptions.techtimemult or 1
-
 local eggsModifier = 0.8	--unused
 alwaysEggs = true			--spawn limited-lifespan eggs when not in Eggs mode?
 eggDecayTime = 180
@@ -99,6 +95,7 @@ modes = {
     [9] = 'Chicken Eggs: Suicidal',
 	[10] = 'Chicken: Custom',
 	[11] = 'Chicken Eggs: Custom',
+	[12] = 'Chicken: Speed'
 }
 defaultDifficulty = modes[2]
 testBuilding 	= UnitDefNames["armestor"].id	--testing to place burrow
@@ -228,6 +225,7 @@ difficulties = {
 	miniQueenTime	 = {0.5},
 	techAccelPerPlayer	= 7.5,
 	scoreMult		 = 1.25,
+	timeModifier	 = 0.8,
   },
   
   ['Chicken: Suicidal'] = {
@@ -246,6 +244,7 @@ difficulties = {
 	miniQueenTime	 = {0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
 	techAccelPerPlayer	= 10,
+	timeModifier	 = 0.66,
 	scoreMult		 = 2,
   },
 
@@ -261,8 +260,30 @@ difficulties = {
 	gracePenalty	= 0,
 	gracePeriodMin	= 30,
 	burrowQueenTime	= (modoptions.burrowqueentime and modoptions.burrowqueentime) or 30,
+	timeModifier	= modoptions.techtimemult or 1,
 	scoreMult		= 0,
   },
+  
+  ['Chicken: Speed'] = {
+    chickenSpawnRate = 50, 
+    burrowSpawnRate  = 45,  
+	waveSizeMult	 = 0.85,	
+	gracePeriod		 = 90,
+	gracePenalty	 = 10,
+	gracePeriodMin	 = 20,
+	burrowRespawnChance	= 0,
+	queenTime		 = 20*60,
+	queenHealthMod	 = 0.2,
+	miniQueenTime	 = {},
+	endMiniQueenWaves	= 6,
+	techAccelPerPlayer	= 0,
+	humanAggroQueenTimeFactor	= 0.35,
+	humanAggroTechTimeProgress	= 7,
+	burrowRegressTime	= 20,
+	queenSpawnMult	 = 2.5, 
+	timeModifier	 = 0.35,
+	scoreMult		 = 0,
+  },  
 }
 
 -- minutes to seconds
@@ -284,25 +305,16 @@ end
 ]]--
 
 for _, d in pairs(difficulties) do
-  d.timeSpawnBonus = d.timeSpawnBonus/60
+  d.timeSpawnBonus = (d.timeSpawnBonus or 0)/60
   d.chickenTypes = Copy(chickenTypes)
   d.defenders = Copy(defenders)
   d.supporters = Copy(supporters)
   d.specialPowers = d.specialPowers or Copy(specialPowers)
+  
+  TimeModifier(d.chickenTypes, d.timeModifier or 1)
+  TimeModifier(d.defenders, d.timeModifier or 1)
+  TimeModifier(d.supporters, d.timeModifier or 1)
 end
-
-TimeModifier(difficulties['Chicken: Hard'].chickenTypes, hardModifier)
-TimeModifier(difficulties['Chicken: Hard'].defenders,    hardModifier)
-TimeModifier(difficulties['Chicken: Hard'].supporters,    hardModifier)
-TimeModifier(difficulties['Chicken: Hard'].specialPowers,    hardModifier)
-TimeModifier(difficulties['Chicken: Suicidal'].chickenTypes, suicidalModifier)
-TimeModifier(difficulties['Chicken: Suicidal'].defenders,    suicidalModifier)
-TimeModifier(difficulties['Chicken: Suicidal'].supporters,    suicidalModifier)
-TimeModifier(difficulties['Chicken: Suicidal'].specialPowers,    suicidalModifier)
-TimeModifier(difficulties['Chicken: Custom'].chickenTypes, customModifier)
-TimeModifier(difficulties['Chicken: Custom'].defenders,    customModifier)
-TimeModifier(difficulties['Chicken: Custom'].supporters,    customModifier)
-TimeModifier(difficulties['Chicken: Custom'].specialPowers,    customModifier)
 
 difficulties['Chicken Eggs: Very Easy']   = Copy(difficulties['Chicken: Very Easy'])
 difficulties['Chicken Eggs: Easy']   = Copy(difficulties['Chicken: Easy'])

@@ -59,6 +59,10 @@ return {
     name = 'Chicken Eggs: Custom',
     desc = 'A chicken experience customizable using modoptions WITH EGGS!'
   },
+  {
+	name = 'Chicken: Speed',
+	desc = 'High speed chicken! (20 minutes) (intended for testing)'
+  }
 }
 
 

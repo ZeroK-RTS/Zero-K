@@ -167,7 +167,7 @@ if (not gameMode) then -- set human and computer teams
 else
   local teams = Spring.GetTeamList()
   local highestLevel = 0
-  for _, teamID in ipairs(teams) do
+  for _, teamID in pairs(teams) do
     local teamLuaAI = Spring.GetTeamLuaAI(teamID)
     -- check only for chicken AI teams
     if (teamLuaAI and teamLuaAI ~= "" and modes[teamLuaAI]) then
@@ -373,10 +373,10 @@ end
 local function KillAllComputerUnits()
   victory = true
   for teamID in pairs(computerTeams) do
-    local teamUnits = spGetTeamUnits(teamID)
-    for i=1,#teamUnits do
-      Spring.DestroyUnit(teamUnits[i])
-    end
+    --local teamUnits = spGetTeamUnits(teamID)
+    --for i=1,#teamUnits do
+    --  Spring.DestroyUnit(teamUnits[i])
+    --end
 	local allyTeam = select(6, Spring.GetTeamInfo(teamID))
 	GG.DestroyAlliance(allyTeam)
   end
