@@ -138,6 +138,11 @@ merge(medRangeSkirmieeArray,riotRangeSkirmieeArray)
 merge(longRangeSkirmieeArray,medRangeSkirmieeArray)
 merge(artyRangeSkirmieeArray,longRangeSkirmieeArray)
 
+-- Stuff that mobile AA skirms
+
+local skirmableAir = {
+	["corcrw"] = true,
+}
 
 -- Things that are fled by some things
 
@@ -606,52 +611,58 @@ local behaviourConfig = {
 
 	-- mobile AA
 	["armjeth"] = {
-		skirms = {}, 
+		skirms = skirmableAir, 
 		swarms = {}, 
 		flees = armedLand,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
+        skirmLeeway = 50, 
 	},
 	["corcrash"] = {
-		skirms = {}, 
+		skirms = skirmableAir, 
 		swarms = {}, 
 		flees = armedLand,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
+        skirmLeeway = 50, 
 	},
 	["armaak"] = {
-		skirms = {}, 
+		skirms = skirmableAir, 
 		swarms = {}, 
 		flees = armedLand,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
+        skirmLeeway = 50, 
 	},
 	["hoveraa"] = {
-		skirms = {}, 
+		skirms = skirmableAir, 
 		swarms = {}, 
 		flees = armedLand,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
+        skirmLeeway = 50, 
 	},
 	["spideraa"] = {
-		skirms = {}, 
+		skirms = skirmableAir, 
 		swarms = {}, 
 		flees = armedLand,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
+        skirmLeeway = 50, 
 	},
 	["corsent"] = {
-		skirms = {}, 
+		skirms = skirmableAir, 
 		swarms = {}, 
 		flees = armedLand,
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
+        skirmLeeway = 50, 
 	},
 }
 
