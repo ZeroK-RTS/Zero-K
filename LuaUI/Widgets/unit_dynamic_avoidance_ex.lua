@@ -1,4 +1,4 @@
-local versionName = "v1.50"
+local versionName = "v1.51"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -58,12 +58,13 @@ local activateImpatienceG=0 --auto disable auto-reverse and half the distanceCON
 
 -- Graph constant:
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
-local safetyMarginCONSTANTunitG = 0.0 --obstacle graph offset (a "safety margin" constant). Offset the obstacle effect -avoid torward more left or right (default = 0.0 radian)
-local smCONSTANTunitG		= 0.0  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect -avoid torward more left or right (default = 0.0 radian)
-local aCONSTANTg			= math.pi/4 -- attractor graph; scale the attractor's strenght. Less equal to a lesser attraction(default = math.pi/4 radian, max math.pi/2)
-local obsCONSTANTg			= math.pi/4 -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser avoidance(default = math.pi/4 radian)
+local safetyMarginCONSTANTunitG = 0.0 --obstacle graph offset (a "safety margin" constant). Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.0 radian)
+local smCONSTANTunitG		= 0.0  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.0 radian)
+local aCONSTANTg			= math.pi/10 -- attractor graph; scale the attractor's strenght. Less equal to a lesser attraction(default = math.pi/10 radian, max math.pi/2)
+local obsCONSTANTg			= math.pi/10 -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser avoidance(default = math.pi/10 radian)
 --aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction.
 --an antagonist to aCONSTANg (obsCONSTANTg) Note: obstacle graph also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy.
+local windowingFuncMultG = 1 --?
 
 -- Obstacle/Target competetive interaction constant:
 local cCONSTANT1g 			= 2 --attractor constant; effect the behaviour. ie: the selection between 4 behaviour state. (default = 2 multiplier)
@@ -89,6 +90,7 @@ local noiseAngleG =math.pi/36 --(default is pi/36 rad); add random angle (range 
 local collisionAngleG=math.pi/12 --(default is pi/6 rad) a "field of vision" (range from 0 to +-math.pi/6) where auto-reverse will activate 
 local fleeingAngleG=math.pi/4 --(default is pi/4 rad) angle of enemy (range from 0 to +-math.pi/4) where fleeing enemy is considered. Set to 0 to de-activate.
 --pi is 180 degrees
+local maximumTurnAngleG = math.pi/2 --safety measure. Prevent overturn (eg: 360+xx degree turn)
 
 --Network constant:
 local gps_then_DoCalculation_delayG = 0.4
@@ -105,7 +107,7 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 local surroundingOfActiveUnitG={} --store value for transfer between function. Store obstacle separation, los, and ect.
 local cycleG=1 --first execute "GetPreliminarySeparation()"
 local wreckageID_offset=0
-local roundTripComplete= true --to detect network lag, prevent messy overlapping command queuing
+local roundTripComplete= true --variable for detecting network lag, prevent messy overlapping command queuing
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
@@ -982,7 +984,7 @@ end
 function GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, separationDistance, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT)
 	local differenceInAngle = unitDirection-relativeAngle
 	local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle))
-	local hI = 4/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
+	local hI = windowingFuncMultG/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
 	local wI = obsCONSTANTg* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
 	local dI = math.exp(-1*separationDistance/distanceCONSTANT) --distance multiplier
 	return rI, wI, dI
@@ -1022,9 +1024,9 @@ end
 --
 function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum)
 	local unitAngleDerived= math.abs(wTarget)*fTarget + math.abs(wObstacle)*fObstacleSum + (noiseAngleG)*(GaussianNoise()*2-1) --add wavefunction 
-	if math.abs(unitAngleDerived) > math.pi/2 then --to prevent excess in avoidance causing overflow in angle changes (maximum angle should be pi, but useful angle should be pi/2 eg: 90 degree)
+	if math.abs(unitAngleDerived) > maximumTurnAngleG then --to prevent excess in avoidance causing overflow in angle changes (maximum angle should be pi, but useful angle should be pi/2 eg: 90 degree)
 		--Spring.Echo("Dynamic Avoidance warning: total angle changes excess")
-		unitAngleDerived = Sgn(unitAngleDerived)*math.pi/2 end
+		unitAngleDerived = Sgn(unitAngleDerived)*maximumTurnAngleG end
 	local newUnitAngleDerived= unitDirection +unitAngleDerived --add derived angle into current unit direction plus some noise
 	if (turnOnEcho == 1) then 
 		Spring.Echo("fTarget (getNewAngle)" .. fTarget)
