@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.093 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.100 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -34,6 +34,7 @@ options_order = {
 	'rotateonedge', 
 	'rotfactor',
     'inverttilt',
+    'groundrot',
 	
 	'lblScroll',
 	'edgemove', 
@@ -41,6 +42,7 @@ options_order = {
 	'speedFactor', 
 	'speedFactor_k', 
 	'invertscroll', 
+	'smoothmeshscroll', 
 	
 	'lblZoom',
 	'invertzoom', 
@@ -100,6 +102,13 @@ options = {
 		type = 'bool',
 		value = true,
 	},
+	smoothmeshscroll = {
+		name = 'Smooth Mesh Scrolling',
+		desc = 'A smoother way to scroll. Applies to all types of mouse/keyboard scrolling.',
+		type = 'bool',
+		value = false,
+	},
+	
 	targetmouse = {
 		name = 'Rotate world origin at cursor',
 		desc = 'Rotate world using origin at the cursor rather than the center of screen.',
@@ -270,6 +279,13 @@ options = {
 		desc = "Reset the camera position and orientation. Map a hotkey or use <Ctrl> + <Alt> + <Shift> + <Middleclick>",
 		type = 'button',
         -- OnChange defined later
+	},
+	
+	groundrot = {
+		name = "Rotate When Camera Hits Ground",
+		desc = "If world-rotation motion causes the camera to hit the ground, camera-rotation motion takes over. Doesn't apply in Free Mode.",
+		type = 'bool',
+		value = false,
 	},
 	
 }
@@ -459,6 +475,9 @@ local function VirtTraceRay(x,y, cs)
 	
 	if gpos then
 		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
+		
+		--gy = Spring.GetSmoothMeshHeight (gx,gz)
+		
 		if gx < 0 or gx > mwidth or gz < 0 or gz > mheight then
 			return false, gx, gy, gz	
 		else
@@ -472,6 +491,7 @@ local function VirtTraceRay(x,y, cs)
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz
 	
+	--gy = Spring.GetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
 end
 
@@ -513,8 +533,16 @@ local function UpdateCam(cs)
 	cs.py = ls_y - opp
 	cs.pz = ls_z - cos(cs.ry) * alt
 	
-	if not options.freemode.value and cs.py < Spring.GetGroundHeight(cs.px, cs.pz)+5 then
-		return false
+	if not options.freemode.value then
+		local gndheight = Spring.GetGroundHeight(cs.px, cs.pz)+5
+		--gndheight = Spring.GetSmoothMeshHeight(cs.px, cs.pz)+5
+		if cs.py < gndheight then
+			if options.groundrot.value then
+				cs.py = gndheight
+			else
+				return false
+			end
+		end
 	end
 	
 	return cs
@@ -770,7 +798,12 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	ls_z = math.min(ls_z, mheight-3)
 	ls_z = math.max(ls_z, 3)
 	
-	ls_y = Spring.GetGroundHeight(ls_x, ls_z) or 0
+	if options.smoothmeshscroll.value then
+		ls_y = Spring.GetSmoothMeshHeight(ls_x, ls_z) or 0
+	else
+		ls_y = Spring.GetGroundHeight(ls_x, ls_z) or 0
+	end
+	
 	
 	local csnew = UpdateCam(cs)
 	if csnew then
