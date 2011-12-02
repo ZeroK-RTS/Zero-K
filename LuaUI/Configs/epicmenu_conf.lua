@@ -162,6 +162,7 @@ path='Settings/Interface/Interface Skin'
 		items = {
 			{ key = 'Robocracy', name = 'Robocracy', },
 			{ key = 'Carbon', name = 'Carbon', },
+			{ key = 'DarkHive', name = 'DarkHive', },
 		},
 	})
 	
