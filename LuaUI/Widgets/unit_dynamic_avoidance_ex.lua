@@ -717,7 +717,6 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			foundMatch=true
 			wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
 		else --if not own unit or trees or rock then
-		Spring.Echo (cQueue[queueIndex].params[1])
 			targetFeatureID=cQueue[queueIndex].params[1]+wreckageID_offset_multiplier-wreckageID_offset --remove the inherent offset
 			while iterativeTest<=3 and not foundMatch do --do test of reclaim wreckage (wreckage ID depend on number of players)
 				if Spring.ValidFeatureID(targetFeatureID) then
