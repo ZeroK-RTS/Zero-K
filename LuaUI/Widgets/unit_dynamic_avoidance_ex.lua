@@ -1,4 +1,4 @@
-local versionName = "v1.51"
+local versionName = "v1.53"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Nov 23, 2011",
+    date      = "Dec 3, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -64,7 +64,7 @@ local aCONSTANTg			= math.pi/10 -- attractor graph; scale the attractor's streng
 local obsCONSTANTg			= math.pi/10 -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser avoidance(default = math.pi/10 radian)
 --aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction.
 --an antagonist to aCONSTANg (obsCONSTANTg) Note: obstacle graph also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy.
-local windowingFuncMultG = 1 --?
+local windowingFuncMultG = 1 --? (default = 1 multiplier)
 
 -- Obstacle/Target competetive interaction constant:
 local cCONSTANT1g 			= 2 --attractor constant; effect the behaviour. ie: the selection between 4 behaviour state. (default = 2 multiplier)
@@ -89,12 +89,16 @@ local dummyIDg = "248" --fake id for Lua Message to check lag (prevent processin
 local noiseAngleG =math.pi/36 --(default is pi/36 rad); add random angle (range from 0 to +-math.pi/36) to the new angle. To prevent a rare state that contribute to unit going straight toward enemy
 local collisionAngleG=math.pi/12 --(default is pi/6 rad) a "field of vision" (range from 0 to +-math.pi/6) where auto-reverse will activate 
 local fleeingAngleG=math.pi/4 --(default is pi/4 rad) angle of enemy (range from 0 to +-math.pi/4) where fleeing enemy is considered. Set to 0 to de-activate.
---pi is 180 degrees
 local maximumTurnAngleG = math.pi/2 --safety measure. Prevent overturn (eg: 360+xx degree turn)
+--pi is 180 degrees
 
 --Network constant:
 local gps_then_DoCalculation_delayG = 0.4
 local doCalculation_then_gps_delayG = 0.1
+
+--Engine based correction constant:
+local wreckageID_offset_multiplier = 0
+local wreckageID_offset_initial = 32000
 
 --------------------------------------------------------------------------------
 --Variables:
@@ -125,7 +129,7 @@ function widget:Initialize()
 		local _,_,spectator,_,_,_,_,_,_=spGetPlayerInfo(playerIDList[i])
 		if spectator then numberOfPlayers=numberOfPlayers-1 end
 	end
-	wreckageID_offset=4500+ (numberOfPlayers-2)*1500
+	wreckageID_offset=wreckageID_offset_initial+ (numberOfPlayers-2)*wreckageID_offset_multiplier
 	if (turnOnEcho == 1) then Spring.Echo("myTeamID(Initialize)" .. myTeamID) end
 end
 
@@ -138,7 +142,7 @@ function widget:PlayerChanged(playerID)
 		local _,_,spectator,_,_,_,_,_,_=spGetPlayerInfo(playerIDList[i])
 		if spectator then numberOfPlayers=numberOfPlayers-1 end
 	end
-	wreckageID_offset=4500+ (numberOfPlayers-2)*1500
+	wreckageID_offset=wreckageID_offset_initial+ (numberOfPlayers-2)*wreckageID_offset_multiplier
 end
 
 --execute different function at different timescale
@@ -209,16 +213,16 @@ function RefreshUnitList()
 	local metaForVisibleUnits = {}
 	local visibleUnits=spGetVisibleUnits(myTeamID)
 	for _, unitID in ipairs(visibleUnits) do --memorize units that is in view of camera
-		metaForVisibleUnits[unitID]="yes"
+		metaForVisibleUnits[unitID]="yes" --set "yes" for visible unit (in view) and by default set "nil" for non visible unit
 	end
 	for _, unitID in ipairs(allMyUnits) do
 		if unitID~=nil then --skip end of the table
 			local unitDefID = spGetUnitDefID(unitID)
 			local unitDef = UnitDefs[unitDefID]
 			local unitSpeed =unitDef["speed"]
-			local unitInView = metaForVisibleUnits[unitID]
+			local unitInView = metaForVisibleUnits[unitID] --transfer "yes" or "nil" from meta table into a local variable
 			if (unitSpeed>0) then 
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef["isCommander"] then --include only cloakies and constructor
+				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef["isCommander"] then --only include only cloakies and constructor
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView}
 				elseif not unitDef["canFly"] then --if enabled: include all ground unit
@@ -467,6 +471,12 @@ end
 --return a table of surrounding enemy
 function GetAllUnitsInRectangle(unitID, losRadius)
 	local x,y,z = spGetUnitPosition(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
+	local unitDef = UnitDefs[unitDefID]
+	local iAmConstructor = unitDef["builder"]
+	local unitState = spGetUnitStates(unitID)
+	local iAmNotCloaked = not unitState["cloak"]
+	
 	if (turnOnEcho == 1) then
 		Spring.Echo("spGetUnitIsDead(unitID)==false (GetAllUnitsInRectangle):")
 		Spring.Echo(spGetUnitIsDead(unitID)==false)
@@ -479,9 +489,18 @@ function GetAllUnitsInRectangle(unitID, losRadius)
 		local isAlly= spIsUnitAllied(rectangleUnitID)
 		if (rectangleUnitID ~= unitID) and not isAlly then--filter out ally units and self
 			local rectangleUnitTeamID = spGetUnitTeam(rectangleUnitID)
-			if (rectangleUnitTeamID ~= gaiaTeamID) then
-				arrayIndex=arrayIndex+1
-				relevantUnit[arrayIndex]=rectangleUnitID
+			if (rectangleUnitTeamID ~= gaiaTeamID) then --filter out gaia (non aligned unit)
+				local recUnitDefID = spGetUnitDefID(rectangleUnitID)
+				if recUnitDefID~=nil and (iAmConstructor and iAmNotCloaked) then --if the enemy is in plain sight and I am not the cloakies that need to avoid everything: then do the following check before registering enemy
+					local recUnitDef = UnitDefs[recUnitDefID]
+					if recUnitDef["weapons"][1]~=nil then -- if enemy has weapons: then register enemy
+						arrayIndex=arrayIndex+1
+						relevantUnit[arrayIndex]=rectangleUnitID
+					end
+				else --if enemy is only unidentified radar blip: then register enemy
+					arrayIndex=arrayIndex+1
+					relevantUnit[arrayIndex]=rectangleUnitID
+				end
 			end
 		end
 	end
@@ -684,7 +703,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetY"]=cQueue[queueIndex].params[2]
 		commandIndexTable[unitID]["backupTargetZ"]=cQueue[queueIndex].params[3]
 		boxSizeTrigger=1
-	elseif cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125 then
+	elseif cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125 then --reclaim or ressurect
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 		-- Spring.Echo(a[queueIndex]["name"])
 		local wreckPosX, wreckPosY, wreckPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
@@ -698,7 +717,8 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			foundMatch=true
 			wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
 		else --if not own unit or trees or rock then
-			targetFeatureID=cQueue[queueIndex].params[1]+1500-wreckageID_offset --remove the inherent offset
+		Spring.Echo (cQueue[queueIndex].params[1])
+			targetFeatureID=cQueue[queueIndex].params[1]+wreckageID_offset_multiplier-wreckageID_offset --remove the inherent offset
 			while iterativeTest<=3 and not foundMatch do --do test of reclaim wreckage (wreckage ID depend on number of players)
 				if Spring.ValidFeatureID(targetFeatureID) then
 					foundMatch=true
@@ -708,12 +728,14 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 					wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
 				end
 				iterativeTest=iterativeTest+1
-				targetFeatureID=targetFeatureID-1500
+				targetFeatureID=targetFeatureID-wreckageID_offset_multiplier
 			end
 		end
+		local isAreaMode = false
 		if foundMatch==false then --if no wreckage, no trees, no rock, and no unitID then use coordinate
 			if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+				isAreaMode = true
 			else
 				--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 			end
@@ -723,7 +745,10 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetY"]=wreckPosY
 		commandIndexTable[unitID]["backupTargetZ"]=wreckPosZ
 		boxSizeTrigger=2
-	elseif cQueue[queueIndex].id==40 then
+		if not isAreaMode and (cQueue[queueIndex+1].params[3]==nil or cQueue[queueIndex+1].id == CMD_STOP) then --signature for discrete reclaim/ressurect command
+			boxSizeTrigger = 3 --change to boxsize similar to repair command
+		end
+	elseif cQueue[queueIndex].id==40 then --repair command
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		local targetUnitID=cQueue[queueIndex].params[1]
 	
