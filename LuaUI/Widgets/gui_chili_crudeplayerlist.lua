@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List v1.2",
-    desc      = "v1.21 Chili Crude Player List.",
+    desc      = "v1.25 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -238,7 +238,7 @@ local function MakeSpecTooltip()
 	for i=1,#players do
 		local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(players[i])
 		if spectator and active then
-			specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = cpuUsage}
+			specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = math.min(cpuUsage,1)}
 			--specsSorted[#specsSorted + 1] = {name = name, ping = pingTime, cpu = cpuUsage}
 		end
 	end
@@ -269,18 +269,23 @@ local function UpdatePlayerInfo()
 				pingTime = pingTime or 0
 				cpuUsage = cpuUsage or 0
 				local min_pingTime = math.min(pingTime, 1)
-				local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
+				local min_cpuUsage = math.min(cpuUsage, 1)
+				local cpuCol = pingCpuColors[ math.ceil( min_cpuUsage * 5 ) ] 
 				local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 				local pingTime_readable = PingTimeOut(pingTime)
 				
 				local cpuLabel = entities[i].cpuLabel
-				cpuLabel.font.color = cpuCol
-				cpuLabel:SetCaption(math.round(cpuUsage*100) .. '%')
-				cpuLabel:Invalidate()
+				if cpuLabel then
+					cpuLabel.font.color = cpuCol
+					cpuLabel:SetCaption(math.round(cpuUsage*100) .. '%')
+					cpuLabel:Invalidate()
+				end
 				local pingLabel = entities[i].pingLabel
-				pingLabel.font.color = pingCol
-				pingLabel:SetCaption(pingTime_readable)
-				pingLabel:Invalidate()
+				if pingLabel then
+					pingLabel.font.color = pingCol
+					pingLabel:SetCaption(pingTime_readable)
+					pingLabel:Invalidate()
+				end
 			end
 			if wantsNameRefresh[playerID] then
 				local name_out = name or ''
@@ -288,7 +293,7 @@ local function UpdatePlayerInfo()
 					or #(Spring.GetPlayerList(teamID,true)) == 0
 					or spectator
 				then
-					if Spring.GetGameSeconds() < 0.1 then
+					if Spring.GetGameSeconds() < 0.1 or cpuUsage > 1 then
 						name_out = "<Waiting> " ..(name or '')
 						wantsNameRefresh[playerID] = true
 					elseif Spring.GetTeamUnitCount(teamID) > 0  then
@@ -297,7 +302,7 @@ local function UpdatePlayerInfo()
 						name_out = "<Dead> " ..(name or '')
 					end
 				end
-				entities[playerID].nameLabel:SetCaption(name_out)
+				entities[i].nameLabel:SetCaption(name_out)
 			end
 		end	-- if not isAI
 	end	-- for entities
@@ -368,10 +373,15 @@ local function AddEntity(entity, teamID, allyTeamID)
 	if playerID then
 		name,active,spectator,_,_,pingTime,cpuUsage,country,rank, customKeys = Spring.GetPlayerInfo(playerID)
 	end
+	--Spring.Echo("Entity with team ID " .. teamID .. " is " .. (active and '' or "NOT ") .. "active")
+	if not active then deadTeam = true end
 
+	pingTime = pingTime or 0
+	cpuUsage = cpuUsage or 0
+	
 	local name_out = entity.name or ''
 	if (name_out == '' or deadTeam) and not entity.isAI then
-		if Spring.GetGameSeconds() < 0.1 then
+		if Spring.GetGameSeconds() < 0.1 or cpuUsage > 1 then
 			name_out = "<Waiting> " ..(name or '')
 			wantsNameRefresh[playerID] = true
 		elseif Spring.GetTeamUnitCount(teamID) > 0  then
@@ -380,10 +390,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			name_out = "<Dead> " ..(name or '')
 		end
 	end
-	
-	pingTime = pingTime or 0
-	cpuUsage = cpuUsage or 0
-	
+
 	local icon = nil
 	local icRank = nil 
 	local icCountry = country and country ~= '' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
@@ -401,7 +408,8 @@ local function AddEntity(entity, teamID, allyTeamID)
 	end 
 	
 	local min_pingTime = math.min(pingTime, 1)
-	local cpuCol = pingCpuColors[ math.ceil( cpuUsage * 5 ) ] 
+	local min_cpuUsage = math.min(cpuUsage, 1)
+	local cpuCol = pingCpuColors[ math.ceil( min_cpuUsage * 5 ) ] 
 	local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
 	local pingTime_readable = PingTimeOut(pingTime)
 
