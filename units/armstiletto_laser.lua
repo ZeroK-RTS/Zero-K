@@ -141,7 +141,7 @@ unitDef = {
       areaOfEffect            = 80,
       burst                   = 2,
       burstrate               = 5,
-      commandfire             = true,
+      commandfire             = false,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -156,7 +156,6 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       manualBombSettings      = true,
-      model                   = [[wep_b_fabby.s3o]],
       myGravity               = 1000,
       noSelfDamage            = true,
       range                   = 10,
