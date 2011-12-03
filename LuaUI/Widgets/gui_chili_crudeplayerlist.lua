@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List v1.2",
-    desc      = "v1.25 Chili Crude Player List.",
+    desc      = "v1.26 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -114,8 +114,8 @@ options = {
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
-			window_cpl.color = {1,1,1,self.value}
-			window_cpl:Invalidate()
+			scroll_cpl.backgroundColor = {1,1,1,self.value}
+			scroll_cpl:Invalidate()
 		end,
 	},
 	alignToTop = {
@@ -759,7 +759,7 @@ function widget:Initialize()
 	window_cpl = Window:New{  
 		dockable = true,
 		name = "Player List",
-		color = {1,1,1,options.backgroundOpacity.value},
+		color = {0,0,0,0},
 		right = 0,  
 		bottom = 0,
 		width  = x_bound,
@@ -778,10 +778,9 @@ function widget:Initialize()
 	scroll_cpl = ScrollPanel:New{
 		parent = window_cpl,	
 		width = "100%",
-		height = "100%",
-		--padding = {2,2,2,2},
-		backgroundColor  = {0,0,0,0},
-		padding = {0, 0, 0, 0},
+		--height = "100%",
+		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
+		--padding = {0, 0, 0, 0},
 		--autosize = true,
 		hitTestAllowEmpty = true
 	}
