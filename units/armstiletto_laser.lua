@@ -34,7 +34,6 @@ unitDef = {
 	helptext_de    = [[Schneller Tarnkappenbomber, der mit einem Stossspannungsgenerator zum Paralysieren großflächiger Gebiete bewaffnet ist.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 3,
@@ -42,7 +41,6 @@ unitDef = {
   iconType            = [[bomberriot]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  maneuverleashlength = [[1380]],
   mass                = 238,
   maxAcc              = 0.5,
   maxDamage           = 1100,
@@ -57,10 +55,7 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
   side                = [[ARM]],
   sightDistance       = 660,
-  smoothAnim          = true,
   stealth             = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[VTOL]],
   turnRadius          = 100,
 
   weapons             = {
@@ -89,7 +84,6 @@ unitDef = {
       areaOfEffect            = 96,
       avoidFeature            = false,
       avoidFriendly           = false,
-      beamlaser               = 1,
       beamTime                = 0.01,
 	  burst					  = 80,
 	  burstRate				  = 0.3,
@@ -160,7 +154,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 10,
       reloadtime              = 10,
-      renderType              = 6,
       scale                   = [[0]],
       weaponType              = [[AircraftBomb]],
     },
@@ -171,7 +164,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD = {
-      description      = [[Wreckage - Stiletto II]],
+      description      = [[Wreckage - Stiletto]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1130,
@@ -192,7 +185,7 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Stiletto II]],
+      description      = [[Debris - Stiletto]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1130,

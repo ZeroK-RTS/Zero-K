@@ -66,7 +66,6 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 660,
-  smoothAnim          = true,
   turnRadius          = 350,
   workerTime          = 0,
 
@@ -130,7 +129,7 @@ unitDef = {
       burst                   = 15,
       burstrate               = 0.09,
       collideFriendly         = false,
-      commandfire             = true,
+      commandfire             = false,
       craterBoost             = 1,
       craterMult              = 2,
 
