@@ -41,7 +41,6 @@ function widget:DrawGenesis()
 		files = {}
 		--AddDir("LuaUI/Images")
 		AddDir("icons")
-		AddDir("unitpics")
 	else 
 		if (UnitDefs[i]) then
 			gl.Texture(7,'#'..i)
