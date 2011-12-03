@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Combo Overhead/Free Camera (experimental)",
-    desc      = "v0.100 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
+    desc      = "v0.101 Camera featuring 6 actions. Type \255\90\90\255/luaui cofc help\255\255\255\255 for help.",
     author    = "CarRepairer",
     date      = "2011-03-16",
     license   = "GNU GPL, v2 or later",
@@ -619,10 +619,12 @@ local function Zoom(zoomin, s, forceCenter)
     
 	local sp = (zoomin and -options.zoominfactor.value or options.zoomoutfactor.value) * (s and 3 or 1)
 	
-	ls_dist = ls_dist + ls_dist*sp
-
-	ls_dist = math.max(ls_dist, 20)
+	local ls_dist_new = ls_dist + ls_dist*sp
+	ls_dist_new = math.max(ls_dist_new, 20)
+	ls_dist_new = math.min(ls_dist_new, maxDistY)
 	
+	ls_dist = ls_dist_new
+
 	local cstemp = UpdateCam(cs)
 	if cstemp then cs = cstemp; end
 	if zoomin or ls_dist < maxDistY then
@@ -1112,14 +1114,12 @@ function widget:MouseWheel(up, value)
     if fpsmode then return end
 	local a,c,m,s = spGetModKeyState()
 	
-	-- Altitude --
 	if c then
 		return Tilt(s, up and 1 or -1)
 	elseif a then
 		return Altitude(up, s)
 	end
 	
-	-- Zoom --	
 	return Zoom(not up, s)
 end
 
