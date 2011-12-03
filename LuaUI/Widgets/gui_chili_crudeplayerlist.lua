@@ -666,7 +666,7 @@ SetupPlayerNames = function()
 	
 	--push things to bottom of window if needed
 	--scroll_cpl.width = x_bound --window_cpl.width - window_cpl.padding[1] - window_cpl.padding[3]
-	local height = row * (fontsize+2)
+	local height = row * (fontsize+1) + 2
 	--window_cpl.minimumSize = {x_bound, height}
 	scroll_cpl.height = math.min(height, window_cpl.height)
 	if not (options.alignToTop.value) then 
