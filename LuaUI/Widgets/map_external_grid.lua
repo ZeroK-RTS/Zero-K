@@ -12,14 +12,14 @@ function widget:GetInfo()
   }
 end
 
--- TODO: make res and range settable in options
+if VFS.FileExists("nomapedgewidget.txt") then
+	return
+end
 
-local DspLst=nil
-local localAllyID = Spring.GetLocalAllyTeamID ()
+local DspLst = nil
 --local updateFrequency = 120	-- unused
 local gridTex = "LuaUI/Images/vr_grid.png"
 --local height = 0	-- how far above ground to draw
-local mirror = true
 
 ---magical speedups---
 local math = math
@@ -167,7 +167,7 @@ local function InitGroundHeights()
 		heights[x] = {}
 		for z = (-range)*res,Game.mapSizeZ+range*res, res do
 			local px, pz
-			if mirror then
+			if options.mirrorHeightMap.value then
 				if (x < 0 or x > Game.mapSizeX) then	-- outside X map bounds; mirror true heightmap
 					local xAbs = math.abs(x)
 					local xFrac = (Game.mapSizeX ~= xAbs) and x%(Game.mapSizeX) or Game.mapSizeX
@@ -178,7 +178,7 @@ local function InitGroundHeights()
 						px = xFrac
 					end
 				end
-				if (z < 0 or z > Game.mapSizeZ) and mirror  then	-- outside Z map bounds; mirror true heightmap
+				if (z < 0 or z > Game.mapSizeZ) then	-- outside Z map bounds; mirror true heightmap
 					local zAbs = math.abs(z)
 					local zFrac = (Game.mapSizeZ ~= zAbs) and z%(Game.mapSizeZ) or Game.mapSizeZ
 					local zFlip = -1^math.floor(z/Game.mapSizeZ)

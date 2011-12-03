@@ -11,18 +11,20 @@ function widget:GetInfo()
   }
 end
 
+if VFS.FileExists("nomapedgewidget.txt") then
+	return
+end
+
 --TODO make a barrier or something to hide the vertex gaps at edge and to help distinguish the playing area
 
-local useShader = true --when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
-                       --when not, the map is drawn mirrored 8 times into a display list
-local wiremap = false
-local gridSize = 32
 local gridTex = "LuaUI/Images/vr_grid_large.png"
 local realTex = '$grass'
 local tex = realTex
 
 options_path = 'Settings/View/Map/Map Extension Config'
 options = {
+	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
+    --when not, the map is drawn mirrored 8 times into a display list
 	useShader = {
 		name = "Use shader",
 		type = 'bool',
@@ -30,7 +32,6 @@ options = {
 		desc = 'Use a shader when mirroring the map',
 		OnChange = function(self)
 			gl.DeleteList(dList)
-			useShader = self.value
 			widget:Initialize()
 		end, 		
 	},
@@ -45,7 +46,6 @@ options = {
 		desc = 'Sets tile size (smaller = more heightmap detail)',
 		OnChange = function(self)
 			gl.DeleteList(dList)
-			gridSize = self.value
 			widget:Initialize()
 		end, 
 	},
@@ -64,13 +64,13 @@ options = {
 }
 
 local shaderTable = {
-uniform = {
+	uniform = {
       mirrorX = 0,
       mirrorZ = 0,
       up = 0,
       left = 0,
     },
-vertex = [[
+	vertex = [[
       // Application to vertex shader
       uniform float mirrorX;
       uniform float mirrorZ;
@@ -83,11 +83,22 @@ vertex = [[
       gl_Vertex.x = abs(mirrorX-gl_Vertex.x);
       gl_Vertex.z = abs(mirrorZ-gl_Vertex.z);
 
+      float ff = 20000;
+      if((mirrorZ && mirrorX))
+        ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2)+pow(abs(gl_Vertex.x-left*mirrorX)/150, 2)+2);
+      else if(mirrorX)
+        ff=ff/(pow(abs(gl_Vertex.x-left*mirrorX)/150, 2)+2);
+      else if(mirrorZ)
+        ff=ff/(pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2)+2);
+
       gl_Position  = gl_ModelViewProjectionMatrix*gl_Vertex;
+	  gl_FogFragCoord = //gl_Position.z+ff;
+	  length((gl_ModelViewMatrix * gl_Vertex).xyz)+ff; //see how Spring shaders do the fog and copy from there to fix this
       gl_FrontColor = gl_Color;
 	  }
     ]],
 }
+-- place this under gl_Vertex.z = abs(mirrorZ-gl_Vertex.z); in void main() for curvature effect
 --if(mirrorX)gl_Vertex.y -= pow(abs(gl_Vertex.x-left*mirrorX)/150, 2);
 --if(mirrorZ)gl_Vertex.y -= pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2);
 
@@ -100,7 +111,7 @@ local abs = math.abs
 	gl.Color(1,1,1,1)
 
 	local function doMap(dx,dz,sx,sz)
-		local Scale = gridSize
+		local Scale = options.gridSize.value
 		local sggh = Spring.GetGroundHeight
 		local Vertex = gl.Vertex
 		local glColor = gl.Color
@@ -128,10 +139,11 @@ local abs = math.abs
 			for z=sten[ind+1], sten[ind+2], (1+(-ind*2))*Scale do
 				zv = abs(dz+z)+sz
 				TexCoord(xm0/mapSizeX, z/mapSizeZ)
-				Normal(GetGroundNormal(xm0,z))
-				Vertex(xv0,sggh(xm0,z),zv)
+       -- Normal(GetGroundNormal(xm0,z))
+        h = sggh(xm0,z)
+				Vertex(xv0,h,zv)
 				TexCoord(xm1/mapSizeX, z/mapSizeZ)
-				Normal(GetGroundNormal(xm1,z))
+        --Normal(GetGroundNormal(xm1,z))
 				h = sggh(xm1,z)
 				Vertex(xv1,h,zv)
 			end
@@ -160,6 +172,7 @@ end
 local function DrawOMap(useMirrorShader)
 	gl.Blending(GL.SRC_ALPHA,GL.ONE_MINUS_SRC_ALPHA)
 	gl.DepthTest(GL.LEQUAL)
+	gl.Texture(tex)
 	gl.BeginEnd(GL.TRIANGLE_STRIP,DrawMapVertices, useMirrorShader)
 	gl.DepthTest(false)
 	gl.Color(1,1,1,1)
@@ -176,13 +189,13 @@ local uup
 local uleft
 
 function widget:Initialize()
-	if gl.CreateShader and useShader then
+	if gl.CreateShader and options.useShader.value then
 		mirrorShader = gl.CreateShader(shaderTable)
 	end
 	if not mirrorShader then
 		widget.DrawWorldPreUnit = function()
 			gl.DepthMask(true)
-			gl.Texture(tex)
+			--gl.Texture(tex)
 			gl.CallList(dList)
 			gl.DepthMask(false)
 			gl.Texture(false)
@@ -210,6 +223,8 @@ function widget:DrawWorldPreUnit() --is overwritten when not using the shader
   local glUniform = gl.Uniform
   local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
 
+gl.Fog(true)
+--gl.FogCoord(1)
   gl.UseShader(mirrorShader)
   gl.PushMatrix()
   gl.DepthMask(true)
@@ -257,4 +272,6 @@ function widget:DrawWorldPreUnit() --is overwritten when not using the shader
   gl.PopMatrix()
   gl.UseShader(0)
 
+  gl.Fog(false)
+  
 end
