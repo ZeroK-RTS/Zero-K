@@ -88,8 +88,8 @@ unitDef = {
     PLASMA = {
       name                    = [[Light Plasma Cannon]],
       areaOfEffect            = 32,
-      craterBoost             = 1,
-      craterMult              = 3,
+      craterBoost             = 0,
+      craterMult              = 0,
 
       damage                  = {
         default = 210,

@@ -68,6 +68,7 @@ unitDef = {
   smoothAnim             = true,
   steeringmode           = [[1]],
   turnRate               = 1144,
+  upright                = false,
   workerTime             = 0,
 }
 

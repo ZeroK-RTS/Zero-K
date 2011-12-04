@@ -91,9 +91,15 @@ unitDef = {
     COR_GOL             = {
       name                    = [[Tankbuster Cannon]],
       areaOfEffect            = 32,
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 0,
+      craterMult              = 0,
 
+       customParams            = {
+	    gatherradius = [[100]],
+	    smoothradius = [[75]],
+		smoothmult   = [[0.2]],
+	  },
+      
       damage                  = {
         default = 1000,
         planes  = 1000,

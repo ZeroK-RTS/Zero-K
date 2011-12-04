@@ -93,7 +93,7 @@ unitDef = {
       name                    = [[Heavy Rocket]],
       areaOfEffect            = 75,
       cegTag                  = [[missiletrailred]],
-      craterBoost             = 0,
+      craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
