@@ -99,6 +99,12 @@ local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 	
 end
 
+local workaround = {
+    [UnitDefNames["armca"].id] = true,
+    [UnitDefNames["armcsa"].id] = true,
+    [UnitDefNames["corvalk"].id] = true,
+    [UnitDefNames["corbtrans"].id] = true
+}
 
 local function updateMovementSpeed( unitID, ud, speedFactor)	
 	
@@ -116,7 +122,7 @@ local function updateMovementSpeed( unitID, ud, speedFactor)
 		local state = origUnitSpeed[unitID]
 		
 		if ud.canFly then
-			if ud.isFighter or ud.isBomber then
+			if (ud.isFighter or ud.isBomber) and not workaround[ud.id] then
 				state.movetype = 0
 			else
 				state.movetype = 1
@@ -136,16 +142,8 @@ local function updateMovementSpeed( unitID, ud, speedFactor)
 	
 	if Spring.MoveCtrl.GetTag(unitID) == nil then
 		if state.movetype == 0 then
-			--Spring.MoveCtrl.SetAirMoveTypeData(unitID, {maxSpeed = state.origSpeed*speedFactor})
-			--Spring.MoveCtrl.SetAirMoveTypeData (unitID, {maxAcc = state.origMaxAcc*(speedFactor > 0.001 and speedFactor or 0.001)})
-			-- debug
-			local success = true
-			success = pcall(Spring.MoveCtrl.SetAirMoveTypeData, unitID, {maxSpeed = state.origSpeed*speedFactor})
-			if success then
-				Spring.MoveCtrl.SetAirMoveTypeData (unitID, {maxAcc = state.origMaxAcc*(speedFactor > 0.001 and speedFactor or 0.001)})
-			else
-				Spring.Echo("<Attributes> Error: Unit ".. ud.name .. " (id " .. unitID .. ") isFighter or isBomber, but is not a plane")
-			end
+			Spring.MoveCtrl.SetAirMoveTypeData(unitID, {maxSpeed = state.origSpeed*speedFactor})
+			Spring.MoveCtrl.SetAirMoveTypeData (unitID, {maxAcc = state.origMaxAcc*(speedFactor > 0.001 and speedFactor or 0.001)})
 		elseif state.movetype == 1 then
 			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {maxSpeed = state.origSpeed*speedFactor})
 			--Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {maxSpeed = state.origReverseSpeed*speedFactor})
