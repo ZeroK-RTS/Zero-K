@@ -99,13 +99,6 @@ local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 	
 end
 
-local workaround = {
-    [UnitDefNames["armca"].id] = true,
-    [UnitDefNames["armcsa"].id] = true,
-    [UnitDefNames["corvalk"].id] = true,
-    [UnitDefNames["corbtrans"].id] = true
-}
-
 local function updateMovementSpeed( unitID, ud, speedFactor)	
 	
 	if not origUnitSpeed[unitID] then
@@ -122,7 +115,7 @@ local function updateMovementSpeed( unitID, ud, speedFactor)
 		local state = origUnitSpeed[unitID]
 		
 		if ud.canFly then
-			if (ud.isFighter or ud.isBomber) and not workaround[ud.id] then
+			if (ud.isFighter or ud.isBomber) then
 				state.movetype = 0
 			else
 				state.movetype = 1

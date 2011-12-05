@@ -52,6 +52,7 @@ unitDef = {
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,
+  hoverAttack         = true,
   iconType            = [[builderair]],
   idleAutoHeal        = 5,
   idleTime            = 1800,

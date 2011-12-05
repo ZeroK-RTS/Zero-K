@@ -79,6 +79,7 @@ unitDef = {
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,
+  hoverAttack         = true,
   iconType            = [[t3builder]],
   initCloaked         = false,
   maneuverleashlength = [[1280]],

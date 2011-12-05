@@ -41,6 +41,7 @@ unitDef = {
   floater             = true,
   footprintX          = 3,
   footprintZ          = 3,
+  hoverAttack         = true,
   iconType            = [[airtransport]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
