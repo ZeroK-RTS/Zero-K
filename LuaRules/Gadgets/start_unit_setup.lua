@@ -421,6 +421,10 @@ end
 
 
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
+  local luaAI = Spring.GetTeamLuaAI(teamID)
+  if luaAI and string.find(string.lower(luaAI), "chicken") then
+	return
+  end
   -- get start unit
   
   -- no getting double comms now!
