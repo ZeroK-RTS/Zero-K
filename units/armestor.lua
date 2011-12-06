@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armestor]],
-  name                          = [[Energy Pylon]],
-  description                   = [[Propagates Energy Grid]],
+  name                          = [[Energy Transmission Pylon]],
+  description                   = [[Extends overdrive grid]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   bmcode                        = [[0]],
