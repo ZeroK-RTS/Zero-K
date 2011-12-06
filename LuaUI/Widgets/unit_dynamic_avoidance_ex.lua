@@ -1,4 +1,4 @@
-local versionName = "v1.53"
+local versionName = "v1.61"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (coding)",
-    date      = "Dec 3, 2011",
+    date      = "Dec 6, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -43,6 +43,8 @@ local spGetPlayerInfo = Spring.GetPlayerInfo
 local spGetUnitStates = Spring.GetUnitStates
 local spGetUnitTeam = Spring.GetUnitTeam
 local spSendLuaUIMsg = Spring.SendLuaUIMsg
+local spGetUnitLastAttacker = Spring.GetUnitLastAttacker
+local spGetUnitHealth = Spring.GetUnitHealth
 local CMD_STOP			= CMD.STOP
 local CMD_INSERT		= CMD.INSERT
 local CMD_REMOVE		= CMD.REMOVE
@@ -112,6 +114,7 @@ local surroundingOfActiveUnitG={} --store value for transfer between function. S
 local cycleG=1 --first execute "GetPreliminarySeparation()"
 local wreckageID_offset=0
 local roundTripComplete= true --variable for detecting network lag, prevent messy overlapping command queuing
+local attackerG= {}
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
@@ -154,11 +157,12 @@ function widget:Update()
 	local cycle = cycleG
 	local skippingTimer = skippingTimerG
 	local timeToContactCONSTANT=timeToContactCONSTANTg
+	local attacker = attackerG
 	-----
 	local now=spGetGameSeconds()
 	if (now >= skippingTimer[1]) then --if "now" is 1.1 second after last update then do "RefreshUnitList()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
-		unitInMotion=RefreshUnitList() --add relevant unit to unitlist/unitInMotion
+		unitInMotion, attacker=RefreshUnitList(attacker) --add relevant unit to unitlist/unitInMotion
 		local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --set unit update based on ping or every 1.1 second
 		skippingTimer[1]=now+projectedDelay
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
@@ -166,7 +170,7 @@ function widget:Update()
 	
 	if (now >=skippingTimer[2] and cycle==1) and roundTripComplete then --if now is 0.1 second after last update & already unlocked by echo from server then do "GetPreliminarySeparation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
-		surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable)
+		surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 		cycle=2 --send next cycle to "DoCalculation()" function
 		
 		skippingTimer = ActualNetworkDelay(1, skippingTimer, nil, nil ,now)
@@ -175,7 +179,7 @@ function widget:Update()
 	end
 	if (now >=skippingTimer[2] and cycle==2) then --if now is 0.5 second after last update & already executed GetPreliminarySeparation() then do "DoCalculation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
-		commandIndexTable=DoCalculation (surroundingOfActiveUnit,commandIndexTable) --initiate the avoidance
+		commandIndexTable=DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker) --initiate the avoidance
 		cycle=1 --send next cycle back to "GetPreliminarySeparation()" function
 		
 		--local projectedDelay=ReportedNetworkDelay(myPlayerID, 0.5) --get the reported ping
@@ -200,12 +204,13 @@ function widget:Update()
 	cycleG = cycle
 	skippingTimerG = skippingTimer
 	timeToContactCONSTANTg=timeToContactCONSTANT
+	attackerG = attacker
 	-----
 end
 ---------------------------------Level 0 Top level
 ---------------------------------Level1 Lower level
 -- return a refreshed unit list, else return nil
-function RefreshUnitList()
+function RefreshUnitList(attacker)
 	local allMyUnits = spGetTeamUnits(myTeamID)
 	local arrayIndex=1
 	local relevantUnit={}
@@ -217,6 +222,9 @@ function RefreshUnitList()
 	end
 	for _, unitID in ipairs(allMyUnits) do
 		if unitID~=nil then --skip end of the table
+			-- refresh attacker's list
+			attacker = RetrieveAttackerList (unitID, attacker)
+			--
 			local unitDefID = spGetUnitDefID(unitID)
 			local unitDef = UnitDefs[unitDefID]
 			local unitSpeed =unitDef["speed"]
@@ -246,11 +254,11 @@ function RefreshUnitList()
 		Spring.Echo("relevantUnit(RefreshUnitList): ")
 		Spring.Echo(relevantUnit)
 	end
-	return relevantUnit
+	return relevantUnit, attacker
 end
 
 -- detect initial enemy separation to detect "fleeing enemy"  later
-function GetPreliminarySeparation(unitInMotion,commandIndexTable)
+function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 	local surroundingOfActiveUnit={}
 	if unitInMotion[1]~=nil then --don't execute if no unit present
 		local arrayIndex=1
@@ -276,7 +284,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable)
 						local lastPosition = {currentX, currentZ}
 						local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
 						local losRadius	= GetUnitLOSRadius(unitID) --get LOS
-						local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius) --catalogue enemy
+						local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
 						if (cQueue[1].id == CMD_MOVE and unitInMotion[i].isVisible ~= "yes") then --if unit has move Command and is outside user's view
 							reachedTarget = false --force unit to do avoidance despite close to target (try to circle over target until seen by user)
 						end
@@ -322,7 +330,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable)
 end
 
 --perform the actual collision avoidance calculation and send the appropriate command to unit
-function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
+function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
 	if surroundingOfActiveUnit[1]~=nil then --if flagged as nil then no stored content then this mean there's no relevant unit
 		for i=2,surroundingOfActiveUnit[1], 1 do --index 1 is for array's lenght
 			local unitID=surroundingOfActiveUnit[i][1]
@@ -347,7 +355,7 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable)
 				local unitSpeed= surroundingOfActiveUnit[i][7]
 				local impatienceTrigger= surroundingOfActiveUnit[i][8]
 				local lastPosition = surroundingOfActiveUnit[i][9]
-				local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius) --get new unit separation for comparison
+				local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --get new unit separation for comparison
 				local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition) --calculate move solution
 				local newY=spGetGroundHeight(newX,newZ)
 				commandIndexTable= InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand) --send move solution to unit
@@ -398,6 +406,23 @@ function ActualNetworkDelay(reportingIn, skippingTimer,doCalculation_then_gps_de
 end
 ---------------------------------Level1
 ---------------------------------Level2 (level 1's call-in)
+function RetrieveAttackerList (unitID, attacker)
+	local unitHealth,_,_,_,_ = spGetUnitHealth(unitID)
+	if attacker[unitID] == nil then --if attacker table is empty then fill with default value
+		attacker[unitID] = {id = nil, countDown = 0, myHealth = unitHealth}
+	end
+	if attacker[unitID].countDown >0 then attacker[unitID].countDown = attacker[unitID].countDown - 1 end --count-down until zero and stop
+	if unitHealth< attacker[unitID].myHealth then --if underattack then find out the attackerID
+		local attackerID = spGetUnitLastAttacker(unitID)
+		if attackerID~=nil then --if attackerID is found then mark the attackerID for avoidance
+			attacker[unitID].countDown = attacker[unitID].countDown + 3
+			attacker[unitID].id = attackerID
+		end
+	end
+	attacker[unitID].myHealth = unitHealth --refresh health data	
+	return attacker
+end
+
 --check if widget's command or user's command
 function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 	local targetCoordinate = {}
@@ -462,14 +487,14 @@ function GetUnitLOSRadius(unitID)
 	local unitDefID= spGetUnitDefID(unitID)
 	local unitDef= UnitDefs[unitDefID]
 	local losRadius =550 --arbitrary (scout LOS)
-	if unitDef~=nil then
+	if unitDef~=nil then --if unitDef is not empty then use the following LOS
 		losRadius= unitDef.losRadius*32 --for some reason it was times 32
 	end
 	return (losRadius + extraLOSRadiusCONSTANTg)
 end
 
 --return a table of surrounding enemy
-function GetAllUnitsInRectangle(unitID, losRadius)
+function GetAllUnitsInRectangle(unitID, losRadius, attacker)
 	local x,y,z = spGetUnitPosition(unitID)
 	local unitDefID = spGetUnitDefID(unitID)
 	local unitDef = UnitDefs[unitDefID]
@@ -484,7 +509,10 @@ function GetAllUnitsInRectangle(unitID, losRadius)
 	local unitsInRectangle = spGetUnitsInRectangle(x-losRadius, z-losRadius, x+losRadius, z+losRadius)
 
 	local relevantUnit={}
-	local arrayIndex=1
+	local arrayIndex=1	
+	--add attackerID into enemy list
+	relevantUnit, arrayIndex = AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
+	--
 	for _, rectangleUnitID in ipairs(unitsInRectangle) do
 		local isAlly= spIsUnitAllied(rectangleUnitID)
 		if (rectangleUnitID ~= unitID) and not isAlly then--filter out ally units and self
@@ -736,7 +764,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 				isAreaMode = true
 			else
-				--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+				Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 			end
 		end
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
@@ -771,6 +799,19 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
 	end
 	return commandIndexTable, targetCoordinate, boxSizeTrigger
+end
+
+function AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
+	if attacker[unitID].countDown > 0 then
+		local separation = spGetUnitSeparation (unitID,attacker[unitID].id)
+		if separation ~=nil then --if attackerID is still a valid id (ie: enemy did not disappear) then:
+			if separation> losRadius then
+				arrayIndex=arrayIndex+1
+				relevantUnit[arrayIndex]=rectangleUnitID
+			end
+		end
+	end
+	return relevantUnit, arrayIndex
 end
 
 function GetUnitRelativeAngle (unitIDmain, unitID2)
