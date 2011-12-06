@@ -48,15 +48,14 @@ local strafeUnitDefs = {
     [UnitDefNames["armcsa"].id] = true,
     [UnitDefNames["corvalk"].id] = true,
     [UnitDefNames["corbtrans"].id] = true,
-    [UnitDefNames["corcrw"].id] = true,
 }
 
 local unitState = {}
 
 --------------------------------------------------------------------------------
 -- Command Handling
-local function ToggleCommand(unitID, cmdParams, cmdOptions)
-	if unitState[unitID] then
+local function ToggleCommand(unitID, cmdParams, unitDefID)
+	if unitState[unitID] and strafeUnitDefs[unitDefID] then
 		local state = cmdParams[1]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_AIR_STRAFE)
 		
@@ -75,7 +74,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID ~= CMD_AIR_STRAFE) then
 		return true  -- command was not used
 	end
-	ToggleCommand(unitID, cmdParams, cmdOptions)  
+	ToggleCommand(unitID, cmdParams, unitDefID)  
 	return false  -- command was used
 end
 
@@ -100,7 +99,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
         unitState[unitID] = {active = ud.airStrafe}
         spInsertUnitCmdDesc(unitID, airStrafeCmdDesc)
         if unitState[unitID].active then
-            ToggleCommand(unitID, {1})
+            ToggleCommand(unitID, {1}, unitDefID)
         end
     end
 end

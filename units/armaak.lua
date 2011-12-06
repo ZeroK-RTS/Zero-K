@@ -84,9 +84,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 1.25,
-        planes  = 1.25,
-        subs    = 0.675,
+        default = 0.117,
+        planes  = 1.17,
+        subs    = 0.5,
       },
 
       endsmoke                = [[0]],
@@ -130,8 +130,8 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 2,
-        planes  = 20,
+        default = 1.88,
+        planes  = 18.8,
         subs    = 1,
       },
 

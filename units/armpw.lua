@@ -110,9 +110,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 11.5,
-        planes  = 11.5,
-        subs    = 0.575,
+        default = 11.34,
+        planes  = 11.34,
+        subs    = 0.567,
       },
 
       endsmoke                = [[0]],
