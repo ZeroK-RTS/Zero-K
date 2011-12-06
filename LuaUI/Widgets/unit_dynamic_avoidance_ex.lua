@@ -1,4 +1,4 @@
-local versionName = "v1.61"
+local versionName = "v1.65"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -13,7 +13,7 @@ function widget:GetInfo()
   return {
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
-    author    = "msafwan (coding)",
+    author    = "msafwan (system coder)",
     date      = "Dec 6, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
@@ -101,7 +101,7 @@ local doCalculation_then_gps_delayG = 0.1
 --Engine based correction constant:
 local wreckageID_offset_multiplier = 0
 local wreckageID_offset_initial = 32000
-
+--curModID = upper(Game.modShortName)
 --------------------------------------------------------------------------------
 --Variables:
 local unitInMotionG={} --store unitID
@@ -595,13 +595,14 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		local dFobstacle=0
 		local dSum=0
 		local nearestFrontObstacleRange =999
+		local normalizingFactor=0
 
 		--count every enemy unit and sum its contribution to the obstacle/repulsor variable
-		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger)
+		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger)
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal)
 		--convert an angular command into a coordinate command
-		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger)
+		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor)
 		if (turnOnEcho == 1) then
 			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
 			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
@@ -876,8 +877,14 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG
 	local smCONSTANT = smCONSTANTunitG --?
 	local distanceCONSTANT = distanceCONSTANTunitG
+	local obsCONSTANT =obsCONSTANTg
+	local normalizingFactor = 0
 	if (turnOnEcho == 1) then Spring.Echo("unitID(SumAllUnitAroundUnitID)" .. thisUnitID) end
 	if (surroundingUnits[1]~=nil) then --don't execute if no enemy unit exist
+		local graphSample={}
+		for i=1, 360+1, 1 do
+			graphSample[i]=0 --initialize content
+		end
 		for i=2,surroundingUnits[1], 1 do
 			local unitRectangleID=surroundingUnits[i]
 			if (unitRectangleID ~= nil)then --excluded any nil entry
@@ -896,13 +903,23 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					if impatienceTrigger==0 then --zero means that unit is impatient
 						distanceCONSTANT=distanceCONSTANT/2
 					end
-					local ri, wi, di = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT)
+					local ri, wi, di = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT,obsCONSTANT)
 					local fObstacle = ri*wi*di
-					distanceCONSTANT=distanceCONSTANTunitG
+					distanceCONSTANT=distanceCONSTANTunitG --reset distance constant
 
 					--get second obstacle/enemy/repulsor wave function to calculate slope
-					local ri2, wi2, di2 = GetRiWiDi (unitDirection+0.05, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT)
+					local ri2, wi2, di2 = GetRiWiDi (unitDirection+0.05, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT)
 					local fObstacle2 = ri2*wi2*di2
+					
+					--create a snapshot of the entire graph. Resolution: 360 datapoint
+					local dI = math.exp(-1*unitSeparation/distanceCONSTANT) --distance multiplier
+					local hI = windowingFuncMultG/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
+					for i=-180, 180, 1 do --sample the entire graph
+						local differenceInAngle = (unitDirection+math.pi/i)-relativeAngle
+						local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle))
+						local wI = obsCONSTANT* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
+						graphSample[i+180+1]=graphSample[i+180+1]+ (rI*wI*dI*hI)
+					end
 
 					--get repulsor wavefunction's slope
 					local fObstacleSlope = GetFObstacleSlope(fObstacle2, fObstacle, unitDirection+0.05, unitDirection)
@@ -912,8 +929,15 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 				end
 			end
 		end
+		local biggestValue=0
+		for i=1, 360+1, 1 do --find maximum value from graph
+			if biggestValue<graphSample[i] then
+				biggestValue = graphSample[i]
+			end
+		end
+		normalizingFactor = obsCONSTANT/biggestValue --normalize graph value to a determined maximum
 	end
-	return wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange --return obstacle's calculation result
+	return wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, normalizingFactor --return obstacle's calculation result
 end
 
 --determine appropriate behaviour
@@ -977,13 +1001,13 @@ function CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, 
 end
 
 --convert angular command into coordinate, plus other function
-function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger)
+function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor)
 	local safetyDistanceCONSTANT=safetyDistanceCONSTANTg
 	local timeToContactCONSTANT=timeToContactCONSTANTg
 	local activateAutoReverse=activateAutoReverseG
 
 	if (nearestFrontObstacleRange> losRadius) then nearestFrontObstacleRange = 999 end --if no obstacle infront of unit then set nearest obstacle as far as LOS to prevent infinite velocity.
-	local newUnitAngleDerived= GetNewAngle(unitDirection, wTarget, fTarget, wObstacle, fObstacleSum) --derive a new angle from calculation for move solution
+	local newUnitAngleDerived= GetNewAngle(unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor) --derive a new angle from calculation for move solution
 
 	local velocity=unitSpeed
 	local maximumVelocity = (nearestFrontObstacleRange- safetyDistanceCONSTANT)/timeToContactCONSTANT --calculate minimum velocity for collision in the next "timeToContact" second.
@@ -1046,11 +1070,11 @@ function GetUnitSubtendedAngle (unitIDmain, unitID2)
 end
 
 --calculate enemy's wavefunction
-function GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, separationDistance, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT)
+function GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, separationDistance, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT)
 	local differenceInAngle = unitDirection-relativeAngle
 	local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle))
 	local hI = windowingFuncMultG/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
-	local wI = obsCONSTANTg* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
+	local wI = obsCONSTANT* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
 	local dI = math.exp(-1*separationDistance/distanceCONSTANT) --distance multiplier
 	return rI, wI, dI
 end
@@ -1087,7 +1111,8 @@ function ConstantInitialize(fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSu
 	return alphaCONSTANT1, alphaCONSTANT2, gammaCONSTANT1and2, gammaCONSTANT2and1 --return constant for immediate use
 end
 --
-function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum)
+function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor)
+	fObstacleSum = fObstacleSum*normalizingFactor --downscale value depend on the entire graph's maximum
 	local unitAngleDerived= math.abs(wTarget)*fTarget + math.abs(wObstacle)*fObstacleSum + (noiseAngleG)*(GaussianNoise()*2-1) --add wavefunction 
 	if math.abs(unitAngleDerived) > maximumTurnAngleG then --to prevent excess in avoidance causing overflow in angle changes (maximum angle should be pi, but useful angle should be pi/2 eg: 90 degree)
 		--Spring.Echo("Dynamic Avoidance warning: total angle changes excess")
