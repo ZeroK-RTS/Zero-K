@@ -83,9 +83,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 1.4,
-        planes  = 14,
-        subs    = 0.7,
+        default = 1.64,
+        planes  = 16.38,
+        subs    = 0.8,
       },
 
       duration                = 0.02,
