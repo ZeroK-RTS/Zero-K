@@ -154,7 +154,7 @@ local function CheckForVictory()
 	local lastAllyTeam
     for _,a in pairs(allylist) do
 		if not destroyedAlliances[a] and (a ~= gaiaAllyTeamID) then
-			Spring.Echo("Alliance " .. a .. " remains in the running")
+			--Spring.Echo("Alliance " .. a .. " remains in the running")
 			count = count + 1
 			lastAllyTeam = a
 		end
