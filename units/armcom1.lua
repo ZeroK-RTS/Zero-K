@@ -43,6 +43,7 @@ unitDef = {
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
+    commtype = [[1]],
   },
 
   energyMake             = 3.2,

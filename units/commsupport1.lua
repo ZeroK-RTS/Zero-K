@@ -42,6 +42,7 @@ unitDef = {
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
+    commtype = [[4]],
   },
 
   defaultmissiontype  = [[Standby]],
