@@ -1,4 +1,4 @@
-local versionName = "v1.65"
+local versionName = "v1.66"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (system coder)",
-    date      = "Dec 6, 2011",
+    date      = "Dec 7, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -765,7 +765,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 				isAreaMode = true
 			else
-				Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+				--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 			end
 		end
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
@@ -935,7 +935,11 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 				biggestValue = graphSample[i]
 			end
 		end
-		normalizingFactor = obsCONSTANT/biggestValue --normalize graph value to a determined maximum
+		if biggestValue > obsCONSTANT then
+			normalizingFactor = obsCONSTANT/biggestValue --normalize graph value to a determined maximum
+		else 
+			normalizingFactor = 1 --don't change the graph if the graph never exceed maximum value
+		end
 	end
 	return wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, normalizingFactor --return obstacle's calculation result
 end
