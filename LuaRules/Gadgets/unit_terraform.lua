@@ -2994,7 +2994,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
-	if ud.isBuilder and not ud.isFactory and not exceptionArray[unitDefID] then
+	if (ud.isBuilder or ud.builder) --[[TODO: remove isBuilder after 85.0]] and not ud.isFactory and not exceptionArray[unitDefID] then
 		spInsertUnitCmdDesc(unitID, rampCmdDesc)
 		spInsertUnitCmdDesc(unitID, levelCmdDesc)
 		spInsertUnitCmdDesc(unitID, raiseCmdDesc)

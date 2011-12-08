@@ -210,7 +210,7 @@ function UpdateOneGroupsDetails(myGroupId)
 		if ( not myUnits[unitID] ) then
 			local udid = spGetUnitDefID(unitID)
 			local ud = UnitDefs[udid]
-			if (ud.isBuilder and ud.canMove) then
+			if ((ud.isBuilder or ud.builder) --[[TODO: remove isBuilder after 85.0]] and ud.canMove) then
 				myUnits[unitID] = "idle"
 			end
 		end
@@ -407,16 +407,18 @@ function GetWorkFor(unitID)
 		
 	end
 	
+	-- removed canHover tag since it's deprecated
+	-- also, @special handling: why?
 	if ( busyDist < huge or queueDist < huge ) then
 		local udid = spGetUnitDefID(unitID)
 		local ud = UnitDefs[udid]
 		if ( busyDist < queueDist ) then	-- assist is closer
 			if ( ud.canFly ) then busyDist = busyDist * 0.50 end
-			if ( ud.canHover ) then busyDist = busyDist * 0.75 end
+			--if ( ud.canHover ) then busyDist = busyDist * 0.75 end
 			return { unitID, CMD_GUARD, { busyClose }, busyDist, 0 }
 		else	-- new project is closer
 			if ( ud.canFly ) then queueDist = queueDist * 0.50 end
-			if ( ud.canHover ) then queueDist = queueDist * 0.75 end
+			--if ( ud.canHover ) then queueDist = queueDist * 0.75 end
 			myCmd = myQueue[queueClose]
 			local cmd, x, y, z, h = myCmd.id, myCmd.x, myCmd.y, myCmd.z, myCmd.h
 			return { unitID, cmd, { x, y, z, h }, queueDist, queueClose }
@@ -487,7 +489,7 @@ function widget:KeyPress(key, mods, isRepeat)
 			if ( not myUnits[unitID] ) then
 				local udid = spGetUnitDefID(unitID)
 				local ud = UnitDefs[udid]
-				if (ud.isBuilder and ud.canMove) then
+				if ((ud.isBuilder or ud.builder) --[[TODO: remove isBuilder after 85.0]] and ud.canMove) then
 					myUnits[unitID] = "idle"
 				end
 			end

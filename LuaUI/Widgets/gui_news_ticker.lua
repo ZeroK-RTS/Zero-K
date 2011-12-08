@@ -256,7 +256,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	elseif (ud.customParms.commtype) then AddEvent(ud.humanName .. ": commander lost", unitDefID, colorRed)
 	elseif (ud.isBuilding) then AddEvent(ud.humanName .. ": building destroyed", unitDefID, colorRed)
 	elseif (ud.modCategories.ship) or (ud.modCategories.sub) then AddEvent(ud.humanName .. " sunk", unitDefID, colorRed)
-	elseif (ud.isBuilder) then AddEvent(ud.humanName .. ": constructor lost", unitDefID, colorRed)
+	elseif ((ud.isBuilder or ud.builder) --[[TODO: remove isBuilder after 85.0]]) then AddEvent(ud.humanName .. ": constructor lost", unitDefID, colorRed)
 	else AddEvent(ud.humanName .. ": unit lost", unitDefID, colorRed)
 	end
 end
@@ -269,7 +269,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	--	Spring.Echo(name,param)
 	--end
 	-- cheap units aren't newsworthy unless they're builders
-	if (not ud.isBuilder and (UnitDefs[unitDefID].metalCost < (mIncome * options.minCostMult.value) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
+	if (not (ud.isBuilder or ud.builder) --[[TODO: remove isBuilder after 85.0]] and (UnitDefs[unitDefID].metalCost < (mIncome * options.minCostMult.value) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
 	if (not ud.canMove) or (ud.isFactory) then
 		AddEvent(ud.humanName .. ": construction completed", unitDefID, colorGreen, "structureComplete")
 	else

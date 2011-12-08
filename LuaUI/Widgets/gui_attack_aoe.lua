@@ -58,7 +58,7 @@ local GetUnitRadius          = Spring.GetUnitRadius
 local GetUnitStates          = Spring.GetUnitStates
 local TraceScreenRay         = Spring.TraceScreenRay
 local CMD_ATTACK             = CMD.ATTACK
-local CMD_DGUN               = CMD.DGUN
+local CMD_DGUN               = CMD.DGUN or CMD.MANUALFIRE	-- TODO: remove CMD.DGUN after 85.0
 local g                      = Game.gravity
 local GAME_SPEED             = 30
 local g_f                    = g / GAME_SPEED / GAME_SPEED
@@ -244,7 +244,7 @@ local function SetupUnitDef(unitDefID, unitDef)
     if (weapon.weaponDef) then
       local weaponDef = WeaponDefs[weapon.weaponDef]
       if (weaponDef) then
-        if (num == 3 and unitDef.canDGun) then
+        if (num == 3 and (unitDef.canDGun or unitDef.canManualFire)--[[TODO: remove canDGun after 85.0]]) then
           dgunInfo[unitDefID] = getWeaponInfo(weaponDef, unitDef)
         elseif (not weaponDef.isShield 
                 and not ToBool(weaponDef.interceptor)

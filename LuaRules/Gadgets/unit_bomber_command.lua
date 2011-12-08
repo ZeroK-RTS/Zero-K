@@ -76,7 +76,8 @@ local combatCommands = {	-- commands that require ammo to execute
 	[CMD.FIGHT] = true,
 	[CMD.PATROL] = true,
 	[CMD.GUARD] = true,
-	[CMD.DGUN] = true,
+	[CMD.DGUN] = true,	-- TODO: remove CMD.DGUN after 85.0
+	[CMD.MANUALFIRE] = true,
 }
 
 local padRadius = 750 -- land if pad is within this range

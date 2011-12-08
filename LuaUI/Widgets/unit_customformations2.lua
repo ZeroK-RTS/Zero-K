@@ -1,3 +1,4 @@
+--FIXME: use customcommands.h.lua instead of defining jump by its cmdid	(>:|)
 
 function widget:GetInfo()
 	return {
@@ -61,6 +62,7 @@ local positionCmds = {
 	[CMD.MOVE]=true,		[CMD.ATTACK]=true,		[CMD.RECLAIM]=true,		[CMD.RESTORE]=true,		[CMD.RESURRECT]=true,
 	[CMD.PATROL]=true,		[CMD.CAPTURE]=true,		[CMD.FIGHT]=true, 		[CMD.DGUN]=true,		[38521]=true, -- jump
 	[CMD.UNLOAD_UNIT]=true,	[CMD.UNLOAD_UNITS]=true,[CMD.LOAD_UNITS]=true,	[CMD.GUARD]=true,		[CMD.AREA_ATTACK] = true,
+	[CMD.MANUALFIRE] = true,	-- TODO: remove CMD.DGUN after 85.0
 }
 
 --------------------------------------------------------------------------------

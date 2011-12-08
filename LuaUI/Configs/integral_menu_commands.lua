@@ -183,6 +183,9 @@ local overrides = {
 	[CMD_RETREAT] = { texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'}, text=''},
 }]]
 
+-- TODO: remove in 85.0
+local CMD_MANUALFIRE = CMD.MANUALFIRE or CMD.DGUN
+
 local overrides = {
 	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png',  text= '\255\0\255\0A'},
 	[CMD.STOP] = { texture = imageDir .. 'Bold/cancel.png', text= '\255\0\255\0S'},
@@ -196,7 +199,7 @@ local overrides = {
 	[CMD.RECLAIM] = {text= '\255\0\255\0E', texture = imageDir .. 'Bold/reclaim.png'},
 	[CMD.RESURRECT] = {text= '\255\0\255\0S', texture = imageDir .. 'Bold/resurrect.png'},
 	[CMD_BUILD] = {text = '\255\0\255\0B', texture = imageDir .. 'Bold/build.png'},
-	[CMD.DGUN] = { texture = imageDir .. 'Bold/dgun.png', text= '\255\0\255\0D'},
+	[CMD_MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png', text= '\255\0\255\0D'},
 
 	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png', text= '\255\0\255\0L'},
 	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png', text= '\255\0\255\0U'},
