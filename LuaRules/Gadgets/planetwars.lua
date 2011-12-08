@@ -67,10 +67,10 @@ local function SpawnMobiles(teamnum) --Do not run this from Initialize()
 			spawnTries = 0
 			unitDef = UnitDefNames[m.unitname]
 			
-			if unitDef.isCommander then
+			if unitDef.customParms.commtype then
 				for _, uid in pairs(Spring.GetTeamUnits(teamnum)) do
 					local defID = Spring.GetUnitDefID(uid)
-					if (defID ~= nil and UnitDefs[defID] ~= nil and UnitDefs[defID].isCommander and UnitDefs[defID].name ~= "chickenbroodqueen") then
+					if (defID ~= nil and UnitDefs[defID] ~= nil and UnitDefs[defID].customParms.commtype and UnitDefs[defID].name ~= "chickenbroodqueen") then
 						-- GG.boostHandler.AddBoost(uid,2000,2000) --double boost disabled
 						break
 					end
@@ -274,7 +274,7 @@ local function AddPurchases(unitID, teamID)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID) -- TODO: rez and capture
-	if UnitDefs[unitDefID].isCommander then
+	if UnitDefs[unitDefID].customParms.commtype then
 		commanders[teamID] = commanders[teamID] or {}
 		commanders[teamID][unitID] = true
 		AddPurchases(unitID, teamID)
@@ -320,7 +320,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if (cmdID < CMD_PURCHASE or cmdID > MAX_PURCHASE) then
 		return false --command was not used
 	end
-	if not UnitDefs[unitDefID].isCommander then
+	if not UnitDefs[unitDefID].customParms.commtype then
 		return true, true --command was used, remove it
 	end
 	local po = purchaseOptions[teamID] and purchaseOptions[teamID][cmdID]

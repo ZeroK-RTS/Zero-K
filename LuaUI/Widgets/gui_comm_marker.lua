@@ -33,7 +33,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
   local x, y, z = spGetUnitPosition(unitID)
   local pos = {x, y, z}
   
-  if (udef.isCommander == true) then
+  if (udef.customParms.commtype) then
     spMarkerAddPoint( pos[1], pos[2], pos[3],  "Comm" )
     --setMarkerForUnit( unitID, udef, { x,y,z }, type, range, damage or nil )
   end

@@ -431,7 +431,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 
 	-- stuff for modular commanders
 	local commModules, commCost
-	if ud.isCommander then
+	if ud.customParms.commtype then
 		commModules = WG.GetCommModules and WG.GetCommModules(ud.id)
 		commCost = WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost
 	end

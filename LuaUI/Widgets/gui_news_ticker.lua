@@ -253,7 +253,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	
 	if (ud.canFly) then AddEvent(ud.humanName .. " shot down", unitDefID, colorRed)
 	elseif (ud.isFactory) then AddEvent(ud.humanName .. ": factory destroyed", unitDefID, colorRed)
-	elseif (ud.isCommander) then AddEvent(ud.humanName .. ": commander lost", unitDefID, colorRed)
+	elseif (ud.customParms.commtype) then AddEvent(ud.humanName .. ": commander lost", unitDefID, colorRed)
 	elseif (ud.isBuilding) then AddEvent(ud.humanName .. ": building destroyed", unitDefID, colorRed)
 	elseif (ud.modCategories.ship) or (ud.modCategories.sub) then AddEvent(ud.humanName .. " sunk", unitDefID, colorRed)
 	elseif (ud.isBuilder) then AddEvent(ud.humanName .. ": constructor lost", unitDefID, colorRed)

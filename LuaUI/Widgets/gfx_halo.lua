@@ -322,7 +322,7 @@ local function DrawVisibleUnitsLimited()
     for unitDefID,unitIDs in pairs(teamUnits) do
       local UnitDef = UnitDefs[unitDefID]
 
-      if (limitToCommanders and UnitDef.isCommander)or 
+      if (limitToCommanders and UnitDef.customParms.commtype)or 
          (limitToWorkers and UnitDef.isBuilder)
       then
         for _,unitID in ipairs(unitIDs) do

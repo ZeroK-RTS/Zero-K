@@ -99,7 +99,6 @@ function gadget:Initialize()
     badUnitDefs[v] = true
   end
   for udid, ud in pairs(UnitDefs) do
-    --if ((not ud.isCommander) and (ud.techLevel < 6)) then
     if (ud.isBuilding) or badUnitDefs[ud.name] or ud.customParams.nofps then
       badUnitDefs[udid] = ud.humanName
 	end

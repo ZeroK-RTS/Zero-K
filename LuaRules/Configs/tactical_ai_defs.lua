@@ -112,7 +112,7 @@ local medRangeSkirmieeArray = {
 }
 
 for name,data in pairs(UnitDefNames) do -- add all comms to mid range skirm
-	if data.isCommander then
+	if data.customParams.commtype then
 		medRangeSkirmieeArray[name] = true
 	end
 end

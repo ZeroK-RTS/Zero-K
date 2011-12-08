@@ -913,7 +913,7 @@ local function MakeTeam(teamID)
   local units = Spring.GetTeamUnits(teamID)
   local commID, commIndex
   for i,unitID in ipairs(Spring.GetTeamUnits(teamID)) do
-    if (UnitDefs[Spring.GetUnitDefID(unitID)].isCommander) then
+    if (UnitDefs[Spring.GetUnitDefID(unitID)].customParms.commtype) then
       commID = unitID
       commIndex = i
       break

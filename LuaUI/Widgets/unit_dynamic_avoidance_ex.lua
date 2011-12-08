@@ -230,7 +230,7 @@ function RefreshUnitList(attacker)
 			local unitSpeed =unitDef["speed"]
 			local unitInView = metaForVisibleUnits[unitID] --transfer "yes" or "nil" from meta table into a local variable
 			if (unitSpeed>0) then 
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef["isCommander"] then --only include only cloakies and constructor
+				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParms.commtype then --only include only cloakies and constructor
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView}
 				elseif not unitDef["canFly"] then --if enabled: include all ground unit

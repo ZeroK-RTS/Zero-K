@@ -261,7 +261,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to 
 	local teamID = GetUnitTeam(unitID)
 	ud = UnitDefs[unitDefID]
 	Echo ("<Unit Marker>: " .. unitID .. " from team " .. teamID .. " died.")
-	if (ud.isCommander==true) then --and (teamID == GetMyTeamID()) then
+	if (ud.customParms.commtype) then --and (teamID == GetMyTeamID()) then
 		Echo("<Unit Marker>: " .. unitID .. " is comm !")
 		spMarkerAddPoint( x, y, z)
 		if killer == nil then
@@ -276,7 +276,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to 
 	local unitTeamID = GetUnitTeam(unitID)
 	ud = UnitDefs[unitDefID]
 	local x, y, z = spGetUnitPosition(unitID)
-	if (ud.isCommander==true) and (unitTeamID == GetMyTeamID()) then
+	if (ud.customParms.commtype) and (unitTeamID == GetMyTeamID()) then
 		printDebug("<Unit Marker>: " .. unitID .. " is comm !")
 		firstUnitID = unitID
 		unitChecked = Spring.GetUnitsInRectangle (x-1, z-1, x+1, z+1) -- ( number xmin, number zmin, number xmax, number zmax [,number teamID] )
@@ -290,7 +290,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to 
 					--Spring.SendCommands({'say a:I lost my commander !'})	--would it kill you to actually check for spec state before doing this?
 				else
 					ud = UnitDefs[unitDefID]
-					if (ud.isCommander==true) and (unitTeamID == GetMyTeamID()) then
+					if (ud.customParms.commtype) and (unitTeamID == GetMyTeamID()) then
 						Echo ("<Unit Marker>: Your commander is upgraded.")
 					return end 
 				return end

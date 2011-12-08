@@ -140,7 +140,7 @@ for i,v in pairs (energy) do --not used yet
 	energyList[v] = true
 end
 for i=1, #UnitDefs do
-	if UnitDefs[i].isCommander then
+	if UnitDefs[i].customParms.commtype then
 		commanderList[UnitDefs[i].name] = true
 	end
 end
@@ -413,7 +413,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam)
       CoolPlay("udamaged", 20)
     end
     
-    if (UnitDefs[unitDefID].isCommander) then
+    if (UnitDefs[unitDefID].customParms.commtype) then
       health, maxHealth = GetUnitHealth(unitID)
       if health/maxHealth < 0.5 then
         CoolNoisePlay("warning2", 2)

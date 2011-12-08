@@ -305,16 +305,16 @@ effectUnitDefsXmas = {
 
 local levelScale = {
     1,
-    1.15,
+    1.1,
+    1.2,
     1.25,
-    1.4,
 }
 
 -- load presets from unitdefs
 for i=1,#UnitDefs do
 	local unitDef = UnitDefs[i]
 	
-    if unitDef.customParams.commtype then
+    if unitDef.customParams and unitDef.customParams.commtype then
         if unitDef.customParams.commtype == "1" then
             local s = levelScale[tonumber(unitDef.customParams.level) or 1]
             effectUnitDefs[unitDef.name] = {

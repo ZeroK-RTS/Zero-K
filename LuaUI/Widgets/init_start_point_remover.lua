@@ -33,7 +33,7 @@ function widget:Update()
 	for _,unitID in ipairs(teamUnits) do
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	local unitDef   = UnitDefs[unitDefID]
-		if (unitDef.isCommander) then
+		if (unitDef.customParms.commtype) then
 			local x, y, z = Spring.GetUnitPosition(unitID)
 			Spring.MarkerErasePosition(x, y, z)
 			Spring.SetCameraTarget(x, y, z)

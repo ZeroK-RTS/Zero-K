@@ -509,7 +509,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 		Spring.SetTeamResource(teamID, "ms", START_STORAGE + metalStore)		
 		local boostAmount = START_BOOST + BASE_COMM_COST - commCost
 		
-        if (udef.isCommander and udef.name ~= "chickenbroodqueen") then
+        if (udef.name ~= "chickenbroodqueen") then
           if (startMode == "facplopboost") then
             AddBoost(unitID, boostAmount, boostAmount)
           elseif (startMode == "boost") then
