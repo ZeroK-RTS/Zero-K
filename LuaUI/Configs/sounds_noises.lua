@@ -1304,7 +1304,7 @@ end
 local commanderUnderAttack = "comdying_core_1"
 
 for udid, ud in pairs(UnitDefs) do
-	if ud.customParms.commtype then
+	if ud.customParams.commtype then
 		if sounds[ud.name] then
 			sounds[ud.name].underattack = commanderUnderAttack
 			sounds[ud.name].attackdelay = function(hp) return 20*hp+2 end

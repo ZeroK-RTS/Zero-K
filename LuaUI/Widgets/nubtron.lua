@@ -627,7 +627,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if ud.name == 'corcom' then
 			myFaction = 'core'
 		end
-		if ud and ud.customParms.commtype then
+		if ud and ud.customParams.commtype then
 			myCommID = unitID	
 		end
 
@@ -753,7 +753,7 @@ function widget:Initialize()
 		local ud = UnitDefs[unitDefID]
 		local _, _, _, _, buildProgress = GetUnitHealth(unitID)
 
-		if ud and ud.customParms.commtype and unitTeam == myTeamID then
+		if ud and ud.customParams.commtype and unitTeam == myTeamID then
 			myCommID = unitID
 		end
 
@@ -787,7 +787,7 @@ function widget:SelectionChanged(selectedUnits)
 		local unitDefID = GetUnitDefID(unitID)
 		local ud = UnitDefs[unitDefID]
 		
-		if ud.customParms.commtype then
+		if ud.customParams.commtype then
 			setCondition('commSelected')
 		elseif classesByUnit[ud.name] then
 			setCondition( classesByUnit[ud.name] ..'Selected')

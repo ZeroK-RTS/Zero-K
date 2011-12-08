@@ -114,7 +114,7 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
 
-  if UnitDefs[unitDefID].customParms.commtype then myTeamID = GetMyTeamID() end
+  if UnitDefs[unitDefID].customParams.commtype then myTeamID = GetMyTeamID() end
   
   if (unitTeam == myTeamID) then 
   

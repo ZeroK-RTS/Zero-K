@@ -115,7 +115,7 @@ function AddAllianceUnit(u, ud, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] + 1
 	--Spring.Echo("added alliance=" .. teamID, 'count='..aliveCount[allianceID])
-	if UnitDefs[ud].customParms.commtype then
+	if UnitDefs[ud].customParams.commtype then
 		commsAlive[allianceID][u] = true
 	end	
 end
@@ -124,7 +124,7 @@ function RemoveAllianceUnit(u, ud, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] - 1
 	--Spring.Echo("removed alliance=" .. teamID, 'count='..aliveCount[allianceID]) 
-	if UnitDefs[ud].customParms.commtype then
+	if UnitDefs[ud].customParams.commtype then
 		commsAlive[allianceID][u] = nil
 	end	
 	if (CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) then

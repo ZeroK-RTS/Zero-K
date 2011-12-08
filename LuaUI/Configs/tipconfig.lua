@@ -219,7 +219,7 @@ superweapon = {}
 needPower = {}
 
 for i=1,#UnitDefs do
-	if UnitDefs[i].customParms.commtype then commander[i]=true
+	if UnitDefs[i].customParams.commtype then commander[i]=true
 	elseif UnitDefs[i].metalCost > THRESHOLD_EXPENSIVE then expensive_unit[i] = true end
 end
 
