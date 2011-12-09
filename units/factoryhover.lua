@@ -25,6 +25,10 @@ unitDef = {
   canPatrol        = true,
   canstop          = [[1]],
   category         = [[UNARMED FLOAT]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[120 45 120]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[box]],
   corpse           = [[DEAD]],
 
   customParams     = {
