@@ -308,6 +308,7 @@ local levelScale = {
     1.1,
     1.2,
     1.25,
+	1.3,
 }
 
 -- load presets from unitdefs

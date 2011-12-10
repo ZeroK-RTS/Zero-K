@@ -62,7 +62,7 @@ local x_cpu				= x_share + 20
 local x_ping			= x_cpu + 40
 local x_postping		= x_ping + 40
 
-local x_bound	= x_postping + 10
+local x_bound	= x_postping + 16
 
 local UPDATE_FREQUENCY = 0.5	-- seconds
 
@@ -775,7 +775,6 @@ function widget:Initialize()
 		tweakResizable = true,
 		minimizable = true,
 		minimumSize = {x_bound, 1},
-
 	}
 	scroll_cpl = ScrollPanel:New{
 		parent = window_cpl,	
@@ -784,6 +783,7 @@ function widget:Initialize()
 		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
 		--padding = {0, 0, 0, 0},
 		--autosize = true,
+		horizontalScrollbar = false,
 		hitTestAllowEmpty = true
 	}
 
