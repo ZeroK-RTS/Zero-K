@@ -172,7 +172,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 
 	local weaponType = weaponDef.type
 	local scatter = weaponDef.accuracy + weaponDef.sprayAngle
-	local aoe = weaponDef.areaOfEffect
+	local aoe = weaponDef.areaOfEffect or weaponDef.damageAreaOfEffect	-- TODO: remove areaOfEffect after 85.0
 	local cost = unitDef.cost
 	local mobile = unitDef.speed > 0
 	local waterWeapon = weaponDef.waterWeapon
@@ -244,12 +244,13 @@ local function SetupUnitDef(unitDefID, unitDef)
     if (weapon.weaponDef) then
       local weaponDef = WeaponDefs[weapon.weaponDef]
       if (weaponDef) then
+		local aoe = weaponDef.areaOfEffect or weaponDef.damageAreaOfEffect	-- TODO: remove areaOfEffect after 85.0
         if (num == 3 and (unitDef.canDGun or unitDef.canManualFire)--[[TODO: remove canDGun after 85.0]]) then
           dgunInfo[unitDefID] = getWeaponInfo(weaponDef, unitDef)
         elseif (not weaponDef.isShield 
                 and not ToBool(weaponDef.interceptor)
-                and (weaponDef.areaOfEffect > maxSpread or weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle) > maxSpread )) then
-          maxSpread = max(weaponDef.areaOfEffect, weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle))
+                and (aoe > maxSpread or weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle) > maxSpread )) then
+          maxSpread = max(aoe, weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle))
           maxWeaponDef = weaponDef
         end
       end
