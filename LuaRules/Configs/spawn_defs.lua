@@ -44,7 +44,7 @@ endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 burrowQueenTime		= 15		-- how much killing a burrow shaves off the queen timer, seconds
 burrowWaveSize		= 1.2		-- size of contribution each burrow makes to wave size (1 = 1 squadSize of chickens)
 burrowRespawnChance = 0.15
-burrowRegressTime	= 60		-- direct tech time regress from killing a burrow, divided by playercount
+burrowRegressTime	= 40		-- direct tech time regress from killing a burrow, divided by playercount
 
 humanAggroPerBurrow	= 1			-- divided by playercount
 humanAggroDecay		= 0.25		-- linear rate at which aggro decreases
