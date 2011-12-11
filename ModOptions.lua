@@ -335,14 +335,6 @@ local options = {
   },
   --]]
   {
-    key    = 'stayonteam',
-    name   = 'Stay On Team (Dysfunctional)',
-    desc   = 'Players are only removed from a team when they resign/drop. To become a spec, select all units and share them.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
-  {
     key    = 'specialpower',
     name   = 'Special Advanced Powerplants',
     desc   = 'Rather than explode like a nuke, Adv Fusion do a massive implosion.',
@@ -426,6 +418,15 @@ local options = {
 	def		= true,
 	section	= "experimental",
   },
+  {
+	key		= "qtpfs",
+	name	= "QTPFS Pathfinder",
+	desc	= "Enables Quadtree Pathfinding System (experimental)",
+	type	= "bool",
+	def		= false,
+	section	= "experimental",
+  },  
+  
   {
     key    = 'chicken',
     name   = 'Chicken',

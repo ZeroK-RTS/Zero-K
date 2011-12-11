@@ -109,7 +109,11 @@ local modrules  = {
     featureVisibility = 1;
   },
   
+  system = {
+	pathFinderSystem = (Spring.GetModOptions() and Spring.GetModOptions().qtpfs and 1) or 0,
+  }
 }
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
