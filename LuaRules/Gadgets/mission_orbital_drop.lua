@@ -44,7 +44,7 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID, teleport)
   local unitDef = UnitDefNames[unitDefName]
   if not unitDef.isBuilding and unitDef.speed > 0 and Spring.GetGameFrame() > 1 then
     y = Spring.GetGroundHeight(x, z) + unitSpawnHeight
-    units[unitID] = true
+    units[unitID] = y
     Spring.MoveCtrl.Enable(unitID)
     Spring.MoveCtrl.SetPosition(unitID, x, y, z)
     Spring.MoveCtrl.SetGravity(unitID, fallGravity)
@@ -54,7 +54,7 @@ end
 
 
 function gadget:GameFrame(frame)
-  for unitID in pairs(units) do
+  for unitID, yLast in pairs(units) do
     if Spring.ValidUnitID(unitID) then
       local x, y, z = Spring.GetUnitBasePosition(unitID)
       local h = Spring.GetGroundHeight(x, z)
@@ -63,7 +63,7 @@ function gadget:GameFrame(frame)
 	  if frame%15 == 0 then
 		--Spring.Echo(y, dy)
 	  end
-      if y <= h or dy >= 1 then 
+      if y <= h or y > yLast then 
         -- unit has landed (or is moving up, which means it has missed the ground)
         Spring.MoveCtrl.SetPosition(unitID, x, h, z)
         Spring.MoveCtrl.SetVelocity(unitID, 0, 0, 0)
@@ -79,11 +79,13 @@ function gadget:GameFrame(frame)
 			Spring.SpawnCEG("banishertrail", x + 10, y - 40, z - 10)
 			Spring.SpawnCEG("banishertrail", x - 10, y - 40, z - 10)
 		end
+		units[unitID] = y
       else
 	  	-- unit is falling
 		if frame % 2 == 0 then
 			Spring.SpawnCEG("raventrail", x, y - 40, z) -- meteor trail
 		end
+		units[unitID] = y
       end
     else
       units[unitID] = nil
