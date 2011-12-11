@@ -652,6 +652,25 @@ local function StripNanos()
 	SelectUnitArray(units2, false)
 end
 ]]--
+
+-- comm selection functionality
+local commIndex = 1
+local function SelectComm()
+	if #comms <= 0 then return end	-- no comms, don't bother
+	local unitID = -1
+	
+	repeat	-- if this comm is already in selection, try the next one
+		--Spring.Echo(commIndex)
+		unitID = comms[commIndex].commID
+		if #comms == 1 then break end	-- no other comms, just select this one
+		commIndex = commIndex + 1	-- try next comm
+		if commIndex > #comms then commIndex = 1 end	-- loop
+	until not Spring.IsUnitSelected(unitID)
+	
+	local alt, ctrl, meta, shift = Spring.GetModKeyState()
+	Spring.SelectUnitArray({unitID}, shift)
+end
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- engine callins
@@ -669,7 +688,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 
 	if UnitDefs[unitDefID].isFactory and (not exceptionArray[unitDefID]) then
 		AddFac(unitID, unitDefID)
-	elseif UnitDefs[unitDefID].isCommander then
+	elseif UnitDefs[unitDefID].customParams.level then
 		AddComm(unitID, unitDefID)
 	end
 end
@@ -808,6 +827,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget(widget)
 		return
 	end
+	
+	widgetHandler:AddAction("selectcomm", SelectComm, nil, 't')
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -947,4 +968,8 @@ function widget:Initialize()
 	self:ViewResize(viewSizeX, viewSizeY)
 	
 	InitializeUnits()
+end
+
+function widget:Shutdown()
+	widgetHandler:RemoveAction("selectcomm")
 end
