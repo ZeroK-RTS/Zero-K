@@ -57,7 +57,7 @@ unitDef = {
   movementClass          = [[TANK3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[coracv]],
+  objectName             = [[welder.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
