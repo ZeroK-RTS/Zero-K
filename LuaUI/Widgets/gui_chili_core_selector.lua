@@ -741,7 +741,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	end
 	local ud = UnitDefs[unitDefID]
 	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory)
-	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].isCommander)
+	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].customParams.level)
 	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove) then
 		idleCons[unitID] = true
 		wantUpdateCons = true

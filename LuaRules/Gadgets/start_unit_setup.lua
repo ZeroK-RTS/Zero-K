@@ -542,7 +542,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 
       end
 
-      if (udef.isCommander and udef.name ~= "chickenbroodqueen") then
+      if (udef.customParams.level and udef.name ~= "chickenbroodqueen") then
         if plop then
           facplops[unitID] = 1
         end

@@ -233,9 +233,6 @@ for name, ud in pairs(UnitDefs) do
 		end
 	end
 	if (hasShield) then
-		if not ud.customparams then
-			ud.customparams = {}
-		end
 		ud.customparams.cannotcloak = 1
 		ud.mincloakdistance = 0
 		ud.cloakcost = nil

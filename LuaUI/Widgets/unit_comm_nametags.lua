@@ -139,7 +139,7 @@ function widget:Initialize()
   local allUnits = GetAllUnits()
   for _, unitID in pairs(allUnits) do
     local unitDefID = GetUnitDefID(unitID)
-    if (unitDefID and UnitDefs[unitDefID].isCommander) then
+    if (unitDefID and UnitDefs[unitDefID].customParams.level) then
       comms[unitID] = GetCommAttributes(unitID, unitDefID)
     end
   end
@@ -215,7 +215,7 @@ function widget:DrawWorld()
 end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
-  if (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isCommander) then
+  if (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].customParams.level) then
     comms[unitID] = GetCommAttributes(unitID, unitDefID)
   end
 end

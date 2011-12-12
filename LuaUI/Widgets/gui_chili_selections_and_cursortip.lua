@@ -2021,7 +2021,7 @@ function widget:Initialize()
 
 	for i=1,#UnitDefs do
 		local ud = UnitDefs[i]
-		if (ud.isCommander)           --// engine overrides commanders tooltips with playernames
+		if (ud.customParams.level)           --// engine overrides commanders tooltips with playernames
 		  or (ud.extractsMetal > 0)   --// the Overdrive gadgets adds additional information to the tooltip, but the visualize it a different way
 		then
 			ud.chili_selections_useStaticTooltip = true
