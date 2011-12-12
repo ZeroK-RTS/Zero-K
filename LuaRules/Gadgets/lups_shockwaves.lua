@@ -19,7 +19,7 @@ if (gadgetHandler:IsSyncedCode()) then
   for i=1,#WeaponDefs do
     local wd = WeaponDefs[i]
     if (not wd.description:find("ChickenKick")) then
-      if (wd.areaOfEffect>70 and not wd.paralyzer) then
+      if (wd.damageAreaOfEffect>70 and not wd.paralyzer) then
         Script.SetWatchWeapon(wd.id,true)
       elseif (wd.type == "DGun") then
         Script.SetWatchWeapon(wd.id,true)
@@ -40,7 +40,7 @@ if (gadgetHandler:IsSyncedCode()) then
     else
       --local growth = wd.explosionSpeed
       --local life = wd.areaOfEffect / wd.explosionSpeed
-      local growth = (wd.areaOfEffect*1.1)/20
+      local growth = (wd.damageAreaOfEffect*1.1)/20
       local life = 23
       SendToUnsynced("lups_shockwave", px, py, pz, growth, life)
     end

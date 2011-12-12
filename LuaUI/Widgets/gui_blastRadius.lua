@@ -174,7 +174,7 @@ function DrawBuildMenuBlastRange()
 	end
 	
 	local deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
-	local blastRadius = weapTab[deathBlasId].areaOfEffect
+	local blastRadius = weapTab[deathBlasId].damageAreaOfEffect
 	local defaultDamage = weapTab[deathBlasId].damages[0]	--get default damage
 		
 	local mx, my = spGetMouseState()
@@ -237,8 +237,8 @@ function DrawUnitBlastRadius( unitID )
 		deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
 		blastId = weapNamTab[lower(udef["selfDExplosion"])].id
 
-		blastRadius = weapTab[blastId].areaOfEffect
-		deathblastRadius = weapTab[deathBlasId].areaOfEffect
+		blastRadius = weapTab[blastId].damageAreaOfEffect
+		deathblastRadius = weapTab[deathBlasId].damageAreaOfEffect
 						
 		blastDamage = weapTab[blastId].damages[0]
 		deathblastDamage = weapTab[deathBlasId].damages[0]

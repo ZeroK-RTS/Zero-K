@@ -24,7 +24,7 @@ end
 for i=1,#WeaponDefs do
   local wd = WeaponDefs[i]
   --note that area of effect is radius, not diameter here!
-  if (wd.areaOfEffect >= 300 and wd.targetable) then
+  if (wd.damageAreaOfEffect >= 300 and wd.targetable) then
     nux[wd.id] = true
     Script.SetWatchWeapon(wd.id, true)
   end

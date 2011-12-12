@@ -2704,8 +2704,8 @@ for i=1,#WeaponDefs do
 		Script.SetWatchWeapon(wd.id,true)
 		SeismicWeapon[wd.id] = {
 			smooth = wd.customParams.smoothmult or DEFAULT_SMOOTH,
-			smoothradius = wd.customParams.smoothradius or wd.areaOfEffect*0.5,
-			gatherradius = wd.customParams.gatherradius or wd.areaOfEffect*0.75,
+			smoothradius = wd.customParams.smoothradius or wd.craterAreaOfEffect*0.5,
+			gatherradius = wd.customParams.gatherradius or wd.craterAreaOfEffect*0.75,
 		}
 	end
 end
