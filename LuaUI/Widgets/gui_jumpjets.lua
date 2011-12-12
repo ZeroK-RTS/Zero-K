@@ -264,15 +264,16 @@ function widget:UnitDestroyed(unitID)
 end
 
 
+--[[
 function widget:Initialize()
   -- check for custom key bind, bind jump if does not exist
-  local hotkeys = Spring.GetActionHotKeys("markingmenu")
-  if hotkeys == nil then
+  local hotkeys = Spring.GetActionHotKeys("jump")
+  if #hotkeys == 0 then
 	Spring.SendCommands("unbind any+j mouse2")  
 	Spring.SendCommands("bind any+j jump")
   end
 end 
-
+]]--
 
 function widget:DrawWorld()
   local _, activeCommand = spGetActiveCommand()

@@ -669,6 +669,10 @@ local function SelectComm()
 	
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	Spring.SelectUnitArray({unitID}, shift)
+	if not shift then
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		Spring.SetCameraTarget(x, y, z)
+	end
 end
 
 -------------------------------------------------------------------------------
