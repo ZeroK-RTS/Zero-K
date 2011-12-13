@@ -19,6 +19,7 @@ unitDef = {
 	[[amphraider]],
 	[[amphassault]],
 	[[amphaa]],
+	[[subscout]],
 	[[corsub]],
 	[[serpent]],
   },
