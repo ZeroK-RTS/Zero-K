@@ -42,6 +42,9 @@ local floor = math.floor
 local terraunitDefID = UnitDefNames["terraunit"].id
 local terraformCost = UnitDefNames["terraunit"].metalCost
 
+local mexDefID = UnitDefNames["cormex"].id
+local mexCost = UnitDefNames["cormex"].metalCost
+
 local airDamageList		= {}
 local friendlyDamageList= {}
 local damageList 		= {}
@@ -56,6 +59,9 @@ local reclaimList		= {}
 local terraformList		= {}
 local ouchDamageList	= {}
 local kamDamageList		= {}
+local commDamageList	= {}
+local mexList			= {}
+local energyList		= {}	--unused
 local shareList			= {}
 local shareListTemp1	= {}
 local shareListTemp2	= {}
@@ -72,7 +78,7 @@ local shareList_update = five_minute_frames
 --shareList_update = 32*20
 
 
-local boats, t3Units = {}, {}
+local boats, t3Units, comms = {}, {}, {}
 
 local nukes = {	armsilo=1, 	corsilo=1,
 				armshock=1,	cortron=1,
@@ -198,6 +204,8 @@ function gadget:Initialize()
 		terraformList[team] 	= 0
 		ouchDamageList[team]	= 0
 		kamDamageList[team]		= 0
+		commDamageList[team]	= 0
+		mexList[team]			= 0
 		shareList[team]			= 0
 		shareListTemp1[team]	= 0
 		shareListTemp2[team]	= 0
@@ -232,6 +240,12 @@ function gadget:Initialize()
 		end
 	end
 
+	for i=1,#UnitDefs do
+		if(UnitDefs[i].customParams.level) then comms[i] = true
+	end
+
+ end
+ 
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
@@ -330,12 +344,19 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 			
 			elseif t3Units[attackerDefID] then
 				t3DamageList[attackerTeam] = t3DamageList[attackerTeam] + damage
-			
-			
+
+			elseif comms[attackerDefID] then
+				commDamageList[attackerTeam] = commDamageList[attackerTeam] + damage
+				
 			end	
 		end
 	end
-	
+end
+
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+	if unitDefID == mexDefID then
+		mexList[teamID] = mexList[teamID] + 1
+	end
 end
 
 function gadget:GameFrame(n)
@@ -371,6 +392,7 @@ function gadget:GameFrame(n)
 		local empTeam, 	maxEmpDamage 	= getMaxVal(empDamageList)
 		local t3Team, 	maxT3Damage 	= getMaxVal(t3DamageList)
 		local kamTeam, 	maxKamDamage 	= getMaxVal(kamDamageList)
+		local commTeam, maxCommDamage 	= getMaxVal(commDamageList)
 		
 		local reclaimTeam, 	maxReclaim 	= getMaxVal(reclaimList)
 		local terraTeam, maxTerra		= getMaxVal(terraformList)
@@ -379,6 +401,8 @@ function gadget:GameFrame(n)
 		
 		local capTeam, 	maxCap	 		= getMaxVal(captureList)
 		local shareTeam, maxShare 		= getMaxVal(shareList)
+
+		local mexTeam, maxMex			= getMaxVal(mexList)
 		
 		local friendTeam
 		local maxFriendlyDamageRatio = 0
@@ -456,6 +480,9 @@ function gadget:GameFrame(n)
 		if kamTeam and maxKamDamage > getMeanDamageExcept(kamTeam) * veryEasyFactor then
 			awardAward(kamTeam, 'kam', 'Damage: '.. comma_value(maxKamDamage))
 		end
+		if commTeam and maxCommDamage > getMeanDamageExcept(commTeam) * veryEasyFactor then
+			awardAward(commTeam, 'comm', 'Damage: '.. comma_value(maxCommDamage))
+		end
 		if fireTeam and maxFireDamage > getMeanDamageExcept(fireTeam) * easyFactor then
 			awardAward(fireTeam, 'fire', 'Damage: '.. comma_value(maxFireDamage))
 		end
@@ -483,6 +510,9 @@ function gadget:GameFrame(n)
 		if ouchTeam then
 			awardAward(ouchTeam, 'ouch', 'Damage: '.. comma_value(maxOuchDamage))
 		end
+		if mexTeam and maxMex > 15 then
+			awardAward(mexTeam, 'mex', 'Mexes: '.. maxMex .. ' built')
+		end
 		if expUnitExp >= 3.0 then
 			local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
 			--local expUnitExpRounded = ''..floor(expUnitExp * 10)/10
@@ -490,7 +520,7 @@ function gadget:GameFrame(n)
 			expUnitExpRounded = expUnitExpRounded:sub(1,-2) .. '.' .. expUnitExpRounded:sub(-1) 
 			awardAward(expUnitTeam, 'vet', vetName ..', '.. expUnitExpRounded ..' XP')
 		end
-			
+
 		_G.awardList = awardList
 		sentAwards = true
 	end
@@ -573,6 +603,8 @@ local awardDescs =
 	vet 	= 'Decorated Veteran',
 	ouch 	= 'Big Purple Heart',
 	kam		= 'Kamikaze Award',
+	comm	= 'Master and Commander',
+	mex		= 'Mineral Prospector',
 }
 
 function gadget:Initialize()
