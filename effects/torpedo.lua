@@ -11,6 +11,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       water              = true,
+	  underwater		 = true,
       properties = {
         airdrag            = 0.95,
         alwaysvisible      = false,
@@ -37,6 +38,7 @@ return {
       class              = [[CExpGenSpawner]],
       count              = 1,
       water              = true,
+	  underwater		 = true,
       properties = {
         delay              = 0,
         dir                = [[dir]],
@@ -50,6 +52,7 @@ return {
       count              = 16,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         alpha              = 1,
         alphadecay         = 0.125,
@@ -63,6 +66,7 @@ return {
       class              = [[CSpherePartSpawner]],
       count              = 1,
       water              = true,
+	  underwater		 = true,
       properties = {
         alpha              = 0.25,
         alwaysvisible      = false,
@@ -80,6 +84,7 @@ return {
       count              = 4,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         colormap           = [[0.45 0.45 0.5 0.5  0.045 0.045 0.05 0.05]],
         dir                = [[-0.1 r0.2, 1, -0.1 r0.2]],
