@@ -1,3 +1,5 @@
+//linear constant 65536
+
 // wobbling nanoturrets, comment out to disable
 //#define WOBBLE
 
@@ -64,7 +66,7 @@ Open()
 	wait-for-turn top around y-axis;
 	turn mid to y-axis <90> speed TURNSPEED2;
 	wait-for-turn mid around y-axis;
-	turn bottom to y-axis <180>+1 speed TURNSPEED3;
+	turn bottom to y-axis <180> speed TURNSPEED3;
 	wait-for-turn bottom around y-axis;
 
 	move top1 to z-axis     [13] speed MOVESPEED2;
@@ -91,8 +93,8 @@ Open()
 	
 	turn bay1a to y-axis  <-90>   speed TURNSPEED1;
 	turn bay2a to y-axis   <90>   speed TURNSPEED1;
-	turn door1 to y-axis <-180>+1 speed TURNSPEED3;
-	turn door2 to y-axis  <180>-1 speed TURNSPEED3;
+	turn door1 to y-axis <-180> speed TURNSPEED3;
+	turn door2 to y-axis  <180> speed TURNSPEED3;
 	wait-for-turn bay1a around y-axis;
 	wait-for-turn bay2a around y-axis;
 	wait-for-turn door1 around y-axis;
@@ -196,7 +198,7 @@ Close()
 Activate()
 {
 	signal SIG_ACTIVATION;
-	set-signal-mask SIG_ACTIVATION;
+	//set-signal-mask SIG_ACTIVATION;
 	
 	call-script Open();
 	set YARD_OPEN to 1;
@@ -225,7 +227,7 @@ Deactivate()
 		set YARD_OPEN to 0;
 	}
 	set BUGGER_OFF to 0;
-	call-script Close();
+	start-script Close();
 }
 
 
@@ -339,7 +341,7 @@ Killed(severity, corpsetype)
 	}
 	else if(severity >= 25 AND severity < 50)
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode body type BITMAPONLY | BITMAP;
 		explode top1 type BITMAPONLY | BITMAP;
 		explode top2 type BITMAPONLY | BITMAP;
@@ -357,7 +359,7 @@ Killed(severity, corpsetype)
 	}
 	else if(severity >= 50 AND severity < 100)
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode body type BITMAPONLY | BITMAP;
 		explode top1 type BITMAPONLY | BITMAP;
 		explode top2 type BITMAPONLY | BITMAP;
@@ -379,7 +381,7 @@ Killed(severity, corpsetype)
 	// D-Gunned/Self-D
 	else if(severity >= 100)
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode body type SHATTER | BITMAP;
 		explode top1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
 		explode top2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;

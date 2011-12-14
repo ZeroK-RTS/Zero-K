@@ -44,7 +44,7 @@ local smokePieces = { piece "wing_1", piece "wing_2", piece "wing_3" }
 --opening animation of the factory
 local function Open()
 	Signal(2) --kill the closing animation if it is in process
-	SetSignalMask(1) --set the signal to kill the opening animation
+	--SetSignalMask(1) --set the signal to kill the opening animation
 
 	Turn(wing_1, 3, -1.57, 1)
 	Turn(wing_2, 1, -1.57, 1)

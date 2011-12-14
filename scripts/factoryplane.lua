@@ -36,7 +36,7 @@ local smokePieces = { piece "bay", piece "pad1", piece "fuelpad" }
 --opening animation
 local function Open()
 	Signal(2) --kill the closing animation if it is in process
-	SetSignalMask(1) --set the signal to kill the opening animation
+	--SetSignalMask(1) --set the signal to kill the opening animation
 
 	Move(bay, 1, -18, 15)
 
