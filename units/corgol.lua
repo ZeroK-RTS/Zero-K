@@ -172,7 +172,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 12000,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
@@ -186,47 +186,7 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-
-    DEAD2      = {
-      description      = [[Debris - Goliath]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 12000,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      hitdensity       = [[100]],
-      metal            = 760,
-      object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 760,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
-    FLAME_HEAP = {
-      description      = [[Wreckage]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 80000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 510,
-      object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 510,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
+	
     HEAP       = {
       description      = [[Debris - Goliath]],
       blocking         = false,

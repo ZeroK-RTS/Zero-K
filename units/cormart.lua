@@ -89,6 +89,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
+	  explosionGenerator      = [[custom:PLASMA_HIT_96]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
@@ -117,7 +118,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 700,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -131,28 +132,7 @@ unitDef = {
       world            = [[All Worlds]],
     },
 
-
-    DEAD2 = {
-      description      = [[Debris - Pillager]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 700,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 280,
-      object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 280,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
+    
     HEAP  = {
       description      = [[Debris - Pillager]],
       blocking         = false,

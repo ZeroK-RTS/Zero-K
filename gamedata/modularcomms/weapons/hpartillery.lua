@@ -18,6 +18,7 @@ local weaponDef = {
 	},
 	
 	edgeEffectiveness       = 0.5,
+	explosionGenerator      = [[custom:PLASMA_HIT_96]],	
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 1,
