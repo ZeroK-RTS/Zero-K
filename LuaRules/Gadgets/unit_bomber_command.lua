@@ -361,7 +361,7 @@ function gadget:GameFrame(n)
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
 				local queue = Spring.GetUnitCommands(unitID)
 				if queue and #queue > 0 and combatCommands[queue[1].id] then
-					RequestRearm(unitID)
+					RequestRearm(unitID, nil, true)
 				end
 			end
 		end
