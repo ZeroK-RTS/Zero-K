@@ -223,6 +223,8 @@ local overrides = {
 	
 	[CMD_ONECLICK_WEAPON] = {text= '\255\0\255\0D', texture = imageDir .. 'Bold/action.png'},
 	
+	[CMD_ABANDON_PW] = {text= '', texture = 'LuaUI/Images/Crystal_Clear_action_flag_white.png'},
+	
 	-- states
 	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, text=''},
 	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, text=''},

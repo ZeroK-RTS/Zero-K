@@ -5,18 +5,30 @@ function gadget:GetInfo()
 		author = "GoogleFrog",
 		date = "27, April 2011",
 		license = "Public Domain",
-		layer = 1,
+		layer = math.huge,
 		enabled = true
 	}
 end
 
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
-local defender = nil
-
 if (not gadgetHandler:IsSyncedCode()) then
 	return
 end
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+local defender = nil
+
+include "LuaRules/Configs/customcmds.h.lua"
+
+local abandonCMD = {
+    id      = CMD_ABANDON_PW,
+    name    = "Abandon",
+    action  = "abandon",
+	cursor  = 'Repair',
+    type    = CMDTYPE.ICON,
+	tooltip = "Abandon this building (marks it as neutral)",
+}
 
 local spGetGroundHeight	= Spring.GetGroundHeight
 
@@ -31,8 +43,10 @@ local stuffToReport = {data = {}, count = 0}
 
 GG.pwUnitsByID = unitsByID
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+------------------------------------------------------------------------
+------------------------------------------------------------------------
 
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 	if unitsByID[unitID] and not paralyzer then
 		unitsByID[unitID].totalDamage = (unitsByID[unitID].totalDamage or 0) + damage
 		if attackerTeam then
@@ -100,6 +114,7 @@ local function spawnStructures(left, top, right, bottom, team)
 				
 				local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID)
 				Spring.SetUnitNeutral(unitID,true)
+				Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
 				unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
 			end
 		end
@@ -203,6 +218,16 @@ function gadget:Initialize()
 			gadgetHandler:RemoveGadget()
 		end
 	end
+end
+
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	if unitsByID[unitID] and cmdID == CMD_ABANDON_PW then
+		local gaiaTeam = Spring.GetGaiaTeamID()
+		Spring.TransferUnit(unitID, gaiaTeam, true)
+		Spring.SetUnitNeutral(unitID, true)
+		return false
+	end
+	return true
 end
 
 ------------------------------------------------------------------------
