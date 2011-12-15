@@ -264,29 +264,6 @@ local function UpdatePlayerInfo()
 			local playerID = entities[i].playerID
 			local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
 			
-			if ((not spectator) or options.showSpecs.value) then
-				-- update ping and CPU
-				pingTime = pingTime or 0
-				cpuUsage = cpuUsage or 0
-				local min_pingTime = math.min(pingTime, 1)
-				local min_cpuUsage = math.min(cpuUsage, 1)
-				local cpuCol = pingCpuColors[ math.ceil( min_cpuUsage * 5 ) ] 
-				local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
-				local pingTime_readable = PingTimeOut(pingTime)
-				
-				local cpuLabel = entities[i].cpuLabel
-				if cpuLabel then
-					cpuLabel.font.color = cpuCol
-					cpuLabel:SetCaption(math.round(cpuUsage*100) .. '%')
-					cpuLabel:Invalidate()
-				end
-				local pingLabel = entities[i].pingLabel
-				if pingLabel then
-					pingLabel.font.color = pingCol
-					pingLabel:SetCaption(pingTime_readable)
-					pingLabel:Invalidate()
-				end
-			end
 			if wantsNameRefresh[playerID] then
 				local name_out = name or ''
 				if name_out == ''
@@ -304,6 +281,33 @@ local function UpdatePlayerInfo()
 				end
 				if entities[i].nameLabel then 
 					entities[i].nameLabel:SetCaption(name_out)
+				end
+				wantsNameRefresh[playerID] = nil
+			end			
+			
+			if ((not spectator) or options.showSpecs.value) then
+				-- update ping and CPU
+				pingTime = pingTime or 0
+				cpuUsage = cpuUsage or 0
+				local min_pingTime = math.min(pingTime, 1)
+				local min_cpuUsage = math.min(cpuUsage, 1)
+				local cpuCol = pingCpuColors[ math.ceil( min_cpuUsage * 5 ) ] 
+				local pingCol = pingCpuColors[ math.ceil( min_pingTime * 5 ) ]
+				local pingTime_readable = PingTimeOut(pingTime)
+				
+				local blank = not active
+				
+				local cpuLabel = entities[i].cpuLabel
+				if cpuLabel then
+					cpuLabel.font.color = cpuCol
+					cpuLabel:SetCaption(blank and '' or math.round(cpuUsage*100) .. '%')
+					cpuLabel:Invalidate()
+				end
+				local pingLabel = entities[i].pingLabel
+				if pingLabel then
+					pingLabel.font.color = pingCol
+					pingLabel:SetCaption(blank and '' or pingTime_readable)
+					pingLabel:Invalidate()
 				end
 			end
 		end	-- if not isAI
@@ -405,7 +409,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
 		end 
 		if customKeys.level ~= nil and customKeys.level~="" then 
-			icRank = "LuaUI/Images/Ranks/" .. (1+math.ceil((customKeys.level or 0)/10)) .. ".png"
+			icRank = "LuaUI/Images/Ranks/" .. (1+math.floor((customKeys.level or 0)/10)) .. ".png"
 		end
 	end 
 	
@@ -497,7 +501,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 		)
 	end
 	-- CPU, ping
-	if not (entity.isAI or deadTeam) then
+	if not (entity.isAI) then
 		local cpuLabel = Label:New{
 			x=x_cpu,
 			y=fontsize * row,
