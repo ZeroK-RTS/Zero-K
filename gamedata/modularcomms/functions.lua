@@ -31,7 +31,8 @@ function RemoveWeapons(unitDef)
 end
 
 function ApplyWeapon(unitDef, weapon, replace, forceslot)
-	local wcp = (weapons[weapon] and weapons[weapon].customparams) or {}
+	weapons[weapon].customparams = weapons[weapon].customparams or {}
+	local wcp = weapons[weapon].customparams
 	local slot = tonumber(wcp.slot) or 4
 	local isDgun = (tonumber(wcp.slot) == 3)
 	local altslot = tonumber(wcp.altslot or 3)
