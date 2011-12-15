@@ -12,6 +12,7 @@ heavylaser_fire2.wav
 small_laser_fire.wav
 small_laser_fire2.wav
 small_laser_fire3.wav
+small_laser_fire4.wav
 laser_burn.wav
 laser_burn2.wav
 laser_burn3.wav
@@ -32,3 +33,5 @@ pulse_laser3.wav
 heavy_laser3.wav - Kanoba & Nanoblobs
 
 laser_fire_test1.wav - GoogleFrog
+
+pulse_laser.wav - Skorpio

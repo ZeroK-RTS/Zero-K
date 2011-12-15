@@ -52,4 +52,7 @@ Unknown:
 brawler_emg.wav
 
 Kanoba:
-cannon_hit3
+cannon_hit3.wav
+flak_fire.wav
+flak_hit.wav
+shell_gun.wav
