@@ -160,6 +160,7 @@ local function CheckForVictory()
 		end
     end
 	if count < 2 then
+		Spring.Echo(lastAllyTeam or "Nobody" .. " wins!")
 		spGameOver({lastAllyTeam})
 	end
 end
