@@ -1,7 +1,7 @@
 include("colors.h.lua")
 include("keysym.h.lua")
 
-local versionNumber = "6.2.5"
+local versionNumber = "6.2.6"
 
 function widget:GetInfo()
 	return {
@@ -19,8 +19,9 @@ end
 -- to do : include chicken buildings.
 
 ---- CHANGELOG -----
--- Google Frog          v6.2.5  (11dec2010) :   moved all range display config to chilli menu. Removed extraneous configs
--- versus666,			v6.2.4	(04nov2010)	:	added widget name over buttons when in tweak mode, cleared than a plain box + widget name in tooltips when hovering over buttons.
+-- versus666,			v6.2.6	(16dec2011)	:	comply with F5 (hide gui->hide ranges) for clean screenshots.
+-- Google Frog          v6.2.5  (11dec2010) :	moved all range display config to chilli menu. Removed extraneous configs
+-- versus666,			v6.2.4	(04nov2010)	:	added widget name over buttons when in tweak mode, clearer than a plain box + widget name in tooltips when hovering over buttons.
 -- versus666,			v6.2.3	(04nov2010)	:	added hacksaw to unit list + defRangeNoButtons var & checks due to licho's request, need to add var to option menu.
 												made defRangeNoButtons = true & all ranges visible by default until there is a decent (chili?)gui to enable/disable ranges or buttons. Change at will but use the damn changelog to show who, when, what and how. Thanks.
 -- versus666, 			v6.2.2	(28oct2010)	:	Cleaned some bits of code.
@@ -253,7 +254,7 @@ function UnitDetected( unitID, allyTeam, teamId )
 	local weaponDef
 
 	if (#udef.weapons == 0  ) then
-		--not intresting, has no weapons, lame
+		--not interesting, has no weapons, lame
 		--printDebug("Unit ignored: weaponCount is 0")
 		return
 	end
@@ -406,7 +407,6 @@ end
 function widget:Update()
 	local timef = spGetGameSeconds()
 	local time = floor(timef)
-
 	if ( (timef - updateTimes["line"]) > 0.2 and timef ~= updateTimes["line"] ) then
 		updateTimes["line"] = timef
 		--adjust line width and alpha by camera height
@@ -427,7 +427,6 @@ function widget:Update()
 	if (time % updateTimes["removeInterval"] == 0 and time ~= updateTimes["remove"] ) then
 		updateTimes["remove"] = time
 		--do update stuff:
-
 		if ( CheckSpecState() == false ) then
 			return false
 		end
@@ -439,7 +438,6 @@ function widget:Update()
 			local x, y, z = def["pos"][1], def["pos"][2], def["pos"][3]
 			local a, b, c = spGetPositionLosState(x, y, z)
 			local losState = b
-
 
 			if (losState) then
 				if (udefID == nil) then
@@ -656,7 +654,9 @@ function DrawRanges()
 end
 
 function widget:DrawWorld()
+if not Spring.IsGUIHidden() then
 	DrawRanges()
+end
 	ResetGl()
 end
 
