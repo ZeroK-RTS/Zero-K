@@ -16,7 +16,7 @@ function widget:GetInfo()
     author    = "msafwan (system coder)",
     date      = "Dec 16, 2011",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = 20,
     enabled   = false  --  loaded by default?
   }
 end

@@ -21,21 +21,24 @@ function widget:GetInfo()
     author    = "Troy H. Cheek",
     date      = "July 20, 2009",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = 10,
     enabled   = false  --  loaded by default?
   }
 end
 
 --  Central Build AI creates a common build order queue for all units in the
 --	group.  Select this group (or any member of it) and issue build orders
---  while holding down the SHIFT key to add orders to the common queue.
+--  while holding down the shift key to add orders to the common queue.
 --  Idle builders in the group will automatically move to carry out orders
 --  or assist other builders.  Issue same build order again to cancel.
---  Orders issued without SHIFT will be carried out immediately.
+--  Orders issued without shift will be carried out immediately.
+
+-- optionnally to do:
+-- _ orders with shift+ctrl have higher priority ( insert in queue -> cons won't interrupt their current actions)
 
 local myGroupId = 0	--	Group number (0 to 9) to be controlled by Central Build AI.
 --  -1 = Use custom group (hotkey to select, ctrl-hotkey to add units) similar old Group AI.
-local hotkey = string.byte( "g" )	--  Change "q" to select new hotkey.
+local hotkey = string.byte( "g" )	--  Change "g" to select new hotkey.
 
 local Echo                 	= Spring.Echo
 local spGetUnitDefID		= Spring.GetUnitDefID
@@ -110,6 +113,10 @@ function widget:Initialize()
 		return
 	end
 end
+
+--function widget:CommandNotify(cmdID, cmdParams, cmdOpts)
+-- Spring.Echo(#cmdOpts,#cmdParams)
+--end
 
 --  Paint 'cb' tags on units, draw ghosts of items in central build queue.
 --  Text stuff mostly borrowed from gunblob's Group Label and trepan/JK's BuildETA.
@@ -237,7 +244,7 @@ function widget:CommandNotify(id, params, options)
 	local selectedUnits = spGetSelectedUnits()
 	for _, unitID in ipairs(selectedUnits) do	-- check selected units...
 		if ( myUnits[unitID] ) then	--  was issued to one of our units.
-			if ( options.shift and id < 0 ) then	-- used SHIFT for build.
+			if ( options.shift and id < 0 ) then	-- used shift for build.
 				local x, y, z, h = params[1], params[2], params[3], params[4]
 				local myCmd = { id=id, x=x, y=y, z=z, h=h }
 				local hash = hash(myCmd)
@@ -323,7 +330,7 @@ end
 --	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
 
 function GetFirstCommand(unitID)
-	local queue = spGetUnitCommands(unitID);	--	Why the semicolon?
+	local queue = spGetUnitCommands(unitID)
 	return queue and queue[1]
 end
 
@@ -481,9 +488,11 @@ function hash(myCmd)
 end
 
 function widget:KeyPress(key, mods, isRepeat)
+--Spring.Echo("<central_build_AI.lua DEBUG>: (KeyPress): ".. key)
 	if ( myGroupId > -1 ) then return end
 	if ( key ~= hotkey ) then return end
 	if ( mods.ctrl ) then	-- ctrl means add selected units to group
+	--Spring.Echo("<central_build_AI.lua DEBUG>: (KeyPress): CTRL")
 		local units = spGetSelectedUnits()
 		for _, unitID in ipairs(units) do	--  add the new units
 			if ( not myUnits[unitID] ) then
@@ -507,6 +516,7 @@ function widget:KeyPress(key, mods, isRepeat)
 			end
 		end
 	elseif ( mods.shift ) then	-- add group to selected units
+	--Spring.Echo("<central_build_AI.lua DEBUG>: (KeyPress): shift")
 		spSelectUnitMap(myUnits,true)
 	else	-- select our group or center our group if already selected.
 		local myUnitsCount = 0
