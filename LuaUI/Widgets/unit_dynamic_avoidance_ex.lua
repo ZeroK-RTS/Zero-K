@@ -1,4 +1,4 @@
-local versionName = "v1.66"
+local versionName = "v1.67"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (system coder)",
-    date      = "Dec 7, 2011",
+    date      = "Dec 16, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -83,8 +83,8 @@ local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command 
 
 --Move Command constant:
 local halfTargetBoxSize = {400, 50, 190} --the distance from a target which widget should de-activate (default: move = 400m ie:800x800m box (2x constructor range), reclaim/ressurect=50 (flee if not close enough), repair=190 (1x constructor's range -10))
-local cMD_DummyG = 248 --a fake command ID to flag an idle unit primed for pure avoidance.
-local dummyIDg = "248" --fake id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue)
+local cMD_DummyG = 248 --a fake command ID to flag an idle unit for pure avoidance. (arbitrary value, change if conflict with existing command)
+local dummyIDg = "248" --fake id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue) (arbitrary value, change if conflict with other widget)
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
@@ -99,8 +99,8 @@ local gps_then_DoCalculation_delayG = 0.4
 local doCalculation_then_gps_delayG = 0.1
 
 --Engine based correction constant:
-local wreckageID_offset_multiplier = 0
-local wreckageID_offset_initial = 32000
+local wreckageID_offset_multiplier = 0 --for 0.82 this is 1500
+local wreckageID_offset_initial = 32000	--for 0.82 this is 4500
 --curModID = upper(Game.modShortName)
 --------------------------------------------------------------------------------
 --Variables:
@@ -230,7 +230,7 @@ function RefreshUnitList(attacker)
 			local unitSpeed =unitDef["speed"]
 			local unitInView = metaForVisibleUnits[unitID] --transfer "yes" or "nil" from meta table into a local variable
 			if (unitSpeed>0) then 
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --only include only cloakies and constructor
+				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --only include only cloakies and constructor, and not com (ZK)
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView}
 				elseif not unitDef["canFly"] then --if enabled: include all ground unit
@@ -551,9 +551,9 @@ function CatalogueMovingObject(surroundingUnits, unitID, lastPosition)
 				local relativeAngle 	= GetUnitRelativeAngle (unitID, unitRectangleID)
 				local unitDirection		= GetUnitDirection(unitID, lastPosition)
 				local unitSeparation	= spGetUnitSeparation (unitID, unitRectangleID)
-				if math.abs(unitDirection- relativeAngle)< (collisionAngleG) then --only units within 45 degree to the side is catalogued with exact value
+				if math.abs(unitDirection- relativeAngle)< (collisionAngleG) then --unit inside the collision angle is catalogued with correct value
 					unitsSeparation[unitRectangleID]=unitSeparation
-				else
+				else --unit outside the collision angle is set to arbitrary 999
 					unitsSeparation[unitRectangleID]=999 --set to 999 for other unit so that any normal value will imply an approaching units
 				end
 			end
@@ -700,7 +700,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 	commandIndexTable[unitID]["widgetX"]=newX --update the memory table
 	commandIndexTable[unitID]["widgetZ"]=newZ
 	if (turnOnEcho == 1) then
-		Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
+		Spring.Echo("unitID(InsertCommandQueue)" .. unitID)
 		Spring.Echo("commandIndexTable[unitID][widgetX](InsertCommandQueue):" .. commandIndexTable[unitID]["widgetX"])
 		Spring.Echo("commandIndexTable[unitID][widgetZ](InsertCommandQueue):" .. commandIndexTable[unitID]["widgetZ"])
 		Spring.Echo("newCommand(InsertCommandQueue):")
@@ -895,7 +895,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					Spring.Echo("unitSeparation <unitsSeparation[unitRectangleID](SumAllUnitAroundUnitID)")
 					Spring.Echo(unitSeparation <unitsSeparation[unitRectangleID])
 				end
-				if unitSeparation <unitsSeparation[unitRectangleID] then --see if the enemy is maintaining distance
+				if unitSeparation <(unitsSeparation[unitRectangleID] or 999) then --see if the enemy is maintaining distance
 					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID)
 					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID)
 
