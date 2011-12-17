@@ -3,7 +3,7 @@ local versionNum = '3.02'
 function widget:GetInfo()
   return {
 	name		= "Auto Group",
-	desc 		= "v".. (versionNum) .." Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#. Ctrl backspace remove units. Type '/luaui autogroup help' for help.",
+	desc 		= "v".. (versionNum) .." Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#. Type '/luaui autogroup help' for help.",
 	author		= "Licho",
 	date		= "Mar 23, 2007",
 	license		= "GNU GPL, v2 or later",
@@ -15,8 +15,6 @@ end
 include("keysym.h.lua")
 
 ---- CHANGELOG -----
--- versus666,		v3.02	(16dec2011)	: 	Fixed for 84, removed unused features, now alt backspace to remove
---											selected units from group, changed help accordingly.
 -- versus666,		v3.01	(07jan2011)	: 	Added check to comply with F5.
 -- wagonrepairer	v3.00	(07dec2010)	:	'Chilified' autogroup.
 -- versus666, 		v2.25	(04nov2010)	:	Added switch to show or not group number, by licho's request.
@@ -31,17 +29,16 @@ include("keysym.h.lua")
 -- Licho,			v1.0				:	Creation.
 
 --REMINDER :
--- none
+-- LuaUI\Configs\crudemenu_conf.lua need to be adapted with new commands.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
 local helpText =
 	'Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#.'..
-	'Alt+backspace deletes autogrouping for selected unit type(s).'
-	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
+	'Alt+\~ deletes autogrouping for selected unit type(s).'..
+	'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
 options_order = { 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'verbose', 'immediate', 'groupnumbers', }
@@ -71,7 +68,7 @@ options = {
 	},
 	immediate = {
 		name = 'Immediate Mode',
-		desc = 'Units built/resurrected/received are added to autogroups immediately instead of waiting them to be idle.',
+		desc = 'Units are added to autogroup as soon as they are built instead of when they go idle.',
 		type = 'bool',
 		value = false,
 	},
@@ -97,6 +94,7 @@ options = {
 	},
 }
 
+local debug = false --generates debug message
 local finiGroup = {}
 local myTeam
 local selUnitDefs = {}
@@ -111,6 +109,7 @@ local textSize = 13.0
 local SetUnitGroup 		= Spring.SetUnitGroup
 local GetSelectedUnits 	= Spring.GetSelectedUnits
 local GetUnitDefID 		= Spring.GetUnitDefID
+local Echo 				= Spring.Echo
 local GetAllUnits		= Spring.GetAllUnits
 local GetUnitHealth		= Spring.GetUnitHealth
 local GetMouseState		= Spring.GetMouseState
@@ -121,24 +120,7 @@ local UDefTab			= UnitDefs
 local GetGroupList		= Spring.GetGroupList
 local GetGroupUnits		= Spring.GetGroupUnits
 local GetGameFrame		= Spring.GetGameFrame
-local IsGuiHidden		= Spring.IsGUIHidden
-local Echo				= Spring.Echo
-
-function printDebug( value )
-	if ( debug ) then
-		if ( type( value ) == "boolean" ) then
-			if ( value == true ) then Echo( "true" )
-				else Echo("false") end
-		elseif ( type(value ) == "table" ) then
-			Echo("Dumping table:")
-			for key,val in pairs(value) do 
-				Echo(key,val) 
-			end
-		else
-			Echo( value )
-		end
-	end
-end
+local IsGuiHidden		=	Spring.IsGUIHidden
 
 function widget:Initialize() 
 	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
@@ -249,7 +231,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		if (key == KEYSYMS.N_7) then gr = 7 end
 		if (key == KEYSYMS.N_8) then gr = 8 end
 		if (key == KEYSYMS.N_9) then gr = 9 end
- 		if (key == KEYSYMS.BACKSPACE) then gr = -1 end
+ 		if (key == KEYSYMS.BACKQUOTE) then gr = -1 end
 		if (gr ~= nil) then
 				if (gr == -1) then gr = nil end
 				selUnitDefIDs = {}
@@ -259,13 +241,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 					if ( not UDefTab[udid]["isFactory"] and not UDefTab[udid]["isBuilding"] ) then
 						selUnitDefIDs[udid] = true
 						unit2group[udid] = gr
-						--printDebug(unit2group[udid])
-						--printDebug(unitID)
-						--printDebug(gr)
-						--local x, y, z = Spring.GetUnitPosition(unitID)
-						--Spring.MarkerAddPoint( x, y, z )
 						exec = true
-						SetUnitGroup(unitID, -1) -- -1 was gr originally but bugged since 84, no idea why -1 *works*.
+						SetUnitGroup(unitID, gr)
+						--Echo('AUTOGROUP : Add unit ' .. unitID .. 'to group ' .. gr)
 					end
 				end
 				if ( exec == false ) then
@@ -299,7 +277,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 				end
 				return true 	--key was processed by widget
 			end
-	--[[ elseif (modifier.ctrl and not modifier.meta) then	
+	elseif (modifier.ctrl and not modifier.meta) then	
 		if (key == KEYSYMS.BACKQUOTE) then
 			local mx,my = GetMouseState()
 			local _,pos = TraceScreenRay(mx,my,true)     
@@ -319,7 +297,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 				SelectUnitArray({muid})
 			end
 		end
-		
+		--[[
 		if (key == KEYSYMS.Q) then
 		  for _, uid in ipairs(GetSelectedUnits()) do  
 			SetUnitGroup(uid,-1)
@@ -356,6 +334,11 @@ function widget:SetConfigData(data)
 				end
 			end
 		end
+	end
+end
+
+function printDebug( value )
+	if ( debug ) then Echo( value )
 	end
 end
 --------------------------------------------------------------------------------
