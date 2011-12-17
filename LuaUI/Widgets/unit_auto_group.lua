@@ -1,9 +1,9 @@
-local versionNum = '3.02'
+local versionNum = '3.03'
 
 function widget:GetInfo()
   return {
 	name		= "Auto Group",
-	desc 		= "v".. (versionNum) .." Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#. Type '/luaui autogroup help' for help.",
+	desc 		= "v".. (versionNum) .." Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#. Ctrl BACKQUOTE remove units. Type '/luaui autogroup help' for help.",
 	author		= "Licho",
 	date		= "Mar 23, 2007",
 	license		= "GNU GPL, v2 or later",
@@ -15,6 +15,10 @@ end
 include("keysym.h.lua")
 
 ---- CHANGELOG -----
+-- versus666,		v3.03	(17dec2011)	: 	Back to alt BACKQUOTE to remove selected units from group
+--											to please licho, changed help accordingly.
+-- versus666,		v3.02	(16dec2011)	: 	Fixed for 84, removed unused features, now alt backspace to remove
+--											selected units from group, changed help accordingly.
 -- versus666,		v3.01	(07jan2011)	: 	Added check to comply with F5.
 -- wagonrepairer	v3.00	(07dec2010)	:	'Chilified' autogroup.
 -- versus666, 		v2.25	(04nov2010)	:	Added switch to show or not group number, by licho's request.
@@ -29,16 +33,17 @@ include("keysym.h.lua")
 -- Licho,			v1.0				:	Creation.
 
 --REMINDER :
--- LuaUI\Configs\crudemenu_conf.lua need to be adapted with new commands.
+-- none
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
 local helpText =
 	'Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#.'..
-	'Alt+\~ deletes autogrouping for selected unit type(s).'..
-	'Ctrl+~ removes nearest selected unit from its group and selects it. '
+	'Alt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).'
+	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
 options_order = { 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'verbose', 'immediate', 'groupnumbers', }
@@ -52,6 +57,7 @@ options = {
 		OnChange = function(self)
 			if not self.value then
 				unit2group = {}
+				Spring.Echo('Cleared Autogroups.')
 			end
 		end
 	},
@@ -68,7 +74,7 @@ options = {
 	},
 	immediate = {
 		name = 'Immediate Mode',
-		desc = 'Units are added to autogroup as soon as they are built instead of when they go idle.',
+		desc = 'Units built/resurrected/received are added to autogroups immediately instead of waiting them to be idle.',
 		type = 'bool',
 		value = false,
 	},
@@ -94,7 +100,6 @@ options = {
 	},
 }
 
-local debug = false --generates debug message
 local finiGroup = {}
 local myTeam
 local selUnitDefs = {}
@@ -109,7 +114,6 @@ local textSize = 13.0
 local SetUnitGroup 		= Spring.SetUnitGroup
 local GetSelectedUnits 	= Spring.GetSelectedUnits
 local GetUnitDefID 		= Spring.GetUnitDefID
-local Echo 				= Spring.Echo
 local GetAllUnits		= Spring.GetAllUnits
 local GetUnitHealth		= Spring.GetUnitHealth
 local GetMouseState		= Spring.GetMouseState
@@ -120,7 +124,13 @@ local UDefTab			= UnitDefs
 local GetGroupList		= Spring.GetGroupList
 local GetGroupUnits		= Spring.GetGroupUnits
 local GetGameFrame		= Spring.GetGameFrame
-local IsGuiHidden		=	Spring.IsGUIHidden
+local IsGuiHidden		= Spring.IsGUIHidden
+local Echo				= Spring.Echo
+
+ 	function printDebug( value )
+ 		if ( debug ) then Echo( value )
+ 		end
+ 	end
 
 function widget:Initialize() 
 	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
@@ -241,9 +251,11 @@ function widget:KeyPress(key, modifier, isRepeat)
 					if ( not UDefTab[udid]["isFactory"] and not UDefTab[udid]["isBuilding"] ) then
 						selUnitDefIDs[udid] = true
 						unit2group[udid] = gr
+						--local x, y, z = Spring.GetUnitPosition(unitID)
+						--Spring.MarkerAddPoint( x, y, z )
 						exec = true
-						SetUnitGroup(unitID, gr)
-						--Echo('AUTOGROUP : Add unit ' .. unitID .. 'to group ' .. gr)
+						--Echo('<AUTOGROUP> : Add unit ' .. unitID .. 'to group ' .. gr)
+						SetUnitGroup(unitID, -1) -- -1 was gr originally but bugged since 84, no idea why -1 *works*.
 					end
 				end
 				if ( exec == false ) then
@@ -277,6 +289,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 				end
 				return true 	--key was processed by widget
 			end
+			--[[
 	elseif (modifier.ctrl and not modifier.meta) then	
 		if (key == KEYSYMS.BACKQUOTE) then
 			local mx,my = GetMouseState()
@@ -297,7 +310,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 				SelectUnitArray({muid})
 			end
 		end
-		--[[
+		 
 		if (key == KEYSYMS.Q) then
 		  for _, uid in ipairs(GetSelectedUnits()) do  
 			SetUnitGroup(uid,-1)
@@ -334,11 +347,6 @@ function widget:SetConfigData(data)
 				end
 			end
 		end
-	end
-end
-
-function printDebug( value )
-	if ( debug ) then Echo( value )
 	end
 end
 --------------------------------------------------------------------------------
