@@ -128,6 +128,11 @@ function widget:SetConfigData(data)
 end
 
 function widget:Initialize()
+	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	if spec then
+		widgetHandler:RemoveWidget()
+		return false
+	end
   local groupId
   local icon
 
