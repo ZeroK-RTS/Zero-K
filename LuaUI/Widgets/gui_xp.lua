@@ -13,7 +13,7 @@ function widget:GetInfo()
     enabled   = true  -- loaded by default?
   }
 end
---Version = 1.1 (fix on line 173-178 for crash at line 182, commit on 19.12.2011, xponen)
+--Version = 1.1 (fix on line 173-178 for crash at line 179, commit on 19.12.2011, xponen)
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
