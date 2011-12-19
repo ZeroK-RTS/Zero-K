@@ -76,8 +76,7 @@ local combatCommands = {	-- commands that require ammo to execute
 	[CMD.FIGHT] = true,
 	[CMD.PATROL] = true,
 	[CMD.GUARD] = true,
-	[CMD.DGUN] = true,	-- TODO: remove CMD.DGUN after 85.0
-	[CMD.MANUALFIRE] = true,
+	[CMD.DGUN or CMD.MANUALFIRE] = true, -- TODO: remove CMD.DGUN after 85.0
 }
 
 local padRadius = 750 -- land if pad is within this range
@@ -350,6 +349,10 @@ function gadget:GameFrame(n)
 				--Spring.Echo("Bomber "..bomberID.." cleared for landing")
 				CancelAirpadReservation(bomberID)
 				spGiveOrderToUnit(bomberID, CMD.REMOVE, {tag}, {})	-- clear rearm order
+				if Spring.GetUnitStates(bomberID)["repeat"] then 
+					--spGiveOrderToUnit(bomberID, CMD_REARM, {padID}, {"shift"})
+					InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
+				end
 				Spring.SetUnitFuel(bomberID, 0)	-- set fuel to zero
 				bomberToPad[bomberID] = nil
 				refuelling[bomberID] = true

@@ -162,19 +162,15 @@ function widget:UnitExperience(unitID,unitDefID,unitTeam, xp, oldXP)
   if (not unitHeights[unitID]) then
     unitHeights[unitID] = { nil, ud.height + iconoffset}
   end
-
+  if xp < 0 then xp = 0 end
+  if oldXP < 0 then oldXP = 0 end
+  
   local rank    = min(floor(xp / ud.power_xp_coeffient),4)
   local oldRank = min(floor(oldXP / ud.power_xp_coeffient),4)
 
   if (rank~=oldRank) then
     unitHeights[unitID] = ud.height + iconoffset
 	if not PWUnits[unitID] then
-		if ranks[rank] == nil then 
-			local x, y ,z = Spring.GetUnitPosition(unitID)
-			--Spring.MarkerAddPoint( x, y, z,  "Crash (rank" .. rank .. ")" )
-			widget:Initialize()
-			return
-		end
       for i=0,rank-1 do ranks[i][unitID] = nil end
       ranks[rank][unitID] = true
     else

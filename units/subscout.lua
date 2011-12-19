@@ -27,6 +27,7 @@ unitDef = {
   },
 
   explodeAs             = [[SUBSCOUT_DEATH]],
+  fireState              = 0,  
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[submarine]],
