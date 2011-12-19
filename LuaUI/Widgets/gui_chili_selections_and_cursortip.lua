@@ -1796,7 +1796,7 @@ local function SetupTerraTips()
 			green.. 'Click&Drag'..white..': Free draw terraform. \n'..
 			green.. 'Alt+Click&Drag'..white..': Box terraform. \n'..
 			green.. 'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
-			green.. 'Alt+Click on unit' ..white..': Terraform around unit. \n'..
+			green.. 'Ctrl+Click on unit' ..white..': Terraform around unit. \n'..
 			'\n'..
 			''
 	end
