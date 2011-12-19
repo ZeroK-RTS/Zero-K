@@ -157,6 +157,7 @@ return {
       count              = 1,
       ground             = true,
       water              = false,
+	  unit				 = true,
       properties = {
         airdrag            = 0.8,
         colormap           = [[1 0.5 0.3 0.13    0.45 0.37 0.3 0.13	0.05 0.05 0.04 0.1  0 0 0 0]],
