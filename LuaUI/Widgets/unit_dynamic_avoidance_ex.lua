@@ -349,7 +349,7 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
 							cQueueSyncTest[1]==nil then --if unit has became idle
 						--newCommand=true
 						--cQueue=cQueueSyncTest
-						commandIndexTable[unitID]==nil --empty commandIndex (command history) for this unit
+						commandIndexTable[unitID]=nil --empty commandIndex (command history) for this unit
 						return commandIndexTable --skip
 					end
 				end
