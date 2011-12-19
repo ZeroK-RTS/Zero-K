@@ -13,7 +13,7 @@ function widget:GetInfo()
     enabled   = true  -- loaded by default?
   }
 end
-
+--Version = 1.1 (fix on line 173-178 for crash at line 182, commit on 19.12.2011, xponen)
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -169,6 +169,12 @@ function widget:UnitExperience(unitID,unitDefID,unitTeam, xp, oldXP)
   if (rank~=oldRank) then
     unitHeights[unitID] = ud.height + iconoffset
 	if not PWUnits[unitID] then
+		if ranks[rank] == nil then 
+			local x, y ,z = Spring.GetUnitPosition(unitID)
+			--Spring.MarkerAddPoint( x, y, z,  "Crash (rank" .. rank .. ")" )
+			widget:Initialize()
+			return
+		end
       for i=0,rank-1 do ranks[i][unitID] = nil end
       ranks[rank][unitID] = true
     else
