@@ -1,4 +1,4 @@
-local versionName = "v1.67"
+local versionName = "v1.68"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
     author    = "msafwan (system coder)",
-    date      = "Dec 16, 2011",
+    date      = "Dec 19, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -94,9 +94,9 @@ local fleeingAngleG=math.pi/4 --(default is pi/4 rad) angle of enemy (range from
 local maximumTurnAngleG = math.pi/2 --safety measure. Prevent overturn (eg: 360+xx degree turn)
 --pi is 180 degrees
 
---Network constant:
-local gps_then_DoCalculation_delayG = 0.4
-local doCalculation_then_gps_delayG = 0.1
+--Update constant:
+local doCalculation_then_gps_delayG = 0.3 --elapsed second before gathering preliminary data for issuing new command (default: < gps_then_DoCalculation_delayG)
+local gps_then_DoCalculation_delayG = 0.45 --elapsed second before issuing new command (default: < 0.5)
 
 --Engine based correction constant:
 local wreckageID_offset_multiplier = 0 --for 0.82 this is 1500
@@ -173,7 +173,7 @@ function widget:Update()
 		surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 		cycle=2 --send next cycle to "DoCalculation()" function
 		
-		skippingTimer = ActualNetworkDelay(1, skippingTimer, nil, nil ,now)
+		skippingTimer = ActualNetworkDelay(1, skippingTimer, nil, nil ,now) --measure network delay
 		skippingTimer[2] = now+ gps_then_DoCalculation_delayG --delay next cycle by an additional 0.4 second. This allow reliable unit direction to be derived from unit's speed
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 	end
@@ -184,10 +184,10 @@ function widget:Update()
 		
 		--local projectedDelay=ReportedNetworkDelay(myPlayerID, 0.5) --get the reported ping
 		skippingTimer[2]=now+ doCalculation_then_gps_delayG ---set next execution 0.1 second later
-		local networkDelay = ActualNetworkDelay(0, skippingTimer, doCalculation_then_gps_delayG, gps_then_DoCalculation_delayG, nil)
+		local networkDelay = ActualNetworkDelay(0, skippingTimer, doCalculation_then_gps_delayG, gps_then_DoCalculation_delayG, nil) --get network delay
 		timeToContactCONSTANT= networkDelay --extend command lenght by as much as the network delay
 		
-		skippingTimer = ActualNetworkDelay(2, skippingTimer, nil, nil, now)
+		skippingTimer = ActualNetworkDelay(2, skippingTimer, nil, nil, now) --set timestamp
 		spSendLuaUIMsg(dummyIDg) --send ping to server
 		roundTripComplete = false --lock execution until receive echo from server
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
@@ -281,15 +281,15 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 						--local boxSizeTrigger= unitInMotion[i][2]
 						local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
 						local currentX,_,currentZ = spGetUnitPosition(unitID)
-						local lastPosition = {currentX, currentZ}
+						local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
 						local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
 						local losRadius	= GetUnitLOSRadius(unitID) --get LOS
 						local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
 						if (cQueue[1].id == CMD_MOVE and unitInMotion[i].isVisible ~= "yes") then --if unit has move Command and is outside user's view
 							reachedTarget = false --force unit to do avoidance despite close to target (try to circle over target until seen by user)
 						end
-						if reachedTarget then --empty the commandIndex if reached target
-							commandIndexTable[unitID]=nil 
+						if reachedTarget then --if reached target
+							commandIndexTable[unitID]=nil --empty the commandIndex (command history)
 						end
 						
 						if surroundingUnits[1]~=nil and not reachedTarget then  --execute when enemy exist and target not reached yet
@@ -344,11 +344,13 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
 				--do sync test. Ensure stored command not changed during last delay
 				local cQueueSyncTest = spGetCommandQueue(unitID)
 				if #cQueueSyncTest>=2 then
-					if #cQueueSyncTest~=#cQueue or 
-						(cQueueSyncTest[1].params[1]~=cQueue[1].params[1] or cQueueSyncTest[1].params[3]~=cQueue[1].params[3]) or
-							cQueueSyncTest[1]==nil then
-						newCommand=true
-						cQueue=cQueueSyncTest
+					if #cQueueSyncTest~=#cQueue or --if command queue is not same as original, or
+						(cQueueSyncTest[1].params[1]~=cQueue[1].params[1] or cQueueSyncTest[1].params[3]~=cQueue[1].params[3]) or --if first queue has different content, or
+							cQueueSyncTest[1]==nil then --if unit has became idle
+						--newCommand=true
+						--cQueue=cQueueSyncTest
+						commandIndexTable[unitID]==nil --empty commandIndex (command history) for this unit
+						return commandIndexTable --skip
 					end
 				end
 				
@@ -697,7 +699,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 	end
 	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_SHIFT, newX, newY, newZ}, {"alt"} ) --insert new command
 	----
-	commandIndexTable[unitID]["widgetX"]=newX --update the memory table
+	commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
 	commandIndexTable[unitID]["widgetZ"]=newZ
 	if (turnOnEcho == 1) then
 		Spring.Echo("unitID(InsertCommandQueue)" .. unitID)
