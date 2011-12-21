@@ -334,7 +334,7 @@ local function setupTerraunit(unitID, team, x, y, z)
 	local y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
 
 	Spring.MoveCtrl.Enable(unitID)
-	Spring.MoveCtrl.SetPosition(unitID, x, y, z)
+	Spring.MoveCtrl.SetPosition(unitID, x, y or 0, z)
 	Spring.MoveCtrl.Disable(unitID)
 	
 	spSetUnitSensorRadius(unitID,"los",0) -- REMOVE IN 0.83
@@ -645,7 +645,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			baseCost = baseCost*pointBaseCost
 			totalCost = totalCost*volumeCost + baseCost
 		
-			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
+			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
+			local id = spCreateUnit(terraunitDefID, segment[i].position.x, teamY or 0, segment[i].position.z, 0, team, true)
+            
 			if id then
 				
 				if segment[i].along ~= rampLevels.data[rampLevels.count].along then
@@ -1078,8 +1080,10 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			baseCost = baseCost*pointBaseCost
 			totalCost = totalCost*volumeCost + baseCost
 		
-			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
-			if id then
+			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
+			local id = spCreateUnit(terraunitDefID, segment[i].position.x, teamY or 0, segment[i].position.z, 0, team, true)
+            
+            if id then
 			
 				setupTerraunit(id, team, segment[i].position.x, false, segment[i].position.z)
 			
@@ -1558,9 +1562,11 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		if totalCost ~= 0 then
 			baseCost = baseCost*pointBaseCost
 			totalCost = totalCost*volumeCost + baseCost
-		
-			local id = spCreateUnit(terraunitDefID, segment[i].position.x, 0, segment[i].position.z, 0, team, true)
-			if id then
+            
+            local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
+			local id = spCreateUnit(terraunitDefID, segment[i].position.x, teamY or 0, segment[i].position.z, 0, team, true)
+			
+            if id then
 				unitIdGrid[segment[i].grid.x] = unitIdGrid[segment[i].grid.x] or {}
 				unitIdGrid[segment[i].grid.x][segment[i].grid.z] = id
 				
