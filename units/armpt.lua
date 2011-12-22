@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Skeeter]],
   description            = [[Patrol Boat (Scout/Raider)]],
   acceleration           = 0.0984,
-  bmcode                 = [[1]],
   brakeRate              = 0.0475,
   buildCostEnergy        = 100,
   buildCostMetal         = 100,
@@ -30,7 +29,6 @@ unitDef = {
 	helptext_de    = [[Günstig, schnell und gebrechlich. Dieses Wachboot eignet sich gut als Raider und zum Auskundschaften von Schiffen mit größerer Reichweite. Zum Kämpfen fehlt es ihm an Feuerkraft und der nötigen Panzerung.]],
   },
 
-  defaultmissiontype     = [[Standby]],
   explodeAs              = [[SMALL_UNITEX]],
   floater                = true,
   footprintX             = 3,
@@ -38,7 +36,6 @@ unitDef = {
   iconType               = [[scoutboat]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maneuverleashlength    = [[640]],
   mass                   = 117,
   maxDamage              = 500,
   maxVelocity            = 5.5,
@@ -52,6 +49,15 @@ unitDef = {
   script				 = [[armpt.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
+
+  sfxtypes                      = {
+  
+    explosiongenerators = {
+      [[custom:PULVMUZZLE]],
+    },
+
+  },
+  
   side                   = [[ARM]],
   sightDistance          = 800,
   turninplace            = 0,
@@ -121,6 +127,8 @@ unitDef = {
     MISSILE   = {
       name                    = [[Light Missile]],
       areaOfEffect            = 8,
+	  burst					  = 2,
+	  burstRate				  = 0.2,
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargetting      = 1,
@@ -142,7 +150,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_fury.s3o]],
       range                   = 270,
-      reloadtime              = 2,
+      reloadtime              = 2.5,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],

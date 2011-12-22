@@ -2,10 +2,12 @@ include "constants.lua"
 
 local base = piece 'base' 
 local turret = piece 'turret' 
-local firepoint = piece 'firepoint' 
+local firepoint1, firepoint2 = piece('firepoint1', 'firepoint2')
 local hull = piece 'hull' 
 local wake1 = piece 'wake1' 
-local wake2 = piece 'wake2' 
+local wake2 = piece 'wake2'
+
+local flares = {[0] = firepoint1, [1] = firepoint2}
 
 smokePiece = {base}
 
@@ -14,6 +16,8 @@ local SIG_MOVE = 1
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
 local SIG_AIM_3 = 8
+
+local gun_1 = 0
 
 function script.Create()
 	restore_delay = 3000
@@ -58,10 +62,11 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	return firepoint
+	return flares[gun_1]
 end
---[[
+
 function script.Shot(num)
+	--[[
 	--Spring.Echo(num)
 	local num2 = 3
 	if num == 3 then num2 = 2 end
@@ -73,8 +78,11 @@ function script.Shot(num)
 		--Spring.Echo("Setting reload frame to "..frame)
 		Spring.SetUnitWeaponState(unitID, num2, "reloadFrame", frame)
 	end
+	]]--
+	EmitSfx(flares[gun_1], 1024)
+	gun_1 = 1 - gun_1
 end
-]]--
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if  severity <= .25  then
