@@ -14,8 +14,6 @@ local warningDelay = 30 * 5 	--in frames
 local lastWarning = 0			--in frames
 local localTeamID = Spring.GetLocalTeamID ()
 
-WG.AddEventPos = WG.AddEventPos or function() end
-
 function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)	
 	local currentFrame = Spring.GetGameFrame ()
 	if (lastWarning+warningDelay > currentFrame) then		
@@ -29,7 +27,6 @@ function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, wea
 		local x,y,z = Spring.GetUnitPosition (unitID)
 		if (x and y and z) then
 			Spring.SetLastMessagePosition (x,y,z)
-			WG.AddEventPos(x, y, z)
 		end
 	end
 end
