@@ -49,7 +49,6 @@ unitDef = {
   selfDestructCountdown = 0,
   side                  = [[ARM]],
   sightDistance         = 550,
-  smoothAnim            = true,
   sonarDistance         = 450,
   turnRate              = 500,
   upright               = true,
