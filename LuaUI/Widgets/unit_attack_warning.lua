@@ -1,10 +1,10 @@
 function widget:GetInfo()
   return {
     name      = "Attack Warning",
-    desc      = "warns if stuff gets attacked",
+    desc      = "Warns if stuff gets attacked",
     author    = "knorke",
     date      = "Oct 2011",
-    license   = "GNU GPL, v2 or later or horse",
+    license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true,
   }
@@ -21,7 +21,7 @@ function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, wea
 	end
 	if (localTeamID==unitTeam and not Spring.IsUnitInView (unitID)) then
 		lastWarning = currentFrame
-		local attackedUnit = unitName (unitID) or "Unit"
+		local attackedUnit = (unitDefID and UnitDefs[unitDefID].humanName) or "Unit"
 		Spring.Echo (attackedUnit  .." is under attack")
 		--Spring.PlaySoundFile (blabla attack.wav, ... "userinterface")
 		local x,y,z = Spring.GetUnitPosition (unitID)
@@ -29,18 +29,6 @@ function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, wea
 			Spring.SetLastMessagePosition (x,y,z)
 		end
 	end
-end
-
-function unitName (unitID)
-	if (not unitID) then return nil end
-	local unitDefID = Spring.GetUnitDefID(unitID)
-	if (unitDefID) then
-		local unitDef = UnitDefs[unitDefID]
-		if (unitDef) then
-			return unitDef.humanName
-		end
-	end
-	return nil
 end
 
 --changing teams, rejoin, becoming spec etc
