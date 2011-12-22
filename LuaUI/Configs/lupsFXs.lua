@@ -251,7 +251,7 @@ radarBlink = {
   size        = 5,
   sizeGrowth  = 2,
   colormap    = { {0.3, 1, 1, 0.005}, {0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005},{0, 0, 0, 0.005} },
-  texture     = 'bitmaps/GPL/smallflare_blue.png',
+  texture     = 'bitmaps/GPL/smallflare.tga',
   count       = 1,
   repeatEffect= true,
 }
