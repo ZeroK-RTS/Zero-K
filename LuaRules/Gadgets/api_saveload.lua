@@ -38,6 +38,8 @@ local generalFile = "general.lua"
 local unitFile = "units.lua"
 local featureFile = "features.lua"
 
+local FEATURE_ID_CONSTANT = 32000	-- when featureID is x, param of command issued on feature is x + this
+
 GG.SaveLoad = GG.SaveLoad or {}
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -123,9 +125,10 @@ GG.SaveLoad.GetNewFeatureID = GetNewFeatureID
 
 -- FIXME: autodetection is fairly broken
 local function IsCMDTypeIconModeOrNumber(unitID, cmdID)
+	--Spring.Echo(cmdID, CMD.SET_WANTED_MAX_SPEED, cmdTypeIconModeOrNumber[cmdID])
 	if cmdTypeIconModeOrNumber[cmdID] then return true end	-- check cached results first
 	local index = Spring.FindUnitCmdDesc(unitID, cmdID)
-	local cmdDescs = Spring.GetUnitCmdDescs(unitID, index, index)
+	local cmdDescs = Spring.GetUnitCmdDescs(unitID, index, index) or {}
 	if cmdDescs[1] and (cmdDescs[1].type == CMDTYPE.ICON_MODE or cmdDescs[1].type == CMDTYPE.NUMBER) then
 		cmdTypeIconModeOrNumber[cmdID] = true
 		return true
@@ -180,7 +183,7 @@ local function LoadUnits()
 		for name,value in pairs(data.rulesParams) do
 			Spring.SetUnitRulesParam(newID, name, value)
 		end
-		-- neutral?
+		-- is neutral
 		spSetUnitNeutral(newID, data.neutral)
 	end
 	
@@ -188,15 +191,23 @@ local function LoadUnits()
 	for oldID, data in pairs(savedata.unit) do
 		for i=1,#data.commands do
 			local command = data.commands[i]
-			if (#command.params == 1 and not(IsCMDTypeIconModeOrNumber(data.newID, command.id) )) then
+			if (#command.params == 1 and data.newID and not(IsCMDTypeIconModeOrNumber(data.newID, command.id))) then
 				local targetID = command.params[1]
-				--Spring.Echo(CMD[command.id], command.params[1], GetNewUnitID(command.params[1]))
-				
-				if savedata.unit[targetID] and savedata.unit[targetID].newID then
-					command.params[1] = savedata.unit[targetID].newID
-				elseif savedata.feature[targetID] and savedata.feature[targetID].newID then
-					command.params[1] = savedata.feature[targetID].newID
+				local isFeature = false
+				if targetID > FEATURE_ID_CONSTANT then
+					isFeature = true
+					targetID = targetID - FEATURE_ID_CONSTANT
 				end
+				--Spring.Echo(CMD[command.id], command.params[1], GetNewUnitID(command.params[1]))
+				--Spring.Echo("Order on entity " .. targetID)
+				if (not isFeature) and GetNewUnitID(targetID) then
+					--Spring.Echo("\tType: " .. savedata.unit[targetID].featureDefName)
+					command.params[1] = GetNewUnitID(targetID)
+				elseif isFeature and GetNewFeatureID(targetID) then
+					--Spring.Echo("\tType: " .. savedata.feature[targetID].featureDefName)
+					command.params[1] = GetNewFeatureID(targetID) + FEATURE_ID_CONSTANT
+				end
+				
 			end
 			
 			-- workaround for stupid bug where the coordinates are all mixed up
@@ -235,7 +246,7 @@ local function LoadGeneralInfo()
 	
 	-- team data
 	for teamID, teamData in pairs(savedata.general.teams or {}) do
-		-- this bugs with storages - do it at GameStart instead
+		-- this bugs with storage units - do it after units are created
 		--spSetTeamResource(teamID, "m", teamData.resources.m)
 		--spSetTeamResource(teamID, "ms", teamData.resources.ms)
 		--spSetTeamResource(teamID, "e", teamData.resources.e)
@@ -245,6 +256,15 @@ local function LoadGeneralInfo()
 		for name, value in pairs (rulesParams) do
 			spSetTeamRulesParams(teamID, name, value) 
 		end
+	end
+end
+
+local function SetStorage()
+	for teamID, teamData in pairs(savedata.general.teams or {}) do
+		spSetTeamResource(teamID, "m", teamData.resources.m)
+		spSetTeamResource(teamID, "ms", teamData.resources.ms)
+		spSetTeamResource(teamID, "e", teamData.resources.e)
+		spSetTeamResource(teamID, "es", teamData.resources.es)
 	end
 end
 
@@ -269,19 +289,10 @@ function gadget:Load(zip)
 	savedata.general = ReadFile(zip, "General", generalFile)
 	
 	LoadGeneralInfo()
-	LoadFeatures()	-- do this first so we can change unit orders involving features to point to new ID
+	LoadFeatures()	-- do features before units so we can change unit orders involving features to point to new ID
 	LoadUnits()
+	SetStorage()
 end
-
-function gadget:GameStart(n)
-	for teamID, teamData in pairs(savedata.general.teams or {}) do
-		spSetTeamResource(teamID, "m", teamData.resources.m)
-		spSetTeamResource(teamID, "ms", teamData.resources.ms)
-		spSetTeamResource(teamID, "e", teamData.resources.e)
-		spSetTeamResource(teamID, "es", teamData.resources.es)
-	end
-end
-
 
 -----------------------------------------------------------------------------------
 --  END SYNCED
@@ -341,6 +352,7 @@ local keywords = {
 	["repeat"] = true,
 }
 
+-- recursive function that write a Lua table to file in the correct format
 local function WriteTable(array, numIndents, endOfFile)
 	local str = ""	--WriteIndents(numIndents)
 	str = str .. "{\n"
@@ -518,7 +530,7 @@ function gadget:Initialize()
 end
 
 function gadget:GameFrame(n)
-	if n%autosave_frequency < 0.1 then
+	if n % autosave_frequency < 0.1 then
 		Spring.SendCommands("save -y autosave")
 	end
 end
