@@ -8,34 +8,23 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local name = "Keybind Updater v0.9.3"
+local name = "Keybind Updater v0.9.4"
 
 function widget:GetInfo()
   return {
     name      = name,
-    desc      = "Runtime pdating for keybinds.",
+    desc      = "Runtime updating for keybinds.",
     author    = "KingRaptor",
     date      = "12 December, 2011",
     license   = "Public domain",
-    layer     = -math.huge,
-    enabled   = true,
+    layer     = -100000,
+    enabled   = false,
   }
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local toBind = {
-	jump = {
-		keys = {"any+j"},
-		unbind = {"any+j mouse2"}
-	},
-	oneclickwep = {
-		keys = {"d", "shift+d"},
-	},
-	selectcomm = {
-		keys = {"ctrl+c", "shift+ctrl+c"},
-		unbindaction = {"select AllMap+_Commander+_ClearSelection_SelectOne+"}
-	},
 }
 
 function widget:Initialize()
@@ -65,7 +54,7 @@ function widget:Initialize()
 		end
 	end
 	--widgetHandler:RemoveWidget()
-end 
+end
 
 function widget:Shutdown()
 end

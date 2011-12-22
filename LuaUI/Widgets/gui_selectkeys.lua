@@ -78,15 +78,15 @@ options = {
 	},
 	select_landw = { type = 'button',
 		name = 'Armed Land Units In View',
-		action = 'select Visible+_Not_Builder_Not_Building_Not_Commander_Not_Aircraft_Weapons+_ClearSelection_SelectAll+',
+		action = 'select Visible+_Not_Builder_Not_Building_Not_Aircraft_Weapons+_ClearSelection_SelectAll+',
 	},
 	selectairw = { type = 'button',
 		name = 'Armed Flying Units In View',
-		action = 'select Visible+_Not_Building_Not_Commander_Not_Transport_Aircraft_Weapons+_ClearSelection_SelectAll+',
+		action = 'select Visible+_Not_Building_Not_Transport_Aircraft_Weapons+_ClearSelection_SelectAll+',
 	},
 	selectcomm = { type = 'button',
 		name = 'Select Commander',
-		action = 'select AllMap+_Commander+_ClearSelection_SelectOne+',
+		action = 'selectcomm',
 	},
 	
 	
