@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Grebe]],
   description            = [[Amphibious Raider Bot]],
   acceleration           = 0.2,
+  activateWhenBuilt      = true,
   amphibious             = [[1]],
   brakeRate              = 0.4,
   buildCostEnergy        = 300,

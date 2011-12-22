@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Clam]],
   description         = [[Amphibous Construction Bot, Builds at 9 m/s]],
   acceleration        = 0.4,
+  activateWhenBuilt	  = true,
   brakeRate           = 0.25,
   buildCostEnergy     = 200,
   buildCostMetal      = 200,
@@ -36,7 +37,6 @@ unitDef = {
 	--helptext_de    = [[Der Necro ist ein ziemlich normaler Konstruktionsroboter mit einem Vorteil: er kann Leichen wiederbeleben. Zu 120% der ursprünglichen Energiekosten bekommst du eine so gut wie neue Einheit wiederzurück.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   energyMake          = 0.225,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
@@ -63,6 +63,7 @@ unitDef = {
   script			  = [[amphcon.lua]],
   side                = [[CORE]],
   sightDistance       = 375,
+  sonarDistance		  = 400,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
