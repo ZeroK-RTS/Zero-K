@@ -83,7 +83,7 @@ for _, ud in pairs(UnitDefs) do
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Modular commander handling
+-- Modular commander/PlanetWars handling
 --
 
 VFS.Include('gamedata/modularcomms/unitdefgen.lua')
