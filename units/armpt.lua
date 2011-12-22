@@ -91,9 +91,7 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 100,
-        planes  = 100,
-        subs    = 5,
+        default = 0,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
@@ -127,8 +125,8 @@ unitDef = {
     MISSILE   = {
       name                    = [[Light Missile]],
       areaOfEffect            = 8,
-	  burst					  = 2,
-	  burstRate				  = 0.4,
+	  --burst					  = 2,
+	  --burstRate				  = 0.4,
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargetting      = 1,
@@ -150,7 +148,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_fury.s3o]],
       range                   = 270,
-      reloadtime              = 3.2,
+      reloadtime              = 2,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
