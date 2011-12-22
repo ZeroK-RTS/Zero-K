@@ -300,13 +300,13 @@ local function UpdatePlayerInfo()
 				local cpuLabel = entities[i].cpuLabel
 				if cpuLabel then
 					cpuLabel.font.color = cpuCol
-					cpuLabel:SetCaption(blank and '' or math.round(cpuUsage*100) .. '%')
+					cpuLabel:SetCaption(blank and '\t' or math.round(cpuUsage*100) .. '%')
 					cpuLabel:Invalidate()
 				end
 				local pingLabel = entities[i].pingLabel
 				if pingLabel then
 					pingLabel.font.color = pingCol
-					pingLabel:SetCaption(blank and '' or pingTime_readable)
+					pingLabel:SetCaption(blank and '\t' or pingTime_readable)
 					pingLabel:Invalidate()
 				end
 			end
