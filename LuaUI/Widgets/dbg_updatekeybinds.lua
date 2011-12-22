@@ -46,21 +46,21 @@ function widget:Initialize()
 			-- unbind keys
 			for i=1,#(info.unbind or {}) do
 				Spring.SendCommands("unbind "..info.unbind[i])
-				Spring.Echo("Unbinding key/action: "..info.unbind[i])
+				Spring.Echo("<" .. name .. "> Unbinding key/action: "..info.unbind[i])
 			end
 			for i=1,#(info.unbindaction or {}) do
 				Spring.SendCommands("unbindaction "..info.unbindaction[i])
-				Spring.Echo("Unbinding key: "..info.unbindaction[i])
+				Spring.Echo("<" .. name .. "> Unbinding key: "..info.unbindaction[i])
 			end
 			for i=1,#(info.unbindkeyset or {}) do
 				Spring.SendCommands("unbindkeyset "..info.unbindkeyset[i])
-				Spring.Echo("Unbinding key: "..info.unbindkeyset[i])
+				Spring.Echo("<" .. name .. "> Unbinding action: "..info.unbindkeyset[i])
 			end
 			
 			-- bind keys
 			for i=1,#(info.keys or {})  do
 				Spring.SendCommands("bind "..info.keys[i] .. " " .. command)
-				Spring.Echo("Binding "..info.keys[i] .. " to action " .. command)
+				Spring.Echo("<" .. name .. "> Binding "..info.keys[i] .. " to action " .. command)
 			end	
 		end
 	end
