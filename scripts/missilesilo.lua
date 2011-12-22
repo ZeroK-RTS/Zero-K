@@ -66,14 +66,23 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit)
-	--set INBUILDSTANCE to 1
 end
 
 function script.StartBuilding()
+	Spring.Echo("Start")
 	Turn(scaffold , y_axis, math.rad((-padnum*90) + 45), math.rad(90) )
 end
 
 function script.StopBuilding()
+	Spring.Echo("Stop")
+end
+
+function script.Activate()
+	SetUnitValue(COB.INBUILDSTANCE, 1)
+end
+
+function script.Deactivate()
+	SetUnitValue(COB.INBUILDSTANCE, 0)
 end
 
 function script.QueryNanoPiece() return trolleyb end
