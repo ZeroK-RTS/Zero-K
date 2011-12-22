@@ -162,7 +162,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- scale damage based on target health
 	local health, maxHealth = Spring.GetUnitHealth(unitID)
 	if health <= 0 then health = 0.01 end
-	newCaptureDamage = newCaptureDamage * maxHealth/health
+	newCaptureDamage = newCaptureDamage * (2 - (health/maxHealth))
 	
 	-- reset degrade timer for against this allyteam and add to damage
 	capturedUnits[unitID].aTeams[aTeam].degradeTimer = GENERAL_DEGRADE_TIMER
