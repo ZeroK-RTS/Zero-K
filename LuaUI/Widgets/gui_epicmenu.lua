@@ -162,6 +162,7 @@ local groupDescs = {
 	hook    = "Commands",
 	ico     = "GUI",
 	init    = "Initialization",
+	map		= "Map",
 	minimap = "Minimap",
 	snd     = "Sound",
 	test    = "For Developers",
