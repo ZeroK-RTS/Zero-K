@@ -42,7 +42,7 @@ unitDef = {
   idleTime               = 1800,
   maneuverleashlength    = [[640]],
   mass                   = 237,
-  maxDamage              = 2400,
+  maxDamage              = 2200,
   maxVelocity            = 3.5,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -105,8 +105,8 @@ unitDef = {
       craterMult              = 0.3,
 
       damage                  = {
-        default = 11,
-        planes  = 11,
+        default = 10,
+        planes  = 10,
         subs    = 0.55,
       },
 
@@ -143,7 +143,7 @@ unitDef = {
       description      = [[Wreckage - Typhoon]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 2400,
+      damage           = 2200,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -164,7 +164,7 @@ unitDef = {
       description      = [[Debris - Typhoon]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2400,
+      damage           = 2200,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
