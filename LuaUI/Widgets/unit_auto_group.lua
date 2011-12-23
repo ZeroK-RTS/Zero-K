@@ -255,7 +255,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 						--Spring.MarkerAddPoint( x, y, z )
 						exec = true
 						--Echo('<AUTOGROUP> : Add unit ' .. unitID .. 'to group ' .. gr)
-						SetUnitGroup(unitID, -1) -- -1 was gr originally but bugged since 84, no idea why -1 *works*.
+						if (gr==nil) then SetUnitGroup(unitID, -1) else 
+						SetUnitGroup(unitID, gr) end 
 					end
 				end
 				if ( exec == false ) then
@@ -289,7 +290,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 				end
 				return true 	--key was processed by widget
 			end
-			--[[
+			
 	elseif (modifier.ctrl and not modifier.meta) then	
 		if (key == KEYSYMS.BACKQUOTE) then
 			local mx,my = GetMouseState()
@@ -310,7 +311,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 				SelectUnitArray({muid})
 			end
 		end
-		 
+		 --[[
 		if (key == KEYSYMS.Q) then
 		  for _, uid in ipairs(GetSelectedUnits()) do  
 			SetUnitGroup(uid,-1)
