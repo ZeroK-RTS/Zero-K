@@ -19,7 +19,7 @@ local isStable = false
 local resetWidgetDetailLevel = false -- has widget detail level changed
 
 local ORDER_VERSION = 8 --- change this to reset enabled/disabled widgets
-local DATA_VERSION = 8 -- change this to reset enabled/disabled widgets
+local DATA_VERSION = 9 -- change this to reset widget settings
 
 function includeZIPFirst(filename, envTable)
   if (string.find(filename, '.h.lua', 1, true)) then
