@@ -606,13 +606,17 @@ end
 local function tVerts(verts)
 	for i = 1, #verts do
 		local v = verts[i]
-		glVertex(v[1], v[2], v[3])
+        if v[1] and v[2] and v[3] then
+            glVertex(v[1], v[2], v[3])
+        end
 	end
 end
 local function tVertsMinimap(verts)
 	for i = 1, #verts do
 		local v = verts[i]
-		glVertex(v[1], v[3], 1)
+		if v[1] and v[3] then
+            glVertex(v[1], v[3], 1)
+        end
 	end
 end
 local function DrawFormationLines(vertFunction, lineStipple)
