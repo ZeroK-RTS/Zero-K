@@ -542,8 +542,8 @@ local function SpawnChicken(burrowID, spawnNumber, chickenName)
   local tloc = targetCache
   if (burrowTarget) then tloc = ChooseTarget(burrowTarget) end
   if pvp and burrows[burrowID].targetID then
-	local x, y, z = spGetUnitPosition(burrows[burrowID].targetID)
-	tloc = {x, y, z}
+	local tx, ty, tz = spGetUnitPosition(burrows[burrowID].targetID)
+	tloc = {tx, ty, tz}
   end
 
   for i=1, spawnNumber do
@@ -554,7 +554,7 @@ local function SpawnChicken(burrowID, spawnNumber, chickenName)
       s = s + spawnSquareIncrement
       tries = tries + 1
     until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
-    local unitID = spCreateUnit(chickenName, x, 0, z, "n", chickenTeamID)
+    local unitID = spCreateUnit(chickenName, x, by, z, "n", chickenTeamID)
     spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, emptyTable) --// set moveState to roam
     if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable) end
     chickenBirths[unitID] = now 
@@ -598,7 +598,7 @@ local function SpawnTurret(burrowID, turret, number, force)
       tries = tries + 1
     until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
     
-    local unitID = spCreateUnit(turret, x, 0, z, "n", chickenTeamID) -- FIXME
+    local unitID = spCreateUnit(turret, x, by, z, "n", chickenTeamID) -- FIXME
 	turretDef = UnitDefs[spGetUnitDefID(unitID)]
     --turrets[unitID] = now
 	if turretDef.canMove then
@@ -624,13 +624,13 @@ local function SpawnBurrow(number, burrowLevel, loc)	-- last two args are curren
   --if t < (gracePeriod/4) then return end
     
   for i=1, (number or 1) do
-    local x, z
+    local x, y, z
     local tries = 0
 
 	repeat
 	  x = random(spawnSquare, Game.mapSizeX - spawnSquare)
 	  z = random(spawnSquare, Game.mapSizeZ - spawnSquare)
-	  local y = Spring.GetGroundHeight(x, z)
+	  y = Spring.GetGroundHeight(x, z)
 	  tries = tries + 1
 	  local blocking = Spring.TestBuildOrder(testBuilding, x, y, z, 1)
 	  if (blocking == 2) then
@@ -662,7 +662,7 @@ local function SpawnBurrow(number, burrowLevel, loc)	-- last two args are curren
 	  end
 	until (blocking == 2 or tries > maxTriesSmall or loc)
 
-    local unitID = spCreateUnit(burrowName, x, 0, z, "n", chickenTeamID)
+    local unitID = spCreateUnit(burrowName, x, y, z, "n", chickenTeamID)
     burrows[unitID] = {targetID = unitID, targetDistance = 100000}
 	UpdateBurrowTarget(unitID, nil)
     Spring.SetUnitBlocking(unitID, false)
@@ -676,7 +676,7 @@ local function SpawnUnit(unitName, number, minDist, maxDist, target)
 	minDist = minDist or minBaseDistance
 	maxDist = maxDist or maxBaseDistance
 
-	local x, z
+	local x, y, z
 	local tries = 0
 	local block = false
 	
@@ -688,6 +688,7 @@ local function SpawnUnit(unitName, number, minDist, maxDist, target)
 			x = random(target[1] - maxDist, target[1] + maxDist)
 			z = random(target[3] - maxDist, target[3] + maxDist)			
 		end
+		y = Spring.GetGroundHeight(x, z)
 		tries = tries + 1
 		block = false
 		
@@ -715,7 +716,7 @@ local function SpawnUnit(unitName, number, minDist, maxDist, target)
 	until (not spGetGroundBlocked(x, z) or (not block) or (tries > number + maxTries))
 	
 	for i=1, (number or 1) do
-		local unitID = spCreateUnit(unitName, x + random(-spawnSquare, spawnSquare), 0, z + random(-spawnSquare, spawnSquare), "n", chickenTeamID)
+		local unitID = spCreateUnit(unitName, x + random(-spawnSquare, spawnSquare), y, z + random(-spawnSquare, spawnSquare), "n", chickenTeamID)
 		spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, emptyTable) --// set moveState to roam
 	end
 end
@@ -727,13 +728,13 @@ local function SetMorphFrame()
 end
 
 local function SpawnQueen()
-  local x, z
+  local x, y, z
   local tries = 0
    
   repeat
     x = random(0, Game.mapSizeX)
     z = random(0, Game.mapSizeZ)
-    local y = Spring.GetGroundHeight(x, z)
+    y = Spring.GetGroundHeight(x, z)
     tries = tries + 1
     local blocking = Spring.TestBuildOrder(testBuildingQ, x, y, z, 1)
 	if (blocking == 2) then
@@ -750,17 +751,17 @@ local function SpawnQueen()
   queenHealthMod = queenHealthMod * (0.5*(queenTime/baseQueenTime) + 0.5) * ((playerCount/2) + 0.5)
   
   if queenMorphName ~= '' then SetMorphFrame() end
-  return spCreateUnit(queenName, x, 0, z, "n", chickenTeamID)
+  return spCreateUnit(queenName, x, y, z, "n", chickenTeamID)
 end
 
 local function SpawnMiniQueen()
-  local x, z
+  local x, y, z
   local tries = 0
    
   repeat
     x = random(0, Game.mapSizeX)
     z = random(0, Game.mapSizeZ)
-    local y = Spring.GetGroundHeight(x, z)
+    y = Spring.GetGroundHeight(x, z)
     tries = tries + 1
     local blocking = Spring.TestBuildOrder(testBuildingQ, x, y, z, 1)
 	if (blocking == 2) then
@@ -773,7 +774,7 @@ local function SpawnMiniQueen()
       end
     end
   until (blocking == 2 or tries > maxTries)
-  local unitID = spCreateUnit(miniQueenName, x, 0, z, "n", chickenTeamID)
+  local unitID = spCreateUnit(miniQueenName, x, y, z, "n", chickenTeamID)
   
   local miniQueenTarget  = Spring.GetUnitNearestEnemy(unitID, 20000, false)
   local tloc

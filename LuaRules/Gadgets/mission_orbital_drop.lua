@@ -35,7 +35,7 @@ end
 
 
 function GG.DropUnit(unitDefName, x, y, z, facing, teamID, teleport)
-  local unitID = Spring.CreateUnit(unitDefName, x, 0, z, facing, teamID)
+  local unitID = Spring.CreateUnit(unitDefName, x, y, z, facing, teamID)
   if StartsWith(unitDefName, "chicken") then -- don't drop chickens, make them appear in a cloud of dirt instead
     local y = Spring.GetGroundHeight(x, z)
     Spring.SpawnCEG("dirt3", x, y, z)
