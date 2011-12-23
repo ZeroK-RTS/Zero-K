@@ -471,7 +471,7 @@ end
 local function AddComm(unitID, unitDefID)
 	local i = #comms + 1
 	comms[i] = {commID = unitID, commDefID = unitDefID, warningTime = -1}
-	GenerateButton(comms, i, unitID, unitDefID, WG.crude.GetHotkey("select AllMap+_Commander+_ClearSelection_SelectOne+"):upper() or '')
+	GenerateButton(comms, i, unitID, unitDefID, WG.crude.GetHotkey("selectcomm"):upper() or '')
 	commsByID[unitID] = i
 	UpdateComm(unitID, i)
 	ShiftFacRow()
