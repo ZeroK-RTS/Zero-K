@@ -153,7 +153,8 @@ MakeMinimapWindow = function()
 	
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	
-	local w,h = screenWidth*0.32,screenHeight*0.4+iconsize
+	--local w,h = screenWidth*0.32,screenHeight*0.4+iconsize
+	local w,h = 328,308+iconsize
 	if (options.use_map_ratio.value) then
 		w,h = AdjustToMapAspectRatio(w,h)
 	end
@@ -188,8 +189,6 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 6, 'viewmetalmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/radar.png', 8, 'viewradar' ),
 			MakeMinimapButton( 'LuaUI/images/map/fow.png', 9, 'viewfow' ),
-			
-			
 		},
 	}
 end
