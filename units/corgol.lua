@@ -123,43 +123,49 @@ unitDef = {
 
 
     CORGOL_FLAMETHROWER = {
-      name                    = [[Flame Thrower]],
+	  name                    = [[Flamethrower]],
       areaOfEffect            = 64,
       avoidFeature            = false,
       collideFeature          = false,
       craterBoost             = 0,
       craterMult              = 0,
-	  
+
 	  customParams        	  = {
+		flamethrower = [[1]],
 	    setunitsonfire = "1",
 		burntime = [[360]],
 	  },
-
+	  
       damage                  = {
         default = 5,
-        planes  = 5,
         subs    = 0.05,
       },
 
+	  duration				  = 0.1,
       explosionGenerator      = [[custom:SMOKE]],
-      fireStarter             = 140,
-      flameGfxTime            = 1.6,
-      impulseBoost            = 0,
+	  fallOffRate             = 1,
+	  fireStarter             = 100,
+	  impulseBoost            = 0,
       impulseFactor           = 0,
       intensity               = 0.1,
-      interceptedByShieldType = 0,
+      interceptedByShieldType = 1,
       noExplode               = true,
-      range                   = 240,
+      noSelfDamage            = true,
+	  --predictBoost			  = 1,
+      range                   = 280,
       reloadtime              = 0.16,
-      sizeGrowth              = 1.05,
-      soundStart              = [[weapon/flamethrower]],
+	  rgbColor                = [[1 1 1]],
+	  soundStart              = [[weapon/flamethrower]],
       soundTrigger            = true,
-      sprayAngle              = 50000,
-      tolerance               = 2500,
+	  texture1				  = [[fireball]],
+	  texture2				  = [[fireball]],
+	  thickness	              = 12,
+      tolerance               = 5000,
       turret                  = true,
-      weaponType              = [[Flame]],
-      weaponVelocity          = 800,
+      weaponType              = [[LaserCannon]],
+      weaponVelocity          = 500,
     },
+
 
   },
 

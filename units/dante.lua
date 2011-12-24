@@ -106,41 +106,47 @@ unitDef = {
   weaponDefs          = {
 
     DANTE_FLAMER         = {
-      name                    = [[Flame Thrower]],
+      name                    = [[Flamethrower]],
       areaOfEffect            = 96,
       avoidFeature            = false,
       collideFeature          = false,
       craterBoost             = 0,
       craterMult              = 0,
-	  
-	  customParams        	  = {
-	    setunitsonfire = "1",
-		burntime = [[540]],		
-	  },
 
+	  customParams        	  = {
+		flamethrower = [[1]],
+	    setunitsonfire = "1",
+		burntime = [[450]],
+	  },
+	  
       damage                  = {
         default = 15,
         subs    = 0.15,
       },
 
+	  duration				  = 0.1,
       explosionGenerator      = [[custom:SMOKE]],
-      fireStarter             = 150,
-      flameGfxTime            = 1.6,
-      impulseBoost            = 0,
+	  fallOffRate             = 1,
+	  fireStarter             = 100,
+	  impulseBoost            = 0,
       impulseFactor           = 0,
       intensity               = 0.1,
-      interceptedByShieldType = 0,
+      interceptedByShieldType = 1,
       noExplode               = true,
+      noSelfDamage            = true,
+	  --predictBoost			  = 1,
       range                   = 340,
       reloadtime              = 0.16,
-      sizeGrowth              = 1.4,
-      soundStart              = [[weapon/flamethrower]],
+	  rgbColor                = [[1 1 1]],
+	  soundStart              = [[weapon/flamethrower]],
       soundTrigger            = true,
-      sprayAngle              = 40000,
-      tolerance               = 2500,
+	  texture1				  = [[fireball]],
+	  texture2				  = [[fireball]],
+	  thickness	              = 12,
+      tolerance               = 5000,
       turret                  = true,
-      weaponType              = [[Flame]],
-      weaponVelocity          = 800,
+      weaponType              = [[LaserCannon]],
+      weaponVelocity          = 500,
     },
 
 

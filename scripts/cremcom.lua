@@ -101,7 +101,7 @@ local wepTable = UnitDefs[unitDefID].weapons
 wepTable.n = nil
 for index, weapon in pairs(wepTable) do
 	local weaponDef = WeaponDefs[weapon.weaponDef]
-	if weaponDef.type == "Flame" then
+	if weaponDef.type == "Flame" or (weaponDef.customParams and weaponDef.customParams.flamethrower) then
 		flamers[index] = true
 	end
 end

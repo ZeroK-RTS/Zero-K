@@ -84,7 +84,7 @@ else
 
     local posx,posy,posz, dirx,diry,dirz = Spring.GetUnitWeaponVectors(unitID,weapon-1)
     local wd  = WeaponDefs[UnitDefs[unitDefID].weapons[weapon].weaponDef]
-    local weaponRange = wd.range*wd.duration
+    local weaponRange = wd.range*wd.duration*15
 
     local speedx,speedy,speedz = Spring.GetUnitVelocity(unitID)
     local partpos = "x*delay,y*delay,z*delay|x="..speedx..",y="..speedy..",z="..speedz
@@ -104,7 +104,7 @@ else
       emitVector   = {dirx,diry,dirz},
       emitRotSpread= 10,
 
-      speed        = 7,
+      speed        = 10,
       speedSpread  = 0,
       speedExp     = 1.5,
 
@@ -142,7 +142,7 @@ else
       rotSpread    = 360,
       rotExp       = 9,
 
-      speed        = 7,
+      speed        = 10,
       speedSpread  = 0,
       speedExp     = 1.5,
 
@@ -177,7 +177,7 @@ else
       rotSpread    = 360,
       rotExp       = 9,
 
-      speed        = 7,
+      speed        = 10,
       speedSpread  = 0,
 
       size         = 2,
