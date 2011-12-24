@@ -267,7 +267,7 @@ local function DrawTiles()
 	gl.PopAttrib()
 end
 
-function widget:DrawWorld()
+function widget:DrawWorldPreUnit()
 	if (not island) or options.drawForIslands.value then
 		gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
 		-- Maybe you want Spring.SetDrawGround(false) somewhere
