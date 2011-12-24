@@ -289,9 +289,8 @@ path='Settings/View'
 	ShButton('Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage' )
 	
 path='Settings/View/Effects'
-
 	ShButton('Night View', function() spSendCommands{'luaui togglewidget Night'} end )
-					
+	ShButton('Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end )				
 	ShButton('Toggle Camera Shake', function() spSendCommands{'luaui togglewidget CameraShake'} end )
 	
 path='Settings/View/Map'	
