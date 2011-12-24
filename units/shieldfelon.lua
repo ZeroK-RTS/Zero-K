@@ -70,6 +70,7 @@ unitDef = {
   weapons             = {
     {
       def                = [[SHIELDGUN]],
+      badTargetCategory  = [[UNARMED]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
 	  --mainDir            = [[0 1 0]],
 	  --maxAngleDif        = 270,

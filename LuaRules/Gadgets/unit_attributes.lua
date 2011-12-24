@@ -36,13 +36,36 @@ local spGetUnitWeaponState  = Spring.GetUnitWeaponState
 
 origUnitSpeed = {}
 origUnitReload = {}
-origUnitBuildPower = {}
+origUnitBuildSpeed = {}
 
 if not GG.attUnits then
 	GG.attUnits = {}
 end
 
-local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
+local function updateBuildSpeed(unitID, ud, speedFactor)	
+
+    if ud.buildSpeed == 0 then
+        return
+    end
+        
+    if not origUnitBuildSpeed[unitID] then
+    
+        origUnitBuildSpeed[unitID] = {
+            buildSpeed = ud.buildSpeed,
+        }
+    end
+
+    local state = origUnitBuildSpeed[unitID]
+
+    Spring.SetUnitBuildSpeed(unitID, 
+        state.buildSpeed*speedFactor, -- build
+        state.buildSpeed*speedFactor, -- repair
+        state.buildSpeed*speedFactor, -- reclaim
+        state.buildSpeed*speedFactor) -- rezz
+    
+end
+
+local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 	
 	if not origUnitReload[unitID] then
 	
@@ -99,7 +122,7 @@ local function updateReloadSpeed( unitID, ud, speedFactor, gameFrame)
 	
 end
 
-local function updateMovementSpeed( unitID, ud, speedFactor)	
+local function updateMovementSpeed(unitID, ud, speedFactor)	
 	
 	if not origUnitSpeed[unitID] then
 	
@@ -183,10 +206,9 @@ function GG.UpdateUnitAttributes(unitID, frame)
 	if slowState or captureMult then
 		updateReloadSpeed(unitID, ud, (1-(slowState or 0))*(captureMult or 1), frame)
 		updateMovementSpeed(unitID,ud,1-(slowState or 0))
-		
+		updateBuildSpeed(unitID,ud,1-(slowState or 0))
 		if slowState ~= 0 and captureMult ~= 1 then
 			changedAtt = true
-			
 		end
 	end
 

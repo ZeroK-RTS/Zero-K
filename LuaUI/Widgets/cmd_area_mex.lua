@@ -81,7 +81,7 @@ end
 
 
 function widget:CommandNotify(id, params, options)	
-	
+    
 	if (id == CMD_AREA_MEX) then
 	
 		local cx, cy, cz, cr = params[1], params[2], params[3], params[4]
@@ -146,13 +146,15 @@ function widget:CommandNotify(id, params, options)
 		for i, id in ipairs(units) do 
 			if mexBuilder[id] then
 				if not shift then 
-					spGiveOrderToUnit(id, CMD.STOP, {} , CMD.OPT_RIGHT )
+					spGiveOrderToUnit(id, CMD.STOP, {} , 0 )
 				end
 				for i, command in ipairs(orderedCommands) do
+                    local x = math.floor(command.x/8)*8
+                    local z = math.floor(command.z/8)*8
 					for j=1, #mexBuilder[id] do
-						local buildable = spTestBuildOrder(-mexBuilder[id][j],command.x,0,command.z,1)
+						local buildable = spTestBuildOrder(-mexBuilder[id][j],x,0,z,1)
 						if buildable ~= 0 then
-							spGiveOrderToUnit(id, mexBuilder[id][j], {command.x,0,command.z} , {"shift"})
+							spGiveOrderToUnit(id, mexBuilder[id][j], {x,0,z} , {"shift"})
 							break
 						end
 					end
