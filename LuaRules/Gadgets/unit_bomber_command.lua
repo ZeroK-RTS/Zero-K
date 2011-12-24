@@ -415,6 +415,11 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		if ((cmdID == CMD_REARM or cmdID == CMD_FIND_PAD) and not cmdOptions.shift) then -- don't allow rearming when already armed or refuelling
 			return false 
 		end	
+	else
+		if combatCommands[cmdID] then
+			RequestRearm(unitID)
+			return cmdOptions.shift 
+		end
 	end
 	if bomberToPad[unitID] then
 		if cmdID ~= CMD_REARM and not cmdOptions.shift then
