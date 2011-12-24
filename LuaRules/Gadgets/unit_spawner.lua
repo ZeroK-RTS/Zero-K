@@ -563,6 +563,7 @@ end
 
 -- also used for supporters
 local function SpawnTurret(burrowID, turret, number, force)
+  if victory then return end
   local temp = defenderChance
   
   if turret and (not force) then
@@ -618,7 +619,7 @@ end
 --local testBuilding = UnitDefNames["armestor"].id
 
 local function SpawnBurrow(number, burrowLevel, loc)	-- last two args are currently unused
-  if (endgame) then return end
+  if (victory or endgame) then return end
   
   local t     = spGetGameSeconds()
   --if t < (gracePeriod/4) then return end
@@ -673,6 +674,7 @@ end
 -- spawns arbitrary unit(s) obeying min and max distance from human units
 -- supports spawning in batches
 local function SpawnUnit(unitName, number, minDist, maxDist, target)
+	if victory then return end
 	minDist = minDist or minBaseDistance
 	maxDist = maxDist or maxBaseDistance
 
@@ -822,7 +824,7 @@ end
 local function Wave()
   local t = spGetGameSeconds()
   
-  if lagging then
+  if lagging or victory then
     return
   end
   
@@ -1144,7 +1146,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	
 	local techDecel = burrowRegressTime
 	totalTechAccel = totalTechAccel - techDecel
-	totalTechAccel = math.min(totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
+	totalTechAccel = math.max(totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
 	Spring.SetGameRulesParam("techAccel", totalTechAccel)
 	
 	--[[
@@ -1255,7 +1257,6 @@ function gadget:GameOver()
 	end
 	score = math.floor(score * scoreMult)	-- multiply by mult
 	Spring.SendCommands("wbynum 255 SPRINGIE:stats,ID: "..Spring.Utilities.Base64Encode(tostring(Spring.GetGameFrame()).."/"..tostring(math.floor(score))))
-	gadgetHandler:RemoveGadget()
 end
 
 --------------------------------------------------------------------------------

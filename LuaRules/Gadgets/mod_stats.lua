@@ -19,11 +19,13 @@ end
 
 if VFS.FileExists("mission.lua") then
   -- stats are meaningless in missions
+  Spring.Echo("<Mod statistics> lol mission")
   return
 end
 
   
 if (not gadgetHandler:IsSyncedCode()) then
+  Spring.Echo("<Mod statistics> lol unsynced")
   return false  --  silent removal
 end
 
@@ -179,12 +181,12 @@ function SendData(statsData)
 	Spring.SendCommands("wbynum 255 SPRINGIE:stats,".. statsData)
 end 
 
-
-function gadget:GameOver()	
+function gadget:GameOver()
 	if GG.chicken then
 		Spring.Echo("Chicken game; unit stats disabled")
 		return	-- don't report stats in chicken
 	end
+	Spring.Echo("Submitting stats")
 	for atk, victims in pairs(damages) do
 		for victim, dam in pairs(victims) do
 			SendData("dmg,"..UnitDefs[atk].name .. ",".. UnitDefs[victim].name .. "," .. dam[1] .. "," .. dam[2])

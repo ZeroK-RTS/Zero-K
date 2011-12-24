@@ -62,6 +62,8 @@ local finishedUnits = {}	-- this stores a list of all units that have ever been 
 local destroy_type = 'destroy'
 local commends = false
 
+local gameover = false
+
 local nilUnitDef = {id=-1}
 local function GetUnitDefIdByName(defName)
   return (UnitDefNames[defName] or nilUnitDef).id
@@ -160,7 +162,7 @@ local function CheckForVictory()
 		end
     end
 	if count < 2 then
-		Spring.Echo(lastAllyTeam or "Nobody" .. " wins!")
+		Spring.Echo(( (lastAllyTeam and ("Team " .. lastAllyTeam)) or "Nobody") .. " wins!")
 		spGameOver({lastAllyTeam})
 	end
 end
@@ -314,14 +316,14 @@ end
 function gadget:GameFrame(n)
   -- check for last ally:
   -- end condition: only 1 ally with human players, no AIs in other ones
-  if n % 37 < 0.1 then
+  if (n % 37 < 0.1) and not gameover then
 	ProcessLastAlly()
   end
 end
 
 function gadget:GameOver()
+	gameover = true
 	Spring.Echo("GAME OVER!!")
-	gadgetHandler:RemoveGadget()
 end
 
 else -- UNSYNCED
