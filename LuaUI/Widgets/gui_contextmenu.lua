@@ -195,13 +195,22 @@ local function GetUnitDefByHumanName(humanName)
 	if (cached_udef ~= nil) then
 		return cached_udef
 	end
+	-- uncomment the altResult stuff to allow a non-exact match
+	--local altResult
 
 	for _,ud in pairs(UnitDefs) do
-		if (ud.humanName:find(humanName)) then
+		if (ud.humanName == humanName) then
 			UnitDefByHumanName_cache[humanName] = ud
 			return ud
+		--elseif (ud.humanName:find(humanName)) then
+		--	altResult = altResult or ud
 		end
 	end
+	--if altResult then
+	--	UnitDefByHumanName_cache[humanName] = altResult
+	--	return altResult
+	--end
+	
 	UnitDefByHumanName_cache[humanName] = false
 	return false
 end
