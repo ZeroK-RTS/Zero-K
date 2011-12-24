@@ -164,6 +164,7 @@ local groupDescs = {
 	init    = "Initialization",
 	map		= "Map",
 	minimap = "Minimap",
+	mission	= "Mission",
 	snd     = "Sound",
 	test    = "For Developers",
 	unit    = "Units",
