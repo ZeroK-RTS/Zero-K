@@ -282,7 +282,6 @@ difficulties = {
 	burrowRegressTime	= 20,
 	queenSpawnMult	 = 2.5, 
 	timeModifier	 = 0.35,
-	scoreMult		 = 0,
   },  
 }
 
