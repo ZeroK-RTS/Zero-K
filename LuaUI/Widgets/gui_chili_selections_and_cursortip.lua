@@ -452,10 +452,10 @@ local function WriteGroupInfo()
 		"Build Power " .. gi_usedbp .. " / " ..  gi_totalbp 
 		
 	gi_label = Label:New{
-		parent  = window_corner;
+		parent = window_corner;
 		y=5,
 		right=5,
-		--x=-110,
+		x=window_corner.width-150,
 		height  = '100%';
 		width = 120,
 		caption = gi_str;
