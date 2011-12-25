@@ -69,8 +69,8 @@ local obsCONSTANTg			= math.pi/10 -- obstacle graph; scale the obstacle's streng
 local windowingFuncMultG = 1 --? (default = 1 multiplier)
 
 -- Obstacle/Target competetive interaction constant:
-local cCONSTANT1g 			= 2 --attractor constant; effect the behaviour. ie: the selection between 4 behaviour state. (default = 2 multiplier)
-local cCONSTANT2g			= 2 --repulsor constant; effect behaviour. (default = 2 multiplier)
+local cCONSTANT1g 			= 1 --attractor constant; effect the behaviour. ie: the selection between 4 behaviour state. (default = 2 multiplier)
+local cCONSTANT2g			= 1 --repulsor constant; effect behaviour. (default = 2 multiplier)
 local gammaCONSTANT2and1g	= 0.05 -- balancing constant; effect behaviour. . (default = 0.05 multiplier)
 local alphaCONSTANT1g		= 0.4 -- balancing constant; effect behaviour. (default = 0.4 multiplier)
 
