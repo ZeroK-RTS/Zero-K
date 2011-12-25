@@ -76,7 +76,7 @@ local combatCommands = {	-- commands that require ammo to execute
 	[CMD.FIGHT] = true,
 	[CMD.PATROL] = true,
 	[CMD.GUARD] = true,
-	[CMD.DGUN or CMD.MANUALFIRE] = true, -- TODO: remove CMD.DGUN after 85.0
+	[CMD.MANUALFIRE] = true,
 }
 
 local padRadius = 750 -- land if pad is within this range
@@ -416,9 +416,9 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 			return false 
 		end	
 	else
-		if combatCommands[cmdID] then
+		if combatCommands[cmdID] then	-- trying to fight without ammo, go get ammo first!
 			RequestRearm(unitID)
-			return cmdOptions.shift 
+			return cmdOptions.shift -- allow placing the attack order after the automatic rearm order
 		end
 	end
 	if bomberToPad[unitID] then

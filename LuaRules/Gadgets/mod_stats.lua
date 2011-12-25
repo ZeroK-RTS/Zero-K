@@ -19,13 +19,11 @@ end
 
 if VFS.FileExists("mission.lua") then
   -- stats are meaningless in missions
-  Spring.Echo("<Mod statistics> lol mission")
   return
 end
 
   
 if (not gadgetHandler:IsSyncedCode()) then
-  Spring.Echo("<Mod statistics> lol unsynced")
   return false  --  silent removal
 end
 
