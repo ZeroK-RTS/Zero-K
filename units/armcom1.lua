@@ -19,7 +19,6 @@ unitDef = {
   buildPic               = [[armcom.png]],
   buildTime              = 1200,
   canAttack              = true,
-  canCloak               = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
