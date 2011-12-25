@@ -217,7 +217,7 @@ function UpdateOneGroupsDetails(myGroupId)
 		if ( not myUnits[unitID] ) then
 			local udid = spGetUnitDefID(unitID)
 			local ud = UnitDefs[udid]
-			if ((ud.isBuilder or ud.builder) --[[TODO: remove isBuilder after 85.0]] and ud.canMove) then
+			if (ud.builder and ud.canMove) then
 				myUnits[unitID] = "idle"
 			end
 		end
@@ -498,7 +498,7 @@ function widget:KeyPress(key, mods, isRepeat)
 			if ( not myUnits[unitID] ) then
 				local udid = spGetUnitDefID(unitID)
 				local ud = UnitDefs[udid]
-				if ((ud.isBuilder or ud.builder) --[[TODO: remove isBuilder after 85.0]] and ud.canMove) then
+				if (ud.builder and ud.canMove) then
 					myUnits[unitID] = "idle"
 				end
 			end

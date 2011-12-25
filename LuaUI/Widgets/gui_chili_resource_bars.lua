@@ -76,7 +76,7 @@ local excessE = false
 
 local builderDefs = {}
 for id,ud in pairs(UnitDefs) do
-	if (ud.isBuilder or ud.builder) --[[TODO: remove isBuilder after 85.0]] then
+	if (ud.builder) then
 		builderDefs[#builderDefs+1] = id
 	elseif (ud.buildSpeed > 0) then
 		builderDefs[#builderDefs+1] = id

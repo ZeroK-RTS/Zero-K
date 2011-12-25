@@ -19,8 +19,7 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  silent removal
 end
 
--- TODO: remove in 85.0
-local cmd = CMD.MANUALFIRE or CMD.DGUN
+local cmd = CMD.MANUALFIRE
 
 local spFindUnitCmdDesc = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc = Spring.EditUnitCmdDesc

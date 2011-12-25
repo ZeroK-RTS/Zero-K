@@ -58,7 +58,7 @@ local GetUnitRadius          = Spring.GetUnitRadius
 local GetUnitStates          = Spring.GetUnitStates
 local TraceScreenRay         = Spring.TraceScreenRay
 local CMD_ATTACK             = CMD.ATTACK
-local CMD_DGUN               = CMD.DGUN or CMD.MANUALFIRE	-- TODO: remove CMD.DGUN after 85.0
+local CMD_MANUALFIRE         = CMD.MANUALFIRE
 local g                      = Game.gravity
 local GAME_SPEED             = 30
 local g_f                    = g / GAME_SPEED / GAME_SPEED
@@ -629,7 +629,7 @@ function widget:DrawWorld()
   if (cmd == CMD_ATTACK and aoeUnitDefID) then 
     info = aoeDefInfo[aoeUnitDefID]
 	unitID = aoeUnitID
-  elseif (cmd == CMD_DGUN and dgunUnitDefID) then
+  elseif (cmd == CMD_MANUALFIRE and dgunUnitDefID) then
     info = dgunInfo[dgunUnitDefID]
 	unitID = dgunUnitID
   else
@@ -676,7 +676,7 @@ function widget:DrawWorld()
     DrawAoE(tx, ty, tz, info.aoe, info.ee)
   end
   
-  if (cmd == CMD_DGUN) then
+  if (cmd == CMD_MANUALFIRE) then
     glColor(1, 0, 0, 0.75)
     glLineWidth(1)
     glDrawGroundCircle(fx, fy, fz, info.range, circleDivs)
