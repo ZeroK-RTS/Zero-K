@@ -443,6 +443,7 @@ upgrades = {
 		name = "Personal Cloak",
 		description = "Cloaks the commander",
 		func = function(unitDef) 
+				unitDef.cancloak = true
 				unitDef.cloakcost = unitDef.cloakcost or 5
 				unitDef.mincloakdistance = math.max(150, unitDef.mincloakdistance or 0)
 				if unitDef.cloakcost > 5 then 
