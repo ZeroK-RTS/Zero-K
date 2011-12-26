@@ -396,7 +396,6 @@ local function AddEntity(entity, teamID, allyTeamID)
 			name_out = "<Dead> " ..(name or '')
 		end
 	end
-	country = "my"
 	local icon = nil
 	local icRank = nil 
 	local icCountry = country and country ~= '' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
@@ -412,8 +411,6 @@ local function AddEntity(entity, teamID, allyTeamID)
 			icRank = "LuaUI/Images/Ranks/" .. (1+math.floor((customKeys.level or 0)/10)) .. ".png"
 		end
 	end
-	icon = "LuaUI/Configs/Clans/0K.png"
-	icRank = "LuaUI/Images/Ranks/1.png"
 	
 	local min_pingTime = math.min(pingTime, 1)
 	local min_cpuUsage = math.min(cpuUsage, 1)
