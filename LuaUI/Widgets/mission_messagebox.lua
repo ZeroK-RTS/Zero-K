@@ -15,7 +15,12 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local Chili
+
 local msgBoxPersistent
+local imagePersistent
+local scrollPersistent
+local textPersistent
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -82,9 +87,7 @@ function WG.ShowMessageBox(text, width, height, fontsize, pause)
 end
 
 function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)  
-	local Chili = WG.Chili
 	local vsx, vsy = gl.GetViewSizes()
-	local image
 	
 	--local x = math.floor((vsx - width)/2)
 	local y = math.floor((vsy - height)/2)
@@ -98,69 +101,123 @@ function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 		height = 100
 	end
 	
-	-- get rid of existing box if we have one
+	-- we have an existing box, dispose of it
+	--if msgBoxPersistent then
+	--	msgBoxPersistent:ClearChildren()
+	--	msgBoxPersistent:Dispose()
+	--end	
+	
+	-- we have an existing box, modify that one instead of making a new one
 	if msgBoxPersistent then
-		msgBoxPersistent:Dispose()
+		msgBoxPersistent.width = width
+		msgBoxPersistent.height = height
+		msgBoxPersistent.x = vsx - width
+		--msgBoxPersistent:Invalidate()
+		if imageDir then
+			imagePersistent.width = height * 0.8
+			imagePersistent.height = height * 0.8
+			imagePersistent.file = imageDir
+			imagePersistent.color = {1, 1, 1, 1}
+			
+			local x = imagePersistent.width + imagePersistent.x + 5
+			scrollPersistent.width = (width - x - 8)
+		else
+			imagePersistent.color = {1, 1, 1, 0}
+			scrollPersistent.width = (width - 6 - 8)
+		end
+		imagePersistent:Invalidate()
+		
+		scrollPersistent.height	= height - 8 - 8
+		--scrollPersistent:Invalidate()
+		textPersistent:SetText(text or '')
+		textPersistent.font.size = fontsize or 12
+		--textPersistent:Invalidate()
+		
+		msgBoxPersistent:Invalidate()
+		return	-- done here, exit
 	end
+	
+	-- no messagebox exists, make one
 	msgBoxPersistent = Chili.Window:New{
 		parent = Chili.Screen0,
 		name   = 'msgWindow';
 		width = width,
 		height = height,
 		y = y,
-		right = vsx; 
+		right = 0; 
 		dockable = true;
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = false,
 		padding = {5, 0, 5, 0},
-		minimizable = true,
+		--minimizable = true,
 		--itemMargin  = {0, 0, 0, 0},
 	}
-	if imageDir then image = Chili.Image:New {
-			width = height * 0.8,
-			height = height * 0.8,
-			bottom = 10,
-			y= 10;
-			x= 5;
-			keepAspect = true,
-			file = imageDir;
-			parent = msgBoxPersistent;
-		}
-	end
-	local x = ((image and image.width + image.x) or 0) + 5
-	local scroll = Chili.ScrollPanel:New{
+
+	imagePersistent = Chili.Image:New {
+		width = height * 0.8,
+		height = height * 0.8,
+		y = 10;
+		x = 5;
+		keepAspect = true,
+		file = imageDir;
+		parent = msgBoxPersistent;
+	}
+	
+	local x = ((imageDir and imagePersistent.width + imagePersistent.x) or 0) + 5
+	scrollPersistent = Chili.ScrollPanel:New{
 		parent  = msgBoxPersistent;
-		x       = x,
+		right	= 4,
 		y		= 8,
 		height	= height - 8 - 8,
-		width   = (width - x - 10),
+		width   = (width - x - 8),
         horizontalScrollbar = false,
-		children = {
-			Chili.TextBox:New{
-				parent  = scroll;
-				text    = text or '',
-				width   = "100%",
-				height	= "100%",
-				valign  = "ascender";
-				align   = "left";
-				padding = {5, 5, 5, 5},
-				lineSpacing = 0,
-				font    = {
-					size   = fontsize or 12;
-					shadow = true;
-				},
-			}		
-		}
     }
-
+	
+	textPersistent = Chili.TextBox:New{
+		text    = text or '',
+		autosize = false,
+		valign  = "ascender";
+		align   = "left";
+		padding = {5, 5, 5, 5},
+		lineSpacing = 0,
+		font    = {
+			size   = fontsize or 12;
+			shadow = true;
+		},
+	}	
+	scrollPersistent:AddChild(textPersistent)
 end
 
 function WG.HidePersistentMessageBox()
 	if msgBoxPersistent then
 		msgBoxPersistent:Dispose()
 	end
+end
+
+-- for testing box changes
+--[[
+local bool = true
+local timer = 5
+function widget:Update(dt)
+	timer = timer + dt
+	if timer >= 5 then
+		if bool then
+			WG.ShowPersistentMessageBox("Now you see me...", 300, 100, 12, "LuaUI/Images/advisor2.jpg")  
+		else
+			WG.ShowPersistentMessageBox("Now you don't!", 300, 100, 14, nil)  
+		end
+		timer = 0
+		bool = not bool
+	end
+end
+]]--
+
+local str = "It would serve the greater good if\nyou would lay down arms, human.\nThis planet will be returned to\nthe Tau Empire as is proper."
+function widget:Initialize()
+	Chili = WG.Chili
+	--WG.ShowPersistentMessageBox(str, 300, 100, 12, "LuaUI/Images/advisor2.jpg")
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
