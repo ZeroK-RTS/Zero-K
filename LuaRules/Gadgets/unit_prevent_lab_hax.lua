@@ -5,7 +5,7 @@
 function gadget:GetInfo()
   return {
     name      = "Prevent Lab Hax",
-    desc      = "Stops enemy units from entering labs",
+    desc      = "Stops enemy units from entering labs. Blocks construction of structures in labs.",
     author    = "Google Frog",
     date      = "Jul 24, 2007",
     license   = "GNU GPL, v2 or later",
@@ -104,7 +104,54 @@ function checkLabs()
   end
 end
 
+-- http://springrts.com/mantis/view.php?id=2864
+-- http://springrts.com/mantis/view.php?id=2870
+local function AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, facing) -- engine one does not have facing
+
+    local ud = UnitDefs[unitDefID]
+
+    if ud and (ud.isBuilding or ud.speed == 0) then
+    
+        local xsize = ud.xsize*4
+        local zsize = (ud.ysize or ud.zsize)*4
+        
+        local minx, maxx, minz, maxz
+        
+        if ((face == 0) or (face == 2))  then
+            minx = x-zsize
+            minz = z-xsize
+            maxx = x+zsize
+            maxz = z+xsize
+        else
+            minx = x-xsize
+            minz = z-zsize
+            maxx = x+xsize
+            maxz = z+zsize
+        end
+        
+        for Lid,Lv in pairs(lab) do  
+            -- intersection of 2 rectangles
+            if Lv.minx < maxx and Lv.maxx > minx and Lv.minz < maxz and Lv.maxz > minz then
+                return false
+            end
+        end
+        
+    end
+    
+    return true
+end
+
 function gadget:UnitCreated(unitID, unitDefID)
+  
+  -- http://springrts.com/mantis/view.php?id=2871
+  local ux, uy, uz  = spGetUnitPosition(unitID)
+  local facing = spGetUnitBuildFacing(unitID)
+  if not AllowUnitCreation(unitDefID, nil, nil, ux, uy, uz, facing) then
+    Spring.DestroyUnit(unitID)
+    return
+  end
+  -- end 2871
+  
   local ud = UnitDefs[unitDefID]
   local name = ud.name
   if (ud.isFactory == true) and not (name == "factoryplane" or name == "factorygunship") then
