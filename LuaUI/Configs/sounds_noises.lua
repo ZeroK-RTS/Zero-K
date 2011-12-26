@@ -1209,6 +1209,14 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
+    corrazor = {
+		ok = {
+			[1] = "turret_move",
+		},
+		select = {
+			[1] = "light_turret_select",
+		},
+	},
 	armcir = {
 		ok = {
 			[1] = "light_turret_select",
