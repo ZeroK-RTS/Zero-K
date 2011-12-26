@@ -1,4 +1,4 @@
-local versionName = "v1.71"
+local versionName = "v1.73"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -238,11 +238,13 @@ function RefreshUnitList(attacker)
 			local unitInView = metaForVisibleUnits[unitID] --transfer "yes" or "nil" from meta table into a local variable
 			if (unitSpeed>0) then 
 				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --only include only cloakies and constructor, and not com (ZK)
-					local unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
+					local unitShieldPower, reloadableWeaponIndex = -1, -1
+					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
 				elseif not unitDef["canFly"] then --if enabled: include all ground unit
-					local unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
+					local unitShieldPower, reloadableWeaponIndex = -1, -1
+					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 2, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
 				end
@@ -426,9 +428,9 @@ function CheckWeaponsAndShield (unitDef)
 	for currentWeaponIndex, weapons in ipairs(unitDef.weapons) do --reference: gui_contextmenu.lua by CarRepairer
 		local weaponsID = weapons.weaponDef
 		local weaponsDef = WeaponDefs[weaponsID]
-		if not weaponsDef.name:find('fake') and not weaponsDef.name:find('Fake') and not weaponsDef.name:find('noweapon') then --reference: gui_contextmenu.lua by CarRepairer
+		if weaponsDef.name and not weaponsDef.name:find('fake') and not weaponsDef.name:find('noweapon') then --reference: gui_contextmenu.lua by CarRepairer
 			if weaponsDef.isShield then 
-				unitShieldPower = weaponsDef.unitShieldPower --remember the shield power of this unit
+				unitShieldPower = weaponsDef.shieldPower --remember the shield power of this unit
 			else --if not shield then this is conventional weapon
 				local reloadTime = weaponsDef.reload
 				if reloadTime < fastestReloadTime then --find the weapon with the smallest reload time
@@ -453,7 +455,7 @@ end
 function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 	if cQueue~=nil then --prevent ?. Forgot...
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
-		if ((unitInMotionSingleUnit.isVisible ~= "yes" or isReloading) and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and is idle/with-singular-mono-command (eg: widget's move order), or isVulnerable and has attack order
+		if ((unitInMotionSingleUnit.isVisible ~= "yes" or isReloading) and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and is idle/with-singular-mono-command (eg: widget's move order), or is reloading with mono-command (eg: auto-attack) then:
 			local state=spGetUnitStates(unitID)
 			local movestate= state.movestate
 			if movestate~= 0 then --if not "hold position"
@@ -462,13 +464,13 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		end
 		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND can.
 			local isValidCommand = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) -- allow unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
-			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1 or unitInMotionSingleUnit.isVisible ~= "yes")--allow unit of unitType=1 OR all units outside player's vision
-			local attackSignature = false --attack command signature
+			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1 or unitInMotionSingleUnit.isVisible ~= "yes")--allow only unit of unitType=1 OR any units outside player's vision
+			local _2ndAttackSignature = false --attack command signature
 			if #cQueue >=2 then 
-				attackSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_ATTACK)
+				_2ndAttackSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_ATTACK)
 			end
-			local isReloadingState = isReloading and (cQueue[1].id == CMD_ATTACK or cQueue[1].id == cMD_DummyG or (attackSignature)) --any unit with attack command that is vulnerable/isReloading
-			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingState) then --gateKeeper/firewall  
+			local isReloadingState = isReloading and (cQueue[1].id == CMD_ATTACK or cQueue[1].id == cMD_DummyG or (_2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
+			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingState) then --execute on: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE idle COMMAND for: UnitType==1 or for: any unit outside visibility... or on any unit with any command which is reloading.
 				if isReloadingState or #cQueue>=2 then --prevent STOP command from short circuiting the system
 					if isReloadingState or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						return true, cQueue --allow execution
@@ -790,16 +792,18 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 	------
 	local criticalShieldLevel =criticalShieldLevelG --global constant
 	------
-	local unitType = unitInMotionSingleUnitTable[2] --retrieve stored unittype
+	--local unitType = unitInMotionSingleUnitTable[2] --retrieve stored unittype
 	local shieldIsCritical =false
 	local weaponIsEmpty = false
-	if unitType ==2 then --if not constructor or cloakies
+	--if unitType ==2 or unitType == 1 then
 		local unitID = unitInMotionSingleUnitTable[1] --retrieve stored unitID
 		local unitShieldPower = unitInMotionSingleUnitTable.unitShieldPower --retrieve registered full shield power
 		if unitShieldPower ~= -1 then
 			local _, currentPower = spGetUnitShieldState(unitID)
-			if currentPower/unitShieldPower <criticalShieldLevel then
-				shieldIsCritical = true
+			if currentPower~=nil then
+				if currentPower/unitShieldPower <criticalShieldLevel then
+					shieldIsCritical = true
+				end
 			end
 		end
 		local unitFastestReloadableWeapon = unitInMotionSingleUnitTable.reloadableWeaponIndex --retrieve the quickest reloadable weapon index
@@ -811,7 +815,7 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range"))
 			end
 		end			
-	end
+	--end
 	return (weaponIsEmpty or shieldIsCritical)
 end
 
@@ -1324,6 +1328,14 @@ end
 --  Sgn(x)
 --------------------------------------------------------------------------------
 --Feature Tracking:
--- Each unit under area reclaim will return to the center of area command when sighted an enemy
--- Each unit will mark last attacker and avoid them even when outside LOS
+-- Constructor under area reclaim will return to center of area command when sighting an enemy
+-- Attacked will mark last attacker and avoid them even when outside LOS for 3 second
+-- Unit outside user view will universally auto-avoidance, but remain still when seen
+-- Hold position prevent universal auto-avoidance when not seen, also prevent auto-retreat when unit perform auto-attack
+-- Unit under attack command will perform auto-retreat when reloading or shield < 50% regardless of hold-position state
+-- Cloakable unit will universally auto-avoid when moving...
+-- Area repair will cause unit auto-avoid from point to point (unit to repair); this is contrast to area reclaim.
+-- Area Reclaim/ressurect tolerance < area repair tolerance < move tolerance (unit within certain radius of target will ignore enemy/not avoid)
+-- Individual repair/reclaim command queue has same tolerance as area repair tolerance
 -- 
+
