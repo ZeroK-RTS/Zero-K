@@ -110,7 +110,7 @@ local function AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, fac
 
     local ud = UnitDefs[unitDefID]
 
-    if ud and (ud.isBuilding or ud.speed == 0) then
+    if ud and (ud.isBuilding or ud.speed == 0) and ud.unitname ~= missilesilo then
     
         local xsize = ud.xsize*4
         local zsize = (ud.ysize or ud.zsize)*4
