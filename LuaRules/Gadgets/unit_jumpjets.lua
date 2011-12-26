@@ -225,6 +225,7 @@ local function Jump(unitID, goal, cmdTag)
   jumping[unitID] = true
 
   mcEnable(unitID)
+  Spring.SetUnitVelocity(unitID,0,0,0)
   SetLeaveTracks(unitID, false)
 
   if not cob then
