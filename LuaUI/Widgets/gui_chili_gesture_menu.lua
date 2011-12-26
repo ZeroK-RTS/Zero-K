@@ -466,7 +466,7 @@ function widget:MousePress(x,y,button)
 		if (button == 3) then
 			local activeCmdIndex, activeid = Spring.GetActiveCommand()
 			local _, defid = Spring.GetDefaultCommand()
-			if ((activeid == nil or activeid < 0) and defid == CMD.MOVE) then 
+			if ((activeid == nil or activeid < 0) and (defid == CMD.MOVE or not defid)) then -- nano turrets have no CMD.MOVE active command
 				if SetupMenu(false) then 
 					menu_invisible = true 
 					move_digested = true 

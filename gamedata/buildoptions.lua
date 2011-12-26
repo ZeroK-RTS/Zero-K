@@ -18,6 +18,7 @@ local buildOpts = {
 	[[factoryspider]],
 	[[factoryjump]],
 	[[factorytank]],
+    [[striderhub]],
 	[[corsy]],
 	[[corrad]],
 	[[armarad]],

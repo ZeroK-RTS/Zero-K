@@ -17,11 +17,8 @@ unitDef = {
     [[armroy]],
     [[corroy]],
     [[serpent]],
-    [[cornukesub]],
-    [[armcarry]],
-    [[corbats]],
     [[corarch]],
---    [[armtboat]],
+    [[armtboat]],
   },
 
   buildPic               = [[CORSY.png]],

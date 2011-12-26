@@ -222,6 +222,10 @@ local menu_armcom = {
     unit = "mahlazer",
     label = "Costly",
     items = {
+       {
+        angle = 315,
+        unit = "striderhub"
+       },
 	   {
         angle = 180,
         unit = "raveparty"

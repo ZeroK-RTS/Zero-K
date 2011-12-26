@@ -80,6 +80,7 @@ local unlockUnits = {
 	"factorytank",
 	"factoryplane",
 	"armcsa",
+    "striderhub",
 	
 	-- misc
 	"armarad",

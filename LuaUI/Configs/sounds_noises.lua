@@ -961,6 +961,12 @@ local sounds = {
 			[1] = "building_select1",
 		},
 	},
+    striderhub = {
+		build = "builder_start",
+		select = {
+			[1] = "building_select1",
+		},
+	},
 	
 	-- Factory
 	factorycloak = {

@@ -108,42 +108,13 @@ local menu_armcsa = {
 		  },
 		}
 	  },
-  {
-    angle = -135,
-    unit = "armcomdgun",
-    label = "Sriders",
-    items = {
       {
-        angle = 0,
-        unit = "dante"
-      },
-      --[[{
-        angle = 90,
-        unit = "armshock"
-      },]]
-      {
-        angle = -90,
-        unit = "armbanth"
-      },
-      {
-        angle = 180,
-        unit = "armorco"
-      },
-      {
-        angle = 90,
-        unit = "gorg"
-      },
-      {
-        angle = 135,
-        unit = "armraven"
-      },
-      {
-        angle = -45,
-        unit = "scorpion"
-      },	  
-    }
-  },
-	}
+		angle = -135,
+		unit = "armcomdgun",
+		label = "Striders",
+	  },
+      
+  }
 }
 
 return menu_armcsa

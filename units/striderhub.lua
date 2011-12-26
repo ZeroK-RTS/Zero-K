@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[striderhub]],
   name                          = [[Strider Hub]],
-  description                   = [[Constructs Striders, Builds at 6 m/s]],
+  description                   = [[Constructs Striders, Builds at 12 m/s]],
   acceleration                  = 0,
   brakeRate                     = 1.5,
   buildCostEnergy               = 550,
@@ -18,10 +18,12 @@ unitDef = {
 	[[scorpion]],
     [[dante]],
     [[armraven]],
-	[[funnelweb]],
     [[armbanth]],
     [[gorg]],
     [[armorco]],
+    [[cornukesub]],
+    [[armcarry]],
+    [[corbats]],
   },
 
   buildPic                      = [[striderhub.png]],
@@ -65,7 +67,7 @@ unitDef = {
   movementClass                 = [[KBOT4]],
   noAutoFire                    = false,
   objectName                    = [[striderhub.s3o]],
-  script                        = [[nanotower.lua]],
+  script                        = [[striderhub.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
   showNanoSpray                 = false,
@@ -78,7 +80,7 @@ unitDef = {
   turnRate                      = 1,
   upright                       = true,
   useBuildingGroundDecal        = true,
-  workerTime                    = 6,
+  workerTime                    = 12,
 
   featureDefs                   = {
 

@@ -46,7 +46,7 @@ local factory_commands = {
 	[-UnitDefNames["factorygunship"].id] = {level = 2, order = 8},
 	[-UnitDefNames["factoryplane"].id] = {level = 2, order = 9},
 	[-UnitDefNames["armasp"].id] = {level = 2, order = 10},
-	[-UnitDefNames["corsy"].id] = {level = 2, order = 11},
+	[-UnitDefNames["corsy"].id] = {level = 2, order = 11},z
 
 }
 

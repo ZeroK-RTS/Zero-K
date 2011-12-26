@@ -24,6 +24,7 @@ local factories = {
 	factoryplane = {order = 8},
 	factorygunship = {order = 9},
 	corsy = {order = 10},
+    striderhub = {order = 11},
 }
 
 --Integral menu is NON-ROBUST
