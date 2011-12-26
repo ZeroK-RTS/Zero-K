@@ -109,9 +109,8 @@ unitDef = {
       name                    = [[Flamethrower]],
       areaOfEffect            = 96,
       avoidFeature            = false,
-	  bouncerebound           = 1,
-      bounceslip              = 1,
       collideFeature          = false,
+      collideGround           = false,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -128,7 +127,6 @@ unitDef = {
 
 	  duration				  = 0.1,
       explosionGenerator      = [[custom:SMOKE]],
-	  groundbounce            = 1,
 	  fallOffRate             = 1,
 	  fireStarter             = 100,
 	  impulseBoost            = 0,
