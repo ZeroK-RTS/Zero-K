@@ -43,7 +43,7 @@ local weaponDef = {
     tolerance               = 5000,
     turret                  = true,
     weaponType              = [[LaserCannon]],
-    weaponVelocity          = 500,
+    weaponVelocity          = 800,
 }
 
 return name, weaponDef

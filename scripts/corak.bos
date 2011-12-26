@@ -284,9 +284,9 @@ AimPrimary(heading, pitch)
 	{
 		sleep 5;
 	}
-	turn head to y-axis heading speed <450>;
-	turn l_gun to x-axis <0> - pitch speed <150>;
-	turn r_gun to x-axis <0> - pitch speed <150>;
+	turn head to y-axis heading speed <700>;
+	turn l_gun to x-axis <0> - pitch speed <200>;
+	turn r_gun to x-axis <0> - pitch speed <200>;
 	wait-for-turn head around y-axis;
 	wait-for-turn l_gun around x-axis;
 	wait-for-turn r_gun around x-axis;

@@ -13,7 +13,7 @@
   interceptedbyshieldtype=1;
   model=bomb;
   paralyzer=1;
-  paralyzetime=30;
+  paralyzetime=25;
   range=600;
   reloadtime=0.3;
   rendertype=4;
@@ -22,7 +22,7 @@
   turret=1;
   [DAMAGE]
   {
-    default=4000;
+    default=3500;
     empresistant99=40;
     empresistant75=1000;
   }
