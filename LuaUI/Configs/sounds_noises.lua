@@ -406,6 +406,14 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
+    dante = {
+		ok = {
+			[1] = "heavy_bot_move",
+		},
+		select = {
+			[1] = "heavy_bot_move",
+		},
+	},
 	dante = {
 		ok = {
 			[1] = "heavy_bot_move",
@@ -430,12 +438,12 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
-	armbanth = {
-		ok = {
-			[1] = "turret_select",
+	scorpion = {
+        ok = {
+			[1] = "spy_move",
 		},
 		select = {
-			[1] = "turret_select",
+			[1] = "spy_select",
 		},
 	},
 	armorco = {
