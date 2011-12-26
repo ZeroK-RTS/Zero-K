@@ -1,4 +1,4 @@
-local versionName = "v1.68"
+local versionName = "v1.7"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -12,9 +12,9 @@ local versionName = "v1.68"
 function widget:GetInfo()
   return {
     name      = "Dynamic Avoidance System",
-    desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor and cloakies",
-    author    = "msafwan (system coder)",
-    date      = "Dec 19, 2011",
+    desc      = versionName .. "Dynamic Collision Avoidance system for constructor, cloakies, and ground combat unit",
+    author    = "msafwan",
+    date      = "Dec 26, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -45,7 +45,11 @@ local spGetUnitTeam = Spring.GetUnitTeam
 local spSendLuaUIMsg = Spring.SendLuaUIMsg
 local spGetUnitLastAttacker = Spring.GetUnitLastAttacker
 local spGetUnitHealth = Spring.GetUnitHealth
+local spGetUnitWeaponState = Spring.GetUnitWeaponState
+local spGetUnitShieldState = Spring.GetUnitShieldState
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local CMD_STOP			= CMD.STOP
+local CMD_ATTACK 		= CMD.ATTACK
 local CMD_INSERT		= CMD.INSERT
 local CMD_REMOVE		= CMD.REMOVE
 local CMD_MOVE			= CMD.MOVE
@@ -114,7 +118,7 @@ local surroundingOfActiveUnitG={} --store value for transfer between function. S
 local cycleG=1 --first execute "GetPreliminarySeparation()"
 local wreckageID_offset=0
 local roundTripComplete= true --variable for detecting network lag, prevent messy overlapping command queuing
-local attackerG= {}
+local attackerG= {} --for recording last attacker
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
@@ -218,7 +222,7 @@ function RefreshUnitList(attacker)
 	local metaForVisibleUnits = {}
 	local visibleUnits=spGetVisibleUnits(myTeamID)
 	for _, unitID in ipairs(visibleUnits) do --memorize units that is in view of camera
-		metaForVisibleUnits[unitID]="yes" --set "yes" for visible unit (in view) and by default set "nil" for non visible unit
+		metaForVisibleUnits[unitID]="yes" --flag "yes" for visible unit (in view) and by default flag "nil" for out of view unit
 	end
 	for _, unitID in ipairs(allMyUnits) do
 		if unitID~=nil then --skip end of the table
@@ -231,11 +235,13 @@ function RefreshUnitList(attacker)
 			local unitInView = metaForVisibleUnits[unitID] --transfer "yes" or "nil" from meta table into a local variable
 			if (unitSpeed>0) then 
 				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --only include only cloakies and constructor, and not com (ZK)
+					local unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
-					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView}
+					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
 				elseif not unitDef["canFly"] then --if enabled: include all ground unit
+					local unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
-					relevantUnit[arrayIndex]={unitID, 2, unitSpeed, isVisible = unitInView}
+					relevantUnit[arrayIndex]={unitID, 2, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
 				end
 			end
 			if (turnOnEcho == 1) then --for debugging
@@ -266,61 +272,47 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 			local unitID= unitInMotion[i][1] --get unitID for commandqueue
 			if spGetUnitIsDead(unitID)==false then --prevent execution if unit died during transit
 				local cQueue = spGetCommandQueue(unitID)
-				if cQueue~=nil then --prevent ?. Forgot...
-					if (unitInMotion[i].isVisible ~= "yes" and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and is idle/with-singular-mono-command (eg: widget's move order)
-						local state=spGetUnitStates(unitID)
-						local movestate= state.movestate
-						if movestate~= 0 then --if not "hold position"
-							cQueue={{id = cMD_DummyG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --replace with a fake command. Will be used to initiate avoidance on idle unit & non-viewed unit
+				local executionAllow, cQueueTemp = GateKeeperOrCommandFilter(unitID, cQueue, unitInMotion[i]) --filter/alter unwanted unit state by reading the command queue
+				if executionAllow then
+					cQueue = cQueueTemp --sync cQueue's cosmetic alteration for identification (but actual command is not yet issued)
+					--local boxSizeTrigger= unitInMotion[i][2]
+					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
+					local currentX,_,currentZ = spGetUnitPosition(unitID)
+					local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
+					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
+					local losRadius	= GetUnitLOSRadius(unitID) --get LOS
+					local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
+					if (cQueue[1].id == CMD_MOVE and unitInMotion[i].isVisible ~= "yes") then --if unit has move Command and is outside user's view
+						reachedTarget = false --force unit to do avoidance despite close to target (try to circle over target until seen by user)
+					end
+					if reachedTarget then --if reached target
+						commandIndexTable[unitID]=nil --empty the commandIndex (command history)
+					end
+					
+					if surroundingUnits[1]~=nil and not reachedTarget then  --execute when enemy exist and target not reached yet
+						local unitSSeparation=CatalogueMovingObject(surroundingUnits, unitID, lastPosition) --detect initial enemy separation
+						arrayIndex=arrayIndex+1
+						local unitSpeed = unitInMotion[i][3]
+						local impatienceTrigger,commandIndexTable = GetImpatience(newCommand,unitID, commandIndexTable)
+						surroundingOfActiveUnit[arrayIndex]={unitID, unitSSeparation, targetCoordinate, losRadius, cQueue, newCommand, unitSpeed,impatienceTrigger, lastPosition} --store result for next execution
+						if (turnOnEcho == 1) then
+							Spring.Echo("unitsSeparation(GetPreliminarySeparation):")
+							Spring.Echo(unitsSeparation)
 						end
 					end
-				if cQueue[1]~=nil then --prevent idle unit from executing the system
-					if ((cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) and (unitInMotion[i][2] == 1 or unitInMotion[i].isVisible ~= "yes")) then  -- only command: repair (40), build (<0), reclaim (90), ressurect(125) or move(10), and ONLY for unitType=1 OR all units outside player's vision
-					if #cQueue>=2 then --prevent STOP command from short circuiting the system
-					if cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
-						--local boxSizeTrigger= unitInMotion[i][2]
-						local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
-						local currentX,_,currentZ = spGetUnitPosition(unitID)
-						local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
-						local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
-						local losRadius	= GetUnitLOSRadius(unitID) --get LOS
-						local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
-						if (cQueue[1].id == CMD_MOVE and unitInMotion[i].isVisible ~= "yes") then --if unit has move Command and is outside user's view
-							reachedTarget = false --force unit to do avoidance despite close to target (try to circle over target until seen by user)
-						end
-						if reachedTarget then --if reached target
-							commandIndexTable[unitID]=nil --empty the commandIndex (command history)
-						end
-						
-						if surroundingUnits[1]~=nil and not reachedTarget then  --execute when enemy exist and target not reached yet
-							local unitSSeparation=CatalogueMovingObject(surroundingUnits, unitID, lastPosition) --detect initial enemy separation
-							arrayIndex=arrayIndex+1
-							local unitSpeed = unitInMotion[i][3]
-							local impatienceTrigger,commandIndexTable = GetImpatience(newCommand,unitID, commandIndexTable)
-							surroundingOfActiveUnit[arrayIndex]={unitID, unitSSeparation, targetCoordinate, losRadius, cQueue, newCommand, unitSpeed,impatienceTrigger, lastPosition} --store result for next execution
-							if (turnOnEcho == 1) then
-								Spring.Echo("unitsSeparation(GetPreliminarySeparation):")
-								Spring.Echo(unitsSeparation)
-							end
-						end
-						
-						if (turnOnEcho == 1) then --debugging
-							Spring.Echo("i(GetPreliminarySeparation)" .. i)
-							Spring.Echo("unitID(GetPreliminarySeparation)" .. unitID)
-							Spring.Echo("losRadius(GetPreliminarySeparation)" .. losRadius)
-							Spring.Echo("surroundingUnits(GetPreliminarySeparatione): ")
-							Spring.Echo(surroundingUnits)
-							Spring.Echo("reachedTarget(GetPreliminarySeparation):")
-							Spring.Echo(reachedTarget)
-							Spring.Echo("surroundingUnits~=nil and cQueue[1].id==CMD_MOVE and not reachedTarget(GetPreliminarySeparation):")
-							Spring.Echo((surroundingUnits~=nil and cQueue[1].id==CMD_MOVE and not reachedTarget))
-						end
-					end --if cQueue[2].id~=false
-						if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
-					end --if #cQueue>=2
-					end --if ((cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and (unitInMotion[i][2]==1 or unitInMotion[i].isVisible == nil)
-				end --if cQueue[1]~=nil
-				end --if cQueue~=nil
+					
+					if (turnOnEcho == 1) then --debugging
+						Spring.Echo("i(GetPreliminarySeparation)" .. i)
+						Spring.Echo("unitID(GetPreliminarySeparation)" .. unitID)
+						Spring.Echo("losRadius(GetPreliminarySeparation)" .. losRadius)
+						Spring.Echo("surroundingUnits(GetPreliminarySeparatione): ")
+						Spring.Echo(surroundingUnits)
+						Spring.Echo("reachedTarget(GetPreliminarySeparation):")
+						Spring.Echo(reachedTarget)
+						Spring.Echo("surroundingUnits~=nil and cQueue[1].id==CMD_MOVE and not reachedTarget(GetPreliminarySeparation):")
+						Spring.Echo((surroundingUnits~=nil and cQueue[1].id==CMD_MOVE and not reachedTarget))
+					end
+				end --GateKeeperOrCommandFilter(cQueue, unitInMotion[i]) ==true
 			end --if spGetUnitIsDead(unitID)==false
 		end
 		if arrayIndex>1 then surroundingOfActiveUnit[1]=arrayIndex 
@@ -343,7 +335,7 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
 				
 				--do sync test. Ensure stored command not changed during last delay
 				local cQueueSyncTest = spGetCommandQueue(unitID)
-				if #cQueueSyncTest>=2 then
+				if #cQueueSyncTest>=2 then --if new command is longer than or equal to 2 (1 any command + 1 stop command)
 					if #cQueueSyncTest~=#cQueue or --if command queue is not same as original, or
 						(cQueueSyncTest[1].params[1]~=cQueue[1].params[1] or cQueueSyncTest[1].params[3]~=cQueue[1].params[3]) or --if first queue has different content, or
 							cQueueSyncTest[1]==nil then --if unit has became idle
@@ -423,6 +415,63 @@ function RetrieveAttackerList (unitID, attacker)
 	end
 	attacker[unitID].myHealth = unitHealth --refresh health data	
 	return attacker
+end
+
+function CheckWeaponsAndShield (unitDef)
+	local unitShieldPower, reloadableWeaponIndex =-1, -1 --assume unit has no shield and no reloadable/slow-loading weapons
+	local fastestReloadTime, fastWeaponIndex = 999, -1 --temporary variables
+	for currentWeaponIndex, weapons in ipairs(unitDef.weapons) do --reference: gui_contextmenu.lua by CarRepairer
+		local weaponsID = weapons.weaponDef
+		local weaponsDef = WeaponDefs[weaponsID]
+		if not weaponsDef.name:find('fake') and not weaponsDef.name:find('Fake') and not weaponsDef.name:find('noweapon') then --reference: gui_contextmenu.lua by CarRepairer
+			if weaponsDef.isShield then 
+				unitShieldPower = weaponsDef.unitShieldPower --remember the shield power of this unit
+			else --if not shield then this is conventional weapon
+				local reloadTime = weaponsDef.reload
+				if reloadTime < fastestReloadTime then --find the weapon with the smallest reload time
+					fastestReloadTime = reloadTime
+					fastWeaponIndex = currentWeaponIndex-1 --remember the index of the fastest weapon. Somehow the weapon table actually start at "0", so minus 1 from actual value (ZK)
+				end
+			end
+		end
+	end
+	if fastestReloadTime > 0.5 then --if the fastest reload cycle is greater than widget's update cycle, then:
+		reloadableWeaponIndex = fastWeaponIndex --remember the index of that fastest loading weapon
+		if (turnOnEcho == 1) then --debugging
+			Spring.Echo("reloadableWeaponIndex(CheckWeaponsAndShield):")
+			Spring.Echo(reloadableWeaponIndex)
+			Spring.Echo("fastestReloadTime(CheckWeaponsAndShield):")
+			Spring.Echo(fastestReloadTime)
+		end
+	end
+	return unitShieldPower, reloadableWeaponIndex
+end
+
+function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
+	if cQueue~=nil then --prevent ?. Forgot...
+		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
+		if ((unitInMotionSingleUnit.isVisible ~= "yes" or isReloading) and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and is idle/with-singular-mono-command (eg: widget's move order), or isVulnerable and has attack order
+			local state=spGetUnitStates(unitID)
+			local movestate= state.movestate
+			if movestate~= 0 then --if not "hold position"
+				cQueue={{id = cMD_DummyG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --replace with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit
+			end
+		end
+		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND can.
+			local isValidCommand = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) -- allow unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
+			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1 or unitInMotionSingleUnit.isVisible ~= "yes")--allow unit of unitType=1 OR all units outside player's vision
+			local isReloadingState = isReloading and (cQueue[1].id == CMD_ATTACK or cQueue[1].id == cMD_DummyG or (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_ATTACK)) --any unit with attack command that is vulnerable/isReloading
+			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingState) then --gateKeeper/firewall  
+				if isReloadingState or #cQueue>=2 then --prevent STOP command from short circuiting the system
+					if isReloadingState or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
+						return true, cQueue --allow execution
+					end --if cQueue[2].id~=false
+						if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
+				end --if #cQueue>=2
+			end --if ((cQueue[1].id==40 or cQueue[1].id<0 or cQueue[1].id==90 or cQueue[1].id==10 or cQueue[1].id==125) and (unitInMotion[i][2]==1 or unitInMotion[i].isVisible == nil)
+		end --if cQueue[1]~=nil
+	end --if cQueue~=nil	
+	return false, cQueue --disallow execution
 end
 
 --check if widget's command or user's command
@@ -521,15 +570,24 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker)
 			local rectangleUnitTeamID = spGetUnitTeam(rectangleUnitID)
 			if (rectangleUnitTeamID ~= gaiaTeamID) then --filter out gaia (non aligned unit)
 				local recUnitDefID = spGetUnitDefID(rectangleUnitID)
-				if recUnitDefID~=nil and (iAmConstructor and iAmNotCloaked) then --if the enemy is in plain sight and I am not the cloakies that need to avoid everything: then do the following check before registering enemy
-					local recUnitDef = UnitDefs[recUnitDefID]
-					if recUnitDef["weapons"][1]~=nil then -- if enemy has weapons: then register enemy
+				if recUnitDefID~=nil and (iAmConstructor and iAmNotCloaked) then --if enemy is in plain sight & I am a normal visible constructor: then do the following check before registering enemy
+					local recUnitDef = UnitDefs[recUnitDefID] --retrieve enemy definition
+					local enemyParalyzed,_,_ = spGetUnitIsStunned (rectangleUnitID)
+					if recUnitDef["weapons"][1]~=nil and not enemyParalyzed then -- check enemy for weapons and paralyze effect
 						arrayIndex=arrayIndex+1
-						relevantUnit[arrayIndex]=rectangleUnitID
+						relevantUnit[arrayIndex]=rectangleUnitID --register the enemy only if it has weapons & wasn't paralyzed
 					end
-				else --if enemy is only unidentified radar blip: then register enemy
-					arrayIndex=arrayIndex+1
-					relevantUnit[arrayIndex]=rectangleUnitID
+				else --if enemy is in plain sight & iAm a generic units, then:
+					if iAmNotCloaked then --if I am not cloaked
+						local enemyParalyzed,_,_ = Spring.GetUnitIsStunned (rectangleUnitID)
+						if not enemyParalyzed then -- check for paralyze effect
+							arrayIndex=arrayIndex+1
+							relevantUnit[arrayIndex]=rectangleUnitID --register all enemy only if it's not paralyzed
+						end
+					else --if I am cloaked
+						arrayIndex=arrayIndex+1
+						relevantUnit[arrayIndex]=rectangleUnitID --register all enemy (avoid all unit)
+					end
 				end
 			end
 		end
@@ -720,6 +778,33 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 end
 ---------------------------------Level2
 ---------------------------------Level3 (low-level function)
+--check if unit is vulnerable/reloading
+function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
+	local unitType = unitInMotionSingleUnitTable[2] --retrieve stored unittype
+	local shieldIsCritical =false
+	local weaponIsEmpty = false
+	if unitType ==2 then --if not constructor or cloakies
+		local unitID = unitInMotionSingleUnitTable[1] --retrieve stored unitID
+		local unitShieldPower = unitInMotionSingleUnitTable.unitShieldPower --retrieve registered full shield power
+		if unitShieldPower ~= -1 then
+			local _, currentPower = spGetUnitShieldState(unitID)
+			if currentPower/unitShieldPower <0.5 then
+				shieldIsCritical = true
+			end
+		end
+		local unitFastestReloadableWeapon = unitInMotionSingleUnitTable.reloadableWeaponIndex --retrieve the quickest reloadable weapon index
+		if unitFastestReloadableWeapon ~= -1 then
+			local _, weaponIsLoaded, _, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon)
+			weaponIsEmpty = not weaponIsLoaded
+			if (turnOnEcho == 1) then --debugging
+				Spring.Echo(unitFastestReloadableWeapon)
+				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range"))
+			end
+		end			
+	end
+	return (weaponIsEmpty or shieldIsCritical)
+end
+
 function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate)
 	local boxSizeTrigger=0
 	if (cQueue[queueIndex].id==CMD_MOVE or cQueue[queueIndex].id<0) then
@@ -796,7 +881,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		boxSizeTrigger=3
 	elseif cQueue[1].id == cMD_DummyG then
 		targetCoordinate = {-1, -1,-1} --no target (only avoidance)
-	else --if queue is empty: then use no-target. eg: A case where engine delete the next queues of command and widget expect it to still be there.
+	else --if queue is empty/no match: then use no-target. eg: A case where engine delete the next queues of a valid command and widget expect it to still be there or in case if an Attack command needed avoidance.
 		targetCoordinate={-1, -1, -1}
 		--if for some reason command queue[2] is already empty then use these backup value as target:
 		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
@@ -1201,3 +1286,28 @@ end
 --6
 --Gaussian noise, Box-Muller method, http://www.dspguru.com/dsp/howtos/how-to-generate-white-gaussian-noise
 --http://springrts.com/wiki/Lua_Scripting
+--7
+--"gui_contextmenu.lua" -unit stat widget, by CarRepairer/WagonRepairer
+--8
+--"unit_AA_micro.lua" -widget that micromanage AA, weaponsState example, by Jseah
+
+--------------------------------------------------------------------------------
+--Method Index:
+--  widget:Initialize()
+--  widget:PlayerChanged(playerID)
+--  widget:Update()
+--  RefreshUnitList(attacker)
+--  GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
+--  DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
+--  widget:RecvLuaMsg(msg, playerID)
+--  ReportedNetworkDelay(playerIDa, defaultDelay)
+--  ActualNetworkDelay(reportingIn, skippingTimer,doCalculation_then_gps_delay,gps_then_DoCalculation_delay, now)
+--  RetrieveAttackerList (unitID, attacker)
+--  CheckWeaponsAndShield (unitDef)
+--  ...
+--  CatalogueMovingObject(surroundingUnits, unitID, lastPosition)
+--  ...
+--  ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity)
+--  SumRiWiDiCalculation (wi, fObstacle, fObstacleSlope, di, wTotal, dSum, fObstacleSum, dFobstacle)
+--  GaussianNoise()
+--  Sgn(x)
