@@ -31,7 +31,6 @@ local weaponDef = {
     interceptedByShieldType = 1,
     noExplode               = true,
     noSelfDamage            = true,
-    numbounce               = 5,
 	--predictBoost			  = 1,
     range                   = 280,
     reloadtime              = 0.16,
@@ -43,7 +42,6 @@ local weaponDef = {
 	thickness	              = 12,
     tolerance               = 5000,
     turret                  = true,
-	waterbounce             = 1,
     weaponType              = [[LaserCannon]],
     weaponVelocity          = 500,
 }
