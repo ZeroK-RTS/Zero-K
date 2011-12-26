@@ -1,7 +1,6 @@
-#define TA			// This is a TA script
+//linear constant 65536
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, nano, nano1, nano2, guns, doors, turret, shovel, flare1, flare2;
 
@@ -134,7 +133,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode base type BITMAPONLY | BITMAP1;
 		explode turret type BITMAPONLY | BITMAP3;
 		explode guns type BITMAPONLY | BITMAP4;
@@ -142,13 +141,13 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode base type BITMAPONLY | BITMAP1;
 		explode turret type BITMAPONLY | BITMAP3;
 		explode guns type BITMAPONLY | BITMAP4;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode base type BITMAPONLY | BITMAP1;
 	explode turret type BITMAPONLY | BITMAP3;
 	explode guns type BITMAPONLY | BITMAP4;

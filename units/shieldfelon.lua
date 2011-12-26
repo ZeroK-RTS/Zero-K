@@ -151,7 +151,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Thug]],
+      description      = [[Wreckage - Felon]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1400,
@@ -163,7 +163,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 248,
-      object           = [[thug_d.s3o]],
+      object           = [[shieldfelon_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 248,
       seqnamereclamate = [[TREE1RECLAMATE]],
