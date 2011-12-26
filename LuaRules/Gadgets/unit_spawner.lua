@@ -226,7 +226,7 @@ humanAggroPerBurrow = humanAggroPerBurrow/playerCount
 
 echo("Chicken configured for "..playerCount.." players")
 
-burrowSpawnRate = burrowSpawnRate/(malus*0.8)/SetCount(computerTeams)
+burrowSpawnRate = burrowSpawnRate/(malus*0.8 + 0.2)/SetCount(computerTeams)
 gracePeriod = math.max(gracePeriod - gracePenalty*(playerCount - 1), gracePeriodMin)
 --humanAggroDecay = humanAggroDecay/playerCount
 
@@ -1050,7 +1050,7 @@ function gadget:GameFrame(n)
         if not pvp then
 			queenID = SpawnQueen()
 			local xp = (malus or 1) - 1
-			Spring.SetUnitExperience(queenID, xp)
+			--Spring.SetUnitExperience(queenID, xp)
 			local _, maxHealth = Spring.GetUnitHealth(queenID)
 			maxHealth = maxHealth * queenHealthMod
 			Spring.SetUnitMaxHealth(queenID, maxHealth)
