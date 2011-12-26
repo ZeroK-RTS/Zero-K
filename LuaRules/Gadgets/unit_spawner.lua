@@ -175,7 +175,7 @@ else
       highestLevel = CompareDifficulty(teamLuaAI, highestLevel)
       chickenTeamID = teamID
       computerTeams[teamID] = true
-    else
+    elseif not (chickenTeamID and Spring.AreTeamsAllied(teamID, chickenTeamID))
       humanTeams[teamID]    = true
     end
   end
@@ -226,7 +226,7 @@ humanAggroPerBurrow = humanAggroPerBurrow/playerCount
 
 echo("Chicken configured for "..playerCount.." players")
 
-burrowSpawnRate = burrowSpawnRate/malus/SetCount(computerTeams)
+burrowSpawnRate = burrowSpawnRate/(malus*0.8)/SetCount(computerTeams)
 gracePeriod = math.max(gracePeriod - gracePenalty*(playerCount - 1), gracePeriodMin)
 --humanAggroDecay = humanAggroDecay/playerCount
 

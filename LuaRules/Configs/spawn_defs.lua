@@ -58,7 +58,7 @@ humanAggroQueenTimeFactor = 1	-- burrow queen time is multiplied by this and agg
 humanAggroQueenTimeMin = 0	-- min value of aggro for queen time calc
 humanAggroQueenTimeMax = 8
 
-techAccelPerPlayer	= 5		-- how much tech accel increases per player over one per wave, seconds
+techAccelPerPlayer	= 4		-- how much tech accel increases per player over one per wave, seconds
 techTimeFloorFactor	= 0.5	-- tech timer can never be less than this * real time
 
 scoreMult			= 1
@@ -223,7 +223,7 @@ difficulties = {
 	queenHealthMod	 = 1.5,
 	queenSpawnMult   = 5,
 	miniQueenTime	 = {0.5},
-	techAccelPerPlayer	= 7.5,
+	techAccelPerPlayer	= 5,
 	scoreMult		 = 1.25,
 	timeModifier	 = 0.875,
   },
@@ -243,7 +243,7 @@ difficulties = {
 	queenHealthMod	 = 2,
 	miniQueenTime	 = {0.45}, --{0.37, 0.75},
 	endMiniQueenWaves	= 6,
-	techAccelPerPlayer	= 10,
+	techAccelPerPlayer	= 6,
 	timeModifier	 = 0.75,
 	scoreMult		 = 2,
   },
@@ -273,7 +273,7 @@ difficulties = {
 	gracePeriodMin	 = 20,
 	burrowRespawnChance	= 0,
 	queenTime		 = 20*60,
-	queenHealthMod	 = 0.2,
+	queenHealthMod	 = 0.3,
 	miniQueenTime	 = {},
 	endMiniQueenWaves	= 6,
 	techAccelPerPlayer	= 0,
