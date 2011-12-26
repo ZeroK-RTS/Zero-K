@@ -1,4 +1,4 @@
-local versionName = "v1.7"
+local versionName = "v1.71"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -106,6 +106,9 @@ local gps_then_DoCalculation_delayG = 0.45 --elapsed second before issuing new c
 local wreckageID_offset_multiplier = 0 --for 0.82 this is 1500
 local wreckageID_offset_initial = 32000	--for 0.82 this is 4500
 --curModID = upper(Game.modShortName)
+
+--Weapon Reload and Shield constant:
+local criticalShieldLevelG = 0.5
 --------------------------------------------------------------------------------
 --Variables:
 local unitInMotionG={} --store unitID
@@ -460,7 +463,11 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND can.
 			local isValidCommand = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) -- allow unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
 			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1 or unitInMotionSingleUnit.isVisible ~= "yes")--allow unit of unitType=1 OR all units outside player's vision
-			local isReloadingState = isReloading and (cQueue[1].id == CMD_ATTACK or cQueue[1].id == cMD_DummyG or (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_ATTACK)) --any unit with attack command that is vulnerable/isReloading
+			local attackSignature = false --attack command signature
+			if #cQueue >=2 then 
+				attackSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_ATTACK)
+			end
+			local isReloadingState = isReloading and (cQueue[1].id == CMD_ATTACK or cQueue[1].id == cMD_DummyG or (attackSignature)) --any unit with attack command that is vulnerable/isReloading
 			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingState) then --gateKeeper/firewall  
 				if isReloadingState or #cQueue>=2 then --prevent STOP command from short circuiting the system
 					if isReloadingState or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
@@ -780,6 +787,9 @@ end
 ---------------------------------Level3 (low-level function)
 --check if unit is vulnerable/reloading
 function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
+	------
+	local criticalShieldLevel =criticalShieldLevelG --global constant
+	------
 	local unitType = unitInMotionSingleUnitTable[2] --retrieve stored unittype
 	local shieldIsCritical =false
 	local weaponIsEmpty = false
@@ -788,7 +798,7 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 		local unitShieldPower = unitInMotionSingleUnitTable.unitShieldPower --retrieve registered full shield power
 		if unitShieldPower ~= -1 then
 			local _, currentPower = spGetUnitShieldState(unitID)
-			if currentPower/unitShieldPower <0.5 then
+			if currentPower/unitShieldPower <criticalShieldLevel then
 				shieldIsCritical = true
 			end
 		end
@@ -852,7 +862,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 				isAreaMode = true
 			else
-				--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+				Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 			end
 		end
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
@@ -1307,7 +1317,13 @@ end
 --  ...
 --  CatalogueMovingObject(surroundingUnits, unitID, lastPosition)
 --  ...
+--  GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor)
 --  ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity)
 --  SumRiWiDiCalculation (wi, fObstacle, fObstacleSlope, di, wTotal, dSum, fObstacleSum, dFobstacle)
 --  GaussianNoise()
 --  Sgn(x)
+--------------------------------------------------------------------------------
+--Feature Tracking:
+-- Each unit under area reclaim will return to the center of area command when sighted an enemy
+-- Each unit will mark last attacker and avoid them even when outside LOS
+-- 
