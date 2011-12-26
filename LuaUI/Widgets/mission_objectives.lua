@@ -9,12 +9,16 @@ function widget:GetInfo()
     date      = "Dec 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 1, 
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+if not VFS.FileExists("mission.lua") then
+	return
+end
+
 local Chili
 local Window
 local Panel

@@ -49,6 +49,23 @@ local optionData = include("Configs/startup_info_selector.lua")
 
 local noComm = false
 ---------------------------------------------
+local function IsSpec()
+	if spGetSpectatingState() or spIsReplay() then
+		printDebug("<gui_startup_info_selector DEBUG >: You're spec or playing demo.")
+		return true
+	end
+	return false
+end
+
+if ((not WG.Chili) or IsSpec()) then
+	return
+end
+if (VFS.FileExists("mission.lua")) then
+	return
+end
+
+
+
 local function playSound(filename, ...)
 	local path = filename..".WAV"
 	if (VFS.FileExists(path)) then
@@ -187,23 +204,7 @@ local function CreateWindow()
 	end
 end
 
-local function IsSpec()
-	if spGetSpectatingState() or spIsReplay() then
-		printDebug("<gui_startup_info_selector DEBUG >: You're spec or playing demo.")
-		return true
-	end
-	return false
-end
-
 function widget:Initialize()
-	if ((not WG.Chili) or IsSpec()) then
-		printDebug("<gui_startup_info_selector DEBUG >: Or not using Chili, exiting.")
-		widgetHandler:RemoveWidget()
-	end
-	if (VFS.FileExists("mission.lua")) then
-		widgetHandler:RemoveWidget()
-	end
-	
 	local playerID = Spring.GetMyPlayerID()
 	local teamID = Spring.GetMyTeamID()
 	if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
