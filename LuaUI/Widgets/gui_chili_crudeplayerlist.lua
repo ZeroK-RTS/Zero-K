@@ -52,13 +52,13 @@ local white		= ''
 local cf = Spring.GetGameRulesParam('cf') == 1
 
 local x_icon_country	= 0
-local x_icon_rank		= x_icon_country + 30
+local x_icon_rank		= x_icon_country + 20
 local x_icon_clan		= x_icon_rank + 16
 local x_cf				= x_icon_clan + 16
 local x_team			= x_cf + 20
 local x_name			= x_team + 16
 local x_share			= x_name + 140 
-local x_cpu				= x_share + 20
+local x_cpu				= x_share + 16
 local x_ping			= x_cpu + 40
 local x_postping		= x_ping + 40
 
@@ -396,7 +396,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			name_out = "<Dead> " ..(name or '')
 		end
 	end
-
+	country = "my"
 	local icon = nil
 	local icRank = nil 
 	local icCountry = country and country ~= '' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
@@ -411,7 +411,9 @@ local function AddEntity(entity, teamID, allyTeamID)
 		if customKeys.level ~= nil and customKeys.level~="" then 
 			icRank = "LuaUI/Images/Ranks/" .. (1+math.floor((customKeys.level or 0)/10)) .. ".png"
 		end
-	end 
+	end
+	icon = "LuaUI/Configs/Clans/0K.png"
+	icRank = "LuaUI/Images/Ranks/1.png"
 	
 	local min_pingTime = math.min(pingTime, 1)
 	local min_cpuUsage = math.min(cpuUsage, 1)
