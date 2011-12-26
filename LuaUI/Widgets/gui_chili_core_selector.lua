@@ -657,16 +657,13 @@ end
 local commIndex = 1
 local function SelectComm()
 	if #comms <= 0 then return end	-- no comms, don't bother
-	local unitID = -1
-	
+	local unitID
 	repeat	-- if this comm is already in selection, try the next one
-		--Spring.Echo(commIndex)
 		unitID = comms[commIndex].commID
 		if #comms == 1 then break end	-- no other comms, just select this one
 		commIndex = commIndex + 1	-- try next comm
 		if commIndex > #comms then commIndex = 1 end	-- loop
 	until not Spring.IsUnitSelected(unitID)
-	
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	Spring.SelectUnitArray({unitID}, shift)
 	if not shift then
@@ -832,7 +829,7 @@ function widget:Initialize()
 		return
 	end
 	
-	widgetHandler:AddAction("selectcomm", SelectComm, nil, 't')
+	widgetHandler:AddAction("selectcomm", SelectComm, nil, 'r')
 
 	-- setup Chili
 	Chili = WG.Chili

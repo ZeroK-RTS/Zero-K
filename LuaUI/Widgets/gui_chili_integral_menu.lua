@@ -966,8 +966,11 @@ function widget:Initialize()
 	widgetHandler:ConfigLayoutHandler(LayoutHandler)
 	Spring.ForceLayoutUpdate()
 
-	AddAction("nexttab", ScrollTabRight)
-	AddAction("prevtab", ScrollTabLeft)
+	RemoveAction("nextmenu")
+	RemoveAction("prevmenu")	
+	AddAction("nextmenu", ScrollTabRight, nil, "p")
+	AddAction("prevmenu", ScrollTabLeft, nil, "p")
+	
 	--[[local f,it,isFile = nil,nil,false
 	f  = io.open('cmdcolors.txt','r')
 	if f then
@@ -1213,8 +1216,6 @@ end
 function widget:Shutdown()
   widgetHandler:ConfigLayoutHandler(nil)
   Spring.ForceLayoutUpdate()
-  RemoveAction("nexttab")
-  RemoveAction("prevtab")
 end
 
 options.hidetabs.OnChange = function(self) 
