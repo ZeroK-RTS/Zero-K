@@ -34,7 +34,7 @@ local stack
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local statusImageWidth = 24
-local panelHeight = 32
+local panelHeight = 30
 local fontsize = 14
 
 local statusImages = {
@@ -77,7 +77,7 @@ local function AddObjective(id, title, details, pos, status, color)
 		padding = {0, 0, 0, 0},
 		tooltip = details,
 		hitTestAllowEmpty = true,
-		--backgroundColor = {0, 0, 0, 0}
+		--backgroundColor = {1, 1, 1, 0},
 		OnMouseUp = pos and {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end} or nil
 	}
 	obj.label = Label:New{
@@ -159,8 +159,9 @@ local function RemoveObjective(id)
 	objectives[id] = nil
 end
 
-function WG.ProcessObjective(id, title, details, pos, status, color)
-end
+WG.AddObjective = AddObjective
+WG.ModifyObjective = ModifyObjective
+WG.RemoveObjective = RemoveObjective
 
 local function MakeTestObjectives()
 	AddObjective("testObj", "Test", "This is a test", {1000, 100, 1000}, "incomplete")
@@ -169,6 +170,9 @@ local function MakeTestObjectives()
 	AddObjective("killPicasso", "Kill Picasso", "The mad modder emmanuel has fled to Germany and changed his name to PicassoCT. Show him that none can hide from the might of Spring!", {5000, 100, 1000}, "incomplete")
 	AddObjective("dontRead", "Don't read this", "", nil, "incomplete")
 	ModifyObjective("dontRead", nil, "What did I tell you? You just lost The Game!", nil, "failed")
+	AddObjective("pad1", "Padding 1", "", nil, "incomplete")
+	AddObjective("pad2", "Padding 2", nil, nil, "complete")
+	AddObjective("pad3", "Padding 3", "test", nil, "failed")
 end
 
 --------------------------------------------------------------------------------
@@ -198,14 +202,14 @@ function widget:Initialize()
 		color = {0,0,0,0},
 		right = 0,  
 		bottom = vsy * 0.7,
-		width  = 400,
+		width  = 350,
 		height = 150,
 		padding = {0,0,0,0};
 		parent = screen0,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
-		tweakResizable = true,
+		tweakResizable = false,
 		minimizable = false,
 	}
 	
@@ -271,23 +275,24 @@ function widget:Initialize()
 	
 	scroll = ScrollPanel:New{
 		parent = mainPanel;
-		x = 0, y = 0,
-		height = mainPanel.height - 5 - 5;
-		width =  mainPanel.width - 5 - 5 - minimizeButton.width;
+		x = 2, y = 4,
+		height = mainPanel.height - 12;
+		width =  mainPanel.width - 6;
 		horizontalScrollbar = false,
 		verticalSmartScroll = true,
 		backgroundColor = {0, 0, 0, 0},
 		padding = {0, 0, 0, 0},
+		itemMargin  = {0, 0, 0, 0},
 	}
 	
 	stack = StackPanel:New{
 		parent = scroll,
+		autosize = true,
 		resizeItems = false;
 		orientation   = "vertical";
-		height = "90%",
-		width = "100%",
-		x = 5,
-		y = 5,
+		width = "99%",
+		x = 4,
+		y = 0,
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
 	}
