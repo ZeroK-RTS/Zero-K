@@ -1,15 +1,5 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---
---  file:    unit_stockpile.lua
---  brief:   adds 100 builds to all new units that can stockpile
---  author:  Dave Rodgers
---
---  Copyright (C) 2007.
---  Licensed under the terms of the GNU GPL, v2 or later.
---
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function widget:GetInfo()
   return {
@@ -56,6 +46,10 @@ end
 function widget:Initialize()
   myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
   voiceMagic = "> ["..myName.."]voice"
+  for i, unitID in ipairs(Spring.GetAllUnits()) do
+    local unitDefID = Spring.GetUnitDefID(unitID)
+    widget:UnitFinished(unitID, unitDefID)
+  end
 end
 
 
@@ -72,12 +66,13 @@ function widget:AddConsoleLine(msg)
       for unitID in pairs(factories) do
         local builtUnitID = UnitDefNames[voiceCommand.unit].id
         for i=1, voiceCommand.number do
-          Spring.GiveOrderToUnit(unitID, -builtUnitID, {}, {})
+          Spring.GiveOrderToUnit(unitID, -builtUnitID, {}, voiceCommand.insert and {"alt"} or {})
+        end
+        if voiceCommand["repeat"] then
+          Spring.GiveOrderToUnit(unitID, CMD.REPEAT, {1}, {})
         end
       end
-      if voiceCommand["repeat"] then
-        Spring.GiveOrderToUnit(unitID, CMD.REPEAT, {1}, {})
-      end
+
     end
   end
 end
