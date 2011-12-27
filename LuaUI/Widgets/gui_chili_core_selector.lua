@@ -65,8 +65,8 @@ local echo = Spring.Echo
 
 local BUTTON_WIDTH = 64
 local BUTTON_HEIGHT = 52
-local BASE_COLUMNS = 6
-local NUM_FAC_COLUMNS = BASE_COLUMNS - 1	-- unused
+--local BASE_COLUMNS = 6
+--local NUM_FAC_COLUMNS = BASE_COLUMNS - 1	-- unused
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -90,7 +90,44 @@ for name in pairs(exceptionList) do
 	end
 end
 
-local nano_name = UnitDefNames.armnanotc.humanName
+local nano_name = UnitDefNames.armnanotc.humanName	-- HACK
+
+local function RefreshConsList() end	-- redefined later
+local function ClearData() end
+
+options_path = 'Settings/Interface/Core Selector'
+options_order = { 'maxbuttons', 'monitoridlecomms', 'monitoridlenano', 'lblSelection', 'selectcomm'}
+options = {
+	maxbuttons = {
+		name = 'Maximum number of buttons (3-10)',
+		type = 'number',
+		value = 6,
+		min=3,max=10,step=1,
+		OnChange = function() 
+			ClearData()
+			window_selector:Dispose()
+			widget:Initialize()
+		end,	
+	},
+	monitoridlecomms = {
+		name = 'Track idle comms',
+		type = 'bool',
+		value = true,
+		OnChange = function() RefreshConsList() end,		
+	},
+	monitoridlenano = {
+		name = 'Track idle nanotowers',
+		type = 'bool',
+		value = true,
+		OnChange = function() RefreshConsList() end,		
+	},
+	lblSelection = { type='label', name='Commander', path='Game/Selections', },
+	selectcomm = { type = 'button',
+		name = 'Select Commander',
+		action = 'selectcomm',
+		path = 'Game/Selections',
+	},
+}
 
 -- list and interface vars
 local facsByID = {}	-- [unitID] = index of facs[]
@@ -121,34 +158,6 @@ local GetTeamColor = Spring.GetTeamColor or function (teamID)
   teamColors[teamID] = {r,g,b}
   return r,g,b
 end
-
-local function RefreshConsList() end	-- redefined later
-
-options_path = 'Settings/Interface/Core Selector'
-options_order = { 'monitoridlecomms', 'monitoridlenano',
-  'lblSelection','selectcomm',
-}
-options = {
-	monitoridlecomms = {
-		name = 'Track idle comms',
-		type = 'bool',
-		value = true,
-		OnChange = function() RefreshConsList() end,		
-	},
-	monitoridlenano = {
-		name = 'Track idle nanotowers',
-		type = 'bool',
-		value = true,
-		OnChange = function() RefreshConsList() end,		
-	},
-	
-	lblSelection = { type='label', name='Commander', path='Game/Selections', },
-	selectcomm = { type = 'button',
-		name = 'Select Commander',
-		action = 'selectcomm',
-		path = 'Game/Selections',
-	},
-}
 
 -------------------------------------------------------------------------------
 -- SCREENSIZE FUNCTIONS
@@ -273,7 +282,7 @@ end
 -- makes fac and comm buttons
 local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 	-- don't display surplus buttons
-	if CountButtons(comms) + (array == facs and CountButtons(facs) or 0) > BASE_COLUMNS - 1 then
+	if CountButtons(comms) + (array == facs and CountButtons(facs) or 0) > options.maxbuttons.value - 1 then
 		return
 	end
 	
@@ -283,9 +292,9 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 	end
 	array[i].button = Button:New{
 		parent = stack_main;
-		x = (pos)*(100/BASE_COLUMNS).."%",
+		x = (pos)*(100/options.maxbuttons.value).."%",
 		y = 0,
-		width = (100/BASE_COLUMNS).."%",
+		width = (100/options.maxbuttons.value).."%",
 		height = "100%",
 		caption = '',
 		OnMouseDown = {	function () 
@@ -634,7 +643,7 @@ local function InitializeUnits()
 	end
 end
 
-local function ClearData()
+ClearData = function()
 	while facs[1] do
 		RemoveFac(facs[1].facID)
 	end
@@ -868,7 +877,7 @@ function widget:Initialize()
 		name = "selector_window",
 		x = 450,	-- integral width 
 		bottom = 0,
-		width  = BUTTON_WIDTH * BASE_COLUMNS,
+		width  = BUTTON_WIDTH * options.maxbuttons.value,
 		height = BUTTON_HEIGHT,
 		parent = Chili.Screen0,
 		draggable = false,
@@ -887,7 +896,7 @@ function widget:Initialize()
 	--[[
 	commButton.button = Button:New{
 		parent = stack_main;
-		width = (100/BASE_COLUMNS).."%",
+		width = (100/options.maxbuttons.value).."%",
 		caption = '',
 		OnMouseDown = {	function () 
 				local _,_,left,_,right = Spring.GetMouseState()
@@ -923,7 +932,7 @@ function widget:Initialize()
 		parent = stack_main;
 		x = 0,
 		caption = '',
-		width = (100/BASE_COLUMNS).."%",
+		width = (100/options.maxbuttons.value).."%",
 		OnMouseDown = {	function () 
 				local _,_,left,_,right = Spring.GetMouseState()
 				if left then
