@@ -176,6 +176,7 @@ else
       chickenTeamID = teamID
       computerTeams[teamID] = true
     elseif not (chickenTeamID and Spring.AreTeamsAllied(teamID, chickenTeamID))
+	then
       humanTeams[teamID]    = true
     end
   end
