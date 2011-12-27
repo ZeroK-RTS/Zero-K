@@ -31,8 +31,8 @@ function WG.ShowMessageBox(text, width, height, fontsize, pause)
   local vsx, vsy = gl.GetViewSizes()
   
   -- reverse compatibility
-  if height == 0 or height == nil then height = 300 end
-  if fontsize == 0 or fontsize == nil then fontsize = 14 end
+  if height == 0 or height == nil or type(height) ~= "number" then height = 300 end
+  if fontsize == 0 or fontsize == nil or type(fontsize) ~= "number" then fontsize = 14 end
   
   local x = math.floor((vsx - width)/2)
   local y = math.floor((vsy - height)/2)
