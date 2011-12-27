@@ -125,7 +125,9 @@ end
 local function RefreshConsList() end	-- redefined later
 
 options_path = 'Settings/Interface/Core Selector'
-options_order = { 'monitoridlecomms', 'monitoridlenano'}
+options_order = { 'monitoridlecomms', 'monitoridlenano',
+  'lblSelection','selectcomm',
+}
 options = {
 	monitoridlecomms = {
 		name = 'Track idle comms',
@@ -138,6 +140,13 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = function() RefreshConsList() end,		
+	},
+	
+	lblSelection = { type='label', name='Commander', path='Game/Selections', },
+	selectcomm = { type = 'button',
+		name = 'Select Commander',
+		action = 'selectcomm',
+		path = 'Game/Selections',
 	},
 }
 

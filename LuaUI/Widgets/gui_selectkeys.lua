@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Select Keys",
-    desc      = "v0.032 Common SelectKey Hotkeys for EPIC Menu.",
+    desc      = "v0.033 Common SelectKey Hotkeys for EPIC Menu.",
     author    = "CarRepairer",
     date      = "2010-09-23",
     license   = "GNU GPL, v2 or later",
@@ -22,7 +22,6 @@ options_order = {
 	'select_all',
 	'select_half',
 	'select_one',
-	'selectcomm',
 	
 	'lbl_idle',
 	'select_idleb',
@@ -84,10 +83,7 @@ options = {
 		name = 'Armed Flying Units In View',
 		action = 'select Visible+_Not_Building_Not_Transport_Aircraft_Weapons+_ClearSelection_SelectAll+',
 	},
-	selectcomm = { type = 'button',
-		name = 'Select Commander',
-		action = 'selectcomm',
-	},
+
 	
 	
 	
