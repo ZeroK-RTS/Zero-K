@@ -156,62 +156,60 @@ end
 
 
 function widget:DrawWorld()
-  glDepthTest(true)
-  glTexture('LuaUI/Images/hellomynameis.png')
-  glAlphaTest(GL_GREATER, 0)
-
-  if (showStickyTags) then
-    
-    for unitID, attributes in pairs(comms) do
-	  if (attributes[4]) then
-	      glPushMatrix()
-	      glUnitMultMatrix(unitID)
-	      glUnitPieceMultMatrix(unitID, attributes[4])
-	      glRotate(0,0,1,0)
-	      glTranslate(8, 0, 7)
-	      glColor(1,1,1,1)
-	      glTexRect(-iconhsize, 0, iconhsize, iconsize)
-	      glPopMatrix()
+	if not Spring.IsGUIHidden() then
+		glDepthTest(true)
+		glTexture('LuaUI/Images/hellomynameis.png')
+		glAlphaTest(GL_GREATER, 0)
+		if (showStickyTags) then
+			for unitID, attributes in pairs(comms) do
+				if (attributes[4]) then
+					glPushMatrix()
+					glUnitMultMatrix(unitID)
+					glUnitPieceMultMatrix(unitID, attributes[4])
+					glRotate(0,0,1,0)
+					glTranslate(8, 0, 7)
+					glColor(1,1,1,1)
+					glTexRect(-iconhsize, 0, iconhsize, iconsize)
+					glPopMatrix()
+				end
+			end
+			for unitID, attributes in pairs(comms) do
+				if (attributes[4]) then
+					glPushMatrix()
+					glUnitMultMatrix(unitID)
+					glUnitPieceMultMatrix(unitID, attributes[4])
+					glRotate(0,0,1,0)
+					glTranslate(8, 0, 7)
+					glColor(attributes[2])
+					
+					glPushMatrix()
+					glScale(0.03, 0.03, 0.03)
+					glTranslate (0,120,5)
+					fontHandler.UseFont(stickyFont)
+					fontHandler.DrawCentered(attributes[1], 0,0)
+					glPopMatrix()
+					
+					glPopMatrix()
+				end
+			end
 		end
-    end
-    for unitID, attributes in pairs(comms) do
-	  if (attributes[4]) then
-	      glPushMatrix()
-	      glUnitMultMatrix(unitID)
-	      glUnitPieceMultMatrix(unitID, attributes[4])
-	      glRotate(0,0,1,0)
-	      glTranslate(8, 0, 7)
-	      glColor(attributes[2])
-	 
-	      glPushMatrix()
-	      glScale(0.03, 0.03, 0.03)
-	      glTranslate (0,120,5)
-	      fontHandler.UseFont(stickyFont)
-	      fontHandler.DrawCentered(attributes[1], 0,0)
-	      glPopMatrix()
-	 
-	      glPopMatrix()
-	  end
-    end
+	end
+	for unitID, attributes in pairs(comms) do
+		local heading = GetUnitHeading(unitID)
+		if (not heading) then
+			return
+		end
+		local rot = (heading / 32768) * 180
+		glDrawFuncAtUnit(unitID, false, DrawCommName, unitID, attributes)
+		if (showStickyTags) then
+			glDrawFuncAtUnit(unitID, false, DrawCommName2, unitID, attributes, rot)
+		end
+	end
 
-  end
-      
-  for unitID, attributes in pairs(comms) do
-    local heading = GetUnitHeading(unitID)
-    if (not heading) then
-      return
-    end
-    local rot = (heading / 32768) * 180
-    glDrawFuncAtUnit(unitID, false, DrawCommName, unitID, attributes)
-    if (showStickyTags) then
-      glDrawFuncAtUnit(unitID, false, DrawCommName2, unitID, attributes, rot)
-    end
-  end
-
-  glAlphaTest(false)
-  glColor(1,1,1,1)
-  glTexture(false)
-  glDepthTest(false)
+	glAlphaTest(false)
+	glColor(1,1,1,1)
+	glTexture(false)
+	glDepthTest(false)
 end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)

@@ -38,7 +38,6 @@ end
 local GetSelectedUnits	= Spring.GetSelectedUnits
 local GetUnitDefID		= Spring.GetUnitDefID
 local GetGameSeconds	= Spring.GetGameSeconds
-local GetUnitHealth		= Spring.GetUnitHealth
 local spInView			= Spring.IsUnitInView
 local PlaySoundFile		= Spring.PlaySoundFile
 local spGetUnitHealth	= Spring.GetUnitHealth
