@@ -110,7 +110,7 @@ local function AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, fac
 
     local ud = UnitDefs[unitDefID]
 
-    if ud and (ud.isBuilding or ud.speed == 0) and ud.unitname ~= missilesilo then
+    if ud and (ud.isBuilding or ud.speed == 0) then
     
         local xsize = ud.xsize*4
         local zsize = (ud.ysize or ud.zsize)*4
@@ -154,7 +154,7 @@ function gadget:UnitCreated(unitID, unitDefID)
   
   local ud = UnitDefs[unitDefID]
   local name = ud.name
-  if (ud.isFactory == true) and not (name == "factoryplane" or name == "factorygunship") then
+  if (ud.isFactory == true) and not (name == "factoryplane" or name == "factorygunship" or name == "missilesilo") then
 	local customData = customSettings[name] or {}
 	local ux, uy, uz  = spGetUnitPosition(unitID)
 	local face = spGetUnitBuildFacing(unitID)
