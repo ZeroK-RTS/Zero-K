@@ -545,7 +545,8 @@ local function MakeWidgetList()
 		parent = screen0,
 		backgroundColor = color.sub_bg,
 		caption = 'Widget List (F11)',
-		minimumSize = {300,400},
+		minWidth = 300,
+		minHeight = 400,
 		
 		children = {
 			ScrollPanel:New{
@@ -1555,7 +1556,8 @@ MakeSubWindow = function(fwkey)
 		y = settings.sub_pos_y, 
 		clientWidth = window_width,
 		clientHeight = window_height+B_HEIGHT*4,
-		minimumSize = {250,350},		
+		minWidth = 250,
+		minHeight = 350,		
 		--resizable = false,
 		parent = settings.show_crudemenu and screen0 or nil,
 		backgroundColor = color.sub_bg,

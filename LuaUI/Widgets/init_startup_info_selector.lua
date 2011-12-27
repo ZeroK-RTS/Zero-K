@@ -27,10 +27,12 @@ _ Make each player broadcast their choice to their team in a way it can be used 
 -- SirMaverick,		v1.0				:	Creation.
 --]]
 ----------------------------------------------
+if (VFS.FileExists("mission.lua")) then
+	return
+end
+
 local debug	= false --generates debug message
 local Echo	= Spring.Echo
-local spGetSpectatingState	= Spring.GetSpectatingState
-local spIsReplay			= Spring.IsReplay
 
 local coop = (Spring.GetModOptions().coop == 1) or false
 
@@ -49,7 +51,7 @@ local optionData = include("Configs/startup_info_selector.lua")
 
 local noComm = false
 ---------------------------------------------
-local function playSound(filename, ...)
+local function PlaySound(filename, ...)
 	local path = filename..".WAV"
 	if (VFS.FileExists(path)) then
 		Spring.PlaySoundFile(path, ...)
@@ -106,27 +108,30 @@ function Close(commPicked)
 end
 
 local function CreateWindow()
-	selectorShown = true
+	if mainWindow then
+		mainWindow:Dispose()
+	end
+	
 	printDebug("<gui_startup_info_selector DEBUG >: create window.")
 	-- count options
-	local actived = 0
+	local active = 0
 	for name,option in pairs(optionData) do
 		if option:enabled() then
-			actived = actived + 1
+			active = active + 1
 		end
 	end
 
-	local posterx, postery, buttonspace = posterSize(actived)
+	local posterx, postery, buttonspace = posterSize(active)
 
 	-- create window if necessary
-	if actived > 0 then
+	if active > 0 then
 
 		mainWindow = Window:New{
 			resizable = false,
 			draggable = false,
-			clientWidth  = posterx*actived,
+			clientWidth  = posterx*active,
 			clientHeight = postery + buttonspace +12 ,--there is a title (caption below), height is not just poster+buttons
-			x = (vsx - posterx*actived)/2,
+			x = (vsx - posterx*active)/2,
 			y = ((vsy - postery - buttonspace)/2),
 			parent = screen0,
 			caption = "STARTUP SELECTOR",
@@ -168,7 +173,7 @@ local function CreateWindow()
 				i = i + 1
 			end
 		end
-		local cbWidth = posterx*actived*0.75-- calculate width of close button depending of number or posters
+		local cbWidth = posterx*active*0.75-- calculate width of close button depending of number or posters
 		local closeButton = Button:New{
 			parent = mainWindow,
 			caption = "CLOSE  (defaults to baseline commander)",
@@ -177,7 +182,7 @@ local function CreateWindow()
 			--tooltip = "CLOSE\nNo commander selection made\nTo choose your commander later, open the Esc menu and go to Game Actions -> Select Comm",
 			width = cbWidth,
 			height = 30,
-			x = (posterx*actived - cbWidth)/2,
+			x = (posterx*active - cbWidth)/2,
 			y = postery + (buttonspace)/2+14,
 			--OnMouseUp = {Close}
 			OnClick = {function() Close(false) end}
@@ -187,22 +192,20 @@ local function CreateWindow()
 	end
 end
 
-local function IsSpec()
-	if spGetSpectatingState() or spIsReplay() then
-		printDebug("<gui_startup_info_selector DEBUG >: You're spec or playing demo.")
-		return true
-	end
-	return false
-end
-
 function widget:Initialize()
-	if ((not WG.Chili) or IsSpec()) then
-		printDebug("<gui_startup_info_selector DEBUG >: Or not using Chili, exiting.")
+	if not (WG.Chili) then
 		widgetHandler:RemoveWidget()
 	end
-	if (VFS.FileExists("mission.lua")) then
+	if (Spring.GetSpectatingState() or Spring.IsReplay()) then
+		Spring.Echo("<Startup Info and Selector> Spectator mode or replay. Widget removed.")
 		widgetHandler:RemoveWidget()
 	end
+	-- chili setup
+	Chili = WG.Chili
+	Window = Chili.Window
+	screen0 = Chili.Screen0
+	Image = Chili.Image
+	Button = Chili.Button
 	
 	local playerID = Spring.GetMyPlayerID()
 	local teamID = Spring.GetMyTeamID()
@@ -210,32 +213,20 @@ function widget:Initialize()
 	or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1)	then 
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
 	end
-	playSound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
-	-- chili setup
-	Chili = WG.Chili
-	Window = Chili.Window
-	screen0 = Chili.Screen0
-	Image = Chili.Image
-	Button = Chili.Button
+	PlaySound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
+
 
 	vsx, vsy = widgetHandler:GetViewSizes()
 
-	BindCallins()
-
 	widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
-
-	-- create the window if debug = true and not already shown, shortcut _DrawScreen
-	if debug and not selectorShown then
-		Echo( "<gui_startup_info_selector DEBUG >: Selector shown due to debug.")
-		CreateWindow()
-	end
+	if (not noComm) then CreateWindow() end
 end
 
  
 function widget:Shutdown()
-  if mainWindow then
-    mainWindow:Dispose()
-  end
+  --if mainWindow then
+	--mainWindow:Dispose()
+  --end
   widgetHandler:RemoveAction(actionShow)
 end
 
@@ -243,37 +234,10 @@ end
 --[[
 function widget:GameStart()
   if mainWindow then
-    --mainWindow:Dispose()
+	mainWindow:Dispose()
   end
 end
 ]]--
-
-function UpdateCallins()
-  --why is this called twice?
-  widgetHandler:UpdateCallIn('DrawScreen')
-  -- widgetHandler:UpdateCallIn('DrawScreen')
-end
-
-function BindCallins()
-  widget.DrawScreen = _DrawScreen
-  UpdateCallins()
-end
-
-function UnbindCallins()
-  widget.DrawScreen = nil
-  UpdateCallins()
-end
-
--- use to play communism (always enabled) sound only at game start
-function _DrawScreen()
-  if (Spring.GetGameSeconds() < 0.1) then --create window in pregame and if not already shown
-    --if (Spring.GetModOption('communism',true,true)) then Spring.PlaySoundFile("LuaUI/Sounds/communism/sovnat1.wav", 1, 'ui') 
-	--else Spring.PlaySoundFile("LuaUI/Sounds/communism/cash-register-01.wav", 1, 'ui') end 
-	printDebug("<gui_startup_info_selector DEBUG >: it's _DrawScreen")
-  end
-  if (not selectorShown) and (not noComm) then CreateWindow() end
-  UnbindCallins()
-end
 
 -----
 -----

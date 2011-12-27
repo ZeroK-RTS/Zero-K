@@ -1986,7 +1986,9 @@ function widget:Initialize()
 		draggable = false,
 		autosize  = true,
 		backgroundColor = color.tooltip_bg, 
-		children = { stack_leftbar, stack_main, }
+		children = { stack_leftbar, stack_main, },
+		minHeight = 32,
+		minWidth = 32,
 	}
 	--FontChanged()
 	spSendCommands({"tooltip 0"})
@@ -2008,7 +2010,8 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		padding = {0, 0, 0, 0},
-        minimumSize = {450, 130},
+        minWidth = 450, 
+		minHeight = 130,
 	}
     
 	window_corner = Panel:New{

@@ -20,7 +20,7 @@ Control = Object:Inherit{
   tweakDraggable   = false,
   tweakResizable   = false,
 
-  minimumSize     = {50, 50}, --// Todo replace everywhere with the beneath!
+  --minimumSize     = {50, 50}, --// deprecated; Todo replace everywhere with the beneath!
   minWidth        = 10,
   minHeight       = 10,
   maxWidth        = 1e9,
@@ -76,6 +76,9 @@ function Control:New(obj)
     obj.font = {}
   end
   FontBackwardCompa(obj)
+  local minimumSize = obj.minimumSize or {}
+  obj.minWidth = obj.minWidth or minimumSize[1]
+  obj.minHeight = obj.minHeight or minimumSize[2]
 
   --// load the skin for this control
   obj.classname = self.classname
@@ -922,11 +925,11 @@ function Control:MouseMove(x, y, dx, dy, ...)
     local deltaMousePosY = y - oldState.mouse[2]
 
     local w = math.max(
-      self.minimumSize[1], 
+      self.minWidth, 
       oldState.size[1] + deltaMousePosX
     )
     local h = math.max(
-      self.minimumSize[2], 
+      self.minHeight, 
       oldState.size[2] + deltaMousePosY
     )
 

@@ -355,7 +355,6 @@ function widget:Initialize()
 		tweakResizable = true,
 		resizable = false,
 		--autosize = true,
-		minimumSize = {1,fontSize * 2 + 2},
 		minHeight = fontSize * 2 + 2,
 		color = {0, 0, 0, 0}
 	}

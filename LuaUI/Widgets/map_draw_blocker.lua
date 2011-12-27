@@ -134,7 +134,8 @@ local function CreateDrawCmdWindow()
   window1 = Window:New{
     x = 500,
     y = 300,
-    minimumSize = {500, 150},
+    minWidth = 500,
+	minHeight = 150,
     width  = 500,
     height = 100 + 50*(#playerlist),
     caption = "user map draw activity",
@@ -194,7 +195,8 @@ local function CreateTrafficWindow()
   window0 = Window:New{
     x = 500,
     y = 300,
-    minimumSize = {400, 150},
+    minWidth = 400,
+	minHeight = 150,
     width  = 400,
     height = 100 + 50*(#playerlist),
     caption = "map draw statistic",

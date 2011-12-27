@@ -716,7 +716,8 @@ function widget:Initialize()
 		tweakResizable = true,
 		resizable = false,
 		dragUseGrip = false,
-		minimumSize = {600,200},
+		minWidth = 600,
+		minHeight = 200,
 		color = {0,0,0,0},
 		children = {
 			Label:New{ caption='Factories', fontShadow = true, },

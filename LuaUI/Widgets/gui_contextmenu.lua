@@ -669,7 +669,8 @@ local function MakeStatsWindow(ud, x,y)
 		parent = screen0,
 		backgroundColor = color.stats_bg, 
 		
-		minimumSize = {250,300},
+		minWidth = 250,
+		minHeight = 300,
 		
 		caption = ud.humanName ..' - '.. getDescription(ud, WG.lang or 'en'), 
 		

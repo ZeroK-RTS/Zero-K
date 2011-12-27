@@ -547,7 +547,8 @@ function widget:Initialize()
                     hideConsole()
                 end
             end,
-		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
+		minWidth = MIN_WIDTH,
+		minHeight = MIN_HEIGHT,
 		color = {0,0,0,0},
 		children = {
 			scrollpanel1,

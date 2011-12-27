@@ -176,7 +176,7 @@ MakeMinimapWindow = function()
 		minimizable = true,
 		fixedRatio = options.use_map_ratio.value,
 		dragUseGrip = false,
-		minimumSize = {iconsize*10,50},
+		minWidth = iconsize*10,
 		children = {
 			
 --			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			

@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List v1.2",
-    desc      = "v1.26 Chili Crude Player List.",
+    desc      = "v1.3 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -59,10 +59,10 @@ local x_team			= x_cf + 20
 local x_name			= x_team + 16
 local x_share			= x_name + 140 
 local x_cpu				= x_share + 16
-local x_ping			= x_cpu + 40
-local x_postping		= x_ping + 40
+local x_ping			= x_cpu + 16
+local x_postping		= x_ping + 16
 
-local x_bound	= x_postping + 16
+local x_bound	= x_postping + 20
 
 local UPDATE_FREQUENCY = 0.5	-- seconds
 
@@ -73,7 +73,7 @@ local allyTeams = {}	-- [id] = {team1, team2, ...}
 local teams = {}	-- [id] = {leaderName = name, roster = {entity1, entity2, ...}}
 
 -- entity = player (including specs) or bot
--- ordered list; contains isAI, isSpec, playerID, teamID, name, namelabel, cpulabel, pinglabel
+-- ordered list; contains isAI, isSpec, playerID, teamID, name, namelabel, cpuImg, pingImg
 local entities = {}
 
 local pingMult = 2/3	-- lower = higher ping needed to be red
@@ -86,6 +86,8 @@ pingCpuColors = {
 }
 
 local sharePic        = ":n:"..LUAUI_DIRNAME.."Images/playerlist/share.png"
+local cpuPic		  = ":n:"..LUAUI_DIRNAME.."Images/advplayerslist/cpu.png"
+local pingPic		  = ":n:"..LUAUI_DIRNAME.."Images/advplayerslist/ping.png"
 
 --local show_spec = false
 local localTeam = 0
@@ -108,6 +110,7 @@ options = {
 		value = 13,
 		min=10,max=18,step=1,
 		OnChange = function() SetupPlayerNames() end,
+		advanced = true
 	},
 	backgroundOpacity = {
 		name = "Background opacity",
@@ -297,17 +300,17 @@ local function UpdatePlayerInfo()
 				
 				local blank = not active
 				
-				local cpuLabel = entities[i].cpuLabel
-				if cpuLabel then
-					cpuLabel.font.color = cpuCol
-					cpuLabel:SetCaption(blank and '\t' or math.round(cpuUsage*100) .. '%')
-					cpuLabel:Invalidate()
+				local cpuImg = entities[i].cpuImg
+				if cpuImg then
+					cpuImg.color = cpuCol
+					cpuImg.tooltip = (blank and nil or 'CPU: ' .. math.round(cpuUsage*100) .. '%')
+					cpuImg:Invalidate()
 				end
-				local pingLabel = entities[i].pingLabel
-				if pingLabel then
-					pingLabel.font.color = pingCol
-					pingLabel:SetCaption(blank and '\t' or pingTime_readable)
-					pingLabel:Invalidate()
+				local pingImg = entities[i].pingImg
+				if pingImg then
+					pingImg.color = pingCol
+					pingImg.tooltip = (blank and nil or 'Ping: ' .. pingTime_readable)
+					pingImg:Invalidate()
 				end
 			end
 		end	-- if not isAI
@@ -340,17 +343,18 @@ local function 	WriteAllyTeamNumbers(allyTeam)
 	scroll_cpl:AddChild(
 		Label:New{
 			x=x_team,
-			y=options.text_height.value * row,
+			y=(fontsize+1) * row,
 			caption = (allyTeam == -1 and 'S' or allyTeam+1),
 			textColor = aCol,
 			fontsize = fontsize,
 			fontShadow = true,
+			autosize = false,
 		}
 	)
 	-- ceasefire button
 	if cf and allyTeam ~= -1 and allyTeam ~= localAlliance then
 		local cfCheck = Checkbox:New{
-			x=x_cf,y=fontsize * row + 3,width=20,
+			x=x_cf,y=(fontsize+1) * row + 3,width=20,
 			caption='',
 			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
 			tooltip = CfTooltip(allyTeam),
@@ -427,7 +431,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 					width= fontsize + 3;
 					height=fontsize + 3;
 					x=x_icon_country,
-					y=fontsize * row,
+					y=(fontsize+1) * row,
 				}
 			)
 		end 
@@ -439,7 +443,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 					width= fontsize + 3;
 					height=fontsize + 3;
 					x=x_icon_rank,
-					y=fontsize * row,
+					y=(fontsize+1) * row,
 				}
 			)
 		end 
@@ -451,7 +455,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 					width= fontsize + 3;
 					height=fontsize + 3;
 					x=x_icon_clan,
-					y=fontsize * row,
+					y=(fontsize+1) * row,
 				}
 			)
 		end
@@ -461,7 +465,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 	-- name
 	local nameLabel = Label:New{
 		x=x_name,
-		y=fontsize * row,
+		y=(fontsize+1) * row,
 		width=150,
 		autosize=false,
 		--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
@@ -481,7 +485,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 		scroll_cpl:AddChild(
 			Button:New{
 				x=x_share,
-				y=fontsize * (row+0.5),
+				y=(fontsize+1) * (row+0.5),
 				height = fontsize,
 				width = fontsize,
 				tooltip = 'Double click to share selected units to ' .. name,
@@ -501,26 +505,28 @@ local function AddEntity(entity, teamID, allyTeamID)
 	end
 	-- CPU, ping
 	if not (entity.isAI) then
-		local cpuLabel = Label:New{
+		local cpuImg = Image:New{
 			x=x_cpu,
-			y=fontsize * row,
-			caption = math.round(cpuUsage*100) .. '%',
-			--textColor = cpuCol,
-			fontsize = fontsize,
-			fontShadow = true,
+			y=(fontsize+1) * row,
+			height = (fontsize+3),
+			width = (fontsize+3)*10/16, 
+			tooltip = 'CPU: ' .. math.round(cpuUsage*100) .. '%',
+			file = cpuPic,
 		}
-		entity.cpuLabel = cpuLabel
-		scroll_cpl:AddChild(cpuLabel)
-		local pingLabel = Label:New{
+		function cpuImg:HitTest(x,y) return self end
+		entity.cpuImg = cpuImg
+		scroll_cpl:AddChild(cpuImg)
+		local pingImg = Image:New{
 			x=x_ping,
-			y=fontsize * row,
-			caption = pingTime_readable ,
-			--textColor = pingCol,
-			fontsize = fontsize,
-			fontShadow = true,
+			y=(fontsize+1) * row,
+			height = (fontsize+3),
+			width = (fontsize+3)*10/16, 			
+			tooltip = 'Ping: ' .. pingTime_readable,
+			file = pingPic,
 		}
-		entity.pingLabel = pingLabel
-		scroll_cpl:AddChild(pingLabel)
+		function pingImg:HitTest(x,y) return self end
+		entity.pingImg = pingImg
+		scroll_cpl:AddChild(pingImg)
 	end
 	row = row + 1
 end
@@ -580,8 +586,8 @@ SetupPlayerNames = function()
 		scroll_cpl:AddChild( Label:New{ x=x_cf,		caption = 'CF',		fontShadow = true, 	fontsize = fontsize, } )
 	end
 	scroll_cpl:AddChild( Label:New{ x=x_name, 	caption = 'Name', 	fontShadow = true,  fontsize = fontsize,} )
-	scroll_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'CPU', 	fontShadow = true,  fontsize = fontsize,} )
-	scroll_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'Ping', 	fontShadow = true,  fontsize = fontsize,} )
+	scroll_cpl:AddChild( Label:New{ x=x_cpu, 	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
+	scroll_cpl:AddChild( Label:New{ x=x_ping, 	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
 	
 	local playerlist = Spring.GetPlayerList()
 	local teamsSorted = Spring.GetTeamList()
@@ -660,7 +666,7 @@ SetupPlayerNames = function()
 	-- ceasefire: restricted zones button
 	if cf then
 		scroll_cpl:AddChild( Checkbox:New{
-			x=5, y=fontsize * (row + 0.5),
+			x=5, y=(fontsize+1) * (row + 0.5),
 			height=fontsize * 1.5, width=160,
 			caption = 'Place Restricted Zones',
 			checked = WG.rzones.rZonePlaceMode,
@@ -671,7 +677,7 @@ SetupPlayerNames = function()
 	
 	--push things to bottom of window if needed
 	--scroll_cpl.width = x_bound --window_cpl.width - window_cpl.padding[1] - window_cpl.padding[3]
-	local height = math.ceil(row * (fontsize+1.5) + 2)
+	local height = math.ceil(row * (fontsize+1.5) + 4)
 	--window_cpl.minimumSize = {x_bound, height}
 	scroll_cpl.height = math.min(height, window_cpl.height)
 	if not (options.alignToTop.value) then 
@@ -786,6 +792,7 @@ function widget:Initialize()
 		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
 		--padding = {0, 0, 0, 0},
 		--autosize = true,
+		scrollbarSize = 6,
 		horizontalScrollbar = false,
 		hitTestAllowEmpty = true
 	}
