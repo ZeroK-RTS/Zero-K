@@ -248,7 +248,7 @@ local function RequestRearm(unitID, team, forceNow)
 		end
 	end
 	if forceNow then
-		index = 1
+		index = 0
 	end
 	local targetPad = FindNearestAirpad(unitID, team)
 	if targetPad then
@@ -417,8 +417,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		end	
 	else
 		if combatCommands[cmdID] then	-- trying to fight without ammo, go get ammo first!
-			RequestRearm(unitID)
-			return cmdOptions.shift -- allow placing the attack order after the automatic rearm order
+			scheduleRearmRequest[unitID] = true
 		end
 	end
 	if bomberToPad[unitID] then
