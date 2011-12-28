@@ -16,7 +16,7 @@ unitDef = {
   buildoptions     = {
     [[amphcon]],
 	[[amphskirm]],
-	[[amphraider]],
+--	[[amphraider]],
 	[[amphassault]],
 	[[amphaa]],
 	[[subscout]],
