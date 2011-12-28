@@ -1,4 +1,4 @@
-local versionName = "v1.75"
+local versionName = "v1.76"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -48,6 +48,7 @@ local spGetUnitHealth = Spring.GetUnitHealth
 local spGetUnitWeaponState = Spring.GetUnitWeaponState
 local spGetUnitShieldState = Spring.GetUnitShieldState
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetGameFrame = Spring.GetGameFrame
 local CMD_STOP			= CMD.STOP
 local CMD_ATTACK 		= CMD.ATTACK
 local CMD_GUARD			= CMD.GUARD
@@ -103,13 +104,16 @@ local maximumTurnAngleG = math.pi --safety measure. Prevent overturn (eg: 360+xx
 local doCalculation_then_gps_delayG = 0.3 --elapsed second before gathering preliminary data for issuing new command (default: < gps_then_DoCalculation_delayG)
 local gps_then_DoCalculation_delayG = 0.45 --elapsed second before issuing new command (default: < 0.5)
 
---Engine based correction constant:
+--Engine based wreckID correction constant:
 local wreckageID_offset_multiplier = 0 --for 0.82 this is 1500
 local wreckageID_offset_initial = 32000	--for 0.82 this is 4500
 --curModID = upper(Game.modShortName)
 
 --Weapon Reload and Shield constant:
-local criticalShieldLevelG = 0.5
+local reloadableWeaponCriteriaG = 0.5 --second at which reload time is considered high enough to be a "reload-able". ie: 0.5second
+local criticalShieldLevelG = 0.5 --percent at which shield is considered low and should activate avoidance. ie: 50%
+local minimumRemainingReloadTimeG = 0.9 --seconds before actual reloading finish which avoidance should de-activate. ie: 0.9 second before finish
+local secondPerGameFrameG = 0.5/15 --engine depended second-per-frame (for calculating remaining reload time). ie: 0.0333 second-per-frame or 0.5sec/15frame
 --------------------------------------------------------------------------------
 --Variables:
 local unitInMotionG={} --store unitID
@@ -244,7 +248,7 @@ function RefreshUnitList(attacker)
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
 				elseif not unitDef["canFly"] then --if enabled: include all ground unit
-					local unitShieldPower, reloadableWeaponIndex = -1, -1
+					local unitShieldPower, reloadableWeaponIndex= -1, -1
 					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 2, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
@@ -424,6 +428,9 @@ function RetrieveAttackerList (unitID, attacker)
 end
 
 function CheckWeaponsAndShield (unitDef)
+	--global variable
+	local reloadableWeaponCriteria = reloadableWeaponCriteriaG
+	----
 	local unitShieldPower, reloadableWeaponIndex =-1, -1 --assume unit has no shield and no reloadable/slow-loading weapons
 	local fastestReloadTime, fastWeaponIndex = 999, -1 --temporary variables
 	for currentWeaponIndex, weapons in ipairs(unitDef.weapons) do --reference: gui_contextmenu.lua by CarRepairer
@@ -441,7 +448,7 @@ function CheckWeaponsAndShield (unitDef)
 			end
 		end
 	end
-	if fastestReloadTime > 0.5 then --if the fastest reload cycle is greater than widget's update cycle, then:
+	if fastestReloadTime > reloadableWeaponCriteria then --if the fastest reload cycle is greater than widget's update cycle, then:
 		reloadableWeaponIndex = fastWeaponIndex --remember the index of that fastest loading weapon
 		if (turnOnEcho == 1) then --debugging
 			Spring.Echo("reloadableWeaponIndex(CheckWeaponsAndShield):")
@@ -457,9 +464,9 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 	local allowExecution = false
 	if cQueue~=nil then --prevent ?. Forgot...
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
+		local state=spGetUnitStates(unitID)
+		local holdPosition= (state.movestate == 0)
 		if ((unitInMotionSingleUnit.isVisible ~= "yes" or isReloading) and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and is idle/with-singular-mono-command (eg: widget's move order), or is reloading with mono-command (eg: auto-attack) then:
-			local state=spGetUnitStates(unitID)
-			local movestate= state.movestate
 			if movestate~= 0 then --if not "hold position"
 				cQueue={{id = cMD_DummyG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --replace with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit
 			end
@@ -475,7 +482,7 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 			end
 			local isReloadingState = (isReloading and (cQueue[1].id == CMD_ATTACK or cQueue[1].id == cMD_DummyG or _2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
 			local isGuardState = (cQueue[1].id == CMD_GUARD or _2ndGuardSignature)
-			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingState) or (isGuardState) then --execute on: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE idle COMMAND for: UnitType==1 or for: any unit outside visibility... or on any unit with any command which is reloading.
+			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingState and not holdPosition) or (isGuardState) then --execute on: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE idle COMMAND for: UnitType==1 or for: any unit outside visibility... or on any unit with any command which is reloading.
 				if isReloadingState or #cQueue>=2 then --prevent STOP command from short circuiting the system
 					if isReloadingState or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						allowExecution = true --allow execution
@@ -798,6 +805,8 @@ end
 function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 	------
 	local criticalShieldLevel =criticalShieldLevelG --global constant
+	local minimumRemainingReloadTime =minimumRemainingReloadTimeG
+	local secondPerGameFrame =secondPerGameFrameG
 	------
 	--local unitType = unitInMotionSingleUnitTable[2] --retrieve stored unittype
 	local shieldIsCritical =false
@@ -815,8 +824,10 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 		end
 		local unitFastestReloadableWeapon = unitInMotionSingleUnitTable.reloadableWeaponIndex --retrieve the quickest reloadable weapon index
 		if unitFastestReloadableWeapon ~= -1 then
-			local _, weaponIsLoaded, _, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon)
-			weaponIsEmpty = not weaponIsLoaded
+			local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon)
+			local currentFrame, _ = spGetGameFrame() 
+			local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
+			weaponIsEmpty = (remainingTime> minimumRemainingReloadTime)
 			if (turnOnEcho == 1) then --debugging
 				Spring.Echo(unitFastestReloadableWeapon)
 				Spring.Echo(spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "range"))
@@ -1379,6 +1390,5 @@ end
 -- Area Reclaim/ressurect tolerance < area repair tolerance < move tolerance (unit within certain radius of target will ignore enemy/not avoid)
 -- Individual repair/reclaim command queue has same tolerance as area repair tolerance
 -- 
-
 
 
