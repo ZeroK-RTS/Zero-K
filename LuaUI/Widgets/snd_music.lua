@@ -46,12 +46,17 @@ local songText	= "no name"
 
 local warTracks		=	VFS.DirList('sounds/music/war/', '*.ogg')
 local peaceTracks	=	VFS.DirList('sounds/music/peace/', '*.ogg')
+local victoryTracks	=	VFS.DirList('sounds/music/victory/', '*.ogg')
+local defeatTracks	=	VFS.DirList('sounds/music/defeat/', '*.ogg')
 
 local firstTime = false
 local wasPaused = false
 local firstFade = true
 local initSeed = 0
 local seedInitialized = false
+local gameOver = false
+
+local myTeam = Spring.GetMyTeamID()
 
 options_path = 'Settings/Interface/Pause Screen'
 
@@ -115,6 +120,9 @@ local function PlayNewTrack()
 end
 
 function widget:Update(dt)
+	if gameOver then
+		return
+	end
 	if (Spring.GetGameSeconds()>0) then
 		if not seedInitialized then
 			math.randomseed(os.clock()* 100)
@@ -250,7 +258,21 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	dethklok[1] = dethklok[1] + (unitWorth*multifactor);
 end
 
-
+function widget:GameOver()
+	--gameOver = true
+	local track
+	-- FIXME: get a better way to detect who won
+	if Spring.GetSpectatingState() or not select(3, Spring.GetTeamInfo(myTeam)) then
+		if #victoryTracks <= 0 then return end
+		track = victoryTracks[math.random(1, #victoryTracks)]	
+	else
+		if #defeatTracks <= 0 then return end
+		track = defeatTracks[math.random(1, #defeatTracks)]
+	end
+	Spring.StopSoundStream()
+	Spring.PlaySoundStream(track,WG.music_volume or 0.5)
+	WG.music_start_volume = WG.music_volume
+end
 
 
 --------------------------------------------------------------------------------
