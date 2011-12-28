@@ -110,10 +110,13 @@ AimWeapon2(Func_Var_1, Func_Var_2)
 }
 */
 
-FireWeapon1()
+Shot1()
 {
 	start-script RockZ(ROCK_Z_FIRE_1, gun_1_yaw);
-	
+	gun1 = gun1 + 1;
+	if(gun1 == 4)
+		{ gun1 = 0; }
+
 	if( gun1 == 0 )
 	{
 		move missile1 to z-axis [-4.000000] speed [500.000000];
@@ -138,10 +141,6 @@ FireWeapon1()
 		sleep 1500;
 		move missile4 to z-axis [0.000000] speed [3.000000];
 	}
-
-	gun1 = gun1 + 1;
-	if(gun1 == 4)
-		{ gun1 = 0; }
 }
 
 /*
