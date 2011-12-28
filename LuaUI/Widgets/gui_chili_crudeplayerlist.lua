@@ -66,7 +66,7 @@ local x_bound	= x_postping + 20
 
 local UPDATE_FREQUENCY = 0.5	-- seconds
 
-local wantsNameRefresh = {}
+local wantsNameRefresh = {}	-- unused
 local cfCheckBoxes = {}
 
 local allyTeams = {}	-- [id] = {team1, team2, ...}
@@ -267,26 +267,22 @@ local function UpdatePlayerInfo()
 			local playerID = entities[i].playerID
 			local name,active,spectator,teamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
 			
-			if wantsNameRefresh[playerID] then
-				local name_out = name or ''
-				if name_out == ''
-					or #(Spring.GetPlayerList(teamID,true)) == 0
-					or spectator
-				then
-					if Spring.GetGameSeconds() < 0.1 or cpuUsage > 1 then
-						name_out = "<Waiting> " ..(name or '')
-						wantsNameRefresh[playerID] = true
-					elseif Spring.GetTeamUnitCount(teamID) > 0  then
-						name_out = "<Aband. units> " ..(name or '')
-					else
-						name_out = "<Dead> " ..(name or '')
-					end
+			local name_out = name or ''
+			if name_out == ''
+				or #(Spring.GetPlayerList(teamID,true)) == 0
+				or spectator and not entities[i].isSpec
+			then
+				if Spring.GetGameSeconds() < 0.1 or cpuUsage > 1 then
+					name_out = "<Waiting> " ..(name or '')
+				elseif Spring.GetTeamUnitCount(teamID) > 0  then
+					name_out = "<Aband. units> " ..(name or '')
+				else
+					name_out = "<Dead> " ..(name or '')
 				end
-				if entities[i].nameLabel then 
-					entities[i].nameLabel:SetCaption(name_out)
-				end
-				wantsNameRefresh[playerID] = nil
-			end			
+			end
+			if entities[i].nameLabel then 
+				entities[i].nameLabel:SetCaption(name_out)
+			end
 			
 			if ((not spectator) or options.showSpecs.value) then
 				-- update ping and CPU
@@ -393,7 +389,6 @@ local function AddEntity(entity, teamID, allyTeamID)
 	if (name_out == '' or deadTeam) and not entity.isAI then
 		if Spring.GetGameSeconds() < 0.1 or cpuUsage > 1 then
 			name_out = "<Waiting> " ..(name or '')
-			wantsNameRefresh[playerID] = true
 		elseif Spring.GetTeamUnitCount(teamID) > 0  then
 			name_out = "<Aband. units> " ..(name or '')
 		else
@@ -628,7 +623,7 @@ SetupPlayerNames = function()
 			local index = #teams[teamID].roster + 1
 			teams[teamID].roster[index] = entities[entityID]
 		elseif active then
-			specTeam.roster[#specTeam + 1] = entities[entityID]
+			specTeam.roster[#(specTeam.roster) + 1] = entities[entityID]
 		end
 	end
 	
