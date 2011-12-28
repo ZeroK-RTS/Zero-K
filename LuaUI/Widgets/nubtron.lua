@@ -25,6 +25,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local echo = Spring.Echo
+
 local Spring          = Spring
 local gl, GL          = gl, GL
 local widgetHandler   = widgetHandler
@@ -106,6 +108,7 @@ local curStepNum, curTaskNum
 --local buildFacing
 local commBuildingUnitID, labBuildingUnitID
 
+local cycle = 1
 
 local finishedUnits = {}
 local unfinishedUnits = {}
@@ -126,23 +129,30 @@ local lang = 'en'
 --------------------------------------------------------------------------------
 
 local classesByUnit = {}
-local unitClasses, unitClassNames, mClasses, steps, tasks = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_config.lua", nil, VFS.RAW_FIRST)
+local nubtronData = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_config.lua", nil, VFS.RAW_FIRST)
+local unitClasses = nubtronData.unitClasses
+local unitClassNames = nubtronData.unitClassNames
+local mClasses = nubtronData.mClasses 
+local steps = nubtronData.steps 
+local tasks = nubtronData.tasks
+local taskOrder = nubtronData.taskOrder
+nubtronData = nil
 
 local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function CheckState() end
 
-
-function setCondition(condition)
+local function setCondition(condition)
 	if not conditions[condition] then
 		--Spring.Echo('add cond', condition)
 		conditions[condition] = true
 		CheckState()
 	end
 end
-function remCondition(condition)
+local function remCondition(condition)
 	if conditions[condition] then
 		--Spring.Echo('rem cond', condition)
 		conditions[condition] = nil
@@ -150,12 +160,12 @@ function remCondition(condition)
 	end
 end
 
-function GetFirstCommand(unitID)
+local function GetFirstCommand(unitID)
 	local queue = GetUnitCommands(unitID)
 	return queue and queue[1]
 end
 
-function testForAnyConditions(conditionsToTest)
+local function testForAnyConditions(conditionsToTest)
 	if conditionsToTest then
 		for _,condition in pairs(conditionsToTest) do
 			if conditions[condition] then
@@ -166,7 +176,7 @@ function testForAnyConditions(conditionsToTest)
 	return false
 end
 
-function testForAllConditions(conditionsToTest)
+local function testForAllConditions(conditionsToTest)
 	if conditionsToTest then
 		for _,condition in pairs(conditionsToTest) do
 			if not conditions[condition] then
@@ -179,7 +189,7 @@ function testForAllConditions(conditionsToTest)
 	return true
 end
 
-function testForAnyNotConditions(conditionsToTest)
+local function testForAnyNotConditions(conditionsToTest)
 	if conditionsToTest then
 		for _,condition in pairs(conditionsToTest) do
 			if not conditions[condition] then
@@ -190,7 +200,7 @@ function testForAnyNotConditions(conditionsToTest)
 	return false
 end
 
-function resetTempConditions()
+local function resetTempConditions()
 	for condition,_ in pairs(conditions) do
 		if tempConditions[condition] then
 			conditions[condition] = nil
@@ -198,10 +208,14 @@ function resetTempConditions()
 	end
 end
 
-function CheckState()
+local function GetCurTask()
+	return tasks[ taskOrder[curTaskNum] ]
+end
 
-	local curTask = tasks[curTaskNum]
-	local curStep = steps[tasks[curTaskNum].states[curStepNum]]
+CheckState = function()
+
+	local curTask = GetCurTask()
+	local curStep = steps[curTask.states[curStepNum]]
 	local taskStates = curTask.states
 	
 	if curStep.passIfAny and curStep.passIfAny[1] == 'clickedNubtron' then
@@ -238,7 +252,7 @@ function CheckState()
 	elseif taskPass then
 		resetTempConditions()
 		curStepNum = 1
-		curTaskNum = (curTaskNum % #tasks)+1
+		curTaskNum = (curTaskNum % #taskOrder)+1
 		CheckState()
 		return
 	end
@@ -260,7 +274,7 @@ function CheckState()
 			curStepNum = curStepNum + 1
 		else
 			curStepNum = 1
-			curTaskNum = (curTaskNum % #tasks)+1
+			curTaskNum = (curTaskNum % #taskOrder)+1
 		end
 		
 		CheckState()
@@ -272,7 +286,7 @@ function CheckState()
 	end
 end
 
-function CheckAllUnits()
+local function CheckAllUnits()
 
 	for unitClass, units in pairs(unitClasses) do
 		conditions['build'..unitClass] = nil
@@ -398,7 +412,7 @@ local function addTabText(unitDefID)
 	return " under the Units tab."
 end
 
-local function setup_text(lang)
+local function SetupText(lang)
 	local texts = VFS.Include(LUAUI_DIRNAME .. "Configs/nubtron_texts.lua", nil, VFS.RAW_FIRST)
 	local texts_lang = texts[lang]
 	
@@ -406,9 +420,9 @@ local function setup_text(lang)
 		texts_lang = texts.en
 	end
 	
-	for i,_ in ipairs(tasks) do
-		tasks[i].desc = texts_lang.tasks.descs[i]
-		tasks[i].tip = texts_lang.tasks.tips[i]
+	for i,taskName in ipairs(taskOrder) do
+		tasks[taskName].desc = texts_lang.tasks.descs[taskName]
+		tasks[taskName].tip = texts_lang.tasks.tips[taskName]
 	end
 	for k,_ in pairs(steps) do
 		steps[k].message = texts_lang.steps[k]
@@ -430,8 +444,8 @@ local function setup_text(lang)
 	steps.selectBuildMex.message 	= texts_lang.steps.selectBuildMex
 	steps.startBotLab.message		= texts_lang.steps.startBotLab
 end
-local function setup_text_test(_,_,words)
-	setup_text(words[1])
+local function SetupText_test(_,_,words)
+	SetupText(words[1])
 end
 
 local function SetupNubtronWindow()
@@ -550,11 +564,11 @@ local function SetupNubtronWindow()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+--calins
 
 function widget:DrawWorld()
 
-	local curTask = tasks[curTaskNum]
+	local curTask = GetCurTask()
 	local curStep = steps[curTask.states[curStepNum]]
 
 	local curStepName = curTask.states[curStepNum]
@@ -593,8 +607,6 @@ function widget:DrawWorld()
 	glLineWidth(0)
 	glColor(0,0,0,0)
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if unitTeam == myTeamID then
@@ -772,7 +784,7 @@ function widget:Initialize()
 	end
 	--]]
 	
-	setup_text(lang)
+	SetupText(lang)
 end
 
 function widget:SelectionChanged(selectedUnits)
@@ -809,13 +821,12 @@ function widget:ViewResize(vsx, vsy)
 	viewSizeY = vsy
 end
 
-local cycle = 1
 function widget:Update()
 	cycle = (cycle + 1) % 100
 	if cycle == 1 then
 		if WG.lang and (lang ~= WG.lang) then
 			lang = WG.lang
-			setup_text(lang)
+			SetupText(lang)
 		end
 	end
 	local gameFrame = GetGameFrame()
@@ -865,7 +876,7 @@ function widget:Update()
 		CheckAllUnits()
 	end
 
-	local curTask = tasks[curTaskNum]
+	local curTask = GetCurTask()
 	local curStep = steps[curTask.states[curStepNum]]
 	
 	

@@ -90,23 +90,38 @@ local steps = {
 }
 
 -- main states
+local taskOrder = {
+	'intro',
+	'restoreInterface',
+	'buildMex',
+	'buildSolar',
+	'buildLLT',
+	'buildMex2',
+	'buildSolar2',
+	'buildFac',
+	'buildRadar',
+	'buildCon',
+	'conAssist',
+	'buildRaider',
+	'congrats',
+}
 local tasks = {
 	
-	{
+	intro = {
 		--desc		= 'Introduction',
 		states		= {'intro', 'intro2', 'intro3', 'intro4', 'intro5', },
 	},
-	{
+	restoreInterface = {
 		--desc		= 'Restore your interface',
 		states		= { 'hideMetalMap', },
 	},
-	{
+	buildMex = {
 		--desc		= 'Building a Metal Extractor (mex)',		
 		--tip			= 'Metal extractors output metal which is the heart of your economy.',
 		states		= { 'selectComm', 'showMetalMap', 'finishMex', 'selectBuildMex', 'startMex', 'buildMex', 'hideMetalMap' },
 		passIfAll	= { 'haveMex',},
 	},
-	{
+	buildSolar = {
 		--desc		= 'Building a Solar Collector',
 		--tip			= 'Energy generating structures power your mexes and factories.',
 		states		= { 'selectComm', 'finishSolar', 'selectBuildSolar', 'startSolar', 'buildSolar'},
@@ -114,21 +129,21 @@ local tasks = {
 		errIfAnyNot	= { 'haveMex' },
 		passIfAll	= { 'haveSolar',},
 	},
-	{
+	buildLLT = {
 		--desc		= 'Building a Light Laser Tower (LLT)',
 		states		= { 'selectComm', 'finishLLT', 'selectBuildLLT', 'startLLT', 'buildLLT' },
 		errIfAny	= { 'metalMapView' },
 		errIfAnyNot	= { 'haveMex', 'haveSolar' },
 		passIfAll	= { 'haveLLT',},
 	},
-	{
+	buildMex2 = {
 		--desc		= 'Building another mex on a different metal spot.',
 		---tip			= 'Always try to acquire more metal spots to build more mexes.',
 		states		= { 'selectComm', 'showMetalMap', 'finishMex', 'selectBuildMex', 'startMex', 'buildMex', 'hideMetalMap'},
 		errIfAnyNot	= { 'haveMex', 'haveSolar' },
 		passIfAnyNot	= { 'lowMetalIncome', },
 	},
-	{
+	buildSolar2 = {
 		--desc		= 'Building another Solar Collector',
 		--tip			= 'Always try and build more energy structures to keep your economy growing.',
 		states		= { 'selectComm', 'finishSolar', 'selectBuildSolar', 'startSolar', 'buildSolar', },
@@ -136,14 +151,14 @@ local tasks = {
 		errIfAnyNot	= { 'haveMex', 'haveSolar' },
 		passIfAnyNot	= { 'lowEnergyIncome', }
 	},
-	{
+	buildFac = {
 		--desc		= 'Building a Factory',
 		states		= { 'selectComm', 'finishBotLab', 'selectBuildBotLab', 'startBotLab', 'buildBotLab' },
 		errIfAny	= { 'metalMapView', 'lowMetalIncome', 'lowEnergyIncome', },
 		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT' },
 		passIfAll	= { 'haveBotLab',},
 	},
-	{
+	buildRadar = {
 		--desc		= 'Building a Radar',
 		--tip			= 'Radar coverage shows you distant enemy units as blips.',
 		states		= { 'selectComm', 'finishRadar', 'selectBuildRadar', 'startRadar', 'buildRadar' },
@@ -151,7 +166,7 @@ local tasks = {
 		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab' },
 		passIfAll	= { 'haveRadar',},
 	},
-	{
+	buildCon = {
 		--desc		= 'Building a Constructor',
 		--tip			= 'Just like your Commander, Constructors build (and assist building of) structures.',
 		states		= { 'selectBotLab', 'selectBuildCon', 'buildCon' },
@@ -159,7 +174,7 @@ local tasks = {
 		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab', 'haveRadar' },
 		passIfAll	= { 'haveCon',},
 	},
-	{
+	conAssist = {
 		--desc		= 'Using a constructor to assist your factory',
 		--tip			= 'Factories that are assisted by constructors build faster.',
 		states		= { 'selectCon', 'guardFac', },
@@ -167,7 +182,7 @@ local tasks = {
 		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab', 'haveRadar', 'haveCon' },
 		passIfAll	= { 'guardFac',},
 	},
-	{
+	buildRaider = {
 		--desc		= 'Building Raider Bots in your factory.',
 		--tip			= 'Combat units are used to attack your enemies and make them suffer.',
 		states		= { 'selectBotLab', 'selectBuildRaider', 'buildRaider', },
@@ -175,7 +190,7 @@ local tasks = {
 		errIfAnyNot	= { 'haveMex', 'haveSolar', 'haveLLT', 'haveBotLab', 'haveRadar', 'haveCon', 'guardFac' },
 		passIfAll	= { 'haveRaider',},
 	},
-	{
+	congrats = {
 		--desc		= 'Congratulations!',
 		errIfAny	= { 'metalMapView' },
 		states		= { 'tutorialEnd'},
@@ -183,4 +198,4 @@ local tasks = {
 }
 
 
-return unitClasses, unitClassNames, mClasses, steps, tasks
+return {unitClasses=unitClasses, unitClassNames=unitClassNames, mClasses=mClasses, steps=steps, tasks=tasks, taskOrder=taskOrder,}
