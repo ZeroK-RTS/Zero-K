@@ -1,6 +1,4 @@
--- $Id$
-
--- changelog: versus666,	(21oct2010):	corrected the numerous awfull bad spellings in french.
+-- 
 
 return {
 	en = {
