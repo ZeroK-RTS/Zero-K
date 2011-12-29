@@ -206,17 +206,19 @@ end
 end
 --]]
 
- --similar properties to "widget:Update(dt)" above but update less often.
+ --// similar properties to "widget:Update(dt)" above but update less often.
 function widget:KeyRelease(key, mods, label, unicode)
-	if key == 0x009 then --"0x009" is equal to "tab". Reference: uikeys.txt
+	if key == 0x009 then --// "0x009" is equal to "tab". Reference: uikeys.txt
 		local mode = Spring.GetCameraState()["mode"]
 		if mode == 7 and not tabbedMode then
-			tabbedMode = true
 			Chili.Screen0:RemoveChild(window_minimap)
+			tabbedMode = true
 		end
 		if mode ~= 7 and tabbedMode then
 			Chili.Screen0:AddChild(window_minimap)
 			tabbedMode = false
+			--// when user exit tabbed mode: the minimap always toggle-up regardless of prior minimized-state. Remove (below) when fixed.  
+			window_minimap.hidden = false 
 		end
 	end
 end
@@ -258,7 +260,14 @@ end
 local lx, ly, lw, lh
 
 function widget:DrawScreen() 
-	if (window_minimap.hidden) then return end
+	if (window_minimap.hidden) then 
+		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
+		lx = 0
+		ly = 0
+		lh = 0
+		lw = 0
+		return 
+	end
 	if (lw ~= window_minimap.width or lh ~= window_minimap.height or lx ~= window_minimap.x or ly ~= window_minimap.y) then 
 		local cx,cy,cw,ch = Chili.unpack4(window_minimap.clientArea)
 		ch = ch-iconsize	
@@ -291,3 +300,4 @@ function widget:DrawScreen()
 	gl.PopMatrix()
 	gl.PopAttrib()
 end 
+
