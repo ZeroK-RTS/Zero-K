@@ -30,6 +30,9 @@ local noChangeLineage = {}	-- [unitID] = bool; if true unit will not change line
 local LAG_THRESHOLD = 25000
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+-- uncomment this lineage-handling stuff once it's actually needed (or move to a separate gadget)
+--[[
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	lineage[unitID] = builderID and (lineage[builderID] or Spring.GetUnitTeam(builderID)) or unitTeam
 end
@@ -48,9 +51,9 @@ end
 function GG.GetLineage(unitID)
 	return lineage[unitID]
 end
-
+]]--
 function GG.AllowLineageChangeOnTransfer(unitID, bool)
-	noChangeLineage[unitID] = bool
+	--noChangeLineage[unitID] = bool
 end
 
 --------------------------------------------------------------------------------
