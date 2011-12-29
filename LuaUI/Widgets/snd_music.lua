@@ -57,6 +57,7 @@ local seedInitialized = false
 local gameOver = false
 
 local myTeam = Spring.GetMyTeamID()
+local isSpec = Spring.GetSpectatingState() or Spring.IsReplay()
 
 options_path = 'Settings/Interface/Pause Screen'
 
@@ -262,7 +263,7 @@ function widget:GameOver()
 	--gameOver = true
 	local track
 	-- FIXME: get a better way to detect who won
-	if Spring.GetSpectatingState() or not select(3, Spring.GetTeamInfo(myTeam)) then
+	if isSpec or not select(3, Spring.GetTeamInfo(myTeam)) then
 		if #victoryTracks <= 0 then return end
 		track = victoryTracks[math.random(1, #victoryTracks)]	
 	else
