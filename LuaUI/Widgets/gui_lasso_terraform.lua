@@ -170,6 +170,34 @@ local mouseX, mouseY
 
 ---------------
 
+
+local function stopCommand()
+	drawingLasso = false
+	drawingRectangle = false
+	setHeight = false
+	volumeDraw = false
+	groundGridDraw = false
+	mouseGridDraw = false
+	volumeSelection = 0
+	points = 0
+	terraform_type = 0
+end
+
+local function completelyStopCommand()
+	spSetActiveCommand(-1)
+	originalCommandGiven = false
+	drawingLasso = false
+	drawingRectangle = false
+	setHeight = false
+	volumeDraw = false
+	groundGridDraw = false
+	mouseGridDraw = false
+	drawingRamp = false
+	volumeSelection = 0
+	points = 0
+	terraform_type = 0
+end
+
 local function SendCommand()
 			
 	local constructor = spGetSelectedUnits()
@@ -723,32 +751,6 @@ local function legalPos(pos)
 	return pos and pos[1] > 0 and pos[3] > 0 and pos[1] < Game.mapSizeX and pos[3] < Game.mapSizeZ
 end
 
-local function stopCommand()
-	drawingLasso = false
-	drawingRectangle = false
-	setHeight = false
-	volumeDraw = false
-	groundGridDraw = false
-	mouseGridDraw = false
-	volumeSelection = 0
-	points = 0
-	terraform_type = 0
-end
-
-local function completelyStopCommand()
-	spSetActiveCommand(-1)
-	originalCommandGiven = false
-	drawingLasso = false
-	drawingRectangle = false
-	setHeight = false
-	volumeDraw = false
-	groundGridDraw = false
-	mouseGridDraw = false
-	drawingRamp = false
-	volumeSelection = 0
-	points = 0
-	terraform_type = 0
-end
 
 local function snapToHeight(heightArray, snapHeight, arrayCount)
 	local smallest = abs(heightArray[1] - snapHeight)

@@ -151,6 +151,7 @@ pointBaseCost = pointBaseCost * costMult
 
 local drawPositions			= {count = 0, data = {}}
 local drawPosMap			= {}
+local steepnessMarkers		= {inner = {count = 0, data = {}, frame = 0}}
 
 local structure          	= {}
 local structureTable		= {}
@@ -2119,6 +2120,16 @@ local function finishInitialisingTerraformUnit(id)
 
 end
 
+local function addSteepnessMarker(team, x, z)
+	local n = Spring.GetGameFrame()
+	if steepnessMarkers.inner.frame ~= n then
+		steepnessMarkers.inner = {count = 0, data = {}, frame = n}
+	end
+	Spring.Echo(steepnessMarkers.inner.frame)
+	steepnessMarkers.inner.count = steepnessMarkers.inner.count+1
+	steepnessMarkers.inner.data[steepnessMarkers.inner.count] = {team = team, x = x, z = z}
+end
+
 local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	
 	local terra = terraformUnit[id]
@@ -2204,6 +2215,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	for i = 1, terra.points do
 		if terra.point[i].edges then
 			local newHeight = terra.point[i].orHeight+(terra.point[i].aimHeight-terra.point[i].orHeight)*newProgress
+			local up = terra.point[i].aimHeight-terra.point[i].orHeight > 0
 			for j = 1, terra.point[i].edges do
 			
 				local x = terra.point[i].edge[j].x
@@ -2220,12 +2232,12 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 				end
 
 				local diffHeight = newHeight - edgeHeight
-				if diffHeight > maxHeightDifference then
+				if diffHeight > maxHeightDifference and up then
 				
 					local index = extraPoints + 1
 					if overlap then
 						if not extraPoint[overlap].pyramid then
-							CallAsTeam(terra.team, function () return Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"Terraform cancelled due to steepness") end)
+							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
 							deregisterTerraformUnit(id,arrayIndex,2)			
 							spDestroyUnit(id,{reclaimed = true})
 							return 0
@@ -2265,12 +2277,12 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					end
 					extraPointArea[x][z] = index
 
-				elseif diffHeight < -maxHeightDifference then
+				elseif diffHeight < -maxHeightDifference and not up then
 					
 					local index = extraPoints + 1
 					if overlap then
 						if extraPoint[overlap].pyramid then
-							CallAsTeam(terra.team, function () return Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"Terraform cancelled due to steepness") end)
+							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
 							deregisterTerraformUnit(id,arrayIndex,2)			
 							spDestroyUnit(id,{reclaimed = true})
 							return 0
@@ -2341,11 +2353,11 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 				end
 
 				local diffHeight = newHeight - edgeHeight
-				if diffHeight > maxHeightDifferenceLocal then
+				if diffHeight > maxHeightDifferenceLocal and extraPoint[i].pyramid then
 					local index = extraPoints + 1
 					if overlap then
 						if not extraPoint[overlap].pyramid then
-							CallAsTeam(terra.team, function () return Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"Terraform cancelled due to steepness") end)
+							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
 							deregisterTerraformUnit(id,arrayIndex,2)			
 							spDestroyUnit(id,{reclaimed = true})
 							return 0
@@ -2385,11 +2397,11 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					end
 					extraPointArea[x][z] = index
 
-				elseif diffHeight < -maxHeightDifferenceLocal then
+				elseif diffHeight < -maxHeightDifferenceLocal and not extraPoint[i].pyramid then
 					local index = extraPoints + 1
 					if overlap then
 						if extraPoint[overlap].pyramid then
-							CallAsTeam(terra.team, function () return Spring.MarkerAddPoint(terra.position.x,0,terra.position.z,"Terraform cancelled due to steepness") end)
+							addSteepnessMarker(terra.team, terra.position.x,terra.position.z)
 							deregisterTerraformUnit(id,arrayIndex,2)			
 							spDestroyUnit(id,{reclaimed = true})
 							return 0
@@ -3120,7 +3132,9 @@ end
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
 	
+	_G.steepnessMarkers = steepnessMarkers
 	_G.drawPositions = drawPositions
+	
 	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
 		RaiseWater(modOptions.waterlevel)
 	end
@@ -3138,6 +3152,8 @@ else -- UNSYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local lastMarkerFrame = 0
+
 function gadget:DrawWorldPreUnit()
 	local drawPositions = SYNCED.drawPositions
 	--[[
@@ -3150,6 +3166,22 @@ function gadget:DrawWorldPreUnit()
 		--gl.DrawGroundQuad(point.x1,point.z1,point.x2,point.z2)
 		--gl.Utilities.DrawGroundRectangle(point.x1,point.z1,point.x2,point.z2)
 	end--]]
+end
+
+
+
+function gadget:Update(n)
+	local steepnessMarkers = SYNCED.steepnessMarkers
+	if lastMarkerFrame ~= steepnessMarkers.inner.frame then
+		lastMarkerFrame = steepnessMarkers.inner.frame
+		for i = 1, steepnessMarkers.inner.count do
+			local data = steepnessMarkers.inner.data[i]
+			if Spring.GetMyTeamID() == data.team then
+				Spring.MarkerAddPoint(data.x, 0, data.z, "Terraform cancelled due to steepness", 1)
+			end
+		end
+	end
+
 end
 
 --------------------------------------------------------------------------------
