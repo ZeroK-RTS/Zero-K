@@ -29,6 +29,7 @@ local Font
 -- elements
 local window, stack_main, label_title
 local stack_vote, label_vote, button_vote, progress_vote = {}, {}, {}, {}
+local button_end, button_end_image
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -223,8 +224,36 @@ function widget:Initialize()
 		}
 		progress_vote[i]:SetValue(0)
 		voteCount[i] = 0
-		voteMax[i] = 1	-- protection against div0		
+		voteMax[i] = 1	-- protection against div0
 	end
+	button_end = Button:New {
+		width = 20,
+		height = 20,
+		y = 0,
+		right = 0,
+		parent=window;
+		padding = {0, 0, 0,0},
+		margin = {0, 0, 0, 0},
+		backgroundColor = {1, 1, 1, 0.4},
+		caption="";
+		tooltip = "End vote (requires server admin)";
+		OnMouseDown = {function() 
+				if voteAntiSpam then
+					return
+				end
+				Spring.SendCommands("say !endvote")
+				voteAntiSpam = true
+			end}
+	}
+	button_end_image = Image:New {
+		width = 16,
+		height = 16,
+		x = 2,
+		y = 2,
+		keepAspect = false,
+		file = "LuaUI/Images/closex_16.png";
+		parent = button_end;
+	}	
 end
 
 --------------------------------------------------------------------------------
