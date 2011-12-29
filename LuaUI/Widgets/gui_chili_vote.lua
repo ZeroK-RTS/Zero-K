@@ -12,7 +12,7 @@ function widget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
-
+--//version +0.2; use 'os.clock' instead of 'widget:Update()', and auto-close 'force-start' polls if game starts.
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local Chili
@@ -35,6 +35,7 @@ local button_end, button_end_image
 --------------------------------------------------------------------------------
 local voteCount, voteMax = {}, {}
 local pollActive = false
+local votingForceStart = false
 
 local string_success = " vote successful"
 local string_fail = " not enough votes"
@@ -89,6 +90,17 @@ local function CheckForVoteSpam (currentTime) --// function return "true" if not
 end
 
 function widget:AddConsoleLine(line,priority)
+	if votingForceStart and line:sub(1,7) == "GameID:" then
+		pollActive = false
+		screen0:RemoveChild(window)
+		for i=1,2 do
+			voteCount[i] = 0
+			voteMax[i] = 1	-- protection against div0
+			progress_vote[i]:SetCaption('?/?')
+			progress_vote[i]:SetValue(0)
+		end
+		votingForceStart = false
+	end
 	if line:sub(1,springieName:len()) ~= springieName then	-- no spoofing messages
 		return
 	end
@@ -101,12 +113,14 @@ function widget:AddConsoleLine(line,priority)
 			progress_vote[i]:SetCaption('?/?')
 			progress_vote[i]:SetValue(0)
 		end
+		votingForceStart = false
 	elseif line:find(string_votetopic) and line:find(string_titleEnd) then	--start new vote
 		pollActive = true
 		screen0:AddChild(window)
 		local indexStart = select(2, line:find(string_votetopic))
 		local indexEnd = line:find(string_titleEnd)
 		local title = line:sub(indexStart, indexEnd - 1)
+		votingForceStart = ((title:find("force game"))~=nil)
 		label_title:SetCaption("Poll: "..title)
 	elseif line:find(string_vote1) or line:find(string_vote2) then	--apply a vote
 		GetVotes(line)
