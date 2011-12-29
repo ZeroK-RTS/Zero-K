@@ -46,7 +46,7 @@ local string_titleEnd = "? !vote 1 = yes, !vote 2 = no"
 
 local springieName = Spring.GetModOptions().springiename or ''
 
-local voteAntiSpam = false
+--local voteAntiSpam = false
 local VOTE_SPAM_DELAY = 1	--seconds
 
 --[[
@@ -77,6 +77,17 @@ local function GetVotes(line)
 	end
 end
 
+local lastClickTimestamp = 0
+local function CheckForVoteSpam (currentTime) --// function return "true" if not a voteSpam
+	local elapsedTimeFromLastClick = currentTime - lastClickTimestamp
+	if elapsedTimeFromLastClick < VOTE_SPAM_DELAY then
+		return false
+	else
+		lastClickTimestamp= currentTime
+		return true
+	end
+end
+
 function widget:AddConsoleLine(line,priority)
 	if line:sub(1,springieName:len()) ~= springieName then	-- no spoofing messages
 		return
@@ -102,6 +113,7 @@ function widget:AddConsoleLine(line,priority)
 	end
 end
 
+--[[
 local timer = 0
 function widget:Update(dt)
 	if not voteAntiSpam then
@@ -114,7 +126,7 @@ function widget:Update(dt)
 	voteAntiSpam = false
 	timer = 0
 end
-
+--]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -213,11 +225,12 @@ function widget:Initialize()
 			height = "100%",
 			caption = (i==1) and 'Yes' or 'No',
 			OnMouseDown = {	function () 
-					if voteAntiSpam then
-						return
+					--if voteAntiSpam then return end
+					--voteAntiSpam = true
+					local notSpam = CheckForVoteSpam (os.clock())
+					if notSpam then
+						Spring.SendCommands({'say !vote '..i})
 					end
-					Spring.SendCommands({'say !vote '..i})
-					voteAntiSpam = true
 				end},
 			padding = {1,1,1,1},
 			--keepAspect = true,
@@ -238,11 +251,12 @@ function widget:Initialize()
 		caption="";
 		tooltip = "End vote (requires server admin)";
 		OnMouseDown = {function() 
-				if voteAntiSpam then
-					return
+				--if voteAntiSpam then return end
+				--voteAntiSpam = true
+				local notSpam = CheckForVoteSpam (os.clock())
+					if notSpam then
+					Spring.SendCommands("say !endvote")
 				end
-				Spring.SendCommands("say !endvote")
-				voteAntiSpam = true
 			end}
 	}
 	button_end_image = Image:New {
@@ -253,7 +267,7 @@ function widget:Initialize()
 		keepAspect = false,
 		file = "LuaUI/Images/closex_16.png";
 		parent = button_end;
-	}	
+	}
 end
 
 --------------------------------------------------------------------------------
