@@ -193,7 +193,7 @@ MakeMinimapWindow = function()
 	}
 end
 
-function widget:Update(dt)
+--[[function widget:Update(dt) 
 	local mode = Spring.GetCameraState()["mode"]
 	if mode == 7 and not tabbedMode then
 		tabbedMode = true
@@ -204,7 +204,22 @@ function widget:Update(dt)
 		tabbedMode = false
 	end
 end
+--]]
 
+ --similar properties to "widget:Update(dt)" above but update less often.
+function widget:KeyRelease(key, mods, label, unicode)
+	if key == 0x009 then --"0x009" is equal to "tab". Reference: uikeys.txt
+		local mode = Spring.GetCameraState()["mode"]
+		if mode == 7 and not tabbedMode then
+			tabbedMode = true
+			Chili.Screen0:RemoveChild(window_minimap)
+		end
+		if mode ~= 7 and tabbedMode then
+			Chili.Screen0:AddChild(window_minimap)
+			tabbedMode = false
+		end
+	end
+end
 
 function widget:Initialize()
 	if (Spring.GetMiniMapDualScreen()) then
