@@ -57,6 +57,7 @@ end
 --------------------------------------------------------------------------------
 local pauseGame = false
 local mode = "debug"
+local UPDATE_PERIOD = 120	-- gameframes
 
 local function GetRecepient(allyTeam, laggers)
 	local teams = Spring.GetTeamList(allyTeam)
@@ -67,10 +68,9 @@ local function GetRecepient(allyTeam, laggers)
 	for i=1,#teams do
 		local leader = select(2, Spring.GetTeamInfo(teams[i]))
 		local name, active, spectator, _, _, _, _, _, _, customKeys = Spring.GetPlayerInfo(leader)
-		if active and not spectator then --and not laggers[leader] then	-- only consider giving to someone in position to take!
+		if active and not spectator and not laggers[leader] then	-- only consider giving to someone in position to take!
 			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = tonumber(customKeys.level)}
 		end
-		
 	end
 
 	-- pick highest rank
@@ -89,17 +89,18 @@ local function GetRecepient(allyTeam, laggers)
 	return target
 end
 
+
 function gadget:GameFrame(n)
-	if n%120 == 0 then
+	if n%UPDATE_PERIOD == 0 then
 		local laggers = {}
 		local players = Spring.GetPlayerList()
 		local recepientByAllyTeam = {}
 		
 		for i=1,#players do
 			local name,_,_,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
-			ping = LAG_THRESHOLD
 			if ping >= LAG_THRESHOLD then
-				laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam}
+				local units = Spring.GetTeamUnits(team)
+				laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
 			end
 		end
 		
@@ -119,24 +120,27 @@ function gadget:GameFrame(n)
 			-- no-one on team not lagging (the likely situation in absence of commshare), continue working
 			if not discontinue then
 				recepientByAllyTeam[allyTeam] = recepientByAllyTeam[allyTeam] or GetRecepient(allyTeam, laggers)
-			end
+			
 			-- okay, we have someone to give to, prep transfer
-			if recepientByAllyTeam[allyTeam] then
-				if mode == "debug" then
-					Spring.Echo("Player " .. data.name .. " is lagging; recommend giving all units to " .. recepientByAllyTeam[allyTeam].name)		
-				elseif mode == "giveall" then
-					Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag")
-					local units = Spring.GetTeamUnits(data.team)
-					for j=1,#units do
-						GG.AllowLineageChangeOnTransfer(units[j], false)
-						Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
-						GG.AllowLineageChangeOnTransfer(units[j], true)
+				if recepientByAllyTeam[allyTeam] then
+					if mode == "debug" then
+						Spring.Echo("Player " .. data.name .. " is lagging; recommend giving all units to " .. recepientByAllyTeam[allyTeam].name)		
+					elseif mode == "giveall" then
+						local units = data.units or {}
+						if #units > 0 then
+							Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag")
+							for j=1,#units do
+								GG.AllowLineageChangeOnTransfer(units[j], false)
+								Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
+								GG.AllowLineageChangeOnTransfer(units[j], true)
+							end
+						end
+					end	-- if
+					
+					if pauseGame then
+						-- TODO: allow pause if desired
 					end
-				end
-				
-				if pauseGame then
-					-- TODO: allow pause if desired
-				end
+				end	-- if
 			end	-- if
 		end	-- for
 	end	-- if
