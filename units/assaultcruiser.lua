@@ -37,7 +37,7 @@ unitDef = {
   iconType               = [[heavyship]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 237,
+  mass                   = 400,
   maxDamage              = 9600,
   maxVelocity            = 2.7,
   minCloakDistance       = 75,
@@ -54,13 +54,14 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:brawlermuzzle]],
-      [[custom:emg_shells_l]],
+      [[custom:pulvmuzzle]],
     },
 
   },
 
   side                   = [[CORE]],
-  sightDistance          = 500,
+  sightDistance          = 600,
+  sonarDistance			 = 800,
   turninplace            = 0,
   turnRate               = 260,
   workerTime             = 0,
@@ -227,7 +228,7 @@ unitDef = {
       model                   = [[wep_m_hailstorm.s3o]],
       noSelfDamage            = true,
       range                   = 420,
-      reloadtime              = 3,
+      reloadtime              = 3.2,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/missile_fire12]],
       soundStart              = [[weapon/missile/missile_fire10]],

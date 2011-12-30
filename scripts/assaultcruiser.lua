@@ -29,7 +29,7 @@ end
 --------------------------------------------------------------------
 --constants
 --------------------------------------------------------------------
-smokePiece = {hull, turret1, turret2, turret3}
+smokePiece = {lowerhull, radarbase, upperhull}
 
 local SIG_RESTORE = 1
 local SIG_MOVE = 2
