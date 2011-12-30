@@ -326,9 +326,9 @@ local factionsNanoFx = {
           if (type=="restore") then
             radius = target[4]
           elseif (target>0) then
-            radius = GetUnitRadius(target)*0.80
+            radius = (GetUnitRadius(target) or 1)*0.80
           else
-            radius = GetFeatureRadius(-target) * 0.80
+            radius = (GetFeatureRadius(-target) or 1) * 0.80
           end
 
           local terraform = false

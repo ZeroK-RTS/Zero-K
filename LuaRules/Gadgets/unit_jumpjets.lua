@@ -427,7 +427,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 
   if (distSqr < (range*range)) then
     local cmdTag = spGetCommandQueue(unitID,1)[1].tag
-    if ((t - lastJump[unitID]) >= reload) then
+    if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) then
       local coords = table.concat(cmdParams)
       if (not jumps[coords]) then
         if (not Jump(unitID, cmdParams, cmdTag)) then
