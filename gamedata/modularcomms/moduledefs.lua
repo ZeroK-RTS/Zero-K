@@ -56,10 +56,14 @@ upgrades = {
 	commweapon_lparticlebeam = {
 		name = "Light Particle Beam",
 		description = "Fires rapid medium-range pulses",
-	},	
+	},
+	commweapon_hparticlebeam = {
+		name = "Heavy Particle Beam",
+		description = "A ranged high-energy pulse weapon",
+	},		
 	commweapon_missilelauncher = {
 		name = "Missile Launcher",
-		description = "Fires light seeker missiles",
+		description = "Fires light seeker missiles with good range",
 		func = function(unitDef)
 				unitDef.customparams.nofps = "1"
 			end,		
@@ -189,13 +193,15 @@ upgrades = {
 	},
 	weaponmod_high_frequency_beam = {
 		name = "High Frequency Beam",
-		description = "Beam Laser/Slow Beam/Disruptor Beam: +15% damage and range",
+		description = "Beam Laser/Slow Beam/Disruptor Beam/Particle Beam: +15% damage and range",
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {
 					commweapon_beamlaser = true,
 					commweapon_slowbeam = true,
 					commweapon_disruptor = true,
+					commweapon_lparticlebeam = true,
+					commweapon_hparticlebeam = true,
 				}
 				for i,v in pairs(weapons) do
 					if permitted[i] then
