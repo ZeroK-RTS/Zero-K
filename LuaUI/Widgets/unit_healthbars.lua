@@ -1013,8 +1013,10 @@ do
 
   local sec = 0
   local sec2 = 0
+  local sec3 = 0
 
   local videoFrame   = 0
+  local _1GameFrameSecond = 0.033
 
   function widget:Update(dt)
     sec=sec+dt
@@ -1023,7 +1025,11 @@ do
     gameFrame = GetGameFrame()
 
     videoFrame = videoFrame+1
-    visibleUnits = GetVisibleUnits(-1,nil,false)
+    sec3 = sec3 +dt
+    if sec3 > _1GameFrameSecond then
+        sec3 = 0
+        visibleUnits = GetVisibleUnits(-1,nil,false)
+    end
 
     sec2=sec2+dt
     if (sec2>1/3) then
