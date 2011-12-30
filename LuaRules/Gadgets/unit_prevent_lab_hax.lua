@@ -35,6 +35,7 @@ local spGetUnitPosition = Spring.GetUnitPosition
 local abs = math.abs
 local min = math.min
 
+local terraunitDefID = UnitDefNames["terraunit"].id
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local customSettings = {
@@ -110,7 +111,7 @@ local function AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, fac
 
     local ud = UnitDefs[unitDefID]
 
-    if ud and (ud.isBuilding or ud.speed == 0) then
+    if unitDefID ~= terraunitDefID and ud and (ud.isBuilding or ud.speed == 0) then
     
         local xsize = ud.xsize*4
         local zsize = (ud.ysize or ud.zsize)*4
