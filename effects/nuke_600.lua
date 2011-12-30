@@ -80,6 +80,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         airdrag            = 0.97,
         alwaysvisible      = true,
@@ -167,6 +168,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         airdrag            = 0.97,
         alwaysvisible      = true,
@@ -230,6 +232,7 @@ return {
       count              = 96,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         delay              = [[i1]],
         dir                = [[dir]],
@@ -243,6 +246,7 @@ return {
       count              = 128,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         delay              = [[i1]],
         dir                = [[dir]],
@@ -256,6 +260,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         delay              = 64,
         dir                = [[dir]],
@@ -269,6 +274,7 @@ return {
       count              = 32,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         delay              = [[96 i1]],
         dir                = [[dir]],
@@ -384,6 +390,7 @@ return {
       class              = [[CExpGenSpawner]],
       count              = 1,
       water              = true,
+	  underwater		 = true,
       properties = {
         delay              = 30,
         dir                = [[dir]],
@@ -409,6 +416,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       water              = true,
+	  underwater		 = true,
       properties = {
         airdrag            = 0.99,
         alwaysvisible      = true,
@@ -440,6 +448,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         airdrag            = 0.97,
         alwaysvisible      = true,
@@ -471,6 +480,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+	  underwater		 = true,
       properties = {
         airdrag            = 0.97,
         alwaysvisible      = true,
