@@ -181,7 +181,8 @@ local flexCallIns = {
   'DrawScreenEffects',
   'DrawInMiniMap',
   'SelectionChanged',
-  'AddTransmitLine'
+  'AddTransmitLine',
+  'VoiceCommand',
 }
 local flexCallInMap = {}
 for _,ci in ipairs(flexCallIns) do
@@ -256,6 +257,34 @@ local function ripairs(t)
   return rev_iter, t, (1 + #t)
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+local transmitMagic = "> ["..myName.."]!transmit"
+local voiceMagic = "> ["..myName.."]!transmit voice"
+
+Spring.Echo("transmit magic: "..transmitMagic)
+Spring.Echo("voice magic: "..voiceMagic)
+
+function StringStarts(s, start)
+   return string.sub(s, 1, string.len(start)) == start
+end
+
+local function Deserialize(text)
+  local f, err = loadstring(text)
+  if not f then
+    Spring.Echo("Error while deserializing  table (compiling): "..tostring(err))
+    return
+  end
+  setfenv(f, {}) -- sandbox
+  local success, arg = pcall(f)
+  if not success then
+    Spring.Echo("Error while deserializing table (calling): "..tostring(arg))
+    return
+  end
+  return arg
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1198,19 +1227,24 @@ function widgetHandler:CommandNotify(id, params, options)
   end
   return false
 end
-
-
+  
 function widgetHandler:AddConsoleLine(msg, priority)
-  if string.find(msg, "!transmit") then
-    for _,w in ipairs(self.AddTransmitLineList) do
-      w:AddTransmitLine(msg, priority)
+  if StringStarts(msg, transmitMagic) then
+    if StringStarts(msg, voiceMagic) then
+      local tableString = string.sub(msg, string.len(voiceMagic) + 1) -- strip the magic string
+      local voiceCommandParams = Deserialize("return "..tableString) -- deserialize voice command parameters in table form      
+      for _,w in ipairs(self.VoiceCommandList) do
+        w:VoiceCommand(voiceCommandParams.commandName, voiceCommandParams)
+      end
+    else
+      for _,w in ipairs(self.AddTransmitLineList) do
+        w:AddTransmitLine(msg, priority)
+      end
     end
-    return
   else
     for _,w in ipairs(self.AddConsoleLineList) do
       w:AddConsoleLine(msg, priority)
     end
-    return
   end
 end
 

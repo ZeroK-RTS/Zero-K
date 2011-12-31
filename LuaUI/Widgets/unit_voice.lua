@@ -16,32 +16,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local myName
-local voiceMagic
 local factories = {}
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-function StringStarts(s, start)
-   return string.sub(s, 1, string.len(start)) == start
-end
-
-
-local function Deserialize(text)
-  local f, err = loadstring(text)
-  if not f then
-    Spring.Echo("error while deserializing (compiling): "..tostring(err))
-    return
-  end
-  setfenv(f, {}) -- sandbox
-  local success, arg = pcall(f)
-  if not success then
-    Spring.Echo("error while deserializing (calling): "..tostring(arg))
-    return
-  end
-  return arg
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -67,10 +42,6 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-
-  myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
-  voiceMagic = "> ["..myName.."]!transmit voice"
-  
   -- make the widget work after for /luaui reload
   for i, unitID in ipairs(Spring.GetAllUnits()) do
     widget:UnitFinished(unitID, Spring.GetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
@@ -79,45 +50,20 @@ function widget:Initialize()
 end
 
 
-function widget:AddTransmitLine(msg)
-  
-  if StringStarts(msg, voiceMagic) then -- is a voice command
-    local tableString = string.sub(msg, string.len(voiceMagic) + 1)
-    
-    -- deserialize voice command parameters in table form
-    local voiceCommand = Deserialize("return "..tableString)
-    
-    if voiceCommand.commandName == "buildUnit" then
-      -- todo: don't send to factories that can't build the unit
-      for unitID in pairs(factories) do
-        local builtUnitID = UnitDefNames[voiceCommand.unit].id
-        for i=1, voiceCommand.number do
-          -- todo: send large build orders with "shift" and "ctrl" to reduce network usage
-          Spring.GiveOrderToUnit(unitID, -builtUnitID, {}, voiceCommand.insert and {"alt"} or {})
-        end
-        if voiceCommand["repeat"] then
-          Spring.GiveOrderToUnit(unitID, CMD.REPEAT, {1}, {})
-        end
+function widget:VoiceCommand(commandName, voiceCommandParams)
+  if commandName == "buildUnit" then
+    -- todo: don't send to factories that can't build the unit
+    for unitID in pairs(factories) do
+      local builtUnitID = UnitDefNames[voiceCommandParams.unit].id
+      for i=1, voiceCommandParams.number do
+        -- todo: send large build orders with "shift" and "ctrl" to reduce network usage
+        Spring.GiveOrderToUnit(unitID, -builtUnitID, {}, voiceCommandParams.insert and {"alt"} or {})
+      end
+      if voiceCommandParams["repeat"] then
+        Spring.GiveOrderToUnit(unitID, CMD.REPEAT, {1}, {})
       end
     end
-    --[[
-    if voiceCommand.commandName == "factoryPause" then
-      if voiceCommand.mode == "suspend" then
-        for unitID in pairs(factories) do
-          -- implement "if not waiting"
-          Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
-        end
-      elseif voiceCommand.mode == "resume" then
-        for unitID in pairs(factories) do
-          -- implement "if waiting"
-          Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
-        end
-      end
-    end
-    --]]
-    
   end
-  
 end
 
 
