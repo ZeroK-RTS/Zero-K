@@ -181,6 +181,7 @@ local flexCallIns = {
   'DrawScreenEffects',
   'DrawInMiniMap',
   'SelectionChanged',
+  'AddTransmitLine'
 }
 local flexCallInMap = {}
 for _,ci in ipairs(flexCallIns) do
@@ -1200,10 +1201,17 @@ end
 
 
 function widgetHandler:AddConsoleLine(msg, priority)
-  for _,w in ipairs(self.AddConsoleLineList) do
-    w:AddConsoleLine(msg, priority)
+  if string.find(msg, "!transmit") then
+    for _,w in ipairs(self.AddTransmitLineList) do
+      w:AddTransmitLine(msg, priority)
+    end
+    return
+  else
+    for _,w in ipairs(self.AddConsoleLineList) do
+      w:AddConsoleLine(msg, priority)
+    end
+    return
   end
-  return
 end
 
 
