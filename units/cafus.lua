@@ -30,7 +30,6 @@ unitDef = {
     pylonrange = 800,
   },
 
-  damageModifier                = 0.95,
   energyMake                    = 225,
   energyUse                     = 0,
   explodeAs                     = [[GRAV_BLAST]],

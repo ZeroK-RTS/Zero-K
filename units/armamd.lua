@@ -32,7 +32,6 @@ unitDef = {
 	helptext_de    = [[Der Protector fängt automatisch gegnerische, atomare Interkontinentalraketen, welche in den, vom System abgedeckten, Bereich zielen, ab.]],
   },
 
-  damageModifier                = 0.5,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 5,
   footprintZ                    = 8,

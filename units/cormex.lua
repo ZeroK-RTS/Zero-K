@@ -31,7 +31,6 @@ unitDef = {
     pylonrange         = 50,
   },
 
-  damageModifier         = 0.4,
   energyUse              = 0,
   explodeAs              = [[SMALL_BUILDINGEX]],
   extractsMetal          = 0.001,

@@ -30,7 +30,6 @@ unitDef = {
 	helptext_de    = [[Der Merl feuert seine Raketen senkrecht ab. Ihn zeichnen seine hohe Präzision und die lange Reichweite seiner Flugkörper, sowie die Möglichkeit über Hindernisse zu schießen, aus. Die große Flugzeit macht ihn aber nutzlos gegenüber sich bewegenden Einheiten. Nutze den Merl, um spezielle Einheiten/Gebäude zu zerstören.]],
   },
 
-  damageModifier      = 1,
   defaultmissiontype  = [[Standby]],
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,

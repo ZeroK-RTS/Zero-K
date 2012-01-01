@@ -30,7 +30,6 @@ unitDef = {
 	helptext_de    = [[Der Detriment ist der stärkste Strider auf dem Platz. Er verteidigt sich selbst gegen Luftattacken oder nutzt seine Raketen, um entfernte Ziele zu treffen. Des Weiteren besitzt er eine Gaußkanone, die nur für einen Zweck konzipiert wurde: das schnelle und sichere Töten von starken, gegnerischen Einheiten. Beachte - der kluge Feldherr schickt seinen Detriment mit angebrachter Unterstützung aus, um Gruppen leichter Gegner, bzw. Lufteinheiten in Schach zu halten.]],
   },
 
-  damageModifier         = 1,
   defaultmissiontype     = [[Standby]],
   explodeAs              = [[NUCLEAR_MISSILE]],
   footprintX             = 6,
