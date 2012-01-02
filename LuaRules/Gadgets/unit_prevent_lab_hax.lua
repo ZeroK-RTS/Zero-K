@@ -38,12 +38,6 @@ local min = math.min
 local terraunitDefID = UnitDefNames["terraunit"].id
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local customSettings = {
-	corsy = {xsize = 32, zsize = 12, dispFacing = 0, dispRAngle = 4, reorient = false}
-}
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 local lab = {}
 _G.lab = lab
@@ -107,7 +101,7 @@ end
 
 -- http://springrts.com/mantis/view.php?id=2864
 -- http://springrts.com/mantis/view.php?id=2870
-local function AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, facing) -- engine one does not have facing
+local function AllowUnitCreation(unitDefID, builderID, builderTeam, ux, uy, uz, facing) -- engine one does not have facing
 
     local ud = UnitDefs[unitDefID]
 
@@ -117,19 +111,49 @@ local function AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, fac
         local zsize = (ud.ysize or ud.zsize)*4
         
         local minx, maxx, minz, maxz
-        
-        if ((face == 0) or (face == 2))  then
-            minx = x-zsize
-            minz = z-xsize
-            maxx = x+zsize
-            maxz = z+xsize
-        else
-            minx = x-xsize
-            minz = z-zsize
-            maxx = x+xsize
-            maxz = z+zsize
-        end
-        
+		
+        if ((facing == 0) or (facing == 2))  then
+            
+			if xsize%16 == 0 then
+				ux = math.floor((ux+8)/16)*16
+			else
+				ux = math.floor(ux/16)*16+8
+			end
+
+			if zsize%16 == 0 then
+				uz = math.floor((uz+8)/16)*16
+			else
+				uz = math.floor(uz/16)*16+8
+			end
+			
+			minx = ux-xsize
+            minz = uz-zsize
+            maxx = ux+xsize
+            maxz = uz+zsize
+		else
+			if xsize%16 == 0 then
+				uz = math.floor((uz+8)/16)*16
+			else
+				uz = math.floor(uz/16)*16+8
+			end
+
+			if zsize%16 == 0 then
+				ux = math.floor((ux+8)/16)*16
+			else
+				ux = math.floor(ux/16)*16+8
+			end
+		
+		    minx = ux-zsize
+            minz = uz-xsize
+            maxx = ux+zsize
+            maxz = uz+xsize
+        end        
+		
+       	--Spring.MarkerAddLine(minx,0,minz,maxx,0,minz)
+		--Spring.MarkerAddLine(minx,0,minz,minx,0,maxz)
+		--Spring.MarkerAddLine(maxx,0,maxz,maxx,0,minz)
+		--Spring.MarkerAddLine(maxx,0,maxz,minx,0,maxz)
+		
         for Lid,Lv in pairs(lab) do  
             -- intersection of 2 rectangles
             if Lv.minx < maxx and Lv.maxx > minx and Lv.minz < maxz and Lv.maxz > minz then
@@ -156,37 +180,53 @@ function gadget:UnitCreated(unitID, unitDefID)
   local ud = UnitDefs[unitDefID]
   local name = ud.name
   if (ud.isFactory == true) and not (name == "factoryplane" or name == "factorygunship" or name == "missilesilo") then
-	local customData = customSettings[name] or {}
 	local ux, uy, uz  = spGetUnitPosition(unitID)
 	local face = spGetUnitBuildFacing(unitID)
-	local xsize = (customData.xsize or ud.xsize)*4
-	local zsize = (customData.zsize or ud.ysize or ud.zsize)*4
+	local xsize = (ud.xsize)*4
+	local zsize = (ud.ysize or ud.zsize)*4
 	local team = spGetUnitAllyTeam(unitID)
-	
-	local dispF = (customData.dispFacing or 0)
-	local dispR = (customData.dispRAngle or 0)
-	if face == 0 then
-		uz = uz + dispF
-		ux = ux + dispR
-	elseif face == 1 then
-		uz = uz - dispR
-		ux = ux - dispF
-	elseif face == 2 then
-		uz = uz - dispF
-		ux = ux - dispR
-	else
-		uz = uz + dispR
-		ux = ux + dispF
-	end
-	
+
 	if ((face == 0) or (face == 2))  then
-	  lab[unitID] = { team = team, face = 1 - (customData.reorient and 0 or 1),
-	  minx = ux-zsize, minz = uz-xsize, maxx = ux+zsize, maxz = uz+xsize}
+		if xsize%16 == 0 then
+			ux = math.floor((ux+8)/16)*16
+		else
+			ux = math.floor(ux/16)*16+8
+		end
+
+		if zsize%16 == 0 then
+			uz = math.floor((uz+8)/16)*16
+		else
+			uz = math.floor(uz/16)*16+8
+		end
+	
+		lab[unitID] = { team = team, face = 0,
+			minx = ux-xsize+0.1, minz = uz-zsize+0.1, maxx = ux+xsize-0.1, maxz = uz+zsize-0.1}
 	else
-	  lab[unitID] = { team = team, face = 1 - (customData.reorient and 1 or 0),
-	  minx = ux-xsize, minz = uz-zsize, maxx = ux+xsize, maxz = uz+zsize}
+		if xsize%16 == 0 then
+			uz = math.floor((uz+8)/16)*16
+		else
+			uz = math.floor(uz/16)*16+8
+		end
+
+		if zsize%16 == 0 then
+			ux = math.floor((ux+8)/16)*16
+		else
+			ux = math.floor(ux/16)*16+8
+		end
+		
+		lab[unitID] = { team = team, face = 1,
+			minx = ux-zsize+0.1, minz = uz-xsize+0.1, maxx = ux+zsize-0.1, maxz = uz+xsize-0.1}
 	end
 	
+	--Spring.Echo(face)
+	--Spring.Echo(xsize)
+	--Spring.Echo(zsize)
+	
+	--Spring.MarkerAddLine(lab[unitID].minx,0,lab[unitID].minz,lab[unitID].maxx,0,lab[unitID].minz)
+	--Spring.MarkerAddLine(lab[unitID].minx,0,lab[unitID].minz,lab[unitID].minx,0,lab[unitID].maxz)
+	--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].maxx,0,lab[unitID].minz)
+	--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].minx,0,lab[unitID].maxz)
+
 	lab[unitID].miny = spGetGroundHeight(ux,uz)
 	lab[unitID].maxy = lab[unitID].miny+100
 	
