@@ -136,7 +136,7 @@ local options =
     desc   = 'Disables the use of the /ally command for ingame ceasefires. \nkey: fixedallies',
     type   = 'bool',
 	section = 'diplomacy',
-    def    = true,
+    def    = false,
   },
 
   {
