@@ -3,10 +3,10 @@ unitDef = {
   name                = [[Hovercon]],
   description         = [[Construction Hovercraft, Builds at 6 m/s]],
   acceleration        = 0.066,
-  brakeRate           = 0.0808,
+  brakeRate           = 0.1,
   buildCostEnergy     = 150,
   buildCostMetal      = 150,
-  buildDistance       = 90,
+  buildDistance       = 140,
   builder             = true,
 
   buildoptions        = {
