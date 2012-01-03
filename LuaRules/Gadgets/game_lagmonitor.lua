@@ -63,7 +63,7 @@ end
 
 local teamActivity = {}
 
-function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
+--[[function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
 	teamActivity[teamID]= Spring.GetGameSeconds()
 	return true
 end 
@@ -71,7 +71,7 @@ end
 function gadget:GotChatMsg(msg, player) -- FIXME this does not actually get fired
 	local _, _, spec, teamID, allyTeamID = Spring.GetPlayerInfo(player)
 	teamActivity[teamID] = Spring.GetGameSeconds()
-end 
+end ]]--
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local pauseGame = false
@@ -120,11 +120,11 @@ function gadget:GameFrame(n)
 		
 		for i=1,#players do
 			local name,active,spec,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
-			local activity = teamActivity[team]
+			--local activity = teamActivity[team]
 		
 			if not spec then 
 				if (afkTeams[team] ~= nil) then
-					if active and ping <= 2000 and activity ~= nil and gameSecond - activity < 10 then
+					if active and ping <= 2000 then -- and activity ~= nil and gameSecond-activity<10 
 						GG.allowTransfer = true
 						for unitID, uteam in pairs(lineage) do
 							if (uteam == team) then
@@ -136,7 +136,7 @@ function gadget:GameFrame(n)
 						afkTeams[team] = false
 					end 
 				else  	
-					if not active or ping >= LAG_THRESHOLD or activity == nil or gameSecond - activity > AFK_THRESHOLD then
+					if not active or ping >= LAG_THRESHOLD  then --or activity == nil or gameSecond - activity > AFK_THRESHOLD
 						local units = Spring.GetTeamUnits(team)
 						laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
 					end
