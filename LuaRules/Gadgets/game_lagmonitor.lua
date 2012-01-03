@@ -76,7 +76,7 @@ end
 --------------------------------------------------------------------------------
 local pauseGame = false
 local mode = "giveall"
-local UPDATE_PERIOD = 120	-- gameframes
+local UPDATE_PERIOD = 50	-- gameframes
 
 local function GetRecepient(allyTeam, laggers)
 	local teams = Spring.GetTeamList(allyTeam)
@@ -88,7 +88,7 @@ local function GetRecepient(allyTeam, laggers)
 		local leader = select(2, Spring.GetTeamInfo(teams[i]))
 		local name, active, spectator, _, _, _, _, _, _, customKeys = Spring.GetPlayerInfo(leader)
 		if active and not spectator and not laggers[leader] then	-- only consider giving to someone in position to take!
-			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = tonumber(customKeys.level)}
+			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = tonumber(customKeys.elo)}
 		end
 	end
 
