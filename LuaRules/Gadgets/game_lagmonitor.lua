@@ -119,27 +119,29 @@ function gadget:GameFrame(n)
 		local gameSecond = Spring.GetGameSeconds()
 		
 		for i=1,#players do
-			local name,_,_,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
+			local name,active,spec,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
 			local activity = teamActivity[team]
 		
-			if (afkTeams[team] ~= nil) then
-				if ping <= 2000 or (activity ~= nil and gameSecond - activity < 10) then
-					GG.allowTransfer = true
-					for unitID, uteam in pairs(lineage) do
-						if (uteam == team) then
-							Spring.TransferUnit(unitID, team, true)
+			if not spec then 
+				if (afkTeams[team] ~= nil) then
+					if active and ping <= 2000 and activity ~= nil and gameSecond - activity < 10 then
+						GG.allowTransfer = true
+						for unitID, uteam in pairs(lineage) do
+							if (uteam == team) then
+								Spring.TransferUnit(unitID, team, true)
+							end
 						end
-					end
 					
-					GG.allowTransfer = false
-					afkTeams[team] = false
+						GG.allowTransfer = false
+						afkTeams[team] = false
+					end 
+				else  	
+					if not active or ping >= LAG_THRESHOLD or activity == nil or gameSecond - activity > AFK_THRESHOLD then
+						local units = Spring.GetTeamUnits(team)
+						laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
+					end
 				end 
-			else  	
-				if ping >= LAG_THRESHOLD or activity == nil or gameSecond - activity > AFK_THRESHOLD then
-					local units = Spring.GetTeamUnits(team)
-					laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
-				end
-			end 
+			end
 		end
 		
 		for playerID, data in pairs(laggers) do
