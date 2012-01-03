@@ -24,22 +24,22 @@ end
   
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local lineage = {}	--[unitID] = team
-local noChangeLineage = {}	-- [unitID] = bool; if true unit will not change lineage on transfer
+local lineage = {}
 
 local LAG_THRESHOLD = 25000
+local AFK_THRESHOLD = 30
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	lineage[unitID] = nil
+end
+
 
 -- uncomment this lineage-handling stuff once it's actually needed (or move to a separate gadget)
 --[[
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	lineage[unitID] = builderID and (lineage[builderID] or Spring.GetUnitTeam(builderID)) or unitTeam
-end
-
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	lineage[unitID] = nil
-	noChangeLineage[unitID] = nil
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
@@ -52,10 +52,13 @@ function GG.GetLineage(unitID)
 	return lineage[unitID]
 end
 ]]--
-function GG.AllowLineageChangeOnTransfer(unitID, bool)
-	--noChangeLineage[unitID] = bool
-end
 
+GG.allowTransfer = false
+
+function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
+	if capture then return true end
+	return GG.allowTransfer
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local pauseGame = false
@@ -93,15 +96,44 @@ local function GetRecepient(allyTeam, laggers)
 end
 
 
+local numMousePos     = 2 --//num mouse pos in 1 packet
+GG.alliedCurosrPos = {}
+
+function gadget:RecvLuaMsg(msg, playerID)
+  if (msg:sub(1,1)=="%")
+  then
+    local xz = msg:sub(3)
+
+    local l = xz:len()*0.25
+    if (l==numMousePos) then
+      for i=0,numMousePos-1 do
+        local x = VFS.UnpackU16(xz:sub(i*4+1,i*4+2))
+        local z = VFS.UnpackU16(xz:sub(i*4+3,i*4+4))
+        newPos[i*2+1]   = x
+        newPos[i*2+2] = z
+      end
+
+      local old = GG.alliedCurosrPos[playerID]
+	  if (old == nil or old[1] ~= newPos[1] or old[2] ~= newPos[2]) then 
+		GG.alliedCurosrPos[playerID] = {newPos[1], newPos[2], Spring.GetGameSeconds()}
+	  end
+	end 
+  end
+end
+
+
 function gadget:GameFrame(n)
 	if n%UPDATE_PERIOD == 0 then
 		local laggers = {}
 		local players = Spring.GetPlayerList()
 		local recepientByAllyTeam = {}
+		local gameSecond = Spring.GetGameSeconds()
+		
 		
 		for i=1,#players do
 			local name,_,_,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
-			if ping >= LAG_THRESHOLD then
+			local oldPos = GG.alliedCurosrPos[team]
+			if ping >= LAG_THRESHOLD or oldPos == nil or gameSecond - oldPos[3] > AFK_THRESHOLD then
 				local units = Spring.GetTeamUnits(team)
 				laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
 			end
@@ -132,11 +164,12 @@ function gadget:GameFrame(n)
 						local units = data.units or {}
 						if #units > 0 then
 							Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag")
+							GG.allowTransfer = true
 							for j=1,#units do
-								GG.AllowLineageChangeOnTransfer(units[j], false)
+								lineage[units[j]] = team
 								Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
-								GG.AllowLineageChangeOnTransfer(units[j], true)
 							end
+							GG.allowTransfer = false
 						end
 					end	-- if
 					

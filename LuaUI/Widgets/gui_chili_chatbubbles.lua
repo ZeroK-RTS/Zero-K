@@ -231,7 +231,10 @@ function widget:AddChatMessage(player, msg, type)
 
 	local pp = nil
 	if WG.alliedCursorsPos then 
-		pp = WG.alliedCursorsPos[player]
+		local cur = WG.alliedCursorsPos[player]
+		if cur ~= nil then 
+			pp = {cur[1], cur[2], cur[3], cur[4]}
+		end
 	end 
 
 	
