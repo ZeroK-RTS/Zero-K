@@ -74,7 +74,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local pauseGame = false
-local mode = "debug"
+local mode = "giveall"
 local UPDATE_PERIOD = 120	-- gameframes
 
 local function GetRecepient(allyTeam, laggers)
