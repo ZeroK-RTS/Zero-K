@@ -25,6 +25,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local lineage = {}
+local afkTeams = {}
 
 local LAG_THRESHOLD = 25000
 local AFK_THRESHOLD = 30
@@ -74,7 +75,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local pauseGame = false
-local mode = "giveall"
+local mode = "debug"
 local UPDATE_PERIOD = 120	-- gameframes
 
 local function GetRecepient(allyTeam, laggers)
@@ -120,13 +121,25 @@ function gadget:GameFrame(n)
 		for i=1,#players do
 			local name,_,_,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
 			local activity = teamActivity[team]
-			--[[if activity ~= nil then
-				Spring.Echo(activity)
-			end ]]--
-			if ping >= LAG_THRESHOLD or activity == nil or gameSecond - activity > AFK_THRESHOLD then
-				local units = Spring.GetTeamUnits(team)
-				laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
-			end
+		
+			if (afkTeams[team] ~= nil) then
+				if ping <= 2000 or (activity ~= nil and gameSecond - activity < 10) then
+					GG.allowTransfer = true
+					for unitID, uteam in pairs(lineage) do
+						if (uteam == team) then
+							Spring.TransferUnit(unitID, team, true)
+						end
+					end
+					
+					GG.allowTransfer = false
+					afkTeams[team] = false
+				end 
+			else  	
+				if ping >= LAG_THRESHOLD or activity == nil or gameSecond - activity > AFK_THRESHOLD then
+					local units = Spring.GetTeamUnits(team)
+					laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
+				end
+			end 
 		end
 		
 		for playerID, data in pairs(laggers) do
@@ -151,6 +164,7 @@ function gadget:GameFrame(n)
 					if mode == "debug" then
 						Spring.Echo("Player " .. data.name .. " is lagging; recommend giving all units to " .. recepientByAllyTeam[allyTeam].name)		
 					elseif mode == "giveall" then
+						afkTeams[team] = true
 						local units = data.units or {}
 						if #units > 0 then
 							Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag")
