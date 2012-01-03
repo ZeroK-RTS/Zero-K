@@ -64,6 +64,7 @@ local teamActivity = {}
 
 function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
 	teamActivity[teamID]= Spring.GetGameSeconds()
+	return true
 end 
 
 function gadget:GotChatMsg(msg, player) -- FIXME this does not actually get fired
