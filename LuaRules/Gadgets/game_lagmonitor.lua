@@ -133,7 +133,7 @@ function gadget:GameFrame(n)
 						end
 					
 						GG.allowTransfer = false
-						afkTeams[team] = false
+						afkTeams[team] = nil
 					end 
 				else  	
 					if not active or ping >= LAG_THRESHOLD  then --or activity == nil or gameSecond - activity > AFK_THRESHOLD
