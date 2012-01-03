@@ -131,9 +131,8 @@ local base = {
 		}
 	},
 	{
-		name = "beam",
+		name = "torp",
 		modules = {
-			"commweapon_beamlaser",
 			"commweapon_torpedo",
 		}
 	},
@@ -190,6 +189,7 @@ local base = {
 		name = "partbeam",
 		modules = {
 			"commweapon_lparticlebeam",
+			"commweapon_hparticlebeam",
 		}
 	},
 	{
