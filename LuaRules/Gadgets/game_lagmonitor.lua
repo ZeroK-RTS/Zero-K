@@ -65,6 +65,11 @@ local teamActivity = {}
 function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
 	teamActivity[teamID]= Spring.GetGameSeconds()
 end 
+
+function gadget:GotChatMsg(msg, player) -- FIXME this does not actually get fired
+	local _, _, spec, teamID, allyTeamID = Spring.GetPlayerInfo(player)
+	teamActivity[teamID] = Spring.GetGameSeconds()
+end 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local pauseGame = false
@@ -114,6 +119,9 @@ function gadget:GameFrame(n)
 		for i=1,#players do
 			local name,_,_,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
 			local activity = teamActivity[team]
+			--[[if activity ~= nil then
+				Spring.Echo(activity)
+			end ]]--
 			if ping >= LAG_THRESHOLD or activity == nil or gameSecond - activity > AFK_THRESHOLD then
 				local units = Spring.GetTeamUnits(team)
 				laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
