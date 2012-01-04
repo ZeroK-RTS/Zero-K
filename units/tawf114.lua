@@ -85,8 +85,8 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 650,
-        subs    = 32.5,
+        default = 325,
+        subs    = 16.25,
       },
 
       edgeEffectiveness       = 0.4,
@@ -101,7 +101,7 @@ unitDef = {
       model                   = [[corbanishrk.s3o]],
       noSelfDamage            = true,
       range                   = 400,
-      reloadtime              = 4,
+      reloadtime              = 2,
       renderType              = 1,
       selfprop                = true,
       smokedelay              = [[0.01]],
