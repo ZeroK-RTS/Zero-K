@@ -193,7 +193,7 @@ function widget:DrawWorld()
 				end
 			end
 		end
-	end
+	
 	for unitID, attributes in pairs(comms) do
 		local heading = GetUnitHeading(unitID)
 		if (not heading) then
@@ -205,11 +205,13 @@ function widget:DrawWorld()
 			glDrawFuncAtUnit(unitID, false, DrawCommName2, unitID, attributes, rot)
 		end
 	end
+	
 
 	glAlphaTest(false)
 	glColor(1,1,1,1)
 	glTexture(false)
 	glDepthTest(false)
+	end
 end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
