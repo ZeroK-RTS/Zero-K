@@ -261,11 +261,10 @@ end
 --------------------------------------------------------------------------------
 
 local myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
-local transmitMagic = "> ["..myName.."]!transmit"
-local voiceMagic = "> ["..myName.."]!transmit voice"
+local transmitMagic = "> ["..myName.."]!transmit" -- Lobby is sending to LuaUI
+local voiceMagic = "> ["..myName.."]!transmit voice" -- Lobby is sending a voice command to LuaUI
+local transmitLobbyMagic = "!transmitlobby" -- LuaUI is sending to lobby
 
-Spring.Echo("transmit magic: "..transmitMagic)
-Spring.Echo("voice magic: "..voiceMagic)
 
 function StringStarts(s, start)
    return string.sub(s, 1, string.len(start)) == start
@@ -1229,22 +1228,27 @@ function widgetHandler:CommandNotify(id, params, options)
 end
   
 function widgetHandler:AddConsoleLine(msg, priority)
-  if StringStarts(msg, transmitMagic) then
+  if StringStarts(msg, transmitLobbyMagic) then -- sending to the lobby
+    return -- ignore
+  elseif StringStarts(msg, transmitMagic) then -- receiving from the lobby
     if StringStarts(msg, voiceMagic) then
       local tableString = string.sub(msg, string.len(voiceMagic) + 1) -- strip the magic string
       local voiceCommandParams = Deserialize("return "..tableString) -- deserialize voice command parameters in table form      
       for _,w in ipairs(self.VoiceCommandList) do
         w:VoiceCommand(voiceCommandParams.commandName, voiceCommandParams)
       end
+      return
     else
       for _,w in ipairs(self.AddTransmitLineList) do
         w:AddTransmitLine(msg, priority)
       end
+      return
     end
   else
     for _,w in ipairs(self.AddConsoleLineList) do
       w:AddConsoleLine(msg, priority)
     end
+    return
   end
 end
 
