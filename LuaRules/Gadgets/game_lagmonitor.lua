@@ -36,46 +36,31 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	lineage[unitID] = nil
 end
 
-
--- uncomment this lineage-handling stuff once it's actually needed (or move to a separate gadget)
---[[
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	lineage[unitID] = builderID and (lineage[builderID] or Spring.GetUnitTeam(builderID)) or unitTeam
 end
 
-function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-	if not noChangeLineage[unitID] then
-		lineage[unitID] = teamID
-	end
-end
 
-function GG.GetLineage(unitID)
-	return lineage[unitID]
+GG.allowTransfer = false
+--FIXME block transfers for /take but allow manual H/crude list gives
+--[[
+function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture) 
+	if capture then return true end
+	return GG.allowTransfer  
 end
 ]]--
 
-GG.allowTransfer = false
+local pActivity = {}
 
-function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture) -- todo handle unit gives somehow
-	if capture then return true end
-	return GG.allowTransfer
+
+function gadget:RecvLuaMsg(msg, playerID)
+	if msg:find("AFK",1,true) then
+		pActivity[playerID] = tonumber(msg:sub(4))
+	end 
 end
 
-local teamActivity = {}
-
---[[function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
-	teamActivity[teamID]= Spring.GetGameSeconds()
-	return true
-end 
-
-function gadget:GotChatMsg(msg, player) -- FIXME this does not actually get fired
-	local _, _, spec, teamID, allyTeamID = Spring.GetPlayerInfo(player)
-	teamActivity[teamID] = Spring.GetGameSeconds()
-end ]]--
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local pauseGame = false
-local mode = "giveall"
 local UPDATE_PERIOD = 50	-- gameframes
 
 local function GetRecepient(allyTeam, laggers)
@@ -120,23 +105,24 @@ function gadget:GameFrame(n)
 		
 		for i=1,#players do
 			local name,active,spec,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
-			--local activity = teamActivity[team]
-		
+			local afk = Spring.GetGameSeconds() - (pActivity[players[i]] or 0)
 			if not spec then 
-				if (afkTeams[team] ~= nil) then
-					if active and ping <= 2000 then -- and activity ~= nil and gameSecond-activity<10 
+				if (afkTeams[team] ~= nil) then  -- team is AFK 
+					-- team no longer AFK, return his units
+					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- and activity ~= nil and gameSecond-activity<10 
+						Spring.Echo("Player " .. name .. " is no longer lagging; returning all his units")
 						GG.allowTransfer = true
 						for unitID, uteam in pairs(lineage) do
 							if (uteam == team) then
 								Spring.TransferUnit(unitID, team, true)
 							end
 						end
-					
 						GG.allowTransfer = false
 						afkTeams[team] = nil
 					end 
 				else  	
-					if not active or ping >= LAG_THRESHOLD  then --or activity == nil or gameSecond - activity > AFK_THRESHOLD
+					if not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD then 
+						-- player afk mark him
 						local units = Spring.GetTeamUnits(team)
 						laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
 					end
@@ -163,24 +149,16 @@ function gadget:GameFrame(n)
 			
 			-- okay, we have someone to give to, prep transfer
 				if recepientByAllyTeam[allyTeam] then
-					if mode == "debug" then
-						Spring.Echo("Player " .. data.name .. " is lagging; recommend giving all units to " .. recepientByAllyTeam[allyTeam].name)		
-					elseif mode == "giveall" then
-						afkTeams[team] = true
-						local units = data.units or {}
-						if #units > 0 then
-							Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag")
-							GG.allowTransfer = true
-							for j=1,#units do
-								lineage[units[j]] = team
-								Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
-							end
-							GG.allowTransfer = false
+					afkTeams[team] = true
+					local units = data.units or {}
+					if #units > 0 then
+						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag")
+						GG.allowTransfer = true
+						for j=1,#units do
+							lineage[units[j]] = team
+							Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
 						end
-					end	-- if
-					
-					if pauseGame then
-						-- TODO: allow pause if desired
+						GG.allowTransfer = false
 					end
 				end	-- if
 			end	-- if
