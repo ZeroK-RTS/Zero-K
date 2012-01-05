@@ -81,6 +81,7 @@ local function GetRecepient(allyTeam, laggers)
 	for i=1,#candidatesForTake do
 		local player = candidatesForTake[i]
 		if (player.rank or 0) > highestRank then
+    highestRank = player.rank
 			target = player
 		end
 	end
