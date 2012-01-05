@@ -120,13 +120,14 @@ function gadget:GameFrame(n)
 						GG.allowTransfer = false
 						afkTeams[team] = nil
 					end 
-				else  	
-					if not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD then 
-						-- player afk mark him
-						local units = Spring.GetTeamUnits(team)
+				end
+				if not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD then 
+					-- player afk mark him
+					local units = Spring.GetTeamUnits(team)
+					if units ~= nil and #units > 0 then 
 						laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
-					end
-				end 
+					end 
+				end
 			end
 		end
 		
