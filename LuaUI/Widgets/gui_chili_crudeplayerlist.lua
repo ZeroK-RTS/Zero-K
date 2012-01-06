@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Crude Player List v1.2",
-    desc      = "v1.3 Chili Crude Player List.",
+    desc      = "v1.31 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
@@ -320,9 +320,27 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- setting up player names
 
-local function 	WriteAllyTeamNumbers(allyTeam)
+local function AddCfCheckbox(allyTeam)
+	local fontsize = options.text_height.value
+	if cf and allyTeam ~= -1 and allyTeam ~= localAlliance then
+		local cfCheck = Checkbox:New{
+			x=x_cf,y=(fontsize+1) * row + 3,width=20,
+			caption='',
+			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
+			tooltip = CfTooltip(allyTeam),
+			OnChange = { function(self)
+				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. allyTeam)
+				self.tooltip = CfTooltip(allyTeam)
+			end },
+		}
+		scroll_cpl:AddChild(cfCheck)
+		cfCheckBoxes[allyTeam] = cfCheck
+	end
+end
+
+
+local function	WriteAllyTeamNumbers(allyTeam)
 	local fontsize = options.text_height.value
 	local aCol = {1,0,0,1}
 	if allyTeam == -1 then
@@ -347,21 +365,6 @@ local function 	WriteAllyTeamNumbers(allyTeam)
 			autosize = false,
 		}
 	)
-	-- ceasefire button
-	if cf and allyTeam ~= -1 and allyTeam ~= localAlliance then
-		local cfCheck = Checkbox:New{
-			x=x_cf,y=(fontsize+1) * row + 3,width=20,
-			caption='',
-			checked = Spring.GetTeamRulesParam(localTeam, 'cf_vote_' ..allyTeam)==1,
-			tooltip = CfTooltip(allyTeam),
-			OnChange = { function(self)
-				Spring.SendLuaRulesMsg('ceasefire:'.. (self.checked and 'n' or 'y') .. allyTeam)
-				self.tooltip = CfTooltip(allyTeam)
-			end },
-		}
-		scroll_cpl:AddChild(cfCheck)
-		cfCheckBoxes[allyTeam] = cfCheck
-	end
 end
 
 -- adds all the entity information
@@ -543,7 +546,7 @@ local function AddTeam(teamID, allyTeamID)
 	end
 end
 
--- adds:	ally team number if applicable, ceasefire button if applicable
+-- adds:	ally team number if applicable, ceasefire button
 local function AddAllyTeam(allyTeamID)
 	if #(allyTeams[allyTeamID] or {}) == 0 then
 		return
@@ -559,6 +562,7 @@ local function AddAllyTeam(allyTeamID)
 	if not options.allyTeamPerTeam.value then
 		WriteAllyTeamNumbers(allyTeamID)
 	end
+	AddCfCheckbox(allyTeamID)
 	
 	-- add each team in the allyteam
 	for i=1,#allyTeams[allyTeamID] do
