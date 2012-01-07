@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		author    = "SirMaverick, Google Frog, KDR_11k, CarRepairer (unified by KingRaptor)",
 		date      = "2009",
 		license   = "GPL",
-		layer     = 0,
+		layer     = 1,
 		enabled   = true  --  loaded by default?
 	}
 end
