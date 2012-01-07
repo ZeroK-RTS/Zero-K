@@ -22,18 +22,7 @@ function widget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-if (Game.startPosType ~= 2) then
-  return false
-end
-
-if (Spring.GetGameFrame() > 1) then
-  widgetHandler:RemoveWidget()
-end
-
+-- version: 1.01
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -114,7 +103,7 @@ end
 
 function widget:Initialize()
   -- only show at the beginning
-  if (Spring.GetGameFrame() > 1) then
+  if (Spring.GetGameFrame() > 1 or Game.startPosType ~= 2) then
     widgetHandler:RemoveWidget()
     return
   end
@@ -206,6 +195,24 @@ function widget:Shutdown()
   gl.DeleteList(startboxDListColor)
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--// The following 2 functions originally located on line 25, and supposed to function similar to 'widget:GameFrame(n)' and line 106. 
+--[[
+if (Game.startPosType ~= 2) then
+  return false
+end
+
+if (Spring.GetGameFrame() > 1) then
+  widgetHandler:RemoveWidget()
+end
+--]]
+
+function widget:GameFrame(n)
+	if (n > 1) then
+	  widgetHandler:RemoveWidget() --// Will remove start box when game start. Widget's function is to draw start box.
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
