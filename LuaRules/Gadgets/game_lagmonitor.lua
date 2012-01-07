@@ -63,12 +63,29 @@ end
 --------------------------------------------------------------------------------
 local UPDATE_PERIOD = 50	-- gameframes
 
+local aiList_Global = {}
+local function CheckIsAI(teamID)
+	local aiList_Local = aiList_Global
+	local returnIsAI = false
+	--//
+	if (aiList_Local[teamID] ~= nil) then
+		returnIsAI = aiList_Local[teamID]
+	else
+		local _,_,_,isAI,_,_ = Spring.GetTeamInfo(teamID)
+		aiList_Local[teamID] = isAI
+		returnIsAI = isAI
+	end
+	--//
+	aiList_Global = aiList_Local
+	return returnIsAI
+end
+
 local function GetRecepient(allyTeam, laggers)
 	local teams = Spring.GetTeamList(allyTeam)
 	local highestRank = 0
 	local candidatesForTake = {}
 	local target
-	-- look for active people to give units to
+	-- look for active people to give units to, including AIs
 	for i=1,#teams do
 		local leader = select(2, Spring.GetTeamInfo(teams[i]))
 		local name, active, spectator, _, _, _, _, _, _, customKeys = Spring.GetPlayerInfo(leader)
@@ -81,7 +98,7 @@ local function GetRecepient(allyTeam, laggers)
 	for i=1,#candidatesForTake do
 		local player = candidatesForTake[i]
 		if (player.rank or 0) > highestRank then
-    highestRank = player.rank
+			highestRank = player.rank
 			target = player
 		end
 	end
@@ -122,8 +139,9 @@ function gadget:GameFrame(n)
 						afkTeams[team] = nil
 					end 
 				end
-				if not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD then 
-					-- player afk mark him
+				local isAI = CheckIsAI(team)
+				if (not isAI) and (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then
+					-- player afk: mark him, except AIs
 					local units = Spring.GetTeamUnits(team)
 					if units ~= nil and #units > 0 then 
 						laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
