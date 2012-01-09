@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece	base, body, turret, firepoint, wake1, wake2;
 
@@ -114,10 +111,7 @@ QueryWeapon1(piecenum) {
 	piecenum = firepoint;
 }
 
-SweetSpot(piecenum)
-{
-	piecenum = base;
-}
+
 
 Killed(severity, corpsetype){
 	explode body type BITMAPONLY | BITMAP1;
@@ -126,11 +120,11 @@ Killed(severity, corpsetype){
 		explode turret type BITMAPONLY | BITMAP1;
 		explode body type BITMAPONLY | BITMAP1;
 	} else if( severity <= 50 ) {
-		corpsetype = 2;
+		corpsetype = 1;
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 		explode body type BITMAPONLY | BITMAP1;
 	} else {
-		corpsetype = 3;
+		corpsetype = 2;
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 		explode body type BITMAPONLY | BITMAP1;
 	}
