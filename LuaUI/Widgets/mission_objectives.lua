@@ -303,7 +303,7 @@ function widget:Initialize()
 	
 	mainWindow:RemoveChild(mainPanel)
 	
-	MakeTestObjectives()
+	--MakeTestObjectives()
 end
 
 --------------------------------------------------------------------------------
