@@ -115,6 +115,16 @@ function widget:AddConsoleLine(line,priority)
 		end
 		votingForceStart = false
 	elseif line:find(string_votetopic) and line:find(string_titleEnd) then	--start new vote
+		if pollActive then --//close previous windows in case Springie started a new vote without terminating the last one.
+			screen0:RemoveChild(window)
+			for i=1,2 do
+				voteCount[i] = 0
+				voteMax[i] = 1	-- protection against div0
+				progress_vote[i]:SetCaption('?/?')
+				progress_vote[i]:SetValue(0)
+			end
+			votingForceStart = false		
+		end
 		pollActive = true
 		screen0:AddChild(window)
 		local indexStart = select(2, line:find(string_votetopic))
