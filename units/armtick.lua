@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Tick]],
   description            = [[All-Terrain EMP Crawling Bomb]],
   acceleration           = 0.25,
-  bmcode                 = [[1]],
   brakeRate              = 0.6,
   buildCostEnergy        = 100,
   buildCostMetal         = 100,
@@ -37,7 +36,6 @@ unitDef = {
 	helptext_de    = [[Geschickt eingesetzt kann Tick sich mehrfach rentieren. Nutze Tick, um gegnerische Verteidigung, schwere Einheiten und gut geschützte Einheiten mit langsamen Waffen zu paralysieren. Andere deiner Einheiten haben so die Möglichkeit die feindlichen Truppen einfach, ohne Risiko zu eleminieren. Konter diese Einheit mit Raketentürmen oder einzelnen, billigen Einheiten. Diese Einheit tarnt sich sobald sie sich nicht mehr bewegt.]],
   },
 
-  designation            = [[ARM-PASPD2]],
   explodeAs              = [[ARMTICK_DEATH]],
   fireState              = 0,
   footprintX             = 1,
@@ -68,79 +66,10 @@ unitDef = {
 
   },
 
-  shootme                = [[1]],
   side                   = [[ARM]],
   sightDistance          = 160,
   smoothAnim             = true,
-  steeringmode           = [[1]],
-  TEDClass               = [[TANK]],
-  threed                 = [[1]],
   turnRate               = 3000,
-  wpri_badtargetcategory = [[VTOL]],
-  zbuffer                = [[1]],
-
-  featureDefs            = {
-
-    DEAD  = {
-      description      = [[Wreckage - Tick]],
-      blocking         = true,
-      category         = [[arm_corpses]],
-      damage           = 50,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[smudge01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 40,
-      object           = [[armtick_dead]],
-      reclaimable      = true,
-      reclaimTime      = 40,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
-    },
-
-
-    DEAD2 = {
-      description      = [[Debris - Tick]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 50,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[smudge01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 40,
-      object           = [[debris1x1a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 40,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
-    },
-
-
-    HEAP  = {
-      description      = [[Debris - Tick]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 50,
-      featurereclamate = [[smudge01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 20,
-      object           = [[debris1x1a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 20,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
-    },
-
-  },
-
 }
 
 return lowerkeys({ armtick = unitDef })
