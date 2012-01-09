@@ -1,13 +1,13 @@
-local versionName = "v3.01"
+local versionName = "v3.05"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
   return {
-    name      = "Avatars_1",
+    name      = "Avatars",
     desc      = "An API for a per-user avatar-icon system, + Hello/Hi protocol (experimental)",
     author    = "jK, +msafwan",
-    date      = "2009, +2011 (9 Nov)",
+    date      = "2009, +2012 (9 Jan)",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     api       = false,
@@ -28,8 +28,8 @@ local checksumB		= "4"
 local payloadA		= "5"
 local payloadB		= "6"
 local bye			= "7"
-local broadcastID 	= "&AAB"	--an identifier for packet that work differently than the above but still belong here
-local operatingModeThis = "B"	--a switch to enable old Custom Avatar functionality ("A") and new fixed Avatar functionality ("B")
+local broadcastID 	= "&AAB"	--an identifier for packet that work differently than all the above but still belong here
+local operatingModeThis = "A"	--a switch to enable old Custom Avatar functionality ("A") and new fixed Avatar functionality ("B")
 --Operating Mode A: Exchange custom Avatar (an avatar supplied by user)
 --Computer A
 --|............|Computer B
@@ -81,6 +81,8 @@ local numberOfRetry = 7 --times to send "hi" until remote computer reply
 local maxChecksumLenght= 2000  --if greater than 2049 will cause unpack error 
 --reference: http://www.promixis.com/forums/showthread.php?15419-Lua-Limits-on-Table-Size
 
+local networkDelayMultiplier = 1.15 --// add extra 15% delay for safety.
+
 local configFile = "LuaUI/Configs/avatars.lua"
 local avatarsDir = "LuaUI/Configs/Avatars/"
 local avatar_fallback = avatarsDir .. "Crystal_personal.png"
@@ -110,9 +112,9 @@ end
 
 local function SaveToFile(filename, data, checksum)
 	local file="none"
-	if(data:len()/1024 >= maxFileSize) then
+	if(data:len()/1024 >= maxFileSize) then --//enable neat/original filename only for operational mode "A" where file size can be greater than 10Kb
 		file = avatarsDir .. filename --original filename only (look neat and filename consistent with web based avatar, but risk overwrite similar named file)
-	else
+	else --//add checksum to filename to prevent name duplication
 		file = avatarsDir .. checksum .. '_' .. filename --filename + checksum as name (very safe but messy filename)
 	end
 	Spring.CreateDir(avatarsDir)
@@ -157,9 +159,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function GetAvatar(playername)
+local function GetAvatar(playername) --//to be called by Chatbubble widget. Return player's avatar
 	local avInfo = avatars[playername]
-	return (avInfo and avInfo.file) --if no entry then will return nil (chatbubble can handle the nil value)
+	return (avInfo and avInfo.file) --else return nil (chatbubble can handle the nil value)
 end
 
 
@@ -197,6 +199,63 @@ local function SetMyAvatar(filename)
 	Spring.SendLuaUIMsg(broadcastID) --send 'checkout my new pic!' to everyone
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function GetPlayersData(switch, playerID) --//group player's info as a function to facilitate debuggings. Values can be injected to test multi-player condition.
+	if switch == 1 then --//used by self
+		local _,_,_,_,_,_,_,_,_,customKeys = Spring.GetPlayerInfo(playerID)
+		return customKeys
+		--local customKeys ={avatar="picA"}
+		--return customKeys
+	elseif switch == 2 then --//used by all players
+		local playerName = Spring.GetPlayerInfo(playerID)
+		return playerName
+		--local playerName = {"A", "B", "C", "D", "E"}
+		--return playerName[playerID+1]
+	elseif switch == 3 then --//used by self or other players
+		local _,_,_,_,_,targetPingTime,_,_,_,_= Spring.GetPlayerInfo(playerID)
+		return targetPingTime
+		--local targetPingTime = 666
+		--return targetPingTime
+	elseif switch == 4 then --//used by all players
+		local playerName,_,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,playerCustomKeys = Spring.GetPlayerInfo(playerID)
+		return playerName, playerIsSpectator,playerAllyTeamID, playerCustomKeys
+		--local playerName = {"A", "B", "C", "D", "E"}
+		--local playerIsSpectator = {false,false,false,false,false}
+		--local playerAllyTeamID = {1, 1, 1, 1, 1}
+		--local playerCustomKeys = {"picA","picB","picC","picD","picE"}
+		--return playerName[playerID+1], playerIsSpectator[playerID+1],playerAllyTeamID[playerID+1], playerCustomKeys[playerID+1]
+	elseif switch == 5 then --//used by all players
+		local _,playerIsActive,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
+		return playerIsActive,playerIsSpectator,playerAllyTeamID
+		--local playerIsActive = {true,true, true,true,true}
+		--local playerIsSpectator = {false,false,false,false,false}
+		--local playerAllyTeamID = {1, 1, 1, 1, 1}
+		--return playerIsActive[playerID+1],playerIsSpectator[playerID+1],playerAllyTeamID[playerID+1]
+	elseif switch == 6 then --//used by self
+		local name,_,iAmSpectator,_,allyTeamID,_,_,_,_,customKeys = Spring.GetPlayerInfo(playerID)
+		return name,iAmSpectator,allyTeamID,customKeys
+		--local name = "A"
+		--local iAmSpectator = false
+		--local allyTeamID = 1
+		--local customKeys = {avatar="picA"}
+		--return name,iAmSpectator,allyTeamID,customKeys
+	elseif switch == 7 then --//used by self
+		local myPlayerID_local=Spring.GetMyPlayerID()
+		return myPlayerID_local
+		--local myPlayerID_local = 1
+		--return myPlayerID_local
+	elseif switch == 8 then --//used by all players
+		local playerIDlist_local=Spring.GetPlayerList()
+		return playerIDlist_local
+		--local playerIDlist_local = {0,1,2,3,4}
+		--return playerIDlist_local
+	elseif switch == 9 then --//used by all players (operation mode "B")
+		local _,_,_,_,_,_,_,_,_,customKeys = Spring.GetPlayerInfo(playerID)
+		return customKeys	
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -311,7 +370,7 @@ local function SetAvatarGUI()
 		caption    = "Default";
 		OnClick    = {
 			function()
-				local _,_,_,_,_,_,_,_,_,customKeys = Spring.GetPlayerInfo(myPlayerID)
+				local customKeys = GetPlayersData(1, myPlayerID)
 				local myAvatar={}
 				myAvatar=InitializeDefaultAvatar(myAvatar, customKeys)
 				image.file = myAvatar.file
@@ -380,7 +439,7 @@ local function ConvertStringIntoFileRequest (fileRequestCode)
 	local index = 1
 	for i=1, i <= requestCount do
 		local id = tonumber(fileRequestCode:sub(i*2-1,i*2))
-		local _,_,_,_,_,_,_,_,_,playerCustomKeys = Spring.GetPlayerInfo(id)	--filter out request that has no server data
+		local playerCustomKeys = GetPlayersData(9, id) --filter out request that has no server data
 		if (playerCustomKeys ~= nil and playerCustomKeys.avatar~=nil) then 
 			fileRequestTable[index]={
 				id, --eg:(1,2),(3,4),(5,6),(7,8),(9,10)
@@ -391,6 +450,13 @@ local function ConvertStringIntoFileRequest (fileRequestCode)
 	end
 	return fileRequestTable
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 --communication protocol variables
 local waitTransmissionUntilThisTime =currentTime
@@ -437,7 +503,7 @@ function widget:Update(n)
 			openPortForID=playerID
 			waitForTransmission=true
 			local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-			waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
+			waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
 			Spring.SendLuaUIMsg(msgID .. operatingModeThis .. hi .. openPortForID+100) --send 'hi' to colleague
 		end
 	end
@@ -460,7 +526,7 @@ function widget:Update(n)
 						Spring.SendLuaUIMsg(msgID .. operationMode .. yes .. openPortForID+100)
 						waitForTransmission=true
 						local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
 					end
 				elseif msg:sub(6,6)==yes then --received yes
 					local operationMode = msg:sub(5,5)
@@ -475,13 +541,13 @@ function widget:Update(n)
 					----
 					end
 					local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
 				elseif msg:sub(6,6)==checksumA then --receive checksum
 					local operationMode = msg:sub(5,5)
 					if operationMode == "A" then
 					----
 						local checksum = tonumber(msg:sub(11))					
-						local playerName = Spring.GetPlayerInfo(playerID)
+						local playerName = GetPlayersData(2, playerID)
 						local avatarInfo = avatars[playerName]
 						local payloadRequestFlag=0
 						if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
@@ -513,13 +579,13 @@ function widget:Update(n)
 					----
 					end
 					local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
 				elseif msg:sub(6,6)==checksumB then --receive checksum
 					local operationMode = msg:sub(5,5)
 					if operationMode == "A" then
 					----
 						local checksum = tonumber(msg:sub(11))
-						local playerName = Spring.GetPlayerInfo(playerID)
+						local playerName = GetPlayersData(2, playerID)
 						local avatarInfo = avatars[playerName]
 						local payloadRequestFlag=0
 						if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
@@ -588,7 +654,7 @@ function widget:Update(n)
 					----
 					end
 					local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
 				elseif msg:sub(6,6)==payloadA then
 					local operationMode = msg:sub(5,5)
 					if operationMode == "A" then
@@ -603,7 +669,7 @@ function widget:Update(n)
 							local checksum   = CalcChecksum(image)
 							checklistTableG[(playerID+1)].downloaded=true --tick 'done' on file downloaded
 
-							local playerName = Spring.GetPlayerInfo(playerID)
+							local playerName = GetPlayersData(2, playerID)
 							local avatarInfo = avatars[playerName]
 
 							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
@@ -632,7 +698,7 @@ function widget:Update(n)
 							local checksum   = CalcChecksum(image)
 							checklistTableG[(userID+1)].downloaded=true --tick 'done' on file downloaded
 
-							local playerName = Spring.GetPlayerInfo(userID)
+							local playerName = GetPlayersData(2, playerID)
 							local avatarInfo = avatars[playerName]
 
 							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
@@ -674,11 +740,11 @@ function widget:Update(n)
 					----
 					end
 					local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg				
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg				
 				elseif (msg:sub(6,6)==payloadB) then
+					local operationMode = msg:sub(5,5)
 					if operationMode == "A" then
 					----
-						local operationMode = msg:sub(5,5)
 						if (msg:sub(11,11)=="1") then --payload "is here!" flag
 							msg = msg:sub(12)
 							local endOfFilename = msg:find('$',1,true)
@@ -689,7 +755,7 @@ function widget:Update(n)
 							local checksum   = CalcChecksum(image)
 							checklistTableG[(playerID+1)].downloaded=true --tick 'done' on file downloaded
 
-							local playerName = Spring.GetPlayerInfo(playerID)
+							local playerName = GetPlayersData(2, playerID)
 							local avatarInfo = avatars[playerName]
 
 							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
@@ -713,7 +779,7 @@ function widget:Update(n)
 							local checksum   = CalcChecksum(image)
 							checklistTableG[(userID+1)].downloaded=true --tick 'done' on file downloaded
 
-							local playerName = Spring.GetPlayerInfo(userID)
+							local playerName = GetPlayersData(2, userID)
 							local avatarInfo = avatars[playerName]
 
 							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
@@ -758,7 +824,7 @@ function widget:Update(n)
 							end
 						end
 						local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
 					----
 					end
 				elseif (msg:sub(6,6)==bye) then
@@ -772,7 +838,7 @@ function widget:Update(n)
 						openPortForID=playerID
 						waitForTransmission=true --turn of "hi" sending
 						local totalNetworkDelay= retrieveTotalNetworkDelay(myPlayerID, playerID)
-						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --suspend "hi" sending until next reply msg				
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg				
 						Spring.SendLuaUIMsg(msgID .. operationMode .. yes .. openPortForID+100)
 					end 
 				end
@@ -784,12 +850,12 @@ function widget:Update(n)
 						local operationMode = msg:sub(5,5)
 						if operationMode == "A" then
 							local totalNetworkDelay= retrieveTotalNetworkDelay(destinationID, playerID) --delay between 2 computer
-							waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*2.6
-							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*2.6 --wait until it end
+							waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*(networkDelayMultiplier+networkDelayMultiplier+0.5)
+							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*(networkDelayMultiplier+networkDelayMultiplier+0.5) --assume twice the delay for complete back and forth. Wait until end.
 						else --if mode B
 							local totalNetworkDelay= retrieveTotalNetworkDelay(destinationID, myPlayerID) --delay between us (listener) and the replier
-							waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*1.1
-							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --wait until it end
+							waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier
+							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --wait until it end
 						end
 					end 
 				elseif (msg:sub(6,6)==payloadB or msg:sub(6,6)==payloadA) then --snif package transfer and save for our own
@@ -803,7 +869,7 @@ function widget:Update(n)
 
 							local image      = cdata
 							local checksum   = CalcChecksum(image)
-							local playerName = Spring.GetPlayerInfo(playerID)
+							local playerName = GetPlayersData(2, playerID)
 							local avatarInfo = avatars[playerName]
 
 							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
@@ -820,7 +886,7 @@ function widget:Update(n)
 
 							local image      = cdata
 							local checksum   = CalcChecksum(image)
-							local playerName = Spring.GetPlayerInfo(userID)
+							local playerName = GetPlayersData(2, userID)
 							local avatarInfo = avatars[playerName]
 
 							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
@@ -829,15 +895,15 @@ function widget:Update(n)
 								checklistTableG[(userID+1)].downloaded=true --mark checklist as complete
 							end
 							local totalNetworkDelay= retrieveTotalNetworkDelay(destinationID, myPlayerID) --delay between us (listener) and the replier
-							waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*1.1
-							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --wait until it end
+							waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier
+							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --wait until it end
 						end
 					end
 				elseif msg:sub(6,6)==checksumA or msg:sub(6,6)==checksumB then --snif checksum transfer and save it for our own
 					local operationMode = msg:sub(5,5)
 					if operationMode == "A" then
 						local checksum = tonumber(msg:sub(11))
-						local playerName = Spring.GetPlayerInfo(playerID)
+						local playerName = GetPlayersData(2, playerID)
 						local avatarInfo = avatars[playerName]
 						if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then --check if we have record of this player
 							local file = SearchFileByChecksum(checksum)
@@ -852,8 +918,8 @@ function widget:Update(n)
 						end
 					else
 						local totalNetworkDelay= retrieveTotalNetworkDelay(destinationID, myPlayerID) --delay between us (listener) and the replier
-						waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*1.1
-						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*1.1 --wait until it end
+						waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --wait until it end
 					end
 				elseif (msg:sub(6,6)==bye) then
 					lineIsBusy=false
@@ -869,10 +935,11 @@ function widget:Update(n)
 end
 
 function retrieveTotalNetworkDelay(playerIDa, playerIDb)
-	local _,_,_,_,_,aTargetPingTime,_,_,_,_= Spring.GetPlayerInfo(playerIDa)
-	local _,_,_,_,_,bTargetPingTime,_,_,_,_= Spring.GetPlayerInfo(playerIDb)
+	local aTargetPingTime = GetPlayersData(3, playerIDa)
+	local bTargetPingTime = GetPlayersData(3, playerIDb)
 	local totalDelay= aTargetPingTime+bTargetPingTime
-	if totalDelay<0.5 then return 0.5 --if too low delay don't spam message out too quickly
+	if totalDelay == 0 then return 2
+	elseif totalDelay<0.5 then return 0.5 --if too low delay don't spam message out too quickly
 	elseif totalDelay>=2 then return 2 --if too high delay then don't wait too long, just send until the retry depleted (end connection)
 	else return totalDelay
 	end
@@ -905,7 +972,7 @@ function UpdatePlayerList()
 	end
 
 	--get all playerID list
-	playerIDlistG=Spring.GetPlayerList()
+	playerIDlistG= GetPlayersData(8, nil)
 	--Spring.Echo(playerIDlistG)	
 	
 	--use playerIDlistG to update checklist
@@ -920,8 +987,8 @@ function UpdatePlayerList()
 			checklistTableG[(playerID+1)].retry=0 --reset retry counter
 		end
 		
-		if operationMode == "B" then
-			local playerName,_,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,playerCustomKeys = Spring.GetPlayerInfo(playerID)
+		if operatingModeThis == "B" then
+			local playerName,playerIsSpectator,playerAllyTeamID, playerCustomKeys = GetPlayersData(4, playerID)
 			if (playerCustomKeys ~= nil and playerCustomKeys.avatar~=nil) then 
 				local customKeyAvatarFile = avatarsDir .. playerCustomKeys.avatar .. ".png" --check if we have that file on disk
 				if (VFS.FileExists(playerCustomKeyAvatarFile)) then
@@ -933,7 +1000,7 @@ function UpdatePlayerList()
 		end
 		
 		--the following add ignore flag to selective playerID
-		local _,playerIsActive,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
+		local playerIsActive,playerIsSpectator,playerAllyTeamID = GetPlayersData(5, playerID)
 		if iAmSpectator then --if I am spectator then
 			if not playerIsSpectator or not playerIsActive then --ignore non-specs and inactive player(don't send hi/request file)
 				checklistTableG[(playerID+1)].ignore=true 
@@ -968,13 +1035,13 @@ end
 
 function widget:Initialize()
 	--get info on self
-	myPlayerID=Spring.GetMyPlayerID()
-	local name,_,iAmSpectator,_,allyTeamID,_,_,_,_,customKeys = Spring.GetPlayerInfo(myPlayerID)
+	myPlayerID = GetPlayersData(7, nil)
+	local name,iAmSpectator,allyTeamID,customKeys = GetPlayersData(6, myPlayerID)
 	myPlayerName =name
 	myAllyTeamID=allyTeamID
 	
 	--get all playerID list
-	playerIDlistG=Spring.GetPlayerList()
+	playerIDlistG= GetPlayersData(8, nil)
 	--Spring.Echo(playerIDlistG)
 	avatars = (VFS.FileExists(configFile) and VFS.Include(configFile)) or {}
 
@@ -985,8 +1052,8 @@ function widget:Initialize()
 		playerID=playerIDlistG[iteration]
 		checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --fill checklist with default values (promote communication)
 		
-		if operationMode == "B" then
-			local playerName,_,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,playerCustomKeys = Spring.GetPlayerInfo(playerID)
+		local playerName, playerIsSpectator,playerAllyTeamID, playerCustomKeys = GetPlayersData(4, playerID)
+		if operatingModeThis == "B" then
 			if (playerCustomKeys ~= nil and playerCustomKeys.avatar~=nil) then 
 				local customKeyAvatarFile = avatarsDir .. playerCustomKeys.avatar .. ".png" --check if we have that file on disk
 				if (VFS.FileExists(playerCustomKeyAvatarFile)) then
@@ -1020,7 +1087,7 @@ function widget:Initialize()
 	local myAvatar={}
 	myAvatar= InitializeDefaultAvatar(myAvatar, customKeys)
 	
-	if operationMode == "A" then
+	if operatingModeThis == "A" then
 		if (avatars[myPlayerName]~=nil) then --initialize custom avatar if available
 			if VFS.FileExists(avatars[myPlayerName].file) then --if selected file exist then use it
 				myAvatar.file=avatars[myPlayerName].file
