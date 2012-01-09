@@ -256,6 +256,18 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
   widget:UnitCreated(unitID, unitDefID, newTeamID)
 end
 
+function widget:GameFrame(n)
+	if n == 10 then
+		local team = Spring.GetMyTeamID()
+		local units = Spring.GetTeamUnits(team)
+		if units then
+			for i = 1, #units do
+				widget:UnitCreated(units[i], Spring.GetUnitDefID(units[i]), team, nil)
+			end
+		end
+	end
+end
+
 function widget:Update()
     if rememberToSetHoldPositionPreset then
         for i = 1, #options_order do

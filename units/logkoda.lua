@@ -41,6 +41,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[logkoda.s3o]],
+  script              = [[logkoda.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   side                = [[CORE]],
@@ -62,6 +63,12 @@ unitDef = {
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER GUNSHIP]],
     },
+	
+	{
+      def                = [[BOGUS_FAKE_NAPALM_BOMBLET]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[]],
+    },
 
   },
 
@@ -70,6 +77,7 @@ unitDef = {
 
     NAPALM_BOMBLET = {
       name                    = [[Flame Bomb]],
+	  accuracy				  = 1000,
       areaOfEffect            = 72,
       craterBoost             = 0,
       craterMult              = 0,
@@ -79,9 +87,9 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 1.25,
+        default = 80,
+        planes  = 80,
+        subs    = 1,
       },
 
       explosionGenerator      = [[custom:napalm_koda]],
@@ -92,7 +100,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_b_fabby.s3o]],
       projectiles             = 1,
-      range                   = 260,
+      range                   = 250,
       reloadtime              = 6,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med6]],
@@ -100,7 +108,7 @@ unitDef = {
       soundStart              = [[weapon/cannon/cannon_fire3]],
       --soundStartVolume        = 2,
 	  soundTrigger			  = false,
-      sprayangle              = 650,
+      sprayangle              = 300,
       startsmoke              = [[1]],
       startVelocity           = 350,
       texture2                = [[darksmoketrail]],
@@ -108,9 +116,56 @@ unitDef = {
       turnRate                = 9000,
       turret                  = true,
       weaponAcceleration      = 190,
-      weaponTimer             = 3,
+      weaponTimer             = 2.2,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 320,
+      weaponVelocity          = 260,
+    },
+	
+	BOGUS_FAKE_NAPALM_BOMBLET = {
+      name                    = [[Flame Bomb]],
+	  accuracy				  = 1000,
+      areaOfEffect            = 72,
+	  canattackground         = false,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+	  customParams        	  = {
+	    setunitsonfire = "1",
+	  },
+	  
+      damage                  = {
+        default = 80,
+        planes  = 80,
+        subs    = 1,
+      },
+
+      explosionGenerator      = [[custom:napalm_koda]],
+      fireStarter             = 65,
+      flameGfxTime            = 0.1,
+      impulseBoost            = 0,
+      impulseFactor           = 0.2,
+      interceptedByShieldType = 2,
+      model                   = [[wep_b_fabby.s3o]],
+      projectiles             = 1,
+      range                   = 0,
+      reloadtime              = 6,
+      smokeTrail              = true,
+      soundHit                = [[explosion/ex_med6]],
+      soundHitVolume          = 4,
+      soundStart              = [[weapon/cannon/cannon_fire3]],
+      --soundStartVolume        = 2,
+	  soundTrigger			  = false,
+      sprayangle              = 300,
+      startsmoke              = [[1]],
+      startVelocity           = 350,
+      texture2                = [[darksmoketrail]],
+      trajectoryHeight        = 0.1,
+      turnRate                = 9000,
+      turret                  = true,
+      weaponAcceleration      = 190,
+      weaponTimer             = 2.2,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 260,
     },
 
   },
