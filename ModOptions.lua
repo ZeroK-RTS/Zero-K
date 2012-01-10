@@ -337,7 +337,7 @@ local options = {
   {
     key    = 'specialpower',
     name   = 'Special Advanced Powerplants',
-    desc   = 'Rather than explode like a nuke, Adv Fusion do a massive implosion.',
+    desc   = 'Rather than explode like a nuke, Adv Fusions create a massive implosion.',
     type   = 'bool',
     section= 'experimental',
     def    = false,
