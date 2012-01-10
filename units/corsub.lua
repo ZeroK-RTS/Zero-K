@@ -65,7 +65,7 @@ unitDef = {
       def                = [[FAKEWEAPON]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 90,
+      maxAngleDif        = 30,
       onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP]],
     },
 
@@ -88,6 +88,7 @@ unitDef = {
       areaOfEffect            = 16,
       avoidFriendly           = false,
       burnblow                = true,
+      canAttackGround		  = false,	-- workaround for range hax
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
