@@ -306,7 +306,7 @@ end
 -- THE BIT THAT DOES THE CHECK FOR "ALLIED" UNITS
 
 function inRZones(cAlliance)
-	local teamList = spGetTeamList(cAlliance)
+	local teamList = Spring.GetTeamList(cAlliance)
 	for _,teamID in ipairs(teamList) do
 		for i = 1, zoneID.count do
 			local units = spGetUnitsInRectangle(zoneID.data[i].x, zoneID.data[i].z, zoneID.data[i].x+size, zoneID.data[i].z+size, teamID)
