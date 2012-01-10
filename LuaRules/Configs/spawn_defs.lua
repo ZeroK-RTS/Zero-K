@@ -230,8 +230,8 @@ difficulties = {
   
   ['Chicken: Suicidal'] = {
     chickenSpawnRate = 45, 
-	waveSizeMult	 = 1.5,
     burrowSpawnRate  = 40,
+	waveSizeMult	 = 1.5,	
     timeSpawnBonus   = .06,
 	burrowWaveSize	 = 1.6,	
 	gracePeriod		 = 150,
