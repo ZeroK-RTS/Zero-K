@@ -48,8 +48,23 @@ local yellow	= ''
 local cyan		= ''
 local white		= ''
 	
-
-local cf = Spring.GetGameRulesParam('cf') == 1
+local function IsFFA()
+	local allyteams = Spring.GetAllyTeamList()
+	local gaiaT = Spring.GetGaiaTeamID()
+	local gaiaAT = select(6, Spring.GetTeamInfo(gaiaT))
+	local numAllyTeams = 0
+	for i=1,#allyteams do
+		if allyteams[i] ~= gaiaAT then
+			local teams = Spring.GetTeamList()
+			if #teams > 0  then
+				numAllyTeams = numAllyTeams + 1
+			end
+		end
+	end
+	return numAllyTeams > 2
+end
+	
+local cf = IsFFA()
 
 local x_icon_country	= 0
 local x_icon_rank		= x_icon_country + 20
