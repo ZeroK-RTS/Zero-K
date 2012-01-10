@@ -16,8 +16,8 @@ local SIG_AIM1 = 1
 local ANIM_SPEED = 50
 local RESTORE_DELAY = 3000
 
-local TURRET_TURN_SPEED = 150
-local GUN_TURN_SPEED = 90
+local TURRET_TURN_SPEED = 300
+local GUN_TURN_SPEED = 150
 
 local WHEEL_TURN_SPEED1 = 480
 local WHEEL_TURN_SPEED1_ACCELERATION = 75
@@ -121,14 +121,24 @@ function script.AimWeapon1(heading, pitch)
 	
 	Signal( SIG_AIM1)
 	SetSignalMask( SIG_AIM1)
-
+	
+	Turn( turret , y_axis, heading, math.rad(TURRET_TURN_SPEED))
+	Turn( sleeve , x_axis, -pitch, math.rad(GUN_TURN_SPEED))
+	
+	WaitForTurn(turret , y_axis)
+	WaitForTurn(sleeve , x_axis)
+	
+	StartThread(RestoreAfterDelay)
+	
+	return true
+	--[[
 	local fx, _, fz = Spring.GetUnitPiecePosition(unitID, firepoint)
 	local tx, _, tz = Spring.GetUnitPiecePosition(unitID, turret)
 	local pieceHeading = math.pi * Spring.GetHeadingFromVector(fx-tx,fz-tz) * 2^-15
 	
 	local headingDiff = math.abs((heading+pieceHeading)%(math.pi*2) - math.pi)
 	
-	if headingDiff > 2.9 then
+	if headingDiff > 2.6 then
 		Turn( turret , y_axis, heading)
 		Turn( sleeve , x_axis, -pitch)
 		StartThread(RestoreAfterDelay)
@@ -140,6 +150,7 @@ function script.AimWeapon1(heading, pitch)
 		StartThread(RestoreAfterDelay)
 		return false
 	end
+	--]]
 end
 
 local function Recoil()
@@ -149,13 +160,13 @@ local function Recoil()
 end
 
 function script.Shot(num)		
+	--[[
 	Turn( firepoint , y_axis, math.rad(25))
 	EmitSfx( firepoint,  FIRE_W2 )
 	Turn( firepoint , y_axis, - math.rad(25))
 	EmitSfx( firepoint,  FIRE_W2 )
-	
 	Turn( firepoint , y_axis, 0)
-	
+	--]]
 	StartThread(Recoil)
 end
 
@@ -191,9 +202,6 @@ function script.Killed(severity, corpsetype)
 end
 
 function script.Create()
-
-	Spring.Echo("BLA")
-
 	moving = false
 	
 	Turn( firepoint , x_axis, math.rad(7))

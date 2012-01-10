@@ -104,8 +104,8 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 10,
-        subs    = 0.1,
+        default = 8.5,
+        subs    = 0.01,
       },
 
 	  duration				  = 0.1,
@@ -119,7 +119,7 @@ unitDef = {
       noExplode               = true,
       noSelfDamage            = true,
 	  --predictBoost			  = 1,
-      range                   = 280,
+      range                   = 260,
       reloadtime              = 0.16,
 	  rgbColor                = [[1 1 1]],
 	  soundStart              = [[weapon/flamethrower]],
