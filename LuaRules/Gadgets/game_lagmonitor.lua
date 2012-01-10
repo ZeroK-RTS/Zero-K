@@ -113,7 +113,7 @@ function gadget:GameFrame(n)
 				if (afkTeams[team] ~= nil) then  -- team is AFK 
 					-- team no longer AFK, return his units
 					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- and activity ~= nil and gameSecond-activity<10 
-						Spring.Echo("Player " .. name .. " is no longer lagging; returning all his units")
+						Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his units")
 						GG.allowTransfer = true
 						for unitID, uteam in pairs(lineage) do
 							if (uteam == team) then
@@ -156,7 +156,7 @@ function gadget:GameFrame(n)
 					afkTeams[team] = true
 					local units = data.units or {}
 					if #units > 0 then
-						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag")
+						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")
 						GG.allowTransfer = true
 						for j=1,#units do
 							lineage[units[j]] = team
