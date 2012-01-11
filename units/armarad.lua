@@ -24,7 +24,7 @@ unitDef = {
   corpse                        = [[DEAD]],
  
   customParams                  = {
-        helptext		= [[The advanced Radar Tower has a considerably greater range than the basic version, and reduces the wobble of all radar dots across the map. It is also quite pricey. It reduces the wobble by 1/(adv-radars) - independend from the dot's position is in range of your advanced radars, a field radar, or even your allies radar. Make sure to build 1 or 2 per team of them in games with many metal.]],
+    helptext		= [[The advanced Radar Tower has a considerably greater range than the basic version. In addition each advanced radar tower halves the radar wobble of units - it works globally and affects all allied radars. Building one or two can be of great help, at a price.]],
   }, 
   
   energyUse                     = 3,
