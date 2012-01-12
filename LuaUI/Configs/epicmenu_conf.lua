@@ -167,7 +167,6 @@ path='Settings/Interface/Interface Skin'
 	})
 	
 path='Settings/Misc'
-	ShButton( 'Widget List...', function() WG.crude.ShowWidgetList2() end, '', true )
 	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
 	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
 

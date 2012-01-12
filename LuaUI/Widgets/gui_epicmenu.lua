@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.284 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.285 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -56,7 +56,6 @@ local screen0
 
 --------------------------------------------------------------------------------
 -- Global chili controls
-local window_widgetlist
 local window_crude 
 local window_flags
 local window_help
@@ -64,7 +63,6 @@ local window_getkey
 local lbl_gtime, lbl_fps, lbl_clock, img_flag
 local cmsettings_index = -1
 local window_sub_cur
-local widget_categorize = true
 
 --------------------------------------------------------------------------------
 -- Misc
@@ -102,6 +100,7 @@ local transkey = {
 	comma 			= ',',
 	period 			= '.',
 	slash 			= '/',
+	backslash 			= '\\',
 	
 	kp_multiply		= 'numpad*',
 	kp_divide		= 'numpad/',
@@ -145,31 +144,6 @@ local settings = {
 	music_volume = 0.5,
 }
 
-
---------------------------------------------------------------------------------
---For widget list
-local widget_checks = {}
-local green = {0,1,0,1}
-local orange =  {1,0.5,0,1}
-local gray =  {0.7,0.7,0.7,1}
-local groupDescs = {
-	api     = "For Developers",
-	camera  = "Camera",
-	cmd     = "Commands",
-	dbg     = "For Developers",
-	gfx     = "Effects",
-	gui     = "GUI",
-	hook    = "Commands",
-	ico     = "GUI",
-	init    = "Initialization",
-	map		= "Map",
-	minimap = "Minimap",
-	mission	= "Mission",
-	snd     = "Sound",
-	test    = "For Developers",
-	unit    = "Units",
-	ungrouped    = "Ungrouped",
-}
 
 --------------------------------------------------------------------------------
 --Mouse cursor icons
@@ -426,179 +400,13 @@ local function KillSubWindow()
 	end
 end
 
--- Kill Widgetlist window
-local function KillWidgetList()
-	if window_widgetlist then
-		settings.wl_x = window_widgetlist.x
-		settings.wl_y = window_widgetlist.y
-		
-		settings.wl_h = window_widgetlist.clientHeight
-		settings.wl_w = window_widgetlist.clientWidth
-		
-	end
-	window_widgetlist:Dispose()
-	window_widgetlist = nil
-end
-
 -- Update colors for labels of widget checkboxes in widgetlist window
 local function checkWidget(widget)
-	local name = (type(widget) == 'string') and widget or widget.whInfo.name
-	
-	local wcheck = widget_checks[name]
-	
-	if wcheck then
-		local wdata = widgetHandler.knownWidgets[name]
-		local hilite_color = (wdata.active and green) or (WidgetEnabled(name) and orange) or gray
-		wcheck.font:SetColor(hilite_color)
+	if WG.cws_checkWidget then
+		WG.cws_checkWidget(widget)
 	end
 end
 
--- Make widgetlist window
-local function MakeWidgetList()
-
-	widget_checks = {}
-
-	if window_widgetlist then
-		window_widgetlist:Dispose()
-	end
-
-	local widget_children = {}
-	local widgets_cats = {}
-	
-	local window_height = settings.wl_h
-	local window_width = settings.wl_w
-	
-	local buttonWidth = window_width - 20
-	
-	for name,data in pairs(widgetHandler.knownWidgets) do if not data.alwaysStart then 
-		local name = name
-		local name_display = name .. (data.fromZip and ' (mod)' or '')
-		local data = data
-		local _, _, category = string.find(data.basename, "([^_]*)")
-		
-		if not groupDescs[category] then
-			category = 'ungrouped'
-		end
-		local catdesc = groupDescs[category]
-		if not widget_categorize then
-			catdesc = 'Ungrouped'
-		end
-		widgets_cats[catdesc] = widgets_cats[catdesc] or {}
-			
-		widgets_cats[catdesc][#(widgets_cats[catdesc])+1] = 
-		{	
-			catname 		= catdesc,
-			name_display	= name_display,
-			name		 	= name,
-			active 			= data.active,
-			desc 			= data.desc,
-			author 			= data.author,
-		}
-	end 
-	end 
-	
-	local widgets_cats_i = {}
-	for catdesc, catwidgets in pairs(widgets_cats) do
-		widgets_cats_i[#widgets_cats_i + 1] = {catdesc, catwidgets}
-	end
-	
-	--Sort widget categories
-	table.sort(widgets_cats_i, function(t1,t2)
-		return t1[1] < t2[1]
-	end)
-	
-	for _, data in pairs(widgets_cats_i) do
-		local catdesc = data[1]
-		local catwidgets = data[2]
-	
-		--Sort widget names within this category
-		table.sort(catwidgets, function(t1,t2)
-			return t1.name_display < t2.name_display
-		end)
-		widget_children[#widget_children + 1] = 
-			Label:New{ caption = '- '.. catdesc ..' -', textColor = color.sub_header, align='center', }
-		
-		for _, wdata in ipairs(catwidgets) do
-			local enabled = WidgetEnabled(wdata.name)
-			
-			--Add checkbox to table that is used to update checkbox label colors when widget becomes active/inactive
-			widget_checks[wdata.name] = Checkbox:New{ 
-					caption = wdata.name_display, 
-					checked = enabled,
-					tooltip = '(By ' .. tostring(wdata.author) .. ")\n" .. tostring(wdata.desc),
-					OnChange = { 
-						function(self) 
-							widgetHandler:ToggleWidget(wdata.name)
-						end,
-					},
-				}
-			widget_children[#widget_children + 1] = widget_checks[wdata.name]
-			checkWidget(wdata.name) --sets color of label for this widget checkbox
-		end
-	end
-	
-	window_widgetlist = Window:New{
-		x = settings.wl_x,
-		y = settings.wl_y,
-		clientWidth  = window_width,
-		clientHeight = window_height,
-		parent = screen0,
-		backgroundColor = color.sub_bg,
-		caption = 'Widget List (F11)',
-		minWidth = 300,
-		minHeight = 400,
-		
-		children = {
-			ScrollPanel:New{
-				x=1,
-				y=15,
-				right=5, 
-				bottom = C_HEIGHT*2,
-				
-				children = {
-					StackPanel:New{
-						x=1,
-						y=1,
-						height = #widget_children*C_HEIGHT,
-						right = 1,
-						
-						itemPadding = {1,1,1,1},
-						itemMargin = {0,0,0,0},		
-						children = widget_children,
-					},
-				},
-			},
-			
-			--Close button
-			Button:New{ 
-				caption = 'Close', 
-				OnMouseUp = { KillWidgetList }, 
-				backgroundColor=color.sub_close_bg, 
-				textColor=color.sub_close_fg, 
-				
-				x=1,
-				bottom=1,
-				width='40%',
-				height=C_HEIGHT,
-				
-			},
-			--Categorization checkbox
-			Checkbox:New{ 
-				caption = 'Categorize', 
-				tooltip = 'List widgets by category',
-				OnMouseUp = { function() widget_categorize = not widget_categorize end, KillWidgetList, MakeWidgetList }, 
-				textColor=color.sub_fg, 
-				checked = widget_categorize,
-				x = '50%',
-				width = '30%',
-				height= C_HEIGHT,
-				bottom=1,
-			},
-
-		},
-	}
-	AdjustWindow(window_widgetlist)
-end
 
 local function SetCountry(self) 
 	echo('Setting country: "' .. self.country .. '" ') 
@@ -1970,15 +1778,12 @@ function widget:Initialize()
 	
 	-- Add actions for keybinds
 	AddAction("crudemenu", ActionMenu, nil, "t")
-	AddAction("crudewidgetlist", ActionWidgetList, nil, "t")
 	-- replace default key binds
 	Spring.SendCommands({
 		"unbind esc quitmessage",
 		"unbind esc quitmenu", --Upgrading to 0.82 doesn't change existing uikeys so pre-0.82 keybinds still apply.
-		"unbindkeyset f11"
 	})
 	Spring.SendCommands("bind esc crudemenu")
-	Spring.SendCommands("bind f11 crudewidgetlist")
 
 	BuildMenuTree()
 	MakeMenuBar()
@@ -2050,16 +1855,13 @@ function widget:Shutdown()
   end
 
   RemoveAction("crudemenu")
-  RemoveAction("crudewidgetlist")
  
   -- restore key binds
   Spring.SendCommands({
     "bind esc quitmessage",
     "bind esc quitmenu", -- FIXME made for licho, removed after 0.82 release
-    "bind f11  luaui selector"
   })
   Spring.SendCommands("unbind esc crudemenu")
-  Spring.SendCommands("unbind f11 crudewidgetlist")
 end
 
 function widget:GetConfigData()
@@ -2147,12 +1949,4 @@ end
 function ActionMenu()
 	settings.show_crudemenu = not settings.show_crudemenu
 	ShowHideCrudeMenu()
-end
-
-function ActionWidgetList()
-	if window_widgetlist then
-		KillWidgetList()
-	else
-		MakeWidgetList()
-	end
 end
