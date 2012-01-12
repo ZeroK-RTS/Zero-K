@@ -144,59 +144,7 @@ local settings = {
 	music_volume = 0.5,
 }
 
-
 --------------------------------------------------------------------------------
---Mouse cursor icons
-
-local cursorNames = {
-  'cursornormal',
-  'cursorareaattack',
-  'cursorattack',
-  'cursorattack',
-  'cursorbuildbad',
-  'cursorbuildgood',
-  'cursorcapture',
-  'cursorcentroid',
-  'cursordwatch',
-  'cursorwait',
-  'cursordgun',
-  'cursorattack',
-  'cursorfight',
-  'cursorattack',
-  'cursorgather',
-  'cursorwait',
-  'cursordefend',
-  'cursorpickup',
-  'cursormove',
-  'cursorpatrol',
-  'cursorreclamate',
-  'cursorrepair',
-  'cursorrevive',
-  'cursorrepair',
-  'cursorrestore',
-  'cursorrepair',
-  'cursorselfd',
-  'cursornumber',
-  'cursorwait',
-  'cursortime',
-  'cursorwait',
-  'cursorunload',
-  'cursorwait',
-}
-
-WG.crude.SetCursor = function(cursorSet)
-  for _, cursor in ipairs(cursorNames) do
-    local topLeft = (cursor == 'cursornormal' and cursorSet ~= 'k_haos_girl')
-    Spring.ReplaceMouseCursor(cursor, cursorSet.."/"..cursor, topLeft)
-  end
-end
-
-WG.crude.RestoreCursor = function()
-  for _, cursor in ipairs(cursorNames) do
-    local topLeft = (cursor == 'cursornormal')
-    Spring.ReplaceMouseCursor(cursor, cursor, topLeft)
-  end
-end
 
 WG.crude.SetSkin = function(Skin)
   if Chili then

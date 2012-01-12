@@ -171,29 +171,6 @@ path='Settings/Misc'
 	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
 
 path='Settings/Mouse Cursor'
-	AddOption({
-		name = 'Cursor Sets',
-		type = 'list',
-		OnChange = function (self) 
-			if self.value == 'zk' then
-				WG.crude.RestoreCursor()
-			else
-				WG.crude.SetCursor( self.value ); 
-			end
-		end,
-		items = {
-			{ key = 'zk', name = 'Animated', },
-			{ key = 'zk_static', name = 'Static', },
-			{ key = 'ca', name = 'CA Classic', },
-			{ key = 'ca_static', name = 'CA Static', },
-			{ key = 'erom', name = 'Erom', },
-			{ key = 'masse', name = 'Masse', },
-			{ key = 'Lathan', name = 'Lathan', },
-			{ key = 'k_haos_girl', name = 'K_haos_girl', },
-		},
-		value = 'zk',
-	})
-	ShLabel('')
 	ShButton('Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.' )
 	AddOption({ 	
 		name = 'Hardware Cursor',
