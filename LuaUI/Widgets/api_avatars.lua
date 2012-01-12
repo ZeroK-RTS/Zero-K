@@ -1,4 +1,4 @@
-local versionName = "v3.05"
+local versionName = "v3.07"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     api       = false,
-    enabled   = false
+    enabled   = true
   }
 end
 
@@ -208,19 +208,46 @@ local function GetPlayersData(switch, playerID) --//group player's info as a fun
 		return customKeys
 		--local customKeys ={avatar="picA"}
 		--return customKeys
+		-- Spring.Echo("---")
+		-- Spring.Echo("Switch 1")
+		-- Spring.Echo("playerID")
+		-- Spring.Echo(playerID)
+		-- Spring.Echo("customKeys")
+		-- Spring.Echo(customKeys)
+		-- Spring.Echo("---")
 	elseif switch == 2 then --//used by all players
 		local playerName = Spring.GetPlayerInfo(playerID)
 		return playerName
 		--local playerName = {"A", "B", "C", "D", "E"}
 		--return playerName[playerID+1]
+		-- Spring.Echo("---")
+		-- Spring.Echo("Switch 2")
+		-- Spring.Echo("playerID")
+		-- Spring.Echo(playerID)
+		-- Spring.Echo("playerName")
+		-- Spring.Echo(playerName)
+		-- Spring.Echo("---")
 	elseif switch == 3 then --//used by self or other players
 		local _,_,_,_,_,targetPingTime,_,_,_,_= Spring.GetPlayerInfo(playerID)
 		return targetPingTime
 		--local targetPingTime = 666
 		--return targetPingTime
 	elseif switch == 4 then --//used by all players
-		local playerName,_,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,playerCustomKeys = Spring.GetPlayerInfo(playerID)
-		return playerName, playerIsSpectator,playerAllyTeamID, playerCustomKeys
+		local playerName, activePlayer ,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,playerCustomKeys = Spring.GetPlayerInfo(playerID)
+		-- Spring.Echo("---")
+		-- Spring.Echo("Switch 4")
+		-- Spring.Echo("playerID")
+		-- Spring.Echo(playerID)
+		-- Spring.Echo("playerName")
+		-- Spring.Echo(playerName)
+		-- Spring.Echo("playerIsSpectator")
+		-- Spring.Echo(playerIsSpectator)
+		-- Spring.Echo("playerAllyTeamID")
+		-- Spring.Echo(playerAllyTeamID)
+		-- Spring.Echo("playerCustomKeys")
+		-- Spring.Echo(playerCustomKeys)
+		-- Spring.Echo("---")		
+		return playerName, activePlayer, playerIsSpectator,playerAllyTeamID, playerCustomKeys
 		--local playerName = {"A", "B", "C", "D", "E"}
 		--local playerIsSpectator = {false,false,false,false,false}
 		--local playerAllyTeamID = {1, 1, 1, 1, 1}
@@ -228,6 +255,17 @@ local function GetPlayersData(switch, playerID) --//group player's info as a fun
 		--return playerName[playerID+1], playerIsSpectator[playerID+1],playerAllyTeamID[playerID+1], playerCustomKeys[playerID+1]
 	elseif switch == 5 then --//used by all players
 		local _,playerIsActive,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
+		-- Spring.Echo("---")
+		-- Spring.Echo("Switch 5")
+		-- Spring.Echo("playerID")
+		-- Spring.Echo(playerID)
+		-- Spring.Echo("playerIsActive")
+		-- Spring.Echo(playerIsActive)
+		-- Spring.Echo("playerIsSpectator")
+		-- Spring.Echo(playerIsSpectator)
+		-- Spring.Echo("playerAllyTeamID")
+		-- Spring.Echo(playerAllyTeamID)
+		-- Spring.Echo("---")
 		return playerIsActive,playerIsSpectator,playerAllyTeamID
 		--local playerIsActive = {true,true, true,true,true}
 		--local playerIsSpectator = {false,false,false,false,false}
@@ -248,6 +286,13 @@ local function GetPlayersData(switch, playerID) --//group player's info as a fun
 		--return myPlayerID_local
 	elseif switch == 8 then --//used by all players
 		local playerIDlist_local=Spring.GetPlayerList()
+		-- Spring.Echo("---")
+		-- Spring.Echo("Switch 8")
+		-- Spring.Echo("playerID")
+		-- Spring.Echo(playerID)
+		-- Spring.Echo("playerIDlist_local")
+		-- Spring.Echo(playerIDlist_local)
+		-- Spring.Echo("---")
 		return playerIDlist_local
 		--local playerIDlist_local = {0,1,2,3,4}
 		--return playerIDlist_local
@@ -1052,7 +1097,7 @@ function widget:Initialize()
 		playerID=playerIDlistG[iteration]
 		checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --fill checklist with default values (promote communication)
 		
-		local playerName, playerIsSpectator,playerAllyTeamID, playerCustomKeys = GetPlayersData(4, playerID)
+		local playerName, activePlayer , playerIsSpectator,playerAllyTeamID, playerCustomKeys = GetPlayersData(4, playerID)
 		if operatingModeThis == "B" then
 			if (playerCustomKeys ~= nil and playerCustomKeys.avatar~=nil) then 
 				local customKeyAvatarFile = avatarsDir .. playerCustomKeys.avatar .. ".png" --check if we have that file on disk
@@ -1066,11 +1111,11 @@ function widget:Initialize()
 		
 		--the following add ignore flag to selective playerID
 		if iAmSpectator then --if I am spectator then
-			if not playerIsSpectator then --ignore non-specs (don't send hi/request file)
+			if not playerIsSpectator or not activePlayer then --ignore non-specs and non-ingame(don't send hi/request file)
 				checklistTableG[(playerID+1)].ignore=true 
 			end
 		else --if I am not spectator
-			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator then --if player is enemy or spec then
+			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not activePlayer then --if player is enemy or spec or not ingame then
 				checklistTableG[(playerID+1)].ignore=true --ignore enemy & spec (don't send hi/request file)
 			end
 		end
