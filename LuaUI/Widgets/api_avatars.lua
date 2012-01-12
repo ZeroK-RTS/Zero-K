@@ -1,4 +1,4 @@
-local versionName = "v3.07"
+local versionName = "v3.071"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -95,6 +95,9 @@ local playerIDlistG={}
 local bufferIndex=0
 local msgRecv={}
 local currentTime=0
+
+local nextUpdate = 0
+local delayUpdate = 0.25
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -514,6 +517,13 @@ local tableIsCompleted=false
 local fileRequestTableG={}
 function widget:Update(n)
 	currentTime=currentTime+n
+	
+	local now = Spring.GetGameSeconds()
+	if (now > nextUpdate) then
+		nextUpdate = now + delayUpdate
+		return
+	end
+	
 	local now=currentTime
 	if now>=waitTransmissionUntilThisTime then
 		waitForTransmission=false
@@ -983,9 +993,9 @@ function retrieveTotalNetworkDelay(playerIDa, playerIDb)
 	local aTargetPingTime = GetPlayersData(3, playerIDa)
 	local bTargetPingTime = GetPlayersData(3, playerIDb)
 	local totalDelay= aTargetPingTime+bTargetPingTime
-	if totalDelay == 0 then return 2
-	elseif totalDelay<0.5 then return 0.5 --if too low delay don't spam message out too quickly
-	elseif totalDelay>=2 then return 2 --if too high delay then don't wait too long, just send until the retry depleted (end connection)
+	if totalDelay == 0 then return (2 + delayUpdate)
+	elseif totalDelay<0.5 then return (0.5 + delayUpdate) --if too low delay don't spam message out too quickly
+	elseif totalDelay>=2 then return (2 + delayUpdate) --if too high delay then don't wait too long, just send until the retry depleted (end connection)
 	else return totalDelay
 	end
 end
