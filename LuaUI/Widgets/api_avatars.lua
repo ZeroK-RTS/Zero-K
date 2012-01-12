@@ -1,4 +1,4 @@
-local versionName = "v3.071"
+local versionName = "v3.072"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -518,9 +518,10 @@ local fileRequestTableG={}
 function widget:Update(n)
 	currentTime=currentTime+n
 	
-	local now = Spring.GetGameSeconds()
+	local now = currentTime
 	if (now > nextUpdate) then
 		nextUpdate = now + delayUpdate
+	else
 		return
 	end
 	
