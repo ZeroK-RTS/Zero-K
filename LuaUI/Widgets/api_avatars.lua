@@ -565,7 +565,7 @@ function widget:Update(n)
 
 	if bufferIndex>=1 then --check lua message from 'inbox'
 		local found, playerID, msg=false ,nil, nil
-		while bufferIndex >1 and not found do
+		while bufferIndex >= 1 and not found do
 			playerID=msgRecv[bufferIndex].playerID
 			msg=msgRecv[bufferIndex].msg
 			if (msg:sub(1,4) == msgID or msg:sub(1,4) == broadcastID) then
@@ -574,6 +574,7 @@ function widget:Update(n)
 			msgRecv[bufferIndex]=nil
 			bufferIndex=bufferIndex-1
 		end
+		if msg==nil then return end
 		
 		if (msg:sub(1,4) == msgID) then --if message belong to hello/hi file transfer protocol
 			destinationID=tonumber(msg:sub(8,9))
