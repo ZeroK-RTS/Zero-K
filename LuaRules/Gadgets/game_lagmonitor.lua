@@ -158,22 +158,11 @@ function gadget:GameFrame(n)
 					if #units > 0 then
 						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")
 						GG.allowTransfer = true
-						local sumX, sumY, sumZ, countUnit, meanX, meanY, meanZ = 0, 0, 0, 0, 0
-						for j=1,#units do
+	 					for j=1,#units do
 							lineage[units[j]] = team
 							Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
-							
-							local x, y , z = Spring.GetUnitPosition(units[j])
-							sumX = sumX + x
-							sumY = sumY + y
-							sumZ = sumZ + z
-							countUnit = countUnit + 1
-						end
-						meanX = sumX/countUnit
-						meanY = sumY/countUnit
-						meanZ = sumZ/countUnit
-						Spring.MarkerAddPoint(meanX, meanY, meanZ, "Lagmonitor: " .. recepientByAllyTeam[allyTeam].name .. " receive all units of" .. data.name )
-						
+	 					end
+					
 						GG.allowTransfer = false
 					end
 				end	-- if
