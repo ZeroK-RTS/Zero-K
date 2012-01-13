@@ -163,7 +163,7 @@ function gadget:GameFrame(n)
 							lineage[units[j]] = team
 							Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
 							
-							local x, y , Z = Spring.GetUnitPosition(units[j])
+							local x, y , z = Spring.GetUnitPosition(units[j])
 							sumX = sumX + x
 							sumY = sumY + y
 							sumZ = sumZ + z
