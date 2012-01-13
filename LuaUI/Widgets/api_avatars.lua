@@ -1,4 +1,4 @@
-local versionName = "v3.073"
+local versionName = "v3.074"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -77,7 +77,7 @@ local operatingModeThis = "A"	--a switch to enable old Custom Avatar functionali
 --Other users can 'snif' the communication and use the exchange data to complete own's request list.
 --
 local maxFileSize = 10 --in kB (for operating mode A)
-local numberOfRetry = 7 --times to send "hi" until remote computer reply
+local numberOfRetry = 2 --times to send "hi" before remote computer reply until they are listed in "ignore" for the duration of "refresh delay"
 local maxChecksumLenght= 2000  --if greater than 2049 will cause unpack error 
 --reference: http://www.promixis.com/forums/showthread.php?15419-Lua-Limits-on-Table-Size
 
@@ -211,27 +211,31 @@ local function GetPlayersData(switch, playerID) --//group player's info as a fun
 	if switch == 1 then --//used by self
 		local _,_,_,_,_,_,_,_,_,customKeys = Spring.GetPlayerInfo(playerID)
 		return customKeys
-		--local customKeys ={avatar="picA"}
-		--return customKeys
-		-- Spring.Echo("---")
-		-- Spring.Echo("Switch 1")
-		-- Spring.Echo("playerID")
-		-- Spring.Echo(playerID)
-		-- Spring.Echo("customKeys")
-		-- Spring.Echo(customKeys)
-		-- Spring.Echo("---")
+		--[[
+		local customKeys ={avatar="picA"}
+		return customKeys
+		Spring.Echo("---")
+		Spring.Echo("Switch 1")
+		Spring.Echo("playerID")
+		Spring.Echo(playerID)
+		Spring.Echo("customKeys")
+		Spring.Echo(customKeys)
+		Spring.Echo("---")
+		--]]
 	elseif switch == 2 then --//used by all players
 		local playerName = Spring.GetPlayerInfo(playerID)
 		return playerName
-		--local playerName = {"A", "B", "C", "D", "E"}
-		--return playerName[playerID+1]
-		-- Spring.Echo("---")
-		-- Spring.Echo("Switch 2")
-		-- Spring.Echo("playerID")
-		-- Spring.Echo(playerID)
-		-- Spring.Echo("playerName")
-		-- Spring.Echo(playerName)
-		-- Spring.Echo("---")
+		--[[
+		local playerName = {"A", "B", "C", "D", "E"}
+		return playerName[playerID+1]
+		Spring.Echo("---")
+		Spring.Echo("Switch 2")
+		Spring.Echo("playerID")
+		Spring.Echo(playerID)
+		Spring.Echo("playerName")
+		Spring.Echo(playerName)
+		Spring.Echo("---")
+		--]]
 	elseif switch == 3 then --//used by self or other players
 		local _,_,_,_,_,targetPingTime,_,_,_,_= Spring.GetPlayerInfo(playerID)
 		return targetPingTime
@@ -239,19 +243,21 @@ local function GetPlayersData(switch, playerID) --//group player's info as a fun
 		--return targetPingTime
 	elseif switch == 4 then --//used by all players
 		local playerName, activePlayer ,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,playerCustomKeys = Spring.GetPlayerInfo(playerID)
-		-- Spring.Echo("---")
-		-- Spring.Echo("Switch 4")
-		-- Spring.Echo("playerID")
-		-- Spring.Echo(playerID)
-		-- Spring.Echo("playerName")
-		-- Spring.Echo(playerName)
-		-- Spring.Echo("playerIsSpectator")
-		-- Spring.Echo(playerIsSpectator)
-		-- Spring.Echo("playerAllyTeamID")
-		-- Spring.Echo(playerAllyTeamID)
-		-- Spring.Echo("playerCustomKeys")
-		-- Spring.Echo(playerCustomKeys)
-		-- Spring.Echo("---")		
+		--[[
+		Spring.Echo("---")
+		Spring.Echo("Switch 4")
+		Spring.Echo("playerID")
+		Spring.Echo(playerID)
+		Spring.Echo("playerName")
+		Spring.Echo(playerName)
+		Spring.Echo("playerIsSpectator")
+		Spring.Echo(playerIsSpectator)
+		Spring.Echo("playerAllyTeamID")
+		Spring.Echo(playerAllyTeamID)
+		Spring.Echo("playerCustomKeys")
+		Spring.Echo(playerCustomKeys)
+		Spring.Echo("---")
+		--]]		
 		return playerName, activePlayer, playerIsSpectator,playerAllyTeamID, playerCustomKeys
 		--local playerName = {"A", "B", "C", "D", "E"}
 		--local playerIsSpectator = {false,false,false,false,false}
@@ -260,22 +266,26 @@ local function GetPlayersData(switch, playerID) --//group player's info as a fun
 		--return playerName[playerID+1], playerIsSpectator[playerID+1],playerAllyTeamID[playerID+1], playerCustomKeys[playerID+1]
 	elseif switch == 5 then --//used by all players
 		local _,playerIsActive,playerIsSpectator,_,playerAllyTeamID,_,_,_,_,_ = Spring.GetPlayerInfo(playerID)
-		-- Spring.Echo("---")
-		-- Spring.Echo("Switch 5")
-		-- Spring.Echo("playerID")
-		-- Spring.Echo(playerID)
-		-- Spring.Echo("playerIsActive")
-		-- Spring.Echo(playerIsActive)
-		-- Spring.Echo("playerIsSpectator")
-		-- Spring.Echo(playerIsSpectator)
-		-- Spring.Echo("playerAllyTeamID")
-		-- Spring.Echo(playerAllyTeamID)
-		-- Spring.Echo("---")
+		--[[
+		Spring.Echo("---")
+		Spring.Echo("Switch 5")
+		Spring.Echo("playerID")
+		Spring.Echo(playerID)
+		Spring.Echo("playerIsActive")
+		Spring.Echo(playerIsActive)
+		Spring.Echo("playerIsSpectator")
+		Spring.Echo(playerIsSpectator)
+		Spring.Echo("playerAllyTeamID")
+		Spring.Echo(playerAllyTeamID)
+		Spring.Echo("---")
+		--]]
 		return playerIsActive,playerIsSpectator,playerAllyTeamID
-		--local playerIsActive = {true,true, true,true,true}
-		--local playerIsSpectator = {false,false,false,false,false}
-		--local playerAllyTeamID = {1, 1, 1, 1, 1}
-		--return playerIsActive[playerID+1],playerIsSpectator[playerID+1],playerAllyTeamID[playerID+1]
+		--[[
+		local playerIsActive = {true,true, true,true,true}
+		local playerIsSpectator = {false,false,false,false,false}
+		local playerAllyTeamID = {1, 1, 1, 1, 1}
+		return playerIsActive[playerID+1],playerIsSpectator[playerID+1],playerAllyTeamID[playerID+1]
+		--]]
 	elseif switch == 6 then --//used by self
 		local name,_,iAmSpectator,_,allyTeamID,_,_,_,_,customKeys = Spring.GetPlayerInfo(playerID)
 		return name,iAmSpectator,allyTeamID,customKeys
@@ -1022,10 +1032,10 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function widget:PlayerChanged(playerID) --in case where player status changed (eg: joined, spec)
+function widget:PlayerChanged(playerID) --in case where player status changed (eg: active, non-active)
 	UpdatePlayerList()
 end
-
+--[[
 function widget:PlayerAdded(playerID) --in case where player status changed (eg: joined, spec)
 	UpdatePlayerList()
 end
@@ -1033,7 +1043,7 @@ end
 function widget:PlayerRemoved(playerID)
 	UpdatePlayerList()
 end
-
+--]]
 function UpdatePlayerList()
 	--get info on self
 	local iAmSpectator=false
