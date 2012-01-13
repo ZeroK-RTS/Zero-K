@@ -275,15 +275,6 @@ function widget:Initialize()
 end 
 ]]--
 
-function widget:Initialize()
---  Borrowed from xyz's Action Finder and very_bad_soldier's Ghost Radar
-	if Spring.GetSpectatingState() then
-		Echo( "<Jumjet GUI>: Spectator mode. Widget removed." )
-		widgetHandler:RemoveWidget()
-		return
-	end
-end
-
 function widget:DrawWorld()
   local _, activeCommand = spGetActiveCommand()
   if (activeCommand == CMD_JUMP) then
