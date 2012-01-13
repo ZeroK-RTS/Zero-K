@@ -98,6 +98,8 @@ local currentTime=0
 
 local nextUpdate = 0
 local delayUpdate = 0.1
+local nextRefreshTime = 0
+local refreshDelay = 5
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -524,7 +526,10 @@ function widget:Update(n)
 	else
 		return
 	end
-	
+	if (now > nextRefreshTime) then
+		nextRefreshTime = now + refreshDelay
+		UpdatePlayerList()
+	end
 	if now>=waitTransmissionUntilThisTime then
 		waitForTransmission=false
 	end
@@ -990,6 +995,7 @@ function widget:Update(n)
 			end
 		elseif (msg:sub(1,4) == broadcastID) then --if message is a 'look at my new pic!'.
 			checklistTableG[(playerID+1)].downloaded=false --reset checklist entry for this player
+			checklistTableG[(playerID+1)].ignore=false
 			checklistTableG[(playerID+1)].retry=0 --reset retry
 			tableIsCompleted=false --redo checklist check
 		end
