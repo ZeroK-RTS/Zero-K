@@ -1,4 +1,4 @@
-local versionName = "v3.072"
+local versionName = "v3.073"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -97,7 +97,7 @@ local msgRecv={}
 local currentTime=0
 
 local nextUpdate = 0
-local delayUpdate = 0.25
+local delayUpdate = 0.1
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -525,7 +525,6 @@ function widget:Update(n)
 		return
 	end
 	
-	local now=currentTime
 	if now>=waitTransmissionUntilThisTime then
 		waitForTransmission=false
 	end
@@ -565,10 +564,16 @@ function widget:Update(n)
 	end
 
 	if bufferIndex>=1 then --check lua message from 'inbox'
-		local playerID=msgRecv[bufferIndex].playerID
-		local msg=msgRecv[bufferIndex].msg
-		msgRecv[bufferIndex]=nil
-		bufferIndex=bufferIndex-1
+		local found, playerID, msg=false ,nil, nil
+		while bufferIndex >1 and not found do
+			playerID=msgRecv[bufferIndex].playerID
+			msg=msgRecv[bufferIndex].msg
+			if (msg:sub(1,4) == msgID or msg:sub(1,4) == broadcastID) then
+				found = true
+			end
+			msgRecv[bufferIndex]=nil
+			bufferIndex=bufferIndex-1
+		end
 		
 		if (msg:sub(1,4) == msgID) then --if message belong to hello/hi file transfer protocol
 			destinationID=tonumber(msg:sub(8,9))
@@ -1002,8 +1007,10 @@ function retrieveTotalNetworkDelay(playerIDa, playerIDb)
 end
 
 function widget:RecvLuaMsg(msg, playerID) --each update will put message into "msgRecv"
-	bufferIndex=bufferIndex+1
-	msgRecv[bufferIndex]={msg=msg, playerID=playerID}
+	if msg:sub(1,1)~="%" then
+		bufferIndex=bufferIndex+1
+		msgRecv[bufferIndex]={msg=msg, playerID=playerID}
+	end
 end
 
 --------------------------------------------------------------------------------
