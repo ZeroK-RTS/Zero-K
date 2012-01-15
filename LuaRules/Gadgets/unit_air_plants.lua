@@ -27,8 +27,8 @@ local GiveOrderToUnit = Spring.GiveOrderToUnit
 local GetUnitDefID = Spring.GetUnitDefID
 
 local AIRPLANT = {
-  [UnitDefNames["factoryplane"].id] = true,
-  [UnitDefNames["factorygunship"].id] = true,
+  [UnitDefNames["factoryplane"].id] = {land = true},
+  [UnitDefNames["factorygunship"].id] = {land = false},
 }
 
 local plantList = {}
@@ -53,12 +53,14 @@ local repairCmd = {
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
   if AIRPLANT[unitDefID] then
+	landCmd.params[1] = (AIRPLANT[unitDefID].land and '1') or '0'
     InsertUnitCmdDesc(unitID, 500, landCmd)
     InsertUnitCmdDesc(unitID, 500, repairCmd)
-    plantList[unitID] = {flyState=1, repairAt=0}
+    plantList[unitID] = {flyState=(AIRPLANT[unitDefID].land and 1) or 0, repairAt=0}
+	Spring.SetUnitRulesParam(unitID, "landFlyFactory", plantList[unitID].flyState)
   elseif plantList[builderID] then
     GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, { plantList[builderID].repairAt }, { })
-    GiveOrderToUnit(unitID, CMD.IDLEMODE, { plantList[builderID].flyState }, { })
+	GiveOrderToUnit(unitID, CMD.IDLEMODE, { plantList[builderID].flyState }, { })
   end
 end
 
@@ -74,12 +76,15 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
       EditUnitCmdDesc(unitID, cmdDescID, landCmd)
       plantList[unitID].flyState = cmdParams[1]
       landCmd.params[1] = 1
+	  Spring.SetUnitRulesParam(unitID, "landFlyFactory", plantList[unitID].flyState)
+	  return false
     elseif (cmdID == CMD_AP_AUTOREPAIRLEVEL) then
       local cmdDescID = FindUnitCmdDesc(unitID, CMD_AP_AUTOREPAIRLEVEL)
       repairCmd.params[1] = cmdParams[1]
       EditUnitCmdDesc(unitID, cmdDescID, repairCmd)
       plantList[unitID].repairAt = cmdParams[1]
       repairCmd.params[1] = 1
+	  return false
     end
   end
   return true

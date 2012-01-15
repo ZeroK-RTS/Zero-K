@@ -14,6 +14,10 @@ function widget:GetInfo()
   }
 end
 
+local CMD_UNIT_AI = 36214
+local CMD_PRIORITY = 34220
+local CMD_AP_FLY_STATE = 34569
+
 local holdPosException = { 
     ["factoryplane"] = true,
     ["factorygunship"] = true,
@@ -64,6 +68,17 @@ options = {
         type = 'number',
         value = -1,
         min = -1,
+        max = 2,
+        step = 1,
+        path = "Game/Unit AI/Initial States/Misc",
+    },
+	
+	commander_buildpriority = {
+        name = "Build Priority",
+        desc = "Values: Low, Normal, High",
+        type = 'number',
+        value = 1,
+        min = 0,
         max = 2,
         step = 1,
         path = "Game/Unit AI/Initial States/Misc",
@@ -124,7 +139,7 @@ local function addUnit(defName, path)
         options_order[#options_order+1] = defName .. "_firestate"
     end
 
-    if ud.canMove or ud.canPatrol then
+    if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
         options[defName .. "_movestate"] = {
             name = "Movestate",
             desc = "Values: inherit from factory, hold positon, manuver, roam",
@@ -137,6 +152,44 @@ local function addUnit(defName, path)
         }
         options_order[#options_order+1] = defName .. "_movestate"
     end
+	
+	if (ud.canFly) then
+		options[defName .. "_flylandstate"] = {
+            name = "Fly/Land State",
+            desc = "Values: inherit from factory, fly, land",
+            type = 'number',
+            value = (ud.customParams and ud.customParams.landflystate and ((ud.customParams.landflystate == "1" and 1) or 0)) or -1,
+            min = -1,
+            max = 1,
+            step = 1,
+            path = path,
+        }
+		options_order[#options_order+1] = defName .. "_flylandstate"
+	elseif ud.customParams and ud.customParams.landflystate then
+		options[defName .. "_flylandstate_factory"] = {
+            name = "Fly/Land State for factory",
+            desc = "Values: fly, land",
+            type = 'number',
+            value = (ud.customParams and ud.customParams.landflystate and ud.customParams.landflystate == "1" and 1) or 0,
+            min = 0,
+            max = 1,
+            step = 1,
+            path = path,
+        }
+		options_order[#options_order+1] = defName .. "_flylandstate_factory"
+	end
+	
+	options[defName .. "_buildpriority"] = {
+        name = "Build Priority",
+        desc = "Values: Low, Normal, High",
+        type = 'number',
+        value = 1,
+        min = 0,
+        max = 2,
+        step = 1,
+        path = path,
+    }
+	options_order[#options_order+1] = defName .. "_buildpriority"
 
     if tacticalAIUnits[defName] then
         options[defName .. "_tactical_ai"] = {
@@ -160,10 +213,14 @@ local function addUnit(defName, path)
         options_order[#options_order+1] = defName .. "_personal_cloak"
     
     end
+	
 end
 
 local function AddFactoryOfUnits(defName)
-    local ud = UnitDefNames[defName]
+	if unitAlreadyAdded[defName] then
+        return
+    end
+	local ud = UnitDefNames[defName]
     local name = ud.humanName
     addUnit(defName, name)
     for i = 1, #ud.buildOptions do
@@ -181,6 +238,7 @@ AddFactoryOfUnits("factoryjump")
 AddFactoryOfUnits("factorytank")
 AddFactoryOfUnits("corsy")
 
+addUnit("striderhub","Mech")
 addUnit("armcsa","Mech")
 addUnit("armcomdgun","Mech")
 addUnit("dante","Mech")
@@ -188,9 +246,22 @@ addUnit("armraven","Mech")
 addUnit("armbanth","Mech")
 addUnit("gorg","Mech")
 addUnit("armorco","Mech")
-addUnit("armnanotc","Static")
 
-local CMD_UNIT_AI = 36214
+local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+local _, _, factory_commands, econ_commands, defense_commands, special_commands, _, _, _ = include("Configs/integral_menu_commands.lua")
+
+for i = 1, #buildOpts do
+	local name = buildOpts[i]
+	if econ_commands[-UnitDefNames[name].id] then
+		addUnit(name,"Economy")
+	elseif defense_commands[-UnitDefNames[name].id] then
+		addUnit(name,"Defence")
+	elseif special_commands[-UnitDefNames[name].id] then
+		addUnit(name,"Special")
+	else
+		addUnit(name,"Misc")
+	end
+end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
     if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
@@ -239,7 +310,28 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                     Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options[name .. "_movestate"].value}, 0)
                 end
             end
-            
+			
+			if options[name .. "_flylandstate"] and options[name .. "_flylandstate"].value then
+				if options[name .. "_flylandstate"].value == -1 then
+					-- The unit_air_plants gadget does this bit.
+					--[[ if builderID then
+						local bdid = Spring.GetUnitDefID(builderID)
+                        if UnitDefs[bdid] and UnitDefs[bdid].isFactory then	
+							local flyState = Spring.GetUnitStates(builderID, "landFlyFactory")
+							if flyState then
+                                Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {movestate}, 0)
+                            end
+						end
+					end--]]
+				else
+                    Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, 0)
+                end
+			end
+			
+			if options[name .. "_buildpriority"] and options[name .. "_buildpriority"].value then
+				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_buildpriority"].value}, 0)
+			end
+			
             if options[name .. "_tactical_ai"] and options[name .. "_tactical_ai"].value ~= nil then
                 Spring.GiveOrderToUnit(unitID, CMD_UNIT_AI, {options[name .. "_tactical_ai"].value and 1 or 0}, 0)
             end

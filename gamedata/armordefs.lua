@@ -122,14 +122,33 @@ end
 
 -- use categories to set default weapon damages
 for name, wd in pairs(DEFS.weaponDefs) do
-  local max = -0.000001
-  for _, dAmount in pairs(wd.damage) do
-    max = math.max(max, dAmount)
-  end
-  for categoryName, _ in pairs(armorDefs) do
-    wd.damage[categoryName] = wd.damage[categoryName] or wd.damage.default
-  end
-  wd.damage.default = wd.paralyzer and max*EMP_DAMAGE_MOD or max
+	local max = -0.000001
+	for _, dAmount in pairs(wd.damage) do
+		max = math.max(max, dAmount)
+	end
+	for categoryName, _ in pairs(armorDefs) do
+		wd.damage[categoryName] = wd.damage[categoryName] or wd.damage.default
+	end
+  
+	-- damage vs shields
+	if wd.customparams and wd.customparams.damage_vs_shield then
+		wd.damage.default = tonumber(wd.customparams.damage_vs_shield)
+		Spring.Echo(wd.damage.default)
+	else
+		wd.damage.default = wd.paralyzer and max*EMP_DAMAGE_MOD or max
+		-- add extra damage vs shields for mixed damage units
+		if wd.customparams and wd.customparams.extra_damage then
+			wd.damage.default = wd.damage.default + tonumber(wd.customparams.extra_damage)
+		end
+	end
+	
+	Spring.Echo(wd.name)
+	if wd.customparams then
+		for i,v in pairs(wd.customparams) do
+			Spring.Echo(i)
+		end
+	end
+	
 end
 
 --------------------------------------------------------------------------------

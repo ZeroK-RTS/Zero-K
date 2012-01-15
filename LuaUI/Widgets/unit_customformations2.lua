@@ -34,6 +34,9 @@ local unitIncreaseThresh	= 0.85 -- We only increase maxUnits if the units are gr
 -- Alpha loss per second after releasing mouse
 local lineFadeRate = 2.0
 
+CMD_UNIT_SET_TARGET = 34923 
+CMD_JUMP = 38521
+
 -- What commands are eligible for custom formations
 local formationCmds = {
 	[CMD.MOVE] = true,
@@ -41,13 +44,15 @@ local formationCmds = {
 	[CMD.ATTACK] = true,
 	[CMD.PATROL] = true,
 	[CMD.UNLOAD_UNIT] = true,
-	[38521] = true -- Jump
+	[CMD_JUMP] = true, -- jump
+	[CMD_UNIT_SET_TARGET] = true, -- settarget
 }
 
 -- What commands require alt to be held (Must also appear in formationCmds)
 local requiresAlt = {
 	[CMD.ATTACK] = true,
-	[CMD.UNLOAD_UNIT] = true
+	[CMD.UNLOAD_UNIT] = true,
+	[CMD_UNIT_SET_TARGET] = true, -- settarget
 }
 
 -- Context-based default commands that can be overridden (i.e. guard when mouseover unit)
@@ -60,7 +65,7 @@ local overrideCmds = {
 -- What commands are issued at a position or unit/feature ID (Only used by GetUnitPosition)
 local positionCmds = {
 	[CMD.MOVE]=true,		[CMD.ATTACK]=true,		[CMD.RECLAIM]=true,		[CMD.RESTORE]=true,		[CMD.RESURRECT]=true,
-	[CMD.PATROL]=true,		[CMD.CAPTURE]=true,		[CMD.FIGHT]=true, 		[CMD.MANUALFIRE]=true,		[38521]=true, -- jump
+	[CMD.PATROL]=true,		[CMD.CAPTURE]=true,		[CMD.FIGHT]=true, 		[CMD.MANUALFIRE]=true,		[CMD_JUMP]=true, -- jump
 	[CMD.UNLOAD_UNIT]=true,	[CMD.UNLOAD_UNITS]=true,[CMD.LOAD_UNITS]=true,	[CMD.GUARD]=true,		[CMD.AREA_ATTACK] = true,
 }
 
@@ -201,6 +206,7 @@ local function SetColor(cmdID, alpha)
 	if     cmdID == CMD_MOVE       then glColor(0.5, 1.0, 0.5, alpha) -- Green
 	elseif cmdID == CMD_ATTACK     then glColor(1.0, 0.2, 0.2, alpha) -- Red
 	elseif cmdID == CMD_UNLOADUNIT then glColor(1.0, 1.0, 0.0, alpha) -- Yellow
+	elseif cmdID == CMD_UNIT_SET_TARGET then glColor(1, 0.75, 0, alpha) -- Orange
 	else                                glColor(0.5, 0.5, 1.0, alpha) -- Blue
 	end
 end

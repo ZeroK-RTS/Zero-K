@@ -97,6 +97,10 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
 
+      customParams            = {
+        damage_vs_shield = [[220]],
+      },
+	  
       damage                  = {
         default = 20,
         planes  = 20,

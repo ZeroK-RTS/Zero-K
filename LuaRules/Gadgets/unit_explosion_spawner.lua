@@ -69,10 +69,9 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 			local damage = shieldCollide_id[udid].damage
 			if shieldCharge < damage then
 				return true
-			else
-				Spring.SetUnitShieldState(shieldCarrierUnitID, -1, shieldCharge - shieldCollide_id[udid].gadgetDamage)
-				noCreate[proOwnerID] = true
 			end
+			--Spring.SetUnitShieldState(shieldCarrierUnitID, -1, shieldCharge - shieldCollide_id[udid].gadgetDamage)
+			noCreate[proOwnerID] = true
 		end
 	end
 	return false

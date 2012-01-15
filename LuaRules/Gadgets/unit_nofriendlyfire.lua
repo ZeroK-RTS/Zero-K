@@ -21,6 +21,14 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  silent removal
 end
 
+local bomberWeaponDefs = {
+	[WeaponDefNames["corshad_shield_check"].id] = true,
+}
+
+local HitByWeaponUnits = {
+	[UnitDefNames["armsolar"].id] = true,
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -36,14 +44,20 @@ local spSetUnitHealth  = Spring.SetUnitHealth
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-  if (attackerDefID and 
-      UnitDefs[attackerDefID].customParams and 
-      UnitDefs[attackerDefID].customParams.nofriendlyfire and
-      attackerID ~= unitID and
-      spAreTeamsAllied(unitTeam, attackerTeam)) then
-	return 0
-  end
-  return damage
+	if (attackerDefID and 
+		UnitDefs[attackerDefID].customParams and 
+		UnitDefs[attackerDefID].customParams.nofriendlyfire and
+		attackerID ~= unitID and
+		spAreTeamsAllied(unitTeam, attackerTeam)) then
+		return 0
+	end
+  
+	if HitByWeaponUnits[unitDefID] and not bomberWeaponDefs[weaponID] then
+		local func = Spring.UnitScript.GetScriptEnv(unitID).HitByWeaponGadget
+		Spring.UnitScript.CallAsUnit(unitID,func)
+	end
+  
+	return damage
 end
 
 --------------------------------------------------------------------------------

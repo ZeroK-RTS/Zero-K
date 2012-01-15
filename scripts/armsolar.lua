@@ -69,11 +69,19 @@ local function DefensiveManeuver()
 	SetUnitValue(COB.ACTIVATION, 1)
 end
 
+function HitByWeaponGadget()
+	StartThread(DefensiveManeuver)
+end
+
+--[[
+-- this happens before PreDamaged
 function script.HitByWeapon(x, z, weaponDefID, damage)
-	if not bomberWeaponDefs[weaponDefID] then
+	if damage > 1 and not bomberWeaponDefs[weaponDefID] then
 		StartThread(DefensiveManeuver)
 	end
 end
+--]]
+
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth

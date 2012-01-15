@@ -42,7 +42,7 @@ include("LuaRules/Configs/customcmds.h.lua")
 
 local unitSetTargetCmdDesc = {
 	id      = CMD_UNIT_SET_TARGET,
-	type    = CMDTYPE.ICON_UNIT_OR_MAP,
+	type    = CMDTYPE.ICON_UNIT_OR_RECTANGLE,
 	name    = 'Set Target',
 	action  = 'settarget',
     cursor  = 'Attack',
@@ -174,12 +174,57 @@ end
 --------------------------------------------------------------------------------
 -- Command Tracking
 
+local function disSQ(x1,y1,x2,y2)
+	return (x1 - x2)^2 + (y1 - y2)^2
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	
     
     if cmdID == CMD_UNIT_SET_TARGET  then
         if validUnit(unitDefID) then
-            if #cmdParams == 3 then
+            if #cmdParams == 6 then
+				local team = Spring.GetUnitTeam(unitID)
+				
+				if not team then
+					return false
+				end
+				
+				local units = CallAsTeam(team,
+					function ()
+					return Spring.GetUnitsInRectangle(cmdParams[1],cmdParams[3],cmdParams[4],cmdParams[6]) end)
+					
+				local ux, uy, uz = Spring.GetUnitPosition(unitID)
+				
+				local bestDis = false
+				local bestUnit = false
+
+				if ux and units then
+					for i = 1, #units do
+						local tTeam = Spring.GetUnitTeam(units[i])
+						if tTeam and (not Spring.AreTeamsAllied(team,tTeam)) then
+							local tx,ty,tz = Spring.GetUnitPosition(units[i])
+							if tx then
+								local newDis = disSQ(ux,uz,tx,tz)
+								if (not bestDis) or bestDis > newDis then
+									bestDis = newDis
+									bestUnit = units[i]
+								end
+							end
+						end
+					end
+				end
+				
+				if bestUnit then
+					 addUnit(unitID, {
+						id = unitID, 
+						targetID = bestUnit, 
+						allyTeam = spGetUnitAllyTeam(unitID), 
+						range = UnitDefs[unitDefID].maxWeaponRange
+					})
+				end
+				
+			elseif #cmdParams == 3 then
                 addUnit(unitID, {
                     id = unitID, 
                     x = cmdParams[1], 

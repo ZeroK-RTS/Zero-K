@@ -29,6 +29,7 @@ unitDef = {
   cruiseAlt              = 30,
 
   customParams           = {
+    landflystate   = [[1]],
     description_bp = [[Dróide bomba]],
     description_fr = [[Drône Éxplosif]],
 	description_de = [[Bombendrohne]],

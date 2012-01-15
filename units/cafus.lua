@@ -55,7 +55,7 @@ unitDef = {
   TEDClass                      = [[ENERGY]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
-  workerTime                    = 0,
+  yardMap                       = [[ooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
   featureDefs                   = {
 
