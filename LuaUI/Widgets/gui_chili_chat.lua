@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Chat v0.43",
+    name      = "Chili Chat v0.441",
     desc      = "v0.441 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",

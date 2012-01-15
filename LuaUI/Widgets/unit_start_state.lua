@@ -17,6 +17,9 @@ end
 local CMD_UNIT_AI = 36214
 local CMD_PRIORITY = 34220
 local CMD_AP_FLY_STATE = 34569
+local CMD_RETREAT = 10000
+local CMD_AIR_STRAFE = 39381
+
 
 local holdPosException = { 
     ["factoryplane"] = true,
@@ -31,10 +34,10 @@ local function IsGround(ud)
 end
 
 options_path = 'Game/Unit AI/Initial States'
-options_order = { 'presetlabel', 'holdPosition', 'commander_label', 'commander_firestate', 'commander_movestate'}
+options_order = { 'presetlabel', 'holdPosition', 'commander_label', 'commander_firestate', 'commander_movestate', 'commander_buildpriority', 'commander_retreat'}
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
-    
+
     holdPosition = {
 		type='button',
 		name= "Hold Position",
@@ -43,43 +46,54 @@ options = {
             rememberToSetHoldPositionPreset = true
         end,
 	},
-    
+
     commander_label = {
         name = "label", 
         type = 'label', 
         value = "Commander",
         path = "Game/Unit AI/Initial States/Misc",
     },
-    
+
     commander_firestate = {
-        name = "Firestate",
-        desc = "Values: inherit from factory, hold fire, return fire, fire at will",
+        name = "  Firestate",
+        desc = "Values: hold fire, return fire, fire at will",
         type = 'number',
-        value = -1, -- most firestates are -1
-        min = -1,
+        value = 2, -- commander are fire@will by default
+        min = 0, -- most firestates are -1 but no factory/unit build comm (yet)
         max = 2,
         step = 1,
         path = "Game/Unit AI/Initial States/Misc",
     },
 
     commander_movestate = {
-        name = "Movestate",
-        desc = "Values: inherit from factory, hold positon, manuver, roam",
+        name = "  Movestate",
+        desc = "Values: hold position, maneuver, roam",
         type = 'number',
-        value = -1,
-        min = -1,
+        value = 1,
+        min = 0,-- no factory/unit build comm (yet)
         max = 2,
         step = 1,
         path = "Game/Unit AI/Initial States/Misc",
     },
-	
+
 	commander_buildpriority = {
-        name = "Build Priority",
+        name = "  Build Priority",
         desc = "Values: Low, Normal, High",
         type = 'number',
         value = 1,
         min = 0,
         max = 2,
+        step = 1,
+        path = "Game/Unit AI/Initial States/Misc",
+    },
+	
+	commander_retreat = {
+		name = "  Retreat at value",
+		desc = "Values: no retreat, 30%, 60%, 90% health remaining",
+        type = 'number',
+        value = 0,
+        min = 0,
+        max = 3,
         step = 1,
         path = "Game/Unit AI/Initial States/Misc",
     },
@@ -127,7 +141,7 @@ local function addUnit(defName, path)
     
     if ud.canAttack then
         options[defName .. "_firestate"] = {
-            name = "Firestate",
+            name = "  Firestate",
             desc = "Values: inherit from factory, hold fire, return fire, fire at will",
             type = 'number',
             value = ud.fireState, -- most firestates are -1
@@ -141,8 +155,8 @@ local function addUnit(defName, path)
 
     if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
         options[defName .. "_movestate"] = {
-            name = "Movestate",
-            desc = "Values: inherit from factory, hold positon, manuver, roam",
+            name = "  Movestate",
+            desc = "Values: inherit from factory, hold position, maneuver, roam",
             type = 'number',
             value = ud.moveState,
             min = -1,
@@ -155,7 +169,7 @@ local function addUnit(defName, path)
 	
 	if (ud.canFly) then
 		options[defName .. "_flylandstate"] = {
-            name = "Fly/Land State",
+            name = "  Fly/Land State",
             desc = "Values: inherit from factory, fly, land",
             type = 'number',
             value = (ud.customParams and ud.customParams.landflystate and ((ud.customParams.landflystate == "1" and 1) or 0)) or -1,
@@ -165,9 +179,19 @@ local function addUnit(defName, path)
             path = path,
         }
 		options_order[#options_order+1] = defName .. "_flylandstate"
+		if (ud.airStrafe) then
+		options[defName .. "_airstrafe"] = {
+            name = "  Air Strafe",
+            desc = "Air Strafe: check box to turn it on",
+            type = 'bool',
+            value = 0,
+            path = path,
+        }
+		options_order[#options_order+1] = defName .. "_airstrafe"
+		end
 	elseif ud.customParams and ud.customParams.landflystate then
 		options[defName .. "_flylandstate_factory"] = {
-            name = "Fly/Land State for factory",
+            name = "  Fly/Land State for factory",
             desc = "Values: fly, land",
             type = 'number',
             value = (ud.customParams and ud.customParams.landflystate and ud.customParams.landflystate == "1" and 1) or 0,
@@ -178,9 +202,10 @@ local function addUnit(defName, path)
         }
 		options_order[#options_order+1] = defName .. "_flylandstate_factory"
 	end
-	
+
+	if (ud.isBuilding or ud.isFactory or ud.isBuilder) then
 	options[defName .. "_buildpriority"] = {
-        name = "Build Priority",
+        name = "  Build Priority",
         desc = "Values: Low, Normal, High",
         type = 'number',
         value = 1,
@@ -190,11 +215,26 @@ local function addUnit(defName, path)
         path = path,
     }
 	options_order[#options_order+1] = defName .. "_buildpriority"
+	end
+
+	if (ud.canMove or ud.isFactory) then
+		options[defName .. "_retreatpercent"] = {
+			name = "  Retreat at value",
+			desc = "Values: inherit from factory, no retreat, 30%, 60%, 90% health remaining",
+			type = 'number',
+			value = -1,
+			min = -1,
+			max = 3,
+			step = 1,
+			path = path,
+		}
+	options_order[#options_order+1] = defName .. "_retreatpercent"
+	end
 
     if tacticalAIUnits[defName] then
         options[defName .. "_tactical_ai"] = {
-            name = "Smart AI",
-            desc = "Values: check box to turn it on",
+            name = "  Smart AI",
+            desc = "Smart AI: check box to turn it on",
             type = 'bool',
             value = true,
             path = path,
@@ -204,8 +244,8 @@ local function addUnit(defName, path)
     
     if ud.canCloak then
         options[defName .. "_personal_cloak"] = {
-            name = "Personal Cloak",
-            desc = "Values: check box to turn it on",
+            name = "  Personal Cloak",
+            desc = "Personal Cloak: check box to turn it on",
             type = 'bool',
             value = ud.startCloaked,
             path = path,
@@ -266,14 +306,20 @@ end
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
     if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
         
-        if UnitDefs[unitDefID].customParams.level then
-            if options.commander_firestate.value ~= -1 then
+        if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
+            if options.commander_firestate.value ~= 2 then
                 Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, 0)
             end
             
-            if options.commander_movestate.value ~= -1 then
+            if options.commander_movestate.value ~= 1 then
                 Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate.value}, 0)
             end
+			if options.commander_retreat.value ~= 0 then
+				Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, 0)
+			end
+			if options.commander_buildpriority.value ~= 1 then
+				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_buildpriority.value}, 0)
+			end
         end
         
         local name = UnitDefs[unitDefID].name
@@ -310,7 +356,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                     Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options[name .. "_movestate"].value}, 0)
                 end
             end
-			
+
 			if options[name .. "_flylandstate"] and options[name .. "_flylandstate"].value then
 				if options[name .. "_flylandstate"].value == -1 then
 					-- The unit_air_plants gadget does this bit.
@@ -327,7 +373,28 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                     Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, 0)
                 end
 			end
-			
+
+			if options[name .. "_airstrafe"] and options[name .. "_airstrafe"].value ~= nil then
+				Spring.GiveOrderToUnit(unitID, CMD_AIR_STRAFE, {options[name .. "_airstrafe"].value and 1 or 0}, 0)
+			end
+
+			if options[name .. "_retreatpercent"] and options[name .. "_retreatpercent"].value then
+				if options[name .. "_retreatpercent"].value == -1 then
+					if builderID then
+						local bdid = Spring.GetUnitDefID(builderID)
+						if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
+							local retreat = Spring.GetUnitStates(builderID).retreat
+							if retreat then
+								Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {_retreatpercent}, 0)
+							end
+						end
+					end
+				else
+					Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options[name .. "_retreatpercent"].value}, 0)
+					--WG['retreat'].addRetreatCommand(unitID, unitDefID, 2) -> overriden by factory setting @factory exit.
+				end
+			end
+
 			if options[name .. "_buildpriority"] and options[name .. "_buildpriority"].value then
 				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_buildpriority"].value}, 0)
 			end
