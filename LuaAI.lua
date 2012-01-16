@@ -36,28 +36,8 @@ return {
     desc = 'Flaming hell!'
   },
   {
-    name = 'Chicken Eggs: Easy',
-    desc = 'Easter!'
-  },
-  {
-    name = 'Chicken Eggs: Normal',
-    desc = 'Yummy! Scrambled eggs!'
-  },
-  {
-    name = 'Chicken Eggs: Hard',
-    desc = 'Watch you eggs! Easter bunny is coming!'
-  },
-  {
-    name = 'Chicken Eggs: Suicidal',
-    desc = 'Devilled eggs! It burns! It burns!'
-  },
-  {
     name = 'Chicken: Custom',
     desc = 'A chicken experience customizable using modoptions'
-  },
-  {
-    name = 'Chicken Eggs: Custom',
-    desc = 'A chicken experience customizable using modoptions WITH EGGS!'
   },
   {
 	name = 'Chicken: Speed',
