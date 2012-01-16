@@ -28,6 +28,7 @@ unitDef = {
   cruiseAlt           = 80,
 
   customParams        = {
+    airstrafecontrol = [[1]],
     description_bp = [[Transporte aéreo]],
     description_fr = [[Transport Aerien]],
 	description_de = [[Lufttransport]],

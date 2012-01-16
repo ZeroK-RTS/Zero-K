@@ -28,6 +28,7 @@ unitDef = {
   cruiseAlt              = 140,
 
   customParams           = {
+    airstrafecontrol = [[1]],
     description_bp = [[Aeronave flutuadora agressora]],
     description_fr = [[ADAV Pilleur]],
 	description_de = [[Skirmisher/Flugabwehr Hubschrauber]],

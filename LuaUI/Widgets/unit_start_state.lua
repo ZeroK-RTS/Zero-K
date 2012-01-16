@@ -179,16 +179,6 @@ local function addUnit(defName, path)
             path = path,
         }
 		options_order[#options_order+1] = defName .. "_flylandstate"
-		if (ud.airStrafe) then
-		options[defName .. "_airstrafe"] = {
-            name = "  Air Strafe",
-            desc = "Air Strafe: check box to turn it on",
-            type = 'bool',
-            value = 0,
-            path = path,
-        }
-		options_order[#options_order+1] = defName .. "_airstrafe"
-		end
 	elseif ud.customParams and ud.customParams.landflystate then
 		options[defName .. "_flylandstate_factory"] = {
             name = "  Fly/Land State for factory",
@@ -202,8 +192,18 @@ local function addUnit(defName, path)
         }
 		options_order[#options_order+1] = defName .. "_flylandstate_factory"
 	end
+	
+	if ud.customParams and ud.customParams.airstrafecontrol then
+		options[defName .. "_airstrafe"] = {
+			name = "  Air Strafe",
+			desc = "Air Strafe: check box to turn it on",
+			type = 'bool',
+			value = 0,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_airstrafe"
+	end
 
-	if (ud.isBuilding or ud.isFactory or ud.isBuilder) then
 	options[defName .. "_buildpriority"] = {
         name = "  Build Priority",
         desc = "Values: Low, Normal, High",
@@ -215,7 +215,6 @@ local function addUnit(defName, path)
         path = path,
     }
 	options_order[#options_order+1] = defName .. "_buildpriority"
-	end
 
 	if (ud.canMove or ud.isFactory) then
 		options[defName .. "_retreatpercent"] = {
@@ -307,19 +306,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
         
         if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
-            if options.commander_firestate.value ~= 2 then
-                Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, 0)
-            end
-            
-            if options.commander_movestate.value ~= 1 then
-                Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate.value}, 0)
-            end
-			if options.commander_retreat.value ~= 0 then
-				Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, 0)
-			end
-			if options.commander_buildpriority.value ~= 1 then
-				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_buildpriority.value}, 0)
-			end
+            Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, 0)
+            Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate.value}, 0)
+			Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, 0)
+			Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_buildpriority.value}, 0)
         end
         
         local name = UnitDefs[unitDefID].name

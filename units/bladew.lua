@@ -24,6 +24,7 @@ unitDef = {
   cruiseAlt           = 78,
 
   customParams        = {
+    airstrafecontrol = [[1]],
     description_fr = [[Drône Paralysant Léger]],
 	description_de = [[Leichte, paralysierende Drohne]],
     helptext       = [[The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with banshees or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to defenders.]],

@@ -37,18 +37,15 @@ local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local spFindUnitCmdDesc   = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
 
-local strafeUnitDefs = {
-	[UnitDefNames["armkam"].id] = true,
-	[UnitDefNames["bladew"].id] = true,
-	[UnitDefNames["corape"].id] = true,
-	[UnitDefNames["armbrawl"].id] = true,
-	[UnitDefNames["blackdawn"].id] = true,
-	--[UnitDefNames["corcrw"].id] = true,
-    [UnitDefNames["armca"].id] = true,
-    [UnitDefNames["armcsa"].id] = true,
-    [UnitDefNames["corvalk"].id] = true,
-    [UnitDefNames["corbtrans"].id] = true,
-}
+local strafeUnitDefs = {}
+
+for id, data in pairs(UnitDefs) do
+	Spring.Echo(data.name)
+	if data.customParams and data.customParams.airstrafecontrol then
+		Spring.Echo(data.name)
+		strafeUnitDefs[id] = true
+	end
+end
 
 local unitState = {}
 

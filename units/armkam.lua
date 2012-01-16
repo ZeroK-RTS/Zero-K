@@ -28,6 +28,7 @@ unitDef = {
   cruiseAlt              = 100,
 
   customParams           = {
+    airstrafecontrol = [[1]],
     description_bp = [[Aeronave agressora]],
     description_fr = [[ADAV Pilleur]],
 	description_de = [[Plünder Kampfhubschrauber]],

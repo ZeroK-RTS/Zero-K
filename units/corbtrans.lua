@@ -29,6 +29,7 @@ unitDef = {
   cruiseAlt              = 250,
 
   customParams           = {
+    airstrafecontrol = [[1]],
     description_bp = [[Transporte aéreo pesado armado]],
     description_fr = [[Transport Aerien Arm? Lourd]],
 	description_de = [[Schwerer, bewaffneter Lufttransport]],

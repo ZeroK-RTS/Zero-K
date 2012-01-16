@@ -59,6 +59,7 @@ unitDef = {
   cruiseAlt           = 80,
 
   customParams        = {
+    airstrafecontrol = [[1]],
     description_fr = [[ADAV de Construcion Furtif Camouflable, Construit r 6 m/s]],
 	description_de = [[Fliegender SpecOps Bauleiter, Baut mit 9 m/s]],
 	helptext_de    = [[Athene ist die Spitze der Tarnungsschlagkraft. Ausgerüstet mit einem Verhüllungsgeräte und einem Radarstörer kann es durch gegnerische Verteidigungslinien fliegen und Truppen aus Angreifern zusammenstellen, die dann Verwüstung nachsichziehen werden und die gegnerische Logistik vernichten können.]],

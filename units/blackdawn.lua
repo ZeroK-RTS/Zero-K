@@ -27,6 +27,7 @@ unitDef = {
   cruiseAlt           = 210,
 
   customParams        = {
+    airstrafecontrol = [[1]],
     description_bp = [[Aeronave flutuante de assalto terrestre]],
     description_fr = [[ADAV d'Assaut Terrestre]],
 	description_de = [[Bodenangriff-Kampfhubschrauber]],
