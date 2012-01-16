@@ -17,7 +17,7 @@ end
 --config
 ----------------------------------------------------------------
 --negative to disable blinking
-local blinkPeriod = 0.25
+local blinkPeriod = -1
 local ttl = 15
 local highlightSize = 32
 local highlightLineMin = 24
