@@ -37,19 +37,19 @@ smokePiece = {base, tailgun}
 local weaponPieces = {
 	[1] = {aimFrom = body, flare = {body}},
     [2] = {aimFrom = tailgun, flare = {flare1} },
-	[3] = {pivot = gunl, pitch = arml1, aimFrom = gunl, flare = {flare1l, flare2l, flare3l} },
-	[4] = {pivot = gunr, pitch = armr1, aimFrom = gunr, flare = {flare1r, flare2r, flare3r} },
+    [3] = {aimFrom = tailgun, flare = {flare1} },	
+	[4] = {pivot = gunl, pitch = arml1, aimFrom = gunl, flare = {flare1l, flare2l, flare3l} },
+	[5] = {pivot = gunr, pitch = armr1, aimFrom = gunr, flare = {flare1r, flare2r, flare3r} },
 }
 
-local gun_cycle = {[1] = 1, [2] = 1, [3] = 1, [4] = 1,}
+local gun_cycle = {1, 1, 1, 1, 1}
 
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
 -- Signal definitions
 local SIG_WALK = 1
-local SIG_AIM = {2, 4, 8}
-local SIG_RESTORE = 16
+local SIG_RESTORE = 2
 
 local PERIOD = 0.22
 
@@ -127,16 +127,17 @@ local function RestoreAfterDelay()
 		Turn( tailPieces[i], y_axis, 0, turnSpeed )
 	end
 	
-	for i=3,4 do
+	for i=4,5 do
 		Turn( weaponPieces[i].pivot, y_axis, 0, math.rad(60) )
 		Turn( weaponPieces[i].pitch, x_axis, 0, math.rad(45) )
 	end
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal( SIG_AIM[num])
-	SetSignalMask( SIG_AIM[num])
-	if num == 2 then
+	local sig = 2^num
+	Signal(sig)
+	SetSignalMask(sig)
+	if num == 2 or num == 3 then
 		if heading > math.pi then heading = -(2 * math.pi - heading) end
 		for i=1, #tailPieces do
 			Turn( tailPieces[i], x_axis, -pitch/6, tailPitchSpeed )
@@ -168,12 +169,15 @@ function script.BlockShot(num)
 end
 
 function script.Shot(num)
-	if num > 2 then
+	if num > 3 then
 		gun_cycle[num] = gun_cycle[num] + 1
 		if gun_cycle[num] > 3 then gun_cycle[num] = 1 end
-	else
+	elseif num == 2 then
 		EmitSfx(flare1, 1024)
 		EmitSfx(flare1, 1025)
+	elseif num == 3 then
+		EmitSfx(flare1, 1026)
+		EmitSfx(flare1, 1027)	
 	end
 end
 

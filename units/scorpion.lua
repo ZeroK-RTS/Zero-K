@@ -11,9 +11,9 @@ unitDef = {
   buildTime              = 3000,
   canAttack              = true,
   canGuard               = true,
+  canManualFire			 = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND]],
   cloakCost              = 2,
   cloakCostMoving        = 10,
@@ -28,7 +28,7 @@ unitDef = {
 	cloakstealth   = [[1]],
   },
 
-  explodeAs              = [[BIG_UNITEX]],
+  explodeAs              = [[CRAWL_BLASTSML]],
   footprintX             = 4,
   footprintZ             = 4,
   iconType               = [[t3spidergeneric]],
@@ -48,13 +48,15 @@ unitDef = {
   objectName             = [[scorpion.s3o]],
   script				 = [[scorpion.lua]],
   seismicSignature       = 4,
-  selfDestructAs         = [[BIG_UNITEX]],
+  selfDestructAs         = [[CRAWL_BLASTSML]],
 
   sfxtypes               = {
 
     explosiongenerators = {
       [[custom:zeusmuzzle]],
       [[custom:zeusgroundflash]],
+      [[custom:YELLOW_LIGHTNING_MUZZLE]],
+      [[custom:YELLOW_LIGHTNING_GROUNDFLASH]],	  
     },
 
   },
@@ -83,6 +85,11 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
+    {
+      def                = [[MULTILIGHTNING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },	
+	
     {
       def                = [[PARTICLEBEAM]],
 	  mainDir            = [[-0.2 0 1]],
@@ -152,7 +159,6 @@ unitDef = {
     LIGHTNING = {
       name                    = [[Lightning Gun]],
       areaOfEffect            = 8,
-      beamWeapon              = true,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -191,6 +197,47 @@ unitDef = {
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 400,
     },
+	
+    MULTILIGHTNING = {
+      name                    = [[Multi-Stunner]],
+      areaOfEffect            = 160,
+	  burst					  = 20,
+	  burstRate				  = 0.1,
+	  commandFire			  = true,
+      craterBoost             = 0,
+      craterMult              = 0,
+      cylinderTargetting      = 0,
+
+      damage                  = {
+        default        = 1000,
+        empresistant75 = 250,
+        empresistant99 = 10,
+      },
+
+      duration                = 8,
+      dynDamageExp            = 0,
+      edgeEffectiveness       = 0.8,
+      explosionGenerator      = [[custom:YELLOW_LIGHTNINGPLOSION]],
+      fireStarter             = 0,
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      intensity               = 12,
+      interceptedByShieldType = 1,
+      noSelfDamage            = true,
+      paralyzer               = true,
+      paralyzeTime            = 3,
+      range                   = 470,
+      reloadtime              = 30,
+      rgbColor                = [[1 1 0.25]],
+      soundStart              = [[weapon/lightning_fire]],
+      soundTrigger            = false,
+	  sprayAngle			  = 2048,
+      texture1                = [[lightning]],
+      thickness               = 10,
+      turret                  = true,
+      weaponType              = [[LightningCannon]],
+      weaponVelocity          = 450,
+    },	
 
     PARTICLEBEAM = {
       name                    = [[Auto Particle Beam]],
