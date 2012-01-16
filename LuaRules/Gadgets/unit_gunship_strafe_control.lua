@@ -40,9 +40,7 @@ local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
 local strafeUnitDefs = {}
 
 for id, data in pairs(UnitDefs) do
-	Spring.Echo(data.name)
 	if data.customParams and data.customParams.airstrafecontrol then
-		Spring.Echo(data.name)
 		strafeUnitDefs[id] = true
 	end
 end

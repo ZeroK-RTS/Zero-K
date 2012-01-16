@@ -133,7 +133,6 @@ for name, wd in pairs(DEFS.weaponDefs) do
 	-- damage vs shields
 	if wd.customparams and wd.customparams.damage_vs_shield then
 		wd.damage.default = tonumber(wd.customparams.damage_vs_shield)
-		--Spring.Echo(wd.damage.default)
 	else
 		wd.damage.default = wd.paralyzer and max*EMP_DAMAGE_MOD or max
 		-- add extra damage vs shields for mixed damage units
@@ -141,14 +140,6 @@ for name, wd in pairs(DEFS.weaponDefs) do
 			wd.damage.default = wd.damage.default + tonumber(wd.customparams.extra_damage)
 		end
 	end
-	--[[
-	Spring.Echo(wd.name)
-	if wd.customparams then
-		for i,v in pairs(wd.customparams) do
-			Spring.Echo(i)
-		end
-	end
-	]]--
 	
 end
 
