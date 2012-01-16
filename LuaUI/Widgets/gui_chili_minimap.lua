@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.88 Chili Minimap",
+    desc      = "v0.881 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -75,7 +75,7 @@ options = {
 		name = 'Toggle Pathing Map',
 		desc = 'Select unit then click this to see where it can go.',
 		type = 'button',
-		action = 'showpathmap',
+		action = 'showpathtraversability',
 	},
 	viewmetalmap = {
 		name = 'Toggle Metal Map',
