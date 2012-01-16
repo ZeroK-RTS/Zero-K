@@ -10,7 +10,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Jumjet GUI",
+    name      = "Jumpjet GUI",
     desc      = "Draws jump arc.",
     author    = "quantum",
     date      = "May 30, 2008",
@@ -47,15 +47,17 @@ local spTraceScreenRay         = Spring.TraceScreenRay
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local pairs, ipairs = pairs, ipairs
 
 
 local glVertex = glVertex
-local CMD_JUMP = 38521
 local green    = {0.5,   1, 0.5,   1}
 local yellow   = {  1,   1, 0.5,   1}
-local red      = {  1, 0.5, 0.5,   1}
+local orange   = {	1, 0.5,   0,   1}
+local pink     = {  1, 0.5, 0.5,   1}
+local red      = {  1,   0,   0,   1}
 
 local jumpDefNames  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
@@ -77,8 +79,8 @@ local ignore = {
   [CMD_SET_WANTED_MAX_SPEED] = true,
 }
 
-local curve = {CMD_MOVE, CMD_JUMP}
-local line = {CMD_FIGHT, CMD_ATTACK}
+local curve = {CMD_MOVE, CMD_JUMP, CMD_FIGHT}
+local line = {CMD_ATTACK}
 
 curve = ListToSet(curve)
 line  = ListToSet(line)
@@ -111,7 +113,7 @@ local function DrawLoop(start, vector, color, progress, step, height)
 end
 
 
-local function DrawArc(unitID, start, finish, color, jumpFrame, range)
+local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimate)
 
   -- todo: display lists
   
@@ -127,7 +129,8 @@ local function DrawArc(unitID, start, finish, color, jumpFrame, range)
   end
   
   if (range) then
-    glColor(yellow[1], yellow[2], yellow[3], yellow[4])
+	local col = isEstimate and orange or yellow
+    glColor(col[1], col[2], col[3], col[4])
     glDrawGroundCircle(start[1], start[2], start[3], range, 100)
   end
   
@@ -173,7 +176,7 @@ local function DrawLine(a, b, color)
   glLineStipple(false)
 end
  
-
+-- unused
 local function DrawQueue(unitID)
   local queue = spGetCommandQueue(unitID)
   if (not queue or not jumpDefs[spGetUnitDefID(unitID)]) then
@@ -210,17 +213,20 @@ local function  DrawMouseArc(unitID, shift, groundPos)
   if (not queue or #queue == 0 or not shift) then
     local unitPos = {spGetUnitPosition(unitID)}
     local dist = GetDist2(unitPos, groundPos)
-    local color = range > dist and green or red
+    local color = range > dist and green or pink
     DrawArc(unitID, unitPos, groundPos, color, nil, range)
   elseif (shift) then
     local i = #queue
     while (ignore[queue[i].id] and i > 0) do
       i = i - 1
     end
-    if (curve[queue[i].id]) then
+    if (curve[queue[i].id]) or (queue[i].id < 0) or (#queue[i].params == 3) or (#queue[i].params == 4) then
+	  local isEstimate = not curve[queue[i].id]
       local dist  = GetDist2(queue[i].params, groundPos)
-      local color = range > dist and green or red
-      DrawArc(unitID, queue[i].params, groundPos, color, nil, range)
+	  local cGood = isEstimate and yellow or green
+	  local cBad = isEstimate and orange or pink
+      local color = range > dist and cGood or cBad
+      DrawArc(unitID, queue[i].params, groundPos, color, nil, range, isEstimate)
     end
   end
 end
