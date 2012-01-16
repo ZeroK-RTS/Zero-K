@@ -100,6 +100,7 @@ local nextRefreshTime = 0 --//variable: indicate when to activate player list re
 local refreshDelay = 5 --//constant: seconds before playerIDlistG is refreshed and retry list resetted.
 
 --communication protocol variables
+local currentTime_g=0 --//variable: used to indicate current ingame seconds
 local waitTransmissionUntilThisTime_g =currentTime_g --//variable:allow widget:Update() polling to wait until at time calculated using reported ping.
 local waitBusyUntilThisTime_g=currentTime_g --//variable: allow NetworkProtocol replying to wait until at time calculate using reported ping.
 local checklistTableG_g={} --//variable: widget's stack/queue
@@ -110,7 +111,6 @@ local tableIsCompleted_g=false --//variable: used as switch to stop checking che
 local fileRequestTableG_g={} --//variable: used by Operation Mode "B" to store file requested by others.
 local bufferIndex_g=0 --//variable: used to indicate the index of Message receive buffer (msgRecv)
 local msgRecv_g={} --//variable: store message before it is processed
-local currentTime_g=0 --//variable: used to indicate current ingame seconds
 
 --------------------------------------------------------------------------------
 --File operation----------------------------------------------------------------
