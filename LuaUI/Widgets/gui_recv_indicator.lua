@@ -3,8 +3,8 @@ local versionName = "v1.02"
 --
 --  file:   gui_recv_indicator.lua
 --  brief:   a clustering algorithm
---  algorithm: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and Jörg Sander
---	algorithm: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, Jörg Sander and Xiaowei Xu
+--  algorithm: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and JÃ¶rg Sander
+--	algorithm: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, JÃ¶rg Sander and Xiaowei Xu
 --	code:  Msafwan
 --
 --  Licensed under the terms of the GNU GPL, v2 or later.
@@ -38,7 +38,7 @@ local function AddMarker (cluster, unitIDNoise)
 	------
 	--// extract cluster information and add mapMarker.
 	local currentIndex=0
-	--local playerName = Spring.GetPlayerInfo(givenByTeamID)
+	local playerName = Spring.GetPlayerInfo(givenByTeamID)
 	for index=1 , #cluster do
 		local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
 		for unitIndex=1, #cluster[index] do
@@ -301,19 +301,19 @@ local function ExpandClusterOrder(receivedUnitList, unitID, neighborhoodRadius, 
 	return orderedFile, objects
 end
 
--- ExtractDBSCAN-Clustering (ClusterOrderedObjs,e’, MinPts)
--- // Precondition: e' £ generating dist e for ClusterOrderedObjs
+-- ExtractDBSCAN-Clustering (ClusterOrderedObjs,eÂ’, MinPts)
+-- // Precondition: e' Â£ generating dist e for ClusterOrderedObjs
 -- ClusterId := NOISE;
 -- FOR i FROM 1 TO ClusterOrderedObjs.size DO
 -- Object := ClusterOrderedObjs.get(i);
--- IF Object.reachability_distance > e’ THEN
+-- IF Object.reachability_distance > eÂ’ THEN
 -- // UNDEFINED > e
--- IF Object.core_distance £ e’ THEN
+-- IF Object.core_distance Â£ eÂ’ THEN
 -- ClusterId := nextId(ClusterId);
 -- Object.clusterId := ClusterId;
 -- ELSE
 -- Object.clusterId := NOISE;
--- ELSE // Object.reachability_distance £ e’
+-- ELSE // Object.reachability_distance Â£ eÂ’
 -- Object.clusterId := ClusterId;
 -- END; // ExtractDBSCAN-Clustering
 
