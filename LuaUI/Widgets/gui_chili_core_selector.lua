@@ -733,6 +733,7 @@ end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
   widget:UnitCreated(unitID, unitDefID, unitTeam)
+  widget:UnitFinished(unitID, unitDefID, unitTeam)  
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
