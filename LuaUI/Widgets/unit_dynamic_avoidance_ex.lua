@@ -1,4 +1,4 @@
-local versionName = "v1.76"
+local versionName = "v1.77"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -11,7 +11,7 @@ local versionName = "v1.76"
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Dynamic Avoidance System",
+    name      = "Dynamic Avoidance Syste",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor, cloakies, and ground combat unit",
     author    = "msafwan",
     date      = "Dec 26, 2011",
@@ -88,7 +88,7 @@ local velocityScalingCONSTANTg=1 --decrease/increase command lenght. (default= 1
 local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command lenght (default = 0 meter/second)
 
 --Move Command constant:
-local halfTargetBoxSize = {400, 50, 190, 50} --the distance from a target which widget should de-activate (default: move = 400m ie:800x800m box, 2x constructor range, reclaim/ressurect=50 (flee when not close enough), repair=190 (1x constructor's range -10), GUARD = 50 (arbitrary, same as reclaim))
+local halfTargetBoxSize = {400, 0, 185, 50} --the distance from a target which widget should de-activate (default: MOVE = 400m ie:800x800m box, 2x constructor range, RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
 local cMD_DummyG = 248 --a fake command ID to flag an idle unit for pure avoidance. (arbitrary value, change if conflict with existing command)
 local dummyIDg = "248" --fake id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue) (arbitrary value, change if conflict with other widget)
 
@@ -247,7 +247,7 @@ function RefreshUnitList(attacker)
 					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
-				elseif not unitDef["canFly"] then --if enabled: include all ground unit
+				elseif not unitDef["canFly"] or (unitDef.hoverAttack== true) then --if enabled: include all ground unit
 					local unitShieldPower, reloadableWeaponIndex= -1, -1
 					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
@@ -466,17 +466,17 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		local isReloading = CheckIfUnitIsReloading(unitInMotionSingleUnit) --check if unit is reloading/shieldCritical
 		local state=spGetUnitStates(unitID)
 		local holdPosition= (state.movestate == 0)
-		if ((unitInMotionSingleUnit.isVisible ~= "yes" or isReloading) and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and is idle/with-singular-mono-command (eg: widget's move order), or is reloading with mono-command (eg: auto-attack) then:
+		if ((unitInMotionSingleUnit.isVisible ~= "yes" or isReloading) and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and currently idle/with-singular-mono-command (eg: widget's move order), or is reloading and currently idle/with-singular-mono-command (eg: auto-attack) then:
 			if movestate~= 0 then --if not "hold position"
 				cQueue={{id = cMD_DummyG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --replace with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit
 			end
 		end
-		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND can.
+		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND (cMD_DummyG) is allowed.
 			local isValidCommand = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) -- allow unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
 			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1 or unitInMotionSingleUnit.isVisible ~= "yes")--allow only unit of unitType=1 OR any units outside player's vision
 			local _2ndAttackSignature = false --attack command signature
 			local _2ndGuardSignature = false --guard command signature
-			if #cQueue >=2 then --in case the command-queue is masked by widget's previous command (the actual check for originality is performed by TargetBoxReached() function later)
+			if #cQueue >=2 then --in case the command-queue is masked by widget's previous command, but the actual check for originality is performed by TargetBoxReached() later.
 				_2ndAttackSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_ATTACK)
 				_2ndGuardSignature = (cQueue[1].id == CMD_MOVE and cQueue[2].id == CMD_GUARD)
 			end
@@ -768,7 +768,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
 				if (cQueue[queueIndex+1].params[3]~=nil) then  --area command should has no "nil" on params 1,2,3, & 4
 					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete old command, skip the target:wreck/units. Allow command reset
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_SHIFT, cQueue[queueIndex+1].params[1], cQueue[queueIndex+1].params[2], cQueue[queueIndex+1].params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
+					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cQueue[queueIndex+1].params[1], cQueue[queueIndex+1].params[2], cQueue[queueIndex+1].params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
 				end
 			elseif cQueue[queueIndex+1].id==40 then --if second (2) queue is also repair
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
@@ -778,7 +778,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 			end
 		end
 	end
-	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_SHIFT, newX, newY, newZ}, {"alt"} ) --insert new command
+	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
 	----
 	commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
 	commandIndexTable[unitID]["widgetZ"]=newZ
@@ -858,7 +858,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetX"]=cQueue[queueIndex].params[1] --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=cQueue[queueIndex].params[2]
 		commandIndexTable[unitID]["backupTargetZ"]=cQueue[queueIndex].params[3]
-		boxSizeTrigger=1
+		boxSizeTrigger=1 --//deactivation boxsize for MOVE command
 	elseif cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125 then --reclaim or ressurect
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 		-- Spring.Echo(a[queueIndex]["name"])
@@ -935,7 +935,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=unitPosY
 		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
-		boxSizeTrigger = 4
+		boxSizeTrigger = 4 --//deactivation boxsize for GUARD command
 	else --if queue is empty/no match: then use no-target. eg: A case where engine delete the next queues of a valid command and widget expect it to still be there or in case if an Attack command needed avoidance.
 		targetCoordinate={-1, -1, -1}
 		--if for some reason command queue[2] is already empty then use these backup value as target:
@@ -1343,6 +1343,8 @@ end
 --"gui_contextmenu.lua" -unit stat widget, by CarRepairer/WagonRepairer
 --8
 --"unit_AA_micro.lua" -widget that micromanage AA, weaponsState example, by Jseah
+--9
+--"cmd_retreat.lua" -Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages, by CarRepairer (OPT_INTERNAL function)      
 
 --------------------------------------------------------------------------------
 --Method Index:
