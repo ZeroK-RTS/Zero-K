@@ -99,6 +99,8 @@ local specialPowerCooldown = 0
 
 local lava = (Game.waterDamage > 0)
 
+local eggs = tobool(Spring.GetModOptions().eggs)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --

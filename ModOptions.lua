@@ -434,6 +434,14 @@ local options = {
     type   = 'section',
   },
   {
+	key		= "eggs",
+	name	= "Chicken Eggs",
+	desc	= "Enables eggs mode (applies to all chicken difficulties)",
+	type	= "bool",
+	def		= false,
+    section = 'chicken',
+  },    
+  {
     key    = 'chickenspawnrate',
     name   = 'Chicken Spawn Rate',
     desc   = 'Sets the frequency of chicken waves in seconds.',

@@ -9,13 +9,8 @@ configs.difficulties = {
     [3] = 'Normal',
     [4] = 'Hard',
 	[5] = 'Suicidal',
-    [6] = 'Eggs: Easy',
-    [7] = 'Eggs: Normal',
-    [8] = 'Eggs: Hard',
-    [9] = 'Eggs: Suicidal',
-	[10] = 'Custom',
-	[11] = 'Eggs: Custom',
-	[12] = 'Speed'
+	[6] = 'Custom',
+	[7] = 'Speed'
 }
 
 configs.colorSet = {

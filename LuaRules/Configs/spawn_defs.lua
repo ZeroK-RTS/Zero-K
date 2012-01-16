@@ -3,33 +3,73 @@
 local modoptions = Spring.GetModOptions() or {}
 
 local eggsModifier = 0.8	--unused
-alwaysEggs = true			--spawn limited-lifespan eggs when not in Eggs mode?
-eggDecayTime = 180
+
+--------------------------------------------------------------------------------
+-- system
 
 spawnSquare          = 150       -- size of the chicken spawn square centered on the burrow
 spawnSquareIncrement = 1         -- square size increase for each unit spawned
 burrowName           = "roost"   -- burrow unit name
-playerMalus          = 1         -- how much harder it becomes for each additional player, exponential (playercount^playerMalus = malus)	-- used only for burrow spawn rate and queen XP
+maxBurrows           = 50
+minBaseDistance      = 700      
+maxBaseDistance      = 3500
+
 lagTrigger           = 0.7       -- average cpu usage after which lag prevention mode triggers
 triggerTolerance     = 0.05      -- increase if lag prevention mode switches on and off too fast
 maxAge               = 5*60      -- chicken die at this age, seconds
+
+alwaysVisible        = false     -- chicken are always visible
+
+alwaysEggs			 = true			--spawn limited-lifespan eggs when not in Eggs mode?
+eggDecayTime		 = 180
+burrowEggs           = 15       -- number of eggs each burrow spawns
+
+gameMode		= true	--Spring.GetModOption("zkmode")
+tooltipMessage	= "Kill chickens and collect their eggs to get metal."
+
+mexes = {
+  "cormex", 
+  "armmex",
+  --"armestor"	--pylon; needed for annis etc.
+}
+noTarget = {
+	terraunit=true,
+	wolverine_mine=true,
+	roost=true,
+}
+
+modes = {
+    [0] = 0,
+    [1] = 'Chicken: Very Easy',
+    [2] = 'Chicken: Easy',
+    [3] = 'Chicken: Normal',
+    [4] = 'Chicken: Hard',
+	[5] = 'Chicken: Suicidal',
+	[6] = 'Chicken: Custom',
+	[7] = 'Chicken: Speed'
+}
+defaultDifficulty = modes[2]
+testBuilding 	= UnitDefNames["armestor"].id	--testing to place burrow
+testBuildingQ 	= UnitDefNames["chicken_dragon"].id	--testing to place queen
+
+--------------------------------------------------------------------------------
+-- difficulty settings
+
+playerMalus          = 1         -- how much harder it becomes for each additional player, exponential (playercount^playerMalus = malus)	-- used only for burrow spawn rate and queen XP
+
 queenName            = "chickenflyerqueen"
 queenMorphName		 = "chickenlandqueen"
 miniQueenName		 = "chicken_dragon"
+
+burrowSpawnRate      = 60        -- higher in games with many players, seconds
+chickenSpawnRate     = 59
 waveRatio            = 0.6       -- waves are composed by two types of chicken, waveRatio% of one and (1-waveRatio)% of the other
 baseWaveSize		 = 2.5		 -- multiplied by malus, 1 = 1 squadSize of chickens
 waveSizeMult		 = 1
 defenderChance       = 0.05		-- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
 quasiAttackerChance  = 0.65		-- subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
-maxBurrows           = 50
-burrowEggs           = 15       -- number of eggs each burrow spawns
 --forceBurrowRespawn	 = false	-- burrows always respawn even if the modoption is set otherwise        
 queenSpawnMult       = 4         -- how many times bigger is a queen hatch than a normal burrow hatch
-alwaysVisible        = false     -- chicken are always visible
-burrowSpawnRate      = 60        -- higher in games with many players, seconds
-chickenSpawnRate     = 59
-minBaseDistance      = 700      
-maxBaseDistance      = 3500
 
 gracePeriod          = 180       -- no chicken spawn in this period, seconds
 gracePenalty		 = 15		-- reduced grace per player over one, seconds
@@ -62,45 +102,6 @@ techAccelPerPlayer	= 4		-- how much tech accel increases per player over one per
 techTimeFloorFactor	= 0.5	-- tech timer can never be less than this * real time
 
 scoreMult			= 1
-
-gameMode		= true	--Spring.GetModOption("zkmode")
-tooltipMessage	= "Kill chickens and collect their eggs to get metal."
-mexes = {
-  "cormex", 
-  "armmex",
-  --"armestor"	--pylon; needed for annis etc.
-}
-noTarget = {
-	terraunit=true,
-	armmine1=true,
-	armmine2=true,
-	armmine3=true,
-	cormine1=true,
-	cormine2=true,
-	cormine3=true,
-	cormine_impulse=true,
-	roost=true,
-}
-
-modes = {
-    [0] = 0,
-    [1] = 'Chicken: Very Easy',
-    [2] = 'Chicken: Easy',
-    [3] = 'Chicken: Normal',
-    [4] = 'Chicken: Hard',
-	[5] = 'Chicken: Suicidal',
-    [6] = 'Chicken Eggs: Easy',
-    [7] = 'Chicken Eggs: Normal',
-    [8] = 'Chicken Eggs: Hard',
-    [9] = 'Chicken Eggs: Suicidal',
-	[10] = 'Chicken: Custom',
-	[11] = 'Chicken Eggs: Custom',
-	[12] = 'Chicken: Speed'
-}
-defaultDifficulty = modes[2]
-testBuilding 	= UnitDefNames["armestor"].id	--testing to place burrow
-testBuildingQ 	= UnitDefNames["chicken_dragon"].id	--testing to place queen
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -315,22 +316,7 @@ for _, d in pairs(difficulties) do
   TimeModifier(d.supporters, d.timeModifier or 1)
 end
 
-difficulties['Chicken Eggs: Very Easy']   = Copy(difficulties['Chicken: Very Easy'])
-difficulties['Chicken Eggs: Easy']   = Copy(difficulties['Chicken: Easy'])
-difficulties['Chicken Eggs: Normal'] = Copy(difficulties['Chicken: Normal'])
-difficulties['Chicken Eggs: Hard']   = Copy(difficulties['Chicken: Hard'])
-difficulties['Chicken Eggs: Suicidal']   = Copy(difficulties['Chicken: Suicidal'])
-difficulties['Chicken Eggs: Custom']   = Copy(difficulties['Chicken: Custom'])
-
 difficulties['Chicken: Very Easy'].chickenTypes.chicken_tiamat.time = 999999
-
---for i,v in pairs(difficulties) do v.eggs = true end
-
-difficulties['Chicken Eggs: Easy'].eggs   	= true
-difficulties['Chicken Eggs: Normal'].eggs 	= true
-difficulties['Chicken Eggs: Hard'].eggs   	= true
-difficulties['Chicken Eggs: Suicidal'].eggs	= true
-difficulties['Chicken Eggs: Custom'].eggs	= true
 
 defaultDifficulty = 'Chicken: Normal'
 
