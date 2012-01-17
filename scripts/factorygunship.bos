@@ -1,9 +1,8 @@
-#define TA			// This is a TA script
+//linear constant 65536
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
-piece  base, pad, beam1, beam2, platform, door1, door2, post1,
+piece  base, pad, beam1, beam2, door1, door2, post1,
        post2, nano2, nano1;
 
 static-var  spray, unitviewer, statechg_DesiredState, statechg_StateChanging;
@@ -262,14 +261,13 @@ Killed(severity, corpsetype)
 		explode nano1 type BITMAPONLY | BITMAP1;
 		explode nano2 type BITMAPONLY | BITMAP2;
 		explode pad type BITMAPONLY | BITMAP3;
-		explode platform type BITMAPONLY | BITMAP4;
 		explode post1 type BITMAPONLY | BITMAP5;
 		explode post2 type BITMAPONLY | BITMAP1;
 		return (0);
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode base type BITMAPONLY | BITMAP1;
 		explode beam1 type FALL | BITMAP2;
 		explode beam2 type FALL | BITMAP3;
@@ -278,14 +276,13 @@ Killed(severity, corpsetype)
 		explode nano1 type FALL | BITMAP1;
 		explode nano2 type FALL | BITMAP2;
 		explode pad type BITMAPONLY | BITMAP3;
-		explode platform type BITMAPONLY | BITMAP4;
 		explode post1 type FALL | BITMAP5;
 		explode post2 type FALL | BITMAP1;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode base type BITMAPONLY | BITMAP1;
 		explode beam1 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
 		explode beam2 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
@@ -294,12 +291,11 @@ Killed(severity, corpsetype)
 		explode nano1 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP1;
 		explode nano2 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
 		explode pad type SHATTER | BITMAP3;
-		explode platform type BITMAPONLY | BITMAP4;
 		explode post1 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP5;
 		explode post2 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP1;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode base type BITMAPONLY | BITMAP1;
 	explode beam1 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
 	explode beam2 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP3;
@@ -308,7 +304,6 @@ Killed(severity, corpsetype)
 	explode nano1 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP1;
 	explode nano2 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP2;
 	explode pad type SHATTER | EXPLODE_ON_HIT | BITMAP3;
-	explode platform type BITMAPONLY | BITMAP4;
 	explode post1 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP5;
 	explode post2 type FALL | FIRE | SMOKE | EXPLODE_ON_HIT | BITMAP1;
 }
