@@ -1,4 +1,4 @@
-local versionName = "v1.03"
+local versionName = "v1.04"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -18,27 +18,29 @@ function widget:GetInfo()
     date      = "Jan 17, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
 local myTeamID_gbl = -1 --//variable: myTeamID
 local receivedUnitList = {} --//variable: store received unitID
 local givenByTeamID_gbl = -1 --//variable: store sender's ID
+local gameID_to_playerName_gbl = {}
 
 local minimumNeighbor_gbl = 3 --//constant: minimum neighboring (units) before considered a cluster
 local neighborhoodRadius_gbl = 600 --//constant: neighborhood radius. Distance from each unit where neighborhoodList are generated. 
-local radiusThreshold_gbl = 400 --//constant: density threshold where border is detected. Huge value means 2 cluster are combined, small value mean all unit disassociated
+local radiusThreshold_gbl = 300 --//constant: density threshold where border is detected. Huge value means 2 cluster are combined, small value mean all unit disassociated
 
 ---------------------------------------------------------------------------------
 --Add Marker---------------------------------------------------------------------
 -- 1 function. 
 local function AddMarker (cluster, unitIDNoise)
 	local givenByTeamID = givenByTeamID_gbl
+	local gameID_to_playerName = gameID_to_playerName_gbl
 	------
 	--// extract cluster information and add mapMarker.
 	local currentIndex=0
-	local playerName = Spring.GetPlayerInfo(givenByTeamID)
+	local playerName = gameID_to_playerName[givenByTeamID]
 	for index=1 , #cluster do
 		local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
 		for unitIndex=1, #cluster[index] do
@@ -82,11 +84,12 @@ function widget:Update(n)
 		local myTeamID = myTeamID_gbl
 		local minimumNeighbor = minimumNeighbor_gbl
 		local neighborhoodRadius = neighborhoodRadius_gbl
+		local radiusThreshold = radiusThreshold_gbl
 		local cluster={}
 		local unitIDNoise ={}
 		------
 		--cluster, unitIDNoise = DBSCAN_cluster (myTeamID, minimumNeighbor, neighborhoodRadius, cluster, receivedUnitList, unitIDNoise) --//method 1
-		cluster, unitIDNoise = OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, neighborhoodRadius-200) --//method 2. Better
+		cluster, unitIDNoise = OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, radiusThreshold) --//method 2. Better
 		AddMarker(cluster, unitIDNoise)
 		------
 		waitDuration = 10 --// disable widget:Update() by setting update to huge value. eg: 10 second
@@ -94,18 +97,39 @@ function widget:Update(n)
 	end
 end
 
-local timelapse = 0
+
 function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
-	if unitTeamID == myTeamID_gbl then
+	if unitTeamID == myTeamID_gbl and Spring.ValidUnitID(unitID) then
+		--Spring.Echo(unitID .. "a")
 		receivedUnitList[(#receivedUnitList or 0) +1]=unitID
 		givenByTeamID_gbl = oldTeamID
-		waitDuration = 0.1 --// tell widget:Update() to wait 0.1 more second before start adding mapMarker
+		waitDuration = 0.2 --// tell widget:Update() to wait 0.2 more second before start adding mapMarker
 		elapsedTime = 0 --// tell widget:Update() to reset timer
 	end
 end
 
 function widget:Initialize()
-	myTeamID_gbl = Spring.GetMyTeamID()
+	local gameID_to_playerName = gameID_to_playerName_gbl
+	local myTeamID = myTeamID_gbl
+	-----
+	local playerList = Spring.GetPlayerRoster() --//check playerIDList for players
+	for i = 1, #playerList do
+		local teamID = playerList[i][3]
+		local playerName = playerList[i][1]
+		gameID_to_playerName[teamID] = playerName
+	end
+	myTeamID_gbl = Spring.GetMyTeamID() --//get my teamID. Used to filter receivedUnitList from our own unit.
+	local teamList = Spring.GetTeamList() --//check teamIDlist for AI
+	for j= 1, #teamList do
+		local teamID = teamList[j]
+		if gameID_to_playerName[teamID] == nil then
+			local _, aiName = Spring.GetAIInfo(teamID)
+			gameID_to_playerName[teamID] = aiName
+		end
+	end
+	-----
+	gameID_to_playerName_gbl = gameID_to_playerName
+	myTeamID_gbl = myTeamID
 end
 ---------------------------------------------------------------------------------
 --GetNeigbors--------------------------------------------------------------------
@@ -116,8 +140,7 @@ local function GetNeighbor (unitID, myTeamID, neighborhoodRadius, receivedUnitLi
 	-- local unitDef= UnitDefs[unitDefID]
 	-- local losRadius= unitDef.losRadius*32 --for some reason it was times 32
 	local neighborUnits = Spring.GetUnitsInCylinder(x,z, neighborhoodRadius, myTeamID) --//use Spring to return the surrounding units' ID. Get neighbor. Ouput: unitID + my units
-	local tempUnitList = {} --// try to filter out non-received units from neighbor receivedUnitList
-	local isEmpty = true
+	local tempUnitList = {} --// try to filter out non-received units from receivedUnitList
 	for k = 1, #neighborUnits do
 		local match = false
 		for j= 1, #receivedUnitList do
@@ -131,8 +154,7 @@ local function GetNeighbor (unitID, myTeamID, neighborhoodRadius, receivedUnitLi
 			tempUnitList[unitListLenght+1] = neighborUnits[k]
 		end
 	end
-	neighborUnits = tempUnitList
-	return neighborUnits
+	return tempUnitList
 end
 
 ---------------------------------------------------------------------------------
@@ -240,15 +262,11 @@ local function OrderSeedsUpdate(neighborsID, currentUnitID,objects, orderSeed,un
 end
 
 local function SetCoreDistance(neighborsID, minimumNeighbor, unitID, myTeamID)
-	if #neighborsID ~= nil and #neighborsID >= minimumNeighbor then
-		local neighborsDist= {}
+	if (#neighborsID ~= nil) and (#neighborsID >= minimumNeighbor) then
+		local neighborsDist= {} --//table to list down neighbor's distance.
 		for i=1, #neighborsID do
-			local _2ndUnitID =neighborsID[i]
-			-- Spring.Echo("---")
-			-- Spring.Echo(unitID)
-			-- Spring.Echo(_2ndUnitID)
-			local distance = Spring.GetUnitSeparation (unitID, _2ndUnitID)
-			neighborsDist[i]= distance --//replace with distance value
+			local distance = Spring.GetUnitSeparation (unitID, neighborsID[i])
+			neighborsDist[i]= distance --//add distance value
 		end
 		table.sort(neighborsDist, function(a,b) return a < b end)
 		return neighborsDist[minimumNeighbor] --//return the shortest distance to the minimumNeigbor'th unit.
@@ -301,19 +319,19 @@ local function ExpandClusterOrder(receivedUnitList, unitID, neighborhoodRadius, 
 	return orderedFile, objects
 end
 
--- ExtractDBSCAN-Clustering (ClusterOrderedObjs,e, MinPts)
+-- ExtractDBSCAN-Clustering (ClusterOrderedObjs,e-, MinPts)
 -- // Precondition: e' £ generating dist e for ClusterOrderedObjs
 -- ClusterId := NOISE;
 -- FOR i FROM 1 TO ClusterOrderedObjs.size DO
 -- Object := ClusterOrderedObjs.get(i);
--- IF Object.reachability_distance > e THEN
+-- IF Object.reachability_distance > e- THEN
 -- // UNDEFINED > e
--- IF Object.core_distance £ e THEN
+-- IF Object.core_distance £ e- THEN
 -- ClusterId := nextId(ClusterId);
 -- Object.clusterId := ClusterId;
 -- ELSE
 -- Object.clusterId := NOISE;
--- ELSE // Object.reachability_distance £ e
+-- ELSE // Object.reachability_distance £ e-
 -- Object.clusterId := ClusterId;
 -- END; // ExtractDBSCAN-Clustering
 
