@@ -1,4 +1,4 @@
-local versionName = "v1.02"
+local versionName = "v1.03"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -99,7 +99,7 @@ function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be 
 	if unitTeamID == myTeamID_gbl then
 		receivedUnitList[(#receivedUnitList or 0) +1]=unitID
 		givenByTeamID_gbl = oldTeamID
-		waitDuration = 1 --// tell widget:Update() to wait 1 more second before start adding mapMarker
+		waitDuration = 0.1 --// tell widget:Update() to wait 0.1 more second before start adding mapMarker
 		elapsedTime = 0 --// tell widget:Update() to reset timer
 	end
 end
