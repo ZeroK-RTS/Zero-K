@@ -1,4 +1,4 @@
-local versionName = "v3.074"
+local versionName = "v3.08"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ local operatingModeThis = "A"	--a switch to enable one-on-one Custom Avatar func
 --Other users can 'snif' other user's communication and use the exchange data to complete own's request list.
 --
 local maxFileSize = 10 --in kB (for operating mode A)
-local numberOfRetry = 2 --times to send "hi" before remote computer reply until they are listed in "ignore" for the duration of "refresh delay"
+local numberOfRetry = 3 --times to send "hi" before remote computer reply until they are listed in "ignore" for the duration of "refresh delay"
 local maxChecksumLenght= 2000  --if greater than 2049 will cause unpack error 
 --reference: http://www.promixis.com/forums/showthread.php?15419-Lua-Limits-on-Table-Size
 
@@ -97,7 +97,7 @@ local playerIDlistG={} --//variable: store playerID.
 local nextUpdate = 0 --//variable: indicate when to run widget:Update()
 local delayUpdate = 0.1 --//constant: tiny delay for widget:Update() to reduce CPU usage
 local nextRefreshTime = 0 --//variable: indicate when to activate player list refresh.
-local refreshDelay = 5 --//constant: seconds before playerIDlistG is refreshed and retry list resetted.
+local refreshDelay = 10 --//constant: seconds before playerIDlistG is refreshed and retry list resetted.
 
 --communication protocol variables
 local currentTime_g=0 --//variable: used to indicate current ingame seconds
@@ -111,6 +111,7 @@ local tableIsCompleted_g=false --//variable: used as switch to stop checking che
 local fileRequestTableG_g={} --//variable: used by Operation Mode "B" to store file requested by others.
 local bufferIndex_g=0 --//variable: used to indicate the index of Message receive buffer (msgRecv)
 local msgRecv_g={} --//variable: store message before it is processed
+local networkDelay_g = {sentTimestamp = 0, sumOfDelay = 0, msgCount = 0, averageDelay = 0}
 
 --------------------------------------------------------------------------------
 --File operation----------------------------------------------------------------
@@ -214,6 +215,7 @@ local function SetMyAvatar(filename)
 	local checksum = CalcChecksum(data)
 	SetAvatar(myPlayerName,filename,checksum)
 	Spring.SendLuaUIMsg(broadcastID) --send 'checkout my new pic!' to everyone
+	networkDelay_g.sentTimestamp = os.clock() --//for measuring actual lag
 end
 
 --------------------------------------------------------------------------------
@@ -527,11 +529,30 @@ end
 --------------------------------------------------------------------------------
 --Network Protocols-------------------------------------------------------------
 
+local function RecordActualNeworkDelay (networkDelay)
+	local actualDelay = os.clock() - networkDelay.sentTimestamp
+	networkDelay.sumOfDelay = networkDelay.sumOfDelay + actualDelay
+	networkDelay.msgCount = networkDelay.msgCount +1
+	networkDelay.averageDelay = networkDelay.sumOfDelay /networkDelay.msgCount
+	return networkDelay
+end
+
 function RetrieveTotalNetworkDelay(playerIDa, playerIDb)
 	local aTargetPingTime = GetPlayersData(3, playerIDa)
 	local bTargetPingTime = GetPlayersData(3, playerIDb)
+	if playerIDa == myPlayerID then --//IF playerIDa is myPlayerID: process Ping Data
+		if networkDelay_g.averageDelay > aTargetPingTime then --//if actual delay greater than reported delay
+			local delayOffset = networkDelay_g.averageDelay - aTargetPingTime --// get difference between reported and actual delay
+			aTargetPingTime = aTargetPingTime + delayOffset --//add the difference in delay to the output values
+			if bTargetPingTime == 0 then --//if remote computer's delay is "0"
+				bTargetPingTime = 1 --//arbitrarily assume 1 second delay
+			else
+				bTargetPingTime = bTargetPingTime + delayOffset --//add the difference in delay to output
+			end
+		end
+	end
 	local totalDelay= aTargetPingTime+bTargetPingTime
-	if totalDelay == 0 then return (2 + delayUpdate)
+	if totalDelay == 0 then return (2 + delayUpdate) --//if reported delay is "0" then arbitrarily assume each side has 1 second delay
 	elseif totalDelay<0.5 then return (0.5 + delayUpdate) --if too low delay don't spam message out too quickly
 	elseif totalDelay>=2 then return (2 + delayUpdate) --if too high delay then don't wait too long, just send until the retry depleted (end connection)
 	else return totalDelay
@@ -568,7 +589,7 @@ local function NetworkProtocol()
 				destinationID=tonumber(msg:sub(8,9))
 				local myAvatar = avatars[myPlayerName]
 				
-				if openPortForID==playerID and destinationID==myPlayerID and not lineIsBusy then
+				if openPortForID==playerID and destinationID==myPlayerID and not lineIsBusy then --//if sender is expected
 					if msg:sub(6,6)==hi then --receive hi from target playerID
 						if myPlayerID>playerID then --if I am 'low ranking' playerID then replied yes
 							--reply with yes
@@ -880,7 +901,7 @@ local function NetworkProtocol()
 					elseif (msg:sub(6,6)==bye) then
 						waitForTransmission=false
 					end
-				elseif myPlayerID==destinationID then
+				elseif myPlayerID==destinationID then --//if message from others, targetted to me
 					if msg:sub(6,6)==hi then --receive hi from someone who target you
 						if myPlayerID>playerID or tableIsCompleted then --if I am the'low ranking' playerID then reply yes, else don't (high rank will not answer to low ranking unless has no work to do)
 							--reply with yes
@@ -892,7 +913,7 @@ local function NetworkProtocol()
 							Spring.SendLuaUIMsg(msgID .. operationMode .. yes .. openPortForID+100)
 						end 
 					end
-				elseif myPlayerID~=destinationID then --if noise (if not my message)
+				elseif myPlayerID~=destinationID then --if message is noise (not targetted to me)
 					if msg:sub(6,6)==yes then --listen hi from someone to someone else
 						if myPlayerID>playerID then --if they are the 'higher ranking' playerID (close your own connection for high ranking player (players with low playerID))
 							lineIsBusy=true --assume they took command of the communication medium, close all protocol/cancel ongoing protocol. lineBusy always triggered by high ranking noise
@@ -903,7 +924,7 @@ local function NetworkProtocol()
 								waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*(networkDelayMultiplier+networkDelayMultiplier+0.5)
 								waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*(networkDelayMultiplier+networkDelayMultiplier+0.5) --assume twice the delay for complete back and forth. Wait until end.
 							else --if mode B
-								local totalNetworkDelay= RetrieveTotalNetworkDelay(destinationID, myPlayerID) --delay between us (listener) and the replier
+								local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier
 								waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier
 								waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --wait until it end
 							end
@@ -944,7 +965,7 @@ local function NetworkProtocol()
 									SetAvatar(playerName,filename,checksum)
 									checklistTableG[(userID+1)].downloaded=true --mark checklist as complete
 								end
-								local totalNetworkDelay= RetrieveTotalNetworkDelay(destinationID, myPlayerID) --delay between us (listener) and the replier
+								local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier
 								waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier
 								waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --wait until it end
 							end
@@ -967,7 +988,7 @@ local function NetworkProtocol()
 								end
 							end
 						else
-							local totalNetworkDelay= RetrieveTotalNetworkDelay(destinationID, myPlayerID) --delay between us (listener) and the replier
+							local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier
 							waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier
 							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --wait until it end
 						end
@@ -975,12 +996,19 @@ local function NetworkProtocol()
 						lineIsBusy=false
 						waitForTransmission=false
 					end
+				elseif myPlayerID == playerID then --//if message is an echo of myself
+					if msg:sub(6,6)==hi then --//listen hi from self
+						networkDelay_g = RecordActualNeworkDelay (networkDelay_g)
+					end
 				end
 			elseif (msg:sub(1,4) == broadcastID) then --if message is a 'look at my new pic!'.
 				checklistTableG[(playerID+1)].downloaded=false --reset checklist entry for this player
 				checklistTableG[(playerID+1)].ignore=false
 				checklistTableG[(playerID+1)].retry=0 --reset retry
 				tableIsCompleted=false --redo checklist check
+				if myPlayerID == playerID then
+					networkDelay_g = RecordActualNeworkDelay (networkDelay_g)
+				end
 			end
 		end
 	end
@@ -1050,7 +1078,8 @@ function widget:Update(n)
 			tableIsCompleted=true
 			if operatingModeThis == "B" then
 				if checklistTableG[(myPlayerID+1)].downloaded == false then
-					Spring.SendLuaUIMsg(broadcastID) --send 'I still don't have my pic!' to everyone
+					Spring.SendLuaUIMsg(broadcastID) --send 'I still don't have my pic!' to everyone (Operation Mode: "B")
+					networkDelay_g.sentTimestamp = os.clock()
 				end
 			end
 		else
@@ -1059,6 +1088,7 @@ function widget:Update(n)
 			local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID)
 			waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
 			Spring.SendLuaUIMsg(msgID .. operatingModeThis .. hi .. openPortForID+100) --send 'hi' to colleague
+			networkDelay_g.sentTimestamp = os.clock() --//remember current time for delay checking later
 		end
 	end
 	NetworkProtocol() --// perform Hello/Hi network protocol
