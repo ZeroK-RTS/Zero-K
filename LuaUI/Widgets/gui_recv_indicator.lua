@@ -1,4 +1,4 @@
-local versionName = "v1.04"
+local versionName = "v1.041"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -40,7 +40,7 @@ local function AddMarker (cluster, unitIDNoise)
 	------
 	--// extract cluster information and add mapMarker.
 	local currentIndex=0
-	local playerName = gameID_to_playerName[givenByTeamID]
+	local playerName = gameID_to_playerName[givenByTeamID+1] or givenByTeamID
 	for index=1 , #cluster do
 		local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
 		for unitIndex=1, #cluster[index] do
@@ -58,7 +58,7 @@ local function AddMarker (cluster, unitIDNoise)
 	end
 	currentIndex=currentIndex+1
 	
-	if currentIndex == 1 and unitIDNoise ~= nil then --//if there's no discernable cluster then add individual marker.
+	if unitIDNoise~=nil and #unitIDNoise <= 5 and currentIndex == 1 then --//if there's no discernable cluster, and the outlier is less than 6, and outlier list not empty, then add individual marker.
 		for j= 1 ,#unitIDNoise do
 			local x,y,z=Spring.GetUnitPosition(unitIDNoise[j])
 			Spring.MarkerAddPoint(x,y,z, "Unit received from ".. playerName)
@@ -72,7 +72,7 @@ end
 ---------------------------------------------------------------------------------
 --Spring Call-Ins----------------------------------------------------------------
 --3 functions
-local waitDuration = 10 --//variable: ...
+local waitDuration = 30 --//variable: ...
 local elapsedTime = 0 --//variable: ...
 function widget:Update(n)
 	elapsedTime= elapsedTime + n
@@ -92,15 +92,14 @@ function widget:Update(n)
 		cluster, unitIDNoise = OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, radiusThreshold) --//method 2. Better
 		AddMarker(cluster, unitIDNoise)
 		------
-		waitDuration = 10 --// disable widget:Update() by setting update to huge value. eg: 10 second
-		receivedUnitList = {} --//reset 'receivedUnitList' content
+		waitDuration = 30 --// disable widget:Update() by setting update to huge value. eg: 10 second
 	end
+	receivedUnitList = {} --//reset 'receivedUnitList' content
 end
 
 
 function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
-	if unitTeamID == myTeamID_gbl and Spring.ValidUnitID(unitID) then
-		--Spring.Echo(unitID .. "a")
+	if Spring.ValidUnitID(unitID) and unitTeamID == myTeamID_gbl then 
 		receivedUnitList[(#receivedUnitList or 0) +1]=unitID
 		givenByTeamID_gbl = oldTeamID
 		waitDuration = 0.2 --// tell widget:Update() to wait 0.2 more second before start adding mapMarker
@@ -116,15 +115,15 @@ function widget:Initialize()
 	for i = 1, #playerList do
 		local teamID = playerList[i][3]
 		local playerName = playerList[i][1]
-		gameID_to_playerName[teamID] = playerName
+		gameID_to_playerName[teamID+1] = playerName
 	end
-	myTeamID_gbl = Spring.GetMyTeamID() --//get my teamID. Used to filter receivedUnitList from our own unit.
+	myTeamID = Spring.GetMyTeamID() --//get my teamID. Used to filter receivedUnitList from our own unit.
 	local teamList = Spring.GetTeamList() --//check teamIDlist for AI
 	for j= 1, #teamList do
 		local teamID = teamList[j]
 		if gameID_to_playerName[teamID] == nil then
 			local _, aiName = Spring.GetAIInfo(teamID)
-			gameID_to_playerName[teamID] = aiName
+			gameID_to_playerName[teamID+1] = aiName
 		end
 	end
 	-----
@@ -136,22 +135,21 @@ end
 -- 1 function.
 local function GetNeighbor (unitID, myTeamID, neighborhoodRadius, receivedUnitList) --//return the unitIDs of specific units around a center unit
 	local x,_,z = Spring.GetUnitPosition(unitID)
-	-- local unitDefID= Spring.GetUnitDefID(unitID)
-	-- local unitDef= UnitDefs[unitDefID]
-	-- local losRadius= unitDef.losRadius*32 --for some reason it was times 32
-	local neighborUnits = Spring.GetUnitsInCylinder(x,z, neighborhoodRadius, myTeamID) --//use Spring to return the surrounding units' ID. Get neighbor. Ouput: unitID + my units
-	local tempUnitList = {} --// try to filter out non-received units from receivedUnitList
-	for k = 1, #neighborUnits do
-		local match = false
-		for j= 1, #receivedUnitList do
-			if neighborUnits[k] ==receivedUnitList[j] then --and neighborUnits[k]~=unitID then --//if unit is among the received-unit-list, then accept
-				match = true
-				break
+	local tempUnitList = {} 
+	if x ~= nil then --//handle a case where unitID is valid but output a nil
+		local neighborUnits = Spring.GetUnitsInCylinder(x,z, neighborhoodRadius, myTeamID) --//use Spring to return the surrounding units' ID. Get neighbor. Ouput: unitID + my units
+		for k = 1, #neighborUnits do --// try to filter out non-received units from receivedUnitList
+			local match = false
+			for j= 1, #receivedUnitList do
+				if neighborUnits[k] ==receivedUnitList[j] then --and neighborUnits[k]~=unitID then --//if unit is among the received-unit-list, then accept
+					match = true
+					break
+				end
 			end
-		end
-		if match then --//if unit is among the received-unit-list then remember it
-			local unitListLenght = #tempUnitList or 0
-			tempUnitList[unitListLenght+1] = neighborUnits[k]
+			if match then --//if unit is among the received-unit-list then remember it
+				local unitListLenght = #tempUnitList or 0
+				tempUnitList[unitListLenght+1] = neighborUnits[k]
+			end
 		end
 	end
 	return tempUnitList
