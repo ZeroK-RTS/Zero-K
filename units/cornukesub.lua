@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[cornukesub]],
   name                   = [[Leviathan]],
-  description            = [[Tactical Nuke/Anti Nuke Missile Sub, Drains 6.25 m/s]],
+  description            = [[Tactical Nuke/Anti Nuke Missile Sub, Drains 6.25 m/s, 80 second stockpile]],
   acceleration           = 0.0372,
   activateWhenBuilt      = true,
   brakeRate              = 0.1942,
