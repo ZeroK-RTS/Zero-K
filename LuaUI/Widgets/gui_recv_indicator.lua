@@ -1,4 +1,4 @@
-local versionName = "v1.041"
+local versionName = "v1.042"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -111,19 +111,23 @@ function widget:Initialize()
 	local gameID_to_playerName = gameID_to_playerName_gbl
 	local myTeamID = myTeamID_gbl
 	-----
-	local playerList = Spring.GetPlayerRoster() --//check playerIDList for players
-	for i = 1, #playerList do
-		local teamID = playerList[i][3]
-		local playerName = playerList[i][1]
-		gameID_to_playerName[teamID+1] = playerName
-	end
+	-- local playerList = Spring.GetPlayerRoster() --//check playerIDList for players
+	-- for i = 1, #playerList do
+		-- local teamID = playerList[i][3]
+		-- local playerName = playerList[i][1]
+		-- gameID_to_playerName[teamID+1] = playerName
+	-- end
 	myTeamID = Spring.GetMyTeamID() --//get my teamID. Used to filter receivedUnitList from our own unit.
 	local teamList = Spring.GetTeamList() --//check teamIDlist for AI
 	for j= 1, #teamList do
 		local teamID = teamList[j]
-		if gameID_to_playerName[teamID] == nil then
+		local _,playerID, _, isAI = Spring.GetTeamInfo(teamID)
+		if isAI then
 			local _, aiName = Spring.GetAIInfo(teamID)
 			gameID_to_playerName[teamID+1] = aiName
+		elseif not isAI then
+			local playerName = Spring.GetPlayerInfo(playerID)
+			gameID_to_playerName[teamID+1] = playerName
 		end
 	end
 	-----
