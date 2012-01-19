@@ -34,6 +34,7 @@ local gunpoints = {
 	[3] = {aim = subpoint, pitch = subpoint, fire = subpoint},
 	[4] = {aim = RearTurretSeat, rot = RearTurret, pitch = RearGun, fire = RearFlashPoint},
 	[5] = {aim = Base, pitch = Base, fire = Base},
+	[6] = {aim = Base, pitch = Base, fire = Base},
 }
 
 --signals
@@ -58,7 +59,8 @@ local turretSpeed = 8
 
 --local tiltAngle = math.rad(30)
 local isLanded = true
-local LIGHTNING_DELAY = 1	--gameframes
+local SPECIAL_FIRE_INTERVAL = 3	--gameframes
+local SPECIAL_FIRE_COUNT = 60
 
 local sound_index = 0
 
@@ -190,14 +192,22 @@ end
 
 function Hacky_Stiletto_Workaround_stiletto_func(count)
 	EmitSfx( emit,  FIRE_W5 )
-	if count < 80 then
+	if count < SPECIAL_FIRE_COUNT then
 		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(2/slowState), count + 1)
 	end
 end
 
+local function Distortion()
+	for i=1,SPECIAL_FIRE_COUNT do
+		EmitSfx(emit, DETO_W5)
+		Sleep(100)		
+	end
+end
+
 function ClusterBomb()
 	Hacky_Stiletto_Workaround_stiletto_func(1)
+	--StartThread(Distortion)
 end
 
 function script.AimWeapon( num, heading, pitch )

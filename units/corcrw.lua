@@ -111,10 +111,11 @@ unitDef = {
     },
 
     {
-      --def                = [[LIGHTNING]],
-	  def                = [[CLUSTERBOMB]],
-    },	
-	
+      --def				 = [[LIGHTNING]],
+	  def				 = [[CLUSTERBOMB]],
+	  --def				 = [[TIMEDISTORT]],		  
+    },
+
   },
 
 
@@ -184,52 +185,40 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 600,
     },
+    
+    TIMEDISTORT    = {
+      name                    = [[Time Distortion Field]],
+      areaOfEffect            = 600,
+	  burst					  = 100,
+	  burstRate				  = 0.1,	  
+      craterBoost             = 0,
+      craterMult              = 0,
 
---    LIGHTNING = {
---      name                    = [[Bomb Lightning]],
---      areaOfEffect            = 64,
---      avoidFeature            = false,
---      avoidFriendly           = false,
---	  burst					  = 80,
---	  burstRate				  = 0.3,
---	  
---      customParams            = {
---        extra_damage = [[320]],
---      },
---
---      damage                  = {
---        default        = 960,
---        empresistant75 = 240,
---        empresistant99 = 9.6,
---      },
---
---      duration                = 10,
---      explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
---      fireStarter             = 50,
---      impulseBoost            = 0,
---      impulseFactor           = 0.4,
---      intensity               = 12,
---      interceptedByShieldType = 1,
---      paralyzer               = true,
---      paralyzeTime            = 5,
---      range                   = 465,
---      reloadtime              = 1,
---      rgbColor                = [[0.5 0.5 1]],
---	  sprayAngle			  = 7200,
---      startsmoke              = [[1]],
---      targetMoveError         = 0.3,
---      texture1                = [[lightning]],
---      thickness               = 10,
---      turret                  = true,
---      weaponType              = [[LightningCannon]],
---      weaponVelocity          = 400,
---    },	
+      damage                  = {
+        default = 100,
+      },
+
+      edgeeffectiveness       = 0.75,
+      explosionGenerator      = [[custom:riotball_dark]],
+      explosionSpeed          = 3,
+      impulseBoost            = 1,
+      impulseFactor           = -2,
+      interceptedByShieldType = 1,
+      myGravity               = 10,
+      noSelfDamage            = true,
+      range                   = 300,
+      reloadtime              = 30,
+      soundHitVolume          = 1,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 230,
+    },	
 	
     CLUSTERBOMB = {
       name                    = [[Cluster Bomb]],
       accuracy                = 200,
       areaOfEffect            = 128,
-	  burst					  = 80,
+	  burst					  = 60,
 	  burstRate				  = 0.3,	  
       commandFire             = true,
       craterBoost             = 1,
