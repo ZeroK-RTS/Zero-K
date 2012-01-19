@@ -13,7 +13,7 @@ function gadget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
-
+--Revision 23th
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
   
@@ -37,7 +37,13 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	lineage[unitID] = builderID and (lineage[builderID] or Spring.GetUnitTeam(builderID)) or unitTeam
+	--lineage[unitID] = builderID and (lineage[builderID] or Spring.GetUnitTeam(builderID)) or unitTeam
+	if builderID ~= nil then
+		local originalTeamID = lineage[builderID]
+		if originalTeamID ~= nil then
+			lineage[unitID] = originalTeamID
+		end
+	end
 end
 
 
@@ -118,6 +124,7 @@ function gadget:GameFrame(n)
 						for unitID, uteam in pairs(lineage) do
 							if (uteam == team) then
 								Spring.TransferUnit(unitID, team, true)
+								lineage[unitID] = nil
 							end
 						end
 						GG.allowTransfer = false
