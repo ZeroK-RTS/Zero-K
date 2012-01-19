@@ -1,4 +1,4 @@
-local versionName = "v1.77"
+local versionName = "v1.8"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -11,7 +11,7 @@ local versionName = "v1.77"
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Dynamic Avoidance Syste",
+    name      = "Dynamic Avoidance System (exp)",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor, cloakies, and ground combat unit",
     author    = "msafwan",
     date      = "Dec 26, 2011",
@@ -68,8 +68,8 @@ local activateImpatienceG=0 --auto disable auto-reverse and half the distanceCON
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
 local safetyMarginCONSTANTunitG = 0.0 --obstacle graph offset (a "safety margin" constant). Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.0 radian)
 local smCONSTANTunitG		= 0.0  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.0 radian)
-local aCONSTANTg			= math.pi/10 -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian, max math.pi/2)
-local obsCONSTANTg			= math.pi/10 -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian)
+local aCONSTANTg			= {math.pi/10 , math.pi/4} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD, ATTACK)) max value: math.pi/2
+local obsCONSTANTg			= {math.pi/10, math.pi/4} -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian (MOVE), math.pi/4 (GUARD, ATTACK))
 --aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction.
 --an antagonist to aCONSTANg (obsCONSTANTg)/obstacle graph also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy.
 local windowingFuncMultG = 1 --? (default = 1 multiplier)
@@ -88,7 +88,7 @@ local velocityScalingCONSTANTg=1 --decrease/increase command lenght. (default= 1
 local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command lenght (default = 0 meter/second)
 
 --Move Command constant:
-local halfTargetBoxSize = {400, 0, 185, 50} --the distance from a target which widget should de-activate (default: MOVE = 400m ie:800x800m box, 2x constructor range, RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
+local halfTargetBoxSize = {400, 0, 185, 50} --the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
 local cMD_DummyG = 248 --a fake command ID to flag an idle unit for pure avoidance. (arbitrary value, change if conflict with existing command)
 local dummyIDg = "248" --fake id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue) (arbitrary value, change if conflict with other widget)
 
@@ -286,7 +286,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 				if executionAllow then
 					cQueue = cQueueTemp --sync cQueue's cosmetic alteration for identification (but actual command is not yet issued)
 					--local boxSizeTrigger= unitInMotion[i][2]
-					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
+					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
 					local currentX,_,currentZ = spGetUnitPosition(unitID)
 					local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
 					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
@@ -304,7 +304,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 						arrayIndex=arrayIndex+1
 						local unitSpeed = unitInMotion[i][3]
 						local impatienceTrigger,commandIndexTable = GetImpatience(newCommand,unitID, commandIndexTable)
-						surroundingOfActiveUnit[arrayIndex]={unitID, unitSSeparation, targetCoordinate, losRadius, cQueue, newCommand, unitSpeed,impatienceTrigger, lastPosition} --store result for next execution
+						surroundingOfActiveUnit[arrayIndex]={unitID, unitSSeparation, targetCoordinate, losRadius, cQueue, newCommand, unitSpeed,impatienceTrigger, lastPosition, graphCONSTANTtrigger} --store result for next execution
 						if (turnOnEcho == 1) then
 							Spring.Echo("unitsSeparation(GetPreliminarySeparation):")
 							Spring.Echo(unitsSeparation)
@@ -360,7 +360,8 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
 				local impatienceTrigger= surroundingOfActiveUnit[i][8]
 				local lastPosition = surroundingOfActiveUnit[i][9]
 				local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --get new unit separation for comparison
-				local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition) --calculate move solution
+				local graphCONSTANTtrigger = surroundingOfActiveUnit[i][10] --//fetch information on which aCONSTANT and obsCONSTANT to use
+				local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger) --calculate move solution
 				local newY=spGetGroundHeight(newX,newZ)
 				commandIndexTable= InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand) --send move solution to unit
 				if (turnOnEcho == 1) then
@@ -496,18 +497,19 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 end
 
 --check if widget's command or user's command
-function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
+function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable) --//used by GetPreliminarySeparation()
 	local targetCoordinate = {nil,nil,nil}
 	local boxSizeTrigger=0
+	local graphCONSTANTtrigger = {}
 	local newCommand=true -- immediately assume user's command
 	if commandIndexTable[unitID]==nil then --memory was empty, so fill it with zeros
 		commandIndexTable[unitID]={widgetX=0, widgetZ=0 ,backupTargetX=0, backupTargetY=0, backupTargetZ=0, patienceIndexA=0}
 	else
-		local a = math.modf(dNil(cQueue[1].params[1])) --using math.modf to remove trailing decimal (using only integer for matching). In case high resolution cause a fail matching with server's numbers... and use dNil incase wreckage suddenly disappear.
-		local b = math.modf(commandIndexTable[unitID]["widgetX"])
+		local a = math.modf(dNil(cQueue[1].params[1])) --using math.modf to remove trailing decimal (only integer for matching). In case high resolution cause a fail matching with server's numbers... and use dNil incase wreckage suddenly disappear.
 		local c = math.modf(dNil(cQueue[1].params[3])) --dNil: if it is a reclaim or repair order (no z coordinate) then replace it with -1 (has similar effect to the "nil")
+		local b = math.modf(commandIndexTable[unitID]["widgetX"])
 		local d = math.modf(commandIndexTable[unitID]["widgetZ"])
-		newCommand= (a~= b and c~=d)--check current command with memory
+		newCommand= (a~= b and c~=d)--compare current command with in memory
 		if (turnOnEcho == 1) then --debugging
 			Spring.Echo("unitID(GetPreliminarySeparation)" .. unitID)
 			Spring.Echo("commandIndexTable[unitID][widgetX](IdentifyTargetOnCommandQueue):" .. commandIndexTable[unitID]["widgetX"])
@@ -526,12 +528,12 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable)
 		end
 	end
 	if newCommand then	--if user's new command
-		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate)
-		commandIndexTable[unitID]["patienceIndexA"]=0
+		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate)
+		commandIndexTable[unitID]["patienceIndexA"]=0 --//reset impatience counter
 	else  --if widget's previous command
-		commandIndexTable, targetCoordinate, boxSizeTrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate)	
+		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate)	
 	end
-	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger --return target coordinate
+	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger --return target coordinate
 end
 
 --ignore command set on this box
@@ -657,17 +659,18 @@ function GetImpatience(newCommand, unitID, commandIndexTable)
 	return impatienceTrigger, commandIndexTable
 end
 
-function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition)
+function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger)
 	if (unitID~=nil) and (targetCoordinate ~= nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
 		local aCONSTANT 			= aCONSTANTg --attractor constant (amplitude multiplier)
 		local unitDirection, _		= GetUnitDirection(unitID, lastPosition) --get unit direction
 		local targetAngle = 0
 		local fTarget = 0
 		local fTargetSlope = 0
+		local aCONSTANT_Index = graphCONSTANTtrigger[1]
 		if targetCoordinate[1]~=-1 then --if target coordinate contain -1 then disable target for pure avoidance
 			targetAngle				= GetTargetAngleWithRespectToUnit(unitID, targetCoordinate) --get target angle
-			fTarget					= GetFtarget (aCONSTANT, targetAngle, unitDirection)
-			fTargetSlope			= GetFtargetSlope (aCONSTANT, targetAngle, unitDirection, fTarget)
+			fTarget					= GetFtarget (aCONSTANT[aCONSTANT_Index], targetAngle, unitDirection)
+			fTargetSlope			= GetFtargetSlope (aCONSTANT[aCONSTANT_Index], targetAngle, unitDirection, fTarget)
 			--local targetSubtendedAngle 	= GetTargetSubtendedAngle(unitID, targetCoordinate) --get target 'size' as viewed by the unit
 		end
 
@@ -679,7 +682,7 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		local normalizingFactor=0
 
 		--count every enemy unit and sum its contribution to the obstacle/repulsor variable
-		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger)
+		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger)
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal)
 		--convert an angular command into a coordinate command
@@ -845,8 +848,9 @@ function dNil(x)
 	return x
 end
 
-function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate)
+function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate) --//used by IdentifyTargetOnCommandQueue()
 	local boxSizeTrigger=0
+	local graphCONSTANTtrigger = {}
 	if (cQueue[queueIndex].id==CMD_MOVE or cQueue[queueIndex].id<0) then
 		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
@@ -854,11 +858,20 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		else
 			--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
 		end
+		if #cQueue >= queueIndex+1 then
+			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --//if reclaim or ressurect then identify area reclaim
+				if cQueue[queueIndex+1].params[3] ~= nil then --area reclaim should has no "nil" on params 1,2,3, & 4
+					targetPosX, targetPosY, targetPosZ = -1, -1, -1 --//if area reclaim then avoid forever in presence of enemy
+				end
+			end
+		end
 		targetCoordinate={targetPosX, targetPosY, targetPosZ } --use first queue as target
 		commandIndexTable[unitID]["backupTargetX"]=cQueue[queueIndex].params[1] --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=cQueue[queueIndex].params[2]
 		commandIndexTable[unitID]["backupTargetZ"]=cQueue[queueIndex].params[3]
 		boxSizeTrigger=1 --//deactivation boxsize for MOVE command
+		graphCONSTANTtrigger[1] = 1
+		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125 then --reclaim or ressurect
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 		-- Spring.Echo(a[queueIndex]["name"])
@@ -888,7 +901,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		end
 		local isAreaMode = false
 		if foundMatch==false then --if no wreckage, no trees, no rock, and no unitID then use coordinate
-			if cQueue[queueIndex].params[3]~=nil then --area reclaim should has no "nil" on params 1,2,3, & 4
+			if cQueue[queueIndex].params[3] ~= nil then --area reclaim should has no "nil" on params 1,2,3, & 4
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 				isAreaMode = true
 			else
@@ -903,6 +916,8 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		if not isAreaMode and (cQueue[queueIndex+1].params[3]==nil or cQueue[queueIndex+1].id == CMD_STOP) then --signature for discrete reclaim/ressurect command
 			boxSizeTrigger = 3 --change to boxsize similar to repair command
 		end
+		graphCONSTANTtrigger[1] = 1
+		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[queueIndex].id==40 then --repair command
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		local targetUnitID=cQueue[queueIndex].params[1]
@@ -919,8 +934,13 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetY"]=unitPosY
 		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
 		boxSizeTrigger=3
+		graphCONSTANTtrigger[1] = 1
+		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[1].id == cMD_DummyG then
 		targetCoordinate = {-1, -1,-1} --no target (only avoidance)
+		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached"
+		graphCONSTANTtrigger[1] = nil --//value not needed; because avoidance while not seen (cMD_DummyG) don't use attractor 
+		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[queueIndex].id == CMD_GUARD then
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		local targetUnitID = cQueue[queueIndex].params[1]
@@ -935,13 +955,23 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=unitPosY
 		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
-		boxSizeTrigger = 4 --//deactivation boxsize for GUARD command
-	else --if queue is empty/no match: then use no-target. eg: A case where engine delete the next queues of a valid command and widget expect it to still be there or in case if an Attack command needed avoidance.
+		boxSizeTrigger = 4 --//boxsize for GUARD command
+		graphCONSTANTtrigger[1] = 2 
+		graphCONSTANTtrigger[2] = 2	--//use more aggressive avoidance because it often run just once or twice. It need big result.
+	elseif cQueue[queueIndex].id == CMD_ATTACK then
+		targetCoordinate={-1, -1, -1}
+		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached"
+		graphCONSTANTtrigger[1] = nil --//value not needed; because CMD_ATTACK don't use attractor 
+		graphCONSTANTtrigger[2] = 2	--//use more aggressive avoidance because it often run just once or twice. It need big result.
+	else --if queue has no match/ is empty: then use no-target. eg: A case where undefined command is allowed into the system, or when engine delete the next queues of a valid command and widget expect it to still be there.
 		targetCoordinate={-1, -1, -1}
 		--if for some reason command queue[2] is already empty then use these backup value as target:
 		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
+		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached"
+		graphCONSTANTtrigger[1] = nil
+		graphCONSTANTtrigger[2] = 1
 	end
-	return commandIndexTable, targetCoordinate, boxSizeTrigger
+	return commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger
 end
 
 function AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
@@ -1002,11 +1032,12 @@ function GetTargetSubtendedAngle(unitID, targetCoordinate)
 end
 
 --sum the contribution from all enemy unit
-function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger)
+function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger)
 	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG
 	local smCONSTANT = smCONSTANTunitG --?
 	local distanceCONSTANT = distanceCONSTANTunitG
 	local obsCONSTANT =obsCONSTANTg
+	local obsCONSTANT_Index = graphCONSTANTtrigger[2]
 	local normalizingFactor = 0
 	if (turnOnEcho == 1) then Spring.Echo("unitID(SumAllUnitAroundUnitID)" .. thisUnitID) end
 	if (surroundingUnits[1]~=nil) then --don't execute if no enemy unit exist
@@ -1032,12 +1063,12 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					if impatienceTrigger==0 then --zero means that unit is impatient
 						distanceCONSTANT=distanceCONSTANT/2
 					end
-					local ri, wi, di = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT,obsCONSTANT)
+					local ri, wi, di = GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT,obsCONSTANT[obsCONSTANT_Index])
 					local fObstacle = ri*wi*di
 					distanceCONSTANT=distanceCONSTANTunitG --reset distance constant
 
 					--get second obstacle/enemy/repulsor wave function to calculate slope
-					local ri2, wi2, di2 = GetRiWiDi (unitDirection+0.05, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT)
+					local ri2, wi2, di2 = GetRiWiDi (unitDirection+0.05, relativeAngle, subtendedAngle, unitSeparation, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT[obsCONSTANT_Index])
 					local fObstacle2 = ri2*wi2*di2
 					
 					--create a snapshot of the entire graph. Resolution: 360 datapoint
@@ -1046,7 +1077,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					for i=-180, 180, 1 do --sample the entire graph
 						local differenceInAngle = (unitDirection+math.pi/i)-relativeAngle
 						local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle))
-						local wI = obsCONSTANT* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
+						local wI = obsCONSTANT[obsCONSTANT_Index]* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
 						graphSample[i+180+1]=graphSample[i+180+1]+ (rI*wI*dI*hI)
 					end
 
@@ -1064,8 +1095,8 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 				biggestValue = graphSample[i]
 			end
 		end
-		if biggestValue > obsCONSTANT then
-			normalizingFactor = obsCONSTANT/biggestValue --normalize graph value to a determined maximum
+		if biggestValue > obsCONSTANT[obsCONSTANT_Index] then
+			normalizingFactor = obsCONSTANT[obsCONSTANT_Index]/biggestValue --normalize graph value to a determined maximum
 		else 
 			normalizingFactor = 1 --don't change the graph if the graph never exceed maximum value
 		end
