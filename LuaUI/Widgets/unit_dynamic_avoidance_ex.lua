@@ -11,7 +11,7 @@ local versionName = "v1.8"
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Dynamic Avoidance System (exp)",
+    name      = "Dynamic Avoidance System",
     desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor, cloakies, and ground combat unit",
     author    = "msafwan",
     date      = "Dec 26, 2011",
