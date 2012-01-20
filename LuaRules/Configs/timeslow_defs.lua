@@ -52,7 +52,7 @@ for name,data in pairs(WeaponDefNames) do
 	elseif cp.timeslow_damagefactor then
 		custom.slowDamage = cp.timeslow_damagefactor * (data.damages and data.damages[0] or 0)
 		custom.onlySlow = (cp.timeslow_onlyslow == "1") or false
-		custom.smartRetarget = cp.timeslow_smartretarge and tonumber(cp.timeslow_smartretarget) or nil
+		custom.smartRetarget = cp.timeslow_smartretarget and tonumber(cp.timeslow_smartretarget) or nil
 		weapons[name] = custom
 	end
 	if weapons[name] then array[data.id] = weapons[name] end
