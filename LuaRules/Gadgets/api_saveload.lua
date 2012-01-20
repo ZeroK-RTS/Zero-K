@@ -531,7 +531,7 @@ end
 
 function gadget:GameFrame(n)
 	if n % autosave_frequency < 0.1 then
-		Spring.SendCommands("save -y autosave")
+		--Spring.SendCommands("save -y autosave")
 	end
 end
 -----------------------------------------------------------------------------------
