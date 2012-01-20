@@ -128,8 +128,8 @@ function widget:CommandNotify(cmdID)
 	end
 end
 
-function widget:UnitDamaged(unitID, unitDefID, unitTeam)
-	if (unitTeam == myTeamID) then
+function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
+	if (unitTeam == myTeamID)  and damage>1 then
 		local unitDefID = GetUnitDefID(unitID)
 		local unitName = UnitDefs[unitDefID].name
 		local sounds = soundTable[unitName] or soundTable[default]
