@@ -18,26 +18,26 @@ local UPDATE_PERIOD = 15 -- I'd prefer if this was not changed
 
 
 local weapons = {
-	slowmort_slowbeam = { slowDamage = 190, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
+	slowmort_slowbeam = { slowDamage = 190, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	cormak_blast = { slowDamage = 55, noDeathBlast = true, scaleSlow = true },
 	corcrw_timedistort = { slowDamage = 100, onlySlow = true, scaleSlow = true },
 	slowmissile_weapon = { slowDamage = 1, onlySlow = true, scaleSlow = true },
 	raveparty_violet_slugger = { slowDamage = 2500, noDeathBlast = true, scaleSlow = true },
-	chicken_spidermonkey_web = { slowDamage = 30, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
+	chicken_spidermonkey_web = { slowDamage = 30, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 }
 
 -- reads from customParams and copies to weapons as appropriate - needed for procedurally generated comms
 -- as always, need better way to handle if upgrades are desired!
 local presets = {
-	commrecon_slowbeam = { slowDamage = 450, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
+	commrecon_slowbeam = { slowDamage = 450, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	
-	commrecon2_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
+	commrecon2_slowbeam = { slowDamage = 600, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	commrecon2_slowbomb = { slowDamage = 1250, scaleSlow = true },
 	
-	commrecon3_slowbeam = { slowDamage = 750, onlySlow = true, smartRetarget = 0.5, scaleSlow = true},
+	commrecon3_slowbeam = { slowDamage = 750, onlySlow = true, smartRetarget = 0.33, scaleSlow = true},
 	commrecon3_slowbomb = { slowDamage = 1500, scaleSlow = true },
 	
-	module_disruptorbeam = { slowDamage = 450, smartRetarget = 0.5, scaleSlow = true},
+	module_disruptorbeam = { slowDamage = 450, smartRetarget = 0.33, scaleSlow = true},
 	module_disruptorbomb = { slowDamage = 1250, scaleSlow = true },
 }
 
