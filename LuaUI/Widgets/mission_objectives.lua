@@ -143,6 +143,7 @@ local function ModifyObjective(id, title, details, pos, status, color)
 		obj.panel.OnMouseUp = {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end}
 	end
 	if status then
+		status = string.lower(status)
 		obj.image.file = statusImages[status]
 		obj.image:Invalidate()
 	end
@@ -281,12 +282,13 @@ function widget:Initialize()
 		parent = mainPanel;
 		x = 2, y = 4,
 		height = mainPanel.height - 12;
-		width =  mainPanel.width - 6;
+		width =  mainPanel.width - 24;
 		horizontalScrollbar = false,
 		verticalSmartScroll = true,
 		backgroundColor = {0, 0, 0, 0},
 		padding = {0, 0, 0, 0},
 		itemMargin  = {0, 0, 0, 0},
+		scrollbarSize = 8,
 	}
 	
 	stack = StackPanel:New{

@@ -173,13 +173,13 @@ function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 		height	= height - 8 - 8,
 		width   = (width - x - 8),
         horizontalScrollbar = false,
+		scrollbarSize = 6,
     }
 	
 	textPersistent = Chili.TextBox:New{
 		text    = text or '',
-		autosize = false,
-		valign  = "ascender";
 		align   = "left";
+		width = (width - x - 12),
 		padding = {5, 5, 5, 5},
 		lineSpacing = 0,
 		font    = {
@@ -193,6 +193,7 @@ end
 function WG.HidePersistentMessageBox()
 	if msgBoxPersistent then
 		msgBoxPersistent:Dispose()
+		msgBoxPersistent = nil
 	end
 end
 
@@ -214,10 +215,10 @@ function widget:Update(dt)
 end
 ]]--
 
-local str = "It would serve the greater good if\nyou would lay down arms, human.\nThis planet will be returned to\nthe Tau Empire as is proper."
+local str = "It would serve the greater good if you would lay down arms, human. This planet will be returned to the Tau Empire as is proper."
 function widget:Initialize()
 	Chili = WG.Chili
-	--WG.ShowPersistentMessageBox(str, 300, 100, 12, "LuaUI/Images/advisor2.jpg")
+	--WG.ShowPersistentMessageBox(str, 300, 100, 12, "LuaUI/Images/advisor2.jpg")	-- testing
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
