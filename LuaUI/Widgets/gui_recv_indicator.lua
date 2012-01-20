@@ -1,4 +1,4 @@
-local versionName = "v1.042"
+local versionName = "v1.05"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -21,30 +21,41 @@ function widget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
-
+---------------------------------------------------------------------------------
+--Imports------------------------------------------------------------------------
+local osClock = os.clock
+local spMarkerErasePosition = Spring.MarkerErasePosition
+local spMarkerAddPoint = Spring.MarkerAddPoint
+local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
+---------------------------------------------------------------------------------
 local myTeamID_gbl = -1 --//variable: myTeamID
 local receivedUnitList = {} --//variable: store received unitID
 local givenByTeamID_gbl = -1 --//variable: store sender's ID
 local gameID_to_playerName_gbl = {}
+local knownMarkerPosition_gbl  = {}
 
 local minimumNeighbor_gbl = 3 --//constant: minimum neighboring (units) before considered a cluster
 local neighborhoodRadius_gbl = 600 --//constant: neighborhood radius. Distance from each unit where neighborhoodList are generated. 
 local radiusThreshold_gbl = 300 --//constant: density threshold where border is detected. Huge value means 2 cluster are combined, small value mean all unit disassociated
-
+local waitDuration = 1 --//constant: wait (in second) before 'widget:Update()' is executed
+local markerLife_gbl = 2 --//constant: wait (in second) before marker expired (removed)
 ---------------------------------------------------------------------------------
 --Add Marker---------------------------------------------------------------------
 -- 1 function. 
 local function AddMarker (cluster, unitIDNoise)
 	local givenByTeamID = givenByTeamID_gbl
 	local gameID_to_playerName = gameID_to_playerName_gbl
+	local knownMarkerPosition = knownMarkerPosition_gbl
 	------
 	--// extract cluster information and add mapMarker.
 	local currentIndex=0
-	local playerName = gameID_to_playerName[givenByTeamID+1] or givenByTeamID
+	local playerName = gameID_to_playerName[givenByTeamID+1]
+	local now = osClock()
 	for index=1 , #cluster do
 		local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
 		for unitIndex=1, #cluster[index] do
-			local x,y,z=Spring.GetUnitPosition(cluster[index][unitIndex])
+			local x,y,z=spGetUnitPosition(cluster[index][unitIndex])
 			sumX= sumX+x
 			sumY = sumY+y
 			sumZ = sumZ+z
@@ -53,26 +64,28 @@ local function AddMarker (cluster, unitIDNoise)
 		meanX = sumX/unitCount --//calculate center of cluster
 		meanY = sumY/unitCount
 		meanZ = sumZ/unitCount
-		Spring.MarkerAddPoint(meanX,meanY,meanZ, unitCount .. " units received from ".. playerName)
+		spMarkerAddPoint(meanX,meanY,meanZ, unitCount .. " units received from ".. playerName)
+		knownMarkerPosition[(#knownMarkerPosition or 0)+1] = {meanX, meanY, meanZ, now}
 		currentIndex = index
 	end
 	currentIndex=currentIndex+1
 	
 	if unitIDNoise~=nil and #unitIDNoise <= 5 and currentIndex == 1 then --//if there's no discernable cluster, and the outlier is less than 6, and outlier list not empty, then add individual marker.
 		for j= 1 ,#unitIDNoise do
-			local x,y,z=Spring.GetUnitPosition(unitIDNoise[j])
-			Spring.MarkerAddPoint(x,y,z, "Unit received from ".. playerName)
+			local x,y,z=spGetUnitPosition(unitIDNoise[j])
+			spMarkerAddPoint(x,y,z, "Unit received from ".. playerName)
+			knownMarkerPosition[(#knownMarkerPosition or 0)+1] = {x, y, z, now}
 			currentIndex=currentIndex+1
 		end
 	end
 	------
 	givenByTeamID_gbl = -1 --//reset value
+	knownMarkerPosition_gbl = knownMarkerPosition
 end
 
 ---------------------------------------------------------------------------------
 --Spring Call-Ins----------------------------------------------------------------
 --3 functions
-local waitDuration = 30 --//variable: ...
 local elapsedTime = 0 --//variable: ...
 function widget:Update(n)
 	elapsedTime= elapsedTime + n
@@ -92,9 +105,27 @@ function widget:Update(n)
 		cluster, unitIDNoise = OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, radiusThreshold) --//method 2. Better
 		AddMarker(cluster, unitIDNoise)
 		------
-		waitDuration = 30 --// disable widget:Update() by setting update to huge value. eg: 10 second
+		waitDuration = 3 --// disable widget:Update() by setting update to huge value. eg: 10 second
+		receivedUnitList = {} --//reset 'receivedUnitList' content
 	end
-	receivedUnitList = {} --//reset 'receivedUnitList' content
+	
+	if #knownMarkerPosition_gbl~= nil and #knownMarkerPosition_gbl~= 0  then
+		local knownMarkerPosition = knownMarkerPosition_gbl
+		local now = osClock()
+		local markerLife = markerLife_gbl
+		-----
+		for i=1, #knownMarkerPosition do
+			if knownMarkerPosition[i] ~= nil then
+				local markerAge = now - knownMarkerPosition[i][4]
+				if markerAge >= markerLife then
+					spMarkerErasePosition (knownMarkerPosition[i][1],knownMarkerPosition[i][2],knownMarkerPosition[i][3])
+					knownMarkerPosition[i] = nil --//set to nil here so that next content (inserted using # will put it here, filling the space)
+				end
+			end
+		end
+		-----
+		knownMarkerPosition_gbl = knownMarkerPosition
+	end
 end
 
 
@@ -102,8 +133,8 @@ function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be 
 	if Spring.ValidUnitID(unitID) and unitTeamID == myTeamID_gbl then 
 		receivedUnitList[(#receivedUnitList or 0) +1]=unitID
 		givenByTeamID_gbl = oldTeamID
-		waitDuration = 0.2 --// tell widget:Update() to wait 0.2 more second before start adding mapMarker
-		elapsedTime = 0 --// tell widget:Update() to reset timer
+		waitDuration = 0.2 -- tell widget:Update() to wait 0.2 more second before start adding mapMarker
+		elapsedTime = 0 -- tell widget:Update() to reset timer
 	end
 end
 
@@ -138,10 +169,10 @@ end
 --GetNeigbors--------------------------------------------------------------------
 -- 1 function.
 local function GetNeighbor (unitID, myTeamID, neighborhoodRadius, receivedUnitList) --//return the unitIDs of specific units around a center unit
-	local x,_,z = Spring.GetUnitPosition(unitID)
+	local x,_,z = spGetUnitPosition(unitID)
 	local tempUnitList = {} 
 	if x ~= nil then --//handle a case where unitID is valid but output a nil
-		local neighborUnits = Spring.GetUnitsInCylinder(x,z, neighborhoodRadius, myTeamID) --//use Spring to return the surrounding units' ID. Get neighbor. Ouput: unitID + my units
+		local neighborUnits = spGetUnitsInCylinder(x,z, neighborhoodRadius, myTeamID) --//use Spring to return the surrounding units' ID. Get neighbor. Ouput: unitID + my units
 		for k = 1, #neighborUnits do --// try to filter out non-received units from receivedUnitList
 			local match = false
 			for j= 1, #receivedUnitList do
@@ -167,21 +198,22 @@ local function InsertOrderSeed (orderSeed, unitID_to_orderSeedMeta, unitID, obje
 	local insertionIndex = orderSeedLenght
 	for i = orderSeedLenght, 0, -1 do
 		insertionIndex=i
-		if i >0 then --//at index 0 don't check. Will get nil for sure.
+		if i >0 then --at index 0 don't do check. Will get nil for sure.
 			if orderSeed[i].content.reachability_distance > objects[unitID].reachability_distance then --//if existing value is abit bigger than to-be-inserted value: break
 				break
 			end
 		end
 	end
 	insertionIndex = insertionIndex + 1 --//insert data just above that big value
-	local buffer1 = orderSeed[insertionIndex] --//backup content of current index
-	orderSeed[insertionIndex] = {unitID = unitID , content = objects[unitID]} --//replace current index with new value
-	unitID_to_orderSeedMeta[unitID]=insertionIndex --//update meta table
-	for j = insertionIndex, orderSeedLenght, 1 do --//shift content for content less-or-equal-to table lenght
-		local buffer2 = orderSeed[j+1] --//save content of next index
-		orderSeed[j+1] = buffer1 --//put backup value into next index
-		unitID_to_orderSeedMeta[buffer1.unitID]=j+1 --// update meta table
-		buffer1 = buffer2 --//use saved content as next backup, then repeat process
+	--//shift table content
+	local buffer1 = orderSeed[insertionIndex] --backup content of current index
+	orderSeed[insertionIndex] = {unitID = unitID , content = objects[unitID]} --replace current index with new value
+	unitID_to_orderSeedMeta[unitID]=insertionIndex --update meta table
+	for j = insertionIndex, orderSeedLenght, 1 do --shift content for content less-or-equal-to table lenght
+		local buffer2 = orderSeed[j+1] --save content of next index
+		orderSeed[j+1] = buffer1 --put backup value into next index
+		unitID_to_orderSeedMeta[buffer1.unitID]=j+1 -- update meta table
+		buffer1 = buffer2 --use saved content as next backup, then repeat process
 	end
 	return orderSeed, unitID_to_orderSeedMeta
 end
