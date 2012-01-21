@@ -69,7 +69,6 @@ unitDef = {
   side                = [[CORE]],
   sightDistance       = 325,
   smoothAnim          = true,
-  sonarDistance       = 350,
   terraformSpeed      = 300,
   turninplace         = 0,
   turnRate            = 494,

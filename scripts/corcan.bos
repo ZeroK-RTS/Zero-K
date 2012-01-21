@@ -1,9 +1,8 @@
 // by Chris Mackey 
 
-//linear constant 65536
 #include "constants.h"
 
-piece base, body, l_leg, l_foot, l_rocket, l_pt, r_leg, r_foot, r_rocket, r_pt, turret, ram, spike;
+piece base, l_leg, l_foot, l_rocket, l_pt, r_leg, r_foot, r_rocket, r_pt, turret, ram, spike;
 
 static-var jumping, gun_1_yaw;
 
@@ -85,16 +84,16 @@ walk()
 {
 	while( TRUE )
 	{
-		move body to y-axis [2] speed [5];
+		move base to y-axis [2] speed [5];
 		if( TRUE )
 		{
 			turn r_leg to x-axis <25> speed <50>;
 			turn r_foot to x-axis <-10> speed <100>;
-			turn body to z-axis <-8> speed <15>;
+			turn base to z-axis <-8> speed <15>;
 			move l_leg to y-axis [0.1] speed [2];
 			turn r_foot to z-axis <8> speed <15>;
 			turn l_foot to z-axis <8> speed <15>;
-			move body to y-axis [0] speed [2];
+			move base to y-axis [0] speed [2];
 			move r_foot to y-axis [0.5] speed [2];
 			move l_foot to y-axis [0.5] speed [2];
 			turn l_leg to x-axis <-18> speed <50>;
@@ -105,11 +104,11 @@ walk()
 		{
 			turn r_leg to x-axis <0> speed <50>;
 			turn r_foot to x-axis <0> speed <100>;
-			turn body to z-axis <0> speed <15>;
+			turn base to z-axis <0> speed <15>;
 			move l_leg to y-axis [-1] speed [1.5];
 			turn r_foot to z-axis <0> speed <15>;
 			turn l_foot to z-axis <0> speed <15>;
-			move body to y-axis [2] speed [2];
+			move base to y-axis [2] speed [2];
 			move r_foot to y-axis [0] speed [2];
 			move l_foot to y-axis [0] speed [2];
 			turn l_leg to x-axis <0> speed <50>;
@@ -120,11 +119,11 @@ walk()
 		{
 			turn r_leg to x-axis <-18> speed <50>;
 			turn r_foot to x-axis <12> speed <100>;
-			turn body to z-axis <8> speed <15>;
+			turn base to z-axis <8> speed <15>;
 			move r_leg to y-axis [0.1] speed [2];
 			turn r_foot to z-axis <-8> speed <15>;
 			turn l_foot to z-axis <-8> speed <15>;
-			move body to y-axis [0] speed [2];
+			move base to y-axis [0] speed [2];
 			move r_foot to y-axis [0.5] speed [2];
 			move l_foot to y-axis [0.5] speed [2];
 			turn l_leg to x-axis <25> speed <50>;
@@ -135,11 +134,11 @@ walk()
 		{
 			turn r_leg to x-axis <0> speed <50>;
 			turn r_foot to x-axis <0> speed <100>;
-			turn body to z-axis <0> speed <15>;
+			turn base to z-axis <0> speed <15>;
 			move r_leg to y-axis [-1] speed [1.5];
 			turn r_foot to z-axis <0> speed <15>;
 			turn l_foot to z-axis <0> speed <15>;
-			move body to y-axis [2] speed [2];
+			move base to y-axis [2] speed [2];
 			move r_foot to y-axis [0] speed [2];
 			move l_foot to y-axis [0] speed [2];
 			turn l_leg to x-axis <0> speed <50>;
@@ -173,9 +172,9 @@ StopMoving()
 	turn r_foot to z-axis <0> speed <15>;
 	move r_foot to y-axis [0] speed [4];
 	
-	turn body to z-axis <0> speed <90>;
-	turn body to x-axis <0> speed <90>;
-	move body to y-axis [0] speed [5];
+	turn base to z-axis <0> speed <90>;
+	turn base to x-axis <0> speed <90>;
+	move base to y-axis [0] speed [5];
 }
 
 
@@ -249,7 +248,7 @@ FirePrimary()
 {
 	start-script RockX(ROCK_X_FIRE_1, gun_1_yaw);
 	start-script RockZ(ROCK_Z_FIRE_1, gun_1_yaw);
-	move spike to z-axis [12] speed [600];
+	move spike to z-axis [10] speed [600];
 	wait-for-move spike along z-axis;
 	move spike to z-axis [0] speed [20];
 }
@@ -259,7 +258,7 @@ Killed(severity, corpsetype)
 	if( severity <= 25 )
 	{
 		corpsetype = 1;
-		explode body type BITMAPONLY | BITMAP1;
+		explode base type BITMAPONLY | BITMAP1;
 		explode spike type BITMAPONLY | BITMAP2;
 		explode turret type BITMAPONLY | BITMAP4;
 		explode ram type BITMAPONLY | BITMAP5;
@@ -271,8 +270,8 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 1;
-		explode body type BITMAPONLY | BITMAP1;
+		corpsetype = 2;
+		explode base type BITMAPONLY | BITMAP1;
 		explode spike type FALL | BITMAP2;
 		explode turret type FALL | BITMAP4;
 		explode ram type FALL | BITMAP5;
@@ -284,8 +283,8 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 2;
-		explode body type BITMAPONLY | BITMAP1;
+		corpsetype = 3;
+		explode base type BITMAPONLY | BITMAP1;
 		explode spike type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 		explode ram type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
@@ -295,8 +294,8 @@ Killed(severity, corpsetype)
 		explode r_leg type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
 		return (0);
 	}
-	corpsetype = 2;
-	explode body type BITMAPONLY | BITMAP1;
+	corpsetype = 3;
+	explode base type BITMAPONLY | BITMAP1;
 	explode spike type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 	explode ram type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;

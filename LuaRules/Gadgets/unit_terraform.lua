@@ -28,6 +28,10 @@ local pi             		= math.pi
 local ceil 			  		= math.ceil
 local sqrt 					= math.sqrt
 local random 		  		= math.random
+local spAdjustHeightMap     = Spring.AdjustHeightMap
+local spGetGroundHeight     = Spring.GetGroundHeight
+local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
+local spLevelHeightMap      = Spring.LevelHeightMap
 local spGetUnitBuildFacing  = Spring.GetUnitBuildFacing
 local spGetUnitCommands     = Spring.GetUnitCommands
 local spValidUnitID         = Spring.ValidUnitID
@@ -35,21 +39,9 @@ local spGetGameFrame		= Spring.GetGameFrame
 local spGiveOrderToUnit		= Spring.GiveOrderToUnit
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spTestBuildOrder      = Spring.TestBuildOrder
-
-local spAdjustHeightMap     = Spring.AdjustHeightMap
-local spAdjustSmoothMesh	= Spring.AdjustSmoothMesh
-local spGetGroundHeight     = Spring.GetGroundHeight
-local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
-local spLevelHeightMap      = Spring.LevelHeightMap
 local spSetHeightMap        = Spring.SetHeightMap
 local spSetHeightMapFunc    = Spring.SetHeightMapFunc
 local spRevertHeightMap     = Spring.RevertHeightMap
-local spGetSmoothMeshHeight = Spring.GetSmoothMeshHeight
-local spLevelSmoothMesh     = Spring.LevelSmoothMesh
-local spSetSmoothMesh		= Spring.SetSmoothMesh
-local spSetSmoothMeshFunc	= Spring.SetSmoothMeshFunc
-local spRevertSmoothMesh    = Spring.RevertSmoothMesh
-
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spGetActiveCommand	= Spring.GetActiveCommand
@@ -152,8 +144,6 @@ end
 
 volumeCost = volumeCost * costMult
 pointBaseCost = pointBaseCost * costMult
-
-local smoothMeshBuffer = 48
 
 --------------------------------------------------------------------------------
 -- Arrays
@@ -1339,9 +1329,8 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 						for x = lx, lx+8, 8 do
 							for z = lz, lz+8, 8 do
 								local currHeight = spGetGroundHeight(x, z)
-								local currAirHeight = spGetSmoothMeshHeight(x, z)
 								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, z), x, z) then
-									segment[n].point[m] = {x = x, z = z, orHeight = currHeight, prevHeight = currHeight, orAirHeight = currAirHeight, prevAirHeight = currAirHeight}
+									segment[n].point[m] = {x = x, z = z, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + x
 									totalZ = totalZ + z
@@ -1355,10 +1344,9 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 						
 						-- fill in bottom right if it is missing
 						if right and bottom then
-							local currAirHeight = spGetSmoothMeshHeight(lx+16, lz+16)						
 							local currHeight = spGetGroundHeight(lx+16, lz+16)
-							if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, lz+16), lx+16,lz+16 ) then
-								segment[n].point[m] = {x = lx+16, z = lz+16, orHeight = currHeight, prevHeight = currHeight, orAirHeight = currAirHeight, prevAirHeight = currAirHeight}
+							if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, lz+16), lx+16, lz+16) then
+								segment[n].point[m] = {x = lx+16, z = lz+16, orHeight = currHeight, prevHeight = currHeight}
 								m = m + 1
 								totalX = totalX + lx+16
 								totalZ = totalZ + lz+16
@@ -1369,9 +1357,8 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 						if right then
 							for z = lz, lz+8, 8 do
 								local currHeight = spGetGroundHeight(lx+16, z)
-								local currAirHeight = spGetSmoothMeshHeight(lx+16, z)
 								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(lx+16, z), lx+16, z) then
-									segment[n].point[m] = {x = lx+16, z = z, orHeight = currHeight, prevHeight = currHeight, orAirHeight = currAirHeight, prevAirHeight = currAirHeight}
+									segment[n].point[m] = {x = lx+16, z = z, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + lx+16
 									totalZ = totalZ + z
@@ -1383,9 +1370,8 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 						if bottom then
 							for x = lx, lx+8, 8 do
 								local currHeight = spGetGroundHeight(x, lz+16)
-								local currAirHeight = spGetSmoothMeshHeight(x, lz+16)
 								if checkPointCreation(terraform_type, volumeSelection, currHeight, terraformHeight,spGetGroundOrigHeight(x, lz+16), x, lz+16) then
-									segment[n].point[m] = {x = x, z = lz+16, orHeight = currHeight, prevHeight = currHeight, orAirHeight = currAirHeight, prevAirHeight = currAirHeight}
+									segment[n].point[m] = {x = x, z = lz+16, orHeight = currHeight, prevHeight = currHeight}
 									m = m + 1
 									totalX = totalX + x
 									totalZ = totalZ + lz+16
@@ -1839,7 +1825,7 @@ local function RaiseWater( raiseAmount)
 	end
 	--]]
 	spAdjustHeightMap(0, 0, mapWidth, mapHeight, -raiseAmount)
-	spAdjustSmoothMesh(0, 0, mapWidth, mapHeight, -raiseAmount)
+	
 end
 
 --------------------------------------------------------------------------------
@@ -2236,7 +2222,6 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 				local z = terra.point[i].edge[j].z
 			
 				local groundHeight = spGetGroundHeight(x, z)
-				local airHeight = spGetSmoothMeshHeight(x, z)
 				local edgeHeight = groundHeight
 				local overlap = false
 				local overlapCost = 0
@@ -2265,7 +2250,6 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					extraPoint[index] = {
 						x = x, z = z, 
 						orHeight = groundHeight, 
-						orAirHeight = airHeight,
 						heightDiff = newHeight - maxHeightDifference - groundHeight, 
 						cost = (newHeight - maxHeightDifference - groundHeight), 
 						supportX = terra.point[i].x, 
@@ -2312,7 +2296,6 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						x = x, 
 						z = z, 
 						orHeight = groundHeight, 
-						orAirHeight = airHeight,
 						heightDiff = newHeight + maxHeightDifference - groundHeight, 
 						cost = -(newHeight + maxHeightDifference - groundHeight), 
 						supportX = terra.point[i].x, 
@@ -2360,7 +2343,6 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 			if not (terra.area[x] and terra.area[x][z]) then
 
 				local groundHeight = spGetGroundHeight(x, z)
-				local airHeight = spGetSmoothMeshHeight(x, z)
 				local edgeHeight = groundHeight
 				local overlap = false
 				local overlapCost = 0
@@ -2388,7 +2370,6 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						x = x, 
 						z = z, 
 						orHeight = groundHeight, 
-						orAirHeight = airHeight,
 						heightDiff = newHeight - maxHeightDifferenceLocal - groundHeight, 
 						cost = (newHeight - maxHeightDifferenceLocal - groundHeight), 
 						supportX = extraPoint[i].supportX, 
@@ -2433,7 +2414,6 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						x = x, 
 						z = z, 
 						orHeight = groundHeight, 
-						orAirHeight = airHeight,
 						heightDiff = newHeight + maxHeightDifferenceLocal - groundHeight,						
 						cost = -(newHeight + maxHeightDifferenceLocal - groundHeight), 
 						supportX = extraPoint[i].supportX, 
@@ -2541,7 +2521,6 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		end
 	end
 	
-	-- heightmap change
 	local func = function()
 		for i = 1, terra.points do	
 			local height = terra.point[i].orHeight+terra.point[i].diffHeight*progress
@@ -2553,19 +2532,6 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		end
 	end
 	spSetHeightMapFunc(func)
-
-	-- smoothmesh change
-	func = function()
-		for i = 1, terra.points do	
-			local height = terra.point[i].orAirHeight+terra.point[i].diffHeight*progress
-			spSetSmoothMesh(terra.point[i].x,terra.point[i].z, height)
-			terra.point[i].prevAirHeight = height
-		end 
-		for i = 1, extraPoints do
-			spSetSmoothMesh(extraPoint[i].x,extraPoint[i].z,extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult)
-		end
-	end
-	spSetSmoothMeshFunc(func)
 
 	--Removed Intercept Check
 	--if terraformUnit[id].intercepts ~= 0 then
@@ -2702,8 +2668,7 @@ function gadget:GameFrame(n)
 			if unit then
 				local height = spGetGroundHeight(unit.x, unit.z)
 				if height ~= unit.h then
-					spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
-					spLevelSmoothMesh(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
+					Spring.LevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
 				end
 			else
 				
@@ -2777,31 +2742,24 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		
 		local groundPoints = 0
 		local groundHeight = 0
-		local airHeight = 0
 		
 		local origHeight = {} -- just to not read the heightmap twice
-		local origAirHeight = {}
 		
 		for i = sx-gatherradius, sx+gatherradius,8 do
 			origHeight[i] = {}
-			origAirHeight[i] = {}
 			for j = sz-gatherradius, sz+gatherradius,8 do
 				local disSQ = (i - x)^2 + (j - z)^2
 				if disSQ <= gatherradiusSQ then
 					origHeight[i][j] = spGetGroundHeight(i,j)
-					origAirHeight[i][j] = spGetSmoothMeshHeight(i,j)
 					groundPoints = groundPoints + 1
 					groundHeight = groundHeight + origHeight[i][j]
-					airHeight = airHeight + origHeight[i][j]
 				end
 			end
 		end
 		
 		if groundPoints > 0 then
 			groundHeight = groundHeight/groundPoints
-			airHeight = airHeight/groundPoints
-
-			-- modify heightmap
+			
 			local func = function()
 				for i = sx-smoothradius, sx+smoothradius,8 do
 					for j = sz-smoothradius, sz+smoothradius,8 do
@@ -2819,26 +2777,6 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 				end 
 			end
 			spSetHeightMapFunc(func)
-
-			-- modify smoothmesh
-			func = function()
-				for i = sx-smoothradius, sx+smoothradius,8 do
-					for j = sz-smoothradius, sz+smoothradius,8 do
-						local disSQ = (i - x)^2 + (j - z)^2
-						if disSQ <= smoothradiusSQ then
-							if not origAirHeight[i] then
-								origAirHeight[i] = {}
-							end
-							if not origAirHeight[i][j] then
-								origAirHeight[i][j] = spGetSmoothMeshHeight(i,j)
-							end
-							spSetSmoothMesh(i, j, origAirHeight[i][j] + (airHeight - origAirHeight[i][j]) * maxSmooth * (1-disSQ/smoothradiusSQ))
-						end
-					end
-
-				end
-			end
-			spSetSmoothMeshFunc(func)
 		end
 	end
 
@@ -2982,16 +2920,6 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 				posZ,
 				posY
 			) 
-			spSetSmoothMeshFunc(
-				function(x,z,h)
-					for i = 1, #x, 1 do
-						Spring.AddSmoothMesh(x[i],z[i],h[i])
-					end
-				end,
-				posX,
-				posZ,
-				posY
-			) 			
 		end
 		--spAdjustHeightMap(ux-64, uz-64, ux+64, uz+64 , 0)
 	end

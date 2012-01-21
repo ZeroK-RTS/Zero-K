@@ -43,6 +43,7 @@ unitDef = {
   side              = [[CORE]],
   sightDistance     = 660,
   smoothAnim        = true,
+  sonarDistance     = 800,
   turnRate          = 0,
   waterline         = 1,
   workerTime        = 0,
