@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- note name and description are obtained from server and modified at runtime
+
 structureConfig = {
 	
 	generic_tech = function(unitDef)
@@ -34,7 +36,7 @@ structureConfig = {
 	pw_dropfac = function(unitDef)
 			unitDef.maxdamage = 50000
 			unitDef.name = "Ship Factory"
-			unitDef.description = "Produces 0.25 free ships per turn"
+			unitDef.description = "Produces 0.5 free ships per turn"
 			unitDef.objectname = "pw_dropfac.obj"
 			unitDef.selfdestructcountdown = 180
 			
