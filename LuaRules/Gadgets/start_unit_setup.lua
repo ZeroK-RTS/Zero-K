@@ -831,10 +831,6 @@ function gadget:Load(zip)
 		return
 	end
 	loadGame = true
-	local toSave = {
-		boost = boost,
-		facplops = facplops,
-	}
 	local data = GG.SaveLoad.ReadFile(zip, "Start Unit Setup", SAVE_FILE) or {}
 
 	-- load data wholesale
