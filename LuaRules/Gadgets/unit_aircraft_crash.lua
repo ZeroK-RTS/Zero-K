@@ -9,7 +9,7 @@ function gadget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
-
+--Revision 3
 --------------------------------------------------------------------------------
 -- speedups
 --------------------------------------------------------------------------------
@@ -18,9 +18,11 @@ local spGetUnitHealth		= Spring.GetUnitHealth
 
 local aircraftDefIDs = {}
 
-for i=1,#UnitDefs do
-	if UnitDefs[i].canFly then
-		aircraftDefIDs[i] = UnitDefs[i].health
+function gadget:Initialize()
+	for i=1,#UnitDefs do
+		if UnitDefs[i].canFly then
+			aircraftDefIDs[i] = UnitDefs[i].health
+		end
 	end
 end
 
