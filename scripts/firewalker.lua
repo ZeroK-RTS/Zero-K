@@ -260,17 +260,17 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .50  then
-		Explode(base)
-		Explode(pelvis)
-		Explode(torso)
-		Explode(lgun)
-		Explode(rgun)
-		Explode(rupleg)
-		Explode(rloleg)
-		Explode(rfoot)
-		Explode(lupleg)
-		Explode(lloleg)
-		Explode(lfoot)
+		Explode(base, sfxNone)
+		Explode(pelvis, sfxNone)
+		Explode(torso, sfxNone)
+		Explode(lgun, sfxFall)
+		Explode(rgun, sfxFall)
+		Explode(rupleg, sfxNone)
+		Explode(rloleg, sfxNone)
+		Explode(rfoot, sfxNone)
+		Explode(lupleg, sfxNone)
+		Explode(lloleg, sfxNone)
+		Explode(lfoot, sfxNone)
 		return 1
 	end
 	Explode(base, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
