@@ -318,22 +318,22 @@ for i=1,#UnitDefs do
     if unitDef.customParams and unitDef.customParams.commtype then
         if unitDef.customParams.commtype == "1" then
             local s = levelScale[tonumber(unitDef.customParams.level) or 1]
-            effectUnitDefs[unitDef.name] = {
+            effectUnitDefsXmas[unitDef.name] = {
                 {class='SantaHat', options={color={0,0.7,0,1}, pos={0,4*s,0.35*s}, emitVector={0.3,1,0.2}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
             }
         elseif unitDef.customParams.commtype == "2" then
             local s = levelScale[tonumber(unitDef.customParams.level) or 1]
-            effectUnitDefs[unitDef.name] = {
+            effectUnitDefsXmas[unitDef.name] = {
                 {class='SantaHat', options={pos={0,6*s,2*s}, emitVector={0.4,1,0.2}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
             }
         elseif unitDef.customParams.commtype == "3" then 
             local s = levelScale[tonumber(unitDef.customParams.level) or 1]
-            effectUnitDefs[unitDef.name] = {
+            effectUnitDefsXmas[unitDef.name] = {
                 {class='SantaHat', options={color={0,0.7,0,1}, pos={1.5*s,4*s,0.5*s}, emitVector={0.7,1.6,0.2}, width=2.2*s, height=6*s, ballSize=0.7*s, piece="head"}},
             }
         elseif unitDef.customParams.commtype == "4" then 
             local s = levelScale[tonumber(unitDef.customParams.level) or 1]
-            effectUnitDefs[unitDef.name] = {
+            effectUnitDefsXmas[unitDef.name] = {
                 {class='SantaHat', options={pos={0,3.8*s,0.35*s}, emitVector={0,1,0}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
             }
         end
