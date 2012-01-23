@@ -11,7 +11,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     api       = true,
-    enabled   = true
+    enabled   = false
   }
 end
 
@@ -30,7 +30,7 @@ local payloadA		= "5"
 local payloadB		= "6"
 local bye			= "7"
 local broadcastID 	= wdgtID .. "AAB"	--an identifier for packet that work differently than all the above but still belong here
-local operatingModeThis = "A"	--a switch to enable one-on-one Custom Avatar functionality: "A", and sync-ing Avatars functionality:"B" *may have bugs*
+local operatingModeThis = "B"	--a switch to enable one-on-one Custom Avatar functionality: "A", and sync-ing Avatars functionality:"B" *may have bugs*
 --Operating Mode A: Exchange custom Avatar (an avatar supplied by user)
 --Computer A
 --|............|Computer B
