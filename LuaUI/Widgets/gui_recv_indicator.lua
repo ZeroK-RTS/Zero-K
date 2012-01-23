@@ -1,4 +1,4 @@
-local versionName = "v1.05"
+local versionName = "v1.06"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -28,12 +28,15 @@ local spMarkerErasePosition = Spring.MarkerErasePosition
 local spMarkerAddPoint = Spring.MarkerAddPoint
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
+local spAreTeamsAllied = Spring.AreTeamsAllied
+local spValidUnitID = Spring.ValidUnitID
 ---------------------------------------------------------------------------------
 local myTeamID_gbl = -1 --//variable: myTeamID
 local receivedUnitList = {} --//variable: store received unitID
 local givenByTeamID_gbl = -1 --//variable: store sender's ID
 local gameID_to_playerName_gbl = {}
 local knownMarkerPosition_gbl  = {}
+local notifyCapture_gbl = {}
 
 local minimumNeighbor_gbl = 3 --//constant: minimum neighboring (units) before considered a cluster
 local neighborhoodRadius_gbl = 600 --//constant: neighborhood radius. Distance from each unit where neighborhoodList are generated. 
@@ -130,17 +133,21 @@ end
 
 
 function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
-	if Spring.ValidUnitID(unitID) and unitTeamID == myTeamID_gbl then 
-		receivedUnitList[(#receivedUnitList or 0) +1]=unitID
-		givenByTeamID_gbl = oldTeamID
-		waitDuration = 0.2 -- tell widget:Update() to wait 0.2 more second before start adding mapMarker
-		elapsedTime = 0 -- tell widget:Update() to reset timer
+	if spValidUnitID(unitID) and unitTeamID == myTeamID_gbl then
+		if spAreTeamsAllied(unitTeamID, oldTeamID) or notifyCapture_gbl[oldTeamID] then
+			notifyCapture_gbl[oldTeamID] = false
+			receivedUnitList[(#receivedUnitList or 0) +1]=unitID
+			givenByTeamID_gbl = oldTeamID
+			waitDuration = 0.2 -- tell widget:Update() to wait 0.2 more second before start adding mapMarker
+			elapsedTime = 0 -- tell widget:Update() to reset timer
+		end
 	end
 end
 
 function widget:Initialize()
 	local gameID_to_playerName = gameID_to_playerName_gbl
 	local myTeamID = myTeamID_gbl
+	local notifyCapture = notifyCapture_gbl
 	-----
 	-- local playerList = Spring.GetPlayerRoster() --//check playerIDList for players
 	-- for i = 1, #playerList do
@@ -152,6 +159,7 @@ function widget:Initialize()
 	local teamList = Spring.GetTeamList() --//check teamIDlist for AI
 	for j= 1, #teamList do
 		local teamID = teamList[j]
+		notifyCapture[teamID] = true
 		local _,playerID, _, isAI = Spring.GetTeamInfo(teamID)
 		if isAI then
 			local _, aiName = Spring.GetAIInfo(teamID)
@@ -164,6 +172,7 @@ function widget:Initialize()
 	-----
 	gameID_to_playerName_gbl = gameID_to_playerName
 	myTeamID_gbl = myTeamID
+	notifyCapture_gbl = notifyCapture
 end
 ---------------------------------------------------------------------------------
 --GetNeigbors--------------------------------------------------------------------
