@@ -50,6 +50,7 @@ local spGameOver = Spring.GameOver or nullFunc
 
 local gaiaTeamID = Spring.GetGaiaTeamID()
 local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(gaiaTeamID))
+local chickenAllyTeamID
 
 local aliveCount = {}
 local destroyedAlliances = {}
@@ -93,6 +94,14 @@ end
 --------------------------------------------------------------------------------
 -- local funcs
 --------------------------------------------------------------------------------
+local function GetTeamIsChicken(teamID)
+	local luaAI = Spring.GetTeamLuaAI(teamID)
+	if luaAI and string.find(string.lower(luaAI), "chicken") then
+		return true
+	end
+	return false
+end
+
 local function CountAllianceUnits(allianceID)
 	local teamlist = spGetTeamList(allianceID) or {}
 	local count = 0
@@ -125,8 +134,9 @@ function RemoveAllianceUnit(u, ud, teamID)
 	--Spring.Echo("removed alliance=" .. teamID, 'count='..aliveCount[allianceID]) 
 	if UnitDefs[ud].customParams.commtype then
 		commsAlive[allianceID][u] = nil
-	end	
-	if (CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) then
+	end
+	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID))) and (allianceID ~= chickenAllyTeamID) then
+		Spring.Echo("purge")
 		DestroyAlliance(allianceID)
 	end
 end
@@ -170,13 +180,13 @@ function DestroyAlliance(allianceID)
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
 		if teamList == nil then return end	-- empty allyteam, don't bother
-		Spring.Echo("Game Over: Destroying alliance " .. allianceID)
 		
 		if destroy_type == 'debug' then
 			Spring.Echo("Game Over: DEBUG")
 			Spring.Echo("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			Spring.Echo("Game Over: If this is true, then please resign.")
 		elseif destroy_type == 'destroy' then	-- kaboom
+			Spring.Echo("Game Over: Destroying alliance " .. allianceID)
 			for i=1,#teamList do
 				local t = teamList[i]
 				local teamUnits = spGetTeamUnits(t) 
@@ -191,6 +201,7 @@ function DestroyAlliance(allianceID)
 				spKillTeam(t)
 			end
 		elseif destroy_type == 'losecontrol' then	-- no orders can be issued to team
+			Spring.Echo("Game Over: Destroying alliance " .. allianceID)
 			for i=1,#teamList do
 				spKillTeam(teamList[i])
 			end
@@ -218,7 +229,8 @@ local function ProcessLastAlly()
 		for i=1,#teamlist do
 			local t = teamlist[i]
 			-- any team without units is dead to us; so only teams who are active AND have units matter
-			if (aliveCount[t] > 0) or (GG.waitingForComm or {})[t] then	
+			-- except chicken, who are alive even without units
+			if (aliveCount[t] > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then	
 				local playerlist = spGetPlayerList(t, true) -- active players
 				if playerlist then
 					for j=1,#playerlist do
@@ -233,11 +245,6 @@ local function ProcessLastAlly()
 				if isAiTeam then
 					activeTeams = activeTeams + 1
 				end
-			end
-			-- chicken is alive even without units
-			local luaAI = Spring.GetTeamLuaAI(t)
-			if luaAI and string.find(string.lower(luaAI), "chicken") then
-				activeTeams = activeTeams + 1
 			end
 		end
 		if activeTeams > 0 then
@@ -307,6 +314,16 @@ function gadget:Initialize()
 	CheckAllUnits()
 	destroy_type = Spring.GetModOptions() and Spring.GetModOptions().defeatmode or 'debug'
 	commends = Spring.GetModOptions() and tobool(Spring.GetModOptions().commends)
+	
+	local teams = spGetTeamList()
+	for i=1,#teams do
+		if GetTeamIsChicken(teams[i]) then
+			Spring.Echo("<Game Over> Chicken team found")
+			chickenAllyTeamID = select(6, Spring.GetTeamInfo(teams[i]))
+			break
+		end
+	end
+	
     Spring.Echo("Game Over initialized")
 end
 
