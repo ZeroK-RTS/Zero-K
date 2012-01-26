@@ -1,4 +1,4 @@
-local versionName = "v3.09"
+local versionName = "v3.1"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -1172,8 +1172,8 @@ function UpdatePlayerList()
 			local playerName,playerIsSpectator,playerAllyTeamID, playerCustomKeys = GetPlayersData(4, playerID)
 			if (playerCustomKeys ~= nil and playerCustomKeys.avatar~=nil) then 
 				local customKeyAvatarFile = avatarsDir .. playerCustomKeys.avatar .. ".png" --check if we have that file on disk
-				if (VFS.FileExists(playerCustomKeyAvatarFile)) then
-					local checksum = CalcChecksum(VFS.LoadFile(playerCustomKeyAvatarFile))
+				if (VFS.FileExists(customKeyAvatarFile)) then
+					local checksum = CalcChecksum(VFS.LoadFile(customKeyAvatarFile))
 					SetAvatar(playerName, customKeyAvatarFile , checksum)
 					checklistTableG[(playerID+1)].downloaded=true
 				end
@@ -1251,8 +1251,8 @@ function widget:Initialize()
 		if operatingModeThis == "B" then
 			if (playerCustomKeys ~= nil and playerCustomKeys.avatar~=nil) then 
 				local customKeyAvatarFile = avatarsDir .. playerCustomKeys.avatar .. ".png" --check if we have that file on disk
-				if (VFS.FileExists(playerCustomKeyAvatarFile)) then
-					local checksum = CalcChecksum(VFS.LoadFile(playerCustomKeyAvatarFile))
+				if (VFS.FileExists(customKeyAvatarFile)) then
+					local checksum = CalcChecksum(VFS.LoadFile(customKeyAvatarFile))
 					SetAvatar(playerName, customKeyAvatarFile , checksum)
 					checklistTableG[(playerID+1)].downloaded=true
 				end
