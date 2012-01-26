@@ -1,4 +1,4 @@
-local versionName = "v3.08"
+local versionName = "v3.09"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ local payloadA		= "5"
 local payloadB		= "6"
 local bye			= "7"
 local broadcastID 	= wdgtID .. "AAB"	--an identifier for packet that work differently than all the above but still belong here
-local operatingModeThis = "B"	--a switch to enable one-on-one Custom Avatar functionality: "A", and sync-ing Avatars functionality:"B" *may have bugs*
+local operatingModeThis_g = "B"	--a switch to enable one-on-one Custom Avatar functionality: "A", and sync-ing Avatars functionality:"B" *may have bugs*
 --Operating Mode A: Exchange custom Avatar (an avatar supplied by user)
 --Computer A
 --|............|Computer B
@@ -92,12 +92,12 @@ local avatar_fallback_checksum = 13686070 --//checksum of "Crystal_personal.png"
 local myPlayerID=-1
 local myPlayerName =-1 
 local myAllyTeamID=-1
-local playerIDlistG={} --//variable: store playerID.
+local playerIDlistG_g={} --//variable: store playerID.
 
 local nextUpdate = 0 --//variable: indicate when to run widget:Update()
 local delayUpdate = 0.1 --//constant: tiny delay for widget:Update() to reduce CPU usage
 local nextRefreshTime = 0 --//variable: indicate when to activate player list refresh.
-local refreshDelay = 10 --//constant: seconds before playerIDlistG is refreshed and retry list resetted.
+local refreshDelay_g = 10 --//variable, (determined by number of players): seconds before playerIDlistG_g is refreshed and retry list resetted.
 
 --communication protocol variables
 local currentTime_g=0 --//variable: used to indicate current ingame seconds
@@ -109,9 +109,8 @@ local lineIsBusy_g=false --//variable: used as a switch to stop replying using N
 local openPortForID_g=-1 --//variable: used to filter out message not intended for us 
 local tableIsCompleted_g=false --//variable: used as switch to stop checking checklistTableG
 local fileRequestTableG_g={} --//variable: used by Operation Mode "B" to store file requested by others.
-local bufferIndex_g=0 --//variable: used to indicate the index of Message receive buffer (msgRecv)
-local msgRecv_g={} --//variable: store message before it is processed
-local networkDelay_g = {sentTimestamp = 0, sumOfDelay = 0, msgCount = 0, averageDelay = 0}
+local msgRecv_g={} --//variable: store message before it is processed.
+local networkDelay_g = {sentTimestamp = 0, sumOfDelay = 0, msgCount = 0, averageDelay = 0, offset = 0}
 
 --------------------------------------------------------------------------------
 --File operation----------------------------------------------------------------
@@ -356,7 +355,7 @@ local function SetAvatarGUI()
 	}
 	
 	local captionA = "Feature N/A"
-	if operatingModeThis == "A" then 
+	if operatingModeThis_g == "A" then 
 		captionA = "Select your Avatar"
 	end
 	
@@ -454,7 +453,7 @@ local function SetAvatarGUI()
 	}	
 
 	local sizeA = "0%"
-	if operatingModeThis == "A" then 
+	if operatingModeThis_g == "A" then 
 		sizeA = "100%"
 	end
 	
@@ -537,19 +536,23 @@ local function RecordActualNeworkDelay (networkDelay)
 	return networkDelay
 end
 
-function RetrieveTotalNetworkDelay(playerIDa, playerIDb)
+local function RetrieveTotalNetworkDelay(playerIDa, playerIDb)
 	local aTargetPingTime = GetPlayersData(3, playerIDa)
 	local bTargetPingTime = GetPlayersData(3, playerIDb)
 	if playerIDa == myPlayerID then --//IF playerIDa is myPlayerID: process Ping Data
 		if networkDelay_g.averageDelay > aTargetPingTime then --//if actual delay greater than reported delay
 			local delayOffset = networkDelay_g.averageDelay - aTargetPingTime --// get difference between reported and actual delay
 			aTargetPingTime = aTargetPingTime + delayOffset --//add the difference in delay to the output values
+			networkDelay_g.offset = delayOffset
 			if bTargetPingTime == 0 then --//if remote computer's delay is "0"
 				bTargetPingTime = 1 --//arbitrarily assume 1 second delay
 			else
 				bTargetPingTime = bTargetPingTime + delayOffset --//add the difference in delay to output
 			end
 		end
+	else --if both player is not myPlayerID: add offset anyway
+		aTargetPingTime = aTargetPingTime + networkDelay_g.offset
+		bTargetPingTime = bTargetPingTime + networkDelay_g.offset
 	end
 	local totalDelay= aTargetPingTime+bTargetPingTime
 	if totalDelay == 0 then return (2 + delayUpdate) --//if reported delay is "0" then arbitrarily assume each side has 1 second delay
@@ -560,7 +563,6 @@ function RetrieveTotalNetworkDelay(playerIDa, playerIDb)
 end
 
 local function NetworkProtocol()
-	local bufferIndex = bufferIndex_g
 	local msgRecv= msgRecv_g
 	local waitTransmissionUntilThisTime =waitTransmissionUntilThisTime_g
 	local waitBusyUntilThisTime=waitBusyUntilThisTime_g
@@ -573,16 +575,15 @@ local function NetworkProtocol()
 	local currentTime = currentTime_g
 	---------------------------
 	
-	if bufferIndex>=1 then --check lua message from 'inbox'
+	if (#msgRecv or 0)>=1 then --check lua message from 'inbox'
 		local found, playerID, msg=false ,nil, nil
-		while bufferIndex >= 1 and not found do
-			playerID=msgRecv[bufferIndex].playerID
-			msg=msgRecv[bufferIndex].msg
+		while (#msgRecv or 0) >= 1 and not found do
+			playerID=msgRecv[#msgRecv].playerID
+			msg=msgRecv[#msgRecv].msg
 			if (msg:sub(1,4) == msgID or msg:sub(1,4) == broadcastID) then
 				found = true
 			end
-			msgRecv[bufferIndex]=nil
-			bufferIndex=bufferIndex-1
+			msgRecv[#msgRecv]=nil --//add 'nil' here so #msgRecv shift backward 1 index
 		end
 		if msg~=nil then --//activate only when relevant message received.		
 			if (msg:sub(1,4) == msgID) then --if message belong to hello/hi file transfer protocol
@@ -607,7 +608,7 @@ local function NetworkProtocol()
 						----
 						else --if mode B
 						----
-							local myRequestList = ConvertFileRequestIntoString (playerIDlistG, checklistTableG)
+							local myRequestList = ConvertFileRequestIntoString (playerIDlistG_g, checklistTableG)
 							Spring.SendLuaUIMsg(msgID .. operationMode .. checksumA .. openPortForID+100 .. "x" .. myRequestList)
 						----
 						end
@@ -645,7 +646,7 @@ local function NetworkProtocol()
 								end
 								iteration=iteration+1
 							end
-							local myRequestList = ConvertFileRequestIntoString (playerIDlistG, checklistTableG) --compose our file request
+							local myRequestList = ConvertFileRequestIntoString (playerIDlistG_g, checklistTableG) --compose our file request
 							Spring.SendLuaUIMsg(msgID .. operationMode .. checksumB .. openPortForID+100 .. willSendFile .. myRequestList)
 						----
 						end
@@ -996,7 +997,7 @@ local function NetworkProtocol()
 						lineIsBusy=false
 						waitForTransmission=false
 					end
-				elseif myPlayerID == playerID then --//if message is an echo of myself
+				elseif myPlayerID == playerID then --//if message is an echo of myself: record delay
 					if msg:sub(6,6)==hi then --//listen hi from self
 						networkDelay_g = RecordActualNeworkDelay (networkDelay_g)
 					end
@@ -1006,7 +1007,7 @@ local function NetworkProtocol()
 				checklistTableG[(playerID+1)].ignore=false
 				checklistTableG[(playerID+1)].retry=0 --reset retry
 				tableIsCompleted=false --redo checklist check
-				if myPlayerID == playerID then
+				if myPlayerID == playerID then --//if broadcast is an echo of myself: record delay
 					networkDelay_g = RecordActualNeworkDelay (networkDelay_g)
 				end
 			end
@@ -1014,7 +1015,6 @@ local function NetworkProtocol()
 	end
 	
 	---------------------------
-	bufferIndex_g = bufferIndex
 	msgRecv_g = msgRecv
 	waitTransmissionUntilThisTime_g =waitTransmissionUntilThisTime
 	waitBusyUntilThisTime_g =waitBusyUntilThisTime
@@ -1039,6 +1039,9 @@ function widget:Update(n)
 	local tableIsCompleted = tableIsCompleted_g
 	local checklistTableG = checklistTableG_g
 	local openPortForID = openPortForID_g
+	local operatingModeThis = operatingModeThis_g
+	local playerIDlistG = playerIDlistG_g
+	local refreshDelay = refreshDelay_g
 	---------------------------
 	
 	currentTime=currentTime+n
@@ -1102,6 +1105,8 @@ function widget:Update(n)
 	tableIsCompleted_g = tableIsCompleted
 	checklistTableG_g = checklistTableG
 	openPortForID_g = openPortForID
+	playerIDlistG_g = playerIDlistG
+	refreshDelay_g = refreshDelay
 end
 
 --------------------------------------------------------------------------------
@@ -1109,8 +1114,7 @@ end
 
 function widget:RecvLuaMsg(msg, playerID) --each update will put message into "msgRecv_g"
 	if msg:sub(1,1)== wdgtID then
-		bufferIndex_g=bufferIndex_g+1
-		msgRecv_g[bufferIndex_g]={msg=msg, playerID=playerID}
+		msgRecv_g[(#msgRecv_g or 0) +1]={msg=msg, playerID=playerID}
 		--[[
 		Spring.Echo("----")
 		Spring.Echo(msg:sub(6,6))
@@ -1135,6 +1139,12 @@ function widget:PlayerRemoved(playerID)
 end
 --]]
 function UpdatePlayerList()
+	local operatingModeThis = operatingModeThis_g
+	local checklistTableG = checklistTableG_g
+	local tableIsCompleted =tableIsCompleted_g
+	local playerIDlistG = playerIDlistG_g
+	local refreshDelay = refreshDelay_g
+	------------------
 	--get info on self
 	local iAmSpectator=false
 	if Spring.GetSpectatingState() then 
@@ -1148,13 +1158,14 @@ function UpdatePlayerList()
 	--use playerIDlistG to update checklist
 	local iteration =1
 	local playerID=-1
+	local playerCount = #playerIDlistG
 	while iteration <= #playerIDlistG do --update checklist with appropriate value
 		playerID=playerIDlistG[iteration]
-		if checklistTableG_g[(playerID+1)]==nil then 
-			checklistTableG_g[(playerID+1)]={downloaded=false, retry=0, ignore=false} --add empty entry with new value
+		if checklistTableG[(playerID+1)]==nil then 
+			checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --add empty entry with new value
 		else 
-			checklistTableG_g[(playerID+1)].ignore=false --reset previous ignore list
-			checklistTableG_g[(playerID+1)].retry=0 --reset retry counter
+			checklistTableG[(playerID+1)].ignore=false --reset previous ignore list
+			checklistTableG[(playerID+1)].retry=0 --reset retry counter
 		end
 		
 		if operatingModeThis == "B" then
@@ -1164,7 +1175,7 @@ function UpdatePlayerList()
 				if (VFS.FileExists(playerCustomKeyAvatarFile)) then
 					local checksum = CalcChecksum(VFS.LoadFile(playerCustomKeyAvatarFile))
 					SetAvatar(playerName, customKeyAvatarFile , checksum)
-					checklistTableG_g[(playerID+1)].downloaded=true
+					checklistTableG[(playerID+1)].downloaded=true
 				end
 			end
 		end
@@ -1173,16 +1184,24 @@ function UpdatePlayerList()
 		local playerIsActive,playerIsSpectator,playerAllyTeamID = GetPlayersData(5, playerID)
 		if iAmSpectator then --if I am spectator then
 			if not playerIsSpectator or not playerIsActive then --ignore non-specs and inactive player(don't send hi/request file)
-				checklistTableG_g[(playerID+1)].ignore=true 
+				checklistTableG[(playerID+1)].ignore=true 
+				playerCount = playerCount-1
 			end
 		else --if I am not spectator
 			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not playerIsActive then --if player is the enemy or a spec then
-				checklistTableG_g[(playerID+1)].ignore=true --ignore enemy & spec and inactive player(don't send hi/request file)
+				checklistTableG[(playerID+1)].ignore=true --ignore enemy & spec and inactive player(don't send hi/request file)
+				playerCount = playerCount-1
 			end
 		end
 		iteration=iteration+1
 	end
-	tableIsCompleted_g=false --unlock checklist for another check
+	refreshDelay = (2*playerCount)*numberOfRetry --// set refresh delay based on number of ally and retry count, with a maximum 2 second delay for each
+	tableIsCompleted=false --unlock checklist for another check
+	------------------
+	checklistTableG_g = checklistTableG
+	tableIsCompleted_g = tableIsCompleted
+	playerIDlistG_g = playerIDlistG
+	refreshDelay_g = refreshDelay
 end
 
 function InitializeDefaultAvatar(myAvatar, customKeys)
@@ -1204,6 +1223,11 @@ function InitializeDefaultAvatar(myAvatar, customKeys)
 end
 
 function widget:Initialize()
+	local operatingModeThis = operatingModeThis_g
+	local checklistTableG = checklistTableG_g
+	local playerIDlistG = playerIDlistG_g
+	local refreshDelay = refreshDelay_g
+	------------------
 	--get info on self
 	myPlayerID = GetPlayersData(7, nil)
 	local name,iAmSpectator,allyTeamID,customKeys = GetPlayersData(6, myPlayerID)
@@ -1218,9 +1242,10 @@ function widget:Initialize()
 	--use player list to build checklist
 	local iteration =1
 	local playerID=-1
+	local playerCount = #playerIDlistG
 	while iteration <= #playerIDlistG do --fill checklist with initial value
 		playerID=playerIDlistG[iteration]
-		checklistTableG_g[(playerID+1)]={downloaded=false, retry=0, ignore=false} --fill checklist with default values (promote communication)
+		checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --fill checklist with default values (promote communication)
 		
 		local playerName, activePlayer , playerIsSpectator,playerAllyTeamID, playerCustomKeys = GetPlayersData(4, playerID)
 		if operatingModeThis == "B" then
@@ -1229,7 +1254,7 @@ function widget:Initialize()
 				if (VFS.FileExists(playerCustomKeyAvatarFile)) then
 					local checksum = CalcChecksum(VFS.LoadFile(playerCustomKeyAvatarFile))
 					SetAvatar(playerName, customKeyAvatarFile , checksum)
-					checklistTableG_g[(playerID+1)].downloaded=true
+					checklistTableG[(playerID+1)].downloaded=true
 				end
 			end
 		end
@@ -1237,15 +1262,18 @@ function widget:Initialize()
 		--the following add ignore flag to selective playerID
 		if iAmSpectator then --if I am spectator then
 			if not playerIsSpectator or not activePlayer then --ignore non-specs and non-ingame(don't send hi/request file)
-				checklistTableG_g[(playerID+1)].ignore=true 
+				checklistTableG[(playerID+1)].ignore=true 
+				playerCount = playerCount-1
 			end
 		else --if I am not spectator
 			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not activePlayer then --if player is enemy or spec or not ingame then
-				checklistTableG_g[(playerID+1)].ignore=true --ignore enemy & spec (don't send hi/request file)
+				checklistTableG[(playerID+1)].ignore=true --ignore enemy & spec (don't send hi/request file)
+				playerCount = playerCount-1
 			end
 		end
 		iteration=iteration+1
 	end
+	refreshDelay = (2*playerCount)*numberOfRetry --// set refresh delay based on number of ally and retry count, with a maximum 2 second delay for each
 	
 	--// remove broken entries
 	for playerName,avInfo in pairs(avatars) do
@@ -1273,6 +1301,10 @@ function widget:Initialize()
 	}
 
 	widgetHandler:AddAction("setavatar", SetAvatarGUI, nil, "t");
+	------------------
+	checklistTableG_g = checklistTableG
+	playerIDlistG_g = playerIDlistG
+	refreshDelay_g = refreshDelay
 end
 
 function widget:Shutdown()
