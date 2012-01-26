@@ -7,11 +7,11 @@ function widget:GetInfo()
     name      = "Avatars",
     desc      = versionName .. " An API for a per-user avatar-icon system, + Hello/Hi protocol",
     author    = "jK, +msafwan",
-    date      = "2009, +2012 (9 Jan)",
+    date      = "2009, +2012 (26 Jan)",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     api       = true,
-    enabled   = false
+    enabled   = true
   }
 end
 
@@ -30,7 +30,7 @@ local payloadA		= "5"
 local payloadB		= "6"
 local bye			= "7"
 local broadcastID 	= wdgtID .. "AAB"	--an identifier for packet that work differently than all the above but still belong here
-local operatingModeThis_g = "B"	--a switch to enable one-on-one Custom Avatar functionality: "A", and sync-ing Avatars functionality:"B" *may have bugs*
+local operatingModeThis_g = "A"	--a switch to enable one-on-one Custom Avatar functionality: "A", and sync-ing Avatars functionality:"B" *may have bugs*
 --Operating Mode A: Exchange custom Avatar (an avatar supplied by user)
 --Computer A
 --|............|Computer B
@@ -1214,7 +1214,7 @@ function InitializeDefaultAvatar(myAvatar, customKeys)
 	if (customKeys ~= nil and customKeys.avatar~=nil) then 
 		local customKeyAvatarDir = avatarsDir .. customKeys.avatar .. ".png" --check if we have that file on disk
 		if (VFS.FileExists(customKeyAvatarDir)) then
-			myAvatar.file = avatarsDir .. customKeys.avatar .. ".png"
+			myAvatar.file = customKeyAvatarDir
 			myAvatar.checksum = CalcChecksum(VFS.LoadFile(myAvatar.file))
 		--if we don't have the file then fallback avatar remains
 		end

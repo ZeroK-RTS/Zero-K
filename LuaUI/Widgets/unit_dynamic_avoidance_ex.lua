@@ -1,4 +1,4 @@
-local versionName = "v1.8"
+local versionName = "v1.81"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -12,9 +12,9 @@ local versionName = "v1.8"
 function widget:GetInfo()
   return {
     name      = "Dynamic Avoidance System",
-    desc      = versionName .. "Dynamic Collision Avoidance behaviour for constructor, cloakies, and ground combat unit",
+    desc      = versionName .. "Avoidance AI behaviour for constructor, cloakies, ground combat unit and gunships",
     author    = "msafwan",
-    date      = "Dec 26, 2011",
+    date      = "Jan 26, 2011",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -247,11 +247,16 @@ function RefreshUnitList(attacker)
 					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 1, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
-				elseif not unitDef["canFly"] or (unitDef.hoverAttack== true) then --if enabled: include all ground unit
+				elseif not unitDef["canFly"] then --if enabled: include all ground unit
 					local unitShieldPower, reloadableWeaponIndex= -1, -1
 					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
 					relevantUnit[arrayIndex]={unitID, 2, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
+				elseif (unitDef.hoverAttack== true) then --if enabled: include gunship
+					local unitShieldPower, reloadableWeaponIndex= -1, -1
+					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
+					arrayIndex=arrayIndex+1
+					relevantUnit[arrayIndex]={unitID, 3, unitSpeed, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
 				end
 			end
 			if (turnOnEcho == 1) then --for debugging
@@ -474,7 +479,7 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		end
 		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND (cMD_DummyG) is allowed.
 			local isValidCommand = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) -- allow unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
-			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1 or unitInMotionSingleUnit.isVisible ~= "yes")--allow only unit of unitType=1 OR any units outside player's vision
+			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes" and unitInMotionSingleUnit[2]~=3 )--allow only unit of unitType=1 OR (any units outside player's vision except gunship (unitType=3))
 			local _2ndAttackSignature = false --attack command signature
 			local _2ndGuardSignature = false --guard command signature
 			if #cQueue >=2 then --in case the command-queue is masked by widget's previous command, but the actual check for originality is performed by TargetBoxReached() later.
@@ -1423,5 +1428,3 @@ end
 -- Area Reclaim/ressurect tolerance < area repair tolerance < move tolerance (unit within certain radius of target will ignore enemy/not avoid)
 -- Individual repair/reclaim command queue has same tolerance as area repair tolerance
 -- 
-
-
