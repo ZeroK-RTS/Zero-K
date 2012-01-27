@@ -65,7 +65,7 @@ unitDef = {
 
     {
       def                = [[ROCKET]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP]],
     },
 
   },
