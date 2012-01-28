@@ -401,7 +401,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     end
 end
 
-function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
+function widget:UnitTaken(unitID, unitDefID, newTeamID, teamID)
   widget:UnitCreated(unitID, unitDefID, newTeamID)
 end
 
