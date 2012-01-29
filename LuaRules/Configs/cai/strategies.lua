@@ -6,10 +6,10 @@ example buildTasksMods
 			buildConfig.robots.factoryByDefId[UnitDefNames['factoryveh'].id].importance = 0
 			buildConfig.robots.factoryByDefId[UnitDefNames['factoryspider'].id].importance = 0
 		end,
-
-strikecomm = armcom
-battlecomm = corcom
 --]]
+strikecomm = armcom1
+battlecomm = corcom1
+
 local function noFunc()
 end
 
