@@ -112,13 +112,20 @@ local maxHeightDifference = 30 -- max difference of height around terraforming, 
 local maxRampGradient = 5
 
 local volumeCost = 0.016
-local pointBaseCost = 0.027
-local pointBaseCostDepth = 6
+local pointExtraAreaCost = 0--.027
+local pointExtraAreaCostDepth = 6
+local pointExtraPerimeterCost = 0.05
+local pointExtraPerimeterCostDepth = 6
+
+local perimeterEdgeCost = {
+	[0] = 0,
+	[1] = 1,
+	[2] = 1.4,
+	[3] = 1,
+	[4] = 1,
+}
 -- cost of a point = volumeCost*diffHeight + extraCost*(extraCostDepth < diffHeight and diffHeight or extraCostDepth)
 -- cost of shraka pyramid point = volumeCost*diffHeight
-
--- seismic missile
-local seismicRad = 256
 
 --ramp dimensions
 local maxTotalRampLength = 3000
@@ -143,7 +150,7 @@ if modOptions.terracostmult then
 end
 
 volumeCost = volumeCost * costMult
-pointBaseCost = pointBaseCost * costMult
+pointExtraAreaCost = pointExtraAreaCost * costMult
 
 --------------------------------------------------------------------------------
 -- Arrays
@@ -622,7 +629,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	
 		-- calculate cost
 		local totalCost = 0
-		local baseCost = 0
+		local areaCost = 0
+		local perimeterCost = 0
 		
 		for j = 1, segment[i].points do
 			if not segment[i].area[segment[i].point[j].x] then
@@ -639,12 +647,51 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 			end
 			totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-			baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+			areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
+		end
+		
+		-- Perimeter Cost
+		local pyramidCostEstimate = 0
+		
+		for j = 1, segment[i].points do
+			local x = segment[i].point[j].x
+			local z = segment[i].point[j].z
+			
+			if segment[i].area[x] and segment[i].area[x][z] then
+				
+				local edgeCount = 0
+				
+				if (not segment[i].area[x+8]) or (not segment[i].area[x+8][z]) then
+					edgeCount = edgeCount + 1
+				end
+				if (not segment[i].area[x-8]) or (not segment[i].area[x-8][z]) then
+					edgeCount = edgeCount + 1
+				end
+				if (not segment[i].area[x][z+8]) then
+					edgeCount = edgeCount + 1
+				end
+				if (not segment[i].area[x][z-8]) then
+					edgeCount = edgeCount + 1
+				end
+				
+				if perimeterEdgeCost[edgeCount] > 0 then
+					perimeterCost = perimeterCost + perimeterEdgeCost[edgeCount]*(pointExtraPerimeterCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraPerimeterCostDepth)
+				end
+				
+				if edgeCount > 0 then
+					local height = abs(segment[i].point[j].diffHeight)
+					if height > 30 then
+						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(math.floor(height/maxHeightDifference)-1)*0.5 + math.floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
+					end
+				end
+			end
 		end
 		
 		if totalCost ~= 0 then
-			baseCost = baseCost*pointBaseCost
+			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost
 			totalCost = totalCost*volumeCost + baseCost
+			
+			--Spring.Echo(totalCost .. "\t" .. baseCost)
 		
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, teamY or 0, segment[i].position.z, 0, team, true)
@@ -675,6 +722,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					cost = totalCost, 
 					baseCost = baseCost,
 					totalCost = totalCost,
+					pyramidCostEstimate = pyramidCostEstimate,
 					point = segment[i].point, 
 					points = segment[i].points, 
 					area = segment[i].area, 
@@ -695,6 +743,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
+				
+				spSetUnitTooltip(id, "Estimated Cost: " .. math.floor(pyramidCostEstimate + totalCost))
 			end
 		end
 		
@@ -968,7 +1018,8 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		
 		-- calculate cost
 		local totalCost = 0
-		local baseCost = 0
+		local areaCost = 0
+		local perimeterCost = 0
 		
 		if terraform_type == 1 then
 			for j = 1, segment[i].points do
@@ -986,7 +1037,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
@@ -1007,7 +1058,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(terraformHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
@@ -1034,7 +1085,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 				if not segment[i].area[segment[i].point[j].x] then
 					segment[i].area[segment[i].point[j].x] = {}
 				end
@@ -1055,7 +1106,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
 		elseif terraform_type == 6 then
 			for j = 1, segment[i].points do
@@ -1073,14 +1124,53 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
+			end
+		end
+		
+		-- Perimeter Cost
+		local pyramidCostEstimate = 0
+		
+		for j = 1, segment[i].points do
+			local x = segment[i].point[j].x
+			local z = segment[i].point[j].z
+			
+			if segment[i].area[x] and segment[i].area[x][z] then
+				
+				local edgeCount = 0
+				
+				if (not segment[i].area[x+8]) or (not segment[i].area[x+8][z]) then
+					edgeCount = edgeCount + 1
+				end
+				if (not segment[i].area[x-8]) or (not segment[i].area[x-8][z]) then
+					edgeCount = edgeCount + 1
+				end
+				if (not segment[i].area[x][z+8]) then
+					edgeCount = edgeCount + 1
+				end
+				if (not segment[i].area[x][z-8]) then
+					edgeCount = edgeCount + 1
+				end
+				
+				if perimeterEdgeCost[edgeCount] > 0 then
+					perimeterCost = perimeterCost + perimeterEdgeCost[edgeCount]*(pointExtraPerimeterCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraPerimeterCostDepth)
+				end
+				
+				if edgeCount > 0 then
+					local height = abs(segment[i].point[j].diffHeight)
+					if height > 30 then
+						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(math.floor(height/maxHeightDifference)-1)*0.5 + math.floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
+					end
+				end
 			end
 		end
 		
 		if totalCost ~= 0 then
-			baseCost = baseCost*pointBaseCost
+			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost
 			totalCost = totalCost*volumeCost + baseCost
-		
+			
+			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, teamY or 0, segment[i].position.z, 0, team, true)
             
@@ -1103,6 +1193,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					cost = totalCost, 
 					baseCost = baseCost,
 					totalCost = totalCost,
+					pyramidCostEstimate = pyramidCostEstimate,
 					point = segment[i].point, 
 					points = segment[i].points, 
 					area = segment[i].area, 
@@ -1123,6 +1214,8 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
+				
+				spSetUnitTooltip(id, "Estimated Cost: " .. math.floor(pyramidCostEstimate + totalCost))
 			end
 		end
 		
@@ -1460,7 +1553,9 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		
 		--calculate cost of terraform
 		local totalCost = 0
-		local baseCost = 0
+		local areaCost = 0
+		local perimeterCost = 0
+		
 		if terraform_type == 1 then
 			for j = 1, segment[i].points do
 				if not segment[i].area[segment[i].point[j].x] then
@@ -1477,7 +1572,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
 		elseif terraform_type == 2 then 
 			for j = 1, segment[i].points do
@@ -1495,7 +1590,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
 		elseif terraform_type == 3 then 
 			for j = 1, segment[i].points do
@@ -1519,7 +1614,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
 		elseif terraform_type == 5 then 
 			for j = 1, segment[i].points do
@@ -1537,7 +1632,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
 		elseif terraform_type == 6 then
 			for j = 1, segment[i].points do
@@ -1555,15 +1650,54 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					segment[i].area[segment[i].point[j].x][segment[i].point[j].z] = {orHeight = segment[i].point[j].orHeight,diffHeight = segment[i].point[j].diffHeight, building = false}
 				end
 				totalCost = totalCost + abs(segment[i].point[j].diffHeight)
-				baseCost = baseCost + (pointBaseCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointBaseCostDepth)
+				areaCost = areaCost + (pointExtraAreaCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraAreaCostDepth)
 			end
 			
 		end
 		
+		-- Perimeter Cost
+		local pyramidCostEstimate = 0 -- just for UI
+		
+		for j = 1, segment[i].points do
+			local x = segment[i].point[j].x
+			local z = segment[i].point[j].z
+			
+			if segment[i].area[x] and segment[i].area[x][z] then
+				
+				local edgeCount = 0
+				
+				if (not segment[i].area[x+8]) or (not segment[i].area[x+8][z]) then
+					edgeCount = edgeCount + 1
+				end
+				if (not segment[i].area[x-8]) or (not segment[i].area[x-8][z]) then
+					edgeCount = edgeCount + 1
+				end
+				if (not segment[i].area[x][z+8]) then
+					edgeCount = edgeCount + 1
+				end
+				if (not segment[i].area[x][z-8]) then
+					edgeCount = edgeCount + 1
+				end
+				
+				if perimeterEdgeCost[edgeCount] > 0 then
+					perimeterCost = perimeterCost + perimeterEdgeCost[edgeCount]*(pointExtraPerimeterCostDepth > abs(segment[i].point[j].diffHeight) and abs(segment[i].point[j].diffHeight) or pointExtraPerimeterCostDepth)
+				end
+				
+				if edgeCount > 0 then
+					local height = abs(segment[i].point[j].diffHeight)
+					if height > 30 then
+						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(math.floor(height/maxHeightDifference)-1)*0.5 + math.floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
+					end
+				end
+			end
+		end
+		
 		if totalCost ~= 0 then
-			baseCost = baseCost*pointBaseCost
+			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost
 			totalCost = totalCost*volumeCost + baseCost
-            
+			
+			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			
             local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			local id = spCreateUnit(terraunitDefID, segment[i].position.x, teamY or 0, segment[i].position.z, 0, team, true)
 			
@@ -1591,6 +1725,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					cost = totalCost, 
 					baseCost = baseCost,
 					totalCost = totalCost,
+					pyramidCostEstimate = pyramidCostEstimate,
 					point = segment[i].point, 
 					points = segment[i].points,
 					area = segment[i].area, 
@@ -1611,6 +1746,8 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
+				
+				spSetUnitTooltip(id, "Estimated Cost: " .. math.floor(pyramidCostEstimate + totalCost))
 			end
 		end
 		
@@ -2589,7 +2726,7 @@ function gadget:GameFrame(n)
 				if n - terraformUnit[id].lastUpdate > updateFrequency then
 					local costDiff = health - terraformUnit[id].lastHealth
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
-					spSetUnitTooltip(id, terraUnitTooltip .. terraformUnit[id].totalSpent)
+					spSetUnitTooltip(id, terraUnitTooltip .. math.floor(terraformUnit[id].totalSpent))
 					local updateVar = updateTerraform(diffProgress,health,id,i,costDiff) 
 					while updateVar == -1 do
 						if updateTerraformCost(id) then
@@ -2735,7 +2872,11 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		local gatherradius = SeismicWeapon[weaponID].gatherradius
 		local smoothradiusSQ = smoothradius^2
 		local gatherradiusSQ = gatherradius^2
-		local maxSmooth = SeismicWeapon[weaponID].smooth
+		
+		smoothradius = smoothradius + (8 - smoothradius%8)
+		gatherradius = gatherradius + (8 - gatherradius%8)
+		
+		local maxSmooth = 0.32--SeismicWeapon[weaponID].smooth
 		
 		local sx = floor((x+4)/8)*8
 		local sz = floor((z+4)/8)*8
