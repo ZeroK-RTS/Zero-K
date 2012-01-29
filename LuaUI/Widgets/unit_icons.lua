@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Unit Icons",
-    desc      = "Shows icons above units",
+    desc      = "v0.01 Shows icons above units",
     author    = "CarRepairer",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
@@ -132,6 +132,7 @@ function WG.icons.SetUnitIcon( unitID, data )
 	local oldTexture = iconUnitTexture[iconName] and iconUnitTexture[iconName][unitID]
 	if oldTexture then
 		textureUnitsXshift[oldTexture][unitID] = nil
+		iconUnitTexture[iconName][unitID] = nil
 	end
 	if not texture then
 		return

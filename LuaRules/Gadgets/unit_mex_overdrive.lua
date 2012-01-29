@@ -1411,6 +1411,7 @@ function gadget:DrawWorldPreUnit()
 	end 
 end
 
+--[[ moved to widget
 local function DrawUnitFunc(yshift)
 	gl.Translate(0,yshift,0)
 	gl.Billboard()
@@ -1438,6 +1439,8 @@ function gadget:DrawWorld()
 	end
 	
 end
+--]]
+
 
 -------------------------------------------------------------------------------------
 
