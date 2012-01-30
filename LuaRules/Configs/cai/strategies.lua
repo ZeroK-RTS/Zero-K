@@ -7,9 +7,6 @@ example buildTasksMods
 			buildConfig.robots.factoryByDefId[UnitDefNames['factoryspider'].id].importance = 0
 		end,
 --]]
-strikecomm = armcom1
-battlecomm = corcom1
-
 local function noFunc()
 end
 
@@ -141,8 +138,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "strikecomm", chance = 0.5},
-			[2] = {ID = "battlecomm", chance = 0.5},
+			[1] = {ID = "armcom1", chance = 0.5},
+			[2] = {ID = "corcom1", chance = 0.5},
 		},
 		buildTasksMods = noFunc,
 		conAndEconHandlerMods = {},
@@ -152,8 +149,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "strikecomm", chance = 0.5},
-			[2] = {ID = "battlecomm", chance = 0.5},
+			[1] = {ID = "armcom1", chance = 0.5},
+			[2] = {ID = "corcom1", chance = 0.5},
 		},
 		buildTasksMods = BuildTasksMod_Blitz,
 		conAndEconHandlerMods = {},
@@ -163,8 +160,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "strikecomm", chance = 0.5},
-			[2] = {ID = "battlecomm", chance = 0.5},
+			[1] = {ID = "armcom1", chance = 0.5},
+			[2] = {ID = "corcom1", chance = 0.5},
 		},
 		buildTasksMods = BuildTasksMod_Pusher,
 		conAndEconHandlerMods = {},
@@ -174,8 +171,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "strikecomm", chance = 0.4},
-			[2] = {ID = "battlecomm", chance = 0.6},
+			[1] = {ID = "armcom1", chance = 0.4},
+			[2] = {ID = "corcom1", chance = 0.6},
 		},
 		buildTasksMods =  BuildTasksMod_Defensive,
 		conAndEconHandlerMods = {},
@@ -185,8 +182,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "strikecomm", chance = 0.7},
-			[2] = {ID = "battlecomm", chance = 0.3},
+			[1] = {ID = "armcom1", chance = 0.7},
+			[2] = {ID = "corcom1", chance = 0.3},
 		},
 		buildTasksMods = noFunc,
 		conAndEconHandlerMods = {},
@@ -196,7 +193,7 @@ strategies = {
 		chance = 0,
 		commanders = {
 			count = 1,
-			[1] = {ID = "strikecomm", chance = 1},
+			[1] = {ID = "armcom1", chance = 1},
 		},
 		buildTasksMods = BuildTasksMod_Lolz,
 		conAndEconHandlerMods = {},
