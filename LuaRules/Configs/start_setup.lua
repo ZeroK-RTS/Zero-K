@@ -5,7 +5,10 @@ startUnits = {
 	reconcomm = 'commrecon1',
 }
 
-startUnitsAI = {}
+startUnitsAI = {
+	armcom1 = 'armcom1',
+	corcom1 = 'corcom1',
+}
 
 local aiComms = VFS.Include("gamedata/modularcomms/staticcomms.lua")
 for name in pairs(aiComms) do
