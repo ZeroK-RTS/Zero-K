@@ -1,4 +1,4 @@
-local versionName = "v1.06"
+local versionName = "v1.07"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -15,7 +15,7 @@ function widget:GetInfo()
     name      = "Receive Units Indicator",
     desc      = versionName .. " Notify users of received units from unit transfer",
     author    = "msafwan",
-    date      = "Jan 17, 2012",
+    date      = "Jan 30, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = true  --  loaded by default?
@@ -30,6 +30,7 @@ local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 local spAreTeamsAllied = Spring.AreTeamsAllied
 local spValidUnitID = Spring.ValidUnitID
+local spIsAABBInView = Spring.IsAABBInView
 ---------------------------------------------------------------------------------
 local myTeamID_gbl = -1 --//variable: myTeamID
 local receivedUnitList = {} --//variable: store received unitID
@@ -41,7 +42,8 @@ local notifyCapture_gbl = {}
 local minimumNeighbor_gbl = 3 --//constant: minimum neighboring (units) before considered a cluster
 local neighborhoodRadius_gbl = 600 --//constant: neighborhood radius. Distance from each unit where neighborhoodList are generated. 
 local radiusThreshold_gbl = 300 --//constant: density threshold where border is detected. Huge value means 2 cluster are combined, small value mean all unit disassociated
-local waitDuration = 1 --//constant: wait (in second) before 'widget:Update()' is executed
+local waitConstant_gbl = 1 --//constant: default interval (in second) for 'widget:Update()' to be executed
+local waitDuration_gbl = waitConstant_gbl --//variable: determine how frequently 'widget:Update()' is executed
 local markerLife_gbl = 2 --//constant: wait (in second) before marker expired (removed)
 ---------------------------------------------------------------------------------
 --Add Marker---------------------------------------------------------------------
@@ -73,7 +75,7 @@ local function AddMarker (cluster, unitIDNoise)
 	end
 	currentIndex=currentIndex+1
 	
-	if unitIDNoise~=nil and #unitIDNoise <= 5 and currentIndex == 1 then --//if there's no discernable cluster, and the outlier is less than 6, and outlier list not empty, then add individual marker.
+	if (unitIDNoise~=nil and #unitIDNoise <= 5) and currentIndex == 1 then --//IF the outlier is less than 6 & outlier list is not empty, and IF there's no discernable cluster, then add individual marker.
 		for j= 1 ,#unitIDNoise do
 			local x,y,z=spGetUnitPosition(unitIDNoise[j])
 			spMarkerAddPoint(x,y,z, "Unit received from ".. playerName)
@@ -92,7 +94,7 @@ end
 local elapsedTime = 0 --//variable: ...
 function widget:Update(n)
 	elapsedTime= elapsedTime + n
-	if elapsedTime < waitDuration then
+	if elapsedTime < waitDuration_gbl then
 		return
 	end
 	elapsedTime = 0
@@ -108,7 +110,7 @@ function widget:Update(n)
 		cluster, unitIDNoise = OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, radiusThreshold) --//method 2. Better
 		AddMarker(cluster, unitIDNoise)
 		------
-		waitDuration = 3 --// disable widget:Update() by setting update to huge value. eg: 10 second
+		waitDuration_gbl = waitConstant_gbl --// reset 'widget:Update()' update interval
 		receivedUnitList = {} --//reset 'receivedUnitList' content
 	end
 	
@@ -116,13 +118,20 @@ function widget:Update(n)
 		local knownMarkerPosition = knownMarkerPosition_gbl
 		local now = osClock()
 		local markerLife = markerLife_gbl
+		local waitDuration = waitDuration_gbl
 		-----
 		for i=1, #knownMarkerPosition do
 			if knownMarkerPosition[i] ~= nil then
-				local markerAge = now - knownMarkerPosition[i][4]
-				if markerAge >= markerLife then
-					spMarkerErasePosition (knownMarkerPosition[i][1],knownMarkerPosition[i][2],knownMarkerPosition[i][3])
-					knownMarkerPosition[i] = nil --//set to nil here so that next content (inserted using # will put it here, filling the space)
+				local x, y ,z = knownMarkerPosition[i][1], knownMarkerPosition[i][2], knownMarkerPosition[i][3]
+				local inView = spIsAABBInView(x,y,z, x,y,z )
+				if inView then --//if inView then calculate marker age and/or erase it
+					local markerAge = now - knownMarkerPosition[i][4]
+					if markerAge >= markerLife then
+						spMarkerErasePosition (x,y,z)
+						knownMarkerPosition[i] = nil --//set to nil here so that next content (inserted using # will put it here, filling the space)
+					end
+				else --//if not in view: extend marker life
+					knownMarkerPosition[i][4] = knownMarkerPosition[i][4] + waitDuration --//extend marker life
 				end
 			end
 		end
@@ -133,12 +142,13 @@ end
 
 
 function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
-	if spValidUnitID(unitID) and unitTeamID == myTeamID_gbl then
-		if spAreTeamsAllied(unitTeamID, oldTeamID) or notifyCapture_gbl[oldTeamID] then
+	if spValidUnitID(unitID) and unitTeamID == myTeamID_gbl then --if my unit
+		if spAreTeamsAllied(unitTeamID, oldTeamID) or notifyCapture_gbl[oldTeamID] then --if from my ally, or from a captured enemy unit
+			--myTeamID_gbl = unitTeamID --//uncomment this and comment 'unitTeamID == myTeamID_gbl' (above) when testing
 			notifyCapture_gbl[oldTeamID] = false
 			receivedUnitList[(#receivedUnitList or 0) +1]=unitID
 			givenByTeamID_gbl = oldTeamID
-			waitDuration = 0.2 -- tell widget:Update() to wait 0.2 more second before start adding mapMarker
+			waitDuration_gbl = 0.2 -- tell widget:Update() to wait 0.2 more second before start adding mapMarker
 			elapsedTime = 0 -- tell widget:Update() to reset timer
 		end
 	end
