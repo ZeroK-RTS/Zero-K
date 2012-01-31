@@ -1044,7 +1044,7 @@ function widget:Initialize()
 		--itemMargin  = {0, 0, 0, 0},
 	}
 	
-	  = Panel:New{
+	fakewindow = Panel:New{
 		parent = window,
 		x = 0,
 		y = '15%',
