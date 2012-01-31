@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.29 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.291 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -557,8 +557,8 @@ local function AssignKeyBind(hotkey, path, option, verbose) -- param4 = verbose
 	if option.type == 'bool' then
 		kbfunc = function()
 			local wname = option.wname
-			newval = not pathoptions[path][option.key].value	
-			pathoptions[path][option.key].value	= newval
+			newval = not pathoptions[path][option.wname..option.key].value	
+			pathoptions[path][option.wname..option.key].value	= newval
 			
 			option.OnChange({checked=newval})
 			
@@ -765,9 +765,9 @@ local function AddOption(path, wname, option)
 		origOnChange(option)
 	end
 	
-	pathoptions[path][option.key] = option
+	pathoptions[path][wname..option.key] = option
 	local temp = #(pathorders[path])
-	pathorders[path][temp+1] = option.key
+	pathorders[path][temp+1] = wname..option.key
 	
 	
 	--Keybindings
@@ -795,11 +795,11 @@ local function RemOption(path, wname, option)
 		return
 	end
 	for i,v in ipairs(pathorders[path]) do
-		if v == option.key then
+		if v == (wname..option.key) then
 			table.remove(pathorders[path], i)
 		end
 	end
-	pathoptions[path][option.key] = nil
+	pathoptions[path][wname..option.key] = nil
 end
 
 
@@ -820,21 +820,12 @@ local function IntegrateWidget(w, addoptions, index)
 	end
 	--]]
 	
-	--Add empty onchange function if doesn't exist
-	for k,option in pairs(options) do
-		if not option.OnChange or type(option.OnChange) ~= 'function' then
-			w.options[k].OnChange = function(self) end
-		end
-		w.options[k].default = w.options[k].value
-	end	
-	
 	if w.options.order then
 		echo ("<EPIC Menu> " .. wname ..  ", don't index an option with the word 'order' please, it's too soon and I'm not ready.")
 		w.options.order = nil
 	end
 	
 	--Generate order table if it doesn't exist
-	local options_ordered = {}
 	if not w.options_order then
 		w.options_order = {}
 		for k,v in pairs(options) do
@@ -842,23 +833,25 @@ local function IntegrateWidget(w, addoptions, index)
 		end
 	end
 	
-	-- Use order table to order the options
-	for i,v in ipairs(w.options_order) do
-		local option = options[v]
+	
+	for _,k in ipairs(w.options_order) do
+		local option = options[k]
 		if not option then
 			echo( '<EPIC Menu> Error in loading custom widget settings in ' .. wname .. ', order table incorrect.' )
 			return
 		end
-		option.key = v
-		options_ordered[i] = options[v]
-	end
-	
-	local tree = {}
-	
-	for _,option in ipairs(options_ordered) do
-		local k = option.key
+		
+		--Add empty onchange function if doesn't exist
+		if not option.OnChange or type(option.OnChange) ~= 'function' then
+			w.options[k].OnChange = function(self) end
+		end
+		
+		--store default
+		w.options[k].default = w.options[k].value
+		
+		
+		option.key = k
 		option.wname = wname
-		option.windex = index
 		
 		local origOnChange = w.options[k].OnChange
 		
@@ -909,10 +902,10 @@ local function IntegrateWidget(w, addoptions, index)
 		
 		local path = option.path or defaultpath
 		
-		if not addoptions then
-			RemOption(path, wname, option)
-		else
+		if addoptions then
 			AddOption(path, wname, option)
+		else
+			RemOption(path, wname, option)
 		end
 		
 		if path == curPath then
