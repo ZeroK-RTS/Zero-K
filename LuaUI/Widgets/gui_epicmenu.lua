@@ -1071,7 +1071,7 @@ MakeSubWindow = function(path)
 	
 	local explodedpath = explode('/', path)
 	explodedpath[#explodedpath] = nil
-	local parent_key = table.concat(explodedpath,'/')
+	local parent_path = table.concat(explodedpath,'/')
 	
 	local settings_height = #(pathorders[path]) * B_HEIGHT
 	local settings_width = 270
@@ -1232,8 +1232,8 @@ MakeSubWindow = function(path)
 	window_height = window_height + B_HEIGHT
 	local backButton 
 	--back button
-	if parent_key then
-		window_children[#window_children+1] = Button:New{ caption = 'Back', OnMouseUp = { KillSubWindow, function() MakeSubWindow(parent_key) end,  }, 
+	if parent_path then
+		window_children[#window_children+1] = Button:New{ caption = 'Back', OnMouseUp = { KillSubWindow, function() MakeSubWindow(parent_path) end,  }, 
 			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, x=0, bottom=1, width='33%', height=B_HEIGHT, }
 	end
 	
@@ -1292,16 +1292,6 @@ local function ShowHideCrudeMenu()
 		AdjustWindow(window_sub_cur)
 	end
 end
-
-local function MakePath2(path)
-	local path2 = {}
-	for i = 1,#path do
-		path2[i] = path[i]
-		--echo(table.concat(path2,'/'))
-		AddOption( table.concat(path2,'/'), 'epic' )
-	end
-end
-
 
 local function MakeMenuBar()
 	local btn_padding = {4,3,2,2}
@@ -1509,6 +1499,9 @@ RemakeEpicMenu = function()
 	end
 end
 
+function WG.crude.OpenPath(path)
+	MakeSubWindow(path)
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1582,6 +1575,25 @@ function widget:Initialize()
 	
 	WG.country = settings.country	
 	WG.lang = settings.lang
+	
+		-- add custom widget settings to crudemenu
+	AddAllCustSettings()
+	
+
+	--this is done to establish order the correct button order
+	AddOption('Settings/Reset Settings', 'epic')
+	AddOption('Settings/Camera', 'epic')
+	AddOption('Settings/Interface', 'epic')
+	AddOption('Settings/Misc', 'epic')
+	AddOption('Settings/Mouse Cursor', 'epic')
+	AddOption('Settings/Video', 'epic')
+	AddOption('Settings/View', 'epic')
+	
+	local options_temp ={}
+	CopyTable(options_temp , epic_options);
+	for i,option in ipairs(options_temp ) do
+		AddOption(option.path, 'epic', option)
+	end
 	
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
 	WG.crude.ResetSettings = function()

@@ -723,6 +723,11 @@ function widget:Initialize()
 			Label:New{ caption='Factories', fontShadow = true, },
 			stack_main,
 		},
+		OnMouseDown={ function(self)
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then return end
+			WG.crude.OpenPath(options_path)
+		end },
 	}
 	myTeamID = Spring.GetMyTeamID()
 

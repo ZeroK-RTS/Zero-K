@@ -41,7 +41,6 @@ options = {
 		name = 'Minimap Keeps Aspect Ratio',
 		type = 'bool',
 		value = true,
-		path = 'Settings/Interface',
 		advanced = true,
 		OnChange = function(self)
 			if (self.value) then 
@@ -191,6 +190,17 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/fow.png', 9, 'viewfow' ),
 		},
 	}
+end
+function widget:MousePress(x, y, button)
+	if not Spring.IsAboveMiniMap(x, y) then
+		return false
+	end
+	local alt, ctrl, meta, shift = Spring.GetModKeyState()
+	if not meta then
+	    return false
+	end
+	WG.crude.OpenPath(options_path)
+	return true
 end
 
 --[[function widget:Update(dt) 

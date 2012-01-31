@@ -1044,7 +1044,7 @@ function widget:Initialize()
 		--itemMargin  = {0, 0, 0, 0},
 	}
 	
-	fakewindow = Panel:New{
+	  = Panel:New{
 		parent = window,
 		x = 0,
 		y = '15%',
@@ -1058,6 +1058,12 @@ function widget:Initialize()
 		padding = {0, 0, 0, 0},
 		--backgroundColor = {0.1, 0.1, 0.1, 1},
 --		skinName  = "DarkGlass",
+
+		OnMouseDown={ function(self)
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then return end
+			WG.crude.OpenPath('Game/Commands')
+		end },
 	}
 
 	menuTabRow = StackPanel:New{

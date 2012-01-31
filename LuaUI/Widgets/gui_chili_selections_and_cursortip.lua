@@ -2012,6 +2012,7 @@ function widget:Initialize()
 		padding = {0, 0, 0, 0},
         minWidth = 450, 
 		minHeight = 130,
+		
 	}
     
 	window_corner = Panel:New{
@@ -2024,6 +2025,11 @@ function widget:Initialize()
 		dockable = false,
 		resizable   = false;
 		draggable = false,
+		OnMouseDown={ function(self)
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then return end
+			WG.crude.OpenPath('Settings/Interface/Selected Units Window')
+		end },
 	}
 
 	windMin = Spring.GetGameRulesParam("WindMin")

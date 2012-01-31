@@ -891,6 +891,11 @@ function widget:Initialize()
 		children = {
 			stack_main,
 		},
+		OnMouseDown={ function(self)
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then return end
+			WG.crude.OpenPath(options_path)
+		end },
 	}
 
 	-- for old single comm button system; deprecated

@@ -798,6 +798,11 @@ function widget:Initialize()
 		tweakResizable = true,
 		minimizable = true,
 		minimumSize = {x_bound, 1},
+		OnMouseDown={ function(self)
+			local alt, ctrl, meta, shift = Spring.GetModKeyState()
+			if not meta then return end
+			WG.crude.OpenPath(options_path)
+		end },
 	}
 	scroll_cpl = ScrollPanel:New{
 		parent = window_cpl,	
