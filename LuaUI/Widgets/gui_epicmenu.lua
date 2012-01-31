@@ -790,8 +790,9 @@ end
 
 local function RemOption(path, wname, option)
 	if not pathorders[path] then
-		echo ('<epic menu> error #333 ', wname, path)
-		echo ('<epic menu> ...error #333 ', (option and option.key) )
+		--this occurs when a widget unloads itself inside :init
+		--echo ('<epic menu> error #333 ', wname, path)
+		--echo ('<epic menu> ...error #333 ', (option and option.key) )
 		return
 	end
 	for i,v in ipairs(pathorders[path]) do
@@ -1525,32 +1526,10 @@ function widget:Initialize()
 	end
 	init = true
 	
-	WG.country = settings.country	
-	WG.lang = settings.lang
-	
 	
 	Spring.SendCommands("unbindaction hotbind")
 	Spring.SendCommands("unbindaction hotunbind")
 	
-	-- Clears all saved settings of custom widgets stored in crudemenu's config
-	WG.crude.ResetSettings = function()
-		for path, _ in pairs(pathoptions) do
-			ResetWinSettings(path)
-		end
-		RemakeEpicMenu()
-		echo 'Cleared all settings.'
-	end
-	
-	WG.crude.ResetKeys = function()
-		for actionName,_ in pairs(settings.keybounditems) do
-			--local actionNameL = actionName:lower()
-			local actionNameL = actionName
-			Spring.SendCommands({"unbindaction " .. actionNameL})
-		end
-		settings.keybounditems = {}
-		
-		echo 'Cleared all hotkeys.'
-	end
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -1570,24 +1549,7 @@ function widget:Initialize()
 	Colorbars = Chili.Colorbars
 	screen0 = Chili.Screen0
 
-	-- add custom widget settings to crudemenu
-	AddAllCustSettings()
 	
-
-	--this is done to establish order the correct button order
-	AddOption('Settings/Reset Settings', 'epic')
-	AddOption('Settings/Camera', 'epic')
-	AddOption('Settings/Interface', 'epic')
-	AddOption('Settings/Misc', 'epic')
-	AddOption('Settings/Mouse Cursor', 'epic')
-	AddOption('Settings/Video', 'epic')
-	AddOption('Settings/View', 'epic')
-	
-	local options_temp ={}
-	CopyTable(options_temp , epic_options);
-	for i,option in ipairs(options_temp ) do
-		AddOption(option.path, 'epic', option)
-	end
 	
 	widget:ViewResize(Spring.GetViewGeometry())
 	
@@ -1616,6 +1578,29 @@ function widget:Initialize()
 			myCountry = 'wut'
 		end
 		settings.country = myCountry
+	end
+	
+	WG.country = settings.country	
+	WG.lang = settings.lang
+	
+	-- Clears all saved settings of custom widgets stored in crudemenu's config
+	WG.crude.ResetSettings = function()
+		for path, _ in pairs(pathoptions) do
+			ResetWinSettings(path)
+		end
+		RemakeEpicMenu()
+		echo 'Cleared all settings.'
+	end
+	
+	WG.crude.ResetKeys = function()
+		for actionName,_ in pairs(settings.keybounditems) do
+			--local actionNameL = actionName:lower()
+			local actionNameL = actionName
+			Spring.SendCommands({"unbindaction " .. actionNameL})
+		end
+		settings.keybounditems = {}
+		
+		echo 'Cleared all hotkeys.'
 	end
 	
 	-- Add actions for keybinds
