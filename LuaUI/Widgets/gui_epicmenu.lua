@@ -312,9 +312,12 @@ local function AdjustWindow(window)
 	end
 end
 
-WG.SetRawSetting = function(fwkey, optionkey, value)
-	--Settings_lhShow Advanced Settings
-	--flatwindowlist[fwkey].tree[optionkey].OnChange()
+WG.SetRawSetting = function(path, optionkey, value)
+	--[[
+	local option = pathoptions[path][optionkey]
+	option.value = value
+	pathoptions[path][optionkey].OnChange(option)
+	--]]
 end
 
 -- Adding functions because of "handler=true"
@@ -786,6 +789,11 @@ local function AddOption(path, wname, option)
 end
 
 local function RemOption(path, wname, option)
+	if not pathorders[path] then
+		echo ('<epic menu> error #333 ', wname, path)
+		echo ('<epic menu> ...error #333 ', (option and option.key) )
+		return
+	end
 	for i,v in ipairs(pathorders[path]) do
 		if v == option.key then
 			table.remove(pathorders[path], i)
