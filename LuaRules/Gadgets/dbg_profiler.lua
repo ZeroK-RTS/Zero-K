@@ -376,26 +376,31 @@ end
     end
 
     local vsx, vsy = gl.GetViewSizes()
-    local x,y = vsx-300, vsy-40
+    local x,y = vsx-300, vsy-80
 
     local maximum_ = (maximumSYNCED > maximum) and (maximumSYNCED) or (maximum)
 
     gl.Color(1,1,1,1)
     gl.BeginText()
+	local index1 = 1
     if (profile_unsynced) then
       for i=1,#sortedList do
         local v = sortedList[i]
         local wname = v[1]
         local tLoad = v[2]
-        if maximum > 0 then
-          gl.Rect(x+100-tLoad/maximum_*100, y+1-(12)*i, x+100, y+9-(12)*i)
-        end
-        gl.Text(wname, x+150, y+1-(12)*i, 10)
-        gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(12)*i, 10)
+		if tLoad > 0.2 then
+			if maximum > 0 then
+			  gl.Rect(x+100-tLoad/maximum_*100, y+1-(12)*index1, x+100, y+9-(12)*index1)
+			end
+			gl.Text(wname, x+150, y+1-(12)*index1, 10)
+			gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(12)*index1, 10)
+			index1 = index1 + 1
+		end
       end
     end
+	local index2 = 1
     if (profile_synced) then
-      local j = #sortedList + 1
+      local j = index1 + 1
 
       gl.Rect(x, y+5-(12)*j, x+230, y+4-(12)*j)
       gl.Color(1,0,0)   
@@ -407,14 +412,17 @@ end
         local v = sortedListSYNCED[i]
         local wname = v[1]
         local tLoad = v[2]
-        if maximum > 0 then
-          gl.Rect(x+100-tLoad/maximum_*100, y+1-(12)*(j+i), x+100, y+9-(12)*(j+i))
-        end
-        gl.Text(wname, x+150, y+1-(12)*(j+i), 10)
-        gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(12)*(j+i), 10)
+		if tLoad > 0.2 then
+			if maximum > 0 then
+			  gl.Rect(x+100-tLoad/maximum_*100, y+1-(12)*(j+index2), x+100, y+9-(12)*(j+index2))
+			end
+			gl.Text(wname, x+150, y+1-(12)*(j+index2), 10)
+			gl.Text(('%.3f%%'):format(tLoad), x+105, y+1-(12)*(j+index2), 10)
+			index2 = index2 + 1
+		end
       end
     end
-    local i = #sortedList + #sortedListSYNCED + 2
+    local i = index1 + index2 + 2
     gl.Text("\255\255\064\064total time", x+150, y-1-(12)*i, 10)
     gl.Text("\255\255\064\064"..('%.3fs'):format(allOverTimeSec), x+105, y-1-(12)*i, 10)
     i = i+1
