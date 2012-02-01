@@ -252,7 +252,7 @@ local function MakeButton(container, cmd, insertItem)
 	
 	
 	
-	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action):upper() or ''
+	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 	
 	
 	if not isState and hotkey ~= '' then

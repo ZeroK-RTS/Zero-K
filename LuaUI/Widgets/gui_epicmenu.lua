@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.291 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.30 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -197,6 +197,18 @@ to_string(v, 0)
 end
 --]]
 
+local function CapCase(str)
+	local str = str:lower()
+	str = str:gsub( '_', ' ' )
+	str = str:sub(1,1):upper() .. str:sub(2)
+	
+	str = str:gsub( ' (.)', 
+		function(x) return (' ' .. x):upper(); end
+		)
+	return str
+end
+
+
 local function explode(div,str)
   if (div=='') then return false end
   local pos,arr = 0,{}
@@ -330,8 +342,8 @@ end
 
 
 local function GetFullKey(path, option)
-	local curkey = path .. '_' .. option.key
-	local fullkey = ('epic_'.. curkey)
+	--local curkey = path .. '_' .. option.key
+	local fullkey = ('epic_'.. option.wname .. '_' .. option.key)
 	fullkey = fullkey:gsub(' ', '_')
 	return fullkey
 end
@@ -620,8 +632,12 @@ local function UnassignKeyBind(path, option)
 end
 
 
-local function AddOption(path, wname, option)
+local function AddOption(path, option, wname )
 --echo(path, wname, option)
+
+	if not wname then
+		wname = path
+	end
 
 	local path2 = path
 	if not option then
@@ -645,7 +661,7 @@ local function AddOption(path, wname, option)
 	end
 	
 	if not pathoptions[path] then
-		AddOption( path, 'epic' )
+		AddOption( path )
 	end
 	
 	if not option.key then
@@ -654,7 +670,8 @@ local function AddOption(path, wname, option)
 	option.wname = wname
 	
 	local curkey = path .. '_' .. option.key
-	local fullkey = ('epic_'.. curkey)
+	--local fullkey = ('epic_'.. curkey)
+	local fullkey = GetFullKey(path, option)
 	fullkey = fullkey:gsub(' ', '_')
 	
 	--get spring config setting
@@ -788,7 +805,7 @@ local function AddOption(path, wname, option)
 	
 end
 
-local function RemOption(path, wname, option)
+local function RemOption(path, option, wname )
 	if not pathorders[path] then
 		--this occurs when a widget unloads itself inside :init
 		--echo ('<epic menu> error #333 ', wname, path)
@@ -904,16 +921,14 @@ local function IntegrateWidget(w, addoptions, index)
 		local path = option.path or defaultpath
 		
 		if addoptions then
-			AddOption(path, wname, option)
+			AddOption(path, option, wname )
 		else
-			RemOption(path, wname, option)
+			RemOption(path, option, wname )
 		end
 		
-		if path == curPath then
-			MakeSubWindow(path)
-		end
 	end
 	
+	MakeSubWindow(curPath)
 	
 end
 
@@ -980,7 +995,7 @@ end
 WG.crude.GetHotkey = function(actionName)
 	local hotkey = settings.keybounditems[actionName]
 	if not hotkey then return '' end
-	return GetReadableHotkeyMod(hotkey.mod) .. hotkey.key
+	return GetReadableHotkeyMod(hotkey.mod) .. CapCase(hotkey.key)
 end
 
 
@@ -989,7 +1004,7 @@ local function GetHotkeyData(path, option)
 	local actionName = GetActionName(path, option)
 	local hotkey = settings.keybounditems[actionName]
 	if hotkey then
-		return hotkey, GetReadableHotkeyMod(hotkey.mod) .. hotkey.key
+		return hotkey, GetReadableHotkeyMod(hotkey.mod) .. CapCase(hotkey.key)
 	end
 	
 	return nil, 'None'
@@ -1581,18 +1596,18 @@ function widget:Initialize()
 	
 
 	--this is done to establish order the correct button order
-	AddOption('Settings/Reset Settings', 'epic')
-	AddOption('Settings/Camera', 'epic')
-	AddOption('Settings/Interface', 'epic')
-	AddOption('Settings/Misc', 'epic')
-	AddOption('Settings/Mouse Cursor', 'epic')
-	AddOption('Settings/Video', 'epic')
-	AddOption('Settings/View', 'epic')
+	AddOption('Settings/Reset Settings')
+	AddOption('Settings/Camera')
+	AddOption('Settings/Interface')
+	AddOption('Settings/Misc')
+	AddOption('Settings/Mouse Cursor')
+	AddOption('Settings/Video')
+	AddOption('Settings/View')
 	
 	local options_temp ={}
 	CopyTable(options_temp , epic_options);
 	for i,option in ipairs(options_temp ) do
-		AddOption(option.path, 'epic', option)
+		AddOption(option.path, option)
 	end
 	
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
