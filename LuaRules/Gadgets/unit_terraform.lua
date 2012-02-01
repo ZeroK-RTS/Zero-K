@@ -2876,7 +2876,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		smoothradius = smoothradius + (8 - smoothradius%8)
 		gatherradius = gatherradius + (8 - gatherradius%8)
 		
-		local maxSmooth = 0.32--SeismicWeapon[weaponID].smooth
+		local maxSmooth = SeismicWeapon[weaponID].smooth
 		
 		local sx = floor((x+4)/8)*8
 		local sz = floor((z+4)/8)*8
