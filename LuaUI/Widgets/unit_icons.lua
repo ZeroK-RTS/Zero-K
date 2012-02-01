@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Unit Icons",
-    desc      = "v0.01 Shows icons above units",
+    desc      = "v0.02 Shows icons above units",
     author    = "CarRepairer",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
@@ -38,11 +38,22 @@ local floor = math.floor
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 
+options_path = 'Game/Settings'
+options = {
+	iconsize = {
+		name = 'Hovering Icon Size',
+		type = 'number',
+		value = 33, min=20, max = 40,
+	}
+}
+
+----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+
 local unitHeights  = {}
 local iconOrders = {}
 local iconOrders_order = {}
 
-local iconsize   = 33
 local iconoffset = 14
 
 
@@ -85,7 +96,7 @@ local function OrderIconsOnUnit(unitID )
 				textureUnitsXshift[texture][unitID] = false
 			else
 				textureUnitsXshift[texture][unitID] = xshift
-				xshift = xshift + iconsize
+				xshift = xshift + options.iconsize.value
 			end
 		end
 		
@@ -187,7 +198,7 @@ end
 local function DrawUnitFunc(xshift, yshift)
   glTranslate(xshift,yshift,0)
   glBillboard()
-  glTexRect(-iconsize+10.5, -9, 10.5, iconsize-9)
+  glTexRect(-options.iconsize.value+10.5, -9, 10.5, options.iconsize.value-9)
 end
 
 

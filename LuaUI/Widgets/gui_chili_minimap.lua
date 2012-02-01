@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.881 Chili Minimap",
+    desc      = "v0.882 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -107,7 +107,6 @@ options = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
 		advanced = true,
-		path = 'Settings/Interface',
 		OnChange= function(self) iconsize = self.value and 0 or 20; MakeMinimapWindow() end
 	},
 	
