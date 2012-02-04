@@ -55,6 +55,7 @@ local screen0
 --------------------------------------------------------------------------------
 -- Global chili controls
 local window_crude 
+local window_exit
 local window_flags
 local window_help
 local window_getkey
@@ -1321,6 +1322,53 @@ local function MakeMenuBar()
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 35, height=5, textColor = color.main_fg, autosize=false, }
 	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,4}  }
 	
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	
+	window_exit = Window:New{
+		name='exitwindow',
+		x = screenWidth*0.5-75,  
+		y = screenHeight*0.5-30,  
+		dockable = false,
+		clientWidth = 140,
+		clientHeight = 60,
+		draggable = false,
+		tweakDraggable = true,
+		resizable = false,
+		minimizable = false,
+		backgroundColor = color.main_bg,
+		color = {1,1,1,0.5},
+		margin = {0,0,0,0},
+		padding = {0,0,0,0},
+		
+		children = {
+				
+			Label:New{ 
+				caption = 'Confirm Game Exit', 
+				x = 10,
+				y = 8,
+				width = 120, 
+				textColor = color.main_fg },
+				
+			Button:New{
+				caption = "Exit", OnMouseUp = { function() spSendCommands{"quit","quitforce"} end, }, 
+				x = 12,  
+				y = 30, 
+				height=20, 
+				width=52,
+			},
+			
+			Button:New{
+				caption = "Cancel", OnMouseUp = { function() screen0:RemoveChild(window_exit) end, }, 
+				x = 76,  
+				y = 30, 
+				height=20, 
+				width=52,
+			},
+		},
+	}
+	
+	screen0:RemoveChild(window_exit)
+		
 	window_crude = Window:New{
 		name='epicmenubar',
 		right = 0,  
@@ -1492,7 +1540,7 @@ local function MakeMenuBar()
 						},
 					},
 					Button:New{
-						caption = "", OnMouseUp = { function() spSendCommands{"quitmenu"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						caption = "", OnMouseUp = { function() screen0:AddChild(window_exit) end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin, tooltip = 'Exit the game...',
 						children = {
 							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/quit.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  }, 
@@ -1713,10 +1761,12 @@ function widget:Shutdown()
   RemoveAction("crudemenu")
  
   -- restore key binds
+  --[[
   Spring.SendCommands({
     "bind esc quitmessage",
     "bind esc quitmenu", -- FIXME made for licho, removed after 0.82 release
   })
+  --]]
   Spring.SendCommands("unbind esc crudemenu")
 end
 
