@@ -5,7 +5,7 @@ function widget:GetInfo()
   return {
     name      = "State Icons",
     desc      = "Shows move and fire state icons",
-    author    = "CarRepairer",
+    author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
@@ -30,12 +30,18 @@ local floor = math.floor
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 
-options_path = 'Game/Settings'
+options_path = 'Settings/Interface/Hovering Icons'
 options = {
 	
 	showstateonshift = {
 		name = "Show move/fire states on shift",
 		desc = "When holding shift, icons appear over units indicating move state and fire state.",
+		type = 'bool',
+		value = true,
+	},
+	showarmorstateonshift = {
+		name = "Show armor state on shift",
+		desc = "When holding shift, an icon appears over armored units.",
 		type = 'bool',
 		value = true,
 	},
@@ -59,10 +65,16 @@ local moveStateIcons = {
   [2] = imageDir .. 'states/move_roam.png',
 }
 
+local armoredTexture = 'Luaui/Images/commands/guard.png'
+
 local hide = true
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+local prevFirestate = {}
+local prevMovestate = {}
+local lastArmored = {}
 
 function SetUnitStateIcons(unitID)
 	if not (IsUnitAllied(unitID)or(GetSpectatingState())) then
@@ -72,10 +84,41 @@ function SetUnitStateIcons(unitID)
 	local states = Spring.GetUnitStates(unitID)
 	
 	if not states then return end
-	local fireStateIcon = fireStateIcons[states.firestate]
-	local moveStateIcon = moveStateIcons[states.movestate]
-	WG.icons.SetUnitIcon( unitID, {name='firestate', texture=fireStateIcon} )
-	WG.icons.SetUnitIcon( unitID, {name='movestate', texture=moveStateIcon} )
+	
+	local ud = Spring.GetUnitDefID(unitID)
+	
+	if options.showstateonshift.value then
+		if ud then
+			ud = UnitDefs[ud]
+			if ud then
+				if ud.canAttack then
+					if not prevFirestate[unitID] or prevFirestate[unitID] ~= states.firestate then
+						prevFirestate[unitID] = states.firestate
+						local fireStateIcon = fireStateIcons[states.firestate]
+						WG.icons.SetUnitIcon( unitID, {name='firestate', texture=fireStateIcon} )
+					end
+				end
+				if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
+					if not prevMovestate[unitID] or prevMovestate[unitID] ~= states.movestate then
+						prevMovestate[unitID] = states.movestate
+						local moveStateIcon = moveStateIcons[states.movestate]
+						WG.icons.SetUnitIcon( unitID, {name='movestate', texture=moveStateIcon} )
+					end
+				end
+			end
+		end
+	end
+	
+	if options.showarmorstateonshift.value then
+		local armored = Spring.GetUnitArmored(unitID)
+		if not lastArmored[unitID] and armored then
+			lastArmored[unitID] = true
+			WG.icons.SetUnitIcon( unitID, {name='armored', texture=armoredTexture} )
+		elseif lastArmored[unitID] and not armored then
+			lastArmored[unitID] = nil
+			WG.icons.SetUnitIcon( unitID, {name='armored', texture=nil} )
+		end
+	end
 end
 
 local function UpdateAllUnits()
@@ -100,19 +143,23 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if isRepeat or not options.showstateonshift.value then
+	if isRepeat or not (options.showstateonshift.value or options.showarmorstateonshift.value) then
 		return
 	end
-	
+
 	if key == KEYSYMS.LSHIFT
 		or key == KEYSYMS.RSHIFT
 		then
 		
 		hide = false
 		
-		
-		WG.icons.SetDisplay('firestate', true)
-		WG.icons.SetDisplay('movestate', true)
+		if options.showstateonshift.value then
+			WG.icons.SetDisplay('firestate', true)
+			WG.icons.SetDisplay('movestate', true)
+		end
+		if options.showarmorstateonshift.value then
+			WG.icons.SetDisplay('armored', true)
+		end
 		
 		UpdateAllUnits()
 	end
@@ -127,6 +174,7 @@ function widget:KeyRelease(key, modifier )
 		
 		WG.icons.SetDisplay('firestate', false)
 		WG.icons.SetDisplay('movestate', false)
+		WG.icons.SetDisplay('armored', false)
 	end
 end
 
@@ -134,7 +182,7 @@ end
 --needed if icon widget gets disabled/enabled after this one. find a better way?
 function widget:GameFrame(f)
 
-	if f%(32*5) == 0 then --5 seconds
+	if f%(32) == 0 then --1 second
 		UpdateAllUnits()
 	end
 end

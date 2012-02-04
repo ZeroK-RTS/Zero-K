@@ -5,7 +5,7 @@ function widget:GetInfo()
   return {
     name      = "Unit Icons",
     desc      = "v0.02 Shows icons above units",
-    author    = "CarRepairer",
+    author    = "CarRepairer and GoogleFrog",
     date      = "2012-01-28",
     license   = "GNU GPL, v2 or later",
     layer     = 4,--
@@ -38,12 +38,12 @@ local floor = math.floor
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 
-options_path = 'Game/Settings'
+options_path = 'Settings/Interface/Hovering Icons'
 options = {
 	iconsize = {
 		name = 'Hovering Icon Size',
 		type = 'number',
-		value = 33, min=20, max = 40,
+		value = 30, min=20, max = 40,
 	}
 }
 
@@ -85,7 +85,13 @@ local function OrderIcons()
 end
 
 local function OrderIconsOnUnit(unitID )
-	local xshift = 0
+	local iconCount = 0
+	for _,iconName in ipairs(iconOrders_order) do
+		if (not hideIcons[iconName]) and iconUnitTexture[iconName] and iconUnitTexture[iconName][unitID] then
+			iconCount = iconCount + 1
+		end
+	end
+	local xshift = (0.5 - iconCount*0.5)*options.iconsize.value
 	
 	for _,iconName in ipairs(iconOrders_order) do
 		
@@ -131,7 +137,6 @@ end
 
 
 function WG.icons.SetUnitIcon( unitID, data )
-
 	local iconName = data.name
 	local texture = data.texture
 	
@@ -144,6 +149,9 @@ function WG.icons.SetUnitIcon( unitID, data )
 	if oldTexture then
 		textureUnitsXshift[oldTexture][unitID] = nil
 		iconUnitTexture[iconName][unitID] = nil
+		if (not hideIcons[iconName])then
+			OrderIconsOnUnit(unitID)
+		end
 	end
 	if not texture then
 		return
@@ -198,7 +206,7 @@ end
 local function DrawUnitFunc(xshift, yshift)
   glTranslate(xshift,yshift,0)
   glBillboard()
-  glTexRect(-options.iconsize.value+10.5, -9, 10.5, options.iconsize.value-9)
+  glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
 end
 
 
@@ -218,7 +226,7 @@ function widget:DrawWorld()
 		
 		glTexture( texture )
 		for unitID,xshift in pairs(units) do
-			if xshift then
+			if xshift and unitHeights and unitHeights[unitID] then
 				glDrawFuncAtUnit(unitID, false, DrawUnitFunc,
 					xshift,
 					unitHeights[unitID])

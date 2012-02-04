@@ -126,6 +126,7 @@ end
 
 function GG.GiveFacplop(unitID)
 	facplops[unitID] = 1
+	Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
 end
 
 local function CheckForShutdown()
@@ -164,6 +165,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 
 	if plop and ploppableDefs[unitDefID] and facplops[builderID] then
 		facplops[builderID] = nil
+		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
 		-- 3 seconds to build with commander
 		--[[
 		Spring.SetUnitCosts(unitID, {
@@ -546,7 +548,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 
       if (udef.customParams.level and udef.name ~= "chickenbroodqueen") then
         if plop then
-          facplops[unitID] = 1
+		  GG.GiveFacplop(unitID)
         end
       end
 
@@ -849,7 +851,7 @@ function gadget:Load(zip)
 	end
 	for oldID in pairs(data.facplops) do
 		newID = GG.SaveLoad.GetNewUnitID(oldID)
-		facplops[newID] = true
+		GG.GiveFacplop(unitID)
 	end	
 end
 
@@ -926,7 +928,7 @@ function gadget:DrawWorldPreUnit()
 		end
 	end
 end
-
+--[[ moved to widget
 local function DrawUnitFunc(yshift)
 	gl.Translate(0,yshift,0)
 	gl.Billboard()
@@ -952,6 +954,7 @@ function gadget:DrawWorld()
 	end
 	gl.Texture("")
 end
+--]]
 
 -- need this because SYNCED.tables are merely proxies, not real tables
 local function MakeRealTable(proxy)
