@@ -1328,11 +1328,11 @@ local function MakeMenuBar()
 	
 	window_exit = Window:New{
 		name='exitwindow',
-		x = screenWidth*0.5-75,  
-		y = screenHeight*0.5-30,  
+		x = screenWidth*0.5-50,  
+		y = screenHeight*0.5-70,  
 		dockable = false,
-		clientWidth = 140,
-		clientHeight = 60,
+		clientWidth = 120,
+		clientHeight = 150,
 		draggable = false,
 		tweakDraggable = true,
 		resizable = false,
@@ -1345,18 +1345,28 @@ local function MakeMenuBar()
 		children = {
 				
 			Label:New{ 
-				caption = 'Confirm Game Exit', 
-				x = 10,
-				y = 8,
+				caption = 'Leave Battle?', 
+				x = 0,
+				y = 15,
 				width = 120, 
+				align="center",
 				textColor = color.main_fg },
 				
 			Button:New{
 				caption = "Exit", OnMouseUp = { function() spSendCommands{"quit","quitforce"} end, }, 
-				x = 12,  
-				y = 30, 
-				height=20, 
-				width=52,
+				x = 20,  
+				y = 46, 
+				height=25, 
+				width=80,
+			},
+			
+			
+			Button:New{
+				caption = "Resign", OnMouseUp = { function() spSendCommands{"spectator"} end, }, 
+				x = 20,  
+				y = 78, 
+				height=25, 
+				width=80,
 			},
 			
 			Button:New{
@@ -1365,10 +1375,10 @@ local function MakeMenuBar()
 						screen0:RemoveChild(window_exit) 
 						exitWindowVisible = false
 					end, }, 
-				x = 76,  
-				y = 30, 
-				height=20, 
-				width=52,
+				x = 20,  
+				y = 110, 
+				height=25, 
+				width=80,
 			},
 		},
 	}
@@ -1553,7 +1563,7 @@ local function MakeMenuBar()
 								end
 							end, }, 
 						textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
-						padding = btn_padding, margin = btn_margin, tooltip = 'Exit the game...',
+						padding = btn_padding, margin = btn_margin, tooltip = 'Exit or Resign...',
 						children = {
 							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/quit.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  }, 
 						},
