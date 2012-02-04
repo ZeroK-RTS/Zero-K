@@ -1695,12 +1695,14 @@ function widget:Initialize()
 	
 	-- Add actions for keybinds
 	AddAction("crudemenu", ActionMenu, nil, "t")
+	AddAction("exitwindow", ActionExitWindow, nil, "t")
 	-- replace default key binds
 	Spring.SendCommands({
 		"unbind esc quitmessage",
 		"unbind esc quitmenu", --Upgrading to 0.82 doesn't change existing uikeys so pre-0.82 keybinds still apply.
 	})
 	Spring.SendCommands("bind esc crudemenu")
+	Spring.SendCommands("bind shift+esc exitwindow")
 
 	MakeMenuBar()
 	
@@ -1858,6 +1860,16 @@ function widget:KeyPress(key, modifier, isRepeat)
 		return true
 	end
 	
+end
+
+function ActionExitWindow()
+	if exitWindowVisible then
+		screen0:RemoveChild(window_exit) 
+		exitWindowVisible = false
+	else
+		screen0:AddChild(window_exit) 
+		exitWindowVisible = true
+	end						
 end
 
 function ActionMenu()
