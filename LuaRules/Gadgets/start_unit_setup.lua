@@ -96,7 +96,7 @@ local customKeys = {}	-- [playerID] = {}
 local waitingForComm = {}
 GG.waitingForComm = waitingForComm
 
--- overlaps with the rulesparams; not really needed
+-- overlaps with the rulesparam
 local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
 
@@ -434,18 +434,18 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   end
   Spring.Echo(Spring.GetGameRulesParam("commSpawnedTeam"..teamID), commSpawnedTeam[teamID])
   ]]--
+  
+  --[[
   if ((coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
   or (not coop and Spring.GetGameRulesParam("commSpawnedTeam"..teamID) == 1))
   and not bonusSpawn then
 	return 
   end
- 
-  --[[ 
+  ]]
   if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]))
   and not bonusSpawn then
 	return 
   end
-  ]]--
 
   local startUnit = GetStartUnit(teamID, playerID, isAI)
   if bonusSpawn then
@@ -475,9 +475,11 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 	
 	if not bonusSpawn then
 		Spring.SetGameRulesParam("commSpawnedTeam"..teamID, 1)
-		if playerID then Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1) end
 		commSpawnedTeam[teamID] = true
-		if playerID then commSpawnedPlayer[playerID] = true end
+		if playerID then
+		  Spring.SetGameRulesParam("commSpawnedPlayer"..playerID, 1)
+		  commSpawnedPlayer[playerID] = true 
+		end
 		waitingForComm[teamID] = nil
 	end
 	
