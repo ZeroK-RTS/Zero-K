@@ -139,7 +139,7 @@ local function addUnit(defName, path)
     }
     options_order[#options_order+1] = defName .. "_label"
     
-    if ud.canAttack then
+    if ud.canAttack or ud.isFactory then
         options[defName .. "_firestate"] = {
             name = "  Firestate",
             desc = "Values: inherit from factory, hold fire, return fire, fire at will",

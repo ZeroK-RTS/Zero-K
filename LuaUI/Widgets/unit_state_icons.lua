@@ -91,7 +91,7 @@ function SetUnitStateIcons(unitID)
 		if ud then
 			ud = UnitDefs[ud]
 			if ud then
-				if ud.canAttack then
+				if ud.canAttack or ud.isFactory then
 					if not prevFirestate[unitID] or prevFirestate[unitID] ~= states.firestate then
 						prevFirestate[unitID] = states.firestate
 						local fireStateIcon = fireStateIcons[states.firestate]
