@@ -748,6 +748,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		RemoveFac(unitID)
 	elseif commsByID[unitID] then
 		RemoveComm(unitID)
+		if commIndex > #comms then commIndex = #comms end
 	end
 end
 
