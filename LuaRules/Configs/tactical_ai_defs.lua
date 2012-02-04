@@ -17,7 +17,6 @@ local longRangeSwarmieeArray = {
 	["corstorm"] = true,
 	["armroy"] = true,
 	["armham"] = true,
-	["armpb"] = true,
 }
 
 local medRangeSwarmieeArray = { 
