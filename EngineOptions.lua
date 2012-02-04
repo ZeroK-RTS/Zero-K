@@ -205,7 +205,7 @@ local options =
     type   = 'bool',
     def    = false,
   },
-  
+ 
   {
     key    = 'LuaRules',
     name   = 'Enable LuaRules',
