@@ -43,7 +43,7 @@ options = {
 	iconsize = {
 		name = 'Hovering Icon Size',
 		type = 'number',
-		value = 30, min=20, max = 40,
+		value = 30, min=10, max = 40,
 	}
 }
 
