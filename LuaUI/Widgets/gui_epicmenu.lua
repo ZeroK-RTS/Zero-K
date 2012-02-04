@@ -1528,6 +1528,9 @@ end
 
 
 function widget:Initialize()
+	
+	Spring.SendCommands("unbindaction quitmenu") -- http://springrts.com/mantis/view.php?id=2944
+	
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget(widget)
 		return
