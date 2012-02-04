@@ -79,6 +79,8 @@ local myCountry = 'wut'
 local pathoptions = {}	
 local pathorders = {}
 
+local exitWindowVisible = false
+
 --------------------------------------------------------------------------------
 -- Key bindings
 include("keysym.h.lua")
@@ -1358,7 +1360,11 @@ local function MakeMenuBar()
 			},
 			
 			Button:New{
-				caption = "Cancel", OnMouseUp = { function() screen0:RemoveChild(window_exit) end, }, 
+				caption = "Cancel", 
+				OnMouseUp = { function() 
+						screen0:RemoveChild(window_exit) 
+						exitWindowVisible = false
+					end, }, 
 				x = 76,  
 				y = 30, 
 				height=20, 
@@ -1540,7 +1546,13 @@ local function MakeMenuBar()
 						},
 					},
 					Button:New{
-						caption = "", OnMouseUp = { function() screen0:AddChild(window_exit) end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
+						caption = "", OnMouseUp = { function() 
+								if not exitWindowVisible then
+									screen0:AddChild(window_exit) 
+									exitWindowVisible = true
+								end
+							end, }, 
+						textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5,
 						padding = btn_padding, margin = btn_margin, tooltip = 'Exit the game...',
 						children = {
 							Image:New{file=LUAUI_DIRNAME .. 'Images/epicmenu/quit.png', height=B_HEIGHT-2,width=B_HEIGHT-2,  }, 

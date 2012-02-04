@@ -17,6 +17,7 @@ end
 --------------------------------------------------------------------------------
 
 local Spring = Spring
+local spAreTeamsAllied = Spring.AreTeamsAllied
 
 local spSetUnitCloak = Spring.SetUnitCloak
 local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
@@ -34,19 +35,25 @@ local recloakUnitID = {}
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-					
-	if recloakUnitID[unitID] then
-		recloakUnit[recloakUnitID[unitID]].frames = 16
-	else
-		local cloak = Spring.GetUnitIsCloaked(unitID)
-		if cloak then
-			recloakUnits = recloakUnits + 1
-			recloakUnit[recloakUnits] = {id = unitID, frames = 10}
-			recloakUnitID[unitID] = recloakUnits
-			Spring.SetUnitCloak(unitID, false, 10000)
+	
+	if not (attackerDefID and 
+		UnitDefs[attackerDefID].customParams and 
+		UnitDefs[attackerDefID].customParams.nofriendlyfire and
+		attackerID ~= unitID and
+		spAreTeamsAllied(unitTeam, attackerTeam)) then
+
+		if recloakUnitID[unitID] then
+			recloakUnit[recloakUnitID[unitID]].frames = 16
+		else
+			local cloak = Spring.GetUnitIsCloaked(unitID)
+			if cloak then
+				recloakUnits = recloakUnits + 1
+				recloakUnit[recloakUnits] = {id = unitID, frames = 10}
+				recloakUnitID[unitID] = recloakUnits
+				Spring.SetUnitCloak(unitID, false, 10000)
+			end
 		end
 	end
-	
 end
 
 function gadget:GameFrame(n)
