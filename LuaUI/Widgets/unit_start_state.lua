@@ -99,12 +99,12 @@ options = {
     },
 }
 
-local tacticalAIDefs = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
+local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
 
 local tacticalAIUnits = {}
 
 for unitDefName, behaviourData in pairs(tacticalAIDefs) do
-        tacticalAIUnits[unitDefName] = true
+        tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
 end
 
 local unitAlreadyAdded = {}
@@ -231,14 +231,14 @@ local function addUnit(defName, path)
 	end
 
     if tacticalAIUnits[defName] then
-        options[defName .. "_tactical_ai"] = {
-            name = "  Smart AI",
-            desc = "Smart AI: check box to turn it on",
-            type = 'bool',
-            value = true,
-            path = path,
-        }
-        options_order[#options_order+1] = defName .. "_tactical_ai"
+		options[defName .. "_tactical_ai"] = {
+			name = "  Smart AI",
+			desc = "Smart AI: check box to turn it on",
+			type = 'bool',
+			value = tacticalAIUnits[defName].value,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_tactical_ai"
     end
     
     if ud.canCloak then

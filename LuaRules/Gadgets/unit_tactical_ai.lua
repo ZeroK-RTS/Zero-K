@@ -497,7 +497,7 @@ end
 ------------------------------------------------------
 -- Load Ai behaviour
 
-local function LoadBehaviour(unitConfigArray)
+local function LoadBehaviour(unitConfigArray, behaviourDefaults)
 
 	for unitDef, behaviourData in pairs(unitConfigArray) do
 		local ud = UnitDefNames[unitDef]
@@ -512,14 +512,14 @@ local function LoadBehaviour(unitConfigArray)
 				skirmEverything = (behaviourData.skirmEverything or false), 
 				maxSwarmRange = ud.maxWeaponRange - (behaviourData.maxSwarmLeeway or 0), 
 				minSwarmRange = ud.maxWeaponRange - (behaviourData.minSwarmLeeway or ud.maxWeaponRange/2),
-				minCircleStrafeDistance = ud.maxWeaponRange - (behaviourData.minCircleStrafeDistance or unitConfigArray.defaultMinCircleStrafeDistance),
+				minCircleStrafeDistance = ud.maxWeaponRange - (behaviourData.minCircleStrafeDistance or behaviourDefaults.defaultMinCircleStrafeDistance),
 				skirmRange = ud.maxWeaponRange - (behaviourData.skirmLeeway or 0),
-				jinkTangentLength = (behaviourData.jinkTangentLength or unitConfigArray.defaultJinkTangentLength),
-				jinkParallelLength =  (behaviourData.jinkParallelLength or unitConfigArray.defaultJinkParallelLength),
+				jinkTangentLength = (behaviourData.jinkTangentLength or behaviourDefaults.defaultJinkTangentLength),
+				jinkParallelLength =  (behaviourData.jinkParallelLength or behaviourDefaults.defaultJinkParallelLength),
 				alwaysJinkFight = (behaviourData.alwaysJinkFight or false),
-                localJinkOrder = (behaviourData.alwaysJinkFight or unitConfigArray.defaultLocalJinkOrder),
+                localJinkOrder = (behaviourData.alwaysJinkFight or behaviourDefaults.defaultLocalJinkOrder),
 				stoppingDistance = (behaviourData.stoppingDistance or 0),
-				strafeOrderLength = (behaviourData.strafeOrderLength or unitConfigArray.defaultStrafeOrderLength),
+				strafeOrderLength = (behaviourData.strafeOrderLength or behaviourDefaults.defaultStrafeOrderLength),
 				fleeCombat = (behaviourData.fleeCombat or false), 
 				fleeLeeway = (behaviourData.fleeLeeway or 100), 
 				fleeDistance = (behaviourData.fleeDistance or 100), 
@@ -528,12 +528,12 @@ local function LoadBehaviour(unitConfigArray)
 				swarmLeeway = (behaviourData.swarmLeeway or 50), 
 				skirmOrderDis = (behaviourData.skirmOrderDis or 120),
 				searchRange = (behaviourData.searchRange or 800),
-				defaultAIState = (behaviourData.defaultAIState or 1),
+				defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
 				fleeOrderDis = (behaviourData.fleeOrderDis or 120)
 			}
 			
 			unitAIBehaviour[ud.id].minFleeRange = unitAIBehaviour[ud.id].minFleeRange - unitAIBehaviour[ud.id].fleeLeeway
-			
+
 			if behaviourData.skirms then
 				for skirmDef,_  in pairs(behaviourData.skirms) do
 					local skirmName = UnitDefNames[skirmDef]
@@ -571,13 +571,13 @@ end
 function gadget:Initialize()
 
 	-- import config
-	behaviourDefs = include("LuaRules/Configs/tactical_ai_defs.lua")
+	behaviourDefs, behaviourDefaults = include("LuaRules/Configs/tactical_ai_defs.lua")
 	if not behaviourDefs then 
 		Spring.Echo("LuaRules/Configs/tactical_ai_defs.lua not found")
 		gadgetHandler:RemoveGadget()
 		return 
 	end
-	LoadBehaviour(behaviourDefs)
+	LoadBehaviour(behaviourDefs, behaviourDefaults)
 
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_AI)
@@ -611,6 +611,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		
 		if (behaviour.defaultAIState == 1) then
 			AIToggleCommand(unitID, {1}, {})
+		else
+			AIToggleCommand(unitID, {0}, {})
 		end
 		--Spring.Echo("")
 		

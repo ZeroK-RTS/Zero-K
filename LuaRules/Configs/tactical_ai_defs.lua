@@ -215,14 +215,16 @@ end
 
 
 --- Array loaded into gadget 
-local behaviourConfig = { 
-	
+local behaviourDefaults = {
+	defaultState = 1,
 	defaultJinkTangentLength = 80,
 	defaultJinkParallelLength = 200,
 	defaultStrafeOrderLength = 100,
 	defaultMinCircleStrafeDistance = 40,
     defaultLocalJinkOrder = true,
-	
+}
+
+local behaviourConfig = { 
 	-- swarmers
 	["armtick"] = {
 		skirms = {}, 
@@ -609,6 +611,25 @@ local behaviourConfig = {
 	},
 	--]]
 
+	-- support
+	["spherecloaker"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 400,
+	},
+	
+	["core_spectre"] = {
+		skirms = {}, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 450,
+	},
+	
 	-- mobile AA
 	["armjeth"] = {
 		skirms = skirmableAir, 
@@ -666,7 +687,7 @@ local behaviourConfig = {
 	},
 }
 
-return behaviourConfig
+return behaviourConfig, behaviourDefaults
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
