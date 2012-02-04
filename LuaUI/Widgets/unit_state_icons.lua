@@ -110,7 +110,8 @@ function SetUnitStateIcons(unitID)
 	end
 	
 	if options.showarmorstateonshift.value then
-		local armored = Spring.GetUnitArmored(unitID)
+		local armored, amount = Spring.GetUnitArmored(unitID)
+		armored = armored and amount and amount ~= 1
 		if not lastArmored[unitID] and armored then
 			lastArmored[unitID] = true
 			WG.icons.SetUnitIcon( unitID, {name='armored', texture=armoredTexture} )
