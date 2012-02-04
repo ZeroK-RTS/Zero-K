@@ -138,8 +138,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "armcom1", chance = 0.5},
-			[2] = {ID = "corcom1", chance = 0.5},
+			[1] = {ID = "comm_riot_cai", chance = 0.5},
+			[2] = {ID = "comm_econ_cai", chance = 0.5},
 		},
 		buildTasksMods = noFunc,
 		conAndEconHandlerMods = {},
@@ -149,8 +149,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "armcom1", chance = 0.5},
-			[2] = {ID = "corcom1", chance = 0.5},
+			[1] = {ID = "comm_marksman_cai", chance = 0.5},
+			[2] = {ID = "comm_stun_cai", chance = 0.5},
 		},
 		buildTasksMods = BuildTasksMod_Blitz,
 		conAndEconHandlerMods = {},
@@ -160,8 +160,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "armcom1", chance = 0.5},
-			[2] = {ID = "corcom1", chance = 0.5},
+			[1] = {ID = "comm_riot_cai", chance = 0.5},
+			[2] = {ID = "comm_stun_cai", chance = 0.5},
 		},
 		buildTasksMods = BuildTasksMod_Pusher,
 		conAndEconHandlerMods = {},
@@ -171,8 +171,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "armcom1", chance = 0.4},
-			[2] = {ID = "corcom1", chance = 0.6},
+			[1] = {ID = "comm_marksman_cai", chance = 0.4},
+			[2] = {ID = "comm_econ_cai", chance = 0.6},
 		},
 		buildTasksMods =  BuildTasksMod_Defensive,
 		conAndEconHandlerMods = {},
@@ -182,8 +182,8 @@ strategies = {
 		chance	= 0.2,
 		commanders = {
 			count = 2,
-			[1] = {ID = "armcom1", chance = 0.7},
-			[2] = {ID = "corcom1", chance = 0.3},
+			[1] = {ID = "comm_econ_cai", chance = 0.7},
+			[2] = {ID = "comm_stun_cai", chance = 0.3},
 		},
 		buildTasksMods = noFunc,
 		conAndEconHandlerMods = {},
@@ -193,7 +193,7 @@ strategies = {
 		chance = 0,
 		commanders = {
 			count = 1,
-			[1] = {ID = "armcom1", chance = 1},
+			[1] = {ID = "comm_stun_cai", chance = 1},
 		},
 		buildTasksMods = BuildTasksMod_Lolz,
 		conAndEconHandlerMods = {},

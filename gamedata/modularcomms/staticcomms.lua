@@ -1,4 +1,31 @@
 local comms = {
+  -- Not Hax
+  comm_riot_cai = {
+    chassis = "corcom1",
+	name = "Crowd Controller",
+	modules = { "commweapon_riotcannon",  "module_adv_targeting",},
+	cost = 250,
+  },
+   comm_econ_cai = {
+    chassis = "commsupport1",
+	name = "Base Builder",
+	modules = { "commweapon_beamlaser",  "module_econ",},
+	cost = 275,
+  },
+  comm_marksman_cai = {
+    chassis = "commsupport1",
+	name = "The Marksman",
+    modules = { "commweapon_gaussrifle", "module_adv_targeting",},
+	cost = 225,
+  },
+  comm_stun_cai = {
+    chassis = "armcom1",
+	name = "Exotic Assault",
+    modules = { "commweapon_lightninggun", "module_autorepair",},
+	cost = 375,
+  },
+  
+  -- Hax
   comm_guardian = { 
 	chassis = "armcom2", 
 	name = "Star Guardian",
@@ -46,9 +73,9 @@ local comms = {
 				"module_adv_targeting", "module_high_power_servos", "weaponmod_disruptor_ammo"},
   },
 }
-
+--[[
 for name,stats in pairs(comms) do
 	table.insert(stats.modules, "module_econ")
 end
-
+--]]
 return comms
