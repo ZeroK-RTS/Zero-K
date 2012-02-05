@@ -76,18 +76,18 @@ unitDef = {
     ATA = {
       name                    = [[Tachyon Accelerator]],
       areaOfEffect            = 20,
-      beamTime                = 0.66,
-      burst                   = 2,
-      burstrate               = 0.33,
+      beamTime                = 1,
+      burst                   = 20,
+      burstrate               = 0.05,
       beamlaser               = 1,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 1500,
-        planes  = 1500,
-        subs    = 75,
+        default = 150,
+        planes  = 150,
+        subs    = 7.5,
       },
 
       explosionGenerator      = [[custom:ataalaser]],
@@ -113,7 +113,7 @@ unitDef = {
       thickness               = 16.9373846859543,
       tolerance               = 10000,
       turret                  = true,
-      weaponType              = [[BeamLaser]],
+      weaponType              = [[LaserCannon]],
       weaponVelocity          = 1500,
     },
 
