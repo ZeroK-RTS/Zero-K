@@ -525,7 +525,9 @@ local function AddEntity(entity, teamID, allyTeamID)
 			width = (fontsize+3)*10/16, 
 			tooltip = 'CPU: ' .. math.round(cpuUsage*100) .. '%',
 			file = cpuPic,
+			keepAspect = false,
 		}
+		--Spring.Echo(cpuImg.height, cpuImg)
 		function cpuImg:HitTest(x,y) return self end
 		entity.cpuImg = cpuImg
 		scroll_cpl:AddChild(cpuImg)
@@ -536,6 +538,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 			width = (fontsize+3)*10/16, 			
 			tooltip = 'Ping: ' .. pingTime_readable,
 			file = pingPic,
+			keepAspect = false,
 		}
 		function pingImg:HitTest(x,y) return self end
 		entity.pingImg = pingImg
