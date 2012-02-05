@@ -85,16 +85,14 @@ unitDef = {
       avoidFeature            = false,
       avoidNeutral            = false,
       beamTime                = 1,
-      burst                   = 20,
-      burstrate               = 0.05,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 200,
-        planes  = 200,
-        subs    = 10,
+        default = 4000,
+        planes  = 4000,
+        subs    = 200,
       },
 
       explosionGenerator      = [[custom:ataalaser]],
@@ -118,7 +116,7 @@ unitDef = {
       thickness               = 16.94,
       tolerance               = 10000,
       turret                  = true,
-      weaponType              = [[LaserCannon]],
+      weaponType              = [[BeamLaser]],
       weaponVelocity          = 1400,
     },
 

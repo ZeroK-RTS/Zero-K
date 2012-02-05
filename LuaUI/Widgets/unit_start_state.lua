@@ -473,8 +473,8 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitTaken(unitID, unitDefID, newTeamID, teamID)
-  widget:UnitCreated(unitID, unitDefID, newTeamID)
-  widget:UnitFinished(unitID, unitDefID, newTeamID)
+	widget:UnitCreated(unitID, unitDefID, newTeamID)
+	widget:UnitFinished(unitID, unitDefID, newTeamID)
 end
 
 function widget:GameFrame(n)
