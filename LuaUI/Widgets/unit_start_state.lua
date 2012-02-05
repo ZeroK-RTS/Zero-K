@@ -34,7 +34,7 @@ local function IsGround(ud)
 end
 
 options_path = 'Game/Unit AI/Initial States'
-options_order = { 'presetlabel', 'holdPosition', 'commander_label', 'commander_firestate', 'commander_movestate', 'commander_buildpriority', 'commander_retreat'}
+options_order = { 'presetlabel', 'holdPosition', 'commander_label', 'commander_firestate', 'commander_movestate', 'commander_constructor_buildpriority', 'commander_retreat'}
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
@@ -75,17 +75,28 @@ options = {
         step = 1,
         path = "Game/Unit AI/Initial States/Misc",
     },
-
-	commander_buildpriority = {
-        name = "  Build Priority",
-        desc = "Values: Low, Normal, High",
+--[[
+	commander_buildpriority_0 = {
+        name = "  Nanoframe Build Priority",
+        desc = "Values: Inherit, Low, Normal, High",
         type = 'number',
-        value = 1,
-        min = 0,
+        value = -1,
+        min = -1,
         max = 2,
         step = 1,
         path = "Game/Unit AI/Initial States/Misc",
     },
+--]]	
+	commander_constructor_buildpriority = {
+		name = "  Constructor Build Priority",
+		desc = "Values: Low, Normal, High",
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 2,
+		step = 1,
+		path = "Game/Unit AI/Initial States/Misc",
+	},
 	
 	commander_retreat = {
 		name = "  Retreat at value",
@@ -204,18 +215,37 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_airstrafe"
 	end
 
-	options[defName .. "_buildpriority"] = {
-        name = "  Build Priority",
-        desc = "Values: Low, Normal, High",
+	options[defName .. "_buildpriority_0"] = {
+        name = "  Nanoframe Build Priority",
+        desc = "Values: Inherit, Low, Normal, High",
         type = 'number',
-        value = 1,
-        min = 0,
+        value = -1,
+        min = -1,
         max = 2,
         step = 1,
         path = path,
     }
-	options_order[#options_order+1] = defName .. "_buildpriority"
-
+	options_order[#options_order+1] = defName .. "_buildpriority_0"
+	
+	if ud.speed == 0 then
+		options[defName .. "_buildpriority_0"].value = 1
+	end
+	
+	if ud.canAssist and ud.buildSpeed ~= 0 then
+		options[defName .. "_constructor_buildpriority"] = {
+			name = "  Constructor Build Priority",
+			desc = "Values: Inherit, Low, Normal, High",
+			type = 'number',
+			value = 1,
+			min = -1,
+			max = 2,
+			step = 1,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_constructor_buildpriority"
+	end
+	
+	
 	if (ud.canMove or ud.isFactory) then
 		options[defName .. "_retreatpercent"] = {
 			name = "  Retreat at value",
@@ -227,7 +257,7 @@ local function addUnit(defName, path)
 			step = 1,
 			path = path,
 		}
-	options_order[#options_order+1] = defName .. "_retreatpercent"
+		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
 
     if tacticalAIUnits[defName] then
@@ -260,7 +290,7 @@ local function AddFactoryOfUnits(defName)
         return
     end
 	local ud = UnitDefNames[defName]
-    local name = ud.humanName
+    local name = string.gsub(ud.humanName, "/", "-")
     addUnit(defName, name)
     for i = 1, #ud.buildOptions do
             addUnit(UnitDefs[ud.buildOptions[i]].name, name)
@@ -303,13 +333,12 @@ for i = 1, #buildOpts do
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
-    if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
+	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
         
         if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
             Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, 0)
             Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate.value}, 0)
 			Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, 0)
-			Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_buildpriority.value}, 0)
         end
         
         local name = UnitDefs[unitDefID].name
@@ -385,8 +414,19 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				end
 			end
 
-			if options[name .. "_buildpriority"] and options[name .. "_buildpriority"].value then
-				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_buildpriority"].value}, 0)
+			if options[name .. "_buildpriority_0"] and options[name .. "_buildpriority_0"].value then
+				if options[name .. "_buildpriority_0"].value == -1 then
+					if builderID then
+						local priority = Spring.GetUnitRulesParam(builderID,"buildpriority")
+						if priority then
+							Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, 0)
+						end
+					else
+						Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {1}, 0)
+					end
+				else
+					Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_buildpriority_0"].value}, 0)
+				end
 			end
 			
             if options[name .. "_tactical_ai"] and options[name .. "_tactical_ai"].value ~= nil then
@@ -401,8 +441,40 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     end
 end
 
+function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)     
+	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
+		local name = UnitDefs[unitDefID].name
+		if options[name .. "_constructor_buildpriority"] and options[name .. "_constructor_buildpriority"].value then
+			if options[name .. "_constructor_buildpriority"].value == -1 then
+				local priority = Spring.GetUnitRulesParam(factID,"buildpriority")
+				Spring.Echo(priority)
+				if priority then
+					Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, 0)
+				end
+			end
+		end
+	end
+end
+
+function widget:UnitFinished(unitID, unitDefID, unitTeam) 
+	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
+        
+        if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
+			Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_constructor_buildpriority.value}, 0)
+        end
+        
+        local name = UnitDefs[unitDefID].name
+		if options[name .. "_constructor_buildpriority"] and options[name .. "_constructor_buildpriority"].value then
+			if options[name .. "_constructor_buildpriority"].value ~= -1 then
+				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_constructor_buildpriority"].value}, 0)
+			end
+		end
+	end
+end
+
 function widget:UnitTaken(unitID, unitDefID, newTeamID, teamID)
   widget:UnitCreated(unitID, unitDefID, newTeamID)
+  widget:UnitFinished(unitID, unitDefID, newTeamID)
 end
 
 function widget:GameFrame(n)

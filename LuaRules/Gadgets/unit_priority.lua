@@ -79,6 +79,7 @@ local function SetPriorityState(unitID, state)
 	if (cmdDescID) then
 		CommandDesc.params[1] = state
 		Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = CommandDesc.params, tooltip = Tooltips[1 + state%StateCount]})
+		Spring.SetUnitRulesParam(unitID, "buildpriority", state)
 	end
 	UnitPriority[unitID] = state	
 end 
