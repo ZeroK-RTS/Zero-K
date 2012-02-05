@@ -80,7 +80,6 @@ unitDef = {
       burst                   = 2,
       burstrate               = 0.33,
       beamlaser               = 1,
-      beamTime                = 1,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
