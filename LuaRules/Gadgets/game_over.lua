@@ -272,6 +272,7 @@ end
 function gadget:UnitFinished(u, ud, team)
 	if (team ~= gaiaTeam)
 	  and(not doesNotCountList[ud])
+	  and(not finishedUnits[u])
 	then
 		finishedUnits[u] = true
 		AddAllianceUnit(u, ud, team)
