@@ -1,5 +1,5 @@
 #include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 #include "StateChg.h"
 
 piece  basebottom, flare, basetop, housing, rotor, barrel, shellleft, shellright, aim;
@@ -49,12 +49,12 @@ Go()
 		call-script activatescr();
 	}
 	open = TRUE;
-	set ARMORED to FALSE;
+	//set ARMORED to FALSE;
 }
 
 Stop()
 {
-	set ARMORED to TRUE;
+	//set ARMORED to TRUE;
 	open  = FALSE;	
 	call-script deactivatescr();
 }
@@ -206,7 +206,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode basebottom type BITMAPONLY | BITMAP1;
 		explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 		explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
@@ -215,14 +215,14 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode basebottom type BITMAPONLY | BITMAP1;
 		explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 		explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
 		explode basetop type SHATTER | BITMAP4;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode basebottom type BITMAPONLY | BITMAP1;
 	explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 	explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
