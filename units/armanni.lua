@@ -84,15 +84,17 @@ unitDef = {
       areaOfEffect            = 20,
       avoidFeature            = false,
       avoidNeutral            = false,
-      beamTime                = 1,
+      beamTime                = 0.66,
+      burst                   = 2,
+      burstrate               = 0.33,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 4000,
-        planes  = 4000,
-        subs    = 200,
+        default = 2000,
+        planes  = 2000,
+        subs    = 100,
       },
 
       explosionGenerator      = [[custom:ataalaser]],
