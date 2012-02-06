@@ -295,36 +295,40 @@ local function skirmEnemy(unitID, enemy, move, cQueue,n)
 	local data = unit[unitID]
 	local behaviour = unitAIBehaviour[data.udID]
 	
-	local pointDis = spGetUnitSeparation (enemy,unitID,true)
+	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
+	
+	local vx,vy,vz = Spring.GetUnitVelocity(enemy)
+	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
+	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
+	local cx,cy,cz -- command position	
+	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
+	
+	local pointDis = math.sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
 
-	if pointDis then
-		if behaviour.skirmRange > pointDis then -- if I can shoot at the enemy
-		
-			local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
-			local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-			local cx,cy,cz -- command position
-			
-			local dis = behaviour.skirmOrderDis 
-			local f = dis/pointDis
-			if (pointDis+dis > behaviour.skirmRange-behaviour.stoppingDistance) then
-				f = (behaviour.skirmRange-behaviour.stoppingDistance-pointDis)/pointDis
-			end
-			local cx = ux+(ux-ex)*f
-			local cy = uy
-			local cz = uz+(uz-ez)*f
-		
-			if move then
-				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
-			else
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
-			end
-			
-			data.cx,data.cy,data.cz = cx,cy,cz
-			data.receivedOrder = true
-			return true
-			
+	if behaviour.skirmRange > pointDis then
+
+		local dis = behaviour.skirmOrderDis 
+		local f = dis/pointDis
+		if (pointDis+dis > behaviour.skirmRange-behaviour.stoppingDistance) then
+			f = (behaviour.skirmRange-behaviour.stoppingDistance-pointDis)/pointDis
 		end
+		local cx = ux+(ux-ex)*f
+		local cy = uy
+		local cz = uz+(uz-ez)*f
+	
+		if move then
+			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+		else
+			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+		end
+		
+		data.cx,data.cy,data.cz = cx,cy,cz
+		data.receivedOrder = true
+		return true
+	elseif #cQueue > 0 and move then
+		Spring.Echo("bla")
+		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 	end
 
 	return false
@@ -351,42 +355,43 @@ local function fleeEnemy(unitID, enemy, enemyUnitDef, los, move, cQueue,n)
 		end
 	end
 
-	local pointDis = spGetUnitSeparation (enemy,unitID,true)
+	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
 	
-	if pointDis then
+	local vx,vy,vz = Spring.GetUnitVelocity(enemy)
+	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
+	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
+	local cx,cy,cz -- command position	
+	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
 	
-		if pointDis < enemyRange + behaviour.fleeLeeway then -- if the enemy can shoot at me
-			local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
-			local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-			local cx,cy,cz -- command position
-			
-			local dis = behaviour.fleeOrderDis
-			
-			local f = dis/pointDis
-			if (pointDis+dis > enemyRange+behaviour.fleeDistance) then
-				f = (enemyRange+behaviour.fleeDistance-pointDis)/pointDis
-			end
-			
-			local cx = ux+(ux-ex)*f
-			local cy = uy
-			local cz = uz+(uz-ez)*f
-		
-			if #cQueue > 0 then
-				if move then
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
-				else
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
-				end
-			else
-				spGiveOrderToUnit(unitID, CMD_FIGHT, {cx,cy,cz }, CMD_OPT_RIGHT )
-			end
-			
-			data.cx,data.cy,data.cz = cx,cy,cz
-			data.receivedOrder = true
-			return true
-			
+	local pointDis = math.sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
+
+	if enemyRange + behaviour.fleeLeeway > pointDis then
+
+		local dis = behaviour.fleeOrderDis 
+		local f = dis/pointDis
+		if (pointDis+dis > behaviour.skirmRange-behaviour.stoppingDistance) then
+			f = (enemyRange+behaviour.fleeDistance-pointDis)/pointDis
 		end
+		local cx = ux+(ux-ex)*f
+		local cy = uy
+		local cz = uz+(uz-ez)*f
+
+		if #cQueue > 0 then
+			if move then
+				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			else
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			end
+		else
+			spGiveOrderToUnit(unitID, CMD_FIGHT, {cx,cy,cz }, CMD_OPT_RIGHT )
+		end
+		
+		data.cx,data.cy,data.cz = cx,cy,cz
+		data.receivedOrder = true
+		return true
+	elseif #cQueue > 0 and move then
+		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 	end
 
 	return false
@@ -526,7 +531,8 @@ local function LoadBehaviour(unitConfigArray, behaviourDefaults)
 				fleeRadar = (behaviourData.fleeRadar or false), 
 				minFleeRange = (behaviourData.minFleeRange or 0), 
 				swarmLeeway = (behaviourData.swarmLeeway or 50), 
-				skirmOrderDis = (behaviourData.skirmOrderDis or 120),
+				skirmOrderDis = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis),
+				velocityPrediction = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction),
 				searchRange = (behaviourData.searchRange or 800),
 				defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
 				fleeOrderDis = (behaviourData.fleeOrderDis or 120)

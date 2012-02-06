@@ -59,7 +59,7 @@ local turretSpeed = 8
 
 --local tiltAngle = math.rad(30)
 local isLanded = true
-local SPECIAL_FIRE_COUNT = 60
+local SPECIAL_FIRE_COUNT = 80
 
 local sound_index = 0
 

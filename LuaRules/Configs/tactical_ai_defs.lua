@@ -140,6 +140,13 @@ merge(artyRangeSkirmieeArray,longRangeSkirmieeArray)
 -- Stuff that mobile AA skirms
 
 local skirmableAir = {
+	["blastwing"] = true,
+	["bladew"] = true,
+	["armkam"] = true,
+	["corape"] = true,
+	["armbrawl"] = true,
+	["blackdawn"] = true,
+	["corbtrans"] = true,
 	["corcrw"] = true,
 }
 
@@ -180,15 +187,15 @@ for name,data in pairs(UnitDefNames) do
 end
 
 -- searchRange(defaults to 800): max range of GetNearestEnemy for the unit.
--- defaultAIState (defaults to 1): (1 or 0) state of AI when unit is initialised
+-- defaultAIState (defaults in config): (1 or 0) state of AI when unit is initialised
 
 --*** skirms(defaults to empty): the table of units that this unit will attempt to keep at max range
 -- skirmEverything (defaults to false): Skirms everything (does not skirm radar with this enabled only)
 -- skirmLeeway: (Weapon range - skirmLeeway) = distance that the unit will try to keep from units while skirming
 -- stoppingDistance (defaults to 0): (skirmLeeway - stoppingDistance) = max distance from target unit that move commands can be given while skirming
 -- skirmRadar (defaults to false): Skirms radar dots
--- skirmOrderDis (defaults to 120): max distance the move order is from the unit when skirming
-
+-- skirmOrderDis (defaults in config): max distance the move order is from the unit when skirming
+-- velocityPrediction (defaults in config): number of frames of enemy velocity prediction for skirming and fleeing
 
 --*** swarms(defaults to empty): the table of units that this unit will jink towards and strafe
 -- maxSwarmLeeway (defaults to Weapon range): (Weapon range - maxSwarmLeeway) = Max range that the unit will begin strafing targets while swarming
@@ -202,6 +209,7 @@ end
 -- swarmEnemyDefaultRange (defaults to 800): range of the enemy used if it cannot be seen.
 -- alwaysJinkFight (defaults to false): If enabled the unit with jink whenever it has a fight command
 -- localJinkOrder (defaults in config): Causes move commands to be given near the unit, otherwise given next to opponent
+
 
 
 --*** flees(defaults to empty): the table of units that this unit will flee like the coward it is!!!
@@ -221,6 +229,8 @@ local behaviourDefaults = {
 	defaultStrafeOrderLength = 100,
 	defaultMinCircleStrafeDistance = 40,
     defaultLocalJinkOrder = true,
+	defaultSkirmOrderDis = 120,
+	defaultVelocityPrediction = 30,
 }
 
 local behaviourConfig = { 
@@ -272,7 +282,8 @@ local behaviourConfig = {
 		maxSwarmLeeway = 35, 
 		swarmLeeway = 50, 
 		jinkTangentLength = 140, 
-		stoppingDistance = 15,
+		stoppingDistance = 10,
+		velocityPrediction = 20,
 	},
 	
 	["armflea"] = {
@@ -311,8 +322,9 @@ local behaviourConfig = {
 		maxSwarmLeeway = 35, 
 		swarmLeeway = 30, 
 		jinkTangentLength = 140, 
-		stoppingDistance = 15,
+		stoppingDistance = 25,
 		minCircleStrafeDistance = 10,
+		velocityPrediction = 20,
 	},
 	["corgator"] = {
 		skirms = shortRangeSkirmieeArray, 
@@ -324,7 +336,8 @@ local behaviourConfig = {
 		maxSwarmLeeway =180, 
 		minSwarmLeeway = 300, 
 		swarmLeeway = 40, 
-		stoppingDistance = 8
+		stoppingDistance = 8,
+		defaultSkirmOrderDis = 150,
 	},
 	
 	["corsh"] = {
@@ -335,7 +348,8 @@ local behaviourConfig = {
 		strafeOrderLength = 180,
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 40, 
-		stoppingDistance = 8
+		stoppingDistance = 8,
+		defaultSkirmOrderDis = 150,
 	},
   
 	["corpyro"] = {
@@ -356,7 +370,8 @@ local behaviourConfig = {
 		circleStrafe = true, 
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 30, 
-		stoppingDistance = 8
+		stoppingDistance = 8,
+		defaultSkirmOrderDis = 150,
 	},
   
 	["panther"] = {
@@ -367,7 +382,8 @@ local behaviourConfig = {
 		strafeOrderLength = 180,
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 50, 
-		stoppingDistance = 15
+		stoppingDistance = 15,
+		defaultSkirmOrderDis = 150,
 	},
 
 	["armpt"] = { -- scout boat
@@ -499,7 +515,9 @@ local behaviourConfig = {
 		flees = {},
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 30, 
+		skirmLeeway = 30,
+		defaultSkirmOrderDis = 200,
+		velocityPrediction = 90,
 	},
 	["dclship"] = {
 		skirms = medRangeSkirmieeArray, 
@@ -549,7 +567,9 @@ local behaviourConfig = {
 		flees = {},
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 30, 
+		skirmLeeway = 30,
+		defaultSkirmOrderDis = 200,
+		velocityPrediction = 60,
 	},
 	
 	-- arty range skirms
@@ -664,7 +684,8 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50, 
+        skirmLeeway = 50,
+		defaultSkirmOrderDis = 200,
 	},
 	["spideraa"] = {
 		skirms = skirmableAir, 
@@ -682,7 +703,8 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50, 
+        skirmLeeway = 50,
+		defaultSkirmOrderDis = 200, 
 	},
 }
 
