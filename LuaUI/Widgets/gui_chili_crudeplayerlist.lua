@@ -721,6 +721,9 @@ function widget:Update(s)
 	timer = timer + s
 	if timer > UPDATE_FREQUENCY then
 		timer = 0
+		if (window_cpl.hidden) then --//don't update when window is hidden.
+			return
+		end
 		if lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height then
 			SetupPlayerNames()	-- size changed; regen everything
 			lastSizeX = window_cpl.width
