@@ -226,8 +226,6 @@ function widget:KeyRelease(key, mods, label, unicode)
 		if mode ~= 7 and tabbedMode then
 			Chili.Screen0:AddChild(window_minimap)
 			tabbedMode = false
-			--// when user exit tabbed mode: the minimap always toggle-up regardless of prior minimized-state. Remove (below) when fixed.  
-			window_minimap.hidden = false 
 		end
 	end
 end

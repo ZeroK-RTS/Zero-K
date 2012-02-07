@@ -289,22 +289,22 @@ function widget:DrawScreen()
 						function(self)
 							if button.winVisible then
 								win.hidden = true -- todo this is needed for minimap to hide self, remove when windows can detect if its on the sreen or not
-                                button.tooltip = 'Expand ' .. button.winName
-                                button.backgroundColor={1,0,0,1}
-                                if not win.selfImplementedMinimizable then
-                                    screen0:RemoveChild(win)
-                                else
-                                    win.selfImplementedMinimizable(false)
-                                end
-                            else 
+								button.tooltip = 'Expand ' .. button.winName
+								button.backgroundColor={1,0,0,1}
+								if not win.selfImplementedMinimizable then
+									screen0:RemoveChild(win)
+								else
+									win.selfImplementedMinimizable(false)
+								end
+							else 
 								win.hidden = false
-                                button.tooltip = 'Minimize ' .. button.winName
+								button.tooltip = 'Minimize ' .. button.winName
 								button.backgroundColor={0,1,0,1}
-                                if not win.selfImplementedMinimizable then
-                                    screen0:AddChild(win)
-                                else
-                                    win.selfImplementedMinimizable(true)
-                                end
+								if not win.selfImplementedMinimizable then
+									screen0:AddChild(win)
+								else
+									win.selfImplementedMinimizable(true)
+								end
 							end 
 							button.winVisible = not button.winVisible
 						end
@@ -318,6 +318,7 @@ function widget:DrawScreen()
 			button:SetPos(pos.x,pos.y, pos.width, pos.height)
 			if not button.winVisible then
 				button.winVisible = true 
+				win.hidden = false
                 button.tooltip = 'Minimize ' .. button.winName
 				button.backgroundColor={0,1,0,1}
 				button:Invalidate()
