@@ -1,4 +1,4 @@
-local versionName = "v3.1"
+local versionName = "v3.11"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -7,7 +7,7 @@ function widget:GetInfo()
     name      = "Avatars",
     desc      = versionName .. " An API for a per-user avatar-icon system, + Hello/Hi protocol",
     author    = "jK, +msafwan",
-    date      = "2009, +2012 (26 Jan)",
+    date      = "2009, +2012 (7 Feb)",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     api       = true,
@@ -1205,7 +1205,7 @@ function UpdatePlayerList()
 end
 
 function InitializeDefaultAvatar(myAvatar, customKeys)
-	--initialize own avatar using fallback
+	--initialize own avatar using the default fallback (Crystal_Personal)
 	myAvatar={
 			checksum = avatar_fallback_checksum,
 			file = avatar_fallback
@@ -1287,10 +1287,12 @@ function widget:Initialize()
 	
 	if operatingModeThis == "A" then
 		if (avatars[myPlayerName]~=nil) then --initialize custom avatar if available
-			if VFS.FileExists(avatars[myPlayerName].file) then --if selected file exist then use it
-				myAvatar.file=avatars[myPlayerName].file
-				myAvatar.checksum=avatars[myPlayerName].checksum
-			end --if we don't have the selective avatar then fallback remains
+			if VFS.FileExists(avatars[myPlayerName].file) then --if selected file exist, then use it
+				if  avatar_fallback_checksum ~= avatars[myPlayerName].checksum then --proceed only if NOT the vanilla default Crystal_Personal
+					myAvatar.file=avatars[myPlayerName].file
+					myAvatar.checksum=avatars[myPlayerName].checksum
+				end --if we don't select more exciting avatar then fallback OR server-default remain
+			end --if we don't have the selected avatar then fallback OR server-default remain
 		end 
 	end
 	SetAvatar(myPlayerName, myAvatar.file, myAvatar.checksum) --save value into table and broadcast 'checkout my new avatar' message
