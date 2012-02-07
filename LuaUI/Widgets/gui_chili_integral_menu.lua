@@ -1059,7 +1059,7 @@ function widget:Initialize()
 		--backgroundColor = {0.1, 0.1, 0.1, 1},
 --		skinName  = "DarkGlass",
 
-		OnMouseDown={ function(self)
+		OnMouseDown={ function(self) --// pressing any button on the integral-menu will open a Game-menu.
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return end
 			WG.crude.OpenPath('Game/Commands')
@@ -1132,6 +1132,11 @@ function widget:Initialize()
 			y = "0%";
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
+			OnMouseDown={ function(self) --//pressing any unit-State button on the integral-menu will open Unit-AI menu, it overrides a similar function above.
+				local alt, ctrl, meta, shift = Spring.GetModKeyState()
+				if not meta then return end
+					WG.crude.OpenPath('Game/Unit AI')
+			end },
 		}
 	end
 	
