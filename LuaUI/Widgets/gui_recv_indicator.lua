@@ -1,4 +1,4 @@
-local versionName = "v1.07"
+local versionName = "v1.1"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -33,7 +33,7 @@ local spValidUnitID = Spring.ValidUnitID
 local spIsAABBInView = Spring.IsAABBInView
 ---------------------------------------------------------------------------------
 local myTeamID_gbl = -1 --//variable: myTeamID
-local receivedUnitList = {} --//variable: store received unitID
+local receivedUnitList_gbl = {} --//variable: store unitID and its corresponding unitPosition
 local givenByTeamID_gbl = -1 --//variable: store sender's ID
 local gameID_to_playerName_gbl = {}
 local knownMarkerPosition_gbl  = {}
@@ -45,10 +45,11 @@ local radiusThreshold_gbl = 300 --//constant: density threshold where border is 
 local waitConstant_gbl = 1 --//constant: default interval (in second) for 'widget:Update()' to be executed
 local waitDuration_gbl = waitConstant_gbl --//variable: determine how frequently 'widget:Update()' is executed
 local markerLife_gbl = 2 --//constant: wait (in second) before marker expired (removed)
+local useMergeSorter_gbl = false --//constant: experiment with merge sorter (slower)
 ---------------------------------------------------------------------------------
 --Add Marker---------------------------------------------------------------------
 -- 1 function. 
-local function AddMarker (cluster, unitIDNoise)
+local function AddMarker (cluster, unitIDNoise, receivedUnitList)
 	local givenByTeamID = givenByTeamID_gbl
 	local gameID_to_playerName = gameID_to_playerName_gbl
 	local knownMarkerPosition = knownMarkerPosition_gbl
@@ -60,7 +61,8 @@ local function AddMarker (cluster, unitIDNoise)
 	for index=1 , #cluster do
 		local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
 		for unitIndex=1, #cluster[index] do
-			local x,y,z=spGetUnitPosition(cluster[index][unitIndex])
+			local unitID = cluster[index][unitIndex]
+			local x,y,z= receivedUnitList[unitID][1],receivedUnitList[unitID][2],receivedUnitList[unitID][3] --// get stored unit position
 			sumX= sumX+x
 			sumY = sumY+y
 			sumZ = sumZ+z
@@ -98,7 +100,8 @@ function widget:Update(n)
 		return
 	end
 	elapsedTime = 0
-	if receivedUnitList~=nil then --// if 'receivedUnitList' is not empty: assume ALL unitID was received, calculate the cluster, and add marker.
+	if receivedUnitList_gbl~=nil then --// if 'receivedUnitList' is not empty: assume ALL unitID was received, calculate the cluster, and add marker.
+		local receivedUnitList = receivedUnitList_gbl
 		local myTeamID = myTeamID_gbl
 		local minimumNeighbor = minimumNeighbor_gbl
 		local neighborhoodRadius = neighborhoodRadius_gbl
@@ -108,10 +111,10 @@ function widget:Update(n)
 		------
 		--cluster, unitIDNoise = DBSCAN_cluster (myTeamID, minimumNeighbor, neighborhoodRadius, cluster, receivedUnitList, unitIDNoise) --//method 1
 		cluster, unitIDNoise = OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, radiusThreshold) --//method 2. Better
-		AddMarker(cluster, unitIDNoise)
+		AddMarker(cluster, unitIDNoise, receivedUnitList)
 		------
 		waitDuration_gbl = waitConstant_gbl --// reset 'widget:Update()' update interval
-		receivedUnitList = {} --//reset 'receivedUnitList' content
+		receivedUnitList_gbl = {} --//reset 'receivedUnitList' content
 	end
 	
 	if #knownMarkerPosition_gbl~= nil and #knownMarkerPosition_gbl~= 0  then
@@ -146,7 +149,8 @@ function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be 
 		if spAreTeamsAllied(unitTeamID, oldTeamID) or notifyCapture_gbl[oldTeamID] then --if from my ally, or from a captured enemy unit
 			--myTeamID_gbl = unitTeamID --//uncomment this and comment 'unitTeamID == myTeamID_gbl' (above) when testing
 			notifyCapture_gbl[oldTeamID] = false
-			receivedUnitList[(#receivedUnitList or 0) +1]=unitID
+			local x,y,z = spGetUnitPosition(unitID)
+			receivedUnitList_gbl[unitID]={x,y,z}
 			givenByTeamID_gbl = oldTeamID
 			waitDuration_gbl = 0.2 -- tell widget:Update() to wait 0.2 more second before start adding mapMarker
 			elapsedTime = 0 -- tell widget:Update() to reset timer
@@ -188,17 +192,14 @@ end
 --GetNeigbors--------------------------------------------------------------------
 -- 1 function.
 local function GetNeighbor (unitID, myTeamID, neighborhoodRadius, receivedUnitList) --//return the unitIDs of specific units around a center unit
-	local x,_,z = spGetUnitPosition(unitID)
+	local x,z = receivedUnitList[unitID][1],receivedUnitList[unitID][3]
 	local tempUnitList = {} 
 	if x ~= nil then --//handle a case where unitID is valid but output a nil
 		local neighborUnits = spGetUnitsInCylinder(x,z, neighborhoodRadius, myTeamID) --//use Spring to return the surrounding units' ID. Get neighbor. Ouput: unitID + my units
 		for k = 1, #neighborUnits do --// try to filter out non-received units from receivedUnitList
 			local match = false
-			for j= 1, #receivedUnitList do
-				if neighborUnits[k] ==receivedUnitList[j] then --and neighborUnits[k]~=unitID then --//if unit is among the received-unit-list, then accept
-					match = true
-					break
-				end
+			if receivedUnitList[neighborUnits[k]] then --and neighborUnits[k]~=unitID then --//if unit is among the received-unit-list, then accept
+				match = true
 			end
 			if match then --//if unit is among the received-unit-list then remember it
 				local unitListLenght = #tempUnitList or 0
@@ -210,8 +211,8 @@ local function GetNeighbor (unitID, myTeamID, neighborhoodRadius, receivedUnitLi
 end
 
 ---------------------------------------------------------------------------------
---OPTICS function----------------------------------------------------------------
---6 function
+--Pre-SORTING function----------------------------------------------------------------
+--2 function
 local function InsertOrderSeed (orderSeed, unitID_to_orderSeedMeta, unitID, objects) --//stack tiny values at end of table, and big values at start of table.
 	local orderSeedLenght = #orderSeed or 0 --//code below can handle both: table of lenght 0 and >1
 	local insertionIndex = orderSeedLenght
@@ -278,21 +279,61 @@ local function ShiftOrderSeed (orderSeed, unitID_to_orderSeedMeta, unitID, objec
 	end
 	return orderSeed, unitID_to_orderSeedMeta
 end
+---------------------------------------------------------------------------------
+--Merge-SORTING function----------------------------------------------------------------
+--2 function. Reference: http://www.algorithmist.com/index.php/Merge_sort.c
+local function merge(left, right)
+	local unitID_to_orderSeedMeta = {}
+    local result ={} --var list result
+    while #left>0 or #right>0 do --while length(left) > 0 or length(right) > 0
+        if #left > 0 and #right > 0 then --if length(left) > 0 and length(right) > 0
+            if left[1].content.reachability_distance >= right[1].content.reachability_distance then --if first(left) >= first(right). Stack Big value at start of table, and Tiny value at end of table
+                result[(#result or 0)+1] =left[1]--append first(left) to result
+				unitID_to_orderSeedMeta[left[1].unitID]=#result
+				table.remove(left,1) --left = rest(left)
+            else
+                result[(#result or 0)+1] =right[1]--append first(right) to result
+				unitID_to_orderSeedMeta[right[1].unitID]=#result
+				table.remove(right,1) --right = rest(right)
+			end
+        elseif #left > 0 then --else if length(left) > 0
+            result[(#result or 0)+1] =left[1] --append first(left) to result
+			unitID_to_orderSeedMeta[left[1].unitID]=#result
+            table.remove(left,1) --left = rest(left)
+        elseif #right > 0 then --else if length(right) > 0
+            result[(#result or 0)+1] =right[1] --append first(right) to result
+			unitID_to_orderSeedMeta[right[1].unitID]=#result
+            table.remove(right,1) --right = rest(right)
+		end
+    end --end while
+    return result, unitID_to_orderSeedMeta
+end
 
--- OrderSeeds::update(neighbors, CenterObject);
--- c_dist := CenterObject.core_distance;
--- FORALL Object FROM neighbors DO
--- IF NOT Object.Processed THEN
--- new_r_dist:=max(c_dist,CenterObject.dist(Object));
--- IF Object.reachability_distance=UNDEFINED THEN
--- Object.reachability_distance := new_r_dist;
--- insert(Object, new_r_dist);
--- ELSE // Object already in OrderSeeds
--- IF new_r_dist<Object.reachability_distance THEN
--- Object.reachability_distance := new_r_dist;
--- decrease(Object, new_r_dist);
--- END; // OrderSeeds::update
-
+local function merge_sort(m)
+    --// if list size is 1, consider it sorted and return it
+    if #m <=1 then--if length(m) <= 1
+        return m
+	end
+    --// else list size is > 1, so split the list into two sublists
+    local left, right = {}, {} --var list left, right
+    local middle = math.ceil(#m/2) --var integer middle = length(m) / 2
+    for i= 1, middle, 1 do --for each x in m up to middle
+         left[(#left or 0)+1] = m[i] --add x to left
+	end
+    for j= #m, middle+1, -1 do--for each x in m after or equal middle
+         right[(j-middle)] = m[j]--add x to right
+	end
+    --// recursively call merge_sort() to further split each sublist
+    --// until sublist size is 1
+    left = merge_sort(left)
+    right = merge_sort(right)
+    --// merge the sublists returned from prior calls to merge_sort()
+    --// and return the resulting merged sublist
+    return merge(left, right)
+end
+---------------------------------------------------------------------------------
+--OPTICS function----------------------------------------------------------------
+--5 function
 local function OrderSeedsUpdate(neighborsID, currentUnitID,objects, orderSeed,unitID_to_orderSeedMeta)
 	local c_dist = objects[currentUnitID].core_distance
 	for i=1, #neighborsID do
@@ -301,16 +342,28 @@ local function OrderSeedsUpdate(neighborsID, currentUnitID,objects, orderSeed,un
 			local new_r_dist = math.ceil(c_dist, Spring.GetUnitSeparation(currentUnitID, neighborsID[i]))
 			if objects[neighborsID[i]].reachability_distance==nil then
 				objects[neighborsID[i]].reachability_distance = new_r_dist
-				orderSeed, unitID_to_orderSeedMeta = InsertOrderSeed (orderSeed, unitID_to_orderSeedMeta, neighborsID[i],objects)
+				if useMergeSorter_gbl then
+					orderSeed[(#orderSeed or 0)+1] = {unitID = neighborsID[i], content = objects[neighborsID[i]]}
+					unitID_to_orderSeedMeta[neighborsID[i]] = #orderSeed
+				else				
+					orderSeed, unitID_to_orderSeedMeta = InsertOrderSeed (orderSeed, unitID_to_orderSeedMeta, neighborsID[i],objects)
+				end
 			else --// object already in OrderSeeds
 				if new_r_dist< objects[neighborsID[i]].reachability_distance then
 					objects[neighborsID[i]].reachability_distance = new_r_dist
-					orderSeed, unitID_to_orderSeedMeta = ShiftOrderSeed(orderSeed, unitID_to_orderSeedMeta, neighborsID[i], objects)
+					if useMergeSorter_gbl then
+						local oldPosition = unitID_to_orderSeedMeta[neighborsID[i]]
+						orderSeed[oldPosition] = {unitID = neighborsID[i], content = objects[neighborsID[i]]} -- update values
+					else
+						orderSeed, unitID_to_orderSeedMeta = ShiftOrderSeed(orderSeed, unitID_to_orderSeedMeta, neighborsID[i], objects)
+					end
 				end
 			end
 		end
 	end
-	--table.sort(orderSeed, function(a,b) return a.content.reachability_distance > b.content.reachability_distance end)
+	if useMergeSorter_gbl then 
+		orderSeed, unitID_to_orderSeedMeta = merge_sort(orderSeed) --sort based on reachability distance, and also update unitID_to_orderSeedMeta table respectively
+	end
 	return orderSeed, objects, unitID_to_orderSeedMeta
 end
 
@@ -321,38 +374,41 @@ local function SetCoreDistance(neighborsID, minimumNeighbor, unitID, myTeamID)
 			local distance = Spring.GetUnitSeparation (unitID, neighborsID[i])
 			neighborsDist[i]= distance --//add distance value
 		end
+		local count = 1
 		table.sort(neighborsDist, function(a,b) return a < b end)
-		return neighborsDist[minimumNeighbor] --//return the shortest distance to the minimumNeigbor'th unit.
+		return neighborsDist[minimumNeighbor] --//return the distance of the minimumNeigbor'th unit with respect to the center unit.
 	else
 		return nil
 	end
 end
 
--- ExpandClusterOrder(SetOfObjects, Object, e, MinPts, OrderedFile);
--- neighbors := SetOfObjects.neighbors(Object, e);
--- Object.Processed := TRUE;
--- Object.reachability_distance := UNDEFINED;
--- Object.setCoreDistance(neighbors, e, MinPts);
--- OrderedFile.write(Object);
--- IF Object.core_distance <> UNDEFINED THEN
--- OrderSeeds.update(neighbors, Object);
--- WHILE NOT OrderSeeds.empty() DO
--- currentObject := OrderSeeds.next();
--- neighbors:=SetOfObjects.neighbors(currentObject, e);
--- currentObject.Processed := TRUE;
--- currentObject.setCoreDistance(neighbors, e, MinPts);
--- OrderedFile.write(currentObject);
--- IF currentObject.core_distance<>UNDEFINED THEN
--- OrderSeeds.update(neighbors, currentObject);
--- END; // ExpandClusterOrder
+local function ExtractDBSCAN_Clustering (unitID, currentClusterID, cluster, noiseIDList, objects, neighborhoodRadius_alt)
+	--// Precondition: neighborhoodRadius_alt <= generating dist neighborhoodRadius for Ordered Objects
+	if (objects[unitID].reachability_distance or 999) > neighborhoodRadius_alt then --// UNDEFINED > neighborhoodRadius. ie: Not reachable from outside
+		if (objects[unitID].core_distance or 999) <= neighborhoodRadius_alt then --//has neighbor
+			currentClusterID = (currentClusterID or 0) + 1 --//create new cluster
+			cluster[currentClusterID] = cluster[currentClusterID] or {} --//initialize array
+			local arrayIndex = (#cluster[currentClusterID] or 0) + 1
+			cluster[currentClusterID][arrayIndex] = unitID --//add to new cluster
+		else --//if has no neighbor
+			local arrayIndex = (#noiseIDList or 0) +1
+			noiseIDList[arrayIndex]= unitID --//add to noise list
+		end
+	else --// object.reachability_distance <= neighborhoodRadius_alt. ie:reachable
+		local arrayIndex = (#cluster[currentClusterID] or 0) + 1
+		cluster[currentClusterID][arrayIndex] = unitID--//add to current cluster
+	end
 
-local function ExpandClusterOrder(receivedUnitList, unitID, neighborhoodRadius, minimumNeighbor,orderedFile, myTeamID,objects)
+	return cluster, noiseIDList, currentClusterID
+end
+
+local function ExpandClusterOrder(receivedUnitList, unitID, neighborhoodRadius, neighborhoodRadius_alt, minimumNeighbor, myTeamID,objects, currentClusterID, cluster, noiseIDList)
 	local neighborsID = GetNeighbor (unitID, myTeamID, neighborhoodRadius, receivedUnitList)
 	objects[unitID].processed = true
 	objects[unitID].reachability_distance = nil
 	objects[unitID].core_distance = SetCoreDistance(neighborsID, minimumNeighbor, unitID, myTeamID)
-	orderedFile[(#orderedFile or 0) +1]= {unitID=unitID, content = objects[unitID]}
-	if objects[unitID].core_distance ~= nil then
+	cluster, noiseIDList, currentClusterID = ExtractDBSCAN_Clustering (unitID, currentClusterID, cluster, noiseIDList, objects, neighborhoodRadius_alt)
+	if objects[unitID].core_distance ~= nil then --//it have neighbor
 		local orderSeed ={} 
 		local unitID_to_orderSeedMeta = {}
 		orderSeed, objects, unitID_to_orderSeedMeta = OrderSeedsUpdate(neighborsID, unitID, objects, orderSeed,unitID_to_orderSeedMeta)
@@ -363,93 +419,29 @@ local function ExpandClusterOrder(receivedUnitList, unitID, neighborhoodRadius, 
 			local neighborsID_ne = GetNeighbor (currentUnitID, myTeamID, neighborhoodRadius, receivedUnitList)
 			objects[currentUnitID].processed = true
 			objects[currentUnitID].core_distance = SetCoreDistance(neighborsID_ne, minimumNeighbor, currentUnitID, myTeamID)
-			orderedFile[(#orderedFile or 0) +1]= {unitID=currentUnitID, content = objects[currentUnitID]}
+			cluster, noiseIDList, currentClusterID = ExtractDBSCAN_Clustering (currentUnitID, currentClusterID, cluster, noiseIDList, objects, neighborhoodRadius_alt)
 			if objects[currentUnitID].core_distance~=nil then
 				orderSeed, objects,unitID_to_orderSeedMeta = OrderSeedsUpdate(neighborsID_ne, currentUnitID, objects, orderSeed, unitID_to_orderSeedMeta)
 			end
 		end
 	end
-	return orderedFile, objects
+	return objects, cluster, noiseIDList, currentClusterID
 end
-
--- ExtractDBSCAN-Clustering (ClusterOrderedObjs,e-, MinPts)
--- // Precondition: e' £ generating dist e for ClusterOrderedObjs
--- ClusterId := NOISE;
--- FOR i FROM 1 TO ClusterOrderedObjs.size DO
--- Object := ClusterOrderedObjs.get(i);
--- IF Object.reachability_distance > e- THEN
--- // UNDEFINED > e
--- IF Object.core_distance £ e- THEN
--- ClusterId := nextId(ClusterId);
--- Object.clusterId := ClusterId;
--- ELSE
--- Object.clusterId := NOISE;
--- ELSE // Object.reachability_distance £ e-
--- Object.clusterId := ClusterId;
--- END; // ExtractDBSCAN-Clustering
-
-local function ExtractDBSCAN_Clustering (clusterOrderedObjs, neighborhoodRadius_alt)
-	--// Precondition: neighborhoodRadius_alt <= generating dist neighborhoodRadius for clusterOrderedObjs
-	local clusterID = nil
-	for i=1, #clusterOrderedObjs do
-		--Spring.Echo(clusterOrderedObjs[i].unitID)
-		local object = clusterOrderedObjs[i].content
-		if (object.reachability_distance or 999) > neighborhoodRadius_alt then
-			--// UNDEFINED > neighborhoodRadius
-			if (object.core_distance or 999) <= neighborhoodRadius_alt then
-				clusterID = (clusterID or 0) + 1
-				object.clusterID = clusterID
-			else
-				object.clusterID = nil
-			end
-		else --// object.reachability_distance <= neighborhoodRadius_alt
-			object.clusterID = clusterID
-		end
-		clusterOrderedObjs[i].content=object
-	end
-	
-	local cluster = {}
-	local noiseIDList = {}
-	for i=1, #clusterOrderedObjs do
-		local object = clusterOrderedObjs[i].content
-		if (object.clusterID ~= nil) then 
-			if cluster[object.clusterID] == nil then
-				cluster[object.clusterID] = {}
-			end
-			local listLenght = (#cluster[object.clusterID] or 0) + 1
-			cluster[object.clusterID][listLenght]= clusterOrderedObjs[i].unitID
-		else 
-			noiseIDList[(#noiseIDList or 0) +1]=clusterOrderedObjs[i].unitID
-		end
-	end
-	return cluster, noiseIDList
-end
-
--- Algorithm OPTICS
--- OPTICS (SetOfObjects, e, MinPts, OrderedFile)
--- OrderedFile.open();
--- FOR i FROM 1 TO SetOfObjects.size DO
--- Object := SetOfObjects.get(i);
--- IF NOT Object.Processed THEN
--- ExpandClusterOrder(SetOfObjects, Object, e,
--- MinPts, OrderedFile)
--- OrderedFile.close();
--- END; // OPTICS
 
 function OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, neighborhoodRadius_alt)
-	local orderedFile = {}
 	local objects={}
-	for i=1, #receivedUnitList do
-		local unitID =receivedUnitList[i]
+	local cluster = {}
+	local noiseIDList = {}
+	local currentClusterID = nil
+	for unitID,_ in pairs(receivedUnitList) do
 		objects[unitID] = objects[unitID] or {}
 		if (objects[unitID].processed ~= true) then
-			orderedFile,objects = ExpandClusterOrder(receivedUnitList,unitID, neighborhoodRadius,minimumNeighbor, orderedFile, myTeamID,objects)
+			objects, cluster, noiseIDList, currentClusterID = ExpandClusterOrder(receivedUnitList,unitID, neighborhoodRadius, neighborhoodRadius_alt,minimumNeighbor, myTeamID,objects, currentClusterID, cluster, noiseIDList)
 		end
 	end
-	local cluster, unitIDNoise = ExtractDBSCAN_Clustering (orderedFile, neighborhoodRadius_alt)
-	return cluster, unitIDNoise
-end
-	
+	--local cluster, noiseIDList = ExtractDBSCAN_Clustering (orderedFile, neighborhoodRadius_alt)
+	return cluster, noiseIDList
+end	
 ---------------------------------------------------------------------------
 --DBSCAN function----------------------------------------------------------
 --1 function. Not yet debugged
@@ -517,58 +509,7 @@ function DBSCAN_cluster(myTeamID, minimumNeighbor, neighborhoodRadius, cluster, 
 	end --//for i=1, i <= #receivedUnitList,1
 	return cluster, unitIDNoise
 end
-------------------------------------------------------------------------
---OPTIC pseudocode 2----------------------------------------------------------------------
---[[ --Not yet debugged
-local function update_optics(N, p, Seeds, eps, Minpts)
-	local coredist = p.core_distance
-	local unitID_to_Seeds={}
-	for j=1, #N do
-		local o = {unitID = N[1], reachability_distance= nil, processed=false}
-		if (o.processed==false) then
-		local new-reach-dist = math.ceil(coredist, Spring.GetUnitSeparation(p.unitID, o.unitID))
-		if (o.reachability-distance == nil) --// o is not in Seeds
-			  o.reachability-distance = new-reach-dist
-			  Seeds[(#Seeds or 0) + 1) = o
-		else               --// o in Seeds, check for improvement
-			if (new-reach-dist < o.reachability-distance)
-				o.reachability-distance = new-reach-dist
-				Seeds, unitID_to_Seeds = ShiftOrderSeedUpward(Seeds, unitID_to_Seeds, o.unitID)
-			end
-		end
-	end
-	table.sort(Seeds, function(a,b) return a.reachability_distance > b.reachability_distance end)
-	return Seeds
-end
 
-function OPTICS_second(DB, eps, MinPts, myTeamID)
-	local orderedList={}
-	for i=1, #DB do 
-		local p = {unitID= DB[i], reachability_distance=nil, processed=false}
-		if (p.processed==false) then
-			local N = GetNeighbor(q.unitID, myTeamID, eps, DB)
-			p.processed=true
-			orderedList[(#orderedList or 0)+1]=p
-			local Seeds = {}
-			p.core_distance = SetCoreDistance(N, MinPts, p.unitID, myTeamID)
-			if (p.core_distance ~= nil)
-				Seeds = update_optics(N, p, Seeds, eps, Minpts)
-				while #Seeds~=nil do 
-					local q = Seeds[#Seeds]
-					Seeds[#Seeds]=nil
-					local N' = GetNeighbor (q.unitID, myTeamID, eps, DB)
-					q.processed = true
-					orderedList[(#orderedList or 0)+1]=q
-					q.core_distance = SetCoreDistance(N', MinPts, q.unitID, myTeamID)
-					if (q.core_distance ~= nil)
-						Seeds = update_optics(N', p, Seeds, eps, Minpts)
-					end
-				end
-			end
-		end
-	end	
-end
---]]
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 --Reference:
