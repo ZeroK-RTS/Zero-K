@@ -156,6 +156,12 @@ options = {
 		value = true,
 		desc = "Write the team number next to each player's name (rather than only for first player)",
 		OnChange = function() SetupPlayerNames() end,
+	},
+	debugMessages = {
+		name = "Enable debug messages",
+		type = 'bool',
+		value = false,
+		desc = "Enables some debug messages (disable if it starts flooding console)",
 	},	
 }
 
@@ -527,7 +533,6 @@ local function AddEntity(entity, teamID, allyTeamID)
 			file = cpuPic,
 			keepAspect = false,
 		}
-		--Spring.Echo(cpuImg.height, cpuImg)
 		function cpuImg:HitTest(x,y) return self end
 		entity.cpuImg = cpuImg
 		scroll_cpl:AddChild(cpuImg)
@@ -589,6 +594,9 @@ local function AddAllyTeam(allyTeamID)
 end
 
 SetupPlayerNames = function()
+	if options.debugMessages.value then
+		Spring.Echo("Generating playerlist")
+	end
 	entities = {}
 	teams = {}
 	allyTeams = {}
