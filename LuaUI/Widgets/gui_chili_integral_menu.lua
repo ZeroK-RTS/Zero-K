@@ -12,7 +12,7 @@ function widget:GetInfo()
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010",
     license   = "GNU GPL, v2 or later",
-    layer     = math.huge,
+    layer     = math.huge-1,
     enabled   = true,
 	handler   = true,
   }
