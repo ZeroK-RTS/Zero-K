@@ -101,8 +101,8 @@ pingCpuColors = {
 }
 
 local sharePic        = ":n:"..LUAUI_DIRNAME.."Images/playerlist/share.png"
-local cpuPic		  = ":n:"..LUAUI_DIRNAME.."Images/advplayerslist/cpu.png"
-local pingPic		  = ":n:"..LUAUI_DIRNAME.."Images/advplayerslist/ping.png"
+local cpuPic		  = ":n:"..LUAUI_DIRNAME.."Images/playerlist/cpu.png"
+local pingPic		  = ":n:"..LUAUI_DIRNAME.."Images/playerlist/ping.png"
 
 --local show_spec = false
 local localTeam = 0
