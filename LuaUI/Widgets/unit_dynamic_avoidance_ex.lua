@@ -1,4 +1,4 @@
-local versionName = "v1.81"
+local versionName = "v1.83"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -68,10 +68,10 @@ local activateImpatienceG=0 --auto disable auto-reverse and half the distanceCON
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
 local safetyMarginCONSTANTunitG = 0.0 --obstacle graph offset (a "safety margin" constant). Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.0 radian)
 local smCONSTANTunitG		= 0.0  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.0 radian)
-local aCONSTANTg			= {math.pi/10 , math.pi/4} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD, ATTACK)) max value: math.pi/2
-local obsCONSTANTg			= {math.pi/10, math.pi/4} -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian (MOVE), math.pi/4 (GUARD, ATTACK))
---aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction.
---an antagonist to aCONSTANg (obsCONSTANTg)/obstacle graph also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy.
+local aCONSTANTg			= {math.pi/10 , math.pi/4} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD, ATTACK)) max value: math.pi/2.
+local obsCONSTANTg			= {math.pi/10, math.pi/4} -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian (MOVE), math.pi/4 (GUARD, ATTACK)). 
+--aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction. Activated by 'graphCONSTANTtrigger[1]'
+--an antagonist to aCONSTANg (obsCONSTANTg or obstacle graph) also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy, but already normalized. Activated by 'graphCONSTANTtrigger[2]'
 local windowingFuncMultG = 1 --? (default = 1 multiplier)
 
 -- Obstacle/Target competetive interaction constant:
@@ -79,13 +79,6 @@ local cCONSTANT1g 			= 1 --attractor constant; effect the behaviour. ie: the sel
 local cCONSTANT2g			= 1 --repulsor constant; effect behaviour. (default = 2 multiplier)
 local gammaCONSTANT2and1g	= 0.05 -- balancing constant; effect behaviour. . (default = 0.05 multiplier)
 local alphaCONSTANT1g		= 0.4 -- balancing constant; effect behaviour. (default = 0.4 multiplier)
-
--- Distance or velocity constant:
-local timeToContactCONSTANTg=0.5 --the time scale; for time to collision calculation (default = 0.5 second). Will change based on user's Ping
-local safetyDistanceCONSTANTg=205 --range toward an obstacle before unit auto-reverse (default = 205 meter, ie: half of ZK's stardust range) reference:80 is a size of BA's solar
-local extraLOSRadiusCONSTANTg=205 --add additional distance for unit awareness over the default LOS. (default = +200 meter radius, ie: to 'see' radar blip)
-local velocityScalingCONSTANTg=1 --decrease/increase command lenght. (default= 1 multiplier)
-local velocityAddingCONSTANTg=10 --minimum speed. Add or remove minimum command lenght (default = 0 meter/second)
 
 --Move Command constant:
 local halfTargetBoxSize = {400, 0, 185, 50} --the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
@@ -101,12 +94,19 @@ local maximumTurnAngleG = math.pi --safety measure. Prevent overturn (eg: 360+xx
 --pi is 180 degrees
 
 --Update constant:
-local doCalculation_then_gps_delayG = 0.3 --elapsed second before gathering preliminary data for issuing new command (default: < gps_then_DoCalculation_delayG)
-local gps_then_DoCalculation_delayG = 0.45 --elapsed second before issuing new command (default: < 0.5)
+local doCalculation_then_gps_delayG = 0.25 --elapsed second (Wait) before gathering preliminary data for issuing command (default: 0.25)
+local gps_then_DoCalculation_delayG = 0.25 --elapsed second (Wait) before issuing new command (default: 0.25)
+
+-- Distance or velocity constant:
+local timeToContactCONSTANTg= doCalculation_then_gps_delayG + gps_then_DoCalculation_delayG --time scale for move command; to calculate collision calculation & command lenght (default = 0.5 second). Will change based on user's Ping
+local safetyDistanceCONSTANTg=205 --range toward an obstacle before unit auto-reverse (default = 205 meter, ie: half of ZK's stardust range) reference:80 is a size of BA's solar
+local extraLOSRadiusCONSTANTg=205 --add additional distance for unit awareness over the default LOS. (default = +200 meter radius, ie: to 'see' radar blip)
+local velocityScalingCONSTANTg=1 --scale command lenght. (default= 1 multiplier)
+local velocityAddingCONSTANTg=10 --add or remove command lenght (default = 0 meter/second)
 
 --Engine based wreckID correction constant:
-local wreckageID_offset_multiplier = 0 --for 0.82 this is 1500
-local wreckageID_offset_initial = 32000	--for 0.82 this is 4500
+local wreckageID_offset_multiplier = 0 --for Spring 0.82 this is 1500
+local wreckageID_offset_initial = 32000	--for Spring 0.82 this is 4500
 --curModID = upper(Game.modShortName)
 
 --Weapon Reload and Shield constant:
@@ -168,40 +168,37 @@ function widget:Update()
 	local surroundingOfActiveUnit=surroundingOfActiveUnitG
 	local cycle = cycleG
 	local skippingTimer = skippingTimerG
-	local timeToContactCONSTANT=timeToContactCONSTANTg
 	local attacker = attackerG
 	-----
 	local now=spGetGameSeconds()
-	if (now >= skippingTimer[1]) then --if "now" is 1.1 second after last update then do "RefreshUnitList()"
+	if (now >= skippingTimer[1]) then --wait until 'skippingTimer[1] second', then do "RefreshUnitList()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
-		unitInMotion, attacker=RefreshUnitList(attacker) --add relevant unit to unitlist/unitInMotion
-		local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --set unit update based on ping or every 1.1 second
-		skippingTimer[1]=now+projectedDelay
+		unitInMotion, attacker=RefreshUnitList(attacker) --create unit list
+		
+		local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --create list every 1.1 second, or every each second of lag.
+		skippingTimer[1]=now+projectedDelay --wait until next 'skippingTimer[1] second'
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 	end
 	
-	if (now >=skippingTimer[2] and cycle==1) and roundTripComplete then --if now is 0.1 second after last update & already unlocked by echo from server then do "GetPreliminarySeparation()"
+	if (now >=skippingTimer[2] and cycle==1) and roundTripComplete then --wait until 'skippingTimer[2] second', and wait for 'LUA message received', and wait for 'cycle==1', then do "GetPreliminarySeparation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 		surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
-		cycle=2 --send next cycle to "DoCalculation()" function
+		cycle=2 --set to 'cycle==2'
 		
-		skippingTimer = ActualNetworkDelay(1, skippingTimer, nil, nil ,now) --measure network delay
-		skippingTimer[2] = now+ gps_then_DoCalculation_delayG --delay next cycle by an additional 0.4 second. This allow reliable unit direction to be derived from unit's speed
+		skippingTimer = CalculateNetworkDelay(1, skippingTimer, now) --update delay statistic. Record 'roundTripComplete'.
+		skippingTimer[2] = now+ gps_then_DoCalculation_delayG --wait until 'gps_then_DoCalculation_delayG'. The longer the better. The delay allow reliable unit direction to be derived from unit's motion
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 	end
-	if (now >=skippingTimer[2] and cycle==2) then --if now is 0.5 second after last update & already executed GetPreliminarySeparation() then do "DoCalculation()"
+	if (now >=skippingTimer[2] and cycle==2) then --wait until 'skippingTimer[2] second', and wait for 'cycle==2', then do "DoCalculation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
-		commandIndexTable=DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker) --initiate the avoidance
-		cycle=1 --send next cycle back to "GetPreliminarySeparation()" function
+		local networkDelay = CalculateNetworkDelay(0, skippingTimer, nil) --retrieve delay statistic
+		commandIndexTable=DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay) --initiate avoidance system
+		cycle=1 --set to 'cycle==1'
 		
-		--local projectedDelay=ReportedNetworkDelay(myPlayerID, 0.5) --get the reported ping
-		skippingTimer[2]=now+ doCalculation_then_gps_delayG ---set next execution 0.1 second later
-		local networkDelay = ActualNetworkDelay(0, skippingTimer, doCalculation_then_gps_delayG, gps_then_DoCalculation_delayG, nil) --get network delay
-		timeToContactCONSTANT= networkDelay --extend command lenght by as much as the network delay
-		
-		skippingTimer = ActualNetworkDelay(2, skippingTimer, nil, nil, now) --set timestamp
-		spSendLuaUIMsg(dummyIDg) --send ping to server
-		roundTripComplete = false --lock execution until receive echo from server
+		skippingTimer[2]=now+ doCalculation_then_gps_delayG --wait until 'doCalculation_then_gps_delayG'. Is arbitrarily set. Save CPU by setting longer wait.
+		skippingTimer = CalculateNetworkDelay(2, skippingTimer, now) --prepare delay statistic for new measurement
+		spSendLuaUIMsg(dummyIDg) --send ping to server. Wait for answer
+		roundTripComplete = false --Wait for 'LUA message Receive'.
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
 	end
 
@@ -215,7 +212,6 @@ function widget:Update()
 	surroundingOfActiveUnitG=surroundingOfActiveUnit
 	cycleG = cycle
 	skippingTimerG = skippingTimer
-	timeToContactCONSTANTg=timeToContactCONSTANT
 	attackerG = attacker
 	-----
 end
@@ -337,7 +333,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 end
 
 --perform the actual collision avoidance calculation and send the appropriate command to unit
-function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
+function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay)
 	if surroundingOfActiveUnit[1]~=nil then --if flagged as nil then no stored content then this mean there's no relevant unit
 		for i=2,surroundingOfActiveUnit[1], 1 do --index 1 is for array's lenght
 			local unitID=surroundingOfActiveUnit[i][1]
@@ -366,7 +362,7 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
 				local lastPosition = surroundingOfActiveUnit[i][9]
 				local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --get new unit separation for comparison
 				local graphCONSTANTtrigger = surroundingOfActiveUnit[i][10] --//fetch information on which aCONSTANT and obsCONSTANT to use
-				local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger) --calculate move solution
+				local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay) --calculate move solution
 				local newY=spGetGroundHeight(newX,newZ)
 				commandIndexTable= InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand) --send move solution to unit
 				if (turnOnEcho == 1) then
@@ -379,9 +375,9 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
 	return commandIndexTable
 end
 
-function widget:RecvLuaMsg(msg, playerID) --receive echo from server
+function widget:RecvLuaMsg(msg, playerID) --receive echo from server ('LUA message Receive')
 	if msg:sub(1,3) == dummyIDg and playerID == myPlayerID then
-		roundTripComplete = true
+		roundTripComplete = true --unlock system
 	end
 end
 
@@ -392,24 +388,23 @@ function ReportedNetworkDelay(playerIDa, defaultDelay)
 	end
 end
 
-function ActualNetworkDelay(reportingIn, skippingTimer,doCalculation_then_gps_delay,gps_then_DoCalculation_delay, now)
-	if reportingIn == 0 then
+function CalculateNetworkDelay(reportingIn, skippingTimer, now)
+	if reportingIn == 0 then --report known delay statistic
 		local delay = 0
-		local systemDelay = doCalculation_then_gps_delay+ gps_then_DoCalculation_delay --delay artificially imposed
-		local instantaneousCommandDelay = skippingTimer.networkDelay+ systemDelay --delay at this instant
-		local averageDelay = skippingTimer.sumOfAllNetworkDelay/skippingTimer.sumCounter + systemDelay --delay from previous history (an average)
-		if instantaneousCommandDelay < averageDelay then --prevent random Network fluctuation from shortening command lenght too much
+		local instantaneousDelay = skippingTimer.networkDelay --delay current lag
+		local averageDelay = skippingTimer.sumOfAllNetworkDelay/skippingTimer.sumCounter --average delay
+		if instantaneousDelay < averageDelay then --bound all delay to be > than average delay
 			delay = averageDelay 
 		else
-			delay = instantaneousCommandDelay
+			delay = instantaneousDelay
 		end 
 		return delay
-	elseif reportingIn == 1 then
-		skippingTimer.networkDelay = now - skippingTimer.echoTimestamp --get the delay between previous Command and latest unlock
-		skippingTimer.sumOfAllNetworkDelay=skippingTimer.sumOfAllNetworkDelay + skippingTimer.networkDelay
-		skippingTimer.sumCounter = skippingTimer.sumCounter + 1
+	elseif reportingIn == 1 then --update delay statistic
+		skippingTimer.networkDelay = now - skippingTimer.echoTimestamp --get the delay between previous Command and the latest 'LUA message Receive'
+		skippingTimer.sumOfAllNetworkDelay=skippingTimer.sumOfAllNetworkDelay + skippingTimer.networkDelay --sum all the delay ever recorded
+		skippingTimer.sumCounter = skippingTimer.sumCounter + 1 --count all the delay ever recorded
 		return skippingTimer
-	elseif reportingIn == 2 then
+	elseif reportingIn == 2 then --update delay statistic
 		skippingTimer.echoTimestamp = now	--remember the current time of sending ping
 		return skippingTimer
 	end
@@ -664,7 +659,7 @@ function GetImpatience(newCommand, unitID, commandIndexTable)
 	return impatienceTrigger, commandIndexTable
 end
 
-function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger)
+function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay)
 	if (unitID~=nil) and (targetCoordinate ~= nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
 		local aCONSTANT 			= aCONSTANTg --attractor constant (amplitude multiplier)
 		local unitDirection, _		= GetUnitDirection(unitID, lastPosition) --get unit direction
@@ -691,7 +686,7 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal)
 		--convert an angular command into a coordinate command
-		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor)
+		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay)
 		if (turnOnEcho == 1) then
 			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
 			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
@@ -861,7 +856,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+			Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target")
 		end
 		if #cQueue >= queueIndex+1 then
 			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --//if reclaim or ressurect then identify area reclaim
@@ -875,7 +870,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		commandIndexTable[unitID]["backupTargetY"]=cQueue[queueIndex].params[2]
 		commandIndexTable[unitID]["backupTargetZ"]=cQueue[queueIndex].params[3]
 		boxSizeTrigger=1 --//deactivation boxsize for MOVE command
-		graphCONSTANTtrigger[1] = 1
+		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125 then --reclaim or ressurect
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
@@ -910,19 +905,23 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 				isAreaMode = true
 			else
-				--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+				Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
 			end
 		end
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
 		commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=wreckPosY
 		commandIndexTable[unitID]["backupTargetZ"]=wreckPosZ
+		--graphCONSTANTtrigger[1] = 2 --use bigger angle scale for initial avoidance: after that is a MOVE command to the center or area-command which uses standard angle scale (take ~4 cycle to do 180 flip, but more chaotic) 
+		--graphCONSTANTtrigger[2] = 2
+		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
+		graphCONSTANTtrigger[2] = 1
 		boxSizeTrigger=2
 		if not isAreaMode and (cQueue[queueIndex+1].params[3]==nil or cQueue[queueIndex+1].id == CMD_STOP) then --signature for discrete reclaim/ressurect command
 			boxSizeTrigger = 3 --change to boxsize similar to repair command
+			--graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
+			--graphCONSTANTtrigger[2] = 1
 		end
-		graphCONSTANTtrigger[1] = 1
-		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[queueIndex].id==40 then --repair command
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		local targetUnitID=cQueue[queueIndex].params[1]
@@ -932,7 +931,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --if no unit then use coordinate
 			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+			Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
@@ -944,7 +943,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 	elseif cQueue[1].id == cMD_DummyG then
 		targetCoordinate = {-1, -1,-1} --no target (only avoidance)
 		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached"
-		graphCONSTANTtrigger[1] = nil --//value not needed; because avoidance while not seen (cMD_DummyG) don't use attractor 
+		graphCONSTANTtrigger[1] = nil --//value not needed; because avoidance of 'cMD_DummyG' don't use attractor 
 		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[queueIndex].id == CMD_GUARD then
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
@@ -954,15 +953,15 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			unitDirection, unitPosY = GetUnitDirection(targetUnitID, {nil,nil}) --get target's direction in radian
 			unitPosX, unitPosZ = ConvertToXZ(targetUnitID, unitDirection, 200) --project a target at 200m in front of guarded unit
 		else
-			--Spring.Echo("Dynamic Avoidance targetting failure: fallback to no target")
+			Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=unitPosY
 		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
 		boxSizeTrigger = 4 --//boxsize for GUARD command
-		graphCONSTANTtrigger[1] = 2 
-		graphCONSTANTtrigger[2] = 2	--//use more aggressive avoidance because it often run just once or twice. It need big result.
+		graphCONSTANTtrigger[1] = 2 --//use more aggressive attraction because it GUARD units. It need big result.
+		graphCONSTANTtrigger[2] = 1	--//use less aggressive avoidance because need to stay close to units. It need not stray.
 	elseif cQueue[queueIndex].id == CMD_ATTACK then
 		targetCoordinate={-1, -1, -1}
 		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached"
@@ -1170,25 +1169,27 @@ function CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, 
 end
 
 --convert angular command into coordinate, plus other function
-function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor)
+function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay)
 	local safetyDistanceCONSTANT=safetyDistanceCONSTANTg
 	local timeToContactCONSTANT=timeToContactCONSTANTg
 	local activateAutoReverse=activateAutoReverseG
-
+	------
 	if (nearestFrontObstacleRange> losRadius) then nearestFrontObstacleRange = 999 end --if no obstacle infront of unit then set nearest obstacle as far as LOS to prevent infinite velocity.
 	local newUnitAngleDerived= GetNewAngle(unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor) --derive a new angle from calculation for move solution
 
-	local velocity=unitSpeed
-	local maximumVelocity = (nearestFrontObstacleRange- safetyDistanceCONSTANT)/timeToContactCONSTANT --calculate minimum velocity for collision in the next "timeToContact" second.
-	activateAutoReverse=activateAutoReverse*impatienceTrigger
-	if (velocity >= maximumVelocity) and (activateAutoReverse==1) then velocity = -unitSpeed	end --set to reverse if impact is certain
+	local velocity=unitSpeed*(timeToContactCONSTANT+ networkDelay) --scale-down/scale-up command lenght based on system delay.
+	local networkDelayDrift = unitSpeed*networkDelay --unit drift contributed by network lag
+	local maximumVelocity = (nearestFrontObstacleRange- safetyDistanceCONSTANT)/timeToContactCONSTANT --calculate the velocity that will cause a collision within the next "timeToContactCONSTANT" second.
+	activateAutoReverse=activateAutoReverse*impatienceTrigger --activate/deactivate 'autoReverse' if impatience system is used
+	if (velocity >= maximumVelocity) and (activateAutoReverse==1) then velocity = -unitSpeed	end --set to reverse if impact is imminent
 
 	if (turnOnEcho == 1) then 
 		Spring.Echo("maximumVelocity(SendCommand)" .. maximumVelocity) 
 		Spring.Echo("activateAutoReverse(SendCommand)" .. activateAutoReverse)
+		Spring.Echo("unitDirection(SendCommand)" .. unitDirection)
 	end
 	
-	local newX, newZ= ConvertToXZ(thisUnitID, newUnitAngleDerived,velocity) --convert angle into coordinate form
+	local newX, newZ= ConvertToXZ(thisUnitID, newUnitAngleDerived,velocity, unitDirection, networkDelayDrift) --convert angle into coordinate form
 	return newX, newZ
 end
 
@@ -1223,15 +1224,21 @@ function GetUnitDirection(unitID, lastPosition) --give unit direction in radian,
 	return unitDirection, currentY
 end
 
-function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity)
+function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, networkDelayDrift)
 	--localize global constant
 	local velocityAddingCONSTANT=velocityAddingCONSTANTg
 	local velocityScalingCONSTANT=velocityScalingCONSTANTg
 	--
 	local x,_,z = spGetUnitPosition(thisUnitID)
 	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT --add multiplier
-	local newX = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + x
+	local newX = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
 	local newZ = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + z
+	
+	if unitDirection ~= nil then --argument #4 & #5 can be empty (for other usage). Also used in ExtractTarget for GUARD command.
+		local distanceTraveledDueToNetworkDelay = networkDelayDrift 
+		newX = distanceTraveledDueToNetworkDelay*math.cos(unitDirection) + newX -- translate move command abit further forward; to account for lag. Network Lag makes move command lags behind the unit. 
+		newZ = distanceTraveledDueToNetworkDelay*math.sin(unitDirection) + newZ
+	end
 	
 	if (turnOnEcho == 1) then
 		Spring.Echo("x(ConvertToXZ) " .. x)
@@ -1392,7 +1399,7 @@ end
 --  DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker)
 --  widget:RecvLuaMsg(msg, playerID)
 --  ReportedNetworkDelay(playerIDa, defaultDelay)
---  ActualNetworkDelay(reportingIn, skippingTimer,doCalculation_then_gps_delay,gps_then_DoCalculation_delay, now)
+--  CalculateNetworkDelay(reportingIn, skippingTimer,doCalculation_then_gps_delay,gps_then_DoCalculation_delay, now)
 --  RetrieveAttackerList (unitID, attacker)
 --  CheckWeaponsAndShield (unitDef)
 --  GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
