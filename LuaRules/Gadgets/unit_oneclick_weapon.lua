@@ -19,6 +19,7 @@ end
 -- speedups
 --------------------------------------------------------------------------------
 local spGetUnitDefID	= Spring.GetUnitDefID
+local spGetUnitHealth	= Spring.GetUnitHealth
 local spGetUnitTeam		= Spring.GetUnitTeam
 local spGetUnitIsDead	= Spring.GetUnitIsDead
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
@@ -101,7 +102,7 @@ local function doTheCommand(unitID, unitDefID, num)
 	local frame = Spring.GetGameFrame()
 	local currentReload = Spring.GetUnitWeaponState(unitID, defs[unitDefID][num].weaponToReload, "reloadState")
 	--if not (spGetUnitIsDead(unitID) or (reloadFrame[unitID][num] > frame)) then
-	if not (spGetUnitIsDead(unitID) or (currentReload > frame)) then
+	if (select(5, spGetUnitHealth(unitID)) == 1) and not (spGetUnitIsDead(unitID) or (currentReload > frame)) then
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
 		local func = env[defs[unitDefID][num].functionToCall]
 		Spring.UnitScript.CallAsUnit(unitID, func)
