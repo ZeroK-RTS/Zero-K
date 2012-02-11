@@ -675,6 +675,7 @@ end
 local commIndex = 1
 local function SelectComm()
 	if #comms <= 0 then return end	-- no comms, don't bother
+	if commIndex > #comms then commIndex = #comms end
 	local unitID
 	repeat	-- if this comm is already in selection, try the next one
 		unitID = comms[commIndex].commID
@@ -748,7 +749,6 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		RemoveFac(unitID)
 	elseif commsByID[unitID] then
 		RemoveComm(unitID)
-		if commIndex > #comms then commIndex = #comms end
 	end
 end
 
