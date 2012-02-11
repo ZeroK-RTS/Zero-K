@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
@@ -166,8 +166,14 @@ function checkairs()
       for i = 1, teammaxcount do
          airbuff = airtargets[h].units[i]
 	     if airbuff ~= nil then
-	       health, _, _, _, _ = GetHP(airtargets[h].units[i].id)
-	       airtargets[h].units[i].hp = health
+		   if not isDead(airbuff.id) then
+	         health, _, _, _, _ = GetHP(airtargets[h].units[i].id)
+	         airtargets[h].units[i].hp = health
+		   else
+		     removeAir(airbuff.id, h)
+		   end
+		 else
+	       removeAir(airbuff.id, h)
 	     end
       end
     end
@@ -231,7 +237,7 @@ end
 function unassignTarget(unitID, refID, allyteam)
   local attacking = AAdef[allyteam].units[refID].attacking
   if attacking ~= nil then
-    AAdef[allyteam].units[refID].attacking = nil
+	AAdef[allyteam].units[refID].attacking = nil
 	local tteam = GetUnitAllyTeam(attacking)
 	local trefID = airtargetsref[tteam].units[attacking]
 	if trefID ~= nil then
@@ -255,9 +261,9 @@ function BestTarget(targets, count, damage, current)
     targetteam = GetUnitAllyTeam(targets[i])
 	refID = airtargetsref[targetteam].units[targets[i]]
 	if refID ~= nil then
-	  if airtargets[targetteam].units[refID].id == current then
-	    airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
-	  end
+	  --if airtargets[targetteam].units[refID].id == current then
+	    --airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
+	  --end
 	  --Echo("considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", hp: " .. airtargets[targetteam].units[refID].hp)
 	  if airtargets[targetteam].units[refID].hp <= airtargets[targetteam].units[refID].incoming + damage then
 	    if onehit == false then
@@ -312,9 +318,9 @@ function HSBestTarget(targets, count, damage, current)
     targetteam = GetUnitAllyTeam(targets[i])
     refID = airtargetsref[targetteam].units[targets[i]]
 	if refID ~= nil then
-	  if airtargets[targetteam].units[refID].id == current then
-	    airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
-	  end
+	  --if airtargets[targetteam].units[refID].id == current then
+	    --airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
+	  --end
       _, maxhp = GetHP(targets[i])
 	  local unitDefID = GetUnitDefID(targets[i])
 	  local ud = UnitDefs[unitDefID]
