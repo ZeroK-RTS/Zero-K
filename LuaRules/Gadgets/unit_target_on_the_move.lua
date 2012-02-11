@@ -50,6 +50,16 @@ local unitSetTargetCmdDesc = {
 	hidden = true,
 }
 
+local unitSetTargetCircleCmdDesc = {
+	id      = CMD_UNIT_SET_TARGET_CIRCLE,
+	type    = CMDTYPE.ICON_UNIT_OR_AREA,
+	name    = 'Set Target Circle',
+	action  = 'settargetcircle',
+    cursor  = 'Attack',
+	tooltip	= 'Sets target for unit, not removed by move commands, circle version',
+	hidden = true,
+}
+
 local unitCancelTargetCmdDesc = {
 	id      = CMD_UNIT_CANCEL_TARGET,
 	type    = CMDTYPE.ICON,
@@ -79,7 +89,7 @@ local function setTarget(data)
                 spSetUnitTarget(data.id, data.x, data.y, data.z)
             end
         elseif spValidUnitID(data.targetID) and spGetUnitAllyTeam(data.targetID) ~= data.allyTeam then
-            if unitInRange(data.id, data.targetID, data.range) then
+            if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) then
                 spSetUnitTarget(data.id, data.targetID)
             end
         else
@@ -145,6 +155,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
 	if validUnit(unitDefID) then
 		spInsertUnitCmdDesc(unitID, unitSetTargetCmdDesc)
+		spInsertUnitCmdDesc(unitID, unitSetTargetCircleCmdDesc)
         spInsertUnitCmdDesc(unitID, unitCancelTargetCmdDesc)
 	end
 	
@@ -178,10 +189,42 @@ local function disSQ(x1,y1,x2,y2)
 	return (x1 - x2)^2 + (y1 - y2)^2
 end
 
+local function setTargetClosestFromList(unitID, unitDefID, team, choiceUnits)
+
+	local ux, uy, uz = Spring.GetUnitPosition(unitID)
+				
+	local bestDis = false
+	local bestUnit = false
+
+	if ux and choiceUnits then
+		for i = 1, #choiceUnits do
+			local tTeam = Spring.GetUnitTeam(choiceUnits[i])
+			if tTeam and (not Spring.AreTeamsAllied(team,tTeam)) then
+				local tx,ty,tz = Spring.GetUnitPosition(choiceUnits[i])
+				if tx then
+					local newDis = disSQ(ux,uz,tx,tz)
+					if (not bestDis) or bestDis > newDis then
+						bestDis = newDis
+						bestUnit = choiceUnits[i]
+					end
+				end
+			end
+		end
+	end
+	
+	if bestUnit then
+		 addUnit(unitID, {
+			id = unitID, 
+			targetID = bestUnit, 
+			allyTeam = spGetUnitAllyTeam(unitID), 
+			range = UnitDefs[unitDefID].maxWeaponRange
+		})
+	end
+end
+
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	
-    
-    if cmdID == CMD_UNIT_SET_TARGET  then
+    if cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE then
         if validUnit(unitDefID) then
             if #cmdParams == 6 then
 				local team = Spring.GetUnitTeam(unitID)
@@ -190,39 +233,42 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					return false
 				end
 				
+				local top, bot, left, right
+				if cmdParams[1] < cmdParams[4] then
+					left = cmdParams[1]
+					right = cmdParams[4]
+				else
+					left = cmdParams[4]
+					right = cmdParams[1]
+				end
+				
+				if cmdParams[3] < cmdParams[6] then
+					top = cmdParams[3]
+					bot = cmdParams[6]
+				else
+					bot = cmdParams[6]
+					top = cmdParams[3]
+				end
+				
 				local units = CallAsTeam(team,
 					function ()
-					return Spring.GetUnitsInRectangle(cmdParams[1],cmdParams[3],cmdParams[4],cmdParams[6]) end)
+					return Spring.GetUnitsInRectangle(left,top,right,bot) end)
+				
+				setTargetClosestFromList(unitID, unitDefID, team, units)
+			
+			elseif #cmdParams == 4 then
+			
+				local team = Spring.GetUnitTeam(unitID)
+				
+				if not team then
+					return false
+				end
+				
+				local units = CallAsTeam(team,
+					function ()
+					return Spring.GetUnitsInCylinder(cmdParams[1],cmdParams[3],cmdParams[4]) end)
 					
-				local ux, uy, uz = Spring.GetUnitPosition(unitID)
-				
-				local bestDis = false
-				local bestUnit = false
-
-				if ux and units then
-					for i = 1, #units do
-						local tTeam = Spring.GetUnitTeam(units[i])
-						if tTeam and (not Spring.AreTeamsAllied(team,tTeam)) then
-							local tx,ty,tz = Spring.GetUnitPosition(units[i])
-							if tx then
-								local newDis = disSQ(ux,uz,tx,tz)
-								if (not bestDis) or bestDis > newDis then
-									bestDis = newDis
-									bestUnit = units[i]
-								end
-							end
-						end
-					end
-				end
-				
-				if bestUnit then
-					 addUnit(unitID, {
-						id = unitID, 
-						targetID = bestUnit, 
-						allyTeam = spGetUnitAllyTeam(unitID), 
-						range = UnitDefs[unitDefID].maxWeaponRange
-					})
-				end
+				setTargetClosestFromList(unitID, unitDefID, team, units)
 				
 			elseif #cmdParams == 3 then
                 addUnit(unitID, {

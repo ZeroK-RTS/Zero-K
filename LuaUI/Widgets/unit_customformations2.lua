@@ -33,8 +33,8 @@ local unitIncreaseThresh	= 0.85 -- We only increase maxUnits if the units are gr
 
 -- Alpha loss per second after releasing mouse
 local lineFadeRate = 2.0
-
 CMD_UNIT_SET_TARGET = 34923 
+CMD_UNIT_SET_TARGET_CIRCLE = 34925
 CMD_JUMP = 38521
 
 -- What commands are eligible for custom formations
@@ -46,6 +46,7 @@ local formationCmds = {
 	[CMD.UNLOAD_UNIT] = true,
 	[CMD_JUMP] = true, -- jump
 	[CMD_UNIT_SET_TARGET] = true, -- settarget
+	[CMD_UNIT_SET_TARGET_CIRCLE] = true, -- settarget
 }
 
 -- What commands require alt to be held (Must also appear in formationCmds)
@@ -53,6 +54,7 @@ local requiresAlt = {
 	[CMD.ATTACK] = true,
 	[CMD.UNLOAD_UNIT] = true,
 	[CMD_UNIT_SET_TARGET] = true, -- settarget
+	[CMD_UNIT_SET_TARGET_CIRCLE] = true, -- settarget
 }
 
 -- Context-based default commands that can be overridden (i.e. guard when mouseover unit)
@@ -207,6 +209,7 @@ local function SetColor(cmdID, alpha)
 	elseif cmdID == CMD_ATTACK     then glColor(1.0, 0.2, 0.2, alpha) -- Red
 	elseif cmdID == CMD_UNLOADUNIT then glColor(1.0, 1.0, 0.0, alpha) -- Yellow
 	elseif cmdID == CMD_UNIT_SET_TARGET then glColor(1, 0.75, 0, alpha) -- Orange
+	elseif cmdID == CMD_UNIT_SET_TARGET_CIRCLE then glColor(1, 0.75, 0, alpha) -- Orange
 	else                                glColor(0.5, 0.5, 1.0, alpha) -- Blue
 	end
 end
