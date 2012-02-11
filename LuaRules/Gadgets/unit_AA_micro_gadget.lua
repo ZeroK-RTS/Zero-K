@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -39,6 +39,10 @@ local isDead             = Spring.GetUnitIsDead
 local GetUnitStockpile	 = Spring.GetUnitStockpile
 local GetUnitStates      = Spring.GetUnitStates
 local isUnitCloaked      = Spring.GetUnitIsCloaked
+local inALOS             = Spring.IsPosInAirLos
+local inRadar            = Spring.IsPosInRadar
+local inLOS              = Spring.IsPosInLos
+local GetLOSState        = Spring.GetUnitLosState
 --[[local FindUnitCmdDesc    = Spring.FindUnitCmdDesc
 local InsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 local AAmicrocmd = {
@@ -57,6 +61,7 @@ local teams              = {}
 local AAdef              = {} -- {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = 5, reloaded = true, name = ud.name, reloading = {0, 0, 0}, frame = 0, damage = damage per shot, refiredelay = 0, team = allyteam, inrange = {}}
 local AAdefreference     = {}
 local AAdefmaxcount      = {}
+local DPSAA              = {["corrl"] = 60, ["corrazor"] = 150, ["armcir"] = 250, ["corflak"] = 360, ["screamer"] = 1750}
 --[[
    :armca       : crane -- "Crane - Construction Aircraft, Builds at 4.8 m/s"
    :armcsa      : athena -- 
@@ -116,7 +121,7 @@ function checkAAdef()
     ----Echo(AAdefbuff)
 	if AAdefbuff ~= nil then
 	  --Echo("ID " .. AAdefbuff.id)
-	  if GetUnitDefID(AAdefbuff.id) ~= nil then
+	  if not UnitIsDead(AAdefbuff.id) then
 		AAdef[h].units[i].frame = AAdef[h].units[i].frame + 1
 		if WeaponReady(AAdefbuff.id, i, h) then 
 		  if AAdefbuff.name == "missiletower" and AAdefbuff.reloading[2] == 0 then
@@ -168,14 +173,14 @@ function checkairs()
       for i = 1, teammaxcount do
          airbuff = airtargets[h].units[i]
 	     if airbuff ~= nil then
-		   if not isDead(airbuff.id) then
+		   if not UnitIsDead(airbuff.id) then
 	         health, _, _, _, _ = GetHP(airtargets[h].units[i].id)
 	         airtargets[h].units[i].hp = health
 		   else
 		     removeAir(airbuff.id, h)
 		   end
 		 else
-	       removeAir(airbuff.id, h)
+	       --removeAir(airbuff.id, h)
 	     end
       end
     end
@@ -200,9 +205,15 @@ function assignTarget(unitID, refID, allyteam)
 	    local ateam = GetUnitAllyTeam(assign)
 	    local arefID = airtargetsref[ateam].units[assign]
 	    unassignTarget(unitID, refID, allyteam)
-	    attackTarget(unitID, assign, refID, allyteam)
-	    AAdef[allyteam].units[refID].attacking = assign
-	    airtargets[ateam].units[arefID].incoming = airtargets[ateam].units[arefID].incoming + AAdef[allyteam].units[refID].damage
+		if assign ~= attacking then
+	      attackTarget(unitID, assign, refID, allyteam)
+	      AAdef[allyteam].units[refID].attacking = assign
+		  if AAdef[allyteam].units[refID].name == "missiletower" then
+		    airtargets[ateam].units[arefID].incoming = airtargets[ateam].units[arefID].incoming + getShotDamage("missiletower") / 2 - 10
+		  else
+	        airtargets[ateam].units[arefID].incoming = airtargets[ateam].units[arefID].incoming + AAdef[allyteam].units[refID].damage
+		  end
+		end
 	  end
 	end
 	if output[2] == 0 or (output[2]~= 0 and assign == nil) then
@@ -240,13 +251,15 @@ function unassignTarget(unitID, refID, allyteam)
   local attacking = AAdef[allyteam].units[refID].attacking
   if attacking ~= nil then
 	AAdef[allyteam].units[refID].attacking = nil
-	local tteam = GetUnitAllyTeam(attacking)
-	local trefID = airtargetsref[tteam].units[attacking]
-	if trefID ~= nil then
-	  airtargets[tteam].units[trefID].incoming = airtargets[tteam].units[trefID].incoming - AAdef[allyteam].units[refID].damage
-      --Echo("tower " .. refID .. " was targeting " .. attacking .. ", deassigning from " .. airtargets[tteam].units[trefID].name)
-	  if airtargets[tteam].units[trefID].incoming < 0 then
-	    airtargets[tteam].units[trefID].incoming = 0
+	if not UnitIsDead(attacking) then
+	  local tteam = GetUnitAllyTeam(attacking)
+	  local trefID = airtargetsref[tteam].units[attacking]
+	  if trefID ~= nil then
+	    airtargets[tteam].units[trefID].incoming = airtargets[tteam].units[trefID].incoming - AAdef[allyteam].units[refID].damage
+        --Echo("tower " .. refID .. " was targeting " .. attacking .. ", deassigning from " .. airtargets[tteam].units[trefID].name)
+	    if airtargets[tteam].units[trefID].incoming < 0 then
+	      airtargets[tteam].units[trefID].incoming = 0
+	    end
 	  end
 	end
   end
@@ -259,13 +272,14 @@ function BestTarget(targets, count, damage, current)
   local besthp = 0
   local targetteam
   --local hpafter
-  for i = 1, count do
+for i = 1, count do
+  if not UnitIsDead(targets[i]) then
     targetteam = GetUnitAllyTeam(targets[i])
 	refID = airtargetsref[targetteam].units[targets[i]]
 	if refID ~= nil then
-	  --if airtargets[targetteam].units[refID].id == current then
-	    --airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
-	  --end
+	  if airtargets[targetteam].units[refID].id == current then
+	    airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
+	  end
 	  --Echo("considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", hp: " .. airtargets[targetteam].units[refID].hp)
 	  if airtargets[targetteam].units[refID].hp <= airtargets[targetteam].units[refID].incoming + damage then
 	    if onehit == false then
@@ -299,6 +313,7 @@ function BestTarget(targets, count, damage, current)
 	  end
 	end
   end
+end
   if best ~= 0 then
     best = targets[best]
     ----Echo("best target found, expected hp after damage " .. hpafter)
@@ -316,13 +331,14 @@ function HSBestTarget(targets, count, damage, current)
   local besthp = 0
   local targetteam
   --local hpafter
-  for i = 1, count do
+for i = 1, count do
+  if not UnitIsDead(targets[i]) then
     targetteam = GetUnitAllyTeam(targets[i])
     refID = airtargetsref[targetteam].units[targets[i]]
 	if refID ~= nil then
-	  --if airtargets[targetteam].units[refID].id == current then
-	    --airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
-	  --end
+	  if airtargets[targetteam].units[refID].id == current then
+	    airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
+	  end
       _, maxhp = GetHP(targets[i])
 	  local unitDefID = GetUnitDefID(targets[i])
 	  local ud = UnitDefs[unitDefID]
@@ -360,6 +376,7 @@ function HSBestTarget(targets, count, damage, current)
 	  end
 	end
   end
+end
   if best ~= 0 then
     best = targets[best]
     --Echo("best target found, expected hp after damage " .. hpafter)
@@ -380,18 +397,24 @@ function getAATargetsinRange(unitID, refID, allyteam)
   local team
   local ud
   local defID
+  local LOS
   --Echo(units)
   for i,targetID in ipairs(units) do
     team = GetUnitAllyTeam(targetID)
 	if not AreTeamsAllied(team, allyteam) then
 	  defID = GetUnitDefID(targetID)
 	  ud = UnitDefs[defID]
+	  LOS = GetLOSState(targetID, allyteam)
 	  if Isair(ud.name) then
-	    targets[targetscount] = targetID
-	    targetscount = targetscount + 1
+	    if LOS["los"] == true or LOS["radar"] == true then
+	      targets[targetscount] = targetID
+	      targetscount = targetscount + 1
+		end
       else
-	    ltargets[ltargetscount] = targetID
-	    ltargetscount = ltargetscount + 1
+	    if LOS["los"] == true or LOS["radar"] == true then
+	      ltargets[ltargetscount] = targetID
+	      ltargetscount = ltargetscount + 1
+		end
 	  end
 	end
   end
@@ -498,7 +521,10 @@ end
 
 function UnitIsDead(unitID)
   local uDef = isDead(unitID)
-  return uDef
+  if uDef == false then
+    return false
+  end
+  return true
 end
 
 function escortingAA(unitID, refID, allyteam)
@@ -511,7 +537,7 @@ function escortingAA(unitID, refID, allyteam)
 	if AreTeamsAllied(team, allyteam) and not stun then
 	  local unitDefID = GetUnitDefID(AAID)
 	  local ud = UnitDefs[unitDefID]
-	  escort = escort + DPSAA(ud.name)
+	  escort = escort + ( DPSAA[ud.name] or 0 )
 	end
   end
   if escort >= 300 then
@@ -549,6 +575,11 @@ function attackcommand(unitID, targetID)
   GiveOrder(unitID, CMD.ATTACK, {targetID}, {})
 end
 
+function removetarget(unitID)
+  --GiveOrder(unitID, CMD.INSERT, {0, CMD.ATTACK, CMD.OPT_ALT, targetID}, {"alt"})
+  GiveOrder(unitID, CMD_UNIT_CANCEL_TARGET, {}, {})
+end
+
 function stopcommand(unitID)
   GiveOrder(unitID, CMD.STOP, {}, {})
 end
@@ -566,7 +597,7 @@ function IsAA(name)
   return false
 end
 
-function DPSAA(name)
+--[[function DPSAA(name)
   if name == "corrl" then
     return 60
   end
@@ -583,7 +614,7 @@ function DPSAA(name)
     return 1750
   end
   return 0
-end
+end]]--
 
 function AAmaxcounter(name)
   if name == "missiletower" then -- or name == "corrazor"  then
@@ -700,8 +731,10 @@ function removeAA(unitID, allyteam)
   if AAdef[allyteam] ~= nil then
   if AAdefreference[allyteam].units[unitID] ~= nil then
     local refID = AAdefreference[allyteam].units[unitID]
-    AAdef[allyteam].units[refID] = AAdef[allyteam].units[AAdefmaxcount[allyteam]]
-	AAdefreference[allyteam].units[AAdef[allyteam].units[AAdefmaxcount[allyteam]].id] = refID
+	if AAdefmaxcount[allyteam] > 1 then
+      AAdef[allyteam].units[refID] = AAdef[allyteam].units[AAdefmaxcount[allyteam]]
+	  AAdefreference[allyteam].units[AAdef[allyteam].units[AAdefmaxcount[allyteam]].id] = refID
+	end
 	AAdef[allyteam].units[AAdefmaxcount[allyteam]] = nil
 	AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] - 1
   end
@@ -730,8 +763,10 @@ function removeAir(unitID, allyteam)
   if airtargetsref[allyteam] ~= nil then
   if airtargetsref[allyteam].units[unitID] ~= nil then
     local refID = airtargetsref[allyteam].units[unitID]
-    airtargets[allyteam].units[refID] = airtargets[allyteam].units[airtargetsmaxcount[allyteam]]
-	airtargetsref[allyteam].units[airtargets[allyteam].units[airtargetsmaxcount[allyteam]].id] = refID
+	if airtargetsmaxcount[allyteam] > 1 then
+      airtargets[allyteam].units[refID] = airtargets[allyteam].units[airtargetsmaxcount[allyteam]]
+	  airtargetsref[allyteam].units[airtargets[allyteam].units[airtargetsmaxcount[allyteam]].id] = refID
+	end
 	airtargets[allyteam].units[airtargetsmaxcount[allyteam]] = nil
 	airtargetsmaxcount[allyteam] = airtargetsmaxcount[allyteam] - 1
   end
