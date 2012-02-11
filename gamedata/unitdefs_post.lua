@@ -120,7 +120,7 @@ end
 -- see http://springrts.com/phpbb/viewtopic.php?f=13&t=27550
 
 for name, ud in pairs(UnitDefs) do
-	if ud.maxvelocity and (ud.maxvelocity > 0 or ud.customparams.mobilebuilding) then
+	if (ud.maxvelocity and ud.maxvelocity > 0) or ud.customparams.mobilebuilding then
 		ud.customparams.ignoreplacementrestriction = "true"
 	end
 end
