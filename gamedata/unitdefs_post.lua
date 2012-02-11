@@ -116,6 +116,19 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Set units that ignore map-side gadgetted placement resitrctions
+-- see http://springrts.com/phpbb/viewtopic.php?f=13&t=27550
+
+for name, ud in pairs(UnitDefs) do
+	if ud.maxvelocity and (ud.maxvelocity > 0 or ud.customparams.mobilebuilding) then
+		ud.customparams.ignoreplacementrestriction = "true"
+	end
+end
+
+ 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Set unit faction and build options
 --
 
