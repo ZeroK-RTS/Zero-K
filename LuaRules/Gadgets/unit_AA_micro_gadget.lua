@@ -17,6 +17,8 @@ if (not gadgetHandler:IsSyncedCode()) then
 end
 --SYNCED--
 
+include("LuaRules/Configs/customcmds.h.lua")
+
 local random = math.random
 local TeamUnits          = Spring.GetTeamUnits
 local GetPlayerInfo      = Spring.GetPlayerInfo

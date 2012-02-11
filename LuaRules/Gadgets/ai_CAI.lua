@@ -2949,7 +2949,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					controlledUnit.turret.cost = controlledUnit.turret.cost - ud.metalCost
 					controlledUnit.turret.count = controlledUnit.turret.count - 1
 					controlledUnit.turretByID[unitID] = nil
-				elseif (ud.energyMake > 0 or ud.energyUpkeep < 0) then
+				elseif (ud.energyMake > 0 or ud.energyUpkeep < 0 or (ud.customParams and ud.customParams.windgen)) then
 					controlledUnit.econ.cost = controlledUnit.econ.cost - ud.metalCost
 					if controlledUnit.econByID[unitID].onDefenceHeatmap then
 						editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,-1,0)
@@ -3172,7 +3172,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					controlledUnit.turret.cost = controlledUnit.turret.cost + ud.metalCost
 					controlledUnit.turret.count = controlledUnit.turret.count + 1
 					controlledUnit.turretByID[unitID] = {index = controlledUnit.turret.count, ud = ud,x = x, y = y, z = z, cost = ud.metalCost, finished = false, air = not ud.weapons[1].onlyTargets.land }
-				elseif (ud.energyMake > 0 or ud.energyUpkeep < 0) then
+				elseif (ud.energyMake > 0 or ud.energyUpkeep < 0 or (ud.customParams and ud.customParams.windgen)) then
 					local x,y,z = spGetUnitPosition(unitID)
 					if not built then
 						editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1,0)
@@ -3302,7 +3302,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 			elseif ud.isBuilding or ud.speed == 0 then -- building
 				if ud.maxWeaponRange > 0 then -- turret
 					controlledUnit.turretByID[unitID].finished = true
-				elseif (ud.energyMake > 0 or ud.energyUpkeep < 0) then
+				elseif (ud.energyMake > 0 or ud.energyUpkeep < 0 or (ud.customParams and ud.customParams.windgen)) then
 					controlledUnit.econByID[unitID].finished = true
 				elseif ud.radarRadius > 0 then -- radar
 					controlledUnit.radarByID[unitID].finished = true
