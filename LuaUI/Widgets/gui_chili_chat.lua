@@ -3,8 +3,8 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Chat v0.441",
-    desc      = "v0.441 Chili Chat Console.",
+    name      = "Chili Chat v0.442",
+    desc      = "v0.442 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -66,7 +66,8 @@ local colorNames = {}
 local colors = {}
 
 local visible = true
-local firstEnter=true
+local firstEnter=true --used to activate ally-chat at game start. To run once
+local noAlly=false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
 
 local function option_remakeConsole()
 	remakeConsole()
@@ -174,7 +175,7 @@ options = {
 	},
 	defaultAllyChat = {
 		name = "Default ally chat",
-		desc = "Sets default chat mode to allies at start",
+		desc = "Sets default chat mode to allies at game start",
 		type = 'bool',
 		value = true,
 	},	
@@ -386,9 +387,12 @@ function widget:KeyPress(key, modifier, isRepeat)
 	
 	if (key == KEYSYMS.RETURN) then
 		if not WG.enteringText then 
+			if noAlly then
+				firstEnter= false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
+			end
 			if firstEnter then
 				if (not (modifier.Shift or modifier.Ctrl)) and options.defaultAllyChat.value then
-					Spring.SendCommands("chatally")
+					spSendCommands("chatally")
 				end
 				firstEnter=false
 			end
@@ -445,6 +449,12 @@ function widget:Initialize()
 	if (not WG.Chili) then
 		widgetHandler:RemoveWidget()
 		return
+	end
+	local spectating = Spring.GetSpectatingState()
+	local myAllyTeamID = Spring.GetMyAllyTeamID() --get my alliance ID
+	local teamList = Spring.GetTeamList(myAllyTeamID) --get list of teams in my alliance
+	if #teamList == 1 and (not spectating) then --if I'm alone and playing (no ally), then no need to set default-ally-chat during gamestart . eg: 1vs1
+		noAlly = true
 	end
 
 	Chili = WG.Chili
@@ -554,6 +564,12 @@ function widget:Initialize()
 			scrollpanel1,
 			inputspace,
 		},
+		OnMouseDown={ function(self) --//click on scroll bar shortcut to "Settings/Interface/Chat/Console".
+				local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
+				if not forwardSlash then return end
+					WG.crude.OpenPath(options_path)
+					WG.crude.ShowMenu() --make epic Chili menu appear.
+		end },
 	}
 	
 	remakeConsole()

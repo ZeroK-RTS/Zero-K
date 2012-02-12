@@ -1886,3 +1886,10 @@ function ActionMenu()
 	settings.show_crudemenu = not settings.show_crudemenu
 	ShowHideCrudeMenu()
 end
+
+function WG.crude.ShowMenu() --// allow other widget to toggle-up Epic-Menu. This'll enable access to game settings' Menu via click on other GUI elements.
+	if not settings.show_crudemenu then 
+		settings.show_crudemenu = true
+		ShowHideCrudeMenu()
+	end
+end

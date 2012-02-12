@@ -256,7 +256,13 @@ function widget:AddChatMessage(player, msg, type)
 
 		custom_timeadded = GetTimer(),
     window_id = newWindowID(),
-		OnMouseDown = {function() 
+		OnMouseDown = {function()
+			local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
+			if forwardSlash then
+				WG.crude.OpenPath(options_path) --click + "/" will shortcut to option-menu
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				return
+			end		
 			if pp ~= nil then 
 				Spring.SetCameraTarget(pp[1], 0, pp[2],1)
 			end 

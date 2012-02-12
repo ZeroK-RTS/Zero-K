@@ -318,7 +318,7 @@ local function MakeButton(container, cmd, insertItem)
 			isDisabled = cmd.disabled;
 			tooltip = tooltip;
 			cmdid = cmd.id;
-			OnMouseDown = {ClickFunc}
+			OnMouseDown = {ClickFunc} --activate the clicked command
 		}
 		if cmd.OnClick then 
 			button.OnMouseDown = cmd.OnClick
@@ -1042,6 +1042,12 @@ function widget:Initialize()
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
+		OnMouseDown={ function(self) --// click+"/" on integral-menu windows will open a Game-menu.
+			local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
+			if not forwardSlash then return end
+				WG.crude.OpenPath(options_path)
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+		end },
 	}
 	
 	fakewindow = Panel:New{
@@ -1059,10 +1065,11 @@ function widget:Initialize()
 		--backgroundColor = {0.1, 0.1, 0.1, 1},
 --		skinName  = "DarkGlass",
 
-		OnMouseDown={ function(self) --// pressing any button on the integral-menu will open a Game-menu.
-			local alt, ctrl, meta, shift = Spring.GetModKeyState()
-			if not meta then return end
-			WG.crude.OpenPath('Game/Commands')
+		OnMouseDown={ function(self) --// click+"/" on any button on the integral-menu will open a Game-menu.
+			local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
+			if not forwardSlash then return end
+				WG.crude.OpenPath('Game/Commands')
+				WG.crude.ShowMenu() --make epic Chili menu appear.
 		end },
 	}
 
@@ -1132,10 +1139,11 @@ function widget:Initialize()
 			y = "0%";
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
-			OnMouseDown={ function(self) --//pressing any unit-State button on the integral-menu will open Unit-AI menu, it overrides a similar function above.
-				local alt, ctrl, meta, shift = Spring.GetModKeyState()
-				if not meta then return end
+			OnMouseDown={ function(self) --// click+"/" on any unit-State button will open Unit-AI menu, it overrides one similar function above.
+				local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
+				if not forwardSlash then return end
 					WG.crude.OpenPath('Game/Unit AI')
+					WG.crude.ShowMenu() --make epic Chili menu appear.
 			end },
 		}
 	end

@@ -194,11 +194,15 @@ function widget:MousePress(x, y, button)
 	if not Spring.IsAboveMiniMap(x, y) then
 		return false
 	end
+	local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
+	if forwardSlash then
+		WG.crude.OpenPath(options_path) --click + "/" will shortcut to option-menu
+		WG.crude.ShowMenu() --make epic Chili menu appear.
+	end
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	if not meta then
 	    return false
 	end
-	WG.crude.OpenPath(options_path)
 	return true
 end
 
