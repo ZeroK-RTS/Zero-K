@@ -451,7 +451,7 @@ local function UpdateBurrowTarget(burrowID, targetArg)
 	local oldTarget = data.targetID
 	if not targetArg then
 		for id,_ in pairs(targets) do
-			local testDistance = spGetUnitSeparation(burrowID, id, true)
+			local testDistance = spGetUnitSeparation(burrowID, id, true) or 100000
 			if testDistance < data.targetDistance then
 				data.targetDistance = testDistance
 				data.targetID = id
