@@ -59,6 +59,8 @@ local MEX_DIAMETER = Game.extractorRadius*2
 
 --local CMD_MEXE = 30666
 
+local spammedError = false
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -657,7 +659,10 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									if unitDef then
 										Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  \nEnergy: -" .. math.round(mexE,2))
 									else
-										Spring.Echo("unitDefID missing for maxxed metal extractor")
+										if not spammedError then
+											Spring.Echo("unitDefID missing for maxxed metal extractor")
+											spammedError = true
+										end
 									end
 								end
 							end
@@ -684,7 +689,10 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2) .. " \nConnect more energy sources to produce additional metal")
 							end
 						else
-							Spring.Echo("unitDefID missing for metal extractor")
+							if not spammedError then
+								Spring.Echo("unitDefID missing for metal extractor")
+								spammedError = true
+							end
 						end
 					end
 				end
@@ -914,7 +922,10 @@ function gadget:GameFrame(n)
 					if unitDef then
 						Spring.SetUnitTooltip(unitID,"Metal Extractor - Makes: " .. math.round(orgMetal,2) .. " Not connected to Grid")
 					else
-						Spring.Echo("unitDefID missing for ungridded mex")
+						if not spammedError then
+							Spring.Echo("unitDefID missing for ungridded mex")
+							spammedError = true
+						end
 					end
 				end
 			end
@@ -931,7 +942,10 @@ function gadget:GameFrame(n)
 					local unitDefID = Spring.GetUnitDefID(unitID)
 					local unitDef = unitDefID and UnitDefs[unitDefID]
 					if not unitDef then
-						Spring.Echo("unitDefID missing for pylon")
+						if not spammedError then
+							Spring.Echo("unitDefID missing for pylon")
+							spammedError = true
+						end
 					else
 						if not pylonDefs[unitDefID].keeptooltip then
 							if grid ~= 0 then
