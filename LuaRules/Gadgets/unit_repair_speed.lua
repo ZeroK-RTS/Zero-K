@@ -37,6 +37,14 @@ local uncombatTimes = {}
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
 
+	if (attackerDefID and 
+		UnitDefs[attackerDefID].customParams and 
+		UnitDefs[attackerDefID].customParams.nofriendlyfire and
+		attackerID ~= unitID and
+		Spring.AreTeamsAllied(unitTeam, attackerTeam)) then
+		return
+	end
+
 	local newDone = Spring.GetGameFrame() + TIME_SINCE_DAMAGED
 
 	if combatUnits[unitID] then
