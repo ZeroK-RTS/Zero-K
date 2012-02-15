@@ -1,4 +1,4 @@
-local versionNumber = "v0.33"
+local versionNumber = "v0.4"
 
 function gadget:GetInfo()
   return {
@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -28,6 +28,7 @@ local GetCommandQueue    = Spring.GetCommandQueue
 local GetUnitAllyTeam    = Spring.GetUnitAllyTeam
 local GetUnitTeam        = Spring.GetUnitTeam
 local GetUnitDefID       = Spring.GetUnitDefID
+local GetUnitSeparation  = Spring.GetUnitSeparation
 local AreTeamsAllied     = Spring.AreTeamsAllied
 local GiveOrder          = Spring.GiveOrderToUnit
 local GetUnitsInRange    = Spring.GetUnitsInSphere
@@ -61,7 +62,11 @@ local teams              = {}
 local AAdef              = {} -- {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = 5, reloaded = true, name = ud.name, reloading = {0, 0, 0}, frame = 0, damage = damage per shot, refiredelay = 0, team = allyteam, inrange = {}}
 local AAdefreference     = {}
 local AAdefmaxcount      = {}
+local shot               = {} -- {id = shotID, unitID = ownerID, refID = owner's refID, allyteam = owner's allyteam, prefID = projectile refID in owner's list)
+local shotreference      = {}
+local shotmaxcount       = 0
 local DPSAA              = {["corrl"] = 60, ["corrazor"] = 150, ["armcir"] = 250, ["corflak"] = 360, ["screamer"] = 1750}
+local weapondefID        = {}
 --[[
    :armca       : crane -- "Crane - Construction Aircraft, Builds at 4.8 m/s"
    :armcsa      : athena -- 
@@ -151,6 +156,13 @@ function checkAAdef()
 		  end
 		  AAdef[h].units[i].counter = 0
 		end
+		for j = 1, AAdef[h].units[i].projectilescount do
+		  AAdef[h].units[i].projectiles[j].TOF = AAdef[h].units[i].projectiles[j].TOF - 1
+		  if AAdef[h].units[i].projectiles[j].TOF <= 0 then
+		    removeShot(AAdef[h].units[i].projectiles[j].id)
+			j = j - 1
+		  end
+		end
 	  else
 	    removeAA(AAdefbuff.id, h)
 	  end
@@ -209,7 +221,7 @@ function assignTarget(unitID, refID, allyteam)
 	      unassignTarget(unitID, refID, allyteam)
 	      attackTarget(unitID, assign, refID, allyteam)
 	      AAdef[allyteam].units[refID].attacking = assign
-	      airtargets[ateam].units[arefID].incoming = airtargets[ateam].units[arefID].incoming + AAdef[allyteam].units[refID].damage
+	      airtargets[ateam].units[arefID].tincoming = airtargets[ateam].units[arefID].tincoming + AAdef[allyteam].units[refID].damage
 		  --Echo("id " .. unitID .. " targeting " .. assign .. " " .. airtargets[ateam].units[arefID].name .. ", hp " .. airtargets[ateam].units[arefID].hp .. " incoming " .. airtargets[ateam].units[arefID].incoming)
 		end
 	  end
@@ -256,10 +268,10 @@ function unassignTarget(unitID, refID, allyteam)
 	    trefID = airtargetsref[tteam].units[attacking]
 	  end
 	  if trefID ~= nil then
-	    airtargets[tteam].units[trefID].incoming = airtargets[tteam].units[trefID].incoming - AAdef[allyteam].units[refID].damage
+	    airtargets[tteam].units[trefID].tincoming = airtargets[tteam].units[trefID].tincoming - AAdef[allyteam].units[refID].damage
         --Echo("tower " .. refID .. " was targeting " .. attacking .. ", deassigning from " .. airtargets[tteam].units[trefID].name)
-	    if airtargets[tteam].units[trefID].incoming < 0 then
-	      airtargets[tteam].units[trefID].incoming = 0
+	    if airtargets[tteam].units[trefID].tincoming < 0 then
+	      airtargets[tteam].units[trefID].tincoming = 0
 	    end
 	  end
 	end
@@ -280,7 +292,7 @@ for i = 1, count do
     targetteam = GetUnitAllyTeam(targets[i])
 	refID = airtargetsref[targetteam].units[targets[i]]
 	if refID ~= nil then
-	  incoming = airtargets[targetteam].units[refID].incoming
+	  incoming = airtargets[targetteam].units[refID].incoming + airtargets[targetteam].units[refID].tincoming
 	  hp = airtargets[targetteam].units[refID].hp
 	  if airtargets[targetteam].units[refID].id == current then
 	    incoming = incoming - cdamage
@@ -293,7 +305,7 @@ for i = 1, count do
 		    best = i
 			besthp = hp - incoming - damage
 	        onehit = true
-			end
+	      end
 		else
 		  if hp - incoming >= 0 and hp - incoming - damage >= besthp then
 		    --hpafter = hp - incoming
@@ -324,7 +336,7 @@ end
     ----Echo("best target found, expected hp after damage " .. hpafter)
     return best
   end
-  Echo("preventing overkill")
+  --Echo("preventing overkill")
   return nil
 end
 
@@ -701,6 +713,22 @@ function getShotDamage(name)
   return 0
 end
 
+function getshotVelocity(name)
+  if name == "corrl" then
+    return 750
+  end
+  if name == "missiletower" then
+    return 900
+  end
+  if name == "armcir" then
+    return 800
+  end
+  if name == "screamer" then
+    return 1600
+  end
+  return nil
+end
+
 ------------------------------
 ---------MEM MANAGEMENT-------
 
@@ -715,7 +743,7 @@ function addAA(unitID, unitDefID, name, allyteam)
 	    teamcount = allyteam
 	  end
 	end
-    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000}, frame = 0, damage = sdamage - 5, lasttarget = nil, refiredelay = 0, team = allyteam, inrange = {}}
+    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000}, frame = 0, damage = sdamage - 5, lasttarget = nil, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name)}
     AAdefreference[allyteam].units[unitID] = AAdefmaxcount[allyteam] + 1
 	--insertcommandstate(unitID)
 	GiveOrder(unitID, CMD.FIRE_STATE, {1}, {})
@@ -733,7 +761,7 @@ function addAir(unitID, unitDefID, name, allyteam)
 	  teamcount = allyteam
 	end
   end
-  airtargets[allyteam].units[airtargetsmaxcount[allyteam] + 1] = {id = unitID, name = name, incoming = 0, hp = health, team = allyteam, inrange = {}, fired = {}, firedtime = {}}
+  airtargets[allyteam].units[airtargetsmaxcount[allyteam] + 1] = {id = unitID, name = name, tincoming = 0, incoming = 0, hp = health, team = allyteam, inrange = {}}
   airtargetsref[allyteam].units[unitID] = airtargetsmaxcount[allyteam] + 1
   airtargetsmaxcount[allyteam] = airtargetsmaxcount[allyteam] + 1
 end
@@ -766,9 +794,9 @@ function transferAA(unitID, newteam, oldteam)
   AAdef[newteam].units[AAdefmaxcount[newteam] + 1] = AAdef[oldteam].units[refID]
   AAdefreference[newteam].units[unitID] = AAdefmaxcount[newteam] + 1
   AAdefmaxcount[newteam] = AAdefmaxcount[newteam] + 1
-	GiveOrder(unitID, CMD.FIRE_STATE, {1}, {})
-    --Echo("AA unit transferred, hold fire order given")
   removeAA(unitID, oldteam)
+	--GiveOrder(unitID, CMD.FIRE_STATE, {1}, {})
+    --Echo("AA unit transferred, hold fire order given")
 end
 
 function removeAir(unitID, allyteam)
@@ -799,9 +827,65 @@ function transferAir(unitID, newteam, oldteam)
   airtargets[newteam].units[airtargetsmaxcount[newteam] + 1] = airtargets[oldteam].units[refID]
   airtargetsref[newteam].units[unitID] = airtargetsmaxcount[newteam] + 1
   airtargetsmaxcount[newteam] = airtargetsmaxcount[newteam] + 1
-	GiveOrder(unitID, CMD.FIRE_STATE, {1}, {})
-    --Echo("AA unit transferred, hold fire order given")
   removeAir(unitID, oldteam)
+	--GiveOrder(unitID, CMD.FIRE_STATE, {1}, {})
+    --Echo("AA unit transferred, hold fire order given")
+end
+
+function addShot(unitID, refID, allyteam, shotID, targetID)
+  shot[shotmaxcount + 1] = {id = shotID, unitID = unitID, refID = refID, allyteam = allyteam, prefID = nil}
+  if targetID ~= nil then
+    local tallyteam = GetUnitAllyTeam(targetID)
+  if airtargetsref[tallyteam] ~= nil then
+    local arefID = airtargetsref[tallyteam].units[targetID]
+	if airtargets[tallyteam].units[arefID] ~= nil then
+      local AAdefbuff = AAdef[allyteam].units[refID]
+	  local distance = GetUnitSeparation(unitID, targetID)
+	  local flighttime = 30 * distance / AAdefbuff.shotspeed
+	  --Echo("shot fired " .. shotID .. " owner " .. unitID .. " target " .. targetID .. " separation " .. distance ..  " TOF " .. flighttime)
+      AAdef[allyteam].units[refID].projectiles[AAdefbuff.projectilescount + 1] = {id = shotID, target = targetID, tteam = tallyteam, TOF = flighttime}
+	  shot[shotmaxcount + 1].prefID = AAdefbuff.projectilescount + 1
+	  AAdef[allyteam].units[refID].projectilescount = AAdefbuff.projectilescount + 1
+	  airtargets[tallyteam].units[arefID].incoming = airtargets[tallyteam].units[arefID].incoming + AAdefbuff.damage
+	end
+  end
+  end
+  shotreference[shotID] = shotmaxcount + 1
+  shotmaxcount = shotmaxcount + 1
+end
+
+function removeShot(shotID)
+  local shotref = shotreference[shotID]
+  if shotref ~= nil then
+    local prefID = shot[shotref].prefID
+	if prefID ~= nil then
+      --Echo("shot hit " .. shotID)
+	  local unitID = shot[shotref].unitID
+	  local refID = shot[shotref].refID
+	  local allyteam = shot[shotref].allyteam
+	  local AAdefbuff = AAdef[allyteam].units[refID]
+	  local target = AAdefbuff.projectiles[prefID].target
+	  local tallyteam = AAdefbuff.projectiles[prefID].tteam
+	  if airtargetsref[tallyteam] ~= nil then
+	    local trefID = airtargetsref[tallyteam].units[target]
+	    if airtargets[tallyteam].units[trefID] ~= nil then
+		  airtargets[tallyteam].units[trefID].incoming = airtargets[tallyteam].units[trefID].incoming - AAdefbuff.damage
+		  if airtargets[tallyteam].units[trefID].incoming < 0 then
+		    airtargets[tallyteam].units[trefID].incoming = 0
+		  end
+		end
+	  end
+	  if AAdefbuff.projectilescount > 1 then
+	    shotref2 = shotreference[AAdefbuff.projectiles[AAdefbuff.projectilescount].id]
+		shot[shotref2].prefID = prefID
+	  end
+	  AAdef[allyteam].units[refID].projectiles[prefID] = AAdefbuff.projectiles[AAdefbuff.projectilescount]
+	  AAdef[allyteam].units[refID].projectilescount = AAdefbuff.projectilescount - 1
+	end
+    shot[shotref] = shot[shotmaxcount]
+	shotmaxcount = shotmaxcount - 1
+	shotreference[shotID] = nil
+  end
 end
 
 ------------------------------
@@ -827,7 +911,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
   local _, _, _, _, _, allyteam, _, _ = GetTeamInfo(unitTeam)
   local ud = UnitDefs[unitDefID]
-  --Echo("Unit Destroyed: " .. allyteam)
+  --Echo("Unit Destroyed: " .. unitID)
   if IsAA(ud.name) then
     removeAA(unitID, allyteam)
   end
@@ -848,6 +932,25 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
   end
 end
 
+function gadget:ProjectileCreated(projID, unitID)
+if unitID ~= 0 and unitID ~= nil then
+  unitdefID = GetUnitDefID(unitID)
+  local ud = UnitDefs[unitdefID]
+  if IsAA(ud.name) then
+    local allyteam = GetUnitAllyTeam(unitID)
+    if AAdefreference[allyteam] ~= nil then
+	  refID = AAdefreference[allyteam].units[unitID]
+      --Echo("shot fired " .. projID .. " owner " .. unitID)
+	  addShot(unitID, refID, allyteam, projID, AAdef[allyteam].units[refID].attacking)
+	end
+  end
+end
+end
+
+function gadget:ProjectileDestroyed(projID)
+  removeShot(projID)
+end
+
 function gadget:GameFrame()
   ----Echo("update")
   checkairs()
@@ -861,4 +964,31 @@ end
 
 function gadget:Initialize()
   Echo("AA Micro Gadget Enabled")
+  for i=1,#WeaponDefs do
+    local wd = WeaponDefs[i]
+	if wd.name:find("corrl") then
+	  Script.SetWatchWeapon(i,true)
+      weapondefID["corrl"] = i
+	end
+	if wd.name:find("missiletower") then
+	  Script.SetWatchWeapon(i,true)
+      weapondefID["missiletower"] = i
+	end
+	if wd.name:find("armcir") then
+	  Script.SetWatchWeapon(i,true)
+      weapondefID["armcir"] = i
+	end
+	if wd.name:find("screamer") then
+	  Script.SetWatchWeapon(i,true)
+      weapondefID["screamer"] = i
+	end
+	if wd.name:find("corflak") then
+	  --Script.SetWatchWeapon(i,true)
+      weapondefID["corflak"] = i
+	end
+	if wd.name:find("corrazor") then
+	  --Script.SetWatchWeapon(i,true)
+      weapondefID["corrazor"] = i
+	end
+  end
 end
