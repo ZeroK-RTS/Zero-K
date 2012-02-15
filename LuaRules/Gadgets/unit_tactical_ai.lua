@@ -327,7 +327,6 @@ local function skirmEnemy(unitID, enemy, move, cQueue,n)
 		data.receivedOrder = true
 		return true
 	elseif #cQueue > 0 and move then
-		Spring.Echo("bla")
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 	end
 
