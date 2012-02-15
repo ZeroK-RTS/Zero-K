@@ -517,7 +517,7 @@ end
 
 function UnitIsDead(unitID)
   local uDef = isDead(unitID)
-  if uDef == false then
+  if uDef == false and uDef ~= nil then
     return false
   end
   return true
@@ -734,6 +734,7 @@ function removeAA(unitID, allyteam)
 	end
 	AAdef[allyteam].units[AAdefmaxcount[allyteam]] = nil
 	AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] - 1
+	AAdefreference[allyteam].units[unitID] = nil
   end
   end
 end
@@ -766,6 +767,7 @@ function removeAir(unitID, allyteam)
 	end
 	airtargets[allyteam].units[airtargetsmaxcount[allyteam]] = nil
 	airtargetsmaxcount[allyteam] = airtargetsmaxcount[allyteam] - 1
+	airtargetsref[allyteam].units[unitID] = nil
   end
   end
 end
