@@ -250,7 +250,7 @@ function unassignTarget(unitID, refID, allyteam)
 	if not UnitIsDead(attacking) then
 	  local tteam = GetUnitAllyTeam(attacking)
 	  local trefID = nil
-	  if tteam ~= nil then
+	  if tteam ~= nil and airtargetsref[tteam] ~= nil then
 	    trefID = airtargetsref[tteam].units[attacking]
 	  end
 	  if trefID ~= nil then
