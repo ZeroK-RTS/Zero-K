@@ -148,7 +148,7 @@ local function AddMarker (cluster, unitIDNoise, receivedUnitList)
 		end
 		for j= 1 ,#unitIDNoise do
 			local x,y,z=spGetUnitPosition(unitIDNoise[j])
-			if x~=nil then
+			if x~=nil then --// exclude 'nil'. Unit under construction usually return 'nil'.
 				if j>= 6 and currentIndex > 1 then --//IF current index is greater than 5, and there already discernable cluster, then no need to hi-light individual units.
 					notIgnore=false
 				end
@@ -278,9 +278,9 @@ end
 
 
 function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
-	if spValidUnitID(unitID) then --and unitTeamID == myTeamID_gbl then --if my unit
+	if spValidUnitID(unitID) and unitTeamID == myTeamID_gbl then --if my unit
 		if spAreTeamsAllied(unitTeamID, oldTeamID) or notifyCapture_gbl[oldTeamID] then --if from my ally, or from a captured enemy unit
-			myTeamID_gbl = unitTeamID --//uncomment this and comment 'unitTeamID == myTeamID_gbl' (above) when testing
+			--myTeamID_gbl = unitTeamID --//uncomment this and comment 'unitTeamID == myTeamID_gbl' (above) when testing
 			notifyCapture_gbl[oldTeamID] = false
 			local x,y,z = spGetUnitPosition(unitID)
 			receivedUnitList_gbl[unitID]={x,y,z}
