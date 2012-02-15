@@ -124,6 +124,7 @@ function checkAAdef()
 	  if not UnitIsDead(AAdefbuff.id) then
 		AAdef[h].units[i].frame = AAdef[h].units[i].frame + 1
 		if WeaponReady(AAdefbuff.id, i, h) then 
+		  --Echo("weapon ready")
 		  if AAdefbuff.counter == 0 then
 		    --Echo("ready, searching for target hp: " .. AAdef[h].units[i].damage)
 			local cstate = isUnitCloaked(AAdefbuff.id)
@@ -188,6 +189,7 @@ function assignTarget(unitID, refID, allyteam)
   local notargets = false
   local assign = nil
   local damage = AAdef[allyteam].units[refID].damage
+  local cdamage = damage
   if output ~= nil then
     --Echo("enemies in range")
     if output[2] ~= 0 then
@@ -196,19 +198,19 @@ function assignTarget(unitID, refID, allyteam)
 		damage = damage * 2
 	  end
 	  if AAdef[allyteam].units[refID].name == "missiletower" and escortingAA(unitID, refID, allyteam) then
-	    assign = HSBestTarget(output[1], output[2], damage, attacking)
+	    assign = HSBestTarget(output[1], output[2], damage, attacking, cdamage)
 	  else
-	    assign = BestTarget(output[1], output[2], damage, attacking)
+	    assign = BestTarget(output[1], output[2], damage, attacking, cdamage)
 	  end
 	  if assign ~= nil then
-	    local ateam = GetUnitAllyTeam(assign)
-	    local arefID = airtargetsref[ateam].units[assign]
-	    unassignTarget(unitID, refID, allyteam)
 		if assign ~= attacking then
+	      local ateam = GetUnitAllyTeam(assign)
+	      local arefID = airtargetsref[ateam].units[assign]
+	      unassignTarget(unitID, refID, allyteam)
 	      attackTarget(unitID, assign, refID, allyteam)
 	      AAdef[allyteam].units[refID].attacking = assign
 	      airtargets[ateam].units[arefID].incoming = airtargets[ateam].units[arefID].incoming + AAdef[allyteam].units[refID].damage
-		  --Echo("targeting " .. assign .. " " .. airtargets[ateam].units[arefID].name .. ", hp " .. airtargets[ateam].units[arefID].hp .. " incoming " .. airtargets[ateam].units[arefID].incoming)
+		  --Echo("id " .. unitID .. " targeting " .. assign .. " " .. airtargets[ateam].units[arefID].name .. ", hp " .. airtargets[ateam].units[arefID].hp .. " incoming " .. airtargets[ateam].units[arefID].incoming)
 		end
 	  end
 	end
@@ -264,49 +266,53 @@ function unassignTarget(unitID, refID, allyteam)
   end
 end
 
-function BestTarget(targets, count, damage, current)
+function BestTarget(targets, count, damage, current, cdamage)
   local refID
   local onehit = false
   local best = 0
   local besthp = 0
   local targetteam
+  local incoming
+  local hp
   --local hpafter
 for i = 1, count do
   if not UnitIsDead(targets[i]) then
     targetteam = GetUnitAllyTeam(targets[i])
 	refID = airtargetsref[targetteam].units[targets[i]]
 	if refID ~= nil then
+	  incoming = airtargets[targetteam].units[refID].incoming
+	  hp = airtargets[targetteam].units[refID].hp
 	  if airtargets[targetteam].units[refID].id == current then
-	    airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
+	    incoming = incoming - cdamage
 	  end
-	  --Echo("considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", hp: " .. airtargets[targetteam].units[refID].hp .. ", incoming: " .. airtargets[targetteam].units[refID].incoming)
-	  if airtargets[targetteam].units[refID].hp <= airtargets[targetteam].units[refID].incoming + damage then
+	  --Echo("considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", hp: " .. hp .. ", incoming: " .. incoming)
+	  if hp <= incoming + damage then
 	    if onehit == false then
-		  if airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming >= 0 then
-		    --hpafter = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming
+		  if hp - incoming >= 0 then
+		    --hpafter = hp - incoming
 		    best = i
-			besthp = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming - damage
+			besthp = hp - incoming - damage
 	        onehit = true
-		  end
+			end
 		else
-		  if airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming >= 0 and airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming - damage >= besthp then
-		    --hpafter = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming
+		  if hp - incoming >= 0 and hp - incoming - damage >= besthp then
+		    --hpafter = hp - incoming
 		    best = i
-			besthp = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming - damage
+			besthp = hp - incoming - damage
 		  end
 		end
 	  elseif onehit == false then
 	    if best ~= 0 then
-	      if airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming >= 0 and airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming <= besthp then
-		    --hpafter = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming
+	      if hp - incoming >= 0 and hp - incoming <= besthp then
+		    --hpafter = hp - incoming
 		    best = i
-			besthp = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming
+			besthp = hp - incoming
 		  end
 		else
-		  if airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming >= 0 then
-		    --hpafter = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming
+		  if hp - incoming >= 0 then
+		    --hpafter = hp - incoming
 		    best = i
-			besthp = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming
+			besthp = hp - incoming
 		  end
 		end
 	  end
@@ -318,57 +324,61 @@ end
     ----Echo("best target found, expected hp after damage " .. hpafter)
     return best
   end
-  --Echo("preventing overkill")
+  Echo("preventing overkill")
   return nil
 end
 
-function HSBestTarget(targets, count, damage, current)
+function HSBestTarget(targets, count, damage, current, cdamage)
   local maxhp
   local refID
   local onehit = false
   local best = 0
   local besthp = 0
   local targetteam
+  local incoming
+  local hp
   --local hpafter
 for i = 1, count do
   if not UnitIsDead(targets[i]) then
     targetteam = GetUnitAllyTeam(targets[i])
     refID = airtargetsref[targetteam].units[targets[i]]
 	if refID ~= nil then
+	  incoming = incoming
+	  hp = airtargets[targetteam].units[refID].hp
 	  if airtargets[targetteam].units[refID].id == current then
-	    airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
+	    incoming = incoming - cdamage
 	  end
       _, maxhp = GetHP(targets[i])
 	  local unitDefID = GetUnitDefID(targets[i])
 	  local ud = UnitDefs[unitDefID]
 	  if (maxhp > 650 or ud.name == "corhurc2") and ud.name ~= "corvamp" then
-	    if airtargets[targetteam].units[refID].hp <= airtargets[targetteam].units[refID].incoming + damage then
+	    if hp <= incoming + damage then
 	      if onehit == false then
-		    if airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming >= 0 then
-		      --hpafter = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming
+		    if hp - incoming >= 0 then
+		      --hpafter = hp - incoming
 		      best = i
-			  besthp = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming - damage
+			  besthp = hp - incoming - damage
 	          onehit = true
 		    end
 		  else
-		    if airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming >= 0 and airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming - damage >= besthp then
+		    if hp - incoming >= 0 and hp - incoming - damage >= besthp then
 		      --hpafter = airtargets[refID].hp - airtargets[refID].incoming
 		      best = i
-			  besthp = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming - damage
+			  besthp = hp - incoming - damage
 		    end
 		  end
 	    elseif onehit == false then
   	      if best ~= 0 then
-	        if airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming >= 0 and airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming <= besthp then
+	        if hp - incoming >= 0 and hp - incoming <= besthp then
 		      --hpafter = airtargets[refID].hp - airtargets[refID].incoming
 		      best = i
-			  besthp = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming
+			  besthp = hp - incoming
 		    end
 		  else
-		    if airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming >= 0 then
+		    if hp - incoming >= 0 then
 		      --hpafter = airtargets[refID].hp - airtargets[refID].incoming
 		      best = i
-			  besthp = airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming
+			  besthp = hp - incoming
 		    end
 		  end
 	    end
@@ -460,6 +470,7 @@ function WeaponReady(unitID, refID, allyteam)
   if ready == false then
     --Echo("weapon not ready")
 	if AAdef[allyteam].units[refID].reloaded ~= ready then
+	  --Echo("id " .. unitID .. "weapon fired!")
 	  AAdef[allyteam].units[refID].reloaded = ready
 	  if AAdef[allyteam].units[refID].name == "corrl" and AAdef[allyteam].units[refID].reloading[1] ~= rframe and AAdef[allyteam].units[refID].reloading[2] ~= rframe and AAdef[allyteam].units[refID].reloading[3] ~= rframe then
 	    local lowestreloading = 3
@@ -630,7 +641,7 @@ function AAmaxrefiredelay(name)
     return 7
   end
   if name == "armcir" then
-    return 10
+    return 15
   end
   return 4
 end
