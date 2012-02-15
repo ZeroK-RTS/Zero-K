@@ -249,7 +249,10 @@ function unassignTarget(unitID, refID, allyteam)
 	AAdef[allyteam].units[refID].attacking = nil
 	if not UnitIsDead(attacking) then
 	  local tteam = GetUnitAllyTeam(attacking)
-	  local trefID = airtargetsref[tteam].units[attacking]
+	  local trefID = nil
+	  if tteam ~= nil then
+	    trefID = airtargetsref[tteam].units[attacking]
+	  end
 	  if trefID ~= nil then
 	    airtargets[tteam].units[trefID].incoming = airtargets[tteam].units[trefID].incoming - AAdef[allyteam].units[refID].damage
         --Echo("tower " .. refID .. " was targeting " .. attacking .. ", deassigning from " .. airtargets[tteam].units[trefID].name)
