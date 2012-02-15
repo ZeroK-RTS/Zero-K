@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -124,11 +124,6 @@ function checkAAdef()
 	  if not UnitIsDead(AAdefbuff.id) then
 		AAdef[h].units[i].frame = AAdef[h].units[i].frame + 1
 		if WeaponReady(AAdefbuff.id, i, h) then 
-		  if AAdefbuff.name == "missiletower" and AAdefbuff.reloading[2] == 0 then
-		    AAdef[h].units[i].damage = getShotDamage(AAdefbuff.name) / 2 - 10
-		  else
-		    AAdef[h].units[i].damage = getShotDamage(AAdefbuff.name) - 5
-		  end
 		  if AAdefbuff.counter == 0 then
 		    --Echo("ready, searching for target hp: " .. AAdef[h].units[i].damage)
 			local cstate = isUnitCloaked(AAdefbuff.id)
@@ -192,14 +187,18 @@ function assignTarget(unitID, refID, allyteam)
   local attacking = AAdef[allyteam].units[refID].attacking
   local notargets = false
   local assign = nil
+  local damage = AAdef[allyteam].units[refID].damage
   if output ~= nil then
     --Echo("enemies in range")
     if output[2] ~= 0 then
 	  --Echo("visible air in range of tower " .. refID)
+	  if AAdef[allyteam].units[refID].name == "missiletower" and AAdef[allyteam].units[refID].reloading[2] ~= 0 then
+		damage = damage * 2
+	  end
 	  if AAdef[allyteam].units[refID].name == "missiletower" and escortingAA(unitID, refID, allyteam) then
-	    assign = HSBestTarget(output[1], output[2], AAdef[allyteam].units[refID].damage, attacking)
+	    assign = HSBestTarget(output[1], output[2], damage, attacking)
 	  else
-	    assign = BestTarget(output[1], output[2], AAdef[allyteam].units[refID].damage, attacking)
+	    assign = BestTarget(output[1], output[2], damage, attacking)
 	  end
 	  if assign ~= nil then
 	    local ateam = GetUnitAllyTeam(assign)
@@ -208,11 +207,8 @@ function assignTarget(unitID, refID, allyteam)
 		if assign ~= attacking then
 	      attackTarget(unitID, assign, refID, allyteam)
 	      AAdef[allyteam].units[refID].attacking = assign
-		  if AAdef[allyteam].units[refID].name == "missiletower" then
-		    airtargets[ateam].units[arefID].incoming = airtargets[ateam].units[arefID].incoming + getShotDamage("missiletower") / 2 - 10
-		  else
-	        airtargets[ateam].units[arefID].incoming = airtargets[ateam].units[arefID].incoming + AAdef[allyteam].units[refID].damage
-		  end
+	      airtargets[ateam].units[arefID].incoming = airtargets[ateam].units[arefID].incoming + AAdef[allyteam].units[refID].damage
+		  --Echo("targeting " .. assign .. " " .. airtargets[ateam].units[arefID].name .. ", hp " .. airtargets[ateam].units[arefID].hp .. " incoming " .. airtargets[ateam].units[arefID].incoming)
 		end
 	  end
 	end
@@ -280,7 +276,7 @@ for i = 1, count do
 	  if airtargets[targetteam].units[refID].id == current then
 	    airtargets[targetteam].units[refID].incoming = airtargets[targetteam].units[refID].incoming - damage
 	  end
-	  --Echo("considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", hp: " .. airtargets[targetteam].units[refID].hp)
+	  --Echo("considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", hp: " .. airtargets[targetteam].units[refID].hp .. ", incoming: " .. airtargets[targetteam].units[refID].incoming)
 	  if airtargets[targetteam].units[refID].hp <= airtargets[targetteam].units[refID].incoming + damage then
 	    if onehit == false then
 		  if airtargets[targetteam].units[refID].hp - airtargets[targetteam].units[refID].incoming >= 0 then
@@ -680,7 +676,7 @@ function getShotDamage(name)
     return 110
   end
   if name == "missiletower" then
-    return 1300
+    return 650
   end
   if name == "armcir" then
     return 250
@@ -688,6 +684,7 @@ function getShotDamage(name)
   if name == "screamer" then
     return 1750
   end
+  return 0
 end
 
 ------------------------------
