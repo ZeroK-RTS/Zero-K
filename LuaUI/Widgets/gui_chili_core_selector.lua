@@ -806,6 +806,13 @@ function widget:Update(dt)
 		UpdateComm(comms[i].commID, i)
 	end
 	warningColorPhase = not warningColorPhase
+	for i=1,#comms do
+		local comm = comms[i]
+		if comm.button and comm.warningTime > 0 then
+			comms[i].button.backgroundColor = (warningColorPhase and buttonColorWarning) or buttonColor
+			comms[i].button:Invalidate()
+		end
+	end	
 	timer = 0
 end
 
@@ -813,15 +820,6 @@ end
 function widget:UnitDamaged(unitID, unitDefID, unitTeam)
 	if commsByID[unitID] then
 		comms[commsByID[unitID]].warningTime = commWarningTime
-	end
-end
-function widget:DrawScreen()
-	for i=1,#comms do
-		local comm = comms[i]
-		if comm.button and comm.warningTime > 0 then
-			comms[i].button.backgroundColor = (warningColorPhase and buttonColorWarning) or buttonColor
-			comms[i].button:Invalidate()
-		end
 	end
 end
 
