@@ -131,9 +131,11 @@ local base = {
 		}
 	},
 	{
-		name = "torp",
+		name = "aa",
 		modules = {
-			"commweapon_torpedo",
+			"commweapon_missilelauncher",
+			"commweapon_beamlaser",
+			"weaponmod_antiair",
 		}
 	},
 	{

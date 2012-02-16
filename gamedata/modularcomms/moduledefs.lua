@@ -147,6 +147,24 @@ upgrades = {
 	},		
 	
 	-- weapon mods
+	weaponmod_antiair = {
+		name = "Anti-Air Kit",
+		description = "Beam Laser/Riot Cannon/Missile Launcher: Convert to anti-air weapons",
+		func = function(unitDef)
+				for i,v in pairs(weapons) do
+					if (i == "commweapon_riotcannon") then	-- -20% damage
+						ReplaceWeapon(unitDef, "commweapon_riotcannon", "commweapon_flakcannon")
+						ReplaceWeapon(unitDef, "commweapon_riotcannon", "commweapon_flakcannon")
+					elseif (i == "commweapon_beamlaser") then
+						ReplaceWeapon(unitDef, "commweapon_beamlaser", "commweapon_aalaser")
+						ReplaceWeapon(unitDef, "commweapon_beamlaser", "commweapon_aalaser")
+					elseif (i == "commweapon_missilelauncher") then
+						ReplaceWeapon(unitDef, "commweapon_missilelauncher", "commweapon_aamissile")
+						ReplaceWeapon(unitDef, "commweapon_missilelauncher", "commweapon_aamissile")
+					end
+				end
+			end	
+	},	
 	weaponmod_autoflechette = {
 		name = "Autoflechette",
 		description = "Shotgun: -25% projectiles, -40% reload time",
