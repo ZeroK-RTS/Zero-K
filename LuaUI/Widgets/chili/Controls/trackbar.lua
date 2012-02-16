@@ -6,6 +6,7 @@ Trackbar = Control:Inherit{
   min       = 0,
   max       = 100,
   step      = 1,
+  useValueTooltip = nil,
 
   defaultWidth     = 90,
   defaultHeight    = 20,
@@ -19,11 +20,35 @@ local this = Trackbar
 local inherited = this.inherited
 
 --//=============================================================================
+local function FormatNum(num)
+  if (num == 0) then
+    return "0"
+  else
+    local strFormat = string.format
+    local absNum = math.abs(num)
+    if (absNum < 0.01) then
+      return strFormat("%.3f", num)
+    elseif (absNum < 1) then
+      return strFormat("%.2f", num)
+    elseif (absNum < 10) then
+      return strFormat("%.1f", num)
+    else
+      return strFormat("%.0f", num)
+    end
+  end
+end
+
 
 function Trackbar:New(obj)
   obj = inherited.New(self,obj)
+
+  if ((not obj.tooltip) or (obj.tooltip == '')) and (useValueTooltip ~= false) then
+    obj.useValueTooltip = true
+  end  
+  
   obj:SetMinMax(obj.min,obj.max)
   obj:SetValue(obj.value)
+  
   return obj
 end
 
@@ -86,6 +111,9 @@ function Trackbar:SetValue(v)
   v = self:_Clamp(v)
   local oldvalue = self.value
   self.value = v
+  if self.useValueTooltip then
+    self.tooltip = "Current: "..FormatNum(v)
+  end
   self:CallListeners(self.OnChange,v,oldvalue)
   self:Invalidate()
 end
