@@ -25,6 +25,7 @@ local textPersistent
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local flashTime = 0
+local TIME_TO_FLASH = 2	-- seconds
 
 function WG.ShowMessageBox(text, width, height, fontsize, pause)  
   local Chili = WG.Chili
@@ -107,7 +108,7 @@ function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 	--	msgBoxPersistent:Dispose()
 	--end	
 	
-	flashTime = 60
+	flashTime = TIME_TO_FLASH
 	
 	-- we have an existing box, modify that one instead of making a new one
 	if msgBoxPersistent then
@@ -213,20 +214,9 @@ function widget:Update(dt)
 	if msgBoxPersistent and flashTime > 0 then
 		msgBoxPersistent.color = (flashPhase and {0,0,0,1}) or {1,1,1,1}
 		msgBoxPersistent:Invalidate()
+		flashTime = flashTime - timer
 	end	
 	timer = 0
-end
-
-function widget:GameFrame(n)
-	if (n%10 < 0.1) then
-		if flashTime > 0 then
-			flashTime = flashTime - 10
-			if (flashTime <= 0) then
-				msgBoxPersistent.color = {1,1,1,1}
-				msgBoxPersistent:Invalidate()
-			end
-		end
-	end
 end
 
 -- for testing box changes
@@ -250,7 +240,7 @@ end
 local str = "It would serve the greater good if you would lay down arms, human. This planet will be returned to the Tau Empire as is proper."
 function widget:Initialize()
 	Chili = WG.Chili
-	WG.ShowPersistentMessageBox(str, 300, 100, 12, "LuaUI/Images/advisor2.jpg")	-- testing
+	--WG.ShowPersistentMessageBox(str, 300, 100, 12, "LuaUI/Images/advisor2.jpg")	-- testing
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

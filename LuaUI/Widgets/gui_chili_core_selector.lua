@@ -142,7 +142,7 @@ local wantUpdateCons = false
 
 --local gamestart = GetGameFrame() > 1
 local myTeamID = false
-local commWarningTime		= 2*30 -- how long to flash button frame, gameframes
+local commWarningTime		= 2 -- how long to flash button frame, seconds
 --local commWarningTimeLeft	= -1
 
 -------------------------------------------------------------------------------
@@ -798,7 +798,8 @@ function widget:Update(dt)
 	timer = timer + dt
 	if timer < UPDATE_FREQUENCY then
 		return
-	end	
+	end
+	
 	for i=1,#facs do
 		UpdateFac(facs[i].facID, i)
 	end
@@ -811,6 +812,7 @@ function widget:Update(dt)
 		if comm.button and comm.warningTime > 0 then
 			comms[i].button.backgroundColor = (warningColorPhase and buttonColorWarning) or buttonColor
 			comms[i].button:Invalidate()
+			comm.warningTime = comm.warningTime - timer
 		end
 	end	
 	timer = 0
@@ -820,21 +822,6 @@ end
 function widget:UnitDamaged(unitID, unitDefID, unitTeam)
 	if commsByID[unitID] then
 		comms[commsByID[unitID]].warningTime = commWarningTime
-	end
-end
-
-function widget:GameFrame(n)
-	if (n%10 < 0.1) then
-		for i = 1, #comms do
-			local comm = comms[i]
-			if comm.button and comm.warningTime > 0 then
-				comm.warningTime = comm.warningTime - 10
-				if (comm.warningTime <= 0) then
-					comms[i].button.backgroundColor = buttonColor
-					comms[i].button:Invalidate()
-				end
-			end
-		end
 	end
 end
 
