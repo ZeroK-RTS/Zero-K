@@ -941,7 +941,9 @@ if unitID ~= 0 and unitID ~= nil then
     if AAdefreference[allyteam] ~= nil then
 	  refID = AAdefreference[allyteam].units[unitID]
       --Echo("shot fired " .. projID .. " owner " .. unitID)
-	  addShot(unitID, refID, allyteam, projID, AAdef[allyteam].units[refID].attacking)
+	  if AAdef[allyteam].units[refID] ~= nil then
+	    addShot(unitID, refID, allyteam, projID, AAdef[allyteam].units[refID].attacking)
+	  end
 	end
   end
 end
