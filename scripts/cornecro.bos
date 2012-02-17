@@ -109,6 +109,7 @@ Create()
 	start-script SmokeUnit();
 }
 
+
 StartMoving()
 {
 	bMoving = TRUE;
@@ -135,6 +136,17 @@ StopMoving()
 	move llowercalf to y-axis [0] speed [3]; //down
 	move rlowercalf to y-axis [0] speed [2]; //up	
 }
+
+QueryWeapon1(piecenum)
+{
+	piecenum = torso;
+}
+
+AimWeapon1()
+{
+	return(1);
+}
+
 
 StartBuilding(heading, pitch)
 {
