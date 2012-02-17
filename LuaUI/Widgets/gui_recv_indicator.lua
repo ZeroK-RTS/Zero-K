@@ -3,8 +3,8 @@ local versionName = "v1.29"
 --
 --  file:   gui_recv_indicator.lua
 --  brief:   a clustering algorithm
---  algorithm: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and JÃ¶rg Sander
---	algorithm: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, JÃ¶rg Sander and Xiaowei Xu
+--  algorithm: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and Jörg Sander
+--	algorithm: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, Jörg Sander and Xiaowei Xu
 --	code:  Msafwan
 --
 --  Licensed under the terms of the GNU GPL, v2 or later.
@@ -56,7 +56,7 @@ local gameID_to_playerName_gbl = {}
 local knownMarkerPosition_gbl  = {}
 local knownCirclePosition_gbl = {}
 local notifyCapture_gbl = {}
-local knownMarkerPositionEMPTY_gbl = true --//variable: a flag. Used because the associated table did not start filling at index 1, thus unable to check them if it is truely empty or not.
+local knownMarkerPositionEMPTY_gbl = true --//variable: a flag. Used because those table did not start filling at index 1, thus unable to check them (with #) if it is truely empty or not.
 local knownCirclePositionEMPTY_gbl = true --//variable: a flag
 local receivedUnitListEMPTY_gbl = true --//variable: a flag
 
@@ -85,6 +85,7 @@ local timePart = 0
 local fontSize = 16
 local maxLabelLength = 16
 --end----------------------------------------------------------------------------
+WG.recvIndicator ={} --//allow global access
 ---------------------------------------------------------------------------------
 --Add Marker---------------------------------------------------------------------
 -- 1 function. 
@@ -197,7 +198,7 @@ function widget:Update(n)
 		local unitIDNoise ={}
 		------
 		--cluster, unitIDNoise = DBSCAN_cluster (myTeamID, minimumNeighbor, neighborhoodRadius, cluster, receivedUnitList, unitIDNoise) --//method 1
-		cluster, unitIDNoise = OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, radiusThreshold) --//method 2. Better
+		cluster, unitIDNoise = WG.recvIndicator.OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, radiusThreshold) --//method 2. Better
 		AddMarker(cluster, unitIDNoise, receivedUnitList)
 		------
 		receivedUnitListEMPTY_gbl = true --//flag the table as empty
@@ -357,7 +358,7 @@ function widget:DrawScreen() --Reference: gui_point_tracker.lua (Evil4Zerggin)
 	if #knownCirclePosition_gbl~= nil then
 		for i,_ in pairs(knownCirclePosition_gbl) do
 			local sX,sY,sZ = spWorldToScreenCoords(knownCirclePosition_gbl[i][1], knownCirclePosition_gbl[i][2], knownCirclePosition_gbl[i][3])
-			if (sX >= 0 and sY >= 0 and sX <= vsX and sY <= vsY) then --if within view then: draw circle
+			if (sX >= 0 and sY >= 0 and sX <= vsX and sY <= vsY) then --if within view then: draw circle on screen
 				-- glPushMatrix()
 				-- glLineWidth(2)
 				-- gl.Rotate(270, 1, 0, 0)
@@ -368,7 +369,7 @@ function widget:DrawScreen() --Reference: gui_point_tracker.lua (Evil4Zerggin)
 				-- glColor(1,1,1,1)
 				-- glLineWidth(1)
 				-- glPopMatrix()
-			else --//draw edge of the screen arrow
+			else --//if outside view then: draw arrow on edge of the screen
 				glPushMatrix()
 				glLineWidth(1)
 				if (on) and (knownCirclePosition_gbl[i][4]) then
@@ -442,7 +443,7 @@ end
 
 function widget:DrawWorld() --Reference: minimap_events.lua (Dave Rodgers), gfx_stereo3d.lua (Carrepairer, jK)
 	if #knownCirclePosition_gbl~= nil then
-		for i,_ in pairs(knownCirclePosition_gbl) do
+		for i,_ in pairs(knownCirclePosition_gbl) do --// draw circle on the ground
 			local x,y,z,r = knownCirclePosition_gbl[i][1], knownCirclePosition_gbl[i][2], knownCirclePosition_gbl[i][3], knownCirclePosition_gbl[i][5]
 			local inView = spIsAABBInView(x-r,y-r,z-r, x+r,y+r,z+r )
 			if inView and (on) then 
@@ -708,12 +709,12 @@ local function ExpandClusterOrder(receivedUnitList, unitID, neighborhoodRadius, 
 	return objects, cluster, noiseIDList, currentClusterID
 end
 
-function OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, neighborhoodRadius_alt)
+function WG.recvIndicator.OPTICS_cluster (receivedUnitList, neighborhoodRadius, minimumNeighbor, myTeamID, neighborhoodRadius_alt) --//OPTIC_cluster function are accessible globally
 	local objects={}
 	local cluster = {}
 	local noiseIDList = {}
 	local currentClusterID = nil
-	for unitID,_ in pairs(receivedUnitList) do
+	for unitID,_ in pairs(receivedUnitList) do --//go thru the un-ordered list
 		objects[unitID] = objects[unitID] or {}
 		if (objects[unitID].processed ~= true) then
 			objects, cluster, noiseIDList, currentClusterID = ExpandClusterOrder(receivedUnitList,unitID, neighborhoodRadius, neighborhoodRadius_alt,minimumNeighbor, myTeamID,objects, currentClusterID, cluster, noiseIDList)
@@ -730,7 +731,7 @@ function DBSCAN_cluster(myTeamID, minimumNeighbor, neighborhoodRadius, cluster, 
 	local visitedUnitID = {}
 	local currentCluster_global=1
 
-	for i=1, #receivedUnitList do
+	for i=1, #receivedUnitList do --//go thru the ordered list
 		local unitID = receivedUnitList[i]
 		
 		if visitedUnitID[unitID] ~= true then --//skip if already visited
