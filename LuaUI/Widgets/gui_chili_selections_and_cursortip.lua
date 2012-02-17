@@ -1677,6 +1677,7 @@ local function MakeToolTip_Terra(cmdName)
 		main = {
 			{ name='cmdName', text = cyan..cmdName, wrap=false},
 			{ name='tips', text = terraTips[cmdName], wrap=true },
+			{ name='help', text = green .. 'Space+/: Configure hotkeys', },
 		},
 	}
 	
@@ -2026,9 +2027,11 @@ function widget:Initialize()
 		resizable   = false;
 		draggable = false,
 		OnMouseDown={ function(self)
-			local alt, ctrl, meta, shift = Spring.GetModKeyState()
-			if not meta then return end
+			local _,_, meta,_ = Spring.GetModKeyState()
+			if not meta then return false end
 			WG.crude.OpenPath('Settings/Interface/Selected Units Window')
+			WG.crude.ShowMenu()
+			return true --skip button function, else clicking on build pic will also select the unit.
 		end },
 	}
 

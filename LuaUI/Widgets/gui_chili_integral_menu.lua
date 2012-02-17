@@ -326,6 +326,7 @@ local function MakeButton(container, cmd, insertItem)
 		if (isState) then 
 			button.padding = {4,4,2.5,2}
 --			button.backgroundColor = {0,0,0,0}
+			tooltip = "Unit State"	-- for special options
 		end 
 		if (isBuild) then
 			button.padding = {1,1,1,1}
@@ -1042,11 +1043,12 @@ function widget:Initialize()
 		minimumSize = {MIN_WIDTH, MIN_HEIGHT},
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
-		OnMouseDown={ function(self) --// click+"/" on integral-menu windows will open a Game-menu.
-			local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
-			if not forwardSlash then return end
-				WG.crude.OpenPath(options_path)
-				WG.crude.ShowMenu() --make epic Chili menu appear.
+		OnMouseDown={ function(self) --// click+ space on integral-menu tab will open a Game-menu.
+			local _,_, meta,_ = Spring.GetModKeyState()
+			if not meta then return false end --allow button to continue its function
+			WG.crude.OpenPath(options_path)
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+			return false
 		end },
 	}
 	
@@ -1065,11 +1067,14 @@ function widget:Initialize()
 		--backgroundColor = {0.1, 0.1, 0.1, 1},
 --		skinName  = "DarkGlass",
 
-		OnMouseDown={ function(self) --// click+"/" on any button on the integral-menu will open a Game-menu.
-			local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
-			if not forwardSlash then return end
-				WG.crude.OpenPath('Game/Commands')
-				WG.crude.ShowMenu() --make epic Chili menu appear.
+		OnMouseDown={ function(self) --// click+ space on any button on the integral-menu will open a Game-menu.
+			-- local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
+			-- if not forwardSlash then return false end
+			local _,_, meta,_ = Spring.GetModKeyState()
+			if not meta then return false end --allow button to continue its function
+			WG.crude.OpenPath('Game/Commands')
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+			return false
 		end },
 	}
 
@@ -1139,11 +1144,14 @@ function widget:Initialize()
 			y = "0%";
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
-			OnMouseDown={ function(self) --// click+"/" on any unit-State button will open Unit-AI menu, it overrides one similar function above.
-				local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
-				if not forwardSlash then return end
-					WG.crude.OpenPath('Game/Unit AI')
-					WG.crude.ShowMenu() --make epic Chili menu appear.
+			OnMouseDown={ function(self) --// click+ space on any unit-State button will open Unit-AI menu, it overrides similar function above.
+				-- local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
+				-- if not forwardSlash then return false end
+				local _,_, meta,_ = Spring.GetModKeyState()
+				if not meta then return false end --allow button to continue its function
+				WG.crude.OpenPath('Game/Unit AI')
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				return true --stop the button's function, else unit-state button will look bugged. 
 			end },
 		}
 	end

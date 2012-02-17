@@ -565,10 +565,11 @@ function widget:Initialize()
 			inputspace,
 		},
 		OnMouseDown={ function(self) --//click on scroll bar shortcut to "Settings/Interface/Chat/Console".
-				local forwardSlash = Spring.GetKeyState(0x02F) --reference: uikeys.txt
-				if not forwardSlash then return end
-					WG.crude.OpenPath(options_path)
-					WG.crude.ShowMenu() --make epic Chili menu appear.
+				local _,_, meta,_ = Spring.GetModKeyState()
+				if not meta then return false end
+				WG.crude.OpenPath(options_path)
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				return true
 		end },
 	}
 	

@@ -814,8 +814,10 @@ function widget:Initialize()
 		minimumSize = {x_bound, 1},
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
-			if not meta then return end
+			if not meta then return false end
 			WG.crude.OpenPath(options_path)
+			WG.crude.ShowMenu()
+			return true
 		end },
 	}
 	scroll_cpl = ScrollPanel:New{
