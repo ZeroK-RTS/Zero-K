@@ -272,14 +272,14 @@ local function addUnit(defName, path)
     end
     
     if ud.canCloak then
-        options[defName .. "_personal_cloak"] = {
+        options[defName .. "_personal_cloak_0"] = {
             name = "  Personal Cloak",
             desc = "Personal Cloak: check box to turn it on",
             type = 'bool',
             value = ud.startCloaked,
             path = path,
         }
-        options_order[#options_order+1] = defName .. "_personal_cloak"
+        options_order[#options_order+1] = defName .. "_personal_cloak_0"
     
     end
 	
@@ -433,8 +433,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                 Spring.GiveOrderToUnit(unitID, CMD_UNIT_AI, {options[name .. "_tactical_ai"].value and 1 or 0}, 0)
             end
             
-            if options[name .. "_personal_cloak"] and options[name .. "_personal_cloak"].value ~= nil then
-                Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {options[name .. "_personal_cloak"].value and 1 or 0}, 0)
+            if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
+                Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, 0)
             end
             
         end

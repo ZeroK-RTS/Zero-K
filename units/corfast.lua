@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corfast]],
   name                = [[Freaker]],
-  description         = [[Jumpjet Constructor, Builds at 9 m/s]],
+  description         = [[Jumpjet Constructor/Resurrector, Builds at 9 m/s]],
   acceleration        = 0.26,
   bmcode              = [[1]],
   brakeRate           = 0.26,
@@ -19,6 +19,7 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   canreclamate        = [[1]],
+  canResurrect        = true,
   canstop             = [[1]],
   category            = [[LAND UNARMED]],
   corpse              = [[DEAD]],

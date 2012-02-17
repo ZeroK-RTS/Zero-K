@@ -53,6 +53,7 @@ unitDef = {
   iconType               = [[builder]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
+  initCloaked            = true,
   leaveTracks            = true,
   maneuverleashlength    = [[640]],
   mass                   = 123,
