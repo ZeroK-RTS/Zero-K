@@ -19,6 +19,7 @@ end
 -- to do : include chicken buildings.
 
 ---- CHANGELOG -----
+-- versus666,			V6.3	(17fev2012) :	corrected min range due to Outlaw fake weapon, merged with Unit Ranges by Niobium. Very basic range, no gravity compensation as it would cost many CPU cycles time with many units, it should be fine given the dynamic nature of units.
 -- versus666,			v6.2.6	(16dec2011)	:	comply with F5 (hide gui->hide ranges) for clean screenshots.
 -- Google Frog          v6.2.5  (11dec2010) :	moved all range display config to chilli menu. Removed extraneous configs
 -- versus666,			v6.2.4	(04nov2010)	:	added widget name over buttons when in tweak mode, clearer than a plain box + widget name in tooltips when hovering over buttons.
@@ -108,6 +109,7 @@ local Chili
 options_path = 'Game/Settings/Defense Ranges'
 
 options = { 
+	showselectedunitrange = {name = 'Show selected unit(s) range(s)', type = 'bool', value = false},
 	allyground = {name = 'Show Ally Ground Defence', type = 'bool', value = false},
 	allyair = {name = 'Show Ally Air Defence', type = 'bool', value = false},
 	allynuke = {name = 'Show Ally Nuke Defence', type = 'bool', value = true},
@@ -117,6 +119,7 @@ options = {
 }
 
 options_order = {
+	'showselectedunitrange',
 	'allyground',
 	'allyair',
 	'allynuke',
@@ -145,6 +148,18 @@ local lineConfig = {}
 lineConfig["lineWidth"] = 1.0 -- calcs dynamic now
 lineConfig["alphaValue"] = 0.0 --> dynamic behavior can be found in the function "widget:Update"
 lineConfig["circleDivs"] = 40.0
+
+-- active range vars
+local spGetSelUnitsSorted	= Spring.GetSelectedUnitsSorted
+local spGetUnitViewPosition	= Spring.GetUnitViewPosition
+local uDefs					= UnitDefs
+local wDefs					= WeaponDefs
+local wepRanges				= {}
+--local buildRange			= {}
+local sqrt					= math.sqrt
+
+local weapNamTab			= WeaponDefNames
+local weapTab				= WeaponDefs
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local GL_LINE_LOOP          = GL.LINE_LOOP
@@ -200,6 +215,7 @@ local spGetLocalTeamID	 	= Spring.GetLocalTeamID
 local spGetActiveCommand 	= Spring.GetActiveCommand
 local spGetActiveCmdDesc 	= Spring.GetActiveCmdDesc
 local spIsSphereInView  	= Spring.IsSphereInView
+local IsGuiHidden			=	Spring.IsGUIHidden
 
 local udefTab				= UnitDefs
 local weapTab				= WeaponDefs
@@ -223,10 +239,33 @@ local DrawRanges
 
 function widget:Initialize()
 	state["myPlayerID"] = spGetLocalTeamID()
-
 	DetectMod()
-
+	
+	for uDefID, uDef in pairs(uDefs) do
+		wepRanges[uDefID] = {}
+		local weapons = uDef.weapons
+		local entryIndex = 0
+		for weaponIndex=1, #weapons do
+			local weaponRange = wDefs[weapons[weaponIndex].weaponDef].range -- take the value of 'range' in each 'weapons' in 'weaponDefs'
+			if (weaponRange > 32) then -- many 'fake' weapons have <= 16 range. ->Up to 32 for outlaw.
+				entryIndex = entryIndex + 1
+				wepRanges[uDefID][entryIndex] = weaponRange
+			end
+		end
+		--[[if ( weapNamTab[lower(udef["deathExplosion"])] == nil ) then
+			return
+		end
+		
+		local udef = uDefs[unitDefID]
+		if ( weapNamTab[lower(udef["deathExplosion"])] == nil ) then
+			return
+		end
+		local deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
+		local blastRadius = weapTab[deathBlasId].areaOfEffect
+		local defaultDamage = weapTab[deathBlasId].damages[0]	--get default damage]]--
+	end
 end
+
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 	UnitDetected( unitID, true )
@@ -653,11 +692,39 @@ function DrawRanges()
 	glDepthTest(false)
 end
 
-function widget:DrawWorld()
-if not Spring.IsGUIHidden() then
-	DrawRanges()
+function DrawSelectedRanges()
+	if ( options.showselectedunitrange.value == true ) then
+		-- range OpenGL stuff
+		glLineWidth(1.49)
+		glDepthTest(true)
+			-- Get selected units, sorted for efficiency
+		local selUnits = spGetSelUnitsSorted()
+		selUnits.n = nil -- So our loop works
+		-- Set the color
+		-- Do the loop
+		for uDefID, uIDs in pairs(selUnits) do
+			local uWepRanges = wepRanges[uDefID]
+			if uWepRanges then
+				for i = 1, #uIDs do
+					local ux, uy, uz = spGetUnitViewPosition(uIDs[i])
+					for r = 1, #uWepRanges do
+						glLineWidth(lineConfig["lineWidth"])
+						glColor(0.0, 1-(r/5), 1-(r/5), lineConfig["alphaValue"])
+						glDrawGroundCircle(ux, uy, uz, uWepRanges[r], lineConfig["circleDivs"])
+					end
+				end
+			end
+		end
+	end
 end
-	ResetGl()
+
+function widget:DrawWorld()
+	if not IsGuiHidden() then
+		-- def range routine
+		DrawRanges()
+		DrawSelectedRanges()
+		ResetGl()
+	end
 end
 
 function printDebug( value )
