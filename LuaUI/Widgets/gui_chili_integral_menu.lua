@@ -326,7 +326,6 @@ local function MakeButton(container, cmd, insertItem)
 		if (isState) then 
 			button.padding = {4,4,2.5,2}
 --			button.backgroundColor = {0,0,0,0}
-			tooltip = "Unit State"	-- for special options
 		end 
 		if (isBuild) then
 			button.padding = {1,1,1,1}

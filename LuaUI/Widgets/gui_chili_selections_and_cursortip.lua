@@ -1677,7 +1677,6 @@ local function MakeToolTip_Terra(cmdName)
 		main = {
 			{ name='cmdName', text = cyan..cmdName, wrap=false},
 			{ name='tips', text = terraTips[cmdName], wrap=true },
-			{ name='help', text = green .. 'Space+/: Configure hotkeys', },
 		},
 	}
 	
