@@ -778,7 +778,7 @@ function Isair(name)
   if name == "armca" or name == "armcsa" or name == "fighter" or name == "corvamp" or name == "armstiletto_laser" or name == "corhurc2" or name == "corshad" or name == "armcybr" or name == "corawac" then
     return true
   end
-  if name == "attackdrone" or name == "carrydrone" or name == "chicken_pigeon" or name == "chicken_blimpy" or name == "chicken_roc" or or name == "chickenf" name == "chickenflyerqueen" then
+  if name == "attackdrone" or name == "carrydrone" or name == "chicken_pigeon" or name == "chicken_blimpy" or name == "chicken_roc" or name == "chickenf" or name == "chickenflyerqueen" then
     return true
   end
   return false
