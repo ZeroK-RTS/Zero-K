@@ -159,6 +159,8 @@ local callInLists = {
   'AllowDirectUnitControl',
   'MoveCtrlNotify',
   'TerraformComplete',
+  'AllowWeaponTargetCheck',
+  'AllowWeaponTarget',
   -- unsynced
   'DrawUnit',
   'DrawFeature',
@@ -1227,6 +1229,34 @@ function gadgetHandler:TerraformComplete(unitID, unitDefID, unitTeam,
     end
   end
   return false
+end
+
+
+function gadgetHandler:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)
+	for _, g in ipairs(self.AllowWeaponTargetCheckList) do
+		if (g:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)) then
+			return true
+		end
+	end
+
+	return false
+end
+
+
+function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
+	local allowed = false
+	local priority = 1.0
+
+	for _, g in ipairs(self.AllowWeaponTargetList) do
+		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
+
+		if (targetAllowed) then
+			priority = math.max(priority, targetPriority)
+			allowed = true
+		end
+	end
+
+	return allowed, priority
 end
 
 

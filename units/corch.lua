@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[corch]],
-  name                = [[Hovercon]],
+  name                = [[Quill]],
   description         = [[Construction Hovercraft, Builds at 6 m/s]],
   acceleration        = 0.066,
   brakeRate           = 0.1,
