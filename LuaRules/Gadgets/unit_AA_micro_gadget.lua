@@ -1,4 +1,12 @@
-local versionNumber = "v0.4"
+local versionNumber = "v0.45"
+
+--[[   TO DO::
+
+Consider unit power(cost) in attacking
+Screamers hold fire until unit is killable
+Use unitAI toggle instead of return fire
+
+]]--
 
 function gadget:GetInfo()
   return {
@@ -44,16 +52,26 @@ local inALOS             = Spring.IsPosInAirLos
 local inRadar            = Spring.IsPosInRadar
 local inLOS              = Spring.IsPosInLos
 local GetLOSState        = Spring.GetUnitLosState
---[[local FindUnitCmdDesc    = Spring.FindUnitCmdDesc
+local FindUnitCmdDesc    = Spring.FindUnitCmdDesc
+local EditUnitCmdDesc    = Spring.EditUnitCmdDesc
+local GetUnitCmdDesc     = Spring.GetUnitCmdDescs
 local InsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
-local AAmicrocmd = {
+--[[local AAmicrocmd = {
       id      = CMD_AA_MICRO, 
-      name    = "AA micro",
-      action  = "AA micro",
       type    = CMDTYPE.ICON_MODE,
+      name    = "AA micro",
+      action  = "aamicro",
       tooltip = "Toggles AA Micro usage of this tower",
-      params  = { '1', 'On', 'Off'}
+      params  = {1, 'On','Off'}
 }]]--
+local unitAICmdDesc = {
+	id      = CMD_UNIT_AI,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Unit AI',
+	action  = 'unitai',
+	tooltip	= 'Toggles smart unit AI for the unit',
+	params 	= {1, 'AI Off','AI On'}
+}
 local airtargets         = {} -- {id = unitID, incoming = 0, hp = int, team = allyteam, inrange = {}}
 local airtargetsref      = {}
 local airtargetsmaxcount = {}
@@ -128,12 +146,20 @@ function checkAAdef()
 	  --Echo("ID " .. AAdefbuff.id)
 	  if not UnitIsDead(AAdefbuff.id) then
 		AAdef[h].units[i].frame = AAdef[h].units[i].frame + 1
+		local cstate = isUnitCloaked(AAdefbuff.id)
+		if cstate ~= nil and cstate ~= AAdefbuff.cstate then
+		  AAdefbuff.cstate = cstate
+		  if cstate and IsMicro(AAdefbuff.id) then
+		    GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, {AAdefbuff.cfire}, {})
+		  else
+		    GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, {AAdefbuff.fire}, {})
+		  end
+		end
 		if WeaponReady(AAdefbuff.id, i, h) then 
 		  --Echo("weapon ready")
 		  if AAdefbuff.counter == 0 then
 		    --Echo("ready, searching for target hp: " .. AAdef[h].units[i].damage)
-			local cstate = isUnitCloaked(AAdefbuff.id)
-			if not cstate then
+			if not AAdefbuff.cstate and IsMicro(AAdefbuff.id) then
 			  assignTarget(AAdefbuff.id, i, h)
 			end
 			AAdef[h].units[i].counter = AAmaxcounter(AAdefbuff.name)
@@ -143,14 +169,13 @@ function checkAAdef()
 		  end
 		else
 		  --Echo("not ready, deassigning target")
-		  local state = GetUnitStates(AAdefbuff.id)
-		  local cstate = isUnitCloaked(AAdefbuff.id)
-	      if state.firestate ~= 2 and not cstate and AAdefbuff.name ~= "missiletower" then
+	      if IsMicro(AAdefbuff.id) and AAdefbuff.name ~= "missiletower" then
 	        removecommand(AAdefbuff.id)
 	        stopcommand(AAdefbuff.id)
 		  end
 		  if AAdefbuff.refiredelay == 0 then
 		    unassignTarget(AAdefbuff.id, i, h)
+			AAdefbuff.refiredelay = -1
 		  else
 		    AAdef[h].units[i].refiredelay = AAdef[h].units[i].refiredelay - 1
 		  end
@@ -606,6 +631,19 @@ function stopcommand(unitID)
   GiveOrder(unitID, CMD.STOP, {}, {})
 end
 
+function IsMicro(unitID)
+if unitID ~= nil then
+  local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
+  local cmdDesc = GetUnitCmdDesc(unitID, cmdDescID, cmdDescID)
+  local nparams = cmdDesc[1].params
+  if nparams[1] == '1' then
+    return true
+  else
+    return false
+  end
+end
+end
+
 ------------------------------
 -----------CONSTANTS----------
 
@@ -743,10 +781,10 @@ function addAA(unitID, unitDefID, name, allyteam)
 	    teamcount = allyteam
 	  end
 	end
-    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000}, frame = 0, damage = sdamage - 5, lasttarget = nil, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name)}
+    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000}, frame = 0, damage = sdamage - 5, lasttarget = nil, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0}
     AAdefreference[allyteam].units[unitID] = AAdefmaxcount[allyteam] + 1
 	--insertcommandstate(unitID)
-	GiveOrder(unitID, CMD.FIRE_STATE, {1}, {})
+	GiveOrder(unitID, CMD.FIRE_STATE, {0}, {})
     --Echo("new AA, hold fire order given")
     AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] + 1
 end
@@ -888,6 +926,81 @@ function removeShot(shotID)
   end
 end
 
+function GetUnit(unitID)
+if unitID ~= nil then
+  local unitDefID = GetUnitDefID(unitID)
+  if unitDefID ~= nil then
+    local ud = UnitDefs[unitDefID]
+  else
+    return nil, nil, nil, nil
+  end
+  local allyteam = GetUnitAllyTeam(unitID)
+  if IsAA(ud.name) then
+	if AAdefreference[allyteam] ~= nil and AAdefreference[allyteam].units ~= nil then
+	  local refID = AAdefreference[allyteam].units[unitID]
+	  if refID ~= nil then
+	    local AAdefbuff = AAdef[allyteam].units[refID]
+	    return unitID, refID, allyteam, AAdefbuff
+	  else
+	    return unitID, nil, allyteam, nil
+	  end
+	else
+	  return unitID, nil, nil, nil
+	end
+  end
+  if IsAir(ud.name) then
+    if airtargetsref[allyteam] ~= nil and airtargetsref[allyteam].units ~= nil then
+	  local refID = airtargetsref[allyteam].units[unitID]
+	  if refID ~= nil then
+	    local airbuff = airtargets[allyteam].units[refID]
+	    return unitID, refID, allyteam, airbuff
+	  else
+	    return unitID, nil, allyteam, nil
+	  end
+	else
+	  return unitID, nil, nil, nil
+	end
+  end
+end
+return nil, nil, nil, nil
+end
+
+function GetAAUnit(unitID)
+if unitID ~= nil then
+  local allyteam = GetUnitAllyTeam(unitID)
+  if AAdefreference[allyteam] ~= nil and AAdefreference[allyteam].units ~= nil then
+	local refID = AAdefreference[allyteam].units[unitID]
+	if refID ~= nil then
+	  local AAdefbuff = AAdef[allyteam].units[refID]
+	  return unitID, refID, allyteam, AAdefbuff
+	else
+	  return unitID, nil, allyteam, AAdefbuff
+	end
+  else
+	return unitID, nil, nil, nil
+  end
+end
+return nil, nil, nil, nil
+end
+
+function GetAirUnit(unitID)
+if unitID ~= nil then
+  local allyteam = GetUnitAllyTeam(unitID)
+  if airtargetsref[allyteam] ~= nil and airtargetsref[allyteam].units ~= nil then
+	local refID = airtargetsref[allyteam].units[unitID]
+	if refID ~= nil then
+	  local airbuff = airtargets[allyteam].units[refID]
+	  return unitID, refID, allyteam, airbuff
+	else
+	  return unitID, nil, allyteam, airbuff
+	end
+  else
+	return unitID, nil, nil, nil
+  end
+end
+return nil, nil, nil, nil
+end
+
 ------------------------------
 -----------CALL INS-----------
 
@@ -905,6 +1018,12 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
   if Isair(ud.name) then
     addAir(unitID, unitDefID, ud.name, GetUnitAllyTeam(unitID))
 	--Echo("air created")
+  end
+  if IsAA(ud.name) then
+    InsertUnitCmdDesc(unitID, unitAICmdDesc)
+	local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
+	--Echo(cmdDescID)
+	EditUnitCmdDesc(unitID, cmdDescID, {params = {1, 'AI Off','AI On'}})
   end
 end
 
@@ -962,6 +1081,56 @@ function gadget:GameFrame()
     checkweapon()
   end
   ]]--
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+  if cmdID ~= CMD_UNIT_AI and cmdID ~= CMD.FIRE_STATE then
+	return true  -- command was not used
+  end
+  local ud = UnitDefs[unitDefID]
+if cmdID == CMD_UNIT_AI then
+  local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
+  local cmdDesc = GetUnitCmdDesc(unitID, cmdDescID, cmdDescID)
+  local nparams = cmdDesc[1].params
+  --Echo(nparams[1])
+  if nparams[1] == '0' then
+    nparams = {1, 'AI Off','AI On'}
+  else
+    nparams = {0, 'AI Off','AI On'}
+  end
+  EditUnitCmdDesc(unitID, cmdDescID, {params = nparams})
+else
+  if IsAA(ud.name) then
+    local cstate = isUnitCloaked(unitID)
+    if cstate then
+	  local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
+	  if allyteam ~= nil and refID ~= nil and AAdefbuff ~= nil then
+	    --Echo("cloaked state " .. cmdParams[1])
+        if cmdParams[1] == 2 then
+          AAdef[allyteam].units[refID].cfire = 2
+        elseif cmdParams[1] == 1 then
+          AAdef[allyteam].units[refID].cfire = 1
+		  --Echo("cloak 1")
+	    else
+          AAdef[allyteam].units[refID].cfire = 0
+        end
+	  end
+	else
+	  local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
+	  if allyteam ~= nil and refID ~= nil and AAdefbuff ~= nil then
+	    --Echo("uncloaked state " .. cmdParams[1])
+        if cmdParams[1] == 2 then
+          AAdef[allyteam].units[refID].fire = 2
+        elseif cmdParams[1] == 1 then
+          AAdef[allyteam].units[refID].fire = 1
+	    else
+          AAdef[allyteam].units[refID].fire = 0
+        end
+	  end
+	end
+  end
+end
+  return true
 end
 
 function gadget:Initialize()
