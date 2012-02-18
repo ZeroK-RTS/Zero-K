@@ -9,6 +9,14 @@
 --------------------------------------------------------------------------------
 
 local modrules  = {
+  
+  movement = {
+    allowAirPlanesToLeaveMap = true;  -- defaults to true
+    allowPushingEnemyUnits   = false; -- defaults to false
+    allowCrushingAlliedUnits = false; -- defaults to false
+    allowUnitCollisionDamage = true; -- defaults to false
+  },
+  
   construction = {
     constructionDecay      = false; -- defaults to true
     constructionDecayTime  = 6.66;  -- defaults to 6.66
