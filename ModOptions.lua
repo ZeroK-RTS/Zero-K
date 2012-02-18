@@ -523,12 +523,12 @@ local options = {
   {
 	key    = 'burrowqueentime',
 	name   = 'Burrow Queen Time',
-	desc   = 'How much time each burrow death subtracts from queen appearance time (divided by playercount), seconds',
+	desc   = 'How much time each burrow death subtracts from queen appearance time, seconds',
 	type   = 'number',
 	section= 'chicken',
-	def    = 100,
+	def    = 15,
 	min    = 0,
-	max    = 1200,
+	max    = 120,
 	step   = 1,  
   },
 --[[
