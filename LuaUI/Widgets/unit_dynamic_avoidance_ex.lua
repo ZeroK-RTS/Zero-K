@@ -1,4 +1,4 @@
-local versionName = "v2.00"
+local versionName = "v2.01"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -62,7 +62,7 @@ local CMD_OPT_SHIFT		= CMD.OPT_SHIFT
 -- Constant:
 -- Switches:
 local turnOnEcho =0 --Echo out all numbers for debugging the system (default = 0)
-local activateAutoReverseG=1 --activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
+local activateAutoReverseG=0 --activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
 local activateImpatienceG=0 --auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
 -- Graph constant:
@@ -77,10 +77,10 @@ local windowingFuncMultG = 1 --? (default = 1 multiplier)
 local normalizeObsGraphG = false --// if 'true': normalize turn angle to a maximum of "obsCONSTANTg", if 'false': allow turn angle to grow as big as it can (depend on number of enemy, limited by "maximumTurnAngleG").
 
 -- Obstacle/Target competetive interaction constant:
-local cCONSTANT1g 			= {0.01,1} --attractor constant; effect the behaviour. ie: selection between 4 behaviour state. (default = 0.01x (All), 1x (Cloakies)) (behaviour:(MAINTAIN USER's COMMAND)|(IGNORE USER's COMMAND))
-local cCONSTANT2g			= {0.01,1} --repulsor constant; effect behaviour. (default = 0.01x (All), 1x (Cloakies)) (behaviour:(MAINTAIN USER's COMMAND)|(IGNORE USER's COMMAND))
-local gammaCONSTANT2and1g	= {0.05,0.05} -- balancing constant; effect behaviour. . (default = 0.05x (All), 0.05x (Cloakies))
-local alphaCONSTANT1g		= {500,0.4} -- balancing constant; effect behaviour. (default = 500x (All), 0.4x (Cloakies)) (behaviour:(MAINTAIN USER's COMMAND)|(IGNORE USER's COMMAND))
+local cCONSTANT1g 			= {0.01,1,2} --attractor constant; effect the behaviour. ie: selection between 4 behaviour state. (default = 0.01x (All), 1x (Cloakies)) (behaviour:(MAINTAIN USER's COMMAND)|(IGNORE USER's COMMAND))
+local cCONSTANT2g			= {0.01,1,2} --repulsor constant; effect behaviour. (default = 0.01x (All), 1x (Cloakies)) (behaviour:(MAINTAIN USER's COMMAND)|(IGNORE USER's COMMAND))
+local gammaCONSTANT2and1g	= {0.05,0.05,0.05} -- balancing constant; effect behaviour. . (default = 0.05x (All), 0.05x (Cloakies))
+local alphaCONSTANT1g		= {500,0.4,0.4} -- balancing constant; effect behaviour. (default = 500x (All), 0.4x (Cloakies)) (behaviour:(MAINTAIN USER's COMMAND)|(IGNORE USER's COMMAND))
 
 --Move Command constant:
 local halfTargetBoxSize = {400, 0, 185, 50} --the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
@@ -280,24 +280,24 @@ function RefreshUnitList(attacker)
 			if (unitSpeed>0) then
 				local unitType = 0 --// category that control WHEN avoidance is activated for each unit. eg: Category 2 only enabled when not in view & when guarding units. Used by 'GateKeeperOrCommandFilter()'
 				local fixedPointType = 1 --//category that control WHICH avoidance behaviour to use. eg: Category 2 priotize avoidance and prefer to ignore user's command when enemy is close. Used by 'CheckWhichFixedPointIsStable()'
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --only include only cloakies and constructor, and not com (ZK)
-					unitType =1
-					if options.enableCons.value==false then --//if Cons epicmenu option is false then exclude Cons
+				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com (ZK)
+					unitType =1 --//this unit type do avoidance even in camera view
+					if options.enableCons.value==false and unitDef["builder"] then --//if Cons epicmenu option is false and it is a constructor, then exclude Cons
 						unitType = 0
 					end
-					if unitDef["canCloak"] then 
-						fixedPointType=2
+					if unitDef["canCloak"] then --only cloakies
+						fixedPointType=2 --//use aggressive behaviour (avoid more)
 						if options.enableCloaky.value==false then --//if Cloaky epicmenu option is false then exclude Cloaky
 							unitType = 0
 						end
 					end
-				elseif not unitDef["canFly"] then --if enabled: include all ground unit
-					unitType =2
+				elseif not unitDef["canFly"] then --include all ground unit, including com
+					unitType =2 --//this unit type only have avoidance outside camera view
 					if options.enableGround.value==false then --//if Ground unit epicmenu option is false then exclude Ground unit
 						unitType = 0
 					end
-				elseif (unitDef.hoverAttack== true) then --if enabled: include gunship
-					unitType =3
+				elseif (unitDef.hoverAttack== true) then --include gunships
+					unitType =3 --//this unit type only have avoidance outside camera view
 					if options.enableGunship.value==false then --//if Gunship epicmenu option is false then exclude Gunship
 						unitType = 0
 					end
@@ -341,7 +341,8 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 				if executionAllow then
 					cQueue = cQueueTemp --cQueueTemp has been altered for identification, copy it to cQueue for use (actual command is not yet issued)
 					--local boxSizeTrigger= unitInMotion[i][2]
-					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable) --check old or new command
+					local fixedPointCONSTANTtrigger = unitInMotion[i][4] --//using fixedPointType to trigger different fixed point constant for each unit type
+					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable,fixedPointCONSTANTtrigger) --check old or new command
 					local currentX,_,currentZ = spGetUnitPosition(unitID)
 					local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
 					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
@@ -355,7 +356,6 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 					end
 					
 					if surroundingUnits[1]~=nil and not reachedTarget then  --execute when enemy exist and target not reached yet
-						local fixedPointCONSTANTtrigger = unitInMotion[i][4] --//using fixedPointType to trigger different fixed point constant for each unit type
 						local unitSSeparation=CatalogueMovingObject(surroundingUnits, unitID, lastPosition) --detect initial enemy separation
 						arrayIndex=arrayIndex+1 --// increment table index by 1, start at index 2; table lenght is stored at row 1
 						local unitSpeed = unitInMotion[i][3]
@@ -530,6 +530,7 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		end
 		if cQueue[1]~=nil then --prevent idle unit from executing the system (prevent crash), but idle unit with FAKE COMMAND (cMD_DummyG) is allowed.
 			local isValidCommand = (cQueue[1].id == 40 or cQueue[1].id < 0 or cQueue[1].id == 90 or cQueue[1].id == CMD_MOVE or cQueue[1].id == 125 or  cQueue[1].id == cMD_DummyG) -- ALLOW unit with command: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE COMMAND
+			--local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes" and unitInMotionSingleUnit[2]~= 3)--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision except gunship)
 			local isValidUnitTypeOrIsNotVisible = (unitInMotionSingleUnit[2] == 1) or (unitInMotionSingleUnit.isVisible ~= "yes")--ALLOW only unit of unitType=1 OR (all unitTypes that is outside player's vision)
 			local _2ndAttackSignature = false --attack command signature
 			local _2ndGuardSignature = false --guard command signature
@@ -553,7 +554,7 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 end
 
 --check if widget's command or user's command
-function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable) --//used by GetPreliminarySeparation()
+function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable, fixedPointCONSTANTtrigger) --//used by GetPreliminarySeparation()
 	local targetCoordinate = {nil,nil,nil}
 	local boxSizeTrigger=0
 	local graphCONSTANTtrigger = {}
@@ -584,12 +585,12 @@ function IdentifyTargetOnCommandQueue(cQueue, unitID,commandIndexTable) --//used
 		end
 	end
 	if newCommand then	--if user's new command
-		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate)
+		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger = ExtractTarget (1, unitID,cQueue,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger)
 		commandIndexTable[unitID]["patienceIndexA"]=0 --//reset impatience counter
 	else  --if widget's previous command
-		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate)	
+		commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger,fixedPointCONSTANTtrigger = ExtractTarget (2, unitID,cQueue,commandIndexTable,targetCoordinate,fixedPointCONSTANTtrigger)	
 	end
-	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger --return target coordinate
+	return targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger --return target coordinate
 end
 
 --ignore command set on this box
@@ -724,6 +725,8 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		local fTargetSlope = 0
 		----
 		aCONSTANT = aCONSTANT[graphCONSTANTtrigger[1]] --//select which 'aCONSTANT' value
+		fTarget = aCONSTANT --//maximum value is aCONSTANT
+		fTargetSlope = 1 --//slope is negative or positive
 		if targetCoordinate[1]~=-1 then --if target coordinate contain -1 then disable target for pure avoidance
 			targetAngle				= GetTargetAngleWithRespectToUnit(unitID, targetCoordinate) --get target angle
 			fTarget					= GetFtarget (aCONSTANT, targetAngle, unitDirection)
@@ -906,7 +909,7 @@ function dNil(x)
 	return x
 end
 
-function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate) --//used by IdentifyTargetOnCommandQueue()
+function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate, fixedPointCONSTANTtrigger) --//used by IdentifyTargetOnCommandQueue()
 	local boxSizeTrigger=0
 	local graphCONSTANTtrigger = {}
 	if (cQueue[queueIndex].id==CMD_MOVE or cQueue[queueIndex].id<0) then
@@ -1003,9 +1006,10 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[1].id == cMD_DummyG then
 		targetCoordinate = {-1, -1,-1} --no target (only avoidance)
-		boxSizeTrigger = nil --//value not needed; because 'halfboxsize' for a "-1" target always return "not reached"
-		graphCONSTANTtrigger[1] = nil --//value not needed; because avoidance of 'cMD_DummyG' don't use attractor 
+		boxSizeTrigger = nil --//value not needed; because 'halfboxsize' for a "-1" target always return "not reached", calculation is skipped (no nil error)
+		graphCONSTANTtrigger[1] = 1 --//this value doesn't matter because 'cMD_DummyG' don't use attractor (-1 disabled the attractor calculation, and 'fixedPointCONSTANTtrigger' behaviour ignore attractor). Needed because "fTarget" is tied to this variable in "AvoidanceCalculator()". 
 		graphCONSTANTtrigger[2] = 1
+		fixedPointCONSTANTtrigger = 3 --//use behaviour that promote avoidance/ignore attractor
 	elseif cQueue[queueIndex].id == CMD_GUARD then
 		local unitPosX, unitPosY, unitPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		local targetUnitID = cQueue[queueIndex].params[1]
@@ -1025,18 +1029,20 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		graphCONSTANTtrigger[2] = 1	--//use less aggressive avoidance because need to stay close to units. It need not stray.
 	elseif cQueue[queueIndex].id == CMD_ATTACK then
 		targetCoordinate={-1, -1, -1}
-		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached"
-		graphCONSTANTtrigger[1] = nil --//value not needed; because CMD_ATTACK don't use attractor 
+		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached", calculation skipped (no nil error)
+		graphCONSTANTtrigger[1] = 1 --//this value doesn't matter because 'CMD_ATTACK' don't use attractor (-1 already disabled the attractor calculation, and 'fixedPointCONSTANTtrigger' ignore attractor). Needed because "fTarget" is tied to this variable in "AvoidanceCalculator()".
 		graphCONSTANTtrigger[2] = 2	--//use more aggressive avoidance because it often run just once or twice. It need big result.
+		fixedPointCONSTANTtrigger = 3 --//use behaviour that promote avoidance/ignore attractor (incase -1 is not enough)
 	else --if queue has no match/ is empty: then use no-target. eg: A case where undefined command is allowed into the system, or when engine delete the next queues of a valid command and widget expect it to still be there.
 		targetCoordinate={-1, -1, -1}
 		--if for some reason command queue[2] is already empty then use these backup value as target:
 		--targetCoordinate={commandIndexTable[unitID]["backupTargetX"], commandIndexTable[unitID]["backupTargetY"],commandIndexTable[unitID]["backupTargetZ"]} --if the second queue isappear then use the backup
-		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached"
-		graphCONSTANTtrigger[1] = nil
+		boxSizeTrigger = nil --//value not needed; because boxsize for a "-1" target always return "not reached", , calculation is skipped (no nil error)
+		graphCONSTANTtrigger[1] = 1  --//needed because "fTarget" is tied to this variable in "AvoidanceCalculator()". This value doesn't matter because -1 already skip attractor calculation & 'fixedPointCONSTANTtrigger' already ignore attractor values.
 		graphCONSTANTtrigger[2] = 1
+		fixedPointCONSTANTtrigger = 3
 	end
-	return commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger
+	return commandIndexTable, targetCoordinate, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger
 end
 
 function AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
