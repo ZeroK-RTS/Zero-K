@@ -4,7 +4,6 @@ local versionNumber = "v0.45"
 
 Consider unit power(cost) in attacking
 Screamers hold fire until unit is killable
-Use unitAI toggle instead of return fire
 
 ]]--
 
@@ -783,9 +782,6 @@ function addAA(unitID, unitDefID, name, allyteam)
 	end
     AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000}, frame = 0, damage = sdamage - 5, lasttarget = nil, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0}
     AAdefreference[allyteam].units[unitID] = AAdefmaxcount[allyteam] + 1
-	--insertcommandstate(unitID)
-	GiveOrder(unitID, CMD.FIRE_STATE, {0}, {})
-    --Echo("new AA, hold fire order given")
     AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] + 1
 end
 
@@ -1024,6 +1020,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
 	--Echo(cmdDescID)
 	EditUnitCmdDesc(unitID, cmdDescID, {params = {1, 'AI Off','AI On'}})
+	GiveOrder(unitID, CMD.FIRE_STATE, {0}, {})
   end
 end
 
