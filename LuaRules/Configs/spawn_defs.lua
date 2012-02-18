@@ -260,7 +260,7 @@ difficulties = {
 	gracePeriod		= (modoptions.graceperiod and modoptions.graceperiod * 60) or 180,
 	gracePenalty	= 0,
 	gracePeriodMin	= 30,
-	burrowQueenTime	= (modoptions.burrowqueentime and modoptions.burrowqueentime) or 30,
+	burrowQueenTime	= (modoptions.burrowqueentime and modoptions.burrowqueentime) or 15,
 	timeModifier	= modoptions.techtimemult or 1,
 	scoreMult		= 0,
   },
