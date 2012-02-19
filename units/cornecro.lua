@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[cornecro]],
-  name                = [[Con Artist]],
+  name                = [[Convict]],
   description         = [[Construction/Shield Support bot, Builds at 6 m/s]],
   acceleration        = 0.5,
   bmcode              = [[1]],
@@ -30,10 +30,10 @@ unitDef = {
     description_fr = [[Robot de Construction, Construit ? 6 m/s]],
     description_it = [[Robot da Costruzzione, Costruisce a 6 m/s]],
 	description_de = [[Konstruktions, Baut mit 6 M/s]],
-    helptext       = [[The Con Artist is a fairly standard construction bot with a twist: a light shield to defend itself and support allied shieldbots.]],
+    helptext       = [[The Convict is a fairly standard construction bot with a twist: a light shield to defend itself and support allied shieldbots.]],
     helptext_bp    = [[]],
-    --helptext_fr    = [[Le Con Artist tient son nom de sa facult?, comme tous les constructeurs de sa faction, ? r?ssuciter les carcasses du champ de bataille. La Resurrection ne consomme que de l'?nergie, et d?pends du co?t de l'unit? originelle.]],
-    --helptext_de    = [[Der Con Artist ist ein ziemlich normaler Konstruktionsroboter mit einem Vorteil: er kann Leichen wiederbeleben. Zu 120% der ursprünglichen Energiekosten bekommst du eine so gut wie neue Einheit wiederzurück.]],
+    --helptext_fr    = [[Le Convict tient son nom de sa facult?, comme tous les constructeurs de sa faction, ? r?ssuciter les carcasses du champ de bataille. La Resurrection ne consomme que de l'?nergie, et d?pends du co?t de l'unit? originelle.]],
+    --helptext_de    = [[Der Convict ist ein ziemlich normaler Konstruktionsroboter mit einem Vorteil: er kann Leichen wiederbeleben. Zu 120% der ursprünglichen Energiekosten bekommst du eine so gut wie neue Einheit wiederzurück.]],
   },
 
   defaultmissiontype  = [[Standby]],
