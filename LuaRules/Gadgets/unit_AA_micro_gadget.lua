@@ -859,7 +859,7 @@ function removeAA(unitID, allyteam)
     local refID = AAdefreference[allyteam].units[unitID]
 	  if AAdefmaxcount[allyteam] > 1 then
         AAdef[allyteam].units[refID] = AAdef[allyteam].units[AAdefmaxcount[allyteam]]
-		Echo("removed unit " allyteam .. " " .. refID)
+		Echo("removed unit " .. allyteam .. " " .. refID)
 		Echo(AAdef[allyteam].units[AAdefmaxcount[allyteam]])
 	    AAdefreference[allyteam].units[AAdef[allyteam].units[AAdefmaxcount[allyteam]].id] = refID
 	  end
