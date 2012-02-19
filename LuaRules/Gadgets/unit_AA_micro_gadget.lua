@@ -145,6 +145,9 @@ function checkAAdef()
 	  --Echo("ID " .. AAdefbuff.id)
 	  if not UnitIsDead(AAdefbuff.id) then
 		AAdef[h].units[i].frame = AAdef[h].units[i].frame + 1
+		if AAdef[h].units[i].frame == 1 then
+		  GiveOrder(AAdef[h].units[i].id, CMD.FIRE_STATE, {0}, {})
+		end
 		local cstate = isUnitCloaked(AAdefbuff.id)
 		local _, _, stun = UnitStun(AAdefbuff.id)
 		if cstate ~= nil and cstate ~= AAdefbuff.cstate then
@@ -757,7 +760,7 @@ function IsAttacking(unitID)
   return false
 end
 
-function IsMoveTypeAir(unitID)
+--[[function IsMoveTypeAir(unitID)
   local move = Tooltip(unitID)
   if move == "Blastwing - Bomb Drone" or move == "Gnat - Light Paralyzer Drone" or move == "Banshee - Raider Gunship" or move == "Rapier - Multi-Role/AA Gunship" or move == "Brawler - Assault Gunship" or move == "Black Dawn - Riot/Skirmish Gunship" or move == "Krow - Flying Fortress" or move == "Valkyrie - Air Transport" or move == "Vindicator - Armed Heavy Air Transport" then
     return true
@@ -769,7 +772,7 @@ function IsMoveTypeAir(unitID)
     return true
   end
   return false
-end
+end]]--
 
 function Isair(name)
   if name == "bladew" or name == "blastwing" or name == "armkam" or name == "corape" or name == "armbrawl" or name == "blackdawn" or name == "corcrw" or name == "corvalk" or name == "corbtrans"  then
@@ -1069,7 +1072,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
 	--Echo(cmdDescID)
 	EditUnitCmdDesc(unitID, cmdDescID, {params = {1, 'AI Off','AI On'}})
-	GiveOrder(unitID, CMD.FIRE_STATE, {0}, {})
   end
 end
 
