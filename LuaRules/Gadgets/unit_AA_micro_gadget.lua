@@ -859,8 +859,8 @@ function removeAA(unitID, allyteam)
     local refID = AAdefreference[allyteam].units[unitID]
 	  if AAdefmaxcount[allyteam] > 1 then
         AAdef[allyteam].units[refID] = AAdef[allyteam].units[AAdefmaxcount[allyteam]]
-		Echo("removed unit " .. allyteam .. " " .. refID)
-		Echo(AAdef[allyteam].units[AAdefmaxcount[allyteam]])
+		--Echo("removed unit " .. allyteam .. " " .. refID)
+		--Echo(AAdef[allyteam].units[AAdefmaxcount[allyteam]])
 	    AAdefreference[allyteam].units[AAdef[allyteam].units[AAdefmaxcount[allyteam]].id] = refID
 	  end
 	  AAdef[allyteam].units[AAdefmaxcount[allyteam]] = nil
@@ -1093,11 +1093,13 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
   local _, _, _, _, _, oldteam, _, _ = GetTeamInfo(oldTeam)
   local _, _, _, _, _, newteam, _, _ = GetTeamInfo(unitTeam)
   local ud = UnitDefs[unitDefID]
-  if Isair(ud.name) then
-    transferAir(unitID, newteam, oldteam)
-  end
-  if IsAA(ud.name) then
-    transferAA(unitID, newteam, oldteam)
+  if newteam ~= oldteam then
+    if Isair(ud.name) then
+      transferAir(unitID, newteam, oldteam)
+    end
+    if IsAA(ud.name) then
+      transferAA(unitID, newteam, oldteam)
+    end
   end
 end
 
