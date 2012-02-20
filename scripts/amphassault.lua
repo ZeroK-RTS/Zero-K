@@ -14,92 +14,96 @@ local gunPieces = {
 }
 local gun_1 = 0
 
+local SPEED = 1.9
+
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 
 	while true do
 		
-		-- right
-		Turn( rfleg, x_axis, math.rad(40),math.rad(40))
-		Turn( rffoot, x_axis, math.rad(-40),math.rad(40))
-		
-		Turn( rbleg, x_axis, math.rad(5),math.rad(10))
-		Turn( rbfoot, x_axis, math.rad(-40),math.rad(80))
-		
-		Move( rfleg, y_axis, 0.3,0.6)
-		Move( rbleg, y_axis, 0.3,0.6)
-		
-		-- left
-		Turn( lfleg, x_axis, math.rad(-20),math.rad(120))
-		Turn( lffoot, x_axis, math.rad(35),math.rad(150))
-		
-		Turn( lbleg, x_axis, math.rad(0),math.rad(45))
-		Turn( lbfoot, x_axis, math.rad(0),math.rad(46))
+		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
 
-		Move( lfleg, y_axis, 0.5,2.2)
-		Move( lbleg, y_axis, 0.5,1)
-		
-		Move( body, y_axis, 1,1)
-		Sleep(500) -- ****************
-		
 		-- right
-		Turn( rbleg, x_axis, math.rad(-50),math.rad(110))
-		Turn( rbfoot, x_axis, math.rad(50),math.rad(180))
+		Turn( rfleg, x_axis, math.rad(40),math.rad(40)*speedmult)
+		Turn( rffoot, x_axis, math.rad(-40),math.rad(40)*speedmult)
 		
-		Move( rfleg, y_axis, 1.6,2.6)
-		Move( rbleg, y_axis, 1,1.4)
+		Turn( rbleg, x_axis, math.rad(5),math.rad(10)*speedmult)
+		Turn( rbfoot, x_axis, math.rad(-40),math.rad(80)*speedmult)
+		
+		Move( rfleg, y_axis, 0.6,1.2*speedmult)
+		Move( rbleg, y_axis, 0.6,1.2*speedmult)
 		
 		-- left
-		Turn( lfleg, x_axis, math.rad(0),math.rad(40))
-		Turn( lffoot, x_axis, math.rad(0),math.rad(80))
+		Turn( lfleg, x_axis, math.rad(-20),math.rad(120)*speedmult)
+		Turn( lffoot, x_axis, math.rad(35),math.rad(150)*speedmult)
 		
-		Move( lfleg, y_axis, 0,1)
-		Move( lbleg, y_axis, 0,1)
+		Turn( lbleg, x_axis, math.rad(0),math.rad(45)*speedmult)
+		Turn( lbfoot, x_axis, math.rad(0),math.rad(46)*speedmult)
+
+		Move( lfleg, y_axis, 1,4.4*speedmult)
+		Move( lbleg, y_axis, 1,2*speedmult)
 		
-		Move( body, y_axis, 0.5,1)
-		Sleep(500) -- ****************
+		Move( body, y_axis, 1.5,1*speedmult)
+		Sleep(500/speedmult) -- ****************
 		
 		-- right
-		Turn( rfleg, x_axis, math.rad(-20),math.rad(120))
-		Turn( rffoot, x_axis, math.rad(35),math.rad(150))
+		Turn( rbleg, x_axis, math.rad(-50),math.rad(110)*speedmult)
+		Turn( rbfoot, x_axis, math.rad(50),math.rad(180)*speedmult)
 		
-		Turn( rbleg, x_axis, math.rad(0),math.rad(45))
-		Turn( rbfoot, x_axis, math.rad(0),math.rad(46))
+		Move( rfleg, y_axis, 3.2,5.2*speedmult)
+		Move( rbleg, y_axis, 2,2.8*speedmult)
 		
-		Move( rfleg, y_axis, 0.5,2.2)
-		Move( rbleg, y_axis, 0.5,1)
+		-- left
+		Turn( lfleg, x_axis, math.rad(0),math.rad(40)*speedmult)
+		Turn( lffoot, x_axis, math.rad(0),math.rad(80)*speedmult)
+		
+		Move( lfleg, y_axis, 0,2*speedmult)
+		Move( lbleg, y_axis, 0,2*speedmult)
+		
+		Move( body, y_axis, 1,1*speedmult)
+		Sleep(500/speedmult) -- ****************
+		
+		-- right
+		Turn( rfleg, x_axis, math.rad(-20),math.rad(120)*speedmult)
+		Turn( rffoot, x_axis, math.rad(35),math.rad(150)*speedmult)
+		
+		Turn( rbleg, x_axis, math.rad(0),math.rad(45)*speedmult)
+		Turn( rbfoot, x_axis, math.rad(0),math.rad(46)*speedmult)
+		
+		Move( rfleg, y_axis, 1,4.4*speedmult)
+		Move( rbleg, y_axis, 1,2*speedmult)
 		
 		
 		-- left
-		Turn( lfleg, x_axis, math.rad(40),math.rad(40))
-		Turn( lffoot, x_axis, math.rad(-40),math.rad(40))
+		Turn( lfleg, x_axis, math.rad(40),math.rad(40)*speedmult)
+		Turn( lffoot, x_axis, math.rad(-40),math.rad(40)*speedmult)
 		
-		Turn( lbleg, x_axis, math.rad(5),math.rad(10))
-		Turn( lbfoot, x_axis, math.rad(-40),math.rad(80))
+		Turn( lbleg, x_axis, math.rad(5),math.rad(10)*speedmult)
+		Turn( lbfoot, x_axis, math.rad(-40),math.rad(80)*speedmult)
 		
-		Move( lfleg, y_axis, 0.3,0.6)
-		Move( lbleg, y_axis, 0.3,0.6)
+		Move( lfleg, y_axis, 0.6,1.2*speedmult)
+		Move( lbleg, y_axis, 0.6,1.2*speedmult)
 		
-		Move( body, y_axis, 1,1)
-		Sleep(500) -- ****************
+		Move( body, y_axis, 3,2*speedmult)
+		Sleep(500/speedmult) -- ****************
 		
 		-- right
-		Turn( rfleg, x_axis, math.rad(0),math.rad(40))
-		Turn( rffoot, x_axis, math.rad(0),math.rad(80))
+		Turn( rfleg, x_axis, math.rad(0),math.rad(40)*speedmult)
+		Turn( rffoot, x_axis, math.rad(0),math.rad(80)*speedmult)
 		
-		Move( rfleg, y_axis, 0,1)
-		Move( rbleg, y_axis, 0,1)
+		Move( rfleg, y_axis, 0,2)
+		Move( rbleg, y_axis, 0,2)
 		
 		-- left
-		Turn( lbleg, x_axis, math.rad(-50),math.rad(110))
-		Turn( lbfoot, x_axis, math.rad(50),math.rad(180))
+		Turn( lbleg, x_axis, math.rad(-50),math.rad(110)*speedmult)
+		Turn( lbfoot, x_axis, math.rad(50),math.rad(180)*speedmult)
 		
-		Move( lfleg, y_axis, 1.6,2.6)
-		Move( lbleg, y_axis, 1,1.4)
+		Move( lfleg, y_axis, 3.2,5.2*speedmult)
+		Move( lbleg, y_axis, 2,2.8*speedmult)
 		
-		Move( body, y_axis, 0.5,1)
-		Sleep(500) -- ****************
+		Move( body, y_axis, 1,1*speedmult)
+		Sleep(500/speedmult) -- ****************
 	end
 end
 
@@ -152,7 +156,7 @@ local function RestoreAfterDelay()
     Sleep(6000)
     Turn(turret, y_axis, 0, math.rad(90))
     Turn(lbarrel1, x_axis, 0, math.rad(45))
-    Turn(lbarrel2, x_axis, 0, math.rad(45))    
+    Turn(rbarrel1, x_axis, 0, math.rad(45))    
 end
 
 function script.AimWeapon(num, heading, pitch)
