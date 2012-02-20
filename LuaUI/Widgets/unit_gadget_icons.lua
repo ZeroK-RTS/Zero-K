@@ -30,9 +30,11 @@ local myAllyTeamID = 666
 
 local powerTexture = 'Luaui/Images/energy.png'
 local facplopTexture = 'Luaui/Images/gift.png'
+local rearmTexture = 'LuaUI/Images/noammo.png'
 
 local lastLowPower = {}
 local lastFacPlop = {}
+local lastRearm = {}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -59,6 +61,18 @@ function SetIcons(unitID)
 					WG.icons.SetUnitIcon( unitID, {name='facplop', texture=facplopTexture} )
 				else
 					WG.icons.SetUnitIcon( unitID, {name='facplop', texture=nil} )
+				end
+			end
+		end
+		
+		local rearm = Spring.GetUnitRulesParam(unitID, "noammo") 
+		if rearm then
+			if (not lastRearm[unitID]) or lastRearm[unitID] ~= rearm then
+				lastRearm[unitID] = rearm
+				if rearm ~= 0 then
+					WG.icons.SetUnitIcon( unitID, {name='rearm', texture=rearmTexture} )
+				else
+					WG.icons.SetUnitIcon( unitID, {name='rearm', texture=nil} )
 				end
 			end
 		end

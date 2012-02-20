@@ -442,6 +442,7 @@ else
 --------------------------------------------------------------------------------
 -- UNSYNCED
 --------------------------------------------------------------------------------
+--[[ widget
 local airpads = SYNCED.airpads
 local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
@@ -507,7 +508,7 @@ function gadget:DrawWorld()
 	end
 	gl.Texture("")
 end
-
+--]]
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_REARM)
 	Spring.SetCustomCommandDrawData(CMD_REARM, "Repair", {0, 1, 1, 1})
