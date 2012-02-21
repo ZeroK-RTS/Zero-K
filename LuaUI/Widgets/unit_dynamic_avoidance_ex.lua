@@ -1,4 +1,4 @@
-local versionName = "v2.01"
+local versionName = "v2.02"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -165,7 +165,9 @@ options = {
 		value = true,
 		desc = "Allow constructor to return to base when having area-reclaim/area-ressurect command, else it will return to center of the circle when retreating. This function enabled and used \'Receive Indicator\' widget",
 		OnChange = function(self) 
-			spSendCommands("luaui enablewidget Receive Indicator")
+			if self.value==true then
+				spSendCommands("luaui enablewidget Receive Units Indicator")
+			end
 		end,
 	},
 }
