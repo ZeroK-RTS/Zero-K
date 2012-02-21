@@ -59,7 +59,13 @@ options = {
 		type = 'bool',
 		value = false,
 		desc = "Draws mirror map when map is an island",		
-	},	        
+	},
+	drawWall = {
+		name = "Draw boundary wall",
+		type = 'bool',
+		value = true,
+		desc = "Draws wall at map boundaries",		
+	},        
 	useShader = {
 		name = "Use shader",
 		type = 'bool',
@@ -404,7 +410,9 @@ function widget:DrawWorldPreUnit() --is overwritten when not using the shader
 end
 
 function widget:DrawWorld()
-    gl.DepthTest(GL.LEQUAL)
-    gl.CallList(dListWall)
-    gl.DepthTest(false)
+    if options.drawWall.value then
+        gl.DepthTest(GL.LEQUAL)
+        gl.CallList(dListWall)
+        gl.DepthTest(false)
+    end
 end
