@@ -1,4 +1,4 @@
-local version = 'v1.0'
+local version = 'v1.01'
 
 function widget:GetInfo()
 	return {
@@ -21,6 +21,9 @@ local spGetPlayerInfo  = Spring.GetPlayerInfo
 local spSendCommands = Spring.SendCommands
 local spTraceScreenRay = Spring.TraceScreenRay
 local spValidUnitID  = Spring.ValidUnitID 
+local spGetCameraPosition		= Spring.GetCameraPosition
+local tan				= math.tan
+local atan				= math.atan
 --------------------------------------------------------------------------------
 -- Constant:
 local pasteCommand = "PasteText "
@@ -32,16 +35,21 @@ function widget:MousePress(x, y, button)
 	if mpos == nil then 
 		return false
 	end
-	local unit = spGetUnitsInRectangle( mpos[1]-50, mpos[3]-50, mpos[1]+50,mpos[3]+50) 
-	local unitID = unit[1] --//only take 1st row because since the box is very small it can only fit 1 unit. 1 unit is a reasonable assumption.
+	local _,cy,_= spGetCameraPosition()
+	local addedSize = MaintainUnitSize(40, 1000, cy)
+	local unit = spGetUnitsInRectangle( mpos[1]-40-addedSize, mpos[3]-40-addedSize, mpos[1]+40+addedSize,mpos[3]+40+addedSize) 
+	local unitID = unit[1] --//only take 1st row because since the box is quite small it could only fit 1 unit. 1 unit is a reasonable assumption.
 	local validUnitID = spValidUnitID(unitID)
-	if validUnitID == false then
+	if validUnitID == false or validUnitID == nil then
 		return false
 	end
 	local teamID = spGetUnitTeam(unitID)
 	local _,playerID,_,_,_,_,_,_ = spGetTeamInfo(teamID) --//definition of playerID in this context refer to: http://springrts.com/wiki/Lua_SyncedRead#Player.2CTeam.2CAlly_Lists.2FInfo
 	local unitDefID = spGetUnitDefID(unitID)
 	local unitDefinition = UnitDefs[unitDefID]
+	if unitDefinition == nil then
+		return false
+	end
 	local unitHumanName = unitDefinition.humanName
 	local playerName,_,_,_,_,_,_,_,_,_ = spGetPlayerInfo(playerID)
 
@@ -60,4 +68,14 @@ function widget:MousePress(x, y, button)
 		local textToBePasted = whisper .. playerID
 		spSendCommands(textToBePasted)
 	end
+end
+
+function MaintainUnitSize(unitOriginalSize, originalViewHeight, currentViewHeight) --//from gui_flat2DView.lua (xponen)
+	if (currentViewHeight >originalViewHeight) then
+		local viewAngle= atan(unitOriginalSize/originalViewHeight)
+		local newSize = tan(viewAngle)*currentViewHeight
+		local addedSize = newSize- unitOriginalSize
+		return addedSize
+	end
+	return 0
 end
