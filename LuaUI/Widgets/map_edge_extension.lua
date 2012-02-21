@@ -18,6 +18,8 @@ end
 if VFS.FileExists("nomapedgewidget.txt") then
 	return
 end
+
+local spGetGroundHeight = Spring.GetGroundHeight
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local gridTex = "LuaUI/Images/vr_grid_large.png"
@@ -44,12 +46,20 @@ local umirrorZ
 local uup
 local uleft
 
+local island = false
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 options_path = 'Settings/View/Map/Map Extension Config'
 options = {
 	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
         --when not, the map is drawn mirrored 8 times into a display list
+	drawForIslands = {
+		name = "Draw for islands",
+		type = 'bool',
+		value = false,
+		desc = "Draws mirror map when map is an island",		
+	},	        
 	useShader = {
 		name = "Use shader",
 		type = 'bool',
@@ -138,6 +148,35 @@ local shaderTable = {
 -- place this under gl_Vertex.z = abs(mirrorZ-gl_Vertex.z); in void main() for curvature effect
 --if(mirrorX)gl_Vertex.y -= pow(abs(gl_Vertex.x-left*mirrorX)/150, 2);
 --if(mirrorZ)gl_Vertex.y -= pow(abs(gl_Vertex.z-up*mirrorZ)/150, 2);
+
+local function GetGroundHeight(x, z)
+	return spGetGroundHeight(x,z)
+end
+
+local function IsIsland()
+	local sampleDist = 512
+	for i=1,Game.mapSizeX,sampleDist do
+		-- top edge
+		if GetGroundHeight(i, 0) > 0 then
+			return false
+		end
+		-- bottom edge
+		if GetGroundHeight(i, Game.mapSizeZ) > 0 then
+			return false
+		end
+	end
+	for i=1,Game.mapSizeZ,sampleDist do
+		-- left edge
+		if GetGroundHeight(0, i) > 0 then
+			return false
+		end
+		-- right edge
+		if GetGroundHeight(Game.mapSizeX, i) > 0 then
+			return false
+		end	
+	end
+	return true
+end
 
 local function DrawMapVertices(useMirrorShader)
 
@@ -271,15 +310,19 @@ local function DrawMapWall()
 end
 
 function widget:Initialize()
+        Spring.SendCommands("luaui disablewidget External VR Grid")
+        island = IsIsland()
 	if gl.CreateShader and options.useShader.value then
 		mirrorShader = gl.CreateShader(shaderTable)
 	end
 	if not mirrorShader then
 		widget.DrawWorldPreUnit = function()
-			gl.DepthMask(true)
-			--gl.Texture(tex)
-			gl.CallList(dList)
-			gl.Texture(false)
+                        if (not island) or options.drawForIslands.value then
+                            gl.DepthMask(true)
+                            --gl.Texture(tex)
+                            gl.CallList(dList)
+                            gl.Texture(false)
+                        end
 		end
 	else
 		umirrorX = gl.GetUniformLocation(mirrorShader,"mirrorX")
@@ -302,64 +345,66 @@ function widget:Shutdown()
 end
 
 function widget:DrawWorldPreUnit() --is overwritten when not using the shader
-    local glTranslate = gl.Translate
-    local glUniform = gl.Uniform
-    local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
-    
-    gl.Fog(true)
-    gl.FogCoord(1)
-    gl.UseShader(mirrorShader)
-    gl.PushMatrix()
-    gl.DepthMask(true)
-    gl.Texture(tex)
-    if wiremap then
-        gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+    if (not island) or options.drawForIslands.value then
+        local glTranslate = gl.Translate
+        local glUniform = gl.Uniform
+        local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
+        
+        gl.Fog(true)
+        gl.FogCoord(1)
+        gl.UseShader(mirrorShader)
+        gl.PushMatrix()
+        gl.DepthMask(true)
+        gl.Texture(tex)
+        if wiremap then
+            gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+        end
+        glUniform(umirrorX, GamemapSizeX)
+        glUniform(umirrorZ, GamemapSizeZ)
+        glUniform(uleft, 1)
+        glUniform(uup, 1)
+        glTranslate(-GamemapSizeX,0,-GamemapSizeZ)
+        gl.CallList(dList)
+        glUniform(uleft , 0)
+        glTranslate(GamemapSizeX*2,0,0)
+        gl.CallList(dList)
+        gl.Uniform(uup, 0)
+        glTranslate(0,0,GamemapSizeZ*2)
+        gl.CallList(dList)
+        glUniform(uleft, 1)
+        glTranslate(-GamemapSizeX*2,0,0)
+        gl.CallList(dList)
+        
+        glUniform(umirrorX, 0)
+        glTranslate(GamemapSizeX,0,0)
+        gl.CallList(dList)
+        glUniform(uleft, 0)
+        glUniform(uup, 1)
+        glTranslate(0,0,-GamemapSizeZ*2)
+        gl.CallList(dList)
+        
+        glUniform(uup, 0)
+        glUniform(umirrorZ, 0)
+        glUniform(umirrorX, GamemapSizeX)
+        glTranslate(GamemapSizeX,0,GamemapSizeZ)
+        gl.CallList(dList)
+        glUniform(uleft, 1)
+        glTranslate(-GamemapSizeX*2,0,0)
+        gl.CallList(dList)
+        if wiremap then
+            gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+        end
+        gl.DepthMask(false)
+        gl.Texture(false)
+        gl.PopMatrix()
+        gl.UseShader(0)
+        
+        gl.Fog(false)
     end
-    glUniform(umirrorX, GamemapSizeX)
-    glUniform(umirrorZ, GamemapSizeZ)
-    glUniform(uleft, 1)
-    glUniform(uup, 1)
-    glTranslate(-GamemapSizeX,0,-GamemapSizeZ)
-    gl.CallList(dList)
-    glUniform(uleft , 0)
-    glTranslate(GamemapSizeX*2,0,0)
-    gl.CallList(dList)
-    gl.Uniform(uup, 0)
-    glTranslate(0,0,GamemapSizeZ*2)
-    gl.CallList(dList)
-    glUniform(uleft, 1)
-    glTranslate(-GamemapSizeX*2,0,0)
-    gl.CallList(dList)
-    
-    glUniform(umirrorX, 0)
-    glTranslate(GamemapSizeX,0,0)
-    gl.CallList(dList)
-    glUniform(uleft, 0)
-    glUniform(uup, 1)
-    glTranslate(0,0,-GamemapSizeZ*2)
-    gl.CallList(dList)
-    
-    glUniform(uup, 0)
-    glUniform(umirrorZ, 0)
-    glUniform(umirrorX, GamemapSizeX)
-    glTranslate(GamemapSizeX,0,GamemapSizeZ)
-    gl.CallList(dList)
-    glUniform(uleft, 1)
-    glTranslate(-GamemapSizeX*2,0,0)
-    gl.CallList(dList)
-    if wiremap then
-        gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-    end
-    gl.DepthMask(false)
-    gl.Texture(false)
-    gl.PopMatrix()
-    gl.UseShader(0)
-    
-    gl.Fog(false)
 end
 
 function widget:DrawWorld()
     gl.DepthTest(GL.LEQUAL)
     gl.CallList(dListWall)
-    gl.DepthTest(false)--??
+    gl.DepthTest(false)
 end

@@ -339,8 +339,9 @@ function widget:DrawScreen()
 	if forceUpdate or (posChanged and options.dockEnabled.value) then 
 		forceUpdate = false
 		local dockWindows = {}	 -- make work array of windows 
-		for _, win in ipairs(screen0.children) do 
-			if (win.dockable) then 
+		for _, win in ipairs(screen0.children) do
+			local dock = win.collide or win.dockable
+			if (dock) then 
 				dockWindows[win] = {win.x, win.y, win.x + win.width, win.y + win.height}
 			end 
 		end 

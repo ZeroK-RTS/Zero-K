@@ -59,7 +59,7 @@ options = {
 		name = "Draw for islands",
 		type = 'bool',
 		value = Spring.GetConfigInt("ReflectiveWater", 0) ~= 4,
-		desc = "Draws grid for islands",		
+		desc = "Draws mirror grid when map is an island",		
 	},	
 	res = {
 		name = "Tile size (64-512)",
@@ -274,6 +274,7 @@ function widget:DrawWorldPreUnit()
 end
 
 function widget:Initialize()
+	Spring.SendCommands("luaui disablewidget Map Edge Extension")
 	island = IsIsland()
 	InitGroundHeights()
 	DspLst = glCreateList(DrawTiles)
