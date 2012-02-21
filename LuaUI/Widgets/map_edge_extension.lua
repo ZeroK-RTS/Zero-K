@@ -1,30 +1,55 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Map edge extension",
-    version   = "0.4",
+    name      = "Map Edge Extension",
+    version   = "v0.4+",
     desc      = "Draws a mirrored map next to the edges of the real map",
     author    = "Pako",
     date      = "2010.10.27 - 2011.10.29", --YYYY.MM.DD, created - updated
     license   = "GPL",
     layer     = 0,
-    enabled   = false,
+    enabled   = true,
+    detailsDefault = 2
   }
 end
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 if VFS.FileExists("nomapedgewidget.txt") then
 	return
 end
-
---TODO make a barrier or something to hide the vertex gaps at edge and to help distinguish the playing area
-
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local gridTex = "LuaUI/Images/vr_grid_large.png"
+--local wallTex = "bitmaps/PD/hexbig.png"
+local wallTex = "bitmaps/PD/shield2.png"
+--local wallTex = "LuaUI/Images/vr_grid.png"
 local realTex = '$grass'
 local tex = realTex
 
+local height = 4096
+local minHeight = -height/4
+local maxHeight = height*3/4
+
+local texScale = 0.01
+local colorFloor = { 0.1, 0.88, 1, 1}
+local colorCeiling = { 0.1, 0.88, 1, 0}
+
+local dList
+local dListWall
+local mirrorShader
+
+local umirrorX
+local umirrorZ
+local uup
+local uleft
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 options_path = 'Settings/View/Map/Map Extension Config'
 options = {
 	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
-    --when not, the map is drawn mirrored 8 times into a display list
+        --when not, the map is drawn mirrored 8 times into a display list
 	useShader = {
 		name = "Use shader",
 		type = 'bool',
@@ -60,8 +85,20 @@ options = {
 			else tex = gridTex end
 			widget:Initialize()
 		end, 		
-	},	
+	},		
+	wallFromOutside = {
+		name = "Visible walls from outside",
+		type = 'bool',
+		value = false,
+		desc = "Map wall is visible from the outside (e.g. when it's between you and main map)",
+                OnChange = function(self)
+                        gl.DeleteList(dListWall)
+                        widget:Initialize()
+                end
+	},        
 }
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local shaderTable = {
 	uniform = {
@@ -104,9 +141,9 @@ local shaderTable = {
 
 local function DrawMapVertices(useMirrorShader)
 
-local floor = math.floor
-local ceil = math.ceil
-local abs = math.abs
+	local floor = math.floor
+	local ceil = math.ceil
+	local abs = math.abs
 
 	gl.Color(1,1,1,1)
 
@@ -179,14 +216,59 @@ local function DrawOMap(useMirrorShader)
 	gl.Blending(GL.SRC_ALPHA,GL.ONE_MINUS_SRC_ALPHA)
 end
 
-
-local dList
-local mirrorShader
-
-local umirrorX
-local umirrorZ
-local uup
-local uleft
+local function DrawMapWall()
+    gl.Texture(wallTex)
+    if not options.wallFromOutside.value then
+        gl.Culling(GL.FRONT) --'cuts' the outside faces --remove this if you want it to draw over map too
+    end
+    gl.Shape( GL.TRIANGLE_STRIP,
+        {
+            { v = { 0, minHeight, 0},      --top left down   
+                    texcoord = { 0, 0 },           
+                    c = colorFloor
+            },
+                { v = { 0, maxHeight, 0},          
+                    texcoord = { 0, height*texScale },      --top left up     
+                    c = colorCeiling
+            },    
+            { v = { Game.mapSizeX, minHeight, 0},          
+                    texcoord = { Game.mapSizeX*texScale, 0 },   --top right        
+                    c = colorFloor
+            },
+                { v = { Game.mapSizeX, maxHeight, 0},          
+                    texcoord = { Game.mapSizeX*texScale, height*texScale },           
+                    c = colorCeiling
+            },
+            
+                    { v = { Game.mapSizeX, minHeight, Game.mapSizeZ},          -- bottom right  
+                    texcoord = { Game.mapSizeX*texScale+Game.mapSizeZ*texScale, 0 },        
+                    c = colorFloor
+            },
+                { v = { Game.mapSizeX, maxHeight, Game.mapSizeZ},          
+                    texcoord = { Game.mapSizeX*texScale+Game.mapSizeZ*texScale, height*texScale },           
+                    c = colorCeiling
+            },
+            
+                { v = { 0, minHeight, Game.mapSizeZ},  --bottom left        
+                    texcoord = { Game.mapSizeZ*texScale, 0 },           
+                    c = colorFloor
+            },
+                { v = { 0, maxHeight, Game.mapSizeZ},          
+                    texcoord = { Game.mapSizeZ*texScale, height*texScale },           
+                    c = colorCeiling
+            },
+            
+                 { v = { 0, minHeight, 0},        --back to top right  
+                    texcoord = { 0, 0 },           
+                    c = colorFloor
+            },
+                { v = { 0, maxHeight, 0},          
+                    texcoord = { 0, height*texScale },           
+                    c = colorCeiling
+            },
+        }
+    )
+end
 
 function widget:Initialize()
 	if gl.CreateShader and options.useShader.value then
@@ -197,7 +279,6 @@ function widget:Initialize()
 			gl.DepthMask(true)
 			--gl.Texture(tex)
 			gl.CallList(dList)
-			gl.DepthMask(false)
 			gl.Texture(false)
 		end
 	else
@@ -208,6 +289,7 @@ function widget:Initialize()
 	end
 	dList = gl.CreateList(DrawOMap, mirrorShader)
 	--Spring.SetDrawGround(false)
+        dListWall = gl.CreateList(DrawMapWall)
 end
 
 function widget:Shutdown()
@@ -216,62 +298,68 @@ function widget:Shutdown()
 	if mirrorShader then
 		gl.DeleteShader(mirrorShader)
 	end
+        gl.DeleteList(dListWall)
 end
 
 function widget:DrawWorldPreUnit() --is overwritten when not using the shader
-  local glTranslate = gl.Translate
-  local glUniform = gl.Uniform
-  local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
+    local glTranslate = gl.Translate
+    local glUniform = gl.Uniform
+    local GamemapSizeZ, GamemapSizeX = Game.mapSizeZ,Game.mapSizeX
+    
+    gl.Fog(true)
+    gl.FogCoord(1)
+    gl.UseShader(mirrorShader)
+    gl.PushMatrix()
+    gl.DepthMask(true)
+    gl.Texture(tex)
+    if wiremap then
+        gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+    end
+    glUniform(umirrorX, GamemapSizeX)
+    glUniform(umirrorZ, GamemapSizeZ)
+    glUniform(uleft, 1)
+    glUniform(uup, 1)
+    glTranslate(-GamemapSizeX,0,-GamemapSizeZ)
+    gl.CallList(dList)
+    glUniform(uleft , 0)
+    glTranslate(GamemapSizeX*2,0,0)
+    gl.CallList(dList)
+    gl.Uniform(uup, 0)
+    glTranslate(0,0,GamemapSizeZ*2)
+    gl.CallList(dList)
+    glUniform(uleft, 1)
+    glTranslate(-GamemapSizeX*2,0,0)
+    gl.CallList(dList)
+    
+    glUniform(umirrorX, 0)
+    glTranslate(GamemapSizeX,0,0)
+    gl.CallList(dList)
+    glUniform(uleft, 0)
+    glUniform(uup, 1)
+    glTranslate(0,0,-GamemapSizeZ*2)
+    gl.CallList(dList)
+    
+    glUniform(uup, 0)
+    glUniform(umirrorZ, 0)
+    glUniform(umirrorX, GamemapSizeX)
+    glTranslate(GamemapSizeX,0,GamemapSizeZ)
+    gl.CallList(dList)
+    glUniform(uleft, 1)
+    glTranslate(-GamemapSizeX*2,0,0)
+    gl.CallList(dList)
+    if wiremap then
+        gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+    end
+    gl.DepthMask(false)
+    gl.Texture(false)
+    gl.PopMatrix()
+    gl.UseShader(0)
+    
+    gl.Fog(false)
+end
 
-gl.Fog(true)
---gl.FogCoord(1)
-  gl.UseShader(mirrorShader)
-  gl.PushMatrix()
-  gl.DepthMask(true)
-  gl.Texture(tex)
-  if wiremap then
-    gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
-  end
-  glUniform(umirrorX, GamemapSizeX)
-  glUniform(umirrorZ, GamemapSizeZ)
-  glUniform(uleft, 1)
-  glUniform(uup, 1)
-  glTranslate(-GamemapSizeX,0,-GamemapSizeZ)
-  gl.CallList(dList)
-  glUniform(uleft , 0)
-  glTranslate(GamemapSizeX*2,0,0)
-  gl.CallList(dList)
-  gl.Uniform(uup, 0)
-  glTranslate(0,0,GamemapSizeZ*2)
-  gl.CallList(dList)
-  glUniform(uleft, 1)
-  glTranslate(-GamemapSizeX*2,0,0)
-  gl.CallList(dList)
-
-  glUniform(umirrorX, 0)
-  glTranslate(GamemapSizeX,0,0)
-  gl.CallList(dList)
-  glUniform(uleft, 0)
-  glUniform(uup, 1)
-  glTranslate(0,0,-GamemapSizeZ*2)
-  gl.CallList(dList)
-
-  glUniform(uup, 0)
-  glUniform(umirrorZ, 0)
-  glUniform(umirrorX, GamemapSizeX)
-  glTranslate(GamemapSizeX,0,GamemapSizeZ)
-  gl.CallList(dList)
-  glUniform(uleft, 1)
-  glTranslate(-GamemapSizeX*2,0,0)
-  gl.CallList(dList)
-  if wiremap then
-    gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-  end
-  gl.DepthMask(false)
-  gl.Texture(false)
-  gl.PopMatrix()
-  gl.UseShader(0)
-
-  gl.Fog(false)
-  
+function widget:DrawWorld()
+    gl.DepthTest(GL.LEQUAL)
+    gl.CallList(dListWall)
+    gl.DepthTest(false)--??
 end
