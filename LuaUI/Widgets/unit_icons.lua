@@ -241,6 +241,46 @@ function widget:DrawWorld()
 	glDepthMask(false)
 end
 
+-- drawscreen method
+-- the problem with this one is it draws at same size regardless of how far away the unit is
+--[[
+function widget:DrawScreenEffects()
+	if Spring.IsGUIHidden() then return end
+	
+	if (next(unitHeights) == nil) then
+		return -- avoid unnecessary GL calls
+	end
+	
+	gl.Color(1,1,1,1)
+	glDepthMask(true)
+	glDepthTest(true)
+	glAlphaTest(GL_GREATER, 0.001)
+	
+	for texture, units in pairs(textureUnitsXshift) do
+		glTexture( texture )
+		for unitID,xshift in pairs(units) do
+			gl.PushMatrix()
+			local x,y,z = Spring.GetUnitPosition(unitID)
+			y = y + (unitHeights[unitID] or 0)
+			x,y,z = Spring.WorldToScreenCoords(x,y,z)
+			glTranslate(x,y,z)
+			if xshift and unitHeights then
+				glTranslate(xshift,0,0)
+				--glBillboard()
+				glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
+			end
+			gl.PopMatrix()
+		end
+	end
+	
+	glTexture(false)
+	
+	glAlphaTest(false)
+	glDepthTest(false)
+	glDepthMask(false)
+end
+
+]]
 
 function widget:Initialize()
 end
