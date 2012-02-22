@@ -14,7 +14,8 @@ unitDef = {
   buildingGroundDecalType       = [[armnanotc_aoplane.dds]],
 
   buildoptions                  = {
-    [[armcomdgun]],
+    [[armcsa]],
+	[[armcomdgun]],
 	[[scorpion]],
     [[dante]],
     [[armraven]],

@@ -29,7 +29,6 @@ ploppables = {
   "factoryplane",
   "factorygunship",
   "corsy",
-  "armcsa",
 }
 
 -- storage
