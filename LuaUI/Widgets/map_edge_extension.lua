@@ -23,13 +23,13 @@ local spGetGroundHeight = Spring.GetGroundHeight
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local gridTex = "LuaUI/Images/vr_grid_large.png"
---local wallTex = "bitmaps/PD/hexbig.png"
-local wallTex = "bitmaps/PD/shield2.png"
+local wallTex = "bitmaps/PD/hexbig.png"
+--local wallTex = "bitmaps/PD/shield2.png"
 --local wallTex = "LuaUI/Images/vr_grid.png"
 local realTex = '$grass'
 local tex = realTex
 
-local height = 4096
+local height = 2048
 local minHeight = -height/4
 local maxHeight = height*3/4
 
@@ -106,7 +106,7 @@ options = {
 		name = "Visible walls from outside",
 		type = 'bool',
 		value = false,
-		desc = "Map wall is visible from the outside (e.g. when it's between you and main map)",
+		desc = "Map wall is visible from the outside (e.g. when it's between camera and main map)",
                 OnChange = function(self)
                         gl.DeleteList(dListWall)
                         widget:Initialize()
@@ -313,6 +313,7 @@ local function DrawMapWall()
             },
         }
     )
+    gl.Culling(false)
 end
 
 function widget:Initialize()
