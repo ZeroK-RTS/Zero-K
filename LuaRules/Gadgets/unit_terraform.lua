@@ -133,13 +133,15 @@ local maxTotalRampWidth = 800
 local minTotalRampLength = 32
 local minTotalRampWidth = 24
 
-local checkLoopFrames = 1800 -- how many frames it takes to check through all cons
+local checkLoopFrames = 1200 -- how many frames it takes to check through all cons
 local terraformDecayFrames = 2400 -- how many frames a terrablock can survive for without a repair command
 local decayCheckFrequency = 90 -- frequency of terraform decay checks
 
 local structureCheckLoopFrames = 300 -- frequency of slow update for building deformation check
 
 local terraUnitLimit = 250 -- limit on terraunits per player
+
+local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
 local terraUnitTooltip = "Spent: "
 
@@ -181,7 +183,7 @@ local constructorTable		= {}
 local constructors			= 0
 local currentCon 			= 0 
 
-local checkInterval 		= 0 
+local checkInterval 		= 0
 
 local unitOrderList 		= {count = 0, data = {}} 
 -- workaround: if order is given on the same frame as terraunit creation the order temporarilly
@@ -364,6 +366,30 @@ end
 
 local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift)
 
+	--** Initial constructor processing **
+	local unitsX = 0
+	local unitsZ = 0
+	local i = 1
+	while i <= units do
+		if (spValidUnitID(unit[i])) then
+			local x,_,z = Spring.GetUnitPosition(unit[i])
+			unitsX = unitsX + x
+			unitsZ = unitsZ + z
+			i = i + 1
+		else
+			unit[i] = unit[units]
+			unit[units] = nil
+			units = units - 1
+		end
+	end
+		
+	if units == 0 then 
+		return
+	end
+	
+	unitsX = unitsX/units
+	unitsZ = unitsZ/units
+
 	--calculate equations of the 3 lines, left, right and mid
 	
 	local border = {}
@@ -408,6 +434,11 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	local leftRot = {x = mid.z+x1, z = -mid.x+z1}
 	local rightRot = {x = -mid.z+x1, z = mid.x+z1}
   
+	--Spring.MarkerAddPoint(leftRot.x,0,leftRot.z,"L")
+	--Spring.MarkerAddPoint(rightRot.x,0,rightRot.z,"R")
+	--Spring.MarkerAddPoint(rightRot.x+add.x,0,rightRot.z+add.z,"R + A")
+	--Spring.MarkerAddPoint(rightRot.x+addPerp.x,0,rightRot.z+addPerp.z,"R + AP")
+	
 	local topleftGrad
 	local botleftGrad
   
@@ -513,7 +544,11 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				top = floor((toppoint.z+add.z*i+addPerp.z*j)/8)*8, 
 				bottom = ceil((botpoint.z+add.z*i+addPerp.z*j)/8)*8
 			}
-			segment[n].position = {x = (rightRot.x-4+add.x*i+addPerp.x*(j+0.5)-16*(x2-x1)/dis), z = (rightRot.z-4+add.z*i+addPerp.z*(j+0.5)-16*(z2-z1)/dis)}
+			-- end of segment
+			--segment[n].position = {x = (rightRot.x-4+add.x*i+addPerp.x*(j+0.5)-16*(x2-x1)/dis), z = (rightRot.z-4+add.z*i+addPerp.z*(j+0.5)-16*(z2-z1)/dis)}
+			
+			-- middle of segment
+			segment[n].position = {x = rightRot.x+add.x*(i+0.5)+addPerp.x*(j+0.5), z = rightRot.z+add.z*(i+0.5)+addPerp.z*(j+0.5)}
 			local pc = 1
 		  
 			local topline1 = {x = leftpoint.x+add.x*i+addPerp.x*j, z = leftpoint.z+add.z*i+addPerp.z*j, m = topleftGrad}
@@ -692,9 +727,13 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			totalCost = totalCost*volumeCost + baseCost
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
-		
+			local pos = segment[i].position
+			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
+			local scale = terraUnitLeash/math.sqrt(vx^2 + vz^2)
+			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
+
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
-			local id = spCreateUnit(terraunitDefID, segment[i].position.x, teamY or 0, segment[i].position.z, 0, team, true)
+			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
             
 			if id then
 				
@@ -705,7 +744,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				rampLevels.data[rampLevels.count].count = rampLevels.data[rampLevels.count].count + 1
 				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
 			
-				setupTerraunit(id, team, segment[i].position.x, false, segment[i].position.z)
+				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -714,7 +753,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				terraformOrder[terraformOrders].indexes = terraformOrder[terraformOrders].indexes + 1
 				
 				terraformUnit[id] = {
-					position = segment[i].position, 
+					positionAnchor = segment[i].position, 
+					position = {x = terraunitX, z = terraunitZ}, 
 					progress = 0, 
 					lastUpdate = 0, 
 					totalSpent = 0,
@@ -750,33 +790,10 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		
 	end
 	--** Give repair order for each block to all selected units **
-  	if rampLevels.count == 0 then
+	if rampLevels.count == 0 then
 		return
 	end
-		
-	local unitsX = 0
-	local unitsZ = 0
-	local i = 1
-	while i <= units do
-		if (spValidUnitID(unit[i])) then
-			local x,_,z = Spring.GetUnitPosition(unit[i])
-			unitsX = unitsX + x
-			unitsZ = unitsZ + z
-			i = i + 1
-		else
-			unit[i] = unit[units]
-			unit[units] = nil
-			units = units - 1
-		end
-	end
-		
-	if units == 0 then 
-		return
-	end
-	
-	unitsX = unitsX/units
-	unitsZ = unitsZ/units	
-	
+
 	local orderList = {data = {}, count = 0}
 	
 	local zig = 0
@@ -816,6 +833,30 @@ end
 local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,units,team,volumeSelection,shift)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
+	
+	--** Initial constructor processing **
+	local unitsX = 0
+	local unitsZ = 0
+	local i = 1
+	while i <= units do
+		if (spValidUnitID(unit[i])) then
+			local x,_,z = Spring.GetUnitPosition(unit[i])
+			unitsX = unitsX + x
+			unitsZ = unitsZ + z
+			i = i + 1
+		else
+			unit[i] = unit[units]
+			unit[units] = nil
+			units = units - 1
+		end
+	end
+		
+	if units == 0 then 
+		return
+	end
+	
+	unitsX = unitsX/units
+	unitsZ = unitsZ/units	
 	
 	--** Convert Mouse Points to a Closed Loop on a Grid **
 
@@ -897,6 +938,9 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			segment[n].area = {}
 			segment[n].border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 			segment[n].position = {x = point[count*wallSegmentLength+1].x, z = point[count*wallSegmentLength+1].z}
+			
+			local averagePosition = {x = 0, z = 0, n = 0}
+			
 			local pc = 1
 			
 			for j = count*wallSegmentLength+1, (count+1)*wallSegmentLength do
@@ -905,6 +949,10 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					continue = false				
 					break
 				else
+					
+					averagePosition.x = averagePosition.x + point[j].x
+					averagePosition.z = averagePosition.z + point[j].z
+					averagePosition.n = averagePosition.n + 1
 					
 					for lx = -16,16,8 do
 						for lz = -16,16,8 do
@@ -944,6 +992,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			
 			-- discard segments with no new terraforming
 			if pc ~= 1 then
+				segment[n].position = {x = averagePosition.x/averagePosition.n, z = averagePosition.z/averagePosition.n}
 				segment[n].points = pc - 1
 				n = n + 1
 			end
@@ -1170,13 +1219,17 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			totalCost = totalCost*volumeCost + baseCost
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			local pos = segment[i].position
+			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
+			local scale = terraUnitLeash/math.sqrt(vx^2 + vz^2)
+			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
 			
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
-			local id = spCreateUnit(terraunitDefID, segment[i].position.x, teamY or 0, segment[i].position.z, 0, team, true)
+			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
             
             if id then
 			
-				setupTerraunit(id, team, segment[i].position.x, false, segment[i].position.z)
+				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -1185,7 +1238,8 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				terraformOrder[terraformOrders].indexes = terraformOrder[terraformOrders].indexes + 1
 
 				terraformUnit[id] = {
-					position = segment[i].position, 
+					positionAnchor = segment[i].position, 
+					position = {x = terraunitX, z = terraunitZ}, 
 					progress = 0, 
 					lastUpdate = 0, 
 					totalSpent = 0,
@@ -1247,6 +1301,30 @@ end
 local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,units,team,volumeSelection,shift)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
+	
+	--** Initial constructor processing **
+	local unitsX = 0
+	local unitsZ = 0
+	local i = 1
+	while i <= units do
+		if (spValidUnitID(unit[i])) then
+			local x,_,z = Spring.GetUnitPosition(unit[i])
+			unitsX = unitsX + x
+			unitsZ = unitsZ + z
+			i = i + 1
+		else
+			unit[i] = unit[units]
+			unit[units] = nil
+			units = units - 1
+		end
+	end
+		
+	if units == 0 then 
+		return
+	end
+	
+	unitsX = unitsX/units
+	unitsZ = unitsZ/units
 	
 	--** Convert Mouse Points to a Closed Loop on a Grid **
 	
@@ -1697,9 +1775,13 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			totalCost = totalCost*volumeCost + baseCost
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			local pos = segment[i].position
+			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
+			local scale = terraUnitLeash/math.sqrt(vx^2 + vz^2)
+			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
 			
             local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
-			local id = spCreateUnit(terraunitDefID, segment[i].position.x, teamY or 0, segment[i].position.z, 0, team, true)
+			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			
             if id then
 				unitIdGrid[segment[i].grid.x] = unitIdGrid[segment[i].grid.x] or {}
@@ -1708,7 +1790,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				aveX = aveX + segment[i].position.x
 				aveZ = aveZ + segment[i].position.z
 				
-				setupTerraunit(id, team, segment[i].position.x, false, segment[i].position.z)
+				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -1717,7 +1799,8 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				terraformOrder[terraformOrders].indexes = terraformOrder[terraformOrders].indexes + 1
 
 				terraformUnit[id] = {
-					position = segment[i].position, 
+					positionAnchor = segment[i].position, 
+					position = {x = terraunitX, z = terraunitZ}, 
 					progress = 0, 
 					lastUpdate = 0, 
 					totalSpent = 0,
@@ -1754,36 +1837,12 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	end
 	
 	--** Give repair order for each block to all selected units **
-	
 	if terraformOrder[terraformOrders].indexes == 0 then
 		return
 	end
 	
 	aveX = aveX/terraformOrder[terraformOrders].indexes
 	aveZ = aveZ/terraformOrder[terraformOrders].indexes
-	
-	local unitsX = 0
-	local unitsZ = 0
-	local i = 1
-	while i <= units do
-		if (spValidUnitID(unit[i])) then
-			local x,_,z = Spring.GetUnitPosition(unit[i])
-			unitsX = unitsX + x
-			unitsZ = unitsZ + z
-			i = i + 1
-		else
-			unit[i] = unit[units]
-			unit[units] = nil
-			units = units - 1
-		end
-	end
-		
-	if units == 0 then 
-		return
-	end
-	
-	unitsX = unitsX/units
-	unitsZ = unitsZ/units
 	
 	local orderList = {data = {}, count = 0}
 	
@@ -2755,6 +2814,7 @@ function gadget:GameFrame(n)
 	end
 	
 	--check constrcutors that are repairing terraform blocks
+	
 	if constructors ~= 0 then
 		if n % checkInterval == 0 then
 			-- only check 1 con per cycle
@@ -2762,6 +2822,7 @@ function gadget:GameFrame(n)
 			if currentCon > constructors then
 				currentCon = 1
 			end
+			
 			local cQueue = spGetCommandQueue(constructorTable[currentCon])
 			if cQueue then
 				local ncq = #cQueue
@@ -2772,6 +2833,27 @@ function gadget:GameFrame(n)
 							if terraformUnit[cQueue[i].params[1]] then
 								terraformUnit[cQueue[i].params[1]].decayTime = n + terraformDecayFrames
 							end
+							
+							-- bring terraunit towards con
+							if i == 1 then
+								local cx, _, cz = Spring.GetUnitPosition(constructorTable[currentCon])
+								local team = Spring.GetUnitTeam(constructorTable[currentCon])
+								if cx and team then
+									local tpos = terraformUnit[cQueue[i].params[1] ].positionAnchor
+									local vx, vz = cx - tpos.x, cz - tpos.z
+									local scale = terraUnitLeash/math.sqrt(vx^2 + vz^2)
+									
+									local x,z = tpos.x + scale*vx, tpos.z + scale*vz
+									local y = CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
+									
+									terraformUnit[cQueue[i].params[1] ].position = {x = x, z = z}
+									Spring.SetUnitPosition(cQueue[i].params[1], x, y , z)
+									--Spring.MoveCtrl.Enable(cQueue[i].params[1])
+									--Spring.MoveCtrl.SetPosition(cQueue[i].params[1], x, y , z)
+									--Spring.MoveCtrl.Disable(cQueue[i].params[1])
+								end
+							end
+							
 						elseif #cQueue[i].params == 4 then -- there is a command with 5 params that I do not want 
 							-- area command
 							local radSQ = cQueue[i].params[4]^2
