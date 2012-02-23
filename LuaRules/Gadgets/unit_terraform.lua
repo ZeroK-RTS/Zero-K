@@ -111,10 +111,10 @@ local maxRampLegth = 200 -- maximun length of ramp segment
 local maxHeightDifference = 30 -- max difference of height around terraforming, Makes Shraka Pyramids
 local maxRampGradient = 5
 
-local volumeCost = 0.016
+local volumeCost = 0.0128
 local pointExtraAreaCost = 0--.027
 local pointExtraAreaCostDepth = 6
-local pointExtraPerimeterCost = 0.05
+local pointExtraPerimeterCost = 0.0425
 local pointExtraPerimeterCostDepth = 6
 
 local perimeterEdgeCost = {
