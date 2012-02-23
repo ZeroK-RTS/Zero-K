@@ -1,6 +1,6 @@
 include "constants.lua"
 
-local base, pelvis, torso = piece('base', 'pelvis', 'torso')
+local base, pelvis, torso, aimpoint = piece('base', 'pelvis', 'torso', 'aimpoint')
 local rthigh, rcalf, rfoot, lthigh, lcalf, lfoot = piece('rthigh', 'rcalf', 'rfoot', 'lthigh', 'lcalf', 'lfoot')
 local rshoulder, rgun, rflare, lshoulder, lgun, lflare = piece('rshoulder', 'rgun', 'rflare', 'lshoulder', 'lgun', 'lflare')
 
@@ -92,7 +92,7 @@ local function RestoreAfterDelay()
 end
 
 function script.AimFromWeapon()
-	return torso
+	return aimpoint
 end
 
 function script.AimWeapon(num, heading, pitch)

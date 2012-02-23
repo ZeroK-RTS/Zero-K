@@ -116,6 +116,7 @@ unitDef = {
       soundStartVolume        = 4,
       soundTrigger	      = true,
       startsmoke              = [[0]],
+      targetBorder	      = true,
       texture1	              = [[wake]],
       tolerance               = 5000,
       turret                  = true,
