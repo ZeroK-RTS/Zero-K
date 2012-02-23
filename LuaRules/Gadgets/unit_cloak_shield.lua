@@ -548,40 +548,40 @@ local function DrawSphere(divs, arcs, neg)
 
   -- sides
   for d = 4, (divs - 2) do
-    gl.BeginEnd(GL.QUAD_STRIP, function()
+    
+	if (d < 7) then
+		gl.Material({
+			ambient  = { 0, 0, 0 },
+			diffuse  = { 0, 0, 0, trans[d-3]},
+			emission = { 0.05, 0.10, 0.15 },
+			specular = { 0.25, 0.75, 1 },
+			shininess = 4
+		})
+	elseif (d > 10) then
+		gl.Material({
+			ambient  = { 0, 0, 0 },
+			diffuse  = { 0, 0, 0, trans[15-d]},
+			emission = { 0.05, 0.10, 0.15 },
+			specular = { 0.25, 0.75, 1 },
+			shininess = 4
+		})
+	else
+		gl.Material({
+			ambient  = { 0, 0, 0 },
+			diffuse  = { 0, 0, 0, 1.0 },
+			emission = { 0.05, 0.10, 0.15 },
+			specular = { 0.25, 0.75, 1.0 },
+			shininess = 4
+		})
+	end
+	
+	gl.BeginEnd(GL.QUAD_STRIP, function()
       local topRads = divRads * (d + 0)
       local botRads = divRads * (d + 1)
       local top = cos(topRads)
       local bot = cos(botRads)
-      local topRad =	 sin(topRads)
+      local topRad = sin(topRads)
       local botRad = sin(botRads)
-	  
-	  if (d < 7) then
-	    gl.Material({
-		  ambient  = { 0, 0, 0 },
-		  diffuse  = { 0, 0, 0, trans[d-3]},
-		  emission = { 0.05, 0.10, 0.15 },
-		  specular = { 0.25, 0.75, 1 },
-		  shininess = 4
-		  })
-	  elseif (d > 10) then
-	    gl.Material({
-		  ambient  = { 0, 0, 0 },
-		  diffuse  = { 0, 0, 0, trans[15-d]},
-		  emission = { 0.05, 0.10, 0.15 },
-		  specular = { 0.25, 0.75, 1 },
-		  shininess = 4
-		  })
-	  else
-	    gl.Material({
-		ambient  = { 0, 0, 0 },
-		diffuse  = { 0, 0, 0, 1.0 },
-		emission = { 0.05, 0.10, 0.15 },
-		specular = { 0.25, 0.75, 1.0 },
-		shininess = 4
-		})
-      end
-	  
 		
       for i = 0, arcs do
         local a = i * (2.0 * math.pi) / arcs
