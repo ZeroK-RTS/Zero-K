@@ -24,6 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    maxwatertank = [[200]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -97,27 +98,27 @@ unitDef = {
       impulseFactor           = 60,
       intensity               = 0.7,
       interceptedByShieldType = 1,
-      myGravity		      = 0.2,
+      myGravity		          = 0.6,
       noGap                   = false,
       noSelfDamage            = true,
-      projectiles	      = 2,
-      range                   = 270,
+      projectiles	          = 2,
+      range                   = 300,
       reloadtime              = 0.1,
       rgbColor                = [[0.6 0.8 1]],
       rgbColor2               = [[0.6 0.8 1]],
       separation              = 1,
-      stages		      = 24,
-      --size                    = 0,
+      stages		          = 24,
+      --size                  = 0,
       sizeDecay               = 0,
       soundStart              = [[weapon/hiss]],
       soundStartVolume        = 4,
       startsmoke              = [[0]],
-      texture1		      = [[wake]],	-- donut work
+      texture1	              = [[wake]],	-- donut work
       tolerance               = 5000,
       turret                  = true,
       weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 300,
+      weaponVelocity          = 500,
     },
 
   },
