@@ -26,7 +26,7 @@ local tankByID = {data = {}, count = 0}
 
 local TANK_MAX = 300
 local REGEN_PERIOD = 13
-local SHOT_COST = 1.2
+local SHOT_COST = 0.4
 local REGEN_RATE = 6
 
 local function updateWeaponFromTank(unitID)
@@ -36,7 +36,7 @@ local function updateWeaponFromTank(unitID)
 	Spring.SetUnitWeaponState(unitID, 0, {
 		range = proportion*200 + 100,
 		projectileSpeed = proportion*10+7.5,
-		reloadTime = 0.2 - 0.1*proportion,
+		reloadTime = 0.15 - 0.5*proportion,
 	})
 
 end

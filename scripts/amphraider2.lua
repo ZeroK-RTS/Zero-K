@@ -37,6 +37,7 @@ local SIG_RESTORE = 8
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local gun_1 = 1
+local TANK_MAX 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local function Walk()
@@ -78,6 +79,8 @@ function script.StopMoving()
 end
 
 function script.Create()
+	TANK_MAX = UnitDefs[Spring.GetUnitDefID(unitID)].customParams.maxwatertank
+
 	StartThread(SmokeUnit)	
 end
 
@@ -114,7 +117,21 @@ function script.FireWeapon(num)
 end
 
 function script.Shot(num)
-	EmitSfx(firepoints[gun_1], 1024)
+	local waterTank = Spring.GetUnitRulesParam(unitID,"watertank")
+    if waterTank then
+        local proportion = waterTank/TANK_MAX
+		if proportion > 0.4 then
+			EmitSfx(firepoints[gun_1], 1024)
+			if math.random() < (proportion-0.4)/0.6 then
+				EmitSfx(firepoints[gun_1], 1024)
+			end
+		else
+			if math.random() < (proportion + 0.2)/0.6 then
+				EmitSfx(firepoints[gun_1], 1024)
+			end
+		end
+	end
+	
 	gun_1 = 1 - gun_1
 	GG.shotWaterWeapon(unitID)
 end
