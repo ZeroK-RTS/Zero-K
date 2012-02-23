@@ -58,6 +58,7 @@ local gameOver = false
 
 local myTeam = Spring.GetMyTeamID()
 local isSpec = Spring.GetSpectatingState() or Spring.IsReplay()
+local defeat = false
 
 options_path = 'Settings/Interface/Pause Screen'
 
@@ -259,11 +260,17 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	dethklok[1] = dethklok[1] + (unitWorth*multifactor);
 end
 
+function widget:TeamDied(team)
+	if team == myTeam and not isSpec then
+		defeat = true
+	end
+end
+
 function widget:GameOver()
 	--gameOver = true
 	local track
 	-- FIXME: get a better way to detect who won
-	if isSpec or not select(3, Spring.GetTeamInfo(myTeam)) then
+	if defeat then
 		if #victoryTracks <= 0 then return end
 		track = victoryTracks[math.random(1, #victoryTracks)]	
 	else
