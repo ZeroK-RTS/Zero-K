@@ -49,6 +49,7 @@ unitDef = {
 
   sfxtypes               = {
     explosiongenerators = {
+      [[custom:watercannon_muzzle]],
     },
   },
 
@@ -90,7 +91,7 @@ unitDef = {
         subs    = 0.3,
       },
 
-      explosionGenerator      = [[custom:NONE]],
+      explosionGenerator      = [[custom:watercannon_impact]],
       impactOnly              = true,
       impulseBoost            = 15,
       impulseFactor           = 60,

@@ -114,6 +114,7 @@ function script.FireWeapon(num)
 end
 
 function script.Shot(num)
+	EmitSfx(firepoints[gun_1], 1024)
 	gun_1 = 1 - gun_1
 end
 
