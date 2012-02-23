@@ -40,7 +40,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		if extraNormalDamageList[weaponID] then
 			attackerID = attackerID or -1
 			-- be careful; this line can cause recursion! don't make it do paralyzer damage
-			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponID], 0, attackerID)
+			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponID], 0, attackerID, weaponID)
 		end
 		if health and maxHealth and health ~= 0 then -- taking no chances.
 			return damage*maxHealth/health
@@ -160,7 +160,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		
 		if extraNormalDamageList[weaponID] then
 			attackerID = attackerID or -1
-			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponID], 0, attackerID)
+			Spring.AddUnitDamage(unitID, extraNormalDamageList[weaponID], 0, attackerID, weaponID)
 		end
 		return 0
 	end

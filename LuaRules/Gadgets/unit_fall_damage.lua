@@ -58,7 +58,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			Spring.AddUnitImpulse(unitID,0,0.16,0)
 		end
 	end
-	
+
 	-- ground collision
 	if weaponID == -1 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
 		

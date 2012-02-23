@@ -116,6 +116,7 @@ end
 function script.Shot(num)
 	EmitSfx(firepoints[gun_1], 1024)
 	gun_1 = 1 - gun_1
+	GG.shotWaterWeapon(unitID)
 end
 
 function script.Killed(recentDamage, maxHealth)

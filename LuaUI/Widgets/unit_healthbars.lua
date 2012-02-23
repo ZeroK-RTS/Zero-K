@@ -147,6 +147,7 @@ local barColors = {
   slow    = { 0.50,0.10,0.70,barAlpha },
   goo     = { 0.50,0.50,0.50,barAlpha },
   shield  = { 0.20,0.60,0.60,barAlpha },
+  tank    = { 0.10,0.20,0.90,barAlpha },
 
   resurrect = { 1.00,0.50,0.00,featureBarAlpha },
   reclaim   = { 0.75,0.75,0.75,featureBarAlpha },
@@ -582,6 +583,7 @@ do
         canStockpile  = ud.canStockpile,
         reloadTime    = ud.reloadTime,
         primaryWeapon = ud.primaryWeapon-1,
+		maxWaterTank  = ud.customParams.maxwatertank,
       }
     end
     ci = customInfo[unitDefID]
@@ -691,6 +693,15 @@ do
       if (captureReloadState and captureReloadState > 0) then
 		local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
         AddBar("capture reload",capture,"reload2",(fullText and floor(capture*100)..'%') or '')
+      end
+	  
+	  --// WATER TANK
+	  local waterTank = GetUnitRulesParam(unitID,"watertank")
+      if (ci.maxWaterTank and waterTank) then
+        local prog = waterTank/ci.maxWaterTank
+		if prog < 1 then
+			AddBar("Water Tank",prog,"tank",(fullText and floor(prog*100)..'%') or '')
+		end
       end
 
 	  --// SPECIAL WEAPON

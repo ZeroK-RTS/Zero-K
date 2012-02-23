@@ -24,7 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    maxwatertank = [[200]],
+    maxwatertank = [[300]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
