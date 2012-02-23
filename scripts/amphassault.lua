@@ -173,9 +173,9 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-    EmitSfx(gunPieces[gun_1].flare, 1024)
+    --EmitSfx(gunPieces[gun_1].flare, 1024)
     Move(gunPieces[gun_1].recoil, z_axis, -10)
-    Move(gunPieces[gun_1].recoil, z_axis, 0, 5)
+    Move(gunPieces[gun_1].recoil, z_axis, 0, 10)
     gun_1 = 1 - gun_1
 end
 

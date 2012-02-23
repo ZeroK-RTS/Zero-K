@@ -26,7 +26,7 @@ unitDef = {
     --description_bp = [[Robô dispersador]],
     --description_fr = [[Robot Émeutier]],
 	--description_de = [[Sturm Roboter]],
-    helptext       = [[The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a slow but powerful flechette cannon.]],
+    helptext       = [[The Grizzly is a classic assault unit - relatively slow, clumsy and next to unstoppable. Its weapon is a disruptor beam that damages and slows enemies.]],
     --helptext_bp    = [[O raio de calor do Sumo é muito poderoso a curto alcançe, mas se dissipa com a distância e é bem mais fraca de longe. A velocidade alta de disparo o torna ideal para lutar contra grandes grupos de unidades baratas. ]],
     --helptext_fr    = [[Le rayon r chaleur du Sumo est capable de délivrer une puissance de feu important sur un point précis. Plus la cible est proche, plus les dégâts seront importants. La précision du rayon est idéale pour lutter contre de larges vagues d'ennemis, mais l'imposant blindage du Sumo le restreint r une vitesse réduite.]],
 	--helptext_de    = [[Der Sumo nutzt seinen mächtigen Heat Ray in nächster Nähe, auf größerer Entfernung aber verliert er entsprechend an Feuerkraft. Er eignet sich ideal, um größere Gruppen von billigen, feindlichen Einheiten zu vernichten. Bemerkenswert ist, dass der Sumo in die Luft springen kann und schließlich auf feindlichen Einheiten landet, was diesen enormen Schaden zufügt.]],
@@ -81,7 +81,7 @@ unitDef = {
   weapons             = {
  
     {
-      def                = [[FLECHETTE]],
+      def                = [[GYROJET]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -91,44 +91,46 @@ unitDef = {
 
   weaponDefs          = {
   
-	FLECHETTE = {
-	  name                    = [[Flechette]],
-	  areaOfEffect            = 32,
-	  burst					  = 3,
-	  burstRate				  = 0.03,
-	  coreThickness           = 0.5,
-	  craterBoost             = 0,
-	  craterMult              = 0,
-  
-	  damage                  = {
-	  	default = 32,
-	  	subs    = 1.6,
-	  },
+    GYROJET = {
+      name                    = [[Gyrojet]],
+      areaOfEffect            = 8,
+      cegTag                  = [[torpedo_trail]],
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 125,
+        planes  = 125,
+        subs    = 125,
+      },
 	  
-	  duration                = 0.02,
-	  explosionGenerator      = [[custom:BEAMWEAPON_HIT_YELLOW]],
-	  fireStarter             = 50,
-	  heightMod               = 1,
-	  impulseBoost            = 0,
-	  impulseFactor           = 0.4,
-	  interceptedByShieldType = 1,
-	  projectiles			  = 4,
-	  range                   = 300,
-	  reloadtime              = 2,
-	  rgbColor                = [[1 1 0]],
-	  soundHit                = [[weapon/laser/lasercannon_hit]],
-	  soundStart              = [[weapon/cannon/cannon_fire4]],
-	  soundStartVolume		= 0.6,
-	  soundTrigger            = true,
-	  sprayangle				= 1600,
-	  targetMoveError         = 0.15,
-	  thickness               = 2,
-	  tolerance               = 10000,
-	  turret                  = true,
-	  weaponType              = [[LaserCannon]],
-	  weaponVelocity          = 880,
-	}
-	
+      fireStarter             = 70,
+      flightTime              = 2.2,
+      guidance                = false,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 2,
+      lineOfSight             = true,
+      model                   = [[wep_m_frostshard.s3o]],
+      noSelfDamage            = true,
+      predictBoost            = 1,
+      range                   = 400,
+      reloadtime              = 0.5,
+      smokeTrail              = true,
+      soundHit                = [[weapon/cannon/emg_hit]],
+      soundHitVolume          = 8,
+      soundStart              = [[weapon/cannon/mini_cannon]],
+      soundStartVolume        = 6,
+      startVelocity           = 500,
+      texture2                = [[wake]],
+      tracks                  = false,
+      turret                  = true,
+	  waterweapon			  = true,
+      weaponAcceleration      = 190,
+      weaponTimer             = 1,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 500,
+    },	
   },
 
 
