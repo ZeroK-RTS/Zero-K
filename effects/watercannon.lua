@@ -81,7 +81,7 @@ return {
         particlesizespread = 2,
         particlespeed      = 1,
         particlespeedspread = 0,
-        pos                = [[r-1 r1, 2, r-1 r1]],
+        pos                = [[r-1 r1, 1, r-1 r1]],
         sizegrowth         = 1.2,
         sizemod            = 1.0,
         texture            = [[dirt]],
