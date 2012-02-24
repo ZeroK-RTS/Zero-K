@@ -11,14 +11,22 @@ smokePiece = {torso}
 --------------------------------------------------------------------------------------
 local PACE = 2
 
-local THIGH_FRONT_ANGLE = -math.rad(50)
+local THIGH_FRONT_ANGLE = math.rad(-50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
-local THIGH_BACK_ANGLE = math.rad(30)
+local THIGH_BACK_ANGLE = math.rad(10)
 local THIGH_BACK_SPEED = math.rad(60) * PACE
-local CALF_FRONT_ANGLE = math.rad(-20)
-local CALF_FRONT_SPEED = math.rad(90) * PACE
-local CALF_BACK_ANGLE = math.rad(10)
-local CALF_BACK_SPEED = math.rad(90) * PACE
+local CALF_RETRACT_ANGLE = math.rad(0)
+local CALF_RETRACT_SPEED = math.rad(90) * PACE
+local CALF_STRAIGHTEN_ANGLE = math.rad(70)
+local CALF_STRAIGHTEN_SPEED = math.rad(90) * PACE
+local FOOT_FRONT_ANGLE = -THIGH_FRONT_ANGLE - math.rad(10)
+local FOOT_FRONT_SPEED = 2*THIGH_FRONT_SPEED
+local FOOT_BACK_ANGLE = -(THIGH_BACK_ANGLE + CALF_STRAIGHTEN_ANGLE)
+local FOOT_BACK_SPEED = THIGH_BACK_SPEED + CALF_STRAIGHTEN_SPEED
+local BODY_TILT_ANGLE = math.rad(10)
+local BODY_TILT_SPEED = math.rad(20)
+local BODY_RISE_HEIGHT = 6
+local BODY_RISE_SPEED = 8*PACE
 
 local ARM_FRONT_ANGLE = -math.rad(20)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
@@ -48,25 +56,52 @@ local gun_1 = 1
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
+-- four-stroke bipedal (reverse-jointed) walkscript
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		--left leg up, right leg back
-		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(lcalf, x_axis, CALF_FRONT_ANGLE, CALF_FRONT_SPEED)
-		Turn(rthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(rcalf, x_axis, CALF_BACK_ANGLE, CALF_BACK_SPEED)
-		WaitForTurn(lthigh, x_axis)
-		Sleep(0)
+		--straighten left leg and draw it back, raise body, center right leg
+		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED)
+		Turn(pelvis, z_axis, BODY_TILT_ANGLE, BODY_TILT_SPEED)
+		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(lcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
+		Turn(lfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED)		
+		Turn(rthigh, x_axis, 0, THIGH_FRONT_SPEED)
+		Turn(rcalf, x_axis, 0, CALF_RETRACT_SPEED)
+		Turn(rfoot, x_axis, 0, FOOT_FRONT_SPEED)
+		WaitForTurn(lthigh, y_axis)
+		Sleep(200)
 		
-		--right leg up, left leg back
-		Turn(lthigh, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(lcalf, x_axis, CALF_BACK_ANGLE, CALF_BACK_SPEED)
+		-- lower body, draw right leg forwards
+		Move(pelvis, y_axis, 0, BODY_RISE_SPEED)
+		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED)
+		--Turn(lcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(rcalf, x_axis, CALF_FRONT_ANGLE, CALF_FRONT_SPEED)
-		WaitForTurn(rthigh, x_axis)		
-		Sleep(0)
+		Turn(rfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED)	
+		WaitForMove(pelvis, y_axis)
+		Sleep(200)
+		
+		--straighten right leg and draw it back, raise body, center left leg
+		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED)
+		Turn(pelvis, z_axis, -BODY_TILT_ANGLE, BODY_TILT_SPEED)
+		Turn(lthigh, x_axis, 0, THIGH_FRONT_SPEED)
+		Turn(lcalf, x_axis, 0, CALF_RETRACT_SPEED)
+		Turn(lfoot, x_axis, 0, FOOT_FRONT_SPEED)		
+		Turn(rthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
+		Turn(rfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED)		
+		WaitForTurn(rthigh, y_axis)
+		Sleep(200)
+		
+		-- lower body, draw left leg forwards
+		Move(pelvis, y_axis, 0, BODY_RISE_SPEED)
+		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED)
+		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
+		Turn(lfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED)			
+		--Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
+		WaitForMove(pelvis, y_axis)
+		Sleep(200)
 	end
 end
 
@@ -88,6 +123,7 @@ end
 
 function script.Create()
 	TANK_MAX = UnitDefs[Spring.GetUnitDefID(unitID)].customParams.maxwatertank
+	--StartThread(Walk)
 
 	StartThread(SmokeUnit)	
 end

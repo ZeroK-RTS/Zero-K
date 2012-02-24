@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[amphraider2]],
   name                   = [[Ray]],
-  description            = [[Amphibious Raider Bot]],
+  description            = [[Amphibious Raider/Skirmish Bot (Land)]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   amphibious             = [[1]],
@@ -24,6 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    helptext	 = [[The Ray uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water.]],
     maxwatertank = [[300]],
   },
 
@@ -84,7 +85,7 @@ unitDef = {
       burst		     		  = 3,
       burstRate		          = 0.03,
       --cegTag		      = [[torpedo_trail]],
-      colormap                = [[0.6 0.8 1 1 0.6 0.8 1 1]],
+      --colormap                = [[0.6 0.8 1 1 0.6 0.8 1 1]],
       craterBoost             = 0,
       craterMult              = 0,
 
