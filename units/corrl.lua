@@ -16,7 +16,7 @@ unitDef = {
   buildTime                     = 80,
   canAttack                     = true,
   canstop                       = [[1]],
-  category                      = [[FLOAT]],
+  category                      = [[FLOAT TURRET]],
   collisionVolumeOffsets        = [[0 -5 0]],
   collisionVolumeScales         = [[24 60 24]],
   collisionVolumeTest           = 1,
@@ -74,7 +74,7 @@ unitDef = {
     {
       def                = [[ARMRL_MISSILE]],
       badTargetCategory  = [[HOVER SWIM LAND SINK FLOAT SHIP]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },

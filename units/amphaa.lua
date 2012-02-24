@@ -69,7 +69,7 @@ unitDef = {
     {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP]],
     },  
   
     {

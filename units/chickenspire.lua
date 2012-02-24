@@ -76,7 +76,7 @@ unitDef = {
     {
       def                = [[SLAMSPORE]],
 	  badTargetCategory	 = [[MOBILE]],
-      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
     },
 
   },

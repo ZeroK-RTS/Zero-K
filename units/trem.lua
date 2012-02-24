@@ -81,7 +81,7 @@ unitDef = {
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 270,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },

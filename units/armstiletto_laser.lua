@@ -63,7 +63,7 @@ unitDef = {
     {
       def                = [[BOGUS_BOMB]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
 

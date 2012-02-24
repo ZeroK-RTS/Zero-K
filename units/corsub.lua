@@ -66,7 +66,7 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 30,
-      onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP]],
     },
 
 
@@ -75,7 +75,7 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 180,
-      onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP]],
     },
 
   },

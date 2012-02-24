@@ -16,7 +16,7 @@ unitDef = {
   buildTime                     = 90,
   canAttack                     = true,
   canstop                       = [[1]],
-  category                      = [[SINK]],
+  category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 -32 0]],
   collisionVolumeScales         = [[30 90 30]],
   collisionVolumeTest           = 1,
@@ -72,7 +72,7 @@ unitDef = {
     {
       def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },

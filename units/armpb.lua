@@ -15,7 +15,7 @@ unitDef = {
   buildTime                     = 400,
   canAttack                     = true,
   canstop                       = [[1]],
-  category                      = [[SINK]],
+  category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[24 50 24]],
   collisionVolumeTest           = 1,
@@ -65,7 +65,7 @@ unitDef = {
     {
       def                = [[GAUSS]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },

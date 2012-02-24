@@ -76,7 +76,7 @@ unitDef = {
       def                = [[LASER]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
     {

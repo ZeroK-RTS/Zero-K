@@ -66,14 +66,14 @@ unitDef = {
     {
       def                = [[PLASMA]],
       badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },
 
 
     {
       def                = [[DEPTHCHARGE]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK FLOAT SHIP GUNSHIP]],
+      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP]],
     },
 
   },

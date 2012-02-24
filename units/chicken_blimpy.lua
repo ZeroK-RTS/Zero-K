@@ -77,7 +77,7 @@ unitDef = {
     {
       def                = [[BOGUS_BOMB]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
 
@@ -85,7 +85,7 @@ unitDef = {
       def                = [[BOMBTRIGGER]],
       mainDir            = [[0 -1 0]],
       maxAngleDif        = 70,
-      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER SUB]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER SUB]],
     },
 
 
@@ -93,7 +93,7 @@ unitDef = {
       def                = [[DODOBOMB]],
       mainDir            = [[0 -1 0]],
       maxAngleDif        = 90,
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
 
   },

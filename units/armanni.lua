@@ -18,7 +18,7 @@ unitDef = {
   buildTime                     = 1500,
   canAttack                     = true,
   canstop                       = [[1]],
-  category                      = [[SINK]],
+  category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 -2 0]],
   collisionVolumeScales         = [[60 72 60]],
   collisionVolumeTest           = 1,
@@ -71,7 +71,7 @@ unitDef = {
     {
       def                = [[ATA]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK FLOAT GUNSHIP FIXEDWING HOVER]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },
 
   },

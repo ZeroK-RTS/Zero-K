@@ -72,7 +72,7 @@ unitDef = {
     {
       def                = [[ADV_ROCKET]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER FIXEDWING GUNSHIP]],
     },
 
   },

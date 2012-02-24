@@ -44,7 +44,7 @@ unitDef = {
   movementClass       = [[TANK3]],
   moveState           = 0,
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SWIM LAND SHIP GUNSHIP HOVER]],
   objectName          = [[cormart.s3o]],
   pushResistant       = 1,
   seismicSignature    = 4,
@@ -67,7 +67,7 @@ unitDef = {
       def                = [[CORE_ARTILLERY]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 180,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },

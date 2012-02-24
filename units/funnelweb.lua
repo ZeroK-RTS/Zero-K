@@ -71,7 +71,7 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
 	  maxAngleDif		 = 40,
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
     {
@@ -79,7 +79,7 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
 	  maxAngleDif		 = 90,
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },  	
 	
     {

@@ -73,7 +73,7 @@ unitDef = {
     {
       def                = [[WEB]],
 	  badTargetCategory	 = [[UNARMED]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
 	  mainDir            = [[0 0 1]],
       maxAngleDif        = 180,	  
     },
@@ -81,7 +81,7 @@ unitDef = {
     --{
     --  def                = [[SPORES]],
     --  badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-    --  onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+    --  onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     --},
 
   },

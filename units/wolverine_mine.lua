@@ -67,7 +67,7 @@ unitDef = {
     {
       def                = [[BOMBLET]],
       badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER GUNSHIP]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP]],
     },
 
   },

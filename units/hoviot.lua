@@ -78,13 +78,13 @@ unitDef = {
       def                = [[LASERTWIN]],
 	  mainDir            = [[0 0 1]],
       maxAngleDif        = (90+70)+(90+70),
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 	{
       def                = [[LASERTWIN]],
 	  mainDir            = [[0 0 -1]],
       maxAngleDif        = (90+70)+(90+70),
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },

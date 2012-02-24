@@ -47,7 +47,7 @@ unitDef = {
   movementClass       = [[HOVER3]],
   moveState           = 0,
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SWIM LAND SHIP GUNSHIP HOVER]],
   objectName          = [[Longneck_Tachy.s3o]],
   seismicSignature    = 4,
   selfDestructAs      = [[MEDIUM_BUILDINGEX]],
@@ -65,7 +65,7 @@ unitDef = {
     {
       def                = [[ATA]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK FLOAT GUNSHIP FIXEDWING HOVER]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },
 
   },

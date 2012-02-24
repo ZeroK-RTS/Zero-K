@@ -79,14 +79,14 @@ unitDef = {
       def                = [[JAWS]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
 
 
     {
       def                = [[SPORES]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
 
@@ -95,7 +95,7 @@ unitDef = {
       badTargetCategory  = [[FIREPROOF]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
 

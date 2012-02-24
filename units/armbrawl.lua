@@ -84,7 +84,7 @@ unitDef = {
       mainDir            = [[0 -0.35 1]],
       maxAngleDif        = 50,
 	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK FLOAT GUNSHIP FIXEDWING HOVER]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },
 
   },

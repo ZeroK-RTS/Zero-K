@@ -16,7 +16,7 @@ unitDef = {
   canAttack                     = true,
   canGuard                      = true,
   canstop                       = [[1]],
-  category                      = [[FLOAT]],
+  category                      = [[FLOAT TURRET]],
   collisionVolumeOffsets        = [[0 -8 0]],
   collisionVolumeScales         = [[49 60 49]],
   collisionVolumeTest           = 1,
@@ -70,7 +70,7 @@ unitDef = {
     {
       def                = [[ARMDEVA_WEAPON]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },

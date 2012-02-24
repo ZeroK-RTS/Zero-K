@@ -71,7 +71,7 @@ unitDef = {
     {
       def                = [[TACNUKE]],
       badTargetCategory  = [[SWIM LAND SUB SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SUB SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },

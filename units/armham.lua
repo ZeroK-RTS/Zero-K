@@ -54,7 +54,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   moveState              = 0,
   noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB SWIM LAND SHIP SINK FLOAT HOVER]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SWIM LAND SHIP GUNSHIP HOVER]],
   objectName             = [[Milo.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
@@ -86,7 +86,7 @@ unitDef = {
     {
       def                = [[HAMMER_WEAPON]],
       badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },
 
   },

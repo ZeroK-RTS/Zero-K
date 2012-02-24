@@ -44,8 +44,9 @@ unitDef = {
   minCloakDistance       = 75,
   modelCenterOffset      = [[0 0 0]],
   movementClass          = [[KBOT2]],
+  moveState              = 0,
   noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB GUNSHIP ]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SWIM LAND SHIP GUNSHIP HOVER]],
   objectName             = [[dominator.s3o]],
   script                 = [[shieldarty.lua]],
   seismicSignature       = 4,
@@ -79,7 +80,7 @@ unitDef = {
     {
       def                = [[EMP_ROCKET]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },

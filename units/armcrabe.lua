@@ -92,7 +92,7 @@ unitDef = {
 
     {
       def                = [[ARM_CRABE_GAUSS]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },

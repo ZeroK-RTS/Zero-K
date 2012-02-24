@@ -75,7 +75,7 @@ unitDef = {
       def                = [[WEAPON]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 120,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
 
   },

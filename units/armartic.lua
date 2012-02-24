@@ -12,7 +12,7 @@ unitDef = {
   buildPic                      = [[armartic.png]],
   buildTime                     = 170,
   canAttack                     = true,
-  category                      = [[SINK]],
+  category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 75 32]],
   collisionVolumeTest           = 1,
@@ -62,7 +62,7 @@ unitDef = {
 
     {
       def                = [[arm_det_weapon]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
 
   },

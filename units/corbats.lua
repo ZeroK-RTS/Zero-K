@@ -77,7 +77,7 @@ unitDef = {
       def                = [[PLASMA]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 330,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
 
@@ -85,7 +85,7 @@ unitDef = {
       def                = [[PLASMA]],
       mainDir            = [[0 0 -1]],
       maxAngleDif        = 330,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
 
@@ -93,7 +93,7 @@ unitDef = {
       def                = [[PLASMA]],
       mainDir            = [[0 0 -1]],
       maxAngleDif        = 330,
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },

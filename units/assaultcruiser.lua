@@ -79,7 +79,7 @@ unitDef = {
       mainDir            = [[-1 0 1]],
       maxAngleDif        = 240,
 	  badTargetCategory	 = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 	
     {
@@ -87,7 +87,7 @@ unitDef = {
       mainDir            = [[1 0 1]],
       maxAngleDif        = 240,
 	  badTargetCategory	 = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 	
     {
@@ -95,7 +95,7 @@ unitDef = {
       mainDir            = [[-1 0 -1]],
       maxAngleDif        = 240,
 	  badTargetCategory	 = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 	
     {
@@ -103,7 +103,7 @@ unitDef = {
       mainDir            = [[1 0 -1]],
       maxAngleDif        = 240,
 	  badTargetCategory	 = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },	
 	
     {
@@ -111,7 +111,7 @@ unitDef = {
       mainDir            = [[-1 0 0]],
       maxAngleDif        = 240,
 	  badTargetCategory	 = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },	
 
     {
@@ -119,7 +119,7 @@ unitDef = {
       mainDir            = [[1 0 0]],
       maxAngleDif        = 240,
 	  badTargetCategory	 = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },		
 	
   },

@@ -76,7 +76,7 @@ unitDef = {
 
     {
       def                = [[STORM_ROCKET]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },

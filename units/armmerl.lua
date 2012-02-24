@@ -48,7 +48,7 @@ unitDef = {
   movementClass       = [[TANK3]],
   moveState           = 0,
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SWIM LAND SHIP GUNSHIP HOVER]],
   objectName          = [[core_diplomat.s3o]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
@@ -80,7 +80,7 @@ unitDef = {
     {
       def                = [[CORTRUCK_ROCKET]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },

@@ -74,7 +74,7 @@ unitDef = {
 
     {
       def                = [[NAPALM_MORTAR]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
   },

@@ -74,7 +74,7 @@ unitDef = {
     {
       def                = [[MISSILE]],
 	  badTargetCategory	 = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },

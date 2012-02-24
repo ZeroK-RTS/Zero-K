@@ -70,7 +70,7 @@ unitDef = {
 
     {
       def                = [[PARALYZER]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP]],
     },
 
   },

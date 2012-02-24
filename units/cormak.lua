@@ -80,21 +80,21 @@ unitDef = {
     {
       def                = [[FAKEGUN1]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP FIXEDWING]],
     },
 
 
     {
       def                = [[BLAST]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP FIXEDWING]],
     },
 
 
     {
       def                = [[FAKEGUN2]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[LAND SINK SHIP SWIM FLOAT HOVER GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP FIXEDWING]],
     },
 
   },

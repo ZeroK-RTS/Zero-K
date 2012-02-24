@@ -75,7 +75,7 @@ unitDef = {
     {
       def                = [[LAZER]],
       badTargetCategory  = [[FIXEDWING GUNSHIP SATELLITE]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER FIXEDWING GUNSHIP SATELLITE]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP SATELLITE]],
     },
 
 

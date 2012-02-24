@@ -18,7 +18,7 @@ unitDef = {
   buildTime                     = 1200,
   canAttack                     = true,
   canstop                       = [[1]],
-  category                      = [[SINK]],
+  category                      = [[SINK TURRET]],
   collisionVolumeScales         = [[50 100 50]],
   collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
@@ -77,14 +77,14 @@ unitDef = {
     {
       def                = [[PLASMA]],
 	  badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
 
     {
       def                = [[HEATRAY]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },

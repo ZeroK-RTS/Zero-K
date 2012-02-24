@@ -73,14 +73,14 @@ unitDef = {
     {
       def                = [[COR_GOL]],
 	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
 
     {
       def                = [[CORGOL_FLAMETHROWER]],
       badTargetCategory  = [[FIREPROOF]],
-      onlyTargetCategory = [[SWIM LAND SINK FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
   },
