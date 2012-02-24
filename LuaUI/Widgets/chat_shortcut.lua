@@ -61,11 +61,11 @@ function widget:MousePress(x, y, button)
 		spSendCommands(textToBePasted)
 	end
 	if button == rightButton then
-		local textToBePasted = pasteCommand .. playerName
+		local textToBePasted = pasteCommand .. (playerName or "")
 		spSendCommands(textToBePasted)
 	end
 	if button == middleButton then
-		local textToBePasted = whisper .. playerID
+		local textToBePasted = whisper .. (playerID or "")
 		spSendCommands(textToBePasted)
 	end
 end
