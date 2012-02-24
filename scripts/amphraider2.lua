@@ -70,8 +70,8 @@ local function Walk()
 		Turn(rthigh, x_axis, 0, THIGH_FRONT_SPEED)
 		Turn(rcalf, x_axis, 0, CALF_RETRACT_SPEED)
 		Turn(rfoot, x_axis, 0, FOOT_FRONT_SPEED)
-		WaitForTurn(lthigh, y_axis)
-		Sleep(200)
+		WaitForTurn(lthigh, x_axis)
+		Sleep(0)
 		
 		-- lower body, draw right leg forwards
 		Move(pelvis, y_axis, 0, BODY_RISE_SPEED)
@@ -80,7 +80,7 @@ local function Walk()
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED)	
 		WaitForMove(pelvis, y_axis)
-		Sleep(200)
+		Sleep(0)
 		
 		--straighten right leg and draw it back, raise body, center left leg
 		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED)
@@ -91,8 +91,8 @@ local function Walk()
 		Turn(rthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
 		Turn(rfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED)		
-		WaitForTurn(rthigh, y_axis)
-		Sleep(200)
+		WaitForTurn(rthigh, x_axis)
+		Sleep(0)
 		
 		-- lower body, draw left leg forwards
 		Move(pelvis, y_axis, 0, BODY_RISE_SPEED)
@@ -101,7 +101,7 @@ local function Walk()
 		Turn(lfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED)			
 		--Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
 		WaitForMove(pelvis, y_axis)
-		Sleep(200)
+		Sleep(0)
 	end
 end
 
