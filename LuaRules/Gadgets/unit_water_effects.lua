@@ -26,22 +26,23 @@ local tankByID = {data = {}, count = 0}
 
 local TANK_MAX = 300
 local REGEN_PERIOD = 13
-local SHOT_COST = 0.4
+local SHOT_COST = 1.2
 local REGEN_RATE = 6
+local HEALTH_REGEN = 16
 
 local function updateWeaponFromTank(unitID)
 
 	local proportion = tank[unitID].storage/TANK_MAX
 
 	Spring.SetUnitWeaponState(unitID, 0, {
-		range = proportion*200 + 100,
-		projectileSpeed = proportion*10+7.5,
-		reloadTime = 0.15 - 0.5*proportion,
+		range = proportion*300 + 100,
+		projectileSpeed = proportion*10+8,
+		projectiles = math.floor(proportion*6.5)+2,
 	})
 
 end
 
---local last
+local last
 
 function shotWaterWeapon(unitID)
 	--[[
@@ -58,6 +59,19 @@ function shotWaterWeapon(unitID)
 	end
 	
 	updateWeaponFromTank(unitID)
+	--[[
+	local proportion = tank[unitID].storage/TANK_MAX
+	local reloadFrames = 2 - proportion
+
+	if math.random() > reloadFrames%1 then
+		reloadFrames = math.floor(reloadFrames)
+	else
+		reloadFrames = math.ceil(reloadFrames)
+	end
+	
+	Spring.SetUnitWeaponState(unitID, 0, {
+		reloadFrame = Spring.GetGameFrame() + reloadFrames,
+	})--]]
 	
 	Spring.SetUnitRulesParam(unitID,"watertank",tank[unitID].storage, {inlos = true})
 end
@@ -77,13 +91,17 @@ function gadget:GameFrame(n)
 
 				if height < 0 then
 					if tank[unitID].storage ~= TANK_MAX then
-						tank[unitID].storage = tank[unitID].storage + math.max(-height,16)*REGEN_RATE*0.0625
+						tank[unitID].storage = tank[unitID].storage + math.min(-height,16)*REGEN_RATE*0.0625
 						if tank[unitID].storage > TANK_MAX then
 							tank[unitID].storage = TANK_MAX
 						end
 						Spring.SetUnitRulesParam(unitID,"watertank",tank[unitID].storage, {inlos = true})
 						updateWeaponFromTank(unitID)
 					end
+					
+					local hp, maxHp = Spring.GetUnitHealth(unitID)
+					local newHp = hp + math.min(-height,32)*HEALTH_REGEN*0.03125
+					Spring.SetUnitHealth(unitID, newHp) 
 				end
 				i = i + 1
 			else

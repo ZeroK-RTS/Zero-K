@@ -36,8 +36,16 @@ local SIG_RESTORE = 8
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
-local gun_1 = 1
+-- Weapon config
+
+local SOUND_PERIOD = 1
+local soundIndex = SOUND_PERIOD
 local TANK_MAX 
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+local gun_1 = 1
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local function Walk()
@@ -99,9 +107,9 @@ function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
-		Turn( torso, y_axis, heading, math.rad(360) )
-		Turn( lshoulder, x_axis, -pitch, math.rad(150) )
-		Turn( rshoulder, x_axis, -pitch, math.rad(150) )
+		Turn( torso, y_axis, heading, math.rad(480) )
+		Turn( lshoulder, x_axis, -pitch, math.rad(200) )
+		Turn( rshoulder, x_axis, -pitch, math.rad(200) )
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(lshoulder, x_axis)
 		StartThread(RestoreAfterDelay)
@@ -114,11 +122,28 @@ function script.QueryWeapon(num)
 end
 
 function script.FireWeapon(num)
+	soundIndex = soundIndex - 1
+	if soundIndex <= 0 then
+		local proportion = 0
+		local waterTank = Spring.GetUnitRulesParam(unitID,"watertank")
+		if waterTank then
+			proportion = waterTank/TANK_MAX
+		end
+		soundIndex = SOUND_PERIOD*(2 - proportion)
+		local px, py, pz = Spring.GetUnitPosition(unitID)
+		Spring.PlaySoundFile("sounds/weapon/hiss.wav", 5-proportion*2, px, py, pz)
+	end
+
+	GG.shotWaterWeapon(unitID)
 end
 
 function script.Shot(num)
+    if math.random() < 0.4 then
+		EmitSfx(firepoints[gun_1], 1024)
+	end
+	--[[
 	local waterTank = Spring.GetUnitRulesParam(unitID,"watertank")
-    if waterTank then
+	if waterTank then
         local proportion = waterTank/TANK_MAX
 		if proportion > 0.4 then
 			EmitSfx(firepoints[gun_1], 1024)
@@ -130,10 +155,9 @@ function script.Shot(num)
 				EmitSfx(firepoints[gun_1], 1024)
 			end
 		end
-	end
-	
+	end--]]
+	--Spring.Echo(Spring.GetGameFrame())
 	gun_1 = 1 - gun_1
-	GG.shotWaterWeapon(unitID)
 end
 
 function script.Killed(recentDamage, maxHealth)
