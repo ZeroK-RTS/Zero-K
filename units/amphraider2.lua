@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[amphraider2]],
-  name                   = [[Ray]],
+  name                   = [[Archer]],
   description            = [[Amphibious Raider/Skirmish Bot (Land)]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
@@ -24,7 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext	 = [[The Ray uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water.]],
+    helptext	 = [[The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water.]],
     maxwatertank = [[300]],
   },
 
