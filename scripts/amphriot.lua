@@ -155,9 +155,12 @@ end
 
 function script.FireWeapon(num)
 	if num == 1 then
-
+            EmitSfx(flares[gun_1], 1024)
+            EmitSfx(mainturret, 1025)
+            gun_1 = gun_1 + 1
+            if gun_1 > 4 then gun_1 = 1 end
 	elseif num == 2 then
-		EmitSfx(flaremain, 1024)
+
 	end
 end
 

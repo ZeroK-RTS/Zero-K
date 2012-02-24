@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[amphaa]],
   name                   = [[Angler]],
-  description            = [[Amphibious AA/Torpedo Bot]],
+  description            = [[Amphibious AA Bot]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   amphibious             = [[1]],
@@ -49,7 +49,8 @@ unitDef = {
 
   sfxtypes               = {
     explosiongenerators = {
-	  [[custom:THUDMUZZLE]],
+	  [[custom:STORMMUZZLE]],
+	  [[custom:STORMBACK]],
     },
   },
 
@@ -59,18 +60,12 @@ unitDef = {
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
-  trackType              = [[ChickenTrackPointy]],
+  trackType              = [[ComTrack]],
   trackWidth             = 22,
   turnRate               = 1000,
   upright                = true,
 
   weapons                = {
-  
-    {
-      def                = [[TORPEDO]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP]],
-    },  
   
     {
       def                = [[FLAK]],
@@ -81,84 +76,61 @@ unitDef = {
   },
 
 
-  weaponDefs             = {
-  
-    TORPEDO = {
-      name                    = [[Torpedo Launcher]],
-      areaOfEffect            = 16,
-      avoidFriendly           = false,
-      bouncerebound           = 0.5,
-      bounceslip              = 0.5,
-      burnblow                = true,
-      collideFriendly         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
+  weapons                = {
 
-      damage                  = {
-        default = 180,
-      },
-
-      explosionGenerator      = [[custom:TORPEDO_HIT]],
-      groundbounce            = 1,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      model                   = [[wep_t_longbolt.s3o]],
-      numbounce               = 4,
-      range                   = 450,
-      reloadtime              = 2.5,
-      soundHit                = [[explosion/ex_underwater]],
-      soundStart              = [[weapon/torpedo]],
-      startVelocity           = 150,
-      tracks                  = true,
-      turnRate                = 22000,
-      turret                  = true,
-      waterWeapon             = true,
-      weaponAcceleration      = 22,
-      weaponTimer             = 3,
-      weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 320,
+    {
+      def                = [[MISSILE]],
+      --badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },
-  
-  
-    FLAK = {
-      name                    = [[Flak Cannon]],
-      accuracy                = 100,
-      areaOfEffect            = 64,
-      burnblow                = true,
+
+  },
+
+
+  weaponDefs             = {
+
+    ARMKBOT_MISSILE = {
+      name                    = [[Missile Pack]],
+      areaOfEffect            = 48,
+      burst					  = 4,
+      burstRate				  = 0.1,
       canattackground         = false,
-      cegTag                  = [[flak_trail]],
-      color                   = 1,
-      craterBoost             = 0,
-      craterMult              = 0,
+      cegTag                  = [[missiletrailblue]],
+      craterBoost             = 1,
+      craterMult              = 2,
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 10,
-        planes  = 100,
-        subs    = 5,
+        default = 18,
+        planes  = 180,
+        subs    = 9,
       },
 
-      edgeEffectiveness       = 0.85,
-      explosionGenerator      = [[custom:FLAK_HIT_16]],
+      explosionGenerator      = [[custom:FLASH2]],
+      fireStarter             = 70,
+      flightTime              = 3,
       impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      minbarrelangle          = [[-24]],
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 2,
+      model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
-      predictBoost            = 1,
-      range                   = 900,
-      reloadtime              = 0.75,
-	  size                    = 0.01,
-      soundHit                = [[weapon/flak_hit]],
-      soundStart              = [[weapon/flak_fire]],
-      startsmoke              = [[1]],
+      range                   = 850,
+      reloadtime              = 8,
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/rocket_hit]],
+      soundStart              = [[weapon/missile/missile_fire7]],
+      startVelocity           = 650,
+      texture2                = [[AAsmoketrail]],
+      tolerance               = 9000,
+      tracks                  = true,
+      turnRate                = 63000,
       turret                  = true,
-      weaponTimer             = 1,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 2000,
-    },	
+      weaponAcceleration      = 141,
+      weaponTimer             = 5,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 850,
+    },
+
   },
 
 

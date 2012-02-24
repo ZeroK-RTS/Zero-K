@@ -16,12 +16,10 @@ unitDef = {
   buildoptions     = {
     [[amphcon]],
 	[[amphskirm]],
---	[[amphraider]],
+	[[amphraider2]],
+	[[amphriot]],	
 	[[amphassault]],
 	[[amphaa]],
-	[[subscout]],
-	[[corsub]],
-	[[serpent]],
   },
 
   buildPic         = [[factoryamph.png]],
