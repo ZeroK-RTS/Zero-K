@@ -1,4 +1,4 @@
-local versionName = "v2.02"
+local versionName = "v2.03"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -67,8 +67,8 @@ local activateImpatienceG=0 --auto disable auto-reverse & half the 'distanceCONS
 
 -- Graph constant:
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
-local safetyMarginCONSTANTunitG = 0.0 --obstacle graph offset (a "safety margin" constant). Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.0 radian)
-local smCONSTANTunitG		= 0.0  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.0 radian)
+local safetyMarginCONSTANTunitG = 0.175 --obstacle graph offset (a "safety margin" constant). Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.175 radian)
+local smCONSTANTunitG		= 0.175  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.175 radian)
 local aCONSTANTg			= {math.pi/10 , math.pi/4} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD & ATTACK)) (max value: math.pi/2).
 local obsCONSTANTg			= {math.pi/10, math.pi/4} -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian (MOVE), math.pi/4 (GUARD & ATTACK)). 
 --aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction. Activated by 'graphCONSTANTtrigger[1]'
