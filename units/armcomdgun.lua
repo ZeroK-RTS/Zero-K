@@ -22,7 +22,7 @@ unitDef = {
   cloakCost              = 8,
   cloakCostMoving        = 24,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[35 35 35]],
+  collisionVolumeScales  = [[42 42 42]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
@@ -51,14 +51,14 @@ unitDef = {
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   objectName             = [[noruas]],
-  script                 = [[noruas.cob]],
+  script                 = [[armcomdgun.lua]],
   seismicSignature       = 16,
   selfDestructAs         = [[ESTOR_BUILDING]],
 
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:GATE]],
+      [[custom:laserbladestrike]],
     },
 
   },
