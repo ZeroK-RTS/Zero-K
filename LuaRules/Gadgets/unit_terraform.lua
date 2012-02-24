@@ -2835,7 +2835,7 @@ function gadget:GameFrame(n)
 							end
 							
 							-- bring terraunit towards con
-							if i == 1 then
+							if i == 1 and spValidUnitID(cQueue[i].params[1]) and terraformUnit[cQueue[i].params[1] ] then
 								local cx, _, cz = Spring.GetUnitPosition(constructorTable[currentCon])
 								local team = Spring.GetUnitTeam(constructorTable[currentCon])
 								if cx and team then
