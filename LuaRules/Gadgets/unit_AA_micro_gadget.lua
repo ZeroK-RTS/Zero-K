@@ -1,8 +1,8 @@
-local versionNumber = "v0.46"
+local versionNumber = "v0.5"
 
 --[[   TO DO::
 
-Consider unit power(cost) in attacking
+Cooperative targeting to bring down bigger targets
 Screamers hold fire until unit is killable
 
 ]]--
@@ -38,6 +38,9 @@ local GetUnitDefID       = Spring.GetUnitDefID
 local GetUnitSeparation  = Spring.GetUnitSeparation
 local AreTeamsAllied     = Spring.AreTeamsAllied
 local GiveOrder          = Spring.GiveOrderToUnit
+local GetUnitsInCylinder = Spring.GetUnitsInCylinder
+local GetUnitRules       = Spring.GetUnitRulesParams
+local GetUnitRule        = Spring.GetUnitRulesParam
 local GetUnitsInRange    = Spring.GetUnitsInSphere
 local WeaponState        = Spring.GetUnitWeaponState
 local UnitStun           = Spring.GetUnitIsStunned
@@ -82,6 +85,7 @@ local AAdefmaxcount      = {}
 local shot               = {} -- {id = shotID, unitID = ownerID, refID = owner's refID, allyteam = owner's allyteam, prefID = projectile refID in owner's list)
 local shotreference      = {}
 local shotmaxcount       = 0
+local airunitdefs        = {}
 local DPSAA              = {["corrl"] = 60, ["corrazor"] = 150, ["armcir"] = 250, ["corflak"] = 360}
 local weapondefID        = {}
 --[[
@@ -247,15 +251,20 @@ function assignTarget(unitID, refID, allyteam)
 	  if AAdef[allyteam].units[refID].name == "missiletower" and AAdef[allyteam].units[refID].reloading[2] ~= 0 then
 		damage = damage * 2
 	  end
-	  if skip >= output[2] then
+	  if skip > output[2] then
 	    AAdef[allyteam].units[refID].skiptarget = 0
+	    unassignTarget(unitID, refID, allyteam)
+	    if IsMicro(AAdef[allyteam].units[refID].id) then
+	      removecommand(AAdef[allyteam].units[refID].id)
+	      stopcommand(AAdef[allyteam].units[refID].id)
+		end
 	  end
 	  if AAdef[allyteam].units[refID].name == "missiletower" and escortingAA(unitID, refID, allyteam) then
-	    assign = HSBestTarget(output[1], output[2], damage, attacking, cdamage, skip)
+	    assign = HSBestTarget(output[1], output[2], damage, attacking, cdamage, skip, output[3])
 	  elseif AAdef[allyteam].units[refID].name == "screamer" and escortingAA(unitID, refID, allyteam) then
-	    assign = HSBestTarget(output[1], output[2], damage, attacking, cdamage, skip)
+	    assign = HSBestTarget(output[1], output[2], damage, attacking, cdamage, skip, output[3])
 	  else
-	    assign = BestTarget(output[1], output[2], damage, attacking, cdamage, skip)
+	    assign = BestTarget(output[1], output[2], damage, attacking, cdamage, skip, output[3])
 	  end
 	  if assign ~= nil then
 		if assign ~= attacking then
@@ -273,13 +282,13 @@ function assignTarget(unitID, refID, allyteam)
 	  --Echo("no air in vision")
 	  notargets = true
 	  local state = GetUnitStates(unitID)
-      if AAdef[allyteam].units[refID].name == "corrl" and output[4] ~= 0 and state.firestate ~= 2 then
-	    --Echo("Land targets in range " .. output[4])
+      if AAdef[allyteam].units[refID].name == "corrl" and output[5] ~= 0 and state.firestate ~= 2 then
+	    --Echo("Land targets in range " .. output[5])
 		if AAdef[allyteam].units[refID].lasttarget ~= nil and not UnitIsDead(AAdef[allyteam].units[refID].lasttarget) and InRange(unitID, AAdef[allyteam].units[refID].lasttarget, AAdef[allyteam].units[refID].range) then
 		  assign = AAdef[allyteam].units[refID].lasttarget
 		else
-		  assign = random(1, output[4])
-		  assign = output[3][assign]
+		  assign = random(1, output[5])
+		  assign = output[4][assign]
 		  AAdef[allyteam].units[refID].lasttarget = assign
 		end
 		if not IsAttacking(unitID) then
@@ -321,23 +330,24 @@ function unassignTarget(unitID, refID, allyteam)
   end
 end
 
-function BestTarget(targets, count, damage, current, cdamage, skip)
+function BestTarget(targets, count, damage, current, cdamage, skip, cost)
   local refID
   local onehit = false
   local best = 0
+  local bestcost = 0
   local besthp = 0
   local targetteam
   local incoming
   local hp
+  local airbuff
   --local hpafter
 for i = 1, count do
   if not UnitIsDead(targets[i]) then
-    targetteam = GetUnitAllyTeam(targets[i])
-	refID = airtargetsref[targetteam].units[targets[i]]
-	if refID ~= nil then
-	  incoming = airtargets[targetteam].units[refID].incoming + airtargets[targetteam].units[refID].tincoming
-	  hp = airtargets[targetteam].units[refID].hp
-	  if airtargets[targetteam].units[refID].id == current then
+    _, refID, targetteam, airbuff = GetAirUnit(targets[i])
+	if airbuff ~= nil then
+	  incoming = airbuff.incoming + airbuff.tincoming
+	  hp = airbuff.hp
+	  if airbuff.id == current then
 	    incoming = incoming - cdamage
 	  end
 	  --Echo("considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", hp: " .. hp .. ", incoming: " .. incoming)
@@ -347,18 +357,29 @@ for i = 1, count do
 		    --hpafter = hp - incoming
 			if skip == 0 then
 		      best = i
-			  --Echo(best)
+			  bestcost = cost[i]
 			  besthp = hp - incoming - damage
 	          onehit = true
+			  --Echo(best)
 			else
 			  skip = skip - 1
 			end
 	      end
 		else
-		  if hp - incoming >= 0 and hp - incoming - damage >= besthp then
+		  if hp - incoming >= 0 and bestcost > cost[i] then
 		    --hpafter = hp - incoming
 			if skip == 0 then
 		      best = i
+			  bestcost = cost[i]
+			  besthp = hp - incoming - damage
+			else
+			  skip = skip - 1
+			end
+		  elseif hp - incoming >= 0 and hp - incoming - damage >= besthp and bestcost == cost[i] then
+		    --hpafter = hp - incoming
+			if skip == 0 then
+		      best = i
+			  bestcost = cost[i]
 			  besthp = hp - incoming - damage
 			else
 			  skip = skip - 1
@@ -400,11 +421,12 @@ end
   return nil
 end
 
-function HSBestTarget(targets, count, damage, current, cdamage, skip)
+function HSBestTarget(targets, count, damage, current, cdamage, skip, cost)
   local maxhp
   local refID
   local onehit = false
   local best = 0
+  local bestcost = 0
   local besthp = 0
   local targetteam
   local incoming
@@ -412,12 +434,11 @@ function HSBestTarget(targets, count, damage, current, cdamage, skip)
   --local hpafter
 for i = 1, count do
   if not UnitIsDead(targets[i]) then
-    targetteam = GetUnitAllyTeam(targets[i])
-    refID = airtargetsref[targetteam].units[targets[i]]
-	if refID ~= nil then
-	  incoming = airtargets[targetteam].units[refID].incoming + airtargets[targetteam].units[refID].tincoming
-	  hp = airtargets[targetteam].units[refID].hp
-	  if airtargets[targetteam].units[refID].id == current then
+    _, refID, targetteam, airbuff = GetAirUnit(targets[i])
+	if airbuff ~= nil then
+	  incoming = airbuff.incoming + airbuff.tincoming
+	  hp = airbuff.hp
+	  if airbuff.id == current then
 	    incoming = incoming - cdamage
 	  end
       _, maxhp = GetHP(targets[i])
@@ -430,6 +451,7 @@ for i = 1, count do
 		      --hpafter = hp - incoming
 			  if skip == 0 then
 		        best = i
+				bestcost = cost[i]
 			    besthp = hp - incoming - damage
 	            onehit = true
 			  else
@@ -437,10 +459,19 @@ for i = 1, count do
 			  end
 		    end
 		  else
-		    if hp - incoming >= 0 and hp - incoming - damage >= besthp then
+		    if bestcost > cost[i] then
 		      --hpafter = airtargets[refID].hp - airtargets[refID].incoming
 		      if skip == 0 then
 			    best = i
+				bestcost = cost[i]
+			    besthp = hp - incoming - damage
+			  else
+			    skip = skip - 1
+			  end
+			elseif hp - incoming >= 0 and hp - incoming - damage >= besthp and bestcost == cost[i] then
+		      if skip == 0 then
+			    best = i
+				bestcost = cost[i]
 			    besthp = hp - incoming - damage
 			  else
 			    skip = skip - 1
@@ -485,6 +516,7 @@ end
 
 function getAATargetsinRange(unitID, refID, allyteam)
   local targets = {}
+  local targetscost = {}
   local ltargets = {}
   local targetscount = 1
   local ltargetscount = 1
@@ -493,8 +525,10 @@ function getAATargetsinRange(unitID, refID, allyteam)
   local units = GetUnitsInRange(x, y, z, AAdef[allyteam].units[refID].range)
   local team
   local ud
+  local cost
   local defID
   local LOS
+  --local sortcontinue
   --Echo(units)
   for i,targetID in ipairs(units) do
     team = GetUnitAllyTeam(targetID)
@@ -504,7 +538,31 @@ function getAATargetsinRange(unitID, refID, allyteam)
 	  LOS = GetLOSState(targetID, allyteam)
 	  if Isair(ud.name) then
 	    if LOS["los"] == true or LOS["radar"] == true then
-	      targets[targetscount] = targetID
+		  ud = airunitdefs[ud.name]
+		  cost = ud.cost
+		  --[[sortcontinue = targetscount
+		  for j = 1, targetscount - 1 do
+		    if sortcontinue == targetscount then
+		      if targetscost[j] < cost then
+			    sortcontinue = j
+			    j = targetscount
+			  end
+			end
+		  end
+		  j = targetscount
+		  targets[j] = targetID
+		  targetscost[j] = cost
+		  while j ~= sortcontinue do
+	        targets[j] = targets[j - 1]
+		    targetscost[j] = targetscost[j - 1]
+			j = j - 1
+			if j == sortcontinue then
+			  targets[j] = targetID
+			  targetscost[j] = cost
+			end
+		  end]]--
+		  targets[targetscount] = targetID
+		  targetscost[targetscount] = targetID
 	      targetscount = targetscount + 1
 		end
       else
@@ -518,7 +576,7 @@ function getAATargetsinRange(unitID, refID, allyteam)
   if targetscount == 1 and ltargetscount == 1 then
     return nil
   end
-  return {targets, targetscount - 1, ltargets, ltargetscount - 1}
+  return {targets, targetscount - 1, targetscost, ltargets, ltargetscount - 1}
 end
 
 function InRange(unitID, targetID, urange)
@@ -657,6 +715,18 @@ function getTarget(unitID)
   return nil
 end
 
+function IsAttacking(unitID)
+  local cQueue = GetCommandQueue(unitID)
+  if cQueue[1] ~= nil then
+    if cQueue[1].id == CMD.ATTACK then
+	  if cQueue[1].params[2] == nil then
+	    return true
+	  end
+	end
+  end
+  return false
+end
+
 function attackTarget(unitID, targetID, refID, allyteam)
   attackcommand(unitID, targetID)
   AAdef[allyteam].units[refID].attacking = targetID
@@ -694,6 +764,10 @@ if unitID ~= nil then
     return false
   end
 end
+end
+
+function TimeInRange(unitID, refID, allyteam, targetID)
+  
 end
 
 ------------------------------
@@ -740,24 +814,12 @@ end
 
 function AAmaxrefiredelay(name)
   if name == "missiletower" or name == "screamer" then -- or name == "corrazor"  then
-    return 15
+    return 20
   end
   if name == "armcir" then
-    return 25
+    return 30
   end
-  return 7
-end
-
-function IsAttacking(unitID)
-  local cQueue = GetCommandQueue(unitID)
-  if cQueue[1] ~= nil then
-    if cQueue[1].id == CMD.ATTACK then
-	  if cQueue[1].params[2] == nil then
-	    return true
-	  end
-	end
-  end
-  return false
+  return 25
 end
 
 --[[function IsMoveTypeAir(unitID)
@@ -775,13 +837,7 @@ end
 end]]--
 
 function Isair(name)
-  if name == "bladew" or name == "blastwing" or name == "armkam" or name == "corape" or name == "armbrawl" or name == "blackdawn" or name == "corcrw" or name == "corvalk" or name == "corbtrans"  then
-    return true
-  end
-  if name == "armca" or name == "armcsa" or name == "fighter" or name == "corvamp" or name == "armstiletto_laser" or name == "corhurc2" or name == "corshad" or name == "armcybr" or name == "corawac" then
-    return true
-  end
-  if name == "attackdrone" or name == "carrydrone" or name == "chicken_pigeon" or name == "chicken_blimpy" or name == "chicken_roc" or name == "chickenf" or name == "chickenflyerqueen" then
+  if airunitdefs[name] ~= nil then
     return true
   end
   return false
@@ -817,6 +873,27 @@ function getshotVelocity(name)
     return 1600
   end
   return nil
+end
+
+function getairMoveSpeed(name)
+  if airunitdefs[name] ~= nil then
+    return airunitdefs[name].maxspeed
+  end
+  return 0
+end
+
+function getairCost(name)
+  if airunitdefs[name] ~= nil then
+    return airunitdefs[name].cost
+  end
+  return 0
+end
+
+function getairMaxHP(name)
+  if airunitdefs[name] ~= nil then
+    return airunitdefs[name].hp
+  end
+  return 0
 end
 
 ------------------------------
@@ -1184,6 +1261,16 @@ end
 
 function gadget:Initialize()
   Echo("AA Micro Gadget Enabled")
+  
+  for id,unitDef in pairs(UnitDefs) do
+    if unitDef.name ~= "fakeunit_aatarget" then
+      if unitDef.canFly then
+	    airunitdefs[unitDef.name] = {hp = unitDef.health, maxspeed = unitDef.speed / 30, cost = unitDef.metalCost}
+	    --Echo(unitDef.name, airunitdefs[unitDef.name].hp, airunitdefs[unitDef.name].maxspeed, airunitdefs[unitDef.name].cost)
+      end
+	end
+  end
+  
   for i=1,#WeaponDefs do
     local wd = WeaponDefs[i]
 	if wd.name:find("corrl") then
