@@ -1025,7 +1025,7 @@ end
 
 function widget:MousePress(x, y, button)
 	ls_have = false
-	overview_mode = false
+	--overview_mode = false
     --if fpsmode then return end
 	if lockspringscroll then
 		lockspringscroll = false
