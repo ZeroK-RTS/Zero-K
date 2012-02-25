@@ -6,14 +6,14 @@ unitDef = {
   activateWhenBuilt      = true,
   amphibious             = [[1]],
   brakeRate              = 0.375,
-  buildCostEnergy        = 350,
-  buildCostMetal         = 350,
+  buildCostEnergy        = 300,
+  buildCostMetal         = 300,
 
   buildoptions           = {
   },
 
   buildPic               = [[amphaa.png]],
-  buildTime              = 350,
+  buildTime              = 300,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -66,17 +66,6 @@ unitDef = {
   upright                = true,
 
   weapons                = {
-  
-    {
-      def                = [[FLAK]],
-      --badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
-    },
-	
-  },
-
-
-  weapons                = {
 
     {
       def                = [[ARMKBOT_MISSILE]],
@@ -89,11 +78,11 @@ unitDef = {
 
   weaponDefs             = {
 
-    ARMKBOT_MISSILE = {
+    MISSILE = {
       name                    = [[Missile Pack]],
       areaOfEffect            = 48,
       burst					  = 4,
-      burstRate				  = 0.1,
+      burstRate				  = 0.2,
       canattackground         = false,
       cegTag                  = [[missiletrailblue]],
       craterBoost             = 1,
@@ -148,10 +137,10 @@ unitDef = {
       footprintZ       = 3,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 140,
+      metal            = 120,
       object           = [[wreck2x2b.s3o]],
       reclaimable      = true,
-      reclaimTime      = 140,
+      reclaimTime      = 120,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -166,10 +155,10 @@ unitDef = {
       footprintX       = 2,
       footprintZ       = 2,
       hitdensity       = [[100]],
-      metal            = 70,
+      metal            = 60,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 70,
+      reclaimTime      = 60,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
