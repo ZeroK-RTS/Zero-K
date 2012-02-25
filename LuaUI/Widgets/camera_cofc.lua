@@ -1266,6 +1266,7 @@ function widget:Initialize()
 	spSendCommands( 'unbindaction toggleoverview' )
 	spSendCommands( 'unbindaction trackmode' )
 	spSendCommands( 'unbindaction track' )
+	spSendCommands( 'unbindaction mousestate' ) --//disable screen-panning-mode toggled by 'backspace' key
 end
 
 function widget:Shutdown()
@@ -1273,6 +1274,7 @@ function widget:Shutdown()
 	spSendCommands( 'bind any+tab toggleoverview' )
 	spSendCommands( 'bind any+t track' )
 	spSendCommands( 'bind ctrl+t trackmode' )
+	spSendCommands( 'bind backspace mousestate' ) --//re-enable screen-panning-mode toggled by 'backspace' key
 end
 
 function widget:TextCommand(command)
