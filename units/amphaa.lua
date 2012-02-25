@@ -79,7 +79,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[MISSILE]],
+      def                = [[ARMKBOT_MISSILE]],
       --badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },

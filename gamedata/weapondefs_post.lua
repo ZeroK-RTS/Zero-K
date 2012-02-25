@@ -155,6 +155,7 @@ do
   RawCanAttack = function(ud)
     if (ud.weapons) then
       for i, weapon in pairs(ud.weapons) do
+		--Spring.Echo(ud.name)
         local wd = WeaponDefs[weapon.name:lower()]
         if ((not wd.isshield) and 
             (not wd.interceptor)) then
