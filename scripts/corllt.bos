@@ -121,6 +121,9 @@ RestoreAfterDelay()
 Create()
 {
 	hide flare;
+	hide shellleft;
+	hide shellright;
+	move barrel to z-axis [3.500000] now;
 	start-script SmokeUnit();
 		open = FALSE;
 		open2 = FALSE;
