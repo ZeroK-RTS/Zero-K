@@ -58,8 +58,7 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-		[[custom:HEAVY_CANNON_MUZZLE]],
-		[[custom:RIOT_SHELL_L]],
+      [[custom:watercannon_muzzle]],
     },
 
   },
@@ -72,7 +71,7 @@ unitDef = {
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
-  trackType           = [[crossFoot]],
+  trackType           = [[ComTrack]],
   trackWidth          = 66,
   turnRate            = 500,
   upright             = false,
@@ -105,12 +104,10 @@ unitDef = {
       },
 	  
       fireStarter             = 70,
-      flightTime              = 2.2,
-      guidance                = false,
+      flightTime              = 1,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      lineOfSight             = true,
       model                   = [[wep_m_frostshard.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,
