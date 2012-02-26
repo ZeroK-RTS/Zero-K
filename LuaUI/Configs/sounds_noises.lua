@@ -397,6 +397,57 @@ local sounds = {
 		},
 	},
 	
+	-- Amphib
+	amphcon = {
+		build = "builder_start",
+		ok = {
+			[1] = "amph_move",
+		},
+		select = {
+			[1] = "amph_select",
+		},
+	},
+	amphraider2 = {
+		ok = {
+			[1] = "amph_move",
+		},
+		select = {
+			[1] = "amph_select",
+		},
+	},
+	amphraider3 = {
+		ok = {
+			[1] = "amph_move",
+		},
+		select = {
+			[1] = "amph_select",
+		},
+	},
+	amphriot = {
+		ok = {
+			[1] = "amph_move",
+		},
+		select = {
+			[1] = "amph_select",
+		},
+	},
+	amphassault = {
+		ok = {
+			[1] = "amph_move",
+		},
+		select = {
+			[1] = "amph_select",
+		},
+	},
+	amphaa = {
+		ok = {
+			[1] = "amph_move",
+		},
+		select = {
+			[1] = "amph_select",
+		},
+	},
+	
 	-- Mech
 	armraz = {
 		ok = {
@@ -996,6 +1047,12 @@ local sounds = {
 		},
 	},
 	factoryspider = {
+		build = "builder_start",
+		select = {
+			[1] = "factory_select",
+		},
+	},
+	factoryamph = {
 		build = "builder_start",
 		select = {
 			[1] = "factory_select",

@@ -39,3 +39,4 @@ hiss.wav
 
 burn_mixed.wav - Open LieroX & Nanoblobs
 torpedo.wav - Kanoba & freeloops
+torp_land.wav - Kanoba & Golgotha

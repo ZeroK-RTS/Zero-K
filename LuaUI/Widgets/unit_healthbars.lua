@@ -700,7 +700,7 @@ do
       if (ci.maxWaterTank and waterTank) then
         local prog = waterTank/ci.maxWaterTank
 		if prog < 1 then
-			AddBar("Water Tank",prog,"tank",(fullText and floor(prog*100)..'%') or '')
+			AddBar("water tank",prog,"tank",(fullText and floor(prog*100)..'%') or '')
 		end
       end
 

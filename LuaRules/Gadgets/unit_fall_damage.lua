@@ -27,17 +27,6 @@ local GRAVITY = Game.gravity
 
 local attributes = {}
 
-local PERIOD = 5
-local unitUpdates = {}
-local onGround = {}
-
-for i = 0, PERIOD-1 do
-	unitUpdates[i] = {
-		data = {},
-		count = 0,
-	}
-end
-
 for unitDefID=1,#UnitDefs do
 	local ud = UnitDefs[unitDefID]
 	attributes[unitDefID] = {
@@ -48,9 +37,15 @@ for unitDefID=1,#UnitDefs do
 	}
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+-- weaponDefID -1 --> debris collision
+-- weaponDefID -2 --> ground collision
+-- weaponDefID -3 --> object collision
+-- weaponDefID -4 --> fire damage
+-- weaponDefID -5 --> kill damage
+
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	--Spring.AddUnitImpulse(unitID,0,3,0)
-	if weaponID == WeaponDefNames["corgrav_gravity_pos"].id or weaponID == WeaponDefNames["corgrav_gravity_neg"].id then
+	if weaponDefID == WeaponDefNames["corgrav_gravity_pos"].id or weaponDefID == WeaponDefNames["corgrav_gravity_neg"].id then
 
 		local bx, by, bz = Spring.GetUnitBasePosition(unitID)
 		local height = Spring.GetGroundHeight(bx,bz)
@@ -59,20 +54,15 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		end
 	end
 
+	-- unit or wreck collision
+	if weaponDefID == -3 and attackerID == nil then
+		return 0 -- units bounce and damage themselves. This buffs drops though.
+	end
+	
 	-- ground collision
-	if weaponID == -1 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
+	if weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
 		
-		-- check if the damage is really due to fall damage
 		local armor = select(2,Spring.GetUnitArmored(unitID)) or 1
-		local realDamage = damage/armor
-		if realDamage == 0 or realDamage == 3 or realDamage > 48.999 and realDamage < 49.001 then
-			return damage
-		end		
-		
-		if onGround[unitID] then
-			return 0
-		end
-		
 		local att = attributes[unitDefID]
 		local ud = UnitDefs[unitDefID]
 		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
@@ -96,37 +86,4 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		return fallDamage*armor + outsideDamage
 	end
 	return damage
-end
-
-function gadget:GameFrame(f)
-	local units = unitUpdates[f%PERIOD]
-	local i = 1
-	while i < units.count do
-		if Spring.ValidUnitID(units.data[i]) then
-			local bx, by, bz = Spring.GetUnitBasePosition(units.data[i])
-			local height = Spring.GetGroundHeight(bx,bz)
-			onGround[units.data[i]] = math.abs(by-height) < 0.1
-			i = i + 1
-		else
-			units.data[i] = units.data[units.count]
-			units.data[units.count] = nil
-			units.count = units.count - 1
-		end
-	end
-end
-
-
-function gadget:UnitCreated(unitID,unitDefID)
-	local ud = UnitDefs[unitDefID]
-	if not ud.canFly and ud.speed > 0 then
-		local f = math.floor(math.random()*PERIOD)
-		unitUpdates[f].count = unitUpdates[f].count + 1
-		unitUpdates[f].data[unitUpdates[f].count] = unitID
-	end
-end
-
-function gadget:Initialize()
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		gadget:UnitCreated(unitID,Spring.GetUnitDefID(unitID))
-	end
 end

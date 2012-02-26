@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[spiderassault]],
-  name                   = [[Cudgel]],
+  name                   = [[Hermit]],
   description            = [[All Terrain Assault Bot]],
   acceleration           = 0.18,
   bmcode                 = [[1]],
@@ -28,12 +28,12 @@ unitDef = {
     description_es = [[Robot de Asalto]],
     description_fr = [[Robot d'Assaut]],
     description_it = [[Robot d'assalto]],
-    helptext       = [[The Cudgel can take an incredible beating, and is useful as a shield for the weaker, more-damaging Recluses.]],
+    helptext       = [[The Hermit can take an incredible beating, and is useful as a shield for the weaker, more-damaging Recluses.]],
     helptext_bp    = [[Thug é um robô assaultante. Pode resistir muito dano, e é útil como um escudo para os mais fracos porém mais potentes Recluses.]],
     helptext_es    = [[El Thud es increiblemente resistente, y es útil como esudo para los Recluse que hacen más da?o]],
     helptext_fr    = [[Le Thug est extraordinairement r?sistant pour sa taille. Si ses canons ? plasma n'ont pas la pr?cision requise pour abattre les cibles rapides, il reste n?anmoins un bouclier parfait pour des unit?s moins solides telles que les Recluses.]],
     helptext_it    = [[Il Thud é incredibilmente resistente, ed e utile come scudo per i Recluse che fanno piú danno]],
-	helptext_de    = [[Der Cudgel kann unglaublich viel Prügel einstecken und ist als Schutzschild für schwächere, oder zu schonende Einheiten, hervorragend geeignet.]],
+	helptext_de    = [[Der Hermit kann unglaublich viel Prügel einstecken und ist als Schutzschild für schwächere, oder zu schonende Einheiten, hervorragend geeignet.]],
   },
 
   defaultmissiontype     = [[Standby]],

@@ -34,6 +34,8 @@ bot_move.wav - freeloops
 spider_move.wav - awesund
 spider_select.wav - awesund
 spider_select2.wav - Nanoblobs
+amph_move.wav - OpenGameArt and Freeloops
+amph_select.wav - The Recordist
 crawlie_select.wav - awesund
 heavy_bot_move.wav - Golgotha and freeloops
 sniper_select.wav - pacdv

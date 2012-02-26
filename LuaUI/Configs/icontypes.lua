@@ -901,7 +901,7 @@ local icontypes = {
     radiusadjust=0,
   },
   facamph = {
-    bitmap='icons/facamph.dds',
+    bitmap='icons/facamph.png',
     size=2.6,
     radiusadjust=0,
   },
