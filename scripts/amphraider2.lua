@@ -46,7 +46,7 @@ local SIG_RESTORE = 8
 --------------------------------------------------------------------------------------
 -- Weapon config
 
-local SOUND_PERIOD = 1
+local SOUND_PERIOD = 2
 local soundIndex = SOUND_PERIOD
 local TANK_MAX 
 
@@ -165,9 +165,9 @@ function script.FireWeapon(num)
 		if waterTank then
 			proportion = waterTank/TANK_MAX
 		end
-		soundIndex = SOUND_PERIOD*(2 - proportion)
+		soundIndex = math.floor(math.random()+1.5)
 		local px, py, pz = Spring.GetUnitPosition(unitID)
-		Spring.PlaySoundFile("sounds/weapon/hiss.wav", 5-proportion*2, px, py, pz)
+		Spring.PlaySoundFile("sounds/weapon/watershort.wav", 20+proportion*5, px, py, pz)
 	end
 
 	GG.shotWaterWeapon(unitID)
