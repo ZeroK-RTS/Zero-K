@@ -28,7 +28,7 @@ local TANK_MAX = 300
 local REGEN_PERIOD = 13
 local SHOT_COST = 1.2
 local REGEN_RATE = 6
-local HEALTH_REGEN = 16
+local HEALTH_REGEN = 18
 
 local function updateWeaponFromTank(unitID)
 
@@ -87,11 +87,11 @@ function gadget:GameFrame(n)
 			local unitID = tankByID.data[i]
 
 			if Spring.ValidUnitID(unitID) then
-				local height = select(2, Spring.GetUnitPosition(unitID))
+				local height = select(2, Spring.GetUnitBasePosition(unitID))
 
 				if height < 0 then
 					if tank[unitID].storage ~= TANK_MAX then
-						tank[unitID].storage = tank[unitID].storage + math.min(-height,16)*REGEN_RATE*0.0625
+						tank[unitID].storage = tank[unitID].storage + math.min(-height,40)*REGEN_RATE*0.025
 						if tank[unitID].storage > TANK_MAX then
 							tank[unitID].storage = TANK_MAX
 						end
@@ -100,7 +100,7 @@ function gadget:GameFrame(n)
 					end
 					
 					local hp, maxHp = Spring.GetUnitHealth(unitID)
-					local newHp = hp + math.min(-height,32)*HEALTH_REGEN*0.03125
+					local newHp = hp + math.min(-height,40)*HEALTH_REGEN*0.025
 					Spring.SetUnitHealth(unitID, newHp) 
 				end
 				i = i + 1
