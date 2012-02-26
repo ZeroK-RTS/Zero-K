@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Map Edge Extension",
-    version   = "v0.4+",
+    version   = "v0.4",
     desc      = "Draws a mirrored map next to the edges of the real map",
     author    = "Pako",
     date      = "2010.10.27 - 2011.10.29", --YYYY.MM.DD, created - updated
@@ -23,22 +23,10 @@ local spGetGroundHeight = Spring.GetGroundHeight
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local gridTex = "LuaUI/Images/vr_grid_large.png"
-local wallTex = "bitmaps/PD/hexbig.png"
---local wallTex = "bitmaps/PD/shield2.png"
---local wallTex = "LuaUI/Images/vr_grid.png"
 local realTex = '$grass'
 local tex = realTex
 
-local height = 2048
-local minHeight = -height/4
-local maxHeight = height*3/4
-
-local texScale = 0.01
-local colorFloor = { 0.1, 0.88, 1, 1}
-local colorCeiling = { 0.1, 0.88, 1, 0}
-
 local dList
-local dListWall
 local mirrorShader
 
 local umirrorX
@@ -60,12 +48,6 @@ options = {
 		value = false,
 		desc = "Draws mirror map when map is an island",		
 	},
-	drawWall = {
-		name = "Draw boundary wall",
-		type = 'bool',
-		value = true,
-		desc = "Draws wall at map boundaries",		
-	},        
 	useShader = {
 		name = "Use shader",
 		type = 'bool',
@@ -102,16 +84,6 @@ options = {
 			widget:Initialize()
 		end, 		
 	},		
-	wallFromOutside = {
-		name = "Visible walls from outside",
-		type = 'bool',
-		value = false,
-		desc = "Map wall is visible from the outside (e.g. when it's between camera and main map)",
-                OnChange = function(self)
-                        gl.DeleteList(dListWall)
-                        widget:Initialize()
-                end
-	},        
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -261,61 +233,6 @@ local function DrawOMap(useMirrorShader)
 	gl.Blending(GL.SRC_ALPHA,GL.ONE_MINUS_SRC_ALPHA)
 end
 
-local function DrawMapWall()
-    gl.Texture(wallTex)
-    if not options.wallFromOutside.value then
-        gl.Culling(GL.FRONT) --'cuts' the outside faces --remove this if you want it to draw over map too
-    end
-    gl.Shape( GL.TRIANGLE_STRIP,
-        {
-            { v = { 0, minHeight, 0},      --top left down   
-                    texcoord = { 0, 0 },           
-                    c = colorFloor
-            },
-                { v = { 0, maxHeight, 0},          
-                    texcoord = { 0, height*texScale },      --top left up     
-                    c = colorCeiling
-            },    
-            { v = { Game.mapSizeX, minHeight, 0},          
-                    texcoord = { Game.mapSizeX*texScale, 0 },   --top right        
-                    c = colorFloor
-            },
-                { v = { Game.mapSizeX, maxHeight, 0},          
-                    texcoord = { Game.mapSizeX*texScale, height*texScale },           
-                    c = colorCeiling
-            },
-            
-                    { v = { Game.mapSizeX, minHeight, Game.mapSizeZ},          -- bottom right  
-                    texcoord = { Game.mapSizeX*texScale+Game.mapSizeZ*texScale, 0 },        
-                    c = colorFloor
-            },
-                { v = { Game.mapSizeX, maxHeight, Game.mapSizeZ},          
-                    texcoord = { Game.mapSizeX*texScale+Game.mapSizeZ*texScale, height*texScale },           
-                    c = colorCeiling
-            },
-            
-                { v = { 0, minHeight, Game.mapSizeZ},  --bottom left        
-                    texcoord = { Game.mapSizeZ*texScale, 0 },           
-                    c = colorFloor
-            },
-                { v = { 0, maxHeight, Game.mapSizeZ},          
-                    texcoord = { Game.mapSizeZ*texScale, height*texScale },           
-                    c = colorCeiling
-            },
-            
-                 { v = { 0, minHeight, 0},        --back to top right  
-                    texcoord = { 0, 0 },           
-                    c = colorFloor
-            },
-                { v = { 0, maxHeight, 0},          
-                    texcoord = { 0, height*texScale },           
-                    c = colorCeiling
-            },
-        }
-    )
-    gl.Culling(false)
-end
-
 function widget:Initialize()
         Spring.SendCommands("luaui disablewidget External VR Grid")
         island = IsIsland()
@@ -339,7 +256,6 @@ function widget:Initialize()
 	end
 	dList = gl.CreateList(DrawOMap, mirrorShader)
 	--Spring.SetDrawGround(false)
-        dListWall = gl.CreateList(DrawMapWall)
 end
 
 function widget:Shutdown()
@@ -348,7 +264,6 @@ function widget:Shutdown()
 	if mirrorShader then
 		gl.DeleteShader(mirrorShader)
 	end
-        gl.DeleteList(dListWall)
 end
 
 function widget:DrawWorldPreUnit() --is overwritten when not using the shader
@@ -407,13 +322,5 @@ function widget:DrawWorldPreUnit() --is overwritten when not using the shader
         gl.UseShader(0)
         
         gl.Fog(false)
-    end
-end
-
-function widget:DrawWorld()
-    if options.drawWall.value then
-        gl.DepthTest(GL.LEQUAL)
-        gl.CallList(dListWall)
-        gl.DepthTest(false)
     end
 end

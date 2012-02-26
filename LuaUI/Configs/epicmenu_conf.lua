@@ -273,6 +273,7 @@ path='Settings/View/Map'
 
 	ShButton('VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end )
 	ShButton('Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end )
+	ShButton('Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end )
 
 path='Help'
 	AddOption({
