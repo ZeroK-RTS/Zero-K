@@ -270,7 +270,7 @@ function widget:GameOver()
 	--gameOver = true
 	local track
 	-- FIXME: get a better way to detect who won
-	if defeat then
+	if not defeat then
 		if #victoryTracks <= 0 then return end
 		track = victoryTracks[math.random(1, #victoryTracks)]	
 	else
