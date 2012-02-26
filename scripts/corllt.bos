@@ -1,4 +1,5 @@
-#include "sfxtype.h"
+//linear constant 163840
+
 #include "constants.h"
 #include "StateChg.h"
 
@@ -19,11 +20,11 @@ activatescr()
 {
 	turn shellleft to y-axis <-60.000000> speed <80.000000>;
 	turn shellright to y-axis <60.000000> speed <80.000000>;
-	move barrel to z-axis [3.500000] speed [5.000000];
+	//move barrel to z-axis [3.500000] speed [5.000000];
 	open = TRUE;
 	wait-for-turn shellleft around y-axis;
 	wait-for-turn shellright around y-axis;
-	wait-for-move barrel along z-axis;
+	//wait-for-move barrel along z-axis;
 	
 	//sleep 39;
 }
@@ -33,10 +34,10 @@ deactivatescr()
 
 	turn shellleft to y-axis <0.000000> speed <80.000000>;
 	turn shellright to y-axis <0.000000> speed <80.000000>;
-	move barrel to z-axis [0.000000] speed [5.000000];
+	//move barrel to z-axis [0.000000] speed [5.000000];
 	wait-for-turn shellleft around y-axis;
 	wait-for-turn shellright around y-axis;
-	wait-for-move barrel along z-axis;
+	//wait-for-move barrel along z-axis;
 
 	sleep 39;
 }
@@ -111,10 +112,10 @@ RestoreAfterDelay()
 	sleep 1200;
 	turn shellleft to y-axis <0.000000> speed <80.000000>;
 	turn shellright to y-axis <0.000000> speed <80.000000>;
-	move barrel to z-axis [0.000000] speed [5.000000];
+	//move barrel to z-axis [0.000000] speed [5.000000];
 	wait-for-turn shellleft around y-axis;
 	wait-for-turn shellright around y-axis;
-	wait-for-move barrel along z-axis;	
+	//wait-for-move barrel along z-axis;	
 }
 
 Create()
@@ -164,17 +165,6 @@ AimPrimary(heading, pitch)
 
 FirePrimary()
 {
-	//if ( open ) 
-//	{
-		move barrel to z-axis [3.150000] speed [10.000000];
-		emit-sfx 1024 from flare;
-		wait-for-move barrel along z-axis;
-		move barrel to z-axis [3.500000] speed [8.000000];
-//	}
-//	if ( !open )
-	
-//	call-script Go();
-
 }
 
 AimFromPrimary(piecenum)
