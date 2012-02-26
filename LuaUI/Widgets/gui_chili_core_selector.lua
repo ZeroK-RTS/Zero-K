@@ -834,7 +834,7 @@ function widget:Initialize()
 		return
 	end
 	
-	widgetHandler:AddAction("selectcomm", SelectComm, nil, 'p')
+	widgetHandler:AddAction("selectcomm", SelectComm, nil, 'tp')
 
 	-- setup Chili
 	Chili = WG.Chili
