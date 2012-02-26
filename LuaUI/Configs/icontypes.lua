@@ -301,7 +301,24 @@ local icontypes = {
     size=2,
   },
 
-
+  -- amphibious
+  amphraider = {
+    bitmap='icons/amphraider.png',
+    size=1.9,
+  },
+  amphtorpraider = {
+    bitmap='icons/amphtorpraider.png',
+    size=1.9,
+  },
+  amphaa = {
+    bitmap='icons/amphaa.png',
+    size=1.8,
+  },
+  amphtorpriot = {
+    bitmap='icons/amphtorpriot.png',
+    size=2.2,
+  },
+  
   --t2 vehicles (aka tanks)
   tankantinuke = {
     bitmap='icons/tankantinuke.dds',
@@ -880,6 +897,11 @@ local icontypes = {
   },
   facjumpjet = {
     bitmap='icons/facjumpjet.png',
+    size=2.6,
+    radiusadjust=0,
+  },
+  facamph = {
+    bitmap='icons/facamph.dds',
     size=2.6,
     radiusadjust=0,
   },
