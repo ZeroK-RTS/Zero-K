@@ -56,11 +56,11 @@ local function Walk()
 		-- extend front legs, retract rear legs
 		Turn(lfleg, x_axis, LEG_EXTEND_ANGLE_F, LEG_EXTEND_SPEED)
 		Turn(lffoot, x_axis, FOOT_EXTEND_ANGLE_F, FOOT_EXTEND_SPEED_F)
-		Turn(rfleg, x_axis, LEG_EXTEND_ANGLE_F, LEG_EXTEND_SPEED)
-		Turn(rffoot, x_axis, FOOT_EXTEND_ANGLE_F, FOOT_EXTEND_SPEED_F)
+		Turn(rfleg, x_axis, LEG_RETRACT_ANGLE_F, LEG_RETRACT_SPEED)
+		Turn(rffoot, x_axis, FOOT_RETRACT_ANGLE_F, FOOT_RETRACT_SPEED_F)	
 		
-		Turn(lbleg, x_axis, -LEG_RETRACT_ANGLE_R, LEG_RETRACT_SPEED)
-		Turn(lbfoot, x_axis, -FOOT_RETRACT_ANGLE_R, FOOT_RETRACT_SPEED_R)		
+		Turn(lbleg, x_axis, -LEG_EXTEND_ANGLE_R, LEG_EXTEND_SPEED)
+		Turn(lbfoot, x_axis, -FOOT_EXTEND_ANGLE_R, FOOT_EXTEND_SPEED_R)		
 		Turn(rbleg, x_axis, -LEG_RETRACT_ANGLE_R, LEG_RETRACT_SPEED)
 		Turn(rbfoot, x_axis, -FOOT_RETRACT_ANGLE_R, FOOT_RETRACT_SPEED_R)
 
@@ -73,11 +73,11 @@ local function Walk()
 		-- extend rear legs, retract front legs
 		Turn(lfleg, x_axis, LEG_RETRACT_ANGLE_F, LEG_RETRACT_SPEED)
 		Turn(lffoot, x_axis, FOOT_RETRACT_ANGLE_F, FOOT_RETRACT_SPEED_F)
-		Turn(rfleg, x_axis, LEG_RETRACT_ANGLE_F, LEG_RETRACT_SPEED)
-		Turn(rffoot, x_axis, FOOT_RETRACT_ANGLE_F, FOOT_RETRACT_SPEED_F)		
+		Turn(rfleg, x_axis, LEG_EXTEND_ANGLE_F, LEG_EXTEND_SPEED)
+		Turn(rffoot, x_axis, FOOT_EXTEND_ANGLE_F, FOOT_EXTEND_SPEED_F)		
 		
-		Turn(lbleg, x_axis, -LEG_EXTEND_ANGLE_R, LEG_EXTEND_SPEED)
-		Turn(lbfoot, x_axis, -FOOT_EXTEND_ANGLE_R, FOOT_EXTEND_SPEED_R)
+		Turn(lbleg, x_axis, -LEG_RETRACT_ANGLE_R, LEG_RETRACT_SPEED)
+		Turn(lbfoot, x_axis, -FOOT_RETRACT_ANGLE_R, FOOT_RETRACT_SPEED_R)	
 		Turn(rbleg, x_axis, -LEG_EXTEND_ANGLE_R, LEG_EXTEND_SPEED)
 		Turn(rbfoot, x_axis, -FOOT_EXTEND_ANGLE_R, FOOT_EXTEND_SPEED_R)		
 		
