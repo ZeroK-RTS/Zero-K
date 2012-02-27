@@ -25,23 +25,9 @@ local SIG_AIM1 = 2
 local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 
-local PACE = 1.4
+local SPEED = 1.9
 
-local LEG_EXTEND_ANGLE_F = math.rad(40)
-local LEG_EXTEND_ANGLE_R = math.rad(50)
-local LEG_EXTEND_SPEED = math.rad(60) * PACE
-local LEG_RETRACT_ANGLE_F = math.rad(-40)
-local LEG_RETRACT_ANGLE_R = math.rad(-20)
-local LEG_RETRACT_SPEED = math.rad(60) * PACE
-
-local FOOT_EXTEND_ANGLE_F = math.rad(-60)
-local FOOT_EXTEND_ANGLE_R = math.rad(-90)
-local FOOT_EXTEND_SPEED_F = math.rad(80) * PACE
-local FOOT_EXTEND_SPEED_R = math.rad(100) * PACE
-local FOOT_RETRACT_ANGLE_F = math.rad(40)
-local FOOT_RETRACT_ANGLE_R = math.rad(40)
-local FOOT_RETRACT_SPEED_F = math.rad(80) * PACE
-local FOOT_RETRACT_SPEED_R = math.rad(80) * PACE
+local SPEED = 2
 
 --------------------------------------------------------------------------------
 -- vars
@@ -53,51 +39,70 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		-- extend front legs, retract rear legs
-		Turn(lfleg, x_axis, LEG_EXTEND_ANGLE_F, LEG_EXTEND_SPEED)
-		Turn(lffoot, x_axis, FOOT_EXTEND_ANGLE_F, FOOT_EXTEND_SPEED_F)
-		Turn(rfleg, x_axis, LEG_RETRACT_ANGLE_F, LEG_RETRACT_SPEED)
-		Turn(rffoot, x_axis, FOOT_RETRACT_ANGLE_F, FOOT_RETRACT_SPEED_F)	
+	
+		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
 		
-		Turn(lbleg, x_axis, -LEG_EXTEND_ANGLE_R, LEG_EXTEND_SPEED)
-		Turn(lbfoot, x_axis, -FOOT_EXTEND_ANGLE_R, FOOT_EXTEND_SPEED_R)		
-		Turn(rbleg, x_axis, -LEG_RETRACT_ANGLE_R, LEG_RETRACT_SPEED)
-		Turn(rbfoot, x_axis, -FOOT_RETRACT_ANGLE_R, FOOT_RETRACT_SPEED_R)
+		-- extend left
+		Turn(lfleg, x_axis, math.rad(-50), math.rad(25)*speedmult)
+		Turn(lffoot, x_axis, math.rad(0), math.rad(150)*speedmult)
+		
+		Turn(rfleg, x_axis, math.rad(-40), math.rad(80)*speedmult)
+		Turn(rffoot, x_axis, math.rad(60), math.rad(120)*speedmult)	
+		
+		Turn(rbleg, x_axis, math.rad(20), math.rad(100)*speedmult)
+		Turn(rbfoot, x_axis, math.rad(30), math.rad(50)*speedmult)
+		
+		Turn(lbleg, x_axis, math.rad(-40), math.rad(80)*speedmult)
+		Turn(lbfoot, x_axis, math.rad(60), math.rad(120)*speedmult)	
 
-		WaitForTurn(lfleg, x_axis)
-		WaitForTurn(lffoot, x_axis)
-		WaitForTurn(rbleg, x_axis)
-		WaitForTurn(rbfoot, x_axis)
-		Sleep(0)
+		Sleep(400/speedmult)
 		
-		-- extend rear legs, retract front legs
-		Turn(lfleg, x_axis, LEG_RETRACT_ANGLE_F, LEG_RETRACT_SPEED)
-		Turn(lffoot, x_axis, FOOT_RETRACT_ANGLE_F, FOOT_RETRACT_SPEED_F)
-		Turn(rfleg, x_axis, LEG_EXTEND_ANGLE_F, LEG_EXTEND_SPEED)
-		Turn(rffoot, x_axis, FOOT_EXTEND_ANGLE_F, FOOT_EXTEND_SPEED_F)		
+		Turn(lfleg, x_axis, math.rad(40), math.rad(150)*speedmult)
+		Turn(lffoot, x_axis, math.rad(-60), math.rad(100)*speedmult)
 		
-		Turn(lbleg, x_axis, -LEG_RETRACT_ANGLE_R, LEG_RETRACT_SPEED)
-		Turn(lbfoot, x_axis, -FOOT_RETRACT_ANGLE_R, FOOT_RETRACT_SPEED_R)	
-		Turn(rbleg, x_axis, -LEG_EXTEND_ANGLE_R, LEG_EXTEND_SPEED)
-		Turn(rbfoot, x_axis, -FOOT_EXTEND_ANGLE_R, FOOT_EXTEND_SPEED_R)		
+		Sleep(200/speedmult)
 		
-		WaitForTurn(lfleg, x_axis)
-		WaitForTurn(lffoot, x_axis)
-		WaitForTurn(rbleg, x_axis)
-		WaitForTurn(rbfoot, x_axis)		
-		Sleep(0)
+		Turn(rbleg, x_axis, math.rad(40), math.rad(50)*speedmult)
+		Turn(rbfoot, x_axis, math.rad(-60), math.rad(225)*speedmult)
+		
+		Sleep(400/speedmult)
+
+		-- extend right
+		Turn(lfleg, x_axis, math.rad(-40), math.rad(80)*speedmult)
+		Turn(lffoot, x_axis, math.rad(60), math.rad(120)*speedmult)
+		
+		Turn(rfleg, x_axis, math.rad(-50), math.rad(25)*speedmult)
+		Turn(rffoot, x_axis, math.rad(0), math.rad(150)*speedmult)
+		
+		Turn(rbleg, x_axis, math.rad(-40), math.rad(80)*speedmult)
+		Turn(rbfoot, x_axis, math.rad(60), math.rad(120)*speedmult)
+		
+		Turn(lbleg, x_axis, math.rad(20), math.rad(100)*speedmult)
+		Turn(lbfoot, x_axis, math.rad(30), math.rad(50)*speedmult)		
+	
+		Sleep(400/speedmult)
+		
+		Turn(rfleg, x_axis, math.rad(40), math.rad(150)*speedmult)
+		Turn(rffoot, x_axis, math.rad(-60), math.rad(100)*speedmult)
+		
+		Sleep(200/speedmult)
+		
+		Turn(lbleg, x_axis, math.rad(40), math.rad(50)*speedmult)
+		Turn(lbfoot, x_axis, math.rad(-60), math.rad(225)*speedmult)
+		
+		Sleep(400/speedmult)
 	end
 end
 
 local function ResetLegs()
-	Turn(lfleg, x_axis, 0, LEG_EXTEND_SPEED)
-	Turn(lffoot, x_axis, 0, FOOT_EXTEND_SPEED_F)
-	Turn(rfleg, x_axis, 0, LEG_RETRACT_SPEED)
-	Turn(rffoot, x_axis, 0, FOOT_RETRACT_SPEED_F)
-	Turn(lbleg, x_axis, 0, LEG_EXTEND_SPEED)
-	Turn(lbfoot, x_axis, 0, FOOT_EXTEND_SPEED_F)
-	Turn(rbleg, x_axis, 0, LEG_RETRACT_SPEED)
-	Turn(rbfoot, x_axis, 0, FOOT_RETRACT_SPEED_F)	
+	Turn(lfleg, x_axis, 0, math.rad(80))
+	Turn(lffoot, x_axis, 0, math.rad(80))
+	Turn(rfleg, x_axis, 0, math.rad(80))
+	Turn(rffoot, x_axis, 0, math.rad(80))
+	Turn(lbleg, x_axis, 0, math.rad(80))
+	Turn(lbfoot, x_axis, 0, math.rad(80))
+	Turn(rbleg, x_axis, 0, math.rad(80))
+	Turn(rbfoot, x_axis, 0, math.rad(80))	
 end
 
 function script.Create()
