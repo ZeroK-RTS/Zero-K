@@ -24,6 +24,7 @@ ploppables = {
   "factorytank",
   "factoryshield",
   "factorycloak",
+  "factoryamph",
   "factoryjump",
   "factoryspider",
   "factoryplane",
