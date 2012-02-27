@@ -15,6 +15,7 @@ local buildOpts = {
 	[[factoryplane]],
 	[[factorygunship]],
 	[[factoryhover]],
+	[[factoryamph]],
 	[[factoryspider]],
 	[[factoryjump]],
 	[[factorytank]],

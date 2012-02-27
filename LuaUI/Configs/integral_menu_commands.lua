@@ -18,13 +18,14 @@ local factories = {
 	factoryshield = {order = 2},
 	factoryveh = {order = 3},
 	factoryhover = {order = 4},
-	factoryspider = {order = 5},
-	factoryjump = {order = 6},
-	factorytank = {order = 7},
-	factoryplane = {order = 8},
-	factorygunship = {order = 9},
-	corsy = {order = 10},
-    striderhub = {order = 11},
+	factorygunship = {order = 5},
+	factoryplane = {order = 6},
+	factoryspider = {order = 7},
+	factoryjump = {order = 8},
+	factorytank = {order = 9},
+	factoryamph = {order = 10},
+	corsy = {order = 11},
+    striderhub = {order = 12},
 }
 
 --Integral menu is NON-ROBUST

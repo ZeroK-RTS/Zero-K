@@ -48,6 +48,10 @@ local menu_armcom = {
         angle = -90,
         unit = "armcsa"
       },
+	  {
+        angle = -135,
+        unit = "factoryamph"
+      },
       {
         angle = 180,
         unit = "corsy"
