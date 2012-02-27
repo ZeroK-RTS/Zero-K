@@ -82,7 +82,7 @@ unitDef = {
     {
       def                = [[EMG]],
       mainDir            = [[0 -0.35 1]],
-      maxAngleDif        = 50,
+      maxAngleDif        = 100,
 	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },

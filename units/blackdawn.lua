@@ -65,7 +65,7 @@ unitDef = {
     {
       def                = [[VTOL_SALVO]],
       mainDir            = [[0 -0.35 1]],
-      maxAngleDif        = 45,
+      maxAngleDif        = 90,
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },
