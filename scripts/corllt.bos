@@ -18,12 +18,12 @@ static-var  open, open2;
 //--------------------------------START DA FUNK!
 activatescr()
 {
-	turn shellleft to y-axis <-60.000000> speed <80.000000>;
-	turn shellright to y-axis <60.000000> speed <80.000000>;
+	//turn shellleft to y-axis <-60.000000> speed <80.000000>;
+	//turn shellright to y-axis <60.000000> speed <80.000000>;
 	//move barrel to z-axis [3.500000] speed [5.000000];
 	open = TRUE;
-	wait-for-turn shellleft around y-axis;
-	wait-for-turn shellright around y-axis;
+	//wait-for-turn shellleft around y-axis;
+	//wait-for-turn shellright around y-axis;
 	//wait-for-move barrel along z-axis;
 	
 	//sleep 39;
@@ -32,11 +32,11 @@ activatescr()
 deactivatescr()
 {
 
-	turn shellleft to y-axis <0.000000> speed <80.000000>;
-	turn shellright to y-axis <0.000000> speed <80.000000>;
+	//turn shellleft to y-axis <0.000000> speed <80.000000>;
+	//turn shellright to y-axis <0.000000> speed <80.000000>;
 	//move barrel to z-axis [0.000000] speed [5.000000];
-	wait-for-turn shellleft around y-axis;
-	wait-for-turn shellright around y-axis;
+	//wait-for-turn shellleft around y-axis;
+	//wait-for-turn shellright around y-axis;
 	//wait-for-move barrel along z-axis;
 
 	sleep 39;
@@ -110,8 +110,8 @@ Deactivate()
 RestoreAfterDelay()
 {
 	sleep 1200;
-	turn shellleft to y-axis <0.000000> speed <80.000000>;
-	turn shellright to y-axis <0.000000> speed <80.000000>;
+	//turn shellleft to y-axis <0.000000> speed <80.000000>;
+	//turn shellright to y-axis <0.000000> speed <80.000000>;
 	//move barrel to z-axis [0.000000] speed [5.000000];
 	wait-for-turn shellleft around y-axis;
 	wait-for-turn shellright around y-axis;
@@ -121,8 +121,8 @@ RestoreAfterDelay()
 Create()
 {
 	hide flare;
-	hide shellleft;
-	hide shellright;
+	//hide shellleft;
+	//hide shellright;
 	move barrel to z-axis [3.500000] now;
 	start-script SmokeUnit();
 		open = FALSE;
