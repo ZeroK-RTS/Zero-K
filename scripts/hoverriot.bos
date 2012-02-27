@@ -1,7 +1,4 @@
-#define TA			// This is a TA script
-
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  base, flare, wake1, wake2, wake3, wake4,
        wake5, wake6, wake7, wake8, ground1, barrel;
@@ -150,9 +147,9 @@ QueryWeapon1(piecenum)
 	piecenum = flare;
 }
 
-SweetSpot(piecenum)
+AimFromWeapon1(piecenum)
 {
-	piecenum = base;
+	piecenum = barrel;
 }
 
 Killed(severity, corpsetype)
@@ -171,7 +168,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode base type BITMAPONLY | BITMAP2;
 		explode wake1 type FALL | BITMAP4;
 		explode wake2 type FALL | BITMAP5;
@@ -183,7 +180,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode base type BITMAPONLY | BITMAP2;
 		explode wake1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 		explode wake2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
@@ -193,7 +190,7 @@ Killed(severity, corpsetype)
 		explode wake6 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode base type BITMAPONLY | BITMAP2;
 	explode wake1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 	explode wake2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
