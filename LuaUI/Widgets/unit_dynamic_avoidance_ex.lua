@@ -1,4 +1,4 @@
-local versionName = "v2.03"
+local versionName = "v2.06"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground combat unit and gunships",
     author    = "msafwan",
-    date      = "Feb 18, 2012",
+    date      = "Feb 28, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -58,6 +58,8 @@ local CMD_REMOVE		= CMD.REMOVE
 local CMD_MOVE			= CMD.MOVE
 local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
 local CMD_OPT_SHIFT		= CMD.OPT_SHIFT
+--local spRequestPath = Spring.RequestPath
+local mathRandom = math.random
 --------------------------------------------------------------------------------
 -- Constant:
 -- Switches:
@@ -85,7 +87,7 @@ local alphaCONSTANT1g		= {500,0.4,0.4} -- balancing constant; effect behaviour. 
 --Move Command constant:
 local halfTargetBoxSize = {400, 0, 185, 50} --the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
 local cMD_DummyG = 248 --a fake command ID to flag an idle unit for pure avoidance. (arbitrary value, change if conflict with existing command)
-local dummyIDg = "248" --fake id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue) (arbitrary value, change if conflict with other widget)
+local dummyIDg = "[]" --fake id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue) (arbitrary value, change if conflict with other widget)
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
@@ -691,7 +693,7 @@ function CatalogueMovingObject(surroundingUnits, unitID, lastPosition)
 			local unitRectangleID=surroundingUnits[i]
 			if (unitRectangleID ~= nil) then
 				local relativeAngle 	= GetUnitRelativeAngle (unitID, unitRectangleID)
-				local unitDirection, _	= GetUnitDirection(unitID, lastPosition)
+				local unitDirection,_,_	= GetUnitDirection(unitID, lastPosition)
 				local unitSeparation	= spGetUnitSeparation (unitID, unitRectangleID)
 				if math.abs(unitDirection- relativeAngle)< (collisionAngleG) then --unit inside the collision angle is catalogued with correct value
 					unitsSeparation[unitRectangleID]=unitSeparation
@@ -720,8 +722,8 @@ end
 
 function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger)
 	if (unitID~=nil) and (targetCoordinate ~= nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
-		local aCONSTANT 			= aCONSTANTg --attractor constant (amplitude multiplier)
-		local unitDirection, _		= GetUnitDirection(unitID, lastPosition) --get unit direction
+		local aCONSTANT 								= aCONSTANTg --attractor constant (amplitude multiplier)
+		local unitDirection, _, usingLastPosition		= GetUnitDirection(unitID, lastPosition) --get unit direction
 		local targetAngle = 0
 		local fTarget = 0
 		local fTargetSlope = 0
@@ -748,7 +750,7 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
 		--convert an angular command into a coordinate command
-		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay)
+		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay, usingLastPosition)
 		if (turnOnEcho == 1) then
 			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
 			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
@@ -827,11 +829,11 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
 		queueIndex=2 --skip index 1 of stored command. Skip widget's command
 	end
-	if #cQueue>=queueIndex+2 then --reclaim 1,area reclaim 2,stop 3, or: move 1,reclaim 2, area reclaim 3,stop 4.
+	if #cQueue>=queueIndex+1 then --reclaim,area reclaim,stop, or: move,reclaim, area reclaim,stop, or: area reclaim, stop, or:move, area reclaim, stop.
 		if (cQueue[queueIndex].id==40 or cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125) then --if first (1) queue is reclaim/ressurect/repair
 			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --if second (2) queue is also reclaim/ressurect
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
-				if (cQueue[queueIndex+1].params[3]~=nil) then  --area command should has no "nil" on params 1,2,3, & 4
+				if (cQueue[queueIndex+1].params[3]~=nil) then  --second (2) queue is area reclaim. area command should has no "nil" on params 1,2,3, & 4
 					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete old command, skip the target:wreck/units. Allow command reset
 					local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex+1])
 					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
@@ -841,6 +843,9 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 				if (cQueue[queueIndex+1].params[3]~=nil) then  --area command should has no "nil" on params 1,2,3, & 4
 					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete old command, skip the target:units. Allow continuous command reset
 				end
+			elseif (cQueue[queueIndex].params[3]~=nil) then  --first (1) queue is area reclaim. area command should has no "nil" on params 1,2,3, & 4
+				local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex])
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
 			end
 		end
 	end
@@ -1017,7 +1022,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		local targetUnitID = cQueue[queueIndex].params[1]
 		if Spring.ValidUnitID(targetUnitID) then --if valid unit ID, not fake (if fake then will use "no target" for pure avoidance)
 			local unitDirection = 0
-			unitDirection, unitPosY = GetUnitDirection(targetUnitID, {nil,nil}) --get target's direction in radian
+			unitDirection, unitPosY,_ = GetUnitDirection(targetUnitID, {nil,nil}) --get target's direction in radian
 			unitPosX, unitPosZ = ConvertToXZ(targetUnitID, unitDirection, 200) --project a target at 200m in front of guarded unit
 		else
 			Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target")
@@ -1288,7 +1293,7 @@ function CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, 
 end
 
 --convert angular command into coordinate, plus other function
-function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay)
+function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay, usingLastPosition)
 	local safetyDistanceCONSTANT=safetyDistanceCONSTANTg
 	local timeToContactCONSTANT=timeToContactCONSTANTg
 	local activateAutoReverse=activateAutoReverseG
@@ -1296,8 +1301,11 @@ function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unit
 	if (nearestFrontObstacleRange> losRadius) then nearestFrontObstacleRange = 999 end --if no obstacle infront of unit then set nearest obstacle as far as LOS to prevent infinite velocity.
 	local newUnitAngleDerived= GetNewAngle(unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor) --derive a new angle from calculation for move solution
 
-	local velocity=unitSpeed*(timeToContactCONSTANT+ networkDelay) --scale-down/scale-up command lenght based on system delay.
-	local networkDelayDrift = unitSpeed*networkDelay --unit drift contributed by network lag
+	local velocity=unitSpeed*(timeToContactCONSTANT+ networkDelay) --scale-down/scale-up command lenght based on system delay. Short command may make unit move in jittery way
+	local networkDelayDrift = 0
+	if usingLastPosition then  --unit drift contributed by network lag/2 (divide-by-2 for safety margin), only calculated when unit is known to be moving (eg: is using lastPosition to determine direction), but network lag value is not accurate enough to yield an accurate drift prediction.
+		networkDelayDrift = unitSpeed*(networkDelay/2)
+	end
 	local maximumVelocity = (nearestFrontObstacleRange- safetyDistanceCONSTANT)/timeToContactCONSTANT --calculate the velocity that will cause a collision within the next "timeToContactCONSTANT" second.
 	activateAutoReverse=activateAutoReverse*impatienceTrigger --activate/deactivate 'autoReverse' if impatience system is used
 	if (velocity >= maximumVelocity) and (activateAutoReverse==1) then velocity = -unitSpeed	end --set to reverse if impact is imminent
@@ -1353,7 +1361,7 @@ function FindSafeHavenForCons(unitID, now)
 				unorderedUnitList[unitID_list] = {x,y,z} --//store
 			end
 		end
-		local cluster, _ = WG.recvIndicator.OPTICS_cluster(unorderedUnitList, 600,3, myTeamID,300) --//find clusters
+		local cluster, _ = WG.recvIndicator.OPTICS_cluster(unorderedUnitList, 600,3, myTeamID,300) --//find clusters with atleast 3 unit per cluster and with at least within 300-meter from each other 
 		for index=1 , #cluster do
 			local sumX, sumY,sumZ, unitCount,meanX, meanY, meanZ = 0,0 ,0 ,0 ,0,0,0
 			for unitIndex=1, #cluster[index] do
@@ -1371,21 +1379,11 @@ function FindSafeHavenForCons(unitID, now)
 		end
 		safeHavenLastUpdate = now
 	end --//end cluster detection
-	local currentSafeHaven, nearestSafeHaven, nearestSafeHavenDistance = {params={}},{params={}}, 999999 --// initialize table using 'params' to be consistent with 'cQueue' content
-	local x,_,z = spGetUnitPosition(unitID)
-	for j=1, #safeHavenCoordinates, 1 do
-		local distance = Distance(safeHavenCoordinates[j][1], safeHavenCoordinates[j][3] , x, z)
-		if distance > 300 and distance < nearestSafeHavenDistance then
-			nearestSafeHaveDistance = distance
-			nearestSafeHaven.params[1] = safeHavenCoordinates[j][1]
-			nearestSafeHaven.params[2] = safeHavenCoordinates[j][2]
-			nearestSafeHaven.params[3] = safeHavenCoordinates[j][3]
-		elseif distance < 300 then
-			currentSafeHaven.params[1] = safeHavenCoordinates[j][1]
-			currentSafeHaven.params[2] = safeHavenCoordinates[j][2]
-			currentSafeHaven.params[3] = safeHavenCoordinates[j][3]
-		end
-	end
+	local currentSafeHaven = {params={}} --// initialize table using 'params' to be consistent with 'cQueue' content
+	local nearestSafeHaven = {params={}} --// initialize table using 'params' to be consistent with 'cQueue' content
+	local nearestSafeHavenDistance = 999999 
+	nearestSafeHaven, currentSafeHaven = NearestSafeCoordinate (unitID, safeHavenCoordinates, nearestSafeHavenDistance, nearestSafeHaven, currentSafeHaven)
+
 	if nearestSafeHaven.params[1]~=nil then --//if nearest safe haven found then go there
 		return nearestSafeHaven
 	elseif currentSafeHaven.params[1]~=nil then --//elseif only current safe haven is available then go here
@@ -1398,20 +1396,22 @@ end
 ---------------------------------Level4 (lower than low-level function)
 
 function GetUnitDirection(unitID, lastPosition) --give unit direction in radian, 2D
-	local dx = 0
-	local dz = 0
+	local dx, dz = 0,0
+	local usingLastPosition = true
 	local currentX, currentY, currentZ = spGetUnitPosition(unitID)
 	if (lastPosition[1] ~= nil) then --calculate unit's vector using difference-in-location when lastPosition contain coordinates
 		dx = currentX-lastPosition[1]
 		dz = currentZ-lastPosition[2]
 		if (dx == 0 and dz == 0) then --use the reported vector if lastPosition failed to reveal any vector
 			dx,_,dz= spGetUnitDirection(unitID)
+			usingLastPosition = false
 		end
 	else --use the reported vector if lastPosition contain "nil"
 		dx,_,dz= spGetUnitDirection(unitID)
+		usingLastPosition = false
 	end
 	local unitDirection = math.atan2(dz, dx)
-	return unitDirection, currentY
+	return unitDirection, currentY, usingLastPosition
 end
 
 function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, networkDelayDrift)
@@ -1424,7 +1424,7 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 	local newX = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
 	local newZ = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + z
 	
-	if unitDirection ~= nil then --argument #4 & #5 can be empty (for other usage). Also used in ExtractTarget for GUARD command.
+	if (unitDirection ~= nil) and (networkDelayDrift>0) then --need this check because argument #4 & #5 can be empty (for other usage). Also used in ExtractTarget for GUARD command.
 		local distanceTraveledDueToNetworkDelay = networkDelayDrift 
 		newX = distanceTraveledDueToNetworkDelay*math.cos(unitDirection) + newX -- translate move command abit further forward; to account for lag. Network Lag makes move command lags behind the unit. 
 		newZ = distanceTraveledDueToNetworkDelay*math.sin(unitDirection) + newZ
@@ -1500,9 +1500,63 @@ function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, 
 	return newUnitAngleDerived --sent out derived angle
 end
 
-function Distance(x1,z1,x2,z2)
-  local dis = math.sqrt((x1-x2)*(x1-x2)+(z1-z2)*(z1-z2))
-  return dis
+function NearestSafeCoordinate (unitID, safeHavenCoordinates, nearestSafeHavenDistance, nearestSafeHaven, currentSafeHaven)
+	local x,_,z = spGetUnitPosition(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
+	local unitDef = UnitDefs[unitDefID]
+	--local movementType = unitDef.moveData.name
+	for j=1, #safeHavenCoordinates, 1 do --//iterate over all possible retreat point (bases with at least 3 units in a cluster)
+		local distance = Distance(safeHavenCoordinates[j][1], safeHavenCoordinates[j][3] , x, z)
+		local pathOpen = false
+		local validX = 0
+		local validZ = 0
+		for i=1, 5, 1 do --//randomly select position around 100-meter from the center for 5 times before giving up, if given up: it imply that this position is too congested for retreating.
+			local xDirection = mathRandom(-1,1)
+			local zDirection = mathRandom(-1,1)
+			validX = safeHavenCoordinates[j][1] + (xDirection*100 + xDirection*mathRandom(0,100))
+			validZ = safeHavenCoordinates[j][3] + (zDirection*100 + zDirection*mathRandom(0,100))
+			local units = spGetUnitsInRectangle( validX-40, validZ-40, validX+40, validZ+40 )
+			if units == nil or #units == 0 then --//if this box is empty then return this area as accessible.
+				pathOpen = true
+				break
+			end
+		end
+		
+		--local pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1], safeHavenCoordinates[j][2], safeHavenCoordinates[j][3])
+		-- if pathOpen == nil then
+			-- pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1]-80, safeHavenCoordinates[j][2], safeHavenCoordinates[j][3])
+			-- validX = safeHavenCoordinates[j][1]-80
+			-- validZ = safeHavenCoordinates[j][3]
+			-- if not pathOpen then
+				-- pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1], safeHavenCoordinates[j][2], safeHavenCoordinates[j][3]-80)
+				-- validX = safeHavenCoordinates[j][1]
+				-- validZ = safeHavenCoordinates[j][3]-80
+				-- if not pathOpen then
+					-- pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1], safeHavenCoordinates[j][2], safeHavenCoordinates[j][3]+80)
+					-- validX = safeHavenCoordinates[j][1]
+					-- validZ = safeHavenCoordinates[j][3]+80
+					-- if not pathOpen then
+						-- pathOpen = spRequestPath(movementType, x,y,z, safeHavenCoordinates[j][1]+80, safeHavenCoordinates[j][2], safeHavenCoordinates[j][3])
+						-- validX = safeHavenCoordinates[j][1]+80
+						-- validZ = safeHavenCoordinates[j][3]
+					-- end
+				-- end
+			-- end
+		--end
+		--Spring.MarkerAddPoint(validX, safeHavenCoordinates[j][2] , validZ, "here")
+			
+		if distance > 300 and distance < nearestSafeHavenDistance and pathOpen then
+			nearestSafeHavenDistance = distance
+			nearestSafeHaven.params[1] = validX
+			nearestSafeHaven.params[2] = safeHavenCoordinates[j][2]
+			nearestSafeHaven.params[3] = validZ
+		elseif distance < 300 then --//theoretically this will run once because units can only be at 1 cluster at 1 time or not at any cluster at all
+			currentSafeHaven.params[1] = validX
+			currentSafeHaven.params[2] = safeHavenCoordinates[j][2]
+			currentSafeHaven.params[3] = validZ
+		end
+	end
+	return nearestSafeHaven, currentSafeHaven
 end
 ---------------------------------Level4
 ---------------------------------Level5
@@ -1537,6 +1591,11 @@ end
 function Sgn(x)
 	local y= x/(math.abs(x))
 	return y
+end
+
+function Distance(x1,z1,x2,z2)
+  local dis = math.sqrt((x1-x2)*(x1-x2)+(z1-z2)*(z1-z2))
+  return dis
 end
 ---------------------------------Level5
 
