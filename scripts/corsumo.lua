@@ -14,11 +14,13 @@ local l_turn = piece "l_turn"
 local l_turret = piece "l_turret"
 local l_pivot = piece "l_pivot"
 local l_barrel = piece "l_barrel"
+local l_flare = piece "l_flare"
 
 local r_turn = piece "r_turn"
 local r_turret = piece "r_turret"
 local r_pivot = piece "r_pivot"
 local r_barrel = piece "r_barrel"
+local r_flare = piece "r_flare"
 
 -- legs
 local lf_ball = piece "lf_ball"
@@ -53,8 +55,8 @@ local smokePieces = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_
 
 local weaponPieces = {
 	[1] = {turret = b_eye, sleeve = b_eye, flare = b_eye},
-	[2] = {turret = l_turret, sleeve = l_pivot, flare = l_barrel, normal = {1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), -1/math.sqrt(2), 0} },
-	[3] = {turret = r_turret, sleeve = r_pivot, flare = r_barrel, normal = {-1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), 1/math.sqrt(2), 0}},
+	[2] = {turret = l_turret, sleeve = l_pivot, flare = l_flare, normal = {1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), -1/math.sqrt(2), 0} },
+	[3] = {turret = r_turret, sleeve = r_pivot, flare = r_flare, normal = {-1/math.sqrt(2), 1/math.sqrt(2), 0}, radial = {0,0,1}, right = {1/math.sqrt(2), 1/math.sqrt(2), 0}},
 	[4] = {turret = b_eye, sleeve = b_eye, flare = b_eye}
 }
 
@@ -397,8 +399,8 @@ function script.QueryWeapon(num)
 	return weaponPieces[num].flare
 end
 
-function script.AimFromWeapon(num) return 
-	weaponPieces[num].turret 
+function script.AimFromWeapon(num)
+	return weaponPieces[num].turret 
 end
 
 local normal = {0, 1/math.sqrt(2), 1/math.sqrt(2)}
