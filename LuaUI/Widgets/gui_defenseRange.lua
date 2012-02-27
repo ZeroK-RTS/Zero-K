@@ -709,7 +709,7 @@ function DrawSelectedRanges()
 					local ux, uy, uz = spGetUnitViewPosition(uIDs[i])
 					for r = 1, #uWepRanges do
 						glLineWidth(lineConfig["lineWidth"])
-						glColor(0.0, 1-(r/5), 1-(r/5), lineConfig["alphaValue"])
+						glColor(1-(r/5), 0, 0, lineConfig["alphaValue"])
 						glDrawGroundCircle(ux, uy, uz, uWepRanges[r], lineConfig["circleDivs"])
 					end
 				end

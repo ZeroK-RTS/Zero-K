@@ -619,9 +619,9 @@ function widget:DrawWorld()
   if extraDrawRange and selUnitID and cmd == CMD_ATTACK then
     local fx, fy, fz = GetUnitPosition(selUnitID)
 	if fx then
-		glColor(1, 0, 0, 0.75)
+		glColor(1, 0.35, 0.35, 0.75)
 		glLineWidth(1)
-		glDrawGroundCircle(fx, fy, fz, extraDrawRange, circleDivs)
+		glDrawGroundCircle(fx, fy, fz, extraDrawRange, 50)
 		glColor(1,1,1,1)
 	end
   end
