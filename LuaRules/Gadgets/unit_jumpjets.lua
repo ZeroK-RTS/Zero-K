@@ -56,6 +56,7 @@ local spSetUnitRulesParam  = Spring.SetUnitRulesParam
 local spSetUnitNoMinimap   = Spring.SetUnitNoMinimap
 local spGetCommandQueue    = Spring.GetCommandQueue
 local spGiveOrderToUnit    = Spring.GiveOrderToUnit
+local spSetUnitVelocity	   = Spring.SetUnitVelocity
 local spSetUnitNoSelect    = Spring.SetUnitNoSelect
 local spSetUnitBlocking    = Spring.SetUnitBlocking
 local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
@@ -284,10 +285,12 @@ local function Jump(unitID, goal, cmdTag)
         spDestroyUnit(fakeUnitID, false, true)
         return -- unit died
       end
+      local x0, y0, z0 = spGetUnitBasePosition(unitID)
       local x = start[1] + vector[1]*i
       local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height -- parabola
       local z = start[3] + vector[3]*i
       mcSetPosition(unitID, x, y, z)
+      spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
 	  
 	  if cob then
 		spCallCOBScript(unitID, "Jumping", 1, i * 100)
