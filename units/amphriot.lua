@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[amphriot]],
-  name                   = [[Clam]],
+  name                   = [[Scallop]],
   description            = [[Amphibious Riot Bot (Land), Skirmish Bot (Sea)]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
@@ -164,7 +164,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Clam]],
+      description      = [[Wreckage - Scallop]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1600,
@@ -184,7 +184,7 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Clam]],
+      description      = [[Debris - Scallop]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1600,
