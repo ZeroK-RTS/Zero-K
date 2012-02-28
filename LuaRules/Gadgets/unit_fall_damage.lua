@@ -45,12 +45,14 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	--Spring.AddUnitImpulse(unitID,0,3,0)
-	if weaponDefID == WeaponDefNames["corgrav_gravity_pos"].id or weaponDefID == WeaponDefNames["corgrav_gravity_neg"].id then
+	if weaponDefID == WeaponDefNames["corgrav_gravity_pos"].id or 
+	   weaponDefID == WeaponDefNames["corgrav_gravity_neg"].id or
+	   weaponDefID == WeaponDefNames["amphraider2_watercannon"].id then
 
 		local bx, by, bz = Spring.GetUnitBasePosition(unitID)
 		local height = Spring.GetGroundHeight(bx,bz)
 		if math.abs(by-height) < 0.01 then
-			Spring.AddUnitImpulse(unitID,0,0.16,0)
+			Spring.AddUnitImpulse(unitID,0,0.16*GRAVITY/70,0)
 		end
 	end
 
