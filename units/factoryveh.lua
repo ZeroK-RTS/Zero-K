@@ -16,8 +16,8 @@ unitDef = {
   buildoptions                  = {
     [[corned]],
     [[corfav]],
+	[[corgator]],
     [[cormist]],
-    [[corgator]],
     [[corlevlr]],
     [[corraid]],
     [[corgarp]],

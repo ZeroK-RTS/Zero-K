@@ -13,7 +13,7 @@ unitDef = {
     [[corsh]],
     [[nsaclash]],
     [[hoverassault]],
-    [[hoverriot]],
+	[[hoverriot]],
     [[hoveraa]],
     [[armmanni]],
   },

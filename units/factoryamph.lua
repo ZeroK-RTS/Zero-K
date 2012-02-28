@@ -15,11 +15,12 @@ unitDef = {
 
   buildoptions     = {
     [[amphcon]],
-	[[amphskirm]],
+	-- torp raider
 	[[amphraider2]],
 	[[amphriot]],	
 	[[amphassault]],
 	[[amphaa]],
+	-- teleporter
   },
 
   buildPic         = [[factoryamph.png]],
