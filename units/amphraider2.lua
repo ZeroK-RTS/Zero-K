@@ -25,7 +25,7 @@ unitDef = {
 
   customParams           = {
     helptext	 = [[The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water.]],
-    maxwatertank = [[300]],
+    maxwatertank = [[180]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -96,7 +96,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:watercannon_impact]],
-      impulseBoost            = 8,
+      impulseBoost            = 11,
       impulseFactor           = 30,
       intensity               = 0.7,
       interceptedByShieldType = 1,

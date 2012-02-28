@@ -24,7 +24,7 @@ end
 local tank = {}
 local tankByID = {data = {}, count = 0}
 
-local TANK_MAX = 300
+local TANK_MAX = 180
 local REGEN_PERIOD = 13
 local SHOT_COST = 1.2
 local REGEN_RATE = 6
