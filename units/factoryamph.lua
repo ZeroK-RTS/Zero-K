@@ -15,7 +15,7 @@ unitDef = {
 
   buildoptions     = {
     [[amphcon]],
-	-- torp raider
+	[[amphraider3]],
 	[[amphraider2]],
 	[[amphriot]],	
 	[[amphassault]],
