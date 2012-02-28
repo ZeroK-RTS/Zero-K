@@ -65,6 +65,11 @@ unitDef = {
 
   weapons                = {
     {
+      def                = [[TORPCANNON]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP]],
+    },  
+    {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP]],
@@ -73,6 +78,35 @@ unitDef = {
 
 
   weaponDefs             = {
+
+    TORPCANNON = {
+      name                    = [[Torpedo Projector]],
+      areaOfEffect            = 32,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 120,
+        subs    = 6,
+      },
+
+      explosionGenerator      = [[custom:INGEBORG]],
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      model                   = [[wep_m_ajax.s3o]],
+      myGravity               = 0.1,
+      noSelfDamage            = true,
+      projectiles	      = 2,
+      range                   = 250,
+      reloadtime              = 3,
+      soundHit                = [[weapon/cannon/cannon_hit2]],
+      soundStart              = [[weapon/cannon/mini_cannon]],
+      startsmoke              = [[1]],
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 200,
+    },
   
     TORPEDO = {
       name                    = [[Torpedo]],
@@ -91,7 +125,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      model                   = [[wep_m_hailstorm.s3o]],
+      model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,
       projectiles	      = 2,

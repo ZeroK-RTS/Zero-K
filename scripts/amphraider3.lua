@@ -32,8 +32,12 @@ local FOREARM_BACK_ANGLE = math.rad(10)
 local FOREARM_BACK_SPEED = math.rad(45) * PACE
 
 local SIG_WALK = 1
-local SIG_AIM = 2
+local SIG_AIM = {2, 4}
 local SIG_RESTORE = 8
+
+local unitDefID = Spring.GetUnitDefID(unitID)
+local wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
+local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -132,8 +136,8 @@ function script.AimFromWeapon()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal(SIG_AIM)
-	SetSignalMask(SIG_AIM)
+	Signal(SIG_AIM[num])
+	SetSignalMask(SIG_AIM[num])
 	Turn( head, y_axis, heading, math.rad(240) )
 	Turn( lturret, x_axis, -pitch, math.rad(120) )
 	Turn( rturret, x_axis, -pitch, math.rad(120) )	
@@ -149,6 +153,8 @@ function script.QueryWeapon(num)
 end
 
 function script.FireWeapon(num)
+    local toChange = 3 - num
+    Spring.SetUnitWeaponState(unitID, toChange-1, "reloadFrame", Spring.GetGameFrame() + reloadTime)
 end
 
 function script.Shot(num)
