@@ -405,6 +405,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "amph_select",
+			volume = 0.7,
 		},
 	},
 	amphraider2 = {
@@ -413,6 +414,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "amph_select",
+			volume = 0.7,
 		},
 	},
 	amphraider3 = {
@@ -421,6 +423,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "amph_select",
+			volume = 0.7,
 		},
 	},
 	amphriot = {
@@ -429,6 +432,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "amph_select",
+			volume = 0.7,
 		},
 	},
 	amphassault = {
@@ -437,6 +441,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "amph_select",
+			volume = 0.7,
 		},
 	},
 	amphaa = {
@@ -445,6 +450,7 @@ local sounds = {
 		},
 		select = {
 			[1] = "amph_select",
+			volume = 0.7,
 		},
 	},
 	

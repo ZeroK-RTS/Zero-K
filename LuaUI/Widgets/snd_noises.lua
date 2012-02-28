@@ -71,11 +71,11 @@ local function playSound(filename, ...)
 end
 
 
-local function CoolNoisePlay(category, cooldownTime) 
+local function CoolNoisePlay(category, cooldownTime, volume) 
 	cooldownTime = cooldownTime or 0
 	local t = GetGameSeconds()
 	if ( (not cooldown[category]) or ((t - cooldown[category]) > cooldownTime) ) then
-		playSound(category, 1, 'userinterface')
+		playSound(category, volume or 1, 'userinterface')
 		cooldown[category] = t
 	end
 end
@@ -106,7 +106,7 @@ function widget:SelectionChanged(selection)
 	if (unitName and soundTable[unitName]) then
 		local sound = soundTable[unitName].select[1]
 		if (sound) then
-			CoolNoisePlay((sound), 0.5)
+			CoolNoisePlay((sound), 0.5, soundTable[unitName].select.volume)
 		end
 	end
 end
@@ -121,7 +121,7 @@ function widget:CommandNotify(cmdID)
 	local sounds = soundTable[unitName] or soundTable[default]
 	if (CMD[cmdID]) then
 		if (sounds and sounds.ok) then
-			CoolNoisePlay(sounds.ok[1], 0.5)
+			CoolNoisePlay(sounds.ok[1], 0.5, sounds.ok.volume)
 		end
 	elseif (sounds and sounds.build) then
 		CoolNoisePlay(sounds.build, 0.5)

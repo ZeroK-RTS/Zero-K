@@ -33,9 +33,9 @@ unitDef = {
   idleTime               = 1800,
   leaveTracks            = true,
   mass                   = 390,
-  maxDamage              = 1600,
+  maxDamage              = 850,
   maxSlope               = 36,
-  maxVelocity            = 1.4 ,
+  maxVelocity            = 1.4,
   maxWaterDepth          = 5000,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
@@ -54,7 +54,7 @@ unitDef = {
 
   side                   = [[ARM]],
   sightDistance          = 500,
-  sonarDistance          = 400,
+  sonarDistance          = 500,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -94,7 +94,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 220,
+        default = 100,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -117,7 +117,7 @@ unitDef = {
       weaponAcceleration      = 26,
       weaponTimer             = 3,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 320,
+      weaponVelocity          = 300,
     },
   
   
@@ -144,7 +144,7 @@ unitDef = {
       interceptedByShieldType = 1,
       projectiles	      = 3,
       range                   = 300,
-      reloadtime              = 1,
+      reloadtime              = 0.9,
       rgbColor                = [[1 1 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
       soundStart              = [[weapon/cannon/cannon_fire4]],
