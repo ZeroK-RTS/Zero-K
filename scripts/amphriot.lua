@@ -105,9 +105,40 @@ local function ResetLegs()
 	Turn(rbfoot, x_axis, 0, math.rad(80))	
 end
 
+local longRange = false
+local torpRange = WeaponDefNames["amphriot_torpedo"].range
+local shotRange = WeaponDefNames["amphriot_flechette"].range
+
+local function WeaponRangeUpdate()
+	while true do
+		local height = select(2, Spring.GetUnitPosition(unitID))
+		if height < -20 then
+			if not longRange then
+				Spring.SetUnitWeaponState(unitID, 0, {range = torpRange})
+				longRange = true
+			end
+		elseif longRange then
+			Spring.SetUnitWeaponState(unitID, 0, {range = shotRange})
+			longRange = false
+		end
+		Sleep(200)
+	end
+end
+
 function script.Create()
 	--StartThread(Walk)
 	StartThread(SmokeUnit)
+	StartThread(WeaponRangeUpdate)
+	local height = select(2, Spring.GetUnitPosition(unitID))
+	if height < -20 then
+		if not longRange then
+			Spring.SetUnitWeaponState(unitID, 0, {range = torpRange})
+			longRange = true
+		end
+	elseif longRange then
+		Spring.SetUnitWeaponState(unitID, 0, {range = shotRange})
+		longRange = false
+	end
 end
 
 function script.StartMoving()
