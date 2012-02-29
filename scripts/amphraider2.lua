@@ -9,7 +9,7 @@ local firepoints = {[0] = lflare, [1] = rflare}
 smokePiece = {torso}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
-local PACE = 2
+local PACE = 3
 
 local THIGH_FRONT_ANGLE = math.rad(-50)
 local THIGH_FRONT_SPEED = math.rad(60) * PACE
@@ -23,10 +23,10 @@ local FOOT_FRONT_ANGLE = -THIGH_FRONT_ANGLE - math.rad(10)
 local FOOT_FRONT_SPEED = 2*THIGH_FRONT_SPEED
 local FOOT_BACK_ANGLE = -(THIGH_BACK_ANGLE + CALF_STRAIGHTEN_ANGLE)
 local FOOT_BACK_SPEED = THIGH_BACK_SPEED + CALF_STRAIGHTEN_SPEED
-local BODY_TILT_ANGLE = math.rad(10)
-local BODY_TILT_SPEED = math.rad(20)
-local BODY_RISE_HEIGHT = 6
-local BODY_RISE_SPEED = 8*PACE
+local BODY_TILT_ANGLE = math.rad(5)
+local BODY_TILT_SPEED = math.rad(10)
+local BODY_RISE_HEIGHT = 4
+local BODY_RISE_SPEED = 6*PACE
 
 local ARM_FRONT_ANGLE = -math.rad(20)
 local ARM_FRONT_SPEED = math.rad(22.5) * PACE
@@ -61,44 +61,45 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
+		local speed =  1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 		--straighten left leg and draw it back, raise body, center right leg
-		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED)
-		Turn(pelvis, z_axis, BODY_TILT_ANGLE, BODY_TILT_SPEED)
-		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(lcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
-		Turn(lfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED)		
-		Turn(rthigh, x_axis, 0, THIGH_FRONT_SPEED)
-		Turn(rcalf, x_axis, 0, CALF_RETRACT_SPEED)
-		Turn(rfoot, x_axis, 0, FOOT_FRONT_SPEED)
+		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED*speed)
+		Turn(pelvis, z_axis, BODY_TILT_ANGLE, BODY_TILT_SPEED*speed)
+		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED*speed)
+		Turn(lcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
+		Turn(lfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)		
+		Turn(rthigh, x_axis, 0, THIGH_FRONT_SPEED*speed)
+		Turn(rcalf, x_axis, 0, CALF_RETRACT_SPEED*speed)
+		Turn(rfoot, x_axis, 0, FOOT_FRONT_SPEED*speed)
 		WaitForTurn(lthigh, x_axis)
 		Sleep(0)
 		
 		-- lower body, draw right leg forwards
-		Move(pelvis, y_axis, 0, BODY_RISE_SPEED)
-		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED)
+		Move(pelvis, y_axis, 0, BODY_RISE_SPEED*speed)
+		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
 		--Turn(lcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
-		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(rfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED)	
+		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
+		Turn(rfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)	
 		WaitForMove(pelvis, y_axis)
 		Sleep(0)
 		
 		--straighten right leg and draw it back, raise body, center left leg
-		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED)
-		Turn(pelvis, z_axis, -BODY_TILT_ANGLE, BODY_TILT_SPEED)
-		Turn(lthigh, x_axis, 0, THIGH_FRONT_SPEED)
-		Turn(lcalf, x_axis, 0, CALF_RETRACT_SPEED)
-		Turn(lfoot, x_axis, 0, FOOT_FRONT_SPEED)		
-		Turn(rthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
-		Turn(rfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED)		
+		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED*speed)
+		Turn(pelvis, z_axis, -BODY_TILT_ANGLE, BODY_TILT_SPEED*speed)
+		Turn(lthigh, x_axis, 0, THIGH_FRONT_SPEED*speed)
+		Turn(lcalf, x_axis, 0, CALF_RETRACT_SPEED*speed)
+		Turn(lfoot, x_axis, 0, FOOT_FRONT_SPEED*speed)		
+		Turn(rthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED*speed)
+		Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
+		Turn(rfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)		
 		WaitForTurn(rthigh, x_axis)
 		Sleep(0)
 		
 		-- lower body, draw left leg forwards
-		Move(pelvis, y_axis, 0, BODY_RISE_SPEED)
-		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED)
-		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(lfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED)			
+		Move(pelvis, y_axis, 0, BODY_RISE_SPEED*speed)
+		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
+		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
+		Turn(lfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)			
 		--Turn(rcalf, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
 		WaitForMove(pelvis, y_axis)
 		Sleep(0)

@@ -170,6 +170,11 @@ effectUnitDefs = {
     {class='StaticParticles', options=zenithCorona},
   },    
 
+  amphtele = {
+	{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere"})},
+	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere"})},
+  },
+
   -- length tag does nothing
   --// PLANES //----------------------------
   armcybr = {
