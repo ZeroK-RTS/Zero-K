@@ -41,6 +41,7 @@ unitDef = {
   iconType               = [[corcommander]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
+  initCloaked            = true,
   leaveTracks            = true,
   mass                   = 444,
   maxDamage              = 2000,
