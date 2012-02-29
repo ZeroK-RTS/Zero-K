@@ -1,6 +1,6 @@
 include "constants.lua"
 
-local base, body, turret, rbarrel1, rbarrel2, lbarrel1, lbarrel2, rflare, lflare = piece('base', 'body', 'turret', 'rbarrel1', 'rbarrel2', 'lbarrel1', 'lbarrel2', 'rflare', 'lflare')
+local base, body, turret, rbarrel1, rbarrel2, lbarrel1, lbarrel2, rflare, lflare, torpedo = piece('base', 'body', 'turret', 'rbarrel1', 'rbarrel2', 'lbarrel1', 'lbarrel2', 'rflare', 'lflare', 'torpedo')
 local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot =  piece('rfleg', 'rffoot', 'lfleg', 'lffoot', 'rbleg', 'rbfoot', 'lbleg', 'lbfoot')
 
 local SIG_WALK = 1
@@ -143,11 +143,19 @@ function script.Create()
 end
 
 function script.QueryWeapon(num)
-    return gunPieces[gun_1].flare
+	if num == 1 then
+		return gunPieces [gun_1].flare
+	elseif num == 2 then
+		return torpedo
+	end
 end
 
 function script.AimFromWeapon(num)
-    return turret
+	if num == 1 then
+		return turret
+	elseif num == 2 then
+		return torpedo
+	end
 end
 
 local function RestoreAfterDelay()
@@ -160,25 +168,31 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
-    Signal(SIG_AIM)
-    SetSignalMask(SIG_AIM)
-    Turn(turret, y_axis, heading, math.rad(180))
-    Turn(lbarrel1, x_axis, -pitch, math.rad(90))
-    Turn(rbarrel1, x_axis, -pitch, math.rad(90))
-    WaitForTurn(turret, y_axis)
-    WaitForTurn(rbarrel1, x_axis)
-    WaitForTurn(lbarrel1, x_axis)
-    StartThread(RestoreAfterDelay)
-    return true
+	if num == 1 then
+		Signal(SIG_AIM)
+		SetSignalMask(SIG_AIM)
+		Turn(turret, y_axis, heading, math.rad(180))
+		Turn(lbarrel1, x_axis, -pitch, math.rad(90))
+		Turn(rbarrel1, x_axis, -pitch, math.rad(90))
+		WaitForTurn(turret, y_axis)
+		WaitForTurn(rbarrel1, x_axis)
+        WaitForTurn(lbarrel1, x_axis)
+		StartThread(RestoreAfterDelay)
+		return true
+	elseif num == 2 then
+		return true
+	end
 end
 
 function script.Shot(num)
-    gun_1 = 1 - gun_1
-    for i=1,12 do
-        EmitSfx(gunPieces[gun_1].flare, 1024)
-    end
-    Move(gunPieces[gun_1].recoil, z_axis, -10)
-    Move(gunPieces[gun_1].recoil, z_axis, 0, 10)
+	if num == 1 then
+		gun_1 = 1 - gun_1
+--		for i=1,12 do
+--			EmitSfx(gunPieces[gun_1].flare, 1024)
+--		end
+		Move(gunPieces[gun_1].recoil, z_axis, -10)
+		Move(gunPieces[gun_1].recoil, z_axis, 0, 10)
+	end
 end
 
 -- should also explode the leg pieces but I really cba...

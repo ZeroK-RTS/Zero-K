@@ -101,7 +101,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.4,
-      explosionGenerator      = [[custom:large_green_goo]],
+      explosionGenerator      = [[custom:bull_fade]],
       fireStarter             = 0,
       guidance                = true,
       interceptedByShieldType = 1,
