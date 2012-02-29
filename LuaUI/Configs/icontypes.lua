@@ -318,6 +318,10 @@ local icontypes = {
     bitmap='icons/amphtorpriot.png',
     size=2.2,
   },
+  amphtransport = {
+    bitmap='icons/amphtransport.png',
+    size=2.2,
+  },
   
   --t2 vehicles (aka tanks)
   tankantinuke = {
@@ -575,6 +579,10 @@ local icontypes = {
   },
   staticshield = {
     bitmap='icons/staticshield.dds',
+    size=2.0,
+  },
+  statictransport = {
+    bitmap='icons/statictransport.png',
     size=2.0,
   },
   staticaa = {

@@ -52,6 +52,15 @@ local moveDefs = {
 		crushstrength = 150,
 	},
 	
+	AKBOT4 = {		--amphib
+		footprintx = 4,
+		footprintz = 4,
+		maxwaterdepth = 5000,
+		depthmod = 0,
+		maxslope = 36,
+		crushstrength = 5000,
+	},
+	
 	AKBOT6 = {		--amphib
 		footprintx = 6,
 		footprintz = 6,
