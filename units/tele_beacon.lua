@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[tele_entrance]],
+  unitname                      = [[tele_beacon]],
   name                          = [[Lighthouse]],
   description                   = [[Teleport Bridge Entry Beacon]],
   acceleration                  = 0,
@@ -51,4 +51,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ tele_entrance = unitDef })
+return lowerkeys({ tele_beacon = unitDef })
