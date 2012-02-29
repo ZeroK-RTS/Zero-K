@@ -16,13 +16,14 @@ unitDef = {
   buildoptions                  = {
     [[corned]],
     [[corfav]],
+	[[cormist]],
 	[[corgator]],
-    [[cormist]],
     [[corlevlr]],
     [[corraid]],
+	[[capturecar]],
     [[corgarp]],
     [[armmerl]],
-    [[capturecar]],
+    
   },
 
   buildPic                      = [[factoryveh.png]],

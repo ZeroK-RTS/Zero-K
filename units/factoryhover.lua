@@ -14,8 +14,8 @@ unitDef = {
     [[nsaclash]],
     [[hoverassault]],
 	[[hoverriot]],
-    [[hoveraa]],
     [[armmanni]],
+    [[hoveraa]],
   },
 
   buildPic         = [[factoryhover.png]],
