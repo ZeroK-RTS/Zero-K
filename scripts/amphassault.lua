@@ -172,11 +172,13 @@ function script.AimWeapon(num, heading, pitch)
     return true
 end
 
-function script.FireWeapon(num)
-    --EmitSfx(gunPieces[gun_1].flare, 1024)
+function script.Shot(num)
+    gun_1 = 1 - gun_1
+    for i=1,12 do
+        EmitSfx(gunPieces[gun_1].flare, 1024)
+    end
     Move(gunPieces[gun_1].recoil, z_axis, -10)
     Move(gunPieces[gun_1].recoil, z_axis, 0, 10)
-    gun_1 = 1 - gun_1
 end
 
 -- should also explode the leg pieces but I really cba...

@@ -80,7 +80,7 @@ unitDef = {
   weapons             = {
  
     {
-      def                = [[GYROJET]],
+      def                = [[HARPOON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -90,43 +90,42 @@ unitDef = {
 
   weaponDefs          = {
   
-    GYROJET = {
-      name                    = [[Gyrojet]],
+    HARPOON = {
+      name                    = [[Harpoon Gun]],
       areaOfEffect            = 8,
+      burst					  = 2,
+      burstRate				  = 0.5,
       cegTag                  = [[torpedo_trail]],
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 125,
-        planes  = 125,
-        subs    = 125,
+        default = 300,
+        subs    = 300,
       },
 	  
       fireStarter             = 70,
       flightTime              = 1,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      interceptedByShieldType = 2,
-      model                   = [[wep_m_frostshard.s3o]],
+      interceptedByShieldType = 1,
+      model                   = [[wep_t_harpoon.s3o]],
       noSelfDamage            = true,
-      predictBoost            = 1,
       range                   = 400,
-      reloadtime              = 0.5,
+      reloadtime              = 3,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/emg_hit]],
-      soundHitVolume          = 8,
-      soundStart              = [[weapon/cannon/mini_cannon]],
-      soundStartVolume        = 6,
-      startVelocity           = 500,
-      texture2                = [[wake]],
+      --soundHitVolume          = 8,
+      soundStart              = [[weapon/soft_crunch]],
+      --soundStartVolume        = 6,
+      --texture2                = [[wake]],
       tracks                  = false,
       turret                  = true,
-	  waterweapon			  = true,
-      weaponAcceleration      = 190,
-      weaponTimer             = 1,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 500,
+      waterweapon	      = true,
+      --weaponAcceleration      = 190,
+      --weaponTimer             = 1,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 300,
     },	
   },
 

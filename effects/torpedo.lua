@@ -112,9 +112,9 @@ return {
       properties = {
         colormap           = [[0.9 0.9 0.9 0.01 0.8 0.8 0.8 0.01 0 0 0 0.01]],
         dir                = [[dir]],
-        frontoffset        = 0,
+        frontoffset        = 1,
         fronttexture       = [[wake]],
-        length             = 4,
+        length             = 1,
         sidetexture        = [[wake]],
         size               = 2,
         sizegrowth         = 0.4,
@@ -135,9 +135,9 @@ return {
       properties = {
         colormap           = [[0.9 0.9 0.9 0.01 0.8 0.8 0.8 0.01 0 0 0 0.01]],
         dir                = [[dir]],
-        frontoffset        = 0,
+        frontoffset        = 1,
         fronttexture       = [[wake]],
-        length             = 4,
+        length             = 2,
         sidetexture        = [[wake]],
         size               = 3,
         sizegrowth         = 0.4,
