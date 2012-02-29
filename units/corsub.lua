@@ -38,7 +38,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 240,
-  maxDamage              = 1250,
+  maxDamage              = 1400,
   maxVelocity            = 2.9,
   minCloakDistance       = 75,
   minWaterDepth          = 15,
@@ -94,8 +94,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 410,
-        subs    = 410,
+        default = 450,
+        subs    = 450,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -171,7 +171,7 @@ unitDef = {
       description      = [[Wreckage - Snake]],
       blocking         = false,
       category         = [[corpses]],
-      damage           = 950,
+      damage           = 1400,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -191,7 +191,7 @@ unitDef = {
       description      = [[Debris - Snake]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 900,
+      damage           = 1400,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
