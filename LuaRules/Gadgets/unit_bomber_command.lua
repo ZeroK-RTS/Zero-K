@@ -442,7 +442,6 @@ else
 --------------------------------------------------------------------------------
 -- UNSYNCED
 --------------------------------------------------------------------------------
---[[ widget
 local airpads = SYNCED.airpads
 local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
@@ -480,6 +479,7 @@ function gadget:DefaultCommand(type, targetID)
 	end
 end
 
+--[[ widget
 local noAmmoTexture = 'LuaUI/Images/noammo.png'
 
 local function DrawUnitFunc(yshift)

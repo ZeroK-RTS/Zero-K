@@ -11,23 +11,23 @@ function gadget:GetInfo()
   }
 end
 
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
-if (not gadgetHandler:IsSyncedCode()) then
-    return
-end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
 include("LuaRules/Configs/customcmds.h.lua")
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+if (gadgetHandler:IsSyncedCode()) then
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- SYNCED
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 local placeBeaconCmdDesc = {
 	id      = CMD_PLACE_BEACON,
 	type    = CMDTYPE.ICON_MAP,
 	name    = 'Beacon',
-	cursor  = 'UNLOAD_UNITS',
+	cursor  = 'Unload units',
 	action  = 'placebeacon',
 	tooltip = 'Place teleport entrance at selected location.',
 }
@@ -35,9 +35,9 @@ local placeBeaconCmdDesc = {
 local waitAtBeaconCmdDesc = {
 	id      = CMD_WAIT_AT_BEACON,
 	type    = CMDTYPE.ICON_UNIT,
-	name    = 'Beacon Qeue',
-	cursor  = 'LOAD_UNITS',
-	action  = 'beaconqeue',
+	name    = 'Beacon Queue',
+	cursor  = 'Load units',
+	action  = 'beaconqueue',
 	tooltip = 'Wait to be teleported by a beacon.',
 }
 
@@ -497,11 +497,29 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
-	Spring.SetCustomCommandDrawData(CMD_PLACE_BEACON, "UNLOAD_UNITS", {0.2, 0.8, 0, 1})
-	Spring.SetCustomCommandDrawData(CMD_WAIT_AT_BEACON, "LOAD_UNITS", {0.1, 0.1, 1, 1})
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local team = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, team)
 	end
+end
+
+
+else
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- UNSYNCED
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+function gadget:Initialize()
+	gadgetHandler:RegisterCMDID(CMD_PLACE_BEACON)
+	gadgetHandler:RegisterCMDID(CMD_WAIT_AT_BEACON)
+	
+	Spring.AssignMouseCursor("Beacon", "cursorunload", true)
+	Spring.AssignMouseCursor("Beacon Queue", "cursorpickup", true)
+	Spring.SetCustomCommandDrawData(CMD_PLACE_BEACON, "Beacon", {0.2, 0.8, 0, 1})
+	Spring.SetCustomCommandDrawData(CMD_WAIT_AT_BEACON, "Beacon Queue", {0.1, 0.1, 1, 1})
+end
+
+
 end

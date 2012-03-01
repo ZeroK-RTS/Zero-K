@@ -173,11 +173,16 @@ effectUnitDefs = {
   amphtele = {
 	{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere"})},
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere"})},
+	--{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere", onActive = true, size=18})},
+	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere", onActive = true, size=100})},
+	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=50, strength = .005, precision=50, repeatEffect=true, onActive=true}},
   },
 	
   tele_beacon = {
 	{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere"})},
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere"})},
+	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere", onActive = true, size=50})},
+	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=30, strength = .005, precision=50, repeatEffect=true, onActive=true}},	
   },
 
   -- length tag does nothing

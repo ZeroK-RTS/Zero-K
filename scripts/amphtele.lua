@@ -100,7 +100,6 @@ local function DeployTeleport_Thread()
 	Sleep(1000/DEPLOY_SPEED)
 	
 	GG.tele_deployTeleport(unitID)
-	
 	--Turn( pelvis , z_axis, 0, math.rad(20)*PACE  )
 	--Move( pelvis , y_axis, 0, 12*PACE )
 
@@ -144,6 +143,12 @@ local mode
 function activity_mode(n)
 	if (not mode) or mode ~= n then
 		--Spring.Echo(n)
+                if n < 2 then
+                    SetUnitValue(COB.ACTIVATION, 0)
+                else
+                    SetUnitValue(COB.ACTIVATION, 1)
+                end
+                
 		Spin(holder, z_axis, math.rad(spinmodes[n].holder*holderDirection) )
 		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
 		Spin(sphere, y_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
