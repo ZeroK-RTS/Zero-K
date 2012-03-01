@@ -372,6 +372,7 @@ function gadget:DrawWorld()
 		gl.DepthTest(true)
 		
 		gl.LineWidth(2)
+                gl.LineStipple('')
 		local controllers = SYNCED.controllers
 	
 		for id, data in spairs(controllers) do
@@ -391,6 +392,7 @@ function gadget:DrawWorld()
 		
 		gl.DepthTest(false)
 		gl.Color(1,1,1,1)
+                gl.LineStipple(false)
 		
 		gl.PopAttrib()
 	end
