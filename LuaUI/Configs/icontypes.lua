@@ -583,7 +583,7 @@ local icontypes = {
   },
   statictransport = {
     bitmap='icons/statictransport.png',
-    size=2.0,
+    size=1.4,
   },
   staticaa = {
     bitmap='icons/staticaa.dds',

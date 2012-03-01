@@ -148,6 +148,7 @@ local barColors = {
   goo     = { 0.50,0.50,0.50,barAlpha },
   shield  = { 0.20,0.60,0.60,barAlpha },
   tank    = { 0.10,0.20,0.90,barAlpha },
+  tele    = { 0.00,0.60,0.60,barAlpha },
 
   resurrect = { 1.00,0.50,0.00,featureBarAlpha },
   reclaim   = { 0.75,0.75,0.75,featureBarAlpha },
@@ -701,6 +702,23 @@ do
         local prog = waterTank/ci.maxWaterTank
 		if prog < 1 then
 			AddBar("water tank",prog,"tank",(fullText and floor(prog*100)..'%') or '')
+		end
+      end
+	  
+	  --// Teleport progress
+	  local TeleportEnd = GetUnitRulesParam(unitID,"teleportend")
+	  local TeleportCost = GetUnitRulesParam(unitID,"teleportcost")
+      if TeleportEnd and TeleportCost and TeleportEnd ~= 0 then
+        local prog
+		if TeleportEnd > TeleportCost then
+			-- End frame given
+			prog = 1 - (TeleportEnd - gameFrame)/TeleportCost
+		else 
+			-- Same parameters used to display a static progress
+			prog = 1 - TeleportEnd/TeleportCost
+		end
+		if prog < 1 then
+			AddBar("teleport",prog,"tele",(fullText and floor(prog*100)..'%') or '')
 		end
       end
 

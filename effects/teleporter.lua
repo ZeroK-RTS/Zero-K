@@ -1,5 +1,6 @@
 -- teleport_out
 -- teleport_in
+-- teleport_progress
 
 return {
   ["teleport_out"] = {
@@ -58,7 +59,22 @@ return {
     },
   },
   
- ["teleport_in"] = {
+  ["teleport_progress"] = {
+    yellowbolts = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 3,
+        explosiongenerator = [[custom:YELLOW_LIGHTNING_YELLOWBOLTS]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+  },
+  
+  ["teleport_in"] = {
     drag = {
       air                = true,
       class              = [[CSimpleParticleSystem]],

@@ -100,9 +100,9 @@ end
 
 local function doTheCommand(unitID, unitDefID, num)
 	local frame = Spring.GetGameFrame()
-	local currentReload = Spring.GetUnitWeaponState(unitID, defs[unitDefID][num].weaponToReload, "reloadState")
+	local currentReload = (not defs[unitDefID][num].weaponToReload) or Spring.GetUnitWeaponState(unitID, defs[unitDefID][num].weaponToReload, "reloadState")
 	--if not (spGetUnitIsDead(unitID) or (reloadFrame[unitID][num] > frame)) then
-	if (select(5, spGetUnitHealth(unitID)) == 1) and not (spGetUnitIsDead(unitID) or (currentReload > frame)) then
+	if (select(5, spGetUnitHealth(unitID)) == 1) and not (spGetUnitIsDead(unitID) or (defs[unitDefID][num].weaponToReload and (currentReload > frame))) then
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
 		local func = env[defs[unitDefID][num].functionToCall]
 		Spring.UnitScript.CallAsUnit(unitID, func)
@@ -110,11 +110,13 @@ local function doTheCommand(unitID, unitDefID, num)
 		local slowState = 1 - (spGetUnitRulesParam(unitID,"slowState") or 0)
 		
 		-- reload
-		local reloadFrameVal = frame + defs[unitDefID][num].reloadTime/slowState
-		--reloadFrame[unitID][num] = reloadFrameVal
-		--scheduledReloadByUnitID[unitID] = math.max(reloadFrameVal, scheduledReloadByUnitID[unitID] or 0)
-		--Spring.SetUnitRulesParam(unitID, "specialReloadFrame", scheduledReloadByUnitID[unitID], {inlos = true})	-- for healthbar
-		Spring.SetUnitWeaponState(unitID, defs[unitDefID][num].weaponToReload, "reloadState", reloadFrameVal)
+		if (defs[unitDefID][num].reloadTime and defs[unitDefID][num].weaponToReload) then
+			local reloadFrameVal = frame + defs[unitDefID][num].reloadTime/slowState
+			--reloadFrame[unitID][num] = reloadFrameVal
+			--scheduledReloadByUnitID[unitID] = math.max(reloadFrameVal, scheduledReloadByUnitID[unitID] or 0)
+			--Spring.SetUnitRulesParam(unitID, "specialReloadFrame", scheduledReloadByUnitID[unitID], {inlos = true})	-- for healthbar
+			Spring.SetUnitWeaponState(unitID, defs[unitDefID][num].weaponToReload, "reloadState", reloadFrameVal)
+		end
 		return true
 	end
 	return false

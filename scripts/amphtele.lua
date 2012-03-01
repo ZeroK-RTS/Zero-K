@@ -1,6 +1,7 @@
 --linear constant 65536
 
 include "constants.lua"
+include "utility.lua"
 
 local base, pelvis, body = piece('base', 'pelvis', 'body')
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
@@ -39,12 +40,126 @@ local FOREARM_BACK_ANGLE = math.rad(10)
 local FOREARM_BACK_SPEED = math.rad(45) * PACE
 
 local SIG_WALK = 1
+local SIG_CHANGE_MODE = 2
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Create beacon animation and delay
+
+local function Create_Beacon_Thread(x,z)
+	Turn( body , z_axis, math.rad(120), math.rad(80) )
+	Sleep(1500)
+	Turn( body , z_axis, math.rad(240), math.rad(80) )
+	Sleep(1500)
+	Turn( body , z_axis, math.rad(0), math.rad(80) )
+	Sleep(1500)
+
+	Spring.MoveCtrl.Disable(unitID)
+	GG.tele_createBeacon(unitID,x,z)
+end
+
+function Create_Beacon(x,z)
+	Signal(SIG_WALK)
+	StartThread(Create_Beacon_Thread,x,z)
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Deploy into static mode animation and delay
+
+local deployed = false
+local DEPLOY_SPEED = 0.3
+
+local function DeployTeleport_Thread()
+	
+	Turn( rthigh , x_axis, 0, math.rad(1000)  )
+	Turn( rshin , x_axis, 0, math.rad(1000)  )
+	Turn( rfoot , x_axis, 0, math.rad(1000)  )
+	Turn( lthigh , x_axis, 0, math.rad(1000)  )
+	Turn( lshin , x_axis, 0, math.rad(1000)  )
+	Turn( lfoot , x_axis, 0, math.rad(1000)  )
+	Turn( pelvis , z_axis, 0, math.rad(1000)  )
+	Move( pelvis , y_axis, 0, 10 )
+	
+	Sleep(33)
+	Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+	
+	Sleep(33)
+	Turn( body , x_axis, math.rad(90), math.rad(90*DEPLOY_SPEED)  )
+	Move( pelvis , y_axis, 11, 5 )
+	Move( pelvis , z_axis, -6, 5 )
+	
+	Turn( rthigh , x_axis, math.rad(-50), math.rad(50*DEPLOY_SPEED)  )
+	Turn( rshin , x_axis, math.rad(70), math.rad(70*DEPLOY_SPEED)  )
+	Turn( rfoot , x_axis, math.rad(-15), math.rad(15*DEPLOY_SPEED)  )
+	
+	Turn( lthigh , x_axis, math.rad(-50), math.rad(50*DEPLOY_SPEED)  )
+	Turn( lshin , x_axis, math.rad(70), math.rad(70*DEPLOY_SPEED)  )
+	Turn( lfoot , x_axis, math.rad(-15), math.rad(15*DEPLOY_SPEED)  )
+
+	Sleep(1000/DEPLOY_SPEED)
+	
+	GG.tele_deployTeleport(unitID)
+	
+	--Turn( pelvis , z_axis, 0, math.rad(20)*PACE  )
+	--Move( pelvis , y_axis, 0, 12*PACE )
+
+end
+
+function DeployTeleport()
+	if GG.tele_ableToDeploy(unitID) then
+		deployed = true
+		Signal(SIG_WALK)
+		StartThread(DeployTeleport_Thread)
+	end
+end
+
+function UndeployTeleport()
+	deployed = false
+	Turn( body , x_axis, math.rad(0), math.rad(90))
+	Move( body , z_axis, 0, 5 )
+	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
+	Turn( rshin , x_axis, 0, math.rad(120)*PACE  )
+	Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
+	Turn( lthigh , x_axis, 0, math.rad(80)*PACE  )
+	Turn( lshin , x_axis, 0, math.rad(80)*PACE  )
+	Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
+	Turn( pelvis , z_axis, 0, math.rad(20)*PACE  )
+	Move( pelvis , y_axis, 0, 12*PACE )
+end
 
 
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Ball animation
+local spinmodes = {
+	[1] = {holder = 30, sphere = 25},
+	[2] = {holder = 50, sphere = 45},
+	[3] = {holder = 100, sphere = 130},
+}
+
+local holderDirection = plusOrMinusOne()
+local mode
+
+function activity_mode(n)
+	if (not mode) or mode ~= n then
+		--Spring.Echo(n)
+		Spin(holder, z_axis, math.rad(spinmodes[n].holder*holderDirection) )
+		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
+		Spin(sphere, y_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
+		Spin(sphere, z_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
+		mode = n
+	end
+end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- four-stroke bipedal (reverse-jointed) walkscript
+
 local function Walk()
+	
+	Turn( body , x_axis, math.rad(0), math.rad(90))
+	Move( body , z_axis, 0, 5 )
+
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
@@ -94,28 +209,29 @@ local function Walk()
 end
 
 function script.StartMoving()
+	deployed = false
+	GG.tele_undeployTeleport(unitID)
 	StartThread(Walk)
 end
 
 function script.StopMoving()
 	Signal(SIG_WALK)
-	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
-	Turn( rshin , x_axis, 0, math.rad(120)*PACE  )
-	Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lthigh , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lshin , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
-	Turn( pelvis , z_axis, 0, math.rad(20)*PACE  )
-	Move( pelvis , y_axis, 0, 12*PACE )
+	if not deployed then
+		Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
+		Turn( rshin , x_axis, 0, math.rad(120)*PACE  )
+		Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
+		Turn( lthigh , x_axis, 0, math.rad(80)*PACE  )
+		Turn( lshin , x_axis, 0, math.rad(80)*PACE  )
+		Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
+		Turn( pelvis , z_axis, 0, math.rad(20)*PACE  )
+		Move( pelvis , y_axis, 0, 12*PACE )
+	end
 end
 
 function script.Create()
 	StartThread(SmokeUnit)
-        --StartThread(Walk)
-        Spin(holder, z_axis, math.rad(math.random(-90,90)) )
-        Spin(sphere, x_axis, math.rad(math.random(-150,150)))
-        Spin(sphere, y_axis, math.rad(math.random(-150,150)))
-        Spin(sphere, z_axis, math.rad(math.random(-150,150)))
+	--StartThread(Walk)
+	activity_mode(1)
 end
 
 
@@ -129,6 +245,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rshin, sfxNone)
 		Explode(rthigh, sfxNone)
 		Explode(body, sfxNone)
+		Explode(sphere, sfxFall)
 		return 1
 	elseif severity <= 99 then
 		Explode(lfoot, sfxFall)
@@ -138,6 +255,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rshin, sfxFall)
 		Explode(rthigh, sfxFall)
 		Explode(body, sfxShatter)
+		Explode(sphere, sfxFall)
 		return 2
 	else
 		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
@@ -147,6 +265,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
 		Explode(body, sfxShatter + sfxExplode )
+		Explode(sphere, sfxFall)
 		return 2
 	end
 end

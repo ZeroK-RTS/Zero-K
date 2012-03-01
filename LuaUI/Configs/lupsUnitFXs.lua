@@ -174,6 +174,11 @@ effectUnitDefs = {
 	{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere"})},
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere"})},
   },
+	
+  tele_beacon = {
+	{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere"})},
+	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere"})},
+  },
 
   -- length tag does nothing
   --// PLANES //----------------------------
