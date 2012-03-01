@@ -32,7 +32,7 @@ function activity_mode(n)
 	end
 end
 
-function startTeleOutCeg_Thread(teleportiee)
+function startTeleOutLoop_Thread(teleportiee, teleporter)
 	Signal(SIG_CEG_EFFECTS)
 	SetSignalMask(SIG_CEG_EFFECTS)
 	
@@ -40,16 +40,21 @@ function startTeleOutCeg_Thread(teleportiee)
 		if Spring.ValidUnitID(teleportiee) then
 			local x, y, z = Spring.GetUnitPosition(teleportiee)
 			Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
+			GG.PokeDecloakUnit(teleportiee)
 		end
+		if Spring.ValidUnitID(teleporter) then
+			GG.PokeDecloakUnit(teleporter)
+		end
+		GG.PokeDecloakUnit(unitID)
 		Sleep(300)
 	end
 end
 
-function startTeleOutCeg(teleportiee)
-	StartThread(startTeleOutCeg_Thread, teleportiee)
+function startTeleOutLoop(teleportiee, teleporter)
+	StartThread(startTeleOutLoop_Thread, teleportiee, teleporter)
 end
 	
-function endTeleOutCeg()
+function endTeleOutLoop()
 	Signal(SIG_CEG_EFFECTS)
 end
 

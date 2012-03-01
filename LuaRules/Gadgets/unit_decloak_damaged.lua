@@ -33,6 +33,21 @@ local recloakUnitID = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function GG.PokeDecloakUnit(unitID)
+	if recloakUnitID[unitID] then
+		recloakUnit[recloakUnitID[unitID]].frames = 10
+	else
+		local cloak = Spring.GetUnitIsCloaked(unitID)
+		if cloak then
+			recloakUnits = recloakUnits + 1
+			recloakUnit[recloakUnits] = {id = unitID, frames = 10}
+			recloakUnitID[unitID] = recloakUnits
+			Spring.SetUnitCloak(unitID, false, 10000)
+		end
+	end
+
+end
+
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
 	
@@ -41,18 +56,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 		UnitDefs[attackerDefID].customParams.nofriendlyfire and
 		attackerID ~= unitID and
 		spAreTeamsAllied(unitTeam, attackerTeam)) then
-
-		if recloakUnitID[unitID] then
-			recloakUnit[recloakUnitID[unitID]].frames = 16
-		else
-			local cloak = Spring.GetUnitIsCloaked(unitID)
-			if cloak then
-				recloakUnits = recloakUnits + 1
-				recloakUnit[recloakUnits] = {id = unitID, frames = 10}
-				recloakUnitID[unitID] = recloakUnits
-				Spring.SetUnitCloak(unitID, false, 10000)
-			end
-		end
+		
+		GG.PokeDecloakUnit(unitID)
+		
 	end
 end
 

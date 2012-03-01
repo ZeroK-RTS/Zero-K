@@ -2,6 +2,7 @@
 
 include "constants.lua"
 include "utility.lua"
+include 'letsNotFailAtTrig.lua'
 
 local base, pelvis, body = piece('base', 'pelvis', 'body')
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
@@ -47,6 +48,13 @@ local SIG_CHANGE_MODE = 2
 -- Create beacon animation and delay
 
 local function Create_Beacon_Thread(x,z)
+	local y = Spring.GetGroundHeight(x,z) or 0
+	
+	local dx, dy, dz = Spring.GetUnitDirection(unitID)
+	local ux, uy, uz = Spring.GetUnitBasePosition(unitID)
+	
+	local nx, ny, nz = Spring.GetGroundNormal(ux,uz)
+	
 	Turn( body , z_axis, math.rad(120), math.rad(80) )
 	Sleep(1500)
 	Turn( body , z_axis, math.rad(240), math.rad(80) )
@@ -86,8 +94,8 @@ local function DeployTeleport_Thread()
 	
 	Sleep(33)
 	Turn( body , x_axis, math.rad(90), math.rad(90*DEPLOY_SPEED)  )
-	Move( pelvis , y_axis, 11, 5 )
-	Move( pelvis , z_axis, -6, 5 )
+	Move( pelvis , y_axis, 11, 11*DEPLOY_SPEED )
+	Move( pelvis , z_axis, -6, 6*DEPLOY_SPEED )
 	
 	Turn( rthigh , x_axis, math.rad(-50), math.rad(50*DEPLOY_SPEED)  )
 	Turn( rshin , x_axis, math.rad(70), math.rad(70*DEPLOY_SPEED)  )
@@ -156,6 +164,7 @@ function activity_mode(n)
 		mode = n
 	end
 end
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- four-stroke bipedal (reverse-jointed) walkscript

@@ -60,14 +60,14 @@ local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
 local COST_FACTOR = 0.5
 
 local offset = {
-	[1] = {x = 1, z = 0},
-	[2] = {x = 1, z = 1},
-	[3] = {x = 0, z = 1},
-	[4] = {x = -1, z = 1},
-	[5] = {x = 0, z = -1},
-	[6] = {x = -1, z = -1},
-	[7] = {x = 1, z = -1},
-	[8] = {x = -1, z = 0},
+	[0] = {x = 1, z = 0},
+	[1] = {x = 1, z = 1},
+	[2] = {x = 0, z = 1},
+	[3] = {x = -1, z = 1},
+	[4] = {x = 0, z = -1},
+	[5] = {x = -1, z = -1},
+	[6] = {x = 1, z = -1},
+	[7] = {x = -1, z = 0},
 }
 
 -------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 	Spring.SetUnitRulesParam(unitID,"teleportend",0)
 
 	if tele[unitID].link then
-		local func = Spring.UnitScript.GetScriptEnv(tele[unitID].link).startTeleOutCeg
+		local func = Spring.UnitScript.GetScriptEnv(tele[unitID].link).endTeleOutLoop
 		Spring.UnitScript.CallAsUnit(tele[unitID].link,func)
 		Spring.SetUnitRulesParam(tele[unitID].link,"teleportend",0)
 	end
@@ -158,8 +158,8 @@ end
 
 local function undeployTeleport(unitID)
 	if tele[unitID].deployed then 
-		local func = Spring.UnitScript.GetScriptEnv(tid).UndeployTeleport
-		Spring.UnitScript.CallAsUnit(tid,func)
+		local func = Spring.UnitScript.GetScriptEnv(unitID).UndeployTeleport
+		Spring.UnitScript.CallAsUnit(unitID,func)
 		GG.tele_undeployTeleport(unitID)
 	end
 end
@@ -387,12 +387,15 @@ function gadget:GameFrame(f)
 								ud = ud and UnitDefs[ud]
 								if ud then
 									local size = ud.xsize
-									for j = 1, 8 do
-										local place, feature = Spring.TestBuildOrder(ud.id, tx + offset[j].x*(size*4+40), 0 ,tz + offset[j].z*(size*4+40), 1)
+									local startCheck = math.floor(math.random(8))
+									local direction = (math.random() < 0.5 and -1) or 1
+									for j = 0, 7 do
+										local spot = (j*direction+startCheck)%8
+										local place, feature = Spring.TestBuildOrder(ud.id, tx + offset[spot].x*(size*4+40), 0 ,tz + offset[spot].z*(size*4+40), 1)
 										if (place == 2 and feature == nil) or ud.canFly then
 											teleportiee = nid
 											bestPriority = cQueue[1].params[5]
-											teleTarget = j
+											teleTarget = spot
 											break
 										end
 									end
@@ -423,8 +426,8 @@ function gadget:GameFrame(f)
 							
 							changeSpeed(tid, bid, 3)
 							
-							local func = Spring.UnitScript.GetScriptEnv(bid).startTeleOutCeg
-							Spring.UnitScript.CallAsUnit(bid,func, teleportiee)
+							local func = Spring.UnitScript.GetScriptEnv(bid).startTeleOutLoop
+							Spring.UnitScript.CallAsUnit(bid,func, teleportiee, tid)
 						end
 					else
 						if teleFinished then
