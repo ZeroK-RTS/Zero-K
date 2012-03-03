@@ -269,7 +269,7 @@ function checkairs()
 			 --Echo(health)
 			 if airtargets[h].units[i].globalassign then
 			   airtargets[h].units[i].globalassigncount = airtargets[h].units[i].globalassigncount - 1
-			   Echo("air gassigncounter", airbuff.id, airbuff.globalassigncount)
+			   --Echo("air gassigncounter", airbuff.id, airbuff.globalassigncount)
 			   if airtargets[h].units[i].globalassigncount <= 0 then
 			     airtargets[h].units[i].globalassigncount = 0
 			     airtargets[h].units[i].globalassign = false
@@ -786,7 +786,7 @@ function WeaponReady(unitID, refID, allyteam)
 	  end
 	end
 	if AAdef[allyteam].units[refID].reloaded ~= ready then
-      Echo("weapon fired")
+      --Echo("weapon fired")
 	  AAdef[allyteam].units[refID].globalassign = false
 	  AAdef[allyteam].units[refID].gassigncounter = 0
 	  AAdef[allyteam].units[refID].reloaded = ready
