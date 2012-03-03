@@ -11,37 +11,34 @@ local holder, sphere = piece('holder', 'sphere')
 smokePiece = {pelvis}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
+local PERIOD = 0.4
 local PACE = 1.5
 
 local THIGH_FRONT_ANGLE = math.rad(-50)
-local THIGH_FRONT_SPEED = math.rad(60) * PACE
-local THIGH_BACK_ANGLE = math.rad(10)
-local THIGH_BACK_SPEED = math.rad(60) * PACE
-local CALF_RETRACT_ANGLE = math.rad(0)
-local CALF_RETRACT_SPEED = math.rad(90) * PACE
-local CALF_STRAIGHTEN_ANGLE = math.rad(70)
-local CALF_STRAIGHTEN_SPEED = math.rad(90) * PACE
-local FOOT_FRONT_ANGLE = -THIGH_FRONT_ANGLE - math.rad(20)
-local FOOT_FRONT_SPEED = 2*THIGH_FRONT_SPEED
-local FOOT_BACK_ANGLE = -(THIGH_BACK_ANGLE + CALF_STRAIGHTEN_ANGLE)
-local FOOT_BACK_SPEED = THIGH_BACK_SPEED + CALF_STRAIGHTEN_SPEED
-local BODY_TILT_ANGLE = math.rad(5)
-local BODY_TILT_SPEED = math.rad(10)
-local BODY_RISE_HEIGHT = 4
-local BODY_LOWER_HEIGHT = 2
-local BODY_RISE_SPEED = 6*PACE
+local THIGH_BACK_ANGLE = math.rad(0)
+local THIGH_FRONT_SPEED = math.rad(50)/PERIOD
+local THIGH_BACK_SPEED =  math.rad(50)/PERIOD
 
-local ARM_FRONT_ANGLE = -math.rad(20)
-local ARM_FRONT_SPEED = math.rad(22.5) * PACE
-local ARM_BACK_ANGLE = math.rad(10)
-local ARM_BACK_SPEED = math.rad(22.5) * PACE
-local FOREARM_FRONT_ANGLE = -math.rad(40)
-local FOREARM_FRONT_SPEED = math.rad(45) * PACE
-local FOREARM_BACK_ANGLE = math.rad(10)
-local FOREARM_BACK_SPEED = math.rad(45) * PACE
+local CALF_RETRACT_ANGLE = math.rad(0)
+local CALF_STRAIGHTEN_ANGLE = math.rad(50)
+local CALF_RETRACT_SPEED = math.rad(50)/PERIOD*2
+local CALF_STRAIGHTEN_SPEED = math.rad(50)/PERIOD*2
+
+local FOOT_FRONT_ANGLE = -THIGH_FRONT_ANGLE - math.rad(20)
+local FOOT_BACK_ANGLE = -(THIGH_BACK_ANGLE + CALF_STRAIGHTEN_ANGLE)
+local FOOT_FRONT_SPEED = FOOT_FRONT_ANGLE-FOOT_BACK_ANGLE/PERIOD*1.5
+local FOOT_BACK_SPEED = FOOT_FRONT_ANGLE-FOOT_BACK_ANGLE/PERIOD*1.5
+
+local BODY_TILT_ANGLE = math.rad(5)
+local BODY_TILT_SPEED = BODY_TILT_ANGLE/PERIOD * 2
+local BODY_RISE_HEIGHT = 2
+local BODY_LOWER_HEIGHT = 0
+local BODY_RISE_SPEED = (BODY_RISE_HEIGHT - BODY_LOWER_HEIGHT)/PERIOD*2
 
 local SIG_WALK = 1
 local SIG_CHANGE_MODE = 2
+
+--PERIOD = PERIOD + 0.001
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -187,17 +184,15 @@ local function Walk()
 		Turn(rthigh, x_axis, 0, THIGH_FRONT_SPEED*speed)
 		Turn(rshin, x_axis, 0, CALF_RETRACT_SPEED*speed)
 		Turn(rfoot, x_axis, 0, FOOT_FRONT_SPEED*speed)
-		WaitForTurn(lthigh, x_axis)
-		Sleep(0)
+		Sleep(PERIOD * 1000/speed)
 		
 		-- lower body, draw right leg forwards
 		Move(pelvis, y_axis, BODY_LOWER_HEIGHT, BODY_RISE_SPEED*speed)
 		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
-		--Turn(lshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
+		--Turn(lshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
 		Turn(rfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)	
-		WaitForMove(pelvis, y_axis)
-		Sleep(0)
+		Sleep(PERIOD * 1000/speed/2)
 		
 		--straighten right leg and draw it back, raise body, center left leg
 		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED*speed)
@@ -208,17 +203,15 @@ local function Walk()
 		Turn(rthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED*speed)
 		Turn(rshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
 		Turn(rfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)		
-		WaitForTurn(rthigh, x_axis)
-		Sleep(0)
+		Sleep(PERIOD * 1000/speed)
 		
 		-- lower body, draw left leg forwards
 		Move(pelvis, y_axis, BODY_LOWER_HEIGHT, BODY_RISE_SPEED*speed)
 		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
 		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
 		Turn(lfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)			
-		--Turn(rshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
-		WaitForMove(pelvis, y_axis)
-		Sleep(0)
+		--Turn(rshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
+		Sleep(PERIOD * 1000/speed/2)
 	end
 end
 
@@ -244,7 +237,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit)
-	--StartThread(Walk)
+	StartThread(Walk)
 	activity_mode(1)
 end
 
