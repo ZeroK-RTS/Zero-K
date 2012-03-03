@@ -24,7 +24,9 @@ local SIG_BEACON = 2
 local function Create_Beacon_Thread(x,z)
 	local y = Spring.GetGroundHeight(x,z) or 0
 	
+	Signal(SIG_DEPLOY)
 	Signal(SIG_BEACON)
+	Signal(SIG_WALK)
 	SetSignalMask(SIG_BEACON)
 	
 	activity_mode(3)
@@ -67,6 +69,9 @@ local DEPLOY_SPEED = 0.3
 
 local function DeployTeleport_Thread()
 	
+	Signal(SIG_DEPLOY)
+	Signal(SIG_BEACON)
+	Signal(SIG_WALK)
 	SetSignalMask(SIG_DEPLOY)
 	
 	Turn( rthigh , x_axis, 0, math.rad(1000)  )
@@ -103,7 +108,6 @@ end
 function DeployTeleport()
 	if GG.tele_ableToDeploy(unitID) then
 		deployed = true
-		Signal(SIG_WALK)
 		StartThread(DeployTeleport_Thread)
 	end
 end
@@ -160,6 +164,7 @@ local function Walk()
 	
 	Turn( body , x_axis, math.rad(0), math.rad(90))
 	Move( body , z_axis, 0, 5 )
+	Turn( body , y_axis, math.rad(0), math.rad(80) )
 	
 	Signal(SIG_DEPLOY)
 	Signal(SIG_BEACON)

@@ -15,6 +15,12 @@ include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local BEACON_PLACE_RANGE_SQR = 80^2
+local BEACON_PLACE_RANGE_MOVE = 60
+local BEACON_WAIT_RANGE_MOVE = 150
+local BEACON_TELEPORT_RADIUS = 200
+local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
+
 if (gadgetHandler:IsSyncedCode()) then
 
 -------------------------------------------------------------------------------------
@@ -49,12 +55,6 @@ local teleDef = {
 }
 
 local beaconDef = UnitDefNames["tele_beacon"].id
-
-local BEACON_PLACE_RANGE_SQR = 80^2
-local BEACON_PLACE_RANGE_MOVE = 60
-local BEACON_WAIT_RANGE_MOVE = 150
-local BEACON_TELEPORT_RADIUS = 200
-local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
 
 -- frames to teleport = unit mass * COST_FACTOR
 local COST_FACTOR = 0.5
@@ -243,8 +243,6 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 		
 		return true, false -- command was used but don't remove it
 	end
-	
-	
 	
 	if cmdID == CMD_WAIT_AT_BEACON and beaconWaiter[unitID] then
 		
@@ -500,6 +498,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
+	_G.tele = tele
+
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local team = Spring.GetUnitTeam(unitID)
@@ -522,6 +522,58 @@ function gadget:Initialize()
 	Spring.AssignMouseCursor("Beacon Queue", "cursorpickup", true)
 	Spring.SetCustomCommandDrawData(CMD_PLACE_BEACON, "Beacon", {0.2, 0.8, 0, 1})
 	Spring.SetCustomCommandDrawData(CMD_WAIT_AT_BEACON, "Beacon Queue", {0.1, 0.1, 1, 1})
+end
+
+
+local glVertex 				= gl.Vertex
+local spIsUnitInView 		= Spring.IsUnitInView
+local spGetUnitPosition 	= Spring.GetUnitPosition
+local spGetUnitLosState 	= Spring.GetUnitLosState
+local spValidUnitID 		= Spring.ValidUnitID
+local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID 	
+
+local myTeam = spGetMyAllyTeamID()
+
+local function DrawFunc(u1, u2)
+	glVertex(spGetUnitPosition(u1))
+	glVertex(spGetUnitPosition(u2))
+end
+
+function gadget:DrawWorld()
+
+	local spec, fullview = Spring.GetSpectatingState()
+	spec = spec or fullview
+
+	if SYNCED.tele and snext(SYNCED.tele) then
+		gl.PushAttrib(GL.LINE_BITS)
+		
+		gl.DepthTest(true)
+		
+		gl.LineWidth(2)
+        gl.LineStipple('')
+		local tele = SYNCED.tele
+	
+		for tid, data in spairs(tele) do
+			local bid = data.link
+			if spValidUnitID(tid) and spValidUnitID(bid) and (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid)) then
+				
+				gl.Color(0.1, 0.3, 1, 0.9)
+				gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)
+				
+				local x,y,z = spGetUnitPosition(bid)
+				
+				gl.DrawGroundCircle(x,y,z, BEACON_TELEPORT_RADIUS, 32)
+			end
+	
+		end
+		
+		gl.DepthTest(false)
+		gl.Color(1,1,1,1)
+                gl.LineStipple(false)
+		
+		gl.PopAttrib()
+	end
+	
 end
 
 
