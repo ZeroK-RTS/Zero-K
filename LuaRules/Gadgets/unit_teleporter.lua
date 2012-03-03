@@ -15,8 +15,8 @@ include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local BEACON_PLACE_RANGE_SQR = 80^2*10000000000000
-local BEACON_PLACE_RANGE_MOVE = 60*1000000000000
+local BEACON_PLACE_RANGE_SQR = 80^2
+local BEACON_PLACE_RANGE_MOVE = 60
 local BEACON_WAIT_RANGE_MOVE = 150
 local BEACON_TELEPORT_RADIUS = 200
 local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
