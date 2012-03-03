@@ -1,6 +1,7 @@
 include "constants.lua"
 
-local base, body, turret, rbarrel1, rbarrel2, lbarrel1, lbarrel2, rflare, lflare, torpedo = piece('base', 'body', 'turret', 'rbarrel1', 'rbarrel2', 'lbarrel1', 'lbarrel2', 'rflare', 'lflare', 'torpedo')
+local base, body, turret, torpedo = piece('base', 'body', 'turret', 'torpedo')
+local rbarrel1, rbarrel2, lbarrel1, lbarrel2, rflare, lflare, mflare = piece('rbarrel1', 'rbarrel2', 'lbarrel1', 'lbarrel2', 'rflare', 'lflare', 'mflare')
 local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot =  piece('rfleg', 'rffoot', 'lfleg', 'lffoot', 'rbleg', 'rbfoot', 'lbleg', 'lbfoot')
 
 local SIG_WALK = 1
@@ -10,9 +11,9 @@ local SIG_RESTORE = 4
 local gunPieces = {
     [0] = {flare = lflare, recoil = lbarrel2},
     [1] = {flare = rflare, recoil = rbarrel2},
-
 }
 local gun_1 = 0
+local beamCount = 0
 
 local SPEED = 1.9
 
@@ -144,7 +145,14 @@ end
 
 function script.QueryWeapon(num)
 	if num == 1 then
-		return gunPieces [gun_1].flare
+		if beamCount < 2 then
+			return mflare
+		else
+			if beamCount >= 24 then
+				beamCount = 0
+			end
+			return gunPieces[gun_1].flare
+		end
 	elseif num == 2 then
 		return torpedo
 	end
@@ -186,6 +194,10 @@ end
 
 function script.Shot(num)
 	if num == 1 then
+		beamCount = beamCount + 1
+		if beamCount > 24 then
+			beamCount = 0
+		end
 		gun_1 = 1 - gun_1
 --		for i=1,12 do
 --			EmitSfx(gunPieces[gun_1].flare, 1024)
