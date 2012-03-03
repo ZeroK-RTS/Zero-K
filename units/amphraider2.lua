@@ -95,7 +95,7 @@ unitDef = {
         subs    = 0.01,
       },
 
-      explosionGenerator      = [[custom:watercannon_impact]],
+      explosionGenerator      = [[custom:none]], --watercannon_impact
       impulseBoost            = 11,
       impulseFactor           = 30,
       intensity               = 0.7,

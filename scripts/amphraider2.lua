@@ -175,7 +175,7 @@ function script.FireWeapon(num)
 end
 
 function script.Shot(num)
-    if math.random() < 0.4 then
+    if math.random() < 0.2 then
 		EmitSfx(firepoints[gun_1], 1024)
 	end
 	--[[

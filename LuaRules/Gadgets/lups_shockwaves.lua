@@ -15,14 +15,18 @@ end
 
 if (gadgetHandler:IsSyncedCode()) then
 
+  local hasShockwave = {} -- other gadgets can do Script.SetWatchWeapon and it is a global setting
+
   --// find weapons which cause a shockwave
   for i=1,#WeaponDefs do
     local wd = WeaponDefs[i]
     if (not wd.description:find("ChickenKick")) then
       if (wd.damageAreaOfEffect>70 and not wd.paralyzer) then
         Script.SetWatchWeapon(wd.id,true)
+		hasShockwave[wd.id] = true
       elseif (wd.type == "DGun") then
         Script.SetWatchWeapon(wd.id,true)
+		hasShockwave[wd.id] = true
       --elseif (wd.description:find("Clogger")) then
       --  Script.SetWatchWeapon(wd.id,true)
       end
@@ -35,16 +39,17 @@ if (gadgetHandler:IsSyncedCode()) then
     --  SendToUnsynced("lups_shockwave", px, py, pz, 6.4, 30, 0.13, true)
     --  return true
     --else
-    if (wd.type == "DGun") then
-      SendToUnsynced("lups_shockwave", px, py, pz, 4.0, 18, 0.13, true)
-    else
-      --local growth = wd.explosionSpeed
-      --local life = wd.areaOfEffect / wd.explosionSpeed
-      local growth = (wd.damageAreaOfEffect*1.1)/20
-      local life = 23
-      SendToUnsynced("lups_shockwave", px, py, pz, growth, life)
-    end
-
+	if hasShockwave[weaponID] then
+      if (wd.type == "DGun") then
+        SendToUnsynced("lups_shockwave", px, py, pz, 4.0, 18, 0.13, true)
+      else
+        --local growth = wd.explosionSpeed
+        --local life = wd.areaOfEffect / wd.explosionSpeed
+        local growth = (wd.damageAreaOfEffect*1.1)/20
+        local life = 23
+        SendToUnsynced("lups_shockwave", px, py, pz, growth, life)
+      end
+	end
     return false
   end
 

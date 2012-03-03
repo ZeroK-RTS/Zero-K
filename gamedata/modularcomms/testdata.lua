@@ -144,6 +144,7 @@ local base = {
 			"commweapon_gaussrifle",
 			"conversion_shockrifle",
 			"module_personal_shield",
+			"module_personal_cloak",
 			"module_areashield",
 			"module_adv_targeting",
 			"weaponmod_disruptor_ammo",

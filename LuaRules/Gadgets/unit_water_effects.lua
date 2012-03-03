@@ -30,6 +30,8 @@ local SHOT_COST = 1.2
 local REGEN_RATE = 6
 local HEALTH_REGEN = 18
 
+local waterCannonID = WeaponDefNames["amphraider2_watercannon"].id
+
 local function updateWeaponFromTank(unitID)
 
 	local proportion = tank[unitID].storage/TANK_MAX
@@ -42,16 +44,15 @@ local function updateWeaponFromTank(unitID)
 
 end
 
-local last
+-- make a sane number of cegs
+function gadget:Explosion(weaponID, x, y, z, owner)
+	if weaponID == waterCannonID and math.random() < 0.02 then
+		Spring.SpawnCEG("watercannon_impact", x, y, z, 0, 0, 0, 1)
+	end
+end
 
 function shotWaterWeapon(unitID)
-	--[[
-	local frame = Spring.GetGameFrame()
-    if last then
-        Spring.Echo(frame-last)
-    end
-    last = frame
-	--]]
+	
 	tank[unitID].storage = tank[unitID].storage - SHOT_COST
 
 	if tank[unitID].storage < 0 then
@@ -59,19 +60,19 @@ function shotWaterWeapon(unitID)
 	end
 	
 	updateWeaponFromTank(unitID)
-	--[[
-	local proportion = tank[unitID].storage/TANK_MAX
-	local reloadFrames = 2 - proportion
-
-	if math.random() > reloadFrames%1 then
-		reloadFrames = math.floor(reloadFrames)
-	else
-		reloadFrames = math.ceil(reloadFrames)
-	end
 	
-	Spring.SetUnitWeaponState(unitID, 0, {
-		reloadFrame = Spring.GetGameFrame() + reloadFrames,
-	})--]]
+	--local proportion = tank[unitID].storage/TANK_MAX
+	--local reloadFrames = 2 - proportion
+    --
+	--if math.random() > reloadFrames%1 then
+	--	reloadFrames = math.floor(reloadFrames)
+	--else
+	--	reloadFrames = math.ceil(reloadFrames)
+	--end
+	--
+	--Spring.SetUnitWeaponState(unitID, 0, {
+	--	reloadFrame = Spring.GetGameFrame() + reloadFrames,
+	--})
 	
 	Spring.SetUnitRulesParam(unitID,"watertank",tank[unitID].storage, {inlos = true})
 end
@@ -105,7 +106,7 @@ function gadget:GameFrame(n)
 				end
 				i = i + 1
 			else
-				tank[tankByID.data[tankByID.count]].index = i
+				tank[tankByID.data[tankByID.count] ].index = i
 				tankByID.data[i] = tankByID.data[tankByID.count]
 				tankByID.data[tankByID.count] = nil
 				tank[unitID] = nil
@@ -130,7 +131,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if tank[unitID] then
-		tank[tankByID.data[tankByID.count]].index = tank[unitID].index
+		tank[tankByID.data[tankByID.count] ].index = tank[unitID].index
 		tankByID.data[tank[unitID].index] = tankByID.data[tankByID.count]
 		tankByID.data[tankByID.count] = nil
 		tank[unitID] = nil
@@ -139,6 +140,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
+	
+	Script.SetWatchWeapon(waterCannonID,true)
+
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local team = Spring.GetUnitTeam(unitID)
