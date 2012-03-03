@@ -55,7 +55,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
-      [[custom:RAIDMUZZLE]],
+      [[custom:beamweapon_mussle_blue]],
     },
 
   },
@@ -70,58 +70,55 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[ROCKET]],
+      def                = [[DEW]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },
 
+  weaponDefs             = {
 
-  weaponDefs          = {
-
-    ROCKET = {
-      name                    = [[Rocket]],
+    DEW = {
+      name                    = [[Direct Energy Weapon]],
       areaOfEffect            = 48,
-      cegTag                  = [[missiletrailredsmall]],
+      beamWeapon              = true,
+	  cegTag                  = [[barney_1_1]],
+      coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 130,
-        planes  = 130,
-        subs    = 7,
+        default = 150,
+        planes  = 150,
+        subs    = 7.5,
       },
 
-      fireStarter             = 70,
-      flightTime              = 2.2,
-      guidance                = false,
+      duration                = 0.3,
+      explosionGenerator      = [[custom:FLASH1blue]],
+      fireStarter             = 50,
+      heightMod               = 1,
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      interceptedByShieldType = 2,
+      interceptedByShieldType = 1,
       lineOfSight             = true,
-      model                   = [[wep_m_ajax.s3o]],
       noSelfDamage            = true,
-      predictBoost            = 1,
-      range                   = 300,
+      range                   = 200,
       reloadtime              = 1.2,
-      renderType              = 1,
-      selfprop                = true,
-      smokedelay              = [[.1]],
-      smokeTrail              = true,
-      soundHit                = [[weapon/missile/sabot_hit]],
-      soundHitVolume          = 8,
-      soundStart              = [[weapon/missile/sabot_fire]],
-      soundStartVolume        = 7,
-      startsmoke              = [[1]],
-      startVelocity           = 150,
-      texture2                = [[darksmoketrail]],
-      tracks                  = false,
-      trajectoryHeight        = 0.05,
+      renderType              = 0,
+      rgbColor                = [[0 0.3 1]],
+      soundHit                = [[weapon/laser/lasercannon_hit]],
+      soundStart              = [[weapon/laser/small_laser_fire2]],
+      soundTrigger            = true,
+      targetMoveError         = 0.15,
+      texture1                = [[energywave]],
+      texture2                = [[null]],
+      texture3                = [[null]],
+      thickness               = 12,
+      tolerance               = 10000,
       turret                  = true,
-      weaponAcceleration      = 130,
-      weaponTimer             = 2.2,
-      weaponType              = [[MissileLauncher]],
+      weaponType              = [[LaserCannon]],
       weaponVelocity          = 130,
     },
 

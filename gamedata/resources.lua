@@ -91,6 +91,7 @@ local resources = {
       dirtplosion2= "pd/dirtplosion2.tga",
 	  dosray = "pd/dosray.tga",
       dust= "other/dust.tga",
+	  energywave= "other/energywave.tga",
       electnovaexplo= "cc/electnovaexplo.png",
       exp00_1= "gpl/explosion2/exp00_1.tga",
       exp00_10= "gpl/explosion2/exp00_10.tga",
