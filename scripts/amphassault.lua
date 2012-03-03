@@ -212,7 +212,7 @@ function script.Shot(num)
 		Move(gunPieces[gun_1].recoil, z_axis, 0, 10)
 	elseif num == 1 then
 		local height = select(2, Spring.GetUnitPosition(unitID))
-		Spring.Echo(height)
+
 		if height < 18 then
 			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz)
 		else

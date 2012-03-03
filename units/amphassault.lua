@@ -36,7 +36,7 @@ unitDef = {
   explodeAs           = [[BIG_UNIT]],
   footprintX          = 4,
   footprintZ          = 4,
-  iconType            = [[t3generic]],
+  iconType            = [[amphtorpassault]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
@@ -152,7 +152,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 450,
+        default = 850,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -165,7 +165,7 @@ unitDef = {
       model                   = [[wep_t_longbolt.s3o]],
       numbounce               = 4,
       range                   = 550,
-      reloadtime              = 2,
+      reloadtime              = 4,
       soundHit                = [[explosion/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
       startVelocity           = 90,

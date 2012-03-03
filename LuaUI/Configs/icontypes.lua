@@ -318,6 +318,10 @@ local icontypes = {
     bitmap='icons/amphtorpriot.png',
     size=2.2,
   },
+  amphtorpassault = {
+    bitmap='icons/amphtorpriot.png',
+    size=2.6,
+  },
   amphtransport = {
     bitmap='icons/amphtransport.png',
     size=2.2,

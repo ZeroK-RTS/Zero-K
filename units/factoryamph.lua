@@ -20,7 +20,7 @@ unitDef = {
 	[[amphriot]],	
 	[[amphassault]],
 	[[amphaa]],
-	-- teleporter
+	[[amphtele]],
   },
 
   buildPic         = [[factoryamph.png]],

@@ -68,6 +68,7 @@ local shortRangeSkirmieeArray = {
 	["corgator"] = true,
 	["corpyro"] = true,
 	["logkoda"] = true,
+	["amphraider3"] = true,
 	["corsumo"] = true,
 }
 
@@ -76,6 +77,7 @@ local riotRangeSkirmieeArray = {
 	["panther"] = true,
 	["corsh"] = true,
 	["coresupp"] = true,
+	["amphriot"] = true,
 	["armcomdgun"] = true,
 	["dante"] = true,
 }
@@ -90,6 +92,7 @@ local medRangeSkirmieeArray = {
 	
 	["armwar"] = true,
 	["armzeus"] = true,
+	["amphraider2"] = true,
 	
 	["arm_venom"] = true,
 	["spiderassault"] = true,
@@ -128,6 +131,7 @@ local longRangeSkirmieeArray = {
 local artyRangeSkirmieeArray = {
 	["armsptk"] = true,
 	["corstorm"] = true,
+	["amphassault"] = true,
 	["chicken_sporeshooter"] = true,
 }
 
@@ -395,6 +399,15 @@ local behaviourConfig = {
 		swarmLeeway = 30, 
 		stoppingDistance = 8
 	},
+	["amphraider2"] = {
+		skirms = riotRangeSkirmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true,
+		maxSwarmLeeway = 40,
+		skirmLeeway = 30, 
+		minCircleStrafeDistance = 10,
+	},
 	
 	-- riots
 	["armwar"] = {
@@ -451,6 +464,15 @@ local behaviourConfig = {
 		maxSwarmLeeway = 0, 
 		skirmLeeway = -30, 
 		stoppingDistance = 10
+	},
+	["amphriot"] = {
+		skirms = riotRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		circleStrafe = true,
+		maxSwarmLeeway = 40,
+		skirmLeeway = 30, 
+		minCircleStrafeDistance = 10,
 	},
 		
 	--assaults
@@ -697,6 +719,16 @@ local behaviourConfig = {
         skirmLeeway = 50, 
 	},
 	["corsent"] = {
+		skirms = skirmableAir, 
+		swarms = {}, 
+		flees = armedLand,
+		fleeLeeway = 100,
+		fleeDistance = 100,
+		minFleeRange = 500,
+        skirmLeeway = 50,
+		defaultSkirmOrderDis = 200, 
+	},
+	["amphaa"] = {
 		skirms = skirmableAir, 
 		swarms = {}, 
 		flees = armedLand,
