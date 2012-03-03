@@ -125,7 +125,6 @@ local function CreateWindow()
 
 	-- create window if necessary
 	if active > 0 then
-
 		mainWindow = Window:New{
 			resizable = false,
 			draggable = false,
@@ -219,7 +218,46 @@ function widget:Initialize()
 	vsx, vsy = widgetHandler:GetViewSizes()
 
 	widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
-	if (not noComm) then CreateWindow() end
+	if (not noComm) then
+		buttonWindow = Window:New{
+			resizable = false,
+			draggable = false,
+			width = 64,
+			height = 64,
+			right = 0,
+			y = 128,
+			tweakDraggable = true,
+			color = {0, 0, 0, 0},
+			padding = {0, 0, 0, 0},
+			itemMargin = {0, 0, 0, 0}
+		}
+		if Spring.GetGameSeconds() <= 0 then
+			screen0:AddChild(buttonWindow)
+		end
+		
+		button = Button:New{
+			parent = buttonWindow,
+			caption = '',
+			tooltip = "Open comm selection screen",
+			width = "100%",
+			height = "100%",
+			x = 0,
+			y = 0,
+			--OnMouseUp = {Close}
+			OnClick = {function() Spring.SendCommands({"luaui "..actionShow}) end}	
+		}
+		
+		buttonImage = Image:New{
+			parent = button,
+			width="100%";
+			height="100%";
+			x=0;
+			y=0;
+			file = "LuaUI/Images/startup_info_selector/selecticon.png",
+			keepAspect = false,
+		}	
+		CreateWindow()
+	end
 end
 
  
@@ -230,14 +268,9 @@ function widget:Shutdown()
   widgetHandler:RemoveAction(actionShow)
 end
 
--- keep the window open, we want to be able to pick later
---[[
 function widget:GameStart()
-  if mainWindow then
-	mainWindow:Dispose()
-  end
+  screen0:RemoveChild(buttonWindow)
 end
-]]--
 
 -----
 -----
