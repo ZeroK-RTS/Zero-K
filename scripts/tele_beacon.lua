@@ -18,11 +18,11 @@ local mode
 
 function activity_mode(n)
 	if (not mode) or mode ~= n then
-                if n < 2 then
-                    SetUnitValue(COB.ACTIVATION, 0)
-                else
-                    SetUnitValue(COB.ACTIVATION, 1)
-                end
+		if n < 2 then
+			SetUnitValue(COB.ACTIVATION, 0)
+		elseif mode < 2 then
+			SetUnitValue(COB.ACTIVATION, 1)
+		end
 		
 		Spin(holder, y_axis, math.rad(spinmodes[n].holder*holderDirection) )
 		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))

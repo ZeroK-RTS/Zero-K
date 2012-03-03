@@ -124,7 +124,7 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 end
 
 function GG.tele_ableToDeploy(unitID)
-	return tele[unitID].link
+	return tele[unitID].link and not tele[unitID].deployed
 end
 
 function GG.tele_deployTeleport(unitID)

@@ -11,34 +11,37 @@ local holder, sphere = piece('holder', 'sphere')
 smokePiece = {pelvis}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
-local PERIOD = 0.4
 local PACE = 1.5
 
 local THIGH_FRONT_ANGLE = math.rad(-50)
-local THIGH_BACK_ANGLE = math.rad(0)
-local THIGH_FRONT_SPEED = math.rad(50)/PERIOD
-local THIGH_BACK_SPEED =  math.rad(50)/PERIOD
-
+local THIGH_FRONT_SPEED = math.rad(60) * PACE
+local THIGH_BACK_ANGLE = math.rad(10)
+local THIGH_BACK_SPEED = math.rad(60) * PACE
 local CALF_RETRACT_ANGLE = math.rad(0)
-local CALF_STRAIGHTEN_ANGLE = math.rad(50)
-local CALF_RETRACT_SPEED = math.rad(50)/PERIOD*2
-local CALF_STRAIGHTEN_SPEED = math.rad(50)/PERIOD*2
-
+local CALF_RETRACT_SPEED = math.rad(90) * PACE
+local CALF_STRAIGHTEN_ANGLE = math.rad(70)
+local CALF_STRAIGHTEN_SPEED = math.rad(90) * PACE
 local FOOT_FRONT_ANGLE = -THIGH_FRONT_ANGLE - math.rad(20)
+local FOOT_FRONT_SPEED = 2*THIGH_FRONT_SPEED
 local FOOT_BACK_ANGLE = -(THIGH_BACK_ANGLE + CALF_STRAIGHTEN_ANGLE)
-local FOOT_FRONT_SPEED = FOOT_FRONT_ANGLE-FOOT_BACK_ANGLE/PERIOD*1.5
-local FOOT_BACK_SPEED = FOOT_FRONT_ANGLE-FOOT_BACK_ANGLE/PERIOD*1.5
-
+local FOOT_BACK_SPEED = THIGH_BACK_SPEED + CALF_STRAIGHTEN_SPEED
 local BODY_TILT_ANGLE = math.rad(5)
-local BODY_TILT_SPEED = BODY_TILT_ANGLE/PERIOD * 2
-local BODY_RISE_HEIGHT = 2
-local BODY_LOWER_HEIGHT = 0
-local BODY_RISE_SPEED = (BODY_RISE_HEIGHT - BODY_LOWER_HEIGHT)/PERIOD*2
+local BODY_TILT_SPEED = math.rad(10)
+local BODY_RISE_HEIGHT = 4
+local BODY_LOWER_HEIGHT = 2
+local BODY_RISE_SPEED = 6*PACE
+
+local ARM_FRONT_ANGLE = -math.rad(20)
+local ARM_FRONT_SPEED = math.rad(22.5) * PACE
+local ARM_BACK_ANGLE = math.rad(10)
+local ARM_BACK_SPEED = math.rad(22.5) * PACE
+local FOREARM_FRONT_ANGLE = -math.rad(40)
+local FOREARM_FRONT_SPEED = math.rad(45) * PACE
+local FOREARM_BACK_ANGLE = math.rad(10)
+local FOREARM_BACK_SPEED = math.rad(45) * PACE
 
 local SIG_WALK = 1
-local SIG_CHANGE_MODE = 2
-
---PERIOD = PERIOD + 0.001
+local SIG_DEPLOY = 2
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -47,20 +50,30 @@ local SIG_CHANGE_MODE = 2
 local function Create_Beacon_Thread(x,z)
 	local y = Spring.GetGroundHeight(x,z) or 0
 	
-	local dx, dy, dz = Spring.GetUnitDirection(unitID)
-	local ux, uy, uz = Spring.GetUnitBasePosition(unitID)
+	activity_mode(3)
 	
-	local nx, ny, nz = Spring.GetGroundNormal(ux,uz)
-	
-	Turn( body , z_axis, math.rad(120), math.rad(80) )
-	Sleep(1500)
-	Turn( body , z_axis, math.rad(240), math.rad(80) )
-	Sleep(1500)
-	Turn( body , z_axis, math.rad(0), math.rad(80) )
-	Sleep(1500)
+	Turn( body , y_axis, math.rad(120), math.rad(80) )
+	for i = 1, 15 do
+		Sleep(100)
+		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
+	end
+	Turn( body , y_axis, math.rad(240), math.rad(80) )
+	for i = 1, 15 do
+		Sleep(100)
+		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
+	end
+	Turn( body , y_axis, math.rad(0), math.rad(80) )
+	for i = 1, 15 do
+		Sleep(100)
+		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
+	end
 
 	Spring.MoveCtrl.Disable(unitID)
 	GG.tele_createBeacon(unitID,x,z)
+	
+	Spring.SpawnCEG("teleport_in", x, y, z, 0, 0, 0, 1)
+	
+	activity_mode(1)
 end
 
 function Create_Beacon(x,z)
@@ -76,6 +89,8 @@ local deployed = false
 local DEPLOY_SPEED = 0.3
 
 local function DeployTeleport_Thread()
+	
+	SetSignalMask(SIG_DEPLOY)
 	
 	Turn( rthigh , x_axis, 0, math.rad(1000)  )
 	Turn( rshin , x_axis, 0, math.rad(1000)  )
@@ -122,14 +137,14 @@ function UndeployTeleport()
 	deployed = false
 	Turn( body , x_axis, math.rad(0), math.rad(90))
 	Move( body , z_axis, 0, 5 )
-	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
-	Turn( rshin , x_axis, 0, math.rad(120)*PACE  )
-	Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lthigh , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lshin , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
-	Turn( pelvis , z_axis, 0, math.rad(20)*PACE  )
-	Move( pelvis , y_axis, 0, 12*PACE )
+	Turn( rthigh , x_axis, 0, math.rad(80)  )
+	Turn( rshin , x_axis, 0, math.rad(120)  )
+	Turn( rfoot , x_axis, 0, math.rad(80)  )
+	Turn( lthigh , x_axis, 0, math.rad(80)  )
+	Turn( lshin , x_axis, 0, math.rad(80)  )
+	Turn( lfoot , x_axis, 0, math.rad(80)  )
+	Turn( pelvis , z_axis, 0, math.rad(20)  )
+	Move( pelvis , y_axis, 0, 12 )
 end
 
 
@@ -148,11 +163,11 @@ local mode
 function activity_mode(n)
 	if (not mode) or mode ~= n then
 		--Spring.Echo(n)
-                if n < 2 then
-                    SetUnitValue(COB.ACTIVATION, 0)
-                else
-                    SetUnitValue(COB.ACTIVATION, 1)
-                end
+		if n < 2 then
+			SetUnitValue(COB.ACTIVATION, 0)
+		elseif mode < 2 then
+			SetUnitValue(COB.ACTIVATION, 1)
+		end
                 
 		Spin(holder, z_axis, math.rad(spinmodes[n].holder*holderDirection) )
 		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
@@ -170,11 +185,26 @@ local function Walk()
 	
 	Turn( body , x_axis, math.rad(0), math.rad(90))
 	Move( body , z_axis, 0, 5 )
-
+	
+	Signal(SIG_DEPLOY)
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
 		local speed =  1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		
+		Turn(pelvis, z_axis, math.rad(5), math.rad(5))
+		
+		Turn(rthigh, x_axis, math.rad(-70), math.rad(80))
+		
+		Sleep(1000)
+		
+		Turn(pelvis, z_axis, math.rad(-5), math.rad(5))
+		
+		Turn(rthigh, x_axis, math.rad(10), math.rad(80))
+		
+		Sleep(1000)
+		
+		--[[
 		--straighten left leg and draw it back, raise body, center right leg
 		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED*speed)
 		Turn(pelvis, z_axis, BODY_TILT_ANGLE, BODY_TILT_SPEED*speed)
@@ -184,15 +214,17 @@ local function Walk()
 		Turn(rthigh, x_axis, 0, THIGH_FRONT_SPEED*speed)
 		Turn(rshin, x_axis, 0, CALF_RETRACT_SPEED*speed)
 		Turn(rfoot, x_axis, 0, FOOT_FRONT_SPEED*speed)
-		Sleep(PERIOD * 1000/speed)
+		WaitForTurn(lthigh, x_axis)
+		Sleep(0)
 		
 		-- lower body, draw right leg forwards
 		Move(pelvis, y_axis, BODY_LOWER_HEIGHT, BODY_RISE_SPEED*speed)
 		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
-		--Turn(lshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
+		--Turn(lshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
 		Turn(rfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)	
-		Sleep(PERIOD * 1000/speed/2)
+		WaitForMove(pelvis, y_axis)
+		Sleep(0)
 		
 		--straighten right leg and draw it back, raise body, center left leg
 		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED*speed)
@@ -203,15 +235,17 @@ local function Walk()
 		Turn(rthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED*speed)
 		Turn(rshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
 		Turn(rfoot, x_axis, FOOT_BACK_ANGLE, FOOT_BACK_SPEED*speed)		
-		Sleep(PERIOD * 1000/speed)
+		WaitForTurn(rthigh, x_axis)
+		Sleep(0)
 		
 		-- lower body, draw left leg forwards
 		Move(pelvis, y_axis, BODY_LOWER_HEIGHT, BODY_RISE_SPEED*speed)
 		Turn(pelvis, z_axis, 0, BODY_TILT_SPEED*speed)
 		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED*speed)
 		Turn(lfoot, x_axis, FOOT_FRONT_ANGLE, FOOT_FRONT_SPEED*speed)			
-		--Turn(rshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED*speed)
-		Sleep(PERIOD * 1000/speed/2)
+		--Turn(rshin, x_axis, CALF_STRAIGHTEN_ANGLE, CALF_STRAIGHTEN_SPEED)
+		WaitForMove(pelvis, y_axis)
+		Sleep(0)--]]
 	end
 end
 
@@ -237,7 +271,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit)
-	StartThread(Walk)
+	--StartThread(Walk)
 	activity_mode(1)
 end
 

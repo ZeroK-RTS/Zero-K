@@ -8,7 +8,7 @@ return {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       ground             = true,
-      water              = true,
+      water              = false,
       properties = {
         airdrag            = 1,
         colormap           = [[1 .5 1 .1   0 0 0 0]],
@@ -35,7 +35,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
-      water              = true,
+      water              = false,
       properties = {
         airdrag            = 0,
         colormap           = [[0 0 0 1   0 0 0 .7   0 0 0 .3   0 0 0 0]],
@@ -65,7 +65,7 @@ return {
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = true,
-      water              = true,
+      water              = false,
       properties = {
         delay              = 3,
         explosiongenerator = [[custom:YELLOW_LIGHTNING_YELLOWBOLTS]],
@@ -79,7 +79,7 @@ return {
       air                = true,
       class              = [[CSimpleParticleSystem]],
       ground             = true,
-      water              = true,
+      water              = false,
       properties = {
         airdrag            = 1,
         colormap           = [[1 .5 1 .1   0 0 0 0]],
@@ -106,7 +106,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       count              = 1,
       ground             = true,
-      water              = true,
+      water              = false,
       properties = {
         airdrag            = 0,
         colormap           = [[0 0 0 1   0 0 0 .7   0 0 0 .3   0 0 0 0]],
