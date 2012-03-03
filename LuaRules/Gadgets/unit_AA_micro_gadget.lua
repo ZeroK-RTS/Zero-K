@@ -2,6 +2,8 @@ local versionNumber = "v0.9"
 
 --[[   TO DO::
 
+Handle morphing of AA towers
+Control targeting of razor and flak
 Screamers hold fire until unit is killable
 
 ]]--
@@ -661,8 +663,8 @@ function getAATargetsinRange(unitID, refID, allyteam)
 	if not AreTeamsAllied(team, allyteam) then
 	  defID = GetUnitDefID(targetID)
 	  ud = UnitDefs[defID]
+	  LOS = GetLOSState(targetID, allyteam)
 	  if Isair(ud.name) then
-	    LOS = GetLOSState(targetID, allyteam)
 	    if LOS["los"] == true or LOS["radar"] == true then
 		  local timeinrange = TimeInRange(unitID, refID, allyteam, targetID)
 		  --Echo(timeinrange, nextshot)
