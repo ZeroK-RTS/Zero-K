@@ -144,24 +144,30 @@ function script.Create()
 end
 
 function script.QueryWeapon(num)
-	if num == 1 then
+	if num == 2 then
 		if beamCount < 2 then
+			if beamCount == 1 then
+				Spring.SetUnitWeaponState(unitID, 1, "range", 0)
+			end
 			return mflare
 		else
+			if beamCount == 2 then
+				Spring.SetUnitWeaponState(unitID, 1, "range", 550)
+			end
 			if beamCount >= 24 then
 				beamCount = 0
 			end
 			return gunPieces[gun_1].flare
 		end
-	elseif num == 2 then
+	elseif num == 1 then
 		return torpedo
 	end
 end
 
 function script.AimFromWeapon(num)
-	if num == 1 then
+	if num == 2 then
 		return turret
-	elseif num == 2 then
+	elseif num == 1 then
 		return torpedo
 	end
 end
@@ -176,7 +182,7 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 1 then
+	if num == 2 then
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		Turn(turret, y_axis, heading, math.rad(180))
@@ -187,13 +193,13 @@ function script.AimWeapon(num, heading, pitch)
         WaitForTurn(lbarrel1, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
-	elseif num == 2 then
+	elseif num == 1 then
 		return true
 	end
 end
 
 function script.Shot(num)
-	if num == 1 then
+	if num == 2 then
 		beamCount = beamCount + 1
 		if beamCount > 24 then
 			beamCount = 0
@@ -204,6 +210,14 @@ function script.Shot(num)
 --		end
 		Move(gunPieces[gun_1].recoil, z_axis, -10)
 		Move(gunPieces[gun_1].recoil, z_axis, 0, 10)
+	elseif num == 1 then
+		local height = select(2, Spring.GetUnitPosition(unitID))
+		Spring.Echo(height)
+		if height < 18 then
+			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz)
+		else
+			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz)
+		end
 	end
 end
 

@@ -79,14 +79,7 @@ unitDef = {
   workerTime          = 0,
 
   weapons                       = {
-
-    {
-      def                = [[LASER]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-	
-    {
+	{
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
 --      mainDir            = [[0 0 1]],
@@ -94,6 +87,11 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP]],
     },
 	
+    {
+      def                = [[LASER]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
   },
 
 
