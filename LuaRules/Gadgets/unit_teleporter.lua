@@ -94,12 +94,12 @@ local checkFrame = {}
 -------------------------------------------------------------------------------------
 -- Most script interaction
 
-local function changeSpeed(tid, bid, speed, down)
+local function changeSpeed(tid, bid, speed)
 	local func = Spring.UnitScript.GetScriptEnv(tid).activity_mode
-	Spring.UnitScript.CallAsUnit(tid,func,speed, down)
+	Spring.UnitScript.CallAsUnit(tid,func,speed)
 	if bid then
 		local func = Spring.UnitScript.GetScriptEnv(bid).activity_mode
-		Spring.UnitScript.CallAsUnit(bid,func,speed, down)
+		Spring.UnitScript.CallAsUnit(bid,func,speed)
 	end
 end
 
@@ -144,6 +144,7 @@ end
 
 function GG.tele_createBeacon(unitID,x,z)
 	local place, feature = Spring.TestBuildOrder(beaconDef, x, 0 ,z, 1)
+	changeSpeed(unitID, nil, 1)
 	if place == 2 and feature == nil then
 		if tele[unitID].link and Spring.ValidUnitID(tele[unitID].link) then
 			Spring.DestroyUnit(tele[unitID].link, true)

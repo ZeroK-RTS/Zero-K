@@ -51,8 +51,6 @@ local function Create_Beacon_Thread(x,z)
 	GG.tele_createBeacon(unitID,x,z)
 	
 	Spring.SpawnCEG("teleport_in", x, y, z, 0, 0, 0, 1)
-	
-	activity_mode(1)
 end
 
 function Create_Beacon(x,z)
@@ -141,7 +139,6 @@ local mode
 
 function activity_mode(n)
 	if (not mode) or mode ~= n then
-		Spring.Echo(n)
 		if n < 2 then
 			SetUnitValue(COB.ACTIVATION, 0)
 		elseif mode < 2 then
