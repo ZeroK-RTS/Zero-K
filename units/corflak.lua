@@ -50,6 +50,15 @@ unitDef = {
   objectName                    = [[CORFLAK.s3o]],
   seismicSignature              = 4,
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
+  
+  sfxtypes               = {
+
+  explosiongenerators = {
+      [[custom:rockomuzzle]],
+    },
+
+  },
+  
   side                          = [[CORE]],
   sightDistance                 = 660,
   smoothAnim                    = true,
@@ -90,7 +99,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
-      explosionGenerator      = [[custom:FLAK_HIT_24]],
+      explosionGenerator      = [[custom:flakplosion]],
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,

@@ -53,6 +53,15 @@ unitDef = {
   objectName             = [[corsent.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
+  
+  sfxtypes               = {
+
+  explosiongenerators = {
+      [[custom:rockomuzzle]],
+    },
+
+  },
+  
   side                   = [[CORE]],
   sightDistance          = 660,
   smoothAnim             = true,
@@ -100,7 +109,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.85,
-      explosionGenerator      = [[custom:FLAK_HIT_16]],
+      explosionGenerator      = [[custom:flakplosion]],
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,

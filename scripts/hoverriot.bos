@@ -1,9 +1,9 @@
 #include "constants.h"
 
-piece  base, flare, wake1, wake2, wake3, wake4,
-       wake5, wake6, wake7, wake8, ground1, barrel;
+piece	base, body, jetl, jetr, jetb, turret,
+		fire1, fire2, fire3, wake;
 
-static-var  Static_Var_1, wobble, random;
+static-var  Static_Var_1, gun1, wobble, random;
 
 // Signal definitions
 #define SIG_MOVE			2
@@ -28,7 +28,7 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 			{
 				smoketype = 256 | 1;
 			}
-			emit-sfx smoketype from base;
+			emit-sfx smoketype from body;
 		}
 		sleeptime = healthpercent * 50;
 		if( sleeptime < 200 )
@@ -84,35 +84,13 @@ StartMoving()
 	{
 		if( Static_Var_1 <= 2 )
 		{
-			random = Rand( 1, 2 );
-			if( random == 1 )
-			{
-				emit-sfx 5 from wake1;
-				emit-sfx 5 from wake3;
-				emit-sfx 5 from wake5;
-				emit-sfx 5 from wake7;
-				emit-sfx 3 from wake1;
-			 	emit-sfx 3 from wake3;
-			  	emit-sfx 3 from wake5;
-			  	emit-sfx 3 from wake7;
-			}
-			if( random == 2 )
-			{
-				emit-sfx 5 from wake2;
-				emit-sfx 5 from wake4;
-				emit-sfx 5 from wake6;
-				emit-sfx 5 from wake8;
-				emit-sfx 3 from wake2;
-			 	emit-sfx 3 from wake4;
-			  	emit-sfx 3 from wake6;
-			  	emit-sfx 3 from wake8;
-			}
+			emit-sfx 5 from wake;
 		}
 		if( Static_Var_1 > 2)
 		{
-			emit-sfx 1024+0 from ground1;
+			emit-sfx 1024+0 from wake;
 		}
-		sleep 150;
+		sleep 50;
 	}
 }
 
@@ -123,9 +101,8 @@ setSFXoccupy(Func_Var_1)
 
 Create()
 {
+	gun1 = 1;
 	wobble=TRUE;
-	hide flare;
-	hide ground1;
 	start-script SmokeUnit();
 	start-script WobbleUnit();
 }
@@ -135,67 +112,79 @@ AimWeapon1(heading, pitch)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
-	turn barrel to y-axis heading speed <300.000000>;
-	turn barrel to x-axis <0.000000> - pitch speed <300.000000>;
-	wait-for-turn barrel around y-axis;
-	wait-for-turn barrel around x-axis;
+	turn turret to y-axis heading speed <300.000000>;
+	turn turret to x-axis <0.000000> - pitch speed <300.000000>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn turret around x-axis;
 	return (1);
 }
 
 QueryWeapon1(piecenum)
 {
-	piecenum = flare;
+	if (gun1 > 3)
+	{
+		gun1 = 1;
+	}
+	if ( gun1 == 1 )
+	{
+		piecenum = fire1;
+	}
+	else if ( gun1 == 2 )
+	{
+		piecenum = fire2;
+	}
+	else
+	{
+		piecenum = fire3;
+	}
 }
 
 AimFromWeapon1(piecenum)
 {
-	piecenum = barrel;
+	piecenum = turret;
 }
+
+Shot1()
+{
+	++gun1;
+}
+
 
 Killed(severity, corpsetype)
 {
 	if( severity <= 25 )
 	{
 		corpsetype = 1;
-		explode base type BITMAPONLY | BITMAP1;
-		explode wake1 type BITMAPONLY | BITMAP2;
-		explode wake2 type BITMAPONLY | BITMAP3;
-		explode wake3 type BITMAPONLY | BITMAP4;
-		explode wake4 type BITMAPONLY | BITMAP5;
-		explode wake5 type BITMAPONLY | BITMAP1;
-		explode wake6 type BITMAPONLY | BITMAP2;
+		explode body type BITMAPONLY | BITMAP1;
+		explode jetl type BITMAPONLY | BITMAP2;
+		explode jetr type BITMAPONLY | BITMAP3;
+		explode jetb type BITMAPONLY | BITMAP4;
 		return (0);
 	}
 	if( severity <= 50 )
 	{
 		corpsetype = 1;
-		explode base type BITMAPONLY | BITMAP2;
-		explode wake1 type FALL | BITMAP4;
-		explode wake2 type FALL | BITMAP5;
-		explode wake3 type FALL | BITMAP1;
-		explode wake4 type FALL | BITMAP2;
-		explode wake5 type FALL | BITMAP3;
-		explode wake6 type FALL | BITMAP4;
+		explode body type BITMAPONLY | BITMAP2;
+		explode jetr type BITMAPONLY | BITMAP4;
+		explode jetl type BITMAPONLY | BITMAP1;
+		explode jetb type BITMAPONLY | BITMAP3;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
 		corpsetype = 2;
-		explode base type BITMAPONLY | BITMAP2;
-		explode wake1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
-		explode wake2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
-		explode wake3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode wake4 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode wake5 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
-		explode wake6 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		explode body type BITMAPONLY | BITMAP2;
+		explode jetr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		explode jetl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode jetb type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 		return (0);
 	}
 	corpsetype = 2;
-	explode base type BITMAPONLY | BITMAP2;
-	explode wake1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
-	explode wake2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
-	explode wake3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-	explode wake4 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-	explode wake5 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
-	explode wake6 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		explode body type BITMAPONLY | BITMAP2;
+		explode jetr type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
+		explode jetl type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+		explode jetb type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP4;
 }

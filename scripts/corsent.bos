@@ -154,13 +154,11 @@ FireWeapon1()
 {
 	gun_2 = !gun_2;
 	if( gun_2 ) {
-		show flare1;
-		hide flare1;
+		emit-sfx 1024 from flare1;
 		move barrel1 to z-axis RECOIL_DISTANCE now;
 		move barrel1 to z-axis 0 speed RECOIL_RESTORE_SPEED;
 	} else {
-		show flare2;
-		hide flare2;
+		emit-sfx 1024 from flare2;
 		move barrel2 to z-axis RECOIL_DISTANCE now;
 		move barrel2 to z-axis 0 speed RECOIL_RESTORE_SPEED;
 	}

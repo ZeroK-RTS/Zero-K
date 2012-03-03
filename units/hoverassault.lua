@@ -55,7 +55,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
-      [[custom:beamweapon_mussle_blue]],
+      [[custom:beamweapon_muzzle_blue]],
     },
 
   },
@@ -83,7 +83,7 @@ unitDef = {
       name                    = [[Direct Energy Weapon]],
       areaOfEffect            = 48,
       beamWeapon              = true,
-	  cegTag                  = [[barney_1_1]],
+      cegTag                  = [[beamweapon_muzzle_blue]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -95,7 +95,7 @@ unitDef = {
       },
 
       duration                = 0.3,
-      explosionGenerator      = [[custom:FLASH1blue]],
+      explosionGenerator      = [[custom:beamerray]],
       fireStarter             = 50,
       heightMod               = 1,
       impactOnly              = true,
