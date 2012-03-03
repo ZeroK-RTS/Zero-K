@@ -15,6 +15,7 @@ local SPEED = 3
 
 local SIG_WALK = 1
 local SIG_DEPLOY = 2
+local SIG_BEACON = 2
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -22,6 +23,9 @@ local SIG_DEPLOY = 2
 
 local function Create_Beacon_Thread(x,z)
 	local y = Spring.GetGroundHeight(x,z) or 0
+	
+	Signal(SIG_BEACON)
+	SetSignalMask(SIG_BEACON)
 	
 	activity_mode(3)
 	
@@ -133,13 +137,13 @@ local mode
 
 function activity_mode(n)
 	if (not mode) or mode ~= n then
-		--Spring.Echo(n)
+		Spring.Echo(n)
 		if n < 2 then
 			SetUnitValue(COB.ACTIVATION, 0)
 		elseif mode < 2 then
 			SetUnitValue(COB.ACTIVATION, 1)
 		end
-                
+
 		Spin(holder, z_axis, math.rad(spinmodes[n].holder*holderDirection) )
 		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
 		Spin(sphere, y_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
@@ -158,6 +162,7 @@ local function Walk()
 	Move( body , z_axis, 0, 5 )
 	
 	Signal(SIG_DEPLOY)
+	Signal(SIG_BEACON)
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do

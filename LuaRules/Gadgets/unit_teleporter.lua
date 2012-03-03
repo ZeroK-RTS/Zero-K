@@ -94,12 +94,12 @@ local checkFrame = {}
 -------------------------------------------------------------------------------------
 -- Most script interaction
 
-local function changeSpeed(tid, bid, speed)
+local function changeSpeed(tid, bid, speed, down)
 	local func = Spring.UnitScript.GetScriptEnv(tid).activity_mode
-	Spring.UnitScript.CallAsUnit(tid,func,speed)
+	Spring.UnitScript.CallAsUnit(tid,func,speed, down)
 	if bid then
 		local func = Spring.UnitScript.GetScriptEnv(bid).activity_mode
-		Spring.UnitScript.CallAsUnit(bid,func,speed)
+		Spring.UnitScript.CallAsUnit(bid,func,speed, down)
 	end
 end
 
@@ -118,7 +118,7 @@ local function interruptTeleport(unitID, doNotChangeSpeed)
 		Spring.SetUnitRulesParam(tele[unitID].link,"teleportend",0)
 	end
 
-	if not doNotChangeSpeed then
+	if not doNotChangeSpeed and tele[unitID].deployed then
 		changeSpeed(unitID, tele[unitID].link, 2)
 	end
 end
