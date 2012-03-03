@@ -32,16 +32,19 @@ local function Create_Beacon_Thread(x,z)
 	activity_mode(3)
 	
 	Turn( body , y_axis, math.rad(120), math.rad(80) )
+	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
 	for i = 1, 15 do
 		Sleep(100)
 		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
 	end
 	Turn( body , y_axis, math.rad(240), math.rad(80) )
+	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
 	for i = 1, 15 do
 		Sleep(100)
 		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
 	end
 	Turn( body , y_axis, math.rad(0), math.rad(80) )
+	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
 	for i = 1, 15 do
 		Sleep(100)
 		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
@@ -140,12 +143,11 @@ local mode
 function activity_mode(n)
 	if (not mode) or mode ~= n then
 		if n < 2 then
-            Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 0)
-			--SetUnitValue(COB.ACTIVATION, 0)
+			SetUnitValue(COB.ACTIVATION, 0)
 		elseif mode < 2 then
 			SetUnitValue(COB.ACTIVATION, 1)
 		end
-                
+
 		Spin(holder, z_axis, math.rad(spinmodes[n].holder*holderDirection) )
 		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
 		Spin(sphere, y_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))

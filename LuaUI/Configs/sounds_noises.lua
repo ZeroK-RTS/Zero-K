@@ -453,6 +453,15 @@ local sounds = {
 			volume = 0.7,
 		},
 	},
+	amphtele = {
+		ok = {
+			[1] = "amph_move",
+		},
+		select = {
+			[1] = "teleport_select",
+			volume = 0.7,
+		},
+	},
 	
 	-- Mech
 	armraz = {
@@ -1355,6 +1364,23 @@ local sounds = {
 	corsilo = {
 		select = {
 			[1] = "silo_select",
+		},
+	},
+	wolverine_mine = {
+		ok = {
+			[1] = "turret_move",
+		},
+		select = {
+			[1] = "crawlie_select",
+		},
+	},
+	tele_beacon = {
+		ok = {
+			[1] = "turret_move",
+		},
+		select = {
+			[1] = "teleport_select",
+			volume = 0.7,
 		},
 	},
 	

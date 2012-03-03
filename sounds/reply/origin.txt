@@ -13,6 +13,7 @@ adv_fusion_select.wav - Golgotha
 geo_select.wav - soundsnap.com and Scorched 3D
 cloaker_select.wav - Scorched 3D
 shield_select.wav - Scorched 3D
+teleport_select - Open Game Art
 building_select1.wav - simply the best
 building_select2.wav - Scorched 3D
 factory_select.wav - Golgotha

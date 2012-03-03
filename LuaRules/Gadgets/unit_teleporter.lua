@@ -15,8 +15,8 @@ include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local BEACON_PLACE_RANGE_SQR = 80^2
-local BEACON_PLACE_RANGE_MOVE = 60
+local BEACON_PLACE_RANGE_SQR = 80^2*10000000000000
+local BEACON_PLACE_RANGE_MOVE = 60*1000000000000
 local BEACON_WAIT_RANGE_MOVE = 150
 local BEACON_TELEPORT_RADIUS = 200
 local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
@@ -149,6 +149,7 @@ function GG.tele_createBeacon(unitID,x,z)
 		if tele[unitID].link and Spring.ValidUnitID(tele[unitID].link) then
 			Spring.DestroyUnit(tele[unitID].link, true)
 		end
+		Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, Spring.GetGroundHeight(x,z) or 0, z)
 		local beaconID = Spring.CreateUnit(beaconDef, x, 0, z, 1, Spring.GetUnitTeam(unitID))
 		tele[unitID].link = beaconID
 		beacon[beaconID] = {link = unitID, x = x, z = z}
@@ -341,6 +342,9 @@ function gadget:GameFrame(f)
 							else
 								dy = uy - Spring.GetGroundHeight(ux,uz) + Spring.GetGroundHeight(dx,dz)
 							end
+							
+							Spring.PlaySoundFile("sounds/misc/teleport.wav", 10, ux, uy, uz)
+							Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, dx, dy, dz)
 							
 							Spring.SpawnCEG("teleport_out", ux, uy, uz, 0, 0, 0, size)
 							Spring.SpawnCEG("teleport_in", dx, dy, dz, 0, 0, 0, size)
