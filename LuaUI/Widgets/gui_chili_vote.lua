@@ -12,7 +12,7 @@ function widget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
---//version +0.2; use 'os.clock' instead of 'widget:Update()', and auto-close 'force-start' polls if game starts.
+--//version +0.3;
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local Chili
@@ -44,6 +44,7 @@ local string_vote2 = " option 2 has "
 local string_votetopic = " Do you want to "
 local string_endvote = " poll cancelled"
 local string_titleEnd = "? !vote 1 = yes, !vote 2 = no"
+local string_noVote = "There is no poll going on, start some first"
 
 local springieName = Spring.GetModOptions().springiename or ''
 
@@ -104,7 +105,7 @@ function widget:AddConsoleLine(line,priority)
 	if line:sub(1,springieName:len()) ~= springieName then	-- no spoofing messages
 		return
 	end
-	if line:find(string_success) or line:find(string_fail) or line:find(string_endvote) then	--terminate existing vote
+	if line:find(string_success) or line:find(string_fail) or line:find(string_endvote) or line:find(string_noVote) then	--terminate existing vote
 		pollActive = false
 		screen0:RemoveChild(window)
 		for i=1,2 do
