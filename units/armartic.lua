@@ -22,8 +22,8 @@ unitDef = {
   customParams                  = {
     description_fr = [[Tourelle EMP]],
 	description_de = [[EMP Waffe]],
-    helptext       = [[The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage recieved is reduced to a quarter. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy.]],
-    helptext_fr    = [[le Faraday est une redoutable tour r canon EMP. Sa zone d'effet et sa puissance de feu lui permettent de venir r bout de nombreux ennemis massés, laissant d'autre tirs les achever. Une fois repliée, elle gagne en blindage. Attention cependant r ne pas paralyser ses propres unités avec la zone d'impact EMP.]],
+    helptext       = [[The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a quarter. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy.]],
+    helptext_fr    = [[le Faraday est une redoutable défense EMP à zone d'effêt paralysant les adversaires sans les endommager. Repliée son blindage réduit à un quart les dommages reçus. Attention cependant à ne pas paralyser ses propres unités dans la zone d'effêt EMP.]],
     helptext_de = [[Faraday ist ein schlagkräftiger EMP Turm. Er hat einen großen Radius, sowie hohen Schaden. Er vervollständigt die Effekte anderer Türme, doch alleine ist er ziemlich nutzlos. Falls geschlossen, besitzt er mehr Lebenspunkte. Beachte dennoch seinen Flächenschaden, welcher auch nahegelegene eigene Einheiten paralysieren kann.]],
   },
 

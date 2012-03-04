@@ -673,7 +673,7 @@ function widget:RecvLuaMsg(msg, playerID)
 	local cameraState = PacketToCameraState(msg)
 	
 	if not cameraState then
-		Echo("<LockCamera>: Bad packet recieved.")
+		Echo("<LockCamera>: Bad packet received.")
 		return
 	end
 	

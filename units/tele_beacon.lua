@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[tele_beacon]],
   name                          = [[Lighthouse]],
-  description                   = [[Teleport Bridge Entry Beacon]],
+  description                   = [[Teleport Bridge Entry Beacon linked to Djin, DEFEND to teleport.]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildAngle                    = 4096,
