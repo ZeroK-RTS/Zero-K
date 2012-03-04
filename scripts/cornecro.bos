@@ -4,7 +4,7 @@
 #include "constants.h"
 
 
-piece base, torso, shield, lathe, emit,
+piece base, pelvis, torso, shield, lathe, emit, centerpoint,
 lthigh, luppercalf, llowercalf, lfoot,
 rthigh, ruppercalf, rlowercalf, rfoot; 
 
@@ -31,7 +31,7 @@ Walk()
 	
 //	move base to y-axis [2] speed [4];
 //	turn base to z-axis <8> speed <15>;
-	move base to y-axis [5] speed [3];
+	move pelvis to y-axis [5] speed [3];
 
 	while (TRUE)
 	{
@@ -44,7 +44,7 @@ Walk()
 		turn rfoot to x-axis <-20> speed <50> * PACE;
 		turn lfoot to x-axis <10> speed <50> * PACE;
 	
-		turn base to z-axis <-10> speed <15> * PACE;
+		turn pelvis to z-axis <-10> speed <15> * PACE;
 		move llowercalf to z-axis [-1.1] speed [3]; //down
 		move rlowercalf to z-axis [0] speed [2]; //up
 		move llowercalf to y-axis [-1.1] speed [3]; //down
@@ -63,7 +63,7 @@ Walk()
 		turn lfoot to x-axis <-20> speed <50> * PACE;
 		turn rfoot to x-axis <10> speed <50> * PACE;
 		
-		turn base to z-axis <10> speed <15> * PACE;
+		turn pelvis to z-axis <10> speed <15> * PACE;
 		move rlowercalf to z-axis [-1.1] speed [3]; //down
 		move llowercalf to z-axis [0] speed [2]; //up
 		move rlowercalf to y-axis [-1.1] speed [3]; //down
@@ -120,7 +120,7 @@ StopMoving()
 {
 	bMoving = FALSE;
 	signal SIG_MOVE;
-	move base to y-axis [0] speed [12];
+	move pelvis to y-axis [0] speed [12];
 	turn rthigh to x-axis <0> speed <60> * PACE; //back
 	turn lthigh to x-axis <0> speed <60> * PACE; //forward
 		
@@ -130,7 +130,7 @@ StopMoving()
 	turn rfoot to x-axis <0> speed <50> * PACE;
 	turn lfoot to x-axis <0> speed <50> * PACE;
 	
-	turn base to z-axis <0> speed <15> * PACE;
+	turn pelvis to z-axis <0> speed <15> * PACE;
 	move llowercalf to z-axis [0] speed [3]; //down
 	move rlowercalf to z-axis [0] speed [2]; //up
 	move llowercalf to y-axis [0] speed [3]; //down
@@ -139,7 +139,7 @@ StopMoving()
 
 QueryWeapon1(piecenum)
 {
-	piecenum = torso;
+	piecenum = centerpoint;
 }
 
 AimWeapon1()
