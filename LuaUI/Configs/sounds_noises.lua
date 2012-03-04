@@ -884,97 +884,121 @@ local sounds = {
 		build = "builder_start",
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	armpt = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	coresupp = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	dclship = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	corsub = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "sub_select",
+			volume = 1.1,
 		},
 	},
 	armroy = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	corroy = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	serpent = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "sub_select",
+			volume = 1.1,
 		},
 	},
 	cornukesub = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "sub_select",
+			volume = 1.1,
 		},
 	},
 	armcarry = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	corbats = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	corarch = {
 		ok = {
 			[1] = "rumble2",
+			volume = 1.6,
 		},
 		select = {
 			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	
