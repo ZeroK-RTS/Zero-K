@@ -9,6 +9,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 .8 1 .1   0 0 0 0]],
@@ -36,6 +37,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         delay              = 0,
         explosiongenerator = [[custom:teleport_burst]],
@@ -62,6 +64,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 .8 1 .1   0 0 0 0]],
@@ -91,6 +94,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 .8 1 .1   0 0 0 0]],
@@ -117,6 +121,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[1 1 1 0.1   0 0 0 0]],
@@ -143,6 +148,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 1 1 0.1   0 0 0 0]],
@@ -169,6 +175,7 @@ return {
       class              = [[CSimpleParticleSystem]],
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         airdrag            = 1,
         colormap           = [[0 0 0 0   0 0 0 1   0 0 0 0]],
@@ -198,6 +205,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         airdrag            = 0,
         colormap           = [[1 1 0 .1   0 0 0 0]],
@@ -237,6 +245,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         alpha              = 0.3,
         alwaysvisible      = false,
@@ -251,6 +260,7 @@ return {
       count              = 1,
       ground             = true,
       water              = true,
+	  underwater         = true,
       properties = {
         delay              = 10,
         explosiongenerator = [[custom:teleport_fade]],

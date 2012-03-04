@@ -143,14 +143,16 @@ function GG.tele_undeployTeleport(unitID)
 end
 
 function GG.tele_createBeacon(unitID,x,z)
-	local place, feature = Spring.TestBuildOrder(beaconDef, x, 0 ,z, 1)
+	local y = Spring.GetGroundHeight(x,z)
+	local place, feature = Spring.TestBuildOrder(beaconDef, x, y, z, 1)
 	changeSpeed(unitID, nil, 1)
 	if place == 2 and feature == nil then
 		if tele[unitID].link and Spring.ValidUnitID(tele[unitID].link) then
 			Spring.DestroyUnit(tele[unitID].link, true)
 		end
 		Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, Spring.GetGroundHeight(x,z) or 0, z)
-		local beaconID = Spring.CreateUnit(beaconDef, x, 0, z, 1, Spring.GetUnitTeam(unitID))
+		local beaconID = Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
+		Spring.SetUnitPosition(beaconID, x, y, z)
 		tele[unitID].link = beaconID
 		beacon[beaconID] = {link = unitID, x = x, z = z}
 	end
