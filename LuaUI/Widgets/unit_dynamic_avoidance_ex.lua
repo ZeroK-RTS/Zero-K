@@ -1,9 +1,9 @@
-local versionName = "v2.06"
+local versionName = "v2.1"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
 --  brief:   a collision avoidance system
---  original idea: "non-Linear Dynamic system approach to modelling behavior" -SiomeGoldenstein, Edward Large, DimitrisMetaxas
+--  using: "non-Linear Dynamic system approach to modelling behavior" -SiomeGoldenstein, Edward Large, DimitrisMetaxas
 --	code:  Msafwan
 --
 --  Licensed under the terms of the GNU GPL, v2 or later.
@@ -11,10 +11,10 @@ local versionName = "v2.06"
 --------------------------------------------------------------------------------
 function widget:GetInfo()
   return {
-    name      = "Dynamic Avoidance System",
+    name      = "Dynamic Avoidance System (exp)",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground combat unit and gunships",
     author    = "msafwan",
-    date      = "Feb 28, 2012",
+    date      = "March 4, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -60,11 +60,13 @@ local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
 local CMD_OPT_SHIFT		= CMD.OPT_SHIFT
 --local spRequestPath = Spring.RequestPath
 local mathRandom = math.random
+--local mathMax = math.max
+--local spGetUnitSensorRadius  = Spring.GetUnitSensorRadius
 --------------------------------------------------------------------------------
 -- Constant:
 -- Switches:
 local turnOnEcho =0 --Echo out all numbers for debugging the system (default = 0)
-local activateAutoReverseG=0 --activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
+local activateAutoReverseG=1 --activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
 local activateImpatienceG=0 --auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
 -- Graph constant:
@@ -92,7 +94,7 @@ local dummyIDg = "[]" --fake id for Lua Message to check lag (prevent processing
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
 local noiseAngleG =math.pi/36 --(default is pi/36 rad); add random angle (range from 0 to +-math.pi/36) to the new angle. To prevent a rare state that contribute to unit going straight toward enemy
-local collisionAngleG=math.pi/12 --(default is pi/6 rad) a "field of vision" (range from 0 to +-math.pi/6) where auto-reverse will activate 
+local collisionAngleG=math.pi/36 --(default is pi/6 rad) a "field of vision" (range from 0 to +-math.pi/366) where auto-reverse will activate 
 local fleeingAngleG=math.pi/4 --(default is pi/4 rad) angle of enemy (range from 0 to +-math.pi/4) where fleeing enemy is considered (to de-activate avoidance to perform chase). Set to 0 to de-activate.
 local maximumTurnAngleG = math.pi --safety measure. Prevent overturn (eg: 360+xx degree turn)
 --pi is 180 degrees
@@ -153,14 +155,20 @@ options = {
 		name = 'Enable for ground units',
 		type = 'bool',
 		value = true,
-		desc = 'Enable for ground units. All ground unit will avoid enemy while outside camera view, but units with hold position state is excluded',
+		desc = 'Enable for ground units. All ground unit will avoid enemy while outside camera view OR when reloading, but units with hold position state is excluded',
 	},
 	enableGunship = {
 		name = 'Enable for gunships',
 		type = 'bool',
 		value = true,
-		desc = 'Enable gunship\'s avoidance feature. Gunship avoid enemy while outside camera view.',
+		desc = 'Enable gunship\'s avoidance feature. Gunship avoid enemy while outside camera view OR when reloading, but units with hold position state is excluded.',
 	},
+	-- enableAmphibious = {
+		-- name = 'Enable for amphibious',
+		-- type = 'bool',
+		-- value = true,
+		-- desc = 'Enable amphibious unit\'s avoidance feature (including Commander, and submarine). Unit avoid enemy while outside camera view OR when reloading, but units with hold position state is excluded..',
+	-- },
 	enableReturnToBase = {
 		name = "Find base",
 		type = 'bool',
@@ -284,17 +292,18 @@ function RefreshUnitList(attacker)
 			if (unitSpeed>0) then
 				local unitType = 0 --// category that control WHEN avoidance is activated for each unit. eg: Category 2 only enabled when not in view & when guarding units. Used by 'GateKeeperOrCommandFilter()'
 				local fixedPointType = 1 --//category that control WHICH avoidance behaviour to use. eg: Category 2 priotize avoidance and prefer to ignore user's command when enemy is close. Used by 'CheckWhichFixedPointIsStable()'
-				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com (ZK)
+				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
 					unitType =1 --//this unit type do avoidance even in camera view
 					if options.enableCons.value==false and unitDef["builder"] then --//if Cons epicmenu option is false and it is a constructor, then exclude Cons
 						unitType = 0
 					end
 					if unitDef["canCloak"] then --only cloakies
 						fixedPointType=2 --//use aggressive behaviour (avoid more)
-						if options.enableCloaky.value==false then --//if Cloaky epicmenu option is false then exclude Cloaky
+						if options.enableCloaky.value==false then --//if Cloaky option is false then exclude Cloaky
 							unitType = 0
 						end
 					end
+				--elseif not unitDef["canFly"] and not unitDef["canSubmerge"] then --include all ground unit, but excluding com & amphibious
 				elseif not unitDef["canFly"] then --include all ground unit, including com
 					unitType =2 --//this unit type only have avoidance outside camera view
 					if options.enableGround.value==false then --//if Ground unit epicmenu option is false then exclude Ground unit
@@ -305,6 +314,11 @@ function RefreshUnitList(attacker)
 					if options.enableGunship.value==false then --//if Gunship epicmenu option is false then exclude Gunship
 						unitType = 0
 					end
+				-- elseif not unitDef["canFly"] and unitDef["canSubmerge"] then --include all amphibious unit & com
+					-- unitType =4 --//this unit type only have avoidance outside camera view
+					-- if options.enableAmphibious.value==false then --//if Gunship epicmenu option is false then exclude Gunship
+						-- unitType = 0
+					-- end
 				end
 				if (unitType>0) then
 					local unitShieldPower, reloadableWeaponIndex= -1, -1
@@ -360,7 +374,9 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 					end
 					
 					if surroundingUnits[1]~=nil and not reachedTarget then  --execute when enemy exist and target not reached yet
-						local unitSSeparation=CatalogueMovingObject(surroundingUnits, unitID, lastPosition) --detect initial enemy separation
+						--local unitType =unitInMotion[i][2]
+						--local unitSSeparation, losRadius = CatalogueMovingObject(surroundingUnits, unitID, lastPosition, unitType, losRadius) --detect initial enemy separation & alter losRadius when unit submerged
+						local unitSSeparation, losRadius = CatalogueMovingObject(surroundingUnits, unitID, lastPosition, losRadius) --detect initial enemy separation & alter losRadius when unit submerged
 						arrayIndex=arrayIndex+1 --// increment table index by 1, start at index 2; table lenght is stored at row 1
 						local unitSpeed = unitInMotion[i][3]
 						local impatienceTrigger,commandIndexTable = GetImpatience(newCommand,unitID, commandIndexTable)
@@ -419,16 +435,18 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, net
 				local unitSpeed= surroundingOfActiveUnit[i][7]
 				local impatienceTrigger= surroundingOfActiveUnit[i][8]
 				local lastPosition = surroundingOfActiveUnit[i][9]
-				local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --get new unit separation for comparison
+				local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --get the latest unit list (rather than using the preliminary list) to ensure reliable avoidance
 				local graphCONSTANTtrigger = surroundingOfActiveUnit[i][10] --//fetch information on which aCONSTANT and obsCONSTANT to use
 				local fixedPointCONSTANTtrigger = surroundingOfActiveUnit[i][11] --//fetch information on which fixedPoint constant to use
-				local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger) --calculate move solution
-				local newY=spGetGroundHeight(newX,newZ)
-				commandIndexTable= InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand, now) --send move solution to unit
-				if (turnOnEcho == 1) then
-					Spring.Echo("newX(Update) " .. newX)
-					Spring.Echo("newZ(Update) " .. newZ)
-				end			
+				if (newSurroundingUnits[1] ~=nil) then --//check again if there's still any enemy to avoid. Submerged unit might return empty list if their enemy has no Sonar (their 'losRadius' became half the original value so that they don't detect/avoid unnecessarily). 
+					local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger, newCommand) --calculate move solution
+					local newY=spGetGroundHeight(newX,newZ)
+					commandIndexTable= InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand, now) --send move solution to unit
+					if (turnOnEcho == 1) then
+						Spring.Echo("newX(Update) " .. newX)
+						Spring.Echo("newZ(Update) " .. newZ)
+					end
+				end
 			end
 		end
 	end
@@ -545,8 +563,9 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 			local isReloadingState = (isReloading and (cQueue[1].id == CMD_ATTACK or cQueue[1].id == cMD_DummyG or _2ndAttackSignature)) --any unit with attack command or was idle that is Reloading
 			local isGuardState = (cQueue[1].id == CMD_GUARD or _2ndGuardSignature)
 			if (isValidCommand and isValidUnitTypeOrIsNotVisible) or (isReloadingState and not holdPosition) or (isGuardState) then --execute on: repair (40), build (<0), reclaim (90), ressurect(125), move(10), or FAKE idle COMMAND for: UnitType==1 or for: any unit outside visibility... or on any unit with any command which is reloading.
-				if isReloadingState or #cQueue>=2 then --prevent STOP command from short circuiting the system
-					if isReloadingState or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
+				local isReloadAvoidance = (isReloadingState and not holdPosition)
+				if isReloadAvoidance or #cQueue>=2 then --check cQueue for lenght to prevent STOP command from short circuiting the system 
+					if isReloadAvoidance or cQueue[2].id~=false then --prevent a spontaneous enemy engagement from short circuiting the system
 						allowExecution = true --allow execution
 					end --if cQueue[2].id~=false
 						if (turnOnEcho == 1) then Spring.Echo(cQueue[2].id) end --for debugging
@@ -641,37 +660,40 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker)
 		Spring.Echo("spGetUnitIsDead(unitID)==false (GetAllUnitsInRectangle):")
 		Spring.Echo(spGetUnitIsDead(unitID)==false)
 	end
+	
 	local unitsInRectangle = spGetUnitsInRectangle(x-losRadius, z-losRadius, x+losRadius, z+losRadius)
-
 	local relevantUnit={}
-	local arrayIndex=1	
+	local arrayIndex=1
+	
 	--add attackerID into enemy list
 	relevantUnit, arrayIndex = AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
 	--
 	for _, rectangleUnitID in ipairs(unitsInRectangle) do
 		local isAlly= spIsUnitAllied(rectangleUnitID)
-		if (rectangleUnitID ~= unitID) and not isAlly then--filter out ally units and self
+		if (rectangleUnitID ~= unitID) and not isAlly then --filter out ally units and self
 			local rectangleUnitTeamID = spGetUnitTeam(rectangleUnitID)
 			if (rectangleUnitTeamID ~= gaiaTeamID) then --filter out gaia (non aligned unit)
 				local recUnitDefID = spGetUnitDefID(rectangleUnitID)
-				if recUnitDefID~=nil and (iAmConstructor and iAmNotCloaked) then --if enemy is in plain sight & I am a normal visible constructor: then do the following check before registering enemy
+				local registerEnemy = false
+				if recUnitDefID~=nil and (iAmConstructor and iAmNotCloaked) then --if enemy is in LOS & I am a visible constructor: then
 					local recUnitDef = UnitDefs[recUnitDefID] --retrieve enemy definition
 					local enemyParalyzed,_,_ = spGetUnitIsStunned (rectangleUnitID)
 					if recUnitDef["weapons"][1]~=nil and not enemyParalyzed then -- check enemy for weapons and paralyze effect
-						arrayIndex=arrayIndex+1
-						relevantUnit[arrayIndex]=rectangleUnitID --register the enemy only if it has weapons & wasn't paralyzed
+						registerEnemy = true --register the enemy only if it armed & wasn't paralyzed
 					end
-				else --if enemy is in plain sight & iAm a generic units, then:
+				else --if enemy is detected (in LOS or RADAR), and iAm a generic units OR any cloaked constructor then:
 					if iAmNotCloaked then --if I am not cloaked
 						local enemyParalyzed,_,_ = Spring.GetUnitIsStunned (rectangleUnitID)
 						if not enemyParalyzed then -- check for paralyze effect
-							arrayIndex=arrayIndex+1
-							relevantUnit[arrayIndex]=rectangleUnitID --register all enemy only if it's not paralyzed
+							registerEnemy = true --register enemy if it's not paralyzed
 						end
-					else --if I am cloaked
-						arrayIndex=arrayIndex+1
-						relevantUnit[arrayIndex]=rectangleUnitID --register all enemy (avoid all unit)
+					else --if I am cloaked (constructor or cloakies), then:
+						registerEnemy = true --register all enemy (avoid all unit)
 					end
+				end
+				if registerEnemy then
+					arrayIndex=arrayIndex+1
+					relevantUnit[arrayIndex]=rectangleUnitID --register enemy
 				end
 			end
 		end
@@ -686,41 +708,58 @@ function GetAllUnitsInRectangle(unitID, losRadius, attacker)
 end
 
 --allow a unit to recognize fleeing enemy; so it doesn't need to avoid them
-function CatalogueMovingObject(surroundingUnits, unitID, lastPosition)
+function CatalogueMovingObject(surroundingUnits, unitID, lastPosition, losRadius)
 	local unitsSeparation={}
 	if (surroundingUnits[1]~=nil) then --don't catalogue anything if no enemy exist
-		for i=2,surroundingUnits[1],1 do
+		local unitDepth = 99
+		local sonarDetected = false
+		local halfLosRadius = losRadius/2
+		--if unitType == 4 then --//if unit is amphibious, then:
+			_,unitDepth,_ = spGetUnitPosition(unitID) --//get unit's y-axis. Less than 0 mean submerged.
+		--end
+		for i=2,surroundingUnits[1],1 do --//iterate over all enemy list.
 			local unitRectangleID=surroundingUnits[i]
 			if (unitRectangleID ~= nil) then
 				local relativeAngle 	= GetUnitRelativeAngle (unitID, unitRectangleID)
 				local unitDirection,_,_	= GetUnitDirection(unitID, lastPosition)
 				local unitSeparation	= spGetUnitSeparation (unitID, unitRectangleID)
-				if math.abs(unitDirection- relativeAngle)< (collisionAngleG) then --unit inside the collision angle is catalogued with correct value
+				if math.abs(unitDirection- relativeAngle)< (collisionAngleG) then --unit inside the collision angle is catalogued with a value that is useful for comparision later
 					unitsSeparation[unitRectangleID]=unitSeparation
-				else --unit outside the collision angle is set to arbitrary 999
-					unitsSeparation[unitRectangleID]=999 --set to 999 for other unit so that any normal value will imply an approaching units
+				else --unit outside the collision angle is set to an arbitrary 999 which is not useful for comparision later
+					unitsSeparation[unitRectangleID]=999 --set saperation distance to 999 such that later comparison (which is always smaller than this) imply an approaching units
+				end
+				if unitDepth <0 then --//if unit is submerged, then:
+					--local enemySonarRadius = (spGetUnitSensorRadius(unitRectangleID,"sonar") or 0)
+					local enemyDefID = spGetUnitDefID(unitRectangleID)
+					local enemySonarRadius = (UnitDefs[enemyDefID].sonarRadius or 0)
+					if enemySonarRadius > halfLosRadius then --//check enemy for sonar
+						sonarDetected = true
+					end
 				end
 			end
+		end
+		if (not sonarDetected) and (unitDepth < 0) then --//if enemy doesn't have sonar but Iam still submerged, then:
+			losRadius = halfLosRadius --// halven the unit's 'avoidance' range. Don't need to avoid enemy if enemy are blind.
 		end
 	end
 	if (turnOnEcho == 1) then
 		Spring.Echo("unitSeparation(CatalogueMovingObject):")
 		Spring.Echo(unitsSeparation)
 	end
-	return unitsSeparation
+	return unitsSeparation, losRadius
 end
 
 function GetImpatience(newCommand, unitID, commandIndexTable)
 	local impatienceTrigger=1 --zero will de-activate auto reverse
-	if commandIndexTable[unitID]["patienceIndexA"]>=6 then impatienceTrigger=0 end
+	if commandIndexTable[unitID]["patienceIndexA"]>=6 then impatienceTrigger=0 end --//if impatience index level 6 (after 6 time avoidance) then trigger impatience. Impatience will deactivate/change some values downstream
 	if not newCommand and activateImpatienceG==1 then
-		commandIndexTable[unitID]["patienceIndexA"]=commandIndexTable[unitID]["patienceIndexA"]+1 --increase impatience index
+		commandIndexTable[unitID]["patienceIndexA"]=commandIndexTable[unitID]["patienceIndexA"]+1 --increase impatience index if impatience system is activate
 	end
 	if (turnOnEcho == 1) then Spring.Echo("commandIndexTable[unitID][patienceIndexA] (GetImpatienceLevel) " .. commandIndexTable[unitID]["patienceIndexA"]) end
 	return impatienceTrigger, commandIndexTable
 end
 
-function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger)
+function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger, newCommand)
 	if (unitID~=nil) and (targetCoordinate ~= nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
 		local aCONSTANT 								= aCONSTANTg --attractor constant (amplitude multiplier)
 		local unitDirection, _, usingLastPosition		= GetUnitDirection(unitID, lastPosition) --get unit direction
@@ -750,7 +789,7 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
 		--convert an angular command into a coordinate command
-		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay, usingLastPosition)
+		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay, usingLastPosition, newCommand)
 		if (turnOnEcho == 1) then
 			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
 			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
@@ -1293,7 +1332,7 @@ function CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, 
 end
 
 --convert angular command into coordinate, plus other function
-function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay, usingLastPosition)
+function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay, usingLastPosition, newCommand)
 	local safetyDistanceCONSTANT=safetyDistanceCONSTANTg
 	local timeToContactCONSTANT=timeToContactCONSTANTg
 	local activateAutoReverse=activateAutoReverseG
@@ -1305,11 +1344,15 @@ function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unit
 	local networkDelayDrift = 0
 	if usingLastPosition then  --unit drift contributed by network lag/2 (divide-by-2 for safety margin), only calculated when unit is known to be moving (eg: is using lastPosition to determine direction), but network lag value is not accurate enough to yield an accurate drift prediction.
 		networkDelayDrift = unitSpeed*(networkDelay/2)
+	else --if not using-last-position (eg: initially stationary) then add this backward motion (as 'hax' against unit move toward enemy because of avoidance due to firing/reloading weapon)
+		networkDelayDrift = -1*unitSpeed/2
 	end
 	local maximumVelocity = (nearestFrontObstacleRange- safetyDistanceCONSTANT)/timeToContactCONSTANT --calculate the velocity that will cause a collision within the next "timeToContactCONSTANT" second.
 	activateAutoReverse=activateAutoReverse*impatienceTrigger --activate/deactivate 'autoReverse' if impatience system is used
-	if (velocity >= maximumVelocity) and (activateAutoReverse==1) then velocity = -unitSpeed	end --set to reverse if impact is imminent
-
+	if (velocity >= maximumVelocity) and (activateAutoReverse==1) and (not newCommand) then 
+		velocity = -unitSpeed	--set to reverse if impact is imminent & when autoReverse is active & when isn't a newCommand. NewCommand is TRUE if its on initial avoidance. We don't want auto-reverse on initial avoidance (we rely on normal avoidance first, then auto-reverse if it about to collide with enemy).
+	end 
+	
 	if (turnOnEcho == 1) then 
 		Spring.Echo("maximumVelocity(SendCommand)" .. maximumVelocity) 
 		Spring.Echo("activateAutoReverse(SendCommand)" .. activateAutoReverse)
@@ -1424,7 +1467,7 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 	local newX = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
 	local newZ = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + z
 	
-	if (unitDirection ~= nil) and (networkDelayDrift>0) then --need this check because argument #4 & #5 can be empty (for other usage). Also used in ExtractTarget for GUARD command.
+	if (unitDirection ~= nil) and (networkDelayDrift~=0) then --need this check because argument #4 & #5 can be empty (for other usage). Also used in ExtractTarget for GUARD command.
 		local distanceTraveledDueToNetworkDelay = networkDelayDrift 
 		newX = distanceTraveledDueToNetworkDelay*math.cos(unitDirection) + newX -- translate move command abit further forward; to account for lag. Network Lag makes move command lags behind the unit. 
 		newZ = distanceTraveledDueToNetworkDelay*math.sin(unitDirection) + newZ
