@@ -15,7 +15,7 @@ local spinmodes = {
 
 local holderDirection = plusOrMinusOne()
 local mode
-local soundIndex = 6
+local soundIndex = 9
 
 function activity_mode(n)
 	if (not mode) or mode ~= n then
@@ -27,7 +27,7 @@ function activity_mode(n)
 		end
 		
 		if n == 3 then
-			soundIndex = 6
+			soundIndex = 9
 		end
 		
 		Spin(holder, y_axis, math.rad(spinmodes[n].holder*holderDirection) )
@@ -53,11 +53,11 @@ function startTeleOutLoop_Thread(teleportiee, teleporter)
 		end
 		GG.PokeDecloakUnit(unitID)
 		soundIndex = soundIndex + 1
-		if soundIndex > 5 then
-			Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 0.3, x, y, z)
+		if soundIndex > 8 then
+			Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 0.5, x, y, z)
 			soundIndex = 0
 		end
-		Sleep(300)
+		Sleep(200)
 	end
 end
 
