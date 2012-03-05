@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corroy]],
   name                   = [[Enforcer]],
-  description            = [[Light Missile Cruiser (Skirmisher/Riot Support)]],
+  description            = [[Missile Cruiser (Skirmisher/Riot Support)]],
   acceleration           = 0.039,
   activateWhenBuilt      = true,
   brakeRate              = 0.115,
