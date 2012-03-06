@@ -930,14 +930,15 @@ function widget:Initialize()
 		OnMouseDown = {	function () 
 				local _,_,left,_,right = Spring.GetMouseState()
 				if left then
+					-- FIXME: commanders will still be selected even if not monitored! (category detection donut work)
 					if options.monitoridlecomms.value and options.monitoridlenano.value then
 						Spring.SendCommands({"select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+"})
 					elseif options.monitoridlenano.value then
-						Spring.SendCommands({"select AllMap+_Builder_Not_Commander_Not_Building_Idle+_ClearSelection_SelectOne+"})
+						Spring.SendCommands({"select AllMap+_Builder_Not_Category_Commander_Not_Building_Idle+_ClearSelection_SelectOne+"})
 					elseif options.monitoridlecomms.value then
 						Spring.SendCommands({"select AllMap+_Builder_Not_Building_Not_NameContain_" .. nano_name .. "_Idle+_ClearSelection_SelectOne+"})
 					else
-						Spring.SendCommands({"select AllMap+_Builder_Not_Commander_Not_Building_Not_NameContain_" .. nano_name .. "_Idle+_ClearSelection_SelectOne+"})
+						Spring.SendCommands({"select AllMap+_Builder_Not_Category_Commander_Not_Building_Not_NameContain_" .. nano_name .. "_Idle+_ClearSelection_SelectOne+"})
 					end
 				elseif right and idleCons.count > 0 then
 					Spring.SelectUnitMap(idleCons, false)
