@@ -177,11 +177,11 @@ local function getWeaponInfo(weaponDef, unitDef)
 	local mobile = unitDef.speed > 0
 	local waterWeapon = weaponDef.waterWeapon
 	local ee = weaponDef.edgeEffectiveness
-  
+  Spring.Echo(weaponDef.customParams.weaponvelocity)
 	if (weaponDef.cylinderTargetting >= 100) then
 		retData = {type = "orbital", scatter = scatter}
 	elseif (weaponType == "Cannon") then
-		retData = {type = "ballistic", scatter = scatter, v = weaponDef.customParams.maxvelocity,range = weaponDef.range,
+		retData = {type = "ballistic", scatter = scatter, v = (weaponDef.customParams.weaponvelocity or 0),range = weaponDef.range,
 			mygravity = weaponDef.customParams and weaponDef.customParams.mygravity and weaponDef.customParams.mygravity*800
 		}
 	elseif (weaponType == "MissileLauncher") then
@@ -190,11 +190,11 @@ local function getWeaponInfo(weaponDef, unitDef)
 			turnRate = weaponDef.turnRate
 		end
 		if (weaponDef.wobble > turnRate * 1.4) then
-			scatter = (weaponDef.wobble - weaponDef.turnRate) * weaponDef.customParams.maxvelocity * 16
+			scatter = (weaponDef.wobble - weaponDef.turnRate) * (weaponDef.customParams.weaponvelocity or 0) * 16
 			local rangeScatter = (8 * weaponDef.wobble - weaponDef.turnRate)
 			retData = {type = "wobble", scatter = scatter, rangeScatter = rangeScatter, range = weaponDef.range}
 		elseif (weaponDef.wobble > turnRate) then
-			scatter = (weaponDef.wobble - weaponDef.turnRate) * weaponDef.customParams.maxvelocity * 16
+			scatter = (weaponDef.wobble - weaponDef.turnRate) * (weaponDef.customParams.weaponvelocity or 0) * 16
 			retData = {type = "wobble", scatter = scatter}
 		elseif (weaponDef.tracks) then
 			retData = {type = "tracking"}

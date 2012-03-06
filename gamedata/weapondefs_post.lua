@@ -128,8 +128,8 @@ end
 	if weaponDef.mygravity then
 		weaponDef.customparams.mygravity = weaponDef.mygravity -- For attack AOE widget
     end
-	if weaponDef.maxvelocity then
-		weaponDef.customparams.maxvelocity = weaponDef.maxvelocity -- For attack AOE widget
+	if weaponDef.weaponvelocity then
+		weaponDef.customparams.weaponvelocity = weaponDef.weaponvelocity -- For attack AOE widget
 	end
  end
 
