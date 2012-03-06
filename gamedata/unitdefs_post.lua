@@ -433,21 +433,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Halve maxAngleDif
---
-
-for name, unitDef in pairs(UnitDefs) do
-	if unitDef.weapons then
-		for i, weapon in pairs(unitDef.weapons) do
-			if weapon.maxangledif then
-				weapon.maxangledif = weapon.maxangledif*0.5
-			end
-		end
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Lasercannons going through units fix
 -- 
 

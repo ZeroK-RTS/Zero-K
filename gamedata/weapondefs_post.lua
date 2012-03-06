@@ -122,12 +122,15 @@ end
 -- because the way lua access to unitdefs and weapondefs is setup is insane
 --
  for _, weaponDef in pairs(WeaponDefs) do
-    if weaponDef.mygravity then
-		if not weaponDef.customparams then
-			weaponDef.customparams = {}
-		end
+    if not weaponDef.customparams then
+		weaponDef.customparams = {}
+	end
+	if weaponDef.mygravity then
 		weaponDef.customparams.mygravity = weaponDef.mygravity -- For attack AOE widget
     end
+	if weaponDef.maxvelocity then
+		weaponDef.customparams.maxvelocity = weaponDef.maxvelocity -- For attack AOE widget
+	end
  end
 
 --------------------------------------------------------------------------------

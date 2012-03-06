@@ -172,7 +172,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 
 	local weaponType = weaponDef.type
 	local scatter = weaponDef.accuracy + weaponDef.sprayAngle
-	local aoe = weaponDef.areaOfEffect or weaponDef.damageAreaOfEffect	-- TODO: remove areaOfEffect after 85.0
+	local aoe = weaponDef.damageAreaOfEffect
 	local cost = unitDef.cost
 	local mobile = unitDef.speed > 0
 	local waterWeapon = weaponDef.waterWeapon
@@ -181,7 +181,7 @@ local function getWeaponInfo(weaponDef, unitDef)
 	if (weaponDef.cylinderTargetting >= 100) then
 		retData = {type = "orbital", scatter = scatter}
 	elseif (weaponType == "Cannon") then
-		retData = {type = "ballistic", scatter = scatter, v = weaponDef.maxVelocity,range = weaponDef.range,
+		retData = {type = "ballistic", scatter = scatter, v = weaponDef.customParams.maxvelocity,range = weaponDef.range,
 			mygravity = weaponDef.customParams and weaponDef.customParams.mygravity and weaponDef.customParams.mygravity*800
 		}
 	elseif (weaponType == "MissileLauncher") then
@@ -190,11 +190,11 @@ local function getWeaponInfo(weaponDef, unitDef)
 			turnRate = weaponDef.turnRate
 		end
 		if (weaponDef.wobble > turnRate * 1.4) then
-			scatter = (weaponDef.wobble - weaponDef.turnRate) * weaponDef.maxVelocity * 16
+			scatter = (weaponDef.wobble - weaponDef.turnRate) * weaponDef.customParams.maxvelocity * 16
 			local rangeScatter = (8 * weaponDef.wobble - weaponDef.turnRate)
 			retData = {type = "wobble", scatter = scatter, rangeScatter = rangeScatter, range = weaponDef.range}
 		elseif (weaponDef.wobble > turnRate) then
-			scatter = (weaponDef.wobble - weaponDef.turnRate) * weaponDef.maxVelocity * 16
+			scatter = (weaponDef.wobble - weaponDef.turnRate) * weaponDef.customParams.maxvelocity * 16
 			retData = {type = "wobble", scatter = scatter}
 		elseif (weaponDef.tracks) then
 			retData = {type = "tracking"}
@@ -244,7 +244,7 @@ local function SetupUnitDef(unitDefID, unitDef)
     if (weapon.weaponDef) then
       local weaponDef = WeaponDefs[weapon.weaponDef]
       if (weaponDef) then
-		local aoe = weaponDef.areaOfEffect or weaponDef.damageAreaOfEffect	-- TODO: remove areaOfEffect after 85.0
+		local aoe = weaponDef.damageAreaOfEffect
         if (num == 3 and (unitDef.canDGun or unitDef.canManualFire)--[[TODO: remove canDGun after 85.0]]) then
           dgunInfo[unitDefID] = getWeaponInfo(weaponDef, unitDef)
         elseif (not weaponDef.isShield 

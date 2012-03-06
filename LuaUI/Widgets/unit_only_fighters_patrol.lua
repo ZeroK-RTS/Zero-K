@@ -50,7 +50,7 @@ local function WeaponCanTargetAir(weapon)
 	for name,param in wd:pairs() do
 		Spring.Echo("wd:",name,param)
 	end
-	categories=wd.onlyTargetCategories
+	categories=wd.onlyTargetCategories -- DEPRICATED
 	if categories then
 		for name,value in pairs(categories) do
 			Spring.Echo("wdtc:",name,value)
