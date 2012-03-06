@@ -36,6 +36,20 @@ local function Motion()
 	end
 end
 
+local function shootyThingo()
+	Sleep(33)
+	Move(turret, y_axis, 0,20)
+	Hide(missile)
+	Sleep(1000)
+	Move(turret, y_axis, 20, 20)
+	Show(missile)
+end
+	
+	
+function script.Shot()
+	StartThread(shootyThingo)
+end
+
 function script.StartMoving()
 	StartThread(Motion)
 end

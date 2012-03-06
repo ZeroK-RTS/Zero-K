@@ -31,6 +31,7 @@ unitDef = {
 
   energyUse                     = 1.5,
   explodeAs                     = [[BIG_UNITEX]],
+  floater                       = true,
   footprintX                    = 2,
   footprintZ                    = 2,
   iconType                      = [[staticjammer]],
@@ -42,7 +43,6 @@ unitDef = {
   maxDamage                     = 712,
   maxSlope                      = 36,
   maxVelocity                   = 0,
-  maxWaterDepth                 = 0,
   minCloakDistance              = 100,
   noAutoFire                    = false,
   objectName                    = [[radarjammer.obj]],
