@@ -49,6 +49,9 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	local wname = Spring.GetProjectileName(proID)
 	if passedProjectile[proID] then
 		return true
+	--elseif select(2, Spring.GetProjectilePosition(proID)) < 0 then
+	--	passedProjectile[proID] = true
+	--	return true
 	elseif wname and  shieldCarrierUnitID and shieldEmitterWeaponNum then
 		local wd = WeaponDefNames[wname]
 		if wd and wd.noExplode then
