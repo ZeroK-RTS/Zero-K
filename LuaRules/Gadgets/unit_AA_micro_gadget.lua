@@ -499,19 +499,23 @@ function assignTarget(unitID, refID, allyteam, output)
 	  local state = GetUnitStates(unitID)
       if AAdefbuff.name == "corrl" and output[5] ~= 0 then
 	    --Echo("Land targets in range " .. output[5])
-        AAdef[allyteam].units[refID].landtarget = 1
+        AAdef[allyteam].units[refID].landtarget = true
 		GiveOrder(AAdef[allyteam].units[refID].id, CMD.FIRE_STATE, 2, refID, allyteam)
-	  elseif AAdefbuff.name == "corrl" and output[5] == 0 then
-        AAdef[allyteam].units[refID].landtarget = 1
-		GiveOrder(AAdef[allyteam].units[refID].id, CMD.FIRE_STATE, AAdefbuff.fire, refID, allyteam)
 	  end
     end
-	if AAdefbuff.name == "corrl" and output[2] ~= 0 and assign ~= nil then
-      AAdef[allyteam].units[refID].landtarget = 1
-      GiveOrder(AAdef[allyteam].units[refID].id, CMD.FIRE_STATE, AAdefbuff.fire, refID, allyteam)
-	end
   else
 	notargets = true
+  end
+  if AAdefbuff.name == "corrl" then
+    local landtargets = false
+	if output ~= nil then
+      if output[5] ~= 0 then
+	    landtargets = true
+	  end
+	end
+	if not landtargets and FireState(AAdefbuff.id) ~= AAdefbuff.fire then
+      GiveOrder(AAdef[allyteam].units[refID].id, CMD.FIRE_STATE, AAdefbuff.fire, refID, allyteam)
+	end
   end
   if notargets == true then
     --Echo("no visible air targets")
@@ -1022,6 +1026,13 @@ function IsMorphing(unitID)
   return false
 end
 
+function FireState(unitID)
+  local cmdDescID = FindUnitCmdDesc(unitID, CMD.FIRE_STATE)
+  local cmdDesc = GetUnitCmdDesc(unitID, cmdDescID, cmdDescID)
+  local nparams = cmdDesc[1].params
+  return (nparams[1] + 0)
+end
+
 ------------------------------
 -----------CONSTANTS----------
 
@@ -1146,7 +1157,7 @@ function addAA(unitID, unitDefID, name, allyteam)
 	    teamcount = allyteam
 	  end
 	end
-    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, deactivateorder = false, morph = false, damage = sdamage - 5, landtarget = 0, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
+    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, deactivateorder = false, morph = false, damage = sdamage - 5, landtarget = false, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
     AAdefreference[allyteam].units[unitID] = AAdefmaxcount[allyteam] + 1
     AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] + 1
 end
@@ -1480,7 +1491,7 @@ if IsAA(ud.name) then
 	  local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
 	  if allyteam ~= nil and refID ~= nil and AAdefbuff ~= nil then
 	    --Echo("cloaked state " .. cmdParams[1])
-		if AAdefbuff.landtarget == 0 then
+		if not AAdefbuff.landtarget then
           if cmdParams[1] == 2 then
             AAdef[allyteam].units[refID].cfire = 2
           elseif cmdParams[1] == 1 then
@@ -1488,16 +1499,15 @@ if IsAA(ud.name) then
 	      else
             AAdef[allyteam].units[refID].cfire = 0
           end
-		end
-		if AAdefbuff.landtarget == 1 then
-		  AAdef[allyteam].units[refID].landtarget = 0
+		else
+		  AAdef[allyteam].units[refID].landtarget = false
 		end
 	  end
 	else
 	  local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
 	  if allyteam ~= nil and refID ~= nil and AAdefbuff ~= nil then
-	    --Echo("uncloaked state " .. cmdParams[1])
-		if AAdefbuff.landtarget == 0 then
+		if not AAdefbuff.landtarget then
+		  --Echo("uncloaked state " .. cmdParams[1])
           if cmdParams[1] == 2 then
             AAdef[allyteam].units[refID].fire = 2
           elseif cmdParams[1] == 1 then
@@ -1505,9 +1515,8 @@ if IsAA(ud.name) then
 	      else
             AAdef[allyteam].units[refID].fire = 0
           end
-		end
-		if AAdefbuff.landtarget == 1 then
-		  AAdef[allyteam].units[refID].landtarget = 0
+		else
+		  AAdef[allyteam].units[refID].landtarget = false
 		end
 	  end
 	end
