@@ -1,4 +1,4 @@
-local versionName = "v2.1"
+local versionName = "v2.11"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -546,7 +546,7 @@ function GateKeeperOrCommandFilter (unitID, cQueue, unitInMotionSingleUnit)
 		local state=spGetUnitStates(unitID)
 		local holdPosition= (state.movestate == 0)
 		if ((unitInMotionSingleUnit.isVisible ~= "yes" or isReloading) and (cQueue[1] == nil or #cQueue == 1)) then --if unit is out of user's vision and currently idle/with-singular-mono-command (eg: widget's move order), or is reloading and currently idle/with-singular-mono-command (eg: auto-attack) then:
-			if movestate~= 0 then --if not "hold position"
+			if (holdPosition== false) then --if not "hold position"
 				cQueue={{id = cMD_DummyG, params = {-1 ,-1,-1}, options = {}}, {id = CMD_STOP, params = {-1 ,-1,-1}, options = {}}, nil} --replace with a FAKE COMMAND. Will be used to initiate avoidance on idle unit & non-viewed unit
 			end
 		end
@@ -963,7 +963,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target")
+			--Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target")
 		end
 		boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
@@ -1015,7 +1015,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 				isAreaMode = true
 			else
-				Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
+				--Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
 			end
 		end
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
@@ -1041,7 +1041,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --if no unit then use coordinate
 			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target")
+			--Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
@@ -1064,7 +1064,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			unitDirection, unitPosY,_ = GetUnitDirection(targetUnitID, {nil,nil}) --get target's direction in radian
 			unitPosX, unitPosZ = ConvertToXZ(targetUnitID, unitDirection, 200) --project a target at 200m in front of guarded unit
 		else
-			Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target")
+			--Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
