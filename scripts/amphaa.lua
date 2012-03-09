@@ -68,6 +68,7 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
+	GG.Floating_StopMoving(unitID)
 	Signal(SIG_WALK)
 	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
 	Turn( rcalf , x_axis, 0, math.rad(120)*PACE  )
@@ -98,6 +99,12 @@ function script.AimFromWeapon()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	
+	local reloadState = Spring.GetUnitWeaponState(unitID, 0 , 'reloadState')
+	if reloadState < 0 or reloadState - Spring.GetGameFrame() < 50 then
+		GG.Floating_AimWeapon(unitID)
+	end
+	
 	Signal(SIG_AIM1)
 	SetSignalMask(SIG_AIM1)
 	Turn( torso, y_axis, heading, math.rad(360) )
@@ -105,7 +112,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn( rgun, x_axis, -pitch, math.rad(180) )
 	WaitForTurn(torso, y_axis)
 	WaitForTurn(lgun, x_axis)
-        WaitForTurn(rgun, x_axis)
+    WaitForTurn(rgun, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end

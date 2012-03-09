@@ -407,7 +407,7 @@ local function updateUnits(n)
 			end
 		
 			--Spring.Echo("unit parsed")
-			if not data.active then
+			if (not data.active) or Spring.GetUnitRulesParam(unitID,"disable_tac_ai") == 1 then
 				if data.receivedOrder then
 					local cQueue = spGetCommandQueue(unitID)
 					clearOrder(unitID,data,cQueue)
