@@ -22,10 +22,16 @@ end
 -------------------------------------------------------------------------------------
 
 local corbtrans = UnitDefNames["corbtrans"].id
+local armkam = UnitDefNames["armkam"].id
+local bladew = UnitDefNames["corbtrans"].id
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if unitDefID == corbtrans then
 		Spring.SetUnitWeaponState(unitID,0,{range = 300})
 		Spring.SetUnitWeaponState(unitID,1,{range = 300})
+	elseif unitDefID == armkam then
+		Spring.SetUnitWeaponState(unitID,0,{range = 250})
+	elseif unitDefID == bladew then
+		Spring.SetUnitWeaponState(unitID,0,{range = 220})
 	end
 end
