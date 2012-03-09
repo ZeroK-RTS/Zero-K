@@ -76,11 +76,17 @@ local function addFloat(unitID, unitDefID)
 			float[unitID] = {
 				index = floatByID.count,
 				surfacing = true,
+				prevSurfacing = true,
+				onSurface = false,
 				speed = def.initialRiseSpeed,
 				x = x, y = y, z = z,
 				unitDefID = unitDefID,
 				paraData = {want = false, para = false},
 			}
+			
+			local func = Spring.UnitScript.GetScriptEnv(unitID).Float_startRiseFromFloor
+			Spring.UnitScript.CallAsUnit(unitID,func)
+			
 		else
 			Spring.MoveCtrl.Disable(unitID)
 		end
@@ -115,14 +121,20 @@ end
 --------------------------------------------------------------------------------
 -- Script calls
 
-function GG.Floating_StopMoving(unitID)
-	if floatState[unitID] == FLOAT_ALWAYS and not select(1, Spring.GetUnitIsStunned(unitID)) then
+local function checkAlwaysFloat(unitID)
+	if not select(1, Spring.GetUnitIsStunned(unitID)) then
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local cQueue = Spring.GetCommandQueue(unitID)
 		local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
 		if not moving then
 			addFloat(unitID, unitDefID)
 		end
+	end
+end
+
+function GG.Floating_StopMoving(unitID)
+	if floatState[unitID] == FLOAT_ALWAYS  then
+		checkAlwaysFloat(unitID)
 	end
 end
 
@@ -180,14 +192,27 @@ function gadget:GameFrame(f)
 					local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
 					setSurfaceState(unitID, data.unitDefID, not moving)
 				elseif floatState[unitID] == FLOAT_ATTACK then
-					setSurfaceState(unitID, data.unitDefID, aimWeapon[unitID])
+					setSurfaceState(unitID, data.unitDefID, aimWeapon[unitID] or false)
 				elseif floatState[unitID] == FLOAT_NEVER then
 					setSurfaceState(unitID, data.unitDefID, false)
 				end
 			end
 			
+			-- Animation
+			if data.prevSurfacing ~= data.surfacing then
+				if data.surfacing then
+					local func = Spring.UnitScript.GetScriptEnv(unitID).Float_rising
+					Spring.UnitScript.CallAsUnit(unitID,func)
+				else
+					local func = Spring.UnitScript.GetScriptEnv(unitID).Float_sinking
+					Spring.UnitScript.CallAsUnit(unitID,func)
+					data.onSurface = false
+				end
+				data.prevSurfacing = data.surfacing
+			end
+			
 			-- Accelerate the speed
-			if data.y < def.floatPoint then
+			if data.y <= def.floatPoint then
 				if data.surfacing then
 					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)
 				else
@@ -199,9 +224,30 @@ function gadget:GameFrame(f)
 			
 			-- Add speed to position and update it
 			if data.speed ~= 0 then
+				if not data.onSurface then
+					local waterline = data.y - def.floatPoint
+					if data.speed < 0 and waterline > 0 and waterline < -data.speed then
+						local func = Spring.UnitScript.GetScriptEnv(unitID).Float_crossWaterline
+						Spring.UnitScript.CallAsUnit(unitID,func, data.speed)
+					end
+					if data.speed > 0 and waterline < 0 and -waterline < data.speed then
+						local func = Spring.UnitScript.GetScriptEnv(unitID).Float_crossWaterline
+						Spring.UnitScript.CallAsUnit(unitID,func, data.speed)
+					end
+				end
+				
 				data.y = data.y + data.speed
 				local height = Spring.GetGroundHeight(data.x, data.z)
 				if data.y > height then
+					if data.surfacing and def.stopSpeedLeeway > math.abs(data.speed) and def.stopPositionLeeway > math.abs(data.y - def.floatPoint) then
+						data.speed = 0
+						data.y = def.floatPoint
+						if not data.onSurface then
+							local func = Spring.UnitScript.GetScriptEnv(unitID).Float_stationaryOnSurface
+							Spring.UnitScript.CallAsUnit(unitID,func)
+							data.onSurface = true
+						end
+					end
 					Spring.MoveCtrl.SetPosition(unitID, data.x, data.y, data.z)
 				else
 					Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
@@ -240,6 +286,9 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = unitFloatIdleBehaviour.params})
 		end
 		floatState[unitID] = state
+		if state == FLOAT_ALWAYS then
+			checkAlwaysFloat(unitID)
+		end
 	end
 end
 
