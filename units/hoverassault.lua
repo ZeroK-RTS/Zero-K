@@ -55,7 +55,7 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
-      [[custom:beamweapon_muzzle_blue]],
+      [[custom:beamerray]],
     },
 
   },

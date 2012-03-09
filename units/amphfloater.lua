@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[amphfloater]],
-  name                   = [[Flagnacious]],
+  name                   = [[Buoy]],
   description            = [[Amphibious Floating Bot]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
@@ -64,7 +64,7 @@ unitDef = {
 
   weapons                = {
     {
-      def                = [[GRENADE]],
+      def                = [[CANNON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -79,8 +79,8 @@ unitDef = {
 
   weaponDefs             = {
 
-	GRENADE = {
-      name                    = [[Grenade Launcher]],
+	CANNON = {
+      name                    = [[Cannon]],
       accuracy                = 200,
       areaOfEffect            = 32,
       craterBoost             = 1,
@@ -97,9 +97,8 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       interceptedByShieldType = 2,
-      model                   = [[diskball.s3o]],
       projectiles             = 1,
-      range                   = 360,
+      range                   = 430,
       reloadtime              = 2.2,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med6]],
@@ -111,7 +110,7 @@ unitDef = {
       startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 300,
+      weaponVelocity          = 260,
 	},
 
   },
@@ -120,7 +119,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Flagnacious]],
+      description      = [[Wreckage - Buoy]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 900,
@@ -140,7 +139,7 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Flagnacious]],
+      description      = [[Debris - Buoy]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 900,
