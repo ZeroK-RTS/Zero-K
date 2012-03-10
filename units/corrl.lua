@@ -24,6 +24,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    usetacai       = [[1]],
     description_fr = [[Tourelle Lance-Missile Légcre]],
 	description_de = [[Leichter Raketenturm (Flugabwehr/Skirmish)]],
     helptext       = [[The Defender is a light multi-purpose missile tower. It is good for sniping units from a distance, providing some degree of anti-air protection, and skirmishing enemy LLTs from outside their range. However, it breaks when you sneeze on it.]],

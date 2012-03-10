@@ -116,7 +116,7 @@ local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical
 local tacticalAIUnits = {}
 
 for unitDefName, behaviourData in pairs(tacticalAIDefs) do
-        tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
+    tacticalAIUnits[unitDefName] = {value = (behaviourData.defaultAIState or behaviourDefaults.defaultState) == 1}
 end
 
 local unitAlreadyAdded = {}
@@ -275,12 +275,12 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
 
-    if tacticalAIUnits[defName] then
+    if tacticalAIUnits[defName] or (ud.customParams and ud.customParams.usetacai) then
 		options[defName .. "_tactical_ai"] = {
 			name = "  Smart AI",
 			desc = "Smart AI: check box to turn it on",
 			type = 'bool',
-			value = tacticalAIUnits[defName].value,
+			value = (tacticalAIUnits[defName] and tacticalAIUnits[defName].value) or (ud.customParams and ud.customParams.usetacai) or 1,
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_tactical_ai"
@@ -476,7 +476,6 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 		if options[name .. "_constructor_buildpriority"] and options[name .. "_constructor_buildpriority"].value then
 			if options[name .. "_constructor_buildpriority"].value == -1 then
 				local priority = Spring.GetUnitRulesParam(factID,"buildpriority")
-				Spring.Echo(priority)
 				if priority then
 					Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, {"shift"})
 				end

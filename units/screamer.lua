@@ -24,6 +24,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    usetacai       = [[1]],
     description_fr = [[Tourelle Lance Missile Anti-Air Longue Portée]],
 	description_de = [[Extrem weitreichender Flugabwehrraketenturm]],
     helptext       = [[The Screamer is an extremely long-ranging first strike anti-air weapon that sends a clear message to enemy aircraft - can't go here, sonny. Each shot must be stockpiled at the cost of 80 resources, but this is well worth the price, for a quick salvo of missiles will wipe out almost any air attack without fuss.]],

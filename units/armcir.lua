@@ -25,6 +25,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
+    usetacai       = [[1]],
     description_fr = [[Batterie de Missiles Anti-Air ? Moyenne Port?e]],
 	description_de = [[Weitreichende Anti-Air Raketenbatterie]],
 	helptext_de    = [[Der Chainsaw ist eine weitreichendes Anit-Air Geschütz, welches massiv Schaden austeilt und sogar Bomber vom Himmel holen kann. Dennoch kann es nicht viel Schaden einstecken und versagt kläglich, wenn es direkt angegriffen wird.]],

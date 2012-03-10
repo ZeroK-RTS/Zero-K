@@ -92,15 +92,16 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 750,
-        planes  = 750,
-        subs    = 3.75,
+        default = 800,
+        planes  = 800,
+        subs    = 4,
       },
 
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 100,
       flighttime              = 14,
+	  impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
