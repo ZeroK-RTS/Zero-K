@@ -1,4 +1,4 @@
-local versionName = "v2.11"
+local versionName = "v2.12"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -1395,10 +1395,10 @@ function FindSafeHavenForCons(unitID, now)
 			if (unitSpeed>0) then --//if moving units
 				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --if cloakies and constructor, and not com (ZK)
 					--intentionally empty. Not include cloakies and builder.
-				elseif not unitDef["canFly"] then --if all ground unit
+				elseif not unitDef["canFly"] then --if all ground unit, amphibious, and ships
 					unorderedUnitList[unitID_list] = {x,y,z} --//store
 				elseif (unitDef.hoverAttack== true) then --if gunships
-					unorderedUnitList[unitID_list] = {x,y,z} --//store
+					--intentionally empty. Not include gunships.
 				end
 			else --if buildings
 				unorderedUnitList[unitID_list] = {x,y,z} --//store
@@ -1553,9 +1553,12 @@ function NearestSafeCoordinate (unitID, safeHavenCoordinates, nearestSafeHavenDi
 		local pathOpen = false
 		local validX = 0
 		local validZ = 0
-		for i=1, 5, 1 do --//randomly select position around 100-meter from the center for 5 times before giving up, if given up: it imply that this position is too congested for retreating.
-			local xDirection = mathRandom(-1,1)
-			local zDirection = mathRandom(-1,1)
+		local positionToCheck = {{0,0},{1,1},{-1,-1},{1,-1},{-1,1},{0,1},{0,-1},{1,0},{-1,0}}
+		for i=1, 9, 1 do --//randomly select position around 100-meter from the center for 5 times before giving up, if given up: it imply that this position is too congested for retreating.
+			--local xDirection = mathRandom(-1,1)
+			--local zDirection = mathRandom(-1,1)
+			local xDirection = positionToCheck[i][1]
+			local zDirection = positionToCheck[i][2]
 			validX = safeHavenCoordinates[j][1] + (xDirection*100 + xDirection*mathRandom(0,100))
 			validZ = safeHavenCoordinates[j][3] + (zDirection*100 + zDirection*mathRandom(0,100))
 			local units = spGetUnitsInRectangle( validX-40, validZ-40, validX+40, validZ+40 )
