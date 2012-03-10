@@ -12,7 +12,7 @@ unitDef = {
   buildoptions           = {
   },
 
-  buildPic               = [[amphraider.png]],
+  buildPic               = [[amphfloater.png]],
   buildTime              = 300,
   canAttack              = true,
   canGuard               = true,

@@ -4,10 +4,13 @@ local base, body, turret, torpedo = piece('base', 'body', 'turret', 'torpedo')
 local rbarrel1, rbarrel2, lbarrel1, lbarrel2, rflare, lflare, mflare = piece('rbarrel1', 'rbarrel2', 'lbarrel1', 'lbarrel2', 'rflare', 'lflare', 'mflare')
 local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot =  piece('rfleg', 'rffoot', 'lfleg', 'lffoot', 'rbleg', 'rbfoot', 'lbleg', 'lbfoot')
 
+local vents = {piece('ventf1', 'ventf2', 'ventr1', 'ventr2', 'ventr3')}
+
 local SIG_WALK = 1
 local SIG_AIM = 2
 local SIG_RESTORE = 4
 local SIG_BOB = 8
+local SIG_FLOAT = 32
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -28,35 +31,46 @@ local function Bob()
 	end
 end
 
+local function SinkBubbles()
+    SetSignalMask(SIG_FLOAT)
+    while true do
+        for i=1,#vents do
+            EmitSfx(vents[i], SFX.BUBBLE)
+        end
+        Sleep(66)
+    end
+end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim gadget callins
 
 function Float_startFromFloor()
 	Signal(SIG_WALK)
+        Signal(SIG_FLOAT)
 	StartThread(Bob)
 end
 
 function Float_stopOnFloor()
 	Signal(SIG_BOB)
+        Signal(SIG_FLOAT)
 end
---[[
-function Float_rising()
 
+function Float_rising()
+        Signal(SIG_FLOAT)
 end
 
 function Float_sinking()
-
+        Signal(SIG_FLOAT)
+        StartThread(SinkBubbles)
 end
 
 function Float_crossWaterline(speed)
-
+        --Signal(SIG_FLOAT)
 end
 
 function Float_stationaryOnSurface()
-
+        Signal(SIG_FLOAT)
 end
---]]
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------

@@ -4,6 +4,7 @@ include "constants.lua"
 
 local base, head, body, barrel, firepoint = piece('base', 'head', 'body', 'barrel', 'firepoint')
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
+local vent1, vent2 = piece('vent1', 'vent2')
 
 smokePiece = {body}
 --------------------------------------------------------------------------------------
@@ -33,6 +34,7 @@ local SIG_AIM1 = 2
 local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_BOB = 16
+local SIG_FLOAT = 32
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -53,35 +55,46 @@ local function Bob()
 	end
 end
 
+local function SinkBubbles()
+    SetSignalMask(SIG_FLOAT)
+    while true do
+        EmitSfx(vent1, SFX.BUBBLE)
+        EmitSfx(vent2, SFX.BUBBLE)
+        Sleep(66)
+    end
+end
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim gadget callins
 
 function Float_startFromFloor()
 	Signal(SIG_WALK)
+        Signal(SIG_FLOAT)
 	StartThread(Bob)
 end
 
 function Float_stopOnFloor()
 	Signal(SIG_BOB)
+        Signal(SIG_FLOAT)
 end
---[[
-function Float_rising()
 
+function Float_rising()
+        Signal(SIG_FLOAT)
 end
 
 function Float_sinking()
-
+        Signal(SIG_FLOAT)
+        StartThread(SinkBubbles)
 end
 
 function Float_crossWaterline(speed)
-
+        --Signal(SIG_FLOAT)
 end
 
 function Float_stationaryOnSurface()
-
+        Signal(SIG_FLOAT)
 end
---]]
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------

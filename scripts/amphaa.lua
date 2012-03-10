@@ -2,9 +2,10 @@
 
 include "constants.lua"
 
-local base, pelvis, torso, aimpoint = piece('base', 'pelvis', 'torso')
+local base, pelvis, torso, vent = piece('base', 'pelvis', 'torso', 'vent')
 local rthigh, rcalf, rfoot, lthigh, lcalf, lfoot = piece('rthigh', 'rcalf', 'rfoot', 'lthigh', 'lcalf', 'lfoot')
 local lgun, lbarrel1, lbarrel2, rgun, rbarrel1, rbarrel2 = piece('lgun', 'lbarrel1', 'lbarrel2', 'rgun', 'rbarrel1', 'rbarrel2')
+
 
 local firepoints = {lbarrel1, rbarrel1, lbarrel2, rbarrel2}
 
@@ -53,6 +54,36 @@ local function Bob()
 	end
 end
 
+local function FloatBubbles()
+    --[[
+    SetSignalMask(SIG_FLOAT)
+    local isSubmerged = true
+    while true do
+        --EmitSfx(vent, SFX.BUBBLE)
+        
+        if isSubmerged then -- water breaking anim - kind of overkill?
+            local x,y,z = Spring.GetUnitPosition(unitID)
+            y = y + Spring.GetUnitHeight(unitID)*0.5
+            if y > 0 then
+                --Spring.Echo("splash")
+                Spring.SpawnCEG("water_breaksurface", x, 0, z, 0, 1, 0, 20, 0)
+                isSubmerged = false
+            end
+        end
+        Sleep(33)
+        
+    end
+    ]]
+end
+
+local function SinkBubbles()
+    SetSignalMask(SIG_FLOAT)
+    while true do   --FIXME: not stopped when sinking ends!
+        EmitSfx(vent, SFX.BUBBLE)
+        Sleep(66)
+    end
+end
+
 local function riseFloat_thread()
 	if floatState ~= 0 then
 		floatState = 0
@@ -61,6 +92,8 @@ local function riseFloat_thread()
 	end
 	Signal(SIG_FLOAT)
 	SetSignalMask(SIG_FLOAT)
+        --StartThread(FloatBubbles)
+        
 	Turn(lthigh ,x_axis, math.rad(30), math.rad(240))
 	Turn(lcalf ,x_axis, math.rad(-50), math.rad(240))
 	Turn(lfoot ,x_axis, math.rad(80), math.rad(240))
@@ -106,10 +139,9 @@ local function staticFloat_thread()
 	else
 		return
 	end
-	
 	Signal(SIG_FLOAT)
 	SetSignalMask(SIG_FLOAT)
-	
+        
 	Turn(lcalf ,x_axis, math.rad(-55-20), math.rad(50))
 	Turn(lfoot ,x_axis, math.rad(80+20), math.rad(50))
 	Turn(rcalf ,x_axis, math.rad(-55+20), math.rad(50))
@@ -190,6 +222,7 @@ end
 
 function Float_sinking()
 	StartThread(sinkFloat_thread)
+        StartThread(SinkBubbles)
 end
 
 function Float_crossWaterline(speed)
