@@ -59,6 +59,15 @@ local floatState = {}
 local aimWeapon = {}
 
 --------------------------------------------------------------------------------
+-- Communication to script
+
+local function callScript(unitID, funcName, args)
+	local func = Spring.UnitScript.GetScriptEnv(unitID)[funcName]
+	if func then
+		Spring.UnitScript.CallAsUnit(unitID,func, args)
+	end
+end
+--------------------------------------------------------------------------------
 -- Float Table Manipulation
 
 local function addFloat(unitID, unitDefID)
@@ -69,7 +78,7 @@ local function addFloat(unitID, unitDefID)
 		Spring.MoveCtrl.SetNoBlocking(unitID, true)
 		local place, feature = Spring.TestBuildOrder(unitDefID, x, y ,z, 1)
 		Spring.MoveCtrl.SetNoBlocking(unitID, false)
-		if y < def.floatPoint and place == 2 then
+		if y < def.depthRequirement and place == 2 then
 			Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
 			floatByID.count = floatByID.count + 1
 			floatByID.data[floatByID.count] = unitID
@@ -78,15 +87,12 @@ local function addFloat(unitID, unitDefID)
 				surfacing = true,
 				prevSurfacing = true,
 				onSurface = false,
+				justStarted = true,
 				speed = def.initialRiseSpeed,
 				x = x, y = y, z = z,
 				unitDefID = unitDefID,
 				paraData = {want = false, para = false},
 			}
-			
-			local func = Spring.UnitScript.GetScriptEnv(unitID).Float_startRiseFromFloor
-			Spring.UnitScript.CallAsUnit(unitID,func)
-			
 		else
 			Spring.MoveCtrl.Disable(unitID)
 		end
@@ -162,6 +168,13 @@ function gadget:GameFrame(f)
 			local data = float[unitID]
 			local def = floatDefs[data.unitDefID]
 			
+			-- This cannot be done when the float is added because that will often be
+			-- the result of a unit script. Strange trigger inheritence bleh!
+			if data.justStarted then
+				callScript(unitID, "Float_startFromFloor")
+				data.justStarted = nil
+			end
+			
 			-- Check various paralysis conditions
 			if checkStun then
 				local stun
@@ -201,11 +214,9 @@ function gadget:GameFrame(f)
 			-- Animation
 			if data.prevSurfacing ~= data.surfacing then
 				if data.surfacing then
-					local func = Spring.UnitScript.GetScriptEnv(unitID).Float_rising
-					Spring.UnitScript.CallAsUnit(unitID,func)
+					callScript(unitID, "Float_rising")
 				else
-					local func = Spring.UnitScript.GetScriptEnv(unitID).Float_sinking
-					Spring.UnitScript.CallAsUnit(unitID,func)
+					callScript(unitID, "Float_sinking")
 					data.onSurface = false
 				end
 				data.prevSurfacing = data.surfacing
@@ -219,7 +230,7 @@ function gadget:GameFrame(f)
 					data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
 				end
 			else
-				data.speed = data.speed + def.airAccel
+				data.speed = (data.speed + def.airAccel)*def.airDrag
 			end
 			
 			-- Add speed to position and update it
@@ -227,12 +238,10 @@ function gadget:GameFrame(f)
 				if not data.onSurface then
 					local waterline = data.y - def.floatPoint
 					if data.speed < 0 and waterline > 0 and waterline < -data.speed then
-						local func = Spring.UnitScript.GetScriptEnv(unitID).Float_crossWaterline
-						Spring.UnitScript.CallAsUnit(unitID,func, data.speed)
+						callScript(unitID, "Float_crossWaterline", {data.speed})
 					end
 					if data.speed > 0 and waterline < 0 and -waterline < data.speed then
-						local func = Spring.UnitScript.GetScriptEnv(unitID).Float_crossWaterline
-						Spring.UnitScript.CallAsUnit(unitID,func, data.speed)
+						callScript(unitID, "Float_crossWaterline", {data.speed})
 					end
 				end
 				
@@ -243,8 +252,7 @@ function gadget:GameFrame(f)
 						data.speed = 0
 						data.y = def.floatPoint
 						if not data.onSurface then
-							local func = Spring.UnitScript.GetScriptEnv(unitID).Float_stationaryOnSurface
-							Spring.UnitScript.CallAsUnit(unitID,func)
+							callScript(unitID, "Float_stationaryOnSurface")
 							data.onSurface = true
 						end
 					end
@@ -255,6 +263,7 @@ function gadget:GameFrame(f)
 					Spring.MoveCtrl.Disable(unitID)
 					Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
 					Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+					callScript(unitID, "Float_stopOnFloor")
 					removeFloat(unitID)
 					
 					i = i - 1 
