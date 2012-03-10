@@ -234,8 +234,6 @@ end
 
 function script.AimFromWeapon(num)
 	if num == 2 then
-		Spring.Echo("why does AimFromWeapon call all the time?!?!??!?!")
-		GG.Floating_AimWeapon(unitID)
 		return turret
 	elseif num == 1 then
 		return torpedo
@@ -253,6 +251,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 2 then
+		GG.Floating_AimWeapon(unitID)
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		Turn(turret, y_axis, heading, math.rad(180))
