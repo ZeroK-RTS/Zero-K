@@ -3,7 +3,7 @@ local weaponDef = {
     name                    = [[Disruptor Bomb]],
     accuracy                = 256,
     areaOfEffect            = 512,
-	--cegTag                  = [[torpedo_trail]],
+	cegTag                  = [[beamweapon_muzzle_purple]],
     commandFire             = true,
     craterBoost             = 0,
     craterMult              = 0,
@@ -21,7 +21,7 @@ local weaponDef = {
 		subs    = 17.5,
     },
 
-    explosionGenerator      = [[custom:riotballplus]],
+    explosionGenerator      = [[custom:riotballplus2_purple]],
     fireStarter             = 100,
     impulseBoost            = 0,
     impulseFactor           = 0,
