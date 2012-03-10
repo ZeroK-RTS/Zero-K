@@ -4,7 +4,7 @@ include "constants.lua"
 
 local base, head, body, barrel, firepoint = piece('base', 'head', 'body', 'barrel', 'firepoint')
 local rthigh, rshin, rfoot, lthigh, lshin, lfoot = piece('rthigh', 'rshin', 'rfoot', 'lthigh', 'lshin', 'lfoot')
-local vent1, vent2 = piece('vent1', 'vent2')
+local vent1, vent2, vent3 = piece('vent1', 'vent2', 'vent3')
 
 smokePiece = {body}
 --------------------------------------------------------------------------------------
@@ -60,6 +60,7 @@ local function SinkBubbles()
     while true do
         EmitSfx(vent1, SFX.BUBBLE)
         EmitSfx(vent2, SFX.BUBBLE)
+        EmitSfx(vent3, SFX.BUBBLE)
         Sleep(66)
     end
 end
