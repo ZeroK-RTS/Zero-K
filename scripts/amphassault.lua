@@ -20,20 +20,20 @@ local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
 	
-	Turn( rfleg, x_axis, math.rad(0),math.rad(60))
-	Turn( rffoot, x_axis, math.rad(0),math.rad(60))
+	Turn( rfleg, x_axis, math.rad(20),math.rad(60))
+	Turn( rffoot, x_axis, math.rad(-20),math.rad(60))
 	
-	Turn( rbleg, x_axis, math.rad(0),math.rad(60))
-	Turn( rbfoot, x_axis, math.rad(0),math.rad(60))
+	Turn( rbleg, x_axis, math.rad(-20),math.rad(60))
+	Turn( rbfoot, x_axis, math.rad(20),math.rad(60))
 	
 	Move( rfleg, y_axis, 0,1)
 	Move( rbleg, y_axis, 0,1)
 	
-	Turn( lfleg, x_axis, math.rad(0),math.rad(60))
-	Turn( lffoot, x_axis, math.rad(0),math.rad(60))
+	Turn( lfleg, x_axis, math.rad(20),math.rad(60))
+	Turn( lffoot, x_axis, math.rad(-20),math.rad(60))
 	
-	Turn( lbleg, x_axis, math.rad(0),math.rad(60))
-	Turn( lbfoot, x_axis, math.rad(0),math.rad(60))
+	Turn( lbleg, x_axis, math.rad(-20),math.rad(60))
+	Turn( lbfoot, x_axis, math.rad(20),math.rad(60))
 	
 	Move( lfleg, y_axis, 0,1)
 	Move( lbleg, y_axis, 0,1)
@@ -52,7 +52,26 @@ end
 
 local function SinkBubbles()
     SetSignalMask(SIG_FLOAT)
-    while true do
+    
+	Turn( rfleg, x_axis, math.rad(0),math.rad(20))
+	Turn( rffoot, x_axis, math.rad(0),math.rad(20))
+	
+	Turn( rbleg, x_axis, math.rad(0),math.rad(20))
+	Turn( rbfoot, x_axis, math.rad(0),math.rad(20))
+	
+	Move( rfleg, y_axis, 0,1)
+	Move( rbleg, y_axis, 0,1)
+	
+	Turn( lfleg, x_axis, math.rad(0),math.rad(20))
+	Turn( lffoot, x_axis, math.rad(0),math.rad(20))
+	
+	Turn( lbleg, x_axis, math.rad(0),math.rad(20))
+	Turn( lbfoot, x_axis, math.rad(0),math.rad(20))
+	
+	Move( lfleg, y_axis, 0,1)
+	Move( lbleg, y_axis, 0,1)
+	
+	while true do
         for i=1,#vents do
             EmitSfx(vents[i], SFX.BUBBLE)
         end
@@ -79,8 +98,8 @@ function Float_rising()
 end
 
 function Float_sinking()
-        Signal(SIG_FLOAT)
-        StartThread(SinkBubbles)
+	Signal(SIG_FLOAT)
+	StartThread(SinkBubbles)
 end
 
 function Float_crossWaterline(speed)
@@ -106,6 +125,10 @@ local SPEED = 1.9
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	
+	Turn(base, x_axis, 0, math.rad(20))
+	Turn(base, z_axis, 0, math.rad(20))
+	Move(base, y_axis, 0, 10)
 
 	while true do
 		

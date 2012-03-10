@@ -105,6 +105,11 @@ local gun_1 = 1
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	
+	Turn(base, x_axis, 0, math.rad(20))
+	Turn(base, z_axis, 0, math.rad(20))
+	Move(base, y_axis, 0, 10)
+	
 	while true do
 		--left leg up, right leg back
 		Turn(lthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
