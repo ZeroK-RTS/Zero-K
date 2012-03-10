@@ -3,7 +3,7 @@ return {
 		
     groundsmoke = {
       class              = [[CSimpleParticleSystem]],
-      count              = 2,
+      count              = 1,
       ground             = 0,	
 						unit = 1,
 
@@ -15,7 +15,7 @@ return {
         emitrotspread      = 20,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, 2, 0]],
-        numparticles       = 3,
+        numparticles       = 1,
         particlelife       = 4,
         particlelifespread = 10,
         particlesize       = 4,
@@ -28,12 +28,12 @@ return {
         texture            = [[smokesmall]],
       },
     },
-				
-				    flash = {
+	
+	flash = {
       class              = [[CSimpleParticleSystem]],
-      count              = 2,
+      count              = 1,
       ground             = 1,	
-						air = 1,
+      air = 1,
 
       properties = {
         airdrag            = 0.8,
@@ -43,7 +43,7 @@ return {
         emitrotspread      = 20,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, 2, 0]],
-        numparticles       = 3,
+        numparticles       = 1,
         particlelife       = 8,
         particlelifespread = 8,
         particlesize       = 4,
@@ -56,9 +56,9 @@ return {
         texture            = [[flare]],
       },
     },
-								    flash2 = {
+	flash2 = {
       class              = [[CSimpleParticleSystem]],
-      count              = 2,
+      count              = 1,
       ground             = 1,	
 						air = 1,
 
@@ -83,12 +83,11 @@ return {
         texture            = [[flare]],
       },
     },
-				
-				
-				    stacheln1 = {
+	
+	stacheln1 = {
       air                = true,
       class              = [[explspike]],
-      count              = 8,
+      count              = 2,
       ground             = true,
       water              = true,
       properties = {
@@ -102,9 +101,10 @@ return {
         width              = 20,
       },
     },
-				    funken = {
+	
+	funken = {
       class              = [[CSimpleParticleSystem]],
-      count              = 5,
+      count              = 1,
       ground             = true,
       unit               = 1,
       properties = {
@@ -128,9 +128,8 @@ return {
         texture            = [[gunshot]],
       },
     },
-				
-				
-											    yudell = {
+
+	yudell = {
       air                = false,
       class              = [[CSimpleGroundFlash]],
       count              = 1,
@@ -138,15 +137,15 @@ return {
       water              = false,
       properties = {
         
-        colormap           = [[0.6 0.25 1 1  0.4 0.2 1 1    0 0 0 0]],
+        colormap           = [[0.6 0.25 1 0.2  0.4 0.2 1 0.2    0 0 0 0]],
         size               = 80,
         sizegrowth         = [[-1.25]],
         texture            = [[groundflash]],	
         ttl                = 60,
       },
     },	
-				
-															    yudell3 = {
+	
+	yudell3 = {
       air                = false,
       class              = [[CSimpleGroundFlash]],
       count              = 1,
@@ -154,7 +153,7 @@ return {
       water              = false,
       properties = {
         
-        colormap           = [[1 1 0 1  1 .45 0 1     0 0 0 0]],
+        colormap           = [[1 1 0 0.2  1 .45 0 0.2     0 0 0 0]],
         size               = 20,
         sizegrowth         = [[-1.25]],
         texture            = [[groundflash]],	

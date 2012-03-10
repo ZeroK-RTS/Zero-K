@@ -70,6 +70,8 @@ local resources = {
 			explo='GPL/fire.png',
 	  -- MANUAL
 
+	  flaredark='flaredark.png',
+	  
       AAsmoketrail= "AAsmoketrail.tga",
       bigexplo= "cc/bigexplo.tga",
       bloodblast= "pd/bloodblast.png",
@@ -118,6 +120,7 @@ local resources = {
       kfoam= "other/foam.tga",
       kfoom= "other/foom.tga",
       largelaser= "gpl/largelaserfalloff.png",
+	  largelaserdark= "gpl/largelaserfalloffdark.png",
       lightb= "pd/lightningball.tga",
       lightb3= "pd/lightningball3.tga",
       lightb4= "pd/lightningball4.tga",
@@ -146,6 +149,7 @@ local resources = {
 	  shield3mist= "pd/shield3mist.png",
 	  shield3wake= "pd/shield3wake.png",
       smallflare= "gpl/smallflare.tga",
+	  smallflaredark= "gpl/smallflaredark.png",
       smoke= "pd/smokesmall.tga",
       smokesmall= "pd/smokesmall.tga",
       smoketrailthinner= "pd/smoketrailthinner.tga",

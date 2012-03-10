@@ -88,6 +88,22 @@ function script.AimWeapon(weaponNum, heading, pitch)
 	return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
 end
 
+--[[
+-- multi-emit workaround
+function script.BlockShot(num)
+	local px, py, pz = Spring.GetUnitPosition(unitID)
+	Spring.PlaySoundFile("sounds/weapon/laser/heavy_laser6.wav", 10, px, py, pz)
+	return false
+end
+
+function script.Shot(weaponNum)
+	EmitSfx(fire, FIRE_W1)
+	EmitSfx(fire, FIRE_W1)
+	EmitSfx(fire, FIRE_W1)
+	EmitSfx(fire, FIRE_W1)
+end
+--]]
+
 function script.AimFromWeapon(weaponNum)
 	return barrel
 end

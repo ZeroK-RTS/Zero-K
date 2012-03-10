@@ -68,7 +68,7 @@ unitDef = {
 
   weapons                       = {
 
-    {
+	{
       def                = [[ATA]],
       badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
@@ -90,9 +90,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 4000,
-        planes  = 4000,
-        subs    = 200,
+        default = 800,
+        planes  = 800,
+        subs    = 40,
       },
 
       explosionGenerator      = [[custom:ataalaser]],
@@ -104,15 +104,17 @@ unitDef = {
       laserFlareSize          = 16.94,
       minIntensity            = 1,
       noSelfDamage            = true,
+	  projectiles             = 5,
       range                   = 1250,
       reloadtime              = 8,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
+	  soundStartVolume        = 3,
       targetMoveError         = 0.3,
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
+      texture1                = [[largelaserdark]],
+      texture2                = [[flaredark]],
+      texture3                = [[flaredark]],
+      texture4                = [[smallflaredark]],
       thickness               = 16.94,
       tolerance               = 10000,
       turret                  = true,
