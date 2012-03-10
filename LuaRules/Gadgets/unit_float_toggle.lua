@@ -88,6 +88,7 @@ local function addFloat(unitID, unitDefID)
 				prevSurfacing = true,
 				onSurface = false,
 				justStarted = true,
+				sinkTank = 0,
 				speed = def.initialRiseSpeed,
 				x = x, y = y, z = z,
 				unitDefID = unitDefID,
@@ -147,7 +148,11 @@ end
 function GG.Floating_AimWeapon(unitID)
 	if floatState[unitID] == FLOAT_ATTACK and not select(1, Spring.GetUnitIsStunned(unitID)) then
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		addFloat(unitID, unitDefID)
+		local cQueue = Spring.GetCommandQueue(unitID)
+		local moving = cQueue and #cQueue > 0 and cQueue[1].id == CMD.MOVE and not cQueue[1].options.internal
+		if not moving then
+			addFloat(unitID, unitDefID)
+		end
 	end
 	aimWeapon[unitID] = true
 end
@@ -205,7 +210,9 @@ function gadget:GameFrame(f)
 					local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
 					setSurfaceState(unitID, data.unitDefID, not moving)
 				elseif floatState[unitID] == FLOAT_ATTACK then
-					setSurfaceState(unitID, data.unitDefID, aimWeapon[unitID] or false)
+					local cQueue = Spring.GetCommandQueue(unitID)
+					local moving = cQueue and #cQueue > 0 and cQueue[1].id == CMD.MOVE and not cQueue[1].options.internal
+					setSurfaceState(unitID, data.unitDefID, (not moving and aimWeapon[unitID]) or false)
 				elseif floatState[unitID] == FLOAT_NEVER then
 					setSurfaceState(unitID, data.unitDefID, false)
 				end
@@ -217,24 +224,36 @@ function gadget:GameFrame(f)
 					callScript(unitID, "Float_rising")
 				else
 					callScript(unitID, "Float_sinking")
-					data.onSurface = false
 				end
 				data.prevSurfacing = data.surfacing
 			end
 			
+			-- Fill tank
+			if  def.sinkTankRequirement then
+				if not data.surfacing then
+					if data.y <= def.floatPoint and data.sinkTank <= def.sinkTankRequirement then
+						data.sinkTank = data.sinkTank + 1
+					end
+				else
+					data.sinkTank = 0
+				end
+			end
+			
 			-- Accelerate the speed
 			if data.y <= def.floatPoint then
-				if data.surfacing then
-					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)
-				else
+				if not data.surfacing and (not def.sinkTankRequirement or data.sinkTank > def.sinkTankRequirement) then
 					data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
+					data.onSurface = false
+				elseif not data.onSurface then
+					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)
 				end
 			else
 				data.speed = (data.speed + def.airAccel)*def.airDrag
 			end
 			
-			-- Add speed to position and update it
+			-- Speed the position
 			if data.speed ~= 0 then
+				-- Splash animation
 				if not data.onSurface then
 					local waterline = data.y - def.floatPoint
 					if data.speed < 0 and waterline > 0 and waterline < -data.speed then
@@ -269,6 +288,7 @@ function gadget:GameFrame(f)
 					i = i - 1 
 				end
 			end
+			
 			i = i + 1
 		else
 			removeFloat(unitID)
@@ -302,7 +322,6 @@ local function FloatToggleCommand(unitID, cmdParams, cmdOptions)
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	
 	if (cmdID ~= CMD_UNIT_FLOAT_STATE) then
 		return true  -- command was not used
 	end

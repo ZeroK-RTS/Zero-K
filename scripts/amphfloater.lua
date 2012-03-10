@@ -32,6 +32,56 @@ local SIG_WALK = 1
 local SIG_AIM1 = 2
 local SIG_AIM2 = 4
 local SIG_RESTORE = 8
+local SIG_BOB = 16
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Swim functions
+
+local function Bob()
+	Signal(SIG_BOB)
+	SetSignalMask(SIG_BOB)
+	while true do
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
+		Move(base, y_axis, math.rad(math.random(0,3)), math.rad(math.random(1,2)) )
+		Sleep(2000)
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
+		Move(base, y_axis, math.rad(math.random(-3,0)), math.rad(math.random(1,2)) )
+		Sleep(2000)
+	end
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Swim gadget callins
+
+function Float_startFromFloor()
+	Signal(SIG_WALK)
+	StartThread(Bob)
+end
+
+function Float_stopOnFloor()
+	Signal(SIG_BOB)
+end
+--[[
+function Float_rising()
+
+end
+
+function Float_sinking()
+
+end
+
+function Float_crossWaterline(speed)
+
+end
+
+function Float_stationaryOnSurface()
+
+end
+--]]
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -72,6 +122,7 @@ function script.StopMoving()
 	Turn( lthigh , x_axis, 0, math.rad(80)*PACE  )
 	Turn( lshin , x_axis, 0, math.rad(80)*PACE  )
 	Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
+	GG.Floating_StopMoving(unitID)
 end
 
 function script.Create()
@@ -91,6 +142,8 @@ function script.AimFromWeapon()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	GG.Floating_AimWeapon(unitID)
+	
 	if num == 1 then
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)

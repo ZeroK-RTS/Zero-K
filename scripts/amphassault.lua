@@ -7,6 +7,59 @@ local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot =  piece('rfleg
 local SIG_WALK = 1
 local SIG_AIM = 2
 local SIG_RESTORE = 4
+local SIG_BOB = 8
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Swim functions
+
+local function Bob()
+	Signal(SIG_BOB)
+	SetSignalMask(SIG_BOB)
+	while true do
+		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
+		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
+		Move(base, y_axis, math.rad(math.random(0,3)), math.rad(math.random(1,2)) )
+		Sleep(2000)
+		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
+		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
+		Move(base, y_axis, math.rad(math.random(-3,0)), math.rad(math.random(1,2)) )
+		Sleep(2000)
+	end
+end
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+-- Swim gadget callins
+
+function Float_startFromFloor()
+	Signal(SIG_WALK)
+	StartThread(Bob)
+end
+
+function Float_stopOnFloor()
+	Signal(SIG_BOB)
+end
+--[[
+function Float_rising()
+
+end
+
+function Float_sinking()
+
+end
+
+function Float_crossWaterline(speed)
+
+end
+
+function Float_stationaryOnSurface()
+
+end
+--]]
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
 
 local gunPieces = {
     [0] = {flare = lflare, recoil = lbarrel2},
@@ -133,6 +186,7 @@ function script.StopMoving()
 	Move( lfleg, y_axis, 0,1)
 	Move( lbleg, y_axis, 0,1)
 	
+	GG.Floating_StopMoving(unitID)
 end
 
 function script.Create()
@@ -166,6 +220,8 @@ end
 
 function script.AimFromWeapon(num)
 	if num == 2 then
+		Spring.Echo("why does AimFromWeapon call all the time?!?!??!?!")
+		GG.Floating_AimWeapon(unitID)
 		return turret
 	elseif num == 1 then
 		return torpedo
