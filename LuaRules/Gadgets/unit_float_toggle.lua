@@ -91,6 +91,7 @@ local function addFloat(unitID, unitDefID)
 				onSurface = false,
 				justStarted = true,
 				sinkTank = 0,
+				nextSpecialDrag = 1,
 				speed = def.initialRiseSpeed,
 				x = x, y = y, z = z,
 				unitDefID = unitDefID,
@@ -246,26 +247,32 @@ function gadget:GameFrame(f)
 			if data.y <= def.floatPoint then
 				if not data.surfacing then
 					if (not def.sinkTankRequirement or data.sinkTank > def.sinkTankRequirement) then
-						data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
+						data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag
 						data.onSurface = false
 					else
-						data.speed = data.speed*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
+						data.speed = data.speed*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)*data.nextSpecialDrag
 					end
 				elseif not data.onSurface then
-					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)
+					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)*data.nextSpecialDrag
 				end
 			else
-				data.speed = (data.speed + def.airAccel)*def.airDrag
+				data.speed = (data.speed + def.airAccel)*def.airDrag*data.nextSpecialDrag
 			end
 			
 			-- Speed the position
 			if data.speed ~= 0 then
-				-- Splash animation
+				
+				data.nextSpecialDrag = 1
+				-- Splash animation and slowdown
 				if not data.onSurface then
 					local waterline = data.y - def.floatPoint
+					-- enter water
 					if data.speed < 0 and waterline > 0 and waterline < -data.speed then
 						callScript(unitID, "Float_crossWaterline", {data.speed})
+						data.nextSpecialDrag = data.nextSpecialDrag*def.waterHitDrag
 					end
+					
+					--leave water
 					if data.speed > 0 and waterline < 0 and -waterline < data.speed then
 						callScript(unitID, "Float_crossWaterline", {data.speed})
 					end

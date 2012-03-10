@@ -7,6 +7,7 @@
 -- sinkDownDrag:        Drag on positive velocity while trying to sink
 -- airAccel:            Acceleration while out of water. aka gravity qhich is only active out of water
 -- airDrag:             Drag on speed while out of water
+-- waterHitDrag:        Reduction in speed upon hitting the water
 -- floatPoint:          Position of unit base that denotes the surface of the water
 -- depthRequirement:    Max depth of sea floor that float can be enabled
 -- sinkOnPara:          If true the unit will set to sink if paralysed. In either mode state cannot be changed while paraed
@@ -29,6 +30,7 @@ local floatDefs = {
 		sinkDownDrag = 0.9,
 		airAccel = -0.1,
 		airDrag = 0.995,
+		waterHitDrag = 0.5,
 		floatPoint = -20,
 		depthRequirement = -30,
 		sinkOnPara = true,
@@ -50,10 +52,11 @@ local floatDefs = {
 		sinkDownDrag = 0.98,
 		airAccel = -0.1, -- aka gravity, only effective out of water
 		airDrag = 0.995,
+		waterHitDrag = 0.5,
 		floatPoint = -15,
 		depthRequirement = -15,
 		sinkOnPara = false,
-		sinkTankRequirement = 50,
+		sinkTankRequirement = false,
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},
@@ -69,10 +72,11 @@ local floatDefs = {
 		sinkDownDrag = 0.98,
 		airAccel = -0.1, -- aka gravity, only effective out of water
 		airDrag = 0.995,
+		waterHitDrag = 0.5,
 		floatPoint = -40,
 		depthRequirement = -40,
 		sinkOnPara = false,
-		sinkTankRequirement = 120,
+		sinkTankRequirement = false,
 		stopSpeedLeeway = 0.05,
 		stopPositionLeeway = 0.1,
 	},

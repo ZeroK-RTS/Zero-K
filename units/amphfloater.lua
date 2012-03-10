@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[amphfloater]],
   name                   = [[Buoy]],
-  description            = [[Amphibious Skirmisher Bot]],
+  description            = [[Inflatable Amphibious Bot]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   amphibious             = [[1]],
@@ -65,7 +65,7 @@ unitDef = {
 
   weapons                = {
     {
-      def                = [[DISRUPTOR]],
+      def                = [[CANNON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -80,47 +80,42 @@ unitDef = {
 
   weaponDefs             = {
 
-    DISRUPTOR = {
-	name                    = [[Disruptor Pulse Beam]],
-	areaOfEffect            = 32,
-	beamdecay 		= 0.9,
-	beamTime                = 0.2,
-	beamttl                 = 50,
-	coreThickness           = 0.5,
-	craterBoost             = 0,
-	craterMult              = 0,
-    
-	damage                  = {
-	    default = 300,
+	CANNON = {
+      name                    = [[Disruption Cannon]],
+      accuracy                = 200,
+      areaOfEffect            = 32,
+      craterBoost             = 1,
+      craterMult              = 2,
+	  
+      damage                  = {
+        default = 290,
+        planes  = 290,
+        subs    = 12,
+      },
+      
+      explosionGenerator      = [[custom:PLASMA_HIT_32]],
+      fireStarter             = 180,
+      impulseBoost            = 0,
+      impulseFactor           = 0.2,
+      interceptedByShieldType = 2,
+	  myGravity               = 0.2,
+	  predictBoost            = 1,
+      projectiles             = 1,
+      range                   = 430,
+      reloadtime              = 3.4,
+	  rgbcolor                = [[0.9 0.1 0.9]],
+      smokeTrail              = true,
+      soundHit                = [[explosion/ex_med6]],
+      soundHitVolume          = 8,
+      soundStart              = [[weapon/cannon/cannon_fire3]],
+      soundStartVolume        = 3.5,
+      soundTrigger			  = true,
+      sprayangle              = 0,
+      startsmoke              = [[1]],
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 330,
 	},
-    
-	explosionGenerator      = [[custom:flash1teal]],
-	fireStarter             = 30,
-	impactOnly              = true,
-	impulseBoost            = 0,
-	impulseFactor           = 0.4,
-	interceptedByShieldType = 1,
-	largeBeamLaser          = true,
-	laserFlareSize          = 4.33,
-	minIntensity            = 1,
-	noSelfDamage            = true,
-	range                   = 430,
-	reloadtime              = 3,
-	rgbColor                = [[0.2 1 1]],
-	soundStart              = [[weapon/laser/heavy_laser5]],
-	soundStartVolume        = 3,
-	soundTrigger            = true,
-	sweepfire               = false,
-	texture1                = [[largelaser]],
-	texture2                = [[flare]],
-	texture3                = [[flare]],
-	texture4                = [[smallflare]],
-	thickness               = 4.33,
-	tolerance               = 18000,
-	turret                  = true,
-	weaponType              = [[BeamLaser]],
-	weaponVelocity          = 500,
-    },
 
   },
 

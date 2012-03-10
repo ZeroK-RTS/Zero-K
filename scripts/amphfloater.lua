@@ -71,30 +71,30 @@ end
 
 function Float_startFromFloor()
 	Signal(SIG_WALK)
-        Signal(SIG_FLOAT)
+    Signal(SIG_FLOAT)
 	StartThread(Bob)
 end
 
 function Float_stopOnFloor()
 	Signal(SIG_BOB)
-        Signal(SIG_FLOAT)
+    Signal(SIG_FLOAT)
 end
 
 function Float_rising()
-        Signal(SIG_FLOAT)
+     Signal(SIG_FLOAT)
 end
 
 function Float_sinking()
-        Signal(SIG_FLOAT)
-        StartThread(SinkBubbles)
+    Signal(SIG_FLOAT)
+    StartThread(SinkBubbles)
 end
 
 function Float_crossWaterline(speed)
-        --Signal(SIG_FLOAT)
+    --Signal(SIG_FLOAT)
 end
 
 function Float_stationaryOnSurface()
-        Signal(SIG_FLOAT)
+     Signal(SIG_FLOAT)
 end
 
 --------------------------------------------------------------------------------------
@@ -156,7 +156,10 @@ function script.AimFromWeapon()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	GG.Floating_AimWeapon(unitID)
+	local reloadState = Spring.GetUnitWeaponState(unitID, 0 , 'reloadState')
+	if reloadState < 0 or reloadState - Spring.GetGameFrame() < 30 then
+		GG.Floating_AimWeapon(unitID)
+	end
 	
 	if num == 1 then
 		Signal(SIG_AIM1)

@@ -251,7 +251,10 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 2 then
-		GG.Floating_AimWeapon(unitID)
+		local reloadState = Spring.GetUnitWeaponState(unitID, 1 , 'reloadState')
+		if reloadState < 0 or reloadState - Spring.GetGameFrame() < 80 then
+			GG.Floating_AimWeapon(unitID)
+		end
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		Turn(turret, y_axis, heading, math.rad(180))
