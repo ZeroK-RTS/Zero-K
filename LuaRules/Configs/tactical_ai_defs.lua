@@ -21,6 +21,7 @@ local longRangeSwarmieeArray = {
 
 local medRangeSwarmieeArray = { 
 	["armrock"] = true,
+	["amphfloater"] = true,
 	["chickens"] = true,
 }
 
@@ -121,6 +122,7 @@ end
 
 local longRangeSkirmieeArray = {
 	["armrock"] = true,
+	["amphfloater"] = true,
 	["nsclash"] = true, -- hover janus
 	["capturecar"] = true,
 	["chickenc"] = true,
@@ -524,6 +526,14 @@ local behaviourConfig = {
 	},	
 	
 	["armrock"] = {
+		skirms = medRangeSkirmieeArray, 
+		swarms = medRangeSwarmieeArray, 
+		flees = {},
+		maxSwarmLeeway = 30, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 10, 
+	},
+	["amphfloater"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},

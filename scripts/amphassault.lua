@@ -19,6 +19,25 @@ local SIG_FLOAT = 32
 local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
+	
+	Turn( rfleg, x_axis, math.rad(0),math.rad(60))
+	Turn( rffoot, x_axis, math.rad(0),math.rad(60))
+	
+	Turn( rbleg, x_axis, math.rad(0),math.rad(60))
+	Turn( rbfoot, x_axis, math.rad(0),math.rad(60))
+	
+	Move( rfleg, y_axis, 0,1)
+	Move( rbleg, y_axis, 0,1)
+	
+	Turn( lfleg, x_axis, math.rad(0),math.rad(60))
+	Turn( lffoot, x_axis, math.rad(0),math.rad(60))
+	
+	Turn( lbleg, x_axis, math.rad(0),math.rad(60))
+	Turn( lbfoot, x_axis, math.rad(0),math.rad(60))
+	
+	Move( lfleg, y_axis, 0,1)
+	Move( lbleg, y_axis, 0,1)
+	
 	while true do
 		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
 		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
@@ -252,7 +271,7 @@ end
 function script.AimWeapon(num, heading, pitch)
 	if num == 2 then
 		local reloadState = Spring.GetUnitWeaponState(unitID, 1 , 'reloadState')
-		if reloadState < 0 or reloadState - Spring.GetGameFrame() < 80 then
+		if reloadState < 0 or reloadState - Spring.GetGameFrame() < 90 then
 			GG.Floating_AimWeapon(unitID)
 		end
 		Signal(SIG_AIM)
