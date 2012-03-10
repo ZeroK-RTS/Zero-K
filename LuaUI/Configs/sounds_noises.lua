@@ -426,6 +426,15 @@ local sounds = {
 			volume = 0.7,
 		},
 	},
+	amphfloater = {
+		ok = {
+			[1] = "amph_move",
+		},
+		select = {
+			[1] = "amph_select",
+			volume = 0.7,
+		},
+	},
 	amphriot = {
 		ok = {
 			[1] = "amph_move",

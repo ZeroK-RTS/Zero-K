@@ -24,6 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    floattoggle = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

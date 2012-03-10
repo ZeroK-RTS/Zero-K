@@ -22,6 +22,8 @@ end
 -------------------------------------------------------------------------------------
 -- Commands
 
+local DEFAULT_FLOAT = 1
+
 include("LuaRules/Configs/customcmds.h.lua")
 
 local unitFloatIdleBehaviour = {
@@ -30,7 +32,7 @@ local unitFloatIdleBehaviour = {
 	name    = 'Float State',
 	action  = 'floatstate',
 	tooltip	= 'Controls when a unit floats',
-	params 	= {0, 'Sink','Attack','Float'}
+	params 	= {DEFAULT_FLOAT, 'Sink','Attack','Float'}
 }
 
 local FLOAT_NEVER = 0
@@ -94,6 +96,7 @@ local function addFloat(unitID, unitDefID)
 				unitDefID = unitDefID,
 				paraData = {want = false, para = false},
 			}
+			Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*2^-15*math.pi, 0)
 		else
 			Spring.MoveCtrl.Disable(unitID)
 		end
@@ -241,9 +244,13 @@ function gadget:GameFrame(f)
 			
 			-- Accelerate the speed
 			if data.y <= def.floatPoint then
-				if not data.surfacing and (not def.sinkTankRequirement or data.sinkTank > def.sinkTankRequirement) then
-					data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
-					data.onSurface = false
+				if not data.surfacing then
+					if (not def.sinkTankRequirement or data.sinkTank > def.sinkTankRequirement) then
+						data.speed = (data.speed + def.sinkAccel)*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
+						data.onSurface = false
+					else
+						data.speed = data.speed*(data.speed > 0 and def.sinkUpDrag or def.sinkDownDrag)
+					end
 				elseif not data.onSurface then
 					data.speed = (data.speed + def.riseAccel)*(data.speed > 0 and def.riseUpDrag or def.riseDownDrag)
 				end
@@ -331,7 +338,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if floatDefs[unitDefID] then
-		floatState[unitID] = FLOAT_ALWAYS
+		floatState[unitID] = DEFAULT_FLOAT
 		Spring.InsertUnitCmdDesc(unitID, unitFloatIdleBehaviour)
 	end
 end

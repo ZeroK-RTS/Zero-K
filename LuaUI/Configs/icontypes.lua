@@ -310,6 +310,10 @@ local icontypes = {
     bitmap='icons/amphtorpraider.png',
     size=1.9,
   },
+  amphskirm = {
+    bitmap='icons/amphskirm.png',
+    size=1.8,
+  },
   amphaa = {
     bitmap='icons/amphaa.png',
     size=1.8,

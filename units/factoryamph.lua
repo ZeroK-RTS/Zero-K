@@ -17,6 +17,7 @@ unitDef = {
     [[amphcon]],
 	[[amphraider3]],
 	[[amphraider2]],
+	[[amphfloater]],
 	[[amphriot]],	
 	[[amphassault]],
 	[[amphaa]],

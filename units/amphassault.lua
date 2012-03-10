@@ -23,6 +23,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
+    floattoggle = [[1]],
     --description_bp = [[Robô dispersador]],
     --description_fr = [[Robot Émeutier]],
 	--description_de = [[Sturm Roboter]],
@@ -152,7 +153,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 850,
+        default = 300,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],

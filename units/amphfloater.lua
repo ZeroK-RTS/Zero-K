@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[amphfloater]],
   name                   = [[Buoy]],
-  description            = [[Amphibious Floating Bot]],
+  description            = [[Inflatable Amphibious Bot]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   amphibious             = [[1]],
@@ -24,13 +24,14 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    floattoggle = [[1]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
   hideDamage             = false,
-  iconType               = [[walkerraider]],
+  iconType               = [[amphskirm]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
@@ -87,8 +88,8 @@ unitDef = {
       craterMult              = 2,
 	  
       damage                  = {
-        default = 240,
-        planes  = 240,
+        default = 290,
+        planes  = 290,
         subs    = 12,
       },
       
@@ -97,20 +98,22 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.2,
       interceptedByShieldType = 2,
+	  myGravity               = 0.2,
+	  predictBoost            = 1,
       projectiles             = 1,
       range                   = 430,
-      reloadtime              = 2.2,
+      reloadtime              = 2.5,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med6]],
       soundHitVolume          = 8,
       soundStart              = [[weapon/cannon/cannon_fire3]],
-      soundStartVolume        = 2,
-      soundTrigger			= true,
-      sprayangle              = 512,
+      soundStartVolume        = 3.5,
+      soundTrigger			  = true,
+      sprayangle              = 0,
       startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 260,
+      weaponVelocity          = 330,
 	},
 
   },

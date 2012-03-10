@@ -46,11 +46,11 @@ local function Bob()
 	while true do
 		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
 		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
-		Move(base, y_axis, math.rad(math.random(0,3)), math.rad(math.random(1,2)) )
+		Move(base, y_axis, math.rad(math.random(0,6)), math.rad(math.random(2,6)) )
 		Sleep(2000)
 		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
 		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
-		Move(base, y_axis, math.rad(math.random(-3,0)), math.rad(math.random(1,2)) )
+		Move(base, y_axis, math.rad(math.random(-6,0)), math.rad(math.random(2,6)) )
 		Sleep(2000)
 	end
 end
