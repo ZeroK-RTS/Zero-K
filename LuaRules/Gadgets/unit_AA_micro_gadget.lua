@@ -17,7 +17,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
@@ -1586,5 +1586,11 @@ function gadget:Initialize()
 	  --Script.SetWatchWeapon(i,true)
       weapondefID["corrazor"] = i
 	end
+  end
+  
+  -- load active units
+  for _, unitID in ipairs(Spring.GetAllUnits()) do
+    local unitDefID = Spring.GetUnitDefID(unitID)
+    gadget:UnitCreated(unitID, unitDefID)
   end
 end
