@@ -231,7 +231,7 @@ function script.Create()
 end
 
 function script.QueryWeapon(num)
-	if num == 2 then
+	if num == 1 then
 		if beamCount < 2 then
 			if beamCount == 1 then
 				Spring.SetUnitWeaponState(unitID, 1, "range", 0)
@@ -246,15 +246,15 @@ function script.QueryWeapon(num)
 			end
 			return gunPieces[gun_1].flare
 		end
-	elseif num == 1 then
+	elseif num == 2 then
 		return torpedo
 	end
 end
 
 function script.AimFromWeapon(num)
-	if num == 2 then
+	if num == 1 then
 		return turret
-	elseif num == 1 then
+	elseif num == 2 then
 		return torpedo
 	end
 end
@@ -269,8 +269,8 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == 2 then
-		local reloadState = Spring.GetUnitWeaponState(unitID, 1 , 'reloadState')
+	if num == 1 then
+		local reloadState = Spring.GetUnitWeaponState(unitID, 0 , 'reloadState')
 		if reloadState < 0 or reloadState - Spring.GetGameFrame() < 90 then
 			GG.Floating_AimWeapon(unitID)
 		end
@@ -284,13 +284,13 @@ function script.AimWeapon(num, heading, pitch)
         WaitForTurn(lbarrel1, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
-	elseif num == 1 then
+	elseif num == 2 then
 		return true
 	end
 end
 
 function script.Shot(num)
-	if num == 2 then
+	if num == 1 then
 		beamCount = beamCount + 1
 		if beamCount > 24 then
 			beamCount = 0
@@ -301,7 +301,7 @@ function script.Shot(num)
 --		end
 		Move(gunPieces[gun_1].recoil, z_axis, -10)
 		Move(gunPieces[gun_1].recoil, z_axis, 0, 10)
-	elseif num == 1 then
+	elseif num == 2 then
 		local height = select(2, Spring.GetUnitPosition(unitID))
 		local px, py, pz = Spring.GetUnitPosition(unitID)
 		if height < 18 then

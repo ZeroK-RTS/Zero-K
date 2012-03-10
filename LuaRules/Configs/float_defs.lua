@@ -21,14 +21,14 @@ local floatDefs = {
 	-- velocity. It then treads water so sinks if EMPed. It is heavier than water
 	-- so sinks at a fairly constant velocity as well.
 	[UnitDefNames["amphaa"].id] = {
-		initialRiseSpeed = 2,
-		riseAccel = 0.07,
+		initialRiseSpeed = 3,
+		riseAccel = 0.12,
 		riseUpDrag = 0.9,
 		riseDownDrag = 0.7,
-		sinkAccel = -0.06,
+		sinkAccel = -0.12,
 		sinkUpDrag = 0.9,
 		sinkDownDrag = 0.9,
-		airAccel = -0.1,
+		airAccel = -0.1, -- aka gravity, only effective out of water
 		airDrag = 0.995,
 		waterHitDrag = 0.5,
 		floatPoint = -20,
@@ -43,13 +43,13 @@ local floatDefs = {
 	-- acceleration with low drag. To sink the tank must be filled with water
 	-- which results in a delay and low sink acceleration.
 	[UnitDefNames["amphfloater"].id] = {
-		initialRiseSpeed = 1,
-		riseAccel = 0.05,
-		riseUpDrag = 0.99,
-		riseDownDrag = 0.9,
-		sinkAccel = -0.04,
-		sinkUpDrag = 0.98,
-		sinkDownDrag = 0.98,
+		initialRiseSpeed = 2,
+		riseAccel = 0.10,
+		riseUpDrag = 0.9,
+		riseDownDrag = 0.7,
+		sinkAccel = -0.10,
+		sinkUpDrag = 0.9,
+		sinkDownDrag = 0.9,
 		airAccel = -0.1, -- aka gravity, only effective out of water
 		airDrag = 0.995,
 		waterHitDrag = 0.5,
@@ -63,14 +63,14 @@ local floatDefs = {
 	
 	-- Big epic unit moves up and down about as quickly as Atlantis
 	[UnitDefNames["amphassault"].id] = {
-		initialRiseSpeed = 1,
-		riseAccel = 0.03,
-		riseUpDrag = 0.98,
-		riseDownDrag = 0.9,
-		sinkAccel = -0.03,
-		sinkUpDrag = 0.98,
-		sinkDownDrag = 0.98,
-		airAccel = -0.1, -- aka gravity, only effective out of water
+		initialRiseSpeed = 2,
+		riseAccel = 0.06,
+		riseUpDrag = 0.9,
+		riseDownDrag = 0.7,
+		sinkAccel = -0.06,
+		sinkUpDrag = 0.9,
+		sinkDownDrag = 0.9,
+		airAccel = -0.3, -- aka gravity, only effective out of water
 		airDrag = 0.995,
 		waterHitDrag = 0.5,
 		floatPoint = -40,
