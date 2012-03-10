@@ -43,11 +43,11 @@ local floatDefs = {
 	-- acceleration with low drag. To sink the tank must be filled with water
 	-- which results in a delay and low sink acceleration.
 	[UnitDefNames["amphfloater"].id] = {
-		initialRiseSpeed = 0.1,
-		riseAccel = 0.025,
+		initialRiseSpeed = 1,
+		riseAccel = 0.05,
 		riseUpDrag = 0.99,
 		riseDownDrag = 0.9,
-		sinkAccel = -0.01,
+		sinkAccel = -0.04,
 		sinkUpDrag = 0.98,
 		sinkDownDrag = 0.98,
 		airAccel = -0.1, -- aka gravity, only effective out of water
@@ -63,11 +63,11 @@ local floatDefs = {
 	
 	-- Big epic unit moves up and down about as quickly as Atlantis
 	[UnitDefNames["amphassault"].id] = {
-		initialRiseSpeed = 0.05,
-		riseAccel = 0.01,
+		initialRiseSpeed = 1,
+		riseAccel = 0.03,
 		riseUpDrag = 0.98,
 		riseDownDrag = 0.9,
-		sinkAccel = -0.01,
+		sinkAccel = -0.03,
 		sinkUpDrag = 0.98,
 		sinkDownDrag = 0.98,
 		airAccel = -0.1, -- aka gravity, only effective out of water

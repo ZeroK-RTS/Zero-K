@@ -83,9 +83,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 3000,
-        planes  = 3000,
-        subs    = 150,
+        default = 300,
+        planes  = 300,
+        subs    = 15,
       },
 
       explosionGenerator      = [[custom:ataalaser]],
@@ -100,8 +100,10 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 1020,
       reloadtime              = 20,
+	  projectiles             = 10,
       renderType              = 0,
       rgbColor                = [[0.25 0 1]],
+	  soundTrigger            = true,
       soundStart              = [[weapon/laser/heavy_laser6]],
       targetMoveError         = 0.3,
       texture1                = [[largelaser]],
