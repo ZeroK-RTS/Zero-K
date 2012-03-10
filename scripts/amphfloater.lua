@@ -156,10 +156,7 @@ function script.AimFromWeapon()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	local reloadState = Spring.GetUnitWeaponState(unitID, 0 , 'reloadState')
-	if reloadState < 0 or reloadState - Spring.GetGameFrame() < 30 then
-		GG.Floating_AimWeapon(unitID)
-	end
+	GG.Floating_AimWeapon(unitID)
 	
 	if num == 1 then
 		Signal(SIG_AIM1)

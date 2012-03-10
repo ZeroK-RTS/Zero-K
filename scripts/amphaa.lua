@@ -76,14 +76,6 @@ local function FloatBubbles()
     ]]
 end
 
-local function SinkBubbles()
-    SetSignalMask(SIG_FLOAT)
-    while true do   --FIXME: not stopped when sinking ends!
-        EmitSfx(vent, SFX.BUBBLE)
-        Sleep(66)
-    end
-end
-
 local function riseFloat_thread()
 	if floatState ~= 0 then
 		floatState = 0
@@ -199,6 +191,11 @@ local function sinkFloat_thread()
 	Turn(base, z_axis, 0, math.rad(math.random(1,2)) )
 	Move(base, y_axis, 0, math.rad(math.random(1,2)) )
 	
+	while true do   --FIXME: not stopped when sinking ends!
+        EmitSfx(vent, SFX.BUBBLE)
+        Sleep(66)
+    end
+	
 end
 
 --------------------------------------------------------------------------------------
@@ -212,7 +209,7 @@ function Float_startFromFloor()
 end
 
 function Float_stopOnFloor()
-	StartThread(sinkFloat_thread)
+	Signal(SIG_FLOAT)
 	Signal(SIG_BOB)
 end
 
@@ -222,7 +219,6 @@ end
 
 function Float_sinking()
 	StartThread(sinkFloat_thread)
-        StartThread(SinkBubbles)
 end
 
 function Float_crossWaterline(speed)
