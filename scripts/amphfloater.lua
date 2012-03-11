@@ -165,6 +165,14 @@ local function RestoreAfterDelay()
 end
 
 function script.AimFromWeapon()
+	--Spring.Echo(Spring.GetUnitWeaponState(unitID, 0, "projectileSpeed"))
+	local height = select(2, Spring.GetUnitBasePosition(unitID))
+	if height < -130 then
+		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = 200})
+	else
+		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = 11})
+	end
+	
 	return barrel
 end
 
@@ -185,7 +193,7 @@ end
 
 function script.QueryWeapon(num)
 	if num == 1 then
-		return firepoint
+		return barrel
 	end
 end
 
