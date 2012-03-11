@@ -38,7 +38,7 @@ unitDef = {
 
   customParams     = {
     --description_de = [[Produziert Aerogleiter, Baut mit 6 M/s]],
-    helptext       = [[The Amphibous Operations Plant builds amphibious bots and submarines (when underwater), providing an alternative approach to land/sea warfare.]],
+    helptext       = [[The Amphibious  Operations Plant builds amphibious bots and submarines (when underwater), providing an alternative approach to land/sea warfare.]],
 	--helptext_de    = [[Die Amphibious Operations Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Halberd, Mace, Penetrator]],
     sortName = [[8]],
   },
