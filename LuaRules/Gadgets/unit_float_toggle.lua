@@ -129,6 +129,17 @@ local function setSurfaceState(unitID, unitDefID, surfacing)
 	end
 end
 
+function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
+	if float[unitID] then
+		Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
+		Spring.MoveCtrl.Disable(unitID)
+		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+		callScript(unitID, "script.Stop")
+		removeFloat(unitID)
+	end
+end
+
 --------------------------------------------------------------------------------
 -- Script calls
 
@@ -260,7 +271,8 @@ function gadget:GameFrame(f)
 			end
 			
 			-- Speed the position
-			if data.speed ~= 0 then
+			local height = Spring.GetGroundHeight(data.x, data.z)
+			if data.speed ~= 0 or data.y <= height then
 				
 				data.nextSpecialDrag = 1
 				-- Splash animation and slowdown
@@ -279,7 +291,7 @@ function gadget:GameFrame(f)
 				end
 				
 				data.y = data.y + data.speed
-				local height = Spring.GetGroundHeight(data.x, data.z)
+				
 				if data.y > height then
 					if data.surfacing and def.stopSpeedLeeway > math.abs(data.speed) and def.stopPositionLeeway > math.abs(data.y - def.floatPoint) then
 						data.speed = 0

@@ -65,17 +65,25 @@ local function SinkBubbles()
     end
 end
 
+local function dustBottom()
+	local x,y,z = Spring.GetUnitPiecePosDir(unitID,rfoot)
+	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
+	local x,y,z = Spring.GetUnitPiecePosDir(unitID,lfoot)
+	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
+end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim gadget callins
 
 function Float_startFromFloor()
+	dustBottom()
 	Signal(SIG_WALK)
     Signal(SIG_FLOAT)
 	StartThread(Bob)
 end
 
 function Float_stopOnFloor()
+	dustBottom()
 	Signal(SIG_BOB)
     Signal(SIG_FLOAT)
 end

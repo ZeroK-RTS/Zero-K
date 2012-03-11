@@ -19,7 +19,7 @@ local SIG_FLOAT = 32
 local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
-	
+
 	Turn( rfleg, x_axis, math.rad(20),math.rad(60))
 	Turn( rffoot, x_axis, math.rad(-20),math.rad(60))
 	
@@ -39,13 +39,30 @@ local function Bob()
 	Move( lbleg, y_axis, 0,1)
 	
 	while true do
+		
 		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
 		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
 		Move(base, y_axis, math.rad(math.random(0,3)), math.rad(math.random(1,2)) )
 		Sleep(2000)
+		
+		--[[ Doesn't workm don't know why.
+		Turn( rfleg, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn( rffoot, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		
+		Turn( rbleg, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn( rbfoot, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		
+		Turn( lfleg, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn( lffoot, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		
+		Turn( lbleg, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn( lbfoot, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		--]]
+		
 		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
 		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
 		Move(base, y_axis, math.rad(math.random(-3,0)), math.rad(math.random(1,2)) )
+		
 		Sleep(2000)
 	end
 end
@@ -78,27 +95,41 @@ local function SinkBubbles()
         Sleep(66)
     end
 end
+
+local function dustBottom()
+	local x,y,z = Spring.GetUnitPiecePosDir(unitID,rffoot)
+	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
+	local x,y,z = Spring.GetUnitPiecePosDir(unitID,rbfoot)
+	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
+	local x,y,z = Spring.GetUnitPiecePosDir(unitID,lffoot)
+	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
+	local x,y,z = Spring.GetUnitPiecePosDir(unitID,lbfoot)
+	Spring.SpawnCEG("uw_vindiback", x, y+5, z, 0, 0, 0, 0)
+end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim gadget callins
 
 function Float_startFromFloor()
+	dustBottom()
 	Signal(SIG_WALK)
-        Signal(SIG_FLOAT)
+    Signal(SIG_FLOAT)
 	StartThread(Bob)
 end
 
 function Float_stopOnFloor()
+	dustBottom()
 	Signal(SIG_BOB)
-        Signal(SIG_FLOAT)
+    Signal(SIG_FLOAT)
 end
 
 function Float_rising()
-        Signal(SIG_FLOAT)
+    Signal(SIG_FLOAT)
 end
 
 function Float_sinking()
 	Signal(SIG_FLOAT)
+	Signal(SIG_BOB)
 	StartThread(SinkBubbles)
 end
 
