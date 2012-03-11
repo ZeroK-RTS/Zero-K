@@ -62,6 +62,7 @@ unitDef = {
   sightDistance          = 800,
   turninplace            = 0,
   turnRate               = 698,
+  waterline              = 2,
   workerTime             = 0,
 
   weapons                = {
