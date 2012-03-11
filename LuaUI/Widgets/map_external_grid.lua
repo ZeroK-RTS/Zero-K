@@ -8,6 +8,7 @@ function widget:GetInfo()
     license   = "PD",
     layer     = -3,
     enabled   = true,
+    detailsDefault = 3,
   }
 end
 
@@ -69,7 +70,7 @@ options = {
 		max = 512, 
 		step = 64,
 		value = 512,
-		desc = 'Sets tile size (lower = more detail)\nStepsize is 64; recommend factors of 512',
+		desc = 'Sets tile size (lower = more detail)\nStepsize is 64; recommend powers of 2',
 		OnChange = function(self)
 			gl.DeleteList(DspLst)
 			widget:Initialize()

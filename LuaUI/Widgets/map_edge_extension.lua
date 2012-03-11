@@ -10,7 +10,7 @@ function widget:GetInfo()
     license   = "GPL",
     layer     = 0,
     enabled   = false,
-    detailsDefault = 2
+    --detailsDefault = 2
   }
 end
 --------------------------------------------------------------------------------
@@ -22,7 +22,8 @@ end
 local spGetGroundHeight = Spring.GetGroundHeight
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local gridTex = "LuaUI/Images/vr_grid_large.png"
+local gridTex = "LuaUI/Images/vr_grid_large.dds"
+--local gridTex = "bitmaps/PD/shield3hex.png"
 local realTex = '$grass'
 local tex = realTex
 
@@ -66,7 +67,7 @@ options = {
 		max = 512, 
 		step = 32,
 		value = 32,
-		desc = 'Sets tile size (smaller = more heightmap detail)',
+		desc = 'Sets tile size (smaller = more heightmap detail)\nStepsize is 32; recommend powers of 2',
 		OnChange = function(self)
 			gl.DeleteList(dList)
 			widget:Initialize()
@@ -75,7 +76,7 @@ options = {
 	useRealTex = {
 		name = "Use realistic texture",
 		type = 'bool',
-		value = true,
+		value = false,
 		desc = 'Use a realistic texture instead of a VR grid',
 		OnChange = function(self)
 			gl.DeleteList(dList)
