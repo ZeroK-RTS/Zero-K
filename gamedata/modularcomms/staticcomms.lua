@@ -1,4 +1,10 @@
 local comms = {
+  comm_mission_tutorial1 = {
+    chassis = "armcom3",
+	name = "Tutorial Commander",
+	modules = { "commweapon_beamlaser", "module_autorepair", "module_autorepair"},
+  },  
+
   -- Not Hax
   comm_riot_cai = {
     chassis = "corcom1",
@@ -65,12 +71,6 @@ local comms = {
     chassis = "commsupport2",
 	name = "Bear Hunter",
     modules = { "commweapon_shotgun", "module_dmg_booster", "module_adv_targeting", "module_high_power_servos", "module_fieldradar"},
-  },
-  comm_special = {
-    chassis = "cremcom3",
-	name = "Lady of War",
-    modules = { "commweapon_heavymachinegun", "commweapon_gaussrifle", "module_ablative_armor", "module_ablative_armor", "module_dmg_booster",
-				"module_adv_targeting", "module_high_power_servos", "weaponmod_disruptor_ammo"},
   },
 }
 --[[
