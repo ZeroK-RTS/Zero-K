@@ -7,7 +7,7 @@ function widget:GetInfo()
     date      = "Sep 2011",
     license   = "PD",
     layer     = -3,
-    enabled   = false,
+    enabled   = true,
   }
 end
 
@@ -68,7 +68,7 @@ options = {
 		min = 64, 
 		max = 512, 
 		step = 64,
-		value = 128,
+		value = 512,
 		desc = 'Sets tile size (lower = more detail)\nStepsize is 64; recommend factors of 512',
 		OnChange = function(self)
 			gl.DeleteList(DspLst)
@@ -82,7 +82,7 @@ options = {
 		min = 1024, 
 		max = 8192, 
 		step = 256,
-		value = 8192,
+		value = 3072,
 		desc = 'How far outside the map to draw',
 		OnChange = function(self)
 			gl.DeleteList(DspLst)
