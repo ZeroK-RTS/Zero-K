@@ -101,7 +101,6 @@ unitDef = {
 	  projectiles             = 5,
       range                   = 1020,
       reloadtime              = 20,
-	  projectiles             = 10,
       renderType              = 0,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
