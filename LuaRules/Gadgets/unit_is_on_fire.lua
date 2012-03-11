@@ -105,7 +105,6 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 						--attackerDefID = attackerDefID,
 						weaponID    = weaponID,
 					}
-					
 					SetUnitCloak(unitID, false, 10000)
 					SetUnitRulesParam(unitID, "on_fire", 1)
 				end
@@ -132,7 +131,7 @@ function gadget:GameFrame(n)
 				unitsOnFire[unitID] = nil
 			else
 				t.damageLeft = t.damageLeft - t.fireDmg*CHECK_INTERVAL
-				AddUnitDamage(unitID,t.fireDmg*CHECK_INTERVAL,0,t.attackerID, t.weaponID )
+				AddUnitDamage(unitID,t.fireDmg*CHECK_INTERVAL,0,t.attackerID, t.weaponDefID )
 				--Spring.Echo(t.attackerDefID)
 				burningUnits[cnt] = unitID
 				cnt=cnt+1
