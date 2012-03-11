@@ -26,14 +26,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    --description_bp = [[Robô de construç?o e ressurreiç?o, constrói a 6 m/s]],
-    --description_es = [[Robot de Construccion/Resurrección, Construye a 6 m/s]],
-    --description_fr = [[Robot de Construction/Resurrection, Construit ? 6 m/s]],
-    --description_it = [[Robot da Costruzzione/Risurrezione, Costruisce a 6 m/s]],
-	--description_de = [[Konstruktions-/Wiederbelebungsroboter, Baut mit 6 M/s]],
-    helptext       = [[The Clam is a sturdy constructor that can build, reclaim or resurrect in the deep sea as well as it does on land.]]
-    --helptext_fr    = [[Le Necro tient son nom de sa facult?, comme tous les constructeurs de sa faction, ? r?ssuciter les carcasses du champ de bataille. La Resurrection ne consomme que de l'?nergie, et d?pends du co?t de l'unit? originelle.]],
-	--helptext_de    = [[Der Necro ist ein ziemlich normaler Konstruktionsroboter mit einem Vorteil: er kann Leichen wiederbeleben. Zu 120% der ursprünglichen Energiekosten bekommst du eine so gut wie neue Einheit wiederzurück.]],
+    helptext       = [[The Clam is a sturdy constructor that can build, reclaim or resurrect in the deep sea as well as it does on land.]],
   },
 
   energyMake          = 0.225,
