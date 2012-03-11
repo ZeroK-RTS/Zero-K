@@ -94,6 +94,17 @@ local checkFrame = {}
 -------------------------------------------------------------------------------------
 -- Most script interaction
 
+local function callScript(unitID, funcName, args)
+	local func = Spring.UnitScript.GetScriptEnv(unitID)
+	if func then
+		func = func[funcName]
+		if func then
+			return Spring.UnitScript.CallAsUnit(unitID,func, args)
+		end
+	end
+	return false
+end
+
 local function changeSpeed(tid, bid, speed)
 	local func = Spring.UnitScript.GetScriptEnv(tid).activity_mode
 	Spring.UnitScript.CallAsUnit(tid,func,speed)
@@ -349,15 +360,19 @@ function gadget:GameFrame(f)
 							Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, dx, dy, dz)
 							
 							Spring.SpawnCEG("teleport_out", ux, uy, uz, 0, 0, 0, size)
-							Spring.SpawnCEG("teleport_in", dx, dy, dz, 0, 0, 0, size)
+							
 							
 							teleportingUnit[teleportiee] = false
 							
-							Spring.SetUnitPosition(teleportiee, dx, dz)
-							Spring.MoveCtrl.Enable(teleportiee)
-							Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
-							Spring.MoveCtrl.Disable(teleportiee)
+							if not callScript(teleportiee, "unit_teleported", {dx, dy, dz}) then
+								Spring.SetUnitPosition(teleportiee, dx, dz)
+								Spring.MoveCtrl.Enable(teleportiee)
+								Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
+								Spring.MoveCtrl.Disable(teleportiee)
+							end
 							
+							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
+							Spring.SpawnCEG("teleport_in", ux, uy, uz, 0, 0, 0, size)
 							
 							Spring.SetUnitMoveGoal(teleportiee, dx,0,dz)
 							

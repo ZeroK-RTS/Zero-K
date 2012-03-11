@@ -47,6 +47,7 @@ local sinkCommand = {
 	[CMD.GUARD] = true,
 	[CMD.FIGHT] = true,
 	[CMD.PATROL] = true,
+	[CMD_WAIT_AT_BEACON] = true,
 }
 
 local floatDefs = include("LuaRules/Configs/float_defs.lua")
@@ -135,7 +136,7 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 		Spring.MoveCtrl.Disable(unitID)
 		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
 		Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-		callScript(unitID, "script.Stop")
+		callScript(unitID, "script.StopMoving")
 		removeFloat(unitID)
 	end
 end
@@ -170,6 +171,28 @@ function GG.Floating_AimWeapon(unitID)
 		end
 	end
 	aimWeapon[unitID] = true
+end
+
+
+function GG.Floating_UnitTeleported(unitID, position)
+	if float[unitID] then
+		local data = float[unitID]
+		local def = floatDefs[data.unitDefID]
+		data.x, data.y, data.z = position[1], position[2], position[3]
+		--data.speed = 0.1
+		local height = Spring.GetGroundHeight(data.x, data.z)
+		if height <= def.depthRequirement then
+			data.onSurface = false
+			Spring.MoveCtrl.SetPosition(unitID, data.x, data.y, data.z)
+			return true
+		else
+			Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 0)
+			callScript(unitID, "script.StopMoving")
+			removeFloat(unitID)
+			return false
+		end
+	end
+	return false
 end
 
 --------------------------------------------------------------------------------
@@ -244,7 +267,7 @@ function gadget:GameFrame(f)
 			end
 			
 			-- Fill tank
-			if  def.sinkTankRequirement then
+			if def.sinkTankRequirement then
 				if not data.surfacing then
 					if data.y <= def.floatPoint and data.sinkTank <= def.sinkTankRequirement then
 						data.sinkTank = data.sinkTank + 1
@@ -272,7 +295,7 @@ function gadget:GameFrame(f)
 			
 			-- Speed the position
 			local height = Spring.GetGroundHeight(data.x, data.z)
-			if data.speed ~= 0 or data.y <= height then
+			if data.speed ~= 0 or data.y <= height or not data.onSurface then
 				
 				data.nextSpecialDrag = 1
 				-- Splash animation and slowdown

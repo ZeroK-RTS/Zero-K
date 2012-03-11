@@ -102,7 +102,11 @@ function Float_crossWaterline(speed)
 end
 
 function Float_stationaryOnSurface()
-     Signal(SIG_FLOAT)
+    Signal(SIG_FLOAT)
+end
+
+function unit_teleported(position)
+	return GG.Floating_UnitTeleported(unitID, position)
 end
 
 --------------------------------------------------------------------------------------

@@ -238,6 +238,10 @@ function Float_stationaryOnSurface()
 	StartThread(staticFloat_thread)
 end
 
+function unit_teleported(position)
+	return GG.Floating_UnitTeleported(unitID, position)
+end
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 local gun_1 = 1
