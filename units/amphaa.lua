@@ -24,6 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    helptext       = [[Angler is amphibious AA designed to counter the factory's nemesis - Shadow. Two of them together can float to the surface and kill a single Shadow.]],
     floattoggle = [[1]],
   },
 

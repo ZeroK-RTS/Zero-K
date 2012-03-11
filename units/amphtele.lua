@@ -22,6 +22,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    helptext       = [[Djinn excels at moving large land based armies across bodies of water. When deployed it teleports units from around it's pre-placed static beacon to it's present location. This is one way so ensure the destination is safe.]],
   },
 
   defaultmissiontype     = [[Standby]],

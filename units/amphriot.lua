@@ -21,6 +21,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    helptext	   = [[A flexible unit, the Scallop is armed with torpedoes for underwater use and a quadruple shotgun when on land. It is the closest thing there is to a mainline torpedo unit that can stand up to armed ships. That is not to say it is good against them.]],
     extradrawrange = 460,
   },
 
