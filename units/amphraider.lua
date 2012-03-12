@@ -19,7 +19,7 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   canstop                = [[1]],
-  category               = [[SINK]],
+  category               = [[LAND SINK]],
   collisionVolumeTest    = 1,
   corpse                 = [[DEAD]],
 
