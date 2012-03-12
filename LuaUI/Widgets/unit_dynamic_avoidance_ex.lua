@@ -1,4 +1,4 @@
-local versionName = "v2.12"
+local versionName = "v2.13"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -731,7 +731,8 @@ function CatalogueMovingObject(surroundingUnits, unitID, lastPosition, losRadius
 				if unitDepth <0 then --//if unit is submerged, then:
 					--local enemySonarRadius = (spGetUnitSensorRadius(unitRectangleID,"sonar") or 0)
 					local enemyDefID = spGetUnitDefID(unitRectangleID)
-					local enemySonarRadius = (UnitDefs[enemyDefID].sonarRadius or 0)
+					local unitDefsSonarContent = (UnitDefs[enemyDefID] and UnitDefs[enemyDefID].sonarRadius)
+					local enemySonarRadius = (unitDefsSonarContent or 0)
 					if enemySonarRadius > halfLosRadius then --//check enemy for sonar
 						sonarDetected = true
 					end
