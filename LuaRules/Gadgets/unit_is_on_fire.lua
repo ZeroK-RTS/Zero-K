@@ -85,12 +85,15 @@ for i=1,#WeaponDefs do
 end
 
 local unitsOnFire = {}
+local inGameFrame = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
                             attackerID, attackerDefID, attackerTeam)
+  if (inGameFrame) then return end  --ignore own AddUnitDamage calls
+  
 	if (flamerWeaponDefs[weaponID]) then
 		local fwd = flamerWeaponDefs[weaponID]
 		if (UnitDefs[unitDefID].customParams.fireproof~="1") then
@@ -124,6 +127,7 @@ function gadget:GameFrame(n)
 	if (n%CHECK_INTERVAL<1)and(next(unitsOnFire)) then
 		local burningUnits = {}
 		local cnt = 1
+    inGameFrame = true
 		for unitID, t in pairs(unitsOnFire) do
 			if (n > t.endFrame) then
 				SetUnitRulesParam(unitID, "on_fire", 0)
@@ -131,12 +135,13 @@ function gadget:GameFrame(n)
 				unitsOnFire[unitID] = nil
 			else
 				t.damageLeft = t.damageLeft - t.fireDmg*CHECK_INTERVAL
-				AddUnitDamage(unitID,t.fireDmg*CHECK_INTERVAL,0,t.attackerID, t.weaponDefID )
+				AddUnitDamage(unitID,t.fireDmg*CHECK_INTERVAL,0,t.attackerID, t.weaponID )
 				--Spring.Echo(t.attackerDefID)
 				burningUnits[cnt] = unitID
 				cnt=cnt+1
 			end
 		end
+    inGameFrame = false 
 		if (cnt>1) then
 			_G.burningUnits = burningUnits
 			SendToUnsynced("onFire")
