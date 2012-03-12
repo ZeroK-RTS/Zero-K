@@ -290,7 +290,9 @@ local function Jump(unitID, goal, cmdTag)
       local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height -- parabola
       local z = start[3] + vector[3]*i
       mcSetPosition(unitID, x, y, z)
-      spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
+	  if x0 then
+        spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
+	  end
 	  
 	  if cob then
 		spCallCOBScript(unitID, "Jumping", 1, i * 100)
