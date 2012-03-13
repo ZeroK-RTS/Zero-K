@@ -212,7 +212,9 @@ local function chooseUnitDefIDWithDebug(array, unitID, ud, choice)
 			return array[i].ID
 		end
 	end
-	Spring.Echo("Chance Wrong for " .. ud.humanName .. " with choice " .. choice)
+	-- Very rarely chances do not add up correctly or math.random() >= 1
+	return array[1].ID
+	--Spring.Echo("Chance Wrong for " .. ud.humanName .. " with choice " .. choice)
 end
 
 -- normalises the importance factors in an importance array
