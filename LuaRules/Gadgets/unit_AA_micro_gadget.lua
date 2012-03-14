@@ -17,7 +17,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -158,37 +158,17 @@ function checkAAdef()
 	  --Echo("ID " .. AAdefbuff.id)
 	  if not UnitIsDead(AAdefbuff.id) then
         local targets = nil
-		local cstate = isUnitCloaked(AAdefbuff.id)
 		local morphing = IsMorphing(AAdefbuff.id)
 		AAdef[h].units[i].frame = AAdefbuff.frame + 1
-    if AAdefbuff.frame == 1 and IsMicroCMD(AAdefbuff.id) then
-          local cmdDescID = FindUnitCmdDesc(AAdefbuff.id, CMD.FIRE_STATE)
-          local cmdDesc = GetUnitCmdDesc(AAdefbuff.id, cmdDescID, cmdDescID)
-          local nparams = cmdDesc[1].params
-	      AAdef[h].units[i].cfire = nparams[1] + 0
-		  GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, 0, i, h)
-		end
-		if cstate ~= nil and cstate ~= AAdefbuff.cstate then
-		  AAdef[h].units[i].cstate = cstate
-		end
-		if AAdefbuff.morph ~= morphing then
-		  AAdef[h].units[i].morph = morphing
-		end
 		if IsIdle(AAdefbuff.id) then
 		  AAdef[h].units[i].orderreceived = false
 		end
-		if morphing or cstate or AAdefbuff.orderreceived then
-		  if IsMicroCMD(AAdefbuff.id) then
-		    --Echo("player order, disabling control")
-		    GiveOrder(AAdefbuff.id, CMD_UNIT_AI, 0, i, h)
-		    GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, AAdefbuff.cfire, i, h)
-		  end
-		end
-		if IsIdle(AAdefbuff.id) and not cstate and not morphing then
-		  if not IsMicroCMD(AAdefbuff.id) and not AAdefbuff.deactivate then
-		    GiveOrder(AAdefbuff.id, CMD_UNIT_AI, 1, i, h)
-		    GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, AAdefbuff.fire, i, h)
-		  end
+		if IsMicroCMD(AAdefbuff.id) then
+          local fcmdDescID = FindUnitCmdDesc(AAdefbuff.id, CMD.FIRE_STATE)
+	      fcmdDesc = GetUnitCmdDesc(AAdefbuff.id, fcmdDescID, fcmdDescID)
+	      fnparams = fcmdDesc[1].params
+	      fnparams[1] = AAdef[h].units[i].fire
+          EditUnitCmdDesc(AAdefbuff.id, fcmdDescID, {params = fnparams})
 		end
 		weaponready, nextshot = WeaponReady(AAdefbuff.id, i, h)
 		AAdef[h].units[i].nextshot = nextshot
@@ -487,8 +467,7 @@ function assignTarget(unitID, refID, allyteam, output)
 	  local state = GetUnitStates(unitID)
       if AAdefbuff.name == "corrl" and output[5] ~= 0 then
 	    --Echo("Land targets in range " .. output[5])
-        AAdef[allyteam].units[refID].landtarget = true
-		GiveOrder(AAdef[allyteam].units[refID].id, CMD.FIRE_STATE, 2, refID, allyteam)
+        AAdef[allyteam].units[refID].fire = 2
 	  end
     end
   else
@@ -501,8 +480,8 @@ function assignTarget(unitID, refID, allyteam, output)
 	    landtargets = true
 	  end
 	end
-	if not landtargets and FireState(AAdefbuff.id) ~= AAdefbuff.fire then
-      GiveOrder(AAdef[allyteam].units[refID].id, CMD.FIRE_STATE, AAdefbuff.fire, refID, allyteam)
+	if not landtargets then
+        AAdef[allyteam].units[refID].fire = 0
 	end
   end
   if notargets == true then
@@ -649,7 +628,7 @@ function getAATargetsinRange(unitID, refID, allyteam)
   local x, y, z = GetUnitPosition(unitID)
   --Echo("getting targets")
   local AAdefbuff = AAdef[allyteam].units[refID]
-  local units = GetUnitsInRange(x, y, z, AAdefbuff.range)
+  local units = GetUnitsInCylinder(x, z, AAdefbuff.range)
   local nextshot = AAdefbuff.nextshot
   local team
   local ud
@@ -956,11 +935,13 @@ function GiveOrder(unitID, cmdID, params, refID, allyteam)
 end
 
 function IsMicro(unitID)
-  local cstate = isUnitCloaked(unitID)
   local morphing = IsMorphing(unitID)
+  local finished = IsFinished(unitID)
   local _, _, stun = UnitStun(unitID)
   local unitAI = IsMicroCMD(unitID)
-  if unitAI and not morphing and not cstate and not stun then
+  local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
+  local playerorder = AAdef[allyteam].units[refID].orderreceived
+  if unitAI and not morphing and not stun and finished and not playerorder then
     return true
   end
   return false
@@ -1140,7 +1121,7 @@ function addAA(unitID, unitDefID, name, allyteam)
 	    teamcount = allyteam
 	  end
 	end
-    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, morph = false, damage = sdamage - 5, landtarget = false, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
+    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, morph = false, damage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
     AAdefreference[allyteam].units[unitID] = AAdefmaxcount[allyteam] + 1
     AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] + 1
 end
@@ -1242,9 +1223,6 @@ function addShot(unitID, refID, allyteam, shotID, targetID)
 	shot[shotmaxcount + 1].prefID = AAdefbuff.projectilescount + 1
 	AAdef[allyteam].units[refID].projectilescount = AAdefbuff.projectilescount + 1
 	airtargets[tallyteam].units[arefID].incoming = airtargets[tallyteam].units[arefID].incoming + AAdefbuff.damage
-  end
-  if AAdefbuff.landtarget == 2 then
-    GiveOrder(AAdef[allyteam].units[refID].id, CMD.FIRE_STATE, AAdefbuff.fire, refID, allyteam)
   end
   shotreference[shotID] = shotmaxcount + 1
   shotmaxcount = shotmaxcount + 1
@@ -1454,7 +1432,7 @@ if IsAA(ud.name) then
       if not AAdefbuff.orderaccept then
 	    AAdef[allyteam].units[refID].deactivate = true
 	  end
-	  fnparams[1] = AAdef[allyteam].units[refID].cfire
+	  fnparams[1] = 2
     else
 	  nparams = {1, 'AI Off','AI On'}
       if not AAdefbuff.orderaccept then
@@ -1464,40 +1442,6 @@ if IsAA(ud.name) then
     end
     EditUnitCmdDesc(unitID, cmdDescID, {params = nparams})
     EditUnitCmdDesc(unitID, fcmdDescID, {params = fnparams})
-  elseif cmdID == CMD.FIRE_STATE then
-    if not IsMicro(unitID) then
-	  local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
-	  if allyteam ~= nil and refID ~= nil and AAdefbuff ~= nil then
-	    --Echo("cloaked state " .. cmdParams[1])
-		if not AAdefbuff.landtarget then
-          if cmdParams[1] == 2 then
-            AAdef[allyteam].units[refID].cfire = 2
-          elseif cmdParams[1] == 1 then
-            AAdef[allyteam].units[refID].cfire = 1
-	      else
-            AAdef[allyteam].units[refID].cfire = 0
-          end
-		else
-		  AAdef[allyteam].units[refID].landtarget = false
-		end
-	  end
-	else
-	  local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
-	  if allyteam ~= nil and refID ~= nil and AAdefbuff ~= nil then
-		if not AAdefbuff.landtarget then
-		  --Echo("uncloaked state " .. cmdParams[1])
-          if cmdParams[1] == 2 then
-            AAdef[allyteam].units[refID].fire = 2
-          elseif cmdParams[1] == 1 then
-            AAdef[allyteam].units[refID].fire = 1
-	      else
-            AAdef[allyteam].units[refID].fire = 0
-          end
-		else
-		  AAdef[allyteam].units[refID].landtarget = false
-		end
-	  end
-	end
   else
 	if AAdefbuff ~= nil then
 	  --Echo("AA micro order?", AAdefbuff.orderaccept)
