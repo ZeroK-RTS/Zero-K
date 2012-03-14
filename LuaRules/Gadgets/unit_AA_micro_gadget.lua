@@ -161,7 +161,7 @@ function checkAAdef()
 		local cstate = isUnitCloaked(AAdefbuff.id)
 		local morphing = IsMorphing(AAdefbuff.id)
 		AAdef[h].units[i].frame = AAdefbuff.frame + 1
-		if AAdefbuff.frame == 1 then
+    if AAdefbuff.frame == 1 and IsMicroCMD(AAdefbuff.id) then
           local cmdDescID = FindUnitCmdDesc(AAdefbuff.id, CMD.FIRE_STATE)
           local cmdDesc = GetUnitCmdDesc(AAdefbuff.id, cmdDescID, cmdDescID)
           local nparams = cmdDesc[1].params
@@ -1380,7 +1380,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     InsertUnitCmdDesc(unitID, unitAICmdDesc)
 	local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
 	--Echo(cmdDescID)
-	EditUnitCmdDesc(unitID, cmdDescID, {params = {1, 'AI Off','AI On'}})
+	EditUnitCmdDesc(unitID, cmdDescID, {params = {0, 'AI Off','AI On'}})
   end
 end
 
