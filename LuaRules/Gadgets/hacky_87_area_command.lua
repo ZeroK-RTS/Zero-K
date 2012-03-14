@@ -31,7 +31,7 @@ local units = {count = 0, unitID = {}}
 local thereIsStuffToDo = false
 
 function gadget:UnitCmdDone(unitID, unitDefID, team, cmdID, cmdTag)
-	if (cmdID == CMD.RECLAIM or cmdID == CMD_RESURRECT or cmdID == CMD_REPAIR) then
+	if (cmdID == CMD.RECLAIM or cmdID == CMD_RESURRECT or cmdID == CMD_REPAIR or cmdID < 0) then
 		-- Double wait requires a 1 frame delay
 		thereIsStuffToDo = true
 		units.count = units.count + 1

@@ -141,7 +141,7 @@ local function TagTree(unit, faction, newbuildoptions)
     end
 	local ud = UnitDefs[unit]
     ud.faction = faction
-    if (UnitDefs[unit].buildoptions) then
+    if (UnitDefs[unit].buildoptions) and (ud.workertime and ud.workertime > 0) then
 	  if (ud.maxvelocity > 0) and unit ~= "armcsa" then
 	    ud.buildoptions = newbuildoptions
 	  end	
