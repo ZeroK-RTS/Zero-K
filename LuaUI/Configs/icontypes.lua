@@ -17,6 +17,11 @@ local icontypes = {
     size=1.3,
     radiusadjust=1,
   },
+  
+  none = {
+    size=0,
+    radiusadjust=0,
+  },
 
 -- commanders
   commander1 = {
