@@ -41,7 +41,7 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   mass                = 153,
-  maxDamage           = 640,
+  maxDamage           = 680,
   maxSlope            = 18,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
@@ -92,8 +92,8 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 300,
-        planes  = 300,
+        default = 330,
+        planes  = 330,
         subs    = 15,
       },
 
@@ -105,7 +105,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_dragonsfang.s3o]],
       projectiles             = 2,
-      range                   = 440,
+      range                   = 450,
       reloadtime              = 10,
       selfprop                = true,
       smokedelay              = [[.1]],
