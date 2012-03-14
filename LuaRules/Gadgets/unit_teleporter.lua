@@ -186,8 +186,8 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID,
                              cmdID, cmdParams, cmdOptions)
-		
-	if teleportingUnit[unitID] then
+	
+	if teleportingUnit[unitID] and cmdID ~= 1 and cmdID ~= 2 and cmdID ~= CMD.FIRESTATE and cmdID ~= CMD.MOVESTATE and cmdID ~= CMD.CLOAK then
 		interruptTeleport(teleportingUnit[unitID])
 	end
 	

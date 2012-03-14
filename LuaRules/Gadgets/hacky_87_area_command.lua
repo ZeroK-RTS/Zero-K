@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "12 March 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
