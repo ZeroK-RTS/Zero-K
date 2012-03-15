@@ -174,7 +174,7 @@ function script.AimFromWeapon()
 	if height < -130 then
 		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = 200})
 	else
-		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = 11})
+		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = 11.3})
 	end
 	
 	return barrel

@@ -68,7 +68,7 @@ unitDef = {
   sightDistance       = 484,
   smoothAnim          = true,
   turninplace         = 0,
-  turnRate            = 500,
+  turnRate            = 600,
   workerTime          = 0,
 
   weapons             = {
