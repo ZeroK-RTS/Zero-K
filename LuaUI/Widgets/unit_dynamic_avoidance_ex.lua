@@ -1,4 +1,4 @@
-local versionName = "v2.13"
+local versionName = "v2.2"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground combat unit and gunships",
     author    = "msafwan",
-    date      = "March 4, 2012",
+    date      = "March 17, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -133,6 +133,7 @@ local cycleG=1 --first execute "GetPreliminarySeparation()"
 local wreckageID_offset=0
 local roundTripComplete= true --variable for detecting network lag, prevent messy overlapping command queuing
 local attackerG= {} --for recording last attacker
+local commandTTL_G = {} --for recording command's age. To check for expiration
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
@@ -221,11 +222,12 @@ function widget:Update()
 	local cycle = cycleG
 	local skippingTimer = skippingTimerG
 	local attacker = attackerG
+	local commandTTL = commandTTL_G
 	-----
 	local now=spGetGameSeconds()
 	if (now >= skippingTimer[1]) then --wait until 'skippingTimer[1] second', then do "RefreshUnitList()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
-		unitInMotion, attacker=RefreshUnitList(attacker) --create unit list
+		unitInMotion, attacker, commandTTL=RefreshUnitList(attacker, commandTTL) --create unit list
 		
 		local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --create list every 1.1 second, or every each second of lag.
 		skippingTimer[1]=now+projectedDelay --wait until next 'skippingTimer[1] second'
@@ -244,7 +246,7 @@ function widget:Update()
 	if (now >=skippingTimer[2] and cycle==2) then --wait until 'skippingTimer[2] second', and wait for 'cycle==2', then do "DoCalculation()"
 		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
 		local networkDelay = CalculateNetworkDelay(0, skippingTimer, nil) --retrieve delay statistic
-		commandIndexTable=DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay, now) --initiate avoidance system
+		commandIndexTable, commandTTL =DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay, now, commandTTL) --initiate avoidance system
 		cycle=1 --set to 'cycle==1'
 		
 		skippingTimer[2]=now+ doCalculation_then_gps_delayG --wait until 'doCalculation_then_gps_delayG'. Is arbitrarily set. Save CPU by setting longer wait.
@@ -265,12 +267,13 @@ function widget:Update()
 	cycleG = cycle
 	skippingTimerG = skippingTimer
 	attackerG = attacker
+	commandTTL_G = commandTTL
 	-----
 end
 ---------------------------------Level 0 Top level
 ---------------------------------Level1 Lower level
 -- return a refreshed unit list, else return nil
-function RefreshUnitList(attacker)
+function RefreshUnitList(attacker, commandTTL)
 	local allMyUnits = spGetTeamUnits(myTeamID_gbl)
 	local arrayIndex=1
 	local relevantUnit={}
@@ -282,8 +285,10 @@ function RefreshUnitList(attacker)
 	end
 	for _, unitID in ipairs(allMyUnits) do
 		if unitID~=nil then --skip end of the table
-			-- refresh attacker's list
+			-- additional hitchiking function: refresh attacker's list
 			attacker = RetrieveAttackerList (unitID, attacker)
+			-- additional hitchiking function: refresh WATCHDOG's list
+			commandTTL = RefreshWatchdogList (unitID, commandTTL)
 			--
 			local unitDefID = spGetUnitDefID(unitID)
 			local unitDef = UnitDefs[unitDefID]
@@ -343,7 +348,7 @@ function RefreshUnitList(attacker)
 		Spring.Echo("relevantUnit(RefreshUnitList): ")
 		Spring.Echo(relevantUnit)
 	end
-	return relevantUnit, attacker
+	return relevantUnit, attacker, commandTTL
 end
 
 -- detect initial enemy separation to detect "fleeing enemy"  later
@@ -408,7 +413,7 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 end
 
 --perform the actual collision avoidance calculation and send the appropriate command to unit
-function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay, now)
+function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay, now, commandTTL)
 	if surroundingOfActiveUnit[1]~=nil then --if flagged as nil then no stored content then this mean there's no relevant unit
 		for i=2,surroundingOfActiveUnit[1], 1 do --index 1 is for array's lenght
 			local unitID=surroundingOfActiveUnit[i][1]
@@ -419,38 +424,41 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, net
 				local cQueue=surroundingOfActiveUnit[i][5]
 				local newCommand=surroundingOfActiveUnit[i][6]
 				
-				--do sync test. Ensure stored command not changed during last delay
+				--do sync test. Ensure stored command not changed during last delay. eg: it change if user issued new command
 				local cQueueSyncTest = spGetCommandQueue(unitID)
+				local needToCancelOrder = false
 				if #cQueueSyncTest>=2 then --if new command is longer than or equal to 2 (1 any command + 1 stop command)
 					if #cQueueSyncTest~=#cQueue or --if command queue is not same as original, or
-						(cQueueSyncTest[1].params[1]~=cQueue[1].params[1] or cQueueSyncTest[1].params[3]~=cQueue[1].params[3]) or --if first queue has different content, or
-							cQueueSyncTest[1]==nil then --if unit has became idle
+						(cQueueSyncTest[1].params[1]~=cQueue[1].params[1] or cQueueSyncTest[1].params[3]~=cQueue[1].params[3]) or --or, if first queue has different content, or
+							cQueueSyncTest[1]==nil then --or, if unit has became idle
 						--newCommand=true
 						--cQueue=cQueueSyncTest
 						commandIndexTable[unitID]=nil --empty commandIndex (command history) for this unit
-						return commandIndexTable --skip
+						commandTTL[unitID][#commandTTL]=nil --delete latest watchdog's entry for this unit
+						needToCancelOrder = true --skip widget's command
 					end
 				end
-				
-				local unitSpeed= surroundingOfActiveUnit[i][7]
-				local impatienceTrigger= surroundingOfActiveUnit[i][8]
-				local lastPosition = surroundingOfActiveUnit[i][9]
-				local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --get the latest unit list (rather than using the preliminary list) to ensure reliable avoidance
-				local graphCONSTANTtrigger = surroundingOfActiveUnit[i][10] --//fetch information on which aCONSTANT and obsCONSTANT to use
-				local fixedPointCONSTANTtrigger = surroundingOfActiveUnit[i][11] --//fetch information on which fixedPoint constant to use
-				if (newSurroundingUnits[1] ~=nil) then --//check again if there's still any enemy to avoid. Submerged unit might return empty list if their enemy has no Sonar (their 'losRadius' became half the original value so that they don't detect/avoid unnecessarily). 
-					local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger, newCommand) --calculate move solution
-					local newY=spGetGroundHeight(newX,newZ)
-					commandIndexTable= InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand, now) --send move solution to unit
-					if (turnOnEcho == 1) then
-						Spring.Echo("newX(Update) " .. newX)
-						Spring.Echo("newZ(Update) " .. newZ)
+				if not needToCancelOrder then --//if unit receive new command then widget need to stop issuing command based on old information. This prevent user from being annoyed by widget overriding their command.
+					local unitSpeed= surroundingOfActiveUnit[i][7]
+					local impatienceTrigger= surroundingOfActiveUnit[i][8]
+					local lastPosition = surroundingOfActiveUnit[i][9]
+					local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --get the latest unit list (rather than using the preliminary list) to ensure reliable avoidance
+					local graphCONSTANTtrigger = surroundingOfActiveUnit[i][10] --//fetch information on which aCONSTANT and obsCONSTANT to use
+					local fixedPointCONSTANTtrigger = surroundingOfActiveUnit[i][11] --//fetch information on which fixedPoint constant to use
+					if (newSurroundingUnits[1] ~=nil) then --//check again if there's still any enemy to avoid. Submerged unit might return empty list if their enemy has no Sonar (their 'losRadius' became half the original value so that they don't detect/avoid unnecessarily). 
+						local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger, newCommand) --calculate move solution
+						local newY=spGetGroundHeight(newX,newZ)
+						commandIndexTable, commandTTL = InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand, now, commandTTL) --send move solution to unit
+						if (turnOnEcho == 1) then
+							Spring.Echo("newX(Update) " .. newX)
+							Spring.Echo("newZ(Update) " .. newZ)
+						end
 					end
 				end
 			end
 		end
 	end
-	return commandIndexTable
+	return commandIndexTable, commandTTL
 end
 
 function widget:RecvLuaMsg(msg, playerID) --receive echo from server ('LUA message Receive')
@@ -498,12 +506,37 @@ function RetrieveAttackerList (unitID, attacker)
 	if unitHealth< attacker[unitID].myHealth then --if underattack then find out the attackerID
 		local attackerID = spGetUnitLastAttacker(unitID)
 		if attackerID~=nil then --if attackerID is found then mark the attackerID for avoidance
-			attacker[unitID].countDown = attacker[unitID].countDown + 3
+			attacker[unitID].countDown = attacker[unitID].countDown + 3 --//add 3xUnitRefresh-rate (~3.3second) to attacker's TTL
 			attacker[unitID].id = attackerID
 		end
 	end
 	attacker[unitID].myHealth = unitHealth --refresh health data	
 	return attacker
+end
+
+function RefreshWatchdogList (unitID, commandTTL)
+	if commandTTL[unitID] == nil then --if commandTTL table is empty then insert an empty table
+		commandTTL[unitID] = {}
+	else --//if commandTTL is not empty then perform check and update its content appropriately. Its not empty when widget has issued a new command
+		local cQueue = spGetCommandQueue(unitID, 1)
+		for i=#commandTTL[unitID], 1, -1 do
+			local firstParam, secondParam = 0, 0
+			if cQueue[1]~=nil then
+				firstParam, secondParam = cQueue[1].params[1], cQueue[1].params[3]
+			if (firstParam == commandTTL[unitID][i].widgetCommand[1]) and (secondParam == commandTTL[unitID][i].widgetCommand[2]) then --//if current command is similar to the one once issued by widget then countdown its TTL
+				if commandTTL[unitID][i].countDown >0 then 
+					commandTTL[unitID][i].countDown = commandTTL[unitID][i].countDown - 1 --count-down until zero and stop
+				elseif commandTTL[unitID][i].countDown ==0 then --if commandTTL is found to reach ZERO then remove the command, assume a 'TIMEOUT', then remove *this* watchdog entry
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+					commandTTL[unitID][i] = nil
+				end
+				break --//exit the iteration, save the rest of the commandTTL for checking on next update/next cQueue. If later commandTTL is for cQueue[2] then it would be more appropriate to compare it later (currently we only check cQueue[1] for timeout/expiration).
+			else --//if current command is a NEW command (not similar to widget's issued), then delete *this* watchdog entry. Operator "#" will automatically register the 'nil' as 'end of table' for future updates
+				commandTTL[unitID][i] = nil
+			end
+		end
+	end
+	return commandTTL
 end
 
 function CheckWeaponsAndShield (unitDef)
@@ -731,7 +764,10 @@ function CatalogueMovingObject(surroundingUnits, unitID, lastPosition, losRadius
 				if unitDepth <0 then --//if unit is submerged, then:
 					--local enemySonarRadius = (spGetUnitSensorRadius(unitRectangleID,"sonar") or 0)
 					local enemyDefID = spGetUnitDefID(unitRectangleID)
-					local unitDefsSonarContent = (UnitDefs[enemyDefID] and UnitDefs[enemyDefID].sonarRadius)
+					local unitDefsSonarContent = 999 --//set to very large so that any un-identified contact is assumed as having sonar (as threat). 
+					if UnitDefs[enemyDefID]~=nil then
+						unitDefsSonarContent = UnitDefs[enemyDefID].sonarRadius
+					end
 					local enemySonarRadius = (unitDefsSonarContent or 0)
 					if enemySonarRadius > halfLosRadius then --//check enemy for sonar
 						sonarDetected = true
@@ -814,7 +850,7 @@ end
 
 -- maintain the visibility of original command
 -- reference: "unit_tactical_ai.lua" -ZeroK gadget by Google Frog
-function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, newCommand, now)
+function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, newCommand, now, commandTTL)
 	--Method 1: doesn't work online
 	--if not newCommand then spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) end --delete old command
 	-- spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
@@ -868,28 +904,32 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 	if not newCommand then  --if widget's command then delete it
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
 		queueIndex=2 --skip index 1 of stored command. Skip widget's command
+		commandTTL[unitID][#commandTTL[unitID]] = nil --//delete the latest watchdog entry (assuming commandTTL are insert/delete same command that widget is insert/delete). 
 	end
 	if #cQueue>=queueIndex+1 then --reclaim,area reclaim,stop, or: move,reclaim, area reclaim,stop, or: area reclaim, stop, or:move, area reclaim, stop.
 		if (cQueue[queueIndex].id==40 or cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125) then --if first (1) queue is reclaim/ressurect/repair
 			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --if second (2) queue is also reclaim/ressurect
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
 				if (cQueue[queueIndex+1].params[3]~=nil) then  --second (2) queue is area reclaim. area command should has no "nil" on params 1,2,3, & 4
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete old command, skip the target:wreck/units. Allow command reset
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete latest reclaiming/ressurecting command (skip the target:wreck/units). Allow command reset
 					local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex+1])
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
+					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command OR to any heavy concentration of ally (haven)
+					commandTTL[unitID][#commandTTL[unitID] +1] = {countDown = 15, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 15x*RefreshUnitUpdateRate* to expire
 				end
 			elseif cQueue[queueIndex+1].id==40 then --if second (2) queue is also repair
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
 				if (cQueue[queueIndex+1].params[3]~=nil) then  --area command should has no "nil" on params 1,2,3, & 4
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete old command, skip the target:units. Allow continuous command reset
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete current repair command, (skip the target:units). Reset the repair command
 				end
-			elseif (cQueue[queueIndex].params[3]~=nil) then  --first (1) queue is area reclaim. area command should has no "nil" on params 1,2,3, & 4
+			elseif (cQueue[queueIndex].params[3]~=nil) then  --if first (1) queue is area reclaim (an area reclaim without any wreckage to reclaim). area command should has no "nil" on params 1,2,3, & 4
 				local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex])
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
+				commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = 4, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
 			end
 		end
 	end
 	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
+	commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = 4, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
 	----
 	commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
 	commandIndexTable[unitID]["widgetZ"]=newZ
@@ -908,7 +948,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 			Spring.Echo(cQueue[2].params[3])
 		end
 	end
-	return commandIndexTable --return updated memory table
+	return commandIndexTable, commandTTL --return updated memory tables. One for checking if new command is issued and another is to check for command's expiration age.
 end
 ---------------------------------Level2
 ---------------------------------Level3 (low-level function)
@@ -1096,9 +1136,9 @@ function AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, 
 	if attacker[unitID].countDown > 0 then
 		local separation = spGetUnitSeparation (unitID,attacker[unitID].id)
 		if separation ~=nil then --if attackerID is still a valid id (ie: enemy did not disappear) then:
-			if separation> losRadius then
+			if separation> losRadius then --only include attacker that is outside LosRadius because anything inside LosRadius is automatically included later anyway
 				arrayIndex=arrayIndex+1
-				relevantUnit[arrayIndex]=rectangleUnitID
+				relevantUnit[arrayIndex]= attacker[unitID].id --//add attacker as a threat
 			end
 		end
 	end
@@ -1384,7 +1424,9 @@ function FindSafeHavenForCons(unitID, now)
 	if options.enableReturnToBase.value==false or WG.recvIndicator == nil then --//if epicmenu option 'Return To Base' is false then return nil
 		return nil
 	end
+	Spring.Echo((now - safeHavenLastUpdate))
 	if (now - safeHavenLastUpdate) > 4 then --//only update NO MORE than once every 4 second:
+		safeHavenCoordinates = {} --//reset old content
 		local allMyUnits = spGetTeamUnits(myTeamID)
 		local unorderedUnitList = {}
 		for i=1, #allMyUnits, 1 do --//convert unit list into a compatible format for the Clustering function below
@@ -1669,6 +1711,8 @@ end
 --"cmd_retreat.lua" -Place 'retreat zones' on the map and order units to retreat to them at desired HP percentages, by CarRepairer (OPT_INTERNAL function)      
 --"gui_epicmenu.lua" --"Extremely Powerful Ingame Chili Menu.", by Carrepairer
 --"gui_chili_integral_menu.lua" --Chili Integral Menu, by Licho, KingRaptor, Google Frog
+--10
+--Thanks to versus666 for his endless playtesting and creating idea for improvement & bug report (eg: messy command queue case, widget overriding user's command case, "avoidance may be bad for gunship" case, avoidance depending on detected enemy sonar, constructor's retreat timeout, ect)
 --------------------------------------------------------------------------------
 --Method Index:
 --  widget:Initialize()
