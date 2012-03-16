@@ -265,7 +265,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-    if severity <= 50 then
+        if severity <= .50 then
 		Explode(lfoot, sfxNone)
 		Explode(lshin, sfxNone)
 		Explode(lthigh, sfxNone)
@@ -275,7 +275,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(body, sfxNone)
 		Explode(sphere, sfxFall)
 		return 1
-	elseif severity <= 99 then
+	elseif severity <= .99 then
 		Explode(lfoot, sfxFall)
 		Explode(lshin, sfxFall)
 		Explode(lthigh, sfxFall)

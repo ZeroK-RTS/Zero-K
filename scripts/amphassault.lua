@@ -373,11 +373,11 @@ end
 -- should also explode the leg pieces but I really cba...
 function script.Killed(recentDamage, maxHealth)
     local severity = recentDamage/maxHealth
-    if severity <= 50 then
+    if severity <= .50 then
         Explode(turret, sfxNone)
         Explode(body, sfxNone)
         return 1
-    elseif severity <= 99 then
+    elseif severity <= .99 then
         Explode(body, sfxShatter)
         Explode(turret, sfxShatter)
         Explode(lbarrel1, sfxFall + sfxSmoke)
