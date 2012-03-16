@@ -523,6 +523,7 @@ function RefreshWatchdogList (unitID, commandTTL)
 			local firstParam, secondParam = 0, 0
 			if cQueue[1]~=nil then
 				firstParam, secondParam = cQueue[1].params[1], cQueue[1].params[3]
+			end
 			if (firstParam == commandTTL[unitID][i].widgetCommand[1]) and (secondParam == commandTTL[unitID][i].widgetCommand[2]) then --//if current command is similar to the one once issued by widget then countdown its TTL
 				if commandTTL[unitID][i].countDown >0 then 
 					commandTTL[unitID][i].countDown = commandTTL[unitID][i].countDown - 1 --count-down until zero and stop
