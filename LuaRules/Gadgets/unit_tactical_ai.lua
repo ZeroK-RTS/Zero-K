@@ -301,6 +301,11 @@ local function skirmEnemy(unitID, enemy, move, cQueue,n)
 	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
 	local cx,cy,cz -- command position	
+	
+	if not (ex and vx) then
+		return false
+	end
+	
 	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
 	
 	local pointDis = math.sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)

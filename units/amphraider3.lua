@@ -38,7 +38,7 @@ unitDef = {
   mass                   = 390,
   maxDamage              = 400,
   maxSlope               = 36,
-  maxVelocity            = 2.8,
+  maxVelocity            = 2.7,
   maxWaterDepth          = 5000,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
@@ -144,7 +144,7 @@ unitDef = {
       waterWeapon             = true,
       weaponAcceleration      = 1,
       weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 100,
+      weaponVelocity          = 140,
     },
   },
 

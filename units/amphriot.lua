@@ -95,7 +95,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 100,
+        default = 130,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -125,14 +125,14 @@ unitDef = {
     FLECHETTE = {
       name                    = [[Flechette]],
       areaOfEffect            = 32,
-      burst		      = 3,
-      burstRate		      = 0.03,
+      burst		              = 3,
+      burstRate		          = 0.03,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
       
       damage                  = {
-	    default = 32,
+	    default = 22,
 	    subs    = 1.6,
       },
       
@@ -143,8 +143,8 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      projectiles	      = 3,
-      range                   = 300,
+      projectiles	          = 3,
+      range                   = 280,
       reloadtime              = 0.9,
       rgbColor                = [[1 1 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],
