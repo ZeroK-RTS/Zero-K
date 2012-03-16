@@ -228,6 +228,10 @@ local function SendCommand()
 			
 			local a,c,m,s = spGetModKeyState()
 			
+			for n = 1, i do
+				Spring.Echo(n .. "   " .. (params[n] or "nil"))
+			end
+			
 			if s then
 				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
 				originalCommandGiven = true
