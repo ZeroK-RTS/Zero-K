@@ -77,30 +77,32 @@ local function addFloat(unitID, unitDefID)
 	if not float[unitID] then
 		local def = floatDefs[unitDefID]
 		local x,y,z = Spring.GetUnitBasePosition(unitID)
-		Spring.MoveCtrl.Enable(unitID)
-		Spring.MoveCtrl.SetNoBlocking(unitID, true)
-		local place, feature = Spring.TestBuildOrder(unitDefID, x, y ,z, 1)
-		Spring.MoveCtrl.SetNoBlocking(unitID, false)
-		if y < def.depthRequirement and place == 2 then
-			Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
-			floatByID.count = floatByID.count + 1
-			floatByID.data[floatByID.count] = unitID
-			float[unitID] = {
-				index = floatByID.count,
-				surfacing = true,
-				prevSurfacing = true,
-				onSurface = false,
-				justStarted = true,
-				sinkTank = 0,
-				nextSpecialDrag = 1,
-				speed = def.initialRiseSpeed,
-				x = x, y = y, z = z,
-				unitDefID = unitDefID,
-				paraData = {want = false, para = false},
-			}
-			Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*2^-15*math.pi, 0)
-		else
-			Spring.MoveCtrl.Disable(unitID)
+		if y < def.depthRequirement then
+			Spring.MoveCtrl.Enable(unitID)
+			Spring.MoveCtrl.SetNoBlocking(unitID, true)
+			local place, feature = Spring.TestBuildOrder(unitDefID, x, y ,z, 1)
+			Spring.MoveCtrl.SetNoBlocking(unitID, false)
+			if  place == 2 then
+				Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
+				floatByID.count = floatByID.count + 1
+				floatByID.data[floatByID.count] = unitID
+				float[unitID] = {
+					index = floatByID.count,
+					surfacing = true,
+					prevSurfacing = true,
+					onSurface = false,
+					justStarted = true,
+					sinkTank = 0,
+					nextSpecialDrag = 1,
+					speed = def.initialRiseSpeed,
+					x = x, y = y, z = z,
+					unitDefID = unitDefID,
+					paraData = {want = false, para = false},
+				}
+				Spring.MoveCtrl.SetRotation(unitID, 0, Spring.GetUnitHeading(unitID)*2^-15*math.pi, 0)
+			else
+				Spring.MoveCtrl.Disable(unitID)
+			end
 		end
 	end
 end
