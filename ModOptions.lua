@@ -573,7 +573,7 @@ local options = {
     name   = 'Enable 87.0 Workarounds',
     desc   = 'This enables workarounds for area reclaim and nanoframe targeting in sea. It is only required when running engine 87.0.',
     type   = 'bool',
-    def    = true,
+    def    = false,
     section= 'experimental',
   },
 }
