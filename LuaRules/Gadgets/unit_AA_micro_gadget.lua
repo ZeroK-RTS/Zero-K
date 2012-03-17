@@ -17,7 +17,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -1239,6 +1239,8 @@ function removeShot(shotID)
 	  local allyteam = shot[shotref].allyteam
 	  local AAdefbuff = AAdef[allyteam].units[refID]
 	  if AAdefbuff ~= nil then
+	  if AAdefbuff.projectiles ~= nil then
+	  if AAdefbuff.projectiles[prefID] ~= nil then
 	    local target = AAdefbuff.projectiles[prefID].target
 	    local _, trefID, tallyteam, airbuff = GetAirUnit(target)
 	    if airbuff ~= nil then
@@ -1253,6 +1255,8 @@ function removeShot(shotID)
 	    end
 	    AAdef[allyteam].units[refID].projectiles[prefID] = AAdefbuff.projectiles[AAdefbuff.projectilescount]
 	    AAdef[allyteam].units[refID].projectilescount = AAdefbuff.projectilescount - 1
+	  end
+	  end
 	  end
 	end
 	if shotmaxcount > 1 and shotref ~= shotmaxcount then
