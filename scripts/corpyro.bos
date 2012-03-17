@@ -320,6 +320,9 @@ Create()
 	turn r_leg to x-axis <-30> now;
 	turn r_foot to x-axis <30> now;
 	turn r_pist1 to x-axis <-50> now;
+	
+	turn l_jetpt to x-axis <50> now;
+	turn r_jetpt to x-axis <50> now;
 }
 
 
