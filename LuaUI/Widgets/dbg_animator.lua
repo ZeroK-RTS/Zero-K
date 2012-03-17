@@ -297,7 +297,7 @@ end
 
 function widget:Initialize()
 	local animationMode = Spring.GetGameRulesParam('animation') == 1
-	echo ( animationMode )
+	--echo ( animationMode )
 	if not WG.Chili or not animationMode then
 		widgetHandler:RemoveWidget(widget)
 		return

@@ -85,3 +85,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		inBuildLinks[unitID] = nil
 	end
 end
+
+function gadget:Initialize()
+	if not (Spring.GetModOptions() and tobool(Spring.GetModOptions().engine_workarounds)) then
+		gadgetHandler:RemoveGadget()
+	end
+end

@@ -567,6 +567,15 @@ local options = {
     maxlen = 12,
   },
 --]]
+
+  {
+    key    = 'engine_workarounds',
+    name   = 'Enable 87.0 Workarounds',
+    desc   = 'This enables workarounds for area reclaim and nanoframe targeting in sea. It is only required when running engine 87.0.',
+    type   = 'bool',
+    def    = true,
+    section= 'experimental',
+  },
 }
 
 --// add key-name to the description (so you can easier manage modoptions in springie)
