@@ -1,4 +1,4 @@
-local versionNumber = "v1.0"
+local versionNumber = "v1.2"
 
 --[[   TO DO::
 
@@ -33,6 +33,7 @@ local TeamUnits          = Spring.GetTeamUnits
 local GetPlayerInfo      = Spring.GetPlayerInfo
 local GetTeamInfo        = Spring.GetTeamInfo
 local GetUnitPosition    = Spring.GetUnitPosition
+local GetUnitBasePosition= Spring.GetUnitBasePosition
 --[[
 Spring.GetUnitHeading 
  ( number unitID ) -> nil | number heading
@@ -88,7 +89,16 @@ local shot               = {} -- {id = shotID, unitID = ownerID, refID = owner's
 local shotreference      = {}
 local shotmaxcount       = 0
 local airunitdefs        = {}
-local DPSAA              = {["corrl"] = 60, ["corrazor"] = 150, ["armcir"] = 250, ["corflak"] = 360}
+local EscortAA           = {} --{["corrl"] = 60, ["corrazor"] = 150, ["armcir"] = 250, ["corflak"] = 360}
+local AAstats            = {}
+local AAdelayedsalvo     = {}
+local AABurst            = {}
+local AADPS              = {}
+local StaticAA           = {}
+local MobileAA           = {}
+MobileAA["amphaa"] = 1
+AABurst["amphaa"] = 1
+AAstats["amphaa"] = {name = "amphaa", wname = nil, damage = 640, shotdamage = 160, salvosize = 4, range = 800, reload = 8 * 30, dps = 80, velocity = 850}  --Hardcoded as amphaa's weapon doesn't show up in weaponDefs
 local weapondefID        = {}
 local globalassignment   = {}
 local globalassignmentcount   = 1
@@ -163,7 +173,7 @@ function checkAAdef()
 		if IsIdle(AAdefbuff.id) then
 		  AAdef[h].units[i].orderreceived = false
 		end
-		if IsMicroCMD(AAdefbuff.id) then
+		if IsMicroCMD(AAdefbuff.id) and IsBurstAA(AAdefbuff.name) and not IsMobileAA(AAdefbuff.name) then
           local fcmdDescID = FindUnitCmdDesc(AAdefbuff.id, CMD.FIRE_STATE)
 	      fcmdDesc = GetUnitCmdDesc(AAdefbuff.id, fcmdDescID, fcmdDescID)
 	      fnparams = fcmdDesc[1].params
@@ -181,14 +191,14 @@ function checkAAdef()
 			unassignTarget(AAdefbuff.id, i, h)
 		  end
 		end
+		counteris0 = false
 		if AAdefbuff.counter == 0 then
 		  AAdef[h].units[i].counter = AAmaxcounter(AAdefbuff.name)
-		  counteris0 = true
 		  if IsMicro(AAdefbuff.id) then
+		    counteris0 = true
 		    targets = getAATargetsinRange(AAdefbuff.id, i, h)
           end
 		else
-		  counteris0 = false
 		  AAdef[h].units[i].counter = AAdef[h].units[i].counter - 1
 		end
 		if weaponready and not AAdef[h].units[i].globalassign then
@@ -207,10 +217,10 @@ function checkAAdef()
 			end
 		  end
 		  if counteris0 then
-		    --Echo("ready, searching for target hp: " .. AAdef[h].units[i].damage)
 			if AAdefbuff.attacking == nil then
 			  unassignTarget(AAdefbuff.id, i, h)
 			  if IsMicro(AAdefbuff.id) then
+		        --Echo("ready, searching for target hp: " .. AAdef[h].units[i].damage)
 				assignTarget(AAdefbuff.id, i, h, targets)
 			  end
 			  AAdef[h].units[i].counter = AAmaxcounter(AAdefbuff.name)
@@ -232,7 +242,7 @@ function checkAAdef()
 		  end
 		elseif not AAdef[h].units[i].globalassign then
 		  --Echo("not ready, deassigning target")
-	      if IsMicro(AAdefbuff.id) and AAdefbuff.name ~= "missiletower" and not IsIdle(AAdefbuff.id) then
+	      if IsMicro(AAdefbuff.id) and AAdefbuff.name ~= "missiletower" and not IsIdle(AAdefbuff.id) and not IsMobileAA(AAdefbuff.name) and not IsDPSAA(AAdefbuff.name) then
 	        removecommand(AAdefbuff.id, i , h)
 			GiveOrder(AAdefbuff.id, CMD.STOP, nil, i, h)
 		  end
@@ -440,24 +450,30 @@ function assignTarget(unitID, refID, allyteam, output)
 	  if skip > output[2] then
 	    AAdef[allyteam].units[refID].skiptarget = 0
 	    unassignTarget(unitID, refID, allyteam)
-	    if IsMicro(AAdefbuff.id) then
+	    if IsMicro(AAdefbuff.id) and not IsMobileAA(AAdefbuff.name) and not IsDPSAA(AAdefbuff.name) then
 	      removecommand(AAdefbuff.id, refID, allyteam)
 		  GiveOrder(AAdefbuff.id, CMD.STOP, nil, refID, allyteam)
 		end
 	  end
-	  if AAdefbuff.name == "screamer" and AAdefbuff.name == "missiletower" and escortingAA(unitID, refID, allyteam) then
+	  if (AAdefbuff.name == "screamer" or AAdefbuff.name == "missiletower") and escortingAA(unitID, refID, allyteam) then
 	    output[1] = HSPruneTargets(output[1], output[2])
 	  end
-	  assign = BestTarget(output[1], output[2], damage, attacking, cdamage, skip, output[3])
+	  if IsBurstAA(AAdefbuff.name) then
+	    assign = BestTarget(output[1], output[2], damage, attacking, cdamage, skip, output[3])
+	  else
+	    assign = DPSBestTarget(output[1], output[2])
+	  end
+	  --Echo(assign)
 	  if assign ~= nil then
 		if assign ~= attacking then
-	      local ateam = GetUnitAllyTeam(assign)
-	      local arefID = airtargetsref[ateam].units[assign]
-	      unassignTarget(unitID, refID, allyteam)
-	      attackTarget(unitID, assign, refID, allyteam)
-	      AAdef[allyteam].units[refID].attacking = assign
-	      airtargets[ateam].units[arefID].tincoming = airtargets[ateam].units[arefID].tincoming + AAdefbuff.damage
-		  --Echo("id " .. unitID .. " targeting " .. assign .. " " .. airtargets[ateam].units[arefID].name .. ", hp " .. airtargets[ateam].units[arefID].hp .. " tincoming " .. airtargets[ateam].units[arefID].tincoming)
+		  _, arefID, ateam, airbuff = GetAirUnit(assign)
+		  if airbuff ~= nil then
+	        unassignTarget(unitID, refID, allyteam)
+	        attackTarget(unitID, assign, refID, allyteam)
+	        AAdef[allyteam].units[refID].attacking = assign
+		    airtargets[ateam].units[arefID].tincoming = airtargets[ateam].units[arefID].tincoming + AAdefbuff.damage
+		    --Echo("id " .. unitID .. " targeting " .. assign .. " " .. airtargets[ateam].units[arefID].name .. ", hp " .. airtargets[ateam].units[arefID].hp .. " tincoming " .. airtargets[ateam].units[arefID].tincoming)
+		  end
 		end
 	  end
 	end
@@ -590,12 +606,48 @@ for i = 1, count do
   end
 end
   if best ~= 0 then
+    --Echo(best, besthp)
     best = targets[best]
-    ----Echo("best target found, expected hp after damage " .. hpafter)
     return best
   end
   --Echo("preventing overkill")
   return nil
+end
+
+function DPSBestTarget(targets, count)
+  local best = nil
+  local besthp = -1000
+  local alldying = true
+  for i = 1, count do
+    if targets[i] ~= nil then
+    if not UnitIsDead(targets[i]) then
+      _, refID, targetteam, airbuff = GetAirUnit(targets[i])
+	  if airbuff ~= nil then
+        --Echo(alldying, best, besthp, i, airbuff.hp - airbuff.incoming - airbuff.tincoming)
+	    if alldying then
+	      if besthp == -1000 or besthp < airbuff.hp - airbuff.incoming - airbuff.tincoming then
+		    best = i
+		    besthp = airbuff.hp - airbuff.incoming - airbuff.tincoming
+		  end
+		  if airbuff.hp - airbuff.incoming - airbuff.tincoming > 0 then
+		    best = i
+		    besthp = airbuff.hp - airbuff.incoming - airbuff.tincoming
+			alldying = false
+		  end
+		else
+	      if besthp > airbuff.hp - airbuff.incoming - airbuff.tincoming and airbuff.hp - airbuff.incoming - airbuff.tincoming > 0 then
+		    best = i
+		    besthp = airbuff.hp - airbuff.incoming - airbuff.tincoming
+		  end
+		end
+	  end
+	end
+	end
+  end
+  if best ~= nil then
+    best = targets[best]
+  end
+  return best
 end
 
 function HSPruneTargets(targets, count)
@@ -626,7 +678,6 @@ function getAATargetsinRange(unitID, refID, allyteam)
   local targetscount = 1
   local ltargetscount = 1
   local x, y, z = GetUnitPosition(unitID)
-  --Echo("getting targets")
   local AAdefbuff = AAdef[allyteam].units[refID]
   local units = GetUnitsInCylinder(x, z, AAdefbuff.range)
   local nextshot = AAdefbuff.nextshot
@@ -649,7 +700,7 @@ function getAATargetsinRange(unitID, refID, allyteam)
 	    if LOS["los"] == true or LOS["radar"] == true then
 		  local timeinrange = TimeInRange(unitID, refID, allyteam, targetID)
 		  --Echo(timeinrange, nextshot)
-		  if timeinrange > nextshot then
+		  if IsBurstAA(AAdefbuff.name) and timeinrange > nextshot then
 		    _, trefID, tallyteam, airbuff = GetAirUnit(targetID)
 			if airbuff ~= nil then
 			if airbuff.hp - airbuff.incoming - airbuff.tincoming > damage then
@@ -748,6 +799,9 @@ function WeaponReady(unitID, refID, allyteam)
   local lowestreloading
   _, ready, _, _, _ = WeaponState(unitID, 0)
   rframe = AAdef[allyteam].units[refID].frame
+  if IsDPSAA(AAdef[allyteam].units[refID].name) then
+    return true, 0
+  end
   if ready == false or ready == true then
   if ready == false then
     --Echo("weapon not ready")
@@ -815,6 +869,9 @@ function WeaponReady(unitID, refID, allyteam)
 	  nextshot = 0
 	end
 	--Echo("id " .. unitID .. "weapon fired! " .. nextshot .. " " .. lowestreloading)
+	if nextshot < 2 then
+	  return true, nextshot
+	end
 	return false, nextshot
   else
     --Echo("weapon ready")
@@ -854,7 +911,7 @@ function WeaponReady(unitID, refID, allyteam)
   end
   end
   --Echo("cannot read")
-  return false
+  return false, 0
 end
 
 ------------------------------
@@ -878,7 +935,7 @@ function escortingAA(unitID, refID, allyteam)
 	if AreTeamsAllied(team, allyteam) and not stun then
 	  local unitDefID = GetUnitDefID(AAID)
 	  local ud = UnitDefs[unitDefID]
-	  escort = escort + ( DPSAA[ud.name] or 0 )
+	  escort = escort + ( EscortAA[ud.name] or 0 )
 	end
   end
   if escort >= 300 then
@@ -912,7 +969,11 @@ function IsAttacking(unitID)
 end
 
 function attackTarget(unitID, targetID, refID, allyteam)
-  GiveOrder(unitID, CMD.ATTACK, targetID, refID, allyteam)
+  if IsMobileAA(AAdef[allyteam].units[refID].name) then
+    GiveOrder(unitID, CMD_UNIT_SET_TARGET, targetID, refID, allyteam)
+  else
+    GiveOrder(unitID, CMD.ATTACK, targetID, refID, allyteam)
+  end
   AAdef[allyteam].units[refID].attacking = targetID
 end
 
@@ -939,9 +1000,16 @@ function IsMicro(unitID)
   local finished = IsFinished(unitID)
   local _, _, stun = UnitStun(unitID)
   local unitAI = IsMicroCMD(unitID)
+  local playerorder = true
+  local abovewater = false
   local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
-  local playerorder = AAdef[allyteam].units[refID].orderreceived
-  if unitAI and not morphing and not stun and finished and not playerorder then
+  if AAdefbuff ~= nil then
+    playerorder = AAdefbuff.orderreceived
+    local height = getAAUnitHeight(AAdefbuff.name)
+	local x, y, z = GetUnitBasePosition(unitID)
+	abovewater = ( y > (0 - height*0.75) )
+  end
+  if unitAI and not morphing and not stun and finished and not playerorder and (abovewater or AAdefbuff.name == "amphaa") then
     return true
   end
   return false
@@ -971,7 +1039,7 @@ function TimeInRange(unitID, refID, allyteam, targetID)
   local distance = AAdef[allyteam].units[refID].range - GetUnitSeparation(unitID, targetID, true)
   local tdefID = GetUnitDefID(targetID)
   local ud = UnitDefs[tdefID]
-  local movespeed = getairMoveSpeed(ud.name)
+  local movespeed = getairMoveSpeed(ud.name) - getAAMoveSpeed(AAdef[allyteam].units[refID].name)
   if movespeed ~= 0 then
     return (30 * distance / movespeed)
   end
@@ -1000,21 +1068,38 @@ end
 ------------------------------
 -----------CONSTANTS----------
 
+function IsDPSAA(name)
+  return (AADPS[name] == 1)
+end
+
+function IsBurstAA(name)
+  return (AABurst[name] == 1)
+end
+
+function IsMobileAA(name)
+  return (MobileAA[name] == 1)
+end
+
+function IsStaticAA(name)
+  return (StaticAA[name] == 1)
+end
+
 function IsAA(name)
-  if name == "corrl" or name == "missiletower" or name == "armcir" or name == "screamer" then -- or name == "corrazor"  then
+  return (AAstats[name] ~= nil)
+end
+
+function hasDelayedSalvo(name)
+  if AAdelayedsalvo[name] ~= nil then
     return true
   end
-  --[[if name == "armarad" then
-    return true
-  end]]--
   return false
 end
 
 function AAmaxcounter(name)
-  if name == "missiletower" then -- or name == "corrazor"  then
+  if name == "missiletower" then
     return 3
   end
-  if name == "screamer" then -- or name == "corrazor"  then
+  if name == "screamer" then
     return 10
   end
   return 3
@@ -1038,52 +1123,60 @@ function Isair(name)
   return false
 end
 
+function getSalvoDamage(name)
+  if AAstats[name] ~= nil then
+    return AAstats[name].damage
+  end
+  return 0
+end
+
 function getShotDamage(name)
-  if name == "corrl" then
-    return 110
+  if AAstats[name] ~= nil then
+    return AAstats[name].shotdamage
   end
-  if name == "missiletower" then
-    return 650
+  return 0
+end
+
+function getDPS(name)
+  if AAstats[name] ~= nil then
+    return AAstats[name].dps
   end
-  if name == "armcir" then
-    return 250
-  end
-  if name == "screamer" then
-    return 1750
+  return 0
+end
+
+function getRange(name)
+  if AAstats[name] ~= nil then
+    return AAstats[name].range
   end
   return 0
 end
 
 function getshotVelocity(name)
-  if name == "corrl" then
-    return 750
-  end
-  if name == "missiletower" then
-    return 900
-  end
-  if name == "armcir" then
-    return 800
-  end
-  if name == "screamer" then
-    return 1600
+  if AAstats[name] ~= nil then
+    return AAstats[name].velocity
   end
   return nil
 end
 
 function getReloadTime(name)
-  if name == "corrl" then
-    return 340
-  end
-  if name == "missiletower" then
-    return 390
-  end
-  if name == "armcir" then
-    return 30
-  end
-  if name == "screamer" then
-    return 54
+  if AAstats[name] ~= nil then
+    return AAstats[name].reload
   end
   return -1
+end
+
+function getAAMoveSpeed(name)
+  if AAstats[name] ~= nil then
+    return AAstats[name].movespeed
+  end
+  return -1
+end
+
+function getAAUnitHeight(name)
+  if AAstats[name] ~= nil then
+    return AAstats[name].height
+  end
+  return 0
 end
 
 function getairMoveSpeed(name)
@@ -1111,7 +1204,7 @@ end
 ---------MEM MANAGEMENT-------
 
 function addAA(unitID, unitDefID, name, allyteam)
-  local ud = UnitDefs[unitDefID]
+    local damage = getSalvoDamage(name)
     local sdamage = getShotDamage(name)
 	if AAdef[allyteam] == nil then
 	  AAdef[allyteam] = {units = {}}
@@ -1121,7 +1214,10 @@ function addAA(unitID, unitDefID, name, allyteam)
 	    teamcount = allyteam
 	  end
 	end
-    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = ud.maxWeaponRange, attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, morph = false, damage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
+    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = getRange(name), attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, morph = false, damage = damage - 5, shotdamage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
+	if IsDPSAA(name) or IsMobileAA(name) then
+	  AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1].fire = 2
+	end
     AAdefreference[allyteam].units[unitID] = AAdefmaxcount[allyteam] + 1
     AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] + 1
 end
@@ -1222,7 +1318,7 @@ function addShot(unitID, refID, allyteam, shotID, targetID)
     AAdef[allyteam].units[refID].projectiles[AAdefbuff.projectilescount + 1] = {id = shotID, target = targetID, TOF = flighttime}
 	shot[shotmaxcount + 1].prefID = AAdefbuff.projectilescount + 1
 	AAdef[allyteam].units[refID].projectilescount = AAdefbuff.projectilescount + 1
-	airtargets[tallyteam].units[arefID].incoming = airtargets[tallyteam].units[arefID].incoming + AAdefbuff.damage
+	airtargets[tallyteam].units[arefID].incoming = airtargets[tallyteam].units[arefID].incoming + AAdefbuff.shotdamage
   end
   shotreference[shotID] = shotmaxcount + 1
   shotmaxcount = shotmaxcount + 1
@@ -1361,7 +1457,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     addAA(unitID, unitDefID, ud.name, GetUnitAllyTeam(unitID))
     InsertUnitCmdDesc(unitID, unitAICmdDesc)
 	local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
-	--Echo(cmdDescID)
 	EditUnitCmdDesc(unitID, cmdDescID, {params = {0, 'AI Off','AI On'}})
   end
 end
@@ -1426,6 +1521,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
   local ud = UnitDefs[unitDefID]
 if IsAA(ud.name) then
   local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
+  if AAdefbuff ~= nil then
   if cmdID == CMD_UNIT_AI then
     local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
     local fcmdDescID = FindUnitCmdDesc(unitID, CMD.FIRE_STATE)
@@ -1447,14 +1543,13 @@ if IsAA(ud.name) then
     EditUnitCmdDesc(unitID, cmdDescID, {params = nparams})
     EditUnitCmdDesc(unitID, fcmdDescID, {params = fnparams})
   else
-	if AAdefbuff ~= nil then
-	  --Echo("AA micro order?", AAdefbuff.orderaccept)
-	  if AAdefbuff.orderaccept then
-	    AAdefbuff.orderaccept = false
-	  else
-        AAdef[allyteam].units[refID].orderreceived = true
-	  end
+	if AAdefbuff.orderaccept then
+	  AAdefbuff.orderaccept = false
+	elseif cmdID ~= 5 and cmdID ~= 70 and cmdID ~= CMD.MOVE and cmdID ~= CMD.FIGHT and cmdID ~= CMD.PATROL and cmdID ~= CMD.GUARD and cmdID ~= CMD_UNIT_CANCEL_TARGET and cmdID ~= CMD.STOP then
+      AAdef[allyteam].units[refID].orderreceived = true
+	  --Echo("order received", cmdID, CMD[cmdID])
 	end
+  end
   end
 end
   return true
@@ -1471,15 +1566,74 @@ function gadget:Initialize()
   Echo("AA Micro Gadget Enabled")
   
   for id,unitDef in pairs(UnitDefs) do
-    if unitDef.name ~= "fakeunit_aatarget" then
+    local exception = true
+	if unitDef.name == "corsub" or unitDef.name == "roost" or unitDef.name == "mahlazer" or unitDef.name == "funnelweb" or unitDef.name == "armorco" or unitDef.name:find("test") or unitDef.name:find("chicken") or unitDef.name:find("fake") then
+	  exception = false
+	end
+	local aaexception = false
+	if unitDef.name == "corrl" then
+	  aaexception = true
+	end
+	local dpsaaexception = false
+	if unitDef.name == "corrl" or unitDef.name == "corcrash" then
+	  dpsaaexception = true
+	end
+    if exception then
       if unitDef.canFly then
-   --[[for name,param in unitDef:pairs() do
-     Spring.Echo(name,param)
-   end]]--
 	    airunitdefs[unitDef.name] = {hp = unitDef.health, maxspeed = unitDef.speed, cost = unitDef.metalCost}
 		globalassignment[globalassignmentcount] = {name = unitDef.name, def = airunitdefs[unitDef.name], units = {}, unitscount = 1}
 		globalassignmentcount = globalassignmentcount + 1
-		--Echo(unitDef.name, airunitdefs[unitDef.name].hp, airunitdefs[unitDef.name].maxspeed, airunitdefs[unitDef.name].cost)
+	  else
+	    if unitDef.name == "amphaa" then
+		  AAstats[unitDef.name].height = unitDef.height
+		  AAstats[unitDef.name].movespeed = unitDef.speed
+		end
+	    for i = 1,#WeaponDefs do
+	      local wd = WeaponDefs[i]
+		  if wd.name:find(unitDef.name) then
+		  if not wd.canAttackGround or aaexception then  --air-only weapons
+		    local damage = 0
+			local sdamage = 0
+			for i = 1, #wd.damages do
+			  if damage < wd.damages[i] then
+			    damage = wd.damages[i]
+			  end
+			end
+			sdamage = damage
+			damage = damage * wd.salvoSize
+			local dps = damage / wd.reload
+		    if damage > 5 and wd.range > 100 and dps > 20 then  --filters
+			  if unitDef.speed == 0 then
+			    StaticAA[unitDef.name] = 1
+			    MobileAA[unitDef.name] = nil
+			  else
+			    MobileAA[unitDef.name] = 1
+			    StaticAA[unitDef.name] = nil
+			  end
+			  if wd.salvoDelay > 0.5 and wd.salvoSize > 1 then
+			    AAdelayedsalvo[unitDef.name] = wd.salvoDelay * 30
+			  end
+			  if wd.reload > 0.5 then
+			    AABurst[unitDef.name] = 1
+			    AADPS[unitDef.name] = nil
+			  else
+			    AADPS[unitDef.name] = 1
+			    AABurst[unitDef.name] = nil
+			  end
+			  if wd.reload <= 1 or dpsaaexception then
+				EscortAA[unitDef.name] = dps
+			  end
+			  if AAstats[unitDef.name] == nil then
+			    --Echo(unitDef.name, wd.name, damage, wd.range, unitDef.height)
+		        AAstats[unitDef.name] = {name = unitDef.name, wname = wd.name, damage = damage, shotdamage = sdamage, salvosize = wd.salvoSize, range = wd.range, reload = wd.reload * 30, dps = dps, velocity = wd.customParams.weaponvelocity, movespeed = unitDef.speed, height = unitDef.height}
+			  else
+			    AAstats[unitDef.name].damage = AAstats[unitDef.name].damage + damage
+				AAstats[unitDef.name].dps = AAstats[unitDef.name].dps + dps
+			  end
+			end
+		  end
+		  end
+		end
       end
 	end
   end
@@ -1488,29 +1642,11 @@ function gadget:Initialize()
   
   for i = 1,#WeaponDefs do
     local wd = WeaponDefs[i]
-	if wd.name:find("corrl") then
-	  Script.SetWatchWeapon(i,true)
-      weapondefID["corrl"] = i
-	end
-	if wd.name:find("missiletower") then
-	  Script.SetWatchWeapon(i,true)
-      weapondefID["missiletower"] = i
-	end
-	if wd.name:find("armcir") then
-	  Script.SetWatchWeapon(i,true)
-      weapondefID["armcir"] = i
-	end
-	if wd.name:find("screamer") then
-	  Script.SetWatchWeapon(i,true)
-      weapondefID["screamer"] = i
-	end
-	if wd.name:find("corflak") then
-	  --Script.SetWatchWeapon(i,true)
-      weapondefID["corflak"] = i
-	end
-	if wd.name:find("corrazor") then
-	  --Script.SetWatchWeapon(i,true)
-      weapondefID["corrazor"] = i
+	for name,_ in pairs(AABurst) do
+	  if wd.name:find(name) then
+	    Script.SetWatchWeapon(i,true)
+        weapondefID[name] = i
+	  end
 	end
   end
   for _, unitID in ipairs(Spring.GetAllUnits()) do
