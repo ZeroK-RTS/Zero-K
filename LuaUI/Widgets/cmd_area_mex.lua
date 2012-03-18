@@ -29,8 +29,13 @@ local spGetUnitPosition = Spring.GetUnitPosition
 local spGetTeamUnits = Spring.GetTeamUnits
 local spGetMyTeamID = Spring.GetMyTeamID
 local spGetUnitDefID = Spring.GetUnitDefID
-local team = Spring.GetMyTeamID()
 local spTestBuildOrder = Spring.TestBuildOrder
+local spGetUnitsInRectangle = Spring.GetUnitsInRectangle
+local spGetUnitAllyTeam = Spring.GetUnitAllyTeam			
+local spGetUnitHealth = Spring.GetUnitHealth			
+
+local team = Spring.GetMyTeamID()
+local myAllyTeam = Spring.GetMyAllyTeamID()
 
 local sqrt = math.sqrt
 local tasort = table.sort
@@ -152,10 +157,22 @@ function widget:CommandNotify(id, params, options)
                     local x = math.floor(command.x/8)*8
                     local z = math.floor(command.z/8)*8
 					for j=1, #mexBuilder[id] do
-						local buildable = spTestBuildOrder(-mexBuilder[id][j],x,0,z,1)
+						local buildable, feature = spTestBuildOrder(-mexBuilder[id][j],x,0,z,1)
 						if buildable ~= 0 then
-							spGiveOrderToUnit(id, mexBuilder[id][j], {x,0,z} , {"shift"})
+							spGiveOrderToUnit(id, mexBuilder[id][j], {x,0,z,0} , {"shift"})
 							break
+						else
+							local units = spGetUnitsInRectangle(x-17,z-17,x+17,z+17)
+							for i = 1, #units do
+								local aid = units[i]
+								local udid = spGetUnitDefID(aid)
+								if spGetUnitAllyTeam(aid) == myAllyTeam and udid and mexIds[udid] then
+									if select(5, spGetUnitHealth(aid)) ~= 1 then
+										spGiveOrderToUnit(id, CMD.REPAIR, {aid} , {"shift"})
+										break
+									end
+								end
+							end
 						end
 					end
 				end
