@@ -46,10 +46,11 @@ unitDef = {
   movementClass          = [[KBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING SATELLITE SUB]],
-  objectName             = [[ARMBANTH]],
+  objectName             = [[Bantha.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLAST]],
-
+  script                 = [[armbanth.lua]],
+  
   sfxtypes               = {
 
     explosiongenerators = {
@@ -158,7 +159,7 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      model                   = [[wep_m_kickback.s3o]],
+      model                   = [[banthamissile.s3o]],
       range                   = 800,
       reloadtime              = 2.75,
       smokedelay              = [[0.1]],
@@ -234,7 +235,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 4200,
-      object           = [[armbanth_dead]],
+      object           = [[bantha_wreck.s3o]],
       reclaimable      = true,
       reclaimTime      = 4200,
       seqnamereclamate = [[TREE1RECLAMATE]],
