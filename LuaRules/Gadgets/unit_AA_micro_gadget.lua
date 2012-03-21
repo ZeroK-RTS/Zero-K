@@ -2,9 +2,7 @@ local versionNumber = "v1.2"
 
 --[[   TO DO::
 
-Restructure memory to use ipairs and table.remove, instead of unitID <-> refID
 Basic flight prediction of aircraft (affects single and global targeting)
-Control targeting of razor and flak
 Screamers hold fire until unit is killable
 
 ]]--
@@ -173,12 +171,14 @@ function checkAAdef()
 		if IsIdle(AAdefbuff.id) then
 		  AAdef[h].units[i].orderreceived = false
 		end
-		if IsMicroCMD(AAdefbuff.id) and IsBurstAA(AAdefbuff.name) and not IsMobileAA(AAdefbuff.name) then
-          local fcmdDescID = FindUnitCmdDesc(AAdefbuff.id, CMD.FIRE_STATE)
-	      fcmdDesc = GetUnitCmdDesc(AAdefbuff.id, fcmdDescID, fcmdDescID)
-	      fnparams = fcmdDesc[1].params
-	      fnparams[1] = AAdef[h].units[i].fire
-          EditUnitCmdDesc(AAdefbuff.id, fcmdDescID, {params = fnparams})
+		if ( IsMicroCMD(AAdefbuff.id) and IsBurstAA(AAdefbuff.name) and not IsMobileAA(AAdefbuff.name) ) or AAdefbuff.resetfirestate then
+	      if fnparams ~= nil and fnparams[1] ~= AAdef[h].units[i].fire and not AAdefbuff.resetfirestate then
+		    GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, {AAdef[h].units[i].fire}, i, h)
+		  end
+		  if AAdefbuff.resetfirestate then
+		    GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, {2}, i, h)
+			AAdef[h].units[i].resetfirestate = false
+		  end
 		end
 		weaponready, nextshot = WeaponReady(AAdefbuff.id, i, h)
 		AAdef[h].units[i].nextshot = nextshot
@@ -463,7 +463,7 @@ function assignTarget(unitID, refID, allyteam, output)
 	  else
 	    assign = DPSBestTarget(output[1], output[2])
 	  end
-	  --Echo(assign)
+	  --Echo("tower id " .. AAdefbuff.id, "assigned unit ID", assign)
 	  if assign ~= nil then
 		if assign ~= attacking then
 		  _, arefID, ateam, airbuff = GetAirUnit(assign)
@@ -970,9 +970,9 @@ end
 
 function attackTarget(unitID, targetID, refID, allyteam)
   if IsMobileAA(AAdef[allyteam].units[refID].name) then
-    GiveOrder(unitID, CMD_UNIT_SET_TARGET, targetID, refID, allyteam)
+    GiveOrder(unitID, CMD_UNIT_SET_TARGET, {targetID}, refID, allyteam)
   else
-    GiveOrder(unitID, CMD.ATTACK, targetID, refID, allyteam)
+    GiveOrder(unitID, CMD.ATTACK, {targetID}, refID, allyteam)
   end
   AAdef[allyteam].units[refID].attacking = targetID
 end
@@ -980,7 +980,7 @@ end
 function removecommand(unitID, refID, allyteam)
   local cQueue = GetCommandQueue(unitID)
   if cQueue[1] ~= nil then
-    GiveOrder(unitID, CMD.REMOVE, cQueue[1].tag, refID, allyteam)
+    GiveOrder(unitID, CMD.REMOVE, {cQueue[1].tag}, refID, allyteam)
   end
 end
 
@@ -989,7 +989,7 @@ function GiveOrder(unitID, cmdID, params, refID, allyteam)
     AAdef[allyteam].units[refID].orderaccept = true
   end
   if params ~= nil then
-    SGiveOrder(unitID, cmdID, {params}, {})
+    SGiveOrder(unitID, cmdID, params, {})
   else
     SGiveOrder(unitID, cmdID, {}, {})
   end
@@ -1214,7 +1214,7 @@ function addAA(unitID, unitDefID, name, allyteam)
 	    teamcount = allyteam
 	  end
 	end
-    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = getRange(name), attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, morph = false, damage = damage - 5, shotdamage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
+    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = getRange(name), attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, resetfirestate = false, morph = false, damage = damage - 5, shotdamage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
 	if IsDPSAA(name) or IsMobileAA(name) then
 	  AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1].fire = 2
 	end
@@ -1266,8 +1266,6 @@ function transferAA(unitID, newteam, oldteam)
   AAdefreference[newteam].units[unitID] = AAdefmaxcount[newteam] + 1
   AAdefmaxcount[newteam] = AAdefmaxcount[newteam] + 1
   removeAA(unitID, oldteam)
-	--GiveOrder(unitID, CMD.FIRE_STATE, {1}, {})
-    --Echo("AA unit transferred, hold fire order given")
 end
 
 function removeAir(unitID, allyteam)
@@ -1300,8 +1298,6 @@ function transferAir(unitID, newteam, oldteam)
   airtargetsref[newteam].units[unitID] = airtargetsmaxcount[newteam] + 1
   airtargetsmaxcount[newteam] = airtargetsmaxcount[newteam] + 1
   removeAir(unitID, oldteam)
-	--GiveOrder(unitID, CMD.FIRE_STATE, {1}, {})
-    --Echo("AA unit transferred, hold fire order given")
 end
 
 function addShot(unitID, refID, allyteam, shotID, targetID)
@@ -1524,24 +1520,21 @@ if IsAA(ud.name) then
   if AAdefbuff ~= nil then
   if cmdID == CMD_UNIT_AI then
     local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
-    local fcmdDescID = FindUnitCmdDesc(unitID, CMD.FIRE_STATE)
 	fcmdDesc = GetUnitCmdDesc(unitID, fcmdDescID, fcmdDescID)
-	fnparams = fcmdDesc[1].params
     if cmdParams[1] == 0 then
 	  nparams = {0, 'AI Off','AI On'}
       if not AAdefbuff.orderaccept then
 	    AAdef[allyteam].units[refID].deactivate = true
+		AAdef[allyteam].units[refID].resetfirestate = true
 	  end
-	  fnparams[1] = 2
     else
 	  nparams = {1, 'AI Off','AI On'}
       if not AAdefbuff.orderaccept then
 	    AAdef[allyteam].units[refID].deactivate = false
+		AAdef[allyteam].units[refID].resetfirestate = false
 	  end
-	  fnparams[1] = AAdef[allyteam].units[refID].fire
     end
     EditUnitCmdDesc(unitID, cmdDescID, {params = nparams})
-    EditUnitCmdDesc(unitID, fcmdDescID, {params = fnparams})
   else
 	if AAdefbuff.orderaccept then
 	  AAdefbuff.orderaccept = false
