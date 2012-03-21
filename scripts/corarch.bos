@@ -94,7 +94,7 @@ StopMoving()
 	signal SIG_MOVE;
 }
 
-AimWeapon2(heading, pitch)
+AimWeapon1(heading, pitch)
 {
 	turn fturret to y-axis heading speed <455.000000>;
 	turn fbarrels to x-axis <0.000000> - pitch speed <430.000000>;
@@ -103,7 +103,7 @@ AimWeapon2(heading, pitch)
 	return (1);
 }
 
-AimWeapon3(heading, pitch)
+AimWeapon2(heading, pitch)
 {
 	turn bturret to y-axis heading speed <455.000000>;
 	turn bbarrels to x-axis <0.000000> - pitch speed <430.000000>;
@@ -114,31 +114,22 @@ AimWeapon3(heading, pitch)
 
 AimFromWeapon1(piecenum)
 {
-	piecenum = radar;
-}
-
-AimFromWeapon2(piecenum)
-{
 	piecenum = fturret;
 
 }
 
-AimFromWeapon3(piecenum)
+AimFromWeapon2(piecenum)
 {
 	piecenum = bturret;
 }
 
-QueryWeapon1(piecenum)
-{
-	piecenum = radar;
-}
 
-QueryWeapon2(piecenum)
+QueryWeapon1(piecenum)
 {
 	piecenum = fflare;
 }
 
-QueryWeapon3(piecenum)
+QueryWeapon2(piecenum)
 {
 	piecenum = bflare;
 }

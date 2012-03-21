@@ -66,13 +66,13 @@ unitDef = {
 
   weapons                = {
 
-    [2] = {
+    [1] = {
       def                = [[AALASER]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
 
-    [3] = {
+    [2] = {
       def                = [[AALASER]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
