@@ -567,7 +567,7 @@ local options = {
     maxlen = 12,
   },
 --]]
-
+--[[
   {
     key    = 'engine_workarounds',
     name   = 'Enable 87.0 Workarounds',
@@ -576,6 +576,7 @@ local options = {
     def    = false,
     section= 'experimental',
   },
+  --]]
 }
 
 --// add key-name to the description (so you can easier manage modoptions in springie)

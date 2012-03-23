@@ -46,7 +46,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[thud.s3o]],
-  onoffable           = true,
+  onoffable           = false,
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
