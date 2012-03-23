@@ -17,6 +17,14 @@ local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 
 deathTeams = {}
 
+-- auto detection of doesnotcount units
+local doesNotCountList = {}
+for name, ud in pairs(UnitDefs) do
+	if (ud.customParams.dontcount) then
+		doesNotCountList[ud.id] = true
+	end
+end
+
 -- one man ally?
 rogueAlly = {}
 
@@ -31,14 +39,19 @@ end
 function gadget:GameFrame(n)
   for team,_ in pairs(deathTeams) do
     local teamUnits = Spring.GetTeamUnits(team)
+	local realUnits = 0
     local selfDunits = {}
     for _,u in ipairs(teamUnits) do
       local selfDtime = Spring.GetUnitSelfDTime(u)
-      if selfDtime > 0 then
-        selfDunits[#selfDunits + 1] = u
-      end
+	  local udid = Spring.GetUnitDefID(u)
+	  if not doesNotCountList[udid] then
+	    realUnits = realUnits + 1
+	    if selfDtime > 0 then
+          selfDunits[#selfDunits + 1] = u
+        end
+	  end
     end
-    if #selfDunits / #teamUnits > 0.8 then
+    if #selfDunits / realUnits > 0.8 then
       Spring.GiveOrderToUnitArray(selfDunits, CMD.SELFD, {}, {})
       SendToUnsynced('resignteam', team)
     end
@@ -66,7 +79,7 @@ function gadget:GameFrame(n)
         end
       end
       if activeTeams < 2 then
-        rogueAlly[a] = true
+        --rogueAlly[a] = true
       else
         rogueAlly[a] = false
       end
