@@ -185,45 +185,42 @@ local overrides = {
 	[CMD_RETREAT] = { texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'}, text=''},
 }]]
 
--- TODO: remove in 85.0
-local CMD_MANUALFIRE = CMD.MANUALFIRE or CMD.DGUN
-
 local overrides = {
-	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png',  text= '\255\0\255\0A'},
-	[CMD.STOP] = { texture = imageDir .. 'Bold/cancel.png', text= '\255\0\255\0S'},
-	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png',text= '\255\0\255\0F'},
-	[CMD.GUARD] = { texture = imageDir .. 'Bold/guard.png', text= '\255\0\255\0G'},
-	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png', text= '\255\0\255\0M'},
-	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png', text= '\255\0\255\0P'},
-	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png', text= '\255\0\255\0W'},
+	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png'},
+	[CMD.STOP] = { texture = imageDir .. 'Bold/cancel.png'},
+	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png'},
+	[CMD.GUARD] = { texture = imageDir .. 'Bold/guard.png'},
+	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png'},
+	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png'},
+	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png'},
 	
-	[CMD.REPAIR] = {text= '\255\0\255\0R', texture = imageDir .. 'Bold/repair.png'},
-	[CMD.RECLAIM] = {text= '\255\0\255\0E', texture = imageDir .. 'Bold/reclaim.png'},
-	[CMD.RESURRECT] = {text= '\255\0\255\0S', texture = imageDir .. 'Bold/resurrect.png'},
+	[CMD.REPAIR] = {texture = imageDir .. 'Bold/repair.png'},
+	[CMD.RECLAIM] = {texture = imageDir .. 'Bold/reclaim.png'},
+	[CMD.RESURRECT] = {texture = imageDir .. 'Bold/resurrect.png'},
 	[CMD_BUILD] = {text = '\255\0\255\0B', texture = imageDir .. 'Bold/build.png'},
-	[CMD_MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png', text= '\255\0\255\0D'},
+	[CMD.MANUALFIRE] = { texture = imageDir .. 'Bold/dgun.png'},
 
-	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png', text= '\255\0\255\0L'},
-	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png', text= '\255\0\255\0U'},
-	[CMD.AREA_ATTACK] = { texture = imageDir .. 'Bold/areaattack.png', text='\255\0\255\0Alt+A'},
+	[CMD.LOAD_UNITS] = { texture = imageDir .. 'Bold/load.png'},
+	[CMD.UNLOAD_UNITS] = { texture = imageDir .. 'Bold/unload.png'},
+	[CMD.AREA_ATTACK] = { texture = imageDir .. 'Bold/areaattack.png'},
 	
-	[CMD_RAMP] = {text = ' ', texture = imageDir .. 'ramp.png'},
-	[CMD_LEVEL] = {text = ' ', texture = imageDir .. 'level.png'},
-	[CMD_RAISE] = {text = ' ', texture = imageDir .. 'raise.png'},
-	[CMD_SMOOTH] = {text = ' ', texture = imageDir .. 'smooth.png'},
-	[CMD_RESTORE] = {text = ' ', texture = imageDir .. 'restore.png'},
-	[CMD_BUMPY] = {text = ' ', texture = imageDir .. 'bumpy.png'},
+	[CMD_RAMP] = {texture = imageDir .. 'ramp.png'},
+	[CMD_LEVEL] = {texture = imageDir .. 'level.png'},
+	[CMD_RAISE] = {texture = imageDir .. 'raise.png'},
+	[CMD_SMOOTH] = {texture = imageDir .. 'smooth.png'},
+	[CMD_RESTORE] = {texture = imageDir .. 'restore.png'},
+	[CMD_BUMPY] = {texture = imageDir .. 'bumpy.png'},
 	
 	[CMD_AREA_MEX] = {text = ' ', texture = imageDir .. 'Bold/mex.png'},
 	
-	[CMD_JUMP] = {text = ' ', texture = imageDir .. 'Bold/jump.png'},	
+	[CMD_JUMP] = {texture = imageDir .. 'Bold/jump.png'},	
 	
 	[CMD_FIND_PAD] = {text = ' ', texture = imageDir .. 'Bold/rearm.png'},
 	
 	[CMD_EMBARK] = {text = ' ', texture = imageDir .. 'Bold/embark.png'},	
 	[CMD_DISEMBARK] = {text = ' ', texture = imageDir .. 'Bold/disembark.png'},
 	
-	[CMD_ONECLICK_WEAPON] = {text= '\255\0\255\0D', texture = imageDir .. 'Bold/action.png'},
+	[CMD_ONECLICK_WEAPON] = {texture = imageDir .. 'Bold/action.png'},
 	
 	[CMD_ABANDON_PW] = {text= '', texture = 'LuaUI/Images/Crystal_Clear_action_flag_white.png'},
 	
@@ -260,10 +257,10 @@ local overrides = {
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text=''},
 	}
 
-local custom_cmd_actions = {
+local custom_cmd_actions = {	-- states are 2, not states are 1
 
 	--SPRING COMMANDS
-	
+
 	selfd=1,
 	attack=1,
 	stop=1,
@@ -275,7 +272,7 @@ local custom_cmd_actions = {
 	repair=1,
 	reclaim=1,
 	resurrect=1,
-	dgun=1,
+	manualfire=1,
 	loadunits=1,
 	unloadunits=1,
 	area_attack=1,
@@ -297,10 +294,12 @@ local custom_cmd_actions = {
 	areamex=1,
 	disembark=1,
 	mine=1,
+	build=1,
 	jump=1,
 	find_pad=1,
 	embark=1,
 	disembark=1,
+	oneclickwep=1,
 	
 	-- terraform
 	rampground=1,

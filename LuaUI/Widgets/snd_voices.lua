@@ -591,7 +591,7 @@ function widget:CommandNotify(commandID, params ,options)
   elseif ((commandID == CMD.ATTACK) or
      (commandID == CMD.FIGHT) or
      (commandID == CMD.AREA_ATTACK) or
-     (commandID == CMD.DGUN)) then
+     (commandID == CMD.MANUALFIRE)) then
     if (UnitDefs[unitDefID].canFly) then
       CoolPlay("attackp", 3, sexTable[unitID])
     else
