@@ -444,7 +444,11 @@ local function MakeButton(container, cmd, insertItem)
 	if (item.image and (texture ~= item.image.file or isState) ) then 
 		item.image.file = texture
 		item.image:Invalidate()
-	end 
+	end
+	
+	if (item.button.tooltip and tooltip ~= item.button.tooltip) then
+		item.button.tooltip = tooltip
+	end
 end
 
 --sorts commands into categories
