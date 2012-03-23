@@ -23,6 +23,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    extradrawrange = 465,
     description_fr = [[Mechwarrior d'Assaut Lourd]],
 	description_de = [[Schwerer Kampfstreicher]],
 	helptext_de    = [[Der Bantha ist die Lösung für eine besonders schwierig zu knackende Verteidigungslinie. Dazu besitzt er einen Tachyonen Beschleuniger und Marschflugkörper für Pattsituationen, blitzschnelle Handfeuerwaffen für den normalen Kampf und haufenweise Munition. Dennoch gib Acht darauf, dass er gegen Luftangriffe fast schutzlos ist.]],
@@ -160,7 +161,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[banthamissile.s3o]],
-      range                   = 800,
+      range                   = 950,
       reloadtime              = 2.75,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
