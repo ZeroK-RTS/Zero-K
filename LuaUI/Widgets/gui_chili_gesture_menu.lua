@@ -51,6 +51,9 @@ local MOVE_THRESHOLD_SQUARED = 900
 local IDLE_THRESHOLD = 0.5 -- after this seconds menu shows if you hold right mouse still
 local SMALL_ICON_SIZE = 20
 local KEYBOARD_ONLY = false 
+local KEYBOARD_OPEN_ONLY = false 
+
+local mouselessOpen = false
 
 local keyconfig = include("Configs/marking_menu_keys.lua")
 local keys = keyconfig.qwerty.keys
@@ -63,6 +66,7 @@ local function OptionsChanged()
 	MOVE_THRESHOLD_SQUARED = options.mouseMoveThreshold.value
 	IDLE_THRESHOLD = options.mouseIdleThreshold.value
 	KEYBOARD_ONLY = options.keyboardOnly.value
+	KEYBOARD_OPEN_ONLY = options.onlyOpenWithKeyboard.value
 	
 	if options.alternateconfig.value then
 		keys = keyconfig.qwerty_d.keys
@@ -74,18 +78,11 @@ local function OptionsChanged()
 		keys = keyconfig.qwerty.keys
 		keys_display = keyconfig.qwerty.keys_display
 	end
-	
-	if options.alternateconfig.value then
-		Spring.SendCommands("bind any+d markingmenu")
-	else
-		Spring.SendCommands("unbind d markingmenu")
-	end
-	
 end 
 
 
 options_path = 'Settings/Interface/Gestures'
-options_order = { 'iconDistance', 'iconSize', 'selectedIconSize', 'mouseMoveThreshold', 'mouseIdleThreshold', 'keyboardOnly', "qwertz", 'alternateconfig', }
+options_order = { 'iconDistance', 'iconSize', 'selectedIconSize', 'mouseMoveThreshold', 'mouseIdleThreshold', 'keyboardOnly', 'onlyOpenWithKeyboard', "qwertz", 'alternateconfig', }
 options = {
 	
 	
@@ -138,6 +135,14 @@ options = {
 		desc = 'Disables gesture recognition',
 		OnChange = OptionsChanged,
 	},
+	
+	onlyOpenWithKeyboard = {
+		name = 'Only open with keyboard',
+		type = 'bool',
+		value = false,
+		desc = 'Disables right click drag to open',
+		OnChange = OptionsChanged,
+	},
 
 	qwertz = {
 		name = "qwertz keyboard",
@@ -151,7 +156,7 @@ options = {
 		name = "Alternate Keyboard Layout",
 		type = "bool",
 		value = false,
-		desc = "Alternate Keyboard Layout using D.",
+		desc = "Centre hotkeys around D instead of S.",
 		OnChange = OptionsChanged,
 	},
 }
@@ -210,7 +215,7 @@ end
 
 
 function widget:Update(t)
-  if not menu or KEYBOARD_ONLY then return end 
+  if not menu or KEYBOARD_ONLY or mouselessOpen then return end 
   local mx, my = Spring.GetMouseState()
   ProcessMove(mx,my)
   if hold_pos then 
@@ -228,7 +233,7 @@ local ly = 0
 
 
 function ProcessMove(x,y) 
-  if (menu ==nil or KEYBOARD_ONLY) then return end 
+  if (menu == nil or KEYBOARD_ONLY or mouselessOpen) then return end 
   local dx = x - lx 
   local dy = y - ly
   diff =  math.sqrt(dx*dx + dy*dy)
@@ -305,8 +310,10 @@ end
 
 
 -- setups menu for selected unit
-function SetupMenu(keyboard) 
-  if (keyboard) then menu_keymode = true else menu_keymode = false end
+function SetupMenu(keyboard, mouseless) 
+  menu_keymode = keyboard
+  mouselessOpen = mouseless
+
   local units = Spring.GetSelectedUnits()
 
   -- only show menu if a unit is selected
@@ -385,7 +392,9 @@ end
 -- note we dont want menu to show on command thats why we return
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-  if cmdID ~= CMD_BUILD_STRUCTURE then return end 
+  if cmdID ~= CMD_BUILD_STRUCTURE then 
+    return 
+  end 
   if menu == nil then 
 	local x,y = Spring.GetWindowGeometry()
 	Spring.WarpMouse(x/2, y/2)
@@ -462,7 +471,7 @@ function widget:MousePress(x,y,button)
 			EndMenu(true) 
 			return true
 		end
-	elseif (menu == nil) then 
+	elseif (menu == nil) and not KEYBOARD_OPEN_ONLY then 
 		if (button == 3) then
 			local activeCmdIndex, activeid = Spring.GetActiveCommand()
 			local _, defid = Spring.GetDefaultCommand()
@@ -551,8 +560,7 @@ function widget:MouseRelease(x,y,button)
 	ProcessMove(Spring.GetMouseState())
 	hold_pos = nil
 	EndMenu(true)
-end 
-
+end
 
 
 function widget:IsAbove(x,y) 
@@ -569,10 +577,6 @@ function widget:GetTooltip(x, y)
     end 
   end 
 end
-
-
-
-
 
 local function BackPathFunc(origin, len)
   local sx,sy = unpack(origin)
@@ -720,19 +724,19 @@ function widget:Initialize()
   end
 
   widgetHandler:AddAction("markingmenu", ActionMenu, nil, "t")
+  widgetHandler:AddAction("mouselessmarkingmenu", MouselessActionMenu, nil, "t")
+  
+  -- Only minimal support for those without our default hotkeys.
   if not customKeyBind then
     Spring.SendCommands("bind any+b markingmenu")
+	Spring.SendCommands("bind any+d mouselessmarkingmenu")
   end
 
 end 
 
 function widget:Shutdown()
-  if not customKeyBind then
-    Spring.SendCommands("unbind b markingmenu")
-  end
   widgetHandler:RemoveAction("markingmenu")
-  
-  Spring.SendCommands("unbind d markingmenu")
+  widgetHandler:RemoveAction("mouselessmarkingmenu")
 end
 
 function ActionMenu()
@@ -741,6 +745,14 @@ function ActionMenu()
     if (activeid == nil or activeid < 0) then 
       return SetupMenu(true)
     end 
+  else 
+    EndMenu(false)
+  end
+end
+
+function MouselessActionMenu()
+  if menu == nil then 
+    SetupMenu(true, true)
   else 
     EndMenu(false)
   end
