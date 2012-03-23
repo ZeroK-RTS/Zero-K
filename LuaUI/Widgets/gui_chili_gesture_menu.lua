@@ -161,10 +161,6 @@ options = {
 	},
 }
 
-
-
-
-
 local mapWidth, mapHeight = Game.mapSizeX, Game.mapSizeZ
 
 ------------------------------------------------
