@@ -96,7 +96,7 @@ local function removeTransportFromRoute(unitID)
 
 	local trans = transport[unitID]
 
-	if not trans.route then
+	if not (trans and trans.route) then
 		return
 	end
 	
