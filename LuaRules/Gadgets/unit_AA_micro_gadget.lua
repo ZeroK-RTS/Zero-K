@@ -172,7 +172,8 @@ function checkAAdef()
 		  AAdef[h].units[i].orderreceived = false
 		end
 		if ( IsMicroCMD(AAdefbuff.id) and IsBurstAA(AAdefbuff.name) and not IsMobileAA(AAdefbuff.name) ) or AAdefbuff.resetfirestate then
-	      if fnparams ~= nil and fnparams[1] ~= AAdef[h].units[i].fire and not AAdefbuff.resetfirestate then
+          local firestate = FireState(AAdefbuff.id)
+	      if firestate ~= nil and firestate ~= AAdef[h].units[i].fire and not AAdefbuff.resetfirestate then
 		    GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, {AAdef[h].units[i].fire}, i, h)
 		  end
 		  if AAdefbuff.resetfirestate then
@@ -218,8 +219,8 @@ function checkAAdef()
 		  end
 		  if counteris0 then
 			if AAdefbuff.attacking == nil then
-			  unassignTarget(AAdefbuff.id, i, h)
 			  if IsMicro(AAdefbuff.id) then
+			    unassignTarget(AAdefbuff.id, i, h)
 		        --Echo("ready, searching for target hp: " .. AAdef[h].units[i].damage)
 				assignTarget(AAdefbuff.id, i, h, targets)
 			  end
@@ -439,13 +440,14 @@ function assignTarget(unitID, refID, allyteam, output)
   local assign = nil
   local damage = AAdefbuff.damage
   local skip = AAdefbuff.skiptarget
-  local cdamage = damage
   if output ~= nil then
     --Echo("enemies in range")
     if output[2] ~= 0 then
 	  --Echo("visible air in range of tower " .. unitID)
-	  if AAdefbuff.name == "missiletower" and AAdefbuff.reloading[2] ~= 0 then
-		damage = damage * 2
+	  if hasDelayedSalvo(AAdefbuff.name) and AAdefbuff.reloading[2] ~= 0 then
+		if AAdefbuff.reloading[2] ~= 0 then
+		  damage = AAdefbuff.shotdamage * AAdefbuff.reloading[2]
+		end
 	  end
 	  if skip > output[2] then
 	    AAdef[allyteam].units[refID].skiptarget = 0
@@ -459,7 +461,7 @@ function assignTarget(unitID, refID, allyteam, output)
 	    output[1] = HSPruneTargets(output[1], output[2])
 	  end
 	  if IsBurstAA(AAdefbuff.name) then
-	    assign = BestTarget(output[1], output[2], damage, attacking, cdamage, skip, output[3])
+	    assign = BestTarget(output[1], output[2], damage, attacking, skip, output[3])
 	  else
 	    assign = DPSBestTarget(output[1], output[2])
 	  end
@@ -471,7 +473,7 @@ function assignTarget(unitID, refID, allyteam, output)
 	        unassignTarget(unitID, refID, allyteam)
 	        attackTarget(unitID, assign, refID, allyteam)
 	        AAdef[allyteam].units[refID].attacking = assign
-		    airtargets[ateam].units[arefID].tincoming = airtargets[ateam].units[arefID].tincoming + AAdefbuff.damage
+		    airtargets[ateam].units[arefID].tincoming = airtargets[ateam].units[arefID].tincoming + AAdefbuff.shotdamage
 		    --Echo("id " .. unitID .. " targeting " .. assign .. " " .. airtargets[ateam].units[arefID].name .. ", hp " .. airtargets[ateam].units[arefID].hp .. " tincoming " .. airtargets[ateam].units[arefID].tincoming)
 		  end
 		end
@@ -512,7 +514,7 @@ function unassignTarget(unitID, refID, allyteam)
 	AAdef[allyteam].units[refID].attacking = nil
 	local _, trefID, tteam, airbuff = GetAirUnit(attacking)
 	if airbuff ~= nil then
-	  airtargets[tteam].units[trefID].tincoming = airtargets[tteam].units[trefID].tincoming - AAdef[allyteam].units[refID].damage
+	  airtargets[tteam].units[trefID].tincoming = airtargets[tteam].units[trefID].tincoming - AAdef[allyteam].units[refID].shotdamage
       --Echo("tower " .. unitID .. " was targeting " .. attacking .. ", deassigning from " .. airtargets[tteam].units[trefID].name, "tincoming is now " .. airtargets[tteam].units[trefID].tincoming)
 	  if airtargets[tteam].units[trefID].tincoming < 0 then
 	    airtargets[tteam].units[trefID].tincoming = 0
@@ -521,7 +523,7 @@ function unassignTarget(unitID, refID, allyteam)
   end
 end	
 
-function BestTarget(targets, count, damage, current, cdamage, skip, cost)
+function BestTarget(targets, count, damage, current, skip, cost)
   local refID
   local onehit = false
   local best = 0
@@ -540,11 +542,12 @@ for i = 1, count do
 	  incoming = airbuff.incoming + airbuff.tincoming
 	  hp = airbuff.hp
 	  if airbuff.id == current then
-	    incoming = incoming - cdamage
+	    incoming = incoming - damage
 	  end
-	  --Echo("considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", hp: " .. hp .. ", incoming: " .. incoming)
+	  --Echo("skipping " .. skip, "considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", cost: " .. cost[i] ..  ", hp: " .. hp .. ", incoming: " .. incoming)
 	  if hp <= incoming + damage then
-	    if onehit == false then
+		--Echo("one-hittable", onehit)
+	    if not onehit then
 		  if hp - incoming >= 0 then
 		    --hpafter = hp - incoming
 			if skip == 0 then
@@ -552,18 +555,19 @@ for i = 1, count do
 			  bestcost = cost[i]
 			  besthp = hp - incoming - damage
 	          onehit = true
-			  --Echo(best)
+			  --Echo("new one-hit")
 			else
 			  skip = skip - 1
 			end
 	      end
 		else
-		  if hp - incoming >= 0 and bestcost > cost[i] then
+		  if hp - incoming >= 0 and bestcost < cost[i] then
 		    --hpafter = hp - incoming
 			if skip == 0 then
 		      best = i
 			  bestcost = cost[i]
 			  besthp = hp - incoming - damage
+			  --Echo("best onehit by new highest cost class")
 			else
 			  skip = skip - 1
 			end
@@ -573,6 +577,7 @@ for i = 1, count do
 		      best = i
 			  bestcost = cost[i]
 			  besthp = hp - incoming - damage
+			  --Echo("best onehit by hp, cost tie")
 			else
 			  skip = skip - 1
 			end
@@ -585,6 +590,7 @@ for i = 1, count do
 			if skip == 0 then
 		      best = i
 			  besthp = hp - incoming
+			  --Echo("best by lowest hp")
 			else
 			  skip = skip - 1
 			end
@@ -595,6 +601,7 @@ for i = 1, count do
 			if skip == 0 then
 		      best = i
 			  besthp = hp - incoming
+			  --Echo("first target")
 			else
 			  skip = skip - 1
 			end
@@ -743,8 +750,7 @@ function getAATargetsinRange(unitID, refID, allyteam)
 			end
 			end
 		  end
-		  ud = airunitdefs[ud.name]
-		  cost = ud.cost
+		  cost = getairCost(ud.name)
 		  targets[targetscount] = targetID
 		  targetscost[targetscount] = cost
 	      targetscount = targetscount + 1
@@ -850,25 +856,29 @@ function WeaponReady(unitID, refID, allyteam)
 		  nextshot = 36
 		end
 	  end
-	  if AAdef[allyteam].units[refID].name == "missiletower" then
+	  if hasDelayedSalvo(AAdef[allyteam].units[refID].name) then
 	    AAdef[allyteam].units[refID].reloading[1] = rframe
-		nextshot = 42
+		AAdef[allyteam].units[refID].reloading[2] = getSalvoSize(AAdef[allyteam].units[refID].name) - 1
+		nextshot = getSalvoDelay(AAdef[allyteam].units[refID].name)
 	  end
 	end
-	if AAdef[allyteam].units[refID].name == "missiletower" and rframe <= AAdef[allyteam].units[refID].reloading[1] + 44 then
-      nextshot = AAdef[allyteam].units[refID].reloading[1] + 42 - rframe
-	elseif AAdef[allyteam].units[refID].name == "missiletower" then
-	  nextshot = AAdef[allyteam].units[refID].reloading[1] + reloadtime - rframe
-	end
-	if AAdef[allyteam].units[refID].name == "missiletower" and rframe >= AAdef[allyteam].units[refID].reloading[1] + 30 and rframe <= AAdef[allyteam].units[refID].reloading[1] + 44 then
-	  AAdef[allyteam].units[refID].reloading[2] = 0
-	  --Echo("missile tower 2nd")
-	  return true, nextshot
+	if hasDelayedSalvo(AAdef[allyteam].units[refID].name) then
+	  local salvoshotdelay = getSalvoDelay(AAdef[allyteam].units[refID].name) * (getSalvoSize(AAdef[allyteam].units[refID].name) - AAdef[allyteam].units[refID].reloading[2])
+	  if rframe <= AAdef[allyteam].units[refID].reloading[1] + salvoshotdelay + 2 and AAdef[allyteam].units[refID].reloading[2] ~= 0 then
+        nextshot = AAdef[allyteam].units[refID].reloading[1] + salvoshotdelay - rframe
+	  elseif AAdef[allyteam].units[refID].reloading[2] == 0 then
+	    nextshot = AAdef[allyteam].units[refID].reloading[1] + reloadtime - rframe
+	  else
+		AAdef[allyteam].units[refID].reloading[2] = AAdef[allyteam].units[refID].reloading[2] - 1
+	  end
+	  if rframe >= AAdef[allyteam].units[refID].reloading[1] + salvoshotdelay - 4 and rframe <= AAdef[allyteam].units[refID].reloading[1] + salvoshotdelay + 2 and AAdef[allyteam].units[refID].reloading[2] ~= 0 then
+	    --Echo("shot number", AAdef[allyteam].units[refID].reloading[2])
+	    return true, nextshot
+	  end
 	end
 	if nextshot < 0 then
 	  nextshot = 0
 	end
-	--Echo("id " .. unitID .. "weapon fired! " .. nextshot .. " " .. lowestreloading)
 	if nextshot < 2 then
 	  return true, nextshot
 	end
@@ -904,8 +914,8 @@ function WeaponReady(unitID, refID, allyteam)
 	    return false, 600
 	  end
 	end
-	if AAdef[allyteam].units[refID].name == "missiletower" then
-	  AAdef[allyteam].units[refID].reloading[2] = -2000
+	if hasDelayedSalvo(AAdef[allyteam].units[refID].name) then
+	  AAdef[allyteam].units[refID].reloading[2] = getSalvoSize(AAdef[allyteam].units[refID].name)
 	end
 	return true, nextshot
   end
@@ -1161,6 +1171,20 @@ end
 function getReloadTime(name)
   if AAstats[name] ~= nil then
     return AAstats[name].reload
+  end
+  return -1
+end
+
+function getSalvoSize(name)
+  if AAstats[name] ~= nil then
+    return AAstats[name].salvosize
+  end
+  return -1
+end
+
+function getSalvoDelay(name)
+  if AAdelayedsalvo[name] ~= nil then
+    return AAdelayedsalvo[name]
   end
   return -1
 end
