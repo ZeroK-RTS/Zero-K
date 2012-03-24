@@ -2,7 +2,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.061 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.070 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -15,6 +15,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local spGetCommandQueue 		= Spring.GetCommandQueue
 local spGetCurrentTooltip		= Spring.GetCurrentTooltip
 local spGetUnitDefID			= Spring.GetUnitDefID
 local spGetFeatureDefID			= Spring.GetFeatureDefID
@@ -105,8 +106,10 @@ local windMin = 0
 local windMax = 2.5
 
 local updateFrequency = 0.2
+local updateFrequency2 = 1.0 --//update frequency for checking unit's command, for showing unit status in its picture.
 
 local timer = 0
+local timer2 = 0
 local tweakShow = false
 
 local window_height = 130
@@ -170,7 +173,7 @@ local gi_label	--group info Chili label
 
 options_path = 'Settings/Interface/Tooltip'
 options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip',
-  'groupalways', 'showgroupinfo', 'squarepics',
+  'groupalways', 'showgroupinfo', 'squarepics','unitCommand'
 }
 
 local function option_Deselect()
@@ -244,6 +247,13 @@ options = {
 	squarepics = {name='Square Buildpics', type='bool', value=false, OnChange = option_Deselect,
 		path = 'Settings/Interface/Selected Units Window',
 	},
+	unitCommand = {
+		name="Show Unit's Command",
+		type='bool',
+		value= false,
+		desc = "Display current command on unit's icon if selection isn't grouped (unit selection is grouped when unit count exceed 8)",
+		path = 'Settings/Interface/Selected Units Window',
+	}
 }
 
 --[[
@@ -524,6 +534,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 		autosize    = true;		
 	}
 	local img = Image:New{
+		name = "selImage";
 		parent  = item;
 		tooltip = ud.humanName .. " - " .. ud.tooltip.. "\n\255\0\255\0Click: Select \nRightclick: Deselect \nAlt+Click: Select One \nCtrl+click: Select Type \nMiddle-click: Goto";
 		file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
@@ -582,8 +593,9 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 			end
 		end}
 	};
-	if ((counts or 1)>1) then
+	if ((counts or 1)>1) then --//add unit count when units are grouped.
 		Label:New{
+			name = "selLabel";
 			parent = img;
 			align  = "right";
 			valign = "top";
@@ -1889,7 +1901,88 @@ function widget:Update(dt)
 		changeNow = true
 		timer = 0
 	end
-	
+	--UNIT.STATUS start (by msafwan)
+	timer2 = timer2 + dt
+	if timer2 >= updateFrequency2  then --//function: add/show units task whenever individual pic is shown.
+		if options.unitCommand.value == true and ((numSelectedUnits<8) and (not options.groupalways.value)) then
+			for i=1,numSelectedUnits do --//variable updated by 'widget:SelectionChanged()'
+				local unitID = selectedUnits[i]
+				local barGridItem = nil
+				local itemImg =nil
+				local picLabel = 1
+				local barGrid = window_corner.childrenByName['Bars'] --//REFERENCE: gui_chili_facbar.lua, by CarRepairer
+				if barGrid then	barGridItem = barGrid.childrenByName[unitID] end
+				if barGridItem then	itemImg = barGridItem.childrenByName['selImage'] end
+				if itemImg then picLabel = itemImg.childrenByName['selLabel'] end  
+				if picLabel == nil then --//insert label when picture is non-grouped (non-grouped picture doesn't have label, it have 'nil') 
+					window_corner.childrenByName['Bars'].childrenByName[unitID].childrenByName['selImage']:ClearChildren();
+					local cQueue = spGetCommandQueue(unitID, 1)
+					local commandName = ""
+					local color = nil
+					if cQueue[1] ~= nil then
+						local commandID = cQueue[1].id				
+						commandName = commandID --"..." 
+						if commandID < 0 then
+							commandName = "Build"
+						else
+							local commandList = {
+													{{CMD.WAIT}, "Wait"},
+													{{CMD.MOVE}, "Move", {0.2,0.8,0.2,1}},
+													{{CMD.PATROL}, "Patrol",{0.4,0,1,1}},
+													{{CMD.FIGHT}, "Fight", {0.4,0,0.8,1}},
+													{{CMD.ATTACK, CMD.AREA_ATTACK}, "Attack",{0.6,0,0,1}}, 
+													{{CMD.GUARD}, "Guard", {0.2,0,0.8,1}},
+													{{CMD.REPAIR}, "Repair",{0.2,0.8,1,1}},
+													--{{CMD.SELFD},  "Suicide"},
+													{{CMD.LOAD_UNITS},  "Load",{0,0.6,0.6,1}},
+													{{CMD.LOAD_ONTO}, "Load",{0,0.6,0.6,1}},
+													{{CMD.UNLOAD_UNITS, CMD.UNLOAD_UNIT}, "Unload", {0.6,0.6,0,1}},
+													{{CMD.RECLAIM}, "Reclaim",{0.6,0,0.4,1}},
+													{{CMD.RESURRECT},"Resurrect",{0.2,0,0.8,1}},
+													{{38521},"Jump",{0,0.8,0,1}},
+													{{32768},"Re-Arm",{0.2,0.8,1,1}},
+													{{35170},"Bridge",{0.6,0.6,0,1}},
+													{{35171},"Teleport",{0,0.6,0.6,1}},
+												}										
+							for i=1, #commandList, 1 do
+								if #commandList[i][1] == 1 then
+									if commandList[i][1][1] == commandID then
+										commandName = commandList[i][2]
+										color = commandList[i][3]
+										break
+									end
+								else
+									if commandList[i][1][1] == commandID or commandList[i][1][2] == commandID then
+										commandName = commandList[i][2]
+										color = commandList[i][3]
+										break
+									end
+								end
+							end
+						end
+					end
+					Label:New{
+						parent = itemImg;
+						name = "commandLabel";
+						align  = "left";
+						valign = "top";
+						--x =  8;
+						----y = 30;
+						--y = 20;
+						--width = 40;
+						fontsize   = 14;
+						fontshadow = true;
+						fontOutline = true;
+						textColor = color or {1,1,1,1}; --//Reference: gui_chili_crudeplayerlist.lua
+						caption    = commandName;
+					};
+				end
+			end
+		end
+		timer2 = 0
+	end	
+	--UNIT.STATUS end
+	--TOOLTIP start
 	old_mx, old_my = mx,my
 	alt,_,meta,_ = spGetModKeyState()
 	mx,my = spGetMouseState()
@@ -1923,9 +2016,7 @@ function widget:Update(dt)
 		MakeTooltip()
 		changeNow = false
 	end
-	
-	
-	
+	--TOOLTIP end
 end
 
 function widget:ViewResize(vsx, vsy)
