@@ -567,7 +567,7 @@ do
     end
   
     --// PARALYZE
-	  if (emp>0.01)and(hp>0.01)and((not morph) or morph.combatMorph)and(emp<1e8) then
+	  if (emp>0.01)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
         local stunned = GetUnitIsStunned(unitID)
         if (stunned) then
           paraUnits[#paraUnits+1]=unitID
