@@ -9,7 +9,7 @@ function widget:GetInfo()
     date      = "2010-03-05",
     license   = "push button magic",
     layer     = 0,
-    enabled   = true,
+    enabled   = false,
   }
 end
 

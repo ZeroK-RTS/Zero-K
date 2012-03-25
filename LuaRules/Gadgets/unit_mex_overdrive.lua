@@ -71,6 +71,7 @@ local spValidUnitID = Spring.ValidUnitID
 -------------------------------------------------------------------------------------
 
 local takenMexId = {} -- mex ids that are taken by disabled pylons
+local notDestroyed = {}
 
 local mexes = {}   -- mexes[teamID][gridID][unitID] == mexMetal
 local mexByID = {}
@@ -316,7 +317,7 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
 	local pX,_,pZ = Spring.GetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
-	
+
 	pylon[allyTeamID][unitID] = {
 		gridID = 0,
 		--mexes = 0,
@@ -454,8 +455,8 @@ end
 
 local function RemovePylon(unitID)
 	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
-
 	if not pylon[allyTeamID][unitID] then
+		Spring.Echo("RemovePylon not pylon[allyTeamID][unitID] " .. unitID)
 		return
 	end
 	
@@ -474,7 +475,6 @@ local function RemovePylon(unitID)
 		DestoryGrid(allyTeamID,oldGridID)
 		
 		pylon[allyTeamID][unitID] = nil
-		
 		for pid,_ in pairs(pylonList) do
 			if (pid ~= unitID) then
 				AddPylonToGrid(pid)
@@ -1097,10 +1097,13 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then
 		SetupMex(unitID, unitDefID, teamID)
 	end
+	if pylonDefs[unitDefID] then
+		notDestroyed[unitID] = true
+	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-	if (pylonDefs[unitDefID]) then
+	if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
 		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
 	end
 end
@@ -1114,7 +1117,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 			SetupMex(unitID, unitDefID, teamID)
 		end
 		
-		if (pylonDefs[unitDefID]) then
+		if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
 			local _,_,_,_,build  = Spring.GetUnitHealth(unitID)
 			if (build == 1) then
 				AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
@@ -1137,7 +1140,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 			RemoveMex(unitID)
 		end
 		
-		if (pylonDefs[unitDefID]) then
+		if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
 			RemovePylon(unitID)
 		end
 		--if (energyDefs[unitDefID]) then
@@ -1153,6 +1156,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		RemoveMexesAroundUnit(unitID)
 	end
 	if (pylonDefs[unitDefID]) then
+		notDestroyed[unitID] = nil
 		RemovePylon(unitID)
 	end
 	--if (energyDefs[unitDefID]) then

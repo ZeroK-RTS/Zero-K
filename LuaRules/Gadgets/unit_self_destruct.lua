@@ -79,7 +79,7 @@ function gadget:GameFrame(n)
         end
       end
       if activeTeams < 2 then
-        --rogueAlly[a] = true
+        rogueAlly[a] = true
       else
         rogueAlly[a] = false
       end
