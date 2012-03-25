@@ -80,9 +80,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = -0.001,
-        planes  = -0.001,
-        subs    = -0.001,
+        default = 10,
+        planes  = 10,
+        subs    = 10,
       },
 
       explosionGenerator      = [[custom:NONE]],
