@@ -130,6 +130,7 @@ unitDef = {
       texture1                = [[lightning]],
       thickness               = 10,
       turret                  = true,
+      waterweapon             = false,
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 400,
     },

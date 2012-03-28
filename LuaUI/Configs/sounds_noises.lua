@@ -489,7 +489,7 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	dante = {
+	armbanth = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},

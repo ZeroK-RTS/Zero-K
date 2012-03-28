@@ -456,7 +456,7 @@ end
 local function RemovePylon(unitID)
 	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
 	if not pylon[allyTeamID][unitID] then
-		Spring.Echo("RemovePylon not pylon[allyTeamID][unitID] " .. unitID)
+		--Spring.Echo("RemovePylon not pylon[allyTeamID][unitID] " .. unitID)
 		return
 	end
 	
