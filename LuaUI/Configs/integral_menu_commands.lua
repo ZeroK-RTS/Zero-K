@@ -300,6 +300,8 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	embark=1,
 	disembark=1,
 	oneclickwep=1,
+	setferry=1, 
+	radialmenu=1,
 	
 	-- terraform
 	rampground=1,
@@ -318,7 +320,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	ap_fly_state=2,
 	ap_autorepairlevel=2,
 	antinukezone=2,
-	unit_ai=2,
+	unitai=2,
 	unit_kill_subordinates=2,
 	
 	
