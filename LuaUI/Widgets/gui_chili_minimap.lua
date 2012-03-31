@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.882 Chili Minimap",
+    desc      = "v0.883 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -195,10 +195,16 @@ function widget:MousePress(x, y, button)
 		return false
 	end
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	if not meta then return false end
-	WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
-	WG.crude.ShowMenu() --make epic Chili menu appear.
-	return true
+	if not meta then  --//skip epicMenu when user didn't press the Spacebar
+		return false 
+	end
+	if Spring.GetActiveCommand() == 0 then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
+		WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
+		WG.crude.ShowMenu() --make epic Chili menu appear.
+		return true
+	else --//skip epicMenu when user have active command. User might be trying to queue/insert command using the minimap.
+		return false
+	end
 end
 
 --[[function widget:Update(dt) 
