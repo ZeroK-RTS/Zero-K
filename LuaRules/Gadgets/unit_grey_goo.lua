@@ -99,8 +99,9 @@ function gadget:GameFrame(f)
 			local unit = units[unitID]
 			local quota = unit.defs.drain
 			local x,_,z = Spring.GetUnitPosition(unitID)
+			local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID)
 			-- drain metal while quote not fulfilled
-			while quota > 0 do
+			while quota > 0 and not stunned_or_inbuild do
 				
 				local feature = getClosestWreck(x, z, unit.defs.range)
 				
