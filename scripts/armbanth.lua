@@ -8,10 +8,10 @@ local body = piece "body"
 local head = piece "head"
 local headflare = piece "headflare"
 local torso = piece "torso"
-local lmissile = piece "lmissile"
-local rmissile = piece "rmissile"
-local lmissileflare = piece "lmissileflare"
-local rmissileflare = piece "rmissileflare"
+local lmissile3 = piece "lmissile3"
+local rmissile3 = piece "rmissile3"
+local lmissileflare3 = piece "lmissileflare3"
+local rmissileflare3 = piece "rmissileflare3"
 
 --left arm
 local larm = piece "larm"
@@ -217,8 +217,8 @@ end
 
 --Missiles
 function script.QueryWeapon3(num)
-	if missilegun then return lmissileflare
-	else return rmissileflare end
+	if missilegun then return lmissileflare3
+	else return rmissileflare3 end
 	end
 	
 function script.AimFromWeapon3(num) return torso end
@@ -233,13 +233,13 @@ end
 
 local function missilelaunch()
 	if missilegun then
-	Hide ( lmissile )
+	Hide ( lmissile3 )
     Sleep(4000)
-    Show ( lmissile )
+    Show ( lmissile3 )
 	else
-	Hide ( rmissile )
+	Hide ( rmissile3 )
     Sleep(4000)
-    Show ( rmissile )
+    Show ( rmissile3 )
 		end
 end
 
