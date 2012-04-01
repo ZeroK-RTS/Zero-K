@@ -74,8 +74,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
 		local speed = math.sqrt(vx^2 + vy^2 + vz^2)
 		if speed > 5.5 then
-			Spring.Echo("damaged")
-			Spring.Echo(speed)
 			return speedToDamage(unitID, unitDefID)
 		end
 		return 0 -- units bounce and damage themselves.
