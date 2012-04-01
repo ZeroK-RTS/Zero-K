@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.001 Chili Keyboard Menu",
+    desc      = "v0.002 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -124,43 +124,53 @@ options = {
 	lbl_w = { type = 'label', name = 'Armed Units' },
 	select_all = { type = 'button',
 		name = 'All Units',
+		tooltip = 'Select all units.',
 		action = 'select AllMap++_ClearSelection_SelectAll+',
 	},
 	select_idleb = { type = 'button',
 		name = 'Idle Builder',
+		tooltip = 'Select the next idle builder.',
 		action = 'select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+',
 	},
 	select_idleallb = { type = 'button',
 		name = 'All Idle Builders',
+		tooltip = 'Select all idle builders.',
 		action = 'select AllMap+_Builder_Not_Building_Not_Transport_Idle+_ClearSelection_SelectAll+',
 	},
 	
 	select_vissame = { type = 'button',
-		name = 'Visible Same as Sel',
+		name = 'Visible Same',
+		tooltip = 'Select all visible units of the same type as current selection.',
 		action = 'select Visible+_InPrevSel+_ClearSelection_SelectAll+',
 	},
 	select_same = { type = 'button',
-		name = 'All Same as Sel',
+		name = 'All Same',
+		tooltip = 'Select all units of the same type as current selection.',
 		action = 'select AllMap+_InPrevSel+_ClearSelection_SelectAll+',
 	},
 	select_half = { type = 'button',
 		name = 'Deselect Half',
+		tooltip = 'Deselect half of the selected units.',
 		action = 'select PrevSelection++_ClearSelection_SelectPart_50+',
 	},
 	select_one = { type = 'button',
 		name = 'Deselect Except One',
+		tooltip = 'Deselect all but one of the selected units.',
 		action = 'select PrevSelection++_ClearSelection_SelectOne+',
 	},
 	select_nonidle = { type = 'button',
 		name = 'Deselect non-idle',
+		tooltip = 'Deselect all but the idle selected units.',
 		action = 'select PrevSelection+_Idle+_ClearSelection_SelectAll+',
 	},
 	select_landw = { type = 'button',
 		name = 'Visible Armed Land',
+		tooltip = 'Select all visible armed land units.',
 		action = 'select Visible+_Not_Builder_Not_Building_Not_Aircraft_Weapons+_ClearSelection_SelectAll+',
 	},
 	selectairw = { type = 'button',
 		name = 'Visible Armed Flying',
+		tooltip = 'Select all visible armed flying units.',
 		action = 'select Visible+_Not_Building_Not_Transport_Aircraft_Weapons+_ClearSelection_SelectAll+',
 	},
 	
@@ -282,7 +292,7 @@ local function AddHotkeyLabel( key, text )
 	}
 end
 
-local function AddBuildButton()
+local function AddBuildButton(color)
 	key_buttons['D']:AddChild(
 		Label:New{ caption = 'BUIL'.. green ..'D', fontSize=14, bottom='1', fontShadow = true, }
 	)
@@ -295,6 +305,9 @@ local function AddBuildButton()
 		}
 	)
 	key_buttons['D'].OnMouseDown = { function() MakeBuildMenu(); end }
+	if color then
+		SetButtonColor(key_buttons['D'], color)
+	end
 end
 
 
@@ -425,7 +438,7 @@ UpdateMenu = function()
 		for i=1,buildKeysLen do
 			local key = buildKeys:sub(i,i)
 			if key == 'D' then
-				AddBuildButton()
+				AddBuildButton(magenta_table)
 			else
 				AddButton(temptree[key], key)
 			end
