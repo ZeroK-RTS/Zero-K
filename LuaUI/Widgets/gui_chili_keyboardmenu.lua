@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.002 Chili Keyboard Menu",
+    desc      = "v0.003 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -219,12 +219,71 @@ end
 --]]
 
 
+local function CopyTable(outtable,intable)
+  for i,v in pairs(intable) do 
+    if (type(v)=='table') then
+      if (type(outtable[i])~='table') then outtable[i] = {} end
+      CopyTable(outtable[i],v)
+    else
+      outtable[i] = v
+    end
+  end
+end
+
+
 ------------------------------------------------
 --functions
 
 local function UpdateButtons() end
 local function UpdateMenu() end
+local function StoreBuilders() end
 
+-- layout handler - its needed for custom commands to work and to delete normal spring menu
+local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
+	widgetHandler.commands   = commands
+	widgetHandler.commands.n = cmdCount
+	widgetHandler:CommandsChanged()
+	local reParamsCmds = {}
+	local customCmds = {}
+	
+	local cnt = 0
+	
+	local AddCommand = function(command) 
+		local cc = {}
+		CopyTable(cc,command )
+		cnt = cnt + 1
+		cc.cmdDescID = cmdCount+cnt
+		if (cc.params) then
+			if (not cc.actions) then --// workaround for params
+				local params = cc.params
+				for i=1,#params+1 do
+					params[i-1] = params[i]
+				end
+				cc.actions = params
+			end
+			reParamsCmds[cc.cmdDescID] = cc.params
+		end
+		--// remove api keys (custom keys are prohibited in the engine handler)
+		cc.pos       = nil
+		cc.cmdDescID = nil
+		cc.params    = nil
+		
+		customCmds[#customCmds+1] = cc
+	end 
+	
+	
+	--// preprocess the Custom Commands
+	for i=1,#widgetHandler.customCommands do
+		AddCommand(widgetHandler.customCommands[i])
+	end
+	
+	for i=1,#globalCommands do
+		AddCommand(globalCommands[i])
+	end
+
+	Update()
+	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
+end 
 
 
 local function SetButtonColor(button, color)
@@ -315,6 +374,8 @@ local function SetCurTab(tab)
 	SetButtonColor(tab_buttons[curTab], white_table)
 	curTab = tab
 	SetButtonColor(tab_buttons[curTab], magenta_table)
+	
+	StoreBuilders(selectedUnits)
 	UpdateButtons()
 end
 
@@ -449,7 +510,6 @@ end
 
 -- setup menu depending on selected unit(s)
 local function SetupBuilderMenuData()
-	local units = selectedUnits
 	build_menu = nil
 	build_menu_selected = nil
 	
@@ -473,7 +533,7 @@ MakeBuildMenu = function()
 	end
 end
 
-local function StoreBuilders(units)
+StoreBuilders = function(units)
 	builder_types = {}
 	builder_types_i = {}
 	builder_ids_i = {}
@@ -766,6 +826,11 @@ end
 --callins
 
 function widget:Initialize()
+	widgetHandler:ConfigLayoutHandler(LayoutHandler)
+	Spring.ForceLayoutUpdate()
+	
+	widget:SelectionChanged(Spring.GetSelectedUnits())
+
 	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button
@@ -812,17 +877,15 @@ function widget:Initialize()
 	if not customKeyBind then
 		Spring.SendCommands("bind d radialbuildmenu")
 	end
-
-	--OptionsChanged()
-	local sel = Spring.GetSelectedUnits()
-	widget:SelectionChanged(sel)
 end 
 
 function widget:Shutdown()
-  if not customKeyBind then
-    Spring.SendCommands("unbind d radialbuildmenu")
-  end
-  widgetHandler:RemoveAction("radialbuildmenu")
+	widgetHandler:ConfigLayoutHandler(nil)
+	Spring.ForceLayoutUpdate()
+	if not customKeyBind then
+		Spring.SendCommands("unbind d radialbuildmenu")
+	end
+	widgetHandler:RemoveAction("radialbuildmenu")
 end
 
 function widget:KeyPress(key, modifier)
@@ -883,6 +946,7 @@ end
 
 function widget:SelectionChanged(sel)
 	--echo('selchanged')
+	selectedUnits = sel
 	-- updating here causes error because commandchanged needs to find whether unit is builder or not
 end
 
@@ -913,8 +977,6 @@ function widget:Update()
 	--updating here seems to solve the issue if the widget layer is sufficiently large
 	if updateCommandsSoon then
 		updateCommandsSoon = false
-		local sel = Spring.GetSelectedUnits()
-		selectedUnits = sel
 		StoreBuilders(selectedUnits)
 		UpdateButtons()
 	end
