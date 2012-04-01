@@ -36,16 +36,16 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	lineage[unitID] = nil
 end
 
+-- Only lineage for factories so the returning player has something to do.
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	--lineage[unitID] = builderID and (lineage[builderID] or Spring.GetUnitTeam(builderID)) or unitTeam
 	if builderID ~= nil then
 		local originalTeamID = lineage[builderID]
-		if originalTeamID ~= nil then
+		if originalTeamID ~= nil and unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory then
 			lineage[unitID] = originalTeamID
 		end
 	end
 end
-
 
 GG.allowTransfer = false
 --FIXME block transfers for /take but allow manual H/crude list gives
