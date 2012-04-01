@@ -89,7 +89,7 @@ unitDef = {
     },
 
 	{
-      def                = [[GRAVITY_NEG_SPECIAL]],
+      def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
@@ -158,7 +158,13 @@ unitDef = {
     },
 	
 	GRAVITY_NEG_SPECIAL = {
-      name                    = [[Attractive Gravity]],
+      -- This is just a marker weapon.
+	  -- When the projectile hits the ground or explodes above ground the float effect will occur.
+	  -- Units fly towards the impact position of this projectile.
+	  -- So the projectile can be any weapon of any speed but:
+	  -- * It must be a projectile (ie no Lightning or LaserCannon)
+	  -- * There must only be one
+	  name                    = [[Attractive Gravity]],
       areaOfEffect            = 8,
       avoidFriendly           = false,
       burstrate               = 0.01,

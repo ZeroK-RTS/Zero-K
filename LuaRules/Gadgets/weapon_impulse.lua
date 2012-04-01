@@ -91,7 +91,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		
 		local dis = distance(ux,uy,uz,ax,ay,az)
 		
-		local mag = impulseWeaponID[weaponDefID]*GRAVITY/dis*impulseMult[moveTypeByID[unitDefID]]/mass[unitDefID]
+		local mag = impulseWeaponID[weaponDefID]*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]/mass[unitDefID]
 		
 		if moveTypeByID[unitDefID] == 0 then
 			Spring.AddUnitImpulse(unitID,(ux-ax)*mag,(uy-ay)*mag,(uz-az)*mag)
@@ -99,7 +99,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 			Spring.SetUnitVelocity(unitID, vx + (ux-ax)*mag, vy + (uy-ay)*mag * GUNSHIP_VERTICAL_MULT, vz + (uz-az)*mag)
 		elseif moveTypeByID[unitDefID] == 2 then
-			Spring.AddUnitImpulse(unitID,(ux-ax)*mag,(uy-ay)*mag+10/mass[unitDefID]*GRAVITY/GRAVITY_BASELINE,(uz-az)*mag)
+			Spring.AddUnitImpulse(unitID,(ux-ax)*mag,(uy-ay)*mag+10/mass[unitDefID],(uz-az)*mag)
 		end
 		--local bx, by, bz = Spring.GetUnitBasePosition(unitID)
 		--local height = Spring.GetGroundHeight(bx,bz)
