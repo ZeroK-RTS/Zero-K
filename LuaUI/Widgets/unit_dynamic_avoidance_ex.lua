@@ -1,4 +1,4 @@
-local versionName = "v2.2"
+local versionName = "v2.25"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -120,6 +120,10 @@ local reloadableWeaponCriteriaG = 0.5 --second at which reload time is considere
 local criticalShieldLevelG = 0.5 --percent at which shield is considered low and should activate avoidance. ie: 50%
 local minimumRemainingReloadTimeG = 0.9 --seconds before actual reloading finish which avoidance should de-activate. ie: 0.9 second before finish
 local secondPerGameFrameG = 0.5/15 --engine depended second-per-frame (for calculating remaining reload time). ie: 0.0333 second-per-frame or 0.5sec/15frame
+
+--Command Timeout constants:
+local commandTimeoutG = 2
+local consRetreatTimeoutG = 15
 --------------------------------------------------------------------------------
 --Variables:
 local unitInMotionG={} --store unitID
@@ -138,7 +142,7 @@ local commandTTL_G = {} --for recording command's age. To check for expiration
 --Methods:
 ---------------------------------Level 0
 options_path = 'Game/Unit AI/Dynamic Avoidance' --//for use 'with gui_epicmenu.lua'
-options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase'}
+options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption'}
 options = {
 	enableCons = {
 		name = 'Enable for constructors',
@@ -181,6 +185,17 @@ options = {
 			end
 		end,
 	},
+	consRetreatTimeoutOption = {
+		name = 'Constructor retreat auto-expire:',
+		type = 'number',
+		value = 15,
+		desc = "Amount in second before constructor retreat command auto-expire (is deleted), and then contructor will return to its previous area-reclaim command.",
+		min=3,max=15,step=1,
+		OnChange = function(self) 
+					consRetreatTimeoutG = self.value
+					Spring.Echo(string.format ("%.1f", 1.1*consRetreatTimeoutG) .. " second")
+				end,
+	},	
 }
 
 function widget:Initialize()
@@ -852,6 +867,10 @@ end
 -- maintain the visibility of original command
 -- reference: "unit_tactical_ai.lua" -ZeroK gadget by Google Frog
 function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, newCommand, now, commandTTL)
+	------- localize global constant:
+	local consRetreatTimeout = consRetreatTimeoutG
+	local commandTimeout = commandTimeoutG
+	------- end global constant
 	--Method 1: doesn't work online
 	--if not newCommand then spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) end --delete old command
 	-- spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
@@ -915,7 +934,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete latest reclaiming/ressurecting command (skip the target:wreck/units). Allow command reset
 					local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex+1])
 					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command OR to any heavy concentration of ally (haven)
-					commandTTL[unitID][#commandTTL[unitID] +1] = {countDown = 15, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 15x*RefreshUnitUpdateRate* to expire
+					commandTTL[unitID][#commandTTL[unitID] +1] = {countDown = consRetreatTimeout, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 15x*RefreshUnitUpdateRate* to expire
 				end
 			elseif cQueue[queueIndex+1].id==40 then --if second (2) queue is also repair
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
@@ -925,12 +944,12 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 			elseif (cQueue[queueIndex].params[3]~=nil) then  --if first (1) queue is area reclaim (an area reclaim without any wreckage to reclaim). area command should has no "nil" on params 1,2,3, & 4
 				local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex])
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
-				commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = 4, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
+				commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeout, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
 			end
 		end
 	end
 	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
-	commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = 4, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
+	commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeout, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
 	----
 	commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
 	commandIndexTable[unitID]["widgetZ"]=newZ
@@ -1425,7 +1444,7 @@ function FindSafeHavenForCons(unitID, now)
 	if options.enableReturnToBase.value==false or WG.recvIndicator == nil then --//if epicmenu option 'Return To Base' is false then return nil
 		return nil
 	end
-	Spring.Echo((now - safeHavenLastUpdate))
+	--Spring.Echo((now - safeHavenLastUpdate))
 	if (now - safeHavenLastUpdate) > 4 then --//only update NO MORE than once every 4 second:
 		safeHavenCoordinates = {} --//reset old content
 		local allMyUnits = spGetTeamUnits(myTeamID)
