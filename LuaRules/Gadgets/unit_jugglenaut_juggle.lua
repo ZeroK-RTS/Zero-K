@@ -36,6 +36,23 @@ for i=1,#WeaponDefs do
 	end
 end
 
+local moveTypeByID = {}
+
+for i=1,#UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.canFly then
+		if (ud.isFighter or ud.isBomber) then
+			moveTypeByID[i] = 0 -- plane
+		else
+			moveTypeByID[i] = 1 -- gunship
+		end
+	elseif not (ud.isBuilding or ud.isFactory or ud.speed == 0) then
+		moveTypeByID[i] = 2 -- ground/sea
+	else
+		moveTypeByID[i] = false -- structure
+	end
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -79,7 +96,7 @@ local function addFlying(unitID, frame, dx, dy, dz, height, parentDis)
 	local unitDefID = Spring.GetUnitDefID(unitID)
 	local ux, uy, uz = Spring.GetUnitPosition(unitID)
 		
-	if unitDefID and ux then
+	if unitDefID and ux and moveTypeByID[unitDefID] and  moveTypeByID[unitDefID] == 2 then
 		local frame = frame or Spring.GetGameFrame()
 		
 		local dis = distance(ux,uy,uz,dx,dy,dz)

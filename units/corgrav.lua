@@ -60,15 +60,15 @@ unitDef = {
 
     {
       def                = [[GRAVITY_POS]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
+      badTargetCategory  = [[]],
+      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
     },
 
 
     {
       def                = [[GRAVITY_NEG]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
+      badTargetCategory  = [[]],
+      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
     },
 
   },
@@ -86,6 +86,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams            = {
+	    impulse = [[-125]],
+	  },
+	  
       damage                  = {
         default = 0.001,
         planes  = 0.001,
@@ -96,8 +100,6 @@ unitDef = {
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
-      impulseBoost            = 30,
-      impulseFactor           = -125,
       intensity               = 0.7,
       interceptedByShieldType = 0,
       noSelfDamage            = true,
@@ -130,6 +132,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams            = {
+	    impulse = [[125]],
+	  },
+	  
       damage                  = {
         default = 0.001,
         planes  = 0.001,
@@ -140,8 +146,6 @@ unitDef = {
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
-      impulseBoost            = 35,
-      impulseFactor           = 125,
       intensity               = 0.7,
       interceptedByShieldType = 0,
       noSelfDamage            = true,

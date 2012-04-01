@@ -37,6 +37,31 @@ for unitDefID=1,#UnitDefs do
 	}
 end
 
+local function speedToDamage(unitID, unitDefID)
+	local armor = select(2,Spring.GetUnitArmored(unitID)) or 1
+	local att = attributes[unitDefID]
+	local ud = UnitDefs[unitDefID]
+	local vx,vy,vz = Spring.GetUnitVelocity(unitID)
+	local x,y,z = Spring.GetUnitPosition(unitID)
+	--local normal = Spring.GetGroundNormal(x,z)
+	local speed = math.sqrt(vx^2 + vy^2 + vz^2)
+
+	local outsideDamage = 0
+	if x < 0 or z < 0 or x > MAP_X or z > MAP_Z then
+		outsideDamage = math.max(-x,-z,x-MAP_X,z-MAP_Z)*att.outOfMapDamagePerElmo
+	end
+
+	local fallDamage = 0
+	if speed > att.velocityDamageThreshold then
+		fallDamage = (speed-att.velocityDamageThreshold)*att.velocityDamageScale
+	end
+	
+	local elasticity = att.elasticity
+	Spring.SetUnitVelocity(unitID,vx*elasticity,vy*elasticity,vz*elasticity)
+	
+	return fallDamage*armor + outsideDamage
+end
+
 -- weaponDefID -1 --> debris collision
 -- weaponDefID -2 --> ground collision
 -- weaponDefID -3 --> object collision
@@ -44,48 +69,21 @@ end
 -- weaponDefID -5 --> kill damage
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
-	--Spring.AddUnitImpulse(unitID,0,3,0)
-	if weaponDefID == WeaponDefNames["corgrav_gravity_pos"].id or 
-	   weaponDefID == WeaponDefNames["corgrav_gravity_neg"].id or
-	   weaponDefID == WeaponDefNames["amphraider2_watercannon"].id then
-
-		local bx, by, bz = Spring.GetUnitBasePosition(unitID)
-		local height = Spring.GetGroundHeight(bx,bz)
-		if math.abs(by-height) < 0.01 then
-			Spring.AddUnitImpulse(unitID,0,0.16*GRAVITY/70,0)
-		end
-	end
-
 	-- unit or wreck collision
-	if weaponDefID == -3 and attackerID == nil then
+	if (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
+		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
+		local speed = math.sqrt(vx^2 + vy^2 + vz^2)
+		if speed > 5.5 then
+			Spring.Echo("damaged")
+			Spring.Echo(speed)
+			return speedToDamage(unitID, unitDefID)
+		end
 		return 0 -- units bounce and damage themselves.
 	end
 	
 	-- ground collision
 	if weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
-		
-		local armor = select(2,Spring.GetUnitArmored(unitID)) or 1
-		local att = attributes[unitDefID]
-		local ud = UnitDefs[unitDefID]
-		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		--local normal = Spring.GetGroundNormal(x,z)
-		local speed = math.sqrt(vx^2 + vy^2 + vz^2)
-
-		local outsideDamage = 0
-		if x < 0 or z < 0 or x > MAP_X or z > MAP_Z then
-			outsideDamage = math.max(-x,-z,x-MAP_X,z-MAP_Z)*att.outOfMapDamagePerElmo
-		end
-
-		local fallDamage = 0
-		if speed > att.velocityDamageThreshold then
-			fallDamage = (speed-att.velocityDamageThreshold)*att.velocityDamageScale
-		end
-		
-		local elasticity = att.elasticity
-		Spring.SetUnitVelocity(unitID,vx*elasticity,vy*elasticity,vz*elasticity)
-		
-		return fallDamage*armor + outsideDamage
+		return speedToDamage(unitID, unitDefID)
 	end
 	return damage
 end

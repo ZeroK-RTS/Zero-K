@@ -89,6 +89,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams            = {
+	    impulse = [[35]],
+	  },
+	  
       damage                  = {
         default = 0.23,
         planes  = 0.23,
@@ -96,8 +100,6 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:none]], --watercannon_impact
-      impulseBoost            = 13,
-      impulseFactor           = 34,
       intensity               = 0.7,
       interceptedByShieldType = 1,
       myGravity		          = 0.65,

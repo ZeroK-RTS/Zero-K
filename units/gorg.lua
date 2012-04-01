@@ -10,6 +10,7 @@ unitDef = {
   buildPic               = [[GORG.png]],
   buildTime              = 12000,
   canAttack              = true,
+  canDGun                = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -84,24 +85,22 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0.2 0 1]],
 	  maxAngleDif		 = 150,
-      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
+      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
     },
 
-
+	{
+      def                = [[GRAVITY_NEG_SPECIAL]],
+      badTargetCategory  = [[FIXEDWING]],
+      mainDir            = [[0 0 1]],
+      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
+    },
+	
     {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[-0.2 0 1]],
 	  maxAngleDif		 = 150,
-      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
-    },
-
-
-    {
-      def                = [[GRAVITY_NEG]],
-      badTargetCategory  = [[FIXEDWING]],
-      mainDir            = [[0 0 1]],
-      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND]],
+      onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
     },
 
     --{
@@ -123,6 +122,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams            = {
+	    impulse = [[-125]],
+	  },
+	  
       damage                  = {
         default = 0.001,
         planes  = 0.001,
@@ -133,8 +136,6 @@ unitDef = {
       endsmoke                = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
-      impulseBoost            = 35,
-      impulseFactor           = -125,
       intensity               = 0.7,
       interceptedByShieldType = 0,
       noSelfDamage            = true,
@@ -143,6 +144,51 @@ unitDef = {
       reloadtime              = 0.2,
       renderType              = 4,
       rgbColor                = [[0 0 1]],
+      rgbColor2               = [[1 0.5 1]],
+      size                    = 2,
+      soundStart              = [[weapon/gravity_fire]],
+      soundTrigger            = true,
+      startsmoke              = [[0]],
+      thickness               = 4,
+      tolerance               = 5000,
+      turret                  = true,
+      weaponTimer             = 0.1,
+      weaponType              = [[LaserCannon]],
+      weaponVelocity          = 2750,
+    },
+	
+	GRAVITY_NEG_SPECIAL = {
+      name                    = [[Attractive Gravity]],
+      areaOfEffect            = 8,
+      avoidFriendly           = false,
+      burstrate               = 0.01,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+	  customParams            = {
+	    massliftthrow = [[1]],
+	    impulse = [[-125]],
+	  },
+	  
+      damage                  = {
+        default = 0.001,
+        planes  = 0.001,
+        subs    = 5E-05,
+      },
+
+      duration                = 0.0333,
+      endsmoke                = [[0]],
+      explosionGenerator      = [[custom:NONE]],
+      impactOnly              = true,
+      intensity               = 0.7,
+      interceptedByShieldType = 0,
+      noSelfDamage            = true,
+      projectiles             = 1,
+      range                   = 550,
+      reloadtime              = 20,
+      renderType              = 4,
+      rgbColor                = [[1 0 1]],
       rgbColor2               = [[1 0.5 1]],
       size                    = 2,
       soundStart              = [[weapon/gravity_fire]],
