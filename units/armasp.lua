@@ -47,7 +47,7 @@ unitDef = {
   sightDistance       = 273,
   turnRate            = 0,
   waterline           = 8,
-  workerTime          = 12,
+  workerTime          = 10,
   yardMap             = [[ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
   featureDefs         = {

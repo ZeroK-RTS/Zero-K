@@ -79,7 +79,7 @@ unitDef = {
   TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
-  workerTime                    = 6,
+  workerTime                    = 5,
   yardMap                       = [[oooooo occcco occcco occcco occcco occcco]],
 
   featureDefs                   = {

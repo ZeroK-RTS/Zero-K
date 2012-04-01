@@ -78,7 +78,7 @@ unitDef = {
   trackWidth             = 32,
   turninplace            = 0,
   turnRate               = 625,
-  workerTime             = 6,
+  workerTime             = 5,
 
   featureDefs            = {
 

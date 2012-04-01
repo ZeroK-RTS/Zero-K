@@ -71,7 +71,7 @@ unitDef = {
   turninplace            = 0,
   turnRate               = 233,
   waterline              = 10,
-  workerTime             = 12,
+  workerTime             = 10,
 
   weapons                = {
 

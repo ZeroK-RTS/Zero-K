@@ -61,7 +61,7 @@ unitDef = {
   smoothAnim       = true,
   turnRate         = 0,
   waterline        = 1,
-  workerTime       = 6,
+  workerTime       = 5,
   yardMap          = [[xoccccoxooccccooooccccooooccccooooccccooooccccooooccccooxoccccox]],
 
   featureDefs      = {

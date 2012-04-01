@@ -64,7 +64,7 @@ unitDef = {
   sightDistance          = 273,
   turnRate               = 0,
   waterline              = 0,
-  workerTime             = 6,
+  workerTime             = 5,
   yardMap                = [[oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco]],
 
   featureDefs            = {

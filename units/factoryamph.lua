@@ -66,7 +66,7 @@ unitDef = {
   side             = [[ARM]],
   sightDistance    = 273,
   turnRate         = 0,
-  workerTime       = 6,
+  workerTime       = 5,
   yardMap          = [[ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc]],
 
   featureDefs      = {

@@ -61,7 +61,7 @@ unitDef = {
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
-  workerTime                    = 12,
+  workerTime                    = 10,
   yardMap                       = [[oooooo occcco occcco occcco occcco oooooo]],
 
   featureDefs                   = {

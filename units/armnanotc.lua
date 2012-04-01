@@ -71,7 +71,7 @@ unitDef = {
   turnRate                      = 1,
   upright                       = true,
   useBuildingGroundDecal        = true,
-  workerTime                    = 12,
+  workerTime                    = 10,
 
   featureDefs                   = {
 

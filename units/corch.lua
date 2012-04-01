@@ -72,7 +72,7 @@ unitDef = {
   terraformSpeed      = 300,
   turninplace         = 0,
   turnRate            = 494,
-  workerTime          = 6,
+  workerTime          = 5,
 
   featureDefs         = {
 

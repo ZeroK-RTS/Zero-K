@@ -100,7 +100,7 @@ unitDef = {
   TEDClass            = [[VTOL]],
   terraformSpeed      = 300,
   turnRate            = 148,
-  workerTime          = 9,
+  workerTime          = 7.5,
 
   featureDefs         = {
 
