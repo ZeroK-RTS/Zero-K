@@ -58,7 +58,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 
 	-- unit or wreck collision
 	if weaponDefID == -3 and attackerID == nil then
-		return 0 -- units bounce and damage themselves. This buffs drops though.
+		return 0 -- units bounce and damage themselves.
 	end
 	
 	-- ground collision

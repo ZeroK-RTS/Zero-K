@@ -82,7 +82,7 @@ local function addFloat(unitID, unitDefID)
 			Spring.MoveCtrl.SetNoBlocking(unitID, true)
 			local place, feature = Spring.TestBuildOrder(unitDefID, x, y ,z, 1)
 			Spring.MoveCtrl.SetNoBlocking(unitID, false)
-			if  place == 2 then
+			if place == 2 then
 				Spring.SetUnitRulesParam(unitID, "disable_tac_ai", 1)
 				floatByID.count = floatByID.count + 1
 				floatByID.data[floatByID.count] = unitID
