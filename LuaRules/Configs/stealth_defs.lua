@@ -12,6 +12,18 @@ local passiveStealth = {
 
 local stealthDefs = {
 
+  corsktl = {
+    draw   = true,
+    init   = false,
+    energy = 20,
+    delay  = 30,
+  },
+  armspy = {
+    draw   = true,
+    init   = false,
+    energy = 20,
+    delay  = 30,
+  },
   spherepole = {
     draw   = true,
     init   = false,
