@@ -403,7 +403,7 @@ upgrades = {
 		name = "CarRepairer's Nanolathe",
 		description = "Adds +6 metal/s build speed",
 		func = function(unitDef)
-				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 6 end
+				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 5 end
 				--if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 60 end
 			end,
 	},
