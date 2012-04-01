@@ -41,8 +41,8 @@ unitDef = {
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[walkerraider]],
-  idleAutoHeal           = 10,
-  idleTime               = 150,
+  idleAutoHeal           = 5,
+  idleTime               = 1800,
   leaveTracks            = true,
   maneuverleashlength    = [[640]],
   mass                   = 88,
@@ -102,9 +102,9 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 12.856,
-        planes  = 12.856,
-        subs    = 0.64,
+        default = 12.213,
+        planes  = 12.213,
+        subs    = 0.61,
       },
 
       duration                = 0.02,
