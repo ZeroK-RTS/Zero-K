@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.003 Chili Keyboard Menu",
+    desc      = "v0.004 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -48,7 +48,8 @@ local Control
 local screen0
 local window_main		
 local tab_commands, tab_sels, tab_toggles
-local key_buttons, key_button_images, tab_buttons
+local key_buttons = {}
+local key_button_images, tab_buttons
 
 ------------------------------------------------
 -- keys
@@ -92,6 +93,12 @@ local lastCmd, lastColor
 
 local curTab = 'commands'
 
+--predeclared functions
+local function UpdateButtons() end
+local function UpdateMenu() end
+local function StoreBuilders() end
+local function SetupKeybuttons() end
+
 ------------------------------------------------
 -- options
 
@@ -115,9 +122,24 @@ options_order = {
 	'lbl_w',
 	'select_landw',
 	'selectairw',
+	
+	
+	'qwertz',
 }
 options = {
 
+	qwertz = {
+		name = 'QWERTZ layout',
+		type = 'bool',
+		path = 'Settings/Interface/KB Menu',
+		OnChange = function(self)
+			SetupKeybuttons()
+			UpdateButtons()
+		end,
+	},
+	
+
+	--selectkey options
 	lbl_main = { type = 'label', name = 'By Total' },
 	lbl_idle = { type = 'label', name = 'Idle' },
 	lbl_same = { type = 'label', name = 'Of Same Type' },
@@ -233,10 +255,6 @@ end
 
 ------------------------------------------------
 --functions
-
-local function UpdateButtons() end
-local function UpdateMenu() end
-local function StoreBuilders() end
 
 -- layout handler - its needed for custom commands to work and to delete normal spring menu
 local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
@@ -623,12 +641,22 @@ local function SetupTabs()
 	SetCurTab('commands')
 end
 
-local function SetupKeybuttons()
+SetupKeybuttons = function()
+
+	for _, button in pairs( key_buttons ) do
+		button:Dispose()
+	end
+
 	key_buttons = {}
 	key_button_images = {}
 	
 	--local rows = { 'QWERT', 'ASDFG', 'ZXCVB' }
 	local rows = { 'QWERTY', 'ASDFGH', 'ZXCVBN' }
+	
+	if options.qwertz.value then
+		rows = { 'QWERTZ', 'ASDFGH', 'YXCVBN' }
+	end
+	
 	local colnum = 0
 	local offset_perc = 4
 	
@@ -974,6 +1002,9 @@ function widget:DrawScreen()
 end
 
 function widget:Update()
+end
+
+function widget:GameFrame(f)
 	--updating here seems to solve the issue if the widget layer is sufficiently large
 	if updateCommandsSoon then
 		updateCommandsSoon = false
