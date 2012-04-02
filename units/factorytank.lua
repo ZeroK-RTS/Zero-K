@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factorytank]],
   name                          = [[Heavy Tank Factory]],
-  description                   = [[Produces Heavy and Specialized Vehicles, Builds at 6 m/s]],
+  description                   = [[Produces Heavy and Specialized Vehicles, Builds at 5 m/s]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,

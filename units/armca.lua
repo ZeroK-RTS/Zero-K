@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armca]],
   name                = [[Crane]],
-  description         = [[Construction Aircraft, Builds at 4.8 m/s]],
+  description         = [[Construction Aircraft, Builds at 4 m/s]],
   acceleration        = 0.072,
   airStrafe           = 0,
   amphibious          = true,

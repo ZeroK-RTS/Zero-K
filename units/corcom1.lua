@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corcom1]],
   name                = [[Battle Commander]],
-  description         = [[Heavy Combat Commander, Builds at 12 m/s]],
+  description         = [[Heavy Combat Commander, Builds at 10 m/s]],
   acceleration        = 0.18,
   activateWhenBuilt   = true,
   amphibious          = [[1]],

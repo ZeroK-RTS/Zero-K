@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corsy]],
   name                   = [[Shipyard]],
-  description            = [[Produces Ships, Builds at 6 m/s]],
+  description            = [[Produces Ships, Builds at 5 m/s]],
   acceleration           = 0,
   brakeRate              = 0,
   buildCostEnergy        = 550,

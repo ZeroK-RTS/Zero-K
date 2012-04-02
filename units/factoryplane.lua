@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factoryplane]],
   name                          = [[Airplane Plant]],
-  description                   = [[Produces Airplanes, Builds at 6 m/s]],
+  description                   = [[Produces Airplanes, Builds at 5 m/s]],
   acceleration                  = 0,
   activateWhenBuilt             = false,
   brakeRate                     = 0,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[cornecro]],
   name                = [[Convict]],
-  description         = [[Construction/Shield Support bot, Builds at 6 m/s]],
+  description         = [[Construction/Shield Support bot, Builds at 5 m/s]],
   acceleration        = 0.5,
   activateWhenBuilt   = true,
   bmcode              = [[1]],

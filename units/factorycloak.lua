@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factorycloak]],
   name                          = [[Cloaky Bot Factory]],
-  description                   = [[Produces Cloaky Robots, Builds at 6 m/s]],
+  description                   = [[Produces Cloaky Robots, Builds at 5 m/s]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,

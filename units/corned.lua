@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corned]],
   name                   = [[Mason]],
-  description            = [[Construction Vehicle, Builds at 6 m/s]],
+  description            = [[Construction Vehicle, Builds at 5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
   buildCostEnergy        = 140,

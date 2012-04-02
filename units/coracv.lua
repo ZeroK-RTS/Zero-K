@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[coracv]],
   name                   = [[Welder]],
-  description            = [[Armed Construction Tank, Builds at 9 m/s]],
+  description            = [[Armed Construction Tank, Builds at 7.5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
   buildCostEnergy        = 250,

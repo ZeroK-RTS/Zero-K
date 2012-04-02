@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armnanotc]],
   name                          = [[Caretaker]],
-  description                   = [[Nanoturret, Builds at 12 m/s]],
+  description                   = [[Nanoturret, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 1.5,
   buildCostEnergy               = 220,

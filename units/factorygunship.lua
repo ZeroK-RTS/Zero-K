@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factorygunship]],
   name                          = [[Gunship Plant]],
-  description                   = [[Produces Gunships, Builds at 6 m/s]],
+  description                   = [[Produces Gunships, Builds at 5 m/s]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostEnergy               = 550,

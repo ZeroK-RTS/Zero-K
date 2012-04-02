@@ -1,7 +1,7 @@
 unitDef = {
   unitname         = [[factoryamph]],
   name             = [[Amphibious Operations Plant]],
-  description      = [[Produces Amphibious Bots and Subs, Builds at 6 m/s]],
+  description      = [[Produces Amphibious Bots and Subs, Builds at 5 m/s]],
   acceleration     = 0,
   bmcode           = [[0]],
   brakeRate        = 0,

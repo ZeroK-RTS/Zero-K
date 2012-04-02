@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[arm_spider]],
   name                   = [[Weaver]],
-  description            = [[Construction Spider, Builds at 9 m/s]],
+  description            = [[Construction Spider, Builds at 7.5 m/s]],
   acceleration           = 0.2,
   brakeRate              = 0.2,
   buildCostEnergy        = 200,

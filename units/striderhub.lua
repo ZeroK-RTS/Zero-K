@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[striderhub]],
   name                          = [[Strider Hub]],
-  description                   = [[Constructs Striders, Builds at 12 m/s]],
+  description                   = [[Constructs Striders, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 1.5,
   buildCostEnergy               = 550,

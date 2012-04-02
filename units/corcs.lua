@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corcs]],
   name                   = [[Mariner]],
-  description            = [[Construction Ship, Builds at 12 m/s]],
+  description            = [[Construction Ship, Builds at 10 m/s]],
   acceleration           = 0.051375,
   bmcode                 = [[1]],
   brakeRate              = 0.061,

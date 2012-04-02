@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factoryspider]],
   name                          = [[Spider Factory]],
-  description                   = [[Produces Spiders, Builds at 6 m/s]],
+  description                   = [[Produces Spiders, Builds at 5 m/s]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,

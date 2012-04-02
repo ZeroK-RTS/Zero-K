@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armcsa]],
   name                = [[Athena]],
-  description         = [[Airborne SpecOps Engineer, Builds at 9 m/s]],
+  description         = [[Airborne SpecOps Engineer, Builds at 7.5 m/s]],
   acceleration        = 0.084,
   airStrafe           = 0,
   amphibious          = true,

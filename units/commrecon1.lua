@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[commrecon1]],
   name                = [[Recon Commander]],
-  description         = [[High Mobility Commander, Builds at 12 m/s]],
+  description         = [[High Mobility Commander, Builds at 10 m/s]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
   amphibious          = [[1]],

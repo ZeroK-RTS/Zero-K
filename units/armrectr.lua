@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armrectr]],
   name                   = [[Rector]],
-  description            = [[Cloaking Construction Bot, Builds at 6 m/s]],
+  description            = [[Cloaking Construction Bot, Builds at 5 m/s]],
   acceleration           = 0.5,
   activateWhenBuilt      = true,
   bmcode                 = [[1]],

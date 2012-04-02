@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armcom1]],
   name                   = [[Strike Commander]],
-  description            = [[Mobile Assault Commander, Builds at 12 m/s]],
+  description            = [[Mobile Assault Commander, Builds at 10 m/s]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   amphibious             = [[1]],

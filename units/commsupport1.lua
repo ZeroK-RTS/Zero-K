@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[commsupport1]],
   name                = [[Support Commander]],
-  description         = [[Econ/Support Commander, Builds at 12 m/s]],
+  description         = [[Econ/Support Commander, Builds at 10 m/s]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
   amphibious          = [[1]],
