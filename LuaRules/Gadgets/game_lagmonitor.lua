@@ -26,6 +26,7 @@ end
 --------------------------------------------------------------------------------
 local lineage = {}
 local afkTeams = {}
+local unitAlreadyFinished = {}
 
 local LAG_THRESHOLD = 25000
 local AFK_THRESHOLD = 30
@@ -34,6 +35,7 @@ local AFK_THRESHOLD = 30
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	lineage[unitID] = nil
+	unitAlreadyFinished[unitID] = nil
 end
 
 -- Only lineage for factories so the returning player has something to do.
@@ -41,10 +43,17 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	--lineage[unitID] = builderID and (lineage[builderID] or Spring.GetUnitTeam(builderID)) or unitTeam
 	if builderID ~= nil then
 		local originalTeamID = lineage[builderID]
-		if originalTeamID ~= nil and unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory then
+		if originalTeamID ~= nil then
 			lineage[unitID] = originalTeamID
 		end
 	end
+end
+
+function gadget:UnitFinished(unitID, unitDefID, unitTeam)
+	if lineage[unitID] and (not unitAlreadyFinished[unitID]) and not (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory) then
+		lineage[unitID] = nil
+	end
+	unitAlreadyFinished[unitID] = true -- reverse build
 end
 
 GG.allowTransfer = false

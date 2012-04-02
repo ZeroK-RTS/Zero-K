@@ -104,8 +104,6 @@ unitDef = {
     {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
-      mainDir            = [[-0.2 0 1]],
-	  maxAngleDif		 = 150,
       onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
     },
 
@@ -164,12 +162,6 @@ unitDef = {
     },
 	
     GRAVITY_NEG_SPECIAL = {
-      -- This is just a marker weapon.
-	  -- When the projectile hits the ground or explodes above ground the float effect will occur.
-	  -- Units fly towards the impact position of this projectile.
-	  -- So the projectile can be any weapon of any speed but:
-	  -- * It must be a projectile (ie no Lightning or LaserCannon)
-	  -- * There must only be one
       name                    = [[Attractive Gravity]],
       areaOfEffect            = 8,
       avoidFriendly           = false,
@@ -180,7 +172,6 @@ unitDef = {
 
 	  customParams            = {
 	    massliftthrow = [[1]],
-	    impulse = [[-125]],
 	  },
 	  
       damage                  = {
@@ -202,16 +193,16 @@ unitDef = {
       renderType              = 4,
       rgbColor                = [[1 0 1]],
       rgbColor2               = [[1 0.5 1]],
-      size                    = 2,
+      size                    = 0.01,
       soundStart              = [[weapon/gravity_fire]],
       soundTrigger            = true,
       startsmoke              = [[0]],
-      thickness               = 4,
+      thickness               = 0.01,
       tolerance               = 5000,
       turret                  = true,
       weaponTimer             = 0.1,
       weaponType              = [[LaserCannon]],
-      weaponVelocity          = 2750,
+      weaponVelocity          = 1000,
     },
 
 
