@@ -90,7 +90,8 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams            = {
-	    impulse = [[35]],
+	    impulse = [[14]],
+		normaldamage = [[1]],
 	  },
 	  
       damage                  = {

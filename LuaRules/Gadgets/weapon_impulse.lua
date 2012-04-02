@@ -33,12 +33,13 @@ local impulseMult = {
 }
 local impulseWeaponID = {}
 
-
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
 	if wd.customParams and wd.customParams.impulse then
-		impulseWeaponID[wd.id] = tonumber(wd.customParams.impulse)
-		Spring.Echo(wd.name)
+		impulseWeaponID[wd.id] = {
+			impulse = tonumber(wd.customParams.impulse), 
+			normalDamage = (wd.customParams.normaldamage and true or false)
+		}
 	end
 end
 
@@ -60,6 +61,13 @@ for i=1,#UnitDefs do
 		moveTypeByID[i] = false -- structure
 	end
 end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+local thereIsStuffToDo = false
+local unitByID = {count = 0, data = {}}
+local unit = {}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -91,22 +99,55 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		
 		local dis = distance(ux,uy,uz,ax,ay,az)
 		
-		local mag = impulseWeaponID[weaponDefID]*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]/mass[unitDefID]
+		local mag = impulseWeaponID[weaponDefID].impulse*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]/mass[unitDefID]
 		
+		local x,y,z 
 		if moveTypeByID[unitDefID] == 0 then
-			Spring.AddUnitImpulse(unitID,(ux-ax)*mag,(uy-ay)*mag,(uz-az)*mag)
+			x,y,z = (ux-ax)*mag, (uy-ay)*mag, (uz-az)*mag
 		elseif moveTypeByID[unitDefID] == 1 then
-			local vx, vy, vz = Spring.GetUnitVelocity(unitID)
-			Spring.SetUnitVelocity(unitID, vx + (ux-ax)*mag, vy + (uy-ay)*mag * GUNSHIP_VERTICAL_MULT, vz + (uz-az)*mag)
+			x,y,z = (ux-ax)*mag, (uy-ay)*mag * GUNSHIP_VERTICAL_MULT, (uz-az)*mag
 		elseif moveTypeByID[unitDefID] == 2 then
-			Spring.AddUnitImpulse(unitID,(ux-ax)*mag,(uy-ay)*mag+10/mass[unitDefID],(uz-az)*mag)
+			x,y,z = (ux-ax)*mag, (uy-ay)*mag+impulseWeaponID[weaponDefID].impulse/(3.5*mass[unitDefID]), (uz-az)*mag
 		end
-		--local bx, by, bz = Spring.GetUnitBasePosition(unitID)
-		--local height = Spring.GetGroundHeight(bx,bz)
-		--if math.abs(by-height) < 0.01 then
-		--	Spring.AddUnitImpulse(unitID,0,0.16*GRAVITY/70,0)
-		--end
-		return 0
+		
+		if not unit[unitID] then
+			unit[unitID] = {
+				moveType = moveTypeByID[unitDefID],
+				x = x, y = y, z = z
+			}
+			unitByID.count = unitByID.count + 1
+			unitByID.data[unitByID.count] = unitID
+		else
+			unit[unitID].x = unit[unitID].x + x
+			unit[unitID].y = unit[unitID].y + y
+			unit[unitID].z = unit[unitID].z + z
+		end
+		
+		thereIsStuffToDo = true
+		
+		if impulseWeaponID[weaponDefID].normalDamage then
+			return damage
+		else
+			return 0
+		end
 	end
 	return damage
+end
+
+function gadget:GameFrame(f)
+	if thereIsStuffToDo then
+		for i = 1, unitByID.count do
+			local unitID = unitByID.data[i]
+			local data = unit[unitID]
+			if data.moveType == 1 then
+				local vx, vy, vz = Spring.GetUnitVelocity(unitID)
+				Spring.SetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
+			else
+				Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
+			end
+		end
+		unitByID = {count = 0, data = {}}
+		unit = {}
+		thereIsStuffToDo = false
+	end
 end

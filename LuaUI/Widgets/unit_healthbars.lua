@@ -567,11 +567,11 @@ do
     end
   
     --// PARALYZE
-	  if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
-        local stunned = GetUnitIsStunned(unitID)
-        if (stunned) then
-          paraUnits[#paraUnits+1]=unitID
-		end
+	if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
+      local stunned = GetUnitIsStunned(unitID)
+      if (stunned) then
+        paraUnits[#paraUnits+1]=unitID
+      end
 	end
   end
 
@@ -665,7 +665,7 @@ do
       end
 
       --// PARALYZE
-	  if (emp>0.01)and(hp>0.01)and((not morph) or morph.combatMorph)and(emp<1e8) then
+	  if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
         local stunned = GetUnitIsStunned(unitID)
         local infotext = ""
         if (stunned) then
@@ -967,6 +967,7 @@ do
   local GetCameraPosition    = Spring.GetCameraPosition
   local GetUnitDefID         = Spring.GetUnitDefID
   local glDepthMask          = gl.DepthMask
+  local glMultiTexCoord      = gl.MultiTexCoord
 
   function widget:DrawWorld()
 	if not Spring.IsGUIHidden() then 
@@ -1025,8 +1026,9 @@ do
     glDepthMask(false)
 	
 	DrawOverlays()
-
+    glMultiTexCoord(1,1,1,1)
     glColor(1,1,1,1)
+	
     --gl.DepthTest(false)
   end
 end --//end do
