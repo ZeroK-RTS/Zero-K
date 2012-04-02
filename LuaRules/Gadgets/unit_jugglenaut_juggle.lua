@@ -56,8 +56,8 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local RISE_TIME = 30
-local FLING_TIME = 40
+local RISE_TIME = 25
+local FLING_TIME = 35
 local UPDATE_FREQUENCY = 2
 local RISE_HEIGHT = 160
 
