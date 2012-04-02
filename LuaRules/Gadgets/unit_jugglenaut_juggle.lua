@@ -56,9 +56,10 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local RISE_TIME = 25
-local FLING_TIME = 35
+local RISE_TIME = 30
+local FLING_TIME = 40
 local UPDATE_FREQUENCY = 2
+local RISE_HEIGHT = 160
 
 local COLLLECT_RADIUS = 250
 
@@ -151,7 +152,7 @@ function gadget:ProjectileDestroyed(proID)
 				local tx, ty, tz = x + (ux-data.sx)*0.4, y + (uy-data.sy)*0.4, z + (uz-data.sz)*0.4
 				local mag = distance(data.sx, data.sy, data.sz, tx, ty, tz)
 				tx, ty, tz = (tx-data.sx)*parentDis/mag + data.sx, (ty-data.sy)*parentDis/mag + data.sy, (tz-data.sz)*parentDis/mag + data.sz
-				addFlying(unitID, frame, tx, ty, tz, data.sy + 130, parentDis)
+				addFlying(unitID, frame, tx, ty, tz, data.sy + RISE_HEIGHT, parentDis)
 			end
 		end
 		projectiles[proID] = nil
