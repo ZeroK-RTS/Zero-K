@@ -499,7 +499,7 @@ function assignTarget(unitID, refID, allyteam, output)
 	  end
 	end
 	if not landtargets then
-        AAdef[allyteam].units[refID].fire = 0
+        AAdef[allyteam].units[refID].fire = 2  --For now, defenders are always fire-at-will
 	end
   end
   if notargets == true then
@@ -1240,6 +1240,9 @@ function addAA(unitID, unitDefID, name, allyteam)
 	end
     AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = getRange(name), attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, resetfirestate = false, morph = false, damage = damage - 5, shotdamage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
 	if IsDPSAA(name) or IsMobileAA(name) then
+	  AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1].fire = 2
+	end
+	if name == "corrl" then  -- For now, all defenders are fire-at-will
 	  AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1].fire = 2
 	end
     AAdefreference[allyteam].units[unitID] = AAdefmaxcount[allyteam] + 1
