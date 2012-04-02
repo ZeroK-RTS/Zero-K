@@ -1,4 +1,4 @@
-local versionName = "v3.11"
+local versionName = "v3.15"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -7,7 +7,7 @@ function widget:GetInfo()
     name      = "Avatars",
     desc      = versionName .. " An API for a per-user avatar-icon system, + Hello/Hi protocol",
     author    = "jK, +msafwan",
-    date      = "2009, +2012 (7 Feb)",
+    date      = "2009, +2012 (2 April)",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     api       = true,
@@ -18,7 +18,7 @@ end
 --------------------------------------------------------------------------------
 --Global Variables--------------------------------------------------------------
 
-local avatars = {}
+local avatarsTable_g = {}
 
 local wdgtID 		= "&" --// 'selectionsend.lua' used "=", 'allyCursor.lua' used "%", 'unitMarker.lua' used "dFl", 'lagmonitor.lua' used "AFK", but please check first.
 local msgID       	= wdgtID .. "AAA"	--an identifier that identify a packet with this widget
@@ -78,7 +78,7 @@ local operatingModeThis_g = "A"	--a switch to enable one-on-one Custom Avatar fu
 --Other users can 'snif' other user's communication and use the exchange data to complete own's request list.
 --
 local maxFileSize = 10 --in kB (for operating mode A)
-local numberOfRetry = 3 --times to send "hi" before remote computer reply until they are listed in "ignore" for the duration of "refresh delay"
+local numberOfRetry_g = 3 --times to send "hi" before remote computer reply until they are listed in "ignore" for the duration of "refresh delay"
 local maxChecksumLenght= 2000  --if greater than 2049 will cause unpack error 
 --reference: http://www.promixis.com/forums/showthread.php?15419-Lua-Limits-on-Table-Size
 
@@ -90,8 +90,8 @@ local avatar_fallback = avatarsDir .. "Crystal_personal.png" --//default avatar
 local avatar_fallback_checksum = 13686070 --//checksum of "Crystal_personal.png". Shortcut
 
 local myPlayerID=-1
-local myPlayerName =-1 
-local myAllyTeamID=-1
+local myPlayerName_g =-1 
+local myAllyTeamID_g=-1
 local playerIDlistG_g={} --//variable: store playerID.
 
 local nextUpdate = 0 --//variable: indicate when to run widget:Update()
@@ -177,17 +177,22 @@ end
 --Avatar information------------------------------------------------------------
 
 local function GetAvatar(playername) --//to be called by Chatbubble widget. Return player's avatar
-	local avInfo = avatars[playername]
+	local avInfo = avatarsTable_g[playername]
 	return (avInfo and avInfo.file) --else return nil (chatbubble can handle the nil value)
 end
 
 
 local function SetAvatar(playerName, filename, checksum)
-	avatars[playerName] = {
+	avatarsTable_g[playerName] = {
 		checksum = checksum,
 		file = filename,
 	}
-	table.save(avatars, configFile)
+	table.save(avatarsTable_g, configFile)
+end
+
+local function DeleteAvatar(playerName)
+	avatarsTable_g[playerName] = nil
+	table.save(avatarsTable_g, configFile)
 end
 
 
@@ -195,7 +200,7 @@ local function SetMyAvatar(filename)
 --[[
 	fixme!!!
 	if (filename == nil) then
-		avatars[myPlayerName] = nil
+		avatarsTable_g[myPlayerName_g] = nil
 	end
 --]]
 
@@ -212,7 +217,7 @@ local function SetMyAvatar(filename)
 	--end
 
 	local checksum = CalcChecksum(data)
-	SetAvatar(myPlayerName,filename,checksum)
+	SetAvatar(myPlayerName_g,filename,checksum)
 	Spring.SendLuaUIMsg(broadcastID) --send 'checkout my new pic!' to everyone
 	networkDelay_g.sentTimestamp = os.clock() --//for measuring actual lag
 end
@@ -398,7 +403,7 @@ local function SetAvatarGUI()
 
 	local image = Chili.Image:New{
 		parent = grid;
-		file   = GetAvatar(myPlayerName);
+		file   = GetAvatar(myPlayerName_g);
 		--file2  = "LuaUI/Images/Copy of waterbump.png";
 		x      = 0;
 		y      = 0;
@@ -414,7 +419,14 @@ local function SetAvatarGUI()
 		caption    = "Select";
 		OnClick    = {
 			function()
-				SetMyAvatar(image.file)
+				SetMyAvatar(image.file) --//use the image shown on the GUI as my current avatar
+				local customKeys = GetPlayersData(1, myPlayerID) --//equal to Spring.GetPlayerInfo(myPlayerID)
+				local myDefaultAvatar=InitializeDefaultAvatar(customKeys)
+				if image.file == myDefaultAvatar.file then
+					DeleteAvatar("useCustom") --//delete entry "useCustom" if player is using default avatar. A "nil" entry will ensure that this widget update the default avatar everytime it start (non-"nil" make it use cached value).
+				else
+					SetAvatar("useCustom", "yes", 0000) --//store a "yes" under playerName "useCustom" as a tool to indicate whether user is using custom avatar or not.
+				end
 				chili_window:Dispose()
 				chili_window = nil
 			end
@@ -443,10 +455,9 @@ local function SetAvatarGUI()
 		caption    = "Default";
 		OnClick    = {
 			function()
-				local customKeys = GetPlayersData(1, myPlayerID)
-				local myAvatar={}
-				myAvatar=InitializeDefaultAvatar(myAvatar, customKeys)
-				image.file = myAvatar.file
+				local customKeys = GetPlayersData(1, myPlayerID) --//equal to Spring.GetPlayerInfo(myPlayerID)
+				local myAvatar=InitializeDefaultAvatar(customKeys)
+				image.file = myAvatar.file --//show the default image (server assigned image) on GUI
 				image:Invalidate()
 			end
 		}
@@ -573,6 +584,7 @@ local function NetworkProtocol()
 	local tableIsCompleted=tableIsCompleted_g
 	local fileRequestTableG=fileRequestTableG_g
 	local currentTime = currentTime_g
+	local avatarsTable = avatarsTable_g
 	---------------------------
 	
 	if (#msgRecv or 0)>=1 then --check lua message from 'inbox'
@@ -588,7 +600,7 @@ local function NetworkProtocol()
 		if msg~=nil then --//activate only when relevant message received.		
 			if (msg:sub(1,4) == msgID) then --if message belong to hello/hi file transfer protocol
 				destinationID=tonumber(msg:sub(8,9))
-				local myAvatar = avatars[myPlayerName]
+				local myAvatar = avatarsTable[myPlayerName_g]
 				
 				if openPortForID==playerID and destinationID==myPlayerID and not lineIsBusy then --//if sender is expected
 					if msg:sub(6,6)==hi then --receive hi from target playerID
@@ -620,7 +632,7 @@ local function NetworkProtocol()
 						----
 							local checksum = tonumber(msg:sub(11))					
 							local playerName = GetPlayersData(2, playerID)
-							local avatarInfo = avatars[playerName]
+							local avatarInfo = avatarsTable[playerName]
 							local payloadRequestFlag=0
 							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
 								local file = SearchFileByChecksum(checksum)
@@ -658,7 +670,7 @@ local function NetworkProtocol()
 						----
 							local checksum = tonumber(msg:sub(11))
 							local playerName = GetPlayersData(2, playerID)
-							local avatarInfo = avatars[playerName]
+							local avatarInfo = avatarsTable[playerName]
 							local payloadRequestFlag=0
 							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
 								local file = SearchFileByChecksum(checksum)
@@ -742,7 +754,7 @@ local function NetworkProtocol()
 								checklistTableG[(playerID+1)].downloaded=true --tick 'done' on file downloaded
 
 								local playerName = GetPlayersData(2, playerID)
-								local avatarInfo = avatars[playerName]
+								local avatarInfo = avatarsTable[playerName]
 
 								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
 									local filename = SaveToFile(filename, image, checksum)
@@ -771,7 +783,7 @@ local function NetworkProtocol()
 								checklistTableG[(userID+1)].downloaded=true --tick 'done' on file downloaded
 
 								local playerName = GetPlayersData(2, playerID)
-								local avatarInfo = avatars[playerName]
+								local avatarInfo = avatarsTable[playerName]
 
 								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
 									local filename = SaveToFile(filename, image, checksum)
@@ -828,7 +840,7 @@ local function NetworkProtocol()
 								checklistTableG[(playerID+1)].downloaded=true --tick 'done' on file downloaded
 
 								local playerName = GetPlayersData(2, playerID)
-								local avatarInfo = avatars[playerName]
+								local avatarInfo = avatarsTable[playerName]
 
 								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
 									local filename = SaveToFile(filename, image, checksum)
@@ -852,7 +864,7 @@ local function NetworkProtocol()
 								checklistTableG[(userID+1)].downloaded=true --tick 'done' on file downloaded
 
 								local playerName = GetPlayersData(2, userID)
-								local avatarInfo = avatars[playerName]
+								local avatarInfo = avatarsTable[playerName]
 
 								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
 									local filename = SaveToFile(filename, image, checksum)
@@ -942,7 +954,7 @@ local function NetworkProtocol()
 								local image      = cdata
 								local checksum   = CalcChecksum(image)
 								local playerName = GetPlayersData(2, playerID)
-								local avatarInfo = avatars[playerName]
+								local avatarInfo = avatarsTable[playerName]
 
 								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
 									local filename = SaveToFile(filename, image, checksum)
@@ -959,7 +971,7 @@ local function NetworkProtocol()
 								local image      = cdata
 								local checksum   = CalcChecksum(image)
 								local playerName = GetPlayersData(2, userID)
-								local avatarInfo = avatars[playerName]
+								local avatarInfo = avatarsTable[playerName]
 
 								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
 									local filename = SaveToFile(filename, image, checksum)
@@ -976,7 +988,7 @@ local function NetworkProtocol()
 						if operationMode == "A" then
 							local checksum = tonumber(msg:sub(11))
 							local playerName = GetPlayersData(2, playerID)
-							local avatarInfo = avatars[playerName]
+							local avatarInfo = avatarsTable[playerName]
 							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then --check if we have record of this player
 								local file = SearchFileByChecksum(checksum)
 								if (file) then
@@ -984,6 +996,7 @@ local function NetworkProtocol()
 									SetAvatar(playerName,file,checksum)
 									checklistTableG[(playerID+1)].downloaded=true
 								else
+									--Spring.Echo("Avatar 988: " .. playerID)
 									checklistTableG[(playerID+1)].retry=0 --if we have no file yet, but heard this broadcast then reset retry count to continue trying to reach this playerID
 									tableIsCompleted=false --recheck checklist
 								end
@@ -1069,7 +1082,7 @@ function widget:Update(n)
 			playerID=playerIDlistG[iteration]
 			if playerID~=myPlayerID and not checklistTableG[(playerID+1)].ignore then --don't check self and don't check ignore list
 				if (checklistTableG[(playerID+1)].downloaded==false) then --check checklist if complete
-					if checklistTableG[(playerID+1)].retry < numberOfRetry then
+					if checklistTableG[(playerID+1)].retry < numberOfRetry_g then
 						doChecking=false
 						checklistTableG[(playerID+1)].retry=checklistTableG[(playerID+1)].retry+1 -- ++ retry count
 					end
@@ -1144,25 +1157,21 @@ function UpdatePlayerList()
 	local tableIsCompleted =tableIsCompleted_g
 	local playerIDlistG = playerIDlistG_g
 	local refreshDelay = refreshDelay_g
+	local numberOfRetry = numberOfRetry_g
 	------------------
 	--get info on self
-	local iAmSpectator=false
-	if Spring.GetSpectatingState() then 
-		iAmSpectator=true
-	end
+	local iAmSpectator= (Spring.GetSpectatingState()) or (false) --//return true if I am spectator (Spring.GetSpectatingState() = true), or return false if I'm not spectating (Spring.GetSpectatingState() = nil).
 
 	--get all playerID list
 	playerIDlistG= GetPlayersData(8, nil)
 	--Spring.Echo(playerIDlistG)	
 	
 	--use playerIDlistG to update checklist
-	local iteration =1
-	local playerID=-1
 	local playerCount = #playerIDlistG
-	while iteration <= #playerIDlistG do --update checklist with appropriate value
-		playerID=playerIDlistG[iteration]
+	for iteration=1, #playerIDlistG, 1 do --update checklist and fill it with appropriate value
+		local playerID = playerIDlistG[iteration]
 		if checklistTableG[(playerID+1)]==nil then 
-			checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --add empty entry with new value
+			checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --add new entry with default value
 		else 
 			checklistTableG[(playerID+1)].ignore=false --reset previous ignore list
 			checklistTableG[(playerID+1)].retry=0 --reset retry counter
@@ -1180,20 +1189,19 @@ function UpdatePlayerList()
 			end
 		end
 		
-		--the following add ignore flag to selective playerID
-		local playerIsActive,playerIsSpectator,playerAllyTeamID = GetPlayersData(5, playerID)
+		--the following code add "ignore" flag to some selected playerID
+		local playerIsActive,playerIsSpectator,playerAllyTeamID = GetPlayersData(5, playerID) --//is equal to Spring.GetPlayerInfo(playerID)
 		if iAmSpectator then --if I am spectator then
 			if not playerIsSpectator or not playerIsActive then --ignore non-specs and inactive player(don't send hi/request file)
 				checklistTableG[(playerID+1)].ignore=true 
 				playerCount = playerCount-1
 			end
 		else --if I am not spectator
-			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not playerIsActive then --if player is the enemy or a spec then
+			if myAllyTeamID_g~=playerAllyTeamID or playerIsSpectator or not playerIsActive then --if player is the enemy or a spec then
 				checklistTableG[(playerID+1)].ignore=true --ignore enemy & spec and inactive player(don't send hi/request file)
 				playerCount = playerCount-1
 			end
 		end
-		iteration=iteration+1
 	end
 	refreshDelay = (2*playerCount)*numberOfRetry --// set refresh delay based on number of ally and retry count, with a maximum 2 second delay for each
 	tableIsCompleted=false --unlock checklist for another check
@@ -1204,20 +1212,23 @@ function UpdatePlayerList()
 	refreshDelay_g = refreshDelay
 end
 
-function InitializeDefaultAvatar(myAvatar, customKeys)
+function InitializeDefaultAvatar(customKeys)
 	--initialize own avatar using the default fallback (Crystal_Personal)
-	myAvatar={
+	local myAvatar={
 			checksum = avatar_fallback_checksum,
 			file = avatar_fallback
 		}  
 	--initialize own avatar using server assigned avatar
 	if (customKeys ~= nil and customKeys.avatar~=nil) then 
-		local customKeyAvatarDir = avatarsDir .. customKeys.avatar .. ".png" --check if we have that file on disk
-		if (VFS.FileExists(customKeyAvatarDir)) then
-			myAvatar.file = customKeyAvatarDir
+		local customKeyAvatarDir = avatarsDir .. customKeys.avatar --file path
+		if (VFS.FileExists(customKeyAvatarDir .. ".png")) then --check if we have the file on disk with a ".png" extension
+			myAvatar.file = customKeyAvatarDir .. ".png"
 			myAvatar.checksum = CalcChecksum(VFS.LoadFile(myAvatar.file))
-		--if we don't have the file then fallback avatar remains
+		elseif (VFS.FileExists(customKeyAvatarDir .. ".jpg")) then --check again if we have the file on disk with a ".jpg" extension instead
+			myAvatar.file = customKeyAvatarDir .. ".jpg"
+			myAvatar.checksum = CalcChecksum(VFS.LoadFile(myAvatar.file))
 		end
+		--if we don't have the file then use fallback avatar
 	end
 	return myAvatar
 end
@@ -1227,27 +1238,29 @@ function widget:Initialize()
 	local checklistTableG = checklistTableG_g
 	local playerIDlistG = playerIDlistG_g
 	local refreshDelay = refreshDelay_g
-	------------------
+	local myPlayerName = myPlayerName_g
+	local myAllyTeamID = myAllyTeamID_g
+	local avatarsTable = avatarsTable_g
+	local numberOfRetry = numberOfRetry_g
+	------------------ localized global variable/constant
 	--get info on self
-	myPlayerID = GetPlayersData(7, nil)
-	local name,iAmSpectator,allyTeamID,customKeys = GetPlayersData(6, myPlayerID)
+	myPlayerID = GetPlayersData(7, nil) --//equal to Spring.GetMyPlayerID()
+	local name,iAmSpectator,allyTeamID,customKeys = GetPlayersData(6, myPlayerID) --//equal to Spring.GetPlayerInfo(myPlayerID)
 	myPlayerName =name
 	myAllyTeamID=allyTeamID
 	
 	--get all playerID list
-	playerIDlistG= GetPlayersData(8, nil)
+	playerIDlistG= GetPlayersData(8, nil) --//equal to Spring.GetPlayerList()
 	--Spring.Echo(playerIDlistG)
-	avatars = (VFS.FileExists(configFile) and VFS.Include(configFile)) or {}
+	avatarsTable = (VFS.FileExists(configFile) and VFS.Include(configFile)) or {}
 
 	--use player list to build checklist
-	local iteration =1
-	local playerID=-1
 	local playerCount = #playerIDlistG
-	while iteration <= #playerIDlistG do --fill checklist with initial value
-		playerID=playerIDlistG[iteration]
-		checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --fill checklist with default values (promote communication)
+	for iteration=1, #playerIDlistG, 1 do --fill checklist with initial value
+		local playerID=playerIDlistG[iteration]
+		checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --fill checklist with default values. This value allow widget to initiate communication with other players
 		
-		local playerName, activePlayer , playerIsSpectator,playerAllyTeamID, playerCustomKeys = GetPlayersData(4, playerID)
+		local playerName, activePlayer , playerIsSpectator,playerAllyTeamID, playerCustomKeys = GetPlayersData(4, playerID) --//equal to Spring.GetPlayerInfo(playerID)
 		if operatingModeThis == "B" then
 			if (playerCustomKeys ~= nil and playerCustomKeys.avatar~=nil) then 
 				local customKeyAvatarFile = avatarsDir .. playerCustomKeys.avatar .. ".png" --check if we have that file on disk
@@ -1259,38 +1272,36 @@ function widget:Initialize()
 			end
 		end
 		
-		--the following add ignore flag to selective playerID
+		--the following codes add "ignore" flag to a selected playerID
 		if iAmSpectator then --if I am spectator then
 			if not playerIsSpectator or not activePlayer then --ignore non-specs and non-ingame(don't send hi/request file)
 				checklistTableG[(playerID+1)].ignore=true 
 				playerCount = playerCount-1
 			end
-		else --if I am not spectator
-			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not activePlayer then --if player is enemy or spec or not ingame then
-				checklistTableG[(playerID+1)].ignore=true --ignore enemy & spec (don't send hi/request file)
+		else --if I am not spectator:
+			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not activePlayer then --ignore enemy and spec and non-ingame (don't send hi/request file)
+				checklistTableG[(playerID+1)].ignore=true
 				playerCount = playerCount-1
 			end
 		end
-		iteration=iteration+1
 	end
-	refreshDelay = (2*playerCount)*numberOfRetry --// set refresh delay based on number of ally and retry count, with a maximum 2 second delay for each
+	refreshDelay = (2*numberOfRetry)*playerCount --// set a 2 second delay (max) for each retry, times the number of players. This determine the "refresh delay" (amount of second before the ignore list being resetted)
 	
 	--// remove broken entries
-	for playerName,avInfo in pairs(avatars) do
+	for playerName,avInfo in pairs(avatarsTable) do
 		if (not VFS.FileExists(avInfo.file)) then
-			avatars[playerName] = nil
+			avatarsTable[playerName] = nil
 		end
 	end
 	
-	local myAvatar={}
-	myAvatar= InitializeDefaultAvatar(myAvatar, customKeys)
+	local myAvatar= InitializeDefaultAvatar(customKeys)
 	
 	if operatingModeThis == "A" then
-		if (avatars[myPlayerName]~=nil) then --initialize custom avatar if available
-			if VFS.FileExists(avatars[myPlayerName].file) then --if selected file exist, then use it
-				if  avatar_fallback_checksum ~= avatars[myPlayerName].checksum then --proceed only if NOT the vanilla default Crystal_Personal
-					myAvatar.file=avatars[myPlayerName].file
-					myAvatar.checksum=avatars[myPlayerName].checksum
+		if (avatarsTable[myPlayerName]~=nil) and (avatarsTable["useCustom"]~=nil) then --initialize custom avatar if was applied by user once and if it is available
+			if VFS.FileExists(avatarsTable[myPlayerName].file) then --if selected file exist, then use it
+				if  avatar_fallback_checksum ~= avatarsTable[myPlayerName].checksum then --proceed if NOT the default Crystal_Personal
+					myAvatar.file=avatarsTable[myPlayerName].file
+					myAvatar.checksum=avatarsTable[myPlayerName].checksum
 				end --if we don't select more exciting avatar then fallback OR server-default remain
 			end --if we don't have the selected avatar then fallback OR server-default remain
 		end 
@@ -1302,15 +1313,18 @@ function widget:Initialize()
 		SetMyAvatar = SetMyAvatar;
 	}
 
-	widgetHandler:AddAction("setavatar", SetAvatarGUI, nil, "t");
+	widgetHandler:AddAction("setavatar", SetAvatarGUI, nil, "t"); --// sending command "/setavatar" will execute SetAvatarGUI.
 	------------------
 	checklistTableG_g = checklistTableG
 	playerIDlistG_g = playerIDlistG
 	refreshDelay_g = refreshDelay
+	myPlayerName_g = myPlayerName
+	myAllyTeamID_g = myAllyTeamID
+	avatarsTable_g = avatarsTable
 end
 
 function widget:Shutdown()
-	--table.save(avatars, configFile) <--will not save when exiting because if the widget exit too early it will save incomplete table
+	--table.save(avatarsTable_g, configFile) <--will not save when exiting because if the widget exit too early it will save incomplete table
 
 	WG.Avatar = nil
 	widgetHandler:RemoveAction("setavatar");
