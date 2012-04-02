@@ -27,7 +27,7 @@ unitDef = {
     helptext       = [[The Jugglenaut is the big daddy to the Sumo. Where its smaller cousin sported the exotic heatray, the Jugg is even more bizzare with its three gravity guns complementing a standard laser cannon. This beast is slow and expensive, but seemingly impervious to enemy fire.]],
     helptext_fr    = [[Le Jugglenaut est un quadrip?de lourd et lent, mais ?xtr?mement solide. Il est ?quip? de deux canons laser ? haute fr?quence, et d'un double laser anti gravit? de technologie Newton. Il d?cole les unit?s ennemies du sol et les ?jecte en arri?re tout en les bombardant de ses tirs. Difficilement arr?table, voire la silhouette d'un Juggernaut ? l'horizon est une des pires chose que l'on puisse apercevoir.]],
 	helptext_de    = [[Der Jugglenaut ist der große Bruder des Sumos. Er besitzt im Gegensatz zu diesem keinen exotischen Heat Ray, sondern drei nicht weniger verrückte Gravitationskanonen und eine einfache Laserkanone. Dieses Biest ist langsam und teuer, aber scheinbar völlig unbeeindruckt vom feindlichen Feuer.]],
-    extradrawrange = 275,
+    extradrawrange = 260,
   },
 
   explodeAs              = [[ESTOR_BUILDINGEX]],
@@ -190,7 +190,7 @@ unitDef = {
       noSelfDamage            = true,
       projectiles             = 1,
       range                   = 550,
-      reloadtime              = 32,
+      reloadtime              = 40,
       renderType              = 4,
       rgbColor                = [[1 0 1]],
       rgbColor2               = [[1 0.5 1]],
