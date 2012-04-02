@@ -10,11 +10,10 @@ unitDef = {
   buildPic               = [[GORG.png]],
   buildTime              = 12000,
   canAttack              = true,
-  canDGun                = true,
+  canManualFire          = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 -5 3]],
   collisionVolumeScales  = [[70 60 65]],
@@ -60,6 +59,7 @@ unitDef = {
 
   },
 
+  --script		 = [[gorg.lua]],
   side                   = [[CORE]],
   sightDistance          = 650,
   smoothAnim             = true,
@@ -84,14 +84,20 @@ unitDef = {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0.2 0 1]],
-	  maxAngleDif		 = 150,
+      maxAngleDif		 = 150,
       onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
     },
 
-	{
+    {
+      def                = [[GRAVITY_NEG_SPECIAL]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+    },
+
+    {
       def                = [[GRAVITY_NEG]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
+      maxAngleDif		 = 150,      
       onlyTargetCategory = [[FIXEDWING HOVER SWIM LAND SHIP GUNSHIP]],
     },
 	
@@ -157,17 +163,17 @@ unitDef = {
       weaponVelocity          = 2750,
     },
 	
-	GRAVITY_NEG_SPECIAL = {
+    GRAVITY_NEG_SPECIAL = {
       -- This is just a marker weapon.
 	  -- When the projectile hits the ground or explodes above ground the float effect will occur.
 	  -- Units fly towards the impact position of this projectile.
 	  -- So the projectile can be any weapon of any speed but:
 	  -- * It must be a projectile (ie no Lightning or LaserCannon)
 	  -- * There must only be one
-	  name                    = [[Attractive Gravity]],
+      name                    = [[Attractive Gravity]],
       areaOfEffect            = 8,
       avoidFriendly           = false,
-      burstrate               = 0.01,
+      commandFire             = true,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,

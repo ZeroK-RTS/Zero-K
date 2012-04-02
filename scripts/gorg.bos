@@ -14,7 +14,8 @@ static-var  bMoving, gun_1;
 #define SIG_AIM2	4
 #define SIG_AIM3	8
 #define	SIG_AIM4	16
-#define	SIG_GRASER	32
+#define	SIG_AIM5	32
+#define SIG_GRASER	64
 
 
 walk()
@@ -357,10 +358,40 @@ QueryWeapon2(piecenum)
 	piecenum = flare1;
 }
 
+AimFromWeapon3(piecenum)
+{
+	piecenum = turret;
+}
+
+QueryWeapon3(piecenum)
+{
+	if (gun_1) piecenum = rflare;
+	else piecenum = lflare;
+}
+
 AimWeapon3(heading, pitch)
 {
 	signal SIG_AIM3;
 	set-signal-mask SIG_AIM3;
+	turn turret to y-axis heading speed <90>;
+	turn Rgun to x-axis <0> - pitch speed <50>;
+	turn Lgun to x-axis <0> - pitch speed <50>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn Rgun around x-axis;
+	wait-for-turn Lgun around x-axis;
+	start-script RestoreAfterDelay();
+	return (1);
+}
+
+Shot3() {
+	gun_1 = !gun_1;
+}
+
+
+AimWeapon4(heading, pitch)
+{
+	signal SIG_AIM4;
+	set-signal-mask SIG_AIM4;
 	turn gun2 to y-axis heading speed <300>;
 	turn gun2 to x-axis <0> - pitch speed <200>;
 	wait-for-turn gun2 around y-axis;
@@ -368,25 +399,25 @@ AimWeapon3(heading, pitch)
 	return (1);
 }
 
-FireWeapon3()
+FireWeapon4()
 {
 	//emit-sfx 1024 from flare2;
 }
 
-AimFromWeapon3(piecenum)
+AimFromWeapon4(piecenum)
 {
 	piecenum = gun2;
 }
 
-QueryWeapon3(piecenum)
+QueryWeapon4(piecenum)
 {
 	piecenum = flare2;
 }
 
-AimWeapon4(Func_Var_1, Func_Var_2)
+AimWeapon5(Func_Var_1, Func_Var_2)
 {
-	signal SIG_AIM4;
-	set-signal-mask SIG_AIM4;
+	signal SIG_AIM5;
+	set-signal-mask SIG_AIM5;
 	turn gun3 to y-axis Func_Var_1 speed <300>;
 	turn gun3 to x-axis <0> - Func_Var_2 speed <200>;
 	wait-for-turn gun3 around y-axis;
@@ -394,17 +425,17 @@ AimWeapon4(Func_Var_1, Func_Var_2)
 	return (1);
 }
 
-FireWeapon4()
+FireWeapon5()
 {
 	//emit-sfx 1024 from flare3;
 }
 
-AimFromWeapon4(piecenum)
+AimFromWeapon5(piecenum)
 {
 	piecenum = gun3;
 }
 
-QueryWeapon4(piecenum)
+QueryWeapon5(piecenum)
 {
 	piecenum = flare3;
 }
