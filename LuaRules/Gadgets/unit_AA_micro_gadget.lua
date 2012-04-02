@@ -15,7 +15,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -97,6 +97,7 @@ local MobileAA           = {}
 MobileAA["amphaa"] = 1
 AABurst["amphaa"] = 1
 AAstats["amphaa"] = {name = "amphaa", wname = nil, damage = 640, shotdamage = 160, salvosize = 4, range = 800, reload = 8 * 30, dps = 80, velocity = 850}  --Hardcoded as amphaa's weapon doesn't show up in weaponDefs
+local corrlreload = 330
 local weapondefID        = {}
 local globalassignment   = {}
 local globalassignmentcount   = 1
@@ -219,6 +220,7 @@ function checkAAdef()
 		  end
 		  if counteris0 then
 			if AAdefbuff.attacking == nil then
+			  AAdef[h].units[i].skiptarget = 0
 			  if IsMicro(AAdefbuff.id) then
 			    unassignTarget(AAdefbuff.id, i, h)
 		        --Echo("ready, searching for target hp: " .. AAdef[h].units[i].damage)
@@ -229,7 +231,7 @@ function checkAAdef()
 			end
 			if AAdefbuff.refiredelay == 0 then
 			  AAdef[h].units[i].skiptarget = AAdef[h].units[i].skiptarget + 1
-			  --Echo("skipping " .. AAdef[h].units[i].skiptarget)
+			  --Echo(AAdef[h].units[i].id .. "skipping " .. AAdef[h].units[i].skiptarget)
 			  unassignTarget(AAdefbuff.id, i, h)
 			  if IsMicro(AAdefbuff.id) then
 			    assignTarget(AAdefbuff.id, i, h)
@@ -499,7 +501,7 @@ function assignTarget(unitID, refID, allyteam, output)
 	  end
 	end
 	if not landtargets then
-        AAdef[allyteam].units[refID].fire = 2  --For now, defenders are always fire-at-will
+        AAdef[allyteam].units[refID].fire = 0  --For now, defenders are always fire-at-will
 	end
   end
   if notargets == true then
@@ -898,14 +900,14 @@ function WeaponReady(unitID, refID, allyteam)
 	  if AAdef[allyteam].units[refID].reloading[1] < AAdef[allyteam].units[refID].reloading[lowestreloading] then
 	    lowestreloading = 1
 	  end
-      --Echo(AAdef[allyteam].units[refID].reloading[lowestreloading])
+      --Echo(AAdef[allyteam].units[refID].reloading[lowestreloading], rframe)
       if AAdef[allyteam].units[refID].reloading[lowestreloading] + reloadtime >= rframe then
 		nextshot = AAdef[allyteam].units[refID].reloading[lowestreloading] + reloadtime - rframe
 		nextshot2 = AAdef[allyteam].units[refID].reloading[4] + 36 - rframe
 		if nextshot < nextshot2 then
 		  nextshot = nextshot2
 		end
-		--Echo("out of missiles" .. AAdef[allyteam].units[refID].reloading[lowestreloading] .. " " .. AAdef[allyteam].units[refID].frame)
+		--Echo(AAdef[allyteam].units[refID].id .. "out of missiles" .. AAdef[allyteam].units[refID].reloading[lowestreloading] .. " " .. AAdef[allyteam].units[refID].frame)
 		return false, nextshot
       end
 	end
@@ -1243,7 +1245,7 @@ function addAA(unitID, unitDefID, name, allyteam)
 	  AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1].fire = 2
 	end
 	if name == "corrl" then  -- For now, all defenders are fire-at-will
-	  AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1].fire = 2
+	  AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1].fire = 0
 	end
     AAdefreference[allyteam].units[unitID] = AAdefmaxcount[allyteam] + 1
     AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] + 1
@@ -1657,6 +1659,8 @@ function gadget:Initialize()
       end
 	end
   end
+  
+  AAstats["corrl"].reload = corrlreload
   
   table.sort(globalassignment, globalassignmentstaticcompare)
   
