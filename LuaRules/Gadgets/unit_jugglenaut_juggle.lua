@@ -59,7 +59,7 @@ end
 local RISE_TIME = 25
 local FLING_TIME = 35
 local UPDATE_FREQUENCY = 2
-local RISE_HEIGHT = 160
+local RISE_HEIGHT = 180
 
 local COLLLECT_RADIUS = 275
 
