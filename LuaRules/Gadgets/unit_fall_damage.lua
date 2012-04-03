@@ -85,12 +85,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			local data = unitCollide[damage]
 			local vx,vy,vz = Spring.GetUnitVelocity(unitID)
 			if data.certainDamage or math.sqrt(vx^2 + vy^2 + vz^2) > UNIT_UNIT_SPEED then
-				Spring.Echo("both damaged")
 				local speed = math.sqrt((vx + data.vx)^2 + (vy + data.vy)^2 + (vz + data.vz)^2)
 				local otherDamage = speedToDamage(data.unitID, data.unitDefID, speed)
 				local myDamage = speedToDamage(unitID, unitDefID, speed)
 				local damageToDeal = math.min(myDamage, otherDamage) * UNIT_UNIT_DAMAGE_FACTOR -- deal the damage of the least massive unit
-				Spring.Echo(damageToDeal)
 				Spring.AddUnitDamage(data.unitID, damageToDeal, 0, nil, -7)
 				return damageToDeal
 			end
