@@ -182,13 +182,13 @@ function checkAAdef()
                 AAdefbuff.resetfirestate = false
               end
             end
-            --if AAdefbuff.attacking ~= nil then
-            --  if not UnitIsDead(AAdefbuff.attacking) or not InRange(AAdefbuff.id, AAdefbuff.attacking, AAdefbuff.range) then
-            --    AAdefbuff.attacking = nil
-            --    AAdefbuff.gassigncounter = 0
-            --    AAdefbuff.counter = 0
-            --  end
-            --end
+            if AAdefbuff.attacking ~= nil then
+              if UnitIsDead(AAdefbuff.attacking) or not InRange(AAdefbuff.id, AAdefbuff.attacking, AAdefbuff.range) then
+                AAdefbuff.attacking = nil
+                AAdefbuff.gassigncounter = 0
+                AAdefbuff.counter = 0
+              end
+            end
             weaponready, nextshot = WeaponReady(AAdefbuff.id, i, h)
             AAdefbuff.nextshot = nextshot
             --Echo(nextshot)
@@ -238,11 +238,12 @@ function checkAAdef()
                 end
                 if AAdefbuff.refiredelay == 0 then
                   AAdefbuff.skiptarget = AAdefbuff.skiptarget + 1
-                  --Echo(AAdefbuff.id .. "skipping " .. AAdefbuff.skiptarget)
+                  --Echo(AAdefbuff.id .. "skipping " .. AAdefbuff.skiptarget .. " was attacking " .. AAdefbuff.attacking)
                   unassignTarget(AAdefbuff.id, i, h)
                   if IsMicro(AAdefbuff.id) then
-                    assignTarget(AAdefbuff.id, i, h)
+                    assignTarget(AAdefbuff.id, i, h, targets)
                   end
+                  --Echo(AAdefbuff.id .. " is attacking ", AAdefbuff.attacking)
                   AAdefbuff.counter = 0
                   AAdefbuff.refiredelay = AAmaxrefiredelay(AAdefbuff.name)
                 elseif AAdefbuff.attacking ~= nil then
@@ -292,7 +293,7 @@ function checkairs()
           if not UnitIsDead(airbuff.id) then
             health, _, _, _, _ = GetHP(airbuff.id)
             airbuff.hp = health
-            --Echo(airbuff.id, health, airbuff.tincoming)
+            --Echo(airbuff.id, health, airbuff.tincoming, airtargets[h].units[i].hp)
             if airbuff.globalassign then
               airbuff.globalassigncount = airbuff.globalassigncount - 1
               --Echo("air gassigncounter", airbuff.id, airbuff.globalassigncount)
@@ -579,7 +580,7 @@ function BestTarget(targets, count, damage, current, skip, cost)
               else
                 skip = skip - 1
               end
-            elseif hp - incoming >= 0 and hp - incoming - damage >= besthp and bestcost == cost[i] then
+            elseif hp - incoming >= 0 and hp - incoming - damage > besthp and bestcost == cost[i] then
               --hpafter = hp - incoming
               if skip == 0 then
                 best = i
@@ -593,7 +594,7 @@ function BestTarget(targets, count, damage, current, skip, cost)
           end
         elseif onehit == false then
           if best ~= 0 then
-            if hp - incoming >= 0 and hp - incoming <= besthp then
+            if hp - incoming >= 0 and hp - incoming < besthp then
               --hpafter = hp - incoming
               if skip == 0 then
                 best = i
@@ -1149,7 +1150,7 @@ function getDPS(name)
   end
   return 0
 end
-
+	
 function getRange(name)
   if AAstats[name] ~= nil then
     return AAstats[name].range
@@ -1187,35 +1188,35 @@ end
 
 function getAAMoveSpeed(name)
   if AAstats[name] ~= nil then
-    return UnitDefNames[name].speed
+    return AAstats[name].movespeed
   end
   return -1
 end
 
 function getAAUnitHeight(name)
   if AAstats[name] ~= nil then
-    return UnitDefNames[name].height
+    return AAstats[name].height
   end
   return 0
 end
 
 function getairMoveSpeed(name)
-  if airunitdefs[name] then
-    return UnitDefNames[name].speed
+  if airunitdefs[name] ~= nil then
+    return airunitdefs[name].maxspeed
   end
   return 0
 end
 
 function getairCost(name)
-  if airunitdefs[name] then
-    return UnitDefNames[name].metalCost
+  if airunitdefs[name] ~= nil then
+    return airunitdefs[name].cost
   end
   return 0
 end
 
 function getairMaxHP(name)
-  if airunitdefs[name] then
-    return UnitDefNames[name].health
+  if airunitdefs[name] ~= nil then
+    return airunitdefs[name].hp
   end
   return 0
 end
@@ -1587,10 +1588,14 @@ function gadget:Initialize()
     end
     if exception then
       if unitDef.canFly then
-        airunitdefs[unitDefName] = true
+        airunitdefs[unitDefName] = {hp = unitDef.health, maxspeed = unitDef.speed, cost = unitDef.metalCost}
         globalassignment[globalassignmentcount] = {name = unitDefName, def = unitDef, units = {}, unitscount = 1}
         globalassignmentcount = globalassignmentcount + 1
       else
+        if unitDefName == "amphaa" then 
+          AAstats[unitDefName].height = unitDef.height
+          AAstats[unitDefName].movespeed = unitDef.speed
+        end 
         for i = 1,#WeaponDefs do
           local wd = WeaponDefs[i]
           if wd.name:find(unitDefName) then
@@ -1624,7 +1629,7 @@ function gadget:Initialize()
               end
               if AAstats[unitDefName] == nil then
                 --Echo(unitDefName, wd.name, damage, wd.range, unitDef.height)
-                AAstats[unitDefName] = { damage = damage, shotdamage = sdamage, salvosize = wd.salvoSize, range = wd.range, reload = wd.reload * 30, dps = dps, velocity = wd.customParams.weaponvelocity }
+                AAstats[unitDefName] = { damage = damage, shotdamage = sdamage, salvosize = wd.salvoSize, range = wd.range, reload = wd.reload * 30, dps = dps, velocity = wd.customParams.weaponvelocity, movespeed = unitDef.speed, height = unitDef.height}
               else
                 AAstats[unitDefName].damage = AAstats[unitDefName].damage + damage
                 AAstats[unitDefName].dps = AAstats[unitDefName].dps + dps
