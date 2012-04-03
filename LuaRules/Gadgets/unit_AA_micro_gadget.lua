@@ -214,7 +214,7 @@ function checkAAdef()
               --Echo("weapon ready")
               target = AAdefbuff.attacking
               if target ~= nil then
-                _, _, _, airbuff = GetAirUnit(target)
+                airbuff = GetAirUnit(target)
                 if airbuff ~= nil then
                   if airbuff.globalassign then
                     unassignTarget(AAdefbuff.id, i, h)
@@ -382,7 +382,7 @@ function globalassign()
   for h = 1, globalassignmentcount - 1 do
     for i = 1, globalassignment[h].unitscount - 1 do
       targetID = globalassignment[h].units[i].id
-      _, _, _, airbuff = GetAirUnit(targetID)
+      airbuff = GetAirUnit(targetID)
       if airbuff ~= nil then
         local tdamage = 0
         local num
@@ -478,7 +478,7 @@ function assignTarget(unitID, refID, allyteam, output)
       --Echo("tower id " .. AAdefbuff.id, "assigned unit ID", assign)
       if assign ~= nil then
         if assign ~= attacking then
-          _, _, _, airbuff = GetAirUnit(assign)
+          airbuff = GetAirUnit(assign)
           if airbuff ~= nil then
             unassignTarget(unitID, refID, allyteam)
             attackTarget(unitID, assign, refID, allyteam)
@@ -521,7 +521,7 @@ end
 function unassignTarget(unitID, refID, allyteam)
   local AAdefbuf = AAdef[allyteam].units[refID]
   if AAdefbuf.attacking ~= nil then
-    local _, _, _, airbuff = GetAirUnit(AAdefbuf.attacking)
+    local airbuff = GetAirUnit(AAdefbuf.attacking)
     if airbuff ~= nil then
       airbuff.tincoming = airbuff.tincoming - AAdefbuf.shotdamage
       --Echo("tower " .. unitID .. " was targeting " .. attacking .. ", deassigning from " .. airbuff.name, "tincoming is now " .. airbuff.tincoming)
@@ -545,7 +545,7 @@ function BestTarget(targets, count, damage, current, skip, cost)
   for i = 1, count do
     if targets[i] ~= nil then
     if not UnitIsDead(targets[i]) then
-      _, _, _, airbuff = GetAirUnit(targets[i])
+      airbuff = GetAirUnit(targets[i])
       if airbuff ~= nil then
         incoming = airbuff.incoming + airbuff.tincoming
         hp = airbuff.hp
@@ -636,7 +636,7 @@ function DPSBestTarget(targets, count)
   for i = 1, count do
     if targets[i] ~= nil then
     if not UnitIsDead(targets[i]) then
-      _, _, _, airbuff = GetAirUnit(targets[i])
+      airbuff = GetAirUnit(targets[i])
       if airbuff ~= nil then
         --Echo(alldying, best, besthp, i, airbuff.hp - airbuff.incoming - airbuff.tincoming)
         if alldying then
@@ -671,7 +671,7 @@ function HSPruneTargets(targets, count)
   local ud
   local maxhp
   for i = 1, count do
-    _, _, _, airbuff = GetAirUnit(targets[i])
+    airbuff = GetAirUnit(targets[i])
     if airbuff ~= nil then
       _, maxhp = GetHP(targets[i])
       unitDefID = GetUnitDefID(targets[i])
@@ -714,7 +714,7 @@ function getAATargetsinRange(unitID, refID, allyteam)
           local timeinrange = TimeInRange(unitID, refID, allyteam, targetID)
           --Echo(timeinrange, nextshot)
           if IsBurstAA(AAdefbuff.name) and timeinrange > nextshot then
-            _, _, _, airbuff = GetAirUnit(targetID)
+            airbuff = GetAirUnit(targetID)
             if airbuff ~= nil then
               if airbuff.hp - airbuff.incoming - airbuff.tincoming > damage then
                 pdamagecount = airbuff.pdamagecount
@@ -1335,7 +1335,7 @@ function addShot(unitID, refID, allyteam, shotID, targetID)
   if IsAttacking(unitID) then
     targetID = getTarget(unitID)
   end
-  local _, _, _, airbuff = GetAirUnit(targetID)
+  local airbuff = GetAirUnit(targetID)
   if airbuff ~= nil then
     local distance = GetUnitSeparation(unitID, targetID)
     local flighttime = 30 * distance / AAdefbuff.shotspeed
@@ -1363,7 +1363,7 @@ function removeShot(shotID)
       if AAdefbuff.projectiles ~= nil then
       if AAdefbuff.projectiles[prefID] ~= nil then
         local target = AAdefbuff.projectiles[prefID].target
-        local _, _, _, airbuff = GetAirUnit(target)
+        local airbuff = GetAirUnit(target)
         if airbuff ~= nil then
           airbuff.incoming = airbuff.incoming - AAdefbuff.damage
           if airbuff.incoming < 0 then
@@ -1457,16 +1457,11 @@ function GetAirUnit(unitID)
     if airtargetsref[allyteam] ~= nil and airtargetsref[allyteam].units ~= nil then
       local refID = airtargetsref[allyteam].units[unitID]
       if refID ~= nil then
-        local airbuff = airtargets[allyteam].units[refID]
-        return unitID, refID, allyteam, airbuff
-      else
-        return unitID, nil, allyteam, nil
+        return airtargets[allyteam].units[refID]
       end
-    else
-      return unitID, nil, nil, nil
     end
   end
-  return nil, nil, nil, nil
+  return nil
 end
 
 ------------------------------
