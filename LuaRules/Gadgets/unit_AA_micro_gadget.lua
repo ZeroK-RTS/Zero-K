@@ -94,9 +94,9 @@ local AABurst            = {}
 local AADPS              = {}
 local StaticAA           = {}
 local MobileAA           = {}
-MobileAA["amphaa"] = 1
-AABurst["amphaa"] = 1
-AAstats["amphaa"] = {name = "amphaa", wname = nil, damage = 640, shotdamage = 160, salvosize = 4, range = 800, reload = 8 * 30, dps = 80, velocity = 850}  --Hardcoded as amphaa's weapon doesn't show up in weaponDefs
+MobileAA["amphaa"] = true
+AABurst["amphaa"] = true
+AAstats["amphaa"] = { damage = 640, shotdamage = 160, salvosize = 4, range = 800, reload = 8 * 30, dps = 80, velocity = 850 }  --Hardcoded as amphaa's weapon doesn't show up in weaponDefs
 local corrlreload = 330
 local weapondefID        = {}
 local globalassignment   = {}
@@ -1081,19 +1081,19 @@ end
 -----------CONSTANTS----------
 
 function IsDPSAA(name)
-  return (AADPS[name] == 1)
+  return AADPS[name]
 end
 
 function IsBurstAA(name)
-  return (AABurst[name] == 1)
+  return AABurst[name]
 end
 
 function IsMobileAA(name)
-  return (MobileAA[name] == 1)
+  return MobileAA[name]
 end
 
 function IsStaticAA(name)
-  return (StaticAA[name] == 1)
+  return StaticAA[name]
 end
 
 function IsAA(name)
@@ -1101,10 +1101,7 @@ function IsAA(name)
 end
 
 function hasDelayedSalvo(name)
-  if AAdelayedsalvo[name] ~= nil then
-    return true
-  end
-  return false
+  return (AAdelayedsalvo[name] ~= nil)
 end
 
 function AAmaxcounter(name)
@@ -1129,10 +1126,7 @@ end
 
 function Isair(name)
   --Echo(name, airunitdefs[name])
-  if airunitdefs[name] ~= nil then
-    return true
-  end
-  return false
+  return airunitdefs[name] or false
 end
 
 function getSalvoDamage(name)
@@ -1185,7 +1179,7 @@ function getSalvoSize(name)
 end
 
 function getSalvoDelay(name)
-  if AAdelayedsalvo[name] ~= nil then
+  if AAdelayedsalvo[name] then
     return AAdelayedsalvo[name]
   end
   return -1
@@ -1193,35 +1187,35 @@ end
 
 function getAAMoveSpeed(name)
   if AAstats[name] ~= nil then
-    return AAstats[name].movespeed
+    return UnitDefNames[name].speed
   end
   return -1
 end
 
 function getAAUnitHeight(name)
   if AAstats[name] ~= nil then
-    return AAstats[name].height
+    return UnitDefNames[name].height
   end
   return 0
 end
 
 function getairMoveSpeed(name)
-  if airunitdefs[name] ~= nil then
-    return airunitdefs[name].maxspeed
+  if airunitdefs[name] then
+    return UnitDefNames[name].speed
   end
   return 0
 end
 
 function getairCost(name)
-  if airunitdefs[name] ~= nil then
-    return airunitdefs[name].cost
+  if airunitdefs[name] then
+    return UnitDefNames[name].metalCost
   end
   return 0
 end
 
 function getairMaxHP(name)
-  if airunitdefs[name] ~= nil then
-    return airunitdefs[name].hp
+  if airunitdefs[name] then
+    return UnitDefNames[name].health
   end
   return 0
 end
@@ -1611,14 +1605,10 @@ function gadget:Initialize()
     end
     if exception then
       if unitDef.canFly then
-        airunitdefs[unitDefName] = {hp = unitDef.health, maxspeed = unitDef.speed, cost = unitDef.metalCost}
-        globalassignment[globalassignmentcount] = {name = unitDefName, def = airunitdefs[unitDefName], units = {}, unitscount = 1}
+        airunitdefs[unitDefName] = true
+        globalassignment[globalassignmentcount] = {name = unitDefName, def = unitDef, units = {}, unitscount = 1}
         globalassignmentcount = globalassignmentcount + 1
       else
-        if unitDefName == "amphaa" then
-          AAstats[unitDefName].height = unitDef.height
-          AAstats[unitDefName].movespeed = unitDef.speed
-        end
         for i = 1,#WeaponDefs do
           local wd = WeaponDefs[i]
           if wd.name:find(unitDefName) then
@@ -1635,28 +1625,24 @@ function gadget:Initialize()
             local dps = damage / wd.reload
             if damage > 5 and wd.range > 100 and dps > 20 then  --filters
               if unitDef.speed == 0 then
-                StaticAA[unitDefName] = 1
-                MobileAA[unitDefName] = nil
+                StaticAA[unitDefName] = true
               else
-                MobileAA[unitDefName] = 1
-                StaticAA[unitDefName] = nil
+                MobileAA[unitDefName] = true
               end
               if wd.salvoDelay > 0.5 and wd.salvoSize > 1 then
                 AAdelayedsalvo[unitDefName] = wd.salvoDelay * 30
               end
               if wd.reload > 0.5 then
-                AABurst[unitDefName] = 1
-                AADPS[unitDefName] = nil
+                AABurst[unitDefName] = true
               else
-                AADPS[unitDefName] = 1
-                AABurst[unitDefName] = nil
+                AADPS[unitDefName] = true
               end
               if wd.reload <= 1 or dpsaaexception then
                 EscortAA[unitDefName] = dps
               end
               if AAstats[unitDefName] == nil then
                 --Echo(unitDefName, wd.name, damage, wd.range, unitDef.height)
-                AAstats[unitDefName] = {name = unitDefName, wname = wd.name, damage = damage, shotdamage = sdamage, salvosize = wd.salvoSize, range = wd.range, reload = wd.reload * 30, dps = dps, velocity = wd.customParams.weaponvelocity, movespeed = unitDef.speed, height = unitDef.height}
+                AAstats[unitDefName] = { damage = damage, shotdamage = sdamage, salvosize = wd.salvoSize, range = wd.range, reload = wd.reload * 30, dps = dps, velocity = wd.customParams.weaponvelocity }
               else
                 AAstats[unitDefName].damage = AAstats[unitDefName].damage + damage
                 AAstats[unitDefName].dps = AAstats[unitDefName].dps + dps
