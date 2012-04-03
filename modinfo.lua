@@ -13,5 +13,5 @@ return {
   
   NTAI = {
     tdfpath='ZK';
-  },
+  }, 
 }
