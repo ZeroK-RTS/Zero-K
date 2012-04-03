@@ -61,6 +61,9 @@ local turretSpeed = 8
 local isLanded = true
 local SPECIAL_FIRE_COUNT = 80
 
+local SLOWDOWN_FACTOR = 0.75
+local UNIT_SPEED = UnitDefNames["corcrw"].speed*SLOWDOWN_FACTOR/30
+
 local sound_index = 0
 
 function script.Activate()
@@ -197,16 +200,13 @@ function Hacky_Stiletto_Workaround_stiletto_func(count)
 			EmitSfx( emit,  FIRE_W5 )
 			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(2/slowState), count + 1)
 		else
-			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 60, count + 1)
+			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 10, count + 1)
 		end
 	else
 		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 		GG.UpdateUnitAttributes(unitID)
 	end
 end
-
-local SLOWDOWN_FACTOR = 0.5
-local UNIT_SPEED = UnitDefNames["corcrw"].speed*SLOWDOWN_FACTOR/30
 
 function ClusterBomb()
 	Hacky_Stiletto_Workaround_stiletto_func(1)

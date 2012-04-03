@@ -100,18 +100,6 @@ local function updateCapturedUnitBar(unitID)
 	end
 end
 
--- frees all subordinates from a controller and removes the unit
-local function removeController(unitID, team, aTeam)
-	
-	for id, data in pairs(controllers[unitID].units) do
-		Spring.TransferUnit(id, capturedUnits[id].originTeam, false)
-		capturedUnits[id] = nil
-		spSetUnitHealth(id, {capture = 0} )
-	end
-	
-	controllers[unitID] = nil
-end
-
 -- removes capture damage dealt by allyTeam from the unit
 local function removeTeamCaptureFromUnit(unitID, allyTeam)
 	if capturedUnits[unitID].aTeams[allyTeam].inControl then
@@ -123,6 +111,56 @@ local function removeTeamCaptureFromUnit(unitID, allyTeam)
 	updateCapturedUnitBar(unitID)
 end
 
+-- transfer with trees
+local function recusivelyTransfer(unitID, newTeam, newAlly, controllerID)
+	if controllers[unitID] then
+		for cid,_ in pairs(controllers[unitID].units) do
+			recusivelyTransfer(cid, newTeam, newAlly, unitID)
+		end
+	end
+	
+	if controllerID then
+		if capturedUnits[unitID].originAllyTeam ~= aTeam then
+			capturedUnits[unitID].aTeams = {
+				[newAlly] = {
+					totalDamage = 0,
+					inControl = controllerID,
+					degradeTimer = 0,
+				}
+			}
+
+			controllers[controllerID].unitCount = controllers[controllerID].unitCount + 1
+			controllers[controllerID].units[unitID] = true
+		else
+			controllers[controllerID].units[unitID] = nil
+			controllers[controllerID].unitCount = controllers[controllerID].unitCount - 1
+			
+			capturedUnits[unitID] = nil
+			
+			updateControllerBar(controllerID)
+		end
+	else
+		capturedUnits[unitID] = nil
+	end
+	
+	spSetUnitHealth(unitID, {capture = 0} )
+	
+	Spring.TransferUnit(unitID, newTeam, false)
+	Spring.GiveOrderToUnit(unitID, CMD_STOP, {}, {})
+end
+
+-- frees all subordinates from a controller and removes the unit
+local function removeController(unitID, team, aTeam)
+	
+	for id, data in pairs(controllers[unitID].units) do
+		recusivelyTransfer(id, capturedUnits[id].originTeam, capturedUnits[id].originAllyTeam, false)
+		capturedUnits[id] = nil
+		spSetUnitHealth(id, {capture = 0} )
+	end
+	
+	controllers[unitID] = nil
+end
+
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
                             attackerID, attackerDefID, attackerTeam)
         
@@ -130,7 +168,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		return damage
 	end
 
-	if ((not attackerTeam) or spAreTeamsAllied(unitTeam, attackerTeam)) or controllers[unitID] then
+	if ((not attackerTeam) or spAreTeamsAllied(unitTeam, attackerTeam)) then
 		return 0
 	end
 	
@@ -179,16 +217,12 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 				controllers[allyData.inControl].unitCount = controllers[allyData.inControl].unitCount - 1
 				updateControllerBar(allyData.inControl)
 			end
-			if aTeam ~= t then
-				capturedUnits[unitID].aTeams[t] = nil
-			end
 		end
+
+		-- give the unit
+		recusivelyTransfer(unitID, attackerTeam, aTeam, attackerID)
 		
-		capturedUnits[unitID].aTeams[aTeam].inControl = attackerID
-		
-		controllers[attackerID].unitCount = controllers[attackerID].unitCount + 1
-		controllers[attackerID].units[unitID] = true
-		
+		-- reload handling
 		if controllers[attackerID].postCaptureReload then
 			local frame = Spring.GetGameFrame() + controllers[attackerID].postCaptureReload
 			Spring.SetUnitRulesParam(attackerID, "selfReloadSpeedChange", 0, {inlos = true})
@@ -199,10 +233,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			reloading[frame].data[reloading[frame].count] = attackerID
 			GG.attUnits[attackerID] = true
 		end
-	
-		-- give the unit
-		Spring.TransferUnit(unitID, attackerTeam, false)
-		Spring.GiveOrderToUnit(unitID, CMD_STOP, {}, {})
+		
 		
 		-- destroy the unit if the controller is set to destroy units
 		if controllers[attackerID].killSubordinates and aTeam ~= capturedUnits[unitID].originAllyTeam then
@@ -307,19 +338,6 @@ function gadget:UnitDestroyed(unitID)
 
 end
 
--- ONLY WORKS FOR TRANSFER WITHIN ALLY TEAM
-function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	
-	if controllers[unitID] then
-		local _,_,_,_,_,oldA = Spring.GetTeamInfo(oldTeamID)
-		local _,_,_,_,_,newA = Spring.GetTeamInfo(teamID)
-		if newA ~= oldA then
-			Spring.Echo("Warning, Warning. Controller transfere between different Ally Teams. Expect things to break")
-		end
-	end
-	
-end
-
 ------------------------------------------------------
 
 function gadget:Initialize()
@@ -372,7 +390,7 @@ function gadget:DrawWorld()
 		gl.DepthTest(true)
 		
 		gl.LineWidth(2)
-                gl.LineStipple('')
+        gl.LineStipple('')
 		local controllers = SYNCED.controllers
 	
 		for id, data in spairs(controllers) do
