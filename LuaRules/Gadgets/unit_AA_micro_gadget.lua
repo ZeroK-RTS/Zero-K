@@ -183,13 +183,13 @@ function checkAAdef()
                 AAdef[h].units[i].resetfirestate = false
               end
             end
-			if AAdefbuff.attacking ~= nil then
-			  if not UnitIsDead(AAdefbuff.attacking) or not InRange(AAdefbuff.id, AAdefbuff.attacking, AAdefbuff.range) then
-			    AAdef[h].units[i].attacking = nil
-				AAdef[h].units[i].gassigncounter = 0
-				AAdef[h].units[i].counter = 0
-			  end
-			end
+            if AAdefbuff.attacking ~= nil then
+              if not UnitIsDead(AAdefbuff.attacking) or not InRange(AAdefbuff.id, AAdefbuff.attacking, AAdefbuff.range) then
+                AAdef[h].units[i].attacking = nil
+                AAdef[h].units[i].gassigncounter = 0
+                AAdef[h].units[i].counter = 0
+              end
+            end
             weaponready, nextshot = WeaponReady(AAdefbuff.id, i, h)
             AAdef[h].units[i].nextshot = nextshot
             --Echo(nextshot)
