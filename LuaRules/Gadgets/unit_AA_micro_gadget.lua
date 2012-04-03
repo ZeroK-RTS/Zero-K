@@ -149,7 +149,7 @@ local loadmultiplier = 1
 ----------CORE LOGIC----------
 
 function checkAAdef()
-  local target, trefID, tallyteam, airbuff
+  local target, airbuff
   local counteris0
   local AAdefbuff
   local weaponready
@@ -168,53 +168,53 @@ function checkAAdef()
           if not UnitIsDead(AAdefbuff.id) then
             local targets = nil
             local morphing = IsMorphing(AAdefbuff.id)
-            AAdef[h].units[i].frame = AAdefbuff.frame + 1
+            AAdefbuff.frame = AAdefbuff.frame + 1
             if IsIdle(AAdefbuff.id) then
-              AAdef[h].units[i].orderreceived = false
+              AAdefbuff.orderreceived = false
             end
             if ( IsMicroCMD(AAdefbuff.id) and IsBurstAA(AAdefbuff.name) and not IsMobileAA(AAdefbuff.name) ) or AAdefbuff.resetfirestate then
               local firestate = FireState(AAdefbuff.id)
-              if firestate ~= nil and firestate ~= AAdef[h].units[i].fire and not AAdefbuff.resetfirestate then
-                GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, {AAdef[h].units[i].fire}, i, h)
+              if firestate ~= nil and firestate ~= AAdefbuff.fire and not AAdefbuff.resetfirestate then
+                GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, {AAdefbuff.fire}, i, h)
               end
               if AAdefbuff.resetfirestate then
                 GiveOrder(AAdefbuff.id, CMD.FIRE_STATE, {2}, i, h)
-                AAdef[h].units[i].resetfirestate = false
+                AAdefbuff.resetfirestate = false
               end
             end
             if AAdefbuff.attacking ~= nil then
               if not UnitIsDead(AAdefbuff.attacking) or not InRange(AAdefbuff.id, AAdefbuff.attacking, AAdefbuff.range) then
-                AAdef[h].units[i].attacking = nil
-                AAdef[h].units[i].gassigncounter = 0
-                AAdef[h].units[i].counter = 0
+                AAdefbuff.attacking = nil
+                AAdefbuff.gassigncounter = 0
+                AAdefbuff.counter = 0
               end
             end
             weaponready, nextshot = WeaponReady(AAdefbuff.id, i, h)
-            AAdef[h].units[i].nextshot = nextshot
+            AAdefbuff.nextshot = nextshot
             --Echo(nextshot)
-            if AAdef[h].units[i].globalassign then
-              AAdef[h].units[i].gassigncounter = AAdef[h].units[i].gassigncounter - 1
-              if AAdef[h].units[i].gassigncounter <= 0 then
-                AAdef[h].units[i].globalassign = false
-                AAdef[h].units[i].gassigncounter = 0
+            if AAdefbuff.globalassign then
+              AAdefbuff.gassigncounter = AAdefbuff.gassigncounter - 1
+              if AAdefbuff.gassigncounter <= 0 then
+                AAdefbuff.globalassign = false
+                AAdefbuff.gassigncounter = 0
                 unassignTarget(AAdefbuff.id, i, h)
               end
             end
             counteris0 = false
             if AAdefbuff.counter == 0 then
-              AAdef[h].units[i].counter = AAmaxcounter(AAdefbuff.name)
+              AAdefbuff.counter = AAmaxcounter(AAdefbuff.name)
               if IsMicro(AAdefbuff.id) then
                 counteris0 = true
                 targets = getAATargetsinRange(AAdefbuff.id, i, h)
               end
             else
-              AAdef[h].units[i].counter = AAdef[h].units[i].counter - 1
+              AAdefbuff.counter = AAdefbuff.counter - 1
             end
-            if weaponready and not AAdef[h].units[i].globalassign then
+            if weaponready and not AAdefbuff.globalassign then
               --Echo("weapon ready")
               target = AAdefbuff.attacking
               if target ~= nil then
-                _, trefID, tallyteam, airbuff = GetAirUnit(target)
+                _, _, _, airbuff = GetAirUnit(target)
                 if airbuff ~= nil then
                   if airbuff.globalassign then
                     unassignTarget(AAdefbuff.id, i, h)
@@ -227,43 +227,43 @@ function checkAAdef()
               end
               if counteris0 then
                 if AAdefbuff.attacking == nil then
-                  AAdef[h].units[i].skiptarget = 0
+                  AAdefbuff.skiptarget = 0
                   if IsMicro(AAdefbuff.id) then
                     unassignTarget(AAdefbuff.id, i, h)
-                    --Echo("ready, searching for target hp: " .. AAdef[h].units[i].damage)
+                    --Echo("ready, searching for target hp: " .. AAdefbuff.damage)
                     assignTarget(AAdefbuff.id, i, h, targets)
                   end
-                  AAdef[h].units[i].counter = AAmaxcounter(AAdefbuff.name)
-                  AAdef[h].units[i].refiredelay = AAmaxrefiredelay(AAdefbuff.name)
+                  AAdefbuff.counter = AAmaxcounter(AAdefbuff.name)
+                  AAdefbuff.refiredelay = AAmaxrefiredelay(AAdefbuff.name)
                 end
                 if AAdefbuff.refiredelay == 0 then
-                  AAdef[h].units[i].skiptarget = AAdef[h].units[i].skiptarget + 1
-                  --Echo(AAdef[h].units[i].id .. "skipping " .. AAdef[h].units[i].skiptarget)
+                  AAdefbuff.skiptarget = AAdefbuff.skiptarget + 1
+                  --Echo(AAdefbuff.id .. "skipping " .. AAdefbuff.skiptarget)
                   unassignTarget(AAdefbuff.id, i, h)
                   if IsMicro(AAdefbuff.id) then
                     assignTarget(AAdefbuff.id, i, h)
                   end
-                  AAdef[h].units[i].counter = 0
-                  AAdef[h].units[i].refiredelay = AAmaxrefiredelay(AAdefbuff.name)
+                  AAdefbuff.counter = 0
+                  AAdefbuff.refiredelay = AAmaxrefiredelay(AAdefbuff.name)
                 elseif AAdefbuff.attacking ~= nil then
-                  AAdef[h].units[i].counter = 0
-                  AAdef[h].units[i].refiredelay = AAdef[h].units[i].refiredelay - 1
+                  AAdefbuff.counter = 0
+                  AAdefbuff.refiredelay = AAdefbuff.refiredelay - 1
                 end
               end
-            elseif not AAdef[h].units[i].globalassign then
+            elseif not AAdefbuff.globalassign then
               --Echo("not ready, deassigning target")
               if IsMicro(AAdefbuff.id) and AAdefbuff.name ~= "missiletower" and not IsIdle(AAdefbuff.id) and not IsMobileAA(AAdefbuff.name) and not IsDPSAA(AAdefbuff.name) then
                 removecommand(AAdefbuff.id, i , h)
                 GiveOrder(AAdefbuff.id, CMD.STOP, nil, i, h)
               end
               unassignTarget(AAdefbuff.id, i, h)
-              AAdef[h].units[i].counter = 0
+              AAdefbuff.counter = 0
             end
             local j = 1
-            while j <= AAdef[h].units[i].projectilescount do
-              AAdef[h].units[i].projectiles[j].TOF = AAdef[h].units[i].projectiles[j].TOF - 1
-              if AAdef[h].units[i].projectiles[j].TOF <= 0 then
-                removeShot(AAdef[h].units[i].projectiles[j].id)
+            while j <= AAdefbuff.projectilescount do
+              AAdefbuff.projectiles[j].TOF = AAdefbuff.projectiles[j].TOF - 1
+              if AAdefbuff.projectiles[j].TOF <= 0 then
+                removeShot(AAdefbuff.projectiles[j].id)
                 j = j - 1
               end
               j = j + 1
@@ -284,7 +284,7 @@ function checkairs()
   local health
   local pdamagecount
   for h = 0, airteamcount do
-  local teammaxcount = airtargetsmaxcount[h]
+    local teammaxcount = airtargetsmaxcount[h]
     if teammaxcount ~= nil then
       for i = 1, teammaxcount do
         airbuff = airtargets[h].units[i]
@@ -359,10 +359,11 @@ function globalassign()
           --Echo(tdamage, airbuff.hp, airbuff.incoming, airbuff.tincoming)
           if airbuff.hp > airbuff.incoming and tdamage > airbuff.hp - airbuff.incoming then
             for j = 1, globalassignmentcount - 1 do
-              if globalassignment[j].name == airbuff.name then
+              local assignmentBuff = globalassignment[j]
+              if assignmentBuff.name == airbuff.name then
                 --Echo("coop target! " .. airbuff.id, airbuff.name)
-                globalassignment[j].units[globalassignment[j].unitscount] = {id = airbuff.id, hp = airbuff.hp}
-                globalassignment[j].unitscount = globalassignment[j].unitscount + 1
+                assignmentBuff.units[assignmentBuff.unitscount] = {id = airbuff.id, hp = airbuff.hp}
+                assignmentBuff.unitscount = assignmentBuff.unitscount + 1
                 j = globalassignmentcount
                 break
               end
@@ -376,12 +377,12 @@ function globalassign()
   for j = 1, globalassignmentcount - 1 do
     table.sort(globalassignment[j].units, globalassigndynamiccompare)
   end
-  local targetID, trefID, tallyteam
+  local targetID
   local unitID, refID, allyteam, AAdefbuff
   for h = 1, globalassignmentcount - 1 do
     for i = 1, globalassignment[h].unitscount - 1 do
       targetID = globalassignment[h].units[i].id
-      _, trefID, tallyteam, airbuff = GetAirUnit(targetID)
+      _, _, _, airbuff = GetAirUnit(targetID)
       if airbuff ~= nil then
         local tdamage = 0
         local num
@@ -390,7 +391,7 @@ function globalassign()
         for j = 1, airbuff.pdamagecount - 1 do
           if airbuff.pdamage[j] ~= nil then
             unitID = airbuff.pdamage[j][1]
-            _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
+            _, _, _, AAdefbuff = GetAAUnit(unitID)
             if AAdefbuff ~= nil then
             if not AAdefbuff.globalassign and not AAdefbuff.cstate and IsMicro(AAdefbuff.id) then
               tdamage = tdamage + airbuff.pdamage[j][2]
@@ -415,16 +416,16 @@ function globalassign()
               _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
               if AAdefbuff ~= nil then
                 --Echo("1 global assign!")
-                AAdef[allyteam].units[refID].globalassign = true
-                AAdef[allyteam].units[refID].gassigncounter = AAdefbuff.nextshot + AAmaxrefiredelay(AAdefbuff.name)
+                AAdefbuff.globalassign = true
+                AAdefbuff.gassigncounter = AAdefbuff.nextshot + AAmaxrefiredelay(AAdefbuff.name)
                 unassignTarget(unitID, refID, allyteam)
                 attackTarget(unitID, airbuff.id, refID, allyteam)
-                AAdef[allyteam].units[refID].attacking = airbuff.id
-                airtargets[tallyteam].units[trefID].tincoming = airtargets[tallyteam].units[trefID].tincoming + AAdefbuff.damage
-                --Echo("global assign " .. AAdefbuff.id .. " targeting " .. airbuff.id .. " tincoming " .. airtargets[tallyteam].units[trefID].tincoming)
-                airtargets[tallyteam].units[trefID].globalassign = true
-                if AAdef[allyteam].units[refID].gassigncounter > airtargets[tallyteam].units[trefID].globalassigncount then
-                  airtargets[tallyteam].units[trefID].globalassigncount = AAdef[allyteam].units[refID].gassigncounter
+                AAdefbuff.attacking = airbuff.id
+                airbuff.tincoming = airbuff.tincoming + AAdefbuff.damage
+                --Echo("global assign " .. AAdefbuff.id .. " targeting " .. airbuff.id .. " tincoming " .. airbuff.tincoming)
+                airbuff.globalassign = true
+                if AAdefbuff.gassigncounter > airbuff.globalassigncount then
+                  airbuff.globalassigncount = AAdefbuff.gassigncounter
                 end
               end
             end
@@ -459,7 +460,7 @@ function assignTarget(unitID, refID, allyteam, output)
         end
       end
       if skip > output[2] then
-        AAdef[allyteam].units[refID].skiptarget = 0
+        AAdefbuff.skiptarget = 0
         unassignTarget(unitID, refID, allyteam)
         if IsMicro(AAdefbuff.id) and not IsMobileAA(AAdefbuff.name) and not IsDPSAA(AAdefbuff.name) then
           removecommand(AAdefbuff.id, refID, allyteam)
@@ -477,13 +478,13 @@ function assignTarget(unitID, refID, allyteam, output)
       --Echo("tower id " .. AAdefbuff.id, "assigned unit ID", assign)
       if assign ~= nil then
         if assign ~= attacking then
-          _, arefID, ateam, airbuff = GetAirUnit(assign)
+          _, _, _, airbuff = GetAirUnit(assign)
           if airbuff ~= nil then
             unassignTarget(unitID, refID, allyteam)
             attackTarget(unitID, assign, refID, allyteam)
-            AAdef[allyteam].units[refID].attacking = assign
-            airtargets[ateam].units[arefID].tincoming = airtargets[ateam].units[arefID].tincoming + AAdefbuff.shotdamage
-            --Echo("id " .. unitID .. " targeting " .. assign .. " " .. airtargets[ateam].units[arefID].name .. ", hp " .. airtargets[ateam].units[arefID].hp .. " tincoming " .. airtargets[ateam].units[arefID].tincoming)
+            AAdefbuff.attacking = assign
+            airbuff.tincoming = airbuff.tincoming + AAdefbuff.shotdamage
+            --Echo("id " .. unitID .. " targeting " .. assign .. " " .. airbuff.name .. ", hp " .. airbuff.hp .. " tincoming " .. airbuff.tincoming)
           end
         end
       end
@@ -494,7 +495,7 @@ function assignTarget(unitID, refID, allyteam, output)
       local state = GetUnitStates(unitID)
       if AAdefbuff.name == "corrl" and output[5] ~= 0 then
         --Echo("Land targets in range " .. output[5])
-        AAdef[allyteam].units[refID].fire = 2
+        AAdefbuff.fire = 2
       end
     end
   else
@@ -508,7 +509,7 @@ function assignTarget(unitID, refID, allyteam, output)
       end
     end
     if not landtargets then
-      AAdef[allyteam].units[refID].fire = 0  --For now, defenders are always fire-at-will
+      AAdefbuff.fire = 0  --For now, defenders are always fire-at-will
     end
   end
   if notargets == true then
@@ -518,27 +519,25 @@ function assignTarget(unitID, refID, allyteam, output)
 end
 
 function unassignTarget(unitID, refID, allyteam)
-  local attacking = AAdef[allyteam].units[refID].attacking
-  if attacking ~= nil then
-    AAdef[allyteam].units[refID].attacking = nil
-    local _, trefID, tteam, airbuff = GetAirUnit(attacking)
+  local AAdefbuf = AAdef[allyteam].units[refID]
+  if AAdefbuf.attacking ~= nil then
+    local _, _, _, airbuff = GetAirUnit(AAdefbuf.attacking)
     if airbuff ~= nil then
-      airtargets[tteam].units[trefID].tincoming = airtargets[tteam].units[trefID].tincoming - AAdef[allyteam].units[refID].shotdamage
-      --Echo("tower " .. unitID .. " was targeting " .. attacking .. ", deassigning from " .. airtargets[tteam].units[trefID].name, "tincoming is now " .. airtargets[tteam].units[trefID].tincoming)
-      if airtargets[tteam].units[trefID].tincoming < 0 then
-        airtargets[tteam].units[trefID].tincoming = 0
+      airbuff.tincoming = airbuff.tincoming - AAdefbuf.shotdamage
+      --Echo("tower " .. unitID .. " was targeting " .. attacking .. ", deassigning from " .. airbuff.name, "tincoming is now " .. airbuff.tincoming)
+      if airbuff.tincoming < 0 then
+        airbuff.tincoming = 0
       end
     end
+    AAdefbuf.attacking = nil
   end
 end
 
 function BestTarget(targets, count, damage, current, skip, cost)
-  local refID
   local onehit = false
   local best = 0
   local bestcost = 0
   local besthp = 0
-  local targetteam
   local incoming
   local hp
   local airbuff
@@ -546,14 +545,14 @@ function BestTarget(targets, count, damage, current, skip, cost)
   for i = 1, count do
     if targets[i] ~= nil then
     if not UnitIsDead(targets[i]) then
-      _, refID, targetteam, airbuff = GetAirUnit(targets[i])
+      _, _, _, airbuff = GetAirUnit(targets[i])
       if airbuff ~= nil then
         incoming = airbuff.incoming + airbuff.tincoming
         hp = airbuff.hp
         if airbuff.id == current then
           incoming = incoming - damage
         end
-        --Echo("skipping " .. skip, "considering target, id: " .. targets[i] .. ", name: " .. airtargets[targetteam].units[refID].name .. ", cost: " .. cost[i] ..  ", hp: " .. hp .. ", incoming: " .. incoming)
+        --Echo("skipping " .. skip, "considering target, id: " .. targets[i] .. ", name: " .. airbuff.name .. ", cost: " .. cost[i] ..  ", hp: " .. hp .. ", incoming: " .. incoming)
         if hp <= incoming + damage then
           --Echo("one-hittable", onehit)
           if not onehit then
@@ -637,7 +636,7 @@ function DPSBestTarget(targets, count)
   for i = 1, count do
     if targets[i] ~= nil then
     if not UnitIsDead(targets[i]) then
-      _, refID, targetteam, airbuff = GetAirUnit(targets[i])
+      _, _, _, airbuff = GetAirUnit(targets[i])
       if airbuff ~= nil then
         --Echo(alldying, best, besthp, i, airbuff.hp - airbuff.incoming - airbuff.tincoming)
         if alldying then
@@ -667,14 +666,12 @@ function DPSBestTarget(targets, count)
 end
 
 function HSPruneTargets(targets, count)
-  local refID
-  local targetteam
   local airbuff
   local unitDefID
   local ud
   local maxhp
   for i = 1, count do
-    _, refID, targetteam, airbuff = GetAirUnit(targets[i])
+    _, _, _, airbuff = GetAirUnit(targets[i])
     if airbuff ~= nil then
       _, maxhp = GetHP(targets[i])
       unitDefID = GetUnitDefID(targets[i])
@@ -704,7 +701,7 @@ function getAATargetsinRange(unitID, refID, allyteam)
   local pdamagecount
   local defID
   local LOS
-  local trefID, tallyteam, airbuff
+  local airbuff
   --Echo(units)
   for i,targetID in ipairs(units) do
     team = GetUnitAllyTeam(targetID)
@@ -717,7 +714,7 @@ function getAATargetsinRange(unitID, refID, allyteam)
           local timeinrange = TimeInRange(unitID, refID, allyteam, targetID)
           --Echo(timeinrange, nextshot)
           if IsBurstAA(AAdefbuff.name) and timeinrange > nextshot then
-            _, trefID, tallyteam, airbuff = GetAirUnit(targetID)
+            _, _, _, airbuff = GetAirUnit(targetID)
             if airbuff ~= nil then
               if airbuff.hp - airbuff.incoming - airbuff.tincoming > damage then
                 pdamagecount = airbuff.pdamagecount
@@ -734,10 +731,10 @@ function getAATargetsinRange(unitID, refID, allyteam)
                   timeinrange = AAmaxcounter(AAdefbuff.name)
                 end
                 if pexisting == 0 then
-                  airtargets[tallyteam].units[trefID].pdamage[pdamagecount] = {AAdefbuff.id, AAdefbuff.damage, timeinrange}
-                  airtargets[tallyteam].units[trefID].pdamagecount = pdamagecount + 1
+                  airbuff.pdamage[pdamagecount] = {AAdefbuff.id, AAdefbuff.damage, timeinrange}
+                  airbuff.pdamagecount = pdamagecount + 1
                 else
-                  airtargets[tallyteam].units[trefID].pdamage[pexisting] = {AAdefbuff.id, AAdefbuff.damage, timeinrange}
+                  airbuff.pdamage[pexisting] = {AAdefbuff.id, AAdefbuff.damage, timeinrange}
                 end
                 --Echo("posting potential damage! " .. pdamagecount, targetID)
               else
@@ -752,9 +749,9 @@ function getAATargetsinRange(unitID, refID, allyteam)
                   end
                 end
                 if pexisting ~= 0 then
-                  airtargets[tallyteam].units[trefID].pdamage[pexisting] = airtargets[tallyteam].units[trefID].pdamage[pdamagecount - 1]
-                  airtargets[tallyteam].units[trefID].pdamage[pdamagecount - 1] = nil
-                  airtargets[tallyteam].units[trefID].pdamagecount = pdamagecount - 1
+                  airbuff.pdamage[pexisting] = airbuff.pdamage[pdamagecount - 1]
+                  airbuff.pdamage[pdamagecount - 1] = nil
+                  airbuff.pdamagecount = pdamagecount - 1
                 end
               end
             end
@@ -1017,7 +1014,7 @@ function IsMicro(unitID)
   local unitAI = IsMicroCMD(unitID)
   local playerorder = true
   local abovewater = false
-  local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
+  local _, _, _, AAdefbuff = GetAAUnit(unitID)
   if AAdefbuff ~= nil then
     playerorder = AAdefbuff.orderreceived
     local height = getAAUnitHeight(AAdefbuff.name)
@@ -1338,15 +1335,15 @@ function addShot(unitID, refID, allyteam, shotID, targetID)
   if IsAttacking(unitID) then
     targetID = getTarget(unitID)
   end
-  local _, arefID, tallyteam, airbuff = GetAirUnit(targetID)
+  local _, _, _, airbuff = GetAirUnit(targetID)
   if airbuff ~= nil then
     local distance = GetUnitSeparation(unitID, targetID)
     local flighttime = 30 * distance / AAdefbuff.shotspeed
     --Echo("shot fired " .. shotID .. " owner " .. unitID .. " target " .. targetID .. " separation " .. distance ..  " TOF " .. flighttime)
-    AAdef[allyteam].units[refID].projectiles[AAdefbuff.projectilescount + 1] = {id = shotID, target = targetID, TOF = flighttime}
+    AAdefbuff.projectiles[AAdefbuff.projectilescount + 1] = {id = shotID, target = targetID, TOF = flighttime}
     shot[shotmaxcount + 1].prefID = AAdefbuff.projectilescount + 1
-    AAdef[allyteam].units[refID].projectilescount = AAdefbuff.projectilescount + 1
-    airtargets[tallyteam].units[arefID].incoming = airtargets[tallyteam].units[arefID].incoming + AAdefbuff.shotdamage
+    AAdefbuff.projectilescount = AAdefbuff.projectilescount + 1
+    airbuff.incoming = airbuff.incoming + AAdefbuff.shotdamage
   end
   shotreference[shotID] = shotmaxcount + 1
   shotmaxcount = shotmaxcount + 1
@@ -1366,11 +1363,11 @@ function removeShot(shotID)
       if AAdefbuff.projectiles ~= nil then
       if AAdefbuff.projectiles[prefID] ~= nil then
         local target = AAdefbuff.projectiles[prefID].target
-        local _, trefID, tallyteam, airbuff = GetAirUnit(target)
+        local _, _, _, airbuff = GetAirUnit(target)
         if airbuff ~= nil then
-          airtargets[tallyteam].units[trefID].incoming = airtargets[tallyteam].units[trefID].incoming - AAdefbuff.damage
-          if airtargets[tallyteam].units[trefID].incoming < 0 then
-            airtargets[tallyteam].units[trefID].incoming = 0
+          airbuff.incoming = airbuff.incoming - AAdefbuff.damage
+          if airbuff.incoming < 0 then
+            airbuff.incoming = 0
           end
         end
         if AAdefbuff.projectilescount > 1 then
@@ -1393,7 +1390,7 @@ function removeShot(shotID)
   end
 end
 
-function GetUnit(unitID)
+function GetUnit(unitID)  --unused
   if unitID ~= nil then
     local unitDefID = GetUnitDefID(unitID)
     if unitDefID ~= nil then
@@ -1561,7 +1558,7 @@ end
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   local ud = UnitDefs[unitDefID]
   if IsAA(ud.name) then
-    local _, refID, allyteam, AAdefbuff = GetAAUnit(unitID)
+    local _, _, _, AAdefbuff = GetAAUnit(unitID)
     if AAdefbuff ~= nil then
       if cmdID == CMD_UNIT_AI then
         local cmdDescID = FindUnitCmdDesc(unitID, CMD_UNIT_AI)
@@ -1569,14 +1566,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
         if cmdParams[1] == 0 then
           nparams = {0, 'AI Off','AI On'}
           if not AAdefbuff.orderaccept then
-            AAdef[allyteam].units[refID].deactivate = true
-            AAdef[allyteam].units[refID].resetfirestate = true
+            AAdefbuff.deactivate = true
+            AAdefbuff.resetfirestate = true
           end
         else
           nparams = {1, 'AI Off','AI On'}
           if not AAdefbuff.orderaccept then
-            AAdef[allyteam].units[refID].deactivate = false
-            AAdef[allyteam].units[refID].resetfirestate = false
+            AAdefbuff.deactivate = false
+            AAdefbuff.resetfirestate = false
           end
         end
         EditUnitCmdDesc(unitID, cmdDescID, {params = nparams})
@@ -1584,7 +1581,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
         if AAdefbuff.orderaccept then
           AAdefbuff.orderaccept = false
         elseif cmdID ~= 5 and cmdID ~= 70 and cmdID ~= CMD.MOVE and cmdID ~= CMD.FIGHT and cmdID ~= CMD.PATROL and cmdID ~= CMD.GUARD and cmdID ~= CMD_UNIT_CANCEL_TARGET and cmdID ~= CMD.STOP then
-          AAdef[allyteam].units[refID].orderreceived = true
+          AAdefbuff.orderreceived = true
           --Echo("order received", cmdID, CMD[cmdID])
         end
       end
