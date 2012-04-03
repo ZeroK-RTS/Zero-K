@@ -143,6 +143,7 @@ local globalassignmentcounter = 30
  (use weaponstate-no-string 2nd return, 1750 dmg)
 ]]--
 local Echo = Spring.Echo
+local loadmultiplier = 1
 
 ------------------------------
 ----------CORE LOGIC----------
@@ -182,6 +183,13 @@ function checkAAdef()
                 AAdef[h].units[i].resetfirestate = false
               end
             end
+			if AAdefbuff.attacking ~= nil then
+			  if not UnitIsDead(AAdefbuff.attacking) or not InRange(AAdefbuff.id, AAdefbuff.attacking, AAdefbuff.range) then
+			    AAdef[h].units[i].attacking = nil
+				AAdef[h].units[i].gassigncounter = 0
+				AAdef[h].units[i].counter = 0
+			  end
+			end
             weaponready, nextshot = WeaponReady(AAdefbuff.id, i, h)
             AAdef[h].units[i].nextshot = nextshot
             --Echo(nextshot)
@@ -1109,12 +1117,12 @@ end
 
 function AAmaxcounter(name)
   if name == "missiletower" then
-    return 3
+    return math.floor(3 * loadmultiplier)
   end
   if name == "screamer" then
-    return 10
+    return math.floor(10 * loadmultiplier)
   end
-  return 3
+  return math.floor(3 * loadmultiplier)
 end
 
 function AAmaxrefiredelay(name)
@@ -1540,6 +1548,19 @@ function gadget:GameFrame()
     globalassignmentcounter = globalassignmentcounter - 1
   end
   checkAAdef()
+  local AAcount = 0
+  for h = 0, teamcount do
+    if AAdefmaxcount[h] ~= nil then
+      AAcount = AAcount + AAdefmaxcount[h]
+	end
+  end
+  local aircount = 0
+  for h = 0, airteamcount do
+    if airtargetsmaxcount[h] ~= nil then
+      aircount = aircount + airtargetsmaxcount[h]
+	end
+  end
+  --loadmultiplier = math.min(3, math.max(1, 1 + AAcount * aircount / 1000) )
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
