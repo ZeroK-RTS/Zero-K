@@ -1,4 +1,4 @@
-local versionName = "v3.15"
+local versionName = "v3.19"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@ end
 
 local avatarsTable_g = {}
 
-local wdgtID 		= "&" --// 'selectionsend.lua' used "=", 'allyCursor.lua' used "%", 'unitMarker.lua' used "dFl", 'lagmonitor.lua' used "AFK", but please check first.
+local wdgtID 		= "&" --// 'selectionsend.lua' used "=", 'allyCursor.lua' used "%", 'unitMarker.lua' used "dFl", 'lagmonitor.lua' used "AFK", so api_avatar.lua use "&".
 local msgID       	= wdgtID .. "AAA"	--an identifier that identify a packet with this widget
 local hi 			= "1"	--to identify packet's purposes
 local yes  			= "2"
@@ -82,7 +82,7 @@ local numberOfRetry_g = 3 --times to send "hi" before remote computer reply unti
 local maxChecksumLenght= 2000  --if greater than 2049 will cause unpack error 
 --reference: http://www.promixis.com/forums/showthread.php?15419-Lua-Limits-on-Table-Size
 
-local networkDelayMultiplier = 1.15 --// add extra 15% delay to the reported ping for safety.
+local networkDelayMultiplier = 1.15 --// constant: 1 trip (A to B) delay + extra 15% delay for safety.
 
 local configFile = "LuaUI/Configs/avatars.lua" --//default database
 local avatarsDir = "LuaUI/Configs/Avatars/" --//default directory
@@ -503,18 +503,17 @@ local function ConvertFileRequestIntoString (playerIDlist, checklistTable)
 	local playerID=-1
 	local fileRequestCode=1
 	local fileRequestIndex=100
-	for iteration=1, iteration <= #playerIDlist do
+	for iteration=1, #playerIDlist, 1 do
 		playerID=playerIDlist[iteration]
-		if not checklistTable[(playerID+1)].ignore then --check self and others but don't check the ignore list
+		if checklistTable[(playerID+1)].accept then --check self and others but don't check the ignore list
 			if (checklistTable[(playerID+1)].downloaded==false) then --check checklist if complete
-				fileRequestCode=fileRequestCode*100+playerID
+				fileRequestCode=(fileRequestCode*100)+playerID
 				fileRequestIndex=fileRequestIndex+1
 			end
 		end
-		iteration=iteration+1 --check next entry
 	end
-	fileRequestCode=fileRequestIndex .. fileRequestCode --eg: "1031000102", means "3 player"= "00","01","02"
-	return fileRequestCode
+	local theRequestCode=fileRequestIndex .. fileRequestCode --IF there is 3 player then 'fileRequestIndex' will do: 100+1+1+1= 103, and 'fileRequestCode' will do: (((1*100+02)*100+01)*100+00) = 1000102. eg: 'theRequestCode'== "1031000102", meaning "3 player" & playerID == "00","01","02".
+	return theRequestCode
 end
 
 local function ConvertStringIntoFileRequest (fileRequestCode)
@@ -522,7 +521,7 @@ local function ConvertStringIntoFileRequest (fileRequestCode)
 	local requestCount = tonumber(fileRequestCode:sub(2,3))
 	fileRequestCode = fileRequestCode:sub(5,4+requestCount*2) --eg: (5,6) or (5,8) or (5,10) or (5,12) or (5,14)
 	local index = 1
-	for i=1, i <= requestCount do
+	for i=1, requestCount,1 do
 		local id = tonumber(fileRequestCode:sub(i*2-1,i*2))
 		local playerCustomKeys = GetPlayersData(9, id) --filter out request that has no server data
 		if (playerCustomKeys ~= nil and playerCustomKeys.avatar~=nil) then 
@@ -539,7 +538,7 @@ end
 --------------------------------------------------------------------------------
 --Network Protocols-------------------------------------------------------------
 
-local function RecordActualNeworkDelay (networkDelay)
+local function RecordActualNetworkDelay (networkDelay)
 	local actualDelay = os.clock() - networkDelay.sentTimestamp
 	networkDelay.sumOfDelay = networkDelay.sumOfDelay + actualDelay
 	networkDelay.msgCount = networkDelay.msgCount +1
@@ -548,10 +547,10 @@ local function RecordActualNeworkDelay (networkDelay)
 end
 
 local function RetrieveTotalNetworkDelay(playerIDa, playerIDb)
-	local aTargetPingTime = GetPlayersData(3, playerIDa)
+	local aTargetPingTime = GetPlayersData(3, playerIDa) --//equal to Spring.GetPlayerInfo(playerIDa)
 	local bTargetPingTime = GetPlayersData(3, playerIDb)
-	if playerIDa == myPlayerID then --//IF playerIDa is myPlayerID: process Ping Data
-		if networkDelay_g.averageDelay > aTargetPingTime then --//if actual delay greater than reported delay
+	if playerIDa == myPlayerID then --//IF playerIDa is myPlayerID: try to actually measure the ping
+		if networkDelay_g.averageDelay > aTargetPingTime then --//if actual delay greater than reported delay (ping)
 			local delayOffset = networkDelay_g.averageDelay - aTargetPingTime --// get difference between reported and actual delay
 			aTargetPingTime = aTargetPingTime + delayOffset --//add the difference in delay to the output values
 			networkDelay_g.offset = delayOffset
@@ -567,477 +566,488 @@ local function RetrieveTotalNetworkDelay(playerIDa, playerIDb)
 	end
 	local totalDelay= aTargetPingTime+bTargetPingTime
 	if totalDelay == 0 then return (2 + delayUpdate) --//if reported delay is "0" then arbitrarily assume each side has 1 second delay
-	elseif totalDelay<0.5 then return (0.5 + delayUpdate) --if too low delay don't spam message out too quickly
-	elseif totalDelay>=2 then return (2 + delayUpdate) --if too high delay then don't wait too long, just send until the retry depleted (end connection)
-	else return totalDelay
+	elseif totalDelay<0.5 then return (0.5 + delayUpdate) --if delay too low don't spam message out too quickly
+	elseif totalDelay>=2 then return (2 + delayUpdate) --if delay too high then don't wait too long, just send until the retry depleted (end connection)
+	else return totalDelay --//use the calculated delay if the delay is within reasonable range
 	end
 end
 
-local function NetworkProtocol()
+local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTime,checklistTableG,waitForTransmission,lineIsBusy,openPortForID,tableIsCompleted,currentTime)
 	local msgRecv= msgRecv_g
-	local waitTransmissionUntilThisTime =waitTransmissionUntilThisTime_g
-	local waitBusyUntilThisTime=waitBusyUntilThisTime_g
-	local checklistTableG=checklistTableG_g
-	local waitForTransmission=waitForTransmission_g
-	local lineIsBusy=lineIsBusy_g
-	local openPortForID=openPortForID_g --used for filtering message
-	local tableIsCompleted=tableIsCompleted_g
 	local fileRequestTableG=fileRequestTableG_g
-	local currentTime = currentTime_g
 	local avatarsTable = avatarsTable_g
 	---------------------------
 	
 	if (#msgRecv or 0)>=1 then --check lua message from 'inbox'
-		local found, playerID, msg=false ,nil, nil
-		while (#msgRecv or 0) >= 1 and not found do
-			playerID=msgRecv[#msgRecv].playerID
+		local entryEmpty = true
+		local remotePlayerID, msg = nil, nil
+		local msgRecvLenght = (#msgRecv or 0)
+		while msgRecvLenght >= 1 and entryEmpty do
+			remotePlayerID=msgRecv[#msgRecv].remotePlayerID
 			msg=msgRecv[#msgRecv].msg
-			if (msg:sub(1,4) == msgID or msg:sub(1,4) == broadcastID) then
-				found = true
+			if (msg:sub(1,4) == msgID or msg:sub(1,4) == broadcastID) then --if message belong to hello/hi file transfer protocol
+				entryEmpty = false
 			end
-			msgRecv[#msgRecv]=nil --//add 'nil' here so #msgRecv shift backward 1 index
+			msgRecv[#msgRecv]=nil --//add 'nil' here so #msgRecv index shift backward by 1
+			msgRecvLenght = #msgRecv --//retrieve the updated table lenght
 		end
-		if msg~=nil then --//activate only when relevant message received.		
-			if (msg:sub(1,4) == msgID) then --if message belong to hello/hi file transfer protocol
-				destinationID=tonumber(msg:sub(8,9))
-				local myAvatar = avatarsTable[myPlayerName_g]
-				
-				if openPortForID==playerID and destinationID==myPlayerID and not lineIsBusy then --//if sender is expected
-					if msg:sub(6,6)==hi then --receive hi from target playerID
-						if myPlayerID>playerID then --if I am 'low ranking' playerID then replied yes
-							--reply with yes
-							local operationMode = msg:sub(5,5) --propagate operation mode to the subsequent protocol
-							Spring.SendLuaUIMsg(msgID .. operationMode .. yes .. openPortForID+100)
-							waitForTransmission=true
-							local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID)
-							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
-						end
-					elseif msg:sub(6,6)==yes then --received yes
-						local operationMode = msg:sub(5,5)
-						if operationMode == "A" then
-						----
-							Spring.SendLuaUIMsg(msgID .. operationMode .. checksumA .. openPortForID+100 .. "x" .. myAvatar.checksum) --send checksum, "x" is payload request flag (not available)
-						----
-						else --if mode B
-						----
-							local myRequestList = ConvertFileRequestIntoString (playerIDlistG_g, checklistTableG)
-							Spring.SendLuaUIMsg(msgID .. operationMode .. checksumA .. openPortForID+100 .. "x" .. myRequestList)
-						----
-						end
-						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID)
-						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
-					elseif msg:sub(6,6)==checksumA then --receive checksum
-						local operationMode = msg:sub(5,5)
-						if operationMode == "A" then
-						----
-							local checksum = tonumber(msg:sub(11))					
-							local playerName = GetPlayersData(2, playerID)
-							local avatarInfo = avatarsTable[playerName]
-							local payloadRequestFlag=0
-							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-								local file = SearchFileByChecksum(checksum)
-								if (file) then
-									--// already downloaded it once, reuse it
-									SetAvatar(playerName,file,checksum)
-									checklistTableG[(playerID+1)].downloaded=true --tick 'done' on file downloaded
-								else
-									payloadRequestFlag=1
-								end
-							end
-							Spring.SendLuaUIMsg(msgID .. operationMode .. checksumB .. openPortForID+100 .. payloadRequestFlag .. myAvatar.checksum) --send checksum
-						else --if mode B
-						----
-							local remoteRequestString = tonumber(msg:sub(11))
-							fileRequestTableG = ConvertStringIntoFileRequest (remoteRequestString) --decode remote computer's file request
-							local willSendFile = 0 --to flag remote computer to wait for file sending
-							local iteration=1
-							while (willSendFile == 0 and iteration <= #fileRequestTableG) do --check if we have any file to send
-								local filepath = avatarsDir .. fileRequestTableG[iteration][2]
-								if VFS.FileExists(filepath) then
-									willSendFile = 1
-								end
-								iteration=iteration+1
-							end
-							local myRequestList = ConvertFileRequestIntoString (playerIDlistG_g, checklistTableG) --compose our file request
-							Spring.SendLuaUIMsg(msgID .. operationMode .. checksumB .. openPortForID+100 .. willSendFile .. myRequestList)
-						----
-						end
-						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID)
-						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
-					elseif msg:sub(6,6)==checksumB then --receive checksum
-						local operationMode = msg:sub(5,5)
-						if operationMode == "A" then
-						----
-							local checksum = tonumber(msg:sub(11))
-							local playerName = GetPlayersData(2, playerID)
-							local avatarInfo = avatarsTable[playerName]
-							local payloadRequestFlag=0
-							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-								local file = SearchFileByChecksum(checksum)
-								if (file) then
-									--// already downloaded it once, reuse it
-									SetAvatar(playerName,file,checksum)
-									checklistTableG[(playerID+1)].downloaded=true --tick 'done' on file downloaded
-								else
-									payloadRequestFlag=1
-								end
-							end
-							if (msg:sub(10,10)=="1") then --if remote computer has payload request
-								local cdata = VFS.LoadFile(myAvatar.file)
-								local filename = ExtractFileName(myAvatar.file)
-								Spring.SendLuaUIMsg(msgID .. operationMode .. payloadA .. openPortForID+100 .. payloadRequestFlag .. "1" .. filename .. '$' .. cdata) --send payload, "1" is payload flag
-							else
-								if payloadRequestFlag==1 then --if we have a request
-									Spring.SendLuaUIMsg(msgID .. operationMode .. payloadA .. openPortForID+100 .. payloadRequestFlag .. "0") --send "payload package" without payload
-								else 	
-									Spring.SendLuaUIMsg(msgID .. operationMode .. bye .. openPortForID+100) --skip next protocol if both player don't need payload
-									waitForTransmission=false
-								end
-							end
-						----
-						else --if mode B
-						----
-							local remoteRequestString = tonumber(msg:sub(11))
-							fileRequestTableG = ConvertStringIntoFileRequest (remoteRequestString) --decode remote computer's file request
-							local willSendFile = 0 --to flag remote computer to wait for file sending
-							
-							local fileToSend = "empty"
-							local filename = "empty"
-							local ownerID = -1
-							
-							local iteration = 1
-							while (willSendFile == 0 and iteration <= #fileRequestTableG) do --check if we have any file to send
-								filename = fileRequestTableG[iteration][2]
-								local filepath = avatarsDir .. filename
-								if VFS.FileExists(filepath) then
-									willSendFile = 1
-									fileToSend = filepath --use this file for sending
-									ownerID = fileRequestTableG[iteration][1] --identify the file users too
-									local newTable = {}
-									iteration=iteration+1
-									while (iteration <= #fileRequestTableG) do --copy request table into new table, skipping earlier entry if exist
-										newTable = { fileRequestTableG[iteration][1] ,fileRequestTableG[iteration][2] }
-										iteration=iteration+1
-									end
-									fileRequestTableG=newTable  --replace old table with new table which has skipped/removed some entry
-								end
-								iteration=iteration+1
-							end
-
-							if (willSendFile == 1) then --if we have file to send
-								local cdata = VFS.LoadFile(fileToSend)
-								Spring.SendLuaUIMsg(msgID .. operationMode .. payloadA .. openPortForID+100 .. "x" .. "1" .. 100+ownerID .. filename .. '$' .. cdata) --send payload, "1" is payload flag
-							else
-								if (msg:sub(10,10) == "1") then  --if remote computer has any file to send
-									Spring.SendLuaUIMsg(msgID .. operationMode .. payloadA .. openPortForID+100 .. "x" .. "0") --send "payload package" without payload
-								else --if NOT us and NOT remote computer has any file to send
-									Spring.SendLuaUIMsg(msgID .. operationMode .. bye .. openPortForID+100) --skip next protocol if both player don't need payload
-									waitForTransmission=false
-								end
-							end
-						----
-						end
-						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID)
-						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
-					elseif msg:sub(6,6)==payloadA then
-						local operationMode = msg:sub(5,5)
-						if operationMode == "A" then
-						----
-							if (msg:sub(11,11)=="1") then --payload "is here!" flag
-								msg = msg:sub(12)
-								local endOfFilename = msg:find('$',1,true)
-								local filename = msg:sub(1,endOfFilename-1)
-								local cdata    = msg:sub(endOfFilename+1)
-								
-								local image      = cdata
-								local checksum   = CalcChecksum(image)
-								checklistTableG[(playerID+1)].downloaded=true --tick 'done' on file downloaded
-
-								local playerName = GetPlayersData(2, playerID)
-								local avatarInfo = avatarsTable[playerName]
-
-								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-									local filename = SaveToFile(filename, image, checksum)
-									SetAvatar(playerName,filename,checksum)
-								end
-							end
-							if (msg:sub(10,10)=="1") then --remote client's payloadRequestFlag
-								local cdata = VFS.LoadFile(myAvatar.file)
-								local filename = ExtractFileName(myAvatar.file)
-								Spring.SendLuaUIMsg(msgID .. operationMode .. payloadB .. openPortForID+100 .. "x" .. "1" .. filename .. '$' .. cdata) --send payload,"x" is payload request flag(unavailable), "1" is payload flag
-							else
-								Spring.SendLuaUIMsg(msgID .. operationMode .. payloadB .. openPortForID+100 .. "x" .. "0") --send "payload package" without payload
-							end
-						----
-						else --if mode B
-						----
-							if (msg:sub(11,11)=="1") then --payload "is here!" flag
-								local userID = msg:sub(13,14)
-								msg = msg:sub(15)
-								local endOfFilename = msg:find('$',1,true)
-								local filename = msg:sub(1,endOfFilename-1)
-								local cdata    = msg:sub(endOfFilename+1)
-								
-								local image      = cdata
-								local checksum   = CalcChecksum(image)
-								checklistTableG[(userID+1)].downloaded=true --tick 'done' on file downloaded
-
-								local playerName = GetPlayersData(2, playerID)
-								local avatarInfo = avatarsTable[playerName]
-
-								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-									local filename = SaveToFile(filename, image, checksum)
-									SetAvatar(playerName,filename,checksum)
-								end
-							end
-
-							local willSendFile = 0 --to flag remote computer to wait for file sending						
-							local fileToSend = "empty"
-							local filename = "empty"
-							local ownerID = -1
-							
-							local iteration = 1
-							while (willSendFile == 0 and iteration <= #fileRequestTableG) do --check if we have any file to send
-								filename = fileRequestTableG[iteration][2]
-								local filepath = avatarsDir .. filename
-								if VFS.FileExists(filepath) then
-									willSendFile = 1
-									fileToSend = filepath --use this file for sending
-									ownerID = fileRequestTableG[iteration][1] --identify the file users too
-									local newTable = {}
-									iteration=iteration+1
-									while (iteration <= #fileRequestTableG) do --copy request table into new table, skipping earlier entry if exist
-										newTable = { fileRequestTableG[iteration][1] ,fileRequestTableG[iteration][2] }
-										iteration=iteration+1
-									end
-									fileRequestTableG=newTable  --replace old table with new table which has skipped/removed some entry
-								end
-								iteration=iteration+1
-							end
-
-							if (willSendFile == 1) then --if we have file to send
-								local cdata = VFS.LoadFile(fileToSend)
-								Spring.SendLuaUIMsg(msgID .. operationMode .. payloadB .. openPortForID+100 .. willSendFile .. "1" .. 100+ownerID .. filename .. '$' .. cdata) --send payload, "1" is payload flag
-							else
-								Spring.SendLuaUIMsg(msgID .. operationMode .. payloadB .. openPortForID+100 .. willSendFile .. "0") --send "payload package" without payload
-							end
-						----
-						end
-						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID)
-						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg				
-					elseif (msg:sub(6,6)==payloadB) then
-						local operationMode = msg:sub(5,5)
-						if operationMode == "A" then
-						----
-							if (msg:sub(11,11)=="1") then --payload "is here!" flag
-								msg = msg:sub(12)
-								local endOfFilename = msg:find('$',1,true)
-								local filename = msg:sub(1,endOfFilename-1)
-								local cdata    = msg:sub(endOfFilename+1)					
-
-								local image      = cdata
-								local checksum   = CalcChecksum(image)
-								checklistTableG[(playerID+1)].downloaded=true --tick 'done' on file downloaded
-
-								local playerName = GetPlayersData(2, playerID)
-								local avatarInfo = avatarsTable[playerName]
-
-								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-									local filename = SaveToFile(filename, image, checksum)
-									SetAvatar(playerName,filename,checksum)
-								end
-							end
-							Spring.SendLuaUIMsg(msgID .. operationMode .. bye .. openPortForID+100)
-							waitForTransmission=false
-						----
-						else --if mode B
-						----
-							if (msg:sub(11,11)=="1") then --payload "is here!" flag
-								local userID = msg:sub(13,14)
-								msg = msg:sub(15)
-								local endOfFilename = msg:find('$',1,true)
-								local filename = msg:sub(1,endOfFilename-1)
-								local cdata    = msg:sub(endOfFilename+1)
-								
-								local image      = cdata
-								local checksum   = CalcChecksum(image)
-								checklistTableG[(userID+1)].downloaded=true --tick 'done' on file downloaded
-
-								local playerName = GetPlayersData(2, userID)
-								local avatarInfo = avatarsTable[playerName]
-
-								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-									local filename = SaveToFile(filename, image, checksum)
-									SetAvatar(playerName,filename,checksum)
-								end
-							end
-
-							local willSendFile = 0 --to flag remote computer to wait for file sending						
-							local fileToSend = "empty"
-							local filename = "empty"
-							local ownerID = -1
-							
-							local iteration = 1
-							while (willSendFile == 0 and iteration <= #fileRequestTableG) do --check if we have any file to send
-								filename = fileRequestTableG[iteration][2]
-								local filepath = avatarsDir .. filename
-								if VFS.FileExists(filepath) then
-									willSendFile = 1
-									fileToSend = filepath --use this file for sending
-									ownerID = fileRequestTableG[iteration][1] --identify the file users too
-									local newTable = {}
-									iteration=iteration+1
-									while (iteration <= #fileRequestTableG) do --copy request table into new table, skipping earlier entry if exist
-										newTable = { fileRequestTableG[iteration][1] ,fileRequestTableG[iteration][2] }
-										iteration=iteration+1
-									end
-									fileRequestTableG=newTable  --replace old table with new table which has skipped/removed some entry
-								end
-								iteration=iteration+1
-							end
-							
-							if (willSendFile == 1) then --if we have file to send
-								local cdata = VFS.LoadFile(fileToSend)
-								Spring.SendLuaUIMsg(msgID .. operationMode .. payloadA .. openPortForID+100 .. "x" .. "1" .. 100+ownerID .. filename .. '$' .. cdata) --send payload, "1" is payload flag
-							else
-								if (msg:sub(10,10) == "1") then  --if remote computer has any file to send
-									Spring.SendLuaUIMsg(msgID .. operationMode .. payloadA .. openPortForID+100 .. "x" .. "0") --send "payload package" without payload
-								else --if NOT us and NOT remote computer has any file to send
-									Spring.SendLuaUIMsg(msgID .. operationMode .. bye .. openPortForID+100) --skip next protocol if both player don't need payload
-									waitForTransmission=false
-								end
-							end
-							local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID)
-							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
-						----
-						end
-					elseif (msg:sub(6,6)==bye) then
-						waitForTransmission=false
+		if (entryEmpty == false) then --//activate only when relevant message received.		
+			local destinationID=tonumber(msg:sub(8,9)) --//get the "openPortForID" sent from remote computer
+			local myAvatar = avatarsTable[myPlayerName_g]
+			
+			if openPortForID==remotePlayerID and destinationID==myPlayerID and not lineIsBusy then --//if sender is expected & line is clear, then:
+				if msg:sub(6,6)==hi then --receive hi from target remotePlayerID.  This is a rare case where me & sender sent "hi" at same time.
+					if myPlayerID>remotePlayerID then --IF myID is greater than sender'sID then I am 'low ranking', so I must reply yes.
+						--reply with yes
+						local operationMode = msg:sub(5,5) --get the sender's operation mode. Propagate operation mode to the entire protocol
+						local msgType = yes
+						Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100)
+						waitForTransmission=true
+						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, remotePlayerID)
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 --suspend any table checking (including "hi" sending) until there's enough time for remote computer to reply (is x2 totalNetworkDelay)
 					end
-				elseif myPlayerID==destinationID then --//if message from others, targetted to me
-					if msg:sub(6,6)==hi then --receive hi from someone who target you
-						if myPlayerID>playerID or tableIsCompleted then --if I am the'low ranking' playerID then reply yes, else don't (high rank will not answer to low ranking unless has no work to do)
-							--reply with yes
-							local operationMode = msg:sub(5,5) --propagate operation mode to the subsequent protocol
-							openPortForID=playerID
-							waitForTransmission=true --turn of "hi" sending
-							local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID)
-							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg				
-							Spring.SendLuaUIMsg(msgID .. operationMode .. yes .. openPortForID+100)
-						end 
+				elseif msg:sub(6,6)==yes then --received yes from targetted remotePlayerID. This is when sender received my "hi" and replied with "yes".
+					local operationMode = msg:sub(5,5) --get the sender's operation mode. Propagate operation mode to the entire protocol
+					if operationMode == "A" then
+					----
+						local msgType = checksumA
+						Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. "x" .. myAvatar.checksum) --send checksum, "x" is payload request flag (not available at this stage)
+						---// default message template: 1-4 (msgID), 5(operationMode), 6(msgType), 7-9(openPortForID)...
+					----
+					else --if mode B
+					----
+						local myRequestList = ConvertFileRequestIntoString (playerIDlistG_g, checklistTableG)
+						local msgType = checksumA
+						Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. "x" .. myRequestList)
+					----
 					end
-				elseif myPlayerID~=destinationID then --if message is noise (not targetted to me)
-					if msg:sub(6,6)==yes then --listen hi from someone to someone else
-						if myPlayerID>playerID then --if they are the 'higher ranking' playerID (close your own connection for high ranking player (players with low playerID))
-							lineIsBusy=true --assume they took command of the communication medium, close all protocol/cancel ongoing protocol. lineBusy always triggered by high ranking noise
-							waitForTransmission=true
-							local operationMode = msg:sub(5,5)
-							if operationMode == "A" then
-								local totalNetworkDelay= RetrieveTotalNetworkDelay(destinationID, playerID) --delay between 2 computer
-								waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*(networkDelayMultiplier+networkDelayMultiplier+0.5)
-								waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*(networkDelayMultiplier+networkDelayMultiplier+0.5) --assume twice the delay for complete back and forth. Wait until end.
-							else --if mode B
-								local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier
-								waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier
-								waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --wait until it end
-							end
-						end 
-					elseif (msg:sub(6,6)==payloadB or msg:sub(6,6)==payloadA) then --snif package transfer and save for our own
-						if (msg:sub(11,11)=="1") then --payload "is here!" flag
-							local operationMode = msg:sub(5,5)
-							if operationMode == "A" then
-								msg = msg:sub(12)
-								local endOfFilename = msg:find('$',1,true)
-								local filename = msg:sub(1,endOfFilename-1)
-								local cdata    = msg:sub(endOfFilename+1)
-
-								local image      = cdata
-								local checksum   = CalcChecksum(image)
-								local playerName = GetPlayersData(2, playerID)
-								local avatarInfo = avatarsTable[playerName]
-
-								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-									local filename = SaveToFile(filename, image, checksum)
-									SetAvatar(playerName,filename,checksum)
-									checklistTableG[(playerID+1)].downloaded=true --mark checklist as complete
-								end
-							else --if mode B
-								local userID = msg:sub(13,14)
-								msg = msg:sub(15)
-								local endOfFilename = msg:find('$',1,true)
-								local filename = msg:sub(1,endOfFilename-1)
-								local cdata    = msg:sub(endOfFilename+1)
-
-								local image      = cdata
-								local checksum   = CalcChecksum(image)
-								local playerName = GetPlayersData(2, userID)
-								local avatarInfo = avatarsTable[playerName]
-
-								if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then
-									local filename = SaveToFile(filename, image, checksum)
-									SetAvatar(playerName,filename,checksum)
-									checklistTableG[(userID+1)].downloaded=true --mark checklist as complete
-								end
-								local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier
-								waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier
-								waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --wait until it end
+					local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, remotePlayerID)
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 --suspend any table checking further until there's enough time for remote computer to reply (is x2 totalNetworkDelay)
+				elseif msg:sub(6,6)==checksumA then --receive checksumA
+					local operationMode = msg:sub(5,5) --get the sender's operation mode. Propagate operation mode to the entire protocol
+					if operationMode == "A" then
+					----
+						local checksum = tonumber(msg:sub(11)) --//get the "myAvatar.checksum" sent from remote computer					
+						local playerName = GetPlayersData(2, remotePlayerID) --//equal to Spring.GetPlayerInfo(remotePlayerID)
+						local avatarInfo = avatarsTable[playerName]
+						local payloadRequestFlag=0
+						if (avatarInfo == nil) or (avatarInfo.checksum ~= checksum) then --//check if we have any information on this player and if his picture's checksum matches with the stored checksum (if no match or no data, then..):
+							local file = SearchFileByChecksum(checksum)
+							if (file) then
+								--// already downloaded it, reuse it
+								SetAvatar(playerName,file,checksum)
+								checklistTableG[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
+							else
+								payloadRequestFlag=1
 							end
 						end
-					elseif msg:sub(6,6)==checksumA or msg:sub(6,6)==checksumB then --snif checksum transfer and save it for our own
-						local operationMode = msg:sub(5,5)
-						if operationMode == "A" then
-							local checksum = tonumber(msg:sub(11))
-							local playerName = GetPlayersData(2, playerID)
-							local avatarInfo = avatarsTable[playerName]
-							if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then --check if we have record of this player
-								local file = SearchFileByChecksum(checksum)
-								if (file) then
-									--// already downloaded it once, reuse it
-									SetAvatar(playerName,file,checksum)
-									checklistTableG[(playerID+1)].downloaded=true
-								else
-									--Spring.Echo("Avatar 988: " .. playerID)
-									checklistTableG[(playerID+1)].retry=0 --if we have no file yet, but heard this broadcast then reset retry count to continue trying to reach this playerID
-									tableIsCompleted=false --recheck checklist
-								end
+						local msgType = checksumB
+						Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. payloadRequestFlag .. myAvatar.checksum) --send checksum
+						---// default message template: 1-4 (msgID), 5(operationMode), 6(msgType), 7-9(openPortForID)...
+					else --if mode B
+					----
+						local remoteRequestString = tonumber(msg:sub(11))
+						fileRequestTableG = ConvertStringIntoFileRequest (remoteRequestString) --decode remote computer's file request
+						local willSendFile = 0 --to flag remote computer to wait for file sending
+						local iteration=1
+						while (willSendFile == 0 and iteration <= #fileRequestTableG) do --check if we have any file to send
+							local filepath = avatarsDir .. fileRequestTableG[iteration][2]
+							if VFS.FileExists(filepath) then
+								willSendFile = 1
 							end
+							iteration=iteration+1
+						end
+						local myRequestList = ConvertFileRequestIntoString (playerIDlistG_g, checklistTableG) --compose our file request
+						local msgType = checksumB
+						Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. willSendFile .. myRequestList)
+					----
+					end
+					local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, remotePlayerID)
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 --suspend any table checking further until there's enough time for remote computer to reply (is x2 totalNetworkDelay)
+				elseif msg:sub(6,6)==checksumB then --receive checksumB
+					local operationMode = msg:sub(5,5) --get the sender's operation mode. Propagate operation mode to the entire protocol
+					if operationMode == "A" then
+					----
+						local checksum = tonumber(msg:sub(11)) --//get the "myAvatar.checksum" sent from remote computer
+						local playerName = GetPlayersData(2, remotePlayerID) --//equal to Spring.GetPlayerInfo(remotePlayerID)
+						local avatarInfo = avatarsTable[playerName]
+						local payloadRequestFlag=0
+						if (avatarInfo == nil) or (avatarInfo.checksum ~= checksum) then
+							local file = SearchFileByChecksum(checksum)
+							if (file) then --// IF already downloaded it once, reuse it
+								SetAvatar(playerName,file,checksum)
+								checklistTableG[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
+							else --// request a download if file didn't exist.
+								payloadRequestFlag=1
+							end
+						end
+						if (msg:sub(10,10)=="1") then --if remote computer sent a 'payload request'
+							local cdata = VFS.LoadFile(myAvatar.file) --//load my pic into "cdata"
+							local filename = ExtractFileName(myAvatar.file) --//extract my picture's filename from my picture's filepath
+							local msgType = payloadA
+							Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. payloadRequestFlag .. "1" .. filename .. '$' .. cdata) --send payload, "1" is payload flag
+							---// default payload message template: 1-4 (msgID), 5(operationMode), 6(msgType), 7-9(openPortForID), 10(payloadRequestFlag), 11(has Payload Flag)...
+						else --if remote computer sent NO 'payload request'
+							if payloadRequestFlag==1 then --if I have a 'payload request' of my own
+								local msgType = payloadA
+								Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. payloadRequestFlag .. "0") --send "payload package" without payload ("0")
+							else --if I DON'T have any 'payload request'
+								local msgType = bye
+								Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100) --skip next protocol if both player don't need payload
+								waitForTransmission=false
+							end
+						end
+					----
+					else --if mode B
+					----
+						local remoteRequestString = tonumber(msg:sub(11))
+						fileRequestTableG = ConvertStringIntoFileRequest (remoteRequestString) --decode remote computer's file request
+						local willSendFile = 0 --to flag remote computer to wait for file sending
+						
+						local fileToSend = "empty"
+						local filename = "empty"
+						local ownerID = -1
+						
+						local iteration = 1
+						while (willSendFile == 0) and (iteration <= #fileRequestTableG) do --check if we have any file to send
+							filename = fileRequestTableG[iteration][2]
+							local filepath = avatarsDir .. filename
+							if VFS.FileExists(filepath) then
+								willSendFile = 1
+								fileToSend = filepath --use this file for sending
+								ownerID = fileRequestTableG[iteration][1] --identify the file users too
+								local newTable = {}
+								iteration=iteration+1
+								while (iteration <= #fileRequestTableG) do --copy request table into new table, skipping earlier entry if exist
+									newTable = { fileRequestTableG[iteration][1] ,fileRequestTableG[iteration][2] }
+									iteration=iteration+1
+								end
+								fileRequestTableG=newTable  --replace old table with new table which has skipped/removed some entry
+							end
+							iteration=iteration+1
+						end
+
+						if (willSendFile == 1) then --if we have file to send
+							local cdata = VFS.LoadFile(fileToSend)
+							local msgType = payloadA
+							Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. "x" .. "1" .. 100+ownerID .. filename .. '$' .. cdata) --send payload, "1" is payload flag
+							---// default message template: 1-4 (msgID), 5(operationMode), 6(msgType), 7-9(openPortForID)...
 						else
-							local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier
-							waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier
-							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --wait until it end
+							if (msg:sub(10,10) == "1") then  --if remote computer has any file to send
+								local msgType = payloadA
+								Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. "x" .. "0") --send "payload package" without payload
+							else --if NOT us and NOT remote computer has any file to send
+								local msgType = bye
+								Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100) --skip next protocol if both player don't need payload
+								waitForTransmission=false
+							end
 						end
-					elseif (msg:sub(6,6)==bye) then
-						lineIsBusy=false
+					----
+					end
+					local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, remotePlayerID)
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 --suspend any table checking further until there's enough time for remote computer to reply (is x2 totalNetworkDelay)
+				elseif msg:sub(6,6)==payloadA then --//receive payload from sender A (assuming we are sender B).
+					local operationMode = msg:sub(5,5) --get the sender's operation mode. Propagate operation mode to the entire protocol
+					if operationMode == "A" then
+					----
+						if (msg:sub(11,11)=="1") then --payload "is here!" flag
+							local payloadMsg = msg:sub(12) --//character 12 & above contain filename and the payload itself. Default payload message template: 1-4 (msgID), 5(operationMode), 6(msgType), 7-9(openPortForID), 10(payloadRequestFlag), 11(has Payload Flag)...
+							local endOfFilename = payloadMsg:find('$',1,true)
+							local filename = payloadMsg:sub(1,endOfFilename-1)
+							local cdata    = payloadMsg:sub(endOfFilename+1)
+							local checksum   = CalcChecksum(cdata)
+							checklistTableG[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
+
+							local playerName = GetPlayersData(2, remotePlayerID)
+							local avatarInfo = avatarsTable[playerName]
+
+							if (avatarInfo == nil) or (avatarInfo.checksum ~= checksum) then
+								local filename = SaveToFile(filename, cdata, checksum)
+								SetAvatar(playerName,filename,checksum)
+							end
+						end
+						if (msg:sub(10,10)=="1") then --remote client's payloadRequestFlag
+							local cdata = VFS.LoadFile(myAvatar.file)
+							local filename = ExtractFileName(myAvatar.file)
+							local msgType = payloadB
+							Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. "x" .. "1" .. filename .. '$' .. cdata) --send payload,"x" is payload request flag(unavailable), "1" is payload flag
+						else
+							local msgType = payloadB
+							Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. "x" .. "0") --send "payload package" without payload
+						end
+					----
+					else --if mode B
+					----
+						if (msg:sub(11,11)=="1") then --payload "is here!" flag
+							local userID = msg:sub(13,14)
+							local payloadMsg = msg:sub(15)
+							local endOfFilename = payloadMsg:find('$',1,true)
+							local filename = payloadMsg:sub(1,endOfFilename-1)
+							local cdata    = payloadMsg:sub(endOfFilename+1)
+							local checksum   = CalcChecksum(cdata)
+							checklistTableG[(userID+1)].downloaded=true --tick 'done' on file downloaded
+
+							local playerName = GetPlayersData(2, remotePlayerID)
+							local avatarInfo = avatarsTable[playerName]
+
+							if (avatarInfo==nil) or (avatarInfo.checksum ~= checksum) then
+								local filename = SaveToFile(filename, cdata, checksum)
+								SetAvatar(playerName,filename,checksum)
+							end
+						end
+
+						local willSendFile = 0 --to flag remote computer to wait for file sending						
+						local fileToSend = "empty"
+						local filename = "empty"
+						local ownerID = -1
+						
+						local iteration = 1
+						while (willSendFile == 0 and iteration <= #fileRequestTableG) do --check if we have any file to send
+							filename = fileRequestTableG[iteration][2]
+							local filepath = avatarsDir .. filename
+							if VFS.FileExists(filepath) then
+								willSendFile = 1
+								fileToSend = filepath --use this file for sending
+								ownerID = fileRequestTableG[iteration][1] --identify the file users too
+								local newTable = {}
+								iteration=iteration+1
+								while (iteration <= #fileRequestTableG) do --copy request table into new table, skipping earlier entry if exist
+									newTable = { fileRequestTableG[iteration][1] ,fileRequestTableG[iteration][2] }
+									iteration=iteration+1
+								end
+								fileRequestTableG=newTable  --replace old table with new table which has skipped/removed some entry
+							end
+							iteration=iteration+1
+						end
+
+						if (willSendFile == 1) then --if we have file to send
+							local cdata = VFS.LoadFile(fileToSend)
+							local msgType = payloadB
+							Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. willSendFile .. "1" .. 100+ownerID .. filename .. '$' .. cdata) --send payload, "1" is payload flag
+							---// default message template: 1-4 (msgID), 5(operationMode), 6(msgType), 7-9(openPortForID)...
+						else
+							local msgType = payloadB
+							Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. willSendFile .. "0") --send "payload package" without payload
+						end
+					----
+					end
+					local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, remotePlayerID)
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 --suspend any table checking further until there's enough time for remote computer to reply (is x2 totalNetworkDelay)
+				elseif (msg:sub(6,6)==payloadB) then --//receive payload from sender B (assuming we are sender A).
+					local operationMode = msg:sub(5,5) --get the sender's operation mode. Propagate operation mode to the entire protocol
+					if operationMode == "A" then
+					----
+						if (msg:sub(11,11)=="1") then --payload "is here!" flag
+							local payloadMsg = msg:sub(12) --//character 12 & above contain filename and the payload itself. Default payload message template: 1-4 (msgID), 5(operationMode), 6(msgType), 7-9(openPortForID), 10(payloadRequestFlag), 11(has Payload Flag)...
+							local endOfFilename = payloadMsg:find('$',1,true)
+							local filename = payloadMsg:sub(1,endOfFilename-1)
+							local cdata    = payloadMsg:sub(endOfFilename+1)
+							local checksum   = CalcChecksum(cdata)
+							checklistTableG[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
+
+							local playerName = GetPlayersData(2, remotePlayerID)
+							local avatarInfo = avatarsTable[playerName]
+
+							if (avatarInfo == nil) or (avatarInfo.checksum ~= checksum) then
+								local filename = SaveToFile(filename, cdata, checksum)
+								SetAvatar(playerName,filename,checksum)
+							end
+						end
+						local msgType = bye
+						Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100)
 						waitForTransmission=false
+					----
+					else --if mode B
+					----
+						if (msg:sub(11,11)=="1") then --payload "is here!" flag
+							local userID = msg:sub(13,14)
+							local payloadMsg = msg:sub(15)
+							local endOfFilename = payloadMsg:find('$',1,true)
+							local filename = payloadMsg:sub(1,endOfFilename-1)
+							local cdata    = payloadMsg:sub(endOfFilename+1)
+							local checksum   = CalcChecksum(cdata)
+							checklistTableG[(userID+1)].downloaded=true --tick 'done' on file downloaded
+
+							local playerName = GetPlayersData(2, remotePlayerID)
+							local avatarInfo = avatarsTable[playerName]
+
+							if (avatarInfo==nil) or (avatarInfo.checksum ~= checksum) then
+								local filename = SaveToFile(filename, cdata, checksum)
+								SetAvatar(playerName,filename,checksum)
+							end
+						end
+
+						local willSendFile = 0 --to flag remote computer to wait for file sending						
+						local fileToSend = "empty"
+						local filename = "empty"
+						local ownerID = -1
+						
+						local iteration = 1
+						while (willSendFile == 0 and iteration <= #fileRequestTableG) do --check if we have any file to send
+							filename = fileRequestTableG[iteration][2]
+							local filepath = avatarsDir .. filename
+							if VFS.FileExists(filepath) then
+								willSendFile = 1
+								fileToSend = filepath --use this file for sending
+								ownerID = fileRequestTableG[iteration][1] --identify the file users too
+								local newTable = {}
+								iteration=iteration+1
+								while (iteration <= #fileRequestTableG) do --copy request table into new table, skipping earlier entry if exist
+									newTable = { fileRequestTableG[iteration][1] ,fileRequestTableG[iteration][2] }
+									iteration=iteration+1
+								end
+								fileRequestTableG=newTable  --replace old table with new table which has skipped/removed some entry
+							end
+							iteration=iteration+1
+						end
+						
+						if (willSendFile == 1) then --if we have file to send
+							local cdata = VFS.LoadFile(fileToSend)
+							local msgType = payloadA
+							Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. "x" .. "1" .. 100+ownerID .. filename .. '$' .. cdata) --send payload, "1" is payload flag
+						else
+							if (msg:sub(10,10) == "1") then  --if remote computer has any file to send
+								local msgType = payloadA
+								Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100 .. "x" .. "0") --send "payload package" without payload
+							else --if NOT us and NOT remote computer has any file to send
+								local msgType = bye
+								Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100) --skip next protocol if both player don't need payload
+								waitForTransmission=false
+							end
+						end
+						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, remotePlayerID)
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 --suspend any table checking further until there's enough time for remote computer to reply (is x2 totalNetworkDelay). This only apply to operation mode 'B' since mode 'A' protocol ended here.
+					----
 					end
-				elseif myPlayerID == playerID then --//if message is an echo of myself: record delay
-					if msg:sub(6,6)==hi then --//listen hi from self
-						networkDelay_g = RecordActualNeworkDelay (networkDelay_g)
+				elseif (msg:sub(6,6)==bye) then
+					waitForTransmission=false
+				end
+			elseif myPlayerID==destinationID then --//if message is from others & is meant for me
+				if msg:sub(6,6)==hi then --receive hi from someone who target you
+					if myPlayerID>remotePlayerID or tableIsCompleted then --if I have the 'low ranking' PlayerID then reply yes, else don't (high ranking do not answer to low ranking unless its checklist table is completed (idle))
+						--reply with yes
+						local operationMode = msg:sub(5,5) --propagate operation mode to the subsequent protocol
+						openPortForID=remotePlayerID
+						waitForTransmission=true --turn off "hi" sending, turn off checklist table checking
+						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, remotePlayerID)
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 --suspend any table checking further until there's enough time for remote computer to reply (is x2 totalNetworkDelay). This only apply to operation mode 'B' since mode 'A' protocol ended here.
+						local msgType = yes
+						Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100)
+					end 
+				end
+			elseif myPlayerID~=destinationID then --if message is noise (not targetted to me)
+				if msg:sub(6,6)==yes then --heard "yes" from someone to someone else
+					if myPlayerID>remotePlayerID then --if they are the 'higher ranking' PlayerID: close your own connection for them
+						lineIsBusy=true --assume they took command of the communication medium, close all protocol/cancel ongoing protocol. lineBusy always triggered by high ranking noise
+						waitForTransmission=true
+						--[[ --//commented because using a same waiting method for both operationMode
+						local operationMode = msg:sub(5,5)
+						if operationMode == "A" then
+							local totalNetworkDelay= RetrieveTotalNetworkDelay(destinationID, remotePlayerID) --delay between 2 computer
+							waitBusyUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 + (totalNetworkDelay*0.5) --assume twice the delay for complete back and forth + 3rd message. Wait until3rd message.
+							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 + (totalNetworkDelay*0.5)--assume twice the delay for complete back and forth + 3rd message. Wait until3rd message.
+						else --if mode B
+							local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier. As an accurate estimate of delay between sender & receiver
+							waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend communication protocol until next checksum is sent either by sender/receiver.
+							waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend checklist check until next checksum is sent either by sender/receiver.
+						end --]]
+						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier. As an accurate estimate of delay between sender & receiver
+						waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend communication protocol until next checksum is sent either by sender/receiver.
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend checklist check until next checksum is sent either by sender/receiver.						
 					end
+				elseif msg:sub(6,6)==checksumA or msg:sub(6,6)==checksumB then --snif checksum transfer and save it for our own
+					local operationMode = msg:sub(5,5)
+					if operationMode == "A" then
+						local checksum = tonumber(msg:sub(11))
+						local playerName = GetPlayersData(2, remotePlayerID)
+						local avatarInfo = avatarsTable[playerName]
+						if (not avatarInfo)or(avatarInfo.checksum ~= checksum) then --check if we have record of this player
+							local file = SearchFileByChecksum(checksum)
+							if (file) then
+								--// already downloaded it once, reuse it
+								SetAvatar(playerName,file,checksum)
+								checklistTableG[(remotePlayerID+1)].downloaded=true
+							else
+								checklistTableG[(remotePlayerID+1)].retry=0 --if we have no file yet, but heard this broadcast then reset retry count to continue trying to reach this remotePlayerID
+								tableIsCompleted=false --recheck checklist
+							end
+						end
+					else
+						--intentionally empty--
+						--[[ --//commented because using a same waiting method for both operationMode
+						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier. As an accurate estimate of delay between sender & receiver
+						waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend communication protocol until next checksum/payload is sent either by sender/receiver.
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend checklist check until next checksum/payload is sent either by sender/receiver.
+						--]]
+					end	
+					local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier. As an accurate estimate of delay between sender & receiver
+					waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend communication protocol until next checksum/payload is sent either by sender/receiver.
+					waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend checklist check until next checksum/payload is sent either by sender/receiver.
+					
+				elseif (msg:sub(6,6)==payloadB or msg:sub(6,6)==payloadA) then --snif package transfer and save for our own
+					if (msg:sub(11,11)=="1") then --payload "is here!" flag
+						local operationMode = msg:sub(5,5)
+						if operationMode == "A" then
+							local payloadMsg = msg:sub(12) --//character 12 & above contain filename and the payload itself. Default payload message template: 1-4 (msgID), 5(operationMode), 6(msgType), 7-9(openPortForID), 10(payloadRequestFlag), 11(has Payload Flag)...
+							local endOfFilename = payloadMsg:find('$',1,true)
+							local filename = payloadMsg:sub(1,endOfFilename-1)
+							local cdata    = payloadMsg:sub(endOfFilename+1)
+							local checksum   = CalcChecksum(cdata)
+							checklistTableG[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
+
+							local playerName = GetPlayersData(2, remotePlayerID)
+							local avatarInfo = avatarsTable[playerName]
+
+							if (avatarInfo == nil) or (avatarInfo.checksum ~= checksum) then
+								local filename = SaveToFile(filename, cdata, checksum)
+								SetAvatar(playerName,filename,checksum)
+							end
+						else --if mode B
+							local userID = msg:sub(13,14)
+							local payloadMsg = msg:sub(15)
+							local endOfFilename = payloadMsg:find('$',1,true)
+							local filename = payloadMsg:sub(1,endOfFilename-1)
+							local cdata    = payloadMsg:sub(endOfFilename+1)
+							local checksum   = CalcChecksum(cdata)
+							checklistTableG[(userID+1)].downloaded=true --tick 'done' on file downloaded
+
+							local playerName = GetPlayersData(2, remotePlayerID)
+							local avatarInfo = avatarsTable[playerName]
+
+							if (avatarInfo==nil) or (avatarInfo.checksum ~= checksum) then
+								local filename = SaveToFile(filename, cdata, checksum)
+								SetAvatar(playerName,filename,checksum)
+							end
+						end
+						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier
+						waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend communication protocol until next payload is sent either by sender/receiver.
+						waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend checklist check until next payload is sent either by sender/receiver.
+					end
+				elseif (msg:sub(6,6)==bye) then
+					lineIsBusy=false
+					waitForTransmission=false
 				end
-			elseif (msg:sub(1,4) == broadcastID) then --if message is a 'look at my new pic!'.
-				checklistTableG[(playerID+1)].downloaded=false --reset checklist entry for this player
-				checklistTableG[(playerID+1)].ignore=false
-				checklistTableG[(playerID+1)].retry=0 --reset retry
-				tableIsCompleted=false --redo checklist check
-				if myPlayerID == playerID then --//if broadcast is an echo of myself: record delay
-					networkDelay_g = RecordActualNeworkDelay (networkDelay_g)
+			elseif myPlayerID == remotePlayerID then --//if message is an echo of myself: record delay
+				if msg:sub(6,6)==hi then --//listen hi from self
+					networkDelay_g = RecordActualNetworkDelay (networkDelay_g)
 				end
+			end
+		elseif (msg:sub(1,4) == broadcastID) then --if message is a 'look at my new pic!'.
+			checklistTableG[(remotePlayerID+1)].downloaded=false --reset checklist entry for this player
+			--checklistTableG[(remotePlayerID+1)].accept=true
+			checklistTableG[(remotePlayerID+1)].retry=0 --reset retry
+			tableIsCompleted=false --redo checklist check
+			if myPlayerID == remotePlayerID then --//if broadcast is an echo of myself: record delay
+				networkDelay_g = RecordActualNetworkDelay (networkDelay_g)
 			end
 		end
 	end
 	
 	---------------------------
 	msgRecv_g = msgRecv
-	waitTransmissionUntilThisTime_g =waitTransmissionUntilThisTime
-	waitBusyUntilThisTime_g =waitBusyUntilThisTime
-	checklistTableG_g =checklistTableG
-	waitForTransmission_g =waitForTransmission
-	lineIsBusy_g =lineIsBusy
-	openPortForID_g =openPortForID --used for filtering message
-	tableIsCompleted_g =tableIsCompleted
 	fileRequestTableG_g =fileRequestTableG
-	currentTime_g = currentTime
+	
+	return waitTransmissionUntilThisTime,waitBusyUntilThisTime,checklistTableG,waitForTransmission,lineIsBusy,openPortForID,tableIsCompleted
 end
 
 --------------------------------------------------------------------------------
@@ -1062,6 +1072,7 @@ function widget:Update(n)
 	if (now > nextUpdate) then
 		nextUpdate = now + delayUpdate
 	else
+		currentTime_g = currentTime --//return "currentTime" back to global environment 
 		return
 	end
 	if (now > nextRefreshTime) then
@@ -1080,17 +1091,17 @@ function widget:Update(n)
 		local doChecking=true
 		while doChecking and iteration <= #playerIDlistG do
 			playerID=playerIDlistG[iteration]
-			if playerID~=myPlayerID and not checklistTableG[(playerID+1)].ignore then --don't check self and don't check ignore list
+			if playerID~=myPlayerID and checklistTableG[(playerID+1)].accept then --don't check self and don't check ignore list
 				if (checklistTableG[(playerID+1)].downloaded==false) then --check checklist if complete
 					if checklistTableG[(playerID+1)].retry < numberOfRetry_g then
-						doChecking=false
+						doChecking=false --//escape current loop, signal an interruption, and continue with other function
 						checklistTableG[(playerID+1)].retry=checklistTableG[(playerID+1)].retry+1 -- ++ retry count
 					end
 				end
 			end
 			iteration=iteration+1 --check next entry
 		end
-		if doChecking then --if last check performed without interruption meaning all entry are complete
+		if doChecking then --if last check performed without any interruption (doChecking = true) then all entry are complete
 			tableIsCompleted=true
 			if operatingModeThis == "B" then
 				if checklistTableG[(myPlayerID+1)].downloaded == false then
@@ -1098,16 +1109,17 @@ function widget:Update(n)
 					networkDelay_g.sentTimestamp = os.clock()
 				end
 			end
-		else
+		else --//if checking was interrupted (doChecking = false) then some player is hasn't been contacted/communicated yet, then contact them
 			openPortForID=playerID
-			waitForTransmission=true
-			local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID)
-			waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --suspend "hi" sending until next reply msg
-			Spring.SendLuaUIMsg(msgID .. operatingModeThis .. hi .. openPortForID+100) --send 'hi' to colleague
+			waitForTransmission=true --//prevent another checklist check in the next Update() cycle (wait until contact is complete)
+			local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, playerID) --//return 1 trip delay, including Update(n)'s interval & measured LUA-msg delay. 
+			waitTransmissionUntilThisTime=currentTime + (totalNetworkDelay*networkDelayMultiplier)*2 --suspend any table checking (including "hi" sending) until there's enough time for remote computer to reply (x2 totalDelay)
+			local msgType = hi
+			Spring.SendLuaUIMsg(msgID .. operatingModeThis .. msgType .. openPortForID+100) --send 'hi' to colleague
 			networkDelay_g.sentTimestamp = os.clock() --//remember current time for delay checking later
 		end
 	end
-	NetworkProtocol() --// perform Hello/Hi network protocol
+	waitTransmissionUntilThisTime,waitBusyUntilThisTime,checklistTableG,waitForTransmission,lineIsBusy,openPortForID,tableIsCompleted = NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTime,checklistTableG,waitForTransmission,lineIsBusy,openPortForID,tableIsCompleted,currentTime) --// perform Hello/Hi network protocol
 	
 	---------------------------
 	currentTime_g = currentTime
@@ -1119,7 +1131,6 @@ function widget:Update(n)
 	checklistTableG_g = checklistTableG
 	openPortForID_g = openPortForID
 	playerIDlistG_g = playerIDlistG
-	refreshDelay_g = refreshDelay
 end
 
 --------------------------------------------------------------------------------
@@ -1130,7 +1141,7 @@ function widget:RecvLuaMsg(msg, playerID) --each update will put message into "m
 		msgRecv_g[(#msgRecv_g or 0) +1]={msg=msg, playerID=playerID}
 		--[[
 		Spring.Echo("----")
-		Spring.Echo(msg:sub(6,6))
+		Spring.Echo(msg:sub(6,6)) --//echo out the message type (for debugging)
 		Spring.Echo(playerID)
 		--]]
 	end
@@ -1158,12 +1169,13 @@ function UpdatePlayerList()
 	local playerIDlistG = playerIDlistG_g
 	local refreshDelay = refreshDelay_g
 	local numberOfRetry = numberOfRetry_g
-	------------------
+	local myAllyTeamID = myAllyTeamID_g
+	------------------localized global variable/constant
 	--get info on self
 	local iAmSpectator= (Spring.GetSpectatingState()) or (false) --//return true if I am spectator (Spring.GetSpectatingState() = true), or return false if I'm not spectating (Spring.GetSpectatingState() = nil).
 
 	--get all playerID list
-	playerIDlistG= GetPlayersData(8, nil)
+	playerIDlistG= GetPlayersData(8, nil) --//equal to Spring.GetPlayerList()
 	--Spring.Echo(playerIDlistG)	
 	
 	--use playerIDlistG to update checklist
@@ -1171,9 +1183,9 @@ function UpdatePlayerList()
 	for iteration=1, #playerIDlistG, 1 do --update checklist and fill it with appropriate value
 		local playerID = playerIDlistG[iteration]
 		if checklistTableG[(playerID+1)]==nil then 
-			checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --add new entry with default value
+			checklistTableG[(playerID+1)]={downloaded=false, retry=0, accept=true} --add new entry with default value
 		else 
-			checklistTableG[(playerID+1)].ignore=false --reset previous ignore list
+			checklistTableG[(playerID+1)].accept=true --reset previous ignore list
 			checklistTableG[(playerID+1)].retry=0 --reset retry counter
 		end
 		
@@ -1193,17 +1205,17 @@ function UpdatePlayerList()
 		local playerIsActive,playerIsSpectator,playerAllyTeamID = GetPlayersData(5, playerID) --//is equal to Spring.GetPlayerInfo(playerID)
 		if iAmSpectator then --if I am spectator then
 			if not playerIsSpectator or not playerIsActive then --ignore non-specs and inactive player(don't send hi/request file)
-				checklistTableG[(playerID+1)].ignore=true 
+				checklistTableG[(playerID+1)].accept=false 
 				playerCount = playerCount-1
 			end
 		else --if I am not spectator
-			if myAllyTeamID_g~=playerAllyTeamID or playerIsSpectator or not playerIsActive then --if player is the enemy or a spec then
-				checklistTableG[(playerID+1)].ignore=true --ignore enemy & spec and inactive player(don't send hi/request file)
+			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not playerIsActive then --if player is the enemy or a spec or inactive then
+				checklistTableG[(playerID+1)].accept=false --ignore enemy & spec and inactive player(don't send hi/request file)
 				playerCount = playerCount-1
 			end
 		end
 	end
-	refreshDelay = (2*playerCount)*numberOfRetry --// set refresh delay based on number of ally and retry count, with a maximum 2 second delay for each
+	refreshDelay = (2*numberOfRetry)*playerCount --// set a 2 second delay (max) for each retry, times the number of players. This determine the "refresh delay" (amount of second before the ignore list being resetted)
 	tableIsCompleted=false --unlock checklist for another check
 	------------------
 	checklistTableG_g = checklistTableG
@@ -1258,7 +1270,7 @@ function widget:Initialize()
 	local playerCount = #playerIDlistG
 	for iteration=1, #playerIDlistG, 1 do --fill checklist with initial value
 		local playerID=playerIDlistG[iteration]
-		checklistTableG[(playerID+1)]={downloaded=false, retry=0, ignore=false} --fill checklist with default values. This value allow widget to initiate communication with other players
+		checklistTableG[(playerID+1)]={downloaded=false, retry=0, accept=true} --fill checklist with default values. This value allow widget to initiate communication with other players
 		
 		local playerName, activePlayer , playerIsSpectator,playerAllyTeamID, playerCustomKeys = GetPlayersData(4, playerID) --//equal to Spring.GetPlayerInfo(playerID)
 		if operatingModeThis == "B" then
@@ -1275,12 +1287,12 @@ function widget:Initialize()
 		--the following codes add "ignore" flag to a selected playerID
 		if iAmSpectator then --if I am spectator then
 			if not playerIsSpectator or not activePlayer then --ignore non-specs and non-ingame(don't send hi/request file)
-				checklistTableG[(playerID+1)].ignore=true 
+				checklistTableG[(playerID+1)].accept=false 
 				playerCount = playerCount-1
 			end
 		else --if I am not spectator:
 			if myAllyTeamID~=playerAllyTeamID or playerIsSpectator or not activePlayer then --ignore enemy and spec and non-ingame (don't send hi/request file)
-				checklistTableG[(playerID+1)].ignore=true
+				checklistTableG[(playerID+1)].accept=false
 				playerCount = playerCount-1
 			end
 		end
