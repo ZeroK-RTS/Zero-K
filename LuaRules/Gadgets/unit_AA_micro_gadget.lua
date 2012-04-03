@@ -182,13 +182,13 @@ function checkAAdef()
                 AAdefbuff.resetfirestate = false
               end
             end
-            if AAdefbuff.attacking ~= nil then
-              if not UnitIsDead(AAdefbuff.attacking) or not InRange(AAdefbuff.id, AAdefbuff.attacking, AAdefbuff.range) then
-                AAdefbuff.attacking = nil
-                AAdefbuff.gassigncounter = 0
-                AAdefbuff.counter = 0
-              end
-            end
+            --if AAdefbuff.attacking ~= nil then
+            --  if not UnitIsDead(AAdefbuff.attacking) or not InRange(AAdefbuff.id, AAdefbuff.attacking, AAdefbuff.range) then
+            --    AAdefbuff.attacking = nil
+            --    AAdefbuff.gassigncounter = 0
+            --    AAdefbuff.counter = 0
+            --  end
+            --end
             weaponready, nextshot = WeaponReady(AAdefbuff.id, i, h)
             AAdefbuff.nextshot = nextshot
             --Echo(nextshot)
@@ -1511,18 +1511,18 @@ function gadget:GameFrame()
     globalassignmentcounter = globalassignmentcounter - 1
   end
   checkAAdef()
-  local AAcount = 0
-  for h = 0, teamcount do
-    if AAdefmaxcount[h] ~= nil then
-      AAcount = AAcount + AAdefmaxcount[h]
-    end
-  end
-  local aircount = 0
-  for h = 0, airteamcount do
-    if airtargetsmaxcount[h] ~= nil then
-      aircount = aircount + airtargetsmaxcount[h]
-    end
-  end
+  --local AAcount = 0
+  --for h = 0, teamcount do
+  --  if AAdefmaxcount[h] ~= nil then
+  --    AAcount = AAcount + AAdefmaxcount[h]
+  --  end
+  --end
+  --local aircount = 0
+  --for h = 0, airteamcount do
+  --  if airtargetsmaxcount[h] ~= nil then
+  --    aircount = aircount + airtargetsmaxcount[h]
+  --  end
+  --end
   --loadmultiplier = math.min(3, math.max(1, 1 + AAcount * aircount / 1000) )
 end
 
