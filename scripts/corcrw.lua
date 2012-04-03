@@ -190,16 +190,34 @@ function script.AimFromWeapon(num)
 end
 
 function Hacky_Stiletto_Workaround_stiletto_func(count)
-	EmitSfx( emit,  FIRE_W5 )
 	--EmitSfx(emit, DETO_W5)
 	if count < SPECIAL_FIRE_COUNT then
 		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
-		GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(2/slowState), count + 1)
+		if count + 1 < SPECIAL_FIRE_COUNT then
+			EmitSfx( emit,  FIRE_W5 )
+			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(2/slowState), count + 1)
+		else
+			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 60, count + 1)
+		end
+	else
+		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+		GG.UpdateUnitAttributes(unitID)
 	end
 end
 
+local SLOWDOWN_FACTOR = 0.5
+local UNIT_SPEED = UnitDefNames["corcrw"].speed*SLOWDOWN_FACTOR/30
+
 function ClusterBomb()
 	Hacky_Stiletto_Workaround_stiletto_func(1)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SLOWDOWN_FACTOR)
+	GG.attUnits[unitID] = true
+	GG.UpdateUnitAttributes(unitID)
+	--local vx, vy, vz = Spring.GetUnitVelocity(unitID)
+	--local hSpeed = math.sqrt(vx^2 + vz^2)
+	--if hSpeed > UNIT_SPEED then
+	--	Spring.SetUnitVelocity(unitID, vx*UNIT_SPEED/hSpeed, vy, vz*UNIT_SPEED/hSpeed)
+	--end
 end
 
 function script.AimWeapon( num, heading, pitch )

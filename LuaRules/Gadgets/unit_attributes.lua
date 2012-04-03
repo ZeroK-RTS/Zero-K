@@ -21,7 +21,7 @@ if not gadgetHandler:IsSyncedCode() then
 	return
 end
 
-local UPDATE_PERIOD = 15
+local UPDATE_PERIOD = 3 -- see http://springrts.com/mantis/view.php?id=3048
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -165,7 +165,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 			--Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {maxSpeed = state.origReverseSpeed*speedFactor})
 			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {turnRate = state.origTurnRate*speedFactor})
 			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {accRate = state.origMaxAcc*(speedFactor > 0.001 and speedFactor or 0.001)})
-			Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {decRate = state.origMaxDec*(speedFactor > 0.01 and speedFactor or 0.01)})
+			--Spring.MoveCtrl.SetGunshipMoveTypeData (unitID, {decRate = state.origMaxDec*(speedFactor > 0.01 and speedFactor or 0.01)})
 		elseif state.movetype == 2 then
 			Spring.MoveCtrl.SetGroundMoveTypeData(unitID, {maxSpeed = state.origSpeed*speedFactor})
 			--Spring.MoveCtrl.SetGroundMoveTypeData (unitID, {maxSpeed = state.origReverseSpeed*speedFactor})
@@ -199,15 +199,23 @@ function GG.UpdateUnitAttributes(unitID, frame)
 	local changedAtt = false
 	
 	-- Increased reload from CAPTURE --
-	local captureMult = spGetUnitRulesParam(unitID,"captureReloadMult")
+	local selfReloadSpeedChange = spGetUnitRulesParam(unitID,"selfReloadSpeedChange")
+	
+	-- Unit speed change (like sprint) --
+	local selfMoveSpeedChange = Spring.GetUnitRulesParam(unitID, "selfMoveSpeedChange")
+	
 	-- SLOW --
 	local slowState = spGetUnitRulesParam(unitID,"slowState")
 	
-	if slowState or captureMult then
-		updateReloadSpeed(unitID, ud, (1-(slowState or 0))*(captureMult or 1), frame)
-		updateMovementSpeed(unitID,ud,1-(slowState or 0))
-		updateBuildSpeed(unitID,ud,1-(slowState or 0))
-		if slowState ~= 0 and captureMult ~= 1 then
+	if selfReloadSpeedChange or selfMoveSpeedChange or slowState then
+		local buildMult  = (1-(slowState or 0))
+		local moveMult   = (1-(slowState or 0))*(selfMoveSpeedChange or 1)
+		local reloadMult = (1-(slowState or 0))*(selfReloadSpeedChange or 1)
+
+		updateReloadSpeed(unitID, ud, reloadMult, frame)
+		updateMovementSpeed(unitID,ud, moveMult)
+		updateBuildSpeed(unitID, ud, buildMult)
+		if buildMult ~= 1 or moveMult ~= 1 or reloadMult ~= 1 then
 			changedAtt = true
 		end
 	end

@@ -191,7 +191,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		
 		if controllers[attackerID].postCaptureReload then
 			local frame = Spring.GetGameFrame() + controllers[attackerID].postCaptureReload
-			Spring.SetUnitRulesParam(attackerID, "captureReloadMult", 0, {inlos = true})
+			Spring.SetUnitRulesParam(attackerID, "selfReloadSpeedChange", 0, {inlos = true})
 			Spring.SetUnitRulesParam(attackerID, "captureRechargeFrame", frame, {inlos = true})
 			GG.UpdateUnitAttributes(attackerID)
 			reloading[frame] = reloading[frame] or {count = 0, data = {}}
@@ -286,7 +286,7 @@ function gadget:GameFrame(f)
 	if reloading[f] then
 		for i = 1, reloading[f].count do
 			local unitID = reloading[f].data[i]
-			Spring.SetUnitRulesParam(unitID,"captureReloadMult",1, {inlos = true})
+			Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange",1, {inlos = true})
 			Spring.SetUnitRulesParam(unitID, "captureRechargeFrame", 0, {inlos = true})
 			GG.UpdateUnitAttributes(unitID)
 		end
@@ -392,7 +392,7 @@ function gadget:DrawWorld()
 		
 		gl.DepthTest(false)
 		gl.Color(1,1,1,1)
-                gl.LineStipple(false)
+        gl.LineStipple(false)
 		
 		gl.PopAttrib()
 	end
