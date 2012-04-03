@@ -1228,99 +1228,95 @@ function addAA(unitID, unitDefID, name, allyteam)
   local sdamage = getShotDamage(name)
   if AAdef[allyteam] == nil then
     AAdef[allyteam] = {units = {}}
-    AAdefreference[allyteam] = {units = {}}
     AAdefmaxcount[allyteam] = 0
     if allyteam > teamcount then
       teamcount = allyteam
     end
   end
-  AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1] = {id = unitID, range = getRange(name), attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, resetfirestate = false, morph = false, damage = damage - 5, shotdamage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
+  local refID = AAdefmaxcount[allyteam] + 1
+  AAdef[allyteam].units[refID] = {id = unitID, range = getRange(name), attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, resetfirestate = false, morph = false, damage = damage - 5, shotdamage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
   if IsDPSAA(name) or IsMobileAA(name) then
-    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1].fire = 2
+    AAdef[allyteam].units[refID].fire = 2
   end
   if name == "corrl" then  -- For now, all defenders are fire-at-will
-    AAdef[allyteam].units[AAdefmaxcount[allyteam] + 1].fire = 0
+    AAdef[allyteam].units[refID].fire = 0
   end
-  AAdefreference[allyteam].units[unitID] = AAdefmaxcount[allyteam] + 1
-  AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] + 1
+  AAdefreference[unitID] = refID
+  AAdefmaxcount[allyteam] = refID
 end
 
 function addAir(unitID, unitDefID, name, allyteam)
   local health, _, _, _, _ = GetHP(unitID)
   if airtargets[allyteam] == nil then
     airtargets[allyteam] = {units = {}}
-    airtargetsref[allyteam] = {units = {}}
     airtargetsmaxcount[allyteam] = 0
     if allyteam > airteamcount then
       airteamcount = allyteam
     end
   end
-  airtargets[allyteam].units[airtargetsmaxcount[allyteam] + 1] = {id = unitID, name = name, tincoming = 0, incoming = 0, hp = health, team = allyteam, inrange = {}, pdamage = {}, pdamagecount = 1, globalassign = false, globalassigncount = 0}
-  airtargetsref[allyteam].units[unitID] = airtargetsmaxcount[allyteam] + 1
-  airtargetsmaxcount[allyteam] = airtargetsmaxcount[allyteam] + 1
+  local refID = airtargetsmaxcount[allyteam] + 1
+  airtargets[allyteam].units[refID] = {id = unitID, name = name, tincoming = 0, incoming = 0, hp = health, team = allyteam, inrange = {}, pdamage = {}, pdamagecount = 1, globalassign = false, globalassigncount = 0}
+  airtargetsref[unitID] = refID
+  airtargetsmaxcount[allyteam] = refID
 end
 
 function removeAA(unitID, allyteam)
-  if AAdef[allyteam] ~= nil then
-  if AAdefreference[allyteam].units[unitID] ~= nil then
-    local refID = AAdefreference[allyteam].units[unitID]
-      if AAdefmaxcount[allyteam] > 1 then
-        AAdef[allyteam].units[refID] = AAdef[allyteam].units[AAdefmaxcount[allyteam]]
-        AAdefreference[allyteam].units[AAdef[allyteam].units[AAdefmaxcount[allyteam]].id] = refID
-      end
-      AAdef[allyteam].units[AAdefmaxcount[allyteam]] = nil
-      AAdefmaxcount[allyteam] = AAdefmaxcount[allyteam] - 1
-    AAdefreference[allyteam].units[unitID] = nil
-  end
+  if AAdefreference[unitID] then
+    local refID = AAdefreference[unitID]
+    local maxID = AAdefmaxcount[allyteam]
+    if maxID > 1 then
+      AAdef[allyteam].units[refID] = AAdef[allyteam].units[maxID]
+      AAdefreference[AAdef[allyteam].units[maxID].id] = refID
+    end
+    AAdef[allyteam].units[maxID] = nil
+    AAdefmaxcount[allyteam] = maxID - 1
+    AAdefreference[unitID] = nil
   end
 end
 
 function transferAA(unitID, newteam, oldteam)
-  refID = AAdefreference[oldteam].units[unitID]
   if AAdef[newteam] == nil then
     AAdef[newteam] = {units = {}}
-    AAdefreference[newteam] = {units = {}}
     AAdefmaxcount[newteam] = 0
     if newteam > teamcount then
       teamcount = newteam
     end
   end
-  AAdef[newteam].units[AAdefmaxcount[newteam] + 1] = AAdef[oldteam].units[refID]
-  AAdefreference[newteam].units[unitID] = AAdefmaxcount[newteam] + 1
-  AAdefmaxcount[newteam] = AAdefmaxcount[newteam] + 1
+  local refID = AAdefmaxcount[newteam] + 1
+  AAdef[newteam].units[refID] = AAdef[oldteam].units[AAdefreference[unitID]]
+  AAdefmaxcount[newteam] = refID
   removeAA(unitID, oldteam)
+  AAdefreference[unitID] = refID
 end
 
 function removeAir(unitID, allyteam)
-  if airtargetsref[allyteam] ~= nil then
-  if airtargetsref[allyteam].units[unitID] ~= nil then
-    local refID = airtargetsref[allyteam].units[unitID]
+  if airtargetsref[unitID] then
+    local refID = airtargetsref[unitID]
+    local maxID = airtargetsmaxcount[allyteam]
     --Echo("removing " .. airtargets[allyteam].units[refID].id .. " tincoming " .. airtargets[allyteam].units[refID].tincoming)
-    if airtargetsmaxcount[allyteam] > 1 then
-      airtargets[allyteam].units[refID] = airtargets[allyteam].units[airtargetsmaxcount[allyteam]]
-      airtargetsref[allyteam].units[airtargets[allyteam].units[airtargetsmaxcount[allyteam]].id] = refID
+    if maxID > 1 then
+      airtargets[allyteam].units[refID] = airtargets[allyteam].units[maxID]
+      airtargetsref[airtargets[allyteam].units[maxID].id] = refID
     end
-    airtargets[allyteam].units[airtargetsmaxcount[allyteam]] = nil
-    airtargetsmaxcount[allyteam] = airtargetsmaxcount[allyteam] - 1
-    airtargetsref[allyteam].units[unitID] = nil
-  end
+    airtargets[allyteam].units[maxID] = nil
+    airtargetsmaxcount[allyteam] = maxID - 1
+    airtargetsref[unitID] = nil
   end
 end
 
 function transferAir(unitID, newteam, oldteam)
-  refID = airtargetsref[oldteam].units[unitID]
   if airtargets[newteam] == nil then
     airtargets[newteam] = {units = {}}
-    airtargetsref[newteam] = {units = {}}
     airtargetsmaxcount[newteam] = 0
     if newteam > airteamcount then
       airteamcount = newteam
     end
   end
-  airtargets[newteam].units[airtargetsmaxcount[newteam] + 1] = airtargets[oldteam].units[refID]
-  airtargetsref[newteam].units[unitID] = airtargetsmaxcount[newteam] + 1
-  airtargetsmaxcount[newteam] = airtargetsmaxcount[newteam] + 1
+  local refID = airtargetsmaxcount[newteam] + 1
+  airtargets[newteam].units[refID] = airtargets[oldteam].units[airtargetsref[unitID]]
+  airtargetsmaxcount[newteam] = refID
   removeAir(unitID, oldteam)
+  airtargetsref[unitID] = refID
 end
 
 function addShot(unitID, refID, allyteam, shotID, targetID)
@@ -1394,29 +1390,21 @@ function GetUnit(unitID)  --unused
     end
     local allyteam = GetUnitAllyTeam(unitID)
     if IsAA(ud.name) then
-      if AAdefreference[allyteam] ~= nil and AAdefreference[allyteam].units ~= nil then
-        local refID = AAdefreference[allyteam].units[unitID]
-        if refID ~= nil then
-          local AAdefbuff = AAdef[allyteam].units[refID]
-          return unitID, refID, allyteam, AAdefbuff
-        else
-          return unitID, nil, allyteam, nil
-        end
+      local refID = AAdefreference[unitID]
+      if refID ~= nil then
+        local AAdefbuff = AAdef[allyteam].units[refID]
+        return unitID, refID, allyteam, AAdefbuff
       else
-        return unitID, nil, nil, nil
+        return unitID, nil, allyteam, nil
       end
     end
     if IsAir(ud.name) then
-      if airtargetsref[allyteam] ~= nil and airtargetsref[allyteam].units ~= nil then
-        local refID = airtargetsref[allyteam].units[unitID]
-        if refID ~= nil then
-          local airbuff = airtargets[allyteam].units[refID]
-          return unitID, refID, allyteam, airbuff
-        else
-          return unitID, nil, allyteam, nil
-        end
+      local refID = airtargetsref[unitID]
+      if refID ~= nil then
+        local airbuff = airtargets[allyteam].units[refID]
+        return unitID, refID, allyteam, airbuff
       else
-        return unitID, nil, nil, nil
+        return unitID, nil, allyteam, nil
       end
     end
   end
@@ -1428,18 +1416,14 @@ function GetAAUnit(unitID)
     --Echo(unitID)
     local allyteam = GetUnitAllyTeam(unitID)
     --Echo(allyteam)
-    if AAdefreference[allyteam] ~= nil and AAdefreference[allyteam].units ~= nil then
-      local refID = AAdefreference[allyteam].units[unitID]
-      --Echo(refID)
-      if refID ~= nil then
-        local AAdefbuff = AAdef[allyteam].units[refID]
-        --Echo(AAdefbuff)
-        return unitID, refID, allyteam, AAdefbuff
-      else
-        return unitID, nil, allyteam, nil
-      end
+    local refID = AAdefreference[unitID]
+    --Echo(refID)
+    if refID ~= nil then
+      local AAdefbuff = AAdef[allyteam].units[refID]
+      --Echo(AAdefbuff)
+      return unitID, refID, allyteam, AAdefbuff
     else
-      return unitID, nil, nil, nil
+      return unitID, nil, allyteam, nil
     end
   end
   return nil, nil, nil, nil
@@ -1448,11 +1432,9 @@ end
 function GetAirUnit(unitID)
   if unitID ~= nil then
     local allyteam = GetUnitAllyTeam(unitID)
-    if airtargetsref[allyteam] ~= nil and airtargetsref[allyteam].units ~= nil then
-      local refID = airtargetsref[allyteam].units[unitID]
-      if refID ~= nil then
-        return airtargets[allyteam].units[refID]
-      end
+    local refID = airtargetsref[unitID]
+    if refID ~= nil then
+      return airtargets[allyteam].units[refID]
     end
   end
   return nil
