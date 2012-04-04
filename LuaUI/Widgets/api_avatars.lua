@@ -588,7 +588,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 		local remotePlayerID, msg = nil, nil
 		local msgRecvLenght = (#msgRecv or 0)
 		while msgRecvLenght >= 1 and entryEmpty do
-			remotePlayerID=msgRecv[#msgRecv].remotePlayerID
+			remotePlayerID=msgRecv[#msgRecv].playerID
 			msg=msgRecv[#msgRecv].msg
 			if (msg:sub(1,4) == msgID or msg:sub(1,4) == broadcastID) then --if message belong to hello/hi file transfer protocol
 				entryEmpty = false
