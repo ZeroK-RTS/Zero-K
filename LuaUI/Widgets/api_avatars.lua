@@ -1,4 +1,4 @@
-local versionName = "v3.2"
+local versionName = "v3.21"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -175,26 +175,25 @@ end
 
 --------------------------------------------------------------------------------
 --Avatar information------------------------------------------------------------
+local function SetAvatar(playerName, filename, checksum, avatarsTable) --//to save value into "avatarsTable[]"
+	avatarsTable[playerName] = {
+		checksum = checksum,
+		file = filename,
+	}
+	table.save(avatarsTable, configFile)
+	return avatarsTable
+end
+
+local function DeleteAvatar(playerName, avatarsTable)   --//to delete value from "avatarsTable[]"
+	avatarsTable[playerName] = nil
+	table.save(avatarsTable, configFile)
+	return avatarsTable
+end
 
 local function GetAvatar(playername) --//to be called by Chatbubble widget. Return player's avatar
 	local avInfo = avatarsTable_g[playername]
 	return (avInfo and avInfo.file) --else return nil (chatbubble can handle the nil value)
 end
-
-
-local function SetAvatar(playerName, filename, checksum)
-	avatarsTable_g[playerName] = {
-		checksum = checksum,
-		file = filename,
-	}
-	table.save(avatarsTable_g, configFile)
-end
-
-local function DeleteAvatar(playerName)
-	avatarsTable_g[playerName] = nil
-	table.save(avatarsTable_g, configFile)
-end
-
 
 local function SetMyAvatar(filename)
 --[[
@@ -217,7 +216,7 @@ local function SetMyAvatar(filename)
 	--end
 
 	local checksum = CalcChecksum(data)
-	SetAvatar(myPlayerName_g,filename,checksum)
+	avatarsTable_g = SetAvatar(myPlayerName_g,filename,checksum, avatarsTable_g)
 	Spring.SendLuaUIMsg(broadcastID) --send 'checkout my new pic!' to everyone
 	networkDelay_g.sentTimestamp = os.clock() --//for measuring actual lag
 end
@@ -423,9 +422,9 @@ local function SetAvatarGUI()
 				local customKeys = GetPlayersData(1, myPlayerID) --//equal to Spring.GetPlayerInfo(myPlayerID)
 				local myDefaultAvatar=InitializeDefaultAvatar(customKeys)
 				if image.file == myDefaultAvatar.file then
-					DeleteAvatar("useCustom") --//delete entry "useCustom" if player is using default avatar. A "nil" entry will ensure that this widget update the default avatar everytime it start (non-"nil" make it use cached value).
+					avatarsTable_g = DeleteAvatar("useCustom",avatarsTable_g) --//delete entry "useCustom" if player is using default avatar. A "nil" entry will ensure that this widget update the default avatar everytime it start (non-"nil" make it use cached value).
 				else
-					SetAvatar("useCustom", "yes", 0000) --//store a "yes" under playerName "useCustom" as a tool to indicate whether user is using custom avatar or not.
+					avatarsTable_g = SetAvatar("useCustom", "yes", 0000, avatarsTable_g ) --//store a "yes" under playerName "useCustom" as a tool to indicate whether user is using custom avatar or not.
 				end
 				chili_window:Dispose()
 				chili_window = nil
@@ -640,7 +639,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 							local file = SearchFileByChecksum(checksum)
 							if (file) then
 								--// already downloaded it, reuse it
-								SetAvatar(playerName,file,checksum)
+								avatarsTable = SetAvatar(playerName,file,checksum, avatarsTable)
 								checklistTableG[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
 							else
 								payloadRequestFlag=1
@@ -680,7 +679,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 						if (avatarInfo == nil) or (avatarInfo.checksum ~= checksum) then
 							local file = SearchFileByChecksum(checksum)
 							if (file) then --// IF already downloaded it once, reuse it
-								SetAvatar(playerName,file,checksum)
+								avatarsTable = SetAvatar(playerName,file,checksum, avatarsTable)
 								checklistTableG[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
 							else --// request a download if file didn't exist.
 								payloadRequestFlag=1
@@ -768,7 +767,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 
 							if (avatarInfo == nil) or (avatarInfo.checksum ~= checksum) then
 								local filename = SaveToFile(filename, cdata, checksum)
-								SetAvatar(playerName,filename,checksum)
+								avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
 							end
 						end
 						if (msg:sub(10,10)=="1") then --remote client's payloadRequestFlag
@@ -797,7 +796,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 
 							if (avatarInfo==nil) or (avatarInfo.checksum ~= checksum) then
 								local filename = SaveToFile(filename, cdata, checksum)
-								SetAvatar(playerName,filename,checksum)
+								avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
 							end
 						end
 
@@ -855,7 +854,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 
 							if (avatarInfo == nil) or (avatarInfo.checksum ~= checksum) then
 								local filename = SaveToFile(filename, cdata, checksum)
-								SetAvatar(playerName,filename,checksum)
+								avatarsTable = SetAvatar(playerName,filename,checksum,avatarsTable)
 							end
 						end
 						local msgType = bye
@@ -878,7 +877,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 
 							if (avatarInfo==nil) or (avatarInfo.checksum ~= checksum) then
 								local filename = SaveToFile(filename, cdata, checksum)
-								SetAvatar(playerName,filename,checksum)
+								avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
 							end
 						end
 
@@ -970,7 +969,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 							local file = SearchFileByChecksum(checksum)
 							if (file) then
 								--// already downloaded it once, reuse it
-								SetAvatar(playerName,file,checksum)
+								avatarsTable = SetAvatar(playerName,file,checksum, avatarsTable)
 								checklistTableG[(remotePlayerID+1)].downloaded=true
 							else
 								checklistTableG[(remotePlayerID+1)].retry=0 --if we have no file yet, but heard this broadcast then reset retry count to continue trying to reach this remotePlayerID
@@ -1005,7 +1004,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 
 							if (avatarInfo == nil) or (avatarInfo.checksum ~= checksum) then
 								local filename = SaveToFile(filename, cdata, checksum)
-								SetAvatar(playerName,filename,checksum)
+								avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
 							end
 						else --if mode B
 							local userID = msg:sub(13,14)
@@ -1021,7 +1020,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 
 							if (avatarInfo==nil) or (avatarInfo.checksum ~= checksum) then
 								local filename = SaveToFile(filename, cdata, checksum)
-								SetAvatar(playerName,filename,checksum)
+								avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
 							end
 						end
 						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier
@@ -1051,6 +1050,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 	---------------------------
 	msgRecv_g = msgRecv
 	fileRequestTableG_g =fileRequestTableG
+	avatarsTable_g = avatarsTable
 	
 	return waitTransmissionUntilThisTime,waitBusyUntilThisTime,checklistTableG,waitForTransmission,lineIsBusy,openPortForID,tableIsCompleted
 end
@@ -1175,6 +1175,7 @@ function UpdatePlayerList()
 	local refreshDelay = refreshDelay_g
 	local numberOfRetry = numberOfRetry_g
 	local myAllyTeamID = myAllyTeamID_g
+	local avatarsTable = avatarsTable_g
 	------------------localized global variable/constant
 	--get info on self
 	local iAmSpectator= (Spring.GetSpectatingState()) or (false) --//return true if I am spectator (Spring.GetSpectatingState() = true), or return false if I'm not spectating (Spring.GetSpectatingState() = nil).
@@ -1200,7 +1201,7 @@ function UpdatePlayerList()
 				local customKeyAvatarFile = avatarsDir .. playerCustomKeys.avatar .. ".png" --check if we have that file on disk
 				if (VFS.FileExists(customKeyAvatarFile)) then
 					local checksum = CalcChecksum(VFS.LoadFile(customKeyAvatarFile))
-					SetAvatar(playerName, customKeyAvatarFile , checksum)
+					avatarsTable = SetAvatar(playerName, customKeyAvatarFile , checksum, avatarsTable)
 					checklistTableG[(playerID+1)].downloaded=true
 				end
 			end
@@ -1227,6 +1228,7 @@ function UpdatePlayerList()
 	tableIsCompleted_g = tableIsCompleted
 	playerIDlistG_g = playerIDlistG
 	refreshDelay_g = refreshDelay
+	avatarsTable_g = avatarsTable
 end
 
 function InitializeDefaultAvatar(customKeys)
@@ -1283,7 +1285,7 @@ function widget:Initialize()
 				local customKeyAvatarFile = avatarsDir .. playerCustomKeys.avatar .. ".png" --check if we have that file on disk
 				if (VFS.FileExists(customKeyAvatarFile)) then
 					local checksum = CalcChecksum(VFS.LoadFile(customKeyAvatarFile))
-					SetAvatar(playerName, customKeyAvatarFile , checksum)
+					avatarsTable = SetAvatar(playerName, customKeyAvatarFile , checksum, avatarsTable)
 					checklistTableG[(playerID+1)].downloaded=true
 				end
 			end
@@ -1306,7 +1308,7 @@ function widget:Initialize()
 	
 	--// remove broken entries
 	for playerName,avInfo in pairs(avatarsTable) do
-		if (not VFS.FileExists(avInfo.file)) then
+		if (not VFS.FileExists(avInfo.file)) and playerName~="useCustom" then
 			avatarsTable[playerName] = nil
 		end
 	end
@@ -1323,7 +1325,9 @@ function widget:Initialize()
 			end --if we don't have the selected avatar then fallback OR server-default remain
 		end 
 	end
-	SetAvatar(myPlayerName, myAvatar.file, myAvatar.checksum) --save value into table and broadcast 'checkout my new avatar' message
+	avatarsTable = SetAvatar(myPlayerName, myAvatar.file, myAvatar.checksum, avatarsTable) --save value into table and broadcast 'checkout my new avatar' message
+	Spring.SendLuaUIMsg(broadcastID) --send 'checkout my new pic!' to everyone
+	networkDelay_g.sentTimestamp = os.clock() --//for measuring actual lag
 	
 	WG.Avatar = {
 		GetAvatar   = GetAvatar;
