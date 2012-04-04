@@ -1,4 +1,4 @@
-local versionName = "v3.19"
+local versionName = "v3.2"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -551,9 +551,14 @@ local function RetrieveTotalNetworkDelay(playerIDa, playerIDb)
 	local bTargetPingTime = GetPlayersData(3, playerIDb)
 	if playerIDa == myPlayerID then --//IF playerIDa is myPlayerID: try to actually measure the ping
 		if networkDelay_g.averageDelay > aTargetPingTime then --//if actual delay greater than reported delay (ping)
-			local delayOffset = networkDelay_g.averageDelay - aTargetPingTime --// get difference between reported and actual delay
-			aTargetPingTime = aTargetPingTime + delayOffset --//add the difference in delay to the output values
-			networkDelay_g.offset = delayOffset
+			local delayOffset = 0
+			if aTargetPingTime == 0 then   --//if my delay is "0"
+				aTargetPingTime = 1 --//arbitrarily assume 1 second delay
+			else 
+				delayOffset = networkDelay_g.averageDelay - aTargetPingTime --// get difference between reported and actual delay
+				aTargetPingTime = aTargetPingTime + delayOffset --//add the difference in delay to the output values
+				networkDelay_g.offset = delayOffset
+			end
 			if bTargetPingTime == 0 then --//if remote computer's delay is "0"
 				bTargetPingTime = 1 --//arbitrarily assume 1 second delay
 			else
