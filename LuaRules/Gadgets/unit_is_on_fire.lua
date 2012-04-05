@@ -39,6 +39,7 @@ Spring.SetGameRulesParam("unitsOnFire",1)
 local DEFAULT_BURN_TIME = 450
 local DEFAULT_BURN_TIME_RANDOMNESS = 0.3
 local DEFAULT_BURN_DAMAGE = 0.5
+local MIN_IMMERSION_FOR_EXTINGUISH = 0.8
 
 local CHECK_INTERVAL = 6
 
@@ -85,14 +86,34 @@ for i=1,#WeaponDefs do
 end
 
 local unitsOnFire = {}
+local inWater = {}
 local inGameFrame = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local function CheckImmersion(unitID)
+    local pos = select(2, Spring.GetUnitBasePosition(unitID))
+    local height = Spring.GetUnitHeight(unitID)
+    if pos < -(height * MIN_IMMERSION_FOR_EXTINGUISH) then
+	return true
+    end
+    return false
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function gadget:UnitEnteredWater(unitID, unitDefID, unitTeam)
+        inWater[unitID] = true
+end
+
+function gadget:UnitLeftWater(unitID, unitDefID, unitTeam)
+        inWater[unitID] = nil
+end
+
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
                             attackerID, attackerDefID, attackerTeam)
-  if (inGameFrame) then return end  --ignore own AddUnitDamage calls
+	if (inGameFrame) then return end  --ignore own AddUnitDamage calls
   
 	if (flamerWeaponDefs[weaponID]) then
 		local fwd = flamerWeaponDefs[weaponID]
@@ -117,6 +138,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 end
 
 function gadget:UnitDestroyed(unitID)
+	inWater[unitID] = nil
 	if (unitsOnFire[unitID]) then
 		unitsOnFire[unitID] = nil
 	end
@@ -129,7 +151,7 @@ function gadget:GameFrame(n)
 		local cnt = 1
     inGameFrame = true
 		for unitID, t in pairs(unitsOnFire) do
-			if (n > t.endFrame) then
+			if (n > t.endFrame) or (inWater[unitID] and CheckImmersion(unitID)) then
 				SetUnitRulesParam(unitID, "on_fire", 0)
 				SetUnitCloak(unitID, false, false)
 				unitsOnFire[unitID] = nil
