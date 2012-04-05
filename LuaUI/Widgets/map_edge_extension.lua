@@ -25,7 +25,6 @@ local spGetGroundHeight = Spring.GetGroundHeight
 local gridTex = "LuaUI/Images/vr_grid_large.dds"
 --local gridTex = "bitmaps/PD/shield3hex.png"
 local realTex = '$grass'
-local tex = realTex
 
 local dList
 local mirrorShader
@@ -80,8 +79,6 @@ options = {
 		desc = 'Use a realistic texture instead of a VR grid',
 		OnChange = function(self)
 			gl.DeleteList(dList)
-			if self.value then tex = realTex
-			else tex = gridTex end
 			widget:Initialize()
 		end, 		
 	},		
@@ -227,7 +224,8 @@ end
 local function DrawOMap(useMirrorShader)
 	gl.Blending(GL.SRC_ALPHA,GL.ONE_MINUS_SRC_ALPHA)
 	gl.DepthTest(GL.LEQUAL)
-	gl.Texture(tex)
+        if options.useRealTex.value then gl.Texture(realTex)
+	else gl.Texture(gridTex) end
 	gl.BeginEnd(GL.TRIANGLE_STRIP,DrawMapVertices, useMirrorShader)
 	gl.DepthTest(false)
 	gl.Color(1,1,1,1)
@@ -278,7 +276,8 @@ function widget:DrawWorldPreUnit() --is overwritten when not using the shader
         gl.UseShader(mirrorShader)
         gl.PushMatrix()
         gl.DepthMask(true)
-        gl.Texture(tex)
+        if options.useRealTex.value then gl.Texture(realTex)
+	else gl.Texture(gridTex) end
         if wiremap then
             gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
         end
