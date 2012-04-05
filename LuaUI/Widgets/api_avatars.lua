@@ -1036,13 +1036,14 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 					networkDelay_g = RecordActualNetworkDelay (networkDelay_g)
 				end
 			end
-		elseif (msg:sub(1,4) == broadcastID) then --if message is a 'look at my new pic!'.
-			checklistTableG[(remotePlayerID+1)].downloaded=false --reset checklist entry for this player
-			--checklistTableG[(remotePlayerID+1)].accept=true
-			checklistTableG[(remotePlayerID+1)].retry=0 --reset retry
-			tableIsCompleted=false --redo checklist check
-			if myPlayerID == remotePlayerID then --//if broadcast is an echo of myself: record delay
-				networkDelay_g = RecordActualNetworkDelay (networkDelay_g)
+			if (msg:sub(1,4) == broadcastID) then --if message is a 'look at my new pic!'.
+				checklistTableG[(remotePlayerID+1)].downloaded=false --reset checklist entry for this player
+				--checklistTableG[(remotePlayerID+1)].accept=true
+				checklistTableG[(remotePlayerID+1)].retry=0 --reset retry
+				tableIsCompleted=false --redo checklist check
+				if myPlayerID == remotePlayerID then --//if broadcast is an echo of myself: record delay
+					networkDelay_g = RecordActualNetworkDelay (networkDelay_g)
+				end
 			end
 		end
 	end
@@ -1144,10 +1145,9 @@ end
 function widget:RecvLuaMsg(msg, playerID) --each update will put message into "msgRecv_g"
 	if msg:sub(1,1)== wdgtID then
 		msgRecv_g[(#msgRecv_g or 0) +1]={msg=msg, playerID=playerID}
-		--[[
-		Spring.Echo("----")
-		Spring.Echo(msg:sub(6,6)) --//echo out the message type (for debugging)
-		Spring.Echo(playerID)
+		----[[
+		Spring.Echo(msg:sub(6,6) .. "<--msgType") --//echo out the message type (for debugging)
+		Spring.Echo(playerID .. "<--playerID")
 		--]]
 	end
 end
