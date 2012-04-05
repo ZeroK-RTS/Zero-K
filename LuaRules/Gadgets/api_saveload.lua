@@ -38,6 +38,7 @@ local generalFile = "general.lua"
 local unitFile = "units.lua"
 local featureFile = "features.lua"
 
+local AUTOSAVE_FREQUENCY = 30*60*5	-- 5 minutes
 local FEATURE_ID_CONSTANT = 32000	-- when featureID is x, param of command issued on feature is x + this
 
 GG.SaveLoad = GG.SaveLoad or {}
@@ -530,7 +531,7 @@ function gadget:Initialize()
 end
 
 function gadget:GameFrame(n)
-	if n % autosave_frequency < 0.1 then
+	if n % AUTOSAVE_FREQUENCY == 0 then
 		--Spring.SendCommands("save -y autosave")
 	end
 end

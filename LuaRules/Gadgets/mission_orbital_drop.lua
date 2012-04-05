@@ -60,12 +60,10 @@ function gadget:GameFrame(frame)
       local x, y, z = Spring.GetUnitBasePosition(unitID)
       local h = Spring.GetGroundHeight(x, z)
       local _, dy = Spring.GetUnitVelocity(unitID)
-	  -- FIXME: dy is always zero in 84.0+
-	  if frame%15 == 0 then
-		--Spring.Echo(y, dy)
-	  end
+      
+      -- FIXME: dy is always zero in 84.0+
       if y <= h or y > yLast then 
-        -- unit has landed (or is moving up, which means it has missed the ground)
+        -- unit has landed (or is moving upwards, which means it has missed the ground)
         Spring.MoveCtrl.SetPosition(unitID, x, h, z)
         Spring.MoveCtrl.SetVelocity(unitID, 0, 0, 0)
         Spring.MoveCtrl.Disable(unitID)
