@@ -129,8 +129,6 @@ local callInLists = {
   'UnitCloaked',
   'UnitDecloaked',
   'StockpileChanged',
-  
-  'UnitCommand',	--FIXME: not in base
 
   -- Feature CallIns
   'FeatureCreated',
@@ -202,6 +200,13 @@ local callInLists = {
   -- Save/Load
   'Save',
   'Load',
+  
+  -- FIXME: NOT IN BASE
+  'UnitCommand',
+  'UnitEnteredWater',
+  'UnitEnteredAir',
+  'UnitLeftWater',
+  'UnitLeftAir',
 }
 
 
@@ -1989,14 +1994,43 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- NOT IN BASE VERSION
+-- FIXME: NOT IN BASE VERSION
 --
-
-callInLists[#callInLists + 1] = "UnitCommand"
 
 function gadgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) 
   for _,g in ipairs(self.UnitCommandList) do
     g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) 
+  end
+  return
+end
+
+function gadgetHandler:UnitEnteredWater(unitID, unitDefID, unitTeam)
+  for _,g in ipairs(self.UnitEnteredWaterList) do
+    g:UnitEnteredWater(unitID, unitDefID, unitTeam)
+  end
+  return
+end
+
+
+function gadgetHandler:UnitEnteredAir(unitID, unitDefID, unitTeam)
+  for _,g in ipairs(self.UnitEnteredAirList) do
+    g:UnitEnteredAir(unitID, unitDefID, unitTeam)
+  end
+  return
+end
+
+
+function gadgetHandler:UnitLeftWater(unitID, unitDefID, unitTeam)
+  for _,g in ipairs(self.UnitLeftWaterList) do
+    g:UnitLeftWater(unitID, unitDefID, unitTeam)
+  end
+  return
+end
+
+
+function gadgetHandler:UnitLeftAir(unitID, unitDefID, unitTeam)
+  for _,g in ipairs(self.UnitLeftAirList) do
+    g:UnitLeftAir(unitID, unitDefID, unitTeam)
   end
   return
 end
