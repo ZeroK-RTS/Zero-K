@@ -12,13 +12,14 @@ function widget:GetInfo()
     layer     = 0,
     api       = true,
     enabled   = true
+	alwaysStart = true,
   }
 end
 
 --------------------------------------------------------------------------------
 --Global Variables--------------------------------------------------------------
 
-local enableEcho_debug = true
+local enableEcho_debug = false
 local resetDownloadedRetryFlag_debug = false
 
 local avatarsTable_g = {}
@@ -1343,3 +1344,4 @@ end
 --gui_ally_cursors.lua , author: jK
 --gui_chili_crudeplayerlist.lua, author: CarRepairer, +KingRaptor
 --cawidgets.lua, author: Dave Rodgers, +jk, quantum, KingRaptor
+--thx to jseah for idea of using echo on commit version (for debugging).
