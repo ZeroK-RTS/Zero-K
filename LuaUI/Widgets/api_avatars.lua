@@ -1,4 +1,4 @@
-local versionName = "v3.24"
+local versionName = "v3.26"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     api       = true,
-    enabled   = true
+    enabled   = true,
 	alwaysStart = true,
   }
 end
@@ -129,23 +129,6 @@ local function CalcChecksum(data)
 	return checksum
 end
 
-
-local function SaveToFile(filename, data, checksum)
-	local file="none"
-	if(data:len()/1024 >= maxFileSize) then --//enable neat/original filename only for operational mode "A" where file size can be greater than 10Kb
-		file = avatarsDir .. filename --original filename only (look neat and filename consistent with web based avatar, but risk overwrite similar named file)
-	else --//add checksum to filename to prevent name duplication
-		file = avatarsDir .. checksum .. '_' .. filename --filename + checksum as name (very safe but messy filename)
-	end
-	Spring.CreateDir(avatarsDir)
-	local out = assert(io.open(file, "wb"))
-	out:write(data)
-	assert(out:close())
-	Spring.Echo(file) --echo out saved file
-	
-	return file
-end
-
 local function SearchFileByChecksum(checksum)
 	local files = VFS.DirList(avatarsDir)
 	for i=1,#files do
@@ -156,6 +139,30 @@ local function SearchFileByChecksum(checksum)
 			return file --return file, or if not found: return nil
 		end
 	end
+end
+
+
+local function SaveToFile(filename, data, checksum)
+	local duplicateFilePath = SearchFileByChecksum(checksum)
+	local filepath="none"
+	if (duplicateFilePath) then --//use existing filename & filepath if a duplicate file is found. This prevent widget from saving multiple duplicate under different name.
+		filepath = duplicateFilePath
+	else --//save file and extract filepath when no duplicate if found
+	
+		if(data:len()/1024 >= maxFileSize) then --//enable neat/original filename only for operational mode "A" where file size can be greater than 10Kb
+			filepath = avatarsDir .. filename --original filename only (look neat and filename consistent with web based avatar, but risk overwrite similar named file)
+		else --//add checksum to filename to prevent name duplication
+			filepath = avatarsDir .. checksum .. '_' .. filename --filename + checksum as name (very safe but messy filename)
+		end
+		Spring.CreateDir(avatarsDir)
+		local out = assert(io.open(filepath, "wb"))
+		out:write(data)
+		assert(out:close())
+		
+	end
+	Spring.Echo(filepath) --echo out saved file
+	
+	return filepath
 end
 
 local function ExtractFileName(filepath)
@@ -765,8 +772,8 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 							checklistTable[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
 
 							local playerName = GetPlayersData(2, remotePlayerID)
-							local filename = SaveToFile(filename, cdata, checksum)
-							avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
+							local filepath = SaveToFile(filename, cdata, checksum)
+							avatarsTable = SetAvatar(playerName,filepath,checksum, avatarsTable)
 						end
 						if (msg:sub(10,10)=="1") then --remote client's payloadRequestFlag
 							local cdata = VFS.LoadFile(myAvatar.file)
@@ -790,8 +797,8 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 							checklistTable[(userID+1)].downloaded=true --tick 'done' on file downloaded
 
 							local playerName = GetPlayersData(2, userID)
-							local filename = SaveToFile(filename, cdata, checksum)
-							avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
+							local filepath = SaveToFile(filename, cdata, checksum)
+							avatarsTable = SetAvatar(playerName,filepath,checksum, avatarsTable)
 						end
 
 						local willSendFile = 0 --to flag remote computer to wait for file sending						
@@ -844,8 +851,8 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 							checklistTable[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
 
 							local playerName = GetPlayersData(2, remotePlayerID)
-							local filename = SaveToFile(filename, cdata, checksum)
-							avatarsTable = SetAvatar(playerName,filename,checksum,avatarsTable)
+							local filepath = SaveToFile(filename, cdata, checksum)
+							avatarsTable = SetAvatar(playerName,filepath,checksum,avatarsTable)
 						end
 						local msgType = bye
 						Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100)
@@ -864,8 +871,8 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 							checklistTable[(userID+1)].downloaded=true --tick 'done' on file downloaded
 
 							local playerName = GetPlayersData(2, userID)
-							local filename = SaveToFile(filename, cdata, checksum)
-							avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
+							local filepath = SaveToFile(filename, cdata, checksum)
+							avatarsTable = SetAvatar(playerName,filepath,checksum, avatarsTable)
 						end
 
 						local willSendFile = 0 --to flag remote computer to wait for file sending						
@@ -929,7 +936,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 						Spring.SendLuaUIMsg(msgID .. operationMode .. msgType .. openPortForID+100)
 					end 
 				end
-			elseif myPlayerID~=destinationID then --if message is noise (not targetted to me)
+			elseif (myPlayerID~=destinationID) and (myPlayerID~=remotePlayerID) then --if message is noise (not targetted to me) and message not from me
 				if msg:sub(6,6)==yes then --heard "yes" from someone to someone else
 					if myPlayerID>remotePlayerID then --if they are the 'higher ranking' PlayerID: close your own connection for them
 						lineIsBusy=true --assume they took command of the communication medium, close all protocol/cancel ongoing protocol. lineBusy always triggered by high ranking noise
@@ -989,8 +996,8 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 							checklistTable[(remotePlayerID+1)].downloaded=true --tick 'done' on file downloaded
 
 							local playerName = GetPlayersData(2, remotePlayerID)
-							local filename = SaveToFile(filename, cdata, checksum)
-							avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
+							local filepath = SaveToFile(filename, cdata, checksum)
+							avatarsTable = SetAvatar(playerName,filepath,checksum, avatarsTable)
 						else --if mode B
 							local userID = msg:sub(13,14)
 							local payloadMsg = msg:sub(15)
@@ -1001,8 +1008,8 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 							checklistTable[(userID+1)].downloaded=true --tick 'done' on file downloaded
 
 							local playerName = GetPlayersData(2, userID)
-							local filename = SaveToFile(filename, cdata, checksum)
-							avatarsTable = SetAvatar(playerName,filename,checksum, avatarsTable)
+							local filepath = SaveToFile(filename, cdata, checksum)
+							avatarsTable = SetAvatar(playerName,filepath,checksum, avatarsTable)
 						end
 						local totalNetworkDelay= RetrieveTotalNetworkDelay(myPlayerID, destinationID) --delay between us (listener) and the replier
 						waitBusyUntilThisTime=currentTime + (totalNetworkDelay)*networkDelayMultiplier --//suspend communication protocol until next payload is sent either by sender/receiver.
@@ -1012,7 +1019,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 					lineIsBusy=false
 					waitForTransmission=false
 				end
-			elseif myPlayerID == remotePlayerID then --//if message is an echo of myself: record delay
+			elseif myPlayerID == remotePlayerID then --//if message is from me (an echo of myself), then record delay
 				if msg:sub(6,6)==hi then --//listen hi from self
 					networkDelay_g = RecordActualNetworkDelay (networkDelay_g)
 				end
@@ -1207,7 +1214,8 @@ function UpdatePlayerList(tableIsCompleted, operatingModeThis, checklistTable, p
 			-- checklistTable[(playerID+1)].retry=0
 		-- end
 	end
-	refreshDelay = (4*numberOfRetry*networkDelayMultiplier)*playerCount --// set a 4 second delay (max) for each retry, times the number of players. This determine the "refresh delay" (amount of second before the ignore list being resetted)
+	local derivedRefreshDelay = (4*numberOfRetry*networkDelayMultiplier)*playerCount
+	refreshDelay = math.max(derivedRefreshDelay, 4) --// set a 4 second delay (max) for each retry, times the number of players, OR set to a minimum of 4 second (in case at gamestart it return 0 delay). This determine the "refresh delay" (amount of second before the ignore list being resetted)
 	tableIsCompleted=false --unlock checklist for another check
 	--if enableEcho_debug then Spring.Echo(iAmSpectator) Spring.Echo("^iAmSpectator, updatePlayerList()") end
 	--if enableEcho_debug then Spring.Echo(playerCount) Spring.Echo("^playerCount, updatePlayerList()") end
@@ -1290,7 +1298,8 @@ function widget:Initialize()
 			end
 		end
 	end
-	refreshDelay = (4*numberOfRetry*networkDelayMultiplier)*playerCount --// set a 4 second delay (max back & forth delay) for each retry, times the number of players. This determine the "refresh delay" (amount of second before the ignore list being resetted)
+	local derivedRefreshDelay = (4*numberOfRetry*networkDelayMultiplier)*playerCount
+	refreshDelay = math.max(derivedRefreshDelay, 4) --// set a 4 second delay (max) for each retry, times the number of players, OR set to a minimum of 4 second (in case at gamestart it return 0 delay). This determine the "refresh delay" (amount of second before the ignore list being resetted)
 	
 	--// remove broken entries
 	for playerName,avInfo in pairs(avatarsTable) do
