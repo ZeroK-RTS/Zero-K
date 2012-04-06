@@ -43,15 +43,10 @@ for unitDefID=1,#UnitDefs do
 	end
 end
 
-local function speedToDamage(unitID, unitDefID, damageSpeedOverride)
+local function speedToDamage(unitID, unitDefID, speed)
 	local armor = select(2,Spring.GetUnitArmored(unitID)) or 1
 	local att = attributes[unitDefID]
-	local ud = UnitDefs[unitDefID]
-	local vx,vy,vz = Spring.GetUnitVelocity(unitID)
 	local x,y,z = Spring.GetUnitPosition(unitID)
-	--local normal = Spring.GetGroundNormal(x,z)
-	local speed = damageSpeedOverride or math.sqrt(vx^2 + vy^2 + vz^2)
-
 	local outsideDamage = 0
 	if x < 0 or z < 0 or x > MAP_X or z > MAP_Z then
 		outsideDamage = math.max(-x,-z,x-MAP_X,z-MAP_Z)*att.outOfMapDamagePerElmo
@@ -61,9 +56,6 @@ local function speedToDamage(unitID, unitDefID, damageSpeedOverride)
 	if speed > att.velocityDamageThreshold then
 		fallDamage = (speed-att.velocityDamageThreshold)*att.velocityDamageScale
 	end
-	
-	local elasticity = att.elasticity
-	Spring.SetUnitVelocity(unitID,vx*elasticity,vy*elasticity,vz*elasticity)
 	
 	return fallDamage*armor + outsideDamage
 end
@@ -109,7 +101,18 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	
 	-- ground collision
 	if weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
-		return speedToDamage(unitID, unitDefID)
+
+		local att = attributes[unitDefID]
+		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
+		local x,y,z = Spring.GetUnitPosition(unitID)
+		local nx, nz = Spring.GetGroundNormal(x,z)
+		Spring.Echo(nx .. "  " .. nz)
+		Spring.Echo(math.sqrt(nx^2 + nz^2))
+		local speed = damageSpeedOverride or math.sqrt(vx^2 + vy^2 + vz^2)
+		local elasticity = att.elasticity
+		Spring.SetUnitVelocity(unitID,vx*elasticity,vy*elasticity,vz*elasticity)
+	
+		return speedToDamage(unitID, unitDefID, speed)
 	end
 	return damage
 end
