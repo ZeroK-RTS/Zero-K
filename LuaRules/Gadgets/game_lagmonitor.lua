@@ -28,6 +28,20 @@ local lineage = {}
 local afkTeams = {}
 local unitAlreadyFinished = {}
 
+GG.Lagmonitor_activeTeams = {}
+
+local allyTeamList = Spring.GetAllyTeamList()
+for i=1,#allyTeamList do
+	local allyTeamID = allyTeamList[i]
+	local teamList = Spring.GetTeamList(allyTeamID)
+	GG.Lagmonitor_activeTeams[allyTeamID] = {count = #teamList}
+	for j=1,#teamList do
+		local teamID = teamList[j]
+		GG.Lagmonitor_activeTeams[allyTeamID][teamID] = true
+	end
+end
+	
+
 local LAG_THRESHOLD = 25000
 local AFK_THRESHOLD = 30
 --------------------------------------------------------------------------------
@@ -110,9 +124,6 @@ local function GetRecepient(allyTeam, laggers)
 	return target
 end
 
-
-
-
 function gadget:GameFrame(n)
 	if n%UPDATE_PERIOD == 0 then
 		local laggers = {}
@@ -138,6 +149,8 @@ function gadget:GameFrame(n)
 						end
 						GG.allowTransfer = false
 						afkTeams[team] = nil
+						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count + 1
+						GG.Lagmonitor_activeTeams[allyTeam][team] = true
 					end 
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then
@@ -170,6 +183,8 @@ function gadget:GameFrame(n)
 			-- okay, we have someone to give to, prep transfer
 				if recepientByAllyTeam[allyTeam] then
 					afkTeams[team] = true
+					GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1
+					GG.Lagmonitor_activeTeams[allyTeam][team] = false
 					local units = data.units or {}
 					if #units > 0 then
 						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")

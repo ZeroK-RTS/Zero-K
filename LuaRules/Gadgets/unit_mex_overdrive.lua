@@ -958,13 +958,16 @@ function gadget:GameFrame(n)
 				end
 			end
 			--// Share Overdrive Metal
-			if GG.Lagmonitor_activeTeams and GG.Lagmonitor_activeTeams(allyTeamID) then
-				local activeTeams = GG.Lagmonitor_activeTeams(allyTeamID)
-				for i = 1, activeTeams.count do 
-					local teamID = activeTeams.data[i]
-					local te = teamEnergy[teamID]
-					Spring.AddTeamResource(teamID, "m", summedMetalProduction / activeTeams.count)
-					SendToUnsynced("MexEnergyEvent", teamID, activeTeams.count, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
+			if GG.Lagmonitor_activeTeams then
+				local activeTeams = GG.Lagmonitor_activeTeams[allyTeamID]
+				local activeCount = (activeTeams.count >= 1 and activeTeams.count) or 1
+				for i = 1, allyTeamData.teams do 
+					local teamID = allyTeamData.team[i]
+					if activeTeams[teamID] then
+						local te = teamEnergy[teamID]
+						Spring.AddTeamResource(teamID, "m", summedMetalProduction / activeCount)
+						SendToUnsynced("MexEnergyEvent", teamID, activeCountt, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
+					end
 				end 
 			else
 				for i = 1, allyTeamData.teams do 
