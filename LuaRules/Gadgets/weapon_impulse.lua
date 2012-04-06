@@ -107,7 +107,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		elseif moveTypeByID[unitDefID] == 1 then
 			x,y,z = (ux-ax)*mag, (uy-ay)*mag * GUNSHIP_VERTICAL_MULT, (uz-az)*mag
 		elseif moveTypeByID[unitDefID] == 2 then
-			x,y,z = (ux-ax)*mag, (uy-ay)*mag+impulseWeaponID[weaponDefID].impulse/(3.5*mass[unitDefID]), (uz-az)*mag
+			x,y,z = (ux-ax)*mag, (uy-ay)*mag+impulseWeaponID[weaponDefID].impulse/(8*mass[unitDefID]), (uz-az)*mag
 		end
 		
 		if not unit[unitID] then
