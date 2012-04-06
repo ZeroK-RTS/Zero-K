@@ -150,8 +150,8 @@ function beginJump()
         Turn(lleg, x_axis, -2*LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
         Turn(rleg, x_axis, -2*LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
         
-        Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_RELEASE_SPEED)
-        Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_RELEASE_SPEED)
+        --Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_RELEASE_SPEED)
+        --Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_RELEASE_SPEED)
         Turn(llarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_RELEASE_SPEED)
         Turn(rlarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_RELEASE_SPEED)
         bSomersault = true
@@ -181,12 +181,19 @@ local function Somersault()
                 Turn(pelvis, x_axis, math.rad(-22), math.rad(40))
         else
         end
-        Sleep(800)
+        
+        Sleep(600)
+        Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED)
+        Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED)
+        Turn(llarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED)
+        Turn(rlarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED)             
+        Sleep(200)
 
-        Turn(lthigh, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(rthigh, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(lleg, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(rleg, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)        
+        Turn(lthigh, x_axis, LEG_JUMP_COIL_ANGLE*1.5, LEG_JUMP_COIL_SPEED)
+        Turn(rthigh, x_axis, LEG_JUMP_COIL_ANGLE*1.5, LEG_JUMP_COIL_SPEED)
+        Turn(lleg, x_axis, LEG_JUMP_COIL_ANGLE*1.5, LEG_JUMP_COIL_SPEED)
+        Turn(rleg, x_axis, LEG_JUMP_COIL_ANGLE*1.5, LEG_JUMP_COIL_SPEED)
+        
         if jumpDir == 1 then
                 Turn(pelvis, x_axis, math.rad(200), math.rad(240))
         elseif jumpDir == 2 then
@@ -196,10 +203,11 @@ local function Somersault()
         end
         WaitForTurn(pelvis, x_axis)
         Turn(pelvis, x_axis, 0, math.rad(240))
-        Turn(lthigh, x_axis, LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(rthigh, x_axis, LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(lleg, x_axis, -2*LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(rleg, x_axis, -2*LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_COIL_SPEED)
+        
+        Turn(lthigh, x_axis, 2*LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
+        Turn(rthigh, x_axis, -LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_COIL_SPEED)
+        Turn(lleg, x_axis, -LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
+        Turn(rleg, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
 end
 
 -- needed because the gadgets throw tantrums if you start a thread in the above functions
