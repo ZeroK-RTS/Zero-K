@@ -536,90 +536,84 @@ end
 
 function BestTarget(targets, count, damage, current, skip, cost)
   local onehit = false
-  local best = 0
+  local best = 0  -- best denotes the array index in targets of the best target; 0 = no target assigned
   local bestcost = 0
   local besthp = 0
   local incoming
   local hp
   local airbuff
+  local stillskipping = true
   --local hpafter
-  for i = 1, count do
-    if targets[i] ~= nil then
-    if not UnitIsDead(targets[i]) then
-      airbuff = GetAirUnit(targets[i])
-      if airbuff ~= nil then
-        incoming = airbuff.incoming + airbuff.tincoming
-        hp = airbuff.hp
-        if airbuff.id == current then
-          incoming = incoming - damage
-        end
-        --Echo("skipping " .. skip, "considering target, id: " .. targets[i] .. ", name: " .. airbuff.name .. ", cost: " .. cost[i] ..  ", hp: " .. hp .. ", incoming: " .. incoming)
-        if hp <= incoming + damage then
-          --Echo("one-hittable", onehit)
-          if not onehit then
-            if hp - incoming >= 0 then
-              --hpafter = hp - incoming
-              if skip == 0 then
+  while stillskipping do
+    stillskipping = false
+    for i = 1, count do
+      if targets[i] ~= nil then
+      if not UnitIsDead(targets[i]) then
+        airbuff = GetAirUnit(targets[i])
+        if airbuff ~= nil then
+          incoming = airbuff.incoming + airbuff.tincoming
+          hp = airbuff.hp
+          if airbuff.id == current then
+            incoming = incoming - damage
+          end
+          --Echo("skipping " .. skip, "considering target, id: " .. targets[i] .. ", name: " .. airbuff.name .. ", cost: " .. cost[i] ..  ", hp: " .. hp .. ", incoming: " .. incoming)
+          if hp <= incoming + damage then
+            --Echo("one-hittable", onehit)
+            if not onehit then
+              if hp - incoming >= 0 then
+                --hpafter = hp - incoming
                 best = i
                 bestcost = cost[i]
                 besthp = hp - incoming - damage
                 onehit = true
                 --Echo("new one-hit")
-              else
-                skip = skip - 1
               end
-            end
-          else
-            if hp - incoming >= 0 and bestcost < cost[i] then
-              --hpafter = hp - incoming
-              if skip == 0 then
+            else
+              if hp - incoming >= 0 and bestcost < cost[i] then
+                --hpafter = hp - incoming
                 best = i
                 bestcost = cost[i]
                 besthp = hp - incoming - damage
                 --Echo("best onehit by new highest cost class")
-              else
-                skip = skip - 1
-              end
-            elseif hp - incoming >= 0 and hp - incoming - damage > besthp and bestcost == cost[i] then
-              --hpafter = hp - incoming
-              if skip == 0 then
+              elseif hp - incoming >= 0 and hp - incoming - damage > besthp and bestcost == cost[i] then
+                --hpafter = hp - incoming
                 best = i
                 bestcost = cost[i]
                 besthp = hp - incoming - damage
                 --Echo("best onehit by hp, cost tie")
-              else
-                skip = skip - 1
               end
             end
-          end
-        elseif onehit == false then
-          if best ~= 0 then
-            if hp - incoming >= 0 and hp - incoming < besthp then
-              --hpafter = hp - incoming
-              if skip == 0 then
+          elseif onehit == false then
+            if best ~= 0 then
+              if hp - incoming >= 0 and hp - incoming < besthp then
+                --hpafter = hp - incoming
                 best = i
                 besthp = hp - incoming
                 --Echo("best by lowest hp")
-              else
-                skip = skip - 1
               end
-            end
-          else
-            if hp - incoming >= 0 then
-              --hpafter = hp - incoming
-              if skip == 0 then
+            else
+              if hp - incoming >= 0 then
+                --hpafter = hp - incoming
                 best = i
                 besthp = hp - incoming
                 --Echo("first target")
-              else
-                skip = skip - 1
               end
             end
           end
         end
       end
+      end
     end
-    end
+    if skip > 0 then
+	  skip = skip - 1
+	  if best ~= 0 then
+	    targets[best] = nil
+	    best = 0
+	    bestcost = 0
+	    besthp = 0
+	    stillskipping = true
+	  end
+	end
   end
   if best ~= 0 then
     --Echo(best, besthp)
@@ -631,7 +625,7 @@ function BestTarget(targets, count, damage, current, skip, cost)
 end
 
 function DPSBestTarget(targets, count)
-  local best = nil
+  local best = nil  -- best denotes the array index in targets of the best target; nil = no target assigned
   local besthp = -1000
   local alldying = true
   for i = 1, count do
@@ -1660,3 +1654,13 @@ function gadget:Initialize()
     gadget:UnitCreated(unitID, unitDefID)
   end
 end
+
+--[[ --Allow Weapon Target is called once per enemy in range of each thing, roughly every 16 frames; gets called for enemies behind obstacles; aka, useless
+function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
+  local unitDefID = GetUnitDefID(attackerID)
+  local ud = UnitDefs[unitDefID]
+  if IsAA(ud.name) then
+    Echo("allow weapon target, attacker", attackerID, "target", targetID, "weapondefID", attackerWeaponDefID)
+  end
+  return true, 1
+end]]--
