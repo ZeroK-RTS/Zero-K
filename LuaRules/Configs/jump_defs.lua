@@ -51,6 +51,7 @@ jumpClassGroups = {
 	"armaak",
 	"corclog",
 	"corsumo",
+	"cadenza",
 	"factoryjump",
 	-- "pizzathehut",--bad unit left for testing purposes
 	},
@@ -93,6 +94,9 @@ overCategory = {
 	
  corsumo = {
     delay = 30, height = 100, range = 300, reload = 13, cobscript = false, rotateMidAir = false},	
+
+ cadenza = {
+    delay = 30, reload = 20, cobscript = false, rotateMidAir = false},
 
 -- corpyro = {
 	-- range = 400, height = 200, speed = 6,  reload = 10, },	
