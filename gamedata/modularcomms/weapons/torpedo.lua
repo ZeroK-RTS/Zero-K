@@ -10,11 +10,11 @@ local weaponDef = {
 	craterBoost             = 0,
 	craterMult              = 0,
 
-    customParams            = {
+	customParams            = {
 		badTargetCategory  = [[FIXEDWING]],
 		onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK FLOAT SHIP GUNSHIP]],
-		slot = [[3]],
-    },	
+		slot = [[5]],
+	},	
 	
 	damage                  = {
 		default = 180,
