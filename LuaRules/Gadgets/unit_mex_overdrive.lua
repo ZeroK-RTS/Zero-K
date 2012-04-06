@@ -966,7 +966,7 @@ function gadget:GameFrame(n)
 					if activeTeams[teamID] then
 						local te = teamEnergy[teamID]
 						Spring.AddTeamResource(teamID, "m", summedMetalProduction / activeCount)
-						SendToUnsynced("MexEnergyEvent", teamID, activeCountt, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
+						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
 					end
 				end 
 			else
