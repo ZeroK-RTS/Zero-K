@@ -14,7 +14,7 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   canstop             = [[1]],
-  category            = [[LAND UNARMED]],
+  category            = [[LAND]],
   corpse              = [[DEAD]],
 
   customParams        = {

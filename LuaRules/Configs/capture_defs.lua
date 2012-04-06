@@ -12,11 +12,9 @@ local weapons = {
 -- all units with capture weapons must have a unit entry
 local units = {
 	capturecar = { 
-		unitLimit = false,
 		postCaptureReload = 240, 
 	},
 }
--- unitLimit			- the max number of units it can control. False for infinite
 -- postCaptureReload 	- reload time after capturing
 
 for i=1,#WeaponDefs do

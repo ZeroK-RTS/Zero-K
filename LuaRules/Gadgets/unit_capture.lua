@@ -41,124 +41,145 @@ if gadgetHandler:IsSyncedCode() then
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spAreTeamsAllied		= Spring.AreTeamsAllied
 local spSetUnitHealth		= Spring.SetUnitHealth
+local spGetUnitIsDead       = Spring.GetUnitIsDead
+local spValidUnitID         = Spring.ValidUnitID
+local spGetUnitTeam         = Spring.GetUnitTeam
+local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
+local spTransferUnit        = Spring.TransferUnit
+local spGiveOrderToUnit     = Spring.GiveOrderToUnit
+local spGetTeamInfo         = Spring.GetTeamInfo
+local spGetUnitHealth       = Spring.GetUnitHealth
+local spGetGameFrame        = Spring.GetGameFrame
+local spSetUnitRulesParam   = Spring.SetUnitRulesParam
+local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
+local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
+local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 local captureWeaponDefs, captureUnitDefs = include("LuaRules/Configs/capture_defs.lua")
 
+local damageByID = {data = {}, count = 0}
+local unitDamage = {}
+
 local capturedUnits = {}
-local controllers = {}
+
+local controllerByID = {data = {}, count = 0}
+local controllers = {} 
+
+local drawingByID = {data = {}, count = 0}
+local drawing = {} 
+
 local reloading = {}
 
--- updates capture bar for controllers
-local function updateControllerBar(unitID)
-	if controllers[unitID].unitMax then
-		if controllers[unitID].unitMax == controllers[unitID].unitCount then
-			Spring.SetUnitRulesParam(unitID,"cantfire",1, {inlos = true})
+local function checkThingsDoubleTable(things, thingByID)
+	
+	local covered = {}
+	
+	for i = 1, thingByID.count do
+		local id = thingByID.data[i]
+		if things[id].index == i then
+			covered[id] = true
 		else
-			Spring.SetUnitRulesParam(unitID,"cantfire",0, {inlos = true})
+			Spring.Echo("Thing with incorrect index")
+			local bla = bla + 1
+		end
+	end
+	
+	for id,data in pairs(things) do
+		if not covered[id] then
+			Spring.Echo("Thing not covered")
+			local bla = bla + 1
 		end
 	end
 end
 
--- remove all capture damage from a unit, does not transfere unit
-local function removeCapturedUnit(unitID, alive)
-	
-	local unitTeam = Spring.GetUnitAllyTeam(unitID)
-	
-	for aTeam, allyData in pairs(capturedUnits[unitID].aTeams) do
-		if allyData.inControl then
-			controllers[allyData.inControl].units[unitID] = nil
-			controllers[allyData.inControl].unitCount = controllers[allyData.inControl].unitCount - 1
-			updateControllerBar(allyData.inControl)
-		end
-	end
-	if alive then
-		spSetUnitHealth(unitID, {capture = 0} )
-	end
-	capturedUnits[unitID] = nil
+local function removeThingFromDoubleTable(id, things, thingByID)
+	things[thingByID.data[thingByID.count] ].index = things[id].index
+	thingByID.data[things[id].index] = thingByID.data[thingByID.count]
+	thingByID.data[thingByID.count] = nil
+	things[id] = nil
+	thingByID.count = thingByID.count - 1
 end
 
--- displays capture bar as largest capture from any ally team
-local function updateCapturedUnitBar(unitID)
-	capturedUnits[unitID].largestCaptureFromAnyOneTeam = 0
-	local noCapture = true
-	for _,data in pairs(capturedUnits[unitID].aTeams) do
-		if data.inControl then
-			noCapture = false
-		elseif capturedUnits[unitID].largestCaptureFromAnyOneTeam < data.totalDamage  then
-			noCapture = false
-			capturedUnits[unitID].largestCaptureFromAnyOneTeam = data.totalDamage
-		end
-	end
-	
-	if noCapture then
-		removeCapturedUnit(unitID, true)
-	else
-		spSetUnitHealth(unitID, {capture = capturedUnits[unitID].largestCaptureFromAnyOneTeam/capturedUnits[unitID].captureHealth} )
-	end
-end
-
--- removes capture damage dealt by allyTeam from the unit
-local function removeTeamCaptureFromUnit(unitID, allyTeam)
-	if capturedUnits[unitID].aTeams[allyTeam].inControl then
-		controllers[capturedUnits[unitID].aTeams[allyTeam].inControl].units[unitID] = nil
-		controllers[capturedUnits[unitID].aTeams[allyTeam].inControl].unitCount = controllers[capturedUnits[unitID].aTeams[allyTeam].inControl].unitCount - 1
-		updateControllerBar(capturedUnits[unitID].aTeams[allyTeam].inControl)
-	end
-	capturedUnits[unitID].aTeams[allyTeam] = nil
-	updateCapturedUnitBar(unitID)
+local function removeThingFromIterable(id, things, thingByID)
+	things[thingByID.data[thingByID.count] ] = things[id]
+	thingByID.data[things[id]] = thingByID.data[thingByID.count]
+	thingByID.data[thingByID.count] = nil
+	things[id] = nil
+	thingByID.count = thingByID.count - 1
 end
 
 -- transfer with trees
-local function recusivelyTransfer(unitID, newTeam, newAlly, controllerID)
+local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID)
 	if controllers[unitID] then
-		for cid,_ in pairs(controllers[unitID].units) do
+		local unitByID = controllers[unitID].unitByID
+		local i = 1
+		while i <= unitByID.count do
+			local cid = unitByID.data[i]
 			recusivelyTransfer(cid, newTeam, newAlly, unitID)
+			if cid == unitByID.data[i] then
+				i = i + 1
+			end
 		end
 	end
 	
-	if controllerID then
-		if capturedUnits[unitID].originAllyTeam ~= aTeam then
-			capturedUnits[unitID].aTeams = {
-				[newAlly] = {
-					totalDamage = 0,
-					inControl = controllerID,
-					degradeTimer = 0,
-				}
-			}
-
-			controllers[controllerID].unitCount = controllers[controllerID].unitCount + 1
-			controllers[controllerID].units[unitID] = true
-		else
-			controllers[controllerID].units[unitID] = nil
-			controllers[controllerID].unitCount = controllers[controllerID].unitCount - 1
-			
-			capturedUnits[unitID] = nil
-			
-			updateControllerBar(controllerID)
+	if spGetUnitIsDead(unitID) or not spValidUnitID(unitID) then
+		return
+	end
+	
+	if not capturedUnits[unitID] then
+		capturedUnits[unitID] = {
+			originTeam = spGetUnitTeam(unitID),
+			originAllyTeam = spGetUnitAllyTeam(unitID),
+			controllerID = nil,
+			controllerAllyTeam = nil,
+		}
+	end
+	
+	if capturedUnits[unitID].originAllyTeam == newAlly then
+		if capturedUnits[unitID].controllerID then
+			local oldController = capturedUnits[unitID].controllerID
+			removeThingFromIterable(unitID, controllers[oldController].units, controllers[oldController].unitByID)
+			removeThingFromDoubleTable(unitID, drawing, drawingByID)
 		end
-	else
+		capturedUnits[unitID] = nil
+	elseif newControllerID then
+		if capturedUnits[unitID].controllerID ~= newControllerID then
+			if capturedUnits[unitID].controllerID then
+				local oldController = capturedUnits[unitID].controllerID
+				removeThingFromIterable(unitID, controllers[oldController].units, controllers[oldController].unitByID)
+				drawing[unitID].controller = newControllerID
+			else
+				drawingByID.count = drawingByID.count + 1
+				drawingByID.data[drawingByID.count] = unitID
+				drawing[unitID] = {
+					index = drawingByID.count,
+					controller = newControllerID,
+				}
+			end
+			capturedUnits[unitID].controllerID = newControllerID
+			capturedUnits[unitID].controllerAllyTeam = newAlly
+			local unitByID = controllers[newControllerID].unitByID
+			unitByID.count = unitByID.count + 1
+			unitByID.data[unitByID.count] = unitID
+			controllers[newControllerID].units[unitID] = unitByID.count
+		end
+	elseif capturedUnits[unitID].controllerID then
+		local oldController = capturedUnits[unitID].controllerID
+		removeThingFromIterable(unitID, controllers[oldController].units, controllers[oldController].unitByID)
+		removeThingFromDoubleTable(unitID, drawing, drawingByID)
 		capturedUnits[unitID] = nil
 	end
 	
+	if unitDamage[unitID] then
+		removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+	end
 	spSetUnitHealth(unitID, {capture = 0} )
 	
-	Spring.TransferUnit(unitID, newTeam, false)
-	Spring.GiveOrderToUnit(unitID, CMD_STOP, {}, {})
-end
-
--- frees all subordinates from a controller and removes the unit
-local function removeController(unitID, team, aTeam)
-	
-	for id, data in pairs(controllers[unitID].units) do
-		recusivelyTransfer(id, capturedUnits[id].originTeam, capturedUnits[id].originAllyTeam, false)
-		capturedUnits[id] = nil
-		spSetUnitHealth(id, {capture = 0} )
-	end
-	
-	controllers[unitID] = nil
+	spTransferUnit(unitID, newTeam, false)
+	spGiveOrderToUnit(unitID, CMD_STOP, {}, {})
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
@@ -173,21 +194,30 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 	
 	-- add stats that the unit requires for this gadget
-	if not capturedUnits[unitID] then
-		capturedUnits[unitID] = {
+	if not unitDamage[unitID] then
+		damageByID.count = damageByID.count + 1
+		damageByID.data[damageByID.count] = unitID
+		unitDamage[unitID] = {
+			index = damageByID.count,
 			captureHealth = UnitDefs[unitDefID].buildTime,
-			originTeam = unitTeam,
-			originAllyTeam = Spring.GetUnitAllyTeam(unitID),
-			aTeams = {},
+			largestDamage = 0,
+			allyTeamByID = {count = 0, data = {}},
+			allyTeams = {},
 		}
 	end
 	
+	local damageData = unitDamage[unitID]
+	local allyTeamByID = damageData.allyTeamByID
+	local allyTeams = damageData.allyTeams
+	
 	-- add ally team stats
-	local _,_,_,_,_,aTeam = Spring.GetTeamInfo(attackerTeam)
-	if not capturedUnits[unitID].aTeams[aTeam] then
-		capturedUnits[unitID].aTeams[aTeam] = {
+	local _,_,_,_,_,attackerAllyTeam = spGetTeamInfo(attackerTeam)
+	if not allyTeams[attackerAllyTeam] then
+		allyTeamByID.count = allyTeamByID.count + 1
+		allyTeamByID.data[allyTeamByID.count] = attackerAllyTeam
+		allyTeams[attackerAllyTeam] = {
+			index = allyTeamByID.count,
 			totalDamage = 0,
-			inControl = false,
 			degradeTimer = GENERAL_DEGRADE_TIMER,
 		}
 	end
@@ -198,35 +228,29 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		newCaptureDamage = newCaptureDamage * (damage/WeaponDefs[weaponID].damages[0]) 
 	end	--scale damage based on real damage (i.e. take into account armortypes etc.)
 	-- scale damage based on target health
-	local health, maxHealth = Spring.GetUnitHealth(unitID)
-	if health <= 0 then health = 0.01 end
+	local health, maxHealth = spGetUnitHealth(unitID)
+	if health <= 0 then 
+		health = 0.01 
+	end
 	newCaptureDamage = newCaptureDamage * (2 - (health/maxHealth))
 	
+	local allyTeamData = allyTeams[attackerAllyTeam]
+	
 	-- reset degrade timer for against this allyteam and add to damage
-	capturedUnits[unitID].aTeams[aTeam].degradeTimer = GENERAL_DEGRADE_TIMER
-	capturedUnits[unitID].aTeams[aTeam].totalDamage = capturedUnits[unitID].aTeams[aTeam].totalDamage + newCaptureDamage
+	allyTeamData.degradeTimer = GENERAL_DEGRADE_TIMER
+	allyTeamData.totalDamage = allyTeamData.totalDamage + newCaptureDamage
 	
 	-- capture the unit if total damage is greater than max hp of unit
-	if capturedUnits[unitID].aTeams[aTeam].totalDamage >= capturedUnits[unitID].captureHealth then 
-
-		capturedUnits[unitID].aTeams[aTeam].totalDamage = capturedUnits[unitID].captureHealth
-		
-		for t, allyData in pairs(capturedUnits[unitID].aTeams) do
-			if allyData.inControl then
-				controllers[allyData.inControl].units[unitID] = nil
-				controllers[allyData.inControl].unitCount = controllers[allyData.inControl].unitCount - 1
-				updateControllerBar(allyData.inControl)
-			end
-		end
+	if allyTeamData.totalDamage >= damageData.captureHealth then
 
 		-- give the unit
-		recusivelyTransfer(unitID, attackerTeam, aTeam, attackerID)
+		recusivelyTransfer(unitID, attackerTeam, attackerAllyTeam, attackerID)
 		
 		-- reload handling
 		if controllers[attackerID].postCaptureReload then
-			local frame = Spring.GetGameFrame() + controllers[attackerID].postCaptureReload
-			Spring.SetUnitRulesParam(attackerID, "selfReloadSpeedChange", 0, {inlos = true})
-			Spring.SetUnitRulesParam(attackerID, "captureRechargeFrame", frame, {inlos = true})
+			local frame = spGetGameFrame() + controllers[attackerID].postCaptureReload
+			spSetUnitRulesParam(attackerID, "selfReloadSpeedChange", 0, {inlos = true})
+			spSetUnitRulesParam(attackerID, "captureRechargeFrame", frame, {inlos = true})
 			GG.UpdateUnitAttributes(attackerID)
 			reloading[frame] = reloading[frame] or {count = 0, data = {}}
 			reloading[frame].count = reloading[frame].count + 1
@@ -234,30 +258,88 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			GG.attUnits[attackerID] = true
 		end
 		
-		
 		-- destroy the unit if the controller is set to destroy units
-		if controllers[attackerID].killSubordinates and aTeam ~= capturedUnits[unitID].originAllyTeam then
-			Spring.GiveOrderToUnit(unitID, CMD_SELFD, {}, {})
+		if controllers[attackerID].killSubordinates and attackerAllyTeam ~= capturedUnits[unitID].originAllyTeam then
+			spGiveOrderToUnit(unitID, CMD_SELFD, {}, {})
 		end
+		return 0
 	end
 	
-	updateControllerBar(attackerID)
-	updateCapturedUnitBar(unitID)
+	if damageData.largestDamage < allyTeamData.totalDamage then
+		damageData.largestDamage = allyTeamData.totalDamage
+		spSetUnitHealth(unitID, {capture = damageData.largestDamage/damageData.captureHealth} )
+	end
 	
 	return 0
 end
 
+--------------------------------------------------------------------------------
+-- Update
+
+function gadget:GameFrame(f)
+    if (f-5) % 32 == 0 then
+		local i = 1
+		while i <= damageByID.count do
+			local unitID = damageByID.data[i]
+			local damageData = unitDamage[unitID]
+			local allyTeamByID = damageData.allyTeamByID
+			local allyTeams = damageData.allyTeams
+			local largestDamage = 0
+			local j = 1
+			while j <= allyTeamByID.count do
+				local allyTeamID = allyTeamByID.data[j]
+				local allyData = allyTeams[allyTeamID]
+				if allyData.degradeTimer <= 0 then
+					local captureLoss = DEGRADE_FACTOR*damageData.captureHealth
+					if allyData.totalDamage <= captureLoss then
+						removeThingFromDoubleTable(allyTeamID, allyTeams, allyTeamByID)
+					else
+						allyData.totalDamage = allyData.totalDamage - captureLoss
+						if largestDamage < allyData.totalDamage then
+							largestDamage = allyData.totalDamage
+						end
+						j = j + 1
+					end
+				else
+					allyData.degradeTimer = allyData.degradeTimer - 1
+					if largestDamage < allyData.totalDamage then
+						largestDamage = allyData.totalDamage
+					end
+				end
+			end
+			
+			if largestDamage == 0 then
+				removeThingFromDoubleTable(unitID, unitDamage, damageByID)
+				spSetUnitHealth(unitID, {capture = 0} )
+			else
+				damageData.largestDamage = largestDamage
+				spSetUnitHealth(unitID, {capture = damageData.largestDamage/damageData.captureHealth} )
+				i = i + 1
+			end
+        end
+    end
+	
+	if reloading[f] then
+		for i = 1, reloading[f].count do
+			local unitID = reloading[f].data[i]
+			spSetUnitRulesParam(unitID, "selfReloadSpeedChange",1, {inlos = true})
+			spSetUnitRulesParam(unitID, "captureRechargeFrame", 0, {inlos = true})
+			GG.UpdateUnitAttributes(unitID)
+		end
+		reloading[f] = nil
+	end
+end
 
 --------------------------------------------------------------------------------
 -- Command Handling
 local function KillToggleCommand(unitID, cmdParams, cmdOptions)
 	if controllers[unitID] then
 		local state = cmdParams[1]
-		local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_UNIT_KILL_SUBORDINATES)
+		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_UNIT_KILL_SUBORDINATES)
 		
 		if (cmdDescID) then
 			unitKillSubordinatesCmdDesc.params[1] = state
-			Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = unitKillSubordinatesCmdDesc.params})
+			spEditUnitCmdDesc(unitID, cmdDescID, { params = unitKillSubordinatesCmdDesc.params})
 		end
 		controllers[unitID].killSubordinates = (state == 1)
 	end
@@ -274,66 +356,58 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 end
 
 
+--------------------------------------------------------------------------------
+-- Unit Handling
+
+
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 
 	if not captureUnitDefs[unitDefID] then
 		return
 	end
 	
+	controllerByID.count = controllerByID.count + 1
+	controllerByID.data[controllerByID.count] = unitID
+	
 	controllers[unitID] = {
-		unitMax = captureUnitDefs[unitDefID].unitLimit,
+		index = controllerByID.count,
 		postCaptureReload = captureUnitDefs[unitDefID].postCaptureReload,
 		units = {},
-		unitCount = 0,
+		unitByID = {count = 0, data = {}},
 		killSubordinates = false,
 	}
 	
-	Spring.SetUnitRulesParam(unitID,"cantfire",0, {inlos = true})
+	spSetUnitRulesParam(unitID,"cantfire",0, {inlos = true})
 	
-	Spring.InsertUnitCmdDesc(unitID, unitKillSubordinatesCmdDesc)
+	spInsertUnitCmdDesc(unitID, unitKillSubordinatesCmdDesc)
 	KillToggleCommand(unitID, {0}, {})
 
 end
 
-function gadget:GameFrame(f)
-    if (f-5) % 32 == 0 then
-        for unitID, capData in pairs(capturedUnits) do
-			local decay = false
-			for aTeam, allyData in pairs(capData.aTeams) do
-				allyData.degradeTimer = allyData.degradeTimer - 1
-				if allyData.degradeTimer <= 0 and ((not allyData.inControl) or capData.originAllyTeam == aTeam) then
-					local captureLoss = DEGRADE_FACTOR*capturedUnits[unitID].captureHealth
-					if allyData.totalDamage <= captureLoss then
-						removeTeamCaptureFromUnit(unitID, aTeam)
-					else
-						allyData.totalDamage = allyData.totalDamage - captureLoss
-						updateCapturedUnitBar(unitID)
-					end
-				end
-			end
-        end
-    end
-	
-	if reloading[f] then
-		for i = 1, reloading[f].count do
-			local unitID = reloading[f].data[i]
-			Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange",1, {inlos = true})
-			Spring.SetUnitRulesParam(unitID, "captureRechargeFrame", 0, {inlos = true})
-			GG.UpdateUnitAttributes(unitID)
-		end
-		reloading[f] = false
-	end
-	
-end
 
 function gadget:UnitDestroyed(unitID)
 
 	if controllers[unitID] then
-		removeController(unitID, Spring.GetUnitTeam(unitID), Spring.GetUnitAllyTeam(unitID))
+		local unitByID = controllers[unitID].unitByID
+		local i = 1
+		while i <= unitByID.count do
+			local cid = unitByID.data[i]
+			recusivelyTransfer(cid, capturedUnits[cid].originTeam, capturedUnits[cid].originAllyTeam, unitID)
+			if cid == unitByID.data[i] then
+				i = i + 1
+			end
+		end
+		removeThingFromDoubleTable(unitID, controllers, controllerByID)
 	end
 	
 	if capturedUnits[unitID] then
-		removeCapturedUnit(unitID, false)
+		if capturedUnits[unitID].controllerID then
+			removeThingFromIterable(unitID, controllers[capturedUnits[unitID].controllerID].units, controllers[capturedUnits[unitID].controllerID].unitByID)
+		end
+	end
+	
+	if unitDamage[unitID] then
+		removeThingFromDoubleTable(unitID, unitDamage, damageByID)
 	end
 
 end
@@ -342,7 +416,8 @@ end
 
 function gadget:Initialize()
 
-	_G.controllers = controllers
+	_G.drawing = drawing
+	_G.drawingByID = drawingByID
 	
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_KILL_SUBORDINATES)
@@ -364,57 +439,83 @@ else
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local glVertex 				= gl.Vertex
 local spIsUnitInView 		= Spring.IsUnitInView
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetUnitLosState 	= Spring.GetUnitLosState
 local spValidUnitID 		= Spring.ValidUnitID
 local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID 	
+local spGetGameFrame        = Spring.GetGameFrame
+local spGetSpectatingState  = Spring.GetSpectatingState
+
+local glVertex 		= gl.Vertex
+local glPushAttrib  = gl.PushAttrib
+local glLineStipple = gl.LineStipple
+local glDepthTest   = gl.DepthTest
+local glLineWidth   = gl.LineWidth
+local glColor       = gl.Color
+local glBeginEnd    = gl.BeginEnd
+local glPopAttrib   = gl.PopAttrib
+local glCreateList  = gl.CreateList
+local glCallList    = gl.CallList
+local glDeleteList  = gl.DeleteList
+local GL_LINES      = GL.LINES
 
 local myTeam = spGetMyAllyTeamID()
 
-local function DrawFunc(u1, u2)
-	glVertex(spGetUnitPosition(u1))
-	glVertex(spGetUnitPosition(u2))
-end
-
+local drawList = 0
+local drawAnything = false
 
 function gadget:DrawWorld()
+    if drawAnything then
+        glPushAttrib(GL.LINE_BITS)
+		glDepthTest(true)
+		glLineWidth(2)
+        glLineStipple('')
+        glColor(1, 1, 1, 0.9)
+        glCallList(drawList)
+        glColor(1,1,1,1)
+        glLineStipple(false)
+        glPopAttrib()
+    end
+end
 
-	local spec, fullview = Spring.GetSpectatingState()
-	spec = spec or fullview
-
-	if SYNCED.controllers and snext(SYNCED.controllers) then
-		gl.PushAttrib(GL.LINE_BITS)
-		
-		gl.DepthTest(true)
-		
-		gl.LineWidth(2)
-        gl.LineStipple('')
-		local controllers = SYNCED.controllers
-	
-		for id, data in spairs(controllers) do
-		
-			if spValidUnitID(id) then
-				for cid, damage in spairs(data.units) do
-					local los1 = spGetUnitLosState(cid, myTeam, false)
-					local los2 = spGetUnitLosState(id, myTeam, false)
-					if spValidUnitID(cid) and (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(cid) or spIsUnitInView(id)) then
-						gl.Color(1, 1, 1, 0.9)
-						gl.BeginEnd(GL.LINES, DrawFunc, id, cid)
-					end
-				end
+local function drawFunc(drawing, drawingByID, spec)
+	for i = 1, drawingByID.count do
+		local controliee = drawingByID.data[i]
+		local controller = drawing[controliee].controller
+		if spValidUnitID(controliee) and spValidUnitID(controller) then
+			local los1 = spGetUnitLosState(controliee, myTeam, false)
+			local los2 = spGetUnitLosState(controller, myTeam, false)
+			if (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(controliee) or spIsUnitInView(controller)) then
+				glVertex(spGetUnitPosition(controller))
+				glVertex(spGetUnitPosition(controliee))
 			end
-	
 		end
-		
-		gl.DepthTest(false)
-		gl.Color(1,1,1,1)
-        gl.LineStipple(false)
-		
-		gl.PopAttrib()
 	end
-	
+end
+
+local function gameFrame()
+	if SYNCED.drawing and SYNCED.drawingByID then
+		local spec, fullview = spGetSpectatingState()
+		spec = spec or fullview
+		local drawing = SYNCED.drawing
+		local drawingByID = SYNCED.drawingByID
+		glDeleteList(drawList)
+		if drawingByID.count ~= 0 then
+			drawAnything = true
+			drawList = glCreateList(function () glBeginEnd(GL_LINES, drawFunc, drawing, drawingByID, spec) end)
+		end
+	end
+		
+end
+
+local lastFrame = 0
+function gadget:Update()
+    local f = spGetGameFrame()
+    if lastFrame < f then
+        lastFrame = f
+        gameFrame()
+    end
 end
 
 --------------------------------------------------------------------------------
