@@ -1,11 +1,11 @@
 unitDef = {
   unitname         = [[factoryhover]],
   name             = [[Hovercraft Platform]],
-  description      = [[Produces Hovercraft, Builds at 5 m/s]],
+  description      = [[Produces Hovercraft, Builds at10 m/s]],
   acceleration     = 0,
   brakeRate        = 0,
-  buildCostEnergy  = 550,
-  buildCostMetal   = 550,
+  buildCostEnergy  = 700,
+  buildCostMetal   = 700,
   builder          = true,
 
   buildoptions     = {
@@ -19,7 +19,7 @@ unitDef = {
   },
 
   buildPic         = [[factoryhover.png]],
-  buildTime        = 550,
+  buildTime        = 700,
   canMove          = true,
   canPatrol        = true,
   canstop          = [[1]],
@@ -61,7 +61,7 @@ unitDef = {
   smoothAnim       = true,
   turnRate         = 0,
   waterline        = 1,
-  workerTime       = 5,
+  workerTime       = 10,
   yardMap          = [[xoccccoxooccccooooccccooooccccooooccccooooccccooooccccooxoccccox]],
 
   featureDefs      = {
@@ -77,10 +77,10 @@ unitDef = {
       footprintZ       = 7,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 220,
+      metal            = 280,
       object           = [[ARMFHP_DEAD.s3o]],
       reclaimable      = true,
-      reclaimTime      = 220,
+      reclaimTime      = 280,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -96,10 +96,10 @@ unitDef = {
       footprintX       = 8,
       footprintZ       = 7,
       hitdensity       = [[100]],
-      metal            = 110,
+      metal            = 140,
       object           = [[debris4x4c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 110,
+      reclaimTime      = 140,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },

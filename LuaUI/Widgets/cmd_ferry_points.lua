@@ -302,7 +302,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				else
 					local unitDefID = Spring.GetUnitDefID(selected[i])
 					local ud = UnitDefs[unitDefID]
-					if not ud.cantBeTransported then
+					if (not ud.cantBeTransported) or ud.isFactory then
 						toBeWaited.count = toBeWaited.count + 1
 						toBeWaited.unit[toBeWaited.count] = selected[i]
 					end

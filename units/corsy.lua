@@ -1,11 +1,11 @@
 unitDef = {
   unitname               = [[corsy]],
   name                   = [[Shipyard]],
-  description            = [[Produces Ships, Builds at 5 m/s]],
+  description            = [[Produces Ships, Builds at10 m/s]],
   acceleration           = 0,
   brakeRate              = 0,
-  buildCostEnergy        = 550,
-  buildCostMetal         = 550,
+  buildCostEnergy        = 700,
+  buildCostMetal         = 700,
   builder                = true,
 
   buildoptions           = {
@@ -22,7 +22,7 @@ unitDef = {
   },
 
   buildPic               = [[CORSY.png]],
-  buildTime              = 550,
+  buildTime              = 700,
   canMove                = true,
   canPatrol              = true,
   canStop                = true,
@@ -64,7 +64,7 @@ unitDef = {
   sightDistance          = 273,
   turnRate               = 0,
   waterline              = 0,
-  workerTime             = 5,
+  workerTime             = 10,
   yardMap                = [[oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco oocccccco]],
 
   featureDefs            = {
@@ -80,10 +80,10 @@ unitDef = {
       footprintZ       = 14,
       height           = [[4]],
       hitdensity       = [[100]],
-      metal            = 220,
+      metal            = 280,
       object           = [[seafac_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 220,
+      reclaimTime      = 280,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -100,10 +100,10 @@ unitDef = {
       footprintX       = 8,
       footprintZ       = 8,
       hitdensity       = [[100]],
-      metal            = 110,
+      metal            = 140,
       object           = [[debris4x4c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 110,
+      reclaimTime      = 140,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
