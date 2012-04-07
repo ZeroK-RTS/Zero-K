@@ -56,6 +56,7 @@ local aliveCount = {}
 local destroyedAlliances = {}
 
 local finishedUnits = {}	-- this stores a list of all units that have ever been completed, so it can distinguish between incomplete and partly reclaimed units
+local toDestroy = {}
 
 local destroy_type = 'destroy'
 local commends = false
@@ -195,7 +196,7 @@ function DestroyAlliance(allianceID)
 					if GG.pwUnitsByID and GG.pwUnitsByID[u] then
 						spTransferUnit(u, gaiaTeam, true)		-- don't blow up PW buildings
 					else
-						spDestroyUnit(u, true)
+						toDestroy[u] = true
 					end
 				end
 				spKillTeam(t)
@@ -287,6 +288,7 @@ function gadget:UnitDestroyed(u, ud, team)
 		finishedUnits[u] = nil
 		RemoveAllianceUnit(u, ud, team)
 	end
+	toDestroy[u] = nil
 end
 
 function gadget:UnitGiven(u, ud, newTeam, oldTeam)
@@ -331,8 +333,14 @@ end
 function gadget:GameFrame(n)
   -- check for last ally:
   -- end condition: only 1 ally with human players, no AIs in other ones
-  if (n % 37 < 0.1) and not gameover then
-	ProcessLastAlly()
+  if (n % 37 < 0.1) then
+	for u in pairs(toDestroy) do
+		spDestroyUnit(u, true)
+	end
+	toDestroy = {}
+	if not gameover then
+		ProcessLastAlly()
+	end
   end
 end
 
