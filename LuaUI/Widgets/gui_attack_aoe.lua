@@ -177,7 +177,6 @@ local function getWeaponInfo(weaponDef, unitDef)
 	local mobile = unitDef.speed > 0
 	local waterWeapon = weaponDef.waterWeapon
 	local ee = weaponDef.edgeEffectiveness
-  Spring.Echo(weaponDef.customParams.weaponvelocity)
 	if (weaponDef.cylinderTargetting >= 100) then
 		retData = {type = "orbital", scatter = scatter}
 	elseif (weaponType == "Cannon") then
