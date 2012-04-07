@@ -55,7 +55,7 @@ local UnitStun           = Spring.GetUnitIsStunned
 local Tooltip            = Spring.GetUnitTooltip
 local GetHP              = Spring.GetUnitHealth
 local isDead             = Spring.GetUnitIsDead
-local GetUnitStockpile	 = Spring.GetUnitStockpile
+local GetUnitStockpile     = Spring.GetUnitStockpile
 local GetUnitStates      = Spring.GetUnitStates
 local isUnitCloaked      = Spring.GetUnitIsCloaked
 local inALOS             = Spring.IsPosInAirLos
@@ -71,8 +71,8 @@ local unitAICmdDesc = {
   type    = CMDTYPE.ICON_MODE,
   name    = 'Unit AI',
   action  = 'unitai',
-  tooltip	= 'Toggles smart unit AI for the unit',
-  params 	= {1, 'AI Off','AI On'}
+  tooltip    = 'Toggles smart unit AI for the unit',
+  params     = {1, 'AI Off','AI On'}
 }
 local airtargets         = {} -- {id = unitID, incoming = 0, hp = int, team = allyteam, inrange = {}}
 local airtargetsref      = {}
@@ -200,6 +200,11 @@ function checkAAdef()
                 unassignTarget(AAdefbuff.id, i, h)
               end
             end
+            if AAdefbuff.rangeupdatetimer <= 0 then
+              AAdefbuff.rangeupdate = true
+            else
+              AAdefbuff.rangeupdatetimer = AAdefbuff.rangeupdatetimer - 1
+            end
             counteris0 = false
             if AAdefbuff.counter == 0 then
               AAdefbuff.counter = AAmaxcounter(AAdefbuff.name)
@@ -241,10 +246,13 @@ function checkAAdef()
                   --Echo(AAdefbuff.id .. "skipping " .. AAdefbuff.skiptarget .. " was attacking " .. AAdefbuff.attacking)
                   unassignTarget(AAdefbuff.id, i, h)
                   if IsMicro(AAdefbuff.id) then
-                    assignTarget(AAdefbuff.id, i, h, targets)
+                    local assign = assignTarget(AAdefbuff.id, i, h, targets)
                   end
                   --Echo(AAdefbuff.id .. " is attacking ", AAdefbuff.attacking)
                   AAdefbuff.counter = 0
+				  if assign == nil then
+                    AAdefbuff.counter = AAmaxcounter(AAdefbuff.name)
+				  end
                   AAdefbuff.refiredelay = AAmaxrefiredelay(AAdefbuff.name)
                 elseif AAdefbuff.attacking ~= nil then
                   AAdefbuff.counter = 0
@@ -461,7 +469,6 @@ function assignTarget(unitID, refID, allyteam, output)
         end
       end
       if skip > output[2] then
-        AAdefbuff.skiptarget = 0
         unassignTarget(unitID, refID, allyteam)
         if IsMicro(AAdefbuff.id) and not IsMobileAA(AAdefbuff.name) and not IsDPSAA(AAdefbuff.name) then
           removecommand(AAdefbuff.id, refID, allyteam)
@@ -493,30 +500,15 @@ function assignTarget(unitID, refID, allyteam, output)
     if output[2] == 0 or (output[2]~= 0 and assign == nil) then
       --Echo("no air in vision")
       notargets = true
-      local state = GetUnitStates(unitID)
-      if AAdefbuff.name == "corrl" and output[5] ~= 0 then
-        --Echo("Land targets in range " .. output[5])
-        AAdefbuff.fire = 2
-      end
     end
   else
     notargets = true
-  end
-  if AAdefbuff.name == "corrl" then
-    local landtargets = false
-    if output ~= nil then
-      if output[5] ~= 0 then
-        landtargets = true
-      end
-    end
-    if not landtargets then
-      AAdefbuff.fire = 0  --For now, defenders are always fire-at-will
-    end
   end
   if notargets == true then
     --Echo("no visible air targets")
     unassignTarget(unitID, refID, allyteam)
   end
+  return assign
 end
 
 function unassignTarget(unitID, refID, allyteam)
@@ -605,15 +597,15 @@ function BestTarget(targets, count, damage, current, skip, cost)
       end
     end
     if skip > 0 then
-	  skip = skip - 1
-	  if best ~= 0 then
-	    targets[best] = nil
-	    best = 0
-	    bestcost = 0
-	    besthp = 0
-	    stillskipping = true
-	  end
-	end
+      skip = skip - 1
+      if best ~= 0 then
+        targets[best] = nil
+        best = 0
+        bestcost = 0
+        besthp = 0
+        stillskipping = true
+      end
+    end
   end
   if best ~= 0 then
     --Echo(best, besthp)
@@ -687,7 +679,15 @@ function getAATargetsinRange(unitID, refID, allyteam)
   local ltargetscount = 1
   local x, y, z = GetUnitPosition(unitID)
   local AAdefbuff = AAdef[allyteam].units[refID]
-  local units = GetUnitsInCylinder(x, z, AAdefbuff.range)
+  --local units = GetUnitsInCylinder(x, z, AAdefbuff.range)
+  local units = {}
+  local unitscount = 0
+  for i,inrange in ipairs(AAdefbuff.inrange) do
+    if not UnitIsDead(inrange) then
+      units[unitscount + 1] = inrange
+      unitscount = unitscount + 1
+    end
+  end
   local nextshot = AAdefbuff.nextshot
   local team
   local ud
@@ -1144,7 +1144,7 @@ function getDPS(name)
   end
   return 0
 end
-	
+    
 function getRange(name)
   if AAstats[name] ~= nil then
     return AAstats[name].range
@@ -1229,13 +1229,8 @@ function addAA(unitID, unitDefID, name, allyteam)
     end
   end
   local refID = AAdefmaxcount[allyteam] + 1
-  AAdef[allyteam].units[refID] = {id = unitID, range = getRange(name), attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, resetfirestate = false, morph = false, damage = damage - 5, shotdamage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 0, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
-  if IsDPSAA(name) or IsMobileAA(name) then
-    AAdef[allyteam].units[refID].fire = 2
-  end
-  if name == "corrl" then  -- For now, all defenders are fire-at-will
-    AAdef[allyteam].units[refID].fire = 0
-  end
+  AAdef[allyteam].units[refID] = {id = unitID, range = getRange(name), attacking = nil, counter = AAmaxcounter(name), reloaded = true, name = name, reloading = {-2000, -2000, -2000, -2000}, frame = 0, deactivate = false, resetfirestate = false, morph = false, damage = damage - 5, shotdamage = sdamage - 5, orderaccept = false, orderreceived = false, refiredelay = 0, team = allyteam, inrange = {}, rangeupdate = true, rangeupdatetimer = 10, inrangecount = 0, projectiles = {}, projectilescount = 0, shotspeed = getshotVelocity(name), cstate = false, cfire = 2, fire = 2, skiptarget = 0, nextshot = 0, globalassign = false, gassigncounter = 0}
+  -- All AA is on fire-at-will for Allow Weapon Target to work
   AAdefreference[unitID] = refID
   AAdefmaxcount[allyteam] = refID
 end
@@ -1375,6 +1370,19 @@ function removeShot(shotID)
   end
 end
 
+function addInRange(AAdefbuff, targetID)
+  --Echo("added " .. targetID)
+  for i,target in ipairs(AAdefbuff.inrange) do
+    if target == targetID then
+      return true
+    end
+  end
+  AAdefbuff.inrange[AAdefbuff.inrangecount + 1] = targetID
+  AAdefbuff.inrangecount = AAdefbuff.inrangecount + 1
+  AAdefbuff.rangeupdatetimer = 10
+  return false
+end
+
 function GetUnit(unitID)  --unused
   if unitID ~= nil then
     local unitDefID = GetUnitDefID(unitID)
@@ -1425,7 +1433,7 @@ function GetAAUnit(unitID)
 end
 
 function GetAirUnit(unitID)
-  if unitID ~= nil then
+  if unitID ~= nil and unitID ~= -1 then
     local allyteam = GetUnitAllyTeam(unitID)
     local refID = airtargetsref[unitID]
     if refID ~= nil then
@@ -1506,18 +1514,18 @@ function gadget:GameFrame()
     globalassignmentcounter = globalassignmentcounter - 1
   end
   checkAAdef()
-  --local AAcount = 0
-  --for h = 0, teamcount do
-  --  if AAdefmaxcount[h] ~= nil then
-  --    AAcount = AAcount + AAdefmaxcount[h]
-  --  end
-  --end
-  --local aircount = 0
-  --for h = 0, airteamcount do
-  --  if airtargetsmaxcount[h] ~= nil then
-  --    aircount = aircount + airtargetsmaxcount[h]
-  --  end
-  --end
+  local AAcount = 0
+  for h = 0, teamcount do
+    if AAdefmaxcount[h] ~= nil then
+      AAcount = AAcount + AAdefmaxcount[h]
+    end
+  end
+  local aircount = 0
+  for h = 0, airteamcount do
+    if airtargetsmaxcount[h] ~= nil then
+      aircount = aircount + airtargetsmaxcount[h]
+    end
+  end
   --loadmultiplier = math.min(3, math.max(1, 1 + AAcount * aircount / 1000) )
 end
 
@@ -1655,12 +1663,31 @@ function gadget:Initialize()
   end
 end
 
---[[ --Allow Weapon Target is called once per enemy in range of each thing, roughly every 16 frames; gets called for enemies behind obstacles; aka, useless
 function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
   local unitDefID = GetUnitDefID(attackerID)
   local ud = UnitDefs[unitDefID]
   if IsAA(ud.name) then
-    Echo("allow weapon target, attacker", attackerID, "target", targetID, "weapondefID", attackerWeaponDefID)
+    local _, _, _, AAdefbuff = GetAAUnit(attackerID)
+    unitDefID = GetUnitDefID(targetID)
+    local tud = UnitDefs[unitDefID]
+    if not Isair(tud.name) then
+      return true, 1
+    else
+      if AAdefbuff.rangeupdate then
+        AAdefbuff.rangeupdate = false
+        AAdefbuff.inrange = {}
+        AAdefbuff.inrangecount = 0
+        addInRange(AAdefbuff, targetID)
+      else
+        addInRange(AAdefbuff, targetID)
+      end
+    end
+    if AAdefbuff.attacking == targetID or AAdefbuff.orderreceived == true then
+      return true, 1
+    end
+    if IsStaticAA(ud.name) and IsBurstAA(ud.name) then
+      return false, 1
+    end
   end
   return true, 1
-end]]--
+end
