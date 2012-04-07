@@ -14,9 +14,7 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-if (not gadgetHandler:IsSyncedCode()) then
-    return
-end
+if (gadgetHandler:IsSyncedCode()) then -- synced
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -53,7 +51,7 @@ for i=1,#UnitDefs do
 	end
 end
 
--------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
 local RISE_TIME = 25
@@ -87,6 +85,8 @@ local function removeFlying(unitID)
 	flyingByID.data[flyingByID.count] = nil
 	flying[unitID] = nil
 	flyingByID.count = flyingByID.count - 1
+	
+	SendToUnsynced("removeFlying", unitID)
 end
 
 local function addFlying(unitID, frame, dx, dy, dz, height, parentDis)
@@ -117,6 +117,8 @@ local function addFlying(unitID, frame, dx, dy, dz, height, parentDis)
 			dx = dx, dy = dy, dz = dz,
 			fx = ux, fy = height, fz = uz,
 		}
+		
+		SendToUnsynced("addFlying", unitID, unitDefID)
 	end
 end
 
@@ -227,4 +229,97 @@ function gadget:Initialize()
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
+end
+
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+else	--unsynced
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+local Lups
+local SYNCED = SYNCED
+
+local particleIDs = {}
+
+local flyFX = {
+	--{class='UnitPieceLight', options={ delay=24, life=math.huge } },
+	{class='StaticParticles', options={
+		life        = 30,
+		colormap    = { {0.2, 0.1, 1, 0.01, 0.2, 0.1, 1, 0.005} },
+		texture     = 'bitmaps/GPL/groundflash.tga',
+		count       = 1,
+		sizeMod	    = 3,
+		repeatEffect = true,
+		}
+	},
+	--{class='SimpleParticles', options={	--FIXME
+	--	life        = 50,
+	--	speed        = 0.65,
+	--	colormap    = { {0.2, 0.1, 1, 1} },
+	--	texture     = 'bitmaps/PD/chargeparticles.tga',
+	--	partpos	    = "0,0,0",
+	--	count        = 15,
+	--	rotSpeed     = 1,
+	--	rotSpeedSpread = -2,
+	--	rotSpread    = 360,
+	--	sizeGrowth  = -0.05,		
+	--	emitVector   = {0,1,0},
+	--	emitRotSpread = 60,		
+	--	delaySpread = 180,
+	--	sizeMod	    = 10,
+	--	}
+	--},	
+	--{class='ShieldSphere', options={
+	--	life		= math.huge,
+	--	colormap1 = { {0.2, 0.1, 1, 0.6} },
+	--	colormap2 = { {0.2, 0.1, 1, 0.15} }
+	--	}
+	--},
+} 
+
+local function addFlying(_, unitID, unitDefID)
+	particleIDs[unitID] = {}
+	local teamID = Spring.GetUnitTeam(unitID)
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local radius = Spring.GetUnitRadius(unitID)
+	local height = Spring.GetUnitHeight(unitID)
+	for i,fx in pairs(flyFX) do
+		fx.options.unit = unitID
+		fx.options.unitDefID = unitDefID
+		fx.options.team      = teamID
+		fx.options.allyTeam  = allyTeamID
+		fx.options.size = radius * (fx.options.sizeMod or 1)
+		fx.options.pos = {0, height/2, 0}
+		table.insert( particleIDs[unitID], Lups.AddParticles(fx.class,fx.options) )
+	end
+end
+
+local function removeFlying(_, unitID)
+	for i=1,#particleIDs[unitID] do
+		Lups.RemoveParticles(particleIDs[unitID][i])
+	end
+end
+
+function gadget:Initialize()
+        gadgetHandler:AddSyncAction("addFlying", addFlying)
+	gadgetHandler:AddSyncAction("removeFlying", removeFlying)
+end
+
+function gadget:Update()
+	if (not Lups) then
+		Lups = GG['Lups']
+	end
+end
+
+
+function gadget:Shutdown()
+	gadgetHandler.RemoveSyncAction("addFlying")
+        gadgetHandler.RemoveSyncAction("removeFlying")
+end
+
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 end

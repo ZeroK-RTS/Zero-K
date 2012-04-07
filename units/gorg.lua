@@ -188,7 +188,7 @@ unitDef = {
       },
 
 	  edgeEffectiveness       = 0.5,
-      explosionGenerator      = [[custom:NONE]],
+      explosionGenerator      = [[custom:GRAV]],
       lineOfSight             = true,
       noSelfDamage            = true,
 	  projectiles             = 1,
