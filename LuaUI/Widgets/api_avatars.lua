@@ -1027,7 +1027,7 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 				if checklistTable[(remotePlayerID+1)] ==nil then
 					checklistTable[(playerID+1)]={downloaded=false, retry=0, accept=true} --fill checklist with default values. This value allow widget to initiate communication with other players.
 				else
-					hecklistTable[(remotePlayerID+1)].downloaded=false --reset checklist entry for this player
+					checklistTable[(remotePlayerID+1)].downloaded=false --reset checklist entry for this player
 					--checklistTable[(remotePlayerID+1)].accept=true
 					checklistTable[(remotePlayerID+1)].retry=0 --reset retry
 				end
