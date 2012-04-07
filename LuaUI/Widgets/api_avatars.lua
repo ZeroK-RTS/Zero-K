@@ -1,4 +1,4 @@
-local versionName = "v3.261"
+local versionName = "v3.27"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -188,6 +188,7 @@ local function SetAvatar(playerName, filename, checksum, avatarsTable) --//to sa
 	avatarsTable[playerName] = {
 		checksum = checksum,
 		file = filename,
+		age = 0,
 	}
 	table.save(avatarsTable, configFile)
 	return avatarsTable
@@ -201,7 +202,11 @@ end
 
 local function GetAvatar(playername) --//to be called by Chatbubble widget. Return player's avatar
 	local avInfo = avatarsTable_g[playername]
-	return (avInfo and avInfo.file) --else return nil (chatbubble can handle the nil value)
+	local filepath = nil
+	if (avInfo.age or 0) <= 5 then --//block all outdated picture from being shown on chatbubble after ~5 games.
+		filepath = avInfo.file 
+	end
+	return filepath --else return nil (chatbubble can handle the nil value)
 end
 
 local function SetMyAvatar(filename)
@@ -961,7 +966,6 @@ local function NetworkProtocol(waitTransmissionUntilThisTime,waitBusyUntilThisTi
 					if operationMode == "A" then
 						local checksum = tonumber(msg:sub(11))
 						local playerName = GetPlayersData(2, remotePlayerID)
-						local avatarInfo = avatarsTable[playerName]
 						local file = SearchFileByChecksum(checksum)
 						if (file) then
 							--// already downloaded it once, reuse it
@@ -1304,10 +1308,12 @@ function widget:Initialize()
 	local derivedRefreshDelay = (4*numberOfRetry*networkDelayMultiplier)*playerCount
 	refreshDelay = math.max(derivedRefreshDelay, 4) --// set a 4 second delay (max) for each retry, times the number of players, OR set to a minimum of 4 second (in case at gamestart it return 0 delay). This determine the "refresh delay" (amount of second before the ignore list being resetted)
 	
-	--// remove broken entries
+	--// remove broken entries & update entry age
 	for playerName,avInfo in pairs(avatarsTable) do
-		if (not VFS.FileExists(avInfo.file)) and playerName~="useCustom" then
+		if (not VFS.FileExists(avInfo.file)) and playerName~="useCustom" then --//remove player entry that has no corresponding file
 			avatarsTable[playerName] = nil
+		elseif playerName~="useCustom" then --//++ the age for player entry with corresponding file. This ensure that outdated entry can be tracked
+			avatarsTable[playerName].age = (avatarsTable[playerName].age or 0) +1
 		end
 	end
 	
