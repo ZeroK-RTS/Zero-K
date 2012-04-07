@@ -203,8 +203,10 @@ end
 local function GetAvatar(playername) --//to be called by Chatbubble widget. Return player's avatar
 	local avInfo = avatarsTable_g[playername]
 	local filepath = nil
-	if (avInfo.age or 0) <= 5 then --//block all outdated picture from being shown on chatbubble after ~5 games.
-		filepath = avInfo.file 
+	if avInfo then 
+		if (avInfo.age or 0) <= 5 then --//block all outdated picture from being shown on chatbubble after ~5 games.
+			filepath = avInfo.file 
+		end
 	end
 	return filepath --else return nil (chatbubble can handle the nil value)
 end
