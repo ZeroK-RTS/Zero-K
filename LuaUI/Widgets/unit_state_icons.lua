@@ -37,7 +37,7 @@ options = {
 		name = "Show move/fire states on shift",
 		desc = "When holding shift, icons appear over units indicating move state and fire state.",
 		type = 'bool',
-		value = true,
+		value = false,
 	},
 	showarmorstateonshift = {
 		name = "Show armor state on shift",
