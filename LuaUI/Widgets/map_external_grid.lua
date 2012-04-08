@@ -30,10 +30,13 @@ local glTexCoord = gl.TexCoord
 local glColor = gl.Color
 local glCreateList = gl.CreateList
 local glTexRect = gl.TexRect
+local spTraceScreenRay = Spring.TraceScreenRay
 ----------------------
 
 local heights = {}
 local island = false
+local mapSizeX = Game.mapSizeX
+local mapSizeZ = Game.mapSizeZ
 
 --[[
 local maxHillSize = 800/res
@@ -44,7 +47,7 @@ local noFeatureRange = 0
 ]]--
 
 options_path = 'Settings/View/Map/Configure VR Grid'
-options_order = {"mirrorHeightMap","drawForIslands","res","range"}
+options_order = {"mirrorHeightMap","drawForIslands","res","range","northSouthText"}
 options = {
 	mirrorHeightMap = {
 		name = "Mirror heightmap",
@@ -89,7 +92,17 @@ options = {
 			gl.DeleteList(DspLst)
 			widget:Initialize()
 		end, 
-	},		
+	},	
+	northSouthText = {
+		name = "North, East, South, & West text",
+		type = 'bool',
+		value = false,
+		desc = 'Help you identify map direction under rotation by placing a "North/South/East/West" text on the map edges',
+		OnChange = function(self)
+			gl.DeleteList(DspLst)
+			widget:Initialize()
+		end, 		
+	},	
 }
 
 -- for terrain randomization - kind of primitive
@@ -134,23 +147,23 @@ end
 
 local function IsIsland()
 	local sampleDist = 512
-	for i=1,Game.mapSizeX,sampleDist do
+	for i=1,mapSizeX,sampleDist do
 		-- top edge
 		if GetGroundHeight(i, 0) > 0 then
 			return false
 		end
 		-- bottom edge
-		if GetGroundHeight(i, Game.mapSizeZ) > 0 then
+		if GetGroundHeight(i, mapSizeZ) > 0 then
 			return false
 		end
 	end
-	for i=1,Game.mapSizeZ,sampleDist do
+	for i=1,mapSizeZ,sampleDist do
 		-- left edge
 		if GetGroundHeight(0, i) > 0 then
 			return false
 		end
 		-- right edge
-		if GetGroundHeight(Game.mapSizeX, i) > 0 then
+		if GetGroundHeight(mapSizeX, i) > 0 then
 			return false
 		end	
 	end
@@ -160,30 +173,30 @@ end
 local function InitGroundHeights()
 	local res = options.res.value or 128
 	local range = (options.range.value or 8192)/res
-	local TileMaxX = Game.mapSizeX/res +1
-	local TileMaxZ = Game.mapSizeZ/res +1
+	local TileMaxX = mapSizeX/res +1
+	local TileMaxZ = mapSizeZ/res +1
 	
-	for x = (-range)*res,Game.mapSizeX+range*res, res do
+	for x = (-range)*res,mapSizeX+range*res, res do
 		heights[x] = {}
-		for z = (-range)*res,Game.mapSizeZ+range*res, res do
+		for z = (-range)*res,mapSizeZ+range*res, res do
 			local px, pz
 			if options.mirrorHeightMap.value then
-				if (x < 0 or x > Game.mapSizeX) then	-- outside X map bounds; mirror true heightmap
+				if (x < 0 or x > mapSizeX) then	-- outside X map bounds; mirror true heightmap
 					local xAbs = math.abs(x)
-					local xFrac = (Game.mapSizeX ~= xAbs) and x%(Game.mapSizeX) or Game.mapSizeX
-					local xFlip = -1^math.floor(x/Game.mapSizeX)
+					local xFrac = (mapSizeX ~= xAbs) and x%(mapSizeX) or mapSizeX
+					local xFlip = -1^math.floor(x/mapSizeX)
 					if xFlip == -1 then
-						px = Game.mapSizeX - xFrac
+						px = mapSizeX - xFrac
 					else
 						px = xFrac
 					end
 				end
-				if (z < 0 or z > Game.mapSizeZ) then	-- outside Z map bounds; mirror true heightmap
+				if (z < 0 or z > mapSizeZ) then	-- outside Z map bounds; mirror true heightmap
 					local zAbs = math.abs(z)
-					local zFrac = (Game.mapSizeZ ~= zAbs) and z%(Game.mapSizeZ) or Game.mapSizeZ
-					local zFlip = -1^math.floor(z/Game.mapSizeZ)
+					local zFrac = (mapSizeZ ~= zAbs) and z%(mapSizeZ) or mapSizeZ
+					local zFlip = -1^math.floor(z/mapSizeZ)
 					if zFlip == -1 then
-						pz = Game.mapSizeZ - zFrac
+						pz = mapSizeZ - zFrac
 					else
 						pz = zFrac
 					end				
@@ -232,11 +245,37 @@ function widget:GameFrame(n)
 end
 ]]--
 
+local function TextOutside()
+	if (options.northSouthText.value) then
+		local mapSizeX = mapSizeX
+		local mapSizeZ = mapSizeZ
+		local average = (GetGroundHeight(mapSizeX/2,0) + GetGroundHeight(0,mapSizeZ/2) + GetGroundHeight(mapSizeX/2,mapSizeZ) +GetGroundHeight(mapSizeX,mapSizeZ/2))/4
+
+		gl.Rotate(-90,1,0,0)
+		gl.Translate (0,0,average)		
+		gl.Text("North", mapSizeX/2, 200, 200, "co")
+		
+		gl.Rotate(-90,0,0,1)
+		gl.Text("East", mapSizeZ/2, mapSizeX+200, 200, "co")
+		
+		gl.Rotate(-90,0,0,1)	
+		gl.Text("South", -mapSizeX/2, mapSizeZ +200, 200, "co")
+		
+		gl.Rotate(-90,0,0,1)
+		gl.Text("West", -mapSizeZ/2,200, 200, "co")
+		
+		-- gl.Text("North", mapSizeX/2, 100, 200, "on")
+		-- gl.Text("South", mapSizeX/2,-mapSizeZ, 200, "on")
+		-- gl.Text("East", mapSizeX,-(mapSizeZ/2), 200, "on")
+		-- gl.Text("West", 0,-(mapSizeZ/2), 200, "on")
+	end
+end
+
 local function TilesVerticesOutside()
 	local res = options.res.value or 128
 	local range = (options.range.value or 8192)/res
-	local TileMaxX = Game.mapSizeX/res +1
-	local TileMaxZ = Game.mapSizeZ/res +1	
+	local TileMaxX = mapSizeX/res +1
+	local TileMaxZ = mapSizeZ/res +1	
 	for x=-range,TileMaxX+range,1 do
 		for z=-range,TileMaxZ+range,1 do
 			if (x > 0 and z > 0 and x < TileMaxX and z < TileMaxZ) then 
@@ -263,6 +302,7 @@ local function DrawTiles()
 	gl.Texture(false)
 	gl.DepthMask(false)
 	gl.DepthTest(false)
+	TextOutside()
 	glColor(1,1,1,1)
 	gl.PopAttrib()
 end
@@ -272,6 +312,18 @@ function widget:DrawWorldPreUnit()
 		gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
 		-- Maybe you want Spring.SetDrawGround(false) somewhere
 	end	
+end
+
+function widget:MousePress(x, y, button)
+	local _, mpos = spTraceScreenRay(x, y, true) --//convert UI coordinate into ground coordinate.
+	if mpos==nil then --//activate epic menu if mouse position is outside the map
+		local _, _, meta, _ = Spring.GetModKeyState()
+		if meta then  --//show epicMenu when user also press the Spacebar
+			WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+			return false
+		end
+	end
 end
 
 function widget:Initialize()
