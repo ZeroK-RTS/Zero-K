@@ -70,6 +70,13 @@ local unitCancelTargetCmdDesc = {
 }
 
 --------------------------------------------------------------------------------
+-- Gadget Interaction
+
+function GG.GetUnitTarget(unitID)
+	return unitById[unitID] and unit.data[unitById[unitID]] and unit.data[unitById[unitID]].targetID
+end
+
+--------------------------------------------------------------------------------
 -- Target setting
 
 local function unitInRange(unitID, targetID, range)
@@ -422,7 +429,8 @@ end
 
 local function gameFrame()
     if spIsGUIHidden() then 
-        return 
+        drawAnything = false
+		return 
     end
     
     if SYNCED.unit then

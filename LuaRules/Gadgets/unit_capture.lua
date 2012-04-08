@@ -501,12 +501,16 @@ local function gameFrame()
 		local drawing = SYNCED.drawing
 		local drawingByID = SYNCED.drawingByID
 		glDeleteList(drawList)
+		
 		if drawingByID.count ~= 0 then
 			drawAnything = true
 			drawList = glCreateList(function () glBeginEnd(GL_LINES, drawFunc, drawing, drawingByID, spec) end)
+		else
+			drawAnything = false
 		end
+	else
+		drawAnything = false
 	end
-		
 end
 
 local lastFrame = 0
