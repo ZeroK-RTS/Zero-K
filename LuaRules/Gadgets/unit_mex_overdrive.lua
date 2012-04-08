@@ -24,6 +24,7 @@ local linkdefs = {}
 
 local DEFAULT_PYLON_RANGE = 200 -- mex range, link = range*2
 local MEX_OWNER_SHARE = 0.05 -- 5% to owner
+local OD_OWNER_SHARE = 0.5 -- 50% of OD goes to owner of energy
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
@@ -805,6 +806,9 @@ function gadget:GameFrame(n)
 				end 
 			end 
 			
+			local teamODEnergy = {}
+			local teamODEnergySum = 0 
+			
 			-- calculate overdrive energy excess 
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
@@ -820,6 +824,8 @@ function gadget:GameFrame(n)
 						local ne = inc * fillRatio   -- actual energy used for overdrive depends on fill ratio. At 50% of storage, 50% of income is used 
                         --teamEcho(teamID, teamID .. ",   CUR: " .. te.eCur .. ",   MAX: " .. te.eMax  .. ",   HIDE: " .. HIDDEN_STORAGE)
                         --teamEcho(teamID, teamID .. ",   INC: " .. inc .. ",   FR: " .. fillRatio )
+						teamODEnergy[teamID] = ne
+						teamODEnergySum = teamODEnergySum + ne
                         allyEExcess  = allyEExcess + ne
 						changeTeamEnergy(te, -ne)
 					end 
@@ -961,11 +967,24 @@ function gadget:GameFrame(n)
 			if GG.Lagmonitor_activeTeams then
 				local activeTeams = GG.Lagmonitor_activeTeams[allyTeamID]
 				local activeCount = (activeTeams.count >= 1 and activeTeams.count) or 1
+				teamODEnergySum = 0
+				for i = 1, allyTeamData.teams do  -- calculate active team OD sum
+					if activeTeams[teamID] then
+						teamODEnergySum = teamODEnergySum + teamODEnergy[teamID]
+					end
+				end 
+								
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
 						local te = teamEnergy[teamID]
-						Spring.AddTeamResource(teamID, "m", summedMetalProduction / activeCount)
+						local odMetal = summedMetalProduction / activeCount
+						if (teamODEnergySum > 0) then 
+							odMetal = OD_OWNER_SHARE * summedMetalProduction * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odMetal
+						end					
+						Spring.AddTeamResource(teamID, "m", odMetal)
+						
+						-- FIXME send information about REAL share -> odMetal
 						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
 					end
 				end 
@@ -973,7 +992,13 @@ function gadget:GameFrame(n)
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
-					Spring.AddTeamResource(teamID, "m", summedMetalProduction / allyTeamData.teams)
+					local odMetal = summedMetalProduction / allyTeamData.teams
+					if (teamODEnergySum > 0) then 
+						odMetal = OD_OWNER_SHARE * summedMetalProduction * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odMetal
+					end
+
+					Spring.AddTeamResource(teamID, "m", odMetal)
+					-- FIXME send information about REAL share -> odMetal
 					SendToUnsynced("MexEnergyEvent", teamID, allyTeamData.teams, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
 				end 
 			end
