@@ -649,6 +649,15 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
 	},	
+	["armmanni"] = {
+		skirms = artyRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 40, 
+	},	
 	-- cowardly support units
 	--[[
 	["example"] = {

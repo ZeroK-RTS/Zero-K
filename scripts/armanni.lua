@@ -81,11 +81,18 @@ function script.AimWeapon(weaponNum, heading, pitch)
 	if not open then return false end
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
+	
+	GG.DontFireRadar_CheckAim(unitID)
+	
 	Turn( turret , y_axis, heading, math.rad(50) )
 	Turn( gun , x_axis, 0 - pitch, math.rad(40) )
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
 	return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
+end
+
+function script.BlockShot(num, targetID)
+	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) and true or false
 end
 
 --[[

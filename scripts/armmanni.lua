@@ -87,12 +87,19 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
+	
+	GG.DontFireRadar_CheckAim(unitID)
+	
 	Turn( turret , y_axis, heading, math.rad(70) )
 	Turn( gun , x_axis, -pitch, math.rad(60) )
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
+end
+
+function script.BlockShot(num, targetID)
+	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) and true or false
 end
 
 function script.AimFromWeapon1(num)

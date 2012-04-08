@@ -225,6 +225,8 @@ function script.AimWeapon(num, heading,pitch)
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
 	
+	GG.DontFireRadar_CheckAim(unitID)
+	
 	-- Announce that we would like to aim, and wait until we can
 	while not bCanAim do
 		Sleep(100)
@@ -248,6 +250,10 @@ function script.AimWeapon(num, heading,pitch)
 	Turn( camera , y_axis, 0, math.rad(100) )
 	bAiming = false
 	return(true)
+end
+
+function script.BlockShot(num, targetID)
+	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) and true or false
 end
 
 function script.FireWeapon(num)
