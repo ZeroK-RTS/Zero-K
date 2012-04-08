@@ -31,7 +31,7 @@ local unitFloatIdleBehaviour = {
 	type    = CMDTYPE.ICON_MODE,
 	name    = 'Float State',
 	action  = 'floatstate',
-	tooltip	= 'Controls when a unit floats',
+	tooltip	= 'Float / Sink',
 	params 	= {DEFAULT_FLOAT, 'Sink','Attack','Float'}
 }
 
