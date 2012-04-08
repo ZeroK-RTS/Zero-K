@@ -137,9 +137,9 @@ function gadget:GameFrame(n)
 			local _,_,_,isAI,_,_ = Spring.GetTeamInfo(team)
 			if not spec  and not isAI then 
 				if (afkTeams[team] ~= nil) then  -- team is AFK 
-					-- team no longer AFK, return his units
+        -- team no longer AFK, return his or her units
 					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- and activity ~= nil and gameSecond-activity<10 
-						Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his units")
+          Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
 						GG.allowTransfer = true
 						for unitID, uteam in pairs(lineage) do
 							if (uteam == team) then
