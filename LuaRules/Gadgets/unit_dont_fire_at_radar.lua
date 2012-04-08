@@ -22,6 +22,7 @@ end
 --------------------------------------------------------------------------------
 local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
+local spGetUnitTeam         = Spring.GetUnitTeam
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
@@ -30,6 +31,7 @@ local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitLosState     = Spring.GetUnitLosState
 local spGetCommandQueue     = Spring.GetCommandQueue
 local spSetUnitTarget       = Spring.SetUnitTarget
+local spGetUnitDefID        = Spring.GetUnitDefID
 
 local CMD_ATTACK		= CMD.ATTACK
 local CMD_OPT_INTERNAL 	= CMD.OPT_INTERNAL
@@ -72,9 +74,19 @@ local wantGoodTarget = {}
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function unitInLos(targetID, allyTeam)
-	local los = spGetUnitLosState(targetID,allyTeam,false)
-	return los and los.los
+local function canShootAtUnit(targetID, allyTeam)
+	local see = spGetUnitLosState(targetID,allyTeam,false)
+	local raw = spGetUnitLosState(targetID,allyTeam,true)
+	--GG.tableEcho(see)
+	if see and see.los then
+		return true
+	elseif raw > 2 then
+		local unitDefID = spGetUnitDefID(targetID)
+		if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].speed == 0 then
+			return true
+		end
+	end
+	return false
 end
 
 local function isTheRightSortOfCommand(cQueue, index)
@@ -88,7 +100,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if units[unitID] then
 		local data = units[unitID]
 		--Spring.Echo("AllowWeaponTarget frame " .. Spring.GetGameFrame())
-		if spValidUnitID(targetID) and unitInLos(targetID,data.allyTeam) then
+		if spValidUnitID(targetID) and canShootAtUnit(targetID, spGetUnitAllyTeam(unitID)) then
 			--GG.unitEcho(targetID, "target")
 			if wantGoodTarget[unitID] then
 				wantGoodTarget[unitID] = nil
@@ -112,7 +124,7 @@ function GG.DontFireRadar_CheckAim(unitID)
 	if units[unitID] then
 		local cQueue = spGetCommandQueue(unitID)
 		local data = units[unitID]
-		if isTheRightSortOfCommand(cQueue, 1) and not unitInLos(cQueue[1].params[1], data.allyTeam) then
+		if isTheRightSortOfCommand(cQueue, 1) and not canShootAtUnit(cQueue[1].params[1], spGetUnitAllyTeam(unitID)) then
 			local firestate = Spring.GetUnitStates(unitID).firestate
 			
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, {} )
@@ -127,7 +139,7 @@ end
 function GG.DontFireRadar_CheckBlock(unitID, targetID)
 	if units[unitID] and spValidUnitID(targetID) then
 		local data = units[unitID]
-		if unitInLos(targetID, data.allyTeam) then
+		if canShootAtUnit(targetID, spGetUnitAllyTeam(unitID)) then
 			return false
 		else
 			spSetUnitTarget(unitID,0)
@@ -150,9 +162,7 @@ local function DontFireAtRadarToggleCommand(unitID, cmdParams, cmdOptions)
 		end
 		if state == 1 then
 			if not units[unitID] then
-				units[unitID] = {
-					allyTeam = spGetUnitAllyTeam(unitID)
-				}
+				units[unitID] = true
 			end
 		else
 			if units[unitID] then

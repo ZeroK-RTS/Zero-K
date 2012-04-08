@@ -45,7 +45,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[Longneck_Tachy.s3o]],
-  script	      = [[armmanni.lua]],
+  script	          = [[armmanni.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[MEDIUM_BUILDINGEX]],
   
