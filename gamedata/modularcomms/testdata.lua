@@ -136,6 +136,7 @@ local base = {
 			"commweapon_missilelauncher",
 			"commweapon_beamlaser",
 			"weaponmod_antiair",
+			"module_resurrect",
 		}
 	},
 	{
