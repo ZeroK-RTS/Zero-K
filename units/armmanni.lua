@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Penetrator]],
   description         = [[Mobile Tachyon Accelerator (Artillery/Anti-Armor)]],
   acceleration        = 0.016,
-  bmcode              = [[1]],
   brakeRate           = 0.148,
   buildCostEnergy     = 1000,
   buildCostMetal      = 1000,
@@ -15,7 +14,6 @@ unitDef = {
   canHover            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[HOVER]],
   corpse              = [[DEAD]],
 
@@ -29,7 +27,6 @@ unitDef = {
 	helptext_de    = [[Penetrators Waffe, genannt "der Blaue Laser des Todes", hat die Macht und Präzision die meisten Einheiten mit einem einzigen Schuss zu vernichten. Nutze ihn gegen gut gepanzerte Einheiten, aber halte ihn hinter den Frontlinien - er besitzt nur wenig Verteidigung und kann nicht ruckartig weglaufen. Gehe sicher, dass du genug Energievorräte besitzt, denn seine Waffe braucht von dieser sehr viel.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[MEDIUM_BUILDINGEX]],
   footprintX          = 3,
   footprintZ          = 3,
@@ -37,7 +34,6 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  maneuverleashlength = [[640]],
   mass                = 304,
   maxDamage           = 1000,
   maxSlope            = 18,
@@ -49,13 +45,20 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[Longneck_Tachy.s3o]],
+  script	      = [[armmanni.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[MEDIUM_BUILDINGEX]],
+  
+  sfxtypes            = {
+
+    explosiongenerators = {
+      [[custom:HEAVYHOVERS_ON_GROUND]],
+    },
+
+  },  
+  
   side                = [[ARM]],
   sightDistance       = 660,
-  smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
   turninplace         = 0,
   turnRate            = 320,
   workerTime          = 0,
