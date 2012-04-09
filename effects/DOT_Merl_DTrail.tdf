@@ -1,0 +1,63 @@
+[DOT_Merl_DTrail0]
+{
+
+//Pass auf womit du dat teil schmeist, junge!
+	[Rauch]
+	{
+	class=CSimpleParticleSystem;
+
+		[properties]
+		{
+
+		Texture=smokesmall;
+
+
+		colorMap	 =  0.3 0.3 0.3 0.75	0 0 0 0.01;
+
+      		pos 		= 0, 1, 0;
+		gravity		= 0, 0.2, 0;
+	       	emitVector	= 0, 1, 0;
+		emitRot		= 0;
+		emitRotSpread	= 0;
+
+		sizeGrowth	= 0.5 r.5;
+		sizeMod		= 1.0;
+
+		airdrag			= 1;
+		particleLife		= 25;
+		particleLifeSpread	= 25;
+		numParticles		= 2;
+		particleSpeed		= 1;
+		particleSpeedSpread	= 0.5;
+		particleSize		= 0.5;
+		particleSizeSpread	= 1;
+
+		directional		= 0; 
+		useAirLos		= 1;
+		}
+	air=0;
+	ground=1;
+	water=0;
+	count=1;
+	}
+
+
+	[licht]
+		{
+		class=CSimpleGroundFlash;
+		[properties]
+		{
+		  texture=groundflash;
+		  size=8;
+		  sizeGrowth=0 -0.25;
+		  ttl=8;
+	          colorMap= 1 1 1 1    0 0 0 0.01;
+		}
+    	air=0;
+    	ground=1;
+    	water=0;
+	count=1;
+	}
+
+
+}

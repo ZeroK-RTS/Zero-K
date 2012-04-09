@@ -4,7 +4,8 @@
 --  Load CA's effects from ./effects and not ./gamedata/explosions
 --
 
-local luaFiles = VFS.DirList('effects', '*.lua')
+local luaFiles = VFS.DirList('effects', '*.lua', '*.tdf')
+--couldn't be arsed to convert to lua since there is no real benefit for CEG's -Zement/DOT
 
 for _, filename in ipairs(luaFiles) do
   local edEnv = {}
