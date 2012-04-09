@@ -206,18 +206,18 @@ end
 local function UpdateResourceStats(t)
 
 	resourceInfo.count = resourceInfo.count + 1
-	resourceInfo.data[resourceInfo.count] = {res = {}, t = t}
+	resourceInfo.data[resourceInfo.count] = {allyRes = {}, teamRes = {}, t = t}
 
 	for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
 		local teams = allyTeamData.teams
 		local team = allyTeamData.team
 		
-		local gadgetResources = GG.Overdrive_resources[allyTeamID] or {}
+		local allyOverdriveResources = GG.Overdrive_allyTeamResources[allyTeamID] or {}
 		
-		resourceInfo.data[resourceInfo.count].res[allyTeamID] = {
+		resourceInfo.data[resourceInfo.count].allyRes[allyTeamID] = {
 			metal_income_total = 0,
-			metal_income_base = gadgetResources.baseMetal or 0,
-			metal_income_overdrive = gadgetResources.overdriveMetal or 0,
+			metal_income_base = allyOverdriveResources.baseMetal or 0,
+			metal_income_overdrive = allyOverdriveResources.overdriveMetal or 0,
 			metal_income_other = 0,
 			
 			metal_spend_total = 0,
@@ -227,37 +227,69 @@ local function UpdateResourceStats(t)
 			metal_storage_current = 0,
 			metal_storage_free = 0,
 			
-			energy_income_total = gadgetResources.baseEnergy or 0,
+			energy_income_total = allyOverdriveResources.baseEnergy or 0,
 			
 			energy_spend_total = 0,
-			energy_spend_overdrive = gadgetResources.overdriveEnergy or 0,
+			energy_spend_overdrive = allyOverdriveResources.overdriveEnergy or 0,
 			energy_spend_construction = 0,
 			energy_spend_other = 0,
-			energy_spend_waste = gadgetResources.wasteEnergy or 0,
+			energy_spend_waste = allyOverdriveResources.wasteEnergy or 0,
 			
 			energy_storage_current = 0,
 		}
 		
-		local res = resourceInfo.data[resourceInfo.count].res[allyTeamID]
+		local aRes = resourceInfo.data[resourceInfo.count].allyRes[allyTeamID]
 		
 		for i = 1, teams do
 			local teamID = team[i]
 			local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teamID, "metal")
-			res.metal_spend_construction = res.metal_spend_construction + mExpe
-			res.metal_income_total = res.metal_income_total + mInco
-			res.metal_spend_total = res.metal_spend_total + mExpe
-			res.metal_storage_free = res.metal_storage_free + mStor - mCurr
-			res.metal_storage_current = res.metal_storage_current + mCurr
+			aRes.metal_spend_construction = aRes.metal_spend_construction + mExpe
+			aRes.metal_income_total = aRes.metal_income_total + mInco
+			aRes.metal_spend_total = aRes.metal_spend_total + mExpe
+			aRes.metal_storage_free = aRes.metal_storage_free + mStor - mCurr
+			aRes.metal_storage_current = aRes.metal_storage_current + mCurr
+			
 			local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(teamID, "energy")
-			res.energy_spend_total = res.energy_spend_total + eExpe
-			res.energy_storage_current = res.energy_storage_current + eCurr
+			aRes.energy_spend_total = aRes.energy_spend_total + eExpe
+			aRes.energy_storage_current = aRes.energy_storage_current + eCurr
+			
+			local teamOverdriveResources = GG.Overdrive_teamResources[teamID] or {}
+			
+			resourceInfo.data[resourceInfo.count].teamRes[teamID] = {
+				metal_income_total = mInco + mReci,
+				metal_income_base = teamOverdriveResources.baseMetal or 0,
+				metal_income_overdrive = teamOverdriveResources.overdriveMetal or 0,
+				metal_income_other = 0,
+				
+				metal_spend_total = mExpe + mSent,
+				metal_spend_construction = mExpe,
+				
+				metal_share_net = mReci - mSent,
+				
+				metal_storage_current = mCurr,
+				
+				energy_income_total = eInco,
+				
+				energy_spend_total = eExpe,
+				energy_spend_construction = mExpe,
+				energy_spend_other = 0,
+				
+				energy_share_net = teamOverdriveResources.overdriveEnergyChange or 0,
+				
+				energy_storage_current = eCurr,
+			}
+			
+			local tRes = resourceInfo.data[resourceInfo.count].teamRes[teamID]
+			
+			tRes.metal_income_other = tRes.metal_income_total - tRes.metal_income_base - tRes.metal_income_overdrive - mReci
+			tRes.energy_spend_other = tRes.energy_spend_total - tRes.energy_spend_construction + math.min(0, tRes.energy_share_net) 
 		end
 		
-		res.metal_income_other = res.metal_income_total - res.metal_income_base - res.metal_income_overdrive
-		res.metal_spend_waste = math.min(res.metal_storage_free - res.metal_income_total - res.metal_spend_total,0)
+		aRes.metal_income_other = aRes.metal_income_total - aRes.metal_income_base - aRes.metal_income_overdrive
+		aRes.metal_spend_waste = math.min(aRes.metal_storage_free - aRes.metal_income_total - aRes.metal_spend_total,0)
 		
-		res.energy_spend_construction = res.metal_spend_construction
-		res.energy_spend_other = res.energy_spend_total - (res.energy_spend_overdrive + res.energy_spend_construction + res.energy_spend_waste)		
+		aRes.energy_spend_construction = aRes.metal_spend_construction
+		aRes.energy_spend_other = aRes.energy_spend_total - (aRes.energy_spend_overdrive + aRes.energy_spend_construction + aRes.energy_spend_waste)		
 	end
 end
 
@@ -737,11 +769,24 @@ function gadget:GameOver()
 	local resourceInfo = SYNCED.resourceInfo
 	local data = resourceInfo.data
 	
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i=1,#allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		local teamList = Spring.GetTeamList(allyTeamID)
+		local echo = allyTeamID
+		for j=1,#teamList do
+			local teamID = teamList[j]
+			echo = echo .. " " .. teamID .. " " .. (teamNames[teamID] or "no_name")
+		end
+		Spring.SendCommands("wbynum 255 SPRINGIE: allyTeamPlayerMap " .. echo)
+		--Spring.Echo(echo)
+	end
+	
 	for i = 1, resourceInfo.count do
 		if data[i] then
-			local echo = data[i].t .. " "
-			for allyTeamID, allyData in spairs(data[i].res) do 
-				echo = echo .. allyTeamID .. " " ..
+			local echo = data[i].t
+			for allyTeamID, allyData in spairs(data[i].allyRes) do 
+				echo = echo .. " " .. allyTeamID .. " " ..
 				allyData.metal_income_total .. " " ..
 				allyData.metal_income_base .. " " ..
 				allyData.metal_income_overdrive .. " " ..
@@ -763,10 +808,37 @@ function gadget:GameOver()
 				allyData.energy_spend_waste .. " " ..
 				
 				allyData.energy_storage_current .. " "
-				
-				echo = echo .. " "
 			end
-			Spring.SendCommands("wbynum 255 SPRINGIE: resourcedata " .. echo)
+			Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. echo)
+			--Spring.Echo(echo)
+			
+			echo = data[i].t
+			
+			for teamID, teamData in spairs(data[i].teamRes) do 
+				echo = echo .. " " .. teamID .. " " ..
+				teamData.metal_income_total .. " " ..
+				teamData.metal_income_base .. " " ..
+				teamData.metal_income_overdrive .. " " ..
+				teamData.metal_income_other .. " " ..
+		
+				teamData.metal_spend_total .. " " ..
+				teamData.metal_spend_construction .. " " ..
+				
+				teamData.metal_share_net  .. " " ..
+				
+				teamData.metal_storage_current .. " " ..
+				
+				teamData.energy_income_total .. " " ..
+				
+				teamData.energy_spend_total .. " " ..
+				teamData.energy_spend_construction .. " " ..
+				teamData.energy_spend_other .. " " ..
+				
+				teamData.energy_share_net  .. " " ..
+				
+				teamData.energy_storage_current .. " "
+			end
+			Spring.SendCommands("wbynum 255 SPRINGIE: teamResourceData " .. echo)
 			--Spring.Echo(echo)
 		end
 	end

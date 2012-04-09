@@ -117,22 +117,39 @@ end
 -------------------------------------------------------------------------------------
 -- Awards
 
-GG.Overdrive_resources = {}
-local lastResources = {} -- 1 second lag for resource updates
- 
+GG.Overdrive_allyTeamResources = {}
+local lastAllyTeamResources = {} -- 1 second lag for resource updates
+
 local function sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, teamIncome, ODenergy, wasteEnergy)
-	local last = lastResources[allyTeamID] or {}
-	GG.Overdrive_resources[allyTeamID] = {
+	local last = lastAllyTeamResources[allyTeamID] or {}
+	GG.Overdrive_allyTeamResources[allyTeamID] = {
 		baseMetal = summedBaseMetal,
 		overdriveMetal = last.overdriveMetal or 0,
 		baseEnergy = teamIncome,
 		overdriveEnergy = last.overdriveEnergy or 0,
 		wasteEnergy = last.wasteEnergy or 0,
 	}
-	lastResources[allyTeamID] = {
+	lastAllyTeamResources[allyTeamID] = {
 		overdriveMetal = summedOverdrive,
 		overdriveEnergy = ODenergy,
 		wasteEnergy = wasteEnergy,
+	}
+end
+
+
+GG.Overdrive_teamResources = {}
+local lastTeamResources = {} -- 1 second lag for resource updates
+
+local function sendTeamInformationToAwards(teamID, baseMetal, overdriveMetal, overdriveEnergyChange)
+	local last = lastTeamResources[teamID] or {}
+	GG.Overdrive_teamResources[teamID] = {
+		baseMetal = baseMetal,
+		overdriveMetal = last.overdriveMetal or 0,
+		overdriveEnergyChange = last.overdriveEnergyChange or 0,
+	}
+	lastTeamResources[teamID] = {
+		overdriveMetal = overdriveMetal,
+		overdriveEnergyChange = overdriveEnergyChange,
 	}
 end
  
@@ -1012,6 +1029,8 @@ function gadget:GameFrame(n)
 						end		
 						
 						local baseShare = summedBaseMetal / activeCount
+						
+						sendTeamInformationToAwards(teamID, baseShare, odShare, te.totalChange)
 						
 						Spring.AddTeamResource(teamID, "m", odShare + baseShare)
 						--Spring.Echo(teamID .. " got " .. (odShare + baseShare))
