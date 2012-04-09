@@ -784,7 +784,7 @@ function gadget:GameOver()
 	
 	for i = 1, resourceInfo.count do
 		if data[i] then
-			local echo = data[i].t
+			local echo = data[i].t .. " "
 			for allyTeamID, allyData in spairs(data[i].allyRes) do 
 				echo = echo .. " " .. allyTeamID .. " " ..
 				allyData.metal_income_total .. " " ..
@@ -807,12 +807,12 @@ function gadget:GameOver()
 				allyData.energy_spend_other .. " " ..
 				allyData.energy_spend_waste .. " " ..
 				
-				allyData.energy_storage_current .. " "
+				allyData.energy_storage_current
 			end
 			Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. echo)
 			--Spring.Echo(echo)
 			
-			echo = data[i].t
+			echo = data[i].t .. " "
 			
 			for teamID, teamData in spairs(data[i].teamRes) do 
 				echo = echo .. " " .. teamID .. " " ..
@@ -836,7 +836,7 @@ function gadget:GameOver()
 				
 				teamData.energy_share_net  .. " " ..
 				
-				teamData.energy_storage_current .. " "
+				teamData.energy_storage_current
 			end
 			Spring.SendCommands("wbynum 255 SPRINGIE: teamResourceData " .. echo)
 			--Spring.Echo(echo)
