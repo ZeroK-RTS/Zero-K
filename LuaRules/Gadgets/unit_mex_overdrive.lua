@@ -113,6 +113,28 @@ do
   end
 end
  
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Awards
+
+GG.Overdrive_resources = {}
+local lastResources = {} -- 1 second lag for resource updates
+ 
+local function sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, teamIncome, ODenergy, wasteEnergy)
+	local last = lastResources[allyTeamID] or {}
+	GG.Overdrive_resources[allyTeamID] = {
+		baseMetal = summedBaseMetal,
+		overdriveMetal = last.overdriveMetal or 0,
+		baseEnergy = teamIncome,
+		overdriveEnergy = last.overdriveEnergy or 0,
+		wasteEnergy = last.wasteEnergy or 0,
+	}
+	lastResources[allyTeamID] = {
+		overdriveMetal = summedOverdrive,
+		overdriveEnergy = ODenergy,
+		wasteEnergy = wasteEnergy,
+	}
+end
  
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -977,7 +999,9 @@ function gadget:GameFrame(n)
 				end 
 				
 				--Spring.Echo(allyTeamID .. " energy sum " .. teamODEnergySum)
-				
+	
+				sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, teamIncome, ODenergy, energyWasted)
+	
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then

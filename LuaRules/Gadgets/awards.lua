@@ -36,6 +36,7 @@ local spGetAllUnits			= Spring.GetAllUnits
 local spGetUnitTeam			= Spring.GetUnitTeam
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitExperience	= Spring.GetUnitExperience
+local spGetTeamResources    = Spring.GetTeamResources
 
 local floor = math.floor
 
@@ -177,9 +178,96 @@ local function UpdateShareList()
 end
 
 -------------------
+-- Resource tracking
+
+local HIDDEN_STORAGE = 10000
+
+local allyTeamInfo = {} 
+local resourceInfo = {count = 0, data = {}}
+
+do
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i=1,#allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		allyTeamInfo[allyTeamID] = {
+			team = {},
+			teams = 0,
+		}
+		
+		local teamList = Spring.GetTeamList(allyTeamID)
+		for j=1,#teamList do
+			local teamID = teamList[j]
+			allyTeamInfo[allyTeamID].teams = allyTeamInfo[allyTeamID].teams + 1
+			allyTeamInfo[allyTeamID].team[allyTeamInfo[allyTeamID].teams] = teamID
+		end
+	end
+end
+
+local function UpdateResourceStats(t)
+
+	resourceInfo.count = resourceInfo.count + 1
+	resourceInfo.data[resourceInfo.count] = {res = {}, t = t}
+
+	for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
+		local teams = allyTeamData.teams
+		local team = allyTeamData.team
+		
+		local gadgetResources = GG.Overdrive_resources[allyTeamID] or {}
+		
+		resourceInfo.data[resourceInfo.count].res[allyTeamID] = {
+			metal_income_total = 0,
+			metal_income_base = gadgetResources.baseMetal or 0,
+			metal_income_overdrive = gadgetResources.overdriveMetal or 0,
+			metal_income_other = 0,
+			
+			metal_spend_total = 0,
+			metal_spend_construction = 0,
+			metal_spend_waste = 0,
+			
+			metal_storage_current = 0,
+			metal_storage_free = 0,
+			
+			energy_income_total = gadgetResources.baseEnergy or 0,
+			
+			energy_spend_total = 0,
+			energy_spend_overdrive = gadgetResources.overdriveEnergy or 0,
+			energy_spend_construction = 0,
+			energy_spend_other = 0,
+			energy_spend_waste = gadgetResources.wasteEnergy or 0,
+			
+			energy_storage_current = 0,
+		}
+		
+		local res = resourceInfo.data[resourceInfo.count].res[allyTeamID]
+		
+		for i = 1, teams do
+			local teamID = team[i]
+			local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teamID, "metal")
+			res.metal_spend_construction = res.metal_spend_construction + mExpe
+			res.metal_income_total = res.metal_income_total + mInco
+			res.metal_spend_total = res.metal_spend_total + mExpe
+			res.metal_storage_free = res.metal_storage_free + mStor - mCurr
+			res.metal_storage_current = res.metal_storage_current + mCurr
+			local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(teamID, "energy")
+			res.energy_spend_total = res.energy_spend_total + eExpe
+			res.energy_storage_current = res.energy_storage_current + eCurr
+		end
+		
+		res.metal_income_other = res.metal_income_total - res.metal_income_base - res.metal_income_overdrive
+		res.metal_spend_waste = math.min(res.metal_storage_free - res.metal_income_total - res.metal_spend_total,0)
+		
+		res.energy_spend_construction = res.metal_spend_construction
+		res.energy_spend_other = res.energy_spend_total - (res.energy_spend_overdrive + res.energy_spend_construction + res.energy_spend_waste)		
+	end
+end
+
+-------------------
 -- Callins
 
 function gadget:Initialize()
+	
+	_G.resourceInfo = resourceInfo
+	
 	local tempTeamList = Spring.GetTeamList()
 	for _, team in ipairs(tempTeamList) do
 		--Spring.Echo('team', team)
@@ -360,6 +448,10 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 end
 
 function gadget:GameFrame(n)
+
+	if n%32 == 2 then 
+        UpdateResourceStats((n-2)/32)
+    end
 
 	if n % shareList_update == 1 and not spIsGameOver() then
 		UpdateShareList()
@@ -637,10 +729,48 @@ function gadget:GameOver()
 	--Spring.Echo("Game over (unsynced)")
 	-- reassign colors in case they have been changed locally
 	for _,team in pairs(totalTeamList) do
-                teamColors[team]  = {Spring.GetTeamColor(team)}
-                teamColorsDim[team]  = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
-        end
+		teamColors[team]  = {Spring.GetTeamColor(team)}
+		teamColorsDim[team]  = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
+	end
 
+	--// Resources
+	local resourceInfo = SYNCED.resourceInfo
+	local data = resourceInfo.data
+	
+	for i = 1, resourceInfo.count do
+		if data[i] then
+			local echo = data[i].t .. " "
+			for allyTeamID, allyData in spairs(data[i].res) do 
+				echo = echo .. allyTeamID .. " " ..
+				allyData.metal_income_total .. " " ..
+				allyData.metal_income_base .. " " ..
+				allyData.metal_income_overdrive .. " " ..
+				allyData.metal_income_other .. " " ..
+		
+				allyData.metal_spend_total .. " " ..
+				allyData.metal_spend_construction .. " " ..
+				allyData.metal_spend_waste .. " " ..
+				
+				allyData.metal_storage_current .. " " ..
+				allyData.metal_storage_free .. " " ..
+				
+				allyData.energy_income_total .. " " ..
+				
+				allyData.energy_spend_total .. " " ..
+				allyData.energy_spend_overdrive .. " " ..
+				allyData.energy_spend_construction .. " " ..
+				allyData.energy_spend_other .. " " ..
+				allyData.energy_spend_waste .. " " ..
+				
+				allyData.energy_storage_current .. " "
+				
+				echo = echo .. " "
+			end
+			Spring.SendCommands("wbynum 255 SPRINGIE: resourcedata " .. echo)
+			--Spring.Echo(echo)
+		end
+	end
+	
 	--[[
 	gadget.IsAbove = gadget.IsAbove_
 	gadget.MouseMove = gadget.MouseMove_
