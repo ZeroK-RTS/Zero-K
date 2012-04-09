@@ -130,12 +130,13 @@ function widget:Update(s)
 
 end
 
-local function Format(input)
+local function Format(input, override)
 	
 	local leadingString = GreenStr .. "+"
 	if input < 0 then
 		leadingString = RedStr .. "-"
 	end
+	leadingString = override or leadingString
 	input = math.abs(input)
 	
 	if input < 0.01 then
@@ -170,12 +171,14 @@ function widget:GameFrame(n)
 	local teamMInco = 0
 	local teamMSpent = 0
 	local teamFreeStorage = 0
+	local teamTotalMetalStored = 0
 	for i = 1, #teams do
 		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(teams[i], "metal")
 		totalConstruction = totalConstruction + mExpe
 		teamMInco = teamMInco + mInco
 		teamMSpent = teamMSpent + mExpe
 		teamFreeStorage = teamFreeStorage + mStor - mCurr
+		teamTotalMetalStored = teamTotalMetalStored + mCurr
 		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(teams[i], "energy")
 		totalExpense = totalExpense + eExpe
 	end
@@ -239,9 +242,9 @@ function widget:GameFrame(n)
 		bar_energy_overlay:SetCaption( ("%i/%i"):format(eCurr, eStor) )
 	end
 	
-	local mexInc = Format((WG.mexIncome or 0)/(WG.allies or 1))
-	local odInc = Format((WG.metalFromOverdrive or 0)/(WG.allies or 1))
-	local otherM = Format(mInco - (WG.metalFromOverdrive or 0)/(WG.allies or 1) - (WG.mexIncome or 0)/(WG.allies or 1) - mReci)
+	local mexInc = Format(WG.myMexIncome or 0)
+	local odInc = Format((WG.myMetalFromOverdrive or 0))
+	local otherM = Format(mInco - (WG.myMetalFromOverdrive or 0) - (WG.myMexIncome or 0) - mReci)
 	local shareM = Format(mReci - mSent)
 	local constuction = Format(-mExpe)
 	
@@ -250,6 +253,7 @@ function widget:GameFrame(n)
 	local teamOtherM = Format(teamMInco - (WG.metalFromOverdrive or 0) - (WG.mexIncome or 0))
 	local teamWasteM = Format(math.min(teamFreeStorage - teamMInco - teamMSpent,0))
 	local totalMetalIncome = Format(teamMInco)
+	local totalMetalStored = Format((teamTotalMetalStored or 0), "")
 	
 	local energyInc = Format(eInco - math.max(0, (WG.change or 0)))
 	local energyShare =  Format(WG.change or 0)
@@ -276,7 +280,9 @@ function widget:GameFrame(n)
 	"\nOverdrive: " .. teamODInc ..
 	"\nReclaim and Cons: " .. teamOtherM ..
 	"\nConstruction: " .. totalConstruction ..
-	"\nWaste: " .. teamWasteM 
+	"\nWaste: " .. teamWasteM ..
+	"\n" .. 
+	"\nTotal Stored: " .. totalMetalStored
 	
 	bar_energy.tooltip = "Local Energy Economy" ..
 	"\nIncome: " .. energyInc ..
@@ -654,9 +660,10 @@ local lastChange = 0
 local lastEnergyForOverdrive = 0
 local lastEnergyWasted = 0
 local lastMetalFromOverdrive = 0
+local lastMyMetalFromOverdrive = 0
 
 -- note works only in communism mode
-function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, EnergyChange, teamIncome)
+function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOverdrive, EnergyChange, teamIncome)
   if (Spring.GetLocalTeamID() == teamID) then 
   	WG.energyWasted = lastEnergyWasted
     lastEnergyWasted = energyWasted
@@ -667,6 +674,9 @@ function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalI
 	WG.mexIncome = baseMetal
 	WG.metalFromOverdrive = lastMetalFromOverdrive
     lastMetalFromOverdrive = overdriveMetal
+	WG.myMexIncome = myBase
+	WG.myMetalFromOverdrive = lastMyMetalFromOverdrive
+	lastMyMetalFromOverdrive = myOverdrive
 	WG.teamIncome = teamIncome
 	WG.allies = allies
   end

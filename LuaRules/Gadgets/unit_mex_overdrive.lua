@@ -916,7 +916,7 @@ function gadget:GameFrame(n)
 				if stunned_or_inbuld then
 					orgMetal = 0
 				end
-				summedBaseMetal =summedBaseMetal + orgMetal
+				summedBaseMetal = summedBaseMetal + orgMetal
                 
 				Spring.SetUnitRulesParam(unitID, "overdrive", 1)
 				Spring.CallCOBScript(unitID, "SetSpeed", 0, orgMetal * 500) 
@@ -982,36 +982,20 @@ function gadget:GameFrame(n)
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
 						local te = teamEnergy[teamID]
-						local odMetal = summedMetalProduction / activeCount
+						local odShare = summedOverdrive / activeCount
 						if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
-							odMetal = OD_OWNER_SHARE * summedMetalProduction * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odMetal
+							odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odShare
 						end		
 						
-						Spring.AddTeamResource(teamID, "m", odMetal)
-						--Spring.Echo(teamID .. " got " .. odMetal)
-						-- FIXME send information about REAL share -> odMetal
-						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
+						local baseShare = summedBaseMetal / activeCount
+						
+						Spring.AddTeamResource(teamID, "m", odShare + baseShare)
+						--Spring.Echo(teamID .. " got " .. (odShare + baseShare))
+						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, baseShare, odShare, te.totalChange, teamIncome) 
 					end
 				end 
 			else
-				local teamODEnergySum = 0
-				for i = 1, allyTeamData.teams do  -- calculate active team OD sum
-					local teamID = allyTeamData.team[i]
-					teamODEnergySum = teamODEnergySum + teamODEnergy[teamID]
-				end 
-			
-				for i = 1, allyTeamData.teams do 
-					local teamID = allyTeamData.team[i]
-					local te = teamEnergy[teamID]
-					local odMetal = summedMetalProduction / allyTeamData.teams
-					if (teamODEnergySum > 0) then 
-						odMetal = OD_OWNER_SHARE * summedMetalProduction * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odMetal
-					end
-
-					Spring.AddTeamResource(teamID, "m", odMetal)
-					-- FIXME send information about REAL share -> odMetal
-					SendToUnsynced("MexEnergyEvent", teamID, allyTeamData.teams, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
-				end 
+				Spring.Echo("Lag monitor doesn't work so Overdrive is STUFFED")
 			end
 		end
 	end
@@ -1254,10 +1238,10 @@ local floor = math.floor
 
 local circlePolys = 0 -- list for circles
 
-function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, EnergyChange, teamIncome)
+function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome)
   if (teamID ~= Spring.GetLocalTeamID()) then return end
   if (Script.LuaUI('MexEnergyEvent')) then
-    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, EnergyChange, teamIncome)
+    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome)
   end
 end
 
