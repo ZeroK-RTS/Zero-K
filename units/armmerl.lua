@@ -29,7 +29,7 @@ unitDef = {
 	helptext_de    = [[Der Merl feuert seine Raketen senkrecht ab. Ihn zeichnen seine hohe Präzision und die lange Reichweite seiner Flugkörper, sowie die Möglichkeit über Hindernisse zu schießen, aus. Die große Flugzeit macht ihn aber nutzlos gegenüber sich bewegenden Einheiten. Nutze den Merl, um spezielle Einheiten/Gebäude zu zerstören.]],
   },
 
-  explodeAs           = [[BIG_UNITEX]],
+  explodeAs           = [[BIG_UNITEX_MERL]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[vehiclelrarty]],
@@ -48,7 +48,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SWIM LAND SHIP GUNSHIP HOVER]],
   objectName          = [[core_diplomat.s3o]],
   seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  selfDestructAs      = [[BIG_UNITEX_MERL]],
 
   sfxtypes            = {
 
@@ -98,7 +98,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
-      explosionGenerator      = [[custom:STARFIRE]],
+      explosionGenerator      = [[custom:DOT_Merl_Explo]],
       fireStarter             = 100,
       flighttime              = 14,
 	  impactOnly              = true,

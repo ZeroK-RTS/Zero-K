@@ -89,7 +89,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.5,
-	  explosionGenerator      = [[custom:PLASMA_HIT_96]],
+	  explosionGenerator      = [[custom:DOT_Pillager_Explo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,

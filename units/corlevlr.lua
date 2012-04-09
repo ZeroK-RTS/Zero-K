@@ -13,7 +13,7 @@ unitDef = {
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
-  canPatrol           = true,
+  canPatrol           = true,	
   canstop             = [[1]],
   category            = [[LAND]],
   corpse              = [[DEAD]],
@@ -29,7 +29,7 @@ unitDef = {
   },
 
   defaultmissiontype  = [[Standby]],
-  explodeAs           = [[BIG_UNITEX]],
+  explodeAs           = [[BIG_UNITEX_LEVELER]],
   footprintX          = 3,
   footprintZ          = 3,
   iconType            = [[vehicleriot]],
@@ -48,7 +48,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[corleveler_512.s3o]],
   seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
+  selfDestructAs      = [[BIG_UNITEX_LEVELER]],
 
   sfxtypes            = {
 
@@ -109,7 +109,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:FLASH64]],
+      explosionGenerator      = [[custom:DOT_Leveler_Explo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
