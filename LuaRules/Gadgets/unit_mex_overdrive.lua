@@ -748,7 +748,7 @@ function gadget:GameFrame(n)
 		
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
 			
-			--// check if pylons changed their active status (emp, reverse-build, ..)
+			--// Check if pylons changed their active status (emp, reverse-build, ..)
 			for unitID, pylonData in pairs(pylon[allyTeamID]) do
 				if spValidUnitID(unitID) then
 					local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
@@ -768,7 +768,7 @@ function gadget:GameFrame(n)
 			local teamEnergy = {}
 			local teamIncome = 0
 
-			-- calcullate total income - tax 95% of energy income 
+			--// Calculate total income - tax 95% of energy income 
 			local sumInc = 0
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
@@ -789,7 +789,8 @@ function gadget:GameFrame(n)
 				end 
 			end 
 			--Spring.Echo("sumInc: " .. sumInc)
-			-- distribute taxes evenly - apply "change" on individual teams 
+			
+			--// Distribute taxes evenly - apply "change" on individual teams 
 			local share = sumInc / allyTeamData.teams
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
@@ -807,9 +808,8 @@ function gadget:GameFrame(n)
 			end 
 			
 			local teamODEnergy = {}
-			local teamODEnergySum = 0 
 			
-			-- calculate overdrive energy excess 
+			--// Calculate overdrive energy excess 
 			for i = 1, allyTeamData.teams do 
 				local teamID = allyTeamData.team[i]
 				local te = teamEnergy[teamID]
@@ -824,8 +824,6 @@ function gadget:GameFrame(n)
 						local ne = inc * fillRatio   -- actual energy used for overdrive depends on fill ratio. At 50% of storage, 50% of income is used 
                         --teamEcho(teamID, teamID .. ",   CUR: " .. te.eCur .. ",   MAX: " .. te.eMax  .. ",   HIDE: " .. HIDDEN_STORAGE)
                         --teamEcho(teamID, teamID .. ",   INC: " .. inc .. ",   FR: " .. fillRatio )
-						teamODEnergy[teamID] = ne
-						teamODEnergySum = teamODEnergySum + ne
                         allyEExcess  = allyEExcess + ne
 						changeTeamEnergy(te, -ne)
 					end 
@@ -905,8 +903,10 @@ function gadget:GameFrame(n)
                 --teamEcho(teamID, teamID .. ",   Real E Change: " .. te.totalChange)
 				if te.totalChange > 0 then
 					Spring.AddTeamResource(teamID, "e", te.totalChange)
+					teamODEnergy[teamID] = 0 
 				elseif te.totalChange < 0 then
 					Spring.UseTeamResource(teamID, "e", -te.totalChange)
+					teamODEnergy[teamID] = -te.totalChange
 				end
 			end 
 			
@@ -967,28 +967,39 @@ function gadget:GameFrame(n)
 			if GG.Lagmonitor_activeTeams then
 				local activeTeams = GG.Lagmonitor_activeTeams[allyTeamID]
 				local activeCount = (activeTeams.count >= 1 and activeTeams.count) or 1
-				teamODEnergySum = 0
+				local teamODEnergySum = 0
 				for i = 1, allyTeamData.teams do  -- calculate active team OD sum
+					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
-						teamODEnergySum = teamODEnergySum + teamODEnergy[teamID]
+						teamODEnergySum = teamODEnergySum + (teamODEnergy[teamID] or 0)
+						--Spring.Echo(teamID .. " energy " ..  (teamODEnergy[teamID] or "nil"))
 					end
 				end 
-								
+				
+				--Spring.Echo(allyTeamID .. " energy sum " .. teamODEnergySum)
+				
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
 						local te = teamEnergy[teamID]
 						local odMetal = summedMetalProduction / activeCount
-						if (teamODEnergySum > 0) then 
+						if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
 							odMetal = OD_OWNER_SHARE * summedMetalProduction * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odMetal
-						end					
-						Spring.AddTeamResource(teamID, "m", odMetal)
+						end		
 						
+						Spring.AddTeamResource(teamID, "m", odMetal)
+						--Spring.Echo(teamID .. " got " .. odMetal)
 						-- FIXME send information about REAL share -> odMetal
 						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, te.totalChange, teamIncome) 
 					end
 				end 
 			else
+				local teamODEnergySum = 0
+				for i = 1, allyTeamData.teams do  -- calculate active team OD sum
+					local teamID = allyTeamData.team[i]
+					teamODEnergySum = teamODEnergySum + teamODEnergy[teamID]
+				end 
+			
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
