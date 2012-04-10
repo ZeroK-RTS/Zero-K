@@ -1,4 +1,4 @@
-local versionName = "v2.25"
+local versionName = "v2.251"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -1458,8 +1458,10 @@ function FindSafeHavenForCons(unitID, now)
 			if (unitSpeed>0) then --//if moving units
 				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --if cloakies and constructor, and not com (ZK)
 					--intentionally empty. Not include cloakies and builder.
-				elseif not unitDef["canFly"] then --if all ground unit, amphibious, and ships
+				elseif unitDef.customParams.commtype then --if COMMANDER,
 					unorderedUnitList[unitID_list] = {x,y,z} --//store
+				elseif not unitDef["canFly"] then --if all ground unit, amphibious, and ships (except commander)
+					--unorderedUnitList[unitID_list] = {x,y,z} --//store
 				elseif (unitDef.hoverAttack== true) then --if gunships
 					--intentionally empty. Not include gunships.
 				end
