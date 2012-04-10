@@ -102,7 +102,7 @@ function script.BlockShot(num, targetID)
 	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) and true or false
 end
 
-function script.AimFromWeapon1(num)
+function script.AimFromWeapon(num)
 	return gun
 end
 
