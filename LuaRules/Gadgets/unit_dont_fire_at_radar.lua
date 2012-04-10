@@ -32,6 +32,7 @@ local spGetUnitLosState     = Spring.GetUnitLosState
 local spGetCommandQueue     = Spring.GetCommandQueue
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitPosition     = Spring.GetUnitPosition
 
 local CMD_ATTACK		= CMD.ATTACK
 local CMD_OPT_INTERNAL 	= CMD.OPT_INTERNAL
@@ -97,26 +98,32 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID)
-	if units[unitID] then
-		local data = units[unitID]
-		--Spring.Echo("AllowWeaponTarget frame " .. Spring.GetGameFrame())
-		if spValidUnitID(targetID) and canShootAtUnit(targetID, spGetUnitAllyTeam(unitID)) then
-			--GG.unitEcho(targetID, "target")
-			if wantGoodTarget[unitID] then
-				wantGoodTarget[unitID] = nil
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, {"alt"} )
-				local cQueue = spGetCommandQueue(unitID)
-				if isTheRightSortOfCommand(cQueue, 2)  then
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, {} )
+	local x = CallAsTeam(spGetUnitTeam(unitID), function () return spGetUnitPosition(targetID) end)
+	if x then
+		--Spring.Echo(x)
+		if units[unitID] then
+			local data = units[unitID]
+			--Spring.Echo("AllowWeaponTarget frame " .. Spring.GetGameFrame())
+			if spValidUnitID(targetID) and canShootAtUnit(targetID, spGetUnitAllyTeam(unitID)) then
+				--GG.unitEcho(targetID, "target")
+				if wantGoodTarget[unitID] then
+					wantGoodTarget[unitID] = nil
+					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, {"alt"} )
+					local cQueue = spGetCommandQueue(unitID)
+					if isTheRightSortOfCommand(cQueue, 2)  then
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, {} )
+					end
 				end
+				return true, 1
+			else
+				--GG.unitEcho(targetID, "No")
+				return false, 1
 			end
-			return true, 1
 		else
-			--GG.unitEcho(targetID, "No")
-			return false, 1
+			return true, 1
 		end
 	else
-		return true, 1
+		return false, 1
 	end
 end
 

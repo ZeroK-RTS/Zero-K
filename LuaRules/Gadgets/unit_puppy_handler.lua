@@ -93,6 +93,8 @@ local function RestorePuppy(unitID, x, y, z)
 	Spring.AddUnitDamage(unitID, 15, 0, -1, WeaponDefNames["puppy_missile"].id) -- prevent puppy fountain
 	-- Spring.SetUnitNoSelect(unitID, false)
 	Spring.SetUnitNoMinimap(unitID, false)
+	Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+	Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
 	--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
 end
 
