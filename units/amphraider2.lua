@@ -90,13 +90,13 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams            = {
-	    impulse = [[14]],
+	    impulse = [[15]],
 		normaldamage = [[1]],
 	  },
 	  
       damage                  = {
-        default = 0.23,
-        planes  = 0.23,
+        default = 0.6,
+        planes  = 0.6,
         subs    = 0.01,
       },
 
@@ -116,17 +116,17 @@ unitDef = {
       stages		          = 5,
       --size                  = 0,
       sizeDecay               = 0,
-      --soundStart              = [[weapon/hiss]],
+      --soundStart            = [[weapon/hiss]],
       soundStartVolume        = 4,
-      soundTrigger	      = true,
+      soundTrigger	          = true,
       startsmoke              = [[0]],
-      targetBorder	      = true,
+      targetBorder	          = true,
       texture1	              = [[wake]],
       tolerance               = 5000,
       turret                  = true,
       weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 500,
+      weaponVelocity          = 650,
     },
 
   },

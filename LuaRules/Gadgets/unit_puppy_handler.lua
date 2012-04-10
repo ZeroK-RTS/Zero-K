@@ -40,42 +40,60 @@ local puppyLosRadius
 local cannotBeDamage = {}
 local stuckPuppyWorkaround = {}
 
+local puppyGoodPosition = {}
+
+local hiddenPuppy = {}
+
 local function HidePuppy(unitID)
-  -- send the puppy to the stratosphere, cloak it
-  Spring.MoveCtrl.Enable(unitID)
-  local x, _, z = Spring.GetUnitPosition(unitID)
-  local y = Spring.GetGroundHeight(x,z)
-  Spring.MoveCtrl.SetPosition(unitID, x, y - 200, z)
-  --Spring.SetUnitCloak(unitID, 4)
-  -- Spring.SetUnitSensorRadius(unitID, "los", 0)
-  --Spring.SetUnitStealth(unitID, true)
-  Spring.SetUnitNoDraw(unitID, true)
-  -- Spring.SetUnitNoSelect(unitID, true)
-  Spring.SetUnitNoMinimap(unitID, true)
-  --Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
-  
-  local frame = Spring.GetGameFrame() + 450
-  cannotBeDamage[unitID] = frame
-  stuckPuppyWorkaround[frame] = stuckPuppyWorkaround[frame] or {count = 0, data = {}}
-  stuckPuppyWorkaround[frame].count = stuckPuppyWorkaround[frame].count + 1
-  stuckPuppyWorkaround[frame].data[stuckPuppyWorkaround[frame].count] = unitID
+	--Spring.Echo("Hide " .. unitID)
+	hiddenPuppy[unitID] = true
+	-- send the puppy to the stratosphere, cloak it
+	Spring.MoveCtrl.Enable(unitID)
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	local y = Spring.GetGroundHeight(x,z)
+	Spring.MoveCtrl.SetPosition(unitID, x, y - 200, z)
+	--Spring.SetUnitCloak(unitID, 4)
+	-- Spring.SetUnitSensorRadius(unitID, "los", 0)
+	--Spring.SetUnitStealth(unitID, true)
+	Spring.SetUnitNoDraw(unitID, true)
+	-- Spring.SetUnitNoSelect(unitID, true)
+	Spring.SetUnitNoMinimap(unitID, true)
+	--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
+
+	local frame = Spring.GetGameFrame() + 450
+	cannotBeDamage[unitID] = cannotBeDamage[unitID] or frame
+	stuckPuppyWorkaround[frame] = stuckPuppyWorkaround[frame] or {count = 0, data = {}}
+	stuckPuppyWorkaround[frame].count = stuckPuppyWorkaround[frame].count + 1
+	stuckPuppyWorkaround[frame].data[stuckPuppyWorkaround[frame].count] = unitID
 end
 
 
 local function RestorePuppy(unitID, x, y, z)
- --Spring.SetUnitCloak(unitID, false)
-  Spring.MoveCtrl.SetPosition(unitID, x, y, z)
-  Spring.SetUnitBlocking(unitID, false, false)	-- allows it to clip into wrecks (workaround for puppies staying in heaven)
-  Spring.MoveCtrl.Disable(unitID)
-  Spring.SetUnitBlocking(unitID, true, true)	-- restores normal state once they land
-  -- Spring.SetUnitSensorRadius(unitID, "los", puppyLosRadius)
-  --Spring.SetUnitStealth(unitID, false)
-  Spring.SetUnitNoDraw(unitID, false)
-  cannotBeDamage[unitID] = false
-  Spring.AddUnitDamage(unitID, 15, 0, -1, WeaponDefNames["puppy_missile"].id) -- prevent puppy fountain
-  -- Spring.SetUnitNoSelect(unitID, false)
-  Spring.SetUnitNoMinimap(unitID, false)
-  --Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
+	--Spring.SetUnitCloak(unitID, false)
+	--Spring.Echo("RestorePuppy " .. unitID)
+	if not hiddenPuppy[unitID] then
+		local frame = Spring.GetGameFrame() + 1
+		stuckPuppyWorkaround[frame] = stuckPuppyWorkaround[frame] or {count = 0, data = {}}
+		stuckPuppyWorkaround[frame].count = stuckPuppyWorkaround[frame].count + 1
+		stuckPuppyWorkaround[frame].data[stuckPuppyWorkaround[frame].count] = unitID
+		cannotBeDamage[unitID] = cannotBeDamage[unitID] or frame
+		puppyGoodPosition[unitID] = puppyGoodPosition[unitID] or {x = x, y = y, z = z}
+		return
+	end
+	--Spring.Echo("RestorePuppy DONE")
+	hiddenPuppy[unitID] = nil
+	Spring.MoveCtrl.SetPosition(unitID, x, y, z)
+	Spring.SetUnitBlocking(unitID, false, false)	-- allows it to clip into wrecks (workaround for puppies staying in heaven)
+	Spring.MoveCtrl.Disable(unitID)
+	Spring.SetUnitBlocking(unitID, true, true)	-- restores normal state once they land
+	-- Spring.SetUnitSensorRadius(unitID, "los", puppyLosRadius)
+	--Spring.SetUnitStealth(unitID, false)
+	Spring.SetUnitNoDraw(unitID, false)
+	cannotBeDamage[unitID] = false
+	Spring.AddUnitDamage(unitID, 15, 0, -1, WeaponDefNames["puppy_missile"].id) -- prevent puppy fountain
+	-- Spring.SetUnitNoSelect(unitID, false)
+	Spring.SetUnitNoMinimap(unitID, false)
+	--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})
 end
 
 local function PuppyShot(unitID, unitDefID)
@@ -123,7 +141,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
         -- attacked unit is an ally
         if unitDefID == puppyDefID then
           -- attacked unit is an allied puppy, cancel damage
-          return 0
+		  --Spring.Echo("UnitPreDamaged " .. attackerID)
+		  return 0
         end
       else
         -- attacked unit is an enemy, self-destruct the puppy
@@ -153,7 +172,12 @@ function gadget:GameFrame(frame)
 		for i = 1, stuckPuppyWorkaround[frame].count do
 			local unitID = stuckPuppyWorkaround[frame].data[i]
 			if cannotBeDamage[unitID] and cannotBeDamage[unitID] == frame and spValidUnitID(unitID) then
-				local x, _, z = Spring.GetUnitPosition(unitID)
+				local x, z
+				if puppyGoodPosition[unitID] then
+					x,z = puppyGoodPosition[unitID].x, puppyGoodPosition[unitID].z
+				else
+					x,_,z = Spring.GetUnitPosition(unitID)
+				end
 				local y = Spring.GetGroundHeight(x,z)
 				RestorePuppy(unitID, x, y, z)
 			end

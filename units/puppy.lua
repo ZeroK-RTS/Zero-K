@@ -49,7 +49,7 @@ unitDef = {
   objectName             = [[puppy.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[TINY_BUILDINGEX]],
-  selfDestructCountdown  = 0,
+  selfDestructCountdown  = 5,
 
   sfxtypes               = {
 

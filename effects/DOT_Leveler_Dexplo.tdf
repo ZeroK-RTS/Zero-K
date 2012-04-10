@@ -35,7 +35,7 @@
 		directional		= 0; 
 		useAirLos		= 1;
 		}
-	air=0;
+	air=1;
 	ground=1;
 	water=0;
 	count=1;
@@ -74,7 +74,7 @@
 		directional		= 0; 
 		useAirLos		= 1;
 		}
-	air=0;
+	air=1;
 	ground=1;
 	water=0;
 	count=1;
@@ -91,7 +91,7 @@
 		  ttl=8;
 	          colorMap= 1 1 1 1    0 0 0 0.01;
 		}
-    	air=0;
+    	air=1;
     	ground=1;
     	water=0;
 	count=1;

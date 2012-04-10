@@ -87,7 +87,6 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
-	
 	GG.DontFireRadar_CheckAim(unitID)
 	
 	Turn( turret , y_axis, heading, math.rad(70) )

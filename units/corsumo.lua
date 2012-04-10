@@ -172,7 +172,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 40,
+        default = 50,
         subs    = 2,
       },
 
@@ -207,21 +207,21 @@ unitDef = {
 
     LANDING = {
       name                    = [[Sumo Landing]],
-      areaOfEffect            = 300,
+      areaOfEffect            = 340,
       canattackground         = false,
       craterBoost             = 4,
       craterMult              = 6,
 
       damage                  = {
-        default = 800,
-        planes  = 800,
+        default = 1000,
+        planes  = 1000,
         subs    = 40,
       },
 
       edgeEffectiveness       = 0,
       explosionGenerator      = [[custom:FLASH64]],
-      impulseBoost            = 1,
-      impulseFactor           = 0.8,
+      impulseBoost            = 0.5,
+      impulseFactor           = 1,
       interceptedByShieldType = 1,
       lineOfSight             = true,
       noSelfDamage            = true,

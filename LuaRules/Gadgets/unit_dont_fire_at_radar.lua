@@ -126,7 +126,6 @@ function GG.DontFireRadar_CheckAim(unitID)
 		local data = units[unitID]
 		if isTheRightSortOfCommand(cQueue, 1) and not canShootAtUnit(cQueue[1].params[1], spGetUnitAllyTeam(unitID)) then
 			local firestate = Spring.GetUnitStates(unitID).firestate
-			
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, {} )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {firestate}, {} )

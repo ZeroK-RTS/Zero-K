@@ -109,7 +109,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:DOT_Leveler_Explo]],
+      explosionGenerator      = [[custom:FLASH64]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,

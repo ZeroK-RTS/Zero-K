@@ -1,4 +1,6 @@
 -- $Id$
+
+--[[
 local versionName = "v1.0b"
 
 function widget:GetInfo()
@@ -9,10 +11,9 @@ function widget:GetInfo()
     date      = "9 Mar, 2009, +9 April 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
-    enabled   = true --  loaded by default?
+    enabled   = false --  loaded by default?
   }
 end
-
 
 -- Speedups
 
@@ -119,7 +120,7 @@ function widget:CommandNotify(id, params, options)
 						local placeToPut = #areaShieldUnit[targetID].guardedBy +1
 						areaShieldUnit[targetID].guardedBy[placeToPut] = selectedUnits[i] --//insert selected unitID into the areaShield's "guardedBy" table
 						--if enableEcho then Spring.Echo(targetID .. " targetID") end
-						follower_to_areaShieldUnit_meta[selectedUnits[i]]= {areaShieldUnitID = targetID,positionInTable = placeToPut,}
+						follower_to_areaShieldUnit_meta[selectedUnits[i] ]= {areaShieldUnitID = targetID,positionInTable = placeToPut,}
 					end
 				end			
 			end
@@ -177,7 +178,7 @@ function RemoveTableEntry(unitIDTable, index, metaTable) --//will remove an entr
 	local normalEntry = true
 	local endOfTable = #unitIDTable
 	if index == endOfTable then normalEntry = false end--//check if index is on the endOfTable or not. If is endOfTable then just remove entry and done.
-	metaTable[unitIDTable[index]] = nil --//empty the metaTable associated with current index
+	metaTable[unitIDTable[index] ] = nil --//empty the metaTable associated with current index
 	unitIDTable[index] = nil --//empty the current index
 	if normalEntry then
 		unitIDTable[index] = unitIDTable[endOfTable] --//move endOfTable entry to the current index
@@ -233,9 +234,9 @@ function widget:Initialize()
   end
 	
 end
-
+--]]
 --Previous implementation (for future reference). It work by sending several individual command every half a second, but this might be considered a spam by Spring and is causing user command to be delayed (probably able to use "spGiveOrderToUnitArray" to fix but not tested yet).
---[[
+
 function widget:GetInfo()
   return {
     name      = "Shield Guard",
@@ -291,7 +292,6 @@ local shieldRadius = {core_spectre = 300, corthud = 80}
 local shieldWait = {core_spectre = true, corthud = false}
 
 local shieldArray = { 
-  "core_spectre",
   "corthud",
 }
 
@@ -551,5 +551,5 @@ function widget:Initialize()
   end
 	
 end
---]]
+
 

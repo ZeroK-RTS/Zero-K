@@ -327,7 +327,14 @@ end
 
 
 function endJump()
+	Move( b_dome, x_axis, 22)
+	Move( b_dome, y_axis, -30)
+	Move( b_dome, z_axis, 12)
+	
 	EmitSfx( b_dome, crater )
+	Move( b_dome, x_axis, 0)
+	Move( b_dome, y_axis, 0)
+	Move( b_dome, z_axis, 0)
 	
 	EmitSfx( rf_foot, dirtfling )
 	EmitSfx( lf_foot, dirtfling )

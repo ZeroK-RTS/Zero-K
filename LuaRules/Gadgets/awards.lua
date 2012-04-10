@@ -773,20 +773,20 @@ function gadget:GameOver()
 	for i=1,#allyTeamList do
 		local allyTeamID = allyTeamList[i]
 		local teamList = Spring.GetTeamList(allyTeamID)
-		local echo = allyTeamID
+		local toSend = allyTeamID
 		for j=1,#teamList do
 			local teamID = teamList[j]
-			echo = echo .. " " .. teamID .. " " .. (teamNames[teamID] or "no_name")
+			toSend = toSend .. " " .. teamID .. " " .. (teamNames[teamID] or "no_name")
 		end
-		Spring.SendCommands("wbynum 255 SPRINGIE: allyTeamPlayerMap " .. echo)
-		--Spring.Echo(echo)
+		Spring.SendCommands("wbynum 255 SPRINGIE: allyTeamPlayerMap " .. toSend)
+		--Spring.Echo(toSend)
 	end
 	
 	for i = 1, resourceInfo.count do
 		if data[i] then
-			local echo = data[i].t .. " "
+			local toSend = data[i].t .. " "
 			for allyTeamID, allyData in spairs(data[i].allyRes) do 
-				echo = echo .. " " .. allyTeamID .. " " ..
+				toSend = toSend .. " " .. allyTeamID .. " " ..
 				allyData.metal_income_total .. " " ..
 				allyData.metal_income_base .. " " ..
 				allyData.metal_income_overdrive .. " " ..
@@ -809,13 +809,13 @@ function gadget:GameOver()
 				
 				allyData.energy_storage_current
 			end
-			Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. echo)
-			--Spring.Echo(echo)
+			Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. toSend)
+			--Spring.Echo(toSend)
 			
-			echo = data[i].t .. " "
+			toSend = data[i].t .. " "
 			
 			for teamID, teamData in spairs(data[i].teamRes) do 
-				echo = echo .. " " .. teamID .. " " ..
+				toSend = toSend .. " " .. teamID .. " " ..
 				teamData.metal_income_total .. " " ..
 				teamData.metal_income_base .. " " ..
 				teamData.metal_income_overdrive .. " " ..
@@ -838,8 +838,8 @@ function gadget:GameOver()
 				
 				teamData.energy_storage_current
 			end
-			Spring.SendCommands("wbynum 255 SPRINGIE: teamResourceData " .. echo)
-			--Spring.Echo(echo)
+			Spring.SendCommands("wbynum 255 SPRINGIE: teamResourceData " .. toSend)
+			--Spring.Echo(toSend)
 		end
 	end
 	
