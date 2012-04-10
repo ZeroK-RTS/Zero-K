@@ -14,12 +14,7 @@ function widget:GetInfo()
   }
 end
 
-local CMD_UNIT_AI = 36214
-local CMD_PRIORITY = 34220
-local CMD_AP_FLY_STATE = 34569
-local CMD_RETREAT = 10000
-local CMD_AIR_STRAFE = 39381
-local CMD_UNIT_FLOAT_STATE = 33412
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 
 local holdPosException = { 
@@ -191,6 +186,18 @@ local function addUnit(defName, path)
             path = path,
         }
 		options_order[#options_order+1] = defName .. "_flylandstate"
+		
+		options[defName .. "_autorepairlevel"] = {
+            name = "  Auto Repair to airpad",
+            desc = "Values: inherit from factory, no autorepair, 30%, 50%, 80% health remaining",
+            type = 'number',
+            value = 0, -- auto repair is stupid
+            min = -1,
+            max = 3,
+            step = 1,
+            path = path,
+        }
+		options_order[#options_order+1] = defName .. "_autorepairlevel"
 	elseif ud.customParams and ud.customParams.landflystate then
 		options[defName .. "_flylandstate_factory"] = {
             name = "  Fly/Land State for factory",
@@ -203,6 +210,18 @@ local function addUnit(defName, path)
             path = path,
         }
 		options_order[#options_order+1] = defName .. "_flylandstate_factory"
+		
+		options[defName .. "_autorepairlevel_factory"] = {
+            name = "  Auto Repair to airpad",
+            desc = "Values: no autorepair, 30%, 50%, 80% health remaining",
+            type = 'number',
+            value = 0, -- auto repair is stupid
+            min = 0,
+            max = 3,
+            step = 1,
+            path = path,
+        }
+		options_order[#options_order+1] = defName .. "_autorepairlevel_factory"
 	end
 	
 	if ud.customParams and ud.customParams.airstrafecontrol then
@@ -350,7 +369,6 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
-        
         if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
             Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"})
             Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate.value}, {"shift"})
@@ -393,20 +411,23 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
             end
 
 			if options[name .. "_flylandstate"] and options[name .. "_flylandstate"].value then
-				if options[name .. "_flylandstate"].value == -1 then
-					-- The unit_air_plants gadget does this bit.
-					--[[ if builderID then
-						local bdid = Spring.GetUnitDefID(builderID)
-                        if UnitDefs[bdid] and UnitDefs[bdid].isFactory then	
-							local flyState = Spring.GetUnitStates(builderID, "landFlyFactory")
-							if flyState then
-                                Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {movestate}, 0)
-                            end
-						end
-					end--]]
-				else
-                    Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, {"shift"})
+				if options[name .. "_flylandstate"].value ~= -1 then -- The unit_air_plants gadget deals with inherit
+					Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, {"shift"})
                 end
+			end
+			
+			if options[name .. "_flylandstate_factory"] and options[name .. "_flylandstate_factory"].value then
+				Spring.GiveOrderToUnit(unitID, CMD_AP_FLY_STATE, {options[name .. "_flylandstate_factory"].value}, {"shift"})
+			end
+			
+			if options[name .. "_autorepairlevel_factory"] and options[name .. "_autorepairlevel_factory"].value then
+				Spring.GiveOrderToUnit(unitID, CMD_AP_FLY_STATE, {options[name .. "_autorepairlevel_factory"].value}, {"shift"})
+			end
+			
+			if options[name .. "_autorepairlevel"] and options[name .. "_autorepairlevel"].value then
+				if options[name .. "_autorepairlevel"].value ~= -1 then  -- The unit_air_plants gadget deals with inherit
+					Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel"].value}, {"shift"})
+				end
 			end
 
 			if options[name .. "_airstrafe"] and options[name .. "_airstrafe"].value ~= nil then
@@ -486,7 +507,6 @@ end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam) 
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
-        
         if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
 			Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_constructor_buildpriority.value}, {"shift"})
         end
@@ -500,7 +520,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 end
 
-function widget:UnitTaken(unitID, unitDefID, newTeamID, teamID)
+function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	widget:UnitCreated(unitID, unitDefID, newTeamID)
 	widget:UnitFinished(unitID, unitDefID, newTeamID)
 end
