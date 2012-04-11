@@ -258,19 +258,24 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 
-function gadget:UnitTaken(unitID, unitDefID, unitTeam)
-  if (cloakShieldUnits[unitID]) then
-    cloakShieldUnits[unitID].radius = 0
-  end
-  cloakers[unitID] = nil
-  cloakees[unitID] = nil
-  SetUnitCloak(unitID, false)
-  SendToUnsynced(SYNCSTR, unitID, 0)
-  local cmdDescID = FindUnitCmdDesc(unitID, CMD_CLOAK_SHIELD)
-  if (cmdDescID) then
-    cloakShieldCmdDesc.params[1] = (state and '2') or '0'
-    EditUnitCmdDesc(unitID, cmdDescID, { params = cloakShieldCmdDesc.params })
-  end
+function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
+	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID)
+	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
+	
+	if (newAllyTeam ~= oldAllyTeam) then
+		if (cloakShieldUnits[unitID]) then
+			cloakShieldUnits[unitID].radius = 0
+		end
+		cloakers[unitID] = nil
+		cloakees[unitID] = nil
+		SetUnitCloak(unitID, false)
+		SendToUnsynced(SYNCSTR, unitID, 0)
+		local cmdDescID = FindUnitCmdDesc(unitID, CMD_CLOAK_SHIELD)
+		if (cmdDescID) then
+			cloakShieldCmdDesc.params[1] = (state and '2') or '0'
+			EditUnitCmdDesc(unitID, cmdDescID, { params = cloakShieldCmdDesc.params })
+		end
+	end
 end
 
 
@@ -315,7 +320,8 @@ local function UpdateCloakees(data)
           local udid = GetUnitDefID(cloakeeLvl2)
           if ((not uncloakableDefs[udid]) and
               (GetUnitAllyTeam(cloakeeLvl2) == allyTeam)) then
-            SetUnitCloak(cloakeeLvl2, level)
+            SetUnitCloak(cloakeeLvl2, 4)
+			Spring.Echo("bla")
             -- note: this gives perfect cloaking, but is the only level
             -- to work under paralysis
             cloakees[cloakeeLvl2] = true
