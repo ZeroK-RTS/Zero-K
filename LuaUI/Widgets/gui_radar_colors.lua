@@ -15,7 +15,7 @@ function widget:Initialize()
 	-- always, los, radar, jammer
 	Spring.SetLosViewColors(
 		{ 0.25, 0.2, 0, 0.18 }, 
-		{ 0.2, 0.2, 0.1, 0 }, 
+		{ 0.2, 0.13, 0.17, 0 }, 
 		{ 0.25, 0.2, 0, 0 }
 	)
 	widgetHandler:RemoveWidget()
