@@ -36,7 +36,6 @@ local GetMyTeamID          = Spring.GetMyTeamID
 local GetGameSpeed         = Spring.GetGameSpeed
 local GetGameSeconds       = Spring.GetGameSeconds
 local GetUnitViewPosition  = Spring.GetUnitViewPosition
-local IsGuiHidden			=	Spring.IsGUIHidden
 
 local glTranslate      = gl.Translate
 local glColor          = gl.Color
@@ -206,7 +205,6 @@ local function DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
 end
 
 function widget:DrawWorld()
-	if not IsGuiHidden then
 		local theTime = GetGameSeconds()
 
 		if (theTime ~= lastTime) then

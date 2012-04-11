@@ -157,7 +157,7 @@ end
 
 local function GetColorAggression(value)
 	local r,g,b
-	if (value=<-1) then
+	if (value<=-1) then
 		r = 255
 		g = math.floor(255/(math.abs(value)))
 		b = math.floor(255/(math.abs(value)))
