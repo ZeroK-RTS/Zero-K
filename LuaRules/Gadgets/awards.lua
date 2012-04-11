@@ -778,7 +778,7 @@ function gadget:GameOver()
 			local teamID = teamList[j]
 			toSend = toSend .. " " .. teamID .. " " .. (teamNames[teamID] or "no_name")
 		end
-		Spring.SendCommands("wbynum 255 SPRINGIE: allyTeamPlayerMap " .. toSend)
+		--Spring.SendCommands("wbynum 255 SPRINGIE: allyTeamPlayerMap " .. toSend)
 		--Spring.Echo(toSend)
 	end
 	
@@ -809,7 +809,7 @@ function gadget:GameOver()
 				
 				allyData.energy_storage_current
 			end
-			Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. toSend)
+			--Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. toSend)
 			--Spring.Echo(toSend)
 			
 			toSend = data[i].t .. " "
@@ -838,7 +838,7 @@ function gadget:GameOver()
 				
 				teamData.energy_storage_current
 			end
-			Spring.SendCommands("wbynum 255 SPRINGIE: teamResourceData " .. toSend)
+			--Spring.SendCommands("wbynum 255 SPRINGIE: teamResourceData " .. toSend)
 			--Spring.Echo(toSend)
 		end
 	end
