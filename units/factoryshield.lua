@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factoryshield]],
   name                          = [[Shield Bot Factory]],
-  description                   = [[Produces Tough Robots, Builds at10 m/s]],
+  description                   = [[Produces Tough Robots, Builds at 10 m/s]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,

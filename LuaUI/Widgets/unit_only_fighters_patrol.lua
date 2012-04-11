@@ -44,6 +44,13 @@ local mustStop = {
 	[UnitDefNames.corshad.id] = true,
 }
 
+function widget:Initialize()
+	if Spring.GetSpectatingState() or Spring.IsReplay() then
+		Spring.Echo("<Only Fighters Patrol>: disabled for spectators")
+		widgetHandler:RemoveWidget()
+	end
+end
+
 --[[
 local function WeaponCanTargetAir(weapon)
 	local wd = WeaponDefs[ weapon.weaponDef ]

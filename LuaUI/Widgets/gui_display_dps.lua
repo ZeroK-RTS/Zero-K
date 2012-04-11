@@ -36,6 +36,7 @@ local GetMyTeamID          = Spring.GetMyTeamID
 local GetGameSpeed         = Spring.GetGameSpeed
 local GetGameSeconds       = Spring.GetGameSeconds
 local GetUnitViewPosition  = Spring.GetUnitViewPosition
+local IsGuiHidden			=	Spring.IsGUIHidden
 
 local glTranslate      = gl.Translate
 local glColor          = gl.Color
@@ -205,19 +206,19 @@ local function DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
 end
 
 function widget:DrawWorld()
-  local theTime = GetGameSeconds()
-  
-  if (theTime ~= lastTime) then
-  
-    if next(unitDamage) then calcDPS(unitDamage, false, theTime) end
-    if next(unitParalyze) then calcDPS(unitParalyze, true, theTime) end
-    
-    if changed then
-      table.sort(damageTable, function(m1,m2) return m1.damage < m2.damage; end)
-      changed = false
-    end
-  end
-  
+	if not IsGuiHidden then
+		local theTime = GetGameSeconds()
+
+		if (theTime ~= lastTime) then
+		if next(unitDamage) then calcDPS(unitDamage, false, theTime) end
+		if next(unitParalyze) then calcDPS(unitParalyze, true, theTime) end
+
+		if changed then
+			table.sort(damageTable, function(m1,m2) return m1.damage < m2.damage; end)
+			changed = false
+		end
+	end
+
   lastTime = theTime
  
   if (not next(damageTable)) and (not next(deadList)) then return end

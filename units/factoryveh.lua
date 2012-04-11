@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factoryveh]],
   name                          = [[Light Vehicle Factory]],
-  description                   = [[Produces Wheeled Vehicles, Builds at10 m/s]],
+  description                   = [[Produces Wheeled Vehicles, Builds at 10 m/s]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[factoryjump]],
   name                          = [[Jumpjet/Specialist Plant]],
-  description                   = [[Produces Jumpjets and Special Walkers, Builds at10 m/s]],
+  description                   = [[Produces Jumpjets and Special Walkers, Builds at 10 m/s]],
   acceleration                  = 0,
   bmcode                        = [[0]],
   brakeRate                     = 0,

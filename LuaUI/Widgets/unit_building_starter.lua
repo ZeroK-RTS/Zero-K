@@ -31,6 +31,13 @@ local spGetSelectedUnits = Spring.GetSelectedUnits
 
 local abs = math.abs
 --
+function widget:Initialize()
+	if Spring.GetSpectatingState() or Spring.IsReplay() then
+		Spring.Echo("<Building Starter>: disabled for spectators")
+		widgetHandler:RemoveWidget()
+	end
+end
+
 function widget:CommandNotify(id, params, options)
  
   if (id < 0) then

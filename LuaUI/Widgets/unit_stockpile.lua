@@ -25,7 +25,12 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+function widget:Initialize()
+	if Spring.GetSpectatingState() or Spring.IsReplay() then
+		Spring.Echo("<Stockpiler>: disabled for spectators")
+		widgetHandler:RemoveWidget()
+	end
+end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
   local ud = UnitDefs[unitDefID]

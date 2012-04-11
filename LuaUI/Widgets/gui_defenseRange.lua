@@ -19,7 +19,7 @@ end
 -- to do : include chicken buildings.
 
 ---- CHANGELOG -----
--- versus666,			V6.3	(17fev2012) :	corrected min range due to Outlaw fake weapon, merged with Unit Ranges by Niobium. Very basic range, no gravity compensation as it would cost many CPU cycles time with many units, it should be fine given the dynamic nature of units.
+-- versus666,			V6.3	(17fev2012) :	corrected min range due to Outlaw fake weapon, merged with Unit Ranges by Niobium. Very basic range, no gravity compensation as it would cost many CPU cycles time with many units, it should be fine given the dynamic nature of units, disabled by default
 -- versus666,			v6.2.6	(16dec2011)	:	comply with F5 (hide gui->hide ranges) for clean screenshots.
 -- Google Frog          v6.2.5  (11dec2010) :	moved all range display config to chilli menu. Removed extraneous configs
 -- versus666,			v6.2.4	(04nov2010)	:	added widget name over buttons when in tweak mode, clearer than a plain box + widget name in tooltips when hovering over buttons.
@@ -466,9 +466,9 @@ function widget:Update()
 	if (time % updateTimes["removeInterval"] == 0 and time ~= updateTimes["remove"] ) then
 		updateTimes["remove"] = time
 		--do update stuff:
-		if ( CheckSpecState() == false ) then
-			return false
-		end
+		--if ( CheckSpecState() == false ) then
+		--	return false
+		--end
 
 		--remove dead units
 		for k, def in pairs(defences) do

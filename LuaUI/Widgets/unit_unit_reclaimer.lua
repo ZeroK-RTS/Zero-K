@@ -18,7 +18,6 @@ local allyTeam = Spring.GetMyAllyTeamID()
 
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
-local spGetCommandQueue = Spring.GetCommandQueue
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
@@ -29,6 +28,12 @@ local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local reclaimEnemy = Game.reclaimAllowEnemies
 
 --
+function widget:Initialize()
+	if Spring.GetSpectatingState() or Spring.IsReplay() then
+		Spring.Echo("<Specific Unit Reclaimer>: disabled for spectators")
+		widgetHandler:RemoveWidget()
+	end
+end
 
 function spEcho(text)
   Spring.Echo(text)
@@ -86,7 +91,4 @@ function widget:CommandNotify(id, params, options)
 	end
 	
   end
-  
 end
-
-

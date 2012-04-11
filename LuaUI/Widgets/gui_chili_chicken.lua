@@ -155,6 +155,24 @@ local function GetColor(percent)
 	return string.char(255,r,g,0)
 end
 
+local function GetColorAggression(value)
+	local r,g,b
+	if (value=<-1) then
+		r = 255
+		g = math.floor(255/(math.abs(value)))
+		b = math.floor(255/(math.abs(value)))
+	elseif (value>=1) then
+		r = math.floor(254/(math.abs(value)))--floor gives entier inférieur
+		g = 255
+		b = math.floor(255/(math.abs(value))) --floor gives entier inférieur
+	else
+		r=255
+		g=255
+		b=255
+	end
+	return string.char(255,r,g,b)
+end
+
 -- gets the synced config setting for current difficulty
 local function GetDifficultyValue(value)
 	return difficulty[value] or widget[value]
@@ -210,7 +228,23 @@ local function UpdateRules()
 	local chickenCount, chickenKills = GetCount("Count"), GetCount("Kills")
 	label_chickens:SetCaption("Chickens alive/killed : \255\0\255\0"..chickenCount.."\008/\255\255\0\0"..chickenKills)
 	label_burrows:SetCaption("Burrows alive/killed : \255\0\255\0"..gameInfo[roostName .. "Count"].."\008/\255\255\0\0"..gameInfo[roostName .. "Kills"])
-	label_aggro:SetCaption("Player aggression rating: "..("%.3f"):format(gameInfo["humanAggro"]))
+--[[?	if (gameInfo["humanAggro"] >=4) then
+		label_aggro:SetCaption("Player aggression rating: \255\0\255\0"..("%.3f"):format(gameInfo["humanAggro"]))
+	elseif (gameInfo["humanAggro"] < 4) and (gameInfo["humanAggro"] >= 2) then
+		label_aggro:SetCaption("Player aggression rating: \255\120\255\150"..("%.3f"):format(gameInfo["humanAggro"]))
+	elseif (gameInfo["humanAggro"] < 2) and (gameInfo["humanAggro"] >= 0.5) then
+		label_aggro:SetCaption("Player aggression rating: \255\200\255\150"..("%.3f"):format(gameInfo["humanAggro"]))
+	elseif (gameInfo["humanAggro"] < 0.5) and (gameInfo["humanAggro"] >= -0.5) then
+		label_aggro:SetCaption("Player aggression rating: \255\255\255\255"..("%.3f"):format(gameInfo["humanAggro"]))
+	elseif (gameInfo["humanAggro"] < -0.5) and (gameInfo["humanAggro"] >= -2) then
+		label_aggro:SetCaption("Player aggression rating: \255\255\255\130"..("%.3f"):format(gameInfo["humanAggro"]))
+	elseif (gameInfo["humanAggro"] < -2) then
+		label_aggro:SetCaption("Player aggression rating: \255\255\230\0"..("%.3f"):format(gameInfo["humanAggro"]))
+	elseif (gameInfo["humanAggro"] < -4) then
+		label_aggro:SetCaption("Player aggression rating: \255\255\0\0"..("%.3f"):format(gameInfo["humanAggro"]))
+	end]]--
+	label_aggro:SetCaption("Player aggression rating: "..GetColorAggression(gameInfo["humanAggro"])..("%.3f"):format(gameInfo["humanAggro"]))
+	
 	label_tech:SetCaption("Tech progress modifier : "..FormatTime(gameInfo["techAccel"]))
 	label_chickens.tooltip = "Chickens spawn every ".. GetDifficultyValue('chickenSpawnRate') .." seconds\n"..MakeChickenBreakdown()
 

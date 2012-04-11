@@ -39,7 +39,6 @@ local spGetCommandQueue 	= Spring.GetCommandQueue
 local spGetTeamUnits 		= Spring.GetTeamUnits
 local spGetUnitSeparation 	= Spring.GetUnitSeparation
 
-
 local team = Spring.GetMyTeamID()
 
 local cloakers = {}
@@ -307,18 +306,18 @@ function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
   if (oldTeam == team) then
     widget:UnitDestroyed(unitID, unitDefID, newTeam)
   end
-  
 end
 
 -----------------------
 --Add cloaker names to array
 
 function widget:Initialize() 
-  
-  local units = spGetTeamUnits(team)
-  for i, id in ipairs(units) do 
-    widget:UnitCreated(id, spGetUnitDefID(id),team)
-  end
-	
+	if Spring.GetSpectatingState() or Spring.IsReplay() then
+		Spring.Echo("<Cloaker Guard>: disabled for spectators")
+		widgetHandler:RemoveWidget()
+	end
+	local units = spGetTeamUnits(team)
+	for i, id in ipairs(units) do 
+		widget:UnitCreated(id, spGetUnitDefID(id),team)
+	end
 end
-
