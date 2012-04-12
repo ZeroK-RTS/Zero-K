@@ -81,7 +81,7 @@ local function canShootAtUnit(targetID, allyTeam)
 	--GG.tableEcho(see)
 	if see and see.los then
 		return true
-	elseif raw > 2 then
+	elseif raw and raw > 2 then
 		local unitDefID = spGetUnitDefID(targetID)
 		if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].speed == 0 then
 			return true
