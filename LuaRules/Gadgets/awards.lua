@@ -503,8 +503,8 @@ function gadget:GameFrame(n)
 	
 		for _, unitID in ipairs(spGetAllUnits()) do
 			local teamID = spGetUnitTeam(unitID)
-			 local unitDefID = spGetUnitDefID(unitID)
-			 gadget:UnitDestroyed(unitID, unitDefID, teamID)
+			local unitDefID = spGetUnitDefID(unitID)
+			gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		end
 	
 		local pwnTeam, 	maxDamage 		= getMaxVal(damageList)		

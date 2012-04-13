@@ -1,7 +1,5 @@
 include "constants.lua"
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
-
 --------------------------------------------------------------------------------
 -- pieces
 --------------------------------------------------------------------------------
@@ -125,6 +123,7 @@ function preJump(turn,distance)
                 end    
         end
         
+        -- coil for jump
         Move(pelvis, y_axis, -5, 10)
         Turn(torso, y_axis, 0, math.rad(180))
         
@@ -142,6 +141,7 @@ function preJump(turn,distance)
 end
 
 function beginJump()
+        -- release jump
         Move(pelvis, y_axis, 0, 24)
         Turn(lthigh, y_axis, 0, math.rad(180))
         Turn(rthigh, y_axis, 0, math.rad(180))
@@ -182,18 +182,19 @@ local function Somersault()
         else
         end
         
+        -- curl up body
         Sleep(600)
-        Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED)
-        Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED)
-        Turn(llarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED)
-        Turn(rlarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED)             
+        --Turn(luparm, y_axis, -math.rad(45), UPARM_JUMP_RELEASE_SPEED)
+        --Turn(ruparm, y_axis, math.rad(45), UPARM_JUMP_RELEASE_SPEED)
+        Turn(llarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_RELEASE_SPEED)
+        Turn(rlarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_RELEASE_SPEED)
+        Turn(lthigh, x_axis, -math.rad(90), LEG_JUMP_RELEASE_SPEED)
+        Turn(rthigh, x_axis, -math.rad(90), LEG_JUMP_RELEASE_SPEED)
+        Turn(lleg, x_axis, math.rad(30), LEG_JUMP_RELEASE_SPEED)
+        Turn(rleg, x_axis, math.rad(30), LEG_JUMP_RELEASE_SPEED)
         Sleep(200)
 
-        Turn(lthigh, x_axis, LEG_JUMP_COIL_ANGLE*1.5, LEG_JUMP_COIL_SPEED)
-        Turn(rthigh, x_axis, LEG_JUMP_COIL_ANGLE*1.5, LEG_JUMP_COIL_SPEED)
-        Turn(lleg, x_axis, LEG_JUMP_COIL_ANGLE*1.5, LEG_JUMP_COIL_SPEED)
-        Turn(rleg, x_axis, LEG_JUMP_COIL_ANGLE*1.5, LEG_JUMP_COIL_SPEED)
-        
+        -- spin
         if jumpDir == 1 then
                 Turn(pelvis, x_axis, math.rad(200), math.rad(240))
         elseif jumpDir == 2 then
@@ -204,10 +205,18 @@ local function Somersault()
         WaitForTurn(pelvis, x_axis)
         Turn(pelvis, x_axis, 0, math.rad(240))
         
-        Turn(lthigh, x_axis, 2*LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(rthigh, x_axis, -LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(lleg, x_axis, -LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(rleg, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
+        -- strike a pose
+        Turn(luparm, y_axis, 0, UPARM_JUMP_COIL_SPEED*1.5)
+        Turn(ruparm, y_axis, 0, UPARM_JUMP_COIL_SPEED*1.5)        
+        Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED*1.5)
+        Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED*1.5)
+        Turn(llarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED*1.5)
+        Turn(rlarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED*1.5)
+        
+        Turn(lthigh, x_axis, 1.75*LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED*1.5)
+        Turn(rthigh, x_axis, -math.rad(50), LEG_JUMP_COIL_SPEED*1.5)
+        Turn(lleg, x_axis, -LEG_JUMP_COIL_ANGLE, LEG_JUMP_RELEASE_SPEED)
+        Turn(rleg, x_axis, math.rad(40), LEG_JUMP_RELEASE_SPEED*1.5)
 end
 
 -- needed because the gadgets throw tantrums if you start a thread in the above functions
@@ -261,14 +270,14 @@ end
 function script.Create()
 	Turn(luparm, z_axis, math.rad(45))
 	Turn(ruparm, z_axis, math.rad(-45))
-        Turn(lbflare1, x_axis, math.rad(-105))
-        Turn(lbflare2, x_axis, math.rad(-105))
-        Turn(rbflare1, x_axis, math.rad(-105))
-        Turn(rbflare2, x_axis, math.rad(-105))
-        Turn(lbflare1, z_axis, math.rad(-30))
-        Turn(lbflare2, z_axis, math.rad(-30))
-        Turn(rbflare1, z_axis, math.rad(30))
-        Turn(rbflare2, z_axis, math.rad(30))       
+        Turn(lbflare1, x_axis, math.rad(-120))
+        Turn(lbflare2, x_axis, math.rad(-120))
+        Turn(rbflare1, x_axis, math.rad(-120))
+        Turn(rbflare2, x_axis, math.rad(-120))
+        Turn(lbflare1, y_axis, math.rad(-45))
+        Turn(lbflare2, y_axis, math.rad(-45))
+        Turn(rbflare1, y_axis, math.rad(45))
+        Turn(rbflare2, y_axis, math.rad(45))       
         
 	StartThread(SmokeUnit)
         StartThread(SomersaultLoop)
