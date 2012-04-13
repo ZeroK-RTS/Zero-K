@@ -97,6 +97,7 @@ local StaticAA           = {}
 local MobileAA           = {}
 MobileAA["amphaa"] = true
 AABurst["amphaa"] = true
+CylinderAA["amphaa"] = true
 AAstats["amphaa"] = { damage = 640, shotdamage = 160, salvosize = 4, range = 800, reload = 8 * 30, dps = 80, velocity = 850 }  --Hardcoded as amphaa's weapon doesn't show up in weaponDefs
 local corrlreload = 330
 local weapondefID        = {}
@@ -566,7 +567,7 @@ function BestTarget(targets, count, damage, current, skip, cost)
           if hp <= incoming + damage then
             --Echo("one-hittable", onehit)
             if not onehit then
-              if hp - incoming >= 0 then
+              if hp - incoming > 0 then
                 --hpafter = hp - incoming
                 best = i
                 bestcost = cost[i]
@@ -575,13 +576,13 @@ function BestTarget(targets, count, damage, current, skip, cost)
                 --Echo("new one-hit")
               end
             else
-              if hp - incoming >= 0 and bestcost < cost[i] then
+              if hp - incoming > 0 and bestcost < cost[i] then
                 --hpafter = hp - incoming
                 best = i
                 bestcost = cost[i]
                 besthp = hp - incoming - damage
                 --Echo("best onehit by new highest cost class")
-              elseif hp - incoming >= 0 and hp - incoming - damage > besthp and bestcost == cost[i] then
+              elseif hp - incoming > 0 and hp - incoming - damage > besthp and bestcost == cost[i] then
                 --hpafter = hp - incoming
                 best = i
                 bestcost = cost[i]
@@ -591,14 +592,14 @@ function BestTarget(targets, count, damage, current, skip, cost)
             end
           elseif onehit == false then
             if best ~= 0 then
-              if hp - incoming >= 0 and hp - incoming < besthp then
+              if hp - incoming > 0 and hp - incoming < besthp then
                 --hpafter = hp - incoming
                 best = i
                 besthp = hp - incoming
                 --Echo("best by lowest hp")
               end
             else
-              if hp - incoming >= 0 then
+              if hp - incoming > 0 then
                 --hpafter = hp - incoming
                 best = i
                 besthp = hp - incoming
@@ -1679,6 +1680,7 @@ function gadget:Initialize()
   end
 
   AAstats["corrl"].reload = corrlreload
+  CylinderAA["hoveraa"] = true
 
   table.sort(globalassignment, globalassignmentstaticcompare)
 
