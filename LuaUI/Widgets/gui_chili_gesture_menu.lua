@@ -731,19 +731,19 @@ function widget:Initialize()
   end
 
   widgetHandler:AddAction("markingmenu", ActionMenu, nil, "t")
-  widgetHandler:AddAction("mouselessmarkingmenu", MouselessActionMenu, nil, "t")
+  widgetHandler:AddAction("keyboardmarkingmenu", MouselessActionMenu, nil, "t")
   
   -- Only minimal support for those without our default hotkeys.
   if not customKeyBind then
     Spring.SendCommands("bind any+b markingmenu")
-	Spring.SendCommands("bind any+d mouselessmarkingmenu")
+	--Spring.SendCommands("bind any+d keyaboardmarkingmenu")
   end
 
 end 
 
 function widget:Shutdown()
   widgetHandler:RemoveAction("markingmenu")
-  widgetHandler:RemoveAction("mouselessmarkingmenu")
+  widgetHandler:RemoveAction("keyboardmarkingmenu")
 end
 
 function ActionMenu()
