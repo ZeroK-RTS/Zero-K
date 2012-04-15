@@ -239,13 +239,33 @@ local n_special = {}
 local n_units = {}
 local n_states = {}
 
+local function CapCase(str)
+	local str = str:lower()
+	str = str:gsub( '_', ' ' )
+	str = str:sub(1,1):upper() .. str:sub(2)
+	
+	str = str:gsub( ' (.)', 
+		function(x) return (' ' .. x):upper(); end
+		)
+	return str
+end
+
+local function getHotkey(actionName)
+	local hotkey = Spring.GetActionHotKeys(actionName)
+	if hotkey and hotkey[1] then
+		return '(\255\0\255\0' .. CapCase(hotkey[1]) .. '\008)'
+	else
+		return ''
+	end
+end
+
 --shortcuts
 local menuChoices = {
 	[1] = { array = n_common, name = "Order" },
-	[2] = { array = n_factories, name = "Factory", config = factory_commands },
-	[3] = { array = n_econ, name = "Econ", config = econ_commands },
-	[4] = { array = n_defense, name = "Defense", config = defense_commands },
-	[5] = { array = n_special, name = "Special", config = special_commands },
+	[2] = { array = n_factories, name = "Factory" .. getHotkey("tab_factory"), config = factory_commands },
+	[3] = { array = n_econ, name = "Econ" .. getHotkey("tab_economy"), config = econ_commands },
+	[4] = { array = n_defense, name = "Defense" .. getHotkey("tab_defence"), config = defense_commands },
+	[5] = { array = n_special, name = "Special" .. getHotkey("tab_special"), config = special_commands },
 	[6] = { array = n_units, name = "Units" },
 }
 
@@ -284,6 +304,7 @@ end
 local function MakeButton(container, cmd, insertItem, index) 
 	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
 	local isBuild = (cmd.id < 0)
+	local gridHotkeyed = not isState and menuChoice ~= 1 and menuChoice ~= 6 
 	local text
 	local texture
 	local countText = ''
@@ -304,7 +325,7 @@ local function MakeButton(container, cmd, insertItem, index)
 	
 	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 	
-	if isBuild and hotkeyMode and not isState then
+	if gridHotkeyed and hotkeyMode then
 		hotkey = gridMap[container.index][index] or ''
 	end
 	
@@ -385,7 +406,7 @@ local function MakeButton(container, cmd, insertItem, index)
 		end
 		
 		local label 
-		if (not cmd.onlyTexture and text and text ~= '') then 
+		if (not cmd.onlyTexture and text and text ~= '') or gridHotkeyed then 
 			label = Label:New {
 				width="100%";
 				height="100%";
@@ -1022,6 +1043,8 @@ local function HotkeyTabFactory()
 	hotkeyMode = true
 	Update(true)
 	ColorTabs()
+	Spring.Echo(WG.crude.GetHotkey("tab_factory"))
+	Spring.Echo(WG.crude.GetHotkey("attack"))
 end
 
 local function HotkeyTabEconomy()

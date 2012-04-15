@@ -1001,6 +1001,22 @@ WG.crude.GetHotkey = function(actionName)
 	return GetReadableHotkeyMod(hotkey.mod) .. CapCase(hotkey.key)
 end
 
+--[[
+-- is this an improvement?
+WG.crude.GetHotkey = function(actionName)
+	local hotkey = settings.keybounditems[actionName]
+	if not hotkey then
+		local fallback = Spring.GetActionHotKeys(actionName)
+		if fallback and fallback[1] then
+			return CapCase(fallback[1])
+		else
+			return ''
+		end
+	end
+	return GetReadableHotkeyMod(hotkey.mod) .. CapCase(hotkey.key)
+end
+--]]
+
 
 --Get hotkey action and readable hotkey string
 local function GetHotkeyData(path, option)
