@@ -1038,6 +1038,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		hotkeyMode = false
 		menuChoice = 1 -- auto-return to orders to make it clear hotkey time is over
 		Update(true)
+		ColorTabs()
 		return true 
 	end
 end
