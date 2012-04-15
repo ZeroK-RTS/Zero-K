@@ -263,8 +263,8 @@ local function UpdateFac(unitID, index)
 		local buildeeDef = UnitDefs[buildeeDefID]
 		tooltip = tooltip .. "\nCurrent project: "..buildeeDef.humanName.." ("..math.floor(progress*100).."% done)"
 	end
-	facs[index].button.tooltip = tooltip .. "\n\255\0\255\0Left-click: Select"..
-										"\nRight-click: Select and go to"..
+	facs[index].button.tooltip = tooltip .. "\n\255\0\255\0Left-click: Select and go to"..
+										"\nRight-click: Select"..
 										"\nShift: Append to current selection\008"
 										
 	-- change image if needed
@@ -301,7 +301,7 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 				local _,_,left,_,right = GetMouseState()
 				local shift = select(4, GetModKeyState())
 				SelectUnitArray({unitID}, shift)
-				if right then
+				if left then
 					local x, y, z = Spring.GetUnitPosition(unitID)
 					Spring.SetCameraTarget(x, y, z)
 				end
@@ -473,8 +473,8 @@ local function UpdateComm(unitID, index)
 	
 	comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
 								"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
-								"\n\255\0\255\0Left-click: Select"..
-								"\nRight-click: Select and go to"..
+								"\n\255\0\255\0Left-click: Select and go to"..
+								"\nRight-click: Select"..
 								"\nShift: Append to current selection\008"	
 end
 
