@@ -2035,6 +2035,17 @@ function gadgetHandler:UnitLeftAir(unitID, unitDefID, unitTeam)
   return
 end
 
+function gadgetHandler:GameSetup(state, ready, playerStates)
+  for _,g in ipairs(self.GameSetupList) do
+    local success, newReady = g:GameSetup(state, ready, playerStates)
+    if (success) then
+      return true, newReady
+    end
+  end
+  return false
+end
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
