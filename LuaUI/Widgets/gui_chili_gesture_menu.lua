@@ -139,7 +139,7 @@ options = {
 	onlyOpenWithKeyboard = {
 		name = 'Only open with keyboard',
 		type = 'bool',
-		value = false,
+		value = true,
 		desc = 'Disables right click drag to open',
 		OnChange = OptionsChanged,
 	},
