@@ -43,7 +43,7 @@ function gadget:GameSetup(state, label, playerStates)
 		end 
 		
 		if okCount > 0 and allOK then
-			Spring.Echo("All present people set start position, starting game!")
+			--Spring.Echo("All present people set start position, starting game!")
 			return true, true	
 		end 
 	end 
