@@ -52,6 +52,7 @@ local IDLE_THRESHOLD = 0.5 -- after this seconds menu shows if you hold right mo
 local SMALL_ICON_SIZE = 20
 local KEYBOARD_ONLY = false 
 local KEYBOARD_OPEN_ONLY = false 
+local ALLOW_MULTIPLE = false 
 
 local mouselessOpen = false
 
@@ -67,6 +68,7 @@ local function OptionsChanged()
 	IDLE_THRESHOLD = options.mouseIdleThreshold.value
 	KEYBOARD_ONLY = options.keyboardOnly.value
 	KEYBOARD_OPEN_ONLY = options.onlyOpenWithKeyboard.value
+	ALLOW_MULTIPLE = options.allowMultiple.value
 	
 	if options.alternateconfig.value then
 		keys = keyconfig.qwerty_d.keys
@@ -122,7 +124,7 @@ options = {
 	mouseIdleThreshold = {
 		name = "Mouse idle threshold (0.1-3s)",
 		type = 'number',
-		value = 0.5,
+		value = 1,
 		min=0.1,max=3,step=0.1,
 		desc = "When you hold right button still, menu appears after this time(s)",
 		OnChange = OptionsChanged,		
@@ -139,7 +141,7 @@ options = {
 	onlyOpenWithKeyboard = {
 		name = 'Only open with keyboard',
 		type = 'bool',
-		value = true,
+		value = false,
 		desc = 'Disables right click drag to open',
 		OnChange = OptionsChanged,
 	},
@@ -159,6 +161,15 @@ options = {
 		desc = "Centre hotkeys around D instead of S.",
 		OnChange = OptionsChanged,
 	},
+	
+	allowMultiple = {
+		name = "Allow for multiple selected units",
+		type = "bool",
+		value = false,
+		desc = "Allows gestures even for multiple units selected",
+		OnChange = OptionsChanged,
+	},
+	
 }
 
 local mapWidth, mapHeight = Game.mapSizeX, Game.mapSizeZ
@@ -313,7 +324,7 @@ function SetupMenu(keyboard, mouseless)
   local units = Spring.GetSelectedUnits()
 
   -- only show menu if a unit is selected
-  if units and #units > 0 then 
+  if units and (#units == 1 or (#units > 0 and (ALLOW_MULTIPLE or keyboard))) then 
     origin = {Spring.GetMouseState()} -- origin might by set by mouse hold detection so we only set it if unset
     
     local found = false
@@ -755,6 +766,8 @@ function MouselessActionMenu()
 end
 
 function widget:CommandsChanged()
+--[[ COMMANDS DISABLED
+
 	local selectedUnits = Spring.GetSelectedUnits()
 	local customCommands = widgetHandler.customCommands
 	local foundBuilder = false
@@ -780,5 +793,5 @@ function widget:CommandsChanged()
       pos = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE}, 
     })
   end 
-
+]]--
 end
