@@ -244,7 +244,7 @@ MakeMinimapWindow = function()
 				OnClick = {toggleTeamColors},
 				children={
 					Chili.Image:New{
-						file='LuaUI/images/playerlist/share.png',
+						file='LuaUI/images/map/minimap_colors_simple.png',
 						width="100%";
 						height="100%";
 						x="0%";
