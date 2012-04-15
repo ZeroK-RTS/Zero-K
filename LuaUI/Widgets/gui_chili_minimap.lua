@@ -21,6 +21,7 @@ local glResetMatrices = gl.ResetMatrices
 
 local iconsize = 20
 
+local recentlyInitialized = false
 local tabbedMode = false
 
 local function toggleTeamColors() 
@@ -40,8 +41,8 @@ end
 local function MakeMinimapWindow()
 end
 
-options_path = 'Game/Settings/Map'
-options_order = { 'use_map_ratio', 'hidebuttons', 'simpleteamcolors', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors', }
+options_path = 'Settings/View/Minimap'
+options_order = { 'use_map_ratio', 'hidebuttons', 'simpleteamcolors', 'startwithlos', 'startwithradar', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors', }
 options = {
 	
 	use_map_ratio = {
@@ -67,15 +68,29 @@ options = {
 	},
 	--]]
 	simpleteamcolors = {
-		name = 'Simple Team Colors',
+		name = 'Start with simple team colors',
 		type = 'bool',
 		desc = 'Set simple team colors at game start. ', 
-		value = false,
+		value = true,
 		OnChange = function(self)
 				if (self.value and not WG.usingSimpleTeamColors) or (not self.value and WG.usingSimpleTeamColors) then
 					toggleTeamColors()
 				end
 			end,
+	},
+	
+	startwithlos = {
+		name = 'Start with LOS view',
+		type = 'bool',
+		desc = 'Enables LOS view at game start.', 
+		value = false,
+	},
+	
+	startwithradar = {
+		name = 'Start with Radar view',
+		type = 'bool',
+		desc = 'Enables Radar view at game start.', 
+		value = false,
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
@@ -207,13 +222,13 @@ MakeMinimapWindow = function()
 --			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			
 			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}},
 			
-			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 2, 'lastmsgpos' ),
-			MakeMinimapButton( 'LuaUI/images/map/standard.png', 3.5, 'viewstandard' ),
-			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 4.5, 'viewheightmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 5.5, 'viewblockmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 6.5, 'viewmetalmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/radar.png', 8, 'viewradar' ),
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 9, 'viewfow' ),
+			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 1, 'lastmsgpos' ),
+			MakeMinimapButton( 'LuaUI/images/map/standard.png', 2.5, 'viewstandard' ),
+			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'viewmetalmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/radar.png', 7, 'viewradar' ),
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 8, 'viewfow' ),
 			
 			Chili.Button:New{ 
 				height=iconsize, width=iconsize, 
@@ -221,7 +236,7 @@ MakeMinimapWindow = function()
 				margin={0,0,0,0},
 				padding={4,3,2,2},
 				bottom=0, 
-				right=iconsize*1+5, 
+				right=iconsize*9+5, 
 				
 				tooltip = "Toggle simplified teamcolours",
 				
@@ -297,11 +312,27 @@ function widget:Initialize()
 		return
 	end
 
+	recentlyInitialized = true
+	
 	Chili = WG.Chili
 	
 	MakeMinimapWindow()
 	
 	gl.SlaveMiniMap(true)
+end
+
+function widget:Update()
+	if recentlyInitialized then
+		options.simpleteamcolors.OnChange(options.simpleteamcolors)
+		if options.startwithlos.value then
+			Spring.Echo("BLA")
+			Spring.SendCommands('togglelos')
+		end
+		if options.startwithradar.value then
+			Spring.SendCommands('toggleradarandjammer')
+		end
+		recentlyInitialized = false
+	end
 end
 
 
