@@ -160,8 +160,8 @@ path='Settings/Interface/Interface Skin'
 			WG.crude.SetSkin( self.value );
 		end,
 		items = {
-			{ key = 'Robocracy', name = 'Robocracy', },
 			{ key = 'Carbon', name = 'Carbon', },
+			{ key = 'Robocracy', name = 'Robocracy', },
 			{ key = 'DarkHive', name = 'DarkHive', },
 		},
 	})
