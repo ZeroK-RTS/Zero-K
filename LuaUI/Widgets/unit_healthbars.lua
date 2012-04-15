@@ -45,7 +45,7 @@ local featureHpThreshold = 0.85
 
 local infoDistance = 700000
 
-local minReloadTime = 4 --// in seconds
+local minReloadTime = 3 --// in seconds
 
 local drawStunnedOverlay = true
 local drawUnitsOnFire    = Spring.GetGameRulesParam("unitsOnFire")
