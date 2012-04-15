@@ -171,6 +171,7 @@ local selectedFac	-- unitID
 local alreadyRemovedTag = {}
 
 local hotkeyMode = false
+local recentlyInitialized = false
 
 local gridKeyMap = {
 	[KEYSYMS.Q] = {1,1}, 
@@ -1035,6 +1036,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			end
 		end
 		hotkeyMode = false
+		menuChoice = 1 -- auto-return to orders to make it clear hotkey time is over
 		Update(true)
 		return true 
 	end
@@ -1092,14 +1094,12 @@ function widget:Initialize()
 	widgetHandler:ConfigLayoutHandler(LayoutHandler)
 	Spring.ForceLayoutUpdate()
 	
+	recentlyInitialized = true
+	
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")	
 	AddAction("nextmenu", ScrollTabRight, nil, "p")
 	AddAction("prevmenu", ScrollTabLeft, nil, "p")
-	
-	for i = 2, 5 do
-		updateTabName(i, menuChoices[i])
-	end
 	
 	--[[local f,it,isFile = nil,nil,false
 	f  = io.open('cmdcolors.txt','r')
@@ -1338,6 +1338,17 @@ function widget:DrawScreen()
 			but:Invalidate()
 		end 
 		lastCmd = cmdid
+	end
+end
+
+-- Make the hotkeys appear on the menu tabs
+function widget:Update()
+	if recentlyInitialized then
+		for i = 2, 5 do
+			updateTabName(i, menuChoices[i])
+		end
+		recentlyInitialized = false
+		ColorTabs(1)
 	end
 end
 
