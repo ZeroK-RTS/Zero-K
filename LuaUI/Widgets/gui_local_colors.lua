@@ -5,12 +5,10 @@ function widget:GetInfo()
 		author = "Licho",
 		date = "February, 2010",
 		license = "GPL v3",
-		layer = -10000,
+		layer = -10001,
 		enabled = true,
 	}
 end
-
-
 
 if VFS.FileExists("Luaui/Configs/ZKTeamColors.lua") then
 	colorCFG = VFS.Include("Luaui/Configs/ZKTeamColors.lua")
@@ -49,6 +47,7 @@ local allyColors = colorCFG.allyColors
 
 local enemyColors = colorCFG.enemyColors 
 
+WG.usingSimpleTeamColors = false
 
 local function SetNewTeamColors() 
 	local gaia = Spring.GetGaiaTeamID()
@@ -71,6 +70,24 @@ local function SetNewTeamColors()
 	Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
 end
 
+local function SetNewSimpleTeamColors() 
+	local gaia = Spring.GetGaiaTeamID()
+	Spring.SetTeamColor(gaia, unpack(gaiaColor))
+	
+	local myAlly = Spring.GetMyAllyTeamID()
+	local myTeam = Spring.GetMyTeamID()
+
+	for _, teamID in ipairs(Spring.GetTeamList()) do
+		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID)
+		if (allyID == myAlly) then
+			Spring.SetTeamColor(teamID, unpack(allyColors[1]))
+		elseif (teamID ~= gaia) then
+			Spring.SetTeamColor(teamID, unpack(enemyColors[1]))
+		end
+	end
+	Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
+end
+
 
 local function ResetOldTeamColors()
 	for _,team in ipairs(Spring.GetTeamList()) do
@@ -78,6 +95,15 @@ local function ResetOldTeamColors()
 	end
 end
 
+function WG.localTeamColorToggle()
+	if WG.usingSimpleTeamColors then
+		SetNewTeamColors()
+		WG.usingSimpleTeamColors = false
+	else
+		SetNewSimpleTeamColors() 
+		WG.usingSimpleTeamColors = true
+	end
+end
 
 function widget:Initialize()
 	SetNewTeamColors()

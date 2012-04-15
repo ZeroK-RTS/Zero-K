@@ -23,6 +23,13 @@ local iconsize = 20
 
 local tabbedMode = false
 
+local function toggleTeamColors() 
+	if WG.localTeamColorToggle then
+		WG.localTeamColorToggle() 
+	end
+end 
+
+
 local function AdjustToMapAspectRatio(w,h)
 	if (Game.mapX > Game.mapY) then
 		return w, w*Game.mapY/Game.mapX+iconsize
@@ -34,7 +41,7 @@ local function MakeMinimapWindow()
 end
 
 options_path = 'Game/Settings/Map'
-options_order = { 'use_map_ratio', 'hidebuttons', 'simplecolors', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', }
+options_order = { 'use_map_ratio', 'hidebuttons', 'simpleteamcolors', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors', }
 options = {
 	
 	use_map_ratio = {
@@ -50,12 +57,25 @@ options = {
 			window_minimap.fixedRatio = self.value;			
 		end,
 	},
+	--[[ cause of confusion
 	simplecolors = {
 		name = 'Simple Radar Blip Colors',
 		type = 'bool',
 		desc = 'Show radar blips as green for yours, teal for allies and red for enemies.', 
 		springsetting = 'SimpleMiniMapColors',
 		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
+	},
+	--]]
+	simpleteamcolors = {
+		name = 'Simple Team Colors',
+		type = 'bool',
+		desc = 'Set simple team colors at game start. ', 
+		value = false,
+		OnChange = function(self)
+				if (self.value and not WG.usingSimpleTeamColors) or (not self.value and WG.usingSimpleTeamColors) then
+					toggleTeamColors()
+				end
+			end,
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
@@ -103,6 +123,13 @@ options = {
 		action = 'toggleradarandjammer',
 	},
 	
+	simplecolors = {
+		name = 'Toggle Simple Teamcolors',
+		desc = 'Toggle simples teamcolors, allies blue, enemies red and self teal.',
+		type = 'button',
+		OnChange = toggleTeamColors,
+	},
+	
 	hidebuttons = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
@@ -111,7 +138,7 @@ options = {
 	},
 	
 }
-			
+
 local function MakeMinimapButton(file, pos, option )
 	local desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
 	local hotkey = WG.crude.GetHotkey(options[option].action)
@@ -180,13 +207,36 @@ MakeMinimapWindow = function()
 --			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			
 			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}},
 			
-			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 1, 'lastmsgpos' ),
-			MakeMinimapButton( 'LuaUI/images/map/standard.png', 3, 'viewstandard' ),
-			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 4, 'viewheightmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 5, 'viewblockmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 6, 'viewmetalmap' ),
+			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', 2, 'lastmsgpos' ),
+			MakeMinimapButton( 'LuaUI/images/map/standard.png', 3.5, 'viewstandard' ),
+			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 4.5, 'viewheightmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 5.5, 'viewblockmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 6.5, 'viewmetalmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/radar.png', 8, 'viewradar' ),
 			MakeMinimapButton( 'LuaUI/images/map/fow.png', 9, 'viewfow' ),
+			
+			Chili.Button:New{ 
+				height=iconsize, width=iconsize, 
+				caption="",
+				margin={0,0,0,0},
+				padding={4,3,2,2},
+				bottom=0, 
+				right=iconsize*1+5, 
+				
+				tooltip = "Toggle simplified teamcolours",
+				
+				--OnClick={ function(self) options[option].OnChange() end }, 
+				OnClick = {toggleTeamColors},
+				children={
+					Chili.Image:New{
+						file='LuaUI/images/playerlist/share.png',
+						width="100%";
+						height="100%";
+						x="0%";
+						y="0%";
+					}
+				},
+			},
 		},
 	}
 end
@@ -248,10 +298,8 @@ function widget:Initialize()
 	end
 
 	Chili = WG.Chili
-
 	
 	MakeMinimapWindow()
-	
 	
 	gl.SlaveMiniMap(true)
 end
