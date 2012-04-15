@@ -52,7 +52,7 @@ NOTE FOR OTHER GAME DEVS:
 ------------------------
 ------------------------
 options_path = 'Settings/Interface/Integral Menu'
-options_order = { 'disablesmartselect', 'hidetabs', }
+options_order = { 'disablesmartselect', 'hidetabs', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
 options = {
 	disablesmartselect = {
 		name = 'Disable Smart Tab Select',
@@ -62,6 +62,30 @@ options = {
 		name = 'Hide Tab Row',
 		type = 'bool',
 		advanced = true,
+	},
+	tab_factory = {
+		name = "Factory Tab",
+		desc = "Switches to factory tab, enables grid hotkeys",
+		type = 'button',
+        hotkey = {key='z', mod=''},
+	},
+	tab_economy = {
+		name = "Economy Tab",
+		desc = "Switches to economy tab, enables grid hotkeys",
+		type = 'button',
+        hotkey = {key='x', mod=''},
+	},
+	tab_defence = {
+		name = "Defence Tab",
+		desc = "Switches to defence tab, enables grid hotkeys",
+		type = 'button',
+        hotkey = {key='c', mod=''},
+	},
+	tab_special = {
+		name = "Special Tab",
+		desc = "Switches to special tab, enables grid hotkeys",
+		type = 'button',
+        hotkey = {key='v', mod=''},
 	},
 }
 
@@ -239,33 +263,13 @@ local n_special = {}
 local n_units = {}
 local n_states = {}
 
-local function CapCase(str)
-	local str = str:lower()
-	str = str:gsub( '_', ' ' )
-	str = str:sub(1,1):upper() .. str:sub(2)
-	
-	str = str:gsub( ' (.)', 
-		function(x) return (' ' .. x):upper(); end
-		)
-	return str
-end
-
-local function getHotkey(actionName)
-	local hotkey = Spring.GetActionHotKeys(actionName)
-	if hotkey and hotkey[1] then
-		return '(\255\0\255\0' .. CapCase(hotkey[1]) .. '\008)'
-	else
-		return ''
-	end
-end
-
 --shortcuts
 local menuChoices = {
 	[1] = { array = n_common, name = "Order" },
-	[2] = { array = n_factories, name = "Factory" .. getHotkey("tab_factory"), config = factory_commands },
-	[3] = { array = n_econ, name = "Econ" .. getHotkey("tab_economy"), config = econ_commands },
-	[4] = { array = n_defense, name = "Defense" .. getHotkey("tab_defence"), config = defense_commands },
-	[5] = { array = n_special, name = "Special" .. getHotkey("tab_special"), config = special_commands },
+	[2] = { array = n_factories, name = "Factory", config = factory_commands, actionName = "epic_chili_integral_menu_tab_factory" },
+	[3] = { array = n_econ, name = "Econ", config = econ_commands, actionName = "epic_chili_integral_menu_tab_economy" },
+	[4] = { array = n_defense, name = "Defense", config = defense_commands, actionName = "epic_chili_integral_menu_tab_defence" },
+	[5] = { array = n_special, name = "Special", config = special_commands, actionName = "epic_chili_integral_menu_tab_special" },
 	[6] = { array = n_units, name = "Units" },
 }
 
@@ -1026,14 +1030,12 @@ function widget:KeyPress(key, modifier, isRepeat)
 					local index = Spring.GetCmdDescIndex(cmdid)
 					if index then
 						Spring.SetActiveCommand(index,1,true,false,false,false,false,false)
-						hotkeyMode = false
-						Update(true)
 					end
 				end
 			end
 		end
 		hotkeyMode = false
-		--Spring.Echo(hotkeyMode)
+		Update(true)
 		return true 
 	end
 end
@@ -1043,8 +1045,6 @@ local function HotkeyTabFactory()
 	hotkeyMode = true
 	Update(true)
 	ColorTabs()
-	Spring.Echo(WG.crude.GetHotkey("tab_factory"))
-	Spring.Echo(WG.crude.GetHotkey("attack"))
 end
 
 local function HotkeyTabEconomy()
@@ -1068,19 +1068,23 @@ local function HotkeyTabSpecial()
 	ColorTabs()
 end
 
-local function HotkeyTabUnit()
-	menuChoice = 6
-	hotkeyMode = true
-	Update(true)
-	ColorTabs()
-end
-
+options.tab_factory.OnChange = HotkeyTabFactory
+options.tab_economy.OnChange = HotkeyTabEconomy
+options.tab_defence.OnChange = HotkeyTabDefence
+options.tab_special.OnChange = HotkeyTabSpecial
 
 local function AddAction(cmd, func, data, types)
 	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
 end
 local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
+end
+
+local function updateTabName(num, choice)
+	local hotkey = WG.crude.GetHotkey(choice.actionName)
+	if hotkey then
+		choice.name = choice.name ..  '(\255\0\255\0' .. hotkey .. '\008)'	
+	end
 end
 
 -- INITS 
@@ -1093,11 +1097,9 @@ function widget:Initialize()
 	AddAction("nextmenu", ScrollTabRight, nil, "p")
 	AddAction("prevmenu", ScrollTabLeft, nil, "p")
 	
-	AddAction("tab_factory", HotkeyTabFactory, nil, "t")
-	AddAction("tab_economy", HotkeyTabEconomy, nil, "t")
-	AddAction("tab_defence", HotkeyTabDefence, nil, "t")
-	AddAction("tab_special", HotkeyTabSpecial, nil, "t")
-	--AddAction("tab_unit", HotkeyTabUnit, nil, "p") -- not functional
+	for i = 2, 5 do
+		updateTabName(i, menuChoices[i])
+	end
 	
 	--[[local f,it,isFile = nil,nil,false
 	f  = io.open('cmdcolors.txt','r')

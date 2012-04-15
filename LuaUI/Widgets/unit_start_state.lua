@@ -30,7 +30,7 @@ local function IsGround(ud)
 end
 
 options_path = 'Game/Unit AI/Initial States'
-options_order = { 'presetlabel', 'holdPosition', 'commander_label', 'commander_firestate', 'commander_movestate', 'commander_constructor_buildpriority', 'commander_retreat'}
+options_order = { 'presetlabel', 'holdPosition', 'commander_label', 'commander_firestate', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_retreat'}
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
@@ -61,7 +61,7 @@ options = {
         path = "Game/Unit AI/Initial States/Misc",
     },
 
-    commander_movestate = {
+    commander_movestate1 = {
         name = "  Movestate",
         desc = "Values: hold position, maneuver, roam",
         type = 'number',
@@ -161,7 +161,7 @@ local function addUnit(defName, path)
     end
 
     if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
-        options[defName .. "_movestate"] = {
+        options[defName .. "_movestate1"] = {
             name = "  Movestate",
             desc = "Values: inherit from factory, hold position, maneuver, roam",
             type = 'number',
@@ -171,7 +171,7 @@ local function addUnit(defName, path)
             step = 1,
             path = path,
         }
-        options_order[#options_order+1] = defName .. "_movestate"
+        options_order[#options_order+1] = defName .. "_movestate1"
     end
 	
 	if (ud.canFly) then
@@ -187,17 +187,17 @@ local function addUnit(defName, path)
         }
 		options_order[#options_order+1] = defName .. "_flylandstate"
 		
-		options[defName .. "_autorepairlevel"] = {
+		options[defName .. "_autorepairlevel1"] = {
             name = "  Auto Repair to airpad",
             desc = "Values: inherit from factory, no autorepair, 30%, 50%, 80% health remaining",
             type = 'number',
-            value = 0, -- auto repair is stupid
+            value = -1,
             min = -1,
             max = 3,
             step = 1,
             path = path,
         }
-		options_order[#options_order+1] = defName .. "_autorepairlevel"
+		options_order[#options_order+1] = defName .. "_autorepairlevel1"
 	elseif ud.customParams and ud.customParams.landflystate then
 		options[defName .. "_flylandstate_factory"] = {
             name = "  Fly/Land State for factory",
@@ -371,7 +371,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
         if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
             Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"})
-            Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate.value}, {"shift"})
+            Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"})
 			Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, {"shift"})
         end
         
@@ -394,8 +394,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                 end
             end
             
-            if options[name .. "_movestate"] and options[name .. "_movestate"].value then
-                if options[name .. "_movestate"].value == -1 then
+            if options[name .. "_movestate1"] and options[name .. "_movestate1"].value then
+                if options[name .. "_movestate1"].value == -1 then
                     if builderID then
                         local bdid = Spring.GetUnitDefID(builderID)
                         if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
@@ -406,7 +406,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                         end
                     end
                 else
-                    Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options[name .. "_movestate"].value}, {"shift"})
+                    Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options[name .. "_movestate1"].value}, {"shift"})
                 end
             end
 
@@ -424,9 +424,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				Spring.GiveOrderToUnit(unitID, CMD_AP_FLY_STATE, {options[name .. "_autorepairlevel_factory"].value}, {"shift"})
 			end
 			
-			if options[name .. "_autorepairlevel"] and options[name .. "_autorepairlevel"].value then
-				if options[name .. "_autorepairlevel"].value ~= -1 then  -- The unit_air_plants gadget deals with inherit
-					Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel"].value}, {"shift"})
+			if options[name .. "_autorepairlevel1"] and options[name .. "_autorepairlevel1"].value then
+				if options[name .. "_autorepairlevel1"].value ~= -1 then  -- The unit_air_plants gadget deals with inherit
+					Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel1"].value}, {"shift"})
+				elseif not builderID then
+					Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {0}, {"shift"})
 				end
 			end
 
@@ -541,7 +543,7 @@ function widget:Update()
     if rememberToSetHoldPositionPreset then
         for i = 1, #options_order do
             local opt = options_order[i]
-            local find = string.find(opt, "_movestate")
+            local find = string.find(opt, "_movestate1")
             local name = find and string.sub(opt,0,find-1)
             local ud = name and UnitDefNames[name]
             if ud and not holdPosException[name] and IsGround(ud) then
