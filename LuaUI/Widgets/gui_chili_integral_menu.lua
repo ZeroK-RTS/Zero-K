@@ -266,12 +266,12 @@ local n_states = {}
 
 --shortcuts
 local menuChoices = {
-	[1] = { array = n_common, name = "Order" },
-	[2] = { array = n_factories, name = "Factory", config = factory_commands, actionName = "epic_chili_integral_menu_tab_factory" },
-	[3] = { array = n_econ, name = "Econ", config = econ_commands, actionName = "epic_chili_integral_menu_tab_economy" },
-	[4] = { array = n_defense, name = "Defense", config = defense_commands, actionName = "epic_chili_integral_menu_tab_defence" },
-	[5] = { array = n_special, name = "Special", config = special_commands, actionName = "epic_chili_integral_menu_tab_special" },
-	[6] = { array = n_units, name = "Units" },
+	[1] = { array = n_common, name = "Order", hotkeyName = "Order" },
+	[2] = { array = n_factories, name = "Factory", hotkeyName = "Factory", config = factory_commands, actionName = "epic_chili_integral_menu_tab_factory" },
+	[3] = { array = n_econ, name = "Econ", hotkeyName = "Econ", config = econ_commands, actionName = "epic_chili_integral_menu_tab_economy" },
+	[4] = { array = n_defense, name = "Defense", hotkeyName = "Defense", config = defense_commands, actionName = "epic_chili_integral_menu_tab_defence" },
+	[5] = { array = n_special, name = "Special", hotkeyName = "Special", config = special_commands, actionName = "epic_chili_integral_menu_tab_special" },
+	[6] = { array = n_units, name = "Units", hotkeyName = "Units" },
 }
 
 local menuChoice = 1
@@ -888,7 +888,7 @@ local function MakeMenuTab(i, alpha)
 --			shadow = true
 --		},
 		
-		caption = menuChoices[i].name,
+		caption = hotkeyMode and menuChoices[i].name or menuChoices[i].hotkeyName,
 		OnClick = {
 			function()
 				menuChoice = i
@@ -1086,7 +1086,7 @@ end
 local function updateTabName(num, choice)
 	local hotkey = WG.crude.GetHotkey(choice.actionName)
 	if hotkey ~= '' then
-		choice.name = choice.name ..  '(\255\0\255\0' .. hotkey .. '\008)'	
+		choice.hotkeyName = choice.name ..  '(\255\0\255\0' .. hotkey .. '\008)'	
 	end
 end
 
