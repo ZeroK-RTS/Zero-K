@@ -146,6 +146,56 @@ local forceUpdateFrequency = 0.2	-- seconds
 local selectedFac	-- unitID
 local alreadyRemovedTag = {}
 
+local hotkeyMode = false
+
+local gridKeyMap = {
+	[KEYSYMS.Q] = {1,1}, 
+	[KEYSYMS.W] = {1,2},
+	[KEYSYMS.E] = {1,3},
+	[KEYSYMS.R] = {1,4},
+	[KEYSYMS.T] = {1,5},
+	[KEYSYMS.Y] = {1,6},
+	[KEYSYMS.A] = {2,1}, 
+	[KEYSYMS.S] = {2,2},
+	[KEYSYMS.D] = {2,3},
+	[KEYSYMS.F] = {2,4},
+	[KEYSYMS.G] = {2,5},
+	[KEYSYMS.H] = {2,6},
+	[KEYSYMS.Z] = {3,1}, 
+	[KEYSYMS.X] = {3,2},
+	[KEYSYMS.C] = {3,3},
+	[KEYSYMS.V] = {3,4},
+	[KEYSYMS.B] = {3,5},
+	[KEYSYMS.N] = {3,6},
+}
+
+local gridMap = {
+	[1] = {
+		[1] = "Q",
+		[2] = "W",
+		[3] = "E",
+		[4] = "R",
+		[5] = "T",
+		[6] = "Y",
+	},
+	[2] = {
+		[1] = "A",
+		[2] = "S",
+		[3] = "D",
+		[4] = "F",
+		[5] = "G",
+		[6] = "H",
+	},
+	[3] = {
+		[1] = "Z",
+		[2] = "X",
+		[3] = "C",
+		[4] = "V",
+		[5] = "B",
+		[6] = "N",
+	},
+}
+
 -- Chili classes
 local Chili
 local Button
@@ -177,6 +227,8 @@ local buildProgress	--Progressbar, child of buildRowButtons[1].image; updates ev
 local buildRow_visible = false
 local buildQueue = {}	--build order table of selectedFac
 local buildQueueUnsorted = {}	--puts all units of same type into single index; thus no sequence
+
+local gridLocation = {}
 
 -- arrays with commands to be displayed 
 local n_common = {}
@@ -229,7 +281,7 @@ end
 ------------------------
 --  Generates or updates chili button - either image or text or both based - container is parent of button, cmd is command desc structure
 ------------------------
-local function MakeButton(container, cmd, insertItem) 
+local function MakeButton(container, cmd, insertItem, index) 
 	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
 	local isBuild = (cmd.id < 0)
 	local text
@@ -250,10 +302,11 @@ local function MakeButton(container, cmd, insertItem)
 		text = cmd.name 
 	end
 	
-	
-	
 	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 	
+	if isBuild and hotkeyMode and not isState then
+		hotkey = gridMap[container.index][index] or ''
+	end
 	
 	if not isState and hotkey ~= '' then
 		text = '\255\0\255\0' .. hotkey
@@ -510,8 +563,8 @@ local function UpdateContainer(container, nl, columns)
 	
 	if needUpdate then 
 		RemoveChildren(container) 
-		for _, cmd in ipairs(nl) do 
-			MakeButton(container, cmd, true)
+		for i, cmd in ipairs(nl) do 
+			MakeButton(container, cmd, true, i)
 		end 
 		for i = 1, columns - #container.children do 
 			Control:New {
@@ -520,35 +573,11 @@ local function UpdateContainer(container, nl, columns)
 			}
 		end 
 	else 
-		for _, cmd in ipairs(nl) do  -- update buttons only 
-			MakeButton(container, cmd, false)
+		for i, cmd in ipairs(nl) do  -- update buttons only 
+			MakeButton(container, cmd, false, i)
 		end 
 	end 
 end 
-
--- if you ever want to know why the command removal works use this on Spring.GetFactoryCommands(selectedFac)
---[[
-local function EchoTable(ta, front)
-	for i, v in pairs(ta) do
-		if (type(v) == "table") then
-			Spring.Echo(i)
-			EchoTable(v,front .. "  ")
-		elseif v == nil then
-			if i == nil then
-				Spring.Echo(front .. "nil  nil")
-			else
-				Spring.Echo(front .. i .. "   nil")
-			end
-		else
-			if i == nil then
-				Spring.Echo(front .. "nil   " .. v)
-			else
-				Spring.Echo(front .. i .. "  " .. v)
-			end
-		end
-	end
-end
---]]
 
 local function BuildRowButtonFunc(num, cmdid, left, right)
 	buildQueue = spGetFullBuildQueue(selectedFac)
@@ -767,6 +796,10 @@ local function Update(buttonpush)
 	--most commands don't use row sorting; econ, defense and special do
 	local useRowSort = (menuChoice == 3 or menuChoice == 4 or menuChoice == 5)
 	
+	if menuChoice == 1 then
+		hotkeyMode = false
+	end
+	
 	--if (#commands + #customCommands == 0) then 
 		---screen0:RemoveChild(window);
 		--window_visible = false;
@@ -958,6 +991,68 @@ local function ScrollTabLeft()
 	ColorTabs()
 end
 
+--------------------------------------
+-- Hotkey Mode
+
+function widget:KeyPress(key, modifier, isRepeat)
+	if (hotkeyMode) and not isRepeat then 
+		local pos = gridKeyMap[key]
+		if pos and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
+			local cmdid = sp_commands[pos[1]].children[pos[2]]
+			if cmdid then
+				cmdid = cmdid.cmdid
+				if cmdid then 
+					local index = Spring.GetCmdDescIndex(cmdid)
+					if index then
+						Spring.SetActiveCommand(index,1,true,false,false,false,false,false)
+						hotkeyMode = false
+						Update(true)
+					end
+				end
+			end
+		end
+		hotkeyMode = false
+		--Spring.Echo(hotkeyMode)
+		return true 
+	end
+end
+
+local function HotkeyTabFactory()
+	menuChoice = 2
+	hotkeyMode = true
+	Update(true)
+	ColorTabs()
+end
+
+local function HotkeyTabEconomy()
+	menuChoice = 3
+	hotkeyMode = true
+	Update(true)
+	ColorTabs()
+end
+
+local function HotkeyTabDefence()
+	menuChoice = 4
+	hotkeyMode = true
+	Update(true)
+	ColorTabs()
+end
+
+local function HotkeyTabSpecial()
+	menuChoice = 5
+	hotkeyMode = true
+	Update(true)
+	ColorTabs()
+end
+
+local function HotkeyTabUnit()
+	menuChoice = 6
+	hotkeyMode = true
+	Update(true)
+	ColorTabs()
+end
+
+
 local function AddAction(cmd, func, data, types)
 	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
 end
@@ -969,11 +1064,17 @@ end
 function widget:Initialize()
 	widgetHandler:ConfigLayoutHandler(LayoutHandler)
 	Spring.ForceLayoutUpdate()
-
+	
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")	
 	AddAction("nextmenu", ScrollTabRight, nil, "p")
 	AddAction("prevmenu", ScrollTabLeft, nil, "p")
+	
+	AddAction("tab_factory", HotkeyTabFactory, nil, "t")
+	AddAction("tab_economy", HotkeyTabEconomy, nil, "t")
+	AddAction("tab_defence", HotkeyTabDefence, nil, "t")
+	AddAction("tab_special", HotkeyTabSpecial, nil, "t")
+	--AddAction("tab_unit", HotkeyTabUnit, nil, "p") -- not functional
 	
 	--[[local f,it,isFile = nil,nil,false
 	f  = io.open('cmdcolors.txt','r')
@@ -1120,6 +1221,7 @@ function widget:Initialize()
 			y = math.floor(100/numRows)*(i-1).."%";
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
+			index = i,
 		}
 		--Spring.Echo("Command row "..i.." created")
 	end
