@@ -1082,7 +1082,7 @@ end
 
 local function updateTabName(num, choice)
 	local hotkey = WG.crude.GetHotkey(choice.actionName)
-	if hotkey then
+	if hotkey ~= '' then
 		choice.name = choice.name ..  '(\255\0\255\0' .. hotkey .. '\008)'	
 	end
 end
