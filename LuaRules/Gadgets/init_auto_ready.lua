@@ -20,12 +20,6 @@ local lastLabel = nil
 local waitingFor = {}
 local isReady = {}
 
-
-LUAUI_DIRNAME = 'LuaUI/'
-local fontHandler   = loadstring(VFS.LoadFile(LUAUI_DIRNAME.."modfonts.lua", VFS.ZIP_FIRST))()
-local floor = math.floor
-local font = "LuaUI/Fonts/FreeSansBold_14"
-local fh = fontHandler.UseFont(font)
 local glPopMatrix      = gl.PopMatrix
 local glPushMatrix     = gl.PushMatrix
 local glRotate         = gl.Rotate
@@ -110,12 +104,7 @@ function gadget:DrawScreen()
     glPushMatrix()
     glTranslate((vsx * 0.5), (vsy * 0.5)+150, 0)
     glScale(1.5, 1.5, 1)
-    if (fh) then
-      fh = fontHandler.UseFont(font)
-      fontHandler.DrawCentered(msg)
-    else
-      glText(text, 0, 0, 14, "oc")
-    end
+    glText(text, 0, 0, 14, "oc")
     glPopMatrix()
 end 
 
