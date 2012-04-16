@@ -24,7 +24,7 @@ local isReady = {}
 LUAUI_DIRNAME = 'LuaUI/'
 local fontHandler   = loadstring(VFS.LoadFile(LUAUI_DIRNAME.."modfonts.lua", VFS.ZIP_FIRST))()
 local floor = math.floor
-local font = "LuaUI/Fonts/FreeSansBold_20"
+local font = "LuaUI/Fonts/FreeSansBold_14"
 local fh = fontHandler.UseFont(font)
 local glPopMatrix      = gl.PopMatrix
 local glPushMatrix     = gl.PushMatrix
@@ -89,7 +89,12 @@ function gadget:DrawScreen()
 	if text == nil then 
 		text = "Waiting for people "
 	end 
+	local cnt = 0 
 	if (next(waitingFor) ~= nil) then 
+		if cnt % 6 == 5 then 
+			text = text .. "\n"
+		end
+		cnt = cnt + 1
 		text = text .. "\n\255\255\255\255Waiting for "
 		for name, state in pairs(waitingFor) do 
 			if state == "missing" then 
@@ -109,7 +114,7 @@ function gadget:DrawScreen()
       fh = fontHandler.UseFont(font)
       fontHandler.DrawCentered(msg)
     else
-      glText(text, 0, 0, 20, "oc")
+      glText(text, 0, 0, 14, "oc")
     end
     glPopMatrix()
 end 
