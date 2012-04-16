@@ -21,7 +21,7 @@ local waitingFor = {}
 LUAUI_DIRNAME = 'LuaUI/'
 local fontHandler   = loadstring(VFS.LoadFile(LUAUI_DIRNAME.."modfonts.lua", VFS.ZIP_FIRST))()
 local floor = math.floor
-local font = "LuaUI/Fonts/FreeSansBold_30"
+local font = "LuaUI/Fonts/FreeSansBold_20"
 local fh = fontHandler.UseFont(font)
 local glPopMatrix      = gl.PopMatrix
 local glPushMatrix     = gl.PushMatrix
@@ -90,7 +90,7 @@ function gadget:DrawScreen()
       fh = fontHandler.UseFont(font)
       fontHandler.DrawCentered(msg)
     else
-      glText(text, 0, 0, 24, "oc")
+      glText(text, 0, 0, 20, "oc")
     end
 
     glPopMatrix()
