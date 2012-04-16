@@ -44,19 +44,22 @@ function gadget:GameSetup(label, ready, playerStates)
 	local allOK = true 
 	waitingFor = {}
 	
-	
 	for num, state in pairs(playerStates) do 
 		local name,active,spec, teamID,_,ping = Spring.GetPlayerInfo(num)
 		local x,y,z = Spring.GetTeamStartPosition(teamID)
 		local _,_,_,isAI,_,_ = Spring.GetTeamInfo(teamID)
 		local startPosSet = x ~= nil and x~= -100 and y ~= -100 and z~=-100
 	
-		if active and not spec and not isAI then 
-			if state == "ready" or startPosSet then
-				okCount = okCount + 1
-			else
-				allOK = false 
-				waitingFor[#waitingFor + 1] = name
+		if not spec and not isAI then 
+			if not active then 
+				waitingFor[name] = "missing"
+			else 
+				if state == "ready" or startPosSet then
+					okCount = okCount + 1
+				else
+					allOK = false 
+					waitingFor[name] = "notready"
+				end 
 			end 
 		end 
 	end 
@@ -81,8 +84,13 @@ function gadget:DrawScreen()
 		text = "Waiting for people "
 	end 
 	if (#waitingFor > 0) then 
-		text = text .. "\n\255\255\255\255Waiting for \255\255\0\0"
-		for _, name in ipairs(waitingFor) do 
+		text = text .. "\n\255\255\255\255Waiting for "
+		for name, state in pairs(waitingFor) do 
+			if state == "missing" then 
+				text = text .. "\255\255\0\0"
+			else
+				text = text .. "\255\255\255\0"
+			end 
 			text = text .. name .. ", "
 		end 
 		text = text .. "\n\255\255\255\255 Say !force to start sooner"
