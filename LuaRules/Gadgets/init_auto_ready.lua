@@ -14,16 +14,36 @@ if (not gadgetHandler:IsSyncedCode()) then
 
 local allReady = false 
 local startTimer = nil
+local lastLabel = nil
+local waitingFor = {}
+
+
+LUAUI_DIRNAME = 'LuaUI/'
+local fontHandler   = loadstring(VFS.LoadFile(LUAUI_DIRNAME.."modfonts.lua", VFS.ZIP_FIRST))()
+local floor = math.floor
+local font = "LuaUI/Fonts/FreeSansBold_30"
+local fh = fontHandler.UseFont(font)
+local glPopMatrix      = gl.PopMatrix
+local glPushMatrix     = gl.PushMatrix
+local glRotate         = gl.Rotate
+local glScale          = gl.Scale
+local glText           = gl.Text
+local glTranslate      = gl.Translate
+
+
 
 function gadget:Initialize() 
 	startTimer = Spring.GetTimer()
 end 
 
-function gadget:GameSetup(state, label, playerStates)
+function gadget:GameSetup(label, ready, playerStates)
+	lastLabel = label 
 	local timeDiff = Spring.DiffTimers(Spring.GetTimer(), startTimer)
 	if (timeDiff >=15) then
 		local okCount = 0
 		local allOK = true 
+		waitingFor = {}
+	
 	
 		for num, state in pairs(playerStates) do 
 			local name,active,spec, teamID,_,ping = Spring.GetPlayerInfo(num)
@@ -36,19 +56,51 @@ function gadget:GameSetup(state, label, playerStates)
 					okCount = okCount + 1
 				else
 					allOK = false 
-					break 
+					waitingFor[#waitingFor + 1] = name
 				end 
 			end 
 			
 		end 
 		
 		if okCount > 0 and allOK then
-			--Spring.Echo("All present people set start position, starting game!")
 			return true, true	
 		end 
 	end 
+	return true, false
 end
 
+function gadget:DrawScreen() 
+	local vsx, vsy = gl.GetViewSizes()
+	local text = lastLabel 
+	if text == nil then 
+		text = "Waiting for people "
+	end 
+	if (#waitingFor > 0) then 
+		text = "\n\255\255\255\255Waiting for \255\255\0\0"
+		for _, name in ipairs(waitingFor) do 
+			text = text .. name .. ", "
+		end 
+	end 
+	text = text .. "\n\255\255\255\255 Say !force to start sooner"
+
+    glPushMatrix()
+    glTranslate((vsx * 0.5), (vsy * 0.5)+150, 0)
+    glScale(1.5, 1.5, 1)
+    if (fh) then
+      fh = fontHandler.UseFont(font)
+      fontHandler.DrawCentered(msg)
+    else
+      glText(text, 0, 0, 24, "oc")
+    end
+
+    glPopMatrix()
+end 
+
+function gadget:Update() 
+	if (Spring.GetGameFrame() > 1) then 
+		gadgetHandler:RemoveGadget()
+	end 
+end 
 
 
 end 
