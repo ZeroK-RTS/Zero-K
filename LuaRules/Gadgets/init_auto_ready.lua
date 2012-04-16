@@ -97,7 +97,6 @@ function gadget:DrawScreen()
     else
       glText(text, 0, 0, 20, "oc")
     end
-
     glPopMatrix()
 end 
 
