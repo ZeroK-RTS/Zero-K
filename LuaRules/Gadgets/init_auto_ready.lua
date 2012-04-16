@@ -10,6 +10,7 @@ function gadget:GetInfo()
   }
 end
 
+
 if (not gadgetHandler:IsSyncedCode()) then
 
 local allReady = false 
@@ -17,6 +18,7 @@ local startTimer = nil
 local readyTimer = nil
 local lastLabel = nil
 local waitingFor = {}
+local isReady = {}
 
 
 LUAUI_DIRNAME = 'LuaUI/'
@@ -43,7 +45,7 @@ function gadget:GameSetup(label, ready, playerStates)
 	local okCount = 0
 	local allOK = true 
 	waitingFor = {}
-	
+		
 	for num, state in pairs(playerStates) do 
 		local name,active,spec, teamID,_,ping = Spring.GetPlayerInfo(num)
 		local x,y,z = Spring.GetTeamStartPosition(teamID)
@@ -56,6 +58,10 @@ function gadget:GameSetup(label, ready, playerStates)
 			else 
 				if state == "ready" or startPosSet then
 					okCount = okCount + 1
+					if isReady[name] == nil then 
+						isReady[name] = true 
+						Spring.SendCommands("wbynum 255 SPRINGIE:READY:".. name)
+					end 
 				else
 					allOK = false 
 					waitingFor[name] = "notready"
