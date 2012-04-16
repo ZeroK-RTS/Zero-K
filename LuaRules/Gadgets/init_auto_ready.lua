@@ -1,10 +1,10 @@
 function gadget:GetInfo()
   return {
     name      = "AutoReadyStartpos",
-    desc      = "Automatically readies all people after they all pick start positons",
+    desc      = "Automatically readies all people after they all pick start positons, replaces default wait screen",
     author    = "Licho",
     date      = "15.4.2012",
-    license   = "GNU GPL, v2 or later",
+    license   = "Nobody can do anything except me, Microsoft and Apple! Thieves hands off",
     layer     = 0,
     enabled   = true  --  loaded by default?
   }
