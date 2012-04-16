@@ -81,7 +81,7 @@ function gadget:DrawScreen()
 		text = "Waiting for people "
 	end 
 	if (#waitingFor > 0) then 
-		text = "\n\255\255\255\255Waiting for \255\255\0\0"
+		text = text .. "\n\255\255\255\255Waiting for \255\255\0\0"
 		for _, name in ipairs(waitingFor) do 
 			text = text .. name .. ", "
 		end 
