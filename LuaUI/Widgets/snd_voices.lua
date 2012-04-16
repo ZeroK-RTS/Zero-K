@@ -404,31 +404,47 @@ end
 
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
-  if (unitTeam == myTeamID) and damage>1 then
-    if (IsStructure(unitID)) then
-      CoolPlay("sdamaged", 20)
-    elseif (UnitDefs[unitDefID].isTransport) then
-      CoolPlay("tdamaged", 10)
-    else
-      CoolPlay("udamaged", 20)
-    end
-    
-    if (UnitDefs[unitDefID].customParams.commtype) then
-      health, maxHealth = GetUnitHealth(unitID)
-      if health/maxHealth < 0.5 then
-        CoolNoisePlay("warning2", 2)
-      else
-        CoolNoisePlay("warning1", 2)
-      end
-      if health/maxHealth < 0.2 then
-        CoolPlay("comdying",1)
-      end
-    end
-  end
+	if (unitTeam == myTeamID) and damage>1 then
+		if (GetUnitHealth(unitID) > 0 ) then
+			if (IsStructure(unitID)) then
+				CoolPlay("sdamaged", 20)
+			elseif (UnitDefs[unitDefID].isTransport) then
+				CoolPlay("tdamaged", 10)
+			else
+				CoolPlay("udamaged", 20)
+			end
+			if (UnitDefs[unitDefID].customParams.commtype) then
+				health, maxHealth = GetUnitHealth(unitID)
+				if health/maxHealth < 0.5 then
+					CoolNoisePlay("warning2", 2)
+				else
+					CoolNoisePlay("warning1", 2)
+				end
+				if health/maxHealth < 0.2 then
+				CoolPlay("comdying",1)
+				end
+			end
+		else
+			moveState[unitID] = nil
+			retreatState[unitID] = nil
+			fireState[unitID] = nil
+			allyTeam = GetUnitAllyTeam(unitID)
+			UnitPlay("destroyedu", sexTable[unitID], unitID, 20)
+			-- for _, energyName in ipairs(energyList) do
+			-- if (energyName == UnitDefs[unitDefID].name) then
+				--CoolPlay("edestroyed", 0)
+			-- end
+			-- end
+			-- if ((UnitDefs[UnitDefID].name == "corcom") or
+				-- (UnitDefs[UnitDefID].name == "armcom")) then
+			-- Play("comkill")
+			-- end
+		end
+	end
 end
 
 
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+--[[function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
   moveState[unitID] = nil
   retreatState[unitID] = nil
   fireState[unitID] = nil
@@ -446,7 +462,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
     -- end
   end
 end
-
+]]--
 
 function widget:Update(dt)
 
