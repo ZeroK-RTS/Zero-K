@@ -83,7 +83,7 @@ function gadget:DrawScreen()
 	if text == nil then 
 		text = "Waiting for people "
 	end 
-	if (#waitingFor > 0) then 
+	if (next(waitingFor) ~= nil) then 
 		text = text .. "\n\255\255\255\255Waiting for "
 		for name, state in pairs(waitingFor) do 
 			if state == "missing" then 
