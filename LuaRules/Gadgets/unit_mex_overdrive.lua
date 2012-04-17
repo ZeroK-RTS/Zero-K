@@ -995,7 +995,7 @@ function gadget:GameFrame(n)
 				
 				if mexByID[unitID].refundTeamID then
 					local teamID = mexByID[unitID].refundTeamID
-					privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + value*mexByID[unitID].refundTime*MEX_REFUND_SHARE/MEX_REFUND_TIME
+					privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + orgMetal*mexByID[unitID].refundTime*MEX_REFUND_SHARE/MEX_REFUND_TIME
 					mexByID[unitID].refundTime = mexByID[unitID].refundTime - 1
 					if mexByID[unitID].refundTime <= 0 then
 						mexByID[unitID].refundTeamID = nil
