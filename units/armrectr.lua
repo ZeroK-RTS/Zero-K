@@ -68,7 +68,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[spherecon.s3o]],
   radarDistanceJam       = 256,
-  repairSpeed            = 7.2,
   resurrect              = [[1]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
