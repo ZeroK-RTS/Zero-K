@@ -24,6 +24,8 @@ local linkdefs = {}
 
 local DEFAULT_PYLON_RANGE = 200 -- mex range, link = range*2
 local MEX_OWNER_SHARE = 0.05 -- 5% to owner
+local MEX_REFUND_TIME = 300 -- 300 seconds = 5 minutes
+local MEX_REFUND_SHARE = 0.5 -- refund starts at 50%
 local OD_OWNER_SHARE = 0.5 -- 50% of OD goes to owner of energy
 
 for i=1,#UnitDefs do
@@ -582,19 +584,23 @@ local function AddNewMexes(n)
 	if (n%32 ~= 2) then -- in sync 1 frame after slow update
 		return
 	end
-	for unitID,_ in pairs(mexesToAdd) do -- check units to add 
+	for unitID,data in pairs(mexesToAdd) do -- check units to add 
 		local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
 		local currentlyActive = not stunned_or_inbuld
 		if currentlyActive then
-			mexesToAdd[unitID] = mexesToAdd[unitID] - 1
-			if mexesToAdd[unitID] <= 0 then --unit should be operating to max we can determine metal and add 
-				mexesToAdd[unitID] = nil
+			data.count = data.count - 1
+			if data.count <= 0 then --unit should be operating to max we can determine metal and add 
 				local allyTeamID = Spring.GetUnitAllyTeam(unitID)
 				if (allyTeamID) then
 					local mm, mu = Spring.GetUnitResources(unitID)
 					local metalMake = (mm or 0) - (mu or 0)
 					metalMake = metalMake / MEX_OWNER_SHARE
 					mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
+					
+					if data.teamID then
+						mexByID[unitID].refundTeamID = data.teamID
+						mexByID[unitID].refundTime = MEX_REFUND_TIME
+					end
 					
 					Spring.CallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
 					local mexGridID = 0
@@ -619,28 +625,34 @@ local function AddNewMexes(n)
 						ai.grid[mexGridID].mexSquaredSum = ai.grid[mexGridID].mexSquaredSum + (metalMake * metalMake)
 					end
 				end
+				mexesToAdd[unitID] = nil
 			end
 		end
 	end
 end
 
 local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
+	
 	local summedMetalProduction = 0
-	local maxedMetalProduction = 0
-		
 	local summedBaseMetal = 0
+	local summedOverdrive = 0
+	
+	local maxedMetalProduction = 0
 	local maxedBaseMetal = 0
-    
-    local summedOverdrive = 0
 	local maxedOverdrive = 0
+    
     
 	local allyMetal = allyTeamData.mexMetal
 	local allyMetalSquared = allyTeamData.mexSquaredSum
+	local allyTeamMexes = mexes[allyTeamID]
 	
 	local energyWasted = allyE
 	
 	local gridEnergySpent = {}
 	local gridMetalGain = {}
+	
+	local mexBaseMetal = {}
+	local privateBaseMetal = {}
 
 	local reCalc = true
 	local maxedGrid = {}
@@ -650,7 +662,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 			if not (maxedGrid[i] or allyTeamData.nilGrid[i]) then -- do not check maxed grids
 				gridEnergySpent[i] = 0
 				gridMetalGain[i] = 0
-				for unitID, orgMetal in pairs(mexes[allyTeamID][i]) do -- loop mexes
+				for unitID, orgMetal in pairs(allyTeamMexes[i]) do -- loop mexes
 					local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
 					if stunned_or_inbuld then
 						orgMetal = 0
@@ -676,7 +688,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							reCalc = true
 							allyE = allyE - gridE
 							energyWasted = allyE
-							for unitID, orgMetal in pairs(mexes[allyTeamID][i]) do
+							for unitID, orgMetal in pairs(allyTeamMexes[i]) do
 								local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
 								if stunned_or_inbuld then
 									orgMetal = 0
@@ -686,13 +698,17 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
 								local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
 								Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
-                                
+ 
 								maxedMetalProduction = maxedMetalProduction + thisMexM
 								maxedBaseMetal = maxedBaseMetal + orgMetal
                                 maxedOverdrive = maxedOverdrive + orgMetal * metalMult
                                 
 								allyMetalSquared = allyMetalSquared - orgMetal * orgMetal
 								gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
+								
+								if mexByID[unitID].refundTeamID then
+									mexBaseMetal[unitID] = orgMetal
+								end
 								
 								local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 								if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
@@ -714,12 +730,17 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
 					local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
 					Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
-                    
+					
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedBaseMetal = summedBaseMetal + orgMetal
                     summedOverdrive = summedOverdrive + orgMetal * metalMult
                     
 					gridMetalGain[i] = gridMetalGain[i] + orgMetal * metalMult
+					
+					if mexByID[unitID].refundTeamID then
+						mexBaseMetal[unitID] = orgMetal
+					end
+					
 					local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 					if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
 						if unitDef then
@@ -744,6 +765,16 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 		end			
 	end
 	
+	for unitID, value in pairs(mexBaseMetal) do
+		local teamID = mexByID[unitID].refundTeamID
+		privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + value*mexByID[unitID].refundTime*MEX_REFUND_SHARE/MEX_REFUND_TIME
+		mexByID[unitID].refundTime = mexByID[unitID].refundTime - 1
+		if mexByID[unitID].refundTime <= 0 then
+			mexByID[unitID].refundTeamID = nil
+			mexByID[unitID].refundTime = nil
+		end
+	end
+	
 	if energyWasted < 0.01 then
 		energyWasted = 0
 	end
@@ -753,7 +784,8 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 		summedBaseMetal + maxedBaseMetal,
         summedOverdrive + maxedOverdrive,
 		gridEnergySpent,
-		gridMetalGain;
+		gridMetalGain,
+		privateBaseMetal
 end
 
 local function teamEcho(team, st)
@@ -900,7 +932,8 @@ function gadget:GameFrame(n)
 			end
 
 			--// Use the free Grid-Energy for Overdrive
-			local energyWasted, summedMetalProduction, summedBaseMetal, summedOverdrive, gridEnergySpent, gridMetalGain = OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
+			local energyWasted, summedMetalProduction, summedBaseMetal, summedOverdrive, gridEnergySpent, 
+					gridMetalGain, privateBaseMetal = OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 			
 			local ODenergy = allyE - energyWasted
 
@@ -959,6 +992,16 @@ function gadget:GameFrame(n)
                 
 				Spring.SetUnitRulesParam(unitID, "overdrive", 1)
 				Spring.CallCOBScript(unitID, "SetSpeed", 0, orgMetal * 500) 
+				
+				if mexByID[unitID].refundTeamID then
+					local teamID = mexByID[unitID].refundTeamID
+					privateBaseMetal[teamID] = (privateBaseMetal[teamID] or 0) + value*mexByID[unitID].refundTime*MEX_REFUND_SHARE/MEX_REFUND_TIME
+					mexByID[unitID].refundTime = mexByID[unitID].refundTime - 1
+					if mexByID[unitID].refundTime <= 0 then
+						mexByID[unitID].refundTeamID = nil
+						mexByID[unitID].refundTime = nil
+					end
+				end
 
 				local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 				summedMetalProduction = summedMetalProduction + orgMetal
@@ -1007,11 +1050,16 @@ function gadget:GameFrame(n)
 				local activeTeams = GG.Lagmonitor_activeTeams[allyTeamID]
 				local activeCount = (activeTeams.count >= 1 and activeTeams.count) or 1
 				local teamODEnergySum = 0
+				local summedBaseMetalAfterPrivate = summedBaseMetal
 				for i = 1, allyTeamData.teams do  -- calculate active team OD sum
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
 						teamODEnergySum = teamODEnergySum + (teamODEnergy[teamID] or 0)
 						--Spring.Echo(teamID .. " energy " ..  (teamODEnergy[teamID] or "nil"))
+					end
+					
+					if privateBaseMetal[teamID] then
+						summedBaseMetalAfterPrivate = summedBaseMetalAfterPrivate - privateBaseMetal[teamID]
 					end
 				end 
 				
@@ -1028,7 +1076,7 @@ function gadget:GameFrame(n)
 							odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odShare
 						end		
 						
-						local baseShare = summedBaseMetal / activeCount
+						local baseShare = summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)
 						
 						sendTeamInformationToAwards(teamID, baseShare, odShare, te.totalChange)
 						
@@ -1048,10 +1096,10 @@ end
 -------------------------------------------------------------------------------------
 -- MEXES
 
-local function SetupMex(unitID, unitDefID, unitTeam)
+local function SetupMex(unitID, unitDefID, unitTeam, refund)
 	Spring.SetUnitResourcing(unitID, 'cmm', 0)
 	Spring.SetUnitResourcing(unitID, 'cue', 0)
-	mexesToAdd[unitID] = 3 -- 3 seconds left for the income to stabilize
+	mexesToAdd[unitID] = {teamID = refund and unitTeam, count = 3} -- 3 seconds left for the income to stabilize
 end
 
 local function RemoveMex(unitID)
@@ -1105,7 +1153,7 @@ local function RemoveMexesAroundUnit(unitID)
 	for i = 1, #units do
 		if mexByID[units[i]] and units[i] ~= unitID then
 			RemoveMex(units[i])
-			mexesToAdd[units[i]] = 3
+			mexesToAdd[units[i]] = {teamID = mexesToAdd[units[i]] and mexesToAdd[units[i]].teamID, count = 3}
 		end
 	end
 end
@@ -1155,7 +1203,7 @@ function gadget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		if (mexDefs[unitDefID]) then
-			SetupMex(unitID,unitDefID, Spring.GetUnitTeam(unitID))
+			SetupMex(unitID,unitDefID, Spring.GetUnitTeam(unitID), false)
 		end
 		if (pylonDefs[unitDefID]) then
 			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
@@ -1171,7 +1219,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then
-		SetupMex(unitID, unitDefID, teamID)
+		SetupMex(unitID, unitDefID, unitTeam, true)
 	end
 	if pylonDefs[unitDefID] then
 		notDestroyed[unitID] = true
@@ -1190,7 +1238,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 	
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (mexDefs[unitDefID]) then 
-			SetupMex(unitID, unitDefID, teamID)
+			SetupMex(unitID, unitDefID, teamID, false)
 		end
 		
 		if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
