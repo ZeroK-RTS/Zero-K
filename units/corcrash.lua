@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Vandal]],
   description            = [[Anti-air Bot]],
   acceleration           = 0.45,
-  bmcode                 = [[1]],
   brakeRate              = 0.45,
   buildCostEnergy        = 100,
   buildCostMetal         = 100,

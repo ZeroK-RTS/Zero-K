@@ -33,7 +33,6 @@ unitDef = {
 	helptext_de    = [[Ultimatum beinhaltet nur eine Waffe: ein Desintegrator, welche gegnerische Panzer mit einem Schlag vaporisieren kann. Am meisten wird dafür er gebraucht, sich an gegenerische, harte Streicher heranzuschleichen und diese mit einigen Schüssen zu erledigen. Verteidigung gegen sie wird erreicht, indem man seine Schwergewicht mit leichten Einheiten beschützt.]],
   },
 
-  defaultmissiontype     = [[Standby]],
   energyUse              = 0,
   explodeAs              = [[ESTOR_BUILDING]],
   footprintX             = 2,

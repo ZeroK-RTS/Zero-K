@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Racketeer]],
   description            = [[EMP Artillery]],
   acceleration           = 0.25,
-  bmcode                 = [[1]],
   brakeRate              = 0.25,
   buildCostEnergy        = 350,
   buildCostMetal         = 350,
@@ -27,7 +26,6 @@ unitDef = {
 
   },
 
-  defaultmissiontype     = [[Standby]],
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
@@ -35,7 +33,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maneuverleashlength    = [[640]],
   mass                   = 248,
   maxDamage              = 950,
   maxSlope               = 36,
@@ -64,8 +61,6 @@ unitDef = {
   side                   = [[ARM]],
   sightDistance          = 325,
   smoothAnim             = true,
-  steeringmode           = [[2]],
-  TEDClass               = [[KBOT]],
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

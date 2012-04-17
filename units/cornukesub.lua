@@ -54,7 +54,6 @@ unitDef = {
   sightDistance          = 660,
   smoothAnim             = true,
   sonarDistance          = 0,
-  steeringmode           = [[1]],
   turninplace            = 0,
   turnRate               = 307,
   upright                = true,

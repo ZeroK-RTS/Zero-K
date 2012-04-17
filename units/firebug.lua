@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Burrowing Fire Skirmisher]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
-  bmcode                 = [[1]],
   brakeRate              = 0.4,
   buildCostEnergy        = 300,
   buildCostMetal         = 300,
@@ -27,7 +26,6 @@ unitDef = {
     helptext       = [[The Firebug shoots a single missile at range with a 50 second reload time doing 1500 damage and 2000 fire damage. The firebug can then run away and burrow until it reloads its missile.]],
  },
 
-  defaultmissiontype     = [[Standby]],
   explodeAs              = [[FIREBUG_DEATH]],
   fireState              = 0,
   footprintX             = 2,
@@ -35,7 +33,6 @@ unitDef = {
   iconType               = [[walkerbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maneuverleashlength    = [[640]],
   mass                   = 200,
   maxDamage              = 300,
   maxSlope               = 36,
@@ -65,8 +62,6 @@ unitDef = {
   side                   = [[CORE]],
   sightDistance          = 240,
   smoothAnim             = true,
-  steeringmode           = [[1]],
-  TEDClass               = [[KBOT]],
   turnRate               = 3000,
   workerTime             = 0,
 

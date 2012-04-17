@@ -38,7 +38,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  maneuverleashlength    = [[640]],
   mass                   = 198,
   maxDamage              = 1050,
   maxSlope               = 18,

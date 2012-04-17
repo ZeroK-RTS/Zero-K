@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Bantha]],
   description            = [[Heavy Standoff Strider]],
   acceleration           = 0.1047,
-  bmcode                 = [[1]],
   brakeRate              = 0.2212,
   buildCostEnergy        = 10500,
   buildCostMetal         = 10500,

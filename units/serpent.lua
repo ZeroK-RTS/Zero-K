@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Sniper Submarine]],
   acceleration           = 0.1,
   activateWhenBuilt      = true,
-  bmcode                 = [[1]],
   brakeRate              = 0.3,
   buildCostEnergy        = 2000,
   buildCostMetal         = 2000,
