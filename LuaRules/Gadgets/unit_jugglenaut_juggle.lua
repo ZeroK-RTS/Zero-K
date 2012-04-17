@@ -145,6 +145,7 @@ function gadget:ProjectileDestroyed(proID)
 		local data = projectiles[proID]
 		local x,y,z = Spring.GetProjectilePosition(proID)
 		y = Spring.GetGroundHeight(x,z) + 20
+		Spring.SpawnCEG("riotballgrav", data.sx, data.sy, data.sz, 0, 1, 0, COLLLECT_RADIUS)
 		local units = Spring.GetUnitsInSphere(data.sx, data.sy, data.sz, COLLLECT_RADIUS)
 		local parentDis = distance(data.sx, data.sy, data.sz, x,y,z)
 		for i = 1, #units do

@@ -136,5 +136,45 @@ return {
       },
     },
   },
+  
+  ["riotballgrav"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      air = true,
+      ground = true,
+      water = true,
+      unit = true,
+      alwaysvisible      = true,
+      circlealpha        = 0.4,
+      circlegrowth       = 7,
+      flashalpha         = 0.5,
+      flashsize          = 320,
+      ttl                = 64,
+      color = {
+        [1]  = 0.2,
+        [2]  = 0.3,
+        [3]  = 0.8,
+      },
+    },
+    ring1 = {
+      air                = true,
+      class              = [[CBitmapMuzzleFlame]],
+      ground             = true,
+      water              = true,
+      count              = 5,
+      properties = {
+        colormap           = [[0.1 0.15 0.4 .1   .05 0.075 0.2 .1   0 0 0 0]],
+        dir                = [[-1 r2, 1, -1 r2]],
+        frontoffset        = 0,
+        fronttexture       = [[shockwave]],
+        length             = 1,
+        pos                = [[0, 0, 0]],
+        sidetexture        = [[null]],
+        size               = 1,
+        sizegrowth         = 260,
+        ttl                = 60,
+      },
+    }, 
+  },  
 }
 

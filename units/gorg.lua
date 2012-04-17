@@ -162,22 +162,22 @@ unitDef = {
       weaponVelocity          = 2750,
     },
 	
-	GRAVITY_NEG_SPECIAL = {
+    GRAVITY_NEG_SPECIAL = {
       name                    = [[Psychic Tank Float]],
       accuracy                = 10,
       alphaDecay              = 0.7,
       areaOfEffect            = 2,
-	  avoidFeature            = false,
+      avoidFeature            = false,
       avoidFriendly           = false,
-	  collideEnemy            = false,
-	  collideFeature          = false,
+      collideEnemy            = false,
+      collideFeature          = false,
       collideFriendly         = false,
       collideGround           = false,
-	  collideNeutral          = false,
+      collideNeutral          = false,
       burnblow                = true,
       craterBoost             = 0.15,
       craterMult              = 0.3,
-	  commandFire             = true,
+      commandFire             = true,
 	  
 	  customParams            = {
 	    massliftthrow = [[1]],
@@ -187,11 +187,11 @@ unitDef = {
         default = 0.01,
       },
 
-	  edgeEffectiveness       = 0.5,
+      edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:GRAV]],
       lineOfSight             = true,
       noSelfDamage            = true,
-	  projectiles             = 1,
+      projectiles             = 1,
       range                   = 550,
       reloadtime              = 40,
       renderType              = 4,
