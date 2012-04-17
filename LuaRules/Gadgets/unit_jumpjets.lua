@@ -270,13 +270,13 @@ local function Jump(unitID, goal, cmdTag)
         mcSetRotationVelocity(unitID, 0, turn/rotUnit*step, 0)
 	  end
 	  
-	  fakeUnitID = spCreateUnit(
-	  "fakeunit_aatarget", start[1], start[2], start[3], "n", teamID)
-	  mcEnable(fakeUnitID)
-	  spSetUnitNoSelect(fakeUnitID, true)
-	  spSetUnitBlocking(fakeUnitID, false)
-	  spSetUnitNoDraw(fakeUnitID, true)
-	  spSetUnitNoMinimap(fakeUnitID, true)
+	  --fakeUnitID = spCreateUnit(
+	  --"fakeunit_aatarget", start[1], start[2], start[3], "n", teamID)
+	  --mcEnable(fakeUnitID)
+	  --spSetUnitNoSelect(fakeUnitID, true)
+	  --spSetUnitBlocking(fakeUnitID, false)
+	  --spSetUnitNoDraw(fakeUnitID, true)
+	  --spSetUnitNoMinimap(fakeUnitID, true)
 	end
   
     local halfJump
