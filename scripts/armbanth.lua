@@ -79,6 +79,9 @@ local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
 local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
 
+wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
+local reloadTimeShort = wd and WeaponDefs[wd].reload*30 or 30
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function script.Create()
@@ -152,7 +155,7 @@ end
 local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
-	Sleep(2000)
+	Sleep(6000)
 	Turn( head, y_axis, 0, 3 )
 	Turn( torso, y_axis, 0, 3 )
 	Turn( larm, x_axis, 0, 3 )
@@ -256,7 +259,6 @@ function script.AimWeapon(num, heading, pitch )
 		StartThread(RestoreAfterDelay)
 		return true	
 	elseif num == 3 then
-		Signal( SIG_Aim )
 		Signal( SIG_Aim3 )
 		SetSignalMask( SIG_Aim3 )
 		Turn( head, y_axis, heading, 3 )
@@ -273,13 +275,15 @@ end
 
 
 function script.FireWeapon(num)
-	if num == 2 then
+	if num == 1 then
+	    local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
+		Spring.SetUnitWeaponState(unitID, 2, "reloadFrame", Spring.GetGameFrame() + reloadTimeShort*speedmult)	
+	elseif num == 2 then
 		armgun = not armgun
 		StartThread(armrecoil)
 	elseif num == 3 then
-	        local toChange = 3 - num
 	        local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
-		Spring.SetUnitWeaponState(unitID, 0, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
+			Spring.SetUnitWeaponState(unitID, 0, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
 		--StartThread(SuperBeam)
 	elseif num == 4 then
 		missilegun = not missilegun

@@ -26,7 +26,7 @@ unitDef = {
   customParams        = {
     description_fr = [[Mechwarrior d'Assaut]],
 	description_de = [[Sturm/Riotroboter]],
-    helptext       = [[The Dante is a heavy frontal assault unit for when conventional means don't cut it. Its flamethrower and twin heatrays aren't extraordinary, but its incendiary rockets can be fired in a salvo of twenty that devastates a wide swath of terrain.]],
+    helptext       = [[The Dante is a heavy combat unit that specializes in getting close and melting its target. Its flamethrower and twin heatrays aren't extraordinary, but its incendiary rockets can be fired in a salvo of twenty that devastates a wide swath of terrain.]],
     helptext_fr    = [[]],
 	helptext_de    = [[Der Dante ist eine schwere Sturmeinheit für den Fronteinsatz, wenn herkömmliche Mittel versagen. Sein Flammenwerfer und doppelläufiger Heat Ray sind zwar nichts besonderes, doch seine Brandraketen können in 20-Schuss Salven breite Schneisen in das Gelände schlagen.]],
   },
@@ -48,6 +48,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[dante.s3o]],
+  script			  = [[dante.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[CRAWL_BLASTSML]],
 
@@ -206,6 +207,7 @@ unitDef = {
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
+	    burnchance = "1",
 	  },
 	  
       damage                  = {
@@ -253,13 +255,14 @@ unitDef = {
       avoidNeutral            = false,
       burst                   = 10,
       burstrate               = 0.1,
-	  cegTag                  = [[missiletrailredsmall]],
+      cegTag                  = [[missiletrailredsmall]],
       commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
+	    burnchance = "1",
 	  },
 	  
       damage                  = {
@@ -277,7 +280,7 @@ unitDef = {
       impulseFactor           = 0.1,
       interceptedByShieldType = 2,
       model                   = [[wep_m_hailstorm.s3o]],
-	  projectiles			  = 2,
+      projectiles			  = 2,
       range                   = 460,
       reloadtime              = 20,
       smokedelay              = [[0.1]],
@@ -290,13 +293,13 @@ unitDef = {
       startVelocity           = 150,
       tolerance               = 6500,
       tracks                  = false,
-      turnRate                = 5000,
+      turnRate                = 3000,
       turret                  = true,
       weaponAcceleration      = 100,
       weaponTimer             = 2.2,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 800,
-      wobble                  = 10000,
+      wobble                  = 6000,
     },
 
   },
