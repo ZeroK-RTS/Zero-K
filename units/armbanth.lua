@@ -12,12 +12,12 @@ unitDef = {
   buildTime              = 10500,
   canAttack              = true,
   canGuard               = true,
+  canManualFire		 = true,
   canMove                = true,
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 -8 -2]],
-  collisionVolumeScales  = [[62 80 48]],
+  collisionVolumeScales  = [[62 88 48]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
@@ -44,6 +44,7 @@ unitDef = {
   maxVelocity            = 1.72,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
+  modelCenterOffset      = [[0 -8 -2]],  
   movementClass          = [[KBOT4]],
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING SATELLITE SUB]],
@@ -57,6 +58,7 @@ unitDef = {
     explosiongenerators = {
       [[custom:zeusmuzzle]],
       [[custom:zeusgroundflash]],
+      [[custom:opticblast_charge]]
     },
 
   },
@@ -88,13 +90,17 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-
+    {
+      def                = [[ATA_SPECIAL]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
+    },    
+    
     {
       def                = [[CORKROG_ROCKET]],
       badTargetCategory  = [[SWIM LAND SHIP HOVER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
-
   },
 
 
@@ -141,6 +147,49 @@ unitDef = {
       weaponVelocity          = 1500,
     },
 
+
+    ATA_SPECIAL            = {
+      name                    = [[Super Tachyon Accelerator]],
+      areaOfEffect            = 32,
+      --beamDecay               = 0.8,
+      beamTime                = 3,
+      --beamttl                 = 15,
+      commandFire	      = true,
+      coreThickness           = 0.6,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = 1600,
+        planes  = 1600,
+        subs    = 80,
+      },
+
+      explosionGenerator      = [[custom:ataalaser]],
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 20,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      projectiles             = 5,
+      range                   = 1050,
+      reloadtime              = 30,
+      rgbColor                = [[0.25 0 1]],
+      soundStart              = [[weapon/laser/heavy_laser4.wav]],
+      soundHit                = [[weapon/laser/laser_burn7]],
+      targetMoveError         = 0.3,
+      texture1                = [[largelaserdark]],
+      texture2                = [[flaredark]],
+      texture3                = [[flaredark]],
+      texture4                = [[smallflaredark]],
+      thickness               = 20,
+      tolerance               = 10000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 1500,
+    },    
 
     CORKROG_ROCKET = {
       name                    = [[Heavy Rockets]],
@@ -217,6 +266,34 @@ unitDef = {
       weaponType              = [[LightningCannon]],
       weaponVelocity          = 400,
     },
+    
+    SPECIALTRIGGER      = {
+      name                    = [[FakeWeapon]],
+      commandFire             = true,
+      cylinderTargeting	      = 1,
+      craterBoost             = 0,
+      craterMult              = 0,
+
+      damage                  = {
+        default = -0.001,
+        planes  = -0.001,
+        subs    = -0.001,
+      },
+
+      explosionGenerator      = [[custom:NONE]],
+      impactOnly	      = true,
+      impulseBoost            = 0,
+      impulseFactor           = 1,
+      interceptedByShieldType = 0,
+      range                   = 950,
+      reloadtime              = 30,
+      size                    = 0,
+      targetborder            = 1,
+      tolerance               = 20000,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 600,
+    },    
 
   },
 
