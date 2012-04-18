@@ -4,11 +4,11 @@ function widget:GetInfo()
 		name      = "Mex Snap",
 		desc      = "Snaps mexes to give 100% metal",
 		author    = "Niobium",
-		version   = "v1.1",
+		version   = "v1.2",
 		date      = "November 2010",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = false,
+		enabled   = true,
 		handler   = true
 	}
 end
@@ -22,7 +22,7 @@ local spTraceScreenRay = Spring.TraceScreenRay
 
 local isMex = {}
 for uDefID, uDef in pairs(UnitDefs) do
-	if uDef.isMetalExtractor then
+	if uDef.extractsMetal > 0 then
 		isMex[uDefID] = true
 	end
 end
@@ -52,7 +52,7 @@ local function GetClosestMexPosition(spot, x, z, uDefID, facing)
 	local positions = WG.GetMexPositions(spot, uDefID, facing, true)
 	for i = 1, #positions do
 		local pos = positions[i]
-		local dx, dz = x - pos[1], z - pos[3]
+		local dx, dz = spot.x - pos[1], spot.z - pos[3]
 		local dist = dx*dx + dz*dz
 		if dist < bestDist then
 			bestPos = pos
@@ -64,9 +64,10 @@ end
 
 local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
 	
-	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
-		return
-	end
+	-- causes other widgets to cause C stack overflow
+	--if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
+	--	return
+	--end
 	
 	Spring.GiveOrder(cmdID, cmdParams, cmdOpts.coded)
 end
@@ -100,7 +101,7 @@ function widget:DrawWorld()
 	-- Find build position and check if it is valid (Would get 100% metal)
 	local bx, by, bz = Spring.Pos2BuildPos(-cmdID, pos[1], pos[2], pos[3])
 	local closestSpot = GetClosestMetalSpot(bx, bz)
-	if not closestSpot or WG.IsMexPositionValid(closestSpot, bx, bz) then return end
+	if not closestSpot then return end
 	
 	-- Get the closet position that would give 100%
 	local bface = Spring.GetBuildFacing()
@@ -130,12 +131,12 @@ function widget:DrawWorld()
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOpts)
-	
+
 	if isMex[-cmdID] then
 		
 		local bx, bz = cmdParams[1], cmdParams[3]
 		local closestSpot = GetClosestMetalSpot(bx, bz)
-		if closestSpot and not WG.IsMexPositionValid(closestSpot, bx, bz) then
+		if closestSpot then
 			
 			local bface = cmdParams[4]
 			local bestPos = GetClosestMexPosition(closestSpot, bx, bz, -cmdID, bface)

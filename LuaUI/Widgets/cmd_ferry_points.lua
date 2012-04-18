@@ -358,7 +358,7 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 
 	if Spring.ValidUnitID(unitID) then
 		local cmd = Spring.GetCommandQueue(unitID)
-		if #cmd > 0 and cmd[1].id == CMD.WAIT then
+		if cmd and #cmd > 0 and cmd[1].id == CMD.WAIT then
 			Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
 			if #cmd == 1 then
 				Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {})

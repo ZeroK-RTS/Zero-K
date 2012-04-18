@@ -325,7 +325,6 @@ function widget:Update()
 	if recentlyInitialized then
 		options.simpleteamcolors.OnChange(options.simpleteamcolors)
 		if options.startwithlos.value then
-			Spring.Echo("BLA")
 			Spring.SendCommands('togglelos')
 		end
 		if options.startwithradar.value then

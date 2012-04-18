@@ -125,7 +125,7 @@ function widget:CommandNotify(id, params, options)
 			aveZ = uz/us
 		end
 	
-		for k, mex in pairs(mexes) do		
+		for k, mex in pairs(WG.metalSpots) do		
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
 			if (Distance(cx,cz,mex.x,mex.z) < cr^2) then -- circle area, slower
 				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
@@ -154,8 +154,8 @@ function widget:CommandNotify(id, params, options)
 					spGiveOrderToUnit(id, CMD.STOP, {} , 0 )
 				end
 				for i, command in ipairs(orderedCommands) do
-                    local x = math.floor(command.x/8)*8
-                    local z = math.floor(command.z/8)*8
+                    local x = command.x
+                    local z = command.z
 					for j=1, #mexBuilder[id] do
 						local buildable, feature = spTestBuildOrder(-mexBuilder[id][j],x,0,z,1)
 						if buildable ~= 0 then
@@ -219,10 +219,17 @@ function widget:CommandsChanged()
 	
 end
 
+function widget:Initialize()
+	local units = spGetTeamUnits(spGetMyTeamID())
+	for i, id in ipairs(units) do 
+		widget:UnitCreated(id, spGetUnitDefID(id))
+	end
+	
+end
 
 ----------------------
 -- Mex detection from easymetal by carrepairer
-
+--[[
 local floor = math.floor
 
 local spGetGroundInfo   = Spring.GetGroundInfo
@@ -432,3 +439,4 @@ function widget:Initialize()
 	end
 	
 end
+--]]
