@@ -119,7 +119,11 @@ local modrules  = {
   
   system = {
 	pathFinderSystem = (Spring.GetModOptions() and (Spring.GetModOptions().qtpfs == "1") and 1) or 0,
-  }
+  },
+  
+  movement = { 
+    useClassicGroundMoveType = true, 
+  },
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
