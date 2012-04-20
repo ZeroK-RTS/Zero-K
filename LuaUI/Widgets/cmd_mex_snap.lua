@@ -16,9 +16,14 @@ end
 ------------------------------------------------------------
 -- Speedups
 ------------------------------------------------------------
-local spGetActiveCommand = Spring.GetActiveCommand
-local spGetMouseState = Spring.GetMouseState
-local spTraceScreenRay = Spring.TraceScreenRay
+local spGetActiveCommand   = Spring.GetActiveCommand
+local spGetMouseState      = Spring.GetMouseState
+local spTraceScreenRay     = Spring.TraceScreenRay
+local spGetUnitDefID       = Spring.GetUnitDefID
+local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
+local spGetUnitAllyTeam    = Spring.GetUnitAllyTeam
+local spGetUnitHealth      = Spring.GetUnitHealth
+local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 
 local isMex = {}
 for uDefID, uDef in pairs(UnitDefs) do
@@ -137,13 +142,33 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOpts)
 		local bx, bz = cmdParams[1], cmdParams[3]
 		local closestSpot = GetClosestMetalSpot(bx, bz)
 		if closestSpot then
+		
+			local units = spGetUnitsInCylinder(closestSpot.x, closestSpot.z, 47)
+			local foundUnit = false
+			local myAlly = spGetMyAllyTeamID()
+			for i = 1, #units do
+				local unitID = units[i]
+				local unitDefID = Spring.GetUnitDefID(unitID)
+				if unitDefID and isMex[unitDefID] and spGetUnitAllyTeam(unitID) == myAlly then
+					foundUnit = unitID
+					break
+				end
+			end
 			
-			local bface = cmdParams[4]
-			local bestPos = GetClosestMexPosition(closestSpot, bx, bz, -cmdID, bface)
-			if bestPos then
-				
-				GiveNotifyingOrder(cmdID, {bestPos[1], bestPos[2], bestPos[3], bface}, cmdOpts)
+			if foundUnit then
+				local build = select(5, spGetUnitHealth(foundUnit))
+				if build ~= 1 then
+					GiveNotifyingOrder(CMD.REPAIR, {foundUnit}, cmdOpts)
+				end
 				return true
+			else
+				local bface = cmdParams[4]
+				local bestPos = GetClosestMexPosition(closestSpot, bx, bz, -cmdID, bface)
+				if bestPos then
+					
+					GiveNotifyingOrder(cmdID, {bestPos[1], bestPos[2], bestPos[3], bface}, cmdOpts)
+					return true
+				end
 			end
 		end
 	end

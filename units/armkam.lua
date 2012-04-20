@@ -98,8 +98,8 @@ unitDef = {
 	  --cylinderTargetting	  = 1,
 
       damage                  = {
-        default = 6,
-        subs    = 0.3,
+        default = 6.3,
+        subs    = 0.315,
       },
 
       endsmoke                = [[0]],
@@ -115,7 +115,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       pitchtolerance          = [[12000]],
-      range                   = 220,
+      range                   = 240,
       reloadtime              = 0.11,
       renderType              = 0,
       rgbColor                = [[1 0 0]],
@@ -141,7 +141,7 @@ unitDef = {
       description      = [[Wreckage - Banshee]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 1100,
+      damage           = 860,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -161,7 +161,7 @@ unitDef = {
       description      = [[Debris - Banshee]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 1100,
+      damage           = 860,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
