@@ -122,7 +122,7 @@ local modrules  = {
   },
   
   movement = { 
-    useClassicGroundMoveType = true, 
+    --useClassicGroundMoveType = false,  -- defaults to false
   },
 }
 --------------------------------------------------------------------------------

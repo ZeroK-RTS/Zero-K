@@ -57,6 +57,7 @@ unitDef = {
   noAutoFire             = false,
   objectName             = [[ARMCARRIER]],
   radarDistance          = 1500,
+  scale                   = [[0.25]],
   seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLASTSML]],
   showNanoSpray          = false,
