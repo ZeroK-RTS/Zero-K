@@ -73,8 +73,8 @@ local aux = {	--merged into special
 	corrad = {order = 10, row = 1},
 	armsonar = {order = 11, row = 1},
 	armjamt = {order = 12, row = 1},
---	corjamt = {order = 12, row = 1},
 	armarad = {order = 14, row = 1},
+--	corjamt = {order = 12, row = 1},
 	--armasp = {order = 15, row = 1},
 }
 

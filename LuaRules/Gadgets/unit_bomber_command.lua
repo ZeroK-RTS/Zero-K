@@ -333,6 +333,8 @@ function gadget:GameFrame(n)
 			if fuel >= MAX_FUEL then
 				refuelling[bomberID] = nil
 				Spring.SetUnitRulesParam(bomberID, "noammo", 0)	-- ready to go
+				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
+				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
 			end
 		end	
 	end
@@ -354,6 +356,8 @@ function gadget:GameFrame(n)
 					InsertCommand(bomberID, 99999, CMD_REARM, {targetPad})
 				end
 				Spring.SetUnitFuel(bomberID, 0)	-- set fuel to zero
+				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
+				Spring.GiveOrderToUnit(bomberID,CMD.WAIT, {}, {})
 				bomberToPad[bomberID] = nil
 				refuelling[bomberID] = true
 				Spring.SetUnitRulesParam(bomberID, "noammo", 2)	-- refuelling
