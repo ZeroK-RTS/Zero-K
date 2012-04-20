@@ -87,7 +87,7 @@ end
 
 function widget:CommandNotify(id, params, options)	
     
-	if (id == CMD_AREA_MEX) then
+	if (id == CMD_AREA_MEX and WG.metalSpots) then
 	
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
 		
