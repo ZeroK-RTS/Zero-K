@@ -64,9 +64,9 @@ local defense = {
 --	armartic = {order = 3, row = 3},
 	corgrav = {order = 4, row = 3},
 	cortl = {order = 14, row = 3},
-	corjamt = {order = 16, row = 3},
-	cordoom = {order = 17, row = 3},
-	armanni = {order = 18, row = 3},
+	cordoom = {order = 16, row = 3},
+	armanni = {order = 17, row = 3},
+	corjamt = {order = 18, row = 3},
 }
 
 local aux = {	--merged into special
