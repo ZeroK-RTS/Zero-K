@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.006 Chili Keyboard Menu",
+    desc      = "v0.007 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -95,7 +95,7 @@ local curTab = 'none'
 
 --predeclared functions
 local function UpdateButtons() end
-local function UpdateMenu() end
+local function UpdateBuildMenu() end
 local function StoreBuilders() end
 local function SetupKeybuttons() end
 
@@ -509,7 +509,7 @@ local function BuildMode(enable)
 	end
 end
 
-local function AddButton(item, index)
+local function AddBuildStructureButton(item, index)
 	
 	if not item then
 		--grid_menu:AddChild(Label:New{caption=''})
@@ -550,7 +550,7 @@ local function AddButton(item, index)
 			menu_level = menu_level + 1  -- save menu_level
 			build_menu = item
 			build_menu_selected = item
-			UpdateMenu() -- fixme - check this
+			UpdateBuildMenu() -- fixme - check this
 		end
 		advance_builder = false
 	end
@@ -565,17 +565,13 @@ local function AddButton(item, index)
 	if menu_level == 0 and item.label then
 		button1:AddChild( Label:New{ caption = item.label, fontSize = 11, bottom=0, fontShadow = true,  } )
 	end
+	
+	
+	
 	local label_hotkey
 	if index then
-		local angle = KeyToAngle(index)
-		--[[
-		if angle < 0 then angle = angle + 360 end 
-		local idx = angle / 45
-		local hotkey = keys_display[1 + idx%8]
-		local label_hotkey = Label:New{ name = hotkey, caption = (build_mode and green..hotkey or ''), fontSize = 11, y = 0, right=0, fontShadow = true, }
-		hotkey_labels[#hotkey_labels +1] = label_hotkey
-		button1:AddChild( label_hotkey )
-		--]]
+		--local angle = KeyToAngle(index)
+		AddHotkeyLabel( index, index )
 	end 
 	button1:AddChild( Image:New {
 		file = "#"..ud.id,
@@ -590,7 +586,7 @@ local function AddButton(item, index)
 end
 
 
-UpdateMenu = function()
+UpdateBuildMenu = function()
 
 	ClearKeyButtons()
 	
@@ -616,7 +612,7 @@ UpdateMenu = function()
 			if key == 'D' then
 				AddBuildButton(magenta_table)
 			else
-				AddButton(temptree[key], key)
+				AddBuildStructureButton(temptree[key], key)
 			end
 		end
 		
@@ -636,7 +632,7 @@ local function SetupBuilderMenuData()
 		build_menu_selected = build_menu
 	end
 	
-	UpdateMenu()
+	UpdateBuildMenu()
 end
 
 MakeBuildMenu = function()
