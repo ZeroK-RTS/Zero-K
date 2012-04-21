@@ -102,7 +102,6 @@ end
 -- *** Config
 
 include "LuaRules/Configs/cai/general.lua"
-include "LuaRules/Gadgets/mex_spot_finder.lua"
 
 -- *** 'Globals'
 
@@ -3812,7 +3811,7 @@ function gadget:Initialize()
 	SetupCmdChangeAIDebug()
 	
 	--// mex spot detection
-	mexSpot = GetMetalMap()
+	mexSpot = GG.metalSpots
 	if not mexSpot then
 		Spring.Echo("Mex spot detection failed, AI failed to initalise")
 		gadgetHandler:RemoveGadget()

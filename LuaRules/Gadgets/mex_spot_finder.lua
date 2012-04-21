@@ -1,208 +1,387 @@
-----------------------
--- Mex detection from easymetal by carrepairer
 
-local maxMetalData = 2500000
-local pathToSave = "LuaUI/Widgets/MetalMaps/"
+function gadget:GetInfo()
+	return {
+		name      = "Metalspot Finder Gadget",
+		desc      = "Finds metal spots",
+		author    = "Niobium, modified by Google Frog",
+		version   = "v1.1",
+		date      = "November 2010",
+		license   = "GNU GPL, v2 or later",
+		layer     = -30000,
+		enabled   = true
+	}
+end
 
-local floor = math.floor
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
+if (gadgetHandler:IsSyncedCode()) then
 
-local spGetGroundInfo   = Spring.GetGroundInfo
+
+------------------------------------------------------------
+-- Config
+------------------------------------------------------------
+local gridSize = 16 -- Resolution of metal map
+local buildGridSize = 8 -- Resolution of build positions
+
+local MEX_OWNER_SHARE = 0.05
+local METAL_MAP_SQUARE_SIZE = 16
+local MEX_RADIUS = Game.extractorRadius
+local MAP_SIZE_X = Game.mapSizeX
+local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
+local MAP_SIZE_Z = Game.mapSizeZ
+local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
+
+------------------------------------------------------------
+-- Speedups
+------------------------------------------------------------
+local min, max = math.min, math.max
+local floor, ceil = math.floor, math.ceil
+local sqrt = math.sqrt
+local huge = math.huge
+
+local spGetGroundInfo = Spring.GetGroundInfo
 local spGetGroundHeight = Spring.GetGroundHeight
+local spTestBuildOrder = Spring.TestBuildOrder
 
-local gridSize			= 4
-local threshFraction	= 0.4
-local metalExtraction	= 0.004
+local extractorRadius = Game.extractorRadius
+local extractorRadiusSqr = extractorRadius * extractorRadius
+ 
+local buildmapSizeX = Game.mapSizeX - buildGridSize
+local buildmapSizeZ = Game.mapSizeZ - buildGridSize
+local buildmapStartX = buildGridSize
+local buildmapStartZ = buildGridSize
 
-local mapWidth 			= floor(Game.mapSizeX)
-local mapHeight 		= floor(Game.mapSizeZ)
-local mapWidth2 		= floor(Game.mapSizeX / gridSize)
-local mapHeight2 		= floor(Game.mapSizeZ / gridSize)
+local metalmapSizeX = Game.mapSizeX - 1.5 * gridSize
+local metalmapSizeZ = Game.mapSizeZ - 1.5 * gridSize
+local metalmapStartX = 1.5 * gridSize
+local metalmapStartZ = 1.5 * gridSize
 
-local metalMap 			= {}
-local maxMetal 			= 0
+------------------------------------------------------------
+-- Variables
+------------------------------------------------------------
 
-local metalData 		= {}
-local metalDataCount 	= 0
+local mexUnitDef = UnitDefNames["cormex"]
 
-local snapDist			= 10000
-local mexSize			= 25
-local mexRad			= Game.extractorRadius > 125 and Game.extractorRadius or 125
+local mexDefInfo = {
+	extraction = 5e-5,
+	square = mexUnitDef.extractSquare,
+	oddX = mexUnitDef.xsize % 4 == 2,
+	oddZ = mexUnitDef.zsize % 4 == 2,
+}
 
-local mexSpot			 = {count = 0,}
-local metalMapAnalysed	= false
-
-local function NearFlag(px, pz, dist)
-	if mexSpot.count == 0 then 
-		return false 
+------------------------------------------------------------
+-- Callins
+------------------------------------------------------------
+function gadget:Initialize()
+	local metalSpots = GetSpots()
+	local metalSpotsByPos = GetSpotsByPos(metalSpots)
+	
+	if #metalSpots < 3 then
+		metalSpots = false
+		metalSpotsByPos = false
 	end
-	for i = 1, mexSpot.count do		
-		local fx, fz = mexSpot[i].x, mexSpot[i].z
-		if (px-fx)^2 + (pz-fz)^2 < dist then
-			return i
-		end
-	end
-	return false
+	
+	GG.metalSpots = metalSpots
+	GG.metalSpotsByPos = metalSpotsByPos
+	_G.metalSpots = metalSpots
+	
+	GG.IntegrateMetal = IntegrateMetal
 end
 
-local function round(num, idp)
-  local mult = 10^(idp or 0)
-  return floor(num * mult + 0.5) / mult
-end
+------------------------------------------------------------
+-- Extractor Income Processing
+------------------------------------------------------------
 
-local function mergeToFlag(flagNum, px, pz, pWeight)
-
-	local fx = mexSpot[flagNum].x
-	local fz = mexSpot[flagNum].z
-	local fWeight = mexSpot[flagNum].weight
+function IntegrateMetal(x, z)
+	local centerX, centerZ
 	
-	local avgX, avgZ
-	
-	if fWeight > pWeight then
-		local fStrength = round(fWeight / pWeight)
-		avgX = (fx*fStrength + px) / (fStrength +1)
-		avgZ = (fz*fStrength + pz) / (fStrength +1)
+	if (mexDefInfo.oddX) then
+		centerX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
 	else
-		local pStrength = (pWeight / fWeight)
-		avgX = (px*pStrength + fx) / (pStrength +1)
-		avgZ = (pz*pStrength + fz) / (pStrength +1)		
+		centerX = floor( x / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
 	end
 	
-	mexSpot[flagNum].x = avgX
-	mexSpot[flagNum].z = avgZ
-	mexSpot[flagNum].weight = fWeight + pWeight
-end
-
-local function AnalyzeMetalMap()	
-	for mx_i = 1, mapWidth2 do
-		metalMap[mx_i] = {}
-		for mz_i = 1, mapHeight2 do
-			local mx = mx_i * gridSize
-			local mz = mz_i * gridSize
-			local _, curMetal = spGetGroundInfo(mx, mz)
-			curMetal = floor(curMetal * 100)
-			metalMap[mx_i][mz_i] = curMetal
-			if (curMetal > maxMetal) then
-				maxMetal = curMetal
-			end	
+	if (mexDefInfo.oddZ) then
+		centerZ = (floor( z / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
+	else
+		centerZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
+	end
+	
+	
+	local startX = floor((centerX - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
+	local startZ = floor((centerZ - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
+	local endX = floor((centerX + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
+	local endZ = floor((centerZ + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
+	startX, startZ = max(startX, 0), max(startZ, 0)
+	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
+	
+	local mult = mexDefInfo.extraction / MEX_OWNER_SHARE -- multiplied to show correct value due to overdrive system which sets extraction to 5%
+	local square = mexDefInfo.square
+	local result = 0
+	
+	if (square) then
+		for i = startX, endX do
+			for j = startZ, endZ do
+				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
+				local _, metal = spGetGroundInfo(cx, cz)
+				result = result + metal
+			end
 		end
-	end
-	
-	local lowMetalThresh = floor(maxMetal * threshFraction)
-	
-	for mx_i = 1, mapWidth2 do
-		for mz_i = 1, mapHeight2 do
-			local mCur = metalMap[mx_i][mz_i]
-			if mCur > lowMetalThresh then
-				metalDataCount = metalDataCount +1
+	else
+		for i = startX, endX do
+			for j = startZ, endZ do
+				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
+				local dx, dz = cx - centerX, cz - centerZ
+				local dist = sqrt(dx * dx + dz * dz)
 				
-				metalData[metalDataCount] = {
-					x = mx_i * gridSize,
-					z = mz_i * gridSize,
-					metal = mCur
-				}
-				
+				if (dist < MEX_RADIUS) then
+					local _, metal = spGetGroundInfo(cx, cz)
+					result = result + metal
+				end
 			end
 		end
 	end
 	
-	--Spring.Echo("number of spots " .. #metalData)
-	if #metalData > maxMetalData then -- ceases to work
-		mexSpot = false
-		return false
-	end
+	return result * mult, centerX, centerZ
+end
+
+------------------------------------------------------------
+-- Mex finding
+------------------------------------------------------------
+function GetSpots()
 	
-	table.sort(metalData, function(a,b) return a.metal > b.metal end)
+	-- Main group collection
+	local uniqueGroups = {}
 	
+	-- Strip info
+	local nStrips = 0
+	local stripLeft = {}
+	local stripRight = {}
+	local stripGroup = {}
 	
-	for index = 1, metalDataCount do
+	-- Indexes
+	local aboveIdx
+	local workingIdx
+	
+	-- Strip processing function (To avoid some code duplication)
+	local function DoStrip(x1, x2, z, worth)
 		
-		local mx = metalData[index].x
-		local mz = metalData[index].z
-		local mCur = metalData[index].metal
+		local assignedTo
 		
-		local nearFlagNum = NearFlag(mx, mz, mexRad*mexRad)
-	
-		if nearFlagNum then
-			mergeToFlag(nearFlagNum, mx, mz, mCur)
+		for i = aboveIdx, workingIdx - 1 do
+			if stripLeft[i] > x2 + gridSize then
+				break
+			elseif stripRight[i] + gridSize >= x1 then
+				local matchGroup = stripGroup[i]
+				if assignedTo then
+					if matchGroup ~= assignedTo then
+						for iz = matchGroup.minZ, assignedTo.minZ - gridSize, gridSize do
+							assignedTo.left[iz] = matchGroup.left[iz]
+						end
+						for iz = matchGroup.minZ, matchGroup.maxZ, gridSize do
+							assignedTo.right[iz] = matchGroup.right[iz]
+						end
+						if matchGroup.minZ < assignedTo.minZ then
+							assignedTo.minZ = matchGroup.minZ
+						end
+						assignedTo.maxZ = z
+						assignedTo.worth = assignedTo.worth + matchGroup.worth
+						uniqueGroups[matchGroup] = nil
+					end
+				else
+					assignedTo = matchGroup
+					assignedTo.left[z] = assignedTo.left[z] or x1 -- Only accept the first
+					assignedTo.right[z] = x2 -- Repeated overwrite gives us result we want
+					assignedTo.maxZ = z -- Repeated overwrite gives us result we want
+					assignedTo.worth = assignedTo.worth + worth
+				end
+			else
+				aboveIdx = aboveIdx + 1
+			end
+		end
+		
+		nStrips = nStrips + 1
+		stripLeft[nStrips] = x1
+		stripRight[nStrips] = x2
+		
+		if assignedTo then
+			stripGroup[nStrips] = assignedTo
 		else
-			mexSpot.count = mexSpot.count + 1
-			mexSpot[mexSpot.count] = {
-				x = mx,
-				z = mz,
-				weight = mCur
-			}
-			
+			local newGroup = {
+					left = {[z] = x1},
+					right = {[z] = x2},
+					minZ = z,
+					maxZ = z,
+					worth = worth
+				}
+			stripGroup[nStrips] = newGroup
+			uniqueGroups[newGroup] = true
 		end
 	end
 	
-	return true
-
-end
-
--- save and load not working, probably needs entirely different implmentation
--- saving metalmap
-local function SaveMetalMap(filename)
-	--Spring.Echo("exporting mexmap to ".. filename);
-	local file = assert(io.open(filename,'w'), "Unable to save mexmap to "..filename)
-	
-	for k, mex in pairs(mexSpot) do
-		--file:write(k)
-		--file:write("\n")
-		file:write(mex.x)
-		file:write("\n")
-		file:write(mex.z)
-		file:write("\n")
-		--file:write(mex.weight)
-		--file:write("\n")
-		--if (Distance(cx,cz,mex.x,mex.z) < cr^2) then -- circle area, slower
-		--commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
+	-- Strip finding
+	workingIdx = huge
+	for mz = metalmapStartX, metalmapSizeZ, gridSize do
+		
+		aboveIdx = workingIdx
+		workingIdx = nStrips + 1
+		
+		local stripStart = nil
+		local stripWorth = 0
+		
+		for mx = metalmapStartZ, metalmapSizeX, gridSize do
+			local _, groundMetal = spGetGroundInfo(mx, mz)
+			if groundMetal > 0 then
+				stripStart = stripStart or mx
+				stripWorth = stripWorth + groundMetal
+			elseif stripStart then
+				DoStrip(stripStart, mx - gridSize, mz, stripWorth)
+				stripStart = nil
+				stripWorth = 0
+			end
+		end
+		
+		if stripStart then
+			DoStrip(stripStart, metalmapSizeX, mz, stripWorth)
+		end
 	end
 	
-	file:close()
-	Spring.Echo("mexmap exported to ".. filename);
-end
-
-local function LoadMetalMap(filename)
-	--Spring.Echo("importing mexmap from ".. filename);
-	local file = assert(io.open(filename,'r'), "Unable to load mexmap from "..filename)
-	while true do
-		l1 = file:read()
-		if not l1 then break end
-		l2 = file:read()
-		--l3 = file:read()
-		--l4 = file:read()
-		mexSpot.count = mexSpot.count+1
-		mexSpot[mexSpot.count] = {
-			x = l1,
-			z = l2 --,
-			--weight = l4
-		}
+	-- Final processing
+	local spots = {}
+	for g, _ in pairs(uniqueGroups) do
+		
+		local gMinX, gMaxX = huge, -1
+		local gLeft, gRight = g.left, g.right
+		for iz = g.minZ, g.maxZ, gridSize do
+			if gLeft[iz] < gMinX then gMinX = gLeft[iz] end
+			if gRight[iz] > gMaxX then gMaxX = gRight[iz] end
+		end
+		g.x = (gMinX + gMaxX) * 0.5
+		g.z = (g.minZ + g.maxZ) * 0.5
+		
+		g.metal, g.x, g.z = IntegrateMetal(g.x,g.z)
+		
+		g.y = spGetGroundHeight(g.x, g.z)
+		
+		local merged = false
+		
+		for i = 1, #spots do
+			local spot = spots[i]
+			local dis = (g.x - spot.x)^2 + (g.z - spot.z)^2
+			if dis < extractorRadiusSqr*4 then
+				local metal, mx, mz = IntegrateMetal((g.x + spot.x) * 0.5, (g.z + spot.z) * 0.5)
+				
+				if dis < extractorRadiusSqr*2 or metal > (g.metal + spot.metal)*0.95 then
+					spot.x = mx
+					spot.y = spGetGroundHeight(mx, mx)
+					spot.z = mz
+					spot.metal = metal
+					merged = true
+					break
+				end
+			end
+		end
+		
+		if not merged then
+			spots[#spots + 1] = g
+		end
 	end
-	Spring.Echo("mexmap imported from ".. filename);
 	
+	--for i = 1, #spots do
+	--	Spring.MarkerAddPoint(spots[i].x,spots[i].y,spots[i].z,"")
+	--end
+	
+	return spots
 end
 
-function GetMetalMap()
-
-	if metalMapAnalysed then
-		return mexSpot
+function GetValidStrips(spot)
+	
+	local sMinZ, sMaxZ = spot.minZ, spot.maxZ
+	local sLeft, sRight = spot.left, spot.right
+	
+	local validLeft = {}
+	local validRight = {}
+	
+	local maxZOffset = buildGridSize * ceil(extractorRadius / buildGridSize - 1)
+	for mz = max(sMaxZ - maxZOffset, buildmapStartZ), min(sMinZ + maxZOffset, buildmapSizeZ), buildGridSize do
+		local vLeft, vRight = buildmapStartX, buildmapSizeX
+		for sz = sMinZ, sMaxZ, gridSize do
+			local dz = sz - mz
+			local maxXOffset = buildGridSize * ceil(sqrt(extractorRadiusSqr - dz * dz) / buildGridSize - 1) -- Test for metal being included is dist < extractorRadius
+			local left, right = sRight[sz] - maxXOffset, sLeft[sz] + maxXOffset
+			if left  > vLeft  then vLeft  = left  end
+			if right < vRight then vRight = right end
+		end
+		validLeft[mz] = vLeft
+		validRight[mz] = vRight
 	end
+	
+	spot.validLeft = validLeft
+	spot.validRight = validRight
+end
 
-	--Spring.CreateDir(pathToSave)
-	--if not os.isdir(pathToSave) then
-	--io.mkdir(pathToSave)-- end
-	--os.execute("mkdir ".. pathToSave) -- in case directory doesn't exist
-	--local filename = (pathToSave.. string.lower(string.gsub(Game.mapName, ".smf", "")) .. ".springmexmap")
-	--file = io.open(filename,'r')
-	--io.close(file)
-	if file ~= nil then -- file exists?
-		--Spring.Echo("Mexmap detected - loading...")
-		--LoadMetalMap(filename)
+
+------------------------------------------------------------
+-- Speedup
+------------------------------------------------------------
+function GetSpotsByPos(spots)
+	local spotPos = {}
+	for i = 1, #spots do
+		local spot = spots[i]
+		local x = spot.x
+		local z = spot.z
+		--Spring.MarkerAddPoint(x,0,z,x .. ", " .. z)
+		spotPos[x] = spotPos[x] or {}
+		spotPos[x][z] = i
+	end
+	return spotPos
+end
+
+------------------------------------------------------------
+-- Widget asks Gadget to send data
+------------------------------------------------------------
+function gadget:RecvLuaMsg(msg, playerID)
+	if msg == "RequestMetalSpots" then
+		SendToUnsynced("SendMetalSpots", playerID) 
+	end
+end
+
+------------------------------------------------------------
+-- UNSYNCED
+------------------------------------------------------------
+else
+
+local metalSpots = {}
+local metalSpotsByPos = {}
+
+function WrapToLuaUI(_,playerID)
+	if playerID == Spring.GetLocalPlayerID() and Script.LuaUI('SendMetalSpots') then
+		Script.LuaUI.SendMetalSpots(playerID, metalSpots, metalSpotsByPos)
+	end
+end
+
+function gadget:Initialize()
+	
+	if type(SYNCED.metalSpots) == "table" then
+		for i, v in spairs(SYNCED.metalSpots) do
+			local x = v.x
+			local z = v.z
+			metalSpots[i] = {
+				x = x,
+				y = v.y,
+				z = z,
+				metal = v.metal
+			}
+			--Spring.MarkerAddPoint(x,0,z,x .. ", " .. z)
+			metalSpotsByPos[x] = metalSpotsByPos[x] or {}
+			metalSpotsByPos[x][z] = i
+		end
 	else
-		AnalyzeMetalMap()
-		metalMapAnalysed = true
-		return mexSpot
-		--SaveMetalMap(filename)
+		metalSpots = false
+		metalSpotsByPos = false
 	end
-	
+	gadgetHandler:AddSyncAction('SendMetalSpots',WrapToLuaUI)
+end
+
 end
