@@ -101,6 +101,7 @@ unitDef = {
     RED_KILLER = {
       name                    = [[Red Killer]],
       accuracy                = 750,
+      avoidFeature            = false,
       areaOfEffect            = 192,
       craterBoost             = 4,
       craterMult              = 3,
@@ -133,6 +134,7 @@ unitDef = {
       name                    = [[Orange Roaster]],
       accuracy                = 750,
       areaOfEffect            = 512,
+      avoidFeature            = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 	  
@@ -168,6 +170,7 @@ unitDef = {
       name                    = [[Yellow Slammer]],
       accuracy                = 750,
       areaOfEffect            = 384,
+      avoidFeature            = false,
       craterBoost             = 0.5,
       craterMult              = 1,
 
@@ -198,6 +201,7 @@ unitDef = {
       name                    = [[Green Stamper]],
       accuracy                = 750,
       areaOfEffect            = 300,
+      avoidFeature            = false,
       craterBoost             = 32,
       craterMult              = 1,
 
@@ -234,6 +238,7 @@ unitDef = {
       name                    = [[Blue Shocker]],
       accuracy                = 750,
       areaOfEffect            = 320,
+      avoidFeature            = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 
@@ -268,6 +273,7 @@ unitDef = {
       name                    = [[Violet Slugger]],
       accuracy                = 750,
       areaOfEffect            = 720,
+      avoidFeature            = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 
