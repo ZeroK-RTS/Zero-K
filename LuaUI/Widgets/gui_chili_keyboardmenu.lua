@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.005 Chili Keyboard Menu",
+    desc      = "v0.006 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -91,7 +91,7 @@ local commandButtons = {}
 local updateCommandsSoon = false
 local lastCmd, lastColor
 
-local curTab = 'commands'
+local curTab = 'none'
 
 --predeclared functions
 local function UpdateButtons() end
@@ -695,14 +695,15 @@ end
 local function SetupTabs()
 	tab_buttons = {}
 	local tabs = {
-		selections = 'Selections (Ctrl)',
-		commands = 'Commands',
-		states = 'States (Alt)',
+		ctrl = 'Selections (Ctrl)',
+		none = 'Commands',
+		alt = 'States (Alt)',
+		meta = 'Other (Spacebar)',
 	}
-	local tabs_i = { 'selections', 'commands', 'states',}
+	local tabs_i = { 'ctrl', 'none', 'alt', 'meta' }
 	
 	
-	tabCount = 3
+	tabCount = #tabs_i
 	
 	for i, tab in ipairs(tabs_i) do
 		local data = tabs[tab]
@@ -735,7 +736,7 @@ local function SetupTabs()
 		}
 		
 	end
-	SetCurTab('commands')
+	SetCurTab('none')
 end
 
 SetupKeybuttons = function()
@@ -845,7 +846,7 @@ local function UpdateButton( hotkey_key, hotkey, name, fcn, tooltip, texture, co
 			parent = key_buttons[hotkey_key];
 		}
 	else
-		key_buttons[hotkey_key]:SetCaption( name )
+		key_buttons[hotkey_key]:SetCaption( name:gsub(' ', '\n') )
 	end
 	
 	if color then
@@ -860,6 +861,7 @@ local function BreakDownHotkey(hotkey)
 	local hotkey_mod =
 		hotkey:lower():find('ctrl') and 'ctrl'
 		or hotkey:lower():find('alt') and 'alt'
+		or hotkey:lower():find('meta') and 'meta'
 		or ''
 	
 	return hotkey_key, hotkey_mod
@@ -894,10 +896,16 @@ local function SetupCommands( modifier )
 	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end 
 	
 	ClearKeyButtons()
+	
+	if modifier == 'none' then
+		modifier = '';
+	end
+		
 	for i, cmd in ipairs( curCommands ) do
 		local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 		
 		local hotkey_key, hotkey_mod = BreakDownHotkey(hotkey)
+		--echo(cmd.name, hotkey_key, hotkey_mod)
 		
 		if modifier == '' and cmd.id == CMD_RADIALBUILDMENU then
 			AddBuildButton()
@@ -935,14 +943,7 @@ end
 
 
 UpdateButtons = function()
-	
-	if curTab == 'selections' then
-		SetupCommands('ctrl')
-	elseif curTab == 'states' then
-		SetupCommands('alt')
-	else
-		SetupCommands('')
-	end
+	SetupCommands( curTab )
 end
 
 
@@ -1042,9 +1043,11 @@ function widget:KeyPress(key, modifier)
 	end
 	
 	if key == KEYSYMS.LCTRL or key == KEYSYMS.RCTRL  then
-		SetCurTab('selections')
+		SetCurTab('ctrl')
 	elseif key == KEYSYMS.LALT or key == KEYSYMS.RALT then
-		SetCurTab('states')
+		SetCurTab('alt')
+	elseif key == KEYSYMS.LMETA or key == KEYSYMS.RMETA or key == KEYSYMS.SPACE then
+		SetCurTab('meta')
 	end
 end
 
@@ -1054,9 +1057,17 @@ function widget:KeyRelease(key)
 	end
 	
 	
-	if key == KEYSYMS.LCTRL or key == KEYSYMS.RCTRL or key == KEYSYMS.LALT or key == KEYSYMS.LALT then
+	if
+		key == KEYSYMS.LCTRL or key == KEYSYMS.RCTRL
+		or key == KEYSYMS.LALT or key == KEYSYMS.LALT
+		or key == KEYSYMS.LMETA or key == KEYSYMS.RMETA or key == KEYSYMS.SPACE 
+		then
 		local alt, ctrl, meta, shift = Spring.GetModKeyState()
-		SetCurTab( ctrl and 'selections' or alt and 'states' or 'commands' )
+		SetCurTab( ctrl and 'ctrl'
+			or alt and 'alt'
+			or meta and 'meta'
+			or 'none' 
+			)
 	end
 end
 

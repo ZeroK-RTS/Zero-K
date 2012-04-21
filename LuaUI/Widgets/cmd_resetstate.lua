@@ -9,60 +9,61 @@ function widget:GetInfo()
     date      = "2009-01-27",
     license   = "GNU GPL, v2 or later",
     layer     = -1,
+	handler	= true,
     enabled   = true,
   }
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
--- Speedups
-local spGiveOrderToUnit  		= Spring.GiveOrderToUnit
-local spGiveOrderToUnitArray  	= Spring.GiveOrderToUnitArray
-local spGetSelectedUnits 		= Spring.GetSelectedUnits
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-options_path = 'Game/Commands'
 
-options_order = {'resetfire', 'resetmove', 'lblspace', }
+local CMD_RESETFIRE = 10003
+local CMD_RESETMOVE = 10004
 
-options = {
-	resetfire = {
-		name = 'Hold Fire & Stop',
-		desc = 'Set the unit to hold fire, then stop all commands.',
-		type = 'button',
-	},
-	resetmove = {
-		name = 'Hold Position & Stop',
-		desc = 'Set the unit to hold position, then stop all commands.',
-		type = 'button',
-	},
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+function widget:CommandsChanged()
+	for _, unitID in ipairs( Spring.GetSelectedUnits() ) do
+		--local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+		table.insert(widgetHandler.customCommands, {
+			id      = CMD_RESETFIRE,
+			name	= 'Hold Fire & Stop',
+			type    = CMDTYPE.ICON,
+			tooltip = 'Hold fire and stop.',
+			action  = 'resetfire',
+			params  = { }, 
+			pos = {CMD_MOVE_STATE,CMD_FIRE_STATE, }, 
+		})
+
+		table.insert(widgetHandler.customCommands, {
+			id      = CMD_RESETMOVE,
+			name	= 'Hold Pos & Stop',
+			type    = CMDTYPE.ICON,
+			tooltip = 'Hold position and stop.',
+			action  = 'resetmove',
+			params  = { }, 
+			pos = {CMD_MOVE_STATE,CMD_FIRE_STATE, }, 
+		})
+
 	
-	lblspace = { type = 'label', name = '', },
-	
-	
-}
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-options.resetfire.OnChange = function()
-	local selUnits = spGetSelectedUnits()
-	spGiveOrderToUnitArray(selUnits, CMD.FIRE_STATE, {0}, {}) 
-	spGiveOrderToUnitArray(selUnits, CMD.STOP, {}, {})
-	return true
+	end
 end
 
-options.resetmove.OnChange = function()
-	local selUnits = spGetSelectedUnits()
-	spGiveOrderToUnitArray(selUnits, CMD.MOVE_STATE, { 0 }, {})
-	spGiveOrderToUnitArray(selUnits, CMD.STOP, {}, {})
-	return true
+function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
+	if cmdID == CMD_RESETFIRE then
+		Spring.GiveOrder(CMD.FIRE_STATE, {0}, {}) 
+		Spring.GiveOrder(CMD.STOP, {}, {})
+		return true
+	elseif cmdID == CMD_RESETMOVE then
+		Spring.GiveOrder(CMD.MOVE_STATE, { 0 }, {})
+		Spring.GiveOrder(CMD.STOP, {}, {})
+		return true
+	end
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function widget:Initialize()
 	if Spring.GetSpectatingState() or Spring.IsReplay() then

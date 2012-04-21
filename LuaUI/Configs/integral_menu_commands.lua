@@ -311,6 +311,9 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	restoreground=1,
 	--terraform_internal=1,
 	
+	resetfire=1,
+	resetmove=1,
+	
 	--states
 	stealth=2,
 	cloak_shield=2,
