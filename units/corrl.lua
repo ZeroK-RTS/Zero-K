@@ -46,6 +46,7 @@ unitDef = {
   maxSlope                      = 36,
   maxVelocity                   = 0,
   minCloakDistance              = 150,
+  modelCenterOffset             = [[0 20 0]],
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[lmt2.s3o]],
