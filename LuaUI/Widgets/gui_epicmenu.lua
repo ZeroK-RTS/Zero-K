@@ -876,36 +876,6 @@ local function IntegrateWidget(w, addoptions, index)
 		
 		local origOnChange = w.options[k].OnChange
 		
-		------testing
-		--[[
-		local value = w.options[k].value
-		w.options[k].value = nil
-		w.options[k].priv_value = value
-		setmetatable( w.options[k], w.options[k] )
-		w.options[k].__index = function(t, key)
-			if key == 'value' then
-				if(
-					not wname:find('Chili Chat')
-					and not wname:find('Combo Overhead')
-					and not wname:find('Selections')
-					and not wname:find('Auto Group')
-					and not wname:find('Resource Bars')
-					and not wname:find('Crude Player')
-					and not wname:find('Docking')
-					) then
-					echo ('get val', wname, k, key, t.priv_value)
-				end
-				return t.priv_value
-			end
-		end
-		w.options[k].__newindex = function(t, key, val)
-			if key == 'value' then
-				--echo 'set val'
-				t.priv_value = val
-			end
-		end
-		--]]
-		
 		if option.type ~= 'button' then
 			option.OnChange = 
 				function(self)
@@ -922,6 +892,42 @@ local function IntegrateWidget(w, addoptions, index)
 		end
 		
 		local path = option.path or defaultpath
+		
+		------testing
+		-- [[
+		local value = w.options[k].value
+		w.options[k].value = nil
+		w.options[k].priv_value = value
+		setmetatable( w.options[k], w.options[k] )
+		w.options[k].__index = function(t, key)
+			if key == 'value' then
+				if(
+					not wname:find('Chili Chat')
+					and not wname:find('Combo Overhead')
+					and not wname:find('Selections')
+					and not wname:find('Auto Group')
+					and not wname:find('Resource Bars')
+					and not wname:find('Crude Player')
+					and not wname:find('Docking')
+					) then
+					--echo ('get val', wname, k, key, t.priv_value)
+				end
+				return t.priv_value
+			end
+		end
+		w.options[k].__newindex = function(t, key, val)
+			if key == 'value' then
+				--echo ('set val', wname, k, key, val)
+				t.priv_value = val
+				
+				local fullkey = GetFullKey(path, option)
+				fullkey = fullkey:gsub(' ', '_')
+				settings.config[fullkey] = option.value
+				
+			end
+		end
+		--]]
+		
 		
 		if addoptions then
 			AddOption(path, option, wname )
@@ -1095,8 +1101,16 @@ local function ResetWinSettings(path)
 	end
 end
 
-
-
+--[[ WIP
+WG.crude.MakeHotkey = function(path, optionkey)
+	local option = pathoptions[path][optionkey]
+	local hotkey, hotkeystring = GetHotkeyData(path, option)
+	if not get_key then
+		MakeKeybindWindow( path, option, hotkey ) 
+	end
+	
+end
+--]]
 
 -- Make submenu window based on index from flat window list
 --local function MakeSubWindow(key)

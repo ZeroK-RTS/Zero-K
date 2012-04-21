@@ -23,7 +23,7 @@ local holdPosException = {
     ["armnanotc"] = true,
 }
 
-local rememberToSetHoldPositionPreset = false
+--local rememberToSetHoldPositionPreset = false
 
 local function IsGround(ud)
     return not ud.canFly
@@ -39,7 +39,21 @@ options = {
 		name= "Hold Position",
 		desc = "Set all land units to hold position",
 		OnChange = function ()
+			--[[
             rememberToSetHoldPositionPreset = true
+			--]]
+			
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_movestate1")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud and not holdPosException[name] and IsGround(ud) then
+					options[opt].value = 0
+					--return
+				end
+			end
+			
         end,
 	},
 
@@ -540,6 +554,7 @@ function widget:GameFrame(n)
 end
 
 function widget:Update()
+	--[[
     if rememberToSetHoldPositionPreset then
         for i = 1, #options_order do
             local opt = options_order[i]
@@ -552,4 +567,5 @@ function widget:Update()
         end
         rememberToSetHoldPositionPreset = false
     end
+	--]]
 end
