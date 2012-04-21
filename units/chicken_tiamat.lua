@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Heavy Assault/Riot]],
   acceleration        = 0.36,
   autoheal            = 20,
-  bmcode              = [[1]],
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -15,7 +14,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[LAND FIREPROOF]],
 
   customParams        = {
@@ -27,7 +25,6 @@ unitDef = {
 	helptext_de    = [[Das ultimative Sturmchicken: Tiamat ist eine feuer-, eisenspuckende und Sporenspeiende Monstrosität, die keine Angst oder Furcht kennt, aber auch keine Gnade. Sie besitzt sogar ein schleimiges Schild, welches sie selbst und nahe, verbündete Einheiten schützt.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[NOWEAPON]],
   footprintX          = 4,
   footprintZ          = 4,

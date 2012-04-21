@@ -17,7 +17,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = true,
@@ -47,7 +46,6 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[marshmellow.s3o]],
-  scale               = [[1]],
   seismicSignature    = 0,
   selfDestructAs      = [[TINY_BUILDINGEX]],
 

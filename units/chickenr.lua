@@ -14,7 +14,6 @@ unitDef = {
   canHover            = false,  
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[LAND]],
 
   customParams        = {
@@ -33,7 +32,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  maneuverleashlength = [[640]],
   mass                = 142,
   maxDamage           = 500,
   maxSlope            = 36,

@@ -14,7 +14,6 @@ unitDef = {
   canHover            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[60 29 64]],

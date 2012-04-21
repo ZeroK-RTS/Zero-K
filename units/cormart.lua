@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Pillager]],
   description         = [[General-Purpose Artillery]],
   acceleration        = 0.0282,
-  bmcode              = [[1]],
   brakeRate           = 0.136,
   buildCostEnergy     = 700,
   buildCostMetal      = 700,
@@ -14,7 +13,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[LAND]],
   corpse              = [[DEAD]],
 

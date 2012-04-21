@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Shielded Skirmisher]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
-  bmcode              = [[1]],
   brakeRate           = 0.22,
   buildCostEnergy     = 620,
   buildCostMetal      = 620,
@@ -15,7 +14,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[LAND]],
   corpse              = [[DEAD]],
 

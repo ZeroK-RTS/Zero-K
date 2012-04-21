@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Dodo Bomber]],
   airHoverFactor      = 0,
   amphibious          = true,
-  bmcode              = [[1]],
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -16,7 +15,6 @@ unitDef = {
   canLand             = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,
@@ -30,7 +28,6 @@ unitDef = {
 	helptext_de    = [[Blimpy wirft Dodos auf ahnungslose Heere und Basen ab.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[NOWEAPON]],
   floater             = true,
   footprintX          = 4,
@@ -67,8 +64,6 @@ unitDef = {
   side                = [[THUNDERBIRDS]],
   sightDistance       = 512,
   smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[VTOL]],
   turnRate            = 6000,
   workerTime          = 0,
 

@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Spidermonkey]],
   description         = [[All-Terrain Support]],
   acceleration        = 0.36,
-  bmcode              = [[1]],
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -14,7 +13,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[LAND]],
 
   customParams        = {

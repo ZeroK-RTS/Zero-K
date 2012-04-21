@@ -17,7 +17,6 @@ unitDef = {
   canLand             = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = false,
@@ -69,8 +68,6 @@ unitDef = {
   side                = [[THUNDERBIRDS]],
   sightDistance       = 4096,
   smoothAnim          = true,
-  steeringmode        = [[2]],
-  TEDClass            = [[VTOL]],
   turnRate            = 900,
   workerTime          = 0,
 

@@ -5,7 +5,6 @@ unitDef = {
   acceleration        = 0.24,
   amphibious          = true,
   bankscale           = [[1]],
-  bmcode              = [[1]],
   brakeRate           = 4.41,
   buildCostEnergy     = 850,
   buildCostMetal      = 850,
@@ -17,7 +16,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = true,
@@ -39,7 +37,6 @@ unitDef = {
     helptext_fr    = [[Le Brawler est un ADAV lourd, de par son blondage comme de par le calibre de ses mitrailleuses. Il peut donc résister r des défenses anti air assez longtemps pour s'en débarrasser. Un redoutable ADAV, mais cependant sans défense contre l'air.]],
   },
 
-  defaultmissiontype  = [[VTOL_standby]],
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 3,
@@ -56,7 +53,6 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[stingray.s3o]],
-  scale               = [[1]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
@@ -72,8 +68,6 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 480,
   smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[VTOL]],
   turnRate            = 792,
   workerTime          = 0,
 

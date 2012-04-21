@@ -13,7 +13,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[LAND]],
 
   customParams        = {
@@ -24,7 +23,6 @@ unitDef = {
 	helptext_de    = [[Der Basilisk erklettert Wände wie eine Spinne und kann somit den Gegner mit seiner hoch ätzenden Spucke überraschen. Nur ein wachsames Auge hält diese Viecher von deiner Basis fern. Kampfhubschrauber sind die beste Lösung gegen die Basiliskeneinfälle.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[NOWEAPON]],
   footprintX          = 3,
   footprintZ          = 3,

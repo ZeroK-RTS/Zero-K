@@ -21,7 +21,6 @@ unitDef = {
   canPatrol           = true,
   canreclamate        = [[1]],
   canResurrect        = true,
-  canstop             = [[1]],
   category            = [[LAND UNARMED]],
   corpse              = [[DEAD]],
 

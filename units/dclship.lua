@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Torpedo Frigate]],
   acceleration        = 0.048,
   activateWhenBuilt   = true,
-  bmcode              = [[1]],
   brakeRate           = 0.043,
   buildCostEnergy     = 450,
   buildCostMetal      = 450,
@@ -15,7 +14,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[SHIP]],
   collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[55 60 100]],
@@ -29,7 +27,6 @@ unitDef = {
 	helptext_de    = [[Die relativ günstige Torpedofregatte besitzt eine Waffe speziell zur U-Jagd, die auch im Stande ist Schiffe zu treffen.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[BIG_UNITEX]],
   floater             = true,
   footprintX          = 4,

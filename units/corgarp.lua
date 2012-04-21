@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Wolverine]],
   description         = [[Artillery Minelayer Vehicle]],
   acceleration        = 0.0282,
-  bmcode              = [[1]],
   brakeRate           = 0.08,
   buildCostEnergy     = 260,
   buildCostMetal      = 260,
@@ -14,7 +13,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[LAND]],
   corpse              = [[DEAD]],
 
@@ -28,7 +26,6 @@ unitDef = {
 	helptext_de    = [[Der Wolverine legt Minen aus der Ferne, die ziemlich effektiv sind, aber nur eine begrenzte Lebensdauer (30s) besitzen. Er bedindet sich meist außerhalb der Reichweiten der Verteidigung, aber ist nur schwach gepanzert und kann nicht allzu schnell fliehen. Von daher begleite ihn lieber mit ein paar deiner Einheiten.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 3,
   footprintZ          = 3,
@@ -65,8 +62,6 @@ unitDef = {
   side                = [[CORE]],
   sightDistance       = 660,
   smoothAnim          = true,
-  steeringmode        = [[1]],
-  TEDClass            = [[TANK]],
   trackOffset         = 6,
   trackStrength       = 5,
   trackStretch        = 1,

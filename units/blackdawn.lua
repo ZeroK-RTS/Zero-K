@@ -15,7 +15,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   canSubmerge         = false,
   category            = [[GUNSHIP]],
   collide             = true,
@@ -57,7 +56,6 @@ unitDef = {
   side                = [[CORE]],
   sightDistance       = 585,
   smoothAnim          = true,
-  steeringmode        = [[1]],
   turnRate            = 849,
 
   weapons             = {

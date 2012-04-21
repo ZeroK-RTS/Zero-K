@@ -19,7 +19,6 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   canreclamate        = [[1]],
-  canstop             = [[1]],
   category            = [[UNARMED HOVER]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[50 22 55]],

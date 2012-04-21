@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Dampener]],
   description         = [[Minelaying Hover]],
   acceleration        = 0.0435,
-  bmcode              = [[1]],
   brakeRate           = 0.205,
   buildCostEnergy     = 180,
   buildCostMetal      = 180,
@@ -15,7 +14,6 @@ unitDef = {
   canHover            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[HOVER]],
   corpse              = [[DEAD]],
 

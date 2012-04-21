@@ -14,7 +14,6 @@ unitDef = {
   canHover            = false,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[SWIM]],
 
   customParams        = {

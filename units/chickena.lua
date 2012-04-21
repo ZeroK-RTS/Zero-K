@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Cockatrice]],
   description         = [[Assault/Anti-Armor]],
   acceleration        = 0.36,
-  bmcode              = [[1]],
   brakeRate           = 0.205,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
@@ -14,7 +13,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = [[1]],
   category            = [[LAND]],
 
   customParams        = {
@@ -25,7 +23,6 @@ unitDef = {
 	helptext_de    = [[Der Cockatrice ist wahrlich eine Bestie. Scheinbar unverletzlich, bewegt es sich einfach auf seine Ziele zu und zerstückelt sie vor Ort mit seinem unglaublich starken Kiefer. Glücklicherweise ist er nicht besonders schnell und intelligent und kann somit von Skirmishern und Schwärmen leicht zerstört werden.]],
   },
 
-  defaultmissiontype  = [[Standby]],
   explodeAs           = [[NOWEAPON]],
   footprintX          = 4,
   footprintZ          = 4,
