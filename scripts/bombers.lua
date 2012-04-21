@@ -64,7 +64,7 @@ function Reload()
 		if id == CMD.AREA_ATTACK then
 			target = queue[1].params
 		elseif id == CMD.ATTACK and #(queue[1].params) == 1 then
-			target = {queue[1].params[1]}
+			--target = {queue[1].params[1]}
 		end
 		re = ReloadQueue(queue, tag, id)
 	end
