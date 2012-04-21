@@ -257,6 +257,7 @@ local overrides = {
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text=''},
 	}
 
+-- noone really knows what this table does but it's needed for crude to get the hotkey
 local custom_cmd_actions = {	-- states are 2, not states are 1
 
 	--SPRING COMMANDS
@@ -275,7 +276,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	manualfire=1,
 	loadunits=1,
 	unloadunits=1,
-	area_attack=1,
+	areaattack=1,
 	
 	-- states
 	onoff=2,
