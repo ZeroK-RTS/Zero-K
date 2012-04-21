@@ -8,8 +8,9 @@ static-var bMoving, bAiming, bCanAim,shooting_num, base_speed, bStayAbove, resto
 #define SIG_MOVE			16
 #define SIG_RESTORE			32
 
-#include "sfxtype.h"
-#include "exptype.h"
+#define LIFESPAN			25000
+
+#include "constants.h"
 #include "StateChg.h"
 
 
@@ -262,6 +263,12 @@ RestoreAfterDelay()
 	
 }
 
+LimitLifespan()
+{
+	sleep LIFESPAN;
+	get KILL_UNIT;
+}
+
 Create()
 {
 	emit-sfx 1024+2 from body;
@@ -303,7 +310,7 @@ Create()
 	call-script InitState();				
 	start-script RequestState(ACTIVE);	
 	
-	//start-script RestoreAfterDelay();
+	start-script LimitLifespan();
 }
 
 SweetSpot(piecenum)
