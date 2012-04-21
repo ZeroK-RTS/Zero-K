@@ -1,7 +1,7 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Mex Snap",
+		name      = "Mex Snap ZK",
 		desc      = "Snaps mexes to give 100% metal",
 		author    = "Niobium",
 		version   = "v1.2",
