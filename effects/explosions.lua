@@ -1882,37 +1882,6 @@ return {
     },
   },
 
-  ["purpleimpact2"] = {
-    groundflash = {
-      circlealpha        = 0.4,
-      circlegrowth       = 10,
-      flashalpha         = 5,
-      flashsize          = 30,
-      ttl                = 10,
-      color = {
-        [1]  = 0.80000001192093,
-        [2]  = 0,
-        [3]  = 0.80000001192093,
-      },
-    },
-    heatcloud = {
-      air                = false,
-      count              = 6,
-      ground             = true,
-      underwater         = 0,
-      water              = true,
-      properties = {
-        heat               = 10,
-        heatfalloff        = 2,
-        maxheat            = 10,
-        pos                = [[-10 r20, r20,-10 r20]],
-        size               = 20,
-        sizegrowth         = 0.2,
-        texture            = [[pinkexplo]],
-      },
-    },
-  },
-
   ["flashnuke1920"] = {
     usedefaultexplosions = true,
     groundflash = {
@@ -2041,59 +2010,6 @@ return {
         [1]  = 1,
         [2]  = 0.89999997615814,
         [3]  = 0.60000002384186,
-      },
-    },
-  },
-
-  ["purpleimpact1"] = {
-    dirt = {
-      count              = 2,
-      ground             = true,
-      water              = true,
-      properties = {
-        alphafalloff       = 2,
-        color              = [[1, 0.2, 1]],
-        pos                = [[-10 r20, 20, -10 r20]],
-        size               = 10,
-        speed              = [[0.75 r-1.5, 1.7 r1.6, 0.75 r-1.5]],
-      },
-    },
-    gfx = {
-      count              = 25,
-      water              = true,
-      properties = {
-        color              = 200,
-        creationtime       = 2,
-        lifetime           = 10,
-        pos                = [[-8 r8, 0 r15, -8 r8]],
-        speed              = [[0.5 r-0.5, 0.7 r1.6, 0.5 r-0.5]],
-      },
-    },
-    groundflash = {
-      circlealpha        = 0.4,
-      circlegrowth       = 10,
-      flashalpha         = 5,
-      flashsize          = 50,
-      ttl                = 10,
-      color = {
-        [1]  = 0.80000001192093,
-        [2]  = 0,
-        [3]  = 0.80000001192093,
-      },
-    },
-    heatcloud = {
-      air                = false,
-      count              = 6,
-      ground             = true,
-      underwater         = 0,
-      water              = true,
-      properties = {
-        heat               = 10,
-        heatfalloff        = 1,
-        maxheat            = 10,
-        pos                = [[0, 20, 0]],
-        size               = 20,
-        sizegrowth         = 0.2,
       },
     },
   },
