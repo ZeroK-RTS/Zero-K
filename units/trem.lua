@@ -13,7 +13,7 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
+  canstop          	      = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[44 34 60]],
@@ -91,16 +91,23 @@ unitDef = {
     PLASMA = {
       name                    = [[Rapid-Fire Plasma Artillery]],
       accuracy                = 1400,
-      areaOfEffect            = 144,
-      craterBoost             = 1,
-      craterMult              = 2,
-
+      areaOfEffect            = 160,
+      craterBoost             = 0.25,
+      craterMult              = 0.5,
+	  
+	  customParams            = {
+	    gatherradius = [[128]],
+	    smoothradius = [[96]],
+		smoothmult   = [[0.2]],
+	  },
+	  
       damage                  = {
-        default = 180,
-        planes  = 180,
-        subs    = 9,
+        default = 200,
+        planes  = 200,
+        subs    = 10,
       },
-
+	  
+      explosionGenerator      = [[custom:tremor]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
