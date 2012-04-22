@@ -653,10 +653,6 @@ function widget:DrawInMiniMap()
 			glColor(mexColor)
 			
 			glDrawGroundCircle(x, 0, z, 64, 32)
-			
-			glPushMatrix()
-			
-			glPopMatrix()
 		end
 
 		glLineWidth(0)
