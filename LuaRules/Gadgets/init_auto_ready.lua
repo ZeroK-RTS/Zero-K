@@ -69,7 +69,7 @@ function gadget:GameSetup(label, ready, playerStates)
 		end 
 	end 
 		
-	if (timeDiff > 15 or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
+	if (timeDiff > 25 or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
 		if (readyTimer == nil) then 
 			readyTimer = Spring.GetTimer()	
 		end 
