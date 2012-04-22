@@ -21,6 +21,6 @@ end
 function SendMetalSpots(playerID, metalSpots, metalSpotsByPos)
 	WG.metalSpots = metalSpots
 	WG.metalSpotsByPos = metalSpotsByPos
-	Spring.Echo("Mexspot Fetcher recieved")
+	Spring.Echo("Mexspot Fetcher received")
 	widgetHandler:RemoveWidget(self)
 end
