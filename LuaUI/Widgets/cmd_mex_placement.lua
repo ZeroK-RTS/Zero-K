@@ -555,18 +555,26 @@ function widget:DrawWorld()
 		for i = 1, #WG.metalSpots do
 			local spot = WG.metalSpots[i]
 			local x,z = spot.x, spot.z
-			local y = spGetGroundHeight(x,z)+45
+			local y = spGetGroundHeight(x,z)
 
-			local mexColor = getSpotColor(x,y,z,i,specatate)
+			local mexColor = getSpotColor(x,y+45,z,i,specatate)
+			
+			glPushMatrix()
 			
 			glLineWidth(spot.metal*1.5)
 			glColor(mexColor)
-			glDepthTest(true)
-			glDrawGroundCircle(x, 1, z, 40, 32)
-			glDepthTest(false)
 
-			glPushMatrix()
-			
+			glDrawGroundCircle(x, 1, z, 40, 32)
+			glRotate(90,1,0,0)
+			glColor(0,1,1)		
+			glTranslate(0,0,-y-5)
+			glColor(1,1,1)
+			glTexture("LuaUI/Images/ibeam.png")
+			local width = 30* spot.metal
+			glTexRect(x-width/2, z+20, x+width/2, z+50,0,0,spot.metal,1)
+			glTexture(false)
+			--glColor(0,1,1)
+			--glRect(x-width/2, z+18, x+width/2, z+20)
 			glPopMatrix()
 		end
 
