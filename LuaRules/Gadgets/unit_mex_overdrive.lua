@@ -23,20 +23,19 @@ local pylonDefs = {}
 local linkdefs = {}
 
 local DEFAULT_PYLON_RANGE = 200 -- mex range, link = range*2
-local MEX_OWNER_SHARE = 0.05 -- 5% to owner
 local MEX_REFUND_TIME = 300 -- 300 seconds = 5 minutes
 local MEX_REFUND_SHARE = 0.5 -- refund starts at 50%
 local OD_OWNER_SHARE = 0.5 -- 50% of OD goes to owner of energy
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
-	if (udef.extractsMetal > 0) then
+	if (udef.customParams.ismex) then
 		mexDefs[i] = true
 	end
 	if (tonumber(udef.customParams.pylonrange) or 0 > 0) then
 		pylonDefs[i] = {
 			range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE,
-			extractor = (udef.extractsMetal > 0),
+			extractor = (udef.customParams.ismex and true or false),
 			neededLink = tonumber(udef.customParams.neededlink) or false,
 			keeptooltip = udef.customParams.keeptooltip or false,
 		}
@@ -580,57 +579,6 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local function AddNewMexes(n)
-	if (n%32 ~= 2) then -- in sync 1 frame after slow update
-		return
-	end
-	for unitID,data in pairs(mexesToAdd) do -- check units to add 
-		local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
-		local currentlyActive = not stunned_or_inbuld
-		if currentlyActive then
-			data.count = data.count - 1
-			if data.count <= 0 then --unit should be operating to max we can determine metal and add 
-				local allyTeamID = Spring.GetUnitAllyTeam(unitID)
-				if (allyTeamID) then
-					local mm, mu = Spring.GetUnitResources(unitID)
-					local metalMake = (mm or 0) - (mu or 0)
-					metalMake = metalMake / MEX_OWNER_SHARE
-					mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
-					
-					if data.teamID then
-						mexByID[unitID].refundTeamID = data.teamID
-						mexByID[unitID].refundTime = MEX_REFUND_TIME
-					end
-					
-					Spring.CallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
-					local mexGridID = 0
-					local mX, _, mZ = Spring.GetUnitPosition(unitID)
-					for pid, pylonData in pairs(pylon[allyTeamID]) do
-						if unitID == pid then -- self OD mexes
-						--if pylonData.overdrive and pylonData.mexes < PYLON_MEX_LIMIT and (pylonData.x-mX)^2 + (pylonData.z-mZ)^2 <= pylonData.mexRange^2  then
-							--pylonData.mexes = pylonData.mexes+1
-							pylonData.mex[unitID] = true
-							mexGridID = pylonData.gridID
-							break
-						end
-					end
-					mexes[allyTeamID][mexGridID][unitID] = metalMake
-					mexByID[unitID].gridID = mexGridID
-					if mexGridID ~= 0 then
-						local ai = allyTeamInfo[allyTeamID]
-						ai.mexCount = ai.mexCount + 1
-						ai.mexMetal = ai.mexMetal + metalMake
-						ai.mexSquaredSum = ai.mexSquaredSum + (metalMake * metalMake)
-						ai.grid[mexGridID].mexMetal = ai.grid[mexGridID].mexMetal + metalMake
-						ai.grid[mexGridID].mexSquaredSum = ai.grid[mexGridID].mexSquaredSum + (metalMake * metalMake)
-					end
-				end
-				mexesToAdd[unitID] = nil
-			end
-		end
-	end
-end
-
 local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 	
 	local summedMetalProduction = 0
@@ -696,7 +644,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								local mexE = gridE*(orgMetal * orgMetal)/ gridMetalSquared 
 								local metalMult = energyToExtraM(mexE)
 								Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
-								local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
+								local thisMexM = orgMetal + orgMetal * metalMult
 								Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
  
 								maxedMetalProduction = maxedMetalProduction + thisMexM
@@ -728,7 +676,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					
 					local metalMult = energyToExtraM(mexE)
 					Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
-					local thisMexM = orgMetal * (1-MEX_OWNER_SHARE) + orgMetal * metalMult
+					local thisMexM = orgMetal + orgMetal * metalMult
 					Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
 					
 					summedMetalProduction = summedMetalProduction + thisMexM
@@ -811,7 +759,6 @@ end
 local lastTeamNe = {}
 
 function gadget:GameFrame(n)
-	AddNewMexes(n)
 
 	if (n%32 == 1) then
 	
@@ -1096,15 +1043,42 @@ end
 -------------------------------------------------------------------------------------
 -- MEXES
 
-local function SetupMex(unitID, unitDefID, unitTeam, refund)
-	Spring.SetUnitResourcing(unitID, 'cmm', 0)
-	Spring.SetUnitResourcing(unitID, 'cue', 0)
-	mexesToAdd[unitID] = {teamID = refund and unitTeam, count = 3} -- 3 seconds left for the income to stabilize
+local function AddMex(unitID, teamID, metalMake)
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	if (allyTeamID) then
+		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
+		
+		if teamID then
+			mexByID[unitID].refundTeamID = teamID
+			mexByID[unitID].refundTime = MEX_REFUND_TIME
+		end
+		
+		Spring.CallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
+		local mexGridID = 0
+		local mX, _, mZ = Spring.GetUnitPosition(unitID)
+		for pid, pylonData in pairs(pylon[allyTeamID]) do
+			if unitID == pid then -- self OD mexes
+			--if pylonData.overdrive and pylonData.mexes < PYLON_MEX_LIMIT and (pylonData.x-mX)^2 + (pylonData.z-mZ)^2 <= pylonData.mexRange^2  then
+				--pylonData.mexes = pylonData.mexes+1
+				pylonData.mex[unitID] = true
+				mexGridID = pylonData.gridID
+				break
+			end
+		end
+		mexes[allyTeamID][mexGridID][unitID] = metalMake
+		mexByID[unitID].gridID = mexGridID
+		if mexGridID ~= 0 then
+			local ai = allyTeamInfo[allyTeamID]
+			ai.mexCount = ai.mexCount + 1
+			ai.mexMetal = ai.mexMetal + metalMake
+			ai.mexSquaredSum = ai.mexSquaredSum + (metalMake * metalMake)
+			ai.grid[mexGridID].mexMetal = ai.grid[mexGridID].mexMetal + metalMake
+			ai.grid[mexGridID].mexSquaredSum = ai.grid[mexGridID].mexSquaredSum + (metalMake * metalMake)
+		end
+	end
 end
 
 local function RemoveMex(unitID)
-	Spring.SetUnitResourcing(unitID, 'cmm', 0)
-	Spring.SetUnitResourcing(unitID, 'cue', 0)
 	local gridID = 0
 	local mex = mexByID[unitID]
 	
@@ -1144,18 +1118,6 @@ local function RemoveMex(unitID)
 		end
 	end
 
-end
-
-local function RemoveMexesAroundUnit(unitID)
-	local x,_,z = Spring.GetUnitPosition(unitID)
-	local units = Spring.GetUnitsInCylinder(x,z,MEX_DIAMETER)
-	
-	for i = 1, #units do
-		if mexByID[units[i]] and units[i] ~= unitID then
-			RemoveMex(units[i])
-			mexesToAdd[units[i]] = {teamID = mexesToAdd[units[i]] and mexesToAdd[units[i]].teamID, count = 3}
-		end
-	end
 end
 
 -------------------------------------------------------------------------------------
@@ -1203,7 +1165,8 @@ function gadget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		if (mexDefs[unitDefID]) then
-			SetupMex(unitID,unitDefID, Spring.GetUnitTeam(unitID), false)
+			local inc = Spring.GetUnitRulesParam(unitID, "mexIncome")
+			AddMex(unitID, false, inc)
 		end
 		if (pylonDefs[unitDefID]) then
 			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
@@ -1219,7 +1182,8 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then
-		SetupMex(unitID, unitDefID, unitTeam, true)
+		local inc = Spring.GetUnitRulesParam(unitID, "mexIncome")
+		AddMex(unitID, unitTeam, inc)
 	end
 	if pylonDefs[unitDefID] then
 		notDestroyed[unitID] = true
@@ -1238,7 +1202,8 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 	
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (mexDefs[unitDefID]) then 
-			SetupMex(unitID, unitDefID, teamID, false)
+			local inc = Spring.GetUnitRulesParam(unitID, "mexIncome")
+			AddMex(unitID, false, inc)
 		end
 		
 		if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
@@ -1277,7 +1242,6 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID] and mexByID[unitID]) then  
 		RemoveMex(unitID)
-		RemoveMexesAroundUnit(unitID)
 	end
 	if (pylonDefs[unitDefID]) then
 		notDestroyed[unitID] = nil

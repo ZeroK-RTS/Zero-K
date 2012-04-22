@@ -29,11 +29,11 @@ unitDef = {
 	helptext_de        = [[Der Metallextraktor ist die primäre Quelle für die Metallförderung. Wenn du Energie bereitstellst, werden deine Extraktoren diese automatisch dazu nutzen, ihre Produktivität zu erhöhen und somit mehr Metall fördern.]],
     occupationStrength = 1,
     pylonrange         = 50,
+	ismex              = 1,
   },
 
   energyUse              = 0,
   explodeAs              = [[SMALL_BUILDINGEX]],
-  extractsMetal          = 0.001,
   floater                = true,
   footprintX             = 3,
   footprintZ             = 3,

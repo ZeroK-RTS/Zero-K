@@ -118,14 +118,14 @@ function constructionAndEconomyHandler(a, at, frame)
 	
 	conJob.mex.defenceChance = 0
 	
-	if at.units.mex.count/mexSpot.count > 0.5 then
+	if at.units.mex.count/#GG.metalSpots > 0.5 then
 		conJob.mex.defenceChance = 0.5
 	elseif averagedEcon.aveMInc > 7 and averagedEcon.energyToMetalRatio < 1.2 then
 		conJob.mex.defenceChance = 0.26
 	end
 	
 	conJob.reclaim.importance = 0
-	if at.units.mex.count*3 > mexSpot.count or frame > 14400 then
+	if at.units.mex.count*3 > #GG.metalSpots or frame > 14400 then
 		conJob.reclaim.importance = 4
 	end
 	
@@ -135,7 +135,7 @@ function constructionAndEconomyHandler(a, at, frame)
 		facJob[3].importance = 2
 	end
 	
-	--conJob.mex.importance = conJob.mex.importance + 14*(1 - at.units.mex.count/mexSpot.count)
+	--conJob.mex.importance = conJob.mex.importance + 14*(1 - at.units.mex.count/#GG.metalSpots)
 	conJob.energy.interruptable = false
 	
 	if averagedEcon.energyToMetalRatio > 1.9 then
@@ -169,10 +169,10 @@ function constructionAndEconomyHandler(a, at, frame)
 	conJob.factory.importance = 7
 	
 	if averagedEcon.activeBpToMetalRatio < 1.2 then
-		facJob[1].importance = 3 + 4*(1 - at.units.mex.count/mexSpot.count)
+		facJob[1].importance = 3 + 4*(1 - at.units.mex.count/#GG.metalSpots)
 		conJob.factory.importance = 6
 	elseif averagedEcon.activeBpToMetalRatio < 2.3 then
-		facJob[1].importance = 1 + (1 - at.units.mex.count/mexSpot.count)
+		facJob[1].importance = 1 + (1 - at.units.mex.count/#GG.metalSpots)
 		conJob.factory.importance = 6
 	else
 		facJob[1].importance = 0.15
@@ -187,7 +187,7 @@ function constructionAndEconomyHandler(a, at, frame)
 		conJob.defence.importance = 3
 	end
 	
-	facJob[1].importance = facJob[1].importance + 5*(1 - at.units.mex.count/mexSpot.count)
+	facJob[1].importance = facJob[1].importance + 5*(1 - at.units.mex.count/#GG.metalSpots)
 		
 	if controlledUnit.factory.count == 0 or (not controlledUnit.factoryByID[controlledUnit.factory[1]].finished) then
 		conJob.factory.importance = 20

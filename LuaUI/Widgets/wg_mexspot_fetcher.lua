@@ -14,11 +14,13 @@ end
 function widget:Initialize()
 	widgetHandler:RegisterGlobal("SendMetalSpots", SendMetalSpots)
 	Spring.SendLuaRulesMsg("RequestMetalSpots")
-	Spring.MarkerAddPoint(0,0,0,"")
+	Spring.Echo("Mexspot Fetcher fetching")
+	--Spring.MarkerAddPoint(0,0,0,"")
 end
 
 function SendMetalSpots(playerID, metalSpots, metalSpotsByPos)
 	WG.metalSpots = metalSpots
 	WG.metalSpotsByPos = metalSpotsByPos
+	Spring.Echo("Mexspot Fetcher recieved")
 	widgetHandler:RemoveWidget(self)
 end

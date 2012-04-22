@@ -273,7 +273,7 @@ local function DrawMexRanges(teamID)
   for _,unitID in ipairs(units) do
     local udid = Spring.GetUnitDefID(unitID)
     local ud = udid and UnitDefs[udid] or nil
-    if (ud and (ud.extractsMetal > 0)) then
+    if (ud and (ud.customParams.ismex) then
       local x, y, z = Spring.GetUnitBasePosition(unitID)
       if (x) then
         gl.DrawGroundCircle(x, y, z, ud.extractRange, 64)

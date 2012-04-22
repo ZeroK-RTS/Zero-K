@@ -978,7 +978,7 @@ function gadget:DrawScreen()
 				for awardType, record in spairs(awards) do
 					awardCount = awardCount + 1
 					if not sentToPlanetWars then
-						local planetWarsData = teamNames[team] ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
+						local planetWarsData = (teamNames[teamID] or "no_name") ..' '.. awardType ..' '.. awardDescs[awardType] ..', '.. record
 						Spring.SendCommands("wbynum 255 SPRINGIE:award,".. planetWarsData)
 						Spring.Echo(planetWarsData)
 					end
@@ -997,7 +997,7 @@ function gadget:DrawScreen()
 					gl.Rect(0-margin/2, 0-margin/2, colSpacing-margin/2, tHeight+margin/2)
 					
 					glColor(1,1,1,1)	
-					fhDraw(teamNames[team] , 0, fontHeight )
+					fhDraw((teamNames[teamID] or "no_name") , 0, fontHeight )
 					
 					row = row + 1
 					glTranslate( 0, 0 - (tHeight+margin), 0)

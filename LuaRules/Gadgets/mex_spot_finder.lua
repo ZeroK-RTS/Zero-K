@@ -21,10 +21,14 @@ if (gadgetHandler:IsSyncedCode()) then
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
+local MAPSIDE_METALMAP = "map_metal_layout.lua"
+local GAMESIDE_METALMAP = "LuaRules/Configs/MetalSpots/" .. (Game.mapName or "") .. ".lua"
+
+local DEFAULT_MEX_INCOME = 2
+
 local gridSize = 16 -- Resolution of metal map
 local buildGridSize = 8 -- Resolution of build positions
 
-local MEX_OWNER_SHARE = 0.05
 local METAL_MAP_SQUARE_SIZE = 16
 local MEX_RADIUS = Game.extractorRadius
 local MAP_SIZE_X = Game.mapSizeX
@@ -64,7 +68,7 @@ local metalmapStartZ = 1.5 * gridSize
 local mexUnitDef = UnitDefNames["cormex"]
 
 local mexDefInfo = {
-	extraction = 5e-5,
+	extraction = 0.001,
 	square = mexUnitDef.extractSquare,
 	oddX = mexUnitDef.xsize % 4 == 2,
 	oddZ = mexUnitDef.zsize % 4 == 2,
@@ -74,10 +78,12 @@ local mexDefInfo = {
 -- Callins
 ------------------------------------------------------------
 function gadget:Initialize()
+	Spring.Echo("Mex Spot Finder Initialising")
 	local metalSpots = GetSpots()
 	local metalSpotsByPos = GetSpotsByPos(metalSpots)
 	
 	if #metalSpots < 3 then
+		Spring.Echo("Indiscrete metal map detected")
 		metalSpots = false
 		metalSpotsByPos = false
 	end
@@ -93,8 +99,10 @@ end
 -- Extractor Income Processing
 ------------------------------------------------------------
 
-function IntegrateMetal(x, z)
+function IntegrateMetal(x, z, radius)
 	local centerX, centerZ
+	
+	radius = radius or MEX_RADIUS
 	
 	if (mexDefInfo.oddX) then
 		centerX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
@@ -108,15 +116,14 @@ function IntegrateMetal(x, z)
 		centerZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
 	end
 	
-	
-	local startX = floor((centerX - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
-	local startZ = floor((centerZ - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
-	local endX = floor((centerX + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
-	local endZ = floor((centerZ + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
+	local startX = floor((centerX - radius) / METAL_MAP_SQUARE_SIZE)
+	local startZ = floor((centerZ - radius) / METAL_MAP_SQUARE_SIZE)
+	local endX = floor((centerX + radius) / METAL_MAP_SQUARE_SIZE)
+	local endZ = floor((centerZ + radius) / METAL_MAP_SQUARE_SIZE)
 	startX, startZ = max(startX, 0), max(startZ, 0)
 	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
 	
-	local mult = mexDefInfo.extraction / MEX_OWNER_SHARE -- multiplied to show correct value due to overdrive system which sets extraction to 5%
+	local mult = mexDefInfo.extraction
 	local square = mexDefInfo.square
 	local result = 0
 	
@@ -135,7 +142,7 @@ function IntegrateMetal(x, z)
 				local dx, dz = cx - centerX, cz - centerZ
 				local dist = sqrt(dx * dx + dz * dz)
 				
-				if (dist < MEX_RADIUS) then
+				if (dist < radius) then
 					local _, metal = spGetGroundInfo(cx, cz)
 					result = result + metal
 				end
@@ -150,6 +157,41 @@ end
 -- Mex finding
 ------------------------------------------------------------
 function GetSpots()
+	
+	local spots = {}
+
+	-- Check configs
+	local loadConfig = false
+	if VFS.FileExists(GAMESIDE_METALMAP) then
+		spots = VFS.Include(GAMESIDE_METALMAP)
+		Spring.Echo("Loading gameside mex config")
+		loadConfig = true
+	elseif VFS.FileExists(MAPSIDE_METALMAP) then
+		spots = VFS.Include(MAPSIDE_METALMAP)
+		Spring.Echo("Loading mapside mex config")
+		loadConfig = true
+	else
+		Spring.Echo("Detecting mex config from metalmap")
+	end
+	
+	if loadConfig then
+		local i = 1
+		while i <= #spots do
+			local spot = spots[i]
+			if spot and spot.x and spot.z then
+				local metal
+				metal, spot.x, spot.z = IntegrateMetal(spot.x, spot.z)
+				spot.y = spGetGroundHeight(spot.x, spot.z)
+				spot.metal = spot.metal or (metal > 0 and metal) or DEFAULT_MEX_INCOME
+				i = i + 1
+			else
+				spot[i] = spot[#spots]
+				spot[#spots] = nil
+			end
+		end
+		
+		return spots
+	end
 	
 	-- Main group collection
 	local uniqueGroups = {}
@@ -248,8 +290,9 @@ function GetSpots()
 	end
 	
 	-- Final processing
-	local spots = {}
 	for g, _ in pairs(uniqueGroups) do
+		
+		local d = {}
 		
 		local gMinX, gMaxX = huge, -1
 		local gLeft, gRight = g.left, g.right
@@ -257,22 +300,22 @@ function GetSpots()
 			if gLeft[iz] < gMinX then gMinX = gLeft[iz] end
 			if gRight[iz] > gMaxX then gMaxX = gRight[iz] end
 		end
-		g.x = (gMinX + gMaxX) * 0.5
-		g.z = (g.minZ + g.maxZ) * 0.5
+		local x = (gMinX + gMaxX) * 0.5
+		local z = (g.minZ + g.maxZ) * 0.5
 		
-		g.metal, g.x, g.z = IntegrateMetal(g.x,g.z)
+		d.metal, d.x, d.z = IntegrateMetal(x,z)
 		
-		g.y = spGetGroundHeight(g.x, g.z)
+		d.y = spGetGroundHeight(d.x, d.z)
 		
 		local merged = false
 		
 		for i = 1, #spots do
 			local spot = spots[i]
-			local dis = (g.x - spot.x)^2 + (g.z - spot.z)^2
+			local dis = (d.x - spot.x)^2 + (d.z - spot.z)^2
 			if dis < extractorRadiusSqr*4 then
-				local metal, mx, mz = IntegrateMetal((g.x + spot.x) * 0.5, (g.z + spot.z) * 0.5)
+				local metal, mx, mz = IntegrateMetal((d.x + spot.x) * 0.5, (d.z + spot.z) * 0.5)
 				
-				if dis < extractorRadiusSqr*2 or metal > (g.metal + spot.metal)*0.95 then
+				if dis < extractorRadiusSqr*2 or metal > (d.metal + spot.metal)*0.95 then
 					spot.x = mx
 					spot.y = spGetGroundHeight(mx, mx)
 					spot.z = mz
@@ -284,7 +327,7 @@ function GetSpots()
 		end
 		
 		if not merged then
-			spots[#spots + 1] = g
+			spots[#spots + 1] = d
 		end
 	end
 	

@@ -122,9 +122,6 @@ local aiTeamData = {} -- all the information a single AI stores
 local allyTeamData = {} -- all the information that each ally team is required to store
 -- some information is stored by all. Other info is stored only be allyTeams with AI
 
--- spots that mexes can be built on
-mexSpot = {count = 0}
-
 local econAverageMemory = 3 -- how many econ update steps economy is averaged over
 
 -- size of heatmap arrays and squares
@@ -474,9 +471,9 @@ end
 -- returns if position is within distance of a mex spot
 local function nearMexSpot(tx,tz,distance)
 
-	for i = 1, mexSpot.count do
-		local x = mexSpot[i].x
-		local z = mexSpot[i].z
+	for i = 1, #GG.metalSpots do
+		local x = GG.metalSpots[i].x
+		local z = GG.metalSpots[i].z
 		if disSQ(x,z,tx,tz) < distance^2 then
 			return true
 		end
@@ -872,9 +869,9 @@ local function makeMex(team, unitID)
 	local minMexSpotDisSQ = false
 	local minMexSpotID = 0
 	
-	for i = 1, mexSpot.count do
-		if CallAsTeam(team, function () return spTestBuildOrder(buildDefs.mexIds[1].ID, mexSpot[i].x, 0 ,mexSpot[i].z, 1) ~= 0 end) then
-			local dis = disSQ(mexSpot[i].x,mexSpot[i].z,x,z)
+	for i = 1, #GG.metalSpots do
+		if CallAsTeam(team, function () return spTestBuildOrder(buildDefs.mexIds[1].ID, GG.metalSpots[i].x, 0 ,GG.metalSpots[i].z, 1) ~= 0 end) then
+			local dis = disSQ(GG.metalSpots[i].x,GG.metalSpots[i].z,x,z)
 			if (not minMexSpotDisSQ) or dis < minMexSpotDisSQ then
 				minMexSpotDisSQ = dis
 				minMexSpotID = i
@@ -883,7 +880,7 @@ local function makeMex(team, unitID)
 	end
 	
 	if minMexSpotID ~= 0 then
-		spGiveOrderToUnit(unitID, -buildDefs.mexIds[1].ID, {mexSpot[minMexSpotID].x,0,mexSpot[minMexSpotID].z}, {})
+		spGiveOrderToUnit(unitID, -buildDefs.mexIds[1].ID, {GG.metalSpots[minMexSpotID].x,0,GG.metalSpots[minMexSpotID].z}, {})
 	else
 		--Spring.Echo("No free mex spots")
 	end
@@ -2491,7 +2488,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 					addValueToHeatmapInArea(enemyDefence,enemyDefenceHeatmap, ud.metalCost, x, z)
 				end
 			end
-		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.extractsMetal ~= 0 then -- econ
+		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.customParams.ismex then -- econ
 			addValueToHeatmap(enemyEconomy, enemyEconomyHeatmap, ud.metalCost, aX, aZ)
 		end
 		
@@ -2538,7 +2535,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 					at.enemyForceComposition.unit.airDefence = at.enemyForceComposition.unit.airDefence + ud.metalCost
 				end
 			end
-		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.extractsMetal ~= 0 then -- econ
+		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.customParams.ismex then -- econ
 			
 		end
 	end
@@ -2836,7 +2833,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 				controlledUnit.airpad.cost = controlledUnit.airpad.cost - ud.metalCost
 				controlledUnit.airpad.count = controlledUnit.airpad.count - 1
 				controlledUnit.airpadByID[unitID] = nil
-			elseif ud.extractsMetal > 0 then
+			elseif ud.customParams.ismex then
 				if controlledUnit.mexByID[unitID].onDefenceHeatmap then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,-1,0)
 				end
@@ -2974,7 +2971,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 		units.cost = units.cost - ud.metalCost
 		units.cost = units.cost + ud.metalCost
 		
-		if ud.extractsMetal > 0 then
+		if ud.customParams.ismex then
 			units.mex.count = units.mex.count - 1
 		end
 		units.factoryByID[unitID] = nil
@@ -3051,7 +3048,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 				controlledUnit.airpad.cost = controlledUnit.airpad.cost + ud.metalCost
 				controlledUnit.airpad.count = controlledUnit.airpad.count + 1
 				controlledUnit.airpadByID[unitID] = { ud = ud, cost = ud.metalCost, finished = false}
-			elseif ud.extractsMetal > 0 then
+			elseif ud.customParams.ismex then
 				local x,y,z = spGetUnitPosition(unitID)
 				if not built then
 					editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1,0)
@@ -3197,7 +3194,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 	
 		units.cost = units.cost + ud.metalCost
 		
-		if ud.extractsMetal > 0 then
+		if ud.customParams.ismex then
 			units.mex.count = units.mex.count + 1
 			units.mexByID[unitID] = true
 		elseif ud.isFactory then -- factory
@@ -3248,7 +3245,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 			controlledUnit.anyByID[unitID].finished = true
 			if unitDefID == buildDefs.airpadDefID then
 				controlledUnit.airpadByID[unitID].finished = true
-			elseif ud.extractsMetal > 0 then
+			elseif ud.customParams.ismex then
 				controlledUnit.mexByID[unitID].finished = true
 			elseif ud.isFactory then -- factory
 				a.conJob.factory.assignedBP = a.conJob.factory.assignedBP + ud.buildSpeed
@@ -3786,6 +3783,11 @@ function gadget:Initialize()
 	local aiOnTeam = {}
 	usingAI = false
 	
+	if not GG.metalSpots then
+		Spring.Echo("CAI: Fatal error, map not supported due to metal map.")
+		gadgetHandler:RemoveGadget()
+	end
+	
 	for _,team in ipairs(spGetTeamList()) do
 		--local _,_,_,isAI,side = spGetTeamInfo(team)
 		if aiConfigByName[spGetTeamLuaAI(team)] then
@@ -3811,8 +3813,8 @@ function gadget:Initialize()
 	SetupCmdChangeAIDebug()
 	
 	--// mex spot detection
-	mexSpot = GG.metalSpots
-	if not mexSpot then
+	GG.metalSpots = GG.metalSpots
+	if not GG.metalSpots then
 		Spring.Echo("Mex spot detection failed, AI failed to initalise")
 		gadgetHandler:RemoveGadget()
 		return 

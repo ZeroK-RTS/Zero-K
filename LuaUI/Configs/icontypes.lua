@@ -858,8 +858,7 @@ local icontypes = {
   },
   mex = {
     bitmap='icons/mex.dds',
-    radiusadjust=1,
-    size=1.0,
+    size = 1,
   },
   power = {
     bitmap='icons/power.dds',

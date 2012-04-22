@@ -158,7 +158,7 @@ function widget:CommandNotify(id, params, options)
   if BA and (id == 31244) then
     if (#params == 1) then
       local unitDefID = GetUnitDefID(params[1])
-      if (unitDefID ~= nil) and (UnitDefs[unitDefID].extractsMetal) then
+      if (unitDefID ~= nil) and (UnitDefs[unitDefID].customParams.ismex) then
         CMD_UPGRADEMEX = 31244
       end
     end

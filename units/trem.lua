@@ -112,7 +112,6 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       myGravity               = 0.1,
-      noSelfDamage            = true,
       range                   = 1400,
       reloadtime              = 0.36,
       soundHit                = [[weapon/cannon/cannon_hit2]],

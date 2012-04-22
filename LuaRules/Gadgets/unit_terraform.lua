@@ -2934,6 +2934,9 @@ end
 
 local SeismicWeapon = {}
 local DEFAULT_SMOOTH = 0.5
+local HEIGHT_FUDGE_FACTOR = 10
+local HEIGHT_RAD_MULT = 0.8
+local MIN_SMOOTH_RAD = 20
 
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]
@@ -2950,15 +2953,27 @@ end
 function gadget:Explosion(weaponID, x, y, z, owner)
 	
 	if SeismicWeapon[weaponID] then
+		local height = spGetGroundHeight(x,z)
+		
 		local smoothradius = SeismicWeapon[weaponID].smoothradius
-		local gatherradius = SeismicWeapon[weaponID].gatherradius
+		local gatherradius = SeismicWeapon[weaponID].gatherradius	
+		local maxSmooth = SeismicWeapon[weaponID].smooth
+		if y > height + HEIGHT_FUDGE_FACTOR then
+			local factor = 1 - ((y - height - HEIGHT_FUDGE_FACTOR)/smoothradius*HEIGHT_RAD_MULT)^2
+			if factor > 0 then
+				smoothradius = smoothradius*factor
+				gatherradius = gatherradius*factor
+				maxSmooth = maxSmooth*factor
+			else
+				return
+			end
+		end
+		
 		local smoothradiusSQ = smoothradius^2
 		local gatherradiusSQ = gatherradius^2
 		
 		smoothradius = smoothradius + (8 - smoothradius%8)
 		gatherradius = gatherradius + (8 - gatherradius%8)
-		
-		local maxSmooth = SeismicWeapon[weaponID].smooth
 		
 		local sx = floor((x+4)/8)*8
 		local sz = floor((z+4)/8)*8

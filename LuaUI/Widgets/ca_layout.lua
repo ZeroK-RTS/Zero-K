@@ -170,7 +170,7 @@ local function GetBuildIconFrame(udef)
   elseif (udef.weapons[1] and udef.isBuilding) then
     return unitTex
 
-  elseif ((udef.totalEnergyOut>0) or (udef.extractsMetal>0) or (udef.name=="armwin" or udef.name=="corwin")) then
+  elseif ((udef.totalEnergyOut>0) or (udef.customParams.ismex) or (udef.name=="armwin" or udef.name=="corwin")) then
     return ecoTex
 
   elseif (udef.weapons[1] or udef.canKamikaze) then

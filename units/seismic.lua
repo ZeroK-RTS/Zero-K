@@ -125,6 +125,7 @@ unitDef = {
       tolerance               = 4000,
       twoPhase                = true,
       vlaunch                 = true,
+	  waterWeapon             = true,
       weaponAcceleration      = 180,
       weaponTimer             = 3,
       weaponType              = [[StarburstLauncher]],
