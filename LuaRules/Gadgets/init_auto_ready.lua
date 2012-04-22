@@ -31,6 +31,7 @@ local readyCount = 0
 local waitingCount = 0 
 local missingCount = 0
 
+local forceSent = false 
 
 function gadget:Initialize() 
 	startTimer = Spring.GetTimer()
@@ -69,14 +70,17 @@ function gadget:GameSetup(label, ready, playerStates)
 		end 
 	end 
 		
-	if (timeDiff > 25 or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
+	if (timeDiff > 30 or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
 		if (readyTimer == nil) then 
 			readyTimer = Spring.GetTimer()	
 		end 
 	end 
 	
 	if (readyTimer ~= nil and Spring.DiffTimers(Spring.GetTimer(), readyTimer) > 4) then 
-		Spring.SendCommands("wbynum 255 SPRINGIE:FORCE")
+		if not forceSent then 
+			Spring.SendCommands("wbynum 255 SPRINGIE:FORCE")
+			forceSent = true
+		end 
 		return true, true	
 	end 
 	
