@@ -136,6 +136,8 @@ local windTooltips = {
 	["armwin"] = true,
 }
 
+local mexDefID = UnitDefNames["cormex"].id
+
 local terraCmds = {
 	Ramp=1,
 	Level=1,
@@ -1377,6 +1379,11 @@ local function MakeToolTip_UD(tt_table)
 	local helptext = GetHelpText(tt_table.buildType)
 	local iconPath = GetUnitIcon(tt_table.unitDef)
 	
+	local extraText = ""
+	if mexDefID == tt_table.unitDef.id then
+		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
+	end
+	
 	local tt_structure = {
 		leftbar = {
 			tt_table.morph_data 
@@ -1385,7 +1392,7 @@ local function MakeToolTip_UD(tt_table)
 			{ name = 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat(tt_table.unitDef.metalCost), },
 		},
 		main = {
-			{ name = 'udname', icon = iconPath, text = tt_table.unitDef.humanName, fontSize=2 },
+			{ name = 'udname', icon = iconPath, text = tt_table.unitDef.humanName .. extraText, fontSize=2 },
 			{ name = 'tt', text = tt_table.unitDef.tooltip, wrap=true },
 			{ name='health', icon = 'LuaUI/images/commands/Bold/health.png',  text = numformat(tt_table.unitDef.health), },
 			--[[

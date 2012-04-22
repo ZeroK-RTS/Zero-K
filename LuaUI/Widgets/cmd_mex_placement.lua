@@ -70,6 +70,8 @@ local glRotate           = gl.Rotate
 local glPopMatrix        = gl.PopMatrix
 local glPushMatrix       = gl.PushMatrix
 local glTranslate        = gl.Translate
+local glCallList         = gl.CallList
+local glCreateList       = gl.CreateList
 
 local GL_FRONT_AND_BACK = GL.FRONT_AND_BACK
 local GL_FILL           = GL.FILL
@@ -124,6 +126,8 @@ end
 --------------------------------------------------------------------------------
 -- Variables
 --------------------------------------------------------------------------------
+
+WG.mouseoverMexIncome = 0
 
 local spotByID = {}
 local spotData = {}
@@ -303,6 +307,7 @@ function widget:UnitFinished(unitID, unitDefID, teamID)
 			if spotID then
 				spotByID[unitID] = spotID
 				spotData[spotID] = {unitID = unitID, allyTeam = spGetUnitAllyTeam(unitID)}
+				updateMexDrawList()
 			end
 		elseif spGetUnitAllyTeam(unitID) == myAllyTeam then
 			local x,_,z = Spring.GetUnitPosition(unitID)
@@ -310,6 +315,7 @@ function widget:UnitFinished(unitID, unitDefID, teamID)
 			if spotID then
 				spotByID[unitID] = spotID
 				spotData[spotID] = {unitID = unitID}
+				updateMexDrawList()
 			end
 		end
 	end
@@ -319,6 +325,7 @@ function widget:UnitDestroyed(unitID, unitDefID)
 	if unitDefID == mexDefID and spotByID[unitID] then
 		spotData[spotByID[unitID]] = nil
 		spotByID[unitID] = nil
+		updateMexDrawList()
 	end
 end
 
@@ -347,6 +354,7 @@ local function Initialize()
 			end
 		end
 	end
+	updateMexDrawList()
 end
 
 function widget:GameFrame()
@@ -382,6 +390,9 @@ local drawMexSpots = false
 local centerX 
 local centerZ
 local extraction = 0
+
+local mainMexDrawList = 0
+local miniMexDrawList = 0
 
 local METAL_MAP_SQUARE_SIZE = 16
 local MEX_RADIUS = Game.extractorRadius
@@ -449,33 +460,6 @@ local function IntegrateMetal(x, z, forceUpdate)
 	extraction = result * mult
 end
 
-local function DrawTextWithBackground(text, x, y, size, opt)
-	local width = glGetTextWidth(text) * size
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-	
-	glColor(0.25, 0.25, 0.25, 0.75)
-	if (opt) then
-		if (strFind(opt, "r")) then
-			glRect(x, y, x - width, y + size * TEXT_CORRECT_Y)
-		elseif (strFind(opt, "c")) then
-			glRect(x + width * 0.5, y, x - width * 0.5, y + size * TEXT_CORRECT_Y)
-		else
-			glRect(x, y, x + width, y + size * TEXT_CORRECT_Y)
-		end
-	else
-		glRect(x, y, x + width, y + size * TEXT_CORRECT_Y)
-	end
-	glColor(0.75, 0.75, 0.75, 1)	
-	glText(text, x, y, size, opt)
-	
-end
-
-
-local function DoLine(x1, y1, z1, x2, y2, z2)
-    gl.Vertex(x1, y1, z1)
-    gl.Vertex(x2, y2, z2)
-end
-
 local function getSpotColor(x,y,z,id, specatate)
 	if specatate then
 		if spotData[id] then
@@ -498,6 +482,100 @@ local function getSpotColor(x,y,z,id, specatate)
 			--	return enemyMexColor
 			--end
 		end
+	end
+end
+
+function calcMainMexDrawList()
+	local specatate = spGetSpectatingState()
+	
+	for i = 1, #WG.metalSpots do
+		local spot = WG.metalSpots[i]
+		local x,z = spot.x, spot.z
+		local y = spGetGroundHeight(x,z)
+
+		local mexColor = getSpotColor(x,y+45,z,i,specatate)
+		
+		glPushMatrix()
+		
+		glLineWidth(spot.metal*1.5)
+		glColor(mexColor)
+		glDepthTest(true)
+		glDrawGroundCircle(x, 1, z, 40, 32)
+		
+		glRotate(90,1,0,0)
+		glColor(0,1,1)		
+		glTranslate(0,0,-y-10)
+		glColor(1,1,1)
+		glTexture("LuaUI/Images/ibeam.png")
+		local width = 30* spot.metal
+		glTexRect(x-width/2, z+20, x+width/2, z+50,0,0,spot.metal,1)
+		glTexture(false)
+		--glColor(0,1,1)
+		--glRect(x-width/2, z+18, x+width/2, z+20)
+		glDepthTest(false)
+		glPopMatrix()
+	end
+
+	glLineWidth(0)
+	glColor(1,1,1,1)
+end
+
+function calcMiniMexDrawList()
+	local specatate = spGetSpectatingState()
+	
+	glLoadIdentity()
+	glTranslate(0,1,0)
+	glScale(mapXinv , -mapZinv, 1)
+	glRotate(270,1,0,0)
+
+	for i = 1, #WG.metalSpots do
+		local spot = WG.metalSpots[i]
+		local x,z = spot.x, spot.z
+		local y = spGetGroundHeight(x,z)
+
+		local mexColor = getSpotColor(x,y,z,i,specatate)
+		
+		glLineWidth(spot.metal)
+		glColor(mexColor)
+		
+		glDrawGroundCircle(x, 0, z, 40, 32)
+		
+		glPushMatrix()
+		
+		glPopMatrix()
+	end
+
+	glLineWidth(0)
+	glColor(1,1,1,1)
+end
+
+function updateMexDrawList()
+	mainMexDrawList = glCreateList(calcMainMexDrawList)
+	miniMexDrawList = glCreateList(calcMiniMexDrawList)
+end
+
+local function DoLine(x1, y1, z1, x2, y2, z2)
+    gl.Vertex(x1, y1, z1)
+    gl.Vertex(x2, y2, z2)
+end
+
+function widget:Update()
+
+	if mexSpotToDraw and WG.metalSpots then
+		WG.mouseoverMexIncome = mexSpotToDraw.metal
+		local mx, my = spGetMouseState()
+	else
+		local _, cmd_id = spGetActiveCommand()
+		if -mexDefID ~= cmd_id then
+			return
+		end
+		local mx, my = spGetMouseState()
+		local _, coords = spTraceScreenRay(mx, my, true, true)
+		if (not coords) then 
+			return 
+		end
+		IntegrateMetal(coords[1], coords[3])
+		WG.mouseoverMexIncome = extraction
 	end
 end
 
@@ -547,41 +625,9 @@ function widget:DrawWorld()
 			gl.DepthMask(false)
 		end
 	end
-	
 
 	if drawMexSpots then
-		local specatate = spGetSpectatingState()
-	
-		for i = 1, #WG.metalSpots do
-			local spot = WG.metalSpots[i]
-			local x,z = spot.x, spot.z
-			local y = spGetGroundHeight(x,z)
-
-			local mexColor = getSpotColor(x,y+45,z,i,specatate)
-			
-			glPushMatrix()
-			
-			glLineWidth(spot.metal*1.5)
-			glColor(mexColor)
-			glDepthTest(true)
-			glDrawGroundCircle(x, 1, z, 40, 32)
-			
-			glRotate(90,1,0,0)
-			glColor(0,1,1)		
-			glTranslate(0,0,-y-10)
-			glColor(1,1,1)
-			glTexture("LuaUI/Images/ibeam.png")
-			local width = 30* spot.metal
-			glTexRect(x-width/2, z+20, x+width/2, z+50,0,0,spot.metal,1)
-			glTexture(false)
-			--glColor(0,1,1)
-			--glRect(x-width/2, z+18, x+width/2, z+20)
-			glDepthTest(false)
-			glPopMatrix()
-		end
-
-		glLineWidth(0)
-		glColor(1,1,1,1)
+		glCallList(mainMexDrawList)
 	end
 
 end
@@ -589,15 +635,13 @@ end
 function widget:DrawInMiniMap()
 
 	if drawMexSpots then
-	
 		local specatate = spGetSpectatingState()
 	
-		glPushMatrix()
 		glLoadIdentity()
 		glTranslate(0,1,0)
 		glScale(mapXinv , -mapZinv, 1)
 		glRotate(270,1,0,0)
-	
+
 		for i = 1, #WG.metalSpots do
 			local spot = WG.metalSpots[i]
 			local x,z = spot.x, spot.z
@@ -608,15 +652,39 @@ function widget:DrawInMiniMap()
 			glLineWidth(spot.metal)
 			glColor(mexColor)
 			
-			glDrawGroundCircle(x, 0, z, 40, 32)
+			glDrawGroundCircle(x, 0, z, 64, 32)
 			
-			--glPopMatrix()
+			glPushMatrix()
+			
+			glPopMatrix()
 		end
 
 		glLineWidth(0)
 		glColor(1,1,1,1)
 	end
 
+end
+
+--[[
+local function DrawTextWithBackground(text, x, y, size, opt)
+	local width = glGetTextWidth(text) * size
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+	
+	glColor(0.25, 0.25, 0.25, 0.75)
+	if (opt) then
+		if (strFind(opt, "r")) then
+			glRect(x, y, x - width, y + size * TEXT_CORRECT_Y)
+		elseif (strFind(opt, "c")) then
+			glRect(x + width * 0.5, y, x - width * 0.5, y + size * TEXT_CORRECT_Y)
+		else
+			glRect(x, y, x + width, y + size * TEXT_CORRECT_Y)
+		end
+	else
+		glRect(x, y, x + width, y + size * TEXT_CORRECT_Y)
+	end
+	glColor(0.75, 0.75, 0.75, 1)	
+	glText(text, x, y, size, opt)
+	
 end
 
 function widget:DrawScreen()
@@ -639,4 +707,4 @@ function widget:DrawScreen()
 		glColor(1, 1, 1, 1)
 	end
 end
-
+--]]
