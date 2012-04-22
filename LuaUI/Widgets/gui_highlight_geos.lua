@@ -27,6 +27,7 @@ local spGetMapDrawMode = Spring.GetMapDrawMode
 local spGetActiveCommand = Spring.GetActiveCommand
 local spGetGameFrame        = Spring.GetGameFrame
 
+
 local geoDefID = UnitDefNames["geo"].id
 
 local mapX = Game.mapSizeX

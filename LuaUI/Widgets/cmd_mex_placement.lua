@@ -95,6 +95,13 @@ local mapZ = Game.mapSizeZ
 local mapXinv = 1/mapX
 local mapZinv = 1/mapZ
 
+local METAL_MAP_SQUARE_SIZE = 16
+local MEX_RADIUS = Game.extractorRadius
+local MAP_SIZE_X = Game.mapSizeX
+local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
+local MAP_SIZE_Z = Game.mapSizeZ
+local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
+
 local allyMexColor = {0, 1, 0, 0.7}
 local neutralMexColor = {1, 1, 0, 0.7}
 local enemyMexColor = {1, 0, 0, 0.7}
@@ -158,6 +165,66 @@ end
 local function Distance(x1,z1,x2,z2)
 	local dis = (x1-x2)*(x1-x2)+(z1-z2)*(z1-z2)
 	return dis
+end
+
+
+local function IntegrateMetal(x, z, forceUpdate)
+	local newCenterX, newCenterZ
+	
+	if (mexDefInfo.oddX) then
+		newCenterX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
+	else
+		newCenterX = floor( x / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
+	end
+	
+	if (mexDefInfo.oddZ) then
+		newCenterZ = (floor( z / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
+	else
+		newCenterZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
+	end
+	
+	if (centerX == newCenterX and centerZ == newCenterZ and not forceUpdate) then 
+		return 
+	end
+	
+	centerX = newCenterX
+	centerZ = newCenterZ
+	
+	local startX = floor((centerX - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
+	local startZ = floor((centerZ - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
+	local endX = floor((centerX + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
+	local endZ = floor((centerZ + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
+	startX, startZ = max(startX, 0), max(startZ, 0)
+	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
+	
+	local mult = mexDefInfo.extraction
+	local square = mexDefInfo.square
+	local result = 0
+	
+	if (square) then
+		for i = startX, endX do
+			for j = startZ, endZ do
+				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
+				local _, metal = spGetGroundInfo(cx, cz)
+				result = result + metal
+			end
+		end
+	else
+		for i = startX, endX do
+			for j = startZ, endZ do
+				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
+				local dx, dz = cx - centerX, cz - centerZ
+				local dist = sqrt(dx * dx + dz * dz)
+				
+				if (dist < MEX_RADIUS) then
+					local _, metal = spGetGroundInfo(cx, cz)
+					result = result + metal
+				end
+			end
+		end
+	end
+
+	extraction = result * mult
 end
 
 ------------------------------------------------------------
@@ -357,7 +424,10 @@ local function Initialize()
 	updateMexDrawList()
 end
 
-function widget:GameFrame()
+local mexSpotToDraw = false
+local drawMexSpots = false
+
+function widget:Update()
 	if not wasSpectating and spGetSpectatingState() then
 		spotByID = {}
 		spotData = {}
@@ -373,10 +443,28 @@ function widget:GameFrame()
 			end
 		end
 	end
-	
 	if metalSpotsNil and WG.metalSpots ~= nil then
 		Initialize()
 		metalSpotsNil = false
+	end
+	
+	WG.mouseoverMexIncome = 0
+	
+	if mexSpotToDraw and WG.metalSpots then
+		WG.mouseoverMexIncome = mexSpotToDraw.metal
+		local mx, my = spGetMouseState()
+	else
+		local _, cmd_id = spGetActiveCommand()
+		if -mexDefID ~= cmd_id then
+			return
+		end
+		local mx, my = spGetMouseState()
+		local _, coords = spTraceScreenRay(mx, my, true, true)
+		if (not coords) then 
+			return 
+		end
+		IntegrateMetal(coords[1], coords[3])
+		WG.mouseoverMexIncome = extraction
 	end
 end
 
@@ -384,81 +472,12 @@ end
 -- Drawing
 ------------------------------------------------------------
 
-local mexSpotToDraw = false
-local drawMexSpots = false
-
 local centerX 
 local centerZ
 local extraction = 0
 
 local mainMexDrawList = 0
 local miniMexDrawList = 0
-
-local METAL_MAP_SQUARE_SIZE = 16
-local MEX_RADIUS = Game.extractorRadius
-local MAP_SIZE_X = Game.mapSizeX
-local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
-local MAP_SIZE_Z = Game.mapSizeZ
-local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
-
-local function IntegrateMetal(x, z, forceUpdate)
-	local newCenterX, newCenterZ
-	
-	if (mexDefInfo.oddX) then
-		newCenterX = (floor( x / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
-	else
-		newCenterX = floor( x / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
-	end
-	
-	if (mexDefInfo.oddZ) then
-		newCenterZ = (floor( z / METAL_MAP_SQUARE_SIZE) + 0.5) * METAL_MAP_SQUARE_SIZE
-	else
-		newCenterZ = floor( z / METAL_MAP_SQUARE_SIZE + 0.5) * METAL_MAP_SQUARE_SIZE
-	end
-	
-	if (centerX == newCenterX and centerZ == newCenterZ and not forceUpdate) then 
-		return 
-	end
-	
-	centerX = newCenterX
-	centerZ = newCenterZ
-	
-	local startX = floor((centerX - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
-	local startZ = floor((centerZ - MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
-	local endX = floor((centerX + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
-	local endZ = floor((centerZ + MEX_RADIUS) / METAL_MAP_SQUARE_SIZE)
-	startX, startZ = max(startX, 0), max(startZ, 0)
-	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
-	
-	local mult = mexDefInfo.extraction
-	local square = mexDefInfo.square
-	local result = 0
-	
-	if (square) then
-		for i = startX, endX do
-			for j = startZ, endZ do
-				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
-				local _, metal = spGetGroundInfo(cx, cz)
-				result = result + metal
-			end
-		end
-	else
-		for i = startX, endX do
-			for j = startZ, endZ do
-				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
-				local dx, dz = cx - centerX, cz - centerZ
-				local dist = sqrt(dx * dx + dz * dz)
-				
-				if (dist < MEX_RADIUS) then
-					local _, metal = spGetGroundInfo(cx, cz)
-					result = result + metal
-				end
-			end
-		end
-	end
-
-	extraction = result * mult
-end
 
 local function getSpotColor(x,y,z,id, specatate)
 	if specatate then
@@ -487,7 +506,7 @@ end
 
 function calcMainMexDrawList()
 	local specatate = spGetSpectatingState()
-	
+
 	for i = 1, #WG.metalSpots do
 		local spot = WG.metalSpots[i]
 		local x,z = spot.x, spot.z
@@ -559,26 +578,6 @@ local function DoLine(x1, y1, z1, x2, y2, z2)
     gl.Vertex(x2, y2, z2)
 end
 
-function widget:Update()
-
-	if mexSpotToDraw and WG.metalSpots then
-		WG.mouseoverMexIncome = mexSpotToDraw.metal
-		local mx, my = spGetMouseState()
-	else
-		local _, cmd_id = spGetActiveCommand()
-		if -mexDefID ~= cmd_id then
-			return
-		end
-		local mx, my = spGetMouseState()
-		local _, coords = spTraceScreenRay(mx, my, true, true)
-		if (not coords) then 
-			return 
-		end
-		IntegrateMetal(coords[1], coords[3])
-		WG.mouseoverMexIncome = extraction
-	end
-end
-
 function widget:DrawWorld()
 	
 	-- Check command is to build a mex
@@ -591,14 +590,14 @@ function widget:DrawWorld()
 	mexSpotToDraw = false
 	drawMexSpots = WG.metalSpots and (-mexDefID == cmdID or CMD_AREA_MEX == cmdID or peruse)
 	
-	if WG.metalSpots and pos and (-mexDefID == cmdID or peruse) then
+	if WG.metalSpots and pos and (-mexDefID == cmdID or peruse or CMD_AREA_MEX == cmdID) then
 	
 		-- Find build position and check if it is valid (Would get 100% metal)
 		local bx, by, bz = Spring.Pos2BuildPos(mexDefID, pos[1], pos[2], pos[3])
 		local bface = Spring.GetBuildFacing()
 		local closestSpot, distance, index = GetClosestMetalSpot(bx, bz)
 		
-		if closestSpot and not (peruse and distance > 60) and (not spotData[index]) then 
+		if closestSpot and (-mexDefID == cmdID or not ((CMD_AREA_MEX == cmdID or peruse) and distance > 60)) and (not spotData[index]) then 
 		
 			mexSpotToDraw = closestSpot
 			gl.DepthTest(false)

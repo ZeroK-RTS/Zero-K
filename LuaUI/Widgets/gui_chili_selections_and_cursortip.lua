@@ -1784,6 +1784,12 @@ local function MakeTooltip()
 		else
 			KillTooltip()
 		end
+		
+		if WG.mouseoverMexIncome and WG.mouseoverMexIncome ~= 0 then
+			MakeToolTip_Text(" Metal spot, Income +" .. strFormat("%.2f", WG.mouseoverMexIncome))
+			return
+		end
+		
 		return
 	end
 	
@@ -1796,7 +1802,12 @@ local function MakeTooltip()
 		return
 	end
 	
-	KillTooltip() 
+	if WG.mouseoverMexIncome and WG.mouseoverMexIncome ~= 0 then
+		MakeToolTip_Text(" Metal spot, Income +" .. strFormat("%.2f", WG.mouseoverMexIncome))
+		return
+	end
+	
+	KillTooltip()
 	return
 	
 end --function MakeTooltip
