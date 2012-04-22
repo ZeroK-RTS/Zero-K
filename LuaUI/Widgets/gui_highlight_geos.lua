@@ -25,6 +25,7 @@ local glDepthTest = gl.DepthTest
 local glCallList = gl.CallList
 local spGetMapDrawMode = Spring.GetMapDrawMode
 local spGetActiveCommand = Spring.GetActiveCommand
+local spGetGameFrame        = Spring.GetGameFrame
 
 local geoDefID = UnitDefNames["geo"].id
 
@@ -73,7 +74,7 @@ end
 function widget:DrawWorld()
 	
 	local _, cmdID = spGetActiveCommand()
-	drawGeos = spGetMapDrawMode() == 'metal' or -geoDefID == cmdID
+	drawGeos = spGetMapDrawMode() == 'metal' or -geoDefID == cmdID or spGetGameFrame() < 1
 	
 	if drawGeos then
 		
