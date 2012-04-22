@@ -315,7 +315,7 @@ function GetSpots()
 			if dis < extractorRadiusSqr*4 then
 				local metal, mx, mz = IntegrateMetal((d.x + spot.x) * 0.5, (d.z + spot.z) * 0.5)
 				
-				if dis < extractorRadiusSqr*2 or metal > (d.metal + spot.metal)*0.95 then
+				if dis < extractorRadiusSqr*1.7 or metal > (d.metal + spot.metal)*0.95 then
 					spot.x = mx
 					spot.y = spGetGroundHeight(mx, mx)
 					spot.z = mz
