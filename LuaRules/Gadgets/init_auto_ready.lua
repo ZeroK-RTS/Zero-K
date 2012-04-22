@@ -27,6 +27,9 @@ local glScale          = gl.Scale
 local glText           = gl.Text
 local glTranslate      = gl.Translate
 
+local readyCount = 0 
+local waitingCount = 0 
+local missingCount = 0
 
 
 function gadget:Initialize() 
@@ -36,8 +39,9 @@ end
 function gadget:GameSetup(label, ready, playerStates)
 	lastLabel = label 
 	local timeDiff = Spring.DiffTimers(Spring.GetTimer(), startTimer)
-	local okCount = 0
-	local allOK = true 
+	local readyCount = 0 
+	local waitingCount = 0 
+	local missingCount = 0
 	waitingFor = {}
 		
 	for num, state in pairs(playerStates) do 
@@ -48,29 +52,31 @@ function gadget:GameSetup(label, ready, playerStates)
 	
 		if not spec and not isAI then 
 			if not active then 
+				missingCount = missingCount + 1
 				waitingFor[name] = "missing"
 			else 
 				if state == "ready" or startPosSet then
-					okCount = okCount + 1
+					readyCount = readyCount + 1
 					if isReady[name] == nil then 
 						isReady[name] = true 
 						Spring.SendCommands("wbynum 255 SPRINGIE:READY:".. name)
 					end 
 				else
-					allOK = false 
+					waitingCount = waitingCount + 1
 					waitingFor[name] = "notready"
 				end 
 			end 
 		end 
 	end 
 		
-	if timeDiff > 15 and okCount > 0 and allOK then
+	if (timeDiff > 15 or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
 		if (readyTimer == nil) then 
 			readyTimer = Spring.GetTimer()	
 		end 
 	end 
 	
 	if (readyTimer ~= nil and Spring.DiffTimers(Spring.GetTimer(), readyTimer) > 4) then 
+		Spring.SendCommands("wbynum 255 SPRINGIE:FORCE")
 		return true, true	
 	end 
 	
