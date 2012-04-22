@@ -563,11 +563,12 @@ function widget:DrawWorld()
 			
 			glLineWidth(spot.metal*1.5)
 			glColor(mexColor)
-
+			glDepthTest(true)
 			glDrawGroundCircle(x, 1, z, 40, 32)
+			
 			glRotate(90,1,0,0)
 			glColor(0,1,1)		
-			glTranslate(0,0,-y-5)
+			glTranslate(0,0,-y-10)
 			glColor(1,1,1)
 			glTexture("LuaUI/Images/ibeam.png")
 			local width = 30* spot.metal
@@ -575,6 +576,7 @@ function widget:DrawWorld()
 			glTexture(false)
 			--glColor(0,1,1)
 			--glRect(x-width/2, z+18, x+width/2, z+20)
+			glDepthTest(false)
 			glPopMatrix()
 		end
 
