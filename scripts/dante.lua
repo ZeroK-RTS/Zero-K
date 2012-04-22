@@ -368,16 +368,16 @@ function script.Killed(recentDamage, maxHealth)
 		--StartThread(burn)
 		--Sleep((1000 * rand (2 , 5)))
 
-		Explode(pelvis)
-		Explode(luparm)
-		Explode(lleg)
-		Explode(lupleg)
-		Explode(rarm)
-		Explode(rleg)
-		Explode(ruparm)
-		Explode(rupleg)
-		Explode(torso)
-		corpsetype = 1
+		Explode(pelvis, sfxNone)
+		Explode(luparm, sfxNone)
+		Explode(lleg, sfxNone)
+		Explode(lupleg, sfxNone)
+		Explode(rarm, sfxFall)
+		Explode(rleg, sfxNone)
+		Explode(ruparm, sfxNone)
+		Explode(rupleg, sfxNone)
+		Explode(torso, sfxNone)
+		return 1
 	else
 		Explode(pelvis, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
 		Explode(luparm, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
@@ -388,6 +388,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(ruparm, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
 		Explode(rupleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
 		Explode(torso, SFX.SHATTER + SFX.EXPLODE_ON_HIT )
-		corpsetype = 2
+		return 2
 	end
 end
