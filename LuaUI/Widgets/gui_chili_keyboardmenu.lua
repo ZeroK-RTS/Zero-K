@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.007 Chili Keyboard Menu",
+    desc      = "v0.008 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -129,6 +129,7 @@ options_order = {
 	'uikey3',
 	'uikey4',
 	'uikey5',
+	'uikey6',
 	
 	'qwertz',
 }
@@ -239,6 +240,12 @@ options = {
 		desc = '',
 		action = 'AllMap+_Not_Builder_Not_Building_Transport_Aircraft+_ClearSelection_SelectAll+',
 	},
+	uikey6 = { type = 'button',
+		name = 'Unknown uikey 6 - allunits?',
+		desc = '',
+		action = 'AllMap+_InPrevSel_Not_InHotkeyGroup+_SelectAll+',
+	},
+	
 	
 	
 }
