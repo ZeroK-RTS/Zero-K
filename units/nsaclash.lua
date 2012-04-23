@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[nsaclash]],
   name                = [[Scalpel]],
-  description         = [[Skirmisher Hover (Anti-Armor)]],
+  description         = [[Skirmisher Hover (Anti-Heavy)]],
   acceleration        = 0.0435,
   brakeRate           = 0.205,
   buildCostEnergy     = 220,
@@ -24,11 +24,11 @@ unitDef = {
   customParams        = {
     description_bp = [[Veículo escaramuçador]],
     description_fr = [[V?hicule Tirailleur]],
-	description_de = [[Skirmisher Gleiter (Panzerknacker)]],
+	description_de = [[Skirmisher Gleiter (Anti-Heavy)]],
     helptext       = [[Use the Scalpel for hit-and-run attacks. Has a long reload time and not too many hit points, and should always be kept at range with the enemy. An arcing projectile allows it to shoot over obstacles and friendly units.]],
     helptext_bp    = [[Scalpel é um escaramuçador: Use-o para ataques de bater e correr. Demora para recarregar e n?o é muito resistente, devendo sempre ser mantido a distância do inimigo. Seus projéteis de trajetória curva superam obstáculos.]],
     helptext_fr    = [[Le Scalpel est un tirailleur, il est utile pour harrasser l'ennemi ? l'aide de son lance roquette. Il tire des roquettes ? t?te chercheuse au dessus des obstacles, mais son temps de rechargement, sa maniabilit? et son faible blindage le rendent vuln?rable aux contre attaques.]],
-	helptext_de    = [[Nutze den Scalpel für Schlag-und-Renn Attacken. Er hat eine lange Nachladezeit und nicht allzu große Lebenspunkte. Außerdem sollte er immer auf Distanz zum Feind gehalten werden. Der bogenförmige Schuss ermöglicht es über Hindernisse und freundliche Einheiten zu schießen.]],
+	helptext_de    = [[Nutze den Scalpel für Schlag-und-Renn Attacken. Er hat eine lange Nachladezeit und nicht allzu viele Lebenspunkte. Er sollte immer auf Distanz zum Feind gehalten werden. Die bogenförmige Schussbahn ermöglicht es über Hindernisse und freundliche Einheiten zu schießen.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
