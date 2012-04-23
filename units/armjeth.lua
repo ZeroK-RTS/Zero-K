@@ -4,17 +4,19 @@ unitDef = {
   description            = [[Anti-air Bot]],
   acceleration           = 0.5,
   brakeRate              = 0.32,
-  buildCostEnergy        = 100,
-  buildCostMetal         = 100,
+  buildCostEnergy        = 150,
+  buildCostMetal         = 150,
   builder                = false,
   buildPic               = [[ARMJETH.png]],
-  buildTime              = 100,
+  buildTime              = 150,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[LAND]],
+  cloakCost              = 0.1,
+  cloakCostMoving        = 0.5,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[35 40 35]],
   collisionVolumeTest    = 1,
@@ -43,6 +45,7 @@ unitDef = {
   iconType               = [[kbotaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
+  initCloaked            = true,
   leaveTracks            = true,
   mass                   = 117,
   maxDamage              = 550,
@@ -78,7 +81,7 @@ unitDef = {
   turnRate               = 2200,
   upright                = true,
   workerTime             = 0,
-
+  
   weapons                = {
 
     {
@@ -88,7 +91,6 @@ unitDef = {
     },
 
   },
-
 
   weaponDefs             = {
 
@@ -118,8 +120,8 @@ unitDef = {
       laserFlareSize          = 3.25,
       minIntensity            = 1,
       pitchtolerance          = 8192,
-      range                   = 760,
-      reloadtime              = 0.4,
+      range                   = 700,
+      reloadtime              = 0.3,
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],
       soundStartVolume        = 4,
@@ -131,7 +133,6 @@ unitDef = {
     },
 
   },
-
 
   featureDefs            = {
 
@@ -147,10 +148,10 @@ unitDef = {
       footprintZ       = 2,
       height           = [[40]],
       hitdensity       = [[100]],
-      metal            = 40,
+      metal            = 60,
       object           = [[spherejeth_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 40,
+      reclaimTime      = 60,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -166,10 +167,10 @@ unitDef = {
       footprintZ       = 2,
       height           = [[4]],
       hitdensity       = [[100]],
-      metal            = 20,
+      metal            = 30,
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
-      reclaimTime      = 20,
+      reclaimTime      = 30,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },

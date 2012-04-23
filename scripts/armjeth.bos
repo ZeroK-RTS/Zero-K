@@ -174,7 +174,7 @@ AimWeapon1(heading,pitch)
 	return(TRUE);
 }
 	
-FireWeapon1()
+Shot1()
 {
 	if (gun == 1)
 	{

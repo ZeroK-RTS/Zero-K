@@ -31,6 +31,7 @@ local team = GetMyTeamID()
 
 local exceptionList = {	--add exempt units here
 	"armsnipe",
+	"armjeth",
 }
 
 local exceptionArray = {}	--used by the widget code; don't mess with this kthx
