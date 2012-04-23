@@ -23,8 +23,8 @@ return {
       properties = {
         alpha              = 0.6,
         color              = [[0.3,0,0.4]],
-        expansionspeed     = 3,
-        ttl                = 150,
+        expansionspeed     = 3.6,
+        ttl                = 90,
       },
     },
   },
