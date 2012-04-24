@@ -25,6 +25,7 @@ local MAPSIDE_METALMAP = "map_metal_layout.lua"
 local GAMESIDE_METALMAP = "LuaRules/Configs/MetalSpots/" .. (Game.mapName or "") .. ".lua"
 
 local DEFAULT_MEX_INCOME = 2
+local MINIMUN_MEX_INCOME = 0.2
 
 local gridSize = 16 -- Resolution of metal map
 local buildGridSize = 8 -- Resolution of build positions
@@ -35,6 +36,9 @@ local MAP_SIZE_X = Game.mapSizeX
 local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
 local MAP_SIZE_Z = Game.mapSizeZ
 local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
+
+local gameConfig = VFS.FileExists(GAMESIDE_METALMAP) and VFS.Include(GAMESIDE_METALMAP) or false
+local mapConfig = VFS.FileExists(MAPSIDE_METALMAP) and VFS.Include(MAPSIDE_METALMAP) or false
 
 ------------------------------------------------------------
 -- Speedups
@@ -93,13 +97,18 @@ function gadget:Initialize()
 		metalSpotsByPos = false
 	end
 	
+	local metalValueOverride = gameConfig and gameConfig.metalValueOverride
+	
 	if metalSpots then
 		local mult = (modOptions and modOptions.metalmult) or 1
 		local i = 1
 		while i <= #metalSpots do
 			local spot = metalSpots[i]
 			spot.metal = spot.metal*mult
-			if spot.metal > 0.2 then
+			if spot.metal > MINIMUN_MEX_INCOME then
+				if metalValueOverride then
+					spot.metal = metalValueOverride
+				end
 				i = i + 1
 			else
 				metalSpots[i] = metalSpots[#metalSpots]
@@ -176,43 +185,48 @@ end
 ------------------------------------------------------------
 -- Mex finding
 ------------------------------------------------------------
+local function SanitiseSpots(spots)
+	local i = 1
+	while i <= #spots do
+		local spot = spots[i]
+		if spot and spot.x and spot.z then
+			local metal
+			metal, spot.x, spot.z = IntegrateMetal(spot.x, spot.z)
+			spot.y = spGetGroundHeight(spot.x, spot.z)
+			spot.metal = metalValueOverride or spot.metal or (metal > 0 and metal) or DEFAULT_MEX_INCOME
+			i = i + 1
+		else
+			spot[i] = spot[#spots]
+			spot[#spots] = nil
+		end
+	end
+	
+	return spots
+end
+
+
 function GetSpots()
 	
 	local spots = {}
 
 	-- Check configs
-	local loadConfig = false
-	if VFS.FileExists(GAMESIDE_METALMAP) then
-		spots = VFS.Include(GAMESIDE_METALMAP)
+	if gameConfig then
 		Spring.Echo("Loading gameside mex config")
-		loadConfig = true
-	elseif VFS.FileExists(MAPSIDE_METALMAP) then
-		spots = VFS.Include(MAPSIDE_METALMAP)
-		Spring.Echo("Loading mapside mex config")
-		loadConfig = true
-	else
-		Spring.Echo("Detecting mex config from metalmap")
+		if gameConfig.spots then
+			spots = SanitiseSpots(gameConfig.spots)
+			return spots
+		end
 	end
 	
-	if loadConfig then
-		local i = 1
-		while i <= #spots do
-			local spot = spots[i]
-			if spot and spot.x and spot.z then
-				local metal
-				metal, spot.x, spot.z = IntegrateMetal(spot.x, spot.z)
-				spot.y = spGetGroundHeight(spot.x, spot.z)
-				spot.metal = spot.metal or (metal > 0 and metal) or DEFAULT_MEX_INCOME
-				i = i + 1
-			else
-				spot[i] = spot[#spots]
-				spot[#spots] = nil
-			end
-		end
-		
+	if mapConfig then
+		Spring.Echo("Loading mapside mex config")
+		loadConfig = true
+		spots = SanitiseSpots(mapConfig)
 		return spots
 	end
 	
+	Spring.Echo("Detecting mex config from metalmap")
+
 	-- Main group collection
 	local uniqueGroups = {}
 	
