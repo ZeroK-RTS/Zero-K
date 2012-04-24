@@ -323,17 +323,9 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Metal and Energy Bonus; fac cost mult
+-- Energy Bonus, fac cost mult
 --
 
-if (modOptions and modOptions.metalmult) then
-  for name in pairs(UnitDefs) do
-    local em = UnitDefs[name].extractsmetal
-    if (em) then
-      UnitDefs[name].extractsmetal = em * modOptions.metalmult
-    end
-  end
-end
 
 if (modOptions and modOptions.energymult) then
   for name in pairs(UnitDefs) do

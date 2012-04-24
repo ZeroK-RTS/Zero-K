@@ -52,16 +52,23 @@ NOTE FOR OTHER GAME DEVS:
 ------------------------
 ------------------------
 options_path = 'Settings/Interface/Integral Menu'
-options_order = { 'disablesmartselect', 'hidetabs', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
+options_order = { 'disablesmartselect', 'hidetabs', 'disableunitshotkeys', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
 options = {
 	disablesmartselect = {
 		name = 'Disable Smart Tab Select',
 		type = 'bool',
+		value = false,
 	},
 	hidetabs = {
 		name = 'Hide Tab Row',
 		type = 'bool',
 		advanced = true,
+		value = false,
+	},
+	disableunitshotkeys = {
+		name = 'Disable Units Hotkeys',
+		type = 'bool',
+		value = false,
 	},
 	tab_factory = {
 		name = "Factory Tab",
@@ -330,7 +337,7 @@ local function MakeButton(container, cmd, insertItem, index)
 	
 	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 	
-	if gridHotkeyed and hotkeyMode then
+	if gridHotkeyed and hotkeyMode or (not options.disableunitshotkeys.value and menuChoice == 6 and container.i_am_sp_commands) then
 		hotkey = gridMap[container.index][index] or ''
 	end
 	
@@ -1022,6 +1029,7 @@ end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if (hotkeyMode) and not isRepeat then 
+		local thingsDone = false
 		local pos = gridKeyMap[key]
 		if pos and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
 			local cmdid = sp_commands[pos[1]].children[pos[2]]
@@ -1031,6 +1039,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 					local index = Spring.GetCmdDescIndex(cmdid)
 					if index then
 						Spring.SetActiveCommand(index,1,true,false,false,false,false,false)
+						thingsDone = true
 					end
 				end
 			end
@@ -1039,7 +1048,28 @@ function widget:KeyPress(key, modifier, isRepeat)
 		menuChoice = 1 -- auto-return to orders to make it clear hotkey time is over
 		Update(true)
 		ColorTabs()
-		return true 
+		return thingsDone 
+	elseif menuChoice == 6 and not options.disableunitshotkeys.value and selectedFac then
+		Spring.Echo("bla")
+		Spring.Echo(options.disableunitshotkeys.value)
+		Spring.Echo("bla")
+		local pos = gridKeyMap[key]
+		if pos and pos[1] ~= 3 and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
+			local cmdid = sp_commands[pos[1]].children[pos[2]]
+			if cmdid then
+				cmdid = cmdid.cmdid
+				if cmdid then 
+					local index = Spring.GetCmdDescIndex(cmdid)
+					if index then
+						local alt,ctrl,meta,shift = Spring.GetModKeyState()
+						if not ctrl then -- don't mess up ctrl+key commands
+							Spring.SetActiveCommand(index,1,true,false,alt,false,false,shift)
+							return true
+						end
+					end
+				end
+			end
+		end
 	end
 end
 
@@ -1249,6 +1279,7 @@ function widget:Initialize()
 			padding = {0, 0, 0, 0},
 			itemMargin  = {0, 0, 0, 0},
 			index = i,
+			i_am_sp_commands = true,
 		}
 		--Spring.Echo("Command row "..i.." created")
 	end

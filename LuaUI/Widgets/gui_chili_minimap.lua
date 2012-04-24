@@ -149,7 +149,8 @@ options = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
 		advanced = true,
-		OnChange= function(self) iconsize = self.value and 0 or 20; MakeMinimapWindow() end
+		OnChange= function(self) iconsize = self.value and 0 or 20; MakeMinimapWindow() end,
+		value = false,
 	},
 	
 }

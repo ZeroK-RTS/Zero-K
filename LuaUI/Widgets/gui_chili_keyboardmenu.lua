@@ -143,6 +143,7 @@ options = {
 			SetupKeybuttons()
 			UpdateButtons()
 		end,
+		value = false,
 	},
 	
 

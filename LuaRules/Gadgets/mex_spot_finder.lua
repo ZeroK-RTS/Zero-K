@@ -74,6 +74,11 @@ local mexDefInfo = {
 	oddZ = mexUnitDef.zsize % 4 == 2,
 }
 
+local modOptions
+if (Spring.GetModOptions) then
+  modOptions = Spring.GetModOptions()
+end
+
 ------------------------------------------------------------
 -- Callins
 ------------------------------------------------------------
@@ -86,6 +91,21 @@ function gadget:Initialize()
 		Spring.Echo("Indiscrete metal map detected")
 		metalSpots = false
 		metalSpotsByPos = false
+	end
+	
+	if metalSpots then
+		local mult = (modOptions and modOptions.metalmult) or 1
+		local i = 1
+		while i <= #metalSpots do
+			local spot = metalSpots[i]
+			spot.metal = spot.metal*mult
+			if spot.metal > 0.2 then
+				i = i + 1
+			else
+				metalSpots[i] = metalSpots[#metalSpots]
+				metalSpots[#metalSpots] = nil
+			end
+		end
 	end
 	
 	GG.metalSpots = metalSpots

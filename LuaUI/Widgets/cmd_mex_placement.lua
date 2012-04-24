@@ -16,13 +16,6 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 ------------------------------------------------------------
--- Config
-------------------------------------------------------------
-
-local TEXT_SIZE = 16
-local TEXT_CORRECT_Y = 1.25
-
-------------------------------------------------------------
 -- Speedups
 ------------------------------------------------------------
 local spGetActiveCommand    = Spring.GetActiveCommand
@@ -102,9 +95,19 @@ local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
 local MAP_SIZE_Z = Game.mapSizeZ
 local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
 
-local allyMexColor = {0, 1, 0, 0.7}
-local neutralMexColor = {1, 1, 0, 0.7}
-local enemyMexColor = {1, 0, 0, 0.7}
+local allyMexColor = {[1] = {0, 1, 0, 0.7}, [2] = {0, 1, 0, 1}}
+local neutralMexColor = {[1] = {1, 1, 0, 0.7}, [2] = {1, 1, 0,1}}
+local enemyMexColor = {[1] = {1, 0, 0, 0.7}, [2] = {1, 0, 0, 1}}
+
+------------------------------------------------------------
+-- Config
+------------------------------------------------------------
+
+local TEXT_SIZE = 16
+local TEXT_CORRECT_Y = 1.25
+
+local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
+
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -452,7 +455,6 @@ function widget:Update()
 	
 	if mexSpotToDraw and WG.metalSpots then
 		WG.mouseoverMexIncome = mexSpotToDraw.metal
-		local mx, my = spGetMouseState()
 	else
 		local _, cmd_id = spGetActiveCommand()
 		if -mexDefID ~= cmd_id then
@@ -479,24 +481,24 @@ local extraction = 0
 local mainMexDrawList = 0
 local miniMexDrawList = 0
 
-local function getSpotColor(x,y,z,id, specatate)
+local function getSpotColor(x,y,z,id, specatate, t)
 	if specatate then
 		if spotData[id] then
 			if spotData[id].allyTeam == spGetMyAllyTeamID() then
-				return allyMexColor
+				return allyMexColor[t]
 			else
-				return enemyMexColor
+				return enemyMexColor[t]
 			end
 		else
-			return neutralMexColor
+			return neutralMexColor[t]
 		end
 	else
 		if spotData[id] then
-			return allyMexColor
+			return allyMexColor[t]
 		else
 			--local _, inLos = spGetPositionLosState(x,y,z, myAllyTeam)
 			--if inLos then
-				return neutralMexColor
+				return neutralMexColor[t]
 			--else
 			--	return enemyMexColor
 			--end
@@ -512,7 +514,18 @@ function calcMainMexDrawList()
 		local x,z = spot.x, spot.z
 		local y = spGetGroundHeight(x,z)
 
-		local mexColor = getSpotColor(x,y+45,z,i,specatate)
+		local mexColor = getSpotColor(x,y+45,z,i,specatate,1)
+		local metal = spot.metal
+		local size = 1
+		if metal > 10 then
+			if metal > 100 then
+				metal = metal*0.01
+				size = 5
+			else
+				metal = metal*0.1
+				size = 2.5
+			end
+		end
 		
 		glPushMatrix()
 		
@@ -526,8 +539,8 @@ function calcMainMexDrawList()
 		glTranslate(0,0,-y-10)
 		glColor(1,1,1)
 		glTexture("LuaUI/Images/ibeam.png")
-		local width = 30* spot.metal
-		glTexRect(x-width/2, z+20, x+width/2, z+50,0,0,spot.metal,1)
+		local width = 30*metal*size
+		glTexRect(x-width/2, z+20, x+width/2, z+20+30*size,0,0,metal,1)
 		glTexture(false)
 		--glColor(0,1,1)
 		--glRect(x-width/2, z+18, x+width/2, z+20)
@@ -538,7 +551,7 @@ function calcMainMexDrawList()
 	glLineWidth(0)
 	glColor(1,1,1,1)
 end
-
+--[[
 function calcMiniMexDrawList()
 	local specatate = spGetSpectatingState()
 	
@@ -567,10 +580,10 @@ function calcMiniMexDrawList()
 	glLineWidth(0)
 	glColor(1,1,1,1)
 end
-
+--]]
 function updateMexDrawList()
 	mainMexDrawList = glCreateList(calcMainMexDrawList)
-	miniMexDrawList = glCreateList(calcMiniMexDrawList)
+	--miniMexDrawList = glCreateList(calcMiniMexDrawList)
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)
@@ -646,12 +659,12 @@ function widget:DrawInMiniMap()
 			local x,z = spot.x, spot.z
 			local y = spGetGroundHeight(x,z)
 
-			local mexColor = getSpotColor(x,y,z,i,specatate)
+			local mexColor = getSpotColor(x,y,z,i,specatate,2)
 			
 			glLineWidth(spot.metal)
 			glColor(mexColor)
 			
-			glDrawGroundCircle(x, 0, z, 64, 32)
+			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
 		end
 
 		glLineWidth(0)

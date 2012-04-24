@@ -243,7 +243,7 @@ local function addUnit(defName, path)
 			name = "  Air Strafe",
 			desc = "Air Strafe: check box to turn it on",
 			type = 'bool',
-			value = 0,
+			value = true,
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_airstrafe"
