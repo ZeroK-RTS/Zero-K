@@ -51,6 +51,7 @@ unitDef = {
   objectName             = [[behethud.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
+  script                 = [[cormak.lua]],
 
   sfxtypes               = {
 
