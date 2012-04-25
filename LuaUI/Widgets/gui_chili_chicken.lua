@@ -265,7 +265,7 @@ local function UpdateRules()
 	else
 		techTime = techTime * GetDifficultyValue('humanAggroTechTimeProgress')
 	end
-	label_tech.tooltip = tooltipBurrowTech.."\nTech progress change next wave (at current PAR): "..("%.1f"):format(techTime) .." seconds"	
+	label_tech.tooltip = tooltipBurrowTech --.."\nTech progress change next wave (at current PAR): "..("%.1f"):format(techTime) .." seconds"	--FIXME: gives misleading values
 	
 	label_burrows.tooltip = "Burrow spawn time (at current burrow count): ".. ("%.1f"):format(GetDifficultyValue('burrowSpawnRate')*0.25*(gameInfo[roostName.."Count"] + 1)/gameInfo.malus) .." seconds\n"..
 							tooltipBurrowRespawn

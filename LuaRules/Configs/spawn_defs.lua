@@ -67,7 +67,7 @@ waveRatio            = 0.6       -- waves are composed by two types of chicken, 
 baseWaveSize		 = 2.5		 -- multiplied by malus, 1 = 1 squadSize of chickens
 waveSizeMult		 = 1
 defenderChance       = 0.05		-- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
-quasiAttackerChance  = 0.65		-- subtract defenderChance from this to get spawn chance if "defender" is tagged as a quasi-attacker
+quasiAttackerChance  = 0.6		-- same as defenderChance but for supporters
 --forceBurrowRespawn	 = false	-- burrows always respawn even if the modoption is set otherwise        
 queenSpawnMult       = 4         -- how many times bigger is a queen hatch than a normal burrow hatch
 
