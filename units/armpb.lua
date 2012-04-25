@@ -77,6 +77,7 @@ unitDef = {
       name                    = [[Light Gauss Cannon]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
+	  avoidfeature            = false,
       bouncerebound           = 0.15,
       bounceslip              = 1,
       cegTag                  = [[gauss_tag_l]],

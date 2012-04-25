@@ -94,6 +94,7 @@ unitDef = {
       name                    = [[Gauss Battery]],
       alphaDecay              = 0.12,
       areaOfEffect            = 16,
+	  avoidfeature            = false,
       bouncerebound           = 0.15,
       bounceslip              = 1,
       burst                   = 3,
