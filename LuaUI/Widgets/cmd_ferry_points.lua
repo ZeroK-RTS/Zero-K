@@ -289,7 +289,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		
 		return true
 		
-	elseif cmdID == CMD_MOVE or cmdID == CMD_FIGHT then
+	elseif cmdID == CMD_MOVE or cmdID == CMD_FIGHT and cmdParams then
 	
 		local routeID = nearFerryPoint(cmdParams[1], cmdParams[3], COLLECTION_RADIUS_DRAW)
 		if routeID then

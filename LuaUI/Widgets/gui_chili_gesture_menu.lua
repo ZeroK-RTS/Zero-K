@@ -522,7 +522,9 @@ local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
 	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
 		return
 	end
-	Spring.GiveOrder(cmdID, cmdParams, cmdOpts)
+	if cmdParams then
+		Spring.GiveOrder(cmdID, cmdParams, cmdOpts)
+	end
 end
 
 local function GiveNotifyingInsertOrder(cmdID, cmdParams, cmdOpts)

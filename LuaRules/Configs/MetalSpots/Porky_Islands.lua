@@ -1,3 +1,3 @@
 return {
-	--metalValueOverride = 2.2,
+	metalValueOverride = 2.2,
 }
