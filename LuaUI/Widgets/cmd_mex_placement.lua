@@ -424,7 +424,9 @@ local function Initialize()
 			end
 		end
 	end
-	updateMexDrawList()
+	if WG.metalSpots then
+		updateMexDrawList()
+	end
 end
 
 local mexSpotToDraw = false
