@@ -104,13 +104,13 @@ function gadget:Initialize()
 		local i = 1
 		while i <= #metalSpots do
 			local spot = metalSpots[i]
-			spot.metal = spot.metal*mult
 			if spot.metal > MINIMUN_MEX_INCOME then
 				if metalValueOverride then
 					spot.metal = metalValueOverride
 				end
 				i = i + 1
 			else
+				spot.metal = spot.metal*mult
 				metalSpots[i] = metalSpots[#metalSpots]
 				metalSpots[#metalSpots] = nil
 			end
