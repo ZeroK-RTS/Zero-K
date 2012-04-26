@@ -128,10 +128,30 @@ function script.Create()
 	StartThread(SmokeUnit)
 end
 
+local AutoAttack = nil
+function AutoAttack_Thread()
+  while true do
+    Sleep(1000)
+    local x, y, z = Spring.GetUnitPosition(unitID)
+    if AutoAttack then
+      Spring.GiveOrderToUnit(unitID, 34923, {x, y, z}, {})
+    else
+      Spring.GiveOrderToUnit(unitID, 34924, {x, y, z}, {})
+    end
+  end
+end
+
 function script.Activate()
+  if AutoAttack == nil then
+    AutoAttack = true
+    StartThread(AutoAttack_Thread)
+  else
+    AutoAttack = true
+  end
 end
 
 function script.Deactivate()
+  AutoAttack = false
 end
 
 function script.StartMoving()
