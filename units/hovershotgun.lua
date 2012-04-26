@@ -119,7 +119,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Halberd]],
+      description      = [[Wreckage - Punisher]],
       blocking         = false,
       category         = [[corpses]],
       damage           = 1200,
@@ -140,7 +140,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Halberd]],
+      description      = [[Debris - Punisher]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1200,
@@ -160,7 +160,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Halberd]],
+      description      = [[Debris - Punisher]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1200,

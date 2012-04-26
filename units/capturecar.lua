@@ -119,7 +119,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD = {
-      description      = [[Wreckage - Dreamweaver]],
+      description      = [[Wreckage - Dominatrix]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 860,
@@ -140,7 +140,7 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Dreamweaver]],
+      description      = [[Debris - Dominatrix]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 860,

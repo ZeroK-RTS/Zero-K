@@ -137,7 +137,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Pulverizer]],
+      description      = [[Wreckage - Defender]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 300,
@@ -158,7 +158,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Pulverizer]],
+      description      = [[Debris - Defender]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 300,
@@ -179,7 +179,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Pulverizer]],
+      description      = [[Debris - Defender]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 300,

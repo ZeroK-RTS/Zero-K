@@ -132,7 +132,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Racketeeer]],
+      description      = [[Wreckage - Racketeer]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 950,
@@ -152,7 +152,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Racketeeer]],
+      description      = [[Debris - Racketeer]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 950,

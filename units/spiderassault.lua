@@ -124,7 +124,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Cudgel]],
+      description      = [[Wreckage - Hermit]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1500,
@@ -145,7 +145,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Cudgel]],
+      description      = [[Debris - Hermit]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1500,
@@ -166,7 +166,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Cudgel]],
+      description      = [[Debris - Hermit]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1500,

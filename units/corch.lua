@@ -76,7 +76,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Hovercon]],
+      description      = [[Wreckage - Quill]],
       blocking         = false,
       category         = [[corpses]],
       damage           = 900,
@@ -96,7 +96,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Hovercon]],
+      description      = [[Debris - Quill]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 900,
@@ -116,7 +116,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Hovercon]],
+      description      = [[Debris - Quill]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 900,

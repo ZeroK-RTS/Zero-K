@@ -107,7 +107,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Scalpel]],
+      description      = [[Wreckage - Dampener]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 620,
@@ -128,7 +128,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Scalpel]],
+      description      = [[Debris - Dampener]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 620,
@@ -149,7 +149,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Scalpel]],
+      description      = [[Debris - Dampener]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 620,

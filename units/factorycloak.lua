@@ -83,7 +83,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Infantry Bot Factory]],
+      description      = [[Wreckage - Cloaky Bot Factory]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 4000,
@@ -104,7 +104,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Infantry Bot Factory]],
+      description      = [[Debris - Cloaky Bot Factory]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 4000,
@@ -125,7 +125,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Infantry Bot Factory]],
+      description      = [[Debris - Cloaky Bot Factory]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 4000,

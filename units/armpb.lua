@@ -123,7 +123,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Pit Bull]],
+      description      = [[Wreckage - Gauss]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 2250,
@@ -144,7 +144,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Pit Bull]],
+      description      = [[Debris - Gauss]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2250,
@@ -165,7 +165,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Pit Bull]],
+      description      = [[Debris - Gauss]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2250,

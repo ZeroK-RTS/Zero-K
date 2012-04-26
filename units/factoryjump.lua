@@ -78,7 +78,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Jumpjet Factory]],
+      description      = [[Wreckage - Jumpjet/Specialist Plant]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 4000,
@@ -99,7 +99,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Jumpjet Factory]],
+      description      = [[Debris - Jumpjet/Specialist Plant]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 4000,

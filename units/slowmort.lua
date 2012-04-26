@@ -127,7 +127,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Morty]],
+      description      = [[Wreckage - Moderator]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 550,
@@ -148,7 +148,7 @@ unitDef = {
 
 
     HEAP  = {
-      description = [[Debris - Morty]],
+      description = [[Debris - Moderator]],
       blocking    = false,
       category    = [[heaps]],
       damage      = 550,

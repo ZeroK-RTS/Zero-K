@@ -62,7 +62,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Wind Generator]],
+      description      = [[Wreckage - Wind/Tidal Generator]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 130,
@@ -83,7 +83,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Wind Generator]],
+      description      = [[Debris - Wind/Tidal Generator]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 130,

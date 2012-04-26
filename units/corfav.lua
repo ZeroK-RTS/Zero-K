@@ -121,7 +121,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Weasel]],
+      description      = [[Wreckage - Dart]],
       blocking         = false,
       category         = [[corpses]],
       damage           = 120,
@@ -142,7 +142,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Weasel]],
+      description      = [[Debris - Dart]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 120,
@@ -163,7 +163,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Weasel]],
+      description      = [[Debris - Dart]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 120,

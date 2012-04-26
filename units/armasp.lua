@@ -53,7 +53,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Air Repair Pad]],
+      description      = [[Wreckage - Air Repair/Rearm Pad]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 1860,
@@ -73,7 +73,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Air Repair Pad]],
+      description      = [[Debris - Air Repair/Rearm Pad]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 1860,

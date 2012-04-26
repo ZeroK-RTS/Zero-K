@@ -134,7 +134,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Instigator]],
+      description      = [[Wreckage - Scorcher]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 420,
@@ -155,7 +155,7 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Instigator]],
+      description      = [[Debris - Scorcher]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 420,
@@ -176,7 +176,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Instigator]],
+      description      = [[Debris - Scorcher]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 420,

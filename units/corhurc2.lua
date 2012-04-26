@@ -169,7 +169,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Firestorm]],
+      description      = [[Wreckage - Phoenix]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 660,
@@ -189,7 +189,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Firestorm]],
+      description      = [[Debris - Phoenix]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 660,

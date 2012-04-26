@@ -116,7 +116,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Necro]],
+      description      = [[Wreckage - Convict]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 650,
@@ -137,7 +137,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Necro]],
+      description      = [[Debris - Convict]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 650,
