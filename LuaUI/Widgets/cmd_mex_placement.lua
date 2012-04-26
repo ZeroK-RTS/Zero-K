@@ -413,6 +413,7 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 end
 
 local function Initialize() 
+
 	local units = spGetAllUnits()
 	for i, unitID in ipairs(units) do 
 		local unitDefID = spGetUnitDefID(unitID)
@@ -425,7 +426,10 @@ local function Initialize()
 		end
 	end
 	if WG.metalSpots then
+		Spring.Echo("Mex Placement Initialised with " .. #WG.metalSpots .. " spots.")
 		updateMexDrawList()
+	else
+		Spring.Echo("Mex Placement Initialised with metal map mode.")
 	end
 end
 
@@ -433,7 +437,7 @@ local mexSpotToDraw = false
 local drawMexSpots = false
 
 function widget:Update()
-	if not wasSpectating and spGetSpectatingState() then
+	if WG.metalSpots and (not wasSpectating) and spGetSpectatingState() then
 		spotByID = {}
 		spotData = {}
 		wasSpectating = true

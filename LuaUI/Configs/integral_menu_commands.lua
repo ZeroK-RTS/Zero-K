@@ -220,6 +220,7 @@ local overrides = {
 	[CMD_DISEMBARK] = {text = ' ', texture = imageDir .. 'Bold/disembark.png'},
 	
 	[CMD_ONECLICK_WEAPON] = {texture = imageDir .. 'Bold/action.png'},
+	[CMD_UNIT_SET_TARGET] = {texture = imageDir .. 'Bold/action.png'},
 	
 	[CMD_ABANDON_PW] = {text= '', texture = 'LuaUI/Images/Crystal_Clear_action_flag_white.png'},
 	
@@ -301,6 +302,8 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	embark=1,
 	disembark=1,
 	oneclickwep=1,
+	settarget=1,
+	canceltarget=1,
 	setferry=1, 
 	radialmenu=1,
 	
