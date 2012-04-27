@@ -204,6 +204,22 @@ local function SanitiseSpots(spots)
 	return spots
 end
 
+local function makeString(group)
+	if group then
+		local ret = ""
+		for i, v in pairs(group.left) do
+			ret = ret .. i .. v
+		end
+		ret = ret .. " "
+		for i, v in pairs(group.right) do
+			ret = ret .. i .. v
+		end
+		ret = ret .. " " .. group.minZ .. " " .. group.maxZ .. " " .. group.worth
+		return ret
+	else
+		return ""
+	end
+end
 
 function GetSpots()
 	
@@ -263,7 +279,7 @@ function GetSpots()
 						end
 						assignedTo.maxZ = z
 						assignedTo.worth = assignedTo.worth + matchGroup.worth
-						uniqueGroups[matchGroup] = nil
+						uniqueGroups[makeString(matchGroup)] = nil
 					end
 				else
 					assignedTo = matchGroup
@@ -292,7 +308,7 @@ function GetSpots()
 					worth = worth
 				}
 			stripGroup[nStrips] = newGroup
-			uniqueGroups[newGroup] = true
+			uniqueGroups[makeString(newGroup)] = newGroup
 		end
 	end
 	
@@ -324,8 +340,7 @@ function GetSpots()
 	end
 	
 	-- Final processing
-	for g, _ in pairs(uniqueGroups) do
-		
+	for _, g in pairs(uniqueGroups) do
 		local d = {}
 		
 		local gMinX, gMaxX = huge, -1
