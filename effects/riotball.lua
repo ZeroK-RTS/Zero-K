@@ -2,12 +2,12 @@ return {
   ["riotball"] = {
     usedefaultexplosions = false,
     groundflash = {
-      alwaysvisible      = true,
+      alwaysvisible      = false,
       circlealpha        = 0.4,
-      circlegrowth       = 7,
-      flashalpha         = 0.2,
-      flashsize          = 300,
-      ttl                = 45,
+      circlegrowth       = 3.6,
+      flashalpha         = 0.4,
+      flashsize          = 150,
+      ttl                = 90,
       color = {
         [1]  = 0.3,
         [2]  = 0,

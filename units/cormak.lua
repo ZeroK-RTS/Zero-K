@@ -115,6 +115,11 @@ unitDef = {
         planes  = 75,
         subs    = 5,
       },
+	  
+	  customParams           = {
+	    lups_explodespeed = 0.3,
+		lups_explodelife = 1.15,
+	  },
 
       edgeeffectiveness       = 0.95,
       explosionGenerator      = [[custom:riotball]],
