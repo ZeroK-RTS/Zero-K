@@ -125,6 +125,7 @@ local function Walk()
 end
 
 function script.Create()
+	--Move( emit, y_axis, 20)
 	StartThread(SmokeUnit)
 end
 
