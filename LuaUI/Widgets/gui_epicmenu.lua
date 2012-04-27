@@ -914,7 +914,9 @@ local function IntegrateWidget(w, addoptions, index)
 			end
 		end
 		w.options[k].__newindex = function(t, key, val)
-			if key == 'value' then
+			-- For some reason this is called twice per click with the same parameters for most options
+			-- a few rare options have val = nil for their second call which resets the option.
+			if key == 'value' and val ~= nil then
 				--echo ('set val', wname, k, key, val)
 				t.priv_value = val
 				
