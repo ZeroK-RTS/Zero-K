@@ -1050,9 +1050,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 		ColorTabs()
 		return thingsDone 
 	elseif menuChoice == 6 and not options.disableunitshotkeys.value and selectedFac then
-		Spring.Echo("bla")
-		Spring.Echo(options.disableunitshotkeys.value)
-		Spring.Echo("bla")
 		local pos = gridKeyMap[key]
 		if pos and pos[1] ~= 3 and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
 			local cmdid = sp_commands[pos[1]].children[pos[2]]
