@@ -57,6 +57,7 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
+	  [[custom:RIOTBALL]],
       [[custom:RAIDMUZZLE]],
       [[custom:LEVLRMUZZLE]],
       [[custom:RIOT_SHELL_L]],
@@ -122,7 +123,7 @@ unitDef = {
 	  },
 
       edgeeffectiveness       = 0.95,
-      explosionGenerator      = [[custom:riotball]],
+      explosionGenerator      = [[custom:NONE]],
       explosionSpeed          = 3,
       impulseBoost            = 0,
       impulseFactor           = 0,

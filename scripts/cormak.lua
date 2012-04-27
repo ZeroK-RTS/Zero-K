@@ -148,7 +148,8 @@ function AutoAttack_Thread()
 				frame = spGetGameFrame()+RELOAD_FRAMES
 			end
 			spSetUnitWeaponState(unitID,2,{reloadFrame = frame})
-			EmitSfx( emit,  4097 )
+			EmitSfx( emit,  UNIT_SFX1 )
+			EmitSfx( emit,  DETO_W2 )
 		end
 	end
 end
@@ -171,7 +172,8 @@ end
 
 function script.FireWeapon(num)
 	if num == 3 then
-		EmitSfx( emit,  4097 )
+		EmitSfx( emit,  UNIT_SFX1 )
+		EmitSfx( emit,  DETO_W2 )
 	end
 end
 
