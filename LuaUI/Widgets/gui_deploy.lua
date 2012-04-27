@@ -11,7 +11,7 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+--[[
 if (Spring.GetModOptions().zkmode~="deploy") then
   return false --//remove widget quietly
 end
@@ -24,7 +24,7 @@ function widget:GetInfo()
     date      = "May 02, 2007",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
@@ -529,7 +529,7 @@ function DrawScreen(teamID,  f, mf,  u, mu,  m, mm,  e, me)
 
   DrawReadyTeams()
 end
-
+--]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
