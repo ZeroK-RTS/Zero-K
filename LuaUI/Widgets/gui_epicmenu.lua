@@ -893,8 +893,6 @@ local function IntegrateWidget(w, addoptions, index)
 		
 		local path = option.path or defaultpath
 		
-		------testing
-		--[[
 		local value = w.options[k].value
 		w.options[k].value = nil
 		w.options[k].priv_value = value
@@ -926,8 +924,6 @@ local function IntegrateWidget(w, addoptions, index)
 				
 			end
 		end
-		--]]
-		
 		
 		if addoptions then
 			AddOption(path, option, wname )
