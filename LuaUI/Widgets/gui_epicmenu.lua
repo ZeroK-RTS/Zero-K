@@ -893,6 +893,8 @@ local function IntegrateWidget(w, addoptions, index)
 		
 		local path = option.path or defaultpath
 		
+		------testing
+		--[[
 		local value = w.options[k].value
 		w.options[k].value = nil
 		w.options[k].priv_value = value
@@ -914,9 +916,7 @@ local function IntegrateWidget(w, addoptions, index)
 			end
 		end
 		w.options[k].__newindex = function(t, key, val)
-			-- For some reason this is called twice per click with the same parameters for most options
-			-- a few rare options have val = nil for their second call which resets the option.
-			if key == 'value' and val ~= nil then
+			if key == 'value' then
 				--echo ('set val', wname, k, key, val)
 				t.priv_value = val
 				
@@ -926,6 +926,8 @@ local function IntegrateWidget(w, addoptions, index)
 				
 			end
 		end
+		--]]
+		
 		
 		if addoptions then
 			AddOption(path, option, wname )
