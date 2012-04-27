@@ -89,7 +89,6 @@ end
 function gadget:Initialize()
 	Spring.Echo("Mex Spot Finder Initialising")
 	local metalSpots = GetSpots()
-	local metalSpotsByPos = GetSpotsByPos(metalSpots)
 	
 	if #metalSpots < 3 then
 		Spring.Echo("Indiscrete metal map detected")
@@ -108,14 +107,16 @@ function gadget:Initialize()
 				if metalValueOverride then
 					spot.metal = metalValueOverride
 				end
+				spot.metal = spot.metal*mult
 				i = i + 1
 			else
-				spot.metal = spot.metal*mult
 				metalSpots[i] = metalSpots[#metalSpots]
 				metalSpots[#metalSpots] = nil
 			end
 		end
 	end
+	
+	local metalSpotsByPos = GetSpotsByPos(metalSpots)
 	
 	GG.metalSpots = metalSpots
 	GG.metalSpotsByPos = metalSpotsByPos
