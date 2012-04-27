@@ -332,6 +332,7 @@ function widget:Update()
 			Spring.SendCommands('toggleradarandjammer')
 		end
 		recentlyInitialized = false
+		widgetHandler:RemoveCallIn("Update")
 	end
 end
 
