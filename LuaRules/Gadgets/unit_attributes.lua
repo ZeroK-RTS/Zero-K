@@ -42,6 +42,11 @@ if not GG.attUnits then
 	GG.attUnits = {}
 end
 
+if not GG.att_reload then
+	GG.att_reload = {}
+end
+
+
 local function updateBuildSpeed(unitID, ud, speedFactor)	
 
     if ud.buildSpeed == 0 then
@@ -211,7 +216,9 @@ function GG.UpdateUnitAttributes(unitID, frame)
 		local buildMult  = (1-(slowState or 0))
 		local moveMult   = (1-(slowState or 0))*(selfMoveSpeedChange or 1)
 		local reloadMult = (1-(slowState or 0))*(selfReloadSpeedChange or 1)
-
+	
+		GG.att_reload[unitID] = reloadMult
+	
 		updateReloadSpeed(unitID, ud, reloadMult, frame)
 		updateMovementSpeed(unitID,ud, moveMult)
 		updateBuildSpeed(unitID, ud, buildMult)

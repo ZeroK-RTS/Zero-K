@@ -128,30 +128,37 @@ function script.Create()
 	StartThread(SmokeUnit)
 end
 
-local AutoAttack = nil
+local spGetUnitWeaponState = Spring.GetUnitWeaponState
+local spSetUnitWeaponState = Spring.SetUnitWeaponState
+local spGetGameFrame = Spring.GetGameFrame
+local RELOAD_FRAMES = 27
+
 function AutoAttack_Thread()
-  while true do
-    Sleep(1000)
-    local x, y, z = Spring.GetUnitPosition(unitID)
-    if AutoAttack then
-      Spring.GiveOrderToUnit(unitID, 34923, {x, y, z}, {})
-    else
-      Spring.GiveOrderToUnit(unitID, 34924, {x, y, z}, {})
-    end
-  end
+	Signal(SIG_ACTIVATE)
+	SetSignalMask(SIG_ACTIVATE)
+	while true do
+		Sleep(100)
+		local reloaded = select(2,spGetUnitWeaponState(unitID,2))
+		if reloaded then
+			local frame
+			local reloadMult = GG.att_reload[unitID]
+			if reloadMult then
+				frame = spGetGameFrame()+RELOAD_FRAMES/reloadMult
+			else
+				frame = spGetGameFrame()+RELOAD_FRAMES
+			end
+			spSetUnitWeaponState(unitID,2,{reloadFrame = frame})
+			EmitSfx( emit,  4097 )
+		end
+	end
 end
 
 function script.Activate()
-  if AutoAttack == nil then
-    AutoAttack = true
-    StartThread(AutoAttack_Thread)
-  else
-    AutoAttack = true
-  end
+  StartThread(AutoAttack_Thread)
 end
 
 function script.Deactivate()
-  AutoAttack = false
+  Signal(SIG_ACTIVATE)
 end
 
 function script.StartMoving()
