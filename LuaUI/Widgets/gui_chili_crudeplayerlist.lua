@@ -169,12 +169,16 @@ options = {
 --------------------------------------------------------------------------------
 
 function WG.crudeplayerlist_recolor_players()
-	for i = 1, #teams do
-		if teams[i] and teams[i].roster then
-			for j = 1, #teams[i].roster do
-				if teams[i].roster[j].nameLabel then
-					local entity = teams[i].roster[j].nameLabel
-					entity:SetCaption(Chili.color2incolor({Spring.GetTeamColor(i)} or {1,1,1,1}) .. entity.realText)
+	if teams then
+		for i = 1, #teams do
+			if teams[i] and teams[i].roster then
+				for j = 1, #teams[i].roster do
+					if teams[i].roster[j] and teams[i].roster[j].nameLabel then
+						local entity = teams[i].roster[j].nameLabel
+						if Chili and Chili.color2incolor then
+							entity:SetCaption(Chili.color2incolor({Spring.GetTeamColor(i)} or {1,1,1,1}) .. (entity.realText or ""))
+						end
+					end
 				end
 			end
 		end
