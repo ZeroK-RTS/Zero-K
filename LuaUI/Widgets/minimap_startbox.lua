@@ -386,6 +386,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local mapX = Game.mapSizeX
+local mapZ = Game.mapSizeZ
+local mapXinv = 1/mapX
+local mapZinv = 1/mapZ
+local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
+
 function widget:DrawInMiniMap(sx, sz)
   -- only show at the beginning
   if (Spring.GetGameFrame() > 1) then
@@ -426,9 +432,12 @@ function widget:DrawInMiniMap(sx, sz)
     end
   end
 
-  gl.PushAttrib(GL_HINT_BIT)
-  gl.Smoothing(true) --enable point smoothing
-
+  gl.LineWidth(3)
+	gl.LoadIdentity()
+	gl.Translate(0,1,0)
+	gl.Scale(mapXinv , -mapZinv, 1)
+	gl.Rotate(270,1,0,0)
+  
   -- show the team start positions
   for _, teamID in ipairs(Spring.GetTeamList()) do
     local _,leader = Spring.GetTeamInfo(teamID)
@@ -440,19 +449,14 @@ function widget:DrawInMiniMap(sx, sz)
         local r, g, b = color[1], color[2], color[3]
         local time = Spring.DiffTimers(Spring.GetTimer(), startTimer)
         local i = 2 * math.abs(((time * 3) % 1) - 0.5)
-        -- FIXME ATIBUG gl.PointSize(11)
         gl.Color(i, i, i)
-        gl.BeginEnd(GL.POINTS, gl.Vertex, x, z)
-        -- FIXME ATIBUG gl.PointSize(7.5)
+		gl.DrawGroundCircle(x,0,z, MINIMAP_DRAW_SIZE*1.2,32)
         gl.Color(r, g, b)
-        gl.BeginEnd(GL.POINTS, gl.Vertex, x, z)
+		gl.DrawGroundCircle(x,0,z, MINIMAP_DRAW_SIZE*0.7,32)
       end
     end
   end
-
   gl.LineWidth(1.0)
-  -- FIXME ATIBUG gl.PointSize(1.0)
-  gl.PopAttrib() --reset point smoothing
   gl.PopMatrix()
 end
 
