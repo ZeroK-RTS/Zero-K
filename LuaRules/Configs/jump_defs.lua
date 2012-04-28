@@ -51,7 +51,7 @@ jumpClassGroups = {
 	"armaak",
 	"corclog",
 	"corsumo",
-	"cadenza",
+	--"cadenza",
 	"factoryjump",
 	-- "pizzathehut",--bad unit left for testing purposes
 	},
