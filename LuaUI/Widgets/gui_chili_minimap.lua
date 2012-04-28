@@ -324,7 +324,9 @@ end
 
 function widget:Update()
 	if recentlyInitialized then
-		options.simpleteamcolors.OnChange(options.simpleteamcolors)
+		if (options.simpleteamcolors.value and not WG.usingSimpleTeamColors) or (not options.simpleteamcolors.value and WG.usingSimpleTeamColors) then
+			toggleTeamColors()
+		end
 		if options.startwithlos.value then
 			Spring.SendCommands('togglelos')
 		end

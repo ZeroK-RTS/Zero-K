@@ -1189,7 +1189,7 @@ MakeSubWindow = function(path)
 			end
 			
 		elseif option.type == 'label' then	
-			tree_children[#tree_children+1] = Label:New{ caption = option.value or option.name, textColor = color.sub_header, }
+			tree_children[#tree_children+1] = Label:New{ caption = option.priv_value or option.name, textColor = color.sub_header, }
 			
 		elseif option.type == 'text' then	
 			tree_children[#tree_children+1] = 
@@ -1208,7 +1208,7 @@ MakeSubWindow = function(path)
 				x=0,
 				right = 35,
 				caption = option.name, 
-				checked = option.value or false, 
+				checked = option.priv_value or false, 
 				
 				OnMouseUp = { option.OnChange, }, 
 				textColor = color.sub_fg, 
@@ -1226,7 +1226,7 @@ MakeSubWindow = function(path)
 				Trackbar:New{ 
 					width = "100%",
 					caption = option.name, 
-					value = option.value, 
+					value = option.priv_value, 
 					trackColor = color.sub_fg, 
 					min=option.min or 0, 
 					max=option.max or 100, 
@@ -1258,7 +1258,7 @@ MakeSubWindow = function(path)
 					width = "100%",
 					height = B_HEIGHT*2,
 					tooltip=option.desc,
-					color = option.value or {1,1,1,1},
+					color = option.priv_value or {1,1,1,1},
 					OnMouseUp = { option.OnChange, },
 				}
 				
