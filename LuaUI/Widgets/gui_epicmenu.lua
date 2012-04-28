@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.30 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.301 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -77,6 +77,7 @@ local init = false
 local myCountry = 'wut'
 
 local pathoptions = {}	
+local alloptions = {}	
 local pathorders = {}
 
 local exitWindowVisible = false
@@ -631,7 +632,7 @@ local function UnassignKeyBind(path, option)
 		Spring.SendCommands("unbindaction " .. actionName:lower()) -- this only works if lowercased, even if /keyprint says otherwise!
 	end
 	
-	settings.keybounditems[actionName] = nil
+	settings.keybounditems[actionName] = 'none'
 end
 
 
@@ -785,11 +786,6 @@ local function AddOption(path, option, wname )
 		origOnChange(option)
 	end
 	
-	pathoptions[path][wname..option.key] = option
-	local temp = #(pathorders[path])
-	pathorders[path][temp+1] = wname..option.key
-	
-	
 	--Keybindings
 	if option.type == 'button' or option.type == 'bool' then
 		local actionName = GetActionName(path, option)
@@ -797,14 +793,27 @@ local function AddOption(path, option, wname )
 		local uikey_hotkey_str = GetUikeyHotkeyStr(actionName)
 		local uikey_hotkey = uikey_hotkey_str and HotkeyFromUikey(uikey_hotkey_str)
 		
+		if option.hotkey then
+		  local orig_hotkey = {}
+		  CopyTable(orig_hotkey, option.hotkey)
+		  option.orig_hotkey = orig_hotkey
+		end
+		
 		local hotkey = settings.keybounditems[actionName] or option.hotkey or uikey_hotkey
-		if hotkey then
+		if hotkey and hotkey ~= 'none' then
 			if uikey_hotkey then
 				UnassignKeyBind(path, option)
 			end
 			AssignKeyBind(hotkey, path, option, false)
 		end
+		
 	end
+	
+	pathoptions[path][wname..option.key] = option
+	alloptions[path..wname..option.key] = option
+	local temp = #(pathorders[path])
+	pathorders[path][temp+1] = wname..option.key
+	
 	
 end
 
@@ -821,6 +830,7 @@ local function RemOption(path, option, wname )
 		end
 	end
 	pathoptions[path][wname..option.key] = nil
+	alloptions[path..wname..option.key] = nil
 end
 
 
@@ -892,41 +902,51 @@ local function IntegrateWidget(w, addoptions, index)
 		end
 		
 		local path = option.path or defaultpath
-		
+		-- [[
 		local value = w.options[k].value
 		w.options[k].value = nil
 		w.options[k].priv_value = value
-		setmetatable( w.options[k], w.options[k] )
-		w.options[k].__index = function(t, key)
-			if key == 'value' then
-				if(
-					not wname:find('Chili Chat')
-					and not wname:find('Combo Overhead')
-					and not wname:find('Selections')
-					and not wname:find('Auto Group')
-					and not wname:find('Resource Bars')
-					and not wname:find('Crude Player')
-					and not wname:find('Docking')
-					) then
-					--echo ('get val', wname, k, key, t.priv_value)
-				end
-				return t.priv_value
-			end
-		end
-		w.options[k].__newindex = function(t, key, val)
-			-- For some reason this is called twice per click with the same parameters for most options
-			-- a few rare options have val = nil for their second call which resets the option.
-			if key == 'value' and val ~= nil then
-				--echo ('set val', wname, k, key, val)
-				t.priv_value = val
-				
-				local fullkey = GetFullKey(path, option)
-				fullkey = fullkey:gsub(' ', '_')
-				settings.config[fullkey] = option.value
-				
-			end
-		end
 		
+		
+		--setmetatable( w.options[k], temp )
+		local temp = w.options[k]
+		w.options[k] = {}
+		local mt = {
+		  __index = function(t, key)
+			  if key == 'value' then
+				  if(
+					  not wname:find('Chili Chat')
+					  ) then
+					  --echo ('get val', wname, k, key, t.priv_value)
+				  end
+				  --return t.priv_value
+				  return temp.priv_value
+			  else
+				  return temp[key]
+			  end
+		  end,
+		  
+		  __newindex = function(t, key, val)
+			  -- For some reason this is called twice per click with the same parameters for most options
+			  -- a few rare options have val = nil for their second call which resets the option.
+			  
+			  if key == 'value' then
+				  if val ~= nil then
+				    --echo ('set val', wname, k, key, val)
+				    temp.priv_value = val
+				    
+				    local fullkey = GetFullKey(path, option)
+				    fullkey = fullkey:gsub(' ', '_')
+				    settings.config[fullkey] = option.value
+				  end
+			  else
+				  temp[key] = val
+			  end
+			  
+		  end
+		}
+		setmetatable( w.options[k], mt )
+		--]]
 		if addoptions then
 			AddOption(path, option, wname )
 		else
@@ -1001,7 +1021,9 @@ end
 
 WG.crude.GetHotkey = function(actionName)
 	local hotkey = settings.keybounditems[actionName]
-	if not hotkey then return '' end
+	if not hotkey or hotkey == 'none' then
+	  return ''
+	end
 	return GetReadableHotkeyMod(hotkey.mod) .. CapCase(hotkey.key)
 end
 
@@ -1026,7 +1048,7 @@ end
 local function GetHotkeyData(path, option)
 	local actionName = GetActionName(path, option)
 	local hotkey = settings.keybounditems[actionName]
-	if hotkey then
+	if hotkey and hotkey ~= 'none' then
 		return hotkey, GetReadableHotkeyMod(hotkey.mod) .. CapCase(hotkey.key)
 	end
 	
@@ -1726,9 +1748,16 @@ function widget:Initialize()
 			local actionNameL = actionName
 			Spring.SendCommands({"unbindaction " .. actionNameL})
 		end
+		
 		settings.keybounditems = {}
 		
-		echo 'Cleared all hotkeys.'
+		for _,option in pairs(alloptions) do
+		    if option.orig_hotkey then
+			  AssignKeyBind(option.orig_hotkey, option.path, option, false)
+		    end
+		end
+		
+		echo 'Reset all hotkeys to default.'
 	end
 	
 	-- Add actions for keybinds
