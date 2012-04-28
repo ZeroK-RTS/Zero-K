@@ -553,6 +553,7 @@ local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetUnitLosState 	= Spring.GetUnitLosState
 local spValidUnitID 		= Spring.ValidUnitID
 local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID 	
+local spGetModKeyState      = Spring.GetModKeyState
 
 local myTeam = spGetMyAllyTeamID()
 
@@ -574,10 +575,10 @@ function gadget:DrawWorld()
 		gl.LineWidth(2)
         gl.LineStipple('')
 		local tele = SYNCED.tele
-	
+		local alt,ctrl,meta,shift = spGetModKeyState()
 		for tid, data in spairs(tele) do
 			local bid = data.link
-			if spValidUnitID(tid) and spValidUnitID(bid) and (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid)) then
+			if spValidUnitID(tid) and spValidUnitID(bid) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
 				
 				gl.Color(0.1, 0.3, 1, 0.9)
 				gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)

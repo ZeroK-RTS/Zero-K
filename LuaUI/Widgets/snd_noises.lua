@@ -111,6 +111,21 @@ function widget:SelectionChanged(selection)
 	end
 end
 
+function WG.sounds_gaveOrderToUnit(unitID, isBuild)
+	if unitID then
+		local unitDefID = GetUnitDefID(unitID)
+		local unitName = UnitDefs[unitDefID].name
+		local sounds = soundTable[unitName] or soundTable[default]
+		if not isBuild then
+			if (sounds and sounds.ok) then
+				CoolNoisePlay(sounds.ok[1], 0.5, sounds.ok.volume)
+			end
+		elseif (sounds and sounds.build) then
+			CoolNoisePlay(sounds.build, 0.5)
+		end
+	end
+end
+
 function widget:CommandNotify(cmdID)
 	local unitID = GetSelectedUnits()[1]
 	if (not unitID) then

@@ -198,7 +198,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		spInsertUnitCmdDesc(unitID, dontFireAtRadarCmdDesc)
 		canHandleUnit[unitID] = true
 		
-		DontFireAtRadarToggleCommand(unitID, {0})
+		DontFireAtRadarToggleCommand(unitID, {1})
 	end
 end
 

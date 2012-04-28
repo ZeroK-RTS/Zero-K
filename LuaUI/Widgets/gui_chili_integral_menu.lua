@@ -1088,6 +1088,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 								opts = opts + CMD.OPT_SHIFT
 							end
 							Spring.GiveOrderToUnit(selectedFac, cmdid, {0}, opts)
+							if WG.sounds_gaveOrderToUnit then
+								WG.sounds_gaveOrderToUnit(selectedFac, true)
+							end
 							-- does not work with meta held
 							--Spring.SetActiveCommand(index,1,true,false,alt,false,false,shift)
 							return true

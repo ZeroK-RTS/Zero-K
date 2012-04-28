@@ -326,14 +326,14 @@ local function addUnit(defName, path)
     end
     
 	if dontFireAtRadarUnits[ud.id] then
-		options[defName .. "_dont_fire_at_radar"] = {
-            name = "  Don't fire at radar",
-            desc = "Check box to turn it on",
+		options[defName .. "_fire_at_radar"] = {
+            name = "  Fire at radar",
+            desc = "Check box to make these units fire at radar. All other units fire at radar but these have the option not to.",
             type = 'bool',
-            value = false,
+            value = true,
             path = path,
         }
-        options_order[#options_order+1] = defName .. "_dont_fire_at_radar"
+        options_order[#options_order+1] = defName .. "_fire_at_radar"
 	end
 	
     if ud.canCloak then
@@ -506,12 +506,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                 Spring.GiveOrderToUnit(unitID, CMD_UNIT_AI, {options[name .. "_tactical_ai"].value and 1 or 0}, {"shift"})
             end
             
-			if options[name .. "_dont_fire_at_radar"] and options[name .. "_dont_fire_at_radar"].value ~= nil then
+			if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
 				Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
 			end
 			
-            if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
-                Spring.GiveOrderToUnit(unitID, CMD_DONT_FIRE_AT_RADAR, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
+            if options[name .. "_fire_at_radar"] and options[name .. "_fire_at_radar"].value ~= nil then
+                Spring.GiveOrderToUnit(unitID, CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"})
             end
             
         end
