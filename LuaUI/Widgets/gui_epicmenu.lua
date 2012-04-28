@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.301 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.302 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02",
     license   = "GNU GPL, v2 or later",
@@ -797,6 +797,7 @@ local function AddOption(path, option, wname )
 		  local orig_hotkey = {}
 		  CopyTable(orig_hotkey, option.hotkey)
 		  option.orig_hotkey = orig_hotkey
+		  echo(option.key, option.orig_hotkey.key)
 		end
 		
 		local hotkey = settings.keybounditems[actionName] or option.hotkey or uikey_hotkey
@@ -902,6 +903,8 @@ local function IntegrateWidget(w, addoptions, index)
 		end
 		
 		local path = option.path or defaultpath
+		
+		
 		-- [[
 		local value = w.options[k].value
 		w.options[k].value = nil
@@ -909,43 +912,40 @@ local function IntegrateWidget(w, addoptions, index)
 		
 		
 		--setmetatable( w.options[k], temp )
-		local temp = w.options[k]
-		w.options[k] = {}
-		local mt = {
-		  __index = function(t, key)
-			  if key == 'value' then
-				  if(
-					  not wname:find('Chili Chat')
-					  ) then
-					  --echo ('get val', wname, k, key, t.priv_value)
-				  end
-				  --return t.priv_value
-				  return temp.priv_value
-			  else
-				  return temp[key]
-			  end
-		  end,
-		  
-		  __newindex = function(t, key, val)
-			  -- For some reason this is called twice per click with the same parameters for most options
-			  -- a few rare options have val = nil for their second call which resets the option.
-			  
-			  if key == 'value' then
-				  if val ~= nil then
-				    --echo ('set val', wname, k, key, val)
-				    temp.priv_value = val
-				    
-				    local fullkey = GetFullKey(path, option)
-				    fullkey = fullkey:gsub(' ', '_')
-				    settings.config[fullkey] = option.value
-				  end
-			  else
-				  temp[key] = val
-			  end
-			  
-		  end
-		}
-		setmetatable( w.options[k], mt )
+		--local temp = w.options[k]
+		--w.options[k] = {}
+		w.options[k].__index = function(t, key)
+			if key == 'value' then
+				if(
+					not wname:find('Chili Chat')
+					) then
+					--echo ('get val', wname, k, key, t.priv_value)
+				end
+				--return t.priv_value
+				return t.priv_value
+			end
+		end
+		
+		w.options[k].__newindex = function(t, key, val)
+			-- For some reason this is called twice per click with the same parameters for most options
+			-- a few rare options have val = nil for their second call which resets the option.
+			
+			if key == 'value' then
+				if val ~= nil then -- maybe this isn't needed
+				  --echo ('set val', wname, k, key, val)
+				  t.priv_value = val
+				  
+				  local fullkey = GetFullKey(path, option)
+				  fullkey = fullkey:gsub(' ', '_')
+				  settings.config[fullkey] = option.value
+				end
+			else
+			  rawset(t,key,val)
+			end
+			
+		end
+		
+		setmetatable( w.options[k], w.options[k] )
 		--]]
 		if addoptions then
 			AddOption(path, option, wname )
@@ -1189,7 +1189,7 @@ MakeSubWindow = function(path)
 			end
 			
 		elseif option.type == 'label' then	
-			tree_children[#tree_children+1] = Label:New{ caption = option.priv_value or option.name, textColor = color.sub_header, }
+			tree_children[#tree_children+1] = Label:New{ caption = option.value or option.name, textColor = color.sub_header, }
 			
 		elseif option.type == 'text' then	
 			tree_children[#tree_children+1] = 
@@ -1208,7 +1208,7 @@ MakeSubWindow = function(path)
 				x=0,
 				right = 35,
 				caption = option.name, 
-				checked = option.priv_value or false, 
+				checked = option.value or false, 
 				
 				OnMouseUp = { option.OnChange, }, 
 				textColor = color.sub_fg, 
@@ -1226,7 +1226,7 @@ MakeSubWindow = function(path)
 				Trackbar:New{ 
 					width = "100%",
 					caption = option.name, 
-					value = option.priv_value, 
+					value = option.value, 
 					trackColor = color.sub_fg, 
 					min=option.min or 0, 
 					max=option.max or 100, 
@@ -1258,7 +1258,7 @@ MakeSubWindow = function(path)
 					width = "100%",
 					height = B_HEIGHT*2,
 					tooltip=option.desc,
-					color = option.priv_value or {1,1,1,1},
+					color = option.value or {1,1,1,1},
 					OnMouseUp = { option.OnChange, },
 				}
 				
