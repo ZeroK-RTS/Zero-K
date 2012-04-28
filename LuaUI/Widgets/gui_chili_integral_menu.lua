@@ -52,7 +52,7 @@ NOTE FOR OTHER GAME DEVS:
 ------------------------
 ------------------------
 options_path = 'Settings/Interface/Integral Menu'
-options_order = { 'disablesmartselect', 'hidetabs', 'disableunitshotkeys', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
+options_order = { 'disablesmartselect', 'hidetabs', 'disableunitshotkeys', 'unitshotkeyrequiremeta', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
 options = {
 	disablesmartselect = {
 		name = 'Disable Smart Tab Select',
@@ -69,6 +69,11 @@ options = {
 		name = 'Disable Units Hotkeys',
 		type = 'bool',
 		value = false,
+	},
+	unitshotkeyrequiremeta = {
+		name = 'Units Hotkey Only With Meta',
+		type = 'bool',
+		value = true,
 	},
 	tab_factory = {
 		name = "Factory Tab",
@@ -337,7 +342,17 @@ local function MakeButton(container, cmd, insertItem, index)
 	
 	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 	
-	if gridHotkeyed and hotkeyMode or (not options.disableunitshotkeys.value and menuChoice == 6 and container.i_am_sp_commands) then
+	if (not options.disableunitshotkeys.value and menuChoice == 6 and selectedFac and container.i_am_sp_commands) then
+		if options.unitshotkeyrequiremeta.value then
+			local alt,ctrl,meta,shift = Spring.GetModKeyState()
+			if meta then
+				hotkey = gridMap[container.index][index] or ''
+			end
+		else
+			hotkey = gridMap[container.index][index] or ''
+		end
+	end
+	if gridHotkeyed and hotkeyMode then
 		hotkey = gridMap[container.index][index] or ''
 	end
 	
@@ -418,7 +433,7 @@ local function MakeButton(container, cmd, insertItem, index)
 		end
 		
 		local label 
-		if (not cmd.onlyTexture and text and text ~= '') or gridHotkeyed then 
+		if (not cmd.onlyTexture and text and text ~= '') or gridHotkeyed or menuChoice == 6 then 
 			label = Label:New {
 				width="100%";
 				height="100%";
@@ -1059,8 +1074,17 @@ function widget:KeyPress(key, modifier, isRepeat)
 					local index = Spring.GetCmdDescIndex(cmdid)
 					if index then
 						local alt,ctrl,meta,shift = Spring.GetModKeyState()
-						if not ctrl then -- don't mess up ctrl+key commands
-							Spring.SetActiveCommand(index,1,true,false,alt,false,false,shift)
+						if (meta or not options.unitshotkeyrequiremeta.value) and not ctrl then -- Requires space to be held
+							local opts = 0
+							if alt then
+								opts = opts + CMD.OPT_ALT
+							end
+							if shift then
+								opts = opts + CMD.OPT_SHIFT
+							end
+							Spring.GiveOrderToUnit(selectedFac, cmdid, {0}, opts)
+							-- does not work with meta held
+							--Spring.SetActiveCommand(index,1,true,false,alt,false,false,shift)
 							return true
 						end
 					end
@@ -1068,7 +1092,23 @@ function widget:KeyPress(key, modifier, isRepeat)
 			end
 		end
 	end
+
+	if key == KEYSYMS.SPACE and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value then
+		Update(true)
+	end
 end
+
+function widget:KeyRelease(key, modifier, isRepeat)
+	if key == KEYSYMS.SPACE and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value then
+		Update(true)
+	end
+end
+
+	--Spring.Echo(CMD.OPT_META) = 4
+	--Spring.Echo(CMD.OPT_RIGHT) = 16
+	--Spring.Echo(CMD.OPT_SHIFT) = 32
+	--Spring.Echo(CMD.OPT_CTRL) = 64
+	--Spring.Echo(CMD.OPT_ALT) = 128
 
 local function HotkeyTabFactory()
 	menuChoice = 2
