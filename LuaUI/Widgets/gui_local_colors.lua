@@ -104,6 +104,9 @@ function WG.localTeamColorToggle()
 		SetNewSimpleTeamColors() 
 		WG.usingSimpleTeamColors = true
 	end
+	if WG.crudeplayerlist_recolor_players then
+		WG.crudeplayerlist_recolor_players()
+	end
 end
 
 function widget:Initialize()

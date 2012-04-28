@@ -168,6 +168,22 @@ options = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function WG.crudeplayerlist_recolor_players()
+	for i = 1, #teams do
+		if teams[i] and teams[i].roster then
+			for j = 1, #teams[i].roster do
+				if teams[i].roster[j].nameLabel then
+					teams[i].roster[j].nameLabel.textColor = {Spring.GetTeamColor(i)} or {1,1,1,1}
+					--Spring.Echo(Spring.GetTeamColor(i))
+				end
+			end
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local function ShareUnits(playername, team)
 	local selcnt = Spring.GetSelectedUnitsCount()
 	if selcnt > 0 then
@@ -504,7 +520,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 		scroll_cpl:AddChild(
 			Button:New{
 				x=x_share,
-				y=(fontsize+1) * (row+0.5),
+				y=(fontsize+1) * (row+0.5)-2.5,
 				height = fontsize,
 				width = fontsize,
 				tooltip = 'Double click to share selected units to ' .. name,
@@ -713,10 +729,8 @@ SetupPlayerNames = function()
 	window_cpl:Invalidate()
 end
 
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 
 function widget:Shutdown()
 	Spring.SendCommands({"info 1"})
