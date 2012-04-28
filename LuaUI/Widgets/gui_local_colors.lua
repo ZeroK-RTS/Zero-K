@@ -10,10 +10,11 @@ function widget:GetInfo()
 	}
 end
 
-if VFS.FileExists("Luaui/Configs/ZKTeamColors.lua") then
-	colorCFG = VFS.Include("Luaui/Configs/ZKTeamColors.lua")
-elseif VFS.FileExists("Luaui/Configs/LocalColors.lua") then -- allow for user over ride
+if VFS.FileExists("Luaui/Configs/LocalColors.lua") then -- user override
 	colorCFG = VFS.Include("Luaui/Configs/LocalColors.lua")
+	Spring.Echo("Loaded local team color config.")
+elseif VFS.FileExists("Luaui/Configs/ZKTeamColors.lua") then
+	colorCFG = VFS.Include("Luaui/Configs/ZKTeamColors.lua")
 else
 	error("missing file: Luaui/Configs/LocalColors.lua")
 end
