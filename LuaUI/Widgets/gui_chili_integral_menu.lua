@@ -52,7 +52,7 @@ NOTE FOR OTHER GAME DEVS:
 ------------------------
 ------------------------
 options_path = 'Settings/Interface/Integral Menu'
-options_order = { 'disablesmartselect', 'hidetabs', 'disableunitshotkeys', 'unitshotkeyrequiremeta', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
+options_order = { 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special' }
 options = {
 	disablesmartselect = {
 		name = 'Disable Smart Tab Select',
@@ -65,15 +65,20 @@ options = {
 		advanced = true,
 		value = false,
 	},
-	disableunitshotkeys = {
-		name = 'Disable Units Hotkeys',
-		type = 'bool',
-		value = false,
-	},
-	unitshotkeyrequiremeta = {
-		name = 'Units Hotkey Only With Meta',
+	unitstabhotkey = {
+		name = 'Hotkey for Units tab',
 		type = 'bool',
 		value = true,
+	},
+	unitshotkeyrequiremeta = {
+		name = 'Units tab hotkeys require Meta',
+		type = 'bool',
+		value = true,
+	},
+	unitshotkeyaltaswell = {
+		name = 'Units tab can use Alt as Meta',
+		type = 'bool',
+		value = false,
 	},
 	tab_factory = {
 		name = "Factory Tab",
@@ -342,10 +347,10 @@ local function MakeButton(container, cmd, insertItem, index)
 	
 	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 	
-	if (not options.disableunitshotkeys.value and menuChoice == 6 and selectedFac and container.i_am_sp_commands) then
+	if (options.unitstabhotkey.value and menuChoice == 6 and selectedFac and container.i_am_sp_commands) then
 		if options.unitshotkeyrequiremeta.value then
 			local alt,ctrl,meta,shift = Spring.GetModKeyState()
-			if meta then
+			if meta or (alt and options.unitshotkeyaltaswell.value) then
 				hotkey = gridMap[container.index][index] or ''
 			end
 		else
@@ -1064,7 +1069,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		Update(true)
 		ColorTabs()
 		return thingsDone 
-	elseif menuChoice == 6 and not options.disableunitshotkeys.value and selectedFac then
+	elseif menuChoice == 6 and options.unitstabhotkey.value and selectedFac then
 		local pos = gridKeyMap[key]
 		if pos and pos[1] ~= 3 and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
 			local cmdid = sp_commands[pos[1]].children[pos[2]]
@@ -1074,7 +1079,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 					local index = Spring.GetCmdDescIndex(cmdid)
 					if index then
 						local alt,ctrl,meta,shift = Spring.GetModKeyState()
-						if (meta or not options.unitshotkeyrequiremeta.value) and not ctrl then -- Requires space to be held
+						if (meta or (alt and options.unitshotkeyaltaswell.value) or not options.unitshotkeyrequiremeta.value) and not ctrl then
 							local opts = 0
 							if alt then
 								opts = opts + CMD.OPT_ALT
@@ -1093,13 +1098,13 @@ function widget:KeyPress(key, modifier, isRepeat)
 		end
 	end
 
-	if key == KEYSYMS.SPACE and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value then
+	if (key == KEYSYMS.SPACE or ((key == KEYSYMS.RALT or key == KEYSYMS.LALT) and options.unitshotkeyaltaswell.value)) and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value  and options.unitstabhotkey.value then
 		Update(true)
 	end
 end
 
 function widget:KeyRelease(key, modifier, isRepeat)
-	if key == KEYSYMS.SPACE and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value then
+	if (key == KEYSYMS.SPACE or ((key == KEYSYMS.RALT or key == KEYSYMS.LALT) and options.unitshotkeyaltaswell.value)) and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value and options.unitstabhotkey.value then
 		Update(true)
 	end
 end
