@@ -173,8 +173,8 @@ function WG.crudeplayerlist_recolor_players()
 		if teams[i] and teams[i].roster then
 			for j = 1, #teams[i].roster do
 				if teams[i].roster[j].nameLabel then
-					teams[i].roster[j].nameLabel.textColor = {Spring.GetTeamColor(i)} or {1,1,1,1}
-					--Spring.Echo(Spring.GetTeamColor(i))
+					local entity = teams[i].roster[j].nameLabel
+					entity:SetCaption(Chili.color2incolor({Spring.GetTeamColor(i)} or {1,1,1,1}) .. entity.realText)
 				end
 			end
 		end
@@ -505,6 +505,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 		autosize=false,
 		--caption = (spectator and '' or ((teamID+1).. ') ') )  .. name, --do not remove, will add later as option
 		caption = name_out,
+		realText = name_out,
 		textColor = teamID and {Spring.GetTeamColor(teamID)} or {1,1,1,1},
 		fontsize = fontsize,
 		fontShadow = true,
