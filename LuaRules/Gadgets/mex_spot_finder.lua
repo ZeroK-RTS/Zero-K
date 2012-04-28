@@ -238,7 +238,7 @@ function GetSpots()
 	if mapConfig then
 		Spring.Echo("Loading mapside mex config")
 		loadConfig = true
-		spots = SanitiseSpots(mapConfig)
+		spots = SanitiseSpots(mapConfig.spots)
 		return spots
 	end
 	
