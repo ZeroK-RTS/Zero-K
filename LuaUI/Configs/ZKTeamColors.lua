@@ -4,8 +4,8 @@ colors = {
 	gaiaColor	= { 200, 200, 200 },	-- can only be 1 color
 	
 	allyColors = {						-- as many as needed
-	  { 020, 075, 255 },
 	  { 050, 200, 050 },
+	  { 020, 075, 255 },
 	  { 000, 140, 255 },
 	  
 	  { 120, 175, 50 },
