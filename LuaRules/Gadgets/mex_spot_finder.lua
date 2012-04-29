@@ -21,7 +21,7 @@ if (gadgetHandler:IsSyncedCode()) then
 ------------------------------------------------------------
 -- Config
 ------------------------------------------------------------
-local MAPSIDE_METALMAP = "map_metal_layout.lua"
+local MAPSIDE_METALMAP = "mapconfig/map_metal_layout.lua"
 local GAMESIDE_METALMAP = "LuaRules/Configs/MetalSpots/" .. (Game.mapName or "") .. ".lua"
 
 local DEFAULT_MEX_INCOME = 2
