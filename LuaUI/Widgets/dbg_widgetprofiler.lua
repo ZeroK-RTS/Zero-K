@@ -259,8 +259,8 @@ end
     end
 
     local deltaTime = Spring.DiffTimers(Spring.GetTimer(),startTimer)
-
     if (deltaTime>=tick) then
+      if (options.hideLowValues.value) then sortedList = {} end -- clear the list (prevents duplicates)
       startTimer = Spring.GetTimer()
 
       totalLoads = {}
@@ -286,10 +286,10 @@ end
         allOverTimeSec = allOverTimeSec + total
 
         local tLoad = loadAverages[wname]
+        allOverTime = allOverTime + tLoad
+        if (maximum<tLoad) then maximum=tLoad end
         if tLoad > 0.5 or not (options.hideLowValues.value) then 
                 sortedList[n] = {wname..'('..cmaxname..')',tLoad}
-                allOverTime = allOverTime + tLoad
-                if (maximum<tLoad) then maximum=tLoad end
                 n = n + 1
         end
       end
