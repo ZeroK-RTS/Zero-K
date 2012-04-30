@@ -24,6 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    cloakstealth   = [[1]],
     description_bp = [[Robô anti-ar]],
     description_es = [[Robot Antiaéreo]],
     description_fi = [[Ilmatorjuntarobotti]],
