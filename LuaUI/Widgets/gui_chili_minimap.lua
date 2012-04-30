@@ -28,6 +28,8 @@ local function toggleTeamColors()
 	if WG.localTeamColorToggle then
 		WG.localTeamColorToggle() 
 	end
+	options.simpleteamcolors.value = WG.usingSimpleTeamColors
+	Spring.Echo(options.simpleteamcolors.value)
 end 
 
 
