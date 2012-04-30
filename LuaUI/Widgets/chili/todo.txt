@@ -10,7 +10,6 @@
 - masks for HitTest (depending on linked textures-> alpha channel)
 - more different window controls -> background textures
 - use matrices for clientspace transformations
-- mousewheel support
 - theme & layout handler
 
 controls:

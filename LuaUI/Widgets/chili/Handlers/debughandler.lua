@@ -26,6 +26,9 @@ setmetatable(DebugHandler.objectsOwnedByWidgets, {
   __index=function(t,i)
     local st = {};
     setmetatable(st,{__mode="v"});
+    if (not i) then
+      Spring.Echo("WAAA",debug.traceback())
+    end
     t[i] = st;
     return st;
   end,
@@ -69,7 +72,7 @@ local function ChiliErrorHandler(msg,...)
         break
       end
       if (name == "self") then
-        if (true) then
+        if (value._widget ~= widget) then --// ignore controls owned by Chili Framework!
           control = value
         end
       end

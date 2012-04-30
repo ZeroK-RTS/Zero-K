@@ -81,6 +81,15 @@ end
 function Label:DrawControl()
   local font = self.font
   font:DrawInBox(self._caption,self.x,self.y,self.width,self.height,self.align,self.valign)
+
+  if (self.debug) then
+    gl.Color(0,1,0,0.5)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
+    gl.LineWidth(2)
+    gl.Rect(self.x,self.y,self.x+self.width,self.y+self.height)
+    gl.LineWidth(1)
+    gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+  end
 end
 
 --//=============================================================================

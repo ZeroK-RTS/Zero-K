@@ -228,6 +228,13 @@ function table:arrayshallowcopy()
   for i=1, #self do
     newArray[i] = self[i]
   end
+  return newTable
+end
+
+function table:arrayappend(t)
+  for i=1, #t do
+    self[#self+1] = t[i]
+  end
 end
 
 function table:arraymap(fun)
@@ -263,7 +270,7 @@ end
 function table:ifind(element)
   for i=1, #self do
     if self[i] == element then
-      return true
+      return i
     end
   end
   return false

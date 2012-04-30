@@ -13,6 +13,7 @@ Progressbar = Control:Inherit{
   caption   = "",
 
   color     = {0,0,1,1},
+  backgroundColor = {1,1,1,1},
 
   OnChange  = {},
 }
