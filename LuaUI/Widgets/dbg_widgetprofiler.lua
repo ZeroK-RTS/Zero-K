@@ -31,6 +31,19 @@ local inHook = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+options_path = 'Settings/Misc/Widget Profiler'
+options = {
+	hideLowValues = {
+                name = "Hide low values",
+		type = 'bool',
+		value = false,
+		desc = "Hide readings for widgets with <0.5% FPS cost",
+	},	
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local SCRIPT_DIR = Script.GetName() .. '/'
 
 local function IsHook(func)
@@ -273,10 +286,12 @@ end
         allOverTimeSec = allOverTimeSec + total
 
         local tLoad = loadAverages[wname]
-        sortedList[n] = {wname..'('..cmaxname..')',tLoad}
-        allOverTime = allOverTime + tLoad
-        if (maximum<tLoad) then maximum=tLoad end
-        n = n + 1
+        if tLoad > 0.5 or not (options.hideLowValues.value) then 
+                sortedList[n] = {wname..'('..cmaxname..')',tLoad}
+                allOverTime = allOverTime + tLoad
+                if (maximum<tLoad) then maximum=tLoad end
+                n = n + 1
+        end
       end
 
       table.sort(sortedList,SortFunc)

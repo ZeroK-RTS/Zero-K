@@ -1014,7 +1014,8 @@ function widget:Initialize()
 		tweakResizable = true,
 		--padding = {3, 3, 15, 3}
 		--color       = {Spring.GetTeamColor(Spring.GetLocalTeamID())};
-		minimumSize = {120, 40},
+		minWidth = 120,
+		minHeight = 40,
 	}
 	--[[
 	subwindow = ScrollPanel:New{

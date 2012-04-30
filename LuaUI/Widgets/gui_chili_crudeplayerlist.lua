@@ -724,7 +724,8 @@ SetupPlayerNames = function()
 	--push things to bottom of window if needed
 	--scroll_cpl.width = x_bound --window_cpl.width - window_cpl.padding[1] - window_cpl.padding[3]
 	local height = math.ceil(row * (fontsize+1.5) + 4)
-	--window_cpl.minimumSize = {x_bound, height}
+	--window_cpl.minWidth = x_bound
+	--window_cpl.minHeight = height
 	scroll_cpl.height = math.min(height, window_cpl.height)
 	if not (options.alignToTop.value) then 
 		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
@@ -830,7 +831,7 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
-		minimumSize = {x_bound, 1},
+		minWidth = x_bound,
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
@@ -840,7 +841,7 @@ function widget:Initialize()
 		end },
 	}
 	scroll_cpl = ScrollPanel:New{
-		parent = window_cpl,	
+		parent = window_cpl,
 		width = "100%",
 		--height = "100%",
 		backgroundColor  = {1,1,1,options.backgroundOpacity.value},

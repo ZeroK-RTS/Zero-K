@@ -872,7 +872,8 @@ function widget:Initialize()
 		tweakResizable = true,
 		resizable = false,
 		dragUseGrip = false,
-		--minimumSize = {300,64},
+		--minWidth = 300,
+		--minHeight = 64,
 		color = {0,0,0,0},
 		children = {
 			stack_main,
