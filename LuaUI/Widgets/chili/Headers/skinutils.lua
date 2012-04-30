@@ -387,6 +387,7 @@ function DrawScrollPanelBorder(self)
 
   
   gl.Color(self.backgroundColor)
+  --gl.Color(1,1,1,1)
 
   do
       TextureHandler.LoadTexture(0,self.BorderTileImage,self)
@@ -417,6 +418,7 @@ function DrawScrollPanel(obj)
   local contX,contY,contWidth,contHeight = unpack4(obj.contentArea)
 
   gl.Color(obj.backgroundColor)
+  --gl.Color(1,1,1,1)
 
   if (obj.BackgroundTileImage) then
       TextureHandler.LoadTexture(0,obj.BackgroundTileImage,obj)
@@ -523,14 +525,11 @@ function DrawCheckbox(obj)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
+  local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
+  local tw,th = texInfo.xsize, texInfo.ysize
 
   gl.Color(1,1,1,1)
   TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
-
-  local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
-  local tw,th = texInfo.xsize, texInfo.ysize
-
-  
     gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, x,y,w,h, skLeft,skTop,skRight,skBottom, tw,th, 0)
   --gl.Texture(0,false)
 
@@ -562,7 +561,7 @@ function DrawProgressbar(obj)
 
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
-  gl.Color(1,1,1,1)
+  gl.Color(obj.backgroundColor)
   if not obj.noSkin then
     TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
     local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
