@@ -133,7 +133,7 @@ end
 
 --//=============================================================================
 
-function Font.AdjustPosToAlignment(x, y, width, height, align, valign)
+function Font:AdjustPosToAlignment(x, y, width, height, align, valign)
   local extra = ''
 
   --// vertical alignment
@@ -145,6 +145,9 @@ function Font.AdjustPosToAlignment(x, y, width, height, align, valign)
   elseif valign == "bottom" then
     y     = y + height
     extra = 'b'
+  elseif valign == "linecenter" then
+    y     = y + (height / 2) + (1 + self._font.descender) * self.size / 2
+    extra = 'x'
   else
     --// ascender
     extra = 'a'
@@ -163,8 +166,6 @@ function Font.AdjustPosToAlignment(x, y, width, height, align, valign)
 
   return x,y,extra
 end
-
-local AdjustPosToAlignment = Font.AdjustPosToAlignment
 
 local function _GetExtra(align, valign)
   local extra = ''
@@ -228,7 +229,7 @@ function Font:DrawInBox(text, x, y, w, h, align, valign)
 
   local font = self._font
 
-  local x,y,extra = AdjustPosToAlignment(x, y, w, h, align, valign)
+  local x,y,extra = self:AdjustPosToAlignment(x, y, w, h, align, valign)
   
   if self.outline then
 	extra = extra .. 'o'
