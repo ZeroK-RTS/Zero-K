@@ -20,14 +20,16 @@ if (gadgetHandler:IsSyncedCode()) then
   return false  --  silent removal
 end
 
-local function Resign(_, teamID)
-  if tonumber(teamID) == Spring.GetMyTeamID() then
+local function Resign(_, name)
+  local playerID = Spring.GetMyPlayerID()
+  local myName = Spring.GetPlayerInfo(playerID)
+  if name == myName then
     Spring.SendCommands('spectator')
   end
 end
 
 function gadget:Initialize()
-  gadgetHandler:AddChatAction('resignteam', Resign, " resigns the player on the specified team")
+  gadgetHandler:AddChatAction('resignteam', Resign, " resigns the player with the specified name")
 end
 
 --------------------------------------------------------------------------------
