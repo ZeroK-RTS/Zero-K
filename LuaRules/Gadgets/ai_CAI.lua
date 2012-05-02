@@ -1723,7 +1723,7 @@ local function raiderJobHandler(team)
 	
 	for unitID,data in pairs(raiderByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
-		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
+		if (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
 			averageX = averageX + x
@@ -1775,7 +1775,7 @@ local function raiderJobHandler(team)
 	
 	for unitID,data in pairs(raiderByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
-		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
+		if (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID then
 				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})
@@ -1885,7 +1885,7 @@ local function gunshipJobHandler(team)
 	
 	for unitID,data in pairs(gunshipByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
-		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
+		if (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
 			averageX = averageX + x
@@ -1940,7 +1940,7 @@ local function gunshipJobHandler(team)
 	
 	for unitID,data in pairs(gunshipByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
-		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
+		if (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID then
 				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})
@@ -2019,7 +2019,7 @@ local function combatJobHandler(team)
 
 	for unitID,data in pairs(combatByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
-		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
+		if (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
 			averageX = averageX + x
@@ -2102,7 +2102,7 @@ local function combatJobHandler(team)
 	
 	for unitID,data in pairs(combatByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
-		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
+		if (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID then
 				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})
