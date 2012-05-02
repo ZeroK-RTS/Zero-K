@@ -82,8 +82,18 @@ local mouseOverClose = false
 options_path = 'Settings/Interface/Pause Screen'
 
 options = { 
-	hideimage = {name='Disable Image', type='bool', value=false},
-	disablesound = {name='Disable Sound', type='bool', value=false},
+	hideimage = {
+		name='Disable Pause Screen', 
+		type='bool',
+		desc = 'Remember to not display pause-screen anymore. \n\nRemainder: you can revisit this configuration page at any time later at "Settings/Interface/Pause Screen" if needed.',
+		value=false,
+		},
+	disablesound = {
+		name='Disable Voice',
+		type='bool',
+		desc = 'Remember to not play voice-over for pausing anymore.',
+		value=false,
+		},
 }
 
 local SOUND_DIRNAME = 'LuaUI/Sounds/Voices/'
@@ -123,7 +133,7 @@ function widget:DrawScreen()
 		--pause switch
 		pauseTimestamp = osClock()
 		if ( diffPauseTime <= slideTime ) then
-			pauseTimestamp = pauseTimestamp - ( slideTime - ( diffPauseTime / slideTime ) * slideTime )
+			pauseTimestamp = pauseTimestamp - ( slideTime - diffPauseTime )
 		end
 	end
 	
@@ -142,7 +152,7 @@ function widget:DrawScreen()
 	lastPause = paused
 		
 	if ( (paused or ( ( now - pauseTimestamp) <= slideTime )) and not options.hideimage.value) then
-		drawPause()
+		drawPause(paused, now)
 	end
 	
 	ResetGl()
@@ -164,10 +174,19 @@ function widget:MousePress(x, y, button)
 			clickTimestamp = osClock()
 		end
 		
+		--display setting for Pause Screen when pressing Spacebat+Click on the Pause Screen.
+		local alt, ctrl, meta, shift = Spring.GetModKeyState()
+		if not meta then  --//skip epicMenu when user didn't press the Spacebar
+			return false 
+		end
+		WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
+		WG.crude.ShowMenu() --make epic Chili menu appear.
+		--[[
 		--hide window for the rest of forever if it was a right mouse button
 		if ( button == 3 ) then
 			options.hideimage.value = true
 		end
+		--]]
 		
 		return true
 	end
@@ -195,13 +214,15 @@ end
 
 function widget:GetTooltip(x, y)
 	if ( ( clickTimestamp == nil and options.hideimage.value == false ) and isOverWindow(x, y) ) then
-		return "Click left mouse button to hide pause window.\nClick right mouse button to hide forever (reenable in settings)."
+		return "Click here to hide pause window.\nSpace+Click here to show option menu."
 	end
 end
 
-function drawPause()
+function drawPause(paused, now)
+	--[[
 	local _, _, paused = spGetGameSpeed()
 	local now = osClock()
+	--]]
 	local diffPauseTime = ( now - pauseTimestamp)
 
 	local text =  { 1.0, 1.0, 1.0, 1.0 }
