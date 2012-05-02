@@ -116,6 +116,7 @@ local pointExtraAreaCost = 0--.027
 local pointExtraAreaCostDepth = 6
 local pointExtraPerimeterCost = 0.0425
 local pointExtraPerimeterCostDepth = 6
+local inbuiltCostMult = 0.5
 
 local perimeterEdgeCost = {
 	[0] = 0,
@@ -151,8 +152,9 @@ if modOptions.terracostmult then
 	costMult = modOptions.terracostmult
 end
 
-volumeCost = volumeCost * costMult
-pointExtraAreaCost = pointExtraAreaCost * costMult
+volumeCost = volumeCost * costMult * inbuiltCostMult
+pointExtraPerimeterCost = pointExtraPerimeterCost * costMult * inbuiltCostMult
+pointExtraAreaCost = pointExtraAreaCost * costMult * inbuiltCostMult
 
 --------------------------------------------------------------------------------
 -- Arrays
