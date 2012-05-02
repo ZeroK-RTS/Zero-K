@@ -80,6 +80,7 @@ local x_postping		= x_ping + 16
 local x_bound	= x_postping + 20
 
 local UPDATE_FREQUENCY = 0.5	-- seconds
+local wasSimpleColor = false -- variable: indicate if simple color was toggled on or off. Used to trigger player-list to refresh.
 
 local wantsNameRefresh = {}	-- unused
 local cfCheckBoxes = {}
@@ -167,7 +168,7 @@ options = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+--[[ This function doesn't work for unknown reason (??). Intended to update text color remotely.
 function WG.crudeplayerlist_recolor_players()
 	if teams then
 		for i = 1, #teams do
@@ -177,6 +178,7 @@ function WG.crudeplayerlist_recolor_players()
 						local entity = teams[i].roster[j].nameLabel
 						if Chili and Chili.color2incolor then
 							entity:SetCaption(Chili.color2incolor({Spring.GetTeamColor(i)} or {1,1,1,1}) .. (entity.realText or ""))
+							Label:Invalidate();
 						end
 					end
 				end
@@ -184,6 +186,7 @@ function WG.crudeplayerlist_recolor_players()
 		end
 	end
 end
+--]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -752,10 +755,15 @@ function widget:Update(s)
 		if (window_cpl.hidden) then --//don't update when window is hidden.
 			return
 		end
-		if lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height then
+		local currentColorScheme = wasSimpleColor 
+		if WG.usingSimpleTeamColors then
+			currentColorScheme = WG.usingSimpleTeamColors
+		end
+		if (lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height) or (wasSimpleColor and not currentColorScheme) or (not wasSimpleColor and not not currentColorScheme) then --//if user resize the player-list OR if the simple-color state have changed, then refresh the player list.
 			SetupPlayerNames()	-- size changed; regen everything
 			lastSizeX = window_cpl.width
 			lastSizeY = window_cpl.height
+			wasSimpleColor = currentColorScheme
 		else
 			UpdatePlayerInfo()
 		end
