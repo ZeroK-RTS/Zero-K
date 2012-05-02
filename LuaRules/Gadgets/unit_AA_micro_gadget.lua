@@ -961,8 +961,8 @@ function escortingAA(unitID, allyteam)
 end
 
 function getTarget(unitID)
-  local cQueue1 = GetCommandQueue(unitID)[1]
-  if cQueue1 ~= nil then
+  local cQueue1 = GetCommandQueue(unitID, 1)[1]
+  if cQueue1 then
     if cQueue1.id == CMD.ATTACK then
       if cQueue1.params[2] == nil then
         return cQueue1.params[1]
@@ -973,8 +973,8 @@ function getTarget(unitID)
 end
 
 function IsAttacking(unitID)
-  local cQueue1 = GetCommandQueue(unitID)[1]
-  if cQueue1 ~= nil then
+  local cQueue1 = GetCommandQueue(unitID, 1)[1]
+  if cQueue1 then
     if cQueue1.id == CMD.ATTACK then
       if cQueue1.params[2] == nil then
         return true
@@ -995,8 +995,8 @@ function attackTarget(unitID, targetID, allyteam)
 end
 
 function removecommand(unitID, allyteam)
-  local cQueue1 = GetCommandQueue(unitID)[1]
-  if cQueue1 ~= nil then
+  local cQueue1 = GetCommandQueue(unitID, 1)[1]
+  if cQueue1 then
     GiveOrder(unitID, CMD.REMOVE, {cQueue1.tag}, allyteam)
   end
 end
@@ -1046,8 +1046,8 @@ end
 end
 
 function IsIdle(unitID)
-  local cQueue = GetCommandQueue(unitID)
-  if cQueue[1] ~= nil then
+  local cQueue1 = GetCommandQueue(unitID, 1)[1]
+  if cQueue1 then
     return false
   end
   return true
