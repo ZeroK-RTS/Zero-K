@@ -18,6 +18,14 @@ gl.Utilities = gl.Utilities or {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local min    = math.min
+local max    = math.max
+local sin    = math.sin
+local cos    = math.cos
+local TWO_PI = math.pi * 2
+
+local glVertex = gl.Vertex
+
 GL.KEEP = 0x1E00
 GL.INCR_WRAP = 0x8507
 GL.DECR_WRAP = 0x8508
@@ -34,104 +42,108 @@ local stencilBit2 = 0x10
 function gl.Utilities.DrawMyBox(minX,minY,minZ, maxX,maxY,maxZ)
   gl.BeginEnd(GL.QUADS, function()
     --// top
-    gl.Vertex(minX, maxY, minZ);
-    gl.Vertex(maxX, maxY, minZ);
-    gl.Vertex(maxX, maxY, maxZ);
-    gl.Vertex(minX, maxY, maxZ);
+    glVertex(minX, maxY, minZ);
+    glVertex(maxX, maxY, minZ);
+    glVertex(maxX, maxY, maxZ);
+    glVertex(minX, maxY, maxZ);
     --// bottom
-    gl.Vertex(minX, minY, minZ);
-    gl.Vertex(minX, minY, maxZ);
-    gl.Vertex(maxX, minY, maxZ);
-    gl.Vertex(maxX, minY, minZ);
+    glVertex(minX, minY, minZ);
+    glVertex(minX, minY, maxZ);
+    glVertex(maxX, minY, maxZ);
+    glVertex(maxX, minY, minZ);
   end);
   gl.BeginEnd(GL.QUAD_STRIP, function()
     --// sides
-    gl.Vertex(minX, minY, minZ);
-    gl.Vertex(minX, maxY, minZ);
-    gl.Vertex(minX, minY, maxZ);
-    gl.Vertex(minX, maxY, maxZ);
-    gl.Vertex(maxX, minY, maxZ);
-    gl.Vertex(maxX, maxY, maxZ);
-    gl.Vertex(maxX, minY, minZ);
-    gl.Vertex(maxX, maxY, minZ);
-    gl.Vertex(minX, minY, minZ);
-    gl.Vertex(minX, maxY, minZ);
+    glVertex(minX, minY, minZ);
+    glVertex(minX, maxY, minZ);
+    glVertex(minX, minY, maxZ);
+    glVertex(minX, maxY, maxZ);
+    glVertex(maxX, minY, maxZ);
+    glVertex(maxX, maxY, maxZ);
+    glVertex(maxX, minY, minZ);
+    glVertex(maxX, maxY, minZ);
+    glVertex(minX, minY, minZ);
+    glVertex(minX, maxY, minZ);
   end);
 end
 
 
 function gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
   divs = divs or 25
+  local halfHeight = height / 2
+  local divAngle = TWO_PI / divs
+  
   gl.BeginEnd(GL.TRIANGLE_STRIP, function()
     --//Note: We can't use for-loops here cause of precision issues!
 
     --// top
-    local alpha=-(2*math.pi)/divs
+    local alpha = -divAngle
     repeat
-      alpha = alpha + (2*math.pi)/divs
-      alpha = math.min(alpha,2*math.pi)
+      alpha = alpha + divAngle
+      alpha = min(alpha, TWO_PI)
 
-      local sa = math.sin(alpha % (2*math.pi))
-      local ca = math.cos(alpha % (2*math.pi))
-      gl.Vertex(x+radius*sa, y+height/2, y+radius*ca);
-      gl.Vertex(x, y+height/2, y);
-    until (alpha >= 2*math.pi)
+      local sa = sin(alpha)
+      local ca = cos(alpha)
+      glVertex(x+radius*sa, y+halfHeight, z+radius*ca);
+      glVertex(x, y+halfHeight, z);
+    until (alpha >= TWO_PI)
 
     --// degenerate
-    gl.Vertex(x, y+height/2, y);
-    gl.Vertex(x, y-height/2, y);
-    gl.Vertex(x, y-height/2, y);
+    glVertex(x, y+halfHeight, z);
+    glVertex(x, y-halfHeight, z);
+    glVertex(x, y-halfHeight, z);
 
     --// bottom
-    alpha=(2*math.pi)/divs
+    alpha = divAngle
     repeat
-      alpha = alpha - (2*math.pi)/divs
-      alpha = math.max(alpha,-2*math.pi)
+      alpha = alpha - divAngle
+      alpha = max(alpha, -TWO_PI)
 
-      local sa = math.sin(alpha)
-      local ca = math.cos(alpha)
-      gl.Vertex(x+radius*sa, y-height/2, y+radius*ca);
-      gl.Vertex(x, y-height/2, y);
-    until (alpha <= -2*math.pi)
+      local sa = sin(alpha)
+      local ca = cos(alpha)
+      glVertex(x+radius*sa, y-halfHeight, z+radius*ca);
+      glVertex(x, y-halfHeight, z);
+    until (alpha <= -TWO_PI)
 
     --// degenerate
-    gl.Vertex(x, y-height/2, y);
-    gl.Vertex(x, y-height/2, y+radius);
-    gl.Vertex(x, y-height/2, y+radius);
+    glVertex(x, y-halfHeight, z);
+    glVertex(x, y-halfHeight, z+radius);
+    glVertex(x, y-halfHeight, z+radius);
 
     --// sides
-    alpha=-(2*math.pi)/divs
+    alpha = -divAngle
     repeat
-      alpha = alpha + (2*math.pi)/divs
-      alpha = math.min(alpha,2*math.pi)
+      alpha = alpha + divAngle
+      alpha = min(alpha, TWO_PI)
 
-      local sa = math.sin(alpha)
-      local ca = math.cos(alpha)
-      gl.Vertex(x+radius*sa, y+height/2, y+radius*ca);
-      gl.Vertex(x+radius*sa, y-height/2, y+radius*ca);
-    until (alpha >= 2*math.pi)
+      local sa = sin(alpha)
+      local ca = cos(alpha)
+      glVertex(x+radius*sa, y+halfHeight, z+radius*ca);
+      glVertex(x+radius*sa, y-halfHeight, z+radius*ca);
+    until (alpha >= TWO_PI)
   end);
 end
 
 
+local heightMargin = 2000
+local minheight, maxheight = Spring.GetGroundExtremes()  --the returned values do not change even if we terraform the map
+local averageGroundHeight = (minheight + maxheight) / 2
+local shapeHeight = heightMargin + (maxheight - minheight) + heightMargin
+
 local cylinder = gl.CreateList(gl.Utilities.DrawMyCylinder,0,0,0,1,1,35)
 function gl.Utilities.DrawGroundCircle(x,z,radius)
-  local minheight, maxheight = Spring.GetGroundExtremes()
-
   gl.PushMatrix()
-  gl.Translate(x, minheight, z)
-  gl.Scale(radius, (maxheight-minheight)*3 , radius)
+  gl.Translate(x, averageGroundHeight, z)
+  gl.Scale(radius, shapeHeight, radius)
   gl.Utilities.DrawVolume(cylinder)
   gl.PopMatrix()
 end
 
-local box = gl.CreateList(gl.Utilities.DrawMyBox,0,0,0,1,1,1)
+local box = gl.CreateList(gl.Utilities.DrawMyBox,0,0.5,0,1,0.5,1)
 function gl.Utilities.DrawGroundRectangle(x1,z1,x2,z2)
-  local minheight, maxheight = Spring.GetGroundExtremes()
-
   gl.PushMatrix()
-  gl.Translate(x1, minheight, z1)
-  gl.Scale(x2-x1, (maxheight-minheight)*3 , z2-z1)
+  gl.Translate(x1, averageGroundHeight, z1)
+  gl.Scale(x2-x1, shapeHeight, z2-z1)
   gl.Utilities.DrawVolume(box)
   gl.PopMatrix()
 end

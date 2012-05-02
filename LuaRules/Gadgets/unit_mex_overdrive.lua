@@ -9,7 +9,7 @@ function gadget:GetInfo()
     author    = "Licho, Google Frog (pylon conversion)",
     date      = "16.5.2008 (OD date)",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = -4,   -- OD grid circles must be drawn before lava drawing gadget some maps have (which has layer = -3)
     enabled   = true  --  loaded by default?
   }
 end
