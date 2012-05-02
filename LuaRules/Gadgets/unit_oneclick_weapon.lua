@@ -132,7 +132,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_ONECLICK_WEAPON and not cmdOptions.shift then
-		local cmd = Spring.GetUnitCommands(unitID)
+		local cmd = Spring.GetUnitCommands(unitID, 1)
 		if cmd and cmd[1] and cmd[1].id and cmd[1].id == CMD_ONECLICK_WEAPON then
 			Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd[1].tag},{})
 			return false

@@ -242,7 +242,7 @@ function widget:CommandNotify(id, params, options)
   end
   for _, unitID in ipairs(spGetSelectedUnits()) do
     local _, _, _, shift   = spGetModKeyState()
-    if (#spGetCommandQueue(unitID) == 0 or not shift) then
+    if (#spGetCommandQueue(unitID, 1) == 0 or not shift) then
       lastJump[unitID] = {
         pos   = {spGetUnitPosition(unitID)},
         frame = spGetGameFrame(),
@@ -254,7 +254,7 @@ end
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
   if jumpDefs[unitDefID] then
-    local cmd = spGetCommandQueue(unitID)[2] 
+    local cmd = spGetCommandQueue(unitID, 2)[2] 
     if (cmd and cmd.id == CMD_JUMP) then
         lastJump[unitID] = {
           pos = {spGetUnitPosition(unitID)}, 

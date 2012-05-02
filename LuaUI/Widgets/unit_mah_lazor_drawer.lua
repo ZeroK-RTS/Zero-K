@@ -48,7 +48,7 @@ end
 function widget:GameFrame(frame)
 	if frame%MAH_UPDATE_FREQUENCY == 0 then
 		for unitID, data in pairs(mahLazors) do
-			local cmd = Spring.GetUnitCommands(unitID)
+			local cmd = Spring.GetUnitCommands(unitID, 3)
 			if cmd and #cmd > 2 and cmd[1].id == CMD_ATTACK and #cmd[1].params == 3 and cmd[2].id == CMD_ATTACK then
 				if data.height then
 					local c1height = Spring.GetGroundHeight(cmd[1].params[1],cmd[1].params[3])

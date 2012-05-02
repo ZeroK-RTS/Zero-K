@@ -60,7 +60,7 @@ function widget:Update(deltaTime)
 
  if (countDown > DELAY) then
    for unitID,_ in pairs(moveUnits) do
-     local cQueue = GetCommandQueue(unitID)
+     local cQueue = GetCommandQueue(unitID, 1)
      if (table.getn(cQueue) == 0) then
        local x, y, z = GetUnitPosition(unitID)
        if (math.random(1,2) == 1) then

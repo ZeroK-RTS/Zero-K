@@ -128,7 +128,7 @@ local function GetDistance(x1, x2, y1, y2)
 end
 
 local function UpdateCarrierTarget(carrierID)
-	local cQueueC = GetCommandQueue(carrierID)
+	local cQueueC = GetCommandQueue(carrierID, 1)
 	if cQueueC and cQueueC[1] and cQueueC[1].id == CMD_ATTACK then
 		local ox,oy,oz = GetUnitPosition(carrierID)
 		local params = cQueueC[1].params
@@ -147,7 +147,7 @@ local function UpdateCarrierTarget(carrierID)
 		
 		for droneID in pairs(carrierList[carrierID].drones) do
 			--[[
-			local cQueue = GetCommandQueue(droneID)
+			local cQueue = GetCommandQueue(droneID, 1)
 			local engaged = false
 			if cQueue and cQueue[1] and cQueue[1].id == CMD_ATTACK then
 				engaged = true

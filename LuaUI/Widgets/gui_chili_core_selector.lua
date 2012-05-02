@@ -723,7 +723,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		if not bQueue[1] then  --- has no build queue
 			local _, _, _, _, buildProg = GetUnitHealth(unitID)
 			if not ud.isFactory then
-				local cQueue = Spring.GetCommandQueue(unitID)
+				local cQueue = Spring.GetCommandQueue(unitID, 1)
 				if not cQueue[1] then
 					widget:UnitIdle(unitID, unitDefID, myTeamID)
 				end

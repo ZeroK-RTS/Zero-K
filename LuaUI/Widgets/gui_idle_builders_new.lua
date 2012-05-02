@@ -70,7 +70,7 @@ local function IsIdleBuilder(unitID)
         if ud.isFactory then
           return true 
         else
-          local cQueue = Spring.GetCommandQueue(unitID)
+          local cQueue = Spring.GetCommandQueue(unitID, 1)
           if not cQueue[1] then
             return true
           end

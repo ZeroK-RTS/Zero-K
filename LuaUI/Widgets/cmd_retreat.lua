@@ -166,7 +166,7 @@ local function setRetreatOrder(unitID, unitDefID, retreatOrder)
 end
 
 function GetFirstCommand(unitID)
-	local queue = GetUnitCommands(unitID)
+	local queue = GetUnitCommands(unitID, 1)
 	return queue and queue[1]
 end
 

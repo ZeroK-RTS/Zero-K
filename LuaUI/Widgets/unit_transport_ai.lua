@@ -83,7 +83,7 @@ end
 
 
 function IsEmbarkCommand(unitID)
- local queue = GetCommandQueue(unitID);        
+ local queue = GetCommandQueue(unitID, 1);        
  if (queue ~= nil and #queue>=1 and IsEmbark(queue[1])) then 
    return true
  end
@@ -105,7 +105,7 @@ function IsDisembark(cmd)
 end
   
 function IsWaitCommand(unitID)
- local queue = GetCommandQueue(unitID);        
+ local queue = GetCommandQueue(unitID, 1);        
  if (queue ~= nil and queue[1].id == CMD.WAIT and not queue[1].options.alt) then 
    return true
  end
@@ -113,7 +113,7 @@ function IsWaitCommand(unitID)
 end
 
 function IsIdle(unitID) 
-  local queue = GetCommandQueue(unitID)
+  local queue = GetCommandQueue(unitID, 1)
   if (queue == nil or #queue==0) then 
     return true
   else
@@ -446,7 +446,7 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
     GiveOrderToUnit(unitID, x[1], x[2], x[3])
   end
   storedQueue[unitID] = nil
-  local queue = GetCommandQueue(unitID)
+  local queue = GetCommandQueue(unitID, 1)
   if (queue and queue[1] and queue[1].id == CMD.WAIT) then GiveOrderToUnit(unitID, CMD.WAIT, {}, {}) end -- workaround: clears wait order if STOP fails to do so
 end
 

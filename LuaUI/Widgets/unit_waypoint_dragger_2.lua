@@ -3,7 +3,6 @@ local sprGetDefaultCommand   = Spring.GetDefaultCommand
 local sprGetGameSeconds      = Spring.GetGameSeconds
 local sprGetSelectedUnits    = Spring.GetSelectedUnits
 local sprGetCommandQueue     = Spring.GetCommandQueue
-local sprGetUnitCommands     = Spring.GetUnitCommands
 local sprGetMouseState       = Spring.GetMouseState
 local sprGetModKeyState      = Spring.GetModKeyState
 local sprGiveOrderToUnit     = Spring.GiveOrderToUnit

@@ -979,7 +979,7 @@ local function makeEnergy(team,unitID)
 	
 	-- check for nearby con
 	for cid,_ in pairs(conJob.energy.con) do
-		local cQueue = spGetCommandQueue(cid)
+		local cQueue = spGetCommandQueue(cid, 1)
 		local cx,cy,cz = spGetUnitPosition(cid)
 		if #cQueue > 0 and disSQ(cx,cz,ux,uz) < 800^2 then
 			for i = 1, buildDefs.energyIds.count do
@@ -1173,7 +1173,7 @@ local function conJobHandler(team)
 	--]]
 	-- reclaim
 	for unitID,_ in pairs(conJob.reclaim.con) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 1)
 		if #cQueue == 0 or controlledUnit.conByID[unitID].idle then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].makingDefence = false
@@ -1184,7 +1184,7 @@ local function conJobHandler(team)
 	
 	-- defence
 	for unitID,_ in pairs(conJob.defence.con) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 1)
 		if #cQueue == 0 or controlledUnit.conByID[unitID].idle then
 			local x,y,z = spGetUnitPosition(unitID)
 			controlledUnit.conByID[unitID].oldJob = conJob.defence.index
@@ -1229,7 +1229,7 @@ local function conJobHandler(team)
 	
 	-- mex
 	for unitID,_ in pairs(conJob.mex.con) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 1)
 		if #cQueue == 0 or controlledUnit.conByID[unitID].idle then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].oldJob = conJob.mex.index
@@ -1246,7 +1246,7 @@ local function conJobHandler(team)
 	if a.uncompletedFactory == true then
 		a.uncompletedFactory = false
 		for unitID,data in pairs(conJob.factory.con) do
-			local cQueue = spGetCommandQueue(unitID)
+			local cQueue = spGetCommandQueue(unitID, 1)
 			if #cQueue ~= 0 and buildDefs.factoryByDefId[-cQueue[1].id] then
 				a.uncompletedFactory = true
 			end
@@ -1255,7 +1255,7 @@ local function conJobHandler(team)
 	
 	-- factory assist/construction
 	for unitID,data in pairs(conJob.factory.con) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 1)
 			
 		if #cQueue == 0 or controlledUnit.conByID[unitID].idle then
 			controlledUnit.conByID[unitID].idle = false
@@ -1269,7 +1269,7 @@ local function conJobHandler(team)
 	
 	-- energy
 	for unitID,_ in pairs(conJob.energy.con) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 1)
 		if #cQueue == 0 or controlledUnit.conByID[unitID].idle then
 			controlledUnit.conByID[unitID].idle = false
 			controlledUnit.conByID[unitID].makingDefence = false
@@ -1524,7 +1524,7 @@ local function battleGroupHandler(team, frame, slowUpdate)
 					minZ = z
 				end
 				
-				local cQueue = spGetCommandQueue(unitID)
+				local cQueue = spGetCommandQueue(unitID, 1)
 				if #cQueue > 0 and cQueue[1].id == CMD_ATTACK and #cQueue[1].params == 1 then
 					local udid = spGetUnitDefID(cQueue[1].params[1])
 					if (not udid) or (not UnitDefs[udid].canFly) then
@@ -1722,7 +1722,7 @@ local function raiderJobHandler(team)
 	local averageCount = 0
 	
 	for unitID,data in pairs(raiderByID) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 3)
 		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
@@ -1774,7 +1774,7 @@ local function raiderJobHandler(team)
 	end
 	
 	for unitID,data in pairs(raiderByID) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 3)
 		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID then
@@ -1811,7 +1811,7 @@ local function artyJobHandler(team)
 	
 	if enemyDefence.count > 0 then
 		for unitID,data in pairs(artyByID) do
-			local cQueue = spGetCommandQueue(unitID)
+			local cQueue = spGetCommandQueue(unitID, 1)
 			if #cQueue == 0 then
 				local randIndex = math.floor(math.random(1,enemyDefence.count))
 				spGiveOrderToUnit(unitID, CMD_FIGHT , {enemyDefence[randIndex].x,enemyDefence[randIndex].y, enemyDefence[randIndex].z,}, {})
@@ -1838,7 +1838,7 @@ local function bomberJobHandler(team)
 	
 	if enemyOffense.count > 0 then
 		for unitID,data in pairs(bomberByID) do
-			local cQueue = spGetCommandQueue(unitID)
+			local cQueue = spGetCommandQueue(unitID, 1)
 			if #cQueue == 0 then
 				local randIndex = math.floor(math.random(1,enemyOffense.count))
 				local static, mobile = getEnemyAntiAirInRange(a.allyTeam, enemyOffense[randIndex].x, enemyOffense[randIndex].z)
@@ -1884,7 +1884,7 @@ local function gunshipJobHandler(team)
 	local averageCount = 0
 	
 	for unitID,data in pairs(gunshipByID) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 3)
 		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
@@ -1939,7 +1939,7 @@ local function gunshipJobHandler(team)
 	end
 	
 	for unitID,data in pairs(gunshipByID) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 3)
 		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID then
@@ -1956,8 +1956,6 @@ local function gunshipJobHandler(team)
 			end
 		end
 	end
-
-
 
 end
 
@@ -1976,7 +1974,7 @@ local function fighterJobHandler(team)
 	
 	if spValidUnitID( at.fighterTarget) then
 		for unitID,data in pairs(fighterByID) do
-			local cQueue = spGetCommandQueue(unitID)
+			local cQueue = spGetCommandQueue(unitID, 1)
 			if #cQueue == 0 then
 				spGiveOrderToUnit(unitID, CMD_ATTACK , { at.fighterTarget}, {})
 			end
@@ -2020,7 +2018,7 @@ local function combatJobHandler(team)
 	local averageCount = 0
 
 	for unitID,data in pairs(combatByID) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 3)
 		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
@@ -2103,7 +2101,7 @@ local function combatJobHandler(team)
 	end
 	
 	for unitID,data in pairs(combatByID) do
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 3)
 		if (#cQueue == 0 or (cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID then
@@ -2133,7 +2131,7 @@ local function scoutJobHandler(team)
 	local unScoutedPoint = at.unScoutedPoint
 	if unScoutedPoint.count > 0 then
 		for unitID,data in pairs(scoutByID) do
-			local cQueue = spGetCommandQueue(unitID)
+			local cQueue = spGetCommandQueue(unitID, 1)
 			if #cQueue == 0 then
 				local randIndex = math.floor(math.random(1,unScoutedPoint.count))
 				spGiveOrderToUnit(unitID, CMD_FIGHT , {unScoutedPoint[randIndex].x,unScoutedPoint[randIndex].y,unScoutedPoint[randIndex].z}, {})
@@ -2564,7 +2562,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 			if not ud.canFly then
 				local jump = spGetUnitRulesParam(unitID, "jumpReload")
 				if ((not jump) or jump == 1) and spGetUnitSeparation(unitID, attackerID, true) < jumpDefs[unitDefID].range + 100 then
-					local cQueue = spGetCommandQueue(unitID)
+					local cQueue = spGetCommandQueue(unitID, 1)
 					if #cQueue == 0 or cQueue[1].id ~= CMD_JUMP then
 						local x,y,z = spGetUnitPosition(attackerID)
 						spGiveOrderToUnit(unitID, CMD_JUMP, {x+math.random(-30,30),y,z+math.random(-30,30)}, {"alt"} )

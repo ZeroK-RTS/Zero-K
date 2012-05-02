@@ -22,7 +22,7 @@ function widget:CommandNotify(id, params, options)
         for i = 1, #units do
             local unitID = units[i]
             if Spring.ValidUnitID(unitID) then
-                local cmd = Spring.GetCommandQueue(unitID)
+                local cmd = Spring.GetCommandQueue(unitID, 1)
                 if cmd and #cmd ~= 0 and cmd[1].id == CMD.ATTACK and #cmd[1].params == 1 and not cmd[1].options.internal then
                     Spring.GiveOrderToUnit(unitID,CMD_UNIT_SET_TARGET,cmd[1].params,{})
                 end

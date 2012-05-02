@@ -109,7 +109,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 				if wantGoodTarget[unitID] then
 					wantGoodTarget[unitID] = nil
 					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, {"alt"} )
-					local cQueue = spGetCommandQueue(unitID)
+					local cQueue = spGetCommandQueue(unitID, 2)
 					if isTheRightSortOfCommand(cQueue, 2)  then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, {} )
 					end
@@ -129,7 +129,7 @@ end
 
 function GG.DontFireRadar_CheckAim(unitID)
 	if units[unitID] then
-		local cQueue = spGetCommandQueue(unitID)
+		local cQueue = spGetCommandQueue(unitID, 1)
 		local data = units[unitID]
 		if isTheRightSortOfCommand(cQueue, 1) and not canShootAtUnit(cQueue[1].params[1], spGetUnitAllyTeam(unitID)) then
 			local firestate = Spring.GetUnitStates(unitID).firestate

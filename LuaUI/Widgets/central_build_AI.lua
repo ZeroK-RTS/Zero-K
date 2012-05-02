@@ -330,7 +330,7 @@ end
 --	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
 
 function GetFirstCommand(unitID)
-	local queue = spGetUnitCommands(unitID)
+	local queue = spGetUnitCommands(unitID, 1)
 	return queue and queue[1]
 end
 

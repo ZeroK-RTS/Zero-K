@@ -345,7 +345,7 @@ function gadget:GameFrame(n)
 		end
 		scheduleRearmRequest = {}
 		for bomberID, padID in pairs(bomberToPad) do
-			local queue = Spring.GetUnitCommands(bomberID)
+			local queue = Spring.GetUnitCommands(bomberID, 1)
 			if (queue and queue[1] and queue[1].id == CMD_REARM) and (Spring.GetUnitSeparation(bomberID, padID, true) < padRadius) then
 				local tag = queue[1].tag
 				--Spring.Echo("Bomber "..bomberID.." cleared for landing")
@@ -366,7 +366,7 @@ function gadget:GameFrame(n)
 		
 		for unitID in pairs(bomberUnitIDs) do -- CommandFallback doesn't seem to activate for inbuilt commands!!!
 			if spGetUnitRulesParam(unitID, "noammo") == 1 then
-				local queue = Spring.GetUnitCommands(unitID)
+				local queue = Spring.GetUnitCommands(unitID, 1)
 				if queue and #queue > 0 and combatCommands[queue[1].id] then
 					RequestRearm(unitID, nil, true)
 				end

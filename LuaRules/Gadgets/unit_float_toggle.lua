@@ -149,7 +149,7 @@ end
 local function checkAlwaysFloat(unitID)
 	if not select(1, Spring.GetUnitIsStunned(unitID)) then
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local cQueue = Spring.GetCommandQueue(unitID)
+		local cQueue = Spring.GetCommandQueue(unitID, 1)
 		local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
 		if not moving then
 			addFloat(unitID, unitDefID)
@@ -166,7 +166,7 @@ end
 function GG.Floating_AimWeapon(unitID)
 	if floatState[unitID] == FLOAT_ATTACK and not select(1, Spring.GetUnitIsStunned(unitID)) then
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local cQueue = Spring.GetCommandQueue(unitID)
+		local cQueue = Spring.GetCommandQueue(unitID, 1)
 		local moving = cQueue and #cQueue > 0 and cQueue[1].id == CMD.MOVE and not cQueue[1].options.internal
 		if not moving then
 			addFloat(unitID, unitDefID)
@@ -246,11 +246,11 @@ function gadget:GameFrame(f)
 			-- Check if the unit should sink
 			if checkOrder then
 				if floatState[unitID] == FLOAT_ALWAYS then
-					local cQueue = Spring.GetCommandQueue(unitID)
+					local cQueue = Spring.GetCommandQueue(unitID, 1)
 					local moving = cQueue and #cQueue > 0 and sinkCommand[cQueue[1].id]
 					setSurfaceState(unitID, data.unitDefID, not moving)
 				elseif floatState[unitID] == FLOAT_ATTACK then
-					local cQueue = Spring.GetCommandQueue(unitID)
+					local cQueue = Spring.GetCommandQueue(unitID, 1)
 					local moving = cQueue and #cQueue > 0 and cQueue[1].id == CMD.MOVE and not cQueue[1].options.internal
 					setSurfaceState(unitID, data.unitDefID, (not moving and aimWeapon[unitID]) or false)
 				elseif floatState[unitID] == FLOAT_NEVER then

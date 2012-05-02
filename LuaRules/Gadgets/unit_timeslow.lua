@@ -100,7 +100,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local health = Spring.GetUnitHealth(unitID)
 		if slowedUnits[unitID].slowDamage > health*attritionWeaponDefs[weaponID].smartRetarget then
 			
-			local cmd = Spring.GetCommandQueue(attackerID)
+			local cmd = Spring.GetCommandQueue(attackerID, 3)
 
 			-- set order by player
 			if #cmd > 1 and (cmd[1].id == CMD_ATTACK and #cmd[1].params == 1 and cmd[1].params[1] == unitID 

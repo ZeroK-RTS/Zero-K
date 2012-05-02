@@ -47,7 +47,7 @@ local function isIdleRepairer(unitID)
 		return false
 	end
 	
-	local cQueue = spGetCommandQueue(unitID)
+	local cQueue = spGetCommandQueue(unitID, 1)
 	if cQueue[1] then
 		return false
 	end

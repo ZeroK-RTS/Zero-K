@@ -314,7 +314,7 @@ local function updateShields()
 			spGiveOrderToUnit(unit, CMD_REMOVE, {1}, {"alt"} )
 			spGiveOrderToUnit(unit, CMD_INSERT, {1, CMD_SET_WANTED_MAX_SPEED, CMD.OPT_RIGHT, i.maxVel }, {"alt"} )
   
-			local cQueue = spGetCommandQueue(unit) 
+			local cQueue = spGetCommandQueue(unit, 1) 
 
 			if (#cQueue ~= 0) and (i.folCount ~= 0) then
 			
