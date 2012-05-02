@@ -30,8 +30,7 @@ static-var	moving, once, animCount,
 RestoreAfterDelay(delay)
 {
 	sleep delay;
-	turn turret to y-axis 0 speed TURRET_TURN_SPEED/2;
-	turn turret to x-axis 0 speed TURRET_TURN_SPEED/2;
+	turn turret to x-axis (0) speed TURRET_TURN_SPEED;
 }
 
 AnimControl() {
@@ -244,10 +243,8 @@ AimWeapon1 (heading, pitch)
 {
 	signal SIG_AIM1;
 	set-signal-mask SIG_AIM1;
-	turn turret to y-axis (heading) speed TURRET_TURN_SPEED;
-	turn turret to x-axis (0-pitch) speed TURRET_TURN_SPEED;
+	turn turret to x-axis <-25> speed TURRET_TURN_SPEED;
 	wait-for-turn turret around x-axis;
-	wait-for-turn turret around y-axis;
 	start-script RestoreAfterDelay(RESTORE_DELAY);
 
 	return (TRUE);
@@ -295,7 +292,6 @@ Killed(severity, corpsetype)
 Create()
 {
 	moving = FALSE;
-	
 	while (get BUILD_PERCENT_LEFT)
 	{
 		sleep 250;
