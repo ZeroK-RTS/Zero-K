@@ -49,6 +49,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
       --spSetUnitHealth(unitID, maxHealth)  -- does nothing, hp overwritten by engine
       unitsCount = unitsCount + 1
       units[unitsCount] = unitID
+
+      GG.Awards_UnitResurrected (unitDefID, teamID)
     end
   end
 end

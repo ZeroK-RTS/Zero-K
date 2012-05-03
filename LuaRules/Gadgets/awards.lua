@@ -58,6 +58,7 @@ local t3DamageList		= {}
 local captureList		= {}
 local reclaimList		= {}
 local reclaimListByFeature = {}
+local resurrectList		= {}
 local terraformList		= {}
 local ouchDamageList	= {}
 local kamDamageList		= {}
@@ -322,6 +323,7 @@ function gadget:Initialize()
 		t3DamageList[team] 		= 0
 		captureList[team]		= 0
 		reclaimList[team]		= 0
+		resurrectList[team]		= 0
 		terraformList[team] 	= 0
 		ouchDamageList[team]	= 0
 		kamDamageList[team]		= 0
@@ -377,13 +379,13 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	if not spAreTeamsAllied(oldTeam,newTeam) then
 		if captureList[newTeam] then
 			local ud = UnitDefs[unitDefID]
-			local mCost = ud and ud.metalCost
+			local mCost = ud and ud.metalCost or 0
 			captureList[newTeam] = captureList[newTeam] + mCost
 		end
 	else -- teams are allied
 		if shareListTemp1[oldTeam] and shareListTemp1[newTeam] then
 			local ud = UnitDefs[unitDefID]
-			local mCost = ud and ud.metalCost
+			local mCost = ud and ud.metalCost or 0
 			shareListTemp1[oldTeam] = shareListTemp1[oldTeam] + mCost
 			shareListTemp1[newTeam] = shareListTemp1[newTeam] - mCost
 		end
@@ -439,6 +441,12 @@ function gadget:FeatureDestroyed (featureID, allyTeam)
     AddFeatureReclaim(featureID)
     reclaimListByFeature[featureID] = nil
   end
+end
+
+
+function GG.Awards_UnitResurrected (unitDefID, teamID)
+  local ud = UnitDefs[unitDefID]
+  resurrectList[teamID] = resurrectList[teamID] + (ud and ud.metalCost or 0)
 end
 
 
@@ -551,6 +559,7 @@ function gadget:GameFrame(n)
 		local commTeam, maxCommDamage 	= getMaxVal(commDamageList)
 		
 		local reclaimTeam, 	maxReclaim 	= getMaxVal(reclaimList)
+		local rezzTeam, maxRezz			= getMaxVal(resurrectList)
 		local terraTeam, maxTerra		= getMaxVal(terraformList)
 		
 		local ouchTeam, maxOuchDamage 	= getMaxVal(ouchDamageList)
@@ -656,6 +665,11 @@ function gadget:GameFrame(n)
 		if terraTeam and maxTerra > 250 then
 			awardAward(terraTeam, 'terra', 'Terraform: '.. comma_value(maxTerra) .. " spent")
 		end
+
+		if rezzTeam and maxRezz >= 1000 then
+			awardAward(rezzTeam, 'rezz', 'Resurrected value: '.. comma_value(maxRezz))
+		end
+
 		--Spring.Echo(maxReclaim, getMeanMetalIncome())
 		if reclaimTeam and maxReclaim > getMeanMetalIncome() * minReclaimRatio then
 			awardAward(reclaimTeam , 'reclaim', comma_value(maxReclaim) .. "m from wreckage")
@@ -756,6 +770,7 @@ local awardDescs =
 	share 	= 'Share Bear',
 	terra	= 'Legendary Landscaper',
 	reclaim = 'Spoils of War',
+	rezz	= 'Necromancy Award',
 	vet 	= 'Decorated Veteran',
 	ouch 	= 'Big Purple Heart',
 	kam		= 'Kamikaze Award',
