@@ -1,10 +1,10 @@
-local versionName = "v1.29"
+local versionName = "v1.291"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
 --  brief:   a clustering algorithm
---  algorithm: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and Jörg Sander
---	algorithm: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, Jörg Sander and Xiaowei Xu
+--  algorithm: Ordering Points To Identify the Clustering Structure (OPTICS) by Mihael Ankerst, Markus M. Breunig, Hans-Peter Kriegel and JÃ¶rg Sander
+--	algorithm: density-based spatial clustering of applications with noise (DBSCAN) by Martin Ester, Hans-Peter Kriegel, JÃ¶rg Sander and Xiaowei Xu
 --	code:  Msafwan
 --
 --  Licensed under the terms of the GNU GPL, v2 or later.
@@ -294,6 +294,11 @@ function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be 
 end
 
 function widget:Initialize()
+	local myPlayerID=Spring.GetMyPlayerID()
+	local _, _, spec = Spring.GetPlayerInfo(myPlayerID)
+	if spec then widgetHandler:RemoveWidget() return false end --//widget will not load if we are a spectator.
+	
+	----- localize global variable:
 	local gameID_to_playerName = gameID_to_playerName_gbl
 	local myTeamID = myTeamID_gbl
 	local notifyCapture = notifyCapture_gbl
@@ -350,6 +355,10 @@ function widget:Initialize()
 	myTeamID_gbl = myTeamID
 	notifyCapture_gbl = notifyCapture
 	myColor_gbl = myColor
+end
+
+function widget:PlayerChanged(playerID)
+	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end --//widget will unload when we become spectator.
 end
 ---------------------------------------------------------------------------------
 --Visual FX----------------------------------------------------------------
