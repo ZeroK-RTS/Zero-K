@@ -428,12 +428,10 @@ local function AddFeatureReclaim(featureID)
 end
 
 local function FinalizeReclaimList()
-  if (reclaimListByFeature) then
-    for featureID, _ in pairs(reclaimListByFeature) do
-      AddFeatureReclaim(featureID)
-    end
-    reclaimListByFeature = nil
+  for featureID, _ in pairs(reclaimListByFeature) do
+    AddFeatureReclaim(featureID)
   end
+  reclaimListByFeature = {}
 end
 
 function gadget:FeatureDestroyed (featureID, allyTeam)
