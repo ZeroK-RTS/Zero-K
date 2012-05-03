@@ -756,8 +756,8 @@ function widget:Update(s)
 			return
 		end
 		local currentColorScheme = wasSimpleColor 
-		if WG.usingSimpleTeamColors then
-			currentColorScheme = WG.usingSimpleTeamColors
+		if WG.guiLocalColor then
+			currentColorScheme = WG.guiLocalColor.usingSimpleTeamColors
 		end
 		if (lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height) or (wasSimpleColor and not currentColorScheme) or (not wasSimpleColor and not not currentColorScheme) then --//if user resize the player-list OR if the simple-color state have changed, then refresh the player list.
 			SetupPlayerNames()	-- size changed; regen everything
@@ -866,3 +866,4 @@ function widget:Initialize()
 	lastSizeX = window_cpl.width
 	lastSizeY = window_cpl_height
 end
+

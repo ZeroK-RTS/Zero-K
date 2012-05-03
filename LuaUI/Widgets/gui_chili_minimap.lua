@@ -25,10 +25,10 @@ local recentlyInitialized = false
 local tabbedMode = false
 
 local function toggleTeamColors() 
-	if WG.localTeamColorToggle then
-		WG.localTeamColorToggle() 
+	if WG.guiLocalColor then
+		WG.guiLocalColor.localTeamColorToggle() 
+		options.simpleteamcolors.value = WG.guiLocalColor.usingSimpleTeamColors
 	end
-	options.simpleteamcolors.value = WG.usingSimpleTeamColors
 end 
 
 
@@ -43,7 +43,7 @@ local function MakeMinimapWindow()
 end
 
 options_path = 'Settings/View/Minimap'
-options_order = { 'use_map_ratio', 'hidebuttons', 'simpleteamcolors', 'startwithlos', 'startwithradar', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors', }
+options_order = { 'use_map_ratio', 'hidebuttons', 'simpleteamcolors', 'startwithlos', 'startwithradar', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors' }
 options = {
 	
 	use_map_ratio = {
@@ -59,25 +59,25 @@ options = {
 			window_minimap.fixedRatio = self.value;			
 		end,
 	},
-	--[[ cause of confusion
-	simplecolors = {
-		name = 'Simple Radar Blip Colors',
+	--[[
+	simpleMinimapColors = {
+		name = 'Simplified Minimap Colors',
 		type = 'bool',
-		desc = 'Show radar blips as green for yours, teal for allies and red for enemies.', 
+		desc = 'Show minimap blips as green for you, teal for allies and red for enemies (only minimap will use this simple color scheme).', 
 		springsetting = 'SimpleMiniMapColors',
 		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
 	},
 	--]]
 	simpleteamcolors = {
-		name = 'Start with simple team colors',
+		name = 'Simplified Team Colors',
 		type = 'bool',
-		desc = 'Set simple team colors at game start. ', 
+		desc = 'Use teal as your color, green for allies and red for enemies for all view-mode at game start (both zoom-out and minimap view will use this simple color scheme).', 
 		value = true,
-		OnChange = function(self)
-				if (self.value and not WG.usingSimpleTeamColors) or (not self.value and WG.usingSimpleTeamColors) then
-					toggleTeamColors()
-				end
-			end,
+		OnChange = function()
+			if (options.simpleteamcolors.value and not WG.guiLocalColor.usingSimpleTeamColors) or (not options.simpleteamcolors.value and WG.guiLocalColor.usingSimpleTeamColors) then --//change the team color scheme when the saved scheme didn't match the current scheme.
+				toggleTeamColors()
+			end
+		end,
 	},
 	
 	startwithlos = {
@@ -143,7 +143,10 @@ options = {
 		name = 'Toggle Simple Teamcolors',
 		desc = 'Toggle simples teamcolors, allies blue, enemies red and self teal.',
 		type = 'button',
-		OnChange = toggleTeamColors,
+		OnChange = function()
+				toggleTeamColors()
+				options.simpleteamcolors.value = not options.simpleteamcolors.value
+			end,
 	},
 	
 	hidebuttons = {
@@ -325,9 +328,9 @@ end
 
 function widget:Update()
 	if recentlyInitialized then
-		if (options.simpleteamcolors.value and not WG.usingSimpleTeamColors) or (not options.simpleteamcolors.value and WG.usingSimpleTeamColors) then
-			toggleTeamColors()
-		end
+		-- if (options.simpleteamcolors.value and not WG.usingSimpleTeamColors) or (not options.simpleteamcolors.value and WG.usingSimpleTeamColors) then --//change the team color scheme when the saved scheme didn't match the current scheme.
+			--toggleTeamColors()
+		-- end
 		if options.startwithlos.value then
 			Spring.SendCommands('togglelos')
 		end
@@ -335,7 +338,7 @@ function widget:Update()
 			Spring.SendCommands('toggleradarandjammer')
 		end
 		recentlyInitialized = false
-		widgetHandler:RemoveCallIn("Update")
+		widgetHandler:RemoveCallIn("Update") -- remove update call-in as it no longer needed. ref: gui_ally_cursors.lua by jK
 	end
 end
 

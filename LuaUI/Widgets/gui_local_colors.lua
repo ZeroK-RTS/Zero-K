@@ -19,6 +19,15 @@ else
 	error("missing file: Luaui/Configs/LocalColors.lua")
 end
 
+local wasSimpleColor = true --//variable: to check if configuration file has preference for simple color. Trigger simple-team-color/not-simple-team-color during initialization
+if VFS.FileExists("Luaui/Config/ZK_data.lua") then
+	local configFile =  VFS.Include("Luaui/Config/ZK_data.lua")
+	wasSimpleColor = configFile["EPIC Menu"].config.epic_Chili_Minimap_simpleteamcolors
+	if wasSimpleColor == nil then
+		wasSimpleColor = true
+	end
+end
+
 colorCFG.gaiaColor[1] = colorCFG.gaiaColor[1]/255 
 colorCFG.gaiaColor[2] = colorCFG.gaiaColor[2]/255
 colorCFG.gaiaColor[3] = colorCFG.gaiaColor[3]/255
@@ -39,16 +48,11 @@ for set, contents in pairs(colorCFG.enemyColors) do
 	colorCFG.enemyColors[set][3] = colorCFG.enemyColors[set][3]/255
 end
 
-
 local myColor = colorCFG.myColor
-
 local gaiaColor = colorCFG.gaiaColor
-
 local allyColors = colorCFG.allyColors
-
-local enemyColors = colorCFG.enemyColors 
-
-WG.usingSimpleTeamColors = false
+local enemyColors = colorCFG.enemyColors
+WG.guiLocalColor = {usingSimpleTeamColors = wasSimpleColor} --//variable: a value read by other widget to determine current color scheme. Effect gui_chili_crudeplayerlist.lua & gui_chili_minimap.lua. 
 
 local function SetNewTeamColors() 
 	local gaia = Spring.GetGaiaTeamID()
@@ -96,21 +100,27 @@ local function ResetOldTeamColors()
 	end
 end
 
-function WG.localTeamColorToggle()
-	if WG.usingSimpleTeamColors then
+function WG.guiLocalColor.localTeamColorToggle()
+	WG.guiLocalColor.usingSimpleTeamColors = not WG.guiLocalColor.usingSimpleTeamColors
+	local isSimpleColor = WG.guiLocalColor.usingSimpleTeamColors
+	if not isSimpleColor then
 		SetNewTeamColors()
-		WG.usingSimpleTeamColors = false
-	else
+	elseif isSimpleColor then
 		SetNewSimpleTeamColors() 
-		WG.usingSimpleTeamColors = true
 	end
+	--[[
 	if WG.crudeplayerlist_recolor_players then
 		WG.crudeplayerlist_recolor_players()
 	end
+	--]]
 end
 
 function widget:Initialize()
-	SetNewTeamColors()
+	if wasSimpleColor then 
+		SetNewSimpleTeamColors()
+	elseif not wasSimpleColor then
+		SetNewTeamColors()
+	end
 end
 
 function widget:Shutdown()
