@@ -16,8 +16,10 @@ if (gadgetHandler:IsSyncedCode()) then
 tideRhym = {}
 tideIndex = 1
 tideContinueFrame = 0
-lavaLevel = -200
+local minheight, maxheight = Spring.GetGroundExtremes()
+lavaLevel = minheight - lavarise - 20
 lavaGrow = 0.25
+lavarise = (maxheight - minheight) / 6
 _G.Game.mapSizeX = Game.mapSizeX
 _G.Game.mapSizeY = Game.mapSizeY
 gameframe = 0
@@ -26,7 +28,7 @@ function gadget:Initialize()
     if(Spring.GetModOptions().zkmode ~= "lavarise") then
 	    gadgetHandler:RemoveGadget()
 	end
-	addTideRhym (lavaLevel + 100, 0.25, 5*60)
+	addTideRhym (lavaLevel + lavarise, 0.25, 300)
 	
 	--addTideRhym (-21, 0.25, 5)
 	--addTideRhym (150, 0.25, 3)
@@ -52,11 +54,11 @@ function updateLava ()
 		or (lavaGrow > 0 and lavaLevel > tideRhym[tideIndex].targetLevel) then
 		tideContinueFrame = gameframe + tideRhym[tideIndex].remainTime*30
 		lavaGrow = 0
-		Spring.Echo ("Next LAVA LEVEL change in " .. (tideContinueFrame-gameframe)/30 .. " seconds", "Lava Height now " .. tideRhym[tideIndex].targetLevel, "Next Lava Height " .. tideRhym[tideIndex].targetLevel + 100.25)
+		Spring.Echo ("Next LAVA LEVEL change in " .. (tideContinueFrame-gameframe)/30 .. " seconds", "Lava Height now " .. tideRhym[tideIndex].targetLevel, "Next Lava Height " .. tideRhym[tideIndex].targetLevel + lavarise + 0.25)
 	end
 	
 	if (gameframe == tideContinueFrame) then
-		addTideRhym (lavaLevel + 100, 0.25, 5*60)
+		addTideRhym (lavaLevel + lavarise, 0.25, 300)
 		tideIndex = tideIndex + 1
 		--Spring.Echo ("tideIndex=" .. tideIndex .. " target=" ..tideRhym[tideIndex].targetLevel )		
 		if  (lavaLevel < tideRhym[tideIndex].targetLevel) then 
@@ -129,7 +131,7 @@ function DrawGroundHuggingSquare(red,green,blue,alpha,  x1,z1,x2,z2,   HoverHeig
 	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
 	gl.DepthTest(true)
 	gl.DepthMask(true)	
-	gl.Texture(":a:bitmaps\\lava2.png")-- Texture file	
+	gl.Texture(":a:bitmaps\\lava2.jpg")-- Texture file	
 	gl.Color(red,green,blue,alpha)	
 	gl.BeginEnd(GL.QUADS,DrawGroundHuggingSquareVertices,  x1,z1, x2,z2,  HoverHeight)
 	gl.Texture(false)
