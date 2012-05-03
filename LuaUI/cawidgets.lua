@@ -2012,6 +2012,7 @@ function widgetHandler:GameProgress(frame)
     w:GameProgress(frame)
   end
   return
+end
 
 
 --------------------------------------------------------------------------------
