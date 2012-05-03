@@ -47,6 +47,11 @@ local options = {
 		name = 'King of the Hill',
 		desc = 'Control the hill for a set amount of time to win! See King of the Hill section.',
       },
+	  {
+	    key  = 'lavarise',
+		name = 'Lava Rising',
+		desc = 'Endlessly rising lava!  Fiery fun for the whole family!',
+	  }
     },
 
   },
