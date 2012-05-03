@@ -15,7 +15,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true	--  loaded by default?
+    enabled   = false	--  loaded by default?
   }
 end
 
@@ -492,10 +492,11 @@ function assignTarget(unitID, allyteam, output)
       end
     end
     if output[2] == 0 or (output[2] ~= 0 and assign == nil) then
-      --Echo("no air in vision")
+      Echo("no air in vision")
       notargets = true
       if AAdefbuff.name == "corrl" then
         if output[5] ~= 0 then
+		  Echo("ground in vision")
           AAdefbuff.fire = 2
         else
           AAdefbuff.fire = 0
