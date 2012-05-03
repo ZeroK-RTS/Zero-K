@@ -101,8 +101,8 @@ local options = {
     },
     {
         key='lavarisespeed',
-        name='Speed of lava increase',
-        desc='Set how many cycles before map floods completely. ',
+        name='Number of cycles',
+        desc='Set how many cycles before map floods completely.  The more cycles, the slower the map floods. ',
         type='number',
         def=7,
         min=2,
@@ -114,12 +114,12 @@ local options = {
     {
         key='lavariseperiod',
         name='Length of lava cycle',
-        desc='How long each rise will wait for the next in minutes.',
+        desc='How long each rise will wait for the next in minutes. ',
         type='number',
         def=3,
         min=0.1,
         max=10,
-        step=0.2,
+        step=0.1,
         section='lava',
     },
 	
