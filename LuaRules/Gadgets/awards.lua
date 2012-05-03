@@ -57,6 +57,7 @@ local defDamageList		= {}
 local t3DamageList		= {}
 local captureList		= {}
 local reclaimList		= {}
+local reclaimListByFeature = {}
 local terraformList		= {}
 local ouchDamageList	= {}
 local kamDamageList		= {}
@@ -398,19 +399,48 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	end
 end
 
-function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
-	if FeatureDefs[featureDefID] then
-		reclaimList[builderTeam] = reclaimList[builderTeam] - FeatureDefs[featureDefID].metal*part
-	end
-	return true
-end
-
 function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, step) 
 	if terraunitDefID == unitDefID then
 		terraformList[builderTeam] = terraformList[builderTeam] + step*terraformCost
 	end
 	return true
 end
+
+
+function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
+  reclaimListByFeature[featureID] = reclaimListByFeature[featureID] or { metal = FeatureDefs[featureDefID].metal }
+  reclaimListByFeature[featureID][builderTeam] = (reclaimListByFeature[featureID][builderTeam] or 0) + part
+  return true
+end
+
+local function AddFeatureReclaim(featureID)
+  local featureData = reclaimListByFeature[featureID]
+  local metal = featureData.metal
+  featureData.metal = nil
+
+  for team, part in pairs(featureData) do
+    if (part < 0) then  --more metal was reclaimed from feature than spent on repairing it (during resurrecting)
+      reclaimList[team] = reclaimList[team] - metal * part
+    end
+  end
+end
+
+local function FinalizeReclaimList()
+  if (reclaimListByFeature) then
+    for featureID, _ in pairs(reclaimListByFeature) do
+      AddFeatureReclaim(featureID)
+    end
+    reclaimListByFeature = nil
+  end
+end
+
+function gadget:FeatureDestroyed (featureID, allyTeam)
+  if (reclaimListByFeature[featureID]) then
+    AddFeatureReclaim(featureID)
+    reclaimListByFeature[featureID] = nil
+  end
+end
+
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
 		attackerID, attackerDefID, attackerTeam)
@@ -506,6 +536,8 @@ function gadget:GameFrame(n)
 			local unitDefID = spGetUnitDefID(unitID)
 			gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		end
+	
+		FinalizeReclaimList()
 	
 		local pwnTeam, 	maxDamage 		= getMaxVal(damageList)		
 		local navyTeam, maxNavyDamage 	= getMaxVal(navyDamageList)
