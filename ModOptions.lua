@@ -92,7 +92,37 @@ local options = {
         step=0.5,
         section='koth',
     },
+	
+	{
+    key    = 'lava',
+    name   = 'Lava Rise Settings',
+    desc   = 'Settings for lava rise mode.',
+    type   = 'section',
+    },
+    {
+        key='lavarisespeed',
+        name='Speed of lava increase',
+        desc='Set how many cycles before map floods completely. ',
+        type='number',
+        def=7,
+        min=2,
+        max=12,
+        step=1.0,
+        section='lava',
+    },
 
+    {
+        key='lavariseperiod',
+        name='Length of lava cycle',
+        desc='How long each rise will wait for the next in minutes.',
+        type='number',
+        def=3,
+        min=0.1,
+        max=10,
+        step=0.2,
+        section='lava',
+    },
+	
   {
     key = "startingresourcetype",
     name = "Starting Resource Type",

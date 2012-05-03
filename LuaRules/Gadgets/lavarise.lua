@@ -17,7 +17,9 @@ tideRhym = {}
 tideIndex = 1
 tideContinueFrame = 0
 local minheight, maxheight = Spring.GetGroundExtremes()
-lavarise = (maxheight - minheight) / 4
+lavarisespeed = (Spring.GetModOptions().lavarisespeed or 0)
+lavariseperiod = (Spring.GetModOptions().lavariseperiod or 0) * 60
+lavarise = (maxheight - minheight) / lavarisespeed
 lavaLevel = minheight - lavarise - 20
 lavaGrow = 0.25
 _G.Game.mapSizeX = Game.mapSizeX
@@ -28,7 +30,7 @@ function gadget:Initialize()
     if(Spring.GetModOptions().zkmode ~= "lavarise") then
 	    gadgetHandler:RemoveGadget()
 	end
-	addTideRhym (lavaLevel + lavarise, 0.25, 300)
+	addTideRhym (lavaLevel + lavarise, 0.25, lavariseperiod)
 	
 	--addTideRhym (-21, 0.25, 5)
 	--addTideRhym (150, 0.25, 3)
@@ -58,7 +60,7 @@ function updateLava ()
 	end
 	
 	if (gameframe == tideContinueFrame) then
-		addTideRhym (lavaLevel + lavarise, 0.25, 300)
+		addTideRhym (lavaLevel + lavarise, 0.25, lavariseperiod)
 		tideIndex = tideIndex + 1
 		--Spring.Echo ("tideIndex=" .. tideIndex .. " target=" ..tideRhym[tideIndex].targetLevel )		
 		if  (lavaLevel < tideRhym[tideIndex].targetLevel) then 
