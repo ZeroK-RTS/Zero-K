@@ -211,7 +211,7 @@ local callInLists = {
   'TweakMouseWheel',
   'TweakIsAbove',
   'TweakGetTooltip',
-
+  'GameProgress',
 -- these use mouseOwner instead of lists
 --  'MouseMove',
 --  'MouseRelease',
@@ -2005,6 +2005,13 @@ function widgetHandler:SelectionChanged(selectedUnits)
   end
   return
 end
+
+
+function widgetHandler:GameProgress(frame)
+  for _,w in ipairs(self.GameProgressList) do
+    w:GameProgress(frame)
+  end
+  return
 
 
 --------------------------------------------------------------------------------
