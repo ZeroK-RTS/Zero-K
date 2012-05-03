@@ -1,4 +1,4 @@
-local versionName = "v1.291"
+local versionName = "v1.292"
 --------------------------------------------------------------------------------
 --
 --  file:   gui_recv_indicator.lua
@@ -31,6 +31,7 @@ local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
 local spAreTeamsAllied = Spring.AreTeamsAllied
 local spValidUnitID = Spring.ValidUnitID
 local spIsAABBInView = Spring.IsAABBInView
+local spGetGameFrame  = Spring.GetGameFrame 
 
 --Copied From gui_point_tracker.lua----------------------------------------------
 local glLineWidth = gl.LineWidth
@@ -69,6 +70,8 @@ local markerLife_gbl = 4 --//constant: wait (in second) before marker expired (t
 local circleLife_gbl = 6
 local maximumLife_gbl = 20 --//constant: wait (in second) before marker & circle forcefully expired (to prevent clutter)
 local useMergeSorter_gbl = false --//constant: experiment with merge sorter (slower)
+
+local iNotLagging = true --//variable: indicate if player(me) is lagging in current game. If I'm lagging then do not count any received units (because I might be in state of rejoining and those units I saw are probably just a replay).
 
 --Copied From gui_point_tracker.lua & minimap_event.lua--------------------------
 local circleList_gbl =nil
@@ -279,16 +282,18 @@ end
 
 
 function widget:UnitGiven(unitID, unitDefID, unitTeamID, oldTeamID) --//will be executed repeatedly if there's more than 1 unit transfer
-	if spValidUnitID(unitID) and unitTeamID == myTeamID_gbl then --if my unit
-		if spAreTeamsAllied(unitTeamID, oldTeamID) or notifyCapture_gbl[oldTeamID] then --if from my ally, or from a captured enemy unit
-			--myTeamID_gbl = unitTeamID --//uncomment this and comment 'unitTeamID == myTeamID_gbl' (above) when testing
-			notifyCapture_gbl[oldTeamID] = false
-			local x,y,z = spGetUnitPosition(unitID)
-			receivedUnitList_gbl[unitID]={x,y,z}
-			receivedUnitListEMPTY_gbl = false --//flag the table as not empty
-			givenByTeamID_gbl = oldTeamID
-			waitDuration_gbl = 0.2 -- tell widget:Update() to wait 0.2 more second before start adding mapMarker
-			elapsedTime = 0 -- tell widget:Update() to reset timer
+	if iNotLagging then
+		if spValidUnitID(unitID) and unitTeamID == myTeamID_gbl then --if my unit
+			if spAreTeamsAllied(unitTeamID, oldTeamID) or notifyCapture_gbl[oldTeamID] then --if from my ally, or from a captured enemy unit
+				--myTeamID_gbl = unitTeamID --//uncomment this and comment 'unitTeamID == myTeamID_gbl' (above) when testing
+				notifyCapture_gbl[oldTeamID] = false
+				local x,y,z = spGetUnitPosition(unitID)
+				receivedUnitList_gbl[unitID]={x,y,z}
+				receivedUnitListEMPTY_gbl = false --//flag the table as not empty
+				givenByTeamID_gbl = oldTeamID
+				waitDuration_gbl = 0.2 -- tell widget:Update() to wait 0.2 more second before start adding mapMarker
+				elapsedTime = 0 -- tell widget:Update() to reset timer
+			end
 		end
 	end
 end
@@ -357,8 +362,21 @@ function widget:Initialize()
 	myColor_gbl = myColor
 end
 
+---------------------------------------------------------------------------------
+--Widget's Turn-Off/On switch-----------------------------------------------------
+--2 functions
 function widget:PlayerChanged(playerID)
 	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end --//widget will unload when we become spectator.
+end
+
+function widget:GameProgress(serverFrameNum) --//see if me are lagging behind the server in the current game. If me is lagging then trigger a switch, (this switch will tell the widget to stop counting received units).
+	local myFrameNum = spGetGameFrame()
+	local frameNumDiff = serverFrameNum - myFrameNum
+	if frameNumDiff > 120 then --// 120 frame means: a 4 second lag. Consider me is lagging if my frame differ from server by more than 4 second.
+		iNotLagging = false
+	else  --// consider me not lagging if my frame differ from server's frame for less than 4 second.
+		iNotLagging = true
+	end
 end
 ---------------------------------------------------------------------------------
 --Visual FX----------------------------------------------------------------
