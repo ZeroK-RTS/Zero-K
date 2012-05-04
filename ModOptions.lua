@@ -114,12 +114,12 @@ local options = {
     {
         key='lavariseperiod',
         name='Length of lava cycle',
-        desc='How long each rise will wait for the next in minutes. ',
+        desc='How long each rise will wait for the next in seconds. ',
         type='number',
         def=2,
-        min=0.1,
-        max=100,
-        step=0.1,
+        min=1,
+        max=6000,
+        step=1,
         section='lava',
     },
 	

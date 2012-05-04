@@ -18,7 +18,7 @@ tideIndex = 1
 tideContinueFrame = 0
 local minheight, maxheight = Spring.GetGroundExtremes()
 lavarisespeed = (Spring.GetModOptions().lavarisespeed or 0)
-lavariseperiod = (Spring.GetModOptions().lavariseperiod or 0) * 60
+lavariseperiod = (Spring.GetModOptions().lavariseperiod or 0)
 lavarise = (maxheight - minheight) / lavarisespeed
 lavaLevel = minheight - lavarise - 20
 lavaGrow = 0.25
@@ -124,7 +124,7 @@ function gadget:DrawWorld ()
          --gl.Color(1-cm1,1-cm1-cm2,0.5,1)
 		
 		--DrawGroundHuggingSquare(1-cm1,1-cm1-cm2,0.5,1,  0, 0, Game.mapX*512, Game.mapY*512 ,SYNCED.lavaLevel) --***map.width bla
-		DrawGroundHuggingSquare(1,1,1,1,  0, 0, Game.mapX*512, Game.mapY*512 ,SYNCED.lavaLevel) --***map.width bla
+		DrawGroundHuggingSquare(1,1,1,1,  -1000, -1000, Game.mapX*512 + 1000, Game.mapY*512 + 1000,SYNCED.lavaLevel) --***map.width bla
 		--DrawGroundHuggingSquare(0,0.5,0.8,0.8,  0, 0, Game.mapX*512, Game.mapY*512 ,SYNCED.lavaLevel) --***map.width bla
 	end
 end
