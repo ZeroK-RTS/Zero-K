@@ -55,7 +55,7 @@ unitDef = {
   sfxtypes               = {
 
   explosiongenerators = {
-      [[custom:rockomuzzle]],
+      [[custom:HEAVY_CANNON_MUZZLE]],
     },
 
   },
@@ -114,13 +114,10 @@ unitDef = {
       predictBoost            = 1,
       range                   = 900,
       reloadtime              = 0.4,
-      renderType              = 4,
-	  size                    = 0.01,
+      size                    = 0.01,
       soundHit                = [[weapon/flak_hit]],
       soundStart              = [[weapon/flak_fire]],
-      startsmoke              = [[1]],
       turret                  = true,
-      unitsonly               = [[1]],
       weaponTimer             = 1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 2000,
