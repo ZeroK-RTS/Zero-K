@@ -11,6 +11,7 @@ function gadget:GetInfo()
 end
 
 
+local GetUnitDefID       = Spring.GetUnitDefID
 
 if (gadgetHandler:IsSyncedCode()) then
 tideRhym = {}
@@ -106,13 +107,17 @@ end
 function lavaDeathCheck ()
 local all_units = Spring.GetAllUnits ()
 	for i in pairs(all_units) do
-		x,y,z = Spring.GetUnitBasePosition   (all_units[i])
-		if (y ~= nil) then
-			if (y and y < lavaLevel) then 
-				--Spring.AddUnitDamage (all_units[i],1000) 
-				Spring.DestroyUnit (all_units[i])
-				--Spring.SpawnCEG("tpsmokecloud", x, y, z)
-			end
+		local unitDefID = GetUnitDefID(all_units[i])
+		ud = UnitDefs[unitDefID]
+	    if ud.name ~= "terraunit" then
+		    x,y,z = Spring.GetUnitBasePosition   (all_units[i])
+		    if (y ~= nil) then
+			    if (y and y < lavaLevel) then 
+				    --Spring.AddUnitDamage (all_units[i],1000) 
+				    Spring.DestroyUnit (all_units[i])
+				    --Spring.SpawnCEG("tpsmokecloud", x, y, z)
+			    end
+		    end
 		end
 	end
 end
