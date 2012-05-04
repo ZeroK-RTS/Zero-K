@@ -265,17 +265,21 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Vehicle buff
+-- Maneuverablity Buff
 -- 
 
-local VEHICLE_TURNRATE_MULT = 1
-local VEHICLE_ACCEL_MULT = 1
+local TURNRATE_MULT = 1
+local ACCEL_MULT = 3
 
 for name, ud in pairs(UnitDefs) do
-	if ud.movementclass and ud.movementclass:find("TANK") then
-		ud.turnrate = ud.turnrate * VEHICLE_TURNRATE_MULT
-		ud.acceleration = ud.acceleration * VEHICLE_ACCEL_MULT
-		ud.brakerate = ud.brakerate * VEHICLE_ACCEL_MULT
+	--if  then
+	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
+		local class = ud.movementclass
+		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
+			ud.turnrate = ud.turnrate * TURNRATE_MULT
+			ud.acceleration = ud.acceleration * ACCEL_MULT
+			ud.brakerate = ud.brakerate * ACCEL_MULT
+		end
 	end
 end
 
