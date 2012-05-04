@@ -1,6 +1,9 @@
 
 -- In-game, type "/luarules caiscout [x]" in the console to toggle scoutmap drawing for team [x]
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function gadget:GetInfo()
   return {
     name      = "CAI",
@@ -13,6 +16,8 @@ function gadget:GetInfo()
   }
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local spGetAllUnits			= Spring.GetAllUnits
 local spGetTeamInfo 		= Spring.GetTeamInfo
 local spGetTeamLuaAI 		= Spring.GetTeamLuaAI
@@ -48,8 +53,11 @@ for name, data in pairs(jumpDefNames) do
 	jumpDefs[UnitDefNames[name].id] = data
 end
 
+local SAVE_FILE = "Gadgets/ai_cai.lua"
 
+--------------------------------------------------------------------------------
 -- commands
+--------------------------------------------------------------------------------
 include("LuaRules/Configs/customcmds.h.lua")
 
 local CMD_MOVE_STATE	= CMD.MOVE_STATE
@@ -69,9 +77,11 @@ local CMD_REMOVE 		= CMD.REMOVE
 
 local twoPi = math.pi*2
 
-if (not gadgetHandler:IsSyncedCode()) then
-	return
-end
+if (gadgetHandler:IsSyncedCode()) then
+
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
 
 local function CopyTable(original)   -- Warning: circular table references lead to
 	local copy = {}               -- an infinite loop.
@@ -121,6 +131,13 @@ local debugData = {
 local aiTeamData = {} -- all the information a single AI stores
 local allyTeamData = {} -- all the information that each ally team is required to store
 -- some information is stored by all. Other info is stored only be allyTeams with AI
+
+-- is this even needed any more?
+_G.aiTeamData = aiTeamData
+_G.allyTeamData = allyTeamData
+
+-- spots that mexes can be built on
+mexSpot = {count = 0}
 
 local econAverageMemory = 3 -- how many econ update steps economy is averaged over
 
@@ -2676,7 +2693,7 @@ local function initialiseFaction(team)
 	if shortname == "ZK" then
 		a.buildDefs = a.buildConfig.robots
 		return true
-	else
+	else	-- CA reverse compatibility	-- remove?
 		local units = spGetTeamUnits(team)
 		for i = 1, #units do
 			local ud = UnitDefs[spGetUnitDefID(units[i])]
@@ -3830,5 +3847,41 @@ function gadget:Initialize()
 		end
 		--x,_,z = spGetUnitPosition(unitID)
 	end
+
+end
+
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Echo("ERROR: CAI failed to access save/load API")
+		return
+	end
+	local data = GG.SaveLoad.ReadFile(zip, "CAI", SAVE_FILE) or {}
+	-- TBD
+end
+
+else
+
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
+-- need this because SYNCED.tables are merely proxies, not real tables
+local function MakeRealTable(proxy)
+	local ret = {}
+	for i,v in spairs(proxy) do
+		ret[i] = v
+	end
+	return ret
+end
+
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Echo("ERROR: CAI failed to access save/load API")
+		return
+	end
+	local allyTeamData = MakeRealTable(SYNCED.allyTeamData)
+	local aiTeamData = MakeRealTable(SYNCED.aiTeamData)
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, allyTeamData)
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, aiTeamData)
+end
 
 end
