@@ -6,10 +6,10 @@ local body = piece "body"
 local head = piece "head"
 local headflare = piece "headflare"
 local torso = piece "torso"
-local lmissile3 = piece "lmissile3"
-local rmissile3 = piece "rmissile3"
-local lmissileflare3 = piece "lmissileflare3"
-local rmissileflare3 = piece "rmissileflare3"
+local lmissiles = piece "lmissiles"
+local rmissiles = piece "rmissiles"
+local lmissileflare = piece "lmissileflare"
+local rmissileflare = piece "rmissileflare"
 
 --left arm
 local larm = piece "larm"
@@ -50,7 +50,7 @@ local SIG_Aim  = 4
 local SIG_Aim2  = 8
 local SIG_Aim3  = 16
 local armgun = false
-local missilegun = false
+local missilegun = 1
 local PACE = 1.1
 
 local THIGH_FRONT_ANGLE = -math.rad(40)
@@ -87,7 +87,8 @@ local reloadTimeShort = wd and WeaponDefs[wd].reload*30 or 30
 function script.Create()
 	Turn( larm, z_axis, -0.1)
 	Turn( rarm, z_axis, 0.1)	
-
+	Turn( lmissileflare, z_axis, math.rad(-90))
+	Turn( rmissileflare, z_axis, math.rad(-90))	
 	StartThread(SmokeUnit)
 end
 
@@ -165,15 +166,11 @@ end
 
 
 local function missilelaunch()
-	if missilegun then
-		Hide ( lmissile3 )
-		Sleep(4000)
-		Show ( lmissile3 )
-	else
-		Hide ( rmissile3 )
-		Sleep(4000)
-		Show ( rmissile3 )
-	end
+		Hide ( lmissiles )
+		Hide ( rmissiles )
+		Sleep(30000)
+		Show ( lmissiles )
+		Show ( rmissiles )
 end
 
 local function armrecoil()
@@ -202,36 +199,25 @@ local function armrecoil()
 	end
 end
 
-local function SuperBeam()
-	for i=1,CHARGE_TIME do
-		SetUnitValue(COB.CEG_DAMAGE,i)
-		EmitSfx(headflare, 1024 + 2)
-		Sleep(33)
-	end
-	local px, py, pz = Spring.GetUnitPosition(unitID)
-	Spring.PlaySoundFile("sounds/weapon/laser/heavy_laser4.wav", 10, px, py, pz)
-	for i=1,FIRE_TIME do
-		EmitSfx(headflare, 2048 + 4)
-	    	Sleep(33)
-	end
-end
-
 function script.QueryWeapon(num)
-	if num == 1 or num == 3 or num == 5 then
+	if num == 1 then
 		return headflare
 	elseif num == 2 then
 		if armgun then return larmflare
 		else return rarmflare end	
-	elseif num == 4 then
-		if missilegun then return lmissileflare3
-		else return rmissileflare3 end	
+	elseif num == 3 then
+		if missilegun == 1 then
+			return lmissiles
+		elseif missilegun == 2 then
+			return rmissiles
+		end
 	end
 end
 
 function script.AimFromWeapon(num)
-	if num == 1 or num == 3 or num == 5 then
+	if num == 1 or num == 3 then
 		return headflare
-	elseif num == 2 or num == 4 then
+	elseif num == 2 then
 		return torso
 	end
 end
@@ -259,34 +245,22 @@ function script.AimWeapon(num, heading, pitch )
 		StartThread(RestoreAfterDelay)
 		return true	
 	elseif num == 3 then
-		Signal( SIG_Aim3 )
-		SetSignalMask( SIG_Aim3 )
-		Turn( head, y_axis, heading, 3 )
-		Turn( headflare, x_axis, -pitch, 3 )
-		WaitForTurn( head, y_axis )
-		WaitForTurn( headflare, x_axis )
-		StartThread(RestoreAfterDelay)
-		return true	
-	elseif num == 4 then
 		return true
 	end
 	return false
 end
 
 
-function script.FireWeapon(num)
-	if num == 1 then
-	    local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
-		Spring.SetUnitWeaponState(unitID, 2, "reloadFrame", Spring.GetGameFrame() + reloadTimeShort*speedmult)	
-	elseif num == 2 then
+function script.Shot(num)
+	if num == 2 then
 		armgun = not armgun
 		StartThread(armrecoil)
 	elseif num == 3 then
-	        local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
-			Spring.SetUnitWeaponState(unitID, 0, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
-		--StartThread(SuperBeam)
-	elseif num == 4 then
-		missilegun = not missilegun
+		if missilegun < 2 then
+			missilegun = missilegun+1
+		else
+			missilegun = 1
+		end
 		StartThread(missilelaunch)
 	end
 end
@@ -298,6 +272,20 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(body, sfxNone)
 		Explode(head, sfxNone)
 		Explode(pelvis, sfxNone)
+		dead = true
+		
+		Explode(lleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rarmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(larmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(llarm, sfxShatter)
+		Explode(lmissiles, sfxShatter)
+		Explode(rmissiles, sfxShatter)
+		
+		Turn(torso, y_axis, 0, 50)
+		Turn(rarmgun, y_axis, 30, 20)	
+		Turn(larmgun, y_axis, 30, 20)
+		
+		Sleep(800)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
 		Explode(body, sfxNone)
