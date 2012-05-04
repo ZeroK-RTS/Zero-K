@@ -57,7 +57,7 @@ function updateLava ()
 		or (lavaGrow > 0 and lavaLevel > tideRhym[tideIndex].targetLevel) then
 		tideContinueFrame = gameframe + tideRhym[tideIndex].remainTime*30
 		lavaGrow = 0
-		if msgcounter <= gameframe - 30 then
+		if msgcounter <= gameframe - 900 then
 		  Spring.Echo ("Next LAVA LEVEL change in " .. (tideContinueFrame-gameframe)/30 .. " seconds", "Lava Height now " .. tideRhym[tideIndex].targetLevel, "Next Lava Height " .. tideRhym[tideIndex].targetLevel + lavarise + 0.25)
 	      msgcounter = gameframe
 		end
