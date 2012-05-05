@@ -473,7 +473,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 	--else
 		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
 	--end
-	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("teleport_huge", x, y, z) end
+	if Spring.GetGameFrame() <= 1 then Spring.SpawnCEG("teleport_in", x, y, z) end
 	
 	if not bonusSpawn then
 		Spring.SetGameRulesParam("commSpawnedTeam"..teamID, 1)
