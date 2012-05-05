@@ -33,9 +33,9 @@ unitDef = {
 
   customParams           = {
 	cloakstealth = [[1]],
-	description_de = [[Mobiler Sturmkommandant, Baut mit 12 M/s]],
+	description_de = [[Mobiler Sturmkommandant, Baut mit 10 M/s]],
 	helptext       = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor.]],
-	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufrüstung erhält er eine Disintegratorkanone.]],
+	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes GerÃ¼st, das mit den meisten Modulen ausgerÃ¼stet werden kann, mit anstÃ¤ndiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender AufrÃ¼stung erhÃ¤lt er eine Disintegratorkanone.]],
 	level = [[1]],
 	statsname = [[armcom1]],
 	soundok = [[heavy_bot_move]],
