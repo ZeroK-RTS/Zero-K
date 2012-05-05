@@ -1,4 +1,4 @@
-local versionName = "v2.251"
+local versionName = "v2.27"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground combat unit and gunships",
     author    = "msafwan",
-    date      = "March 17, 2012",
+    date      = "May 5, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -138,6 +138,7 @@ local wreckageID_offset=0
 local roundTripComplete= true --variable for detecting network lag, prevent messy overlapping command queuing
 local attackerG= {} --for recording last attacker
 local commandTTL_G = {} --for recording command's age. To check for expiration
+local iNotLagging_gbl = true --//variable: indicate if player(me) is lagging in current game. If lagging then do not process anything.
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
@@ -239,41 +240,43 @@ function widget:Update()
 	local attacker = attackerG
 	local commandTTL = commandTTL_G
 	-----
-	local now=spGetGameSeconds()
-	if (now >= skippingTimer[1]) then --wait until 'skippingTimer[1] second', then do "RefreshUnitList()"
-		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
-		unitInMotion, attacker, commandTTL=RefreshUnitList(attacker, commandTTL) --create unit list
+	if iNotLagging_gbl then
+		local now=spGetGameSeconds()
+		if (now >= skippingTimer[1]) then --wait until 'skippingTimer[1] second', then do "RefreshUnitList()"
+			if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
+			unitInMotion, attacker, commandTTL=RefreshUnitList(attacker, commandTTL) --create unit list
+			
+			local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --create list every 1.1 second OR every (0+latency) second, depending on which is greater.
+			skippingTimer[1]=now+projectedDelay --wait until next 'skippingTimer[1] second'
+			if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
+		end
 		
-		local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --create list every 1.1 second, or every each second of lag.
-		skippingTimer[1]=now+projectedDelay --wait until next 'skippingTimer[1] second'
-		if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
-	end
-	
-	if (now >=skippingTimer[2] and cycle==1) and roundTripComplete then --wait until 'skippingTimer[2] second', and wait for 'LUA message received', and wait for 'cycle==1', then do "GetPreliminarySeparation()"
-		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
-		surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
-		cycle=2 --set to 'cycle==2'
-		
-		skippingTimer = CalculateNetworkDelay(1, skippingTimer, now) --update delay statistic. Record 'roundTripComplete'.
-		skippingTimer[2] = now+ gps_then_DoCalculation_delayG --wait until 'gps_then_DoCalculation_delayG'. The longer the better. The delay allow reliable unit direction to be derived from unit's motion
-		if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
-	end
-	if (now >=skippingTimer[2] and cycle==2) then --wait until 'skippingTimer[2] second', and wait for 'cycle==2', then do "DoCalculation()"
-		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
-		local networkDelay = CalculateNetworkDelay(0, skippingTimer, nil) --retrieve delay statistic
-		commandIndexTable, commandTTL =DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay, now, commandTTL) --initiate avoidance system
-		cycle=1 --set to 'cycle==1'
-		
-		skippingTimer[2]=now+ doCalculation_then_gps_delayG --wait until 'doCalculation_then_gps_delayG'. Is arbitrarily set. Save CPU by setting longer wait.
-		skippingTimer = CalculateNetworkDelay(2, skippingTimer, now) --prepare delay statistic for new measurement
-		spSendLuaUIMsg(dummyIDg) --send ping to server. Wait for answer
-		roundTripComplete = false --Wait for 'LUA message Receive'.
-		if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
-	end
+		if (now >=skippingTimer[2] and cycle==1) and roundTripComplete then --wait until 'skippingTimer[2] second', and wait for 'LUA message received', and wait for 'cycle==1', then do "GetPreliminarySeparation()"
+			if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
+			surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
+			cycle=2 --set to 'cycle==2'
+			
+			skippingTimer = CalculateNetworkDelay(1, skippingTimer, now) --update delay statistic. Record 'roundTripComplete'.
+			skippingTimer[2] = now+ gps_then_DoCalculation_delayG --wait until 'gps_then_DoCalculation_delayG'. The longer the better. The delay allow reliable unit direction to be derived from unit's motion
+			if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
+		end
+		if (now >=skippingTimer[2] and cycle==2) then --wait until 'skippingTimer[2] second', and wait for 'cycle==2', then do "DoCalculation()"
+			if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
+			local networkDelay = CalculateNetworkDelay(0, skippingTimer, nil) --retrieve delay statistic
+			commandIndexTable, commandTTL =DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay, now, commandTTL) --initiate avoidance system
+			cycle=1 --set to 'cycle==1'
+			
+			skippingTimer[2]=now+ doCalculation_then_gps_delayG --wait until 'doCalculation_then_gps_delayG'. Is arbitrarily set. Save CPU by setting longer wait.
+			skippingTimer = CalculateNetworkDelay(2, skippingTimer, now) --prepare delay statistic for new measurement
+			spSendLuaUIMsg(dummyIDg) --send ping to server. Wait for answer
+			roundTripComplete = false --Wait for 'LUA message Receive'.
+			if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
+		end
 
-	if (turnOnEcho == 1) then
-		Spring.Echo("unitInMotion(Update):")
-		Spring.Echo(unitInMotion)
+		if (turnOnEcho == 1) then
+			Spring.Echo("unitInMotion(Update):")
+			Spring.Echo(unitInMotion)
+		end
 	end
 	-------return global table
 	commandIndexTableG=commandIndexTable
@@ -285,6 +288,17 @@ function widget:Update()
 	commandTTL_G = commandTTL
 	-----
 end
+
+function widget:GameProgress(serverFrameNum) --//see if player are lagging behind the server in the current game. If player is lagging then trigger a switch, (this switch will tell the widget to stop processing units).
+	local myFrameNum = spGetGameFrame()
+	local frameNumDiff = serverFrameNum - myFrameNum
+	if frameNumDiff > 120 then --// 120 frame means: a 4 second lag. Consider me is lagging if my frame differ from server by more than 4 second.
+		iNotLagging_gbl = false
+	else  --// consider me not lagging if my frame differ from server's frame for less than 4 second.
+		iNotLagging_gbl = true
+	end
+end
+
 ---------------------------------Level 0 Top level
 ---------------------------------Level1 Lower level
 -- return a refreshed unit list, else return nil
@@ -442,16 +456,21 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, net
 				--do sync test. Ensure stored command not changed during last delay. eg: it change if user issued new command
 				local cQueueSyncTest = spGetCommandQueue(unitID)
 				local needToCancelOrder = false
-				if #cQueueSyncTest>=2 then --if new command is longer than or equal to 2 (1 any command + 1 stop command)
-					if #cQueueSyncTest~=#cQueue or --if command queue is not same as original, or
-						(cQueueSyncTest[1].params[1]~=cQueue[1].params[1] or cQueueSyncTest[1].params[3]~=cQueue[1].params[3]) or --or, if first queue has different content, or
-							cQueueSyncTest[1]==nil then --or, if unit has became idle
-						--newCommand=true
-						--cQueue=cQueueSyncTest
-						commandIndexTable[unitID]=nil --empty commandIndex (command history) for this unit
-						commandTTL[unitID][#commandTTL]=nil --delete latest watchdog's entry for this unit
-						needToCancelOrder = true --skip widget's command
+				if cQueueSyncTest ~= nil then
+					if #cQueueSyncTest>=2 then --if new command is longer than or equal to 2 (eg: 1st = any command, 2nd = stop command) then it is indicative of user's NEW command (command like auto-attack or idle has only 1 queue and should be ignored as an overriding force).
+						--if #cQueueSyncTest~=#cQueue or --if command queue lenght is not same as original (is indicative of user's NEW command, but may just mean that user queued new command on top of old one) 
+						if (cQueueSyncTest[1].params[1]~=cQueue[1].params[1] or cQueueSyncTest[1].params[3]~=cQueue[1].params[3]) or -- if first queue has different content (is definitive of user's NEW command)
+						(cQueueSyncTest[1]==nil) then --or, if somehow the unit queued an idle state (not sure...)
+							--newCommand=true
+							--cQueue=cQueueSyncTest
+							commandIndexTable[unitID]=nil --empty commandIndex (command history) for this unit. CommandIndex store widget's previous command, which become irrelevant when user override the widget.
+							if (not newCommand) then --if the last command was made by this widget:
+								commandTTL[unitID][#commandTTL[unitID]]=nil --delete the last watchdog's entry for this unit. That last entry contain a timeout-info on unit's last command, but user has overriden that unit's last command.
+							end
+							needToCancelOrder = true --skip widget's command
+						end
 					end
+				else Spring.Echo("cQueueSyncTest == nil!") --//under an unknown circumstances the unit's commandQueue became nil (??).
 				end
 				if not needToCancelOrder then --//if unit receive new command then widget need to stop issuing command based on old information. This prevent user from being annoyed by widget overriding their command.
 					local unitSpeed= surroundingOfActiveUnit[i][7]
@@ -533,6 +552,9 @@ function RefreshWatchdogList (unitID, commandTTL)
 	if commandTTL[unitID] == nil then --if commandTTL table is empty then insert an empty table
 		commandTTL[unitID] = {}
 	else --//if commandTTL is not empty then perform check and update its content appropriately. Its not empty when widget has issued a new command
+
+		--//Method1: the following function do work offline but not online because widget's command appears delayed (latency) and this cause missmatch with what commandTTL expect to see: it doesn't see the command thus it assume the command already been deleted.
+		--[[
 		local cQueue = spGetCommandQueue(unitID, 1)
 		for i=#commandTTL[unitID], 1, -1 do
 			local firstParam, secondParam = 0, 0
@@ -546,11 +568,35 @@ function RefreshWatchdogList (unitID, commandTTL)
 					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 					commandTTL[unitID][i] = nil
 				end
-				break --//exit the iteration, save the rest of the commandTTL for checking on next update/next cQueue. If later commandTTL is for cQueue[2] then it would be more appropriate to compare it later (currently we only check cQueue[1] for timeout/expiration).
-			else --//if current command is a NEW command (not similar to widget's issued), then delete *this* watchdog entry. Operator "#" will automatically register the 'nil' as 'end of table' for future updates
+				break --//exit the iteration, save the rest of the commandTTL for checking on next update/next cQueue. Since later commandTTL is for cQueue[2](next qeueu) then it is more appropriate to compare it later (currently we only check cQueue[1] for timeout/expiration).
+			else --//if current command is a NEW command (not similar to the one catalogued in commandTTL as widget-issued), then delete this watchdog entry. LUA Operator "#" will automatically register the 'nil' as 'end of table' for future updates
 				commandTTL[unitID][i] = nil
+				--commandTTL[unitID][i].miss = commandTTL[unitID][i].miss +1 --//when unit's command doesn't match the one on watchdog-list then mark the entry as "miss"+1 .  
 			end
 		end
+		--]]
+		
+		--//Method2: work by checking for cQueue after the command has expired. No latency could be as long as command's expiration time so it solve Method1's issue.
+		local returnToReclaimOffset = 1 --
+		for i=#commandTTL[unitID], 1, -1 do --iterate over commandTTL
+			if commandTTL[unitID][i] ~= nil then
+				if commandTTL[unitID][i].countDown >0 then 
+					commandTTL[unitID][i].countDown = commandTTL[unitID][i].countDown - (1*returnToReclaimOffset) --count-down until zero and stop
+					break --//exit the iteration, do not go to next iteration until this entry expire first... 
+				elseif commandTTL[unitID][i].countDown ==0 then --if commandTTL is found to reach ZERO then remove the command, assume a 'TIMEOUT', then remove *this* watchdog entry
+					local cQueue = spGetCommandQueue(unitID, 1) --// get unit's immediate command
+					local firstParam, secondParam = 0, 0
+					if cQueue[1]~=nil then
+						firstParam, secondParam = cQueue[1].params[1], cQueue[1].params[3] --if cQueue not empty then use it... x, z,
+					end
+					if (firstParam == commandTTL[unitID][i].widgetCommand[1]) and (secondParam == commandTTL[unitID][i].widgetCommand[2]) then --//if current command is similar to the one once issued by widget then delete it
+						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
+					end
+					commandTTL[unitID][i] = nil --empty watchdog entry
+					returnToReclaimOffset = 2 --when the loop iterate back to a reclaim command: remove 2 second from its countdown (accelerate expiration by 2 second). This is for aesthetic reason and didn't effect system's mechanic.  Since constructor always retreat with 2 command (avoidance+return to base), remove the countdown from the avoidance. 
+				end
+			end
+		end		
 	end
 	return commandTTL
 end
@@ -924,7 +970,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 	if not newCommand then  --if widget's command then delete it
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
 		queueIndex=2 --skip index 1 of stored command. Skip widget's command
-		commandTTL[unitID][#commandTTL[unitID]] = nil --//delete the latest watchdog entry (assuming commandTTL are insert/delete same command that widget is insert/delete). 
+		commandTTL[unitID][#commandTTL[unitID]] = nil --//delete the last watchdog entry (the "not newCommand" means that previous widget's command haven't changed yet (nothing has interrupted this unit, same is with commandTTL), and so if command is to delete then it is good opportunity to also delete its timeout info at *commandTTL* too). Deleting this entry mean that this particular command will no longer be checked for timeout.
 	end
 	if #cQueue>=queueIndex+1 then --reclaim,area reclaim,stop, or: move,reclaim, area reclaim,stop, or: area reclaim, stop, or:move, area reclaim, stop.
 		if (cQueue[queueIndex].id==40 or cQueue[queueIndex].id==90 or cQueue[queueIndex].id==125) then --if first (1) queue is reclaim/ressurect/repair
@@ -944,7 +990,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 			elseif (cQueue[queueIndex].params[3]~=nil) then  --if first (1) queue is area reclaim (an area reclaim without any wreckage to reclaim). area command should has no "nil" on params 1,2,3, & 4
 				local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex])
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
-				commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeout, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
+				commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeout, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 2x*RefreshUnitUpdateRate* to expire
 			end
 		end
 	end
