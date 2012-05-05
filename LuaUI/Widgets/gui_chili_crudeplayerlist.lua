@@ -748,6 +748,8 @@ end
 local timer = 0
 local lastSizeX
 local lastSizeY
+local currentColorScheme = wasSimpleColor
+
 function widget:Update(s)
 	timer = timer + s
 	if timer > UPDATE_FREQUENCY then
@@ -755,11 +757,10 @@ function widget:Update(s)
 		if (window_cpl.hidden) then --//don't update when window is hidden.
 			return
 		end
-		local currentColorScheme = wasSimpleColor 
 		if WG.guiLocalColor then
 			currentColorScheme = WG.guiLocalColor.usingSimpleTeamColors
 		end
-		if (lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height) or (wasSimpleColor and not currentColorScheme) or (not wasSimpleColor and not not currentColorScheme) then --//if user resize the player-list OR if the simple-color state have changed, then refresh the player list.
+		if (lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height) or (wasSimpleColor ~= currentColorScheme) then --//if user resize the player-list OR if the simple-color state have changed, then refresh the player list.
 			SetupPlayerNames()	-- size changed; regen everything
 			lastSizeX = window_cpl.width
 			lastSizeY = window_cpl.height
