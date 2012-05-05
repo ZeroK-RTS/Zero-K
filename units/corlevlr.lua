@@ -93,7 +93,7 @@ unitDef = {
 	  customParams            = {
 	    gatherradius = [[90]],
 	    smoothradius = [[60]],
-		smoothmult   = [[0.04]],
+		smoothmult   = [[0.08]],
 	  },
 	  
       damage                  = {
