@@ -33,6 +33,7 @@ local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
 local spGetUnitLosState		= Spring.GetUnitLosState
 local spGetUnitStates		= Spring.GetUnitStates
 local spValidUnitID			= Spring.ValidUnitID
+local spGetUnitIsStunned    = Spring.GetUnitIsStunned
 local random 				= math.random
 local sqrt 					= math.sqrt
 
@@ -434,7 +435,7 @@ local function updateUnits(n)
 				-- use AI on target
 				local enemyUnitDef = false
 				local los = false
-				if enemy then
+				if enemy and not select(2,spGetUnitIsStunned(enemy)) then
 					los = spGetUnitLosState(enemy,data.allyTeam,false)
 					if los then
 						los = los.los
