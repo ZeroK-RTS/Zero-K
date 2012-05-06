@@ -56,7 +56,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
-  yardMap                       = [[oooo oGGo oGGo oooo]],
+  yardMap                       = [[ooooo ogggo ogggo ogggo ooooo]],
 
   featureDefs                   = {
 

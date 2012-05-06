@@ -36,7 +36,7 @@ unitDef = {
   upright                       = false,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
-  yardMap                       = [[fffffffff]],
+  yardMap                       = [[ff ff]],
 
   featureDefs                   = {
 

@@ -63,7 +63,7 @@ unitDef = {
   TEDClass                      = [[FORT]],
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
-  yardMap                       = [[oooo]],
+  yardMap                       = [[ooo ooo ooo]],
 
   weapons                       = {
 

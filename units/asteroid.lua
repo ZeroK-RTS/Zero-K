@@ -31,7 +31,7 @@ unitDef = {
   turnRate                      = 0,
   upright                       = false,
   workerTime                    = 0,
-  yardMap                       = [[fffffffff]],
+  yardMap                       = [[ff ff]],
   
   featureDefs                   = {
 

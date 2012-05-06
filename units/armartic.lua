@@ -56,7 +56,7 @@ unitDef = {
   side                          = [[ARM]],
   sightDistance                 = 506,
   useBuildingGroundDecal        = true,
-  yardMap                       = [[ooooooooo]],
+  yardMap                       = [[oo oo]],
 
   weapons                       = {
 
