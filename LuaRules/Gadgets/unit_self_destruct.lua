@@ -20,7 +20,7 @@ deathTeams = {}
 -- auto detection of doesnotcount units
 local doesNotCountList = {}
 for name, ud in pairs(UnitDefs) do
-	if (ud.customParams.dontcount) then
+	if (ud.customParams.dontcount or ud.canKamikaze) then
 		doesNotCountList[ud.id] = true
 	end
 end
