@@ -91,8 +91,7 @@ unitDef = {
 
     {
       def                = [[EMP_MISSILE]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
   },
 
@@ -218,7 +217,7 @@ unitDef = {
       intensity               = 12,
       interceptedByShieldType = 1,
       paralyzer               = true,
-      paralyzeTime            = 1,
+      paralyzeTime            = 1.5,
       range                   = 465,
       reloadtime              = 1,
       rgbColor                = [[0.5 0.5 1]],
