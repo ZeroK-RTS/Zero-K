@@ -6,15 +6,12 @@ Object = {
   --y         = 0,
   --width     = 10,
   --height    = 10,
-  defaultWidth  = 10, --FIXME reall needed?
+  defaultWidth  = 10,
   defaultHeight = 10,
-
-  visible = true,
 
   preserveChildrenOrder = false, --// if false adding/removing children is much faster, but also the order (in the .children array) isn't reliable anymore
 
   children    = {},
-  children_hidden = {},
   childrenByName = CreateWeakTable(),
 
   OnDispose    = {},
@@ -240,10 +237,6 @@ end
 
 
 function Object:RemoveChild(child)
-  if not child then
-      Spring.Echo("WTF " .. self.name)
-      return
-  end
   if CompareLinks(child.parent,self) then
     child:SetParent(nil)
   end
@@ -279,25 +272,8 @@ end
 
 
 function Object:ClearChildren()
-  --self:CallChildrenInverse("Dispose") --FIXME instead of disposing perhaps just unlink from parent?
-
-
-  --// maske it faster
-  local old = self.preserveChildrenOrder
-  self.preserveChildrenOrder = false
-
-  --// remove all children  
-    for i=1,#self.children_hidden do
-      self:ShowChild(self.children_hidden[i])
-    end
-
-    --for i=1,#self.children do	-- RONG
-    while #self.children > 0 do -- RITE
-      self:RemoveChild(self.children[1])
-    end
-
-  --// restore old state
-  self.preserveChildrenOrder = old
+  self:CallChildrenInverse("Dispose") --FIXME instead of disposing perhaps just unlink from parent?
+  self.children = {}
 end
 
 
@@ -307,21 +283,13 @@ end
 
 --//=============================================================================
 
-function Object:SetLayer(layer)
-  if (self.parent) then
-    (self.parent):SetChildLayer(self,layer)
-  end
-end
-
-function Object:SetChildLayer(child,layer)
+function Object:SetLayer(child,layer)
   child = UnlinkSafe(child)
   local children = self.children
 
-  layer = math.min(layer, #children)
-
   --// it isn't at the same pos anymore, search it!
   for i=1,#children do
-    if CompareLinks(children[i], child) then
+    if (UnlinkSafe(children[i]) == child) then
       table.remove(children,i)
       break
     end
@@ -332,104 +300,9 @@ end
 
 
 function Object:BringToFront()
-  self:SetLayer(1)
-end
-
---//=============================================================================
-function Object:HideChild(obj)
-  --FIXME cause of performance reasons it would be usefull to use the direct object, but then we need to cache the link somewhere to avoid the auto calling of dispose
-  local objDirect = UnlinkSafe(obj)
-
-  if (not self.children[objDirect]) then
-    --if (self.debug) then
-      Spring.Echo("Chili: tried to hide a non-child (".. (obj.name or "") ..")")
-    --end
-    return
+  if (self.parent) then
+    (self.parent):SetLayer(self,1)
   end
-
-  if (self.children_hidden[objDirect]) then
-    --if (self.debug) then
-      Spring.Echo("Chili: tried to hide the same child multiple times (".. (obj.name or "") ..")")
-    --end
-    return
-  end
-
-  local children = self.children
-  local cn = #children
-  for i=1,cn do
-    if CompareLinks(objDirect,children[i]) then
-      self.children_hidden[objDirect] =  {child, i, children[i-1], children[i+1]}
-      break
-    end
-  end
-
-  self:RemoveChild(obj)
-  obj.parent = self
-end
-
-
-function Object:ShowChild(obj)
-  --FIXME cause of performance reasons it would be usefull to use the direct object, but then we need to cache the link somewhere to avoid the auto calling of dispose
-  local objDirect = UnlinkSafe(obj)
-
-  if (not self.children_hidden[objDirect]) then
-    --if (self.debug) then
-      Spring.Echo("Chili: tried to show a non-child (".. (obj.name or "") ..")")
-    --end
-    return
-  end
-
-  if (self.children[objDirect]) then
-    --if (self.debug) then
-      Spring.Echo("Chili: tried to show the same child multiple times (".. (obj.name or "") ..")")
-    --end
-    return
-  end
-
-  local params = self.children_hidden[objDirect]
-  self.children_hidden[objDirect] = nil
-
-  local children = self.children
-  local cn = #children
-
-  if (params[3]) then
-    for i=1,cn do
-      if CompareLinks(params[3],children[i]) then
-        self:AddChild(obj)
-	self:SetChildLayer(obj,i+1)
-        return true
-      end
-    end
-  end
-
-  self:AddChild(obj)
-  self:SetChildLayer(obj,params[2])
-  return true
-end
-
-
-function Object:SetVisibility(visible)
-  if (visible) then
-    self.parent:ShowChild(self)
-  else
-    self.parent:HideChild(self)
-  end
-  self.visible = visible
-end
-
-
-function Object:Hide()
-  self:SetVisibility(false)
-end
-
-
-function Object:Show()
-  self:SetVisibility(true)
-end
-
-
-function Object:ToggleVisibility()
-  self:SetVisibility(not self.visible)
 end
 
 --//=============================================================================
