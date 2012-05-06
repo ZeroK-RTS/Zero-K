@@ -1166,7 +1166,9 @@ function gadget:Initialize()
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		if (mexDefs[unitDefID]) then
 			local inc = Spring.GetUnitRulesParam(unitID, "mexIncome")
-			AddMex(unitID, false, inc)
+			if inc then
+				AddMex(unitID, false, inc)
+			end
 		end
 		if (pylonDefs[unitDefID]) then
 			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
@@ -1183,7 +1185,9 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then
 		local inc = Spring.GetUnitRulesParam(unitID, "mexIncome")
-		AddMex(unitID, unitTeam, inc)
+		if inc then
+			AddMex(unitID, unitTeam, inc)
+		end
 	end
 	if pylonDefs[unitDefID] then
 		notDestroyed[unitID] = true

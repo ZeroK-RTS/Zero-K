@@ -64,7 +64,7 @@ local metalSpotsByPos = {}
 local sameOrder = {}
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID == -mexDefID) and metalSpots then
+	if (cmdID == -mexDefID or (cmdID == CMD.INSERT and cmdParams and cmdParams[2] == -mexDefID)) and metalSpots then
 		local x = cmdParams[1]
 		local z = cmdParams[3]
 		--Spring.MarkerAddPoint(x,0,z,x .. ", " .. z)
