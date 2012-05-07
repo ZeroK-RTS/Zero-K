@@ -338,7 +338,7 @@ unitDef = {
       metal            = 700,
       object           = [[debris4x4c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 70,
+      reclaimTime      = 700,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },

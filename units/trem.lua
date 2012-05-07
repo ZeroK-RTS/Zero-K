@@ -141,6 +141,7 @@ unitDef = {
       metal            = 600,
       object           = [[tremor_dead_new.s3o]],
       reclaimable      = true,
+      reclaimTime      = 600,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
