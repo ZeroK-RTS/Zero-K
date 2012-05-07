@@ -12,7 +12,7 @@
   impulsefactor=0;
   interceptedbyshieldtype=1;
   paralyzer=1;
-  paralyzetime=25;
+  paralyzetime=16;
   range=600;
   reloadtime=0.3;
   rendertype=4;
@@ -21,7 +21,7 @@
   turret=1;
   [DAMAGE]
   {
-    default=3500;
+    default=3000;
     empresistant99=40;
     empresistant75=1000;
   }
