@@ -56,18 +56,18 @@ function widget:GameProgress(serverFrameNum)
 		if not ui_active_G then
 			screen0:AddChild(window)
 			ui_active_G = true
-		end
-		if textToSpeechEnabled then
-			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
+			if textToSpeechEnabled then
+				Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
+			end
 		end
 	elseif frameDistanceToFinish < 120 then
 		if ui_active_G then
 			screen0:RemoveChild(window)
 			ui_active_G = false
+			if textToSpeechEnabled then
+				Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " ENABLE TTS")
+			end		
 		end
-		if textToSpeechEnabled then
-			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " ENABLE TTS")
-		end		
 	end
 end
 
