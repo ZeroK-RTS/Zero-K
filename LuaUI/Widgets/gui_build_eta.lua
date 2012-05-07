@@ -260,7 +260,7 @@ local function DrawEtaText(timeLeft,yoffset)
 end
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() or (options.showonlyonshift.value or not select(4,Spring.GetModKeyState())) then return end
+	if Spring.IsGUIHidden() or (options.showonlyonshift.value and not select(4,Spring.GetModKeyState())) then return end
 	gl.DepthTest(true)
 
 	gl.Color(1, 1, 1)
