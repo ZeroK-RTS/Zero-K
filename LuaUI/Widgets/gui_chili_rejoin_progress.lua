@@ -75,7 +75,7 @@ function widget:Update(dt)
 	if ui_active_G then
 		oneSecondElapsed_G = oneSecondElapsed_G + dt
 		if oneSecondElapsed_G >= 1 then
-			local localGameFrameRate = localGameFrame_G - localLastFrameNum_G
+			local localGameFrameRate = (localGameFrame_G - localLastFrameNum_G) / oneSecondElapsed_G
 			serverFrameNum_G = serverFrameRate_G*oneSecondElapsed_G + serverFrameNum_G -- estimate current Server's frame number while waiting for GameProgress() to update.
 			local frameDistanceToFinish = serverFrameNum_G-localGameFrame_G
 			timeToComplete_G = frameDistanceToFinish/localGameFrameRate -- estimate the time to completion.
@@ -87,6 +87,7 @@ function widget:Update(dt)
 			progress_vote:SetValue(voteCount/voteMax)
 			
 			oneSecondElapsed_G = 0
+			localLastFrameNum_G = localGameFrame_G
 		end
 	end
 end
