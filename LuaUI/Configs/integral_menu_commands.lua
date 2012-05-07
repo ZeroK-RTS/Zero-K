@@ -258,7 +258,7 @@ local overrides = {
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text=''},
 	}
 
--- noone really knows what this table does but it's needed for crude to get the hotkey
+-- noone really knows what this table does but it's needed for epic menu to get the hotkey
 local custom_cmd_actions = {	-- states are 2, not states are 1
 
 	--SPRING COMMANDS
@@ -306,6 +306,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	canceltarget=1,
 	setferry=1, 
 	radialmenu=1,
+	placebeacon=1,
 	
 	-- terraform
 	rampground=1,
@@ -319,7 +320,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	resetmove=1,
 	
 	--states
-	stealth=2,
+--	stealth=2, --no longer applicable
 	cloak_shield=2,
 	retreat=2,
 	['luaui noretreat']=2,
@@ -331,6 +332,9 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	antinukezone=2,
 	unitai=2,
 	unit_kill_subordinates=2,
+	autoassist=2,	
+	airstrafe=2,
+	divestate=2,
 	
 	
 }

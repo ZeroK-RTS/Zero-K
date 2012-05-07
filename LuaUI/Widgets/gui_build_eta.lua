@@ -38,6 +38,21 @@ local etaTable = {}
 
 --------------------------------------------------------------------------------
 
+options_path = 'Settings/View/Build ETA'
+options_order = { 'showonlyonshift'}
+options = {
+	
+	showonlyonshift = {
+		name = 'Show only on shift',
+		type = 'bool',
+		value = false,
+		--OnChange = function() Spring.SendCommands{'showhealthbars'} end,
+	},
+}
+
+		
+--------------------------------------------------------------------------------
+
 local vsx, vsy = widgetHandler:GetViewSizes()
 
 function widget:ViewResize(viewSizeX, viewSizeY)
@@ -245,7 +260,7 @@ local function DrawEtaText(timeLeft,yoffset)
 end
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() then return end
+	if Spring.IsGUIHidden() or (options.showonlyonshift.value or not select(4,Spring.GetModKeyState())) then return end
 	gl.DepthTest(true)
 
 	gl.Color(1, 1, 1)

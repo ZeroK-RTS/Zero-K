@@ -45,8 +45,6 @@ local featureHpThreshold = 0.85
 
 local infoDistance = 700000
 
-local minReloadTime = 3 --// in seconds
-
 local drawStunnedOverlay = true
 local drawUnitsOnFire    = Spring.GetGameRulesParam("unitsOnFire")
 local drawJumpJet        = Spring.GetGameRulesParam("jumpJets")
@@ -68,7 +66,7 @@ local function OptionsChanged()
 end 
 
 options_path = 'Settings/View/Healthbars'
-options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages'}
+options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'minReloadTime'}
 options = {
 	
 	showhealthbars = {
@@ -92,7 +90,17 @@ options = {
 		desc = 'Shows percentages next to bars',
 		OnChange = OptionsChanged,
 	},
-	
+
+	minReloadTime = {
+		name = 'Min reload time',
+		type = 'number',
+		value = 3,
+		min = 1,
+		max = 10,
+		step = 1,
+		desc = 'Min reload time (sec)',
+		OnChange = OptionsChanged,
+	},	
 	
 
 }
@@ -732,7 +740,7 @@ do
 	  ]]--
 	  
       --// RELOAD
-      if (ci.reloadTime>=minReloadTime) then
+      if (ci.reloadTime>=options.minReloadTime.value) then
         _,reloaded,reloadFrame = GetUnitWeaponState(unitID,ci.primaryWeapon)
         if (reloaded==false) then
 		  local slowState = 1-(GetUnitRulesParam(unitID,"slowState") or 0)
