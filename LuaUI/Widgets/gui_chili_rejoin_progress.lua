@@ -39,6 +39,7 @@ local timeToComplete_G = 0 --//variable: store the estimated time for catching u
 local localLastFrameNum_G = 0 --//variable: used to calculate local game-frame rate.
 local ui_active_G = false --//variable:indicate whether UI is shown or hidden.
 local textToSpeechEnabled = true --//variable: used to properly disable/re-enable TTS when rejoining
+local averageLocalSpeed_G = {sumOfSpeed= 0, sumCounter= 0} --//variable: store the local-gameFrame speeds so that an average can be calculated.  
 --------------------------------------------------------------------------------
 
 if VFS.FileExists("Luaui/Config/ZK_data.lua") then
@@ -76,6 +77,10 @@ function widget:Update(dt)
 		oneSecondElapsed_G = oneSecondElapsed_G + dt
 		if oneSecondElapsed_G >= 1 then
 			local localGameFrameRate = (localGameFrame_G - localLastFrameNum_G) / oneSecondElapsed_G
+			averageLocalSpeed_G.sumOfSpeed = averageLocalSpeed_G.sumOfSpeed + localGameFrameRate -- try to calculate the average of local gameFrame speed.
+			averageLocalSpeed_G.sumCounter = averageLocalSpeed_G.sumCounter + 1
+			localGameFrameRate = averageLocalSpeed_G.sumOfSpeed/averageLocalSpeed_G.sumCounter -- using the average to calculate the estimate for time of completion.
+			
 			serverFrameNum_G = serverFrameRate_G*oneSecondElapsed_G + serverFrameNum_G -- estimate current Server's frame number while waiting for GameProgress() to update.
 			local frameDistanceToFinish = serverFrameNum_G-localGameFrame_G
 			timeToComplete_G = frameDistanceToFinish/localGameFrameRate -- estimate the time to completion.
@@ -120,11 +125,11 @@ function widget:Initialize()
 
 	window = Window:New{
 		--parent = screen0,
-		name   = 'votes';
+		name   = 'rejoinProgress';
 		color = {0, 0, 0, 0},
 		width = 300;
 		height = 120;
-		right = 2; 
+		left = 2; 
 		y = "45%";
 		dockable = false;
 		draggable = true,
@@ -171,7 +176,7 @@ function widget:Initialize()
 		height	= "100%",
 		max     = 1;
 		caption = "?/?";
-		color   = (i == 1 and {0.2,0.9,0.3,1}) or {0.9,0.15,0.2,1};
+		color   =  {0.9,0.15,0.2,1}; --Red, {0.2,0.9,0.3,1} --Green
 	}
 	progress_vote:SetValue(0)
 	voteCount = 0
