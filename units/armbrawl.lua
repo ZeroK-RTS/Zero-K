@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armbrawl]],
   name                = [[Brawler]],
-  description         = [[Assault Gunship]],
+  description         = [[Assault/Skirmish Gunship]],
   acceleration        = 0.24,
   amphibious          = true,
   bankscale           = [[1]],

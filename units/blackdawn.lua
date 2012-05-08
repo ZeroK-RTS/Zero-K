@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[blackdawn]],
   name                = [[Black Dawn]],
-  description         = [[Riot/Skirmish Gunship]],
+  description         = [[Heavy Raider/Riot Gunship]],
   acceleration        = 0.135,
   amphibious          = true,
   brakeRate           = 2.838,
