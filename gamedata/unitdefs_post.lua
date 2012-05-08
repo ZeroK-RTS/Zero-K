@@ -456,6 +456,22 @@ end --for
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Avoid firing at unarmed
+-- 
+for name, ud in pairs(UnitDefs) do
+	if (ud.weapons) then
+		for wName,wDef in pairs(ud.weapons) do     
+			if wDef.badtargetcategory then
+				wDef.badtargetcategory = wDef.badtargetcategory .. " UNARMED"
+			else
+				wDef.badtargetcategory = "UNARMED"
+			end
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Avoid neutral	-- breaks explicit attack orders
 --
 --[[
