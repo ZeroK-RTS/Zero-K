@@ -24,7 +24,7 @@ local iconsize = 20
 local recentlyInitialized = false
 local tabbedMode = false
 
-local function toggleTeamColors(value)
+local function toggleTeamColors()
 	if WG.LocalColor then
 		WG.LocalColor.localTeamColorToggle()
 	end
