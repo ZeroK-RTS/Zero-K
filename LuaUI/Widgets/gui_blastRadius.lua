@@ -16,8 +16,9 @@ end
 
 --These can be modified if needed
 local blastCircleDivs = 64
-local blastLineWidth = 1.0
+local blastLineWidth = 2.0
 local blastAlphaValue = 0.5
+--local blastImage = "LuaUI/Images/explosive.png"
 local updateInt = 1 --seconds for the ::update loop
 
 --------------------------------------------------------------------------------
@@ -53,7 +54,9 @@ local spGetMyPlayerID       = Spring.GetMyPlayerID
 local spGetPlayerInfo       = Spring.GetPlayerInfo
 local spEcho                = Spring.Echo
 
+local glBeginEnd            = gl.BeginEnd
 local glColor               = gl.Color
+local glLineStipple         = gl.LineStipple
 local glLineWidth           = gl.LineWidth
 local glDepthTest           = gl.DepthTest
 local glTexture             = gl.Texture
@@ -63,6 +66,9 @@ local glPushMatrix          = gl.PushMatrix
 local glTranslate           = gl.Translate
 local glBillboard           = gl.Billboard
 local glText                = gl.Text
+local glTexRect             = gl.TexRect
+local glTexCoord            = gl.TexCoord
+local glVertex              = gl.Vertex
 
 local max					= math.max
 local min					= math.min
@@ -70,6 +76,14 @@ local sqrt					= math.sqrt
 local abs					= math.abs
 local lower                 = string.lower
 local floor                 = math.floor
+
+-----------------------------------------------------------------------------------
+local alwaysDisplay = {
+	[UnitDefNames.armfus.id] = true,
+	[UnitDefNames.cafus.id] = true,
+	[UnitDefNames.armnanotc.id] = true,
+	[UnitDefNames.corsilo.id] = true,
+}
 
 -----------------------------------------------------------------------------------
 function widget:Update()
@@ -88,6 +102,7 @@ function widget:Update()
 end
 
 function widget:DrawWorld()
+	glLineStipple(true)
 	DrawBuildMenuBlastRange()
 	
 	--hardcoded: meta + X
@@ -151,7 +166,7 @@ function DrawBuildMenuBlastRange()
 	--local keyPressed = spGetKeyState(KEYSYMS.X )
 	local alt,ctrl,meta,shift = spGetModKeyState()
 		
-	if ( not meta ) then --and keyPressed) then
+	if ( not meta ) and not (alwaysDisplay[-cmd_id]) then --and keyPressed) then
 		return
 	end
 	
@@ -211,10 +226,16 @@ function DrawBuildMenuBlastRange()
 	--glDrawGroundCircle(centerX, 0, centerZ, blastRadius * (( spGetGameSeconds() % 3 ) / 3.0 ), blastCircleDivs )
 	
 	local height = Spring.GetGroundHeight(centerX,centerZ)
+	local halfSquare = blastRadius*0.5
 	
-	--draw EXPLODE text
+	--draw EXPLODE text and icon
 	glPushMatrix()
-	glTranslate(centerX - ( blastRadius / 2 ),  height , centerZ  + ( blastRadius / 2) )
+	
+	glTranslate(centerX , height, centerZ)
+	--gl.Rotate(90,1,0,0)
+	--glTexRect(-halfSquare, halfSquare, halfSquare, -halfSquare)
+	--gl.Rotate(-90,1,0,0)
+	glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
 	glBillboard()
 	glText( defaultDamage, 0.0, 0.0, sqrt(blastRadius), "cn")
 	glPopMatrix()  
@@ -244,13 +265,18 @@ function DrawUnitBlastRadius( unitID )
 		deathblastDamage = weapTab[deathBlasId].damages[0]
 					
 		local height = Spring.GetGroundHeight(x,z)
+		local halfSquare = deathblastRadius*0.5
 					
 		glLineWidth(blastLineWidth)
 		glColor( blastColor[1], blastColor[2], blastColor[3], blastAlphaValue)
 		glDrawGroundCircle( x,y,z, blastRadius, blastCircleDivs )
 				
 		glPushMatrix()
-		glTranslate(x - ( blastRadius / 1.7 ), height , z  + ( blastRadius / 1.7 ) )
+		glTranslate(x , height, z)
+		--gl.Rotate(90,1,0,0)
+		--glTexRect(-halfSquare, halfSquare, halfSquare, -halfSquare)
+		--gl.Rotate(-90,1,0,0)
+		glTranslate(-blastRadius / 2, 0, blastRadius / 2 )
 		glBillboard()
 		text = blastDamage --text = "SELF-D"
 		if ( deathblastRadius == blastRadius ) then
@@ -299,6 +325,7 @@ function ResetGl()
 	glLineWidth( 1.0 )
 	glDepthTest(false)
 	glTexture(false)
+	glLineStipple(false)
 end
 
 --[[
