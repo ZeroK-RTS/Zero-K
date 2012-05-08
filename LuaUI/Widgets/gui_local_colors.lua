@@ -10,6 +10,17 @@ function widget:GetInfo()
 	}
 end
 
+options_path = 'Settings/Interface/Local Team Colors'
+options = {
+	simpleColors = {
+		name = "Simple Colors",
+		type = 'bool',
+		value = false,
+		desc = 'All allies are green, all enemies are red.',
+		OnChange = function() widget:Initialize() end
+	},
+}
+
 if VFS.FileExists("Luaui/Configs/LocalColors.lua") then -- user override
 	colorCFG = VFS.Include("Luaui/Configs/LocalColors.lua")
 	Spring.Echo("Loaded local team color config.")
@@ -17,15 +28,6 @@ elseif VFS.FileExists("Luaui/Configs/ZKTeamColors.lua") then
 	colorCFG = VFS.Include("Luaui/Configs/ZKTeamColors.lua")
 else
 	error("missing file: Luaui/Configs/LocalColors.lua")
-end
-
-local wasSimpleColor = true --//variable: to check if configuration file has preference for simple color. Trigger simple-team-color/not-simple-team-color during initialization
-if VFS.FileExists("Luaui/Config/ZK_data.lua") then
-	local configFile =  VFS.Include("Luaui/Config/ZK_data.lua")
-	wasSimpleColor = configFile["EPIC Menu"].config.epic_Chili_Minimap_simpleteamcolors
-	if wasSimpleColor == nil then
-		wasSimpleColor = true
-	end
 end
 
 colorCFG.gaiaColor[1] = colorCFG.gaiaColor[1]/255 
@@ -52,7 +54,14 @@ local myColor = colorCFG.myColor
 local gaiaColor = colorCFG.gaiaColor
 local allyColors = colorCFG.allyColors
 local enemyColors = colorCFG.enemyColors
-WG.guiLocalColor = {usingSimpleTeamColors = wasSimpleColor} --//variable: a value read by other widget to determine current color scheme. Effect gui_chili_crudeplayerlist.lua & gui_chili_minimap.lua. 
+
+WG.LocalColor = {}
+
+local function RecreatePlayerList()
+	if WG.PlayerList.RecreateList then
+		WG.PlayerList.RecreateList()
+	end
+end
 
 local function SetNewTeamColors() 
 	local gaia = Spring.GetGaiaTeamID()
@@ -73,6 +82,8 @@ local function SetNewTeamColors()
 		end
 	end
 	Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
+	
+	RecreatePlayerList()
 end
 
 local function SetNewSimpleTeamColors() 
@@ -91,6 +102,8 @@ local function SetNewSimpleTeamColors()
 		end
 	end
 	Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
+	
+	RecreatePlayerList()
 end
 
 
@@ -98,27 +111,19 @@ local function ResetOldTeamColors()
 	for _,team in ipairs(Spring.GetTeamList()) do
 		Spring.SetTeamColor(team,Spring.GetTeamOrigColor(team))
 	end
+	
+	RecreatePlayerList()
 end
 
-function WG.guiLocalColor.localTeamColorToggle()
-	WG.guiLocalColor.usingSimpleTeamColors = not WG.guiLocalColor.usingSimpleTeamColors
-	local isSimpleColor = WG.guiLocalColor.usingSimpleTeamColors
-	if not isSimpleColor then
-		SetNewTeamColors()
-	elseif isSimpleColor then
-		SetNewSimpleTeamColors() 
-	end
-	--[[
-	if WG.crudeplayerlist_recolor_players then
-		WG.crudeplayerlist_recolor_players()
-	end
-	--]]
+function WG.LocalColor.localTeamColorToggle()
+	options.simpleColors.value = not options.simpleColors.value
+	widget:Initialize()
 end
 
 function widget:Initialize()
-	if wasSimpleColor then 
+	if options.simpleColors.value then
 		SetNewSimpleTeamColors()
-	elseif not wasSimpleColor then
+	else
 		SetNewTeamColors()
 	end
 end

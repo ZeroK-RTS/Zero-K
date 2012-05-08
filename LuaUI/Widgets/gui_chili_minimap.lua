@@ -24,10 +24,9 @@ local iconsize = 20
 local recentlyInitialized = false
 local tabbedMode = false
 
-local function toggleTeamColors() 
-	if WG.guiLocalColor then
-		WG.guiLocalColor.localTeamColorToggle() 
-		options.simpleteamcolors.value = WG.guiLocalColor.usingSimpleTeamColors
+local function toggleTeamColors(value)
+	if WG.LocalColor then
+		WG.LocalColor.localTeamColorToggle()
 	end
 end 
 
@@ -45,7 +44,6 @@ end
 options_path = 'Settings/Interface/Minimap'
 options_order = { 'use_map_ratio', 'hidebuttons', 'simpleteamcolors', 'startwithlos', 'startwithradar', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors' }
 options = {
-	
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
 		type = 'bool',
@@ -68,17 +66,6 @@ options = {
 		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
 	},
 	--]]
-	simpleteamcolors = {
-		name = 'Simplified Team Colors',
-		type = 'bool',
-		desc = 'Use teal as your color, green for allies and red for enemies for all view-mode at game start (both zoom-out and minimap view will use this simple color scheme).', 
-		value = true,
-		OnChange = function()
-			if (options.simpleteamcolors.value and not WG.guiLocalColor.usingSimpleTeamColors) or (not options.simpleteamcolors.value and WG.guiLocalColor.usingSimpleTeamColors) then --//change the team color scheme when the saved scheme didn't match the current scheme.
-				toggleTeamColors()
-			end
-		end,
-	},
 	
 	startwithlos = {
 		name = 'Start with LOS view',
@@ -139,16 +126,6 @@ options = {
 		action = 'toggleradarandjammer',
 	},
 	
-	simplecolors = {
-		name = 'Toggle Simple Teamcolors',
-		desc = 'Toggle simples teamcolors, allies blue, enemies red and self teal.',
-		type = 'button',
-		OnChange = function()
-				toggleTeamColors()
-				options.simpleteamcolors.value = not options.simpleteamcolors.value
-			end,
-	},
-	
 	hidebuttons = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
@@ -156,7 +133,6 @@ options = {
 		OnChange= function(self) iconsize = self.value and 0 or 20; MakeMinimapWindow() end,
 		value = false,
 	},
-	
 }
 
 local function MakeMinimapButton(file, pos, option )

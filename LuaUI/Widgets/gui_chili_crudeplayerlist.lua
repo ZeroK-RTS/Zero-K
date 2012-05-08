@@ -3,14 +3,14 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Crude Player List v1.31",
+    name      = "Chili Crude Player List",
     desc      = "v1.31 Chili Crude Player List.",
     author    = "CarRepairer",
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     enabled   = true,
-	detailsDefault = 1
+    detailsDefault = 1
   }
 end
 
@@ -80,7 +80,6 @@ local x_postping		= x_ping + 16
 local x_bound	= x_postping + 20
 
 local UPDATE_FREQUENCY = 0.5	-- seconds
-local wasSimpleColor = false -- variable: indicate if simple color was toggled on or off. Used to trigger player-list to refresh.
 
 local wantsNameRefresh = {}	-- unused
 local cfCheckBoxes = {}
@@ -168,26 +167,7 @@ options = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---[[ This function doesn't work for unknown reason (??). Intended to update text color remotely.
-function WG.crudeplayerlist_recolor_players()
-	if teams then
-		for i = 1, #teams do
-			if teams[i] and teams[i].roster then
-				for j = 1, #teams[i].roster do
-					if teams[i].roster[j] and teams[i].roster[j].nameLabel then
-						local entity = teams[i].roster[j].nameLabel
-						if Chili and Chili.color2incolor then
-							entity:SetCaption(Chili.color2incolor({Spring.GetTeamColor(i)} or {1,1,1,1}) .. (entity.realText or ""))
-							Label:Invalidate();
-						end
-					end
-				end
-			end
-		end
-	end
-end
---]]
-
+WG.PlayerList = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -737,7 +717,6 @@ SetupPlayerNames = function()
 	end
 	window_cpl:Invalidate()
 end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -748,7 +727,6 @@ end
 local timer = 0
 local lastSizeX
 local lastSizeY
-local currentColorScheme = wasSimpleColor
 
 function widget:Update(s)
 	timer = timer + s
@@ -757,14 +735,10 @@ function widget:Update(s)
 		if (window_cpl.hidden) then --//don't update when window is hidden.
 			return
 		end
-		if WG.guiLocalColor then
-			currentColorScheme = WG.guiLocalColor.usingSimpleTeamColors
-		end
-		if (lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height) or (wasSimpleColor ~= currentColorScheme) then --//if user resize the player-list OR if the simple-color state have changed, then refresh the player list.
+		if (lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height) then --//if user resize the player-list OR if the simple-color state have changed, then refresh the player list.
 			SetupPlayerNames()	-- size changed; regen everything
 			lastSizeX = window_cpl.width
 			lastSizeY = window_cpl.height
-			wasSimpleColor = currentColorScheme
 		else
 			UpdatePlayerInfo()
 		end
@@ -866,5 +840,7 @@ function widget:Initialize()
 	Spring.SendCommands({"info 0"})
 	lastSizeX = window_cpl.width
 	lastSizeY = window_cpl_height
+	
+	WG.PlayerList.RecreateList = SetupPlayerNames
 end
 
