@@ -188,6 +188,8 @@ superweaponDefs = {
 	"armbrtha",
 	"corsilo",
 	"mahlazer",
+	"zenith",
+	"raveparty",
 }
 
 needPowerDefs = {

@@ -522,11 +522,4 @@ function widget:Initialize()
 	SetTip()
 end
 
---function widget:GameFrame(f)
---end
-
-function widget:Shutdown()
-	WG.KP_AutomaticTipDispenser=nil
-end
-
 
