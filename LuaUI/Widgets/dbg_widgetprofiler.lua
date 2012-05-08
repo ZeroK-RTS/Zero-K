@@ -302,7 +302,7 @@ end
     end
 
     local vsx, vsy = gl.GetViewSizes()
-    local x,y = vsx-300, vsy-40
+    local x,y = vsx-300, vsy-60
 
     gl.Color(1,1,1,1)
     gl.BeginText()
