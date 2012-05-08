@@ -7,8 +7,8 @@ unitDef = {
   amphibious             = [[1]],
   autoHeal               = 5,
   brakeRate              = 0.375,
-  buildCostEnergy        = 1250,
-  buildCostMetal         = 1250,
+  buildCostEnergy        = 1200,
+  buildCostMetal         = 1200,
   buildDistance          = 120,
   builder                = true,
 
@@ -16,7 +16,7 @@ unitDef = {
   },
 
   buildPic               = [[armcom.png]],
-  buildTime              = 1250,
+  buildTime              = 1200,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
