@@ -86,8 +86,8 @@ local super = {	--merged into special
 	armbrtha = {order = 3, row = 2},
 	corsilo = {order = 4, row = 2},
 	zenith = {order = 5, row = 2},
-	mahlazer = {order = 6, row = 2},
-	raveparty = {order = 7, row = 2},
+	raveparty = {order = 6, row = 2},
+	mahlazer = {order = 7, row = 2},
 	--zenith = {order = 1, row = 3},
 }
 
