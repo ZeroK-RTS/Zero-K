@@ -42,7 +42,7 @@ end
 local function MakeMinimapWindow()
 end
 
-options_path = 'Settings/View/Minimap'
+options_path = 'Settings/Interface/Minimap'
 options_order = { 'use_map_ratio', 'hidebuttons', 'simpleteamcolors', 'startwithlos', 'startwithradar', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors' }
 options = {
 	

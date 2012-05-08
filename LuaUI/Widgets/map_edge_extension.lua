@@ -38,7 +38,7 @@ local island = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-options_path = 'Settings/View/Map/Map Extension Config'
+options_path = 'Settings/Graphics/Map/Map Extension Config'
 options = {
 	--when using shader the map is stored once in a DL and drawn 8 times with vertex mirroring and bending
         --when not, the map is drawn mirrored 8 times into a display list

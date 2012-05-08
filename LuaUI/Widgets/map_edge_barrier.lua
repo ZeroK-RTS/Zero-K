@@ -40,7 +40,7 @@ local island = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-options_path = 'Settings/View/Map/Edge Barrier Config'
+options_path = 'Settings/Graphics/Map/Edge Barrier Config'
 options = {
 	drawForIslands = {
 		name = "Draw for islands",

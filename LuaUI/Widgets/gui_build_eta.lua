@@ -38,7 +38,7 @@ local etaTable = {}
 
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/View/Build ETA'
+options_path = 'Settings/Interface/Build ETA'
 options_order = { 'showonlyonshift'}
 options = {
 	

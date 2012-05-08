@@ -114,10 +114,10 @@ local sounds = {
 	
 	enemyAirSpotted = {file = "sounds/reply/advisor/enemy_aircraft_spotted.wav"},
 	
-	stallingM = {file = "sounds/reply/advisor/stall_metal.wav"},
-	stallingE = {file = "sounds/reply/advisor/stall_energy.wav"},
+	stallingMetal = {file = "sounds/reply/advisor/stall_metal.wav"},
+	stallingEnergy = {file = "sounds/reply/advisor/stall_energy.wav"},
 	
-	excessingM = {file = "sounds/reply/advisor/excess_metal.wav"},
+	excessMetal = {file = "sounds/reply/advisor/excess_metal.wav"},
 }
 for name,data in pairs(sounds) do
 	data.timeout = data.timeout or timeoutConstant
@@ -265,12 +265,12 @@ function widget:GameFrame(n)
 		local mlevel, mstore,mpull,mincome = spGetTeamRes(myTeam, "metal")
 		mIncome = mincome	-- global = our local
 		if mlevel/mstore >= 0.95 and lastMExcessEvent + RESOURCE_WARNING_PERIOD < n then
-			AddEvent("Excessing metal", nil, colorYellow)
+			AddEvent("Excessing metal", nil, colorYellow, "excessMetal")
 			lastMExcessEvent = n
 		end
-		local elevel,estore,epull,eincome = spGetTeamRes(myTeam, "energy", "stallingE")
+		local elevel,estore,epull,eincome = spGetTeamRes(myTeam, "energy")
 		if elevel/(estore - OD_BUFFER) <= 0.2 and lastEStallEvent + RESOURCE_WARNING_PERIOD < n  then
-			AddEvent("Stalling energy", nil, colorOrange)
+			AddEvent("Stalling energy", nil, colorOrange, "stallingEnergy")
 			lastEStallEvent = n
 		end
 	end

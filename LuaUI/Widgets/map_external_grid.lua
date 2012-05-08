@@ -46,7 +46,7 @@ local featureChance = 0.01
 local noFeatureRange = 0
 ]]--
 
-options_path = 'Settings/View/Map/Configure VR Grid'
+options_path = 'Settings/Graphics/Map/VR Grid Config'
 options_order = {"mirrorHeightMap","drawForIslands","res","range","northSouthText"}
 options = {
 	mirrorHeightMap = {

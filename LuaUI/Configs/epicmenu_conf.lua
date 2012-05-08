@@ -103,6 +103,12 @@ path='Game'
 	ShButton( 'Share Dialog...', 'sharedialog' ) 
 	ShButton( 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end) ) 
 
+path='Game/View'
+	ShLabel('Spectator View/Selection')
+	ShButton('View Chosen Player', function() spSendCommands{"specfullview 0"} end )
+	ShButton('View All', function() spSendCommands{"specfullview 1"} end )
+	ShButton('Select Any Unit', function() spSendCommands{"specfullview 2"} end )
+	ShButton('View All & Select Any', function() spSendCommands{"specfullview 3"} end )
 
 path='Game/Screenshots'	
 	ShButton( 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots' ) 
@@ -165,22 +171,21 @@ path='Settings/Interface/Interface Skin'
 			{ key = 'DarkHive', name = 'DarkHive', },
 		},
 	})
-	
-path='Settings/Misc'
-	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
-	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
 
-path='Settings/Mouse Cursor'
+path='Settings/Interface/Mouse Cursor'
 	ShButton('Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.' )
 	AddOption({ 	
 		name = 'Hardware Cursor',
 		type = 'bool',
 		springsetting = 'HardwareCursor',
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
-	} )
+	} )	
+	
+path='Settings/Misc'
+	ShButton( 'Local Widget Config', function() spSendCommands{"luaui localwidgetsconfig"} end, '', true )
+	ShButton( 'LuaUI TweakMode (Esc to exit)', 'luaui tweakgui', 'LuaUI TweakMode. Move and resize parts of the user interface. (Hit Esc to exit)' )
 
-
-path='Settings/Video'
+path='Settings/Graphics'
 	ShLabel('Lups (Lua Particle System)')
 	ShButton('Toggle Lups', function() spSendCommands{'luaui togglewidget LupsManager'} end )
 	
@@ -232,16 +237,6 @@ path='Settings/Video'
 	ShButton('Medium Detail Shadows', function() local curShadow=Spring.GetConfigInt("Shadows"); curShadow=math.max(1,curShadow); spSendCommands{"Shadows " .. curShadow .. " 2048"} end )
 	ShButton('High Detail Shadows', function() local curShadow=Spring.GetConfigInt("Shadows"); curShadow=math.max(1,curShadow); spSendCommands{"Shadows " .. curShadow .. " 4096"} end )
 
-path='Settings/View'
-
-	ShLabel('Spectator View/Selection')
-	ShButton('View Chosen Player', function() spSendCommands{"specfullview 0"} end )
-	ShButton('View All', function() spSendCommands{"specfullview 1"} end )
-	ShButton('Select Any Unit', function() spSendCommands{"specfullview 2"} end )
-	ShButton('View All & Select Any', function() spSendCommands{"specfullview 3"} end )
-
-	ShLabel('Other settings')
-	
 	AddOption({
 		name = 'Brightness',
 		type = 'number',
@@ -261,20 +256,19 @@ path='Settings/View'
 		OnChange = function(self) Spring.SendCommands{"disticon " .. self.value} end 
 	} )
 	
-	ShLabel('')
+path='Settings/Graphics/Effects'
+	ShButton('Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
+	ShButton('Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end, 'Creates a smoke signal effect at map points' )				
+	ShButton('Toggle Camera Shake', function() spSendCommands{'luaui togglewidget CameraShake'} end )	
+
+path='Settings/Graphics/Map'	
+	ShButton('VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end, 'Draws a grid around the map' )
+	ShButton('Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end ,'Alternate map grid')
+	ShButton('Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')	
+	
+path='Settings/Interface'
 	ShButton('Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage' )
 	
-path='Settings/View/Effects'
-	ShButton('Night View', function() spSendCommands{'luaui togglewidget Night'} end )
-	ShButton('Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end )				
-	ShButton('Toggle Camera Shake', function() spSendCommands{'luaui togglewidget CameraShake'} end )
-	
-path='Settings/View/Map'	
-
-	ShButton('VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end )
-	ShButton('Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end )
-	ShButton('Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end )
-
 path='Help'
 	AddOption({
 		type='text',
@@ -284,7 +278,8 @@ path='Help'
 			]]
 	})
 	ShButton('Tutorial', function() spSendCommands{"luaui togglewidget Nubtron"} end )
-	ShButton('Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end )
+	ShButton('Tip Dispenser', function() spSendCommands{"luaui togglewidget Automatic Tip Dispenser"} end, 'An advisor which gives you tips as you play' )
+	ShButton('Clippy Comments', function() spSendCommands{"luaui togglewidget Clippy Comments"} end, "Units speak up if they see you're not playing optimally" )
 
 
 

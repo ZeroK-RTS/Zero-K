@@ -14,7 +14,7 @@ end
 
 -- CarRepairer: v0.31 has configurable settings in the menu.
 
-options_path = 'Settings/View/Effects/Bloom'
+options_path = 'Settings/Graphics/Effects/Bloom'
 options = {
 
 	dbgDraw 		= { type='bool', 	name='Draw Only Bloom Mask', 	value=false,		},

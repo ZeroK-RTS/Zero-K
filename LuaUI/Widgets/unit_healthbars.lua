@@ -65,7 +65,7 @@ local function OptionsChanged()
 	drawBarPercentages = options.drawBarPercentages.value
 end 
 
-options_path = 'Settings/View/Healthbars'
+options_path = 'Settings/Interface/Healthbars'
 options_order = { 'showhealthbars', 'drawFeatureHealth', 'drawBarPercentages', 'minReloadTime'}
 options = {
 	

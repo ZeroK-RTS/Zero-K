@@ -46,8 +46,8 @@ local helpText =
 	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
-options_order = { 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'verbose', 'immediate', 'groupnumbers', }
-options_path = 'Game/Settings/AutoGroup'
+options_order = { 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
+options_path = 'Settings/Interface/AutoGroup'
 options = {
 	loadgroups = {
 		name = 'Preserve Auto Groups',

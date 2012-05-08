@@ -19,7 +19,7 @@ local spGetAllUnits = Spring.GetAllUnits
 
 local drawUnits = {}
 
-options_path = 'Settings/View/Show All Commands'
+options_path = 'Settings/Interface/Show All Commands'
 options_order = { 'showonlyonshift'}
 options = {
 	

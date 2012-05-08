@@ -262,7 +262,7 @@ local function UpdateConvSep()
 	conv = options.conv.value * swap
 end
 
-options_path = 'Settings/View/Effects/Stereo3D'
+options_path = 'Settings/Graphics/Effects/Stereo3D'
 options_order = { 'toggle3d', 'helpwindow', 'lblblank1', 'lblsettings', 'swapeyes', 'lasersight', 'hidecursor', 'sep', 'conv', 'lblblank2', 's3dmode', 'lblblank3',  }
 options = {
 	

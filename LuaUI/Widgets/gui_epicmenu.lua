@@ -1721,11 +1721,11 @@ function widget:Initialize()
 	--this is done to establish order the correct button order
 	AddOption('Settings/Reset Settings')
 	AddOption('Settings/Camera')
+	AddOption('Settings/Graphics')	
 	AddOption('Settings/Interface')
+	AddOption('Settings/Interface/Mouse Cursor')
 	AddOption('Settings/Misc')
-	AddOption('Settings/Mouse Cursor')
-	AddOption('Settings/Video')
-	AddOption('Settings/View')
+
 	
 	local options_temp ={}
 	CopyTable(options_temp , epic_options);
