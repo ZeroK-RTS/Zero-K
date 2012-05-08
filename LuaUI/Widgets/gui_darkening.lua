@@ -108,7 +108,7 @@ end
 
 function widget:DrawWorldPreUnit()
   local drawMode = Spring.GetMapDrawMode()
-  if (drawMode~="normal")and(drawMode~="los") then return end
+  if (drawMode=="height") or (drawMode=="path") then return end
 
   gl.MatrixMode(GL.PROJECTION); gl.PushMatrix(); gl.LoadIdentity()
   gl.MatrixMode(GL.MODELVIEW);  gl.PushMatrix(); gl.LoadIdentity()
