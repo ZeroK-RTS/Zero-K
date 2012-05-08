@@ -100,12 +100,28 @@ options = {
 	},
 }
 
-local timeoutConstant = 150
+local timeoutConstant = 60
 
 local sounds = {
-	unitComplete = {file = "LuaUI/sounds/voices/productionc_arm_1.wav", timeout = timeoutConstant},
-	structureComplete = {file = "LuaUI/sounds/voices/constructionc_arm_1.wav", timeout = timeoutConstant},
+	unitComplete = {file = "LuaUI/sounds/voices/productionc_arm_1.wav"},
+	structureComplete = {file = "LuaUI/sounds/voices/constructionc_arm_1.wav"},
+	factoryIdle = {file = "sounds/reply/advisor/factory_idle.wav"},
+	
+	aircraftShotDown = {file = "sounds/reply/advisor/aircraft_shot_down.wav"},
+	commanderLost = {file = "sounds/reply/advisor/commander_lost.wav"},
+	buildingDestroyed = {file = "sounds/reply/advisor/building_destroyed.wav"},
+	unitLost = {file = "sounds/reply/advisor/unit_lost.wav"},
+	
+	enemyAirSpotted = {file = "sounds/reply/advisor/enemy_aircraft_spotted.wav"},
+	
+	stallingM = {file = "sounds/reply/advisor/stall_metal.wav"},
+	stallingE = {file = "sounds/reply/advisor/stall_energy.wav"},
+	
+	excessingM = {file = "sounds/reply/advisor/excess_metal.wav"},
 }
+for name,data in pairs(sounds) do
+	data.timeout = data.timeout or timeoutConstant
+end
 
 local noMonitor = {
 	[UnitDefNames.terraunit.id] = true,
@@ -130,7 +146,7 @@ local logCompleteInView = true
 --end
 
 -- add a news event - makes a label and plays a sound if needed
-local function AddEvent(str, unitDefID, color, sound)
+local function AddEvent(str, unitDefID, color, sound, pos)
 	local frame = Spring.GetGameFrame()
 	if unitDefID then
 		if lastEventFrame[unitDefID] == frame then return end -- FIXME: stupid way of doing spam protection
@@ -142,7 +158,13 @@ local function AddEvent(str, unitDefID, color, sound)
 	if lastLabel then
 		x = math.max(x, lastLabel.x + lastLabel.width + labelSpacing)
 	end
-	labels[#labels+1] = Label:New{
+	
+	local posTable
+	if pos then
+		posTable = { function() Spring.SetCameraTarget(pos[1], pos[2], pos[3], 1) end }
+	end
+	
+	local newLabel = Label:New{
 		width=string.len(str) * fontSize/2;
 		height="100%";
 		autosize=true;
@@ -155,7 +177,33 @@ local function AddEvent(str, unitDefID, color, sound)
 		fontSize = fontSize;
 		fontShadow = true;
 		parent = panel_ticker;
+		OnClick = posTable;
 	}
+
+	
+	-- implements button mouse functionality for the panel
+	function newLabel:HitTest(x,y) return self end
+	function newLabel:MouseDown(...)
+		local inherited = newLabel.inherited
+		self._down = true
+		self.state = 'pressed'
+		inherited.MouseDown(self, ...)
+		self:Invalidate()
+		return self
+	end
+
+	function newLabel:MouseUp(...)
+		local inherited = newLabel.inherited
+		if (self._down) then
+			self._down = false
+			self.state = 'normal'
+			inherited.MouseUp(self, ...)
+			self:Invalidate()
+			return self
+		end
+	end
+	
+	labels[#labels+1] = newLabel
 	if useSounds and soundTimeout < frame then
 		local soundInfo = sounds[sound]
 		if not soundInfo then return end
@@ -220,7 +268,7 @@ function widget:GameFrame(n)
 			AddEvent("Excessing metal", nil, colorYellow)
 			lastMExcessEvent = n
 		end
-		local elevel,estore,epull,eincome = spGetTeamRes(myTeam, "energy")
+		local elevel,estore,epull,eincome = spGetTeamRes(myTeam, "energy", "stallingE")
 		if elevel/(estore - OD_BUFFER) <= 0.2 and lastEStallEvent + RESOURCE_WARNING_PERIOD < n  then
 			AddEvent("Stalling energy", nil, colorOrange)
 			lastEStallEvent = n
@@ -231,11 +279,12 @@ end
 function widget:UnitEnteredLos(unitID, unitTeam)
 	if not Spring.AreTeamsAllied(unitTeam, myTeam) then
 		local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
+		local pos = {Spring.GetUnitPosition(unitID)}
 		if unitDef.canFly and not airSpotted then
-			AddEvent("Enemy aircraft spotted", nil, colorRed)
+			AddEvent("Enemy aircraft spotted", nil, colorRed, "enemyAirSpotted", pos)
 			airSpotted = true
 		elseif unitDef.name == "corsilo" and not nukeSpotted then
-			AddEvent("Enemy nuke silo spotted", nil, colorRed)
+			AddEvent("Enemy nuke silo spotted", nil, colorRed, "enemyNukeSpotted", pos)
 			nukeSpotted = true			
 		end
 	end
@@ -251,13 +300,15 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	--can u c me?
 	if (spInView(unitID)) and (logDeathInView == false) then return end
 	
-	if (ud.canFly) then AddEvent(ud.humanName .. " shot down", unitDefID, colorRed)
-	elseif (ud.isFactory) then AddEvent(ud.humanName .. ": factory destroyed", unitDefID, colorRed)
-	elseif (ud.customParams.commtype) then AddEvent(ud.humanName .. ": commander lost", unitDefID, colorRed)
-	elseif (ud.isBuilding) then AddEvent(ud.humanName .. ": building destroyed", unitDefID, colorRed)
-	elseif (ud.modCategories.ship) or (ud.modCategories.sub) then AddEvent(ud.humanName .. " sunk", unitDefID, colorRed)
-	elseif (ud.builder) then AddEvent(ud.humanName .. ": constructor lost", unitDefID, colorRed)
-	else AddEvent(ud.humanName .. ": unit lost", unitDefID, colorRed)
+	local pos = {Spring.GetUnitPosition(unitID)}
+	
+	if (ud.canFly) then AddEvent(ud.humanName .. " shot down", unitDefID, colorRed, "aircraftShotDown", pos)
+	elseif (ud.isFactory) then AddEvent(ud.humanName .. ": factory destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
+	elseif (ud.customParams.commtype) then AddEvent(ud.humanName .. ": commander lost", unitDefID, colorRed, "commanderLost", pos)
+	elseif (ud.isBuilding) then AddEvent(ud.humanName .. ": building destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
+	elseif (ud.modCategories.ship) or (ud.modCategories.sub) then AddEvent(ud.humanName .. " sunk", unitDefID, colorRed, "unitLost", pos)
+	elseif (ud.builder) then AddEvent(ud.humanName .. ": constructor lost", unitDefID, colorRed, "unitLost", pos)
+	else AddEvent(ud.humanName .. ": unit lost", unitDefID, colorRed, "unitLost", pos)
 	end
 end
 
@@ -269,18 +320,20 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	--	Spring.Echo(name,param)
 	--end
 	-- cheap units aren't newsworthy unless they're builders
-	if (not (ud.isBuilder or ud.builder) --[[TODO: remove isBuilder after 85.0]] and (UnitDefs[unitDefID].metalCost < (mIncome * options.minCostMult.value) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
+	if ((not ud.builder) and (UnitDefs[unitDefID].metalCost < (mIncome * options.minCostMult.value) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
+	local pos = {Spring.GetUnitPosition(unitID)}
 	if (not ud.canMove) or (ud.isFactory) then
-		AddEvent(ud.humanName .. ": construction completed", unitDefID, colorGreen, "structureComplete")
+		AddEvent(ud.humanName .. ": construction completed", unitDefID, colorGreen, "structureComplete", pos)
 	else
-		AddEvent(ud.humanName .. ": unit operational", unitDefID, colorGreen, "unitComplete")
+		AddEvent(ud.humanName .. ": unit operational", unitDefID, colorGreen, "unitComplete", pos)
 	end
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	local ud = UnitDefs[unitDefID]
 	if ud.isFactory and (spGetTeam(unitID) == myTeam) then
-		AddEvent(ud.humanName .. ": factory idle", unitDefID, colorYellow)
+		local pos = {Spring.GetUnitPosition(unitID)}
+		AddEvent(ud.humanName .. ": factory idle", unitDefID, colorYellow, "factoryIdle", pos)
 	end
 end
 
