@@ -54,7 +54,7 @@ local missileEmits = {{lbak1, lbak2}, {rbak1, rbak2}}
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
-local SIG_MOVE = 1
+local SIG_WALK = 1
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
 local SIG_AIM_3 = 8
