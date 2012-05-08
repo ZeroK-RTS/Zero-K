@@ -15,7 +15,7 @@ unitDef = {
   buildingGroundDecalType       = [[arm_solar_ground.dds]],
   buildPic                      = [[ARMSOLAR.png]],
   buildTime                     = 70,
-  category                      = [[SINK UNARMED]],
+  category                      = [[SINK UNARMED STUPIDTARGET]],
   corpse                        = [[DEAD]],
 
   customParams                  = {

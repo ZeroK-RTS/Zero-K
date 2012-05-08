@@ -14,7 +14,7 @@ unitDef = {
   buildTime                     = 280,
   canAttack                     = true,
   canstop                       = [[1]],
-  category                      = [[FLOAT UNARMED]],
+  category                      = [[FLOAT UNARMED STUPIDTARGET]],
   collisionVolumeTest           = 1,
   corpse                        = [[DEAD]],
 

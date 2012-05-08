@@ -462,9 +462,9 @@ for name, ud in pairs(UnitDefs) do
 	if (ud.weapons) then
 		for wName,wDef in pairs(ud.weapons) do     
 			if wDef.badtargetcategory then
-				wDef.badtargetcategory = wDef.badtargetcategory .. " UNARMED"
+				wDef.badtargetcategory = wDef.badtargetcategory .. " STUPIDTARGET"
 			else
-				wDef.badtargetcategory = "UNARMED"
+				wDef.badtargetcategory = "STUPIDTARGET"
 			end
 		end
 	end
