@@ -277,7 +277,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(lleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(rarmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(larmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(llarm, sfxShatter)
+		Explode(larm, sfxShatter)
 		Explode(lmissiles, sfxShatter)
 		Explode(rmissiles, sfxShatter)
 		
