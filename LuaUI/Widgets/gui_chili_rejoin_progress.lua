@@ -40,7 +40,7 @@ local localLastFrameNum_G = 0 --//variable: used to calculate local game-frame r
 local ui_active_G = false --//variable:indicate whether UI is shown or hidden.
 local textToSpeechEnabled = true --//variable: used to properly disable/re-enable TTS when rejoining
 local averageLocalSpeed_G = {sumOfSpeed= 0, sumCounter= 0} --//variable: store the local-gameFrame speeds so that an average can be calculated.  
-local simpleMovingAverageLocalSpeed_G = {storage={},currentIndex = 1, currentAverage=0} --//variable: for calculating rolling average.  
+local simpleMovingAverageLocalSpeed_G = {storage={},currentIndex = 1, currentAverage=60} --//variable: for calculating rolling average. Initial average is set at 30 (x1.0 gameSpeed)
 --------------------------------------------------------------------------------
 
 if VFS.FileExists("Luaui/Config/ZK_data.lua") then
@@ -116,7 +116,9 @@ function SimpleMovingAverage(localGameFrameRate)
 		simpleMovingAverageLocalSpeed_G.currentIndex = 1 --wrap the table index around (create a circle of 300 entry).
 	end
 	index = (simpleMovingAverageLocalSpeed_G.currentIndex) --retrieve an index advanced by 1.
-	simpleMovingAverageLocalSpeed_G.currentAverage = simpleMovingAverageLocalSpeed_G.currentAverage + localGameFrameRate/299 - (simpleMovingAverageLocalSpeed_G.storage[index] or 0)/299 --calculate average: add new value, remove old value. Ref: http://en.wikipedia.org/wiki/Moving_average#Simple_moving_average
+	simpleMovingAverageLocalSpeed_G.currentAverage = simpleMovingAverageLocalSpeed_G.currentAverage + localGameFrameRate/299 - (simpleMovingAverageLocalSpeed_G.storage[index] or 30)/299 --calculate average: add new value, remove old value. Ref: http://en.wikipedia.org/wiki/Moving_average#Simple_moving_average
+	localGameFrameRate = simpleMovingAverageLocalSpeed_G.currentAverage -- replace localGameFrameRate with its average value.
+	--[[ --initial average is already set to 30 (x1.0) so no need for these code.
 	if #simpleMovingAverageLocalSpeed_G.storage == 300 then --do when table is completed:
 		localGameFrameRate = simpleMovingAverageLocalSpeed_G.currentAverage -- replace localGameFrameRate with its average value.
 	else --do when table not completed:
@@ -126,6 +128,7 @@ function SimpleMovingAverage(localGameFrameRate)
 		end
 		localGameFrameRate = sum/#simpleMovingAverageLocalSpeed_G.storage --standard average, do until table is completed
 	end
+	--]]
 	return localGameFrameRate
 end
 
