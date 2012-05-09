@@ -69,7 +69,7 @@ local visible = true
 local firstEnter=true --used to activate ally-chat at game start. To run once
 local noAlly=false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
 
-local wasSimpleColor = false -- variable: indicate if simple color was toggled on or off. Used to trigger player-list to refresh.
+local wasSimpleColor = nil -- variable: indicate if simple color was toggled on or off. Used to trigger player-list to refresh.
 
 local function option_remakeConsole()
 	remakeConsole()
