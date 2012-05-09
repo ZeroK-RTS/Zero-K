@@ -314,8 +314,12 @@ local white = { 1, 1, 1 }
 
 local spGetCameraState		= Spring.GetCameraState
 local spGetCameraVectors	= Spring.GetCameraVectors
+local spGetGroundHeight		= Spring.GetGroundHeight
+local spGetSmoothMeshHeight	= Spring.GetSmoothMeshHeight
 local spGetModKeyState		= Spring.GetModKeyState
 local spGetMouseState		= Spring.GetMouseState
+local spGetSelectedUnits	= Spring.GetSelectedUnits
+local spGetUnitPosition		= Spring.GetUnitPosition
 local spIsAboveMiniMap		= Spring.IsAboveMiniMap
 local spSendCommands		= Spring.SendCommands
 local spSetCameraState		= Spring.SetCameraState
@@ -393,7 +397,7 @@ local hideCursor = false
 
 local mwidth, mheight = Game.mapSizeX, Game.mapSizeZ
 local mcx, mcz 	= mwidth / 2, mheight / 2
-local mcy 		= Spring.GetGroundHeight(mcx, mcz)
+local mcy 		= spGetGroundHeight(mcx, mcz)
 local maxDistY = max(mheight, mwidth) * 2
 
 
@@ -476,7 +480,7 @@ local function VirtTraceRay(x,y, cs)
 	if gpos then
 		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
 		
-		--gy = Spring.GetSmoothMeshHeight (gx,gz)
+		--gy = spGetSmoothMeshHeight (gx,gz)
 		
 		if gx < 0 or gx > mwidth or gz < 0 or gz > mheight then
 			return false, gx, gy, gz	
@@ -491,7 +495,7 @@ local function VirtTraceRay(x,y, cs)
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz
 	
-	--gy = Spring.GetSmoothMeshHeight (gx,gz)
+	--gy = spGetSmoothMeshHeight (gx,gz)
 	return false, gx, gy, gz
 end
 
@@ -534,8 +538,8 @@ local function UpdateCam(cs)
 	cs.pz = ls_z - cos(cs.ry) * alt
 	
 	if not options.freemode.value then
-		local gndheight = Spring.GetGroundHeight(cs.px, cs.pz)+5
-		--gndheight = Spring.GetSmoothMeshHeight(cs.px, cs.pz)+5
+		local gndheight = spGetGroundHeight(cs.px, cs.pz)+5
+		--gndheight = spGetSmoothMeshHeight(cs.px, cs.pz)+5
 		if cs.py < gndheight then
 			if options.groundrot.value then
 				cs.py = gndheight
@@ -582,8 +586,8 @@ local function Zoom(zoomin, s, forceCenter)
 			local new_pz = cs.pz + dz * sp
 			
 			if not options.freemode.value then
-                if new_py < Spring.GetGroundHeight(cs.px, cs.pz)+5 then
-                    sp = (Spring.GetGroundHeight(cs.px, cs.pz)+5 - cs.py) / dy
+                if new_py < spGetGroundHeight(cs.px, cs.pz)+5 then
+                    sp = (spGetGroundHeight(cs.px, cs.pz)+5 - cs.py) / dy
                     new_px = cs.px + dx * sp
                     new_py = cs.py + dy * sp
                     new_pz = cs.pz + dz * sp
@@ -648,8 +652,8 @@ local function Altitude(up, s)
 	local dy = py * (up and 1 or -1) * (s and 0.3 or 0.1)
 	local new_py = py + dy
 	if not options.freemode.value then
-        if new_py < Spring.GetGroundHeight(cs.px, cs.pz)+5  then
-            new_py = Spring.GetGroundHeight(cs.px, cs.pz)+5  
+        if new_py < spGetGroundHeight(cs.px, cs.pz)+5  then
+            new_py = spGetGroundHeight(cs.px, cs.pz)+5  
         elseif new_py > maxDistY then
             new_py = maxDistY 
         end
@@ -693,7 +697,7 @@ OverviewAction = function()
 			ls_dist = last_ls_dist 
 			ls_x = gx
 			ls_z = gz
-			ls_y = Spring.GetGroundHeight(ls_x, ls_z)
+			ls_y = spGetGroundHeight(ls_x, ls_z)
 			ls_have = true
 			local cstemp = UpdateCam(cs)
 			if cstemp then cs = cstemp; end
@@ -801,9 +805,9 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	ls_z = math.max(ls_z, 3)
 	
 	if options.smoothmeshscroll.value then
-		ls_y = Spring.GetSmoothMeshHeight(ls_x, ls_z) or 0
+		ls_y = spGetSmoothMeshHeight(ls_x, ls_z) or 0
 	else
-		ls_y = Spring.GetGroundHeight(ls_x, ls_z) or 0
+		ls_y = spGetGroundHeight(ls_x, ls_z) or 0
 	end
 	
 	
@@ -866,10 +870,10 @@ function widget:Update(dt)
 	
 	trackcycle = trackcycle %(4) + 1
 	if trackcycle == 1 and trackmode then
-		local selUnits = Spring.GetSelectedUnits()
+		local selUnits = spGetSelectedUnits()
 		if selUnits and selUnits[1] then
-			local x,y,z = Spring.GetUnitPosition( selUnits[1] )
-			Spring.SetCameraTarget(x,y,z, 0.2)
+			local x,y,z = spGetUnitPosition( selUnits[1] )
+			spSetCameraTarget(x,y,z, 0.2)
 		end
 	end
 	

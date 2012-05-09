@@ -26,6 +26,9 @@ local glScale		= gl.Scale
 local glTranslate	= gl.Translate
 local glPopMatrix	= gl.PopMatrix
 
+local spGetModKeyState	= Spring.GetModKeyState
+local spGetMouseState	= Spring.GetMouseState
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -107,7 +110,7 @@ end
 
 local mods = {}
 function widget:MousePress(x,y,button)
-  local alt, ctrl, meta, shift = Spring.GetModKeyState()
+  local alt, ctrl, meta, shift = spGetModKeyState()
   mods.alt=alt; mods.ctrl=ctrl; mods.meta=meta; mods.shift=shift;
 
   return screen0:MouseDown(x,y,button,mods)
@@ -115,7 +118,7 @@ end
 
 
 function widget:MouseRelease(x,y,button)
-  local alt, ctrl, meta, shift = Spring.GetModKeyState()
+  local alt, ctrl, meta, shift = spGetModKeyState()
   mods.alt=alt; mods.ctrl=ctrl; mods.meta=meta; mods.shift=shift;
 
   return screen0:MouseUp(x,y,button,mods)
@@ -123,7 +126,7 @@ end
 
 
 function widget:MouseMove(x,y,dx,dy,button)
-  local alt, ctrl, meta, shift = Spring.GetModKeyState()
+  local alt, ctrl, meta, shift = spGetModKeyState()
   mods.alt=alt; mods.ctrl=ctrl; mods.meta=meta; mods.shift=shift;
 
   return screen0:MouseMove(x,y,dx,dy,button,mods)
@@ -131,7 +134,7 @@ end
 
 
 function widget:MouseWheel(up,value)
-  local x,y = Spring.GetMouseState()
+  local x,y = spGetMouseState()
   local alt, ctrl, meta, shift = Spring.GetModKeyState()
   mods.alt=alt; mods.ctrl=ctrl; mods.meta=meta; mods.shift=shift;
 

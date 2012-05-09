@@ -212,7 +212,8 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	local spect,spectFull = Spring.GetSpectatingState()
-	if Spring.AreTeamsAllied(unitTeam,Spring.GetMyTeamID()) or (spect and spectFull) then
+	local myTeam = Spring.GetMyTeamID()
+	if Spring.AreTeamsAllied(unitTeam, myTeam) or (spect and spectFull) then
 		etaTable[unitID] = MakeETA(unitID,unitDefID)
 	end
 end
