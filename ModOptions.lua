@@ -353,7 +353,7 @@ local options = {
     section= 'experimental',
     def    = 'destroy',
     items = {
-      { key='debug', name="Debug", desc='Does nothing.' },
+      { key='debug', name="Debug", desc='Does nothing; game is endless.' },
       { key='destroy', name="Destroy Alliance", desc='Destroys the alliance if they are defeated"' },
       { key='losecontrol', name="Lose Control", desc='Alliance loses control of their units if they are defeated.' },
 

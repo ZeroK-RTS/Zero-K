@@ -88,8 +88,9 @@ for name, ud in pairs(UnitDefs) do
 end
 
 local commsAlive = {}
-for _,allianceID in ipairs(spGetAllyTeamList()) do
-	commsAlive[allianceID] = {}
+local allyTeams = spGetAllyTeamList()
+for i=1,#allyTeams do
+	commsAlive[allyTeams[i]] = {}
 end
 
 --------------------------------------------------------------------------------
@@ -186,6 +187,7 @@ function DestroyAlliance(allianceID)
 			Spring.Echo("Game Over: DEBUG")
 			Spring.Echo("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			Spring.Echo("Game Over: If this is true, then please resign.")
+			return	-- don't perform victory check
 		elseif destroy_type == 'destroy' then	-- kaboom
 			Spring.Echo("Game Over: Destroying alliance " .. allianceID)
 			for i=1,#teamList do
@@ -214,7 +216,7 @@ GG.DestroyAlliance = DestroyAlliance
 
 -- check for active players
 local function ProcessLastAlly()	
-    if Spring.IsCheatingEnabled() then
+    if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
 	  return
     end
     local allylist = spGetAllyTeamList()
@@ -315,7 +317,7 @@ function gadget:Initialize()
 	gaiaTeam = Spring.GetGaiaTeamID()
 	_,_,_,_,_, gaiaAlliance = spGetTeamInfo(gaiaTeam)
 	CheckAllUnits()
-	destroy_type = Spring.GetModOptions() and Spring.GetModOptions().defeatmode or 'debug'
+	destroy_type = Spring.GetModOptions() and Spring.GetModOptions().defeatmode or 'destroy'
 	commends = Spring.GetModOptions() and tobool(Spring.GetModOptions().commends)
 	
 	local teams = spGetTeamList()
