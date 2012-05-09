@@ -10,40 +10,56 @@ local skin = {
 }
 
 --//=============================================================================
+
+local glColor		= gl.Color
+local glRect		= gl.Rect
+local glTranslate	= gl.Translate
+local glTexture		= gl.Texture
+local glTextureInfo	= gl.TextureInfo
+local glVertex		= gl.Vertex
+local glBeginEnd	= gl.BeginEnd
+local glPushMatrix	= gl.PushMatrix
+local glPopMatrix	= gl.PopMatrix
+
+local GL_TRIANGLE_STRIP	= GL.TRIANGLE_STRIP
+local GL_TRIANGLES	= GL.TRIANGLES
+local GL_LINES		= GL.LINES
+
+--//=============================================================================
 --// Render Helpers
 
 local function _DrawBorder(x,y,w,h,bt,color1,color2)
-  gl.Color(color1)
-  gl.Vertex(x,     y+h)
-  gl.Vertex(x+bt,  y+h-bt)
-  gl.Vertex(x,     y)
-  gl.Vertex(x+bt,  y)
-  gl.Vertex(x+bt,  y)
-  gl.Vertex(x+bt,  y+bt)
-  gl.Vertex(x+w,   y)
-  gl.Vertex(x+w-bt,y+bt)
+  glColor(color1)
+  glVertex(x,     y+h)
+  glVertex(x+bt,  y+h-bt)
+  glVertex(x,     y)
+  glVertex(x+bt,  y)
+  glVertex(x+bt,  y)
+  glVertex(x+bt,  y+bt)
+  glVertex(x+w,   y)
+  glVertex(x+w-bt,y+bt)
 
-  gl.Color(color2)
-  gl.Vertex(x+w-bt,y+bt)
-  gl.Vertex(x+w,   y)
-  gl.Vertex(x+w-bt,y+h)
-  gl.Vertex(x+w,   y+h)
-  gl.Vertex(x+w-bt,y+h-bt)
-  gl.Vertex(x+w-bt,y+h)
-  gl.Vertex(x+bt,  y+h-bt)
-  gl.Vertex(x+bt,  y+h)
-  gl.Vertex(x,     y+h)
+  glColor(color2)
+  glVertex(x+w-bt,y+bt)
+  glVertex(x+w,   y)
+  glVertex(x+w-bt,y+h)
+  glVertex(x+w,   y+h)
+  glVertex(x+w-bt,y+h-bt)
+  glVertex(x+w-bt,y+h)
+  glVertex(x+bt,  y+h-bt)
+  glVertex(x+bt,  y+h)
+  glVertex(x,     y+h)
 end
 
 
 local function _DrawCheck(rect)
   local x,y,w,h = rect[1],rect[2],rect[3],rect[4]
-  gl.Vertex(x+w*0.25, y+h*0.5)
-  gl.Vertex(x+w*0.125,y+h*0.625)
-  gl.Vertex(x+w*0.375,y+h*0.625)
-  gl.Vertex(x+w*0.375,y+h*0.875)
-  gl.Vertex(x+w*0.75, y+h*0.25)
-  gl.Vertex(x+w*0.875,y+h*0.375)
+  glVertex(x+w*0.25, y+h*0.5)
+  glVertex(x+w*0.125,y+h*0.625)
+  glVertex(x+w*0.375,y+h*0.625)
+  glVertex(x+w*0.375,y+h*0.875)
+  glVertex(x+w*0.75, y+h*0.25)
+  glVertex(x+w*0.875,y+h*0.375)
 end
 
 
@@ -54,24 +70,24 @@ local function _DrawDragGrip(obj)
   local w = obj.dragGripSize[1]
   local h = obj.dragGripSize[2]
 
-  gl.Color(0.8,0.8,0.8,0.9)
-  gl.Vertex(x, y + h*0.5)
-  gl.Vertex(x + w*0.5, y)
-  gl.Vertex(x + w*0.5, y + h*0.5)
+  glColor(0.8,0.8,0.8,0.9)
+  glVertex(x, y + h*0.5)
+  glVertex(x + w*0.5, y)
+  glVertex(x + w*0.5, y + h*0.5)
 
-  gl.Color(0.3,0.3,0.3,0.9)
-  gl.Vertex(x + w*0.5, y + h*0.5)
-  gl.Vertex(x + w*0.5, y)
-  gl.Vertex(x + w, y + h*0.5)
+  glColor(0.3,0.3,0.3,0.9)
+  glVertex(x + w*0.5, y + h*0.5)
+  glVertex(x + w*0.5, y)
+  glVertex(x + w, y + h*0.5)
 
-  gl.Vertex(x + w*0.5, y + h)
-  gl.Vertex(x, y + h*0.5)
-  gl.Vertex(x + w*0.5, y + h*0.5)
+  glVertex(x + w*0.5, y + h)
+  glVertex(x, y + h*0.5)
+  glVertex(x + w*0.5, y + h*0.5)
 
-  gl.Color(0.1,0.1,0.1,0.9)
-  gl.Vertex(x + w*0.5, y + h)
-  gl.Vertex(x + w*0.5, y + h*0.5)
-  gl.Vertex(x + w, y + h*0.5)
+  glColor(0.1,0.1,0.1,0.9)
+  glVertex(x + w*0.5, y + h)
+  glVertex(x + w*0.5, y + h*0.5)
+  glVertex(x + w, y + h*0.5)
 end
 
 
@@ -89,27 +105,27 @@ local function _DrawResizeGrip(obj)
 
     x = x-1
     y = y-1
-    gl.Color(1,1,1,0.2)
-      gl.Vertex(x - w, y)
-      gl.Vertex(x, y - h)
+    glColor(1,1,1,0.2)
+      glVertex(x - w, y)
+      glVertex(x, y - h)
 
-      gl.Vertex(x - math.floor(w*0.66), y)
-      gl.Vertex(x, y - math.floor(h*0.66))
+      glVertex(x - math.floor(w*0.66), y)
+      glVertex(x, y - math.floor(h*0.66))
 
-      gl.Vertex(x - math.floor(w*0.33), y)
-      gl.Vertex(x, y - math.floor(h*0.33))
+      glVertex(x - math.floor(w*0.33), y)
+      glVertex(x, y - math.floor(h*0.33))
 
     x = x+1
     y = y+1
-    gl.Color(0.1, 0.1, 0.1, 0.9)
-      gl.Vertex(x - w, y)
-      gl.Vertex(x, y - h)
+    glColor(0.1, 0.1, 0.1, 0.9)
+      glVertex(x - w, y)
+      glVertex(x, y - h)
 
-      gl.Vertex(x - math.floor(w*0.66), y)
-      gl.Vertex(x, y - math.floor(h*0.66))
+      glVertex(x - math.floor(w*0.66), y)
+      glVertex(x, y - math.floor(h*0.66))
 
-      gl.Vertex(x - math.floor(w*0.33), y)
-      gl.Vertex(x, y - math.floor(h*0.33))
+      glVertex(x - math.floor(w*0.33), y)
+      glVertex(x, y - math.floor(h*0.33))
   end
 end
 
@@ -124,44 +140,44 @@ function DrawBorder(obj,state)
   local h = obj.height
   local bt = obj.borderThickness
 
-  gl.Color((state=='pressed' and obj.borderColor2) or obj.borderColor1)
-  gl.Vertex(x,     y+h)
-  gl.Vertex(x+bt,  y+h-bt)
-  gl.Vertex(x,     y)
-  gl.Vertex(x+bt,  y)
-  gl.Vertex(x+bt,  y)
-  gl.Vertex(x+bt,  y+bt)
-  gl.Vertex(x+w,   y)
-  gl.Vertex(x+w-bt,y+bt)
+  glColor((state=='pressed' and obj.borderColor2) or obj.borderColor1)
+  glVertex(x,     y+h)
+  glVertex(x+bt,  y+h-bt)
+  glVertex(x,     y)
+  glVertex(x+bt,  y)
+  glVertex(x+bt,  y)
+  glVertex(x+bt,  y+bt)
+  glVertex(x+w,   y)
+  glVertex(x+w-bt,y+bt)
 
-  gl.Color((state=='pressed' and obj.borderColor1) or obj.borderColor2)
-  gl.Vertex(x+w-bt,y+bt)
-  gl.Vertex(x+w,   y)
-  gl.Vertex(x+w-bt,y+h)
-  gl.Vertex(x+w,   y+h)
-  gl.Vertex(x+w-bt,y+h-bt)
-  gl.Vertex(x+w-bt,y+h)
-  gl.Vertex(x+bt,  y+h-bt)
-  gl.Vertex(x+bt,  y+h)
-  gl.Vertex(x,     y+h)
+  glColor((state=='pressed' and obj.borderColor1) or obj.borderColor2)
+  glVertex(x+w-bt,y+bt)
+  glVertex(x+w,   y)
+  glVertex(x+w-bt,y+h)
+  glVertex(x+w,   y+h)
+  glVertex(x+w-bt,y+h-bt)
+  glVertex(x+w-bt,y+h)
+  glVertex(x+bt,  y+h-bt)
+  glVertex(x+bt,  y+h)
+  glVertex(x,     y+h)
 end
 
 
 function DrawBackground(obj)
-  gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBackground, obj)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBackground, obj)
 end
 
 
 function _DrawScrollbar(obj, type, x,y,w,h, pos, visiblePercent, state)
-  gl.Color(obj.backgroundColor)
-  gl.Rect(x,y,x+w,y+h)
+  glColor(obj.backgroundColor)
+  glRect(x,y,x+w,y+h)
 
   if (type=='horizontal') then
     local gripx,gripw = x+w*pos, w*visiblePercent
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, gripx,y,gripw,h, 1, obj.borderColor1, obj.borderColor2)
+    glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, gripx,y,gripw,h, 1, obj.borderColor1, obj.borderColor2)
   else
     local gripy,griph = y+h*pos, h*visiblePercent
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, x,gripy,w,griph, 1, obj.borderColor1, obj.borderColor2)
+    glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, x,gripy,w,griph, 1, obj.borderColor1, obj.borderColor2)
   end
 end
 
@@ -172,11 +188,11 @@ function _DrawBackground(obj)
   local w = obj.width
   local h = obj.height
 	
-  gl.Color(obj.backgroundColor)
-  gl.Vertex(x,   y)
-  gl.Vertex(x,   y+h)
-  gl.Vertex(x+w, y)
-  gl.Vertex(x+w, y+h)
+  glColor(obj.backgroundColor)
+  glVertex(x,   y)
+  glVertex(x,   y+h)
+  glVertex(x+w, y)
+  glVertex(x+w, y+h)
 end
 
 
@@ -184,14 +200,14 @@ end
 --// Control Renderer
 
 function DrawWindow(obj)
-  gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBackground, obj, obj.state)
-  gl.BeginEnd(GL.TRIANGLE_STRIP, DrawBorder, obj, obj.state)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBackground, obj, obj.state)
+  glBeginEnd(GL_TRIANGLE_STRIP, DrawBorder, obj, obj.state)
 end
 
 
 function DrawButton(obj)
-  gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBackground, obj, obj.state)
-  gl.BeginEnd(GL.TRIANGLE_STRIP, DrawBorder, obj, obj.state)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBackground, obj, obj.state)
+  glBeginEnd(GL_TRIANGLE_STRIP, DrawBorder, obj, obj.state)
 
   if (obj.caption) then
     local x = obj.x
@@ -205,20 +221,20 @@ end
 
 
 function DrawPanel(obj)
-  gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBackground, obj, obj.state)
-  gl.BeginEnd(GL.TRIANGLE_STRIP, DrawBorder, obj, obj.state)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBackground, obj, obj.state)
+  glBeginEnd(GL_TRIANGLE_STRIP, DrawBorder, obj, obj.state)
 end
 
 
 function DrawItemBkGnd(obj,x,y,w,h,state)
   if (state=="selected") then
-    gl.Color(0.15,0.15,0.9,1)   
+    glColor(0.15,0.15,0.9,1)   
   else
-    gl.Color({0.8, 0.8, 1, 0.45})
+    glColor({0.8, 0.8, 1, 0.45})
   end
-  gl.Rect(x,y,x+w,y+h)
+  glRect(x,y,x+w,y+h)
 
-  gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, x,y,w,h, 1, obj.borderColor1, obj.borderColor2)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, x,y,w,h, 1, obj.borderColor1, obj.borderColor2)
 end
 
 
@@ -226,8 +242,8 @@ function DrawScrollPanel(obj)
   local clientX,clientY,clientWidth,clientHeight = unpack4(obj.clientArea)
   local contX,contY,contWidth,contHeight = unpack4(obj.contentArea)
 
-  gl.PushMatrix()
-  gl.Translate(math.floor(obj.x + clientX),math.floor(obj.y + clientY),0)
+  glPushMatrix()
+  glTranslate(math.floor(obj.x + clientX),math.floor(obj.y + clientY),0)
 
   if obj._vscrollbar then
     _DrawScrollbar(obj, 'vertical', clientWidth,  0, obj.scrollbarSize, clientHeight,
@@ -238,7 +254,7 @@ function DrawScrollPanel(obj)
                         obj.scrollPosX/contWidth, clientWidth/contWidth)
   end
 
-  gl.PopMatrix()
+  glPopMatrix()
 end
 
 
@@ -249,13 +265,13 @@ function DrawTrackbar(obj)
   local w = obj.width
   local h = obj.height
 
-  gl.Color(0,0,0,1)
-  gl.Rect(x,y+h*0.5,x+w,y+h*0.5+1)
+  glColor(0,0,0,1)
+  glRect(x,y+h*0.5,x+w,y+h*0.5+1)
 
   local vc = y+h*0.5 --//verticale center
   local pos = x+percent*w
 
-  gl.Rect(pos-2,vc-h*0.5,pos+2,vc+h*0.5)
+  glRect(pos-2,vc-h*0.5,pos+2,vc+h*0.5)
 end
 
 
@@ -264,30 +280,30 @@ function DrawCheckbox(obj)
   local tx = 0
   local ty = vc
 
-  gl.PushMatrix()
-  gl.Translate(obj.x,obj.y,0)
+  glPushMatrix()
+  glTranslate(obj.x,obj.y,0)
 
   obj.font:Print(obj.caption, tx, ty, "left", "center")
 
   local box  = obj.boxsize
   local rect = {obj.width-box,obj.height*0.5-box*0.5,box,box}
 
-  gl.Color(obj.backgroundColor)
-  gl.Rect(rect[1]+1,rect[2]+1,rect[1]+1+rect[3]-2,rect[2]+1+rect[4]-2)
+  glColor(obj.backgroundColor)
+  glRect(rect[1]+1,rect[2]+1,rect[1]+1+rect[3]-2,rect[2]+1+rect[4]-2)
 
-  gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, rect[1],rect[2],rect[3],rect[4], 1, obj.borderColor1, obj.borderColor2)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, rect[1],rect[2],rect[3],rect[4], 1, obj.borderColor1, obj.borderColor2)
 
   if (obj.checked) then
-    gl.BeginEnd(GL.TRIANGLE_STRIP,_DrawCheck,rect)
+    glBeginEnd(GL_TRIANGLE_STRIP,_DrawCheck,rect)
   end
 
-  gl.PopMatrix()
+  glPopMatrix()
 end
 
 
 function DrawColorbars(obj)
-  gl.PushMatrix()
-  gl.Translate(obj.x,obj.y,0)
+  glPushMatrix()
+  glTranslate(obj.x,obj.y,0)
 
   local barswidth  = obj.width - (obj.height + 4)
 
@@ -300,34 +316,34 @@ function DrawColorbars(obj)
   local bX1,bY1,bX2,bY2 = 0,4*step,color[3]*barswidth,5*step
   local aX1,aY1,aX2,aY2 = 0,6*step,(color[4] or 1)*barswidth,7*step
 
-  gl.Color(1,0,0,1)
-  gl.Rect(rX1,rY1,rX2,rY2)
+  glColor(1,0,0,1)
+  glRect(rX1,rY1,rX2,rY2)
 
-  gl.Color(0,1,0,1)
-  gl.Rect(gX1,gY1,gX2,gY2)
+  glColor(0,1,0,1)
+  glRect(gX1,gY1,gX2,gY2)
 
-  gl.Color(0,0,1,1)
-  gl.Rect(bX1,bY1,bX2,bY2)
+  glColor(0,0,1,1)
+  glRect(bX1,bY1,bX2,bY2)
 
-  gl.Color(1,1,1,1)
-  gl.Rect(aX1,aY1,aX2,aY2)
+  glColor(1,1,1,1)
+  glRect(aX1,aY1,aX2,aY2)
 
-  gl.Color(color)
-  gl.Rect(barswidth + 2,obj.height,obj.width - 2,0)
+  glColor(color)
+  glRect(barswidth + 2,obj.height,obj.width - 2,0)
 
-  gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, barswidth + 2,0,obj.width - barswidth - 4,obj.height, 1, obj.borderColor1,obj.borderColor2)
+  glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, barswidth + 2,0,obj.width - barswidth - 4,obj.height, 1, obj.borderColor1,obj.borderColor2)
 
-  gl.PopMatrix()
+  glPopMatrix()
 end
 
 
 function DrawDragGrip(obj)
-  gl.BeginEnd(GL.TRIANGLES, _DrawDragGrip, obj)
+  glBeginEnd(GL_TRIANGLES, _DrawDragGrip, obj)
 end
 
 
 function DrawResizeGrip(obj)
-  gl.BeginEnd(GL.LINES, _DrawResizeGrip, obj)
+  glBeginEnd(GL_LINES, _DrawResizeGrip, obj)
 end
 
 
@@ -339,21 +355,21 @@ function DrawTreeviewNode(self)
     local w = self.children[1].width
     local h = self.clientArea[2] + self.children[1].height
 
-    gl.Color(0.1,0.1,1,0.55)
-    gl.Rect(x,y,x+w,y+h)
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawBorder, x,y,w,h, 1, darkBlue, darkBlue)
+    glColor(0.1,0.1,1,0.55)
+    glRect(x,y,x+w,y+h)
+    glBeginEnd(GL_TRIANGLE_STRIP, _DrawBorder, x,y,w,h, 1, darkBlue, darkBlue)
   end
 end
 
 
 local function _DrawLineV(x, y1, y2, width, next_func, ...)
-  gl.Vertex(x-width*0.5, y1)
-  gl.Vertex(x+width*0.5, y1)
-  gl.Vertex(x-width*0.5, y2)
+  glVertex(x-width*0.5, y1)
+  glVertex(x+width*0.5, y1)
+  glVertex(x-width*0.5, y2)
 
-  gl.Vertex(x+width*0.5, y1)
-  gl.Vertex(x-width*0.5, y2)
-  gl.Vertex(x+width*0.5, y2)
+  glVertex(x+width*0.5, y1)
+  glVertex(x-width*0.5, y2)
+  glVertex(x+width*0.5, y2)
 
   if (next_func) then
     next_func(...)
@@ -362,13 +378,13 @@ end
 
 
 local function _DrawLineH(x1, x2, y, width, next_func, ...)
-  gl.Vertex(x1, y-width*0.5)
-  gl.Vertex(x1, y+width*0.5)
-  gl.Vertex(x2, y-width*0.5)
+  glVertex(x1, y-width*0.5)
+  glVertex(x1, y+width*0.5)
+  glVertex(x2, y-width*0.5)
 
-  gl.Vertex(x1, y+width*0.5)
-  gl.Vertex(x2, y-width*0.5)
-  gl.Vertex(x2, y+width*0.5)
+  glVertex(x1, y+width*0.5)
+  glVertex(x2, y-width*0.5)
+  glVertex(x2, y+width*0.5)
 
   if (next_func) then
     next_func(...)
@@ -387,25 +403,25 @@ function DrawTreeviewNodeTree(self)
     y2 = y3
   end
 
-  gl.Color(self.treeview.treeColor)
-  gl.BeginEnd(GL.TRIANGLES, _DrawLineV, x1-0.5, y1, y2, 1, _DrawLineH, x1, x2, y3-0.5, 1)
+  glColor(self.treeview.treeColor)
+  glBeginEnd(GL_TRIANGLES, _DrawLineV, x1-0.5, y1, y2, 1, _DrawLineH, x1, x2, y3-0.5, 1)
 
   if (not self.nodes[1]) then
     return
   end
 
-  gl.Color(1,1,1,1)
+  glColor(1,1,1,1)
   local image = self.ImageExpanded or self.treeview.ImageExpanded
   if (not self.expanded) then
     image = self.ImageCollapsed or self.treeview.ImageCollapsed
   end
 
   TextureHandler.LoadTexture(0, image, self)
-  local texInfo = gl.TextureInfo(image) or {xsize=1, ysize=1}
+  local texInfo = glTextureInfo(image) or {xsize=1, ysize=1}
   local tw,th = texInfo.xsize, texInfo.ysize
 
   _DrawTextureAspect(self.x,self.y,math.ceil(self.padding[1]),math.ceil(self.children[1].height) ,tw,th)
-  gl.Texture(0,false)
+  glTexture(0,false)
 end
 
 

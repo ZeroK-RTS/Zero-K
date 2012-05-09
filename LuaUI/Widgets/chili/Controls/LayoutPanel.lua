@@ -58,6 +58,19 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glPushMatrix    = gl.PushMatrix
+local glColor         = gl.Color
+local glLineWidth     = gl.LineWidth
+local glPolygonMode   = gl.PolygonMode
+local glRect          = gl.Rect
+local glTranslate     = gl.Translate
+local glPopMatrix     = gl.PopMatrix
+
+local GL_FRONT_AND_BACK = GL.FRONT_AND_BACK
+local GL_FILL           = GL.FILL
+
+--//=============================================================================
+
 function LayoutPanel:New(obj)
   obj = inherited.New(self,obj)
   if (obj.selectable) then
@@ -632,19 +645,19 @@ function LayoutPanel:DrawChildren()
   local cn = self.children
   if (not cn[1]) then return end
 
-  gl.PushMatrix()
-  gl.Translate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
+  glPushMatrix()
+  glTranslate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
   for i=1,#cn do
     self:DrawItemBkGnd(i)
   end
   if (self.debug) then
-    gl.Color(1,0,0,0.5)
+    glColor(1,0,0,0.5)
     for i=1,#self._cells do
       local x,y,w,h = unpack4(self._cells[i])
-      gl.Rect(x,y,x+w,y+h)
+      glRect(x,y,x+w,y+h)
     end
   end
-  gl.PopMatrix()
+  glPopMatrix()
 
   self:_DrawChildrenInClientArea('Draw')
 end
@@ -655,27 +668,27 @@ function LayoutPanel:DrawChildrenForList()
   if (not cn[1]) then return end
 
   if (self.debug) then
-    gl.Color(0,1,0,0.5)
-    gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
-    gl.LineWidth(2)
-    gl.Rect(self.x,self.y,self.x+self.width,self.y+self.height)
-    gl.LineWidth(1)
-    gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+    glColor(0,1,0,0.5)
+    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE)
+    glLineWidth(2)
+    glRect(self.x,self.y,self.x+self.width,self.y+self.height)
+    glLineWidth(1)
+    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL)
   end
 
-  gl.PushMatrix()
-  gl.Translate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
+  glPushMatrix()
+  glTranslate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
   for i=1,#cn do
     self:DrawItemBkGnd(i)
   end
   if (self.debug) then
-    gl.Color(1,0,0,0.5)
+    glColor(1,0,0,0.5)
     for i=1,#self._cells do
       local x,y,w,h = unpack4(self._cells[i])
-      gl.Rect(x,y,x+w,y+h)
+      glRect(x,y,x+w,y+h)
     end
   end
-  gl.PopMatrix()
+  glPopMatrix()
 
   self:_DrawChildrenInClientArea('DrawForList')
 end

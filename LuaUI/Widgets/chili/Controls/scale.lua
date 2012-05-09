@@ -20,6 +20,8 @@ local this = Scale
 --//=============================================================================
 
 local glVertex = gl.Vertex
+local glColor = gl.Color
+local glBeginEnd = gl.BeginEnd
 
 local function defaultTransform(x) 
 	return (math.log(1+x*140 ) / math.log(141))
@@ -80,8 +82,8 @@ end
 
 
 function Scale:DrawControl()
-  gl.Color(self.color)
-  gl.BeginEnd(GL.LINES, drawScaleLines, self)
+  glColor(self.color)
+  glBeginEnd(GL_LINES, drawScaleLines, self)
 
   local font = self.font
      

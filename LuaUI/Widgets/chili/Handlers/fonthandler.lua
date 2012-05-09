@@ -3,6 +3,8 @@
 
 FontHandler = {}
 
+local glDeleteFont = gl.DeleteFont
+local glLoadFont = gl.LoadFont
 
 --//=============================================================================
 --// cache loaded fonts
@@ -21,7 +23,7 @@ local fontsize_threshold = 1
 FontHandler._scream = Script.CreateScream()
 FontHandler._scream.func = function()
   for i=1,#loadedFonts do
-    gl.DeleteFont(loadedFonts[i])
+    glDeleteFont(loadedFonts[i])
   end
   loadedFonts = {}
 end
@@ -38,7 +40,7 @@ function FontHandler.UnloadFont(font)
       if (refCount <= 1) then
         --// the font isn't in use anymore, free it
         local last_idx = #loadedFonts
-        gl.DeleteFont(loadedFonts[i])
+        glDeleteFont(loadedFonts[i])
         loadedFonts[i] = loadedFonts[last_idx]
         loadedFonts[last_idx] = nil
         refCounts[i] = refCounts[last_idx]
@@ -66,7 +68,7 @@ function FontHandler.LoadFont(fontname,size,outwidth,outweight)
   end
 
   local idx = #loadedFonts+1
-  local font = gl.LoadFont(fontname,size,outwidth,outweight)
+  local font = glLoadFont(fontname,size,outwidth,outweight)
   loadedFonts[idx] = font
   refCounts[idx] = 1
   return font

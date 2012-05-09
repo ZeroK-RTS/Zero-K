@@ -53,6 +53,16 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glCreateList    = gl.CreateList
+local glCallList      = gl.CallList
+local glDeleteList    = gl.DeleteList
+local glGetViewSizes  = gl.GetViewSizes
+local glPushMatrix    = gl.PushMatrix
+local glTranslate     = gl.Translate
+local glPopMatrix     = gl.PopMatrix
+
+--//=============================================================================
+
 local function FontBackwardCompa(obj)
   obj.font.outline = obj.font.outline or obj.fontOutline
   obj.font.color = obj.font.color or obj.captionColor
@@ -122,15 +132,15 @@ end
 
 function Control:Dispose()
   if (self._all_dlist) then
-    gl.DeleteList(self._all_dlist)
+    glDeleteList(self._all_dlist)
     self._all_dlist = nil
   end
   if (self._children_dlist) then
-    gl.DeleteList(self._children_dlist)
+    glDeleteList(self._children_dlist)
     self._children_dlist = nil
   end
   if (self._own_dlist) then
-    gl.DeleteList(self._own_dlist)
+    glDeleteList(self._own_dlist)
     self._own_dlist = nil
   end
 
@@ -670,11 +680,11 @@ function Control:_UpdateOwnDList()
 
   if (self._needRedraw) then
     if (self._own_dlist) then
-      gl.DeleteList(self._own_dlist)
+      glDeleteList(self._own_dlist)
       self._own_dlist = nil
     end
 
-    self._own_dlist = gl.CreateList(self.DrawControl, self)
+    self._own_dlist = glCreateList(self.DrawControl, self)
 
     self._needRedraw = nil
   end
@@ -683,19 +693,19 @@ end
 --[[
 function Control:_UpdateChildrenDList()
   if (self._children_dlist) then
-    gl.DeleteList(self._children_dlist)
+    glDeleteList(self._children_dlist)
     self._children_dlist = nil
   end
-  self._children_dlist = gl.CreateList(self.CallChildrenInverse, self, 'DrawForList')
+  self._children_dlist = glCreateList(self.CallChildrenInverse, self, 'DrawForList')
 end
 --]]
 
 function Control:_UpdateAllDList()
   if (self._all_dlist) then
-    gl.DeleteList(self._all_dlist)
+    glDeleteList(self._all_dlist)
     self._all_dlist = nil
   end
-  self._all_dlist = gl.CreateList(self.DrawForList,self)
+  self._all_dlist = glCreateList(self.DrawForList,self)
 
   if (self.parent)and(not self.parent._needRedraw)and(self.parent._UpdateAllDList)and(self.parent.useDList) then
     (self.parent):_UpdateAllDList()
@@ -712,14 +722,14 @@ function Control:_DrawInClientArea(fnc,...)
     --gl.Color(1,0.1,0,0.2)
     --gl.Rect(self.x + clientX, self.y + clientY, self.x + clientX + clientWidth, self.y + clientY + clientHeight)
 
-    sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
+    sy = select(2,glGetViewSizes()) - (sy + clientHeight)
     PushScissor(sx,sy,math.ceil(clientWidth),math.ceil(clientHeight))
   end
 
-  gl.PushMatrix()
-  gl.Translate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
+  glPushMatrix()
+  glTranslate(math.floor(self.x + self.clientArea[1]),math.floor(self.y + self.clientArea[2]),0)
   fnc(...)
-  gl.PopMatrix()
+  glPopMatrix()
 
   if (self.safeOpengl) then
     --gl.Scissor(false)
@@ -781,7 +791,7 @@ end
 
 function Control:DrawForList()
   if (self._own_dlist) then
-    gl.CallList(self._own_dlist);
+    glCallList(self._own_dlist);
   else
     self:DrawControl();
   end
@@ -807,7 +817,7 @@ function Control:Draw()
   end
 
   if (self._own_dlist) then
-    gl.CallList(self._own_dlist);
+    glCallList(self._own_dlist);
   else
     self:DrawControl();
   end

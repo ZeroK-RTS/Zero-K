@@ -17,6 +17,15 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glPushMatrix    = gl.PushMatrix
+local glColor         = gl.Color
+local glRect          = gl.Rect
+local glTranslate     = gl.Translate
+local glPopMatrix     = gl.PopMatrix
+local glGetViewSizes  = gl.GetViewSizes
+
+--//=============================================================================
+
 function ScrollPanel:SetScrollPos(x,y,inview)
   if (x) then
     if (inview) then
@@ -170,18 +179,18 @@ function ScrollPanel:_DrawInClientArea(fnc,...)
   if (self.safeOpengl) then
     local sx,sy = self:LocalToScreen(clientX,clientY)
 
-    --gl.Color(1,0.1,0,0.2)
-    --gl.Rect(self.x + clientX, self.y + clientY, self.x + clientX + clientWidth, self.y + clientY + clientHeight)
+    --glColor(1,0.1,0,0.2)
+    --glRect(self.x + clientX, self.y + clientY, self.x + clientX + clientWidth, self.y + clientY + clientHeight)
 
-    sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
+    sy = select(2,glGetViewSizes()) - (sy + clientHeight)
     PushScissor(sx,sy,clientWidth,clientHeight)
   end
 
-  gl.PushMatrix()
-  gl.Translate(math.floor(self.x + clientX - self.scrollPosX),math.floor(self.y + clientY - self.scrollPosY),0)
+  glPushMatrix()
+  glTranslate(math.floor(self.x + clientX - self.scrollPosX),math.floor(self.y + clientY - self.scrollPosY),0)
   fnc(...)
   --self:CallChildrenInverseCheckFunc(self.IsInView,...)
-  gl.PopMatrix()
+  glPopMatrix()
 
   if (self.safeOpengl) then
     PopScissor()

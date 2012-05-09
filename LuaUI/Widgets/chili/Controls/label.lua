@@ -21,6 +21,19 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glPushMatrix    = gl.PushMatrix
+local glColor         = gl.Color
+local glLineWidth     = gl.LineWidth
+local glPolygonMode   = gl.PolygonMode
+local glRect          = gl.Rect
+local glTranslate     = gl.Translate
+local glPopMatrix     = gl.PopMatrix
+
+local GL_FRONT_AND_BACK = GL.FRONT_AND_BACK
+local GL_FILL           = GL.FILL
+
+--//=============================================================================
+
 function Label:New(obj)
   obj = inherited.New(self,obj)
   obj:SetCaption(obj.caption)
@@ -83,12 +96,12 @@ function Label:DrawControl()
   font:DrawInBox(self._caption,self.x,self.y,self.width,self.height,self.align,self.valign)
 
   if (self.debug) then
-    gl.Color(0,1,0,0.5)
-    gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
-    gl.LineWidth(2)
-    gl.Rect(self.x,self.y,self.x+self.width,self.y+self.height)
-    gl.LineWidth(1)
-    gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+    glColor(0,1,0,0.5)
+    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE)
+    glLineWidth(2)
+    glRect(self.x,self.y,self.x+self.width,self.y+self.height)
+    glLineWidth(1)
+    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL)
   end
 end
 

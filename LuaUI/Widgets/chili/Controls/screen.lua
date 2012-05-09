@@ -22,8 +22,12 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glGetViewSizes = gl.GetViewSizes
+
+--//=============================================================================
+
 function Screen:New(obj)
-  local vsx,vsy = gl.GetViewSizes()
+  local vsx,vsy = glGetViewSizes()
   obj.width  = vsx
   obj.height = vsy
   obj = inherited.New(self,obj)
@@ -84,7 +88,7 @@ end
 --//=============================================================================
 
 function Screen:IsAbove(x,y,...)
-  y = select(2,gl.GetViewSizes()) - y
+  y = select(2,glGetViewSizes()) - y
   local hoveredControl = inherited.IsAbove(self,x,y,...)
 
   --// tooltip
@@ -110,7 +114,7 @@ end
 
 
 function Screen:MouseDown(x,y,...)
-  y = select(2,gl.GetViewSizes()) - y
+  y = select(2,glGetViewSizes()) - y
   local activeControl = inherited.MouseDown(self,x,y,...)
   self.activeControl = MakeWeakLink(activeControl)
   return (not not activeControl)
@@ -118,7 +122,7 @@ end
 
 
 function Screen:MouseUp(x,y,...)
-  y = select(2,gl.GetViewSizes()) - y
+  y = select(2,glGetViewSizes()) - y
   local activeControl = Unlink(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
@@ -152,7 +156,7 @@ end
 
 
 function Screen:MouseMove(x,y,dx,dy,...)
-  y = select(2,gl.GetViewSizes()) - y
+  y = select(2,glGetViewSizes()) - y
   local activeControl = Unlink(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)
@@ -172,7 +176,7 @@ end
 
 
 function Screen:MouseWheel(x,y,...)
-  y = select(2,gl.GetViewSizes()) - y
+  y = select(2,glGetViewSizes()) - y
   local activeControl = Unlink(self.activeControl)
   if activeControl then
     local cx,cy = activeControl:ScreenToLocal(x,y)

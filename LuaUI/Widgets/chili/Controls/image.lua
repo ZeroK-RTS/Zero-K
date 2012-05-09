@@ -25,6 +25,13 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glColor		= gl.Color
+local glTexture		= gl.Texture
+local glTexRect		= gl.TexRect
+local glTextureInfo	= gl.TextureInfo	
+
+--//=============================================================================
+
 local function _DrawTextureAspect(x,y,w,h ,tw,th, flipy)
   local twa = w/tw
   local tha = h/th
@@ -45,38 +52,38 @@ local function _DrawTextureAspect(x,y,w,h ,tw,th, flipy)
   x = math.ceil(x)
   y = math.ceil(y)
 
-  gl.TexRect(x,y,right,bottom,false,flipy)
+  glTexRect(x,y,right,bottom,false,flipy)
 end
 
 function Image:DrawControl()
   if (not (self.file or self.file2)) then return end
   local c = self.color
-  gl.Color(c[1],c[2],c[3],c[4])
+  glColor(c[1],c[2],c[3],c[4])
 
   if (self.keepAspect) then
     if (self.file2) then 
       TextureHandler.LoadTexture(0,self.file2,self)
-      local texInfo = gl.TextureInfo(self.file2) or {xsize=1, ysize=1}
+      local texInfo = glTextureInfo(self.file2) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
       _DrawTextureAspect(self.x,self.y,self.width,self.height, tw,th, self.flip2)
     end 
     if (self.file) then 
       TextureHandler.LoadTexture(0,self.file,self)
-      local texInfo = gl.TextureInfo(self.file) or {xsize=1, ysize=1}
+      local texInfo = glTextureInfo(self.file) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
       _DrawTextureAspect(self.x,self.y,self.width,self.height, tw,th, self.flip)
     end
   else
     if (self.file2) then 
       TextureHandler.LoadTexture(0,self.file2,self)
-      gl.TexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip2)
+      glTexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip2)
     end 
     if (self.file) then 
       TextureHandler.LoadTexture(0,self.file,self)
-      gl.TexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip)
+      glTexRect(self.x,self.y,self.x+self.width,self.y+self.height,false,self.flip)
     end
   end
-  gl.Texture(0,false)
+  glTexture(0,false)
 end
 
 --//=============================================================================

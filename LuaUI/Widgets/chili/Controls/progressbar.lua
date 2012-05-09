@@ -23,6 +23,11 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glColor	= gl.Color
+local glRect	= gl.Rect
+
+--//=============================================================================
+
 function Progressbar:New(obj)
   obj = inherited.New(self,obj)
   obj:SetMinMax(obj.min,obj.max)
@@ -100,11 +105,11 @@ function Progressbar:DrawControl()
   local w = self.width
   local h = self.height
 
-  gl.Color(self.backgroundColor)
-  gl.Rect(x+w*percent,y,x+w,y+h)
+  glColor(self.backgroundColor)
+  glRect(x+w*percent,y,x+w,y+h)
 
-  gl.Color(self.color)
-  gl.Rect(x,y,x+w*percent,y+h)
+  glColor(self.color)
+  glRect(x,y,x+w*percent,y+h)
 
   if (self.caption) then
     (self.font):Print(self.caption, x+w*0.5, y+h*0.5, "center", "center")

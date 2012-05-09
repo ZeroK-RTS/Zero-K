@@ -6,6 +6,10 @@ end
 
 --//=============================================================================
 
+local glScissor = gl.Scissor
+
+--//=============================================================================
+
 function unpack4(t)
   return t[1], t[2], t[3], t[4]
 end
@@ -132,7 +136,7 @@ function PushScissor(x,y,w,h)
   stackN = stackN + 1
   stack[stackN] = curScissor
 
-  gl.Scissor(x,y,right - x,bottom - y)
+  glScissor(x,y,right - x,bottom - y)
 end
 
 
@@ -141,10 +145,10 @@ function PopScissor()
   stackN = stackN - 1
   curScissor = stack[stackN]
   if (stackN == 1) then
-    gl.Scissor(false)
+    glScissor(false)
   else
     local x,y, right,bottom = unpack4(curScissor)
-    gl.Scissor(x,y,right - x,bottom - y)
+    glScissor(x,y,right - x,bottom - y)
   end
 end
 

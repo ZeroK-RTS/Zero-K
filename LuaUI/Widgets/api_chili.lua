@@ -12,10 +12,19 @@ function widget:GetInfo()
     enabled   = true,  --  loaded by default?
     handler   = true,
     api       = true,
-	alwaysStart = true,
+    alwaysStart = true,
   }
 end
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local glGetViewSizes	= gl.GetViewSizes
+local glPushMatrix	= gl.PushMatrix
+local glScale		= gl.Scale
+local glTranslate	= gl.Translate
+local glPopMatrix	= gl.PopMatrix
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -59,24 +68,24 @@ end
 
 function widget:DrawScreen()
   if (not screen0:IsEmpty()) then
-    gl.PushMatrix()
-    local vsx,vsy = gl.GetViewSizes()
-    gl.Translate(0,vsy,0)
-    gl.Scale(1,-1,1)
+    glPushMatrix()
+    local vsx,vsy = glGetViewSizes()
+    glTranslate(0,vsy,0)
+    glScale(1,-1,1)
     screen0:Draw()
-    gl.PopMatrix()
+    glPopMatrix()
   end
 end
 
 
 function widget:TweakDrawScreen()
   if (not screen0:IsEmpty()) then
-    gl.PushMatrix()
-    local vsx,vsy = gl.GetViewSizes()
-    gl.Translate(0,vsy,0)
-    gl.Scale(1,-1,1)
+    glPushMatrix()
+    local vsx,vsy = glGetViewSizes()
+    glTranslate(0,vsy,0)
+    glScale(1,-1,1)
     screen0:TweakDraw()
-    gl.PopMatrix()
+    glPopMatrix()
   end
 end
 

@@ -17,7 +17,11 @@ local next = next
 local spGetTimer = Spring.GetTimer
 local spDiffTimers = Spring.DiffTimers
 local glActiveTexture = gl.ActiveTexture
+local glTexture = gl.Texture
 local glCallList = gl.CallList
+local glCreateList = gl.CreateList
+local glDeleteList = gl.DeleteList
+local glDeleteTexture = gl.DeleteTexture
 
 local weakMetaTable = {__mode="k"}
 
@@ -29,8 +33,8 @@ local loaded = {}
 local requested = {}
 
 local placeholderFilename = theme.skin.icons.imageplaceholder
-local placeholderDL = gl.CreateList(gl.Texture,CHILI_DIRNAME .. "Skins/default/empty.png")
---local placeholderDL = gl.CreateList(gl.Texture,placeholderFilename)
+local placeholderDL = glCreateList(glTexture,CHILI_DIRNAME .. "Skins/default/empty.png")
+--local placeholderDL = glCreateList(glTexture,placeholderFilename)
 
 local function AddRequest(filename,obj)
   local req = requested
@@ -50,8 +54,8 @@ TextureHandler._scream = Script.CreateScream()
 TextureHandler._scream.func = function()
   requested = {}
   for filename,tex in pairs(loaded) do
-    gl.DeleteList(tex.dl)
-    gl.DeleteTexture(filename)
+    glDeleteList(tex.dl)
+    glDeleteTexture(filename)
   end
   loaded = {}
 end
@@ -87,8 +91,8 @@ function TextureHandler.DeleteTexture(filename)
   if (tex) then
     tex.references = tex.references - 1
     if (tex.references==0) then
-      gl.DeleteList(tex.dl)
-      gl.DeleteTexture(filename)
+      glDeleteList(tex.dl)
+      glDeleteTexture(filename)
       loaded[filename] = nil
     end
   end
@@ -119,11 +123,11 @@ function TextureHandler.Update()
 
     if (not filename) then return end
 
-    gl.Texture(filename)
-    gl.Texture(false)
+    glTexture(filename)
+    glTexture(false)
 
     local texture = {}
-    texture.dl = gl.CreateList(gl.Texture,filename)
+    texture.dl = glCreateList(glTexture,filename)
     texture.references = #objs
     loaded[filename] = texture
 

@@ -20,6 +20,12 @@ local inherited = this.inherited
 
 --//=============================================================================
 
+local glPushMatrix	= gl.PushMatrix
+local glScale		= gl.Scale
+local glPopMatrix	= gl.PopMatrix
+
+--//=============================================================================
+
 function Font:New(obj)
   obj = inherited.New(self,obj)
 
@@ -210,15 +216,15 @@ function Font:Draw(text, x, y, align, valign)
 	extra = extra .. 's'
   end
 
-  gl.PushMatrix()
-    gl.Scale(1,-1,1)
+  glPushMatrix()
+    glScale(1,-1,1)
     font:Begin()
       font:SetTextColor(self.color)
       font:SetOutlineColor(self.outlineColor)
       font:SetAutoOutlineColor(self.autoOutlineColor)
         font:Print(text, x, -y, self.size, extra)
     font:End()
-  gl.PopMatrix()
+  glPopMatrix()
 end
 
 
@@ -239,15 +245,15 @@ function Font:DrawInBox(text, x, y, w, h, align, valign)
 
   y = y + 1 --// FIXME: if this isn't done some chars as 'R' get truncated at the top
 
-  gl.PushMatrix()
-    gl.Scale(1,-1,1)
+  glPushMatrix()
+    glScale(1,-1,1)
     font:Begin()
       font:SetTextColor(self.color)
       font:SetOutlineColor(self.outlineColor)
       font:SetAutoOutlineColor(self.autoOutlineColor)
         font:Print(text, x, -y, self.size, extra)
     font:End()
-  gl.PopMatrix()
+  glPopMatrix()
 end
 
 Font.Print = Font.Draw
