@@ -142,7 +142,7 @@ local tryloading  = 1     --// try to activate lups if it isn't found
 
 local function ClearFxs(unitID)
   if (particleIDs[unitID]) then
-    for i=1,#particleIDs[unitID]
+    for i=1,#particleIDs[unitID] do
       local fxID = particleIDs[unitID][i]
       Lups.RemoveParticles(fxID)
     end
@@ -154,7 +154,7 @@ end
 local function ClearFx(unitID, fxIDtoDel)
   if (particleIDs[unitID]) then
   local newTable = {}
-    for i=1,#particleIDs[unitID]
+    for i=1,#particleIDs[unitID] do
       local fxID = particleIDs[unitID][i]
       if fxID == fxIDtoDel then 
         Lups.RemoveParticles(fxID)
@@ -308,8 +308,8 @@ local function PlayerChanged(_,playerID)
   if (playerID == Spring.GetMyPlayerID()) then
     --// clear all FXs
     for _,unitFxIDs in pairs(particleIDs) do
-      for i=1,#unitFxIDs
-		local fxID = unitFxIDs[i]    
+      for i=1,#unitFxIDs do
+	local fxID = unitFxIDs[i]    
         Lups.RemoveParticles(fxID)
       end
     end
@@ -418,7 +418,7 @@ end
 function widget:Shutdown()
   if (initialized) then
     for _,unitFxIDs in pairs(particleIDs) do
-      for i=1,#unitFxIDs
+      for i=1,#unitFxIDs do
 	local fxID = unitFxIDs[i]
       end
     end

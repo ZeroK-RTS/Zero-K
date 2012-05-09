@@ -201,7 +201,7 @@ local function MakeChickenBreakdown()
     local count = gameInfo[chickenName.."Count"]
 	local kills = gameInfo[chickenName.."Kills"]
 	local str = "\n"..chickenNamesPlural[chickenName]..": \255\0\255\0"..count.."\008/\255\255\0\0"..kills
-	t[#t+1] = (t, str)
+	t[#t+1] = str
 	tNames[str] = chickenName
   end
   table.sort(t, function(a,b) return chickenTypes[tNames[a]]["time"] < chickenTypes[tNames[b]]["time"] end )	-- sort by chicken appearance

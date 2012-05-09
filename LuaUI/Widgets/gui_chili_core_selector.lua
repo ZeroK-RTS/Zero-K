@@ -378,7 +378,7 @@ local function ShiftFacRow()
 			facs[i].button = nil
 		end
 	end
-	for i=1,#facs do do
+	for i=1,#facs do
 		GenerateButton(facs, i, facs[i].facID, facs[i].facDefID)
 		UpdateFac(facs[i].facID, i)
 	end	

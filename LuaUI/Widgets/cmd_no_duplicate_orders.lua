@@ -107,26 +107,25 @@ function widget:CommandNotify(id, params, options)
         if (#cQueue > 0) and (params[1] == cQueue[1].params[1]) then
           blockUnits[unitID] = true
         end
-      end
+      end -- for
       if next(blockUnits) then
         for i=1, #selUnits do
           local unitID = selUnits[i]
-            GiveOrderToUnit(unitID, id, params, options)
-          else
-            local cQueue = GetCommandQueue(unitID)
-            for j=1, #cQueue do
-              local v = cQueue[j]
-              if (v.tag ~= cQueue[1].tag) then
-                GiveOrderToUnit(unitID,v.id,v.params,{"shift"})
-              end
-            end
-          end
+          GiveOrderToUnit(unitID, id, params, options)
         end
-        return true
       else
-        return false
-      end  
-    end
+        local cQueue = GetCommandQueue(unitID)
+        for j=1, #cQueue do
+          local v = cQueue[j]
+          if (v.tag ~= cQueue[1].tag) then
+              GiveOrderToUnit(unitID,v.id,v.params,{"shift"})
+          end
+        end --for
+      end -- if..else
+      return true
+    else
+      return false
+    end  
   end
 end
 

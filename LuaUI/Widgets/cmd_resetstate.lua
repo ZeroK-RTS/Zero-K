@@ -1,6 +1,5 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---[[
 function widget:GetInfo()
   return {
     name      = "ResetState",
@@ -18,37 +17,39 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local CMD_RESETFIRE = 10003
-local CMD_RESETMOVE = 10004
-
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- donut unhide commands until they get icons!!
 function widget:CommandsChanged()
-	for _, unitID in ipairs( Spring.GetSelectedUnits() ) do
+	local units = Spring.GetSelectedUnits()
+	for i=1,#units do
+		local unitID = units[i]
 		--local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-		table.insert(widgetHandler.customCommands, {
+		local customCommands = widgetHandler.customCommands
+		customCommands[#customCommands+1] = {
 			id      = CMD_RESETFIRE,
 			name	= 'Hold Fire & Stop',
 			type    = CMDTYPE.ICON,
 			tooltip = 'Hold fire and stop.',
 			action  = 'resetfire',
-			params  = { }, 
+			params  = { },
+			--hidden  = true,
 			pos = {CMD_MOVE_STATE,CMD_FIRE_STATE, }, 
-		})
+		}
 
-		table.insert(widgetHandler.customCommands, {
+		customCommands[#customCommands+1] = {
 			id      = CMD_RESETMOVE,
 			name	= 'Hold Pos & Stop',
 			type    = CMDTYPE.ICON,
 			tooltip = 'Hold position and stop.',
 			action  = 'resetmove',
-			params  = { }, 
+			params  = { },
+			--hidden  = true,
 			pos = {CMD_MOVE_STATE,CMD_FIRE_STATE, }, 
-		})
-
-	
+		}
 	end
 end
 
@@ -71,6 +72,5 @@ function widget:Initialize()
 		return true
 	end	
 end
---]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
