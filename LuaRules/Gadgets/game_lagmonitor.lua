@@ -7,13 +7,13 @@ function gadget:GetInfo()
     name      = "Lag Monitor",
     desc      = "Gives away units of people who are lagging",
     author    = "KingRaptor",
-    date      = "27/12/2011",
+    date      = "9/5/2012",
     license   = "Public domain",
     layer     = 0,
     enabled   = true  --  loaded by default?
   }
 end
---Revision 23th
+--Revision Million-th
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
   
@@ -26,6 +26,7 @@ end
 --------------------------------------------------------------------------------
 local lineage = {}
 local afkTeams = {}
+local tickTockCounter = {}
 local unitAlreadyFinished = {}
 
 GG.Lagmonitor_activeTeams = {}
@@ -136,10 +137,10 @@ function gadget:GameFrame(n)
 			local afk = Spring.GetGameSeconds() - (pActivity[players[i]] or 0)
 			local _,_,_,isAI,_,_ = Spring.GetTeamInfo(team)
 			if not spec  and not isAI then 
-				if (afkTeams[team] ~= nil) then  -- team is AFK 
-        -- team no longer AFK, return his or her units
-					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- and activity ~= nil and gameSecond-activity<10 
-          Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
+				if (afkTeams[team] == true) then  -- team was AFK 
+					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- team no longer AFK, return his or her units
+						tickTockCounter[players[i]] = nil -- empty tick-tock clock.
+						Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
 						GG.allowTransfer = true
 						for unitID, uteam in pairs(lineage) do
 							if (uteam == team) then
@@ -153,12 +154,16 @@ function gadget:GameFrame(n)
 						GG.Lagmonitor_activeTeams[allyTeam][team] = true
 					end 
 				end
-				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then
-					-- player afk: mark him, except AIs
-					local units = Spring.GetTeamUnits(team)
-					if units ~= nil and #units > 0 then 
-						laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
-					end 
+				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
+					tickTockCounter[players[i]] = (tickTockCounter[players[i]] or 0) + 1 --tick tock clock ++
+					if tickTockCounter[players[i]] >= 2 then --allow team to be tagged as AFK after 3 passes (3x50frame = 5 second).
+						local units = Spring.GetTeamUnits(team)
+						if units ~= nil and #units > 0 then 
+							laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
+						end
+					end
+				else --if not at all AFK or lagging: then...
+					tickTockCounter[players[i]] = nil -- empty tick-tock clock. We don't want the counter to always show 2 if player/team return.
 				end
 			end
 		end
@@ -180,19 +185,22 @@ function gadget:GameFrame(n)
 			if not discontinue then
 				recepientByAllyTeam[allyTeam] = recepientByAllyTeam[allyTeam] or GetRecepient(allyTeam, laggers)
 			
-			-- okay, we have someone to give to, prep transfer
+				-- okay, we have someone to give to, prep transfer
 				if recepientByAllyTeam[allyTeam] then
-					afkTeams[team] = true
-					GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1
-					GG.Lagmonitor_activeTeams[allyTeam][team] = false
+					if (afkTeams[team] == nil) then -- if team was not an AFK-er (but now is an AFK-er) then process the following... else do nothing for the same AFK-er.
+						--REASON for WHY THE ABOVE^ CHECK was ADDED: if someone sent units to this AFK-er then (typically) var:"laggers[players[i]]" will be filled twice for the same player (line 161) & normally unit will be sent (redirected) to the non-AFK-er (line 198), but (unfortunately) equation:"GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1" will also run twice for the AFK ally (line 193) and it will effect 'unit_mex_overdrive.lua on line 999'. 			
+						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1
+						GG.Lagmonitor_activeTeams[allyTeam][team] = false
+					end
+					afkTeams[team] = true --mark team as AFK
 					local units = data.units or {}
-					if #units > 0 then
+					if #units > 0 then -- transfer units when number of units in AFK team is > 0
 						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")
 						GG.allowTransfer = true
-	 					for j=1,#units do
+						for j=1,#units do
 							lineage[units[j]] = team
 							Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
-	 					end
+						end
 					
 						GG.allowTransfer = false
 					end
