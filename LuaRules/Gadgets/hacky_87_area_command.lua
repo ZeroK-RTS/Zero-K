@@ -44,10 +44,10 @@ function gadget:GameFrame(f)
 	if thereIsStuffToDo then
 		for i = 1, units.count do
 			local unitID = units.unitID[i]
-			if Spring.ValidUnitID(unitID) then
+			if spValidUnitID(unitID) then
 				-- Double wait, is there anything you can't fix? <3
-				Spring.GiveOrderToUnit(unitID,CMD_WAIT,{},{})
-				Spring.GiveOrderToUnit(unitID,CMD_WAIT,{},{})
+				spGiveOrderToUnit(unitID,CMD_WAIT,{},{})
+				spGiveOrderToUnit(unitID,CMD_WAIT,{},{})
 			end
 		end
 		thereIsStuffToDo = false

@@ -31,6 +31,7 @@ local random 		  		= math.random
 local spAdjustHeightMap     = Spring.AdjustHeightMap
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
+local spGetGroundNormal     = Spring.GetGroundNormal
 local spLevelHeightMap      = Spring.LevelHeightMap
 local spGetUnitBuildFacing  = Spring.GetUnitBuildFacing
 local spGetUnitCommands     = Spring.GetUnitCommands
@@ -291,18 +292,18 @@ end
 local function checkPointCreation(terraform_type, volumeSelection, orHeight, newHeight, startHeight, x, z)
 	
 	if terraform_type == 6 then
-		local _, ny, _ = Spring.GetGroundNormal(x,z)
-		if ny > select(2,Spring.GetGroundNormal(x+8,z)) then
-			ny = select(2,Spring.GetGroundNormal(x+8,z))
+		local _, ny, _ = spGetGroundNormal(x,z)
+		if ny > select(2,spGetGroundNormal(x+8,z)) then
+			ny = select(2,spGetGroundNormal(x+8,z))
 		end
-		if ny > select(2,Spring.GetGroundNormal(x-8,z)) then
-			ny = select(2,Spring.GetGroundNormal(x-8,z))
+		if ny > select(2,spGetGroundNormal(x-8,z)) then
+			ny = select(2,spGetGroundNormal(x-8,z))
 		end
-		if ny > select(2,Spring.GetGroundNormal(x,z+8)) then
-			ny = select(2,Spring.GetGroundNormal(x,z+8))
+		if ny > select(2,spGetGroundNormal(x,z+8)) then
+			ny = select(2,spGetGroundNormal(x,z+8))
 		end
-		if ny > select(2,Spring.GetGroundNormal(x,z-8)) then
-			ny = select(2,Spring.GetGroundNormal(x,z-8))
+		if ny > select(2,spGetGroundNormal(x,z-8)) then
+			ny = select(2,spGetGroundNormal(x,z-8))
 		end
 		--if (volumeSelection == 1 and ny > 0.595) or ny > 0.894 then
 		--	Spring.MarkerAddLine(x,0,z,x+8,0,z+8)
@@ -374,7 +375,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	local i = 1
 	while i <= units do
 		if (spValidUnitID(unit[i])) then
-			local x,_,z = Spring.GetUnitPosition(unit[i])
+			local x,_,z = spGetUnitPosition(unit[i])
 			unitsX = unitsX + x
 			unitsZ = unitsZ + z
 			i = i + 1
@@ -630,7 +631,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	
 	local rampLevels = {count = 0, data = {[0] = {along = false}}}
 	
-	local frame = Spring.GetGameFrame()
+	local frame = spGetGameFrame()
 	
 	for i = 1,n-1 do
 		
@@ -842,7 +843,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	local i = 1
 	while i <= units do
 		if (spValidUnitID(unit[i])) then
-			local x,_,z = Spring.GetUnitPosition(unit[i])
+			local x,_,z = spGetUnitPosition(unit[i])
 			unitsX = unitsX + x
 			unitsZ = unitsZ + z
 			i = i + 1
@@ -1033,7 +1034,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	
 	local otherTerraformUnitCount = terraformUnitCount
 	
-	local frame = Spring.GetGameFrame()
+	local frame = spGetGameFrame()
 
 	for i = 1,n-1 do
 	
@@ -1310,7 +1311,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	local i = 1
 	while i <= units do
 		if (spValidUnitID(unit[i])) then
-			local x,_,z = Spring.GetUnitPosition(unit[i])
+			local x,_,z = spGetUnitPosition(unit[i])
 			unitsX = unitsX + x
 			unitsZ = unitsZ + z
 			i = i + 1
@@ -1593,7 +1594,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 	terraformOrders = terraformOrders + 1
 	terraformOrder[terraformOrders] = {border = border, index = {}, indexes = 0}
 
-	local frame = Spring.GetGameFrame()
+	local frame = spGetGameFrame()
 	
 	local unitIdGrid = {}
 	local aveX = 0
@@ -2319,7 +2320,7 @@ local function finishInitialisingTerraformUnit(id)
 end
 
 local function addSteepnessMarker(team, x, z)
-	local n = Spring.GetGameFrame()
+	local n = spGetGameFrame()
 	if steepnessMarkers.inner.frame ~= n then
 		steepnessMarkers.inner = {count = 0, data = {}, frame = n}
 	end
@@ -2838,7 +2839,7 @@ function gadget:GameFrame(n)
 							
 							-- bring terraunit towards con
 							if i == 1 and spValidUnitID(cQueue[i].params[1]) and terraformUnit[cQueue[i].params[1] ] then
-								local cx, _, cz = Spring.GetUnitPosition(constructorTable[currentCon])
+								local cx, _, cz = spGetUnitPosition(constructorTable[currentCon])
 								local team = Spring.GetUnitTeam(constructorTable[currentCon])
 								if cx and team then
 									local tpos = terraformUnit[cQueue[i].params[1] ].positionAnchor
@@ -2849,7 +2850,7 @@ function gadget:GameFrame(n)
 									local y = CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
 									
 									terraformUnit[cQueue[i].params[1] ].position = {x = x, z = z}
-									Spring.SetUnitPosition(cQueue[i].params[1], x, y , z)
+									spSetUnitPosition(cQueue[i].params[1], x, y , z)
 									--Spring.MoveCtrl.Enable(cQueue[i].params[1])
 									--Spring.MoveCtrl.SetPosition(cQueue[i].params[1], x, y , z)
 									--Spring.MoveCtrl.Disable(cQueue[i].params[1])
@@ -2889,7 +2890,7 @@ function gadget:GameFrame(n)
 			if unit then
 				local height = spGetGroundHeight(unit.x, unit.z)
 				if height ~= unit.h then
-					Spring.LevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
+					spLevelHeightMap(unit.minx,unit.minz,unit.maxx,unit.maxz,unit.h)
 				end
 			else
 				

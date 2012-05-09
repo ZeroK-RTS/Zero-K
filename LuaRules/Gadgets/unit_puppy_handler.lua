@@ -29,6 +29,8 @@ local spAreTeamsAllied = Spring.AreTeamsAllied
 local spGetUnitTeam = Spring.GetUnitTeam
 local spGetUnitDefID = Spring.GetUnitDefID
 local spValidUnitID = Spring.ValidUnitID
+local spGetGroundHeight = Spring.GetGroundHeight
+local spGetUnitPosition = Spring.GetUnitPosition
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -49,8 +51,8 @@ local function HidePuppy(unitID)
 	hiddenPuppy[unitID] = true
 	-- send the puppy to the stratosphere, cloak it
 	Spring.MoveCtrl.Enable(unitID)
-	local x, _, z = Spring.GetUnitPosition(unitID)
-	local y = Spring.GetGroundHeight(x,z)
+	local x, _, z = spGetUnitPosition(unitID)
+	local y = spGetGroundHeight(x,z)
 	Spring.MoveCtrl.SetPosition(unitID, x, y - 200, z)
 	--Spring.SetUnitCloak(unitID, 4)
 	-- Spring.SetUnitSensorRadius(unitID, "los", 0)
@@ -178,9 +180,9 @@ function gadget:GameFrame(frame)
 				if puppyGoodPosition[unitID] then
 					x,z = puppyGoodPosition[unitID].x, puppyGoodPosition[unitID].z
 				else
-					x,_,z = Spring.GetUnitPosition(unitID)
+					x,_,z = spGetUnitPosition(unitID)
 				end
-				local y = Spring.GetGroundHeight(x,z)
+				local y = spGetGroundHeight(x,z)
 				RestorePuppy(unitID, x, y, z)
 			end
 		end

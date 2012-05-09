@@ -28,6 +28,8 @@ _G.Game.mapSizeX = Game.mapSizeX
 _G.Game.mapSizeY = Game.mapSizeY
 gameframe = 0
 
+local sin = math.sin
+
 function gadget:Initialize()
     if(Spring.GetModOptions().zkmode ~= "lavarise") then
 	    gadgetHandler:RemoveGadget()
@@ -125,6 +127,19 @@ end
 
 else --- UNSYCNED:
 
+local glTexCoord = TexCoord
+local glVertex = gl.Vertex
+local glPushAttrib = gl.PushAttrib
+local glDepthTest = gl.DepthTest
+local glDepthMask = gl.DepthMask
+local glTexture = gl.Texture
+local glColor = gl.Color
+local glBeginEnd = gl.BeginEnd
+local glTexture = gl.Texture
+local glDepthMask = gl.DepthMask
+local glDepthTest = gl.DepthTest
+local glPopAttrib = gl.PopAttrib
+
 function gadget:DrawWorld ()  
     if (SYNCED.lavaLevel) then
 		r = 0.8
@@ -139,33 +154,33 @@ function gadget:DrawWorld ()
 end
 
 function DrawGroundHuggingSquare(red,green,blue,alpha,  x1,z1,x2,z2,   HoverHeight)
-	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
-	gl.DepthTest(true)
-	gl.DepthMask(true)	
-	gl.Texture(":a:bitmaps\\lava2.jpg")-- Texture file	
-	gl.Color(red,green,blue,alpha)	
-	gl.BeginEnd(GL.QUADS,DrawGroundHuggingSquareVertices,  x1,z1, x2,z2,  HoverHeight)
-	gl.Texture(false)
-	gl.DepthMask(false)
-	gl.DepthTest(false)	
-	gl.PopAttrib()
+	glPushAttrib(GL.ALL_ATTRIB_BITS)
+	glDepthTest(true)
+	glDepthMask(true)
+	glTexture(":a:bitmaps\\lava2.jpg")-- Texture file
+	glColor(red,green,blue,alpha)
+	glBeginEnd(GL.QUADS,DrawGroundHuggingSquareVertices,  x1,z1, x2,z2,  HoverHeight)
+	glTexture(false)
+	glDepthMask(false)
+	glDepthTest(false)
+	glPopAttrib()
 end
 
 
 function DrawGroundHuggingSquareVertices(x1,z1, x2,z2,   HoverHeight)
   local y=HoverHeight--+Spring.GetGroundHeight(x,z)  
-  local s = 2+math.sin (SYNCED.frame/50)/10
-  gl.TexCoord(-s,-s)
-  gl.Vertex(x1 ,y, z1)
+  local s = 2+sin(SYNCED.frame/50)/10
+  glTexCoord(-s,-s)
+  glVertex(x1 ,y, z1)
   
-  gl.TexCoord(-s,s) 
-  gl.Vertex(x1,y,z2)
+  glTexCoord(-s,s) 
+  glVertex(x1,y,z2)
   
-  gl.TexCoord(s,s)
-  gl.Vertex(x2,y,z2)
+  glTexCoord(s,s)
+  glVertex(x2,y,z2)
   
-  gl.TexCoord(s,-s)
-  gl.Vertex(x2,y,z1)
+  glTexCoord(s,-s)
+  glVertex(x2,y,z1)
 end
 
 end--ende unsync

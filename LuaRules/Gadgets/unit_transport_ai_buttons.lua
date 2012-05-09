@@ -165,13 +165,13 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
   if (cmdID == CMD_EMBARK) then
     local opt = {"alt"}
     if (cmdOptions.shift) then table.insert(opt,"shift") end
-    Spring.GiveOrderToUnit(unitID, CMD_WAIT, {}, opt)
+    GiveOrderToUnit(unitID, CMD_WAIT, {}, opt)
     SendToUnsynced("taiEmbark", unitID, teamID, true, cmdOptions.shift)
     return false
   elseif (cmdID == CMD_DISEMBARK) then
     local opt = {"alt", "ctrl"}
     if (cmdOptions.shift) then table.insert(opt,"shift") end
-    Spring.GiveOrderToUnit(unitID, CMD_WAIT, {}, opt)
+    GiveOrderToUnit(unitID, CMD_WAIT, {}, opt)
     SendToUnsynced("taiEmbark", unitID, teamID, false, cmdOptions.shift)
     return false
   end

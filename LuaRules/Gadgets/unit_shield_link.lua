@@ -23,7 +23,9 @@ local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitTeam			= Spring.GetUnitTeam
 local spGetUnitIsStunned	= Spring.GetUnitIsStunned
 local spGetUnitIsActive		= Spring.GetUnitIsActive
-						
+local spGetUnitShieldState	= Spring.GetUnitShieldState
+local spSetUnitShieldState	= Spring.SetUnitShieldState
+
 if gadgetHandler:IsSyncedCode() then
 
 local shieldTeams = {}
@@ -188,7 +190,7 @@ function gadget:GameFrame(n)
 					local linkUnits = 0
 					local udata = {}	-- unit data,	charge and chargeMax
 						for unitID2,su2 in pairs(su.link) do
-							local shieldOn,shieldCharge = Spring.GetUnitShieldState(unitID2, -1)
+							local shieldOn,shieldCharge = spGetUnitShieldState(unitID2, -1)
 							su.shieldOn = shieldOn
 							if (shieldOn) then 
 								udata[unitID2] = {
@@ -212,14 +214,14 @@ function gadget:GameFrame(n)
 							slack = slack + d.chargeMax - newCharge
 						end 
 						d.charge = newCharge
-						Spring.SetUnitShieldState(uid, -1, newCharge)
+						spSetUnitShieldState(uid, -1, newCharge)
 					end
 		
 					if overflow > 0 and slack > 0 then	-- if there was overflow (above max charge) and	there is still some unused space for charge, transfer it there 
 						for uid,d in pairs(udata) do
 							if (d.charge < d.chargeMax) then 
 								local newCharge = d.charge + overflow * (d.chargeMax - d.charge) / slack 
-								Spring.SetUnitShieldState(uid, -1, newCharge)
+								spSetUnitShieldState(uid, -1, newCharge)
 							end 
 						end
 					end 
@@ -237,6 +239,13 @@ else
 --------------------------------------------------------------------------------
 
 local glVertex = gl.Vertex
+local glColor = gl.Color
+local glBeginEnd = gl.BeginEnd
+local glPushAttrib = gl.PushAttrib
+local glLineWidth = gl.LineWidth
+local glDepthTest = gl.DepthTest
+local glPopAttrib = gl.PopAttrib
+
 local isUnitInView = Spring.IsUnitInView
 local areTeamsAllied = Spring.AreTeamsAllied
 local getUnitTeam = Spring.GetUnitTeam
@@ -256,43 +265,43 @@ local function DrawFunc()
 	local spec, fullview = Spring.GetSpectatingState()
 	spec = spec or fullview
 	
-	for allyID, connections in spairs(SYNCED.shieldConnections) do 
-	
-	for _,con in sipairs(connections) do 
+	for allyID, connections in spairs(SYNCED.shieldConnections) do
+
+	for _,con in sipairs(connections) do
 		local u1 = con[1]
 		local u2 = con[2]
 		
 		local l1
-		local l2 
+		local l2
 		
-		if (spec or allyID == myAllyID) then 
+		if (spec or allyID == myAllyID) then
 			l1 = isUnitInView(u1)
 			l2 = isUnitInView(u2)
-		end 
-		
-		if ((l1 or l2) and (spValidUnitID(u1) and spValidUnitID(u2))) then 
+		end
+
+		if ((l1 or l2) and (spValidUnitID(u1) and spValidUnitID(u2))) then
 			glVertex(spGetUnitPosition(u1))
 			glVertex(spGetUnitPosition(u2))
-		end 
+		end
 	end
-	end 
+	end
 end 
 
 	
 function gadget:DrawWorld()
-	if SYNCED.shieldConnections and snext(SYNCED.shieldConnections) then 
-		gl.PushAttrib(GL.LINE_BITS)
+	if SYNCED.shieldConnections and snext(SYNCED.shieldConnections) then
+		glPushAttrib(GL.LINE_BITS)
 	
-		gl.DepthTest(true)
-		gl.Color(1,0,1,math.random()*0.3+0.2)
-		gl.LineWidth(1)
-		gl.BeginEnd(GL.LINES, DrawFunc)
+		glDepthTest(true)
+		glColor(1,0,1,math.random()*0.3+0.2)
+		glLineWidth(1)
+		glBeginEnd(GL.LINES, DrawFunc)
 	
-		gl.DepthTest(false)
-		gl.Color(1,1,1,1)
+		glDepthTest(false)
+		glColor(1,1,1,1)
 	
-		gl.PopAttrib()
-	end 
+		glPopAttrib()
+	end
 end
 
 --------------------------------------------------------------------------------

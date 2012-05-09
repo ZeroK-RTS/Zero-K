@@ -28,6 +28,14 @@ local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitCOBValue 	= Spring.GetUnitCOBValue
 local spAreTeamsAllied		= Spring.AreTeamsAllied
 local spValidUnitID 		= Spring.ValidUnitID
+local spGiveOrderToUnit		= Spring.GiveOrderToUnit
+local spGetUnitHealth		= Spring.GetUnitHealth
+local spSetUnitRulesParam	= Spring.SetUnitRulesParam
+local spGetCommandQueue		= Spring.GetCommandQueue
+local spGetUnitStates		= Spring.GetUnitStates
+local spGetUnitTeam		= Spring.GetUnitTeam
+local spSetUnitTarget		= Spring.SetUnitTarget
+local spGetUnitNearestEnemy	= Spring.GetUnitNearestEnemy
 
 local CMD_ATTACK = CMD.ATTACK
 local CMD_REMOVE = CMD.REMOVE
@@ -54,7 +62,7 @@ end
 
 local function updateSlow(unitID, state)
 
-	local health = Spring.GetUnitHealth(unitID)
+	local health = spGetUnitHealth(unitID)
 	
 	if health then
 		if state.slowDamage > health*MAX_SLOW_FACTOR then
@@ -63,7 +71,7 @@ local function updateSlow(unitID, state)
 		
 		local percentSlow = state.slowDamage/health
 
-		Spring.SetUnitRulesParam(unitID,"slowState",percentSlow, {inlos = true})
+		spSetUnitRulesParam(unitID,"slowState",percentSlow, {inlos = true})
 	end
 end
 
@@ -96,47 +104,47 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 
 	-- check if a target change is needed
 	-- only changes target if the target is fully slowed and next order is an attack order
-	if Spring.ValidUnitID(attackerID) and attritionWeaponDefs[weaponID].smartRetarget then
-		local health = Spring.GetUnitHealth(unitID)
+	if spValidUnitID(attackerID) and attritionWeaponDefs[weaponID].smartRetarget then
+		local health = spGetUnitHealth(unitID)
 		if slowedUnits[unitID].slowDamage > health*attritionWeaponDefs[weaponID].smartRetarget then
 			
-			local cmd = Spring.GetCommandQueue(attackerID, 3)
+			local cmd = spGetCommandQueue(attackerID, 3)
 
 			-- set order by player
 			if #cmd > 1 and (cmd[1].id == CMD_ATTACK and #cmd[1].params == 1 and cmd[1].params[1] == unitID 
 				and (cmd[2].id == CMD_ATTACK or 
 				(#cmd > 2 and cmd[2].id == CMD_SET_WANTED_MAX_SPEED and cmd[3].id == CMD_ATTACK))) then
 				
-				local re = Spring.GetUnitStates(attackerID)["repeat"]
+				local re = spGetUnitStates(attackerID)["repeat"]
 					
 				if cmd[2].id == CMD_SET_WANTED_MAX_SPEED then
-					Spring.GiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag},{})
+					spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag},{})
 				else
-					Spring.GiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
+					spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
 				end
 					
 				if re then
-					Spring.GiveOrderToUnit(attackerID,CMD_ATTACK,cmd[1].params,{"shift"})
+					spGiveOrderToUnit(attackerID,CMD_ATTACK,cmd[1].params,{"shift"})
 				end
 
 			end
 			
 			-- if attack is a non-player command
 			if #cmd == 0 or cmd[1].id ~= CMD_ATTACK or (cmd[1].id == CMD_ATTACK and cmd[1].options.internal) then
-				local newTargetID = Spring.GetUnitNearestEnemy(attackerID,UnitDefs[attackerDefID].range, true)
+				local newTargetID = spGetUnitNearestEnemy(attackerID,UnitDefs[attackerDefID].range, true)
 				if newTargetID ~= unitID and spValidUnitID(attackerID) and spValidUnitID(newTargetID) then
-					local team = Spring.GetUnitTeam(newTargetID)
+					local team = spGetUnitTeam(newTargetID)
 					if (not team) or team ~= gaiaTeamID then
-						Spring.SetUnitTarget(attackerID,newTargetID)
+						spSetUnitTarget(attackerID,newTargetID)
 						if #cmd > 0 and cmd[1].id == CMD_ATTACK then
 							if #cmd > 1 and cmd[2].id == CMD_SET_WANTED_MAX_SPEED then
-								Spring.GiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag},{})
+								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag,cmd[2].tag},{})
 							else
-								Spring.GiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
+								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
 							end
 						elseif #cmd > 1 and cmd[1].id == CMD_MOVE and cmd[2].id == CMD_FIGHT and 
 							cmd[2].options.internal and #cmd[2].params == 1 and cmd[2].params[1] == unitID then
-							Spring.GiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[2].tag},{})
+							spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[2].tag},{})
 						end
 					end
 				end
@@ -193,7 +201,7 @@ function gadget:GameFrame(f)
         
 			if state.degradeTimer <= 0 then
 				
-				local health = Spring.GetUnitHealth(unitID) or 0
+				local health = spGetUnitHealth(unitID) or 0
 				state.slowDamage = state.slowDamage-health*DEGRADE_FACTOR
 				if state.slowDamage < 0 then
 					state.slowDamage = 0

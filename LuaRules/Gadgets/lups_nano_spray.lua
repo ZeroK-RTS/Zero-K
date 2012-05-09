@@ -141,6 +141,7 @@ local type  = type
 local pairs = pairs
 local SYNCED = SYNCED
 local spairs = spairs
+local spUtilGetUnitIsBuilding = Spring.Utilities.GetUnitIsBuilding
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -316,7 +317,7 @@ local factionsNanoFx = {
 
   function GameFrame(_,offset)
     for unitID,nanoInfo in spairs(SYNCED.nanoEmitters[offset]) do
-      local type, target = Spring.Utilities.GetUnitIsBuilding(unitID)
+      local type, target = spUtilGetUnitIsBuilding(unitID)
 
       if (target) then
         local cmdTag = GetCmdTag(unitID)

@@ -17,6 +17,10 @@ local frame = 0
 
 local unitFrames = {}
 
+local spValidUnitID = Spring.ValidUnitID
+local spUsCallAsUnit = Spring.UnitScript.CallAsUnit
+local spUsGetScriptEnv = Spring.UnitScript.GetScriptEnv
+
 function GG.Hacky_Stiletto_Workaround_gadget_func(unitID, offset, number)
 	
 	if unitFrames[frame+offset] then
@@ -32,9 +36,9 @@ function gadget:GameFrame(n)
 	
 	if unitFrames[n] then
 		for i = 1, unitFrames[n].count do
-			if Spring.ValidUnitID(unitFrames[n].data[i].id) then
-				local func = Spring.UnitScript.GetScriptEnv(unitFrames[n].data[i].id).Hacky_Stiletto_Workaround_stiletto_func
-				Spring.UnitScript.CallAsUnit(unitFrames[n].data[i].id,func,unitFrames[n].data[i].number)
+			if spValidUnitID(unitFrames[n].data[i].id) then
+				local func = spUsGetScriptEnv(unitFrames[n].data[i].id).Hacky_Stiletto_Workaround_stiletto_func
+				spUsCallAsUnit(unitFrames[n].data[i].id,func,unitFrames[n].data[i].number)
 			end
 		end
 		unitFrames[n] = nil
