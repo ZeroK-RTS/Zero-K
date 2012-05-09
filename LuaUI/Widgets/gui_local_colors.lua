@@ -58,7 +58,7 @@ local enemyColors = colorCFG.enemyColors
 WG.LocalColor = {}
 
 local function RecreatePlayerList()
-	if WG.PlayerList.RecreateList then
+	if WG.PlayerList then
 		WG.PlayerList.RecreateList()
 	end
 end
