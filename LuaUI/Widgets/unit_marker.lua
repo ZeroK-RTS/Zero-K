@@ -282,7 +282,8 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to 
 		unitChecked = Spring.GetUnitsInRectangle (x-1, z-1, x+1, z+1) -- ( number xmin, number zmin, number xmax, number zmax [,number teamID] )
 		if unitChecked[1] ~= nil then
 			printDebug( "<Unit Marker>: something found !")
-			for _,unitID in ipairs (unitChecked) do
+			for i=1, #unitChecked do
+				unitID = unitChecked[i]
 				printDebug("<Unit Marker>: Found this : " .. unitID )
 				secondUnitID = unitID
 				if ( secondUnitID == firstUnitID ) then

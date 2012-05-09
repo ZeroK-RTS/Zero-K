@@ -69,6 +69,10 @@ options = {
 	},
 }
 
+local function TableInsert(tab, toInsert)
+  tab[#tab+1] = toInsert
+end
+
 function IsTransport(unitDefID) 
   ud = UnitDefs[unitDefID]
   return (ud ~= nil and (ud.transportCapacity >= 1) and ud.canFly)
@@ -169,18 +173,19 @@ end
 
 
 function widget:Initialize()
-	local _, _, spec, teamID = GetPlayerInfo(Spring.GetMyPlayerID())
-	if spec then
-		widgetHandler:RemoveWidget()
-		return false
-	end
+  local _, _, spec, teamID = GetPlayerInfo(Spring.GetMyPlayerID())
+   if spec then
+    widgetHandler:RemoveWidget()
+    return false
+  end
   myTeamID = teamID
   widgetHandler:RegisterGlobal('taiEmbark', taiEmbark)
 
-
-  for _, unitID in ipairs(GetTeamUnits(teamID)) do  -- init existing transports
-	if AddTransport(unitID, GetUnitDefID(unitID)) then
-       AssignTransports(unitID, 0)
+  local units = GetTeamUnits(teamID)
+  for i=1,#units do  -- init existing transports
+    local unitID = units[i]
+    if AddTransport(unitID, GetUnitDefID(unitID)) then
+      AssignTransports(unitID, 0)
     end
   end
 end
@@ -282,14 +287,15 @@ end
 
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders) 
-	if unitTeam == myTeamID then 
+  if unitTeam == myTeamID then 
     local ud = UnitDefs[unitDefID]
     if (CONST_IGNORE_BUILDERS and ud.builder and ud.canAssist) then return end
     if (IsTransportable(unitDefID) and not userOrders) then 
 --      Echo ("new unit from factory "..unitID)
 
-      for _,v in ipairs(GetCommandQueue(unitID)) do
-        if (IsEmbark(v)) then 
+      local commands = GetCommandQueue(unitID)
+      for i=1, #commands do
+        if (IsEmbark(commands[i])) then 
           priorityUnits[unitID] = unitDefID
           return
         end
@@ -306,14 +312,16 @@ function widget:CommandNotify(id, params, options)
   local sel = nil
   if (not options.shift) then
     sel = GetSelectedUnits()
-    for _, uid in ipairs(sel) do
+    for i=1,#sel do
+      local uid = sel[i]
       widget:UnitDestroyed(uid, GetUnitDefID(uid), myTeamID)
     end
   end
 
   if (id == CMD.WAIT and options.alt) then
     if (sel == nil) then sel = GetSelectedUnits() end
-    for _, uid in ipairs(sel) do
+    for i=1,#sel do
+      local uid = sel[i]
       priorityUnits[uid] = GetUnitDefID(uid)
     end
   end
@@ -334,11 +342,11 @@ function widget:Update(deltaTime)
 --      Echo ("prio called " ..i)
       waitingUnits[i] = {ST_PRIORITY, d}
       AssignTransports(0, i)
-      table.insert(todel, i)
+      TableInsert(todel, i)
     end
   end
-  for _, x in ipairs(todel) do
-    priorityUnits[x] = nil
+  for i=1, #todel do
+    priorityUnits[todel[i] ] = nil
   end
 
   timer = 0
@@ -393,13 +401,14 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
   DeleteToPickTran(transportID)
   hackIdle[transportID] = true
   local cnt = 0
-  for k, v in ipairs(queue) do
+  for k=1, #queue do
+    local v = queue[k]
     if (not v.options.internal) then 
       if ((v.id == CMD.MOVE or (v.id==CMD.WAIT) or v.id == CMD.SET_WANTED_MAX_SPEED) and not ender) then
         cnt = cnt +1
         if (v.id == CMD.MOVE) then 
           GiveOrderToUnit(transportID, CMD.MOVE, v.params, {"shift"})      
-          table.insert(torev, {v.params[1], v.params[2], v.params[3]+20})
+          TableInsert(torev, {v.params[1], v.params[2], v.params[3]+20})
           vl = v.params 
         end
 		if (IsDisembark(v)) then 
@@ -411,11 +420,11 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
         end
         if (v.ID ~= CMD.WAIT) then
           local opts = {}
-          table.insert(opts, "shift") -- appending
-          if (v.options.alt)   then table.insert(opts, "alt")   end
-          if (v.options.ctrl)  then table.insert(opts, "ctrl")  end
-          if (v.options.right) then table.insert(opts, "right") end
-          table.insert(storedQueue[unitID], {v.id, v.params, opts})
+          TableInsert(opts, "shift") -- appending
+          if (v.options.alt)   then TableInsert(opts, "alt")   end
+          if (v.options.ctrl)  then TableInsert(opts, "ctrl")  end
+          if (v.options.right) then TableInsert(opts, "right") end
+          TableInsert(storedQueue[unitID], {v.id, v.params, opts})
         end
       end
     end
@@ -442,7 +451,8 @@ end
 function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
   if (teamID ~= myTeamID or storedQueue[unitID] == nil) then return end
   GiveOrderToUnit(unitID, CMD.STOP, {}, {})
-  for _, x in ipairs(storedQueue[unitID]) do
+  for i=1, #storedQueue[unitID] do
+    local x = storedQueue[unitID][i]
     GiveOrderToUnit(unitID, x[1], x[2], x[3])
   end
   storedQueue[unitID] = nil
@@ -469,8 +479,8 @@ function CanTransport(transportID, unitID)
   
 
   local mass = 0 -- mass check
-  for _,a in ipairs(trans) do
-    mass = mass + UnitDefs[GetUnitDefID(a)].mass
+  for i=1, #trans do
+    mass = mass + UnitDefs[GetUnitDefID(trans[i])].mass
   end
   if (mass > UnitDefs[tdef].transportMass) then
 --    Echo ("mass failed")
@@ -500,7 +510,7 @@ function AssignTransports(transportID, unitID)
          end
   --       Echo ("   "..transportID .. " " .. id .. "  " .. benefit)
 
-         if (benefit > CONST_BENEFIT_LIMIT) then table.insert(best, {benefit, transportID, id}) end
+         if (benefit > CONST_BENEFIT_LIMIT) then TableInsert(best, {benefit, transportID, id}) end
        end 
      end
   elseif (unitID ~=0) then
@@ -521,7 +531,7 @@ function AssignTransports(transportID, unitID)
 
 --         Echo ("   "..id.. " " .. unitID .. "  " .. benefit)
 
-        if (benefit > CONST_BENEFIT_LIMIT) then table.insert(best, {benefit, id, unitID}) end
+        if (benefit > CONST_BENEFIT_LIMIT) then TableInsert(best, {benefit, id, unitID}) end
       end
     end
   end 
@@ -573,7 +583,8 @@ function GetPathLength(unitID)
   local d = 0
   local queue = GetCommandQueue(unitID);
   if (queue == nil) then return 0 end
-  for k, v in ipairs(queue) do
+  for k=1, #queue do
+    local v = queue[k]
     if (v.id == CMD.MOVE or v.id==CMD.WAIT) then
       if (v.id == CMD.MOVE) then 
         d = d + Dist(px,py, pz, v.params[1], v.params[2], v.params[3])
@@ -599,7 +610,7 @@ function widget:KeyPress(key, modifier, isRepeat)
   if (key == KEYSYMS.Q and not modifier.ctrl) then
     if (not modifier.alt) then
       local opts = {"alt"}
-      if (modifier.shift) then table.insert(opts, "shift") end 
+      if (modifier.shift) then TableInsert(opts, "shift") end 
 
       for _, id in ipairs(GetSelectedUnits()) do -- embark
         local def = GetUnitDefID(id)
@@ -610,7 +621,7 @@ function widget:KeyPress(key, modifier, isRepeat)
       end
     else 
       local opts = {"alt", "ctrl"}
-      if (modifier.shift) then table.insert(opts, "shift") end  
+      if (modifier.shift) then TableInsert(opts, "shift") end  
       for _, id in ipairs(GetSelectedUnits()) do --disembark
         local def = GetUnitDefID(id)
         if (IsTransportable(def)  or UnitDefs[def].isFactory) then GiveOrderToUnit(id, CMD.WAIT, {}, opts) end

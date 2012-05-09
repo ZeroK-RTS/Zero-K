@@ -55,9 +55,11 @@ function widget:GameFrame(n)
   if (n == comNotify) and (n > 300) then
     local comCount = 0
     local allyID = Spring.GetMyAllyTeamID()
-    for _, teamID in ipairs(Spring.GetTeamList(allyID)) do
-      for _, unitID in ipairs(Spring.GetTeamUnits(teamID)) do
-        if (UnitDefs[GetUnitDefID(unitID)].customParams.commtype) then
+    local teams = Spring.GetTeamList(allyID)
+    for i=1,#teams do
+      local units = Spring.GetTeamUnits(teams[i])
+      for j=1, #units do
+        if (UnitDefs[GetUnitDefID(units[j])].customParams.commtype) then
           comCount = (comCount + 1)
         end
       end

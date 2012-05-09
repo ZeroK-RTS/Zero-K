@@ -266,7 +266,8 @@ end
 
 local function tableremove(table1, item)
 	local table2 = {}
-	for i,v in ipairs(table1) do
+	for i=1, #table1 do
+		local v = table1[i]
 		if v ~= item then
 			table2[#table2+1] = v
 		end
@@ -444,7 +445,8 @@ local function MakeFlags()
 	
 
 	local flagCount = 0
-	for _,country in ipairs(countries) do
+	for i=1, #countries do
+		local country = countries[i]
 		local countryLang = country_langs[country] or 'en'
 		flagCount = flagCount + 1
 		flagChildren[#flagChildren + 1] = Image:New{ file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. country ..'.png', }
@@ -530,8 +532,8 @@ local function HotkeyFromUikey(uikey_hotkey)
 	local uikey_table = explode('+', uikey_hotkey)
 	local alt, ctrl, meta, shift
 
-	for i, str in ipairs(uikey_table) do
-		local str2 = str:lower()
+	for i=1, #uikey_table do
+		local str2 = uikey_table[i]:lower()
 		if str2 == 'alt' 		then alt = true
 		elseif str2 == 'ctrl' 	then ctrl = true
 		elseif str2 == 'shift' 	then shift = true
@@ -590,8 +592,8 @@ local function AssignKeyBind(hotkey, path, option, verbose) -- param4 = verbose
 		local actions = Spring.GetKeyBindings(hotkey.mod .. hotkey.key)
 		if (actions and #actions > 0) then
 			echo( 'Warning: There are other actions bound to this hotkey combo (' .. GetReadableHotkeyMod(hotkey.mod) .. hotkey.key .. '):' )
-			for i,v in ipairs(actions) do
-				for actionCmd, actionExtra in pairs(v) do
+			for i=1, #actions do
+				for actionCmd, actionExtra in pairs(actions[i]) do
 					echo ('  - ' .. actionCmd .. ' ' .. actionExtra)
 				end
 			end
@@ -825,8 +827,8 @@ local function RemOption(path, option, wname )
 		--echo ('<epic menu> ...error #333 ', (option and option.key) )
 		return
 	end
-	for i,v in ipairs(pathorders[path]) do
-		if v == (wname..option.key) then
+	for i=1, #pathorders[path] do
+		if pathorders[path][i] == (wname..option.key) then
 			table.remove(pathorders[path], i)
 		end
 	end
@@ -866,7 +868,8 @@ local function IntegrateWidget(w, addoptions, index)
 	end
 	
 	
-	for _,k in ipairs(w.options_order) do
+	for i=1, #w.options_order do
+		local k = w.options_order[i]
 		local option = options[k]
 		if not option then
 			echo( '<EPIC Menu> Error in loading custom widget settings in ' .. wname .. ', order table incorrect.' )
@@ -962,8 +965,8 @@ end
 --Store custom widget settings for all active widgets
 local function AddAllCustSettings()
 	local cust_tree = {}
-	for i,widget in ipairs(widgetHandler.widgets) do
-		IntegrateWidget(widget, true, i)
+	for i=1,#widgetHandler.widgets do
+		IntegrateWidget(widgetHandler.widgets[i], true, i)
 	end
 end
 
@@ -1238,7 +1241,8 @@ MakeSubWindow = function(path)
 			
 		elseif option.type == 'list' then	
 			tree_children[#tree_children+1] = Label:New{ caption = option.name, textColor = color.sub_header, }
-			for _,item in ipairs(option.items) do
+			for i=1, #option.items do
+				local item = option.items[i]
 				settings_height = settings_height + B_HEIGHT 
 				tree_children[#tree_children+1] = 
 					Button:New{
@@ -1729,7 +1733,8 @@ function widget:Initialize()
 	
 	local options_temp ={}
 	CopyTable(options_temp , epic_options);
-	for i,option in ipairs(options_temp ) do
+	for i=1, #options_temp do
+		local option = options_temp[i]
 		AddOption(option.path, option)
 	end
 	

@@ -209,9 +209,11 @@ end
 
 function widget:GameFrame(frame)
 	if frame == initFrame then
-		local units = spGetTeamUnits(spGetMyTeamID())
-		for i, id in ipairs(units) do 
-			widget:UnitCreated(id, spGetUnitDefID(id),spGetMyTeamID())
+		local myTeam = spGetMyTeamID()
+		local units = spGetTeamUnits(myTeam)
+		for i=1,#units do
+			local id = units[i]
+			widget:UnitCreated(id, spGetUnitDefID(id),myTeam)
 		end
 	end
 end 
@@ -229,7 +231,8 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_FACTORY_GUARD then 
 		local selectedUnits = Spring.GetSelectedUnits()
 		local newState = nil
-		for _, unitID in ipairs(selectedUnits) do
+		for i=1, #selectedUnits do
+			local unitID = selectedUnits[i]
 			if factories[unitID] then
 				if newState == nil then
 					newState = not factories[unitID].assist

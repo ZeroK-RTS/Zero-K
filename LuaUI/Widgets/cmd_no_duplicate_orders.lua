@@ -37,8 +37,11 @@ local buildList = {}
 
 function widget:Initialize()
   if Spring.GetSpectatingState() or Spring.IsReplay() then widgetHandler:RemoveWidget() end
-  for _,unitID in ipairs(Spring.GetTeamUnits(Spring.GetMyTeamID())) do
-    local _, _, _, _, buildProgress = GetUnitHealth(unitID)
+  local myTeam = Spring.GetMyTeamID()
+  local units = Spring.GetTeamUnits(myTeam)
+  for i=1,#units do
+    local unitID = units[i]
+    local buildProgress = select(5, GetUnitHealth(unitID))
     if (buildProgress < 1) then widget:UnitCreated(unitID) end    
   end
 end
@@ -98,19 +101,21 @@ function widget:CommandNotify(id, params, options)
     if (id == CMD.ATTACK) then
       local selUnits = GetSelectedUnits()
       local blockUnits = {}
-      for _,unitID in ipairs(selUnits) do
+      for i=1, #selUnits do
+        local unitID = selUnits[i]
         local cQueue = GetCommandQueue(unitID, 1)
         if (#cQueue > 0) and (params[1] == cQueue[1].params[1]) then
           blockUnits[unitID] = true
         end
       end
       if next(blockUnits) then
-        for _,unitID in ipairs(selUnits) do
-          if not blockUnits[unitID] then
+        for i=1, #selUnits do
+          local unitID = selUnits[i]
             GiveOrderToUnit(unitID, id, params, options)
           else
             local cQueue = GetCommandQueue(unitID)
-            for _,v in ipairs(cQueue) do
+            for j=1, #cQueue do
+              local v = cQueue[j]
               if (v.tag ~= cQueue[1].tag) then
                 GiveOrderToUnit(unitID,v.id,v.params,{"shift"})
               end

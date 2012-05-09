@@ -121,7 +121,8 @@ function widget:DrawScreen()
      local dist = math.sqrt((rdx * rdx) + (rdy * rdy))
      --because there is only GetFeaturesInRectangle. Features outside of the circle are needed to be ignored
      local units = Spring.GetFeaturesInRectangle(rangestart[1]-dist,rangestart[3]-dist,rangestart[1]+dist,rangestart[3]+dist)
-     for _,unit in ipairs(units) do
+     for i=1,#units do
+	local unit = units[i]
         local ux, _, uy = Spring.GetFeaturePosition(unit)
         local udx, udy = (ux - rangestart[1]), (uy - rangestart[3])
         udist = math.sqrt((udx * udx) + (udy * udy))

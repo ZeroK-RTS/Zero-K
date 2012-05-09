@@ -118,7 +118,7 @@ local function GetCount(type)
   local total = 0
   for chickenName,colorInfo in pairs(chickenColorSet) do
     local subTotal = gameInfo[chickenName..type]
-    table.insert(t, colorInfo..subTotal)
+    t[#t+1] = colorInfo..subTotal
     total = total + subTotal
   end
   return total
@@ -201,7 +201,7 @@ local function MakeChickenBreakdown()
     local count = gameInfo[chickenName.."Count"]
 	local kills = gameInfo[chickenName.."Kills"]
 	local str = "\n"..chickenNamesPlural[chickenName]..": \255\0\255\0"..count.."\008/\255\255\0\0"..kills
-    table.insert(t, str)
+	t[#t+1] = (t, str)
 	tNames[str] = chickenName
   end
   table.sort(t, function(a,b) return chickenTypes[tNames[a]]["time"] < chickenTypes[tNames[b]]["time"] end )	-- sort by chicken appearance
@@ -341,8 +341,8 @@ function widget:DrawScreen()
     fontHandler.UseFont(waveFont)
     local waveY = viewSizeY - Spring.DiffTimers(t, waveTime)*waveSpeed*viewSizeY
     if (waveY > 0) then
-      for i, message in ipairs(waveMessage) do
-        fontHandler.DrawCentered(message, viewSizeX/2, waveY-WaveRow(i))
+      for i=1,#waveMessage do
+        fontHandler.DrawCentered(waveMessage[i], viewSizeX/2, waveY-WaveRow(i))
       end
     else
       waveMessage = nil

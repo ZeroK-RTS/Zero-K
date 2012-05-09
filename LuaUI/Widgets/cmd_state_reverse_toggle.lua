@@ -33,8 +33,8 @@ function widget:CommandNotify(id, params, options)
 			if state < 0 then
 			  state = multiStates[id] + state	-- wrap
 			end
-			for v,sid in ipairs(units) do
-				spGiveOrderToUnit(sid, id, { state }, {})	
+			for i=1, #units do
+				spGiveOrderToUnit(units[i], id, { state }, {})	
 			end
 			return true
 		end

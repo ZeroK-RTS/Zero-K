@@ -28,8 +28,6 @@ local GetMouseState		= Spring.GetMouseState
 local GetModKeyState	= Spring.GetModKeyState
 local SelectUnitArray	= Spring.SelectUnitArray
 
-local push        = table.insert
-
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 WhiteStr   = "\255\255\255\255"
@@ -175,7 +173,7 @@ end
 local function SetCount(set, numOnly)
 	local count = 0
 	if numOnly then
-		for k in ipairs(set) do
+		for i=1,#set do
 			count = count + 1
 		end
 	else
@@ -374,13 +372,13 @@ end
 
 --shifts facs when one of their kind is removed
 local function ShiftFacRow()
-	for i in ipairs(facs) do
+	for i=1,#facs do
 		if facs[i].button then
 			facs[i].button:Dispose()
 			facs[i].button = nil
 		end
 	end
-	for i in ipairs(facs) do
+	for i=1,#facs do do
 		GenerateButton(facs, i, facs[i].facID, facs[i].facDefID)
 		UpdateFac(facs[i].facID, i)
 	end	
@@ -495,14 +493,15 @@ local function AddComm(unitID, unitDefID)
 	ShiftFacRow()
 end
 
+--shifts comms when one of their kind is removed
 local function ShiftCommRow()
-	for i in ipairs(comms) do
+	for i=1,#comms do
 		if comms[i].button then
 			comms[i].button:Dispose()
 			comms[i].button = nil
 		end
 	end
-	for i in ipairs(comms) do
+	for i=1,#comms do
 		GenerateButton(comms, i, comms[i].commID, comms[i].commDefID)
 		UpdateComm(comms[i].commID, i)
 	end	

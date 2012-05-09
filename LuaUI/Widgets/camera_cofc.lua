@@ -831,8 +831,8 @@ local function PeriodicWarning()
 			c_widgets_list[#c_widgets_list+1] = name
 		end
 	end
-	for _,wname in ipairs(c_widgets_list) do
-		c_widgets = c_widgets .. wname .. ', '
+	for i=1, #c_widgets_list do
+		c_widgets = c_widgets .. c_widgets_list[i] .. ', '
 	end
 	if c_widgets ~= '' then
 		echo('<COFCam> *Periodic warning* Please disable other camera widgets: ' .. c_widgets)

@@ -251,8 +251,8 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 		cells[#cells+1] = ''
 	elseif not ws.slaveTo then
 		if mainweapon then
-			for _,index2 in ipairs(mainweapon) do
-				wsm = weaponStats[index2]
+			for i=1, #mainweapon do
+				wsm = weaponStats[mainweapon[i]]
 				ws.damw = ws.damw + wsm.bestTypeDamagew
 				ws.dpsw = ws.dpsw + wsm.dpsw
 				ws.dam = ws.dam + wsm.bestTypeDamage
@@ -304,7 +304,8 @@ local function printWeapons(unitDef)
 	local wd = WeaponDefs
 	if not wd then return false end	
 	
-	for i, weapon in ipairs(unitDef.weapons) do
+	for i=1, #unitDef.weapons do
+		local weapon = unitDef.weapons[i]
 		local weaponID = weapon.weaponDef
 		local weaponDef = WeaponDefs[weaponID]
 	
@@ -483,8 +484,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		for i,v in ipairs(commModules) do
-			statschildren[#statschildren+1] = Label:New{ caption = v, textColor = color.stats_fg,}
+		for i=1, #commModules do
+			statschildren[#statschildren+1] = Label:New{ caption = commModules[i], textColor = color.stats_fg,}
 			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg,}
 		end	
 	end
@@ -499,8 +500,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 		
 		statschildren[#statschildren+1] = Label:New{ caption = 'WEAPONS', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		for _,v in ipairs(cells) do
-			statschildren[#statschildren+1] = Label:New{ caption = v, textColor = color.stats_fg, }
+		for i=1, #cells do
+			statschildren[#statschildren+1] = Label:New{ caption = cells[i], textColor = color.stats_fg, }
 		end
 	end
 	
@@ -701,7 +702,8 @@ local function PriceWindow(unitID, action)
 	local grid_children = {}
 	
 	local dollar_amounts = {50,100,200,500,1000,2000,5000,10000, 0}
-	for _, dollar_amount in ipairs(dollar_amounts) do
+	for i=1, #dollar_amounts do
+		local dollar_amount = dollar_amounts[i]
 		local caption, func
 		if action == 'bounty' then
 			if dollar_amount ~= 0 then

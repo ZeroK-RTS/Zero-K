@@ -95,8 +95,6 @@ local GetFeaturePosition = Spring.GetFeaturePosition
 local acos   = math.acos
 local PI_DEG = 180 / math.pi
 
-local ipairs = ipairs
-
 local glPushMatrix = gl.PushMatrix
 local glTranslate  = gl.Translate
 local glScale      = gl.Scale

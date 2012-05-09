@@ -49,7 +49,7 @@ local spTraceScreenRay         = Spring.TraceScreenRay
 --------------------------------------------------------------------------------
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local pairs, ipairs = pairs, ipairs
+local pairs = pairs
 
 
 local glVertex = glVertex
@@ -63,8 +63,8 @@ local jumpDefNames  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
 local function ListToSet(t)
   local new = {}
-  for k, v in ipairs(t) do
-    new[v] = true
+  for i=1,#t do
+    new[ t[i] ] = true
   end 
   return new
 end
@@ -240,7 +240,9 @@ function widget:CommandNotify(id, params, options)
   if (id ~= CMD_JUMP) then
     return
   end
-  for _, unitID in ipairs(spGetSelectedUnits()) do
+  local units = spGetSelectedUnits()
+  for i=1,#units do
+    unitID = units[i]
     local _, _, _, shift   = spGetModKeyState()
     if (#spGetCommandQueue(unitID, 1) == 0 or not shift) then
       lastJump[unitID] = {
@@ -287,8 +289,9 @@ function widget:DrawWorld()
     local mouseX, mouseY   = spGetMouseState()
     local category, arg    = spTraceScreenRay(mouseX, mouseY)
     local _, _, _, shift   = spGetModKeyState()
-    for _, unitID in ipairs(spGetSelectedUnits()) do
-      DrawMouseArc(unitID, shift, category == 'ground' and arg)
+    local units = spGetSelectedUnits()
+    for i=1,#units do
+      DrawMouseArc(units[i], shift, category == 'ground' and arg)
     end
   end
 end

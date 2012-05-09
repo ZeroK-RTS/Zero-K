@@ -284,8 +284,8 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		local foundValidUnit = false
 		local newRetreatOrder = nil
 		local selectedUnits = GetSelectedUnits()
-		for _, unitID in ipairs(selectedUnits) do
-
+		for i=1, #selectedUnits do
+			local unitID = selectedUnits[i]
 			local unitDefID = GetUnitDefID(unitID)
 			local ud = UnitDefs[unitDefID]
 
@@ -350,7 +350,8 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdP
 		end
 		
 		--local selectedUnits = GetSelectedUnits()
-		--for _, unitID in ipairs(selectedUnits) do
+		--for i=1, #selectedUnits do
+			--local unitID = selectedUnits[i]
 			--retreatingUnits[unitID] = nil
 		--end
 
@@ -377,7 +378,7 @@ function widget:CommandsChanged()
 		pos = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT}, 
 	})
 
-
+	-- what is this I don't even
 	for _, unitID in ipairs(selectedUnits) do
 
 		local unitID = GetSelectedUnits()[1]

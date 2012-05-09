@@ -142,7 +142,8 @@ local tryloading  = 1     --// try to activate lups if it isn't found
 
 local function ClearFxs(unitID)
   if (particleIDs[unitID]) then
-    for _,fxID in ipairs(particleIDs[unitID]) do
+    for i=1,#particleIDs[unitID]
+      local fxID = particleIDs[unitID][i]
       Lups.RemoveParticles(fxID)
     end
     particleIDs[unitID] = nil
@@ -153,7 +154,8 @@ end
 local function ClearFx(unitID, fxIDtoDel)
   if (particleIDs[unitID]) then
   local newTable = {}
-    for _,fxID in ipairs(particleIDs[unitID]) do
+    for i=1,#particleIDs[unitID]
+      local fxID = particleIDs[unitID][i]
       if fxID == fxIDtoDel then 
         Lups.RemoveParticles(fxID)
       else 
@@ -193,7 +195,8 @@ local function UnitFinished(_,unitID,unitDefID)
 
   local effects = UnitEffects[unitDefID]
   if (effects) then
-    for _,fx in ipairs(effects) do
+    for i=1,#effects do
+      local fx = effects[i]
       if (not fx.options) then
         Spring.Echo("LUPS DEBUG GRRR", UnitDefs[unitDefID].name, fx and fx.class)
         return
@@ -242,7 +245,8 @@ local function UnitEnteredLos(_,unitID)
   local unitDefID = spGetUnitDefID(unitID)
   local effects   = UnitEffects[unitDefID]
   if (effects) then
-    for _,fx in ipairs(effects) do
+    for i=1,#effects do
+      local fx = effects[i]
       if (fx.class=="GroundFlash") then
         fx.options.pos = { Spring.GetUnitBasePosition(unitID) }
       end
@@ -304,7 +308,8 @@ local function PlayerChanged(_,playerID)
   if (playerID == Spring.GetMyPlayerID()) then
     --// clear all FXs
     for _,unitFxIDs in pairs(particleIDs) do
-      for _,fxID in ipairs(unitFxIDs) do
+      for i=1,#unitFxIDs
+		local fxID = unitFxIDs[i]    
         Lups.RemoveParticles(fxID)
       end
     end
@@ -413,8 +418,8 @@ end
 function widget:Shutdown()
   if (initialized) then
     for _,unitFxIDs in pairs(particleIDs) do
-      for _,fxID in ipairs(unitFxIDs) do
-        Lups.RemoveParticles(fxID)
+      for i=1,#unitFxIDs
+	local fxID = unitFxIDs[i]
       end
     end
     particleIDs = {}

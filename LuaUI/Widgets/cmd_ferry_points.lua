@@ -161,7 +161,7 @@ end
 function widget:CommandsChanged()
 	local customCommands = widgetHandler.customCommands
 
-	table.insert(customCommands, {			
+	customCommands[#customCommands+1] = {			
 		id      = CMD_SET_FERRY,
 		type    = CMDTYPE.ICON_MAP,
 		tooltip = 'Places a ferry route',
@@ -171,7 +171,7 @@ function widget:CommandsChanged()
 		texture = 'LuaUI/Images/commands/Bold/ferry.png',
 
 		pos = {CMD_CLOAK,CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT}, 
-	})
+	}
 end
 
 

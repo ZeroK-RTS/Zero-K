@@ -163,7 +163,9 @@ local function CountTheirs(unitKind)
 	for i in pairs(unitKind) do
 		defs[#defs+1] = i
 	end
-	for _,team in ipairs(Spring.GetTeamList()) do
+	local teams = Spring.GetTeamList()
+	for i=1,#teams do
+		local team = teams[i]
 		if not Spring.AreTeamsAllied(team,myTeam) then
 			nGot=nGot+#(spGetTeamUnitsByDefs(team,defs) or {})
 		end
@@ -181,13 +183,13 @@ local function Prevalence(unitKind)
 end
 
 local function IsSelected(unitKind)
-	local isSelected=false
-	for _,u in ipairs(spGetTeamUnitsByDefs(myTeam,unitKind)) do
-		if Spring.IsUnitSelected(u) then
-			isSelected=true
+	local units = spGetTeamUnitsByDefs(myTeam,unitKind)
+	for i=1,#units do
+		if Spring.IsUnitSelected(units[i]) then
+			return true
 		end
 	end
-	return isSelected
+	return false
 end
 
 -- used to get weighted sum of units in existence and selected
@@ -313,12 +315,12 @@ local function GetRandomTip()
 	GetTipsList()-- Create tipsList according to what's going on
 	if #tipsList >=2 then
 		local w=0
-		for t,_ in ipairs(tipsList) do
+		for t=1, #tipsList do
 			w=w+tipsList[t].weight
 		end
 		local d = w*math.random()
 		w=0
-		for t,_ in ipairs(tipsList) do
+		for t=1, #tipsList do
 			w=w+tipsList[t].weight
 			if w>=d then
 				local text, sound = tipsList[t].text,tipsList[t].sound

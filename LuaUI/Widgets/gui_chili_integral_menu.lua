@@ -159,13 +159,13 @@ local function AddHotkeyOptions()
 	table.sort(options_order_tmp_states)
 
 	options_order[#options_order+1] = 'lblcmd'
-	for _, option in ipairs( options_order_tmp_cmd ) do
-		options_order[#options_order+1] = option
+	for i=1, #options_order_tmp_cmd do
+		options_order[#options_order+1] = options_order_tmp_cmd[i]
 	end
 	
 	options_order[#options_order+1] = 'lblstate'
-	for _, option in ipairs( options_order_tmp_states ) do
-		options_order[#options_order+1] = option
+	for i=1, #options_order_tmp_states do
+		options_order[#options_order+1] = options_order_tmp_states[i]
 	end
 end
 
@@ -604,8 +604,8 @@ local function UpdateContainer(container, nl, columns)
 	if cnt ~= #nl then  -- different counts, we update fully
 		needUpdate = true 
 	else  -- check if some items are different 
-		for _, cmd in ipairs(nl) do  
-			dif[cmd.id] = nil
+		for i=1, #nl do  
+			dif[nl[i].id] = nil
 		end 
 	
 		for _, _ in pairs(dif) do  -- different item found, we do full update 
@@ -616,8 +616,8 @@ local function UpdateContainer(container, nl, columns)
 	
 	if needUpdate then 
 		RemoveChildren(container) 
-		for i, cmd in ipairs(nl) do 
-			MakeButton(container, cmd, true, i)
+		for i=1, #nl do 
+			MakeButton(container, nl[i], true, i)
 		end 
 		for i = 1, columns - #container.children do 
 			Control:New {
@@ -626,8 +626,8 @@ local function UpdateContainer(container, nl, columns)
 			}
 		end 
 	else 
-		for i, cmd in ipairs(nl) do  -- update buttons only 
-			MakeButton(container, cmd, false, i)
+		for i=1, #nl do 
+			MakeButton(container, nl[i], false, i)
 		end 
 	end 
 end 

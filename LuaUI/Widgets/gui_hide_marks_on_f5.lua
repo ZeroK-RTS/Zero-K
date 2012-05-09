@@ -59,13 +59,15 @@ function widget:KeyPress(key, modifier, isRepeat)
 	if ( key == KEYSYMS.F5) then
 		if Spring.IsGUIHidden() then
 			Spring.SendCommands("mapmarks 1")
-			for _, cursor in ipairs(cursorNames) do
+			for i=1, #cursorNames do
+				local cursor = cursorNames[i]
 				local topLeft = (cursor == 'cursornormal')
 				Spring.ReplaceMouseCursor(cursor, cursor, topLeft)
 			end
 		else
 			Spring.SendCommands("mapmarks 0")
-			for _, cursor in ipairs(cursorNames) do
+			for i=1, #cursorNames do
+				local cursor = cursorNames[i]
 				local topLeft = (cursor == 'cursornormal' and cursorSet ~= 'k_haos_girl')
 				Spring.ReplaceMouseCursor(cursor, "empty/"..cursor, topLeft)
 			end

@@ -86,15 +86,16 @@ end
 
 local function OrderIconsOnUnit(unitID )
 	local iconCount = 0
-	for _,iconName in ipairs(iconOrders_order) do
+	for i=1, #iconOrders_order do
+		local iconName = iconOrders_order[i]
 		if (not hideIcons[iconName]) and iconUnitTexture[iconName] and iconUnitTexture[iconName][unitID] then
 			iconCount = iconCount + 1
 		end
 	end
 	local xshift = (0.5 - iconCount*0.5)*options.iconsize.value
 	
-	for _,iconName in ipairs(iconOrders_order) do
-		
+	for i=1, #iconOrders_order do
+		local iconName = iconOrders_order[i]
 		local texture = iconUnitTexture[iconName] and iconUnitTexture[iconName][unitID]
 		if texture then
 		
@@ -116,8 +117,9 @@ end
 
 
 local function ReOrderIconsOnUnits()
-	for _,unitID in ipairs( Spring.GetAllUnits() ) do
-		OrderIconsOnUnit(unitID)
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		OrderIconsOnUnit(units[i])
 	end
 end
 

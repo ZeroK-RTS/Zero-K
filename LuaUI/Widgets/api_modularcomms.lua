@@ -82,10 +82,12 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua")
 --------------------------------------------------------------------------------
 local function RemoveDuplicates(base, delete)
 	local count = {}
-	for i,v in ipairs(delete) do
+	for i=1,#delete do
+		local v = delete[i]
 		count[v] = (count[v] or 0) + 1
 	end	
-	for i,v in ipairs(base) do
+	for i=1, #base do
+		local v = base[i]
 		if count[v] and count[v] > 0 then
 			base[i] = nil
 			count[v] = count[v] - 1
