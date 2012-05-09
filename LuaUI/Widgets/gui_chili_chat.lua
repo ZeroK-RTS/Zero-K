@@ -69,6 +69,8 @@ local visible = true
 local firstEnter=true --used to activate ally-chat at game start. To run once
 local noAlly=false	--used to skip the ally-chat above. eg: if 1vs1 skip ally-chat
 
+local wasSimpleColor = false -- variable: indicate if simple color was toggled on or off. Used to trigger player-list to refresh.
+
 local function option_remakeConsole()
 	remakeConsole()
 end
@@ -432,6 +434,17 @@ end
 
 local timer = 0
 
+local function CheckColorScheme() --//toggle between color scheme
+	local currentColorScheme = wasSimpleColor 
+	if WG.LocalColor then 
+		currentColorScheme = WG.LocalColor.usingSimpleTeamColors	
+	end
+	if wasSimpleColor ~= currentColorScheme then
+		option_remakeConsole()
+		wasSimpleColor = currentColorScheme
+	end
+end
+
 function widget:Update(s)
 	timer = timer + s
 	if timer > 2 then
@@ -440,6 +453,7 @@ function widget:Update(s)
 			window_console.x / screen0.width + 0.004, 
 			1 - (window_console.y + window_console.height) / screen0.height + 0.005, 
 			window_console.width / screen0.width)})
+		CheckColorScheme()
 	end
 end
 

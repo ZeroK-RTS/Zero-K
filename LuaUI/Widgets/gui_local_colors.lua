@@ -121,6 +121,7 @@ function WG.LocalColor.localTeamColorToggle()
 end
 
 function widget:Initialize()
+	WG.LocalColor.usingSimpleTeamColors = options.simpleColors.value
 	if options.simpleColors.value then
 		SetNewSimpleTeamColors()
 	else
