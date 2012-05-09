@@ -39,9 +39,9 @@ local lavaGrowSpeed = 0.25
 local minheight, maxheight = Spring.GetGroundExtremes()
 local lavaRise = (maxheight - minheight) / lavaRiseCycles
 local lavaGrow = lavaGrowSpeed
-local nextMessageFrame = -1
+local lavaLevel = minheight - lavaRise - 20
 
-_G.lavaLevel = minheight - lavaRise - 20
+local nextMessageFrame = -1
 
 
 local function addTideRhym (targetLevel, speed, remainTime)
@@ -116,12 +116,9 @@ end
 
 
 function gadget:GameFrame (f)
-  _G.lavaLevel = lavaLevel + sin(f/30)*2
-  _G.frame = f
-
   --if (f%2==0) then
     updateLava (f)
-    _G.lavaLevel = lavaLevel+lavaGrow
+    lavaLevel = lavaLevel+lavaGrow
 
     --if (lavaLevel == 160) then lavaGrow=-0.5 end
     --if (lavaLevel == -10) then lavaGrow=0.25 end
@@ -130,6 +127,9 @@ function gadget:GameFrame (f)
   if (f%10==0) then
     lavaDeathCheck()
   end
+
+  _G.lavaLevel = lavaLevel + sin(f/30)*2  --make it visible from unsynced
+  _G.frame = f
 
   --[[
   if (f%10==0) then
@@ -149,7 +149,7 @@ else
 
 
 local sin          = math.sin
-local glTexCoord   = TexCoord
+local glTexCoord   = gl.TexCoord
 local glVertex     = gl.Vertex
 local glPushAttrib = gl.PushAttrib
 local glDepthTest  = gl.DepthTest
@@ -164,7 +164,7 @@ local GL_ALL_ATTRIB_BITS = GL.ALL_ATTRIB_BITS
 local lavaTexture = ":a:" .. "bitmaps/lava2.jpg"
 
 local mapSizeX = Game.mapSizeX
-local mapSizeY = Game.mapSizeY
+local mapSizeY = Game.mapSizeZ
 
 
 local function DrawGroundHuggingSquareVertices(x1,z1, x2,z2, HoverHeight)
