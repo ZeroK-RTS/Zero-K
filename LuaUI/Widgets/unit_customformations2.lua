@@ -342,7 +342,7 @@ end
 
 local function GiveNotifyingOrderToUnit(uID, cmdID, cmdParams, cmdOpts)
 	local widgets = widgetHandler.widgets
-	for i=1, widgets do
+	for i=1, #widgets do
 		local w = widgets[i]
 		if w.UnitCommandNotify and w:UnitCommandNotify(uID, cmdID, cmdParams, cmdOpts) then
 			return
