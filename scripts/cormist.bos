@@ -21,7 +21,7 @@ static-var	moving, once, animCount, curGun, firepoint, deployed,
 
 #define TURRET_TURN_SPEED				<240>
 #define GUN_TURN_SPEED					<60>
-#define ARMS_MOVE_SPEED					[12]
+#define ARMS_MOVE_SPEED					[10.8]
 
 #define ANIM_PERIOD				50
 #define PIVOT_MOD				11 //appox. equal to MAX_PIVOT / turnrate
@@ -205,7 +205,7 @@ Deploy()
 	}
 	if (moving == 0)
 	{
-		move arms to y-axis [4] speed ARMS_MOVE_SPEED;
+		move arms to y-axis [3.6] speed ARMS_MOVE_SPEED;
 		wait-for-move arms along y-axis;
 		deployed = 1;
 	}
