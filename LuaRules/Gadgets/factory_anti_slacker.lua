@@ -15,6 +15,7 @@ end
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetGameFrame = Spring.GetGameFrame
 local spSetUnitBlocking = Spring.SetUnitBlocking
+local spGetUnitIsDead = Spring.GetUnitIsDead
 
 local noEject = {
 	[UnitDefNames["missilesilo"].id] = true,
@@ -32,7 +33,7 @@ if (gadgetHandler:IsSyncedCode()) then
 function gadget:GameFrame(n)
 	if setBlocking[n] then	--restore blocking
 		for unitID, _ in pairs(setBlocking[n]) do
-			if not Spring.GetUnitIsDead(unitID) then spSetUnitBlocking(unitID, true) end
+			if not spGetUnitIsDead(unitID) then spSetUnitBlocking(unitID, true) end
 		end
 		setBlocking[n] = nil
 	end
