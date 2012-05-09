@@ -100,7 +100,7 @@ local options = {
     type   = 'section',
     },
     {
-        key='lavarisespeed',
+        key='lavarisecycles',
         name='Number of cycles',
         desc='Set how many cycles before map floods completely.  The more cycles, the slower the map floods. ',
         type='number',

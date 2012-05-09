@@ -11,30 +11,44 @@ function gadget:GetInfo()
 end
 
 
-local GetUnitDefID       = Spring.GetUnitDefID
-
 if (gadgetHandler:IsSyncedCode()) then
-tideRhym = {}
-tideIndex = 1
-tideContinueFrame = 0
-local minheight, maxheight = Spring.GetGroundExtremes()
-lavarisespeed = (Spring.GetModOptions().lavarisespeed or 0)
-lavariseperiod = (Spring.GetModOptions().lavariseperiod or 0)
-msgcounter = 0
-lavarise = (maxheight - minheight) / lavarisespeed
-lavaLevel = minheight - lavarise - 20
-lavaGrow = 0.25
-_G.Game.mapSizeX = Game.mapSizeX
-_G.Game.mapSizeY = Game.mapSizeY
-gameframe = 0
+--- SYNCED:
 
-local sin = math.sin
+local sin    = math.sin
+local random = math.random
+local spGetGroundHeight     = Spring.GetGroundHeight
+local spGetAllUnits         = Spring.GetAllUnits
+local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitBasePosition = Spring.GetUnitBasePosition
+local spDestroyUnit         = Spring.DestroyUnit
+local spEcho                = Spring.Echo
+local GAME_SPEED            = Game.gameSpeed
+
+local terraunitDefID = UnitDefNames["terraunit"].id
+
+local tideRhym = {}
+local tideIndex = 1
+local currentTide
+local tideContinueFrame = 0
+
+local modOptions = Spring.GetModOptions()
+local lavaRiseCycles = (modOptions.lavarisecycles or 7)
+local lavaRisePeriod = (modOptions.lavariseperiod or 120)
+local lavaGrowSpeed = 0.25
+
+local minheight, maxheight = Spring.GetGroundExtremes()
+local lavaRise = (maxheight - minheight) / lavaRiseCycles
+local lavaGrow = lavaGrowSpeed
+local nextMessageFrame = -1
+
+_G.lavaLevel = minheight - lavaRise - 20
+
 
 function gadget:Initialize()
-    if(Spring.GetModOptions().zkmode ~= "lavarise") then
+    if (modOptions.zkmode ~= "lavarise") then
 	    gadgetHandler:RemoveGadget()
 	end
-	addTideRhym (lavaLevel + lavarise, 0.25, lavariseperiod)
+	addTideRhym (lavaLevel + lavaRise, lavaGrowSpeed, lavaRisePeriod)
 	
 	--addTideRhym (-21, 0.25, 5)
 	--addTideRhym (150, 0.25, 3)
@@ -43,123 +57,135 @@ function gadget:Initialize()
 	--addTideRhym (-20, 1, 5)
 	--addTideRhym (180, 0.5, 60)
 	--addTideRhym (240, 0.2, 10)
+  
+  currentTide = tideRhym[tideIndex]
 end
 
 
 function addTideRhym (targetLevel, speed, remainTime)
-	local newTide = {}
-	newTide.targetLevel = targetLevel
-	newTide.speed = speed
-	newTide.remainTime = remainTime
-	table.insert (tideRhym, newTide)
+	local newTide = {
+  	targetLevel = targetLevel,
+    speed       = speed,
+    remainTime  = remainTime
+  }
+	tideRhym[#tideRhym + 1] = newTide
 end
 
 
-function updateLava ()
-	if (lavaGrow < 0 and lavaLevel < tideRhym[tideIndex].targetLevel) 
-		or (lavaGrow > 0 and lavaLevel > tideRhym[tideIndex].targetLevel) then
-		tideContinueFrame = gameframe + tideRhym[tideIndex].remainTime*30
+function updateLava (gameframe)
+	if (lavaGrow < 0 and lavaLevel < currentTide.targetLevel) 
+		or (lavaGrow > 0 and lavaLevel > currentTide.targetLevel) then
+		tideContinueFrame = gameframe + currentTide.remainTime * GAME_SPEED
 		lavaGrow = 0
-		if msgcounter <= gameframe - 900 then
-		  Spring.Echo ("Next LAVA LEVEL change in " .. (tideContinueFrame-gameframe)/30 .. " seconds", "Lava Height now " .. tideRhym[tideIndex].targetLevel, "Next Lava Height " .. tideRhym[tideIndex].targetLevel + lavarise + 0.25)
-	      msgcounter = gameframe
+		if (nextMessageFrame <= gameframe) then
+		  spEcho ("Next LAVA LEVEL change in " .. (tideContinueFrame-gameframe) / GAME_SPEED .. " seconds", "Lava Height now " .. currentTide.targetLevel, "Next Lava Height " .. currentTide.targetLevel + lavaRise)
+      nextMessageFrame = gameframe + 30 * GAME_SPEED
 		end
 	end
 	
 	if (gameframe == tideContinueFrame) then
-		addTideRhym (lavaLevel + lavarise, 0.25, lavariseperiod)
+		addTideRhym (lavaLevel + lavaRise, lavaGrowSpeed, lavaRisePeriod)
 		tideIndex = tideIndex + 1
-		--Spring.Echo ("tideIndex=" .. tideIndex .. " target=" ..tideRhym[tideIndex].targetLevel )		
-		if  (lavaLevel < tideRhym[tideIndex].targetLevel) then 
-			lavaGrow = tideRhym[tideIndex].speed
+    currentTide = tideRhym[tideIndex]    
+    
+		--spEcho ("tideIndex=" .. tideIndex .. " target=" .. currentTide.targetLevel )		
+		if (lavaLevel < currentTide.targetLevel) then 
+			lavaGrow = currentTide.speed
 		else
-			lavaGrow = -tideRhym[tideIndex].speed
+			lavaGrow = -currentTide.speed
 		end
 	end
+  
 end
 
 
 function gadget:GameFrame (f)
-	gameframe = f
-	_G.lavaLevel = lavaLevel+math.sin(f/30)*2
+	_G.lavaLevel = lavaLevel + sin(f/30)*2
 	_G.frame = f
-	if (f%10==0) then
-		lavaDeathCheck()
-	end
 
 	--if (f%2==0) then
-		updateLava ()
-		lavaLevel = lavaLevel+lavaGrow
+		updateLava (f)
+		_G.lavaLevel = lavaLevel+lavaGrow    
 		
 		--if (lavaLevel == 160) then lavaGrow=-0.5 end
 		--if (lavaLevel == -10) then lavaGrow=0.25 end
 	--end
+  
+	if (f%10==0) then
+		lavaDeathCheck()
+	end
 	
-	--if (f%10==0) then		
-		local x = math.random(1,Game.mapX*512)
-		local z = math.random(1,Game.mapY*512)
-		local y = Spring.GetGroundHeight(x,z)
-		if y  < lavaLevel then
-			--Spring.SpawnCEG("tpsmokecloud", x, lavaLevel, z)
+	--[[
+  if (f%10==0) then		
+		local x = random(1,Game.mapSizeX)
+		local z = random(1,Game.mapSizeY)
+		local y = spGetGroundHeight(x,z)
+		if y < lavaLevel then
+			Spring.SpawnCEG("tpsmokecloud", x, lavaLevel, z)
 		end
-	--end
-	
+	end
+  --]]
 end
+
 
 function lavaDeathCheck ()
-local all_units = Spring.GetAllUnits ()
-	for i in pairs(all_units) do
-		local unitDefID = GetUnitDefID(all_units[i])
-		ud = UnitDefs[unitDefID]
-	    if ud.name ~= "terraunit" then
-		    x,y,z = Spring.GetUnitBasePosition   (all_units[i])
-		    if (y ~= nil) then
+local allUnits = spGetAllUnits()
+	for i = 1, #allUnits do
+    	local unitID = allUnits[i]
+		local unitDefID = spGetUnitDefID(unitID)
+	    if (unitDefID ~= terraunitDefID) then
+		    _,y,_ = spGetUnitBasePosition (unitID)
 			    if (y and y < lavaLevel) then 
-				    --Spring.AddUnitDamage (all_units[i],1000) 
-				    Spring.DestroyUnit (all_units[i])
+				    --Spring.AddUnitDamage (unitID,1000) 
+				    spDestroyUnit (unitID)
 				    --Spring.SpawnCEG("tpsmokecloud", x, y, z)
 			    end
-		    end
 		end
 	end
 end
 
 
-else --- UNSYCNED:
+else
+--- UNSYNCED:
 
-local glTexCoord = TexCoord
-local glVertex = gl.Vertex
+
+local sin          = math.sin
+local glTexCoord   = TexCoord
+local glVertex     = gl.Vertex
 local glPushAttrib = gl.PushAttrib
-local glDepthTest = gl.DepthTest
-local glDepthMask = gl.DepthMask
-local glTexture = gl.Texture
-local glColor = gl.Color
-local glBeginEnd = gl.BeginEnd
-local glTexture = gl.Texture
-local glDepthMask = gl.DepthMask
-local glDepthTest = gl.DepthTest
-local glPopAttrib = gl.PopAttrib
+local glDepthTest  = gl.DepthTest
+local glDepthMask  = gl.DepthMask
+local glTexture    = gl.Texture
+local glColor      = gl.Color
+local glBeginEnd   = gl.BeginEnd
+local glPopAttrib  = gl.PopAttrib
+local GL_QUADS           = GL.QUADS
+local GL_ALL_ATTRIB_BITS = GL.ALL_ATTRIB_BITS
 
-function gadget:DrawWorld ()  
+local lavaTexture = ":a:" .. "bitmaps/lava2.jpg"
+
+local mapSizeX = Game.mapSizeX
+local mapSizeY = Game.mapSizeY
+
+
+local function gadget:DrawWorld ()  
     if (SYNCED.lavaLevel) then
-		r = 0.8
-		DrawWorldTimer=DrawWorldTimer or Spring.GetTimer()		
+         --glColor(1-cm1,1-cm1-cm2,0.5,1)
 		
-         --gl.Color(1-cm1,1-cm1-cm2,0.5,1)
-		
-		--DrawGroundHuggingSquare(1-cm1,1-cm1-cm2,0.5,1,  0, 0, Game.mapX*512, Game.mapY*512 ,SYNCED.lavaLevel) --***map.width bla
-		DrawGroundHuggingSquare(1,1,1,1,  -1000, -1000, Game.mapX*512 + 1000, Game.mapY*512 + 1000,SYNCED.lavaLevel) --***map.width bla
-		--DrawGroundHuggingSquare(0,0.5,0.8,0.8,  0, 0, Game.mapX*512, Game.mapY*512 ,SYNCED.lavaLevel) --***map.width bla
+		--DrawGroundHuggingSquare(1-cm1,1-cm1-cm2,0.5,1, 0, 0, mapSizeX, mapSizeY, SYNCED.lavaLevel) --***map.width bla
+		DrawGroundHuggingSquare(1,1,1,1, -1000, -1000, mapSizeX + 1000, mapSizeY + 1000, SYNCED.lavaLevel) --***map.width bla
+		--DrawGroundHuggingSquare(0,0.5,0.8,0.8, 0, 0, mapSizeX, mapSizeY, SYNCED.lavaLevel) --***map.width bla
 	end
 end
 
-function DrawGroundHuggingSquare(red,green,blue,alpha,  x1,z1,x2,z2,   HoverHeight)
-	glPushAttrib(GL.ALL_ATTRIB_BITS)
+
+function DrawGroundHuggingSquare(red,green,blue,alpha, x1,z1,x2,z2, HoverHeight)
+	glPushAttrib(GL_ALL_ATTRIB_BITS)
 	glDepthTest(true)
 	glDepthMask(true)
-	glTexture(":a:bitmaps\\lava2.jpg")-- Texture file
+	glTexture(lavaTexture)  -- Texture file
 	glColor(red,green,blue,alpha)
-	glBeginEnd(GL.QUADS,DrawGroundHuggingSquareVertices,  x1,z1, x2,z2,  HoverHeight)
+	glBeginEnd(GL_QUADS, DrawGroundHuggingSquareVertices, x1,z1, x2,z2, HoverHeight)
 	glTexture(false)
 	glDepthMask(false)
 	glDepthTest(false)
@@ -167,8 +193,8 @@ function DrawGroundHuggingSquare(red,green,blue,alpha,  x1,z1,x2,z2,   HoverHeig
 end
 
 
-function DrawGroundHuggingSquareVertices(x1,z1, x2,z2,   HoverHeight)
-  local y=HoverHeight--+Spring.GetGroundHeight(x,z)  
+function DrawGroundHuggingSquareVertices(x1,z1, x2,z2, HoverHeight)
+  local y = HoverHeight  --+Spring.GetGroundHeight(x,z)  
   local s = 2+sin(SYNCED.frame/50)/10
   glTexCoord(-s,-s)
   glVertex(x1 ,y, z1)
@@ -183,4 +209,4 @@ function DrawGroundHuggingSquareVertices(x1,z1, x2,z2,   HoverHeight)
   glVertex(x2,y,z1)
 end
 
-end--ende unsync
+end  --UNSYNCED
