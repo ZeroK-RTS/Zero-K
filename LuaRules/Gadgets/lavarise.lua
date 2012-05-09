@@ -44,6 +44,16 @@ local nextMessageFrame = -1
 _G.lavaLevel = minheight - lavaRise - 20
 
 
+local function addTideRhym (targetLevel, speed, remainTime)
+	local newTide = {
+  	targetLevel = targetLevel,
+    speed       = speed,
+    remainTime  = remainTime
+  }
+	tideRhym[#tideRhym + 1] = newTide
+end
+
+
 function gadget:Initialize()
     if (modOptions.zkmode ~= "lavarise") then
 	    gadgetHandler:RemoveGadget()
@@ -62,17 +72,7 @@ function gadget:Initialize()
 end
 
 
-function addTideRhym (targetLevel, speed, remainTime)
-	local newTide = {
-  	targetLevel = targetLevel,
-    speed       = speed,
-    remainTime  = remainTime
-  }
-	tideRhym[#tideRhym + 1] = newTide
-end
-
-
-function updateLava (gameframe)
+local function updateLava (gameframe)
 	if (lavaGrow < 0 and lavaLevel < currentTide.targetLevel) 
 		or (lavaGrow > 0 and lavaLevel > currentTide.targetLevel) then
 		tideContinueFrame = gameframe + currentTide.remainTime * GAME_SPEED
@@ -96,6 +96,23 @@ function updateLava (gameframe)
 		end
 	end
   
+end
+
+
+local function lavaDeathCheck ()
+  local allUnits = spGetAllUnits()
+	for i = 1, #allUnits do
+    	local unitID = allUnits[i]
+		local unitDefID = spGetUnitDefID(unitID)
+	    if (unitDefID ~= terraunitDefID) then
+		    _,y,_ = spGetUnitBasePosition (unitID)
+			    if (y and y < lavaLevel) then 
+				    --Spring.AddUnitDamage (unitID,1000) 
+				    spDestroyUnit (unitID)
+				    --Spring.SpawnCEG("tpsmokecloud", x, y, z)
+			    end
+		end
+	end
 end
 
 
@@ -128,23 +145,6 @@ function gadget:GameFrame (f)
 end
 
 
-function lavaDeathCheck ()
-local allUnits = spGetAllUnits()
-	for i = 1, #allUnits do
-    	local unitID = allUnits[i]
-		local unitDefID = spGetUnitDefID(unitID)
-	    if (unitDefID ~= terraunitDefID) then
-		    _,y,_ = spGetUnitBasePosition (unitID)
-			    if (y and y < lavaLevel) then 
-				    --Spring.AddUnitDamage (unitID,1000) 
-				    spDestroyUnit (unitID)
-				    --Spring.SpawnCEG("tpsmokecloud", x, y, z)
-			    end
-		end
-	end
-end
-
-
 else
 --- UNSYNCED:
 
@@ -168,32 +168,7 @@ local mapSizeX = Game.mapSizeX
 local mapSizeY = Game.mapSizeY
 
 
-local function gadget:DrawWorld ()  
-    if (SYNCED.lavaLevel) then
-         --glColor(1-cm1,1-cm1-cm2,0.5,1)
-		
-		--DrawGroundHuggingSquare(1-cm1,1-cm1-cm2,0.5,1, 0, 0, mapSizeX, mapSizeY, SYNCED.lavaLevel) --***map.width bla
-		DrawGroundHuggingSquare(1,1,1,1, -1000, -1000, mapSizeX + 1000, mapSizeY + 1000, SYNCED.lavaLevel) --***map.width bla
-		--DrawGroundHuggingSquare(0,0.5,0.8,0.8, 0, 0, mapSizeX, mapSizeY, SYNCED.lavaLevel) --***map.width bla
-	end
-end
-
-
-function DrawGroundHuggingSquare(red,green,blue,alpha, x1,z1,x2,z2, HoverHeight)
-	glPushAttrib(GL_ALL_ATTRIB_BITS)
-	glDepthTest(true)
-	glDepthMask(true)
-	glTexture(lavaTexture)  -- Texture file
-	glColor(red,green,blue,alpha)
-	glBeginEnd(GL_QUADS, DrawGroundHuggingSquareVertices, x1,z1, x2,z2, HoverHeight)
-	glTexture(false)
-	glDepthMask(false)
-	glDepthTest(false)
-	glPopAttrib()
-end
-
-
-function DrawGroundHuggingSquareVertices(x1,z1, x2,z2, HoverHeight)
+local function DrawGroundHuggingSquareVertices(x1,z1, x2,z2, HoverHeight)
   local y = HoverHeight  --+Spring.GetGroundHeight(x,z)  
   local s = 2+sin(SYNCED.frame/50)/10
   glTexCoord(-s,-s)
@@ -207,6 +182,31 @@ function DrawGroundHuggingSquareVertices(x1,z1, x2,z2, HoverHeight)
   
   glTexCoord(s,-s)
   glVertex(x2,y,z1)
+end
+
+
+local function DrawGroundHuggingSquare(red,green,blue,alpha, x1,z1,x2,z2, HoverHeight)
+	glPushAttrib(GL_ALL_ATTRIB_BITS)
+	glDepthTest(true)
+	glDepthMask(true)
+	glTexture(lavaTexture)  -- Texture file
+	glColor(red,green,blue,alpha)
+	glBeginEnd(GL_QUADS, DrawGroundHuggingSquareVertices, x1,z1, x2,z2, HoverHeight)
+	glTexture(false)
+	glDepthMask(false)
+	glDepthTest(false)
+	glPopAttrib()
+end
+
+
+function gadget:DrawWorld ()  
+    if (SYNCED.lavaLevel) then
+         --glColor(1-cm1,1-cm1-cm2,0.5,1)
+		
+		--DrawGroundHuggingSquare(1-cm1,1-cm1-cm2,0.5,1, 0, 0, mapSizeX, mapSizeY, SYNCED.lavaLevel) --***map.width bla
+		DrawGroundHuggingSquare(1,1,1,1, -1000, -1000, mapSizeX + 1000, mapSizeY + 1000, SYNCED.lavaLevel) --***map.width bla
+		--DrawGroundHuggingSquare(0,0.5,0.8,0.8, 0, 0, mapSizeX, mapSizeY, SYNCED.lavaLevel) --***map.width bla
+	end
 end
 
 end  --UNSYNCED
