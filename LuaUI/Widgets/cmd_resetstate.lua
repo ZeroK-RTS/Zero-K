@@ -1,3 +1,4 @@
+--[[
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:GetInfo()
@@ -24,9 +25,9 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 -- donut unhide commands until they get icons!!
 function widget:CommandsChanged()
-	local units = Spring.GetSelectedUnits()
-	for i=1,#units do
-		local unitID = units[i]
+	--local units = Spring.GetSelectedUnits()
+	--for i=1,#units do
+	--	local unitID = units[i]
 		--local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
 		local customCommands = widgetHandler.customCommands
 		customCommands[#customCommands+1] = {
@@ -50,7 +51,7 @@ function widget:CommandsChanged()
 			--hidden  = true,
 			pos = {CMD_MOVE_STATE,CMD_FIRE_STATE, }, 
 		}
-	end
+	--end
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
@@ -74,3 +75,4 @@ function widget:Initialize()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+]]
