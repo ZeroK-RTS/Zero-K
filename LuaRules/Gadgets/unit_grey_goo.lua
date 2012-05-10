@@ -21,8 +21,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local CMD_GUARD = CMD.GUARD
-
+local CMD_FIRE_STATE = CMD.FIRE_STATE
+local CMD_MOVE_STATE = CMD.MOVE_STATE
+local CMD_GUARD      = CMD.GUARD
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -156,7 +157,10 @@ function gadget:GameFrame(f)
 				unit.progress = unit.progress - unit.defs.cost
 				local x,y,z = Spring.GetUnitPosition(unitIndex[i])
 				local newId = Spring.CreateUnit(unit.defs.spawns,x+math.random(-50,50),y,z+math.random(-50,50),math.random(2*math.pi),Spring.GetUnitTeam(unitIndex[i]))
-				Spring.GiveOrderToUnit(newId, CMD_GUARD, {unitIndex[i]}, {})
+				local states = Spring.GetUnitStates(unitIndex[i])
+				Spring.GiveOrderToUnit(newId, CMD_FIRE_STATE, {states.firestate}, 0)
+				Spring.GiveOrderToUnit(newId, CMD_MOVE_STATE, {states.movestate}, 0)
+				Spring.GiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
 			end
 			if unit.oldProgress ~= unit.progress then
 				unit.oldProgress = unit.progress
