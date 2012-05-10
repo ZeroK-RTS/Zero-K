@@ -1,4 +1,4 @@
-local versionName = "v2.27"
+local versionName = "v2.3"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground combat unit and gunships",
     author    = "msafwan",
-    date      = "May 5, 2012",
+    date      = "May 10, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -88,7 +88,7 @@ local alphaCONSTANT1g		= {500,0.4,0.4} -- balancing constant; effect behaviour. 
 
 --Move Command constant:
 local halfTargetBoxSize = {400, 0, 185, 50} --the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
-local cMD_DummyG = 248 --a fake command ID to flag an idle unit for pure avoidance. (arbitrary value, change if conflict with existing command)
+local cMD_DummyG = 248 --a fake command ID to flag an idle unit for pure avoidance. (arbitrary value, change if it overlap with existing command)
 local dummyIDg = "[]" --fake id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue) (arbitrary value, change if conflict with other widget)
 
 --Angle constant:
@@ -111,8 +111,8 @@ local velocityScalingCONSTANTg=1 --scale command lenght. (default= 1 multiplier)
 local velocityAddingCONSTANTg=10 --add or remove command lenght (default = 0 meter/second)
 
 --Engine based wreckID correction constant:
-local wreckageID_offset_multiplier = 0 --for Spring 0.82 this is 1500
-local wreckageID_offset_initial = 32000	--for Spring 0.82 this is 4500
+local wreckageID_offset_multiplier = 0 --for Spring 0.82 this is 1500. *Update: is obsolete. Its original function is to offset game's maxUnit based on ingame player count, which no longer needed.
+local wreckageID_offset_initial = 32000	--for Spring 0.82 this is 4500 *Update: is obsolete. Its original function is to offset game's initial gameStart's maxUnit, which no longer needed since we have 'Game.maxUnits' call-in.
 --curModID = upper(Game.modShortName)
 
 --Weapon Reload and Shield constant:
@@ -127,7 +127,7 @@ local consRetreatTimeoutG = 15
 --------------------------------------------------------------------------------
 --Variables:
 local unitInMotionG={} --store unitID
-local skippingTimerG={0,0, echoTimestamp=0, networkDelay=0, sumOfAllNetworkDelay=0, sumCounter=0}
+local skippingTimerG={0,0, echoTimestamp=0, networkDelay=0, averageDelay = 0.3, storedDelay = {}, index = 1, sumOfAllNetworkDelay=0, sumCounter=0} --variable: store the timing for next update, and store values for calculating average network delay.
 local commandIndexTableG= {} --store latest widget command for comparison
 local myTeamID_gbl=-1
 local myPlayerID=-1
@@ -206,6 +206,7 @@ function widget:Initialize()
 	if spec then widgetHandler:RemoveWidget() return false end
 	myTeamID_gbl= spGetMyTeamID()
 	
+	--[[ Old Method: find maxUnits heuristically...
 	--count players to offset the ID of wreckage
 	local playerIDList= Spring.GetPlayerList()
 	local numberOfPlayers=#playerIDList
@@ -214,11 +215,17 @@ function widget:Initialize()
 		if spectator then numberOfPlayers=numberOfPlayers-1 end
 	end
 	wreckageID_offset=wreckageID_offset_initial+ (numberOfPlayers-2)*wreckageID_offset_multiplier
+	--]]
+	
+	--New Method: use game call-in...
+	wreckageID_offset = Game.maxUnits
 	if (turnOnEcho == 1) then Spring.Echo("myTeamID_gbl(Initialize)" .. myTeamID_gbl) end
 end
 
 function widget:PlayerChanged(playerID)
 	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end
+	
+	--[[ Old Method: find maxUnits heuristically...
 	--count players to offset the ID of wreckage
 	local playerIDList= Spring.GetPlayerList()
 	local numberOfPlayers=#playerIDList
@@ -227,6 +234,10 @@ function widget:PlayerChanged(playerID)
 		if spectator then numberOfPlayers=numberOfPlayers-1 end
 	end
 	wreckageID_offset=wreckageID_offset_initial+ (numberOfPlayers-2)*wreckageID_offset_multiplier
+	--]]
+	
+	--New Method: use game call-in...
+	wreckageID_offset = Game.maxUnits
 end
 
 --execute different function at different timescale
@@ -511,18 +522,31 @@ end
 function CalculateNetworkDelay(reportingIn, skippingTimer, now)
 	if reportingIn == 0 then --report known delay statistic
 		local delay = 0
-		local instantaneousDelay = skippingTimer.networkDelay --delay current lag
-		local averageDelay = skippingTimer.sumOfAllNetworkDelay/skippingTimer.sumCounter --average delay
+		local instantaneousDelay = skippingTimer.networkDelay --present delay
+		--local averageDelay = skippingTimer.sumOfAllNetworkDelay/skippingTimer.sumCounter --average delay
+		
+		local averageDelay = skippingTimer.averageDelay
 		if instantaneousDelay < averageDelay then --bound all delay to be > than average delay
-			delay = averageDelay 
+			delay = averageDelay
 		else
 			delay = instantaneousDelay
 		end 
 		return delay
 	elseif reportingIn == 1 then --update delay statistic
 		skippingTimer.networkDelay = now - skippingTimer.echoTimestamp --get the delay between previous Command and the latest 'LUA message Receive'
-		skippingTimer.sumOfAllNetworkDelay=skippingTimer.sumOfAllNetworkDelay + skippingTimer.networkDelay --sum all the delay ever recorded
-		skippingTimer.sumCounter = skippingTimer.sumCounter + 1 --count all the delay ever recorded
+		--Method 1: use simple average [[
+		--skippingTimer.sumOfAllNetworkDelay=skippingTimer.sumOfAllNetworkDelay + skippingTimer.networkDelay --sum all the delay ever recorded
+		--skippingTimer.sumCounter = skippingTimer.sumCounter + 1 --count all the delay ever recorded
+		--]]
+		
+		--Method 2: use rolling average [[
+		skippingTimer.storedDelay[skippingTimer.index] = skippingTimer.networkDelay --store network delay value in a rolling table
+		skippingTimer.index = skippingTimer.index+1 --table index ++
+		if skippingTimer.index >= 12 then --roll the table/wrap around, so that the index circle the table
+			skippingTimer.index = 1
+		end
+		skippingTimer.averageDelay = skippingTimer.averageDelay + skippingTimer.networkDelay/10 - (skippingTimer.storedDelay[skippingTimer.index] or 0.3)/10 --add new delay and minus old delay, also use 0.3sec as the old delay if nothing is stored yet.
+		--]]
 		return skippingTimer
 	elseif reportingIn == 2 then --update delay statistic
 		skippingTimer.echoTimestamp = now	--remember the current time of sending ping
@@ -738,6 +762,7 @@ function GetUnitLOSRadius(unitID)
 	local losRadius =550 --arbitrary (scout LOS)
 	if unitDef~=nil then --if unitDef is not empty then use the following LOS
 		losRadius= unitDef.losRadius*32 --for some reason it was times 32
+		if unitDef["builder"] then losRadius = losRadius + extraLOSRadiusCONSTANTg end --add additional detection range for constructors
 	end
 	return (losRadius + extraLOSRadiusCONSTANTg)
 end
@@ -884,7 +909,7 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		local normalizingFactor=0
 
 		--count every enemy unit and sum its contribution to the obstacle/repulsor variable
-		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger)
+		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius)
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
 		--convert an angular command into a coordinate command
@@ -1256,7 +1281,7 @@ function GetTargetSubtendedAngle(unitID, targetCoordinate)
 end
 
 --sum the contribution from all enemy unit
-function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger)
+function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius)
 	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG
 	local smCONSTANT = smCONSTANTunitG --?
 	local distanceCONSTANT = distanceCONSTANTunitG
@@ -1269,7 +1294,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 	if (turnOnEcho == 1) then Spring.Echo("unitID(SumAllUnitAroundUnitID)" .. thisUnitID) end
 	if (surroundingUnits[1]~=nil) then --don't execute if no enemy unit exist
 		local graphSample={}
-		if normalizeObsGraph then
+		if normalizeObsGraph then --an option (default OFF) allow the obstacle graph to be normalized for experimenting purposes 
 			for i=1, 360+1, 1 do
 				graphSample[i]=0 --initialize content 360 points
 			end
@@ -1286,7 +1311,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 				end
 				if unitSeparation <(unitsSeparation[unitRectangleID] or 999) then --see if the enemy is maintaining distance
 					local relativeAngle 	= GetUnitRelativeAngle (thisUnitID, unitRectangleID)
-					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID)
+					local subtendedAngle	= GetUnitSubtendedAngle (thisUnitID, unitRectangleID, losRadius)
 
 					--get obstacle/ enemy/repulsor wave function
 					if impatienceTrigger==0 then --zero means that unit is impatient
@@ -1592,7 +1617,7 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 end
 
 --get enemy angular size with respect to unit's perspective
-function GetUnitSubtendedAngle (unitIDmain, unitID2)
+function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius)
 	local unitSize2 =32 --a commander size for an unidentified enemy unit
 	local unitDefID2= spGetUnitDefID(unitID2)
 	local unitDef2= UnitDefs[unitDefID2]
@@ -1604,7 +1629,7 @@ function GetUnitSubtendedAngle (unitIDmain, unitID2)
 	local unitSize = unitDef.xsize*8 --8 is the actual Distance per square
 	local separationDistance = 0
 	if (unitID2~=nil) then separationDistance = spGetUnitSeparation (unitIDmain, unitID2) --actual separation distance
-	else separationDistance = GetUnitLOSRadius(unitIDmain) --as far as unit's reported LOSradius
+	else separationDistance = losRadius -- GetUnitLOSRadius(unitIDmain) --as far as unit's reported LOSradius
 	end
 
 	local unit2SubtendedAngle = math.atan((unitSize + unitSize2)/separationDistance) --convert size and distance into radian (angle)
@@ -1781,6 +1806,8 @@ end
 --"gui_chili_integral_menu.lua" --Chili Integral Menu, by Licho, KingRaptor, Google Frog
 --10
 --Thanks to versus666 for his endless playtesting and creating idea for improvement & bug report (eg: messy command queue case, widget overriding user's command case, "avoidance may be bad for gunship" case, avoidance depending on detected enemy sonar, constructor's retreat timeout, ect)
+--11
+-- Ref: http://en.wikipedia.org/wiki/Moving_average#Simple_moving_average (rolling average)
 --------------------------------------------------------------------------------
 --Method Index:
 --  widget:Initialize()
