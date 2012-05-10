@@ -7,13 +7,13 @@ function gadget:GetInfo()
     name      = "Lag Monitor",
     desc      = "Gives away units of people who are lagging",
     author    = "KingRaptor",
-    date      = "9/5/2012",
+    date      = "10/5/2012",
     license   = "Public domain",
     layer     = 0,
     enabled   = true  --  loaded by default?
   }
 end
---Revision Million-th
+--Revision 25-th?
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
   
@@ -26,7 +26,8 @@ end
 --------------------------------------------------------------------------------
 local lineage = {}
 local afkTeams = {}
-local tickTockCounter = {}
+local tickTockCounter = {} --remember how many second a player is in AFK mode. Used to add delay before unit transfer commence. 
+local unstablePlayerCounter = {} --remember how many times a player was AFK. Used to de-merit a player from receiving any units.
 local unitAlreadyFinished = {}
 
 GG.Lagmonitor_activeTeams = {}
@@ -103,15 +104,16 @@ local function GetRecepient(allyTeam, laggers)
 	for i=1,#teams do
 		local leader = select(2, Spring.GetTeamInfo(teams[i]))
 		local name, active, spectator, _, _, _, _, _, _, customKeys = Spring.GetPlayerInfo(leader)
+		local deductElo = (unstablePlayerCounter[leader] or 0)*250
 		if active and not spectator and not laggers[leader] then	-- only consider giving to someone in position to take!
-			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = tonumber(customKeys.elo)}
+			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0) - deductElo)}
 		end
 	end
 
 	-- pick highest rank
 	for i=1,#candidatesForTake do
 		local player = candidatesForTake[i]
-		if (player.rank or 0) > highestRank then
+		if player.rank > highestRank then
 			highestRank = player.rank
 			target = player
 		end
@@ -160,6 +162,7 @@ function gadget:GameFrame(n)
 						local units = Spring.GetTeamUnits(team)
 						if units ~= nil and #units > 0 then 
 							laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
+							unstablePlayerCounter[players[i]] = (unstablePlayerCounter[players[i]] or 0) + 1 --mark player as unstable + 1
 						end
 					end
 				else --if not at all AFK or lagging: then...
@@ -201,7 +204,6 @@ function gadget:GameFrame(n)
 							lineage[units[j]] = team
 							Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
 						end
-					
 						GG.allowTransfer = false
 					end
 				end	-- if
