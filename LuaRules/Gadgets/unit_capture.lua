@@ -248,10 +248,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		
 		-- reload handling
 		if controllers[attackerID].postCaptureReload then
-			local frame = spGetGameFrame() + controllers[attackerID].postCaptureReload
+			local gameFrame = spGetGameFrame()
+			local frame = gameFrame + controllers[attackerID].postCaptureReload
 			spSetUnitRulesParam(attackerID, "selfReloadSpeedChange", 0, {inlos = true})
 			spSetUnitRulesParam(attackerID, "captureRechargeFrame", frame, {inlos = true})
-			GG.UpdateUnitAttributes(attackerID)
+			GG.UpdateUnitAttributes(attackerID, gameFrame)
 			reloading[frame] = reloading[frame] or {count = 0, data = {}}
 			reloading[frame].count = reloading[frame].count + 1
 			reloading[frame].data[reloading[frame].count] = attackerID
@@ -324,7 +325,7 @@ function gadget:GameFrame(f)
 			local unitID = reloading[f].data[i]
 			spSetUnitRulesParam(unitID, "selfReloadSpeedChange",1, {inlos = true})
 			spSetUnitRulesParam(unitID, "captureRechargeFrame", 0, {inlos = true})
-			GG.UpdateUnitAttributes(unitID)
+			GG.UpdateUnitAttributes(unitID, f)
 		end
 		reloading[f] = nil
 	end
@@ -424,8 +425,8 @@ function gadget:Initialize()
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		local teamID = Spring.GetUnitTeam(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
+		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
