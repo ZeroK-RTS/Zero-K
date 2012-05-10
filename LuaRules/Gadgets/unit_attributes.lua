@@ -36,6 +36,7 @@ local spSetUnitBuildSpeed   = Spring.SetUnitBuildSpeed
 local spSetUnitWeaponState  = Spring.SetUnitWeaponState
 local spGetUnitWeaponState  = Spring.GetUnitWeaponState
 
+local spGetUnitMoveTypeData    = Spring.GetUnitMoveTypeData
 local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
 local spSetAirMoveTypeData     = Spring.MoveCtrl.SetAirMoveTypeData
 local spSetGunshipMoveTypeData = Spring.MoveCtrl.SetGunshipMoveTypeData
@@ -140,9 +141,11 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 	
 	if not origUnitSpeed[unitID] then
 	
+  	local moveData = spGetUnitMoveTypeData(unitID)
+    
 		origUnitSpeed[unitID] = {
 			origSpeed = ud.speed,
-			--origReverseSpeed = ud.rspeed,
+			origReverseSpeed = (moveData.name == "ground") and moveData.maxReverseSpeed or ud.speed
 			origTurnRate = ud.turnRate,
 			origMaxAcc = ud.maxAcc,
 			origMaxDec = ud.maxDec,
@@ -187,7 +190,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 		elseif state.movetype == 2 then
 			spSetGroundMoveTypeData (unitID, {
 				maxSpeed        = state.origSpeed       *speedFactor,
-				--maxReverseSpeed = state.origReverseSpeed*speedFactor,
+				maxReverseSpeed = state.origReverseSpeed*speedFactor,
 				turnRate        = state.origTurnRate    *speedFactor,
 				accRate         = state.origMaxAcc      *speedFactor,
 				decRate         = state.origMaxDec      *decFactor
