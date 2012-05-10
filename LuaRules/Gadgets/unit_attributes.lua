@@ -64,14 +64,16 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
         return
     end
         
-    if not origUnitBuildSpeed[unitID] then
+    local unitDefID = ud.id
+
+    if not origUnitBuildSpeed[unitDefID] then
     
-        origUnitBuildSpeed[unitID] = {
+        origUnitBuildSpeed[unitDefID] = {
             buildSpeed = ud.buildSpeed,
         }
     end
 
-    local state = origUnitBuildSpeed[unitID]
+    local state = origUnitBuildSpeed[unitDefID]
 
     spSetUnitBuildSpeed(unitID, 
         state.buildSpeed*speedFactor, -- build
@@ -82,14 +84,15 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
 end
 
 local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
+	local unitDefID = ud.id
 	
-	if not origUnitReload[unitID] then
+	if not origUnitReload[unitDefID] then
 	
-		origUnitReload[unitID] = {
+		origUnitReload[unitDefID] = {
 			weapon = {},
 			weaponCount = #ud.weapons-1,
 		}
-		local state = origUnitReload[unitID]
+		local state = origUnitReload[unitDefID]
 		
 		for i = 0, state.weaponCount do
 			local wd = WeaponDefs[ud.weapons[i+1].weaponDef]
@@ -107,7 +110,7 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 		
 	end
 	
-	local state = origUnitReload[unitID]
+	local state = origUnitReload[unitDefID]
 	
 	for i = 0, state.weaponCount do
 		local w = state.weapon[i]
@@ -138,21 +141,22 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 end
 
 local function updateMovementSpeed(unitID, ud, speedFactor)	
+	local unitDefID = ud.id
 	
-	if not origUnitSpeed[unitID] then
+	if not origUnitSpeed[unitDefID] then
 	
-  	local moveData = spGetUnitMoveTypeData(unitID)
+		local moveData = spGetUnitMoveTypeData(unitID)
     
-		origUnitSpeed[unitID] = {
+		origUnitSpeed[unitDefID] = {
 			origSpeed = ud.speed,
-			origReverseSpeed = (moveData.name == "ground") and moveData.maxReverseSpeed or ud.speed
+			origReverseSpeed = (moveData.name == "ground") and moveData.maxReverseSpeed or ud.speed,
 			origTurnRate = ud.turnRate,
 			origMaxAcc = ud.maxAcc,
 			origMaxDec = ud.maxDec,
 			movetype = -1,
 		}
 		
-		local state = origUnitSpeed[unitID]
+		local state = origUnitSpeed[unitDefID]
 		
 		if ud.canFly then
 			if (ud.isFighter or ud.isBomber) then
@@ -166,7 +170,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 		
 	end
 	
-	local state = origUnitSpeed[unitID]
+	local state = origUnitSpeed[unitDefID]
 	local decFactor = speedFactor
 	if speedFactor <= 0 then
 		speedFactor = 0
@@ -202,8 +206,6 @@ end
 
 local function removeUnit(unitID)
 	GG.attUnits[unitID] = nil
-	origUnitSpeed[unitID] = nil
-	origUnitReload[unitID] = nil
 end
 
 function GG.UpdateUnitAttributes(unitID, frame)
