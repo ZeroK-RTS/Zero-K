@@ -1,13 +1,14 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v0.9 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v0.92 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
     date      = "May 7, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
     enabled   = true, --  loaded by default?
+	handler = true, -- allow this widget to use 'widgetHandler:FindWidget()'
   }
 end
 
@@ -38,27 +39,29 @@ local localGameFrame_G = 0 --//variable: get latest my gameFrame from GameFrame(
 local timeToComplete_G = 0 --//variable: store the estimated time for catching up during rejoining.
 local localLastFrameNum_G = 0 --//variable: used to calculate local game-frame rate.
 local ui_active_G = false --//variable:indicate whether UI is shown or hidden.
-local textToSpeechEnabled = true --//variable: used to properly disable/re-enable TTS when rejoining
+local ttsControlEnabled = true --//variable: used to properly disable/re-enable TTS when rejoining
 local averageLocalSpeed_G = {sumOfSpeed= 0, sumCounter= 0} --//variable: store the local-gameFrame speeds so that an average can be calculated.  
 local simpleMovingAverageLocalSpeed_G = {storage={},currentIndex = 1, currentAverage=30} --//variable: for calculating rolling average. Initial average is set at 30 (x1.0 gameSpeed)
 --------------------------------------------------------------------------------
-
+--[[
 if VFS.FileExists("Luaui/Config/ZK_data.lua") then
 	local configFile =  VFS.Include("Luaui/Config/ZK_data.lua")
-	textToSpeechEnabled = configFile["EPIC Menu"].config.epic_Text_To_Speech_Control_enable
-	if textToSpeechEnabled == nil then
-		textToSpeechEnabled = true
+	ttsControlEnabled = configFile["EPIC Menu"].config.epic_Text_To_Speech_Control_enable
+	if ttsControlEnabled == nil then
+		ttsControlEnabled = true
 	end
-end
+end --]]
 
 function widget:GameProgress(serverFrameNum) 
+	CheckTTSwidget()
 	serverFrameNum_G = serverFrameNum
+	Spring.Echo(widgetHandler:FindWidget("Text To Speech Control").options.enable)
 	local frameDistanceToFinish = serverFrameNum_G-localGameFrame_G
 	if frameDistanceToFinish >= 120 then
 		if not ui_active_G then
 			screen0:AddChild(window)
 			ui_active_G = true
-			if textToSpeechEnabled then
+			if ttsControlEnabled then
 				Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
 			end
 		end
@@ -66,7 +69,7 @@ function widget:GameProgress(serverFrameNum)
 		if ui_active_G then
 			screen0:RemoveChild(window)
 			ui_active_G = false
-			if textToSpeechEnabled then
+			if ttsControlEnabled then
 				Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " ENABLE TTS")
 			end		
 		end
@@ -120,6 +123,15 @@ function SimpleMovingAverage(localGameFrameRate)
 	localGameFrameRate = simpleMovingAverageLocalSpeed_G.currentAverage -- replace localGameFrameRate with its average value.
 
 	return localGameFrameRate
+end
+
+function CheckTTSwidget()
+	local widget = widgetHandler:FindWidget("Text To Speech Control")
+	if widget then --get all variable from TTS control widget.
+		ttsControlEnabled = widget.options.enable.value --get the value
+	else --If widget is not found, then 'Rejoin Progress widget' will not try to disable/enable TTS. It became neutral.
+		ttsControlEnabled = false --disable TTS control
+	end
 end
 
 ----------------------------------------------------------
