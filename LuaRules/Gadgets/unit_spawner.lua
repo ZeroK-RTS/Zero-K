@@ -125,7 +125,7 @@ end
 local function SetToList(set)
   local list = {}
   for k in pairs(set) do
-    table.insert(list, k)
+    list[#list+1] = k
   end
   return list
 end
@@ -317,7 +317,8 @@ local function DetectCpuLag()
   if paused then return end
   local n = Spring.GetGameFrame()
   local players = Spring.GetPlayerList()
-  for _, playerID in ipairs(players) do
+  for i=1, #players do
+    local playerID = players[i]
     local _, active, spectator, _, _, _, cpuUsage = Spring.GetPlayerInfo(playerID)
     if (cpuUsage > 0) then
       cpuUsages[playerID] = {cpuUsage=math.min(cpuUsage, 1.2), frame=n}

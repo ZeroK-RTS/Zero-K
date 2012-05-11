@@ -355,7 +355,8 @@ local function setupTerraunit(unitID, team, x, y, z)
 	
 	local allyTeamList = spGetAllyTeamList()
 	local _,_,_,_,_,unitAllyTeam = spGetTeamInfo(team)
-	for _,allyID in ipairs (allyTeamList) do
+	for i=1, #allyTeamList do
+		local allyID = allyTeamList[i]
 		if allyID ~= unitAllyTeam then
 			spSetUnitLosMask(unitID, allyID, {los=true, radar=true, prevLos=true, contRadar=true } )
 		end

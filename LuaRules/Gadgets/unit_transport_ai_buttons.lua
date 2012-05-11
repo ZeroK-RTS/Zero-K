@@ -162,17 +162,12 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-  if (cmdID == CMD_EMBARK) then
+  if (cmdID == CMD_EMBARK) or (cmdID == CMD_DISEMBARK) then
     local opt = {"alt"}
-    if (cmdOptions.shift) then table.insert(opt,"shift") end
+    if (cmdID == CMD_DISEMBARK) then opt[#opt+1] = "ctrl" end
+    if (cmdOptions.shift) then opt[#opt+1] = "shift" end
     GiveOrderToUnit(unitID, CMD_WAIT, {}, opt)
     SendToUnsynced("taiEmbark", unitID, teamID, true, cmdOptions.shift)
-    return false
-  elseif (cmdID == CMD_DISEMBARK) then
-    local opt = {"alt", "ctrl"}
-    if (cmdOptions.shift) then table.insert(opt,"shift") end
-    GiveOrderToUnit(unitID, CMD_WAIT, {}, opt)
-    SendToUnsynced("taiEmbark", unitID, teamID, false, cmdOptions.shift)
     return false
   end
   return true

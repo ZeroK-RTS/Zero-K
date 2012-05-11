@@ -14,7 +14,7 @@
 
 function gadget:GetInfo()
   return {
-    name      = "UnitEStallDisable",
+    name      = "Unit E-Stall Disable",
     desc      = "Deactivates units during energy stall",
     author    = "Licho",
     date      = "23.7.2007",
@@ -32,7 +32,6 @@ if (gadgetHandler:IsSyncedCode()) then
 
 --Speed-ups
 
-local insert            = table.insert
 local GiveOrderToUnit		= Spring.GiveOrderToUnit
 local GetUnitStates			= Spring.GetUnitStates
 local GetUnitTeam				= Spring.GetUnitTeam

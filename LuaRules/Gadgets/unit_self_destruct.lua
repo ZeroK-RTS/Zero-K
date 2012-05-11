@@ -39,17 +39,18 @@ end
 function gadget:GameFrame(n)
   for team,_ in pairs(deathTeams) do
     local teamUnits = Spring.GetTeamUnits(team)
-	local realUnits = 0
+    local realUnits = 0
     local selfDunits = {}
-    for _,u in ipairs(teamUnits) do
+    for i=1, #teamUnits do
+      local u = teamUnits[i]
       local selfDtime = Spring.GetUnitSelfDTime(u)
-	  local udid = Spring.GetUnitDefID(u)
-	  if not doesNotCountList[udid] then
-	    realUnits = realUnits + 1
-	    if selfDtime > 0 then
+      local udid = Spring.GetUnitDefID(u)
+      if not doesNotCountList[udid] then
+        realUnits = realUnits + 1
+        if selfDtime > 0 then
           selfDunits[#selfDunits + 1] = u
         end
-	  end
+      end
     end
     if #selfDunits / realUnits > 0.8 then
       Spring.GiveOrderToUnitArray(selfDunits, CMD.SELFD, {}, {})
@@ -62,16 +63,17 @@ function gadget:GameFrame(n)
   -- max 1 player, active and not a spec
   if n % 20 < 0.1 then
     local allylist = Spring.GetAllyTeamList()
-    for _,a in ipairs(allylist) do
+    for i=1,#allylist do
       repeat
+      local a = allylist[i]
       local teamlist = Spring.GetTeamList(a)
       if not teamlist then break end -- continue
       local activeTeams = 0
       for _,t in ipairs(teamlist) do
         local playerlist = Spring.GetPlayerList(t, true) -- active players
         if playerlist then
-          for _,p in ipairs(playerlist) do
-            local _,_,spec = Spring.GetPlayerInfo(p)
+          for j=1,#playerlist do
+            local _,_,spec = Spring.GetPlayerInfo(playerlist[j])
             if not spec then
               activeTeams = activeTeams + 1
             end

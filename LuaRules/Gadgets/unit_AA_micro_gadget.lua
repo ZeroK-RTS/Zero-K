@@ -708,7 +708,8 @@ function getAATargetsinRange(unitID, allyteam)
   local LOS
   local airbuff
   --Echo(units)
-  for i,targetID in ipairs(units) do
+  for i=1,#units do
+    local targetID = units[i]
     team = GetUnitAllyTeam(targetID)
     if not AreTeamsAllied(team, allyteam) then
       defID = GetUnitDefID(targetID)
@@ -945,7 +946,8 @@ function escortingAA(unitID, allyteam)
   local x, y, z = GetUnitPosition(unitID)
   local units = GetUnitsInCylinder(x, z, AAdef[allyteam].units[unitID].range / 2)
   local escort = 0
-  for i,AAID in ipairs(units) do
+  for i=1, #units do
+    local AAID = units[i]
     team = GetUnitAllyTeam(AAID)
     _, _, stun = UnitStun(AAID)
     if AreTeamsAllied(team, allyteam) and not stun then

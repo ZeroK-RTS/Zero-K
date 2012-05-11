@@ -169,7 +169,9 @@ function gadget:DrawWorldPreUnit()
 	--glBlending(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA)
 	glLineWidth(2)
 	glColor(.6,.6,.2,1)
-	for _,u in ipairs(spGetSelectedUnits()) do
+	local units = spGetSelectedUnits()
+	for i=1,#units do
+		u = units[i]
 		if repairerDefs[UnitDefs[spGetUnitDefID(u)].name] then
 			local x,y,z=spGetUnitPosition(u)
 			glPushMatrix()

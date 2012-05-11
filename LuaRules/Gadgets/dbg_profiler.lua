@@ -103,7 +103,8 @@ local function ArrayInsert(t, f, g)
   if (f) then
     local layer = g.ghInfo.layer
     local index = 1
-    for i,v in ipairs(t) do
+    for i=1,#t do
+      local v = t[i]
       if (v == g) then
         return -- already in the table
       end
@@ -117,8 +118,8 @@ end
 
 
 local function ArrayRemove(t, g)
-  for k,v in ipairs(t) do
-    if (v == g) then
+  for k=1, #t do
+    if (t[k] == g) then
       table.remove(t, k)
       -- break
     end
@@ -143,7 +144,8 @@ local function StartHook()
   end
 
   --// hook all existing callins
-  for _,callin in ipairs(CallInsList) do
+  for i=1, #CallInsList do
+    local callin = CallInsList[i]
     local callinGadgets = gh[callin .. "List"]
     for _,g in ipairs(callinGadgets or {}) do
       g[callin] = Hook(g,callin)

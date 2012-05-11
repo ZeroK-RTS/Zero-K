@@ -293,7 +293,7 @@ local function addFlying(_, unitID, unitDefID)
 		fx.options.allyTeam  = allyTeamID
 		fx.options.size = radius * (fx.options.sizeMod or 1)
 		fx.options.pos = {0, height/2, 0}
-		table.insert( particleIDs[unitID], Lups.AddParticles(fx.class,fx.options) )
+		particleIDs[unitID][#particleIDs[unitID] + 1] = Lups.AddParticles(fx.class,fx.options)
 	end
 end
 

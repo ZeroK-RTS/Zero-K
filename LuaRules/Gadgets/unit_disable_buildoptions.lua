@@ -96,11 +96,11 @@ function gadget:UnitCreated(unitID, unitDefID)
 				if (moveData and moveData.family and moveData.depth) then
 					if (moveData.family == "ship") then
 						if (-groundheight < moveData.depth) then
-							table.insert(disableTable, {buildoptionID, "Unit disabled: Water is too shallow here."})
+							disableTable[#disableTable + 1] = {buildoptionID, "Unit disabled: Water is too shallow here."}
 						end
 					elseif (moveData.family ~= "hover") then
 						if (-groundheight > moveData.depth) then
-							table.insert(disableTable, {buildoptionID, "Unit disabled: Water is too deep here."})
+							disableTable[#disableTable + 1] = {buildoptionID, "Unit disabled: Water is too deep here."}
 						end
 					end
 				end

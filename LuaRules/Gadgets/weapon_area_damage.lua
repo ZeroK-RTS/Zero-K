@@ -43,7 +43,8 @@ function gadget:GameFrame(f)
 		for i,w in pairs(explosionList) do
 			local ulist = Spring.GetUnitsInSphere(w.pos.x, w.pos.y, w.pos.z, w.radius)
 			if (ulist) then
-				for _,u in ipairs(ulist) do
+				for j=1, #ulist do
+					local u = ulist[j]
 					local ux, uy, uz = Spring.GetUnitPosition(u)
 					local damage = w.damage
 					if w.rangeFall ~= 0 then

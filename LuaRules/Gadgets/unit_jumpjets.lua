@@ -42,7 +42,6 @@ local coroutine   = coroutine
 local Sleep       = coroutine.yield
 local pairs       = pairs
 local assert      = assert
-local ipairs      = ipairs
 
 local pi2    = math.pi*2
 local random = math.random

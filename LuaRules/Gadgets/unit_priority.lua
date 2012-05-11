@@ -68,6 +68,9 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 --  SYNCED
 --------------------------------------------------------------------------------
+local spGetTeamList		= Spring.GetTeamList
+local spGetTeamResources	= Spring.GetTeamResources
+
 
 local function SetReserved(teamID, value)
 	TeamReserved[teamID] = value or 0
@@ -230,8 +233,9 @@ end
 function gadget:GameFrame(n) 
 	if n % 32 == 15 then 
 		TeamScale = {}
-	
-		for _,teamID in ipairs(Spring.GetTeamList()) do 
+		local teams = spGetTeamList()
+		for i=1,#teams do
+			local teamID = teams[i]
 			prioUnits = TeamPriorityUnits[teamID] or {}
 			local prioSpending = 0
 			local lowPrioSpending = 0
@@ -248,47 +252,47 @@ function gadget:GameFrame(n)
 			
 			SendToUnsynced("PriorityStats", teamID,  prioSpending, lowPrioSpending, n)   
 
-			local level, _, pull, income, expense, _, _, recieved = Spring.GetTeamResources(teamID, "metal")
-			local elevel, _, epull, eincome, eexpense, _, _, erecieved = Spring.GetTeamResources(teamID, "energy")
+			local level, _, pull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal")
+			local elevel, _, epull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy")
 			
-            if TeamReserved[teamID] and (level < TeamReserved[teamID] or elevel < TeamReserved[teamID]) then -- below reserved level, low and normal no spending
-                TeamScale[teamID] = {0,0}
+			if TeamReserved[teamID] and (level < TeamReserved[teamID] or elevel < TeamReserved[teamID]) then -- below reserved level, low and normal no spending
+				TeamScale[teamID] = {0,0}
 			elseif TeamReserved[teamID] and TeamReserved[teamID] > 0 and -- approach reserved level, less low and normal spending
-                    (level < TeamReserved[teamID] + pull or elevel < TeamReserved[teamID] + epull) then 
+			(level < TeamReserved[teamID] + pull or elevel < TeamReserved[teamID] + epull) then 
                     
                 -- both these values are positive and at least one is less than 1
-                local mRatio = (level - TeamReserved[teamID])/pull
-                local eRatio = (elevel - TeamReserved[teamID])/epull
+			local mRatio = (level - TeamReserved[teamID])/pull
+			local eRatio = (elevel - TeamReserved[teamID])/epull
               
-                local spare
-                if mRatio < eRatio then 
-                    spare = (income + recieved + level) - TeamReserved[teamID] - prioSpending
-                else
-                    spare = (eincome + erecieved + elevel) - TeamReserved[teamID] - prioSpending
-                end
-                
-                local normalSpending = pull - lowPrioSpending - prioSpending
-                
-                if spare > 0 then
-                    if normalSpending <= 0 then
-                        if lowPrioSpending ~= 0 then
-                            TeamScale[teamID] = {0,spare/lowPrioSpending}
-                        else
-                            TeamScale[teamID] = {0,0}
-                        end
-                    elseif spare > normalSpending then
-                        spare = spare - normalSpending
-                        if spare > 0 and lowPrioSpending ~= 0 then
-                            TeamScale[teamID] = {1,spare/lowPrioSpending}
-                        else
-                            TeamScale[teamID] = {1,0}
-                        end
-                    elseif spare > 0 then
-                        TeamScale[teamID] = {spare/normalSpending,0}
-                    end
-                else
-                    TeamScale[teamID] = {0,0}
-                end
+			local spare
+			if mRatio < eRatio then 
+			    spare = (income + recieved + level) - TeamReserved[teamID] - prioSpending
+			else
+			    spare = (eincome + erecieved + elevel) - TeamReserved[teamID] - prioSpending
+			end
+			
+			local normalSpending = pull - lowPrioSpending - prioSpending
+			
+			if spare > 0 then
+			    if normalSpending <= 0 then
+				 if lowPrioSpending ~= 0 then
+				     TeamScale[teamID] = {0,spare/lowPrioSpending}
+				 else
+				     TeamScale[teamID] = {0,0}
+				 end
+			    elseif spare > normalSpending then
+				 spare = spare - normalSpending
+				 if spare > 0 and lowPrioSpending ~= 0 then
+				     TeamScale[teamID] = {1,spare/lowPrioSpending}
+				 else
+				     TeamScale[teamID] = {1,0}
+				 end
+			    elseif spare > 0 then
+				 TeamScale[teamID] = {spare/normalSpending,0}
+			    end
+			else
+			    TeamScale[teamID] = {0,0}
+			end
                 
 			elseif (prioSpending > 0 or lowPrioSpending > 0) then
 				
@@ -308,7 +312,7 @@ function gadget:GameFrame(n)
 				end 
 			end
             
-            SendToUnsynced("MetalReserveState", teamID, TeamReserved[teamID] or 0) 
+		SendToUnsynced("MetalReserveState", teamID, TeamReserved[teamID] or 0) 
 		end
 
 		TeamPriorityUnits = {}

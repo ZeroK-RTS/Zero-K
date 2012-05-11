@@ -47,8 +47,7 @@ function gadget:Explosion(w, x, y, z, owner)
 		if not noCreate[owner] then
 			--if not Spring.GetGroundBlocked(x,z) then
 			if UseUnitResource(owner, "m", spawn_defs_id[w].cost) then
-				table.insert(createList, 
-                    {name = spawn_defs_id[w].name, owner = owner, x=x,y=y,z=z, expire=spawn_defs_id[w].expire, feature = spawn_defs_id[w].feature})
+				createList[#createList+1] = {name = spawn_defs_id[w].name, owner = owner, x=x,y=y,z=z, expire=spawn_defs_id[w].expire, feature = spawn_defs_id[w].feature}
 				return true
 			end
 		else

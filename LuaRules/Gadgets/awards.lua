@@ -303,7 +303,8 @@ function gadget:Initialize()
 	_G.resourceInfo = resourceInfo
 	
 	local tempTeamList = Spring.GetTeamList()
-	for _, team in ipairs(tempTeamList) do
+	for i=1, #tempTeamList do
+		local team = tempTeamList[i]
 		--Spring.Echo('team', team)
 		if team ~= gaiaTeamID then
 			totalTeams = totalTeams + 1
@@ -536,8 +537,9 @@ function gadget:GameFrame(n)
 	end
 	
 	if not sentAwards then 
-	
-		for _, unitID in ipairs(spGetAllUnits()) do
+		local units = spGetAllUnits()
+		for i=1,#units do
+			local unitID = units[i]
 			local teamID = spGetUnitTeam(unitID)
 			local unitDefID = spGetUnitDefID(unitID)
 			gadget:UnitDestroyed(unitID, unitDefID, teamID)
@@ -778,7 +780,8 @@ local awardDescs =
 
 function gadget:Initialize()
 	local tempTeamList = Spring.GetTeamList()
-	for _, team in ipairs(tempTeamList) do
+	for i=1, #tempTeamList do
+		local team = tempTeamList[i]
 		--Spring.Echo('team', team)
 		if team ~= gaiaTeamID then
 			totalTeams = totalTeams + 1

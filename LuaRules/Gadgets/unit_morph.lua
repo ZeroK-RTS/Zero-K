@@ -703,7 +703,7 @@ function gadget:Initialize()
   PWUnits = GG.PlanetWars and GG.PlanetWars.units or {}
 
   if (type(GG.UnitRanked)~="table") then GG.UnitRanked = {} end
-  table.insert(GG.UnitRanked, UnitRanked)
+  GG.UnitRanked[#GG.UnitRanked+1] =  UnitRanked
 
   --// get the morphDefs
   morphDefs = include("LuaRules/Configs/morph_defs.lua")
@@ -1450,7 +1450,7 @@ local function split(msg,sep)
   local s=sep or '|'
   local t={}
   for e in string.gmatch(msg..s,'([^%'..s..']+)%'..s) do
-    table.insert(t,e)
+    t[#t+1] = e
   end
   return t
 end

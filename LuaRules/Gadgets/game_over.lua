@@ -146,15 +146,19 @@ end
 -- used during initialization
 local function CheckAllUnits()
 	aliveCount = {}
-	for _,teamID in ipairs(spGetTeamList()) do
+	local teams = spGetTeamList()
+	for i=1,#teams do
+		local teamID = teams[i]
 		if teamID ~= gaiaTeam then
 			aliveCount[teamID] = 0
 		end
 	end
-	for _, unitID in ipairs(spGetAllUnits()) do
-		 local teamID = spGetUnitTeam(unitID)
-		 local unitDefID = spGetUnitDefID(unitID)
-		 gadget:UnitFinished(unitID, unitDefID, teamID)
+	local units = spGetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local teamID = spGetUnitTeam(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
+		gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 end
 
@@ -222,8 +226,9 @@ local function ProcessLastAlly()
     local allylist = spGetAllyTeamList()
     local activeAllies = 0
     local lastActive = nil
-    for _,a in ipairs(allylist) do
+    for i=1,#allylist do
 		repeat
+		local a = allylist[i]
 		if (a == gaiaAllyTeamID) then break end -- continue
 		if (destroyedAlliances[a]) then break end -- continue
 		local teamlist = spGetTeamList(a)

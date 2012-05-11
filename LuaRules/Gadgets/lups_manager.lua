@@ -71,7 +71,11 @@ else
 -- speed ups + some table functions
 --
 
-local tinsert = table.insert
+--local tinsert = table.insert
+local tinsert = function(tab, insert)
+  tab[#tab+1] = insert
+end
+
 local type  = type
 local pairs = pairs
 
@@ -168,8 +172,8 @@ local function UnitCloaked(_,unitID,unitDefID,teamID)
   end
 
   if (particleIDs[unitID]) then
-    for _,fxID in ipairs(particleIDs[unitID]) do
-      Lups.RemoveParticles(fxID)
+    for i=1,#particleIDs[unitID] do
+      Lups.RemoveParticles(particleIDs[unitID][i])
     end
   end
   particleIDs[unitID] = {}
@@ -208,8 +212,8 @@ local function UnitDecloaked(_,unitID,unitDefID,teamID)
   end
 
   if (particleIDs[unitID]) then
-    for _,fxID in ipairs(particleIDs[unitID]) do
-      Lups.RemoveParticles(fxID)
+    for i=1,#particleIDs[unitID] do
+      Lups.RemoveParticles(particleIDs[unitID][i])
     end
   end
   particleIDs[unitID] = {}
@@ -264,9 +268,9 @@ end
 local function ReinitializeUnitFX()
   --// clear old FXs
   for _,unitFxIDs in pairs(particleIDs) do
-    for _,fxID in ipairs(unitFxIDs) do
-      Lups.RemoveParticles(fxID)
-    end
+    for i=1,#unitFxIDs do
+      Lups.RemoveParticles(unitFxIDs[i])
+    end    
   end
   particleIDs = {}
 
@@ -328,9 +332,9 @@ function gadget:Shutdown()
 
   if (initialized) then
     for _,unitFxIDs in pairs(particleIDs) do
-      for _,fxID in ipairs(unitFxIDs) do
-        Lups.RemoveParticles(fxID)
-      end
+      for i=1,#unitFxIDs do
+	Lups.RemoveParticles(unitFxIDs[i])
+      end    
     end
     particleIDs = {}
   end
