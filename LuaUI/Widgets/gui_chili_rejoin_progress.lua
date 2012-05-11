@@ -53,9 +53,8 @@ if VFS.FileExists("Luaui/Config/ZK_data.lua") then
 end --]]
 
 function widget:GameProgress(serverFrameNum) 
-	CheckTTSwidget()
+	ttsControlEnabled = CheckTTSwidget()
 	serverFrameNum_G = serverFrameNum
-	Spring.Echo(widgetHandler:FindWidget("Text To Speech Control").options.enable)
 	local frameDistanceToFinish = serverFrameNum_G-localGameFrame_G
 	if frameDistanceToFinish >= 120 then
 		if not ui_active_G then
@@ -126,12 +125,14 @@ function SimpleMovingAverage(localGameFrameRate)
 end
 
 function CheckTTSwidget()
+	local ttsValue
 	local widget = widgetHandler:FindWidget("Text To Speech Control")
 	if widget then --get all variable from TTS control widget.
-		ttsControlEnabled = widget.options.enable.value --get the value
+		ttsValue = widget.options.enable.value --get the value
 	else --If widget is not found, then 'Rejoin Progress widget' will not try to disable/enable TTS. It became neutral.
-		ttsControlEnabled = false --disable TTS control
+		ttsValue = false --disable TTS control
 	end
+	return ttsValue
 end
 
 ----------------------------------------------------------
