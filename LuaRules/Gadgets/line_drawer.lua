@@ -55,9 +55,16 @@ else
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local glVertex    = gl.Vertex
+local glLineWidth = gl.LineWidth
+local glColor     = gl.Color
+local glBeginEnd  = gl.BeginEnd
+local GL_LINES    = GL.LINES
+
+
 local function Line(line)
-   gl.Vertex(line[1], line[2], line[3])
-   gl.Vertex(line[4], line[5], line[6])
+   glVertex(line[1], line[2], line[3])
+   glVertex(line[4], line[5], line[6])
 end
 
 function gadget:DrawWorld()
@@ -67,18 +74,18 @@ function gadget:DrawWorld()
 	local i = 1
 	while i <= lines.count do
 		
-		gl.LineWidth(3)
+		glLineWidth(3)
 		
-		gl.Color(1,0,0,1)
-		gl.BeginEnd(GL.LINES, Line, lines.data[i])
+		glColor(1,0,0,1)
+		glBeginEnd(GL_LINES, Line, lines.data[i])
 		i = i + 1
 		
-		gl.Color(0,1,0,1)
-		gl.BeginEnd(GL.LINES, Line, lines.data[i])
+		glColor(0,1,0,1)
+		glBeginEnd(GL_LINES, Line, lines.data[i])
 		i = i + 1
 		
-		gl.Color(0,0,1,1)
-		gl.BeginEnd(GL.LINES, Line, lines.data[i])
+		glColor(0,0,1,1)
+		glBeginEnd(GL_LINES, Line, lines.data[i])
 		i = i + 1
 	end
 	

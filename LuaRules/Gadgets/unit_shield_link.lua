@@ -21,10 +21,13 @@ end
 local spGetUnitPosition		= Spring.GetUnitPosition
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetUnitTeam			= Spring.GetUnitTeam
+local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
 local spGetUnitIsStunned	= Spring.GetUnitIsStunned
 local spGetUnitIsActive		= Spring.GetUnitIsActive
 local spGetUnitShieldState	= Spring.GetUnitShieldState
 local spSetUnitShieldState	= Spring.SetUnitShieldState
+local spGetTeamInfo			= Spring.GetTeamInfo
+
 
 if gadgetHandler:IsSyncedCode() then
 
@@ -51,7 +54,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if ud.shieldWeaponDef then
 		local shieldWep = WeaponDefs[ud.shieldWeaponDef]
 		local x,y,z = spGetUnitPosition(unitID)
-		local allyTeam = Spring.GetUnitAllyTeam(unitID)
+		local allyTeam = spGetUnitAllyTeam(unitID)
 		shieldTeams[allyTeam] = shieldTeams[allyTeam] or {}
 		shieldUnit = {
 			shieldPower = shieldWep.shieldPower,
@@ -69,7 +72,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
-	local allyTeam = Spring.GetUnitAllyTeam(unitID)
+	local allyTeam = spGetUnitAllyTeam(unitID)
 	if ud.shieldWeaponDef and shieldTeams[allyTeam] then
 		local shieldUnit = shieldTeams[allyTeam][unitID]
 		shieldTeams[allyTeam][unitID] = nil
@@ -81,7 +84,7 @@ end
 
 function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local ud = UnitDefs[unitDefID]
-	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeam)
+	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam)
 	if ud.shieldWeaponDef then
 		if shieldTeams[oldAllyTeam] and shieldTeams[oldAllyTeam][unitID] then
 			local shieldUnit = shieldTeams[oldAllyTeam][unitID]
@@ -90,7 +93,7 @@ function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 			shieldUnit.link = {}
 		end
 			
-		local allyTeam = Spring.GetUnitAllyTeam(unitID)
+		local allyTeam = spGetUnitAllyTeam(unitID)
 		shieldTeams[allyTeam] = shieldTeams[allyTeam] or {}
 		shieldTeams[allyTeam][unitID] = shieldUnit
 	end
@@ -246,11 +249,13 @@ local glLineWidth = gl.LineWidth
 local glDepthTest = gl.DepthTest
 local glPopAttrib = gl.PopAttrib
 
-local isUnitInView = Spring.IsUnitInView
-local areTeamsAllied = Spring.AreTeamsAllied
-local getUnitTeam = Spring.GetUnitTeam
-local getUnitLosState = Spring.GetUnitLosState
-local spValidUnitID = Spring.ValidUnitID
+local GL_LINE_BITS = GL.LINE_BITS
+local GL_LINES     = GL.LINES
+
+local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
+local spGetSpectatingState = Spring.GetSpectatingState
+local spIsUnitInView       = Spring.IsUnitInView
+local spValidUnitID        = Spring.ValidUnitID
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -261,8 +266,8 @@ end
 
 
 local function DrawFunc()
-	myAllyID = Spring.GetMyAllyTeamID()
-	local spec, fullview = Spring.GetSpectatingState()
+	myAllyID = spGetMyAllyTeamID()
+	local spec, fullview = spGetSpectatingState()
 	spec = spec or fullview
 	
 	for allyID, connections in spairs(SYNCED.shieldConnections) do
@@ -275,8 +280,8 @@ local function DrawFunc()
 		local l2
 		
 		if (spec or allyID == myAllyID) then
-			l1 = isUnitInView(u1)
-			l2 = isUnitInView(u2)
+			l1 = spIsUnitInView(u1)
+			l2 = spIsUnitInView(u2)
 		end
 
 		if ((l1 or l2) and (spValidUnitID(u1) and spValidUnitID(u2))) then
@@ -290,12 +295,12 @@ end
 	
 function gadget:DrawWorld()
 	if SYNCED.shieldConnections and snext(SYNCED.shieldConnections) then
-		glPushAttrib(GL.LINE_BITS)
+		glPushAttrib(GL_LINE_BITS)
 	
 		glDepthTest(true)
 		glColor(1,0,1,math.random()*0.3+0.2)
 		glLineWidth(1)
-		glBeginEnd(GL.LINES, DrawFunc)
+		glBeginEnd(GL_LINES, DrawFunc)
 	
 		glDepthTest(false)
 		glColor(1,1,1,1)

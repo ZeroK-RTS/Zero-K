@@ -27,7 +27,10 @@ local abs             		= math.abs
 local pi             		= math.pi
 local ceil 			  		= math.ceil
 local sqrt 					= math.sqrt
+local pow					= math.pow
 local random 		  		= math.random
+local max					= math.max
+
 local spAdjustHeightMap     = Spring.AdjustHeightMap
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
@@ -55,6 +58,7 @@ local spGetTeamInfo			= Spring.GetTeamInfo
 local spGetUnitHealth		= Spring.GetUnitHealth 
 local spSetUnitHealth		= Spring.SetUnitHealth
 local spGetCommandQueue 	= Spring.GetCommandQueue
+local spGetUnitTeam		= Spring.GetUnitTeam	
 local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam	
 local spAddHeightMap		= Spring.AddHeightMap	
 local spGetUnitPosition		= Spring.GetUnitPosition	
@@ -91,11 +95,7 @@ local bumpyMap = {}
 for i = 0, 64, 8 do
 	bumpyMap[i] = {}
 	for j = 0, 64, 8 do
-		if math.abs(i-32) > math.abs(j-32) then
-			bumpyMap[i][j] = 32 - math.abs(i-32)
-		else
-			bumpyMap[i][j] = 32 - math.abs(j-32)
-		end
+		bumpyMap[i][j] = 32 - max(abs(i-32), abs(j-32))
 	end
 end
 
@@ -284,8 +284,8 @@ local function pointHeight(xs, ys, zs, x, z, m, h, xdis)
 end
 
 local function bumpyFunc(x,z,bumpyType)
-	local sign = math.pow(-1,((x - x%64)/64 + (z - z%64)/64))
-	--return math.pow(-1,((x - x%8)/8 + (z - z%8)/8))*3*(bumpyType + 1)
+	local sign = pow(-1,((x - x%64)/64 + (z - z%64)/64))
+	--return pow(-1,((x - x%8)/8 + (z - z%8)/8))*3*(bumpyType + 1)
 	return bumpyMap[x%64][z%64]*sign*(bumpyType + 1)
 end
 
@@ -316,7 +316,7 @@ local function checkPointCreation(terraform_type, volumeSelection, orHeight, new
 		return true
 	end
 	
-	if math.abs(orHeight-newHeight) == 0 then
+	if abs(orHeight-newHeight) == 0 then
 		return false
 	end
 
@@ -720,7 +720,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				if edgeCount > 0 then
 					local height = abs(segment[i].point[j].diffHeight)
 					if height > 30 then
-						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(math.floor(height/maxHeightDifference)-1)*0.5 + math.floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
+						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(floor(height/maxHeightDifference)-1)*0.5 + floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
 					end
 				end
 			end
@@ -733,7 +733,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
 			local pos = segment[i].position
 			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
-			local scale = terraUnitLeash/math.sqrt(vx^2 + vz^2)
+			local scale = terraUnitLeash/sqrt(vx^2 + vz^2)
 			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
 
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
@@ -788,7 +788,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
-				spSetUnitTooltip(id, "Estimated Cost: " .. math.floor(pyramidCostEstimate + totalCost))
+				spSetUnitTooltip(id, "Estimated Cost: " .. floor(pyramidCostEstimate + totalCost))
 			end
 		end
 		
@@ -1212,7 +1212,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				if edgeCount > 0 then
 					local height = abs(segment[i].point[j].diffHeight)
 					if height > 30 then
-						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(math.floor(height/maxHeightDifference)-1)*0.5 + math.floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
+						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(floor(height/maxHeightDifference)-1)*0.5 + floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
 					end
 				end
 			end
@@ -1225,7 +1225,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
 			local pos = segment[i].position
 			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
-			local scale = terraUnitLeash/math.sqrt(vx^2 + vz^2)
+			local scale = terraUnitLeash/sqrt(vx^2 + vz^2)
 			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
 			
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
@@ -1273,7 +1273,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
-				spSetUnitTooltip(id, "Estimated Cost: " .. math.floor(pyramidCostEstimate + totalCost))
+				spSetUnitTooltip(id, "Estimated Cost: " .. floor(pyramidCostEstimate + totalCost))
 			end
 		end
 		
@@ -1768,7 +1768,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				if edgeCount > 0 then
 					local height = abs(segment[i].point[j].diffHeight)
 					if height > 30 then
-						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(math.floor(height/maxHeightDifference)-1)*0.5 + math.floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
+						pyramidCostEstimate = pyramidCostEstimate + ((height - height%maxHeightDifference)*(floor(height/maxHeightDifference)-1)*0.5 + floor(height/maxHeightDifference)*(height%maxHeightDifference))*volumeCost
 					end
 				end
 			end
@@ -1781,7 +1781,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
 			local pos = segment[i].position
 			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
-			local scale = terraUnitLeash/math.sqrt(vx^2 + vz^2)
+			local scale = terraUnitLeash/sqrt(vx^2 + vz^2)
 			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
 			
             local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
@@ -1834,7 +1834,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
-				spSetUnitTooltip(id, "Estimated Cost: " .. math.floor(pyramidCostEstimate + totalCost))
+				spSetUnitTooltip(id, "Estimated Cost: " .. floor(pyramidCostEstimate + totalCost))
 			end
 		end
 		
@@ -2535,7 +2535,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		-- diamond pyramids
 		--local maxHeightDifferenceLocal = (abs(extraPoint[i].x-extraPoint[i].supportX) + abs(extraPoint[i].z-extraPoint[i].supportZ))*maxHeightDifference/8+maxHeightDifference
 		-- circular pyramids
-		local maxHeightDifferenceLocal = math.sqrt((extraPoint[i].x-extraPoint[i].supportX)^2 + (extraPoint[i].z-extraPoint[i].supportZ)^2)*maxHeightDifference/8+maxHeightDifference 
+		local maxHeightDifferenceLocal = sqrt((extraPoint[i].x-extraPoint[i].supportX)^2 + (extraPoint[i].z-extraPoint[i].supportZ)^2)*maxHeightDifference/8+maxHeightDifference 
 		for j = 1, extraPoint[i].check.count do
 			local x = extraPoint[i].check.pos[j].x + extraPoint[i].x
 			local z = extraPoint[i].check.pos[j].z + extraPoint[i].z
@@ -2711,7 +2711,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 
 	-- Bug Safety
 	for i = 1, extraPoints do
-		if math.abs(extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult) > 3000 then
+		if abs(extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult) > 3000 then
 			Spring.Echo("Terraform:")
 			Spring.Echo("Strange pyramid construction")
 			Spring.Echo("Destroying Terraform Unit")
@@ -2789,7 +2789,7 @@ function gadget:GameFrame(n)
 				if n - terraformUnit[id].lastUpdate > updateFrequency then
 					local costDiff = health - terraformUnit[id].lastHealth
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
-					spSetUnitTooltip(id, terraUnitTooltip .. math.floor(terraformUnit[id].totalSpent))
+					spSetUnitTooltip(id, terraUnitTooltip .. floor(terraformUnit[id].totalSpent))
 					local updateVar = updateTerraform(diffProgress,health,id,i,costDiff) 
 					while updateVar == -1 do
 						if updateTerraformCost(id) then
@@ -2841,11 +2841,11 @@ function gadget:GameFrame(n)
 							-- bring terraunit towards con
 							if i == 1 and spValidUnitID(cQueue[i].params[1]) and terraformUnit[cQueue[i].params[1] ] then
 								local cx, _, cz = spGetUnitPosition(constructorTable[currentCon])
-								local team = Spring.GetUnitTeam(constructorTable[currentCon])
+								local team = spGetUnitTeam(constructorTable[currentCon])
 								if cx and team then
 									local tpos = terraformUnit[cQueue[i].params[1] ].positionAnchor
 									local vx, vz = cx - tpos.x, cz - tpos.z
-									local scale = terraUnitLeash/math.sqrt(vx^2 + vz^2)
+									local scale = terraUnitLeash/sqrt(vx^2 + vz^2)
 									
 									local x,z = tpos.x + scale*vx, tpos.z + scale*vz
 									local y = CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
@@ -3393,7 +3393,7 @@ function gadget:Initialize()
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local teamID = Spring.GetUnitTeam(unitID)
+		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 end

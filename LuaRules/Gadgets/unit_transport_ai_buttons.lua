@@ -35,6 +35,7 @@ local CMD_ONOFF         = CMD.ONOFF;
 local CMD_REPEAT        = CMD.REPEAT;
 local CMD_MOVE_STATE    = CMD.MOVE_STATE;
 local CMD_FIRE_STATE    = CMD.FIRE_STATE;
+local CMD_ONOFF         = CMD.ONOFF
 
 local gaiaID = Spring.GetGaiaTeamID();
 
@@ -138,7 +139,7 @@ end
 
 
 function gadget:UnitGiven(unitID) -- minor hack unrelated to transport ai - enable captured unit
-    GiveOrderToUnit(unitID, CMD.ONOFF, { 1 }, { })
+    GiveOrderToUnit(unitID, CMD_ONOFF, { 1 }, { })
 end
 
 

@@ -66,8 +66,29 @@ local spammedError = false
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local GetUnitIsActive = Spring.GetUnitIsActive
-local spValidUnitID = Spring.ValidUnitID
+local sqrt  = math.sqrt
+local round = math.round
+local min   = math.min
+local max   = math.max
+
+local spValidUnitID       = Spring.ValidUnitID
+local spGetUnitDefID      = Spring.GetUnitDefID
+local spGetUnitAllyTeam   = Spring.GetUnitAllyTeam
+local spGetUnitPosition   = Spring.GetUnitPosition
+local spGetUnitIsStunned  = Spring.GetUnitIsStunned
+local spGetUnitStates     = Spring.GetUnitStates
+local spGetUnitHealth     = Spring.GetUnitHealth
+local spGetUnitResources  = Spring.GetUnitResources
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spSetUnitTooltip    = Spring.SetUnitTooltip
+local spCallCOBScript     = Spring.CallCOBScript
+
+local spGetTeamResources  = Spring.GetTeamResources
+local spAddTeamResource   = Spring.AddTeamResource
+local spUseTeamResource   = Spring.UseTeamResource
+local spGetTeamInfo       = Spring.GetTeamInfo
+
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -159,7 +180,7 @@ end
 -- local functions
 
 local function energyToExtraM(energy)  
-	return -1+math.sqrt(1+(energy*0.25))
+	return -1+sqrt(1+(energy*0.25))
 end
 
 
@@ -240,7 +261,7 @@ local function GetGridColor(conversion, isExcess)
                         local z = bad-good
                         -- n - good, since we are inside "good-bad" now
                         -- n must not be bigger than z
-                        nRemain = math.min(n-good, z)
+                        nRemain = min(n-good, z)
                         
                         g = 1 - nRemain/z
                         r = (nRemain/z)^.3
@@ -256,8 +277,8 @@ end
 -- PYLONS
 
 local function AddPylonToGrid(unitID)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
-	local pX,_,pZ = Spring.GetUnitPosition(unitID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
+	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 
 	local newGridID = 0
@@ -355,8 +376,8 @@ local function AddPylonToGrid(unitID)
 end
 
 local function AddPylon(unitID, unitDefID, unitOverdrive, range)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
-	local pX,_,pZ = Spring.GetUnitPosition(unitID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
+	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 
 	pylon[allyTeamID][unitID] = {
@@ -377,7 +398,7 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	-- check for mexes
 	if unitOverdrive then 
 		for mid, orgMetal in pairs(mexes[allyTeamID][0]) do
-			local mX,_,mZ = Spring.GetUnitPosition(mid)
+			local mX,_,mZ = spGetUnitPosition(mid)
 			if (mid == unitID) then -- mex as pylon
 			--if (pX-mX)^2 + (pZ-mZ)^2 <= range^2 and not takenMexId[mid] then
 			
@@ -396,7 +417,7 @@ local function AddPylon(unitID, unitDefID, unitOverdrive, range)
 	--[[
 	for eid, state in pairs(ai.plant) do
 		if (state == 0) then
-			local eX,_,eZ = Spring.GetUnitPosition(eid)
+			local eX,_,eZ = spGetUnitPosition(eid)
 			if (pX-eX)^2 + (pZ-eZ)^2 < PYLON_ENERGY_RANGESQ then
 				ai.plant[eid] = 1
 				pylon[allyTeamID][unitID].nearEnergy[eid] = true
@@ -431,10 +452,10 @@ local function DestoryGrid(allyTeamID,oldGridID)
 end
 
 local function ReactivatePylon(unitID)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 	
-	local pX,_,pZ = Spring.GetUnitPosition(unitID)
+	local pX,_,pZ = spGetUnitPosition(unitID)
 	
 	pylon[allyTeamID][unitID].active = true
 
@@ -442,7 +463,7 @@ local function ReactivatePylon(unitID)
 	--[[
 	for eid, state in pairs(ai.plant) do
 		if state == 0 then
-			local eX,_,eZ = Spring.GetUnitPosition(eid)
+			local eX,_,eZ = spGetUnitPosition(eid)
 			if (pX-eX)^2 + (pZ-eZ)^2 < PYLON_ENERGY_RANGESQ then
 				state = 1
 				pylon[allyTeamID][unitID].nearEnergy[eid] = true
@@ -456,7 +477,7 @@ local function ReactivatePylon(unitID)
 end
 
 local function DeactivatePylon(unitID)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 	
 	local oldGridID = pylon[allyTeamID][unitID].gridID
@@ -479,7 +500,7 @@ local function DeactivatePylon(unitID)
 	--[[
 	for eid,_ in pairs(energyList) do
 		ai.plant[eid] = 0
-		local eX,_,eZ = Spring.GetUnitPosition(eid)
+		local eX,_,eZ = spGetUnitPosition(eid)
 		-- check for nearby pylons
 		for pid, pylonData in pairs(pylon[allyTeamID]) do
 			if (pylonData.x-eX)^2 + (pylonData.z-eZ)^2 < PYLON_ENERGY_RANGESQ and pylonData.active then
@@ -495,13 +516,13 @@ local function DeactivatePylon(unitID)
 end
 
 local function RemovePylon(unitID)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if not pylon[allyTeamID][unitID] then
 		--Spring.Echo("RemovePylon not pylon[allyTeamID][unitID] " .. unitID)
 		return
 	end
 	
-	local pX,_,pZ = Spring.GetUnitPosition(unitID)
+	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 	
 	local oldGridID = pylon[allyTeamID][unitID].gridID
@@ -526,7 +547,7 @@ local function RemovePylon(unitID)
 		--[[
 		for eid,_ in pairs(energyList) do
 			ai.plant[eid] = 0
-			local eX,_,eZ = Spring.GetUnitPosition(eid)
+			local eX,_,eZ = spGetUnitPosition(eid)
 			-- check for nearby pylons
 			for pid, pylonData in pairs(pylon[allyTeamID]) do
 				if (pylonData.x-eX)^2 + (pylonData.z-eZ)^2 < PYLON_ENERGY_RANGESQ  and pylonData.active then
@@ -550,7 +571,7 @@ local function RemovePylon(unitID)
 		local mexGridID = 0
 		takenMexId[mid] = false
 		
-		local mX, _, mZ = Spring.GetUnitPosition(mid)
+		local mX, _, mZ = spGetUnitPosition(mid)
 						
 		for pid, pylonData in pairs(pylon[allyTeamID]) do
 			if pid == mid then
@@ -611,7 +632,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 				gridEnergySpent[i] = 0
 				gridMetalGain[i] = 0
 				for unitID, orgMetal in pairs(allyTeamMexes[i]) do -- loop mexes
-					local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
+					local stunned_or_inbuld = spGetUnitIsStunned(unitID)
 					if stunned_or_inbuld then
 						orgMetal = 0
 					end
@@ -637,15 +658,15 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							allyE = allyE - gridE
 							energyWasted = allyE
 							for unitID, orgMetal in pairs(allyTeamMexes[i]) do
-								local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
+								local stunned_or_inbuld = spGetUnitIsStunned(unitID)
 								if stunned_or_inbuld then
 									orgMetal = 0
 								end
 								local mexE = gridE*(orgMetal * orgMetal)/ gridMetalSquared 
 								local metalMult = energyToExtraM(mexE)
-								Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
+								spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
 								local thisMexM = orgMetal + orgMetal * metalMult
-								Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
+								spCallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
  
 								maxedMetalProduction = maxedMetalProduction + thisMexM
 								maxedBaseMetal = maxedBaseMetal + orgMetal
@@ -658,10 +679,11 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									mexBaseMetal[unitID] = orgMetal
 								end
 								
-								local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
-								if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
+                local unitDefID = spGetUnitDefID(unitID)
+								if not pylonDefs[unitDefID].keeptooltip then
+                  local unitDef = UnitDefs[unitDefID]
 									if unitDef then
-										Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  \nEnergy: -" .. math.round(mexE,2))
+										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
 									else
 										if not spammedError then
 											Spring.Echo("unitDefID missing for maxxed metal extractor")
@@ -675,9 +697,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					end 
 					
 					local metalMult = energyToExtraM(mexE)
-					Spring.SetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
+					spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5)
 					local thisMexM = orgMetal + orgMetal * metalMult
-					Spring.CallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
+					spCallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
 					
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedBaseMetal = summedBaseMetal + orgMetal
@@ -689,13 +711,14 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 						mexBaseMetal[unitID] = orgMetal
 					end
 					
-					local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
-					if not pylonDefs[Spring.GetUnitDefID(unitID)].keeptooltip then
+          local unitDefID = spGetUnitDefID(unitID)
+					if not pylonDefs[unitDefID].keeptooltip then
+            local unitDef = UnitDefs[unitDefID]
 						if unitDef then
 							if (metalMult < 1.5) then
-								Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2))
+								spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  Energy: -" .. round(mexE,2))
 							else
-								Spring.SetUnitTooltip(unitID,"Makes: " .. math.round(orgMetal,2) .. " + Overdrive: +" .. math.round(metalMult*100,0) .. "%  Energy: -" .. math.round(mexE,2) .. " \nConnect more energy sources to produce additional metal")
+								spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  Energy: -" .. round(mexE,2) .. " \nConnect more energy sources to produce additional metal")
 							end
 						else
 							if not spammedError then
@@ -769,8 +792,8 @@ function gadget:GameFrame(n)
 			--// Check if pylons changed their active status (emp, reverse-build, ..)
 			for unitID, pylonData in pairs(pylon[allyTeamID]) do
 				if spValidUnitID(unitID) then
-					local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
-					local states = Spring.GetUnitStates(unitID)
+					local stunned_or_inbuld = spGetUnitIsStunned(unitID)
+					local states = spGetUnitStates(unitID)
 					local currentlyActive = (not stunned_or_inbuld) and states and states.active
 					if (currentlyActive) and (not pylonData.active) then
 						ReactivatePylon(unitID)
@@ -792,11 +815,11 @@ function gadget:GameFrame(n)
 				local teamID = allyTeamData.team[i]
 				teamEnergy[teamID] = {totalChange = 0, num = teamID}
 				local te = teamEnergy[teamID]
-				te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = Spring.GetTeamResources(teamID, "energy")
+				te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = spGetTeamResources(teamID, "energy")
 				local incTakeNE = (lastTeamNe[teamID] and lastTeamNe[teamID] > 0 and te.eInc -lastTeamNe[teamID]) or te.eInc
                 teamIncome = teamIncome + incTakeNE
 				if (te.eCur ~= nil) then 
-					te.eTax = incTakeNE * math.max(0, math.min(1, (te.eCur - te.eInc) / (te.eMax - HIDDEN_STORAGE))) -- don't take more than you make!
+					te.eTax = incTakeNE * max(0, min(1, (te.eCur - te.eInc) / (te.eMax - HIDDEN_STORAGE))) -- don't take more than you make!
 					if te.eCur - te.eTax > te.eMax - HIDDEN_STORAGE then
                         te.eTax = te.eCur - (te.eMax - HIDDEN_STORAGE)
                     end
@@ -838,7 +861,7 @@ function gadget:GameFrame(n)
                     --teamEcho(teamID, teamID .. ",   REAL: " .. te.eInc .. "   -" .. te.eExp)
                     --teamEcho(teamID, teamID .. ",   INC: " .. inc)
 					if (inc > 0) then  
-						local fillRatio = math.max(0, (te.eCur - te.eInc) / (te.eMax - HIDDEN_STORAGE))
+						local fillRatio = max(0, (te.eCur - te.eInc) / (te.eMax - HIDDEN_STORAGE))
 						local ne = inc * fillRatio   -- actual energy used for overdrive depends on fill ratio. At 50% of storage, 50% of income is used 
                         --teamEcho(teamID, teamID .. ",   CUR: " .. te.eCur .. ",   MAX: " .. te.eMax  .. ",   HIDE: " .. HIDDEN_STORAGE)
                         --teamEcho(teamID, teamID .. ",   INC: " .. inc .. ",   FR: " .. fillRatio )
@@ -856,9 +879,9 @@ function gadget:GameFrame(n)
 				maxGridCapacity[i] = 0
 				if not allyTeamData.nilGrid[i] then
 					for unitID,_ in pairs(allyTeamData.grid[i].pylon) do
-						local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID)
+						local stunned_or_inbuild = spGetUnitIsStunned(unitID)
 						if (not stunned_or_inbuild) then
-							local _,_,em,eu = Spring.GetUnitResources(unitID)
+							local _,_,em,eu = spGetUnitResources(unitID)
 							maxGridCapacity[i] = maxGridCapacity[i] + (em or 0) - (eu or 0)
 						end
 					end
@@ -869,11 +892,11 @@ function gadget:GameFrame(n)
 			for unitID, pylonData in pairs(pylon[allyTeamID]) do
 				if pylonData.neededLink then
 					if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
-						Spring.SetUnitRulesParam(unitID,"lowpower",1, {inlos = true})
+						spSetUnitRulesParam(unitID,"lowpower",1, {inlos = true})
 						lowPowerUnits.inner.count = lowPowerUnits.inner.count + 1
 						lowPowerUnits.inner.units[lowPowerUnits.inner.count] = unitID
 					else
-						Spring.SetUnitRulesParam(unitID,"lowpower",0, {inlos = true})
+						spSetUnitRulesParam(unitID,"lowpower",0, {inlos = true})
 					end
 				end
 			end
@@ -898,7 +921,7 @@ function gadget:GameFrame(n)
 					local te = teamEnergy[teamID]
 					--Spring.Echo(teamID .. ",   Refund: " .. energyWasted*( te.eMax - HIDDEN_STORAGE - te.eCur)/totalFreeStorage)
 					changeTeamEnergy(te, energyWasted*( te.eMax - HIDDEN_STORAGE - te.eCur)/totalFreeStorage)
-					--Spring.AddTeamResource(teamID, "e", energyWasted*( eMax - HIDDEN_STORAGE - eCur)/totalFreeStorage)
+					--spAddTeamResource(teamID, "e", energyWasted*( eMax - HIDDEN_STORAGE - eCur)/totalFreeStorage)
                 end
 				energyWasted = 0
 			else
@@ -909,7 +932,7 @@ function gadget:GameFrame(n)
                     totalRealInc = totalRealInc + te.eInc
 					--Spring.Echo(teamID .. ",   Refund fill: " .. te.eMax - HIDDEN_STORAGE - te.eCur)
                     changeTeamEnergy(te, te.eMax - HIDDEN_STORAGE - te.eCur)
-					--Spring.AddTeamResource(teamID, "e", ( eMax - HIDDEN_STORAGE - eCur))
+					--spAddTeamResource(teamID, "e", ( eMax - HIDDEN_STORAGE - eCur))
 				end
 				energyWasted = energyWasted - totalFreeStorage
 			end	
@@ -921,24 +944,24 @@ function gadget:GameFrame(n)
                 lastTeamNe[teamID] = te.totalChange - (te.taxChange or 0)
                 --teamEcho(teamID, teamID .. ",   Real E Change: " .. te.totalChange)
 				if te.totalChange > 0 then
-					Spring.AddTeamResource(teamID, "e", te.totalChange)
+					spAddTeamResource(teamID, "e", te.totalChange)
 					teamODEnergy[teamID] = 0 
 				elseif te.totalChange < 0 then
-					Spring.UseTeamResource(teamID, "e", -te.totalChange)
+					spUseTeamResource(teamID, "e", -te.totalChange)
 					teamODEnergy[teamID] = -te.totalChange
 				end
 			end 
 			
 			--// Income For non-Gridded mexes
 			for unitID, orgMetal in pairs(mexes[allyTeamID][0]) do
-				local stunned_or_inbuld = Spring.GetUnitIsStunned(unitID)
+				local stunned_or_inbuld = spGetUnitIsStunned(unitID)
 				if stunned_or_inbuld then
 					orgMetal = 0
 				end
 				summedBaseMetal = summedBaseMetal + orgMetal
                 
-				Spring.SetUnitRulesParam(unitID, "overdrive", 1)
-				Spring.CallCOBScript(unitID, "SetSpeed", 0, orgMetal * 500) 
+				spSetUnitRulesParam(unitID, "overdrive", 1)
+				spCallCOBScript(unitID, "SetSpeed", 0, orgMetal * 500) 
 				
 				if mexByID[unitID].refundTeamID then
 					local teamID = mexByID[unitID].refundTeamID
@@ -950,12 +973,13 @@ function gadget:GameFrame(n)
 					end
 				end
 
-				local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 				summedMetalProduction = summedMetalProduction + orgMetal
-				local pylonDef = pylonDefs[Spring.GetUnitDefID(unitID)]
+        local unitDefID = spGetUnitDefID(unitID)
+				local pylonDef = pylonDefs[unitDefID]
 				if pylonDef and not pylonDef.keeptooltip then
+        	local unitDef = UnitDefs[unitDefID]
 					if unitDef then
-						Spring.SetUnitTooltip(unitID,"Metal Extractor - Makes: " .. math.round(orgMetal,2) .. " Not connected to Grid")
+						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
 					else
 						if not spammedError then
 							Spring.Echo("unitDefID missing for ungridded mex")
@@ -974,7 +998,7 @@ function gadget:GameFrame(n)
 				pylonData.color = GetGridColor(conversion, false)
 				
 				if not pylonData.overdrive then
-					local unitDefID = Spring.GetUnitDefID(unitID)
+					local unitDefID = spGetUnitDefID(unitID)
 					local unitDef = unitDefID and UnitDefs[unitDefID]
 					if not unitDef then
 						if not spammedError then
@@ -984,9 +1008,9 @@ function gadget:GameFrame(n)
 					else
 						if not pylonDefs[unitDefID].keeptooltip then
 							if grid ~= 0 then
-								Spring.SetUnitTooltip(unitID,"GRID: "  .. math.round(gridEnergySpent[grid],2) .. "/" .. math.round(maxGridCapacity[grid],2) .. "E => " .. math.round(gridMetalGain[grid],2).."M")
+								spSetUnitTooltip(unitID,"GRID: "  .. round(gridEnergySpent[grid],2) .. "/" .. round(maxGridCapacity[grid],2) .. "E => " .. round(gridMetalGain[grid],2).."M")
 							else
-								Spring.SetUnitTooltip(unitID,unitDef.humanName .. " - Currently Disabled")
+								spSetUnitTooltip(unitID,unitDef.humanName .. " - Currently Disabled")
 							end
 						end
 					end
@@ -1027,7 +1051,7 @@ function gadget:GameFrame(n)
 						
 						sendTeamInformationToAwards(teamID, baseShare, odShare, te.totalChange)
 						
-						Spring.AddTeamResource(teamID, "m", odShare + baseShare)
+						spAddTeamResource(teamID, "m", odShare + baseShare)
 						--Spring.Echo(teamID .. " got " .. (odShare + baseShare))
 						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, baseShare, odShare, te.totalChange, teamIncome) 
 					end
@@ -1044,7 +1068,7 @@ end
 -- MEXES
 
 local function AddMex(unitID, teamID, metalMake)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if (allyTeamID) then
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
 		
@@ -1053,9 +1077,9 @@ local function AddMex(unitID, teamID, metalMake)
 			mexByID[unitID].refundTime = MEX_REFUND_TIME
 		end
 		
-		Spring.CallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
+		spCallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
 		local mexGridID = 0
-		local mX, _, mZ = Spring.GetUnitPosition(unitID)
+		local mX, _, mZ = spGetUnitPosition(unitID)
 		for pid, pylonData in pairs(pylon[allyTeamID]) do
 			if unitID == pid then -- self OD mexes
 			--if pylonData.overdrive and pylonData.mexes < PYLON_MEX_LIMIT and (pylonData.x-mX)^2 + (pylonData.z-mZ)^2 <= pylonData.mexRange^2  then
@@ -1105,14 +1129,14 @@ local function RemoveMex(unitID)
 		mexes[mex.allyTeamID][mex.gridID][unitID] = nil
 		mexByID[unitID] = nil
 	else
-		local x,_,z = Spring.GetUnitPosition(unitID)
+		local x,_,z = spGetUnitPosition(unitID)
 		Spring.MarkerAddPoint(x,0,z,"inconsistent mex entry 124125_1")
 	end
 	
 	for allyTeam, _ in pairs(mexes) do
 		for i = 0, allyTeamInfo[allyTeam].grids do
 			if (mexes[allyTeam][i][unitID] ~= nil) then
-				local x,_,z = Spring.GetUnitPosition(unitID)
+				local x,_,z = spGetUnitPosition(unitID)
 				Spring.MarkerAddPoint(x,0,z,"inconsistent mex entry 124125_0")
 			end
 		end
@@ -1125,12 +1149,12 @@ end
 -- ENERGY
 --[[
 local function AddEnergy(unitID, unitDefID, unitTeam)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 	ai.plant[unitID] = 0
 	
 	-- check for nearby pylons
-	local eX,_,eZ = Spring.GetUnitPosition(unitID)
+	local eX,_,eZ = spGetUnitPosition(unitID)
 	for pid, pylonData in pairs(pylon[allyTeamID]) do
 		if (pylonData.x-eX)^2 + (pylonData.z-eZ)^2 < PYLON_ENERGY_RANGESQ and pylonData.active then
 			ai.plant[unitID] = 1
@@ -1142,7 +1166,7 @@ local function AddEnergy(unitID, unitDefID, unitTeam)
 end
 
 local function RemoveEnergy(unitID, unitDefID, unitTeam)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 	ai.plant[unitID] = nil
 	
@@ -1163,9 +1187,9 @@ function gadget:Initialize()
 	_G.pylon = pylon
 	_G.lowPowerUnits = lowPowerUnits
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
 		if (mexDefs[unitDefID]) then
-			local inc = Spring.GetUnitRulesParam(unitID, "mexIncome")
+			local inc = spGetUnitRulesParam(unitID, "mexIncome")
 			if inc then
 				AddMex(unitID, false, inc)
 			end
@@ -1184,7 +1208,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (mexDefs[unitDefID]) then
-		local inc = Spring.GetUnitRulesParam(unitID, "mexIncome")
+		local inc = spGetUnitRulesParam(unitID, "mexIncome")
 		if inc then
 			AddMex(unitID, unitTeam, inc)
 		end
@@ -1201,20 +1225,20 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
-	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID)
-	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
+	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID)
+	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeamID)
 	
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (mexDefs[unitDefID]) then 
-			local inc = Spring.GetUnitRulesParam(unitID, "mexIncome")
+			local inc = spGetUnitRulesParam(unitID, "mexIncome")
 			AddMex(unitID, false, inc)
 		end
 		
 		if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
-			local _,_,_,_,build  = Spring.GetUnitHealth(unitID)
+			local _,_,_,_,build = spGetUnitHealth(unitID)
 			if (build == 1) then
 				AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
-				--Spring.Echo(Spring.GetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
+				--Spring.Echo(spGetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
 			end
 		end
 		--if (energyDefs[unitDefID]) then
@@ -1225,8 +1249,8 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	local _,_,_,_,_,newAllyTeam = Spring.GetTeamInfo(teamID)
-	local _,_,_,_,_,oldAllyTeam = Spring.GetTeamInfo(oldTeamID)
+	local _,_,_,_,_,newAllyTeam = spGetTeamInfo(teamID)
+	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeamID)
 	
 	if (newAllyTeam ~= oldAllyTeam) then
 		if (mexDefs[unitDefID] and mexByID[unitID]) then 
@@ -1262,34 +1286,41 @@ end
 else  -- UNSYNCED
 -------------------------------------------------------------------------------------
 
-local glVertex = gl.Vertex
-local isUnitInView = Spring.IsUnitInView
-local areTeamsAllied = Spring.AreTeamsAllied
-local getUnitTeam = Spring.GetUnitTeam
-local getUnitLosState = Spring.GetUnitLosState
-local spValidUnitID = Spring.ValidUnitID
-
+local spValidUnitID      = Spring.ValidUnitID
+local isUnitInView       = Spring.IsUnitInView
+local getUnitTeam        = Spring.GetUnitTeam
+local getUnitLosState    = Spring.GetUnitLosState
 local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitDefID     = Spring.GetUnitDefID
 local spGetUnitBasePosition = Spring.GetUnitBasePosition
+local spGetUnitPosition  = Spring.GetUnitPosition
+
+local spGetLocalTeamID   = Spring.GetLocalTeamID
+local spGetMyAllyTeamID  = Spring.GetMyAllyTeamID
+local spGetTeamList      = Spring.GetTeamList
+local spGetTeamUnits     = Spring.GetTeamUnits
+local areTeamsAllied     = Spring.AreTeamsAllied
+local spGetSpectatingState = Spring.GetSpectatingState
+local spGetActiveCommand = Spring.GetActiveCommand
+local spTraceScreenRay   = Spring.TraceScreenRay
+local spGetMouseState    = Spring.GetMouseState
+
+local glVertex        = gl.Vertex
 local glPolygonOffset = gl.PolygonOffset
 local glDepthTest     = gl.DepthTest
-local glCallList = gl.CallList
+local glCallList      = gl.CallList
 local glColor         = gl.Color
 local glBeginEnd      = gl.BeginEnd
-local glCreateList      = gl.CreateList
-local glPushMatrix = gl.PushMatrix
-local glPopMatrix = gl.PopMatrix
-local glTranslate = gl.Translate
-local spGetActiveCommand = Spring.GetActiveCommand
-local glScale = gl.Scale
-local spTraceScreenRay = Spring.TraceScreenRay
-local spGetMouseState = Spring.GetMouseState
-local GL_QUADS = GL.QUADS
-local GL_TRIANGLE_FAN        = GL.TRIANGLE_FAN
-local spGetMyAllyTeamID = Spring.GetMyAllyTeamID
-local spGetTeamList = Spring.GetTeamList
-local spGetTeamUnits = Spring.GetTeamUnits
+local glCreateList    = gl.CreateList
+local glPushMatrix    = gl.PushMatrix
+local glPopMatrix     = gl.PopMatrix
+local glTranslate     = gl.Translate
+local glScale         = gl.Scale
+
+local GL_QUADS        = GL.QUADS
+local GL_TRIANGLE_FAN = GL.TRIANGLE_FAN
+
+local Util_DrawGroundCircle = gl.Utilities.DrawGroundCircle
 
 local powerTexture = 'Luaui/Images/energy.png'
 
@@ -1298,7 +1329,7 @@ local floor = math.floor
 local circlePolys = 0 -- list for circles
 
 function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome)
-  if (teamID ~= Spring.GetLocalTeamID()) then return end
+  if (teamID ~= spGetLocalTeamID()) then return end
   if (Script.LuaUI('MexEnergyEvent')) then
     Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome)
   end
@@ -1328,13 +1359,13 @@ local function DrawArray(ar, unitID)  -- renders lines from unitID to array meme
 	if (not spValidUnitID(unitID)) then return end 
 	
 	--local uvisible = isUnitInView(unitID)
-	local ux,uy,uz = Spring.GetUnitPosition(unitID)
+	local ux,uy,uz = spGetUnitPosition(unitID)
 	
 	for id,_ in spairs(ar) do		
 		if (spValidUnitID(id)) then 
 			glVertex(ux,uy,uz)
 			--if (uvisible or isUnitInView(id)) then
-				glVertex(Spring.GetUnitPosition(id))
+				glVertex(spGetUnitPosition(id))
 			--end 
 		end 
 	end
@@ -1342,8 +1373,8 @@ end
 
 --[[
 local function DrawPylonEnergyLines()
-	myAllyID = Spring.GetMyAllyTeamID()
-	local spec, fullview = Spring.GetSpectatingState()
+	myAllyID = spGetMyAllyTeamID()
+	local spec, fullview = spGetSpectatingState()
 	spec = spec or fullview
 
   	local pylon = SYNCED.pylon
@@ -1363,8 +1394,8 @@ local function DrawPylonEnergyLines()
 end 
 --]]
 local function DrawPylonMexLines()
-	myAllyID = Spring.GetMyAllyTeamID()
-	local spec, fullview = Spring.GetSpectatingState()
+	myAllyID = spGetMyAllyTeamID()
+	local spec, fullview = spGetSpectatingState()
 	spec = spec or fullview
 
   	local pylon = SYNCED.pylon
@@ -1383,8 +1414,8 @@ local function DrawPylonMexLines()
 end 
 
 local function DrawPylonLinkLines()
-	myAllyID = Spring.GetMyAllyTeamID()
-	local spec, fullview = Spring.GetSpectatingState()
+	myAllyID = spGetMyAllyTeamID()
+	local spec, fullview = spGetSpectatingState()
 	spec = spec or fullview
 
   	local pylon = SYNCED.pylon
@@ -1431,7 +1462,7 @@ local function HighlightPylons(selectedUnitDefID)
 			glColor(color[1],color[2], color[3], color[4])
 
 			local x,y,z = spGetUnitBasePosition(id)
-			gl.Utilities.DrawGroundCircle(x,z, radius)
+			Util_DrawGroundCircle(x,z, radius)
 		end 
 	end 
 	
@@ -1448,7 +1479,7 @@ local function HighlightPylons(selectedUnitDefID)
 				glColor(disabledColor)
 --				coords[1] = floor((coords[1]+8)/16)*16
 				--coords[3] = floor((coords[3]+8)/16)*16
-				gl.Utilities.DrawGroundCircle(x,z, radius)
+				Util_DrawGroundCircle(x,z, radius)
 
 				--[[glPushMatrix()
 				glTranslate(unpack(coords))
@@ -1466,10 +1497,10 @@ local function HighlightPylons(selectedUnitDefID)
 	if SYNCED.pylon and snext(SYNCED.pylon) then
 		gl.PushAttrib(GL.LINE_BITS)
 		
-		gl.DepthTest(true)
-		gl.Color(0.8,0.8,0.2,math.random()*0.1+0.3)
+		glDepthTest(true)
+		glColor(0.8,0.8,0.2,math.random()*0.1+0.3)
 		gl.LineWidth(1)
-		gl.BeginEnd(GL.LINES, DrawPylonEnergyLines)
+		glBeginEnd(GL.LINES, DrawPylonEnergyLines)
 		
 		gl.PopAttrib() 
 	end
@@ -1483,16 +1514,16 @@ function gadget:DrawWorldPreUnit()
 	--[[if SYNCED.pylon and snext(SYNCED.pylon) then
 		gl.PushAttrib(GL.LINE_BITS)
 		
-		gl.Color(0.5,0.4,1,math.random()*0.1+0.5)
+		glColor(0.5,0.4,1,math.random()*0.1+0.5)
 		gl.LineWidth(3)
-		gl.BeginEnd(GL.LINES, DrawPylonMexLines)
+		glBeginEnd(GL.LINES, DrawPylonMexLines)
 		
-		gl.Color(0.9,0.8,0.2,math.random()*0.1+0.5)
+		glColor(0.9,0.8,0.2,math.random()*0.1+0.5)
 		gl.LineWidth(3)
-		gl.BeginEnd(GL.LINES, DrawPylonLinkLines)
+		glBeginEnd(GL.LINES, DrawPylonLinkLines)
 			
-		gl.DepthTest(false)
-		gl.Color(1,1,1,1)
+		glDepthTest(false)
+		glColor(1,1,1,1)
 			
 		gl.PopAttrib() 
 	end]]--
@@ -1523,7 +1554,7 @@ end
 
 --[[ moved to widget
 local function DrawUnitFunc(yshift)
-	gl.Translate(0,yshift,0)
+	glTranslate(0,yshift,0)
 	gl.Billboard()
 	gl.TexRect(-10, -10, 10, 10)
 end
@@ -1533,11 +1564,11 @@ function gadget:DrawWorld()
 	local lowPowerUnits = SYNCED.lowPowerUnits.inner
 	
 	if lowPowerUnits.count > 0 then
-		local spec, fullview = Spring.GetSpectatingState()
-		local myAllyID = Spring.GetMyAllyTeamID()
+		local spec, fullview = spGetSpectatingState()
+		local myAllyID = spGetMyAllyTeamID()
 
 		spec = spec or fullview
-		gl.Color(1,1,1,1)
+		glColor(1,1,1,1)
 		gl.Texture(powerTexture )
 		for i = 1, lowPowerUnits.count do
 			local los = Spring.GetUnitLosState(lowPowerUnits.units[i], myAllyID, false)

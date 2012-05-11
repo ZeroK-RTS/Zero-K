@@ -21,6 +21,23 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local random = math.random
+
+local spGetUnitsInCylinder     = Spring.GetUnitsInCylinder
+local spGetFeaturesInRectangle = Spring.GetFeaturesInRectangle
+local spGetFeaturePosition     = Spring.GetFeaturePosition
+local spGetFeatureResources    = Spring.GetFeatureResources
+local spGetUnitPosition        = Spring.GetUnitPosition
+local spGetUnitIsStunned       = Spring.GetUnitIsStunned
+local spGetUnitTeam            = Spring.GetUnitTeam
+local spGetUnitStates          = Spring.GetUnitStates
+local spGetUnitDefID           = Spring.GetUnitDefID
+local spSetFeatureReclaim      = Spring.SetFeatureReclaim
+local spDestroyFeature         = Spring.DestroyFeature
+local spCreateUnit             = Spring.CreateUnit
+local spGiveOrderToUnit        = Spring.GiveOrderToUnit
+local spSetUnitRulesParam      = Spring.SetUnitRulesParam
+
 local CMD_FIRE_STATE = CMD.FIRE_STATE
 local CMD_MOVE_STATE = CMD.MOVE_STATE
 local CMD_GUARD      = CMD.GUARD
@@ -46,7 +63,7 @@ end
 
 local function getStealableAlly(x, z, r, unitID, progress, team)
 
-	local nearby = Spring.GetUnitsInCylinder(x, z, r, team)
+	local nearby = spGetUnitsInCylinder(x, z, r, team)
 
 	for i = 1, #nearby do
 		local id = nearby[i]
@@ -61,17 +78,17 @@ end
 
 local function getClosestWreck(x, z, r) -- hopefully to be replaced
 
-	local features = Spring.GetFeaturesInRectangle(x-r, z-r, x+r, z+r)
+	local features = spGetFeaturesInRectangle(x-r, z-r, x+r, z+r)
 	local rsq = r^2
 	
 	local minDis = false
 	local minID = false
 	
 	for i = 1, #features do
-		local fx, _, fz = Spring.GetFeaturePosition(features[i])
+		local fx, _, fz = spGetFeaturePosition(features[i])
 		local dis = disSQ(x,z,fx,fz)
 		if dis <= rsq and ((not minDis) or dis < minDis) and (not killedFeature[features[i]]) then
-			local _, maxMetal = Spring.GetFeatureResources(features[i])
+			local _, maxMetal = spGetFeatureResources(features[i])
 			if maxMetal ~= 0 then
 				minDis = dis
 				minID = features[i]
@@ -99,16 +116,15 @@ function gadget:GameFrame(f)
 			local unitID = unitIndex[i]
 			local unit = units[unitID]
 			local quota = unit.defs.drain
-			local x,_,z = Spring.GetUnitPosition(unitID)
-			local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID)
+			local x,_,z = spGetUnitPosition(unitID)
+			local stunned_or_inbuild = spGetUnitIsStunned(unitID)
 			-- drain metal while quote not fulfilled
 			while quota > 0 and not stunned_or_inbuild do
 				
 				local feature = getClosestWreck(x, z, unit.defs.range)
 				
 				if feature then
-					local metal, maxMetal = Spring.GetFeatureResources(feature)
-					metal = featureMetal[feature] or metal
+					metal = featureMetal[feature] or spGetFeatureResources(feature)
 					if metal >= quota then
 						unit.progress = unit.progress + quota
 						featureMetal[feature] = metal-quota
@@ -121,7 +137,7 @@ function gadget:GameFrame(f)
 					end
 				else
 					if unit.progress ~= 0 then
-						local ally = getStealableAlly(x, z, unit.defs.range, unitID, unit.progress, Spring.GetUnitTeam(unitID))
+						local ally = getStealableAlly(x, z, unit.defs.range, unitID, unit.progress, spGetUnitTeam(unitID))
 						if ally then
 							if units[ally].progress >= quota then
 								unit.progress = unit.progress + quota
@@ -141,12 +157,12 @@ function gadget:GameFrame(f)
 		
 		-- update feature status
 		for id, metal in pairs(featureMetal) do
-			local _, maxMetal = Spring.GetFeatureResources(id)
-			Spring.SetFeatureReclaim(id, metal/maxMetal)
+			local _, maxMetal = spGetFeatureResources(id)
+			spSetFeatureReclaim(id, metal/maxMetal)
 		end
 		
 		for id, _ in pairs(killedFeature) do
-			Spring.DestroyFeature(id)
+			spDestroyFeature(id)
 		end
 		
 		-- check for enough resources to spawn a new unit
@@ -155,16 +171,16 @@ function gadget:GameFrame(f)
 			local unit = units[unitIndex[i]]
 			if unit.progress >= unit.defs.cost then
 				unit.progress = unit.progress - unit.defs.cost
-				local x,y,z = Spring.GetUnitPosition(unitIndex[i])
-				local newId = Spring.CreateUnit(unit.defs.spawns,x+math.random(-50,50),y,z+math.random(-50,50),math.random(2*math.pi),Spring.GetUnitTeam(unitIndex[i]))
-				local states = Spring.GetUnitStates(unitIndex[i])
-				Spring.GiveOrderToUnit(newId, CMD_FIRE_STATE, {states.firestate}, 0)
-				Spring.GiveOrderToUnit(newId, CMD_MOVE_STATE, {states.movestate}, 0)
-				Spring.GiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
+				local x,y,z = spGetUnitPosition(unitIndex[i])
+				local newId = spCreateUnit(unit.defs.spawns,x+random(-50,50),y,z+random(-50,50),random(2*math.pi),spGetUnitTeam(unitIndex[i]))
+				local states = spGetUnitStates(unitIndex[i])
+				spGiveOrderToUnit(newId, CMD_FIRE_STATE, {states.firestate}, 0)
+				spGiveOrderToUnit(newId, CMD_MOVE_STATE, {states.movestate}, 0)
+				spGiveOrderToUnit(newId, CMD_GUARD     , {unitIndex[i]}    , 0)
 			end
 			if unit.oldProgress ~= unit.progress then
 				unit.oldProgress = unit.progress
-				Spring.SetUnitRulesParam(unitIndex[i],"gooState",unit.progress/unit.defs.cost, {inlos = true})
+				spSetUnitRulesParam(unitIndex[i],"gooState",unit.progress/unit.defs.cost, {inlos = true})
 			end
 		end
 	
@@ -202,8 +218,8 @@ function gadget:Initialize()
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		local teamID = Spring.GetUnitTeam(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
+		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	

@@ -33,6 +33,7 @@ local spGetCommandQueue     = Spring.GetCommandQueue
 local spSetUnitTarget       = Spring.SetUnitTarget
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetUnitStates       = Spring.GetUnitStates
 
 local CMD_ATTACK		= CMD.ATTACK
 local CMD_OPT_INTERNAL 	= CMD.OPT_INTERNAL
@@ -132,7 +133,7 @@ function GG.DontFireRadar_CheckAim(unitID)
 		local cQueue = spGetCommandQueue(unitID, 1)
 		local data = units[unitID]
 		if isTheRightSortOfCommand(cQueue, 1) and not canShootAtUnit(cQueue[1].params[1], spGetUnitAllyTeam(unitID)) then
-			local firestate = Spring.GetUnitStates(unitID).firestate
+			local firestate = spGetUnitStates(unitID).firestate
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {0}, {} )
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 			spGiveOrderToUnit(unitID, CMD_FIRE_STATE, {firestate}, {} )
@@ -217,8 +218,8 @@ function gadget:Initialize()
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		local teamID = Spring.GetUnitTeam(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
+		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	

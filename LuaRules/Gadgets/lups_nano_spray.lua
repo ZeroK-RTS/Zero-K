@@ -15,9 +15,12 @@ function gadget:GetInfo()
 end
 
 
+local spGetFactoryCommands = Spring.GetFactoryCommands
+local spGetUnitCommands    = Spring.GetUnitCommands
+
 local function GetCmdTag(unitID) 
     local cmdTag = 0
-    local cmds = Spring.GetFactoryCommands(unitID,1)
+    local cmds = spGetFactoryCommands(unitID,1)
 	if (cmds) then
         local cmd = cmds[1]
         if cmd then
@@ -25,7 +28,7 @@ local function GetCmdTag(unitID)
         end
     end
 	if cmdTag == 0 then 
-		local cmds = Spring.GetUnitCommands(unitID,1)
+		local cmds = spGetUnitCommands(unitID,1)
 		if (cmds) then
 			local cmd = cmds[1]
 			if cmd then
@@ -36,7 +39,6 @@ local function GetCmdTag(unitID)
 	return cmdTag
 end 
 	
-
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -136,19 +138,23 @@ local tryloading  = 1     --// try to activate lups if it isn't found
 --// Speed-ups
 local GetUnitRadius        = Spring.GetUnitRadius
 local GetFeatureRadius     = Spring.GetFeatureRadius
+local spGetFeatureDefID    = Spring.GetFeatureDefID
+local spGetTeamColor       = Spring.GetTeamColor
+local spGetGameFrame       = Spring.GetGameFrame
+local Utils_GetUnitIsBuilding = Spring.Utilities.GetUnitIsBuilding
+
 local tinsert = table.insert
 local type  = type
 local pairs = pairs
 local SYNCED = SYNCED
 local spairs = spairs
-local spUtilGetUnitIsBuilding = Spring.Utilities.GetUnitIsBuilding
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
 if (not GetFeatureRadius) then
   GetFeatureRadius = function(featureID)
-    local fDefID = Spring.GetFeatureDefID(featureID)
+    local fDefID = spGetFeatureDefID(featureID)
     return (FeatureDefs[fDefID].radius or 0)
   end
 end
@@ -317,7 +323,7 @@ local factionsNanoFx = {
 
   function GameFrame(_,offset)
     for unitID,nanoInfo in spairs(SYNCED.nanoEmitters[offset]) do
-      local type, target = spUtilGetUnitIsBuilding(unitID)
+      local type, target = Utils_GetUnitIsBuilding(unitID)
 
       if (target) then
         local cmdTag = GetCmdTag(unitID)
@@ -352,7 +358,7 @@ local factionsNanoFx = {
           end
 
           local faction = GetFaction(nanoInfo.unitDefID)
-          local teamColor = {Spring.GetTeamColor(nanoInfo.teamID)}
+          local teamColor = {spGetTeamColor(nanoInfo.teamID)}
 
           for i=1,nanoInfo.pieceCount do
             local nanoParams = {
@@ -391,7 +397,7 @@ local factionsNanoFx = {
 -------------------------------------------------------------------------------------
 
 function gadget:Update()
-  if (Spring.GetGameFrame()<1) then 
+  if (spGetGameFrame()<1) then 
     return
   end
 

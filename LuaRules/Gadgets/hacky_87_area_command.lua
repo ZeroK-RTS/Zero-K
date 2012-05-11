@@ -22,7 +22,7 @@ end
 
 local CMD_RECLAIM = CMD.RECLAIM
 local CMD_RESURRECT = CMD.RESURRECT
-local CMD_RESURRECT = CMD.REPAIR
+local CMD_REPAIR = CMD.REPAIR
 local CMD_WAIT = CMD.WAIT
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local spValidUnitID = Spring.ValidUnitID
@@ -31,7 +31,7 @@ local units = {count = 0, unitID = {}}
 local thereIsStuffToDo = false
 
 function gadget:UnitCmdDone(unitID, unitDefID, team, cmdID, cmdTag)
-	if (cmdID == CMD.RECLAIM or cmdID == CMD_RESURRECT or cmdID == CMD_REPAIR or cmdID < 0) then
+	if (cmdID == CMD_RECLAIM or cmdID == CMD_RESURRECT or cmdID == CMD_REPAIR or cmdID < 0) then
 		-- Double wait requires a 1 frame delay
 		thereIsStuffToDo = true
 		units.count = units.count + 1
@@ -56,7 +56,8 @@ function gadget:GameFrame(f)
 end
 
 function gadget:Initialize()
-	if not (Spring.GetModOptions() and Spring.Utilities.tobool(Spring.GetModOptions().engine_workarounds)) then
+	local modOptions = Spring.GetModOptions()
+	if not (modOptions and Spring.Utilities.tobool(modOptions.engine_workarounds)) then
 		gadgetHandler:RemoveGadget()
 	end
 end

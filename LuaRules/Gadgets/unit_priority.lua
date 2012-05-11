@@ -68,8 +68,19 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 --  SYNCED
 --------------------------------------------------------------------------------
-local spGetTeamList		= Spring.GetTeamList
-local spGetTeamResources	= Spring.GetTeamResources
+
+local random = math.random
+
+local spGetTeamList       = Spring.GetTeamList
+local spGetTeamResources  = Spring.GetTeamResources
+local spGetPlayerInfo     = Spring.GetPlayerInfo
+local spGetUnitDefID      = Spring.GetUnitDefID
+local spGetUnitHealth     = Spring.GetUnitHealth
+local spFindUnitCmdDesc   = Spring.FindUnitCmdDesc
+local spEditUnitCmdDesc   = Spring.EditUnitCmdDesc
+local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
+local spRemoveUnitCmdDesc = Spring.RemoveUnitCmdDesc
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 
 local function SetReserved(teamID, value)
@@ -78,11 +89,11 @@ end
 
 
 local function SetPriorityState(unitID, state) 
-	local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_PRIORITY)
+	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PRIORITY)
 	if (cmdDescID) then
 		CommandDesc.params[1] = state
-		Spring.EditUnitCmdDesc(unitID, cmdDescID, { params = CommandDesc.params, tooltip = Tooltips[1 + state%StateCount]})
-		Spring.SetUnitRulesParam(unitID, "buildpriority", state)
+		spEditUnitCmdDesc(unitID, cmdDescID, { params = CommandDesc.params, tooltip = Tooltips[1 + state%StateCount]})
+		spSetUnitRulesParam(unitID, "buildpriority", state)
 	end
 	UnitPriority[unitID] = state	
 end 
@@ -94,14 +105,14 @@ function gadget:Initialize()
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local teamID = Spring.GetUnitTeam(unitID)
-		Spring.InsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
+		spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
 	end
 
 end
 
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("mreserve:",1,true) then
-		local _,_,spec,teamID = Spring.GetPlayerInfo(playerID)
+		local _,_,spec,teamID = spGetPlayerInfo(playerID)
 		local amount = msg:sub(10)
 		if spec then return end
 		SetReserved(teamID, amount*1)
@@ -111,7 +122,7 @@ end
 function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID) 
 	local prio  = DefaultState
 	if (builderID ~= nil)  then
-		local unitDefID = Spring.GetUnitDefID(builderID)
+		local unitDefID = spGetUnitDefID(builderID)
 		if (unitDefID ~= nil and UnitDefs[unitDefID].isFactory) then 
 			prio = UnitPriority[builderID] or DefaultState  -- inherit priorty from factory
 			LastUnitFromFactory[builderID] = UnitID 
@@ -119,7 +130,7 @@ function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID)
 	end 	
 	UnitPriority[UnitID] =  prio
 	CommandDesc.params[1] = prio
-	Spring.InsertUnitCmdDesc(UnitID, CommandOrder, CommandDesc)
+	spInsertUnitCmdDesc(UnitID, CommandOrder, CommandDesc)
 end
 
 
@@ -131,9 +142,9 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 		SetPriorityState(unitID, DefaultState)
 	else  -- not a builder priority makes no sense now
 		UnitPriority[unitID] = nil
-		local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_PRIORITY)
+		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PRIORITY)
 		if (cmdDescID) then
-			Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
+			spRemoveUnitCmdDesc(unitID, cmdDescID)
 		end
 	end 
 
@@ -144,7 +155,7 @@ function gadget:UnitDestroyed(UnitID, unitDefID, teamID)
 	LastUnitFromFactory[UnitID] = nil
     local ud = UnitDefs[unitDefID]
     if ud and ud.metalStorage and ud.metalStorage > 0 and TeamReserved[teamID] then
-        local _, sto = Spring.GetTeamResources(teamID, "metal")
+        local _, sto = spGetTeamResources(teamID, "metal")
         if sto and TeamReserved[teamID] > sto - ud.metalStorage then
             SetReserved(teamID, sto - ud.metalStorage)
         end
@@ -163,7 +174,7 @@ function PriorityCommand(unitID, cmdParams, cmdOptions)
 	
 	local lastUnitID = LastUnitFromFactory[unitID]  
 	if lastUnitID ~= nil then 
-		local _, _, _, _, progress   = Spring.GetUnitHealth(lastUnitID)
+		local _, _, _, _, progress = spGetUnitHealth(lastUnitID)
 		if (progress ~= nil and progress < 1) then  -- we are building some unit ,set its priority too 
 			SetPriorityState(lastUnitID, state)
 		end 
@@ -201,7 +212,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 		TeamPriorityUnits[teamID][builderID] = 0
 		local scale = TeamScale[teamID]
 		if scale ~= nil then 
-			if math.random() < scale[2] then 
+			if random() < scale[2] then 
 				return true
 			else 
 				return false
@@ -218,7 +229,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	
 	local scale = TeamScale[teamID]
 	if scale ~= nil then 
-		if math.random() < scale[1] then 
+		if random() < scale[1] then 
 			return true
 		else 
 			return false
@@ -240,7 +251,7 @@ function gadget:GameFrame(n)
 			local prioSpending = 0
 			local lowPrioSpending = 0
 			for unitID, pri in pairs(prioUnits) do 
-				local unitDefID = Spring.GetUnitDefID(unitID)
+				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
 					if pri == 2 then 
 						prioSpending = prioSpending + UnitDefs[unitDefID].buildSpeed
@@ -334,6 +345,8 @@ else
 --  UNSYNCED
 --------------------------------------------------------------------------------
 
+local spGetLocalTeamID = Spring.GetLocalTeamID
+
 local last_sent_in_frame = 0
 
 function gadget:Initialize()
@@ -342,9 +355,9 @@ function gadget:Initialize()
 end
 
 function WrapPriorityStatsToLuaUI(_,teamID, highPriorityBP, lowPriorityBP, gameFrame)
-    if (teamID == Spring.GetLocalTeamID() and Script.LuaUI('PriorityStats')) then
+    if (teamID == spGetLocalTeamID() and Script.LuaUI('PriorityStats')) then
         if last_sent_in_frame ~= gameFrame then
-            Script.LuaUI.PriorityStats(Spring.GetLocalTeamID(), 0, 0)
+            Script.LuaUI.PriorityStats(spGetLocalTeamID(), 0, 0)
             last_sent_in_frame = gameFrame
         else
             Script.LuaUI.PriorityStats(teamID, highPriorityBP, lowPriorityBP)
@@ -353,7 +366,7 @@ function WrapPriorityStatsToLuaUI(_,teamID, highPriorityBP, lowPriorityBP, gameF
 end
 
 function WrapMetalReserveStateToLuaUI(_,teamID, reserve)
-    if (teamID == Spring.GetLocalTeamID() and Script.LuaUI('MetalReserveState')) then
+    if (teamID == spGetLocalTeamID() and Script.LuaUI('MetalReserveState')) then
         Script.LuaUI.MetalReserveState(teamID, reserve)
     end
 end

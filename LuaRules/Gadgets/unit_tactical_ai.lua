@@ -24,6 +24,7 @@ local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetCommandQueue		= Spring.GetCommandQueue
 local spGetUnitDefID		= Spring.GetUnitDefID	
 local spGetUnitPosition		= Spring.GetUnitPosition
+local spGetUnitVelocity		= Spring.GetUnitVelocity
 local spGiveOrderToUnit		= Spring.GiveOrderToUnit
 local spGetUnitNearestEnemy = Spring.GetUnitNearestEnemy
 local spGetUnitSeparation 	= Spring.GetUnitSeparation
@@ -34,6 +35,7 @@ local spGetUnitLosState		= Spring.GetUnitLosState
 local spGetUnitStates		= Spring.GetUnitStates
 local spValidUnitID			= Spring.ValidUnitID
 local spGetUnitIsStunned    = Spring.GetUnitIsStunned
+local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local random 				= math.random
 local sqrt 					= math.sqrt
 
@@ -69,7 +71,7 @@ local unitAICmdDesc = {
 --------------------------
 
 local function distance(x1,y1,x2,y2)
-	return math.sqrt((x1-x2)^2 + (y1-y2)^2)
+	return sqrt((x1-x2)^2 + (y1-y2)^2)
 end
 
 local function getUnitState(unitID,data,cQueue)
@@ -298,7 +300,7 @@ local function skirmEnemy(unitID, enemy, move, cQueue,n)
 	
 	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
 	
-	local vx,vy,vz = Spring.GetUnitVelocity(enemy)
+	local vx,vy,vz = spGetUnitVelocity(enemy)
 	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
 	local cx,cy,cz -- command position	
@@ -309,7 +311,7 @@ local function skirmEnemy(unitID, enemy, move, cQueue,n)
 	
 	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
 	
-	local pointDis = math.sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
+	local pointDis = sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
 
 	if behaviour.skirmRange > pointDis then
 
@@ -362,13 +364,13 @@ local function fleeEnemy(unitID, enemy, enemyUnitDef, los, move, cQueue,n)
 
 	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
 	
-	local vx,vy,vz = Spring.GetUnitVelocity(enemy)
+	local vx,vy,vz = spGetUnitVelocity(enemy)
 	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
 	local cx,cy,cz -- command position	
 	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
 	
-	local pointDis = math.sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
+	local pointDis = sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
 
 	if enemyRange + behaviour.fleeLeeway > pointDis then
 
@@ -413,7 +415,7 @@ local function updateUnits(n)
 			end
 		
 			--Spring.Echo("unit parsed")
-			if (not data.active) or Spring.GetUnitRulesParam(unitID,"disable_tac_ai") == 1 then
+			if (not data.active) or spGetUnitRulesParam(unitID,"disable_tac_ai") == 1 then
 				if data.receivedOrder then
 					local cQueue = spGetCommandQueue(unitID)
 					clearOrder(unitID,data,cQueue)
@@ -595,7 +597,7 @@ function gadget:Initialize()
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end

@@ -17,9 +17,6 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local abs                       = math.abs
-
---local CMD_ONOFF = CMD.ONOFF
 local SYNCSTR = "unit_burrower"
 
 if (gadgetHandler:IsSyncedCode()) then
@@ -30,10 +27,12 @@ if (gadgetHandler:IsSyncedCode()) then
 local GetUnitIsActive           = Spring.GetUnitIsActive
 local GetUnitStates             = Spring.GetUnitStates
 local GetCOBScriptID            = Spring.GetCOBScriptID
-local GetUnitStates             = Spring.GetUnitStates
 local GetUnitBasePosition       = Spring.GetUnitBasePosition
 local GetUnitHeading            = Spring.GetUnitHeading
 local GetUnitCommands           = Spring.GetUnitCommands
+local GetUnitExperience         = Spring.GetUnitExperience
+local GetUnitHealth             = Spring.GetUnitHealth
+local GetUnitLineage            = Spring.GetUnitLineage
 
 local SetUnitBlocking           = Spring.SetUnitBlocking
 local SetUnitCloak              = Spring.SetUnitCloak
@@ -46,7 +45,14 @@ local CallCOBScript             = Spring.CallCOBScript
 local GiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
 local CreateUnit                = Spring.CreateUnit
 local GiveOrderToUnit           = Spring.GiveOrderToUnit
-local DestroyUnit               = Spring.DestroyUnit 
+local DestroyUnit               = Spring.DestroyUnit
+
+local CMD_FIRE_STATE = CMD.FIRE_STATE
+local CMD_MOVE_STATE = CMD.MOVE_STATE
+local CMD_REPEAT     = CMD.REPEAT
+local CMD_ONOFF      = CMD.ONOFF
+
+local headingMult = math.pi / 32768
 
 local burrowers = {}
 local burrowed = {}
@@ -55,7 +61,7 @@ local holes = {}
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function DuplicateUnit(unitID, unitDefID, unitTeam, destUnitName)
+local function DuplicateUnit(unitID, unitDefID, unitTeam, destUnitName)
   local px, py, pz = GetUnitBasePosition(unitID)
   SetUnitBlocking(unitID, false)
 
@@ -63,14 +69,14 @@ function DuplicateUnit(unitID, unitDefID, unitTeam, destUnitName)
   SetUnitBlocking(newUnitID, true)
 
   local h = GetUnitHeading(unitID)
-  SetUnitRotation(newUnitID, 0, -h * math.pi / 32768, 0)
+  SetUnitRotation(newUnitID, 0, -h * headingMult, 0)
 
   local states = GetUnitStates(unitID)
   GiveOrderArrayToUnitArray( { newUnitID }, {
-    { CMD.FIRE_STATE, { states.firestate },             { } },
-    { CMD.MOVE_STATE, { states.movestate },             { } },
-    { CMD.REPEAT,     { states["repeat"] and 1 or 0 },  { } },
-    { CMD.ONOFF,      { states.active and 1 or 0 },     { } },
+    { CMD_FIRE_STATE, { states.firestate },             { } },
+    { CMD_MOVE_STATE, { states.movestate },             { } },
+    { CMD_REPEAT,     { states["repeat"] and 1 or 0 },  { } },
+    { CMD_ONOFF,      { states.active and 1 or 0 },     { } },
   })
 
   local cmds = GetUnitCommands(unitID)
@@ -81,14 +87,14 @@ function DuplicateUnit(unitID, unitDefID, unitTeam, destUnitName)
   
 
   --//copy experience
-  local newXp = Spring.GetUnitExperience(unitID)
+  local newXp = GetUnitExperience(unitID)
   SetUnitExperience(newUnitID, newXp)
 
     --// copy health
-  local health,maxHealth = Spring.GetUnitHealth(unitID)  
+  local health,maxHealth = GetUnitHealth(unitID)  
   SetUnitHealth(newUnitID, health)
 
-  local lineage = Spring.GetUnitLineage(unitID)
+  local lineage = GetUnitLineage(unitID)
   SetUnitLineage(newUnitID,lineage,true)
 
   return newUnitID
@@ -152,7 +158,7 @@ end
 function gadget:UnitFromFactory(unitID, unitDefID, teamID, builderID, _, _)
   local unitName = UnitDefs[unitDefID].name
   if burrowers[unitName] then
-    GiveOrderToUnit(unitID, CMD.ONOFF, {0}, {})
+    GiveOrderToUnit(unitID, CMD_ONOFF, {0}, {})
   end
 end
 
@@ -186,6 +192,8 @@ else
 --------------------------------------------------------------------------------
 
 --local SYNCED = SYNCED
+
+local abs              = math.abs
 
 local glDepthTest      = gl.DepthTest
 local glDepthMask      = gl.DepthMask

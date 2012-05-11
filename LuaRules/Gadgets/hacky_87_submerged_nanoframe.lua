@@ -87,7 +87,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function gadget:Initialize()
-	if not (Spring.GetModOptions() and Spring.Utilities.tobool(Spring.GetModOptions().engine_workarounds)) then
+	local modOptions = Spring.GetModOptions()
+	if not (modOptions and Spring.Utilities.tobool(modOptions.engine_workarounds)) then
 		gadgetHandler:RemoveGadget()
 	end
 end
