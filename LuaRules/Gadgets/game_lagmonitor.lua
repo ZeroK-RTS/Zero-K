@@ -7,13 +7,13 @@ function gadget:GetInfo()
     name      = "Lag Monitor",
     desc      = "Gives away units of people who are lagging",
     author    = "KingRaptor",
-    date      = "10/5/2012",
+    date      = "11/5/2012",
     license   = "Public domain",
     layer     = 0,
     enabled   = true  --  loaded by default?
   }
 end
---Revision 25-th?
+--Revision 26-th?
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
   
@@ -65,7 +65,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
-function gadget:UnitFinished(unitID, unitDefID, unitTeam)
+function gadget:UnitFinished(unitID, unitDefID, unitTeam) --player who finished a unit will own that unit; its lineage will be deleted and the unit will never be returned to the lagging team.
 	if lineage[unitID] and (not unitAlreadyFinished[unitID]) and not (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory) then
 		lineage[unitID] = nil
 	end
@@ -144,9 +144,10 @@ function gadget:GameFrame(n)
 						tickTockCounter[players[i]] = nil -- empty tick-tock clock.
 						Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
 						GG.allowTransfer = true
+						local spTransferUnit = Spring.TransferUnit
 						for unitID, uteam in pairs(lineage) do
 							if (uteam == team) then
-								Spring.TransferUnit(unitID, team, true)
+								spTransferUnit(unitID, team, true)
 								lineage[unitID] = nil
 							end
 						end
@@ -200,9 +201,10 @@ function gadget:GameFrame(n)
 					if #units > 0 then -- transfer units when number of units in AFK team is > 0
 						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")
 						GG.allowTransfer = true
+						local spTransferUnit = Spring.TransferUnit
 						for j=1,#units do
-							lineage[units[j]] = team
-							Spring.TransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
+							lineage[units[j]] = (lineage[units[j]] or team) --set the lineage to the original owner, but if owner is "nil" then use the current (lagging team) as the original owner & then send the unit away...
+							spTransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
 						end
 						GG.allowTransfer = false
 					end
