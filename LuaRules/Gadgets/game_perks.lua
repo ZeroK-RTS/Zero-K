@@ -48,7 +48,8 @@ local unlockUnits = {
 	"panther",
 	"corgol",
 	
-	"blackdawn",
+	--"blackdawn",
+	"blastwing",
 	"corcrw",
 	
 	"armcybr",
@@ -60,7 +61,7 @@ local unlockUnits = {
 	"armorco",
 	
 	-- defenses and superweapons
-    "corgrav",
+	"corgrav",
 	"screamer",
 	"armanni",
 	"cordoom",
@@ -80,7 +81,7 @@ local unlockUnits = {
 	"factorytank",
 	"factoryplane",
 	"armcsa",
-    "striderhub",
+	"striderhub",
 	
 	-- misc
 	"armarad",
