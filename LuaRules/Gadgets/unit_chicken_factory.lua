@@ -190,7 +190,7 @@ local function overdriveChickenFacs(teamID, chickenFacs)
 		countout = countout - 1
 		again = false
 		for unitID, buildPower in pairs(chickenFacs) do
-			local fc = spGetFactoryCommands(unitID)
+			local fc = spGetFactoryCommands(unitID, 1)
 			local waiting = fc and fc[1] and CMD[fc[1].id] == 'WAIT' 
 			if spGetUnitIsBuilding(unitID) and not waiting then
 				local newState = spUseUnitResource(unitID, 'e', 1)

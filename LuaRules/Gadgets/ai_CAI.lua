@@ -1349,7 +1349,7 @@ local function factoryJobHandler(team)
 		local scouting = false
 		local raiding = false
 		
-		local cQueue = spGetFactoryCommands(unitID)
+		local cQueue = spGetFactoryCommands(unitID, 1)
 		if #cQueue == 0 then
 			local defData = buildDefs.factoryByDefId[data.ud.id]
 			local choice = 1
