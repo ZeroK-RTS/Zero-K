@@ -348,7 +348,7 @@ end
 -- FIXME: doesn't change wreck cost
 if (modOptions and modOptions.factorycostmult) then
   for name, def in pairs(UnitDefs) do
-    if def.unitname:find("factory") or def.unitname == "corsy" or def.unitname == "armcsa" then
+    if def.unitname:find("factory") or def.unitname == "corsy" or def.unitname == "armcsa" or def.unitname == "striderhub" then
 		def.buildcostmetal = def.buildcostmetal * modOptions.factorycostmult
 		def.buildcostenergy = def.buildcostenergy * modOptions.factorycostmult
 		def.buildtime = def.buildtime * modOptions.factorycostmult
