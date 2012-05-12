@@ -99,25 +99,28 @@ end
 ]]--
 
 local function doTheCommand(unitID, unitDefID, num)
-	local frame = Spring.GetGameFrame()
-	local currentReload = (not defs[unitDefID][num].weaponToReload) or Spring.GetUnitWeaponState(unitID, defs[unitDefID][num].weaponToReload, "reloadState")
-	--if not (spGetUnitIsDead(unitID) or (reloadFrame[unitID][num] > frame)) then
-	if (select(5, spGetUnitHealth(unitID)) == 1) and not (spGetUnitIsDead(unitID) or (defs[unitDefID][num].weaponToReload and (currentReload > frame))) then
-		local env = Spring.UnitScript.GetScriptEnv(unitID)
-		local func = env[defs[unitDefID][num].functionToCall]
-		Spring.UnitScript.CallAsUnit(unitID, func)
+	local data = defs[unitDefID] and defs[unitDefID][num]
+	if (data) then
+		local currentReload = data.weaponToReload and Spring.GetUnitWeaponState(unitID, data.weaponToReload, "reloadState")
+		local frame = Spring.GetGameFrame()
+		--if (reloadFrame[unitID][num] <= frame and not spGetUnitIsDead(unitID)) then
+		if ((not currentReload or currentReload <= frame) and select(5, spGetUnitHealth(unitID)) == 1 and not spGetUnitIsDead(unitID)) then
+			local env = Spring.UnitScript.GetScriptEnv(unitID)
+			local func = env[data.functionToCall]
+			Spring.UnitScript.CallAsUnit(unitID, func)
 		
-		local slowState = 1 - (spGetUnitRulesParam(unitID,"slowState") or 0)
+			local slowState = 1 - (spGetUnitRulesParam(unitID,"slowState") or 0)
 		
-		-- reload
-		if (defs[unitDefID][num].reloadTime and defs[unitDefID][num].weaponToReload) then
-			local reloadFrameVal = frame + defs[unitDefID][num].reloadTime/slowState
-			--reloadFrame[unitID][num] = reloadFrameVal
-			--scheduledReloadByUnitID[unitID] = math.max(reloadFrameVal, scheduledReloadByUnitID[unitID] or 0)
-			--Spring.SetUnitRulesParam(unitID, "specialReloadFrame", scheduledReloadByUnitID[unitID], {inlos = true})	-- for healthbar
-			Spring.SetUnitWeaponState(unitID, defs[unitDefID][num].weaponToReload, "reloadState", reloadFrameVal)
+			-- reload
+			if (data.reloadTime and data.weaponToReload) then
+				local reloadFrameVal = frame + data.reloadTime/slowState
+				--reloadFrame[unitID][num] = reloadFrameVal
+				--scheduledReloadByUnitID[unitID] = math.max(reloadFrameVal, scheduledReloadByUnitID[unitID] or 0)
+				--Spring.SetUnitRulesParam(unitID, "specialReloadFrame", scheduledReloadByUnitID[unitID], {inlos = true})	-- for healthbar
+				Spring.SetUnitWeaponState(unitID, data.weaponToReload, "reloadState", reloadFrameVal)
+			end
+			return true
 		end
-		return true
 	end
 	return false
 end
