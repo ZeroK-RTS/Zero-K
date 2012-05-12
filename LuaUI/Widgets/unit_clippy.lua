@@ -85,6 +85,8 @@ local font = "LuaUI/Fonts/komtxt__.ttf"
 ------------------------
 ------------------------
 local function DisposeTip(unitID)
+	if not unitID then return end
+	
 	if activeTips[unitID] and activeTips[unitID].img then
 		activeTips[unitID].img:Dispose()
 	end
