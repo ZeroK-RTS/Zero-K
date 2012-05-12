@@ -26,13 +26,19 @@ local spGetUnitHealth = Spring.GetUnitHealth
 ------------------------
 --  CONFIG
 ------------------------
-options_path = 'Settings/Interface/Clippy Comments'
+options_path = 'Settings/Help/Clippy Comments'
 options = {
-	noRankLimit = {
-		name = "No Rank Limit",
+	rankLimit = {
+		name = "Rank Limit",
 		type = 'bool',
 		value = false,
-		desc = 'Units make comments even to pros.',
+		desc = 'Units make comments only to newbies.',
+	},
+	warnExpensiveUnits = {
+		name = "Warning for Expensive Units",
+		type = 'bool',
+		value = true,
+		desc = 'Units complain about expensive units made early game.',
 	},
 }
 
@@ -41,6 +47,8 @@ VFS.Include("LuaUI/Configs/clippy.lua",nil)
 local activeTips = {}	-- [unitID] = {stuff for tip being displayed}
 
 local units = {}
+local haveFactoryDefIDs = {}
+local lastFactoryTime = -10000 -- gameframe
 local totalValue = 0
 local defenseValue = 0
 
@@ -99,7 +107,7 @@ local function GetTipDimensions(unitID, str, height, invert)
 end
 
 local function MakeTip(unitID, tip)
-	if not (options.noRankLimit.value or (rank <= 2)) then
+	if (options.rankLimit.value and (rank > 2)) then
 		return
 	end
 	DisposeTip(unitID)
@@ -151,50 +159,56 @@ local function ProcessCommand(unitID, command)
 		if numNanos > 0 and (metalIncome/numNanos < METAL_PER_NANO) then
 			MakeTip(unitID, "nano_excess")
 		end
-	else
-		if superweapons[-command] and TIMER_SUPERWEAPON > gameframe/30 then
-			if tips.superweapon.lastUsed > gameframe - tips.superweapon.cooldown*30 then
-				return
-			end
-			MakeTip(unitID, "superweapon")
+	elseif factories[-command] then
+		if haveFactoryDefIDs[-command] then
+			MakeTip(unitID, "factory_duplicate")
 			return
-		elseif expensive_units[-command] and TIMER_EXPENSIVE_UNITS > gameframe/30 then
-			if tips.expensive_unit.lastUsed > gameframe - tips.expensive_unit.cooldown*30 then
-				return
-			end
-			local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
-			if metalIncome < INCOME_TO_SPLURGE then
-				MakeTip(currentBuilder, "expensive_unit")
-				return
-			end
+		elseif gameframe < lastFactoryTime + DELAY_BETWEEN_FACS then
+			MakeTip(unitID, "factory_multiple")
+			return
 		end
-		if defenses[-command] then
-			if tips.defense_excess.lastUsed > gameframe - tips.defense_excess.cooldown*30 then
-				return
-			end
-			if totalValue == 0 then return end
-			if defenseValue/totalValue > DEFENSE_QUOTA then
-				MakeTip(unitID, "defense_excess")
-				return
-			end
-		elseif energy[-command] then
-			if tips.energy_excess.lastUsed > gameframe - tips.energy_excess.cooldown*30 then
-				return
-			end
-			local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
-			local energyCurrent,_,_,energyIncome = spGetTeamResources(myTeam, "energy")
-			if energyIncome/metalIncome > ENERGY_TO_METAL_RATIO then
-				MakeTip(unitID, "energy_excess")
-				return
-			end
+	elseif superweapons[-command] and TIMER_SUPERWEAPON > gameframe/30 then
+		if tips.superweapon.lastUsed > gameframe - tips.superweapon.cooldown*30 then
+			return
 		end
-		local metalCurrent,metalStorage,_,metalIncome,metalExpense = spGetTeamResources(myTeam, "metal")
+		MakeTip(unitID, "superweapon")
+		return
+	elseif expensive_units[-command] and options.warnExpensiveUnits.value and TIMER_EXPENSIVE_UNITS > gameframe/30 then
+		if tips.expensive_unit.lastUsed > gameframe - tips.expensive_unit.cooldown*30 then
+			return
+		end
+		local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
+		if metalIncome < INCOME_TO_SPLURGE then
+			MakeTip(currentBuilder, "expensive_unit")
+			return
+		end
+	end
+	if defenses[-command] then
+		if tips.defense_excess.lastUsed > gameframe - tips.defense_excess.cooldown*30 then
+			return
+		end
+		if totalValue == 0 then return end
+		if defenseValue/totalValue > DEFENSE_QUOTA then
+			MakeTip(unitID, "defense_excess")
+			return
+		end
+	elseif energy[-command] then
+		if tips.energy_excess.lastUsed > gameframe - tips.energy_excess.cooldown*30 then
+			return
+		end
+		local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
 		local energyCurrent,_,_,energyIncome = spGetTeamResources(myTeam, "energy")
-		if energyIncome/metalIncome < 1 and energyCurrent < ENERGY_LOW_THRESHOLD then
-			MakeTip(unitID, "energy_deficit")
-		elseif metalCurrent/metalStorage > 0.95 and metalIncome - metalExpense > 0 then
-			MakeTip(unitID, "metal_excess")
-		end	
+		if energyIncome/metalIncome > ENERGY_TO_METAL_RATIO then
+			MakeTip(unitID, "energy_excess")
+			return
+		end
+	end
+	local metalCurrent,metalStorage,_,metalIncome,metalExpense = spGetTeamResources(myTeam, "metal")
+	local energyCurrent,_,_,energyIncome = spGetTeamResources(myTeam, "energy")
+	if energyIncome/metalIncome < 1 and energyCurrent < ENERGY_LOW_THRESHOLD then
+		MakeTip(unitID, "energy_deficit")
+	elseif metalCurrent/metalStorage > 0.95 and metalIncome - metalExpense > 0 then
+		MakeTip(unitID, "metal_excess")
 	end
 end
 
@@ -250,6 +264,9 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		totalValue = totalValue - cost
 		if defenses[unitDefID] then
 			defenseValue = defenseValue - cost
+		elseif factories[unitDefID] then
+			haveFactoryDefIDs[unitDefID] = nil
+			lastFactoryTime = -10000
 		end
 	end
 	DisposeTip(unitID)
@@ -262,7 +279,18 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		totalValue = totalValue + cost
 		if defenses[unitDefID] then
 			defenseValue = defenseValue + cost
+		elseif factories[unitDefID] then
+			haveFactoryDefIDs[unitDefID] = true
+			lastFactoryTime = gameframe
 		end
+	end
+end
+
+function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
+	if newTeamID == myTeam then
+		widget:UnitFinished(unitID, unitDefID, teamID)
+	elseif teamID == myTeam then
+		widget:UnitDestroued(unitID, unitDefID, teamID)
 	end
 end
 

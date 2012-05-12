@@ -6,13 +6,15 @@ ENERGY_TO_METAL_RATIO = 2.4	-- suggested maximum for energy
 ENERGY_LOW_THRESHOLD = 300
 DEFENSE_QUOTA = 0.2	-- suggested maximum proportion of total assets that is defense
 
+DELAY_BETWEEN_FACS = 10*60*30
+
 --seconds
 TIMER_EXPENSIVE_UNITS = 60 * 10
 TIMER_ADV_FACTORY = 60 * 15
 TIMER_SUPERWEAPON = 60 * 30
 
 tips = {
-	nano_excess = {str = {"Don't we have enough\nnanos already?"}, life = 7, cooldown = 20},
+	nano_excess = {str = {"Don't we have enough\nCaretakers already?"}, life = 7, cooldown = 20},
 	expensive_unit = {str = {"Boss, I'm not sure\nwe can afford that at\nthis stage of the game.",
 				"Sir, I don't think that\nunit is in our price\nrange right now."}, life = 9, cooldown = 20},
 	superweapon = {str = {"A superweapon,\nnow? Seriously?"}, life = 7, cooldown = 60},
@@ -30,7 +32,9 @@ tips = {
 				"Boss, we have too much metal.\nGet more of us making stuff."}, life = 7, cooldown = 30},
 	metal_deficit = {str = {"Running low on metal, chief.\nWe should try reclaiming\nor getting more mexes."}, life = 7, cooldown = 60},
 	
-	facplop = {str = {"This facplop is burning\na hole in my pocket..."}, life = 7, cooldown = 30},
+	facplop = {str = {"This free factory is burning\na hole in my pocket..."}, life = 7, cooldown = 30},
+	factory_duplicate = {str = {"We already have one of\nthat fac. I don't think\nwe need a second, chief."}, life = 9, cooldown = 60},
+	factory_multiple = {str = {"Sir, we don't need another\nfac so soon. Assist with cons\nif you need to build faster."}, life = 10, cooldown = 60},
 	
 	defense_excess = {str = {"Boss, this isn't a\nTower Defense game...",
 				"Chief, don't you think\nwe have enough\ndefenses already?",
@@ -102,10 +106,19 @@ local defenseDefs = {
 	"corjamt"
 }
 
+factoryDefs = {
+	"corsy",
+	"striderhub",
+}
+for name in pairs(UnitDefNames) do
+	if string.find(name, "factory") then factoryDefs[#factoryDefs+1] = name end
+end
+
 --unitDefID-indexed tables
 expensive_units = {}
 superweapons = {}
 commanders = {}
+factories = {}
 adv_factories = {}
 energy = {}
 defenses = {}
@@ -128,3 +141,4 @@ CreateArray(superweaponDefs, superweapons)
 CreateArray(canRetreatDefs, canRetreat)
 CreateArray(energyDefs, energy)
 CreateArray(defenseDefs, defenses)
+CreateArray(factoryDefs, factories)

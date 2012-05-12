@@ -171,6 +171,7 @@ energyDefs = {
 
 factoryDefs = {
 	"corsy",
+	"striderhub",
 }
 
 advFactoryDefs = {
