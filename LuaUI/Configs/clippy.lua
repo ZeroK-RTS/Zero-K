@@ -6,6 +6,8 @@ ENERGY_TO_METAL_RATIO = 2.4	-- suggested maximum for energy
 ENERGY_LOW_THRESHOLD = 300
 DEFENSE_QUOTA = 0.2	-- suggested maximum proportion of total assets that is defense
 
+RANK_LIMIT = 3
+
 DELAY_BETWEEN_FACS = 10*60*30
 
 --seconds

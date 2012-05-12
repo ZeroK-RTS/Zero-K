@@ -31,7 +31,7 @@ options = {
 	rankLimit = {
 		name = "Rank Limit",
 		type = 'bool',
-		value = false,
+		value = true,
 		desc = 'Units make comments only to newbies.',
 	},
 	warnExpensiveUnits = {
@@ -48,7 +48,7 @@ local activeTips = {}	-- [unitID] = {stuff for tip being displayed}
 
 local units = {}
 local haveFactoryDefIDs = {}
-local lastFactoryTime = -10000 -- gameframe
+local lastFactoryTime = -100000 -- gameframe
 local totalValue = 0
 local defenseValue = 0
 
@@ -109,7 +109,7 @@ local function GetTipDimensions(unitID, str, height, invert)
 end
 
 local function MakeTip(unitID, tip)
-	if (options.rankLimit.value and (rank > 2)) then
+	if (options.rankLimit.value and (rank > RANK_LIMIT)) then
 		return
 	end
 	DisposeTip(unitID)
@@ -268,7 +268,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 			defenseValue = defenseValue - cost
 		elseif factories[unitDefID] then
 			haveFactoryDefIDs[unitDefID] = nil
-			lastFactoryTime = -10000
+			lastFactoryTime = -100000
 		end
 	end
 	DisposeTip(unitID)
