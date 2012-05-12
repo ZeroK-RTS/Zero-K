@@ -3,6 +3,7 @@ INCOME_TO_SPLURGE = 25	-- ignore expensive warning if you have this much income
 METAL_PER_NANO = 12		-- suggested nanos per metal ^ -1
 NANO_DEF_ID = UnitDefNames.armnanotc.id
 ENERGY_TO_METAL_RATIO = 2.4	-- suggested maximum for energy
+ENERGY_LOW_THRESHOLD = 300
 DEFENSE_QUOTA = 0.2	-- suggested maximum proportion of total assets that is defense
 
 --seconds
@@ -16,12 +17,18 @@ tips = {
 				"Sir, I don't think that\nunit is in our price\nrange right now."}, life = 9, cooldown = 20},
 	superweapon = {str = {"A superweapon,\nnow? Seriously?"}, life = 7, cooldown = 60},
 	adv_factory = {str = {"Are you sure that's\na good starting\nfac, chief?"}, life = 7, cooldown = 60},
+	
 	retreat_repair = {str = {"Getting shot up!\nRequesting permission\nto pull out, sir!",
 				"Get me out of here!\nI need repairs!",}, life = 7, cooldown = 20},
+				
 	energy_excess  = {str = {"I think we've got\nenough energy for\nnow, boss.",
 				"We're not playing\nEnergy Tycoon, man...",
 				"Sir, we're swimming\nin energy as it is."}, life = 7, cooldown = 20},
-	energy_stall  = {str = {"Stalling energy, sir.\nSome more E structures?"}, life = 7, cooldown = 20},
+	energy_deficit  = {str = {"Energy deficit, sir.\nMore E structures?",
+				"Commander, we'll soon\nrun out of energy\nunless we build more E."}, life = 7, cooldown = 45},
+	metal_excess  = {str = {"Sir, we have a metal glut.\nPut some more buildpower\ninto making units.",
+				"Boss, we have too much metal.\nGet more of us making stuff."}, life = 7, cooldown = 30},
+	metal_deficit = {str = {"Running low on metal, chief.\nWe should try reclaiming\nor getting more mexes."}, life = 7, cooldown = 60},
 	
 	facplop = {str = {"This facplop is burning\na hole in my pocket..."}, life = 7, cooldown = 30},
 	

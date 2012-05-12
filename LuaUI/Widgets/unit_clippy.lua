@@ -151,36 +151,50 @@ local function ProcessCommand(unitID, command)
 		if numNanos > 0 and (metalIncome/numNanos < METAL_PER_NANO) then
 			MakeTip(unitID, "nano_excess")
 		end
-	elseif superweapons[-command] and TIMER_SUPERWEAPON > gameframe/30 then
-		if tips.superweapon.lastUsed > gameframe - tips.superweapon.cooldown*30 then
+	else
+		if superweapons[-command] and TIMER_SUPERWEAPON > gameframe/30 then
+			if tips.superweapon.lastUsed > gameframe - tips.superweapon.cooldown*30 then
+				return
+			end
+			MakeTip(unitID, "superweapon")
 			return
+		elseif expensive_units[-command] and TIMER_EXPENSIVE_UNITS > gameframe/30 then
+			if tips.expensive_unit.lastUsed > gameframe - tips.expensive_unit.cooldown*30 then
+				return
+			end
+			local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
+			if metalIncome < INCOME_TO_SPLURGE then
+				MakeTip(currentBuilder, "expensive_unit")
+				return
+			end
 		end
-		MakeTip(unitID, "superweapon")			
-	elseif expensive_units[-command] and TIMER_EXPENSIVE_UNITS > gameframe/30 then
-		if tips.expensive_unit.lastUsed > gameframe - tips.expensive_unit.cooldown*30 then
-			return
+		if defenses[-command] then
+			if tips.defense_excess.lastUsed > gameframe - tips.defense_excess.cooldown*30 then
+				return
+			end
+			if totalValue == 0 then return end
+			if defenseValue/totalValue > DEFENSE_QUOTA then
+				MakeTip(unitID, "defense_excess")
+				return
+			end
+		elseif energy[-command] then
+			if tips.energy_excess.lastUsed > gameframe - tips.energy_excess.cooldown*30 then
+				return
+			end
+			local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
+			local energyCurrent,_,_,energyIncome = spGetTeamResources(myTeam, "energy")
+			if energyIncome/metalIncome > ENERGY_TO_METAL_RATIO then
+				MakeTip(unitID, "energy_excess")
+				return
+			end
 		end
-		local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
-		if metalIncome < INCOME_TO_SPLURGE then
-			MakeTip(currentBuilder, "expensive_unit")
-		end
-	elseif defenses[-command] then
-		if tips.defense_excess.lastUsed > gameframe - tips.defense_excess.cooldown*30 then
-			return
-		end
-		if totalValue == 0 then return end
-		if defenseValue/totalValue > DEFENSE_QUOTA then
-			MakeTip(unitID, "defense_excess")
-		end		
-	elseif energy[-command] then
-		if tips.energy_excess.lastUsed > gameframe - tips.energy_excess.cooldown*30 then
-			return
-		end
-		local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
-		local energyIncome = select(4, spGetTeamResources(myTeam, "energy"))
-		if energyIncome/metalIncome > ENERGY_TO_METAL_RATIO then
-			MakeTip(unitID, "energy_excess")
-		end
+		local metalCurrent,metalStorage,_,metalIncome,metalExpense = spGetTeamResources(myTeam, "metal")
+		local energyCurrent,_,_,energyIncome = spGetTeamResources(myTeam, "energy")
+		if energyIncome/metalIncome < 1 and energyCurrent < ENERGY_LOW_THRESHOLD then
+			MakeTip(unitID, "energy_deficit")
+		elseif metalCurrent/metalStorage > 0.95 and metalIncome - metalExpense > 0 then
+			MakeTip(unitID, "metal_excess")
+		end	
 	end
 end
 
