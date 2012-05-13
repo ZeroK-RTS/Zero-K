@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.008 Chili Keyboard Menu",
+    desc      = "v0.009 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -92,6 +92,7 @@ local updateCommandsSoon = false
 local lastCmd, lastColor
 
 local curTab = 'none'
+local keyRows = {}
 
 --predeclared functions
 local function UpdateButtons() end
@@ -345,6 +346,26 @@ local function to_string(data, indent)
 end
 --]]
 
+local function explode(div,str)
+	if (div=='') then
+		--return false
+		local ret = {}
+		local len = str:len()
+		for i=1,len do
+			local char = str:sub(i,i)
+			ret[#ret+1] = char
+		end
+		return ret
+	end
+	local pos,arr = 0,{}
+	-- for each divider found
+	for st,sp in function() return string.find(str,div,pos,true) end do
+	  table.insert(arr,string.sub(str,pos,st-1)) -- Attach chars left of current divider
+	  pos = sp + 1 -- Jump past current divider
+	end
+	table.insert(arr,string.sub(str,pos)) -- Attach chars right of last divider
+	return arr
+end
 
 local function CopyTable(outtable,intable)
   for i,v in pairs(intable) do 
@@ -699,12 +720,13 @@ end
 local function SetupTabs()
 	tab_buttons = {}
 	local tabs = {
-		ctrl = 'Selections (Ctrl)',
 		none = 'Commands',
+		ctrl = 'Selections (Ctrl)',
 		alt = 'States (Alt)',
 		meta = 'Other (Spacebar)',
+		unbound = 'Unbound',
 	}
-	local tabs_i = { 'ctrl', 'none', 'alt', 'meta' }
+	local tabs_i = { 'none', 'ctrl', 'alt', 'meta', 'unbound' }
 	
 	
 	tabCount = #tabs_i
@@ -752,12 +774,14 @@ SetupKeybuttons = function()
 	key_buttons = {}
 	key_button_images = {}
 	
-	--local rows = { 'QWERT', 'ASDFG', 'ZXCVB' }
-	local rows = { 'QWERTY', 'ASDFGH', 'ZXCVBN' }
+	--keyRows = { 'QWERT', 'ASDFG', 'ZXCVB' }
+	keyRows = { 'QWERTY', 'ASDFGH', 'ZXCVBN' }
 	
 	if options.qwertz.value then
-		rows = { 'QWERTZ', 'ASDFGH', 'YXCVBN' }
+		keyRows = { 'QWERTZ', 'ASDFGH', 'YXCVBN' }
 	end
+	
+	local rows = keyRows
 	
 	local colnum = 0
 	local offset_perc = 4
@@ -873,7 +897,7 @@ end
 
 local function SetupCommands( modifier )
 
-	AddCustomCommands(selectedUnits)
+	--AddCustomCommands(selectedUnits)
 	BuildMode(false)
 	
     local commands = widgetHandler.commands
@@ -904,12 +928,27 @@ local function SetupCommands( modifier )
 	if modifier == 'none' then
 		modifier = '';
 	end
+	
+	local unboundKeys = table.concat( keyRows )
+	local unboundKeyList = explode( '', unboundKeys )
+	local unboundKeyIndex = 1
 		
 	for i, cmd in ipairs( curCommands ) do
 		local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
 		
 		local hotkey_key, hotkey_mod = BreakDownHotkey(hotkey)
-		--echo(cmd.name, hotkey_key, hotkey_mod)
+		--echo(CMD[cmd.id], cmd.name, hotkey_key, hotkey_mod)
+		
+		if modifier == 'unbound' and hotkey_key == ''
+			and cmd.type ~= CMDTYPE.NEXT and cmd.type ~= CMDTYPE.PREV
+			and cmd.id >= 0
+			then
+			if unboundKeyList[unboundKeyIndex] then
+				hotkey_key = unboundKeyList[unboundKeyIndex]
+				hotkey_mod = 'unbound'
+				unboundKeyIndex = unboundKeyIndex + 1
+			end
+		end
 		
 		if modifier == '' and cmd.id == CMD_RADIALBUILDMENU then
 			AddBuildButton()
@@ -928,9 +967,9 @@ local function SetupCommands( modifier )
 			end
 			--color=nil
 			UpdateButton( hotkey_key, hotkey, cmd.name, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
-			
 		end
 		commandButtons[cmd.id] = key_buttons[hotkey_key]
+		
 	end
 	for i, selection in ipairs(selections) do
 		local option = options[selection]
@@ -1093,6 +1132,7 @@ end
 function widget:CommandsChanged()
 	--echo ('commands changed')
 	-- updating here causes async error when clearing hotkey labels, two commandschanged occur at once
+	AddCustomCommands(selectedUnits)
 	updateCommandsSoon = true
 end
 
