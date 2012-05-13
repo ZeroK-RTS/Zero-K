@@ -259,8 +259,11 @@ local function AnimFinished(waitingForAnim, piece, axis)
 	local wthreads = waitingForAnim[index]
 	if wthreads then
 		waitingForAnim[index] = {}
-		for i=1,#wthreads do
+
+		local i = 1
+		while wthreads[i] do
 			WakeUp(wthreads[i])
+			i = i + 1
 		end
 	end
 end
@@ -776,13 +779,17 @@ function gadget:GameFrame()
 	local zzz = sleepers[n]
 	if zzz then
 		sleepers[n] = nil
+
 		-- Wake up the lazy bastards.
-		for i = 1, #zzz do
+		local i = 1
+		while zzz[i] do
 			local unitID = zzz[i].unitID
 
 			PushActiveUnitID(unitID)
 			sp_CallAsUnit(unitID, WakeUp, zzz[i])
 			PopActiveUnitID()
+
+			i = i + 1
 		end
 	end
 end
