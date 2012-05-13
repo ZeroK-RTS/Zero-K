@@ -66,7 +66,7 @@ local SALVO_TIME = 1000
 
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
-local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
+local reloadTime = wd and WeaponDefs[wd].reload*30 or 20*30
 
 local base_speed = 100
 --------------------------------------------------------------------------------
@@ -278,6 +278,7 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 3 then
+		--dgunning = true
 		Signal( SIG_AIM_3)
 		SetSignalMask( SIG_AIM_3)
 		armsFree = false
@@ -291,6 +292,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(larm, x_axis)
 		targetHeading = heading + GetUnitValue(COB.HEADING)/32768
 		StartThread(RestoreAfterDelay)
+		dgunning = false
 		return true
 	elseif num == 4 then
 		if dgunning  then return false end
