@@ -389,7 +389,13 @@ end
 function Spring.UnitScript.SetSignalMask(mask)
 	local activeUnit = GetActiveUnit()
 	local activeThread = activeUnit.threads[co_running() or error("[SetSignalMask] not in a thread", 2)]
+	if (activeThread.signal_mask_set) then
+		local ud = UnitDefs[Spring.GetUnitDefID(activeUnit.unitID)]
+		Spring.Echo("Warning: Spring.UnitScript.SetSignalMask called second time for the same thread (possible lack of StartThread?)")
+		Spring.Echo("UnitDef: " .. ud.name .. " Old mask: " .. activeThread.signal_mask .. " New mask: " .. mask)
+	end
 	activeThread.signal_mask = mask
+	activeThread.signal_mask_set = true
 end
 
 function Spring.UnitScript.Signal(mask)

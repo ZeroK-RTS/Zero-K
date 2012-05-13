@@ -36,7 +36,6 @@ local base_speed = 100
 local SIG_MOVE = 2	
 local SIG_AIM1 = 4
 local SIG_AIM2 = 8
-local SIG_CURL = 16
 
 local PACE = 1.2
 
@@ -62,8 +61,6 @@ local gun_0 = 0
 
 -- four-stroke tetrapedal walkscript
 local function Walk()
-	while bCurled or bCurling do Sleep(100) end
-	SetUnitValue(COB.MAX_SPEED, base_speed)
 	while true do
 		-- Spring.Echo("left fore and right back move, left back and right fore anchor")
 		Turn(leg4, z_axis, legRaiseAngle, legRaiseSpeed)	-- LF leg up
@@ -111,8 +108,7 @@ end
 local function Curl()
 	if nocurl then return end
 	--Spring.Echo("Initiating curl")
-	Signal( SIG_CURL)
-	SetSignalMask( SIG_CURL)
+	SetSignalMask(SIG_MOVE)
 	
 	Sleep(100)
 	bCurling = true
@@ -186,18 +182,15 @@ local function ResetLegs()
 	Turn( leg2 , x_axis, 0, math.rad(95) )
 	Turn( leg3 , x_axis, 0, math.rad(95) )
 	Turn( leg4 , x_axis, 0, math.rad(95) )
-	Spring.SetUnitArmored(unitID,false)
 end
 
 local function Uncurl()
-	if not bMoving then return end
 	--Spring.Echo("Initiating uncurl")
-	Signal( SIG_CURL) 
-	SetSignalMask( SIG_CURL)
 	bCurled = false
 	bCurling = true
 	
 	ResetLegs()
+	Spring.SetUnitArmored(unitID,false)
 	
 	Move( canon , y_axis, 0 , 2.5 )
 	Move( base , y_axis, 0 , 2.5 )
@@ -218,7 +211,7 @@ local function Uncurl()
     WaitForTurn(leg3, z_axis)
     WaitForTurn(leg4, z_axis)    
 	
-    --SetUnitValue(COB.MAX_SPEED, base_speed)
+    SetUnitValue(COB.MAX_SPEED, base_speed)
     bCurling = false
 end
 
