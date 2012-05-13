@@ -17,14 +17,27 @@ end
 --------------------------------------------------------------------------------
   
 if (gadgetHandler:IsSyncedCode()) then
-  return false  --  silent removal
+--------------------------------------------------------------------------------
+-- synced
+--------------------------------------------------------------------------------
+function gadget:RecvLuaMsg(msg, playerID)
+  if msg == "forceresign" then
+    local team = select(4, Spring.GetPlayerInfo(playerID))
+    Spring.KillTeam(team)
+  end
 end
+
+else
+--------------------------------------------------------------------------------
+-- unsynced
+--------------------------------------------------------------------------------
 
 local function Resign(_, name)
   local playerID = Spring.GetMyPlayerID()
   local myName = Spring.GetPlayerInfo(playerID)
   if name == myName then
-    Spring.SendCommands('spectator')
+    --Spring.SendCommands('spectator')
+    Spring.SendLuaRulesMsg("forceresign")
   end
 end
 
@@ -32,5 +45,6 @@ function gadget:Initialize()
   gadgetHandler:AddChatAction('resignteam', Resign, " resigns the player with the specified name")
 end
 
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
