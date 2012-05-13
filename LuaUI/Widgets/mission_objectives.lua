@@ -144,11 +144,13 @@ local function ModifyObjective(id, title, details, pos, status, color)
 	end
 	if status then
 		status = string.lower(status)
-		obj.image.file = statusImages[status]
-		obj.image:Invalidate()
+		if statusImages[status] then
+		      obj.image.file = statusImages[status]
+		      obj.image:Invalidate()
+		end
 	end
-	if status or color then
-		obj.label.font.color = color or statusColors[status]
+	if (status) or color then
+		obj.label.font.color = color or statusColors[status] or obj.label.font.color
 		obj.label:Invalidate()	
 	end
 end

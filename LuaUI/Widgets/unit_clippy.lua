@@ -84,6 +84,10 @@ local font = "LuaUI/Fonts/komtxt__.ttf"
 
 ------------------------
 ------------------------
+if VFS.FileExists("mission.lua") then
+	return
+end
+
 local function DisposeTip(unitID)
 	if not unitID then return end
 	
