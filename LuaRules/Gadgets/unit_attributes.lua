@@ -99,7 +99,6 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 			local reload = wd.reload
 			state.weapon[i] = {
 				reload = reload,
-				prevReload = reload,
 				burstRate = wd.salvoDelay,
 				oldReloadFrames = floor(reload*30),
 			}
@@ -115,7 +114,7 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 	for i = 0, state.weaponCount do
 		local w = state.weapon[i]
 		local reloadState = spGetUnitWeaponState(unitID, i , 'reloadState')
-		local reloadTime = w.prevReload -- spGetUnitWeaponState(unitID, i , 'reloadTime') -- GetUnitWeaponState for reloadTime does not work
+		local reloadTime  = spGetUnitWeaponState(unitID, i , 'reloadTime')
 		if speedFactor <= 0 then
 			local newReload = 100000 -- set a high reload time so healthbars don't judder. NOTE: math.huge is TOO LARGE
 			if reloadState < 0 then -- unit is already reloaded, so set unit to almost reloaded
@@ -124,7 +123,6 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 				local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
 				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload+UPDATE_PERIOD})
 			end
-			w.prevReload = newReload
 			-- add UPDATE_PERIOD so that the reload time never advances past what it is now
 		else
 			local newReload = w.reload/speedFactor
@@ -134,7 +132,6 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 			else
 				spSetUnitWeaponState(unitID, i, {reloadTime = newReload, reloadState = nextReload})
 			end
-			w.prevReload = newReload
 		end
 	end
 	
