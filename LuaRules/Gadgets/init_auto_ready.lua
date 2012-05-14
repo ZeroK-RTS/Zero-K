@@ -48,6 +48,7 @@ function gadget:GameSetup(label, ready, playerStates)
 	local totalCount = 0
 	waitingFor = {}
 	local activeAllies = {}
+	local totalAllies = {}
 		
 	for num, state in pairs(playerStates) do 
 		local name,active,spec,teamID,allyTeamID,ping = Spring.GetPlayerInfo(num)
@@ -72,16 +73,21 @@ function gadget:GameSetup(label, ready, playerStates)
 					waitingFor[name] = "notready"
 				end
 				activeAllies[allyTeamID] = true
-			end 
+			end
+			totalAllies[allyTeamID] = true
 		end 
 	end
 	
-	local numActiveAllies = 0
+	local numActiveAllies, numTotalAllies = 0, 0
 	for i in pairs(activeAllies) do
 		numActiveAllies = numActiveAllies + 1
 	end
-		
-	if ( ( (timeDiff > MAX_TIME_DIFF) and numActiveAllies > 1) or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
+	for i in pairs(totalAllies) do
+		numTotalAllies = numTotalAllies + 1
+	end
+	local enoughAlliesActive = (numTotalAllies == 1) or (numActiveAllies > 1)
+	
+	if ( ( (timeDiff > MAX_TIME_DIFF) and enoughAlliesActive ) or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
 		if (readyTimer == nil) then 
 			readyTimer = Spring.GetTimer()	
 		end 
