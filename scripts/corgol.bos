@@ -10,11 +10,13 @@ static-var	moving, once, animCount, gun_1_yaw;
 // Signal definitions
 #define SIG_AIM1				1
 #define SIG_AIM2				2
+#define SIG_AIM3				16
 #define SIG_ROCK_X				4		//Signal to prevent multiple rocking. REPLACE!
 #define SIG_TILT_Z				8		//Signal to prevent multiple rocking. REPLACE!
 #define ANIM_SPEED				50
 #define RESTORE_DELAY			3000
 #define LARGE_MUZZLE_FLASH_FX	1024
+#define HUGE_MUZZLE_FLASH_FX	1025
 
 //rocking
 #define ROCK_PIECE				base	//piece to rock. REPLACE!
@@ -208,14 +210,42 @@ AimWeapon2 (heading, pitch)
 
 Shot2()
 {
-	call-script lua_FlameShot(2);
+	//call-script lua_FlameShot(2);
 	return (TRUE);
 }
 
-
-SweetSpot(piecenum)
+AimFromWeapon3(piecenum)
 {
-	piecenum = base;
+	piecenum = turret1;
+}
+
+QueryWeapon3(piecenum)
+{
+	piecenum = firepoint1;
+}
+
+AimWeapon3 (heading, pitch)
+{
+	signal SIG_AIM3;
+	set-signal-mask SIG_AIM3;
+	
+	turn turret1 to y-axis (heading) speed <90>;
+	turn sleeve1 to x-axis (0 - pitch) speed <45>;
+	wait-for-turn turret1 around y-axis;
+	wait-for-turn sleeve1 around x-axis;
+	start-script RestoreAfterDelay(RESTORE_DELAY);
+	gun_1_yaw = heading;
+	return TRUE;
+}
+
+Shot3(placeholder)
+{
+	start-script RockX(ROCK_X_FIRE_1, gun_1_yaw);
+	start-script TiltZ(gun_1_yaw);
+	emit-sfx HUGE_MUZZLE_FLASH_FX from firepoint1;
+	move barrel1 to z-axis [-5] now;
+	sleep 125;
+	move barrel1 to z-axis 0 speed [10];
 }
 
 Killed(severity, corpsetype)
