@@ -135,7 +135,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
       proximityPriority       = 4,
-      range                   = 390,
+      range                   = 400,
       reloadtime              = 0.11,
       rgbColor                = [[0 1 0]],
       soundStart              = [[weapon/laser/laser_burn5]],
@@ -163,8 +163,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 45,
-        subs    = 2.25,
+        default = 50,
+        subs    = 2.5,
       },
 
       duration                = 0.3,
@@ -180,7 +180,7 @@ unitDef = {
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       proximityPriority       = 4,
-      range                   = 390,
+      range                   = 400,
       reloadtime              = 0.1,
       rgbColor                = [[1 0.1 0]],
       rgbColor2               = [[1 1 0.25]],
