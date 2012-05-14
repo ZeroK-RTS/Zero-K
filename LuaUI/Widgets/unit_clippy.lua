@@ -296,7 +296,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	if newTeamID == myTeam then
 		widget:UnitFinished(unitID, unitDefID, teamID)
 	elseif teamID == myTeam then
-		widget:UnitDestroued(unitID, unitDefID, teamID)
+		widget:UnitDestroyed(unitID, unitDefID, teamID)
 	end
 end
 
