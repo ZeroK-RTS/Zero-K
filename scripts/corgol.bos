@@ -210,7 +210,7 @@ AimWeapon2 (heading, pitch)
 
 Shot2()
 {
-	//call-script lua_FlameShot(2);
+	call-script lua_FlameShot(2);
 	return (TRUE);
 }
 
