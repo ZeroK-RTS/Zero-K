@@ -4,14 +4,13 @@ unitDef = {
   description         = [[Very Heavy Tank Buster]],
   acceleration        = 0.0282,
   brakeRate           = 0.052,
-  buildCostEnergy     = 2100,
-  buildCostMetal      = 2100,
+  buildCostEnergy     = 2200,
+  buildCostMetal      = 2200,
   builder             = false,
   buildPic            = [[corgol.png]],
-  buildTime           = 2100,
+  buildTime           = 2200,
   canAttack           = true,
   canGuard            = true,
-  --canManualFire       = true,
   canMove             = true,
   canPatrol           = true,
   canstop             = [[1]],
@@ -22,11 +21,11 @@ unitDef = {
     description_bp = [[Tanque dispersador pesado]],
     description_fr = [[Tank Émeutier Lourd]],
 	description_de = [[Sehr schwerer Panzerknacker]],
-    helptext       = [[The Goliath is the single heaviest tank on the field. Its main gun is a hefty cannon designed to smash lesser tanks into oblivion, while mounted on the turret is a disruptor beam that lames its prey. However, it turns like a tub of water, and it has no real way of dealing with raider swarms or air attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications.]],
+    helptext       = [[The Goliath is the single heaviest tank on the field. Its main gun is a hefty cannon designed to smash lesser tanks into oblivion, while mounted on the turret is a light flamethrower which quickly cooks anything that invades the Golly's privacy. However, it turns like a tub of water, and its short range makes it easy prey for advanced skirmishers, or air attacks. The heavy main cannon can shake walls down so it is somewhat able to spearhead assaults against areas with terraformed fortifications.]],
     helptext_bp    = [[Goliath é o tanque mais pesado do jogo, uma prova do poder de fogo de Logos. Sua arma principal é um grande canh?o que acaba facilmente com unidades pequenas, e seu lança chamas pode destruir rapidamente qualquer coisa que se aproxime demais. Porém, ele manobra lentamente e seu curto alcançe o torna presa fácil para escaramuçadores e ataques aéreos.]],
     helptext_fr    = [[Le Goliath est tout simplement le plus gros tank jamais construit. Un blindage lourd, un énorme canon plasma r moyenne portée fera voler en éclat les ennemis apeurés tandis que son lance flamme s'occupera des plus téméraires. Le Goliath est facile r repérer, il ne laisse que des ruines derricre lui.]],
 	helptext_de    = [[Der Goliath ist der stärkste Panzer auf dem Platz. Seine mächtige Hauptkanone wurde entwickelt, um kleinere Panzer ins Nirvana zu schicken, während der aufgesetzte Flammenwerfer alle Einheiten, die dem Goliath zu nahe kommen, kurz und schmervoll verbrennt. Trotzdem bewegt sich der Panzer wie eine Wasserwanne und seine kurze Reichweite macht ihn zur einfachen Beute von hochentwickelten Skirmishern oder Luftattacken.]],
-	extradrawrange = 300,
+	extradrawrange = 240,
   },
 
   explodeAs           = [[BIG_UNIT]],
@@ -53,7 +52,6 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:LARGE_MUZZLE_FLASH_FX]],
-      [[custom:ARMBRTHA_FLARE]],
     },
 
   },
@@ -74,22 +72,17 @@ unitDef = {
 
     {
       def                = [[COR_GOL]],
-      badTargetCategory  = [[FIXEDWING GUNSHIP]],
+	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
 
     {
-      def                = [[DISRUPTOR]],
+      def                = [[CORGOL_FLAMETHROWER]],
       badTargetCategory  = [[FIREPROOF]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
 
-    --{
-    --  def                = [[DISINTEGRATOR]],
-    --  onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
-    --},    
-    
   },
 
 
@@ -97,20 +90,20 @@ unitDef = {
 
     COR_GOL             = {
       name                    = [[Tankbuster Cannon]],
-      areaOfEffect            = 40,
+      areaOfEffect            = 32,
       craterBoost             = 0,
       craterMult              = 0,
 
       customParams            = {
 	    gatherradius = [[105]],
 	    smoothradius = [[70]],
-	    smoothmult   = [[0.35]],
-      },
+		smoothmult   = [[0.4]],
+	  },
       
       damage                  = {
-        default = 1200,
-        planes  = 1200,
-        subs    = 60,
+        default = 1400,
+        planes  = 1400,
+        subs    = 70,
       },
 
       explosionGenerator      = [[custom:TESS]],
@@ -119,93 +112,61 @@ unitDef = {
       interceptedByShieldType = 1,
       noSelfDamage            = true,
       range                   = 450,
-      reloadtime              = 4,
+      reloadtime              = 4.9,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
       soundStart              = [[weapon/cannon/rhino]],
+      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 310,
     },
 
 
-    DISRUPTOR = {
-      name                    = [[Disruptor Pulse Beam]],
-      areaOfEffect            = 32,
-      beamdecay		      = 0.9,
-      beamTime                = 0.2,
-      beamttl                 = 50,
-      coreThickness           = 0.1,
+    CORGOL_FLAMETHROWER = {
+	  name                    = [[Flamethrower]],
+      areaOfEffect            = 64,
+      avoidFeature            = false,
+      collideFeature          = false,
+      collideGround           = false,
       craterBoost             = 0,
       craterMult              = 0,
-  
-      customParams			= {
-	timeslow_damagefactor = [[2]],
-      },
-	  
-      damage = {
-	default = 200,
-      },
-  
-      explosionGenerator      = [[custom:flash2purple]],
-      fireStarter             = 30,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      largeBeamLaser          = true,
-      laserFlareSize          = 4.33,
-      minIntensity            = 1,
-      noSelfDamage            = true,
-      range                   = 300,
-      reloadtime              = 2,
-      rgbColor                = [[0.3 0 0.4]],
-      soundStart              = [[weapon/laser/heavy_laser5]],
-      soundStartVolume        = 3,
-      soundTrigger            = true,
-      sweepfire               = false,
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
-      thickness               = 8,
-      tolerance               = 18000,
-      turret                  = true,
-      weaponType              = [[BeamLaser]],
-      weaponVelocity          = 500,
-    },
-    
-    DISINTEGRATOR = {
-      name                    = [[Disintegrator]],
-      areaOfEffect            = 48,
-      avoidFeature            = false,
-      avoidFriendly           = false,
-      avoidNeutral            = false,
-      commandfire             = true,
-      craterBoost             = 1,
-      craterMult              = 6,
 
+	  customParams        	  = {
+		flamethrower = [[1]],
+	    setunitsonfire = "1",
+		burntime = [[360]],
+	  },
+	  
       damage                  = {
-	default    = 1200,
+        default = 5,
+        subs    = 0.05,
       },
-  
-      explosionGenerator      = [[custom:DGUNTRACE]],
-      impulseBoost            = 0,
+
+	  duration				  = 0.1,
+      explosionGenerator      = [[custom:SMOKE]],
+	  fallOffRate             = 1,
+	  fireStarter             = 100,
+	  impulseBoost            = 0,
       impulseFactor           = 0,
-      interceptedByShieldType = 1,
+      intensity               = 0.1,
+      interceptedByShieldType = 0,
       noExplode               = true,
       noSelfDamage            = true,
-      range                   = 250,
-      reloadtime              = 25,
-      size                    = 6,
-      soundHit                = [[explosion/ex_med6]],
-      soundStart              = [[weapon/laser/heavy_laser4]],
+	  --predictBoost			  = 1,
+      range                   = 280,
+      reloadtime              = 0.16,
+	  rgbColor                = [[1 1 1]],
+	  soundStart              = [[weapon/flamethrower]],
       soundTrigger            = true,
-      tolerance               = 10000,
+	  texture1				  = [[fireball]],
+	  texture2				  = [[fireball]],
+	  thickness	              = 12,
+      tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 4.2,
-      weaponType              = [[DGun]],
-      weaponVelocity          = 300,
-    }
+      weaponType              = [[LaserCannon]],
+      weaponVelocity          = 800,
+    },
+
 
   },
 
@@ -224,10 +185,10 @@ unitDef = {
       footprintZ       = 4,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 840,
+      metal            = 880,
       object           = [[golly_d.s3o]],
       reclaimable      = true,
-      reclaimTime      = 840,
+      reclaimTime      = 880,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -243,10 +204,10 @@ unitDef = {
       footprintX       = 4,
       footprintZ       = 4,
       hitdensity       = [[100]],
-      metal            = 420,
+      metal            = 440,
       object           = [[debris4x4c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 420,
+      reclaimTime      = 440,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
