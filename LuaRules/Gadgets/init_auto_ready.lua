@@ -13,6 +13,8 @@ end
 
 if (not gadgetHandler:IsSyncedCode()) then
 
+local MAX_TIME_DIFF = 75	-- wait this long for disconnected players
+
 local allReady = false 
 local startTimer = nil
 local readyTimer = nil
@@ -43,6 +45,7 @@ function gadget:GameSetup(label, ready, playerStates)
 	local readyCount = 0 
 	local waitingCount = 0 
 	local missingCount = 0
+	local totalCount = 0
 	waitingFor = {}
 		
 	for num, state in pairs(playerStates) do 
@@ -51,7 +54,8 @@ function gadget:GameSetup(label, ready, playerStates)
 		local _,_,_,isAI,_,_ = Spring.GetTeamInfo(teamID)
 		local startPosSet = x ~= nil and x~= -100 and y ~= -100 and z~=-100
 	
-		if not spec and not isAI then 
+		if not spec and not isAI then
+			totalCount = totalCount + 1
 			if not active then 
 				missingCount = missingCount + 1
 				waitingFor[name] = "missing"
@@ -70,7 +74,7 @@ function gadget:GameSetup(label, ready, playerStates)
 		end 
 	end 
 		
-	if (timeDiff > 30 or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
+	if ( ( (timeDiff > MAX_TIME_DIFF) and totalCount > 2) or missingCount == 0) and readyCount > 0 and waitingCount ==0 then
 		if (readyTimer == nil) then 
 			readyTimer = Spring.GetTimer()	
 		end 
