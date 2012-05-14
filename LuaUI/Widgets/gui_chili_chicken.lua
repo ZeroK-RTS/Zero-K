@@ -159,12 +159,12 @@ local function GetColorAggression(value)
 	local r,g,b
 	if (value<=-1) then
 		r = 255
-		g = math.floor(255/(math.abs(value)))
-		b = math.floor(255/(math.abs(value)))
+		g = math.max(255 + value*25, 0)
+		b = math.max(255 + value*25, 0)
 	elseif (value>=1) then
-		r = math.floor(254/(math.abs(value)))--floor gives entier inférieur
+		r = math.max(255 - value*25, 0)
 		g = 255
-		b = math.floor(255/(math.abs(value))) --floor gives entier inférieur
+		b = math.max(255 - value*25, 0)
 	else
 		r=255
 		g=255

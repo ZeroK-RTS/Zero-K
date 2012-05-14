@@ -66,10 +66,11 @@ chickenSpawnRate     = 59
 waveRatio            = 0.6       -- waves are composed by two types of chicken, waveRatio% of one and (1-waveRatio)% of the other
 baseWaveSize		 = 2.5		 -- multiplied by malus, 1 = 1 squadSize of chickens
 waveSizeMult		 = 1
-defenderChance       = 0.05		-- amount of turrets spawned per wave, <1 is the probability of spawning a single turret
-quasiAttackerChance  = 0.6		-- same as defenderChance but for supporters
 --forceBurrowRespawn	 = false	-- burrows always respawn even if the modoption is set otherwise        
 queenSpawnMult       = 4         -- how many times bigger is a queen hatch than a normal burrow hatch
+
+defensePerWave       = 0.5	-- number of turrets added to defense pool every wave, multiplied by playercount
+defensePerBurrowKill = 0.5	-- number of turrets added to defense pool for each burrow killed
 
 gracePeriod          = 180       -- no chicken spawn in this period, seconds
 gracePenalty		 = 15		-- reduced grace per player over one, seconds
@@ -84,14 +85,13 @@ endMiniQueenWaves	= 7		-- waves per miniqueen in PvP endgame
 burrowQueenTime		= 15		-- how much killing a burrow shaves off the queen timer, seconds
 burrowWaveSize		= 1.2		-- size of contribution each burrow makes to wave size (1 = 1 squadSize of chickens)
 burrowRespawnChance = 0.15
-burrowRegressTime	= 60		-- direct tech time regress from killing a burrow, divided by playercount
+burrowRegressTime	= 40		-- direct tech time regress from killing a burrow, divided by playercount
 
 humanAggroPerBurrow	= 1			-- divided by playercount
 humanAggroDecay		= 0.25		-- linear rate at which aggro decreases
 humanAggroWaveFactor = 1
 humanAggroWaveMax	= 5
-humanAggroDefenseFactor = 1		-- multiplies aggro for defender spawn chance	-- this one uses per-wave delta rather than listed value
-humanAggroSupportFactor	= 0.1	-- multiplies aggro for supporter spawn chance
+humanAggroDefenseFactor = 0.5	-- turrets issued per point of PAR every wave, multiplied by playercount
 humanAggroTechTimeProgress = 20	-- how much to increase chicken tech progress (* aggro), seconds
 humanAggroTechTimeRegress = 0	-- how much to reduce chicken tech progress (* aggro), seconds
 humanAggroQueenTimeFactor = 1	-- burrow queen time is multiplied by this and aggro (after clamping)
@@ -140,7 +140,7 @@ local chickenTypes = {
   chickenr       =  {time = 24,  squadSize = 1.2, obsolete = 50},
   --chicken_leaper =  {time = 24,  squadSize = 2, obsolete = 45},  
   chickenwurm    =  {time = 28,  squadSize =   0.7},
-  chicken_roc	 =  {time = 28,  squadSize =   0.5},  
+  chicken_roc	 =  {time = 28,  squadSize =   0.4},  
   chicken_sporeshooter =  {time = 32,  squadSize =   0.5},
   chickenf       =  {time = 36,  squadSize = 0.5},
   chickenc       =  {time = 42,  squadSize = 0.5},
@@ -152,16 +152,17 @@ local chickenTypes = {
 }
 
 local defenders = {
-  chickend = {time = 20, squadSize = 0.65 },
-  chicken_dodo = {time = 30,  squadSize = 2}, 
-  chicken_spidermonkey =  {time = 25, squadSize = 0.7},
+  chickend = {time = 10, squadSize = 0.6, cost = 1 },
+  chicken_dodo = {time = 25,  squadSize = 2, cost = 1}, 
+  chicken_spidermonkey =  {time = 20, squadSize = 0.6, cost = 1},
   --chicken_rafflesia =  {time = 30, squadSize = 0.4 },
 }
 
 local supporters = {
   --chickenspire =  {time = 50, squadSize = 0.1},
-  chicken_shield =  {time = 30, squadSize = 0.6},
-  chicken_spidermonkey =  {time = 20, squadSize = 0.7},
+  chicken_shield =  {time = 30, squadSize = 0.4},
+  chicken_dodo = {time = 25, squadSize = 2},
+  chicken_spidermonkey =  {time = 20, squadSize = 0.6},
 }
 
 -- TODO
@@ -280,7 +281,7 @@ difficulties = {
 	techAccelPerPlayer	= 0,
 	humanAggroQueenTimeFactor	= 0.35,
 	humanAggroTechTimeProgress	= 7,
-	burrowRegressTime	= 20,
+	burrowRegressTime	= 12,
 	queenSpawnMult	 = 2.5, 
 	timeModifier	 = 0.35,
   },  

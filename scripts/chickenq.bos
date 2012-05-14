@@ -180,7 +180,7 @@ Create()
 	emit-sfx 1026 from body;
 	emit-sfx 1026 from head;
 	emit-sfx 1026 from tail;
-	start-script Stomp();
+	//start-script Stomp();
 }
 
 AimFromPrimary(piecenum)
