@@ -198,6 +198,7 @@ function widget:Initialize()
 	if (Spring.GetSpectatingState() or Spring.IsReplay()) then
 		Spring.Echo("<Startup Info and Selector> Spectator mode or replay. Widget removed.")
 		widgetHandler:RemoveWidget()
+		return
 	end
 	-- chili setup
 	Chili = WG.Chili
