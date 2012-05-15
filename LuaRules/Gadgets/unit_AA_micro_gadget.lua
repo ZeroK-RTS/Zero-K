@@ -15,7 +15,7 @@ function gadget:GetInfo()
     date      = "14/09/11",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false	--  loaded by default?
+    enabled   = true	--  loaded by default?
   }
 end
 
@@ -183,7 +183,7 @@ function checkAAdef()
             end
             if AAdefbuff.attacking ~= nil then
               if UnitIsDead(AAdefbuff.attacking) or not InRange(unitID, AAdefbuff.attacking, AAdefbuff.range) then
-                AAdefbuff.attacking = nil
+				unassignTarget(AAdefbuff)
                 AAdefbuff.gassigncounter = 0
                 AAdefbuff.counter = 0
               end
@@ -294,6 +294,10 @@ function checkairs()
           if not UnitIsDead(unitID) then
             health, _, _, _, _ = GetHP(unitID)
             airbuff.hp = health
+			--Echo(unitID, airbuff.tincoming, airbuff.incoming)
+			for ID,_ in pairs(airbuff.attacking) do
+			  --Echo(unitID, ID)
+			end
             if airbuff.globalassign then
               airbuff.globalassigncount = airbuff.globalassigncount - 1
               --Echo("air gassigncounter", unitID, airbuff.globalassigncount)
@@ -421,6 +425,7 @@ function globalassign()
                 unassignTarget(AAdefbuff)
                 attackTarget(unitID, targetID, allyteam)
                 AAdefbuff.attacking = targetID
+				airbuff.attacking[unitID] = true
                 airbuff.tincoming = airbuff.tincoming + AAdefbuff.damage
                 --Echo("global assign " .. unitID .. " targeting " .. unitID .. " tincoming " .. airbuff.tincoming)
                 airbuff.globalassign = true
@@ -483,6 +488,7 @@ function assignTarget(unitID, allyteam, output)
             unassignTarget(AAdefbuff)
             attackTarget(unitID, assign, allyteam)
             AAdefbuff.attacking = assign
+			airbuff.attacking[unitID] = true
             if IsBurstAA(AAdefbuff.name) then
               airbuff.tincoming = airbuff.tincoming + AAdefbuff.shotdamage
             end
@@ -520,6 +526,7 @@ function unassignTarget(AAdefbuff)
   if AAdefbuff.attacking ~= nil then
     local airbuff = GetAirUnit(AAdefbuff.attacking)
     if airbuff ~= nil then
+	  airbuff.attacking[AAdefbuff.id] = nil
       airbuff.tincoming = airbuff.tincoming - AAdefbuff.shotdamage
       --Echo("tower " .. unitID .. " was targeting " .. attacking .. ", deassigning from " .. airbuff.name, "tincoming is now " .. airbuff.tincoming)
       if airbuff.tincoming < 0 then
@@ -1263,7 +1270,7 @@ function addAir(unitID, unitDefID, name, allyteam)
 	airtargets[allyteam] = {units = {}}
   end
   airtargetsmaxcount[allyteam] = airtargetsmaxcount[allyteam] + 1
-  airtargets[allyteam].units[unitID] = {name = name, tincoming = 0, incoming = 0, hp = health, team = allyteam, inrange = {}, pdamage = {}, pdamagecount = 1, globalassign = false, globalassigncount = 0}
+  airtargets[allyteam].units[unitID] = {name = name, tincoming = 0, incoming = 0, hp = health, team = allyteam, inrange = {}, pdamage = {}, pdamagecount = 1, globalassign = false, globalassigncount = 0, attacking = {}}
 end
 
 function removeAA(unitID, allyteam)
@@ -1523,12 +1530,13 @@ function gadget:Initialize()
     if unitDefName == "corrl" or unitDefName == "corcrash" then
       dpsaaexception = true
     end
+    if unitDef.canFly then
+      airunitdefs[unitDefName] = {hp = unitDef.health, maxspeed = unitDef.speed, cost = unitDef.metalCost}
+      globalassignment[globalassignmentcount] = {name = unitDefName, def = unitDef, units = {}, unitscount = 1}
+      globalassignmentcount = globalassignmentcount + 1
+	end
     if exception then
-      if unitDef.canFly then
-        airunitdefs[unitDefName] = {hp = unitDef.health, maxspeed = unitDef.speed, cost = unitDef.metalCost}
-        globalassignment[globalassignmentcount] = {name = unitDefName, def = unitDef, units = {}, unitscount = 1}
-        globalassignmentcount = globalassignmentcount + 1
-      else
+      if not unitDef.canFly then
         if unitDefName == "amphaa" then 
           AAstats[unitDefName].height = unitDef.height
           AAstats[unitDefName].movespeed = unitDef.speed
