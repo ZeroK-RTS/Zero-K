@@ -1239,29 +1239,30 @@ end
 
 function gadgetHandler:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)
 	for _, g in ipairs(self.AllowWeaponTargetCheckList) do
-		if (g:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)) then
-			return true
+		if (not g:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, attackerWeaponDefID)) then
+			return false
 		end
 	end
-
-	return false
+	return true
 end
 
 
 function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
-	local allowed = false
 	local priority = 1.0
 
 	for _, g in ipairs(self.AllowWeaponTargetList) do
 		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
 
-		if (targetAllowed) then
-			priority = math.max(priority, targetPriority)
-			allowed = true
+		if (not targetAllowed) then
+			return false, 1.0
+		end
+
+		if (targetPriority > 0.0) then
+			priority = priority * targetPriority
 		end
 	end
 
-	return allowed, priority
+	return true, priority
 end
 
 
