@@ -971,7 +971,7 @@ local function SetupCommands( modifier )
 			end
 			
 			local label = cmd.name
-			if texture then
+			if texture and texture ~= '' then
 				label = ''
 			end
 			if cmd.name == 'Morph' then
