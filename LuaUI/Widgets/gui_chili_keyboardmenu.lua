@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Keyboard Menu",
-    desc      = "v0.009 Chili Keyboard Menu",
+    desc      = "v0.010 Chili Keyboard Menu",
     author    = "CarRepairer",
     date      = "2012-03-27",
     license   = "GNU GPL, v2 or later",
@@ -85,6 +85,7 @@ local white = '\255\255\255\255'
 
 local magenta_table = {0.8, 0, 0, 1}
 local white_table = {1,1,1, 1}
+local black_table = {0,0,0,1}
 
 local tabHeight = 15
 local commandButtons = {}
@@ -442,6 +443,7 @@ local function ClearKeyButtons()
 		key_buttons[k].OnMouseDown = {}
 		key_buttons[k].OnMouseUp = {}
 		key_buttons[k]:ClearChildren()
+		key_buttons[k].tooltip = nil
 		SetButtonColor( key_buttons[k], white_table )
 	end
 end
@@ -874,8 +876,9 @@ local function UpdateButton( hotkey_key, hotkey, name, fcn, tooltip, texture, co
 			parent = key_buttons[hotkey_key];
 		}
 	else
-		key_buttons[hotkey_key]:SetCaption( name:gsub(' ', '\n') )
+		--key_buttons[hotkey_key]:SetCaption( name:gsub(' ', '\n') )
 	end
+	key_buttons[hotkey_key]:SetCaption( name and name:gsub(' ', '\n') or '' )
 	
 	if color then
 		SetButtonColor(key_buttons[hotkey_key], color)
@@ -942,6 +945,7 @@ local function SetupCommands( modifier )
 		if modifier == 'unbound' and hotkey_key == ''
 			and cmd.type ~= CMDTYPE.NEXT and cmd.type ~= CMDTYPE.PREV
 			and cmd.id >= 0
+			and cmd.id ~= CMD_RADIALBUILDMENU
 			then
 			if unboundKeyList[unboundKeyIndex] then
 				hotkey_key = unboundKeyList[unboundKeyIndex]
@@ -961,12 +965,19 @@ local function SetupCommands( modifier )
 			end
 			local _,cmdid,_,cmdname = Spring.GetActiveCommand()
 			
-			local color = cmd.disabled and red_table
+			local color = cmd.disabled and black_table
 			if cmd.id == cmdid then
 				color = magenta_table
 			end
-			--color=nil
-			UpdateButton( hotkey_key, hotkey, cmd.name, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
+			
+			local label = cmd.name
+			if texture then
+				label = ''
+			end
+			if cmd.name == 'Morph' then
+				hotkey = 'Morph'
+			end
+			UpdateButton( hotkey_key, hotkey, label, function() CommandFunction( cmd.id ); end, cmd.tooltip, texture, color )
 		end
 		commandButtons[cmd.id] = key_buttons[hotkey_key]
 		
@@ -978,7 +989,7 @@ local function SetupCommands( modifier )
 		if hotkey_mod == modifier and key_buttons[hotkey_key] then
 			local override = overrides[selection]  -- command overrides
 			local texture = override and override.texture
-			UpdateButton( hotkey_key, hotkey, option.name:gsub(' ', '\n'), function() Spring.SendCommands(option.action) end, option.tooltip, texture )
+			UpdateButton( hotkey_key, hotkey, option.name, function() Spring.SendCommands(option.action) end, option.tooltip, texture )
 		end
 	end
 	
