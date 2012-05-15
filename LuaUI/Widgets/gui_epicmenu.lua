@@ -329,13 +329,6 @@ local function AdjustWindow(window)
 	end
 end
 
-WG.SetRawSetting = function(path, optionkey, value)
-	--[[
-	local option = pathoptions[path][optionkey]
-	option.value = value
-	pathoptions[path][optionkey].OnChange(option)
-	--]]
-end
 
 -- Adding functions because of "handler=true"
 local function AddAction(cmd, func, data, types)
