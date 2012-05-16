@@ -159,11 +159,11 @@ local points = 0
 
 local drawPoint = {}
 local drawPoints = 0
-
+--draw list--
 local volumeDraw
 local groundGridDraw
 local mouseGridDraw
-
+----
 local mouseUnit = {id = false}
 
 local mouseX, mouseY
@@ -1026,6 +1026,10 @@ function widget:Update(n)
 				terraformHeight = terraformHeight + (my-mouseY)*mouseSensitivity
 				storedHeight = terraformHeight
 			end
+			if (volumeDraw) then 
+				gl.DeleteList(volumeDraw); volumeDraw=nil
+				gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+			end
 			volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeLevel)
 			mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridLevel)
 		elseif terraform_type == 2 then
@@ -1041,6 +1045,10 @@ function widget:Update(n)
 				terraformHeight = terraformHeight + (my-mouseY)*mouseSensitivity
 				storedHeight = terraformHeight
 			end
+			if (volumeDraw) then
+				gl.DeleteList(volumeDraw); volumeDraw=nil
+				gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+			end			
 			volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeRaise)
 			mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 		elseif terraform_type == 4 then
@@ -1112,17 +1120,27 @@ function widget:MouseRelease(mx, my, button)
 				if disSQ < 6400 and points > 10 then
 					loop = 1
 					calculateAreaPoints(point,points)
+					if (groundGridDraw) then gl.DeleteList(groundGridDraw); groundGridDraw=nil end
 					groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 				else
 					loop = 0
 					calculateLinePoints(point,points)
+					if (groundGridDraw) then gl.DeleteList(groundGridDraw); groundGridDraw=nil end
 					groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 				end
 				
 				if terraform_type == 1 then
+					if (volumeDraw) then
+						gl.DeleteList(volumeDraw); volumeDraw=nil
+						gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+					end
 					volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeLevel)
 					mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridLevel)
 				elseif terraform_type == 2 then
+					if (volumeDraw) then
+						gl.DeleteList(volumeDraw); volumeDraw=nil
+						gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+					end
 					volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeRaise)
 					mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 				end
@@ -1133,10 +1151,12 @@ function widget:MouseRelease(mx, my, button)
 				if disSQ < 6400 and points > 10 then
 					loop = 1
 					calculateAreaPoints(point,points)
+					if (groundGridDraw) then gl.DeleteList(groundGridDraw); groundGridDraw=nil end
 					groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 				else
 					loop = 0
 					calculateLinePoints(point,points)
+					if (groundGridDraw) then gl.DeleteList(groundGridDraw); groundGridDraw=nil end
 					groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 				end
 				if points ~= 0 then
@@ -1192,12 +1212,21 @@ function widget:MouseRelease(mx, my, button)
 							
 							loop = 0
 							calculateLinePoints(point,points)
+							if (groundGridDraw) then gl.DeleteList(groundGridDraw); groundGridDraw=nil end
 							groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 							
 							if terraform_type == 1 then
+								if (volumeDraw) then 
+									gl.DeleteList(volumeDraw); volumeDraw=nil
+									gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+								end
 								volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeLevel)
 								mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridLevel)
 							elseif terraform_type == 2 then
+								if (volumeDraw) then 
+									gl.DeleteList(volumeDraw); volumeDraw=nil
+									gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+								end
 								volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeRaise)
 								mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 							end
@@ -1236,12 +1265,21 @@ function widget:MouseRelease(mx, my, button)
 					loop = 1
 					calculateAreaPoints(point,points)
 				end
+				if (groundGridDraw) then gl.DeleteList(groundGridDraw); groundGridDraw=nil end
 				groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 				
 				if terraform_type == 1 then
+					if (volumeDraw) then
+						gl.DeleteList(volumeDraw); volumeDraw=nil
+						gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+					end
 					volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeLevel)
 					mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridLevel)
 				elseif terraform_type == 2 then
+					if (volumeDraw) then
+						gl.DeleteList(volumeDraw); volumeDraw=nil
+						gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+					end
 					volumeDraw = glCreateList(glBeginEnd, GL_LINES, lineVolumeRaise)
 					mouseGridDraw = glCreateList(glBeginEnd, GL_LINES, mouseGridRaise)
 				end
@@ -1580,4 +1618,12 @@ function widget:DrawScreen()
 		end
 	end
 
+end
+--------------------------------------------------------------------------------
+-- Drawing
+--------------------------------------------------------------------------------
+function widget:Shutdown()
+	gl.DeleteList(volumeDraw)
+	gl.DeleteList(mouseGridDraw)
+	gl.DeleteList(groundGridDraw)
 end

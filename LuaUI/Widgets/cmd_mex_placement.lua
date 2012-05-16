@@ -588,8 +588,13 @@ function calcMiniMexDrawList()
 end
 --]]
 function updateMexDrawList()
+	if (mainMexDrawList) then gl.DeleteList(mainMexDrawList); mainMexDrawList=nil end --delete previous list if exist (ref:gui_chicken.lua by quantum)
 	mainMexDrawList = glCreateList(calcMainMexDrawList)
 	--miniMexDrawList = glCreateList(calcMiniMexDrawList)
+end
+
+function widget:Shutdown()
+	gl.DeleteList(mainMexDrawList)
 end
 
 local function DoLine(x1, y1, z1, x2, y2, z2)

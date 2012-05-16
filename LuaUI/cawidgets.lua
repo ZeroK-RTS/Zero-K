@@ -1289,44 +1289,6 @@ function widgetHandler:ViewResize(viewGeometry)
   return
 end
 
-------------------
--- FPS limiter----
-local activateFPSLimiter = true
-local updateAtFrame = 0 --//variable
-local currentFrame = 0 --//variable
-local displayList --//variable
-local framePoll = {frame = 0, lastUpdate = os.clock()} --// variable: store polled frame-count. 1st number represent number of frame soo far, 2nd number represent the time of last pool reset
-
-function CachedDrawScreen(self)
-	framePoll.frame = framePoll.frame +1
-	if framePoll.frame >= 60 then --//calculate the appropriate update interval by pooling the time required to draw 60 frame
-		local desiredDisplayInterval = 0.03 --//set the desired framerate to 30fps (1/30 = 0.03second)
-		local currentTime = os.clock()
-		local secondPerFrame = (currentTime - framePoll.lastUpdate)/framePoll.frame --(second elapsed)/(number of frame elapsed) == second-per-frame
-		local numberOfFrameForDesiredDisplayInterval = desiredDisplayInterval/secondPerFrame --(desired interval)/(second-per-frame) == number-of-frame
-		updateAtFrame = math.ceil(numberOfFrameForDesiredDisplayInterval) --//use the number-of-frame needed, or use 1-frame (eg: if number-of-frame<1 then return 1, else return number-of-frame end).
-		framePoll.lastUpdate = currentTime
-		framePoll.frame = 0 --reset pool
-	end
-	currentFrame = currentFrame +1
-	if currentFrame >= updateAtFrame then
-		gl.DeleteList(displayList) --delete old list
-		displayList = gl.CreateList( --create new list
-						function()
-							for _,w in ripairs(self.DrawScreenList) do
-								w:DrawScreen()
-								if (self.tweakMode and w.TweakDrawScreen) then
-									w:TweakDrawScreen()
-								end
-							end
-						end
-					)
-		currentFrame =0
-	end
-	gl.CallList(displayList) --use existing list
-end
---end FPS limiter---
---------------------
 function widgetHandler:DrawScreen()
   if (Spring.IsGUIHidden()) then
     return
@@ -1339,10 +1301,6 @@ function widgetHandler:DrawScreen()
       {v = { px,  py }}, {v = { px+sx, py }}, {v = { px+sx, py+sy }}, {v = { px, py+sy }}
     })
     gl.Color(1, 1, 1)
-  end
-  if activateFPSLimiter then
-    CachedDrawScreen(self)
-    return
   end
   for _,w in ripairs(self.DrawScreenList) do
     w:DrawScreen()

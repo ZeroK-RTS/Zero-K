@@ -114,11 +114,11 @@ function SimpleMovingAverage(localGameFrameRate)
 	local index = (simpleMovingAverageLocalSpeed_G.currentIndex) --retrieve current index.
 	simpleMovingAverageLocalSpeed_G.storage[index] = localGameFrameRate --remember current entry.
 	simpleMovingAverageLocalSpeed_G.currentIndex = simpleMovingAverageLocalSpeed_G.currentIndex +1 --advance index by 1.
-	if simpleMovingAverageLocalSpeed_G.currentIndex == 301 then
-		simpleMovingAverageLocalSpeed_G.currentIndex = 1 --wrap the table index around (create a circle of 300 entry).
+	if simpleMovingAverageLocalSpeed_G.currentIndex == 152 then
+		simpleMovingAverageLocalSpeed_G.currentIndex = 1 --wrap the table index around (create a circle of 151 entry).
 	end
 	index = (simpleMovingAverageLocalSpeed_G.currentIndex) --retrieve an index advanced by 1.
-	simpleMovingAverageLocalSpeed_G.currentAverage = simpleMovingAverageLocalSpeed_G.currentAverage + localGameFrameRate/299 - (simpleMovingAverageLocalSpeed_G.storage[index] or 30)/299 --calculate average: add new value, remove old value. Ref: http://en.wikipedia.org/wiki/Moving_average#Simple_moving_average
+	simpleMovingAverageLocalSpeed_G.currentAverage = simpleMovingAverageLocalSpeed_G.currentAverage + localGameFrameRate/150 - (simpleMovingAverageLocalSpeed_G.storage[index] or 30)/150 --calculate average: add new value, remove old value. Ref: http://en.wikipedia.org/wiki/Moving_average#Simple_moving_average
 	localGameFrameRate = simpleMovingAverageLocalSpeed_G.currentAverage -- replace localGameFrameRate with its average value.
 
 	return localGameFrameRate
@@ -126,7 +126,7 @@ end
 
 function CheckTTSwidget()
 	local ttsValue
-	local widget = widgetHandler:FindWidget("Text To Speech Control")
+	local widget = widgetHandler:FindWidget("Text To Speech Control") --Reference: gui_epicmenu.lua by Carrepairer/Wagonrepairer
 	if widget then --get all variable from TTS control widget.
 		ttsValue = widget.options.enable.value --get the value
 	else --If widget is not found, then 'Rejoin Progress widget' will not try to disable/enable TTS. It became neutral.

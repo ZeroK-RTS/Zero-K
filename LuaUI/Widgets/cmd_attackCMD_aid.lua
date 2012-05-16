@@ -16,7 +16,6 @@ end
 --Functions:
 local CMD_ATTACK        	 = CMD.ATTACK
 
---local vampName_gbl = "Vamp"
 --------------------------------------------------------------------------------
 function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator.lua by xponen, and central_build_AI.lua by Troy H. Creek
 	if (id == CMD_ATTACK) then
@@ -40,8 +39,6 @@ function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator
 				local unitDef_primaryWeapon_target = UnitDefs[unitDefID].weapons[1].onlyTargets
 				local exclusiveAA = (unitDef_primaryWeapon_target["fixedwing"] and unitDef_primaryWeapon_target["gunship"]) and 
 									not (unitDef_primaryWeapon_target["sink"] or unitDef_primaryWeapon_target["land"] or unitDef_primaryWeapon_target["sub"])
-				--if unitDef["humanName"] ~= vampName_gbl then return false end --skip whole thing if player didn't select Vamp exclusively (widget only active when player only select Vamp)
-
 				--[[
 				Spring.Echo(UnitDefs[unitDefID].weapons[1].onlyTargets)
 				for name,content in pairs(UnitDefs[unitDefID].weapons[1].onlyTargets) do
@@ -50,9 +47,9 @@ function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator
 				end
 				--]]
 				if (exclusiveAA) then 
-					antiAirUnits[(#antiAirUnits or 0) +1]= unitID 
+					antiAirUnits[#antiAirUnits +1]= unitID 
 				else
-					normalUnits[(#normalUnits or 0) +1]= unitID 
+					normalUnits[#normalUnits +1]= unitID 
 				end
 			end
 			if #antiAirUnits == 0 then return false end --skip whole thing if no AA unit was selected (because player dont need widget to do normal attack command).
@@ -79,14 +76,14 @@ function ReturnAllAirTarget(cx, cz, cr, selectedTeam, selectedAlly)
 			local unitDef = UnitDefs[unitDefID]
 			if not unitDef then
 				if GetDotsFloating(targetUnits[i]) then --check & remember floating radar dots in new table.
-					filteredTargets[(#filteredTargets or 0)+1] = targetUnits[i]
+					filteredTargets[#filteredTargets +1] = targetUnits[i]
 				end
 			else
 				if unitDef["canFly"] then --check & remember flying units in new table
-					filteredTargets[(#filteredTargets or 0)+1] = targetUnits[i]
+					filteredTargets[#filteredTargets +1] = targetUnits[i]
 				end
 			end
-			nonFilteredTargets[(#nonFilteredTargets or 0)+1] = targetUnits[i] --also copy all target to a non-filtered table
+			nonFilteredTargets[#nonFilteredTargets +1] = targetUnits[i] --also copy all target to a non-filtered table
 		end
 	end	
 	return filteredTargets, nonFilteredTargets
