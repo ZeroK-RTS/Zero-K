@@ -14,10 +14,10 @@
 
 function widget:GetInfo()
   return {
-    name      = "Team Commander Ends",
-    desc      = "Indicator for the Team Comm Ends state (at game start)",
+    name      = "TeamCommEnds & Lavarise indicator",
+    desc      = "Indicate Team Comm Ends state & Lavarise state (at game start)",
     author    = "trepan, dizekat",
-    date      = "Jul 9, 2008",
+    date      = "Jul 9 2008, 2012(lavarise)",
     license   = "GNU GPL, v2 or later",
     layer     = -3,
     enabled   = true,  --  loaded by default?
@@ -62,8 +62,9 @@ function widget:DrawScreen()
   end
   
   local endmode = (Spring.GetModOptions().commends) == "1"
+  local lavamode = (Spring.GetModOptions().zkmode) == "lavarise"
   
-  if endmode then
+  if endmode or lavamode then
     local timer = widgetHandler:GetHourTimer()
     local colorStr
     if (math.fmod(timer, 0.5) < 0.25) then
@@ -71,7 +72,24 @@ function widget:DrawScreen()
     else
       colorStr = YellowStr
     end
-    local msg = colorStr .. "Team Commander Ends!"
+    local mainText
+    local secondText
+    if endmode and lavamode then
+      if (math.fmod(timer, 6) < 3) then
+    	mainText = "Team Commander Ends!"
+    	secondText = "When all commanders in a team are killed, team loses!"
+      else 
+    	mainText = "Lava Rise mode!"
+    	secondText = "Lava will rise from the ground and will gradually consume everything!"
+      end
+    elseif endmode then
+      mainText = "Team Commander Ends!"
+      secondText = "When all commanders in a team are killed, team loses!"
+    elseif lavamode then
+      mainText = "Lava Rise mode!"
+      secondText = "Lava will rise from the ground and will gradually consume everything!"
+    end
+    local msg = colorStr .. mainText
     glPushMatrix()
     glTranslate((vsx * 0.5), (vsy * 0.5) + 50, 0)
     glScale(1.5, 1.5, 1)
@@ -83,11 +101,11 @@ function widget:DrawScreen()
       glText(msg, 0, 0, 24, "oc")
     end
 
-    if endmode then
-      msg = "When all commanders in a team are killed, team loses!",
-      glTranslate(0, -50, 0)
-      glText(msg, 0, 0, 12, "oc")
-    end
+    --if endmode then
+    msg = secondText,
+    glTranslate(0, -50, 0)
+    glText(msg, 0, 0, 12, "oc")
+    --end
     glPopMatrix()
 
   end
