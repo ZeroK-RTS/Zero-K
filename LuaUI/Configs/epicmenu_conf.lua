@@ -236,7 +236,8 @@ path='Settings/Graphics'
 	ShButton('Low Detail Shadows', function() local curShadow=Spring.GetConfigInt("Shadows"); curShadow=math.max(1,curShadow); spSendCommands{"Shadows " .. curShadow .. " 1024"} end )
 	ShButton('Medium Detail Shadows', function() local curShadow=Spring.GetConfigInt("Shadows"); curShadow=math.max(1,curShadow); spSendCommands{"Shadows " .. curShadow .. " 2048"} end )
 	ShButton('High Detail Shadows', function() local curShadow=Spring.GetConfigInt("Shadows"); curShadow=math.max(1,curShadow); spSendCommands{"Shadows " .. curShadow .. " 4096"} end )
-
+	
+	ShLabel('Various')
 	AddOption({
 		name = 'Brightness',
 		type = 'number',
@@ -255,6 +256,17 @@ path='Settings/Graphics'
 		springsetting = 'UnitIconDist',
 		OnChange = function(self) Spring.SendCommands{"disticon " .. self.value} end 
 	} )
+	
+	AddOption({
+		name = 'Draw Distance',
+		type = 'number',
+		min = 1, 
+		max = 1000,
+		springsetting = 'UnitLodDist',
+		OnChange = function(self) Spring.SendCommands{"distdraw " .. self.value} end 
+	} )
+	
+	ShButton('Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
 	
 path='Settings/Graphics/Effects'
 	ShButton('Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
