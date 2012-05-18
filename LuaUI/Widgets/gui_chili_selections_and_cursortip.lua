@@ -698,7 +698,7 @@ local function UpdateSelectedUnitsTooltip()
 					if options.manualWeaponReloadBar.value then
 						local unitDefID = spGetUnitDefID(unitid)
 						local unitDef = UnitDefs[unitDefID]
-						local weaponNo3 = (unitDef.weapons[3]) or unitDef.weapons[2] or unitDef.weapons[1] --select weapon no.3 (slot 3 usually used for user controlled weapon)
+						local weaponNo3 = (unitDef.weapons[3]) --select weapon no.3 (slot 3 usually used for user controlled weapon)
 						if (weaponNo3 ~= nil) and WeaponDefs[weaponNo3.weaponDef].manualFire then
 							local reloadTime = WeaponDefs[weaponNo3.weaponDef].reload
 							local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitid, 2) --select weapon no.3, but we use 2 because somehow table start at 0. eg: 0,1,2, Also in: cmd_dynamic_avoidance.lua
