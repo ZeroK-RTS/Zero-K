@@ -37,6 +37,8 @@ local spGetSelectedUnits                = Spring.GetSelectedUnits
 local spGetSelectedUnitsCounts          = Spring.GetSelectedUnitsCounts
 local spGetSelectedUnitsCount           = Spring.GetSelectedUnitsCount
 local spGetSelectedUnitsByDef           = Spring.GetSelectedUnitsSorted
+local spGetUnitWeaponState 				= Spring.GetUnitWeaponState
+local spGetGameFrame 					= Spring.GetGameFrame
 
 local echo = Spring.Echo
 
@@ -121,6 +123,7 @@ local selectedUnitsByDef = {}
 local selectedUnits = {}
 local selectionSortOrder = {}
 
+local secondPerGameFrame = 1/30 --this constant is used for calculating weapon reload time.
 
 local color = {}
 
@@ -175,7 +178,7 @@ local gi_label	--group info Chili label
 
 options_path = 'Settings/Interface/Tooltip'
 options_order = { 'tooltip_delay', 'hpshort', 'featurehp', 'hide_for_unreclaimable', 'showdrawtooltip','showterratooltip',
-  'groupalways', 'showgroupinfo', 'squarepics','unitCommand'
+  'groupalways', 'showgroupinfo', 'squarepics','unitCommand', 'manualWeaponReloadBar'
 }
 
 local function option_Deselect()
@@ -255,7 +258,14 @@ options = {
 		value= false,
 		desc = "Display current command on unit's icon if selection isn't grouped (unit selection is grouped when unit count exceed 8)",
 		path = 'Settings/Interface/Selected Units Window',
-	}
+	},
+	manualWeaponReloadBar = {
+		name="Show Unit's Reload Bar",
+		type='bool',
+		value= true,
+		desc = "Show reload progress for weapon that use manual trigger. *Only applies for ungrouped unit selection*",
+		path = 'Settings/Interface/Selected Units Window',
+	},
 }
 
 --[[
@@ -615,7 +625,7 @@ local function AddSelectionIcon(barGrid,unitid,defid,unitids,counts)
 		parent  = item;
 		name    = 'health';
 		width   = 50;
-		height  = 5;
+		height  = 10;
 		max     = 1;
 		color   = {0.0,0.99,0.0,1};
 	};
@@ -674,16 +684,69 @@ local function UpdateSelectedUnitsTooltip()
 			if ((numSelectedUnits<8) and (not options.groupalways.value)) then
 				for i=1,numSelectedUnits do
 					local unitid = selectedUnits[i]
-
-					local unitIcon = barsContainer.childrenByName[unitid]
 					--Spring.Echo(unitid)
+					local unitIcon = barsContainer.childrenByName[unitid]
 					local healthbar = unitIcon.childrenByName['health']
 					local health, maxhealth = spGetUnitHealth(unitid)
 					if (health) then
-						healthbar:SetValue(health/maxhealth)
 						healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
 						healthbar.color = GetHealthColor(health/maxhealth)
+						healthbar:SetValue(health/maxhealth) --update the healthbar value
 					end
+					
+					--RELOAD_BAR: start-- , by msafwan. Function: show tiny reload bar for clickable weapon in unit selection list
+					if options.manualWeaponReloadBar.value then
+						local unitDefID = spGetUnitDefID(unitid)
+						local unitDef = UnitDefs[unitDefID]
+						local weaponNo3 = (unitDef.weapons[3]) or unitDef.weapons[2] or unitDef.weapons[1] --select weapon no.3 (slot 3 usually used for user controlled weapon)
+						if (weaponNo3 ~= nil) and WeaponDefs[weaponNo3.weaponDef].manualFire then
+							local reloadTime = WeaponDefs[weaponNo3.weaponDef].reload
+							local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitid, 2) --select weapon no.3, but we use 2 because somehow table start at 0. eg: 0,1,2, Also in: cmd_dynamic_avoidance.lua
+							local currentFrame, _ = spGetGameFrame() 
+							local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
+							local reloadMiniBar = unitIcon.childrenByName['reloadMiniBar']
+							local reloadFraction =1 - remainingTime/reloadTime
+							if reloadMiniBar and reloadFraction < 0.99 then --update value IF already have the miniBar & is reloading weapon
+								reloadMiniBar:SetValue(reloadFraction)
+								miniReloadBarPresent = true
+							elseif reloadMiniBar then --remove the minibar IF not reloading weapon
+								unitIcon:RemoveChild(reloadMiniBar) --ref: chili/Controls/object.lua by jK & quantum.
+								unitIcon:RemoveChild(healthbar) --delete modified healthbar 
+								Progressbar:New{ --recreate original healthbar 
+									parent  = unitIcon;
+									name    = 'health';
+									width   = 50;
+									height  = 10;
+									max     = 1;
+									value 	= (health/maxhealth);
+									color   = {0.0,0.99,0.0,1};
+								};
+							elseif reloadFraction < 0.99 then --create the minibar IF doesn't have the minibar & is reloading weapon
+									unitIcon:RemoveChild(healthbar) --delete original healthbar 
+									Progressbar:New{ --recreate new healthbar (this is to solve issue of bar not resizing when we just changed the "height" & do 'healthbar:Invalidate()').
+										parent  = unitIcon;
+										name    = 'health';
+										width   = 50;
+										height  = 8;
+										minHeight = 8;
+										max     = 1;
+										value 	= (health/maxhealth);
+										color   = {0.0,0.99,0.0,1};
+									};
+									Progressbar:New{ --create mini reload bar
+										parent  = unitIcon;
+										name    = 'reloadMiniBar';
+										width   = 49;
+										height  = 2;
+										minHeight = 2;
+										max     = 1;
+										value = reloadFraction;
+										color   = {013, 245, 243,1}; --? color. 
+									};
+							end
+						end
+					end
+					--RELOAD_BAR: end--	
 				end
 			else
 				for defid,unitids in pairs(selectedUnitsByDef) do
@@ -697,9 +760,9 @@ local function UpdateSelectedUnitsTooltip()
 
 					local unitGroup = barsContainer.childrenByName[defid]
 					local healthbar = unitGroup.childrenByName['health']
-					healthbar:SetValue(health/maxhealth)
 					healthbar.tooltip = numformat(health) .. ' / ' .. numformat(maxhealth)
 					healthbar.color = GetHealthColor(health/maxhealth)
+					healthbar:SetValue(health/maxhealth)
 				end
 			end
 
@@ -1919,27 +1982,27 @@ function widget:Update(dt)
 		changeNow = true
 		timer = 0
 	end
-	--UNIT.STATUS start (by msafwan)
+	--UNIT.STATUS start (by msafwan), function: add/show units task whenever individual pic is shown.
 	timer2 = timer2 + dt
-	if timer2 >= updateFrequency2  then --//function: add/show units task whenever individual pic is shown.
+	if timer2 >= updateFrequency2  then
 		if options.unitCommand.value == true and ((numSelectedUnits<8) and (not options.groupalways.value)) then
-			for i=1,numSelectedUnits do --//variable updated by 'widget:SelectionChanged()'
+			for i=1,numSelectedUnits do --//iterate over all selected unit *this variable is updated by 'widget:SelectionChanged()'
 				local unitID = selectedUnits[i]
 				local barGridItem = nil
 				local itemImg =nil
 				local picLabel = 1
-				local barGrid = window_corner.childrenByName['Bars'] --//REFERENCE: gui_chili_facbar.lua, by CarRepairer
+				local barGrid = window_corner.childrenByName['Bars'] --//find chili element that we want to modify. REFERENCE: gui_chili_facbar.lua, by CarRepairer
 				if barGrid then	barGridItem = barGrid.childrenByName[unitID] end
 				if barGridItem then	itemImg = barGridItem.childrenByName['selImage'] end
 				if itemImg then picLabel = itemImg.childrenByName['selLabel'] end  
-				if picLabel == nil then --//insert label when picture is non-grouped (non-grouped picture doesn't have label, it have 'nil') 
-					window_corner.childrenByName['Bars'].childrenByName[unitID].childrenByName['selImage']:ClearChildren();
+				if picLabel == nil then --//if picture has no label then insert our own label *if picture is non-grouped it doesn't have label, but when grouped it have numbers as label. 
+					window_corner.childrenByName['Bars'].childrenByName[unitID].childrenByName['selImage']:ClearChildren(); --delete old label (if any exist) so we can create new label with new value
 					local cQueue = spGetCommandQueue(unitID, 1)
 					local commandName = ""
 					local color = nil
 					if cQueue[1] ~= nil then
 						local commandID = cQueue[1].id				
-						commandName = commandID --"..." 
+						commandName = ":" .. commandID --"unrecognized" 
 						if commandID < 0 then
 							commandName = "Build"
 						else
@@ -1962,7 +2025,7 @@ function widget:Update(dt)
 													{{35170},"Bridge",{0.6,0.6,0,1}},
 													{{35171},"Teleport",{0,0.6,0.6,1}},
 												}										
-							for i=1, #commandList, 1 do
+							for i=1, #commandList, 1 do --iterate over the commandList so we could find a match with unit's current command.
 								if #commandList[i][1] == 1 then
 									if commandList[i][1][1] == commandID then
 										commandName = commandList[i][2]
@@ -1979,19 +2042,15 @@ function widget:Update(dt)
 							end
 						end
 					end
-					Label:New{
+					Label:New{ --create new chili element
 						parent = itemImg;
 						name = "commandLabel";
 						align  = "left";
 						valign = "top";
-						--x =  8;
-						----y = 30;
-						--y = 20;
-						--width = 40;
 						fontsize   = 14;
 						fontshadow = true;
 						fontOutline = true;
-						textColor = color or {1,1,1,1}; --//Reference: gui_chili_crudeplayerlist.lua
+						textColor = color or {1,1,1,1}; --//Reference: gui_chili_crudeplayerlist.lua by KingRaptor
 						caption    = commandName;
 					};
 				end
