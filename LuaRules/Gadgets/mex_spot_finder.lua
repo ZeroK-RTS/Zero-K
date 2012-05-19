@@ -91,7 +91,7 @@ function gadget:Initialize()
 	local metalSpots = GetSpots()
 	local metalSpotsByPos = false
 	
-	if #metalSpots < 3 then
+	if #metalSpots < 6 then
 		Spring.Echo("Indiscrete metal map detected")
 		metalSpots = false
 	end
