@@ -890,12 +890,6 @@ local function Wave()
   totalTechAccel = math.max(totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
   Spring.SetGameRulesParam("techAccel", totalTechAccel)
   
-  local defensePoolDelta = humanAggro * humanAggroDefenseFactor + defensePerWave
-  if defensePoolDelta < 0 then defensePoolDelta = 0 end
-  defensePool = defensePool + defensePoolDelta
-  defenseQuota = defensePool/burrowCount
-  Spring.Echo("Defense pool/quota: " .. defensePool .. " / " .. defenseQuota)  
-  
   --[[
   for chickenName, c in pairs(chickenTypes) do
   	c.time = c.time + techDecel
@@ -920,12 +914,24 @@ local function Wave()
     SpawnChicken(queenID, chicken1Number*queenSpawnMult, chicken1Name)
     SpawnChicken(queenID, chicken2Number*queenSpawnMult, chicken2Name)
   end
+
+  -- some code for defenses
+  local defensePoolDelta = humanAggro * humanAggroDefenseFactor
+  if turret then
+    defensePoolDelta = defensePoolDelta + defensePerWave	-- don't add defensePerWave for the waves where no turrets can be spawned anyway
+  end
+  if defensePoolDelta < 0 then defensePoolDelta = 0 end
+  defensePool = defensePool + defensePoolDelta
+  defenseQuota = defensePool/burrowCount 
   
   local spawnDef = false
-  cost = (defenders[turret] and defenders[turret].cost) or 1
+  local cost = (defenders[turret] and defenders[turret].cost) or 1
   if turret and cost < defenseQuota then
     spawnDef = true
+    Spring.Echo("Defense pool/quota: " .. defensePool .. " / " .. defenseQuota)    
   end
+  
+ 
   
   for burrowID in pairs(burrows) do
       SpawnChicken(burrowID, chicken1Number, chicken1Name)
