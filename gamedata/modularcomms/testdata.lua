@@ -194,6 +194,10 @@ local base = {
 		modules = {
 			"commweapon_lparticlebeam",
 			"commweapon_hparticlebeam",
+			"module_guardian_armor",
+			"module_superspeed",
+			"module_super_nano",
+			"module_ablative_armor",
 		}
 	},
 	{

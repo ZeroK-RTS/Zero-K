@@ -88,6 +88,7 @@ local function ProcessComm(name, config)
 		end
 
 		local attributeMods = { -- add a mod for everythings that can have a negative adjustment
+			health = 0,
 			speed = 0,
 			reload = 0,
 		}
@@ -120,6 +121,9 @@ local function ProcessComm(name, config)
 					if upgrades[moduleName].func then --apply upgrade function
 						upgrades[moduleName].func(commDefs[name], attributeMods) 
 					end
+					if upgrades[moduleName].useWeaponSlot then
+						numWeapons = numWeapons + 1
+					end
 				else
 					Spring.Echo("\tERROR: Upgrade "..moduleName.." not found")
 				end
@@ -129,12 +133,16 @@ local function ProcessComm(name, config)
 				ApplyWeapon(commDefs[name], "commweapon_peashooter")
 			end
 		end
+		
+		-- apply attributemods
 		if attributeMods.speed > 0 then
-			commDefs[name].maxvelocity = commDefs[name].customparams.basespeed*(1+attributeMods.speed)
+			commDefs[name].maxvelocity = commDefs[name].maxvelocity*(1+attributeMods.speed)
 		else
-			commDefs[name].maxvelocity = commDefs[name].customparams.basespeed*(1+attributeMods.speed)
-			--commDefs[name].maxvelocity = commDefs[name].customparams.basespeed/(1-attributeMods.speed)
-		end	
+			commDefs[name].maxvelocity = commDefs[name].maxvelocity*(1+attributeMods.speed)
+			--commDefs[name].maxvelocity = commDefs[name].maxvelocity/(1-attributeMods.speed)
+		end
+		commDefs[name].maxdamage = commDefs[name].maxdamage*(1+attributeMods.health)
+		
 		if config.name then
 			commDefs[name].name = config.name
 		end

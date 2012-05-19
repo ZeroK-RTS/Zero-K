@@ -63,10 +63,7 @@ upgrades = {
 	},		
 	commweapon_missilelauncher = {
 		name = "Missile Launcher",
-		description = "Fires light seeker missiles with good range",
-		func = function(unitDef)
-				unitDef.customparams.nofps = "1"
-			end,		
+		description = "Fires light seeker missiles with good range",	
 	},
 	commweapon_partillery = {
 		name = "Plasma Artillery",
@@ -79,9 +76,6 @@ upgrades = {
 	commweapon_rocketlauncher = {
 		name = "Rocket Launcher",
 		description = "Medium-range low-velocity hitter",
-		func = function(unitDef)
-				unitDef.customparams.nofps = "1"
-			end,	
 	},
 	commweapon_shotgun = {
 		name = "Shotgun",
@@ -152,7 +146,7 @@ upgrades = {
 		description = "Beam Laser/Riot Cannon/Missile Launcher: Convert to anti-air weapons",
 		func = function(unitDef)
 				for i,v in pairs(weapons) do
-					if (i == "commweapon_riotcannon") then	-- -20% damage
+					if (i == "commweapon_riotcannon") then
 						ReplaceWeapon(unitDef, "commweapon_riotcannon", "commweapon_flakcannon")
 						ReplaceWeapon(unitDef, "commweapon_riotcannon", "commweapon_flakcannon")
 					elseif (i == "commweapon_beamlaser") then
@@ -537,7 +531,37 @@ upgrades = {
 				unitDef.isTargetingUpgrade = true
 				unitDef.activatewhenbuilt = true
 		end,
-	}, 
+	},
+	
+	-- modules that use a weapon slot
+	module_guardian_armor = {
+		name = "Guardian Defense System",
+		description = "Adds 50% HP (including other modules); self-repairs 10 HP/s",
+		func = function(unitDef, attributeMods)
+				attributeMods.health = attributeMods.health + 0.5
+				unitDef.autoheal = (unitDef.autoheal or 0) + 10
+		end,
+		useWeaponSlot = true,
+	},	
+
+	module_superspeed = {
+		name = "Marathon Motion Control",
+		description = "Increases speed by 50% of base",
+		func = function(unitDef, attributeMods)
+				attributeMods.speed = attributeMods.speed + 0.5
+		end,
+		useWeaponSlot = true,
+	},
+	
+	module_super_nano = {
+		name = "Engineer's Revenge",
+		description = "Adds 15 metal/s build speed and 200 build range",
+		func = function(unitDef)
+				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 15 end
+				if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 200 end
+		end,
+		useWeaponSlot = true,
+	},	
 	
 	-- deprecated
 	module_improved_optics = {

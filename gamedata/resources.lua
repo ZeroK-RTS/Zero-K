@@ -71,7 +71,8 @@ local resources = {
 	  -- MANUAL
 
 	  flaredark='flaredark.png',
-	  
+
+      ["3explo"]= "cc/3explo.tga",
       AAsmoketrail= "AAsmoketrail.tga",
       bigexplo= "cc/bigexplo.tga",
       bloodblast= "pd/bloodblast.png",
@@ -79,12 +80,12 @@ local resources = {
       blooddrop= "pd/blooddrop.png",
       blooddropwhite= "pd/blooddropwhite.tga",
       bloodsplat= "pd/bloodsplat.tga",
-	  bluelight = "other/light_blue.png",
+      bluelight = "other/light_blue.png",
       bluenovaexplo= "cc/bluenovaexplo.tga",
       bluering= "cc/bluering.tga",
-	  brightblueexplo='CC/brightblueexplo.tga',
-	  burncircle='PD/burncircle.tga',
-	  chargeparticles='PD/chargeparticles.tga',
+      brightblueexplo='CC/brightblueexplo.tga',
+      burncircle='PD/burncircle.tga',
+      chargeparticles='PD/chargeparticles.tga',
       corelaser= "gpl/corelaser.png",
       darksmoketrail= "darksmoketrail.tga",
       debris2= "other/debris2.tga",
@@ -115,6 +116,7 @@ local resources = {
       flashside2= "cc/flashside2.tga",
       flowerflash= "pd/flowerflash.tga",
 	  greenlight= "other/light_green.png",
+      greennovaexplo= "cc/greennovaexplo.tga",
       gunshot= "cc/gunshot.tga",
       kburst= "other/burst.tga",
       kfoam= "other/foam.tga",
