@@ -50,7 +50,7 @@ local buildOpts = {
 	[[raveparty]],
 	[[zenith]],
 	[[armcsa]],
-	[[corfav]],
+	[[armflea]],
 }
 
 return buildOpts
