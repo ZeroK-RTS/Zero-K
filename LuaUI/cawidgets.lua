@@ -265,6 +265,19 @@ local transmitMagic = "> ["..myName.."]!transmit" -- Lobby is sending to LuaUI
 local voiceMagic = "> ["..myName.."]!transmit voice" -- Lobby is sending a voice command to LuaUI
 local transmitLobbyMagic = "!transmitlobby" -- LuaUI is sending to lobby
 
+local playerNames = {}
+local mutedPlayers = {}
+
+local function ListMutedPlayers()
+  local playerroster = Spring.GetPlayerList()
+  for i=1,#playerroster do
+    local name,_,_,teamID,_,_,_,_,_,customkeys = Spring.GetPlayerInfo(playerroster[i])
+    playerNames[name] = true
+    if (customkeys and customkeys.muted == 1) and name ~= myName then
+      mutedPlayers[name] = true
+    end
+  end
+end
 
 function StringStarts(s, start)
    return string.sub(s, 1, string.len(start)) == start
@@ -284,6 +297,23 @@ local function Deserialize(text)
   end
   return arg
 end
+
+--adapted from lolui
+local function ParseMsgForPlayerName(msg)
+	local playername
+	if (playerNames[msg:sub(2,(msg:find("> Allies: ") or 1)-1)]) then
+		playername = msg:sub(2,msg:find("> ")-1)
+	elseif (playerNames[msg:sub(2,(msg:find("> ") or 1)-1)]) then
+		playername = msg:sub(2,msg:find("> ")-1)
+	elseif (playerNames[msg:sub(2,(msg:find("] ") or 1)-1)]) then
+		playername = msg:sub(2,msg:find("] ")-1)
+	elseif (playerNames[msg:sub(1,(msg:find(" added point: ") or 1)-1)]) then
+		playername = msg:sub(1,msg:find(" added point: ")-1)
+	end
+	return playername
+end
+
+ListMutedPlayers()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1245,6 +1275,12 @@ function widgetHandler:AddConsoleLine(msg, priority)
       return
     end
   else
+    -- check if player is muted
+    local playername = ParseMsgForPlayerName(msg)
+    if mutedPlayers[playername] then
+      return
+    end
+    
     for _,w in ipairs(self.AddConsoleLineList) do
       w:AddConsoleLine(msg, priority)
     end
@@ -1650,6 +1686,7 @@ end
 
 
 function widgetHandler:PlayerAdded(playerID, reason)
+  ListMutedPlayers()
   for _,w in ipairs(self.PlayerAddedList) do
     w:PlayerAdded(playerID, reason)
   end
@@ -1701,6 +1738,11 @@ end
 
 
 function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
+  local playername = Spring.GetPlayerInfo(playerID)
+  if mutedPlayers[playername] then
+    return true
+  end
+  
   local retval = false
   for _,w in ipairs(self.MapDrawCmdList) do
     local takeEvent = w:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
