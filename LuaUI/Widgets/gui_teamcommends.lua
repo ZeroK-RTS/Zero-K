@@ -67,11 +67,11 @@ function widget:DrawScreen()
   if endmode or lavamode then
     local timer = widgetHandler:GetHourTimer()
     local colorStr
-    if (math.fmod(timer, 0.5) < 0.25) then
-      colorStr = RedStr
-    else
+    --if (math.fmod(timer, 0.5) < 0.25) then
+      --colorStr = RedStr
+    --else
       colorStr = YellowStr
-    end
+    --end
     local mainText
     local secondText
     if endmode and lavamode then
