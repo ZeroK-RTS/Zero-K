@@ -64,7 +64,7 @@ local turretSpeed = 8
 
 --local tiltAngle = math.rad(30)
 local isLanded = true
-local SPECIAL_FIRE_COUNT = 30*5
+local SPECIAL_FIRE_COUNT = 75
 
 local SLOWDOWN_FACTOR = 0.75
 local UNIT_SPEED = UnitDefNames["corcrw"].speed*SLOWDOWN_FACTOR/30
@@ -204,13 +204,10 @@ end
 function Hacky_Stiletto_Workaround_stiletto_func(count)
 	--EmitSfx(subemit[0], DETO_W5)
 	if count < SPECIAL_FIRE_COUNT then
-		--local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 		if count + 1 < SPECIAL_FIRE_COUNT then
 			EmitSfx( subemit[0],  FIRE_W5 )
-			for i=1,4 do
-				EmitSfx( subemit[i], FIRE_W6)
-			end
-			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 1, count + 1)
+			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(2/slowState), count + 1)
 		else
 			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 10, count + 1)
 		end
@@ -259,7 +256,7 @@ end
 function script.FireWeapon(num)
 	--Sleep( 1000 )
 	if num ~= 3 then
-		--EmitSfx(gunpoints[num].fire, 1024)
+		EmitSfx(gunpoints[num].fire, 1024)
 	else
 		--ClusterBomb()
 	end
