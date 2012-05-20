@@ -28,6 +28,11 @@ local RightFlashPoint = piece "RightFlashPoint"
 local subpoint, emit = piece("subpoint", "emit")
 local jetleft, jetright, jetrear = piece('jetleft', 'jetright', 'jetrear')
 
+local subemit = {}
+for i=0,4 do
+	subemit[i] = piece("subemit"..i)
+end
+
 local gunpoints = {
 	[1] = {aim = RightTurretSeat, rot = RightTurret, pitch = RightGun, fire = RightFlashPoint},
 	[2] = {aim = LeftTurretSeat, rot = LeftTurret, pitch = LeftGun, fire = LeftFlashPoint},
@@ -59,7 +64,7 @@ local turretSpeed = 8
 
 --local tiltAngle = math.rad(30)
 local isLanded = true
-local SPECIAL_FIRE_COUNT = 80
+local SPECIAL_FIRE_COUNT = 30*5
 
 local SLOWDOWN_FACTOR = 0.75
 local UNIT_SPEED = UnitDefNames["corcrw"].speed*SLOWDOWN_FACTOR/30
@@ -134,7 +139,9 @@ function script.Create()
 	Turn(RearTurretSeat,y_axis,math.rad(180))
 	Turn(RearTurretSeat,x_axis,math.rad(14.5))
 	
-	Turn(emit, x_axis, math.rad(90))
+	for i=0,4 do
+		Turn(subemit[i], x_axis, math.rad(90))
+	end
 	
 	updateVectors(1)
 	updateVectors(2)
@@ -148,6 +155,8 @@ function script.Create()
 	Turn(jetleft, x_axis, math.rad(90))
 	Turn(jetright, x_axis, math.rad(90))
 	Turn(jetrear, x_axis, math.rad(90))
+	
+	Spin(emit, y_axis, math.rad(180))
 	
 	--Move(LeftTurretSeat,x_axis,-2)
 	--Move(LeftTurretSeat,y_axis,-1.1)
@@ -193,12 +202,15 @@ function script.AimFromWeapon(num)
 end
 
 function Hacky_Stiletto_Workaround_stiletto_func(count)
-	--EmitSfx(emit, DETO_W5)
+	--EmitSfx(subemit[0], DETO_W5)
 	if count < SPECIAL_FIRE_COUNT then
-		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		--local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 		if count + 1 < SPECIAL_FIRE_COUNT then
-			EmitSfx( emit,  FIRE_W5 )
-			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, math.floor(2/slowState), count + 1)
+			EmitSfx( subemit[0],  FIRE_W5 )
+			for i=1,4 do
+				EmitSfx( subemit[i], FIRE_W6)
+			end
+			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 1, count + 1)
 		else
 			GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 10, count + 1)
 		end
@@ -221,7 +233,7 @@ function ClusterBomb()
 end
 
 function script.AimWeapon( num, heading, pitch )
-	if num == 5 then
+	if num >= 5 then
 		return false
 	elseif num == 3 then
 		--EmitSfx(Base, 2048 + 2)
@@ -247,7 +259,7 @@ end
 function script.FireWeapon(num)
 	--Sleep( 1000 )
 	if num ~= 3 then
-		EmitSfx(gunpoints[num].fire, 1024)
+		--EmitSfx(gunpoints[num].fire, 1024)
 	else
 		--ClusterBomb()
 	end
