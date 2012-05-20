@@ -517,6 +517,7 @@ upgrades = {
 				unitDef.onoffable = true
 			end,
 	},
+	
 	module_jump_booster = {
 		name = "Dragonfly Booster",
 		description = "Increases jump range and height",
@@ -524,6 +525,15 @@ upgrades = {
 				unitDef.customparams.jumpclass = "commrecon2"
 			end,	
 	},
+	module_superspeed = {
+		name = "Marathon Motion Control",
+		description = "Increases speed by 50% of base",
+		func = function(unitDef, attributeMods)
+				attributeMods.speed = attributeMods.speed + 0.5
+		end,
+		--useWeaponSlot = true,
+	},
+	
 	module_radarnet = {
 		name = "Integrated Radar Network",
 		description = "Reduces radar wobble for all units",
@@ -536,28 +546,19 @@ upgrades = {
 	-- modules that use a weapon slot
 	module_guardian_armor = {
 		name = "Guardian Defense System",
-		description = "Adds 50% HP (including other modules); self-repairs 10 HP/s",
+		description = "Adds 100% HP (including other modules); self-repairs 20 HP/s",
 		func = function(unitDef, attributeMods)
-				attributeMods.health = attributeMods.health + 0.5
-				unitDef.autoheal = (unitDef.autoheal or 0) + 10
+				attributeMods.health = attributeMods.health + 1
+				unitDef.autoheal = (unitDef.autoheal or 0) + 20
 		end,
 		useWeaponSlot = true,
 	},	
 
-	module_superspeed = {
-		name = "Marathon Motion Control",
-		description = "Increases speed by 50% of base",
-		func = function(unitDef, attributeMods)
-				attributeMods.speed = attributeMods.speed + 0.5
-		end,
-		useWeaponSlot = true,
-	},
-	
 	module_super_nano = {
 		name = "Engineer's Revenge",
-		description = "Adds 15 metal/s build speed and 200 build range",
+		description = "Adds 20 metal/s build speed and 200 build range",
 		func = function(unitDef)
-				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 15 end
+				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 20 end
 				if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 200 end
 		end,
 		useWeaponSlot = true,
