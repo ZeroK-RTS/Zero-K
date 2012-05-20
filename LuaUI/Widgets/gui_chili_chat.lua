@@ -457,6 +457,10 @@ function widget:Update(s)
 	end
 end
 
+function widget:PlayerAdded(playerID)
+	setup()
+end
+
 -----------------------------------------------------------------------
 
 function widget:Initialize()
