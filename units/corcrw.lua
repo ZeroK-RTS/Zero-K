@@ -34,7 +34,7 @@ unitDef = {
     description_bp = [[Fortaleza voadora]],
     description_fr = [[Forteresse Volante]],
     description_de = [[Schwebendes Bollwerk]],
-    helptext	   = [[The Krow may be expensive and ponderous, but its incredible armor allows it do fly into all but the thickest anti-air defenses and engage enemies - including fighters - with its three laser cannons. However, its real power lies in the carpet bombs which it can drop under it to create a wide swathe of destruction.]],
+    helptext	   = [[The Krow may be expensive and ponderous, but its incredible armor allows it do fly into all but the thickest anti-air defenses and engage enemies with its three laser cannons. It can also fire a high-energy cutting beam directly under it to split open particularly hard targets.]],
     helptext_bp    = [[Aeronave flutuante armada com lasers para ataque terrestre. Muito cara e muito poderosa.]],
     helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
 	helptext_de    = [[Der Krow scheint teuer und schwerfällig, aber seine unglaubliche Panzerung erlaubt ihm auch durch die größe Flugabwehr zu kommen und alles abzuholzen, was in Sichtweite seiner drei Laserkanonen kommt. Er kann sogar feindliche Jäger vom Himmel holen.]],
@@ -124,7 +124,7 @@ unitDef = {
   weaponDefs             = {
 
     KROWLASER  = {
-      name                    = [[Laser]],
+      name                    = [[Laserbeam]],
       areaOfEffect            = 14,
       beamTime                = 0.5,
       coreThickness           = 0.5,
@@ -197,7 +197,7 @@ unitDef = {
     },
     
     SPACELASER    = {
-      name                    = [[Very High Intensity Laserbeam]],
+      name                    = [[Heavy Cutting Beam]],
       areaOfEffect            = 48,
       avoidFeature            = false,
       avoidNeutral            = false,
@@ -206,8 +206,8 @@ unitDef = {
       beamTime                = 0.01,
       canattackground         = false,
       coreThickness           = 0.3,
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 0.15,
+      craterMult              = 0.5,
       cylinderTargetting      = 8192,
 
       damage                  = {
@@ -238,7 +238,7 @@ unitDef = {
     },
     
     SPACELASER_SMALL    = {
-      name                    = [[Laserbeam]],
+      name                    = [[Light Cutting Beam]],
       areaOfEffect            = 16,
       avoidFeature            = false,
       avoidNeutral            = false,
