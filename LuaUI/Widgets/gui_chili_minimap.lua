@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Minimap",
-    desc      = "v0.883 Chili Minimap",
+    desc      = "v0.884 Chili Minimap",
     author    = "Licho, CarRepairer",
     date      = "@2010",
     license   = "GNU GPL, v2 or later",
@@ -21,7 +21,6 @@ local glResetMatrices = gl.ResetMatrices
 
 local iconsize = 20
 
-local recentlyInitialized = false
 local tabbedMode = false
 
 local function toggleTeamColors()
@@ -42,7 +41,7 @@ local function MakeMinimapWindow()
 end
 
 options_path = 'Settings/Interface/Minimap'
-options_order = { 'use_map_ratio', 'hidebuttons', 'simpleteamcolors', 'startwithlos', 'startwithradar', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors' }
+options_order = { 'use_map_ratio', 'hidebuttons', 'startwithlos', 'startwithradar', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors' }
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -71,14 +70,14 @@ options = {
 		name = 'Start with LOS view',
 		type = 'bool',
 		desc = 'Enables LOS view at game start.', 
-		value = false,
+		value = true, --default LOS & Radar/Jammer view ON is better for everyone
 	},
 	
 	startwithradar = {
 		name = 'Start with Radar view',
 		type = 'bool',
 		desc = 'Enables Radar view at game start.', 
-		value = false,
+		value = true,
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
@@ -292,8 +291,6 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-
-	recentlyInitialized = true
 	
 	Chili = WG.Chili
 	
@@ -302,20 +299,15 @@ function widget:Initialize()
 	gl.SlaveMiniMap(true)
 end
 
-function widget:Update()
-	if recentlyInitialized then
-		-- if (options.simpleteamcolors.value and not WG.usingSimpleTeamColors) or (not options.simpleteamcolors.value and WG.usingSimpleTeamColors) then --//change the team color scheme when the saved scheme didn't match the current scheme.
-			--toggleTeamColors()
-		-- end
+function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
 		if options.startwithlos.value then
-			Spring.SendCommands('togglelos')
+			Spring.SendCommands("showmetalmap") -- toggle MetalMap ON (toggling metalmap and then toggling LOS in sequence seem to make LOS option work).
+			Spring.SendCommands('togglelos') --toggle LOS view ON
 		end
-		if options.startwithradar.value then
-			Spring.SendCommands('toggleradarandjammer')
+		if not options.startwithradar.value then --
+			Spring.SendCommands('toggleradarandjammer') --toggle Radar & Jammer view OFF
 		end
-		recentlyInitialized = false
-		widgetHandler:RemoveCallIn("Update") -- remove update call-in as it no longer needed. ref: gui_ally_cursors.lua by jK
-	end
+		widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
 
