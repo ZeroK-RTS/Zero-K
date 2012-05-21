@@ -1,4 +1,4 @@
-local versionName = "v2.34"
+local versionName = "v2.6"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -50,6 +50,7 @@ local spGetUnitShieldState = Spring.GetUnitShieldState
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameFrame = Spring.GetGameFrame
 local spSendCommands = Spring.SendCommands
+local spGetSelectedUnits = Spring.GetSelectedUnits
 local CMD_STOP			= CMD.STOP
 local CMD_ATTACK 		= CMD.ATTACK
 local CMD_GUARD			= CMD.GUARD
@@ -139,6 +140,7 @@ local roundTripComplete= true --variable for detecting network lag, prevent mess
 local attackerG= {} --for recording last attacker
 local commandTTL_G = {} --for recording command's age. To check for expiration
 local iNotLagging_gbl = true --//variable: indicate if player(me) is lagging in current game. If lagging then do not process anything.
+local selectedCons_Meta_gbl = {} --//variable: remember which Constructor is selected by player.
 --------------------------------------------------------------------------------
 --Methods:
 ---------------------------------Level 0
@@ -198,16 +200,18 @@ options = {
 				end,
 	},
 	dbg_RemoveAvoidanceSplitSecond = {
-		name = 'Debug: Remove first Avoidance during constructor retreat',
+		name = 'Debug: Constructor instant retreat',
 		type = 'bool',
-		value = false,
-		desc = "---",
+		value = true,
+		desc = "Widget to issue a retreat order first before issuing an avoidance (to reduce chance of avoidance putting constructor into more danger, might not needed).",
+		advanced = true,
 	},
 	dbg_IgnoreSelectedCons ={
-		name = 'Debug: Ignore selected constructor',
+		name = 'Debug: Ignore current selection',
 		type = 'bool',
 		value = false,
-		desc = "---",
+		desc = "Selected constructor(s) will be ignored by widget.\nNote: there's a second delay before unit is ignored/re-acquire after selection/de-selection, default: disabled",
+		advanced = true,
 	},
 }
 
@@ -262,12 +266,13 @@ function widget:Update()
 	local skippingTimer = skippingTimerG
 	local attacker = attackerG
 	local commandTTL = commandTTL_G
+	local selectedCons_Meta = selectedCons_Meta_gbl
 	-----
 	if iNotLagging_gbl then
 		local now=spGetGameSeconds()
 		if (now >= skippingTimer[1]) then --wait until 'skippingTimer[1] second', then do "RefreshUnitList()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
-			unitInMotion, attacker, commandTTL=RefreshUnitList(attacker, commandTTL) --create unit list
+			unitInMotion, attacker, commandTTL, selectedCons_Meta =RefreshUnitList(attacker, commandTTL) --create unit list
 			
 			local projectedDelay=ReportedNetworkDelay(myPlayerID, 1.1) --create list every 1.1 second OR every (0+latency) second, depending on which is greater.
 			skippingTimer[1]=now+projectedDelay --wait until next 'skippingTimer[1] second'
@@ -276,7 +281,7 @@ function widget:Update()
 		
 		if (now >=skippingTimer[2] and cycle==1) and roundTripComplete then --wait until 'skippingTimer[2] second', and wait for 'LUA message received', and wait for 'cycle==1', then do "GetPreliminarySeparation()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
-			surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
+			surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, selectedCons_Meta)
 			cycle=2 --set to 'cycle==2'
 			
 			skippingTimer = CalculateNetworkDelay(1, skippingTimer, now) --update delay statistic. Record 'roundTripComplete'.
@@ -309,6 +314,7 @@ function widget:Update()
 	skippingTimerG = skippingTimer
 	attackerG = attacker
 	commandTTL_G = commandTTL
+	selectedCons_Meta_gbl = selectedCons_Meta
 	-----
 end
 
@@ -330,8 +336,9 @@ function RefreshUnitList(attacker, commandTTL)
 	local arrayIndex=1
 	local relevantUnit={}
 	
-	local selectedUnits	= Spring.GetSelectedUnits()
+	local selectedUnits	= (spGetSelectedUnits()) or {}
 	local selectedUnits_Meta = {}
+	local selectedCons_Meta = {}
 	for i = 1, #selectedUnits, 1 do
 		selectedUnits_Meta[selectedUnits[i]]=true
 	end
@@ -355,24 +362,33 @@ function RefreshUnitList(attacker, commandTTL)
 				local unitType = 0 --// category that control WHEN avoidance is activated for each unit. eg: Category 2 only enabled when not in view & when guarding units. Used by 'GateKeeperOrCommandFilter()'
 				local fixedPointType = 1 --//category that control WHICH avoidance behaviour to use. eg: Category 2 priotize avoidance and prefer to ignore user's command when enemy is close. Used by 'CheckWhichFixedPointIsStable()'
 				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
-					unitType =1 --//this unit type do avoidance even in camera view
-					if options.enableCons.value==false and unitDef["builder"] or (selectedUnits_Meta[unitID] and options.dbg_IgnoreSelectedCons.value)  then --//if Cons epicmenu option is false and it is a constructor, then exclude Cons
-						unitType = 0
+					unitType =1 --//this unit-type will do avoidance even in camera view
+					
+					local isBuilder_ignoreTrue = false
+					if unitDef["builder"] then
+						isBuilder_ignoreTrue = (options.dbg_IgnoreSelectedCons.value == true and selectedUnits_Meta[unitID] == true) --is (epicMenu force-selection-ignore is true? AND unit is a constructor?)
+						if selectedUnits_Meta[unitID] == true then
+							selectedCons_Meta[unitID] = true --remember selected Constructor
+						end
 					end
-					if unitDef["canCloak"] then --only cloakies
-						fixedPointType=2 --//use aggressive behaviour (avoid more)
-						if options.enableCloaky.value==false then --//if Cloaky option is false then exclude Cloaky
+					
+					if (unitDef["builder"] and options.enableCons.value==false) or (isBuilder_ignoreTrue) then --//if ((Cons epicmenu option is false) OR (epicMenu force-selection-ignore is true)) AND it is a constructor, then... exclude (this) Cons
+						unitType = 0 --//this unit-type excluded from avoidance
+					end
+					if unitDef["canCloak"] then --only cloakies + constructor that is cloakies
+						fixedPointType=2 --//use aggressive behaviour (avoid more & more likely to ignore the users)
+						if options.enableCloaky.value==false or (isBuilder_ignoreTrue) then --//if (Cloaky option is false) OR (epicMenu force-selection-ignore is true AND unit is a constructor) then exclude Cloaky
 							unitType = 0
 						end
 					end
 				--elseif not unitDef["canFly"] and not unitDef["canSubmerge"] then --include all ground unit, but excluding com & amphibious
 				elseif not unitDef["canFly"] then --include all ground unit, including com
-					unitType =2 --//this unit type only have avoidance outside camera view
+					unitType =2 --//this unit type only have avoidance outside camera view & while reloading (in camera view)
 					if options.enableGround.value==false then --//if Ground unit epicmenu option is false then exclude Ground unit
 						unitType = 0
 					end
 				elseif (unitDef.hoverAttack== true) then --include gunships
-					unitType =3 --//this unit type only have avoidance outside camera view
+					unitType =3 --//this unit-type only have avoidance outside camera view & while reloading (in camera view)
 					if options.enableGunship.value==false then --//if Gunship epicmenu option is false then exclude Gunship
 						unitType = 0
 					end
@@ -405,11 +421,11 @@ function RefreshUnitList(attacker, commandTTL)
 		Spring.Echo("relevantUnit(RefreshUnitList): ")
 		Spring.Echo(relevantUnit)
 	end
-	return relevantUnit, attacker, commandTTL
+	return relevantUnit, attacker, commandTTL, selectedCons_Meta
 end
 
 -- detect initial enemy separation to detect "fleeing enemy"  later
-function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
+function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, selectedCons_Meta)
 	local surroundingOfActiveUnit={}
 	if unitInMotion[1]~=nil then --don't execute if no unit present
 		local arrayIndex=1
@@ -425,6 +441,9 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker)
 					local targetCoordinate, commandIndexTable, newCommand, boxSizeTrigger, graphCONSTANTtrigger, fixedPointCONSTANTtrigger=IdentifyTargetOnCommandQueue(cQueue, unitID, commandIndexTable,fixedPointCONSTANTtrigger) --check old or new command
 					local currentX,_,currentZ = spGetUnitPosition(unitID)
 					local lastPosition = {currentX, currentZ} --record current position for use to determine unit direction later.
+					if selectedCons_Meta[unitID] and boxSizeTrigger~= 4 then --if unitIsSelected and NOT using GUARD 'halfboxsize' then:
+						boxSizeTrigger = 1 -- override all reclaim/ressurect/repair's deactivation 'halfboxsize' with the one for MOVE command (give more tolerance when unit is selected)
+					end
 					local reachedTarget = TargetBoxReached(targetCoordinate, unitID, boxSizeTrigger, lastPosition) --check if widget should ignore command
 					local losRadius	= GetUnitLOSRadius(unitID) --get LOS
 					local surroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --catalogue enemy
@@ -868,7 +887,7 @@ function CatalogueMovingObject(surroundingUnits, unitID, lastPosition, losRadius
 			if (unitRectangleID ~= nil) then
 				local relativeAngle 	= GetUnitRelativeAngle (unitID, unitRectangleID)
 				local unitDirection,_,_	= GetUnitDirection(unitID, lastPosition)
-				local unitSeparation	= spGetUnitSeparation (unitID, unitRectangleID)
+				local unitSeparation	= spGetUnitSeparation (unitID, unitRectangleID, true)
 				if math.abs(unitDirection- relativeAngle)< (collisionAngleG) then --unit inside the collision angle is catalogued with a value that is useful for comparision later
 					unitsSeparation[unitRectangleID]=unitSeparation
 				else --unit outside the collision angle is set to an arbitrary 999 which is not useful for comparision later
@@ -1119,7 +1138,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target")
+			--Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target")
 		end
 		boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
@@ -1142,14 +1161,12 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 		-- Spring.Echo(a[queueIndex]["name"])
 		local wreckPosX, wreckPosY, wreckPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
-		local notAreaMode = true
-		local noMatch=true
-		--Method 1: set target to individual wreckage and (if failed) revert to center of area command or to no target.
+		local areaMode = false
+		local foundMatch=false
+		--Method 1: set target to individual wreckage, else (if failed) revert to center of current area-command or to no target. *This method was used initially when constructor do not yet have retreat to base*
 		--[[
 		local targetFeatureID=-1
 		local iterativeTest=1
-		local foundMatch=false
-		local isAreaMode = false
 		if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --if reclaim own unit
 			foundMatch=true
 			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
@@ -1173,42 +1190,48 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		if foundMatch==false then --if no wreckage, no trees, no rock, and no unitID then use coordinate
 			if cQueue[queueIndex].params[3] ~= nil then --area reclaim should has no "nil" on params 1,2,3, & 4
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
-				isAreaMode = true
+				areaMode = true
 			else
 				Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
 			end
 		end
 		--]]
-		--Method 2: set target to center of area command (if area command) or set target to wreckage (if individual command)
-		if cQueue[queueIndex].params[3] ~= nil then --area reclaim should has no "nil" on params 1,2,3, & 4
+		
+		--Method 2: set target to center of area command (also check for area command in next queue), else set target to wreckage or to no target. *This method assume retreat to base is a norm*
+		-- [[
+		if (cQueue[queueIndex].params[3] ~= nil) then --area reclaim should has no "nil" on params 1,2,3, & 4
 			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 			notAreaMode = false
-			noMatch = false
+			foundMatch = true
+		elseif (cQueue[queueIndex+1].params[3] ~= nil and (cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125)) then
+			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex+1].params[1], cQueue[queueIndex+1].params[2],cQueue[queueIndex+1].params[3]
+			notAreaMode = false
+			foundMatch = true
 		end
 		if notAreaMode then
 			if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --if reclaim own unit
 				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
-				noMatch = false
+				foundMatch = true
 			elseif Spring.ValidFeatureID(cQueue[queueIndex].params[1]) then --if reclaim trees and rock
 				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
-				noMatch = false
+				foundMatch = true
 			else --if not own unit or trees or rock then
 				local targetFeatureID=cQueue[queueIndex].params[1]-wreckageID_offset --remove the game's offset
 				if Spring.ValidFeatureID(targetFeatureID) then
 					wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
-					noMatch = false
+					foundMatch = true
 				elseif Spring.ValidUnitID(targetFeatureID) then
 					wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
-					noMatch = false
+					foundMatch = true
 				end
 			end		
 		end
-		if noMatch then --if no wreckage, no trees, no rock, and no unitID then return error
-			Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
+		if not foundMatch then --if no area-command, no wreckage, no trees, no rock, and no unitID then return error
+			--Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
 		end
 		--]]
 		
-		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
+		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck/center-of-area-command as target
 		commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=wreckPosY
 		commandIndexTable[unitID]["backupTargetZ"]=wreckPosZ
@@ -1217,8 +1240,10 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 		graphCONSTANTtrigger[2] = 1
 		boxSizeTrigger=2 --use deactivation 'halfboxsize' for RECLAIM/RESSURECT command
-		if not isAreaMode and (cQueue[queueIndex+1].params[3]==nil or cQueue[queueIndex+1].id == CMD_STOP) then --signature for discrete RECLAIM/RESSURECT command
-			boxSizeTrigger = 3 --change to deactivation 'halfboxsize' similar to REPAIR command
+		
+		--if not areaMode and (cQueue[queueIndex+1].params[3]==nil or cQueue[queueIndex+1].id == CMD_STOP) then --signature for discrete RECLAIM/RESSURECT command. *used by Method 1*
+		if not areaMode then
+			boxSizeTrigger = 3 --change to deactivation 'halfboxsize' similar to REPAIR command if user queued a discrete reclaim/ressurect command
 			--graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 			--graphCONSTANTtrigger[2] = 1
 		end
@@ -1231,13 +1256,13 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --if no unit then use coordinate
 			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target")
+			--Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=unitPosY
 		commandIndexTable[unitID]["backupTargetZ"]=unitPosZ
-		boxSizeTrigger=3
+		boxSizeTrigger=3 --change to deactivation 'halfboxsize' similar to REPAIR command
 		graphCONSTANTtrigger[1] = 1
 		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[1].id == cMD_DummyG then
@@ -1254,7 +1279,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			unitDirection, unitPosY,_ = GetUnitDirection(targetUnitID, {nil,nil}) --get target's direction in radian
 			unitPosX, unitPosZ = ConvertToXZ(targetUnitID, unitDirection, 200) --project a target at 200m in front of guarded unit
 		else
-			Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target")
+			--Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
@@ -1283,7 +1308,7 @@ end
 
 function AddAttackerIDToEnemyList (unitID, losRadius, relevantUnit, arrayIndex, attacker)
 	if attacker[unitID].countDown > 0 then
-		local separation = spGetUnitSeparation (unitID,attacker[unitID].id)
+		local separation = spGetUnitSeparation (unitID,attacker[unitID].id, true)
 		if separation ~=nil then --if attackerID is still a valid id (ie: enemy did not disappear) then:
 			if separation> losRadius then --only include attacker that is outside LosRadius because anything inside LosRadius is automatically included later anyway
 				arrayIndex=arrayIndex+1
@@ -1360,7 +1385,7 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 		for i=2,surroundingUnits[1], 1 do
 			local unitRectangleID=surroundingUnits[i]
 			if (unitRectangleID ~= nil)then --excluded any nil entry
-				local unitSeparation	= spGetUnitSeparation (thisUnitID, unitRectangleID)
+				local unitSeparation	= spGetUnitSeparation (thisUnitID, unitRectangleID, true) --get 2D distance
 				--if enemy spontaneously appear then set the memorized separation distance to 999; maybe previous polling missed it and to prevent nil
 				if unitsSeparation[unitRectangleID]==nil then unitsSeparation[unitRectangleID]=999 end
 				if (turnOnEcho == 1) then
@@ -1867,7 +1892,7 @@ end
 --"gui_epicmenu.lua" --"Extremely Powerful Ingame Chili Menu.", by Carrepairer
 --"gui_chili_integral_menu.lua" --Chili Integral Menu, by Licho, KingRaptor, Google Frog
 --10
---Thanks to versus666 for his endless playtesting and creating idea for improvement & bug report (eg: messy command queue case, widget overriding user's command case, "avoidance may be bad for gunship" case, avoidance depending on detected enemy sonar, constructor's retreat timeout, ect)
+--Thanks to versus666 for his endless playtesting and creating idea for improvement & bug report (eg: messy command queue case, widget overriding user's command case, "avoidance may be bad for gunship" case, avoidance depending on detected enemy sonar, constructor's retreat timeout, selection effect avoidance, ect)
 --11
 -- Ref: http://en.wikipedia.org/wiki/Moving_average#Simple_moving_average (rolling average)
 --------------------------------------------------------------------------------
