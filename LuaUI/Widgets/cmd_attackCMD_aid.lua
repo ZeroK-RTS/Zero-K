@@ -1,11 +1,11 @@
-local version = "v0.7"
+local version = "v0.8"
 
 function widget:GetInfo()
   return {
     name      = "AA Command Helper",
     desc      = version .. " Filter out ground target from area attack when using AA unit",
     author    = "msafwan",
-    date      = "May 16, 2012",
+    date      = "May 22, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true -- loaded by default?
@@ -13,27 +13,18 @@ function widget:GetInfo()
 end
 
 --------------------------------------------------------------------------------
---Functions:
-local CMD_ATTACK        	 = CMD.ATTACK
-
 --------------------------------------------------------------------------------
-function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator.lua by xponen, and central_build_AI.lua by Troy H. Creek
-	if (id == CMD_ATTACK) then
+function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator.lua by msafwan, and central_build_AI.lua by Troy H. Creek
+	if (id == CMD.ATTACK) then
 		local cx, cy, cz, cr = params[1], params[2], params[3], params[4]
 		if (cr == nil) then return false end --skip the whole thing if player use a single-click (widget only accept area-attack)
-		if (cx == nil or cy == nil or cz == nil) then return false end --skip whole thing if coordinate is nil (eg: issue command outside of map)
-		--[[
-		local xmin = cx-cr
-		local xmax = cx+cr
-		local zmin = cz-cr
-		local zmax = cz+cr
-		--]]
+		if (cx == nil or cy == nil or cz == nil) then return false end --skip whole thing if coordinate was nil (eg: issue command outside of map)
 					
 		local units	= Spring.GetSelectedUnits()
 		local antiAirUnits = {}
 		local normalUnits = {}
 		if(units ~= nil) then
-			for i=1, #units,1 do  --see if player select Vamp.
+			for i=1, #units,1 do  --catalog AA and non-AA
 				local unitID = units[i]
 				local unitDefID = Spring.GetUnitDefID(unitID)
 				local unitDef_primaryWeapon_target = UnitDefs[unitDefID].weapons[1].onlyTargets
@@ -56,8 +47,8 @@ function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator
 			local selectedTeam =  Spring.GetUnitTeam(units[1]) --remember the ID for own team
 			local selectedAlly = Spring.GetUnitAllyTeam(units[1]) -- remember the ID for own ally
 			local airTargets, allTargets = ReturnAllAirTarget(cx, cz, cr, selectedTeam, selectedAlly) -- get all air target for selected area-command
-			local success = IssueReplacementCommand (antiAirUnits, airTargets, options, normalUnits,allTargets)
-			return success --return true if widget issued a replacement command.
+			IssueReplacementCommand (antiAirUnits, airTargets, options, normalUnits,allTargets)
+			return true --return true after widget issued a replacement command.
 		end
 	end
 	return false
@@ -68,7 +59,7 @@ function ReturnAllAirTarget(cx, cz, cr, selectedTeam, selectedAlly)
 	local filteredTargets = {}
 	local nonFilteredTargets = {}
 	for i=1, #targetUnits,1 do  --see if targets can fly and if they are enemy or ally.
-		--local unitID = targetUnits[i]
+		--note: unitID == targetUnits[i]
 		local enemyTeamID = Spring.GetUnitTeam(targetUnits[i])
 		local enemyAllyID = Spring.GetUnitAllyTeam(targetUnits[i])
 		if (enemyTeamID~=selectedTeam) and (selectedAlly ~= enemyAllyID) then --differenciate between selected unit, targeted units, and enemyteam. Filter out ally and owned units
@@ -90,18 +81,11 @@ function ReturnAllAirTarget(cx, cz, cr, selectedTeam, selectedAlly)
 end
 
 function IssueReplacementCommand (antiAirUnits, airTargets, options, normalUnits,allTargets)
-	local replaceCommand= false
-	if #airTargets >= 1 then
-		local attackCommandList = PrepareCommandArray(airTargets, options)
-		Spring.GiveOrderArrayToUnitArray (antiAirUnits, attackCommandList)
-		replaceCommand = true
-	end
-	if #allTargets >= 1 then
-		local attackCommandList = PrepareCommandArray(allTargets, options)
-		Spring.GiveOrderArrayToUnitArray (normalUnits, attackCommandList)
-		replaceCommand = true
-	end
-	return replaceCommand
+	local attackCommandListAir = PrepareCommandArray(airTargets, options)
+	Spring.GiveOrderArrayToUnitArray (antiAirUnits, attackCommandListAir)
+
+	local attackCommandListAll = PrepareCommandArray(allTargets, options)
+	Spring.GiveOrderArrayToUnitArray (normalUnits, attackCommandListAll)
 end
 --------------------------------------------------------------------------------
 function GetDotsFloating (unitID) --ref: gui_vertLineAid.lua by msafwan
@@ -120,10 +104,10 @@ end
 
 function PrepareCommandArray (targetUnits, options)
 	local attackCommandList = {}
-	attackCommandList[1] = {CMD_ATTACK,{targetUnits[1],},{(options.shift and "shift"),}}
+	attackCommandList[1] = {CMD.ATTACK,{targetUnits[1],},{((options.shift and "shift") or nil),}}
 	local j = 2
 	for i=2, #targetUnits, 1 do
-		attackCommandList[j] = {CMD_ATTACK,{targetUnits[i],},{"shift",}}
+		attackCommandList[j] = {CMD.ATTACK,{targetUnits[i],},{"shift",}}
 		j= j + 1
 	end
 	return attackCommandList
