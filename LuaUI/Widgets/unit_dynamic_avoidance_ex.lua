@@ -1,4 +1,4 @@
-local versionName = "v2.3"
+local versionName = "v2.33"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground combat unit and gunships",
     author    = "msafwan",
-    date      = "May 10, 2012",
+    date      = "May 21, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -73,7 +73,7 @@ local activateImpatienceG=0 --auto disable auto-reverse & half the 'distanceCONS
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
 local safetyMarginCONSTANTunitG = 0.175 --obstacle graph offset (a "safety margin" constant). Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.175 radian)
 local smCONSTANTunitG		= 0.175  -- obstacle graph offset (a "safety margin" constant).  Offset the obstacle effect: to prefer avoid torward more left or right (default = 0.175 radian)
-local aCONSTANTg			= {math.pi/10 , math.pi/4} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD & ATTACK)) (max value: math.pi/2).
+local aCONSTANTg			= {math.pi/10 , math.pi/4} -- attractor graph; scale the attractor's strenght. Less equal to a lesser turning toward attraction(default = math.pi/10 radian (MOVE),math.pi/4 (GUARD & ATTACK)) (max value: math.pi/2 (because both contribution from obstacle & target will sum to math.pi)).
 local obsCONSTANTg			= {math.pi/10, math.pi/4} -- obstacle graph; scale the obstacle's strenght. Less equal to a lesser turning away from avoidance(default = math.pi/10 radian (MOVE), math.pi/4 (GUARD & ATTACK)). 
 --aCONSTANTg Note: math.pi/4 is equal to about 45 degrees turning (left or right). aCONSTANTg is the maximum amount of turning toward target and the actual turning depend on unit's direction. Activated by 'graphCONSTANTtrigger[1]'
 --an antagonist to aCONSTANg (obsCONSTANTg or obstacle graph) also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy, but already normalized. Activated by 'graphCONSTANTtrigger[2]'
@@ -93,10 +93,10 @@ local dummyIDg = "[]" --fake id for Lua Message to check lag (prevent processing
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
-local noiseAngleG =math.pi/36 --(default is pi/36 rad); add random angle (range from 0 to +-math.pi/36) to the new angle. To prevent a rare state that contribute to unit going straight toward enemy
-local collisionAngleG=math.pi/36 --(default is pi/6 rad) a "field of vision" (range from 0 to +-math.pi/366) where auto-reverse will activate 
-local fleeingAngleG=math.pi/4 --(default is pi/4 rad) angle of enemy (range from 0 to +-math.pi/4) where fleeing enemy is considered (to de-activate avoidance to perform chase). Set to 0 to de-activate.
-local maximumTurnAngleG = math.pi --safety measure. Prevent overturn (eg: 360+xx degree turn)
+local noiseAngleG =0.1 --(default is pi/36 rad); add random angle (range from 0 to +-math.pi/36) to the new angle. To prevent a rare state that contribute to unit going straight toward enemy
+local collisionAngleG= 0.1 --(default is pi/6 rad) a "field of vision" (range from 0 to +-math.pi/366) where auto-reverse will activate 
+local fleeingAngleG= 0.7 --(default is pi/4 rad) angle of enemy (range from 0 to +-math.pi/4) where fleeing enemy is considered as fleeing(to de-activate avoidance to perform chase). Set to 0 to de-activate.
+local maximumTurnAngleG = 3.1 --(default is pi rad) safety measure. Prevent overturn (eg: 360+xx degree turn)
 --pi is 180 degrees
 
 --Update constant:
@@ -491,9 +491,18 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, net
 					local graphCONSTANTtrigger = surroundingOfActiveUnit[i][10] --//fetch information on which aCONSTANT and obsCONSTANT to use
 					local fixedPointCONSTANTtrigger = surroundingOfActiveUnit[i][11] --//fetch information on which fixedPoint constant to use
 					if (newSurroundingUnits[1] ~=nil) then --//check again if there's still any enemy to avoid. Submerged unit might return empty list if their enemy has no Sonar (their 'losRadius' became half the original value so that they don't detect/avoid unnecessarily). 
-						local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger, newCommand) --calculate move solution
-						local newY=spGetGroundHeight(newX,newZ)
-						commandIndexTable, commandTTL = InsertCommandQueue(cQueue, unitID, newX, newY, newZ, commandIndexTable, newCommand, now, commandTTL) --send move solution to unit
+						local avoidanceCommand = true
+						commandTTL, avoidanceCommand = InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)--delete old widget command, and send constructor to base for retreat (if issuing retreat then do not need to do avoidance in that 1 instance)
+						if avoidanceCommand then
+							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger, newCommand) --calculate move solution
+							local newY=spGetGroundHeight(newX,newZ)
+							--start Insert Avoidance Command Queue:--
+							spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
+							commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeoutG, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
+							commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
+							commandIndexTable[unitID]["widgetZ"]=newZ
+							--end Insert Avoidance Command Queue:--
+						end
 						if (turnOnEcho == 1) then
 							Spring.Echo("newX(Update) " .. newX)
 							Spring.Echo("newZ(Update) " .. newZ)
@@ -937,7 +946,7 @@ end
 
 -- maintain the visibility of original command
 -- reference: "unit_tactical_ai.lua" -ZeroK gadget by Google Frog
-function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, newCommand, now, commandTTL)
+function InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)
 	------- localize global constant:
 	local consRetreatTimeout = consRetreatTimeoutG
 	local commandTimeout = commandTimeoutG
@@ -992,6 +1001,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 	-- end
 	--Method 4: with network delay detection won't do any problem
 	local queueIndex=1
+	local avoidanceCommand = true
 	if not newCommand then  --if widget's command then delete it
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
 		queueIndex=2 --skip index 1 of stored command. Skip widget's command
@@ -1006,6 +1016,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 					local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex+1])
 					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command OR to any heavy concentration of ally (haven)
 					commandTTL[unitID][#commandTTL[unitID] +1] = {countDown = consRetreatTimeout, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 15x*RefreshUnitUpdateRate* to expire
+					avoidanceCommand = false
 				end
 			elseif cQueue[queueIndex+1].id==40 then --if second (2) queue is also repair
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
@@ -1016,18 +1027,14 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 				local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex])
 				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
 				commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeout, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 2x*RefreshUnitUpdateRate* to expire
+				avoidanceCommand = false
 			end
 		end
 	end
-	spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
-	commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeout, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
-	----
-	commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
-	commandIndexTable[unitID]["widgetZ"]=newZ
 	if (turnOnEcho == 1) then
 		Spring.Echo("unitID(InsertCommandQueue)" .. unitID)
-		Spring.Echo("commandIndexTable[unitID][widgetX](InsertCommandQueue):" .. commandIndexTable[unitID]["widgetX"])
-		Spring.Echo("commandIndexTable[unitID][widgetZ](InsertCommandQueue):" .. commandIndexTable[unitID]["widgetZ"])
+		--Spring.Echo("commandIndexTable[unitID][widgetX](InsertCommandQueue):" .. commandIndexTable[unitID]["widgetX"])
+		--Spring.Echo("commandIndexTable[unitID][widgetZ](InsertCommandQueue):" .. commandIndexTable[unitID]["widgetZ"])
 		Spring.Echo("newCommand(InsertCommandQueue):")
 		Spring.Echo(newCommand)
 		Spring.Echo("cQueue[1].params[1](InsertCommandQueue):" .. cQueue[1].params[1])
@@ -1039,7 +1046,7 @@ function InsertCommandQueue(cQueue, unitID,newX, newY, newZ, commandIndexTable, 
 			Spring.Echo(cQueue[2].params[3])
 		end
 	end
-	return commandIndexTable, commandTTL --return updated memory tables. One for checking if new command is issued and another is to check for command's expiration age.
+	return commandTTL, avoidanceCommand --return updated memory tables. One for checking if new command is issued and another is to check for command's expiration age.
 end
 ---------------------------------Level2
 ---------------------------------Level3 (low-level function)
@@ -1664,7 +1671,11 @@ end
 --
 function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor)
 	fObstacleSum = fObstacleSum*normalizingFactor --downscale value depend on the entire graph's maximum
-	local unitAngleDerived= math.abs(wTarget)*fTarget + math.abs(wObstacle)*fObstacleSum + (noiseAngleG)*(GaussianNoise()*2-1) --add wave-amplitude, and add noise between -ve & +ve noiseAngle
+	local angleFromTarget = math.abs(wTarget)*fTarget
+	local angleFromObstacle = math.abs(wObstacle)*fObstacleSum
+	--Spring.Echo(math.modf(angleFromObstacle))
+	local angleFromNoise = (noiseAngleG)*(GaussianNoise()*2-1)
+	local unitAngleDerived= angleFromTarget + angleFromObstacle + angleFromNoise --add wave-amplitude, and add noise between -ve & +ve noiseAngle
 	if math.abs(unitAngleDerived) > maximumTurnAngleG then --to prevent excess in avoidance causing overflow in angle changes (maximum angle should be pi, but useful angle should be pi/2 eg: 90 degree)
 		--Spring.Echo("Dynamic Avoidance warning: total angle changes excess")
 		unitAngleDerived = Sgn(unitAngleDerived)*maximumTurnAngleG end
