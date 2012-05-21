@@ -1,4 +1,4 @@
-local versionName = "v2.33"
+local versionName = "v2.34"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -143,7 +143,7 @@ local iNotLagging_gbl = true --//variable: indicate if player(me) is lagging in 
 --Methods:
 ---------------------------------Level 0
 options_path = 'Game/Unit AI/Dynamic Avoidance' --//for use 'with gui_epicmenu.lua'
-options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption'}
+options_order = {'enableCons','enableCloaky','enableGround','enableGunship','enableReturnToBase','consRetreatTimeoutOption', 'dbg_RemoveAvoidanceSplitSecond', 'dbg_IgnoreSelectedCons'}
 options = {
 	enableCons = {
 		name = 'Enable for constructors',
@@ -196,7 +196,19 @@ options = {
 					consRetreatTimeoutG = self.value
 					Spring.Echo(string.format ("%.1f", 1.1*consRetreatTimeoutG) .. " second")
 				end,
-	},	
+	},
+	dbg_RemoveAvoidanceSplitSecond = {
+		name = 'Debug: Remove first Avoidance during constructor retreat',
+		type = 'bool',
+		value = false,
+		desc = "---",
+	},
+	dbg_IgnoreSelectedCons ={
+		name = 'Debug: Ignore selected constructor',
+		type = 'bool',
+		value = false,
+		desc = "---",
+	},
 }
 
 function widget:Initialize()
@@ -318,6 +330,11 @@ function RefreshUnitList(attacker, commandTTL)
 	local arrayIndex=1
 	local relevantUnit={}
 	
+	local selectedUnits	= Spring.GetSelectedUnits()
+	local selectedUnits_Meta = {}
+	for i = 1, #selectedUnits, 1 do
+		selectedUnits_Meta[selectedUnits[i]]=true
+	end
 	local metaForVisibleUnits = {}
 	local visibleUnits=spGetVisibleUnits(myTeamID_gbl)
 	for _, unitID in ipairs(visibleUnits) do --memorize units that is in view of camera
@@ -339,7 +356,7 @@ function RefreshUnitList(attacker, commandTTL)
 				local fixedPointType = 1 --//category that control WHICH avoidance behaviour to use. eg: Category 2 priotize avoidance and prefer to ignore user's command when enemy is close. Used by 'CheckWhichFixedPointIsStable()'
 				if (unitDef["builder"] or unitDef["canCloak"]) and not unitDef.customParams.commtype then --include only constructor and cloakies, and not com
 					unitType =1 --//this unit type do avoidance even in camera view
-					if options.enableCons.value==false and unitDef["builder"] then --//if Cons epicmenu option is false and it is a constructor, then exclude Cons
+					if options.enableCons.value==false and unitDef["builder"] or (selectedUnits_Meta[unitID] and options.dbg_IgnoreSelectedCons.value)  then --//if Cons epicmenu option is false and it is a constructor, then exclude Cons
 						unitType = 0
 					end
 					if unitDef["canCloak"] then --only cloakies
@@ -492,8 +509,8 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, net
 					local fixedPointCONSTANTtrigger = surroundingOfActiveUnit[i][11] --//fetch information on which fixedPoint constant to use
 					if (newSurroundingUnits[1] ~=nil) then --//check again if there's still any enemy to avoid. Submerged unit might return empty list if their enemy has no Sonar (their 'losRadius' became half the original value so that they don't detect/avoid unnecessarily). 
 						local avoidanceCommand = true
-						commandTTL, avoidanceCommand = InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)--delete old widget command, and send constructor to base for retreat (if issuing retreat then do not need to do avoidance in that 1 instance)
-						if avoidanceCommand then
+						commandTTL, avoidanceCommand = InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)--delete old widget command, update commandTTL, and send constructor to base for retreat
+						if avoidanceCommand or (not options.dbg_RemoveAvoidanceSplitSecond.value) then 
 							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger, newCommand) --calculate move solution
 							local newY=spGetGroundHeight(newX,newZ)
 							--start Insert Avoidance Command Queue:--
@@ -502,10 +519,10 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, net
 							commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
 							commandIndexTable[unitID]["widgetZ"]=newZ
 							--end Insert Avoidance Command Queue:--
-						end
-						if (turnOnEcho == 1) then
-							Spring.Echo("newX(Update) " .. newX)
-							Spring.Echo("newZ(Update) " .. newZ)
+							if (turnOnEcho == 1) then
+								Spring.Echo("newX(Update) " .. newX)
+								Spring.Echo("newZ(Update) " .. newZ)
+							end
 						end
 					end
 				end
@@ -1102,7 +1119,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			--Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target")
+			Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target")
 		end
 		boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
@@ -1125,9 +1142,14 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 		-- Spring.Echo(a[queueIndex]["name"])
 		local wreckPosX, wreckPosY, wreckPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
+		local notAreaMode = true
+		local noMatch=true
+		--Method 1: set target to individual wreckage and (if failed) revert to center of area command or to no target.
+		--[[
 		local targetFeatureID=-1
 		local iterativeTest=1
 		local foundMatch=false
+		local isAreaMode = false
 		if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --if reclaim own unit
 			foundMatch=true
 			wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
@@ -1148,15 +1170,44 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 				targetFeatureID=targetFeatureID-wreckageID_offset_multiplier
 			end
 		end
-		local isAreaMode = false
 		if foundMatch==false then --if no wreckage, no trees, no rock, and no unitID then use coordinate
 			if cQueue[queueIndex].params[3] ~= nil then --area reclaim should has no "nil" on params 1,2,3, & 4
 				wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 				isAreaMode = true
 			else
-				--Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
+				Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
 			end
 		end
+		--]]
+		--Method 2: set target to center of area command (if area command) or set target to wreckage (if individual command)
+		if cQueue[queueIndex].params[3] ~= nil then --area reclaim should has no "nil" on params 1,2,3, & 4
+			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
+			notAreaMode = false
+			noMatch = false
+		end
+		if notAreaMode then
+			if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --if reclaim own unit
+				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
+				noMatch = false
+			elseif Spring.ValidFeatureID(cQueue[queueIndex].params[1]) then --if reclaim trees and rock
+				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
+				noMatch = false
+			else --if not own unit or trees or rock then
+				local targetFeatureID=cQueue[queueIndex].params[1]-wreckageID_offset --remove the game's offset
+				if Spring.ValidFeatureID(targetFeatureID) then
+					wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
+					noMatch = false
+				elseif Spring.ValidUnitID(targetFeatureID) then
+					wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
+					noMatch = false
+				end
+			end		
+		end
+		if noMatch then --if no wreckage, no trees, no rock, and no unitID then return error
+			Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
+		end
+		--]]
+		
 		targetCoordinate={wreckPosX, wreckPosY,wreckPosZ} --use wreck as target
 		commandIndexTable[unitID]["backupTargetX"]=wreckPosX --backup the target
 		commandIndexTable[unitID]["backupTargetY"]=wreckPosY
@@ -1180,7 +1231,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --if no unit then use coordinate
 			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			--Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target")
+			Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
@@ -1203,7 +1254,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			unitDirection, unitPosY,_ = GetUnitDirection(targetUnitID, {nil,nil}) --get target's direction in radian
 			unitPosX, unitPosZ = ConvertToXZ(targetUnitID, unitDirection, 200) --project a target at 200m in front of guarded unit
 		else
-			--Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target")
+			Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target")
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
