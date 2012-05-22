@@ -1,4 +1,4 @@
-local version = "v0.8"
+local version = "v0.9"
 
 function widget:GetInfo()
   return {
@@ -25,22 +25,27 @@ function widget:CommandNotify(id, params, options)	--ref: gui_tacticalCalculator
 		local normalUnits = {}
 		if(units ~= nil) then
 			for i=1, #units,1 do  --catalog AA and non-AA
-				local unitID = units[i]
-				local unitDefID = Spring.GetUnitDefID(unitID)
-				local unitDef_primaryWeapon_target = UnitDefs[unitDefID].weapons[1].onlyTargets
-				local exclusiveAA = (unitDef_primaryWeapon_target["fixedwing"] and unitDef_primaryWeapon_target["gunship"]) and 
-									not (unitDef_primaryWeapon_target["sink"] or unitDef_primaryWeapon_target["land"] or unitDef_primaryWeapon_target["sub"])
-				--[[
-				Spring.Echo(UnitDefs[unitDefID].weapons[1].onlyTargets)
-				for name,content in pairs(UnitDefs[unitDefID].weapons[1].onlyTargets) do
-					Spring.Echo(name)
-					Spring.Echo(content)
-				end
-				--]]
-				if (exclusiveAA) then 
-					antiAirUnits[#antiAirUnits +1]= unitID 
+				-- Note: unitID = units[i]
+				local unitDefID = Spring.GetUnitDefID(units[i])
+				local unitDef_primaryWeapon = UnitDefs[unitDefID].weapons[1]
+				if (unitDef_primaryWeapon~= nil) then
+					local primaryWeapon_target = UnitDefs[unitDefID].weapons[1].onlyTargets
+					local exclusiveAA = (primaryWeapon_target["fixedwing"] and primaryWeapon_target["gunship"]) and 
+										not (primaryWeapon_target["sink"] or primaryWeapon_target["land"] or primaryWeapon_target["sub"])
+					--[[
+					Spring.Echo(UnitDefs[unitDefID].weapons[1].onlyTargets)
+					for name,content in pairs(UnitDefs[unitDefID].weapons[1].onlyTargets) do
+						Spring.Echo(name)
+						Spring.Echo(content)
+					end
+					--]]
+					if (exclusiveAA) then 
+						antiAirUnits[#antiAirUnits +1]= units[i] 
+					else
+						normalUnits[#normalUnits +1]= units[i] 
+					end
 				else
-					normalUnits[#normalUnits +1]= unitID 
+					normalUnits[#normalUnits +1]= units[i]
 				end
 			end
 			if #antiAirUnits == 0 then return false end --skip whole thing if no AA unit was selected (because player dont need widget to do normal attack command).
@@ -81,11 +86,14 @@ function ReturnAllAirTarget(cx, cz, cr, selectedTeam, selectedAlly)
 end
 
 function IssueReplacementCommand (antiAirUnits, airTargets, options, normalUnits,allTargets)
-	local attackCommandListAir = PrepareCommandArray(airTargets, options)
-	Spring.GiveOrderArrayToUnitArray (antiAirUnits, attackCommandListAir)
-
-	local attackCommandListAll = PrepareCommandArray(allTargets, options)
-	Spring.GiveOrderArrayToUnitArray (normalUnits, attackCommandListAll)
+	if #antiAirUnits>=1 and #airTargets>=1 then
+		local attackCommandListAir = PrepareCommandArray(airTargets, options)
+		Spring.GiveOrderArrayToUnitArray (antiAirUnits, attackCommandListAir)
+	end
+	if #normalUnits>=1 and #allTargets>=1 then
+		local attackCommandListAll = PrepareCommandArray(allTargets, options)
+		Spring.GiveOrderArrayToUnitArray (normalUnits, attackCommandListAll)
+	end
 end
 --------------------------------------------------------------------------------
 function GetDotsFloating (unitID) --ref: gui_vertLineAid.lua by msafwan
