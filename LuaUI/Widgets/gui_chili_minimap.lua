@@ -70,14 +70,14 @@ options = {
 		name = 'Start with LOS view',
 		type = 'bool',
 		desc = 'Enables LOS view at game start.', 
-		value = true, --default LOS & Radar/Jammer view ON is better for everyone
+		value = false, --default LOS & Radar/Jammer view ON is better for everyone
 	},
 	
 	startwithradar = {
 		name = 'Start with Radar view',
 		type = 'bool',
 		desc = 'Enables Radar view at game start.', 
-		value = true,
+		value = false,
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
