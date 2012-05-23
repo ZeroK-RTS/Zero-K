@@ -106,7 +106,7 @@ local function ProcessCommand(id, params, options)
       local insert_tag=0
       local insert_pos=0
       for j=1, #commands do
-		local command = commands[j]
+	local command = commands[j]
         --Spring.Echo("cmd:"..table.tostring(command))
         local px2,py2,pz2=GetCommandPos(command)
         if px2>-1 then
@@ -115,7 +115,7 @@ local function ProcessCommand(id, params, options)
           if dlen<min_dlen then
             min_dlen=dlen
             insert_tag=command.tag
-            insert_pos=i
+            insert_pos=j
           end
           px,py,pz=px2,py2,pz2
         end   
