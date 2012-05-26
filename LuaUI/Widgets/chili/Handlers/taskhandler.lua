@@ -72,8 +72,25 @@ function TaskHandler.Update()
 
   local obj
   local Update
+
+  --// run it for all current tasks
   local cnt = objectsCount
   objectsCount = 0 --// clear the array, so all objects needs to reinsert themselves when they want to get called again
+  objects,objects2 = objects2,objects
+  for i=1,cnt do
+    obj = objects2[i]
+    if (obj)and(not obj.disposed) then
+      obj.__inUpdateQueue = false
+      Update = obj.Update
+      if (Update) then
+        Update(obj)
+      end
+    end
+  end
+
+  --// re-run it for newly added tasks
+  cnt = objectsCount
+  objectsCount = 0
   objects,objects2 = objects2,objects
   for i=1,cnt do
     obj = objects2[i]
