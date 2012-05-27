@@ -1,9 +1,8 @@
 unitDef = {
   unitname                      = [[railgunturret]],
   name                          = [[Splinter]],
-  description                   = [[Railgun Turret (Anti-Armor)]],
+  description                   = [[Railgun Turret (Anti-Heavy) - Requires 25 Power]],
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   buildCostEnergy               = 700,
   buildCostMetal                = 700,
   builder                       = false,
@@ -22,7 +21,10 @@ unitDef = {
   customParams                  = {
     description_de = [[Schienenkanoneturm (Panzerbrechend)]],
     helptext       = [[The Splinter's high velocity gauss cannon slices through enemy armor like a chainsaw through butter.]],
-	helptext_de    = [[Seine Hochgeschwindigkeits-Gauﬂkanone schneidet sich durch die feindliche Panzerung wie eine Kettens‰ge durch Butter.]],
+    helptext_de    = [[Seine Hochgeschwindigkeits-Gauﬂkanone schneidet sich durch die feindliche Panzerung wie eine Kettens‰ge durch Butter.]],
+    keeptooltip    = [[any string I want]],
+    neededlink     = 25,
+    pylonrange     = 50,	
   },
 
   defaultmissiontype            = [[GUARD_NOMOVE]],
@@ -33,7 +35,7 @@ unitDef = {
   iconType                      = [[defenseheavy]],
   levelGround                   = false,
   mass                          = 333,
-  maxDamage                     = 3600,
+  maxDamage                     = 5000,
   maxSlope                      = 18,
   minCloakDistance              = 150,
   noAutoFire                    = false,
@@ -42,10 +44,17 @@ unitDef = {
   script                        = [[railgunturret.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
-  shootme                       = [[1]],
+
+  sfxtypes               = {
+
+    explosiongenerators = {
+      [[custom:RAIDMUZZLE]],
+    },
+
+  },  
+  
   side                          = [[ARM]],
   sightDistance                 = 660,
-  TEDClass                      = [[FORT]],
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oooo oooo oooo oooo]],
@@ -72,6 +81,11 @@ unitDef = {
       burst                   = 2,
       burstrate               = 0.4,
       cegTag                  = [[gauss_tag_m]],
+      
+      customParams			= {
+	timeslow_damagefactor = [[1.2]],
+      },
+      
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -81,24 +95,23 @@ unitDef = {
         subs    = 22.5,
       },
 
-      explosionGenerator      = [[custom:gauss_hit_m]],
+      explosionGenerator      = [[custom:gauss_hit_m_purple]],
       groundbounce            = 1,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 0,
-      minbarrelangle          = [[-15]],
       noExplode               = true,
       numbounce               = 40,
       range                   = 650,
       reloadtime              = 3,
-      rgbColor                = [[0.5 1 1]],
+      rgbColor                = [[0.9 0.1 0.9]],
       separation              = 0.5,
       size                    = 0.8,
       sizeDecay               = -0.1,
       soundHit                = [[weapon/gauss_hit]],
       soundStart              = [[weapon/gauss_fire]],
-      sprayangle              = 800,
+      sprayangle              = 100,
       stages                  = 32,
       startsmoke              = [[1]],
       turret                  = true,
@@ -116,9 +129,8 @@ unitDef = {
       description      = [[Wreckage - Splinter]],
       blocking         = true,
       category         = [[arm_corpses]],
-      damage           = 2100,
+      damage           = 5000,
       featureDead      = [[HEAP]],
-      featurereclamate = [[smudge01]],
       footprintX       = 3,
       footprintZ       = 3,
       height           = 100,
@@ -127,8 +139,6 @@ unitDef = {
       object           = [[railgunturret_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 280,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
     },
 
 
@@ -136,8 +146,7 @@ unitDef = {
       description      = [[Debris - Splinter]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2100,
-      featurereclamate = [[smudge01]],
+      damage           = 5000,
       footprintX       = 3,
       footprintZ       = 3,
       height           = 4,
@@ -146,8 +155,6 @@ unitDef = {
       object           = [[debris4x4b.s3o]],
       reclaimable      = true,
       reclaimTime      = 140,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
     },
 
   },
