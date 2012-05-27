@@ -201,6 +201,7 @@ unitDef = {
     MULTILIGHTNING = {
       name                    = [[Multi-Stunner]],
       areaOfEffect            = 160,
+      avoidFeature            = false,
 	  burst					  = 20,
 	  burstRate				  = 0.1,
 	  commandFire			  = true,
