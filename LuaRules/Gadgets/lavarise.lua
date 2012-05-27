@@ -10,6 +10,9 @@ function gadget:GetInfo()
   }
 end
 
+if (modOptions.zkmode ~= "lavarise") then
+  return
+end
 
 if (gadgetHandler:IsSyncedCode()) then
 --- SYNCED:
@@ -55,9 +58,6 @@ end
 
 
 function gadget:Initialize()
-  if (modOptions.zkmode ~= "lavarise") then
-    gadgetHandler:RemoveGadget()
-  end
   addTideRhym (lavaLevel + lavaRise, lavaGrowSpeed, lavaRisePeriod)
 
   --addTideRhym (-21, 0.25, 5)
@@ -166,13 +166,6 @@ local lavaTexture = ":a:" .. "bitmaps/lava2.jpg"
 local mapSizeX = Game.mapSizeX
 local mapSizeY = Game.mapSizeZ
 
---FIX FOR HOTSTEPPER
-  local updatedraw = drawlava
-  if (modOptions.zkmode ~= "lavarise") then
-    updatedraw = empty
-  end
---END OF FIX
-
 local function DrawGroundHuggingSquareVertices(x1,z1, x2,z2, HoverHeight)
   local y = HoverHeight  --+Spring.GetGroundHeight(x,z)
   local s = 2+sin(SYNCED.frame/50)/10
@@ -203,12 +196,7 @@ local function DrawGroundHuggingSquare(red,green,blue,alpha, x1,z1,x2,z2, HoverH
   glPopAttrib()
 end
 
-
 function gadget:DrawWorld ()
-  updatedraw()
-end
-
-local function drawlava()
   if (SYNCED.lavaLevel) then
     --glColor(1-cm1,1-cm1-cm2,0.5,1)
 
@@ -216,9 +204,6 @@ local function drawlava()
     DrawGroundHuggingSquare(1,1,1,1, -1000, -1000, mapSizeX + 1000, mapSizeY + 1000, SYNCED.lavaLevel) --***map.width bla
     --DrawGroundHuggingSquare(0,0.5,0.8,0.8, 0, 0, mapSizeX, mapSizeY, SYNCED.lavaLevel) --***map.width bla
   end
-end
-
-local function empty()
 end
 
 end  --UNSYNCED
