@@ -35,6 +35,18 @@ local SIG_AIM2 = 4
 local SIG_RESTORE = 8
 local SIG_BOB = 16
 local SIG_FLOAT = 32
+local SIG_UNPACK = 64
+
+local wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
+local PROJECTILE_SPEED = WeaponDefs[wd].projectilespeed
+
+local UNPACK_TIME = 1/3
+
+--------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------
+
+local bUnpacked = false
+local gun_1 = 1
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -103,6 +115,7 @@ end
 
 function Float_stationaryOnSurface()
     Signal(SIG_FLOAT)
+    bUnpacked = true
 end
 
 function unit_teleported(position)
@@ -111,9 +124,7 @@ end
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
-local gun_1 = 1
---------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------
+
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
@@ -142,7 +153,19 @@ local function Walk()
 end
 
 function script.StartMoving()
+	--Move(lthigh, y_axis, 0, 12)
+	--Move(rthigh, y_axis, 0, 12)
+	Signal(SIG_UNPACK)
+	bUnpacked = false
 	StartThread(Walk)
+end
+
+local function Unpack()
+    Signal(SIG_UNPACK)
+    SetSignalMask(SIG_UNPACK)
+    
+    Sleep(UNPACK_TIME)
+    bUnpacked = true
 end
 
 function script.StopMoving()
@@ -153,7 +176,13 @@ function script.StopMoving()
 	Turn( lthigh , x_axis, 0, math.rad(80)*PACE  )
 	Turn( lshin , x_axis, 0, math.rad(80)*PACE  )
 	Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
+	
+	--Move(lthigh, y_axis, 4, 12)
+	--Move(rthigh, y_axis, 4, 12)
+	
 	GG.Floating_StopMoving(unitID)
+	
+	StartThread(Unpack)
 end
 
 function script.Create()
@@ -174,13 +203,17 @@ function script.AimFromWeapon()
 	if height < -130 then
 		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = 200})
 	else
-		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = 11.3})
+		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = PROJECTILE_SPEED})
 	end
 	
 	return barrel
 end
 
 function script.AimWeapon(num, heading, pitch)
+	--if not bUnpacked then
+	--    return false
+	--end
+	
 	GG.Floating_AimWeapon(unitID)
 	
 	if num == 1 then
