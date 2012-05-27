@@ -50,9 +50,9 @@ for name,data in pairs(WeaponDefNames) do
 	local cp = data.customParams
 	if cp.timeslow_preset then
 		weapons[name] = Spring.Utilities.CopyTable(presets[cp.timeslow_preset])
-	elseif cp.timeslow_damagefactor then
-		custom.slowDamage = cp.timeslow_damagefactor * (data.damages and data.damages[0] or 0)
-		custom.onlySlow = (cp.timeslow_onlyslow == "1") or false
+	elseif cp.timeslow_damagefactor or cp.timeslow_damage then
+		custom.slowDamage = cp.timeslow_damage or (cp.timeslow_damagefactor * (data.damages and data.damages[0] or 0))
+		custom.onlySlow = (cp.timeslow_onlyslow) or false
 		custom.smartRetarget = cp.timeslow_smartretarget and tonumber(cp.timeslow_smartretarget) or nil
 		weapons[name] = custom
 	end
