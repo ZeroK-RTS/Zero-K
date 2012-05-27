@@ -701,7 +701,7 @@ SetupPlayerNames = function()
 			checked = WG.rzones.rZonePlaceMode,
 			OnChange = { function(self) WG.rzones.rZonePlaceMode = not WG.rzones.rZonePlaceMode; end },
 		} )
-		row = row + 1
+		row = row + 1.5
 	end
 	
 	--push things to bottom of window if needed
