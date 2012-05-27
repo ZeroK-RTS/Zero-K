@@ -18,6 +18,9 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
   if not gadgetHandler:IsSyncedCode() then
     return false -- no unsynced code
   end
+  
+  GG.SetFaction = function() end
+  
   function gadget:GameFrame(n)
     if n == 0 then
       for _, teamID in ipairs(Spring.GetTeamList()) do
