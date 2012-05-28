@@ -790,8 +790,15 @@ function gadget:Initialize()
 	end
 	
 	for _,team in pairs(totalTeamList) do
-		local _, leaderPlayerID = Spring.GetTeamInfo(team)
-		teamNames[team] = Spring.GetPlayerInfo(leaderPlayerID)
+		local _, leaderPlayerID, _, isAI = Spring.GetTeamInfo(team)
+		local name
+		if isAI then
+		  local _, aiName, _, shortName = Spring.GetAIInfo(team)
+		  name = aiName ..' ('.. shortName .. ')'
+		else
+		  name = Spring.GetPlayerInfo(leaderPlayerID)
+		end
+		teamNames[team] = name
 		teamColors[team]  = {Spring.GetTeamColor(team)}
 		teamColorsDim[team]  = {teamColors[team][1], teamColors[team][2], teamColors[team][3], 0.5}
 	end
