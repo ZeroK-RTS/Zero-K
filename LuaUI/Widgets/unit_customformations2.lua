@@ -14,6 +14,8 @@ function widget:GetInfo()
 	}
 end
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 --------------------------------------------------------------------------------
 -- User Configurable Constants
 --------------------------------------------------------------------------------
@@ -33,9 +35,6 @@ local unitIncreaseThresh	= 0.85 -- We only increase maxUnits if the units are gr
 
 -- Alpha loss per second after releasing mouse
 local lineFadeRate = 2.0
-CMD_UNIT_SET_TARGET = 34923 
-CMD_UNIT_SET_TARGET_CIRCLE = 34925
-CMD_JUMP = 38521
 
 -- What commands are eligible for custom formations
 local formationCmds = {
@@ -156,12 +155,14 @@ local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 
 local keyShift = 304
 
+--[[
 function widget:Initialize()
 	if Spring.GetSpectatingState() or Spring.IsReplay() then
 		Spring.Echo("<CustomFormations2>: disabled for spectators")
 		widgetHandler:RemoveWidget()
 	end
 end
+--]]
 
 --------------------------------------------------------------------------------
 -- Helper Functions
