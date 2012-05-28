@@ -20,7 +20,6 @@ local open = false
 
 local function Open()
 	Signal(SIG_OPEN)
-	SetSignalMask(SIG_OPEN)
 	Turn(door1, z_axis, math.rad(-90), math.rad(45))
 	Turn(door2, z_axis, math.rad(90), math.rad(45))
 	WaitForTurn(door1, z_axis)
