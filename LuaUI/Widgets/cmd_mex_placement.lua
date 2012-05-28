@@ -519,6 +519,7 @@ function calcMainMexDrawList()
 		local spot = WG.metalSpots[i]
 		local x,z = spot.x, spot.z
 		local y = spGetGroundHeight(x,z)
+		if y < 0 then y = 0 end
 
 		local mexColor = getSpotColor(x,y+45,z,i,specatate,1)
 		local metal = spot.metal
