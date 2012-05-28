@@ -300,7 +300,7 @@ local function CancelAirpadReservation(unitID)
 	local reservations = airpads[targetPad].reservations
 	if reservations.units[unitID] then
 		reservations.units[unitID] = nil
-		reservations.count = math.max(reservations.count, 0)
+		reservations.count = math.max(reservations.count - 1, 0)
 	end
 end
 
