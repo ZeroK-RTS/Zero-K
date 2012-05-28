@@ -10,6 +10,7 @@ function gadget:GetInfo()
   }
 end
 
+local modOptions = Spring.GetModOptions()
 if (modOptions.zkmode ~= "lavarise") then
   return
 end
@@ -34,7 +35,6 @@ local tideIndex = 1
 local currentTide
 local tideContinueFrame = 0
 
-local modOptions = Spring.GetModOptions()
 local lavaRiseCycles = (modOptions.lavarisecycles or 7)
 local lavaRisePeriod = (modOptions.lavariseperiod or 120)
 local lavaGrowSpeed = 0.25
