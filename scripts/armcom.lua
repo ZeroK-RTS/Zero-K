@@ -195,7 +195,6 @@ end
 local function RestoreDgun()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
-	SetSignalMask(SIG_DGUN)
 	Sleep(RESTORE_DELAY_DGUN)
 	isLasering = false
 	isDgunning = false
