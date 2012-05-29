@@ -460,7 +460,7 @@ function CreateWindow()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-        minimizable = false,
+		minimizable = false,
 		
 		OnMouseDown={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
@@ -481,10 +481,10 @@ function CreateWindow()
 		value = 0,
 		min=0, 
 		max=1, 
-		step=0.01, 
+		step=0.01,
 		OnMouseUp = { 
-			function ()
-				updateReserveBars(true, --[[ not right moust button release --]] false, trkbar_metal.value)
+			function (self, x, y, mouse)
+				updateReserveBars(true, mouse ~= 3, trkbar_metal.value)
 			end
 			}, 
         noDrawStep = true,
@@ -577,10 +577,10 @@ function CreateWindow()
 		value = 0,
 		min=0, 
 		max=1, 
-		step=0.01, 
+		step=0.01,
 		OnMouseUp = { 
-			function ()
-				updateReserveBars(--[[ not right moust button release --]] false, true, trkbar_energy.value)
+			function (self, x, y, mouse)
+				updateReserveBars(true, mouse ~= 3, trkbar_metal.value)
 			end
 		}, 
         noDrawStep = true,
