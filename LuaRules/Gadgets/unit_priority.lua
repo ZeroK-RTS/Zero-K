@@ -25,6 +25,7 @@ end
 --------------------------------------------------------------------------------
 
 include("LuaRules/Configs/customcmds.h.lua")
+include("LuaRules/Configs/constants.lua")
 
 local Tooltips = {
 	'Construction Low priority.',
@@ -47,7 +48,8 @@ local StateCount = #CommandDesc.params-1
 local UnitPriority = {}  --  UnitPriority[unitID] = 0,1,2     priority of the unit
 local TeamPriorityUnits = {}  -- TeamPriorityUnits[TeamID][UnitID] = 0,2    which units are low/high priority builders
 local TeamScale = {}  -- TeamScale[TeamID]= {0.1, 0.4}   how much to scale down production of lnormal and low prirotity units
-local TeamReserved = {} -- how much metal is reserved for high priority in each team
+local TeamMetalReserved = {} -- how much metal is reserved for high priority in each team
+local TeamEnergyReserved = {} -- ditto for energy
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
 
 
@@ -83,8 +85,12 @@ local spRemoveUnitCmdDesc = Spring.RemoveUnitCmdDesc
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 
 
-local function SetReserved(teamID, value)
-	TeamReserved[teamID] = value or 0
+local function SetMetalReserved(teamID, value)
+	TeamMetalReserved[teamID] = value or 0
+end
+
+local function SetEnergyReserved(teamID, value)
+	TeamEnergyReserved[teamID] = value or 0
 end
 
 
@@ -115,8 +121,14 @@ function gadget:RecvLuaMsg(msg, playerID)
 		local _,_,spec,teamID = spGetPlayerInfo(playerID)
 		local amount = msg:sub(10)
 		if spec then return end
-		SetReserved(teamID, amount*1)
+		SetMetalReserved(teamID, amount*1)
 	end	
+	if msg:find("ereserve:",1,true) then
+		local _,_,spec,teamID = spGetPlayerInfo(playerID)
+		local amount = msg:sub(10)
+		if spec then return end
+		SetEnergyReserved(teamID, amount*1)
+	end
 end
 
 function gadget:UnitCreated(UnitID, UnitDefID, TeamID, builderID) 
@@ -154,11 +166,19 @@ function gadget:UnitDestroyed(UnitID, unitDefID, teamID)
 	UnitPriority[UnitID] = nil
 	LastUnitFromFactory[UnitID] = nil
     local ud = UnitDefs[unitDefID]
-    if ud and ud.metalStorage and ud.metalStorage > 0 and TeamReserved[teamID] then
-        local _, sto = spGetTeamResources(teamID, "metal")
-        if sto and TeamReserved[teamID] > sto - ud.metalStorage then
-            SetReserved(teamID, sto - ud.metalStorage)
-        end
+    if ud then
+		if ud.metalStorage and ud.metalStorage > 0 and TeamMetalReserved[teamID] then
+			local _, sto = spGetTeamResources(teamID, "metal")
+			if sto and TeamMetalReserved[teamID] > sto - ud.metalStorage then
+				SetMetalReserved(teamID, sto - ud.metalStorage)
+			end
+		end
+		if ud.energyStorage and ud.energyStorage > 0 and TeamEnergyReserved[teamID] then
+			local _, sto = spGetTeamResources(teamID, "energy") - HIDDEN_STORAGE
+			if sto and TeamEnergyReserved[teamID] > sto - ud.energyStorage then
+				SetEnergyReserved(teamID, sto - ud.energyStorage)
+			end
+		end
     end
 end
 
@@ -266,44 +286,45 @@ function gadget:GameFrame(n)
 			local level, _, pull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal")
 			local elevel, _, epull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy")
 			
-			if TeamReserved[teamID] and (level < TeamReserved[teamID] or elevel < TeamReserved[teamID]) then -- below reserved level, low and normal no spending
+			if (TeamMetalReserved[teamID] and level < TeamMetalReserved[teamID]) or (TeamEnergyReserved [teamID] and elevel < TeamEnergyReserved[teamID]) then 
+				-- below reserved level, low and normal no spending
 				TeamScale[teamID] = {0,0}
-			elseif TeamReserved[teamID] and TeamReserved[teamID] > 0 and -- approach reserved level, less low and normal spending
-			(level < TeamReserved[teamID] + pull or elevel < TeamReserved[teamID] + epull) then 
+			elseif (TeamMetalReserved[teamID] and TeamMetalReserved[teamID] > 0 and level < TeamMetalReserved[teamID] + pull) or 
+					(TeamEnergyReserved[teamID] and TeamEnergyReserved[teamID] > 0 and elevel < TeamEnergyReserved[teamID] + epull) then -- approach reserved level, less low and normal spending
                     
                 -- both these values are positive and at least one is less than 1
-			local mRatio = (level - TeamReserved[teamID])/pull
-			local eRatio = (elevel - TeamReserved[teamID])/epull
-              
-			local spare
-			if mRatio < eRatio then 
-			    spare = (income + recieved + level) - TeamReserved[teamID] - prioSpending
-			else
-			    spare = (eincome + erecieved + elevel) - TeamReserved[teamID] - prioSpending
-			end
+				local mRatio = (level - (TeamMetalReserved[teamID] or 0))/pull
+				local eRatio = (elevel - (TeamEnergyReserved[teamID] or 0))/epull
+				  
+				local spare
+				if mRatio < eRatio then 
+					spare = (income + recieved + level) - (TeamMetalReserved[teamID] or 0) - prioSpending
+				else
+					spare = (eincome + erecieved + elevel) - (TeamEnergyReserved[teamID] or 0) - prioSpending
+				end
 			
-			local normalSpending = pull - lowPrioSpending - prioSpending
-			
-			if spare > 0 then
-			    if normalSpending <= 0 then
-				 if lowPrioSpending ~= 0 then
-				     TeamScale[teamID] = {0,spare/lowPrioSpending}
-				 else
-				     TeamScale[teamID] = {0,0}
-				 end
-			    elseif spare > normalSpending then
-				 spare = spare - normalSpending
-				 if spare > 0 and lowPrioSpending ~= 0 then
-				     TeamScale[teamID] = {1,spare/lowPrioSpending}
-				 else
-				     TeamScale[teamID] = {1,0}
-				 end
-			    elseif spare > 0 then
-				 TeamScale[teamID] = {spare/normalSpending,0}
-			    end
-			else
-			    TeamScale[teamID] = {0,0}
-			end
+				local normalSpending = pull - lowPrioSpending - prioSpending
+				
+				if spare > 0 then
+					if normalSpending <= 0 then
+					 if lowPrioSpending ~= 0 then
+						 TeamScale[teamID] = {0,spare/lowPrioSpending}
+					 else
+						 TeamScale[teamID] = {0,0}
+					 end
+					elseif spare > normalSpending then
+					 spare = spare - normalSpending
+					 if spare > 0 and lowPrioSpending ~= 0 then
+						 TeamScale[teamID] = {1,spare/lowPrioSpending}
+					 else
+						 TeamScale[teamID] = {1,0}
+					 end
+					elseif spare > 0 then
+					 TeamScale[teamID] = {spare/normalSpending,0}
+					end
+				else
+					TeamScale[teamID] = {0,0}
+				end
                 
 			elseif (prioSpending > 0 or lowPrioSpending > 0) then
 				
@@ -323,7 +344,7 @@ function gadget:GameFrame(n)
 				end 
 			end
             
-		SendToUnsynced("MetalReserveState", teamID, TeamReserved[teamID] or 0) 
+		SendToUnsynced("ReserveState", teamID, TeamMetalReserved[teamID] or 0, TeamEnergyReserved[teamID] or 0) 
 		end
 
 		TeamPriorityUnits = {}
@@ -350,7 +371,7 @@ local spGetLocalTeamID = Spring.GetLocalTeamID
 local last_sent_in_frame = 0
 
 function gadget:Initialize()
-    gadgetHandler:AddSyncAction('MetalReserveState',WrapMetalReserveStateToLuaUI)
+    gadgetHandler:AddSyncAction('ReserveState',WrapReserveStateToLuaUI)
     gadgetHandler:AddSyncAction('PriorityStats',WrapPriorityStatsToLuaUI)
 end
 
@@ -365,9 +386,9 @@ function WrapPriorityStatsToLuaUI(_,teamID, highPriorityBP, lowPriorityBP, gameF
     end
 end
 
-function WrapMetalReserveStateToLuaUI(_,teamID, reserve)
-    if (teamID == spGetLocalTeamID() and Script.LuaUI('MetalReserveState')) then
-        Script.LuaUI.MetalReserveState(teamID, reserve)
+function WrapReserveStateToLuaUI(_,teamID, metalReserve, energyReserve)
+    if (teamID == spGetLocalTeamID() and Script.LuaUI('ReserveState')) then
+        Script.LuaUI.ReserveState(teamID, metalReserve, energyReserve)
     end
 end
 

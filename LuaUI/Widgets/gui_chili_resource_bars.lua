@@ -18,6 +18,7 @@ end
 --------------------------------------------------------------------------------
 
 include("colors.h.lua")
+VFS.Include("LuaRules/Configs/constants.lua")
 
 WG.energyWasted = 0
 WG.energyForOverdrive = 0
@@ -34,6 +35,7 @@ WG.lowPriorityBP = 0
 local abs = math.abs
 local echo = Spring.Echo
 local GetMyTeamID = Spring.GetMyTeamID
+local spGetMouseState = Spring.GetMouseState
 local GetTeamResources = Spring.GetTeamResources
 local GetTimer = Spring.GetTimer
 local DiffTimers = Spring.DiffTimers
@@ -52,9 +54,11 @@ local col_buildpower = {0.8, 0.8, 0.2, 1}
 local window
 local trkbar_metal
 local bar_metal
-local bar_metal_overlay
+local bar_metal_reserve_overlay
+local trkbar_energy
 local bar_energy
 local bar_energy_overlay
+local bar_energy_reserve_overlay
 local bar_buildpower
 local lbl_metal
 local lbl_energy
@@ -96,6 +100,7 @@ end
 options = { 
   eexcessflashalways = {name='Always Flash On Energy Excess', type='bool', value=false},
   onlyShowExpense = {name='Only Show Expense', type='bool', value=false},
+  enableReserveBar = {name='Enable Metal Reserve', type='bool', value=false, tooltip = "Enables high priority reserve"},
   workerUsage = {name = "Show Worker Usage", type = "bool", value=false, OnChange = option_workerUsageUpdate},
   energyFlash = {name = "Energy Stall Flash", type = "number", value=0.1, min=0,max=1,step=0.02},
   opacity = {
@@ -186,7 +191,7 @@ function widget:GameFrame(n)
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(myTeamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(myTeamID, "metal")
 	
-	eStor = eStor - 10000 -- reduce by hidden storage
+	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
 	if eCurr > eStor then eCurr = eStor end -- cap by storage
 
 	if options.onlyShowExpense.value then
@@ -227,19 +232,19 @@ function widget:GameFrame(n)
 
 	bar_metal:SetValue( mPercent )
 	if wastingM then
-		bar_metal_overlay:SetCaption( (GreenStr.."%i/%i"):format(mCurr, mStor) )
+		bar_metal_reserve_overlay:SetCaption( (GreenStr.."%i/%i"):format(mCurr, mStor) )
 	else
-		bar_metal_overlay:SetCaption( ("%i/%i"):format(mCurr, mStor) )
+		bar_metal_reserve_overlay:SetCaption( ("%i/%i"):format(mCurr, mStor) )
 	end
 
 	bar_energy:SetValue( ePercent )
     
 	if stallingE then
-		bar_energy_overlay:SetCaption( (RedStr.."%i/%i"):format(eCurr, eStor) )
+		bar_energy_reserve_overlay:SetCaption( (RedStr.."%i/%i"):format(eCurr, eStor) )
 	elseif wastingE then
-        bar_energy_overlay:SetCaption( (GreenStr.."%i/%i"):format(eCurr, eStor) )
+        bar_energy_reserve_overlay:SetCaption( (GreenStr.."%i/%i"):format(eCurr, eStor) )
 	else
-		bar_energy_overlay:SetCaption( ("%i/%i"):format(eCurr, eStor) )
+		bar_energy_reserve_overlay:SetCaption( ("%i/%i"):format(eCurr, eStor) )
 	end
 	
 	local mexInc = Format(WG.myMexIncome or 0)
@@ -289,6 +294,7 @@ function widget:GameFrame(n)
 	"\nSharing & Overdrive: " .. energyShare .. 
 	"\nConstruction: " .. constuction .. 
 	"\nOther: " .. otherE ..
+    "\nReserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
 	"\n" .. 
 	"\nTeam Energy Economy" ..
 	"\nIncome: " .. teamIncome .. 
@@ -393,7 +399,7 @@ function widget:Initialize()
 	end
 
 	widgetHandler:RegisterGlobal("MexEnergyEvent", MexEnergyEvent)
-    widgetHandler:RegisterGlobal("MetalReserveState", MetalReserveState)
+    widgetHandler:RegisterGlobal("ReserveState", ReserveState)
 	--widgetHandler:RegisterGlobal("SendWindProduction", SendWindProduction)
 	--widgetHandler:RegisterGlobal("PriorityStats", PriorityStats)
 
@@ -408,6 +414,23 @@ end
 function widget:Shutdown()
 	window:Dispose()
 	Spring.SendCommands("resbar 1")
+end
+
+local function updateReserveBars(metal, energy, value)
+	if options.enableReserveBar.value then
+		if metal then
+			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
+			Spring.SendLuaRulesMsg("mreserve:"..value*mStor) 
+			WG.metalStorageReserve = value*mStor
+			bar_metal_reserve_overlay:SetValue(value)
+		end
+		if energy then
+			local _, eStor = GetTeamResources(GetMyTeamID(), "energy")
+			Spring.SendLuaRulesMsg("ereserve:"..value*(eStor - HIDDEN_STORAGE)) 
+			WG.energyStorageReserve = value*eStor
+			bar_energy_reserve_overlay:SetValue(value)
+		end
+	end
 end
 
 function CreateWindow()
@@ -453,35 +476,32 @@ function CreateWindow()
 		parent = window,
 		height = p(100/bars),
 		right  = 26,
-                x      = 110,
-                y      = p(100/bars),		
-		--caption = data.name, 
+		x      = 110,
+		y      = p(100/bars),		 
 		value = 0,
-		backgroundColor = {0, 0, 0, 0},	-- donut work
-		trackColor = col_metal,
 		min=0, 
 		max=1, 
 		step=0.01, 
 		OnMouseUp = { 
-            function() 
-                local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
-                Spring.SendLuaRulesMsg("mreserve:"..trkbar_metal.value*mStor) 
-                WG.metalStorageReserve = trkbar_metal.value*mStor
-                bar_metal_overlay:SetValue(trkbar_metal.value)
-            end }, 
+			function ()
+				updateReserveBars(true, --[[ not right moust button release --]] false, trkbar_metal.value)
+			end
+			}, 
         noDrawStep = true,
         noDrawBar = true,
-		--tooltip=data.desc 
+		noDrawThumb = true,
 	}
+	
 	Chili.Image:New{
 		parent = window,
 		height = p(100/bars),
 		width  = 25,
-                y      = p(100/bars),
+		y      = p(100/bars),
 		right  = 0,
 		file   = 'LuaUI/Images/ibeam.png',
 	}
-	bar_metal_overlay = Chili.Progressbar:New{
+	
+	bar_metal_reserve_overlay = Chili.Progressbar:New{
 		parent = window,
 		color  = {0.5,0.5,0.5,0.5},
 		height = p(100/bars),
@@ -489,11 +509,12 @@ function CreateWindow()
         min = 0,
         max = 1,
         value  = 0,
-                x      = 110,
-                y      = p(100/bars),
+		x      = 110,
+		y      = p(100/bars),
         noSkin = true,
         font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
+	
     bar_metal = Chili.Progressbar:New{
 		parent = window,
 		color  = col_metal,
@@ -547,6 +568,26 @@ function CreateWindow()
 
 
 	--// ENERGY
+	trkbar_energy = Chili.Trackbar:New{
+		parent = window,
+		height = p(100/bars),
+		right  = 36,
+        x      = 100,
+        y      = 1,	 
+		value = 0,
+		min=0, 
+		max=1, 
+		step=0.01, 
+		OnMouseUp = { 
+			function ()
+				updateReserveBars(--[[ not right moust button release --]] false, true, trkbar_energy.value)
+			end
+		}, 
+        noDrawStep = true,
+        noDrawBar = true,
+		noDrawThumb = true,
+	}
+	
 	Chili.Image:New{
 		parent = window,
 		height = p(100/bars),
@@ -568,6 +609,21 @@ function CreateWindow()
         noSkin = true,
         font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
+	
+	bar_energy_reserve_overlay = Chili.Progressbar:New{
+		parent = window,
+		color  = {0.5,0.5,0.5,0.5},
+		height = p(100/bars),
+		right  = 26,
+		 value = 0,
+        min = 0,
+        max = 1,
+		right  = 36,
+        x      = 100,
+        y      = 1,
+        noSkin = true,
+        font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
+	}
     
 	bar_energy = Chili.Progressbar:New{
 		parent = window,
@@ -579,8 +635,6 @@ function CreateWindow()
 		tooltip = "Shows your current energy reserves.\n Anything above 100% will be burned by 'mex overdrive'\n which increases production of your mines",
 		font   = {color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, },
 	}
-    
-   
 	
 	lbl_energy = Chili.Label:New{
 		parent = window,
@@ -626,6 +680,7 @@ function CreateWindow()
 	function bar_metal:HitTest(x,y) return self	end
 	function bar_energy:HitTest(x,y) return self end
     function trkbar_metal:HitTest(x,y) return bar_metal end
+    function trkbar_energy:HitTest(x,y) return bar_energy end
 	function lbl_energy:HitTest(x,y) return self end
 	function lbl_metal:HitTest(x,y) return self end
 	function lbl_e_income:HitTest(x,y) return self end
@@ -683,16 +738,26 @@ function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalI
 end
 
 local lastMstor = 0
+local lastEstor = 0
 
-function MetalReserveState(teamID, metalStorageReserve)
+function ReserveState(teamID, metalStorageReserve, energyStorageReserve)
     if (Spring.GetLocalTeamID() == teamID) then 
         local _, mStor = GetTeamResources(teamID, "metal")
-        if ((not WG.metalStorageReserve) or WG.metalStorageReserve ~= metalStorageReserve) or (lastMstor ~= mStor) then
+		local _, eStor = GetTeamResources(teamID, "energy")
+		
+        if ((not WG.metalStorageReserve) or WG.metalStorageReserve ~= metalStorageReserve) or (lastMstor ~= mStor) and mStor > 0 then
             lastMstor = mStor
             trkbar_metal:SetValue(metalStorageReserve/mStor)
-            bar_metal_overlay:SetValue(trkbar_metal.value)
+            bar_metal_reserve_overlay:SetValue(trkbar_metal.value)
         end
-        WG.metalStorageReserve = metalStorageReserve
+		WG.metalStorageReserve = metalStorageReserve
+       
+		if ((not WG.energyStorageReserve) or WG.energyStorageReserve ~= energyStorageReserve) or (lastEstor ~= eStor) and (eStor - HIDDEN_STORAGE) > 0 then
+            lastEstor = eStor
+            trkbar_energy:SetValue(energyStorageReserve/(eStor - HIDDEN_STORAGE))
+            bar_energy_reserve_overlay:SetValue(trkbar_energy.value)
+        end
+         WG.energyStorageReserve = energyStorageReserve
     end
 end
 

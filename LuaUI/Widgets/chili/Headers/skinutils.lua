@@ -662,7 +662,8 @@ function DrawTrackbar(self)
     end
   end
 
-  TextureHandler.LoadTexture(0,self.ThumbImage,self)
+  if not self.noDrawThumb then
+    TextureHandler.LoadTexture(0,self.ThumbImage,self)
     local texInfo = glTextureInfo(self.ThumbImage) or {xsize=1, ysize=1}
     local tw,th = texInfo.xsize, texInfo.ysize
 
@@ -680,7 +681,8 @@ function DrawTrackbar(self)
     local mx = x+pdLeft+barWidth*percent
     local my = y+h*0.5
     glTexRect(math.ceil(mx-tw*0.5),math.ceil(my-th*0.5),math.ceil(mx+tw*0.5),math.ceil(my+th*0.5),false,true)
-
+  end
+  
   glTexture(0,false)
 end
 

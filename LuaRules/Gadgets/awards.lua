@@ -182,7 +182,7 @@ end
 -------------------
 -- Resource tracking
 
-local HIDDEN_STORAGE = 10000
+include("LuaRules/Configs/constants.lua")
 
 local allyTeamInfo = {} 
 local resourceInfo = {count = 0, data = {}}
