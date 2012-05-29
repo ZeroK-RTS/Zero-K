@@ -580,7 +580,7 @@ function CreateWindow()
 		step=0.01,
 		OnMouseUp = { 
 			function (self, x, y, mouse)
-				updateReserveBars(true, mouse ~= 3, trkbar_metal.value)
+				updateReserveBars(mouse ~= 3, true, trkbar_energy.value)
 			end
 		}, 
         noDrawStep = true,
