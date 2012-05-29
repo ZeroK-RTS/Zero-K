@@ -126,6 +126,7 @@ local resources = {
       lightb= "pd/lightningball.tga",
       lightb3= "pd/lightningball3.tga",
       lightb4= "pd/lightningball4.tga",
+      lightb_purple= "pd/lightningball_purple.png",
       lightening= "cc/lightening.tga",
       lightning= "pd/lightning.tga",
       lightring= "pd/lightring.tga",

@@ -396,6 +396,36 @@ return {
 		dir				   = [[dir]],
       },
     },	
-  }, 
+  },
+  
+  ["lightningplosion_smallbolts_purple"] = {
+    ["electric thingies2"] = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.1,
+        colormap           = [[1 1 1 0.01  1 1 1 0.01   1 1 1 0.01  1 1 1 0.01  1 1 1 0.01 0 0 0 0.01]],
+        directional        = true,
+        emitrot            = 0,
+        emitrotspread      = 80,
+        emitvector         = [[0, 1, 0]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 8,
+        particlelifespread = 4,
+        particlesize       = 8,
+        particlesizespread = 8,
+        particlespeed      = 10,
+        particlespeedspread = 10,
+        pos                = [[0, 1.0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1.0,
+        texture            = [[lightb_purple]],
+      },
+    },
+  },  
 }
 

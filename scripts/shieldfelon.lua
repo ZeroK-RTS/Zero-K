@@ -1,8 +1,9 @@
 local spGetUnitShieldState = Spring.GetUnitShieldState
 local spSetUnitShieldState = Spring.SetUnitShieldState
 include "constants.lua"
-
+--------------------------------------------------------------------------------
 -- pieces
+--------------------------------------------------------------------------------
 local base = piece "base"
 local pelvis = piece "pelvis"
 local torso = piece "torso"
@@ -34,27 +35,38 @@ local shotPieces = {
 }
 local gun_1 = 0
 
+--------------------------------------------------------------------------------
 -- constants
+--------------------------------------------------------------------------------
 local DRAIN = 75
 local SHIELD_RADIUS = 100
 local SPEED = 1.4
+local AIM_DELAY = 500
+local RESTORE_DELAY = 4000
 
 --signals
-local SIG_Walk = 1
+local SIG_WALK = 1
+local SIG_AIM = 2
 
-function script.Create()
-	StartThread(SmokeUnit)
-end
+--------------------------------------------------------------------------------
+-- variables
+--------------------------------------------------------------------------------
+local aimTime = AIM_DELAY
+local target
+local bAiming = false
 
+--------------------------------------------------------------------------------
+-- functions
+--------------------------------------------------------------------------------
 local function Walk()
-	SetSignalMask( SIG_Walk )
+	SetSignalMask( SIG_WALK )
     
-    while ( true ) do
-        local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
+	while ( true ) do
+		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
 		
-        Move(pelvis, y_axis, 6.2, 4*speedmult)
+		Move(pelvis, y_axis, 6.2, 4*speedmult)
         
-        Turn( l_thigh, x_axis, -1.3, 1.4*speedmult )
+		Turn( l_thigh, x_axis, -1.3, 1.4*speedmult )
 		Turn( l_leg, x_axis, 0.4, 1.4*speedmult )
 		Turn( l_foot, x_axis, 0.8, 1*speedmult )
         
@@ -66,7 +78,7 @@ local function Walk()
         
 		Move(pelvis, y_axis, 8.2, 4*speedmult)
 		
-        Turn( l_thigh, x_axis, -0.6, 1.4*speedmult )
+		Turn( l_thigh, x_axis, -0.6, 1.4*speedmult )
 		Turn( l_leg, x_axis, 0.5, 1*speedmult)
 		Turn( l_foot, x_axis, 0.1, 1.4*speedmult )
         
@@ -78,7 +90,7 @@ local function Walk()
 		
 		Move(pelvis, y_axis, 6, 4*speedmult)
 		
-        Turn( l_thigh, x_axis, -0.15, 0.9*speedmult )
+		Turn( l_thigh, x_axis, -0.15, 0.9*speedmult )
 		Turn( l_leg, x_axis, 0.8, 0.6*speedmult )
 		Turn( l_foot, x_axis, -0.65, 1.5*speedmult )
         
@@ -90,11 +102,11 @@ local function Walk()
 		
 		Move(pelvis, y_axis, 8.2, 4*speedmult)
         
-        Turn( l_thigh, x_axis, -0.6, 0.9*speedmult )
+		Turn( l_thigh, x_axis, -0.6, 0.9*speedmult )
 		Turn( l_leg, x_axis, -0.3, 2.2*speedmult )
 		Turn( l_foot, x_axis, 0.3, 1.9*speedmult )
         
-        Turn( r_thigh, x_axis, -0.6, 1.4*speedmult )
+		Turn( r_thigh, x_axis, -0.6, 1.4*speedmult )
 		Turn( r_leg, x_axis, 0.5, 1*speedmult)
 		Turn( r_foot, x_axis, 0.1, 1.4*speedmult )
 		
@@ -119,8 +131,29 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal( SIG_Walk )
+	Signal( SIG_WALK )
 	StartThread( StopWalk )
+end
+
+local function FireDelayLoop()
+	while true do
+		if bAiming and aimTime > 0 then
+			aimTime = aimTime - 100
+			EmitSfx(lpilot, 1024)
+			EmitSfx(rpilot, 1024)
+		end
+		Sleep(100)
+	end
+end
+
+function script.Create()
+	StartThread(SmokeUnit)
+	StartThread(FireDelayLoop)
+end
+
+local function RestoreAfterDelay()
+	Sleep(RESTORE_DELAY)
+	aimTime = AIM_DELAY
 end
 
 function script.QueryWeapon(num) 
@@ -132,8 +165,21 @@ function script.AimFromWeapon(num) return shot1 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 2 then 
-        return false 
-    end
+	        return false 
+	end
+	
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
+	
+	local currTarget = GetUnitValue(COB.TARGET_ID, num)
+	bAiming = true
+	if target ~= currTarget then
+		target = currTarget
+		aimTime = AIM_DELAY
+	end
+	while (aimTime > 0) do
+		Sleep(50)
+	end
 	-- use only for single weapon design plz
 	--Turn(shotcent, y_axis, heading)
 	--Turn(shotcent, x_axis, -pitch + math.rad(90))
@@ -160,6 +206,7 @@ function script.FireWeapon(num)
 	if num == 1 then
 		gun_1 = 1 - gun_1
 	end
+	bAiming = false
 end
 
 function script.Killed(recentDamage, maxHealth)

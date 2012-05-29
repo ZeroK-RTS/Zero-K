@@ -46,16 +46,13 @@ unitDef = {
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:THUDMUZZLE]],
-      [[custom:THUDSHELLS]],
-      [[custom:THUDDUST]],
+      [[custom:lightningplosion_smallbolts_purple]],
     },
 
   },
 
   side                = [[CORE]],
-  sightDistance       = 600,
-  smoothAnim          = true,
+  sightDistance       = 520,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -100,7 +97,7 @@ unitDef = {
       shieldPower             = 1200,
       shieldPowerRegen        = 20,
       shieldPowerRegenEnergy  = 0,
-      shieldRadius            = 100,
+      shieldRadius            = 150,
       shieldRepulser          = false,
       shieldStartingPower     = 800,
       smartShield             = true,
@@ -129,7 +126,7 @@ unitDef = {
       impulseFactor           = 0.4,
       intensity               = 6,
       interceptedByShieldType = 1,
-      range                   = 440,
+      range                   = 430,
       reloadtime              = 0.15,
       rgbColor                = [[0.5 0 0.7]],
       soundStart              = [[weapon/constant_electric]],
