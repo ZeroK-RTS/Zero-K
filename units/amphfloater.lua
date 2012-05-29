@@ -98,6 +98,7 @@ unitDef = {
       myGravity               = 0.2,
 	  predictBoost            = 1,
       projectiles             = 1,
+	  range 			      = 450,
       reloadtime              = 1.8,
       rgbcolor                = [[0.9 0.1 0.9]],
       soundHit                = [[weapon/laser/small_laser_fire]],
@@ -107,7 +108,7 @@ unitDef = {
       soundTrigger            = true,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 340,
+      weaponVelocity          = 250,
 	},
 
   },
