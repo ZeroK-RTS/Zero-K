@@ -108,6 +108,7 @@ unitDef = {
       model                   = [[wep_m_frostshard.s3o]],
       range                   = 600,
       reloadtime              = 0.75,
+	  cylinderTargetting      = 1,
       smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med17]],

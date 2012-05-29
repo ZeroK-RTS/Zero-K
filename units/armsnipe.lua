@@ -129,7 +129,7 @@ unitDef = {
       startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 1000,
+      weaponVelocity          = 700,
     },
 
   },
