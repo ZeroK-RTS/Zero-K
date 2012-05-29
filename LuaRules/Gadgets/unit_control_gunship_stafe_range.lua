@@ -33,7 +33,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	elseif unitDefID == armkam then
 		Spring.SetUnitWeaponState(unitID,0,{range = 270})
 	elseif unitDefID == bladew then
-		Spring.SetUnitWeaponState(unitID,0,{range = 240})
+		Spring.SetUnitWeaponState(unitID,0,{range = 260})
 	elseif unitDefID == armbrawl then
 		Spring.SetUnitWeaponState(unitID,0,{range = 500})
 	end
