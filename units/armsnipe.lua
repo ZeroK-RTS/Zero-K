@@ -100,7 +100,7 @@ unitDef = {
     SHOCKRIFLE = {
       name                    = [[Pulsed Particle Projector]],
       areaOfEffect            = 16,
-      colormap                = [[0 0 0 0   0 0 0.2 0.2   0 0 0.5 0.5   0 0 0.7 0.7   0 0 1 1   0 0 1 1]],
+      colormap                = [[0 0 0.4 0.4   0 0 0.6 0.6   0 0 0.8 0.8   0 0 0.9 0.9   0 0 1 1   0 0 1 1]],
       craterBoost             = 0,
       craterMult              = 0,
 
