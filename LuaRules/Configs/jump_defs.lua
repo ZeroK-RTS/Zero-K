@@ -29,6 +29,10 @@ local name
 jumpCategory = { 
 	baseclass = {
 		range = 400, height = 200, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},	
+	
+	skuttleclass = {
+		range = 300, height = 200, speed = 5,  reload = 10,  aaShootMe = true, delay = 0, cobscript = true, rotateMidAir = true},			
+		
 	-- category containining only optional tags for testing error code only.
 	-- iammissingstuff ={
 	-- 	reload	= 10, aaShootMe	= false, },	
@@ -41,11 +45,12 @@ jumpCategory = {
 }
 
 jumpClassGroups = {
-
+	skuttleclass = {
+		"corsktl"
+	},
 	baseclass = { 
 	"corpyro",
 	"corfast",
-	"corsktl",
 	"corcan",
 	"chicken_leaper",
 	"armaak",
