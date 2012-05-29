@@ -31,7 +31,7 @@ options = {
 	rankLimit = {
 		name = "Rank Limit",
 		type = 'bool',
-		value = true,
+		value = false,
 		desc = 'Units make comments only to newbies.',
 	},
 	warnExpensiveUnits = {
@@ -215,6 +215,8 @@ local function ProcessCommand(unitID, command)
 		MakeTip(unitID, "energy_deficit")
 	elseif metalCurrent/metalStorage > 0.95 and metalIncome - metalExpense > 0 then
 		MakeTip(unitID, "metal_excess")
+	--elseif metalCurrent/metalStorage > 0.05 and metalIncome - metalExpense < 0 then
+	--	MakeTip(unitID, "metal_deficit")		
 	end
 end
 
