@@ -102,8 +102,8 @@ unitDef = {
 	  },
 	  
       damage                  = {
-        default = 200,
-        planes  = 200,
+        default = 180,
+        planes  = 180,
         subs    = 10,
       },
 	  
@@ -112,7 +112,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       myGravity               = 0.1,
-      range                   = 1300,
+      range                   = 1000,
       reloadtime              = 0.36,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/tremor_fire]],
