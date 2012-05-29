@@ -35,7 +35,7 @@ local shotPieces = {
 local gun_1 = 0
 
 -- constants
-local DRAIN = 75
+local DRAIN = 450
 local SHIELD_RADIUS = 100
 local SPEED = 1.4
 

@@ -97,7 +97,7 @@ unitDef = {
       shieldPower             = 1200,
       shieldPowerRegen        = 20,
       shieldPowerRegenEnergy  = 0,
-      shieldRadius            = 150,
+      shieldRadius            = 100,
       shieldRepulser          = false,
       shieldStartingPower     = 800,
       smartShield             = true,
@@ -116,7 +116,7 @@ unitDef = {
       cylinderTargetting      = 0,
 
       damage                  = {
-        default        = 100,
+        default        = 600,
       },
 
       explosionGenerator      = [[custom:flash2purple]],
@@ -126,7 +126,7 @@ unitDef = {
       impulseFactor           = 0.4,
       intensity               = 6,
       interceptedByShieldType = 1,
-      range                   = 430,
+      range                   = 450,
       reloadtime              = 0.15,
       rgbColor                = [[0.5 0 0.7]],
       soundStart              = [[weapon/constant_electric]],
