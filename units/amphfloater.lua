@@ -108,7 +108,7 @@ unitDef = {
       soundTrigger            = true,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 250,
+      weaponVelocity          = 340,
 	},
 
   },

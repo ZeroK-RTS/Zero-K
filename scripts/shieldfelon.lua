@@ -38,10 +38,10 @@ local gun_1 = 0
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
-local DRAIN = 450
+local DRAIN = 75
 local SHIELD_RADIUS = 100
 local SPEED = 1.4
-local AIM_DELAY = 500
+local AIM_DELAY = 300
 local RESTORE_DELAY = 4000
 
 --signals
@@ -52,7 +52,6 @@ local SIG_AIM = 2
 -- variables
 --------------------------------------------------------------------------------
 local aimTime = AIM_DELAY
-local target
 local bAiming = false
 
 --------------------------------------------------------------------------------
@@ -137,8 +136,10 @@ end
 
 local function FireDelayLoop()
 	while true do
-		if bAiming and aimTime > 0 then
-			aimTime = aimTime - 100
+		if bAiming then
+			if aimTime > 0 then
+				aimTime = aimTime - 100
+			end
 			EmitSfx(lpilot, 1024)
 			EmitSfx(rpilot, 1024)
 		end
@@ -166,11 +167,15 @@ function script.AimFromWeapon(num) return shot1 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 2 then 
-	        return false 
+	    return false 
 	end
 	
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
+	
+	if not bAiming then
+		aimTime = AIM_DELAY
+	end
 	
 	bAiming = true
 	-- use only for single weapon design plz
@@ -179,18 +184,15 @@ function script.AimWeapon(num, heading, pitch)
 	--Move(shot1, y_axis, math.sin(pitch)*-SHIELD_RADIUS)
 	--Move(shot1, x_axis, math.sin(heading)*SHIELD_RADIUS)
 	--Move(shot1, z_axis, math.cos(heading)*SHIELD_RADIUS)
+	StartThread(RestoreAfterDelay)
 	return true
 end
 
 function script.BlockShot(num)
 	if num == 2 then
-	        return false
+	    return false
 	end
-	local currTarget = GetUnitValue(COB.TARGET_ID, num)
-	if target ~= currTarget then
-		target = currTarget
-		aimTime = AIM_DELAY
-	end
+
 	if aimTime <= 0 then
 		local shieldPow = select(2, spGetUnitShieldState(unitID))
 		if shieldPow > DRAIN then

@@ -69,7 +69,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 		if proOwnerID and Spring.ValidUnitID(proOwnerID) and bombers[proOwnerID] and bombers[proOwnerID].diveState == 1 then
 			if shieldCarrierUnitID and Spring.ValidUnitID(shieldCarrierUnitID) and shieldEmitterWeaponNum then
 				local wid = UnitDefs[Spring.GetUnitDefID(shieldCarrierUnitID)].weapons[shieldEmitterWeaponNum+1].weaponDef
-				if WeaponDefs[wid] and WeaponDefs[wid].shieldPower >= bombers[proOwnerID].diveDamage 
+				if WeaponDefs[wid] and WeaponDefs[wid].shieldPower > bombers[proOwnerID].diveDamage 
 						and ((not Spring.GetUnitRulesParam(proOwnerID, "noammo")) or Spring.GetUnitRulesParam(proOwnerID, "noammo") ~= 1) then
 					temporaryDive(proOwnerID, 150)
 				end

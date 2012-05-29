@@ -199,7 +199,8 @@ end
 
 function script.AimFromWeapon()
 	--Spring.Echo(Spring.GetUnitWeaponState(unitID, 0, "projectileSpeed"))
-	Spring.Echo(PROJECTILE_SPEED)
+	--Spring.Echo(PROJECTILE_SPEED)
+	
 	local height = select(2, Spring.GetUnitBasePosition(unitID))
 	if height < -130 then
 		Spring.SetUnitWeaponState(unitID,0,{projectileSpeed = 200})

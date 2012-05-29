@@ -100,7 +100,7 @@ unitDef = {
     SHOCKRIFLE = {
       name                    = [[Pulsed Particle Projector]],
       areaOfEffect            = 16,
-      colormap                = [[0 0 0.4 0.4   0 0 0.6 0.6   0 0 0.8 0.8   0 0 0.9 0.9   0 0 1 1   0 0 1 1]],
+      colormap                = [[0 0 0.4 0   0 0 0.6 0.3   0 0 0.8 0.6   0 0 0.9 0.8   0 0 1 1   0 0 1 1]],
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -121,7 +121,7 @@ unitDef = {
       reloadtime              = 15,
       renderType              = 4,
       rgbColor                = [[1 0.2 0.2]],
-      separation              = 0.5,
+      separation              = 1.5,
       size                    = 5,
       sizeDecay               = 0,
       soundHit                = [[weapon/laser/heavy_laser6]],
@@ -129,7 +129,7 @@ unitDef = {
       startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 700,
+      weaponVelocity          = 850,
     },
 
   },
