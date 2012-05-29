@@ -23,11 +23,8 @@ local pylonDefs = {}
 local linkdefs = {}
 
 include("LuaRules/Configs/constants.lua")
+include("LuaRules/Configs/mex_overdrive.lua")
 
-local DEFAULT_PYLON_RANGE = 200 -- mex range, link = range*2
-local MEX_REFUND_TIME = 300 -- 300 seconds = 5 minutes
-local MEX_REFUND_SHARE = 0.5 -- refund starts at 50%
-local OD_OWNER_SHARE = 0.5 -- 50% of OD goes to owner of energy
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
