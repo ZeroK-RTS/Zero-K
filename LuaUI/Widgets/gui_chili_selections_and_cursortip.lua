@@ -1497,7 +1497,6 @@ local function MakeToolTip_Unit(data, tooltip)
 	end
 	--local alliance       = spGetUnitAllyTeam(tt_unitID)
 	local _, player,_,isAI = spGetTeamInfo(team)
-	local _,leader,isDead,isAI,_,allyTeamID = Spring.GetTeamInfo(team)
 	
 	local playerName
 	
@@ -1505,7 +1504,7 @@ local function MakeToolTip_Unit(data, tooltip)
 	  local _, aiName, _, shortName = Spring.GetAIInfo(team)
 	  playerName = aiName ..' ('.. shortName .. ')'
 	else
-	  playerName = selectplayer and spGetPlayerInfo(player) or 'noname'
+	  playerName = player and spGetPlayerInfo(player) or 'noname'
 	end
 
 	local teamColor		= Chili.color2incolor(spGetTeamColor(team))
