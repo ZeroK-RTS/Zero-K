@@ -73,8 +73,6 @@ unitDef = {
     {
       def                = [[EMG]],
       badTargetCategory  = [[FIXEDWING]],
-      mainDir            = [[0 0 -1]],
-      maxAngleDif        = 300,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -82,8 +80,6 @@ unitDef = {
     {
       def                = [[EMG]],
       badTargetCategory  = [[FIXEDWING]],
-      mainDir            = [[0 0 1]],
-      maxAngleDif        = 320,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
