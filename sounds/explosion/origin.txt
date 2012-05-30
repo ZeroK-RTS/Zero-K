@@ -61,7 +61,6 @@ freedroid:
 clogger_death.wav
 
 Kanoba:
-ex_underwater.wav
 ex_burn1.wav
 
 Open Game Art:
