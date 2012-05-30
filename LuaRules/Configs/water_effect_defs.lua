@@ -11,10 +11,28 @@ local unitDefData = {
 		tankMax = 180,
 		shotCost = 1.2,
 		tankRegenRate = 6,
-		healthRegen = 18,
+		healthRegen = 20,
 	},
 	[UnitDefNames["amphcon"].id] = {
-		healthRegen = 18,
+		healthRegen = 20,
+	},
+	[UnitDefNames["amphraider3"].id] = {
+		healthRegen = 10,
+	},
+	[UnitDefNames["amphfloater"].id] = {
+		healthRegen = 25,
+	},
+	[UnitDefNames["amphriot"].id] = {
+		healthRegen = 25,
+	},
+	[UnitDefNames["amphassault"].id] = {
+		healthRegen = 40,
+	},
+	[UnitDefNames["amphaa"].id] = {
+		healthRegen = 20,
+	},
+	[UnitDefNames["amphtele"].id] = {
+		healthRegen = 30,
 	},
 }
 
