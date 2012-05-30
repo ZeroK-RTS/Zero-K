@@ -21,21 +21,21 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local tank = {}
-local tankByID = {data = {}, count = 0}
+local unit = {}
+local unitByID = {data = {}, count = 0}
 
-local TANK_MAX = 180
+local unitDefData, waterCannonIterable, waterCannonIndexable = include("LuaRules/Configs/water_effect_defs.lua")
+
 local REGEN_PERIOD = 13
-local SHOT_COST = 1.2
-local REGEN_RATE = 6
-local HEALTH_REGEN = 18
-
-local waterCannonID = WeaponDefNames["amphraider2_watercannon"].id
 
 local function updateWeaponFromTank(unitID)
 
-	local proportion = tank[unitID].storage/TANK_MAX
+	local data = unit[unitID]
+	local effect = unitDefData[data.unitDefID]
 
+	local proportion = unit[unitID].storage/effect.tankMax
+
+	-- these numbers are configable too!!!
 	Spring.SetUnitWeaponState(unitID, 0, {
 		range = proportion*300 + 100,
 		projectileSpeed = proportion*10+8,
@@ -46,22 +46,26 @@ end
 
 -- make a sane number of cegs
 function gadget:Explosion(weaponID, x, y, z, owner)
-	if weaponID == waterCannonID and math.random() < 0.02 then
+	if waterCannonIndexable[weaponID] and math.random() < 0.02 then
+		-- For more than 1 type of water cannon some config could occur here
 		Spring.SpawnCEG("watercannon_impact", x, y, z, 0, 0, 0, 1)
 	end
 end
 
 function shotWaterWeapon(unitID)
 	
-	tank[unitID].storage = tank[unitID].storage - SHOT_COST
+	local data = unit[unitID]
+	local effect = unitDefData[data.unitDefID]
+	
+	data.storage = data.storage - effect.shotCost
 
-	if tank[unitID].storage < 0 then
-		tank[unitID].storage = 0
+	if data.storage < 0 then
+		data.storage = 0
 	end
 	
 	updateWeaponFromTank(unitID)
 	
-	--local proportion = tank[unitID].storage/TANK_MAX
+	--local proportion = unit[unitID].storage/effect.tankMax
 	--local reloadFrames = 2 - proportion
     --
 	--if math.random() > reloadFrames%1 then
@@ -74,7 +78,7 @@ function shotWaterWeapon(unitID)
 	--	reloadFrame = Spring.GetGameFrame() + reloadFrames,
 	--})
 	
-	Spring.SetUnitRulesParam(unitID,"watertank",tank[unitID].storage, {inlos = true})
+	Spring.SetUnitRulesParam(unitID,"watertank",data.storage, {inlos = true})
 end
 
 GG.shotWaterWeapon = shotWaterWeapon
@@ -84,64 +88,71 @@ function gadget:GameFrame(n)
 	if n%REGEN_PERIOD == 0 then
 
 		local i = 1
-		while i <= tankByID.count do
-			local unitID = tankByID.data[i]
+		while i <= unitByID.count do
+			local unitID = unitByID.data[i]
+			local data = unit[unitID]
+			local effect = unitDefData[data.unitDefID]
 
 			if Spring.ValidUnitID(unitID) then
 				local height = select(2, Spring.GetUnitBasePosition(unitID))
 
 				if height < 0 then
-					if tank[unitID].storage ~= TANK_MAX then
-						tank[unitID].storage = tank[unitID].storage + math.min(-height,40)*REGEN_RATE*0.025
-						if tank[unitID].storage > TANK_MAX then
-							tank[unitID].storage = TANK_MAX
+					if data.storage and data.storage ~= effect.tankMax then
+						data.storage = data.storage + math.min(-height,40)*effect.tankRegenRate*0.025
+						if data.storage > effect.tankMax then
+							data.storage = effect.tankMax
 						end
-						Spring.SetUnitRulesParam(unitID,"watertank",tank[unitID].storage, {inlos = true})
+						Spring.SetUnitRulesParam(unitID,"watertank",data.storage, {inlos = true})
 						updateWeaponFromTank(unitID)
 					end
 					
 					local hp, maxHp = Spring.GetUnitHealth(unitID)
-					local newHp = hp + math.min(-height,40)*HEALTH_REGEN*0.025
+					local newHp = hp + math.min(-height,40)*effect.healthRegen*0.025
 					Spring.SetUnitHealth(unitID, newHp) 
 				end
 				i = i + 1
 			else
-				tank[tankByID.data[tankByID.count] ].index = i
-				tankByID.data[i] = tankByID.data[tankByID.count]
-				tankByID.data[tankByID.count] = nil
-				tank[unitID] = nil
-				tankByID.count = tankByID.count - 1
+				unit[unitByID.data[unitByID.count] ].index = i
+				unitByID.data[i] = unitByID.data[unitByID.count]
+				unitByID.data[unitByID.count] = nil
+				unit[unitID] = nil
+				unitByID.count = unitByID.count - 1
 			end
 		end
-		
 	end
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if unitDefID == UnitDefNames["amphraider2"].id then	
-		tankByID.count = tankByID.count + 1
-		tankByID.data[tankByID.count] = unitID
-		tank[unitID] = {
-			storage = TANK_MAX,
-			index = tankByID.count,
+	if unitDefData[unitDefID] then	
+		local tankMax = unitDefData[unitDefID].tankMax
+		unitByID.count = unitByID.count + 1
+		unitByID.data[unitByID.count] = unitID
+		unit[unitID] = {
+			storage = tankMax,
+			index = unitByID.count,
+			unitDefID = unitDefID,
 		}
-		Spring.SetUnitRulesParam(unitID,"watertank",tank[unitID].storage, {inlos = true})
+		if tankMax then
+			Spring.SetUnitRulesParam(unitID,"watertank",unit[unitID].storage, {inlos = true})
+		end
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if tank[unitID] then
-		tank[tankByID.data[tankByID.count] ].index = tank[unitID].index
-		tankByID.data[tank[unitID].index] = tankByID.data[tankByID.count]
-		tankByID.data[tankByID.count] = nil
-		tank[unitID] = nil
-		tankByID.count = tankByID.count - 1
+	if unit[unitID] then
+		unit[unitByID.data[unitByID.count] ].index = unit[unitID].index
+		unitByID.data[unit[unitID].index] = unitByID.data[unitByID.count]
+		unitByID.data[unitByID.count] = nil
+		unit[unitID] = nil
+		unitByID.count = unitByID.count - 1
 	end
 end
 
 function gadget:Initialize()
 	
-	Script.SetWatchWeapon(waterCannonID,true)
+	for i = 1, #waterCannonIterable do
+		Script.SetWatchWeapon(waterCannonIterable[i],true)
+	end
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
