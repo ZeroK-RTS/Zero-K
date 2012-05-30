@@ -35,7 +35,6 @@ WG.lowPriorityBP = 0
 local abs = math.abs
 local echo = Spring.Echo
 local GetMyTeamID = Spring.GetMyTeamID
-local spGetMouseState = Spring.GetMouseState
 local GetTeamResources = Spring.GetTeamResources
 local GetTimer = Spring.GetTimer
 local DiffTimers = Spring.DiffTimers

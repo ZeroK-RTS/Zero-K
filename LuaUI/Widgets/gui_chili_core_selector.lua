@@ -24,7 +24,6 @@ local GetFullBuildQueue = Spring.GetFullBuildQueue
 local GetUnitIsBuilding = Spring.GetUnitIsBuilding
 local GetGameSeconds	= Spring.GetGameSeconds
 local GetGameFrame 		= Spring.GetGameFrame
-local GetMouseState		= Spring.GetMouseState
 local GetModKeyState	= Spring.GetModKeyState
 local SelectUnitArray	= Spring.SelectUnitArray
 
@@ -295,11 +294,10 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 		width = (100/options.maxbuttons.value).."%",
 		height = "100%",
 		caption = '',
-		OnMouseDown = {	function () 
-				local _,_,left,_,right = GetMouseState()
+		OnMouseDown = {	function (self, x, y, mouse) 
 				local shift = select(4, GetModKeyState())
 				SelectUnitArray({unitID}, shift)
-				if left then
+				if mouse == 1 then
 					local x, y, z = Spring.GetUnitPosition(unitID)
 					Spring.SetCameraTarget(x, y, z)
 				end
@@ -927,9 +925,8 @@ function widget:Initialize()
 		x = 0,
 		caption = '',
 		width = (100/options.maxbuttons.value).."%",
-		OnMouseDown = {	function () 
-				local _,_,left,_,right = Spring.GetMouseState()
-				if left then
+		OnMouseDown = {	function (self, x, y, mouse) 
+				if mouse == 1 then
 					-- FIXME: commanders will still be selected even if not monitored! (category detection donut work)
 					if options.monitoridlecomms.value and options.monitoridlenano.value then
 						Spring.SendCommands({"select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+"})
@@ -940,7 +937,7 @@ function widget:Initialize()
 					else
 						Spring.SendCommands({"select AllMap+_Builder_Not_Category_Commander_Not_Building_Not_NameContain_" .. nano_name .. "_Idle+_ClearSelection_SelectOne+"})
 					end
-				elseif right and idleCons.count > 0 then
+				elseif mouse == 3 and idleCons.count > 0 then
 					Spring.SelectUnitMap(idleCons, false)
 				end
 			end},
