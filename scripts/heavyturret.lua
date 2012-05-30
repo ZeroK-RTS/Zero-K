@@ -2,13 +2,11 @@ include "constants.lua"
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
-local base, turret, breech, barrel1, barrel2, flare1, flare2 = piece("base", "turret", "breech", "barrel1", "barrel2", "flare1", "flare2")
+local base, turret, breech, barrel1, barrel2, flare = piece("base", "turret", "breech", "barrel1", "barrel2", "flare")
 smokePiece = {base, turret}
 
 -- Signal definitions
 local SIG_AIM = 1
-
-local gun = false
 
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
@@ -23,26 +21,17 @@ end
 function script.AimFromWeapon(num) return breech end
 
 function script.QueryWeapon(num)
-	if gun then return flare2
-	else return flare1 end
+	return flare
 end
 
 local function Recoil()
-	if gun then
-		EmitSfx(flare2, 1024)
-		Move(barrel2, z_axis, -6)
-		Sleep(300)
-		Move(barrel2, z_axis, 0, 4)
-	else
-		EmitSfx(flare1, 1024)
-		Move(barrel1, z_axis, -6)
-		Sleep(300)
-		Move(barrel1, z_axis, 0, 4)
-	end
+	EmitSfx(flare, 1024)
+	Move(barrel2, z_axis, -6)
+	Sleep(300)
+	Move(barrel2, z_axis, 0, 4)
 end
 
 function script.Shot(num)
-	gun = not gun
 	StartThread(Recoil)
 end
 

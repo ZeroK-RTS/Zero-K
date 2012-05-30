@@ -1,7 +1,7 @@
 unitDef = {
-  unitname                      = [[railgunturret]],
-  name                          = [[Splinter]],
-  description                   = [[Railgun Turret (Anti-Heavy) - Requires 25 Power]],
+  unitname                      = [[heavyturret]],
+  name                          = [[Sunlance]],
+  description                   = [[Anti-Tank Turret - Requires 25 Power]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 700,
   buildCostMetal                = 700,
@@ -9,8 +9,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[railgunturret_decal.dds]],
-  buildPic                      = [[railgunturret.png]],
+  buildingGroundDecalType       = [[heavyturret_decal.dds]],
+  buildPic                      = [[heavyturret.png]],
   buildTime                     = 700,
   canAttack                     = true,
   canGuard                      = true,
@@ -19,9 +19,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Schienenkanoneturm (Panzerbrechend)]],
-    helptext       = [[The Splinter's high velocity gauss cannon slices through enemy armor like a chainsaw through butter.]],
-    helptext_de    = [[Seine Hochgeschwindigkeits-Gauﬂkanone schneidet sich durch die feindliche Panzerung wie eine Kettens‰ge durch Butter.]],
+    --description_de = [[Schienenkanoneturm (Panzerbrechend)]],
+    helptext       = [[The Sunlance's heavy disruptor beam cripples even the heaviest assault unit and will stop any armored assault dead in its tracks.]],
+    --helptext_de    = [[Seine Hochgeschwindigkeits-Gauﬂkanone schneidet sich durch die feindliche Panzerung wie eine Kettens‰ge durch Butter.]],
     keeptooltip    = [[any string I want]],
     neededlink     = 25,
     pylonrange     = 50,	
@@ -35,20 +35,20 @@ unitDef = {
   iconType                      = [[defenseheavy]],
   levelGround                   = false,
   mass                          = 333,
-  maxDamage                     = 5000,
+  maxDamage                     = 5600,
   maxSlope                      = 18,
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[railgunturret.s3o]],
-  script                        = [[railgunturret.lua]],
+  objectName                    = [[heavyturret.s3o]],
+  script                        = [[heavyturret.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:RAIDMUZZLE]],
+      [[custom:none]],
     },
 
   },  
@@ -62,7 +62,7 @@ unitDef = {
   weapons                       = {
 
     {
-      def                = [[GAUSS]],
+      def                = [[DISRUPTOR]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
@@ -72,52 +72,50 @@ unitDef = {
 
   weaponDefs                    = {
 
-    GAUSS = {
-      name                    = [[Gauss Cannon]],
-      alphaDecay              = 0.12,
-      areaOfEffect            = 16,
-      bouncerebound           = 0.15,
-      bounceslip              = 1,
-      burst                   = 2,
-      burstrate               = 0.4,
-      cegTag                  = [[gauss_tag_m]],
-      
-      customParams			= {
-	timeslow_damagefactor = [[1.2]],
-      },
-      
+    DISRUPTOR = {
+      name                    = [[Disruptor Pulse Beam]],
+      areaOfEffect            = 48,
+      beamdecay 	      = 0.95,
+      beamTime                = 0.1,
+      beamttl                 = 50,
+      coreThickness           = 0.3,
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams			= {
+		timeslow_damage = [[2500]],
+      },
+	
       damage                  = {
-        default = 450,
-        planes  = 450,
-        subs    = 22.5,
+		default = 1400,
       },
 
-      explosionGenerator      = [[custom:gauss_hit_m_purple]],
-      groundbounce            = 1,
+      explosionGenerator      = [[custom:flash2purple]],
+      fireStarter             = 30,
       impactOnly              = true,
       impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 0,
-      noExplode               = true,
-      numbounce               = 40,
-      range                   = 650,
-      reloadtime              = 3,
-      rgbColor                = [[0.9 0.1 0.9]],
-      separation              = 0.5,
-      size                    = 0.8,
-      sizeDecay               = -0.1,
-      soundHit                = [[weapon/gauss_hit]],
-      soundStart              = [[weapon/gauss_fire]],
-      sprayangle              = 100,
-      stages                  = 32,
-      startsmoke              = [[1]],
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 4.33,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 750,
+      reloadtime              = 4,
+      rgbColor                = [[0.3 0 0.4]],
+      soundStart              = [[weapon/laser/heavy_laser5]],
+      soundStartVolume        = 5,
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 16,
+      tolerance               = 18000,
       turret                  = true,
-      waterbounce             = 1,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 2400,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,
     },
 
   },
@@ -126,27 +124,27 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Splinter]],
+      description      = [[Wreckage - Sunlance]],
       blocking         = true,
       category         = [[arm_corpses]],
-      damage           = 5000,
+      damage           = 5600,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
       height           = 100,
       hitdensity       = 100,
       metal            = 280,
-      object           = [[railgunturret_dead.s3o]],
+      object           = [[heavyturret_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 280,
     },
 
 
     HEAP = {
-      description      = [[Debris - Splinter]],
+      description      = [[Debris - Sunlance]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 5000,
+      damage           = 5600,
       footprintX       = 3,
       footprintZ       = 3,
       height           = 4,
@@ -161,4 +159,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ railgunturret = unitDef })
+return lowerkeys({ heavyturret = unitDef })
