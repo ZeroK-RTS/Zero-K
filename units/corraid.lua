@@ -123,8 +123,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 1850,
       energy           = 0,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
       height           = [[20]],
@@ -133,29 +132,6 @@ unitDef = {
       object           = [[corraid_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 100,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
-    DEAD2 = {
-      description      = [[Debris - Ravager]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 1850,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 100,
-      object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
@@ -174,8 +150,6 @@ unitDef = {
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
       reclaimTime      = 50,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

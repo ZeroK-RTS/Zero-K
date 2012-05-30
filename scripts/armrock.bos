@@ -217,21 +217,21 @@ Killed( severity, corpsetype )
 	if (severity <= 25)
 	{
 		corpsetype = 1;
-		explode hips type		SHATTER;
-		explode chest type		SHATTER;
+		explode hips type		BITMAPONLY;
+		explode chest type		BITMAPONLY;
 		return( 0 );
 	}
 
 	if (severity <= 50)
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode hips type		SHATTER;
 		explode chest type		SHATTER;
 		explode gun type		SHATTER;
 		return( 0 );
 	}
 
-	corpsetype = 3;
+	corpsetype = 2;
 	explode hips type		SHATTER;
 	explode chest type		SHATTER;
 	explode gun type		SHATTER;

@@ -203,7 +203,6 @@ Deploy()
 		turn turret to y-axis 0 speed TURRET_TURN_SPEED/2;
 		turn gun to x-axis 0 speed GUN_TURN_SPEED/2;
 		move arms to y-axis 0 speed ARMS_RAISE_SPEED;
-		wait-for-move arms along y-axis;
 	}
 	if (moving == 0)
 	{

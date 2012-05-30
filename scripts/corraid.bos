@@ -1,4 +1,4 @@
-#define TAK
+//linear constant 163840
 #include "constants.h"
 
 piece		base, body, turret, sleeve, barrel, firepoint,
@@ -324,7 +324,7 @@ Killed(severity, corpsetype)
 	}
 	else if(severity >= 25 AND severity < 50)
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode barrel type FALL | BITMAP;
 		explode sleeve type FALL | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
@@ -332,7 +332,7 @@ Killed(severity, corpsetype)
 	}
 	else if(severity >= 50 AND severity < 100)
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
@@ -341,7 +341,7 @@ Killed(severity, corpsetype)
 	// D-Gunned/Self-D
 	else if(severity >= 100)
 	{
-	corpsetype = 3;
+	corpsetype = 2;
 		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode body type SHATTER | BITMAP;
