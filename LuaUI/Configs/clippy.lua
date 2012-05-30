@@ -18,7 +18,7 @@ TIMER_SUPERWEAPON = 60 * 30
 tips = {
 	nano_excess = {str = {"Don't we have enough\nCaretakers already?"}, life = 7, cooldown = 20},
 	expensive_unit = {str = {"Boss, I'm not sure\nwe can afford that at\nthis stage of the game.",
-				"Sir, I don't think that\nunit is in our price\nrange right now."}, life = 9, cooldown = 20},
+				"Sir, I don't think that\nunit is in our price\nrange right now."}, life = 9, cooldown = 20, verbosity = 2},
 	superweapon = {str = {"A superweapon,\nnow? Seriously?"}, life = 7, cooldown = 60},
 	adv_factory = {str = {"Are you sure that's\na good starting\nfac, chief?"}, life = 7, cooldown = 60},
 	
@@ -32,11 +32,11 @@ tips = {
 				"Commander, we'll soon\nrun out of energy\nunless we build more E."}, life = 7, cooldown = 45},
 	metal_excess  = {str = {"Sir, we have a metal glut.\nPut some more buildpower\ninto making units.",
 				"Boss, we have too much metal.\nGet more of us making stuff."}, life = 7, cooldown = 30},
-	metal_deficit = {str = {"Running low on metal, chief.\nWe should try reclaiming\nor getting more mexes."}, life = 7, cooldown = 60},
+	metal_deficit = {str = {"Running low on metal, chief.\nWe should try reclaiming\nor getting more mexes."}, life = 7, cooldown = 60, verbosity = 3},
 	
 	facplop = {str = {"This free factory is burning\na hole in my pocket..."}, life = 7, cooldown = 30},
 	factory_duplicate = {str = {"We already have one of\nthat fac. I don't think\nwe need a second, chief."}, life = 9, cooldown = 60},
-	factory_multiple = {str = {"Sir, we don't need another\nfac so soon. Assist with cons\nif you need to build faster."}, life = 10, cooldown = 60},
+	factory_multiple = {str = {"Sir, we don't need another\nfac so soon. Assist with cons\nif you need to build faster."}, life = 10, cooldown = 60, verbosity = 2},
 	
 	defense_excess = {str = {"Boss, this isn't a\nTower Defense game...",
 				"Chief, don't you think\nwe have enough\ndefenses already?",

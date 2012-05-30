@@ -209,9 +209,12 @@ local function ProcessCommand(unitID, command)
 			return
 		end
 	end
+	if (tips.energy_deficit.lastUsed > gameframe - tips.energy_deficit.cooldown*30) or (tips.metal_excess.lastUsed > gameframe - tips.metal_excess.cooldown*30) then
+		return
+	end
 	local metalCurrent,metalStorage,_,metalIncome,metalExpense = spGetTeamResources(myTeam, "metal")
 	local energyCurrent,_,_,energyIncome = spGetTeamResources(myTeam, "energy")
-	if energyIncome/metalIncome < 1 and energyCurrent < ENERGY_LOW_THRESHOLD then
+	if (energyIncome/metalIncome < 1) and (energyCurrent < ENERGY_LOW_THRESHOLD) and not energy[-command] then
 		MakeTip(unitID, "energy_deficit")
 	elseif metalCurrent/metalStorage > 0.95 and metalIncome - metalExpense > 0 then
 		MakeTip(unitID, "metal_excess")
@@ -236,7 +239,7 @@ function widget:Update(dt)
 		myTeam = spGetMyTeamID()	-- just refresh for fun
 		timer = 0
 		local command = select(2, Spring.GetActiveCommand())
-		if command and (activeCommand ~= command) then
+		if command and command < 0 and (activeCommand ~= command) then
 			ProcessCommand(currentBuilder, command)
 			activeCommand = command
 		end
