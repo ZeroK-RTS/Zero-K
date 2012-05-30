@@ -27,6 +27,7 @@ local unitByID = {data = {}, count = 0}
 local unitDefData, waterCannonIterable, waterCannonIndexable = include("LuaRules/Configs/water_effect_defs.lua")
 
 local REGEN_PERIOD = 13
+local SECOND_MULT = REGEN_PERIOD/30
 
 local function updateWeaponFromTank(unitID)
 
@@ -98,7 +99,7 @@ function gadget:GameFrame(n)
 
 				if height < 0 then
 					if data.storage and data.storage ~= effect.tankMax then
-						data.storage = data.storage + math.min(-height,40)*effect.tankRegenRate*0.025
+						data.storage = data.storage + math.min(-height,effect.submergedAt)*effect.tankRegenRate*SECOND_MULT/effect.submergedAt
 						if data.storage > effect.tankMax then
 							data.storage = effect.tankMax
 						end
@@ -107,7 +108,7 @@ function gadget:GameFrame(n)
 					end
 					
 					local hp, maxHp = Spring.GetUnitHealth(unitID)
-					local newHp = hp + math.min(-height,40)*effect.healthRegen*0.025
+					local newHp = hp + math.min(-height,effect.submergedAt)*effect.healthRegen*SECOND_MULT/effect.submergedAt
 					Spring.SetUnitHealth(unitID, newHp) 
 				end
 				i = i + 1
