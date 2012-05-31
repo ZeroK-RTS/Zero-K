@@ -1286,7 +1286,7 @@ function gadget:GameOver()
 		score = score + math.max(60*60 - time, 0) + 250	-- +250 points for winning, +1 point for each second under par
 	end
 	score = math.floor(score * scoreMult)	-- multiply by mult
-	Spring.SendCommands("wbynum 255 SPRINGIE:stats,ID: "..Spring.Utilities.Base64Encode(tostring(Spring.GetGameFrame()).."/"..tostring(math.floor(score))))
+	Spring.SendCommands("wbynum 255 SPRINGIE:score,ID: "..Spring.Utilities.Base64Encode(tostring(Spring.GetGameFrame()).."/"..tostring(math.floor(score))))
 end
 
 --------------------------------------------------------------------------------
