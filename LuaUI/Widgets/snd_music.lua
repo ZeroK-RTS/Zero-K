@@ -26,6 +26,22 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+options_path = 'Settings/Audio/Music'
+options = {
+	useIncludedTracks = {
+		name = "Use Included Tracks",
+		type = 'bool',
+		value = true,
+		desc = 'Use the tracks included with Zero-K',
+	},
+	pausemusic = {
+		name='Pause Music',
+		type='bool',
+		value=false,
+		desc = "Music pauses with game",
+	},
+}
+
 local unitExceptions = include("Configs/snd_music_exception.lua")
 
 local windows = {}
@@ -44,28 +60,19 @@ local fadeVol
 local curTrack	= "no name"
 local songText	= "no name"
 
-local warTracks		=	VFS.DirList('sounds/music/war/', '*.ogg')
-local peaceTracks	=	VFS.DirList('sounds/music/peace/', '*.ogg')
-local victoryTracks	=	VFS.DirList('sounds/music/victory/', '*.ogg')
-local defeatTracks	=	VFS.DirList('sounds/music/defeat/', '*.ogg')
+local warTracks, peaceTracks, victoryTracks, defeatTracks
 
 local firstTime = false
 local wasPaused = false
 local firstFade = true
 local initSeed = 0
-local seedInitialized = false
+local initialized = false
 local gameOver = false
 
 local myTeam = Spring.GetMyTeamID()
 local isSpec = Spring.GetSpectatingState() or Spring.IsReplay()
 local defeat = false
 
-options_path = 'Settings/Interface/Pause Screen'
-
-options = { 
-	pausemusic = {name='Pause Music', type='bool', value=false},
-}
-	
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -126,10 +133,19 @@ function widget:Update(dt)
 		return
 	end
 	if (Spring.GetGameSeconds()>0) then
-		if not seedInitialized then
+		if not initialized then
 			math.randomseed(os.clock()* 100)
-			seedInitialized=true
+			initialized=true
+			
+			-- these are here to give epicmenu time to set the values properly
+			-- (else it's always default at startup)
+			local vfsMode = (options.useIncludedTracks.value and VFS.RAW_FIRST) or VFS.RAW
+			warTracks	=	VFS.DirList('sounds/music/war/', '*.ogg', vfsMode)
+			peaceTracks	=	VFS.DirList('sounds/music/peace/', '*.ogg', vfsMode)
+			victoryTracks	=	VFS.DirList('sounds/music/victory/', '*.ogg', vfsMode)
+			defeatTracks	=	VFS.DirList('sounds/music/defeat/', '*.ogg', vfsMode)
 		end
+		
 		timeframetimer = timeframetimer + dt
 		if (timeframetimer > 1) then	-- every second
 			timeframetimer = 0
