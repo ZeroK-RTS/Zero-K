@@ -155,7 +155,7 @@ local function MakeTip(unitID, tip)
 end
 
 local function ProcessCommand(unitID, command)
-	if not unitID then return end
+	if not (unitID and Spring.ValidUnitID(unitID)) then return end
 	if -command == NANO_DEF_ID then
 		if tips.nano_excess.lastUsed > gameframe - tips.nano_excess.cooldown*30 then
 			return
@@ -310,7 +310,7 @@ function widget:GameFrame(n)
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
-	if cmdID < 0 then
+	if unitTeam == myTeam and cmdID < 0 then
 		ProcessCommand(unitID, cmdID)
 	end
 end
