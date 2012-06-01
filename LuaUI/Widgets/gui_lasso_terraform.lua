@@ -1439,6 +1439,13 @@ function widget:KeyRelease(key)
 end
 
 function widget:KeyPress(key)
+	
+	if key == KEYSYMS.ESCAPE then
+		if drawingLasso or setHeight or drawingRamp or drawingRectangle then
+			completelyStopCommand()
+			return true
+		end
+	end
 
 	if key == KEYSYMS.SPACE and ( 
 		(terraform_type == 1 and (setHeight or drawingLasso)) or 
