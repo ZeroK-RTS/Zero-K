@@ -142,7 +142,6 @@ updateTimes["removeInterval"] = 1 --configurable: seconds for the ::update loop
 
 local state = {}
 state["curModID"] = nil
-state["myPlayerID"] = nil
 
 local lineConfig = {}
 lineConfig["lineWidth"] = 1.0 -- calcs dynamic now
@@ -183,6 +182,7 @@ local glVertex              = gl.Vertex
 local glAlphaTest			= gl.AlphaTest
 local glBlending			= gl.Blending
 local glRect				= gl.Rect
+local glLineStipple         = gl.LineStipple
 
 local huge                  = math.huge
 local max					= math.max
@@ -200,12 +200,11 @@ local sin                   = math.sin
 
 local spEcho                = Spring.Echo
 local spGetGameSeconds      = Spring.GetGameSeconds
-local spGetMouseState       = Spring.GetMouseState
-local spGetMyPlayerID       = Spring.GetMyPlayerID
-local spGetPlayerInfo       = Spring.GetPlayerInfo
+local spGetSpectatingState  = Spring.GetSpectatingState
 local spGetPositionLosState = Spring.GetPositionLosState
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitPosition     = Spring.GetUnitPosition
+local spGetUnitIsDead       = Spring.GetUnitIsDead
 local spTraceScreenRay      = Spring.TraceScreenRay
 local spGetCameraPosition   = Spring.GetCameraPosition
 local spGetMyTeamID			= Spring.GetMyTeamID
@@ -215,7 +214,6 @@ local spGetLocalTeamID	 	= Spring.GetLocalTeamID
 local spGetActiveCommand 	= Spring.GetActiveCommand
 local spGetActiveCmdDesc 	= Spring.GetActiveCmdDesc
 local spIsSphereInView  	= Spring.IsSphereInView
-local IsGuiHidden			=	Spring.IsGUIHidden
 
 local udefTab				= UnitDefs
 local weapTab				= WeaponDefs
@@ -238,7 +236,6 @@ local DrawRanges
 
 
 function widget:Initialize()
-	state["myPlayerID"] = spGetLocalTeamID()
 	DetectMod()
 	
 	for uDefID, uDef in pairs(uDefs) do
@@ -271,14 +268,28 @@ function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 	UnitDetected( unitID, true )
 end
 
-function widget:UnitEnteredLos(unitID, teamID)
-	UnitDetected( unitID, false, teamID )
+function widget:UnitFinished( unitID,  unitDefID,  unitTeam)
+	if defences[unitID] then
+		defences[unitID].complete = true
+	end
 end
 
-function UnitDetected( unitID, allyTeam, teamId )
+function widget:UnitDestroyed(unitID)
+	defences[unitID] = nil
+end
+
+function widget:UnitEnteredLos(unitID, teamID)
+	if defences[unitID] and not defences[unitID].complete then
+		defences[unitID].complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
+	else
+		UnitDetected( unitID, false )
+	end
+end
+
+function UnitDetected( unitID, allyTeam )
 	local tag
 	local tabValue = defences[unitID]
-	if ( tabValue ~= nil and tabValue[1] ~= allyTeam) then
+	if tabValue then
 		--unit already known
 		return
 	end
@@ -364,7 +375,7 @@ function UnitDetected( unitID, allyTeam, teamId )
 	end
 
 	printDebug("Adding UnitID " .. unitID .. " WeaponCount: " .. #foundWeapons ) --.. "W1: " .. foundWeapons[1]["type"])
-	defences[unitID] = { allyState = ( allyTeam == false ), pos = {x, y, z}, unitId = unitID }
+	defences[unitID] = { allyState = ( allyTeam == false ), pos = {x, y, z}, complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1 }
 	defences[unitID]["weapons"] = foundWeapons
 end
 
@@ -432,8 +443,7 @@ function ResetGl()
 end
 
 function CheckSpecState()
-	local playerID = spGetMyPlayerID()
-	local _, _, spec, _, _, _, _, _ = spGetPlayerInfo(playerID)
+	local spec = spGetSpectatingState()
 
 	if ( spec == true ) then
 		spEcho("<DefenseRange>: Spectator mode. Widget removed.")
@@ -472,16 +482,16 @@ function widget:Update()
 
 		--remove dead units
 		for k, def in pairs(defences) do
-			local udefID = spGetUnitDefID(def["unitId"])
-
 			local x, y, z = def["pos"][1], def["pos"][2], def["pos"][3]
 			local a, b, c = spGetPositionLosState(x, y, z)
 			local losState = b
 
 			if (losState) then
-				if (udefID == nil) then
+				if not spGetUnitDefID(k) then
 					printDebug("Unit killed.")
 					defences[k] = nil
+				elseif not def.complete then
+					def.complete = (select(5, Spring.GetUnitHealth(k)) or 0) == 1
 				end
 			end
 		end
@@ -574,7 +584,7 @@ function CalcBallisticCircle( x, y, z, range, weaponDef )
 		local posz = z + cosR * rad
 		local posy = spGetGroundHeight( posx, posz )
 
-		local heightDiff = ( posy - yGround) / 2.0							-- maybe y has to be getGroundHeight(x,z) cause y is unit center and not aligned to ground
+		local heightDiff = ( posy - yGround) / 2.0	-- maybe y has to be getGroundHeight(x,z) cause y is unit center and not aligned to ground
 
 		rad = rad - heightDiff * slope
 		local adjRadius = rangeFunc( range, heightDiff * weaponDef.heightMod, weaponDef.projectilespeed, rangeFactor )
@@ -598,7 +608,7 @@ function CalcBallisticCircle( x, y, z, range, weaponDef )
 			yDiff = abs( posy - newY )
 			posy = newY
 			posy = max( posy, 0.0 )  --hack
-			heightDiff = ( posy - yGround ) 																--maybe y has to be Ground(x,z)
+			heightDiff = ( posy - yGround )	--maybe y has to be Ground(x,z)
 			adjRadius = rangeFunc( range, heightDiff * weaponDef.heightMod, weaponDef.projectilespeed, rangeFactor, weaponDef.myGravity )
 		end
 
@@ -651,8 +661,15 @@ function DrawRanges()
 	glDepthTest(true)
 	local color
 	local range
+	local stipple = false
 	for _, def in pairs(defences) do
-
+		if def.complete and stipple then
+			glLineStipple(false)
+			stipple = false
+		elseif not (def.complete or stipple) then
+			glLineStipple(true)
+			stipple = true
+		end
 		for i, weapon in pairs(def["weapons"]) do
 			local execDraw = false
 			if ( spIsSphereInView( def["pos"][1], def["pos"][2], def["pos"][3], weapon["range"] ) ) then
@@ -719,7 +736,7 @@ function DrawSelectedRanges()
 end
 
 function widget:DrawWorld()
-	if not IsGuiHidden() then
+	if not spIsGUIHidden() then
 		-- def range routine
 		DrawRanges()
 		DrawSelectedRanges()
