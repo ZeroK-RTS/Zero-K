@@ -518,9 +518,9 @@ end
 
 function gadget:GameFrame(n)
 
-	if n%32 == 2 then 
-        UpdateResourceStats((n-2)/32)
-    end
+	--if n%32 == 2 then 
+    --    UpdateResourceStats((n-2)/32)
+    --end
 
 	if n % shareList_update == 1 and not spIsGameOver() then
 		UpdateShareList()
