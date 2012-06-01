@@ -146,9 +146,16 @@ local function ProcessComm(name, config)
 		if config.name then
 			commDefs[name].name = config.name
 		end
+		if config.description then
+			commDefs[name].description = config.description
+		end
+		if config.helptext then
+			commDefs[name].customparams.helptext = config.helptext
+		end
 		
 		-- set name
 		commDefs[name].unitname = name
+		
 		-- set costs
 		config.cost = config.cost or 0
 		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
