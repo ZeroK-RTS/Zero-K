@@ -169,7 +169,7 @@ local function ProcessCommand(unitID, command)
 		if haveFactoryDefIDs[-command] then
 			MakeTip(unitID, "factory_duplicate")
 			return
-		elseif gameframe < lastFactoryTime + DELAY_BETWEEN_FACS then
+		elseif (gameframe < lastFactoryTime + DELAY_BETWEEN_FACS) and not (Spring.GetUnitRulesParam(unitID, "facplop") == 1) then
 			MakeTip(unitID, "factory_multiple")
 			return
 		end

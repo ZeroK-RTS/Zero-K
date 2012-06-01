@@ -1,10 +1,10 @@
 local THRESHOLD_EXPENSIVE = 800
 INCOME_TO_SPLURGE = 25	-- ignore expensive warning if you have this much income
-METAL_PER_NANO = 12		-- suggested nanos per metal ^ -1
+METAL_PER_NANO = 8		-- suggested nanos per metal ^ -1
 NANO_DEF_ID = UnitDefNames.armnanotc.id
-ENERGY_TO_METAL_RATIO = 2.4	-- suggested maximum for energy
+ENERGY_TO_METAL_RATIO = 3	-- suggested maximum for energy
 ENERGY_LOW_THRESHOLD = 300
-DEFENSE_QUOTA = 0.2	-- suggested maximum proportion of total assets that is defense
+DEFENSE_QUOTA = 0.25	-- suggested maximum proportion of total assets that is defense
 
 RANK_LIMIT = 3
 
