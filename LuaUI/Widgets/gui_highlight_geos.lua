@@ -75,7 +75,7 @@ end
 function widget:DrawWorld()
 	
 	local _, cmdID = spGetActiveCommand()
-	drawGeos = spGetMapDrawMode() == 'metal' or -geoDefID == cmdID or spGetGameFrame() < 1
+	drawGeos = spGetMapDrawMode() == 'metal' or -geoDefID == cmdID or spGetGameFrame() < 1 or WG.GetWidgetOption('Chili Minimap','Settings/Interface/Minimap','alwaysDisplayMexes').value
 	
 	if drawGeos then
 		

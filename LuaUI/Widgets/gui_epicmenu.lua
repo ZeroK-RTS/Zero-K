@@ -80,6 +80,10 @@ local pathoptions = {}
 local alloptions = {}	
 local pathorders = {}
 
+WG.GetWidgetOption = function(wname, path, key) 
+	return pathoptions[path][wname..key]
+end 
+
 local exitWindowVisible = false
 
 --------------------------------------------------------------------------------

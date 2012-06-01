@@ -41,7 +41,7 @@ local function MakeMinimapWindow()
 end
 
 options_path = 'Settings/Interface/Minimap'
-options_order = { 'use_map_ratio', 'hidebuttons', 'startwithlos', 'startwithradar', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors' }
+options_order = { 'use_map_ratio', 'hidebuttons', 'startwithlos', 'startwithradar', 'alwaysDisplayMexes', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors' }
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -79,6 +79,14 @@ options = {
 		desc = 'Enables Radar view at game start.', 
 		value = false,
 	},
+	
+	alwaysDisplayMexes = {
+		name = 'Always show metal spots',
+		type ='bool',
+		value = false,
+	},
+
+	
 	
 	lblViews = { type = 'label', name = 'Views', },
 	
@@ -132,6 +140,7 @@ options = {
 		OnChange= function(self) iconsize = self.value and 0 or 20; MakeMinimapWindow() end,
 		value = false,
 	},
+	
 }
 
 local function MakeMinimapButton(file, pos, option )
