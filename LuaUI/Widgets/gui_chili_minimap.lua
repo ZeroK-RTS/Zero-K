@@ -41,7 +41,7 @@ local function MakeMinimapWindow()
 end
 
 options_path = 'Settings/Interface/Minimap'
-options_order = { 'use_map_ratio', 'hidebuttons', 'startwithlos', 'startwithradar', 'alwaysDisplayMexes', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'simplecolors' }
+options_order = { 'use_map_ratio', 'hidebuttons', 'startwithlos', 'startwithradar', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar' }
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -85,8 +85,6 @@ options = {
 		type ='bool',
 		value = false,
 	},
-
-	
 	
 	lblViews = { type = 'label', name = 'Views', },
 	

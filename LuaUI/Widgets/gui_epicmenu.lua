@@ -80,8 +80,8 @@ local pathoptions = {}
 local alloptions = {}	
 local pathorders = {}
 
-WG.GetWidgetOption = function(wname, path, key) 
-	return pathoptions[path][wname..key]
+WG.GetWidgetOption = function(wname, path, key)  -- still fails if path and key are un-concatenatable
+	return (pathoptions and path and key and wname and pathoptions[path] and pathoptions[path][wname..key]) or {}
 end 
 
 local exitWindowVisible = false
