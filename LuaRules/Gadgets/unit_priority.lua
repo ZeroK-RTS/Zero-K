@@ -227,7 +227,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 		return true
 	end
 
-	if (UnitPriority[builderID] == 0 or (UnitPriority[unitID] == 0 and (UnitPriority[builderID] or 1) == 1 )) then -- priority none
+	if (UnitPriority[unitID] == 0 or (UnitPriority[builderID] == 0 and (UnitPriority[unitID] or 1) == 1 )) then -- priority none
 		if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
 		TeamPriorityUnits[teamID][builderID] = 0
 		local scale = TeamScale[teamID]
@@ -241,7 +241,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 		return true
 	end
 
-	if (UnitPriority[builderID] == 2 or (UnitPriority[unitID] == 2 and (UnitPriority[builderID] or 1) == 1)) then  -- priority high
+	if (UnitPriority[unitID] == 2 or (UnitPriority[builderID] == 2 and (UnitPriority[unitID] or 1) == 1)) then  -- priority high
 		if (TeamPriorityUnits[teamID] == nil) then TeamPriorityUnits[teamID] = {} end
 		TeamPriorityUnits[teamID][builderID] = 2		
 		return true
