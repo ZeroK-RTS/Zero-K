@@ -1,5 +1,6 @@
 -- Caching results for Spring.* functions
 
+
 -- *etTeamColor
 local teamColor = {}
 
