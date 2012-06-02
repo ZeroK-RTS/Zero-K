@@ -17,7 +17,7 @@
 --   Spring.GetMapList() -> { 'map1.smf', 'map2.smf', 'map3.sm3', etc... }
 --  
 --   Spring.GetMapInfo('map1') -> {
---     author  = 'string',
+--     author  = 'string', 
 --     desc    = 'string',
 --     mapX    = number,
 --     mapY    = number,
