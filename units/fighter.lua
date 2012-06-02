@@ -148,9 +148,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 16,
-        planes  = 160,
-        subs    = 8,
+        default = 200,
+        planes  = 200,
+        subs    = 10,
       },
 
       explosionGenerator      = [[custom:WEAPEXP_PUFF]],
@@ -165,7 +165,7 @@ unitDef = {
       model                   = [[wep_m_fury.s3o]],
       noSelfDamage            = true,
       range                   = 530,
-      reloadtime              = 4.5,
+      reloadtime              = 5.2,
       renderType              = 1,
       selfprop                = true,
       smokedelay              = [[0.1]],
