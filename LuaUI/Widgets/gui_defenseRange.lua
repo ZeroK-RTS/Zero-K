@@ -51,6 +51,7 @@ modConfig["ZK"]["unitList"] =
 	armartic = { weapons = { 1 } },		--faraday
 	armanni = { weapons = { 1 } },		--annihilator
 	armbrtha = { weapons = { 1 } },		--bertha
+	tacnuke = { weapons = { 1 } },		--tacnuke
 	armarch = { weapons = { 2 } },		--packo (unused)
 	armcir = { weapons = { 2 } },		--chainsaw
 	armdl = { weapons = { 1 } },		--anemone (unused)
@@ -68,6 +69,11 @@ modConfig["ZK"]["unitList"] =
 	corbhmth = { weapons = { 1 } },		--behemoth
 	cortl = { weapons = { 1 } },		--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
+}
+
+local unitDefIDRemap = {
+	[UnitDefNames["missilesilo"].id] = UnitDefNames["tacnuke"].id,
+	[UnitDefNames["tacnuke"].id] = -1,
 }
 
 --uncomment this if you want dps-depending ring-colors
@@ -278,7 +284,7 @@ function widget:UnitDestroyed(unitID)
 	defences[unitID] = nil
 end
 
-function widget:UnitEnteredLos(unitID, teamID)
+function widget:UnitEnteredLos(unitID, unitDefID, unitTeam)
 	if defences[unitID] and not defences[unitID].complete then
 		defences[unitID].complete = (select(5, Spring.GetUnitHealth(unitID)) or 0) == 1
 	else
@@ -293,11 +299,20 @@ function UnitDetected( unitID, allyTeam )
 		--unit already known
 		return
 	end
-
-	local udef = UnitDefs[spGetUnitDefID(unitID)]
+	
+	local unitDefID = spGetUnitDefID(unitID)
+	
+	if unitDefIDRemap[unitDefID] then
+		unitDefID = unitDefIDRemap[unitDefID]
+		if unitDefID == -1 then
+			return
+		end
+	end
+	
+	local udef = UnitDefs[unitDefID]
 	local key = tostring(unitID)
 	local x, y, z = spGetUnitPosition(unitID)
-
+	
 	local range = 0
 	local type = 0
 	local dps
@@ -667,7 +682,7 @@ function DrawRanges()
 			glLineStipple(false)
 			stipple = false
 		elseif not (def.complete or stipple) then
-			glLineStipple(true)
+			glLineStipple(2,255)
 			stipple = true
 		end
 		for i, weapon in pairs(def["weapons"]) do
