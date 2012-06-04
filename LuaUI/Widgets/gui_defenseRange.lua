@@ -167,7 +167,8 @@ local weapNamTab			= WeaponDefNames
 local weapTab				= WeaponDefs
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local GL_LINE_LOOP          = GL.LINE_LOOP
+local GL_LINE_LOOP          = GL.LINE_LOOP -- GL_LINE_LOOP + glLineStipple breaks Licho's ATI
+local GL_LINE_STRIP         = GL.LINE_STRIP
 local glTexEnv				= gl.TexEnv
 local glUnitShape			= gl.UnitShape
 local glFeatureShape		= gl.FeatureShape
@@ -666,9 +667,12 @@ function CheckDrawTodo( def, weaponIdx )
 end
 
 local function BuildVertexList(verts)
-	for i, vert in pairs(verts) do
-		--printDebug(verts)
-		glVertex(vert)
+	local count =  #verts
+	for i = 1, count do
+		glVertex(verts[i])
+	end
+	if count > 0 then
+		glVertex(verts[1])
 	end
 end
 
@@ -679,10 +683,10 @@ function DrawRanges()
 	local stipple = false
 	for _, def in pairs(defences) do
 		if def.complete and stipple then
-			--glLineStipple(false)
+			glLineStipple(false)
 			stipple = false
 		elseif not (def.complete or stipple) then
-			--glLineStipple(2,255)
+			glLineStipple(2,255)
 			stipple = true
 		end
 		for i, weapon in pairs(def["weapons"]) do
@@ -706,7 +710,7 @@ function DrawRanges()
 				end
 				glColor( color[1], color[2], color[3], lineConfig["alphaValue"])
 				glLineWidth(lineConfig["lineWidth"])
-				glBeginEnd(GL_LINE_LOOP, BuildVertexList, weapon["rangeLines"] )
+				glBeginEnd(GL_LINE_STRIP, BuildVertexList, weapon["rangeLines"] )
 				--printDebug( "Drawing defence: range: " .. range .. " Color: " .. color[1] .. "/" .. color[2] .. "/" .. color[3] .. " a:" .. lineConfig["alphaValue"] )
 				if ( ( weapon["type"] == 4 )
 						and
@@ -716,7 +720,7 @@ function DrawRanges()
 				) then
 					--air and ground: draw 2nd circle
 					glColor( weapon["color2"][1], weapon["color2"][2], weapon["color2"][3], lineConfig["alphaValue"])
-					glBeginEnd(GL_LINE_LOOP, BuildVertexList, weapon["rangeLinesEx"] )
+					glBeginEnd(GL_LINE_STRIP, BuildVertexList, weapon["rangeLinesEx"] )
 				end
 			end
 		end
