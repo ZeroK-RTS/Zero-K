@@ -98,7 +98,7 @@ overCategory = {
     cobscript = false},	
 	
  corsumo = {
-    delay = 30, height = 110, range = 360, reload = 13, cobscript = false, rotateMidAir = false},	
+    delay = 30, height = 110, range = 360, reload = 15, cobscript = false, rotateMidAir = false},	
 
  cadenza = {
     delay = 30, reload = 20, cobscript = false, rotateMidAir = false},
