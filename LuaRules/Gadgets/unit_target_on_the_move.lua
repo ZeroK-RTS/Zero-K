@@ -416,7 +416,7 @@ local drawAnything = false
 function gadget:DrawWorld()
     if drawAnything then
         glPushAttrib(GL.LINE_BITS)
-        glLineStipple(1, 2047)
+        glLineStipple(true)
         glDepthTest(false)
         glLineWidth(1.4)
         glColor(1, 0.75, 0, 1)
