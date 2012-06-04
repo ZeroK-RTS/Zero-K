@@ -128,6 +128,9 @@ local longRangeSkirmieeArray = {
 	["chickenc"] = true,
 	["armbanth"] = true,
 	["gorg"] = true,
+	["corllt"] = true,
+	["armdeva"] = true,
+	["armartic"] = true,
 }
 
 local artyRangeSkirmieeArray = {
@@ -135,6 +138,9 @@ local artyRangeSkirmieeArray = {
 	["corstorm"] = true,
 	["amphassault"] = true,
 	["chicken_sporeshooter"] = true,
+	["corrl"] = true,
+	["corhlt"] = true,
+	["armpb"] = true,
 }
 
 merge(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
