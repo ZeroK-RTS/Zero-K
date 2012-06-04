@@ -28,8 +28,8 @@ local function getState()
 end
 
 function script.Create()
-	Turn(thrust1, x_axis, -1, 1)
-	Turn(thrust2, x_axis, -1, 1)
+	Turn(thrust1, x_axis, -math.rad(90), 1)
+	Turn(thrust2, x_axis, -math.rad(90), 1)
 end
 
 function script.StartMoving()
@@ -89,19 +89,9 @@ local function RestoreAfterDelay()
 	
 	
 	if getState() then
-		Turn(engineL, z_axis, -1.57, 1)
-		Turn(engineR, z_axis, 1.57, 1)
-		Turn(engineL, y_axis, -1.57, 1)
-		Turn(engineR, y_axis, 1.57, 1)
-		Turn(engineL, x_axis, 0, 1)
-		Turn(engineR, x_axis, 0, 1)
+		script.StartMoving()
 	else
-		Turn(engineL, z_axis, 0, 1)
-		Turn(engineR, z_axis, 0, 1)
-		Turn(engineL, y_axis, 0, 1)
-		Turn(engineR, y_axis, 0, 1)
-		Turn(engineL, x_axis, 0, 1)
-		Turn(engineR, x_axis, 0, 1)
+		script.StopMoving()
 	end
 end
 
