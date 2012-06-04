@@ -77,7 +77,7 @@ local mcSetRotation         = MoveCtrl.SetRotation
 local mcDisable             = MoveCtrl.Disable
 local mcEnable              = MoveCtrl.Enable
 
-local SetLeaveTracks      = Spring.SetUnitLeaveTracks or MoveCtrl.SetLeaveTracks	--0.82 compatiblity
+local SetLeaveTracks      = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks	--0.82 compatiblity
 
 local emptyTable = {}
 

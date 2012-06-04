@@ -639,7 +639,7 @@ do
       end
 
       --// HEALTH
-      if (health) and ((drawFullHealthBars)or(hp<1)) and ((build==1)or(build-hp>=0.01)) then
+      if (health) and ((drawFullHealthBars)or(hp<1)) and ((build==1)or(hp<0.99)or(drawFullHealthBars)) then
         hp100 = hp*100; hp100 = hp100 - hp100%1; --//same as floor(hp*100), but 10% faster
         if (hp100<0) then hp100=0 elseif (hp100>100) then hp100=100 end
         if (drawFullHealthBars)or(hp100<100) then
