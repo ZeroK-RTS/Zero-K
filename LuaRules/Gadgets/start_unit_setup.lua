@@ -767,6 +767,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		local _,_,spec,teamID = spGetPlayerInfo(playerID)
 		if spec then return end
 		teamSides[teamID] = side
+		commChoice[playerID] = nil	-- unselect existing custom comm, if any
 		if gamestart then
 			-- picked commander after game start, prep for orbital drop
 			-- can't do it directly because that's an unsafe change
