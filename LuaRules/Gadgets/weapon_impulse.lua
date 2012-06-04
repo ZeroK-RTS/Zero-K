@@ -24,7 +24,7 @@ end
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
 
-local GUNSHIP_VERTICAL_MULT = 0.5 -- pre3vents rediculus gunship climb
+local GUNSHIP_VERTICAL_MULT = 0.5 -- prevents rediculus gunship climb
 
 local impulseMult = {
 	[0] = 0.022, -- fixedwing
@@ -69,12 +69,61 @@ local thereIsStuffToDo = false
 local unitByID = {count = 0, data = {}}
 local unit = {}
 
+local transportMass = {}
+local inTransport = {}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- Transport Handling
 
 function gadget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
 	if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(transportID) then
-		Spring.SetUnitVelocity(unitID, 0, 0, 0)
+		Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
+	end
+	
+	if transportMass[transportID] then
+		transportMass[transportID] = transportMass[transportID] - mass[unitDefID]
+		--Spring.Echo(transportMass[transportID])
+	end
+	inTransport[unitID] = nil
+end
+
+function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
+	if transportMass[transportID] then
+		transportMass[transportID] = transportMass[transportID] + mass[unitDefID]
+	else
+		local tudid = Spring.GetUnitDefID(transportID)
+		transportMass[transportID] = mass[tudid] + mass[unitDefID]
+	end
+	inTransport[unitID] = {id = transportID, def = Spring.GetUnitDefID(transportID)}
+	--Spring.Echo(transportMass[transportID])
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	if inTransport[unitID] then
+		local transportID = inTransport[unitID].id
+		if transportMass[transportID] then
+			transportMass[transportID] = transportMass[transportID] - mass[unitDefID]
+			Spring.Echo(transportMass[transportID])
+		end
+		inTransport[unitID] = nil
+		--Spring.Echo(transportMass[transportID])
+	end
+end
+
+function gadget:Initialize()
+	-- load active units
+	for _, transportID in ipairs(Spring.GetAllUnits()) do
+		local transporting = Spring.GetUnitIsTransporting(transportID)
+		if transporting then
+			for i = 1, #transporting do
+				local unitID = transporting[i]
+				local unitDefID = Spring.GetUnitDefID(unitID)
+				if unitDefID then
+					gadget:UnitLoaded(unitID, unitDefID, nil, transportID, nil)
+				end
+			end
+		end
 	end
 end
 
@@ -97,9 +146,14 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local ux, uy, uz = Spring.GetUnitPosition(unitID)
 		local ax, ay, az = Spring.GetUnitPosition(attackerID)
 		
-		local dis = distance(ux,uy,uz,ax,ay,az)
+		if inTransport[unitID] then
+			unitDefID = inTransport[unitID].def
+			unitID = inTransport[unitID].id
+		end
 		
-		local mag = impulseWeaponID[weaponDefID].impulse*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]/mass[unitDefID]
+		local dis = distance(ux,uy,uz,ax,ay,az)
+		local myMass = transportMass[unitID] or mass[unitDefID]
+		local mag = impulseWeaponID[weaponDefID].impulse*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]/myMass
 		
 		local x,y,z 
 		if moveTypeByID[unitDefID] == 0 then
@@ -107,7 +161,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		elseif moveTypeByID[unitDefID] == 1 then
 			x,y,z = (ux-ax)*mag, (uy-ay)*mag * GUNSHIP_VERTICAL_MULT, (uz-az)*mag
 		elseif moveTypeByID[unitDefID] == 2 then
-			x,y,z = (ux-ax)*mag, (uy-ay)*mag+impulseWeaponID[weaponDefID].impulse/(8*mass[unitDefID]), (uz-az)*mag
+			x,y,z = (ux-ax)*mag, (uy-ay)*mag+impulseWeaponID[weaponDefID].impulse/(8*myMass), (uz-az)*mag
 		end
 		
 		if not unit[unitID] then
