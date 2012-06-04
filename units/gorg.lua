@@ -145,6 +145,7 @@ unitDef = {
       interceptedByShieldType = 0,
       noSelfDamage            = true,
       projectiles             = 2,
+      proximityPriority       = -15,
       range                   = 550,
       reloadtime              = 0.2,
       renderType              = 4,
