@@ -3,7 +3,7 @@
 
 function gadget:GetInfo()
   return {
-    name      = "Reclaim Hp changer",
+    name      = "Reclaim HP changer",
     desc      = "Stops units from losing HP when reclaimed",
     author    = "Google Frog",
     date      = "Sep 28, 2009",
@@ -39,8 +39,11 @@ end
 
  function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, part)
 	if part < 0 then
-		local health = spGetUnitHealth(unitID)
+		local health,_,_,_,build = spGetUnitHealth(unitID)
 		spSetUnitHealth(unitID, health - maxHealth[unitDefID]*part)
+		if build < 0.01 then
+			Spring.DestroyUnit(unitID, false, true)
+		end
 	end
 	return true
  end
