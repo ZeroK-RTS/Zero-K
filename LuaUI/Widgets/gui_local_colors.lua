@@ -55,13 +55,7 @@ local gaiaColor = colorCFG.gaiaColor
 local allyColors = colorCFG.allyColors
 local enemyColors = colorCFG.enemyColors
 
-WG.LocalColor = {}
-
-local function RecreatePlayerList()
-	if WG.PlayerList and WG.PlayerList.RecreateList then
-		WG.PlayerList.RecreateList()
-	end
-end
+WG.LocalColor = (type(WG.LocalColor) == "table" and WG.LocalColor) or {}
 
 local function SetNewTeamColors() 
 	local gaia = Spring.GetGaiaTeamID()
@@ -82,8 +76,6 @@ local function SetNewTeamColors()
 		end
 	end
 	Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
-	
-	RecreatePlayerList()
 end
 
 local function SetNewSimpleTeamColors() 
@@ -102,17 +94,22 @@ local function SetNewSimpleTeamColors()
 		end
 	end
 	Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
-	
-	RecreatePlayerList()
 end
-
 
 local function ResetOldTeamColors()
 	for _,team in ipairs(Spring.GetTeamList()) do
 		Spring.SetTeamColor(team,Spring.GetTeamOrigColor(team))
 	end
-	
-	RecreatePlayerList()
+end
+
+local function NotifyColorChange()
+	for name,func in pairs(WG.LocalColor.listeners) do
+		if type(func) == "function" then	-- because we don't trust other widget writers to not give us random junk
+			func()				-- yeah we wouldn't even need to do this with static typing :(
+		else
+			Spring.Echo("<Local Team Colors> ERROR: Listener '" .. name .. "' is not a function!" )
+		end
+	end
 end
 
 function WG.LocalColor.localTeamColorToggle()
@@ -122,14 +119,20 @@ end
 
 function widget:Initialize()
 	WG.LocalColor.usingSimpleTeamColors = options.simpleColors.value
+	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
+	
 	if options.simpleColors.value then
 		SetNewSimpleTeamColors()
 	else
 		SetNewTeamColors()
 	end
+	
+	NotifyColorChange()
 end
 
 function widget:Shutdown()
 	ResetOldTeamColors()
+	NotifyColorChange()
+	WG.LocalColor.localTeamColorToggle = nil
 end
 

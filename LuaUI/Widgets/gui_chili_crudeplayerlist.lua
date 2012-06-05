@@ -167,10 +167,6 @@ options = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-WG.PlayerList = {}
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local function ShareUnits(playername, team)
 	local selcnt = Spring.GetSelectedUnitsCount()
 	if selcnt > 0 then
@@ -841,6 +837,7 @@ function widget:Initialize()
 	lastSizeX = window_cpl.width
 	lastSizeY = window_cpl_height
 	
-	WG.PlayerList.RecreateList = SetupPlayerNames
+	WG.LocalColor = WG.LocalColor or {}
+	WG.LocalColor.listeners["Chili Crude Playerlist"] = SetupPlayerNames
 end
 
