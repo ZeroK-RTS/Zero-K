@@ -36,9 +36,10 @@ local oneClickWepCMD = {
     id      = CMD_ONECLICK_WEAPON,
     name    = "One-Click Weapon",
     action  = "oneclickwep",
-	cursor  = 'oneclickwep',
+    cursor  = 'oneclickwep',
+    texture = "LuaUI/Images/Commands/Bold/action.png",
     type    = CMDTYPE.ICON,
-	tooltip = "Activate the unit's special weapon",
+    tooltip = "Activate the unit's special weapon",
 }
 
 local INITIAL_CMD_DESC_ID = 500
@@ -67,8 +68,8 @@ function gadget:UnitCreated(unitID, unitDefID, team)
 		for i=1, #defs[unitDefID] do
 			local desc = Spring.Utilities.CopyTable(oneClickWepCMD)
 			desc.name = defs[unitDefID][i].name
-			desc.tooltip = defs[unitDefID][i].tooltip
-			desc.texture = defs[unitDefID][i].texture
+			desc.tooltip = defs[unitDefID][i].tooltip or desc.tooltip
+			desc.texture = defs[unitDefID][i].texture or desc.texture
 			desc.params = {i}
 			
 			Spring.InsertUnitCmdDesc(unitID, INITIAL_CMD_DESC_ID + (i-1), desc)
