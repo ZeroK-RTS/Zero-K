@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[cremcom1]],
-  name                   = [[Strike Commander]],
+  name                   = [[Knight Commander]],
   description            = [[Mobile Assault Commander, Builds at 10 m/s]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
@@ -35,14 +35,14 @@ unitDef = {
   customParams           = {
 	cloakstealth = [[1]],
 	description_de = [[Mobiler Sturmkommandant, Baut mit 12 M/s]],
-	helptext       = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed and armor.]],
-	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufrüstung erhält er eine Disintegratorkanone.]],
+	helptext       = [[The Knight Commander is a well-balanced command platform that can mount most modules, with decent speed and armor.]],
+	helptext_de    = [[Der Knight Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufrüstung erhält er eine Disintegratorkanone.]],
 	level = [[1]],
 	statsname = [[armcom1]],
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
-	lups_unit_fxs = { "commandShieldBlue" },
+	--lups_unit_fxs = { "commandShieldBlue" },
   },
 
   energyMake             = 3.2,

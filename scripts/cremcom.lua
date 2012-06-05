@@ -38,7 +38,7 @@ local ARM_SPEED_PITCH = math.rad(180)
 local FOREARM_SPEED_PITCH = math.rad(240)
 
 local PACE = 1.75
-local BASE_VELOCITY = UnitDefNames.armcom1.speed or 1.375*30
+local BASE_VELOCITY = UnitDefNames.cremcom1.speed or 1.375*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 PACE = PACE * VELOCITY/BASE_VELOCITY
 
@@ -83,13 +83,14 @@ local RESTORE_DELAY = 4000
 
 local rightAngle = math.rad(90)
 
+--[[
 local doubleWep = true
 local udef = UnitDefs[unitDefID]
 local wepdef = udef.weapons[3].weaponDef
 if WeaponDefs[wepdef].name == "noweapon" then
 	doubleWep = false
 end
-
+]]
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
@@ -184,9 +185,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if not doubleWep then
-		return flares[gun_num]
-	elseif num == 3 then 
+	if num == 3 then 
 		return flareR 
 	elseif num == 2 or num == 4 then
 		return torso
@@ -215,10 +214,6 @@ function script.AimWeapon(num, heading, pitch)
 		Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
 		Turn( uparmL , x_axis, -pitch, ARM_SPEED_PITCH )
 		Turn( forearmL , x_axis, -rightAngle, FOREARM_SPEED_PITCH )
-		if not doubleWep then
-			Turn( uparmR , x_axis, -pitch, ARM_SPEED_PITCH )
-			Turn( forearmR , x_axis, -rightAngle, FOREARM_SPEED_PITCH )
-		end
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(uparmL, x_axis)
 		StartThread(RestoreAfterDelay)
@@ -251,10 +246,7 @@ function script.Deactivate()
 end
 
 function script.Shot(num)
-	if not doubleWep then
-		EmitSfx(flares[gun_num], 1025)
-		gun_num = 1 - gun_num
-	elseif num == 5 then
+	if num == 5 then
 		EmitSfx(flareL, 1025)
 	elseif num == 3 then
 		EmitSfx(flareR, 1027)
@@ -265,9 +257,7 @@ function script.Shot(num)
 end
 
 function script.FireWeapon(num)
-	if not doubleWep then
-		EmitSfx(flares[gun_num], 1024)
-	elseif num == 5 then
+	if num == 5 then
 		EmitSfx(flareL, 1024)
 	elseif num == 3 then
 		EmitSfx(flareR, 1026)
