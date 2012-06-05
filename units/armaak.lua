@@ -84,9 +84,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 0.9,
-        planes  = 9,
-        subs    = 0.5,
+        default = 0.8,
+        planes  = 8,
+        subs    = 0.4,
       },
 
       endsmoke                = [[0]],
@@ -130,9 +130,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 1.88,
-        planes  = 18.8,
-        subs    = 1,
+        default = 1.75,
+        planes  = 17.5,
+        subs    = 0.875,
       },
 
       explosionGenerator      = [[custom:flash_teal7]],
@@ -149,7 +149,7 @@ unitDef = {
       rgbColor                = [[0 1 1]],
       soundStart              = [[weapon/laser/rapid_laser]],
       soundStartVolume        = 4,
-      thickness               = 2.1650635094611,
+      thickness               = 2.165,
       tolerance               = 8192,
       turret                  = true,
       weaponType              = [[BeamLaser]],
@@ -164,11 +164,8 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Archangel]],
       blocking         = true,
-      category         = [[corpses]],
       damage           = 1020,
       energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
       height           = [[15]],
@@ -177,18 +174,14 @@ unitDef = {
       object           = [[hunchback_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 220,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Archangel]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 1020,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
       height           = [[4]],
@@ -197,8 +190,6 @@ unitDef = {
       object           = [[debris4x4c.s3o]],
       reclaimable      = true,
       reclaimTime      = 110,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },
