@@ -585,12 +585,20 @@ local icontypes = {
     bitmap='icons/defenseriot.dds',
     size=2.0,
   },
+  defensesupport = {
+    bitmap='icons/defensesupport.png',
+    size=2.0,
+  },
   defenseraider = {
     bitmap='icons/defenseraider.dds',
     size=2.0,
   },
   defenseaa = {
     bitmap='icons/defenseaa.dds',
+    size=2.0,
+  },
+  defenseskirmaa = {
+    bitmap='icons/defenseskirmaa.png',
     size=2.0,
   },
   defensespecial = {
@@ -612,6 +620,10 @@ local icontypes = {
   },
   staticaa = {
     bitmap='icons/staticaa.dds',
+    size=2.0,
+  },
+  staticskirmaa = {
+    bitmap='icons/staticskirmaa.png',
     size=2.0,
   },
   staticarty = {
