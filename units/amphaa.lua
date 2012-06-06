@@ -6,14 +6,14 @@ unitDef = {
   activateWhenBuilt      = true,
   amphibious             = [[1]],
   brakeRate              = 0.375,
-  buildCostEnergy        = 250,
-  buildCostMetal         = 250,
+  buildCostEnergy        = 220,
+  buildCostMetal         = 220,
 
   buildoptions           = {
   },
 
   buildPic               = [[amphaa.png]],
-  buildTime              = 250,
+  buildTime              = 220,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -105,7 +105,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
-      range                   = 750,
+      range                   = 800,
       reloadtime              = 10,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
@@ -137,10 +137,10 @@ unitDef = {
       footprintZ       = 3,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 100,
+      metal            = 88,
       object           = [[wreck2x2b.s3o]],
       reclaimable      = true,
-      reclaimTime      = 100,
+      reclaimTime      = 88,
     },
 
     HEAP      = {
@@ -152,10 +152,10 @@ unitDef = {
       footprintX       = 2,
       footprintZ       = 2,
       hitdensity       = [[100]],
-      metal            = 50,
+      metal            = 44,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 50,
+      reclaimTime      = 44,
     },
 
 

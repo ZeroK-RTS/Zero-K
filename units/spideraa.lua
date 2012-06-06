@@ -84,9 +84,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 24,
-        planes  = 240,
-        subs    = 12,
+        default = 22,
+        planes  = 220,
+        subs    = 11,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
