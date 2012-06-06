@@ -841,3 +841,9 @@ function widget:Initialize()
 	WG.LocalColor.listeners["Chili Crude Playerlist"] = SetupPlayerNames
 end
 
+function widget:Shutdown()
+	if WG.LocalColor and WG.LocalColor.listeners then
+		WG.LocalColor.listeners["Chili Crude Playerlist"] = nil
+	end
+end
+

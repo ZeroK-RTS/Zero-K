@@ -428,6 +428,10 @@ function widget:Shutdown()
 	spSendCommands({"console 1"})
 	spSendCommands({"inputtextgeo default"}) -- not saved to spring's config file on exit
 	Spring.SetConfigString("InputTextGeo", "0.26 0.73 0.02 0.028") -- spring default values
+	
+	if WG.LocalColor and WG.LocalColor.listeners then
+		WG.LocalColor.listeners["Chili Chat"] = nil
+	end
 end
 
 local timer = 0
