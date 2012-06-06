@@ -683,10 +683,10 @@ function DrawRanges()
 	local stipple = false
 	for _, def in pairs(defences) do
 		if def.complete and stipple then
-			glLineStipple(false)
+			--glLineStipple(false)
 			stipple = false
 		elseif not (def.complete or stipple) then
-			glLineStipple(2, 4095)
+			--glLineStipple(2, 4095)
 			stipple = true
 		end
 		for i, weapon in pairs(def["weapons"]) do
