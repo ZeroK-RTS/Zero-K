@@ -23,7 +23,7 @@ unitDef = {
   customParams        = {
     description_fr = [[Bombardier ? Dodos]],
 	description_de = [[Dodo Bomber]],
-    helptext       = [[Blimpy drops a Dodo on unsuspecting armies and bases. ]],
+    helptext       = [[Blimpy drops a Dodo on unsuspecting armies and bases.]],
     helptext_fr    = [[Le Blimpy est une unit? a?rienne ressemblant ? un bourdon dont apparemment la seule vocation soit de l?cher sur l'adversaire le Dodo qu'elle transporte sous son ventre. D?vastateur contre les bases.]],
 	helptext_de    = [[Blimpy wirft Dodos auf ahnungslose Heere und Basen ab.]],
   },
@@ -44,7 +44,7 @@ unitDef = {
   minCloakDistance    = 75,
   moverate1           = [[32]],
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chicken_blimpy.s3o]],
   power               = 750,
   seismicSignature    = 0,
