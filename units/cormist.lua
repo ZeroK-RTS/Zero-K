@@ -95,8 +95,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 45,
-        subs    = 2.25,
+        default = 50,
+        subs    = 2.5,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
