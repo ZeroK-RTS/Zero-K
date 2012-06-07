@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[vehicleaa]],
+  unitname               = [[vehaa2]],
   name                   = [[Devestator]],
   description            = [[AA vehicle]],
   acceleration           = 0.05952,
@@ -42,7 +42,7 @@ unitDef = {
   movementClass          = [[TANK3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName             = [[vehicleaa.s3o]],
+  objectName             = [[vehaa.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   
@@ -97,7 +97,6 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:FLASH2]],
-	  fixedlauncher           = true,
       fireStarter             = 70,
       flightTime              = 3,
       guidance                = true,
@@ -118,14 +117,14 @@ unitDef = {
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
       startsmoke              = [[1]],
-      startVelocity           = 350,
+      startVelocity           = 650,
       texture2                = [[AAsmoketrail]],
       tolerance               = 9000,
       tracks                  = true,
       turnRate                = 63000,
       turret                  = true,
-      weaponAcceleration      = 300,
-      weaponTimer             = 6,
+      weaponAcceleration      = 141,
+      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 900,
     },
@@ -148,7 +147,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 150,
-      object           = [[vehicleaa_dead.s3o]],
+      object           = [[vehaa_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 150,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -179,4 +178,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ vehicleaa = unitDef })
+return lowerkeys({ vehaa2 = unitDef })

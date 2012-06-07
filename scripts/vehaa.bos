@@ -1,260 +1,302 @@
-#define TA			// This is a TA script
+//linear constant 163840
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
-piece  base, m1, m2, tracks, turret, tubes;
-static-var  aimer, restore_delay, regspeed, gun1, miz, ready, aoro;
+piece		base, body, turret, firepoint, cab,
+			rwheel1, rwheel2, rwheel3,
+			lwheel1, lwheel2, lwheel3,
+			gs1r, gs2r, gs3r,
+			gs1l, gs2l, gs3l;
 
-
-#ifndef MAX_SPEED
-#define MAX_SPEED 75 
-#endif
+static-var	moving, once, animCount,
+			s1r, s2r, s3r,
+			s1l, s2l, s3l,
+			xtilt, xtiltv, xtilta, ztilt, ztilta, ztiltv, 
+			ya, yv, yp, runsp, WHEEL_TURN_SPEED;
 
 // Signal definitions
-#define SIG_AIM				2
-#define SIG_AIM2			4
+#define SIG_AIM1						1
+#define ANIM_SPEED						50
+#define RESTORE_DELAY					3000
 
-SmokeUnit(healthpercent, sleeptime, smoketype)
+#define TURRET_TURN_SPEED				<250>
+
+#define ANIM_PERIOD				50
+#define PIVOT_MOD				11 //appox. equal to MAX_PIVOT / turnrate
+#define MAX_PIVOT				<16>
+#define MIN_PIVOT				<-16>
+#define PIVOT_SPEED				<60>
+
+RestoreAfterDelay(delay)
 {
-	while( get BUILD_PERCENT_LEFT )
-	{
-		sleep 400;
+	sleep delay;
+	turn turret to x-axis (0) speed TURRET_TURN_SPEED;
+}
+
+AnimControl() {
+	var lastHeading, currHeading, diffHeading, pivotAngle;
+	lastHeading = GET HEADING;
+	while (1) {
+	
+		//pivot
+		currHeading = GET HEADING;
+		diffHeading = currHeading - lastHeading;
+		if (diffHeading > 0x7fff) diffHeading = diffHeading - 0x10000;
+		if (diffHeading < -0x8000) diffHeading = diffHeading + 0x10000;
+		pivotAngle = diffHeading * PIVOT_MOD;
+		if (pivotAngle > MAX_PIVOT) pivotAngle = MAX_PIVOT;
+		if (pivotAngle < MIN_PIVOT) pivotAngle = MIN_PIVOT;
+		turn cab to y-axis pivotAngle speed PIVOT_SPEED;
+		turn base to y-axis 0 - pivotAngle speed PIVOT_SPEED;
+		
+		lastHeading = currHeading;
+		sleep ANIM_PERIOD;
 	}
-	while( TRUE )
+}
+
+Suspension()
+{
+   while(1)
+   {
+   
+   while(runsp)
+   {   
+      s1r = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs1r)) - get PIECE_Y(gs1r);
+      if(s1r < [-1])
+      {
+         s1r = [-1];
+      }
+      if(s1r > [1])
+      {
+         s1r = [1];
+      }
+
+      s2r = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs2r)) - get PIECE_Y(gs2r);
+      if(s2r < [-1])
+      {
+         s2r = [-1];
+      }
+      if(s2r > [1])
+      {
+         s2r = [1];
+      }
+      
+      s3r = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs3r)) - get PIECE_Y(gs3r);
+      if(s3r < [-1])
+      {
+         s3r = [-1];
+      }
+      if(s3r > [1])
+      {
+         s3r = [1];
+      }
+      
+      s1l = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs1l)) - get PIECE_Y(gs1l);
+      if(s1l < [-1])
+      {
+         s1l = [-1];
+      }
+      if(s1l > [1])
+      {
+         s1l = [1];
+      }
+      
+      s2l = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs2l)) - get PIECE_Y(gs2l);
+      if(s2l < [-1])
+      {
+         s2l = [-1];
+      }
+      if(s2l > [1])
+      {
+         s2l = [1];
+      }
+
+      s3l = get GROUND_WATER_HEIGHT(get PIECE_XZ(gs3l)) - get PIECE_Y(gs3l);
+      if(s3l < [-1])
+      {
+         s3l = [-1];
+      }
+      if(s3l > [1])
+      {
+         s3l = [1];
+      }
+      
+      
+      xtilta = 0 - (s1r - s3r + s1l - s3l)/58000 + xtiltv/7;      
+      xtiltv = xtiltv + xtilta;
+      xtilt = xtilt + xtiltv*4;
+      
+      ztilta = 0 + (s1r + s3r - s1l - s3l)/58000 - ztiltv/7;
+      ztiltv = ztiltv + ztilta;
+      ztilt = ztilt + ztiltv*4;
+      
+      ya = (s1r + s3r + s1l + s3l)/100 - yv/25;
+      yv = yv + ya;
+      yp = yp + yv/10;
+      
+      move base to y-axis yp speed <9000>;
+      turn base to x-axis xtilt speed <9000>;
+      turn base to z-axis ztilt speed <9000>;
+      
+      move rwheel1 to y-axis s1r speed <9000>;
+      move rwheel2 to y-axis s2r speed <9000>;
+      move rwheel3 to y-axis s3r speed <9000>;
+      
+      move lwheel1 to y-axis s1l speed <9000>;
+      move lwheel2 to y-axis s2l speed <9000>;
+      move lwheel3 to y-axis s3l speed <9000>;
+      
+      WHEEL_TURN_SPEED = ((get CURRENT_SPEED)/2);
+      
+	spin rwheel1 around x-axis speed WHEEL_TURN_SPEED;
+	spin rwheel2 around x-axis speed WHEEL_TURN_SPEED;
+	spin rwheel3 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel1 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel2 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel3 around x-axis speed WHEEL_TURN_SPEED;
+	
+      sleep 10;
+      }
+      sleep 10;
+   } 
+}
+
+DamageControl()
+{
+	var health;
+	while (TRUE)
 	{
-		healthpercent = get HEALTH;
-		if( healthpercent < 66 )
+		health = get HEALTH;
+		
+		// Restore damaged parts
+/*		if (health > 25)
 		{
-			smoketype = 256 | 2;
-			if( Rand( 1, 66 ) < healthpercent )
+			if (health > 50)
 			{
-				smoketype = 256 | 1;
+				
 			}
-			emit-sfx smoketype from base;
-		}
-		sleeptime = healthpercent * 50;
-		if( sleeptime < 200 )
+
+		}*/
+		
+		// Damage parts, smoke emits etc.
+		if (health < 50)
 		{
-			sleeptime = 200;
+			emit-sfx SFXTYPE_WHITESMOKE from body;
+			if (health < 25)
+			{	
+				emit-sfx SFXTYPE_BLACKSMOKE from turret;
+			}
 		}
-		sleep sleeptime;
+		sleep 1000;
 	}
 }
 
-undeploy()
-{
-	aimer = 0;
-	sleep 3000;	
-	aimer = 1;
-	set MAX_SPEED to regspeed;
-}
 
-deploy()
+StopMoving()
 {
-	aimer = 0;
-	set MAX_SPEED to 1;
-	sleep 3000;
-	aimer = 2;
-}
-
-Toggle(t,value) 
-{
-
-if(t==1)
+	moving = FALSE;
+	
+	sleep 500;
+	if	(!moving)
 	{
-if(value==0)
-{
-call-script undeploy();
-}
-
-if(value==1)
-{
-call-script deploy();	
-}
-	}
-
-}
-
-Create()
-{
-	regspeed = get MAX_SPEED;
-	aimer = 1;
-	miz = 4;
-	ready = 1;
-	aoro = 1;
-	start-script SmokeUnit();
-}
-
-SetMaxReloadTime(Func_Var_1)
-{
-	restore_delay = Func_Var_1 * 2;
-}
-
-RestoreAfterDelay()
-{
-	sleep restore_delay;	
-	turn turret to y-axis <0> speed <100.071429>;
-	turn tubes to x-axis <0> speed <100.071429>;
-}
-
-reload()
-{
-	if (aoro == 1)
-	{
-sleep 8000; //dont cheat
-ready = 1;
-	}
-	if (aoro == 2)
-	{
-sleep 24000; //dont cheat
-ready = 1;
-miz = 4;
+		once = animCount*ANIM_SPEED/1000;
+		if (once > 3) once = 3;
+	
+		stop-spin rwheel1 around x-axis;
+		stop-spin rwheel2 around x-axis;
+		stop-spin rwheel3 around x-axis;
+		stop-spin lwheel1 around x-axis;
+		stop-spin lwheel2 around x-axis;
+		stop-spin lwheel3 around x-axis;
+	
+		runsp = FALSE;
 	}
 }
 
-AimPrimary(heading, pitch)
+StartMoving()
 {
-	if ( aimer == 1)
-	{
-	signal SIG_AIM;
-	set-signal-mask SIG_AIM;
-	start-script restoreafterdelay();
-	turn turret to y-axis heading speed <500.071429>;
-	turn tubes to x-axis 0 - pitch speed <300.071429>;
-	wait-for-turn turret around y-axis;
-	if (ready == 0)
-		{
-	start-script reload();
-		}
-	if (ready == 1)
-		{
-	return (1);
-		}
-	}
+	runsp = TRUE;
+	moving = TRUE;
+	animCount = 0;
+	
+	spin rwheel1 around x-axis speed WHEEL_TURN_SPEED;
+	spin rwheel2 around x-axis speed WHEEL_TURN_SPEED;
+	spin rwheel3 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel1 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel2 around x-axis speed WHEEL_TURN_SPEED;
+	spin lwheel3 around x-axis speed WHEEL_TURN_SPEED;
+	
 }
 
-
-FirePrimary()
+// Weapons
+AimFromWeapon1(piecenum)
 {
-gun1 = 1 - gun1;
-ready = 0;
-aoro = 1;
-start-script reload();
-//emit-sfx 1024+0 from fp1;
+	piecenum = firepoint;
 }
 
-AimFromPrimary(piecenum)
+QueryWeapon1(piecenum)
 {
-	piecenum = turret;
+	piecenum = firepoint;
 }
 
-QueryPrimary(piecenum)
+AimWeapon1 (heading, pitch)
 {
-if (gun1 == 1)
-	{
-	piecenum = m1;
-	}
-if (gun1 == 0)
-	{
-	piecenum = m2;
-	}
-}
+	signal SIG_AIM1;
+	set-signal-mask SIG_AIM1;
+	turn turret to x-axis <-25> speed TURRET_TURN_SPEED;
+	wait-for-turn turret around x-axis;
+	start-script RestoreAfterDelay(RESTORE_DELAY);
 
-//--------------
-
-AimSecondary(heading, pitch)
-{
-	if ( aimer == 2 )
-	{
-	signal SIG_AIM2;
-	set-signal-mask SIG_AIM2;
-	set MAX_SPEED to 1;
-	start-script restoreafterdelay();
-	turn turret to y-axis heading speed <200.071429>;
-	turn tubes to x-axis 0 - pitch speed <100.071429>;
-	wait-for-turn turret around y-axis;
-	if (ready == 0)
-	{
-	start-script reload();
-	}
-	if (ready == 1)
-		{
-	return (1);
-		}
-	}
-}
-
-Shot2()
-{
-	if (aimer == 2)
-	{
-	gun1 = 1 - gun1;
-	//emit-sfx 1024+0 from fp1;
-	}
-	miz = miz - 1;
-	if (miz < 1)
-	{
-	ready = 0;
-	aoro = 2;
-	start-script reload();
-	}
-}
-
-AimFromSecondary(piecenum)
-{
-	piecenum = turret;
-}
-
-QuerySecondary(piecenum)
-{
-if (gun1 == 1)
-	{
-	piecenum = m1;
-	}
-if (gun1 == 0)
-	{
-	piecenum = m2;
-	}
-}
-
-SweetSpot(piecenum)
-{
-	piecenum = base;
+	return (TRUE);
 }
 
 Killed(severity, corpsetype)
 {
-	if( severity <= 25 )
+	if(severity >= 0 AND severity < 25)
 	{
 		corpsetype = 1;
-		explode tracks type BITMAPONLY | BITMAP1;
-		explode base type BITMAPONLY | BITMAP2;
-		explode tubes type BITMAPONLY | BITMAP3;
-		explode turret type BITMAPONLY | BITMAP5;
-		return (0);
+		explode rwheel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode turret type BITMAPONLY | BITMAP;
+		explode body type BITMAPONLY | BITMAP;
 	}
-	if( severity <= 50 )
+	else if(severity >= 25 AND severity < 50)
+	{
+		corpsetype = 1;
+		explode lwheel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode lwheel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode turret type SHATTER | BITMAP;
+		explode body type BITMAPONLY | BITMAP;
+	}
+	else if(severity >= 50 AND severity < 100)
 	{
 		corpsetype = 2;
-		explode tracks type FALL | BITMAP1;
-		explode base type BITMAPONLY | BITMAP2;
-		explode tubes type FALL | BITMAP3;
-		explode turret type FALL | BITMAP5;
-		return (0);
+		explode rwheel3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode lwheel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode lwheel3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode turret type SHATTER | BITMAP;
+		explode body type BITMAPONLY | BITMAP;
 	}
-	if( severity <= 99 )
+	// D-Gunned/Self-D
+	else if(severity >= 100)
 	{
-		corpsetype = 3;
-		explode tracks type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-		explode base type BITMAPONLY | BITMAP2;
-		explode tubes type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
-		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
-		return (0);
+		corpsetype = 2;
+		explode rwheel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode rwheel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode lwheel3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode lwheel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode body type SHATTER | BITMAP;
 	}
-	corpsetype = 3;
-	explode tracks type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP1;
-	explode base type BITMAPONLY | BITMAP2;
-	explode tubes type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
-	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP5;
+}
+
+Create()
+{
+	moving = FALSE;
+	while (get BUILD_PERCENT_LEFT)
+	{
+		sleep 250;
+	}
+	start-script suspension();
+	start-script AnimControl();
+	start-script DamageControl();
 }

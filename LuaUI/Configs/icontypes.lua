@@ -233,6 +233,10 @@ local icontypes = {
     bitmap='icons/vehiclesupport.dds',
     size=1.8,
   },
+  vehicleaa = {
+    bitmap='icons/vehicleaa.png',
+    size=1.8,
+  },
   vehicleriot = {
     bitmap='icons/vehicleriot.dds',
     size=1.8,
