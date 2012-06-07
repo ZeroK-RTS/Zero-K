@@ -211,10 +211,10 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Strike Commander]],
+      description      = [[Wreckage - Knight Commander]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 2250,
+      damage           = 2500,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -231,10 +231,10 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Strike Commander]],
+      description      = [[Debris - Knight Commander]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2250,
+      damage           = 2500,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
