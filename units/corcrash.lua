@@ -113,7 +113,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 850,
       reloadtime              = 2,
-      smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/missile/rocket_hit]],
       soundStart              = [[weapon/missile/missile_fire7]],
