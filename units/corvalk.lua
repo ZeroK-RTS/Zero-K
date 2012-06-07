@@ -73,6 +73,7 @@ unitDef = {
   transportSize       = 4,
   turninplace         = 0,
   turnRate            = 550,
+  verticalSpeed       = 6,
 
   featureDefs         = {
 

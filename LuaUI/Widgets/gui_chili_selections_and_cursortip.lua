@@ -2253,7 +2253,7 @@ function widget:KeyRelease(key)
 		tildepressed = false
 	end
 end
-
+--[[
 function widget:DrawScreen()
 	if not tildepressed then return end
 	local x, y, lmb, mmb, rmb = Spring.GetMouseState()
@@ -2278,7 +2278,7 @@ function widget:DrawScreen()
 		--glColor(1,1,1,1)
 	end
 end
-
+--]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

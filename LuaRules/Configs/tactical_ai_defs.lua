@@ -141,6 +141,8 @@ local artyRangeSkirmieeArray = {
 	["corrl"] = true,
 	["corhlt"] = true,
 	["armpb"] = true,
+	["cordoom"] = true,
+	["armorco"] = true,
 }
 
 merge(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
@@ -524,13 +526,6 @@ local behaviourConfig = {
 	},		
 	
 	-- med range skirms
-	["armbanth"] = {
-		skirms = medRangeSkirmieeArray, 
-		swarms = {}, 
-		flees = {},
-		skirmLeeway = 60, 
-	},	
-	
 	["armrock"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
@@ -611,6 +606,13 @@ local behaviourConfig = {
 	},
 	
 	-- arty range skirms
+	["armbanth"] = {
+		skirms = artyRangeSkirmieeArray,
+		swarms = {}, 
+		flees = {},
+		skirmLeeway = 60, 
+	},	
+	
 	["armsnipe"] = {
 		skirms = artyRangeSkirmieeArray, 
 		swarms = {}, 
