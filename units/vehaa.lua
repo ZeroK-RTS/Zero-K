@@ -16,9 +16,9 @@ unitDef = {
   canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[32 50 52]],
+  collisionVolumeScales  = [[32 40 52]],
   collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
+  collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -97,7 +97,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:FLASH2]],
-	  fixedlauncher           = true,
+      fixedlauncher           = true,
       fireStarter             = 70,
       flightTime              = 3,
       guidance                = true,
@@ -138,11 +138,13 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Devestator]],
       blocking         = true,
-      category         = [[corpses]],
+      collisionVolumeOffsets = [[0 0 0]],
+      collisionVolumeScales  = [[32 40 52]],
+      collisionVolumeTest    = 1,
+      collisionVolumeType    = [[box]],      
       damage           = 900,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
       height           = [[20]],
@@ -151,18 +153,14 @@ unitDef = {
       object           = [[vehicleaa_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 104,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Devestator]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 900,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
       height           = [[4]],
@@ -171,8 +169,6 @@ unitDef = {
       object           = [[debris2x2a.s3o]],
       reclaimable      = true,
       reclaimTime      = 52,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

@@ -135,10 +135,8 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Crabe]],
       blocking         = true,
-      category         = [[arm_corpses]],
       damage           = 4000,
-      featureDead      = [[DEAD2]],
-      featurereclamate = [[smudge01]],
+      featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 4,
       height           = [[20]],
@@ -147,37 +145,13 @@ unitDef = {
       object           = [[armcrabe_dead]],
       reclaimable      = true,
       reclaimTime      = 640,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
-    },
-
-
-    DEAD2 = {
-      description      = [[Debris - Crabe]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 4000,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[smudge01]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 640,
-      object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 640,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Crabe]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 4000,
-      featurereclamate = [[smudge01]],
       footprintX       = 3,
       footprintZ       = 3,
       height           = [[4]],
@@ -186,8 +160,6 @@ unitDef = {
       object           = [[debris3x3c.s3o]],
       reclaimable      = true,
       reclaimTime      = 320,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
     },
 
   },
