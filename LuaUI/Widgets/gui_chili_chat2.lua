@@ -11,9 +11,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2",
-    desc      = "v0.808 Alternate Chili Chat Console.",
+    desc      = "v0.876 Alternate Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
-    date      = "2012-05-26",
+    date      = "2012-06-08",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     experimental = false,
@@ -97,8 +97,15 @@ local MESSAGE_DEFINITIONS = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local HIGHLIGHT_SURROUND_SEQUENCE = ' #### '
+local DEDUPE_SUFFIX = 'x '
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local screen0
 local myName -- my console name
+local myAllyTeamId
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -139,27 +146,16 @@ local wasSimpleColor = nil -- variable: indicate if simple color was toggled on 
 
 options_path = "Settings/Interface/Chat/Console"
 options_order = {
-	'mousewheel', 'clickable_points', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'defaultAllyChat',
+	'mousewheel', 'clickable_points',
+	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'defaultAllyChat',
 	'text_height', 'highlighted_text_height', 'max_lines',
-	'color_background', 'color_chat', 'color_ally', 'color_other', 'color_spec', 'color_dup',
+	'color_background', 'color_chat', 'color_ally', 'color_other', 'color_spec',
+	'dedupe_messages', 'dedupe_points', 'color_dup',
+	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
 	'highlight_surround', 'highlight_sound', 'color_highlight'
 }
-		
+
 options = {
---[[
-	highlight_filter = {
-		name = 'Highlight filter',
-		type = 'list',
-		OnChange = onOptionsChanged,
-		value = 'allies',
-		items = {
-			{ key = 'disabled', name = "Disabled" },
-			{ key = 'allies', name = "Highlight only allies messages" },
-			{ key = 'all', name = "Highlight all messages" },
-		},
-		advanced = true,
-	},
---]]
 	text_height = {
 		name = 'Text Size',
 		type = 'number',
@@ -181,6 +177,68 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
+	
+	-- TODO work in progress
+	dedupe_messages = {
+		name = "Dedupe messages",
+		type = 'bool',
+		value = true,
+		OnChange = onOptionsChanged,
+		advanced = true,
+	},
+	dedupe_points = {
+		name = "Dedupe points and labels",
+		type = 'bool',
+		value = true,
+		OnChange = onOptionsChanged,
+		advanced = true,
+	},
+	
+	highlight_all_private = {
+		name = "Highlight all private messages",
+		type = 'bool',
+		value = true,
+		advanced = true,
+	},
+	highlight_filter_allies = {
+		name = "Check allies messages for highlight",
+		type = 'bool',
+		value = true,
+		advanced = true,
+	},
+	highlight_filter_enemies = {
+		name = "Check enemy messages for highlight",
+		type = 'bool',
+		value = true,
+		advanced = true,
+	},
+	highlight_filter_specs = {
+		name = "Check spec messages for highlight",
+		type = 'bool',
+		value = true,
+		advanced = true,
+	},
+	highlight_filter_other = {
+		name = "Check other messages for highlight",
+		type = 'bool',
+		value = false,
+		advanced = true,
+	},
+--[[
+	highlight_filter = {
+		name = 'Highlight filter',
+		type = 'list',
+		OnChange = onOptionsChanged, -- NO NEED
+		value = 'allies',
+		items = {
+			{ key = 'disabled', name = "Disabled" },
+			{ key = 'allies', name = "Highlight only allies messages" },
+			{ key = 'all', name = "Highlight all messages" },
+		},
+		advanced = true,
+	},
+--]]
+	
 	highlight_surround = {
 		name = "Surround highlighted messages",
 		type = 'bool',
@@ -189,9 +247,9 @@ options = {
 		advanced = true,
 	},
 	highlight_sound = {
-		name = "Sound highlight on your name",
+		name = "Sound for highlighted messages",
 		type = 'bool',
-		value = true,
+		value = false,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -264,7 +322,7 @@ options = {
 	color_highlight = {
 		name = 'Highlight mark',
 		type = 'colors',
-		value = { 1, 0.2, 0.2, 1 },
+		value = { 1, 1, 0.2, 1 },
 		OnChange = onOptionsChanged,
 	},
 	color_background = {
@@ -327,7 +385,7 @@ end
 --------------------------------------------------------------------------------
 
 -- local PLAYERNAME_PATTERN = '[%%w%%[%%]_]+' -- doubled % as escape for gsub usage...
-local PLAYERNAME_PATTERN = escapePatternReplacementChars('([%w%[%]_]+)')
+local PLAYERNAME_PATTERN = escapePatternReplacementChars('([%w%[%]_]+)') -- to make message patterns easier to read/update
 
 function getMessageDefinitionOptionName(def, suboption)
   return def.msgtype .. "_" .. suboption
@@ -345,7 +403,7 @@ for _,def in ipairs(MESSAGE_DEFINITIONS) do
 		local option_name = getMessageDefinitionOptionName(def, "output_format")
 		options_order[#options_order + 1] = option_name
 		local o = {
-			name = "Message format for " .. def.name,
+			name = "Format for " .. def.name,
 			type = 'list',
 			OnChange = function (self)
 				Spring.Echo('Selected: ' .. self.value)
@@ -380,26 +438,64 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- TODO get rid of bogus color2incolor - http://springrts.com/phpbb/viewtopic.php?f=23&t=28208
+-- move to LuaUI/Chili/headers/util.lua or to LuaUI/modfonts.lua?
+local function color2textColor(r, g, b, a)
+
+	local function colorComponent(x)
+		local c = string.char(x * 255)
+		-- use lookup table to weed out other unwanted output values?
+		if c == '\0' then
+			c = '\1'
+		end
+		return c
+	end
+
+	if not r then
+		return '' -- '\255\255\255\255'
+	end
+	
+	if type(r) == 'table' then
+		r, g, b, a = unpack(r)
+	end
+
+	return '\255' .. colorComponent(r) .. colorComponent(g) .. colorComponent(b)
+end
+
+
+local players = {}
+
 local function setup()
-	incolor_dup			= WG.Chili.color2incolor(options.color_dup.value)
-	incolor_highlight	= WG.Chili.color2incolor(options.color_highlight.value)
+	--local textColorizer = WG.Chili.color2incolor
+	local textColorizer = color2textColor
+
+	incolor_dup			= textColorizer(options.color_dup.value)
+	incolor_highlight	= textColorizer(options.color_highlight.value)
 	incolors['#h']		= incolor_highlight
-	incolors['#a'] 		= WG.Chili.color2incolor(options.color_ally.value)
-	incolors['#e'] 		= WG.Chili.color2incolor(options.color_chat.value)
-	incolors['#o'] 		= WG.Chili.color2incolor(options.color_other.value)
-	incolors['#s'] 		= WG.Chili.color2incolor(options.color_spec.value)
+	incolors['#a'] 		= textColorizer(options.color_ally.value)
+	incolors['#e'] 		= textColorizer(options.color_chat.value)
+	incolors['#o'] 		= textColorizer(options.color_other.value)
+	incolors['#s'] 		= textColorizer(options.color_spec.value)
 	
 --	local myallyteamid = Spring.GetMyAllyTeamID()
 
 	local playerroster = Spring.GetPlayerList()
 	
-	for i = 1, #playerroster do -- FIXME ipairs!?
-		local name, _, spec, teamID = Spring.GetPlayerInfo(playerroster[i])
-		incolors[name] = spec and incolors['#s'] or WG.Chili.color2incolor(Spring.GetTeamColor(teamID))
+	for i, id in ipairs(playerroster) do
+		local name, _, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
+		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId }
+-- Spring.Echo('################## ' .. id .. " name " .. name .. " teamId " .. teamId .. " ally " .. allyTeamId)
+		incolors[name] = spec and incolors['#s'] or textColorizer(Spring.GetTeamColor(teamId))
 	end
 
-	myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+	myName, _, _, _, myAllyTeamId = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) -- or do it in the loop?
 	highlightPattern = caseInsensitivePattern(myName)
+end
+
+local function getSource(spec, allyTeamId)
+	return (spec and 'spec')
+		or ((myAllyTeamId == allyTeamId) and 'ally')
+		or 'enemy'
 end
 
 -- update msg members msgtype, argument, playername (when relevant)
@@ -408,6 +504,7 @@ local function parseMessage(msg)
     if candidate.pattern == nil then -- for fallback/other messages
       msg.msgtype = candidate.msgtype
       msg.argument = msg.text
+	  msg.source = 'other'
       return
     end
     local capture1, capture2 = msg.text:match(candidate.pattern)
@@ -415,17 +512,41 @@ local function parseMessage(msg)
       msg.msgtype = candidate.msgtype
       if candidate.noplayername then
         msg.argument = capture1
+		msg.source = 'other'
 		return
-      elseif incolors[capture1] then -- check that a color is defined for this player in order to check that user exists... to avoid pitfalls such as <autoquit>
-        msg.playername = capture1
-        msg.argument = capture2
-        return
+--      elseif incolors[capture1] then -- check that a color is defined for this player in order to check that user exists... to avoid pitfalls such as <autoquit>
+	  -- FIXME TODO use something else...
+	  else
+		local playername = capture1
+		if players[playername] then
+			local player = players[playername]
+			msg.source = getSource(player.spec, player.allyTeamId)
+			msg.playername = playername
+			msg.argument = capture2
+			return
+		end
       end
     end
   end
 end
 
 local function detectHighlight(msg)
+	-- must handle case where we are spec and message comes from player
+
+	if msg.msgtype == 'player_to_player_received' and options.highlight_all_private.value then
+		msg.highlight = true
+		return
+	end
+	
+--	Spring.Echo("msg.source = " .. (msg.source or 'NiL'))
+	
+	if msg.source == 'ally' and not options.highlight_filter_allies.value
+	or msg.source == 'enemy' and not options.highlight_filter_enemies.value
+	or msg.source == 'spec' and not options.highlight_filter_specs.value
+	or msg.source == 'other' and not options.highlight_filter_other.value then
+		return
+	end
+
 	if (msg.argument and msg.argument:find(highlightPattern)) then
 		msg.highlight = true
 	end
@@ -472,8 +593,8 @@ local function displayMessage(msg, remake)
 	end
 
 	-- TODO betterify this / make configurable
-	local highlight_sequence = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. ' #### ') or '')
-	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. 'x ') or '') .. highlight_sequence .. msg.formatted .. highlight_sequence
+	local highlight_sequence = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE) or '')
+	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence .. msg.formatted .. highlight_sequence
 	
 	if (msg.dup > 1 and not remake) then
 		local last = stack_console.children[#(stack_console.children)]
@@ -532,7 +653,8 @@ function RemakeConsole()
 end
 
 local function processMessage(msg)
-	if #messages > 0 and messages[#messages].text == msg.text then -- TODO toggle option for duplicates + do we want to dedupe clickable points?
+	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
+	and #messages > 0 and messages[#messages].text == msg.text then
 		messages[#messages].dup = messages[#messages].dup + 1
 		displayMessage(messages[#messages])
 		return
@@ -558,6 +680,10 @@ local function processMessage(msg)
 	
 	if (msg.msgtype == "player_to_allies" or msg.msgtype == "label") then  -- if ally message make sound
 		Spring.PlaySoundFile('sounds/talk.wav', 1, 'ui')
+	end
+
+	if msg.highlight and options.highlight_sound.value then
+		Spring.PlaySoundFile('LuaUI/Sounds/communism/cash-register-01.wav', 1, 'ui') -- TODO find a better sound :)
 	end
 	
 	-- TODO differentiate between children and messages (because some messages may be hidden, thus no associated children/TextBox)
@@ -616,11 +742,12 @@ function widget:MapDrawCmd(playerId, cmdType, px, py, pz, caption)
 end
 
 function widget:AddMapPoint(playerId, px, py, pz, caption)
-	local playerName, active, isSpec, teamId = Spring.GetPlayerInfo(playerId)
+	local playerName, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerId)
 
 	processMessage({
 		msgtype = ((caption:len() > 0) and 'label' or 'point'),
 		playername = playerName,
+		source = getSource(spec, allyTeamId),
 		text = 'MapDrawCmd '..caption,
 		argument = caption,
 		priority = 0, -- just in case ... probably useless
