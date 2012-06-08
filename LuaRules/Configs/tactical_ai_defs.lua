@@ -224,8 +224,6 @@ end
 -- alwaysJinkFight (defaults to false): If enabled the unit with jink whenever it has a fight command
 -- localJinkOrder (defaults in config): Causes move commands to be given near the unit, otherwise given next to opponent
 
-
-
 --*** flees(defaults to empty): the table of units that this unit will flee like the coward it is!!!
 -- fleeCombat (defaults to false): if true will flee everything without catergory UNARMED
 -- fleeLeeway (defaults to 100): adds to enemy range when fleeing
@@ -351,7 +349,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 300, 
 		swarmLeeway = 40, 
 		stoppingDistance = 8,
-		defaultSkirmOrderDis = 150,
+		skirmOrderDis = 150,
 	},
 	
 	["corsh"] = {
@@ -363,7 +361,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 40, 
 		stoppingDistance = 8,
-		defaultSkirmOrderDis = 150,
+		skirmOrderDis = 150,
 	},
   
 	["corpyro"] = {
@@ -385,7 +383,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 30, 
 		stoppingDistance = 8,
-		defaultSkirmOrderDis = 150,
+		skirmOrderDis = 150,
 	},
   
 	["panther"] = {
@@ -397,7 +395,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 50, 
 		stoppingDistance = 15,
-		defaultSkirmOrderDis = 150,
+		skirmOrderDis = 150,
 	},
 
 	["armpt"] = { -- scout boat
@@ -549,7 +547,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 30,
-		defaultSkirmOrderDis = 200,
+		skirmOrderDis = 200,
 		velocityPrediction = 90,
 	},
 	["dclship"] = {
@@ -601,7 +599,7 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 30,
-		defaultSkirmOrderDis = 200,
+		skirmOrderDis = 200,
 		velocityPrediction = 60,
 	},
 	
@@ -734,7 +732,7 @@ local behaviourConfig = {
 		fleeDistance = 100,
 		minFleeRange = 500,
         skirmLeeway = 50,
-		defaultSkirmOrderDis = 200,
+		skirmOrderDis = 200,
 	},
 	["spideraa"] = {
 		skirms = skirmableAir, 
@@ -753,7 +751,7 @@ local behaviourConfig = {
 		fleeDistance = 100,
 		minFleeRange = 500,
         skirmLeeway = 50,
-		defaultSkirmOrderDis = 200, 
+		skirmOrderDis = 200, 
 	},
 	["amphaa"] = {
 		skirms = skirmableAir, 
@@ -763,7 +761,7 @@ local behaviourConfig = {
 		fleeDistance = 100,
 		minFleeRange = 500,
         skirmLeeway = 50,
-		defaultSkirmOrderDis = 200, 
+		skirmOrderDis = 200, 
 	},
 }
 

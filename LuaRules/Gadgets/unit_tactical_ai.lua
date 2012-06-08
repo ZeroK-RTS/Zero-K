@@ -51,6 +51,7 @@ local unitAIBehaviour = {}
 local CMD_MOVE			= CMD.MOVE
 local CMD_ATTACK		= CMD.ATTACK
 local CMD_FIGHT			= CMD.FIGHT
+local CMD_WAIT			= CMD.WAIT
 local CMD_OPT_INTERNAL 	= CMD.OPT_INTERNAL
 local CMD_OPT_RIGHT 	= CMD.OPT_RIGHT
 local CMD_INSERT 		= CMD.INSERT
@@ -147,7 +148,6 @@ local function clearOrder(unitID,data,cQueue)
 		end
 		receivedOrder = false
 	end
-	
 end
 
 local function swarmEnemy(unitID, enemy, enemyUnitDef, los, move, cQueue,n)
@@ -312,7 +312,7 @@ local function skirmEnemy(unitID, enemy, move, cQueue,n)
 	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
 	
 	local pointDis = sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
-
+	
 	if behaviour.skirmRange > pointDis then
 
 		local dis = behaviour.skirmOrderDis 
@@ -323,7 +323,7 @@ local function skirmEnemy(unitID, enemy, move, cQueue,n)
 		local cx = ux+(ux-ex)*f
 		local cy = uy
 		local cz = uz+(uz-ez)*f
-	
+		
 		if move then
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 			spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
@@ -543,7 +543,7 @@ local function LoadBehaviour(unitConfigArray, behaviourDefaults)
 				velocityPrediction = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction),
 				searchRange = (behaviourData.searchRange or 800),
 				defaultAIState = (behaviourData.defaultAIState or behaviourDefaults.defaultState),
-				fleeOrderDis = (behaviourData.fleeOrderDis or 120)
+				fleeOrderDis = (behaviourData.fleeOrderDis or 120),
 			}
 			
 			unitAIBehaviour[ud.id].minFleeRange = unitAIBehaviour[ud.id].minFleeRange - unitAIBehaviour[ud.id].fleeLeeway
