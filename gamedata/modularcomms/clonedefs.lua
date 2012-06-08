@@ -158,13 +158,13 @@ local copy = {
 		},
 		cremcom4 = {
 			level = 4,
-			mainstats = {maxdamage = 3750, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
+			mainstats = {maxdamage = 3500, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
 			customparams = {rangebonus = "0.075"},
 			wreckmodel = "armcom4_dead",
 		},
 		cremcom5 = {
 			level = 5,
-			mainstats = {maxdamage = 4500, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
+			mainstats = {maxdamage = 4000, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
 			customparams = {rangebonus = "0.1"},
 			wreckmodel = "armcom5_dead",
 		},			

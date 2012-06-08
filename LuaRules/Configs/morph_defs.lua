@@ -491,6 +491,9 @@ local comMorph = {
 	[3] = {
 		time = 30,
 	},
+	[4] = {
+		time = 35,
+	}
 }
 
 --[[
