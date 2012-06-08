@@ -559,10 +559,6 @@ local function processMessage(msg)
 	if (msg.msgtype == "player_to_allies" or msg.msgtype == "label") then  -- if ally message make sound
 		Spring.PlaySoundFile('sounds/talk.wav', 1, 'ui')
 	end
-
-	if msg.highlight and options.highlight_sound.value then
-		Spring.PlaySoundFile('LuaUI/Sounds/communism/cash-register-01.wav', 1, 'ui') -- TODO find a better sound :)
-	end
 	
 	-- TODO differentiate between children and messages (because some messages may be hidden, thus no associated children/TextBox)
 	while #messages > options.max_lines.value do
