@@ -838,6 +838,7 @@ function widget:Initialize()
 	lastSizeY = window_cpl_height
 	
 	WG.LocalColor = WG.LocalColor or {}
+	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
 	WG.LocalColor.listeners["Chili Crude Playerlist"] = SetupPlayerNames
 end
 

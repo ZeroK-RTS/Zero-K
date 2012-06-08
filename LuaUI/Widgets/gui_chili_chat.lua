@@ -594,5 +594,6 @@ function widget:Initialize()
 	visible = true
 	
 	WG.LocalColor = WG.LocalColor or {}
+	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
 	WG.LocalColor.listeners["Chili Chat"] = option_remakeConsole
 end
