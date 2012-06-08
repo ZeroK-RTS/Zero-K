@@ -22,6 +22,7 @@ local weaponDef = {
     },
 
     explosionGenerator      = [[custom:riotballplus2_purple]],
+    explosionSpeed          = 5,
     fireStarter             = 100,
     impulseBoost            = 0,
     impulseFactor           = 0,
