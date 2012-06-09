@@ -42,25 +42,25 @@ local copy = {
 	armcom1 = {
 		armcom2 = {
 			level = 2,
-			mainstats = {maxdamage = 2750, objectname = "armcom2.3do", collisionvolumescales  = [[50 55 50]],},
+			mainstats = {maxdamage = 3000, objectname = "armcom2.3do", collisionvolumescales  = [[50 55 50]],},
 			customparams = {rangebonus = "0.025"},
 			wreckmodel = "armcom2_dead",
 		},
 		armcom3 = {
 			level = 3,
-			mainstats = {maxdamage = 3150, objectname = "armcom3.3do", collisionvolumescales  = [[55 60 55]],},
+			mainstats = {maxdamage = 4000, objectname = "armcom3.3do", collisionvolumescales  = [[55 60 55]],},
 			customparams = {rangebonus = "0.05"},
 			wreckmodel = "armcom3_dead",
 		},
 		armcom4 = {
 			level = 4,
-			mainstats = {maxdamage = 3500, objectname = "armcom4.3do", collisionvolumescales  = [[60 65 60]],},
+			mainstats = {maxdamage = 5400, objectname = "armcom4.3do", collisionvolumescales  = [[60 65 60]],},
 			customparams = {rangebonus = "0.075"},
 			wreckmodel = "armcom4_dead",
 		},
 		armcom5 = {
 			level = 5,
-			mainstats = {maxdamage = 4000, objectname = "armcom5.3do", collisionvolumescales  = [[65 70 65]],},
+			mainstats = {maxdamage = 7000, objectname = "armcom5.3do", collisionvolumescales  = [[65 70 65]],},
 			customparams = {rangebonus = "0.1"},
 			wreckmodel = "armcom5_dead",
 		},		
@@ -68,25 +68,25 @@ local copy = {
 	corcom1 = {
 		corcom2 = {
 			level = 2,
-			mainstats = {maxdamage = 3200, objectname = "corcomAlt2.s3o", },
+			mainstats = {maxdamage = 3800, objectname = "corcomAlt2.s3o", },
 			customparams = {damagebonus = "0.05"},
 			wreckmodel = "corcom2_dead.s3o",
 		},
 		corcom3 = {
 			level = 3,
-			mainstats = {maxdamage = 3600, objectname = "corcomAlt3.s3o", },
+			mainstats = {maxdamage = 5200, objectname = "corcomAlt3.s3o", },
 			customparams = {damagebonus = "0.1"},
 			wreckmodel = "corcom3_dead.s3o",
 		},
 		corcom4 = {
 			level = 4,
-			mainstats = {maxdamage = 4000, objectname = "corcomAlt4.s3o", },
+			mainstats = {maxdamage = 6600, objectname = "corcomAlt4.s3o", },
 			customparams = {damagebonus = "0.15"},
 			wreckmodel = "corcom4_dead.s3o",
 		},
 		corcom5 = {
 			level = 5,
-			mainstats = {maxdamage = 4500, objectname = "corcomAlt5.s3o", },
+			mainstats = {maxdamage = 8200, objectname = "corcomAlt5.s3o", },
 			customparams = {damagebonus = "0.2"},
 			wreckmodel = "corcom5_dead.s3o",
 		},		
@@ -94,25 +94,25 @@ local copy = {
 	commrecon1 = {
 		commrecon2 = {
 			level = 2,
-			mainstats = {maxdamage = 1950, objectname = "commrecon2.s3o"},
+			mainstats = {maxdamage = 2400, objectname = "commrecon2.s3o"},
 			customparams = {speedbonus = "0.05"},
 			wreckmodel = "commrecon2_dead.s3o",
 		},
 		commrecon3 = {
 			level = 3,
-			mainstats = {maxdamage = 2250, objectname = "commrecon3.s3o",},
+			mainstats = {maxdamage = 3000, objectname = "commrecon3.s3o",},
 			customparams = {speedbonus = "0.1"},
 			wreckmodel = "commrecon3_dead.s3o",
 		},
 		commrecon4 = {
 			level = 4,
-			mainstats = {maxdamage = 2500, objectname = "commrecon4.s3o",},
+			mainstats = {maxdamage = 3800, objectname = "commrecon4.s3o",},
 			customparams = {speedbonus = "0.15"},
 			wreckmodel = "commrecon4_dead.s3o",
 		},
 		commrecon5 = {
 			level = 5,
-			mainstats = {maxdamage = 3000, objectname = "commrecon5.s3o",},
+			mainstats = {maxdamage = 4800, objectname = "commrecon5.s3o",},
 			customparams = {speedbonus = "0.2"},
 			wreckmodel = "commrecon5_dead.s3o",
 		},		
@@ -120,25 +120,25 @@ local copy = {
 	commsupport1 = {
 		commsupport2 = {
 			level = 2,
-			mainstats = {maxdamage = 2150, workertime = 12.5, description = "Econ/Support Commander, Builds at 12.5 m/s", objectname = "commsupport2.s3o"},
+			mainstats = {maxdamage = 2500, workertime = 12.5, description = "Econ/Support Commander, Builds at 12.5 m/s", objectname = "commsupport2.s3o"},
 			customparams = {rangebonus = "0.05"},
 			wreckmodel = "commsupport2_dead.s3o",
 		},
 		commsupport3 = {
 			level = 3,
-			mainstats = {maxdamage = 2450, workertime = 15, description = "Econ/Support Commander, Builds at 15 m/s", objectname = "commsupport3.s3o",},
+			mainstats = {maxdamage = 3200, workertime = 15, description = "Econ/Support Commander, Builds at 15 m/s", objectname = "commsupport3.s3o",},
 			customparams = {rangebonus = "0.1"},
 			wreckmodel = "commsupport3_dead.s3o",
 		},
 		commsupport4 = {
 			level = 4,
-			mainstats = {maxdamage = 2750, workertime = 17.5, description = "Econ/Support Commander, Builds at 17.5 m/s", objectname = "commsupport4.s3o",},
+			mainstats = {maxdamage = 4400, workertime = 17.5, description = "Econ/Support Commander, Builds at 17.5 m/s", objectname = "commsupport4.s3o",},
 			customparams = {rangebonus = "0.15"},
 			wreckmodel = "commsupport4_dead.s3o",
 		},
 		commsupport5 = {
 			level = 5,
-			mainstats = {maxdamage = 3200, workertime = 20, description = "Econ/Support Commander, Builds at 20 m/s", objectname = "commsupport5.s3o",},
+			mainstats = {maxdamage = 5600, workertime = 20, description = "Econ/Support Commander, Builds at 20 m/s", objectname = "commsupport5.s3o",},
 			customparams = {rangebonus = "0.2"},
 			wreckmodel = "commsupport5_dead.s3o",
 		},		
