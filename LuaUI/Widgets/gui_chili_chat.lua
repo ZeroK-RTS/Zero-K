@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat v0.442",
-    desc      = "v0.442 Chili Chat Console.",
+    desc      = "v0.443 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
