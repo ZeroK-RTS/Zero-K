@@ -17,12 +17,12 @@ local weaponDef = {
     },
 
     damage                  = {
-		default = 300,
-		planes  = 300,
-		subs    = 15,
+		default = 200,
+		planes  = 200,
+		subs    = 10,
     },
 
-    explosionGenerator      = [[custom:napalm_missile]],
+    explosionGenerator      = [[custom:napalm_hellfire]],
     firestarter             = 180,
     impulseBoost            = 0,
     impulseFactor           = 0,
