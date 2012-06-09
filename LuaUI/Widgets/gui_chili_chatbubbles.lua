@@ -16,11 +16,18 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+local GetSpectatingState = Spring.GetSpectatingState
 local GetTimer = Spring.GetTimer 
 local DiffTimers = Spring.DiffTimers
 
 local Chili
+
+local typeToColor = {
+  a = {0,1,0,1},
+  l = {1,1,1,1},
+  s = {1,1,0.5,1},
+  p = {1,1,1,1},
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -30,6 +37,7 @@ local vsx,vsy = 0,0
 local _window_id = 0
 
 local windows = {}
+
 --[[
 local window_margin = 5
 local window_width  = 400
@@ -37,10 +45,8 @@ local window_timeout = 10
 --]]
 --options_section = 'Interface'
 options_path = 'Settings/Interface/Chat/Bubbles'
-options_order = {'lblblank', 'setavatar', 'window_margin', 'window_width', 'window_height', 'window_timeout', 'firstbubble_y',}
+options_order = {'setavatar','filterGlobalChat', 'filterAutohostMsg', 'text_height', 'window_margin', 'window_width', 'window_height', 'window_timeout', 'firstbubble_y',}
 options = {
-	
-	lblblank = {type='label', name=''},
 	setavatar = {
 		name = 'Set An Avatar',
 		desc = 'Avatar to show next to your bubble. Requires the Avatar widget',
@@ -48,6 +54,24 @@ options = {
 		OnChange = function() Spring.SendCommands{"luaui enablewidget Avatars", "setavatar"} end,
 		path = 'Settings/Interface/Chat',
 	},
+	filterGlobalChat = {
+		name = 'Filter Global Chat',
+		desc = 'Filter out messages made in global chat',
+		type = 'bool',
+		value = true,
+	},
+	filterAutohostMsg = {
+		name = 'Filter Autohost Messages',
+		desc = 'Filter out messages from autohost',
+		type = 'bool',
+		value = true,
+	},	
+	text_height = {
+		name = 'Font Size (10-18)',
+		type = 'number',
+		value = 12,
+		min=10,max=18,step=1,
+	},	
 	window_margin = {
 		name = 'Margin (0 - 10)',
 		desc = 'Margin between bubbles',
@@ -68,9 +92,9 @@ options = {
 		name = 'Height 60-120',
 		desc = '',
 		type = 'number',
-		min = 60,
+		min = 40,
 		max = 120,
-		value = 80,
+		value = 60,
 	},
 	
 	window_timeout = {
@@ -120,6 +144,15 @@ end
 local function newWindowID()
   _window_id = _window_id + 1
   return _window_id
+end
+
+-- explanation for string.char: http://springrts.com/phpbb/viewtopic.php?f=23&t=24952
+local function GetColorChar(colorArg)
+	local color = {}
+	for i=1,3 do
+		color[i] = math.floor(colorArg[i] * 255)
+	end
+	return string.char(255,color[1],color[2],color[3])
 end
 
 --------------------------------------------------------------------------------
@@ -228,6 +261,13 @@ function widget:AddChatMessage(player, msg, type)
 	if (not active or isSpec) then
 		teamcolor = {1,1,1,0.7}
 	end
+	local bubbleColor = typeToColor[type] or {1,1,1,1}
+	local originColor
+	local textColor = GetColorChar(teamcolor)
+	
+	if type == 'p' then
+		msg = "Private: " .. msg
+	end
 
 	local pp = nil
 	if WG.alliedCursorsPos then 
@@ -251,11 +291,11 @@ function widget:AddChatMessage(player, msg, type)
 		draggable = false;
 		
 		skinName  = "DarkGlass";
-		color     = teamcolor;
-		padding   = {16, 16, 16, 16};
+		--color     = bubbleColor;
+		padding   = {12, 12, 12, 12};
 
 		custom_timeadded = GetTimer(),
-    window_id = newWindowID(),
+		window_id = newWindowID(),
 		OnMouseDown = {function()
 			local _, _, meta, _ = Spring.GetModKeyState()
 			if meta then
@@ -275,12 +315,13 @@ function widget:AddChatMessage(player, msg, type)
 	
 	Chili.Image:New{
 		parent = w;
-    file   =   ((WG.Avatar and WG.Avatar.GetAvatar(playerName)) or avatar) or avatar_fallback; --get avatar from "api_avatar.lua" or from server, or use the default avatar
+		file   =   ((WG.Avatar and WG.Avatar.GetAvatar(playerName)) or avatar) or avatar_fallback; --get avatar from "api_avatar.lua" or from server, or use the default avatar
 		--file2  = (type=='s') and "LuaUI/Images/tech_progressbar_empty.png";
 		width  = options.window_height.value-36;
 		height = options.window_height.value-36;
 	}
-
+	
+	--[[
 	local verb = " says:"
 	if (type == 'a') then
 		verb = " says to allies:"
@@ -292,6 +333,7 @@ function widget:AddChatMessage(player, msg, type)
 		verb = " says:"
 	end
 
+	
 	local l = Chili.Label:New{
 		parent   = w;
 		caption  = playerName .. verb;
@@ -308,17 +350,18 @@ function widget:AddChatMessage(player, msg, type)
 			shadow = true;
 		}
 	}
+	]]--
 
 	Chili.TextBox:New{
 		parent  = w;
-		text    = msg;
+		text    = textColor .. "<" .. playerName .. ">\008 " .. GetColorChar(bubbleColor) .. msg .. "\008";
 		x       = options.window_height.value - 32;
-		y       = l.y + l.height + 2;
-		width   = w.clientWidth - (options.window_height.value - 32) - 10;
+		y       = 2;
+		width   = w.clientWidth - (options.window_height.value - 32) - 5;
 		valign  = "ascender";
 		align   = "left";
 		font    = {
-			size   = 14;
+			size   = options.text_height.value;
 			shadow = true;
 		}
 	}
@@ -344,8 +387,6 @@ end
 
 
 function widget:AddConsoleLine(msg)
-	if Game.version == "0.82.7.0 (0.82.7)" then msg = msg:sub(13) end	-- truncate framenumber (workaround for 0.82.7.0)
-	
 	local firstChar = msg:sub(1,1)
 
 	local nickend
@@ -389,9 +430,14 @@ function widget:AddConsoleLine(msg)
 		mesg = msg:sub(3)
 		type = 'l'
 	end
-	if (type == 'a' or type=='p') then 
-		widget:AddChatMessage(playerID,mesg,type)
-	end 
+	if not GetSpectatingState() then
+	      if type ~= '' or (not options.filterGlobalChat.value) then 
+		      return
+	      elseif type ~= 'l' or (not options.filterAutohostMsg.value) then 
+		      return
+	      end
+	end
+	widget:AddChatMessage(playerID,mesg,type)
 end
 
 --------------------------------------------------------------------------------
@@ -436,10 +482,10 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		--draggable = false;
 		skinName  = "DarkGlass";
 		color     = teamcolor;
-		padding   = {16, 16, 16, 16};
+		padding   = {12, 12, 12, 12};
 
 		custom_timeadded = custom_timeadded,
-    window_id = window_id,
+		window_id = window_id,
 
 		draggable = false,
 		OnMouseDown = {function()
@@ -456,56 +502,22 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		file   = 'LuaUI/Images/Crystal_Clear_action_flag.png';
 		width  = options.window_height.value-36;
 		height = options.window_height.value-36;
-		
-
 	}
-
-	if (caption)and(caption ~= "") then
-		local l = Chili.Label:New{
-			parent   = w;
-			caption  = playerName .. " added point:";
-			x        = options.window_height.value - 36;
-			y        = 2;
-			width    = w.clientWidth - (options.window_height.value - 36) - 5;
-			valign   = "ascender";
-			align    = "left";
-			autosize = false;
-			font    = {
-				size   = 12;
-				shadow = true;
-			}
+	local text = playerName .. " added point" .. (caption and (": " .. caption) or '')
+	
+	local l = Chili.TextBox:New{
+		parent   = w;
+		text  = text;
+		x        = options.window_height.value - 36;
+		y        = 2;
+		width    = w.clientWidth - (options.window_height.value - 36) - 5;
+		valign   = "ascender";
+		align    = "left";
+		font    = {
+			size   = options.text_height.value;
+			shadow = true;
 		}
-
-		Chili.TextBox:New{
-			parent  = w;
-			text    = caption;
-			x       = options.window_height.value - 32;
-			y       = l.y + l.height - 5;
-			width   = w.clientWidth - (options.window_height.value - 32) - 10;
-			valign  = "ascender";
-			align   = "left";
-			font    = {
-				size   = 14;
-				shadow = true;
-			}
-		}
-	else
-		Chili.Label:New{
-			parent   = w;
-			caption  = playerName .. " added point";
-			x        = options.window_height.value - 32;
-			width    = w.clientWidth - (options.window_height.value - 32) - 10;
-			height   = "90%";
-			valign   = "center";
-			align    = "left";
-			autosize = false;
-			font    = {
-				size   = 14;
-				shadow = true;
-			},
-		}
-	end
-
+	}
 	PushWindow(w)
 end
 
@@ -534,10 +546,10 @@ function widget:AddWarning(text)
 		draggable = false;
 		skinName  = "DarkGlass";
 		color     = teamcolor;
-		padding   = {16, 16, 16, 16};
+		padding   = {12, 12, 12, 12};
 
 		custom_timeadded = GetTimer(),
-    window_id = newWindowID(),
+		window_id = newWindowID(),
 	}
 
 	Chili.Image:New{
@@ -556,7 +568,8 @@ function widget:AddWarning(text)
 		valign  = "center";
 		align   = "left";
 		font    = {
-			size   = 14;
+			color = {1, 0.5, 0, 1},
+			size   = options.text_height.value;
 			shadow = true;
 		}
 	}

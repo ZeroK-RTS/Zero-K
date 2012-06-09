@@ -49,6 +49,7 @@ WG.chat = WG.chat or {}
 
 local col_text_in
 local col_ally_in
+local col_spec_in
 local col_othertext_in
 local col_dup_in
 
@@ -76,7 +77,7 @@ end
 
 options_path = "Settings/Interface/Chat/Console"
 options_order = {'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel','defaultAllyChat', 'text_height', 'max_lines', 
-		'col_back','col_text', 'col_ally', 'col_othertext', 'col_dup', 
+		'col_back','col_text', 'col_ally', 'col_spec', 'col_othertext', 'col_dup', 
 		}
 options = {
 	
@@ -144,6 +145,12 @@ options = {
 		value = {0.2,1,0.2,1},
 		OnChange = option_remakeConsole,
 	},
+	col_spec = {
+		name = 'Spectator Text',
+		type = 'colors',
+		value = {1,1,0.5,1},
+		OnChange = option_remakeConsole,
+	},	
 	col_othertext = {
 		name = 'Other Text',
 		type = 'colors',
@@ -192,6 +199,7 @@ options = {
 local function setup()
 	col_text_in 		= color2incolor(options.col_text.value)
 	col_ally_in 		= color2incolor(options.col_ally.value)
+	col_spec_in 		= color2incolor(options.col_spec.value)
 	col_othertext_in 	= color2incolor(options.col_othertext.value)
 	col_dup_in 			= color2incolor(options.col_dup.value)
 	
@@ -321,14 +329,24 @@ local function addLine(msg)
 	elseif (colorNames[msg:sub(2,(msg:find("> ") or 1)-1)]) then
 		msgtype = "playermessage"
 		playername = msg:sub(2,msg:find("> ")-1)
-		message = msg:sub(playername:len()+4)
-		message = (playername and colorNames[playername] or '') .. message
+		if msg:find("> Spectators: ") then
+			message = msg:sub(playername:len()+16)
+			message = (playername and colorNames[playername] or '') .. col_spec_in .. message
+		else
+			message = msg:sub(playername:len()+4)
+			message = (playername and colorNames[playername] or '') ..  message
+		end		
 	
 	elseif (colorNames[msg:sub(2,(msg:find("] ") or 1)-1)]) then
 		msgtype = "spectatormessage"
 		playername = msg:sub(2,msg:find("] ")-1)
-		message = msg:sub(playername:len()+4)
-		message = col_othertext_in..'  ['.. col_text_in .. playername .. col_othertext_in .. ']  '.. col_text_in .. message
+		if msg:find("] Spectators: ") then
+			message = msg:sub(playername:len()+16)
+			message = col_othertext_in..'  ['.. col_text_in .. playername .. col_othertext_in .. ']  '.. col_spec_in .. message
+		else
+			message = msg:sub(playername:len()+4)
+			message = col_othertext_in..'  ['.. col_text_in .. playername .. col_othertext_in .. ']  '.. col_text_in .. message
+		end
 		
 	elseif (colorNames[msg:sub(2,(msg:find("(replay)") or 3)-3)]) then
 		msgtype = "spectatormessage"
