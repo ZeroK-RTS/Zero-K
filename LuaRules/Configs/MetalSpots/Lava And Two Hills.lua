@@ -1,4 +1,4 @@
-return {
+local layout = {
 	spots = {	
 		{x = 201, z = 157, metal = 1.3195000886917},
 		{x = 601, z = 591, metal = 1.2950000762939},
@@ -23,3 +23,9 @@ return {
 		{x = 3597, z = 171, metal = 0.74550002813339},
 	}
 }
+
+for i = 1, #layout.spots do
+	layout.spots[i].metal = layout.spots[i].metal*1.5
+end
+
+return layout
