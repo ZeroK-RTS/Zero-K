@@ -1,4 +1,4 @@
-include "smokeunit.lua"
+include "constants.lua"
 include "nanoaim.h.lua"
 
 --pieces
@@ -7,14 +7,14 @@ local aim = piece "aim"
 local emitnano = piece "emitnano"
 
 --local vars
-local smokePieces = { piece "aim", piece "body" }
+smokePieces = { piece "aim", piece "body" }
 local nanoPieces = { piece "aim" }
 
 local nanoTurnSpeedHori = 0.5 * math.pi
 local nanoTurnSpeedVert = 0.1 * math.pi
 
 function script.Create()
-	StartThread(SmokeUnit, smokePieces)
+	StartThread(SmokeUnit)
 	StartThread(UpdateNanoDirectionThread, nanoPieces, 500, nanoTurnSpeedHori, nanoTurnSpeedVert)
 end
 

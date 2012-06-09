@@ -1,4 +1,4 @@
-include "smokeunit.lua"
+include "constants.lua"
 
 local spGetUnitTeam = Spring.GetUnitTeam
 
@@ -31,7 +31,7 @@ local land = piece "land"
 --local vars
 local nanoPieces = {emit1,emit2}
 local nanoIdx = 1
-local smokePieces = { piece "bay", piece "pad1", piece "fuelpad" }
+smokePieces = { piece "bay", piece "pad1", piece "fuelpad" }
 
 --opening animation
 local function Open()
@@ -132,7 +132,7 @@ function padchange()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePieces)
+	StartThread(SmokeUnit)
 	local buildprogress = select(5, Spring.GetUnitHealth(unitID))
 	while buildprogress < 1 do
 	Sleep(250)

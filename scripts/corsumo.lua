@@ -1,6 +1,6 @@
 
 --by Chris Mackey
-include "smokeunit.lua"
+include "constants.lua"
 include 'letsNotFailAtTrig.lua'
 
 --pieces
@@ -51,7 +51,7 @@ local rb_ankle = piece "rb_ankle"
 local rb_pump = piece "rb_pump"
 local rb_foot = piece "rb_foot"
 
-local smokePieces = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
+smokePieces = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
 
 local weaponPieces = {
 	[1] = {turret = b_eye, sleeve = b_eye, flare = b_eye},
@@ -351,7 +351,7 @@ function script.Create()
 	Turn( rf_ball, y_axis, math.rad(-45) )
 	Turn( lb_ball, y_axis, math.rad(-45) )
 	Turn( rb_ball, y_axis, math.rad(45) )
-	StartThread(SmokeUnit, smokePieces)
+	StartThread(SmokeUnit)
 end
 
 function script.StartMoving()

@@ -1,4 +1,4 @@
-include "smokeunit.lua"
+include "constants.lua"
 
 --pieces
 local base = piece "Base"
@@ -19,7 +19,7 @@ local flare3 = piece "flare3"
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
-local smokePieces = { shell_1, shell_2, cannonbase, heatray }
+smokePieces = { shell_1, shell_2, cannonbase, heatray }
 
 --variables
 local heat = false
@@ -96,7 +96,7 @@ function script.Deactivate ( )
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePieces)
+	StartThread(SmokeUnit)
 end
 
 

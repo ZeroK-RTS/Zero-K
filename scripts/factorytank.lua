@@ -1,6 +1,6 @@
 --by Andrew Rapp (luckywaldo7)
 
-include "smokeunit.lua"
+include "constants.lua"
 
 local spGetUnitTeam = Spring.GetUnitTeam
 
@@ -39,7 +39,7 @@ local pad = piece "pad"
 --local vars
 local nanoPieces = {emit_1,emit_2,emit_3}
 local nanoIdx = 1
-local smokePieces = { piece "wing_1", piece "wing_2", piece "wing_3" }
+smokePieces = { piece "wing_1", piece "wing_2", piece "wing_3" }
 
 --opening animation of the factory
 local function Open()
@@ -117,7 +117,7 @@ local function Close()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePieces)
+	StartThread(SmokeUnit)
 end
 
 function script.QueryNanoPiece()

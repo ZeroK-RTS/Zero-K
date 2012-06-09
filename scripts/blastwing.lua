@@ -1,6 +1,6 @@
 
 -- by Chris Mackey
-include "smokeunit.lua"
+include "constants.lua"
 
 --pieces 
 local base = piece "base"
@@ -16,7 +16,7 @@ local up = 2
 
 local RIGHT_ANGLE = math.rad(90)
 
-local smokePieces = { base, l_wing, r_wing }
+smokePieces = { base, l_wing, r_wing }
 local burrowed = false
 
 
@@ -46,7 +46,7 @@ local function UnBurrow()
 end
 
 function script.Create()
-	StartThread(SmokeUnit, smokePieces)
+	StartThread(SmokeUnit)
 end
 
 function script.Activate()
