@@ -56,6 +56,8 @@ DETO_W8 = 4103
 local SMOKEPUFF = 258
 
 function SmokeUnit()
+	local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
+	
 	if not (smokePiece and smokePiece[1]) then 
 		return 
 	end
@@ -66,7 +68,7 @@ function SmokeUnit()
 	while true do
 		--How is the unit doing?
 		local healthPercent = GetUnitValue(COB.HEALTH)
-		if (healthPercent < 66) then -- only smoke if less then 2/3rd health left
+		if (healthPercent < 66) and not spGetUnitIsCloaked(unitID) then -- only smoke if less then 2/3rd health left
 			EmitSfx(smokePiece[math.random(1,#smokePiece)], SMOKEPUFF)
 		end
 		Sleep(8*healthPercent + math.random(100,200))
