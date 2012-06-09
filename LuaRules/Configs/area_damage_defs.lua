@@ -18,7 +18,7 @@ local weapons = {
 -- timeFall		- the proportion of damage not dealt increases linearly with elapsed time from 0 to timeFall at the duration
 
 local presets = {
-	module_napalmgrenade = { radius = 256, damage = 20, duration = 1400, rangeFall = 0.6, timeFall = 0.5 },
+	module_napalmgrenade = { radius = 128, damage = 20, duration = 1400, rangeFall = 0.6, timeFall = 0.5 },
 }
 
 ------------------------
