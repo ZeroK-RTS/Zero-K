@@ -14,7 +14,7 @@ local LOAD_SPEED_Y = 80
 
 
 -- local vars
-smokePieces = { base }
+smokePiece = { base }
 local loaded = false
 
 local function Wake()

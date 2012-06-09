@@ -31,7 +31,7 @@ local land = piece "land"
 --local vars
 local nanoPieces = {emit1,emit2}
 local nanoIdx = 1
-smokePieces = { piece "bay", piece "pad1", piece "fuelpad" }
+smokePiece = { piece "bay", piece "pad1", piece "fuelpad" }
 
 --opening animation
 local function Open()

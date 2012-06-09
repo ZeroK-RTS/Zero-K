@@ -10,7 +10,7 @@ local antenna = piece 'antenna'
 local door1 = piece 'door1' 
 local door2 = piece 'door2' 
 
-local smokePiece = {base, turret}
+smokePiece = {base, turret}
 
 include "constants.lua"
 

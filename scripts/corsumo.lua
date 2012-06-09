@@ -51,7 +51,7 @@ local rb_ankle = piece "rb_ankle"
 local rb_pump = piece "rb_pump"
 local rb_foot = piece "rb_foot"
 
-smokePieces = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
+smokePiece = { t_dome, t_eye, l_turret, r_turret, lf_thigh, rf_thigh, lb_thigh, rb_thigh }
 
 local weaponPieces = {
 	[1] = {turret = b_eye, sleeve = b_eye, flare = b_eye},

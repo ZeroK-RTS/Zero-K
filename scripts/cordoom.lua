@@ -19,7 +19,7 @@ local flare3 = piece "flare3"
 
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 
-smokePieces = { shell_1, shell_2, cannonbase, heatray }
+smokePiece = { shell_1, shell_2, cannonbase, heatray }
 
 --variables
 local heat = false

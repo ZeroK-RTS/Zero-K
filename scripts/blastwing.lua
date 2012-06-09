@@ -16,7 +16,7 @@ local up = 2
 
 local RIGHT_ANGLE = math.rad(90)
 
-smokePieces = { base, l_wing, r_wing }
+smokePiece = { base, l_wing, r_wing }
 local burrowed = false
 
 

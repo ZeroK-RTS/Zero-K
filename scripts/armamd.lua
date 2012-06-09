@@ -5,7 +5,7 @@ include "constants.lua"
 --------------------------------------------------------------------------------
 local base, door1, door2, brace, missile, aimpoint = piece('base', 'door1', 'door2', 'brace', 'missile', 'aimpoint') 
 
-local smokePiece = {base}
+smokePiece = {base}
 
 --------------------------------------------------------------------------------
 -- signals

@@ -39,7 +39,7 @@ local pad = piece "pad"
 --local vars
 local nanoPieces = {emit_1,emit_2,emit_3}
 local nanoIdx = 1
-smokePieces = { piece "wing_1", piece "wing_2", piece "wing_3" }
+smokePiece = { piece "wing_1", piece "wing_2", piece "wing_3" }
 
 --opening animation of the factory
 local function Open()
