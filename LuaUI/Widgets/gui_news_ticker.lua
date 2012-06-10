@@ -186,9 +186,7 @@ local function AddEvent(str, unitDefID, color, sound, pos)
 	function newLabel:MouseDown(...)
 		local inherited = newLabel.inherited
 		self._down = true
-		self.state = 'pressed'
 		inherited.MouseDown(self, ...)
-		self:Invalidate()
 		return self
 	end
 
@@ -196,9 +194,7 @@ local function AddEvent(str, unitDefID, color, sound, pos)
 		local inherited = newLabel.inherited
 		if (self._down) then
 			self._down = false
-			self.state = 'normal'
 			inherited.MouseUp(self, ...)
-			self:Invalidate()
 			return self
 		end
 	end

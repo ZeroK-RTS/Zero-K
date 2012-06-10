@@ -222,7 +222,7 @@ function widget:GameFrame(n)
 	elseif (blinkE_status) then
 		blinkE_status = false
 		bar_energy:SetColor( col_energy )
-        bar_energy_overlay:SetColor({0,0,0,0})
+		bar_energy_overlay:SetColor({0,0,0,0})
 	end
 
 
@@ -375,11 +375,11 @@ function widget:GameFrame(n)
 				bp_aval = bp_aval + ud.buildSpeed
 			end
 		end
-		local buildpercent = bp_use/bp_aval * 100
 		if bp_aval == 0 then
 			bar_buildpower:SetValue(0)
 			bar_buildpower:SetCaption("no workers")
 		else
+			local buildpercent = bp_use/bp_aval * 100
 			bar_buildpower:SetValue(buildpercent)
 			bar_buildpower:SetCaption(("%.1f%%"):format(buildpercent))
 		end

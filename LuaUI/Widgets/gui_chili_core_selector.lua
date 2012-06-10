@@ -469,9 +469,8 @@ local function UpdateComm(unitID, index)
 	local barPercent = health/maxHealth
 	local barPercentOld = comms[index].healthbar.value
 	if barPercent ~= barPercentOld then
-		comms[index].healthbar:SetValue(health/maxHealth)
 		comms[index].healthbar.color = GetHealthColor(health/maxHealth)
-		comms[index].healthbar:Invalidate()
+		comms[index].healthbar:SetValue(health/maxHealth)
 	
 		comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
 								"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
