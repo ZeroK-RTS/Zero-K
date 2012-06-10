@@ -40,6 +40,7 @@ local missileDefIDs = {
 
 local silos = {}
 local missileParents = {}	--stores the parent silo unitID for each missile unitID
+local scheduleForDestruction
 
 function gadget:Initialize()
 	-- partial /luarules reload support
@@ -52,6 +53,15 @@ function gadget:Initialize()
 	end
 end
 
+function gadget:GameFrame(n)
+	if scheduleForDestruction then
+		for i=1,#scheduleForDestruction do
+			Spring.DestroyUnit(scheduleForDestruction[i], true)
+		end
+	end
+	scheduleForDestruction = nil
+end
+
 function gadget:AllowUnitCreation(udefID, builderID)
 	if (spGetUnitDefID(builderID) ~= siloDefID) then return true end
 	local env = Spring.UnitScript.GetScriptEnv(builderID)
@@ -61,8 +71,11 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID)
 	if unitDefID == siloDefID then
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
-		Spring.UnitScript.CallAsUnit(unitID, env.KillAllMissiles)			 --blow up all missiles on pad
-		silos[unitID] = nil	
+		local missiles = Spring.UnitScript.CallAsUnit(unitID, env.GetMissiles)
+		scheduleForDestruction = scheduleForDestruction or {}
+		for index,missileID in pairs(missiles) do
+			scheduleForDestruction[#scheduleForDestruction + 1] = missileID
+		end
 	elseif missileDefIDs[unitDefID] then
 		local parent = missileParents[unitID]
 		if parent then

@@ -54,6 +54,10 @@ function AddMissile(missileID)
 	missiles[padnum] = missileID
 end
 
+function GetMissiles()
+	return missiles
+end
+
 function RemoveMissile(deadID)
 	for i=1,4 do
 		if deadID == missiles[i] then
