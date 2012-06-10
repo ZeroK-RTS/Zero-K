@@ -317,13 +317,13 @@ local function UpdatePlayerInfo()
 				local blank = not active
 				
 				local cpuImg = entities[i].cpuImg
-				if cpuImg then
+				if cpuImg and cpuCol ~= cpuImg.color then
 					cpuImg.color = cpuCol
 					cpuImg.tooltip = (blank and nil or 'CPU: ' .. math.round(cpuUsage*100) .. '%')
 					cpuImg:Invalidate()
 				end
 				local pingImg = entities[i].pingImg
-				if pingImg then
+				if pingImg and pingCol ~= pingImg.color  then
 					pingImg.color = pingCol
 					pingImg.tooltip = (blank and nil or 'Ping: ' .. pingTime_readable)
 					pingImg:Invalidate()

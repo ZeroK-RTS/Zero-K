@@ -260,10 +260,13 @@ local function UpdateFac(unitID, index)
 		local buildeeDef = UnitDefs[buildeeDefID]
 		tooltip = tooltip .. "\nCurrent project: "..buildeeDef.humanName.." ("..math.floor(progress*100).."% done)"
 	end
-	facs[index].button.tooltip = tooltip .. "\n\255\0\255\0Left-click: Select and go to"..
+	tooltip = tooltip .. "\n\255\0\255\0Left-click: Select and go to"..
 										"\nRight-click: Select"..
 										"\nShift: Append to current selection\008"
-										
+	local tooltipOld = facs[index].button.tooltip
+	if tooltipOld ~= tooltip then
+		facs[index].button.tooltip = tooltip
+	end
 	-- change image if needed
 	if buildeeDefID and (buildeeDefID~= facs[index].buildeeDefID) then
 		facs[index].image.file = '#'..buildeeDefID
@@ -463,15 +466,19 @@ local function UpdateComm(unitID, index)
 	if not health then
 		return
 	end
-	comms[index].healthbar:SetValue(health/maxHealth)
-	comms[index].healthbar.color = GetHealthColor(health/maxHealth)
-	comms[index].healthbar:Invalidate()
+	local barPercent = health/maxHealth
+	local barPercentOld = comms[index].healthbar.value
+	if barPercent ~= barPercentOld then
+		comms[index].healthbar:SetValue(health/maxHealth)
+		comms[index].healthbar.color = GetHealthColor(health/maxHealth)
+		comms[index].healthbar:Invalidate()
 	
-	comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
+		comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
 								"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
 								"\n\255\0\255\0Left-click: Select and go to"..
 								"\nRight-click: Select"..
-								"\nShift: Append to current selection\008"	
+								"\nShift: Append to current selection\008"
+      end
 end
 
 --[[
