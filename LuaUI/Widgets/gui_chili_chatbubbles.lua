@@ -160,7 +160,7 @@ end
 
 function widget:Update()
 	local w = windows[1]
-  local time_now = GetTimer()
+	local time_now = GetTimer()
 	if (w)and(DiffTimers(time_now, w.custom_timeadded) > options.window_timeout.value) then
 		table.remove(windows,1)
 		windows_fading[#windows_fading+1] = w
@@ -200,15 +200,22 @@ end
 
 
 function PushWindow(window)
-	window:Realign() --// else `window.height` wouldn't give the desired value
-	windows[#windows+1] = window
+	if window then
+		window:Realign() --// else `window.height` wouldn't give the desired value
+		windows[#windows+1] = window
+	end
 	local w = windows[1]
 	w:SetPos(w.x, options.firstbubble_y.value)
 	for i=2,#windows do
 		windows[i]:SetPos(w.x, w.y + (w.height + options.window_margin.value))
 		w = windows[i]
+		if w.y > vsy then	-- overflow, get rid of top window
+			windows[1]:Dispose()
+			table.remove(windows, 1)
+			PushWindow()
+			return
+		end
 	end
-	
 end
 
 
@@ -284,14 +291,14 @@ function widget:AddChatMessage(player, msg, type)
 		y    = options.firstbubble_y.value;
 		width     = options.window_width.value;
 		height    = options.window_height.value;
-		minWidth  = options.window_width.value;
-		minHeight = options.window_height.value;
+		--minWidth  = options.window_width.value;
+		--minHeight = options.window_height.value;
 		autosize  = true;
 		resizable = false;
 		draggable = false;
 		
 		skinName  = "DarkGlass";
-		--color     = bubbleColor;
+		color     = bubbleColor;
 		padding   = {12, 12, 12, 12};
 
 		custom_timeadded = GetTimer(),
@@ -461,7 +468,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 	end
 
 	local playerName,active,isSpec,teamID = Spring.GetPlayerInfo(player)
-	local teamcolor = {1,0,0,1}
+	local teamcolor = {Spring.GetTeamColor(teamID)}
 	if (not active or isSpec) then
 		teamcolor = {1,0,0,0.7}
 	end
@@ -481,7 +488,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		resizable = false;
 		--draggable = false;
 		skinName  = "DarkGlass";
-		color     = teamcolor;
+		color     = {1,0.2,0.2,0.7};
 		padding   = {12, 12, 12, 12};
 
 		custom_timeadded = custom_timeadded,
@@ -503,7 +510,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		width  = options.window_height.value-36;
 		height = options.window_height.value-36;
 	}
-	local text = playerName .. " added point" .. (caption and (": " .. caption) or '')
+	local text = GetColorChar(teamcolor) .. playerName .. "\008 added point" .. (caption and (": " .. caption) or '')
 	
 	local l = Chili.TextBox:New{
 		parent   = w;
@@ -534,7 +541,7 @@ function widget:AddWarning(text)
 
 	if NewMessage("warning", text) then return end
 
-	teamcolor = {1,1,0,1}
+	teamcolor = {1,0.5,0,1}
 
 	local w = Chili.Window:New{
 		parent    = Chili.Screen0;
