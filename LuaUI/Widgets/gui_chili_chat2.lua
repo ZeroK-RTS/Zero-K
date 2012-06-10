@@ -88,8 +88,8 @@ local MESSAGE_DEFINITIONS = {
 	{ msgtype = 'replay_spec_to_allies', pattern = '^%[PLAYERNAME %(replay%)%] Allies: (.*)', format = '#s[$playername (replay)] $argument' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
 	{ msgtype = 'replay_spec_to_everyone', pattern = '^%[PLAYERNAME %(replay%)%] (.*)', format = '#s[$playername (replay)] #e$argument' },
 
-	{ msgtype = 'label', pattern = '^PLAYERNAME added point: (.+)', format = '#p *** $playername added label \'$argument\'' }, -- NOTE : these messages are ignored -- points and labels are provided through MapDrawCmd() callin
-	{ msgtype = 'point', pattern = '^PLAYERNAME added point: ', format = '#p *** $playername added point' },
+	{ msgtype = 'label', pattern = '^PLAYERNAME added point: (.+)', format = '#p *L $playername added label \'$argument\'' }, -- NOTE : these messages are ignored -- points and labels are provided through MapDrawCmd() callin
+	{ msgtype = 'point', pattern = '^PLAYERNAME added point: ', format = '#p *L $playername added point' },
 	{ msgtype = 'autohost', pattern = '^> (.+)', format = '#o> $argument', noplayername = true },
 	{ msgtype = 'other', format = '#o$text' } -- no pattern... will match anything else
 }
@@ -97,7 +97,7 @@ local MESSAGE_DEFINITIONS = {
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local HIGHLIGHT_SURROUND_SEQUENCE = ' #### '
+local HIGHLIGHT_SURROUND_SEQUENCE = ' ** '
 local DEDUPE_SUFFIX = 'x '
 
 --------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ options = {
 	highlighted_text_height = {
 		name = 'Highlighted Text Size',
 		type = 'number',
-		value = 18,
+		value = 16,
 		min = 8, max = 30, step = 1,
 		OnChange = onOptionsChanged,
 	},
@@ -766,20 +766,6 @@ end
 -----------------------------------------------------------------------
 
 local timer = 0
-
-local function CheckColorScheme() --//toggle between color scheme
-	local currentColorScheme = wasSimpleColor 
-	if WG.LocalColor then
-		currentColorScheme = WG.LocalColor.usingSimpleTeamColors	
-	end
-	if wasSimpleColor ~= currentColorScheme then
-		onOptionsChanged()
-		wasSimpleColor = currentColorScheme
-	end
-end
-
------------------------------------------------------------------------
-
 function widget:Update(s)
 	timer = timer + s
 	if timer > 2 then
@@ -788,7 +774,6 @@ function widget:Update(s)
 			window_console.x / screen0.width + 0.004, 
 			1 - (window_console.y + window_console.height) / screen0.height + 0.005, 
 			window_console.width / screen0.width)})
-		CheckColorScheme()
 	end
 end
 
@@ -930,7 +915,11 @@ function widget:Initialize()
 	Spring.SendCommands({"console 0"})
 	
 	screen0:AddChild(window_console)
-    visible = true
+        visible = true
+	
+	WG.LocalColor = WG.LocalColor or {}
+	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
+	WG.LocalColor.listeners["Chili Chat"] = onOptionsChanged
 end
 
 -----------------------------------------------------------------------
@@ -941,4 +930,8 @@ function widget:Shutdown()
 	end
 	Spring.SendCommands({"console 1"}, {"inputtextgeo default"}) -- not saved to spring's config file on exit
 	Spring.SetConfigString("InputTextGeo", "0.26 0.73 0.02 0.028") -- spring default values
+	
+	if WG.LocalColor and WG.LocalColor.listeners then
+		WG.LocalColor.listeners["Chili Chat"] = nil
+	end
 end
