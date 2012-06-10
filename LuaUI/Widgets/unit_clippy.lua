@@ -256,9 +256,11 @@ function widget:Update(dt)
 				img.hidden = false
 			end
 			
-			img.x = x - (textWidth+8)/2
-			img.y = y - textHeight - 4 - fontSize
-			img:Invalidate()
+			--img.x = x - (textWidth+8)/2
+			--img.y = y - textHeight - 4 - fontSize
+			--img:Invalidate()
+			
+			img:SetPos(x - (textWidth+8)/2, y - textHeight - 4 - fontSize)
 		elseif not tipData.img.hidden then
 			screen0:RemoveChild(tipData.img)
 			tipData.img.hidden = true

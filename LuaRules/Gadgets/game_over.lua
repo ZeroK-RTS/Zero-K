@@ -121,59 +121,18 @@ local function HasNoComms(allianceID)
 	return true
 end
 
-function AddAllianceUnit(u, ud, teamID)
-	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
-	aliveCount[teamID] = aliveCount[teamID] + 1
-	--Spring.Echo("added alliance=" .. teamID, 'count='..aliveCount[allianceID])
-	if UnitDefs[ud].customParams.commtype then
-		commsAlive[allianceID][u] = true
-	end	
-end
-
-function RemoveAllianceUnit(u, ud, teamID)
-	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
-	aliveCount[teamID] = aliveCount[teamID] - 1
-	--Spring.Echo("removed alliance=" .. teamID, 'count='..aliveCount[allianceID]) 
-	if UnitDefs[ud].customParams.commtype then
-		commsAlive[allianceID][u] = nil
-	end
-	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID))) and (allianceID ~= chickenAllyTeamID) then
-		Spring.Echo("purge")
-		DestroyAlliance(allianceID)
-	end
-end
-
--- used during initialization
-local function CheckAllUnits()
-	aliveCount = {}
-	local teams = spGetTeamList()
-	for i=1,#teams do
-		local teamID = teams[i]
-		if teamID ~= gaiaTeam then
-			aliveCount[teamID] = 0
-		end
-	end
-	local units = spGetAllUnits()
-	for i=1,#units do
-		local unitID = units[i]
-		local teamID = spGetUnitTeam(unitID)
-		local unitDefID = spGetUnitDefID(unitID)
-		gadget:UnitFinished(unitID, unitDefID, teamID)
-	end
-end
-
 -- if only one allyteam left, declare it the victor
 local function CheckForVictory()
 	local allylist = spGetAllyTeamList()
 	local count = 0
 	local lastAllyTeam
-    for _,a in pairs(allylist) do
+	for _,a in pairs(allylist) do
 		if not destroyedAlliances[a] and (a ~= gaiaAllyTeamID) then
 			--Spring.Echo("Alliance " .. a .. " remains in the running")
 			count = count + 1
 			lastAllyTeam = a
 		end
-    end
+	end
 	if count < 2 then
 		Spring.Echo(( (lastAllyTeam and ("Team " .. lastAllyTeam)) or "Nobody") .. " wins!")
 		spGameOver({lastAllyTeam})
@@ -181,7 +140,7 @@ local function CheckForVictory()
 end
 
 -- purge the alliance!
-function DestroyAlliance(allianceID)
+local function DestroyAlliance(allianceID)
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
@@ -217,6 +176,47 @@ function DestroyAlliance(allianceID)
 	CheckForVictory()
 end
 GG.DestroyAlliance = DestroyAlliance
+
+local function AddAllianceUnit(u, ud, teamID)
+	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
+	aliveCount[teamID] = aliveCount[teamID] + 1
+	--Spring.Echo("added alliance=" .. teamID, 'count='..aliveCount[allianceID])
+	if UnitDefs[ud].customParams.commtype then
+		commsAlive[allianceID][u] = true
+	end	
+end
+
+local function RemoveAllianceUnit(u, ud, teamID)
+	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
+	aliveCount[teamID] = aliveCount[teamID] - 1
+	--Spring.Echo("removed alliance=" .. teamID, 'count='..aliveCount[allianceID]) 
+	if UnitDefs[ud].customParams.commtype then
+		commsAlive[allianceID][u] = nil
+	end
+	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID))) and (allianceID ~= chickenAllyTeamID) then
+		Spring.Echo("purge")
+		DestroyAlliance(allianceID)
+	end
+end
+
+-- used during initialization
+local function CheckAllUnits()
+	aliveCount = {}
+	local teams = spGetTeamList()
+	for i=1,#teams do
+		local teamID = teams[i]
+		if teamID ~= gaiaTeam then
+			aliveCount[teamID] = 0
+		end
+	end
+	local units = spGetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local teamID = spGetUnitTeam(unitID)
+		local unitDefID = spGetUnitDefID(unitID)
+		gadget:UnitFinished(unitID, unitDefID, teamID)
+	end
+end
 
 -- check for active players
 local function ProcessLastAlly()	

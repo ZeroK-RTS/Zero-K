@@ -219,8 +219,9 @@ local function ProcessLabels()
 	local toRemove = {}
 	for i=1,#labels do
 		local label = labels[i]
-		label.x = label.x - scrollSpeed
-		label:Invalidate()
+		--label.x = label.x - scrollSpeed
+		--label:Invalidate()
+		label:SetPos(label.x - scrollSpeed)
 		if label.x + label.width <= 0 then
 			toRemove[#toRemove+1] = i
 		end
