@@ -440,9 +440,10 @@ function widget:AddConsoleLine(msg)
 	if not GetSpectatingState() then
 	      if type == '' and options.filterGlobalChat.value then 
 		      return
-	      elseif type == 'l' and options.filterAutohostMsg.value then 
-		      return
 	      end
+	end
+	if type == 'l' and options.filterAutohostMsg.value then 
+	      return
 	end
 	widget:AddChatMessage(playerID,mesg,type)
 end
