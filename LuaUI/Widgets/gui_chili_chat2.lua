@@ -5,7 +5,7 @@
 -- TODO (maybe) : extract code that can be shared between similar chat widgets (message formatting, hidden+highlight detection) so only chili/ScrollPanel+TextBoxen stuff remain in there
 -- TODO : test replay message formats (and change pattern matcher/parseCommand() to remove duplication in message definitions)
 -- TODO : check that private (whisper) messages work as expected
--- TODO : check that simpleColors work as expected
+-- TODO FIXME : reformat all messages when simpleColors is toggled or when colors are changed
 -- TODO FIXME : when some messages are hidden... make sure we dont destroy too many stack_console control children
 -- TODO : add message highlight options (never, only ally, all messages) + highlight format (currently surrounds message with #### in highlight color)
 -- FIXME : fix (probable) bug while shrinking max_lines option
@@ -13,9 +13,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2",
-    desc      = "v0.899 Alternate Chili Chat Console.",
+    desc      = "v0.909 Alternate Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
-    date      = "2012-06-11",
+    date      = "2012-06-12",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     experimental = false,
@@ -127,6 +127,13 @@ function MessageProcessor:ProcessConsoleLine(msg, receiver)
 	end
 
 	receiver:AddConsoleMessage(msg)
+end
+
+function MessageProcessor:ProcessConsoleBuffer(count, receiver)
+	local bufferMessages = Spring.GetConsoleBuffer(count)
+	for i = 1,#bufferMessages do
+		self:ProcessConsoleLine(bufferMessages[i], receiver)
+	end
 end
 
 MessageProcessor:Initialize()
@@ -840,29 +847,9 @@ function widget:AddConsoleLine(text, priority)
 	MessageProcessor:ProcessConsoleLine(msg, self)
 end
 
-function widget:LoadConsoleBuffer(count)
-	local bufferMessages = Spring.GetConsoleBuffer(count)
-	for i = 1,#bufferMessages do
-		MessageProcessor:ProcessConsoleLine(bufferMessages[i], self)
-	end
-end
-
 -----------------------------------------------------------------------
 
 local timer = 0
-
-local function CheckColorScheme() --//toggle between color scheme
-	local currentColorScheme = wasSimpleColor 
-	if WG.LocalColor then
-		currentColorScheme = WG.LocalColor.usingSimpleTeamColors	
-	end
-	if wasSimpleColor ~= currentColorScheme then
-		onOptionsChanged()
-		wasSimpleColor = currentColorScheme
-	end
-end
-
------------------------------------------------------------------------
 
 -- FIXME wtf is this obsessive function?
 function widget:Update(s)
@@ -873,7 +860,7 @@ function widget:Update(s)
 			window_console.x / screen0.width + 0.004, 
 			1 - (window_console.y + window_console.height) / screen0.height + 0.005, 
 			window_console.width / screen0.width)})
-		CheckColorScheme()
+--		CheckColorScheme()
 	end
 end
 
@@ -881,6 +868,21 @@ end
 
 function widget:PlayerAdded(playerID)
 	setup()
+end
+
+-----------------------------------------------------------------------
+-- TODO must be shared and use proper LocalColor provided register/unregister functions, not change LocalColor's tables from the outside
+
+function widget:LocalColorUnregister()
+	WG.LocalColor = WG.LocalColor or {}
+	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
+	WG.LocalColor.listeners[widget:GetInfo().name] = onOptionsChanged
+end
+
+function widget:LocalColorRegister()
+	if WG.LocalColor and WG.LocalColor.listeners then
+		WG.LocalColor.listeners[widget:GetInfo().name] = nil
+	end
 end
 
 -----------------------------------------------------------------------
@@ -1006,16 +1008,14 @@ function widget:Initialize()
 	}
 	
 	RemakeConsole()
-	self:LoadConsoleBuffer(options.max_lines.value)
+	MessageProcessor:ProcessConsoleBuffer(options.max_lines.value, self)
 	
 	Spring.SendCommands({"console 0"})
 	
 	screen0:AddChild(window_console)
     visible = true
 	
-	WG.LocalColor = WG.LocalColor or {}
-	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
-	WG.LocalColor.listeners[widget:GetInfo().name] = onOptionsChanged
+	self:LocalColorRegister()
 end
 
 -----------------------------------------------------------------------
@@ -1027,7 +1027,5 @@ function widget:Shutdown()
 	Spring.SendCommands({"console 1", "inputtextgeo default"}) -- not saved to spring's config file on exit
 	Spring.SetConfigString("InputTextGeo", "0.26 0.73 0.02 0.028") -- spring default values
 	
-	if WG.LocalColor and WG.LocalColor.listeners then
-		WG.LocalColor.listeners[widget:GetInfo().name] = nil
-	end
+	self:LocalColorUnregister()
 end
