@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- TODO : extract code that can be shared between widgets (parsing) and maybe move it to cawidget and add new callin
+-- TODO (maybe) : extract code that can be shared between similar chat widgets (message formatting, hidden+highlight detection) so only chili/ScrollPanel+TextBoxen stuff remain in there
 -- TODO : test replay message formats (and change pattern matcher/parseCommand() to remove duplication in message definitions)
 -- TODO : check that private (whisper) messages work as expected
 -- TODO : check that simpleColors work as expected
@@ -11,9 +13,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat 2",
-    desc      = "v0.876 Alternate Chili Chat Console.",
+    desc      = "v0.899 Alternate Chili Chat Console.",
     author    = "CarRepairer, Licho, Shaun",
-    date      = "2012-06-08",
+    date      = "2012-06-11",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     experimental = false,
@@ -27,18 +29,117 @@ include("keysym.h.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
---[[
-each message definition can have:
-	- either 1 format
-	- either name + output, output containing pairs of { name = '', format = '' }
-all the names are used when displaying the options
+-- SHARED/cawidget
 
+local MessageProcessor = {}
+
+local PLAYERNAME_PATTERN = '([%w%[%]_]+)' -- to make message patterns easier to read/update
+
+-- message definitions
+--[[
 pattern syntax:
 	see http://www.lua.org/manual/5.1/manual.html#5.4.1
 	pattern must contain at least 1 capture group; its content will end up in msg.argument after parseMessage()
 	PLAYERNAME will match anything that looks like a playername (see code for definition of PLAYERNAME_PATTERN); it is a capture group
 	if message does not contain a PLAYERNAME, add 'noplayername = true' to definition
 	it should be possible to add definitions to help debug widgets or whatever... (no guarantee)
+--]]
+MessageProcessor.MESSAGE_DEFINITIONS = {
+	{ msgtype = 'player_to_allies', pattern = '^<PLAYERNAME> Allies: (.*)' },
+	{ msgtype = 'player_to_player_received', pattern = '^<PLAYERNAME> Private: (.*)' }, -- TODO test!
+	{ msgtype = 'player_to_player_sent', pattern = '^You whispered PLAYERNAME: (.*)' }, -- TODO test!
+	{ msgtype = 'player_to_specs', pattern = '^<PLAYERNAME> Spectators: (.*)' },
+	{ msgtype = 'player_to_everyone', pattern = '^<PLAYERNAME> (.*)' },
+
+	{ msgtype = 'spec_to_specs', pattern = '^%[PLAYERNAME%] Spectators: (.*)' },
+	{ msgtype = 'spec_to_allies', pattern = '^%[PLAYERNAME%] Allies: (.*)' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
+	{ msgtype = 'spec_to_everyone', pattern = '^%[PLAYERNAME%] (.*)' },
+
+	-- shameful copy-paste -- TODO rewrite pattern matcher to remove this duplication
+	{ msgtype = 'replay_spec_to_specs', pattern = '^%[PLAYERNAME %(replay%)%] Spectators: (.*)' },
+	{ msgtype = 'replay_spec_to_allies', pattern = '^%[PLAYERNAME %(replay%)%] Allies: (.*)' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
+	{ msgtype = 'replay_spec_to_everyone', pattern = '^%[PLAYERNAME %(replay%)%] (.*)'},
+
+	{ msgtype = 'label', pattern = '^PLAYERNAME added point: (.+)', discard = true }, -- NOTE : these messages are discarded -- points and labels are provided through MapDrawCmd() callin
+	{ msgtype = 'point', pattern = '^PLAYERNAME added point: ', discard = true },
+	{ msgtype = 'autohost', pattern = '^> (.+)', noplayername = true },
+	{ msgtype = 'other' } -- no pattern... will match anything else
+}
+
+local function escapePatternReplacementChars(s)
+  return string.gsub(s, "%%", "%%%%")
+end
+
+function MessageProcessor:Initialize()
+	local escapedPlayernamePattern = escapePatternReplacementChars(PLAYERNAME_PATTERN)
+	for _,def in ipairs(self.MESSAGE_DEFINITIONS) do
+		if def.pattern then
+			def.pattern = def.pattern:gsub('PLAYERNAME', escapedPlayernamePattern) -- patch definition pattern so it is an actual lua pattern string
+		end
+	end
+end
+
+local players = {}
+
+local function getSource(spec, allyTeamId)
+	return (spec and 'spec')
+		or ((myAllyTeamId == allyTeamId) and 'ally')
+		or 'enemy'
+end
+
+-- update msg members msgtype, argument, source and playername (when relevant)
+function MessageProcessor:ParseMessage(msg)
+  for _, candidate in ipairs(self.MESSAGE_DEFINITIONS) do
+    if candidate.pattern == nil then -- for fallback/other messages
+      msg.msgtype = candidate.msgtype
+      msg.argument = msg.text
+	  msg.source = 'other'
+      return
+    end
+    local capture1, capture2 = msg.text:match(candidate.pattern)
+    if capture1 then
+      msg.msgtype = candidate.msgtype
+      if candidate.noplayername then
+        msg.argument = capture1
+		msg.source = 'other'
+		return
+	  else
+		local playername = capture1
+		if players[playername] then
+			local player = players[playername]
+			msg.source = getSource(player.spec, player.allyTeamId)
+			msg.playername = playername
+			msg.argument = capture2
+			return
+		end
+      end
+    end
+  end
+end
+
+function MessageProcessor:ProcessConsoleLine(msg, receiver)
+	self:ParseMessage(msg)
+		
+	if msg.msgtype == 'point' or msg.msgtype == 'label' then
+--	if MESSAGE_DEFINITIONS[msg.msgtype].discard then
+		-- ignore all console messages about points... those come in through the MapDrawCmd callin
+		return
+	end
+
+	receiver:AddConsoleMessage(msg)
+end
+
+MessageProcessor:Initialize()
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+-- message rules - widget stuff
+--[[
+each message definition can have:
+	- either 1 format
+	- either name + output, output containing pairs of { name = '', format = '' }
+all the names are used when displaying the options
 
 format syntax:
 - #x : switch to color 'x' where 'x' can be:
@@ -54,9 +155,10 @@ format syntax:
 	- msgtype	type of message as identified by parseMessage()
 	- priority	as received by widget:AddConsoleLine()
 	- text		full message, as received by widget:AddConsoleLine()
+
 --]]
-local MESSAGE_DEFINITIONS = {
-	{ msgtype = 'player_to_allies', pattern = '^<PLAYERNAME> Allies: (.*)', -- format = '#p<$playername> #a$argument',
+local MESSAGE_RULES = {
+	player_to_allies = {
 		name = "Player to allies message",
 		output = {
 			{
@@ -74,30 +176,49 @@ local MESSAGE_DEFINITIONS = {
 			},
 		}
 	},
-	{ msgtype = 'player_to_player_received', pattern = '^<PLAYERNAME> Private: (.*)', format = '#p*$playername* $argument' }, -- TODO test!
-	{ msgtype = 'player_to_player_sent', pattern = '^You whispered PLAYERNAME: (.*)', format = '#p -> *$playername* $argument' }, -- TODO test! NOTE: #p will be color of destination player!
-	{ msgtype = 'player_to_specs', pattern = '^<PLAYERNAME> Spectators: (.*)', format = '#p<$playername> #s$argument' },
-	{ msgtype = 'player_to_everyone', pattern = '^<PLAYERNAME> (.*)', format = '#p<$playername> #e$argument' },
+	player_to_player_received = { format = '#p*$playername* $argument' },
+	player_to_player_sent = { format = '#p -> *$playername* $argument' }, -- NOTE: #p will be color of destination player!
+	player_to_specs = { format = '#p<$playername> #s$argument' },
+	player_to_everyone = { format = '#p<$playername> #e$argument' },
 
-	{ msgtype = 'spec_to_specs', pattern = '^%[PLAYERNAME%] Spectators: (.*)', format = '#s[$playername] $argument' },
-	{ msgtype = 'spec_to_allies', pattern = '^%[PLAYERNAME%] Allies: (.*)', format = '#s[$playername] $argument' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
-	{ msgtype = 'spec_to_everyone', pattern = '^%[PLAYERNAME%] (.*)', format = '#s[$playername] #e$argument' },
+	spec_to_specs = { format = '#s[$playername] $argument' },
+	spec_to_allies = { format = '#s[$playername] $argument' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
+	spec_to_everyone = { format = '#s[$playername] #e$argument' },
 
-	-- shameful copy-paste -- TODO rewrite pattern matcher to remove this duplication
-	{ msgtype = 'replay_spec_to_specs', pattern = '^%[PLAYERNAME %(replay%)%] Spectators: (.*)', format = '#s[$playername (replay)] $argument' },
-	{ msgtype = 'replay_spec_to_allies', pattern = '^%[PLAYERNAME %(replay%)%] Allies: (.*)', format = '#s[$playername (replay)] $argument' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
-	{ msgtype = 'replay_spec_to_everyone', pattern = '^%[PLAYERNAME %(replay%)%] (.*)', format = '#s[$playername (replay)] #e$argument' },
+	-- shameful copy-paste -- TODO remove this duplication
+	replay_spec_to_specs = { format = '#s[$playername (replay)] $argument' },
+	replay_spec_to_allies = { format = '#s[$playername (replay)] $argument' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
+	replay_spec_to_everyone = { format = '#s[$playername (replay)] #e$argument' },
 
-	{ msgtype = 'label', pattern = '^PLAYERNAME added point: (.+)', format = '#p *L $playername added label \'$argument\'' }, -- NOTE : these messages are ignored -- points and labels are provided through MapDrawCmd() callin
-	{ msgtype = 'point', pattern = '^PLAYERNAME added point: ', format = '#p *L $playername added point' },
-	{ msgtype = 'autohost', pattern = '^> (.+)', format = '#o> $argument', noplayername = true },
-	{ msgtype = 'other', format = '#o$text' } -- no pattern... will match anything else
+	label = { format = '#p *** $playername added label \'$argument\'' },
+	point = { format = '#p *** $playername added point' },
+	autohost = { format = '#o> $argument', noplayername = true },
+	other = { format = '#o$text' } -- no pattern... will match anything else
 }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local HIGHLIGHT_SURROUND_SEQUENCE = ' ** '
+local SOUNDS = {
+	ally = "sounds/talk.wav",
+	label = "sounds/talk.wav",
+	highlight = "LuaUI/Sounds/communism/cash-register-01.wav" -- TODO find a better sound :)
+}
+
+local function PlaySound(id, condition)
+	if condition ~= nil and not condition then
+		return
+	end
+	local file = SOUNDS[id]
+	if file then
+		Spring.PlaySoundFile(file, 1, 'ui')
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local HIGHLIGHT_SURROUND_SEQUENCE = ' #### '
 local DEDUPE_SUFFIX = 'x '
 
 --------------------------------------------------------------------------------
@@ -166,7 +287,7 @@ options = {
 	highlighted_text_height = {
 		name = 'Highlighted Text Size',
 		type = 'number',
-		value = 16,
+		value = 18,
 		min = 8, max = 30, step = 1,
 		OnChange = onOptionsChanged,
 	},
@@ -360,7 +481,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- TODO : should these be moved to some shared file/library?
+-- TODO : should these pattern/escape functions be moved to some shared file/library?
 
 local function nocase(s)
   return string.gsub(s, "%a", function (c)
@@ -373,37 +494,21 @@ local function escapePatternMatchChars(s)
   return string.gsub(s, "(%W)", "%%%1")
 end
 
-local function escapePatternReplacementChars(s)
-  return string.gsub(s, "%%", "%%%%")
-end
-
 local function caseInsensitivePattern(s)
   return nocase(escapePatternMatchChars(s))
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
--- local PLAYERNAME_PATTERN = '[%%w%%[%%]_]+' -- doubled % as escape for gsub usage...
-local PLAYERNAME_PATTERN = escapePatternReplacementChars('([%w%[%]_]+)') -- to make message patterns easier to read/update
-
-function getMessageDefinitionOptionName(def, suboption)
-  return def.msgtype .. "_" .. suboption
+-- local widget only
+function getMessageRuleOptionName(msgtype, suboption)
+  return msgtype .. "_" .. suboption
 end
 
--- TODO move this to setup()?
-local MESSAGE_DEFINITIONS_BY_TYPE = {} -- message definitions indexed by msgtype
-for _,def in ipairs(MESSAGE_DEFINITIONS) do
-	MESSAGE_DEFINITIONS_BY_TYPE[def.msgtype] = def
-	if def.pattern then
-		def.pattern = def.pattern:gsub('PLAYERNAME', PLAYERNAME_PATTERN) -- patch definition pattern so it is an actual lua pattern string
-	end
-
-	if def.output and def.name then -- if definition has multiple output formats, make associated config option
-		local option_name = getMessageDefinitionOptionName(def, "output_format")
+for msgtype,rule in pairs(MESSAGE_RULES) do
+	if rule.output and rule.name then -- if definition has multiple output formats, make associated config option
+		local option_name = getMessageRuleOptionName(msgtype, "output_format")
 		options_order[#options_order + 1] = option_name
 		local o = {
-			name = "Format for " .. def.name,
+			name = "Format for " .. rule.name,
 			type = 'list',
 			OnChange = function (self)
 				Spring.Echo('Selected: ' .. self.value)
@@ -414,7 +519,7 @@ for _,def in ipairs(MESSAGE_DEFINITIONS) do
 			advanced = true,
 		}
 		
-		for i, output in ipairs(def.output) do
+		for i, output in ipairs(rule.output) do
 			o.items[i] = { key = i, name = output.name }
 			if output.default then
 				o.value = i
@@ -425,13 +530,16 @@ for _,def in ipairs(MESSAGE_DEFINITIONS) do
 end
 
 local function getOutputFormat(msgtype)
-  local def = MESSAGE_DEFINITIONS_BY_TYPE[msgtype]
-  if def.output then
-    local option_name = getMessageDefinitionOptionName(def, "output_format")
+  local rule = MESSAGE_RULES[msgtype]
+  if not rule then
+	Spring.Echo("UNKNOWN MESSAGE TYPE: " .. msgtype or "NiL")
+	return
+  elseif rule.output then -- rule has multiple user-selectable output formats
+    local option_name = getMessageRuleOptionName(msgtype, "output_format")
     local value = options[option_name].value
-    return def.output[value].format
-  else -- msgtype has only 1 format
-	return def.format
+    return rule.output[value].format
+  else -- rule has only 1 format defined
+	return rule.format
   end
 end
 
@@ -440,6 +548,7 @@ end
 
 -- TODO get rid of bogus color2incolor - http://springrts.com/phpbb/viewtopic.php?f=23&t=28208
 -- move to LuaUI/Chili/headers/util.lua or to LuaUI/modfonts.lua?
+-- also competing with bubbles::GetColorChar()
 local function color2textColor(r, g, b, a)
 
 	local function colorComponent(x)
@@ -462,73 +571,8 @@ local function color2textColor(r, g, b, a)
 	return '\255' .. colorComponent(r) .. colorComponent(g) .. colorComponent(b)
 end
 
-
-local players = {}
-
-local function setup()
-	--local textColorizer = WG.Chili.color2incolor
-	local textColorizer = color2textColor
-
-	incolor_dup			= textColorizer(options.color_dup.value)
-	incolor_highlight	= textColorizer(options.color_highlight.value)
-	incolors['#h']		= incolor_highlight
-	incolors['#a'] 		= textColorizer(options.color_ally.value)
-	incolors['#e'] 		= textColorizer(options.color_chat.value)
-	incolors['#o'] 		= textColorizer(options.color_other.value)
-	incolors['#s'] 		= textColorizer(options.color_spec.value)
-	
---	local myallyteamid = Spring.GetMyAllyTeamID()
-
-	local playerroster = Spring.GetPlayerList()
-	
-	for i, id in ipairs(playerroster) do
-		local name, _, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
-		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId }
--- Spring.Echo('################## ' .. id .. " name " .. name .. " teamId " .. teamId .. " ally " .. allyTeamId)
-		incolors[name] = spec and incolors['#s'] or textColorizer(Spring.GetTeamColor(teamId))
-	end
-
-	myName, _, _, _, myAllyTeamId = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) -- or do it in the loop?
-	highlightPattern = caseInsensitivePattern(myName)
-end
-
-local function getSource(spec, allyTeamId)
-	return (spec and 'spec')
-		or ((myAllyTeamId == allyTeamId) and 'ally')
-		or 'enemy'
-end
-
--- update msg members msgtype, argument, playername (when relevant)
-local function parseMessage(msg)
-  for _, candidate in ipairs(MESSAGE_DEFINITIONS) do
-    if candidate.pattern == nil then -- for fallback/other messages
-      msg.msgtype = candidate.msgtype
-      msg.argument = msg.text
-	  msg.source = 'other'
-      return
-    end
-    local capture1, capture2 = msg.text:match(candidate.pattern)
-    if capture1 then
-      msg.msgtype = candidate.msgtype
-      if candidate.noplayername then
-        msg.argument = capture1
-		msg.source = 'other'
-		return
---      elseif incolors[capture1] then -- check that a color is defined for this player in order to check that user exists... to avoid pitfalls such as <autoquit>
-	  -- FIXME TODO use something else...
-	  else
-		local playername = capture1
-		if players[playername] then
-			local player = players[playername]
-			msg.source = getSource(player.spec, player.allyTeamId)
-			msg.playername = playername
-			msg.argument = capture2
-			return
-		end
-      end
-    end
-  end
-end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function detectHighlight(msg)
 	-- must handle case where we are spec and message comes from player
@@ -553,9 +597,8 @@ local function detectHighlight(msg)
 end
 
 local function formatMessage(msg)
---	local def = MESSAGE_DEFINITIONS_BY_TYPE[msg.msgtype]
---	local format = def.format
-	local format = getOutputFormat(msg.msgtype)
+	local format = getOutputFormat(msg.msgtype) or getOutputFormat("other")
+	
 	local formatted, _ = format:gsub('([#%$]%w+)', function(parameter) -- FIXME pattern too broad for 1-char color specifiers
 			if parameter:sub(1,1) == '$' then
 				return msg[parameter:sub(2,parameter:len())]
@@ -569,26 +612,18 @@ local function formatMessage(msg)
 				return incolors[parameter]
 			end
 		end)
---[[
-	-- FIXME ensure no "injection" is possible -- do it in one pass...
-	local formatted, _ = format:gsub('%$(%w+)', msg)
-	formatted, _ = formatted:gsub('#(%w)', function(color)
-			if color == 'p' then
-				return incolors[msg.playername]
-			else
-				return incolors['$'..color]
-			end
-		end)
---]]
 	msg.formatted = formatted
 end
 
-local function displayMessage(msg, remake)
-	if (msg.msgtype == "spec_to_everyone" and options.hideSpec.value) -- can only hide spec when playing
+local function hideMessage(msg)
+	return (msg.msgtype == "spec_to_everyone" and options.hideSpec.value) -- can only hide spec when playing
 		or (msg.msgtype == "player_to_allies" and options.hideAlly.value)
 		or (msg.msgtype == "point" and options.hidePoint.value)
 		or (msg.msgtype == "label" and options.hideLabel.value)
-	then
+end
+
+local function displayMessage(msg, remake)
+	if hideMessage(msg)	then
 		return
 	end
 
@@ -639,7 +674,61 @@ local function displayMessage(msg, remake)
 end 
 
 
-function PopulateConsole()
+local function setupColors()
+	--local textColorizer = WG.Chili.color2incolor
+	local textColorizer = color2textColor
+
+	incolor_dup			= textColorizer(options.color_dup.value)
+	incolor_highlight	= textColorizer(options.color_highlight.value)
+	incolors['#h']		= incolor_highlight
+	incolors['#a'] 		= textColorizer(options.color_ally.value)
+	incolors['#e'] 		= textColorizer(options.color_chat.value)
+	incolors['#o'] 		= textColorizer(options.color_other.value)
+	incolors['#s'] 		= textColorizer(options.color_spec.value)
+end
+
+local function setupPlayers()
+	--local textColorizer = WG.Chili.color2incolor
+	local textColorizer = color2textColor
+	
+--	local myallyteamid = Spring.GetMyAllyTeamID()
+
+	local playerroster = Spring.GetPlayerList()
+	
+	for i, id in ipairs(playerroster) do
+		local name, _, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
+--		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId }
+-- Spring.Echo('################## ' .. id .. " name " .. name .. " teamId " .. teamId .. " ally " .. allyTeamId)
+		incolors[name] = spec and incolors['#s'] or textColorizer(Spring.GetTeamColor(teamId))
+	end
+end
+
+local function cawidget_setupPlayers()
+	local playerroster = Spring.GetPlayerList()
+	
+	for i, id in ipairs(playerroster) do
+		local name, _, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
+		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId }
+	end
+end
+
+
+local function setupMyself()
+	myName, _, _, _, myAllyTeamId = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) -- or do it in the loop?
+	highlightPattern = caseInsensitivePattern(myName)
+end
+
+local function setup()
+	setupMyself()
+	setupColors()
+	setupPlayers()
+	cawidget_setupPlayers()
+end
+
+
+function RemakeConsole()
+	setup()
+
 	stack_console:ClearChildren()
 	for i = 1, #messages do -- FIXME : messages collection changing while iterating (if max_lines option has been shrinked)
 		local msg = messages[i]
@@ -647,64 +736,10 @@ function PopulateConsole()
 	end	
 end
 
-function RemakeConsole()
-	setup()
-	PopulateConsole()
-end
-
-local function processMessage(msg)
-	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
-	and #messages > 0 and messages[#messages].text == msg.text then
-		messages[#messages].dup = messages[#messages].dup + 1
-		displayMessage(messages[#messages])
-		return
-	end
-	
-	msg.dup = 1
-	
-	if msg.point then
---		Spring.Echo('')
-	else
-		parseMessage(msg)
-		
-		if msg.msgtype == 'point' or msg.msgtype == 'label' then
-			-- ignore all console messages about points... those come in through the MapDrawCmd callin
-			return
-		end
-	end
-	detectHighlight(msg)
-	formatMessage(msg) -- does not handle dedupe or highlight
-	
-	messages[#messages + 1] = msg
-	displayMessage(msg)
-	
-	if (msg.msgtype == "player_to_allies" or msg.msgtype == "label") then  -- if ally message make sound
-		Spring.PlaySoundFile('sounds/talk.wav', 1, 'ui')
-	end
-
-	if msg.highlight and options.highlight_sound.value then
-		Spring.PlaySoundFile('LuaUI/Sounds/communism/cash-register-01.wav', 1, 'ui') -- TODO find a better sound :)
-	end
-	
-	-- TODO differentiate between children and messages (because some messages may be hidden, thus no associated children/TextBox)
-	while #messages > options.max_lines.value do
-		stack_console:RemoveChild(stack_console.children[1])
-		table.remove(messages, 1)
-		--stack_console:UpdateLayout()
-	end
-	
-	if playername == myName then
-		if WG.enteringText then
-			WG.enteringText = false
-			hideConsole()
-		end 		
-	end
-end
 
 -----------------------------------------------------------------------
 
 function widget:KeyPress(key, modifier, isRepeat)
-	
 	if (key == KEYSYMS.RETURN) then
 		if not WG.enteringText then 
 			if noAlly then
@@ -738,17 +773,18 @@ function widget:MapDrawCmd(playerId, cmdType, px, py, pz, caption)
 --	Spring.Echo("########### MapDrawCmd " .. playerId .. " " .. cmdType .. " coo="..px..","..py..","..pz .. (caption and (" caption " .. caption) or ''))
 	if (cmdType == 'point') then
 		widget:AddMapPoint(playerId, px, py, pz, caption) -- caption may be an empty string
+		-- FIXME return true or false?
 	end
 end
 
 function widget:AddMapPoint(playerId, px, py, pz, caption)
 	local playerName, active, spec, teamId, allyTeamId = Spring.GetPlayerInfo(playerId)
 
-	processMessage({
+	widget:AddConsoleMessage({
 		msgtype = ((caption:len() > 0) and 'label' or 'point'),
 		playername = playerName,
 		source = getSource(spec, allyTeamId),
-		text = 'MapDrawCmd '..caption,
+		text = 'MapDrawCmd ' .. caption,
 		argument = caption,
 		priority = 0, -- just in case ... probably useless
 		point = { x = px, y = py, z = pz }
@@ -758,14 +794,77 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:AddConsoleLine(text, priority)
-	processMessage({text = text, priority = priority})
+-- new callin! will remain in widget
+function widget:AddConsoleMessage(msg)
+	if ((msg.msgtype == "point" or msg.msgtype == "label") and options.dedupe_points.value or options.dedupe_messages.value)
+	and #messages > 0 and messages[#messages].text == msg.text then
+		messages[#messages].dup = messages[#messages].dup + 1
+		displayMessage(messages[#messages])
+		return
+	end
+	
+	msg.dup = 1
+	
+	detectHighlight(msg)
+	formatMessage(msg) -- does not handle dedupe or highlight
+	
+	messages[#messages + 1] = msg
+	displayMessage(msg)
+	
+	if msg.highlight and options.highlight_sound.value then
+		PlaySound("highlight")
+	elseif (msg.msgtype == "player_to_allies") then -- FIXME not for sent messages
+		PlaySound("ally")
+	elseif msg.msgtype == "label" then
+		PlaySound("label")
+	end
+	
+	-- TODO differentiate between children and messages (because some messages may be hidden, thus no associated children/TextBox)
+	while #messages > options.max_lines.value do
+		stack_console:RemoveChild(stack_console.children[1])
+		table.remove(messages, 1)
+		--stack_console:UpdateLayout()
+	end
+	
+	if playername == myName then
+		if WG.enteringText then
+			WG.enteringText = false
+			hideConsole()
+		end 		
+	end
 end
 
+-- old callin - move this to cawidget
+function widget:AddConsoleLine(text, priority)
+	msg = { text = text, priority = priority }
+	MessageProcessor:ProcessConsoleLine(msg, self)
+end
+
+function widget:LoadConsoleBuffer(count)
+	local bufferMessages = Spring.GetConsoleBuffer(count)
+	for i = 1,#bufferMessages do
+		MessageProcessor:ProcessConsoleLine(bufferMessages[i], self)
+	end
+end
 
 -----------------------------------------------------------------------
 
 local timer = 0
+
+local function CheckColorScheme() --//toggle between color scheme
+	local currentColorScheme = wasSimpleColor 
+	if WG.LocalColor then
+		currentColorScheme = WG.LocalColor.usingSimpleTeamColors	
+	end
+	if wasSimpleColor ~= currentColorScheme then
+		onOptionsChanged()
+		wasSimpleColor = currentColorScheme
+	end
+end
+
+-----------------------------------------------------------------------
+
+-- FIXME wtf is this obsessive function?
 function widget:Update(s)
 	timer = timer + s
 	if timer > 2 then
@@ -774,6 +873,7 @@ function widget:Update(s)
 			window_console.x / screen0.width + 0.004, 
 			1 - (window_console.y + window_console.height) / screen0.height + 0.005, 
 			window_console.width / screen0.width)})
+		CheckColorScheme()
 	end
 end
 
@@ -906,20 +1006,12 @@ function widget:Initialize()
 	}
 	
 	RemakeConsole()
-
-	local bufferMessages = Spring.GetConsoleBuffer(options.max_lines.value)
-	for i = 1,#bufferMessages do
-		processMessage(bufferMessages[i])
-	end
+	self:LoadConsoleBuffer(options.max_lines.value)
 	
 	Spring.SendCommands({"console 0"})
 	
 	screen0:AddChild(window_console)
-        visible = true
-	
-	WG.LocalColor = WG.LocalColor or {}
-	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
-	WG.LocalColor.listeners["Chili Chat"] = onOptionsChanged
+    visible = true
 end
 
 -----------------------------------------------------------------------
@@ -928,10 +1020,6 @@ function widget:Shutdown()
 	if (window_console) then
 		window_console:Dispose()
 	end
-	Spring.SendCommands({"console 1"}, {"inputtextgeo default"}) -- not saved to spring's config file on exit
+	Spring.SendCommands({"console 1", "inputtextgeo default"}) -- not saved to spring's config file on exit
 	Spring.SetConfigString("InputTextGeo", "0.26 0.73 0.02 0.028") -- spring default values
-	
-	if WG.LocalColor and WG.LocalColor.listeners then
-		WG.LocalColor.listeners["Chili Chat"] = nil
-	end
 end
