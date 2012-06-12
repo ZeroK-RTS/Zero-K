@@ -287,7 +287,7 @@ options = {
 	highlighted_text_height = {
 		name = 'Highlighted Text Size',
 		type = 'number',
-		value = 18,
+		value = 16,
 		min = 8, max = 30, step = 1,
 		OnChange = onOptionsChanged,
 	},
@@ -1012,6 +1012,10 @@ function widget:Initialize()
 	
 	screen0:AddChild(window_console)
     visible = true
+	
+	WG.LocalColor = WG.LocalColor or {}
+	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
+	WG.LocalColor.listeners[widget:GetInfo().name] = onOptionsChanged
 end
 
 -----------------------------------------------------------------------
@@ -1022,4 +1026,8 @@ function widget:Shutdown()
 	end
 	Spring.SendCommands({"console 1", "inputtextgeo default"}) -- not saved to spring's config file on exit
 	Spring.SetConfigString("InputTextGeo", "0.26 0.73 0.02 0.028") -- spring default values
+	
+	if WG.LocalColor and WG.LocalColor.listeners then
+		WG.LocalColor.listeners[widget:GetInfo().name] = nil
+	end
 end
