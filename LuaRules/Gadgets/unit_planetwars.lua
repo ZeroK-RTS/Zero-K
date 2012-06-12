@@ -190,7 +190,7 @@ function gadget:Initialize()
 			end
 		end
 		if err then 
-			Spring.Echo('Planetwars error: ' .. err)
+			Spring.Echo('Planetwars warning: ' .. err)
 		end
 
 		if not unitData then 

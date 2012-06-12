@@ -57,7 +57,7 @@ else
 	end
 end
 if err then 
-	Spring.Echo('Modular Comms error: ' .. err)
+	Spring.Echo('Modular Comms warning: ' .. err)
 end
 
 if not commData then commData = {} end
