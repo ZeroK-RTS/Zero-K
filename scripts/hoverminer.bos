@@ -1,6 +1,6 @@
 #include "constants.h"
 
-piece  base, flare, exhaust, wake1, wake2, wake3, wake4,
+piece  base, flare, wake1, wake2, wake3, wake4,
        wake5, wake6, wake7, wake8, ground1;
 
 static-var  Static_Var_1, wobble, random;
