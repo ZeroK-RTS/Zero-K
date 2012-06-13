@@ -146,7 +146,8 @@ end
 
 
 function Take()
-  Spring.SendCommands("take")
+  --Spring.SendCommands("take")
+  Spring.SendLuaUIMsg("TAKE")
   return
 end
 
@@ -328,3 +329,8 @@ function widget:GameStart()
   widget:PlayerChanged()
 end
 
+function widget:AddConsoleLine(line,priority)
+	if (line:sub(1,20) == "Giving all units of ") then --needed to function properly with "game_lagmonitor.lua". Used to re-display the "take button"/the blipping neon-light if there's more unit to take.
+		widget:PlayerChanged()
+	end
+end

@@ -13,7 +13,22 @@ function gadget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
---Revision 26-th?
+--Revision 27-th?
+--------------------------------------------------------------------------------
+--List of stuff in this gadget (to help us remember stuff for future debugging/improvement):
+
+--Main logic:
+--1) Periodic(CheckAFK & Ping) ---> mark player as AFK/Lagging --->  Check if player has Shared Command --> Check for Candidate with highest ELO -- > Loop(send unit away to candidate & remember unit Ownership).
+--2) Periodic(CheckAFK & Ping) ---> IF AFK/Lagger is no longer lagging --> Return all units & delete unit Ownership.
+
+--Other logics:
+--1) If Owner's builder (constructor) created a unit --> Owner inherit the ownership to that unit
+--2) If Taker finished an Owner's unit --> the unit belong to Taker
+--3) wait 3 strike (3 time AFK & Ping) before --> mark player as AFK/Lagging
+--4) being AFK/Lag --> deduct the perceived ELO by 250 each
+--5) request "TAKE" --> temporary increase the perceived ELO by 250
+
+--Everything else: anti-bug, syntax, methods, ect
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
   
@@ -26,8 +41,9 @@ end
 --------------------------------------------------------------------------------
 local lineage = {}
 local afkTeams = {}
-local tickTockCounter = {} --remember how many second a player is in AFK mode. Used to add delay before unit transfer commence. 
-local unstablePlayerCounter = {} --remember how many times a player was AFK. Used to de-merit a player from receiving any units.
+local tickTockCounter = {} --remember how many second a player is in AFK mode. To add delay before unit transfer commence. 
+local unstablePlayerCounter = {} --remember how many times a player was AFK. To de-merit laggy player from receiving any units.
+local playerWantTake = {} --player who request for a "take". To add-merit for who want to receive unit.
 local unitAlreadyFinished = {}
 
 GG.Lagmonitor_activeTeams = {}
@@ -50,7 +66,7 @@ local AFK_THRESHOLD = 30
 --------------------------------------------------------------------------------
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	lineage[unitID] = nil
+	lineage[unitID] = nil --to delete any units that do not need returning.
 	unitAlreadyFinished[unitID] = nil
 end
 
@@ -60,14 +76,14 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if builderID ~= nil then
 		local originalTeamID = lineage[builderID]
 		if originalTeamID ~= nil then
-			lineage[unitID] = originalTeamID
+			lineage[unitID] = originalTeamID --to return newly created unit to the owner of the construction-unit.
 		end
 	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam) --player who finished a unit will own that unit; its lineage will be deleted and the unit will never be returned to the lagging team.
 	if lineage[unitID] and (not unitAlreadyFinished[unitID]) and not (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory) then
-		lineage[unitID] = nil
+		lineage[unitID] = nil --to relinguish ownership of the unit when another player finishes the unit
 	end
 	unitAlreadyFinished[unitID] = true -- reverse build
 end
@@ -87,12 +103,14 @@ local pActivity = {}
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("AFK",1,true) then
 		pActivity[playerID] = tonumber(msg:sub(4))
-	end 
+	elseif msg:find("TAKE",1,true) then
+		playerWantTake[playerID]= 250
+	end
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local UPDATE_PERIOD = 50	-- gameframes
+local UPDATE_PERIOD = 50	-- gameframes, 1.67 second
 
 
 local function GetRecepient(allyTeam, laggers)
@@ -104,9 +122,11 @@ local function GetRecepient(allyTeam, laggers)
 	for i=1,#teams do
 		local leader = select(2, Spring.GetTeamInfo(teams[i]))
 		local name, active, spectator, _, _, _, _, _, _, customKeys = Spring.GetPlayerInfo(leader)
-		local deductElo = (unstablePlayerCounter[leader] or 0)*250
+		local deductElo = (unstablePlayerCounter[leader] or 0)*250 --unstable player is deducted 250*times-lagging ELO
+		local addElo = (playerWantTake[leader] or 0) --player who want a "take" is added 250 ELO
+		playerWantTake[leader] = 0 --reset value
 		if active and not spectator and not laggers[leader] then	-- only consider giving to someone in position to take!
-			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0) - deductElo)}
+			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0) - deductElo + addElo)}
 		end
 	end
 
@@ -159,7 +179,7 @@ function gadget:GameFrame(n)
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
 					tickTockCounter[players[i]] = (tickTockCounter[players[i]] or 0) + 1 --tick tock clock ++
-					if tickTockCounter[players[i]] >= 2 then --allow team to be tagged as AFK after 3 passes (3x50frame = 5 second).
+					if tickTockCounter[players[i]] >= 2 or (afk > AFK_THRESHOLD) then --allow team to be tagged as lagging only after 3 passes (3x50frame = 5 second).
 						local units = Spring.GetTeamUnits(team)
 						if units ~= nil and #units > 0 then 
 							laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
@@ -199,13 +219,13 @@ function gadget:GameFrame(n)
 					afkTeams[team] = true --mark team as AFK
 					local units = data.units or {}
 					if #units > 0 then -- transfer units when number of units in AFK team is > 0
-						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")
 						GG.allowTransfer = true
 						local spTransferUnit = Spring.TransferUnit
 						for j=1,#units do
 							lineage[units[j]] = (lineage[units[j]] or team) --set the lineage to the original owner, but if owner is "nil" then use the current (lagging team) as the original owner & then send the unit away...
 							spTransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
 						end
+						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")
 						GG.allowTransfer = false
 					end
 				end	-- if
