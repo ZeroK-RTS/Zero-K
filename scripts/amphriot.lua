@@ -196,11 +196,11 @@ function script.FireWeapon(num)
 		gun_1 = gun_1 + 1
 		if gun_1 > 4 then gun_1 = 1 end
 	elseif num == 2 then
-		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < -8 then
-			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz)
+		local px, py, pz = Spring.GetUnitPosition(unitID)
+		if py < -8 then
+			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 8, px, py, pz)
 		else
-			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz)
+			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 8, px, py, pz)
 		end
 	end
 end

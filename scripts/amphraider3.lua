@@ -157,11 +157,11 @@ function script.FireWeapon(num)
 	local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
     Spring.SetUnitWeaponState(unitID, toChange-1, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
 	if num == 2 then
-		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < -8 then
-			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 10, px, py, pz)
+		local px, py, pz = Spring.GetUnitPosition(unitID)
+		if py < -8 then
+			Spring.PlaySoundFile("sounds/weapon/torpedo.wav", 8, px, py, pz)
 		else
-			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 10, px, py, pz)
+			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 8, px, py, pz)
 		end
 	end
 end

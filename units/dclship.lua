@@ -102,6 +102,7 @@ unitDef = {
       soundHit                = [[explosion/wet/ex_underwater]],
       soundStart              = [[weapon/torp_land]],
       startVelocity           = 120,
+	  soundStartVolume        = 8,
       tolerance               = 8000,
       tracks                  = true,
       turnRate                = 20000,
