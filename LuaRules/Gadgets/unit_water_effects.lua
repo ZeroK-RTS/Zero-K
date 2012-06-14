@@ -18,6 +18,8 @@ if (not gadgetHandler:IsSyncedCode()) then
     return
 end
 
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -96,20 +98,28 @@ function gadget:GameFrame(n)
 
 			if Spring.ValidUnitID(unitID) then
 				local height = select(2, Spring.GetUnitBasePosition(unitID))
-
-				if height < 0 then
+				local stunned_or_inbuild = spGetUnitIsStunned(unitID)
+				if not stunned_or_inbuild then
 					if data.storage and data.storage ~= effect.tankMax then
-						data.storage = data.storage + math.min(-height,effect.submergedAt)*effect.tankRegenRate*SECOND_MULT/effect.submergedAt
+						local regenHeight = -height
+						if regenHeight > effect.submergedAt then
+							regenHeight = effect.submergedAt
+						end
+						if regenHeight < effect.baseHeight then
+							regenHeight = effect.baseHeight
+						end
+						data.storage = data.storage + regenHeight*effect.tankRegenRate*SECOND_MULT/effect.submergedAt
 						if data.storage > effect.tankMax then
 							data.storage = effect.tankMax
 						end
 						Spring.SetUnitRulesParam(unitID,"watertank",data.storage, {inlos = true})
 						updateWeaponFromTank(unitID)
 					end
-					
-					local hp, maxHp = Spring.GetUnitHealth(unitID)
-					local newHp = hp + math.min(-height,effect.submergedAt)*effect.healthRegen*SECOND_MULT/effect.submergedAt
-					Spring.SetUnitHealth(unitID, newHp) 
+					if height < 0 then
+						local hp, maxHp = Spring.GetUnitHealth(unitID)
+						local newHp = hp + math.min(-height,effect.submergedAt)*effect.healthRegen*SECOND_MULT/effect.submergedAt
+						Spring.SetUnitHealth(unitID, newHp) 
+					end
 				end
 				i = i + 1
 			else

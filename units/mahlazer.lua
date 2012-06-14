@@ -139,17 +139,17 @@ unitDef = {
 
 
     RELAY    = {
-      name                    = [[MAH RELAY LAZER (fake weapon)]],
+      name                    = [[Mah Relay Lazor]],
       alwaysVisible           = 18,
-      areaOfEffect            = 32,
+      areaOfEffect            = 56,
       avoidFeature            = false,
       avoidNeutral            = false,
       beamlaser               = 1,
       beamTime                = 0.001,
       canattackground         = false,
       coreThickness           = 0.5,
-      craterBoost             = 1,
-      craterMult              = 2,
+      --craterBoost             = 2,
+      --craterMult              = 4,
       cylinderTargetting      = 8192,
 
       damage                  = {
@@ -157,9 +157,7 @@ unitDef = {
         planes  = 100,
       },
 
-      endsmoke                = [[0]],
-      explosionGenerator      = [[custom:NONE]],
-      impactOnly              = true,
+      explosionGenerator      = [[custom:FLASHLAZER]],
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -167,10 +165,11 @@ unitDef = {
       laserFlareSize          = 12,
       minIntensity            = 1,
       range                   = 9000,
-      reloadtime              = 7,
+      reloadtime              = 0.03,
       rgbColor                = [[0.25 0 1]],
+      soundStart              = [[weapon/laser/laser_burn6]],
+      soundStartVolume        = 1,
       soundTrigger            = true,
-      startsmoke              = [[0]],
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],

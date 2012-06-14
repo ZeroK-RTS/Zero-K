@@ -46,7 +46,7 @@ unitDef = {
   idleTime               = 1800,
   mass                   = 208,
   maxDamage              = 1100,
-  maxVelocity            = 4.0,
+  maxVelocity            = 3.9,
   minCloakDistance       = 75,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
@@ -92,8 +92,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 180,
-        subs    = 9,
+        default = 190,
+        subs    = 9.5,
       },
 
       explosionGenerator      = [[custom:DEFAULT]],
@@ -105,7 +105,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_maverick.s3o]],
       pitchtolerance          = [[12000]],
-      range                   = 320,
+      range                   = 340,
       reloadtime              = 4,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],

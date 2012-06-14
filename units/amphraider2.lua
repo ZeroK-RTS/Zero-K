@@ -90,13 +90,13 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams            = {
-	    impulse = [[15]],
+	    impulse = [[20]],
 		normaldamage = [[1]],
 	  },
 	  
       damage                  = {
-        default = 0.6,
-        planes  = 0.6,
+        default = 0.7,
+        planes  = 0.7,
         subs    = 0.01,
       },
 

@@ -13,6 +13,7 @@ local unitDefData = {
 		tankRegenRate = 14,
 		healthRegen = 20,
 		submergedAt = 40,
+		baseHeight = 5,
 	},
 	[UnitDefNames["amphcon"].id] = {
 		healthRegen = 20,
