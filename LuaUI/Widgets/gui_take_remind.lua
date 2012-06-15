@@ -146,8 +146,8 @@ end
 
 
 function Take()
-  --Spring.SendCommands("take")
-  Spring.SendLuaUIMsg("TAKE")
+  Spring.SendCommands("take")
+  --Spring.SendLuaUIMsg("TAKE")
   return
 end
 
