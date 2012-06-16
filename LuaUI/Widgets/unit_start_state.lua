@@ -36,7 +36,7 @@ local function IsGround(ud)
 end
 
 options_path = 'Game/Unit AI/Initial States'
-options_order = { 'presetlabel', 'holdPosition', 'commander_label', 'commander_firestate', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_retreat'}
+options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_retreat'}
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
@@ -44,11 +44,8 @@ options = {
 		type='button',
 		name= "Hold Position",
 		desc = "Set all land units to hold position",
+		path = "Game/Unit AI/Initial States/Presets",
 		OnChange = function ()
-			--[[
-            rememberToSetHoldPositionPreset = true
-			--]]
-			
 			for i = 1, #options_order do
 				local opt = options_order[i]
 				local find = string.find(opt, "_movestate1")
@@ -57,6 +54,45 @@ options = {
 				if ud and not holdPosException[name] and IsGround(ud) then
 					options[opt].value = 0
 					--return
+				end
+			end
+			
+        end,
+	},
+	
+	categorieslabel = {name = "presetlabel", type = 'label', value = "Categories", path = options_path},
+	
+	disableTacticalAI = {
+		type='button',
+		name= "Disable Tactical AI",
+		desc = "Disables tactical AI (jinking and skirming) for all units.",
+		path = "Game/Unit AI/Initial States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_tactical_ai")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = false
+				end
+			end
+			
+        end,
+	},
+	enableTacticalAI = {
+		type='button',
+		name= "Enable Tactical AI",
+		desc = "Enables tactical AI (jinking and skirming) for all units.",
+		path = "Game/Unit AI/Initial States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_tactical_ai")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = true
 				end
 			end
 			
