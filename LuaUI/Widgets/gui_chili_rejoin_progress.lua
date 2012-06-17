@@ -1,14 +1,14 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v0.99 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.0 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
     date      = "June 17, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
     enabled   = true, --  loaded by default?
-	handler = true, -- allow this widget to use 'widgetHandler:FindWidget()'
+	--handler = true, -- allow this widget to use 'widgetHandler:FindWidget()'
   }
 end
 
@@ -45,7 +45,7 @@ local simpleMovingAverageLocalSpeed_G = {storage={},currentIndex = 1, currentAve
 local myTimestamp_G = {} --//variable: store my own timestamp at GameStart
 local serverFrameNum2_G = nil --//variable: the expected server-frame of current running game
 local submittedTimestamp_G = {} --//variable: store all timestamp at GameStart submitted by original players (assuming we are rejoining)
---local functionContainer_G = function(x) end --//variable object: store a function 
+local functionContainer_G = function(x) end --//variable object: store a function 
 --------------------------------------------------------------------------------
 --[[
 if VFS.FileExists("Luaui/Config/ZK_data.lua") then
@@ -137,18 +137,17 @@ function widget:Update(dt)
 		end
 	end
 end
---[[
+
 local function RemoveLUARecvMsg(n)
 	if n > 150 then
 		widgetHandler:RemoveCallIn("RecvLuaMsg") --remove unused method for increase efficiency after frame> timestampLimit (150frame or 5 second).
 		functionContainer_G = function(x) end --replace this function with an empty function/method
 	end 
 end
---]]
 
 function widget:GameFrame(n)
 	myGameFrame_G = n
-	--functionContainer_G(n) --function that are able to remove itself. Reference: gui_take_reminder.lua (widget by EvilZerggin, modified by jK)
+	functionContainer_G(n) --function that are able to remove itself. Reference: gui_take_reminder.lua (widget by EvilZerggin, modified by jK)
 end
 
 --//thanks to Rafal[0K] for pointing to the rolling average idea.
@@ -168,11 +167,18 @@ end
 
 function CheckTTSwidget()
 	local ttsValue
-	local widget = widgetHandler:FindWidget("Text To Speech Control") --Reference: gui_epicmenu.lua by Carrepairer/Wagonrepairer
+	--[[
+	local widget = widgetHandler:FindWidget("Text To Speech Control") --find widget. Reference: gui_epicmenu.lua by Carrepairer/Wagonrepairer
 	if widget then --get all variable from TTS control widget.
 		ttsValue = widget.options.enable.value --get the value
 	else --If widget is not found, then 'Rejoin Progress widget' will not try to disable/enable TTS. It became neutral.
 		ttsValue = false --disable TTS control
+	end
+	--]]
+	if WG.textToSpeechCtrl then
+		ttsValue = WG.textToSpeechCtrl.ttsEnable --retrieve Text-To-Speech widget settings from global table.
+	else
+		ttsValue = false
 	end
 	return ttsValue
 end
@@ -282,16 +288,20 @@ function widget:RecvLuaMsg(bigMsg, playerID)
 		
 		local timeMsg = bigMsg:sub(10) --saperate time-message from the identifier
 		local dayHour, dayMinute = ExtractTimestampNumber(timeMsg)
+		--Spring.Echo(timeMsg .. " " .. dayHour .." " .. dayMinute .. "B")
 		submittedTimestamp[#submittedTimestamp +1] = {dayHour,dayMinute} --store all submitted timestamp from each players
 		local sumHour, sumMinute = 0,0
 		for i=1, #submittedTimestamp,1 do
 			sumHour = sumHour + submittedTimestamp[i][1]
-			sumMinute = sumMinute + submittedTimestamp[i][1]
+			sumMinute = sumMinute + submittedTimestamp[i][2]
 		end
+		--Spring.Echo(sumHour .. " " .. sumMinute .. "C")
 		local avgHour = sumHour/#submittedTimestamp
 		local avgMinute = sumMinute/#submittedTimestamp
+		--Spring.Echo(avgHour .. " " .. avgMinute .. "D")
 		local hourDiff = myTimestamp[1] - avgHour
 		local minuteDiff = myTimestamp[2] - avgMinute
+		--Spring.Echo(hourDiff .. " " .. minuteDiff .. "E")
 		local frameDiff = (hourDiff*3600 + minuteDiff*60)*30 --(3600sec*hours + 60sec*minutes) = total-second, then 30frame*total-second
 
 		local serverFrameNum2 = frameDiff --this value represent the estimate difference in frame when everyone was submitting their timestamp at game start. Therefore the difference in frame will represent how much frame current player are ahead of us.
@@ -310,6 +320,7 @@ function widget:GameStart()
 	local currentTime = os.date("%H:%M") --Reference: clock on "gui_epicmenu.lua" (widget by CarRepairer)
 	local dayHour, dayMinute = ExtractTimestampNumber(currentTime)
 	local myTimestamp = {dayHour, dayMinute}
+	--Spring.Echo(currentTime .. " " .. dayHour .." " .. dayMinute .. "A")
 	local timestampMsg = "rejnProg " .. currentTime --create a timestamp message
 	Spring.SendLuaUIMsg(timestampMsg) --this message will remain in server's cache as a LUA message which rejoiner can intercept. Thus allowing the game to leave a clue at game start for latecomer.  The latecomer will compare the previous timestamp with present and deduce the catch-up time.
 

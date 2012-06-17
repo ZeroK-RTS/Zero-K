@@ -22,20 +22,24 @@ local function SetupTTS(enable)
 	end 
 end 
 
-
 options_path = 'Settings/Audio'
-options_order = { 'enable'}
+options_order = {'enable'}
 options = {
-	enable = {name = "Text-To-Speech (with Zero-K lobby only)", type = 'bool', value = true, 
-	
-	OnChange = function(self)
+	enable ={	
+		name = "Text-To-Speech (with Zero-K lobby only)", 
+		type = 'bool', value = true, 
+		OnChange = function(self)
 			SetupTTS(self.value)
+			WG.textToSpeechCtrl = {ttsEnable = self.value,}
 		end,
-
 	},
 }
 
 function widget:Initialize()
 	SetupTTS(options.enable.value)
+	WG.textToSpeechCtrl = {ttsEnable = options.enable.value,} --allow other widget to get value from this widget. ie: gui_chili_rejoin_progress.lua. We didn't declare it at outside because we doesn't want "WG.textToSpeechCtrl" to be initialize first without widget being enabled first.
 end 
 
+function widget:Shutdown()
+	WG.textToSpeechCtrl = nil
+end
