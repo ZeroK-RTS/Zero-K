@@ -79,12 +79,9 @@ local function ProcessComm(name, config)
 		cp.basehp = tostring(commDefs[name].maxdamage)
 		for i,v in pairs(commDefs[name].weapondefs or {}) do
 			v.customparams = v.customparams or {}
-			v.customparams.baserange = tostring(v.range)
-			v.customparams.basereload = tostring(v.reloadtime)
-			for armorname,dmg in pairs(v.damage) do
-				v.customparams["basedamage_"..armorname] = tostring(dmg)
-				--Spring.Echo(armorname, v.customparams["basedamage_"..armorname])
-			end
+			v.customparams.rangemod = 0
+			v.customparams.reloadmod = 0
+			v.customparams.damagemod = 0
 		end
 
 		local attributeMods = { -- add a mod for everythings that can have a negative adjustment
@@ -218,13 +215,13 @@ end
 -- postprocessing
 for name, data in pairs(commDefs) do
 	--Spring.Echo("\tPostprocessing commtype: ".. name)
+	
 	-- apply intrinsic bonuses
-	if data.customparams.damagebonus then
-		ModifyWeaponDamage(data, data.customparams.damagebonus)
-	end
-	if data.customparams.rangebonus then
-		ModifyWeaponRange(data, data.customparams.rangebonus)
-	end	
+	local damBonus = data.customparams.damagebonus or 0
+	ModifyWeaponDamage(data, damBonus, true)
+	local rangeBonus =  data.customparams.rangebonus or 0
+	ModifyWeaponRange(data, rangeBonus, true)
+
 	if data.customparams.speedbonus then
 		commDefs[name].maxvelocity = commDefs[name].maxvelocity + (commDefs[name].customparams.basespeed*data.customparams.speedbonus)
 	end

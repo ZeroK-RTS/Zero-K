@@ -85,12 +85,10 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 		unitDef.sfxtypes.explosiongenerators[mapWeaponToCEG[slot][2]] = wcp.muzzleeffectshot or [[custom:NONE]]
 	end
 	
-	--base customparams
-	wcp.baserange = tostring(wd.range)
-	for armorname,dmg in pairs(wd.damage) do
-		wcp["basedamage_"..armorname] = tostring(dmg)
-		--Spring.Echo(armorname, v.customparams["basedamage_"..armorname])
-	end
+	local wcp2 = unitDef.weapondefs[weapon].customparams
+	wcp2.rangemod = 0
+	wcp2.reloadmod = 0
+	wcp2.damagemod = 0
 	
 	if (not isDgun) and not dualwield then
 		unitDef.customparams.alreadyhasweapon = true
@@ -108,18 +106,26 @@ function ReplaceWeapon(unitDef, oldWeapon, newWeapon)
 	end
 end
 
-function ModifyWeaponRange(unitDef, factor)
+function ModifyWeaponRange(unitDef, factor, includeCustomParams)
 	local weapons = unitDef.weapondefs or {}
 	for i,v in pairs(weapons) do
-		if v.range then v.range = v.range + (v.customparams.baserange or v.range) * factor end
+		local mod = factor
+		if includeCustomParams then
+			mod = mod + v.customparams.rangemod
+		end
+		if v.range then v.range = v.range * (mod + 1) end
 	end
 end
 
-function ModifyWeaponDamage(unitDef, factor)
+function ModifyWeaponDamage(unitDef, factor, includeCustomParams)
 	local weapons = unitDef.weapondefs or {}
 	for i,v in pairs(weapons) do
+		local mod = factor
+		if includeCustomParams then
+			mod = mod + v.customparams.damagemod
+		end
 		for armorname, dmg in pairs(v.damage) do
-			v.damage[armorname] = dmg + (v.customparams['basedamage_'..armorname] or dmg) * factor
+			v.damage[armorname] = dmg + dmg * mod
 		end
 	end
 end

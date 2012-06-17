@@ -198,6 +198,7 @@ local base = {
 			"module_superspeed",
 			"module_super_nano",
 			"module_ablative_armor",
+			"module_dmg_booster",
 		}
 	},
 	{
@@ -220,6 +221,8 @@ local base = {
 		modules = {
 			"commweapon_flamethrower",
 			"commweapon_flamethrower",
+			"module_dmg_booster",
+			"module_dmg_booster",
 		}
 	},
 	

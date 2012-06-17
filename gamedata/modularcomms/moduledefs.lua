@@ -169,7 +169,6 @@ upgrades = {
 						v.customparams.misceffect = nil
 						v.projectiles = v.projectiles * 0.75
 						v.reloadtime = v.reloadtime * 0.6
-						v.customparams.basereload = v.reloadtime
 						--break
 					end
 				end
@@ -218,10 +217,8 @@ upgrades = {
 				for i,v in pairs(weapons) do
 					if permitted[i] then
 						v.range = v.range * 1.15
-						v.customparams.baserange = v.range
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.15
-							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 						end
 					end
 				end
@@ -243,11 +240,9 @@ upgrades = {
 					if permitted[i] then
 						if not (i == "commweapon_partillery" or i == "commweapon_partillery_napalm") then
 							v.reloadtime = v.reloadtime * 2
-							v.customparams.basereload = v.reloadtime
 							v.customparams.highcaliber = true
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 2.5
-								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 							end
 						else
 							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_hpartillery")
@@ -267,12 +262,9 @@ upgrades = {
 				for i,v in pairs(weapons) do
 					if i == "commweapon_rocketlauncher" then
 						v.range = v.range * 1.5
-						v.customparams.baserange = v.range
 						v.reloadtime = v.reloadtime * 1.5
-						v.customparams.basereload = v.reloadtime
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.25
-							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 						end						
 						v.model = [[wep_m_dragonsfang.s3o]]
 						v.soundhitvolume = 8
@@ -281,12 +273,9 @@ upgrades = {
 						--break
 					elseif i == "commweapon_missilelauncher" then
 						v.range = v.range * 1.5
-						v.customparams.baserange = v.range
 						v.reloadtime = v.reloadtime * 1.5
-						v.customparams.basereload = v.reloadtime
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.25
-							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 						end						
 						v.model = [[wep_m_phoenix.s3o]]
 						v.soundhitvolume = 5
@@ -305,7 +294,6 @@ upgrades = {
 					if i == "commweapon_lightninggun" then
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.25
-							v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 						end
 						v.customparams["extra_damage_mult"] = 0.32	-- same real damage
 						v.paralyzetime = 3
@@ -329,7 +317,6 @@ upgrades = {
 						if (i == "commweapon_riotcannon") then	-- -20% damage
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 0.8
-								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 							end
 							v.customparams.burntime = "420"
 							v.rgbcolor = [[1 0.3 0.1]]
@@ -342,7 +329,6 @@ upgrades = {
 						else	-- -25% damage, 128 AoE
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 0.75
-								v.customparams["basedamage_"..armorname] = tostring(v.damage[armorname])
 							end
 							v.customparams.burntime = "450"
 							v.areaofeffect = 128
@@ -366,10 +352,8 @@ upgrades = {
 				for i,v in pairs(weapons) do
 					if i == "commweapon_heatray" then
 						v.range = v.range * 1.3
-						v.customparams.baserange = tostring(v.range)
 					elseif i == "commweapon_riotcannon" then
 						v.range = v.range * 1.3
-						v.customparams.baserange = tostring(v.range)
 					end
 				end
 			end,	
@@ -389,7 +373,7 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					if v.range then v.range = v.range + (v.customparams.baserange or v.range) * 0.1 end
+					v.customparams.rangemod = v.customparams.rangemod + 0.1
 				end
 			end,	
 	},
@@ -421,9 +405,7 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					for armorname, dmg in pairs(v.damage) do
-						v.damage[armorname] = dmg + (v.customparams["basedamage_"..armorname] or dmg) * 0.1
-					end
+					v.customparams.damagemod = v.customparams.damagemod + 0.1
 				end
 			end,	
 	},
