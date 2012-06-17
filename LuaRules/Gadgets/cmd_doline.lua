@@ -28,11 +28,6 @@ end
 --------------------------------------------------------------------------------
 
 local function AllowAction(playerID)
-  if ((playerID ~= 0) and
-      (playerID ~= 255)) then -- FIXME -- 255 for 0.76b1+ code?
-    Spring.SendMessageToPlayer(playerID, "Must be the host player")
-    return false
-  end
   if (not Spring.IsCheatingEnabled()) then
     Spring.SendMessageToPlayer(playerID, "Cheating must be enabled")
     return false
