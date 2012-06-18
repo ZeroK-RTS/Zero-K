@@ -10,6 +10,8 @@ function widget:GetInfo()
   }
 end
 
+local spGetSpectatingState	= Spring.GetSpectatingState
+
 local warningDelay = 30 * 5 	--in frames
 local lastWarning = 0			--in frames
 local localTeamID = Spring.GetLocalTeamID ()
@@ -31,7 +33,18 @@ function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, wea
 	end
 end
 
+function widget:Initialize()
+	if spGetSpectatingState() then
+		--Spring.Echo("<Attack Warning>: Spectator mode. Widget removed.")
+		widgetHandler:RemoveWidget()
+	end
+end
+
 --changing teams, rejoin, becoming spec etc
 function widget:PlayerChanged (playerID)
+	if spGetSpectatingState() then
+		--Spring.Echo("<Attack Warning>: Spectator mode. Widget removed.")
+		widgetHandler:RemoveWidget()
+	end
 	localTeamID = Spring.GetLocalTeamID ()	
 end
