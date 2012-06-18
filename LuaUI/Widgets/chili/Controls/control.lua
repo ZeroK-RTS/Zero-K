@@ -145,10 +145,11 @@ function Control:Dispose()
   end
 
   if (not self.disposed) then
-    self.font:Dispose()
+    --self.font:Dispose()
   end
 
   inherited.Dispose(self)
+  self.font:Dispose()
 end
 
 --//=============================================================================
