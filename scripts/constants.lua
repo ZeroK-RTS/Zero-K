@@ -31,6 +31,7 @@ hpi = math.pi*0.5
 pi34 = math.pi*1.5
 
 rad = math.rad
+abs = math.abs
 toDegrees = 180/pi
 
 -- Explosion generators

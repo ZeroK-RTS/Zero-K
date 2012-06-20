@@ -53,6 +53,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[stingray.s3o]],
+  script              = [[armbrawl.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
@@ -138,7 +139,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 2600,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
@@ -151,28 +152,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Brawler]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 2600,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 340,
-      object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 340,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Brawler]],
