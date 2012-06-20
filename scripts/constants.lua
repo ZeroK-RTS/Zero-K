@@ -65,6 +65,7 @@ DETO_W8 = 4103
 
 local SMOKEPUFF = 258
 
+-- useful functions
 function SmokeUnit()
 	local spGetUnitIsCloaked = Spring.GetUnitIsCloaked
 	
