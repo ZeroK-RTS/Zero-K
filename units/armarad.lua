@@ -45,6 +45,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[novaradar.s3o]],
+  script                        = [[armarad.lua]],
   onoffable                     = true,
   radarDistance                 = 4000,
   radarHeight					= 75,

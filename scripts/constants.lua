@@ -17,12 +17,21 @@ SFXTYPE_REVERSEWAKE2 = 5
 
 sfxNone 		= SFX.NONE
 sfxExplode 		= SFX.EXPLODE
-sfxBitmap 		= SFX.BITMAP_ONLY
+--sfxBitmap 		= SFX.BITMAP_ONLY -- This is not a thing
 sfxShatter		= SFX.SHATTER
 sfxFall	  		= SFX.FALL
 sfxSmoke   		= SFX.SMOKE
 sfxFire    		= SFX.FIRE
 sfxExplodeOnHit = SFX.EXPLODE_ON_HIT
+
+-- Maths
+tau = math.pi*2
+pi = math.pi
+hpi = math.pi*0.5
+pi34 = math.pi*1.5
+
+rad = math.rad
+toDegrees = 180/pi
 
 -- Explosion generators
 UNIT_SFX1 = 1024
@@ -73,4 +82,17 @@ function SmokeUnit()
 		end
 		Sleep(8*healthPercent + math.random(100,200))
 	end
+end
+
+function onWater()
+	local spGetUnitPosition = Spring.GetUnitPosition
+	local spGetGroundHeight = Spring.GetGroundHeight
+	local x,_,z = spGetUnitPosition(unitID)
+	if x then
+		h = spGetGroundHeight(x,z)
+		if h and h < 0 then
+			return true
+		end
+	end
+	return false
 end
