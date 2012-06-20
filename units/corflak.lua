@@ -71,7 +71,7 @@ unitDef = {
 
     {
       def                = [[ARMFLAK_GUN]],
-      badTargetCategory  = [[FIXEDWING]],
+      --badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
