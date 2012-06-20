@@ -56,6 +56,7 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   objectName             = [[ARMCARRIER]],
+  script                 = [[armcarry.lua]],
   radarDistance          = 1500,
   seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLASTSML]],
@@ -233,7 +234,7 @@ unitDef = {
       category         = [[corpses]],
       damage           = 7500,
       energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
       height           = [[4]],
@@ -245,27 +246,6 @@ unitDef = {
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
-
-
-    DEAD2 = {
-      description      = [[Debris - Reef]],
-      blocking         = false,
-      category         = [[heaps]],
-      damage           = 7500,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
-      footprintX       = 8,
-      footprintZ       = 8,
-      hitdensity       = [[100]],
-      metal            = 1400,
-      object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1400,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
 
     HEAP  = {
       description      = [[Debris - Reef]],
