@@ -111,16 +111,16 @@ end
 --//=============================================================================
 
 function Font:GetLineHeight(size)
-  return self._font.lineheight * (size or self.size)
+  return (self._font and self._font.size and self._font.lineheight * (size or self.size)) or 0
 end
 
 function Font:GetAscenderHeight(size)
   local font = self._font
-  return (font.lineheight + font.descender) * (size or self.size)
+  return (font and font.size and (font.lineheight + font.descender) * (size or self.size)) or 0
 end
 
 function Font:GetTextWidth(text, size)
-  return (self._font and (self._font):GetTextWidth(text) * (size or self.size)) or 0
+  return (self._font and self._font.size and (self._font):GetTextWidth(text) * (size or self.size)) or 0
 end
 
 function Font:GetTextHeight(text, size)
