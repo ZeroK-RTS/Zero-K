@@ -3,7 +3,7 @@
 #include "sfxtype.h"
 #include "exptype.h"
 
-piece  base, door1, door2, hinge1, hinge2, turret, launcher, firep1,
+piece  base, body, aim, door1, door2, hinge1, hinge2, turret, launcher, firep1,
        firep2;
 
 static-var  Static_Var_1, restore_delay, gun_1, statechg_DesiredState, statechg_StateChanging, gh;
@@ -21,7 +21,7 @@ Activatescr()
 		move turret to y-axis [0.000000] speed [30.000000];
 		sleep 400;
 	} else {
-		turn base to x-axis 0 speed <225>;
+		turn body to x-axis 0 speed <225>;
 	}
 	sleep 25;
 	return (0);
@@ -40,7 +40,7 @@ Deactivatescr()
 		turn door2 to z-axis <150.000000> speed <100.000000>;
 		sleep 300;
 	} else {
-		turn base to x-axis <180> speed <225>;
+		turn body to x-axis <180> speed <225>;
 	}
 	sleep 15;
 }
@@ -189,7 +189,7 @@ FirePrimary()
 
 AimFromPrimary(piecenum)
 {
-	piecenum = launcher;
+	piecenum = aim;
 }
 
 QueryPrimary(piecenum)
