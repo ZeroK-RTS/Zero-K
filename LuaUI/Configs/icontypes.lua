@@ -740,15 +740,23 @@ local icontypes = {
     size=2.1,
   },
   smallgunship = {
-    bitmap='icons/gunship.dds',
+    bitmap='icons/gunship.png',
     size=1.4,
   },
   gunship = {
-    bitmap='icons/gunship.dds',
+    bitmap='icons/gunship.png',
+    size=2,
+  },
+  gunshipears = {
+    bitmap='icons/gunshipears.png',
     size=2,
   },
   heavygunship = {
     bitmap='icons/heavygunship.dds',
+    size=2.4,
+  },
+  heavygunshipears = {
+    bitmap='icons/heavygunshipears.png',
     size=2.4,
   },
   supergunship = {
