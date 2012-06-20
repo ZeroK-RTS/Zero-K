@@ -13,6 +13,8 @@ include "constants.lua"
 
 smokePiece = { ant, base}
 
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
+
 local SIG_CLOSE = 1
 local SIG_OPEN = 2
 
@@ -50,13 +52,18 @@ local function Deactivate()
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_CLOSE)
 
-	Spin( dish , y_axis,  rad(0), rad(20))
-	Turn( ant , z_axis, rad(0), rad(60) )
-	Turn( arm , z_axis, rad(0), rad(40) )
-	WaitForTurn(ant, z_axis)
-	Move( dish , y_axis, 0, 7)
-	WaitForMove(dish, y_axis)
-	Spin( spinner , y_axis, rad(0), rad(3) )
+	if spGetUnitIsStunned(unitID) then
+		Spring.UnitScript.StopSpin(dish , y_axis, rad(10))
+		Spring.UnitScript.StopSpin(spinner , y_axis, rad(10))
+	else
+		Spin( dish , y_axis,  rad(0), rad(20))
+		Turn( ant , z_axis, rad(0), rad(60) )
+		Turn( arm , z_axis, rad(0), rad(40) )
+		WaitForTurn(ant, z_axis)
+		Move( dish , y_axis, 0, 7)
+		WaitForMove(dish, y_axis)
+		Spin( spinner , y_axis, rad(0), rad(3) )
+	end
 end
 
 function script.Activate()
