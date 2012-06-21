@@ -89,8 +89,8 @@ unitDef = {
       name                    = [[Light Mine Artillery]],
       accuracy                = 1500,
       areaOfEffect            = 96,
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 0,
+      craterMult              = 0,
 
       customParams            = {
         damage_vs_shield = [[220]],
