@@ -157,12 +157,8 @@ local base = {
 			"commweapon_assaultcannon",
 			"commweapon_assaultcannon",
 			"conversion_partillery",
-			"module_adv_targeting",
-			"module_adv_targeting",
-			"module_adv_targeting",
-			"module_adv_targeting",
-			"module_adv_targeting",
-			"module_adv_targeting"
+			"weaponmod_napalm_warhead",
+			"weaponmod_high_caliber_barrel"
 		}
 	},
 	{

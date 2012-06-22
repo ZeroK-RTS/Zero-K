@@ -10,6 +10,7 @@ local weaponDef = {
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 		areadamage_preset = [[module_napalmgrenade]],
 		burntime = [[60]],
+		setunitsonfire = [[1]],
 	},	  
 	  
 	damage                  = {
@@ -19,7 +20,7 @@ local weaponDef = {
 	},
 	
 	edgeEffectiveness       = 0.5,
-	explosionGenerator		= [[custom:firewalkernapalm]],
+	explosionGenerator		= [[custom:napalm_firewalker]],
 	fireStarter				= 120,
 	impulseBoost            = 0,
 	impulseFactor           = 0.4,

@@ -6,7 +6,9 @@ local weaponDef = {
     
     customParams			= {
     	muzzleEffectFire = [[custom:thud_fire_fx]],
-		burnchance = [[1]],
+	burnchance = [[1]],
+	setunitsonfire = [[1]],
+	burntime = [[450]],
     },
     
     craterBoost             = 0,
@@ -20,6 +22,7 @@ local weaponDef = {
 
     edgeEffectiveness       = 0.5,
     explosionGenerator      = [[custom:napalm_koda]],
+    fireStarter             = 100,
     impulseBoost            = 0,
     impulseFactor           = 0.4,
     interceptedByShieldType = 1,
