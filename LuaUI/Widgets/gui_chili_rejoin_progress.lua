@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v1.0 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.01 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
     date      = "June 17, 2012",
     license   = "GNU GPL, v2 or later",
@@ -11,7 +11,14 @@ function widget:GetInfo()
 	--handler = true, -- allow this widget to use 'widgetHandler:FindWidget()'
   }
 end
+--------------------------------------------------------------------------------
+--Crude Documentation-----------------------------------------------------------
+--How it meant to work:
+--1) GameProgress return serverFrame --> IF I-am-behind THEN activate chili UI ELSE de-activate chili UI --> Update the estimated-time-of-completion every second.
+--2) LuaRecvMsg return timeDifference --> IF I-am-behind THEN activate chili UI ELSE nothing ---> Update the estimated-time-of-completion every second.
+--3) at GameStart send LuaMsg containing GameStart's UTC.
 
+--Others: some tricks to increase efficiency, bug fix, ect
 --------------------------------------------------------------------------------
 --Chili Variable----------------------------------------------------------------- ref: gui_chili_vote.lua by KingRaptor
 local Chili
@@ -128,7 +135,8 @@ function widget:Update(dt)
 			oneSecondElapsed = 0
 			myLastFrameNum = myGameFrame
 			
-			if serverFrameNum1 then serverFrameNum1 = serverFrameNum else serverFrameNum2 = serverFrameNum end
+			if serverFrameNum1 then serverFrameNum1 = serverFrameNum --update serverFrameNum1 if value from GameProgress() is used,
+			else serverFrameNum2 = serverFrameNum end --update serverFrameNum2 if value from LuaRecvMsg() is used.
 			-----return
 			serverFrameNum1_G = serverFrameNum1
 			serverFrameNum2_G = serverFrameNum2
@@ -317,7 +325,7 @@ end
 
 function widget:GameStart()
 	--local format = "%H:%M" 
-	local currentTime = os.date("%H:%M") --Reference: clock on "gui_epicmenu.lua" (widget by CarRepairer)
+	local currentTime = os.date("!%H:%M") --Reference: clock on "gui_epicmenu.lua" (widget by CarRepairer), UTC: http://lua-users.org/wiki/OsLibraryTutorial
 	local dayHour, dayMinute = ExtractTimestampNumber(currentTime)
 	local myTimestamp = {dayHour, dayMinute}
 	--Spring.Echo(currentTime .. " " .. dayHour .." " .. dayMinute .. "A")
