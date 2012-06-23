@@ -56,10 +56,10 @@ unitDef = {
     description_bp = [[]],
     description_fr = [[]],
 	description_de = [[Frühwarn System]],
-    helptext       = [[The Radar tower provides early warning of enemy units and their movements over a moderate distance at virtually no cost. Radar Towers cost no energy to operate, but will automatically shut down if your energy supplies stall.]],
+    helptext       = [[The Radar tower provides early warning of enemy units and their movements over a moderate distance at virtually no cost. It has steady energy cost and will automatically shut down if you run out of energy. Radar coverage is blocked by terrain such as mountains.]],
     helptext_bp    = [[]],
     helptext_fr    = [[]],
-	helptext_de    = [[Dieser Radarturm ermöglicht die frühzeitige Lokalisierung von feindlichen Einheiten in der entsprechenden Reichweite. Für den Betrieb wird Energie benötigt.]],
+    helptext_de    = [[Dieser Radarturm ermöglicht die frühzeitige Lokalisierung von feindlichen Einheiten in der entsprechenden Reichweite. Für den Betrieb wird Energie benötigt. Die Radarbedeckung wird durch Gelände - beispielsweise Berge - blockiert.]],
   },  
   
   featureDefs                   = {
