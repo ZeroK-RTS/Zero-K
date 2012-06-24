@@ -20,7 +20,7 @@ function widget:GetInfo()
 		license = "GNU GPL, v2 or later",
 		layer = math.huge-1,
 		enabled = true,
-		handler = true,
+		handler = false, -- loaded by default?
 	}
 end
 
