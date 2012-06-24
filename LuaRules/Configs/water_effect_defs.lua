@@ -16,7 +16,7 @@ local unitDefData = {
 		baseHeight = 5,
 	},
 	[UnitDefNames["amphcon"].id] = {
-		healthRegen = 20,
+		healthRegen = 10,
 		submergedAt = 40,
 	},
 	[UnitDefNames["amphraider3"].id] = {
@@ -25,10 +25,10 @@ local unitDefData = {
 	},
 	[UnitDefNames["amphfloater"].id] = {
 		healthRegen = 25,
-		submergedAt = 40,
+		submergedAt = 30,
 	},
 	[UnitDefNames["amphriot"].id] = {
-		healthRegen = 25,
+		healthRegen = 10,
 		submergedAt = 40,
 	},
 	[UnitDefNames["amphassault"].id] = {

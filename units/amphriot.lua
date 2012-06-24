@@ -95,7 +95,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 130,
+        default = 110,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -106,7 +106,7 @@ unitDef = {
       interceptedByShieldType = 1,
       model                   = [[wep_t_longbolt.s3o]],
       numbounce               = 4,
-      range                   = 460,
+      range                   = 430,
       reloadtime              = 2,
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
