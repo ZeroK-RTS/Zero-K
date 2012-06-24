@@ -29,9 +29,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Hovercraft de Construction, Construit r 6 m/s]],
 	description_de = [[Konstruktionsluftkissenboot, Baut mir 6 M/s]],
-    helptext       = [[The Hovercon allows smooth expansion across both land and sea. It can also detect submarines that get too close.]],
+    helptext       = [[The Quill allows smooth expansion across both land and sea. It can also detect submarines that get too close.]],
     helptext_fr    = [[L'Hovercon est rapide et agile mais son blindage et ses nanoconstructeurs sont de mauvaise facture.]],
-	helptext_de    = [[Der Hovercan erlaubt es dir leichtgängige Expansionen über Land und See. Dabei kann er sogar U-Boote entdecken, die ihm zu nahe kommen.]],
+	helptext_de    = [[Der Hovercan erlaubt es dir leichtgÃ¤ngige Expansionen Ã¼ber Land und See. Dabei kann er sogar U-Boote entdecken, die ihm zu nahe kommen.]],
   },
 
   energyMake          = 0.15,
