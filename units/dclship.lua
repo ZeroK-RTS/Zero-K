@@ -68,8 +68,8 @@ unitDef = {
   weaponDefs          = {
 
     TORPEDO = {
-      name                    = [[Torpedo]],
-      areaOfEffect            = 16,
+      name                    = [[Depth Charge]],
+      areaOfEffect            = 40,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
@@ -82,11 +82,10 @@ unitDef = {
         subs    = 480,
       },
 
-      explosionGenerator      = [[custom:TORPEDO_HIT]],
+      explosionGenerator      = [[custom:TORPEDO_HIT_LARGE]],
       fixedLauncher           = true,
       groundbounce            = 1,
       guidance                = true,
-      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
