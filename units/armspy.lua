@@ -25,12 +25,12 @@ unitDef = {
   customParams          = {
     description_bp = [[Espi?o invisível a radar]],
     description_fi = [[N?kym?t?n vakoilija]],
-    description_fr = [[Espion Invisible]],
+    description_fr = [[Espion, contre les unités lourdes]],
 	description_de = [[Spion, Anti-Heavy]],
     helptext       = [[The Infiltrator is useful in two ways. Firstly it is an excellent scout, and very difficult to detect. It can penetrate deep into enemy lines. It also has the capacity to shoot a paralyzing bolt that will freeze any one target, good against heavy enemies and enemy infrastructure.]],
     helptext_bp    = [[O Infiltrador é útil de várias formas. Pode ser um batedor invisível e indetectável por radar para espiar o inimigo, ou detona-lo como uma bomba de PEM contra o inimigo.]],
     helptext_fi    = [[Tutkassakin n?kym?t?n Infiltrator pystyy piileksim??n vihollisen alueella tulematta havaituksi ker?ten hy?dyllist? informaatiota t?m?n toiminnasta. Laukaisee tuhoutuessaan EMP-pommin.]],
-    helptext_fr    = [[L'infiltrator peut ?tre utile de plusieur manieres. Il peut ?tre un ?claireur invisible et furtif permettant d'espioner la base enemie sans se faire rep?rer. En cas d'urgence, vous pouvez l'autod?truire ce qui en fait une bombe EMP.]],
+    helptext_fr    = [[L'infiltrator peut être utile de plusieur manières. Il peut être un éclaireur invisible et furtif permettant d'espioner la base enemie sans se faire repérer. Il peut aussi libérer une décharge EMP pour paralyser une cible, utile contre les unités lourdes et l'infrastructure.]],
 	helptext_de    = [[Der Infiltrator ist für zwei Dinge nützlich. Erstens ist er ein exzellenter Aufklärer und sehr schwer zu entdecken. Er kann sich tief hinter die feindlichen Linien begeben. Außerdem besitzt er die Eigentschaft einen paralysierenden Bolzen abzuschießen, der jedes Ziel einfriert, was gegen schwere Einheiten und feindliche Infrastruktur sehr nützlich ist.]],
   },
 

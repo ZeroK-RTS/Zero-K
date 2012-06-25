@@ -24,8 +24,10 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Produziert Energie (variabel)]],
+    description_fr = [[Produit de l'énergie]],
     helptext       = [[Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully. When placed in water, they become somewhat more sturdy tidal generators with a good, constant output.]],
 	helptext_de    = [[Windräder produzieren eine variable Menge an Energie, je nach Höhenlage und Windgeschwindigkeit. Sie sind extrem verletzlich und explodieren in einer Kettenreaktion, sobald sie zerstört werden. Platziere sie also mit Bedacht.]],
+	helptext_fr    = [[Sur terre, l'éolienne produit de l'énergie en quantité variable, selon l'altitude et la vitesse du vent. Elles sont très fragiles et explosent à la chaine quand elles sont trop proches l'une de l'autre. Dans l'eau, la génératrice marémotrice est plus résistante et produit une énérgie constante.]],
     pylonrange = 60,
     windgen    = true,
   },

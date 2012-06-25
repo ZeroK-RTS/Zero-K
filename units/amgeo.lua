@@ -24,8 +24,10 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_de = [[Erzeugt Energie (100) - RISKANT]],	
-    helptext_de    = [[Das  Moho Geothermisches Kraftwerk erzeugt eine große Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar.]],
+    description_de = [[Erzeugt Energie (100) - RISKANT]],
+    description_fr = [[Produit de l'énergie (100) - DANGEREUX]],
+    helptext_de    = [[Das Moho Geothermisches Kraftwerk erzeugt eine große Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar.]],
+    helptext_fr    = [[La centrale géothermique Moho produit une quantité important d'énergie. Son explosion peut être catastrophique selon son emplacement.]],
     pylonrange = 600,
   },
 

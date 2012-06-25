@@ -46,7 +46,9 @@ unitDef = {
   
   customParams        = {
 	description_de = [[Trägerdrohne]],
+	description_fr = [[Drone d'attaque]],
 	helptext_de    = [[]],
+	helptext_fr    = [[]],
   },
   
   

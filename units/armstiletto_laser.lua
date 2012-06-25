@@ -29,7 +29,7 @@ unitDef = {
 	description_de = [[EMP-Tarnkappenbomber]],
     helptext       = [[Fast stealthy bomber armed with a lightning generator that paralyzes units in a wide area under it.]],
     helptext_bp    = [[Bombardeiro rápido e invisível a radar equipado com um gerador de raios ao invés de bombas que dispara raios de PEM contra o inimigo ao atacar.]],
-    helptext_fr    = [[Rapide et furtif, le Stiletto II permet des tirs sur une large zone ? l'aide de ses canons EMP, pouvant paralyser toute une arm?e en un clin d'oeuil.]],
+    helptext_fr    = [[Rapide et furtif, armé de canons EMP pouvant paralyser les unités dans une large bande.]],
 	helptext_de    = [[Schneller Tarnkappenbomber, der mit einem Stossspannungsgenerator zum Paralysieren großflächiger Gebiete bewaffnet ist.]],
   },
 
