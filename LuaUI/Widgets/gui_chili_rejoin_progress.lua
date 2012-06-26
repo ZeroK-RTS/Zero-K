@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v1.05 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.06 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
     date      = "June 17, 2012",
     license   = "GNU GPL, v2 or later",
@@ -58,6 +58,7 @@ local serverFrameNum2_G = nil --//variable: the expected server-frame of current
 local submittedTimestamp_G = {} --//variable: store all timestamp at GameStart submitted by original players (assuming we are rejoining)
 local functionContainer_G = function(x) end --//variable object: store a function 
 local myPlayerID_G = 0
+local gameProgress_G = false --//variable: signal whether GameProgress has been updated.
 --------------------------------------------------------------------------------
 --[[
 if VFS.FileExists("Luaui/Config/ZK_data.lua") then
@@ -93,16 +94,17 @@ end
 function widget:GameProgress(serverFrameNum) --this function run 3rd. It read the official serverFrameNumber
 	local myGameFrame = myGameFrame_G
 	local ui_active = ui_active_G
-	-----localize
+	-----localize--
 
 	local ttsControlEnabled = CheckTTSwidget()
 	local serverFrameNum1 = serverFrameNum
 	local frameDistanceToFinish = serverFrameNum1-myGameFrame
 	ui_active = ActivateGUI_n_TTS (frameDistanceToFinish, ui_active, ttsControlEnabled)
 	
-	-----return
+	-----return--
 	serverFrameNum1_G = serverFrameNum1
 	ui_active_G = ui_active
+	gameProgress_G = true
 end
 
 function widget:Update(dt) --this function run 4th. It update the progressBar
@@ -286,7 +288,13 @@ end
 ----------------------------------------------------------
 --fix for Game Progress delay-----------------------------
 function widget:RecvLuaMsg(bigMsg, playerID) --this function run 2nd. It read the LUA timestamp
-	if (playerID == myPlayerID_G) or (spGetSpectatingState()) then --use our own timestamp or use others' when we are spectating
+	if gameProgress_G then 
+		return false 
+	end
+	
+	local iAmSpec = spGetSpectatingState()
+	local myMsg = (playerID == myPlayerID_G)
+	if (myMsg or iAmSpec) then
 		if bigMsg:sub(1,9) == "rejnProg " then --check for identifier
 			-----var localize-----
 			local ui_active = ui_active_G
@@ -311,7 +319,7 @@ function widget:RecvLuaMsg(bigMsg, playerID) --this function run 2nd. It read th
 			
 			local serverFrameNum2 = frameDiff --this value represent the estimate difference in frame when everyone was submitting their timestamp at game start. Therefore the difference in frame will represent how much frame current player are ahead of us.
 			local ttsControlEnabled = CheckTTSwidget()
-			ui_active = ActivateGUI_n_TTS (frameDiff, ui_active, ttsControlEnabled, 3600)
+			ui_active = ActivateGUI_n_TTS (frameDiff, ui_active, ttsControlEnabled, 1800)
 			
 			-----return
 			ui_active_G = ui_active
