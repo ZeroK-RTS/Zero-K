@@ -47,7 +47,7 @@ local unitSetTargetCmdDesc = {
 	action  = 'settarget',
     cursor  = 'Attack',
 	tooltip	= 'Sets target for unit, not removed by move commands',
-	hidden = true,
+	hidden = false,
 }
 
 local unitSetTargetCircleCmdDesc = {
@@ -66,7 +66,7 @@ local unitCancelTargetCmdDesc = {
 	name    = 'Cancel Target',
 	action  = 'canceltarget',
 	tooltip	= 'Removes target for unit',
-	hidden = true,
+	hidden = false,
 }
 
 --------------------------------------------------------------------------------

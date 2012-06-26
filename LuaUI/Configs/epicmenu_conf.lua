@@ -125,8 +125,9 @@ path='Settings/Camera'
 	ShButton( 'Free', 'viewfree' ) 
 	ShButton( 'Rotatable Overhead', 'viewrot' ) 
 	ShButton( 'Total War', 'viewtw' ) 
-	ShButton( 'Flip the TA Camera', 'viewtaflip' ) 
-	ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' ) 
+	ShButton( 'Flip the TA Camera', 'viewtaflip' )
+	ShButton( 'Toggle Camera Shake', 'luaui togglewidget CameraShake' )
+	ShButton( 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
 path='Settings/Reset Settings'
 	ShLabel( 'Reset graphic settings to minimum.')
@@ -270,8 +271,7 @@ path='Settings/Graphics'
 	
 path='Settings/Graphics/Effects'
 	ShButton('Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
-	ShButton('Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end, 'Creates a smoke signal effect at map points' )				
-	ShButton('Toggle Camera Shake', function() spSendCommands{'luaui togglewidget CameraShake'} end )	
+	ShButton('Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end, 'Creates a smoke signal effect at map points' )					
 
 path='Settings/Graphics/Map'	
 	ShButton('VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end, 'Draws a grid around the map' )
