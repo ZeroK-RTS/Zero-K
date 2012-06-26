@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v1.04 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.05 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
     date      = "June 17, 2012",
     license   = "GNU GPL, v2 or later",
@@ -19,6 +19,10 @@ end
 --3) at GameStart send LuaMsg containing GameStart's UTC.
 
 --Others: some tricks to increase efficiency, bug fix, ect
+--------------------------------------------------------------------------------
+--Localize Spring function------------------------------------------------------
+local spGetSpectatingState = Spring.GetSpectatingState
+local spGetMyPlayerID = Spring.GetMyPlayerID
 --------------------------------------------------------------------------------
 --Chili Variable----------------------------------------------------------------- ref: gui_chili_vote.lua by KingRaptor
 local Chili
@@ -53,6 +57,7 @@ local myTimestamp_G = 0 --//variable: store my own timestamp at GameStart
 local serverFrameNum2_G = nil --//variable: the expected server-frame of current running game
 local submittedTimestamp_G = {} --//variable: store all timestamp at GameStart submitted by original players (assuming we are rejoining)
 local functionContainer_G = function(x) end --//variable object: store a function 
+local myPlayerID_G = 0
 --------------------------------------------------------------------------------
 --[[
 if VFS.FileExists("Luaui/Config/ZK_data.lua") then
@@ -70,7 +75,7 @@ local function ActivateGUI_n_TTS (frameDistanceToFinish, ui_active, ttsControlEn
 			screen0:AddChild(window)
 			ui_active = true
 			if ttsControlEnabled then
-				Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
+				Spring.Echo(Spring.GetPlayerInfo(myPlayerID_G) .. " DISABLE TTS") --eg: output "<playerName> DISABLE TTS"
 			end
 		end
 	elseif frameDistanceToFinish < (altThreshold or 120) then
@@ -78,7 +83,7 @@ local function ActivateGUI_n_TTS (frameDistanceToFinish, ui_active, ttsControlEn
 			screen0:RemoveChild(window)
 			ui_active = false
 			if ttsControlEnabled then
-				Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " ENABLE TTS")
+				Spring.Echo(Spring.GetPlayerInfo(myPlayerID_G) .. " ENABLE TTS")
 			end		
 		end
 	end
@@ -145,17 +150,17 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 		end
 	end
 end
---[[
+
 local function RemoveLUARecvMsg(n)
 	if n > 150 then
 		widgetHandler:RemoveCallIn("RecvLuaMsg") --remove unused method for increase efficiency after frame> timestampLimit (150frame or 5 second).
 		functionContainer_G = function(x) end --replace this function with an empty function/method
 	end 
 end
---]]]
+
 function widget:GameFrame(n)  --this function run at all time. It update current gameFrame
 	myGameFrame_G = n
-	--functionContainer_G(n) --function that are able to remove itself. Reference: gui_take_reminder.lua (widget by EvilZerggin, modified by jK)
+	functionContainer_G(n) --function that are able to remove itself. Reference: gui_take_reminder.lua (widget by EvilZerggin, modified by jK)
 end
 
 --//thanks to Rafal[0K] for pointing to the rolling average idea.
@@ -194,7 +199,8 @@ end
 ----------------------------------------------------------
 --Chili--------------------------------------------------
 function widget:Initialize()
-	--functionContainer_G = RemoveLUARecvMsg
+	functionContainer_G = RemoveLUARecvMsg
+	myPlayerID_G = spGetMyPlayerID()
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -279,41 +285,42 @@ end
 
 ----------------------------------------------------------
 --fix for Game Progress delay-----------------------------
---[[
 function widget:RecvLuaMsg(bigMsg, playerID) --this function run 2nd. It read the LUA timestamp
-	if bigMsg:sub(1,9) == "rejnProg " then --check for identifier
-		-----var localize-----
-		local ui_active = ui_active_G
-		local submittedTimestamp = submittedTimestamp_G
-		local myTimestamp = myTimestamp_G
-		-----localize
-		
-		local timeMsg = bigMsg:sub(10) --saperate time-message from the identifier
-		local systemSecond = tonumber(timeMsg)
-		--Spring.Echo(systemSecond ..  " B")
-		submittedTimestamp[#submittedTimestamp +1] = systemSecond --store all submitted timestamp from each players
-		local sumSecond= 0
-		for i=1, #submittedTimestamp,1 do
-			sumSecond = sumSecond + submittedTimestamp[i]
+	if (playerID == myPlayerID_G) or (spGetSpectatingState()) then --use our own timestamp or use others' when we are spectating
+		if bigMsg:sub(1,9) == "rejnProg " then --check for identifier
+			-----var localize-----
+			local ui_active = ui_active_G
+			local submittedTimestamp = submittedTimestamp_G
+			local myTimestamp = myTimestamp_G
+			-----localize
+			
+			local timeMsg = bigMsg:sub(10) --saperate time-message from the identifier
+			local systemSecond = tonumber(timeMsg)
+			--Spring.Echo(systemSecond ..  " B")
+			submittedTimestamp[#submittedTimestamp +1] = systemSecond --store all submitted timestamp from each players
+			local sumSecond= 0
+			for i=1, #submittedTimestamp,1 do
+				sumSecond = sumSecond + submittedTimestamp[i]
+			end
+			--Spring.Echo(sumSecond ..  " C")
+			local avgSecond = sumSecond/#submittedTimestamp
+			--Spring.Echo(avgSecond ..  " D")
+			local secondDiff = myTimestamp - avgSecond
+			--Spring.Echo(secondDiff ..  " E")
+			local frameDiff = secondDiff*30
+			
+			local serverFrameNum2 = frameDiff --this value represent the estimate difference in frame when everyone was submitting their timestamp at game start. Therefore the difference in frame will represent how much frame current player are ahead of us.
+			local ttsControlEnabled = CheckTTSwidget()
+			ui_active = ActivateGUI_n_TTS (frameDiff, ui_active, ttsControlEnabled, 3600)
+			
+			-----return
+			ui_active_G = ui_active
+			serverFrameNum2_G = serverFrameNum2
+			submittedTimestamp_G = submittedTimestamp
 		end
-		--Spring.Echo(sumSecond ..  " C")
-		local avgSecond = sumSecond/#submittedTimestamp
-		--Spring.Echo(avgSecond ..  " D")
-		local secondDiff = myTimestamp - avgSecond
-		--Spring.Echo(secondDiff ..  " E")
-		local frameDiff = secondDiff*30
-		
-		local serverFrameNum2 = frameDiff --this value represent the estimate difference in frame when everyone was submitting their timestamp at game start. Therefore the difference in frame will represent how much frame current player are ahead of us.
-		local ttsControlEnabled = CheckTTSwidget()
-		ui_active = ActivateGUI_n_TTS (frameDiff, ui_active, ttsControlEnabled, 3600)
-		
-		-----return
-		ui_active_G = ui_active
-		serverFrameNum2_G = serverFrameNum2
-		submittedTimestamp_G = submittedTimestamp
 	end
 end
---]]
+
 function widget:GameStart() --this function run 1st before any other function. It send LUA timestamp
 	--local format = "%H:%M" 
 	local currentTime = os.date("!*t") --ie: clock on "gui_epicmenu.lua" (widget by CarRepairer), UTC & format: http://lua-users.org/wiki/OsLibraryTutorial
