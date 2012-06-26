@@ -145,17 +145,17 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 		end
 	end
 end
-
+--[[
 local function RemoveLUARecvMsg(n)
 	if n > 150 then
 		widgetHandler:RemoveCallIn("RecvLuaMsg") --remove unused method for increase efficiency after frame> timestampLimit (150frame or 5 second).
 		functionContainer_G = function(x) end --replace this function with an empty function/method
 	end 
 end
-
+--]]]
 function widget:GameFrame(n)  --this function run at all time. It update current gameFrame
 	myGameFrame_G = n
-	functionContainer_G(n) --function that are able to remove itself. Reference: gui_take_reminder.lua (widget by EvilZerggin, modified by jK)
+	--functionContainer_G(n) --function that are able to remove itself. Reference: gui_take_reminder.lua (widget by EvilZerggin, modified by jK)
 end
 
 --//thanks to Rafal[0K] for pointing to the rolling average idea.
@@ -194,7 +194,7 @@ end
 ----------------------------------------------------------
 --Chili--------------------------------------------------
 function widget:Initialize()
-	functionContainer_G = RemoveLUARecvMsg
+	--functionContainer_G = RemoveLUARecvMsg
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -279,6 +279,7 @@ end
 
 ----------------------------------------------------------
 --fix for Game Progress delay-----------------------------
+--[[
 function widget:RecvLuaMsg(bigMsg, playerID) --this function run 2nd. It read the LUA timestamp
 	if bigMsg:sub(1,9) == "rejnProg " then --check for identifier
 		-----var localize-----
@@ -312,7 +313,7 @@ function widget:RecvLuaMsg(bigMsg, playerID) --this function run 2nd. It read th
 		submittedTimestamp_G = submittedTimestamp
 	end
 end
-
+--]]
 function widget:GameStart() --this function run 1st before any other function. It send LUA timestamp
 	--local format = "%H:%M" 
 	local currentTime = os.date("!*t") --ie: clock on "gui_epicmenu.lua" (widget by CarRepairer), UTC & format: http://lua-users.org/wiki/OsLibraryTutorial
