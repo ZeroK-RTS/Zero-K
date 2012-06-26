@@ -55,6 +55,7 @@ local recheck = false
 local gameStarted = false
 local textPlsWait = false
 local alternateTake = false
+local playerOutsideGame = {}
 
 ------------------------------------------------
 -- speedups
@@ -93,8 +94,9 @@ local function GetTeamIsTakeable(teamID)
 	for i=1, #players, 1 do -- check shared player in a team
 		local playerID = players[i]
 		local _, _, spec = spGetPlayerInfo(playerID)
-		if not (spec) then
-			takeAble = false -- active team is not takeable
+		if (not spec) -- team who hadn't yet crossed to the spectator realm is not takeable. Ie: in ZK only resigned player goes to spectator.
+			or (not playerOutsideGame[playerID]) then -- team who hadn't yet crossed to reality realm is not takeable. Ie: exited/quited player can still play
+			takeAble = false --if above condition is meet (not spec, and not outside) then this team is indeed playing! dont take...
 		end
 	end
 	return takeAble
@@ -118,7 +120,8 @@ local function UpdateUnitsToTake()
 	for i= 1, #teamList ,1 do
 		local teamID = teamList[i]
 		local unitsOwned = spGetTeamUnitCount(teamID)
-		if (unitsOwned > 0 and GetTeamIsTakeable(teamID)) then
+		local takeable = GetTeamIsTakeable(teamID)
+		if (unitsOwned > 0 and takeable) then
 			unitCount = unitCount + unitsOwned -- count lagger's unit
 		end
 	end
@@ -181,8 +184,10 @@ end
 function Take()
 	if alternateTake then
 		Spring.SendLuaUIMsg("TAKE")
+		Spring.Echo("Take lite")
 	else
 		Spring.SendCommands("take")
+		Spring.Echo("Take heavy")
 	end
 end
 
@@ -191,25 +196,23 @@ end
 ------------------------------------------------
 
 function _Update(_,dt)
-  blinkTimer = blinkTimer + dt
-  if (blinkTimer>1) then blinkTimer = 0 end
-  colorBool = (blinkTimer > 0.5)
-	--[[
-  if (recheck) then
-  	textPlsWait = false -- cancel show "Wait.."
-    count = UpdateUnitsToTake()
-    if (count == 0) then
-      UnbindCallins()
-    end
-    recheck = false
-  end
-  --]]
+	blinkTimer = blinkTimer + dt
+	if (blinkTimer>1) then blinkTimer = 0 end
+	colorBool = (blinkTimer > 0.5)
+
+	if (recheck) then
+		count = UpdateUnitsToTake()
+		if (count == 0) then
+			textPlsWait = false -- cancel show "Wait.."
+			UnbindCallins()
+		end
+		recheck = false
+	end
 end
 
 
 function widget:UnitTaken()
-	--recheck = true
-  	textPlsWait = false -- cancel show "Wait.."
+	recheck = true
     count = UpdateUnitsToTake()
     if (count == 0) then
 		UnbindCallins()
@@ -343,25 +346,28 @@ function widget:GameStart() -- check at game start for players who dropped or di
 	ProcessButton()
 end
 
-function widget:PlayerChanged() --check for player who became spec or un-spec
-	ProcessButton()
-end
-
-function widget:PlayerRemoved(player, reason)-- check for dropped players
-	if gameStarted then
+function widget:PlayerChanged(playerID) --check for player who became spec or un-spec
+	local _,_,_,_,allyTeamID,_,_,_,_,_ = spGetPlayerInfo(playerID)
+	if (allyTeamID == myAllyTeamID) then
 		ProcessButton()
 	end
 end
 
-function widget:AddConsoleLine(line,priority) -- update button when game_lagmonitor.lua gave away units & change the TAKE method based on how the lagger left the game
+function widget:PlayerRemoved(playerID, reason)-- check for dropped players
+	local _,_,_,_,allyTeamID,_,_,_,_,_ = spGetPlayerInfo(playerID)
+	if gameStarted and (allyTeamID == myAllyTeamID) then
+		ProcessButton()
+		alternateTake = true
+		playerOutsideGame[playerID] = true
+	end
+end
 
-	local _,endString = line:find(" left the game: ",7, true)
-	if endString then --ref:http://lua-users.org/wiki/StringLibraryTutorial
-		local reason = line:sub(endString+1, endString+8)
-		if ( reason == "timeout" or reason == "normal ") then
-			alternateTake = true
-		end
-	elseif (line:sub(1,20) == "Giving all units of ") then --needed to function properly with "game_lagmonitor.lua". Used to re-display the "take button"/the blipping neon-light if there's more unit to take.
+function widget:PlayerAdded(playerID)
+	playerOutsideGame[playerID] = nil
+end
+
+function widget:AddConsoleLine(line,priority) -- update button when game_lagmonitor.lua gave away units & change the TAKE method based on how the lagger left the game
+	if (line:sub(1,20) == "Giving all units of ") then --needed to know when "game_lagmonitor.lua" finished transfer the unit. Used to re-display the "take button" (if any unit left) and to reset the take method to "/take" instead of waiting for "game_lagmonitor.lua" (if it was the case)
 		alternateTake =false
 		ProcessButton()
 	end
