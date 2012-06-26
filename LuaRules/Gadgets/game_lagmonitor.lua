@@ -226,7 +226,7 @@ function gadget:GameFrame(n)
 							lineage[units[j]] = (lineage[units[j]] or team) --set the lineage to the original owner, but if owner is "nil" then use the current (lagging team) as the original owner & then send the unit away...
 							spTransferUnit(units[j], recepientByAllyTeam[allyTeam].team, true)
 						end
-						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")
+						Spring.Echo("Giving all units of "..data.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
 						GG.allowTransfer = false
 					end
 				end	-- if

@@ -1,5 +1,5 @@
 -- $Id: gui_take_remind.lua 3550 2008-12-26 04:50:47Z evil4zerggin $
-local versionNumber = "v3.5"
+local versionNumber = "v3.51"
 
 function widget:GetInfo()
   return {
@@ -9,7 +9,7 @@ function widget:GetInfo()
     date      = "31 March 2007,2008,2009",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = false --  loaded by default?
   }
 end
 
@@ -203,7 +203,6 @@ function _Update(_,dt)
 	if (recheck) then
 		count = UpdateUnitsToTake()
 		if (count == 0) then
-			textPlsWait = false -- cancel show "Wait.."
 			UnbindCallins()
 		end
 		recheck = false
@@ -227,7 +226,6 @@ end
 
 function _MouseRelease(_,x, y, button)
   if (IsOnButton(x, y)) then
-	textPlsWait = false -- cancel show "Wait.."
     count = UpdateUnitsToTake()
     if (count > 0) then
       Take()
@@ -353,9 +351,9 @@ function widget:PlayerChanged(playerID) --check for player who became spec or un
 	end
 end
 
-function widget:PlayerRemoved(playerID, reason)-- check for dropped players
-	local _,_,_,_,allyTeamID,_,_,_,_,_ = spGetPlayerInfo(playerID)
-	if gameStarted and (allyTeamID == myAllyTeamID) then
+function widget:PlayerRemoved(playerID, reason)-- check for dropped player (ally and non-spec only). To function with help of "game_lagmonitor.lua".
+	local _,_,isSpec,_,allyTeamID,_,_,_,_,_ = spGetPlayerInfo(playerID)
+	if gameStarted and (allyTeamID == myAllyTeamID) and (not isSpec) then
 		ProcessButton()
 		alternateTake = true
 		playerOutsideGame[playerID] = true
@@ -366,9 +364,13 @@ function widget:PlayerAdded(playerID)
 	playerOutsideGame[playerID] = nil
 end
 
-function widget:AddConsoleLine(line,priority) -- update button when game_lagmonitor.lua gave away units & change the TAKE method based on how the lagger left the game
-	if (line:sub(1,20) == "Giving all units of ") then --needed to know when "game_lagmonitor.lua" finished transfer the unit. Used to re-display the "take button" (if any unit left) and to reset the take method to "/take" instead of waiting for "game_lagmonitor.lua" (if it was the case)
-		alternateTake =false
-		ProcessButton()
+function widget:AddConsoleLine(line,priority) -- update button when game_lagmonitor.lua gave away units
+	if (line:sub(1,20) == "Giving all units of ") then --to know when "game_lagmonitor.lua" finished transfer the unit. Used to re-display the "take button" (if any unit left) and to reset the take method back to "/take" instead of waiting for "game_lagmonitor.lua" (if the case)
+		local allyNumLoc = line:find("#",-5,true)
+		local allyNum = tonumber(line:sub(allyNumLoc+1,allyNumLoc+1))
+		if allyNum == myAllyTeamID then 
+			alternateTake =false
+			ProcessButton()
+		end
 	end
 end
