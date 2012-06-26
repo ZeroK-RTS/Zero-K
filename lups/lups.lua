@@ -319,6 +319,10 @@ function AddParticles(Class,Options   ,__id)
     print(PRIO_LESS,'LUPS->AddFX: no options given');
     return -1;
   end
+  
+  if Options.quality and Options.quality > GetLupsSetting("quality", 3) then
+    return -1;
+  end
 
   if (Options.delay and Options.delay~=0) then
     partIDCount = partIDCount+1
