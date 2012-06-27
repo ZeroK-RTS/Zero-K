@@ -2751,14 +2751,16 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		local z = terra.point[i].z
 		local freeLeft = not (terra.area[x-8] and terra.area[x-8][z]) and not (extraPointArea[x-8] and extraPointArea[x-8][z])
 		local freeUp = not (terra.area[x] and terra.area[x][z-8]) and not (extraPointArea[x] and extraPointArea[x][z-8])
-		drawingList[#drawingList+1] = {x = x, z = z, tex = 1}
+		local freeRight = not (terra.area[x+8] and terra.area[x+8][z]) and not (extraPointArea[x+8] and extraPointArea[x+8][z])
+		local freeDown = not (terra.area[x] and terra.area[x][z+8]) and not (extraPointArea[x] and extraPointArea[x][z+8])
+		drawingList[#drawingList+1] = {x = x, z = z, tex = 1, edge = freeRight or freeDown}
 		if freeLeft then
-			drawingList[#drawingList+1] = {x = x-8, z = z, tex = 1}
+			drawingList[#drawingList+1] = {x = x-8, z = z, tex = 1, edge = true}
 		end
 		if freeUp then
-			drawingList[#drawingList+1] = {x = x, z = z-8, tex = 1}
+			drawingList[#drawingList+1] = {x = x, z = z-8, tex = 1, edge = true}
 			if freeLeft then
-				drawingList[#drawingList+1] = {x = x-8, z = z-8, tex = 1}
+				drawingList[#drawingList+1] = {x = x-8, z = z-8, tex = 1, edge = true}
 			end
 		end
 	end
@@ -2782,15 +2784,18 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	for i = 1, #drawingList do
 		local x = drawingList[i].x+4
 		local z = drawingList[i].z+4
+		local edge = drawingList[i].edge
+		drawingList[i].edge = nil -- don't sent to other gadget to send to unsynced
+		-- edge exists because raised walls have passability at higher normal than uniform ramps
 		local oHeight = spGetGroundOrigHeight(x,z)
 		local height = spGetGroundHeight(x,z)
 		if abs(oHeight-height) < 1 then
 			drawingList[i].tex = 0
 		else
 			local normal = select(2,Spring.GetGroundNormal(x,z))
-			if normal > 0.9 then
+			if (edge and normal > 0.8) or (not edge and  normal > 0.892) then
 				drawingList[i].tex = 1
-			elseif normal > 0.6 then
+			elseif (edge and normal > 0.41) or (not edge and normal > 0.585) then
 				drawingList[i].tex = 2
 			else
 				drawingList[i].tex = 3

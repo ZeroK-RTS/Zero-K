@@ -102,9 +102,9 @@ local special_commands = {
 	[CMD_RAMP] = {order = 16, row = 3},
 	[CMD_LEVEL] = {order = 17, row = 3},
 	[CMD_RAISE] = {order = 18, row = 3},
-	[CMD_SMOOTH] = {order = 19, row = 3},
-	[CMD_RESTORE] = {order = 20, row = 3},
-	[CMD_BUMPY] = {order = 21, row = 3},
+	[CMD_RESTORE] = {order = 19, row = 3},
+	[CMD_SMOOTH] = {order = 20, row = 3},
+	--[CMD_BUMPY] = {order = 21, row = 3},
 }
 
 local function CopyBuildArray(source, target)

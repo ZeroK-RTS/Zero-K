@@ -113,8 +113,8 @@ local minRampWidth = 24
 local startRampWidth = 40
 
 -- max slope of certain units, changes ramp colour
-local botPathingGrad = 1.35
-local vehPathingGrad = 0.5
+local botPathingGrad = 1.375
+local vehPathingGrad = 0.498
 
 -- Colours used during height choosing for level and raise
 local negVolume   = {1, 0, 0, 0.1} -- negative volume
