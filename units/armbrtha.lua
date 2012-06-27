@@ -46,6 +46,7 @@ unitDef = {
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[armbrtha.s3o]],
+  script                        = [[armbrtha.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
 

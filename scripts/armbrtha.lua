@@ -51,11 +51,11 @@ end
 
 function script.FireWeapon(num)
 	EmitSfx( ground,  UNIT_SFX1 )
-	Move( barrel , z_axis, -20 , 500 )
+	Move( barrel , z_axis, -24 , 500 )
 	EmitSfx( barrel_back,  UNIT_SFX2 )
 	EmitSfx( muzzle,  UNIT_SFX3 )
 	WaitForMove(barrel, z_axis)
-	Move( barrel , z_axis, 12 , 6 )
+	Move( barrel , z_axis, 0 , 6 )
 end
 
 function script.QueryWeapon(num)
