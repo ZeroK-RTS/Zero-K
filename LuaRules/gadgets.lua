@@ -92,122 +92,129 @@ gadgetHandler = {
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()
 local callInLists = {
-  'Shutdown',
+	"Shutdown",
 
-  'GamePreload',
-  'GameStart',
-  'GameOver',
-  'TeamDied',
+	"GamePreload",
+	"GameStart",
+	"GameOver",
+	"GameID",
+	"TeamDied",
 
-  'GameFrame',
+	"GameFrame",
 
-  'ViewResize',  -- FIXME ?
+	"ViewResize",  -- FIXME ?
 
-  'TextCommand',  -- FIXME ?
-  'GotChatMsg',
-  'RecvLuaMsg',
+	"TextCommand",  -- FIXME ?
+	"GotChatMsg",
+	"RecvLuaMsg",
 
-  -- Unit CallIns
-  'UnitCreated',
-  'UnitFinished',
-  'UnitFromFactory',
-  'UnitDestroyed',
-  'UnitExperience',
-  'UnitIdle',
-  'UnitCmdDone',
-  'UnitPreDamaged',
-  'UnitDamaged',
-  'UnitTaken',
-  'UnitGiven',
-  'UnitEnteredRadar',
-  'UnitEnteredLos',
-  'UnitLeftRadar',
-  'UnitLeftLos',
-  'UnitSeismicPing',
-  'UnitLoaded',
-  'UnitUnloaded',
-  'UnitCloaked',
-  'UnitDecloaked',
-  'StockpileChanged',
+	-- Unit CallIns
+	"UnitCreated",
+	"UnitFinished",
+	"UnitFromFactory",
+	"UnitDestroyed",
+	"UnitExperience",
+	"UnitIdle",
+	"UnitCmdDone",
+	"UnitPreDamaged",
+	"UnitDamaged",
+	"UnitTaken",
+	"UnitGiven",
+	"UnitEnteredRadar",
+	"UnitEnteredLos",
+	"UnitLeftRadar",
+	"UnitLeftLos",
+	"UnitSeismicPing",
+	"UnitLoaded",
+	"UnitUnloaded",
+	"UnitCloaked",
+	"UnitDecloaked",
+	-- optional
+	-- "UnitUnitCollision",
+	-- "UnitFeatureCollision",
+	-- "UnitMoveFailed",
+	"StockpileChanged",
 
-  -- Feature CallIns
-  'FeatureCreated',
-  'FeatureDestroyed',
+	-- Feature CallIns
+	"FeatureCreated",
+	"FeatureDestroyed",
 
-  -- Projectile CallIns
-  'ProjectileCreated',
-  'ProjectileDestroyed',
+	-- Projectile CallIns
+	"ProjectileCreated",
+	"ProjectileDestroyed",
 
-  -- Shield CallIns
-  'ShieldPreDamaged',
+	-- Shield CallIns
+	"ShieldPreDamaged",
 
-  -- Misc Synced CallIns
-  'Explosion',
+	-- Misc Synced CallIns
+	"Explosion",
 
-  -- LuaRules CallIns
-  'CommandFallback',
-  'AllowCommand',
-  'AllowUnitCreation',
-  'AllowUnitTransfer',
-  'AllowUnitBuildStep',
-  'AllowFeatureBuildStep',
-  'AllowFeatureCreation',
-  'AllowResourceLevel',
-  'AllowResourceTransfer',
-  'AllowDirectUnitControl',
-  'MoveCtrlNotify',
-  'TerraformComplete',
-  'AllowWeaponTargetCheck',
-  'AllowWeaponTarget',
-  -- unsynced
-  'DrawUnit',
-  'DrawFeature',
-  'AICallIn',
+	-- LuaRules CallIns (note: the *PreDamaged calls belong here too)
+	"CommandFallback",
+	"AllowCommand",
+	"AllowUnitCreation",
+	"AllowUnitTransfer",
+	"AllowUnitBuildStep",
+	"AllowFeatureBuildStep",
+	"AllowFeatureCreation",
+	"AllowResourceLevel",
+	"AllowResourceTransfer",
+	"AllowDirectUnitControl",
+	"MoveCtrlNotify",
+	"TerraformComplete",
+	"AllowWeaponTargetCheck",
+	"AllowWeaponTarget",
+	-- unsynced
+	"DrawUnit",
+	"DrawFeature",
+	"DrawShield",
+	"RecvSkirmishAIMessage",
 
-  -- COB CallIn  (FIXME?)
-  'CobCallback',
+	-- COB CallIn  (FIXME?)
+	"CobCallback",
 
-  -- Unsynced CallIns
-  'Update',
-  'DefaultCommand',
-  'DrawGenesis',
-  'DrawWorld',
-  'DrawWorldPreUnit',
-  'DrawWorldShadow',
-  'DrawWorldReflection',
-  'DrawWorldRefraction',
-  'DrawScreenEffects',
-  'DrawScreen',
-  'DrawInMiniMap',
-  'RecvFromSynced',
+	-- Unsynced CallIns
+	"Update",
+	"DefaultCommand",
+	"DrawGenesis",
+	"DrawWorld",
+	"DrawWorldPreUnit",
+	"DrawWorldShadow",
+	"DrawWorldReflection",
+	"DrawWorldRefraction",
+	"DrawScreenEffects",
+	"DrawScreen",
+	"DrawInMiniMap",
+	"RecvFromSynced",
 
-  -- moved from LuaUI
-  'KeyPress',
-  'KeyRelease',
-  'MousePress',
-  'MouseRelease',
-  'MouseMove',
-  'MouseWheel',
-  'IsAbove',
-  'GetTooltip',
-  'UnsyncedHeightMapUpdate',
-  
-  -- FIXME -- not implemented  (more of these?)
-  'WorldTooltip',
-  'MapDrawCmd',
-  'GameSetup',
-  'DefaultCommand',
+	-- moved from LuaUI
+	"KeyPress",
+	"KeyRelease",
+	"MousePress",
+	"MouseRelease",
+	"MouseMove",
+	"MouseWheel",
+	"IsAbove",
+	"GetTooltip",
 
-  -- Save/Load
-  'Save',
-  'Load',
-  
-  -- FIXME: NOT IN BASE
-  'UnitCommand',
-  'UnitEnteredWater',
-  'UnitEnteredAir',
-  'UnitLeftWater',
-  'UnitLeftAir',
+	-- FIXME -- not implemented  (more of these?)
+	"WorldTooltip",
+	"MapDrawCmd",
+	"GameSetup",
+	"DefaultCommand",
+
+	-- Save/Load
+	"Save",
+	"Load",
+
+	-- FIXME: NOT IN BASE
+	"UnitCommand",
+	"UnitEnteredWater",
+	"UnitEnteredAir",
+	"UnitLeftWater",
+	"UnitLeftAir",
+
+	"UnsyncedHeightMapUpdate"
 }
 
 
@@ -913,7 +920,7 @@ function gadgetHandler:RegisterCMDID(gadget, id)
   end
   if (self.CMDIDs[id] ~= nil) then
     Spring.Echo('Gadget (' .. gadget.ghInfo.name .. ') ' ..
-                'tried to register a CMD_ID >= 40000')
+                'tried to register a duplicated CMD_ID')
     Script.Kill('Duplicate CMD_ID code: ' .. id)
   end
   self.CMDIDs[id] = gadget
@@ -1057,6 +1064,13 @@ function gadgetHandler:GameOver()
   return
 end
 
+function gadgetHandler:GameID(gameID)
+  for _,g in ipairs(self.GameIDList) do
+    g:GameID(gameID)
+  end
+  return
+end
+
 
 function gadgetHandler:TeamDied(teamID)
   for _,g in ipairs(self.TeamDiedList) do
@@ -1089,9 +1103,18 @@ function gadgetHandler:DrawFeature(featureID, drawMode)
   return false
 end
 
-function gadgetHandler:AICallIn(dataStr)
-  for _,g in ipairs(self.AICallInList) do
-    local dataRet = g:AICallIn(dataStr)
+function gadgetHandler:DrawShield(unitID, weaponID, drawMode)
+  for _,g in ipairs(self.DrawShieldList) do
+    if (g:DrawShield(unitID, weaponID, drawMode)) then
+      return true
+    end
+  end
+  return false
+end
+
+function gadgetHandler:RecvSkirmishAIMessage(aiTeam, dataStr)
+  for _,g in ipairs(self.RecvSkirmishAIMessageList) do
+    local dataRet = g:RecvSkirmishAIMessage(aiTeam, dataStr)
     if (dataRet) then
       return dataRet
     end
@@ -1125,10 +1148,10 @@ end
 
 
 function gadgetHandler:AllowUnitCreation(unitDefID, builderID,
-                                         builderTeam, x, y, z)
+                                         builderTeam, x, y, z, facing)
   for _,g in ipairs(self.AllowUnitCreationList) do
     if (not g:AllowUnitCreation(unitDefID, builderID,
-                                builderTeam, x, y, z)) then
+                                builderTeam, x, y, z, facing)) then
       return false
     end
   end
@@ -1192,9 +1215,9 @@ function gadgetHandler:AllowResourceLevel(teamID, res, level)
 end
 
 
-function gadgetHandler:AllowResourceTransfer(teamID, res, level)
+function gadgetHandler:AllowResourceTransfer(oldTeamID, newTeamID, res, amount)
   for _,g in ipairs(self.AllowResourceTransferList) do
-    if (not g:AllowResourceTransfer(teamID, res, level)) then
+    if (not g:AllowResourceTransfer(oldTeamID, newTeamID, res, amount)) then
       return false
     end
   end
@@ -1247,23 +1270,21 @@ function gadgetHandler:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, att
 	return true
 end
 
-
-function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
+function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
+	local allowed = true
 	local priority = 1.0
 
 	for _, g in ipairs(self.AllowWeaponTargetList) do
-		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
+		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 
 		if (not targetAllowed) then
-			return false, 1.0
+			allowed = false; break
 		end
 
-		if (targetPriority > 0.0) then
-			priority = priority * targetPriority
-		end
+		priority = math.max(priority, targetPriority)
 	end
 
-	return true, priority
+	return allowed, priority
 end
 
 
@@ -1458,6 +1479,19 @@ function gadgetHandler:UnitDecloaked(unitID, unitDefID, unitTeam)
     g:UnitDecloaked(unitID, unitDefID, unitTeam)
   end
   return
+end
+
+
+function gadgetHandler:UnitUnitCollision(colliderID, collideeID)
+	for _,g in ipairs(self.UnitUnitCollisionList) do
+		g:UnitUnitCollision(colliderID, collideeID)
+	end
+end
+
+function gadgetHandler:UnitFeatureCollision(colliderID, collideeID)
+	for _,g in ipairs(self.UnitFeatureCollisionList) do
+		g:UnitFeatureCollision(colliderID, collideeID)
+	end
 end
 
 
