@@ -304,7 +304,7 @@ local function removeFlying(_, unitID)
 end
 
 function gadget:Initialize()
-        gadgetHandler:AddSyncAction("addFlying", addFlying)
+    gadgetHandler:AddSyncAction("addFlying", addFlying)
 	gadgetHandler:AddSyncAction("removeFlying", removeFlying)
 end
 
@@ -317,7 +317,7 @@ end
 
 function gadget:Shutdown()
 	gadgetHandler.RemoveSyncAction("addFlying")
-        gadgetHandler.RemoveSyncAction("removeFlying")
+    gadgetHandler.RemoveSyncAction("removeFlying")
 end
 
 

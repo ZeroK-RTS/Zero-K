@@ -66,6 +66,7 @@ local spSetUnitPosition		= Spring.SetUnitPosition
 local spSetUnitSensorRadius	= Spring.SetUnitSensorRadius
 local spGetAllUnits			= Spring.GetAllUnits
 local spSetUnitTooltip		= Spring.SetUnitTooltip
+local spGetUnitIsDead       = Spring.GetUnitIsDead
 
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
@@ -2348,6 +2349,16 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		else
 			costDiff = costDiff - (terra.baseCost-terra.baseCostSpent)
 			terra.baseCostSpent = false
+			
+			--[[ naive ground drawing
+			local drawingList = {}
+			for i = 1, terra.points do
+				local x = terra.point[i].x
+				local z = terra.point[i].z
+				drawingList[#drawingList+1] = {x = x, z = z, tex = 1}
+			end
+			GG.Terrain_Texture_changeBlockList(drawingList)
+			--]]
 			--[[
 			something pertaining to drawing would go here
 			for i = 1, terra.points do
@@ -2733,6 +2744,62 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	end
 	spSetHeightMapFunc(func)
 
+	-- Draw the changes
+	local drawingList = {}
+	for i = 1, terra.points do
+		local x = terra.point[i].x
+		local z = terra.point[i].z
+		local freeLeft = not (terra.area[x-8] and terra.area[x-8][z]) and not (extraPointArea[x-8] and extraPointArea[x-8][z])
+		local freeUp = not (terra.area[x] and terra.area[x][z-8]) and not (extraPointArea[x] and extraPointArea[x][z-8])
+		drawingList[#drawingList+1] = {x = x, z = z, tex = 1}
+		if freeLeft then
+			drawingList[#drawingList+1] = {x = x-8, z = z, tex = 1}
+		end
+		if freeUp then
+			drawingList[#drawingList+1] = {x = x, z = z-8, tex = 1}
+			if freeLeft then
+				drawingList[#drawingList+1] = {x = x-8, z = z-8, tex = 1}
+			end
+		end
+	end
+	for i = 1, extraPoints do
+		local x = extraPoint[i].x
+		local z = extraPoint[i].z
+		local freeLeft = not (extraPointArea[x-8] and extraPointArea[x-8][z])
+		local freeUp = not (terra.area[x] and terra.area[x][z-8]) and not (extraPointArea[x] and extraPointArea[x][z-8])
+		drawingList[#drawingList+1] = {x = x, z = z, tex = 2}
+		if freeLeft then
+			drawingList[#drawingList+1] = {x = x-8, z = z, tex = 2}
+		end
+		if freeUp then
+			drawingList[#drawingList+1] = {x = x, z = z-8, tex = 2}
+			if freeLeft then
+				drawingList[#drawingList+1] = {x = x-8, z = z-8, tex = 2}
+			end
+		end
+	end
+	
+	for i = 1, #drawingList do
+		local x = drawingList[i].x+4
+		local z = drawingList[i].z+4
+		local oHeight = spGetGroundOrigHeight(x,z)
+		local height = spGetGroundHeight(x,z)
+		if abs(oHeight-height) < 1 then
+			drawingList[i].tex = 0
+		else
+			local normal = select(2,Spring.GetGroundNormal(x,z))
+			if normal > 0.9 then
+				drawingList[i].tex = 1
+			elseif normal > 0.6 then
+				drawingList[i].tex = 2
+			else
+				drawingList[i].tex = 3
+			end
+		end
+	end
+	
+	GG.Terrain_Texture_changeBlockList(drawingList)
+	
 	--Removed Intercept Check
 	--if terraformUnit[id].intercepts ~= 0 then
 	--	local i = 1
@@ -3261,6 +3328,10 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID)
+
+	if spGetUnitIsDead(unitID) then
+		return
+	end
 
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
