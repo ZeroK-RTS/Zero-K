@@ -243,6 +243,8 @@ local maximum = 0
 local totalLoads = {}
 local allOverTime = 0
 local allOverTimeSec = 0
+local memusage = 0
+local memString = ''
 
 local sortedList = {}
 local function SortFunc(a,b)
@@ -293,6 +295,13 @@ end
                 n = n + 1
         end
       end
+      
+      memusage = collectgarbage("count")
+      if memusage > 10000 then
+	memString = ('%.1f'):format(memusage/1024) .. " M"
+      else
+	memString = ('%.0f'):format(memusage) .. "k"
+      end
 
       table.sort(sortedList,SortFunc)
     end
@@ -322,6 +331,10 @@ end
     i = i+1
     gl.Text("\255\255\064\064total FPS cost", x+150, y-1-(12)*i, 10)
     gl.Text("\255\255\064\064"..('%.1f%%'):format(allOverTime), x+105, y-1-(12)*i, 10)
+    i = i+1
+    
+    gl.Text("\255\255\064\064memory usage", x+150, y-1-(12)*i, 10)
+    gl.Text("\255\255\064\064"..memString, x+105, y-1-(12)*i, 10)
     gl.EndText()
   end
 
