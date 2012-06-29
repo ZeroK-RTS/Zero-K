@@ -1274,7 +1274,7 @@ function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum
 	local priority = 1.0
 
 	for _, g in ipairs(self.AllowWeaponTargetList) do
-		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
+		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 
 		if (not targetAllowed) then
 			return false, 1.0
