@@ -83,7 +83,7 @@ unitDef = {
 
     DEPTHCHARGE = {
       name                    = [[Depth Charge]],
-      areaOfEffect            = 32,
+      areaOfEffect            = 128,
       avoidFriendly           = false,
       collideFriendly         = false,
       craterBoost             = 1,
@@ -95,14 +95,12 @@ unitDef = {
 
       edgeEffectiveness       = 0.99,
       explosionGenerator      = [[custom:TORPEDO_HIT]],
-      guidance                = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       model                   = [[depthcharge.s3o]],
       noSelfDamage            = true,
       predictBoost            = 1,
-      propeller               = [[1]],
       range                   = 300,
       reloadtime              = 3,
       soundHit                = [[explosion/wet/ex_underwater]],

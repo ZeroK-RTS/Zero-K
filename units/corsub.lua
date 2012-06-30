@@ -74,7 +74,7 @@ unitDef = {
       def                = [[ARM_TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 180,
+      maxAngleDif        = 270,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP]],
     },
 
@@ -115,7 +115,7 @@ unitDef = {
       startVelocity           = 90,
       tolerance               = 32767,
       tracks                  = true,
-      turnRate                = 10000,
+      turnRate                = 16000,
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 25,
