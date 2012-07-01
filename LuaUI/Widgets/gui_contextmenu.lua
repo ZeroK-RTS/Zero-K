@@ -259,7 +259,7 @@ local function weapons2Table(cells, weaponStats, ws, merw, index)
 				ws.dps = ws.dps + wsm.dps
 			end
 		end
-		-- multiply paralyze damage by 3 because engine is a damn dirty liar
+		-- multiply paralyze damage by 3 due to armor.txt
 		ws.damw = ws.damw * 3
 		ws.dpsw = ws.dpsw * 3
 		
