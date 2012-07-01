@@ -88,7 +88,7 @@ unitDef = {
       avoidFriendly           = true,
       burnblow                = true,
       craterBoost             = 1,
-      craterMult              = 2,
+      craterMult              = 0.5,
 
 	  customParams            = {
 	    gatherradius = [[90]],
