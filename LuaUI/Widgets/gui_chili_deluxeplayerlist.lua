@@ -3,10 +3,10 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Deluxe Player List - Alpha 1",
+    name      = "Chili Deluxe Player List - Alpha 2",
     desc      = "v0.1 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
-    date      = "2012-06-23",
+    date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     enabled   = true,
@@ -52,7 +52,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/Interface/PlayerList'
-options_order = { 'visible', 'backgroundOpacity', 'text_height', 'name_width', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'text_height', 'name_width', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -86,6 +86,12 @@ options = {
 		OnChange = function() SetupPanels() end,
 		advanced = true
 	},
+	mousewheel = {
+		name = "Scroll with mousewheel",
+		type = 'bool',
+		value = false,
+		OnChange = function(self) scroll_cpl.noMouseWheel = not self.value; end,
+	},
 	alignToTop = {
 		name = "Align to top",
 		type = 'bool',
@@ -118,7 +124,7 @@ options = {
 		name = "Show stats in color",
 		type = 'bool',
 		value = false,
-		desc = "Display resource statistics such as unit metal and income in each player's color (rather than white)",
+		desc = "Display resource statistics such as unit metal and income in each player's color (vs. white)",
 		OnChange = function() SetupPlayerNames() end,
 	},
 	show_ccr = {
@@ -132,14 +138,21 @@ options = {
 		name = "Show rank as text",
 		type = 'bool',
 		value = false,
-		desc = "Show rank as text (rather than as an icon)",
+		desc = "Show rank as text (vs. as an icon)",
 		OnChange = function() SetupPlayerNames() end,
 	},
 	cpu_ping_as_text = {
 		name = "Show ping/cpu as text",
 		type = 'bool',
 		value = false,
-		desc = "Show ping and cpu stats as text (rather than as an icon)",
+		desc = "Show ping and cpu stats as text (vs. as an icon)",
+		OnChange = function() SetupPanels() end,
+	},
+	show_tooltips = {
+		name = "Show tooltips",
+		type = 'bool',
+		value = true,
+		desc = "Show tooltips where available (vs. hiding all tooltips)",
 		OnChange = function() SetupPanels() end,
 	},
 	list_size = {
@@ -397,7 +410,8 @@ local function GetPlayerTeamStats(teamID)
 			end
 			if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
 				-- for mobiles, count only completed units
-				if speed and speed ~= 0 and isbuilt then mMobs = mMobs + metal
+				if speed and speed ~= 0 then
+					if isbuilt then mMobs = mMobs + metal end
 				-- for static defense, include full cost of unfinished units so you can see when your teammates are trying to build too much
 				elseif not unarmed then	mDefs = mDefs + metal
 				end
@@ -474,7 +488,7 @@ end
 
 local function MakeSpecTooltip()
 
-	if list_size == 4 or (list_size == 3 and #specTeam.roster == 0) then
+	if (not options.show_tooltips.value) or list_size == 4 or (list_size == 3 and #specTeam.roster == 0) then
 		scroll_cpl.tooltip = nil
 		return
 	end
@@ -562,6 +576,8 @@ local function MakeNewIcon(entity,name,o)
 	o.y				= o.y			or ((fontsize+1) * row) + 2
 	o.width			= o.width		or fontsize + 3
 	o.height		= o.height		or fontsize + 3
+	
+	o.tooltip = options.show_tooltips.value and o.tooltip or nil
 
 	local newIcon = Chili.Image:New(o)
 	entity[name] = newIcon
@@ -618,12 +634,12 @@ local function UpdatePingCpu(entity,pingTime,cpuUsage,pstatus)
 	else
 		if entity.cpuImg then
 			entity.cpuImg.color = cpuCol
-			entity.cpuImg.tooltip = ('CPU: ' .. cpuText)
+			if options.show_tooltips.value then entity.cpuImg.tooltip = ('CPU: ' .. cpuText) end
 			entity.cpuImg:Invalidate()
 		end
 		if entity.pingImg then
 			entity.pingImg.color = pingCol
-			entity.pingImg.tooltip = ('Ping: ' .. pingText)
+			if options.show_tooltips.value then entity.pingImg.tooltip = ('Ping: ' .. pingText) end
 			entity.pingImg:Invalidate()
 		end
 	end
@@ -860,7 +876,7 @@ local function AddEntity(entity, teamID, allyTeamID)
 				y=(fontsize+1) * (row+0.5)-2.5,
 				height = fontsize,
 				width = fontsize,
-				tooltip = 'Double click to share selected units to ' .. entity.name,
+				tooltip = options.show_tooltips.value and 'Double click to share selected units to ' .. entity.name or nil,
 				caption = '',
 				padding ={0,0,0,0},
 				OnDblClick = { function(self) ShareUnits(entity.name, teamID) end, },
@@ -1233,7 +1249,8 @@ SetupScrollPanel = function ()
 		scrollbarSize = 6,
 		width = x_bound,
 		horizontalScrollbar = false,
-		hitTestAllowEmpty = true
+		hitTestAllowEmpty = true,
+		noMouseWheel = not options.mousewheel.value,
 	}
 	if options.alignToLeft.value then
 		scpl.left = 0
