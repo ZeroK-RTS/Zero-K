@@ -194,7 +194,7 @@ local function RemoveAllianceUnit(u, ud, teamID)
 		commsAlive[allianceID][u] = nil
 	end
 	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID))) and (allianceID ~= chickenAllyTeamID) then
-		Spring.Echo("purge")
+		Spring.Echo("purge allyTeam" .. allianceID)
 		DestroyAlliance(allianceID)
 	end
 end
@@ -238,7 +238,9 @@ local function ProcessLastAlly()
 			local t = teamlist[i]
 			-- any team without units is dead to us; so only teams who are active AND have units matter
 			-- except chicken, who are alive even without units
-			if (aliveCount[t] > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then	
+			local numAlive = aliveCount[t]
+			if #(Spring.GetTeamUnits(t)) == 0 then numAlive = 0 end
+			if (numAlive > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then	
 				local playerlist = spGetPlayerList(t, true) -- active players
 				if playerlist then
 					for j=1,#playerlist do
@@ -340,7 +342,7 @@ end
 function gadget:GameFrame(n)
   -- check for last ally:
   -- end condition: only 1 ally with human players, no AIs in other ones
-  if (n % 37 < 0.1) then
+  if (n % 45 == 0) then
 	for u in pairs(toDestroy) do
 		spDestroyUnit(u, true)
 	end
