@@ -103,9 +103,9 @@ local pActivity = {}
 
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("AFK",1,true) then
-		pActivity[playerID+1] = tonumber(msg:sub(4))
+		pActivity[playerID] = tonumber(msg:sub(4))
 	elseif msg:find("TAKE",1,true) then
-		playerWantTake[playerID+1]= 250
+		playerWantTake[playerID]= 250
 	end
 end
 
@@ -123,11 +123,11 @@ local function GetRecepient(allyTeam, laggers)
 	for i=1,#teams do
 		local leader = select(2, Spring.GetTeamInfo(teams[i]))
 		local name, active, spectator, _, _, _, _, _, _, customKeys = Spring.GetPlayerInfo(leader)
-		local deductElo = (unstablePlayerCounter[leader+1] or 0)*250 --unstable player is deducted 250*times-lagging ELO
-		local addElo = (playerWantTake[leader+1] or 0) --player who want a "take" is added 250 ELO
-		playerWantTake[leader+1] = 0 --reset value
+		local deductElo = (unstablePlayerCounter[leader] or 0)*250 --unstable player is deducted 250*times-lagging ELO
+		local addElo = (playerWantTake[leader] or 0) --player who want a "take" is added 250 ELO
+		playerWantTake[leader] = 0 --reset value
 		if active and not spectator and not laggers[leader] then	-- only consider giving to someone in position to take!
-			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0) - deductElo + addElo)}
+			candidatesForTake[#candidatesForTake] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0) - deductElo + addElo)}
 		end
 	end
 
@@ -157,12 +157,12 @@ function gadget:GameFrame(n)
 		
 		for i=1,#players do
 			local name,active,spec,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
-			local afk = Spring.GetGameSeconds() - (pActivity[players[i]+1] or 0)
+			local afk = Spring.GetGameSeconds() - (pActivity[players[i]] or 0)
 			local _,_,_,isAI,_,_ = Spring.GetTeamInfo(team)
 			if not spec  and not isAI then 
 				if (afkTeams[team] == true) then  -- team was AFK 
 					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- team no longer AFK, return his or her units
-						tickTockCounter[players[i]+1] = nil -- empty tick-tock clock.
+						tickTockCounter[players[i]] = nil -- empty tick-tock clock.
 						Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
 						GG.allowTransfer = true
 						local spTransferUnit = Spring.TransferUnit
@@ -179,16 +179,16 @@ function gadget:GameFrame(n)
 					end 
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
-					tickTockCounter[players[i]+1] = (tickTockCounter[players[i]+1] or 0) + 1 --tick tock clock ++
-					if tickTockCounter[players[i]+1] >= 2 then --allow team to be tagged as lagging only after 3 passes (3x50frame = 5 second).
+					tickTockCounter[players[i]] = (tickTockCounter[players[i]] or 0) + 1 --tick tock clock ++
+					if tickTockCounter[players[i]] >= 2 then --allow team to be tagged as lagging only after 3 passes (3x50frame = 5 second).
 						local units = Spring.GetTeamUnits(team)
 						if units ~= nil and #units > 0 then 
 							laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
-							unstablePlayerCounter[players[i]+1] = (unstablePlayerCounter[players[i]+1] or 0) + 1 --mark player as unstable + 1
+							unstablePlayerCounter[players[i]] = (unstablePlayerCounter[players[i]] or 0) + 1 --mark player as unstable + 1
 						end
 					end
 				else --if not at all AFK or lagging: then...
-					tickTockCounter[players[i]+1] = nil -- empty tick-tock clock. We don't want the counter to always show 2 if player/team return.
+					tickTockCounter[players[i]] = nil -- empty tick-tock clock. We don't want the counter to always show 2 if player/team return.
 				end
 			end
 		end
