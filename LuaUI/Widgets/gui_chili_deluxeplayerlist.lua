@@ -3,13 +3,13 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Deluxe Player List - Alpha 2",
+    name      = "Chili Deluxe Player List - Alpha 2.01",
     desc      = "v0.1 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
-    enabled   = true,
+    enabled   = false,
     detailsDefault = 1
 	-- based on v1.31 Chili Crude Player List by CarRepairer, KingRaptor, et al
   }
