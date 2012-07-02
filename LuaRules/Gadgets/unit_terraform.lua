@@ -20,7 +20,7 @@ if (gadgetHandler:IsSyncedCode()) then -- SYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local USE_TERRAIN_TEXTURE_CHANGE = true
+local USE_TERRAIN_TEXTURE_CHANGE = false
 
 -- Speedups
 local cos             		= math.cos

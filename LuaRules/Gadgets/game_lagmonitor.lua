@@ -29,7 +29,6 @@ end
 --5) request "TAKE" --> temporary increase the perceived ELO by 250
 
 --Everything else: anti-bug, syntax, methods, ect
---1) all table that use playerID as index will have "playerID + 1" as index. reason: playerID can be "0" but table index can't accept "0".
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
   
