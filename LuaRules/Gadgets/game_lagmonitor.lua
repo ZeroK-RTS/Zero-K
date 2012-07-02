@@ -126,7 +126,7 @@ local function GetRecepient(allyTeam, laggers)
 		local addElo = (playerWantTake[leader] or 0) --player who want a "take" is added 250 ELO
 		playerWantTake[leader] = 0 --reset value
 		if active and not spectator and not laggers[leader] then	-- only consider giving to someone in position to take!
-			candidatesForTake[#candidatesForTake] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0) - deductElo + addElo)}
+			candidatesForTake[#candidatesForTake+1] = {name = name, team = teams[i], rank = ((tonumber(customKeys.elo) or 0) - deductElo + addElo)}
 		end
 	end
 
