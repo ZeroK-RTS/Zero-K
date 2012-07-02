@@ -127,10 +127,10 @@ function script.AimWeapon(num, heading, pitch)
 		Sleep(250)
 	end
 
-	Spring.Echo(heading*toDegrees)
+	--Spring.Echo(heading*toDegrees)
 	
 	position = math.floor((heading + tauOn12)/tauOn6)%6
-	Spring.Echo(position)
+	--Spring.Echo(position)
 	
 	
 	Turn( turret, y_axis, heading,  math.rad(600))
