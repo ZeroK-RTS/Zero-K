@@ -1,5 +1,5 @@
 -- $Id: gui_take_remind.lua 3550 2008-12-26 04:50:47Z evil4zerggin $
-local versionNumber = "v3.53"
+local versionNumber = "v3.54"
 
 function widget:GetInfo()
   return {
@@ -20,6 +20,7 @@ end
 --      and some smaller speed ups
 --  SirMaverick: works now when someone uses "/spectator"
 --  jK: now even faster
+--	msafwan: implement take quiting player using game_lagmonitor.lua, and rearrange stuff.
 ------------------------------------------------
 ------------------------------------------------
 --Crude Documentation:
@@ -28,10 +29,8 @@ end
 -- 2) press the button --> count lagger's units --> change button text to "Wait..." (textPlsWait = true) --> [execute a "/take" when alternateTake== false OR execute a LUA-msg-lagmonitor when alternateTake== true] IF units ">0"
 -- 3) 'widget:Unit Taken' --> count lagger's units --> reset button text to "Click here..." (textPlsWait = false) --> hide button IF units "=0"
 
---  logic:
+-- Others:
 -- 1) console-message "Giving all unit.." --> alternateTake= false --> count lagger's units --> change button text to "Click here..." (textPlsWait = false) --> hide button IF units "=0"
--- 2) console-message "player xxx left the game: normal quit/timeout" --> alternateTake= true
-
 ------------------------------------------------
 -- config
 ------------------------------------------------
@@ -52,10 +51,8 @@ local buttonX = 240
 local buttonY = 36
 local recheck = false
 --local lastActivePlayers = 0
-local gameStarted = false
 local textPlsWait = false
 local alternateTake = false
-local playerOutsideGame = {}
 
 ------------------------------------------------
 -- speedups
@@ -90,7 +87,7 @@ local function GetTeamIsTakeable(teamID)
 		local playerID = players[i]
 		local _, active, spec = spGetPlayerInfo(playerID)
 		if (spec) -- team who crossed to the spectator realm is takeable. Ie: in ZK only resigned player goes to spectator.
-			or (playerOutsideGame[playerID]) then -- team who crossed to reality realm is takeable. Ie: exited/quited player is not spectator but is outside game
+			or not active then -- team who crossed to reality realm is takeable. Ie: exited/quited player is not active player, but they are not spec
 			takeAble = true --if above condition is meet (spec, or outside) then this team is indeed takeable! take it...
 		end
 	end
@@ -204,8 +201,8 @@ function _Update(_,dt)
 		count = UpdateUnitsToTake()
 		if (count == 0) then
 			UnbindCallins()
+			recheck = false
 		end
-		recheck = false
 	end
 end
 
@@ -343,7 +340,6 @@ function widget:Initialize()
   count = 0
   myAllyTeamID = spGetMyAllyTeamID()
   --lastActivePlayers = #(spGetPlayerList(true) or {})
-  gameStarted = (Spring.GetGameFrame() > 0) --check whether game already started. ie: incase where LUAUI is reloaded after 'GameStart' event
 end
 
 
@@ -355,7 +351,6 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 function widget:GameStart() -- check at game start for players who dropped or didn't connect at all
-	gameStarted = true
 	ProcessButton()
 end
 
@@ -366,15 +361,10 @@ function widget:PlayerChanged(playerID) --check for player who became spec or un
 	end
 end
 
-function widget:PlayerRemoved(playerID, reason)-- check for dropped player (ally and non-spec only). To function with help of "game_lagmonitor.lua".
+function widget:PlayerRemoved(playerID, reason)-- check for dropped player (ally and non-spec only). To functioning with help of "game_lagmonitor.lua".
 	local _,_,spec,_,allyTeamID = spGetPlayerInfo(playerID)
-	if gameStarted and (allyTeamID == myAllyTeamID) and (not spec) then
+	if (allyTeamID == myAllyTeamID) and (not spec) then
 		alternateTake = true
-		playerOutsideGame[playerID] = true
 		ProcessButton()
 	end
-end
-
-function widget:PlayerAdded(playerID)
-	playerOutsideGame[playerID] = nil
 end
