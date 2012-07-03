@@ -201,8 +201,8 @@ function _Update(_,dt)
 		count = UpdateUnitsToTake()
 		if (count == 0) then
 			UnbindCallins()
-			recheck = false
 		end
+		recheck = false
 	end
 end
 
