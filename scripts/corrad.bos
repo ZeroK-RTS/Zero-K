@@ -38,10 +38,10 @@ TargetingLaser()
 {
 	while( on == 1 )
 	{
-		turn emit1 to x-axis <-40> now;
-		turn emit2 to x-axis <-20> now;
-		turn emit3 to x-axis <0> now;
-		turn emit4 to x-axis <20> now;
+		turn emit1 to x-axis <-50> now;
+		turn emit2 to x-axis <-40> now;
+		turn emit3 to x-axis <-20> now;
+		turn emit4 to x-axis <-5> now;
 		
 		emit-sfx 2048 from emit1;
 		emit-sfx 2049 from emit2;
@@ -62,10 +62,10 @@ TargetingLaser()
 		
 		sleep 20;
 		
-		turn emit1 to x-axis <-20> now;
-		turn emit2 to x-axis <0> now;
-		turn emit3 to x-axis <20> now;
-		turn emit4 to x-axis <40> now;
+		turn emit1 to x-axis <5> now;
+		turn emit2 to x-axis <20> now;
+		turn emit3 to x-axis <40> now;
+		turn emit4 to x-axis <50> now;
 		
 		emit-sfx 2048 from emit1;
 		emit-sfx 2049 from emit2;
