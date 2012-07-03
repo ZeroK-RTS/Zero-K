@@ -2,9 +2,9 @@
 
 #include "constants.h"
 
-piece  base, ground, head;
+piece  base, ground, head, emit1, emit2, emit3, emit4;
 
-static-var  statechg_DesiredState, statechg_StateChanging;
+static-var  statechg_DesiredState, statechg_StateChanging, on;
 
 
 SmokeUnit(healthpercent, sleeptime, smoketype)
@@ -34,13 +34,59 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 	}
 }
 
+TargetingLaser()
+{
+	while( on == 1 )
+	{
+		turn emit1 to x-axis <-40> now;
+		turn emit2 to x-axis <-20> now;
+		turn emit3 to x-axis <0> now;
+		turn emit4 to x-axis <20> now;
+		
+		emit-sfx 2048 from emit1;
+		emit-sfx 2049 from emit2;
+		emit-sfx 2050 from emit3;
+		emit-sfx 2051 from emit4;
+		
+		sleep 20;
+
+		turn emit1 to x-axis <-30> now;
+		turn emit2 to x-axis <-10> now;
+		turn emit3 to x-axis <10> now;
+		turn emit4 to x-axis <30> now;
+		
+		emit-sfx 2048 from emit1;
+		emit-sfx 2049 from emit2;
+		emit-sfx 2050 from emit3;
+		emit-sfx 2051 from emit4;
+		
+		sleep 20;
+		
+		turn emit1 to x-axis <-20> now;
+		turn emit2 to x-axis <0> now;
+		turn emit3 to x-axis <20> now;
+		turn emit4 to x-axis <40> now;
+		
+		emit-sfx 2048 from emit1;
+		emit-sfx 2049 from emit2;
+		emit-sfx 2050 from emit3;
+		emit-sfx 2051 from emit4;
+		
+		sleep 20;
+	}
+}
+
 Go()
 {
+	start-script TargetingLaser();
+	on = 1;
 	spin head around y-axis speed <60.010989>;
+	
 }
 
 Stop()
 {
+	on = 0;
 	spin head around y-axis speed <0.000000>;
 }
 

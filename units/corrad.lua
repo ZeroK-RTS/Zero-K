@@ -61,7 +61,83 @@ unitDef = {
     helptext_fr    = [[]],
     helptext_de    = [[Dieser Radarturm ermöglicht die frühzeitige Lokalisierung von feindlichen Einheiten in der entsprechenden Reichweite. Für den Betrieb wird eine sehr kleine Menge Energie benötigt. Die Radarbedeckung wird durch Gelände - beispielsweise Berge - blockiert.]],
   },  
-  
+
+  weapons                       = {
+
+    {
+      def                = [[TARGETER]],
+      onlyTargetCategory = [[NONE]],
+    },
+
+
+    {
+      def                = [[TARGETER]],
+      onlyTargetCategory = [[NONE]],
+    },
+
+    {
+      def                = [[TARGETER]],
+      onlyTargetCategory = [[NONE]],
+    },
+
+
+    {
+      def                = [[TARGETER]],
+      onlyTargetCategory = [[NONE]],
+    },
+
+  },
+
+
+  weaponDefs                    = {
+
+    TARGETER = {
+      name                    = [[Groovecutter]],
+      alwaysVisible           = 18,
+      areaOfEffect            = 56,
+      avoidFeature            = false,
+      avoidNeutral            = false,
+      beamlaser               = 1,
+      beamTime                = 0.01,
+      canattackground         = false,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
+      cylinderTargetting      = 8192,
+
+      damage                  = {
+        default = 1,
+        planes  = 1,
+      },
+
+      explosionGenerator      = [[custom:FLASHLAZER]],
+      impulseBoost            = 0,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 1,
+      minIntensity            = 1,
+      range                   = 500,
+      reloadtime              = 0.03,
+      rgbColor                = [[0 0.7 0.6]],
+      soundStart              = [[weapon/laser/laser_burn6]],
+      soundStartVolume        = 1,
+      soundTrigger            = true,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 1,
+      tolerance               = 10000,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 1400,
+    },
+
+  },
+
+
   featureDefs                   = {
 
     DEAD  = {
