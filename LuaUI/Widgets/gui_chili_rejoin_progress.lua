@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v1.06 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.08 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
     date      = "June 17, 2012",
     license   = "GNU GPL, v2 or later",
@@ -49,8 +49,9 @@ local oneSecondElapsed_G = 0 --//variable: a timer for 1 second, used in Update(
 local myGameFrame_G = 0 --//variable: get latest my gameFrame from GameFrame() and do work with it.
 local myLastFrameNum_G = 0 --//variable: used to calculate local game-frame rate.
 local ui_active_G = false --//variable:indicate whether UI is shown or hidden.
-local averageLocalSpeed_G = {sumOfSpeed= 0, sumCounter= 0} --//variable: store the local-gameFrame speeds so that an average can be calculated.  
-local simpleMovingAverageLocalSpeed_G = {storage={},currentIndex = 1, currentAverage=30} --//variable: for calculating rolling average. Initial average is set at 30 (x1.0 gameSpeed)
+local averageLocalSpeed_G = {sumOfSpeed= 0, sumCounter= 0} --//variable: store the local-gameFrame speeds so that an average can be calculated. 
+local defaultAverage_G = 30 --//constant: Initial/Default average is set at 30gfps (x1.0 gameSpeed)
+local simpleMovingAverageLocalSpeed_G = {storage={},index = 1, runningAverage=defaultAverage_G} --//variable: for calculating rolling average. Initial/Default average is set at 30gfps (x1.0 gameSpeed)
 --------------------------------------------------------------------------------
 --Variable for fixing GameProgress delay at rejoin------------------------------
 local myTimestamp_G = 0 --//variable: store my own timestamp at GameStart
@@ -58,7 +59,7 @@ local serverFrameNum2_G = nil --//variable: the expected server-frame of current
 local submittedTimestamp_G = {} --//variable: store all timestamp at GameStart submitted by original players (assuming we are rejoining)
 local functionContainer_G = function(x) end --//variable object: store a function 
 local myPlayerID_G = 0
-local gameProgress_G = false --//variable: signal whether GameProgress has been updated.
+local gameProgressActive_G = false --//variable: signal whether GameProgress has been updated.
 --------------------------------------------------------------------------------
 --[[
 if VFS.FileExists("Luaui/Config/ZK_data.lua") then
@@ -104,7 +105,7 @@ function widget:GameProgress(serverFrameNum) --this function run 3rd. It read th
 	-----return--
 	serverFrameNum1_G = serverFrameNum1
 	ui_active_G = ui_active
-	gameProgress_G = true
+	gameProgressActive_G = true
 end
 
 function widget:Update(dt) --this function run 4th. It update the progressBar
@@ -117,7 +118,8 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 			local oneSecondElapsed = oneSecondElapsed_G
 			local myLastFrameNum = myLastFrameNum_G
 			local serverFrameRate = serverFrameRate_G
-			local myGameFrame = myGameFrame_G			
+			local myGameFrame = myGameFrame_G		
+			local simpleMovingAverageLocalSpeed = simpleMovingAverageLocalSpeed_G
 			-----localize
 			
 			local serverFrameNum = serverFrameNum1 or serverFrameNum2 --use FrameNum from GameProgress if available, else use FrameNum derived from LUA_msg.
@@ -132,7 +134,7 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 			myGameFrameRate = averageLocalSpeed_G.sumOfSpeed/averageLocalSpeed_G.sumCounter -- using the average to calculate the estimate for time of completion.
 			--]]
 			--Method2: simple moving average
-			myGameFrameRate = SimpleMovingAverage(myGameFrameRate) -- get our average frameRate
+			myGameFrameRate = SimpleMovingAverage(myGameFrameRate, simpleMovingAverageLocalSpeed) -- get our average frameRate
 			
 			local timeToComplete = frameDistanceToFinish/myGameFrameRate -- estimate the time to completion.
 			local timeToComplete_string = string.format ("%.1f",timeToComplete) .." second left."
@@ -149,6 +151,7 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 			serverFrameNum2_G = serverFrameNum2
 			oneSecondElapsed_G = oneSecondElapsed
 			myLastFrameNum_G = myLastFrameNum
+			simpleMovingAverageLocalSpeed_G = simpleMovingAverageLocalSpeed
 		end
 	end
 end
@@ -166,18 +169,23 @@ function widget:GameFrame(n)  --this function run at all time. It update current
 end
 
 --//thanks to Rafal[0K] for pointing to the rolling average idea.
-function SimpleMovingAverage(myGameFrameRate) 
-	local index = (simpleMovingAverageLocalSpeed_G.currentIndex) --retrieve current index.
-	simpleMovingAverageLocalSpeed_G.storage[index] = myGameFrameRate --remember current entry.
-	simpleMovingAverageLocalSpeed_G.currentIndex = simpleMovingAverageLocalSpeed_G.currentIndex +1 --advance index by 1.
-	if simpleMovingAverageLocalSpeed_G.currentIndex == 152 then
-		simpleMovingAverageLocalSpeed_G.currentIndex = 1 --wrap the table index around (create a circle of 151 entry).
+function SimpleMovingAverage(myGameFrameRate, simpleMovingAverageLocalSpeed)
+	--//remember current frameRate, and advance table index by 1
+	local index = (simpleMovingAverageLocalSpeed.index) --retrieve current index.
+	simpleMovingAverageLocalSpeed.storage[index] = myGameFrameRate --remember current frameRate at current index.
+	simpleMovingAverageLocalSpeed.index = simpleMovingAverageLocalSpeed.index +1 --advance index by 1.
+	--//wrap table index around. Create a circle
+	local poolingSize = 10 --//number of sample. note: simpleMovingAverage() is executed every second, so the value represent an average spanning 10 second.
+	if (simpleMovingAverageLocalSpeed.index == (poolingSize + 2)) then --when table out-of-bound:
+		simpleMovingAverageLocalSpeed.index = 1 --wrap the table index around (create a circle of 150 + 1 (ie: poolingSize plus 1 space) entry).
 	end
-	index = (simpleMovingAverageLocalSpeed_G.currentIndex) --retrieve an index advanced by 1.
-	simpleMovingAverageLocalSpeed_G.currentAverage = simpleMovingAverageLocalSpeed_G.currentAverage + myGameFrameRate/150 - (simpleMovingAverageLocalSpeed_G.storage[index] or 30)/150 --calculate average: add new value, remove old value. Ref: http://en.wikipedia.org/wiki/Moving_average#Simple_moving_average
-	myGameFrameRate = simpleMovingAverageLocalSpeed_G.currentAverage -- replace myGameFrameRate with its average value.
+	--//update averages
+	index = (simpleMovingAverageLocalSpeed.index) --retrieve an index advanced by 1.
+	local oldAverage = (simpleMovingAverageLocalSpeed.storage[index] or defaultAverage_G) --retrieve old average or use initial/default average as old average.
+	simpleMovingAverageLocalSpeed.runningAverage = simpleMovingAverageLocalSpeed.runningAverage + myGameFrameRate/poolingSize - oldAverage/poolingSize --calculate average: add new value, remove old value. Ref: http://en.wikipedia.org/wiki/Moving_average#Simple_moving_average
+	local avgGameFrameRate = simpleMovingAverageLocalSpeed.runningAverage -- replace myGameFrameRate with its average value.
 
-	return myGameFrameRate
+	return avgGameFrameRate, simpleMovingAverageLocalSpeed
 end
 
 function CheckTTSwidget()
@@ -288,7 +296,7 @@ end
 ----------------------------------------------------------
 --fix for Game Progress delay-----------------------------
 function widget:RecvLuaMsg(bigMsg, playerID) --this function run 2nd. It read the LUA timestamp
-	if gameProgress_G then 
+	if gameProgressActive_G then --skip LUA message if gameProgress is already active
 		return false 
 	end
 	
@@ -329,7 +337,7 @@ function widget:RecvLuaMsg(bigMsg, playerID) --this function run 2nd. It read th
 	end
 end
 
-function widget:GameStart() --this function run 1st before any other function. It send LUA timestamp
+function widget:GameStart() --this function run 1st, before any other function. It send LUA timestamp
 	--local format = "%H:%M" 
 	local currentTime = os.date("!*t") --ie: clock on "gui_epicmenu.lua" (widget by CarRepairer), UTC & format: http://lua-users.org/wiki/OsLibraryTutorial
 	local systemSecond = currentTime.hour*3600 + currentTime.min*60 + currentTime.sec

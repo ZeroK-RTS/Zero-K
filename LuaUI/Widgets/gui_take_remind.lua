@@ -1,5 +1,5 @@
 -- $Id: gui_take_remind.lua 3550 2008-12-26 04:50:47Z evil4zerggin $
-local versionNumber = "v3.51"
+local versionNumber = "v3.53"
 
 function widget:GetInfo()
   return {
@@ -84,20 +84,20 @@ local glColor = gl.Color
 ------------------------------------------------
 
 local function GetTeamIsTakeable(teamID)
-	local takeAble = true --assume a takeable team
+	local takeAble = false --assume team is not takeable
+	local players = spGetPlayerList(teamID)--get player(s) in a team
+	for i=1, #players do -- check every player in a team
+		local playerID = players[i]
+		local _, active, spec = spGetPlayerInfo(playerID)
+		if (spec) -- team who crossed to the spectator realm is takeable. Ie: in ZK only resigned player goes to spectator.
+			or (playerOutsideGame[playerID]) then -- team who crossed to reality realm is takeable. Ie: exited/quited player is not spectator but is outside game
+			takeAble = true --if above condition is meet (spec, or outside) then this team is indeed takeable! take it...
+		end
+	end
+
 	local _,_,_,isAI = Spring.GetTeamInfo(teamID)
 	if isAI then 
 		takeAble = false  -- AI teams is not takeable
-	end
-
-	local players = spGetPlayerList(teamID,true)
-	for i=1, #players, 1 do -- check shared player in a team
-		local playerID = players[i]
-		local _, _, spec = spGetPlayerInfo(playerID)
-		if (not spec) -- team who hadn't yet crossed to the spectator realm is not takeable. Ie: in ZK only resigned player goes to spectator.
-			or (not playerOutsideGame[playerID]) then -- team who hadn't yet crossed to reality realm is not takeable. Ie: exited/quited player can still play
-			takeAble = false --if above condition is meet (not spec, and not outside) then this team is indeed playing! dont take...
-		end
 	end
 	return takeAble
 end
@@ -117,7 +117,7 @@ end
 local function UpdateUnitsToTake()
 	local unitCount = 0 -- the number of units to take
 	local teamList = spGetTeamList(myAllyTeamID)
-	for i= 1, #teamList ,1 do
+	for i= 1, #teamList do
 		local teamID = teamList[i]
 		local unitsOwned = spGetTeamUnitCount(teamID)
 		local takeable = GetTeamIsTakeable(teamID)
@@ -184,10 +184,10 @@ end
 function Take()
 	if alternateTake then
 		Spring.SendLuaUIMsg("TAKE")
-		Spring.Echo("Take lite")
+		Spring.Echo("sending TAKE msg")
 	else
 		Spring.SendCommands("take")
-		Spring.Echo("Take heavy")
+		Spring.Echo("executing /TAKE cmd")
 	end
 end
 
@@ -281,16 +281,28 @@ function _DrawWorld()
   end
 end
 
+function _AddConsoleLine(_,line,priority)
+	if (line:sub(1,20) == "Giving all units of ") then --to know when "game_lagmonitor.lua" finished transfer the unit. Used to re-display the "take button" (if any unit left) and to reset the take method back to "/take" instead of waiting for "game_lagmonitor.lua" (if the case)
+		local allyNumLoc = line:find("#",-5,true)
+		local allyNum = tonumber(line:sub(allyNumLoc+1,allyNumLoc+1))
+		if allyNum == myAllyTeamID then 
+			alternateTake =false
+			ProcessButton()
+		end
+	end
+end
 
 local function UpdateCallins()
-  widgetHandler:UpdateCallIn('Update')
-  widgetHandler:UpdateCallIn('Update')
-  widgetHandler:UpdateCallIn('MousePress')
-  widgetHandler:UpdateCallIn('MousePress')
-  widgetHandler:UpdateCallIn('DrawScreen')
-  widgetHandler:UpdateCallIn('DrawScreen')
-  widgetHandler:UpdateCallIn('DrawWorld')
-  widgetHandler:UpdateCallIn('DrawWorld')
+	widgetHandler:UpdateCallIn('Update')
+	widgetHandler:UpdateCallIn('Update')
+	widgetHandler:UpdateCallIn('MousePress')
+	widgetHandler:UpdateCallIn('MousePress')
+	widgetHandler:UpdateCallIn('DrawScreen')
+	widgetHandler:UpdateCallIn('DrawScreen')
+	widgetHandler:UpdateCallIn('DrawWorld')
+	widgetHandler:UpdateCallIn('DrawWorld')
+	widgetHandler:UpdateCallIn('AddConsoleLine')
+	widgetHandler:UpdateCallIn('AddConsoleLine')
 end
 
 
@@ -300,16 +312,18 @@ function BindCallins()
   widget.MouseRelease = _MouseRelease
   widget.DrawScreen = _DrawScreen
   widget.DrawWorld = _DrawWorld
+  widget.AddConsoleLine = _AddConsoleLine
   UpdateCallins()
 end
 
 
 function UnbindCallins()
-  widget.Update = nil
-  widget.MousePress = nil
-  widget.MouseRelease = nil
-  widget.DrawScreen = nil
-  widget.DrawWorld = nil
+  widget.Update = function() end
+  widget.MousePress = function() end
+  widget.MouseRelease = function() end
+  widget.DrawScreen = function() end
+  widget.DrawWorld = function() end --Note: originally it was assigned a "nil", but when performed on AddConsoleLine() it seems to not work, so added an empty-function instead as precaution.
+  widget.AddConsoleLine = function() end --Note: this is empty-function instead of "nil" because "nil" caused AddConsoleLine() on other widget to fail (eg: Chili Chat). Probably caused by cawidget.lua stopped iterating AddConsoleLine() after it found "nil" (because cawidget.lua uses ipair).
   UpdateCallins()
 end
 
@@ -329,6 +343,7 @@ function widget:Initialize()
   count = 0
   myAllyTeamID = spGetMyAllyTeamID()
   --lastActivePlayers = #(spGetPlayerList(true) or {})
+  gameStarted = (Spring.GetGameFrame() > 0) --check whether game already started. ie: incase where LUAUI is reloaded after 'GameStart' event
 end
 
 
@@ -345,32 +360,21 @@ function widget:GameStart() -- check at game start for players who dropped or di
 end
 
 function widget:PlayerChanged(playerID) --check for player who became spec or un-spec
-	local _,_,_,_,allyTeamID,_,_,_,_,_ = spGetPlayerInfo(playerID)
+	local _,_,_,_,allyTeamID = spGetPlayerInfo(playerID)
 	if (allyTeamID == myAllyTeamID) then
 		ProcessButton()
 	end
 end
 
 function widget:PlayerRemoved(playerID, reason)-- check for dropped player (ally and non-spec only). To function with help of "game_lagmonitor.lua".
-	local _,_,isSpec,_,allyTeamID,_,_,_,_,_ = spGetPlayerInfo(playerID)
-	if gameStarted and (allyTeamID == myAllyTeamID) and (not isSpec) then
-		ProcessButton()
+	local _,_,spec,_,allyTeamID = spGetPlayerInfo(playerID)
+	if gameStarted and (allyTeamID == myAllyTeamID) and (not spec) then
 		alternateTake = true
 		playerOutsideGame[playerID] = true
+		ProcessButton()
 	end
 end
 
 function widget:PlayerAdded(playerID)
 	playerOutsideGame[playerID] = nil
-end
-
-function widget:AddConsoleLine(line,priority) -- update button when game_lagmonitor.lua gave away units
-	if (line:sub(1,20) == "Giving all units of ") then --to know when "game_lagmonitor.lua" finished transfer the unit. Used to re-display the "take button" (if any unit left) and to reset the take method back to "/take" instead of waiting for "game_lagmonitor.lua" (if the case)
-		local allyNumLoc = line:find("#",-5,true)
-		local allyNum = tonumber(line:sub(allyNumLoc+1,allyNumLoc+1))
-		if allyNum == myAllyTeamID then 
-			alternateTake =false
-			ProcessButton()
-		end
-	end
 end
