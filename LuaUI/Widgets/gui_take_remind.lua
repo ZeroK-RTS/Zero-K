@@ -1,12 +1,12 @@
 -- $Id: gui_take_remind.lua 3550 2008-12-26 04:50:47Z evil4zerggin $
-local versionNumber = "v3.54"
+local versionNumber = "v3.55"
 
 function widget:GetInfo()
   return {
     name      = "Take Reminder",
     desc      = versionNumber .. " Reminds you to /take if a player is gone",
     author    = "Evil4Zerggin",
-    date      = "31 March 2007,2008,2009",
+    date      = "31 March 2007,2008,2009,2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false --  loaded by default?
@@ -20,7 +20,7 @@ end
 --      and some smaller speed ups
 --  SirMaverick: works now when someone uses "/spectator"
 --  jK: now even faster
---	msafwan: implement take quiting player using game_lagmonitor.lua, and rearrange stuff.
+--	msafwan: implement take for quiting (not resigning) player using game_lagmonitor.lua, and rearranged stuff.
 ------------------------------------------------
 ------------------------------------------------
 --Crude Documentation:
@@ -81,6 +81,7 @@ local glColor = gl.Color
 ------------------------------------------------
 
 local function GetTeamIsTakeable(teamID)
+	if teamID == myTeamID then return false end
 	local takeAble = false --assume team is not takeable
 	local players = spGetPlayerList(teamID)--get player(s) in a team
 	for i=1, #players do -- check every player in a team
