@@ -101,7 +101,6 @@ unitDef = {
       beamTime                = 0.01,
       canattackground         = false,
       coreThickness           = 0.5,
-      CollideFriendly         = 0,
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargetting      = 8192,
