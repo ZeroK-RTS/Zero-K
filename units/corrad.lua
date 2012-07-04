@@ -69,32 +69,13 @@ unitDef = {
       onlyTargetCategory = [[NONE]],
     },
 
-
-    {
-      def                = [[TARGETER]],
-      onlyTargetCategory = [[NONE]],
-    },
-
-    {
-      def                = [[TARGETER]],
-      onlyTargetCategory = [[NONE]],
-    },
-
-
-    {
-      def                = [[TARGETER]],
-      onlyTargetCategory = [[NONE]],
-    },
-
   },
 
 
   weaponDefs                    = {
 
     TARGETER = {
-      name                    = [[Groovecutter]],
-      alwaysVisible           = 18,
-      areaOfEffect            = 56,
+      name                    = [[Scanning Lidar]],
       avoidFeature            = false,
       avoidNeutral            = false,
       beamlaser               = 1,
@@ -103,36 +84,32 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargetting      = 8192,
 
       damage                  = {
-        default = 1,
-        planes  = 1,
+        default = -1E-06,
+        planes  = -1E-06,
       },
 
-      explosionGenerator      = [[custom:FLASHLAZER]],
+      explosionGenerator      = [[custom:NONE]],
+      impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
-      largeBeamLaser          = true,
+      largeBeamLaser          = false,
       laserFlareSize          = 1,
       minIntensity            = 1,
       range                   = 500,
       reloadtime              = 0.03,
       rgbColor                = [[0 0.7 0.6]],
-      soundStart              = [[weapon/laser/laser_burn6]],
-      soundStartVolume        = 1,
-      soundTrigger            = true,
-      texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
+      texture1                = [[largelaserdark]],
+      texture2                = [[flaredark]],
+      texture3                = [[flaredark]],
+      texture4                = [[smallflaredark]],
       thickness               = 1,
       tolerance               = 10000,
       turret                  = true,
       waterWeapon             = true,
       weaponType              = [[BeamLaser]],
-      weaponVelocity          = 1400,
     },
 
   },

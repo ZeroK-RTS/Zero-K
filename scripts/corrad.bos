@@ -44,9 +44,9 @@ TargetingLaser()
 		turn emit4 to x-axis <-5> now;
 		
 		emit-sfx 2048 from emit1;
-		emit-sfx 2049 from emit2;
-		emit-sfx 2050 from emit3;
-		emit-sfx 2051 from emit4;
+		emit-sfx 2048 from emit2;
+		emit-sfx 2048 from emit3;
+		emit-sfx 2048 from emit4;
 		
 		sleep 20;
 
@@ -56,9 +56,9 @@ TargetingLaser()
 		turn emit4 to x-axis <30> now;
 		
 		emit-sfx 2048 from emit1;
-		emit-sfx 2049 from emit2;
-		emit-sfx 2050 from emit3;
-		emit-sfx 2051 from emit4;
+		emit-sfx 2048 from emit2;
+		emit-sfx 2048 from emit3;
+		emit-sfx 2048 from emit4;
 		
 		sleep 20;
 		
@@ -68,9 +68,9 @@ TargetingLaser()
 		turn emit4 to x-axis <50> now;
 		
 		emit-sfx 2048 from emit1;
-		emit-sfx 2049 from emit2;
-		emit-sfx 2050 from emit3;
-		emit-sfx 2051 from emit4;
+		emit-sfx 2048 from emit2;
+		emit-sfx 2048 from emit3;
+		emit-sfx 2048 from emit4;
 		
 		sleep 20;
 	}
