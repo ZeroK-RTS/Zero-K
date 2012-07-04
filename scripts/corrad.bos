@@ -78,7 +78,7 @@ TargetingLaser()
 
 Go()
 {
-	start-script TargetingLaser();
+	//start-script TargetingLaser();
 	on = 1;
 	spin head around y-axis speed <60.010989>;
 	

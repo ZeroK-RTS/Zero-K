@@ -63,12 +63,10 @@ unitDef = {
   },  
 
   weapons                       = {
-
-    {
-      def                = [[TARGETER]],
-      onlyTargetCategory = [[NONE]],
-    },
-
+    --{
+    --  def                = [[TARGETER]],
+    --  onlyTargetCategory = [[NONE]],
+    --},
   },
 
 
