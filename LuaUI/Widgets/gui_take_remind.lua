@@ -1,5 +1,5 @@
 -- $Id: gui_take_remind.lua 3550 2008-12-26 04:50:47Z evil4zerggin $
-local versionNumber = "v3.55"
+local versionNumber = "v3.56"
 
 function widget:GetInfo()
   return {
@@ -53,6 +53,7 @@ local recheck = false
 --local lastActivePlayers = 0
 local textPlsWait = false
 local alternateTake = false
+local droppedPlayer
 
 ------------------------------------------------
 -- speedups
@@ -81,21 +82,19 @@ local glColor = gl.Color
 ------------------------------------------------
 
 local function GetTeamIsTakeable(teamID)
-	if teamID == myTeamID then return false end
-	local takeAble = false --assume team is not takeable
-	local players = spGetPlayerList(teamID)--get player(s) in a team
-	for i=1, #players do -- check every player in a team
-		local playerID = players[i]
-		local _, active, spec = spGetPlayerInfo(playerID)
-		if (spec) -- team who crossed to the spectator realm is takeable. Ie: in ZK only resigned player goes to spectator.
-			or not active then -- team who crossed to reality realm is takeable. Ie: exited/quited player is not active player, but they are not spec
-			takeAble = true --if above condition is meet (spec, or outside) then this team is indeed takeable! take it...
-		end
-	end
-
+	local takeAble = true --assume team is takeable
 	local _,_,_,isAI = Spring.GetTeamInfo(teamID)
 	if isAI then 
 		takeAble = false  -- AI teams is not takeable
+	end
+	local players = spGetPlayerList(teamID)--get player(s) in a team
+	for i=1, #players do -- check every player in a team. If one of them is active/not-spec then the team is not takeable
+		local playerID = players[i]
+				Spring.Echo("GetTeamIsTakeable, playerID "..playerID)
+		local _, active, spec = spGetPlayerInfo(playerID)
+		if (not spec) and (active) then -- only team who become spectator OR is outside-game is takeable. Ie: in ZK only resigned player goes to spectator, and exited player is not spectator.
+			takeAble = false --if above condition is meet (not spec, and not outside) then this team is not takeable!...
+		end
 	end
 	return takeAble
 end
@@ -180,7 +179,7 @@ end
 
 
 function Take()
-	if alternateTake then
+	if droppedPlayer then --alternateTake
 		Spring.SendLuaUIMsg("TAKE")
 		Spring.Echo("sending TAKE msg")
 	else
@@ -283,8 +282,8 @@ function _AddConsoleLine(_,line,priority)
 	if (line:sub(1,20) == "Giving all units of ") then --to know when "game_lagmonitor.lua" finished transfer the unit. Used to re-display the "take button" (if any unit left) and to reset the take method back to "/take" instead of waiting for "game_lagmonitor.lua" (if the case)
 		local allyNumLoc = line:find("#",-5,true)
 		local allyNum = tonumber(line:sub(allyNumLoc+1,allyNumLoc+1))
-		if allyNum == myAllyTeamID then 
-			alternateTake =false
+		if allyNum == myAllyTeamID then
+			droppedPlayer = nil
 			ProcessButton()
 		end
 	end
@@ -340,7 +339,6 @@ function widget:Initialize()
   posy = vsy * 0.75
   count = 0
   myAllyTeamID = spGetMyAllyTeamID()
-  --lastActivePlayers = #(spGetPlayerList(true) or {})
 end
 
 
@@ -365,7 +363,7 @@ end
 function widget:PlayerRemoved(playerID, reason)-- check for dropped player (ally and non-spec only). To functioning with help of "game_lagmonitor.lua".
 	local _,_,spec,_,allyTeamID = spGetPlayerInfo(playerID)
 	if (allyTeamID == myAllyTeamID) and (not spec) then
-		alternateTake = true
+		droppedPlayer = playerID
 		ProcessButton()
 	end
 end
