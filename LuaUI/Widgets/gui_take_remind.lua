@@ -90,7 +90,7 @@ local function GetTeamIsTakeable(teamID)
 	local players = spGetPlayerList(teamID)--get player(s) in a team
 	for i=1, #players do -- check every player in a team. If one of them is active/not-spec then the team is not takeable
 		local playerID = players[i]
-				Spring.Echo("GetTeamIsTakeable, playerID "..playerID)
+ 
 		local _, active, spec = spGetPlayerInfo(playerID)
 		if (not spec) and (active) then -- only team who become spectator OR is outside-game is takeable. Ie: in ZK only resigned player goes to spectator, and exited player is not spectator.
 			takeAble = false --if above condition is meet (not spec, and not outside) then this team is not takeable!...
