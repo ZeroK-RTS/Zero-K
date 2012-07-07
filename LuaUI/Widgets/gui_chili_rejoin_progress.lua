@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v1.08 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.1 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
     date      = "June 17, 2012",
     license   = "GNU GPL, v2 or later",
@@ -137,7 +137,14 @@ function widget:Update(dt) --this function run 4th. It update the progressBar
 			myGameFrameRate = SimpleMovingAverage(myGameFrameRate, simpleMovingAverageLocalSpeed) -- get our average frameRate
 			
 			local timeToComplete = frameDistanceToFinish/myGameFrameRate -- estimate the time to completion.
-			local timeToComplete_string = string.format ("%.1f",timeToComplete) .." second left."
+			local timeToComplete_string = "?/?"
+			if timeToComplete > 75 then
+				local minute, second = math.modf(timeToComplete/60) --second divide by 60sec-per-minute, then saperate result from its remainder
+				second = 60*second --multiply remainder with 60sec-per-minute to get second back.
+				timeToComplete_string = string.format ("%.0f minute, %.0f second left.",minute, second)
+			else
+				timeToComplete_string = string.format ("%.1f second left.",timeToComplete)
+			end
 			progress_vote:SetCaption(timeToComplete_string)
 			progress_vote:SetValue(myGameFrame/serverFrameNum)
 			

@@ -1,5 +1,5 @@
 -- $Id: gui_take_remind.lua 3550 2008-12-26 04:50:47Z evil4zerggin $
-local versionNumber = "v3.56"
+local versionNumber = "v3.57"
 
 function widget:GetInfo()
   return {
@@ -90,7 +90,7 @@ local function GetTeamIsTakeable(teamID)
 	local players = spGetPlayerList(teamID)--get player(s) in a team
 	for i=1, #players do -- check every player in a team. If one of them is active/not-spec then the team is not takeable
 		local playerID = players[i]
- 
+				Spring.Echo("GetTeamIsTakeable, playerID "..playerID)
 		local _, active, spec = spGetPlayerInfo(playerID)
 		if (not spec) and (active) then -- only team who become spectator OR is outside-game is takeable. Ie: in ZK only resigned player goes to spectator, and exited player is not spectator.
 			takeAble = false --if above condition is meet (not spec, and not outside) then this team is not takeable!...
@@ -182,6 +182,7 @@ function Take()
 	if droppedPlayer then --alternateTake
 		Spring.SendLuaUIMsg("TAKE")
 		Spring.Echo("sending TAKE msg")
+		droppedPlayer = nil
 	else
 		Spring.SendCommands("take")
 		Spring.Echo("executing /TAKE cmd")
@@ -207,7 +208,7 @@ function _Update(_,dt)
 end
 
 
-function widget:UnitTaken()
+function _UnitTaken()
 	recheck = true
     count = UpdateUnitsToTake()
     if (count == 0) then
@@ -300,6 +301,8 @@ local function UpdateCallins()
 	widgetHandler:UpdateCallIn('DrawWorld')
 	widgetHandler:UpdateCallIn('AddConsoleLine')
 	widgetHandler:UpdateCallIn('AddConsoleLine')
+	widgetHandler:UpdateCallIn('UnitTaken')
+	widgetHandler:UpdateCallIn('UnitTaken')
 end
 
 
@@ -310,6 +313,7 @@ function BindCallins()
   widget.DrawScreen = _DrawScreen
   widget.DrawWorld = _DrawWorld
   widget.AddConsoleLine = _AddConsoleLine
+  widget.UnitTaken = _UnitTaken
   UpdateCallins()
 end
 
@@ -319,8 +323,9 @@ function UnbindCallins()
   widget.MousePress = function() end
   widget.MouseRelease = function() end
   widget.DrawScreen = function() end
-  widget.DrawWorld = function() end --Note: originally it was assigned a "nil", but when performed on AddConsoleLine() it seems to not work, so added an empty-function instead as precaution.
+  widget.DrawWorld = function() end --Note: originally it was assigned a "nil", but when same thing performed on AddConsoleLine() it seems to not work, so added an empty-function instead as precaution.
   widget.AddConsoleLine = function() end --Note: this is empty-function instead of "nil" because "nil" caused AddConsoleLine() on other widget to fail (eg: Chili Chat). Probably caused by cawidget.lua stopped iterating AddConsoleLine() after it found "nil" (because cawidget.lua uses ipair).
+  widget.UnitTaken = function() end
   UpdateCallins()
 end
 
