@@ -27,10 +27,6 @@ _ Make each player broadcast their choice to their team in a way it can be used 
 -- SirMaverick,		v1.0				:	Creation.
 --]]
 ----------------------------------------------
-if (VFS.FileExists("mission.lua")) then
-	return
-end
-
 local debug	= false --generates debug message
 local Echo	= Spring.Echo
 
