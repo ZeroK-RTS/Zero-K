@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehaa]],
-  name                   = [[Devestator]],
-  description            = [[AA vehicle]],
+  name                   = [[Lancer]],
+  description            = [[Fast AA Vehicle]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
   buildCostEnergy        = 260,
@@ -22,12 +22,12 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[Shoots missiles at enemy air.]],
+    helptext       = [[The Lancer is a speedy solution to enemy bomber attacks, and also works well against gunships.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
-  footprintX             = 2,
-  footprintZ             = 2,
+  footprintX             = 3,
+  footprintZ             = 3,
   iconType               = [[vehaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -72,7 +72,6 @@ unitDef = {
 
     {
       def                = [[MISSILE]],
-      badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
@@ -82,8 +81,8 @@ unitDef = {
   weaponDefs                    = {
 
     MISSILE = {
-      name                    = [[Homing Missiles]],
-      areaOfEffect            = 24,
+      name                    = [[Heavy Missile]],
+      areaOfEffect            = 32,
       canattackground         = false,
       cegTag                  = [[missiletrailblue]],
       craterBoost             = 0,
@@ -91,43 +90,37 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 10,
-        planes  = 100,
-        subs    = 5,
+        default = 40,
+        planes  = 400,
+        subs    = 20,
       },
 
       explosionGenerator      = [[custom:FLASH2]],
       fixedlauncher           = true,
       fireStarter             = 70,
       flightTime              = 3,
-      guidance                = true,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      lineOfSight             = true,
-      metalpershot            = 0,
-      model                   = [[wep_m_fury.s3o]],
+      model                   = [[wep_m_phoenix.s3o]],
       noSelfDamage            = true,
-      range                   = 750,
-      reloadtime              = 1.5,
+      range                   = 850,
+      reloadtime              = 4,
       renderType              = 1,
-      selfprop                = true,
-      smokedelay              = [[0.1]],
       smokeTrail              = true,
-      soundHit                = [[weapon/missile/rocket_hit]],
-      soundStart              = [[weapon/missile/missile_fire7]],
-      startsmoke              = [[1]],
-      startVelocity           = 350,
+      soundHit                = [[weapon/missile/sabot_hit]],
+      soundStart              = [[weapon/missile/missile_fire]],
+      startVelocity           = 300,
       texture2                = [[AAsmoketrail]],
       tolerance               = 9000,
       tracks                  = true,
       turnRate                = 63000,
       turret                  = true,
-      weaponAcceleration      = 300,
+      weaponAcceleration      = 250,
       weaponTimer             = 6,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 900,
+      weaponVelocity          = 700,
     },
 
   },
@@ -136,7 +129,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Devestator]],
+      description      = [[Wreckage - Lancer]],
       blocking         = true,
       collisionVolumeOffsets = [[0 0 0]],
       collisionVolumeScales  = [[32 40 52]],
@@ -157,7 +150,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Devestator]],
+      description      = [[Debris - Lancer]],
       blocking         = false,
       damage           = 900,
       energy           = 0,
