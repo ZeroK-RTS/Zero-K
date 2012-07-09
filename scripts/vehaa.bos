@@ -2,9 +2,9 @@
 
 #include "constants.h"
 
-piece		base, body, turret, firepoint, cab,
-			rwheel1, rwheel2, rwheel3,
-			lwheel1, lwheel2, lwheel3,
+piece		base, body, turret, firepoint,
+			rwheel1, rwheel2,
+			lwheel1, lwheel2,
 			gs1r, gs2r, gs3r,
 			gs1l, gs2l, gs3l;
 
@@ -20,39 +20,6 @@ static-var	moving, once, animCount,
 #define RESTORE_DELAY					3000
 
 #define TURRET_TURN_SPEED				<250>
-
-#define ANIM_PERIOD				50
-#define PIVOT_MOD				11 //appox. equal to MAX_PIVOT / turnrate
-#define MAX_PIVOT				<16>
-#define MIN_PIVOT				<-16>
-#define PIVOT_SPEED				<60>
-
-RestoreAfterDelay(delay)
-{
-	sleep delay;
-	turn turret to x-axis (0) speed TURRET_TURN_SPEED;
-}
-
-AnimControl() {
-	var lastHeading, currHeading, diffHeading, pivotAngle;
-	lastHeading = GET HEADING;
-	while (1) {
-	
-		//pivot
-		currHeading = GET HEADING;
-		diffHeading = currHeading - lastHeading;
-		if (diffHeading > 0x7fff) diffHeading = diffHeading - 0x10000;
-		if (diffHeading < -0x8000) diffHeading = diffHeading + 0x10000;
-		pivotAngle = diffHeading * PIVOT_MOD;
-		if (pivotAngle > MAX_PIVOT) pivotAngle = MAX_PIVOT;
-		if (pivotAngle < MIN_PIVOT) pivotAngle = MIN_PIVOT;
-		turn cab to y-axis pivotAngle speed PIVOT_SPEED;
-		turn base to y-axis 0 - pivotAngle speed PIVOT_SPEED;
-		
-		lastHeading = currHeading;
-		sleep ANIM_PERIOD;
-	}
-}
 
 Suspension()
 {
@@ -139,21 +106,17 @@ Suspension()
       turn base to z-axis ztilt speed <9000>;
       
       move rwheel1 to y-axis s1r speed <9000>;
-      move rwheel2 to y-axis s2r speed <9000>;
-      move rwheel3 to y-axis s3r speed <9000>;
+      move rwheel2 to y-axis s3r speed <9000>;
       
       move lwheel1 to y-axis s1l speed <9000>;
-      move lwheel2 to y-axis s2l speed <9000>;
-      move lwheel3 to y-axis s3l speed <9000>;
+      move lwheel2 to y-axis s3l speed <9000>;
       
       WHEEL_TURN_SPEED = ((get CURRENT_SPEED)/2);
       
 	spin rwheel1 around x-axis speed WHEEL_TURN_SPEED;
 	spin rwheel2 around x-axis speed WHEEL_TURN_SPEED;
-	spin rwheel3 around x-axis speed WHEEL_TURN_SPEED;
 	spin lwheel1 around x-axis speed WHEEL_TURN_SPEED;
 	spin lwheel2 around x-axis speed WHEEL_TURN_SPEED;
-	spin lwheel3 around x-axis speed WHEEL_TURN_SPEED;
 	
       sleep 10;
       }
@@ -204,10 +167,8 @@ StopMoving()
 	
 		stop-spin rwheel1 around x-axis;
 		stop-spin rwheel2 around x-axis;
-		stop-spin rwheel3 around x-axis;
 		stop-spin lwheel1 around x-axis;
 		stop-spin lwheel2 around x-axis;
-		stop-spin lwheel3 around x-axis;
 	
 		runsp = FALSE;
 	}
@@ -221,10 +182,8 @@ StartMoving()
 	
 	spin rwheel1 around x-axis speed WHEEL_TURN_SPEED;
 	spin rwheel2 around x-axis speed WHEEL_TURN_SPEED;
-	spin rwheel3 around x-axis speed WHEEL_TURN_SPEED;
 	spin lwheel1 around x-axis speed WHEEL_TURN_SPEED;
 	spin lwheel2 around x-axis speed WHEEL_TURN_SPEED;
-	spin lwheel3 around x-axis speed WHEEL_TURN_SPEED;
 	
 }
 
@@ -243,10 +202,6 @@ AimWeapon1 (heading, pitch)
 {
 	signal SIG_AIM1;
 	set-signal-mask SIG_AIM1;
-	turn turret to x-axis <-25> speed TURRET_TURN_SPEED;
-	wait-for-turn turret around x-axis;
-	start-script RestoreAfterDelay(RESTORE_DELAY);
-
 	return (TRUE);
 }
 
@@ -270,9 +225,9 @@ Killed(severity, corpsetype)
 	else if(severity >= 50 AND severity < 100)
 	{
 		corpsetype = 2;
-		explode rwheel3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode rwheel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode lwheel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode lwheel3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode lwheel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode turret type SHATTER | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
 	}
@@ -282,7 +237,7 @@ Killed(severity, corpsetype)
 		corpsetype = 2;
 		explode rwheel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode rwheel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode lwheel3 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+		explode lwheel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode lwheel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode body type SHATTER | BITMAP;
@@ -297,6 +252,5 @@ Create()
 		sleep 250;
 	}
 	start-script suspension();
-	start-script AnimControl();
 	start-script DamageControl();
 }

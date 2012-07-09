@@ -28,7 +28,7 @@ unitDef = {
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
-  iconType               = [[vehicleaa]],
+  iconType               = [[vehaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
@@ -42,7 +42,7 @@ unitDef = {
   movementClass          = [[TANK3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName             = [[vehicleaa.s3o]],
+  objectName             = [[vehaa.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   
