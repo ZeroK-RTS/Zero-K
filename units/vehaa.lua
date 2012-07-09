@@ -150,7 +150,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 104,
-      object           = [[vehicleaa_dead.s3o]],
+      object           = [[vehaa_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 104,
     },
