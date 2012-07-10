@@ -518,9 +518,9 @@ end
 
 function gadget:GameFrame(n)
 
-	--if n%32 == 2 then 
-    --    UpdateResourceStats((n-2)/32)
-    --end
+	if n%32 == 2 then 
+        UpdateResourceStats((n-2)/32)
+    end
 
 	if n % shareList_update == 1 and not spIsGameOver() then
 		UpdateShareList()
@@ -811,6 +811,81 @@ function gadget:Initialize()
 	end
 end
 
+local function SendEconomyDataToWidget()
+	
+	if (Script.LuaUI('WriteResourceStatsToFile')) then
+	
+		local resourceInfo = SYNCED.resourceInfo
+		local count = resourceInfo.count
+		local data = resourceInfo.data
+		local reallyBigString = ""
+		
+		for i = 1, count do
+			if data[i] then
+				local toSend = data[i].t .. " "
+				for allyTeamID, allyData in spairs(data[i].allyRes) do 
+					toSend = toSend .. " " .. allyTeamID .. " " ..
+					allyData.metal_income_total .. " " ..
+					allyData.metal_income_base .. " " ..
+					allyData.metal_income_overdrive .. " " ..
+					allyData.metal_income_other .. " " ..
+			
+					allyData.metal_spend_total .. " " ..
+					allyData.metal_spend_construction .. " " ..
+					allyData.metal_spend_waste .. " " ..
+					
+					allyData.metal_storage_current .. " " ..
+					allyData.metal_storage_free .. " " ..
+					
+					allyData.energy_income_total .. " " ..
+					
+					allyData.energy_spend_total .. " " ..
+					allyData.energy_spend_overdrive .. " " ..
+					allyData.energy_spend_construction .. " " ..
+					allyData.energy_spend_other .. " " ..
+					allyData.energy_spend_waste .. " " ..
+					
+					allyData.energy_storage_current
+				end
+				--Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. toSend)
+				reallyBigString = reallyBigString .. toSend .. "\n"
+				
+				toSend = data[i].t .. " "
+				
+				for teamID, teamData in spairs(data[i].teamRes) do 
+					toSend = toSend .. " " .. teamID .. " " ..
+					teamData.metal_income_total .. " " ..
+					teamData.metal_income_base .. " " ..
+					teamData.metal_income_overdrive .. " " ..
+					teamData.metal_income_other .. " " ..
+			
+					teamData.metal_spend_total .. " " ..
+					teamData.metal_spend_construction .. " " ..
+					
+					teamData.metal_share_net  .. " " ..
+					
+					teamData.metal_storage_current .. " " ..
+					
+					teamData.energy_income_total .. " " ..
+					
+					teamData.energy_spend_total .. " " ..
+					teamData.energy_spend_construction .. " " ..
+					teamData.energy_spend_other .. " " ..
+					
+					teamData.energy_share_net  .. " " ..
+					
+					teamData.energy_storage_current
+				end
+				
+				reallyBigString = reallyBigString .. toSend .. "\n"
+			end
+		end
+	
+		Script.LuaUI.WriteResourceStatsToFile(reallyBigString, teamNames)
+	end
+	
+end
+
 function gadget:GameOver()
 	gameOver = true
 	--Spring.Echo("Game over (unsynced)")
@@ -821,82 +896,7 @@ function gadget:GameOver()
 	end
 
 	--// Resources
-	local resourceInfo = SYNCED.resourceInfo
-	local data = resourceInfo.data
-	
-	local allyTeamList = Spring.GetAllyTeamList()
-	for i=1,#allyTeamList do
-		local allyTeamID = allyTeamList[i]
-		local teamList = Spring.GetTeamList(allyTeamID)
-		local toSend = allyTeamID
-		for j=1,#teamList do
-			local teamID = teamList[j]
-			toSend = toSend .. " " .. teamID .. " " .. (teamNames[teamID] or "no_name")
-		end
-		--Spring.SendCommands("wbynum 255 SPRINGIE: allyTeamPlayerMap " .. toSend)
-		--Spring.Echo(toSend)
-	end
-	
-	for i = 1, resourceInfo.count do
-		if data[i] then
-			local toSend = data[i].t .. " "
-			for allyTeamID, allyData in spairs(data[i].allyRes) do 
-				toSend = toSend .. " " .. allyTeamID .. " " ..
-				allyData.metal_income_total .. " " ..
-				allyData.metal_income_base .. " " ..
-				allyData.metal_income_overdrive .. " " ..
-				allyData.metal_income_other .. " " ..
-		
-				allyData.metal_spend_total .. " " ..
-				allyData.metal_spend_construction .. " " ..
-				allyData.metal_spend_waste .. " " ..
-				
-				allyData.metal_storage_current .. " " ..
-				allyData.metal_storage_free .. " " ..
-				
-				allyData.energy_income_total .. " " ..
-				
-				allyData.energy_spend_total .. " " ..
-				allyData.energy_spend_overdrive .. " " ..
-				allyData.energy_spend_construction .. " " ..
-				allyData.energy_spend_other .. " " ..
-				allyData.energy_spend_waste .. " " ..
-				
-				allyData.energy_storage_current
-			end
-			--Spring.SendCommands("wbynum 255 SPRINGIE: allyResourceData " .. toSend)
-			--Spring.Echo(toSend)
-			
-			toSend = data[i].t .. " "
-			
-			for teamID, teamData in spairs(data[i].teamRes) do 
-				toSend = toSend .. " " .. teamID .. " " ..
-				teamData.metal_income_total .. " " ..
-				teamData.metal_income_base .. " " ..
-				teamData.metal_income_overdrive .. " " ..
-				teamData.metal_income_other .. " " ..
-		
-				teamData.metal_spend_total .. " " ..
-				teamData.metal_spend_construction .. " " ..
-				
-				teamData.metal_share_net  .. " " ..
-				
-				teamData.metal_storage_current .. " " ..
-				
-				teamData.energy_income_total .. " " ..
-				
-				teamData.energy_spend_total .. " " ..
-				teamData.energy_spend_construction .. " " ..
-				teamData.energy_spend_other .. " " ..
-				
-				teamData.energy_share_net  .. " " ..
-				
-				teamData.energy_storage_current
-			end
-			--Spring.SendCommands("wbynum 255 SPRINGIE: teamResourceData " .. toSend)
-			--Spring.Echo(toSend)
-		end
-	end
+	SendEconomyDataToWidget()
 	
 	--[[
 	gadget.IsAbove = gadget.IsAbove_
