@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[vehaa]],
-  name                   = [[Lancer]],
+  name                   = [[Crasher]],
   description            = [[Fast AA Vehicle]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
@@ -22,13 +22,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Lancer is a speedy solution to enemy bomber attacks, and also works well against gunships.]],
+    helptext       = [[The Crasher is a speedy solution to enemy bomber attacks, and also works well against gunships.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
-  iconType               = [[vehaa]],
+  iconType               = [[vehicleaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
