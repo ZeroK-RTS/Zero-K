@@ -43,17 +43,16 @@ local options = {
         desc = 'Normal game mode',
       },
       {
-		key  = 'kingofthehill',
-		name = 'King of the Hill',
-		desc = 'Control the hill for a set amount of time to win! See King of the Hill section.',
+	key  = 'kingofthehill',
+	name = 'King of the Hill',
+	desc = 'Control the hill for a set amount of time to win! See King of the Hill section.',
       },
-	  {
-	    key  = 'lavarise',
-		name = 'Lava Rising',
-		desc = 'Endlessly rising lava!  Fiery fun for the whole family!',
-	  }
+      {
+	key  = 'lavarise',
+	name = 'Lava Rising',
+	desc = 'Endlessly rising lava!  Fiery fun for the whole family!',
+      }
     },
-
   },
   {
     key    = 'commends',
@@ -446,20 +445,37 @@ local options = {
     def    = false,
   },
   {
-	key		= "enableunlocks",
-	name	= "Enable unlock system",
-	desc	= "Enables the unlock system (disabling will enable all units by default)",
-	type	= "bool",
-	def		= true,
-	section	= "experimental",
+    key		= "enableunlocks",
+    name	= "Enable unlock system",
+    desc	= "Enables the unlock system (disabling will enable all units by default)",
+    type	= "bool",
+    def		= true,
+    section	= "experimental",
   },
   {
-	key		= "qtpfs",
-	name	= "QTPFS Pathfinder",
-	desc	= "Enables Quadtree Pathfinding System (experimental)",
-	type	= "bool",
-	def		= false,
-	section	= "experimental",
+    key		= "pathfinder",
+    name	= "Pathfinder type",
+    desc	= "Sets the pathfinding system used by units.",
+    type	= "list",
+    def		= "standard",
+    section	= "experimental",
+    items  = {
+      {
+	key  = 'standard',
+	name = 'Standard',
+	desc = 'Standard pathfinder',
+      },
+      {
+	key  = 'qtpfs',
+	name = 'QTPFS',
+	desc = 'New Quadtree Pathfinding System (experimental)',
+      },
+      {
+	key  = 'classic',
+	name = 'Classic',
+	desc = 'An older pathfinding system without turninplace or reverse',
+      }
+    },	
   },  
   
   {

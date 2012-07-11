@@ -103,6 +103,9 @@ local modrules  = {
     fireAtCrashing = false;   -- defaults to false
   },
 
+  movement = {
+    pathFinderSystem = (Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false,
+  },
 
   nanospray = {
     allow_team_colors = true;  -- defaults to true
@@ -118,7 +121,7 @@ local modrules  = {
   },
   
   system = {
-	pathFinderSystem = (Spring.GetModOptions() and (Spring.GetModOptions().qtpfs == "1") and 1) or 0,
+    pathFinderSystem = (Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "qtpfs") and 1) or 0,
   },
 }
 --------------------------------------------------------------------------------
