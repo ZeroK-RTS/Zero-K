@@ -1,5 +1,5 @@
 -- $Id: gui_take_remind.lua 3550 2008-12-26 04:50:47Z evil4zerggin $
-local versionNumber = "v3.57"
+local versionNumber = "v3.6"
 
 function widget:GetInfo()
   return {
@@ -20,17 +20,19 @@ end
 --      and some smaller speed ups
 --  SirMaverick: works now when someone uses "/spectator"
 --  jK: now even faster
---	msafwan: implement take for quiting (not resigning) player using game_lagmonitor.lua, and rearranged stuff.
+--	msafwan: implement take for quiting & AFK-er (not resigning) using game_lagmonitor.lua, and added some comment & code.
 ------------------------------------------------
 ------------------------------------------------
 --Crude Documentation:
 -- Main Logic:
--- 1) 'widget:Player Changed' or 'widget:Player Removed' --> count lagger's units --> reset button text to "Click here..." (textPlsWait = false)  --> show button IF units ">0"
--- 2) press the button --> count lagger's units --> change button text to "Wait..." (textPlsWait = true) --> [execute a "/take" when alternateTake== false OR execute a LUA-msg-lagmonitor when alternateTake== true] IF units ">0"
--- 3) 'widget:Unit Taken' --> count lagger's units --> reset button text to "Click here..." (textPlsWait = false) --> hide button IF units "=0"
+-- 1) 'widget:Player Changed' --> count lagger's units + check AFK --> reset button text to "Click here..." (textPlsWait = false)  --> show button IF units ">0" else hide
+-- 2) 'widget:Player Removed' --> count lagger's units + check AFK --> reset button text to "Click here..." (textPlsWait = false)  --> show button IF units ">0" else hide
+-- 3) 'RecvFromSynced(...)' (thereIsChange=true) --> count lagger's units + check AFK --> reset button text to "Click here..." (textPlsWait = false) --> show button IF units ">0" else hide
+-- 4) 'widget:Unit Taken' --> count lagger's units + check AFK --> reset button text to "Click here..." (textPlsWait = false) --> show button IF units ">0" else hide
 
 -- Others:
--- 1) console-message "Giving all unit.." --> alternateTake= false --> count lagger's units --> change button text to "Click here..." (textPlsWait = false) --> hide button IF units "=0"
+-- 1) press the button --> count lagger's units + check AFK--> change button text to "Wait..." (textPlsWait = true) --> execute a "/take" (if droppedPlayer== false) OR execute a LUA-msg-lagmonitor (if droppedPlayer== true)
+-- 2) console-message "Giving all unit.." --> count lagger's units + check AFK --> change button text to "Click here..." (textPlsWait = false) --> show button IF units ">0" else hide
 ------------------------------------------------
 -- config
 ------------------------------------------------
@@ -52,8 +54,9 @@ local buttonY = 36
 local recheck = false
 --local lastActivePlayers = 0
 local textPlsWait = false
-local alternateTake = false
-local droppedPlayer
+local droppedPlayer =nil
+local lagmonitorAFK = {}
+local afkString_old = "" --store previous value of 'afkString' from game_lagmonitor.lua (RecvFromSynced()). Is used for making comparison.
 
 ------------------------------------------------
 -- speedups
@@ -82,20 +85,29 @@ local glColor = gl.Color
 ------------------------------------------------
 
 local function GetTeamIsTakeable(teamID)
-	local takeAble = true --assume team is takeable
+	local takeAble = true --assume whole team is takeable (spec OR afk)
+	local teamIsAFK = true --assume whole team is afk
+	local teamIsSpec = true --assume whole team is resigned
 	local _,_,_,isAI = Spring.GetTeamInfo(teamID)
 	if isAI then 
 		takeAble = false  -- AI teams is not takeable
+		teamIsAFK = false -- AI teams cannot inactive
+		teamIsSpec = false
 	end
+	
 	local players = spGetPlayerList(teamID)--get player(s) in a team
-	for i=1, #players do -- check every player in a team. If one of them is active/not-spec then the team is not takeable
+	for i=1, #players do -- check every player in a team. If one of them is not-spec/not-afk then entire team is not takeable
 		local playerID = players[i]
 		local _, active, spec = spGetPlayerInfo(playerID)
-		if (not spec) and (active) then -- only team who become spectator OR is outside-game is takeable. Ie: in ZK only resigned player goes to spectator, and exited player is not spectator.
-			takeAble = false --if above condition is meet (not spec, and not outside) then this team is not takeable!...
+		local afk = (not active) or lagmonitorAFK[playerID] --check whether player is outside-game OR reported as AFK
+		if afk== false then teamIsAFK = false end --if a member is not-AFK then assume whole team NOT AFK
+		if spec== false then teamIsSpec = false end --if a member is not-spec then assume whole team NOT spec
+		if (not spec) and (not afk) then -- team whos player not-spectator AND not-afk is NOT takeable. In ZK resigned player goes to spectator, and exited player is afk.
+			takeAble = false --if above condition is meet (a member not-spec, and not-afk) then the team is not takeable!...
+			--break --if at least 1 player is not-spec/not-afk then skip checking the whole team
 		end
 	end
-	return takeAble
+	return takeAble, teamIsAFK, teamIsSpec --isAFK indicate whether whole team was afk, and isSpec indicate whether whole team resigned
 end
 
 
@@ -116,9 +128,10 @@ local function UpdateUnitsToTake()
 	for i= 1, #teamList do
 		local teamID = teamList[i]
 		local unitsOwned = spGetTeamUnitCount(teamID)
-		local takeable = GetTeamIsTakeable(teamID)
+		local takeable, isAFK, isSpec = GetTeamIsTakeable(teamID)
 		if (unitsOwned > 0 and takeable) then
 			unitCount = unitCount + unitsOwned -- count lagger's unit
+			droppedPlayer = (isAFK and not isSpec) or (not isSpec) --if team is whole AFK but not Spec then assume they exited/timeout (ie: isAFK and not isSpec), else: if only some member is not Spec then still assume they exited/timeout (ie: not isSpec), BUT if whole team is both AFK & spec then they all resigned. Exited/timeout means "dropped player", while resigned mean not "dropped player"; widget need to use /take command.
 		end
 	end
 	return unitCount
@@ -181,7 +194,6 @@ function Take()
 	if droppedPlayer then --alternateTake
 		Spring.SendLuaUIMsg("TAKE")
 		Spring.Echo("sending TAKE msg")
-		droppedPlayer = nil
 	else
 		Spring.SendCommands("take")
 		Spring.Echo("executing /TAKE cmd")
@@ -279,11 +291,10 @@ function _DrawWorld()
 end
 
 function _AddConsoleLine(_,line,priority)
-	if (line:sub(1,20) == "Giving all units of ") then --to know when "game_lagmonitor.lua" finished transfer the unit. Used to re-display the "take button" (if any unit left) and to reset the take method back to "/take" instead of waiting for "game_lagmonitor.lua" (if the case)
+	if (line:sub(1,20) == "Giving all units of ") then --is received when "game_lagmonitor.lua" finished transfer the unit. Used to re-display the "take button" (if any unit left) and to reset the take method back to "/take" instead of waiting for "game_lagmonitor.lua" (if the case)
 		local allyNumLoc = line:find("#",-5,true)
 		local allyNum = tonumber(line:sub(allyNumLoc+1,allyNumLoc+1))
 		if allyNum == myAllyTeamID then
-			droppedPlayer = nil
 			ProcessButton()
 		end
 	end
@@ -337,6 +348,7 @@ function widget:Initialize()
     widgetHandler:RemoveWidget()
     return true
   end
+  widgetHandler:RegisterGlobal("LagmonitorAFK", LagmonitorAFK) --part for Gadget->widget communication. Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
   colorBool = false
   vsx, vsy = widgetHandler:GetViewSizes()
   posx = vsx * 0.75
@@ -364,10 +376,32 @@ function widget:PlayerChanged(playerID) --check for player who became spec or un
 	end
 end
 
-function widget:PlayerRemoved(playerID, reason)-- check for dropped player (ally and non-spec only). To functioning with help of "game_lagmonitor.lua".
+function widget:PlayerRemoved(playerID, reason)-- check for dropped player (ally and non-spec only). Functioning with help of "game_lagmonitor.lua".
 	local _,_,spec,_,allyTeamID = spGetPlayerInfo(playerID)
 	if (allyTeamID == myAllyTeamID) and (not spec) then
-		droppedPlayer = playerID
 		ProcessButton()
+	end
+end
+
+function LagmonitorAFK(afkString) --check for player that is marked as AFK by "game_lagmonitor.lua", is updated at every interval. 
+	if afkString ~= afkString_old then --if absolutely new content of string received: perform this:
+		afkString_old = afkString
+		local playerCountLoc = afkString:find("#",-3,true) --search '#' (the playerCount identifier) from the last 3 character
+		local playerCount = tonumber(afkString:sub(playerCountLoc+1)) --get the max playerID value
+		for i=0, playerCount do --iterate over 'lagmonitorAFK' table
+			lagmonitorAFK[i] = nil --reset the whole AFK list
+		end
+		if playerCountLoc >=6 then --check if there's AFK information in that 'afkString'
+			for i=0, playerCount do --iterate for some iteration (limited to some value)
+				if '#' == afkString:sub(1,1) then break end --check if 'end-of-string' reached; if so: break
+				local allyTeam = tonumber(afkString:sub(4,5)) --get allyTeamID
+				if allyTeam == myAllyTeamID then --check with myAllyTeamID
+					local playerID = tonumber(afkString:sub(2,3)) --get playerID
+					lagmonitorAFK[playerID] = true --mark playerID as AFK in 'lagmonitorAFK'
+				end
+				afkString = afkString:sub(6) --discard current segment, repeat again using next segment.
+			end
+		end
+		ProcessButton() --display button if AFK-er has unitCount > 0, then send Lua TAKE if player press the button.
 	end
 end

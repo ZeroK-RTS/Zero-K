@@ -13,7 +13,7 @@ function gadget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
---Revision 28-th?
+--Revision 29-th?
 --------------------------------------------------------------------------------
 --List of stuff in this gadget (to help us remember stuff for future debugging/improvement):
 
@@ -31,19 +31,14 @@ end
 --Everything else: anti-bug, syntax, methods, ect
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-  
-if (not gadgetHandler:IsSyncedCode()) then
-  return false  --  silent removal
-end
-
-  
+if (gadgetHandler:IsSyncedCode()) then -- SYNCED ---
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local lineage = {}
 local afkTeams = {}
-local tickTockCounter = {} --remember how many second a player is in AFK mode. To add delay before unit transfer commence. 
+local tickTockCounter = {} --remember how many second a player is in AFK mode. To add a delay before unit transfer commence.
 local unstablePlayerCounter = {} --remember how many times a player was AFK. To de-merit laggy player from receiving any units.
-local playerWantTake = {} --player who request for a "take". To add-merit for who want to receive unit.
+local playerWantTake = {} --remember which player who request for a "TAKE". To add-merit for who want to receive unit.
 local unitAlreadyFinished = {}
 
 GG.Lagmonitor_activeTeams = {}
@@ -153,6 +148,7 @@ function gadget:GameFrame(n)
 		local players = Spring.GetPlayerList()
 		local recepientByAllyTeam = {}
 		local gameSecond = Spring.GetGameSeconds()
+		local afkPlayer = "" -- remember which player is AFK/Lagg. Information will be sent to 'gui_take_remind.lua' as string
 		
 		for i=1,#players do
 			local name,active,spec,team,allyTeam,ping = Spring.GetPlayerInfo(players[i])
@@ -161,7 +157,6 @@ function gadget:GameFrame(n)
 			if not spec  and not isAI then 
 				if (afkTeams[team] == true) then  -- team was AFK 
 					if active and ping <= 2000 and afk < AFK_THRESHOLD then -- team no longer AFK, return his or her units
-						tickTockCounter[players[i]] = nil -- empty tick-tock clock.
 						Spring.Echo("Player " .. name .. " is no longer lagging or AFK; returning all his or her units")
 						GG.allowTransfer = true
 						local spTransferUnit = Spring.TransferUnit
@@ -178,8 +173,9 @@ function gadget:GameFrame(n)
 					end 
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
-					tickTockCounter[players[i]] = (tickTockCounter[players[i]] or 0) + 1 --tick tock clock ++
-					if tickTockCounter[players[i]] >= 2 then --allow team to be tagged as lagging only after 3 passes (3x50frame = 5 second).
+					afkPlayer = afkPlayer .. (10000 + players[i]*100 + allyTeam) --compose a string of number that contain playerID & allyTeam information
+					tickTockCounter[players[i]] = (tickTockCounter[players[i]] or 0) + 1 --tick tock counter ++. count-up 1
+					if tickTockCounter[players[i]] >= 2 then --team is to be tagged as lagg-er/AFK-er after 3 passes (3 times 50frame = 5 second).
 						local units = Spring.GetTeamUnits(team)
 						if units ~= nil and #units > 0 then 
 							laggers[players[i]] = {name = name, team = team, allyTeam = allyTeam, units = units}
@@ -187,10 +183,12 @@ function gadget:GameFrame(n)
 						end
 					end
 				else --if not at all AFK or lagging: then...
-					tickTockCounter[players[i]] = nil -- empty tick-tock clock. We don't want the counter to always show 2 if player/team return.
+					tickTockCounter[players[i]] = nil -- empty tick-tock clock. We want to reset the counter when the player return.
 				end
 			end
 		end
+		afkPlayer = afkPlayer .. "#".. players[#players] --cap the string with the largest playerID information
+		SendToUnsynced("LagmonitorAFK",afkPlayer) --tell widget about AFK list
 		
 		for playerID, data in pairs(laggers) do
 			-- FIRST! check if everyone else on the team is also lagging
@@ -233,6 +231,19 @@ function gadget:GameFrame(n)
 		end	-- for
 	end	-- if
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+else-- UNSYNCED ---
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+	function WrapToLuaUI(_,afkPlayer)
+		if (Script.LuaUI('LagmonitorAFK')) then
+			Script.LuaUI.LagmonitorAFK(afkPlayer)
+		end
+	end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+	function gadget:Initialize() --Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
+		gadgetHandler:AddSyncAction('LagmonitorAFK',WrapToLuaUI)
+	end
+
+end
