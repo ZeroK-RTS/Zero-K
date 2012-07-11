@@ -1,5 +1,7 @@
 BZFlag:
 marker_place.wav
+message_private.wav
+message_team.wav
 
 Open Quarz:
 krog_stomp.wav
