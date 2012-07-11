@@ -73,9 +73,6 @@ for _, ud in pairs(UnitDefs) do
 --[[
 for _, ud in pairs(UnitDefs) do
     if ud.collisionVolumeOffsets then
-		if not ud.customparams then
-			ud.customparams = {}
-		end
 		ud.customparams.collisionVolumeOffsets = ud.collisionVolumeOffsets  -- For ghost site
     end
  end--]]
@@ -617,3 +614,16 @@ for name, ud in pairs(UnitDefs) do
 	ud.category = ud.category .. " MOBILE"
   end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Copy some unitdef values to customparams
+--
+Spring.Echo("offset start")
+for name, ud in pairs(UnitDefs) do
+    if ud.modelcenteroffset then
+	Spring.Echo(name)
+	ud.customparams.midposoffset = ud.modelcenteroffset
+    end   
+end
+Spring.Echo("offset end")
