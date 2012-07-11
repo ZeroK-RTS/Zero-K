@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[empiricaldpser]],
   name                          = [[Empirical DPS thing]],
-  description                   = [[Shoot at it]],
+  description                   = [[Shoot at it for science.]],
   acceleration                  = 0,
   buildCostEnergy               = 30000,
   buildCostMetal                = 30000,

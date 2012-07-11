@@ -77,7 +77,9 @@ local armorDefs = {
   },
   
   -- populated automatically
-  PLANES = {}, 
+  PLANES = {
+	"empiricaldpser",
+  }, 
   ELSE   = {},
 }
 
