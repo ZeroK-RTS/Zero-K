@@ -466,18 +466,16 @@ local function UpdateComm(unitID, index)
 	if not health then
 		return
 	end
-	local barPercent = health/maxHealth
-	local barPercentOld = comms[index].healthbar.value
-	if barPercent ~= barPercentOld then
-		comms[index].healthbar.color = GetHealthColor(health/maxHealth)
-		comms[index].healthbar:SetValue(health/maxHealth)
+
+	comms[index].healthbar.color = GetHealthColor(health/maxHealth)
+	comms[index].healthbar:SetValue(health/maxHealth)
 	
-		comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
-								"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
-								"\n\255\0\255\0Left-click: Select and go to"..
-								"\nRight-click: Select"..
-								"\nShift: Append to current selection\008"
-      end
+	comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
+							"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
+							"\n\255\0\255\0Left-click: Select and go to"..
+							"\nRight-click: Select"..
+							"\nShift: Append to current selection\008"
+	
 end
 
 --[[
