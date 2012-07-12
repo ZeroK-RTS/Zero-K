@@ -105,7 +105,7 @@ local modrules  = {
 
   movement = {
     allowUnitCollisionOverlap = true,	-- defaults to true
-    useClassicGroundMovementType = (Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false,
+    useClassicGroundMoveType = (Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false,
   },
 
   nanospray = {
