@@ -102,7 +102,12 @@ local modrules  = {
     fireAtKilled   = false;  -- defaults to false
     fireAtCrashing = false;   -- defaults to false
   },
-  
+
+  movement = {
+    allowUnitCollisionOverlap = true,	-- defaults to true
+    useClassicGroundMovementType = (Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false,
+  },
+
   nanospray = {
     allow_team_colors = true;  -- defaults to true
   },
