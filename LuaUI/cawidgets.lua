@@ -212,6 +212,7 @@ local callInLists = {
   'TweakIsAbove',
   'TweakGetTooltip',
   'GameProgress',
+  'UnsyncedHeightMapUpdate',
 -- these use mouseOwner instead of lists
 --  'MouseMove',
 --  'MouseRelease',
@@ -2054,6 +2055,12 @@ function widgetHandler:GameProgress(frame)
   return
 end
 
+function widgetHandler:UnsyncedHeightMapUpdate(x1,z1,x2,z2)
+  for _,w in ipairs(self.UnsyncedHeightMapUpdateList) do
+    w:UnsyncedHeightMapUpdate(x1,z1,x2,z2)
+  end
+  return
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

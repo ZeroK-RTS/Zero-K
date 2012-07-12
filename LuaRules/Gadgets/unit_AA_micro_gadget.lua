@@ -1612,7 +1612,7 @@ function gadget:Initialize()
   end
 end
 
-function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID)
+function gadget:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
   local unitDefID = GetUnitDefID(attackerID)
   local ud = UnitDefs[unitDefID]
   if IsAA(ud.name) and IsMicro(attackerID) then

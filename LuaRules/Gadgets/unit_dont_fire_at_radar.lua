@@ -98,33 +98,27 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID)
-	local x = CallAsTeam(spGetUnitTeam(unitID), function () return spGetUnitPosition(targetID) end)
-	if x then
-		--Spring.Echo(x)
-		if units[unitID] then
-			local data = units[unitID]
-			--Spring.Echo("AllowWeaponTarget frame " .. Spring.GetGameFrame())
-			if spValidUnitID(targetID) and canShootAtUnit(targetID, spGetUnitAllyTeam(unitID)) then
-				--GG.unitEcho(targetID, "target")
-				if wantGoodTarget[unitID] then
-					wantGoodTarget[unitID] = nil
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, {"alt"} )
-					local cQueue = spGetCommandQueue(unitID, 2)
-					if isTheRightSortOfCommand(cQueue, 2)  then
-						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, {} )
-					end
+function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
+	if units[unitID] then
+		local data = units[unitID]
+		--Spring.Echo("AllowWeaponTarget frame " .. Spring.GetGameFrame())
+		if spValidUnitID(targetID) and canShootAtUnit(targetID, spGetUnitAllyTeam(unitID)) then
+			--GG.unitEcho(targetID, "target")
+			if wantGoodTarget[unitID] then
+				wantGoodTarget[unitID] = nil
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_ATTACK, CMD_OPT_INTERNAL, targetID }, {"alt"} )
+				local cQueue = spGetCommandQueue(unitID, 2)
+				if isTheRightSortOfCommand(cQueue, 2)  then
+					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[2].tag}, {} )
 				end
-				return true, 1
-			else
-				--GG.unitEcho(targetID, "No")
-				return false, 1
 			end
+			return true, defPriority
 		else
-			return true, 1
+			--GG.unitEcho(targetID, "No")
+			return false, defPriority
 		end
 	else
-		return false, 1
+		return true, defPriority
 	end
 end
 

@@ -107,7 +107,7 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 4,
       craterMult              = 8,
-      cylinderTargetting      = 1,
+      cylinderTargeting      = 1,
 
       damage                  = {
         default = 3000,
@@ -150,7 +150,7 @@ unitDef = {
       coreThickness           = 0.5,
       --craterBoost             = 2,
       --craterMult              = 4,
-      cylinderTargetting      = 8192,
+      cylinderTargeting      = 8192,
 
       damage                  = {
         default = 100,
@@ -195,7 +195,7 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 2,
       craterMult              = 4,
-      cylinderTargetting      = 8192,
+      cylinderTargeting      = 8192,
 
       damage                  = {
         default = 100,

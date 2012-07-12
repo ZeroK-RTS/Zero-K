@@ -105,7 +105,7 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargetting      = 1,
+      cylinderTargeting      = 1,
 
       damage                  = {
         default = 2.09,

@@ -321,7 +321,6 @@ local function UpdateCloakees(data)
           if ((not uncloakableDefs[udid]) and
               (GetUnitAllyTeam(cloakeeLvl2) == allyTeam)) then
             SetUnitCloak(cloakeeLvl2, 4)
-			Spring.Echo("bla")
             -- note: this gives perfect cloaking, but is the only level
             -- to work under paralysis
             cloakees[cloakeeLvl2] = true
