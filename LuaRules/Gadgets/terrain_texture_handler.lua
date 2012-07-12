@@ -7,7 +7,7 @@ function gadget:GetInfo()
     date      = "25 June 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -16,10 +16,10 @@ local MAP_HEIGHT = Game.mapSizeZ
 local SQUARE_SIZE = 1024
 local SQUARES_X = MAP_WIDTH/SQUARE_SIZE
 local SQUARES_Z = MAP_HEIGHT/SQUARE_SIZE
-local UHM_X = 8
-local UHM_Z = 8
-local UHM_WIDTH = MAP_WIDTH/UHM_X
-local UHM_HEIGHT = MAP_HEIGHT/UHM_Z
+local UHM_WIDTH = 64
+local UHM_HEIGHT = 64
+local UHM_X = UHM_WIDTH/MAP_WIDTH
+local UHM_Z = UHM_HEIGHT/MAP_HEIGHT
 local BLOCK_SIZE = 8
 
 local spSetMapSquareTexture = Spring.SetMapSquareTexture
@@ -28,22 +28,6 @@ local spGetMyTeamID         = Spring.GetMyTeamID
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetGroundOrigHeight = Spring.GetGroundOrigHeight
 local floor = math.floor
-
-local syncedPointList = {count = 0, data = {}}
-local syncedPointMap = {}
-for cx = 0, UHM_X-1 do
-	syncedPointMap[cx] = {}
-	for cz = 0, UHM_Z-1 do
-		syncedPointList.count = syncedPointList.count + 1
-		syncedPointList.data[syncedPointList.count] = {
-			cx = cx, 
-			cz = cz, 
-			x = floor((cx+0.5)*UHM_WIDTH/8)*8, 
-			z = floor((cz+0.5)*UHM_HEIGHT/8)*8,
-		}
-		syncedPointMap[cx][cz] = syncedPointList.count
-	end
-end
 
 if (gadgetHandler:IsSyncedCode()) then
 
@@ -64,26 +48,6 @@ end
 
 function gadget:Shutdown()
 	SendToUnsynced("Shutdown")
-end
-
-local function heightmapFunc(amount)
-	for i = 1, syncedPointList.count do
-		local pos = syncedPointList.data[i]
-		Spring.AddHeightMap(pos.x, pos.z, amount)
-	end
-end
-
-function gadget:GameFrame(f)
-	if f%150 == 42 then
-		Spring.SetHeightMapFunc(heightmapFunc, math.random()*0.02-0.01)
-		local syncedHeights = {}
-		for i = 1, syncedPointList.count do
-			local pos = syncedPointList.data[i]
-			syncedHeights[i] = spGetGroundHeight(pos.x, pos.z)
-		end
-		_G.syncedHeights = syncedHeights
-		SendToUnsynced("updateHeightmapVisibility")
-	end
 end
 
 else
@@ -310,33 +274,22 @@ function gadget:DrawWorld()
 end
 
 function gadget:UnsyncedHeightMapUpdate(x1, z1, x2, z2)
-	local x = x1*8
-	local z = z1*8
-	local cx = floor(x/UHM_WIDTH)
-	local cz = floor(z/UHM_HEIGHT)
-	--Spring.MarkerAddPoint(x,0,z,"point")
-	
-	if chunkMap[cx] and chunkMap[cx][cz] and not (chunkUpdateMap[cx] and chunkUpdateMap[cx][cz]) then
-		if syncedPointMap[cx] and syncedPointMap[cx][cz] then
-			local index = syncedPointMap[cx][cz]
-			local syncedHeight = syncedHeights[index]
-			local pos = syncedPointList.data[index]
-			local height = spGetGroundHeight(pos.x,pos.z)
-			if height == syncedHeight then
-				chunkUpdateMap[cx] = chunkUpdateMap[cx] or {}
-				chunkUpdateMap[cx][cz] = true
-				chunkUpdateList.count = chunkUpdateList.count + 1
-				chunkUpdateList.data[chunkUpdateList.count] = {x = cx, z = cz}
-				--Spring.MarkerAddPoint(x,0,z,"point triggered")
-				--Spring.MarkerAddPoint(cx*UHM_WIDTH,0,cz*UHM_HEIGHT,"To update")
-			end
+	local cz = floor(z1*8/UHM_HEIGHT)
+	local cx1 = floor(x1*8/UHM_WIDTH)
+	local cx2 = floor(x2*8/UHM_WIDTH-0.001)
+	--Spring.MarkerAddPoint(x1*8,0,z1*8,"p1")
+	--Spring.MarkerAddPoint(x2*8,0,z2*8,"p2")
+	-- For some reason multiple chunks can be covered in one update but only in a row along the x direction.
+	for cx = cx1, cx2 do
+		if chunkMap[cx] and chunkMap[cx][cz] and not (chunkUpdateMap[cx] and chunkUpdateMap[cx][cz]) then
+			chunkUpdateMap[cx] = chunkUpdateMap[cx] or {}
+			chunkUpdateMap[cx][cz] = true
+			chunkUpdateList.count = chunkUpdateList.count + 1
+			chunkUpdateList.data[chunkUpdateList.count] = {x = cx, z = cz}
+			--Spring.MarkerAddPoint(x,0,z,"point triggered")
+			--Spring.MarkerAddPoint(cx*UHM_WIDTH,0,cz*UHM_HEIGHT,"To update")
 		end
 	end
-end
-
-
-local function updateHeightmapVisibility()
-	syncedHeights = SYNCED.syncedHeights
 end
 
 local function Shutdown()
@@ -356,7 +309,6 @@ local function Shutdown()
 	
 	gadgetHandler.RemoveSyncAction("changeBlockList")
 	gadgetHandler.RemoveSyncAction("Shutdown")
-	gadgetHandler.RemoveSyncAction("updateHeightmapVisibility", updateHeightmapVisibility)
 end
 
 
@@ -364,14 +316,7 @@ function gadget:Initialize()
 	
 	gadgetHandler:AddSyncAction("changeBlockList", changeBlockList)
 	gadgetHandler:AddSyncAction("Shutdown", Shutdown)
-	gadgetHandler:AddSyncAction("updateHeightmapVisibility", updateHeightmapVisibility)
-	
-	--for i = 1, 7 do
-	--	for j = 1, 7 do
-	--		Spring.MarkerAddPoint(i*UHM_WIDTH,0,j*UHM_HEIGHT)
-	--	end
-	--end
-	
+
 	tempTex = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
 		wrap_s = GL.CLAMP_TO_EDGE, 
 		wrap_t = GL.CLAMP_TO_EDGE,
