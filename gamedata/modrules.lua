@@ -15,6 +15,8 @@ local modrules  = {
     allowPushingEnemyUnits   = true; -- defaults to false
     allowCrushingAlliedUnits = false; -- defaults to false
     allowUnitCollisionDamage = true; -- defaults to false
+	allowUnitCollisionOverlap = true,	-- defaults to true
+    useClassicGroundMoveType = (Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false,
   },
   
   construction = {
@@ -101,11 +103,6 @@ local modrules  = {
   fireAtDead = {
     fireAtKilled   = false;  -- defaults to false
     fireAtCrashing = false;   -- defaults to false
-  },
-
-  movement = {
-    allowUnitCollisionOverlap = true,	-- defaults to true
-    useClassicGroundMoveType = (Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false,
   },
 
   nanospray = {
