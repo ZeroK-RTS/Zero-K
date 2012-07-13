@@ -88,7 +88,7 @@ unitDef = {
     MINE = {
       name                    = [[Light Mine Artillery]],
       accuracy                = 1500,
-      areaOfEffect            = 96,
+      areaOfEffect            = 24,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -111,7 +111,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 800,
       reloadtime              = 5,
-      renderType              = 4,
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
       startsmoke              = [[1]],
