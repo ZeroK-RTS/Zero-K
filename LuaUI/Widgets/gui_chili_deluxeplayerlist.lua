@@ -1423,13 +1423,21 @@ function widget:Initialize()
 	lastSizeX = window_cpl.width
 	lastSizeY = window_cpl.height
 	
-	WG.LocalColor = WG.LocalColor or {}
-	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
-	WG.LocalColor.listeners["Chili Crude Playerlist"] = SetupPlayerNames
+	self:LocalColorRegister()
 end
 
 function widget:Shutdown()
-        if WG.LocalColor and WG.LocalColor.listeners then
-                WG.LocalColor.listeners["Chili Crude Playerlist"] = nil
-        end
+        self:LocalColorUnregister()
+end
+
+function widget:LocalColorRegister()
+	if WG.LocalColor and WG.LocalColor.RegisterListener then
+		WG.LocalColor.RegisterListener(widget:GetInfo().name, SetupPlayerNames)
+	end
+end
+
+function widget:LocalColorUnregister()
+	if WG.LocalColor and WG.LocalColor.UnregisterListener then
+		WG.LocalColor.UnregisterListener(widget:GetInfo().name)
+	end
 end

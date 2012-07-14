@@ -29,118 +29,6 @@ include("keysym.h.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- SHARED/cawidget
-
-local MessageProcessor = {}
-
-local PLAYERNAME_PATTERN = '([%w%[%]_]+)' -- to make message patterns easier to read/update
-
--- message definitions
---[[
-pattern syntax:
-	see http://www.lua.org/manual/5.1/manual.html#5.4.1
-	pattern must contain at least 1 capture group; its content will end up in msg.argument after parseMessage()
-	PLAYERNAME will match anything that looks like a playername (see code for definition of PLAYERNAME_PATTERN); it is a capture group
-	if message does not contain a PLAYERNAME, add 'noplayername = true' to definition
-	it should be possible to add definitions to help debug widgets or whatever... (no guarantee)
---]]
-MessageProcessor.MESSAGE_DEFINITIONS = {
-	{ msgtype = 'player_to_allies', pattern = '^<PLAYERNAME> Allies: (.*)' },
-	{ msgtype = 'player_to_player_received', pattern = '^<PLAYERNAME> Private: (.*)' }, -- TODO test!
-	{ msgtype = 'player_to_player_sent', pattern = '^You whispered PLAYERNAME: (.*)' }, -- TODO test!
-	{ msgtype = 'player_to_specs', pattern = '^<PLAYERNAME> Spectators: (.*)' },
-	{ msgtype = 'player_to_everyone', pattern = '^<PLAYERNAME> (.*)' },
-
-	{ msgtype = 'spec_to_specs', pattern = '^%[PLAYERNAME%] Spectators: (.*)' },
-	{ msgtype = 'spec_to_allies', pattern = '^%[PLAYERNAME%] Allies: (.*)' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
-	{ msgtype = 'spec_to_everyone', pattern = '^%[PLAYERNAME%] (.*)' },
-
-	-- shameful copy-paste -- TODO rewrite pattern matcher to remove this duplication
-	{ msgtype = 'replay_spec_to_specs', pattern = '^%[PLAYERNAME %(replay%)%] Spectators: (.*)' },
-	{ msgtype = 'replay_spec_to_allies', pattern = '^%[PLAYERNAME %(replay%)%] Allies: (.*)' }, -- TODO is there a reason to differentiate spec_to_specs and spec_to_allies??
-	{ msgtype = 'replay_spec_to_everyone', pattern = '^%[PLAYERNAME %(replay%)%] (.*)'},
-
-	{ msgtype = 'label', pattern = '^PLAYERNAME added point: (.+)', discard = true }, -- NOTE : these messages are discarded -- points and labels are provided through MapDrawCmd() callin
-	{ msgtype = 'point', pattern = '^PLAYERNAME added point: ', discard = true },
-	{ msgtype = 'autohost', pattern = '^> (.+)', noplayername = true },
-	{ msgtype = 'other' } -- no pattern... will match anything else
-}
-
-local function escapePatternReplacementChars(s)
-  return string.gsub(s, "%%", "%%%%")
-end
-
-function MessageProcessor:Initialize()
-	local escapedPlayernamePattern = escapePatternReplacementChars(PLAYERNAME_PATTERN)
-	for _,def in ipairs(self.MESSAGE_DEFINITIONS) do
-		if def.pattern then
-			def.pattern = def.pattern:gsub('PLAYERNAME', escapedPlayernamePattern) -- patch definition pattern so it is an actual lua pattern string
-		end
-	end
-end
-
-local players = {}
-
-local function getSource(spec, allyTeamId)
-	return (spec and 'spec')
-		or ((myAllyTeamId == allyTeamId) and 'ally')
-		or 'enemy'
-end
-
--- update msg members msgtype, argument, source and playername (when relevant)
-function MessageProcessor:ParseMessage(msg)
-  for _, candidate in ipairs(self.MESSAGE_DEFINITIONS) do
-    if candidate.pattern == nil then -- for fallback/other messages
-      msg.msgtype = candidate.msgtype
-      msg.argument = msg.text
-	  msg.source = 'other'
-      return
-    end
-    local capture1, capture2 = msg.text:match(candidate.pattern)
-    if capture1 then
-      msg.msgtype = candidate.msgtype
-      if candidate.noplayername then
-        msg.argument = capture1
-		msg.source = 'other'
-		return
-	  else
-		local playername = capture1
-		if players[playername] then
-			local player = players[playername]
-			msg.source = getSource(player.spec, player.allyTeamId)
-			msg.playername = playername
-			msg.argument = capture2
-			return
-		end
-      end
-    end
-  end
-end
-
-function MessageProcessor:ProcessConsoleLine(msg, receiver)
-	self:ParseMessage(msg)
-		
-	if msg.msgtype == 'point' or msg.msgtype == 'label' then
---	if MESSAGE_DEFINITIONS[msg.msgtype].discard then
-		-- ignore all console messages about points... those come in through the MapDrawCmd callin
-		return
-	end
-
-	receiver:AddConsoleMessage(msg)
-end
-
-function MessageProcessor:ProcessConsoleBuffer(count, receiver)
-	local bufferMessages = Spring.GetConsoleBuffer(count)
-	for i = 1,#bufferMessages do
-		self:ProcessConsoleLine(bufferMessages[i], receiver)
-	end
-end
-
-MessageProcessor:Initialize()
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 -- message rules - widget stuff
 --[[
 each message definition can have:
@@ -710,16 +598,6 @@ local function setupPlayers()
 	end
 end
 
-local function cawidget_setupPlayers()
-	local playerroster = Spring.GetPlayerList()
-	
-	for i, id in ipairs(playerroster) do
-		local name, _, spec, teamId, allyTeamId = Spring.GetPlayerInfo(id)
-		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId }
-	end
-end
-
-
 local function setupMyself()
 	myName, _, _, _, myAllyTeamId = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) -- or do it in the loop?
 	highlightPattern = caseInsensitivePattern(myName)
@@ -729,7 +607,6 @@ local function setup()
 	setupMyself()
 	setupColors()
 	setupPlayers()
-	cawidget_setupPlayers()
 end
 
 
@@ -810,6 +687,10 @@ function widget:AddConsoleMessage(msg)
 		return
 	end
 	
+	if msg.player and msg.player.muted then
+	  return
+	end
+	
 	msg.dup = 1
 	
 	detectHighlight(msg)
@@ -841,12 +722,6 @@ function widget:AddConsoleMessage(msg)
 	end
 end
 
--- old callin - move this to cawidget
-function widget:AddConsoleLine(text, priority)
-	msg = { text = text, priority = priority }
-	MessageProcessor:ProcessConsoleLine(msg, self)
-end
-
 -----------------------------------------------------------------------
 
 local timer = 0
@@ -871,17 +746,15 @@ function widget:PlayerAdded(playerID)
 end
 
 -----------------------------------------------------------------------
--- TODO must be shared and use proper LocalColor provided register/unregister functions, not change LocalColor's tables from the outside
-
-function widget:LocalColorUnregister()
-	WG.LocalColor = WG.LocalColor or {}
-	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
-	WG.LocalColor.listeners[widget:GetInfo().name] = onOptionsChanged
+function widget:LocalColorRegister()
+	if WG.LocalColor and WG.LocalColor.RegisterListener then
+		WG.LocalColor.RegisterListener(widget:GetInfo().name, onOptionsChanged)
+	end
 end
 
-function widget:LocalColorRegister()
-	if WG.LocalColor and WG.LocalColor.listeners then
-		WG.LocalColor.listeners[widget:GetInfo().name] = nil
+function widget:LocalColorUnregister()
+	if WG.LocalColor and WG.LocalColor.UnregisterListener then
+		WG.LocalColor.UnregisterListener(widget:GetInfo().name)
 	end
 end
 
@@ -1008,12 +881,15 @@ function widget:Initialize()
 	}
 	
 	RemakeConsole()
-	MessageProcessor:ProcessConsoleBuffer(options.max_lines.value, self)
+	local buffer = widget:ProcessConsoleBuffer(nil, options.max_lines.value)
+	for i=1,#buffer do
+	  widget:AddConsoleMessage(buffer[i])
+	end
 	
 	Spring.SendCommands({"console 0"})
 	
 	screen0:AddChild(window_console)
-    visible = true
+        visible = true
 	
 	self:LocalColorRegister()
 end

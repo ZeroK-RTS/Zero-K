@@ -22,11 +22,21 @@ local DiffTimers = Spring.DiffTimers
 
 local Chili
 
-local typeToColor = {
-  a = {0,1,0,1},
-  l = {1,1,1,1},
-  s = {1,1,0.5,1},
-  p = {1,1,1,1},
+local msgTypeToColor = {
+  player_to_allies = {0,1,0,1},
+  player_to_player_received = {0,1,1,1},
+  player_to_player_sent = {0,1,1,1},
+  player_to_specs = {1,1,0.5,1},
+  player_to_everyone = {1,1,1,1},
+  
+  spec_to_specs = {1,1,0.5,1},
+  spec_to_allies = {1,1,0.5,1},
+  spec_to_everyone = {1,1,1,1},
+  
+  --shameful copy-paste -- TODO rewrite pattern matcher to remove this duplication
+  replay_spec_to_specs = {1,1,0.5,1},
+  replay_spec_to_allies = {1,1,0.5,1},
+  replay_spec_to_everyone = {1,1,1,1},
 }
 
 --------------------------------------------------------------------------------
@@ -246,14 +256,18 @@ function NewMessage(type, a, b, c)
 end
 
 
-function widget:AddChatMessage(player, msg, type)
-
+function widget:AddChatMessage(msg)
+	local player = msg.player and msg.player.id
+	local type = msg.msgtype
+	local text = msg.argument
+	
+	if msg.player and msg.player.muted then return end
 	if NewMessage("chat", player, msg, type) then return end
 
 	local playerName,active,isSpec,teamID
 	local teamcolor
 	local avatar = nil
-	if player < 0 then
+	if type == 'autohost' then
 		active = false
 		playerName = "Autohost"
 		isSpec = true
@@ -268,12 +282,11 @@ function widget:AddChatMessage(player, msg, type)
 	if (not active or isSpec) then
 		teamcolor = {1,1,1,0.7}
 	end
-	local bubbleColor = typeToColor[type] or {1,1,1,1}
-	local originColor
+	local bubbleColor = msgTypeToColor[type] or {1,1,1,1}
 	local textColor = GetColorChar(teamcolor)
 	
-	if type == 'p' then
-		msg = "Private: " .. msg
+	if type == 'player_to_player_received' or type == 'player_to_player_sent' then
+		text = "Private: " .. text
 	end
 
 	local pp = nil
@@ -361,7 +374,7 @@ function widget:AddChatMessage(player, msg, type)
 
 	Chili.TextBox:New{
 		parent  = w;
-		text    = textColor .. "<" .. playerName .. ">\008 " .. GetColorChar(bubbleColor) .. msg .. "\008";
+		text    = textColor .. "<" .. playerName .. ">\008 " .. GetColorChar(bubbleColor) .. text .. "\008";
 		x       = options.window_height.value - 32;
 		y       = 2;
 		width   = w.clientWidth - (options.window_height.value - 32) - 5;
@@ -376,76 +389,18 @@ function widget:AddChatMessage(player, msg, type)
 	PushWindow(w)
 end
 
-
-local function ExtractMsgType(str)
-	local ally      =            select(2, str:find("^(Allies: )"))
-	local private   = ally or    select(2, str:find("^(Private: )"))
-	local spectator = private or select(2, str:find("^(Spectators: )"))
-
-	local type     = ''
-	local msgstart = ally or private or spectator
-	if (msgstart) then
-		str = str:sub(msgstart + 1)
-		type = (ally and 'a') or (private and 'p') or (spectator and 's')
-	end
-
-	return type, str
-end
-
-
-function widget:AddConsoleLine(msg)
-	local firstChar = msg:sub(1,1)
-
-	local nickend
-	local autohost
-	if (firstChar == "<") then
-		--// message comes from a player
-		nickend = msg:find("> ", 1, true)
-	elseif (firstChar == "[") then
-		--// message comes from a spectator
-		nickend = msg:find("] ", 1, true)
-	elseif (firstChar == ">") then
-		--// dedicated autohost relay message
-		if (msg:sub(1,2) == "> ") then
-			autohost = true
-
-			-- autohost interface is ambiguous 
-			-- [[CLAN]bob]hello! - normal chat
-			-- [CLAN]bob has left lobby - leaving message
-			-- [alice]bob has left lobby -- chat mesage from alice
-
-			--local i = 1
-			--while (i) do i = msg:find(']',i+1,true); if (i) then nickend = i end end
-		end
-	end
-
-	if not (nickend or autohost) then
-		return
-	end
-	local playerID = -1
-	local type,mesg
-	if nickend and not autohost then -- ingame
-		local playerName = msg:sub(2, nickend-1)
-		playerID = MyPlayerNameToID(playerName)
-		if (not playerID) then
-			return
-		end
-		msg = msg:sub(nickend+2)
-		type,mesg = ExtractMsgType(msg)
-		
-	else -- autohost
-		mesg = msg:sub(3)
-		type = 'l'
-	end
+function widget:AddConsoleMessage(msg)
+	
 	if not GetSpectatingState() then
-	      if type == '' and options.filterGlobalChat.value then 
+	      if (msg.source == 'spec' or msg.source == "enemy") and options.filterGlobalChat.value then 
 		      return
 	      end
 	end
-	if type == 'l' and options.filterAutohostMsg.value then 
+	if msg.msgtype == 'other' then return end
+	if msg.msgtype == 'autohost' and options.filterAutohostMsg.value then 
 	      return
 	end
-	widget:AddChatMessage(playerID,mesg,type)
+	widget:AddChatMessage(msg)
 end
 
 --------------------------------------------------------------------------------

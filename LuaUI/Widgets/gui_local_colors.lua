@@ -10,6 +10,9 @@ function widget:GetInfo()
 	}
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 options_path = 'Settings/Interface/Local Team Colors'
 options = {
 	simpleColors = {
@@ -20,6 +23,9 @@ options = {
 		OnChange = function() widget:Initialize() end
 	},
 }
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 if VFS.FileExists("Luaui/Configs/LocalColors.lua") then -- user override
 	colorCFG = VFS.Include("Luaui/Configs/LocalColors.lua")
@@ -56,6 +62,9 @@ local allyColors = colorCFG.allyColors
 local enemyColors = colorCFG.enemyColors
 
 WG.LocalColor = (type(WG.LocalColor) == "table" and WG.LocalColor) or {}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function SetNewTeamColors() 
 	local gaia = Spring.GetGaiaTeamID()
@@ -117,8 +126,18 @@ function WG.LocalColor.localTeamColorToggle()
 	widget:Initialize()
 end
 
+function WG.LocalColor.RegisterListener(name, func)
+	WG.LocalColor.listeners[name] = func
+end
+
+function WG.LocalColor.UnregisterListener(name)
+	WG.LocalColor.listeners[name] = nil
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:Initialize()
-	WG.LocalColor.usingSimpleTeamColors = options.simpleColors.value
 	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
 	
 	if options.simpleColors.value then
