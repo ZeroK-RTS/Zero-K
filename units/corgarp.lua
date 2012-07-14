@@ -88,7 +88,7 @@ unitDef = {
     MINE = {
       name                    = [[Light Mine Artillery]],
       accuracy                = 1500,
-      areaOfEffect            = 24,
+      areaOfEffect            = 96,
       craterBoost             = 0,
       craterMult              = 0,
 
