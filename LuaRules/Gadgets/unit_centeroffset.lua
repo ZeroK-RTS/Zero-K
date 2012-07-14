@@ -36,7 +36,6 @@ end
 for i=1,#UnitDefs do
    local midPosOffset = UnitDefs[i].customParams.midposoffset
    if midPosOffset then
-      Spring.Echo(UnitDefs[i].name)
       midPosOffsets[i] = UnpackInt3(midPosOffset)
    end
 end
@@ -46,7 +45,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
       local px, py, pz = unpack(midPosOffsets[unitDefID])
       local _,_,_, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
       px, py, pz = px + ux, py + uy, pz + uz
-      Spring.Echo("bla")
 	  Spring.SetUnitMidAndAimPos(unitID, px, py, pz, px, py, pz)
    end
 end
