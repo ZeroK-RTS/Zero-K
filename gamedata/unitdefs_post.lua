@@ -619,11 +619,8 @@ end
 --------------------------------------------------------------------------------
 -- Copy some unitdef values to customparams
 --
-Spring.Echo("offset start")
 for name, ud in pairs(UnitDefs) do
     if ud.modelcenteroffset then
-	Spring.Echo(name)
 	ud.customparams.midposoffset = ud.modelcenteroffset
     end   
 end
-Spring.Echo("offset end")
