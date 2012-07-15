@@ -86,7 +86,6 @@ unitDef = {
   objectName          = [[selene.s3o]],
   radarDistanceJam    = 300,
   script              = [[armcsa.lua]],
-  script              = [[armcsa.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
