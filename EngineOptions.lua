@@ -7,7 +7,7 @@
 --
 --  These keywords must be lowercase for LuaParser to read them.
 --
---  key:      the string used in the script.txt
+--  key:      the string used in the script.txt 
 --  name:     the displayed name
 --  desc:     the description (could be used as a tooltip)
 --  type:     the option type
