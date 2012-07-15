@@ -31,7 +31,6 @@ unitDef = {
 	helptext_de    = [[Der Leviathan bietet zum einen eine versteckte Verteidigung gegen Atomraketen und andererseits eine Präzisionswaffe. Er besitzt keinen Schutz gegen direkte Angriffe und sollte aus diesem Grund jeden direkten Kontakt mit feindlichen Einheiten vermeiden.]],
 	modelradius    = [[15]],
   },
-  },
 
   explodeAs              = [[BIG_UNITEX]],
   fireState              = 0,
