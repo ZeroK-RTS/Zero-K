@@ -1,4 +1,4 @@
-local versionName = "v2.6"
+local versionName = "v2.61"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -12,7 +12,7 @@ local versionName = "v2.6"
 function widget:GetInfo()
   return {
     name      = "Dynamic Avoidance System",
-    desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground combat unit and gunships",
+    desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
     date      = "May 21, 2012",
     license   = "GNU GPL, v2 or later",
@@ -66,7 +66,7 @@ local mathRandom = math.random
 --------------------------------------------------------------------------------
 -- Constant:
 -- Switches:
-local turnOnEcho =0 --Echo out all numbers for debugging the system (default = 0)
+local turnOnEcho =0 --1:Echo out all numbers for debugging the system, 2:Echo out alert when fail. (default = 0)
 local activateAutoReverseG=1 --activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
 local activateImpatienceG=0 --auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
@@ -151,25 +151,25 @@ options = {
 		name = 'Enable for constructors',
 		type = 'bool',
 		value = true,
-		desc = 'Enable constructor\'s avoidance feature. Constructor will return to base when given area-reclaim/area-ressurect, and partial avoidance while having build/repair/reclaim queue',
+		desc = 'Enable constructor\'s avoidance feature. Constructor will return to base when given area-reclaim/area-ressurect, and partial avoidance while having build/repair/reclaim queue.\n\nTips: order area-reclaim for the whole map, work best for cloaked constructor. Default:On',
 	},
 	enableCloaky = {
 		name = 'Enable for cloakies',
 		type = 'bool',
 		value = true,
-		desc = 'Enable cloakies\' avoidance feature. Cloakable bots will avoid enemy when given move order',
+		desc = 'Enable cloakies\' avoidance feature. Cloakable bots will avoid enemy when given move order, but units with hold-position state is excluded.\n\nTips: is optimized for Sycthe: your Sycthe will less likely to be detected. Default:On',
 	},
 	enableGround = {
 		name = 'Enable for ground units',
 		type = 'bool',
 		value = true,
-		desc = 'Enable for ground units. All ground unit will avoid enemy while outside camera view OR when reloading, but units with hold position state is excluded',
+		desc = 'Enable for ground units. All ground unit will avoid enemy while outside camera view OR when reloading, but units with hold position state is excluded.\n\nTips:\n1) is optimized for masses of thug or shielded unit.\n2) Use Guard to make your unit cover other unit in presence of enemy.\nDefault:On',
 	},
 	enableGunship = {
 		name = 'Enable for gunships',
 		type = 'bool',
-		value = true,
-		desc = 'Enable gunship\'s avoidance feature. Gunship avoid enemy while outside camera view OR when reloading, but units with hold position state is excluded.',
+		value = false,
+		desc = 'Enable gunship\'s avoidance behaviour. Gunship avoid enemy while outside camera view OR when reloading, but units with hold-position state is excluded.\n\nTips: optimize the inherent hit-&-run behaviour by setting the fire-state options to hold-fire. Default:Off',
 	},
 	-- enableAmphibious = {
 		-- name = 'Enable for amphibious',
@@ -181,7 +181,7 @@ options = {
 		name = "Find base",
 		type = 'bool',
 		value = true,
-		desc = "Allow constructor to return to base when having area-reclaim/area-ressurect command, else it will return to center of the circle when retreating. This function enabled and used \'Receive Indicator\' widget",
+		desc = "Allow constructor to return to base when having area-reclaim/area-ressurect command, else it will return to center of the circle when retreating. Enabling this function will also enable the \'Receive Indicator\' widget.\n\nDefault:On",
 		OnChange = function(self) 
 			if self.value==true then
 				spSendCommands("luaui enablewidget Receive Units Indicator")
@@ -192,7 +192,7 @@ options = {
 		name = 'Constructor retreat auto-expire:',
 		type = 'number',
 		value = 15,
-		desc = "Amount in second before constructor retreat command auto-expire (is deleted), and then contructor will return to its previous area-reclaim command.",
+		desc = "Amount in second before constructor retreat command auto-expire (is deleted), and then contructor will return to its previous area-reclaim command.\n\nTips: small value is better.",
 		min=3,max=15,step=1,
 		OnChange = function(self) 
 					consRetreatTimeoutG = self.value
@@ -203,14 +203,14 @@ options = {
 		name = 'Debug: Constructor instant retreat',
 		type = 'bool',
 		value = true,
-		desc = "Widget to issue a retreat order first before issuing an avoidance (to reduce chance of avoidance putting constructor into more danger, might not needed).",
+		desc = "Widget to issue a retreat order first before issuing an avoidance (to reduce chance of avoidance putting constructor into more danger).\n\nDefault:On.",
 		advanced = true,
 	},
 	dbg_IgnoreSelectedCons ={
 		name = 'Debug: Ignore current selection',
 		type = 'bool',
 		value = false,
-		desc = "Selected constructor(s) will be ignored by widget.\nNote: there's a second delay before unit is ignored/re-acquire after selection/de-selection, default: disabled",
+		desc = "Selected constructor(s) will be ignored by widget.\nNote: there's a second delay before unit is ignored/re-acquire after selection/de-selection.\n\nDefault:Off",
 		advanced = true,
 	},
 }
@@ -335,7 +335,6 @@ function RefreshUnitList(attacker, commandTTL)
 	local allMyUnits = spGetTeamUnits(myTeamID_gbl)
 	local arrayIndex=1
 	local relevantUnit={}
-	
 	local selectedUnits	= (spGetSelectedUnits()) or {}
 	local selectedUnits_Meta = {}
 	local selectedCons_Meta = {}
@@ -1138,7 +1137,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			--Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target")
+			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance move targetting failure: fallback to no target") end
 		end
 		boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
@@ -1227,7 +1226,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			end		
 		end
 		if not foundMatch then --if no area-command, no wreckage, no trees, no rock, and no unitID then return error
-			--Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target")
+			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance reclaim targetting failure: fallback to no target") end
 		end
 		--]]
 		
@@ -1256,7 +1255,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		elseif cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --if no unit then use coordinate
 			unitPosX, unitPosY,unitPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 		else
-			--Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target")
+			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance repair targetting failure: fallback to no target") end
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
@@ -1279,7 +1278,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			unitDirection, unitPosY,_ = GetUnitDirection(targetUnitID, {nil,nil}) --get target's direction in radian
 			unitPosX, unitPosZ = ConvertToXZ(targetUnitID, unitDirection, 200) --project a target at 200m in front of guarded unit
 		else
-			--Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target")
+			if (turnOnEcho == 2)then Spring.Echo("Dynamic Avoidance guard targetting failure: fallback to no target") end
 		end
 		targetCoordinate={unitPosX, unitPosY,unitPosZ} --use ally unit as target
 		commandIndexTable[unitID]["backupTargetX"]=unitPosX --backup the target
