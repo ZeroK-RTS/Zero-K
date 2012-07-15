@@ -61,7 +61,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		Spring.SetUnitMidAndAimPos(unitID, mx, my, mz, ax, ay, az)
 	end
 	if modelRadii[unitDefID] then
-		Spring.Echo("bla")
 		Spring.SetUnitRadiusAndHeight(unitID,modelRadii[unitDefID])
 	end
 	--]]
