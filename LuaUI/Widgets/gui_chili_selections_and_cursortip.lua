@@ -107,7 +107,7 @@ local yellow = '\255\255\255\1'
 local windMin = 0
 local windMax = 2.5
 
-local updateFrequency = 0.2
+local updateFrequency = 0.25
 local updateFrequency2 = 1.0 --//update frequency for checking unit's command, for showing unit status in its picture.
 
 local timer = 0
