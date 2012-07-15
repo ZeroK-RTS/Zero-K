@@ -17,7 +17,6 @@ unitDef = {
   collisionVolumeScales   = [[14 14 14]],
   collisionVolumeTest	  = 1,
   collisionVolumeType	  = [[ellipsoid]],
-  corpse              = [[DEAD]],
   cloakCost              = 0,
 
   customParams           = {
