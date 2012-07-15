@@ -43,7 +43,7 @@ local function MakeMinimapWindow()
 end
 
 options_path = 'Settings/Interface/Minimap'
-options_order = { 'use_map_ratio', 'hidebuttons', 'startwithlos', 'startwithradar', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar' }
+options_order = { 'use_map_ratio', 'hidebuttons', 'startwithlos', 'startwithradar', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow'}
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -79,7 +79,7 @@ options = {
 		name = 'Start with Radar view',
 		type = 'bool',
 		desc = 'Enables Radar view at game start.', 
-		value = false,
+		value = true,
 	},
 	
 	alwaysDisplayMexes = {
@@ -125,12 +125,6 @@ options = {
 		name = 'Toggle Fog of War View',
 		type = 'button',
 		action = 'togglelos',
-	},
-	viewradar = {
-		name = 'Toggle Radar & Jammer View',
-		desc = 'Only shows when Fog of War is enabled',
-		type = 'button',
-		action = 'toggleradarandjammer',
 	},
 	
 	hidebuttons = {
@@ -216,8 +210,7 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'viewmetalmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/radar.png', 7, 'viewradar' ),
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 8, 'viewfow' ),
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow' ),
 			
 			Chili.Button:New{ 
 				height=iconsize, width=iconsize, 
@@ -312,9 +305,6 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		if options.startwithlos.value then
 			Spring.SendCommands("showmetalmap") -- toggle MetalMap ON (toggling metalmap and then toggling LOS in sequence seem to make LOS option work).
 			Spring.SendCommands('togglelos') --toggle LOS view ON
-		end
-		if not options.startwithradar.value then --
-			Spring.SendCommands('toggleradarandjammer') --toggle Radar & Jammer view OFF
 		end
 		widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
