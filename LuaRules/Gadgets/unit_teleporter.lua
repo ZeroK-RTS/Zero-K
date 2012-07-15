@@ -246,13 +246,14 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 		if BEACON_PLACE_RANGE_SQR > (cmdParams[1]-ux)^2 + (cmdParams[3]-uz)^2 and ty == Spring.GetGroundHeight(tx, tz) then
 			local cx, cz = math.floor((cmdParams[1]+8)/16)*16, math.floor((cmdParams[3]+8)/16)*16
 			Spring.SetUnitMoveGoal(unitID, ux,0,uz)
-			local place, feature = Spring.TestBuildOrder(beaconDef, cx, 0 ,cz, 1)
-			if place == 2 and feature == nil then
+			--local place, feature = Spring.TestBuildOrder(beaconDef, cx, 0 ,cz, 1)
+			--local inLos = Spring.IsPosInLos(cx,0,cz,Spring.GetUnitAllyTeam(unitID))
+			--if (place == 2 and feature == nil) or not inLos then
 				Spring.MoveCtrl.Enable(unitID)
 				Spring.SetUnitVelocity(unitID, 0, 0, 0)
 				local func = Spring.UnitScript.GetScriptEnv(unitID).Create_Beacon
 				Spring.UnitScript.CallAsUnit(unitID,func,cx,cz)
-			end
+			--end
 			return true, true -- command was used and remove it
 		end
 		

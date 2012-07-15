@@ -31,21 +31,21 @@ local function Create_Beacon_Thread(x,z)
 	
 	activity_mode(3)
 	
-	Turn( body , y_axis, math.rad(120), math.rad(80) )
+	Turn( body , y_axis, math.rad(120), math.rad(40) )
 	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
-	for i = 1, 15 do
+	for i = 1, 30 do
 		Sleep(100)
 		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
 	end
-	Turn( body , y_axis, math.rad(240), math.rad(80) )
+	Turn( body , y_axis, math.rad(240), math.rad(40) )
 	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
-	for i = 1, 15 do
+	for i = 1, 30 do
 		Sleep(100)
 		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
 	end
-	Turn( body , y_axis, math.rad(0), math.rad(80) )
+	Turn( body , y_axis, math.rad(0), math.rad(40) )
 	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
-	for i = 1, 15 do
+	for i = 1, 30 do
 		Sleep(100)
 		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
 	end
