@@ -1782,7 +1782,7 @@ end
 
 
 function widgetHandler:PlayerAdded(playerID, reason)
-  ListMutedPlayers()
+  --ListMutedPlayers()
   for _,w in ipairs(self.PlayerAddedList) do
     w:PlayerAdded(playerID, reason)
   end
