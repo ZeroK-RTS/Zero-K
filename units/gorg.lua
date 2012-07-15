@@ -30,7 +30,6 @@ unitDef = {
     extradrawrange = 260,
 	modelradius    = [[30]],
   },
-  },
 
   explodeAs              = [[ESTOR_BUILDINGEX]],
   footprintX             = 4,

@@ -193,7 +193,11 @@ local function addUnit(defName, path)
     
     path = "Game/Unit AI/Initial States/" .. path
     local ud = UnitDefNames[defName]
-    
+    if not ud then
+		Spring.Echo("Initial States invalid unit " .. defName)
+		return
+	end
+	
     options[defName .. "_label"] = {
         name = "label", 
         type = 'label', 
@@ -393,7 +397,7 @@ local function AddFactoryOfUnits(defName)
     local name = string.gsub(ud.humanName, "/", "-")
     addUnit(defName, name)
     for i = 1, #ud.buildOptions do
-            addUnit(UnitDefs[ud.buildOptions[i]].name, name)
+		addUnit(UnitDefs[ud.buildOptions[i]].name, name)
     end
 end
 AddFactoryOfUnits("factoryshield")

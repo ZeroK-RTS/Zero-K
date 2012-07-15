@@ -120,7 +120,7 @@ function Font:GetAscenderHeight(size)
 end
 
 function Font:GetTextWidth(text, size)
-  return (self._font and self._font.size and (self._font):GetTextWidth(text) * (size or self.size)) or 0
+  return (self._font and self._font.size and (self._font):GetTextWidth(text) * (size or self.size)) or 0 -- still has "attempt to use a deleted font" here
 end
 
 function Font:GetTextHeight(text, size)
