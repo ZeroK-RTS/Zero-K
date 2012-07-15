@@ -160,6 +160,8 @@ local function ProcessCommand(unitID, command)
 		if tips.nano_excess.lastUsed > gameframe - tips.nano_excess.cooldown*30 then
 			return
 		end
+		--local _,_,_,metalIncome,metalExpense = spGetTeamResources(myTeam, "metal")
+		--if (metalIncome - metalExpense) < MIN_PULL_FOR_NANOS then
 		local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
 		local numNanos = #(Spring.GetTeamUnitsByDefs(myTeam, NANO_DEF_ID) or {})
 		if numNanos > 0 and (metalIncome/numNanos < METAL_PER_NANO) then
