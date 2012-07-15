@@ -57,7 +57,7 @@ local teleDef = {
 local beaconDef = UnitDefNames["tele_beacon"].id
 
 -- frames to teleport = unit mass * COST_FACTOR
-local COST_FACTOR = 0.8
+local COST_FACTOR = 0.5
 
 local offset = {
 	[0] = {x = 1, z = 0},
