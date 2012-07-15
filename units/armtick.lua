@@ -13,11 +13,12 @@ unitDef = {
   canMove                = true,
   canstop                = [[1]],
   category               = [[LAND]],
+  collisionVolumeOffsets  = [[0 0 0]],
+  collisionVolumeScales   = [[14 14 14]],
+  collisionVolumeTest	  = 1,
+  collisionVolumeType	  = [[ellipsoid]],
+  corpse              = [[DEAD]],
   cloakCost              = 0,
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[16 12 16]],
-  collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
     description_bp = [[Bomba de PEM escaladora rastejante]],
@@ -33,6 +34,7 @@ unitDef = {
     helptext_fr    = [[Le Tick est rapide et petit lui permettant d'éviter des armes imprécises, en particulier les armes d'assaut et des skirmishers. Il peut paralyser des unités lourdes ou des groupes d'unités de raid qui ne peuvent le tuer avant qu'il soit déjà dans leur périmètre. Des Warriors ou des Glaives peuvent ensuite éliminer les enemis sans risque. Contrez le avec des défenses ou des unités bon marché pour déclencher une détonation prématurée. Le tick est invisible quand il est statique.]],
     helptext_it    = [[Usato bene, il Tick puo valere dozzine di volte il suo costo. Usalo per paralizzare difese, unitá pesanti, e masse di unitá con armi lente. Altre tue unitá posson eliminare i nemici indifesi senza rischi. Contrastali con torri lancia-razzo o singole unitá economiche per provocare una detonazione prematura.]],
 	helptext_de    = [[Geschickt eingesetzt kann Tick sich mehrfach rentieren. Nutze Tick, um gegnerische Verteidigung, schwere Einheiten und gut geschützte Einheiten mit langsamen Waffen zu paralysieren. Andere deiner Einheiten haben so die Möglichkeit die feindlichen Truppen einfach, ohne Risiko zu eleminieren. Konter diese Einheit mit Raketentürmen oder einzelnen, billigen Einheiten. Diese Einheit tarnt sich sobald sie sich nicht mehr bewegt.]],
+	modelradius    = [[7]],
   },
 
   explodeAs              = [[ARMTICK_DEATH]],

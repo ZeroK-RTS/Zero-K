@@ -15,7 +15,7 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 -5 3]],
+  collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[70 60 65]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
@@ -28,6 +28,8 @@ unitDef = {
     helptext_fr    = [[Le Jugglenaut est un quadrip?de lourd et lent, mais ?xtr?mement solide. Il est ?quip? de deux canons laser ? haute fr?quence, et d'un double laser anti gravit? de technologie Newton. Il d?cole les unit?s ennemies du sol et les ?jecte en arri?re tout en les bombardant de ses tirs. Difficilement arr?table, voire la silhouette d'un Juggernaut ? l'horizon est une des pires chose que l'on puisse apercevoir.]],
 	helptext_de    = [[Der Jugglenaut ist der große Bruder des Sumos. Er besitzt im Gegensatz zu diesem keinen exotischen Heat Ray, sondern drei nicht weniger verrückte Gravitationskanonen und eine einfache Laserkanone. Dieses Biest ist langsam und teuer, aber scheinbar völlig unbeeindruckt vom feindlichen Feuer.]],
     extradrawrange = 260,
+	modelradius    = [[30]],
+  },
   },
 
   explodeAs              = [[ESTOR_BUILDINGEX]],

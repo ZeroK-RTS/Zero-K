@@ -27,6 +27,7 @@ unitDef = {
     helptext       = [[The Detriment is the single heaviest strider in the field. It can defend itself against air attacks or use its rockets to hit distant targets, but the real meat lies in the massive gauss guns designed for one purpose - to kill other heavy units quickly and efficiently. Remember - the wise commander sends his Detriment out with adequate escorts against light unit swarms and air assaults.]],
     helptext_fr    = [[Le Detriment est le summum de la technologie. Assez solide pour résister r plusieurs missiles nucléaires, capable de repérer des unités camouflées il fait passer le Bantha pour un caniche. Son armement fait pâlir une armée enticre, et sa relative lenteur est son seul défaut. Son prix est exorbitant et éxige des sacrifices, mais une fois construit rien ne l'arrete.]],
 	helptext_de    = [[Der Detriment ist der stärkste Strider auf dem Platz. Er verteidigt sich selbst gegen Luftattacken oder nutzt seine Raketen, um entfernte Ziele zu treffen. Des Weiteren besitzt er eine Gaußkanone, die nur für einen Zweck konzipiert wurde: das schnelle und sichere Töten von starken, gegnerischen Einheiten. Beachte - der kluge Feldherr schickt seinen Detriment mit angebrachter Unterstützung aus, um Gruppen leichter Gegner, bzw. Lufteinheiten in Schach zu halten.]],
+	modelradius    = [[50]],
   },
 
   explodeAs              = [[NUCLEAR_MISSILE]],

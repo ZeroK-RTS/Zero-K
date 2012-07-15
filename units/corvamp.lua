@@ -32,6 +32,7 @@ unitDef = {
     helptext_bp    = [[Vamp é um caça poderoso contra unidades aéreas mas incapaz de atacar unidades terrestres.]],
     helptext_fr    = [[le Vamp combine, vitesse, invisibilit? au radar, et puissante force offensive Air/Air, afin d'abatre les aeronefs ennemis. Sans d?fense contre les attaques Sol/Air.]],
 	helptext_de    = [[Der Vamp ist darauf spezialisiert, alles vom Himmel zu holen, was dort umherfliegt. Er ist stabil genung, um begrenztes Flugabwehrfeuer auszuhalten, obwohl er keine Möglichkeit zum Angriff auf Bodenziele besitzt.]],
+	modelradius    = [[20]],
   },
 
   explodeAs              = [[GUNSHIPEX]],
