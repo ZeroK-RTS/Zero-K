@@ -530,7 +530,7 @@ local function InitUnsafe()
 			end
 		end
 		if err then 
-			Spring.Echo('Comm Morph error: ' .. err)
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Comm Morph warning: ' .. err)
 		end
 
 		for chassis, subdata in pairs(commData) do
@@ -592,7 +592,7 @@ for id, playerData in pairs(customComms) do
 						Spring.Echo("Duplicate morph, exiting")
 					end
 				else
-					Spring.Echo("Comm Morph error: no setting for level "..i.."->"..i+1 .. " transition")
+					Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Comm Morph error: no setting for level "..i.."->"..i+1 .. " transition")
 					break
 				end
 			end

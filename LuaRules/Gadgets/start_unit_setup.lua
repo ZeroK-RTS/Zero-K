@@ -40,7 +40,6 @@ local spGetSpectatingState 	= Spring.GetSpectatingState
 
 local modOptions = Spring.GetModOptions()
 local startMode = Spring.GetModOption("startingresourcetype",false,"facplop")
-local planetwars = modOptions.planetwarsstructures
 
 
 if (startMode == "limitboost") then
@@ -835,7 +834,7 @@ end
 
 function gadget:Load(zip)
 	if not GG.SaveLoad then
-		Spring.Echo("ERROR: Start Unit Setup failed to access save/load API")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Start Unit Setup failed to access save/load API")
 		return
 	end
 	loadGame = true
@@ -971,7 +970,7 @@ end
 
 function gadget:Save(zip)
 	if not GG.SaveLoad then
-		Spring.Echo("ERROR: Start Unit Setup failed to access save/load API")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Start Unit Setup failed to access save/load API")
 		return
 	end
 	local toSave = {

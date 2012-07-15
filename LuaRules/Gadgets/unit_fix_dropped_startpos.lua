@@ -44,7 +44,7 @@ function gadget:GameFrame(n)
         local x, y, z = Spring.GetUnitPosition(unitid)
 
         if not x then break end
-        if GG.pwUnitsByID[unitid] or (xmin <= x and x <= xmax and zmin <= z and z <= zmax) then
+        if (GG.PlanetWars and (GG.PlanetWars.unitsByID[unitid] or GG.PlanetWars.hqs)) or (xmin <= x and x <= xmax and zmin <= z and z <= zmax) then
           -- all ok
         else
           -- move into middle of team start box

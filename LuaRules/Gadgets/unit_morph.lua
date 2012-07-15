@@ -233,7 +233,7 @@ end
 local function BuildMorphDef(udSrc, morphData)
   local udDst = UnitDefNames[defNamesL[string.lower(morphData.into)] or -1]
   if (not udDst) then
-    Spring.Echo('Morph gadget: Bad morph dst type: ' .. morphData.into)
+    Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph gadget: Bad morph dst type: ' .. morphData.into)
     return
   else
     local unitDef = udDst
@@ -258,7 +258,7 @@ local function BuildMorphDef(udSrc, morphData)
       if (require) then
         reqDefIDs[require]=true
       else
-        Spring.Echo('Morph gadget: Bad morph requirement: ' .. morphData.require)
+        Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph gadget: Bad morph requirement: ' .. morphData.require)
         require = -1
       end
     end
@@ -288,7 +288,7 @@ local function ValidateMorphDefs(mds)
   for src,morphData in pairs(mds) do
     local udSrc = UnitDefNames[defNamesL[string.lower(src)] or -1]
     if (not udSrc) then
-      Spring.Echo('Morph gadget: Bad morph src type: ' .. src)
+      Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph gadget: Bad morph src type: ' .. src)
     else
       newDefs[udSrc.id] = {}
       if (morphData.into) then
@@ -556,8 +556,8 @@ local function FinishMorph(unitID, morphData)
     local data = PWUnit.owner..","..defName..","..math.floor(px)..","..math.floor(pz)..",".."S" -- todo determine and apply smart orientation of the structure
     Spring.SendCommands("w "..hostName.." pwmorph:"..data)
     extraUnitMorphDefs[unitID] = nil
-    GG.PlanetWars.units[unitID] = nil
-    GG.PlanetWars.units[newUnit] = PWUnit
+    --GG.PlanetWars.units[unitID] = nil
+    --GG.PlanetWars.units[newUnit] = PWUnit
     SendToUnsynced('PWCreate', unitTeam, newUnit)
   elseif (not morphData.def.facing) then  -- set rotation only if unit is not planetwars and facing is not true
     --Spring.Echo(morphData.def.facing)
@@ -699,8 +699,8 @@ function gadget:Initialize()
   GG['morphHandler'] = {}
   GG['morphHandler'].AddExtraUnitMorph = AddExtraUnitMorph
 
-  hostName = GG.PlanetWars and GG.PlanetWars.options.hostname or nil
-  PWUnits = GG.PlanetWars and GG.PlanetWars.units or {}
+  --hostName = GG.PlanetWars and GG.PlanetWars.options.hostname or nil
+  --PWUnits = GG.PlanetWars and GG.PlanetWars.units or {}
 
   if (type(GG.UnitRanked)~="table") then GG.UnitRanked = {} end
   GG.UnitRanked[#GG.UnitRanked+1] =  UnitRanked

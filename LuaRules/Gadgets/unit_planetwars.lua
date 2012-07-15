@@ -35,13 +35,18 @@ local spGetGroundHeight	= Spring.GetGroundHeight
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
-local TRANSLOCATION_MULT = 0.95		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
+local TRANSLOCATION_MULT = 0.6		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
+local HQ_DEF_ID = UnitDefNames.pw_hq.id
 
 local unitData = {}
 local unitsByID = {}
+local hqs = {}
+local hqsDestroyed = {}
 local stuffToReport = {data = {}, count = 0}
 
-GG.pwUnitsByID = unitsByID
+GG.PlanetWars = {}
+GG.PlanetWars.unitsByID = unitsByID
+GG.PlanetWars.hqs = hqs
 
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
@@ -73,6 +78,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 		unitsByID[unitID] = nil
 	end
+	if hqs[unitID] then
+		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
+		hqsDestroyed[#hqsDestroyed+1] = unitTeam
+		hqs[unitID] = nil
+	end
 end
 
 ------------------------------------------------------------------------
@@ -85,6 +95,15 @@ local function normaliseBoxes(box)
 	box.bottom = box.bottom/mapHeight
 end
 
+local function TranslocateBoxes(box)
+	local midX, midY = (box.left + box.right)/2, (box.top + box.bottom)/2
+	box.left = box.left + TRANSLOCATION_MULT*(0.5 - midX)
+	box.top = box.top - TRANSLOCATION_MULT*(0.5 - midY)
+	box.right = box.right + TRANSLOCATION_MULT*(0.5 - midX)
+	box.bottom = box.bottom - TRANSLOCATION_MULT*(0.5 - midY)
+end
+
+--[[
 local function spawnStructures(left, top, right, bottom, team)
 	local teamID = team or Spring.GetGaiaTeamID()
 	local xBase = mapWidth*left
@@ -102,7 +121,7 @@ local function spawnStructures(left, top, right, bottom, team)
 			local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
 			
 			if not defID then
-				Spring.Echo('Planetwars error: Missing structure def ' .. info.unitname)
+				Spring.Log(gadget:GetInfo().name, LOG.ERROR, 'Planetwars error: Missing structure def ' .. info.unitname)
 			elseif info.isDestroyed == 1 then
 				--do nothing
 			else
@@ -120,9 +139,33 @@ local function spawnStructures(left, top, right, bottom, team)
 		end
 	end
 end
+]]--
 
+local function SpawnHQ(left, top, right, bottom, team)
+	local teamID = team or Spring.GetGaiaTeamID()
+	local xBase = mapWidth*left
+	local xRand = mapWidth*(right-left)
+	local zBase = mapHeight*top
+	local zRand = mapHeight*(bottom-top)
+	
+	local giveUp = 0
+	
+	local x = xBase + math.random()*xRand
+	local z = zBase + math.random()*zRand
+	local direction = math.floor(math.random()*4)
+	
+	while (Spring.TestBuildOrder(HQ_DEF_ID, x, 0 ,z, direction) == 0 or (lava and Spring.GetGroundHeight(x,z) <= 0)) and giveUp < 25 do
+		x = xBase + math.random()*xRand
+		z = zBase + math.random()*zRand
+		giveUp = giveUp + 1
+	end
+	
+	local unitID = Spring.CreateUnit(HQ_DEF_ID, x, spGetGroundHeight(x,z), z, direction, teamID)
+	hqs[unitID] = true
+	Spring.SetUnitNeutral(unitID,true)
+end
 
-function gadget:GameStart()
+function gadget:GamePreload()
 	local box = {[0] = {}, [1] = {}}
 	box[0].left, box[0].top, box[0].right, box[0].bottom  = Spring.GetAllyTeamStartBox(0)
 	box[1].left, box[1].top, box[1].right, box[1].bottom = Spring.GetAllyTeamStartBox(1)
@@ -134,6 +177,7 @@ function gadget:GameStart()
 	normaliseBoxes(box[0])
 	normaliseBoxes(box[1])
 	
+	--[[
 	local x1,y1,x2,y2 = 0.35, 0.35, 0.65, 0.65
 	if defender then
 		local n = select(6, Spring.GetTeamInfo(defender))
@@ -153,7 +197,14 @@ function gadget:GameStart()
 		spawnStructures(0.44,0.1,0.56,0.9)
 	else -- random idk boxes
 		spawnStructures(0.35,0.35,0.65,0.65)
-	end	
+	end
+	]]--
+	for i=0,1 do
+		TranslocateBoxes(box[i])
+		local teams = Spring.GetTeamList(i)
+		local team = teams[math.random(#teams)]
+		SpawnHQ(box[i].left, box[i].top, box[i].right, box[i].bottom, team)
+	end
 end
 
 function gadget:Initialize()
@@ -163,7 +214,9 @@ function gadget:Initialize()
 			local unitID = units[i]
 			local unitDefID = Spring.GetUnitDefID(unitID)
 			local unitDef = UnitDefs[unitDefID]
-			if unitDef.name:find("pw_") then	-- is PW
+			if unitDefID == HQ_DEF_ID then
+				hqs[unitID] = true
+			elseif unitDef.name:find("pw_") then	-- is PW
 				unitsByID[unitID] = {name = unitDef.name, teamDamages = {}}
 			end
 		end
@@ -173,7 +226,7 @@ function gadget:Initialize()
 		local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
 		local pwDataRaw = modOptions.planetwarsstructures
 		local pwDataFunc, err, success
-		
+		--[[
 		if not (pwDataRaw and type(pwDataRaw) == 'string') then
 			err = "Planetwars data entry in modoption is empty or in invalid format"
 			unitData = {}
@@ -190,7 +243,7 @@ function gadget:Initialize()
 			end
 		end
 		if err then 
-			Spring.Echo('Planetwars warning: ' .. err)
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Planetwars warning: ' .. err)
 		end
 
 		if not unitData then 
@@ -213,6 +266,8 @@ function gadget:Initialize()
 				break
 			end
 		end
+		]]--
+		spawningAnything = pwDataRaw
 		
 		if not spawningAnything then
 			gadgetHandler:RemoveGadget()
@@ -236,5 +291,8 @@ end
 function gadget:GameOver()	
 	for i =1, stuffToReport.count do
 		Spring.SendCommands("wbynum 255 SPRINGIE:structurekilled,".. stuffToReport.data[i])
+	end
+	for i=1, #hqsDestroyed do
+		Spring.SendCommands("wbynum 255 SPRINGIE:hqkilled,".. hqsDestroyed[i])
 	end
 end
