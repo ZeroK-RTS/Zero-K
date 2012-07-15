@@ -40,6 +40,7 @@ local ORDER_FILENAME     = LUAUI_DIRNAME .. 'Config/' .. Game.modShortName:upper
 local CONFIG_FILENAME    = LUAUI_DIRNAME .. 'Config/' .. Game.modShortName:upper() .. '_data.lua'
 local WIDGET_DIRNAME     = LUAUI_DIRNAME .. 'Widgets/'
 
+local HANDLER_BASENAME = "cawidgets.lua"
 local SELECTOR_BASENAME = 'selector.lua'
 
 if not VFS.FileExists(ORDER_FILENAME) then
@@ -275,13 +276,13 @@ end
 local function Deserialize(text)
   local f, err = loadstring(text)
   if not f then
-    Spring.Echo("Error while deserializing  table (compiling): "..tostring(err))
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing  table (compiling): "..tostring(err))
     return
   end
   setfenv(f, {}) -- sandbox
   local success, arg = pcall(f)
   if not success then
-    Spring.Echo("Error while deserializing table (calling): "..tostring(arg))
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Error while deserializing table (calling): "..tostring(arg))
     return
   end
   return arg
@@ -473,7 +474,7 @@ function widgetHandler:SaveConfigData()
       local ok, err = pcall(function() 
 		self.configData[w.whInfo.name] = w:GetConfigData()
 	  end)
-	  if not ok then Spring.Echo("Failed to GetConfigData from: " .. w.whInfo.name.." ("..err..")") end 
+	  if not ok then Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Failed to GetConfigData from: " .. w.whInfo.name.." ("..err..")") end 
     end
   end
   table.save(self.configData, CONFIG_FILENAME, '-- Widget Custom Data')
@@ -570,12 +571,12 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   local text = VFS.LoadFile(filename, _VFSMODE)
 
   if (text == nil) then
-    Spring.Echo('Failed to load: ' .. basename .. '  (missing file: ' .. filename ..')')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (missing file: ' .. filename ..')')
     return nil
   end
   local chunk, err = loadstring(text, filename)
   if (chunk == nil) then
-    Spring.Echo('Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
     return nil
   end
   
@@ -610,7 +611,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   local knownInfo = self.knownWidgets[name]
   if (knownInfo) then
     if (knownInfo.active) then
-      Spring.Echo('Failed to load: ' .. basename .. '  (duplicate name)')
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (duplicate name)')
       return nil
     end
   else
@@ -636,7 +637,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
   knownInfo.active = true
 
   if (widget.GetInfo == nil) then
-    Spring.Echo('Failed to load: ' .. basename .. '  (no GetInfo() call)')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (no GetInfo() call)')
     return nil
   end
 
@@ -743,7 +744,7 @@ function widgetHandler:NewWidget()
     if (self.inCommandsChanged) then
       table.insert(self.customCommands, cmd)
     else
-      Spring.Echo("AddLayoutCommand() can only be used in CommandsChanged()")
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, "AddLayoutCommand() can only be used in CommandsChanged()")
     end
   end
 
@@ -832,12 +833,12 @@ local function HandleError(widget, funcName, status, ...)
   if (funcName ~= 'Shutdown') then
     widgetHandler:RemoveWidget(widget)
   else
-    Spring.Echo('Error in Shutdown()')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Error in Shutdown()')
   end
   local name = widget.whInfo.name
   local error_message = select(1,...)
-  Spring.Echo('Error in ' .. funcName ..'(): ' .. tostring(error_message))
-  Spring.Echo('Removed widget: ' .. name)
+  Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Error in ' .. funcName ..'(): ' .. tostring(error_message))
+  Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Removed widget: ' .. name)
   return nil
 end
 
@@ -863,11 +864,11 @@ local function SafeWrapFuncGL(func, funcName)
       if (funcName ~= 'Shutdown') then
         widgetHandler:RemoveWidget(w)
       else
-        Spring.Echo('Error in Shutdown()')
+        Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Error in Shutdown()')
       end
       local name = w.whInfo.name
-      Spring.Echo('Error in ' .. funcName ..'(): ' .. tostring(r[2]))
-      Spring.Echo('Removed widget: ' .. name)
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Error in ' .. funcName ..'(): ' .. tostring(r[2]))
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Removed widget: ' .. name)
       return nil
     end
   end
@@ -892,7 +893,7 @@ local function SafeWrapWidget(widget)
     return
   elseif (SAFEWRAP == 1) then
     if (widget.GetInfo and widget.GetInfo().unsafe) then
-      Spring.Echo('LuaUI: loaded unsafe widget: ' .. widget.whInfo.name)
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'LuaUI: loaded unsafe widget: ' .. widget.whInfo.name)
       return
     end
   end
@@ -969,7 +970,7 @@ function widgetHandler:RemoveWidget(widget)
     local ok, err = pcall(function() 
 	  self.configData[name] = widget:GetConfigData()
 	end)
-	if not ok then Spring.Echo("Failed to GetConfigData: " .. name.." ("..err..")") end 
+	if not ok then Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Failed to GetConfigData: " .. name.." ("..err..")") end 
   end
   self.knownWidgets[name].active = false
   if (widget.Shutdown) then
@@ -1022,7 +1023,7 @@ function widgetHandler:UpdateWidgetCallIn(name, w)
     end
     self:UpdateCallIn(name)
   else
-    Spring.Echo('UpdateWidgetCallIn: bad name: ' .. name)
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'UpdateWidgetCallIn: bad name: ' .. name)
   end
 end
 
@@ -1034,7 +1035,7 @@ function widgetHandler:RemoveWidgetCallIn(name, w)
     ArrayRemove(ciList, w)
     self:UpdateCallIn(name)
   else
-    Spring.Echo('RemoveWidgetCallIn: bad name: ' .. name)
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'RemoveWidgetCallIn: bad name: ' .. name)
   end
 end
 
@@ -1051,7 +1052,7 @@ end
 function widgetHandler:EnableWidget(name)
   local ki = self.knownWidgets[name]
   if (not ki) then
-    Spring.Echo("EnableWidget(), could not find widget: " .. tostring(name))
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "EnableWidget(), could not find widget: " .. tostring(name))
     return false
   end
   if (not ki.active) then
@@ -1072,7 +1073,7 @@ end
 function widgetHandler:DisableWidget(name)
   local ki = self.knownWidgets[name]
   if (not ki) then
-    Spring.Echo("DisableWidget(), could not find widget: " .. tostring(name))
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "DisableWidget(), could not find widget: " .. tostring(name))
     return false
   end
   if (ki.active) then
@@ -1090,7 +1091,7 @@ end
 function widgetHandler:ToggleWidget(name)
   local ki = self.knownWidgets[name]
   if (not ki) then
-    Spring.Echo("ToggleWidget(), could not find widget: " .. tostring(name))
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "ToggleWidget(), could not find widget: " .. tostring(name))
     return
   end
   if (ki.active) then
@@ -1833,8 +1834,8 @@ end
 
 
 function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
-  local playername = Spring.GetPlayerInfo(playerID)
-  if mutedPlayers[playername] then
+  local customkeys = select(10, Spring.GetPlayerInfo(playerID))
+  if customkeys and customkeys.muted then
     return true
   end
   
