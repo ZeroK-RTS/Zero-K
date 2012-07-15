@@ -20,7 +20,7 @@ if (gadgetHandler:IsSyncedCode()) then -- SYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local USE_TERRAIN_TEXTURE_CHANGE = false
+local USE_TERRAIN_TEXTURE_CHANGE = (Spring.GetModOptions() or {}).terratex == "1"
 
 -- Speedups
 local cos             		= math.cos
@@ -2038,10 +2038,10 @@ end
 local function deregisterTerraformUnit(id,terraformIndex,origin)
 	
 	if not terraformUnit[id] then
-		Spring.Echo("Terraform:")
-		Spring.Echo("Attempted to remove nil terraform ID")
-		Spring.Echo("Error Tpye " .. origin)
-		Spring.Echo("Tell Google Frog")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Terraform:")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Attempted to remove nil terraform ID")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Error Tpye " .. origin)
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Tell Google Frog")
 		return
 	end
 	
@@ -2659,7 +2659,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		end
 		
 		if extraPoints > 9000 then
-			Spring.Echo("spire wall break")
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "spire wall break")
 			break -- safty
 		end
 		i = i + 1
@@ -2701,9 +2701,9 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	end
 	
 	if edgeTerraMult > 1 then
-		Spring.Echo("Terraform:")
-		Spring.Echo("edgeTerraMult > 1 THIS IS VERY BAD")
-		Spring.Echo("Tell Google Frog")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Terraform:")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "edgeTerraMult > 1 THIS IS VERY BAD")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Tell Google Frog")
 	end
 	
 	local progress = terra.progress
@@ -2725,9 +2725,9 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	-- Bug Safety
 	for i = 1, extraPoints do
 		if abs(extraPoint[i].orHeight + extraPoint[i].heightDiff*edgeTerraMult) > 3000 then
-			Spring.Echo("Terraform:")
-			Spring.Echo("Strange pyramid construction")
-			Spring.Echo("Destroying Terraform Unit")
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Terraform:")
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Strange pyramid construction")
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Destroying Terraform Unit")
 			deregisterTerraformUnit(id,arrayIndex,2)			
 			spDestroyUnit(id,{reclaimed = true})
 			return 0

@@ -293,12 +293,12 @@ local options = {
     type   = 'section',
   },
   {
-	key    = 'marketandbounty',
-	name   = 'Enable MarketPlace and Bounties (dysfunctional)',
-	desc   = 'Adds option to sell your units, buy units from allies (including temporary allies). Also allows you to place a bounty on a unit.',
-	type   = 'bool',
-	section= 'experimental',
-	def    = false,
+    key    = 'marketandbounty',
+    name   = 'Enable MarketPlace and Bounties (dysfunctional)',
+    desc   = 'Adds option to sell your units, buy units from allies (including temporary allies). Also allows you to place a bounty on a unit.',
+    type   = 'bool',
+    section= 'experimental',
+    def    = false,
   },
   {
     key    = 'terracostmult',
@@ -368,6 +368,14 @@ local options = {
     def    = false,
   },
   --]]
+  {
+    key    = 'terratex',
+    name   = 'Terraform Texture',
+    desc   = 'Adds a texture to terraformed ground.',
+    type   = 'bool',
+    section= 'experimental',
+    def    = false,
+  },  
   {
     key    = 'specialpower',
     name   = 'Special Advanced Powerplants',
@@ -485,11 +493,11 @@ local options = {
     type   = 'section',
   },
   {
-	key		= "eggs",
-	name	= "Chicken Eggs",
-	desc	= "Enables eggs mode (applies to all chicken difficulties)",
-	type	= "bool",
-	def		= false,
+    key	= "eggs",
+    name	= "Chicken Eggs",
+    desc	= "Enables eggs mode (applies to all chicken difficulties)",
+    type	= "bool",
+    def	= false,
     section = 'chicken',
   },    
   {
