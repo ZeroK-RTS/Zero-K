@@ -1,10 +1,11 @@
 // by Chris Mackey
+// linear constant 163840
 
 #include "constants.h"
 
 piece base, head, popup, 
-l_missile, l_tube, l_door, l_doorslid, 
-r_missile, r_tube, r_door, r_doorslid, 
+l_missile, l_tube, l_door, l_doorslid, l_flare, 
+r_missile, r_tube, r_door, r_doorslid, r_flare, 
 l_thigh, l_leg, l_shin, l_foot, l_toe, lf_toe, lb_toe, 
 r_thigh, r_leg, r_shin, r_foot, r_toe, rf_toe, rb_toe;
 
@@ -255,8 +256,8 @@ AimFromWeapon1(piecenum)
 
 QueryWeapon1(piecenum) 
 {
-	if (gun_1) piecenum = l_missile;
-	else piecenum = r_missile;
+	if (gun_1) piecenum = l_flare;
+	else piecenum = r_flare;
 }
 
 FireWeapon1() 
