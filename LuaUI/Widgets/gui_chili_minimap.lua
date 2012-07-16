@@ -43,7 +43,7 @@ local function MakeMinimapWindow()
 end
 
 options_path = 'Settings/Interface/Minimap'
-options_order = { 'use_map_ratio', 'hidebuttons', 'startwithloson', 'startwithradar', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow'}
+options_order = { 'use_map_ratio', 'hidebuttons', 'startwithlosoff', 'startwithradar', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow'}
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -68,11 +68,11 @@ options = {
 	},
 	--]]
 	
-	startwithloson = {
+	startwithlosoff = {
 		name = 'Start with LOS view',
 		type = 'bool',
 		desc = 'Enables LOS view at game start.', 
-		value = true, --default LOS & Radar/Jammer view ON is better for everyone
+		value = false, --default LOS & Radar/Jammer view ON is better for everyone
 	},
 	
 	startwithradar = {
@@ -302,7 +302,7 @@ function widget:Initialize()
 end
 
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
-		if options.startwithloson.value and not Spring.GetSpectatingState() then
+		if options.startwithlosoff.value and not Spring.GetSpectatingState() then
 			Spring.SendCommands("showmetalmap") -- toggle MetalMap ON (toggling metalmap and then toggling LOS in sequence seem to make LOS option work).
 			Spring.SendCommands('togglelos') --toggle LOS view ON
 		end
