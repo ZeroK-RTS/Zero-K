@@ -1,4 +1,4 @@
-local versionName = "v2.61"
+local versionName = "v2.62"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "May 21, 2012",
+    date      = "July 16, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -111,9 +111,9 @@ local extraLOSRadiusCONSTANTg=205 --add additional distance for unit awareness o
 local velocityScalingCONSTANTg=1 --scale command lenght. (default= 1 multiplier)
 local velocityAddingCONSTANTg=10 --add or remove command lenght (default = 0 meter/second)
 
---Engine based wreckID correction constant:
-local wreckageID_offset_multiplier = 0 --for Spring 0.82 this is 1500. *Update: is obsolete. Its original function is to offset game's maxUnit based on ingame player count, which no longer needed.
-local wreckageID_offset_initial = 32000	--for Spring 0.82 this is 4500 *Update: is obsolete. Its original function is to offset game's initial gameStart's maxUnit, which no longer needed since we have 'Game.maxUnits' call-in.
+--Engine based wreckID correction constant: *Update: replaced with Game.maxUnit
+--local wreckageID_offset_multiplier = 0 --for Spring 0.82 this is 1500. *Update: replaced with Game.maxUnit. Original function is to offset game's maxUnit based on ingame player count.
+--local wreckageID_offset_initial = 32000	--for Spring 0.82 this is 4500 *Update: replaced with Game.maxUnit. Original function is to offset game's initial gameStart's maxUnit.
 --curModID = upper(Game.modShortName)
 
 --Weapon Reload and Shield constant:
@@ -151,13 +151,13 @@ options = {
 		name = 'Enable for constructors',
 		type = 'bool',
 		value = true,
-		desc = 'Enable constructor\'s avoidance feature. Constructor will return to base when given area-reclaim/area-ressurect, and partial avoidance while having build/repair/reclaim queue.\n\nTips: order area-reclaim for the whole map, work best for cloaked constructor. Default:On',
+		desc = 'Enable constructor\'s avoidance feature. Constructor will return to base when given area-reclaim/area-ressurect, and partial avoidance while having build/repair/reclaim queue.\n\nTips: order area-reclaim to the whole map, work best for cloaked constructor, but buggy for flying constructor. Default:On',
 	},
 	enableCloaky = {
 		name = 'Enable for cloakies',
 		type = 'bool',
 		value = true,
-		desc = 'Enable cloakies\' avoidance feature. Cloakable bots will avoid enemy when given move order, but units with hold-position state is excluded.\n\nTips: is optimized for Sycthe: your Sycthe will less likely to be detected. Default:On',
+		desc = 'Enable cloakies\' avoidance feature. Cloakable bots will avoid enemy when given move order, but units with hold-position state is excluded.\n\nTips: is optimized for Sycthe- your Sycthe will less likely to be detected. Default:On',
 	},
 	enableGround = {
 		name = 'Enable for ground units',
@@ -169,7 +169,7 @@ options = {
 		name = 'Enable for gunships',
 		type = 'bool',
 		value = false,
-		desc = 'Enable gunship\'s avoidance behaviour. Gunship avoid enemy while outside camera view OR when reloading, but units with hold-position state is excluded.\n\nTips: optimize the inherent hit-&-run behaviour by setting the fire-state options to hold-fire. Default:Off',
+		desc = 'Enable gunship\'s avoidance behaviour. Gunship avoid enemy while outside camera view OR when reloading, but units with hold-position state is excluded.\n\nTips: to optimize the hit-&-run behaviour- set the fire-state options to hold-fire. Default:Off',
 	},
 	-- enableAmphibious = {
 		-- name = 'Enable for amphibious',
@@ -181,7 +181,7 @@ options = {
 		name = "Find base",
 		type = 'bool',
 		value = true,
-		desc = "Allow constructor to return to base when having area-reclaim/area-ressurect command, else it will return to center of the circle when retreating. Enabling this function will also enable the \'Receive Indicator\' widget.\n\nDefault:On",
+		desc = "Allow constructor to return to base when having area-reclaim/area-ressurect command, else it will return to center of the circle when retreating. Enabling this function will also enable the \'Receive Indicator\' widget. \n\nTips: build 3 new buildings at new location to identify as base, unit will automatically select nearest base. Default:On",
 		OnChange = function(self) 
 			if self.value==true then
 				spSendCommands("luaui enablewidget Receive Units Indicator")
@@ -222,7 +222,8 @@ function widget:Initialize()
 	if spec then widgetHandler:RemoveWidget() return false end
 	myTeamID_gbl= spGetMyTeamID()
 	
-	--[[ Old Method: find maxUnits heuristically...
+	--[[
+	--Old Method: find maxUnits heuristically...
 	--count players to offset the ID of wreckage
 	local playerIDList= Spring.GetPlayerList()
 	local numberOfPlayers=#playerIDList
@@ -232,16 +233,18 @@ function widget:Initialize()
 	end
 	wreckageID_offset=wreckageID_offset_initial+ (numberOfPlayers-2)*wreckageID_offset_multiplier
 	--]]
-	
-	--New Method: use game call-in...
+	--2) New Method: use game call-in...
 	wreckageID_offset = Game.maxUnits
+	--
+	
 	if (turnOnEcho == 1) then Spring.Echo("myTeamID_gbl(Initialize)" .. myTeamID_gbl) end
 end
 
 function widget:PlayerChanged(playerID)
 	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end
 	
-	--[[ Old Method: find maxUnits heuristically...
+	--[[ 
+	--Old Method: find maxUnits heuristically...
 	--count players to offset the ID of wreckage
 	local playerIDList= Spring.GetPlayerList()
 	local numberOfPlayers=#playerIDList
@@ -254,6 +257,7 @@ function widget:PlayerChanged(playerID)
 	
 	--New Method: use game call-in...
 	wreckageID_offset = Game.maxUnits
+	--
 end
 
 --execute different function at different timescale
@@ -1710,7 +1714,7 @@ function GetUnitSubtendedAngle (unitIDmain, unitID2, losRadius)
 	local unitDef= UnitDefs[unitDefID]
 	local unitSize = unitDef.xsize*8 --8 is the actual Distance per square
 	local separationDistance = 0
-	if (unitID2~=nil) then separationDistance = spGetUnitSeparation (unitIDmain, unitID2) --actual separation distance
+	if (unitID2~=nil) then separationDistance = spGetUnitSeparation (unitIDmain, unitID2, true) --actual separation distance
 	else separationDistance = losRadius -- GetUnitLOSRadius(unitIDmain) --as far as unit's reported LOSradius
 	end
 
