@@ -979,7 +979,7 @@ function gadget:GameFrame(n)
 						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
 					else
 						if not spammedError then
-							Spring.Echo("unitDefID missing for ungridded mex")
+							Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for ungridded mex")
 							spammedError = true
 						end
 					end
@@ -999,7 +999,7 @@ function gadget:GameFrame(n)
 					local unitDef = unitDefID and UnitDefs[unitDefID]
 					if not unitDef then
 						if not spammedError then
-							Spring.Echo("unitDefID missing for pylon")
+							Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for pylon")
 							spammedError = true
 						end
 					else
@@ -1054,7 +1054,7 @@ function gadget:GameFrame(n)
 					end
 				end 
 			else
-				Spring.Echo("Lag monitor doesn't work so Overdrive is STUFFED")
+				Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Lag monitor doesn't work so Overdrive is STUFFED")
 			end
 		end
 	end

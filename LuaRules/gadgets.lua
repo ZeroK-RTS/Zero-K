@@ -44,6 +44,7 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
+local HANDLER_BASENAME = "gadgets.lua"
 
 --------------------------------------------------------------------------------
 
@@ -323,12 +324,12 @@ function gadgetHandler:LoadGadget(filename)
   local basename = Basename(filename)
   local text = VFS.LoadFile(filename, VFSMODE)
   if (text == nil) then
-    Spring.Echo('1Failed to load: ' .. filename)
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. filename)
     return nil
   end
   local chunk, err = loadstring(text, filename)
   if (chunk == nil) then
-    Spring.Echo('Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
     return nil
   end
 
@@ -337,7 +338,7 @@ function gadgetHandler:LoadGadget(filename)
   setfenv(chunk, gadget)
   local success, err = pcall(chunk)
   if (not success) then
-    Spring.Echo('Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
     return nil
   end
   if (err == false) then
@@ -354,14 +355,14 @@ function gadgetHandler:LoadGadget(filename)
 
   err = self:ValidateGadget(gadget)
   if (err) then
-    Spring.Echo('Failed to load: ' .. basename .. '  (' .. err .. ')')
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
     return nil
   end
 
   local knownInfo = self.knownGadgets[name]
   if (knownInfo) then
     if (knownInfo.active) then
-      Spring.Echo('Failed to load: ' .. basename .. '  (duplicate name)')
+      Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (duplicate name)')
       return nil
     end
   else
@@ -527,7 +528,7 @@ local function SafeWrap(func, funcName)
       if (funcName ~= 'Shutdown') then
         gadgetHandler:RemoveGadget(g)
       else
-        Spring.Echo('Error in Shutdown')
+        Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Error in Shutdown')
       end
       local name = g.ghInfo.name
       Spring.Echo(r[2])
@@ -667,7 +668,7 @@ function gadgetHandler:UpdateGadgetCallIn(name, g)
     end
     self:UpdateCallIn(name)
   else
-    Spring.Echo('UpdateGadgetCallIn: bad name: ' .. name)
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'UpdateGadgetCallIn: bad name: ' .. name)
   end
 end
 
@@ -679,7 +680,7 @@ function gadgetHandler:RemoveGadgetCallIn(name, g)
     ArrayRemove(ciList, g)
     self:UpdateCallIn(name)
   else
-    Spring.Echo('RemoveGadgetCallIn: bad name: ' .. name)
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'RemoveGadgetCallIn: bad name: ' .. name)
   end
 end
 
@@ -697,7 +698,7 @@ end
 function gadgetHandler:EnableGadget(name)
   local ki = self.knownGadgets[name]
   if (not ki) then
-    Spring.Echo("EnableGadget(), could not find gadget: " .. tostring(name))
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "EnableGadget(), could not find gadget: " .. tostring(name))
     return false
   end
   if (not ki.active) then
@@ -717,7 +718,7 @@ end
 function gadgetHandler:DisableGadget(name)
   local ki = self.knownGadgets[name]
   if (not ki) then
-    Spring.Echo("DisableGadget(), could not find gadget: " .. tostring(name))
+    Spring.Log(HANDLER_BASENAME, LOG.ERROR, "DisableGadget(), could not find gadget: " .. tostring(name))
     return false
   end
   if (ki.active) then

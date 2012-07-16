@@ -91,7 +91,7 @@ for i=1,#UnitDefs do
 
       -- output units without tex2
       if not tex2 then
-        Spring.Echo("CustomUnitShaders: " .. udef.name .. " no tex2")
+        Spring.Log(gadget:GetInfo().name, LOG.WARNING, "CustomUnitShaders: " .. udef.name .. " no tex2")
       end
 
       local normaltex = FindNormalmap(tex1,tex2)
@@ -113,7 +113,7 @@ for i=1,#UnitDefs do
 
           -- output units without tex2
           if not tex2 then
-            Spring.Echo("CustomUnitShaders: " .. udef.name .. " no tex2")
+            Spring.Log(gadget:GetInfo().name, LOG.WARNING, "CustomUnitShaders: " .. udef.name .. " no tex2")
           end
 
           local normaltex = FindNormalmap(tex1,tex2)

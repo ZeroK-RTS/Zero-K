@@ -157,7 +157,7 @@ function widget:Initialize()
 
 
   if (blurShader_h == nil) then
-    Spring.Echo("Halo widget: hblur shader error: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo widget: hblur shader error: "..gl.GetShaderLog())
     widgetHandler:RemoveWidget()
     return false
   end
@@ -203,7 +203,7 @@ function widget:Initialize()
   })
 
   if (blurShader_v == nil) then
-    Spring.Echo("Halo widget: vblur shader error: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo widget: vblur shader error: "..gl.GetShaderLog())
     widgetHandler:RemoveWidget()
     return false
   end

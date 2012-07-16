@@ -94,11 +94,11 @@ function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 	local y = math.floor((vsy - height)/2)
 	
 	if not width then
-		Spring.Echo("Width is nil")
+		--Spring.Echo("Width is nil")
 		width = 320
 	end
 	if not height then
-		Spring.Echo("Height is nil")
+		--Spring.Echo("Height is nil")
 		height = 100
 	end
 	

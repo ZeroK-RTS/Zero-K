@@ -252,8 +252,8 @@ local function WakeUp(thread, ...)
 	local co = thread.thread
 	local good, err = co_resume(co, ...)
 	if (not good) then
-		Spring.Echo(err)
-		Spring.Echo(debug.traceback(co))
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, err)
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, debug.traceback(co))
 		RunOnError(thread)
 	end
 end
@@ -399,8 +399,8 @@ function Spring.UnitScript.SetSignalMask(mask)
 	local activeThread = activeUnit.threads[co_running() or error("[SetSignalMask] not in a thread", 2)]
 	if (activeThread.signal_mask_set) then
 		local ud = UnitDefs[Spring.GetUnitDefID(activeUnit.unitID)]
-		Spring.Echo("Warning: Spring.UnitScript.SetSignalMask called second time for the same thread (possible lack of StartThread?)")
-		Spring.Echo("UnitDef: " .. ud.name .. " Old mask: " .. activeThread.signal_mask .. " New mask: " .. mask)
+		Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Warning: Spring.UnitScript.SetSignalMask called second time for the same thread (possible lack of StartThread?)")
+		Spring.Log(gadget:GetInfo().name, LOG.WARNING, "UnitDef: " .. ud.name .. " Old mask: " .. activeThread.signal_mask .. " New mask: " .. mask)
 	end
 	activeThread.signal_mask = mask
 	activeThread.signal_mask_set = true
@@ -497,12 +497,12 @@ end
 local function LoadChunk(filename)
 	local text = VFS.LoadFile(filename, VFSMODE)
 	if (text == nil) then
-		Spring.Echo("Failed to load: " .. filename)
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to load: " .. filename)
 		return nil
 	end
 	local chunk, err = loadstring(scriptHeader .. text, filename)
 	if (chunk == nil) then
-		Spring.Echo("Failed to load: " .. Basename(filename) .. "  (" .. err .. ")")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Failed to load: " .. Basename(filename) .. "  (" .. err .. ")")
 		return nil
 	end
 	return chunk

@@ -587,7 +587,7 @@ function gadget:Initialize()
 	-- import config
 	behaviourDefs, behaviourDefaults = include("LuaRules/Configs/tactical_ai_defs.lua")
 	if not behaviourDefs then 
-		Spring.Echo("LuaRules/Configs/tactical_ai_defs.lua not found")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "LuaRules/Configs/tactical_ai_defs.lua not found")
 		gadgetHandler:RemoveGadget()
 		return 
 	end

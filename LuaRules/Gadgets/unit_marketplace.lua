@@ -111,7 +111,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		local transdata = explode( '|', msg:sub(#sellprefix+1) )
 		
 		if( #transdata ~= 2 ) then
-			echo ('<MarketPlace> (A) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<MarketPlace> (A) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
 			return false
 		end
 		
@@ -119,7 +119,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 		local price = transdata[2]+0
 		
 		if( type(unitID) ~= 'number' or type(price) ~= 'number' ) then
-			echo ('<MarketPlace> (B) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, '<MarketPlace> (B) Player ' .. playerID .. ' on team ' .. teamID .. ' tried to send a nonsensical command.')
 			return false
 		end
 		

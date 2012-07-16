@@ -239,7 +239,6 @@ end
 --[[
 function widget:GameFrame(n)
 	if n % updateFrequency == 0 then
-		Spring.Echo("ping")
 		DspList = nil
 	end
 end

@@ -563,7 +563,7 @@ end
 local function AssignKeyBind(hotkey, path, option, verbose) -- param4 = verbose
 
 	if not (hotkey.key and hotkey.mod) then
-		echo '<EPIC Menu> Wacky assign keybind error #1'
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, '<EPIC Menu> Wacky assign keybind error #1')
 		return
 	end
 	
@@ -869,7 +869,7 @@ local function IntegrateWidget(w, addoptions, index)
 		local k = w.options_order[i]
 		local option = options[k]
 		if not option then
-			echo( '<EPIC Menu> Error in loading custom widget settings in ' .. wname .. ', order table incorrect.' )
+			Spring.Log(widget:GetInfo().name, LOG.ERROR,  '<EPIC Menu> Error in loading custom widget settings in ' .. wname .. ', order table incorrect.' )
 			return
 		end
 		
@@ -1116,7 +1116,7 @@ local function ResetWinSettings(path)
 				option.OnChange(option)
 			end
 		else
-			echo ('<EPIC Menu> Error #627', option.name)
+			Spring.Log(widget:GetInfo().name, LOG.ERROR, '<EPIC Menu> Error #627', option.name)
 		end
 	end
 end

@@ -522,7 +522,7 @@ function widget:Initialize()
 		})
 
 		if (not stereoShader) then
-			Spring.Echo("Stereo3D widget: shader0 error:" .. gl.GetShaderLog())
+			Spring.Log(widget:GetInfo().name, LOG.ERROR, "Stereo3D widget: shader0 error:" .. gl.GetShaderLog())
 			widgetHandler:RemoveWidget()
 			return;
 		end
@@ -547,7 +547,7 @@ function widget:Initialize()
 		})
 
 		if (not stereoShaderPara) then
-			Spring.Echo("Stereo3D widget: shader1 error:" .. gl.GetShaderLog())
+			Spring.Log(widget:GetInfo().name, LOG.ERROR, "Stereo3D widget: shader1 error:" .. gl.GetShaderLog())
 			widgetHandler:RemoveWidget()
 			return;
 		end
@@ -569,7 +569,7 @@ function widget:Initialize()
 		})
 
 		if (not stereoShaderInt) then
-			Spring.Echo("Stereo3D widget: shader2 error:" .. gl.GetShaderLog())
+			Spring.Log(widget:GetInfo().name, LOG.ERROR, "Stereo3D widget: shader2 error:" .. gl.GetShaderLog())
 			widgetHandler:RemoveWidget()
 			return;
 		end

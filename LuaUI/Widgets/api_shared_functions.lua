@@ -88,7 +88,7 @@ end
 
 function WG.PrintTable(f, table)
 	file = io.open (f, "w")
-	if (file== nil) then Spring.Echo ("could not open file for writing!") return end
+	if (file== nil) then Spring.Log(HANDLER_BASENAME, LOG.ERROR, "could not open file for writing!") return end
 	file:write(WriteTable(table, 0, true))
 	file:flush()
 	file:close()

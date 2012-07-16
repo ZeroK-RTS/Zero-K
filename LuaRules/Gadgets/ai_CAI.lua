@@ -215,10 +215,10 @@ local function chooseUnitDefIDWithDebug(array, unitID, ud, choice)
 	local total = 0
 	for i = 1, count do
 		if not array then
-			Spring.Echo("bad array for " .. ud.humanName .. " with choice " .. choice)
+			Spring.Log(gadget:GetInfo().name, LOG.ERROR, "bad array for " .. ud.humanName .. " with choice " .. choice)
 		end
 		if not array[i] then
-			Spring.Echo("bad array index for " .. ud.humanName .. " with choice " .. choice)
+			Spring.Log(gadget:GetInfo().name, LOG.ERROR, "bad array index for " .. ud.humanName .. " with choice " .. choice)
 		end
 		total = total + array[i].chance
 		if rand < total then
@@ -396,7 +396,7 @@ local function conJobAllocator(team)
 			
 			--mapEcho(unitID,"con added to " .. data.name)
 		else
-			Spring.Echo("broke 'add con to jobs with not enough BP'") -- should not happen
+			Spring.Log(gadget:GetInfo().name, LOG.ERROR, "broke 'add con to jobs with not enough BP'") -- should not happen
 			break
 		end
 	end
@@ -1800,7 +1800,7 @@ local function raiderJobHandler(team)
 				--spGiveOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-200,200),tY,tZ + math.random(-200,200),}, {})
 				for i = 1, battleGroup.count do
 					if battleGroup[i].unit[unitID] then
-						Spring.Echo("Unit already in battle group")
+						Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Unit already in battle group")
 					end
 				end
 				battleGroup[battleGroup.count].unit[unitID] = true
@@ -1965,7 +1965,7 @@ local function gunshipJobHandler(team)
 				--spGiveOrderToUnit(unitID, CMD_FIGHT , {tX + math.random(-200,200),tY,tZ + math.random(-200,200),}, {})
 				for i = 1, battleGroup.count do
 					if battleGroup[i].unit[unitID] then
-						Spring.Echo("Unit already in battle group")
+						Spring.Log(gadget:GetInfo().name, LOG.WARNING, "Unit already in battle group")
 					end
 				end
 				battleGroup[battleGroup.count].unit[unitID] = true
@@ -3799,7 +3799,7 @@ function gadget:Initialize()
 	usingAI = false
 	
 	if not GG.metalSpots then
-		Spring.Echo("CAI: Fatal error, map not supported due to metal map.")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "CAI: Fatal error, map not supported due to metal map.")
 		gadgetHandler:RemoveGadget()
 	end
 	
@@ -3852,7 +3852,7 @@ end
 
 function gadget:Load(zip)
 	if not GG.SaveLoad then
-		Spring.Echo("ERROR: CAI failed to access save/load API")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: CAI failed to access save/load API")
 		return
 	end
 	local data = GG.SaveLoad.ReadFile(zip, "CAI", SAVE_FILE) or {}
@@ -3875,7 +3875,7 @@ end
 
 function gadget:Save(zip)
 	if not GG.SaveLoad then
-		Spring.Echo("ERROR: CAI failed to access save/load API")
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: CAI failed to access save/load API")
 		return
 	end
 	local allyTeamData = MakeRealTable(SYNCED.allyTeamData)

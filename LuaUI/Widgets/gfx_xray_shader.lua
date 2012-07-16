@@ -137,7 +137,7 @@ function widget:Initialize()
   })
 
   if (shader == nil) then
-    spEcho(glGetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, glGetShaderLog())
     spEcho("Xray shader compilation failed.")
     widgetHandler:RemoveWidget()
   end

@@ -673,7 +673,7 @@ function widget:RecvLuaMsg(msg, playerID)
 	local cameraState = PacketToCameraState(msg)
 	
 	if not cameraState then
-		Echo("<LockCamera>: Bad packet received.")
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "<LockCamera>: Bad packet received.")
 		return
 	end
 	
@@ -765,7 +765,7 @@ function widget:Update(dt)
 		--don't send duplicates
 		
 		if not msg then
-			Echo("<LockCamera>: Error creating packet!")
+			Spring.Log(widget:GetInfo().name, LOG.ERROR, "<LockCamera>: Error creating packet!")
 			return
 		end
 		

@@ -102,7 +102,7 @@ local function ReadFile(zip, name, file)
 		end
 	end
 	if err then 
-		Spring.Echo('Save/Load error: ' .. err)
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, 'Save/Load error: ' .. err)
 		return nil
 	end
 	return data

@@ -198,7 +198,7 @@ local function UnitFinished(_,unitID,unitDefID)
     for i=1,#effects do
       local fx = effects[i]
       if (not fx.options) then
-        Spring.Echo("LUPS DEBUG GRRR", UnitDefs[unitDefID].name, fx and fx.class)
+        Spring.Log(widget:GetInfo().name, LOG.ERROR, "LUPS DEBUG GRRR", UnitDefs[unitDefID].name, fx and fx.class)
         return
       end
 
@@ -362,7 +362,7 @@ function widget:Update()
         tryloading=-1
         return
       else
-        Spring.Echo("LuaParticleSystem (Lups) couldn't be loaded!")
+        Spring.Log(widget:GetInfo().name, LOG.ERROR, "LuaParticleSystem (Lups) couldn't be loaded!")
         widgetHandler:RemoveWidgetCallIn("Update",self)
         return
       end

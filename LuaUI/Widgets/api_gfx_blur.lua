@@ -93,7 +93,7 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   })
 
   if (blurtex == nil)or(blurtex2 == nil)or(screencopy == nil) then
-    Spring.Echo("blur api: texture error")
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "blur api: texture error")
     widgetHandler:RemoveWidget()
     return false
   end
@@ -146,7 +146,7 @@ local function DrawStencilTexture()
       })
 
       if (stenciltex == nil) then
-        Spring.Echo("blur api: texture error")
+        Spring.Log(widget:GetInfo().name, LOG.ERROR, "blur api: texture error")
         widgetHandler:RemoveWidget()
         return false
       end
@@ -252,7 +252,7 @@ function widget:Initialize()
   })
 
   if (blurShader == nil) then
-    Spring.Echo("blurShader: shader error: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "blurShader: shader error: "..gl.GetShaderLog())
     widgetHandler:RemoveWidget()
     return false
   end
@@ -265,7 +265,7 @@ function widget:Initialize()
   })
 
   if (blurFsShader == nil) then
-    Spring.Echo("blurFsShader: shader error: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "blurFsShader: shader error: "..gl.GetShaderLog())
     widgetHandler:RemoveWidget()
     return false
   end
@@ -283,7 +283,7 @@ function widget:Initialize()
   })
 
   if (noiseShader == nil) then
-    Spring.Echo("noiseShader: shader error: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "noiseShader: shader error: "..gl.GetShaderLog())
     widgetHandler:RemoveWidget()
     return false
   end
@@ -297,7 +297,7 @@ function widget:Initialize()
   })
 
   if (noiseFsShader == nil) then
-    Spring.Echo("noiseFsShader: shader error: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "noiseFsShader: shader error: "..gl.GetShaderLog())
     widgetHandler:RemoveWidget()
     return false
   end
@@ -323,7 +323,7 @@ function widget:Initialize()
 
   -- debug?
   if (blurtex == nil)or(blurtex2 == nil)or(screencopy == nil) then
-    Spring.Echo("blur api: texture error")
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "blur api: texture error")
     widgetHandler:RemoveWidget()
     return false
   end

@@ -306,7 +306,7 @@ local function CreateResources()
     },
   })
 
-  if (not pre_shader) then Spring.Echo(gl.GetShaderLog()) end
+  if (not pre_shader) then Spring.Log(gadget:GetInfo().name, LOG.ERROR, gl.GetShaderLog()) end
 
   post_shader = gl.CreateShader({
     vertex = [[
@@ -422,7 +422,7 @@ local function CreateResources()
     },
   })
 
-  if (not post_shader) then Spring.Echo(gl.GetShaderLog()) end
+  if (not post_shader) then Spring.Log(gadget:GetInfo().name, LOG.ERROR, gl.GetShaderLog()) end
 
   halo_shader = gl.CreateShader({
     vertex = [[
@@ -483,7 +483,7 @@ local function CreateResources()
   })
 
 
-  if (not halo_shader) then Spring.Echo(gl.GetShaderLog()) end
+  if (not halo_shader) then Spring.Log(gadget:GetInfo().name, LOG.ERROR, gl.GetShaderLog()) end
 
   clear_shader = gl.CreateShader({
     fragment = [[
@@ -494,7 +494,7 @@ local function CreateResources()
     ]]
   })
 
-  if (not clear_shader) then Spring.Echo(gl.GetShaderLog()) end
+  if (not clear_shader) then Spring.Log(gadget:GetInfo().name, LOG.ERROR, gl.GetShaderLog()) end
 end
 
 --------------------------------------------------------------------------------
@@ -952,7 +952,7 @@ end
     end);
 
     if (not result and not cfg.empty) then
-      Spring.Echo("icongen: ".. (UnitDefs[udid].name) ..": give up :<");
+      Spring.Log(gadget:GetInfo().name, LOG.ERROR, "icongen: ".. (UnitDefs[udid].name) ..": give up :<");
     end;
   end
 

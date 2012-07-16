@@ -194,7 +194,7 @@ local function RemoveAllianceUnit(u, ud, teamID)
 		commsAlive[allianceID][u] = nil
 	end
 	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID))) and (allianceID ~= chickenAllyTeamID) then
-		Spring.Echo("purge allyTeam" .. allianceID)
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
 		DestroyAlliance(allianceID)
 	end
 end
@@ -355,7 +355,7 @@ end
 
 function gadget:GameOver()
 	gameover = true
-	Spring.Echo("GAME OVER!!")
+	Spring.Log(gadget:GetInfo().name, LOG.INFO, "GAME OVER!!")
 end
 
 else -- UNSYNCED
