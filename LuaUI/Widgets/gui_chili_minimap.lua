@@ -302,7 +302,7 @@ function widget:Initialize()
 end
 
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
-		if options.startwithloson.value or Spring.GetSpectatingState() then
+		if options.startwithloson.value and not Spring.GetSpectatingState() then
 			Spring.SendCommands("showmetalmap") -- toggle MetalMap ON (toggling metalmap and then toggling LOS in sequence seem to make LOS option work).
 			Spring.SendCommands('togglelos') --toggle LOS view ON
 		end
