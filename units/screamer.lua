@@ -18,7 +18,7 @@ unitDef = {
   canstop                       = [[1]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[74 74 74]],
+  collisionVolumeScales         = [[75 75 75]],
   collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
@@ -30,7 +30,6 @@ unitDef = {
     helptext       = [[The Screamer is an extremely long-ranging first strike anti-air weapon that sends a clear message to enemy aircraft - can't go here, sonny. Each shot must be stockpiled at the cost of 80 resources, but this is well worth the price, for a quick salvo of missiles will wipe out almost any air attack without fuss.]],
     helptext_fr    = [[Leest un lance missile trcs longue portée. Ses missiles r tete chercheuse ultra rapides peuvent abattre r peu prcs nimporte quel avion d'un seul tir. L'ultime défense Anti-Air, de tous points de vue, met necessite de programmer la production de missiles Sol/Air dans son interface avant d'etre apte r faire feu.]],
 	helptext_de    = [[Der Screamer ist eine extrem weitreichende Flugabwehrwaffe, die eine klare Botschaft an die feindlichen Lufteinheiten sendet - hier kommst du nicht rein, Kleiner. Jeder Schuss muss auf Kosten der Ressourcen bevorratet werden. Dennoch ist all dies seinen Preis wert, denn mit ein paar schnellen Salven wird fast jeder Luftangriff zunichtegemacht.]],
-	modelradius    = [[37]],
   },
 
   explodeAs                     = [[BIG_UNITEX]],

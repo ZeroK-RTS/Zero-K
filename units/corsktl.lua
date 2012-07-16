@@ -18,7 +18,7 @@ unitDef = {
   cloakCost              = 5,
   cloakCostMoving        = 15,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[20 20 20]],
+  collisionVolumeScales  = [[20 15 20]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
 
@@ -31,9 +31,6 @@ unitDef = {
     helptext_bp    = [[]],
     helptext_fr    = [[Le Skuttle est une arme redoutable, il s'agit en fait d'un mine armée d'une tete nucléaire légcre, équipée d'un camouflage optique et d'un jetpack. Capable de se faufiler dans les endroits les plus inatendus, le souffle de son explosion est capable de faire des dégâts effroyables. Il se fera cependant détecter si il approche trop d'une cible ennemie. ]],
 	helptext_de    = [[Der Skuttle wirft sich als Kamikazekrieger in die Schlacht und kann dir enorme Vorteile erarbeiten. Hochwirksam gegen schwere Ziele. Der Explosionsradius ist minimal, deshalb gilt: sorgfältig nutzen.]],
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 0 0]],
-	modelradius    = [[10]],
   },
 
   explodeAs              = [[CORSKTL_DEATH]],

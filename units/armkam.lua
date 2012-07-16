@@ -36,7 +36,6 @@ unitDef = {
     helptext_bp    = [[Banshee é a aeronave agressora leve de Nova. Tem uma resist?ncia decente mas causa pouco dano. Funciona bem contra poderio anti-aério pouco resistente, sendo capaz de destruílo e ent?o atacar o resto do inimigo com impunidade por algum tempo, mas funciona mal contra poderio anti-aéreo pesado como metralhadoras anti-aéreas. Pode facilmente acertar unidades móveis e constitui defesa excelente contra inimigos que n?o incluem unidades anti-aéreas em seus grupos de ataque.]],
     helptext_fr    = [[Le Banshee est un ADAV l?ger, un blindage l?ger et peu de d?g?ts en font la hantise des d?buts de conflits. Envoy? dans une base non pr?par?e ou contre une arm?e sans d?fense Anti Air, son attaque rapide est bien souvent fatale.]],
 	helptext_de    = [[Der Banshee ist ein leichter Kampfhubschrauber. Er besitzt nur wenig Ausdauer und macht wenig DPS. Er ist gut für direkte Attacken auf die Verteidiger (z.B. um Luftabwehr auszuschalten). Er trifft bewegte Einheiten sehr gut und erweist sich auch bei Verteidigung gegen Gegner ohne Luftabwehr als sehr nützlich.]],
-	modelradius    = [[20]],
   },
 
   explodeAs              = [[GUNSHIPEX]],

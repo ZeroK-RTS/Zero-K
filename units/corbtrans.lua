@@ -37,7 +37,6 @@ unitDef = {
     helptext_bp    = [[Essa aeronave de transporte é resistente o suficiente para aguentar algum fogo anti-aéreo e vem armada com canh?es laser que dispara contra aquilo que a ataca. Se for destruída durante o voo sua carga é ejetada e com sorte pousa em segurança. ]],
     helptext_fr    = [[Le Vindicator est le summum du transport aerien. Rapide et puissant il peut transporter toutes vos unit?s sur le champ de bataille, il riposte aux tirs gr?ce ? ses multiples canons laser, et s'il est abattu, il ejecte sa livraison au sol avant d'exploser.]],
 	helptext_de    = [[Der Vindicator kann jede Landeinheit im Spiel befördern. Seine doppelläufige Laserkanone und sein automatisches Frachtauswurfsystem machen ihn ideal für den Transport von Einheiten in umkämpfte Landezonen.]],
-	modelradius    = [[20]],
   },
 
   explodeAs              = [[GUNSHIPEX]],

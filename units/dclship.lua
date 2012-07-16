@@ -25,7 +25,6 @@ unitDef = {
     description_de = [[Torpedofregatte]],
     helptext       = [[The Torpedo Frigate is a (relatively) cheap countermeasure to subs, though it can also attack surface targets.]],
 	helptext_de    = [[Die relativ günstige Torpedofregatte besitzt eine Waffe speziell zur U-Jagd, die auch im Stande ist Schiffe zu treffen.]],
-	modelradius    = [[30]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

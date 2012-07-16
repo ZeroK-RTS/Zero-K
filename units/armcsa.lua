@@ -85,7 +85,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[selene.s3o]],
   radarDistanceJam    = 300,
-  script              = [[armcsa.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,

@@ -19,10 +19,6 @@ unitDef = {
   canPatrol           = true,
   canSubmerge         = false,
   category            = [[GUNSHIP]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[18 18 18]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],
   collide             = true,
   cruiseAlt           = 78,
 
@@ -33,7 +29,6 @@ unitDef = {
     helptext       = [[The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with banshees or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to defenders.]],
     helptext_fr    = [[Le Gnat peut etre utilisé pour paralyser les unités légcres. Utilisé en groupe il peut meme s'attaquer r des cibles plus grosses, mais sa fragilité rends cette tactique plus difficile.]],
 	helptext_de    = [[Gnats sind kleine Einheiten, die Feinde paralysieren können. Sie erweisen sich als Verteidigungseinheiten als sehr nützlich und unter der Kombination mit Banshees oder anderen Einheiten können die Feinde so lange bewegungsunfähig gemacht werden, bis deine Einheiten diese vernichtet haben. In der Offensive können sie sogar schwerere Einheiten paralysieren, doch sterben sie relativ schnell gegen Verteidiger.]],
-	modelradius    = [[9]],
   },
 
   explodeAs           = [[TINY_BUILDINGEX]],

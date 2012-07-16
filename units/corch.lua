@@ -32,7 +32,6 @@ unitDef = {
     helptext       = [[The Quill allows smooth expansion across both land and sea. It can also detect submarines that get too close.]],
     helptext_fr    = [[L'Hovercon est rapide et agile mais son blindage et ses nanoconstructeurs sont de mauvaise facture.]],
     helptext_de    = [[Quill erlaubt dir leichtgängige Expansionen über Land und See. Dabei kann er sogar U-Boote entdecken, die ihm zu nahe kommen.]],
-	modelradius    = [[15]],
   },
 
   energyMake          = 0.15,
