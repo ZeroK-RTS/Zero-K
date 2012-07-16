@@ -438,6 +438,12 @@ local function getOutputFormat(msgtype)
   end
 end
 
+local function getSource(spec, allyTeamId)
+	return (spec and 'spec')
+		or ((Spring.GetMyTeamID() == allyTeamId) and 'ally')
+		or 'enemy'
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 

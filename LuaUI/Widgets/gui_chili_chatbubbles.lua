@@ -259,7 +259,7 @@ end
 function widget:AddChatMessage(msg)
 	local player = msg.player and msg.player.id
 	local type = msg.msgtype
-	local text = msg.argument
+	local text = msg.argument or ''
 	
 	if msg.player and msg.player.muted then return end
 	if NewMessage("chat", player, msg, type) then return end

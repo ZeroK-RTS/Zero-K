@@ -344,13 +344,13 @@ local function SetupPlayers()
 	
 	for i, id in ipairs(playerroster) do
 		local name, _, spec, teamId, allyTeamId, _,_,_,_,customkeys = Spring.GetPlayerInfo(id)
-		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId, muted = true}--(customkeys and customkeys.muted == 1) }
+		players[name] = { id = id, spec = spec, allyTeamId = allyTeamId, muted = (customkeys and customkeys.muted == 1) }
 	end
 end
 
 local function getSource(spec, allyTeamId)
 	return (spec and 'spec')
-		or ((myAllyTeamId == allyTeamId) and 'ally')
+		or ((Spring.GetMyTeamID() == allyTeamId) and 'ally')
 		or 'enemy'
 end
 
@@ -387,12 +387,6 @@ end
 
 function MessageProcessor:ProcessConsoleLine(msg)
 	self:ParseMessage(msg)
-		
-	if msg.msgtype == 'point' or msg.msgtype == 'label' then
---	if MESSAGE_DEFINITIONS[msg.msgtype].discard then
-		-- ignore all console messages about points... those come in through the MapDrawCmd callin
-		return
-	end
 end
 
 function MessageProcessor:ProcessConsoleBuffer(count)
@@ -1378,6 +1372,10 @@ function widgetHandler:AddConsoleLine(msg, priority)
     
     msg = { text = msg, priority = priority }
     MessageProcessor:ProcessConsoleLine(msg)
+    if msg.msgtype == 'point' or msg.msgtype == 'label' then
+      -- ignore all console messages about points... those come in through the MapDrawCmd callin
+      return
+    end    
     for _,w in ipairs(self.AddConsoleMessageList) do
       w:AddConsoleMessage(msg)
     end
