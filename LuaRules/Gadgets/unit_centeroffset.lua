@@ -20,6 +20,11 @@ if gadgetHandler:IsSyncedCode() then
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+if not Spring.Spring.SetUnitMidAndAimPos then
+	return
+end
+
 local offsets = {}
 local modelRadii = {}
 
