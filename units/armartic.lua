@@ -25,6 +25,8 @@ unitDef = {
     helptext       = [[The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a quarter. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy.]],
     helptext_fr    = [[le Faraday est une redoutable défense EMP à zone d'effêt paralysant les adversaires sans les endommager. Repliée son blindage réduit à un quart les dommages reçus. Attention cependant à ne pas paralyser ses propres unités dans la zone d'effêt EMP.]],
     helptext_de = [[Faraday ist ein schlagkräftiger EMP Turm. Er hat einen großen Radius, sowie hohen Schaden. Er vervollständigt die Effekte anderer Türme, doch alleine ist er ziemlich nutzlos. Falls geschlossen, besitzt er mehr Lebenspunkte. Beachte dennoch seinen Flächenschaden, welcher auch nahegelegene eigene Einheiten paralysieren kann.]],
+	aimposoffset   = [[0 10 0]],
+	modelradius    = [[16]],
   },
 
   damageModifier                = 0.25,
@@ -78,7 +80,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargetting      = 0,
+      cylinderTargeting      = 0,
 
       damage                  = {
         default        = 1000,

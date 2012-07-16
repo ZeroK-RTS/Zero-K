@@ -166,7 +166,7 @@ unitDef = {
         extra_damage = [[360]],
       },
 
-      cylinderTargetting      = 0,
+      cylinderTargeting      = 0,
 
       damage                  = {
         default        = 1080,
@@ -207,7 +207,7 @@ unitDef = {
 	  commandFire			  = true,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargetting      = 0,
+      cylinderTargeting      = 0,
 
       damage                  = {
         default        = 1000,

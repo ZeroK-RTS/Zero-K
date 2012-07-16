@@ -15,11 +15,11 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND]],
+  collisionVolumeOffsets  = [[0 0 0]],
+  collisionVolumeScales   = [[14 14 14]],
+  collisionVolumeTest	  = 1,
+  collisionVolumeType	  = [[ellipsoid]],
   cloakCost              = 0,
-  collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[16 12 16]],
-  collisionVolumeTest    = 1,
-  collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
     description_bp = [[Bomba rastejante]],
@@ -33,6 +33,7 @@ unitDef = {
     helptext_fr    = [[Le Roach est une unité suicide ultra-rapide. Il est indispensable de savoir la manier pour se débarrasser rapidement des nuées ennemies. Des unités lance-missiles ou tirant avec précision pouront cependant le faire exploser prématurément.]],
     helptext_it    = [[Questa veloce unitá suicida é buona contro unitá ammassate, specialmente carri armati d'assalto. Esplode a catena terribilmente, sicche é meglio non ammassarle. Contrastale con carri o torri lancia-razzi o singole unitá economiche per provocare una detonazione prematura.]],
 	helptext_de    = [[Diese flinke Kamikazeeinheit ist effektiv gegen größere Einheiten, besonderns Sturmpanzer. Sie besitzt eine Tarnvorrichting welche automatisch aktiviert wird sobald diese Einheit still steht. Bewahre Abstand zwischen diesen Einheiten, da sie in einer Kettenreaktion explodieren. Der Defender oder Raketenlaster sind effektiv gegen sie. Außerdem auch billige einzelne Einheiten, um eine frühzeitige Explosion zu erwirken.]],
+	modelradius    = [[7]],
   },
 
   explodeAs              = [[CORROACH_DEATH]],

@@ -35,6 +35,7 @@ unitDef = {
     helptext       = [[The Brawler is an assault gunship that flies out of the reach of most ground mobiles. It has enough armor to survive limited anti-air fire, and its twin EMGs chew through composite armor as if it were paper.]],
     helptext_bp    = [[Brawler é a aeronave de assalto de Nova. Pode resistir fogo anti-aéreo considerável e destruir rapidamente o inimigo com suas metralhadoras de energia, mas ainda é aconselhável n?o envia-lá diretamente contra fogo anti-aéreo pesado.]],
     helptext_fr    = [[Le Brawler est un ADAV lourd, de par son blondage comme de par le calibre de ses mitrailleuses. Il peut donc résister r des défenses anti air assez longtemps pour s'en débarrasser. Un redoutable ADAV, mais cependant sans défense contre l'air.]],
+	modelradius    = [[20]],
   },
 
   explodeAs           = [[GUNSHIPEX]],

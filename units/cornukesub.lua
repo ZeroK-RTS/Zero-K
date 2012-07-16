@@ -29,6 +29,7 @@ unitDef = {
     helptext       = [[The Leviathan provides both a hidden defense against enemy nuclear missiles and a standoff precision strike weapon. It has no defense against direct attacks and should avoid contact with the enemy.]],
     helptext_fr    = [[Le Leviathan est la terreur des profondeurs. Tapi au fond des océans, il utilise ses missiles amphibies pour lancer ses terribles tete nucléaires tactiques sur de grande distances. Capable de réduire r néant une base en quelques tirs bien ajustés, il scme la terreur car on voit rarement venir la menace. (Il faut lancer la construction de missiles depuis le sousmarin)]],
 	helptext_de    = [[Der Leviathan bietet zum einen eine versteckte Verteidigung gegen Atomraketen und andererseits eine Präzisionswaffe. Er besitzt keinen Schutz gegen direkte Angriffe und sollte aus diesem Grund jeden direkten Kontakt mit feindlichen Einheiten vermeiden.]],
+	modelradius    = [[15]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
