@@ -59,8 +59,8 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-      [[custom:THUDMUZZLE]],
-      [[custom:THUDSHELLS]],
+      [[custom:RAIDMUZZLE]],
+      [[custom:RAIDDUST]],
       [[custom:THUDDUST]],
     },
 
@@ -137,7 +137,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 64,
-      object           = [[thug_d.s3o]],
+      object           = [[hermit_wreck.s3o]],
       reclaimable      = true,
       reclaimTime      = 64,
       seqnamereclamate = [[TREE1RECLAMATE]],

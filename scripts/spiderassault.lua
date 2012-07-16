@@ -166,12 +166,18 @@ end
 
 local function recoil()
 	if gun then
-		Move(lbarrel, z_axis, -6)
+	    EmitSfx( lflare, 1024)
+	    EmitSfx( lflare, 1025) 
+
+        Move(lbarrel, z_axis, -6)
 		Move(larm, z_axis, -2)
 
 		Move(lbarrel, z_axis, 0, 3)
 		Move(larm, z_axis, 0, 1)
 		else
+	    EmitSfx( rflare, 1024)
+	    EmitSfx( rflare, 1025) 
+
 		Move(rbarrel, z_axis, -6)
 		Move(rarm, z_axis, -2)
 
@@ -211,11 +217,13 @@ function script.Killed(recentDamage, maxHealth)
 		return 1
 	elseif  severity <= .50  then
 		Explode(base, sfxNone)
-		Explode(barrel, sfxFall + sfxSmoke)
+		Explode(lbarrel, sfxFall + sfxSmoke)
+		Explode(rbarrel, sfxFall + sfxSmoke)
 		return 1
 	else
 		Explode(base, sfxShatter)
-		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lbarrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+	    Explode(rbarrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	end
 end
