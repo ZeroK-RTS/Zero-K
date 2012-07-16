@@ -51,10 +51,11 @@ unitDef = {
   movementClass          = [[TKBOT3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[behecrash.s3o]],
+  objectName             = [[hermit.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-
+  script                = [[spiderassault.lua]],
+  
   sfxtypes               = {
 
     explosiongenerators = {
@@ -72,7 +73,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
-  trackWidth             = 22,
+  trackWidth             = 30,
   turnRate               = 1600,
   workerTime             = 0,
 
