@@ -131,7 +131,7 @@ unitDef = {
       commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
-	  cylinderTargeting	  = 1,
+	  cylinderTargetting	  = 1,
 
       damage                  = {
         default = 1200,

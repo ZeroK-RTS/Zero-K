@@ -79,7 +79,7 @@ unitDef = {
       cegTag                  = [[chainsawtrail]],
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargetting      = 1,
 
       damage                  = {
         default = 25,
