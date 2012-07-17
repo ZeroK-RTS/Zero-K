@@ -777,7 +777,9 @@ local function keepTeamEnergyBelowMax(team)
 end
 
 local lastTeamNe = {}
-
+local frameLapsed =2000
+local previous_summedOverdrive = 0
+local previous_teamODEnergy = {}
 function gadget:GameFrame(n)
 
 	if (n%32 == 1) then
@@ -1034,15 +1036,37 @@ function gadget:GameFrame(n)
 				--Spring.Echo(allyTeamID .. " energy sum " .. teamODEnergySum)
 	
 				sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, teamIncome, ODenergy, energyWasted)
-	
+
+				frameLapsed = frameLapsed + 1
+				if frameLapsed >= 1740 then
+					frameLapsed = 0
+					previous_summedOverdrive = summedOverdrive
+					previous_teamODEnergy = {}
+					for teamID, value in pairs(teamODEnergy) do
+						previous_teamODEnergy[teamID] = value
+					end
+				end
+				local basicODShare = previous_summedOverdrive/activeCount
+				local metalDiff = summedOverdrive - previous_summedOverdrive
+				local teamODEnergyDiff = {}
+				local totalEDiff = 0
+				for teamID, value in pairs(teamODEnergy) do
+					teamODEnergyDiff[teamID] = value - previous_teamODEnergy[teamID]
+					totalEDiff = totalEDiff + teamODEnergyDiff[teamID]
+				end
+				local playersShare = {}
+				for teamID, value in pairs(teamODEnergyDiff) do
+					playersShare[teamID] = (value/totalEDiff)*metalDiff
+				end
+				
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
 						local te = teamEnergy[teamID]
-						local odShare = summedOverdrive / activeCount
-						if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
-							odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odShare
-						end		
+						local odShare = playersShare[teamID] --OR summedOverdrive / activeCount
+						-- if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
+							-- odShare = OD_OWNER_SHARE * summedOverdrive * (teamODEnergy[teamID] / teamODEnergySum) +  (1-OD_OWNER_SHARE) * odShare
+						-- end	
 						
 						local baseShare = summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)
 						
