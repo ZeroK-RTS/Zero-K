@@ -20,6 +20,7 @@ local glResetState = gl.ResetState
 local glResetMatrices = gl.ResetMatrices
 
 local iconsize = 20
+local currentSensorState = 0
 
 local tabbedMode = false
 
@@ -43,7 +44,7 @@ local function MakeMinimapWindow()
 end
 
 options_path = 'Settings/Interface/Minimap'
-options_order = { 'use_map_ratio', 'hidebuttons', 'startwithlosoff', 'startwithradar', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow'}
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'updateInitalSensor', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar'}
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -68,17 +69,20 @@ options = {
 	},
 	--]]
 	
-	startwithlosoff = {
-		name = 'Start with LOS view',
-		type = 'bool',
-		desc = 'Enables LOS view at game start.', 
-		value = false, --default LOS & Radar/Jammer view ON is better for everyone
+	initialSensorState = {
+		name = "Initial Radar/LOS state.",
+		desc = "Values: Off, LOS, Radar",
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 2,
+		step = 1,
 	},
 	
-	startwithradar = {
-		name = 'Start with Radar view',
+	updateInitalSensor = {
+		name = 'Update initial state.',
 		type = 'bool',
-		desc = 'Enables Radar view at game start.', 
+		desc = 'Change initial LOS/Radar state to the state at the end of the last game.', 
 		value = true,
 	},
 	
@@ -124,7 +128,25 @@ options = {
 	viewfow = {
 		name = 'Toggle Fog of War View',
 		type = 'button',
-		action = 'togglelos',
+		OnChange = function()
+			if currentSensorState == 1 then
+				setSensorState(0)
+			else
+				setSensorState(1)
+			end
+		end
+	},
+	
+	viewradar = {
+		name = 'Toggle Radar & Jammer View',
+		type = 'button',
+		OnChange = function()
+			if currentSensorState == 2 then
+				setSensorState(0)
+			else
+				setSensorState(2)
+			end
+		end
 	},
 	
 	hidebuttons = {
@@ -137,7 +159,44 @@ options = {
 	
 }
 
-local function MakeMinimapButton(file, pos, option )
+function setSensorState(state)
+	local losEnabled = Spring.GetMapDrawMode() == "los"
+	currentSensorState = state
+	if state == 0 then
+		if losEnabled then
+			Spring.SendCommands('togglelos')
+		end
+	else
+		if not losEnabled then
+			Spring.SendCommands('togglelos')
+		end
+		if state == 1 then
+			Spring.SetLosViewColors(
+				{ 0.17, 0.23, 0.1, 0 },
+				{ 0.17, 0.23, 0.1, -0.15 },
+				{ 0.17, 0.23, 0.1, -0.15 }
+			)
+		elseif state == 2 then
+			Spring.SetLosViewColors(
+				{ 0.25, 0.2, 0, 0.18 },
+				{ 0.2, 0.13, 0.17, 0 },
+				{ 0.25, 0.2, 0, 0 }
+			)
+		end
+	end
+	if options.updateInitalSensor.value then
+		options.initialSensorState.value = state
+	end
+end
+
+function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
+	
+	Spring.SendCommands("showmetalmap") -- toggle MetalMap ON (toggling metalmap and then toggling LOS in sequence seem to make LOS option work).
+	setSensorState(options.initialSensorState.value)
+	widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
+end
+
+local function MakeMinimapButton(file, pos, option, useOnchange )
 	local desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
 	local hotkey = WG.crude.GetHotkey(options[option].action)
 	if hotkey ~= '' then
@@ -156,7 +215,7 @@ local function MakeMinimapButton(file, pos, option )
 		tooltip = ( options[option].name .. desc .. hotkey ),
 		
 		--OnClick={ function(self) options[option].OnChange() end }, 
-		OnClick={ function(self) Spring.SendCommands( options[option].action ); end },
+		OnClick={ useOnchange and function(self) options[option].OnChange() end or function(self) Spring.SendCommands( options[option].action ); end },
 		children={
 			Chili.Image:New{
 				file=file,
@@ -210,7 +269,8 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'viewmetalmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow' ),
+			MakeMinimapButton( 'LuaUI/images/map/radar.png', 7, 'viewradar', true ),
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 8, 'viewfow', true ),
 			
 			Chili.Button:New{ 
 				height=iconsize, width=iconsize, 
@@ -300,15 +360,6 @@ function widget:Initialize()
 	
 	gl.SlaveMiniMap(true)
 end
-
-function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
-		if options.startwithlosoff.value and not Spring.GetSpectatingState() then
-			Spring.SendCommands("showmetalmap") -- toggle MetalMap ON (toggling metalmap and then toggling LOS in sequence seem to make LOS option work).
-			Spring.SendCommands('togglelos') --toggle LOS view ON
-		end
-		widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
-end
-
 
 function widget:Shutdown()
 	--// reset engine default minimap rendering

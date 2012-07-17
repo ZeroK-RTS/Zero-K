@@ -87,7 +87,7 @@ local game_menu_tree = {
 	{'Views'},
 	{'Line of Sight'},
 	{'Toggle Fog of War', function(self) spSendCommands{"togglelos"} end },
-	{'Toggle Radar/Jammer', function(self) spSendCommands{"toggleradarandjammer"} end },	
+	--{'Toggle Radar/Jammer', function(self) spSendCommands{"toggleradarandjammer"} end },	
 	
 	{'Map Views'},
 	{'Normal', function(self) spSendCommands{"showstandard"} end },	
