@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Chat v0.443",
-    desc      = "v0.443 Chili Chat Console.",
+    desc      = "v0.442 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
     license   = "GNU GPL, v2 or later",
@@ -309,9 +309,6 @@ WG.chat.showConsole = showConsole
 
 local function addLine(msg)
 	if msg:sub(1,3) == "[f=" then msg = msg:sub(13) end	-- truncate framenumber
-	if msg:len > 28 and msg:sub(1, 28) == "Connection attempt rejected:" or msg.len == 17 and msg:sub(1, 13) == " -> Version: " then
-		return --most peoples hate this spam, it will still appear in infolog.txt
-	end
 
 	if lines_count>0 and lines[lines_count].msg == msg then
 		lines[lines_count].dup = lines[lines_count].dup + 1
