@@ -44,7 +44,8 @@ local function MakeMinimapWindow()
 end
 
 options_path = 'Settings/Interface/Minimap'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'updateInitalSensor', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar'}
+local radar_path = 'Settings/Graphics/Radar View Colors'
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'updateInitalSensor', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'radar_color_label', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_reset_default'}
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -149,6 +150,50 @@ options = {
 		end
 	},
 	
+	radar_color_label = { type = 'label', name = 'Note: These colors are additive.', path = radar_path,},
+	
+	radar_fog_color = {
+		name = "Fog Color",
+		type = "colors",
+		value = { 0.25, 0.2, 0.25, 0},
+		OnChange =  function() radar_color_onChange() end,
+		path = radar_path,
+	},
+	radar_los_color = {
+		name = "LOS Color",
+		type = "colors",
+		value = { 0.2, 0.13, 0.2, 0},
+		OnChange =  function() radar_color_onChange() end,
+		path = radar_path,
+	},
+	radar_radar_color = {
+		name = "Radar Color",
+		type = "colors",
+		value = { 0, 0.17, 0, 0},
+		OnChange =  function() radar_color_onChange() end,
+		path = radar_path,
+	},
+	radar_jammer_color = {
+		name = "Jammer Color",
+		type = "colors",
+		value = { 0.18, 0, 0, 0},
+		OnChange = function() radar_color_onChange() end,
+		path = radar_path,
+	},
+	
+	radar_reset_default = {
+		name = 'Reset to Default',
+		type = 'button',
+		OnChange = function()
+			Spring.Echo("bla")
+			options.radar_fog_color.value = { 0.25, 0.2, 0.25, 0}
+			options.radar_los_color.value = { 0.2, 0.13, 0.2, 0}
+			options.radar_radar_color.value = { 0, 0.17, 0, 0}
+			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
+		end,
+		path = radar_path,
+	},
+	
 	hidebuttons = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
@@ -177,15 +222,33 @@ function setSensorState(state)
 				{ 0.17, 0.23, 0.1, -0.15 }
 			)
 		elseif state == 2 then
+			local fog = options.radar_fog_color.value
+			local los = options.radar_los_color.value
+			local radar = options.radar_radar_color.value
+			local jam = options.radar_jammer_color.value
 			Spring.SetLosViewColors(
-				{ 0.25, 0.2, 0, 0.18 },
-				{ 0.2, 0.13, 0.17, 0 },
-				{ 0.25, 0.2, 0, 0 }
+				{ fog[1], los[1], radar[1], jam[1]},
+				{ fog[2], los[2], radar[2], jam[2]}, 
+				{ fog[3], los[3], radar[3], jam[3]}
 			)
 		end
 	end
 	if options.updateInitalSensor.value then
 		options.initialSensorState.value = state
+	end
+end
+
+function radar_color_onChange()
+	if currentSensorState == 2 then
+		local fog = options.radar_fog_color.value
+		local los = options.radar_los_color.value
+		local radar = options.radar_radar_color.value
+		local jam = options.radar_jammer_color.value
+		Spring.SetLosViewColors(
+			{ fog[1], los[1], radar[1], jam[1]},
+			{ fog[2], los[2], radar[2], jam[2]}, 
+			{ fog[3], los[3], radar[3], jam[3]} 
+		)
 	end
 end
 
