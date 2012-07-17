@@ -282,6 +282,9 @@ unitConfigs = {
     rot    = 30,
     angle  = 30,
   },
+  [UnitDefNames.spiderassault.id] = {
+    unfold = true,
+  },  
   [UnitDefNames.arm_spider.id] = {
     scale    = 3,
     attempts = 10,
