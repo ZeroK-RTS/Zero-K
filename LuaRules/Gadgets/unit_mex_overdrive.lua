@@ -1043,7 +1043,7 @@ function gadget:GameFrame(n)
 					previous_summedOverdrive = summedOverdrive
 					previous_teamODEnergy = {}
 					for teamID, value in pairs(teamODEnergy) do
-						previous_teamODEnergy[teamID] = value
+						previous_teamODEnergy[teamID] = (value or 0)
 					end
 				end
 				local basicODShare = previous_summedOverdrive/activeCount
@@ -1051,8 +1051,10 @@ function gadget:GameFrame(n)
 				local teamODEnergyDiff = {}
 				local totalEDiff = 0
 				for teamID, value in pairs(teamODEnergy) do
-					teamODEnergyDiff[teamID] = value - previous_teamODEnergy[teamID]
-					totalEDiff = totalEDiff + teamODEnergyDiff[teamID]
+					if value~=nil then
+						teamODEnergyDiff[teamID] = value - previous_teamODEnergy[teamID]
+						totalEDiff = totalEDiff + teamODEnergyDiff[teamID]
+					end
 				end
 				local playersShare = {}
 				for teamID, value in pairs(teamODEnergyDiff) do
