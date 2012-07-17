@@ -1042,23 +1042,24 @@ function gadget:GameFrame(n)
 					frameLapsed = 0
 					previous_summedOverdrive = summedOverdrive
 					previous_teamODEnergy = {}
-					for teamID, value in pairs(teamODEnergy) do
-						previous_teamODEnergy[teamID] = (value or 0)
+					for i = 1, allyTeamData.teams do 
+						local teamID = allyTeamData.team[i]
+						previous_teamODEnergy[teamID] = teamODEnergy[teamID]
 					end
 				end
 				local basicODShare = previous_summedOverdrive/activeCount
 				local metalDiff = summedOverdrive - previous_summedOverdrive
 				local teamODEnergyDiff = {}
 				local totalEDiff = 0
-				for teamID, value in pairs(teamODEnergy) do
-					if value~=nil then
-						teamODEnergyDiff[teamID] = value - previous_teamODEnergy[teamID]
-						totalEDiff = totalEDiff + teamODEnergyDiff[teamID]
-					end
+				for i = 1, allyTeamData.teams do 
+					local teamID = allyTeamData.team[i]
+					teamODEnergyDiff[teamID] =  teamODEnergy[teamID] - previous_teamODEnergy[teamID]
+					totalEDiff = totalEDiff + teamODEnergyDiff[teamID]
 				end
 				local playersShare = {}
-				for teamID, value in pairs(teamODEnergyDiff) do
-					playersShare[teamID] = (value/totalEDiff)*metalDiff
+				for i = 1, allyTeamData.teams do 
+					local teamID = allyTeamData.team[i]
+					playersShare[teamID] = (teamODEnergy[teamID]/totalEDiff)*metalDiff
 				end
 				
 				for i = 1, allyTeamData.teams do 
