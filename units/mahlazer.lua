@@ -50,6 +50,7 @@ unitDef = {
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[lazer.3do]],
+  script                        = [[mahlazor.lua]],
   onoffable                     = true,
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
