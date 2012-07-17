@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Chat v0.442",
+    name      = "Chili Chat v0.443",
     desc      = "v0.443 Chili Chat Console.",
     author    = "CarRepairer, Licho",
     date      = "2009-07-07",
@@ -76,11 +76,11 @@ end
 
 
 options_path = "Settings/Interface/Chat/Console"
-options_order = {'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel','defaultAllyChat', 'text_height', 'max_lines', 
-		'col_back','col_text', 'col_ally', 'col_spec', 'col_othertext', 'col_dup', 
+options_order = {'noColorName',  'mousewheel', 'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel','defaultAllyChat', 'text_height', 'max_lines',
+		'col_back','col_text', 'col_ally', 'col_spec', 'col_othertext', 'col_dup',
 		}
 options = {
-	
+
 	noColorName = {
 		name = "Don't Color Name",
 		desc = "Color only the brackets around the name with player's team color.",
@@ -88,7 +88,7 @@ options = {
 		value = false,
 		OnChange = option_remakeConsole,
 	},
-	
+
 	text_height = {
 		name = 'Text Size',
 		type = 'number',
@@ -96,7 +96,7 @@ options = {
 		min=8,max=30,step=1,
 		OnChange = option_remakeConsole,
 	},
-	
+
 	hideSpec = {
 		name = "Hide Spectator Chat",
 		type = 'bool',
@@ -129,10 +129,10 @@ options = {
 		name = 'Maximum Lines (80-300)',
 		type = 'number',
 		value = 150,
-		min=80,max=300,step=1, 
+		min=80,max=300,step=1,
 		OnChange = option_remakeConsole,
 	},
-	
+
 	col_text = {
 		name = 'Chat Text',
 		type = 'colors',
@@ -150,7 +150,7 @@ options = {
 		type = 'colors',
 		value = {1,1,0.5,1},
 		OnChange = option_remakeConsole,
-	},	
+	},
 	col_othertext = {
 		name = 'Other Text',
 		type = 'colors',
@@ -167,9 +167,9 @@ options = {
 		name = "Background color",
 		type = "colors",
 		value = {0,0,0,0},
-		OnChange = function(self) 
+		OnChange = function(self)
 			scrollpanel1.backgroundColor = self.value
-			scrollpanel1:Invalidate() 
+			scrollpanel1:Invalidate()
 			inputspace.backgroundColor = self.value
 			inputspace:Invalidate()
 		end,
@@ -185,8 +185,8 @@ options = {
 		desc = "Sets default chat mode to allies at game start",
 		type = 'bool',
 		value = true,
-	},	
-	
+	},
+
 }
 
 
@@ -202,13 +202,13 @@ local function setup()
 	col_spec_in 		= color2incolor(options.col_spec.value)
 	col_othertext_in 	= color2incolor(options.col_othertext.value)
 	col_dup_in 			= color2incolor(options.col_dup.value)
-	
+
 	local myallyteamid = Spring.GetMyAllyTeamID()
 	local playerroster = Spring.GetPlayerList()
 	local playercount = #playerroster
-	
+
 	myName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
-	
+
 	for i=1,playercount do
 		local name,_,_,teamID = Spring.GetPlayerInfo(playerroster[i])
 		local inColor = color2incolor(Spring.GetTeamColor(teamID))
@@ -222,30 +222,30 @@ local function setup()
 end
 
 
-local function GenerateTextControl(line, remake) 
-	
+local function GenerateTextControl(line, remake)
+
 	if (line.mtype == "spectatormessage" and options.hideSpec.value)
-		or (line.mtype == "allymessage" and options.hideAlly.value) 
-		or (line.mtype == "playerpoint" and options.hidePoint.value) 
+		or (line.mtype == "allymessage" and options.hideAlly.value)
+		or (line.mtype == "playerpoint" and options.hidePoint.value)
 		or (line.mtype == "playerlabel" and options.hideLabel.value)
 		then
 		return
 	end
-	
+
 	local tx = (line.dup > 1 and (col_dup_in.. line.dup ..'x '.. col_text_in) or col_text_in)..line.text
-	
+
 	if (line.dup > 1 and not remake) then
-	
+
 		local last = stack_console.children[#(stack_console.children)]
 		if last then
 			last:SetText(tx)
 			last:UpdateClientArea()
 		end
-	else  
+	else
 		local lab = Chili.TextBox:New{
-		
+
 			width = '100%',
-			
+
 			align="left",
 			fontsize = options.text_height.value,
 			valign="ascender",
@@ -266,8 +266,8 @@ local function GenerateTextControl(line, remake)
 		}
 		stack_console:AddChild(lab, false)
 		stack_console:UpdateClientArea()
-	end 
-end 
+	end
+end
 
 
 local function UpdateConsole()
@@ -275,21 +275,21 @@ local function UpdateConsole()
 	for i = 1, lines_count do
 		local line = lines[i]
 		GenerateTextControl(line, true)
-	end	
+	end
 end
 
 function remakeConsole()
-	setup()	
+	setup()
 	UpdateConsole()
 end
 
 local function ReshapeConsole()
 	--scrollpanel1.bottom = inputtext_inside and 35 or 0
-	
-	-- Testing with temporary change to Control:SetPosRelative() 
+
+	-- Testing with temporary change to Control:SetPosRelative()
 	--   with signature Control:SetPosRelative(x, y, right, bottom, w, h, ...). Only works sometimes.
-	--scrollpanel1:SetPosRelative(_, _, inputtext_inside and 0 or 1, inputtext_inside and 35 or 0 ) 
-	
+	--scrollpanel1:SetPosRelative(_, _, inputtext_inside and 0 or 1, inputtext_inside and 35 or 0 )
+
 end
 
 local function MakeInputSpace()
@@ -309,6 +309,9 @@ WG.chat.showConsole = showConsole
 
 local function addLine(msg)
 	if msg:sub(1,3) == "[f=" then msg = msg:sub(13) end	-- truncate framenumber
+	if msg:len > 28 and msg:sub(1, 28) == "Connection attempt rejected:" or msg.len == 17 and msg:sub(1, 13) == " -> Version: " then
+		return --most peoples hate this spam, it will still appear in infolog.txt
+	end
 
 	if lines_count>0 and lines[lines_count].msg == msg then
 		lines[lines_count].dup = lines[lines_count].dup + 1
@@ -318,14 +321,14 @@ local function addLine(msg)
 	local msgtype
 	local message = msg
 	local playername
-		
+
 	--adapted from lolui
 	if (colorNames[msg:sub(2,(msg:find("> Allies: ") or 1)-1)]) then
 		msgtype = "allymessage"
 		playername = msg:sub(2,msg:find("> ")-1)
 		message = msg:sub(playername:len()+12)
 		message = (playername and colorNames[playername] or '') .. col_ally_in .. message
-		
+
 	elseif (colorNames[msg:sub(2,(msg:find("> ") or 1)-1)]) then
 		msgtype = "playermessage"
 		playername = msg:sub(2,msg:find("> ")-1)
@@ -335,8 +338,8 @@ local function addLine(msg)
 		else
 			message = msg:sub(playername:len()+4)
 			message = (playername and colorNames[playername] or '') ..  message
-		end		
-	
+		end
+
 	elseif (colorNames[msg:sub(2,(msg:find("] ") or 1)-1)]) then
 		msgtype = "spectatormessage"
 		playername = msg:sub(2,msg:find("] ")-1)
@@ -347,13 +350,13 @@ local function addLine(msg)
 			message = msg:sub(playername:len()+4)
 			message = col_othertext_in..'  ['.. col_text_in .. playername .. col_othertext_in .. ']  '.. col_text_in .. message
 		end
-		
+
 	elseif (colorNames[msg:sub(2,(msg:find("(replay)") or 3)-3)]) then
 		msgtype = "spectatormessage"
 		playername = msg:sub(2,msg:find("(replay)")-3)
 		message = msg:sub(playername:len()+13)
 		message = '  (r)['.. playername ..'] '.. message
-		
+
 	elseif (colorNames[msg:sub(1,(msg:find(" added point: ") or 1)-1)]) then
 		playername = msg:sub(1,msg:find(" added point: ")-1)
 		message = msg:sub(string.len(playername.." added point: ")+1)
@@ -364,7 +367,7 @@ local function addLine(msg)
 			msgtype = "playerlabel"
 			message = colors[playername] .. '*L '.. col_ally_in .. (playername or '') .. ' added a label: ' .. message
 		end
-	
+
 	elseif (msg:sub(1,1) == ">") then
 		msgtype = "gamemessage"
 		message = msg:sub(3)
@@ -373,38 +376,38 @@ local function addLine(msg)
 		msgtype = "other"
 		message = col_othertext_in ..  message
 	end
-	
+
 	lines_count = lines_count + 1
 	local line = { msg=msg, text=message, dup=1, mtype=msgtype, player=playername}
 	lines[lines_count] = line
 	GenerateTextControl(line)
-	
+
 	if (line.mtype=="allymessage" or line.mtype=="playerlabel") then  -- if ally message make sound
 		Spring.PlaySoundFile('sounds/talk.wav', 1, 'ui')
-	end 
+	end
 
-	
+
 	if lines_count >= options.max_lines.value then
 		stack_console:RemoveChild(stack_console.children[1])
 		lines_count = lines_count - 1
 		--stack_console:UpdateLayout()
 	end
-	
+
 	if playername == myName then
 		if WG.enteringText then
 			WG.enteringText = false
 			RemoveInputSpace()
 			hideConsole()
-		end 		
+		end
 	end
 end
 
 
 
 function widget:KeyPress(key, modifier, isRepeat)
-	
+
 	if (key == KEYSYMS.RETURN) then
-		if not WG.enteringText then 
+		if not WG.enteringText then
 			if noAlly then
 				firstEnter= false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 			end
@@ -415,10 +418,10 @@ function widget:KeyPress(key, modifier, isRepeat)
 				firstEnter=false
 			end
 			WG.enteringText = true
-			if window_console.hidden and not visible then 
+			if window_console.hidden and not visible then
 				screen0:AddChild(window_console)
 				visible = true
-			end 
+			end
 			MakeInputSpace()
 		end
 	else
@@ -426,7 +429,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 			WG.enteringText = false
             return hideConsole()
 		end
-	end 
+	end
 end
 
 
@@ -446,7 +449,7 @@ function widget:Shutdown()
 	spSendCommands({"console 1"})
 	spSendCommands({"inputtextgeo default"}) -- not saved to spring's config file on exit
 	Spring.SetConfigString("InputTextGeo", "0.26 0.73 0.02 0.028") -- spring default values
-	
+
 	if WG.LocalColor and WG.LocalColor.listeners then
 		WG.LocalColor.listeners["Chili Chat"] = nil
 	end
@@ -458,9 +461,9 @@ function widget:Update(s)
 	timer = timer + s
 	if timer > 2 then
 		timer = 0
-		spSendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
-			window_console.x / screen0.width + 0.004, 
-			1 - (window_console.y + window_console.height) / screen0.height + 0.005, 
+		spSendCommands({string.format("inputtextgeo %f %f 0.02 %f",
+			window_console.x / screen0.width + 0.004,
+			1 - (window_console.y + window_console.height) / screen0.height + 0.005,
 			window_console.width / screen0.width)})
 	end
 end
@@ -493,11 +496,11 @@ function widget:Initialize()
 	incolor2color = Chili.incolor2color
 
 	hideConsole = function()
-		if window_console.hidden and visible then 
+		if window_console.hidden and visible then
 			screen0:RemoveChild(window_console)
 			visible = false
 			return true
-		end 
+		end
 		return false
 	end
 
@@ -509,14 +512,14 @@ function widget:Initialize()
 		end
 	end
 	WG.chat.hideConsole = hideConsole
-	WG.chat.showConsole = showConsole	
+	WG.chat.showConsole = showConsole
 
 	Spring.SendCommands("bind Any+enter  chat")
-	
+
 	local inputsize = 33
-	
+
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	
+
 	stack_console = StackPanel:New{
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
@@ -538,7 +541,7 @@ function widget:Initialize()
 		backgroundColor = options.col_back.value,
 		--backgroundColor = {1,1,1,1},
 	}
-	
+
 	scrollpanel1 = ScrollPanel:New{
 		--margin = {5,5,5,5},
 		padding = {5,5,5,5},
@@ -557,8 +560,8 @@ function widget:Initialize()
 			stack_console,
 		},
 	}
-	
-	window_console = Window:New{  
+
+	window_console = Window:New{
 		margin = {0,0,0,0},
 		padding = {0,0,0,0},
 		dockable = true,
@@ -575,7 +578,7 @@ function widget:Initialize()
 		tweakDraggable = true,
 		tweakResizable = true,
 		minimizable = true,
-        selfImplementedMinimizable = 
+        selfImplementedMinimizable =
             function (show)
                 if show then
                     showConsole()
@@ -598,19 +601,19 @@ function widget:Initialize()
 				return true
 		end },
 	}
-	
+
 	remakeConsole()
 
 	local oldLines = Spring.GetConsoleBuffer(30)
 	for i=1,#oldLines do
 		addLine(oldLines[i].text)
 	end
-	
+
 	spSendCommands({"console 0"})
-	
+
 	screen0:AddChild(window_console)
 	visible = true
-	
+
 	WG.LocalColor = WG.LocalColor or {}
 	WG.LocalColor.listeners = WG.LocalColor.listeners or {}
 	WG.LocalColor.listeners["Chili Chat"] = option_remakeConsole
