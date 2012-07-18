@@ -185,11 +185,11 @@ options = {
 		name = 'Reset to Default',
 		type = 'button',
 		OnChange = function()
-			Spring.Echo("bla")
 			options.radar_fog_color.value = { 0.25, 0.2, 0.25, 0}
 			options.radar_los_color.value = { 0.2, 0.13, 0.2, 0}
 			options.radar_radar_color.value = { 0, 0.17, 0, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
+			radar_color_onChange()
 		end,
 		path = radar_path,
 	},
