@@ -577,6 +577,10 @@ local icontypes = {
     bitmap='icons/defense.dds',
     size=2.0,
   },
+  defensetorp = {
+    bitmap='icons/defensetorp.png',
+    size=2.0,
+  },
   defenseskirm = {
     bitmap='icons/defenseskirm.dds',
     size=2.0,
@@ -839,6 +843,11 @@ local icontypes = {
   },    
 
   --icon for energy buildings of various tiers, including pylon
+  energy_med = {
+	bitmap='icons/energy_med.png',
+    size=2.1,
+  },
+  
   energywind = {
     bitmap='icons/energywind.dds',
     size=1.8,
@@ -859,13 +868,13 @@ local icontypes = {
   },
   
   energygeo = {
-    bitmap='icons/energygeo.dds',
+    bitmap='icons/geo1.png',
     size=2,
   },
   
   energymohogeo = {
-    bitmap='icons/energymohogeo.dds',
-    size=3,
+    bitmap='icons/geo2.png',
+    size=2.4,
   },
   
   pylon = {

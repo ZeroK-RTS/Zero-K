@@ -1304,6 +1304,22 @@ local sounds = {
 			[1] = "silo_select",
 		},
 	},
+	zenith = {
+		ok = {
+			[1] = "silo_select",
+		},
+		select = {
+			[1] = "silo_select",
+		},
+	},
+	raveparty = {
+		ok = {
+			[1] = "silo_select",
+		},
+		select = {
+			[1] = "silo_select",
+		},
+	},
 	
 	-- Air Turrets
 	corrl = {
