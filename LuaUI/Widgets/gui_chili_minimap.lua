@@ -155,28 +155,28 @@ options = {
 	radar_fog_color = {
 		name = "Fog Color",
 		type = "colors",
-		value = { 0.25, 0.2, 0.25, 0},
+		value = { 0.25, 0.25, 0.25, 1},
 		OnChange =  function() radar_color_onChange() end,
 		path = radar_path,
 	},
 	radar_los_color = {
 		name = "LOS Color",
 		type = "colors",
-		value = { 0.2, 0.13, 0.2, 0},
+		value = { 0.25, 0.25, 0.25, 1},
 		OnChange =  function() radar_color_onChange() end,
 		path = radar_path,
 	},
 	radar_radar_color = {
 		name = "Radar Color",
 		type = "colors",
-		value = { 0, 0.17, 0, 0},
+		value = { 0, 0, 1, 1},
 		OnChange =  function() radar_color_onChange() end,
 		path = radar_path,
 	},
 	radar_jammer_color = {
 		name = "Jammer Color",
 		type = "colors",
-		value = { 0.18, 0, 0, 0},
+		value = { 0.1, 0, 0, 1},
 		OnChange = function() radar_color_onChange() end,
 		path = radar_path,
 	},
@@ -185,10 +185,10 @@ options = {
 		name = 'Reset to Default',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.25, 0.2, 0.25, 0}
-			options.radar_los_color.value = { 0.2, 0.13, 0.2, 0}
-			options.radar_radar_color.value = { 0, 0.17, 0, 0}
-			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
+			options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
+			options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
+			options.radar_radar_color.value = { 0, 0, 1, 1}
+			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
 			radar_color_onChange()
 		end,
 		path = radar_path,
