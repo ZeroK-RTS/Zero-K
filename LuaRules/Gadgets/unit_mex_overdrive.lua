@@ -676,9 +676,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									mexBaseMetal[unitID] = orgMetal
 								end
 								
-								local unitDefID = spGetUnitDefID(unitID)
+                local unitDefID = spGetUnitDefID(unitID)
 								if not pylonDefs[unitDefID].keeptooltip then
-									local unitDef = UnitDefs[unitDefID]
+                  local unitDef = UnitDefs[unitDefID]
 									if unitDef then
 										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
 									else
@@ -774,61 +774,6 @@ local function keepTeamEnergyBelowMax(team)
         return -change
     end
     return 0
-end
-
-local secondLapsed = {}
-local previous_summedOverdrive = {}
-local previous_teamODEnergy = {}
-local function EnergyOverdriveDecayScheme1(allyTeamID, allyTeamData, activeTeams, activeCount, teamODEnergy, summedOverdrive)
-	if previous_summedOverdrive[allyTeamID]==nil or secondLapsed[allyTeamID] >= 60 then --update the basic OD-share value every 60 second. Basic OD-share means the amount of OD-metal is split equally.
-		secondLapsed[allyTeamID] = 0
-		--Spring.Echo("Updated Old value: ally " .. allyTeamID)
-		previous_summedOverdrive[allyTeamID] = summedOverdrive
-		for i = 1, allyTeamData.teams do
-			local teamID = allyTeamData.team[i]
-			if activeTeams[teamID] then
-				--Spring.Echo(teamID .. " Updated")
-				previous_teamODEnergy[teamID] = (teamODEnergy[teamID] or 0) --remember current team's OD Energy (energy spend for OD)
-			end
-		end
-	end
-	secondLapsed[allyTeamID] = (secondLapsed[allyTeamID] or 0) + 1 -- ++second count
-	
-	local basicODShare = previous_summedOverdrive[allyTeamID]/activeCount -- OD-metal-shares that is set as reference point, set to equal sharing.
-	local metalDiff = summedOverdrive - previous_summedOverdrive[allyTeamID] -- the difference between current OD-metal vs reference OD-metal
-	local isODchange = false --switch
-	local totalEDiff = 0 --the total Energy changes with respect to reference point
-	local teamODEnergyDiff = {} --Energy changes for each team
-	-- Spring.Echo("allyTeamID " .. allyTeamID)
-	-- Spring.Echo("metalDiff " .. metalDiff)
-	-- Spring.Echo("basicODShare " .. basicODShare)
-	if metalDiff ~= 0 then --exclude case where there's no OD-metal changes. To prevent division by 0 (totalEDiff == 0 when there's no OD-metal changes)
-		isODchange = true --switch
-		for i = 1, allyTeamData.teams do 
-			local teamID = allyTeamData.team[i]
-			if activeTeams[teamID] then
-				teamODEnergyDiff[teamID] =  (teamODEnergy[teamID] or 0) - previous_teamODEnergy[teamID] --the difference in energy with respect to reference point for each team.
-				totalEDiff = totalEDiff + teamODEnergyDiff[teamID] --totalEDiff (total Energy difference)
-			end
-		end
-	end
-	--Spring.Echo("totalEDiff " .. totalEDiff)
-	local newODshare = {}
-	for i = 1, allyTeamData.teams do
-		if not isODchange then break end --leave new OD-share as nil if no OD-metal changes detected.
-		local teamID = allyTeamData.team[i]
-		if activeTeams[teamID] then
-			newODshare[teamID] = (teamODEnergyDiff[teamID]/totalEDiff)*metalDiff --the amount of metal deserved for each increase or decrease in team's E
-		end
-	end
-	local playersShare = {}
-	for i = 1, allyTeamData.teams do
-		local teamID = allyTeamData.team[i]
-		if activeTeams[teamID] then
-			playersShare[teamID] = basicODShare + (newODshare[teamID] or 0) --add new OD-metal to the reference OD-metal share
-		end
-	end
-	return playersShare
 end
 
 local lastTeamNe = {}
@@ -1026,10 +971,10 @@ function gadget:GameFrame(n)
 				end
 
 				summedMetalProduction = summedMetalProduction + orgMetal
-				local unitDefID = spGetUnitDefID(unitID)
+        local unitDefID = spGetUnitDefID(unitID)
 				local pylonDef = pylonDefs[unitDefID]
 				if pylonDef and not pylonDef.keeptooltip then
-					local unitDef = UnitDefs[unitDefID]
+        	local unitDef = UnitDefs[unitDefID]
 					if unitDef then
 						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
 					else
@@ -1089,17 +1034,15 @@ function gadget:GameFrame(n)
 				--Spring.Echo(allyTeamID .. " energy sum " .. teamODEnergySum)
 	
 				sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, teamIncome, ODenergy, energyWasted)
-				local playersShare = EnergyOverdriveDecayScheme1(allyTeamID, allyTeamData, activeTeams, activeCount, teamODEnergy, summedOverdrive)
-				
+	
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
 						local te = teamEnergy[teamID]
-						local odShare = playersShare[teamID] --or (summedOverdrive / activeCount) <--original scheme
-						--[[
-						if teamODEnergySum > 0 and teamODEnergy[teamID] then 
-							odShare = OD_OWNER_SHARE * summedOverdrive * (teamODEnergy[teamID] / teamODEnergySum) +  (1-OD_OWNER_SHARE) * odShare
-						end	--]] --original Scheme^^
+						local odShare = summedOverdrive / activeCount
+						if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
+							odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odShare
+						end		
 						
 						local baseShare = summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)
 						
