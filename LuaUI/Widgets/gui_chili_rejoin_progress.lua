@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v1.1 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.12 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
     date      = "June 17, 2012",
     license   = "GNU GPL, v2 or later",
@@ -22,7 +22,6 @@ end
 --------------------------------------------------------------------------------
 --Localize Spring function------------------------------------------------------
 local spGetSpectatingState = Spring.GetSpectatingState
-local spGetMyPlayerID = Spring.GetMyPlayerID
 --------------------------------------------------------------------------------
 --Chili Variable----------------------------------------------------------------- ref: gui_chili_vote.lua by KingRaptor
 local Chili
@@ -60,6 +59,7 @@ local submittedTimestamp_G = {} --//variable: store all timestamp at GameStart s
 local functionContainer_G = function(x) end --//variable object: store a function 
 local myPlayerID_G = 0
 local gameProgressActive_G = false --//variable: signal whether GameProgress has been updated.
+local iAmReplay_G = false
 --------------------------------------------------------------------------------
 --[[
 if VFS.FileExists("Luaui/Config/ZK_data.lua") then
@@ -165,6 +165,8 @@ end
 
 local function RemoveLUARecvMsg(n)
 	if n > 150 then
+		iAmReplay_G = nil
+		spGetSpectatingState = nil --de-reference the function so that garbage collector can clean it up.
 		widgetHandler:RemoveCallIn("RecvLuaMsg") --remove unused method for increase efficiency after frame> timestampLimit (150frame or 5 second).
 		functionContainer_G = function(x) end --replace this function with an empty function/method
 	end 
@@ -217,7 +219,8 @@ end
 --Chili--------------------------------------------------
 function widget:Initialize()
 	functionContainer_G = RemoveLUARecvMsg
-	myPlayerID_G = spGetMyPlayerID()
+	myPlayerID_G = Spring.GetMyPlayerID()
+	iAmReplay_G = Spring.IsReplay()
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -303,10 +306,10 @@ end
 ----------------------------------------------------------
 --fix for Game Progress delay-----------------------------
 function widget:RecvLuaMsg(bigMsg, playerID) --this function run 2nd. It read the LUA timestamp
-	if gameProgressActive_G then --skip LUA message if gameProgress is already active
+	if gameProgressActive_G or iAmReplay_G then --skip LUA message if gameProgress is already active OR game is a replay
 		return false 
 	end
-	
+
 	local iAmSpec = spGetSpectatingState()
 	local myMsg = (playerID == myPlayerID_G)
 	if (myMsg or iAmSpec) then

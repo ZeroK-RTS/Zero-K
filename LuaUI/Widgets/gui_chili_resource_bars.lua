@@ -13,7 +13,7 @@ function widget:GetInfo()
     enabled   = true
   }
 end
-
+--recent changes: 18 July 2012
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -23,6 +23,7 @@ VFS.Include("LuaRules/Configs/constants.lua")
 WG.energyWasted = 0
 WG.energyForOverdrive = 0
 WG.allies = 1
+teamMetalFromOverdrive = {}
 --[[
 WG.windEnergy = 0 
 WG.highPriorityBP = 0
@@ -270,6 +271,16 @@ function widget:GameFrame(n)
 	local totalOtherE = Format(-totalExpense + (WG.energyForOverdrive or 0) + totalConstruction + (WG.energyWasted or 0))
 	local totalConstruction = Format(-totalConstruction)
 	
+	local eachTeamODvalue
+	for _, odValue in ipairs(teamMetalFromOverdrive) do
+		eachTeamODvalue = (eachTeamODvalue or odInc) .. ",".. Format(odValue)
+	end
+	if eachTeamODvalue then 
+		eachTeamODvalue = " \n  (".. eachTeamODvalue ..")" 
+	else 
+		eachTeamODvalue = ""
+	end
+	
 	bar_metal.tooltip = "Local Metal Economy" ..
 	"\nBase Extraction: " .. mexInc ..
 	"\nOverdrive: " .. odInc ..
@@ -281,7 +292,7 @@ function widget:GameFrame(n)
 	"\nTeam Metal Economy" ..
 	"\nTotal Income: " .. totalMetalIncome ..
 	"\nBase Extraction: " .. teamMexInc ..
-	"\nOverdrive: " .. teamODInc ..
+	"\nOverdrive: " .. teamODInc .. eachTeamODvalue ..
 	"\nReclaim and Cons: " .. teamOtherM ..
 	"\nConstruction: " .. totalConstruction ..
 	"\nWaste: " .. teamWasteM ..
@@ -715,9 +726,10 @@ local lastEnergyForOverdrive = 0
 local lastEnergyWasted = 0
 local lastMetalFromOverdrive = 0
 local lastMyMetalFromOverdrive = 0
+local lastTeamMetalFromOverdrive = {}
 
 -- note works only in communism mode
-function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOverdrive, EnergyChange, teamIncome)
+function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOverdrive, EnergyChange, teamIncome, allyTeamID)
   if (Spring.GetLocalTeamID() == teamID) then 
   	WG.energyWasted = lastEnergyWasted
     lastEnergyWasted = energyWasted
@@ -733,6 +745,9 @@ function MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalI
 	lastMyMetalFromOverdrive = myOverdrive
 	WG.teamIncome = teamIncome
 	WG.allies = allies
+  elseif allyTeamID == Spring.GetLocalAllyTeamID() then
+	teamMetalFromOverdrive[teamID+1] = lastTeamMetalFromOverdrive[teamID]
+	lastTeamMetalFromOverdrive[teamID] = myOverdrive
   end
 end
 

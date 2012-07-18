@@ -1107,7 +1107,7 @@ function gadget:GameFrame(n)
 						
 						spAddTeamResource(teamID, "m", odShare + baseShare)
 						--Spring.Echo(teamID .. " got " .. (odShare + baseShare))
-						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, baseShare, odShare, te.totalChange, teamIncome) 
+						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, baseShare, odShare, te.totalChange, teamIncome, allyTeamID) 
 					end
 				end 
 			else
@@ -1349,7 +1349,8 @@ local spGetUnitDefID     = Spring.GetUnitDefID
 local spGetUnitBasePosition = Spring.GetUnitBasePosition
 local spGetUnitPosition  = Spring.GetUnitPosition
 
-local spGetLocalTeamID   = Spring.GetLocalTeamID
+--local spGetLocalTeamID   = Spring.GetLocalTeamID
+local spGetLocalAllyTeamID = Spring.GetLocalAllyTeamID
 local spGetMyAllyTeamID  = Spring.GetMyAllyTeamID
 local spGetTeamList      = Spring.GetTeamList
 local spGetTeamUnits     = Spring.GetTeamUnits
@@ -1382,10 +1383,10 @@ local floor = math.floor
 
 local circlePolys = 0 -- list for circles
 
-function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome)
-  if (teamID ~= spGetLocalTeamID()) then return end
+function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome, allyTeamID)
+  if (allyTeamID ~= spGetLocalAllyTeamID()) then return end
   if (Script.LuaUI('MexEnergyEvent')) then
-    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome)
+    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome, allyTeamID)
   end
 end
 
