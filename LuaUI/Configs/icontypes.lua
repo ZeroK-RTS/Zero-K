@@ -839,18 +839,35 @@ local icontypes = {
   },    
 
   --icon for energy buildings of various tiers, including pylon
-  energy1 = {
-    bitmap='icons/energy1.dds',
+  energywind = {
+    bitmap='icons/energywind.dds',
     size=1.8,
   },
-  energy2 = {
-    bitmap='icons/energy2.dds',
+  energysolar = {
+    bitmap='icons/energysolar.dds',
     size=2,
   },
-  energy3 = {
-    bitmap='icons/energy3.dds',
+  
+  energyfus = {
+    bitmap='icons/energyfus.dds',
+    size=2,
+  },
+  
+  energysuperfus = {
+    bitmap='icons/energysuperfus.dds',
     size=3.0,
   },
+  
+  energygeo = {
+    bitmap='icons/energygeo.dds',
+    size=2,
+  },
+  
+  energymohogeo = {
+    bitmap='icons/energymohogeo.dds',
+    size=3,
+  },
+  
   pylon = {
     bitmap='icons/pylon.dds',
     size=1.8,
