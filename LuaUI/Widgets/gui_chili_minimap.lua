@@ -118,9 +118,7 @@ options = {
 	viewfow = {
 		name = 'Toggle Fog of War View',
 		type = 'button',
-		OnChange = function()
-			Spring.SendCommands('togglelos')
-		end
+		action = 'togglelos',
 	},
 	
 	radar_color_label = { type = 'label', name = 'Note: These colors are additive.', path = radar_path,},
@@ -302,7 +300,7 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'viewmetalmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow', true ),
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow' ),
 			
 			Chili.Button:New{ 
 				height=iconsize, width=iconsize, 
