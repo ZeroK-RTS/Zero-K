@@ -129,25 +129,7 @@ options = {
 	viewfow = {
 		name = 'Toggle Fog of War View',
 		type = 'button',
-		OnChange = function()
-			if currentSensorState == 1 then
-				setSensorState(0)
-			else
-				setSensorState(1)
-			end
-		end
-	},
-	
-	viewradar = {
-		name = 'Toggle Radar & Jammer View',
-		type = 'button',
-		OnChange = function()
-			if currentSensorState == 2 then
-				setSensorState(0)
-			else
-				setSensorState(2)
-			end
-		end
+		action= 'togglelos',
 	},
 	
 	radar_color_label = { type = 'label', name = 'Note: These colors are additive.', path = radar_path,},
@@ -204,39 +186,6 @@ options = {
 	
 }
 
-function setSensorState(state)
-	local losEnabled = Spring.GetMapDrawMode() == "los"
-	currentSensorState = state
-	if state == 0 then
-		if losEnabled then
-			Spring.SendCommands('togglelos')
-		end
-	else
-		if not losEnabled then
-			Spring.SendCommands('togglelos')
-		end
-		if state == 1 then
-			Spring.SetLosViewColors(
-				{ 0.17, 0.23, 0.1, 0 },
-				{ 0.17, 0.23, 0.1, -0.15 },
-				{ 0.17, 0.23, 0.1, -0.15 }
-			)
-		elseif state == 2 then
-			local fog = options.radar_fog_color.value
-			local los = options.radar_los_color.value
-			local radar = options.radar_radar_color.value
-			local jam = options.radar_jammer_color.value
-			Spring.SetLosViewColors(
-				{ fog[1], los[1], radar[1], jam[1]},
-				{ fog[2], los[2], radar[2], jam[2]}, 
-				{ fog[3], los[3], radar[3], jam[3]}
-			)
-		end
-	end
-	if options.updateInitalSensor.value then
-		options.initialSensorState.value = state
-	end
-end
 
 function radar_color_onChange()
 	if currentSensorState == 2 then
@@ -332,7 +281,6 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'viewmetalmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/radar.png', 7, 'viewradar', true ),
 			MakeMinimapButton( 'LuaUI/images/map/fow.png', 8, 'viewfow', true ),
 			
 			Chili.Button:New{ 
