@@ -20,7 +20,6 @@ local glResetState = gl.ResetState
 local glResetMatrices = gl.ResetMatrices
 
 local iconsize = 20
-local currentSensorState = 0
 
 local tabbedMode = false
 
@@ -45,7 +44,7 @@ end
 
 options_path = 'Settings/Interface/Minimap'
 local radar_path = 'Settings/Graphics/Radar View Colors'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'updateInitalSensor', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'viewradar', 'radar_color_label', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_reset_default'}
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'radar_color_label', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -71,19 +70,9 @@ options = {
 	--]]
 	
 	initialSensorState = {
-		name = "Initial Radar/LOS state.",
-		desc = "Values: Off, LOS, Radar",
-		type = 'number',
-		value = 1,
-		min = 0,
-		max = 2,
-		step = 1,
-	},
-	
-	updateInitalSensor = {
-		name = 'Update initial state.',
+		name = "Initial LOS state.",
+		desc = "Game starts with LOS enabled",
 		type = 'bool',
-		desc = 'Change initial LOS/Radar state to the state at the end of the last game.', 
 		value = true,
 	},
 	
@@ -129,7 +118,9 @@ options = {
 	viewfow = {
 		name = 'Toggle Fog of War View',
 		type = 'button',
-		action= 'togglelos',
+		OnChange = function()
+			Spring.SendCommands('togglelos')
+		end
 	},
 	
 	radar_color_label = { type = 'label', name = 'Note: These colors are additive.', path = radar_path,},
@@ -138,40 +129,66 @@ options = {
 		name = "Fog Color",
 		type = "colors",
 		value = { 0.25, 0.25, 0.25, 1},
-		OnChange =  function() radar_color_onChange() end,
+		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
 	radar_los_color = {
 		name = "LOS Color",
 		type = "colors",
 		value = { 0.25, 0.25, 0.25, 1},
-		OnChange =  function() radar_color_onChange() end,
+		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
 	radar_radar_color = {
 		name = "Radar Color",
 		type = "colors",
 		value = { 0, 0, 1, 1},
-		OnChange =  function() radar_color_onChange() end,
+		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
 	radar_jammer_color = {
 		name = "Jammer Color",
 		type = "colors",
 		value = { 0.1, 0, 0, 1},
-		OnChange = function() radar_color_onChange() end,
+		OnChange = function() updateRadarColors() end,
 		path = radar_path,
 	},
 	
-	radar_reset_default = {
-		name = 'Reset to Default',
+	radar_preset_blue_line = {
+		name = 'Blue Outline Radar (default)',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
 			options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
 			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
-			radar_color_onChange()
+			updateRadarColors()
+		end,
+		path = radar_path,
+	},
+	
+	radar_preset_green = {
+		name = 'Green Area Radar',
+		type = 'button',
+		OnChange = function()
+			options.radar_fog_color.value = { 0.25, 0.2, 0.25, 0}
+			options.radar_los_color.value = { 0.2, 0.13, 0.2, 0}
+			options.radar_radar_color.value = { 0, 0.17, 0, 0}
+			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
+			updateRadarColors()
+		end,
+		path = radar_path,
+	},
+	
+	radar_preset_only_los = {
+		name = 'Only LOS',
+		type = 'button',
+		OnChange = function()
+			options.radar_fog_color.value = { 0.25, 0.25, 0.25, 0}
+			options.radar_los_color.value = { 0.25, 0.25, 0.25, 0}
+			options.radar_radar_color.value = { 0, 0, 0, 0}
+			options.radar_jammer_color.value = { 0, 0, 0, 0}
+			updateRadarColors()
 		end,
 		path = radar_path,
 	},
@@ -183,28 +200,32 @@ options = {
 		OnChange= function(self) iconsize = self.value and 0 or 20; MakeMinimapWindow() end,
 		value = false,
 	},
-	
+
 }
 
+function updateRadarColors()
+	local fog = options.radar_fog_color.value
+	local los = options.radar_los_color.value
+	local radar = options.radar_radar_color.value
+	local jam = options.radar_jammer_color.value
+	Spring.SetLosViewColors(
+		{ fog[1], los[1], radar[1], jam[1]},
+		{ fog[2], los[2], radar[2], jam[2]}, 
+		{ fog[3], los[3], radar[3], jam[3]} 
+	)
+end
 
-function radar_color_onChange()
-	if currentSensorState == 2 then
-		local fog = options.radar_fog_color.value
-		local los = options.radar_los_color.value
-		local radar = options.radar_radar_color.value
-		local jam = options.radar_jammer_color.value
-		Spring.SetLosViewColors(
-			{ fog[1], los[1], radar[1], jam[1]},
-			{ fog[2], los[2], radar[2], jam[2]}, 
-			{ fog[3], los[3], radar[3], jam[3]} 
-		)
+function setSensorState(newState)
+	local losEnabled = Spring.GetMapDrawMode() == "los"
+	if losEnabled ~= newState then
+		Spring.SendCommands('togglelos')
 	end
 end
 
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
-	
 	Spring.SendCommands("showmetalmap") -- toggle MetalMap ON (toggling metalmap and then toggling LOS in sequence seem to make LOS option work).
 	setSensorState(options.initialSensorState.value)
+	updateRadarColors()
 	widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
@@ -281,7 +302,7 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'viewmetalmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/fow.png', 8, 'viewfow', true ),
+			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow', true ),
 			
 			Chili.Button:New{ 
 				height=iconsize, width=iconsize, 
@@ -289,7 +310,7 @@ MakeMinimapWindow = function()
 				margin={0,0,0,0},
 				padding={4,3,2,2},
 				bottom=0, 
-				right=iconsize*9+5, 
+				right=iconsize*8.5, 
 				
 				tooltip = "Toggle simplified teamcolours",
 				
