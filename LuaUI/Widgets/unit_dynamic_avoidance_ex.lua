@@ -1,4 +1,4 @@
-local versionName = "v2.62"
+local versionName = "v2.63"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -1136,7 +1136,7 @@ end
 function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoordinate, fixedPointCONSTANTtrigger) --//used by IdentifyTargetOnCommandQueue()
 	local boxSizeTrigger=0
 	local graphCONSTANTtrigger = {}
-	if (cQueue[queueIndex].id==CMD_MOVE or cQueue[queueIndex].id<0) then
+	if (cQueue[queueIndex].id==CMD_MOVE or cQueue[queueIndex].id<0) then --move or building stuff
 		local targetPosX, targetPosY, targetPosZ = -1, -1, -1 -- (-1) is default value because -1 represent "no target"
 		if cQueue[queueIndex].params[1]~= nil and cQueue[queueIndex].params[2]~=nil and cQueue[queueIndex].params[3]~=nil then --confirm that the coordinate exist
 			targetPosX, targetPosY, targetPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
@@ -1152,7 +1152,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 					and cQueue[queueIndex].params[2]==cQueue[queueIndex+1].params[2]
 					and cQueue[queueIndex].params[3]==cQueue[queueIndex+1].params[3] then --area reclaim should have no "nil", and will equal to retreat coordinate when retreating to center of area reclaim.
 					targetPosX, targetPosY, targetPosZ = -1, -1, -1 --//if area reclaim under the above condition, then avoid forever in presence of enemy
-					boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for RECLAIM command
+					boxSizeTrigger=1 --//avoidance deactivation 'halfboxsize' for MOVE command
 				end
 			end
 		end
@@ -1164,8 +1164,8 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		-- local a = Spring.GetUnitCmdDescs(unitID, Spring.FindUnitCmdDesc(unitID, 90), Spring.FindUnitCmdDesc(unitID, 90))
 		-- Spring.Echo(a[queueIndex]["name"])
 		local wreckPosX, wreckPosY, wreckPosZ = -1, -1, -1 -- -1 is default value because -1 represent "no target"
-		local areaMode = false
-		local foundMatch=false
+		local notAreaMode = true
+		local foundMatch = false
 		--Method 1: set target to individual wreckage, else (if failed) revert to center of current area-command or to no target. *This method was used initially when constructor do not yet have retreat to base*
 		--[[
 		local targetFeatureID=-1
@@ -1206,24 +1206,24 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex].params[1], cQueue[queueIndex].params[2],cQueue[queueIndex].params[3]
 			notAreaMode = false
 			foundMatch = true
-		elseif (cQueue[queueIndex+1].params[3] ~= nil and (cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125)) then
+		elseif (cQueue[queueIndex+1].params[3] ~= nil and (cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125)) then --if next queue is an area-reclaim
 			wreckPosX, wreckPosY,wreckPosZ = cQueue[queueIndex+1].params[1], cQueue[queueIndex+1].params[2],cQueue[queueIndex+1].params[3]
 			notAreaMode = false
 			foundMatch = true
 		end
 		if notAreaMode then
-			if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --if reclaim own unit
+			if Spring.ValidUnitID(cQueue[queueIndex].params[1]) then --reclaim own unit?
 				wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(cQueue[queueIndex].params[1])
 				foundMatch = true
-			elseif Spring.ValidFeatureID(cQueue[queueIndex].params[1]) then --if reclaim trees and rock
+			elseif Spring.ValidFeatureID(cQueue[queueIndex].params[1]) then --reclaim trees and rock?
 				wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(cQueue[queueIndex].params[1])
 				foundMatch = true
-			else --if not own unit or trees or rock then
-				local targetFeatureID=cQueue[queueIndex].params[1]-wreckageID_offset --remove the game's offset
-				if Spring.ValidFeatureID(targetFeatureID) then
+			else --if not own unit or trees or rock then:
+				local targetFeatureID=cQueue[queueIndex].params[1]-wreckageID_offset --remove the game's offset. Reclaim wreck?
+				if Spring.ValidFeatureID(targetFeatureID) then --reclaim wreck?
 					wreckPosX, wreckPosY, wreckPosZ = spGetFeaturePosition(targetFeatureID)
 					foundMatch = true
-				elseif Spring.ValidUnitID(targetFeatureID) then
+				elseif Spring.ValidUnitID(targetFeatureID) then --reclaim enemy?
 					wreckPosX, wreckPosY, wreckPosZ = spGetUnitPosition(targetFeatureID)
 					foundMatch = true
 				end
@@ -1245,8 +1245,8 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		boxSizeTrigger=2 --use deactivation 'halfboxsize' for RECLAIM/RESSURECT command
 		
 		--if not areaMode and (cQueue[queueIndex+1].params[3]==nil or cQueue[queueIndex+1].id == CMD_STOP) then --signature for discrete RECLAIM/RESSURECT command. *used by Method 1*
-		if not areaMode then
-			boxSizeTrigger = 3 --change to deactivation 'halfboxsize' similar to REPAIR command if user queued a discrete reclaim/ressurect command
+		if notAreaMode then
+			boxSizeTrigger = 1 --change to deactivation 'halfboxsize' similar to MOVE command if user queued a discrete reclaim/ressurect command
 			--graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 			--graphCONSTANTtrigger[2] = 1
 		end
@@ -1270,7 +1270,7 @@ function ExtractTarget (queueIndex, unitID, cQueue, commandIndexTable, targetCoo
 		graphCONSTANTtrigger[2] = 1
 	elseif cQueue[1].id == cMD_DummyG then
 		targetCoordinate = {-1, -1,-1} --no target (only avoidance)
-		boxSizeTrigger = nil --//value not needed; because 'halfboxsize' for a "-1" target always return "not reached", calculation is skipped (no nil error)
+		boxSizeTrigger = nil --//value not needed; because 'halfboxsize' for a "-1" target always return "not reached" (infinite avoidance), calculation is skipped (no nil error)
 		graphCONSTANTtrigger[1] = 1 --//this value doesn't matter because 'cMD_DummyG' don't use attractor (-1 disabled the attractor calculation, and 'fixedPointCONSTANTtrigger' behaviour ignore attractor). Needed because "fTarget" is tied to this variable in "AvoidanceCalculator()". 
 		graphCONSTANTtrigger[2] = 1
 		fixedPointCONSTANTtrigger = 3 --//use behaviour that promote avoidance/ignore attractor
