@@ -28,10 +28,12 @@ if (System == nil) then
     Script = Script,
     Spring = Spring,
     Game = Game,
+    LuaLobby = LuaLobby,
     gl = gl,
     GL = GL,
     CMD = CMD,
     CMDTYPE = CMDTYPE,
+    LOG = LOG,
     
     UnitDefs        = UnitDefs,
     UnitDefNames    = UnitDefNames,
@@ -52,6 +54,9 @@ if (System == nil) then
     package = package,
     coroutine = coroutine,
     
+    -- luasocket
+    socket          = socket,
+
     --  
     --  Standard functions and variables
     --
