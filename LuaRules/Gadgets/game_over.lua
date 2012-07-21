@@ -113,6 +113,9 @@ local function CountAllianceUnits(allianceID)
 	for i=1,#teamlist do
 		local teamID = teamlist[i]
 		count = count + (aliveCount[teamID] or 0)
+		if (GG.waitingForComm or {})[teamID] then
+			count = count + 1
+		end
 	end
 	return count
 end
@@ -135,6 +138,11 @@ local function HasNoComms(allianceID)
 		return false
 	end
 	return true
+end
+
+local function UnitWithinBounds(unitID)
+	local x, y, z = Spring.GetUnitPosition(unitID)
+	return (x > -500) and (x < Game.mapSizeX + 500) and (y > -1000) and (z > -500) and (z < Game.mapSizeZ + 500)
 end
 
 -- if only one allyteam left, declare it the victor
@@ -163,7 +171,12 @@ local function RevealAllianceUnits(allianceID)
 		local teamUnits = spGetTeamUnits(t) 
 		for j=1,#teamUnits do
 			local u = teamUnits[j]
-			Spring.SetUnitAlwaysVisible(u, true)
+			-- purge extra-map units
+			if not UnitWithinBounds(u) then
+				Spring.DestroyUnit(u)
+			else
+				Spring.SetUnitAlwaysVisible(u, true)
+			end
 		end
 	end
 end
@@ -314,6 +327,9 @@ local function ProcessLastAlly()
 
 	if #activeAllies == 2 then
 		if revealed then return end
+		if activeAllies[1] == chickenAllyTeamID or activeAllies[2] == chickenAllyTeamID then
+			return
+		end
 		-- run value comparison
 		local supreme = CompareArmyValues(activeAllies[1], activeAllies[2])
 		if supreme then
