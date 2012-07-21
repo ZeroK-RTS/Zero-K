@@ -30,6 +30,14 @@ local recloakUnit = {}
 local recloakUnits = 0
 local recloakUnitID = {}
 
+local noFFWeaponDefs = {}
+for i=1,#WeaponDefs do
+  local wd = WeaponDefs[i]
+  if wd.customParams and wd.customParams.nofriendlyfire then
+    noFFWeaponDefs[i] = true
+  end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -51,14 +59,13 @@ end
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
 	
-	if not (attackerDefID and 
-		UnitDefs[attackerDefID].customParams and 
-		UnitDefs[attackerDefID].customParams.nofriendlyfire and
+	if not (attackerTeam and
+		weaponID and
+		noFFWeaponDefs[weaponID] and
 		attackerID ~= unitID and
 		spAreTeamsAllied(unitTeam, attackerTeam)) then
 		
 		GG.PokeDecloakUnit(unitID)
-		
 	end
 end
 

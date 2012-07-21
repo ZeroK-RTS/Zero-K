@@ -16,7 +16,8 @@ local warningDelay = 30 * 5 	--in frames
 local lastWarning = 0			--in frames
 local localTeamID = Spring.GetLocalTeamID ()
 
-function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)	
+function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+	if damage <= 0 then return end
 	local currentFrame = Spring.GetGameFrame ()
 	if (lastWarning+warningDelay > currentFrame) then		
 		return

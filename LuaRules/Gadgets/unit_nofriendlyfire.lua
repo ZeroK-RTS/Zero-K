@@ -29,6 +29,14 @@ local HitByWeaponUnits = {
 	[UnitDefNames["armsolar"].id] = true,
 }
 
+local noFFWeaponDefs = {}
+for i=1,#WeaponDefs do
+  local wd = WeaponDefs[i]
+  if wd.customParams and wd.customParams.nofriendlyfire then
+    noFFWeaponDefs[i] = true
+  end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -44,9 +52,9 @@ local spSetUnitHealth  = Spring.SetUnitHealth
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
-	if (attackerDefID and 
-		UnitDefs[attackerDefID].customParams and 
-		UnitDefs[attackerDefID].customParams.nofriendlyfire and
+	if (attackerTeam and
+		weaponID and
+		noFFWeaponDefs[weaponID] and
 		attackerID ~= unitID and
 		spAreTeamsAllied(unitTeam, attackerTeam)) then
 		return 0

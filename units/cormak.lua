@@ -26,10 +26,9 @@ unitDef = {
     description_es = [[Robot de alboroto]],
     description_fr = [[Robot ?meurier]],
     description_it = [[Robot da rissa]],
-	description_de = [[Riot Roboter]],
+    description_de = [[Riot Roboter]],
     helptext       = [[The Outlaw emits an electromagnetic disruption pulse in a wide circle around it that damages and slows enemy units. Friendly units are unaffected.]],
-	helptext_de    = [[Der Outlaw stößt einen elektromagnetischen Störungspuls, in einem weiten Kreis um sich herum, aus, welcher feindliche Einheiten schädigt und verlangsamt. Freundliche Einheiten sind davon aber nicht betroffen.]],
-    nofriendlyfire = 1,
+    helptext_de    = [[Der Outlaw stößt einen elektromagnetischen Störungspuls, in einem weiten Kreis um sich herum, aus, welcher feindliche Einheiten schädigt und verlangsamt. Freundliche Einheiten sind davon aber nicht betroffen.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -57,7 +56,7 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-	  [[custom:RIOTBALL]],
+      [[custom:RIOTBALL]],
       [[custom:RAIDMUZZLE]],
       [[custom:LEVLRMUZZLE]],
       [[custom:RIOT_SHELL_L]],
@@ -117,10 +116,11 @@ unitDef = {
         subs    = 5,
       },
 	  
-	  customParams           = {
-	    lups_explodespeed = 0.3,
-		lups_explodelife = 1.15,
-	  },
+      customParams           = {
+	lups_explodespeed = 0.3,
+	lups_explodelife = 1.15,
+	nofriendlyfire = 1,
+      },
 
       edgeeffectiveness       = 0.95,
       explosionGenerator      = [[custom:NONE]],
