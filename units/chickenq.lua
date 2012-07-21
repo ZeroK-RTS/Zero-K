@@ -162,7 +162,7 @@ unitDef = {
 
 
     MELEE      = {
-      name                    = [[ChickenClaws]],
+      name                    = [[Chicken Claws]],
       areaOfEffect            = 32,
       craterBoost             = 1,
       craterMult              = 0,
@@ -195,12 +195,16 @@ unitDef = {
 
 
     QUEENCRUSH = {
-      name                    = [[ChickenKick]],
+      name                    = [[Chicken Kick]],
       areaOfEffect            = 400,
       collideFriendly         = false,
       craterBoost             = 0.001,
       craterMult              = 0.002,
 
+      customParams           = {
+	lups_noshockwave = "1",
+      },      
+      
       damage                  = {
         default    = 10,
         chicken    = 0.001,

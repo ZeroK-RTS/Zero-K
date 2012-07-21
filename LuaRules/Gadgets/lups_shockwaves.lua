@@ -20,23 +20,22 @@ if (gadgetHandler:IsSyncedCode()) then
   --// find weapons which cause a shockwave
   for i=1,#WeaponDefs do
     local wd = WeaponDefs[i]
-    if (not wd.description:find("ChickenKick")) then
+    local customParams = wd.customParams or {}
+    if (not customParams.lups_noshockwave) then
       local speed = 1
-	  local life = 1
-	  if  wd.customParams then
-	    if wd.customParams.lups_explodespeed then
-		  speed = wd.customParams.lups_explodespeed
-		end
-		if wd.customParams.lups_explodelife then
-		  life = wd.customParams.lups_explodelife
-		end
-	  end
-	  if (wd.damageAreaOfEffect>70 and not wd.paralyzer) then
+      local life = 1
+      if customParams.lups_explodespeed then
+	speed = wd.customParams.lups_explodespeed
+      end
+      if wd.customParams.lups_explodelife then
+	life = wd.customParams.lups_explodelife
+      end
+      if (wd.damageAreaOfEffect>70 and not wd.paralyzer) then
         Script.SetWatchWeapon(wd.id,true)
-		hasShockwave[wd.id] = {life = life, speed = speed}
+	hasShockwave[wd.id] = {life = life, speed = speed}
       elseif (wd.type == "DGun") then
         Script.SetWatchWeapon(wd.id,true)
-		hasShockwave[wd.id] = {life = life, speed = speed}
+	hasShockwave[wd.id] = {life = life, speed = speed}
       --elseif (wd.description:find("Clogger")) then
       --  Script.SetWatchWeapon(wd.id,true)
       end
