@@ -175,6 +175,13 @@ local function stopCommand()
 	drawingLasso = false
 	drawingRectangle = false
 	setHeight = false
+	if (volumeDraw) then 
+		gl.DeleteList(volumeDraw)
+		gl.DeleteList(mouseGridDraw)
+	end
+	if (groundGridDraw) then 
+		gl.DeleteList(groundGridDraw)
+	end
 	volumeDraw = false
 	groundGridDraw = false
 	mouseGridDraw = false
@@ -189,6 +196,13 @@ local function completelyStopCommand()
 	drawingLasso = false
 	drawingRectangle = false
 	setHeight = false
+	if (volumeDraw) then 
+		gl.DeleteList(volumeDraw)
+		gl.DeleteList(mouseGridDraw)
+	end
+	if (groundGridDraw) then 
+		gl.DeleteList(groundGridDraw)
+	end
 	volumeDraw = false
 	groundGridDraw = false
 	mouseGridDraw = false
@@ -1630,7 +1644,11 @@ end
 -- Drawing
 --------------------------------------------------------------------------------
 function widget:Shutdown()
-	gl.DeleteList(volumeDraw)
-	gl.DeleteList(mouseGridDraw)
-	gl.DeleteList(groundGridDraw)
+	if (volumeDraw) then 
+		gl.DeleteList(volumeDraw); volumeDraw=nil
+		gl.DeleteList(mouseGridDraw); mouseGridDraw=nil
+	end
+	if (groundGridDraw) then 
+		gl.DeleteList(groundGridDraw); groundGridDraw=nil 
+	end
 end
