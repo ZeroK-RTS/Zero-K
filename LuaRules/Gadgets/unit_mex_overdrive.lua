@@ -51,6 +51,19 @@ Spring.SetGameRulesParam("lowpower",1)
 
 local MEX_DIAMETER = Game.extractorRadius*2
 
+local PAYBACK_FACTOR = 1    -- Range (0,1], initial payback factor
+local PAYBACK_FALLOFF = 0.8 -- Range [0,1), payback reduces to 1 - PAYBACK_FALLOFF at end
+
+local paybackDefs = { -- cost is how much to pay back
+	[UnitDefNames["armwin"].id] = {cost = 35},
+	[UnitDefNames["armsolar"].id] = {cost = 70},
+	[UnitDefNames["armfus"].id] = {cost = 1000},
+	[UnitDefNames["cafus"].id] = {cost = 4000},
+	[UnitDefNames["geo"].id] = {cost = 500},
+	[UnitDefNames["amgeo"].id] = {cost = 1000},
+}
+
+
 --local PYLON_ENERGY_RANGESQ = 160000
 --local PYLON_LINK_RANGESQ = 40000
 --local PYLON_MEX_RANGESQ = 10000
@@ -86,7 +99,6 @@ local spAddTeamResource   = Spring.AddTeamResource
 local spUseTeamResource   = Spring.UseTeamResource
 local spGetTeamInfo       = Spring.GetTeamInfo
 
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -100,6 +112,9 @@ local mexesToAdd = {}
 local lowPowerUnits = {inner = {count = 0, units = {}}}
 
 local pylon = {} -- pylon[allyTeamID][unitID] = {gridID,mexes,mex[unitID],x,z,overdrive, nearPlant[unitID],nearPylon[unitID], color}
+
+local unitPaybackTeamID = {} -- indexed by unitID, tells unit which team gets it's payback.
+local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
 
 local allyTeamInfo = {} 
 
@@ -139,12 +154,12 @@ end
 GG.Overdrive_allyTeamResources = {}
 local lastAllyTeamResources = {} -- 1 second lag for resource updates
 
-local function sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, teamIncome, ODenergy, wasteEnergy)
+local function sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, allyTeamEnergyIncome, ODenergy, wasteEnergy)
 	local last = lastAllyTeamResources[allyTeamID] or {}
 	GG.Overdrive_allyTeamResources[allyTeamID] = {
 		baseMetal = summedBaseMetal,
 		overdriveMetal = last.overdriveMetal or 0,
-		baseEnergy = teamIncome,
+		baseEnergy = allyTeamEnergyIncome,
 		overdriveEnergy = last.overdriveEnergy or 0,
 		wasteEnergy = last.wasteEnergy or 0,
 	}
@@ -596,6 +611,36 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- PAYBACK
+
+-- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
+
+local function AddEnergyToPayback(unitID, unitDefID, unitTeam)
+	local def = paybackDefs[unitDefID]
+	
+	unitPaybackTeamID[unitID] = unitTeam
+	teamPayback[unitTeam] = teamPayback[unitTeam] or {count = 0, toRemove = {}, data = {}}
+	
+	local teamData = teamPayback[unitTeam]
+	teamData.count = teamData.count + 1
+	teamData.data[teamData.count] = {
+		unitID = unitID,
+		cost = def.cost,
+		repaid = 0,
+	}
+end
+
+local function RemoveEnergyToPayback(unitID, unitDefID)
+	local unitTeam = unitPaybackTeamID[unitID]
+	if unitTeam then -- many energy pieces will not have a payback when destroyed
+		local teamData = teamPayback[unitTeam]
+		teamData.toRemove[unitID] = true
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Overdrive and resource handling
 
 local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 	
@@ -676,9 +721,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									mexBaseMetal[unitID] = orgMetal
 								end
 								
-                local unitDefID = spGetUnitDefID(unitID)
+								local unitDefID = spGetUnitDefID(unitID)
 								if not pylonDefs[unitDefID].keeptooltip then
-                  local unitDef = UnitDefs[unitDefID]
+									local unitDef = UnitDefs[unitDefID]
 									if unitDef then
 										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
 									else
@@ -708,9 +753,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 						mexBaseMetal[unitID] = orgMetal
 					end
 					
-          local unitDefID = spGetUnitDefID(unitID)
+					local unitDefID = spGetUnitDefID(unitID)
 					if not pylonDefs[unitDefID].keeptooltip then
-            local unitDef = UnitDefs[unitDefID]
+						local unitDef = UnitDefs[unitDefID]
 						if unitDef then
 							if (metalMult < 1.5) then
 								spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  Energy: -" .. round(mexE,2))
@@ -781,7 +826,6 @@ local lastTeamNe = {}
 function gadget:GameFrame(n)
 
 	if (n%32 == 1) then
-	
 		lowPowerUnits.inner = {count = 0, units = {}}
 		
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
@@ -804,7 +848,7 @@ function gadget:GameFrame(n)
 			local allyEExcess = 0
 			local allyEMissing = 0
 			local teamEnergy = {}
-			local teamIncome = 0
+			local allyTeamEnergyIncome = 0
 
 			--// Calculate total income - tax 95% of energy income 
 			local sumInc = 0
@@ -814,7 +858,7 @@ function gadget:GameFrame(n)
 				local te = teamEnergy[teamID]
 				te.eCur, te.eMax, te.ePull, te.eInc, te.eExp, _, te.eSent, te.eRec = spGetTeamResources(teamID, "energy")
 				local incTakeNE = (lastTeamNe[teamID] and lastTeamNe[teamID] > 0 and te.eInc -lastTeamNe[teamID]) or te.eInc
-                teamIncome = teamIncome + incTakeNE
+                allyTeamEnergyIncome = allyTeamEnergyIncome + incTakeNE
 				if (te.eCur ~= nil) then 
 					te.eTax = incTakeNE * max(0, min(1, (te.eCur - te.eInc) / (te.eMax - HIDDEN_STORAGE))) -- don't take more than you make!
 					if te.eCur - te.eTax > te.eMax - HIDDEN_STORAGE then
@@ -971,10 +1015,10 @@ function gadget:GameFrame(n)
 				end
 
 				summedMetalProduction = summedMetalProduction + orgMetal
-        local unitDefID = spGetUnitDefID(unitID)
+				local unitDefID = spGetUnitDefID(unitID)
 				local pylonDef = pylonDefs[unitDefID]
 				if pylonDef and not pylonDef.keeptooltip then
-        	local unitDef = UnitDefs[unitDefID]
+					local unitDef = UnitDefs[unitDefID]
 					if unitDef then
 						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
 					else
@@ -1013,12 +1057,15 @@ function gadget:GameFrame(n)
 					end
 				end
 			end
+
 			--// Share Overdrive Metal
 			if GG.Lagmonitor_activeTeams then
 				local activeTeams = GG.Lagmonitor_activeTeams[allyTeamID]
 				local activeCount = (activeTeams.count >= 1 and activeTeams.count) or 1
 				local teamODEnergySum = 0
 				local summedBaseMetalAfterPrivate = summedBaseMetal
+				
+				-- Extra base share from mex production
 				for i = 1, allyTeamData.teams do  -- calculate active team OD sum
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
@@ -1033,24 +1080,85 @@ function gadget:GameFrame(n)
 				
 				--Spring.Echo(allyTeamID .. " energy sum " .. teamODEnergySum)
 	
-				sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, teamIncome, ODenergy, energyWasted)
-	
+				sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, allyTeamEnergyIncome, ODenergy, energyWasted)
+				
+				-- Payback from energy production
+				local teamPacybackOD = {}
+				local summedOverdriveMetalAfterPayback = summedOverdrive
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
 						local te = teamEnergy[teamID]
-						local odShare = summedOverdrive / activeCount
-						if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
-							odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odShare
-						end		
+						teamPacybackOD[teamID] = 0
 						
+						local paybackInfo = teamPayback[teamID]
+						if paybackInfo then
+							local data = paybackInfo.data
+							local toRemove = paybackInfo.toRemove
+							local j = 1
+							while j <= paybackInfo.count do
+								local unitID = data[j].unitID
+								local removeNow = toRemove[unitID]
+		
+								if not removeNow then
+									if spValidUnitID(unitID) then
+										local _,_,em,eu = spGetUnitResources(unitID)
+										local inc = (em or 0) - (eu or 0)
+										if inc ~= 0 then
+											local repayRatio = data[j].repaid/data[j].cost
+											if repayRatio < 1 then
+												local repayMetal = inc/allyTeamEnergyIncome * summedOverdrive * (1 - repayRatio*PAYBACK_FALLOFF)
+												data[j].repaid = data[j].repaid + repayMetal
+												summedOverdriveMetalAfterPayback = summedOverdriveMetalAfterPayback - repayMetal
+												teamPacybackOD[teamID] = teamPacybackOD[teamID] + repayMetal
+												--Spring.Echo("Repaid " .. data[j].repaid)
+											else
+												removeNow = true
+											end
+										end
+									else
+										-- This should never happen in theory
+										removeNow = true
+									end
+								end
+								
+								if removeNow then
+									data[j] = data[paybackInfo.count]
+									if toRemove[unitID] then
+										toRemove[unitID] = nil
+									end
+									data[paybackInfo.count] = nil
+									paybackInfo.count = paybackInfo.count - 1
+								else
+									j = j + 1
+								end
+							end
+						end
+					end
+				end
+				
+				
+				-- Add resources finally
+				for i = 1, allyTeamData.teams do 
+					local teamID = allyTeamData.team[i]
+					if activeTeams[teamID] then
+						local te = teamEnergy[teamID]
+						
+						-- old system
+						-- local odShare
+						-- local ratio = summedOverdrive / activeCount
+						--if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
+						--	odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * ratio
+						--end		
+						
+						local odShare = summedOverdriveMetalAfterPayback / activeCount + (teamPacybackOD[teamID] or 0)
 						local baseShare = summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)
 						
 						sendTeamInformationToAwards(teamID, baseShare, odShare, te.totalChange)
 						
 						spAddTeamResource(teamID, "m", odShare + baseShare)
-						--Spring.Echo(teamID .. " got " .. (odShare + baseShare))
-						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, baseShare, odShare, te.totalChange, teamIncome, allyTeamID) 
+						--Spring.Echo(teamID .. " got odShare " .. odShare)
+						SendToUnsynced("MexEnergyEvent", teamID, activeCount, energyWasted, ODenergy,summedMetalProduction, summedBaseMetal, summedOverdrive, baseShare, odShare, te.totalChange, allyTeamEnergyIncome, allyTeamID) 
 					end
 				end 
 			else
@@ -1176,6 +1284,7 @@ local function RemoveEnergy(unitID, unitDefID, unitTeam)
 	end
 end
 --]]
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -1219,6 +1328,9 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
 		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
 	end
+	if paybackDefs[unitDefID] then
+		AddEnergyToPayback(unitID, unitDefID, unitTeam)
+	end
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
@@ -1257,6 +1369,10 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
 			RemovePylon(unitID)
 		end
+		
+		if paybackDefs[unitDefID] then
+			RemoveEnergyToPayback(unitID, unitDefID)
+		end
 		--if (energyDefs[unitDefID]) then
 		--	AddEnergy(unitID, unitDefID, unitTeam)
 		--	RemoveEnergy(unitID, unitDefID, unitTeam)
@@ -1271,6 +1387,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (pylonDefs[unitDefID]) then
 		notDestroyed[unitID] = nil
 		RemovePylon(unitID)
+	end
+	if paybackDefs[unitDefID] then
+		RemoveEnergyToPayback(unitID, unitDefID)
 	end
 	--if (energyDefs[unitDefID]) then
 	--	RemoveEnergy(unitID, unitDefID, unitTeam)
@@ -1326,10 +1445,10 @@ local floor = math.floor
 
 local circlePolys = 0 -- list for circles
 
-function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome, allyTeamID)
+function WrapToLuaUI(_,teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
   if (allyTeamID ~= spGetLocalAllyTeamID()) then return end
   if (Script.LuaUI('MexEnergyEvent')) then
-    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, teamIncome, allyTeamID)
+    Script.LuaUI.MexEnergyEvent(teamID, allies, energyWasted, energyForOverdrive, totalIncome, baseMetal, overdriveMetal, myBase, myOD, EnergyChange, allyTeamEnergyIncome, allyTeamID)
   end
 end
 
