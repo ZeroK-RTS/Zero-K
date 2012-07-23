@@ -676,9 +676,9 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									mexBaseMetal[unitID] = orgMetal
 								end
 								
-								local unitDefID = spGetUnitDefID(unitID)
+                local unitDefID = spGetUnitDefID(unitID)
 								if not pylonDefs[unitDefID].keeptooltip then
-									local unitDef = UnitDefs[unitDefID]
+                  local unitDef = UnitDefs[unitDefID]
 									if unitDef then
 										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
 									else
@@ -774,86 +774,6 @@ local function keepTeamEnergyBelowMax(team)
         return -change
     end
     return 0
-end
-
-local secondLapsed = {}
-local previous_summedOverdrive = {}
-local history_summedOverdrive = {}
-local previous_teamODEnergy = {}
-local history_teamODEnergy = {}
-local history_index = 0
-local function EnergyOverdriveDecayScheme1(allyTeamID, allyTeamData, activeTeams, activeCount, teamODEnergy, summedOverdrive, summedBaseMetalAfterPrivate, privateBaseMetal)
-	
-	local timeToUpdate = 180
-	--//Store history of relevant data:
-	history_index_new = history_index + 1
-	if history_index_new > timeToUpdate then history_index_new = 1 end
-	history_summedOverdrive[history_index_new] = history_summedOverdrive[history_index_new] or {}
-	history_summedOverdrive[history_index_new][allyTeamID] = summedOverdrive
-	for i = 1, allyTeamData.teams do --iterate & update E history over all player including for inactive player.
-		local teamID = allyTeamData.team[i]
-		history_teamODEnergy[history_index_new] = history_teamODEnergy[history_index_new] or {}
-		history_teamODEnergy[history_index_new][teamID] = (teamODEnergy[teamID] or 0) --update history
-	end
-	--//Retrieve relevant data from history:
-	local history_index_old = history_index_new - (timeToUpdate - 1)
-	if history_index_old < 1 then history_index_old = history_index_old + timeToUpdate end
-	history_summedOverdrive[history_index_old] = history_summedOverdrive[history_index_old] or {}
-	previous_summedOverdrive[allyTeamID] = history_summedOverdrive[history_index_old][allyTeamID] or 0
-	for i = 1, allyTeamData.teams do
-		local teamID = allyTeamData.team[i]
-		if activeTeams[teamID] then
-			history_teamODEnergy[history_index_old] = history_teamODEnergy[history_index_old] or {}
-			previous_teamODEnergy[teamID] = history_teamODEnergy[history_index_old][teamID] or 0 --retrieve old value
-		end
-	end
-	--//Calculate total E difference & individual E contribution:
-	local teamODEnergyDiff = {} --Energy changes for each team
-	local totalEDiff = 0 --the total Energy changes with respect to reference point
-	for i = 1, allyTeamData.teams do  --get total E difference and get individual E difference.
-		local teamID = allyTeamData.team[i]
-		if activeTeams[teamID] then
-			teamODEnergyDiff[teamID] =  (teamODEnergy[teamID] or 0) - previous_teamODEnergy[teamID] --the difference in currentOD energy with respect to reference point for each team.
-			totalEDiff = totalEDiff + teamODEnergyDiff[teamID] --totalEDiff (total Energy difference)
-		end
-	end
-	--//Calculate normalizing denominator/factor that limit negative OD:
-	local metalDiff = summedOverdrive - previous_summedOverdrive[allyTeamID] -- the difference between current OD-metal vs reference OD-metal
-	local teamODEnergyPercent = {}
-	local normFactor = 1
-	for i = 1, allyTeamData.teams do -- [Anti-bug], flag any big negative OD share which absolute-valued greater than mex-metal-share. This is to prevent negative income for people who looses E.  
-		local teamID = allyTeamData.team[i]
-		if activeTeams[teamID] then
-			teamODEnergyPercent[teamID] = teamODEnergyDiff[teamID]/totalEDiff
-			local proposedODshare = (teamODEnergyPercent[teamID]/normFactor)*metalDiff --equation (1)
-			local proposedMexShare = summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0) --equation copied from other part of unit_mex_overdrive.lua
-			if proposedODshare < 0 and proposedMexShare < math.abs(proposedODshare) then --if proposed delta-ODshare consume more than the available mex-income then: scale down delta-OD for all.
-				normFactor = math.abs(teamODEnergyPercent[teamID]/(proposedMexShare/metalDiff)) --from equation (1), where "proposedODshare" is replaced with "proposedMexShare" and solve for new "normFactor"
-			end
-		end
-	end
-	--//Calculate delta-ODshare for each team:
-	local newODshare = {}
-	for i = 1, allyTeamData.teams do --multiply ODEnergyShare with OD increase/decrease
-		local teamID = allyTeamData.team[i]
-		if activeTeams[teamID] then
-			newODshare[teamID] = (teamODEnergyPercent[teamID]/normFactor)*metalDiff --the amount of metal deserved for each contributed increase or decrease in team's E
-			if(newODshare[teamID] ~= newODshare[teamID]) then --> if nan check, true ,(nan = 0/0). Happens when "teamODEnergyPercent[teamID] == 0/0", "We rely on the property that NaN is the only value that doesn't equal itself" -- DavidManura  -Ref: http://lua-users.org/wiki/InfAndNanComparisons
-				newODshare[teamID] = 0
-			end
-		end
-	end
-	--//Calculate total-ODshare for each team:
-	local basicODShare = previous_summedOverdrive[allyTeamID]/activeCount -- OD-metal-shares that is set as reference point, set to equal sharing.
-	local playersShare = {}
-	for i = 1, allyTeamData.teams do --gave away basic OD share + delta-OD distribution (if available)
-		local teamID = allyTeamData.team[i]
-		if activeTeams[teamID] then
-			playersShare[teamID] = basicODShare + (newODshare[teamID] or 0) --add new OD-metal to the reference OD-metal share
-		end
-	end
-	
-	return playersShare
 end
 
 local lastTeamNe = {}
@@ -1051,10 +971,10 @@ function gadget:GameFrame(n)
 				end
 
 				summedMetalProduction = summedMetalProduction + orgMetal
-				local unitDefID = spGetUnitDefID(unitID)
+        local unitDefID = spGetUnitDefID(unitID)
 				local pylonDef = pylonDefs[unitDefID]
 				if pylonDef and not pylonDef.keeptooltip then
-					local unitDef = UnitDefs[unitDefID]
+        	local unitDef = UnitDefs[unitDefID]
 					if unitDef then
 						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
 					else
@@ -1114,19 +1034,15 @@ function gadget:GameFrame(n)
 				--Spring.Echo(allyTeamID .. " energy sum " .. teamODEnergySum)
 	
 				sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, teamIncome, ODenergy, energyWasted)
-				local playersShare = EnergyOverdriveDecayScheme1(allyTeamID, allyTeamData, activeTeams, activeCount, teamODEnergy, summedOverdrive, summedBaseMetalAfterPrivate, privateBaseMetal)
-				
+	
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
 					if activeTeams[teamID] then
 						local te = teamEnergy[teamID]
-						--[[ 
 						local odShare = summedOverdrive / activeCount
 						if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
 							odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * odShare
 						end		
-						--]] --original Scheme^^
-						local odShare = playersShare[teamID]
 						
 						local baseShare = summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)
 						
