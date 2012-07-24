@@ -58,7 +58,7 @@ local paybackFactorFunction(repayRatio)
 	if repay > 0.8 then
 		return 0.8
 	else
-		return 0.8 - repayRatio*0.6
+		return repay
 	end
 end
 
