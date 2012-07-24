@@ -51,16 +51,26 @@ Spring.SetGameRulesParam("lowpower",1)
 
 local MEX_DIAMETER = Game.extractorRadius*2
 
-local PAYBACK_FACTOR = 1    -- Range (0,1], initial payback factor
-local PAYBACK_FALLOFF = 0.8 -- Range [0,1), payback reduces to 1 - PAYBACK_FALLOFF at end
+local paybackFactorFunction(repayRatio)
+	-- Must map [0,1) to (0,1]
+	-- Must not have any sequences on the domain that converge to 0 in the codomain.
+	local repay =  2 - repayRatio*1.8
+	if repay > 0.8 then
+		return 0.8
+	else
+		return 0.8 - repayRatio*0.6
+	end
+end
+
+local PAYBACK_FACTOR = 1.5
 
 local paybackDefs = { -- cost is how much to pay back
-	[UnitDefNames["armwin"].id] = {cost = 35},
-	[UnitDefNames["armsolar"].id] = {cost = 70},
-	[UnitDefNames["armfus"].id] = {cost = 1000},
-	[UnitDefNames["cafus"].id] = {cost = 4000},
-	[UnitDefNames["geo"].id] = {cost = 500},
-	[UnitDefNames["amgeo"].id] = {cost = 1000},
+	[UnitDefNames["armwin"].id] = {cost = UnitDefNames["armwin"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["armsolar"].id] = {cost = UnitDefNames["armsolar"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["armfus"].id] = {cost = UnitDefNames["armfus"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["cafus"].id] = {cost = UnitDefNames["cafus"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["geo"].id] = {cost = UnitDefNames["geo"].metalCost*PAYBACK_FACTOR},
+	[UnitDefNames["amgeo"].id] = {cost = UnitDefNames["amgeo"].metalCost*PAYBACK_FACTOR},
 }
 
 
@@ -617,7 +627,7 @@ end
 
 local function AddEnergyToPayback(unitID, unitDefID, unitTeam)
 	local def = paybackDefs[unitDefID]
-	
+
 	unitPaybackTeamID[unitID] = unitTeam
 	teamPayback[unitTeam] = teamPayback[unitTeam] or {count = 0, toRemove = {}, data = {}}
 	
@@ -1107,7 +1117,7 @@ function gadget:GameFrame(n)
 										if inc ~= 0 then
 											local repayRatio = data[j].repaid/data[j].cost
 											if repayRatio < 1 then
-												local repayMetal = inc/allyTeamEnergyIncome * summedOverdrive * (1 - repayRatio*PAYBACK_FALLOFF)
+												local repayMetal = inc/allyTeamEnergyIncome * summedOverdrive * paybackFactorFunction(repayRatio)
 												data[j].repaid = data[j].repaid + repayMetal
 												summedOverdriveMetalAfterPayback = summedOverdriveMetalAfterPayback - repayMetal
 												teamPacybackOD[teamID] = teamPacybackOD[teamID] + repayMetal
