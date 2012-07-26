@@ -160,6 +160,36 @@ local options = {
     },
   },
   {
+    key = "overdrivesharingscheme",
+    name = "Overdrive Resource Distribution Scheme",
+    desc = "Different scheme designed for distributing overdrive share.",
+    type = "list",
+    section= 'modifiers',
+    def = "investmentreturn",
+    items = {
+      {
+        key  = "investmentreturn",
+        name = "Investment Return",
+        desc = "Extra overdrive is given to active players who built energy structure until the cost of the structure is paid.",
+      },
+      {
+        key  = "deltaoverdrive",
+        name = "Delta-OD",
+        desc = "Extra overdrive is given to active players who increases the grid's energy w.r.t last 3 minutes.",
+      },
+      {
+        key  = "fiftypercent",
+        name = "50% Exclusive",
+        desc = "Half of the total overdrive is given to active players who are currently feeding energy to the grid.",
+      },
+      {
+        key  = "communism",
+        name = "Equal Sharing",
+        desc = "All overdrive is shared equally among active players at all time.",
+      },
+    },
+  },  
+  {
     key    = "shuffle",
     name   = "Shuffle Start Points",
     desc   = "Shuffles start positions.",

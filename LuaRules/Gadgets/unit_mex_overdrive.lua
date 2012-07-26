@@ -24,6 +24,7 @@ local linkdefs = {}
 
 include("LuaRules/Configs/constants.lua")
 include("LuaRules/Configs/mex_overdrive.lua")
+local odSharingModOptions
 
 
 for i=1,#UnitDefs do
@@ -50,17 +51,6 @@ if (gadgetHandler:IsSyncedCode()) then
 Spring.SetGameRulesParam("lowpower",1)
 
 local MEX_DIAMETER = Game.extractorRadius*2
-
-local paybackFactorFunction(repayRatio)
-	-- Must map [0,1) to (0,1]
-	-- Must not have any sequences on the domain that converge to 0 in the codomain.
-	local repay =  2 - repayRatio*1.8
-	if repay > 0.8 then
-		return 0.8
-	else
-		return repay
-	end
-end
 
 local PAYBACK_FACTOR = 1.5
 
@@ -122,9 +112,6 @@ local mexesToAdd = {}
 local lowPowerUnits = {inner = {count = 0, units = {}}}
 
 local pylon = {} -- pylon[allyTeamID][unitID] = {gridID,mexes,mex[unitID],x,z,overdrive, nearPlant[unitID],nearPylon[unitID], color}
-
-local unitPaybackTeamID = {} -- indexed by unitID, tells unit which team gets it's payback.
-local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
 
 local allyTeamInfo = {} 
 
@@ -621,10 +608,21 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- PAYBACK
+-- PAYBACK InvestmentReturn, return OD cost of the energy structure
 
--- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
+local function PaybackFactorFunction(repayRatio)
+	-- Must map [0,1) to (0,1]
+	-- Must not have any sequences on the domain that converge to 0 in the codomain.
+	local repay =  2 - repayRatio*1.8
+	if repay > 0.8 then
+		return 0.8
+	else
+		return repay
+	end
+end
 
+local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
+local unitPaybackTeamID = {} -- indexed by unitID, tells unit which team gets it's payback.
 local function AddEnergyToPayback(unitID, unitDefID, unitTeam)
 	local def = paybackDefs[unitDefID]
 
@@ -646,6 +644,188 @@ local function RemoveEnergyToPayback(unitID, unitDefID)
 		local teamData = teamPayback[unitTeam]
 		teamData.toRemove[unitID] = true
 	end
+end
+
+local function InvestmentReturn (summedOverdrive,allyTeamData,activeTeams,teamEnergy, allyTeamEnergyIncome, activeCount)
+	-- Payback from energy production
+	local teamPacybackOD = {}
+	local summedOverdriveMetalAfterPayback = summedOverdrive
+	for i = 1, allyTeamData.teams do 
+		local teamID = allyTeamData.team[i]
+		if activeTeams[teamID] then
+			local te = teamEnergy[teamID]
+
+			teamPacybackOD[teamID] = 0
+			
+			local paybackInfo = teamPayback[teamID]
+			if paybackInfo then
+				local data = paybackInfo.data
+				local toRemove = paybackInfo.toRemove
+				local j = 1
+				while j <= paybackInfo.count do
+					local unitID = data[j].unitID
+					local removeNow = toRemove[unitID]
+
+					if not removeNow then
+						if spValidUnitID(unitID) then
+							local _,_,em,eu = spGetUnitResources(unitID)
+							local inc = (em or 0) - (eu or 0)
+							if inc ~= 0 then
+								local repayRatio = data[j].repaid/data[j].cost
+								if repayRatio < 1 then
+									local repayMetal = inc/allyTeamEnergyIncome * summedOverdrive * PaybackFactorFunction(repayRatio)
+									data[j].repaid = data[j].repaid + repayMetal
+									summedOverdriveMetalAfterPayback = summedOverdriveMetalAfterPayback - repayMetal
+									teamPacybackOD[teamID] = teamPacybackOD[teamID] + repayMetal
+									--Spring.Echo("Repaid " .. data[j].repaid)
+								else
+									removeNow = true
+								end
+							end
+						else
+							-- This should never happen in theory
+							removeNow = true
+						end
+					end
+					
+					if removeNow then
+						data[j] = data[paybackInfo.count]
+						if toRemove[unitID] then
+							toRemove[unitID] = nil
+						end
+						data[paybackInfo.count] = nil
+						paybackInfo.count = paybackInfo.count - 1
+					else
+						j = j + 1
+					end
+				end
+			end
+		end
+	end
+	local teamPacybackOD_2 = {}
+	for i = 1, allyTeamData.teams do 
+		local teamID = allyTeamData.team[i]
+		if activeTeams[teamID] then
+			teamPacybackOD_2[teamID] = summedOverdriveMetalAfterPayback / activeCount + (teamPacybackOD[teamID] or 0)
+		end
+	end
+	return teamPacybackOD_2
+end
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- PAYBACK Delta-OD, grow & shrink based on extra E feed into OD & decay after 3 minute
+
+local secondLapsed = {}
+local previous_summedOverdrive = {}
+local history_summedOverdrive = {}
+local previous_teamODEnergy = {}
+local history_teamODEnergy = {}
+local history_index = 0
+local function DeltaODWithDecayScheme(allyTeamID, allyTeamData, activeTeams, activeCount, teamODEnergy, summedOverdrive, summedBaseMetalAfterPrivate, privateBaseMetal)
+	
+	local timeToUpdate = 180 -- constant to customize OD distribution. ie: compare current OD with-respect-to "timeToUpdate" second ago. Greater value means greater return. 
+	--//Store history of relevant data:
+	history_index_new = history_index + 1
+	if history_index_new > timeToUpdate then history_index_new = 1 end
+	history_summedOverdrive[history_index_new] = history_summedOverdrive[history_index_new] or {}
+	history_summedOverdrive[history_index_new][allyTeamID] = summedOverdrive
+	for i = 1, allyTeamData.teams do --iterate & update E history over all player including for inactive player.
+		local teamID = allyTeamData.team[i]
+		history_teamODEnergy[history_index_new] = history_teamODEnergy[history_index_new] or {}
+		history_teamODEnergy[history_index_new][teamID] = (teamODEnergy[teamID] or 0) --update history
+	end
+	--//Retrieve relevant data from history:
+	local history_index_old = history_index_new - (timeToUpdate - 1)
+	if history_index_old < 1 then history_index_old = history_index_old + timeToUpdate end
+	history_summedOverdrive[history_index_old] = history_summedOverdrive[history_index_old] or {}
+	previous_summedOverdrive[allyTeamID] = history_summedOverdrive[history_index_old][allyTeamID] or 0
+	for i = 1, allyTeamData.teams do
+		local teamID = allyTeamData.team[i]
+		if activeTeams[teamID] then
+			history_teamODEnergy[history_index_old] = history_teamODEnergy[history_index_old] or {}
+			previous_teamODEnergy[teamID] = history_teamODEnergy[history_index_old][teamID] or 0 --retrieve old value
+		end
+	end
+	--//Calculate total E difference & individual E contribution:
+	local teamODEnergyDiff = {} --Energy changes for each team
+	local totalEDiff = 0 --the total Energy changes with respect to reference point
+	for i = 1, allyTeamData.teams do  --get total E difference and get individual E difference.
+		local teamID = allyTeamData.team[i]
+		if activeTeams[teamID] then
+			teamODEnergyDiff[teamID] =  (teamODEnergy[teamID] or 0) - previous_teamODEnergy[teamID] --the difference in currentOD energy with respect to reference point for each team.
+			totalEDiff = totalEDiff + teamODEnergyDiff[teamID] --totalEDiff (total Energy difference)
+		end
+	end
+	--//Calculate normalizing denominator/factor that limit negative OD:
+	local metalDiff = summedOverdrive - previous_summedOverdrive[allyTeamID] -- the difference between current OD-metal vs reference OD-metal
+	local teamODEnergyPercent = {}
+	local normFactor = 1
+	for i = 1, allyTeamData.teams do -- [Anti-bug], flag any big negative OD share which absolute-valued greater than mex-metal-share. This is to prevent negative income for people who looses E.  
+		local teamID = allyTeamData.team[i]
+		if activeTeams[teamID] then
+			teamODEnergyPercent[teamID] = teamODEnergyDiff[teamID]/totalEDiff
+			local proposedODshare = (teamODEnergyPercent[teamID]/normFactor)*metalDiff --equation (1)
+			local proposedMexShare = summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0) --equation copied from other part of unit_mex_overdrive.lua
+			if proposedODshare < 0 and proposedMexShare < math.abs(proposedODshare) then --if proposed delta-ODshare consume more than the available mex-income then: scale down delta-OD for all.
+				normFactor = math.abs(teamODEnergyPercent[teamID]/(proposedMexShare/metalDiff)) --from equation (1), where "proposedODshare" is replaced with "proposedMexShare" and solve for new "normFactor"
+			end
+		end
+	end
+	--//Calculate delta-ODshare for each team:
+	local newODshare = {}
+	for i = 1, allyTeamData.teams do --multiply ODEnergyShare with OD increase/decrease
+		local teamID = allyTeamData.team[i]
+		if activeTeams[teamID] then
+			newODshare[teamID] = (teamODEnergyPercent[teamID]/normFactor)*metalDiff --the amount of metal deserved for each contributed increase or decrease in team's E
+			if(newODshare[teamID] ~= newODshare[teamID]) then --> if nan check, true ,(nan = 0/0). Happens when "teamODEnergyPercent[teamID] == 0/0", "We rely on the property that NaN is the only value that doesn't equal itself" -- DavidManura  -Ref: http://lua-users.org/wiki/InfAndNanComparisons
+				newODshare[teamID] = 0
+			end
+		end
+	end
+	--//Calculate total-ODshare for each team:
+	local basicODShare = previous_summedOverdrive[allyTeamID]/activeCount -- OD-metal-shares that is set as reference point, set to equal sharing.
+	local teamPacybackOD = {}
+	for i = 1, allyTeamData.teams do --gave away basic OD share + delta-OD distribution (if available)
+		local teamID = allyTeamData.team[i]
+		if activeTeams[teamID] then
+			teamPacybackOD[teamID] = basicODShare + (newODshare[teamID] or 0) --add new OD-metal to the reference OD-metal share
+		end
+	end
+	return teamPacybackOD
+end
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- PAYBACK 50 percent reserved for contributor who feed E into OD
+
+local function FiftyPercent(allyTeamData,activeTeams,summedOverdrive,activeCount,teamODEnergySum,teamODEnergy)
+	local teamPacybackOD = {}
+	for i = 1, allyTeamData.teams do 
+		local teamID = allyTeamData.team[i]
+		if activeTeams[teamID] then
+			local equalSplit = summedOverdrive / activeCount
+			local odShare = 0
+			if (teamODEnergySum > 0 and teamODEnergy[teamID]) then --if there's Overdrive and player is one of the contributor then:
+				odShare = OD_OWNER_SHARE * summedOverdrive *(teamODEnergy[teamID]/ teamODEnergySum) +  (1-OD_OWNER_SHARE) * equalSplit --OD split exclusive for contributor + OD split for the rest of the alliance
+			end
+			teamPacybackOD[teamID] = odShare
+		end
+	end
+	return teamPacybackOD
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- PAYBACK all split equally
+
+local function CommunalTrust (allyTeamData,activeTeams,summedOverdrive,activeCount)
+	local teamPacybackOD = {}
+	for i = 1, allyTeamData.teams do 
+		local teamID = allyTeamData.team[i]
+		if activeTeams[teamID] then
+			teamPacybackOD[teamID] = summedOverdrive / activeCount
+		end
+	end
+	return teamPacybackOD
 end
 
 -------------------------------------------------------------------------------------
@@ -1092,61 +1272,15 @@ function gadget:GameFrame(n)
 	
 				sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, allyTeamEnergyIncome, ODenergy, energyWasted)
 				
-				-- Payback from energy production
 				local teamPacybackOD = {}
-				local summedOverdriveMetalAfterPayback = summedOverdrive
-				for i = 1, allyTeamData.teams do 
-					local teamID = allyTeamData.team[i]
-					if activeTeams[teamID] then
-						local te = teamEnergy[teamID]
-						teamPacybackOD[teamID] = 0
-						
-						local paybackInfo = teamPayback[teamID]
-						if paybackInfo then
-							local data = paybackInfo.data
-							local toRemove = paybackInfo.toRemove
-							local j = 1
-							while j <= paybackInfo.count do
-								local unitID = data[j].unitID
-								local removeNow = toRemove[unitID]
-		
-								if not removeNow then
-									if spValidUnitID(unitID) then
-										local _,_,em,eu = spGetUnitResources(unitID)
-										local inc = (em or 0) - (eu or 0)
-										if inc ~= 0 then
-											local repayRatio = data[j].repaid/data[j].cost
-											if repayRatio < 1 then
-												local repayMetal = inc/allyTeamEnergyIncome * summedOverdrive * paybackFactorFunction(repayRatio)
-												data[j].repaid = data[j].repaid + repayMetal
-												summedOverdriveMetalAfterPayback = summedOverdriveMetalAfterPayback - repayMetal
-												teamPacybackOD[teamID] = teamPacybackOD[teamID] + repayMetal
-												--Spring.Echo("Repaid " .. data[j].repaid)
-											else
-												removeNow = true
-											end
-										end
-									else
-										-- This should never happen in theory
-										removeNow = true
-									end
-								end
-								
-								if removeNow then
-									data[j] = data[paybackInfo.count]
-									if toRemove[unitID] then
-										toRemove[unitID] = nil
-									end
-									data[paybackInfo.count] = nil
-									paybackInfo.count = paybackInfo.count - 1
-								else
-									j = j + 1
-								end
-							end
-						end
-					end
+				teamPacybackOD = InvestmentReturn (summedOverdrive,allyTeamData,activeTeams,teamEnergy, allyTeamEnergyIncome, activeCount)
+				if odSharingModOptions == "deltaoverdrive" then
+					teamPacybackOD = DeltaODWithDecayScheme(allyTeamID, allyTeamData, activeTeams, activeCount, teamODEnergy, summedOverdrive, summedBaseMetalAfterPrivate, privateBaseMetal)
+				elseif odSharingModOptions == "fiftypercent" then
+					teamPacybackOD = FiftyPercent(allyTeamData,activeTeams,summedOverdrive,activeCount,teamODEnergySum,teamODEnergy)
+				elseif odSharingModOptions == "communism" then
+					teamPacybackOD = CommunalTrust (allyTeamData,activeTeams,summedOverdrive,activeCount)
 				end
-				
 				
 				-- Add resources finally
 				for i = 1, allyTeamData.teams do 
@@ -1154,14 +1288,7 @@ function gadget:GameFrame(n)
 					if activeTeams[teamID] then
 						local te = teamEnergy[teamID]
 						
-						-- old system
-						-- local odShare
-						-- local ratio = summedOverdrive / activeCount
-						--if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
-						--	odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * ratio
-						--end		
-						
-						local odShare = summedOverdriveMetalAfterPayback / activeCount + (teamPacybackOD[teamID] or 0)
+						local odShare = teamPacybackOD[teamID]
 						local baseShare = summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)
 						
 						sendTeamInformationToAwards(teamID, baseShare, odShare, te.totalChange)
@@ -1299,6 +1426,8 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:Initialize()
+	odSharingModOptions =(Spring.GetModOptions()).overdrivesharingscheme --get game modifier (ModOptions.lua)
+	Spring.Echo("Using Overdrive Sharing ModOptions:" .. odSharingModOptions)
 	
 	_G.pylon = pylon
 	_G.lowPowerUnits = lowPowerUnits
