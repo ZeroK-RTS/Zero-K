@@ -63,6 +63,16 @@ local paybackDefs = { -- cost is how much to pay back
 	[UnitDefNames["amgeo"].id] = {cost = UnitDefNames["amgeo"].metalCost*PAYBACK_FACTOR},
 }
 
+local function PaybackFactorFunction(repayRatio)
+	-- Must map [0,1) to (0,1]
+	-- Must not have any sequences on the domain that converge to 0 in the codomain.
+	local repay =  2 - repayRatio*1.8
+	if repay > 0.8 then
+		return 0.8
+	else
+		return repay
+	end
+end
 
 --local PYLON_ENERGY_RANGESQ = 160000
 --local PYLON_LINK_RANGESQ = 40000
@@ -608,21 +618,11 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- PAYBACK InvestmentReturn, return OD cost of the energy structure
-
-local function PaybackFactorFunction(repayRatio)
-	-- Must map [0,1) to (0,1]
-	-- Must not have any sequences on the domain that converge to 0 in the codomain.
-	local repay =  2 - repayRatio*1.8
-	if repay > 0.8 then
-		return 0.8
-	else
-		return repay
-	end
-end
+-- METAL DISTRIBUTION Payback InvestmentReturn, return OD cost of the energy structure
 
 local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data = {[1] = {unitID = unitID, cost = costOfUnit, repaid = howMuchHasBeenRepaid}}}
 local unitPaybackTeamID = {} -- indexed by unitID, tells unit which team gets it's payback.
+
 local function AddEnergyToPayback(unitID, unitDefID, unitTeam)
 	local def = paybackDefs[unitDefID]
 
@@ -713,7 +713,7 @@ local function InvestmentReturn (summedOverdrive,allyTeamData,activeTeams,teamEn
 end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- PAYBACK Delta-OD, grow & shrink based on extra E feed into OD & decay after 3 minute
+-- METAL DISTRIBUTION Delta-OD, grow & shrink based on extra E feed into OD & decay after 3 minute
 
 local secondLapsed = {}
 local previous_summedOverdrive = {}
@@ -726,7 +726,9 @@ local function DeltaODWithDecayScheme(allyTeamID, allyTeamData, activeTeams, act
 	local timeToUpdate = 180 -- constant to customize OD distribution. ie: compare current OD with-respect-to "timeToUpdate" second ago. Greater value means greater return. 
 	--//Store history of relevant data:
 	history_index_new = history_index + 1
-	if history_index_new > timeToUpdate then history_index_new = 1 end
+	if history_index_new > timeToUpdate then 
+		history_index_new = 1 
+	end
 	history_summedOverdrive[history_index_new] = history_summedOverdrive[history_index_new] or {}
 	history_summedOverdrive[history_index_new][allyTeamID] = summedOverdrive
 	for i = 1, allyTeamData.teams do --iterate & update E history over all player including for inactive player.
@@ -736,7 +738,9 @@ local function DeltaODWithDecayScheme(allyTeamID, allyTeamData, activeTeams, act
 	end
 	--//Retrieve relevant data from history:
 	local history_index_old = history_index_new - (timeToUpdate - 1)
-	if history_index_old < 1 then history_index_old = history_index_old + timeToUpdate end
+	if history_index_old < 1 then 
+		history_index_old = history_index_old + timeToUpdate 
+	end
 	history_summedOverdrive[history_index_old] = history_summedOverdrive[history_index_old] or {}
 	previous_summedOverdrive[allyTeamID] = history_summedOverdrive[history_index_old][allyTeamID] or 0
 	for i = 1, allyTeamData.teams do
@@ -795,7 +799,7 @@ local function DeltaODWithDecayScheme(allyTeamID, allyTeamData, activeTeams, act
 end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- PAYBACK 50 percent reserved for contributor who feed E into OD
+-- METAL DISTRIBUTION 50 percent reserved for contributor who feed E into OD
 
 local function FiftyPercent(allyTeamData,activeTeams,summedOverdrive,activeCount,teamODEnergySum,teamODEnergy)
 	local teamPacybackOD = {}
@@ -815,7 +819,7 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- PAYBACK all split equally
+-- METAL DISTRIBUTION all split equally
 
 local function CommunalTrust (allyTeamData,activeTeams,summedOverdrive,activeCount)
 	local teamPacybackOD = {}
@@ -1273,13 +1277,15 @@ function gadget:GameFrame(n)
 				sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, allyTeamEnergyIncome, ODenergy, energyWasted)
 				
 				local teamPacybackOD = {}
-				teamPacybackOD = InvestmentReturn (summedOverdrive,allyTeamData,activeTeams,teamEnergy, allyTeamEnergyIncome, activeCount)
+				
 				if odSharingModOptions == "deltaoverdrive" then
 					teamPacybackOD = DeltaODWithDecayScheme(allyTeamID, allyTeamData, activeTeams, activeCount, teamODEnergy, summedOverdrive, summedBaseMetalAfterPrivate, privateBaseMetal)
 				elseif odSharingModOptions == "fiftypercent" then
 					teamPacybackOD = FiftyPercent(allyTeamData,activeTeams,summedOverdrive,activeCount,teamODEnergySum,teamODEnergy)
 				elseif odSharingModOptions == "communism" then
 					teamPacybackOD = CommunalTrust (allyTeamData,activeTeams,summedOverdrive,activeCount)
+				else
+					teamPacybackOD = InvestmentReturn (summedOverdrive,allyTeamData,activeTeams,teamEnergy, allyTeamEnergyIncome, activeCount)
 				end
 				
 				-- Add resources finally
