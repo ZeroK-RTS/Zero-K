@@ -99,9 +99,9 @@ end
 local function TranslocateBoxes(box)
 	local midX, midY = (box.left + box.right)/2, (box.top + box.bottom)/2
 	local x1 = box.left + TRANSLOCATION_MULT*(0.5 - midX)
-	local y1 = box.top - TRANSLOCATION_MULT*(0.5 - midY)
+	local y1 = box.top + TRANSLOCATION_MULT*(0.5 - midY)
 	local x2 = box.right + TRANSLOCATION_MULT*(0.5 - midX)
-	local y2 = box.bottom - TRANSLOCATION_MULT*(0.5 - midY)
+	local y2 = box.bottom + TRANSLOCATION_MULT*(0.5 - midY)
 	return x1, y1, x2, y2
 end
 
@@ -135,7 +135,7 @@ local function spawnStructures(left, top, right, bottom, team)
 				
 				local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID)
 				Spring.SetUnitNeutral(unitID,true)
-				--Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
+				Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
 				unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
 			end
 		end
