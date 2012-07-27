@@ -4,7 +4,7 @@ unitDef = {
   description                   = [[Blank]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  autoHeal                      = 40,
+  autoHeal                      = 5,
   brakeRate                     = 0,
   buildAngle                    = 4096,
   buildCostEnergy               = 1000,
@@ -20,6 +20,7 @@ unitDef = {
   --corpse                        = [[DEAD]],
 
   customParams                  = {
+	helptext = [[This structure offers benefits to the faction holding the planet. Only members of the attacking or defending factions can harm it.]],
   	dontcount = [[1]],
   },
 

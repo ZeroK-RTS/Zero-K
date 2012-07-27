@@ -121,6 +121,7 @@ local minPixels = 5.0
 local gl = gl
 
 local gameSecs = 0
+local gamestart = false
 
 local xMapSize = Game.mapX * 512
 local yMapSize = Game.mapY * 512
@@ -154,9 +155,14 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+function widget:GameStart()
+  gamestart = true
+end
+
 function widget:Initialize()
 
   gameSecs = GetGameSecs()
+  gamestart = gameSecs > 0
 
   circleList = glCreateList(function()
     glBeginEnd(GL_TRIANGLE_FAN, function()
@@ -279,6 +285,7 @@ end
 
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
+  if not gamestart then return end
   AddEvent(unitID, unitDefID, createColor)
 end
 

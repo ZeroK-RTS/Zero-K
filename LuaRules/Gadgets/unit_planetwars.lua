@@ -43,6 +43,7 @@ local unitsByID = {}
 local hqs = {}
 local hqsDestroyed = {}
 local stuffToReport = {data = {}, count = 0}
+local canAttackTeams = {}	-- teams that can attack PW structures
 
 GG.PlanetWars = {}
 GG.PlanetWars.unitsByID = unitsByID
@@ -97,13 +98,14 @@ end
 
 local function TranslocateBoxes(box)
 	local midX, midY = (box.left + box.right)/2, (box.top + box.bottom)/2
-	box.left = box.left + TRANSLOCATION_MULT*(0.5 - midX)
-	box.top = box.top - TRANSLOCATION_MULT*(0.5 - midY)
-	box.right = box.right + TRANSLOCATION_MULT*(0.5 - midX)
-	box.bottom = box.bottom - TRANSLOCATION_MULT*(0.5 - midY)
+	local x1 = box.left + TRANSLOCATION_MULT*(0.5 - midX)
+	local y1 = box.top - TRANSLOCATION_MULT*(0.5 - midY)
+	local x2 = box.right + TRANSLOCATION_MULT*(0.5 - midX)
+	local y2 = box.bottom - TRANSLOCATION_MULT*(0.5 - midY)
+	return x1, y1, x2, y2
 end
 
---[[
+
 local function spawnStructures(left, top, right, bottom, team)
 	local teamID = team or Spring.GetGaiaTeamID()
 	local xBase = mapWidth*left
@@ -133,13 +135,13 @@ local function spawnStructures(left, top, right, bottom, team)
 				
 				local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID)
 				Spring.SetUnitNeutral(unitID,true)
-				Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
+				--Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
 				unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
 			end
 		end
 	end
 end
-]]--
+
 
 local function SpawnHQ(left, top, right, bottom, team)
 	local teamID = team or Spring.GetGaiaTeamID()
@@ -170,26 +172,20 @@ function gadget:GamePreload()
 	box[0].left, box[0].top, box[0].right, box[0].bottom  = Spring.GetAllyTeamStartBox(0)
 	box[1].left, box[1].top, box[1].right, box[1].bottom = Spring.GetAllyTeamStartBox(1)
 	
-	if not (box[0].right and box[1].right) then
-		spawnStructures(0.35,0.35,0.65,0.65)
+	if not (box[0].left) then
+		box[0].left, box[0].top, box[0].right, box[0].bottom = 0, 0, mapWidth, mapHeight
+	end
+	if not (box[1].left) then
+		box[1].left, box[1].top, box[1].right, box[1].bottom = 0, 0, mapWidth, mapHeight
 	end
 	
 	normaliseBoxes(box[0])
 	normaliseBoxes(box[1])
-	
-	--[[
-	local x1,y1,x2,y2 = 0.35, 0.35, 0.65, 0.65
+
+	-- spawn PW planet structures
 	if defender then
 		local n = select(6, Spring.GetTeamInfo(defender))
-		local x1,y1,x2,y2 = box[n].left, box[n].top, box[n].right, box[n].bottom
-		--Spring.Echo(x1,x2,y1,y2)
-		local midX, midY = (x1 + x2)/2, (y1+y2)/2
-		-- displace towards middle
-		-- warning: will break with FFAs (see box var initialization above)
-		x1 = math.max(x1 + TRANSLOCATION_MULT*(0.5 - midX), 0.1)
-		y1 = math.max(y1 - TRANSLOCATION_MULT*(0.5 - midY), 0.1)
-		x2 = math.min(x2 + TRANSLOCATION_MULT*(0.5 - midX), 0.9)
-		y2 = math.min(y2 - TRANSLOCATION_MULT*(0.5 - midY), 0.9)
+		local x1, y1, x2, y2 = TranslocateBoxes(box[n])
 		spawnStructures(x1, y1, x2, y2, defender)
 	elseif box[0].right - box[0].left >= 0.9 and box[1].right - box[1].left >= 0.9 then -- north vs south
 		spawnStructures(0.1,0.44,0.9,0.56)
@@ -198,12 +194,13 @@ function gadget:GamePreload()
 	else -- random idk boxes
 		spawnStructures(0.35,0.35,0.65,0.65)
 	end
-	]]--
+	
+	-- spawn field command centers
 	for i=0,1 do
-		TranslocateBoxes(box[i])
+		local x1, y1, x2, y2 = TranslocateBoxes(box[i])
 		local teams = Spring.GetTeamList(i)
 		local team = teams[math.random(#teams)]
-		SpawnHQ(box[i].left, box[i].top, box[i].right, box[i].bottom, team)
+		SpawnHQ(x1, y1, x2, y2, team)
 	end
 end
 
@@ -220,13 +217,10 @@ function gadget:Initialize()
 				unitsByID[unitID] = {name = unitDef.name, teamDamages = {}}
 			end
 		end
-	
 	else
-	
 		local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
 		local pwDataRaw = modOptions.planetwarsstructures
 		local pwDataFunc, err, success
-		--[[
 		if not (pwDataRaw and type(pwDataRaw) == 'string') then
 			err = "Planetwars data entry in modoption is empty or in invalid format"
 			unitData = {}
@@ -259,6 +253,7 @@ function gadget:Initialize()
 		end
 		
 		-- spawning code
+		--[[
 		local spawningAnything = false
 		for i,v in pairs(unitData) do
 			if (v.isDestroyed~=1) then 
@@ -273,6 +268,17 @@ function gadget:Initialize()
 			gadgetHandler:RemoveGadget()
 		end
 	end
+	
+	-- get list of players that can attack PW structures
+	local players = Spring.GetPlayerList()
+	for i=1,#players do
+		local player = players[i]
+		local _,_,_,team,_,_,_,_,_,customkeys = Spring.GetPlayerInfo(player)
+		if customkeys and tostring(customkeys.canattackpwstructures) == "1" then
+			canAttackTeams[team] = true
+		end
+	end
+	
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
@@ -281,8 +287,22 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 		Spring.TransferUnit(unitID, gaiaTeam, true)
 		Spring.SetUnitNeutral(unitID, true)
 		return false
+	elseif cmdID == CMD.ATTACK and #cmdParams == 1 then
+		local unitID = cmdParams[1]
+		if unitsByID[unitID] and (not canAttackTeams[unitTeam]) then
+			local unitName = UnitDefs[unitDefID].humanName
+			--Spring.SendMessageToTeam(unitTeam, unitName .. ": Cannot attack that PW structure")
+			return false
+		end
 	end
 	return true
+end
+
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+	if (unitsByID[unitID]) and (not canAttackTeams[attackerTeam]) then
+		return 0
+	end
+	return damage
 end
 
 ------------------------------------------------------------------------
