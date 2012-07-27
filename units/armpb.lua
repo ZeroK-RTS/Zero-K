@@ -26,7 +26,6 @@ unitDef = {
     description_de = [[Versteckter Raketenturm]],
     helptext 	   = [[The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it receives a quarter of incoming damage, making it a good choice when the enemy is using artillery.]],
 	helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Raktenwerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es sehr schwer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht.]],
-	modelradius    = [[15]],
   },
 
   damageModifier                = 0.25,

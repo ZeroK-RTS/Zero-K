@@ -94,7 +94,7 @@ unitDef = {
         extra_damage = [[160]],
       },
 
-      cylinderTargeting      = 0,
+      cylinderTargetting      = 0,
 
       damage                  = {
         default        = 800,
