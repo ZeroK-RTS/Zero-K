@@ -1,7 +1,6 @@
-#define TA			// This is a TA script
+//linear constant 163840
 
-#include "sfxtype.h"
-#include "exptype.h"
+#include "constants.h"
 
 piece  	base, turret, sleeve, dummy1, dummy2, smoke1, smoke2,
 		tracks1, tracks2, tracks3, tracks4,
@@ -226,7 +225,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode base type BITMAPONLY | BITMAP1;
 		explode turret type SHATTER | BITMAP4;
 		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT;
@@ -236,7 +235,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 99 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode base type BITMAPONLY | BITMAP1;
 		explode turret type SHATTER | BITMAP4;
 		explode sleeve type SHATTER | EXPLODE_ON_HIT | BITMAP4;
@@ -244,7 +243,7 @@ Killed(severity, corpsetype)
 		explode dummy2 type SHATTER | BITMAP4;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode base type BITMAPONLY | BITMAP1;
 	explode turret type SHATTER | EXPLODE_ON_HIT | BITMAP4;
 	explode sleeve type SHATTER | EXPLODE_ON_HIT | BITMAP4;
