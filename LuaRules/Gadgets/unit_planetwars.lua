@@ -80,7 +80,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	end
 	if hqs[unitID] then
 		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
-		hqsDestroyed[#hqsDestroyed+1] = unitTeam
+		hqsDestroyed[#hqsDestroyed+1] = allyTeam
 		hqs[unitID] = nil
 	end
 end
