@@ -1278,14 +1278,14 @@ function gadget:GameFrame(n)
 				
 				local teamPacybackOD = {}
 				
-				if odSharingModOptions == "deltaoverdrive" then
+				if odSharingModOptions == "investmentreturn" then 
+					teamPacybackOD = InvestmentReturn (summedOverdrive,allyTeamData,activeTeams,teamEnergy, allyTeamEnergyIncome, activeCount)
+				elseif odSharingModOptions == "deltaoverdrive" then
 					teamPacybackOD = DeltaODWithDecayScheme(allyTeamID, allyTeamData, activeTeams, activeCount, teamODEnergy, summedOverdrive, summedBaseMetalAfterPrivate, privateBaseMetal)
 				elseif odSharingModOptions == "fiftypercent" then
 					teamPacybackOD = FiftyPercent(allyTeamData,activeTeams,summedOverdrive,activeCount,teamODEnergySum,teamODEnergy)
 				elseif odSharingModOptions == "communism" then
 					teamPacybackOD = CommunalTrust (allyTeamData,activeTeams,summedOverdrive,activeCount)
-				else
-					teamPacybackOD = InvestmentReturn (summedOverdrive,allyTeamData,activeTeams,teamEnergy, allyTeamEnergyIncome, activeCount)
 				end
 				
 				-- Add resources finally
@@ -1473,7 +1473,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
 		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
 	end
-	if paybackDefs[unitDefID] then
+	if paybackDefs[unitDefID] and (odSharingModOptions == "investmentreturn") then
 		AddEnergyToPayback(unitID, unitDefID, unitTeam)
 	end
 end
