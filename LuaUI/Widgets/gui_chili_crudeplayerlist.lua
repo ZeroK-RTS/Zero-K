@@ -79,7 +79,7 @@ local x_postping		= x_ping + 16
 
 local x_bound	= x_postping + 20
 
-local UPDATE_FREQUENCY = 0.5	-- seconds
+local UPDATE_FREQUENCY = 0.8	-- seconds
 
 local wantsNameRefresh = {}	-- unused
 local cfCheckBoxes = {}
@@ -597,6 +597,17 @@ local function AddAllyTeam(allyTeamID)
 	end
 end
 
+local function AlignScrollPanel()
+	--push things to bottom of window if needed
+	local height = math.ceil(row * (fontsize+1.5) + 8)
+	scroll_cpl.height = math.min(height, window_cpl.height)
+	if not (options.alignToTop.value) then
+		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
+	else
+		scroll_cpl.y = 0
+	end
+end
+
 SetupPlayerNames = function()
 	if options.debugMessages.value then
 		Spring.Echo("Generating playerlist")
@@ -704,18 +715,7 @@ SetupPlayerNames = function()
 		row = row + 1.5
 	end
 	
-	--push things to bottom of window if needed
-	--scroll_cpl.width = x_bound --window_cpl.width - window_cpl.padding[1] - window_cpl.padding[3]
-	local height = math.ceil(row * (fontsize+1.5) + 4)
-	--window_cpl.minWidth = x_bound
-	--window_cpl.minHeight = height
-	scroll_cpl.height = math.min(height, window_cpl.height)
-	if not (options.alignToTop.value) then 
-		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
-	else
-		scroll_cpl.y = 0
-	end
-	window_cpl:Invalidate()
+	AlignScrollPanel()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -736,7 +736,7 @@ function widget:Update(s)
 			return
 		end
 		if (lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height) then --//if user resize the player-list OR if the simple-color state have changed, then refresh the player list.
-			SetupPlayerNames()	-- size changed; regen everything
+			AlignScrollPanel()
 			lastSizeX = window_cpl.width
 			lastSizeY = window_cpl.height
 		else

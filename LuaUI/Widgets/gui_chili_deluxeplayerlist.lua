@@ -259,7 +259,7 @@ local function CalculateWidths()
 end
 CalculateWidths()
 
-local UPDATE_FREQUENCY = 0.5	-- seconds
+local UPDATE_FREQUENCY = 0.8	-- seconds
 
 local cfCheckBoxes = {}
 
@@ -943,6 +943,16 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 	end
 end
 
+local function AlignScrollPanel()
+	local height = math.ceil(row * (fontsize+1.5) + 8)
+	scroll_cpl.height = math.min(height, window_cpl.height)
+	if not (options.alignToTop.value) then
+		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
+	else
+		scroll_cpl.y = 0
+	end
+end
+
 SetupPlayerNames = function()
 	entities = {}
 	teams = {}
@@ -1223,17 +1233,7 @@ SetupPlayerNames = function()
 		} )
 		row = row + 1.5
 	end
-	
-	--push things to bottom of window if needed
-	local height = math.ceil(row * (fontsize+1.5) + 8)
-	scroll_cpl.height = math.min(height, window_cpl.height)
-	if not (options.alignToTop.value) then
-		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
-	else
-		scroll_cpl.y = 0
-	end
-	window_cpl:Invalidate()
-
+	AlignScrollPanel()
 end
 
 SetupScrollPanel = function ()
@@ -1348,7 +1348,7 @@ function widget:Update(s)
 	if timer > UPDATE_FREQUENCY then
 		timer = 0
 		if (lastSizeX ~= window_cpl.width or lastSizeY ~= window_cpl.height) then --//if user resize the player-list
-			SetupPlayerNames()
+			AlignScrollPanel()
 			lastChosenSizeX = window_cpl.width
 			lastSizeX = window_cpl.width
 			lastSizeY = window_cpl.height
