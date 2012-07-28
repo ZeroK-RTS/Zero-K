@@ -91,21 +91,21 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if  severity <= .25  then
-		Explode(ground, SFX.BITMAPONLY)
-		Explode(head, SFX.FALL + SFX.EXPLODE_ON_HIT )
+		Explode(ground, sfxNone)
+		Explode(head, sfxFall + sfxExplode)
 		return 1
 	elseif  severity <= .50  then
-		Explode(ground, SFX.BITMAPONLY)
-		Explode(head, SFX.FALL + SFX.EXPLODE_ON_HIT )
+		Explode(ground, sfxNone)
+		Explode(head, sfxFall + sfxExplode)
 		return 1
 	elseif  severity <= .99  then
 		corpsetype = 2
-		Explode(ground, SFX.BITMAPONLY)
-		Explode(head, SFX.FALL + SFX.EXPLODE_ON_HIT )
+		Explode(ground, sfxNone)
+		Explode(head, sfxFall + sfxExplode)
 		return 2
 	else
-		Explode(ground, SFX.BITMAPONLY)
-		Explode(head, SFX.FALL + SFX.EXPLODE_ON_HIT )
+		Explode(ground, sfxNone)
+		Explode(head, sfxFall + sfxExplode)
 		return 2
 	end
 end
