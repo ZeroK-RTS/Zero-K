@@ -659,7 +659,7 @@ local icontypes = {
   },
   advradar = {
     bitmap='icons/radar.dds',
-    size=3,
+    size=2.8,
   },  
    sonar = {
     bitmap='icons/sonar.dds',
@@ -864,7 +864,7 @@ local icontypes = {
   
   energysuperfus = {
     bitmap='icons/energysuperfus.dds',
-    size=3.0,
+    size=3.2,
   },
   
   energygeo = {
