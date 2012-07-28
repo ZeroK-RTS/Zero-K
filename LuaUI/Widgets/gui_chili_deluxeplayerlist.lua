@@ -3,15 +3,15 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Deluxe Player List - Alpha 2.01",
-    desc      = "v0.1 Chili Deluxe Player List, Alpha Release",
+    name      = "Chili Deluxe Player List - Alpha 2.02",
+    desc      = "v0.202 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
     enabled   = false,
-    detailsDefault = 1
-	-- based on v1.31 Chili Crude Player List by CarRepairer, KingRaptor, et al
+    --detailsDefault = 1
+    -- based on v1.31 Chili Crude Player List by CarRepairer, KingRaptor, et al
   }
 end
 
@@ -33,6 +33,7 @@ function SetupPlayerNames() end
 function ToggleVisibility() end
 
 local echo = Spring.Echo
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 local Chili
 local Image
@@ -275,6 +276,7 @@ local allyTeamOrderRank = {}
 local allyTeamsDead = {}
 local allyTeamsElo = {}
 local playerTeamStatsCache = {}
+local finishedUnits = {}
 local numBigTeams = 0
 local existsVeryBigTeam = nil
 local myTeamIsVeryBig = nil
@@ -390,34 +392,47 @@ local function FormatElo(elo,full)
 	return elo_out, eloCol
 end
 
-local function GetPlayerTeamStats(teamID)
-	-- This lookup gets done twice per player per update cycle, but it's expensive
-	-- (it iterates through every unit) and doesn't change during the cycle, so
-	-- we'll use memoization to boost performance a little bit.
-	if playerTeamStatsCache[teamID] then return playerTeamStatsCache[teamID] end
-
-	local mMobs, mDefs = 0, 0
-	for i, unit in pairs(Spring.GetTeamUnits(teamID)) do
-		local unitDefID = Spring.GetUnitDefID(unit)
-		if UnitDefs[unitDefID] then -- shouldn't need to guard against nil here, but I've had it happen
-			local metal = UnitDefs[unitDefID].metalCost
-			local speed = UnitDefs[unitDefID].speed
-			local unarmed = UnitDefs[unitDefID].springCategories.unarmed
-			local _,_,_,_,buildprogress = Spring.GetUnitHealth(unit)
-			local isbuilt
-			if buildprogress and buildprogress == 1 then
-				isbuilt = true
+local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
+	local stats = playerTeamStatsCache[unitTeam]
+	if UnitDefs[unitDefID] then -- shouldn't need to guard against nil here, but I've had it happen
+		local metal = UnitDefs[unitDefID].metalCost
+		local speed = UnitDefs[unitDefID].speed
+		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
+		local isbuilt = not select(3, spGetUnitIsStunned(unitID))	
+		if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
+			if remove then
+				metal = -metal
 			end
-			if metal and metal < 1000000 then -- tforms show up as 1million cost, so ignore them
-				-- for mobiles, count only completed units
-				if speed and speed ~= 0 then
-					if isbuilt then mMobs = mMobs + metal end
-				-- for static defense, include full cost of unfinished units so you can see when your teammates are trying to build too much
-				elseif not unarmed then	mDefs = mDefs + metal
+			-- for mobiles, count only completed units
+			if speed and speed ~= 0 then
+				if remove then
+					finishedUnits[unitID] = nil
+					stats.mMobs = stats.mMobs + metal
+				elseif isbuilt then
+					finishedUnits[unitID] = true
+					stats.mMobs = stats.mMobs + metal
 				end
+			-- for static defense, include full cost of unfinished units so you can see when your teammates are trying to build too much
+			elseif not unarmed then
+				stats.mDefs = stats.mDefs + metal
 			end
 		end
 	end
+end
+
+local function GetPlayerTeamStats(teamID)
+	if not playerTeamStatsCache[teamID] then
+		playerTeamStatsCache[teamID] = {mMobs = 0, mDefs = 0}
+		local units = Spring.GetTeamUnits(teamID)
+		for i=1,#units do
+			local unitID = units[i]
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			ProcessUnit(unitID, unitDefID, teamID)
+		end
+	end
+	
+	local stats = playerTeamStatsCache[teamID]
+	
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = Spring.GetTeamResources(teamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
 	if eStor then
@@ -429,23 +444,18 @@ local function GetPlayerTeamStats(teamID)
 	if mStore and mStore == 0 then mStore = 1000 end
 	if eStore and eStore == 0 then eStore = 1000 end
 
-	-- memoize the results
-	playerTeamStatsCache[teamID] = {
-		-- Default these to 1 if the value is nil for some reason.
-		-- These should never be 1 in normal play, so if you see
-		--   them showing up as 1 then that means that something got nil,
-		--   which should perhaps then be looked into further.
-		-- Whereas it's quite reasonable for them to sometimes be zero.
-		--
-		mMobs = mMobs or 1,
-		mDefs = mDefs or 1,
-		mInco = mInco or 1,
-		eInco = eInco or 1,
-		mCurr = mCurr or 1,
-		mStor = mStor or 1,
-		eCurr = eCurr or 1,
-		eStor = eStor or 1,
-	}
+	-- Default these to 1 if the value is nil for some reason.
+	-- These should never be 1 in normal play, so if you see
+	--   them showing up as 1 then that means that something got nil,
+	--   which should perhaps then be looked into further.
+	-- Whereas it's quite reasonable for them to sometimes be zero.
+	stats.mInco = mInco or 1
+	stats.eInco = eInco or 1
+	stats.mCurr = mCurr or 1
+	stats.mStor = mStor or 1
+	stats.eCurr = eCurr or 1
+	stats.eStor = eStor or 1
+	
 	return playerTeamStatsCache[teamID]
 end
 
@@ -1358,7 +1368,6 @@ function widget:Update(s)
 --			end
 --			updateCount = (updateCount + 1) % updateModulus
 			if (not scroll_cpl.parent) then return end --//don't update when window is hidden
-			playerTeamStatsCache = {}
 			UpdatePlayerInfo()
 		end
 
@@ -1388,6 +1397,42 @@ end
 -- workaround for stupidity
 function widget:GameStart()
 	SetupPanels()
+end
+
+-----------------------------------------------------------------------
+-- we need both UnitCreated and UnitFinished because mobiles and static defense aren't treated the same >:<
+function widget:UnitCreated(unitID, unitDefID, unitTeam)
+	local speed = UnitDefs[unitDefID].speed
+	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
+	if (speed == nil or speed == 0) and not unarmed then -- is static-d
+		ProcessUnit(unitID, unitDefID, unitTeam)
+	end
+end
+
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
+	local speed = UnitDefs[unitDefID].speed
+	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
+	if speed and speed ~= 0 and (not finishedUnits[unitID]) then	-- mobile unit
+		ProcessUnit(unitID, unitDefID, unitTeam)
+	end
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	local speed = UnitDefs[unitDefID].speed
+	local unarmed = UnitDefs[unitDefID].springCategories.unarmed
+	if speed and speed ~= 0 then	-- mobile unit
+	      if finishedUnits[unitID] then
+		      ProcessUnit(unitID, unitDefID, unitTeam, true)
+	      end
+	elseif not unarmed then	-- static defense
+	      ProcessUnit(unitID, unitDefID, unitTeam, true)
+	end
+end
+
+function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
+	-- doing this twice is a bit inefficient but bah
+	ProcessUnit(unitID, unitDefID, teamID, true)
+	ProcessUnit(unitID, unitDefID, newTeamID)
 end
 
 -----------------------------------------------------------------------
