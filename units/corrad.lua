@@ -76,10 +76,10 @@ unitDef = {
     --  def                = [[TARGETER]],
     --  onlyTargetCategory = [[NONE]],
     --},
-    {
-      def                = [[SCANNERSWEEP]],
-      onlyTargetCategory = [[NONE]],
-    },
+    --{
+    --  def                = [[SCANNERSWEEP]],
+    --  onlyTargetCategory = [[NONE]],
+    --},
   },
 
 
