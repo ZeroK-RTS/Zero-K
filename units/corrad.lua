@@ -50,6 +50,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[ARADARLVL1.s3o]],
+  script                        = [[corrad.lua]],
   onoffable                     = true,
   radarDistance                 = 2100,
   radarHeight					= 60,

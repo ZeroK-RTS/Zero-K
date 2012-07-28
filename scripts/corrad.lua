@@ -74,7 +74,9 @@ function script.Create()
 	StartThread(SmokeUnit)
 	--StartThread(ScannerLoop)
 	local cmd = Spring.FindUnitCmdDesc(unitID, CMD.ATTACK)
-	if cmd then Spring.RemoveUnitCmdDesc(unitID, cmd) end
+	if cmd then 
+		Spring.RemoveUnitCmdDesc(unitID, cmd) 
+	end
 end
 
 function script.Activate()
