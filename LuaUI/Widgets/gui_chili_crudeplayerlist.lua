@@ -599,7 +599,7 @@ end
 
 local function AlignScrollPanel()
 	--push things to bottom of window if needed
-	local height = math.ceil(row * (fontsize+1.5) + 8)
+	local height = math.ceil(row * (options.text_height.value+1.5) + 8)
 	scroll_cpl.height = math.min(height, window_cpl.height)
 	if not (options.alignToTop.value) then
 		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
