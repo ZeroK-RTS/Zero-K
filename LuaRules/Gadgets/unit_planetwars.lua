@@ -17,7 +17,8 @@ if (not gadgetHandler:IsSyncedCode()) then
 end
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
-local defender = nil
+--local defenderTeam = nil
+local defenderFaction = Spring.GetModOptions().defendingfaction
 
 include "LuaRules/Configs/customcmds.h.lua"
 
@@ -36,6 +37,7 @@ local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
 local TRANSLOCATION_MULT = 0.6		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
+local DEFENDER_ALLYTEAM = 1
 local HQ_DEF_ID = UnitDefNames.pw_hq.id
 
 local unitData = {}
@@ -183,10 +185,11 @@ function gadget:GamePreload()
 	normaliseBoxes(box[1])
 
 	-- spawn PW planet structures
-	if defender then
-		local n = select(6, Spring.GetTeamInfo(defender))
-		local x1, y1, x2, y2 = TranslocateBoxes(box[n])
-		spawnStructures(x1, y1, x2, y2, defender)
+	if defenderFaction then
+		local teams = Spring.GetTeamList(DEFENDER_ALLYTEAM)
+		local team = teams[math.random(#teams)]
+		local x1, y1, x2, y2 = TranslocateBoxes(box[DEFENDER_ALLYTEAM])
+		spawnStructures(x1, y1, x2, y2, team)
 	elseif box[0].right - box[0].left >= 0.9 and box[1].right - box[1].left >= 0.9 then -- north vs south
 		spawnStructures(0.1,0.44,0.9,0.56)
 	elseif box[0].bottom - box[0].top >= 0.9 and box[1].bottom - box[1].top >= 0.9 then -- east vs west
@@ -196,7 +199,7 @@ function gadget:GamePreload()
 	end
 	
 	-- spawn field command centers
-	for i=0,1 do
+	for i=0,(defenderFaction and 1 or 0) do
 		local x1, y1, x2, y2 = TranslocateBoxes(box[i])
 		local teams = Spring.GetTeamList(i)
 		local team = teams[math.random(#teams)]
@@ -244,13 +247,15 @@ function gadget:Initialize()
 			unitData = {} 
 		end
 		
+		--[[
 		for _,teamID in pairs(Spring.GetTeamList()) do
 			local keys = select(7, Spring.GetTeamInfo(teamID))
 			if keys and keys.defender then
-				defender = teamID
+				defenderTeam = teamID
 				break
 			end
 		end
+		]]
 		
 		-- spawning code
 		--[[
@@ -299,7 +304,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if (unitsByID[unitID]) and (not canAttackTeams[attackerTeam]) then
+	if (unitsByID[unitID] or hqs[unitID]) and (not canAttackTeams[attackerTeam]) then
 		return 0
 	end
 	return damage
