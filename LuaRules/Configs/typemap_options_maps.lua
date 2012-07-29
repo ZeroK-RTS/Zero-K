@@ -3,4 +3,5 @@ return {
 	["CenterrockV12"] = "alloff",
 	["DeltaSiegeDry"] = "alloff",
   ["CathraldaV10"] = "alloff",
+  ["Vein"] = "alloff",
 }
