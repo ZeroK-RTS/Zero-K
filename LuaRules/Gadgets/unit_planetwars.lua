@@ -355,7 +355,6 @@ function gadget:Initialize()
 	else
 		local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
 		local pwDataRaw = modOptions.planetwarsstructures
-		Spring.Echo("pwDataRaw " .. pwDataRaw)
 		local pwDataFunc, err, success
 		if not (pwDataRaw and type(pwDataRaw) == 'string') then
 			err = "Planetwars data entry in modoption is empty or in invalid format"
