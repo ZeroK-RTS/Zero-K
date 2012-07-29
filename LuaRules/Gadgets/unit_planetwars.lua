@@ -76,19 +76,19 @@ local function initialiseNoGoZones()
 			local fID = features[i]
 			if FeatureDefs[Spring.GetFeatureDefID(fID)].geoThermal then
 				local x, _, z = Spring.GetFeaturePosition(fID)
-				if (geoDefInfo.oddX) then
+				if (oddX) then
 					x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 				else
 					x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 				end
-				if (geoDefInfo.oddZ) then
+				if (oddZ) then
 					z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 				else
 					z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 				end
 				
 				noGoZones.count = noGoZones.count + 1
-				noGoZones.data[noGoZones.count] = {zl = z-sZ, zu = z+sZ, xl = x-sX, xu = x-xZ}
+				noGoZones.data[noGoZones.count] = {zl = z-sZ, zu = z+sZ, xl = x-sX, xu = x-sZ}
 			end
 		end
 	end
