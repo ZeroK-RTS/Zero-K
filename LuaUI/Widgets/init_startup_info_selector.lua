@@ -222,7 +222,7 @@ function widget:Initialize()
 			width = 64,
 			height = 64,
 			right = 0,
-			y = 128,
+			y = 160,
 			tweakDraggable = true,
 			color = {0, 0, 0, 0},
 			padding = {0, 0, 0, 0},
