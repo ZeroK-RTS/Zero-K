@@ -32,6 +32,7 @@ local abandonCMD = {
 }
 
 local spGetGroundHeight	= Spring.GetGroundHeight
+local spAreTeamsAllied = Spring.AreTeamsAllied
 
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
@@ -304,7 +305,9 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if (unitsByID[unitID] or hqs[unitID]) and (not canAttackTeams[attackerTeam]) then
+	if (unitsByID[unitID]) and attackerTeam and (not canAttackTeams[attackerTeam]) then
+		return 0
+	elseif hqs[unitID] and attackerTeam and (spAreTeamsAllied(unitTeam, attackerTeam)) then
 		return 0
 	end
 	return damage
