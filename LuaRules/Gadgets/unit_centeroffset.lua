@@ -21,7 +21,7 @@ if gadgetHandler:IsSyncedCode() then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-if not Spring.Spring.SetUnitMidAndAimPos then
+if not Spring.SetUnitMidAndAimPos then
 	return
 end
 

@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		version   = "v1.1",
 		date      = "November 2010",
 		license   = "GNU GPL, v2 or later",
-		layer     = -30000,
+		layer     = -math.huge,
 		enabled   = true
 	}
 end
@@ -123,6 +123,8 @@ function gadget:Initialize()
 	_G.metalSpots = metalSpots
 	
 	GG.IntegrateMetal = IntegrateMetal
+	
+	Spring.Echo("Metal Spots found and GGed")
 end
 
 ------------------------------------------------------------

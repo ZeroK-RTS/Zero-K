@@ -506,8 +506,8 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		end
 	end
 	-- check it's all working
-	--[[
 	
+	--[[
 	Spring.MarkerAddPoint( border.left,0,border.top,"topleft")
 	Spring.MarkerAddPoint( border.right,0,border.bottom,"botright")
 	Spring.MarkerAddPoint( x1,y1,z1,  "start")

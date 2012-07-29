@@ -5,7 +5,7 @@ function gadget:GetInfo()
 		author = "GoogleFrog",
 		date = "27, April 2011",
 		license = "Public Domain",
-		layer = math.huge,
+		layer = math.huge-10,
 		enabled = true
 	}
 end
@@ -19,6 +19,9 @@ end
 ------------------------------------------------------------------------
 --local defenderTeam = nil
 local defenderFaction = Spring.GetModOptions().defendingfaction
+
+local spAreTeamsAllied		= Spring.AreTeamsAllied
+local floor = math.floor
 
 include "LuaRules/Configs/customcmds.h.lua"
 
@@ -48,9 +51,88 @@ local hqsDestroyed = {}
 local stuffToReport = {data = {}, count = 0}
 local canAttackTeams = {}	-- teams that can attack PW structures
 
+local BUILD_RESOLUTION = 16
+
 GG.PlanetWars = {}
 GG.PlanetWars.unitsByID = unitsByID
 GG.PlanetWars.hqs = hqs
+
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+local noGoZones = {count = 0, data = {}}
+
+local function initialiseNoGoZones()
+
+	do
+		local geoUnitDef = UnitDefNames["geo"]
+		local features = Spring.GetAllFeatures()
+		
+		local sX = geoUnitDef.xsize*4
+		local sZ = geoUnitDef.zsize*4
+		local oddX = geoUnitDef.xsize % 4 == 2
+		local oddZ = geoUnitDef.zsize % 4 == 2
+		for i = 1, #features do
+			local fID = features[i]
+			if FeatureDefs[Spring.GetFeatureDefID(fID)].geoThermal then
+				local x, _, z = Spring.GetFeaturePosition(fID)
+				if (geoDefInfo.oddX) then
+					x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+				else
+					x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+				end
+				if (geoDefInfo.oddZ) then
+					z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+				else
+					z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+				end
+				
+				noGoZones.count = noGoZones.count + 1
+				noGoZones.data[noGoZones.count] = {zl = z-sZ, zu = z+sZ, xl = x-sX, xu = x-xZ}
+			end
+		end
+	end
+
+	do
+		local mexUnitDef = UnitDefNames["cormex"]
+		local metalSpots = GG.metalSpots
+		
+		if metalSpots then
+			local sX = mexUnitDef.xsize*4
+			local sZ = mexUnitDef.zsize*4
+			for i = 1, #metalSpots do
+				local x = metalSpots[i].x
+				local z = metalSpots[i].z
+				noGoZones.count = noGoZones.count + 1
+				noGoZones.data[noGoZones.count] = {zl = z-sZ, zu = z+sZ, xl = x-sX, xu = x+sX}
+			end
+		end
+	end
+	--[[
+	for i = 1, noGoZones.count do
+		local d = noGoZones.data[i]
+		--Spring.Echo("bla")
+		Spring.MarkerAddPoint(d.xl,0,d.zl,"")
+		Spring.MarkerAddPoint(d.xl,0,d.zu,"")
+		Spring.MarkerAddPoint(d.xu,0,d.zl,"")
+		Spring.MarkerAddPoint(d.xu,0,d.zu,"")
+		Spring.MarkerAddLine(d.xl,0,d.zl,d.xu,0,d.zl)
+		Spring.MarkerAddLine(d.xu,0,d.zl,d.xu,0,d.zu)
+		Spring.MarkerAddLine(d.xu,0,d.zu,d.xl,0,d.zu)
+		Spring.MarkerAddLine(d.xl,0,d.zu,d.xl,0,d.zl)
+	end
+	--]]
+end
+
+local function checkOverlapWithNoGoZone(xl,zl,xu,zu) -- intersection check does not include boundry points
+	for i = 1, noGoZones.count do
+		local d = noGoZones.data[i]
+		if xl < d.xu and xu > d.xl and zl < d.zu and zu > d.zl then 
+			return true
+		end
+	end
+	return false
+end
 
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
@@ -108,7 +190,6 @@ local function TranslocateBoxes(box)
 	return x1, y1, x2, y2
 end
 
-
 local function spawnStructures(left, top, right, bottom, team)
 	local teamID = team or Spring.GetGaiaTeamID()
 	local xBase = mapWidth*left
@@ -130,7 +211,31 @@ local function spawnStructures(left, top, right, bottom, team)
 			elseif info.isDestroyed == 1 then
 				--do nothing
 			else
-				while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or (lava and Spring.GetGroundHeight(x,z) <= 0)) and giveUp < 25 do
+				local unitDef = UnitDefs[defID]
+				local oddX = unitDef.xsize % 4 == 2
+				local oddZ = unitDef.zsize % 4 == 2
+				local sX = unitDef.xsize*4
+				local sZ = unitDef.xsize*4
+				
+				if direction == 1 or direction == 3 then
+					sX, sZ = sZ, sX
+					oddX, oddZ = oddZ, oddX
+				end
+				
+				if (unitDef.oddX) then
+					x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+				else
+					x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+				end
+				if (unitDef.oddZ) then
+					z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+				else
+					z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+				end
+				while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or
+					  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
+					  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) 
+					  and giveUp < 50 do
 					x = xBase + math.random()*xRand
 					z = zBase + math.random()*zRand
 					giveUp = giveUp + 1
@@ -159,7 +264,32 @@ local function SpawnHQ(left, top, right, bottom, team)
 	local z = zBase + math.random()*zRand
 	local direction = math.floor(math.random()*4)
 	
-	while (Spring.TestBuildOrder(HQ_DEF_ID, x, 0 ,z, direction) == 0 or (lava and Spring.GetGroundHeight(x,z) <= 0)) and giveUp < 25 do
+	local unitDef = UnitDefs[HQ_DEF_ID]
+	local oddX = unitDef.xsize % 4 == 2
+	local oddZ = unitDef.zsize % 4 == 2
+	local sX = unitDef.xsize*4
+	local sZ = unitDef.xsize*4
+	
+	if direction == 1 or direction == 3 then
+		sX, sZ = sZ, sX
+		oddX, oddZ = oddZ, oddX
+	end
+	
+	if (unitDef.oddX) then
+		x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+	else
+		x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+	end
+	if (unitDef.oddZ) then
+		z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+	else
+		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+	end
+	
+	while (Spring.TestBuildOrder(HQ_DEF_ID, x, 0 ,z, direction) == 0 or
+		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
+		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) 
+		  and giveUp < 25 do
 		x = xBase + math.random()*xRand
 		z = zBase + math.random()*zRand
 		giveUp = giveUp + 1
@@ -209,6 +339,7 @@ function gadget:GamePreload()
 end
 
 function gadget:Initialize()
+	initialiseNoGoZones()
 	if Spring.GetGameFrame() > 0 then	--game has started
 		local units = Spring.GetAllUnits()
 		for i=1,#units do
@@ -224,6 +355,7 @@ function gadget:Initialize()
 	else
 		local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
 		local pwDataRaw = modOptions.planetwarsstructures
+		Spring.Echo("pwDataRaw " .. pwDataRaw)
 		local pwDataFunc, err, success
 		if not (pwDataRaw and type(pwDataRaw) == 'string') then
 			err = "Planetwars data entry in modoption is empty or in invalid format"
@@ -305,9 +437,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if (unitsByID[unitID]) and attackerTeam and (not canAttackTeams[attackerTeam]) then
-		return 0
-	elseif hqs[unitID] and attackerTeam and (spAreTeamsAllied(unitTeam, attackerTeam)) then
+	if attackerTeam and ((unitsByID[unitID] and (not canAttackTeams[attackerTeam])) or (spAreTeamsAllied(unitTeam, attackerTeam) and hqs[unitID])) then
 		return 0
 	end
 	return damage
