@@ -1,13 +1,19 @@
 local base = piece 'base'
 local fuselage = piece 'fuselage' 
-local wingl = piece 'wingl' 
-local wingr = piece 'wingr' 
-local enginel = piece 'enginel' 
-local enginer = piece 'enginer' 
-local finl = piece 'finl' 
-local finr = piece 'finr' 
+local wingl1 = piece 'wingl1' 
+local wingr1 = piece 'wingr1' 
+local wingl2 = piece 'wingl2' 
+local wingr2 = piece 'wingr2' 
+local engines = piece 'engines' 
+local fins = piece 'fins' 
+local rflap = piece 'rflap' 
+local lflap = piece 'lflap' 
 local predrop = piece 'predrop' 
-local drop = piece 'drop' 
+local drop1 = piece 'drop1' 
+local drop2 = piece 'drop2' 
+local drop3 = piece 'drop3' 
+local drop4 = piece 'drop4' 
+local engines = piece 'engines' 
 local thrustl = piece 'thrustl' 
 local thrustr = piece 'thrustr' 
 local wingtipl = piece 'wingtipl' 
@@ -15,20 +21,29 @@ local wingtipr = piece 'wingtipr'
 local xp,zp = piece("x","z")
 
 
-smokePiece = {fuselage, enginel, enginer}
+smokePiece = {fuselage, thrustr, thrustl}
+
+local bombs = 1
 
 include "bombers.lua"
 include "fakeUpright.lua"
 include "constants.lua"
 
 function script.StartMoving()
-	Turn( finl , z_axis, math.rad(-(-30)), math.rad(50) )
-	Turn( finr , z_axis, math.rad(-(30)), math.rad(50) )
+	Turn( fins , z_axis, math.rad(-(-30)), math.rad(50) )
+	Move( wingr1 , x_axis, 0, 50)
+	Move( wingr2 , x_axis, 0, 50)
+	Move( wingl1 , x_axis, 0, 50)
+	Move( wingl2 , x_axis, 0, 50)
 end
 
 function script.StopMoving()
-	Turn( finl , z_axis, math.rad(-(0)), math.rad(80) )
-	Turn( finr , z_axis, math.rad(-(0)), math.rad(80) )
+	Turn( fins , z_axis, math.rad(-(0)), math.rad(80) )
+	Move( wingr1 , x_axis, -5, 30)
+	Move( wingr2 , x_axis, -5, 30)
+	Move( wingl1 , x_axis, 5, 30)
+	Move( wingl2 , x_axis, 5, 30)
+	
 end
 
 local function Lights()
@@ -50,7 +65,7 @@ end
 
 function script.QueryWeapon(num)
 	--FakeUprightTurn(unitID, xp, zp, base, predrop)
-	return drop
+	return drop1
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -77,29 +92,29 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(fuselage, sfxNone)
 		Explode(enginel, sfxNone)
 		Explode(enginer, sfxNone)
-		Explode(wingl, sfxNone)
-		Explode(wingr, sfxNone)
+		Explode(wingl1, sfxNone)
+		Explode(wingr2, sfxNone)
 		return 1
 	elseif severity <= .50  then
 		Explode(fuselage, sfxNone)
 		Explode(enginel, sfxNone)
 		Explode(enginer, sfxNone)
-		Explode(wingl, sfxNone)
-		Explode(wingr, sfxNone)
+		Explode(wingl2, sfxNone)
+		Explode(wingr1, sfxNone)
 		return 1
 	elseif severity <= 99  then
 		Explode(fuselage, sfxNone)
 		Explode(enginel, sfxFall + sfxSmoke  + sfxFire )
 		Explode(enginer, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingl, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingr, sfxFall + sfxSmoke  + sfxFire )
+		Explode(wingl1, sfxFall + sfxSmoke  + sfxFire )
+		Explode(wingr2, sfxFall + sfxSmoke  + sfxFire )
 		return 2
 	else
 		Explode(fuselage, sfxNone)
 		Explode(enginel, sfxFall + sfxSmoke  + sfxFire )
 		Explode(enginer, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingl, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingr, sfxFall + sfxSmoke  + sfxFire )
+		Explode(wingl1, sfxFall + sfxSmoke  + sfxFire )
+		Explode(wingl2, sfxFall + sfxSmoke  + sfxFire )
 		return 2
 	end
 end
