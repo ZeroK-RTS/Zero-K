@@ -64,6 +64,39 @@ if not commData then commData = {} end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- generate the baseline comm
+-- identical to SP strike comm except it costs 1250
+
+local function GenerateBasicComm()
+	UnitDefs.commbasic = CopyTable(UnitDefs.armcom1, true)
+	local def = UnitDefs.commbasic
+	def.unitname = "commbasic"
+	def.name = "Commander Junior"
+	def.description = "Basic Commander, Builds at 10 m/s"
+	def.buildcostmetal = 1250
+	def.buildcostenergy = 1250
+	def.buildtime = 1250
+	
+	def.customparams.helptext = "The Commander Junior is a basic version of the popular Strike Commander platform, issued to new commanders. "
+			            .."While lacking the glory of its customizable brethren, the Commander Jr. remains an effective tool with full base-building and combat capabilites."
+	
+	for featureName,array in pairs(def.featuredefs) do
+		local mult = 0.4
+		local typeName = "Wreckage"
+		if featureName == "heap" then
+			typeName = "Debris"
+			mult = 0.2 
+		end
+		array.description = typeName .. " - Commander Junior"
+		array.metal = 1250 * mult
+		array.reclaimtime = 1250 * mult
+	end
+end
+
+GenerateBasicComm()
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 commDefs = {}	--holds precedurally generated comm defs
 
 local function ProcessComm(name, config)

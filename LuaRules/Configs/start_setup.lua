@@ -3,6 +3,7 @@ startUnits = {
 	battlecomm = 'corcom1',
 	supportcomm = 'commsupport1',
 	reconcomm = 'commrecon1',
+	basiccomm = 'commbasic'
 }
 
 startUnitsAI = {
