@@ -16,7 +16,7 @@ unitDef = {
   --corpse                        = [[DEAD]],
 
   customParams                  = {
-  	helptext = [[This building is integral to strategic control of the planet. If the winning team loses their Command Center, their influence gains are halved.]]
+  	helptext = [[This building is integral to strategic control of the planet. If the winning team loses their Command Center, their influence gains are halved.]],
   	dontcount = [[1]],
 	soundselect = "building_select1",
   },
