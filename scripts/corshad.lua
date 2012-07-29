@@ -30,21 +30,19 @@ include "fakeUpright.lua"
 include "constants.lua"
 
 function script.StartMoving()
-	Spring.Echo("StartMoving")
 	Turn( fins , z_axis, math.rad(-(-30)), math.rad(50) )
-	Move( wingr1 , x_axis, 500, 10)
-	Move( wingr2 , x_axis, 500, 50)
-	Move( wingl1 , x_axis, -500, 10)
-	Move( wingl2 , x_axis, -500, 50)
+	Move( wingr1 , x_axis, 0, 50)
+	Move( wingr2 , x_axis, 0, 50)
+	Move( wingl1 , x_axis, 0, 50)
+	Move( wingl2 , x_axis, 0, 50)
 end
 
 function script.StopMoving()
-	Spring.Echo("StopMoving")
 	Turn( fins , z_axis, math.rad(-(0)), math.rad(80) )
-	Move( wingr1 , x_axis, -500, 10)
-	Move( wingr2 , x_axis, -500, 30)
-	Move( wingl1 , x_axis, 500, 10)
-	Move( wingl2 , x_axis, 500, 30)
+	Move( wingr1 , x_axis, 5, 30)
+	Move( wingr2 , x_axis, 5, 30)
+	Move( wingl1 , x_axis, -5, 30)
+	Move( wingl2 , x_axis, -5, 30)
 	
 end
 
