@@ -3,11 +3,8 @@ local spinner = piece 'spinner'
 local arm = piece 'arm' 
 local ant = piece 'ant' 
 local dish = piece 'dish' 
-local pontoon1 = piece 'pontoon1' 
-local pontoon2 = piece 'pontoon2' 
-local pontoon3 = piece 'pontoon3' 
-local pontoon4 = piece 'pontoon4' 
---linear constant 163840
+local float1 = piece 'float1' 
+local float2 = piece 'float2' 
 
 include "constants.lua"
 
@@ -20,14 +17,8 @@ local SIG_OPEN = 2
 
 function script.Create()
 	if not onWater() then 
-		Move( pontoon1 , y_axis, 3.75  )
-		Hide( pontoon1)
-		Move( pontoon2 , y_axis, 3.75  )
-		Hide( pontoon2)
-		Move( pontoon3 , y_axis, 3.75  )
-		Hide( pontoon3)
-		Move( pontoon4 , y_axis, 3.75  )
-		Hide( pontoon4)
+		--Hide(float1)
+		--Hide(float2)
 	end
 	StartThread(SmokeUnit)
 end

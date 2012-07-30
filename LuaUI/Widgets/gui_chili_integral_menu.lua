@@ -1431,15 +1431,17 @@ function widget:Update()
 	end
 end
 
-function widget:GameFrame()
+function widget:GameFrame(n)
 	--set progress bar
-	if menuChoice == 6 and selectedFac and buildRowButtons[1] and buildRowButtons[1].image then
-		local progress
-		local unitBuildID      = spGetUnitIsBuilding(selectedFac)
-		if unitBuildID then 
-			progress = select(5, spGetUnitHealth(unitBuildID))
+	if n%6 == 0 then
+		if menuChoice == 6 and selectedFac and buildRowButtons[1] and buildRowButtons[1].image then
+			local progress
+			local unitBuildID      = spGetUnitIsBuilding(selectedFac)
+			if unitBuildID then 
+				progress = select(5, spGetUnitHealth(unitBuildID))
+			end
+			buildProgress:SetValue(progress or 0)
 		end
-		buildProgress:SetValue(progress or 0)
 	end
 end
 

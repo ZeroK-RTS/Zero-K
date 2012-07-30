@@ -73,7 +73,7 @@ local BUTTON_HEIGHT = 52
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-local UPDATE_FREQUENCY = 0.1
+local UPDATE_FREQUENCY = 0.25
 
 local exceptionList = {
 	armasp = true,
@@ -811,9 +811,13 @@ function widget:Update(dt)
 	for i=1,#comms do
 		local comm = comms[i]
 		if comm.button and comm.warningTime > 0 then
-			comms[i].button.backgroundColor = (warningColorPhase and buttonColorWarning) or buttonColor
-			comms[i].button:Invalidate()
 			comm.warningTime = comm.warningTime - timer
+			if comm.warningTime > 0 then
+				comms[i].button.backgroundColor = (warningColorPhase and buttonColorWarning) or buttonColor
+			else
+				comms[i].button.backgroundColor = buttonColor
+			end
+			comms[i].button:Invalidate()
 		end
 	end	
 	timer = 0

@@ -43,7 +43,7 @@ local lastEStallEvent = 0
 local airSpotted = false
 local nukeSpotted = false
 
-local UPDATE_PERIOD = 0.02	-- seconds
+local UPDATE_PERIOD = 0.03	-- seconds
 local UPDATE_PERIOD_LONG = 0.5	-- seconds
 local UPDATE_PERIOD_RESOURCES = 90	-- gameframes
 local RESOURCE_WARNING_PERIOD = 900	-- gameframes
@@ -61,16 +61,17 @@ local myTeam				= Spring.GetMyTeamID()
 --------------------------------------------------------------------------------
 --SPEEDUPS
 --------------------------------------------------------------------------------
-local Echo					= Spring.Echo
-local spGetTeam				= Spring.GetUnitTeam
+local Echo			= Spring.Echo
+local spGetTeam			= Spring.GetUnitTeam
 local spGetGameSeconds		= Spring.GetGameSeconds
-local spInView				= Spring.IsUnitInView
-local spGetTeamRes			= Spring.GetTeamResources
+local spInView			= Spring.IsUnitInView
+local spGetTeamRes		= Spring.GetTeamResources
 local spGetLastAttacker		= Spring.GetUnitLastAttacker
 local spGetGameFrame		= Spring.GetGameFrame
 local spGetSpectatingState	= Spring.GetSpectatingState
-local spIsReplay			= Spring.IsReplay
-local spGetMyTeamID			= Spring.GetMyTeamID
+local spIsReplay		= Spring.IsReplay
+local spGetMyTeamID		= Spring.GetMyTeamID
+local spAreTeamsAllied		= Spring.AreTeamsAllied
 
 local spPlaySoundFile		= Spring.PlaySoundFile
 local spMarkerAddPoint		= Spring.MarkerAddPoint
@@ -250,11 +251,13 @@ function widget:Update(dt)
 		ProcessLabels()
 		timerUpdate = 0
 	end
+	--[[
 	timerUpdateLong = timerUpdateLong + dt
 	if timerUpdateLong > UPDATE_PERIOD_LONG then
-		--CheckSpecState()
+		CheckSpecState()
 		timerUpdateLong = 0
 	end
+	]]--
 end
 
 function widget:GameFrame(n)
@@ -274,7 +277,7 @@ function widget:GameFrame(n)
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
-	if not Spring.AreTeamsAllied(unitTeam, myTeam) then
+	if (not spAreTeamsAllied(unitTeam, myTeam)) then
 		local unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
 		local pos = {Spring.GetUnitPosition(unitID)}
 		if unitDef.canFly and not airSpotted then
