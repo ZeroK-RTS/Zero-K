@@ -20,6 +20,7 @@ if VFS.FileExists("nomapedgewidget.txt") then
 end
 
 local spGetGroundHeight = Spring.GetGroundHeight
+local spTraceScreenRay = Spring.TraceScreenRay
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local gridTex = "LuaUI/Images/vr_grid_large.dds"
@@ -81,7 +82,17 @@ options = {
 			gl.DeleteList(dList)
 			widget:Initialize()
 		end, 		
-	},		
+	},	
+	northSouthText = {
+		name = "North, East, South, & West text",
+		type = 'bool',
+		value = false,
+		desc = 'Help you identify map direction under rotation by placing a "North/South/East/West" text on the map edges',
+		OnChange = function(self)
+			gl.DeleteList(dList)
+			widget:Initialize()
+		end, 		
+	},			
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -152,6 +163,32 @@ local function IsIsland()
 		end	
 	end
 	return true
+end
+
+local function TextOutside()
+	if (options.northSouthText.value) then
+		local mapSizeX = Game.mapSizeX
+		local mapSizeZ = Game.mapSizeZ
+		local average = (GetGroundHeight(mapSizeX/2,0) + GetGroundHeight(0,mapSizeZ/2) + GetGroundHeight(mapSizeX/2,mapSizeZ) +GetGroundHeight(mapSizeX,mapSizeZ/2))/4
+
+		gl.Rotate(-90,1,0,0)
+		gl.Translate (0,0,average)		
+		gl.Text("North", mapSizeX/2, 200, 200, "co")
+		
+		gl.Rotate(-90,0,0,1)
+		gl.Text("East", mapSizeZ/2, mapSizeX+200, 200, "co")
+		
+		gl.Rotate(-90,0,0,1)	
+		gl.Text("South", -mapSizeX/2, mapSizeZ +200, 200, "co")
+		
+		gl.Rotate(-90,0,0,1)
+		gl.Text("West", -mapSizeZ/2,200, 200, "co")
+		
+		-- gl.Text("North", mapSizeX/2, 100, 200, "on")
+		-- gl.Text("South", mapSizeX/2,-mapSizeZ, 200, "on")
+		-- gl.Text("East", mapSizeX,-(mapSizeZ/2), 200, "on")
+		-- gl.Text("West", 0,-(mapSizeZ/2), 200, "on")
+	end
 end
 
 local function DrawMapVertices(useMirrorShader)
@@ -230,6 +267,16 @@ local function DrawOMap(useMirrorShader)
 	gl.DepthTest(false)
 	gl.Color(1,1,1,1)
 	gl.Blending(GL.SRC_ALPHA,GL.ONE_MINUS_SRC_ALPHA)
+	
+	----draw map compass text
+	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
+	gl.Texture(false)
+	gl.DepthMask(false)
+	gl.DepthTest(false)
+	gl.Color(1,1,1,1)
+	TextOutside()
+	gl.PopAttrib()
+	----	
 end
 
 function widget:Initialize()
@@ -323,4 +370,16 @@ function widget:DrawWorldPreUnit() --is overwritten when not using the shader
         
         gl.Fog(false)
     end
+end
+
+function widget:MousePress(x, y, button)
+	local _, mpos = spTraceScreenRay(x, y, true) --//convert UI coordinate into ground coordinate.
+	if mpos==nil then --//activate epic menu if mouse position is outside the map
+		local _, _, meta, _ = Spring.GetModKeyState()
+		if meta then  --//show epicMenu when user also press the Spacebar
+			WG.crude.OpenPath(options_path) --click + space will shortcut to option-menu
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+			return false
+		end
+	end
 end
