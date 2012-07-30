@@ -165,7 +165,7 @@ end
 local function ProcessCommBuildOpts()
 	local chassisList = {"armcom", "corcom", "commrecon", "commsupport", "cremcom"}
 	local commanders = {}
-	local numLevels = 4
+	local numLevels = 5
 	
 	local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 	
@@ -181,6 +181,7 @@ local function ProcessCommBuildOpts()
 	end
 	
 	commanders[#commanders + 1] = "neebcomm"
+	commanders[#commanders + 1] = "commbasic"
 
 	for _,name in pairs(commanders) do
 		TagTree(name, "arm", buildOpts)
