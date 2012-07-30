@@ -104,7 +104,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		local transportID = inTransport[unitID].id
 		if transportMass[transportID] then
 			transportMass[transportID] = transportMass[transportID] - mass[unitDefID]
-			Spring.Echo(transportMass[transportID])
+			--Spring.Echo(transportMass[transportID])
 		end
 		inTransport[unitID] = nil
 		--Spring.Echo(transportMass[transportID])
