@@ -3,10 +3,6 @@ include "constants.lua"
 local base = piece 'base' 
 local ground = piece 'ground' 
 local head = piece 'head' 
-local emit1 = piece 'emit1' 
-local emit2 = piece 'emit2' 
-local emit3 = piece 'emit3' 
-local emit4 = piece 'emit4' 
 
 smokePiece = {head}
 
@@ -14,6 +10,7 @@ local SCANNER_PERIOD = 1000
 
 local on = false
 
+--[[
 local function TargetingLaser()
 	while on do
 		Turn( emit1 , x_axis, math.rad(-50) )
@@ -53,7 +50,7 @@ local function TargetingLaser()
 		Sleep(20)
 	end
 end
-
+]]
 local index = 0
 local function ScannerLoop()
     while true do
