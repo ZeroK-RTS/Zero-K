@@ -13,7 +13,6 @@ local drop1 = piece 'drop1'
 local drop2 = piece 'drop2' 
 local drop3 = piece 'drop3' 
 local drop4 = piece 'drop4' 
-local engines = piece 'engines' 
 local thrustl = piece 'thrustl' 
 local thrustr = piece 'thrustr' 
 local wingtipl = piece 'wingtipl' 
@@ -90,29 +89,25 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if  severity <= .25  then
 		Explode(fuselage, sfxNone)
-		Explode(enginel, sfxNone)
-		Explode(enginer, sfxNone)
+		Explode(engines, sfxNone)
 		Explode(wingl1, sfxNone)
 		Explode(wingr2, sfxNone)
 		return 1
 	elseif severity <= .50  then
 		Explode(fuselage, sfxNone)
-		Explode(enginel, sfxNone)
-		Explode(enginer, sfxNone)
+		Explode(engines, sfxNone)
 		Explode(wingl2, sfxNone)
 		Explode(wingr1, sfxNone)
 		return 1
 	elseif severity <= 99  then
 		Explode(fuselage, sfxNone)
-		Explode(enginel, sfxFall + sfxSmoke  + sfxFire )
-		Explode(enginer, sfxFall + sfxSmoke  + sfxFire )
+		Explode(engines, sfxFall + sfxSmoke  + sfxFire )
 		Explode(wingl1, sfxFall + sfxSmoke  + sfxFire )
 		Explode(wingr2, sfxFall + sfxSmoke  + sfxFire )
 		return 2
 	else
 		Explode(fuselage, sfxNone)
-		Explode(enginel, sfxFall + sfxSmoke  + sfxFire )
-		Explode(enginer, sfxFall + sfxSmoke  + sfxFire )
+		Explode(engines, sfxFall + sfxSmoke  + sfxFire )
 		Explode(wingl1, sfxFall + sfxSmoke  + sfxFire )
 		Explode(wingl2, sfxFall + sfxSmoke  + sfxFire )
 		return 2
