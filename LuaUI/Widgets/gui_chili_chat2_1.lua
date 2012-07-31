@@ -561,8 +561,10 @@ local function displayMessage(msg, remake)
 		}
 		
 		if msg.point and options.clickable_points.value then
-			textbox.OnMouseDown = {function()
-				Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+			textbox.OnMouseDown = {function(self, x, y, mouse) 
+				if mouse == 1 then
+					Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+				end
 			end}
 			function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
 				return self
