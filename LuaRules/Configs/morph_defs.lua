@@ -481,7 +481,7 @@ local morphDefs = {
 --------------------------------------------------------------------------------
 -- modular commander handling
 --------------------------------------------------------------------------------
-local comMorph = {
+local comMorph = {	-- not needed
 	[1] = {
 		time = 20,
 	},
@@ -493,7 +493,10 @@ local comMorph = {
 	},
 	[4] = {
 		time = 35,
-	}
+	},
+	[5] = {
+		time = 40,
+	},
 }
 
 --[[
@@ -576,8 +579,8 @@ for id, playerData in pairs(customComms) do
 				Spring.Echo("Configuring comm morph: "..(array[i]) , array[i+1])
 				local sourceName, targetName = originDef.name, targetDef.name
 				local morphCost
-				local morphOption = comMorph[i] and Spring.Utilities.CopyTable(comMorph[i], true)
-				if morphOption then
+				local morphOption = comMorph[i] and Spring.Utilities.CopyTable(comMorph[i], true) or {}
+				--if morphOption then
 					morphOption.into = array[i+1]
 					-- set time
 					morphOption.time = math.floor( (targetDef.metalCost - originDef.metalCost) / (6 * (i+1)) ) or morphOption.time
@@ -591,10 +594,10 @@ for id, playerData in pairs(customComms) do
 					else
 						Spring.Echo("Duplicate morph, exiting")
 					end
-				else
-					Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Comm Morph error: no setting for level "..i.."->"..i+1 .. " transition")
-					break
-				end
+				--else
+					--Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Comm Morph error: no setting for level "..i.."->"..i+1 .. " transition")
+					--break
+				--end
 			end
 		end
 	end
