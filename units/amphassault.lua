@@ -15,9 +15,9 @@ unitDef = {
   canPatrol           = true,
   category            = [[LAND SINK]],
   collisionVolumeOffsets  = [[0 -24 1]],
-  collisionVolumeScales   = [[70 70 70]],
-  collisionVolumeTest	  = 1,
-  collisionVolumeType	  = [[ellipsoid]],
+  --collisionVolumeScales   = [[70 70 70]],
+  --collisionVolumeTest	  = 1,
+  --collisionVolumeType	  = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
