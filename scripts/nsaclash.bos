@@ -1,3 +1,4 @@
+//linear constant 163840
 #include "constants.h"
 
 piece  base, turret, lbarrel, rbarrel, lflare, rflare, exhaust, wake1, wake2, wake3, wake4,
@@ -136,8 +137,8 @@ Create()
 RestoreAfterDelay()
 {
 	sleep RESTORE_DELAY;
-	turn turret to y-axis <0.000000> speed <90.000000>;
-	turn turret to x-axis <0.000000> speed <45.000000>;
+	turn turret to y-axis <0.000000> speed <90>;
+	turn turret to x-axis <0.000000> speed <45>;
 }
 
 AimFromWeapon1(piecenum) {
@@ -148,12 +149,12 @@ AimWeapon1(heading, pitch)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
-	turn turret to y-axis heading speed <120.000000>;
-	turn turret to x-axis <0.000000> - pitch speed <100.000000>;
-	turn lbarrel to y-axis (<0> + pitch*2) speed <300.000000>;
-	turn rbarrel to y-axis (<0> - pitch*2) speed <300.000000>;
-	turn lbarrel to x-axis (<0> - pitch) speed <300.000000>;
-	turn rbarrel to x-axis (<0> - pitch) speed <300.000000>;
+	turn turret to y-axis heading speed <180>;
+	turn turret to x-axis <0.000000> - pitch speed <100>;
+	turn lbarrel to y-axis (<0> + pitch*2) speed <300>;
+	turn rbarrel to y-axis (<0> - pitch*2) speed <300>;
+	turn lbarrel to x-axis (<0> - pitch) speed <300>;
+	turn rbarrel to x-axis (<0> - pitch) speed <300>;
 	wait-for-turn turret around y-axis;
 	wait-for-turn turret around x-axis;
 	start-script RestoreAfterDelay();
