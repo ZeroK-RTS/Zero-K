@@ -420,14 +420,14 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- 3x repair speed than BP
+-- 2.5x repair speed than BP
 --
 
 for name, unitDef in pairs(UnitDefs) do
 	if (unitDef.repairspeed) then
-		unitDef.repairspeed = unitDef.repairspeed * 3
+		unitDef.repairspeed = unitDef.repairspeed * 2.5
 	elseif (unitDef.workertime) then 
-		unitDef.repairspeed = unitDef.workertime * 3
+		unitDef.repairspeed = unitDef.workertime * 2.5
     end
 end
 
