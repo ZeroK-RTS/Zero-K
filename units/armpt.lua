@@ -37,7 +37,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 117,
-  maxDamage              = 500,
+  maxDamage              = 400,
   maxVelocity            = 5.5,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -84,7 +84,7 @@ unitDef = {
 
   weaponDefs             = {
 
-	FAKEWEAPON = {
+    FAKEWEAPON = {
       name                    = [[Fake Missile]],
       areaOfEffect            = 8,
       craterBoost             = 0,
