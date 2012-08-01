@@ -109,6 +109,7 @@ function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 	--end	
 	
 	flashTime = TIME_TO_FLASH
+	Spring.PlaySoundFile("sounds/message_team.wav", 1, "ui")
 	
 	-- we have an existing box, modify that one instead of making a new one
 	if msgBoxPersistent then
@@ -175,9 +176,9 @@ function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 		y		= 8,
 		height	= height - 8 - 8,
 		width   = (width - x - 8),
-        horizontalScrollbar = false,
+		horizontalScrollbar = false,
 		scrollbarSize = 6,
-    }
+	}
 	
 	textPersistent = Chili.TextBox:New{
 		text    = text or '',

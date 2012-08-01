@@ -125,6 +125,8 @@ local function AddObjective(id, title, details, pos, status, color)
 			return self
 		end
 	end
+	
+	Spring.PlaySoundFile("sounds/message_private.wav", 1, "ui")
 end
 
 local function ModifyObjective(id, title, details, pos, status, color)
@@ -153,6 +155,8 @@ local function ModifyObjective(id, title, details, pos, status, color)
 		obj.label.font.color = color or statusColors[status] or obj.label.font.color
 		obj.label:Invalidate()	
 	end
+	
+	Spring.PlaySoundFile("sounds/message_private.wav", 1, "ui")
 end
 
 local function RemoveObjective(id)
