@@ -553,10 +553,12 @@ local spIsUnitInView 		= Spring.IsUnitInView
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetUnitLosState 	= Spring.GetUnitLosState
 local spValidUnitID 		= Spring.ValidUnitID
+local spGetMyTeamID		= Spring.GetMyTeamID
 local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID 	
-local spGetModKeyState      = Spring.GetModKeyState
+local spGetModKeyState		= Spring.GetModKeyState
+local spAreTeamsAllied		= Spring.AreTeamsAllied
 
-local myTeam = spGetMyAllyTeamID()
+local myTeam = spGetMyTeamID()
 
 local function DrawFunc(u1, u2)
 	glVertex(spGetUnitPosition(u1))
@@ -579,7 +581,8 @@ function gadget:DrawWorld()
 		local alt,ctrl,meta,shift = spGetModKeyState()
 		for tid, data in spairs(tele) do
 			local bid = data.link
-			if spValidUnitID(tid) and spValidUnitID(bid) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
+			local team = Spring.GetUnitTeam(tid)
+			if spValidUnitID(tid) and spValidUnitID(bid) and (spec or spAreTeamsAllied(myTeam, team)) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
 				
 				gl.Color(0.1, 0.3, 1, 0.9)
 				gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)
