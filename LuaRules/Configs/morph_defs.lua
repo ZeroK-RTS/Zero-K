@@ -536,21 +536,10 @@ local function InitUnsafe()
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Comm Morph warning: ' .. err)
 		end
 
-		for chassis, subdata in pairs(commData) do
+		for series, subdata in pairs(commData) do
 			customComms[id] = customComms[id] or {}
-			customComms[id][chassis] = subdata
+			customComms[id][series] = subdata
 		end
-		
-		-- this method makes no sense, it's not like any given generated def will be used for more than one replacement/player!
-		-- would be more logical to use replacee as key and replacement as value in player customkeys
-		--[[
-		customComms[id] = customComms[id] or {}
-		for replacementComm, replacees in pairs(commData) do
-			for _,name in pairs(replacees) do
-				customComms[id][name] = replacementComm
-			end
-		end
-		]]--
 	end
 end
 

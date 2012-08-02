@@ -19,6 +19,8 @@ Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/base64.lua")
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
+local CopyTable = Spring.Utilities.CopyTable
+
 --------------------------------------------------------------------------------
 -- load data
 --------------------------------------------------------------------------------
@@ -95,6 +97,22 @@ local function RemoveDuplicates(base, delete)
 	end
 end
 
+-- recursive magic (likely broken)
+local function MergeModuleTables(moduleTable, previous)
+	local data = commDataGlobal[previous]
+	if data then
+		if data.prev then
+			MergeModuleTables(moduleTable, data.prev)
+		end
+		local modules = data.modules or {}
+		for i=1,#modules do
+			moduleTable[#moduleTable+1] = modules[i]
+		end
+	end
+	
+	return moduleTable
+end
+
 -- gets modules and costs
 local function GetCommSeriesInfo(seriesName, purgeDuplicates)
 	local data = {}
@@ -103,7 +121,8 @@ local function GetCommSeriesInfo(seriesName, purgeDuplicates)
 		data[i] = {name = commList[i]}
 	end
 	for i=1,#data do
-		data[i].modules = commDataGlobal[data[i].name] and Spring.Utilities.CopyTable(commDataGlobal[data[i].name].modules, true) or {}
+		local moduleTable = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].modules or {}
+		data[i].modules = CopyTable(moduleTable, true)
 		data[i].cost = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].cost or 0
 	end
 	-- remove reference to modules already in previous levels
@@ -134,8 +153,21 @@ local function GetCommModules(unitDef)
 	if type(unitDef) == "number" then unitDef = UnitDefs[unitDef].name end
 	if commDataGlobal[unitDef] then
 		local modules = {}
-		for i,v in ipairs(commDataGlobal[unitDef] and commDataGlobal[unitDef].modules) do
-			local modulename = v
+		local modulesInternal = commDataGlobal[unitDef] and commDataGlobal[unitDef].modules or {}
+		--[[
+		if commDataGlobal[unitDef].prev then
+			local copy = CopyTable(modulesInternal)
+			modulesInternal = MergeModuleTables(copy, commDataGlobal[unitDef].prev)
+		end
+		]]--
+		table.sort(modulesInternal,
+				function(a,b)
+					return (a:find("commweapon_") and not b:find("commweapon_"))
+					or (a:find("conversion_") and not (b:find("commweapon_") or b:find("conversion_")) )
+					or (a:find("weaponmod_") and b:find("module_")) 
+				end )
+		for i=1, #modulesInternal do
+			local modulename = modulesInternal[i]
 			modules[i] = upgrades[modulename].name
 		end
 		return modules

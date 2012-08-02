@@ -37,9 +37,14 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- for examples see testdata.lua
+
 local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
+local err, success
+
 local commDataRaw = modOptions.commandertypes
-local commDataFunc, err, success, commData
+local commDataFunc, commData
+
 if not (commDataRaw and type(commDataRaw) == 'string') then
 	err = "Comm data entry in modoption is empty or in invalid format"
 	commData = {}
@@ -94,6 +99,25 @@ local function GenerateBasicComm()
 end
 
 GenerateBasicComm()
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- recursive magic (likely broken)
+local function MergeModuleTables(moduleTable, previous)
+	local data = commData[previous]
+	if data then
+		if data.prev then
+			MergeModuleTables(moduleTable, data.prev)
+		end
+		local modules = data.modules or {}
+		for i=1,#modules do
+			moduleTable[#moduleTable+1] = modules[i]
+		end
+	end
+	
+	return moduleTable
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -127,6 +151,12 @@ local function ProcessComm(name, config)
 		if config.modules then
 			local numWeapons = 0
 			RemoveWeapons(commDefs[name])
+			--[[
+			if config.prev then
+				local copy = CopyTable(config.modules)
+				config.modules = MergeModuleTables(copy, config.prev)
+			end
+			]]
 			-- sort: weapons first, weapon mods next, regular modules last
 			table.sort(config.modules,
 				function(a,b)

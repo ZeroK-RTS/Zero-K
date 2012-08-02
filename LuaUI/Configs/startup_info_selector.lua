@@ -134,6 +134,8 @@ local function WriteTooltip(seriesName)
 end
 
 local function CommSelectTemplate(num, seriesName, comm1Name)
+	if not UnitDefNames[comm1Name] then return end
+	
 	local option = {
 		enabled = function() return true end,
 		poster = chassisImages[UnitDefNames[comm1Name].customParams.statsname],
