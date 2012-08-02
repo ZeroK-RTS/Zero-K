@@ -251,10 +251,10 @@ local options = {
     items = {
       { key='auto', name="Automatic", desc='Use one of the other options based on a mod-defined list, defaulting to Keep Equal' },
       { key='mapdefault', name="Map Default", desc='Use map speed boost' },
-	  { key='average', name="Average", desc='Each terrain types speed boost is averaged' },
-	  { key='keepequal', name="Keep Equal", desc='Non-equal speedboost removed' },
-	  { key='onlyimpassable', name="Only Impassable", desc='Override all speedboost except impassable terrain' },
-	  { key='alloff', name="All Off", desc='Disable all speed boost' },
+      { key='average', name="Average", desc='Each terrain types speed boost is averaged' },
+      { key='keepequal', name="Keep Equal", desc='Non-equal speedboost removed' },
+      { key='onlyimpassable', name="Only Impassable", desc='Override all speedboost except impassable terrain' },
+      { key='alloff', name="All Off", desc='Disable all speed boost' },
     },
   },
     {
@@ -341,6 +341,7 @@ local options = {
     max    = 100,
     step   = 0.01,
   },
+--[[  
   {
     key    = 'damagemult',
     name   = 'Damage Multiplier',
@@ -363,6 +364,7 @@ local options = {
     max    = 10,
     step   = 0.01,
   },
+]]--
   {
     key    = 'cratermult',
     name   = 'Cratering Multiplier',
@@ -405,7 +407,8 @@ local options = {
     type   = 'bool',
     section= 'experimental',
     def    = false,
-  },  
+  },
+--[[
   {
     key    = 'specialpower',
     name   = 'Special Advanced Powerplants',
@@ -421,7 +424,8 @@ local options = {
     type   = 'bool',
     section= 'experimental',
     def    = false,
-  },  
+  },
+]]--
   {
     key    = 'fun',
     name   = 'Fun Stuff',
@@ -436,14 +440,6 @@ local options = {
     section= 'fun',
     def    = false,
   },
-  --[[{
-	key    = 'communism',
-    name   = 'Communism - resource sharing',
-    desc   = 'Overdrive energy and metal extractors are used for common good, resulting metal is shared equally.',
-    type   = 'bool',
-    section= 'modifiers',
-    def    = true,
-  },--]]
   {
     key    = "disablefeatures",
     name   = "Disable Features",
@@ -620,52 +616,6 @@ local options = {
 	max    = 120,
 	step   = 1,  
   },
---[[
-  {
-    key    = 'noawards',
-    name   = 'Disable Awards',
-    desc   = "Turn off the shiny trophies at the end of the battle.",
-    type   = 'bool',
-    def    = false,
-  },
-  {
-    key    = 'activeradars',
-    name   = 'Active Radars',
-    desc   = 'Radars will be always visible for the enemy.',
-    type   = 'bool',
-    def    = false,
-  },
-  {
-    key = "specialair",
-    name = "Special Air Units",
-    desc = "Choose the type of air units.",
-    type = "list",
-    def = "false",
-    items = {
-      { key = "false", name = "Standard Air Units", desc = "Standard air units." },
-      { key = "lasers", name = "Laser Bombers", desc = "Arm bombers fire lasers instead of bombs, Core Krow has an antigravity field instead of lasers." },
-      { key = "seaplanes", name = "Seaplanes", desc= "Seaplanes replace many standard air units." },
-    },
-  },
-  {
-    key    = 'string_opt',
-    name   = 'String Option',
-    desc   = 'an unused string option',
-    type   = 'string',
-    def    = 'BiteMe',
-    maxlen = 12,
-  },
---]]
---[[
-  {
-    key    = 'engine_workarounds',
-    name   = 'Enable 87.0 Workarounds',
-    desc   = 'This enables workarounds for area reclaim and nanoframe targeting in sea. It is only required when running engine 87.0.',
-    type   = 'bool',
-    def    = false,
-    section= 'experimental',
-  },
-  --]]
 }
 
 --// add key-name to the description (so you can easier manage modoptions in springie)
