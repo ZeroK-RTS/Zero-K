@@ -25,7 +25,7 @@ end
 --------------------------------------------------------------------------------
 -- CONFIG
 
-local REPAIR_PENALTY = 5 -- effective 5x cost
+local REPAIR_PENALTY = 4 -- effective 4x cost
 local TIME_SINCE_DAMAGED = 300
 
 
