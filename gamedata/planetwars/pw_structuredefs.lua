@@ -39,7 +39,7 @@ structureConfig = {
 	pw_dropfac = function(unitDef)
 			unitDef.maxdamage = 25000
 			unitDef.name = "Bomber Fabricator"
-			unitDef.description = "Produces 0.5 bombers per turn"
+			unitDef.description = "Produces bombers"
 			unitDef.objectname = "pw_dropfac.obj"
 			unitDef.selfdestructcountdown = 180
 			
@@ -56,7 +56,7 @@ structureConfig = {
 	pw_dropdepot = function(unitDef)
 			unitDef.maxdamage = 20000
 			unitDef.name = "Fleet Command"
-			unitDef.description = "Increases ship capacity by 3"
+			unitDef.description = "Increases ship capacity"
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
 			unitDef.selfdestructcountdown = 180
@@ -65,7 +65,7 @@ structureConfig = {
 			unitDef.footprintz = 11
 			
 			unitDef.customparams.soundselect = "building_select1"
-			unitDef.customparams.helptext = "Increases the number of dropships that can be deployed to a single planet by 3."
+			unitDef.customparams.helptext = "Increases the number of dropships that can be deployed to a single planet."
 			
 			unitDef.collisionvolumescales = [[245 220 145]]
 			unitDef.modelcenteroffset = [[15 40 0]]			
@@ -134,7 +134,7 @@ structureConfig = {
 	pw_wormhole = function(unitDef)
 			unitDef.maxdamage = 12500
 			unitDef.name = "Wormhole Generator"
-			unitDef.description = "Links this planet to nearby planets with 25% influence"
+			unitDef.description = "Links this planet to nearby planets"
 			unitDef.objectname = "pw_wormhole.obj"
 			unitDef.selfdestructcountdown = 90
 			
@@ -151,7 +151,7 @@ structureConfig = {
 	pw_wormhole2 = function(unitDef)
 			unitDef.maxdamage = 17500
 			unitDef.name = "Improved Wormhole Stabilizer"
-			unitDef.description = "Improved link to nearby planets with 50% influence"
+			unitDef.description = "Improved link to nearby planets"
 			unitDef.objectname = "pw_wormhole2.obj"
 			
 			unitDef.footprintx = 9
@@ -167,8 +167,8 @@ structureConfig = {
 		
 	pw_warpgate = function(unitDef)
 			unitDef.maxdamage = 15000
-			unitDef.name = "Jumpgate"
-			unitDef.description = "Allows planet owner to send drops to any point in the galaxy"
+			unitDef.name = "Warp Core Fabricator"
+			unitDef.description = "Produces warp cores"
 			unitDef.objectname = "pw_warpgate.obj"
 			unitDef.script = "pw_warpgate.lua"
 			unitDef.selfdestructcountdown = 180
@@ -180,7 +180,7 @@ structureConfig = {
 			unitDef.selfdestructas = "GRAV_BLAST"
 			
 			unitDef.customparams.soundselect = "cloaker_select"
-			unitDef.customparams.helptext = "An extremely powerful teleportation device that can send a ship across the galaxy in the blink of an eye."
+			unitDef.customparams.helptext = "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."
 			
 			unitDef.collisionvolumescales = [[120 100 120]]
 			unitDef.modelcenteroffset = [[0 0 0]]

@@ -14,7 +14,7 @@ stringNukeSpotted = "\255\255\0\0Enemy nuclear silo located.\008 Build an anti-n
 
 generalTips = {
 	"Use the priority buttons to maximize your efficiency during stalls (expenditure outstripping income). Resources will be allocated to high priority units before low priority ones.",
-	"Repairing units is 3x faster than building them, but proceeds at 1/6th the normal speed if the unit has been recently damaged.",
+	"Repairing units is twice as fast as building them, but proceeds at 1/4th the normal speed if the unit has been recently damaged.",
 	"Different AA types are effective against different targets. The Hacksaw missile turret is lethal against bombers, while the Cobra flak cannon cuts down gunships well.",
 	"When fighting AoE weapons, spread out your units to minimize damage.",
 	"You can draw on the map with tilde (~) and left mouse. ~ + double click adds a labelled point, while ~ + middle click adds a point without label. ~ + right click erases.",
