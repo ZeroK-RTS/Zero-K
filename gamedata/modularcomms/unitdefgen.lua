@@ -149,16 +149,14 @@ local function ProcessComm(name, config)
 		
 		-- process modules
 		if config.modules then
+			local modules = CopyTable(config.modules)
 			local numWeapons = 0
 			RemoveWeapons(commDefs[name])
-			--[[
 			if config.prev then
-				local copy = CopyTable(config.modules)
-				config.modules = MergeModuleTables(copy, config.prev)
+				modules = MergeModuleTables(modules, config.prev)
 			end
-			]]
 			-- sort: weapons first, weapon mods next, regular modules last
-			table.sort(config.modules,
+			table.sort(modules,
 				function(a,b)
 					return (a:find("commweapon_") and not b:find("commweapon_"))
 					or (a:find("conversion_") and not (b:find("commweapon_") or b:find("conversion_")) )
@@ -166,7 +164,7 @@ local function ProcessComm(name, config)
 				end )
 
 			-- process all modules (including weapons)
-			for _,moduleName in ipairs(config.modules) do
+			for _,moduleName in ipairs(modules) do
 				if moduleName:find("commweapon_",1,true) then
 					if weapons[moduleName] then
 						--Spring.Echo("\tApplying weapon: "..moduleName)

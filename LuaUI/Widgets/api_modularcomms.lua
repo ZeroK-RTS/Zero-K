@@ -121,15 +121,21 @@ local function GetCommSeriesInfo(seriesName, purgeDuplicates)
 		data[i] = {name = commList[i]}
 	end
 	for i=1,#data do
-		local moduleTable = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].modules or {}
-		data[i].modules = CopyTable(moduleTable, true)
-		data[i].cost = commDataGlobal[data[i].name] and commDataGlobal[data[i].name].cost or 0
+		local name = data[i].name
+		if name and commDataGlobal[name] then
+			local moduleTable = commDataGlobal[name].modules or {}
+			data[i].modules = CopyTable(moduleTable, true)
+			data[i].cost = commDataGlobal[name].cost or 0
+			data[i].prev = commDataGlobal[name].prev
+		end
 	end
 	-- remove reference to modules already in previous levels
 	if purgeDuplicates then
 		for i = #data, 2, -1 do
-			RemoveDuplicates(data[i].modules, data[i-1].modules)
-			data[i].cost = data[i].cost - data[i-1].cost
+			if not data[i].prev then	-- having a previous comm specified indicates we are using per-level module tables instead of lifetime; no need to purge duplicates
+				RemoveDuplicates(data[i].modules, data[i-1].modules)
+				data[i].cost = data[i].cost - data[i-1].cost
+			end
 		end
 	end
 	return data
@@ -154,12 +160,10 @@ local function GetCommModules(unitDef)
 	if commDataGlobal[unitDef] then
 		local modules = {}
 		local modulesInternal = commDataGlobal[unitDef] and commDataGlobal[unitDef].modules or {}
-		--[[
 		if commDataGlobal[unitDef].prev then
 			local copy = CopyTable(modulesInternal)
 			modulesInternal = MergeModuleTables(copy, commDataGlobal[unitDef].prev)
 		end
-		]]--
 		table.sort(modulesInternal,
 				function(a,b)
 					return (a:find("commweapon_") and not b:find("commweapon_"))
