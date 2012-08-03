@@ -75,7 +75,7 @@ unitDef = {
 
     {
       def                = [[ARMRL_MISSILE]],
-      badTargetCategory  = [[HOVER SWIM LAND SINK FLOAT SHIP]],
+      --badTargetCategory  = [[HOVER SWIM LAND SINK FLOAT SHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
