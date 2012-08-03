@@ -20,6 +20,8 @@ local RETAKING_DEGRADE_TIMER = 15
 local GENERAL_DEGRADE_TIMER = 5
 local DEGRADE_FACTOR = 0.04
 
+local DAMAGE_MULT = 3	-- n times faster when target is at 0% health
+
 include("LuaRules/Configs/customcmds.h.lua")
 local CMD_STOP = CMD.STOP
 local CMD_SELFD = CMD.SELFD
@@ -232,7 +234,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if health <= 0 then 
 		health = 0.01 
 	end
-	newCaptureDamage = newCaptureDamage * (2 - (health/maxHealth))
+	newCaptureDamage = newCaptureDamage * (DAMAGE_MULT - (DAMAGE_MULT - 1)*(health/maxHealth))
 	
 	local allyTeamData = allyTeams[attackerAllyTeam]
 	
