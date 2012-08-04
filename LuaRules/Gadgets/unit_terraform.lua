@@ -118,8 +118,9 @@ local maxRampGradient = 5
 local volumeCost = 0.0128
 local pointExtraAreaCost = 0--.027
 local pointExtraAreaCostDepth = 6
-local pointExtraPerimeterCost = 0.0425
+local pointExtraPerimeterCost = 0.1
 local pointExtraPerimeterCostDepth = 6
+local baseTerraunitCost = 12
 local inbuiltCostMult = 0.5
 
 local perimeterEdgeCost = {
@@ -730,7 +731,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		end
 		
 		if totalCost ~= 0 then
-			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost
+			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
@@ -1222,7 +1223,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		end
 		
 		if totalCost ~= 0 then
-			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost
+			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
@@ -1778,7 +1779,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 		end
 		
 		if totalCost ~= 0 then
-			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost
+			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
 			--Spring.Echo(totalCost .. "\t" .. baseCost)
