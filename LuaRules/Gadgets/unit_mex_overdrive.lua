@@ -1584,7 +1584,7 @@ local GL_TRIANGLE_FAN = GL.TRIANGLE_FAN
 
 local Util_DrawGroundCircle = gl.Utilities.DrawGroundCircle
 
-local powerTexture = 'Luaui/Images/energy.png'
+local powerTexture = 'Luaui/Images/visible_energy.png'
 
 local floor = math.floor
 
