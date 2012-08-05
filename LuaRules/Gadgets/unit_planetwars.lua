@@ -330,7 +330,7 @@ function gadget:GamePreload()
 	end
 	
 	-- spawn field command centers
-	for i=0,(defenderFaction and 1 or 0) do
+	for i=0, 1 do	--(defenderFaction and 1 or 0) do
 		local x1, y1, x2, y2 = TranslocateBoxes(box[i])
 		local teams = Spring.GetTeamList(i)
 		local team = teams[math.random(#teams)]
