@@ -70,7 +70,27 @@ structureConfig = {
 			unitDef.collisionvolumescales = [[245 220 145]]
 			unitDef.modelcenteroffset = [[15 40 0]]			
 		end,
-		
+
+	pw_bombercontrol = function(unitDef)
+			unitDef.maxdamage = 20000
+			unitDef.name = "Bomber Control"
+			unitDef.description = "Increases bomber capacity"
+			unitDef.objectname = "pw_dropdepot.obj"
+			unitDef.waterline = 30
+			unitDef.selfdestructcountdown = 180
+			
+			unitDef.footprintx = 16			
+			unitDef.footprintz = 11
+			
+			unitDef.customparams.soundselect = "building_select1"
+			unitDef.customparams.helptext = "Increases the number of bombers that can be deployed to a single planet."
+			
+			unitDef.collisionvolumescales = [[245 220 145]]
+			unitDef.modelcenteroffset = [[15 40 0]]
+			
+			unitDef.buildpic = "pw_dropdepot.png"
+		end,		
+				
 	pw_mine = function(unitDef)
 			unitDef.maxdamage = 10000
 			unitDef.name = "Power Generator Unit"
@@ -191,31 +211,15 @@ structureConfig = {
 -- test data here
 --[[
 {
-  defender = 0,
-  s1 = {
-    unitname = "pw_mine",
-    name = "Mining outpost",
-    description = "Produces 50 credits each turn"
-  },
-  s2 = {
-    unitname = "pw_mine2",
-    name = "Automated mines",
-    description = "Produces 150 credits each turn"
-  },
-  s3 = {
-    unitname = "pw_mine3",
-    name = "Automated mines",
-    description = "Produces 150 credits each turn"
-  },
   s4 = {
-    unitname = "pw_dropfac",
-    name = "Ship factory",
-    description = "Produces 0.25 dropships each turn"
+    unitname = "pw_bombercontrol",
+    name = "Bomber Control",
+    description = "Increases bomber limit"
   },
   s5 = {
     unitname = "pw_dropdepot",
     name = "Fleet command",
-    description = "Produces 0.25 dropships each turn"
+    description = "Increases dropship limit"
   }, 
   s9 = {
     unitname = "pw_warpgate",
