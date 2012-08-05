@@ -84,7 +84,7 @@ unitDef = {
 --      badTargetCategory  = [[FIXEDWING]],
 --      mainDir            = [[0 0 1]],
 --      maxAngleDif        = 180,
---      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP]],
+--      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
 --    },
 
   },
@@ -118,7 +118,7 @@ unitDef = {
       minIntensity            = 1,
       noSelfDamage            = true,
 	  projectiles             = 5,
-      range                   = 600,
+      range                   = 450,
       reloadtime              = 6,
       rgbColor                = [[0 0 1]],
       scrollSpeed             = 5,
