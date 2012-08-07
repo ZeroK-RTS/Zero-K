@@ -30,7 +30,7 @@ local spGetUnitAllyTeam  = Spring.GetUnitAllyTeam
 local spGetUnitsInBox  = Spring.GetUnitsInBox
 local spSetUnitPosition  = Spring.SetUnitPosition
 local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitBasePosition = Spring.GetUnitBasePosition
 
 local abs = math.abs
 local min = math.min
@@ -54,7 +54,7 @@ function checkLabs()
 	  local team = spGetUnitAllyTeam(id)
 	  if (team ~= Lv.team) and not fly then
 	  
-	    local ux, _, uz  = spGetUnitPosition(id)
+	    local ux, _, uz  = spGetUnitBasePosition(id)
 		
 		if (Lv.face == 1) then
 		  local l = abs(ux-Lv.minx)
@@ -169,10 +169,10 @@ end
 function gadget:UnitCreated(unitID, unitDefID)
   
   -- http://springrts.com/mantis/view.php?id=2871
-  local ux, uy, uz  = spGetUnitPosition(unitID)
+  local ux, uy, uz  = spGetUnitBasePosition(unitID)
   local facing = spGetUnitBuildFacing(unitID)
   if not AllowUnitCreation(unitDefID, nil, nil, ux, uy, uz, facing) then
-    Spring.DestroyUnit(unitID)
+    Spring.DestroyUnit(unitID, false, true)
     return
   end
   -- end 2871
@@ -180,7 +180,7 @@ function gadget:UnitCreated(unitID, unitDefID)
   local ud = UnitDefs[unitDefID]
   local name = ud.name
   if (ud.isFactory == true) and not (name == "factoryplane" or name == "factorygunship" or name == "missilesilo") then
-	local ux, uy, uz  = spGetUnitPosition(unitID)
+	local ux, uy, uz  = spGetUnitBasePosition(unitID)
 	local face = spGetUnitBuildFacing(unitID)
 	local xsize = (ud.xsize)*4
 	local zsize = (ud.ysize or ud.zsize)*4
