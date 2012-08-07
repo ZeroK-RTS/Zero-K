@@ -174,8 +174,8 @@ structureConfig = {
 			unitDef.description = "Improved link to nearby planets"
 			unitDef.objectname = "pw_wormhole2.obj"
 			
-			unitDef.footprintx = 9
-			unitDef.footprintz = 9
+			unitDef.footprintx = 8
+			unitDef.footprintz = 8
 			
 			unitDef.customparams.soundselect = "shield_select"
 			unitDef.customparams.helptext = "This structure maintains a stronger wormhole for increased influence spread to neighboring planets."
@@ -193,8 +193,8 @@ structureConfig = {
 			unitDef.script = "pw_warpgate.lua"
 			unitDef.selfdestructcountdown = 180
 			
-			unitDef.footprintx = 4
-			unitDef.footprintz = 4
+			unitDef.footprintx = 8
+			unitDef.footprintz = 8
 			
 			unitDef.explodeas = "GRAV_BLAST"
 			unitDef.selfdestructas = "GRAV_BLAST"
@@ -206,6 +206,25 @@ structureConfig = {
 			unitDef.modelcenteroffset = [[0 0 0]]
 			unitDef.collisionvolumetype	= [[CylY]]					
 		end,
+		
+	pw_warpjammer = function(unitDef)
+			unitDef.maxdamage = 12000
+			unitDef.name = "Warp Jammer"
+			unitDef.description = "Prevents warp attacks"
+			unitDef.objectname = "pw_warpjammer.s3o"
+			unitDef.script = "pw_warpjammer.lua"
+			unitDef.selfdestructcountdown = 150
+			
+			unitDef.footprintx = 6
+			unitDef.footprintz = 6
+			
+			unitDef.customparams.soundselect = "radar_select"
+			unitDef.customparams.helptext = "The Warp Jammer protects the planet with a field that prevents warpcore-equipped ships from jumping to it."
+			
+			unitDef.collisionvolumescales = [[100 80 100]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[Box]]					
+		end,		
 }
 
 -- test data here
@@ -241,6 +260,11 @@ structureConfig = {
     name = "Improved wormhole stabilizer",
     description = "Improves link strength up to 50% of influence"
   },
+  s20 = {
+    unitname = "pw_warpjammer",
+    name = "Warp Jammer",
+    description = "Blocks warp attacks"
+  },  
   s99 = {
     unitname = "pw_artefact",
     name = "Ancient artefacts",
@@ -248,30 +272,24 @@ structureConfig = {
   },  
 }
 
-ew0KICBkZWZlbmRlciA9IDAsDQogIHMxID0gew0KICAgIHVuaXRuYW1lID0gInB3X21pbmUiLA0K
-ICAgIG5hbWUgPSAiTWluaW5nIG91dHBvc3QiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2Vz
-IDUwIGNyZWRpdHMgZWFjaCB0dXJuIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJw
-d19taW5lMiIsDQogICAgbmFtZSA9ICJBdXRvbWF0ZWQgbWluZXMiLA0KICAgIGRlc2NyaXB0aW9u
-ID0gIlByb2R1Y2VzIDE1MCBjcmVkaXRzIGVhY2ggdHVybiINCiAgfSwNCiAgczMgPSB7DQogICAg
-dW5pdG5hbWUgPSAicHdfbWluZTMiLA0KICAgIG5hbWUgPSAiQXV0b21hdGVkIG1pbmVzIiwNCiAg
-ICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyAxNTAgY3JlZGl0cyBlYWNoIHR1cm4iDQogIH0sDQog
-IHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2Ryb3BmYWMiLA0KICAgIG5hbWUgPSAiU2hpcCBm
-YWN0b3J5IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyAwLjI1IGRyb3BzaGlwcyBlYWNo
-IHR1cm4iDQogIH0sDQogIHM1ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2Ryb3BkZXBvdCIsDQog
-ICAgbmFtZSA9ICJGbGVldCBjb21tYW5kIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyAw
-LjI1IGRyb3BzaGlwcyBlYWNoIHR1cm4iDQogIH0sIA0KICBzOSA9IHsNCiAgICB1bml0bmFtZSA9
-ICJwd193YXJwZ2F0ZSIsDQogICAgbmFtZSA9ICJXYXJwZ2F0ZSIsDQogICAgZGVzY3JpcHRpb24g
-PSAiVGVsZXBvcnRzIDEgc2hpcCBhbnl3aGVyZSBpbiB0aGUgZ2FsYXh5Ig0KICB9LA0KICBzMTAg
-PSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ2VuZXJpY3RlY2giLA0KICAgIG5hbWUgPSAiVGVjaCBi
-dWlsZGluZyIsDQogICAgZGVzY3JpcHRpb24gPSAiUHJvZHVjZXMgemUgcmVzZWFyY2giDQogIH0s
-ICAgICAgDQogIHMxOCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193b3JtaG9sZSIsDQogICAgbmFt
-ZSA9ICJXb3JtaG9sZSBnZW5lcmF0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIHBsYW5l
-dHMgd2l0aCAyNSUgb2YgaW5mbHVlbmNlIg0KICB9LA0KICBzMTkgPSB7DQogICAgdW5pdG5hbWUg
-PSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIHdvcm1ob2xlIHN0YWJpbGl6
-ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkltcHJvdmVzIGxpbmsgc3RyZW5ndGggdXAgdG8gNTAl
-IG9mIGluZmx1ZW5jZSINCiAgfSwNCiAgczk5ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2FydGVm
-YWN0IiwNCiAgICBuYW1lID0gIkFuY2llbnQgYXJ0ZWZhY3RzIiwNCiAgICBkZXNjcmlwdGlvbiA9
-ICJDYXB0dXJlIGFsbCBzdWNoIHBsYW5ldHMgYW5kIGFsbCB0ZWNobm9sb2dpZXMgdG8gd2luLCBw
-cmV2ZW50cyBidXlpbmcgaW5mbHVlbmNlIGZyb20gbG9jYWxzIg0KICB9LCAgDQp9
+ew0KICBzNCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19ib21iZXJjb250cm9sIiwNCiAgICBuYW1lID0g
+IkJvbWJlciBDb250cm9sIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJJbmNyZWFzZXMgYm9tYmVyIGxpbWl0
+Ig0KICB9LA0KICBzNSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUg
+PSAiRmxlZXQgY29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIGRyb3BzaGlwIGxp
+bWl0Ig0KICB9LCANCiAgczkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd2FycGdhdGUiLA0KICAgIG5h
+bWUgPSAiV2FycGdhdGUiLA0KICAgIGRlc2NyaXB0aW9uID0gIlRlbGVwb3J0cyAxIHNoaXAgYW55d2hl
+cmUgaW4gdGhlIGdhbGF4eSINCiAgfSwNCiAgczEwID0gew0KICAgIHVuaXRuYW1lID0gInB3X2dlbmVy
+aWN0ZWNoIiwNCiAgICBuYW1lID0gIlRlY2ggYnVpbGRpbmciLA0KICAgIGRlc2NyaXB0aW9uID0gIlBy
+b2R1Y2VzIHplIHJlc2VhcmNoIg0KICB9LCAgICAgIA0KICBzMTggPSB7DQogICAgdW5pdG5hbWUgPSAi
+cHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiV29ybWhvbGUgZ2VuZXJhdG9yIiwNCiAgICBkZXNjcmlw
+dGlvbiA9ICJMaW5rcyBwbGFuZXRzIHdpdGggMjUlIG9mIGluZmx1ZW5jZSINCiAgfSwNCiAgczE5ID0g
+ew0KICAgIHVuaXRuYW1lID0gInB3X3dvcm1ob2xlMiIsDQogICAgbmFtZSA9ICJJbXByb3ZlZCB3b3Jt
+aG9sZSBzdGFiaWxpemVyIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJJbXByb3ZlcyBsaW5rIHN0cmVuZ3Ro
+IHVwIHRvIDUwJSBvZiBpbmZsdWVuY2UiDQogIH0sDQogIHMyMCA9IHsNCiAgICB1bml0bmFtZSA9ICJw
+d193YXJwamFtbWVyIiwNCiAgICBuYW1lID0gIldhcnAgSmFtbWVyIiwNCiAgICBkZXNjcmlwdGlvbiA9
+ICJCbG9ja3Mgd2FycCBhdHRhY2tzIg0KICB9LCAgDQogIHM5OSA9IHsNCiAgICB1bml0bmFtZSA9ICJw
+d19hcnRlZmFjdCIsDQogICAgbmFtZSA9ICJBbmNpZW50IGFydGVmYWN0cyIsDQogICAgZGVzY3JpcHRp
+b24gPSAiQ2FwdHVyZSBhbGwgc3VjaCBwbGFuZXRzIGFuZCBhbGwgdGVjaG5vbG9naWVzIHRvIHdpbiwg
+cHJldmVudHMgYnV5aW5nIGluZmx1ZW5jZSBmcm9tIGxvY2FscyINCiAgfSwgIA0KfQ==
 ]]--
 
