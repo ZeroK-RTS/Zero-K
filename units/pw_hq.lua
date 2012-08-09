@@ -17,7 +17,7 @@ unitDef = {
 
   customParams                  = {
     description_de = [[PlanetWars Hauptquartier (verdoppelt Einflussgewinn)]],
-    helptext = [[This building is integral to strategic control of the planet. If the winning team has lost their Command Center, their influence gains are halved.]],
+    helptext = [[This building is integral to strategic control of the planet. If the winning team has lost their Command Center, their influence gains are halved and the losing team steals a portion of their metal bounty.]],
     helptext_de = [[Dieses Gebäude ist für die strategische Kontrolle des Planeten unerlässlich. Wenn das Gewinnerteam seine Kommandozentrale verloren hat, erhält es nur die Hälfte der Einflusspunkte.]],
   	dontcount = [[1]],
 	soundselect = "building_select1",
