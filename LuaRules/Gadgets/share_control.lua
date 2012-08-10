@@ -339,7 +339,8 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 	end
 
 	-- can give PW buildings to gaia
-	if (newTeam == Spring.GetGaiaTeamID()) and GG.pwUnitsByID[unitID] then
+	local pwUnits = (GG.PlanetWars or {}).unitsByID
+	if (newTeam == Spring.GetGaiaTeamID()) and (pwUnits or {})[unitID] then
 		return true
 	end
 	

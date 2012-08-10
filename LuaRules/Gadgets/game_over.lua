@@ -200,7 +200,8 @@ local function DestroyAlliance(allianceID)
 				local teamUnits = spGetTeamUnits(t) 
 				for j=1,#teamUnits do
 					local u = teamUnits[j]
-					if GG.pwUnitsByID and GG.pwUnitsByID[u] then
+					local pwUnits = (GG.PlanetWars or {}).unitsByID
+					if pwUnits and pwUnits[u] then
 						spTransferUnit(u, gaiaTeam, true)		-- don't blow up PW buildings
 					else
 						toDestroy[u] = true
