@@ -46,6 +46,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SWIM LAND SHIP GUNSHIP HOVER]],
   objectName          = [[core_diplomat.s3o]],
+  script              = [[armmerl.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX_MERL]],
 
