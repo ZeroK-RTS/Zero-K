@@ -113,9 +113,9 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 	  
-	  customParams        	  = {
-	    setunitsonfire = "1",
-	  },
+      customParams        	  = {
+	setunitsonfire = "1",
+      },
 
       damage                  = {
         default       = 12,
@@ -165,15 +165,13 @@ unitDef = {
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      lineOfSight             = true,
+      interceptedByShieldType = 0,
       noSelfDamage            = true,
       range                   = 160,
       reloadtime              = 1.5,
       size                    = 0,
       soundHit                = [[chickens/chickenbig2]],
       soundStart              = [[chickens/chickenbig2]],
-      startsmoke              = [[0]],
       targetborder            = 1,
       tolerance               = 5000,
       turret                  = true,
