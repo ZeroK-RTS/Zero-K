@@ -72,7 +72,7 @@ options = {
 	--]]
 	
 	initialSensorState = {
-		name = "Initial LOS state.",
+		name = "Initial LOS state",
 		desc = "Game starts with LOS enabled",
 		type = 'bool',
 		value = true,
@@ -223,7 +223,6 @@ function setSensorState(newState)
 end
 
 function widget:Update() --Note: these run-once codes is put here (instead of in Initialize) because we are waiting for epicMenu to initialize the "options" value first.
-	Spring.SendCommands("showmetalmap") -- toggle MetalMap ON (toggling metalmap and then toggling LOS in sequence seem to make LOS option work).
 	setSensorState(options.initialSensorState.value)
 	updateRadarColors()
 	widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
