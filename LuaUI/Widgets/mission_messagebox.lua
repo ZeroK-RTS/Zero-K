@@ -22,13 +22,18 @@ local imagePersistent
 local scrollPersistent
 local textPersistent
 
+local msgBoxConvo
+
+local convoQueue = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local flashTime
 local TIME_TO_FLASH = 3	-- seconds
+local CONVO_BOX_HEIGHT = 96
+
+local flashTime
+local convoExpireFrame
 
 function WG.ShowMessageBox(text, width, height, fontsize, pause)  
-  local Chili = WG.Chili
   local vsx, vsy = gl.GetViewSizes()
   
   -- reverse compatibility
@@ -201,6 +206,82 @@ function WG.HidePersistentMessageBox()
 	end
 end
 
+local function ShowConvoBox(data)
+  local vsx, vsy = gl.GetViewSizes()
+  local width, height = vsx*0.4, CONVO_BOX_HEIGHT
+  
+  local x = math.floor((vsx - width)/2)
+  local y = vsy * 0.2	-- fits under chatbox
+
+  msgBoxConvo = Chili.Window:New{  
+    x = x,  
+    y = y,
+    width  = width,
+    height = height,
+    dockable = false,
+    parent = Chili.Screen0,
+    color = {0,0,0,0},
+    padding = {0,0,0,0},
+    draggable = false,
+    resizable = false,
+    children = {
+      Chili.TextBox:New{
+        text = data.text,
+	height = height,
+        width = width - (height + 8),
+	x = height + 8,
+	y = 0,
+        align = "left",
+        font = {
+	  size = data.fontsize or 14,
+	  outline = true,
+	  shadow = true,
+	},
+        padding = {5, 5, 5, 5},
+        lineSpacing = 0,
+      },
+    }
+  }
+  
+  if data.image then
+    Chili.Image:New {
+      width = height,
+      height = height,
+      y = 0;
+      x = 0;
+      keepAspect = true,
+      file = data.image;
+      parent = msgBoxConvo;
+    }      
+  end
+  
+  if data.sound then
+    Spring.PlaySoundFile(data.sound, 1, 'ui')
+  end
+  
+  convoExpireFrame = Spring.GetGameFrame() + (data.time or 150)
+end
+
+function WG.AddConvo(text, fontsize, image, sound, time)
+  convoQueue[#convoQueue+1] = {text = text, fontsize = fontsize, image = image, sound = sound, time = time}
+  if #convoQueue == 1 then ShowConvoBox(convoQueue[1]) end
+end
+
+function widget:GameFrame(n)
+  if convoExpireFrame and convoExpireFrame <= n then
+    if msgBoxConvo then
+      msgBoxConvo:Dispose()
+      msgBoxConvo = nil
+      
+      table.remove(convoQueue, 1)
+    end
+    
+    if convoQueue[1] then
+      ShowConvoBox(convoQueue[1])
+    end
+  end
+end
+
 -- the following code handles box flashing
 local UPDATE_FREQUENCY = 0.2
 local timer = 0
@@ -244,10 +325,16 @@ function widget:Update(dt)
 end
 ]]--
 
-local str = "It would serve the greater good if you would lay down arms, human. This planet will be returned to the Tau Empire as is proper."
+local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history"—yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
+local str2 = 'Enemy nuclear silo spotted!'
+
 function widget:Initialize()
 	Chili = WG.Chili
-	--WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")	-- testing
+	
+	-- testing
+	--WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")	
+	--WG.AddConvo(str, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 22*30)
+	--WG.AddConvo(str2, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
