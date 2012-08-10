@@ -70,10 +70,10 @@ local base = {
 		}
 	},
 	{
-		name = "partbeam",
+		name = "beam",
 		modules = {
-			"commweapon_lparticlebeam",
-			"commweapon_hparticlebeam",
+			"commweapon_beamlaser_green",
+			"commweapon_beamlaser_red",
 			"module_guardian_armor",
 			"module_superspeed",
 			"module_super_nano",

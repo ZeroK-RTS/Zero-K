@@ -10,6 +10,28 @@ local weaponDef = {
 	customParams			= {
 		slot = [[5]],
 		muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_BLUE]],
+		altforms = {
+			green = {
+				explosionGenerator = [[custom:flash1green]],
+				customParams = { muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_GREEN]] },
+				rgbColor = [[0 1 0]],
+			},
+			red = {
+				explosionGenerator = [[custom:flash1red]],
+				customParams = { muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_RED]] },
+				rgbColor = [[1 0 0]],
+			},
+			yellow = {
+				explosionGenerator = [[custom:flash1yellow]],
+				customParams = { muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_YELLOW]] },
+				rgbColor = [[1 1 0]],
+			},		
+			white = {
+				explosionGenerator = [[custom:flash1white]],
+				customParams = { muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_WHITE]] },
+				rgbColor = [[1 1 1]],
+			},
+		}
 	},
 	
     damage                  = {

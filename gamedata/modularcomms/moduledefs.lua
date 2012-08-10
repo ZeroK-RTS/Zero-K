@@ -1,6 +1,10 @@
 --------------------------------------------------------------------------------
 -- system functions
 --------------------------------------------------------------------------------
+Spring.Utilities = Spring.Utilities or {}
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
+
+local CopyTable = Spring.Utilities.CopyTable
 
 VFS.Include("gamedata/modularcomms/functions.lua")
 
@@ -8,12 +12,6 @@ VFS.Include("gamedata/modularcomms/functions.lua")
 --------------------------------------------------------------------------------
 
 weapons = {}
-
-local weaponsList = VFS.DirList("gamedata/modularcomms/weapons", "*.lua") or {}
-for i=1,#weaponsList do
-	local name, array = VFS.Include(weaponsList[i])
-	weapons[name] = lowerkeys(array)
-end
 
 -- name is needed for widget; description is currently unused
 upgrades = {
@@ -634,3 +632,30 @@ decorations = {
 	}
 }
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local weaponsList = VFS.DirList("gamedata/modularcomms/weapons", "*.lua") or {}
+for i=1,#weaponsList do
+	local name, array = VFS.Include(weaponsList[i])
+	weapons[name] = lowerkeys(array)
+	
+	local weapon = weapons[name]
+	weapon.customparams = weapon.customparams or {}
+	
+	if weapon.customparams.altforms then
+		for color, mods in pairs(weapon.customparams.altforms) do
+			local newName = name.."_"..color
+			weapons[newName] = CopyTable(weapon, true)
+			upgrades[newName] = CopyTable(upgrades[name], true)
+			
+			local weapon2 = weapons[newName]
+			for i,v in pairs(mods) do
+				Spring.Echo(i,v)
+			end
+			
+			local modded = CopyTable(mods)
+			Spring.Utilities.MergeTable(modded, weapon2, true)
+			weapons[newName] = modded
+		end
+	end
+end
