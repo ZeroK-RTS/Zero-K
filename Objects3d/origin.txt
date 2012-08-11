@@ -1,0 +1,126 @@
+*INCOMPLETE*
+
+Final Outcome by Cremuss - Free Art License 1.3
+ * All PW buildings
+ * Antinuke
+ * Sneaky Pete (jammer)
+ * Welder
+ 
+Other Cremuss models - Public Domain?
+ * Mariner, Skeeter, Typhoon, Shredder, Snake, Warlord
+ * Annihilator
+ * Fusion Reactor
+ * Wind Generator?
+ * Cloaky Bot Plant
+ * Some projectile models - PD
+ 
+TA Evolva - ?
+ * Strike Commander
+ 
+Blood & Steel by bobthedinosaur - Public Domain?
+ * Firewalker
+ 
+Engines of War by bobthedinosaur - Public Domain?
+ * Recon Commander
+ * Support Commander
+ * Dante
+ 
+BA Remake by Mr. Bob - CC-BY-NC (confirm)
+ * Behemoth
+ * Zenith
+ * Jumpjet/Specialist Plant
+ * Screamer
+
+Beherith's bots - ?
+ * All amphs
+ * Con Artist
+ * Dirtbag  
+ * Freaker
+ * Felon
+ * Puppy
+
+Chris Mackey - CC-BY-SA except where otherwise specified
+ * All shieldbots except Felon and Dirtbag
+  * Rogue - CC-BY-NC
+  * Roach - CC-BY
+ * Pyro (retextured by smoth)
+ * Sumo
+ * Advanced Radar - CC-BY
+ * Blastwing
+ * Aegis - CC-BY-NC-SA
+ * Singularity Reactor - CC-BY-NC
+ 
+Smoth - ?
+ * Moderator
+ 
+Mr. D - ?
+ * All vehicles
+ * All tanks except Welder
+ * Vehicle, tank, aircraft factories
+ * Dominatrix derivatives
+  * Shield Bot Factory
+  * Amphibous Operations Plant
+  * Spider Factory
+ * Battle Commander
+ 
+Saktoth (Oscar Evans) - ?
+ * Spherebots
+ * Banshee
+ * Hacksaw 
+ * Missile Silo
+ 
+MidKnight - Artistic License 2.0
+ * Hammer
+ * Gnat
+ 
+KingRaptor (L.J. Lim) - Artistic License 2.0
+ * Enforcer
+ * Gull (carrier drone)
+ * Sharpshooter
+ * Sonar Station
+ * Some projectile models - PD
+ 
+Evil4Zerggin - ?
+ * Crusader
+ 
+ZIMBK - Artistic License 2.0
+ * Hovercraft Platform
+ 
+Azaremoth - ?
+ * Metal Extractor
+ * Stardust
+ * Radar Tower
+ 
+ash2life - Artistic License 2.0
+ * Penetrator
+ 
+PressureLine - Public Domain
+ * Brawler
+ * Archangel
+ 
+Kerr - ?
+ * lots of stuff, check SVN
+
+Argh - ?
+ * Shipyard
+ 
+3dmodeler - Artistic License 2.0
+ * Doomsday Machine
+ 
+CaptainBenz - ?
+ * All spiders except Crabe and Flea
+ * Bantha
+ * Catapult
+ 
+Exit_Wound - ?
+ * Black Dawn
+ * Krow
+ * Stiletto
+ 
+scifi - ?
+ * Gunship Plant
+ * Rapier
+ * Hovers?
+ 
+KDR_11k (David Becker) - Public Domain
+ * Chickens
