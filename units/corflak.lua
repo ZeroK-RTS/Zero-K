@@ -29,7 +29,6 @@ unitDef = {
 	helptext		= [[The Cobra is a flak cannon with good AoE and a high damage output, letting it swiftly cut enemy gunships to ribbons.]],
     helptext_fr    = [[Le Cobra est une d?fense Anti-Air de moyenne port?e projetant des balles a fragmentation en l'air. Assez impr?cis mais tirant en zone, il est parfait pour les attaques aeriennes mass?es.]],
 	helptext_de    = [[Die Cobraflak verteidigt deine Basis vor großen Gruppen gegnerischer Lufteinheiten, ermöglicht durch die schnelle Schussfrequenz der Flak. Für Bomber oder andere größere Flugeinheiten eignet sich diese Flak nur bedingt, da der Schaden nicht besonders groß ist.]],
-	aimposoffset   = [[0 16 0]],
   },
 
   explodeAs                     = [[MEDIUM_BUILDINGEX]],
@@ -91,7 +90,7 @@ unitDef = {
       color                   = 1,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargetting      = 1,
 
       damage                  = {
         default = 14.5,

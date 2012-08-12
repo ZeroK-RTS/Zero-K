@@ -16,19 +16,12 @@ unitDef = {
   buildPic                      = [[ARMESTOR.png]],
   buildTime                     = 200,
   category                      = [[SINK UNARMED]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[48 48 48]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     pylonrange = 500,
 	description_de = [[Erweitert den Bereich des Overdrive-Energienetzes]],
 	helptext_de    = [[Durch das Energy Pylon wird es dir ermöglicht, weitere Energiequellen oder Metallextraktoren an ein bestehendes Overdrive-Energienetz anzuschließen.]],
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 -6 0]],
-	modelradius    = [[24]],
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],
