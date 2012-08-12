@@ -545,10 +545,6 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
             if options[name .. "_tactical_ai"] and options[name .. "_tactical_ai"].value ~= nil then
                 Spring.GiveOrderToUnit(unitID, CMD_UNIT_AI, {options[name .. "_tactical_ai"].value and 1 or 0}, {"shift"})
             end
-            
-			if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
-				Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
-			end
 			
             if options[name .. "_fire_at_radar"] and options[name .. "_fire_at_radar"].value ~= nil then
                 Spring.GiveOrderToUnit(unitID, CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"})
@@ -592,6 +588,10 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			if options[name .. "_constructor_buildpriority"].value ~= -1 then
 				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_constructor_buildpriority"].value}, {"shift"})
 			end
+		end
+		
+		if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
+			Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
 		end
 	end
 end
