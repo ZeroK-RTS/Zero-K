@@ -92,15 +92,15 @@ local function getUnitState(unitID,data,cQueue)
 		return false -- set to hold position and is auto-aquiring target
 	end
 	
-	if cQueue[1].id == CMD_ATTACK and (movestate ~= 0 or cQueue[2].id == CMD_FIGHT) then -- if I attack 
-		local fightNext = (#cQueue > 1 and cQueue[2].id == CMD_FIGHT)
+	local fightTwo = (#cQueue > 1 and cQueue[2].id == CMD_FIGHT)
+	if cQueue[1].id == CMD_ATTACK and (movestate ~= 0 or fightTwo) then -- if I attack 
 		local target,check = cQueue[1].params[1],cQueue[1].params[2]
 		if (not check) and spValidUnitID(target) then -- if I target a unit
 			local los = spGetUnitLosState(target,data.allyTeam,false)
 			if los then
 				los = los.los
 			end
-			if not (cQueue[1].id == CMD_FIGHT or fightNext) then -- only skirm single target when given the order manually
+			if not (cQueue[1].id == CMD_FIGHT or fightTwo) then -- only skirm single target when given the order manually
 				return target,false
 			else
 				return -1,false
@@ -113,15 +113,15 @@ local function getUnitState(unitID,data,cQueue)
 	
 		local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
 		if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
-			local fightNext = (#cQueue > 2 and cQueue[3].id == CMD_FIGHT)
-			if cQueue[2].id == CMD_ATTACK and (movestate ~= 0 or fightNext) then -- if the next command is attack, patrol or fight
+			local fightThree = (#cQueue > 2 and cQueue[3].id == CMD_FIGHT)
+			if cQueue[2].id == CMD_ATTACK and (movestate ~= 0 or fightThree) then -- if the next command is attack, patrol or fight
 				local target,check = cQueue[2].params[1],cQueue[2].params[2]
 				if not check then -- if I target a unit
 					local los = spGetUnitLosState(target,data.allyTeam,false)
 					if los then 
 						los = los.los
 					end
-					if not (cQueue[2].id == CMD_FIGHT or fightNext) then -- only skirm single target when given the order manually
+					if not (cQueue[2].id == CMD_FIGHT or fightThree) then -- only skirm single target when given the order manually
 						return target,true
 					else
 						return -1,true
