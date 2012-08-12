@@ -93,7 +93,7 @@ local function getUnitState(unitID,data,cQueue)
 	end
 	
 	if cQueue[1].id == CMD_ATTACK and (movestate ~= 0 or cQueue[2].id == CMD_FIGHT) then -- if I attack 
-		local fightNext = cQueue[2].id == CMD_FIGHT
+		local fightNext = (#cQueue > 1 and cQueue[2].id == CMD_FIGHT)
 		local target,check = cQueue[1].params[1],cQueue[1].params[2]
 		if (not check) and spValidUnitID(target) then -- if I target a unit
 			local los = spGetUnitLosState(target,data.allyTeam,false)
