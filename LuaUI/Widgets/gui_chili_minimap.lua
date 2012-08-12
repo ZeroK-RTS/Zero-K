@@ -19,8 +19,6 @@ local glDrawMiniMap = gl.DrawMiniMap
 local glResetState = gl.ResetState
 local glResetMatrices = gl.ResetMatrices
 
-local vsx, vsy = 9000, 9000
-
 local iconsize = 20
 
 local tabbedMode = false
@@ -273,6 +271,14 @@ MakeMinimapWindow = function()
 		w,h = AdjustToMapAspectRatio(w,h)
 	end
 	
+	if h > 0 and w > 0 and screenHeight > 0 and screenWidth > 0 then
+		if w/h > screenWidth/screenHeight then
+			screenHeight = h*screenWidth/w
+		else
+			screenWidth = w*screenHeight/h
+		end
+	end
+	
 	window_minimap = Chili.Window:New{  
 		dockable = true,
 		name = "Minimap",
@@ -287,12 +293,13 @@ MakeMinimapWindow = function()
 		draggable = false,
 		tweakDraggable = true,
 		resizable = false,
+	    tweakResizable   = true,
 		minimizable = true,
 		fixedRatio = options.use_map_ratio.value,
 		dragUseGrip = false,
 		minWidth = iconsize*10,
-		maxWidth = vsx/2,
-		maxHeight = vsy/2,
+		maxWidth = screenWidth*0.8,
+		maxHeight = screenHeight*0.8,
 		children = {
 			
 --			Chili.Panel:New {bottom = (iconsize), x = 0, y = 0, right = 0, margin={0,0,0,0}, padding = {0,0,0,0}, skinName="DarkGlass"},			
@@ -426,10 +433,8 @@ function widget:DrawScreen()
 		ch = ch - 12
 		--window_minimap.x, window_minimap.y, window_minimap.width, window_minimap.height
 		--Chili.unpack4(window_minimap.clientArea)
-		window_minimap.maxWidth = vsx/2
-		window_minimap.maxHeight = vsy/2
 		cx,cy = window_minimap:LocalToScreen(cx,cy)
-		vsx,vsy = gl.GetViewSizes()
+		local vsx,vsy = gl.GetViewSizes()
 		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
 		lx = window_minimap.x
 		ly = window_minimap.y
