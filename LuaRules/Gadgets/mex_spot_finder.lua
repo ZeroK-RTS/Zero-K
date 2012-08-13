@@ -456,6 +456,29 @@ function WrapToLuaUI(_,playerID)
 	end
 end
 
+local prevFrame = 1
+local FRAME_GAP = 300
+
+function gadget:Update() 
+	local frame = Spring.GetGameFrame()
+	if Spring.IsReplay() then
+		if Script.LuaUI('SendMetalSpots') then
+			Script.LuaUI.SendMetalSpots(playerID, metalSpots, metalSpotsByPos)
+			gadgetHandler:RemoveCallIn("Update")
+		end
+		if (frame > prevFrame) then 
+			if Script.LuaUI('SendMetalSpots') then
+				Script.LuaUI.SendMetalSpots(playerID, metalSpots, metalSpotsByPos)
+				gadgetHandler:RemoveCallIn("Update")
+			else
+				prevFrame = frame + FRAME_GAP
+			end
+		end 
+	else
+		gadgetHandler:RemoveCallIn("Update")
+	end
+end 
+
 function gadget:Initialize()
 	
 	if type(SYNCED.metalSpots) == "table" then
