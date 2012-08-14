@@ -3,6 +3,8 @@
 --z_axis = 3
 SetSFXOccupy = setSFXoccupy		--standard case for function names
 
+GetPieceRotation = Spring.UnitScript.GetPieceRotation
+
 CRASHING = 97
 
 SFXTYPE_VTOL = 0
@@ -22,7 +24,7 @@ sfxShatter		= SFX.SHATTER
 sfxFall	  		= SFX.FALL
 sfxSmoke   		= SFX.SMOKE
 sfxFire    		= SFX.FIRE
-sfxExplodeOnHit = SFX.EXPLODE_ON_HIT
+sfxExplodeOnHit 	= SFX.EXPLODE_ON_HIT
 
 -- Maths
 tau = math.pi*2
