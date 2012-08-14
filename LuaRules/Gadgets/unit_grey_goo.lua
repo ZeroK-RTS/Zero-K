@@ -37,6 +37,7 @@ local spDestroyFeature         = Spring.DestroyFeature
 local spCreateUnit             = Spring.CreateUnit
 local spGiveOrderToUnit        = Spring.GiveOrderToUnit
 local spSetUnitRulesParam      = Spring.SetUnitRulesParam
+local spGetFeatureDefID        = Spring.GetFeatureDefID
 
 local CMD_FIRE_STATE = CMD.FIRE_STATE
 local CMD_MOVE_STATE = CMD.MOVE_STATE
@@ -53,6 +54,20 @@ local unitIndex = {count = 0, info = {}}
 local killedFeature = {}
 
 Spring.SetGameRulesParam("gooState",1)
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local validFeatureDefID = {}
+for i = 1, #FeatureDefs do
+	local fdef = FeatureDefs[i]
+	Spring.Echo("goo ")
+	Spring.Echo(fdef.customParams)
+	if fdef.customParams and fdef.customParams.fromunit then
+		validFeatureDefID[i] = true
+	end
+	Spring.Echo(validFeatureDefID[i])
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -85,13 +100,17 @@ local function getClosestWreck(x, z, r) -- hopefully to be replaced
 	local minID = false
 	
 	for i = 1, #features do
-		local fx, _, fz = spGetFeaturePosition(features[i])
-		local dis = disSQ(x,z,fx,fz)
-		if dis <= rsq and ((not minDis) or dis < minDis) and (not killedFeature[features[i]]) then
-			local _, maxMetal = spGetFeatureResources(features[i])
-			if maxMetal ~= 0 then
-				minDis = dis
-				minID = features[i]
+		local fid = features[i]
+		local fdefid = spGetFeatureDefID(fid) or 0
+		if validFeatureDefID[fdefid] then
+			local fx, _, fz = spGetFeaturePosition(fid)
+			local dis = disSQ(x,z,fx,fz)
+			if dis <= rsq and ((not minDis) or dis < minDis) and (not killedFeature[fid]) then
+				local _, maxMetal = spGetFeatureResources(fid)
+				if maxMetal ~= 0 then
+					minDis = dis
+					minID = fid
+				end
 			end
 		end
 	end

@@ -53,6 +53,8 @@ local function ProcessUnitDef(udName, ud)
     if (isstring(fdName) and istable(fd)) then
       local fullName = udName .. '_' .. fdName
       FeatureDefs[fullName] = fd
+	  fd.customparams = fd.customparams or {}
+	  fd.customparams.fromunit = "1"
       fd.filename = ud.filename
     end
   end
@@ -92,7 +94,6 @@ for udName, ud in pairs(UnitDefs) do
     ProcessUnitDef(udName, ud)
   end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

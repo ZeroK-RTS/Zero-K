@@ -123,7 +123,7 @@ unitDef = {
 
     NAPALM = {
       name                    = [[Napalm Bombs]],
-      areaOfEffect            = 256,
+      areaOfEffect            = 216,
       avoidFeature            = false,
       avoidFriendly           = false,
       burst                   = 15,
@@ -135,6 +135,7 @@ unitDef = {
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
+		burntime = 300,
 	  },
 	  
       damage                  = {

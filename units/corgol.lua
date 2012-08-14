@@ -25,7 +25,7 @@ unitDef = {
     helptext_bp    = [[Goliath é o tanque mais pesado do jogo, uma prova do poder de fogo de Logos. Sua arma principal é um grande canh?o que acaba facilmente com unidades pequenas, e seu lança chamas pode destruir rapidamente qualquer coisa que se aproxime demais. Porém, ele manobra lentamente e seu curto alcançe o torna presa fácil para escaramuçadores e ataques aéreos.]],
     helptext_fr    = [[Le Goliath est tout simplement le plus gros tank jamais construit. Un blindage lourd, un énorme canon plasma r moyenne portée fera voler en éclat les ennemis apeurés tandis que son lance flamme s'occupera des plus téméraires. Le Goliath est facile r repérer, il ne laisse que des ruines derricre lui.]],
 	helptext_de    = [[Der Goliath ist der stärkste Panzer auf dem Platz. Seine mächtige Hauptkanone wurde entwickelt, um kleinere Panzer ins Nirvana zu schicken, während der aufgesetzte Flammenwerfer alle Einheiten, die dem Goliath zu nahe kommen, kurz und schmervoll verbrennt. Trotzdem bewegt sich der Panzer wie eine Wasserwanne und seine kurze Reichweite macht ihn zur einfachen Beute von hochentwickelten Skirmishern oder Luftattacken.]],
-	extradrawrange = 240,
+	extradrawrange = 350,
   },
 
   explodeAs           = [[BIG_UNIT]],
@@ -75,16 +75,13 @@ unitDef = {
 	  badTargetCategory  = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
     },
-
-
     {
-      def                = [[CORGOL_FLAMETHROWER]],
-      badTargetCategory  = [[FIREPROOF]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP FIXEDWING]],
+      def                = [[SLOWBEAM]],
+      badTargetCategory  = [[FIXEDWING UNARMED]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },
-
 
   weaponDefs          = {
 
@@ -97,7 +94,7 @@ unitDef = {
       customParams            = {
 	    gatherradius = [[105]],
 	    smoothradius = [[70]],
-	    smoothmult   = [[0.32]],
+	    smoothmult   = [[0.4]],
 	  },
       
       damage                  = {
@@ -119,7 +116,49 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 310,
     },
+	
+	SLOWBEAM = {
+      name                    = [[Slowing Beam]],
+      areaOfEffect            = 8,
+      beamDecay               = 0.9,
+      beamlaser               = 1,
+      beamTime                = 0.12,
+      beamttl                 = 50,
+      coreThickness           = 0,
+      craterBoost             = 0,
+      craterMult              = 0,
 
+      damage                  = {
+        default = 600,
+      },
+
+      explosionGenerator      = [[custom:flash2purple]],
+      fireStarter             = 30,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      largeBeamLaser          = true,
+      laserFlareSize          = 4,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 350,
+      reloadtime              = 3,
+      rgbColor                = [[0.27 0 0.36]],
+      soundStart              = [[weapon/laser/pulse_laser2]],
+      soundStartVolume        = 15,
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 11,
+      tolerance               = 18000,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,
+    },
 
     CORGOL_FLAMETHROWER = {
       name                    = [[Flamethrower]],
