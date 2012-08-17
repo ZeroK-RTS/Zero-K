@@ -6,14 +6,14 @@ unitDef = {
   activateWhenBuilt      = true,
   amphibious             = [[1]],
   brakeRate              = 0.375,
-  buildCostEnergy        = 200,
-  buildCostMetal         = 200,
+  buildCostEnergy        = 180,
+  buildCostMetal         = 180,
 
   buildoptions           = {
   },
 
   buildPic               = [[amphraider3.png]],
-  buildTime              = 200,
+  buildTime              = 180,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -88,7 +88,7 @@ unitDef = {
 
       damage                  = {
         default = 150,
-        subs    = 6,
+        subs    = 7.5,
       },
 
       explosionGenerator      = [[custom:INGEBORG]],
@@ -163,10 +163,10 @@ unitDef = {
       footprintZ       = 3,
       height           = [[20]],
       hitdensity       = [[100]],
-      metal            = 80,
+      metal            = 72,
       object           = [[wreck2x2b.s3o]],
       reclaimable      = true,
-      reclaimTime      = 80,
+      reclaimTime      = 72,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
@@ -181,10 +181,10 @@ unitDef = {
       footprintX       = 2,
       footprintZ       = 2,
       hitdensity       = [[100]],
-      metal            = 40,
+      metal            = 36,
       object           = [[debris2x2c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 40,
+      reclaimTime      = 36,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
