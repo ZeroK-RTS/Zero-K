@@ -3,7 +3,7 @@ INCOME_TO_SPLURGE = 25	-- ignore expensive warning if you have this much income
 METAL_PER_NANO = 8		-- suggested nanos per metal ^ -1
 MIN_PULL_FOR_NANOS = -10	-- don't make more nanos if our pull is already this low	--unused
 NANO_DEF_ID = UnitDefNames.armnanotc.id
-ENERGY_TO_METAL_RATIO = 3	-- suggested maximum for energy
+ENERGY_TO_METAL_RATIO = 4	-- suggested maximum for energy
 ENERGY_LOW_THRESHOLD = 300
 DEFENSE_QUOTA = 0.3	-- suggested maximum proportion of total assets that is defense
 

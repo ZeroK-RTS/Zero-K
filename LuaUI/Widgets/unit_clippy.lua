@@ -204,9 +204,9 @@ local function ProcessCommand(unitID, command)
 		if tips.energy_excess.lastUsed > gameframe - tips.energy_excess.cooldown*30 then
 			return
 		end
-		local metalIncome = select(4, spGetTeamResources(myTeam, "metal"))
-		local energyCurrent,_,_,energyIncome = spGetTeamResources(myTeam, "energy")
-		if energyIncome/metalIncome > ENERGY_TO_METAL_RATIO then
+		local metalCurrent,metalStorage,_,metalIncome,metalExpense = spGetTeamResources(myTeam, "metal")
+		local energyCurrent,energyStorage,_,energyIncome = spGetTeamResources(myTeam, "energy")
+		if (energyIncome/metalIncome > ENERGY_TO_METAL_RATIO) and (energyCurrent/energyStorage / 0.2) then
 			MakeTip(unitID, "energy_excess")
 			return
 		end
