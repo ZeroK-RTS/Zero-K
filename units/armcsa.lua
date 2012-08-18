@@ -38,6 +38,7 @@ unitDef = {
     [[armsnipe]],
     [[armspy]],
     [[armjeth]],
+    [[amphtele]],
   },
 
   buildPic            = [[ARMCSA.png]],
