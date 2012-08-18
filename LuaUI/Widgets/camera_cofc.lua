@@ -1271,6 +1271,8 @@ function widget:Initialize()
 	spSendCommands( 'unbindaction trackmode' )
 	spSendCommands( 'unbindaction track' )
 	spSendCommands( 'unbindaction mousestate' ) --//disable screen-panning-mode toggled by 'backspace' key
+	
+	spSendCommands("luaui disablewidget SmoothScroll")
 end
 
 function widget:Shutdown()
