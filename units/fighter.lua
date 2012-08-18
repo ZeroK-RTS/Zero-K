@@ -51,7 +51,7 @@ unitDef = {
   minCloakDistance       = 75,
   modelCenterOffset      = [[0 3 0]],
   noAutoFire             = false,
-  noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
+  noChaseCategory        = [[TERRAFORM SATELLITE SUB LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
   objectName             = [[fighter.s3o]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
@@ -80,7 +80,8 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 60,
-      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+	  badTargetCategory  = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
     },
 
 
