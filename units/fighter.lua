@@ -80,7 +80,7 @@ unitDef = {
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
       maxAngleDif        = 60,
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+      onlyTargetCategory = [[FIXEDWING GUNSHIP]],
     },
 
 
