@@ -46,7 +46,7 @@ unitDef = {
   maneuverleashlength    = [[1280]],
   mass                   = 114,
   maxAcc                 = 0.5,
-  maxDamage              = 320,
+  maxDamage              = 350,
   maxVelocity            = 13,
   minCloakDistance       = 75,
   modelCenterOffset      = [[0 3 0]],
@@ -148,9 +148,9 @@ unitDef = {
       cylinderTargetting      = 1,
 
       damage                  = {
-        default = 200,
-        planes  = 200,
-        subs    = 10,
+        default = 11,
+        planes  = 220,
+        subs    = 11,
       },
 
       explosionGenerator      = [[custom:WEAPEXP_PUFF]],
