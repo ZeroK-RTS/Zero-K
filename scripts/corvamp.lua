@@ -13,7 +13,7 @@ smokePiece = {base, engineL, engineR}
 --variables
 local gun = false
 
-local RESTORE_DELAY = 500
+local RESTORE_DELAY = 250
 local FIRE_SLOWDOWN = 0.5
 
 --signals
