@@ -1584,8 +1584,6 @@ local GL_TRIANGLE_FAN = GL.TRIANGLE_FAN
 
 local Util_DrawGroundCircle = gl.Utilities.DrawGroundCircle
 
-local powerTexture = 'Luaui/Images/visible_energy.png'
-
 local floor = math.floor
 
 local circlePolys = 0 -- list for circles
@@ -1634,6 +1632,8 @@ local function DrawArray(ar, unitID)  -- renders lines from unitID to array meme
 end 
 
 --[[
+local powerTexture = 'Luaui/Images/visible_energy.png'
+
 local function DrawPylonEnergyLines()
 	myAllyID = spGetMyAllyTeamID()
 	local spec, fullview = spGetSpectatingState()
