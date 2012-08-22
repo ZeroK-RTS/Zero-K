@@ -129,8 +129,8 @@ local function addUnit(unitID, data)
 end
 
 local function removeUnit(unitID)
-    if validUnit(spGetUnitDefID(unitID)) and unitById[unitID] then
-        spSetUnitTarget(unitID,deadUnitID)
+    spSetUnitTarget(unitID,deadUnitID)
+	if validUnit(spGetUnitDefID(unitID)) and unitById[unitID] then
         if unitById[unitID] ~= unit.count then
             unit.data[unitById[unitID]] = unit.data[unit.count]
             unitById[unit.data[unit.count].id] = unitById[unitID]
