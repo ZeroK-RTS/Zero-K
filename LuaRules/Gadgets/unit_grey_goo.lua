@@ -61,8 +61,6 @@ Spring.SetGameRulesParam("gooState",1)
 local validFeatureDefID = {}
 for i = 1, #FeatureDefs do
 	local fdef = FeatureDefs[i]
-	Spring.Echo("goo ")
-	Spring.Echo(fdef.customParams)
 	if fdef.customParams and fdef.customParams.fromunit then
 		validFeatureDefID[i] = true
 	end
