@@ -15,8 +15,8 @@ include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local BEACON_PLACE_RANGE_SQR = 80000^2
-local BEACON_PLACE_RANGE_MOVE = 75000
+--local BEACON_PLACE_RANGE_SQR = 80000^2	-- causes SIGFPE, max tested value is ~46340^2 (see http://code.google.com/p/zero-k/issues/detail?id=1506)
+--local BEACON_PLACE_RANGE_MOVE = 75000
 local BEACON_WAIT_RANGE_MOVE = 150
 local BEACON_TELEPORT_RADIUS = 200
 local BEACON_TELEPORT_RADIUS_SQR = BEACON_TELEPORT_RADIUS^2
@@ -235,15 +235,15 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 	
 	if cmdID == CMD_PLACE_BEACON and tele[unitID] then
 		local f = Spring.GetGameFrame()
-		if not (tele[unitID].lastSetMove and tele[unitID].lastSetMove + 16 == f) then
-			Spring.SetUnitMoveGoal(unitID, cmdParams[1], cmdParams[2], cmdParams[3], BEACON_PLACE_RANGE_MOVE)
-		end
+		--if not (tele[unitID].lastSetMove and tele[unitID].lastSetMove + 16 == f) then
+		--	Spring.SetUnitMoveGoal(unitID, cmdParams[1], cmdParams[2], cmdParams[3], BEACON_PLACE_RANGE_MOVE)
+		--end
 		tele[unitID].lastSetMove = f
 		
 		local tx, ty, tz = Spring.GetUnitBasePosition(unitID)
 		
 		local ux,_,uz = Spring.GetUnitPosition(unitID)
-		if BEACON_PLACE_RANGE_SQR > (cmdParams[1]-ux)^2 + (cmdParams[3]-uz)^2 and ty == Spring.GetGroundHeight(tx, tz) then
+		if --[[BEACON_PLACE_RANGE_SQR > (cmdParams[1]-ux)^2 + (cmdParams[3]-uz)^2 and]] ty == Spring.GetGroundHeight(tx, tz) then
 			local cx, cz = math.floor((cmdParams[1]+8)/16)*16, math.floor((cmdParams[3]+8)/16)*16
 			Spring.SetUnitMoveGoal(unitID, ux,0,uz)
 			--local place, feature = Spring.TestBuildOrder(beaconDef, cx, 0 ,cz, 1)
@@ -576,7 +576,7 @@ function gadget:DrawWorld()
 		gl.DepthTest(true)
 		
 		gl.LineWidth(2)
-        gl.LineStipple('')
+		gl.LineStipple('')
 		local tele = SYNCED.tele
 		local alt,ctrl,meta,shift = spGetModKeyState()
 		for tid, data in spairs(tele) do
