@@ -86,7 +86,7 @@ local function ValidateStealthDefs(mds)
   for udName,stealthData in pairs(mds) do
     local ud = UnitDefNames[udName]
     if (not ud) then
-      Spring.Echo('Bad stealth unit type: ' .. udName)
+      Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Bad stealth unit type: ' .. udName)
     else
       local newData = {}
       newData.draw   = stealthData.draw

@@ -87,12 +87,12 @@ end
 -- Callins
 ------------------------------------------------------------
 function gadget:Initialize()
-	Spring.Echo("Mex Spot Finder Initialising")
+	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
 	local metalSpots = GetSpots()
 	local metalSpotsByPos = false
 	
 	if #metalSpots < 6 then
-		Spring.Echo("Indiscrete metal map detected")
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Indiscrete metal map detected")
 		metalSpots = false
 	end
 	
@@ -124,7 +124,7 @@ function gadget:Initialize()
 	
 	GG.IntegrateMetal = IntegrateMetal
 	
-	Spring.Echo("Metal Spots found and GGed")
+	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Metal Spots found and GGed")
 end
 
 ------------------------------------------------------------
@@ -230,7 +230,7 @@ function GetSpots()
 
 	-- Check configs
 	if gameConfig then
-		Spring.Echo("Loading gameside mex config")
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
 		if gameConfig.spots then
 			spots = SanitiseSpots(gameConfig.spots)
 			return spots
@@ -238,13 +238,13 @@ function GetSpots()
 	end
 	
 	if mapConfig then
-		Spring.Echo("Loading mapside mex config")
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
 		loadConfig = true
 		spots = SanitiseSpots(mapConfig.spots)
 		return spots
 	end
 	
-	Spring.Echo("Detecting mex config from metalmap")
+	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Detecting mex config from metalmap")
 
 	-- Main group collection
 	local uniqueGroups = {}

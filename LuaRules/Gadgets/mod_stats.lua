@@ -181,7 +181,7 @@ end
 
 function gadget:GameOver()
 	if GG.chicken then
-		Spring.Echo("Chicken game; unit stats disabled")
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Chicken game; unit stats disabled")
 		return	-- don't report stats in chicken
 	end
 	Spring.Echo("Submitting stats")

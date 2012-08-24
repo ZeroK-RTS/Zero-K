@@ -418,7 +418,7 @@ function gadget:Initialize()
 	for i=1,#teams do
 		aliveValue[teams[i]] = 0
 		if GetTeamIsChicken(teams[i]) then
-			Spring.Echo("<Game Over> Chicken team found")
+			Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Chicken team found")
 			chickenAllyTeamID = select(6, Spring.GetTeamInfo(teams[i]))
 			--break
 		end
@@ -426,7 +426,7 @@ function gadget:Initialize()
 	
 	CheckAllUnits()
 	
-	Spring.Echo("Game Over initialized")
+	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Game Over initialized")
 end
 
 function gadget:GameFrame(n)

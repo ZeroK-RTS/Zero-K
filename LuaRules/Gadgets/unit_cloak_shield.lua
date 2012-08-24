@@ -89,7 +89,7 @@ local function ValidateCloakShieldDefs(mds)
   for udName, def in pairs(mds) do
     local ud = UnitDefNames[udName]
     if (not ud) then
-      Spring.Echo('Bad cloakShield unit type: ' .. udName)
+      Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Bad cloakShield unit type: ' .. udName)
     else
       local newData = {}
       newData.draw   = def.draw   or true
@@ -140,7 +140,7 @@ local function ValidateUncloakableDefs(unclks)
   for udName, data in pairs(unclks) do
     local ud = UnitDefNames[udName]
     if (not ud) then
-      Spring.Echo('Bad uncloakable unit type: ' .. udName)
+      Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Bad uncloakable unit type: ' .. udName)
     else
       newDefs[ud.id] = true
 --      print('uncloakable: ' .. udName)

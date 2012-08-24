@@ -922,7 +922,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
 									else
 										if not spammedError then
-											Spring.Echo("unitDefID missing for maxxed metal extractor")
+											Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for maxxed metal extractor")
 											spammedError = true
 										end
 									end
@@ -958,7 +958,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							end
 						else
 							if not spammedError then
-								Spring.Echo("unitDefID missing for metal extractor")
+								Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for metal extractor")
 								spammedError = true
 							end
 						end

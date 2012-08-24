@@ -198,7 +198,7 @@ for id,_ in ipairs(humanTeams) do humanTeamsOrdered[#humanTeamsOrdered+1] = id e
 for i=1, #humanTeamsOrdered do
 	if humanTeamsOrdered[i+1] and not Spring.AreTeamsAllied(humanTeamsOrdered[i], humanTeamsOrdered[i+1]) then
 		pvp = true
-		Spring.Echo("Chicken: PvP mode detected")
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Chicken: PvP mode detected")
 		break
 	end
 end
@@ -1268,7 +1268,7 @@ function gadget:GameOver()
 	local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
 	local energymult = tonumber(Spring.GetModOptions().energymult) or 1
 	if ExceedsOne(modopts.metalmult) or ExceedsOne(modopts.metalmult) or (not ExceedsOne(modopts.terracostmult + 0.001)) or ExceedsOne(modopts.wreckagemult) or (not ExceedsOne(modopts.factorycostmult + 0.001)) then
-		Spring.Echo("<Chicken> Cheating modoptions, no score sent")
+		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Chicken> Cheating modoptions, no score sent")
 		return
 	end
 	

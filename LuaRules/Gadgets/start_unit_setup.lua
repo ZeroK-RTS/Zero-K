@@ -275,7 +275,7 @@ local function InitUnsafe()
 			end
 		end
 		if err then 
-			Spring.Echo('Start Unit Setup warning: ' .. err)
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Start Unit Setup warning: ' .. err)
 		end
 
 		-- record the player's first-level comm def for each chassis

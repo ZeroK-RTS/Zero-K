@@ -220,7 +220,7 @@ local function InitUnsafe()
 			end
 		end
 		if err then 
-			Spring.Echo('Unlock system error: ' .. err)
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Unlock system error: ' .. err)
 		end
 
 		for index, name in pairs(unlockData) do
