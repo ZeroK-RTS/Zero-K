@@ -110,7 +110,7 @@ end
 -- Unit adding/removal
 
 local function validUnit(unitDefID)
-    return UnitDefs[unitDefID] and UnitDefs[unitDefID].canAttack and UnitDefs[unitDefID].canMove and UnitDefs[unitDefID].maxWeaponRange and UnitDefs[unitDefID].maxWeaponRange > 0 and (not UnitDefs[unitDefID].canFly)	--remove canFly in 89.0
+    return UnitDefs[unitDefID] and UnitDefs[unitDefID].canAttack and UnitDefs[unitDefID].canMove and UnitDefs[unitDefID].maxWeaponRange and UnitDefs[unitDefID].maxWeaponRange > 0
 end
 
 local function addUnit(unitID, data)

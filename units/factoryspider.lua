@@ -31,7 +31,7 @@ unitDef = {
   canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[100 120 110]],
+  collisionVolumeScales         = [[100 100 100]],
   collisionVolumeTest	        = 1,
   collisionVolumeType	        = [[ellipsoid]],
   corpse                        = [[DEAD]],
@@ -43,6 +43,7 @@ unitDef = {
     helptext_fi    = [[Tuottaa pitk?lti erikoistuneita tai jalkav?kirobotteja raskaampia yksik?it?. Esimerkiksi EMP, n?kym?tt?myys ja maastokelpoisuus ovat joidenkin t?m?n tehtaan tuotoksien erikoisuuksia.]],
 	helptext_de    = [[Ideal für unwegsames Gelände, liegt der Fokus der Spider Factory eher auf Einheiten mit großer Reichweite und Wendigkeit und weniger auf roher Gewalt. Wichtigste Einheiten: Flea, Recluse, Cudgel, Crabe]],
     sortName       = [[5]],
+	modelradius    = [[50]],
   },
 
   energyMake                    = 0.3,

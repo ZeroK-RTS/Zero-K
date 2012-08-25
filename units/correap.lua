@@ -28,6 +28,9 @@ unitDef = {
     helptext_bp    = [[Reaper é um tanque de batalha pesado que excede em absorver danos e servir de escudo para unidades mais fracas, mas sua baixa velocidade de disparo e agilidade o tornam pouco eficiente contra grandes grupos de pequenas unidades inimigas.]],
     helptext_fr    = [[Le Reaper est un tank d'assaut lourd. Lourd par le blindage, lourd par les dégâts. La lente cadence de tir de son double canon plasma ne conviendra pas aux situations d'encerclement et aux nuées d'ennemis et son blindage le rends peu maniable.]],
 	helptext_de    = [[Der Reaper ist ein schwerer Kampfpanzer, der sich durch die Absorbtion von Schaden auszeichnet. Seine niedrige Feuerrate führt dazu, dass er mit großen Gruppen von Einheiten nicht gut klar kommt und seine schwere Panzerung wirkt sich negativ auf die Manövrierfähigkeit aus.]],
+	aimposoffset   = [[0 0 0]],
+	midposoffset   = [[0 0 0]],
+	modelradius    = [[25]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

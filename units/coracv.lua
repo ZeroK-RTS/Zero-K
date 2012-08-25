@@ -20,7 +20,7 @@ unitDef = {
   canreclamate           = [[1]],
   canstop                = [[1]],
   category               = [[LAND]],
-  collisionVolumeOffsets = [[0 -15 0]],
+  collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[60 60 60]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
@@ -34,6 +34,9 @@ unitDef = {
     helptext_bp    = [[Armado com uma torre de defesa, o construtor armado pode se defender de pequenos ataques inimigos.]],
     helptext_fr    = [[Arm? d'une tourelle laser l?g?re, le Welder saura parfaitement se d?fendre contre les attaques de tirailleurs ou d'?claireurs.]],
 	helptext_de    = [[Mit einem kleinen Verteidigungsturm bewaffnet, kann der Welder sich selbst gegen leichte gegnerische Attacken wehren.]],
+	aimposoffset   = [[0 0 0]],
+	midposoffset   = [[0 -10 0]],
+	modelradius    = [[30]],
   },
 
   energyMake             = 0.225,
