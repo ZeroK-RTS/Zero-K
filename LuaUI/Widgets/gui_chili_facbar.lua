@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili FactoryBar",
-    desc      = "v0.051 Chili buildmenu for factories.",
+    desc      = "v0.052 Chili buildmenu for factories.",
     author    = "CarRepairer (converted from jK's Buildbar)",
     date      = "2010-11-10",
     license   = "GNU GPL, v2 or later",
@@ -343,6 +343,7 @@ local function MakeButton(unitDefID, facID, facIndex)
 			name = unitDefID,
 			tooltip=tooltip,
 			x=0,
+			caption='',
 			width = options.buttonsize.value,
 			height = options.buttonsize.value,
 			padding = {4, 4, 4, 4},
