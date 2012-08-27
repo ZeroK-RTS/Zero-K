@@ -25,10 +25,6 @@ unitDef = {
   canreclamate        = [[1]],
   canSubmerge         = false,
   category            = [[GUNSHIP UNARMED]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[52 52 52]],
-  collisionVolumeTest           = 1,
-  collisionVolumeType           = [[ellipsoid]],
   collide             = true,
   corpse              = [[DEAD]],
   cruiseAlt           = 80,
@@ -47,8 +43,6 @@ unitDef = {
     helptext_es    = [[El Crane vuela rápidamente sobre qualquier terreno, pero es frágil a qualquier AA. Aunque tenga relativamente poco nano comparado con otros constructores, pude construir en muchos lugares inaccesibles y puede ampliar el territorio de un jugador en una manera no linear. Gracias a su mobilidad, es ideal para reclamar pecios.]],
     helptext_fr    = [[Le Crane vole rapidement au dessus de tous les obstacles. Tr?s vuln?rable ? la d?fense a?rienne, il est id?al pour construire dans des endroits tres difficile d'acces ou pour r?cup?rer le m?tal des carcasses sur le champ de bataille.]],
     helptext_it    = [[Il Crane vola velocemnte su qualunque terreno, ma ? fragile a qualunque AA. Anche se ha relativamente poco nano rispetto ad altri costruttori, riesce a costruire un posti inaccessibili e pu? espandere il territorio di un giocatore un una maniera non lineare. Grazie alla sua mobilit? ? ideale pere reclamare relitti.]],
-	
-	modelradius    = [[26]],
   },
 
   energyMake          = 0.12,

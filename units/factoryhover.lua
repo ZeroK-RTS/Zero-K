@@ -24,7 +24,7 @@ unitDef = {
   canPatrol        = true,
   canstop          = [[1]],
   category         = [[UNARMED FLOAT]],
-  collisionVolumeOffsets = [[0 25 0]],
+  collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[108 45 108]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
@@ -35,9 +35,6 @@ unitDef = {
     helptext       = [[The Hovercraft Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Halberd, Mace, Penetrator]],
 	helptext_de    = [[Die Hovercraft Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Halberd, Mace, Penetrator]],
     sortName = [[8]],
-	aimposoffset   = [[0 0 0]],
-	midposoffset   = [[0 -25 0]],
-	modelradius    = [[60]],
   },
 
   energyMake       = 0.225,

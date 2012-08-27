@@ -1272,23 +1272,23 @@ function gadgetHandler:AllowWeaponTargetCheck(attackerID, attackerWeaponNum, att
 end
 
 function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
-	local allowed = true
-	local priority = defPriority
+	local priority = 1.0
 
 	for _, g in ipairs(self.AllowWeaponTargetList) do
-		-- Send priority to each sucessive gadget.
-		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, priority)
+		local targetAllowed, targetPriority = g:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 
 		if (not targetAllowed) then
-			allowed = false
-			break
+			return false, 1.0
 		end
 
-		priority = targetPriority
+		if (targetPriority > 0.0) then
+			priority = priority * targetPriority
+		end
 	end
 
-	return allowed, priority
+	return true, priority
 end
+
 
 --------------------------------------------------------------------------------
 --
