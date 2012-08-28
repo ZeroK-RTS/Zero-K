@@ -51,7 +51,7 @@ local flameFX = {
     emitVector   = {0,1,0},
     emitRotSpread = 60,
     texture      = 'bitmaps/GPL/flame.png',
-    count        = 7,
+    count        = 5,
 }
 
 local smokeFX = {
@@ -137,10 +137,10 @@ function onFire(burningUnits)
       flameFX.size    = r * 0.35
       particleIDs[#particleIDs+1] = AddParticles('SimpleParticles2',flameFX)
 
-      smokeFX.pos     = flameFX.pos 
-      smokeFX.partpos = flameFX.partpos
-      smokeFX.size    = flameFX.size
-      particleIDs[#particleIDs+1] = AddParticles('SimpleParticles2',smokeFX)
+      --smokeFX.pos     = flameFX.pos 
+      --smokeFX.partpos = flameFX.partpos
+      --smokeFX.size    = flameFX.size
+      --particleIDs[#particleIDs+1] = AddParticles('SimpleParticles2',smokeFX)
     end
 
   end
