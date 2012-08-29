@@ -236,7 +236,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
 	if(cmdID and ((cmdID == CMD.CLOAK and cmdParams and (cmdParams[1] == 1)) -- block cloak
-	or (cmdID == CMD.RESURRECT) or (cmdID < 0) or ((cmdID == CMD.INSERT) and cmdParams and (cmdParams[2] < 0)))) -- block rez
+	or (cmdID == CMD.RECLAIM) or (cmdID == CMD.RESURRECT) or (cmdID < 0) or ((cmdID == CMD.INSERT) and cmdParams and (cmdParams[2] < 0)))) -- block rez
 	then return false
 	else return true end
 end
@@ -255,7 +255,7 @@ end
 
 local function SpawnCreep1 (x, y, z, teamID)
   local creep = Spring.CreateUnit(creep1, x + random(-50,50), y, z + random(-50,50), 0, teamID)
-  Spring.MoveCtrl.SetGroundMoveTypeData(creep, "maxSpeed", 1.95)
+  --Spring.MoveCtrl.SetGroundMoveTypeData(creep, "maxSpeed", 1.95)
   return creep
 end
 
