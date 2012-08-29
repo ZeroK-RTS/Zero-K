@@ -10,7 +10,7 @@ function gadget:GetInfo()
 	}
 end
 
-local versionNumber = "v15"
+local versionNumber = "v16"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -39,6 +39,12 @@ local team1 = Spring.GetTeamList(0)[1]
 local team2 = Spring.GetTeamList(1)[1]
 
 local rewardEnergyMult = 0.4
+
+local terraCmds = {
+  [CMD_RAMP]  = true,
+  [CMD_LEVEL] = true,
+  [CMD_RAISE] = true,
+}
 
 -- creeps
 local creep1 = "spiderassault"
@@ -72,7 +78,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if(unitDefID == UnitDefNames[creep1].id or unitDefID == UnitDefNames[creep2].id) then
 		Spring.SetUnitNoSelect(unitID,true) -- creeps uncontrollable
 	end
-	Spring.SetUnitCosts(unitID, {metalCost = 1})
+	--Spring.SetUnitCosts(unitID, {metalCost = 1})
   
   newUnits[unitID] = true
 end
@@ -155,7 +161,7 @@ function SpawnT2(x, z, t)
 	local turret = Spring.CreateUnit("corllt", x, Spring.GetGroundHeight(x, z), z, 0, t)
 	Spring.SetUnitWeaponState(turret, 0,
 	{
-     range = 580,
+     range = 600,
      projectiles = 5,
      burst = 8,
 	 burstRate = 0.01,
@@ -177,7 +183,8 @@ function SpawnT1(x, z, t)
 	local turret = Spring.CreateUnit("corpre", x, Spring.GetGroundHeight(x, z), z, 0, t)
 	Spring.SetUnitWeaponState(turret, 0,
 	{
-	 reloadTime = 0.04,
+    range = 600,
+    reloadTime = 0.03,
     } )
   local cost = 500
   Spring.SetUnitCosts(turret, {
@@ -197,7 +204,7 @@ function SpawnT3(x, z, t)
 	Spring.SetUnitResourcing(turret, "ume", 25) -- needs 25 E to fire like anni/ddm
 	Spring.SetUnitWeaponState(turret, 0,
 	{
-     range = 730,
+     range = 750,
 	 reloadTime = 8,
     } )
   local cost = 1500
@@ -279,7 +286,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
       cmdParams[1] = cmdParams[4]
     end
     if (((cmdID == CMD.CLOAK or cmdID == CMD_CLOAK_SHIELD) and cmdParams and (cmdParams[1] == 1)) or -- block cloak
-      (cmdID == CMD.RECLAIM) or (cmdID == CMD.RESURRECT) or (cmdID < 0)) then -- block reclaim, rez, build
+      (cmdID == CMD.RECLAIM) or (cmdID == CMD.RESURRECT) or (cmdID < 0) or terraCmds[cmdID]) then -- block reclaim, rez, build and terra
       return false
     end
   end
@@ -300,17 +307,24 @@ end
 
 local function SpawnCreep1 (x, y, z, teamID)
   local creep = Spring.CreateUnit(creep1, x + random(-50,50), y, z + random(-50,50), 0, teamID)
-  Spring.SetUnitWeaponState(creep, 0, "reloadTime", 1.5)
+  --Spring.SetUnitWeaponState(creep, 0, "reloadTime", 1.5)
   --Spring.MoveCtrl.SetGroundMoveTypeData(creep, "maxSpeed", 1.95)
   return creep
 end
 
 function gadget:GameFrame(n)
-  for unitID,_ in pairs(newUnits) do
+  for unitID,_ in pairs(newUnits) do -- must be done one frame after unit creation, not in UnitCreated
     local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK_SHIELD)
-    if (cmdDescID) then -- must be done one frame after unit creation, not in UnitCreated
+    if (cmdDescID) then 
       Spring.GiveOrderToUnit(unitID, CMD_CLOAK_SHIELD, {0}, {})
-      Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
+      Spring.RemoveUnitCmdDesc(unitID, cmdDescID) -- block area cloak
+    end
+    
+    for cmdID,_ in pairs(terraCmds) do
+      local cmdDescID = Spring.FindUnitCmdDesc(unitID, cmdID)
+      if (cmdDescID) then
+        Spring.RemoveUnitCmdDesc(unitID, cmdDescID) -- block terraform
+      end
     end
   end
   newUnits = {}
