@@ -10,7 +10,7 @@ function gadget:GetInfo()
 	}
 end
 
-local versionNumber = "v16"
+local versionNumber = "v17"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -67,9 +67,18 @@ local midy = Spring.GetGroundHeight(Game.mapSizeX/2, Game.mapSizeZ/2)
 
 local newUnits = {}
 
+local swimmersData = {}
+
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if(UnitDefs[unitDefID].customParams.commtype and not basecoms[unitTeam]) then
-		basecoms[unitTeam] = UnitDefs[unitDefID].name
+	if (UnitDefs[unitDefID].customParams.commtype) then
+    if (not basecoms[unitTeam]) then
+      basecoms[unitTeam] = UnitDefs[unitDefID].name
+    end
+
+    swimmersData[unitID] = {
+      secondsInWater = 0,
+      secondsOnLand = 0,
+    }
 	end
 	
 	Spring.SetUnitCloak(unitID, false)
@@ -131,6 +140,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 		if(allyteam == 0) then Spring.CreateUnit("amphtele", edge_dist4, y04, edge_dist4, 0, unitTeam)
 		else Spring.CreateUnit("amphtele", Game.mapSizeX - edge_dist4, y14, Game.mapSizeZ - edge_dist4, 2, unitTeam) end
 	elseif(UnitDefs[unitDefID].customParams.commtype) then
+    swimmersData[unitID] = nil
 		if(attackerID == nil and Spring.GetUnitHealth(unitID) > 0) then return end -- blocks respawn at morph (also blocks respawn at self-d. pwned.)
 		if(attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
 			killer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(attackerTeam)))
@@ -341,7 +351,32 @@ function gadget:GameFrame(n)
 				end
 			end
 		end
-	end
+
+    local unitsToDamage = {}
+    for unitID, data in pairs(swimmersData) do
+      local _,height = Spring.GetUnitBasePosition(unitID)
+      if height < 0 then
+        data.secondsInWater = data.secondsInWater + 1
+        data.secondsOnLand = 0
+        if (data.secondsInWater > 10) then
+          unitsToDamage[unitID] = (data.secondsInWater - 10) * 2 -- can't call AddUnitDamage here directly
+        end
+      else
+        data.secondsOnLand = data.secondsOnLand + 1
+        if (data.secondsInWater > 0) then
+          if (data.secondsOnLand < 20) then
+            data.secondsInWater = data.secondsInWater - 1
+          elseif (data.secondsOnLand == 20) then
+            data.secondsInWater = 0
+          end
+        end
+      end
+    end
+    for unitID, damage in pairs(unitsToDamage) do 
+      Spring.AddUnitDamage(unitID, damage, 0, -1, -5) -- water damage
+    end
+  end
+
 	if((n % (5*1350)) == 850) then creepcount = math.min(creepcount + 1, 7) end
 	if((n % 1350) ~= 900) then return end
 	local creep
