@@ -196,8 +196,7 @@ local function ProcessComm(name, config)
 		if attributeMods.speed > 0 then
 			commDefs[name].maxvelocity = commDefs[name].maxvelocity*(1+attributeMods.speed)
 		else
-			commDefs[name].maxvelocity = commDefs[name].maxvelocity*(1+attributeMods.speed)
-			--commDefs[name].maxvelocity = commDefs[name].maxvelocity/(1-attributeMods.speed)
+			commDefs[name].maxvelocity = commDefs[name].maxvelocity/(1-attributeMods.speed)
 		end
 		commDefs[name].maxdamage = commDefs[name].maxdamage*(1+attributeMods.health)
 		
