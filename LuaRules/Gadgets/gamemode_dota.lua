@@ -10,7 +10,7 @@ function gadget:GetInfo()
 	}
 end
 
-local versionNumber = "v17"
+local versionNumber = "v18"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -40,11 +40,16 @@ local team2 = Spring.GetTeamList(1)[1]
 
 local rewardEnergyMult = 0.4
 
-local terraCmds = {
+local blockedCmds = {
+  [CMD.RECLAIM]   = true,
+  [CMD.RESURRECT] = true,
+  [CMD_AREA_MEX]  = true,
   [CMD_RAMP]  = true,
   [CMD_LEVEL] = true,
   [CMD_RAISE] = true,
 }
+
+local disabledCmdArray = { disabled = true }
 
 -- creeps
 local creep1 = "spiderassault"
@@ -79,6 +84,13 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
       secondsInWater = 0,
       secondsOnLand = 0,
     }
+
+    for _, buildoptionID in pairs(UnitDefs[unitDefID].buildOptions) do
+      local cmdDescID = Spring.FindUnitCmdDesc(unitID, -buildoptionID)
+      if (cmdDescID) then
+        Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray)
+      end
+    end
 	end
 	
 	Spring.SetUnitCloak(unitID, false)
@@ -229,7 +241,7 @@ function SpawnT3(x, z, t)
 	Spring.SetUnitHealth(turret, 6000)
 end
 
-function gadget:GameStart()
+function gadget:GamePreload()
 	hq0 = Spring.CreateUnit("pw_hq", edge_dist, y0, edge_dist, 0, team1)
 	hq1 = Spring.CreateUnit("pw_hq", Game.mapSizeX - edge_dist, y1, Game.mapSizeZ - edge_dist, 2, team2)
 	Spring.SetUnitNoSelect(hq0, true)
@@ -263,14 +275,20 @@ function gadget:GameStart()
 	SpawnT3(7665,6682, team2)
 	SpawnT3(6666,6666, team2)
 	
-	-- baes
+	-- bases
 	SpawnT2(edge_dist - 150, edge_dist + 150, team1)
 	SpawnT2(edge_dist + 150, edge_dist - 150, team1)
 
 	SpawnT2(Game.mapSizeX - edge_dist - 150, Game.mapSizeX - edge_dist + 150, team2)
 	SpawnT2(Game.mapSizeX - edge_dist + 150, Game.mapSizeX - edge_dist - 150, team2)
-	
-	-- djinns
+
+	-- mark fountain
+	Spring.LevelHeightMap(fountain-Game.squareSize, fountain-Game.squareSize, fountain, fountain, Spring.GetGroundHeight(fountain, fountain) + 120)
+	Spring.LevelHeightMap(Game.mapSizeX-fountain, Game.mapSizeZ-fountain, Game.mapSizeX-fountain+Game.squareSize, Game.mapSizeZ-fountain+Game.squareSize, Spring.GetGroundHeight(Game.mapSizeX-fountain, Game.mapSizeZ-fountain) + 120)
+end
+
+function gadget:GameStart()
+	-- djinns (cant spawn them at GamePreload because they are selectable and players could move them)
 	allyteams0 = Spring.GetTeamList(0)
 	for i=1, #allyteams0 do
     --Spring.SetTeamResource(allyteams0[i], "ms", 1000)
@@ -283,10 +301,6 @@ function gadget:GameStart()
     --Spring.SetTeamResource(allyteams1[i], "es", 1000)
 		Spring.CreateUnit("amphtele", Game.mapSizeX - edge_dist2 - random(-50, 50), y12, Game.mapSizeZ - edge_dist2 - random(-50, 50), 0, allyteams1[i])
 	end
-	
-	-- mark fountain
-	Spring.LevelHeightMap(fountain-Game.squareSize, fountain-Game.squareSize, fountain, fountain, Spring.GetGroundHeight(fountain, fountain) + 120)
-	Spring.LevelHeightMap(Game.mapSizeX-fountain, Game.mapSizeZ-fountain, Game.mapSizeX-fountain+Game.squareSize, Game.mapSizeZ-fountain+Game.squareSize, Spring.GetGroundHeight(Game.mapSizeX-fountain, Game.mapSizeZ-fountain) + 120)
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
@@ -296,7 +310,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
       cmdParams[1] = cmdParams[4]
     end
     if (((cmdID == CMD.CLOAK or cmdID == CMD_CLOAK_SHIELD) and cmdParams and (cmdParams[1] == 1)) or -- block cloak
-      (cmdID == CMD.RECLAIM) or (cmdID == CMD.RESURRECT) or (cmdID < 0) or terraCmds[cmdID]) then -- block reclaim, rez, build and terra
+      blockedCmds[cmdID] or cmdID < 0) then -- block reclaim, rez, build and terra
       return false
     end
   end
@@ -330,10 +344,11 @@ function gadget:GameFrame(n)
       Spring.RemoveUnitCmdDesc(unitID, cmdDescID) -- block area cloak
     end
     
-    for cmdID,_ in pairs(terraCmds) do
+    for cmdID,_ in pairs(blockedCmds) do
       local cmdDescID = Spring.FindUnitCmdDesc(unitID, cmdID)
       if (cmdDescID) then
-        Spring.RemoveUnitCmdDesc(unitID, cmdDescID) -- block terraform
+        Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray) -- block terraform and some other commands
+        --Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
       end
     end
   end
