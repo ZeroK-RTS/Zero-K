@@ -524,7 +524,7 @@ local function hideMessage(msg)
 end
 
 local function displayMessage(msg, remake)
-	if hideMessage(msg)	then
+	if hideMessage(msg)	or (not WG.Chili) then
 		return
 	end
 
