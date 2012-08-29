@@ -35,7 +35,7 @@ local team1 = Spring.GetTeamList(0)[1]
 local team2 = Spring.GetTeamList(1)[1]
 
 -- creeps
-local creep1 = "corthud"
+local creep1 = "spiderassault"
 local creep2 = "corstorm"
 
 -- current creep count per wave
@@ -122,11 +122,12 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID)
 	elseif(UnitDefs[unitDefID].customParams.commtype) then
 		if(attackerID == nil and Spring.GetUnitHealth(unitID) > 0) then return end -- blocks respawn at morph (also blocks respawn at self-d. pwned.)
 		if(attackerID and Spring.GetUnitTeam(attackerID) and not Spring.AreTeamsAllied(unitTeam, Spring.GetUnitTeam(attackerID)) and Spring.GetUnitDefID(attackerID) and UnitDefs[Spring.GetUnitDefID(attackerID)].customParams.commtype) then
-			killer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(Spring.GetUnitTeam(attackerID))))
-			failer = Spring.GetPlayerInfo(unitTeam)
+			local attackerTeam = Spring.GetUnitTeam(attackerID)
+			killer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(attackerTeam)))
+			failer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(unitTeam)))
 			Spring.Echo(killer .. " pwned " .. failer .. "!")
-			Spring.AddTeamResource(Spring.GetUnitTeam(attackerID), "metal", 500)
-			Spring.AddTeamResource(Spring.GetUnitTeam(attackerID), "energy", 200) -- less E so ecell is still viable
+			Spring.AddTeamResource(attackerTeam, "metal", 500)
+			Spring.AddTeamResource(attackerTeam, "energy", 200) -- less E so ecell is still viable
 		end
 		if(allyteam == 0) then Spring.CreateUnit(basecoms[unitTeam], edge_dist4, y04, edge_dist4, 0, unitTeam)
 		else Spring.CreateUnit(basecoms[unitTeam], Game.mapSizeX - edge_dist4, y14, Game.mapSizeZ - edge_dist4, 2, unitTeam)
@@ -252,6 +253,12 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	return damage
 end
 
+local function SpawnCreep1 (x, y, z, teamID)
+  local creep = Spring.CreateUnit(creep1, x + random(-50,50), y, z + random(-50,50), 0, teamID)
+  Spring.MoveCtrl.SetGroundMoveTypeData(creep, "maxSpeed", 1.95)
+  return creep
+end
+
 function gadget:GameFrame(n)
 	if((n % 30) == 17) then
 		everything = Spring.GetAllUnits()
@@ -270,7 +277,7 @@ function gadget:GameFrame(n)
 	if((n % 1350) ~= 900) then return end
 	local creep
 	for i = 1,creepcount do -- top right, team 0
-		creep = Spring.CreateUnit(creep1, edge_dist2 + random(0,100), y02, edge_dist2 + random(0,100), 0, team1)
+		creep = SpawnCreep1(edge_dist2, y02, edge_dist2, team1)
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX - edge_dist3, yc1, edge_dist3}, {"shift"})
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX - edge_dist, y1, Game.mapSizeZ - edge_dist}, {"shift"})
     end
@@ -279,7 +286,7 @@ function gadget:GameFrame(n)
 	Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX - edge_dist, y1, Game.mapSizeZ - edge_dist}, {"shift"})
 	
 	for i = 1,creepcount do -- bottom left, team 1
-		creep = Spring.CreateUnit(creep1, Game.mapSizeX - edge_dist2 - random(0,100), y12, Game.mapSizeZ - edge_dist2 - random(0,100), 0, team2)
+		creep = SpawnCreep1(Game.mapSizeX - edge_dist2, y12, Game.mapSizeZ - edge_dist2, team2)
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {edge_dist3, yc2, Game.mapSizeZ - edge_dist3}, {"shift"})
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {edge_dist, y0, edge_dist}, {"shift"})
     end
@@ -288,7 +295,7 @@ function gadget:GameFrame(n)
 	Spring.GiveOrderToUnit(creep, CMD.FIGHT, {edge_dist, y0, edge_dist}, {"shift"})
 	
 	for i = 1,creepcount do -- top right, team 1
-		creep = Spring.CreateUnit(creep1, Game.mapSizeX - edge_dist2 - random(0,100), y12, Game.mapSizeZ - edge_dist2 - random(0,100), 0, team2)
+		creep = SpawnCreep1(Game.mapSizeX - edge_dist2, y12, Game.mapSizeZ - edge_dist2, team2)
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX - edge_dist3, yc1, edge_dist3}, {"shift"})
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {edge_dist, y0, edge_dist}, {"shift"})
     end
@@ -297,7 +304,7 @@ function gadget:GameFrame(n)
 	Spring.GiveOrderToUnit(creep, CMD.FIGHT, {edge_dist, y0, edge_dist}, {"shift"})
 
 	for i = 1,creepcount do -- bottom left, team 0
-		creep = Spring.CreateUnit(creep1, edge_dist2 + random(0,100), y02, edge_dist2 + random(0,100), 0, team1)
+		creep = SpawnCreep1(edge_dist2, y02, edge_dist2, team1)
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {edge_dist3, yc2, Game.mapSizeZ - edge_dist3}, {"shift"})
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX - edge_dist, y1, Game.mapSizeZ - edge_dist}, {"shift"})
     end
@@ -306,7 +313,7 @@ function gadget:GameFrame(n)
 	Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX - edge_dist, y1, Game.mapSizeZ - edge_dist}, {"shift"})
 		
 	for i = 1,creepcount do -- mid, team 0
-		creep = Spring.CreateUnit(creep1, edge_dist2 + random(0,100), y02, edge_dist2 + random(0,100), 0, team1)
+		creep = SpawnCreep1(edge_dist2, y02, edge_dist2, team1)
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX/2, midy, Game.mapSizeZ/2}, {"shift"})
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX - edge_dist, y1, Game.mapSizeZ - edge_dist}, {"shift"})
     end
@@ -315,7 +322,7 @@ function gadget:GameFrame(n)
 	Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX - edge_dist, y1, Game.mapSizeZ - edge_dist}, {"shift"})
 	
 	for i = 1,creepcount do -- mid, team 1
-		creep = Spring.CreateUnit(creep1, Game.mapSizeX - edge_dist2 - random(0,100), y12, Game.mapSizeZ - edge_dist2 - random(0,100), 0, team2)
+		creep = SpawnCreep1(Game.mapSizeX - edge_dist2, y12, Game.mapSizeZ - edge_dist2, team2)
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {Game.mapSizeX/2, midy, Game.mapSizeZ/2}, {"shift"})
 		Spring.GiveOrderToUnit(creep, CMD.FIGHT, {edge_dist, y0, edge_dist}, {"shift"})
     end
