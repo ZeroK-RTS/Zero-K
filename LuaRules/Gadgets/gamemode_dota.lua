@@ -5,10 +5,12 @@ function gadget:GetInfo()
 		author = "Sprung, modified by Rafal",
 		date = "25/8/2012",
 		license = "PD",
-		layer = 1,
+		layer = -10,
 		enabled = true,
 	}
 end
+
+local versionNumber = "v15"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -17,6 +19,8 @@ end
 if (not gadgetHandler:IsSyncedCode()) then
 	return
 end
+
+include("LuaRules/Configs/customcmds.h.lua")
 
 local random = math.random
 
@@ -33,6 +37,8 @@ local fountain = 500 -- autoheal
 
 local team1 = Spring.GetTeamList(0)[1]
 local team2 = Spring.GetTeamList(1)[1]
+
+local rewardEnergyMult = 0.4
 
 -- creeps
 local creep1 = "spiderassault"
@@ -53,6 +59,8 @@ local yc2 = Spring.GetGroundHeight(edge_dist3, Game.mapSizeZ - edge_dist3)
 
 local midy = Spring.GetGroundHeight(Game.mapSizeX/2, Game.mapSizeZ/2)
 
+local newUnits = {}
+
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if(UnitDefs[unitDefID].customParams.commtype and not basecoms[unitTeam]) then
 		basecoms[unitTeam] = UnitDefs[unitDefID].name
@@ -61,22 +69,19 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	Spring.SetUnitCloak(unitID, false)
 	Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {0}, {})
 
-	local cmdDescID = Spring.FindUnitCmdDesc(unitID, 32101)  --areacloak
-	if (cmdDescID) then
-		Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
-	end
-
 	if(unitDefID == UnitDefNames[creep1].id or unitDefID == UnitDefNames[creep2].id) then
 		Spring.SetUnitNoSelect(unitID,true) -- creeps uncontrollable
 	end
 	Spring.SetUnitCosts(unitID, {metalCost = 1})
+  
+  newUnits[unitID] = true
 end
 
 function gadget:AllowFeatureCreation()
 	return false
 end
 
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID)
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
 	_,_,_,_,_,allyteam = Spring.GetTeamInfo(unitTeam)
 	if(unitID == hq0) then 
 		for _,aunitID in ipairs(Spring.GetAllUnits()) do
@@ -110,29 +115,40 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID)
 			_,_,_,eu = Spring.GetUnitResources(hq1)
 			Spring.SetUnitResourcing(hq1, "uue", eu - 25)
 		end
-	elseif(UnitDefs[unitDefID].name == creep1 or UnitDefs[unitDefID].name == creep2) then
-		if(attackerID and Spring.GetUnitTeam(attackerID) and (not Spring.AreTeamsAllied(unitTeam, Spring.GetUnitTeam(attackerID))) and Spring.GetUnitDefID(attackerID) and UnitDefs[Spring.GetUnitDefID(attackerID)].customParams.commtype) then
-			Spring.AddTeamResource(Spring.GetUnitTeam(attackerID), "metal", 50)
-			Spring.AddTeamResource(Spring.GetUnitTeam(attackerID), "energy", 20) -- less E so ecell is still viable
-		end
 	elseif(UnitDefs[unitDefID].name == "amphtele") then
+    if (attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
+      local reward = 100
+      Spring.AddTeamResource(attackerTeam, "metal", reward)
+      Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
+    end
+    -- respawn Djinn
 		if(allyteam == 0) then Spring.CreateUnit("amphtele", edge_dist4, y04, edge_dist4, 0, unitTeam)
-		else Spring.CreateUnit("amphtele", Game.mapSizeX - edge_dist4, y14, Game.mapSizeZ - edge_dist4, 2, unitTeam)
-		end
+		else Spring.CreateUnit("amphtele", Game.mapSizeX - edge_dist4, y14, Game.mapSizeZ - edge_dist4, 2, unitTeam) end
 	elseif(UnitDefs[unitDefID].customParams.commtype) then
 		if(attackerID == nil and Spring.GetUnitHealth(unitID) > 0) then return end -- blocks respawn at morph (also blocks respawn at self-d. pwned.)
-		if(attackerID and Spring.GetUnitTeam(attackerID) and not Spring.AreTeamsAllied(unitTeam, Spring.GetUnitTeam(attackerID)) and Spring.GetUnitDefID(attackerID) and UnitDefs[Spring.GetUnitDefID(attackerID)].customParams.commtype) then
-			local attackerTeam = Spring.GetUnitTeam(attackerID)
+		if(attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
 			killer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(attackerTeam)))
 			failer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(unitTeam)))
 			Spring.Echo(killer .. " pwned " .. failer .. "!")
-			Spring.AddTeamResource(attackerTeam, "metal", 500)
-			Spring.AddTeamResource(attackerTeam, "energy", 200) -- less E so ecell is still viable
+			local reward = 500 + 0.1 * UnitDefs[unitDefID].metalCost
+			Spring.AddTeamResource(attackerTeam, "metal", reward)
+			Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
 		end
 		if(allyteam == 0) then Spring.CreateUnit(basecoms[unitTeam], edge_dist4, y04, edge_dist4, 0, unitTeam)
 		else Spring.CreateUnit(basecoms[unitTeam], Game.mapSizeX - edge_dist4, y14, Game.mapSizeZ - edge_dist4, 2, unitTeam)
 		end
 	end
+end
+
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+  if (UnitDefs[unitDefID].name == creep1 or UnitDefs[unitDefID].name == creep2) then
+    if (attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
+      local realDamage = damage + math.min(0, Spring.GetUnitHealth(unitID)) -- negative health means overkill
+      local reward = 50 * (realDamage / UnitDefs[unitDefID].health)
+      Spring.AddTeamResource(attackerTeam, "metal", reward)
+      Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
+    end
+  end
 end
 
 function SpawnT2(x, z, t)
@@ -145,10 +161,16 @@ function SpawnT2(x, z, t)
 	 burstRate = 0.01,
 	 sprayAngle = 0.08,
     } )
+  local cost = 1000
+  Spring.SetUnitCosts(turret, {
+    buildTime = cost,
+    metalCost = cost,
+    energyCost = cost,
+  } )
 	Spring.SetUnitSensorRadius(turret, "los", 1000)
 	Spring.SetUnitNoSelect(turret, true)
-	Spring.SetUnitMaxHealth(turret, 4250)
-	Spring.SetUnitHealth(turret, 4250)
+	Spring.SetUnitMaxHealth(turret, 4500)
+	Spring.SetUnitHealth(turret, 4500)
 end
 
 function SpawnT1(x, z, t)
@@ -157,10 +179,16 @@ function SpawnT1(x, z, t)
 	{
 	 reloadTime = 0.04,
     } )
+  local cost = 500
+  Spring.SetUnitCosts(turret, {
+    buildTime = cost,
+    metalCost = cost,
+    energyCost = cost,
+  } )
 	Spring.SetUnitSensorRadius(turret, "los", 600)
 	Spring.SetUnitNoSelect(turret, true)
-	Spring.SetUnitMaxHealth(turret, 2500)
-	Spring.SetUnitHealth(turret, 2500)
+	Spring.SetUnitMaxHealth(turret, 3000)
+	Spring.SetUnitHealth(turret, 3000)
 end
 
 function SpawnT3(x, z, t)
@@ -172,10 +200,16 @@ function SpawnT3(x, z, t)
      range = 730,
 	 reloadTime = 8,
     } )
+  local cost = 1500
+  Spring.SetUnitCosts(turret, {
+    buildTime = cost,
+    metalCost = cost,
+    energyCost = cost,
+  } )
 	Spring.SetUnitSensorRadius(turret, "los", 1250)
 	Spring.SetUnitNoSelect(turret, true)
-	Spring.SetUnitMaxHealth(turret, 4500)
-	Spring.SetUnitHealth(turret, 4500)
+	Spring.SetUnitMaxHealth(turret, 6000)
+	Spring.SetUnitHealth(turret, 6000)
 end
 
 function gadget:GameStart()
@@ -222,10 +256,14 @@ function gadget:GameStart()
 	-- djinns
 	allyteams0 = Spring.GetTeamList(0)
 	for i=1, #allyteams0 do
+    --Spring.SetTeamResource(allyteams0[i], "ms", 1000)
+    --Spring.SetTeamResource(allyteams0[i], "es", 1000)
 		Spring.CreateUnit("amphtele", edge_dist2 - random(-50, 50), y02, edge_dist2 - random(-50, 50), 0, allyteams0[i])
 	end
 	allyteams1 = Spring.GetTeamList(1)
 	for i=1, #allyteams1 do
+    --Spring.SetTeamResource(allyteams1[i], "ms", 1000)
+    --Spring.SetTeamResource(allyteams1[i], "es", 1000)
 		Spring.CreateUnit("amphtele", Game.mapSizeX - edge_dist2 - random(-50, 50), y12, Game.mapSizeZ - edge_dist2 - random(-50, 50), 0, allyteams1[i])
 	end
 	
@@ -235,10 +273,17 @@ function gadget:GameStart()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
-	if(cmdID and ((cmdID == CMD.CLOAK and cmdParams and (cmdParams[1] == 1)) -- block cloak
-	or (cmdID == CMD.RECLAIM) or (cmdID == CMD.RESURRECT) or (cmdID < 0) or ((cmdID == CMD.INSERT) and cmdParams and (cmdParams[2] < 0)))) -- block rez
-	then return false
-	else return true end
+  if (cmdID) then
+    if (cmdID == CMD.INSERT and cmdParams and cmdParams[2]) then
+      cmdID = cmdParams[2]
+      cmdParams[1] = cmdParams[4]
+    end
+    if (((cmdID == CMD.CLOAK or cmdID == CMD_CLOAK_SHIELD) and cmdParams and (cmdParams[1] == 1)) or -- block cloak
+      (cmdID == CMD.RECLAIM) or (cmdID == CMD.RESURRECT) or (cmdID < 0)) then -- block reclaim, rez, build
+      return false
+    end
+  end
+  return true
 end
 
 -- changing units' damage
@@ -255,11 +300,21 @@ end
 
 local function SpawnCreep1 (x, y, z, teamID)
   local creep = Spring.CreateUnit(creep1, x + random(-50,50), y, z + random(-50,50), 0, teamID)
+  Spring.SetUnitWeaponState(creep, 0, "reloadTime", 1.5)
   --Spring.MoveCtrl.SetGroundMoveTypeData(creep, "maxSpeed", 1.95)
   return creep
 end
 
 function gadget:GameFrame(n)
+  for unitID,_ in pairs(newUnits) do
+    local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK_SHIELD)
+    if (cmdDescID) then -- must be done one frame after unit creation, not in UnitCreated
+      Spring.GiveOrderToUnit(unitID, CMD_CLOAK_SHIELD, {0}, {})
+      Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
+    end
+  end
+  newUnits = {}
+
 	if((n % 30) == 17) then
 		everything = Spring.GetAllUnits()
 		for i=1, #everything do
@@ -268,7 +323,7 @@ function gadget:GameFrame(n)
 				allyteam = select(6, Spring.GetTeamInfo(Spring.GetUnitTeam(everything[i])))
 				if ((allyteam==0 and x<fountain and z<fountain) or (allyteam==1 and x > Game.mapSizeX - fountain and z > Game.mapSizeZ - fountain)) then
 					local hp, maxHp = Spring.GetUnitHealth(everything[i])
-					Spring.SetUnitHealth(everything[i], math.min(hp + 150, maxHp))
+					Spring.SetUnitHealth(everything[i], math.min(hp + 200, maxHp))
 				end
 			end
 		end
