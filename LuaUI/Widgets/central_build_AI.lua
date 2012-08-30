@@ -17,7 +17,7 @@
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
-    desc      = "v1.1 Common non-hierarchical permanent build queue",
+    desc      = "v1.1 Common non-hierarchical permanent build queue\n\nInstruction: add constructors to group zero (ctrl+0), and then give one of them a build queue. As result, the whole group will share same build queue and the work will automatically distribute among them. Use it to macro alot of idle constructors",
     author    = "Troy H. Cheek",
     date      = "July 20, 2009",
     license   = "GNU GPL, v2 or later",
