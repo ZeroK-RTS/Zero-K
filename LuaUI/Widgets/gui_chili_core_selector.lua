@@ -40,6 +40,14 @@ local buttonColorDisabled = {0.2,0.2,0.2,1}
 local imageColor = {1,1,1,1}
 local imageColorDisabled = {0.3, 0.3, 0.3, 1}
 
+local stateCommands = {	-- FIXME: is there a better way of doing this?
+  [CMD.CLOAK] = true,	-- this is the only one that's really needed, since it can occur without user input (when a temporarily decloaked unit recloaks)
+  [CMD.FIRE_STATE] = true,
+  [CMD.MOVE_STATE] = true,
+  [CMD.ONOFF] = true,
+  [CMD.REPEAT] = true,
+  [CMD.IDLEMODE] = true,
+}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -770,8 +778,11 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	end
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdId, cmdOpts, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
 	if (not myTeamID or unitTeam ~= myTeamID) then
+		return
+	end
+	if cmdID and stateCommands[cmdID] then
 		return
 	end
 	if idleCons[unitID] then
