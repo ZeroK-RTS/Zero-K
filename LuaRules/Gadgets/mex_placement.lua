@@ -41,7 +41,7 @@ for udid, ud in ipairs(UnitDefs) do
 	for i, option in ipairs(ud.buildOptions) do 
 		if mexDefID == option then
 			canMex[udid] = true
-			Spring.Echo(ud.name)
+			--Spring.Echo(ud.name)
 		end
 	end
 end

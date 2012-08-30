@@ -64,7 +64,7 @@ for i = 1, #FeatureDefs do
 	if fdef.customParams and fdef.customParams.fromunit then
 		validFeatureDefID[i] = true
 	end
-	Spring.Echo(validFeatureDefID[i])
+	--Spring.Echo(validFeatureDefID[i])
 end
 
 --------------------------------------------------------------------------------
