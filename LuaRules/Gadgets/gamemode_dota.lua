@@ -16,17 +16,16 @@ if (Spring.GetModOptions().zkmode ~= "dota") then
   return
 end
 
-if (not gadgetHandler:IsSyncedCode()) then
-  return
-end
+if (gadgetHandler:IsSyncedCode()) then
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
 
 include("LuaRules/Configs/customcmds.h.lua")
 
 local random = math.random
 
 local HQ = {}
-
-local basecoms = {}
 
 local team1 = Spring.GetTeamList(0)[1]
 local team2 = Spring.GetTeamList(1)[1]
@@ -184,20 +183,20 @@ local newUnits = {}
 local swimmersData = {}
 
 
-local function CreateUnitNearby(unitDef, spawnPoint, teamID)
+local function CreateUnitNearby(unitDef, spawnPoint, teamID, addMarker)
   local x,z = spawnPoint[1] + random(-50, 50), spawnPoint[3] + random(-50, 50)
   local y = Spring.GetGroundHeight(x, z)
   local creep = Spring.CreateUnit(unitDef, x, y, z, spawnPoint.facing, teamID)
+
+  if (addMarker) then
+    SendToUnsynced("gamemode_dota_addmarker", x, y, z, teamID)
+  end
   return creep
 end
 
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   if (UnitDefs[unitDefID].customParams.commtype) then
-    if (not basecoms[unitTeam]) then
-      basecoms[unitTeam] = UnitDefs[unitDefID].name
-    end
-
     swimmersData[unitID] = {
       secondsInWater = 0,
       secondsOnLand  = 0,
@@ -261,7 +260,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     end
 
     -- respawn Djinn
-    CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam)
+    CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam, true)
   elseif (UnitDefs[unitDefID].customParams.commtype) then
     swimmersData[unitID] = nil
     if (attackerID == nil and Spring.GetUnitHealth(unitID) > 0) then return end -- blocks respawn at morph (also blocks respawn at self-d. pwned.)
@@ -276,7 +275,14 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
       Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
     end
 
-    CreateUnitNearby(basecoms[unitTeam], teamData[allyteam+1].comRespawnPoint, unitTeam)
+    local comName = UnitDefs[unitDefID].name
+    local baseComName = comName:sub(1, -2)
+    if (UnitDefNames[baseComName .. "0"]) then
+      comName = baseComName .. "0"
+    elseif (UnitDefNames[baseComName .. "1"]) then
+      comName = baseComName .. "1"
+    end
+    CreateUnitNearby(comName, teamData[allyteam+1].comRespawnPoint, unitTeam, true)
   end
 end
 
@@ -556,4 +562,34 @@ function gadget:GameFrame(n)
       end
     end
   end
+end
+
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
+else
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
+
+local function AddMarker(action, x, y, z, teamID)
+  if (Spring.GetLocalTeamID() == teamID and not Spring.GetSpectatingState()) then
+    Spring.MarkerAddPoint(x, y, z)
+    Spring.MarkerErasePosition(x, y, z)
+  end
+end
+
+
+function gadget:Initialize()
+  gadgetHandler:AddSyncAction("gamemode_dota_addmarker", AddMarker)
+end
+
+
+function gadget:Shutdown()
+  gadgetHandler:RemoveSyncAction("gamemode_dota_addmarker")
+end
+
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
 end
