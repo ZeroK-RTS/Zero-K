@@ -5,12 +5,12 @@ function gadget:GetInfo()
     author  = "Sprung, modified by Rafal",
     date    = "25/8/2012",
     license = "PD",
-    layer   = -10,
+    layer   = 10, -- run after most gadgets
     enabled = true,
   }
 end
 
-local versionNumber = "v21"
+local versionNumber = "v22"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -191,8 +191,6 @@ end
 _G.healingAreasData = healingAreasData -- make it visible from unsynced
 
 
-local newUnits = {}
-
 local swimmersData = {}
 
 
@@ -218,7 +216,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
     for _, buildoptionID in ipairs(UnitDefs[unitDefID].buildOptions) do
       local cmdDescID = Spring.FindUnitCmdDesc(unitID, -buildoptionID)
       if (cmdDescID) then
-        Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray)
+        Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray) -- disable buildoptions
       end
     end
   end
@@ -226,7 +224,19 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   Spring.SetUnitCloak(unitID, false)
   Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {0}, 0)
 
-  newUnits[unitID] = true
+  local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK_SHIELD)
+  if (cmdDescID) then
+    Spring.GiveOrderToUnit(unitID, CMD_CLOAK_SHIELD, {0}, 0)
+    Spring.RemoveUnitCmdDesc(unitID, cmdDescID) -- block area cloak
+  end
+
+  for cmdID,_ in pairs(blockedCmds) do
+    local cmdDescID = Spring.FindUnitCmdDesc(unitID, cmdID)
+    if (cmdDescID) then
+      Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray) -- disable terraform and some other commands
+      --Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
+    end
+  end
 end
 
 
@@ -442,7 +452,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
       cmdID = cmdParams[2]
       cmdParams[1] = cmdParams[4]
     end
-    if (((cmdID == CMD.CLOAK or cmdID == CMD_CLOAK_SHIELD) and cmdParams and (cmdParams[1] == 1)) or -- block cloak
+    if (((cmdID == CMD.CLOAK or cmdID == CMD_CLOAK_SHIELD) and cmdParams and cmdParams[1] == 1) or -- block cloak
       blockedCmds[cmdID] or cmdID < 0) then -- block reclaim, rez, build and terra
       return false
     end
@@ -472,29 +482,16 @@ local CreepSetupFunctions = {
 
   [creep2] =
   function (creepID)
-
+    local cmdDescID = Spring.FindUnitCmdDesc(creepID, CMD_UNIT_AI)
+    if (cmdDescID) then
+      Spring.GiveOrderToUnit(creepID, CMD_UNIT_AI, {0}, 0) -- disable Rogue autoskirm
+      Spring.RemoveUnitCmdDesc(creepID, cmdDescID)
+    end
   end,
 }
 
 
 function gadget:GameFrame(n)
-  for unitID,_ in pairs(newUnits) do -- must be done one frame after unit creation, not in UnitCreated
-    local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK_SHIELD)
-    if (cmdDescID) then
-      Spring.GiveOrderToUnit(unitID, CMD_CLOAK_SHIELD, {0}, 0)
-      Spring.RemoveUnitCmdDesc(unitID, cmdDescID) -- block area cloak
-    end
-
-    for cmdID,_ in pairs(blockedCmds) do
-      local cmdDescID = Spring.FindUnitCmdDesc(unitID, cmdID)
-      if (cmdDescID) then
-        Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray) -- block terraform and some other commands
-        --Spring.RemoveUnitCmdDesc(unitID, cmdDescID)
-      end
-    end
-  end
-  newUnits = {}
-
   if (n % 30 == 17) then
     -- healing areas
     for allyteam = 0, 1 do
