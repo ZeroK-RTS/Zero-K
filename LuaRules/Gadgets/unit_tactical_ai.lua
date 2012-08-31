@@ -491,10 +491,9 @@ local function AIToggleCommand(unitID, cmdParams, cmdOptions)
 		if (cmdDescID) then
 			unitAICmdDesc.params[1] = state
 			spEditUnitCmdDesc(unitID, cmdDescID, { params = unitAICmdDesc.params})
+			unit[unitID].active = (state == 1)
 		end
-		unit[unitID].active = (state == 1)
 	end
-	
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
