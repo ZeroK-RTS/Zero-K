@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local versionNumber = "v20"
+local versionNumber = "v21"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -31,7 +31,7 @@ local team1 = Spring.GetTeamList(0)[1]
 local team2 = Spring.GetTeamList(1)[1]
 local teams = { team1, team2 }
 
-local rewardEnergyMult = 0.4
+local rewardEnergyMult = 0.5
 
 local blockedCmds = {
   [CMD.RECLAIM]   = true,
@@ -43,6 +43,8 @@ local blockedCmds = {
 }
 
 local disabledCmdArray = { disabled = true }
+
+local terraunitDefID = UnitDefNames["terraunit"].id
 
 
 -- creeps
@@ -58,8 +60,6 @@ local turret2 = "corllt"
 local turret3 = "heavyturret"
 
 
-local fountain   = 720 -- autoheal area
-
 local mapSizeX   = Game.mapSizeX
 local mapSizeZ   = Game.mapSizeZ
 local squareSize = Game.squareSize
@@ -71,6 +71,9 @@ local teamData = {
     djinnSpawnPoint = { 1200, 1100, facing = 0 },
     comRespawnPoint = { 630 , 630 , facing = 0 },
 
+    healingAreas = {
+      { 350, 350, radius = 500, healing = 200 },
+    },
     creeperSpawnPoints = {
       { 1350, 1050, facing = 1 },
       { 1350, 1250, facing = 0 },
@@ -97,6 +100,9 @@ local teamData = {
     djinnSpawnPoint = { mapSizeX - 1200, mapSizeZ - 1200, facing = 2 },
     comRespawnPoint = { mapSizeX - 630 , mapSizeZ - 630 , facing = 2 },
 
+    healingAreas = {
+      { mapSizeX - 350, mapSizeZ - 350, radius = 500, healing = 200 },
+    },
     creeperSpawnPoints = {
       { mapSizeX - 1150, mapSizeZ - 1350, facing = 2 },
       { mapSizeX - 1350, mapSizeZ - 1350, facing = 2 },
@@ -154,12 +160,17 @@ local function Point2Dto3D (coordsTable)
   end
 end
 
+
+local healingAreasData = {}
+
 do
   for i = 1, #teams do
     local td = teamData[i]
     AlignToSquareSize(td.hqPosition)
     Point2Dto3D(td.djinnSpawnPoint)
     Point2Dto3D(td.comRespawnPoint)
+
+    healingAreasData[i] = td.healingAreas
 
     for i = 1, #creeperPathWaypoints do
       Point2Dto3D(td.creeperSpawnPoints[i])
@@ -176,6 +187,8 @@ do
     end
   end
 end
+
+_G.healingAreasData = healingAreasData -- make it visible from unsynced
 
 
 local newUnits = {}
@@ -404,10 +417,6 @@ function gadget:GamePreload()
       TurretSetupFunctions[turretType] (turretData[1], turretData[2], teams[i])
     end
   end
-
-  -- mark fountain
-  Spring.LevelHeightMap(fountain - squareSize, fountain - squareSize, fountain, fountain, Spring.GetGroundHeight(fountain, fountain) + 200)
-  Spring.LevelHeightMap(mapSizeX - fountain, mapSizeZ - fountain, mapSizeX - fountain + squareSize, mapSizeZ - fountain + squareSize, Spring.GetGroundHeight(mapSizeX - fountain, mapSizeZ - fountain) + 200)
 end
 
 
@@ -488,14 +497,18 @@ function gadget:GameFrame(n)
 
   if (n % 30 == 17) then
     -- healing areas
-    everything = Spring.GetAllUnits()
-    for i = 1, #everything do
-      if (Spring.GetUnitDefID(everything[i]) ~= UnitDefNames["terraunit"].id) then
-        local x,_,z = Spring.GetUnitBasePosition(everything[i])
-        allyteam = select(6, Spring.GetTeamInfo(Spring.GetUnitTeam(everything[i])))
-        if ((allyteam == 0 and x < fountain and z < fountain) or (allyteam == 1 and x > mapSizeX - fountain and z > mapSizeZ - fountain)) then
-          local hp, maxHp = Spring.GetUnitHealth(everything[i])
-          Spring.SetUnitHealth(everything[i], math.min(hp + 200, maxHp))
+    for allyteam = 0, 1 do
+      local healingAreas = teamData[allyteam+1].healingAreas
+      for i = 1, #healingAreas do
+        local healingArea = healingAreas[i]
+        local units = Spring.GetUnitsInCylinder(healingArea[1], healingArea[2], healingArea.radius)
+
+        for i = 1, #units do
+          local unitID = units[i]
+          if (Spring.GetUnitAllyTeam(unitID) == allyteam and Spring.GetUnitDefID(unitID) ~= terraunitDefID) then
+            local hp, maxHp = Spring.GetUnitHealth(unitID)
+            Spring.SetUnitHealth(unitID, math.min(hp + healingArea.healing, maxHp))
+          end
         end
       end
     end
@@ -572,6 +585,12 @@ else
 -- UNSYNCED
 --------------------------------------------------------------------------------
 
+local Util_DrawGroundCircle = gl.Utilities.DrawGroundCircle
+
+local allyHealingAreaColor  = { 0.0, 0.0, 1.0, 0.3 }
+local enemyHealingAreaColor = { 1.0, 0.0, 0.0, 0.3 }
+
+
 local function AddMarker(action, x, y, z, teamID)
   if (Spring.GetLocalTeamID() == teamID and not Spring.GetSpectatingState()) then
     Spring.MarkerAddPoint(x, y, z)
@@ -587,6 +606,27 @@ end
 
 function gadget:Shutdown()
   gadgetHandler:RemoveSyncAction("gamemode_dota_addmarker")
+end
+
+
+function gadget:DrawWorldPreUnit()
+  local _,fullView = Spring.GetSpectatingState()
+
+  --for allyteam = 1, #SYNCED.healingAreasData do
+  --local healingAreas = SYNCED.healingAreasData[allyteam]
+  for allyteam, healingAreas in sipairs(SYNCED.healingAreasData) do
+    if (fullView or Spring.GetMyAllyTeamID() + 1 == allyteam) then
+      gl.Color(allyHealingAreaColor)
+    else
+      gl.Color(enemyHealingAreaColor)
+    end
+
+    --for i = 1, #healingAreas do
+    --local healingArea = healingAreas[i]
+    for _, healingArea in sipairs(healingAreas) do
+      Util_DrawGroundCircle(healingArea[1], healingArea[2], healingArea.radius)
+    end
+  end
 end
 
 --------------------------------------------------------------------------------
