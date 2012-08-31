@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local versionNumber = "v19"
+local versionNumber = "v20"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -59,7 +59,7 @@ local turret2 = "corllt"
 local turret3 = "heavyturret"
 
 
-local fountain   = 500  -- autoheal
+local fountain   = 720 -- autoheal area
 
 local mapSizeX   = Game.mapSizeX
 local mapSizeZ   = Game.mapSizeZ
@@ -69,69 +69,82 @@ local squareSize = Game.squareSize
 local teamData = {
   [1] = {
     hqPosition      = { 1000, 1000 },
-    djinnSpawnPoint = { 1200, 1200, facing = 0 },
-    comRespawnPoint = { 400 , 400 , facing = 0 },
+    djinnSpawnPoint = { 1200, 1100, facing = 0 },
+    comRespawnPoint = { 630 , 630 , facing = 0 },
 
     creeperSpawnPoints = {
-      { 1200, 1200, facing = 1 },
-      { 1200, 1200, facing = 0 },
-      { 1200, 1200, facing = 0 },
+      { 1350, 1050, facing = 1 },
+      { 1350, 1250, facing = 0 },
+      { 1150, 1250, facing = 0 },
     },
     turretPositions = {
       -- lane turrets
       { 3470, 3652, turret1 },
-      { 4867, 1317, turret1 },
-      { 1487, 5302, turret1 },
-      { 3452,  825, turret2 },
+      { 4890, 1340, turret1 },
+      { 1555, 5315, turret1 },
+      { 3528,  816, turret2 },
       { 2442, 2487, turret2 },
       {  900, 2920, turret2 },
       {  467, 1467, turret3 },
       { 1467,  587, turret3 },
-      { 1638, 1408, turret3 },
+      { 1573, 1443, turret3 },
       -- bases
-      {  850, 1150, turret2 },
-      { 1150,  850, turret2 },
+      {  840, 1160, turret2 },
+      { 1160,  840, turret2 },
     },
   },
   [2] = {
     hqPosition      = { mapSizeX - 1000, mapSizeZ - 1000 },
     djinnSpawnPoint = { mapSizeX - 1200, mapSizeZ - 1200, facing = 2 },
-    comRespawnPoint = { mapSizeX - 400 , mapSizeZ - 400 , facing = 2 },
+    comRespawnPoint = { mapSizeX - 630 , mapSizeZ - 630 , facing = 2 },
 
     creeperSpawnPoints = {
-      { mapSizeX - 1200, mapSizeZ - 1200, facing = 2 },
-      { mapSizeX - 1200, mapSizeZ - 1200, facing = 2 },
-      { mapSizeX - 1200, mapSizeZ - 1200, facing = 3 },
+      { mapSizeX - 1150, mapSizeZ - 1350, facing = 2 },
+      { mapSizeX - 1350, mapSizeZ - 1350, facing = 2 },
+      { mapSizeX - 1350, mapSizeZ - 1150, facing = 3 },
     },
     turretPositions = {
       -- lane turrets
       { 4463, 4583, turret1 },
-      { 6406, 2844, turret1 },
-      { 3118, 6641, turret1 },
-      { 7158, 4648, turret2 },
+      { 6403, 2790, turret1 },
+      { 3125, 6655, turret1 },
+      { 7150, 4640, turret2 },
       { 5675, 5684, turret2 },
-      { 4824, 7162, turret2 },
-      { 6259, 7674, turret3 },
+      { 4824, 7170, turret2 },
+      { 6524, 7664, turret3 },
       { 7665, 6682, turret3 },
       { 6666, 6666, turret3 },
       -- bases
-      { mapSizeX - 1150, mapSizeX -  850, turret2 },
-      { mapSizeX -  850, mapSizeX - 1150, turret2 },
+      { mapSizeX - 1160, mapSizeX -  840, turret2 },
+      { mapSizeX -  840, mapSizeX - 1160, turret2 },
     },
   },
 }
 
 local creeperPathWaypoints = {
   [1] = { -- top right path
-    { mapSizeX - 1600, 1600 },
+    { 4890, 1000 },
+    --{ 6592, 1600 },
+    { 6750, 2790 },
   },
   [2] = { -- middle path
-    { 0.5 * mapSizeX, 0.5 * mapSizeZ },
+    { 3980, 4100 },
   },
   [3] = { -- bottom left path
-    { 1600, mapSizeZ - 1600 },
+    { 1150, 5315 },
+    --{ 1600, 6592 },
+    { 3125, 6950 },
   },
 }
+
+
+local function AlignToSquareSize (coordsTable)
+  if (type(coordsTable) == "table") then
+    for i = 1, 2 do
+      coordsTable[i] = math.floor((coordsTable[i] / squareSize) + 0.5) * squareSize
+    end
+  end
+end
 
 
 local function Point2Dto3D (coordsTable)
@@ -145,11 +158,16 @@ end
 do
   for i = 1, #teams do
     local td = teamData[i]
+    AlignToSquareSize(td.hqPosition)
     Point2Dto3D(td.djinnSpawnPoint)
     Point2Dto3D(td.comRespawnPoint)
 
     for i = 1, #creeperPathWaypoints do
       Point2Dto3D(td.creeperSpawnPoints[i])
+    end
+
+    for i = 1, #td.turretPositions do
+      AlignToSquareSize(td.turretPositions[i])
     end
   end
   for i = 1, #creeperPathWaypoints do
@@ -347,10 +365,27 @@ local TurretSetupFunctions = {
 
 
 function gadget:GamePreload()
+  local function hqHeightMapFunc(centerX, centerZ)
+    local centerHeight = Spring.GetGroundHeight(centerX, centerZ)
+    local wantedHeight
+    local size = 144
+
+    for z = -size, size, squareSize do
+      for x = -size, size, squareSize do
+        wantedHeight = centerHeight + math.min((size - math.max(math.abs(x), math.abs(z))) * (48/64), 48)
+        if (wantedHeight > Spring.GetGroundHeight(centerX + x, centerZ + z)) then
+          Spring.SetHeightMap(centerX + x, centerZ + z, wantedHeight)
+        end
+      end
+    end
+  end
+
   for i = 1, #teams do
     local td = teamData[i]
-    Point2Dto3D(td.hqPosition)
+
     local spawnPoint = td.hqPosition
+    Spring.SetHeightMapFunc(hqHeightMapFunc, spawnPoint[1], spawnPoint[2])
+    Point2Dto3D(td.hqPosition)
     local hq = Spring.CreateUnit("pw_hq", spawnPoint[1], spawnPoint[2], spawnPoint[3], 0, teams[i])
     HQ[i] = hq
 
@@ -365,8 +400,8 @@ function gadget:GamePreload()
   end
 
   -- mark fountain
-  Spring.LevelHeightMap(fountain - squareSize, fountain - squareSize, fountain, fountain, Spring.GetGroundHeight(fountain, fountain) + 120)
-  Spring.LevelHeightMap(mapSizeX - fountain, mapSizeZ - fountain, mapSizeX - fountain + squareSize, mapSizeZ - fountain + squareSize, Spring.GetGroundHeight(mapSizeX - fountain, mapSizeZ - fountain) + 120)
+  Spring.LevelHeightMap(fountain - squareSize, fountain - squareSize, fountain, fountain, Spring.GetGroundHeight(fountain, fountain) + 200)
+  Spring.LevelHeightMap(mapSizeX - fountain, mapSizeZ - fountain, mapSizeX - fountain + squareSize, mapSizeZ - fountain + squareSize, Spring.GetGroundHeight(mapSizeX - fountain, mapSizeZ - fountain) + 200)
 end
 
 
