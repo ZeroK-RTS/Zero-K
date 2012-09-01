@@ -191,6 +191,11 @@ function gadget:DrawWorld()
 
 	if chunkUpdateList.count ~= 0 then
 		
+		gl.DepthMask(false)
+		gl.DepthTest(false)
+		gl.Color(1,1,1,1)
+		gl.AlphaTest(false)	
+		
 		-- Update map textures
 		for c = 1, chunkUpdateList.count do
 			local chunkUpdate = chunkUpdateList.data[c]
