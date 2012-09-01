@@ -2,7 +2,7 @@ function gadget:GetInfo()
   return {
     name    = "AoS",
     desc    = "AoS Mode",
-    author  = "Sprung, modified by Rafal",
+    author  = "Sprung, Rafal, KingRaptor",
     date    = "25/8/2012",
     license = "PD",
     layer   = 10, -- run after most gadgets
@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local versionNumber = "v23"
+local versionNumber = "v0.24"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -36,7 +36,7 @@ local rewardEnergyMult = 0.5
 local blockedCmds = {
   [CMD.RECLAIM]   = true,
   [CMD.RESURRECT] = true,
-  [CMD_AREA_MEX]  = true,
+--[CMD_AREA_MEX]  = true,
   [CMD_RAMP]  = true,
   [CMD_LEVEL] = true,
   [CMD_RAISE] = true,
@@ -218,15 +218,14 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
       lastDamageDefID = 0,
     }
 
-    -- removes build options - handled in unitdefs_post
-    --[[
+    --[[ -- build options removal is now handled in unitdefs_post
     for _, buildoptionID in ipairs(UnitDefs[unitDefID].buildOptions) do
       local cmdDescID = Spring.FindUnitCmdDesc(unitID, -buildoptionID)
       if (cmdDescID) then
         Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray) -- disable buildoptions
       end
     end
-    ]]--
+    --]]
   end
 
   Spring.SetUnitCloak(unitID, false)
@@ -299,7 +298,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     -- respawn Djinn
     CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam, true)
   elseif (UnitDefs[unitDefID].customParams.commtype) then
-    if (attackerID == nil and Spring.GetUnitHealth(unitID) > 0 and GG.wasMorphedTo[unitID]) then
+    if (GG.wasMorphedTo[unitID]) then
       comsData[unitID] = nil
       return -- blocks respawn at morph
     end
@@ -323,6 +322,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
       end
     else
       local damageDefID = comsData[unitID].lastDamageDefID
+
+      if (Spring.GetUnitHealth(unitID) > 0) then -- was self-ded
+        damageDefID = -6
+      end
+
       if (damageDefID == -1) then
         Spring.Echo(failer .. " has been killed by flying debris!")
       elseif (damageDefID == -2 or damageDefID == -3) then
@@ -337,16 +341,24 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     comsData[unitID] = nil
 
     -- respawn commander
-    local comName = GG.startUnits[unitTeam] --UnitDefs[unitDefID].name
-    local baseComName = comName:sub(1, -2)
-    local comLevel = tonumber(comName:sub(-1))
-    comLevel = tostring(math.max(comLevel - 2, 0)) -- respawned com will be 2 levels lower
+    local comName    = UnitDefs[unitDefID].name -- the com type that died
+    local comNameNew = GG.startUnits[unitTeam]  -- new com type selected by user
+    local baseComName    = comName   :sub(1, -2)
+    local baseComNameNew = comNameNew:sub(1, -2)
 
-    if (UnitDefNames[baseComName .. comLevel]) then
-      comName = baseComName .. comLevel
-    elseif (comLevel == "0" and UnitDefNames[baseComName .. "1"]) then
-      comName = baseComName .. "1"
+    if (baseComNameNew == baseComName) then
+      local comLevel = tonumber(comName:sub(-1))
+      comLevel = tostring(math.max(comLevel - 2, 0)) -- respawned com will be 2 levels lower
+
+      if (UnitDefNames[baseComName .. comLevel]) then
+        comName = baseComName .. comLevel
+      elseif (comLevel == "0" and UnitDefNames[baseComName .. "1"]) then
+        comName = baseComName .. "1"
+      end
+    else
+      comName = comNameNew
     end
+
     CreateUnitNearby(comName, teamData[allyteam+1].comRespawnPoint, unitTeam, true)
   end
 end
@@ -533,7 +545,7 @@ local CreepSetupFunctions = {
       Spring.RemoveUnitCmdDesc(creepID, cmdDescID)
     end
   end,
-  
+
   [creep3] = function() end
 }
 
@@ -607,10 +619,10 @@ function gadget:GameFrame(n)
 
         --for i = 1, #creepsToSpawn do
           --local creepDef = creepsToSpawn[i]
-        
+
         -- creep selection and setup
         -- FIXME: find a less hardcodey way to pick creeps
-        for i = 1, teamCreepCount + ((wave%5 == 4 and 2) or 1) do
+        for i = 1, teamCreepCount + ((wave%5 == 4) and 2 or 1) do
           local creepDef = creep1
           if (i == teamCreepCount + 2) then creepDef = creep3
           elseif (i > teamCreepCount) then creepDef = creep2
@@ -672,6 +684,8 @@ end
 function gadget:DrawWorldPreUnit()
   local _,fullView = Spring.GetSpectatingState()
 
+  --gl.Texture("bitmaps/PD/repair.tga")
+
   --for allyteam = 1, #SYNCED.healingAreasData do
   --local healingAreas = SYNCED.healingAreasData[allyteam]
   for allyteam, healingAreas in sipairs(SYNCED.healingAreasData) do
@@ -680,16 +694,16 @@ function gadget:DrawWorldPreUnit()
     else
       gl.Color(enemyHealingAreaColor)
     end
-    --gl.Texture("bitmaps/PD/repair.tga")
-    
+
     --for i = 1, #healingAreas do
     --local healingArea = healingAreas[i]
     for _, healingArea in sipairs(healingAreas) do
-      Util_DrawGroundCircle(healingArea[1], healingArea[2], healingArea.radius)  
+      Util_DrawGroundCircle(healingArea[1], healingArea[2], healingArea.radius)
     end
-    gl.Texture(false)
-    gl.Color(1,1,1,1)
   end
+
+  --gl.Texture(false)
+  gl.Color(1,1,1,1)
 end
 
 --------------------------------------------------------------------------------

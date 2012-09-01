@@ -602,6 +602,7 @@ upgrades_dota = {
 				unitDef.stealth = true
 			end,
 	},
+	module_cloak_field = upgrades.module_jammer,
 }
 
 decorations = {
