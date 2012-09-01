@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local versionNumber = "v0.24"
+local versionNumber = "v0.25"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -23,6 +23,8 @@ if (gadgetHandler:IsSyncedCode()) then
 
 include("LuaRules/Configs/customcmds.h.lua")
 
+local CMD_FIGHT     = CMD.FIGHT
+local CMD_OPT_SHIFT = CMD.OPT_SHIFT
 local random = math.random
 
 local HQ = {}
@@ -63,6 +65,8 @@ local creepWave     = 0
 local turret1 = "corpre"
 local turret2 = "corllt"
 local turret3 = "heavyturret"
+
+local hqTerraHeight = 48
 
 
 local mapSizeX   = Game.mapSizeX
@@ -147,6 +151,8 @@ local creeperPathWaypoints = {
   },
 }
 
+local creeperOrderArrays = {}
+
 
 local function AlignToSquareSize (coordsTable)
   if (type(coordsTable) == "table") then
@@ -166,12 +172,16 @@ local function Point2Dto3D (coordsTable)
 end
 
 
-local healingAreasData = {}
-
 do
+  local healingAreasData = {}
+
   for i = 1, #teams do
     local td = teamData[i]
+
     AlignToSquareSize(td.hqPosition)
+    Point2Dto3D(td.hqPosition)
+    td.hqPosition[2] = td.hqPosition[2] + hqTerraHeight
+
     Point2Dto3D(td.djinnSpawnPoint)
     Point2Dto3D(td.comRespawnPoint)
 
@@ -185,15 +195,28 @@ do
       AlignToSquareSize(td.turretPositions[i])
     end
   end
+
+  _G.healingAreasData = healingAreasData -- make it visible from unsynced
+
   for i = 1, #creeperPathWaypoints do
+    local team1Orders = {}
+    local team2Orders = {}
+
     local waypoints = creeperPathWaypoints[i]
-    for j = 1, #waypoints do
-      Point2Dto3D(waypoints[j])
+    local n = #waypoints + 1
+    for w = 1, #waypoints do
+      Point2Dto3D(waypoints[w])
+
+      team1Orders[w]   = { CMD_FIGHT, waypoints[w], CMD_OPT_SHIFT }
+      team2Orders[n-w] = team1Orders[w]
     end
+
+    table.insert(team1Orders, { CMD_FIGHT, teamData[2].hqPosition, CMD_OPT_SHIFT } )
+    table.insert(team2Orders, { CMD_FIGHT, teamData[1].hqPosition, CMD_OPT_SHIFT } )
+
+    creeperOrderArrays[i] = { team1Orders, team2Orders }
   end
 end
-
-_G.healingAreasData = healingAreasData -- make it visible from unsynced
 
 
 local comsData = {}
@@ -463,7 +486,7 @@ function gadget:GamePreload()
 
     for z = -size, size, squareSize do
       for x = -size, size, squareSize do
-        wantedHeight = centerHeight + math.min((size - math.max(math.abs(x), math.abs(z))) * (48/64), 48)
+        wantedHeight = centerHeight + math.min((size - math.max(math.abs(x), math.abs(z))) * (hqTerraHeight / 64), hqTerraHeight)
         if (wantedHeight > Spring.GetGroundHeight(centerX + x, centerZ + z)) then
           Spring.SetHeightMap(centerX + x, centerZ + z, wantedHeight)
         end
@@ -475,8 +498,7 @@ function gadget:GamePreload()
     local td = teamData[i]
 
     local spawnPoint = td.hqPosition
-    Spring.SetHeightMapFunc(hqHeightMapFunc, spawnPoint[1], spawnPoint[2])
-    Point2Dto3D(td.hqPosition)
+    Spring.SetHeightMapFunc(hqHeightMapFunc, spawnPoint[1], spawnPoint[3])
     local hq = Spring.CreateUnit("pw_hq", spawnPoint[1], spawnPoint[2], spawnPoint[3], 0, teams[i])
     HQ[i] = hq
 
@@ -604,7 +626,7 @@ function gadget:GameFrame(n)
   if (n >= creepSpawnDelay and (n - creepSpawnDelay) % creepSpawnPeriod == 0) then
     creepWave = creepWave + 1
 
-    if (creepWave % 5 == 0) then creepcount = math.min(creepcount + 1, maxcreepcount) end
+    if (creepWave % 5 == 1) then creepcount = math.min(creepcount + 1, maxcreepcount) end
 
     -- prepare list of creeper types to spawn
     local teamCreepCounts = {
@@ -623,14 +645,17 @@ function gadget:GameFrame(n)
     end
 
     for path = 1, #creeperPathWaypoints do
-      local wayPoints = creeperPathWaypoints[path]
+      local wayPoints         = creeperPathWaypoints[path]
+      local creeperOrderArray = creeperOrderArrays[path]
 
       for t = 1, 2 do
+        local orderArray     = creeperOrderArray[t]
         local teamCreepCount = teamCreepCounts[t]
 
         for c = 1, #teamCreepCount do
           local creepDef   = teamCreepCount[c][1]
           local creepCount = teamCreepCount[c][2]
+          local creepGroup = {}
 
           -- spawn and setup creeps
           for i = 1, creepCount do
@@ -638,18 +663,10 @@ function gadget:GameFrame(n)
             CreepSetupFunctions[creepDef] (creepID)
             Spring.SetUnitNoSelect(creepID, true) -- creeps uncontrollable
 
-            if (t == 1) then
-              for w = 1, #wayPoints do
-                Spring.GiveOrderToUnit(creepID, CMD.FIGHT, wayPoints[w], CMD.OPT_SHIFT)
-              end
-              Spring.GiveOrderToUnit(creepID, CMD.FIGHT, teamData[2].hqPosition, CMD.OPT_SHIFT)
-            else
-              for w = #wayPoints, 1, -1 do
-                Spring.GiveOrderToUnit(creepID, CMD.FIGHT, wayPoints[w], CMD.OPT_SHIFT)
-              end
-              Spring.GiveOrderToUnit(creepID, CMD.FIGHT, teamData[1].hqPosition, CMD.OPT_SHIFT)
-            end
+            creepGroup[#creepGroup + 1] = creepID
           end
+
+          Spring.GiveOrderArrayToUnitArray(creepGroup, orderArray) -- make creeps move through waypoints
         end
       end
     end
