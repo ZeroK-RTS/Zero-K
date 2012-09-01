@@ -10,7 +10,7 @@ function widget:GetInfo()
     date      = "30 August 2012",
     license   = "none",
     layer     = math.huge,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 --------------------------------------------------------------------------------
