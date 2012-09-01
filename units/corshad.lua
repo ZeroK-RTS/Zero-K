@@ -97,7 +97,6 @@ unitDef = {
     BOGUS_BOMB = {
       name                    = [[Fake Bomb]],
       areaOfEffect            = 80,
-      commandfire             = true,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -129,7 +128,6 @@ unitDef = {
       burnblow                = true,
       cegTag                  = [[KBOTROCKETTRAIL]],
       collideFriendly         = false,
-      commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
 	  cylinderTargeting	  = 1,

@@ -83,7 +83,7 @@ unitDef = {
 	  burnblow                = true,
 	  cegTag                  = [[raventrail]],
       collideFriendly         = false,
-      commandfire             = true,
+   
       craterBoost             = 1,
       craterMult              = 2,
 

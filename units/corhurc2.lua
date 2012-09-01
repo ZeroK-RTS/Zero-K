@@ -88,7 +88,6 @@ unitDef = {
       areaOfEffect            = 8,
       beamWeapon              = true,
       collideFriendly         = false,
-      commandfire             = true,
       coreThickness           = 0.5,
       craterMult              = 0,
 
@@ -130,7 +129,6 @@ unitDef = {
       burst                   = 15,
       burstrate               = 0.09,
       collideFriendly         = false,
-      commandfire             = false,
       craterBoost             = 1,
       craterMult              = 2,
 
