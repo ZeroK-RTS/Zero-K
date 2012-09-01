@@ -108,8 +108,6 @@ unitDef = {
 
       damage                  = {
         default = 3000,
-        planes  = 3000,
-        subs    = 300,
       },
 
       explosionGenerator      = [[custom:NUKE_150]],
