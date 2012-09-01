@@ -41,31 +41,31 @@ local unlocks = {} -- indexed by teamID, value is a table of key unitDefID and v
 
 local unlockUnits = {
 	-- units
-	"spherepole",
+	--"spherepole",
 
-	"capturecar",
+	--"capturecar",
 	
-	"panther",
-	"corgol",
+	--"panther",
+	--"corgol",
 	
 	--"blackdawn",
-	"blastwing",
-	"corcrw",
+	--"blastwing",
+	--"corcrw",
 	
-	"armcybr",
+	--"armcybr",
 	
-	"armcarry",
+	--"armcarry",
 	
 	"armbanth",
 	"gorg",
 	"armorco",
 	
 	-- defenses and superweapons
-	"corgrav",
-	"screamer",
-	"armanni",
-	"cordoom",
-	"corbhmth",
+	--"corgrav",
+	--"screamer",
+	--"armanni",
+	--"cordoom",
+	--"corbhmth",
 	"armbrtha",
 	"corsilo",
 	"mahlazer",
@@ -76,17 +76,17 @@ local unlockUnits = {
 	
 	-- factories
 	--"factorycloak",
-	"factoryshield",
-	"factoryjump",
-	"factorytank",
-	"factoryplane",
+	--"factoryshield",
+	--"factoryjump",
+	--"factorytank",
+	--"factoryplane",
 	"armcsa",
 	"striderhub",
 	
 	-- misc
-	"armarad",
-	"armmstor",
-	"armestor",
+	--"armarad",
+	--"armmstor",
+	--"armestor",
 }
 
 local unlockUnitsMap = {}
