@@ -31,6 +31,7 @@ unitDef = {
     helptext_bp    = [[Shadow lança uma única bomba a cada ataque, com pouca área de efeito mas grande poder. Em matéria de custo-benefício, é eficiente contra alvos caros e imóveis, mas funciona mal contra unidades móveis principalmente devido a dificuldade de acertar um alvo móvel com uma única bomba.]],
     helptext_fr    = [[Le Shadow largue des bombes de haute précision, parfait pour les frappes chirurgicales comme une défense antimissile ou une tourelle genante, mais peu efficace contre une armée massive.]],
 	helptext_de    = [[Der Shadow wirft eine einzige Bombe mit hohem Schaden ab. Ideal fungiert er dazu, einzelne, strategisch wichtige Gebäude wie z.B. Anti-Atom zu zerstören, um dann mit seinen Haupteinheiten einzufallen. Kleinere Einheiten werden aber nur schwelich getroffen und sollten von daher auf anderem Wege bekämpft werden.]],
+	modelradius    = [[20]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -131,7 +132,7 @@ unitDef = {
       commandfire             = true,
       craterBoost             = 1,
       craterMult              = 2,
-	  cylinderTargetting	  = 1,
+	  cylinderTargeting	  = 1,
 
       damage                  = {
         default = 1200,

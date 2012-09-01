@@ -95,7 +95,7 @@ unitDef = {
       cegTag                  = [[missiletrailblue]],
       craterBoost             = 1,
       craterMult              = 2,
-      cylinderTargetting      = 1,
+      cylinderTargeting      = 1,
 
       damage                  = {
         default = 7,

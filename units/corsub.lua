@@ -29,6 +29,7 @@ unitDef = {
     helptext       = [[Expensive, stealthy, and fragile, this Submarine can quickly sink anything it can hit. The Submarine cannot shoot behind itself, and its turn rate is poor, so positioning is key. Watch out for anything with anti-sub weaponry, especially Hunters.]],
     helptext_fr    = [[Le Snake est discret, cher et fragile, mais il peut couler trcs rapidement la plupart de ses ennemis. De plus il peut torpiller r de grande distance. Ne pouvant tirer derricre lui et tournant rapidement, son positionnement initial est la clef de l'éfficacité.]],
 	helptext_de    = [[Teuer, versteckt und gebrechlich ist dieses U-Boot. Es kann nicht nach hinten schießen und seine Ausrichtung dauert lange. Daher lieber gleich richtig positionieren. Achte auf alles mit Anti-U-Boot Ausrüstung, besonders 'Hunter' - Torpedofregatten.]],
+	modelradius    = [[15]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],

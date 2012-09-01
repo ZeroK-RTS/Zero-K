@@ -189,6 +189,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 				--decRate         = state.origMaxDec      *(speedFactor > 0.01  and speedFactor or 0.01)
 			})
 		elseif state.movetype == 2 then
+			--Spring.Echo(UnitDefs[unitDefID].humanName)
 			spSetGroundMoveTypeData (unitID, {
 				maxSpeed        = state.origSpeed       *speedFactor,
 				maxReverseSpeed = state.origReverseSpeed*speedFactor,
@@ -208,6 +209,7 @@ end
 function GG.UpdateUnitAttributes(unitID, frame)
 	if not spValidUnitID(unitID) then
 		removeUnit(unitID)
+		return
 	end
 	
 	local udid = spGetUnitDefID(unitID)
