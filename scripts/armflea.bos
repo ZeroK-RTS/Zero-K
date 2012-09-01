@@ -1,4 +1,4 @@
-#define TA			// This is a TA script
+//linear constant 163840
 
 #include "constants.h"
 
@@ -23,9 +23,9 @@ Burrow()
 		turn body to x-axis <-20.000000> speed <20.000000>;
 		set CLOAKED to 1;
 		set STEALTH to 1;
-		set MAX_SPEED to maxSpeed / 4;
+		//set MAX_SPEED to maxSpeed / 4;
 		sleep 1000;
-		set STANDINGFIREORDERS to 1;
+		//set STANDINGFIREORDERS to 1;
 	}
 }
 
@@ -38,10 +38,10 @@ UnBurrow()
 	burrowed = 0;
 	set CLOAKED to 0;
 	set STEALTH to 0;
-	set STANDINGFIREORDERS to 2;
+	//set STANDINGFIREORDERS to 2;
 	move body to y-axis [0.000000] speed [5.000000];
 	turn body to x-axis <0.000000> speed <60.000000>;
-	set MAX_SPEED to maxSpeed;
+	//set MAX_SPEED to maxSpeed;
 }
 
 
