@@ -182,6 +182,8 @@ local morphUnits = {} --// make it global in Initialize()
 local reqDefIDs  = {} --// all possible unitDefID's, which are used as a requirement for a morph
 local morphToStart = {} -- morphes to start next frame
 
+GG.wasMorphed = {}	-- when a unit finishes morphing, its unitID is recorded here prior to destruction
+
 --// per team techlevel and owned MorphReq. units table
 local teamTechLevel = {}
 local teamReqUnits  = {}
@@ -665,6 +667,8 @@ local function FinishMorph(unitID, morphData)
   SendToUnsynced("unit_morph_finished", unitID, newUnit)
 
   Spring.SetUnitBlocking(newUnit, true)
+  
+  GG.wasMorphed[unitID] = true
   Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
 end
 
@@ -792,6 +796,8 @@ end
 
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
+  GG.wasMorphed[unitID] = nil
+  
   local morphDefSet = morphDefs[unitDefID]
   if (morphDefSet) then
     local useXPMorph = false

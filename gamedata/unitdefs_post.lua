@@ -163,6 +163,10 @@ local function TagTree(unit, faction, newbuildoptions)
 end
 
 local function ProcessCommBuildOpts()
+	if Spring.GetModOptions().zkmode == "dota" then
+	    return
+	end
+	
 	local chassisList = {"armcom", "corcom", "commrecon", "commsupport", "cremcom"}
 	local commanders = {}
 	local numLevels = 5

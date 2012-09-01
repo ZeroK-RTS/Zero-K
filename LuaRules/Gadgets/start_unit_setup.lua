@@ -58,6 +58,7 @@ end
 local shuffleMode = Spring.GetModOption("shuffle", false, "off")
 
 local coop = Spring.Utilities.tobool(Spring.GetModOption("coop", false, false))
+local dotaMode = Spring.GetModOptions().zkmode == "dota"
 
 --Spring.Echo(coop == 1, coop == 0)
 
@@ -95,6 +96,8 @@ local customComms = {}
 local commChoice = {}
 local customKeys = {}	-- [playerID] = {}
 
+GG.startUnits = {}
+
 local waitingForComm = {}
 GG.waitingForComm = waitingForComm
 
@@ -127,11 +130,16 @@ function GG.HasFacplop(unitID)
 end
 
 function GG.GiveFacplop(unitID)
+	if dotaMode then return end
 	facplops[unitID] = 1
 	Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
 end
 
 local function CheckForShutdown()
+	if dotaMode then
+	    return
+	end
+	
 	local cnt = 0
 	for _,_ in pairs(boost) do
 		cnt = cnt+1
@@ -378,6 +386,7 @@ local function GetStartUnit(teamID, playerID, isAI)
   --if luaAI and string.find(string.lower(luaAI), "chicken") then startUnit = nil end
   
   --if didn't pick a comm, wait for user to pick
+  GG.startUnits[teamID] = startUnit
   return startUnit or nil	-- startUnit or DEFAULT_UNIT
 end
 
@@ -446,12 +455,13 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 	return 
   end
   ]]
+  local startUnit = GetStartUnit(teamID, playerID, isAI)
+  
   if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]))
   and not bonusSpawn then
 	return 
   end
 
-  local startUnit = GetStartUnit(teamID, playerID, isAI)
   if bonusSpawn then
   	--startUnit = DEFAULT_UNIT
   end

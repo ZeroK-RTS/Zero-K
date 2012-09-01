@@ -31,6 +31,7 @@ local debug	= false --generates debug message
 local Echo	= Spring.Echo
 
 local coop = (Spring.GetModOptions().coop == 1) or false
+local dotaMode = Spring.GetModOptions().zkmode == "dota"
 
 local Chili
 local Window
@@ -215,7 +216,7 @@ function widget:Initialize()
 	vsx, vsy = widgetHandler:GetViewSizes()
 
 	widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
-	if (not noComm) then
+	if (not noComm) or dotaMode then
 		buttonWindow = Window:New{
 			resizable = false,
 			draggable = false,
@@ -266,7 +267,9 @@ function widget:Shutdown()
 end
 
 function widget:GameStart()
-  screen0:RemoveChild(buttonWindow)
+	if not dotaMode then
+		screen0:RemoveChild(buttonWindow)
+	end
 end
 
 -----

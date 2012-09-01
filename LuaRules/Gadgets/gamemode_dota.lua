@@ -50,10 +50,13 @@ local terraunitDefID = UnitDefNames["terraunit"].id
 -- creeps
 local creep1 = "spiderassault"
 local creep2 = "corstorm"
+local creep3 = "slowmort"
 
 local creepcount    = 2 -- current creep count per wave
 local maxcreepcount = 7
 local creepbalance  = 0
+
+local wave = 0
 
 -- turrets
 local turret1 = "corpre"
@@ -215,12 +218,15 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
       lastDamageDefID = 0,
     }
 
+    -- removes build options - handled in unitdefs_post
+    --[[
     for _, buildoptionID in ipairs(UnitDefs[unitDefID].buildOptions) do
       local cmdDescID = Spring.FindUnitCmdDesc(unitID, -buildoptionID)
       if (cmdDescID) then
         Spring.EditUnitCmdDesc(unitID, cmdDescID, disabledCmdArray) -- disable buildoptions
       end
     end
+    ]]--
   end
 
   Spring.SetUnitCloak(unitID, false)
@@ -293,9 +299,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     -- respawn Djinn
     CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam, true)
   elseif (UnitDefs[unitDefID].customParams.commtype) then
-    if (attackerID == nil and Spring.GetUnitHealth(unitID) > 0) then
+    if (attackerID == nil and Spring.GetUnitHealth(unitID) > 0 and GG.wasMorphed[unitID]) then
       comsData[unitID] = nil
-      return -- blocks respawn at morph (also blocks respawn at self-d. pwned.)
+      return -- blocks respawn at morph
     end
 
     local failer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(unitTeam)))
@@ -331,7 +337,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     comsData[unitID] = nil
 
     -- respawn commander
-    local comName = UnitDefs[unitDefID].name
+    local comName = GG.startUnits[unitTeam] --UnitDefs[unitDefID].name
     local baseComName = comName:sub(1, -2)
     local comLevel = tonumber(comName:sub(-1))
     comLevel = tostring(math.max(comLevel - 2, 0)) -- respawned com will be 2 levels lower
@@ -503,9 +509,10 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
   if (weaponID and WeaponDefs[weaponID] and WeaponDefs[weaponID].name:find("shockrifle")) then damage = damage * 0.6 end -- nerf Shock Rifle
 
-  -- secret buffs to sprung for being awesome
-  if (UnitDefs[unitDefID].name:find("c47367")) then damage = damage * 0.7 end
-  if (attackerDefID and UnitDefs[attackerDefID].name:find("c47367")) then damage = damage * 1.3 end
+  -- used to be secret buffs to sprung for being "awesome"
+  -- suck on this you cheating scum!!1
+  if (UnitDefs[unitDefID].name:find("c47367")) then damage = damage * 1.3 end
+  if (attackerDefID and UnitDefs[attackerDefID].name:find("c47367")) then damage = damage * 0.7 end
 
   return damage
 end
@@ -526,6 +533,8 @@ local CreepSetupFunctions = {
       Spring.RemoveUnitCmdDesc(creepID, cmdDescID)
     end
   end,
+  
+  [creep3] = function() end
 }
 
 
@@ -589,6 +598,7 @@ function gadget:GameFrame(n)
     --end
     --creepsToSpawn[creepcount+1] = creep2
 
+    wave = wave + 1
     for path = 1, #creeperPathWaypoints do
       local wayPoints = creeperPathWaypoints[path]
 
@@ -597,8 +607,14 @@ function gadget:GameFrame(n)
 
         --for i = 1, #creepsToSpawn do
           --local creepDef = creepsToSpawn[i]
-        for i = 1, teamCreepCount + 1 do
-          local creepDef = (i <= teamCreepCount) and creep1 or creep2
+        
+        -- creep selection and setup
+        -- FIXME: find a less hardcodey way to pick creeps
+        for i = 1, teamCreepCount + ((wave%5 == 4 and 2) or 1) do
+          local creepDef = creep1
+          if (i == teamCreepCount + 2) then creepDef = creep3
+          elseif (i > teamCreepCount) then creepDef = creep2
+          end
 
           local creepID = CreateUnitNearby(creepDef, teamData[t].creeperSpawnPoints[path], teams[t])
           CreepSetupFunctions[creepDef] (creepID)
@@ -664,12 +680,15 @@ function gadget:DrawWorldPreUnit()
     else
       gl.Color(enemyHealingAreaColor)
     end
-
+    --gl.Texture("bitmaps/PD/repair.tga")
+    
     --for i = 1, #healingAreas do
     --local healingArea = healingAreas[i]
     for _, healingArea in sipairs(healingAreas) do
-      Util_DrawGroundCircle(healingArea[1], healingArea[2], healingArea.radius)
+      Util_DrawGroundCircle(healingArea[1], healingArea[2], healingArea.radius)  
     end
+    gl.Texture(false)
+    gl.Color(1,1,1,1)
   end
 end
 

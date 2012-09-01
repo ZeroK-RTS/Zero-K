@@ -475,8 +475,7 @@ upgrades = {
 				if unitDef.cloakcostmoving > 10 then 
 					unitDef.cloakcostmoving = 10 
 				end
-			end
-		,
+			end,
 	},
 	module_personal_shield = {
 		name = "Personal Shield",
@@ -595,6 +594,16 @@ upgrades = {
 	}
 }
 
+upgrades_dota = {
+	module_personal_cloak = {
+		name = "Stealth System",
+		description = "Makes the commander invisible to radar",
+		func = function(unitDef) 
+				unitDef.stealth = true
+			end,
+	},
+}
+
 decorations = {
 	skin_recon_dark = {
 		func = function(unitDef)
@@ -654,5 +663,12 @@ decorations = {
 	}
 }
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if Spring.GetModOptions().zkmode == "dota" then
+	for name,data in pairs(upgrades_dota) do
+		upgrades[name] = data
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
