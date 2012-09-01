@@ -54,9 +54,10 @@ local creep3 = "slowmort"
 
 local creepcount    = 2 -- current creep count per wave
 local maxcreepcount = 7
+local creepSpawnDelay  =  900
+local creepSpawnPeriod = 1350
 local creepbalance  = 0
-
-local wave = 0
+local creepWave     = 0
 
 -- turrets
 local turret1 = "corpre"
@@ -72,16 +73,16 @@ local squareSize = Game.squareSize
 local teamData = {
   [1] = {
     hqPosition      = { 1000, 1000 },
-    djinnSpawnPoint = { 1200, 1100, facing = 0 },
-    comRespawnPoint = { 630 , 630 , facing = 0 },
+    djinnSpawnPoint = { 1200, 1150, facing = 0 },
+    comRespawnPoint = {  630,  630, facing = 0 },
 
     healingAreas = {
-      { 350, 350, radius = 500, healing = 200 },
+      {  350,  350, radius = 500, healing = 200 },
     },
     creeperSpawnPoints = {
-      { 1350, 1050, facing = 1 },
-      { 1350, 1250, facing = 0 },
-      { 1150, 1250, facing = 0 },
+      { 1350,  800, facing = 1 },
+      { 1350, 1300, facing = 0 },
+      {  850, 1300, facing = 0 },
     },
     turretPositions = {
       -- lane turrets
@@ -102,15 +103,15 @@ local teamData = {
   [2] = {
     hqPosition      = { mapSizeX - 1000, mapSizeZ - 1000 },
     djinnSpawnPoint = { mapSizeX - 1200, mapSizeZ - 1200, facing = 2 },
-    comRespawnPoint = { mapSizeX - 630 , mapSizeZ - 630 , facing = 2 },
+    comRespawnPoint = { mapSizeX -  630, mapSizeZ -  630, facing = 2 },
 
     healingAreas = {
-      { mapSizeX - 350, mapSizeZ - 350, radius = 500, healing = 200 },
+      { mapSizeX -  350, mapSizeZ -  350, radius = 500, healing = 200 },
     },
     creeperSpawnPoints = {
-      { mapSizeX - 1150, mapSizeZ - 1350, facing = 2 },
+      { mapSizeX -  850, mapSizeZ - 1350, facing = 2 },
       { mapSizeX - 1350, mapSizeZ - 1350, facing = 2 },
-      { mapSizeX - 1350, mapSizeZ - 1150, facing = 3 },
+      { mapSizeX - 1350, mapSizeZ -  850, facing = 3 },
     },
     turretPositions = {
       -- lane turrets
@@ -600,53 +601,54 @@ function gadget:GameFrame(n)
     end
   end
 
-  if (n % 1350 == 900) then
-    if (n % (5*1350) == 900) then creepcount = math.min(creepcount + 1, maxcreepcount) end
+  if (n >= creepSpawnDelay and (n - creepSpawnDelay) % creepSpawnPeriod == 0) then
+    creepWave = creepWave + 1
 
-    local teamCreepCounts = {
-      [1] = math.max(0, creepcount + creepbalance),
-      [2] = math.max(0, creepcount - creepbalance),
-    }
+    if (creepWave % 5 == 0) then creepcount = math.min(creepcount + 1, maxcreepcount) end
 
     -- prepare list of creeper types to spawn
-    --local creepsToSpawn = {}
-    --for i = 1, creepcount do
-    --  creepsToSpawn[i] = creep1
-    --end
-    --creepsToSpawn[creepcount+1] = creep2
+    local teamCreepCounts = {
+      [1] = {
+        { creep1, math.max(0, creepcount + creepbalance) },
+        { creep2, 1 },
+      },
+      [2] = {
+        { creep1, math.max(0, creepcount - creepbalance) },
+        { creep2, 1 },
+      },
+    }
+    if (creepWave % 5 == 4) then
+      table.insert(teamCreepCounts[1], { creep3, 1 } )
+      table.insert(teamCreepCounts[2], { creep3, 1 } )
+    end
 
-    wave = wave + 1
     for path = 1, #creeperPathWaypoints do
       local wayPoints = creeperPathWaypoints[path]
 
       for t = 1, 2 do
         local teamCreepCount = teamCreepCounts[t]
 
-        --for i = 1, #creepsToSpawn do
-          --local creepDef = creepsToSpawn[i]
+        for c = 1, #teamCreepCount do
+          local creepDef   = teamCreepCount[c][1]
+          local creepCount = teamCreepCount[c][2]
 
-        -- creep selection and setup
-        -- FIXME: find a less hardcodey way to pick creeps
-        for i = 1, teamCreepCount + ((wave%5 == 4) and 2 or 1) do
-          local creepDef = creep1
-          if (i == teamCreepCount + 2) then creepDef = creep3
-          elseif (i > teamCreepCount) then creepDef = creep2
-          end
+          -- spawn and setup creeps
+          for i = 1, creepCount do
+            local creepID = CreateUnitNearby(creepDef, teamData[t].creeperSpawnPoints[path], teams[t])
+            CreepSetupFunctions[creepDef] (creepID)
+            Spring.SetUnitNoSelect(creepID, true) -- creeps uncontrollable
 
-          local creepID = CreateUnitNearby(creepDef, teamData[t].creeperSpawnPoints[path], teams[t])
-          CreepSetupFunctions[creepDef] (creepID)
-          Spring.SetUnitNoSelect(creepID, true) -- creeps uncontrollable
-
-          if (t == 1) then
-            for w = 1, #wayPoints do
-              Spring.GiveOrderToUnit(creepID, CMD.FIGHT, wayPoints[w], CMD.OPT_SHIFT)
+            if (t == 1) then
+              for w = 1, #wayPoints do
+                Spring.GiveOrderToUnit(creepID, CMD.FIGHT, wayPoints[w], CMD.OPT_SHIFT)
+              end
+              Spring.GiveOrderToUnit(creepID, CMD.FIGHT, teamData[2].hqPosition, CMD.OPT_SHIFT)
+            else
+              for w = #wayPoints, 1, -1 do
+                Spring.GiveOrderToUnit(creepID, CMD.FIGHT, wayPoints[w], CMD.OPT_SHIFT)
+              end
+              Spring.GiveOrderToUnit(creepID, CMD.FIGHT, teamData[1].hqPosition, CMD.OPT_SHIFT)
             end
-            Spring.GiveOrderToUnit(creepID, CMD.FIGHT, teamData[2].hqPosition, CMD.OPT_SHIFT)
-          else
-            for w = #wayPoints, 1, -1 do
-              Spring.GiveOrderToUnit(creepID, CMD.FIGHT, wayPoints[w], CMD.OPT_SHIFT)
-            end
-            Spring.GiveOrderToUnit(creepID, CMD.FIGHT, teamData[1].hqPosition, CMD.OPT_SHIFT)
           end
         end
       end
