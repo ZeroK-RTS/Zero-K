@@ -201,18 +201,19 @@ local comsData = {}
 local function CreateUnitNearby(unitDef, spawnPoint, teamID, addMarker)
   local x,z = spawnPoint[1] + random(-50, 50), spawnPoint[3] + random(-50, 50)
   local y = Spring.GetGroundHeight(x, z)
-  local creep = Spring.CreateUnit(unitDef, x, y, z, spawnPoint.facing, teamID)
+  local unitID = Spring.CreateUnit(unitDef, x, y, z, spawnPoint.facing, teamID)
 
   if (addMarker) then
     SendToUnsynced("gamemode_dota_addmarker", x, y, z, teamID)
   end
-  return creep
+  return unitID
 end
 
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   if (UnitDefs[unitDefID].customParams.commtype) then
     comsData[unitID] = {
+      originalTeam    = unitTeam,
       secondsInWater  = 0,
       secondsOnLand   = 0,
       lastDamageDefID = 0,
@@ -299,7 +300,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam, true)
   elseif (UnitDefs[unitDefID].customParams.commtype) then
     if (GG.wasMorphedTo[unitID]) then
+      local newUnitID = GG.wasMorphedTo[unitID]
+      comsData[newUnitID] = comsData[unitID]
       comsData[unitID] = nil
+
       return -- blocks respawn at morph
     end
 
@@ -338,11 +342,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
       end
     end
 
-    comsData[unitID] = nil
-
     -- respawn commander
     local comName    = UnitDefs[unitDefID].name -- the com type that died
-    local comNameNew = GG.startUnits[unitTeam]  -- new com type selected by user
+    local comNameNew = GG.startUnits[ comsData[unitID].originalTeam ] -- new com type selected by user
     local baseComName    = comName   :sub(1, -2)
     local baseComNameNew = comNameNew:sub(1, -2)
 
@@ -359,7 +361,10 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
       comName = comNameNew
     end
 
-    CreateUnitNearby(comName, teamData[allyteam+1].comRespawnPoint, unitTeam, true)
+    local newUnitID = CreateUnitNearby(comName, teamData[allyteam+1].comRespawnPoint, unitTeam, true)
+
+    comsData[newUnitID].originalTeam = comsData[unitID].originalTeam
+    comsData[unitID] = nil
   end
 end
 
