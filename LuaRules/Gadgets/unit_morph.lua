@@ -182,7 +182,7 @@ local morphUnits = {} --// make it global in Initialize()
 local reqDefIDs  = {} --// all possible unitDefID's, which are used as a requirement for a morph
 local morphToStart = {} -- morphes to start next frame
 
-GG.wasMorphed = {}	-- when a unit finishes morphing, its unitID is recorded here prior to destruction
+GG.wasMorphedTo = {} -- when a unit finishes morphing, a mapping of old unitID to new unitID is recorded here prior to old unit destruction
 
 --// per team techlevel and owned MorphReq. units table
 local teamTechLevel = {}
@@ -629,8 +629,7 @@ local function FinishMorph(unitID, morphData)
   -- old health is declared above
   local _,newMaxHealth         = Spring.GetUnitHealth(newUnit)
   local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
-  local hpercent = newHealth/newMaxHealth
-  if newHealth<=1 then 
+  if newHealth <= 1 then 
     newHealth = 1 
   end
   
@@ -643,11 +642,6 @@ local function FinishMorph(unitID, morphData)
 	end
   end
   
-  -- prevent conflict with rezz gadget
-  if hpercent > 0.045 and hpercent < 0.055 then
-    newHealth = newMaxHealth * 0.056 + 1
-  end
-
   Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
 
   --// copy shield power
@@ -668,7 +662,7 @@ local function FinishMorph(unitID, morphData)
 
   Spring.SetUnitBlocking(newUnit, true)
   
-  GG.wasMorphed[unitID] = true
+  GG.wasMorphedTo[unitID] = newUnit
   Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
 end
 
@@ -796,7 +790,7 @@ end
 
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-  GG.wasMorphed[unitID] = nil
+  GG.wasMorphedTo[unitID] = nil
   
   local morphDefSet = morphDefs[unitDefID]
   if (morphDefSet) then

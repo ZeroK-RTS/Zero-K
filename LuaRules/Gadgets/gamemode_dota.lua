@@ -299,7 +299,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     -- respawn Djinn
     CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam, true)
   elseif (UnitDefs[unitDefID].customParams.commtype) then
-    if (attackerID == nil and Spring.GetUnitHealth(unitID) > 0 and GG.wasMorphed[unitID]) then
+    if (attackerID == nil and Spring.GetUnitHealth(unitID) > 0 and GG.wasMorphedTo[unitID]) then
       comsData[unitID] = nil
       return -- blocks respawn at morph
     end
