@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local versionNumber = "v22"
+local versionNumber = "v23"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -51,8 +51,9 @@ local terraunitDefID = UnitDefNames["terraunit"].id
 local creep1 = "spiderassault"
 local creep2 = "corstorm"
 
--- current creep count per wave
-local creepcount = 2
+local creepcount    = 2 -- current creep count per wave
+local maxcreepcount = 7
+local creepbalance  = 0
 
 -- turrets
 local turret1 = "corpre"
@@ -191,7 +192,7 @@ end
 _G.healingAreasData = healingAreasData -- make it visible from unsynced
 
 
-local swimmersData = {}
+local comsData = {}
 
 
 local function CreateUnitNearby(unitDef, spawnPoint, teamID, addMarker)
@@ -208,9 +209,10 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
   if (UnitDefs[unitDefID].customParams.commtype) then
-    swimmersData[unitID] = {
-      secondsInWater = 0,
-      secondsOnLand  = 0,
+    comsData[unitID] = {
+      secondsInWater  = 0,
+      secondsOnLand   = 0,
+      lastDamageDefID = 0,
     }
 
     for _, buildoptionID in ipairs(UnitDefs[unitDefID].buildOptions) do
@@ -275,6 +277,12 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     local hq = HQ[allyteam+1]
     _,_,_,eu = Spring.GetUnitResources(hq)
     Spring.SetUnitResourcing(hq, "uue", eu - 25) -- stop hq from using up the free E from turret
+
+    if (allyteam == 0) then
+      creepbalance = creepbalance - 1
+    else
+      creepbalance = creepbalance + 1
+    end
   elseif (UnitDefs[unitDefID].name == "amphtele") then
     if (attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
       local reward = 100
@@ -285,24 +293,52 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     -- respawn Djinn
     CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam, true)
   elseif (UnitDefs[unitDefID].customParams.commtype) then
-    swimmersData[unitID] = nil
-    if (attackerID == nil and Spring.GetUnitHealth(unitID) > 0) then return end -- blocks respawn at morph (also blocks respawn at self-d. pwned.)
-
-    if (attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
-      killer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(attackerTeam)))
-      failer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(unitTeam)))
-      Spring.Echo(killer .. " pwned " .. failer .. "!")
-
-      local reward = 500 + 0.1 * UnitDefs[unitDefID].metalCost
-      Spring.AddTeamResource(attackerTeam, "metal", reward)
-      Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
+    if (attackerID == nil and Spring.GetUnitHealth(unitID) > 0) then
+      comsData[unitID] = nil
+      return -- blocks respawn at morph (also blocks respawn at self-d. pwned.)
     end
 
+    local failer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(unitTeam)))
+    if (attackerID) then
+      if (not Spring.AreTeamsAllied(unitTeam, attackerTeam) and attackerDefID) then
+        local killer
+
+        if (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone") then
+          local reward = 500 + 0.1 * UnitDefs[unitDefID].metalCost
+          Spring.AddTeamResource(attackerTeam, "metal" , reward)
+          Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
+
+          killer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(attackerTeam)))
+        else
+          killer = "[" .. UnitDefs[attackerDefID].humanName .. "]"
+        end
+
+        Spring.Echo(killer .. " pwned " .. failer .. "!")
+      end
+    else
+      local damageDefID = comsData[unitID].lastDamageDefID
+      if (damageDefID == -1) then
+        Spring.Echo(failer .. " has been killed by flying debris!")
+      elseif (damageDefID == -2 or damageDefID == -3) then
+        Spring.Echo(failer .. " has died after colliding with an obstacle!")
+      elseif (damageDefID == -4) then
+        Spring.Echo(failer .. " has burned to death!")
+      elseif (damageDefID == -5) then
+        Spring.Echo(failer .. " has drowned!")
+      end
+    end
+
+    comsData[unitID] = nil
+
+    -- respawn commander
     local comName = UnitDefs[unitDefID].name
     local baseComName = comName:sub(1, -2)
-    if (UnitDefNames[baseComName .. "0"]) then
-      comName = baseComName .. "0"
-    elseif (UnitDefNames[baseComName .. "1"]) then
+    local comLevel = tonumber(comName:sub(-1))
+    comLevel = tostring(math.max(comLevel - 2, 0)) -- respawned com will be 2 levels lower
+
+    if (UnitDefNames[baseComName .. comLevel]) then
+      comName = baseComName .. comLevel
+    elseif (comLevel == "0" and UnitDefNames[baseComName .. "1"]) then
       comName = baseComName .. "1"
     end
     CreateUnitNearby(comName, teamData[allyteam+1].comRespawnPoint, unitTeam, true)
@@ -318,6 +354,8 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
       Spring.AddTeamResource(attackerTeam, "metal", reward)
       Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
     end
+  elseif (comsData[unitID]) then
+    comsData[unitID].lastDamageDefID = weaponDefID
   end
 end
 
@@ -348,7 +386,7 @@ function SetupTurret2(x, z, teamID)
     projectiles = 5,
     burst = 8,
     burstRate = 0.01,
-    sprayAngle = 0.08,
+    sprayAngle = 0.1,
   } )
   local cost = 1000
   Spring.SetUnitCosts(turret, {
@@ -364,7 +402,7 @@ end
 
 
 function SetupTurret3(x, z, teamID)
-  local height = Spring.GetGroundHeight(x, z) + 50
+  local height = Spring.GetGroundHeight(x, z) + 30
   Spring.LevelHeightMap(x - squareSize, z - squareSize, x + squareSize, z + squareSize, height)
 
   local turret = Spring.CreateUnit("heavyturret", x, height, z, 0, teamID)
@@ -512,13 +550,13 @@ function gadget:GameFrame(n)
 
     -- water damage
     local unitsToDamage = {}
-    for unitID, data in pairs(swimmersData) do
+    for unitID, data in pairs(comsData) do
       local _,height = Spring.GetUnitBasePosition(unitID)
       if (height < 0) then
         data.secondsInWater = data.secondsInWater + 1
         data.secondsOnLand = 0
         if (data.secondsInWater > 10) then
-          unitsToDamage[unitID] = (data.secondsInWater - 10) * 2 -- can't call AddUnitDamage here directly
+          unitsToDamage[unitID] = (data.secondsInWater - 10) * 3 -- can't call AddUnitDamage here directly
         end
       else
         data.secondsOnLand = data.secondsOnLand + 1
@@ -537,22 +575,31 @@ function gadget:GameFrame(n)
   end
 
   if (n % 1350 == 900) then
-    if (n % (5*1350) == 900) then creepcount = math.min(creepcount + 1, 7) end
+    if (n % (5*1350) == 900) then creepcount = math.min(creepcount + 1, maxcreepcount) end
+
+    local teamCreepCounts = {
+      [1] = math.max(0, creepcount + creepbalance),
+      [2] = math.max(0, creepcount - creepbalance),
+    }
 
     -- prepare list of creeper types to spawn
-    local creepsToSpawn = {}
-    for i = 1, creepcount do
-      creepsToSpawn[i] = creep1
-    end
-    creepsToSpawn[creepcount+1] = creep2
+    --local creepsToSpawn = {}
+    --for i = 1, creepcount do
+    --  creepsToSpawn[i] = creep1
+    --end
+    --creepsToSpawn[creepcount+1] = creep2
 
     for path = 1, #creeperPathWaypoints do
       local wayPoints = creeperPathWaypoints[path]
 
-      for i = 1, #creepsToSpawn do
-        creepDef = creepsToSpawn[i]
+      for t = 1, 2 do
+        local teamCreepCount = teamCreepCounts[t]
 
-        for t = 1, 2 do
+        --for i = 1, #creepsToSpawn do
+          --local creepDef = creepsToSpawn[i]
+        for i = 1, teamCreepCount + 1 do
+          local creepDef = (i <= teamCreepCount) and creep1 or creep2
+
           local creepID = CreateUnitNearby(creepDef, teamData[t].creeperSpawnPoints[path], teams[t])
           CreepSetupFunctions[creepDef] (creepID)
           Spring.SetUnitNoSelect(creepID, true) -- creeps uncontrollable
@@ -584,8 +631,8 @@ else
 
 local Util_DrawGroundCircle = gl.Utilities.DrawGroundCircle
 
-local allyHealingAreaColor  = { 0.0, 0.0, 1.0, 0.3 }
-local enemyHealingAreaColor = { 1.0, 0.0, 0.0, 0.3 }
+local allyHealingAreaColor  = { 0.0, 0.0, 1.0, 0.2 }
+local enemyHealingAreaColor = { 1.0, 0.0, 0.0, 0.2 }
 
 
 local function AddMarker(action, x, y, z, teamID)
