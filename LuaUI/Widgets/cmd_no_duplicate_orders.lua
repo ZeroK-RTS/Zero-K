@@ -36,7 +36,7 @@ local GetUnitHealth    = Spring.GetUnitHealth
 local buildList = {}
 
 function widget:Initialize()
-  if Spring.GetSpectatingState() or Spring.IsReplay() then widgetHandler:RemoveWidget() end
+  if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then widgetHandler:RemoveWidget() end
   local myTeam = Spring.GetMyTeamID()
   local units = Spring.GetTeamUnits(myTeam)
   for i=1,#units do

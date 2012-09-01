@@ -57,6 +57,7 @@ local modrules  = {
   
   paralyze = {
     paralyzeOnMaxHealth = true, -- defaults to true
+	unitParalysisDeclineScale = 40, -- Time in seconds to go from 100% to 0% emp
   },
 
   sensors = {

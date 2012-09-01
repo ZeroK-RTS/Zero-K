@@ -65,7 +65,7 @@ local unlockUnits = {
 	--"screamer",
 	--"armanni",
 	--"cordoom",
-	--"corbhmth",
+	"corbhmth",
 	"armbrtha",
 	"corsilo",
 	"mahlazer",
