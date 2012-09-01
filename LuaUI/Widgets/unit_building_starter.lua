@@ -32,7 +32,7 @@ local spGetSelectedUnits = Spring.GetSelectedUnits
 local abs = math.abs
 --
 function widget:Initialize()
-	if Spring.GetSpectatingState() or Spring.IsReplay() then
+	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		Spring.Echo("<Building Starter>: disabled for spectators")
 		widgetHandler:RemoveWidget()
 	end

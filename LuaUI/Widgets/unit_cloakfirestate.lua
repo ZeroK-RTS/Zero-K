@@ -86,7 +86,7 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
-  if Spring.GetSpectatingState() or Spring.IsReplay() then
+   if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
     widgetHandler:RemoveWidget()
     return true
   end

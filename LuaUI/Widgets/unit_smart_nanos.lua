@@ -86,7 +86,7 @@ local myTeamID
 function widget:Initialize()
   myTeamID = GetMyTeamID()
   
-  if Spring.GetSpectatingState() or Spring.IsReplay() then
+   if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
     Spring.Echo("Smart Nanos widget disabled for spectators")
     widgetHandler:RemoveWidget()
   end

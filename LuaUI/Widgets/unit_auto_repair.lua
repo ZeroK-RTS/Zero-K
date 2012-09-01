@@ -116,7 +116,7 @@ local function distSqr(x1,y1,z1, x2, y2, z2)
 end
 
 function widget:Initialize()
-	if Spring.GetSpectatingState() or Spring.IsReplay() then
+	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		widgetHandler:RemoveWidget()
 		return true
 	end

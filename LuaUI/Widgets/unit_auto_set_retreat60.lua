@@ -44,7 +44,7 @@ local debug = false --generates debug message
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function IsSpec()
-	if Spring.GetSpectatingState() or Spring.IsReplay() then
+	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		widgetHandler:RemoveWidget()
 		return true
 	end

@@ -157,7 +157,7 @@ local keyShift = 304
 
 --[[
 function widget:Initialize()
-	if Spring.GetSpectatingState() or Spring.IsReplay() then
+	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		Spring.Echo("<CustomFormations2>: disabled for spectators")
 		widgetHandler:RemoveWidget()
 	end

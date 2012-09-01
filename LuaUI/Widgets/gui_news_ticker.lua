@@ -231,7 +231,7 @@ local function ProcessLabels()
 end
 
 local function CheckSpecState()
-	if (Spring.GetSpectatingState() or Spring.IsReplay()) then
+	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 		Echo("<Unit News> Spectator mode or replay. Widget removed.")
 		widgetHandler:RemoveWidget()
 	end

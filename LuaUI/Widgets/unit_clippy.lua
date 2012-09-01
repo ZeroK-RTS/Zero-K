@@ -233,7 +233,7 @@ local timer = 0
 function widget:Update(dt)
 	timer = timer + dt
 	if timer > updateFrequency then
-		if (Spring.GetSpectatingState() or Spring.IsReplay()) then
+		 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
 			Spring.Echo("<Clippy Comments> Spectator mode or replay. Widget removed.")
 			widgetHandler:RemoveWidget()
 		end
