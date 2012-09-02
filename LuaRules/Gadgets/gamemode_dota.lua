@@ -84,6 +84,16 @@ do
 end
 
 
+local comLevelAfterRespawn = {
+  [0] = 0,
+  [1] = 0,
+  [2] = 0,
+  [3] = 1,
+  [4] = 2,
+  [5] = 2,
+}
+
+
 local mapSizeX   = Game.mapSizeX
 local mapSizeZ   = Game.mapSizeZ
 local squareSize = Game.squareSize
@@ -258,6 +268,21 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
       lastDamageDefID = 0,
     }
 
+    local weapons = UnitDefs[unitDefID].weapons
+    for w = 1, #weapons do
+      local weaponDefID = weapons[w].weaponDef
+
+      if (WeaponDefs[weaponDefID] and WeaponDefs[weaponDefID].name:find("shockrifle")) then -- nerf Shock Rifle
+        local originalRange = Spring.GetUnitWeaponState(unitID, w - 1, "range")
+        Spring.SetUnitWeaponState(unitID, w - 1, {
+          range           = 0.9 * originalRange,
+          projectileSpeed = 0.8 * 1000,
+        })
+      end
+    end
+
+
+
     --[[ -- build options removal is now handled in unitdefs_post
     for _, buildoptionID in ipairs(UnitDefs[unitDefID].buildOptions) do
       local cmdDescID = Spring.FindUnitCmdDesc(unitID, -buildoptionID)
@@ -293,31 +318,19 @@ end
 
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
+  if (Spring.IsGameOver()) then return end
+
   _,_,_,_,_,allyteam = Spring.GetTeamInfo(unitTeam)
-  if (unitID == HQ[1]) then
-    for _,aunitID in ipairs(Spring.GetAllUnits()) do
-      if (Spring.GetUnitAllyTeam(aunitID) == 0) then Spring.DestroyUnit(aunitID, true, false) end
-    end
+  if (unitID == HQ[1] or unitID == HQ[2]) then
+    local winnerAllyTeam = (unitID == HQ[2]) and 0 or 1
+
     for _,allyteam in ipairs(Spring.GetAllyTeamList()) do
-      if (allyteam ~= 1) then
-        for _,teams in ipairs(Spring.GetTeamList(allyteam)) do
-          Spring.KillTeam(teams)
-        end
+      if (allyteam ~= winnerAllyTeam) then
+        GG.DestroyAlliance(allyteam)
       end
     end
-    Spring.GameOver({1})
-  elseif (unitID == HQ[2]) then
-    for _,aunitID in ipairs(Spring.GetAllUnits()) do
-      if (Spring.GetUnitAllyTeam(aunitID) == 1) then Spring.DestroyUnit(aunitID, true, false) end
-    end
-    for _,allyteam in ipairs(Spring.GetAllyTeamList()) do
-      if (allyteam ~= 0) then
-        for _,teams in ipairs(Spring.GetTeamList(allyteam)) do
-          Spring.KillTeam(teams)
-        end
-      end
-    end
-    Spring.GameOver({0})
+
+    Spring.GameOver({winnerAllyTeam})
   elseif (unitDefID == UnitDefNames["heavyturret"].id) then
     local hq = HQ[allyteam+1]
     _,_,_,eu = Spring.GetUnitResources(hq)
@@ -389,7 +402,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 
     if (baseComNameNew == baseComName) then
       local comLevel = tonumber(comName:sub(-1))
-      comLevel = tostring(math.max(comLevel - 2, 0)) -- respawned com will be 2 levels lower
+      comLevel = tostring(comLevelAfterRespawn[comLevel])
+      --comLevel = tostring(math.max(comLevel - 2, 0)) -- respawned com will be 2 levels lower
 
       if (UnitDefNames[baseComName .. comLevel]) then
         comName = baseComName .. comLevel
@@ -575,7 +589,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 end
 
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
   if (protectedStructures[unitDefID] and attackerTeam and Spring.AreTeamsAllied(unitTeam, attackerTeam)) then
     -- block friendly damage to HQs and turrets
     -- blocks self-d damage too, but not normal unit explosion damage
@@ -583,7 +597,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
   end
 
   -- changing units' damage
-  if (weaponID and WeaponDefs[weaponID] and WeaponDefs[weaponID].name:find("shockrifle")) then damage = damage * 0.6 end -- nerf Shock Rifle
+  if (weaponDefID and WeaponDefs[weaponDefID] and WeaponDefs[weaponDefID].name:find("shockrifle")) then damage = damage * 0.6 end -- nerf Shock Rifle
 
   -- used to be secret buffs to sprung for being "awesome"
   -- suck on this you cheating scum!!1
@@ -615,6 +629,8 @@ local CreepSetupFunctions = {
 
 
 function gadget:GameFrame(n)
+  if (Spring.IsGameOver()) then return end
+
   if (n % 30 == 17) then
     -- healing areas
     for allyteam = 0, 1 do
@@ -640,15 +656,15 @@ function gadget:GameFrame(n)
       if (height < 0) then
         data.secondsInWater = data.secondsInWater + 1
         data.secondsOnLand = 0
-        if (data.secondsInWater > 10) then
-          unitsToDamage[unitID] = (data.secondsInWater - 10) * 3 -- can't call AddUnitDamage here directly
+        if (data.secondsInWater > 5) then
+          unitsToDamage[unitID] = (data.secondsInWater - 5) * 3 -- can't call AddUnitDamage here directly
         end
       else
         data.secondsOnLand = data.secondsOnLand + 1
         if (data.secondsInWater > 0) then
-          if (data.secondsOnLand < 20) then
+          if (data.secondsOnLand < 15) then
             data.secondsInWater = data.secondsInWater - 1
-          elseif (data.secondsOnLand == 20) then
+          elseif (data.secondsOnLand == 15) then
             data.secondsInWater = 0
           end
         end

@@ -598,11 +598,19 @@ upgrades_dota = {
 	module_personal_cloak = {
 		name = "Stealth System",
 		description = "Makes the commander invisible to radar",
-		func = function(unitDef) 
+		func = function(unitDef)
 				unitDef.stealth = true
 			end,
 	},
 	module_cloak_field = upgrades.module_jammer,
+	
+	module_resurrect = {
+		name = "Lazarus Nanolathe",
+		description = "Adds +5 metal/s build speed",
+		func = function(unitDef)
+				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 5 end
+			end,
+	},
 }
 
 decorations = {
