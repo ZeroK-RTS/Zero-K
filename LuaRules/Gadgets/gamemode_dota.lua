@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local versionNumber = "v0.26"
+local versionNumber = "v0.27"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -273,10 +273,12 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
       local weaponDefID = weapons[w].weaponDef
 
       if (WeaponDefs[weaponDefID] and WeaponDefs[weaponDefID].name:find("shockrifle")) then -- nerf Shock Rifle
-        local originalRange = Spring.GetUnitWeaponState(unitID, w - 1, "range")
+        local originalRange           = Spring.GetUnitWeaponState(unitID, w - 1, "range")
+        local originalProjectileSpeed = Spring.GetUnitWeaponState(unitID, w - 1, "projectileSpeed")
+
         Spring.SetUnitWeaponState(unitID, w - 1, {
-          range           = 0.9 * originalRange,
-          projectileSpeed = 0.8 * 1000,
+          range           = 0.8 * originalRange,
+          projectileSpeed = 0.8 * originalProjectileSpeed,
         })
       end
     end
