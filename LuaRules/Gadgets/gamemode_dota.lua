@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local versionNumber = "v0.25"
+local versionNumber = "v0.26"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -66,7 +66,22 @@ local turret1 = "corpre"
 local turret2 = "corllt"
 local turret3 = "heavyturret"
 
+local hqDef   = "pw_hq"
 local hqTerraHeight = 48
+
+
+protectedStructures = {
+  hqDef, turret1, turret2, turret3,
+}
+
+do
+  local t = {}
+  for i = 1, #protectedStructures do
+    local defID = UnitDefNames[ protectedStructures[i] ].id
+    t[defID] = true
+  end
+  protectedStructures = t
+end
 
 
 local mapSizeX   = Game.mapSizeX
@@ -99,7 +114,7 @@ local teamData = {
       {  467, 1467, turret3 },
       { 1467,  587, turret3 },
       { 1573, 1443, turret3 },
-      -- bases
+      -- base
       {  840, 1160, turret2 },
       { 1160,  840, turret2 },
     },
@@ -128,7 +143,7 @@ local teamData = {
       { 6524, 7664, turret3 },
       { 7665, 6682, turret3 },
       { 6666, 6666, turret3 },
-      -- bases
+      -- base
       { mapSizeX - 1160, mapSizeX -  840, turret2 },
       { mapSizeX -  840, mapSizeX - 1160, turret2 },
     },
@@ -499,7 +514,7 @@ function gadget:GamePreload()
 
     local spawnPoint = td.hqPosition
     Spring.SetHeightMapFunc(hqHeightMapFunc, spawnPoint[1], spawnPoint[3])
-    local hq = Spring.CreateUnit("pw_hq", spawnPoint[1], spawnPoint[2], spawnPoint[3], 0, teams[i])
+    local hq = Spring.CreateUnit(hqDef, spawnPoint[1], spawnPoint[2], spawnPoint[3], 0, teams[i])
     HQ[i] = hq
 
     Spring.SetUnitNoSelect(hq, true)
@@ -531,22 +546,43 @@ end
 
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
-  if (cmdID) then
-    if (cmdID == CMD.INSERT and cmdParams and cmdParams[2]) then
-      cmdID = cmdParams[2]
-      cmdParams[1] = cmdParams[4]
+  if (cmdID == CMD.INSERT and cmdParams[2]) then
+    cmdID = cmdParams[2]
+
+    local t = {}
+    for i = 4, #cmdParams do
+      t[i-3] = cmdParams[i]
     end
-    if (((cmdID == CMD.CLOAK or cmdID == CMD_CLOAK_SHIELD) and cmdParams and cmdParams[1] == 1) or -- block cloak
-      blockedCmds[cmdID] or cmdID < 0) then -- block reclaim, rez, build and terra
+    cmdParams = t
+  end
+
+  if (((cmdID == CMD.CLOAK or cmdID == CMD_CLOAK_SHIELD) and cmdParams[1] == 1) or -- block cloak
+    blockedCmds[cmdID] or cmdID < 0) then -- block reclaim, rez, build and terra
+    return false
+  end
+
+  if ((cmdID == CMD.ATTACK or cmdID == CMD.MANUALFIRE) and #cmdParams == 1) then -- block attack orders on friendly HQs and turrets
+    local targetID    = cmdParams[1]
+    local targetDefID = Spring.GetUnitDefID(targetID)
+    local targetTeam  = Spring.GetUnitTeam(targetID)
+
+    if (targetDefID and protectedStructures[targetDefID] and Spring.AreTeamsAllied(unitTeam, targetTeam)) then
       return false
     end
   end
+
   return true
 end
 
 
--- changing units' damage
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
+  if (protectedStructures[unitDefID] and attackerTeam and Spring.AreTeamsAllied(unitTeam, attackerTeam)) then
+    -- block friendly damage to HQs and turrets
+    -- blocks self-d damage too, but not normal unit explosion damage
+    return 0
+  end
+
+  -- changing units' damage
   if (weaponID and WeaponDefs[weaponID] and WeaponDefs[weaponID].name:find("shockrifle")) then damage = damage * 0.6 end -- nerf Shock Rifle
 
   -- used to be secret buffs to sprung for being "awesome"
