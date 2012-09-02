@@ -31,7 +31,7 @@ unitDef = {
     helptext_bp    = [[Bombardeiro rápido e invisível a radar equipado com um gerador de raios ao invés de bombas que dispara raios de PEM contra o inimigo ao atacar.]],
     helptext_fr    = [[Rapide et furtif, armé de canons EMP pouvant paralyser les unités dans une large bande.]],
 	helptext_de    = [[Schneller Tarnkappenbomber, der mit einem Stossspannungsgenerator zum Paralysieren großflächiger Gebiete bewaffnet ist.]],
-	modelradius    = [[20]],
+	modelradius    = [[10]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
