@@ -354,7 +354,7 @@ for name, data in pairs(commDefs) do
 	
 	-- rez speed
 	if data.canresurrect then 
-		data.resurrectspeed = data.workertime * 2/3 
+		data.resurrectspeed = data.workertime*0.8
 	end
 	
 	-- make sure weapons can hit their max range
