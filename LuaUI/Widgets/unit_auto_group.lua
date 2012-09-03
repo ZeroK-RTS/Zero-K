@@ -3,7 +3,7 @@ local versionNum = '3.03'
 function widget:GetInfo()
   return {
 	name		= "Auto Group",
-	desc 		= "v".. (versionNum) .." Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#. Ctrl BACKQUOTE remove units. Type '/luaui autogroup help' for help.",
+	desc 		= "v".. (versionNum) .." Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#. Alt BACKQUOTE (~) remove units. Type '/luaui autogroup help' for help or view settings at: Settings/Interface/AutoGroup'.",
 	author		= "Licho",
 	date		= "Mar 23, 2007",
 	license		= "GNU GPL, v2 or later",
@@ -41,8 +41,8 @@ local debug = false --of true generates debug messages
 local unit2group = {} -- list of unit types to group
 
 local helpText =
-	'Alt+0-9 sets autogroup# for selected unit type(s). Newly built units get added to group# equal to their autogroup#.'..
-	'Alt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).'
+	'Alt+0-9 sets autogroup# for selected unit type(s).\nNewly built units get added to group# equal to their autogroup#.'..
+	'\nAlt+BACKQUOTE (~) deletes autogrouping for selected unit type(s).'
 	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 

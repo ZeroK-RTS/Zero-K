@@ -235,7 +235,6 @@ end
 ------------------------------------------------------------
 
 function widget:CommandNotify(cmdID, params, options)	
-
 	if (cmdID == CMD_AREA_MEX and WG.metalSpots) then
 
 		local cx, cy, cz, cr = params[1], params[2], params[3], math.max((params[4] or 60),60)
@@ -311,6 +310,9 @@ function widget:CommandNotify(cmdID, params, options)
 					local buildable, feature = spTestBuildOrder(mexDefID,x,0,z,1)
 					if buildable ~= 0 then
 						spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
+						if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
+							Script.LuaUI.CommandNotifyMex(-mexDefID, {x,0,z,0} , options)
+						end
 					else
 						local mexes = spGetUnitsInRectangle(x-1,z-1,x+1,z+1)
 						for i = 1, #mexes do
@@ -356,6 +358,9 @@ function widget:CommandNotify(cmdID, params, options)
 				return true
 			else
 				spGiveOrder(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options.coded)
+				if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
+					Script.LuaUI.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options)
+				end
 				return true
 			end
 		end

@@ -17,7 +17,7 @@
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
-    desc      = "v1.1 Common non-hierarchical permanent build queue\n\nInstruction: add constructors to group zero (ctrl+0), and then give one of them a build queue. As result, the whole group will share same build queue and the work will automatically distribute among them. Use it to macro alot of idle constructors",
+    desc      = "v1.2 Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use AutoGroup or manual), and then give any of them a build queue. As result, the whole group (group 0) will share the same build queue and the work will automatically distributed among them. Use it to macro alot of idle constructors",
     author    = "Troy H. Cheek",
     date      = "July 20, 2009",
     license   = "GNU GPL, v2 or later",
@@ -35,6 +35,23 @@ end
 
 -- optionnally to do:
 -- _ orders with shift+ctrl have higher priority ( insert in queue -> cons won't interrupt their current actions)
+
+---- CHANGELOG -----
+-- msafwan,			v1.2	(4sept2012)	: 	made it work with ZK "cmd_mex_placement.lua" mex queue, 
+--											reduce the tendency to make a huge blob of constructor (where all constructor do same job),
+--											reduce chance of some constructor not given job when player have alot of constructor,
+-- rafal,			v1.1	(2May2012)	:	Don't fetch full Spring.GetCommandQueue in cases when only the first command is needed - instead using
+--											GetCommandQueue(unitID, 1)
+-- KingRaptor,		v1.1	(24dec2011)	:	Removed the "remove in 85.0" stuff
+-- versus666,		v1.1	(16dec2011)	: 	mostly changed the layer order to get a logical priority among widgets.
+-- KingRaptor,		v1.1	(8dec2011)	:	Fixed the remaining unitdef tags for 85.0
+-- versus666,		v1.1	(7jan2011)	: 	Made CBA, cmd_retreat, gui_nuke_button, gui_team_platter.lua, unit_auto_group to obey F5 (gui hidden).
+-- KingRaptor,		v1.1	(2Nov2010)	:	Moved version number from name to description. 
+-- lccquantum,		v1.1	(2Nov2010)	:	central_build_AI is disabled by default (people will wonder why their builders are acting wierd when in group 0)
+-- versus666,		v1.1	(1Nov2010)	: 	introduced into ZK
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local myGroupId = 0	--	Group number (0 to 9) to be controlled by Central Build AI.
 --  -1 = Use custom group (hotkey to select, ctrl-hotkey to add units) similar old Group AI.
@@ -112,6 +129,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
+	widgetHandler:RegisterGlobal("CommandNotifyMex", CommandNotifyMex) --an event which is called everytime "cmd_mex_placement.lua" handle a mex command. Reference : http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
 end
 
 --function widget:CommandNotify(cmdID, cmdParams, cmdOpts)
@@ -204,7 +222,7 @@ function widget:GroupChanged(groupId)
 --		local units = spGetGroupUnits(myGroupId)
 --		Echo( spGetGameFrame() .. " Change detected in group." )
 		groupHasChanged = true
-		nextFrame = spGetGameFrame() + ping()
+		nextFrame = math.min (spGetGameFrame() + ping() , nextFrame)
 	end
 end
 
@@ -237,24 +255,40 @@ function UpdateOneGroupsDetails(myGroupId)
 	groupHasChanged = nil
 end
 
+--	receive broadcasted event from "cmd_mex_placement.lua" which notify us that it has its own mex queue
+function CommandNotifyMex(id,params,options)
+	widget:CommandNotify(id, params, options, 1)
+end
+
 --  If the command is issued to something in our group, flag it.
 --  Thanks to Niobium for pointing out CommandNotify().
 
-function widget:CommandNotify(id, params, options)
+function widget:CommandNotify(id, params, options, zkMex)
 	local selectedUnits = spGetSelectedUnits()
 	for _, unitID in ipairs(selectedUnits) do	-- check selected units...
 		if ( myUnits[unitID] ) then	--  was issued to one of our units.
-			if ( options.shift and id < 0 ) then	-- used shift for build.
-				local x, y, z, h = params[1], params[2], params[3], params[4]
-				local myCmd = { id=id, x=x, y=y, z=z, h=h }
-				local hash = hash(myCmd)
-				if ( myQueue[hash] ) then	-- if dupe of existing order
-					myQueue[hash] = nil		-- must want to cancel
-				else						-- if not a dupe
-					myQueue[hash] = myCmd	-- add to CB queue
+			if ( options.shift ) then -- used shift for build.
+				if ( id < 0 ) then
+					if zkMex == 1 then -- check if from "cmd_mex_placement.lua". If so, send CMD.STOP to cancel them
+						Spring.GiveOrder(CMD.STOP, {} , 0 ) 
+					end
+					local x, y, z, h = params[1], params[2], params[3], params[4]
+					local myCmd = { id=id, x=x, y=y, z=z, h=h }
+					local hash = hash(myCmd)
+					if ( myQueue[hash] ) then	-- if dupe of existing order
+						myQueue[hash] = nil		-- must want to cancel
+						Spring.GiveOrder(CMD.STOP, {} , 0 ) 
+					else						-- if not a dupe
+						myQueue[hash] = myCmd	-- add to CB queue
+					end
+					CleanOrders(myQueue)	-- don't add if can't build there
+					return true	-- have to return true or Spring still handles command itself.
+				else
+					if myUnits[unitID] == "idle" then 
+						myUnits[unitID] = "busy" --queued other thing
+					end
+					-- do NOT return here because there may be more units.  Let Spring handle.
 				end
-				CleanOrders(myQueue)	-- don't add if can't build there
-				return true	-- have to return true or Spring still handles command itself.
 			else
 				myUnits[unitID] = "busy"	-- direct command instead of queued.
 				-- do NOT return here because there may be more units.  Let Spring handle.
@@ -268,10 +302,10 @@ end
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 	if ( myUnits[unitID] and cmdID < 0) then	-- one of us building something
---		myUnits[unitID] = "idle"
 		for unit2,myCmd in pairs(myUnits) do
 			if ( myCmd == "asst "..unitID ) then
-				spGiveOrderToUnit( unit2, CMD_STOP, {}, { "" } )
+				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command
+				myUnits[unit2] = "idle"
 			end
 		end
 	end
@@ -281,8 +315,8 @@ end
 
 function widget:UnitIdle(unitID, unitDefID, teamID)
 	if ( myUnits[unitID] ) then
---		myUnits[unitID] = "idle"
-		nextFrame = spGetGameFrame() + ping()
+		myUnits[unitID] = "idle"
+		nextFrame = math.min (spGetGameFrame() + ping() , nextFrame) --find new work
 	end
 end
 
@@ -365,24 +399,40 @@ function GetWorkFor(unitID)
 	
 	CleanOrders(myQueue)	-- just in case something's changed since last we checked.
 
-	for unit,theCmd in pairs(myUnits) do	-- see if any busy units need help.
-		local cmd1 = GetFirstCommand(unit)
+	for busyUnit,theCmd in pairs(myUnits) do	-- see if any busy units need help.
+		local cmd1 = GetFirstCommand(busyUnit)
 		local myCmd = myQueue[theCmd]
-		if ( myCmd ) then
+		if ( myCmd ) then --when busy unit has CentralBuild command (theCmd>0) & isn't assisting (theCmd~=0)
 			local cmd, x, y, z, h = myCmd.id, myCmd.x, myCmd.y, myCmd.z, myCmd.h
 			if ( cmd  and cmd < 0 ) then
-				local x2, y2, z2 = spGetUnitPosition(unit)	-- location of busy unit
+				local x2, y2, z2 = spGetUnitPosition( busyUnit)	-- location of busy unit
+				local numOfAssistant = 0.0
+				for unit2,theCmd2 in pairs(myUnits) do --find how many unit is assisting this busy unit
+					local assisting = tonumber(theCmd2:sub(6))
+					if (assisting == busyUnit) then
+						numOfAssistant = numOfAssistant + 0.1
+					end
+				end
 				local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2
+				dist = dist + dist*numOfAssistant
 				if ( dist < busyDist ) then
-					busyClose = unit	-- busy unit who needs help
+					busyClose = busyUnit	-- busy unit who needs help
 					busyDist = dist		-- dist to said unit * 1.5 (divided by 2 instead of 3)
 				end
 			end
-		elseif ( cmd1 and cmd1.id < 0 ) then
-			local x2, y2, z2 = spGetUnitPosition(unit)	-- location of busy unit
+		elseif ( cmd1 and cmd1.id < 0) then --(cmd1.id < 0 or cmd1.id == CMD.REPAIR or cmd1.id == CMD.RECLAIM or cmd1.id == CMD.RESURRECT) ) then --when busy unit has its own command
+			local x2, y2, z2 = spGetUnitPosition(busyUnit)	-- location of busy unit
+			local numOfAssistant = 0.0
+			for unit2,theCmd2 in pairs(myUnits) do --find how many unit is assisting this busy unit
+				local assisting = tonumber(theCmd2:sub(6))
+				if (assisting == busyUnit) then
+					numOfAssistant = numOfAssistant + 0.1
+				end
+			end
 			local dist = Distance(ux,uz,x2,z2) * 1.5
+			dist = dist + dist*numOfAssistant
 			if ( dist < busyDist ) then
-				busyClose = unit	-- busy unit who needs help
+				busyClose = busyUnit	-- busy unit who needs help
 				busyDist = dist		-- dist to said unit * 1.5 (divided by 2 instead of 3)
 			end
 		end
@@ -422,7 +472,7 @@ function GetWorkFor(unitID)
 		if ( busyDist < queueDist ) then	-- assist is closer
 			if ( ud.canFly ) then busyDist = busyDist * 0.50 end
 			--if ( ud.canHover ) then busyDist = busyDist * 0.75 end
-			return { unitID, CMD_GUARD, { busyClose }, busyDist, 0 }
+			return { unitID, CMD_GUARD, { busyClose }, busyDist, 0 } --assist the busy unit by GUARDING it.
 		else	-- new project is closer
 			if ( ud.canFly ) then queueDist = queueDist * 0.50 end
 			--if ( ud.canHover ) then queueDist = queueDist * 0.75 end
@@ -462,7 +512,8 @@ function UnitGoByeBye(unitID)
 		myUnits[unitID] = nil
 		for unit2,myCmd in pairs(myUnits) do
 			if ( myCmd == "asst "..unitID ) then
-				spGiveOrderToUnit( unit2, CMD_STOP, {}, { "" } )
+				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command
+				myUnits[unit2] = "idle"
 			end
 		end
 	end
