@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local versionNumber = "v0.27"
+local versionNumber = "v0.28"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -179,29 +179,40 @@ local creeperPathWaypoints = {
 local creeperOrderArrays = {}
 
 
-local function AlignToSquareSize (coordsTable)
-  if (type(coordsTable) == "table") then
-    for i = 1, 2 do
-      coordsTable[i] = math.floor((coordsTable[i] / squareSize) + 0.5) * squareSize
-    end
-  end
-end
-
-
-local function Point2Dto3D (coordsTable)
-  if (type(coordsTable) == "table") then
-    coordsTable[3] = coordsTable[2]
-    coordsTable[2] = Spring.GetGroundHeight(coordsTable[1], coordsTable[3])
-    coordsTable.facing = coordsTable.facing or 0
-  end
-end
-
-
 do
   local healingAreasData = {}
+  local debugCircles     = {}
+  local debugLines       = {}
 
-  for i = 1, #teams do
-    local td = teamData[i]
+
+  local function AlignToSquareSize (coordsTable)
+    if (type(coordsTable) == "table") then
+      for i = 1, 2 do
+        coordsTable[i] = math.floor((coordsTable[i] / squareSize) + 0.5) * squareSize
+      end
+    end
+  end
+
+  local function Point2Dto3D (coordsTable)
+    if (type(coordsTable) == "table") then
+      coordsTable[3] = coordsTable[2]
+      coordsTable[2] = Spring.GetGroundHeight(coordsTable[1], coordsTable[3])
+      coordsTable.facing = coordsTable.facing or 0
+    end
+  end
+
+  local function AddDebugCircle (coordsTable, circleRadius, circleColor)
+    debugCircles[#debugCircles + 1] = {
+      [1]    = coordsTable[1],
+      [2]    = coordsTable[3],
+      radius = circleRadius,
+      color  = circleColor,
+    }
+  end
+
+
+  for t = 1, #teams do
+    local td = teamData[t]
 
     AlignToSquareSize(td.hqPosition)
     Point2Dto3D(td.hqPosition)
@@ -209,11 +220,14 @@ do
 
     Point2Dto3D(td.djinnSpawnPoint)
     Point2Dto3D(td.comRespawnPoint)
+    AddDebugCircle(td.djinnSpawnPoint, 50, "djinnSpawn")
+    AddDebugCircle(td.comRespawnPoint, 50, "comRespawn")
 
-    healingAreasData[i] = td.healingAreas
+    healingAreasData[t] = td.healingAreas
 
     for i = 1, #creeperPathWaypoints do
       Point2Dto3D(td.creeperSpawnPoints[i])
+      AddDebugCircle(td.creeperSpawnPoints[i], 50, "creeperSpawn")
     end
 
     for i = 1, #td.turretPositions do
@@ -221,39 +235,82 @@ do
     end
   end
 
-  _G.healingAreasData = healingAreasData -- make it visible from unsynced
-
   for i = 1, #creeperPathWaypoints do
+    local waypoints = creeperPathWaypoints[i]
+
     local team1Orders = {}
     local team2Orders = {}
 
-    local waypoints = creeperPathWaypoints[i]
+    local points = {}
+    points[1]              = teamData[1].creeperSpawnPoints[i]
+    points[#waypoints + 2] = teamData[2].creeperSpawnPoints[i]
+
     local n = #waypoints + 1
     for w = 1, #waypoints do
       Point2Dto3D(waypoints[w])
 
       team1Orders[w]   = { CMD_FIGHT, waypoints[w], CMD_OPT_SHIFT }
       team2Orders[n-w] = team1Orders[w]
+
+      AddDebugCircle(waypoints[w], 20, "creeperPath")
+      points[w+1] = waypoints[w]
     end
 
     table.insert(team1Orders, { CMD_FIGHT, teamData[2].hqPosition, CMD_OPT_SHIFT } )
     table.insert(team2Orders, { CMD_FIGHT, teamData[1].hqPosition, CMD_OPT_SHIFT } )
 
     creeperOrderArrays[i] = { team1Orders, team2Orders }
+
+    debugLines[#debugLines + 1] = {
+      color  = "creeperPath",
+      points = points,
+    }
   end
+
+
+  -- make these tables visible from unsynced
+  _G.healingAreasData = healingAreasData
+  _G.debugCircles     = debugCircles
+  _G.debugLines       = debugLines
 end
 
 
 local comsData = {}
 
 
-local function CreateUnitNearby(unitDef, spawnPoint, teamID, addMarker)
-  local x,z = spawnPoint[1] + random(-50, 50), spawnPoint[3] + random(-50, 50)
+local function RandomVector2D(maxLength, minLength)
+  local x, z, sqLength
+  local sqMaxLength = maxLength * maxLength
+
+  if (minLength)  then
+    minLength = math.min(minLength, maxLength - 0.999)
+    local sqMinLength = minLength * minLength
+
+    repeat
+      x = random(-maxLength, maxLength)
+      z = random(-maxLength, maxLength)
+      sqLength = x*x + z*z
+    until (sqMinLength <= sqLength and sqLength <= sqMaxLength)
+  else
+    repeat
+      x = random(-maxLength, maxLength)
+      z = random(-maxLength, maxLength)
+      sqLength = x*x + z*z
+    until (sqLength <= sqMaxLength)
+  end
+
+  return x, z
+end
+
+
+local function CreateUnitNearby(unitDef, spawnPoint, teamID, markerType)
+  local vx, vz = RandomVector2D(50)
+  local x, z = spawnPoint[1] + vx, spawnPoint[3] + vz
   local y = Spring.GetGroundHeight(x, z)
   local unitID = Spring.CreateUnit(unitDef, x, y, z, spawnPoint.facing, teamID)
 
-  if (addMarker) then
-    SendToUnsynced("gamemode_dota_addmarker", x, y, z, teamID)
+  if (markerType) then
+    SendToUnsynced("gamemode_dota_addmarker", x, y, z, teamID, markerType)
   end
   return unitID
 end
@@ -351,7 +408,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     end
 
     -- respawn Djinn
-    CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam, true)
+    CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam, "comRespawn")
   elseif (UnitDefs[unitDefID].customParams.commtype) then
     if (GG.wasMorphedTo[unitID]) then
       local newUnitID = GG.wasMorphedTo[unitID]
@@ -416,7 +473,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
       comName = comNameNew
     end
 
-    local newUnitID = CreateUnitNearby(comName, teamData[allyteam+1].comRespawnPoint, unitTeam, true)
+    local newUnitID = CreateUnitNearby(comName, teamData[allyteam+1].comRespawnPoint, unitTeam, "comRespawn")
 
     comsData[newUnitID].originalTeam = comsData[unitID].originalTeam
     comsData[unitID] = nil
@@ -735,27 +792,78 @@ else
 -- UNSYNCED
 --------------------------------------------------------------------------------
 
+local glDrawGroundCircle    = gl.DrawGroundCircle
 local Util_DrawGroundCircle = gl.Utilities.DrawGroundCircle
+
+
+local lastMarkerFrames = {}
+
+local drawDebugInfo = false
 
 local allyHealingAreaColor  = { 0.0, 0.0, 1.0, 0.2 }
 local enemyHealingAreaColor = { 1.0, 0.0, 0.0, 0.2 }
 
+local debugColors = {
+  ["comRespawn"]   = { 0.2, 0.2, 1.0, 1.0 },
+  ["djinnSpawn"]   = { 0.0, 0.8, 0.8, 1.0 },
+  ["creeperSpawn"] = { 0.9, 0.2, 0.0, 1.0 },
+  ["creeperPath"]  = { 0.9, 0.2, 0.0, 0.7 },
+}
 
-local function AddMarker(action, x, y, z, teamID)
-  if (Spring.GetLocalTeamID() == teamID and not Spring.GetSpectatingState()) then
-    Spring.MarkerAddPoint(x, y, z)
-    Spring.MarkerErasePosition(x, y, z)
+
+local debugLines = {}
+
+for l, debugLine in sipairs(SYNCED.debugLines) do -- need to recreate SYNCED.debugLines table because gl.Shape apparently doesn't like synced tables
+  local points = {}
+
+  for p, point in sipairs(debugLine.points) do
+    points[p] = {
+      v = {
+        point[1],
+        point[2] + 5,
+        point[3],
+      },
+    }
   end
+
+  debugLines[l] = {
+    color  = debugLine.color,
+    points = points,
+  }
+end
+
+
+local function AddMarker(action, x, y, z, teamID, markerType)
+  if (Spring.GetLocalTeamID() == teamID and not Spring.GetSpectatingState()) then
+    local frame = Spring.GetGameFrame()
+
+    if (not lastMarkerFrames[markerType] or lastMarkerFrames[markerType] + 30 <= frame) then
+      Spring.MarkerAddPoint(x, y, z)
+      Spring.MarkerErasePosition(x, y, z)
+      lastMarkerFrames[markerType] = frame
+    end
+  end
+end
+
+
+local function ToggleDebugInfo (cmd, line, words, playerID)
+  drawDebugInfo = not drawDebugInfo
 end
 
 
 function gadget:Initialize()
   gadgetHandler:AddSyncAction("gamemode_dota_addmarker", AddMarker)
+
+  gadgetHandler:AddChatAction("dota_debug", ToggleDebugInfo, "toggles DOTA gadget debug info drawing")
+  --Script.AddActionFallback("dota_debug" .. ' ', "toggles DOTA gadget debug info drawing") -- synced only
 end
 
 
 function gadget:Shutdown()
   gadgetHandler:RemoveSyncAction("gamemode_dota_addmarker")
+
+  gadgetHandler:RemoveChatAction("dota_debug")
+  --Script.RemoveActionFallback("dota_debug") -- synced only
 end
 
 
@@ -781,6 +889,25 @@ function gadget:DrawWorldPreUnit()
   end
 
   --gl.Texture(false)
+
+  if (drawDebugInfo) then
+    gl.LineWidth(3.0)
+
+    for _, debugCircle in sipairs(SYNCED.debugCircles) do
+      gl.Color(debugColors[debugCircle.color])
+
+      glDrawGroundCircle(debugCircle[1], 0, debugCircle[2], debugCircle.radius, 24)
+      --Util_DrawGroundCircle(debugCircle[1], debugCircle[2], debugCircle.radius)
+    end
+
+    for _, debugLine in ipairs(debugLines) do
+      gl.Color(debugColors[debugLine.color])
+      gl.Shape(GL.LINE_STRIP, debugLine.points)
+    end
+
+    gl.LineWidth(1.0)
+  end
+
   gl.Color(1,1,1,1)
 end
 
