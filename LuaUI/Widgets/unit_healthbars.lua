@@ -564,8 +564,10 @@ do
 	if (dist > 9000000) then
       return
     end
-   
-    local empHP = (not paralyzeOnMaxHealth) and health or maxHealth
+    --// GET UNIT INFORMATION
+    health,maxHealth,paralyzeDamage = GetUnitHealth(unitID)
+	
+    local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
     emp = (paralyzeDamage or 0)/empHP
     hp  = (health or 0)/maxHealth
     morph = UnitMorphs[unitID]
