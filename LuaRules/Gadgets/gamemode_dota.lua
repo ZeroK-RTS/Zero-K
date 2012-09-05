@@ -1,20 +1,29 @@
 function gadget:GetInfo()
   return {
-    name    = "AoS",
-    desc    = "AoS Mode",
+    name    = "DotA",
+    desc    = "DotA Mode",
     author  = "Sprung, Rafal, KingRaptor",
-    date    = "25/8/2012",
+    date    = "25/08/2012",
     license = "PD",
     layer   = 10, -- run after most gadgets
     enabled = true,
   }
 end
 
-local versionNumber = "v0.28"
+local versionNumber = "v0.29"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
 end
+
+
+local mapConfig = include("LuaRules/Configs/dota_map_defs.lua")
+
+if (not mapConfig) then
+  --gadgetHandler:RemoveGadget() -- doesn't work before gadget:Initialize()
+  return
+end
+
 
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
@@ -25,7 +34,19 @@ include("LuaRules/Configs/customcmds.h.lua")
 
 local CMD_FIGHT     = CMD.FIGHT
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT
+local squareSize      = Game.squareSize
+local framesPerSecond = Game.gameSpeed
 local random = math.random
+
+
+local unitConfig = include("LuaRules/Configs/dota_unit_defs.lua")
+local hqDef      = unitConfig.hqDef
+local turretDefs = unitConfig.turretDefs
+local creepDefs  = unitConfig.creepDefs
+local mc                   = mapConfig
+local teamData             = mapConfig.teamData
+local creeperPathWaypoints = mapConfig.creeperPathWaypoints
+
 
 local HQ = {}
 
@@ -48,39 +69,21 @@ local disabledCmdArray = { disabled = true }
 
 local terraunitDefID = UnitDefNames["terraunit"].id
 
-
--- creeps
-local creep1 = "spiderassault"
-local creep2 = "corstorm"
-local creep3 = "slowmort"
-
-local creepcount    = 2 -- current creep count per wave
-local maxcreepcount = 7
-local creepSpawnDelay  =  900
-local creepSpawnPeriod = 1350
+local creepcount    = mc.startingCreepCount -- current creep count per wave
 local creepbalance  = 0
 local creepWave     = 0
 
--- turrets
-local turret1 = "corpre"
-local turret2 = "corllt"
-local turret3 = "heavyturret"
 
-local hqDef   = "pw_hq"
-local hqTerraHeight = 48
-
-
-protectedStructures = {
-  hqDef, turret1, turret2, turret3,
-}
+local protectedStructures = {}
 
 do
-  local t = {}
-  for i = 1, #protectedStructures do
-    local defID = UnitDefNames[ protectedStructures[i] ].id
-    t[defID] = true
+  local defID = UnitDefNames[ hqDef.unitName ].id
+  protectedStructures[defID] = true
+
+  for _, turretDef in pairs(turretDefs) do
+    defID = UnitDefNames[ turretDef.unitName ].id
+    protectedStructures[defID] = true
   end
-  protectedStructures = t
 end
 
 
@@ -93,88 +96,6 @@ local comLevelAfterRespawn = {
   [5] = 2,
 }
 
-
-local mapSizeX   = Game.mapSizeX
-local mapSizeZ   = Game.mapSizeZ
-local squareSize = Game.squareSize
-
-
-local teamData = {
-  [1] = {
-    hqPosition      = { 1000, 1000 },
-    djinnSpawnPoint = { 1200, 1150, facing = 0 },
-    comRespawnPoint = {  630,  630, facing = 0 },
-
-    healingAreas = {
-      {  350,  350, radius = 500, healing = 200 },
-    },
-    creeperSpawnPoints = {
-      { 1350,  800, facing = 1 },
-      { 1350, 1300, facing = 0 },
-      {  850, 1300, facing = 0 },
-    },
-    turretPositions = {
-      -- lane turrets
-      { 3470, 3652, turret1 },
-      { 4890, 1340, turret1 },
-      { 1555, 5315, turret1 },
-      { 3528,  816, turret2 },
-      { 2442, 2487, turret2 },
-      {  900, 2920, turret2 },
-      {  467, 1467, turret3 },
-      { 1467,  587, turret3 },
-      { 1573, 1443, turret3 },
-      -- base
-      {  840, 1160, turret2 },
-      { 1160,  840, turret2 },
-    },
-  },
-  [2] = {
-    hqPosition      = { mapSizeX - 1000, mapSizeZ - 1000 },
-    djinnSpawnPoint = { mapSizeX - 1200, mapSizeZ - 1200, facing = 2 },
-    comRespawnPoint = { mapSizeX -  630, mapSizeZ -  630, facing = 2 },
-
-    healingAreas = {
-      { mapSizeX -  350, mapSizeZ -  350, radius = 500, healing = 200 },
-    },
-    creeperSpawnPoints = {
-      { mapSizeX -  850, mapSizeZ - 1350, facing = 2 },
-      { mapSizeX - 1350, mapSizeZ - 1350, facing = 2 },
-      { mapSizeX - 1350, mapSizeZ -  850, facing = 3 },
-    },
-    turretPositions = {
-      -- lane turrets
-      { 4463, 4583, turret1 },
-      { 6403, 2790, turret1 },
-      { 3125, 6655, turret1 },
-      { 7150, 4640, turret2 },
-      { 5675, 5684, turret2 },
-      { 4824, 7170, turret2 },
-      { 6524, 7664, turret3 },
-      { 7665, 6682, turret3 },
-      { 6666, 6666, turret3 },
-      -- base
-      { mapSizeX - 1160, mapSizeX -  840, turret2 },
-      { mapSizeX -  840, mapSizeX - 1160, turret2 },
-    },
-  },
-}
-
-local creeperPathWaypoints = {
-  [1] = { -- top right path
-    { 4890, 1000 },
-    --{ 6592, 1600 },
-    { 6750, 2790 },
-  },
-  [2] = { -- middle path
-    { 3980, 4100 },
-  },
-  [3] = { -- bottom left path
-    { 1150, 5315 },
-    --{ 1600, 6592 },
-    { 3125, 6950 },
-  },
-}
 
 local creeperOrderArrays = {}
 
@@ -216,7 +137,7 @@ do
 
     AlignToSquareSize(td.hqPosition)
     Point2Dto3D(td.hqPosition)
-    td.hqPosition[2] = td.hqPosition[2] + hqTerraHeight
+    td.hqPosition[2] = td.hqPosition[2] + hqDef.terraHeight
 
     Point2Dto3D(td.djinnSpawnPoint)
     Point2Dto3D(td.comRespawnPoint)
@@ -390,7 +311,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
     end
 
     Spring.GameOver({winnerAllyTeam})
-  elseif (unitDefID == UnitDefNames["heavyturret"].id) then
+  elseif (UnitDefs[unitDefID].name == turretDefs["turret3"].unitName) then
     local hq = HQ[allyteam+1]
     _,_,_,eu = Spring.GetUnitResources(hq)
     Spring.SetUnitResourcing(hq, "uue", eu - 25) -- stop hq from using up the free E from turret
@@ -482,7 +403,7 @@ end
 
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
-  if (UnitDefs[unitDefID].name == creep1 or UnitDefs[unitDefID].name == creep2) then
+  if (creepDefs[ UnitDefs[unitDefID].name ]) then
     if (attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
       local realDamage = damage + math.min(0, Spring.GetUnitHealth(unitID)) -- negative health means overkill
       local reward = 50 * (realDamage / UnitDefs[unitDefID].health)
@@ -495,86 +416,15 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 end
 
 
-function SetupTurret1(x, z, teamID)
-  local turret = Spring.CreateUnit("corpre", x, Spring.GetGroundHeight(x, z), z, 0, teamID)
-  Spring.SetUnitWeaponState(turret, 0, {
-    range = 600,
-    reloadTime = 0.03,
-  } )
-  local cost = 500
-  Spring.SetUnitCosts(turret, {
-    buildTime = cost,
-    metalCost = cost,
-    energyCost = cost,
-  } )
-  Spring.SetUnitSensorRadius(turret, "los", 600)
-  Spring.SetUnitMaxHealth(turret, 3000)
-  Spring.SetUnitHealth(turret, 3000)
-  Spring.SetUnitNoSelect(turret, true)
-end
-
-
-function SetupTurret2(x, z, teamID)
-  local turret = Spring.CreateUnit("corllt", x, Spring.GetGroundHeight(x, z), z, 0, teamID)
-  Spring.SetUnitWeaponState(turret, 0, {
-    range = 600,
-    projectiles = 5,
-    burst = 8,
-    burstRate = 0.01,
-    sprayAngle = 0.1,
-  } )
-  local cost = 1000
-  Spring.SetUnitCosts(turret, {
-    buildTime = cost,
-    metalCost = cost,
-    energyCost = cost,
-  } )
-  Spring.SetUnitSensorRadius(turret, "los", 1000)
-  Spring.SetUnitMaxHealth(turret, 4500)
-  Spring.SetUnitHealth(turret, 4500)
-  Spring.SetUnitNoSelect(turret, true)
-end
-
-
-function SetupTurret3(x, z, teamID)
-  local height = Spring.GetGroundHeight(x, z) + 30
-  Spring.LevelHeightMap(x - squareSize, z - squareSize, x + squareSize, z + squareSize, height)
-
-  local turret = Spring.CreateUnit("heavyturret", x, height, z, 0, teamID)
-  Spring.SetUnitResourcing(turret, "ume", 25) -- needs 25 E to fire like anni/ddm
-  Spring.SetUnitWeaponState(turret, 0, {
-    range = 750,
-    reloadTime = 8,
-  } )
-  local cost = 1500
-  Spring.SetUnitCosts(turret, {
-    buildTime = cost,
-    metalCost = cost,
-    energyCost = cost,
-  } )
-  Spring.SetUnitSensorRadius(turret, "los", 1250)
-  Spring.SetUnitMaxHealth(turret, 6000)
-  Spring.SetUnitHealth(turret, 6000)
-  Spring.SetUnitNoSelect(turret, true)
-end
-
-
-local TurretSetupFunctions = {
-  [turret1] = SetupTurret1,
-  [turret2] = SetupTurret2,
-  [turret3] = SetupTurret3,
-}
-
-
 function gadget:GamePreload()
-  local function hqHeightMapFunc(centerX, centerZ)
+  local function hqHeightMapFunc(centerX, centerZ, terraHeight)
     local centerHeight = Spring.GetGroundHeight(centerX, centerZ)
     local wantedHeight
     local size = 144
 
     for z = -size, size, squareSize do
       for x = -size, size, squareSize do
-        wantedHeight = centerHeight + math.min((size - math.max(math.abs(x), math.abs(z))) * (hqTerraHeight / 64), hqTerraHeight)
+        wantedHeight = centerHeight + math.min((size - math.max(math.abs(x), math.abs(z))) * (terraHeight / 64), terraHeight)
         if (wantedHeight > Spring.GetGroundHeight(centerX + x, centerZ + z)) then
           Spring.SetHeightMap(centerX + x, centerZ + z, wantedHeight)
         end
@@ -586,17 +436,21 @@ function gadget:GamePreload()
     local td = teamData[i]
 
     local spawnPoint = td.hqPosition
-    Spring.SetHeightMapFunc(hqHeightMapFunc, spawnPoint[1], spawnPoint[3])
-    local hq = Spring.CreateUnit(hqDef, spawnPoint[1], spawnPoint[2], spawnPoint[3], 0, teams[i])
+    Spring.SetHeightMapFunc(hqHeightMapFunc, spawnPoint[1], spawnPoint[3], hqDef.terraHeight)
+    local hq = Spring.CreateUnit(hqDef.unitName, spawnPoint[1], spawnPoint[2], spawnPoint[3], 0, teams[i])
     HQ[i] = hq
 
     Spring.SetUnitNoSelect(hq, true)
     Spring.SetUnitResourcing(hq, "uue", 75) -- use 75 E to offset t3 turrets
     Spring.SetUnitSensorRadius(hq, "seismic", 4000)
 
-    for _,turretData in ipairs(td.turretPositions) do
-      local turretType = turretData[3]
-      TurretSetupFunctions[turretType] (turretData[1], turretData[2], teams[i])
+    for _, turretData in ipairs(td.turretPositions) do
+      local turretName = turretData[3]
+      local turretDef  = turretDefs[turretName]
+
+      if (turretDef.spawnFunction) then
+        turretDef.spawnFunction (turretData[1], turretData[2], teams[i])
+      end
     end
   end
 end
@@ -651,7 +505,7 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
   if (protectedStructures[unitDefID] and attackerTeam and Spring.AreTeamsAllied(unitTeam, attackerTeam)) then
     -- block friendly damage to HQs and turrets
-    -- blocks self-d damage too, but not normal unit explosion damage
+    -- blocks self-d and normal unit explosion damage only when the explosion is very close so that the damage is dealt the same frame
     return 0
   end
 
@@ -665,26 +519,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 
   return damage
 end
-
-
-local CreepSetupFunctions = {
-  [creep1] =
-  function (creepID)
-    --Spring.SetUnitWeaponState(creepID, 0, "reloadTime", 1.5)
-    --Spring.MoveCtrl.SetGroundMoveTypeData(creepID, "maxSpeed", 1.95)
-  end,
-
-  [creep2] =
-  function (creepID)
-    local cmdDescID = Spring.FindUnitCmdDesc(creepID, CMD_UNIT_AI)
-    if (cmdDescID) then
-      Spring.GiveOrderToUnit(creepID, CMD_UNIT_AI, {0}, 0) -- disable Rogue autoskirm
-      Spring.RemoveUnitCmdDesc(creepID, cmdDescID)
-    end
-  end,
-
-  [creep3] = function() end
-}
 
 
 function gadget:GameFrame(n)
@@ -734,29 +568,30 @@ function gadget:GameFrame(n)
     end
   end
 
-  if (n >= creepSpawnDelay and (n - creepSpawnDelay) % creepSpawnPeriod == 0) then
+  if (n >= mc.creepSpawnDelay and (n - mc.creepSpawnDelay) % mc.creepSpawnPeriod == 0) then
     creepWave = creepWave + 1
 
-    if (creepWave % 5 == 1) then creepcount = math.min(creepcount + 1, maxcreepcount) end
+    if (creepWave > 1 and creepWave % 5 == 1) then
+      creepcount = math.min(creepcount + 1, mc.maxCreepCount)
+    end
 
     -- prepare list of creeper types to spawn
     local teamCreepCounts = {
       [1] = {
-        { creep1, math.max(0, creepcount + creepbalance) },
-        { creep2, 1 },
+        { "creep1", math.max(0, creepcount + creepbalance) },
+        { "creep2", 1 },
       },
       [2] = {
-        { creep1, math.max(0, creepcount - creepbalance) },
-        { creep2, 1 },
+        { "creep1", math.max(0, creepcount - creepbalance) },
+        { "creep2", 1 },
       },
     }
     if (creepWave % 5 == 4) then
-      table.insert(teamCreepCounts[1], { creep3, 1 } )
-      table.insert(teamCreepCounts[2], { creep3, 1 } )
+      table.insert(teamCreepCounts[1], { "creep3", 1 } )
+      table.insert(teamCreepCounts[2], { "creep3", 1 } )
     end
 
     for path = 1, #creeperPathWaypoints do
-      local wayPoints         = creeperPathWaypoints[path]
       local creeperOrderArray = creeperOrderArrays[path]
 
       for t = 1, 2 do
@@ -764,14 +599,18 @@ function gadget:GameFrame(n)
         local teamCreepCount = teamCreepCounts[t]
 
         for c = 1, #teamCreepCount do
-          local creepDef   = teamCreepCount[c][1]
+          local creepName  = teamCreepCount[c][1]
+          local creepDef   = creepDefs[creepName]
           local creepCount = teamCreepCount[c][2]
           local creepGroup = {}
 
           -- spawn and setup creeps
           for i = 1, creepCount do
-            local creepID = CreateUnitNearby(creepDef, teamData[t].creeperSpawnPoints[path], teams[t])
-            CreepSetupFunctions[creepDef] (creepID)
+            local creepID = CreateUnitNearby(creepDef.unitName, teamData[t].creeperSpawnPoints[path], teams[t])
+
+            if (creepDef.setupFunction) then
+              creepDef.setupFunction (creepID)
+            end
             Spring.SetUnitNoSelect(creepID, true) -- creeps uncontrollable
 
             creepGroup[#creepGroup + 1] = creepID
