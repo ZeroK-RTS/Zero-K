@@ -110,7 +110,7 @@ local maxRampWidth = 800
 local minRampLength = 32
 local minRampWidth = 24
 
-local startRampWidth = 40
+local startRampWidth = 60
 
 -- max slope of certain units, changes ramp colour
 local botPathingGrad = 1.375
