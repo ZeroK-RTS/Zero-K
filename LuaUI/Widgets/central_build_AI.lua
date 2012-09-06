@@ -269,22 +269,24 @@ function widget:CommandNotify(id, params, options, zkMex)
 		if ( myUnits[unitID] ) then	--  was issued to one of our units.
 			if ( options.shift ) then -- used shift for build.
 				if ( id < 0 ) then
-					if zkMex == 1 then -- check if from "cmd_mex_placement.lua". If so, send CMD.STOP to cancel them
-						Spring.GiveOrder(CMD.STOP, {} , 0 ) 
+					if zkMex == 1 then -- check if command from "cmd_mex_placement.lua". If so, send CMD.STOP to cancel them
+						Spring.GiveOrder(CMD_REMOVE, {id} ,  {"alt"} )
 					end
 					local x, y, z, h = params[1], params[2], params[3], params[4]
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
 					local hash = hash(myCmd)
 					if ( myQueue[hash] ) then	-- if dupe of existing order
 						myQueue[hash] = nil		-- must want to cancel
-						Spring.GiveOrder(CMD.STOP, {} , 0 ) 
+						-- if zkMex == 1 then 
+						Spring.GiveOrder(CMD_REMOVE, {id} ,  {"alt"} ) --if zkMex then remove the build queue
+						-- end
 					else						-- if not a dupe
 						myQueue[hash] = myCmd	-- add to CB queue
 					end
 					CleanOrders(myQueue)	-- don't add if can't build there
 					return true	-- have to return true or Spring still handles command itself.
 				else
-					if myUnits[unitID] == "idle" then 
+					if myUnits[unitID] == "idle" then
 						myUnits[unitID] = "busy" --queued other thing
 					end
 					-- do NOT return here because there may be more units.  Let Spring handle.
@@ -302,6 +304,11 @@ end
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 	if ( myUnits[unitID] and cmdID < 0) then	-- one of us building something
+		local myCmd1 = myUnits[unitID]
+		myCmd1 = myCmd1:sub(1,4)
+		if myCmd1 ~= "asst" then
+			myUnits[unitID]="idle"
+		end
 		for unit2,myCmd in pairs(myUnits) do
 			if ( myCmd == "asst "..unitID ) then
 				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command
@@ -337,7 +344,7 @@ function FindIdleUnits(myUnits)
 	if ( # nearestOrders < 1 ) then return end	-- nothing we can do
 	local closeDist = huge
 	local close = {}
-	for _, cmd in ipairs(nearestOrders) do
+	for _, cmd in ipairs(nearestOrders) do --find unit with the closest distance to their project
 		if ( cmd[4] < closeDist ) then
 			closeDist = cmd[4]
 			close = cmd
@@ -391,7 +398,7 @@ end
 --	This function returns closest work for a particular builder.
 
 function GetWorkFor(unitID)
-	local busyClose = 0		-- unitID of closest busy unit
+	local busyClosestID = 0		-- unitID of closest busy unit
 	local busyDist = huge	-- how far away it is.  (Thanks to Niobium.)
 	local queueClose = 0	-- command hash of closest project in the queue
 	local queueDist = huge	-- how far away it is.  (Thanks to Niobium.)
@@ -399,40 +406,57 @@ function GetWorkFor(unitID)
 	
 	CleanOrders(myQueue)	-- just in case something's changed since last we checked.
 
-	for busyUnit,theCmd in pairs(myUnits) do	-- see if any busy units need help.
-		local cmd1 = GetFirstCommand(busyUnit)
-		local myCmd = myQueue[theCmd]
-		if ( myCmd ) then --when busy unit has CentralBuild command (theCmd>0) & isn't assisting (theCmd~=0)
+	for busyUnitID,busyCmd1 in pairs(myUnits) do	-- see if any busy units need help.
+		local cmd1 = GetFirstCommand(busyUnitID)
+		local myCmd = myQueue[busyCmd1]
+		if ( myCmd ) then --when busy unit has CentralBuild command
 			local cmd, x, y, z, h = myCmd.id, myCmd.x, myCmd.y, myCmd.z, myCmd.h
 			if ( cmd  and cmd < 0 ) then
-				local x2, y2, z2 = spGetUnitPosition( busyUnit)	-- location of busy unit
+				local x2, y2, z2 = spGetUnitPosition( busyUnitID)	-- location of busy unit
 				local numOfAssistant = 0.0
-				for unit2,theCmd2 in pairs(myUnits) do --find how many unit is assisting this busy unit
-					local assisting = tonumber(theCmd2:sub(6))
-					if (assisting == busyUnit) then
-						numOfAssistant = numOfAssistant + 0.1
+				for assistantUnitID,assistantCmd1 in pairs(myUnits) do --find how many unit is assisting this busy unit
+					local prefix = assistantCmd1:sub(1,4)
+					if prefix ~= "asst" then
+						if (assistantCmd1 == busyCmd1) then
+							numOfAssistant = numOfAssistant + 0.1
+						end
+					else
+						-- assistantCmd1:sub(1,5) == "asst "
+						local assisting = tonumber(assistantCmd1:sub(6))
+						if (assisting == busyUnitID) then
+							numOfAssistant = numOfAssistant + 0.1
+						end
 					end
 				end
 				local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2
 				dist = dist + dist*numOfAssistant
 				if ( dist < busyDist ) then
-					busyClose = busyUnit	-- busy unit who needs help
+					busyClosestID = busyUnitID	-- busy unit who needs help
 					busyDist = dist		-- dist to said unit * 1.5 (divided by 2 instead of 3)
 				end
 			end
-		elseif ( cmd1 and cmd1.id < 0) then --(cmd1.id < 0 or cmd1.id == CMD.REPAIR or cmd1.id == CMD.RECLAIM or cmd1.id == CMD.RESURRECT) ) then --when busy unit has its own command
-			local x2, y2, z2 = spGetUnitPosition(busyUnit)	-- location of busy unit
+		elseif ( cmd1 and cmd1.id < 0) then --when busy unit is currently building a structure
+			local x2, y2, z2 = spGetUnitPosition(busyUnitID)	-- location of busy unit
 			local numOfAssistant = 0.0
-			for unit2,theCmd2 in pairs(myUnits) do --find how many unit is assisting this busy unit
-				local assisting = tonumber(theCmd2:sub(6))
-				if (assisting == busyUnit) then
-					numOfAssistant = numOfAssistant + 0.1
+			for assistantUnitID,assistantCmd1 in pairs(myUnits) do --find how many unit is assisting this busy unit
+				local prefix = assistantCmd1:sub(1,4)
+				if prefix ~= "asst" then
+					local cmd2 = GetFirstCommand(assistantUnitID)
+					if (cmd2 and (cmd2 == cmd1)) then
+						numOfAssistant = numOfAssistant + 0.1
+					end
+				else
+					-- assistantCmd1:sub(1,5) == "asst "
+					local assisting = tonumber(assistantCmd1:sub(6))
+					if (assisting == busyUnitID) then
+						numOfAssistant = numOfAssistant + 0.1
+					end
 				end
 			end
 			local dist = Distance(ux,uz,x2,z2) * 1.5
 			dist = dist + dist*numOfAssistant
 			if ( dist < busyDist ) then
-				busyClose = busyUnit	-- busy unit who needs help
+				busyClosestID = busyUnitID	-- busy unit who needs help
 				busyDist = dist		-- dist to said unit * 1.5 (divided by 2 instead of 3)
 			end
 		end
@@ -472,7 +496,18 @@ function GetWorkFor(unitID)
 		if ( busyDist < queueDist ) then	-- assist is closer
 			if ( ud.canFly ) then busyDist = busyDist * 0.50 end
 			--if ( ud.canHover ) then busyDist = busyDist * 0.75 end
-			return { unitID, CMD_GUARD, { busyClose }, busyDist, 0 } --assist the busy unit by GUARDING it.
+			local theCmd = myUnits[busyClosestID]
+			local myCmd = myQueue[theCmd]
+			if myCmd then --see if unit can use the same build queue from CentralBuildQueue
+				return { unitID, myCmd.id, { myCmd.x, myCmd.y, myCmd.z, myCmd.h }, busyDist, theCmd } --assist the busy unit by copying order.
+			else
+				local cmd1 = GetFirstCommand(busyClosestID)
+				if cmd1 then --see if unit can use the same exact queue from the unit to be assisted
+					return { unitID, cmd1.id, { cmd1.params[1], cmd1.params[2], cmd1.params[3], cmd1.params[4] }, busyDist, theCmd } --assist the busy unit by copying order.
+				else --simply GUARD the unit to be assisted when all fail
+					return { unitID, CMD_GUARD, { busyClosestID }, busyDist, 0 } --assist the busy unit by GUARDING it.
+				end
+			end
 		else	-- new project is closer
 			if ( ud.canFly ) then queueDist = queueDist * 0.50 end
 			--if ( ud.canHover ) then queueDist = queueDist * 0.75 end
@@ -525,7 +560,7 @@ end
 
 function ping()
 	local playerID = spGetLocalPlayerID()
-	local tname, _, tspec, tteam, tallyteam, tping, tcpu = spGetPlayerInfo(playerID)   
+	local tname, _, tspec, tteam, tallyteam, tping, tcpu = spGetPlayerInfo(playerID)  	
 	tping = (tping*1000-((tping*1000)%1)) /100 * 4
 	return max( tping, 3 )
 end
