@@ -80,14 +80,15 @@ options = {
 		name = 'Always show metal spots',
 		type ='bool',
 		value = false,
+		OnChange = function(self) self.value = not self.value end
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
 	
 	viewstandard = {
-		name = 'Normal View',
+		name = 'Clear map drawings',
 		type = 'button',
-		action = 'showstandard',
+		action = 'clearmapmarks',
 	},
 	viewheightmap = {
 		name = 'Toggle Height Map',
@@ -309,7 +310,7 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/standard.png', 2.5, 'viewstandard' ),
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'viewmetalmap' ),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'alwaysDisplayMexes', true),
 			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow' ),
 			
 			Chili.Button:New{ 
