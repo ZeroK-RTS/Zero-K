@@ -44,7 +44,7 @@ end
 
 options_path = 'Settings/Interface/Minimap'
 local radar_path = 'Settings/Graphics/Radar View Colors'
-options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'viewmetalmap', 'lblLos', 'viewfow', 'radar_color_label', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
+options_order = { 'use_map_ratio', 'hidebuttons', 'initialSensorState', 'alwaysDisplayMexes', 'lastmsgpos', 'lblViews', 'viewstandard', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow', 'radar_color_label', 'radar_fog_color', 'radar_los_color', 'radar_radar_color', 'radar_jammer_color', 'radar_preset_blue_line', 'radar_preset_green', 'radar_preset_only_los'}
 options = {
 	use_map_ratio = {
 		name = 'Minimap Keeps Aspect Ratio',
@@ -77,10 +77,10 @@ options = {
 	},
 	
 	alwaysDisplayMexes = {
-		name = 'Always show metal spots',
+		name = 'Show metal spots',
+		hotkey = {key='f4', mod=''},
 		type ='bool',
 		value = false,
-		OnChange = function(self) self.value = not self.value end
 	},
 	
 	lblViews = { type = 'label', name = 'Views', },
@@ -100,12 +100,6 @@ options = {
 		desc = 'Select unit then click this to see where it can go.',
 		type = 'button',
 		action = 'showpathtraversability',
-	},
-	viewmetalmap = {
-		name = 'Toggle Metal Map',
-		desc = 'Shows concentration of metal',
-		type = 'button',
-		action = 'showmetalmap',
 	},
 	
 	lastmsgpos = {
@@ -227,9 +221,11 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 	widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
 
-local function MakeMinimapButton(file, pos, option, useOnchange )
+local function MakeMinimapButton(file, pos, option)
 	local desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
-	local hotkey = WG.crude.GetOptionHotkey(options_path, options[option])
+	local action = WG.crude.GetActionName(options_path, options[option])
+	local hotkey = WG.crude.GetHotkey(action)
+	
 	if hotkey ~= '' then
 		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
 	end
@@ -246,7 +242,7 @@ local function MakeMinimapButton(file, pos, option, useOnchange )
 		tooltip = ( options[option].name .. desc .. hotkey ),
 		
 		--OnClick={ function(self) options[option].OnChange() end }, 
-		OnClick={ useOnchange and function(self) options[option].OnChange() end or function(self) Spring.SendCommands( options[option].action ); end },
+		OnClick={ function(self) Spring.SendCommands( action ); end },
 		children={
 			Chili.Image:New{
 				file=file,
@@ -310,7 +306,7 @@ MakeMinimapWindow = function()
 			MakeMinimapButton( 'LuaUI/images/map/standard.png', 2.5, 'viewstandard' ),
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', 3.5, 'viewheightmap' ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', 4.5, 'viewblockmap' ),
-			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'alwaysDisplayMexes', true),
+			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', 5.5, 'alwaysDisplayMexes'),
 			MakeMinimapButton( 'LuaUI/images/map/fow.png', 7, 'viewfow' ),
 			
 			Chili.Button:New{ 

@@ -632,10 +632,11 @@ local function UnassignKeyBind(path, option)
 			--echo('unassign', "unbind " .. uikey_hotkey_str .. ' ' .. actionName_cmd)
 			Spring.SendCommands("unbind " .. uikey_hotkey_str .. ' ' .. actionName_cmd) 
 		end
-	else
-		--echo('unassign', "unbindaction " .. actionName)
-		Spring.SendCommands("unbindaction " .. actionName:lower()) -- this only works if lowercased, even if /keyprint says otherwise!
 	end
+	
+	--echo('unassign', "unbindaction " .. actionName)
+	Spring.SendCommands("unbindaction " .. actionName:lower()) -- this only works if lowercased, even if /keyprint says otherwise!
+	
 	
 	settings.keybounditems[actionName] = 'none'
 end
@@ -811,8 +812,7 @@ local function AddOption(path, option, wname )
 				UnassignKeyBind(path, option)
 			end
 			AssignKeyBind(hotkey, path, option, false)
-		end
-		
+		end 
 	end
 	
 	pathoptions[path][wname..option.key] = option
