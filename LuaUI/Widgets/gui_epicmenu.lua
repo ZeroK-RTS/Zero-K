@@ -840,6 +840,46 @@ local function RemOption(path, option, wname )
 end
 
 
+-- sets key and wname for each option so that GetOptionHotkey can work before widget initialization completes
+local function PreIntegrateWidget(w)
+	
+	local options = w.options
+	if type(options) ~= 'table' then
+		return
+	end
+	
+	local wname = w.whInfo.name
+	local defaultpath = w.options_path or ('Settings/Misc/' .. wname)
+	
+	if w.options.order then
+		echo ("<EPIC Menu> " .. wname ..  ", don't index an option with the word 'order' please, it's too soon and I'm not ready.")
+		w.options.order = nil
+	end
+	
+	--Generate order table if it doesn't exist
+	if not w.options_order then
+		w.options_order = {}
+		for k,v in pairs(options) do
+			w.options_order[#(w.options_order) + 1] = k
+		end
+	end
+	
+
+	for i=1, #w.options_order do
+		local k = w.options_order[i]
+		local option = options[k]
+		if not option then
+			Spring.Log(widget:GetInfo().name, LOG.ERROR,  '<EPIC Menu> Error in loading custom widget settings in ' .. wname .. ', order table incorrect.' )
+			return
+		end
+		
+	
+		option.key = k
+		option.wname = wname
+	end
+end
+
+
 --(Un)Store custom widget settings for a widget
 local function IntegrateWidget(w, addoptions, index)
 	
@@ -1790,13 +1830,17 @@ function widget:Initialize()
 	-- when widgets are loaded, unloaded or toggled
 	widgetHandler.OriginalInsertWidget = widgetHandler.InsertWidget
 	widgetHandler.InsertWidget = function(self, widget)
+		PreIntegrateWidget(widget)
+		
+		local ret = self:OriginalInsertWidget(widget)
+		
 		if type(widget) == 'table' and type(widget.options) == 'table' then
 			IntegrateWidget(widget, true)
 			if not (init) then
 				RemakeEpicMenu()
 			end
 		end
-		local ret = self:OriginalInsertWidget(widget)
+		
 		
 		checkWidget(widget)
 		return ret
