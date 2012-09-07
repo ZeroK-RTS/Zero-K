@@ -160,12 +160,8 @@ function widget:GameStart()
   gamestart = true
 end
 
-function widget:Initialize()
-
-  gameSecs = GetGameSecs()
-  gamestart = gameSecs > 0
-
-  circleList = glCreateList(function()
+local function CreateLists() 
+circleList = glCreateList(function()
     glBeginEnd(GL_TRIANGLE_FAN, function()
       for i = 0, circleDivs - 1 do
         local r = 2.0 * math.pi * (i / circleDivs)
@@ -204,6 +200,14 @@ function widget:Initialize()
 	  glVertex(-1, 0,  1)
     end)
   end)
+end 
+
+function widget:Initialize()
+
+  gameSecs = GetGameSecs()
+  gamestart = gameSecs > 0
+
+  
 end
 
 
@@ -379,13 +383,13 @@ local function DrawEvent(event)
 
   local color = event.c
   color[4] = alpha
-  glColor(color)
 
   local scale = minPixels + pixels
   
   glPushMatrix()
   glTranslate(event.x, 0, event.z)
   glScale(scale * pxScale, 1, scale * pyScale)
+  glColor(color)
   glCallList(circleList)
   glPopMatrix()
 end
@@ -402,25 +406,26 @@ local function DrawDamage(damage)
   local pixels = damage.v
   
   if (pixels > 0) then
-    glColor(damageColor)
+    
 	local scale = minPixels + pixels
 	
     glPushMatrix()
     glTranslate(px, 0, pz)
     glScale(scale * pxScale, 1, scale * pyScale)
-    glCallList(circleList)
+    glColor(damageColor)
+	glCallList(circleList)
     glPopMatrix()
   end
 
   pixels = damage.p
   if (pixels > 0) then
-    glColor(paralyzeColor)
 
     local scale = minPixels + pixels
 
     glPushMatrix()
     glTranslate(px, 0, pz)
     glScale(scale * pxScale, 1, scale * pyScale)
+	glColor(paralyzeColor)
     glCallList(circleList)
     glPopMatrix()
   end
@@ -435,11 +440,16 @@ function widget:DrawInMiniMap(xSize, ySize)
       (next(damageMap) == nil)) then
     return
   end
+  
+  if circleList == 0 then
+	CreateLists()
+  end
  
   glSmoothing(false, false, false)
   glBlending(GL_SRC_ALPHA, GL_ONE)
   glLineWidth(lineWidth)
   glTexture(false)
+  gl.Lighting(false)
 
   -- setup the pixel scales
   pxScale = xMapSize / xSize
@@ -465,6 +475,7 @@ function widget:DrawInMiniMap(xSize, ySize)
 
   glLineWidth(1)
   glColor(1,1,1,1)
+  gl.Lighting(true)
   glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   glSmoothing(true, true, false)
 end
