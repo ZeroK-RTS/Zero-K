@@ -127,14 +127,14 @@ options = {
 	radar_fog_color = {
 		name = "Fog Color",
 		type = "colors",
-		value = { 0.25, 0.25, 0.25, 1},
+		value = { 0.4, 0.4, 0.4, 1},
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
 	radar_los_color = {
 		name = "LOS Color",
 		type = "colors",
-		value = { 0.25, 0.25, 0.25, 1},
+		value = { 0.15, 0.15, 0.15, 1},
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
@@ -157,8 +157,8 @@ options = {
 		name = 'Blue Outline Radar (default)',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
+			options.radar_fog_color.value = { 0.4, 0.4, 0.4, 1}
+			options.radar_los_color.value = { 0.15, 0.15, 0.15, 1}
 			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
 			updateRadarColors()
@@ -183,8 +183,8 @@ options = {
 		name = 'Only LOS',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_color.value = { 0.25, 0.25, 0.25, 0}
-			options.radar_los_color.value = { 0.25, 0.25, 0.25, 0}
+			options.radar_fog_color.value = { 0.40, 0.40, 0.40, 0}
+			options.radar_los_color.value = { 0.15, 0.15, 0.15, 0}
 			options.radar_radar_color.value = { 0, 0, 0, 0}
 			options.radar_jammer_color.value = { 0, 0, 0, 0}
 			updateRadarColors()
