@@ -496,7 +496,7 @@ local options = {
     name	= "Pathfinder type",
     desc	= "Sets the pathfinding system used by units.",
     type	= "list",
-    def		= "standard",
+    def		= "classic",
     section	= "experimental",
     items  = {
       {
