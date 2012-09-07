@@ -355,6 +355,12 @@ local function GetActionName(path, option)
 	return option.action or fullkey
 end
 
+WG.crude.GetActionName = GetActionName
+
+WG.crude.GetOptionHotkey = function(path, option)
+	return WG.crude.GetHotkey(GetActionName(path,option))
+end
+
 
 -- returns whether widget is enabled
 local function WidgetEnabled(wname)
@@ -836,6 +842,7 @@ end
 
 --(Un)Store custom widget settings for a widget
 local function IntegrateWidget(w, addoptions, index)
+	
 	local options = w.options
 	if type(options) ~= 'table' then
 		return
@@ -843,6 +850,7 @@ local function IntegrateWidget(w, addoptions, index)
 	
 	local wname = w.whInfo.name
 	local defaultpath = w.options_path or ('Settings/Misc/' .. wname)
+	
 	
 	--[[
 	--If a widget disables itself in widget:Initialize it will run the removewidget before the insertwidget is complete. this fix doesn't work
@@ -1027,6 +1035,7 @@ WG.crude.GetHotkey = function(actionName)
 	return GetReadableHotkeyMod(hotkey.mod) .. CapCase(hotkey.key)
 end
 
+
 --[[
 -- is this an improvement?
 WG.crude.GetHotkey = function(actionName)
@@ -1054,6 +1063,8 @@ local function GetHotkeyData(path, option)
 	
 	return nil, 'None'
 end
+
+
 
 --Make a stack with control and its hotkey button
 local function MakeHotkeyedControl(control, path, option)
@@ -1779,13 +1790,13 @@ function widget:Initialize()
 	-- when widgets are loaded, unloaded or toggled
 	widgetHandler.OriginalInsertWidget = widgetHandler.InsertWidget
 	widgetHandler.InsertWidget = function(self, widget)
-		local ret = self:OriginalInsertWidget(widget)
 		if type(widget) == 'table' and type(widget.options) == 'table' then
 			IntegrateWidget(widget, true)
 			if not (init) then
 				RemakeEpicMenu()
 			end
 		end
+		local ret = self:OriginalInsertWidget(widget)
 		
 		checkWidget(widget)
 		return ret

@@ -229,7 +229,7 @@ end
 
 local function MakeMinimapButton(file, pos, option, useOnchange )
 	local desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
-	local hotkey = WG.crude.GetHotkey(options[option].action)
+	local hotkey = WG.crude.GetOptionHotkey(options_path, options[option])
 	if hotkey ~= '' then
 		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
 	end
