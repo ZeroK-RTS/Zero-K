@@ -52,6 +52,7 @@ local glSmoothing            = gl.Smoothing
 local glTexCoord             = gl.TexCoord
 local glTranslate            = gl.Translate
 local glVertex               = gl.Vertex
+local glTexture        		 = gl.Texture
 local spGetFrameTimeOffset   = Spring.GetFrameTimeOffset
 local spGetGameSeconds       = Spring.GetGameSeconds
 local spGetUnitPosition      = Spring.GetUnitPosition
@@ -170,7 +171,7 @@ function widget:Initialize()
         local r = 2.0 * math.pi * (i / circleDivs)
         local cosv = math.cos(r)
         local sinv = math.sin(r)
-        glTexCoord(cosv, sinv)
+        --glTexCoord(cosv, sinv)
         glVertex(cosv, 0, sinv)
       end
     end)
@@ -180,7 +181,7 @@ function widget:Initialize()
           local r = 2.0 * math.pi * (i / circleDivs)
           local cosv = math.cos(r)
           local sinv = math.sin(r)
-          glTexCoord(cosv, sinv)
+          --glTexCoord(cosv, sinv)
           glVertex(cosv, 0, sinv)
         end
       end)
@@ -193,10 +194,14 @@ function widget:Initialize()
   end)
   rectList = glCreateList(function()
     glBeginEnd(GL_QUADS, function()
-      glTexCoord(0, 0); glVertex(-1, 0, -1)
-      glTexCoord(1, 0); glVertex( 1, 0, -1)
-      glTexCoord(1, 1); glVertex( 1, 0,  1)
-      glTexCoord(0, 1); glVertex(-1, 0,  1)
+      --glTexCoord(0, 0); 
+	  glVertex(-1, 0, -1)
+      --glTexCoord(1, 0); 
+	  glVertex( 1, 0, -1)
+      --glTexCoord(1, 1); 
+	  glVertex( 1, 0,  1)
+      --glTexCoord(0, 1); 
+	  glVertex(-1, 0,  1)
     end)
   end)
 end
@@ -431,9 +436,10 @@ function widget:DrawInMiniMap(xSize, ySize)
     return
   end
  
---  glSmoothing(false, false, false)
---  glBlending(GL_SRC_ALPHA, GL_ONE)
+  glSmoothing(false, false, false)
+  glBlending(GL_SRC_ALPHA, GL_ONE)
   glLineWidth(lineWidth)
+  glTexture(false)
 
   -- setup the pixel scales
   pxScale = xMapSize / xSize
@@ -445,8 +451,7 @@ function widget:DrawInMiniMap(xSize, ySize)
   glTranslate(0, 1, 0)
   glScale(1 / xMapSize, -1 / yMapSize,1)
   glRotate(270, 1, 0, 0)
-
-
+  
   -- draw damages before events
   for _,damage in pairs(damageMap) do
     DrawDamage(damage)
@@ -460,8 +465,8 @@ function widget:DrawInMiniMap(xSize, ySize)
 
   glLineWidth(1)
   glColor(1,1,1,1)
---  glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
---  glSmoothing(true, true, false)
+  glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+  glSmoothing(true, true, false)
 end
 
 
