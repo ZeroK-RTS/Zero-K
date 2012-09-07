@@ -67,8 +67,10 @@ options = {
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
-			scroll_cpl.backgroundColor = {1,1,1,self.value}
-			scroll_cpl:Invalidate()
+			if scroll_cpl ~= nil then
+				scroll_cpl.backgroundColor = {1,1,1,self.value}
+				scroll_cpl:Invalidate()
+			end 
 		end,
 	},
 	text_height = {
@@ -91,7 +93,11 @@ options = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = false,
-		OnChange = function(self) scroll_cpl.noMouseWheel = not self.value; end,
+		OnChange = function(self) 
+			if scroll_cpl ~= nil then 
+				scroll_cpl.noMouseWheel = not self.value; 
+			end
+		end,
 	},
 	alignToTop = {
 		name = "Align to top",
@@ -1272,6 +1278,10 @@ SetupScrollPanel = function ()
 end
 
 SetupPanels = function ()
+	if scroll_cpl == nil then 
+		return 
+	end 
+
 
 	CalculateWidths()
 	local x,y,height,width
