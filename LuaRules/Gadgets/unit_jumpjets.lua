@@ -45,6 +45,7 @@ local assert      = assert
 
 local pi2    = math.pi*2
 local random = math.random
+local abs    = math.abs
 
 local CMD_STOP = CMD.STOP
 
@@ -178,8 +179,13 @@ local function Jump(unitID, goal, cmdTag)
   local speed         = jumpDef.speed
   local delay    	  = jumpDef.delay
   local height        = jumpDef.height
+  local cannotJumpMidair    = jumpDef.cannotJumpMidair
   local reloadTime    = (jumpDef.reload or 0)*30
   local teamID        = spGetUnitTeam(unitID)
+  
+  if cannotJumpMidair and abs(spGetGroundHeight(start[1],start[3]) - start[2]) > 1 then
+	return false, false
+  end
   
   local rotateMidAir  = jumpDef.rotateMidAir
   local cob 	 	  = jumpDef.cobscript
@@ -207,7 +213,7 @@ local function Jump(unitID, goal, cmdTag)
     x = x + vector[1]*step
     z = z + vector[3]*step
     if ( (spGetGroundHeight(x,z) - 30) > (start[2] + vector[2]*i + (1-(2*i-1)^2)*height)) then
-      return false -- FIXME: should try to use SetMoveGoal instead of jumping!
+      return false, true -- FIXME: should try to use SetMoveGoal instead of jumping!
     end
   end
 
@@ -434,22 +440,24 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
     if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) then
       local coords = table.concat(cmdParams)
       if (not jumps[coords]) then
-        if (not Jump(unitID, cmdParams, cmdTag)) then
+        local didJump, elseRemove = Jump(unitID, cmdParams, cmdTag)
+        if didJump then
           return true, true -- command was used, remove it 
         end
         jumps[coords] = 1
-        return true, false -- command was used, remove it 
+        return true, elseRemove -- command was used, remove it 
       else
         local r = landBoxSize*jumps[coords]^0.5/2
         local randpos = {
           cmdParams[1] + random(-r, r),
           cmdParams[2],
           cmdParams[3] + random(-r, r)}
-        if (not Jump(unitID, randpos, cmdTag)) then
+		local didJump, elseRemove = Jump(unitID, randpos, cmdTag)
+        if didJump then
           return true, true -- command was used, remove it 
         end
         jumps[coords] = jumps[coords] + 1
-        return true, false -- command was used, remove it 
+        return true, elseRemove -- command was used, remove it 
       end
     end
   else

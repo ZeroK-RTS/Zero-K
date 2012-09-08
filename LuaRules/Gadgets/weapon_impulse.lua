@@ -137,7 +137,7 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	--Spring.AddUnitImpulse(unitID,0,3,0)
 	if impulseWeaponID[weaponDefID] and Spring.ValidUnitID(attackerID) and moveTypeByID[unitDefID] then
-		
+
 		local _, _, inbuild = Spring.GetUnitIsStunned(unitID)
 		if inbuild then
 			return 0
@@ -198,6 +198,7 @@ function gadget:GameFrame(f)
 				Spring.SetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
 			else
 				Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
+				--GG.UnitEcho(unitID,data.y)
 			end
 		end
 		unitByID = {count = 0, data = {}}

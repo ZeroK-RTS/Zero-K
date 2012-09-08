@@ -29,9 +29,6 @@ local name
 jumpCategory = { 
 	baseclass = {
 		range = 400, height = 200, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},	
-	
-	skuttleclass = {
-		range = 400, height = 120, speed = 5.2,  reload = 10,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},			
 		
 	-- category containining only optional tags for testing error code only.
 	-- iammissingstuff ={
@@ -46,9 +43,10 @@ jumpCategory = {
 
 jumpClassGroups = {
 	skuttleclass = {
-		"corsktl"
+		
 	},
 	baseclass = { 
+	"corsktl",
 	"corpyro",
 	"corfast",
 	"corcan",
@@ -94,14 +92,20 @@ overCategory = {
  chicken_leaper = {
     range = 600, reload = 2, },
 	
+corclog = {
+	cannotJumpMidair = true},
+	
  armaak = {
-    cobscript = false},	
+    cobscript = false, cannotJumpMidair = true},	
 	
  corsumo = {
-    delay = 30, height = 110, range = 360, reload = 15, cobscript = false, rotateMidAir = false},	
+    delay = 30, height = 110, range = 360, reload = 15, cobscript = false, rotateMidAir = false, cannotJumpMidair = true},	
 
  cadenza = {
     delay = 30, reload = 20, cobscript = false, rotateMidAir = false},
+	
+corsktl = {
+	range = 400, height = 120, speed = 5.2,  reload = 10,  aaShootMe = false, delay = 0, cannotJumpMidair = true},
 
 -- corpyro = {
 	-- range = 400, height = 200, speed = 6,  reload = 10, },	
@@ -197,14 +201,16 @@ for uName,uOvers in pairs(overCategory) do
 			end
 			
 			if ( uOvers.cobscript == jumpers[uName].cobscript) then
-				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded warning override )")
+				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded cobscript override )")
 			end
 			
 			if ( uOvers.rotateMidAir == jumpers[uName].rotateMidAir) then
-				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded warning override )")
+				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded rotateMidAir override )")
 			end
 			
 			jumpers[uName].speed	= ( uOvers.speed or jumpers[uName].speed)
+			
+			jumpers[uName].cannotJumpMidair	= ( uOvers.cannotJumpMidair or jumpers[uName].cannotJumpMidair)
 
 			jumpers[uName].reload	= ( uOvers.reload or jumpers[uName].reload)
 

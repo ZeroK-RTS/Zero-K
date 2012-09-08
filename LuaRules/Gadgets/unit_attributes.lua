@@ -42,6 +42,12 @@ local spSetAirMoveTypeData     = Spring.MoveCtrl.SetAirMoveTypeData
 local spSetGunshipMoveTypeData = Spring.MoveCtrl.SetGunshipMoveTypeData
 local spSetGroundMoveTypeData  = Spring.MoveCtrl.SetGroundMoveTypeData
 
+local spSetUnitCOBValue = Spring.SetUnitCOBValue
+local COB_MAX_SPEED = COB.MAX_SPEED
+local WACKY_CONVERSION_FACTOR_1 = 2184.53
+
+local workingGroundMoveType = not((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -139,7 +145,6 @@ end
 
 local function updateMovementSpeed(unitID, ud, speedFactor)	
 	local unitDefID = ud.id
-	
 	if not origUnitSpeed[unitDefID] then
 	
 		local moveData = spGetUnitMoveTypeData(unitID)
@@ -189,14 +194,19 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 				--decRate         = state.origMaxDec      *(speedFactor > 0.01  and speedFactor or 0.01)
 			})
 		elseif state.movetype == 2 then
-			--Spring.Echo(UnitDefs[unitDefID].humanName)
-			spSetGroundMoveTypeData (unitID, {
-				maxSpeed        = state.origSpeed       *speedFactor,
-				maxReverseSpeed = state.origReverseSpeed*speedFactor,
-				turnRate        = state.origTurnRate    *speedFactor,
-				accRate         = state.origMaxAcc      *speedFactor,
-				decRate         = state.origMaxDec      *decFactor
-			})
+			if workingGroundMoveType then
+				spSetGroundMoveTypeData (unitID, {
+					maxSpeed        = state.origSpeed       *speedFactor,
+					maxReverseSpeed = state.origReverseSpeed*speedFactor,
+					turnRate        = state.origTurnRate    *speedFactor,
+					accRate         = state.origMaxAcc      *speedFactor,
+					decRate         = state.origMaxDec      *decFactor
+				})
+			else
+				Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
+				Spring.Echo(Spring.GetUnitCOBValue(unitID, COB_MAX_SPEED))
+				spSetUnitCOBValue(unitID, COB_MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
+			end
 		end
 	end
 	
