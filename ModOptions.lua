@@ -509,14 +509,8 @@ local options = {
 	name = 'QTPFS',
 	desc = 'New Quadtree Pathfinding System (experimental)',
       },
-      {
-	key  = 'classic',
-	name = 'Classic',
-	desc = 'An older pathfinding system without turninplace or reverse',
-      }
     },	
   },  
-  
   {
     key    = 'chicken',
     name   = 'Chicken',
