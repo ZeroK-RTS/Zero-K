@@ -46,7 +46,7 @@ local spSetUnitCOBValue = Spring.SetUnitCOBValue
 local COB_MAX_SPEED = COB.MAX_SPEED
 local WACKY_CONVERSION_FACTOR_1 = 2184.53
 
-local workingGroundMoveType = not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
+local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -203,8 +203,8 @@ local function updateMovementSpeed(unitID, ud, speedFactor)
 					decRate         = state.origMaxDec      *decFactor
 				})
 			else
-				Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
-				Spring.Echo(Spring.GetUnitCOBValue(unitID, COB_MAX_SPEED))
+				--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
+				--Spring.Echo(Spring.GetUnitCOBValue(unitID, COB_MAX_SPEED))
 				spSetUnitCOBValue(unitID, COB_MAX_SPEED, math.ceil(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1))
 			end
 		end
