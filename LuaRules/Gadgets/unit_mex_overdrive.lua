@@ -1432,7 +1432,7 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:Initialize()
-	odSharingModOptions =(Spring.GetModOptions()).overdrivesharingscheme or "fiftypercent" --get game modifier (ModOptions.lua)
+	odSharingModOptions =(Spring.GetModOptions()).overdrivesharingscheme or "investmentreturn" --get game modifier (ModOptions.lua)
 	Spring.Echo("Using Overdrive Sharing ModOptions: " .. odSharingModOptions)
 	
 	_G.pylon = pylon

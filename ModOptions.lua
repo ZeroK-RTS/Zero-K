@@ -411,7 +411,7 @@ local options = {
     desc   = 'Adds a texture to terraformed ground.',
     type   = 'bool',
     section= 'experimental',
-    def    = false,
+    def    = true,
   },
 --[[
   {
