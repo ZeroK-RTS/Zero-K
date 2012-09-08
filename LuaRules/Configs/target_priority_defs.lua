@@ -5,7 +5,6 @@ local weaponBadCats = {}
 
 for wid = 1, #WeaponDefs do
 	weaponBadCats[wid] = {}
-	Spring.Echo(wid)
 end
 
 -- Find the weapon bad target cats

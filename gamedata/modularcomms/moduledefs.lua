@@ -7,6 +7,33 @@ VFS.Include("gamedata/modularcomms/functions.lua")
 --------------------------------------------------------------------------------
 
 weapons = {}
+local weaponsList = VFS.DirList("gamedata/modularcomms/weapons", "*.lua") or {}
+for i=1,#weaponsList do
+	local name, array = VFS.Include(weaponsList[i])
+	weapons[name] = lowerkeys(array)
+	
+	local weapon = weapons[name]
+	weapon.customparams = weapon.customparams or {}
+	
+	--[[
+	if weapon.customparams.altforms then
+		for color, mods in pairs(weapon.customparams.altforms) do
+			local newName = name.."_"..color
+			weapons[newName] = CopyTable(weapon, true)
+			upgrades[newName] = CopyTable(upgrades[name], true)
+			
+			local weapon2 = weapons[newName]
+			for i,v in pairs(mods) do
+				Spring.Echo(i,v)
+			end
+			
+			local modded = CopyTable(mods)
+			Spring.Utilities.MergeTable(modded, weapon2, true)
+			weapons[newName] = modded
+		end
+	end
+	]]
+end
 
 -- name is needed for widget; description is currently unused
 upgrades = {
@@ -139,14 +166,13 @@ upgrades = {
 		description = "Beam Laser/Riot Cannon/Missile Launcher: Convert to anti-air weapons",
 		func = function(unitDef)
 				for i,v in pairs(weapons) do
-					local id = v.customparams.idstring
-					if (id == "commweapon_riotcannon") then
+					if (i == "commweapon_riotcannon") then
 						ReplaceWeapon(unitDef, "commweapon_riotcannon", "commweapon_flakcannon")
 						ReplaceWeapon(unitDef, "commweapon_riotcannon", "commweapon_flakcannon")
-					elseif (id == "commweapon_beamlaser") then
+					elseif (i == "commweapon_beamlaser") then
 						ReplaceWeapon(unitDef, "commweapon_beamlaser", "commweapon_aalaser")
 						ReplaceWeapon(unitDef, "commweapon_beamlaser", "commweapon_aalaser")
-					elseif (id == "commweapon_missilelauncher") then
+					elseif (i == "commweapon_missilelauncher") then
 						ReplaceWeapon(unitDef, "commweapon_missilelauncher", "commweapon_aamissile")
 						ReplaceWeapon(unitDef, "commweapon_missilelauncher", "commweapon_aamissile")
 					end
@@ -159,7 +185,7 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					if v.customparams.idstring == "commweapon_shotgun" then
+					if i == "commweapon_shotgun" then
 						v.customparams.misceffect = nil
 						v.projectiles = v.projectiles * 0.75
 						v.reloadtime = v.reloadtime * 0.6
@@ -181,15 +207,14 @@ upgrades = {
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
 					local wcp = v.customparams
-					local id = wcp.idstring
-					if permitted[id] then
+					if permitted[i] then
 						wcp.timeslow_damagefactor = "0.4"
 						v.rgbcolor = [[0.9 0.1 0.9]]
-						if id == "commweapon_shotgun" or id == "commweapon_heavymachinegun" then
+						if i == "commweapon_shotgun" or i == "commweapon_heavymachinegun" then
 							v.explosiongenerator = [[custom:BEAMWEAPON_HIT_PURPLE]]
-						elseif id == "commweapon_gaussrifle" then
+						elseif i == "commweapon_gaussrifle" then
 							v.explosiongenerator = [[custom:GAUSS_HIT_M_PURPLE]]
-						elseif id == "commweapon_shockrifle" then
+						elseif i == "commweapon_shockrifle" then
 							--v.rgbcolor = [[0.1 0.65 0.9]]
 							--v.explosiongenerator = [[custom:BURNTEAL]]
 						end
@@ -210,7 +235,7 @@ upgrades = {
 					commweapon_hparticlebeam = true,
 				}
 				for i,v in pairs(weapons) do
-					if permitted[v.customparams.idstring] then
+					if permitted[i] then
 						v.range = v.range * 1.15
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.15
@@ -232,9 +257,8 @@ upgrades = {
 					commweapon_riotcannon = true,
 				}
 				for i,v in pairs(weapons) do
-					local id = v.customparams.idstring
-					if permitted[id] then
-						if not (id == "commweapon_partillery" or id == "commweapon_partillery_napalm") then
+					if permitted[i] then
+						if not (i == "commweapon_partillery" or i == "commweapon_partillery_napalm") then
 							v.reloadtime = v.reloadtime * 2
 							v.customparams.highcaliber = true
 							for armorname, dmg in pairs(v.damage) do
@@ -256,8 +280,7 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					local id = v.customparams.idstring
-					if id == "commweapon_rocketlauncher" then
+					if i == "commweapon_rocketlauncher" then
 						v.range = v.range * 1.5
 						v.reloadtime = v.reloadtime * 1.5
 						for armorname, dmg in pairs(v.damage) do
@@ -268,7 +291,7 @@ upgrades = {
 						v.soundstart = [[weapon/missile/missile2_fire_bass]]
 						v.soundstartvolume = 7					
 						--break
-					elseif id == "commweapon_missilelauncher" then
+					elseif i == "commweapon_missilelauncher" then
 						v.range = v.range * 1.5
 						v.reloadtime = v.reloadtime * 1.5
 						for armorname, dmg in pairs(v.damage) do
@@ -288,7 +311,7 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					if v.customparams.idstring == "commweapon_lightninggun" then
+					if i == "commweapon_lightninggun" then
 						for armorname, dmg in pairs(v.damage) do
 							v.damage[armorname] = dmg * 1.25
 						end
@@ -310,19 +333,18 @@ upgrades = {
 					commweapon_riotcannon = true,
 				}
 				for i,v in pairs(weapons) do
-					local id = v.customparams.idstring
-					if permitted[id] then
-						if (id == "commweapon_riotcannon") then	-- -20% damage
+					if permitted[i] then
+						if (i == "commweapon_riotcannon") then	-- -20% damage
 							for armorname, dmg in pairs(v.damage) do
 								v.damage[armorname] = dmg * 0.8
 							end
 							v.customparams.burntime = "420"
 							v.rgbcolor = [[1 0.3 0.1]]
-						elseif (id == "commweapon_hpartillery") then	-- -90% damage, 256 AoE, firewalker effect
+						elseif (i == "commweapon_hpartillery") then	-- -90% damage, 256 AoE, firewalker effect
 							ReplaceWeapon(unitDef, "commweapon_hpartillery", "commweapon_hpartillery_napalm")
 							ReplaceWeapon(unitDef, "commweapon_hpartillery", "commweapon_hpartillery_napalm")
 							return
-						elseif (id == "commweapon_partillery") then	-- -25% damage, 128 AoE
+						elseif (i == "commweapon_partillery") then	-- -25% damage, 128 AoE
 							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_partillery_napalm")
 							ReplaceWeapon(unitDef, "commweapon_partillery", "commweapon_partillery_napalm")
 							return
@@ -334,7 +356,7 @@ upgrades = {
 							v.areaofeffect = 128
 						end
 						
-						if (id == "commweapon_riotcannon") or (id == "commweapon_rocketlauncher") then
+						if (i == "commweapon_riotcannon") or (i == "commweapon_rocketlauncher") then
 							v.explosiongenerator = [[custom:napalm_koda]]
 							v.customparams.burnchance = "1"
 							v.soundhit = [[weapon/burn_mixed]]
@@ -350,10 +372,9 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					local id = v.customparams.idstring
-					if id == "commweapon_heatray" then
+					if i == "commweapon_heatray" then
 						v.range = v.range * 1.3
-					elseif id == "commweapon_riotcannon" then
+					elseif i == "commweapon_riotcannon" then
 						v.range = v.range * 1.3
 					end
 				end
@@ -570,14 +591,6 @@ upgrades = {
 				unitDef.energymake = (unitDef.energymake or 0) + 2
 				unitDef.metalmake = (unitDef.metalmake or 0) + 2
 			end,	
-	},
-	
-	conversion_lazor = {
-		name = "Uberlazor",
-		description = "LOLOLOL",
-		func = function(unitDef)
-				ReplaceWeapon(unitDef, "commweapon_beamlaser", "commweapon_hparticlebeam")
-			end,	
 	}
 }
 
@@ -593,9 +606,9 @@ upgrades_dota = {
 	
 	module_resurrect = {
 		name = "Lazarus Nanolathe",
-		description = "Adds +7.5 metal/s build speed",
+		description = "Adds +5 metal/s build speed",
 		func = function(unitDef)
-				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 7.5 end
+				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 5 end
 			end,
 	},
 }
@@ -659,56 +672,11 @@ decorations = {
 	}
 }
 
-for name,data in pairs(upgrades) do
-	local order = data.order
-	if not order then
-		if name:find("commweapon_") then
-			order = 1
-		elseif name:find("conversion_") then
-			order = 2
-		elseif name:find("weaponmod_") then
-			order = 3
-		else
-			order = 4
-		end
-		data.order = order
-	end
-end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 if Spring.GetModOptions().zkmode == "dota" then
 	for name,data in pairs(upgrades_dota) do
 		upgrades[name] = data
-	end
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-local weaponsList = VFS.DirList("gamedata/modularcomms/weapons", "*.lua") or {}
-for i=1,#weaponsList do
-	local name, array = VFS.Include(weaponsList[i])
-	weapons[name] = lowerkeys(array)
-	
-	local weapon = weapons[name]
-	weapon.customparams = weapon.customparams or {}
-	if name ~= "FAKELASER" then
-		weapon.customparams.idstring = name
-	end
-	
-	if weapon.customparams.altforms then
-		for form, mods in pairs(weapon.customparams.altforms) do
-			local newName = name.."_"..form
-			weapons[newName] = CopyTable(weapon, true)
-			upgrades[newName] = CopyTable(upgrades[name], true)
-			
-			local weapon2 = weapons[newName]
-			for i,v in pairs(mods) do
-				Spring.Echo(i,v)
-			end
-			
-			local modded = CopyTable(mods)
-			MergeTable(modded, weapon2, true)
-			weapons[newName] = modded
-		end
 	end
 end
 --------------------------------------------------------------------------------

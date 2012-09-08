@@ -42,11 +42,17 @@ local function disableunits(unitlist)
 end
 
 --deep not safe with circular tables! defaults To false
-Spring.Utilities = Spring.Utilities or {}
-VFS.Include("LuaRules/Utilities/tablefunctions.lua")
-CopyTable = Spring.Utilities.CopyTable
-MergeTable = Spring.Utilities.MergeTable
-
+function CopyTable(tableToCopy, deep)
+  local copy = {}
+  for key, value in pairs(tableToCopy) do
+    if (deep and type(value) == "table") then
+      copy[key] = CopyTable(value, true)
+    else
+      copy[key] = value
+    end
+  end
+  return copy
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

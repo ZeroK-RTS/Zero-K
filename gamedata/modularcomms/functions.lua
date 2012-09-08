@@ -97,9 +97,8 @@ end
 
 function ReplaceWeapon(unitDef, oldWeapon, newWeapon)
 	local weapons = unitDef.weapons or {}
-	local weaponDefs = unitDef.weapondefs or {}
 	for i,v in pairs(weapons) do
- 		if v.def and weaponDefs[v.def] and (weaponDefs[v.def].customparams.idstring == oldWeapon) then
+		if v.def == oldWeapon then
 			--Spring.Echo("replacing " .. oldWeapon .. " with " .. newWeapon)
 			ApplyWeapon(unitDef, newWeapon, false, i)
 			break -- one conversion, one weapon changed. Get 2 if you want 2

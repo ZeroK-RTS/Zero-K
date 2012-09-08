@@ -156,12 +156,11 @@ local function ProcessComm(name, config)
 				modules = MergeModuleTables(modules, config.prev)
 			end
 			-- sort: weapons first, weapon mods next, regular modules last
-			-- individual modules can have different order values as defined in moduledefs.lua
 			table.sort(modules,
 				function(a,b)
-					order_a = (upgrades[a] and upgrades[a].order) or 4
-					order_b = (upgrades[b] and upgrades[b].order) or 4
-					return a < b
+					return (a:find("commweapon_") and not b:find("commweapon_"))
+					or (a:find("conversion_") and not (b:find("commweapon_") or b:find("conversion_")) )
+					or (a:find("weaponmod_") and b:find("module_")) 
 				end )
 
 			-- process all modules (including weapons)
