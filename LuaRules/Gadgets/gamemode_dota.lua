@@ -10,7 +10,7 @@ function gadget:GetInfo()
   }
 end
 
-local versionNumber = "v0.29"
+local versionNumber = "v0.30"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
   return
@@ -54,7 +54,7 @@ local team1 = Spring.GetTeamList(0)[1]
 local team2 = Spring.GetTeamList(1)[1]
 local teams = { team1, team2 }
 
-local rewardEnergyMult = 0.5
+local rewardEnergyMult = 1.0
 
 local blockedCmds = {
   [CMD.RECLAIM]   = true,
@@ -75,6 +75,7 @@ local creepWave     = 0
 
 
 local protectedStructures = {}
+local creepDefIDs = {}
 
 do
   local defID = UnitDefNames[ hqDef.unitName ].id
@@ -83,6 +84,11 @@ do
   for _, turretDef in pairs(turretDefs) do
     defID = UnitDefNames[ turretDef.unitName ].id
     protectedStructures[defID] = true
+  end
+
+  for _, creepDef in pairs(creepDefs) do
+    defID = UnitDefNames[ creepDef.unitName ].id
+    creepDefIDs[defID] = true
   end
 end
 
@@ -297,6 +303,22 @@ function gadget:AllowFeatureCreation()
 end
 
 
+local function GetTeamName(teamID)
+  local teamName
+  local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
+
+  if isAI then
+    --local _,_,_,shortName = Spring.GetAIInfo(unitTeam)
+    --teamName = "[" .. shortName .. "]"
+    teamName = "[AI]"
+  else
+    teamName = Spring.GetPlayerInfo(playerID) or "[uncontrolled]"
+  end
+
+  return teamName
+end
+
+
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
   if (Spring.IsGameOver()) then return end
 
@@ -328,8 +350,11 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
       Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
     end
 
-    -- respawn Djinn
-    CreateUnitNearby("amphtele", teamData[allyteam+1].comRespawnPoint, unitTeam, "comRespawn")
+    local td = teamData[allyteam+1]
+    if (td) then
+      -- respawn Djinn
+      CreateUnitNearby("amphtele", td.comRespawnPoint, unitTeam, "comRespawn")
+    end
   elseif (UnitDefs[unitDefID].customParams.commtype) then
     if (GG.wasMorphedTo[unitID]) then
       local newUnitID = GG.wasMorphedTo[unitID]
@@ -339,7 +364,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
       return -- blocks respawn at morph
     end
 
-    local failer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(unitTeam)))
+    local failer = GetTeamName(unitTeam)
+
     if (attackerID) then
       if (not Spring.AreTeamsAllied(unitTeam, attackerTeam) and attackerDefID) then
         local killer
@@ -349,7 +375,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
           Spring.AddTeamResource(attackerTeam, "metal" , reward)
           Spring.AddTeamResource(attackerTeam, "energy", reward * rewardEnergyMult) -- less E so ecell is still viable
 
-          killer = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(attackerTeam)))
+          killer = GetTeamName(attackerTeam)
         else
           killer = "[" .. UnitDefs[attackerDefID].humanName .. "]"
         end
@@ -374,36 +400,42 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
       end
     end
 
-    -- respawn commander
-    local comName    = UnitDefs[unitDefID].name -- the com type that died
-    local comNameNew = GG.startUnits[ comsData[unitID].originalTeam ] -- new com type selected by user
-    local baseComName    = comName   :sub(1, -2)
-    local baseComNameNew = comNameNew:sub(1, -2)
+    --local originalAllyTeam = select(6, Spring.GetTeamInfo( comsData[unitID].originalTeam ))
+    local td = teamData[allyteam+1]
 
-    if (baseComNameNew == baseComName) then
-      local comLevel = tonumber(comName:sub(-1))
-      comLevel = tostring(comLevelAfterRespawn[comLevel])
-      --comLevel = tostring(math.max(comLevel - 2, 0)) -- respawned com will be 2 levels lower
+    if (td) then
+      -- respawn commander
+      local comName    = UnitDefs[unitDefID].name -- the com type that died
+      local comNameNew = GG.startUnits[ comsData[unitID].originalTeam ] -- new com type selected by user
+      local baseComName    = comName   :sub(1, -2)
+      local baseComNameNew = comNameNew:sub(1, -2)
 
-      if (UnitDefNames[baseComName .. comLevel]) then
-        comName = baseComName .. comLevel
-      elseif (comLevel == "0" and UnitDefNames[baseComName .. "1"]) then
-        comName = baseComName .. "1"
+      if (baseComNameNew == baseComName) then
+        local comLevel = tonumber(comName:sub(-1))
+        comLevel = tostring(comLevelAfterRespawn[comLevel])
+        --comLevel = tostring(math.max(comLevel - 2, 0)) -- respawned com will be 2 levels lower
+
+        if (UnitDefNames[baseComName .. comLevel]) then
+          comName = baseComName .. comLevel
+        elseif (comLevel == "0" and UnitDefNames[baseComName .. "1"]) then
+          comName = baseComName .. "1"
+        end
+      else
+        comName = comNameNew
       end
-    else
-      comName = comNameNew
+
+      local newUnitID = CreateUnitNearby(comName, td.comRespawnPoint, unitTeam, "comRespawn")
+
+      comsData[newUnitID].originalTeam = comsData[unitID].originalTeam
     end
 
-    local newUnitID = CreateUnitNearby(comName, teamData[allyteam+1].comRespawnPoint, unitTeam, "comRespawn")
-
-    comsData[newUnitID].originalTeam = comsData[unitID].originalTeam
     comsData[unitID] = nil
   end
 end
 
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
-  if (creepDefs[ UnitDefs[unitDefID].name ]) then
+  if (creepDefIDs[unitDefID]) then
     if (attackerID and (not Spring.AreTeamsAllied(unitTeam, attackerTeam)) and attackerDefID and (UnitDefs[attackerDefID].customParams.commtype or UnitDefs[attackerDefID].name == "attackdrone")) then
       local realDamage = damage + math.min(0, Spring.GetUnitHealth(unitID)) -- negative health means overkill
       local reward = 50 * (realDamage / UnitDefs[unitDefID].health)
