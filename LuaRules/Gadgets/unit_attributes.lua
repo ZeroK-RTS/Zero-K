@@ -46,7 +46,7 @@ local spSetUnitCOBValue = Spring.SetUnitCOBValue
 local COB_MAX_SPEED = COB.MAX_SPEED
 local WACKY_CONVERSION_FACTOR_1 = 2184.53
 
-local workingGroundMoveType = not((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
+local workingGroundMoveType = not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
