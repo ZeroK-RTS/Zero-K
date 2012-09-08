@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "GoogleFrog",
     date      = "13 April 2011",
     license   = "GNU GPL, v2 or later",
-	handler   = true,
+	handler   = false,
     layer     = 1,
     enabled   = true  --  loaded by default?
   }
@@ -439,10 +439,14 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
+		local orderArray={}
         if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
-            Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"})
-            Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"})
-			Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, {"shift"})
+			-- Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"})
+            -- Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"})
+			-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options.commander_retreat.value}, {"shift"})
+			orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate.value}, {"shift"}}
+			orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"}}
+			orderArray[3] = {CMD_RETREAT, {options.commander_retreat.value}, {"shift"}}
         end
         
         local name = UnitDefs[unitDefID].name
@@ -455,12 +459,14 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                         if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
                             local firestate = Spring.GetUnitStates(builderID).firestate
                             if firestate then
-                                Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {"shift"})
+                                --Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, {"shift"})
+								orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {firestate}, {"shift"}}
                             end
                         end
                     end
                 else
-                    Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options[name .. "_firestate"].value}, {"shift"})
+                    --Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {options[name .. "_firestate"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD.FIRE_STATE, {options[name .. "_firestate"].value}, {"shift"}}
                 end
             end
             
@@ -471,43 +477,52 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                         if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
                             local movestate = Spring.GetUnitStates(builderID).movestate
                             if movestate then
-                                Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {movestate}, {"shift"})
+                                --Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {movestate}, {"shift"})
+								orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {movestate}, {"shift"}}
                             end
                         end
                     end
                 else
-                    Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options[name .. "_movestate1"].value}, {"shift"})
+                    --Spring.GiveOrderToUnit(unitID, CMD.MOVE_STATE, {options[name .. "_movestate1"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD.MOVE_STATE, {options[name .. "_movestate1"].value}, {"shift"}}
                 end
             end
 
 			if options[name .. "_flylandstate"] and options[name .. "_flylandstate"].value then
 				if options[name .. "_flylandstate"].value ~= -1 then -- The unit_air_plants gadget deals with inherit
-					Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, {"shift"})
+					--Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD.IDLEMODE, {options[name .. "_flylandstate"].value}, {"shift"}}
                 end
 			end
 			
 			if options[name .. "_flylandstate_factory"] and options[name .. "_flylandstate_factory"].value then
-				Spring.GiveOrderToUnit(unitID, CMD_AP_FLY_STATE, {options[name .. "_flylandstate_factory"].value}, {"shift"})
+				--Spring.GiveOrderToUnit(unitID, CMD_AP_FLY_STATE, {options[name .. "_flylandstate_factory"].value}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_AP_FLY_STATE, {options[name .. "_flylandstate_factory"].value}, {"shift"}}
 			end
 			
 			if options[name .. "_autorepairlevel_factory"] and options[name .. "_autorepairlevel_factory"].value then
-				Spring.GiveOrderToUnit(unitID, CMD_AP_FLY_STATE, {options[name .. "_autorepairlevel_factory"].value}, {"shift"})
+				--Spring.GiveOrderToUnit(unitID, CMD_AP_FLY_STATE, {options[name .. "_autorepairlevel_factory"].value}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_AP_FLY_STATE, {options[name .. "_autorepairlevel_factory"].value}, {"shift"}}
 			end
 			
 			if options[name .. "_autorepairlevel1"] and options[name .. "_autorepairlevel1"].value then
 				if options[name .. "_autorepairlevel1"].value ~= -1 then  -- The unit_air_plants gadget deals with inherit
-					Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel1"].value}, {"shift"})
+					--Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel1"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD.AUTOREPAIRLEVEL, {options[name .. "_autorepairlevel1"].value}, {"shift"}}
 				elseif not builderID then
-					Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {0}, {"shift"})
+					-- Spring.GiveOrderToUnit(unitID, CMD.AUTOREPAIRLEVEL, {0}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD.AUTOREPAIRLEVEL, {0}, {"shift"}}
 				end
 			end
 
 			if options[name .. "_airstrafe"] and options[name .. "_airstrafe"].value ~= nil then
-				Spring.GiveOrderToUnit(unitID, CMD_AIR_STRAFE, {options[name .. "_airstrafe"].value and 1 or 0}, {"shift"})
+				-- Spring.GiveOrderToUnit(unitID, CMD_AIR_STRAFE, {options[name .. "_airstrafe"].value and 1 or 0}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_AIR_STRAFE, {options[name .. "_airstrafe"].value and 1 or 0}, {"shift"}}
 			end
 			
 			if options[name .. "_floattoggle"] and options[name .. "_floattoggle"].value ~= nil then
-				Spring.GiveOrderToUnit(unitID, CMD_UNIT_FLOAT_STATE, {options[name .. "_floattoggle"].value}, {"shift"})
+				-- Spring.GiveOrderToUnit(unitID, CMD_UNIT_FLOAT_STATE, {options[name .. "_floattoggle"].value}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_UNIT_FLOAT_STATE, {options[name .. "_floattoggle"].value}, {"shift"}}
 			end
 
 			if options[name .. "_retreatpercent"] and options[name .. "_retreatpercent"].value then
@@ -517,12 +532,14 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 						if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
 							local retreat = Spring.GetUnitStates(builderID).retreat
 							if retreat then
-								Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {_retreatpercent}, {"shift"})
+								-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {_retreatpercent}, {"shift"})
+								orderArray[#orderArray + 1] = {CMD_RETREAT, {_retreatpercent}, {"shift"}}
 							end
 						end
 					end
 				else
-					Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options[name .. "_retreatpercent"].value}, {"shift"})
+					-- Spring.GiveOrderToUnit(unitID, CMD_RETREAT, {options[name .. "_retreatpercent"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD_RETREAT, {options[name .. "_retreatpercent"].value}, {"shift"}}
 					--WG['retreat'].addRetreatCommand(unitID, unitDefID, 2) -> overriden by factory setting @factory exit.
 				end
 			end
@@ -532,24 +549,30 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					if builderID then
 						local priority = Spring.GetUnitRulesParam(builderID,"buildpriority")
 						if priority then
-							Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, {"shift"})
+							-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {priority}, {"shift"})
+							orderArray[#orderArray + 1] = {CMD_PRIORITY, {priority}, {"shift"}}
 						end
 					else
-						Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {1}, {"shift"})
+						-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {1}, {"shift"})
+						orderArray[#orderArray + 1] = {CMD_PRIORITY, {1}, {"shift"}}
 					end
 				else
-					Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_buildpriority_0"].value}, {"shift"})
+					-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_buildpriority_0"].value}, {"shift"})
+					orderArray[#orderArray + 1] = {CMD_PRIORITY, {options[name .. "_buildpriority_0"].value}, {"shift"}}
 				end
 			end
 			
             if options[name .. "_tactical_ai"] and options[name .. "_tactical_ai"].value ~= nil then
-                Spring.GiveOrderToUnit(unitID, CMD_UNIT_AI, {options[name .. "_tactical_ai"].value and 1 or 0}, {"shift"})
+                -- Spring.GiveOrderToUnit(unitID, CMD_UNIT_AI, {options[name .. "_tactical_ai"].value and 1 or 0}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_UNIT_AI, {options[name .. "_tactical_ai"].value and 1 or 0}, {"shift"}}
             end
 			
             if options[name .. "_fire_at_radar"] and options[name .. "_fire_at_radar"].value ~= nil then
-                Spring.GiveOrderToUnit(unitID, CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"})
+                -- Spring.GiveOrderToUnit(unitID, CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"}}
             end
-            
+			Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
+			orderArray = nil
         end
     end
 end
@@ -563,7 +586,7 @@ function widget:SelectionChanged(newSelection)
 end
 --]]
 
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)     
+function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
 		local name = UnitDefs[unitDefID].name
 		if options[name .. "_constructor_buildpriority"] and options[name .. "_constructor_buildpriority"].value then
@@ -577,22 +600,28 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 	end
 end
 
-function widget:UnitFinished(unitID, unitDefID, unitTeam) 
+function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
-        if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
-			Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_constructor_buildpriority.value}, {"shift"})
+        local orderArray = {}
+		if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
+			-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_constructor_buildpriority.value}, {"shift"})
+			orderArray[1] = {CMD_PRIORITY, {options.commander_constructor_buildpriority.value}, {"shift"}}
         end
         
         local name = UnitDefs[unitDefID].name
 		if options[name .. "_constructor_buildpriority"] and options[name .. "_constructor_buildpriority"].value then
 			if options[name .. "_constructor_buildpriority"].value ~= -1 then
-				Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_constructor_buildpriority"].value}, {"shift"})
+				-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options[name .. "_constructor_buildpriority"].value}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_PRIORITY, {options[name .. "_constructor_buildpriority"].value}, {"shift"}}
 			end
 		end
 		
 		if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
-			Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
+			-- Spring.GiveOrderToUnit(unitID, CMD.CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"})
+			orderArray[#orderArray + 1] = {CMD.CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"}}
 		end
+		Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
+		orderArray = nil
 	end
 end
 
@@ -602,7 +631,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 end
 
 function widget:GameFrame(n)
-	if n == 10 then
+	if n >= 10 then
 		local team = Spring.GetMyTeamID()
 		local units = Spring.GetTeamUnits(team)
 		if units then
@@ -610,11 +639,12 @@ function widget:GameFrame(n)
 				widget:UnitCreated(units[i], Spring.GetUnitDefID(units[i]), team, nil)
 			end
 		end
+		widgetHandler:RemoveCallIn("GameFrame")
 	end
 end
 
+--[[
 function widget:Update()
-	--[[
     if rememberToSetHoldPositionPreset then
         for i = 1, #options_order do
             local opt = options_order[i]
@@ -627,5 +657,5 @@ function widget:Update()
         end
         rememberToSetHoldPositionPreset = false
     end
-	--]]
 end
+--]]
