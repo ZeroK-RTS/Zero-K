@@ -41,9 +41,17 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 
 	--Spring.Echo("TARGET CHECK")
 	
-	local allyTeam = remAllyTeam[unitID]
-	local los
+	if (not targetID) or (not unitID) or (not attackerWeaponDefID) then
+		return true, 5
+	end
 	
+	local allyTeam = remAllyTeam[unitID]
+	
+	if (not allyTeam) then
+		return true, 5
+	end
+	
+	local los
 	if remVisible[allyTeam] and remVisible[allyTeam][targetID] then
 		los = remVisible[allyTeam][targetID] == 1
 	else
@@ -63,7 +71,11 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	
 	local enemyUnitDef = remUnitDefID[targetID]
 	
-	local defPrio = targetTable[enemyUnitDef][attackerWeaponDefID]
+	if not enemyUnitDef then
+		return true, 5
+	end
+	
+	local defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
 	
 	if not remStunned[targetID] then
 		local stunnedOrInbuild = spGetUnitIsStunned(targetID)

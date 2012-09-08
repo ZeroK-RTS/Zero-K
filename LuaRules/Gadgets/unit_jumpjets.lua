@@ -337,6 +337,11 @@ local function Jump(unitID, goal, cmdTag)
     for i=1, reloadTime do
       spSetUnitRulesParam(unitID,"jumpReload",i*reloadTimeInv)
       Sleep()
+	  if i == 1 then
+	    if Spring.ValidUnitID(unitID) and (not Spring.GetUnitIsDead(unitID)) then
+		  Spring.SetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
+	    end
+	  end
     end
   end
   
