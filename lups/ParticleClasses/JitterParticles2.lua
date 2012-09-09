@@ -209,6 +209,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function JitterParticles2:Initialize()
+  if billShader then gl.DeleteShader(billShader) end --delete an existing shader if any exist
   billShader = gl.CreateShader({
     vertex = [[
       // global attributes
@@ -368,6 +369,7 @@ local function CreateDList(self)
 end
 
 function JitterParticles2:CreateParticle()
+  if self.dlist then gl.DeleteList(self.dlist) end --delete an existing list if any exist
   self.dlist = glCreateList(CreateDList,self)
 
   self.frame = 0

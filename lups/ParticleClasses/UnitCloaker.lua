@@ -139,6 +139,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function UnitCloaker.Initialize()
+  if warpShader then gl.DeleteShader(warpShader) end --delete an existing shader if any exist
   warpShader = gl.CreateShader({
     vertex = [[
       uniform vec3 cameraPos;

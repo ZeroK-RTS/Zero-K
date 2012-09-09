@@ -82,6 +82,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function ShieldJitter.Initialize()
+  if warpShader then gl.DeleteShader(warpShader) end --delete an existing shader if any exist
   warpShader = gl.CreateShader({
     vertex = [[
       uniform float timer;
@@ -133,6 +134,7 @@ function ShieldJitter.Initialize()
   timerUniform    = gl.GetUniformLocation(warpShader, 'timer')
   strengthUniform = gl.GetUniformLocation(warpShader, 'strength')
 
+  if sphereList then gl.DeleteList(sphereList) end --delete an existing list if any exist
   sphereList = gl.CreateList(DrawSphere,0,0,0,1,22)
 end
 

@@ -89,6 +89,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function SphereParticle:Initialize()
+  if SphereList then gl.DeleteList(SphereList) end --delete an existing list if any exist
   SphereList = gl.CreateList(DrawSphere,0,0,0,40,25)
 end
 

@@ -189,6 +189,7 @@ function UnitPieceLight:ReInitialize()
 end
 
 function UnitPieceLight.Initialize()
+  if depthShader then gl.DeleteShader(depthShader) end --delete an existing shader if any exist
   depthShader = gl.CreateShader({
     fragment = [[
       uniform sampler2D tex0;
@@ -218,6 +219,7 @@ function UnitPieceLight.Initialize()
     return false
   end
 
+  if blurShader_h then gl.DeleteShader(blurShader_h) end --delete an existing shader if any exist
   blurShader_h = gl.CreateShader({
     fragment = [[
       float kernel[7]; //= float[7](0.013, 0.054, 0.069, 0.129, 0.212, 0.301, 0.372);
@@ -271,6 +273,7 @@ function UnitPieceLight.Initialize()
     return false
   end
 
+  if blurShader_v then gl.DeleteShader(blurShader_v) end --delete an existing shader if any exist
   blurShader_v = gl.CreateShader({
     fragment = [[
       float kernel[7]; //= float[7](0.013, 0.054, 0.069, 0.129, 0.212, 0.301, 0.372);

@@ -151,6 +151,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function StaticParticles:Initialize()
+  if billShader then gl.DeleteShader(billShader) end --delete an existing shader if any exist
   billShader = gl.CreateShader({
     vertex = [[
       uniform float size;
@@ -256,6 +257,7 @@ function StaticParticles:CreateParticle()
   self.ncolors = #self.colormap-1
   local partposCode = ParseParamString(self.partpos)
 
+  if self.dlist then gl.DeleteList(self.dlist) end --delete an existing list if any exist
   self.dlist = gl.CreateList(function()
     glUniformInt(colorsUniform, self.ncolors)
     for i=1,min(self.ncolors+1,12) do

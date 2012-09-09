@@ -181,6 +181,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function NanoLasers:Initialize()
+  if laserShader then gl.DeleteShader(laserShader) end --delete an existing shader if any exist
   laserShader = gl.CreateShader({
     vertex = [[
       //gl.vertex.xy := length,width
@@ -246,6 +247,7 @@ function NanoLasers:Initialize()
     return false
   end
 
+  if dlist then gl.DeleteList(dlist) end --delete an existing list if any exist
   dlist = gl.CreateList(glBeginEnd,GL_QUADS,function()
     glMultiTexCoord(3,0)
     glVertex(1,-1, 1,0)

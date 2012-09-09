@@ -130,6 +130,7 @@ end
 
 function AirJet.Initialize()
 
+  if jetShader then gl.DeleteShader(jetShader) end --delete an existing shader if any exist
   jetShader = gl.CreateShader({
     vertex = [[
       uniform float timer;
@@ -204,6 +205,7 @@ function AirJet.Initialize()
     return false
   end
 
+  if jitShader then gl.DeleteShader(jitShader) end --delete an existing shader if any exist
   jitShader = gl.CreateShader({
     vertex = [[
       uniform float timer;
@@ -312,6 +314,7 @@ end
 
 
 function AirJet:CreateParticle()
+  if self.dList then gl.DeleteList(self.dList) end --delete an existing list if any exist
   self.dList = glCreateList(glBeginEnd,GL_QUADS,
                             BeginEndDrawList,self)
 

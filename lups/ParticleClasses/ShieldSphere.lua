@@ -85,6 +85,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function ShieldSphereParticle:Initialize()
+  if shieldShader then gl.DeleteShader(shieldShader) end --delete an existing shader if any exist
   shieldShader = gl.CreateShader({
     vertex = [[
       #define pos gl_MultiTexCoord3
@@ -128,6 +129,7 @@ function ShieldSphereParticle:Initialize()
     return false
   end
 
+  if sphereList then gl.DeleteList(sphereList) end --delete an existing list if any exist
   sphereList = gl.CreateList(DrawSphere,0,0,0,1,30,false)
 end
 

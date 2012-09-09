@@ -106,6 +106,9 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function SantaHat:Initialize()
+  if SantaHat.ConeList then gl.DeleteList(SantaHat.ConeList) end --delete an existing list if any exist
+  if SantaHat.BallList then gl.DeleteList(SantaHat.BallList) end --delete an existing list if any exist
+  if SantaHat.TorusList then gl.DeleteList(SantaHat.TorusList) end --delete an existing list if any exist
   SantaHat.ConeList  = gl.CreateList(DrawPin,1,1,8)
   SantaHat.BallList  = gl.CreateList(DrawSphere,0,0,0,1,14)
   SantaHat.TorusList = gl.CreateList(DrawTorus,1,0.15,16,16)

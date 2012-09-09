@@ -212,6 +212,7 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function NanoParticles:Initialize()
+  if billShader then gl.DeleteShader(billShader) end --delete an existing shader if any exist
   billShader = gl.CreateShader({
     vertex = [[
       //gl.Vertex(s,t,ox,oy)
