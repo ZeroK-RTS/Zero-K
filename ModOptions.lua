@@ -405,6 +405,7 @@ local options = {
     def    = false,
   },
   --]]
+  --[[
   {
     key    = 'terratex',
     name   = 'Terraform Texture',
@@ -413,6 +414,7 @@ local options = {
     section= 'experimental',
     def    = true,
   },
+  --]]
 --[[
   {
     key    = 'specialpower',

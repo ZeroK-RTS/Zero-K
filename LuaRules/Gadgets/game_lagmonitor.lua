@@ -43,6 +43,8 @@ local unitAlreadyFinished = {}
 
 GG.Lagmonitor_activeTeams = {}
 
+local spGetUnitDefID = Spring.GetUnitDefID
+
 local allyTeamList = Spring.GetAllyTeamList()
 for i=1,#allyTeamList do
 	local allyTeamID = allyTeamList[i]
@@ -69,9 +71,15 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	--lineage[unitID] = builderID and (lineage[builderID] or Spring.GetUnitTeam(builderID)) or unitTeam
 	if builderID ~= nil then
-		local originalTeamID = lineage[builderID]
-		if originalTeamID ~= nil then
-			lineage[unitID] = originalTeamID --to return newly created unit to the owner of the construction-unit.
+		local builderDefID = spGetUnitDefID(builderID)
+		if builderDefID then
+			ud = UnitDefs[builderDefID]
+			if ud and (not ud.isFactory) then
+				local originalTeamID = lineage[builderID]
+				if originalTeamID ~= nil then
+					lineage[unitID] = originalTeamID --to return newly created unit to the owner of the construction-unit.
+				end
+			end
 		end
 	end
 end

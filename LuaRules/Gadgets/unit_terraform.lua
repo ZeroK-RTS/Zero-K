@@ -20,7 +20,7 @@ if (gadgetHandler:IsSyncedCode()) then -- SYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local USE_TERRAIN_TEXTURE_CHANGE = (Spring.GetModOptions() or {}).terratex == "1"
+local USE_TERRAIN_TEXTURE_CHANGE = true -- (Spring.GetModOptions() or {}).terratex == "1"
 
 -- Speedups
 local cos             		= math.cos
