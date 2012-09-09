@@ -207,7 +207,6 @@ function PostDistortion.Initialize()
   local defines = ""
   if (pd.copyDepthBuffer) then defines = defines .. "#define depthtexture\n" end
 
-  if jitterShader then gl.DeleteShader(jitterShader) end --delete an existing shader if any exist
   jitterShader = gl.CreateShader({
     fragment = defines .. [[
       #ifdef texrect
@@ -277,7 +276,6 @@ function PostDistortion.Initialize()
   -- FBO + some OpenGL stuff
   --
 
-  if enterIdentity then gl.DeleteList(enterIdentity) end --delete an existing list if any exist
   enterIdentity = gl.CreateList(function()
     gl.DepthTest(false);
     gl.UseShader(jitterShader);
@@ -287,7 +285,6 @@ function PostDistortion.Initialize()
     gl.MatrixMode(GL.MODELVIEW);  gl.PushMatrix(); gl.LoadIdentity();
   end)
 
-  if postDrawAndLeaveIdentity then gl.DeleteList(postDrawAndLeaveIdentity) end --delete an existing list if any exist
   postDrawAndLeaveIdentity = gl.CreateList(function()
     gl.TexRect(-1,1,1,-1);
     gl.Texture(0,false);

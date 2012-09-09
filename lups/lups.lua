@@ -1061,7 +1061,6 @@ local function Initialize()
 
   GG.Lups.Config = LupsConfig
 
-  if nilDispList then gl.DeleteList(nilDispList) end --delete an existing list if exist
   nilDispList = gl.CreateList(function() end)
 end
 

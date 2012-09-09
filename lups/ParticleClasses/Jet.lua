@@ -82,7 +82,6 @@ function Jet:ReInitialize()
 end
 
 function Jet.Initialize()
-  if jitShader then gl.DeleteShader(jitShader) end --delete an existing shader if any exist
   jitShader = gl.CreateShader({
     vertex = [[
       uniform float timer;
@@ -182,7 +181,6 @@ end
 
 
 function Jet:CreateParticle()
-  if self.dList then gl.DeleteList(self.dList) end --delete an existing list if any exist
   self.dList = glCreateList(glBeginEnd,GL_QUADS,
                             BeginEndDrawList,self)
 

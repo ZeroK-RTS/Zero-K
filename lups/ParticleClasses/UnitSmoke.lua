@@ -125,7 +125,6 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function UnitSmoke.Initialize()
-  if UnitSmokeShader then gl.DeleteShader(UnitSmokeShader) end --delete an existing shader if any exist
   UnitSmokeShader = gl.CreateShader({
     vertex = [[
       uniform float width;

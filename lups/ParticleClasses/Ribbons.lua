@@ -149,7 +149,6 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function Ribbon.Initialize()
-  if RibbonShader then gl.DeleteShader(RibbonShader) end --delete an existing shader if any exist
   RibbonShader = gl.CreateShader({
     vertex = [[
       uniform float width;

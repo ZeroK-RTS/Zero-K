@@ -78,7 +78,6 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function ShockWave.Initialize()
-  if warpShader then gl.DeleteShader(warpShader) end --delete an existing shader if any exist
   warpShader = gl.CreateShader({
     vertex = [[
       uniform float radius;
@@ -153,7 +152,6 @@ function ShockWave.Initialize()
 
   screenLoc = gl.GetUniformLocation(warpShader, 'screenInverse')
 
-  if dlist then gl.DeleteList(dlist) end --delete an existing list if any exist
   dlist = gl.CreateList(gl.BeginEnd,GL.QUADS,function()
     gl.Vertex(-1,1)
     gl.Vertex(1,1)

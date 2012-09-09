@@ -192,7 +192,6 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function RingParticles:Initialize()
-  if billShader then gl.DeleteShader(billShader) end --delete an existing shader if any exist
   billShader = gl.CreateShader({
     vertex = [[
       uniform float size;
@@ -270,7 +269,6 @@ function RingParticles:CreateParticle()
     newPartList.csize  = newPartList.size
     newPartList.cspeed = newPartList.speed
 
-	if newPartList.dlist then gl.DeleteList(newPartList.dlist) end --delete an existing list if any exist
     newPartList.dlist = gl.CreateList(function(count)
       for y = 0, count do
         --gl.Rotate(360/count,0,1,0)

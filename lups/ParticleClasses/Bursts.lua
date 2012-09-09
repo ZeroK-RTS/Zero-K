@@ -260,7 +260,6 @@ function Bursts:CreateParticle()
   for i=1,self.count do
     local newPartList = {}
     self:InitializePartList(newPartList)
-	if newPartList.dlist then gl.DeleteList(newPartList.dlist) end --delete an existing list if any exist
     newPartList.dlist = gl.CreateList( DrawBurst ,newPartList.rotv,self.directional,newPartList.arc)
     table.insert(self.lists,newPartList)
   end

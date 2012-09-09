@@ -157,7 +157,6 @@ end
 -----------------------------------------------------------------------------------------------------------------
 
 function UnitJitter.Initialize()
-  if warpShader then gl.DeleteShader(warpShader) end --delete an existing shader if any exist
   warpShader = gl.CreateShader({
     vertex = [[
       uniform float timer;
@@ -208,7 +207,6 @@ function UnitJitter.Initialize()
 
   timerUniform  = gl.GetUniformLocation(warpShader, 'timer')
 
-  if warpShader2 then gl.DeleteShader(warpShader2) end --delete an existing shader if any exist
   warpShader2 = gl.CreateShader({
     vertex = [[
       void main()
