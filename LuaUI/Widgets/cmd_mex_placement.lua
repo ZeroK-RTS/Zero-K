@@ -95,7 +95,7 @@ local MAP_SIZE_X_SCALED = MAP_SIZE_X / METAL_MAP_SQUARE_SIZE
 local MAP_SIZE_Z = Game.mapSizeZ
 local MAP_SIZE_Z_SCALED = MAP_SIZE_Z / METAL_MAP_SQUARE_SIZE
 
-local allyMexColor = {[1] = {0, 1, 0, 0.7}, [2] = {0, 1, 0, 1}}
+local allyMexColor = {[1] = {0, 1, 1, 0.7}, [2] = {0, 1, 1, 1}}
 local neutralMexColor = {[1] = {1, 1, 0, 0.7}, [2] = {1, 1, 0,1}}
 local enemyMexColor = {[1] = {1, 0, 0, 0.7}, [2] = {1, 0, 0, 1}}
 
