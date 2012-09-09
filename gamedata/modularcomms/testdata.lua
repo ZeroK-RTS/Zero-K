@@ -74,6 +74,7 @@ local base = {
 		modules = {
 			"commweapon_beamlaser_green",
 			"commweapon_beamlaser_red",
+			"conversion_lazor",
 			"module_guardian_armor",
 			"module_superspeed",
 			"module_super_nano",

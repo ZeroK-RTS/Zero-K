@@ -18,7 +18,6 @@ end
 Spring.Utilities = Spring.Utilities or {}
 VFS.Include("LuaRules/Utilities/base64.lua")
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
-
 local CopyTable = Spring.Utilities.CopyTable
 
 --------------------------------------------------------------------------------
