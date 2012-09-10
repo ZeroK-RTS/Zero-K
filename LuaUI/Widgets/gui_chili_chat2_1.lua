@@ -300,7 +300,7 @@ options = {
 	max_lines = {
 		name = 'Maximum Lines (20-300)',
 		type = 'number',
-		value = 150,
+		value = 60,
 		min = 20, max = 300, step = 1, 
 		OnChange = onOptionsChanged,
 	},
