@@ -359,8 +359,12 @@ end
 
 
 local function GetStartUnit(teamID, playerID, isAI)
-  local startUnit, startUnitAlt
+  local startUnit
 
+  if isAI and (not teamSidesAI[teamID]) then -- AI that didn't pick comm type gets default comm
+    teamSidesAI[teamID] = "armcom1"
+  end
+  
   if teamSidesAI[teamID] then 
 	return startUnitsAI[teamSidesAI[teamID]]
   end
@@ -436,7 +440,7 @@ end
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   local luaAI = Spring.GetTeamLuaAI(teamID)
   if luaAI and string.find(string.lower(luaAI), "chicken") then
-	return
+    return false
   end
   -- get start unit
   
@@ -459,7 +463,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   
   if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]))
   and not bonusSpawn then
-	return 
+    return false
   end
 
   if bonusSpawn then
@@ -566,7 +570,9 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
 
     end
 
+    return true
   end
+  return false
 end
 
 -- {[1] = 1, [2] = 3, [3] = 4} -> {[3] = 1, [1] = 4, [4] = 3}
@@ -731,9 +737,9 @@ function gadget:GameStart()
         -- 1 start unit per player
         local playerlist = Spring.GetPlayerList(team, true)
         playerlist = workAroundSpecsInTeamZero(playerlist, team)
-        if playerlist and (#playerlist > 0) then
+        if playerlist then
           for i=1,#playerlist do
-          	local _,_,spec,_,allyTeam = spGetPlayerInfo(playerlist[i])
+          	local _,_,spec = spGetPlayerInfo(playerlist[i])
             if (not spec) then
               SpawnStartUnit(team, playerlist[i])
             end
@@ -743,16 +749,26 @@ function gadget:GameStart()
           SpawnStartUnit(team, nil, true)
         end
       else -- no coop
-        SpawnStartUnit(team)
+        local _,playerID,_,isAI = spGetTeamInfo(team)
+        if (playerID) then
+          local _,_,spec,teamID = spGetPlayerInfo(playerID)
+          if (teamID == team and not spec) then
+            isAI = false
+          else
+            playerID = nil
+          end
+        end
+        
+        SpawnStartUnit(team, playerID, isAI)
       end
 	  
-	  -- extra PW comms
+	  -- extra comms
 	  local playerlist = Spring.GetPlayerList(team, true)
       playerlist = workAroundSpecsInTeamZero(playerlist, team)
-      if playerlist and (#playerlist > 0) then
+      if playerlist then
         for i=1,#playerlist do
 			if customKeys[playerlist[i]] and customKeys[playerlist[i]].extracomm then
-				for i=1, tonumber(customKeys[playerlist[i]].extracomm) do
+				for j=1, tonumber(customKeys[playerlist[i]].extracomm) do
 					SpawnStartUnit(team, playerlist[i], false, true)
 				end
 			end
@@ -816,7 +832,7 @@ local function SetFaction(side, playerID, teamID)
     teamSidesAI[teamID] = side
 	teamSides[teamID] = side
 	if playerID then
-		playerSides[playerID] = side
+		--playerSides[playerID] = side
 	end
 end
 GG.SetFaction = SetFaction
@@ -824,14 +840,26 @@ GG.SetFaction = SetFaction
 function gadget:GameFrame(n)
   if n == (COMM_SELECT_TIMEOUT) then
 	for team in pairs(waitingForComm) do
-		teamSides[team] = "strikecomm"
+		local _,playerID = spGetTeamInfo(team)
+		teamSides[team] = "basiccomm"
+		--playerSides[playerID] = "basiccomm"
 		scheduledSpawn[n] = scheduledSpawn[n] or {}
-		scheduledSpawn[n][#scheduledSpawn[n] + 1] = {team}
+		scheduledSpawn[n][#scheduledSpawn[n] + 1] = {team, playerID} -- playerID is needed here so the player can't spawn coms 2 times in coop mode
 	end
   end
   if scheduledSpawn[n] then
 	for _, spawnData in pairs(scheduledSpawn[n]) do
-		SpawnStartUnit(spawnData[1], spawnData[2])
+    local teamID, playerID = spawnData[1], spawnData[2]
+    local canSpawn = SpawnStartUnit(teamID, playerID)
+    
+    if (canSpawn) then
+      -- extra comms
+      if playerID and customKeys[playerID] and customKeys[playerID].extracomm then
+        for j=1, tonumber(customKeys[playerID].extracomm) do
+          SpawnStartUnit(teamID, playerID, false, true)
+        end
+      end
+    end
 	end
 	scheduledSpawn[n] = nil
   end
