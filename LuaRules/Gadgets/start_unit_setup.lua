@@ -737,7 +737,7 @@ function gadget:GameStart()
         -- 1 start unit per player
         local playerlist = Spring.GetPlayerList(team, true)
         playerlist = workAroundSpecsInTeamZero(playerlist, team)
-        if playerlist then
+        if playerlist and (#playerlist > 0) then
           for i=1,#playerlist do
           	local _,_,spec = spGetPlayerInfo(playerlist[i])
             if (not spec) then
