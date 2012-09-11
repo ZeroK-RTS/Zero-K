@@ -99,7 +99,7 @@ corclog = {
     cobscript = false, cannotJumpMidair = true},	
 	
  corsumo = {
-    delay = 30, height = 110, range = 360, reload = 15, cobscript = false, rotateMidAir = false, cannotJumpMidair = true},	
+    delay = 30, height = 110, range = 360, reload = 18, cobscript = false, rotateMidAir = false, cannotJumpMidair = true},	
 
  cadenza = {
     delay = 30, reload = 20, cobscript = false, rotateMidAir = false},
