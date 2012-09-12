@@ -1,7 +1,8 @@
 function widget:GetInfo()
   return {
-    name      = "replay control buttons",
-    desc      = "GUI for votes",
+    name      = "Replay control buttons",
+    desc      = "Graphical buttons for controlling replay speed, " .. 
+    "pausing and skipping pregame chatter",
     author    = "knorke",
     date      = "August 2012",
     license   = "stackable",
@@ -9,6 +10,8 @@ function widget:GetInfo()
     enabled   = true  --  loaded by my horse?
   }
 end
+
+local widgetName = widget:GetInfo().name
 
 local Chili
 local Button
@@ -35,9 +38,8 @@ local wantedSpeed = nil
 
 function widget:Initialize()
 	if (not Spring.IsReplay()) then
-		Spring.Echo ("replaycontrol: Not a replay, removing myself.")
+		Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
 		widgetHandler:RemoveWidget(self)
-		Spring.Echo ("replaycontrol: LOL did not work")
 		return
 	end
 	-- setup Chili
