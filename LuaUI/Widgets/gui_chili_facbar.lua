@@ -1,9 +1,11 @@
 -------------------------------------------------------------------------------
 
+local version = "v0.053"
+
 function widget:GetInfo()
   return {
     name      = "Chili FactoryBar",
-    desc      = "v0.052 Chili buildmenu for factories.",
+    desc      = version .. " - Chili buildmenu for factories.",
     author    = "CarRepairer (converted from jK's Buildbar)",
     date      = "2010-11-10",
     license   = "GNU GPL, v2 or later",
@@ -717,8 +719,8 @@ function widget:Initialize()
 		tweakResizable = true,
 		resizable = false,
 		dragUseGrip = false,
-		minWidth = 600,
-		minHeight = 200,
+		minWidth = 56,
+		minHeight = 56,
 		color = {0,0,0,0},
 		children = {
 			Label:New{ caption='Factories', fontShadow = true, },
