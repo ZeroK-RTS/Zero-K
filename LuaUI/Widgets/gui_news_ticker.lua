@@ -48,6 +48,7 @@ local UPDATE_PERIOD_LONG = 0.5	-- seconds
 local UPDATE_PERIOD_RESOURCES = 90	-- gameframes
 local RESOURCE_WARNING_PERIOD = 900	-- gameframes
 local OD_BUFFER = 10000
+local MAX_EVENTS = 20
 
 local mIncome = 0
 
@@ -82,6 +83,9 @@ local fontSize = 12
 local labelSpacing = 15
 local scrollSpeed = math.ceil(60*UPDATE_PERIOD)
 
+local function SetTickerVisiblity()
+end
+
 options_path = 'Settings/Interface/News Ticker'
 options = {
 	backgroundOpacity = {
@@ -98,6 +102,15 @@ options = {
 		type = "number",
 		value = 10, min = 1, max = 20, step = 1,
 		desc = "Multiplies metal income for minimum cost of newsworthy units",
+	},
+	soundOnly = {
+		name = "Sound Only",
+		type = "bool",
+		value = false,
+		desc = "Hides the visible bar",
+		OnChange = function(self)
+			SetTickerVisiblity(not self.value)
+		end
 	},
 }
 
@@ -148,59 +161,66 @@ local logCompleteInView = true
 
 -- add a news event - makes a label and plays a sound if needed
 local function AddEvent(str, unitDefID, color, sound, pos)
+	if #labels > MAX_EVENTS then
+		return
+	end
 	local frame = Spring.GetGameFrame()
 	if unitDefID then
 		if lastEventFrame[unitDefID] == frame then return end -- FIXME: stupid way of doing spam protection
 		lastEventFrame[unitDefID] = frame
 	end
 	
-	local x = window_ticker.width
-	local lastLabel = labels[#labels]
-	if lastLabel then
-		x = math.max(x, lastLabel.x + lastLabel.width + labelSpacing)
-	end
+	if not options.soundOnly.value then
+		local x = window_ticker.width
+		local lastLabel = labels[#labels]
+		if lastLabel then
+			x = math.max(x, lastLabel.x + lastLabel.width + labelSpacing)
+		end
+		
+		local posTable
+		if pos then
+			posTable = { function() Spring.SetCameraTarget(pos[1], pos[2], pos[3], 1) end }
+		end
+		
+		
+		local newLabel = Label:New{
+			width=string.len(str) * fontSize/2;
+			height="100%";
+			autosize=true;
+			x=x,
+			y=0,
+			align="left";
+			valign="top";
+			caption = str,
+			textColor = color,
+			fontSize = fontSize;
+			fontShadow = true;
+			parent = panel_ticker;
+			OnClick = posTable;
+		}
 	
-	local posTable
-	if pos then
-		posTable = { function() Spring.SetCameraTarget(pos[1], pos[2], pos[3], 1) end }
-	end
-	
-	local newLabel = Label:New{
-		width=string.len(str) * fontSize/2;
-		height="100%";
-		autosize=true;
-		x=x,
-		y=0,
-		align="left";
-		valign="top";
-		caption = str,
-		textColor = color,
-		fontSize = fontSize;
-		fontShadow = true;
-		parent = panel_ticker;
-		OnClick = posTable;
-	}
-
-	
-	-- implements button mouse functionality for the panel
-	function newLabel:HitTest(x,y) return self end
-	function newLabel:MouseDown(...)
-		local inherited = newLabel.inherited
-		self._down = true
-		inherited.MouseDown(self, ...)
-		return self
-	end
-
-	function newLabel:MouseUp(...)
-		local inherited = newLabel.inherited
-		if (self._down) then
-			self._down = false
-			inherited.MouseUp(self, ...)
+		
+		-- implements button mouse functionality for the panel
+		function newLabel:HitTest(x,y) return self end
+		function newLabel:MouseDown(...)
+			local inherited = newLabel.inherited
+			self._down = true
+			inherited.MouseDown(self, ...)
 			return self
 		end
+	
+		function newLabel:MouseUp(...)
+			local inherited = newLabel.inherited
+			if (self._down) then
+				self._down = false
+				inherited.MouseUp(self, ...)
+				return self
+			end
+		end
+		
+		labels[#labels+1] = newLabel
 	end
 	
-	labels[#labels+1] = newLabel
 	if useSounds and soundTimeout < frame then
 		local soundInfo = sounds[sound]
 		if not soundInfo then return end
@@ -393,14 +413,16 @@ function widget:Initialize()
 	Panel = Chili.Panel
 	screen0 = Chili.Screen0
 	
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
 	window_ticker = Window:New{
 		padding = {0,0,0,0},
 		--itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "news_ticker_window",
-		x = 300,
-		y = 200,
-		width  = 450,
+		y = screenHeight * 0.20,	-- positioned directly under chat
+		right = 425,
+		width  = screenWidth * 0.30,
 		height = fontSize + 2,
 		parent = Chili.Screen0,
 		draggable = false,
@@ -426,4 +448,12 @@ function widget:Initialize()
 				return true
 				end }, 
 	}
+	
+	SetTickerVisiblity = function(bool)
+		if bool then
+			screen0:AddChild(window_ticker)
+		else
+			screen0:RemoveChild(window_ticker)
+		end
+	end
 end
