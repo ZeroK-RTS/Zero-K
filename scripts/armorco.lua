@@ -13,7 +13,7 @@ local rarm, rarmcannon, rarmbarrel1, rarmflare1, rarmbarrel2, rarmflare2, rarmba
 local lupleg, lmidleg, lleg, lfoot, lftoe, lbtoe = piece("lupleg", "lmidleg", "lleg", "lfoot", "lftoe", "lbtoe")
 local rupleg, rmidleg, rleg, rfoot, rftoe, rbtoe = piece("rupleg", "rmidleg", "rleg", "rfoot", "rftoe", "rbtoe")
 
-smokePiece = { torso, rarmgun, larm_rgunclaw }
+smokePiece = { torso, head, shouldercannon }
 
 local gunFlares = {
     {larmflare1, larmflare2, larmflare3, rarmflare1, rarmflare2, rarmflare3},
@@ -204,34 +204,19 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if (severity <= .25) then
-		Explode(body, sfxNone)
+	if (severity <= .5) then
+		Explode(torso, sfxNone)
 		Explode(head, sfxNone)
 		Explode(pelvis, sfxNone)
-		dead = true
-		
-		Explode(lleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(rarmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-		Explode(larmgun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rarmcannon, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(larmcannon, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(larm, sfxShatter)
-		Explode(lmissiles, sfxShatter)
-		Explode(rmissiles, sfxShatter)
 		
-		Turn(torso, y_axis, 0, 50)
-		Turn(rarmgun, y_axis, 30, 20)	
-		Turn(larmgun, y_axis, 30, 20)
-		
-		Sleep(800)
-		return 1 -- corpsetype
-	elseif (severity <= .5) then
-		Explode(body, sfxNone)
-		Explode(head, sfxNone)
-		Explode(pelvis, sfxShatter)
 		return 1 -- corpsetype
 	else
-		Explode(body, sfxShatter)
+		Explode(torso, sfxShatter)
 		Explode(head, sfxSmoke + sfxFire)
-		Explode(pelvis, sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, sfxShatter)
 		return 2 -- corpsetype
 	end
 end
