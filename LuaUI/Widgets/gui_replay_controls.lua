@@ -220,7 +220,7 @@ function widget:GameFrame (f)
 end
 
 function skipPreGameChatter ()
-	Spring.Echo ("skipping pre game chatter")
+	--Spring.Echo ("skipping pre game chatter")
 	Spring.SendCommands ("skip 1")
 	window:RemoveChild(button_skipPreGame)
 end
