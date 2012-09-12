@@ -301,7 +301,7 @@ options = {
 		name = 'Maximum Lines (20-300)',
 		type = 'number',
 		value = 60,
-		min = 20, max = 300, step = 1, 
+		min = 20, max = 100, step = 1, 
 		OnChange = onOptionsChanged,
 	},
 	
