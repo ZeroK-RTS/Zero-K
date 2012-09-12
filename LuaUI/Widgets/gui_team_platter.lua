@@ -18,7 +18,7 @@ function widget:GetInfo()
   return {
     name      = "TeamPlatter",
     desc      = "Shows a team color platter above all visible units",
-    author    = "trepan",
+    author    = "trepan, tweaked by Sphiloth",
     date      = "Apr 16, 2007",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
@@ -26,8 +26,11 @@ function widget:GetInfo()
   }
 end
 
+local widgetName = widget:GetInfo().name
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
 
 -- Automatically generated local definitions
 
@@ -63,6 +66,19 @@ local spGetVisibleUnits      = Spring.GetVisibleUnits
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- Manual optimizations
+
+local spIsGUIHidden = Spring.IsGUIHidden 
+local abs = math.abs
+local acos = math.acos
+local cos = math.cos
+local sin = math.sin
+local pi = math.pi
+local radInDeg = 180/pi
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local function SetupCommandColors(state)
   local alpha = state and 1 or 0
   local f = io.open('cmdcolors.tmp', 'w+')
@@ -76,6 +92,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
 
 local teamColors = {}
 
@@ -95,20 +112,20 @@ function widget:Initialize()
 
   circleLines = glCreateList(function()
     glBeginEnd(GL_LINE_LOOP, function()
-      local radstep = (2.0 * math.pi) / circleDivs
+      local radstep = (2.0 * pi) / circleDivs
       for i = 1, circleDivs do
         local a = (i * radstep)
-        glVertex(math.sin(a), circleOffset, math.cos(a))
+        glVertex(sin(a), circleOffset, cos(a))
       end
     end)
   end)
 
   circlePolys = glCreateList(function()
     glBeginEnd(GL_TRIANGLE_FAN, function()
-      local radstep = (2.0 * math.pi) / circleDivs
+      local radstep = (2.0 * pi) / circleDivs
       for i = 1, circleDivs do
         local a = (i * radstep)
-        glVertex(math.sin(a), circleOffset, math.cos(a))
+        glVertex(sin(a), circleOffset, cos(a))
       end
     end)
   end)
@@ -174,7 +191,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:DrawWorldPreUnit()
-if not Spring.IsGUIHidden() then
+if not spIsGUIHidden() then
   glLineWidth(3.0)
 
   glDepthTest(true)
@@ -182,38 +199,42 @@ if not Spring.IsGUIHidden() then
   glPolygonOffset(-50, -2)
 
   local lastColorSet = nil
+  local visUnits = spGetVisibleUnits(-1, nil, false)
+
   --for _,unitID in ipairs(spGetAllUnits()) do
-  for _,unitID in ipairs(spGetVisibleUnits(-1,nil,false)) do
-    --if (spIsUnitVisible(unitID)) then
-      local teamID = spGetUnitTeam(unitID)
-      if (teamID) then
-        local udid = spGetUnitDefID(unitID)
-        local radius = GetUnitDefRealRadius(udid)
-        if (radius) then
-          local colorSet  = GetTeamColorSet(teamID)
-          if (trackSlope and (not UnitDefs[udid].canFly)) then
-            local x, y, z = spGetUnitBasePosition(unitID)
-            local gx, gy, gz = spGetGroundNormal(x, z)
-            local degrot = math.acos(gy) * 180 / math.pi
-            glColor(colorSet[1])
-            glDrawListAtUnit(unitID, circlePolys, false,
-                             radius, 1.0, radius,
-                             degrot, gz, 0, -gx)
-            glColor(colorSet[2])
-            glDrawListAtUnit(unitID, circleLines, false,
-                             radius, 1.0, radius,
-                             degrot, gz, 0, -gx)
-          else
-            glColor(colorSet[1])
-            glDrawListAtUnit(unitID, circlePolys, false,
-                             radius, 1.0, radius)
-            glColor(colorSet[2])
-            glDrawListAtUnit(unitID, circleLines, false,
-                             radius, 1.0, radius)
+  if visUnits then
+    for i = 1, #visUnits do
+      --if (spIsUnitVisible(visUnits[i])) then
+        local teamID = spGetUnitTeam(visUnits[i])
+        if (teamID) then
+          local udid = spGetUnitDefID(visUnits[i])
+          local radius = GetUnitDefRealRadius(udid)
+          if (radius) then
+            local colorSet  = GetTeamColorSet(teamID)
+            if (trackSlope and (not UnitDefs[udid].canFly)) then
+              local x, y, z = spGetUnitBasePosition(visUnits[i])
+              local gx, gy, gz = spGetGroundNormal(x, z)
+              local degrot = acos(gy) * radInDeg
+              glColor(colorSet[1])
+              glDrawListAtUnit(visUnits[i], circlePolys, false,
+                               radius, 1.0, radius,
+                               degrot, gz, 0, -gx)
+              glColor(colorSet[2])
+              glDrawListAtUnit(visUnits[i], circleLines, false,
+                               radius, 1.0, radius,
+                               degrot, gz, 0, -gx)
+            else
+              glColor(colorSet[1])
+              glDrawListAtUnit(visUnits[i], circlePolys, false,
+                               radius, 1.0, radius)
+              glColor(colorSet[2])
+              glDrawListAtUnit(visUnits[i], circleLines, false,
+                               radius, 1.0, radius)
+            end
           end
         end
-      end
-    --end
+      --end
+    end
   end
 
   glPolygonOffset(false)
@@ -225,7 +246,7 @@ if not Spring.IsGUIHidden() then
   glDepthTest(false)
 
   local diffTime = spDiffTimers(spGetTimer(), startTimer)
-  local alpha = 1.8 * math.abs(0.5 - (diffTime * 3.0 % 1.0))
+  local alpha = 1.8 * abs(0.5 - (diffTime * 3.0 % 1.0))
   glColor(1, 1, 1, alpha)
 
   for _,unitID in ipairs(spGetSelectedUnits()) do
@@ -235,7 +256,7 @@ if not Spring.IsGUIHidden() then
       if (trackSlope and (not UnitDefs[udid].canFly)) then
         local x, y, z = spGetUnitBasePosition(unitID)
         local gx, gy, gz = spGetGroundNormal(x, z)
-        local degrot = math.acos(gy) * 180 / math.pi
+        local degrot = acos(gy) * radInDeg
         glDrawListAtUnit(unitID, circleLines, false,
                          radius, 1.0, radius,
                           degrot, gz, 0, -gx)
