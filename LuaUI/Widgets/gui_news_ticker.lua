@@ -413,16 +413,16 @@ function widget:Initialize()
 	Panel = Chili.Panel
 	screen0 = Chili.Screen0
 	
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	--local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
 	window_ticker = Window:New{
 		padding = {0,0,0,0},
 		--itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "news_ticker_window",
-		y = screenHeight * 0.20,	-- positioned directly under chat
-		right = 425,
-		width  = screenWidth * 0.30,
+		y = 50,	-- positioned directly under resbars
+		right = 0,
+		width  = 430,
 		height = fontSize + 2,
 		parent = Chili.Screen0,
 		draggable = false,
