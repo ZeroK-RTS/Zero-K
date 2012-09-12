@@ -571,9 +571,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
                 -- Spring.GiveOrderToUnit(unitID, CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"})
 				orderArray[#orderArray + 1] = {CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"}}
             end
-			Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
-			orderArray = nil
         end
+		
+		Spring.GiveOrderArrayToUnitArray ({unitID,},orderArray) --give out all orders at once
+		orderArray = nil
     end
 end
 

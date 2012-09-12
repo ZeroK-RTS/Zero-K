@@ -22,7 +22,7 @@ local gunFlares = {
     {headlaser1, headlaser2, headlaser3}
 }
 local barrels = {larmbarrel1, larmbarrel2, larmbarrel3, rarmbarrel1, rarmbarrel2, rarmbarrel3}
-local aimpoints = {pelvis, aaturret, shouldercannon, head}
+local aimpoints = {torso, aaturret, shouldercannon, head}
 
 local gunIndex = {1,1,1,1}
 
@@ -114,7 +114,9 @@ local function StopWalk()
 	Turn( rbtoe, x_axis, 0, 4 )	
 	Turn( rleg, x_axis, 0, 4 )
 	Turn( pelvis, z_axis, 0, 1)
-	Turn( torso, y_axis, 0, 4)
+	if not(isFiring) then
+		Turn( torso, y_axis, 0, 4)
+	end
 	Move( pelvis, y_axis, 0, 4)
 	Turn( rarm, x_axis, 0, 1)
 	Turn( larm, x_axis, 0, 1)
@@ -135,11 +137,11 @@ end
 local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
-	Sleep(6000)
-	Turn( head, y_axis, 0, 3 )
-	Turn( torso, y_axis, 0, 3 )
-	Turn( larm, x_axis, 0, 3 )
-	Turn( rarm, x_axis, 0, 3 )
+	Sleep(2000)
+	Turn( head, y_axis, 0, 2 )
+	Turn( torso, y_axis, 0, 1.5 )
+	Turn( larm, x_axis, 0, 2 )
+	Turn( rarm, x_axis, 0, 2 )
 	Turn(shouldercannon, x_axis, 0, math.rad(90))
 	isFiring = false
 	lastTorsoHeading = 0
@@ -155,49 +157,49 @@ end
 
 function script.AimWeapon(num, heading, pitch)
     local SIG_AIM = 2^(num+1)
-    Signal(SIG_AIM)
+    isFiring = true
+	Signal(SIG_AIM)
     SetSignalMask(SIG_AIM)
+	
+	StartThread(RestoreAfterDelay)
+	
     if num == 1 then
-	Turn(torso, y_axis, heading, math.rad(180))
-	Turn(larm, x_axis, -pitch, math.rad(120))
-	Turn(rarm, x_axis, -pitch, math.rad(120))
-	WaitForTurn(torso, y_axis)
-	WaitForTurn(larm, x_axis)
+		Turn(torso, y_axis, heading, math.rad(180))
+		Turn(larm, x_axis, -pitch, math.rad(120))
+		Turn(rarm, x_axis, -pitch, math.rad(120))
+		WaitForTurn(torso, y_axis)
+		WaitForTurn(larm, x_axis)
     elseif num == 2 then
-	Turn(aaturret, y_axis, heading - lastTorsoHeading, math.rad(360))
-	Turn(aagun, x_axis, -pitch, math.rad(240))
-	WaitForTurn(aaturret, y_axis)
-	WaitForTurn(aagun, x_axis)
+		Turn(aaturret, y_axis, heading - lastTorsoHeading, math.rad(360))
+		Turn(aagun, x_axis, -pitch, math.rad(240))
+		WaitForTurn(aaturret, y_axis)
+		WaitForTurn(aagun, x_axis)
     elseif num == 3 then
-	Turn(torso, y_axis, heading, math.rad(180))
-	Turn(shouldercannon, x_axis, math.rad(90) - pitch, math.rad(180))
-	WaitForTurn(torso, y_axis)
-	WaitForTurn(shouldercannon, x_axis)
+		Turn(torso, y_axis, heading, math.rad(180))
+		Turn(shouldercannon, x_axis, math.rad(90) - pitch, math.rad(180))
+		WaitForTurn(torso, y_axis)
+		WaitForTurn(shouldercannon, x_axis)
     elseif num == 4 then
-	Turn(torso, y_axis, heading, math.rad(180))
-	WaitForTurn(torso, y_axis)
+		Turn(torso, y_axis, heading, math.rad(180))
+		WaitForTurn(torso, y_axis)
     end
     
     if num ~= 2 then
-	lastTorsoHeading = heading
+		lastTorsoHeading = heading
     end
     
     return true
 end
 
 function script.Shot(num)
-    if num == 1 then
-	Move(barrels[gunIndex[1]], z_axis, -20)
-	Move(barrels[gunIndex[1]], z_axis, 0, 20)
+	if num == 1 then
+		Move(barrels[gunIndex[1]], z_axis, -20)
+		Move(barrels[gunIndex[1]], z_axis, 0, 20)
     end
     gunIndex[num] = gunIndex[num] + 1
     if gunIndex[num] > #gunFlares[num] then
-	gunIndex[num] = 1
+		gunIndex[num] = 1
     end
-end
-
-function script.FireWeapon(num)
-    StartThread(RestoreAfterDelay)
 end
 
 function script.Killed(recentDamage, maxHealth)

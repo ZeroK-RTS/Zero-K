@@ -106,6 +106,7 @@ function widget:DrawInMiniMap()
 		gl.Scale(mapXinv , -mapZinv, 1)
 		gl.Rotate(270,1,0,0)
 		gl.LineWidth(2)
+		gl.Lighting(false)
 		gl.Color(1,1,0,0.7)
 		for i = 1, #geos do
 			local geo = geos[i]

@@ -212,7 +212,6 @@ function widget:Update()
 end
 
 function widget:GameFrame (f)
-	Spring.Echo (f)
 	if (f==1) then
 		window:RemoveChild(button_skipPreGame)
 	end

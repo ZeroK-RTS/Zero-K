@@ -51,6 +51,7 @@ local glPolygonMode      = gl.PolygonMode
 local glDrawGroundCircle = gl.DrawGroundCircle
 local glUnitShape        = gl.UnitShape
 local glDepthTest        = gl.DepthTest
+local glLighting         = gl.Lighting
 local glScale            = gl.Scale
 local glBillboard        = gl.Billboard
 local glAlphaTest        = gl.AlphaTest
@@ -664,8 +665,18 @@ end
 function widget:DrawInMiniMap()
 
 	if drawMexSpots then
+		--[[
+		glPushMatrix()
+			glLoadIdentity()
+			glTranslate(0, 1, 0)
+			glScale(mapXinv , -mapZinv, 1)
+			
+			widget:DrawWorld()
+		glPopMatrix()
+		--]]
+		
 		local specatate = spGetSpectatingState()
-	
+		
 		glLoadIdentity()
 		glTranslate(0,1,0)
 		glScale(mapXinv , -mapZinv, 1)
@@ -679,6 +690,7 @@ function widget:DrawInMiniMap()
 			local mexColor = getSpotColor(x,y,z,i,specatate,2)
 			
 			glLineWidth(spot.metal)
+			glLighting(false)
 			glColor(mexColor)
 			
 			glDrawGroundCircle(x, 0, z, MINIMAP_DRAW_SIZE, 32)
@@ -686,6 +698,7 @@ function widget:DrawInMiniMap()
 
 		glLineWidth(0)
 		glColor(1,1,1,1)
+		
 	end
 
 end

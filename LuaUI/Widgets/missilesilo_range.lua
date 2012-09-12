@@ -170,6 +170,7 @@ local function DrawActiveCommandRangesMinimap()
 	glTranslate(0,1,0)
 	glScale(1/mapX , -1/mapZ, 1)
 	glRotate(270,1,0,0)
+	gl.Lighting(false)
 	
 	for i = 1, radiusCount do
 		local radius = drawRadius[i]
