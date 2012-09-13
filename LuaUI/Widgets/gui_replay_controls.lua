@@ -154,7 +154,7 @@ function widget:Initialize()
 end
 
 function pause ()
-	Spring.Echo ("playback paused")
+	Spring.Echo ("Playback paused")
 	Spring.SendCommands ("pause 1")
 	isPaused = true
 	button_startStop:SetCaption ("play")
@@ -163,7 +163,7 @@ function pause ()
 end
 
 function unpause ()
-	Spring.Echo ("playback continued")
+	Spring.Echo ("Playback continued")
 	Spring.SendCommands ("pause 0")
 	isPaused = false
 	button_startStop:SetCaption ("pause")
@@ -220,7 +220,7 @@ function widget:GameFrame (f)
 end
 
 function skipPreGameChatter ()
-	--Spring.Echo ("skipping pre game chatter")
+	Spring.Echo ("Skipping pregame chatter")
 	Spring.SendCommands ("skip 1")
 	window:RemoveChild(button_skipPreGame)
 end
