@@ -141,7 +141,7 @@ local GetFeatureRadius     = Spring.GetFeatureRadius
 local spGetFeatureDefID    = Spring.GetFeatureDefID
 local spGetTeamColor       = Spring.GetTeamColor
 local spGetGameFrame       = Spring.GetGameFrame
-local Utils_GetUnitIsBuilding = Spring.Utilities.GetUnitIsBuilding
+local Utils_GetUnitNanoTarget = Spring.Utilities.GetUnitNanoTarget
 
 local tinsert = table.insert
 local type  = type
@@ -323,19 +323,22 @@ local factionsNanoFx = {
 
   function GameFrame(_,offset)
     for unitID,nanoInfo in spairs(SYNCED.nanoEmitters[offset]) do
-      local type, target = Utils_GetUnitIsBuilding(unitID)
+      local type, target, isFeature = Utils_GetUnitNanoTarget(unitID)
 
       if (target) then
         local cmdTag = GetCmdTag(unitID)
 		
         if (nanoInfo.cmdTag == cmdTag) then
+          local endpos
           local radius = 30
           if (type=="restore") then
+            endpos = target
             radius = target[4]
-          elseif (target>0) then
+            target = -1
+          elseif (not isFeature) then
             radius = (GetUnitRadius(target) or 1)*0.80
           else
-            radius = (GetFeatureRadius(-target) or 1) * 0.80
+            radius = (GetFeatureRadius(target) or 1) * 0.80
           end
 
           local terraform = false
@@ -344,11 +347,6 @@ local factionsNanoFx = {
             terraform = true
           elseif (type=="reclaim") then
             inversed  = true
-          end
-
-          local endpos
-          if (type=="restore") then
-            endpos = target
           end
 
           local strength = nanoInfo.strength
@@ -363,6 +361,7 @@ local factionsNanoFx = {
           for i=1,nanoInfo.pieceCount do
             local nanoParams = {
               targetID     = target,
+              isFeature    = isFeature,
               unitpiece    = nanoInfo[i],
               unitID       = unitID,
               unitDefID    = nanoInfo.unitDefID,

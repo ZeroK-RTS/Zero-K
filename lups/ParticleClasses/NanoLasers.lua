@@ -47,7 +47,7 @@ NanoLasers.Default = {
   nanopiece    = -1,
 
   --// some unit informations
-  targetID  = 0,
+  targetID  = -1,
   unitID    = -1,
   unitpiece = -1,
   unitDefID = -1,

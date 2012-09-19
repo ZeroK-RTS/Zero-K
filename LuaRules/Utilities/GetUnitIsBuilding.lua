@@ -8,9 +8,10 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function Spring.Utilities.GetUnitIsBuilding(unitID)
+function Spring.Utilities.GetUnitNanoTarget(unitID)
   local type = ""
   local target
+  local isFeature = false
 
   local buildID = Spring.GetUnitIsBuilding(unitID)
   if (buildID) then
@@ -33,8 +34,9 @@ function Spring.Utilities.GetUnitIsBuilding(unitID)
 
           if (featureID >= 0) then
             if Spring.ValidFeatureID(featureID) then
-              target = -featureID
-              type   = "reclaim"
+              target    = featureID
+              isFeature = true
+              type      = "reclaim"
             end
           else
             if Spring.ValidUnitID(unitID_) then
@@ -69,13 +71,14 @@ function Spring.Utilities.GetUnitIsBuilding(unitID)
       elseif cmdID == CMD.RESURRECT then
         local rezzID = cmdParams[1] - Game.maxUnits
         if Spring.ValidFeatureID(rezzID) then
-          target = -rezzID
-          type   = "resurrect"
+          target    = rezzID
+          isFeature = true
+          type      = "resurrect"
         end
 
       end
     end
   end
 
-  return type, target
+  return type, target, isFeature
 end

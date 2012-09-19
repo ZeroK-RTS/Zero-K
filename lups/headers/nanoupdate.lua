@@ -57,26 +57,27 @@ function UpdateNanoParticles(self)
 
     --// UPDATE FINALPOS
     local tid = self.targetID
-    if (tid > 0) then
-      if Spring.ValidUnitID(tid) then
-        self.targetpos = {Spring.GetUnitPosition(tid)}
-      else
-        if (not self._dead) then
-          --// assigned target unit died
-          self._dead = true
-          return
+    if (tid >= 0) then
+      if (not self.isFeature) then
+        if Spring.ValidUnitID(tid) then
+          self.targetpos = {Spring.GetUnitPosition(tid)}
+        else
+          if (not self._dead) then
+            --// assigned target unit died
+            self._dead = true
+            return
+          end
         end
-      end
-    elseif (tid < 0) then
-      tid = -tid
-      if Spring.ValidFeatureID(tid) then
-        self.targetpos = {Spring.GetFeaturePosition(tid)}
-        self.targetpos[2] = self.targetpos[2] + 25
       else
-        if (not self._dead) then
-          --// assigned target feature died
-          self._dead = true
-          return
+        if Spring.ValidFeatureID(tid) then
+          self.targetpos = {Spring.GetFeaturePosition(tid)}
+          self.targetpos[2] = self.targetpos[2] + 25
+        else
+          if (not self._dead) then
+            --// assigned target feature died
+            self._dead = true
+            return
+          end
         end
       end
     end

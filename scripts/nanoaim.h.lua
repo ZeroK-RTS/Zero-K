@@ -14,17 +14,19 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local Utils_GetUnitNanoTarget = Spring.Utilities.GetUnitNanoTarget
+
 function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
-	local type, target = Spring.Utilities.GetUnitIsBuilding(unitID)
+	local type, target, isFeature = Utils_GetUnitNanoTarget(unitID)
 
 	if (target) then
 		local x,y,z
-		if (type == "resurrect") then
+		if (type == "restore") then
 			x,y,z = target[1],target[2],target[3]
-		elseif (target>0) then
+		elseif (not isFeature) then
 			x,y,z = Spring.GetUnitPosition(target)
 		else
-			x,y,z = Spring.GetFeaturePosition(-target)
+			x,y,z = Spring.GetFeaturePosition(target)
 		end
 
 		local ux,uy,uz = Spring.GetUnitPosition(unitID)
