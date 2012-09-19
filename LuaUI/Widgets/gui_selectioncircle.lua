@@ -77,6 +77,7 @@ local GetUnitViewPosition = Spring.GetUnitViewPosition
 local GetUnitBasePosition = Spring.GetUnitBasePosition
 local GetUnitAllyTeam     = Spring.GetUnitAllyTeam
 local spGetSelectedUnits  = Spring.GetSelectedUnits
+local GetUnitNoDraw       = Spring.GetUnitNoDraw
 local IsUnitVisible       = Spring.IsUnitVisible
 local IsUnitSelected      = Spring.IsUnitSelected
 local GetGroundNormal     = Spring.GetGroundNormal
@@ -133,7 +134,7 @@ function widget:DrawWorldPreUnit()
     local lastColorSet = nil
     for i=1,#selUnits do
       local unitID = selUnits[i]
-      if (IsUnitVisible(unitID)) then
+      if (IsUnitVisible(unitID) and not GetUnitNoDraw(unitID)) then
         local teamID = GetUnitTeam(unitID)
         if (teamID) then
           local radius = GetUnitRadius(unitID)

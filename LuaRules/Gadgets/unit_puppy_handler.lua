@@ -34,6 +34,7 @@ local spGetUnitPosition  = Spring.GetUnitPosition
 local spGetGameFrame     = Spring.GetGameFrame
 local spSetUnitNoDraw    = Spring.SetUnitNoDraw
 local spSetUnitNoMinimap = Spring.SetUnitNoMinimap
+local spSetUnitPosition  = Spring.SetUnitPosition
 local spSetUnitBlocking  = Spring.SetUnitBlocking
 local spAddUnitDamage    = Spring.AddUnitDamage
 local spDestroyUnit      = Spring.DestroyUnit
@@ -97,6 +98,7 @@ local function RestorePuppy(unitID, x, y, z)
 	end
 	--Spring.Echo("RestorePuppy DONE")
 	hiddenPuppy[unitID] = nil
+	spSetUnitPosition(unitID, x, z) -- fixes rectangle selection
 	spMoveCtrlSetPosition(unitID, x, y, z)
 	spSetUnitBlocking(unitID, false, false)	-- allows it to clip into wrecks (workaround for puppies staying in heaven)
 	spMoveCtrlDisable(unitID)

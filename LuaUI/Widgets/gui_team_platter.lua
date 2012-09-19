@@ -57,6 +57,7 @@ local spGetUnitDefID         = Spring.GetUnitDefID
 --local spGetUnitRadius        = Spring.GetUnitRadius --not used
 local spGetUnitTeam          = Spring.GetUnitTeam
 local spGetUnitViewPosition  = Spring.GetUnitViewPosition
+local spGetUnitNoDraw        = Spring.GetUnitNoDraw
 local spIsUnitSelected       = Spring.IsUnitSelected
 local spIsUnitVisible        = Spring.IsUnitVisible
 local spSendCommands         = Spring.SendCommands
@@ -205,6 +206,7 @@ if not spIsGUIHidden() then
   if visUnits then
     for i = 1, #visUnits do
       --if (spIsUnitVisible(visUnits[i])) then
+      if (not spGetUnitNoDraw(unitID)) then
         local teamID = spGetUnitTeam(visUnits[i])
         if (teamID) then
           local udid = spGetUnitDefID(visUnits[i])
@@ -233,7 +235,7 @@ if not spIsGUIHidden() then
             end
           end
         end
-      --end
+      end
     end
   end
 

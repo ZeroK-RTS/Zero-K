@@ -27,6 +27,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local spGetUnitNoDraw = Spring.GetUnitNoDraw
+
+
 function widget:Initialize()
         squareLines = gl.CreateList(function()
                 gl.BeginEnd(GL.LINE_LOOP, function()
@@ -53,12 +56,12 @@ end
 --------------------------------------------------------------------------------
 
 function widget:DrawWorldPreUnit()
-        gl.LineWidth(1.0)
+  gl.LineWidth(1.0)
   gl.Color(0, 1, 0)
   -- special function from ca's LuaUI Cache - no need to speed up
   local visibleUnitsRev = Spring.GetVisibleUnitsReverse(Spring.ALL_UNITS, nil, false)
         for _,unitID in ipairs(Spring.GetSelectedUnits()) do
-                if (visibleUnitsRev[unitID]) then
+                if (visibleUnitsRev[unitID] and not spGetUnitNoDraw(unitID)) then
                         local udid = Spring.GetUnitDefID(unitID)
                         local scalex = 4.0 * UnitDefs[udid]["xsize"]
                         local scalez = 4.0 * UnitDefs[udid]["zsize"]
