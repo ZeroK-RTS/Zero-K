@@ -16,8 +16,14 @@ end
 
 ---- CHANGELOG -----
 -- msafwan,			v???	(19sept2012)	: 	introduce impulse jump, fixed landbox randomizer (which didn't work before this), add 1 second delay to
---												unit jumping to same coordinate (to avoid damage from impulse jump, find variable "duplicateCoordCount" to change it),
+--												unit jumping to same coordinate (to avoid damage from impulse jump),
 --												fixed case where unit do nothing when jump command queued, replaced all Spring.GetUnitBasePosition with Spring.GetUnitPosition.
+--												JumpDef for Impulse-Jump: 
+--														height ==> jump height and a maximum height,  0 to infinity
+--														speed ==> a scale from 0-10(default) and 0 to infinity (for adding extra speed to jump. Work by adding artificial gravity which necessitate higher jump speed)
+--														rotateMidAir ==> *not implemented*
+--														range ==> maximum horizontal range, 0 to infinity
+--														reload ==> reload time
 
 if (not gadgetHandler:IsSyncedCode()) then
   return false -- no unsynced code
@@ -82,6 +88,7 @@ local mcSetPosition         = MoveCtrl.SetPosition
 local mcSetRotation         = MoveCtrl.SetRotation
 local mcDisable             = MoveCtrl.Disable
 local mcEnable              = MoveCtrl.Enable
+local spAddUnitImpulse      = Spring.AddUnitImpulse
 
 local SetLeaveTracks      = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks	--0.82 compatiblity
 
@@ -375,7 +382,6 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 	end
 	t1, t2, smallestDiff = nil, nil, nil
 	if flightTimeFull==nil then --target too high to reach!
-		Spring.Echo("Note: Jump exceeded maximum height, cancelling.")
 		jumping[unitID] = false
 		return false, true
 	end
@@ -501,14 +507,14 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 				local dvx = xVel - vx --difference between needed velocity and current velocity
 				local dvz = zVel - vz
 				local dvy = (yVel-mapGravity*i) - vy -- note: is using "v = v0 + a*t"
-				Spring.AddUnitImpulse(unitID, dvx, dvy, dvz) --add launch impulse
+				spAddUnitImpulse(unitID, dvx, dvy, dvz) --add launch impulse
 				-- Spring.Echo(dvx .. " dvx")
 				-- Spring.Echo(dvy .. " dvy")
 				-- Spring.Echo(dvz .. " dvz")	
 			end
 			
-			Spring.AddUnitImpulse(unitID, 0, 1-artificialGrav,0) --add artificial gravity for more aggresive looking jump. Useful in low gravity map
-			Spring.AddUnitImpulse(unitID, 0, -1, 0) --hax; impulse can't be less than 1 or it doesn't work at all. So we add 1 and then remove 1.
+			spAddUnitImpulse(unitID, 0, 1-artificialGrav,0) --add artificial gravity for more aggresive looking jump. Useful in low gravity map
+			spAddUnitImpulse(unitID, 0, -1, 0) --hax; impulse can't be less than 1 or it doesn't work at all. So we add 1 and then remove 1.
 			
 			if cob then
 				spCallCOBScript(unitID, "Jumping", 1, (i/flightTimeFull) * 100) --similar to one in MoveCtrlJump except "i" is replaced with "i/flightTimeFull".
@@ -531,15 +537,17 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 			end
 			
 			local x0, y0, z0 = spGetUnitPosition(unitID)
-			if ((abs(spGetGroundHeight(x0,z0) - y0) <30) and i>(flightTimeFull*0.5)) then --find out if unit has landed
+			if ((abs(spGetGroundHeight(x0,z0) - y0) <10) and i>(flightTimeFull*0.5)) then --find out if unit has landed
 				local vx, vy,vz = Spring.GetUnitVelocity(unitID)
 				local dvx = 0 - vx --difference between 0 velocity and current velocity
 				local dvz = 0 - vz
-				local dvy = 0 - vy
-				Spring.AddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
-				ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --give order during jump
-				landed = true
-				break
+				local dvy = -0.144 - vy
+				if dvy >= 1 then  --wait until unit fall really fast enough to start a brakes or just wait until "flightTimeFull" has passed. Useful for unit jumping up to a ledge where vertical velocity is already zero at the top.
+					spAddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
+					ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --give order during jump
+					landed = true
+					break
+				end
 			end
 			
 			Sleep() --wait until next gameFrame update
@@ -565,13 +573,13 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 			
 			local x0, y0, z0 = spGetUnitPosition(unitID)
 			local _,dy,_  =Spring.GetUnitDirection (unitID)
-			if not landed and (abs(spGetGroundHeight(x0,z0) - y0) <30) and (abs(dy)<0.125) then --check whether unit has landed & whether it is landing on its feet, 
+			if not landed and (abs(spGetGroundHeight(x0,z0) - y0) <20) and (abs(dy)<0.125) then --check whether unit has landed & whether it is landing on its feet, 
 				-- Spring.Echo(dy .. " dy")
 				local vx, vy,vz = Spring.GetUnitVelocity(unitID)
 				local dvx = 0 - vx --difference between 0 velocity and current velocity
-				local dvz = 0 - vz
-				local dvy = 0 - vy
-				Spring.AddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
+				local dvz = 0  - vz
+				local dvy = -0.144 - vy
+				spAddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
 				ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --give order during jump
 				landed = true
 			end
@@ -594,8 +602,8 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 				local vx, vy,vz = Spring.GetUnitVelocity(unitID)
 				local dvx = 0 - vx --difference between 0 velocity and current velocity
 				local dvz = 0 - vz
-				local dvy = 0 - vy
-				Spring.AddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
+				local dvy = -0.144 - vy
+				spAddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
 				ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --give order during jump
 				landed = true
 			end
@@ -617,10 +625,11 @@ local function Jump(unitID, goal, cmdTag, coords, duplicateCoordCount)
 	goal[2]             = spGetGroundHeight(goal[1],goal[3])
 	local start         = {spGetUnitPosition(unitID)}
 
+	local extraJumpDelay = (isImpulseJump and duplicateCoordCount*30) or 0 
 	local unitDefID     = spGetUnitDefID(unitID)
 	local jumpDef       = jumpDefs[unitDefID]
 	local speed         = jumpDef.speed
-	local delay    	  = jumpDef.delay + duplicateCoordCount*30 --the wait animation before jumping
+	local delay    	  = jumpDef.delay + extraJumpDelay --the wait animation before jumping
 	local height        = jumpDef.height --the desired height
 	local cannotJumpMidair    = jumpDef.cannotJumpMidair
 	local reloadTime    = (jumpDef.reload or 0)*30
