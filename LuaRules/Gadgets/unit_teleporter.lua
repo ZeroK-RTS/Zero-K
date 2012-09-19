@@ -187,13 +187,13 @@ end
 function gadget:AllowCommand(unitID, unitDefID, teamID,
                              cmdID, cmdParams, cmdOptions)
 	
-	if teleportingUnit[unitID] and cmdID ~= 1 and cmdID ~= 2 and cmdID ~= CMD.FIRESTATE and cmdID ~= CMD.MOVESTATE and cmdID ~= CMD.CLOAK then
+	if teleportingUnit[unitID] and cmdID ~= CMD.INSERT and cmdID ~= CMD.REMOVE and cmdID ~= CMD.FIRESTATE and cmdID ~= CMD.MOVESTATE and cmdID ~= CMD.CLOAK then
 		interruptTeleport(teleportingUnit[unitID])
 	end
 	
 	local ud = UnitDefs[unitDefID]
 	
-	if   not ud 
+	if not ud 
 	  or
 	    (ud.speed == 0 or ud.isBomber or ud.isFighter) 
       or
@@ -245,15 +245,22 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 		local ux,_,uz = Spring.GetUnitPosition(unitID)
 		if --[[BEACON_PLACE_RANGE_SQR > (cmdParams[1]-ux)^2 + (cmdParams[3]-uz)^2 and]] ty == Spring.GetGroundHeight(tx, tz) then
 			local cx, cz = math.floor((cmdParams[1]+8)/16)*16, math.floor((cmdParams[3]+8)/16)*16
-			Spring.SetUnitMoveGoal(unitID, ux,0,uz)
-			--local place, feature = Spring.TestBuildOrder(beaconDef, cx, 0 ,cz, 1)
-			--local inLos = Spring.IsPosInLos(cx,0,cz,Spring.GetUnitAllyTeam(unitID))
-			--if (place == 2 and feature == nil) or not inLos then
+			local inLos = Spring.IsPosInLos(cx,0,cz,Spring.GetUnitAllyTeam(unitID))
+			local blocked = false
+			if (inLos) then
+				local place, feature = Spring.TestBuildOrder(beaconDef, cx, 0, cz, 1)
+				if not (place == 2 and feature == nil) then
+					blocked = true
+				end
+			end
+			
+			if not blocked then
+				Spring.SetUnitMoveGoal(unitID, ux,0,uz)
 				Spring.MoveCtrl.Enable(unitID)
 				Spring.SetUnitVelocity(unitID, 0, 0, 0)
 				local func = Spring.UnitScript.GetScriptEnv(unitID).Create_Beacon
 				Spring.UnitScript.CallAsUnit(unitID,func,cx,cz)
-			--end
+			end
 			return true, true -- command was used and remove it
 		end
 		
@@ -363,7 +370,7 @@ function gadget:GameFrame(f)
 							Spring.SpawnCEG("teleport_out", ux, uy, uz, 0, 0, 0, size)
 							
 							
-							teleportingUnit[teleportiee] = false
+							teleportingUnit[teleportiee] = nil
 							
 							if not callScript(teleportiee, "unit_teleported", {dx, dy, dz}) then
 								Spring.SetUnitPosition(teleportiee, dx, dz)
@@ -498,8 +505,8 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	
-	if teleportingUnit[teleportiee] then
-		interruptTeleport(teleportingUnit[teleportiee])
+	if teleportingUnit[unitID] then
+		interruptTeleport(teleportingUnit[unitID])
 	end
 	
 	if tele[unitID] then
@@ -596,7 +603,7 @@ function gadget:DrawWorld()
 		
 		gl.DepthTest(false)
 		gl.Color(1,1,1,1)
-                gl.LineStipple(false)
+		gl.LineStipple(false)
 		
 		gl.PopAttrib()
 	end
