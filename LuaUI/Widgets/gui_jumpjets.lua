@@ -58,6 +58,7 @@ local yellow   = {  1,   1, 0.5,   1}
 local orange   = {	1, 0.5,   0,   1}
 local pink     = {  1, 0.5, 0.5,   1}
 local red      = {  1,   0,   0,   1}
+local isImpulseJump = (Spring.GetModOptions().impulsejump  == "1") --ImpulseJump arc
 
 local jumpDefNames  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
@@ -101,15 +102,34 @@ end
 
 
 local function DrawLoop(start, vector, color, progress, step, height)
-  glColor(color[1], color[2], color[3], color[4])
-  for i=progress, 1, step do
-    
-    local x = start[1] + vector[1]*i
-    local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height
-    local z = start[3] + vector[3]*i
-    
-    glVertex(x, y, z)
-  end
+	glColor(color[1], color[2], color[3], color[4])
+	if isImpulseJump then
+		local art_Grav = Game.gravity/30/30 --get any game gravity.
+		local art_yVel = (4*(-art_Grav/2)*(-height))^0.5 --determinant is set to 0. See unit_jumpjets.lua for more info.
+		local art_flightTimeApex = -art_yVel/(2*(-art_Grav/2)) --get the single root for parabola (quadratic) equation 
+		local distance = GetDist2({0,0,0}, vector)
+		--local art_xzVel_est =  distance/(art_flightTimeApex*2)
+		local targetHeight = math.min(height-1, vector[2]) --choose either the ceiling height or the target height
+		local art_flightTimeFull =(-art_yVel - (art_yVel^2 - 4*(-art_Grav/2)*(-vector[2]))^0.5)/(2*(-art_Grav/2)) --equation for finding root for parabola
+		local art_xzVel = distance/art_flightTimeFull --distance = horizontalSpeed*flightTime rearranged
+		local art_directionxz = math.atan2(vector[3]/distance, vector[1]/distance) --get direction in angle (radian)
+		local art_xVel = math.cos(art_directionxz)*art_xzVel --convert horizontal speed into x and z component
+		local art_zVel = math.sin(art_directionxz)*art_xzVel
+		for i=0, art_flightTimeFull, 1 do	--draw each point in the parabola at 1 frame step.
+			local x = start[1] + art_xVel*i
+			local y = start[2] + art_yVel*i -art_Grav*i*i/2
+			local z = start[3] + art_zVel*i
+			glVertex(x, y, z)
+		end
+	else
+		for i=progress, 1, step do
+			local x = start[1] + vector[1]*i
+			local y = start[2] + vector[2]*i + (1-(2*i-1)^2)*height
+			local z = start[3] + vector[3]*i
+
+			glVertex(x, y, z)
+		end
+	end
 end
 
 
@@ -210,10 +230,17 @@ local function  DrawMouseArc(unitID, shift, groundPos)
   end
   local queue = spGetCommandQueue(unitID)
   local range = jumpDefs[unitDefID].range
+  local maxheight = jumpDefs[unitDefID].height
   if (not queue or #queue == 0 or not shift) then
     local unitPos = {spGetUnitPosition(unitID)}
+	local maxheight = jumpDefs[unitDefID].height + unitPos[2]
     local dist = GetDist2(unitPos, groundPos)
-    local color = range > dist and green or pink
+	local color
+	if isImpulseJump then
+		color = ((range > dist and maxheight > groundPos[2]) and green) or pink --impulse jump is made to have limited height
+	else
+		color = (range > dist and green) or pink
+	end
     DrawArc(unitID, unitPos, groundPos, color, nil, range)
   elseif (shift) then
     local i = #queue
