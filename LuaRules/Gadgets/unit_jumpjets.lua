@@ -492,7 +492,7 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 			Spring.SetUnitDirection(unitID, dx, 0, dz) --prevent unit from tumbling during jumploop.
 			--Spring.Echo(dy .. " dy")
 			
-			if rotateMidAir then -- x_x
+			if rotateMidAir then -- x_x :(
 				--Spring.SetUnitRotation (unitID, 0, (startHeading - 2^15)/rotUnit, 0)-- keep current heading
 				--Spring.SetUnitRotation (unitID, 0, (startHeading - 2^15)/rotUnit, 0)-- keep current heading
 				--Spring.Echo((startHeading - 2^15)/rotUnit .. " (startHeading - 2^15)/rotUnit")
@@ -513,8 +513,8 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 				-- Spring.Echo(dvz .. " dvz")	
 			end
 			
-			spAddUnitImpulse(unitID, 0, 1-artificialGrav,0) --add artificial gravity for more aggresive looking jump. Useful in low gravity map
-			spAddUnitImpulse(unitID, 0, -1, 0) --hax; impulse can't be less than 1 or it doesn't work at all. So we add 1 and then remove 1.
+			spAddUnitImpulse(unitID, 0, -1-artificialGrav,0) --add artificial gravity for more aggresive looking jump. Useful in low gravity map
+			spAddUnitImpulse(unitID, 0, 1, 0) --hax; impulse can't be less than 1 or it doesn't work at all. So we add 1 and then remove 1.
 			
 			if cob then
 				spCallCOBScript(unitID, "Jumping", 1, (i/flightTimeFull) * 100) --similar to one in MoveCtrlJump except "i" is replaced with "i/flightTimeFull".
@@ -544,27 +544,27 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 				local dvy = -0.144 - vy
 				if dvy >= 1 then  --wait until unit fall really fast enough to start a brakes or just wait until "flightTimeFull" has passed. Useful for unit jumping up to a ledge where vertical velocity is already zero at the top.
 					spAddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
-					ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --give order during jump
+					
+					ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --reload the order given during jump. This override the unit's tendency to return to their jumping position
 					landed = true
+					if cob then
+						spCallCOBScript( unitID, "EndJump", 0)
+					else
+						Spring.UnitScript.CallAsUnit(unitID,env.endJump)--ie: stop rocket engine animation for jumping com, start landing explosion for sumo,  
+					end					
 					break
 				end
 			end
 			
 			Sleep() --wait until next gameFrame update
-		end
+		end --ended stuff that is expected to happen during time-Of-Flight. The rest happen if something unpredicted occur, like being thrown of course while jumping.
 		
-		if cob then
-			spCallCOBScript( unitID, "EndJump", 0)
-		else
-			Spring.UnitScript.CallAsUnit(unitID,env.endJump)
-		end
-
 		--lastJump[unitID] = spGetGameSeconds()
 		jumping[unitID] = false
 		SetLeaveTracks(unitID, true)
 		
 		--local reloadTimeInv = 1/reloadTime
-		for i=reloadSoFar, reloadTime do --continue updating reload information
+		for i=reloadSoFar, reloadTime do --continue updating reload information after unit land
 			spSetUnitRulesParam(unitID,"jumpReload",i*reloadTimeInv)
 			
 			if not Spring.ValidUnitID(unitID) then
@@ -572,21 +572,35 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 			end
 			
 			local x0, y0, z0 = spGetUnitPosition(unitID)
-			local _,dy,_  =Spring.GetUnitDirection (unitID)
-			if not landed and (abs(spGetGroundHeight(x0,z0) - y0) <20) and (abs(dy)<0.125) then --check whether unit has landed & whether it is landing on its feet, 
-				-- Spring.Echo(dy .. " dy")
-				local vx, vy,vz = Spring.GetUnitVelocity(unitID)
-				local dvx = 0 - vx --difference between 0 velocity and current velocity
-				local dvz = 0  - vz
-				local dvy = -0.144 - vy
-				spAddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
-				ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --give order during jump
+			if not landed and (abs(spGetGroundHeight(x0,z0) - y0) <20) then --check whether unit is not yet landed and whether is it approaching the ground
+				local dx,dy,dz  =Spring.GetUnitDirection (unitID)
+				local dxdz = math.sqrt(dx*dx + dz*dz) --hypothenus for xz direction
+				local dxdzdy = math.sqrt(dxdz*dxdz + dy*dy) --hypothenus for xzy direction
+				local angle = (math.atan2(dy/dxdzdy,dxdz/dxdzdy))*180/math.pi --convert ratio to radian then convert to degree
+				if (abs(angle)<40) then  --check whether it land on its feet 40 degree leaning forward or backward (+-180 degree is upside down)
+					local vx, vy,vz = Spring.GetUnitVelocity(unitID)
+					local dvx = 0 - vx --difference between 0 velocity and current velocity
+					local dvz = 0  - vz
+					local dvy = -0.144 - vy
+					dvx = math.min (abs(xVel) ,abs(dvx)) * (abs(dvx)/dvx) -- limit x impulse to as much as the launch's impulse (math.min), and multiply by its sign (abs(x)/x). So that unit is not entirely invulnerable to falling damage and has somekind of limit. 
+					dvy = math.min (abs(yVel) ,abs(dvy)) * (abs(dvy)/dvy)
+					dvz = math.min (abs(zVel) ,abs(dvy)) * (abs(dvz)/dvz)
+					spAddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
+				end
+				
+				ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --refresh unit's order
 				landed = true
+				if cob then
+					spCallCOBScript( unitID, "EndJump", 0)
+				else
+					Spring.UnitScript.CallAsUnit(unitID,env.endJump)--ie: stop rocket engine animation for jumping com, start landing explosion for sumo, create dramatic land animation for pyro
+				end				
 			end
 			
 			Sleep()
-		end
-		
+		end --ended stuff that would happen if unit thrown off course. The gadget will not break the fall after this point.
+
+		--[[ --let unit fall to death?
 		for i=0, 900, 1 do --wait for 30 more second for unit to land
 			if not Spring.ValidUnitID(unitID) then
 				break --unit died or dissappeared
@@ -603,17 +617,21 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 				local dvx = 0 - vx --difference between 0 velocity and current velocity
 				local dvz = 0 - vz
 				local dvy = -0.144 - vy
+				dvx = math.min (abs(xVel/2) ,abs(dvx)) * (abs(dvx)/dvx) -- limit x impulse to HALF as much as the launch impulse (math.min), and multiply by its sign (abs(x)/x). So that unit is not entirely invulnerable to falling damage and has somekind of limit. 
+				dvy = math.min (abs(yVel/2) ,abs(dvy)) * (abs(dvy)/dvy)
+				dvz = math.min (abs(zVel/2) ,abs(dvy)) * (abs(dvz)/dvz)
 				spAddUnitImpulse(unitID, dvx, dvy, dvz) --send braking impulse.
 				ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --give order during jump
-				landed = true
+				landed = true --mark unit as landed
 			end
 			
 			Sleep()
 		end
+		--]]
 		
 		jumps[coords] = jumps[coords] - 1 --tell CommandFallback that this jump coordinate has finish executing, and other unit can use it
 		unitCmdQueue[unitID] = nil
-	end
+	end --end the monitoring script
   
 	StartScript(JumpLoop)
 	return true
@@ -625,7 +643,7 @@ local function Jump(unitID, goal, cmdTag, coords, duplicateCoordCount)
 	goal[2]             = spGetGroundHeight(goal[1],goal[3])
 	local start         = {spGetUnitPosition(unitID)}
 
-	local extraJumpDelay = (isImpulseJump and duplicateCoordCount*30) or 0 
+	local extraJumpDelay = (isImpulseJump and duplicateCoordCount*27) or 0 
 	local unitDefID     = spGetUnitDefID(unitID)
 	local jumpDef       = jumpDefs[unitDefID]
 	local speed         = jumpDef.speed
@@ -779,10 +797,11 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
         return true, elseRemove -- command was used, remove it 
       else
         local r = landBoxSize*jumps[coords]^0.5/2
+		local randomAngle = random()*pi2 --select real number between 0 and pi2
         local randpos = {
-          cmdParams[1] + random(-r, r), --p/s: 'random(-r, r)' will select integer between -r and r, while 'random(-1,1)*r' will select either r or -r or 0 only,
+          cmdParams[1] + math.cos(randomAngle)*r, --p/s: 'random(-r, r)' will select integer between -r and r, 'random(-1,1)*r' will select integer r or -r or 0, 'random()*r' will select real number between 0 and r
           cmdParams[2],
-          cmdParams[3] + random(-r,r)}
+          cmdParams[3] + math.sin(randomAngle)*r}
 		local didJump, elseRemove = Jump(unitID, randpos, cmdTag, coords, jumps[coords])
 		jumps[coords] = jumps[coords] + 1
         if didJump then
