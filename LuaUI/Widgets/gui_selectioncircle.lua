@@ -170,7 +170,7 @@ function widget:DrawWorldPreUnit()
 
   if (type == 'unit') then
     local unitID = GetPlayerControlledUnit(GetMyPlayerID())
-    if (data ~= unitID) then
+    if (data ~= unitID and not GetUnitNoDraw(data)) then
       SetUnitColor(data)
       local radius = GetUnitRadius(data)
       if (radius) then

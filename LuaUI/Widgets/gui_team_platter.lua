@@ -206,7 +206,7 @@ if not spIsGUIHidden() then
   if visUnits then
     for i = 1, #visUnits do
       --if (spIsUnitVisible(visUnits[i])) then
-      if (not spGetUnitNoDraw(unitID)) then
+      if (not spGetUnitNoDraw(visUnits[i])) then
         local teamID = spGetUnitTeam(visUnits[i])
         if (teamID) then
           local udid = spGetUnitDefID(visUnits[i])
@@ -252,19 +252,21 @@ if not spIsGUIHidden() then
   glColor(1, 1, 1, alpha)
 
   for _,unitID in ipairs(spGetSelectedUnits()) do
-    local udid = spGetUnitDefID(unitID)
-    local radius = GetUnitDefRealRadius(udid)
-    if (radius) then
-      if (trackSlope and (not UnitDefs[udid].canFly)) then
-        local x, y, z = spGetUnitBasePosition(unitID)
-        local gx, gy, gz = spGetGroundNormal(x, z)
-        local degrot = acos(gy) * radInDeg
-        glDrawListAtUnit(unitID, circleLines, false,
-                         radius, 1.0, radius,
-                          degrot, gz, 0, -gx)
-      else
-        glDrawListAtUnit(unitID, circleLines, false,
-                         radius, 1.0, radius)
+    if (spIsUnitVisible(unitID) and not spGetUnitNoDraw(unitID)) then
+      local udid = spGetUnitDefID(unitID)
+      local radius = GetUnitDefRealRadius(udid)
+      if (radius) then
+        if (trackSlope and (not UnitDefs[udid].canFly)) then
+          local x, y, z = spGetUnitBasePosition(unitID)
+          local gx, gy, gz = spGetGroundNormal(x, z)
+          local degrot = acos(gy) * radInDeg
+          glDrawListAtUnit(unitID, circleLines, false,
+                           radius, 1.0, radius,
+                           degrot, gz, 0, -gx)
+        else
+          glDrawListAtUnit(unitID, circleLines, false,
+                           radius, 1.0, radius)
+        end
       end
     end
   end
