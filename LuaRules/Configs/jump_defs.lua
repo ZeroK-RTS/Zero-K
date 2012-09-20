@@ -116,7 +116,7 @@ corsktl = {
 -- this is just an error checking block, not our configuration area
 -- I know n^2, bite me... see error checking comment
 ------------------------------------------------------------------------------------------------------------------------------------------------
-Spring.Echo("Jump Jet Defs error checking begining..")
+Spring.Echo("Jump Jet Defs checking begining...")
 for groupId,groupcluster in pairs(jumpClassGroups) do
 
 	for i=1,#groupcluster do
@@ -173,7 +173,7 @@ for groupId,groupcluster in pairs(jumpClassGroups) do
 	end
 	
 end
-Spring.Echo(".. Jump Jet Defs error checking complete")	
+Spring.Echo(".. Jump Jet Defs checking complete")	
 ------------------------------------------------------------------------------------------------------------------------------------------------
 -- This section allows for overrides, when inidvidual units need to be slightly different but don't justify their own class
 -- 
