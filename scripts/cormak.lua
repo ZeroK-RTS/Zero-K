@@ -132,23 +132,25 @@ end
 local spGetUnitWeaponState = Spring.GetUnitWeaponState
 local spSetUnitWeaponState = Spring.SetUnitWeaponState
 local spGetGameFrame = Spring.GetGameFrame
-local RELOAD_FRAMES = 27
+
+local waveWeaponDef = WeaponDefNames["cormak_blast"]
+local WAVE_RELOAD   = math.ceil( waveWeaponDef.reload * Game.gameSpeed ) -- 27
+local WAVE_TIMEOUT  = math.ceil( waveWeaponDef.damageAreaOfEffect / waveWeaponDef.explosionSpeed ) + 1 -- empirically maximum delay of damage was  (damageAreaOfEffect / explosionSpeed) - 4  frames
+local lastWaveFrame = -WAVE_TIMEOUT
 
 function AutoAttack_Thread()
 	Signal(SIG_ACTIVATE)
 	SetSignalMask(SIG_ACTIVATE)
 	while true do
 		Sleep(100)
-		local reloaded = select(2,spGetUnitWeaponState(unitID,2))
+		local reloaded = select(2, spGetUnitWeaponState(unitID,2))
 		if reloaded then
-			local frame
-			local reloadMult = GG.att_reload[unitID]
-			if reloadMult then
-				frame = spGetGameFrame()+RELOAD_FRAMES/reloadMult
-			else
-				frame = spGetGameFrame()+RELOAD_FRAMES
-			end
-			spSetUnitWeaponState(unitID,2,{reloadFrame = frame})
+			local gameFrame   = spGetGameFrame()
+			local reloadMult  = GG.att_reload[unitID] or 1.0
+			local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
+			spSetUnitWeaponState(unitID, 2, {reloadFrame = reloadFrame} )
+			
+			lastWaveFrame = gameFrame
 			EmitSfx( emit,  UNIT_SFX1 )
 			EmitSfx( emit,  DETO_W2 )
 		end
@@ -173,6 +175,7 @@ end
 
 function script.FireWeapon(num)
 	if num == 3 then
+		lastWaveFrame = spGetGameFrame()
 		EmitSfx( emit,  UNIT_SFX1 )
 		EmitSfx( emit,  DETO_W2 )
 	end
@@ -190,7 +193,7 @@ function script.QueryWeapon(num)
 	return emit
 end
 
-function script.Killed(recentDamage, maxHealth)
+local function Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if  severity <= .25  then
 		Explode(base, sfxNone)
@@ -235,4 +238,46 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(Lfoot, sfxNone)
 		return 2
 	end
+end
+
+function script.Killed(recentDamage, maxHealth)
+  -- spawn debris etc.
+  local wreckLevel = Killed(recentDamage, maxHealth)
+  
+  local framesUntilLastWave = (lastWaveFrame + WAVE_TIMEOUT) - spGetGameFrame()
+  
+  if (framesUntilLastWave <= 0) then -- no active waves left, no need for hax
+    return wreckLevel
+  else
+    local ud = UnitDefs[unitDefID]
+    local x, y, z = Spring.GetUnitPosition(unitID)
+    
+    -- hide unit
+    Spring.SetUnitNoSelect(unitID, true)
+    Spring.SetUnitNoDraw(unitID, true)
+    Spring.SetUnitNoMinimap(unitID, true)
+    Spring.SetUnitSensorRadius(unitID, "los", 0)
+    Spring.SetUnitSensorRadius(unitID, "airLos", 0)
+    Spring.MoveCtrl.Enable(unitID, true)
+    Spring.MoveCtrl.SetNoBlocking(unitID, true)
+    Spring.MoveCtrl.SetPosition(unitID, x, Spring.GetGroundHeight(x, z) - 1000, z)
+    
+    -- spawn wreck
+    local wreckDef = FeatureDefNames[ ud.wreckName ]
+    while (wreckLevel > 1 and wreckDef) do
+      wreckDef   = FeatureDefNames[ wreckDef.deathFeature ]
+      wreckLevel = wreckLevel - 1
+    end
+    if (wreckDef) then
+      local heading   = Spring.GetUnitHeading(unitID)
+      local teamID    = Spring.GetUnitTeam(unitID)
+      local featureID = Spring.CreateFeature(wreckDef.id, x, y, z, heading, teamID)
+      Spring.SetFeatureResurrect(featureID, ud.name)
+      -- engine also sets speed and smokeTime for wrecks, but there are no lua functions for these
+    end
+    
+    Sleep(framesUntilLastWave * (1000 / Game.gameSpeed)) -- wait until all waves hit
+    
+    return 10 -- don't spawn second wreck
+  end
 end

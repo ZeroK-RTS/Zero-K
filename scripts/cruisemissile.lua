@@ -7,6 +7,7 @@ function script.AimWeapon1(heading, pitch) return true end
 local function RemoveMissile()
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)
+	Spring.SetUnitNoMinimap(unitID, true)
 	Spring.SetUnitHealth(unitID, {paralyze=99999999})
 	Spring.SetUnitCloak(unitID, 4)
 	Spring.SetUnitStealth(unitID, true)	
