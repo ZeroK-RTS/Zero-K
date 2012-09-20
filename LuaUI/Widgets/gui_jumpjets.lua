@@ -12,8 +12,8 @@ function widget:GetInfo()
   return {
     name      = "Jumpjet GUI",
     desc      = "Draws jump arc.",
-    author    = "quantum",
-    date      = "May 30, 2008",
+    author    = "quantum", -- Impulse Jump drawing function by msafwan. 
+    date      = "May 30 2008, Sept 20 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 10000,
     enabled   = true,
@@ -44,6 +44,7 @@ local spGetSelectedUnits       = Spring.GetSelectedUnits
 local spGetUnitDefID           = Spring.GetUnitDefID
 local spGetUnitPosition        = Spring.GetUnitPosition
 local spTraceScreenRay         = Spring.TraceScreenRay
+local spGetGroundHeight        = Spring.GetGroundHeight
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -87,9 +88,8 @@ curve = ListToSet(curve)
 line  = ListToSet(line)
 
 local lastJump = {}
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+local vertexCache1 ={} --used only by "DrawImpulseJumpGroundCircle()" to cache vertex
+local positionCompare = {} --same as "vertexCache1" ^
 
 local function GetDist3(a, b)
   return ((a[1] - b[1])^2 + (a[2] - b[2])^2 + (a[3] - b[3])^2)^0.5
@@ -104,23 +104,7 @@ end
 local function DrawLoop(start, vector, color, progress, step, height)
 	glColor(color[1], color[2], color[3], color[4])
 	if isImpulseJump then
-		local art_Grav = Game.gravity/30/30 --get any game gravity.
-		local art_yVel = (4*(-art_Grav/2)*(-height))^0.5 --determinant is set to 0. See unit_jumpjets.lua for more info.
-		local art_flightTimeApex = -art_yVel/(2*(-art_Grav/2)) --get the single root for parabola (quadratic) equation 
-		local distance = GetDist2({0,0,0}, vector)
-		--local art_xzVel_est =  distance/(art_flightTimeApex*2)
-		local targetHeight = math.min(height-1, vector[2]) --choose either the ceiling height or the target height
-		local art_flightTimeFull =(-art_yVel - (art_yVel^2 - 4*(-art_Grav/2)*(-vector[2]))^0.5)/(2*(-art_Grav/2)) --equation for finding root for parabola
-		local art_xzVel = distance/art_flightTimeFull --distance = horizontalSpeed*flightTime rearranged
-		local art_directionxz = math.atan2(vector[3]/distance, vector[1]/distance) --get direction in angle (radian)
-		local art_xVel = math.cos(art_directionxz)*art_xzVel --convert horizontal speed into x and z component
-		local art_zVel = math.sin(art_directionxz)*art_xzVel
-		for i=0, art_flightTimeFull, 1 do	--draw each point in the parabola at 1 frame step.
-			local x = start[1] + art_xVel*i
-			local y = start[2] + art_yVel*i -art_Grav*i*i/2
-			local z = start[3] + art_zVel*i
-			glVertex(x, y, z)
-		end
+		DrawImpulseJumpArc(start,vector, height)
 	else
 		for i=progress, 1, step do
 			local x = start[1] + vector[1]*i
@@ -132,27 +116,30 @@ local function DrawLoop(start, vector, color, progress, step, height)
 	end
 end
 
-
 local function DrawArc(unitID, start, finish, color, jumpFrame, range, isEstimate)
 
-  -- todo: display lists
+	-- todo: display lists
+
+	local step
+	local progress
+	local vector       = {}
+
+	local unitDefID    = spGetUnitDefID(unitID)
+	local height       = jumpDefs[unitDefID].height
+
+	for i=1, 3 do
+		vector[i]        = finish[i] - start[i]
+	end
   
-  local step
-  local progress
-  local vector       = {}
-  
-  local unitDefID    = spGetUnitDefID(unitID)
-  local height       = jumpDefs[unitDefID].height
-  
-  for i=1, 3 do
-    vector[i]        = finish[i] - start[i]
-  end
-  
-  if (range) then
-	local col = isEstimate and orange or yellow
-    glColor(col[1], col[2], col[3], col[4])
-    glDrawGroundCircle(start[1], start[2], start[3], range, 100)
-  end
+	if (range) then --draw range on the ground
+		local col = isEstimate and orange or yellow
+		glColor(col[1], col[2], col[3], col[4])
+		if isImpulseJump then --draw range limited by height
+			DrawImpulseJumpGroundCircle (unitID,height,start,range)
+		else --draw range at all height
+			glDrawGroundCircle(start[1], start[2], start[3], range, 100)
+		end
+	end
   
   if (jumpFrame) then
     local vertex     = {}
@@ -296,6 +283,8 @@ end
 
 function widget:UnitDestroyed(unitID)
   lastJump[unitID] = nil
+  positionCompare[unitID] = nil --used by impulse jump only
+  vertexCache1[unitID] = nil --same ^^
 end
 
 
@@ -321,6 +310,121 @@ function widget:DrawWorld()
       DrawMouseArc(units[i], shift, category == 'ground' and arg)
     end
   end
+end
+
+
+--------------------------------------------------------------------------------
+--Impulse Jump specialized draw function----------------------------------------------
+
+--//this function draw the impulse jump range by calling "RecursiveTerrainScan()" and cache the vertex used when unit is not moving.
+function DrawImpulseJumpGroundCircle (unitID,height,start,range)
+	positionCompare[unitID] = positionCompare[unitID] or {-1,-1,-1}
+	vertexCache1[unitID] = vertexCache1[unitID] or {}
+	local vertexes = {}
+	local samePos =(positionCompare[unitID][1]==start[1] and 
+					positionCompare[unitID][2]==start[2] and 
+					positionCompare[unitID][3]==start[3])
+	if samePos then
+		for i=1, #vertexCache1[unitID], 1 do --if same position then copy vertex from vertex cache
+			if vertexCache1[unitID][i].segment == nil then
+				break ----break when reach the end, else it will continue to copy old vertexes too..
+			end
+			vertexes[i] = {vertexCache1[unitID][i][1], vertexCache1[unitID][i][2], vertexCache1[unitID][i][3], segment = vertexCache1[unitID][i].segment}
+		end
+	else --if unit is moving then calculate new vertex
+		local circleDivs = 70
+		local startSegment = 0
+		local maxHeight = height + spGetGroundHeight(start[1],start[3])
+		vertexes = RecursiveTerrainScan(startSegment, circleDivs, circleDivs, range, start,maxHeight, 0)
+		circleDivs, startSegment, maxHeight = nil, nil, nil
+		
+		for i=1, #vertexes do --cache vertex
+			vertexCache1[unitID][i] = {vertexes[i][1], vertexes[i][2], vertexes[i][3], segment = vertexes[i].segment}
+			vertexCache1[unitID][i+1] = { nil, nil, nil, segment=nil}
+		end
+		positionCompare[unitID] = {start[1], start[2] ,start[3]}
+	end
+	-- [[ GL.LINE_LOOP or GL_LINE_STRIP?
+	glBeginEnd(GL_LINE_STRIP, function() --draw
+								for i = 1, #vertexes do
+									if vertexes[i][1] and vertexes[i][2] and vertexes[i][3] then --nil check because "RecursiveTerrainScan" still return some nil, can't fix for now.
+										glVertex(vertexes[i][1], vertexes[i][2], vertexes[i][3])
+									end
+								end
+							end)--]]
+end
+
+--//this function draw the impulse jump arc using the same equation as used in "unit_jumpjet.lua" gadget.
+local cache1 = {}
+function DrawImpulseJumpArc(start,vector, height)
+
+	local art_Grav = 1 -- Game.gravity/30/30 --get any game gravity.
+	local art_yVel = (cache1[height]) or (4*(-art_Grav/2)*(-height))^0.5 --determinant is set to 0. See unit_jumpjets.lua for more info.
+	--local art_flightTimeApex = -art_yVel/(2*(-art_Grav/2)) --get the single root for parabola (quadratic) equation 
+	local distance = 			GetDist2({0,0,0}, vector)
+	--local art_xzVel_est =		distance/(art_flightTimeApex*2)
+	local targetHeight = 		math.min(height-1, vector[2]) --choose either the ceiling height or the target height
+	local art_flightTimeFull =	(-art_yVel - (art_yVel^2 - 4*(-art_Grav/2)*(-vector[2]))^0.5)/(2*(-art_Grav/2)) --equation for finding root for parabola
+	local art_xzVel = 			distance/art_flightTimeFull --distance = horizontalSpeed*flightTime rearranged
+	local art_directionxz = 	math.atan2(vector[3]/distance, vector[1]/distance) --get direction in angle (radian)
+	local art_xVel = 			math.cos(art_directionxz)*art_xzVel --convert horizontal speed into x and z component
+	local art_zVel = 			math.sin(art_directionxz)*art_xzVel
+	
+	for i=0, art_flightTimeFull, 1 do	--draw each point in the parabola at 1 frame step.
+		local x = start[1] + art_xVel*i
+		local y = start[2] + art_yVel*i -art_Grav*i*i/2
+		local z = start[3] + art_zVel*i
+		glVertex(x, y, z)
+	end
+	
+	cache1[height] = art_yVel
+	art_Grav, art_yVel, art_flightTimeApex, distance, targetHeight = nil, nil, nil, nil, nil
+	art_flightTimeFull, art_xzVel, art_directionxz, art_xVel, art_zVel = nil, nil, nil, nil, nil
+end
+
+--//This function draw a circle and then will recursively map any terrain that cause a gap in the circle. This mapping will be used as vertex. (The gap happens when terrain exceed the maxHeight where the circle intersect). 
+function RecursiveTerrainScan(startSeg, endSeg, circleDivs1, range1, startPos, maxHeight, currentDepth)
+	currentDepth = currentDepth + 1
+	if currentDepth > 100 then 
+		return {{}} --if it is going too deep then then it just doesn't make sense, so return.
+	end 
+	
+	local vertexAndAngle = {}
+	local wasEmpty = false
+	for i = startSeg, endSeg,1 do --create vertex of circle. Copied from "minimap_event.lua" by trepan/Dave Rodgers, thanks.
+		local angle = 2.0 * math.pi * (i / circleDivs1)
+		local cosv = math.cos(angle)*range1 + startPos[1]
+		local sinv = math.sin(angle)*range1 + startPos[3]
+		local groundHeight = spGetGroundHeight(cosv,sinv)
+		if groundHeight < maxHeight then --only vertex within max height is included
+			vertexAndAngle[#vertexAndAngle+1] = {cosv, groundHeight, sinv, segment = i}
+			wasEmpty = false
+		elseif (not wasEmpty) then --include empty vertex once to indicate empty space
+			vertexAndAngle[#vertexAndAngle+1] = {nil, nil, nil, segment = i} --indicate that this vertex is over the max height and need to be revised
+			wasEmpty = true
+		end
+	end
+	
+	local inBtwnEmptyVrtx = {}
+	for i=1, #vertexAndAngle, 1 do --fill in the empty vertexes
+		if vertexAndAngle[i][1] == nil then --if vertexAndAngle[i] is empty, then it mean it need to be filled with real values
+			local nextSegment = (i<#vertexAndAngle and vertexAndAngle[i+1].segment) or endSeg --select the i+1 segment or use end's segment
+			inBtwnEmptyVrtx[1] = nil --we make sure the first content is empty so that the table lenght is resetted to 0 whenever we re-use this table.
+			inBtwnEmptyVrtx = RecursiveTerrainScan(vertexAndAngle[i].segment, nextSegment, circleDivs1, range1-10, startPos,maxHeight, currentDepth)
+			if inBtwnEmptyVrtx[1][1] then
+				vertexAndAngle[i]={inBtwnEmptyVrtx[1][1],inBtwnEmptyVrtx[1][2],inBtwnEmptyVrtx[1][3], segment= inBtwnEmptyVrtx[1].segment} -- replace vertexAndAngle[i] that contain nil
+				local indexToBeSandwiched = i+1
+				for j=2, #inBtwnEmptyVrtx, 1 do
+					table.insert(vertexAndAngle, indexToBeSandwiched, inBtwnEmptyVrtx[j])
+					indexToBeSandwiched = indexToBeSandwiched + 1
+				end
+			else --an extremely rare case where we don't even get a result after millions of recursive depth
+				table.remove(vertexAndAngle, i) -- delete vertexAndAngle[i] that contain nil
+			end
+		end
+	end
+	
+	return vertexAndAngle --we return result to upper recursive level
 end
 
 --------------------------------------------------------------------------------
