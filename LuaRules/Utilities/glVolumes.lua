@@ -3,8 +3,10 @@
 -- Exported Functions:
 --  gl.Utilities.DrawMyBox(minX,minY,minZ, maxX,maxY,maxZ)
 --  gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
+--  gl.Utilities.DrawMyHollowCylinder(x,y,z, height,radius,innerRadius,divs)
 --  gl.Utilities.DrawGroundRectangle(x1,z1,x2,z2)
 --  gl.Utilities.DrawGroundCircle(x,z,radius)
+--  gl.Utilities.DrawGroundHollowCircle(x,z,radius,innerRadius)
 --  gl.Utilities.DrawVolume(vol_dlist)
 
 --------------------------------------------------------------------------------
@@ -23,6 +25,7 @@ local min    = math.min
 local max    = math.max
 local sin    = math.sin
 local cos    = math.cos
+local floor  = math.floor
 local TWO_PI = math.pi * 2
 
 local glVertex = gl.Vertex
@@ -126,6 +129,50 @@ function gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
 end
 
 
+function gl.Utilities.DrawMyHollowCylinder(x,y,z, height,radius,inRadius,divs)
+  divs = divs or 25
+  local sinTable, cosTable = CreateSinCosTable(divs)
+  local bottomY = y - (height / 2)
+  local topY    = y + (height / 2)
+
+  gl.BeginEnd(GL.TRIANGLE_STRIP, function()
+    --// top
+    for i = 1, #sinTable do
+      local sa = sinTable[i]
+      local ca = cosTable[i]
+      glVertex(x + inRadius*sa, topY, z + inRadius*ca)
+      glVertex(x +   radius*sa, topY, z +   radius*ca)
+    end
+
+    --// sides
+    for i = 1, #sinTable do
+      local rx = x + radius * sinTable[i]
+      local rz = z + radius * cosTable[i]
+      glVertex(rx, topY   , rz)
+      glVertex(rx, bottomY, rz)
+    end
+
+    --// bottom
+    for i = 1, #sinTable do
+      local sa = sinTable[i]
+      local ca = cosTable[i]
+      glVertex(x +   radius*sa, bottomY, z +   radius*ca)
+      glVertex(x + inRadius*sa, bottomY, z + inRadius*ca)
+    end
+
+    if (inRadius > 0) then
+      --// inner sides
+      for i = 1, #sinTable do
+        local rx = x + inRadius * sinTable[i]
+        local rz = z + inRadius * cosTable[i]
+        glVertex(rx, bottomY, rz)
+        glVertex(rx, topY   , rz)
+      end
+    end
+  end)
+end
+
+
 local heightMargin = 2000
 local minheight, maxheight = Spring.GetGroundExtremes()  --the returned values do not change even if we terraform the map
 local averageGroundHeight = (minheight + maxheight) / 2
@@ -146,6 +193,33 @@ function gl.Utilities.DrawGroundCircle(x,z,radius)
   gl.Translate(x, averageGroundHeight, z)
   gl.Scale(radius, shapeHeight, radius)
   gl.Utilities.DrawVolume(cylinder)
+  gl.PopMatrix()
+end
+
+
+local hollowCylinders = {
+  [ 0 ] = cylinder,
+}
+local function GetHollowCylinder(radius, innerRadius)
+  if (innerRadius >= 1) then
+    innerRadius = min(innerRadius / radius, 1.0)
+  end
+  innerRadius = floor(innerRadius * 100 + 0.5) / 100
+
+  if (not hollowCylinders[innerRadius]) then
+    hollowCylinders[innerRadius] = gl.CreateList(gl.Utilities.DrawMyHollowCylinder,0,0,0,1,1,innerRadius,35)
+  end
+  return hollowCylinders[innerRadius]
+end
+
+--// when innerRadius is < 1, its value is treated as relative to radius
+--// when innerRadius is >=1, its value is treated as absolute value in elmos
+function gl.Utilities.DrawGroundHollowCircle(x,z,radius,innerRadius)
+  local hollowCylinder = GetHollowCylinder(radius, innerRadius)
+  gl.PushMatrix()
+  gl.Translate(x, averageGroundHeight, z)
+  gl.Scale(radius, shapeHeight, radius)
+  gl.Utilities.DrawVolume(hollowCylinder)
   gl.PopMatrix()
 end
 
