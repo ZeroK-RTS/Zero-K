@@ -26,12 +26,12 @@ local TWO_PI = math.pi * 2
 
 local glVertex = gl.Vertex
 
-GL.KEEP = 0x1E00
+GL.KEEP      = 0x1E00
 GL.INCR_WRAP = 0x8507
 GL.DECR_WRAP = 0x8508
-GL.INCR = 0x1E02
-GL.DECR = 0x1E03
-GL.INVERT = 0x150A
+GL.INCR      = 0x1E02
+GL.DECR      = 0x1E03
+GL.INVERT    = 0x150A
 
 local stencilBit1 = 0x01
 local stencilBit2 = 0x10
@@ -42,29 +42,29 @@ local stencilBit2 = 0x10
 function gl.Utilities.DrawMyBox(minX,minY,minZ, maxX,maxY,maxZ)
   gl.BeginEnd(GL.QUADS, function()
     --// top
-    glVertex(minX, maxY, minZ);
-    glVertex(maxX, maxY, minZ);
-    glVertex(maxX, maxY, maxZ);
-    glVertex(minX, maxY, maxZ);
+    glVertex(minX, maxY, minZ)
+    glVertex(maxX, maxY, minZ)
+    glVertex(maxX, maxY, maxZ)
+    glVertex(minX, maxY, maxZ)
     --// bottom
-    glVertex(minX, minY, minZ);
-    glVertex(minX, minY, maxZ);
-    glVertex(maxX, minY, maxZ);
-    glVertex(maxX, minY, minZ);
-  end);
+    glVertex(minX, minY, minZ)
+    glVertex(minX, minY, maxZ)
+    glVertex(maxX, minY, maxZ)
+    glVertex(maxX, minY, minZ)
+  end)
   gl.BeginEnd(GL.QUAD_STRIP, function()
     --// sides
-    glVertex(minX, minY, minZ);
-    glVertex(minX, maxY, minZ);
-    glVertex(minX, minY, maxZ);
-    glVertex(minX, maxY, maxZ);
-    glVertex(maxX, minY, maxZ);
-    glVertex(maxX, maxY, maxZ);
-    glVertex(maxX, minY, minZ);
-    glVertex(maxX, maxY, minZ);
-    glVertex(minX, minY, minZ);
-    glVertex(minX, maxY, minZ);
-  end);
+    glVertex(minX, minY, minZ)
+    glVertex(minX, maxY, minZ)
+    glVertex(minX, minY, maxZ)
+    glVertex(minX, maxY, maxZ)
+    glVertex(maxX, minY, maxZ)
+    glVertex(maxX, maxY, maxZ)
+    glVertex(maxX, minY, minZ)
+    glVertex(maxX, maxY, minZ)
+    glVertex(minX, minY, minZ)
+    glVertex(minX, maxY, minZ)
+  end)
 end
 
 
@@ -84,14 +84,14 @@ function gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
 
       local sa = sin(alpha)
       local ca = cos(alpha)
-      glVertex(x+radius*sa, y+halfHeight, z+radius*ca);
-      glVertex(x, y+halfHeight, z);
+      glVertex(x+radius*sa, y+halfHeight, z+radius*ca)
+      glVertex(x, y+halfHeight, z)
     until (alpha >= TWO_PI)
 
     --// degenerate
-    glVertex(x, y+halfHeight, z);
-    glVertex(x, y-halfHeight, z);
-    glVertex(x, y-halfHeight, z);
+    glVertex(x, y+halfHeight, z)
+    glVertex(x, y-halfHeight, z)
+    glVertex(x, y-halfHeight, z)
 
     --// bottom
     alpha = divAngle
@@ -101,14 +101,14 @@ function gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
 
       local sa = sin(alpha)
       local ca = cos(alpha)
-      glVertex(x+radius*sa, y-halfHeight, z+radius*ca);
-      glVertex(x, y-halfHeight, z);
+      glVertex(x+radius*sa, y-halfHeight, z+radius*ca)
+      glVertex(x, y-halfHeight, z)
     until (alpha <= -TWO_PI)
 
     --// degenerate
-    glVertex(x, y-halfHeight, z);
-    glVertex(x, y-halfHeight, z+radius);
-    glVertex(x, y-halfHeight, z+radius);
+    glVertex(x, y-halfHeight, z)
+    glVertex(x, y-halfHeight, z+radius)
+    glVertex(x, y-halfHeight, z+radius)
 
     --// sides
     alpha = -divAngle
@@ -118,10 +118,10 @@ function gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
 
       local sa = sin(alpha)
       local ca = cos(alpha)
-      glVertex(x+radius*sa, y+halfHeight, z+radius*ca);
-      glVertex(x+radius*sa, y-halfHeight, z+radius*ca);
+      glVertex(x+radius*sa, y+halfHeight, z+radius*ca)
+      glVertex(x+radius*sa, y-halfHeight, z+radius*ca)
     until (alpha >= TWO_PI)
-  end);
+  end)
 end
 
 
@@ -152,33 +152,33 @@ end
 --------------------------------------------------------------------------------
 
 function gl.Utilities.DrawVolume(vol_dlist)
-  gl.DepthMask(false);
-  if (gl.DepthClamp) then gl.DepthClamp(true); end
-  gl.StencilTest(true);
+  gl.DepthMask(false)
+  if (gl.DepthClamp) then gl.DepthClamp(true) end
+  gl.StencilTest(true)
 
-  gl.Culling(false);
-  gl.DepthTest(true);
-  gl.ColorMask(false, false, false, false);
-  gl.StencilOp(GL.KEEP, GL.INCR, GL.KEEP);
-  --gl.StencilOp(GL.KEEP, GL.INVERT, GL.KEEP);
-  gl.StencilMask(3);
-  gl.StencilFunc(GL.ALWAYS, 0, 0);
-
-  gl.CallList(vol_dlist)
-
-  gl.Culling(GL.FRONT);
-  gl.DepthTest(false);
-  gl.ColorMask(true, true, true, true);
-  gl.StencilOp(GL.ZERO, GL.ZERO, GL.ZERO);
-  gl.StencilMask(3);
-  gl.StencilFunc(GL.NOTEQUAL, 0, 0+1);
+  gl.Culling(false)
+  gl.DepthTest(true)
+  gl.ColorMask(false, false, false, false)
+  gl.StencilOp(GL.KEEP, GL.INCR, GL.KEEP)
+  --gl.StencilOp(GL.KEEP, GL.INVERT, GL.KEEP)
+  gl.StencilMask(3)
+  gl.StencilFunc(GL.ALWAYS, 0, 0)
 
   gl.CallList(vol_dlist)
 
-  if (gl.DepthClamp) then gl.DepthClamp(false); end
-  gl.StencilTest(false);
-  gl.DepthTest(true);
-  gl.Culling(false);
+  gl.Culling(GL.FRONT)
+  gl.DepthTest(false)
+  gl.ColorMask(true, true, true, true)
+  gl.StencilOp(GL.ZERO, GL.ZERO, GL.ZERO)
+  gl.StencilMask(3)
+  gl.StencilFunc(GL.NOTEQUAL, 0, 0+1)
+
+  gl.CallList(vol_dlist)
+
+  if (gl.DepthClamp) then gl.DepthClamp(false) end
+  gl.StencilTest(false)
+  gl.DepthTest(true)
+  gl.Culling(false)
 end
 
 --------------------------------------------------------------------------------
