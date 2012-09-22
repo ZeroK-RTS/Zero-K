@@ -47,27 +47,27 @@ function gl.Utilities.DrawMyBox(minX,minY,minZ, maxX,maxY,maxZ)
   gl.BeginEnd(GL.QUADS, function()
     --// top
     glVertex(minX, maxY, minZ)
-    glVertex(maxX, maxY, minZ)
-    glVertex(maxX, maxY, maxZ)
     glVertex(minX, maxY, maxZ)
+    glVertex(maxX, maxY, maxZ)
+    glVertex(maxX, maxY, minZ)
     --// bottom
     glVertex(minX, minY, minZ)
-    glVertex(minX, minY, maxZ)
-    glVertex(maxX, minY, maxZ)
     glVertex(maxX, minY, minZ)
+    glVertex(maxX, minY, maxZ)
+    glVertex(minX, minY, maxZ)
   end)
   gl.BeginEnd(GL.QUAD_STRIP, function()
     --// sides
-    glVertex(minX, minY, minZ)
     glVertex(minX, maxY, minZ)
-    glVertex(minX, minY, maxZ)
+    glVertex(minX, minY, minZ)
     glVertex(minX, maxY, maxZ)
-    glVertex(maxX, minY, maxZ)
+    glVertex(minX, minY, maxZ)
     glVertex(maxX, maxY, maxZ)
-    glVertex(maxX, minY, minZ)
+    glVertex(maxX, minY, maxZ)
     glVertex(maxX, maxY, minZ)
-    glVertex(minX, minY, minZ)
+    glVertex(maxX, minY, minZ)
     glVertex(minX, maxY, minZ)
+    glVertex(minX, minY, minZ)
   end)
 end
 
@@ -178,8 +178,12 @@ local minheight, maxheight = Spring.GetGroundExtremes()  --the returned values d
 local averageGroundHeight = (minheight + maxheight) / 2
 local shapeHeight = heightMargin + (maxheight - minheight) + heightMargin
 
-local box = gl.CreateList(gl.Utilities.DrawMyBox,0,0.5,0,1,0.5,1)
+local box = gl.CreateList(gl.Utilities.DrawMyBox,0,-0.5,0,1,0.5,1)
 function gl.Utilities.DrawGroundRectangle(x1,z1,x2,z2)
+  if (type(x1) == "table") then
+    local rect = x1
+    x1,z1,x2,z2 = rect[1],rect[2],rect[3],rect[4]
+  end
   gl.PushMatrix()
   gl.Translate(x1, averageGroundHeight, z1)
   gl.Scale(x2-x1, shapeHeight, z2-z1)
@@ -236,7 +240,7 @@ function gl.Utilities.DrawVolume(vol_dlist)
   gl.ColorMask(false, false, false, false)
   gl.StencilOp(GL.KEEP, GL.INCR, GL.KEEP)
   --gl.StencilOp(GL.KEEP, GL.INVERT, GL.KEEP)
-  gl.StencilMask(3)
+  gl.StencilMask(0x11)
   gl.StencilFunc(GL.ALWAYS, 0, 0)
 
   gl.CallList(vol_dlist)
@@ -245,7 +249,7 @@ function gl.Utilities.DrawVolume(vol_dlist)
   gl.DepthTest(false)
   gl.ColorMask(true, true, true, true)
   gl.StencilOp(GL.ZERO, GL.ZERO, GL.ZERO)
-  gl.StencilMask(3)
+  gl.StencilMask(0x11)
   gl.StencilFunc(GL.NOTEQUAL, 0, 0+1)
 
   gl.CallList(vol_dlist)
