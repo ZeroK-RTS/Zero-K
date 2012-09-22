@@ -50,7 +50,6 @@ function widget:Initialize()
 		width = '50%',
 		align="left",
 		valign="ascender",
-		lineSpacing = 0,
 		--itemPadding  = {5,5,5,5},
 		--itemMargin  = {1,1,1,1},
 		text = tx,

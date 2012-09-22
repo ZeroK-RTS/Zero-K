@@ -83,7 +83,6 @@ function WG.ShowMessageBox(text, width, height, fontsize, pause)
             align="left",
             fontsize = fontsize or 16,
             padding = {5, 5, 5, 5},
-            lineSpacing = 0,
             fontOutline = true,
           },
         },
@@ -190,7 +189,6 @@ function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 		align   = "left";
 		width = (width - x - 12),
 		padding = {5, 5, 5, 5},
-		lineSpacing = 0,
 		font    = {
 			size   = fontsize or 12;
 			shadow = true;
@@ -238,7 +236,6 @@ local function ShowConvoBox(data)
 	  shadow = true,
 	},
         padding = {5, 5, 5, 5},
-        lineSpacing = 0,
       },
     }
   }
