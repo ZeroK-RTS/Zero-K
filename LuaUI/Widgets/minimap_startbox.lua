@@ -16,14 +16,14 @@ function widget:GetInfo()
   return {
     name      = "MiniMap Start Boxes",
     desc      = "MiniMap Start Boxes",
-    author    = "trepan, jK",
-    date      = "2007-2009",
+    author    = "trepan, jK, Rafal",
+    date      = "2007-2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
   }
 end
--- version: 1.01
+-- version: 1.02
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -37,6 +37,8 @@ local drawGroundQuads = true
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Utilities/glVolumes.lua")
+
 local gl = gl  --  use a local copy for faster access
 
 local msx = Game.mapSizeX
@@ -44,8 +46,12 @@ local msz = Game.mapSizeZ
 
 local xformList = 0
 local coneList = 0
-local startboxDListStencil = 0
-local startboxDListColor = 0
+
+local allyStartBox    = nil
+local enemyStartBoxes = {}
+
+local allyStartBoxColor  = { 0, 1, 0, 0.3 }  -- green
+local enemyStartBoxColor = { 1, 0, 0, 0.3 }  -- red
 
 local gaiaTeamID
 local gaiaAllyTeamID
@@ -55,49 +61,6 @@ local startTimer = Spring.GetTimer()
 
 local texName = LUAUI_DIRNAME .. 'Images/highlight_strip.png'
 local texScale = 512
-
---------------------------------------------------------------------------------
-
-GL.KEEP = 0x1E00
-GL.INCR_WRAP = 0x8507
-GL.DECR_WRAP = 0x8508
-GL.INCR = 0x1E02
-GL.DECR = 0x1E03
-GL.INVERT = 0x150A
-
-local stencilBit1 = 0x01
-local stencilBit2 = 0x10
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local function DrawMyBox(minX,minY,minZ, maxX,maxY,maxZ)
-  gl.BeginEnd(GL.QUADS, function()
-    --// top
-    gl.Vertex(minX, maxY, minZ);
-    gl.Vertex(maxX, maxY, minZ);
-    gl.Vertex(maxX, maxY, maxZ);
-    gl.Vertex(minX, maxY, maxZ);
-    --// bottom
-    gl.Vertex(minX, minY, minZ);
-    gl.Vertex(minX, minY, maxZ);
-    gl.Vertex(maxX, minY, maxZ);
-    gl.Vertex(maxX, minY, minZ);
-  end);
-  gl.BeginEnd(GL.QUAD_STRIP, function()
-    --// sides
-    gl.Vertex(minX, minY, minZ);
-    gl.Vertex(minX, maxY, minZ);
-    gl.Vertex(minX, minY, maxZ);
-    gl.Vertex(minX, maxY, maxZ);
-    gl.Vertex(maxX, minY, maxZ);
-    gl.Vertex(maxX, maxY, maxZ);
-    gl.Vertex(maxX, minY, minZ);
-    gl.Vertex(maxX, maxY, minZ);
-    gl.Vertex(minX, minY, minZ);
-    gl.Vertex(minX, maxY, minZ);
-  end);
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -140,51 +103,21 @@ function widget:Initialize()
   end)
 
   if (drawGroundQuads) then
-    startboxDListStencil = gl.CreateList(function()
-      local minY,maxY = Spring.GetGroundExtremes()
-      minY = minY - 200; maxY = maxY + 100;
-      for _,at in ipairs(Spring.GetAllyTeamList()) do
-        if (true or at ~= gaiaAllyTeamID) then
-          local xn, zn, xp, zp = Spring.GetAllyTeamStartBox(at)
-          if (xn and ((xn ~= 0) or (zn ~= 0) or (xp ~= msx) or (zp ~= msz))) then
+    local myAllyID = Spring.GetMyAllyTeamID()
+    local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(myAllyID)
+    if (x1 and not (x1 == 0 and z1 == 0 and x2 == msx and z2 == msz)) then
+      allyStartBox = { x1, z1, x2, z2 }
+    end
 
-            if (at == Spring.GetMyAllyTeamID()) then
-              gl.StencilMask(stencilBit2);
-              gl.StencilFunc(GL.ALWAYS, 0, stencilBit2);
-            else
-              gl.StencilMask(stencilBit1);
-              gl.StencilFunc(GL.ALWAYS, 0, stencilBit1);
-            end
-            DrawMyBox(xn,minY,zn, xp,maxY,zp)
-
-          end
+    for _,at in ipairs(Spring.GetAllyTeamList()) do
+      --if (at ~= gaiaAllyTeamID) then
+      if (at ~= myAllyID) then
+        local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(at)
+        if (x1 and not (x1 == 0 and z1 == 0 and x2 == msx and z2 == msz)) then
+          table.insert(enemyStartBoxes, { x1, z1, x2, z2 })
         end
       end
-    end)
-
-    startboxDListColor = gl.CreateList(function()
-      local minY,maxY = Spring.GetGroundExtremes()
-      minY = minY - 200; maxY = maxY + 100;
-      for _,at in ipairs(Spring.GetAllyTeamList()) do
-        if (true or at ~= gaiaAllyTeamID) then
-          local xn, zn, xp, zp = Spring.GetAllyTeamStartBox(at)
-          if (xn and ((xn ~= 0) or (zn ~= 0) or (xp ~= msx) or (zp ~= msz))) then
-
-            if (at == Spring.GetMyAllyTeamID()) then
-              gl.Color( 0, 1, 0, 0.3 )  --  green
-              gl.StencilMask(stencilBit2);
-              gl.StencilFunc(GL.NOTEQUAL, 0, stencilBit2);
-            else
-              gl.Color( 1, 0, 0, 0.3 )  --  red
-              gl.StencilMask(stencilBit1);
-              gl.StencilFunc(GL.NOTEQUAL, 0, stencilBit1);
-            end
-            DrawMyBox(xn,minY,zn, xp,maxY,zp)
-
-          end
-        end
-      end
-    end)
+    end
   end
 end
 
@@ -192,8 +125,6 @@ end
 function widget:Shutdown()
   gl.DeleteList(xformList)
   gl.DeleteList(coneList)
-  gl.DeleteList(startboxDListStencil)
-  gl.DeleteList(startboxDListColor)
 end
 
 --------------------------------------------------------------------------------
@@ -285,29 +216,17 @@ end
 --------------------------------------------------------------------------------
 
 local function DrawStartboxes3dWithStencil()
-  gl.DepthMask(false);
-  if (gl.DepthClamp) then gl.DepthClamp(true); end
+  if (drawGroundQuads) then
+    if (allyStartBox) then
+      gl.Color(allyStartBoxColor)
+      gl.Utilities.DrawGroundRectangle(allyStartBox)
+    end
 
-  gl.DepthTest(true);
-  gl.StencilTest(true);
-  gl.ColorMask(false, false, false, false);
-  gl.Culling(false);
-
-  gl.StencilOp(GL.KEEP, GL.INVERT, GL.KEEP);
-
-  gl.CallList(startboxDListStencil);   --// draw
-
-  gl.Culling(GL.BACK);
-  gl.DepthTest(false);
-
-  gl.ColorMask(true, true, true, true);
-
-  gl.CallList(startboxDListColor);   --// draw
-
-  if (gl.DepthClamp) then gl.DepthClamp(false); end
-  gl.StencilTest(false);
-  gl.DepthTest(true);
-  gl.Culling(false);
+    gl.Color(enemyStartBoxColor)
+    for _,startBox in ipairs(enemyStartBoxes) do
+      gl.Utilities.DrawGroundRectangle(startBox)
+    end
+  end
 end
 
 --------------------------------------------------------------------------------
@@ -349,7 +268,7 @@ function widget:DrawWorld()
         local alpha = 0.5 + math.abs(((time * 3) % 1) - 0.5)
         gl.PushMatrix()
         gl.Translate(newx, newy, newz)
-		gl.Lighting(false)
+        gl.Lighting(false)
         gl.Color(color[1], color[2], color[3], alpha)
         gl.CallList(coneList)
         gl.PopMatrix()
@@ -452,9 +371,9 @@ function widget:DrawInMiniMap(sx, sz)
         local time = Spring.DiffTimers(Spring.GetTimer(), startTimer)
         local i = 2 * math.abs(((time * 3) % 1) - 0.5)
         gl.Color(i, i, i)
-		gl.DrawGroundCircle(x,0,z, MINIMAP_DRAW_SIZE*1.2,32)
+        gl.DrawGroundCircle(x,0,z, MINIMAP_DRAW_SIZE*1.2,32)
         gl.Color(r, g, b)
-		gl.DrawGroundCircle(x,0,z, MINIMAP_DRAW_SIZE*0.7,32)
+        gl.DrawGroundCircle(x,0,z, MINIMAP_DRAW_SIZE*0.7,32)
       end
     end
   end
