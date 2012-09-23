@@ -323,6 +323,11 @@ function widget:UnitTaken( unitID, unitDefID, unitTeam, newTeam )
 	end
 end
 
+function widget:UnitGiven(unitID)
+	deleteNuke( unitID )
+	hideTooltips = true
+end
+
 --End OF Callins
 
 function searchAndAddNukes()
