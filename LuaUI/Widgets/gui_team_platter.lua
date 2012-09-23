@@ -22,7 +22,8 @@ function widget:GetInfo()
     date      = "Apr 16, 2007",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
-    enabled   = false  --  loaded by default?
+    enabled   = false,  --  loaded by default?
+    detailsDefault = 1
   }
 end
 
@@ -80,6 +81,15 @@ local radInDeg = 180/pi
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+-- Memoization tables
+
+local realRadii = {}
+
+local teamColors = {}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local function SetupCommandColors(state)
   local alpha = state and 1 or 0
   local f = io.open('cmdcolors.tmp', 'w+')
@@ -94,6 +104,31 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+options_path = 'Settings/Interface/TeamPlatter'
+options = {
+  outlineTrans = {
+      name = "Outline transparency (1.0 boosts performance)",
+      type = 'number',
+      value = 1, min = 0, max = 1, step = 0.05,
+      --desc = "How much can be seen through the circle outline. The outline can removed completely by " .. 
+      --"setting this to 1, significantly enhancing performance",
+  },
+  fillTrans = {
+      name = "Fill transparency",
+      type = 'number',
+      value = 0.6, min = 0, max = 1, step = 0.05,
+      --desc = "How much can be seen through the circle fill",
+  },
+  extraRadius = {
+      name = "Extra platter radius",
+      type = 'number',
+      value = 6, min = 0, max = 10, step = 0.5,
+      --desc = "How much additional padding should be added to the circle radius in pixels",
+  },
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local teamColors = {}
 
@@ -103,11 +138,19 @@ local circleLines  = 0
 local circlePolys  = 0
 local circleDivs   = 32
 local circleOffset = 0
+local lineWidth = 3
+local noOutlineMakeUp = lineWidth/2
 
 local startTimer = spGetTimer()
 
+
+
+
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+
 
 function widget:Initialize()
 
@@ -146,7 +189,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local realRadii = {}
+
 
 
 local function GetUnitDefRealRadius(udid)
@@ -172,7 +215,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local teamColors = {}
+
 
 
 local function GetTeamColorSet(teamID)
@@ -182,8 +225,7 @@ local function GetTeamColorSet(teamID)
   end
   local r,g,b = spGetTeamColor(teamID)
   
-  colors = {{ r, g, b, 0.4 },
-            { r, g, b, 0.7 }}
+  colors = { r, g, b }
   teamColors[teamID] = colors
   return colors
 end
@@ -193,13 +235,19 @@ end
 
 function widget:DrawWorldPreUnit()
 if not spIsGUIHidden() then
-  glLineWidth(3.0)
+  local extraRadius = options.extraRadius.value
+  local fillAlpha = 1 - options.fillTrans.value
+  local outlineAlpha = 1 - options.outlineTrans.value
+  local showOutline = (outlineAlpha > 0)
+  local noOutlineExtraRadius = extraRadius + noOutlineMakeUp
+  
+  glLineWidth(lineWidth)
 
-  glDepthTest(true)
+  glDepthTest(false)
   
   glPolygonOffset(-50, -2)
 
-  local lastColorSet = nil
+  --local lastColorSet = nil
   local visUnits = spGetVisibleUnits(-1, nil, false)
 
   --for _,unitID in ipairs(spGetAllUnits()) do
@@ -211,27 +259,40 @@ if not spIsGUIHidden() then
         if (teamID) then
           local udid = spGetUnitDefID(visUnits[i])
           local radius = GetUnitDefRealRadius(udid)
+          if showOutline then
+            radius = radius + extraRadius
+          else
+            radius = radius + noOutlineExtraRadius
+          end
           if (radius) then
             local colorSet  = GetTeamColorSet(teamID)
             if (trackSlope and (not UnitDefs[udid].canFly)) then
               local x, y, z = spGetUnitBasePosition(visUnits[i])
               local gx, gy, gz = spGetGroundNormal(x, z)
               local degrot = acos(gy) * radInDeg
-              glColor(colorSet[1])
+              colorSet[4] = fillAlpha
+              glColor(colorSet)
               glDrawListAtUnit(visUnits[i], circlePolys, false,
                                radius, 1.0, radius,
-                               degrot, gz, 0, -gx)
-              glColor(colorSet[2])
-              glDrawListAtUnit(visUnits[i], circleLines, false,
-                               radius, 1.0, radius,
-                               degrot, gz, 0, -gx)
+                               degrot, gz, 0, -gx) 
+              if showOutline then
+                colorSet[4] = outlineAlpha
+                glColor(colorSet)
+                glDrawListAtUnit(visUnits[i], circleLines, false,
+                                 radius, 1.0, radius,
+                                 degrot, gz, 0, -gx)
+              end
             else
-              glColor(colorSet[1])
+              colorSet[4] = fillAlpha
+              glColor(colorSet)
               glDrawListAtUnit(visUnits[i], circlePolys, false,
                                radius, 1.0, radius)
-              glColor(colorSet[2])
-              glDrawListAtUnit(visUnits[i], circleLines, false,
-                               radius, 1.0, radius)
+              if showOutline then
+                colorSet[4] = outlineAlpha
+                glColor(colorSet)
+                glDrawListAtUnit(visUnits[i], circleLines, false,
+                                 radius, 1.0, radius)
+              end
             end
           end
         end
@@ -245,7 +306,7 @@ if not spIsGUIHidden() then
   -- Blink the selected units
   --
 
-  glDepthTest(false)
+  --glDepthTest(false)
 
   local diffTime = spDiffTimers(spGetTimer(), startTimer)
   local alpha = 1.8 * abs(0.5 - (diffTime * 3.0 % 1.0))
@@ -254,7 +315,7 @@ if not spIsGUIHidden() then
   for _,unitID in ipairs(spGetSelectedUnits()) do
     if (spIsUnitVisible(unitID) and not spGetUnitNoDraw(unitID)) then
       local udid = spGetUnitDefID(unitID)
-      local radius = GetUnitDefRealRadius(udid)
+      local radius = GetUnitDefRealRadius(udid) + extraRadius
       if (radius) then
         if (trackSlope and (not UnitDefs[udid].canFly)) then
           local x, y, z = spGetUnitBasePosition(unitID)
