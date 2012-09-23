@@ -23,7 +23,6 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 5,
     enabled   = false,  --  loaded by default?
-    detailsDefault = 1
   }
 end
 
@@ -106,21 +105,21 @@ end
 
 options_path = 'Settings/Interface/TeamPlatter'
 options = {
-  outlineTrans = {
-      name = "Outline transparency (1.0 boosts performance)",
+  outlineOpacity = {
+      name = "Outline opacity (0 boosts performance)",
       type = 'number',
-      value = 1, min = 0, max = 1, step = 0.05,
+      value = 0, min = 0, max = 1, step = 0.05,
       --desc = "How much can be seen through the circle outline. The outline can removed completely by " .. 
       --"setting this to 1, significantly enhancing performance",
   },
-  fillTrans = {
-      name = "Fill transparency",
+  fillOpacity = {
+      name = "Fill opacity",
       type = 'number',
-      value = 0.6, min = 0, max = 1, step = 0.05,
+      value = 0.4, min = 0, max = 1, step = 0.05,
       --desc = "How much can be seen through the circle fill",
   },
   extraRadius = {
-      name = "Extra platter radius",
+      name = "Platter size",
       type = 'number',
       value = 6, min = 0, max = 10, step = 0.5,
       --desc = "How much additional padding should be added to the circle radius in pixels",
@@ -144,12 +143,8 @@ local noOutlineMakeUp = lineWidth/2
 local startTimer = spGetTimer()
 
 
-
-
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 
 
 function widget:Initialize()
@@ -236,9 +231,9 @@ end
 function widget:DrawWorldPreUnit()
 if not spIsGUIHidden() then
   local extraRadius = options.extraRadius.value
-  local fillAlpha = 1 - options.fillTrans.value
-  local outlineAlpha = 1 - options.outlineTrans.value
-  local showOutline = (outlineAlpha > 0)
+  local fillOpacity = options.fillOpacity.value
+  local outlineOpacity = options.outlineOpacity.value
+  local showOutline = (outlineOpacity > 0)
   local noOutlineExtraRadius = extraRadius + noOutlineMakeUp
   
   glLineWidth(lineWidth)
@@ -270,25 +265,25 @@ if not spIsGUIHidden() then
               local x, y, z = spGetUnitBasePosition(visUnits[i])
               local gx, gy, gz = spGetGroundNormal(x, z)
               local degrot = acos(gy) * radInDeg
-              colorSet[4] = fillAlpha
+              colorSet[4] = fillOpacity
               glColor(colorSet)
               glDrawListAtUnit(visUnits[i], circlePolys, false,
                                radius, 1.0, radius,
                                degrot, gz, 0, -gx) 
               if showOutline then
-                colorSet[4] = outlineAlpha
+                colorSet[4] = outlineOpacity
                 glColor(colorSet)
                 glDrawListAtUnit(visUnits[i], circleLines, false,
                                  radius, 1.0, radius,
                                  degrot, gz, 0, -gx)
               end
             else
-              colorSet[4] = fillAlpha
+              colorSet[4] = fillOpacity
               glColor(colorSet)
               glDrawListAtUnit(visUnits[i], circlePolys, false,
                                radius, 1.0, radius)
               if showOutline then
-                colorSet[4] = outlineAlpha
+                colorSet[4] = outlineOpacity
                 glColor(colorSet)
                 glDrawListAtUnit(visUnits[i], circleLines, false,
                                  radius, 1.0, radius)
