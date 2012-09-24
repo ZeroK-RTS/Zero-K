@@ -159,9 +159,9 @@ local function ProcessComm(name, config)
 			-- individual modules can have different order values as defined in moduledefs.lua
 			table.sort(modules,
 				function(a,b)
-					order_a = (upgrades[a] and upgrades[a].order) or 4
-					order_b = (upgrades[b] and upgrades[b].order) or 4
-					return a < b
+					local order_a = (upgrades[a] and upgrades[a].order) or 4
+					local order_b = (upgrades[b] and upgrades[b].order) or 4
+					return order_a < order_b
 				end )
 
 			-- process all modules (including weapons)
