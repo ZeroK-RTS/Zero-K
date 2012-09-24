@@ -254,12 +254,12 @@ if not spIsGUIHidden() then
         if (teamID) then
           local udid = spGetUnitDefID(visUnits[i])
           local radius = GetUnitDefRealRadius(udid)
-          if showOutline then
-            radius = radius + extraRadius
-          else
-            radius = radius + noOutlineExtraRadius
-          end
           if (radius) then
+            if showOutline then
+              radius = radius + extraRadius
+            else
+              radius = radius + noOutlineExtraRadius
+            end
             local colorSet  = GetTeamColorSet(teamID)
             if (trackSlope and (not UnitDefs[udid].canFly)) then
               local x, y, z = spGetUnitBasePosition(visUnits[i])
@@ -310,8 +310,9 @@ if not spIsGUIHidden() then
   for _,unitID in ipairs(spGetSelectedUnits()) do
     if (spIsUnitVisible(unitID) and not spGetUnitNoDraw(unitID)) then
       local udid = spGetUnitDefID(unitID)
-      local radius = GetUnitDefRealRadius(udid) + extraRadius
+      local radius = GetUnitDefRealRadius(udid)
       if (radius) then
+        radius = radius + extraRadius
         if (trackSlope and (not UnitDefs[udid].canFly)) then
           local x, y, z = spGetUnitBasePosition(unitID)
           local gx, gy, gz = spGetGroundNormal(x, z)
