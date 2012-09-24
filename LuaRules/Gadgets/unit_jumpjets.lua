@@ -89,6 +89,7 @@ local mcSetRotation         = MoveCtrl.SetRotation
 local mcDisable             = MoveCtrl.Disable
 local mcEnable              = MoveCtrl.Enable
 local spAddUnitImpulse      = Spring.AddUnitImpulse
+local spSetUnitDirection    = Spring.SetUnitDirection
 
 local SetLeaveTracks      = Spring.SetUnitLeaveTracks -- or MoveCtrl.SetLeaveTracks	--0.82 compatiblity
 
@@ -471,6 +472,8 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 			end
 		end	
 		
+		GG.FallDamage.ExcludeFriendlyCollision(unitID)
+		
 		local halfJump
 		local landed = false
 		local reloadTimeInv = 1/reloadTime
@@ -489,7 +492,7 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 			end			
 			
 			local dx,dy,dz  =Spring.GetUnitDirection (unitID)
-			Spring.SetUnitDirection(unitID, dx, 0, dz) --prevent unit from tumbling during jumploop.
+			spSetUnitDirection(unitID, dx, 0, dz) --prevent unit from tumbling during jumploop.
 			--Spring.Echo(dy .. " dy")
 			
 			if rotateMidAir then -- x_x :(
@@ -629,6 +632,8 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 		end
 		--]]
 		
+		GG.FallDamage.IncludeFriendlyCollision(unitID)  
+		
 		jumps[coords] = jumps[coords] - 1 --tell CommandFallback that this jump coordinate has finish executing, and other unit can use it
 		unitCmdQueue[unitID] = nil
 	end --end the monitoring script
@@ -643,11 +648,10 @@ local function Jump(unitID, goal, cmdTag, coords, duplicateCoordCount)
 	goal[2]             = spGetGroundHeight(goal[1],goal[3])
 	local start         = {spGetUnitPosition(unitID)}
 
-	local extraJumpDelay = (isImpulseJump and duplicateCoordCount*27) or 0 
 	local unitDefID     = spGetUnitDefID(unitID)
 	local jumpDef       = jumpDefs[unitDefID]
 	local speed         = jumpDef.speed
-	local delay    	  = jumpDef.delay + extraJumpDelay --the wait animation before jumping
+	local delay    	  = jumpDef.delay --the wait animation before jumping
 	local height        = jumpDef.height --the desired height
 	local cannotJumpMidair    = jumpDef.cannotJumpMidair
 	local reloadTime    = (jumpDef.reload or 0)*30
@@ -677,7 +681,9 @@ local function Jump(unitID, goal, cmdTag, coords, duplicateCoordCount)
 	jumping[unitID] = true
 
 	
-	if isImpulseJump then 
+	if isImpulseJump then
+		local extraWait = duplicateCoordCount*27 --extra waiting before jumping to avoid mid air collision
+		delay = delay + extraWait
 		return ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotateMidAir,flightDist,delay,reloadTime,cmdTag,goal, coords)
 	else
 		return MoveCtrlJump(unitID,height,cob,delay,rotateMidAir,speed,lineDist,flightDist,reloadTime,start,vector,cmdTag, coords)
@@ -780,10 +786,11 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
   local distSqr = GetDist2Sqr({x, y, z}, cmdParams)
   local jumpDef = jumpDefs[unitDefID]
   local range   = jumpDef.range
+    local rangeSqr= range*range
   local reload  = jumpDef.reload or 0
   local t       = spGetGameSeconds()
 
-  if (distSqr < (range*range)) then
+  if (distSqr < rangeSqr) then
     goalSet[unitID] = false
     local cmdTag = spGetCommandQueue(unitID,1)[1].tag
     if (lastJump[unitID] and (t - lastJump[unitID]) >= reload) then
@@ -802,6 +809,19 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
           cmdParams[1] + math.cos(randomAngle)*r, --p/s: 'random(-r, r)' will select integer between -r and r, 'random(-1,1)*r' will select integer r or -r or 0, 'random()*r' will select real number between 0 and r
           cmdParams[2],
           cmdParams[3] + math.sin(randomAngle)*r}
+		  
+		distSqr = GetDist2Sqr(randpos, cmdParams)
+		if (distSqr > rangeSqr) then --if new random position is further away than maxRange then walk there...
+			Spring.GiveOrderToUnit(unitID,
+				CMD.INSERT,
+				{0,CMD_JUMP,CMD.OPT_SHIFT,randpos[1],randpos[2],randpos[3]},
+				{"alt"}
+			);
+			Approach(unitID, randpos, range)
+			goalSet[unitID] = true
+			return true, true --remove command
+		end
+		
 		local didJump, elseRemove = Jump(unitID, randpos, cmdTag, coords, jumps[coords])
 		jumps[coords] = jumps[coords] + 1
         if didJump then

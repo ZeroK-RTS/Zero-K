@@ -45,6 +45,16 @@ for unitDefID=1,#UnitDefs do
 	end
 end
 
+local excludedUnitID = {}
+GG.FallDamage = {}
+function GG.FallDamage.ExcludeFriendlyCollision(unitID)  --ref: http://answers.springlobby.info/questions/5/lua-unit-script-gadget-communication
+	excludedUnitID[unitID] = true
+end
+
+function GG.FallDamage.IncludeFriendlyCollision(unitID)  
+	excludedUnitID[unitID] = nil
+end
+
 local function outsideMapDamage(unitID, unitDefID)
 	local att = attributes[unitDefID]
 	local x,y,z = Spring.GetUnitPosition(unitID)
@@ -81,8 +91,16 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		
 		if unitCollide[damage] then
 			local data = unitCollide[damage]
+			local amongExcludedUnits = excludedUnitID[unitID] or excludedUnitID[data.unitID]
+			local skipDamage = false
+			if amongExcludedUnits then 
+				local allyID = Spring.GetUnitAllyTeam(unitID)
+				if allyID == data.unitAlliance then
+					skipDamage = true
+				end
+			end
 			local vx,vy,vz = Spring.GetUnitVelocity(unitID)
-			if data.certainDamage or math.sqrt(vx^2 + vy^2 + vz^2) > UNIT_UNIT_SPEED then
+			if not skipDamage and (data.certainDamage or math.sqrt(vx^2 + vy^2 + vz^2) > UNIT_UNIT_SPEED) then
 				local speed = math.sqrt((vx - data.vx)^2 + (vy - data.vy)^2 + (vz - data.vz)^2)
 				local otherDamage = speedToDamage(data.unitID, data.unitDefID, speed)
 				local myDamage = speedToDamage(unitID, unitDefID, speed)
@@ -91,6 +109,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 				return damageToDeal
 			end
 		else
+			local allyID = Spring.GetUnitAllyTeam(unitID)
 			local vx,vy,vz = Spring.GetUnitVelocity(unitID)
 			local speed = math.sqrt(vx^2 + vy^2 + vz^2)
 			unitCollide[damage] = {
@@ -98,6 +117,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 				unitDefID = unitDefID,
 				vx = vx, vy = vy, vz = vz,
 				certainDamage = speed > UNIT_UNIT_SPEED,
+				unitAlliance = allyID
 			}
 			clearTable = true
 		end
