@@ -1315,6 +1315,12 @@ end
 -------------------------------------------------------------------------------------
 -- MEXES
 
+local function TransferMexRefund(unitID, newTeamID)
+	if newTeamID and mexByID[unitID].refundTeamID then
+		mexByID[unitID].refundTeamID = newTeamID
+	end
+end
+
 local function AddMex(unitID, teamID, metalMake)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if (allyTeamID) then
@@ -1499,6 +1505,10 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 		--	AddEnergy(unitID, unitDefID, unitTeam)
 		--	RemoveEnergy(unitID, unitDefID, unitTeam)
 		--end
+	else
+		if (mexDefs[unitDefID]) then 
+			TransferMexRefund(unitID, teamID)
+		end
 	end
 end
 
