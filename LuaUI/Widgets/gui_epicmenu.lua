@@ -18,6 +18,8 @@ end
 
 local spGetConfigInt    		= Spring.GetConfigInt
 local spSendCommands			= Spring.SendCommands
+local min = math.min
+local max = math.max
 
 local echo = Spring.Echo
 
@@ -1416,7 +1418,13 @@ end
 local function MakeMenuBar()
 	local btn_padding = {4,3,2,2}
 	local btn_margin = {0,0,0,0}
-		
+    local exit_menu_width = 210
+    local exit_menu_height = 280
+    local exit_menu_btn_width = 7*exit_menu_width/8
+    local exit_menu_btn_height = max(exit_menu_height/8, 30)
+    local exit_menu_cancel_width = exit_menu_btn_width/2
+    local exit_menu_cancel_height = 2*exit_menu_btn_height/3
+
 	local crude_width = 425
 	local crude_height = B_HEIGHT+10
 	
@@ -1426,15 +1434,15 @@ local function MakeMenuBar()
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 35, height=5, textColor = color.main_fg, autosize=false, }
 	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,4}  }
 	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screen_width,screen_height = Spring.GetWindowGeometry()
 	
 	window_exit = Window:New{
 		name='exitwindow',
-		x = screenWidth*0.5-50,  
-		y = screenHeight*0.5-70,  
+		x = screen_width/2 - exit_menu_width/2,  
+		y = screen_height/2 - exit_menu_height/2,  
 		dockable = false,
-		clientWidth = 120,
-		clientHeight = 150,
+		clientWidth = exit_menu_width,
+		clientHeight = exit_menu_height,
 		draggable = false,
 		tweakDraggable = true,
 		resizable = false,
@@ -1447,28 +1455,28 @@ local function MakeMenuBar()
 		children = {
 				
 			Label:New{ 
-				caption = 'Leave Battle?', 
-				x = 0,
-				y = 15,
-				width = 120, 
+				caption = 'Would you like to quit?', 
+				width = exit_menu_width,
+                x = 0,
+                y = 2*exit_menu_height/64,
 				align="center",
 				textColor = color.main_fg },
 				
 			Button:New{
-				caption = "Exit", OnMouseUp = { function() spSendCommands{"quit","quitforce"} end, }, 
-				x = 20,  
-				y = 46, 
-				height=25, 
-				width=80,
+                caption = "Resign and spectate", OnMouseUp = { function() spSendCommands{"spectator"} end, }, 
+				height=exit_menu_btn_height, 
+				width=exit_menu_btn_width,
+                x = exit_menu_width/2 - exit_menu_btn_width/2, 
+                y = 24*exit_menu_height/64 - exit_menu_btn_height/2, 
 			},
 			
 			
 			Button:New{
-				caption = "Resign", OnMouseUp = { function() spSendCommands{"spectator"} end, }, 
-				x = 20,  
-				y = 78, 
-				height=25, 
-				width=80,
+				caption = "Exit game", OnMouseUp = { function() spSendCommands{"quit","quitforce"} end, },
+				height=exit_menu_btn_height, 
+				width=exit_menu_btn_width,
+                x = exit_menu_width/2 - exit_menu_btn_width/2,  
+                y = 36*exit_menu_height/64 - exit_menu_btn_height/2,
 			},
 			
 			Button:New{
@@ -1477,10 +1485,11 @@ local function MakeMenuBar()
 						screen0:RemoveChild(window_exit) 
 						exitWindowVisible = false
 					end, }, 
-				x = 20,  
-				y = 110, 
-				height=25, 
-				width=80,
+			
+				height=exit_menu_cancel_height, 
+				width=exit_menu_cancel_width,
+                x = 4*exit_menu_width/8, -- exit_menu_cancel_width,
+                y = 58*exit_menu_height/64 - exit_menu_cancel_height/2,
 			},
 		},
 	}

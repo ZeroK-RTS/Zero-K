@@ -7,7 +7,7 @@ function widget:GetInfo()
     name      = "Show All Commands",
     desc      = "Acts like CTRL-A SHIFT all the time",
     author    = "Google Frog",
-    date      = "Mar 1, 2009",
+    date      = "Sep 29, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -16,8 +16,14 @@ end
 
 local spDrawUnitCommands = Spring.DrawUnitCommands
 local spGetAllUnits = Spring.GetAllUnits
+local spSendLuaRulesMsg = Spring.SendLuaRulesMsg
+local spIsGUIHidden = Spring.IsGUIHidden
+local spGetModKeyState = Spring.GetModKeyState
 
 local drawUnits = {}
+
+-- remembers SetTarget drawing mode
+local setTargetNormalDraw = true
 
 options_path = 'Settings/Interface/Show All Commands'
 options_order = { 'showonlyonshift'}
@@ -31,14 +37,33 @@ options = {
 	},
 }
 
+local function drawSetTargetAlways(drawAlways)
+   
+    if drawAlways then
+        if setTargetNormalDraw then
+            spSendLuaRulesMsg("target_on_the_move_draw_always")
+            setTargetNormalDraw = false
+        end
+    else
+        if not setTargetNormalDraw then
+            spSendLuaRulesMsg("target_on_the_move_draw_normal")
+            setTargetNormalDraw = true 
+        end 
+    end
+  
+end
+
 function widget:DrawWorld()
-	if not Spring.IsGUIHidden() and (not options.showonlyonshift.value or select(4,Spring.GetModKeyState())) then 
+	if not spIsGUIHidden() and (not options.showonlyonshift.value or select(4,spGetModKeyState())) then
+        drawSetTargetAlways(true)
 		for i, v in pairs(drawUnits) do
 			if i then
 				spDrawUnitCommands(i)
 			end
 		end
-	end
+	else
+        drawSetTargetAlways(false)
+    end
 end
 
 function widget:UnitCreated(unitID)
@@ -66,7 +91,7 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
-    Spring.SendLuaRulesMsg("target_on_the_move_draw_always")
+    
 	local units = spGetAllUnits()
 	for i, id in pairs(units) do
 		widget:UnitCreated(id)
@@ -74,6 +99,6 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-    Spring.SendLuaRulesMsg("target_on_the_move_draw_normal")
+    drawSetTargetAlways(false)
 end
 

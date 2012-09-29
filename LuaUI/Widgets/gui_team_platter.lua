@@ -146,6 +146,11 @@ local startTimer = spGetTimer()
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function ClearColorMemoization()
+  teamColors = {}
+end
+
+
 
 function widget:Initialize()
 
@@ -170,6 +175,8 @@ function widget:Initialize()
   end)
 
   SetupCommandColors(false)
+
+  self:LocalColorRegister()
 end
 
 
@@ -178,6 +185,20 @@ function widget:Shutdown()
   glDeleteList(circlePolys)
 
   SetupCommandColors(true)
+
+  self:LocalColorUnregister()
+end
+
+function widget:LocalColorRegister()
+  if WG.LocalColor and WG.LocalColor.RegisterListener then
+    WG.LocalColor.RegisterListener(widgetName, ClearColorMemoization)
+  end
+end
+
+function widget:LocalColorUnregister()
+  if WG.LocalColor and WG.LocalColor.UnregisterListener then
+    WG.LocalColor.UnregisterListener(widgetName)
+  end
 end
 
 
