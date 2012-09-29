@@ -22,9 +22,6 @@ local spGetModKeyState = Spring.GetModKeyState
 
 local drawUnits = {}
 
--- remembers SetTarget drawing mode
-local setTargetNormalDraw = true
-
 options_path = 'Settings/Interface/Show All Commands'
 options_order = { 'showonlyonshift'}
 options = {
@@ -37,33 +34,15 @@ options = {
 	},
 }
 
-local function drawSetTargetAlways(drawAlways)
-   
-    if drawAlways then
-        if setTargetNormalDraw then
-            spSendLuaRulesMsg("target_on_the_move_draw_always")
-            setTargetNormalDraw = false
-        end
-    else
-        if not setTargetNormalDraw then
-            spSendLuaRulesMsg("target_on_the_move_draw_normal")
-            setTargetNormalDraw = true 
-        end 
-    end
-  
-end
-
 function widget:DrawWorld()
+
 	if not spIsGUIHidden() and (not options.showonlyonshift.value or select(4,spGetModKeyState())) then
-        drawSetTargetAlways(true)
 		for i, v in pairs(drawUnits) do
 			if i then
 				spDrawUnitCommands(i)
 			end
 		end
-	else
-        drawSetTargetAlways(false)
-    end
+	end
 end
 
 function widget:UnitCreated(unitID)
@@ -91,7 +70,7 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
-    
+    spSendLuaRulesMsg("target_on_the_move_draw_always")
 	local units = spGetAllUnits()
 	for i, id in pairs(units) do
 		widget:UnitCreated(id)
@@ -99,6 +78,6 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-    drawSetTargetAlways(false)
+    spSendLuaRulesMsg("target_on_the_move_draw_normal")
 end
 
