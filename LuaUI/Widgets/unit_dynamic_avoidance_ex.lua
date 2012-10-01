@@ -1,4 +1,4 @@
-local versionName = "v2.63"
+local versionName = "v2.64"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "July 16, 2012",
+    date      = "October 1, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -67,8 +67,8 @@ local mathRandom = math.random
 -- Constant:
 -- Switches:
 local turnOnEcho =0 --1:Echo out all numbers for debugging the system, 2:Echo out alert when fail. (default = 0)
-local activateAutoReverseG=1 --activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
-local activateImpatienceG=0 --auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
+local activateAutoReverseG=1 --integer:[0,1], activate a one-time-reverse-command when unit is about to collide with an enemy (default = 0)
+local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
 -- Graph constant:
 local distanceCONSTANTunitG = 410 --increase obstacle awareness over distance. (default = 410 meter, ie: ZK's stardust range)
@@ -101,8 +101,8 @@ local maximumTurnAngleG = 3.1 --(default is pi rad) safety measure. Prevent over
 --pi is 180 degrees
 
 --Update constant:
-local doCalculation_then_gps_delayG = 0.25 --elapsed second (Wait) before gathering preliminary data for issuing command (default: 0.25 second)
-local gps_then_DoCalculation_delayG = 0.25 --elapsed second (Wait) before issuing new command (default: 0.25 second)
+local doCalculation_then_gps_delayG = 0.25  --elapsed second (Wait) before gathering preliminary data for issuing command (default: 0.25 second)
+local gps_then_DoCalculation_delayG = 0.25  --elapsed second (Wait) before issuing new command (default: 0.25 second)
 
 -- Distance or velocity constant:
 local timeToContactCONSTANTg= doCalculation_then_gps_delayG + gps_then_DoCalculation_delayG --time scale for move command; to calculate collision calculation & command lenght (default = 0.5 second). Will change based on user's Ping
@@ -1326,7 +1326,8 @@ function GetUnitRelativeAngle (unitIDmain, unitID2)
 	local x,_,z = spGetUnitPosition(unitIDmain)
 	local rX, _, rZ= spGetUnitPosition(unitID2)
 	local cX, _, cZ = rX-x, _, rZ-z 
-	local relativeAngle = math.atan2 (cZ, cX)
+	local cXcZ = math.sqrt(cX*cX + cZ*cZ) --hypothenus for xz direction
+	local relativeAngle = math.atan2 (cX/cXcZ, cZ/cXcZ) --math.atan2 accept trigonometric ratio (ie: ratio that has same value as: cos(angle) & sin(angle). Cos is ratio between x and hypothenus, and Sin is ratio between z and hypothenus)
 	return relativeAngle
 end
 
@@ -1334,7 +1335,8 @@ function GetTargetAngleWithRespectToUnit(unitID, targetCoordinate)
 	local x,_,z = spGetUnitPosition(unitID)
 	local tx, tz = targetCoordinate[1], targetCoordinate[3]
 	local dX, dZ = tx- x, tz-z 
-	local targetAngle = math.atan2(dZ, dX)
+	local dXdZ = math.sqrt(dX*dX + dZ*dZ) --hypothenus for xz direction
+	local targetAngle = math.atan2(dX/dXdZ, dZ/dXdZ) --math.atan2 accept trigonometric ratio (ie: ratio that has same value as: cos(angle) & sin(angle))
 	return targetAngle
 end
 
@@ -1416,10 +1418,16 @@ function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wT
 					local hI = windowingFuncMultG/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
 					if normalizeObsGraph then
 						for i=-180, 180, 1 do --sample the entire 360 degree graph
-							local differenceInAngle = (unitDirection+math.pi/i)-relativeAngle
+							local differenceInAngle = (unitDirection+i*math.pi/180)-relativeAngle
 							local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle))
 							local wI = obsCONSTANT* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
-							graphSample[i+180+1]=graphSample[i+180+1]+ (rI*wI*dI*hI)
+							graphSample[i+180+1]=graphSample[i+180+1]+ (rI*wI*dI)
+							--[[
+							Spring.Echo((rI*wI*dI) .. " (rI*wI*dI) (SumAllUnitAroundUnitID)")
+							if i==0 then
+								Spring.Echo("CENTER")
+							end
+							--]]
 						end
 					end
 
@@ -1675,7 +1683,8 @@ function GetUnitDirection(unitID, lastPosition) --give unit direction in radian,
 		dx,_,dz= spGetUnitDirection(unitID)
 		usingLastPosition = false
 	end
-	local unitDirection = math.atan2(dz, dx)
+	local dxdz = math.sqrt(dx*dx + dz*dz) --hypothenus for xz direction
+	local unitDirection = math.atan2(dx/dxdz, dz/dxdz)
 	return unitDirection, currentY, usingLastPosition
 end
 
@@ -1686,13 +1695,13 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 	--
 	local x,_,z = spGetUnitPosition(thisUnitID)
 	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT --add multiplier
-	local newX = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
-	local newZ = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + z
+	local newX = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
+	local newZ = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + z
 	
 	if (unitDirection ~= nil) and (networkDelayDrift~=0) then --need this check because argument #4 & #5 can be empty (for other usage). Also used in ExtractTarget for GUARD command.
 		local distanceTraveledDueToNetworkDelay = networkDelayDrift 
-		newX = distanceTraveledDueToNetworkDelay*math.cos(unitDirection) + newX -- translate move command abit further forward; to account for lag. Network Lag makes move command lags behind the unit. 
-		newZ = distanceTraveledDueToNetworkDelay*math.sin(unitDirection) + newZ
+		newX = distanceTraveledDueToNetworkDelay*math.sin(unitDirection) + newX -- translate move command abit further forward; to account for lag. Network Lag makes move command lags behind the unit. 
+		newZ = distanceTraveledDueToNetworkDelay*math.cos(unitDirection) + newZ
 	end
 	
 	if (turnOnEcho == 1) then
@@ -1725,9 +1734,10 @@ end
 --calculate enemy's wavefunction
 function GetRiWiDi (unitDirection, relativeAngle, subtendedAngle, separationDistance, safetyMarginCONSTANT, smCONSTANT, distanceCONSTANT, obsCONSTANT)
 	local differenceInAngle = unitDirection-relativeAngle
-	local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle))
+	--Spring.Echo(differenceInAngle*180/math.pi .. "angle, unitDirection (GetRiWiDi)")
+	local rI = (differenceInAngle/ subtendedAngle)*math.exp(1- math.abs(differenceInAngle/subtendedAngle)) -- ratio of enemy-direction over the size-of-the-enemy
 	local hI = windowingFuncMultG/ (math.cos(2*subtendedAngle) - math.cos(2*subtendedAngle+ safetyMarginCONSTANT))
-	local wI = obsCONSTANT* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window
+	local wI = obsCONSTANT* (math.tanh(hI- (math.cos(differenceInAngle) -math.cos(2*subtendedAngle +smCONSTANT)))+1) --graph with limiting window. Tanh graph multiplied by obsCONSTANT
 	local dI = math.exp(-1*separationDistance/distanceCONSTANT) --distance multiplier
 	return rI, wI, dI
 end
@@ -1749,7 +1759,7 @@ end
 
 --
 function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor)
-	fObstacleSum = fObstacleSum*normalizingFactor --downscale value depend on the entire graph's maximum
+	fObstacleSum = fObstacleSum*normalizingFactor --downscale value depend on the entire graph's maximum (if normalization is used)
 	local angleFromTarget = math.abs(wTarget)*fTarget
 	local angleFromObstacle = math.abs(wObstacle)*fObstacleSum
 	--Spring.Echo(math.modf(angleFromObstacle))
@@ -1757,8 +1767,10 @@ function GetNewAngle (unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, 
 	local unitAngleDerived= angleFromTarget + angleFromObstacle + angleFromNoise --add wave-amplitude, and add noise between -ve & +ve noiseAngle
 	if math.abs(unitAngleDerived) > maximumTurnAngleG then --to prevent excess in avoidance causing overflow in angle changes (maximum angle should be pi, but useful angle should be pi/2 eg: 90 degree)
 		--Spring.Echo("Dynamic Avoidance warning: total angle changes excess")
-		unitAngleDerived = Sgn(unitAngleDerived)*maximumTurnAngleG end
+		unitAngleDerived = Sgn(unitAngleDerived)*maximumTurnAngleG 
+	end
 	local newUnitAngleDerived= unitDirection +unitAngleDerived --add derived angle into current unit direction plus some noise
+	--Spring.Echo(unitAngleDerived*180/math.pi .. "angle, unitAngleDerived (GetNewAngle)")
 	if (turnOnEcho == 1) then 
 		Spring.Echo("fTarget (getNewAngle)" .. fTarget)
 		Spring.Echo("fObstacleSum (getNewAngle)" ..fObstacleSum)
@@ -1861,6 +1873,9 @@ function GaussianNoise()
 end
 
 function Sgn(x)
+	if x == 0 then
+		return 0
+	end
 	local y= x/(math.abs(x))
 	return y
 end
