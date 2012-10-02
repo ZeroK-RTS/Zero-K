@@ -273,15 +273,16 @@ local function DrawSearchlights()
 	if GetUnitPosition(unitID) and not GetUnitIsDead(unitID) then
 		local _, _, _, _, buildProgress = GetUnitHealth(unitID)
 		local unitRadius = GetUnitRadius(unitID) or 10
-		local px, py, pz = GetUnitPosition(unitID)
-		py = py + searchlightHeightOffset * unitRadius
+		local _,_,_,px, py, pz = GetUnitPosition(unitID,true) --get mid position. Since Spring 89: it return baseposition instead of midposition unless you add "true" to second argument.
+		local relativeHeight = searchlightHeightOffset * unitRadius
+		py = py + relativeHeight
 		local groundy = math.max(GetGroundHeight(px, pz), 0)
-		local height = py - groundy
+		local absHeight = py - groundy
 		local unitDefID = GetUnitDefID(unitID)
 		local unitDef = UnitDefs[unitDefID]
 		local speed = unitDef.speed
 		
-		if (height > 0
+		if (absHeight > 0
 			and (not buildProgress or buildProgress >= 1)
 			and not noLightList[unitDefID]
 			and timeFromNoon > (0.25 + ((unitID * 97) % 256) / 8192)
@@ -316,11 +317,16 @@ local function DrawSearchlights()
 		  
 		  baseX = px + leadDistance * math.cos(heading)
 		  baseZ = pz + leadDistance * math.sin(heading)
-		  ecc = math.min(1 - 2 / (leadDistance / height + 2), 0.75)
+		  ecc = math.min(1 - 2 / (leadDistance / absHeight + 2), 0.75)
 		  
 		  --base
 		  glBlending(GL_DST_COLOR, GL_ONE)
 		  glColor(currColorInverse)
+		  
+		  --scale radius based on height--
+		  local originalRatio= radius/math.sqrt(leadDistance*leadDistance+ relativeHeight*relativeHeight) --ratio of radius-over-distance for original beam
+		  local newSize = originalRatio*math.sqrt(leadDistance*leadDistance+ absHeight*absHeight) --explaination: The same radius-over-distance ratio must apply for all height
+		  radius = newSize
 		  
 		  if (options.bases.value == "full") then
 			glDepthTest(true)
