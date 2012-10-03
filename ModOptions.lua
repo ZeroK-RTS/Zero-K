@@ -494,6 +494,14 @@ local options = {
     section	= "experimental",
   },
   {
+    key		= "impulsejump",
+    name	= "Impulses Jump",
+    desc	= "Allow jumps that is effected by gravity and Newton, else will use a cleaner but rigid motion sequence",
+    type	= "bool",
+    def		= true,
+    section	= "experimental",
+  },  
+  {
     key		= "pathfinder",
     name	= "Pathfinder type",
     desc	= "Sets the pathfinding system used by units.",

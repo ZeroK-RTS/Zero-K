@@ -23,22 +23,23 @@ local name
 --		speed			-- required
 --		reload		-- optional
 --		aaShootMe		-- optional
+--		limitHeight		-- optional (for impulse jump)
 ------------------------------------------------------------------------------------------------------------------------------------------------	
 
   
 jumpCategory = { 
 	baseclass = {
-		range = 400, height = 200, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true},	
+		range = 400, height = 200, speed = 6,  reload = 10,  aaShootMe = false, delay = 0, cobscript = true, rotateMidAir = true, limitHeight=false},	
 		
 	-- category containining only optional tags for testing error code only.
 	-- iammissingstuff ={
 	-- 	reload	= 10, aaShootMe	= false, },	
 	commrecon1 = {
-		range = 400, height = 200, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},
+		range = 400, height = 200, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true, limitHeight=false},
 	commrecon2 = {
-		range = 500, height = 240, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},
+		range = 500, height = 240, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true, limitHeight=false},
 	commrecon3 = {
-		range = 600, height = 280, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true},			
+		range = 600, height = 280, speed = 6,  reload = 20,  aaShootMe = false, delay = 0, cobscript = false, rotateMidAir = true, limitHeight=false},			
 }
 
 jumpClassGroups = {
@@ -155,6 +156,9 @@ for groupId,groupcluster in pairs(jumpClassGroups) do
 					Spring.Echo("   Jump Jet Defs error: (Unit: " .. name .. " missing required parameter rotateMidAir)")	
 					IsBadDef = true			
 				end
+				if ( jumpCategory[groupId].limitHeight == nil ) then
+					Spring.Echo("   Jump Jet Defs warning: (Unit: " .. name .. " missing optional parameter limitHeight)")		
+				end
 			end
 		else -- unit exists, lets make sure he has proper values
 			IsBadDef = true
@@ -164,7 +168,7 @@ for groupId,groupcluster in pairs(jumpClassGroups) do
 		
 		if ( IsBadDef == false ) then
 			local default = jumpCategory[groupId]
-			jumpers[name] = {range=default.range, height=default.height, speed=default.speed, reload=(default.reload or nil), delay=default.delay, cobscript=default.cobscript, rotateMidAir=default.rotateMidAir}
+			jumpers[name] = {range=default.range, height=default.height, speed=default.speed, reload=(default.reload or nil), delay=default.delay, cobscript=default.cobscript, rotateMidAir=default.rotateMidAir, limitHeight=default.limitHeight}
 		else
 			Spring.Echo("   Jump Jet Defs error: (Unit not added: " .. name .. " )")
 			IsBadDef = false 
@@ -207,6 +211,10 @@ for uName,uOvers in pairs(overCategory) do
 			if ( uOvers.rotateMidAir == jumpers[uName].rotateMidAir) then
 				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded rotateMidAir override )")
 			end
+
+			if ( uOvers.limitHeight == jumpers[uName].limitHeight) then
+				Spring.Echo("   Jump Jet Defs warning: ( " .. uName .. " has unneeded limitHeight override )")
+			end			
 			
 			jumpers[uName].speed	= ( uOvers.speed or jumpers[uName].speed)
 			
@@ -219,6 +227,8 @@ for uName,uOvers in pairs(overCategory) do
 			jumpers[uName].height	= ( uOvers.height or jumpers[uName].height)
 			
 			jumpers[uName].delay	= ( uOvers.delay or jumpers[uName].delay)
+			
+			jumpers[uName].limitHeight	= ( uOvers.limitHeight or jumpers[uName].limitHeight)
 			
 			if uOvers.cobscript ~= nil then
 				jumpers[uName].cobscript = uOvers.cobscript
