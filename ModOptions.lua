@@ -498,7 +498,7 @@ local options = {
     name	= "Impulses Jump",
     desc	= "Allow jumps that is effected by gravity and Newton, else will use a cleaner but rigid motion sequence",
     type	= "bool",
-    def		= true,
+    def		= false,
     section	= "experimental",
   },  
   {
