@@ -442,18 +442,22 @@ function preJump(turn, distance)
 end
 
 function beginJump() 
+	--[[
 	bJumping = true
 	StartThread(JumpExhaust)
+	--]]
 end
 
 function jumping()
+	EmitSfx( jx1,  1028 )
+	EmitSfx( jx2,  1028 )
 end
 
 function halfJump()
 end
 
 function endJump() 
-	bJumping = false
+	--bJumping = false
 	EmitSfx( base,  1029 )
 end
 
