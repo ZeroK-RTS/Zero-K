@@ -151,7 +151,9 @@ local function GetRecepient(allyTeam, laggers)
 end
 
 function gadget:GameFrame(n)
-	if n%UPDATE_PERIOD == 0 then
+	n=n-1 --to prevent checking before gamestart
+	if n%UPDATE_PERIOD == 0 then --check every UPDATE_PERIOD-th frame
+		Spring.Echo("TEST LAGMONITOR")
 		local laggers = {}
 		local players = Spring.GetPlayerList()
 		local recepientByAllyTeam = {}
