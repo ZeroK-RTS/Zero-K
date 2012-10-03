@@ -513,8 +513,10 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 		
 		for i=0, flightTimeFull, timeStep do 
 			if not Spring.ValidUnitID(unitID) then
-				jumps[coords][#jumps[coords]] = nil --remove current unit's jump stack, tell CommandFallback that this jump queue has finished a jump and other unit can start using it
-				clearedQueue = true
+				if not clearedQueue then
+					jumps[coords][#jumps[coords]] = nil --remove current unit's jump stack, tell CommandFallback that this jump queue has finished a jump and other unit can start using it
+					clearedQueue = true
+				end
 				break --unit died or dissappeared
 			end
 			
