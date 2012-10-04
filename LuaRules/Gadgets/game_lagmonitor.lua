@@ -151,7 +151,7 @@ local function GetRecepient(allyTeam, laggers)
 end
 
 function gadget:GameFrame(n)
-	n=n-1 --to prevent checking before gamestart
+ 
 	if n%UPDATE_PERIOD == 0 then --check every UPDATE_PERIOD-th frame
 		local laggers = {}
 		local players = Spring.GetPlayerList()
