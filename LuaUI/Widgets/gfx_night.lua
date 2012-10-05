@@ -1,5 +1,5 @@
 -- $Id: gfx_night.lua 3171 2008-11-06 09:06:29Z det $
-local versionNumber = "v1.5.4"
+local versionNumber = "v1.5.5"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -8,7 +8,7 @@ function widget:GetInfo()
     name      = "Night",
     desc      = versionNumber .. " Makes map appear as nighttime and gives units searchlights.\n",
     author    = "Evil4Zerggin; based on jK's darkening widget",
-    date      = "28 September 2008",
+    date      = "28 September 2008,2012",
     license   = "GNU LGPL, v2.1 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
@@ -305,12 +305,12 @@ local function DrawSearchlights()
 			leadDistance = searchlightAirLeadTime * math.sqrt(vx * vx + vz * vz) * 30
 			radius = unitRadius * 2
 		  elseif (unitDef.canFly) then
-			heading = -GetUnitHeading(unitID) * RADIANS_PER_COBANGLE + math.pi / 2
+			heading = -1*(GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
 			local range = math.max(unitDef.buildDistance, unitDef.maxWeaponRange)
 			leadDistance = math.sqrt(math.max(range * range - unitDef.wantedHeight * unitDef.wantedHeight, 0)) * 0.8
 			radius = unitRadius * 2
 		  else
-			heading = (not (GetUnitIsDead(unitID)) and -GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
+			heading = -1*(not (GetUnitIsDead(unitID)) and GetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE + math.pi / 2
 			leadDistance = searchlightGroundLeadTime * speed
 			radius = unitRadius
 		  end
