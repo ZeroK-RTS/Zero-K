@@ -1,4 +1,4 @@
-local versionName = "v2.64"
+local versionName = "v2.7"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -26,6 +26,7 @@ end
 local spGetTeamUnits 	= Spring.GetTeamUnits
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGiveOrderToUnit =Spring.GiveOrderToUnit
+local spGiveOrderArrayToUnitArray = Spring.GiveOrderArrayToUnitArray
 local spGetMyTeamID 	= Spring.GetMyTeamID
 local spIsUnitAllied 	= Spring.IsUnitAllied
 local spGetUnitPosition =Spring.GetUnitPosition
@@ -90,7 +91,7 @@ local alphaCONSTANT1g		= {500,0.4,0.4} -- balancing constant; effect behaviour. 
 --Move Command constant:
 local halfTargetBoxSize = {400, 0, 185, 50} --the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
 local cMD_DummyG = 248 --a fake command ID to flag an idle unit for pure avoidance. (arbitrary value, change if it overlap with existing command)
-local dummyIDg = "[]" --fake id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue) (arbitrary value, change if conflict with other widget)
+local dummyIDg = "[]" --fake ping id for Lua Message to check lag (prevent processing of latest Command queue if server haven't process previous command yet; to avoid messy queue) (arbitrary value, change if conflict with other widget)
 
 --Angle constant:
 --http://en.wikipedia.org/wiki/File:Degree-Radian_Conversion.svg
@@ -107,9 +108,9 @@ local gps_then_DoCalculation_delayG = 0.25  --elapsed second (Wait) before issui
 -- Distance or velocity constant:
 local timeToContactCONSTANTg= doCalculation_then_gps_delayG + gps_then_DoCalculation_delayG --time scale for move command; to calculate collision calculation & command lenght (default = 0.5 second). Will change based on user's Ping
 local safetyDistanceCONSTANTg=205 --range toward an obstacle before unit auto-reverse (default = 205 meter, ie: half of ZK's stardust range) reference:80 is a size of BA's solar
-local extraLOSRadiusCONSTANTg=205 --add additional distance for unit awareness over the default LOS. (default = +200 meter radius, ie: to 'see' radar blip)
-local velocityScalingCONSTANTg=1 --scale command lenght. (default= 1 multiplier)
-local velocityAddingCONSTANTg=10 --add or remove command lenght (default = 0 meter/second)
+local extraLOSRadiusCONSTANTg=205 --add additional distance for unit awareness over the default LOS. (default = +205 meter radius, ie: to 'see' radar blip).. Larger value measn unit detect enemy sooner, else it will rely on its own LOS.
+local velocityScalingCONSTANTg=1 --scale command lenght. (default= 1 multiplier) *Small value cause avoidance to jitter & stop prematurely*
+local velocityAddingCONSTANTg=50 --add or remove command lenght (default = 50 elmo/second) *Small value cause avoidance to jitter & stop prematurely*
 
 --Engine based wreckID correction constant: *Update: replaced with Game.maxUnit
 --local wreckageID_offset_multiplier = 0 --for Spring 0.82 this is 1500. *Update: replaced with Game.maxUnit. Original function is to offset game's maxUnit based on ingame player count.
@@ -271,9 +272,12 @@ function widget:Update()
 	local attacker = attackerG
 	local commandTTL = commandTTL_G
 	local selectedCons_Meta = selectedCons_Meta_gbl
+	local doCalculation_then_gps_delay = doCalculation_then_gps_delayG
+	local gps_then_DoCalculation_delay = gps_then_DoCalculation_delayG
 	-----
 	if iNotLagging_gbl then
 		local now=spGetGameSeconds()
+		--REFRESH UNIT LIST-- *not synced with avoidance*
 		if (now >= skippingTimer[1]) then --wait until 'skippingTimer[1] second', then do "RefreshUnitList()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 			unitInMotion, attacker, commandTTL, selectedCons_Meta =RefreshUnitList(attacker, commandTTL) --create unit list
@@ -282,26 +286,30 @@ function widget:Update()
 			skippingTimer[1]=now+projectedDelay --wait until next 'skippingTimer[1] second'
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------RefreshUnitList") end
 		end
-		
+		--GATHER SOME INFORMATION ON UNITS-- *part 1, start*
 		if (now >=skippingTimer[2] and cycle==1) and roundTripComplete then --wait until 'skippingTimer[2] second', and wait for 'LUA message received', and wait for 'cycle==1', then do "GetPreliminarySeparation()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 			surroundingOfActiveUnit,commandIndexTable=GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, selectedCons_Meta)
 			cycle=2 --set to 'cycle==2'
 			
-			skippingTimer = CalculateNetworkDelay(1, skippingTimer, now) --update delay statistic. Record 'roundTripComplete'.
-			skippingTimer[2] = now+ gps_then_DoCalculation_delayG --wait until 'gps_then_DoCalculation_delayG'. The longer the better. The delay allow reliable unit direction to be derived from unit's motion
+			skippingTimer[2] = now + gps_then_DoCalculation_delay --wait until 'gps_then_DoCalculation_delayG'. The longer the better. The delay allow reliable unit direction to be derived from unit's motion
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------GetPreliminarySeparation") end
 		end
+		--PERFORM AVOIDANCE/ACTION-- *part 2, end*
 		if (now >=skippingTimer[2] and cycle==2) then --wait until 'skippingTimer[2] second', and wait for 'cycle==2', then do "DoCalculation()"
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
-			local networkDelay = CalculateNetworkDelay(0, skippingTimer, nil) --retrieve delay statistic
-			commandIndexTable, commandTTL =DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay, now, commandTTL) --initiate avoidance system
+			local isAvoiding = nil
+			commandIndexTable, commandTTL,isAvoiding =DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, skippingTimer, now, commandTTL) --initiate avoidance system
 			cycle=1 --set to 'cycle==1'
 			
-			skippingTimer[2]=now+ doCalculation_then_gps_delayG --wait until 'doCalculation_then_gps_delayG'. Is arbitrarily set. Save CPU by setting longer wait.
-			skippingTimer = CalculateNetworkDelay(2, skippingTimer, now) --prepare delay statistic for new measurement
-			spSendLuaUIMsg(dummyIDg) --send ping to server. Wait for answer
-			roundTripComplete = false --Wait for 'LUA message Receive'.
+			if isAvoiding then  
+				skippingTimer.echoTimestamp = now -- --prepare delay statistic to measure new delay (aka: reset stopwatch), --same as "CalculateNetworkDelay("restart", , )"^/
+				spSendLuaUIMsg(dummyIDg) --send ping to server. Wait for answer
+				roundTripComplete = false --Wait for 'LUA message Receive'.
+			else
+				roundTripComplete = true --do not need to send LUA message for next update.
+			end
+			skippingTimer[2]=now + doCalculation_then_gps_delay --wait until 'doCalculation_then_gps_delayG'. Is arbitrarily set. Save CPU by setting longer wait.
 			if (turnOnEcho == 1) then Spring.Echo("-----------------------DoCalculation") end
 		end
 
@@ -416,8 +424,11 @@ function RefreshUnitList(attacker, commandTTL)
 			end
 		end
 	end
-	if arrayIndex>1 then relevantUnit[1]=arrayIndex -- store the array's lenght in the first row of the array
-	else relevantUnit[1] = nil end --send out nil if no unit is present
+	if arrayIndex>1 then 
+		relevantUnit[1]=arrayIndex -- store the array's lenght in the first row of the array
+	else 
+		relevantUnit[1] = nil 
+	end --send out nil if no unit is present
 	if (turnOnEcho == 1) then
 		Spring.Echo("allMyUnits(RefreshUnitList): ")
 		Spring.Echo(allMyUnits)
@@ -492,7 +503,8 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 end
 
 --perform the actual collision avoidance calculation and send the appropriate command to unit
-function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, networkDelay, now, commandTTL)
+function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, skippingTimer, now, commandTTL)
+	local isAvoiding = nil
 	if surroundingOfActiveUnit[1]~=nil then --if flagged as nil then no stored content then this mean there's no relevant unit
 		for i=2,surroundingOfActiveUnit[1], 1 do --index 1 is for array's lenght
 			local unitID=surroundingOfActiveUnit[i][1]
@@ -531,12 +543,13 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, net
 					local fixedPointCONSTANTtrigger = surroundingOfActiveUnit[i][11] --//fetch information on which fixedPoint constant to use
 					if (newSurroundingUnits[1] ~=nil) then --//check again if there's still any enemy to avoid. Submerged unit might return empty list if their enemy has no Sonar (their 'losRadius' became half the original value so that they don't detect/avoid unnecessarily). 
 						local avoidanceCommand = true
-						commandTTL, avoidanceCommand = InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)--delete old widget command, update commandTTL, and send constructor to base for retreat
+						local orderArray = {nil}
+						commandTTL, avoidanceCommand,orderArray= InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)--delete old widget command, update commandTTL, and send constructor to base for retreat
 						if avoidanceCommand or (not options.dbg_RemoveAvoidanceSplitSecond.value) then 
-							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger, newCommand) --calculate move solution
+							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand) --calculate move solution
 							local newY=spGetGroundHeight(newX,newZ)
 							--start Insert Avoidance Command Queue:--
-							spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
+							orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
 							commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeoutG, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
 							commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
 							commandIndexTable[unitID]["widgetZ"]=newZ
@@ -546,17 +559,42 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, net
 								Spring.Echo("newZ(Update) " .. newZ)
 							end
 						end
+						if #orderArray >0 then
+							spGiveOrderArrayToUnitArray ({unitID},orderArray)
+							isAvoiding = true
+						end
 					end
 				end
 			end
 		end
 	end
-	return commandIndexTable, commandTTL
+	return commandIndexTable, commandTTL, isAvoiding
 end
 
 function widget:RecvLuaMsg(msg, playerID) --receive echo from server ('LUA message Receive')
 	if msg:sub(1,3) == dummyIDg and playerID == myPlayerID then
+		local skippingTimer = skippingTimerG
+		-----
+		
+		--Spring.Echo(dummyIDg)
+		skippingTimer.networkDelay = spGetGameSeconds() - skippingTimer.echoTimestamp --get the delay between previous Command and the latest 'LUA message Receive'
+		--Method 1: use simple average [[
+		--skippingTimer.sumOfAllNetworkDelay=skippingTimer.sumOfAllNetworkDelay + skippingTimer.networkDelay --sum all the delay ever recorded
+		--skippingTimer.sumCounter = skippingTimer.sumCounter + 1 --count all the delay ever recorded
+		--]]
+		
+		--Method 2: use rolling average [[
+		skippingTimer.storedDelay[skippingTimer.index] = skippingTimer.networkDelay --store network delay value in a rolling table
+		skippingTimer.index = skippingTimer.index+1 --table index ++
+		if skippingTimer.index >= 12 then --roll the table/wrap around, so that the index circle the table. The 11-th sequence is for storing the oldest value, 1-st to 10-th sequence is for the average
+			skippingTimer.index = 1
+		end
+		skippingTimer.averageDelay = skippingTimer.averageDelay + skippingTimer.networkDelay/10 - (skippingTimer.storedDelay[skippingTimer.index] or 0.3)/10 --add new delay and minus old delay, also use 0.3sec as the old delay if nothing is stored yet.
+		--]]
 		roundTripComplete = true --unlock system
+		
+		-----
+		skippingTimerG = skippingTimer
 	end
 end
 
@@ -567,40 +605,6 @@ function ReportedNetworkDelay(playerIDa, defaultDelay)
 	end
 end
 
-function CalculateNetworkDelay(reportingIn, skippingTimer, now)
-	if reportingIn == 0 then --report known delay statistic
-		local delay = 0
-		local instantaneousDelay = skippingTimer.networkDelay --present delay
-		--local averageDelay = skippingTimer.sumOfAllNetworkDelay/skippingTimer.sumCounter --average delay
-		
-		local averageDelay = skippingTimer.averageDelay
-		if instantaneousDelay < averageDelay then --bound all delay to be > than average delay
-			delay = averageDelay
-		else
-			delay = instantaneousDelay
-		end 
-		return delay
-	elseif reportingIn == 1 then --update delay statistic
-		skippingTimer.networkDelay = now - skippingTimer.echoTimestamp --get the delay between previous Command and the latest 'LUA message Receive'
-		--Method 1: use simple average [[
-		--skippingTimer.sumOfAllNetworkDelay=skippingTimer.sumOfAllNetworkDelay + skippingTimer.networkDelay --sum all the delay ever recorded
-		--skippingTimer.sumCounter = skippingTimer.sumCounter + 1 --count all the delay ever recorded
-		--]]
-		
-		--Method 2: use rolling average [[
-		skippingTimer.storedDelay[skippingTimer.index] = skippingTimer.networkDelay --store network delay value in a rolling table
-		skippingTimer.index = skippingTimer.index+1 --table index ++
-		if skippingTimer.index >= 12 then --roll the table/wrap around, so that the index circle the table
-			skippingTimer.index = 1
-		end
-		skippingTimer.averageDelay = skippingTimer.averageDelay + skippingTimer.networkDelay/10 - (skippingTimer.storedDelay[skippingTimer.index] or 0.3)/10 --add new delay and minus old delay, also use 0.3sec as the old delay if nothing is stored yet.
-		--]]
-		return skippingTimer
-	elseif reportingIn == 2 then --update delay statistic
-		skippingTimer.echoTimestamp = now	--remember the current time of sending ping
-		return skippingTimer
-	end
-end
 ---------------------------------Level1
 ---------------------------------Level2 (level 1's call-in)
 function RetrieveAttackerList (unitID, attacker)
@@ -931,7 +935,7 @@ function GetImpatience(newCommand, unitID, commandIndexTable)
 	return impatienceTrigger, commandIndexTable
 end
 
-function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, networkDelay, fixedPointCONSTANTtrigger, newCommand)
+function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand)
 	if (unitID~=nil) and (targetCoordinate ~= nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
 		local aCONSTANT 								= aCONSTANTg --attractor constant (amplitude multiplier)
 		local unitDirection, _, usingLastPosition		= GetUnitDirection(unitID, lastPosition) --get unit direction
@@ -961,7 +965,7 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
 		--convert an angular command into a coordinate command
-		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay, usingLastPosition, newCommand)
+		local newX, newZ= SendCommand(unitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, skippingTimer, usingLastPosition, newCommand)
 		if (turnOnEcho == 1) then
 			Spring.Echo("unitID(AvoidanceCalculator)" .. unitID)
 			Spring.Echo("targetAngle(AvoidanceCalculator) " .. targetAngle)
@@ -1039,10 +1043,11 @@ function InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)
 		-- spGiveOrderToUnit(unitID, cQueue[b].id, cQueue[b].params, options) --replace the rest of the command
 	-- end
 	--Method 4: with network delay detection won't do any problem
+	local orderArray={nil,nil,nil,nil,nil,nil}
 	local queueIndex=1
 	local avoidanceCommand = true
 	if not newCommand then  --if widget's command then delete it
-		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
+		orderArray[1] = {CMD_REMOVE, {cQueue[1].tag}, {}} --spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} ) --delete previous widget command
 		queueIndex=2 --skip index 1 of stored command. Skip widget's command
 		commandTTL[unitID][#commandTTL[unitID]] = nil --//delete the last watchdog entry (the "not newCommand" means that previous widget's command haven't changed yet (nothing has interrupted this unit, same is with commandTTL), and so if command is to delete then it is good opportunity to also delete its timeout info at *commandTTL* too). Deleting this entry mean that this particular command will no longer be checked for timeout.
 	end
@@ -1051,20 +1056,20 @@ function InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)
 			if cQueue[queueIndex+1].id==90 or cQueue[queueIndex+1].id==125 then --if second (2) queue is also reclaim/ressurect
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
 				if (cQueue[queueIndex+1].params[3]~=nil) then  --second (2) queue is area reclaim. area command should has no "nil" on params 1,2,3, & 4
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete latest reclaiming/ressurecting command (skip the target:wreck/units). Allow command reset
+					orderArray[#orderArray+1] = {CMD_REMOVE, {cQueue[queueIndex].tag}, {}} -- spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete latest reclaiming/ressurecting command (skip the target:wreck/units). Allow command reset
 					local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex+1])
-					spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command OR to any heavy concentration of ally (haven)
+					orderArray[#orderArray+1] = {CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command OR to any heavy concentration of ally (haven)
 					commandTTL[unitID][#commandTTL[unitID] +1] = {countDown = consRetreatTimeout, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 15x*RefreshUnitUpdateRate* to expire
 					avoidanceCommand = false
 				end
 			elseif cQueue[queueIndex+1].id==40 then --if second (2) queue is also repair
 				--if (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]-wreckageID_offset) or (not Spring.ValidFeatureID(cQueue[queueIndex+1].params[1]))) and not Spring.ValidUnitID(cQueue[queueIndex+1].params[1]) then --if it was an area command
 				if (cQueue[queueIndex+1].params[3]~=nil) then  --area command should has no "nil" on params 1,2,3, & 4
-					spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete current repair command, (skip the target:units). Reset the repair command
+					orderArray[#orderArray+1] = {CMD_REMOVE, {cQueue[queueIndex].tag}, {}} --spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[queueIndex].tag}, {} ) --delete current repair command, (skip the target:units). Reset the repair command
 				end
 			elseif (cQueue[queueIndex].params[3]~=nil) then  --if first (1) queue is area reclaim (an area reclaim without any wreckage to reclaim). area command should has no "nil" on params 1,2,3, & 4
 				local coordinate = (FindSafeHavenForCons(unitID, now)) or  (cQueue[queueIndex])
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
+				orderArray[#orderArray+1] = {CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, coordinate.params[1], coordinate.params[2], coordinate.params[3]}, {"alt"} ) --divert unit to the center of reclaim/repair command
 				commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeout, widgetCommand= {coordinate.params[1], coordinate.params[3]}} --//remember this command on watchdog's commandTTL table. It has 2x*RefreshUnitUpdateRate* to expire
 				avoidanceCommand = false
 			end
@@ -1085,7 +1090,7 @@ function InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)
 			Spring.Echo(cQueue[2].params[3])
 		end
 	end
-	return commandTTL, avoidanceCommand --return updated memory tables. One for checking if new command is issued and another is to check for command's expiration age.
+	return commandTTL, avoidanceCommand, orderArray --return updated memory tables. One for checking if new command is issued and another is to check for command's expiration age.
 end
 ---------------------------------Level2
 ---------------------------------Level3 (low-level function)
@@ -1558,18 +1563,20 @@ function CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, 
 end
 
 --convert angular command into coordinate, plus other function
-function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, networkDelay, usingLastPosition, newCommand)
+function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, skippingTimer, usingLastPosition, newCommand)
 	local safetyDistanceCONSTANT=safetyDistanceCONSTANTg
 	local timeToContactCONSTANT=timeToContactCONSTANTg
 	local activateAutoReverse=activateAutoReverseG
+	--local doCalculation_then_gps_delay = doCalculation_then_gps_delayG
+	local gps_then_DoCalculation_delay = gps_then_DoCalculation_delayG
 	------
 	if (nearestFrontObstacleRange> losRadius) then nearestFrontObstacleRange = 999 end --if no obstacle infront of unit then set nearest obstacle as far as LOS to prevent infinite velocity.
 	local newUnitAngleDerived= GetNewAngle(unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor) --derive a new angle from calculation for move solution
 
-	local velocity=unitSpeed*(timeToContactCONSTANT+ networkDelay) --scale-down/scale-up command lenght based on system delay. Short command may make unit move in jittery way
+	local velocity=unitSpeed*(math.max(timeToContactCONSTANT, skippingTimer.networkDelay + gps_then_DoCalculation_delay)) --scale-down/scale-up command lenght based on system delay (because short command will make unit move in jittery way & avoidance stop prematurely). *NOTE: select either preset velocity (timeToContactCONSTANT==gps_then_DoCalculation_delayG + doCalculation_then_gps_delayG) or the one taking account delay measurement (skippingTimer.networkDelay + gps_then_DoCalculation_delay), which one is highest, times unitSpeed as defined by UnitDefs.
 	local networkDelayDrift = 0
-	if usingLastPosition then  --unit drift contributed by network lag/2 (divide-by-2 for safety margin), only calculated when unit is known to be moving (eg: is using lastPosition to determine direction), but network lag value is not accurate enough to yield an accurate drift prediction.
-		networkDelayDrift = unitSpeed*(networkDelay/2)
+	if usingLastPosition then  --unit drift contributed by network lag/2 (divide-by-2 because averageDelay is a roundtrip delay and we just want the delay of stuff measured on screen), only calculated when unit is known to be moving (eg: is using lastPosition to determine direction), but network lag value is not accurate enough to yield an accurate drift prediction.
+		networkDelayDrift = unitSpeed*(skippingTimer.averageDelay/2)
 	else --if not using-last-position (eg: initially stationary) then add this backward motion (as 'hax' against unit move toward enemy because of avoidance due to firing/reloading weapon)
 		networkDelayDrift = -1*unitSpeed/2
 	end
