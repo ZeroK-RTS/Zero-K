@@ -191,7 +191,7 @@ function widget:Update()
 
 			w:Dispose()
 		end
-		w:SetPos(w.x + 10, w.y)
+		w:SetPos(w.x + 10, w.y) -- this is where it moves the window off the screen
 	end
 
 	if (deleted > 0) then
@@ -301,7 +301,7 @@ function widget:AddChatMessage(msg)
 	local w = Chili.Window:New{
 		parent    = Chili.Screen0;
 		x         = vsx-options.window_width.value;
-		y    = options.firstbubble_y.value;
+		y         = options.firstbubble_y.value;
 		width     = options.window_width.value;
 		height    = options.window_height.value;
 		--minWidth  = options.window_width.value;
@@ -310,7 +310,7 @@ function widget:AddChatMessage(msg)
 		resizable = false;
 		draggable = false;
 		
-		skinName  = "DarkGlass";
+		skinName  = "BubbleBlack";
 		color     = bubbleColor;
 		padding   = {12, 12, 12, 12};
 
@@ -337,8 +337,8 @@ function widget:AddChatMessage(msg)
 		parent = w;
 		file   =   ((WG.Avatar and WG.Avatar.GetAvatar(playerName)) or avatar) or avatar_fallback; --get avatar from "api_avatar.lua" or from server, or use the default avatar
 		--file2  = (type=='s') and "LuaUI/Images/tech_progressbar_empty.png";
-		width  = options.window_height.value-36;
-		height = options.window_height.value-36;
+		width  = options.window_height.value-24;
+		height = options.window_height.value-24;
 	}
 	
 	--[[
@@ -358,9 +358,9 @@ function widget:AddChatMessage(msg)
 		parent   = w;
 		caption  = playerName .. verb;
 		--caption  = "<" .. playerName .. ">";
-		x        = options.window_height.value - 36;
+		x        = options.window_height.value - 24;
 		y        = 2;
-		width    = w.clientWidth - (options.window_height.value - 36) - 5;
+		width    = w.clientWidth - (options.window_height.value - 24) - 5;
 		height   = 14;
 		valign   = "ascender";
 		align    = "left";
@@ -374,10 +374,10 @@ function widget:AddChatMessage(msg)
 
 	Chili.TextBox:New{
 		parent  = w;
-		text    = textColor .. "<" .. playerName .. ">\008 " .. GetColorChar(bubbleColor) .. text .. "\008";
-		x       = options.window_height.value - 32;
+		text    = textColor .. playerName .. ":\008 " .. GetColorChar(bubbleColor) .. text .. "\008";
+		x       = options.window_height.value - 24;
 		y       = 2;
-		width   = w.clientWidth - (options.window_height.value - 32) - 5;
+		width   = w.clientWidth - (options.window_height.value - 24) - 5;
 		valign  = "ascender";
 		align   = "left";
 		font    = {
@@ -426,7 +426,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 	local playerName,active,isSpec,teamID = Spring.GetPlayerInfo(player)
 	local teamcolor = {Spring.GetTeamColor(teamID)}
 	if (not active or isSpec) then
-		teamcolor = {1,0,0,0.7}
+		teamcolor = {1,0,0,1}
 	end
 	
 	local custom_timeadded = GetTimer()
@@ -443,8 +443,8 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		autosize  = true;
 		resizable = false;
 		--draggable = false;
-		skinName  = "DarkGlass";
-		color     = {1,0.2,0.2,0.7};
+		skinName  = "BubbleBlack";
+		color     = {1,0.2,0.2,1};
 		padding   = {12, 12, 12, 12};
 
 		custom_timeadded = custom_timeadded,
@@ -463,17 +463,17 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 	Chili.Image:New{
 		parent = w;
 		file   = 'LuaUI/Images/Crystal_Clear_action_flag.png';
-		width  = options.window_height.value-36;
-		height = options.window_height.value-36;
+		width  = options.window_height.value-24;
+		height = options.window_height.value-24;
 	}
 	local text = GetColorChar(teamcolor) .. playerName .. "\008 added point" .. (caption and (": " .. caption) or '')
 	
 	local l = Chili.TextBox:New{
 		parent   = w;
 		text  = text;
-		x        = options.window_height.value - 36;
+		x        = options.window_height.value - 24;
 		y        = 2;
-		width    = w.clientWidth - (options.window_height.value - 36) - 5;
+		width    = w.clientWidth - (options.window_height.value - 24) - 5;
 		valign   = "ascender";
 		align    = "left";
 		font    = {
@@ -502,12 +502,12 @@ function widget:AddWarning(text)
 	local w = Chili.Window:New{
 		parent    = Chili.Screen0;
 		x         = vsx-options.window_width.value;
-		y   = options.firstbubble_y.value;
+		y         = options.firstbubble_y.value;
 		width     = options.window_width.value;
 		height    = options.window_height.value;
 		resizable = false;
 		draggable = false;
-		skinName  = "DarkGlass";
+		skinName  = "BubbleBlack";
 		color     = teamcolor;
 		padding   = {12, 12, 12, 12};
 
@@ -518,15 +518,15 @@ function widget:AddWarning(text)
 	Chili.Image:New{
 		parent = w;
 		file   = 'LuaUI/Images/Crystal_Clear_app_error.png';
-		width  = options.window_height.value-36;
-		height = options.window_height.value-36;
+		width  = options.window_height.value-24;
+		height = options.window_height.value-24;
 	}
 
 	Chili.Label:New{
 		parent  = w;
 		caption = text;
-		x       = options.window_height.value - 36;
-		width   = w.clientWidth - (options.window_height.value - 36) - 5;
+		x       = options.window_height.value - 24;
+		width   = w.clientWidth - (options.window_height.value - 24) - 5;
 		height  = "90%";
 		valign  = "center";
 		align   = "left";
