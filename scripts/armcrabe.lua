@@ -31,7 +31,6 @@ smokePiece = {base, turret}
 --------------------------------------------------------------------------------
 
 local restore_delay = 3000
-local base_speed = 100
 
 local SIG_MOVE = 2	
 local SIG_AIM1 = 4
@@ -112,7 +111,7 @@ local function Curl()
 	
 	Sleep(100)
 	bCurling = true
-	SetUnitValue(COB.MAX_SPEED, 1)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.05)
 
 	Move( canon , y_axis, 5 , 2.5 )
 	Move( base , y_axis, -5 , 2.5 )
@@ -211,7 +210,7 @@ local function Uncurl()
     WaitForTurn(leg3, z_axis)
     WaitForTurn(leg4, z_axis)    
 	
-    SetUnitValue(COB.MAX_SPEED, base_speed)
+    Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
     bCurling = false
 end
 
@@ -234,7 +233,6 @@ local function CurlDelay()	--workaround for crabe getting stuck in fac
 end
 
 function script.Create()
-	base_speed = GetUnitValue(COB.MAX_SPEED)
 	--set ARMORED to false
 	Hide( flare1)
 	Hide( flare2)
