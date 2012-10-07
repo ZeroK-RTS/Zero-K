@@ -472,9 +472,6 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 	spSetUnitRulesParam(unitID,"jumpReload",0)
 	
 	unitCmdQueue[unitID] = spGetCommandQueue(unitID)
-	local unitRadius = Spring.GetUnitRadius(unitID)
-	local unitHeight = Spring.GetUnitHeight(unitID)
-	Spring.SetUnitRadiusAndHeight (unitID, unitRadius,1)
 	
 	local function JumpLoop()
 		local wasSleeping = false
@@ -506,8 +503,7 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 		
 		GG.FallDamage.ExcludeFriendlyCollision(unitID)
 		
-		local halfJump, quarterJump, landed, runOnce, clearedQueue= false,false,false, false, false
-		local correctedSpeed = 0
+		local halfJump, quarterJump, landed, runOnce, clearedQueue = false,false,false, false, false
 		local reloadTimeInv = 1/reloadTime
 		local reloadSoFar = 0
 		
@@ -571,18 +567,6 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 				impulseQueue[#impulseQueue+1] = {unitID, dvx, dvy, dvz} --add launch impulse
 			end
 			
-			if i>(flightTimeFull*0.1) and correctedSpeed <2 then --try to compensate for total velocity loss during mid air collision .
-				local vx, vy,vz = Spring.GetUnitVelocity(unitID)
-				if abs(vx)<abs(xVel*0.5) and abs(vz)<abs(zVel*0.5) or abs(vy)< abs(yVel- mapGravity*i)*0.5 then
-					local dvx = xVel - vx --difference between needed velocity and current velocity
-					local dvz = zVel - vz
-					local dvy = (yVel- mapGravity*i) - vy -- note: is using "v = v0 + a*t"
-					impulseQueue[#impulseQueue+1] = {unitID, dvx, dvy, dvz} --add velocity correction
-					correctedSpeed = correctedSpeed + 1
-					--Spring.Echo("CORRECTION")
-				end
-			end
-			
 			impulseQueue[#impulseQueue+1] = {unitID, 0, -artificialGrav-1,0} --add artificial gravity for more aggresive looking jump. Useful in low gravity map
 			impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
 			
@@ -598,7 +582,6 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 						ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --reload the order given during jump. This override the unit's tendency to return to their jumping position
 						landed = true
 						SetLeaveTracks(unitID, true)
-						Spring.SetUnitRadiusAndHeight (unitID, unitRadius,unitHeight)
 						if cob then
 							spCallCOBScript( unitID, "EndJump", 0)
 						else
@@ -650,7 +633,6 @@ local function ImpulseJump(unitID, height,lineDist,speed,start,vector,cob,rotate
 					ReloadQueue(unitID, unitCmdQueue[unitID], cmdTag) --refresh unit's order
 					landed = true
 					SetLeaveTracks(unitID, true)
-					Spring.SetUnitRadiusAndHeight (unitID, unitRadius,unitHeight)
 					if cob then
 						spCallCOBScript( unitID, "EndJump", 0)
 					else
@@ -809,7 +791,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID == CMD_JUMP) then
 		goalSet[unitID] = false --redo the MoveGoal each time player issued a new jump command. As precaution.
 	
-		if (spTestBuildOrder(unitDefID, cmdParams[1], cmdParams[2], cmdParams[3], 1) == 0) then
+		if (not isImpulseJump) and (spTestBuildOrder(unitDefID, cmdParams[1], cmdParams[2], cmdParams[3], 1) == 0) then
 			return false --do not allow
 		end
 	end

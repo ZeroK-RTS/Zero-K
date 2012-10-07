@@ -17,7 +17,7 @@
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
-    desc      = "v1.21 Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use AutoGroup or manual), and then give any of them a build queue. As result, the whole group (group 0) will share the same build queue and the work will automatically distributed among them. Use it to macro alot of idle constructors",
+    desc      = "v1.22 Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use AutoGroup or manual), and then give any of them a build queue. As result, the whole group (group 0) will share the same build queue and the work will automatically distributed among them. Use it to macro alot of idle constructors",
     author    = "Troy H. Cheek, modified by msafwan",
     date      = "July 20, 2009, 7 Oct 2012",
     license   = "GNU GPL, v2 or later",
@@ -156,7 +156,13 @@ if not Spring.IsGUIHidden() then
 			glBillboard()
 			glColor(textColor)
 --			glText("cb "..myCmd, -10.0, -15.0, textSize, "con")
-			glText("cb", -10.0, -15.0, textSize, "con")
+			if myCmd == "idle" then
+				glText("idl", -10.0, -15.0, textSize, "con")
+			elseif myCmd == "busy" then
+				glText("bsy", -10.0, -15.0, textSize, "con")
+			else
+				glText("cb", -10.0, -15.0, textSize, "con")
+			end
 			glPopMatrix()
 			glColor(1, 1, 1, 1)
 		end -- if InView
@@ -273,8 +279,8 @@ function widget:CommandNotify(id, params, options, zkMex)
 	local selectedUnits = spGetSelectedUnits()
 	for _, unitID in ipairs(selectedUnits) do	-- check selected units...
 		if ( myUnits[unitID] ) then	--  was issued to one of our units.
-			if ( options.shift ) then -- used shift for build.
-				if ( id < 0 ) then
+			if ( options.shift ) then -- used shift for:.
+				if ( id < 0 ) then --for: building
 					local x, y, z, h = params[1], params[2], params[3], params[4]
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
 					local hash = hash(myCmd)
@@ -285,14 +291,21 @@ function widget:CommandNotify(id, params, options, zkMex)
 					end
 					CleanOrders(myQueue)	-- don't add if can't build there
 					return true	-- have to return true or Spring still handles command itself.
-				else
-					if myUnits[unitID] == "idle" then
-						myUnits[unitID] = "busy" --queued other thing
+				else --for: moving/attacking/repairing, ect
+					if myUnits[unitID] == "idle" then --unit is not doing anything
+						myUnits[unitID] = "busy" --is doing irrelevant thing
 					end
 					-- do NOT return here because there may be more units.  Let Spring handle.
 				end
 			else
-				myUnits[unitID] = "busy"	-- direct command instead of queued.
+				if ( id < 0 ) then --direct command of building stuff
+					local x, y, z, h = params[1], params[2], params[3], params[4]
+					local myCmd = { id=id, x=x, y=y, z=z, h=h }
+					local hash = hash(myCmd)
+					myUnits[unitID] = hash
+				else
+					myUnits[unitID] = "busy"	-- direct command of something else.
+				end
 				-- do NOT return here because there may be more units.  Let Spring handle.
 			end
 		end
@@ -315,7 +328,14 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 			end
 		end
 		for unit2,myCmd in pairs(myUnits) do
-			if ( myCmd == myCmd1 or myCmd == "asst "..unitID ) then --check if this unit is being GUARDed or whether someone is using same command as this unit, if true:
+			if ( myCmd == myCmd1 ) then --check if others is using same command as this unit, if true:
+				local cmd2 = GetFirstCommand(unit2)
+				if ( cmd2 == nil ) then		-- no orders?  Must be idle.
+					myUnits[unit2]="idle"
+				else 
+					myUnits[unit2]="busy" -- command done but still busy.
+				end
+			elseif ( myCmd == "asst "..unitID ) then  --check if this unit is being GUARDed
 				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command
 				myUnits[unit2] = "idle" --set as "idle"
 			end
@@ -368,7 +388,7 @@ function FindIdleUnits(myUnits, thisFrame)
 			end
 		end
 		if ( # nearestOrders < 1 ) then 
-			break -- no more job queue, escape the loop.
+			break -- no more job, escape the loop.
 		end	-- nothing we can do
 		local closeDist = huge
 		local close = {}
