@@ -310,9 +310,12 @@ function widget:CommandNotify(cmdID, params, options)
                     local z = command.z
 					local buildable, feature = spTestBuildOrder(mexDefID,x,0,z,1)
 					if buildable ~= 0 then
-						spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
+						local handledExternally = false
 						if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-							Script.LuaUI.CommandNotifyMex(-mexDefID, {x,0,z,0} , options)
+							handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x,0,z,0} , options)
+						end
+						if ( not handledExternally ) then
+							spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
 						end
 					else
 						local mexes = spGetUnitsInRectangle(x-1,z-1,x+1,z+1)
@@ -358,9 +361,12 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 				return true
 			else
-				spGiveOrder(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options.coded)
+				local handledExternally = false
 				if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-					Script.LuaUI.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options)
+					handledExternally = Script.LuaUI.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options)
+				end
+				if ( not handledExternally ) then
+					spGiveOrder(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options.coded)
 				end
 				return true
 			end

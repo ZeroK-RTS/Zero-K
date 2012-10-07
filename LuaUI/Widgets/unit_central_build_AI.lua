@@ -17,9 +17,9 @@
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
-    desc      = "v1.2 Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use AutoGroup or manual), and then give any of them a build queue. As result, the whole group (group 0) will share the same build queue and the work will automatically distributed among them. Use it to macro alot of idle constructors",
-    author    = "Troy H. Cheek",
-    date      = "July 20, 2009",
+    desc      = "v1.21 Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use AutoGroup or manual), and then give any of them a build queue. As result, the whole group (group 0) will share the same build queue and the work will automatically distributed among them. Use it to macro alot of idle constructors",
+    author    = "Troy H. Cheek, modified by msafwan",
+    date      = "July 20, 2009, 7 Oct 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
     enabled   = false  --  loaded by default?
@@ -37,6 +37,8 @@ end
 -- _ orders with shift+ctrl have higher priority ( insert in queue -> cons won't interrupt their current actions)
 
 ---- CHANGELOG -----
+-- msafwan,			v1.21	(7oct2012)	: 	fix some cases where unit become 'idle' but failed to be registered by CBA, 
+--											make CBA assign all job at once rather than sending 1 by 1 after every some gameframe delay,
 -- msafwan,			v1.2	(4sept2012)	: 	made it work with ZK "cmd_mex_placement.lua" mex queue, 
 --											reduce the tendency to make a huge blob of constructor (where all constructor do same job),
 --											reduce chance of some constructor not given job when player have alot of constructor,
@@ -53,9 +55,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local myGroupId = 0	--	Group number (0 to 9) to be controlled by Central Build AI.
---  -1 = Use custom group (hotkey to select, ctrl-hotkey to add units) similar old Group AI.
-local hotkey = string.byte( "g" )	--  Change "g" to select new hotkey.
+local myGroupId = 0	--//Constant: a group number (0 to 9) will be controlled by Central Build AI. NOTE: put "-1" to use a custom group instead (use the hotkey to add units;ie: ctrl+hotkey).
+local hotkey = string.byte( "g" )	--//Constant: a custom hotkey to add unit to custom group. NOTE: set myGroupId to "-1" to use this hotkey.
+local checkFeatures = false --//Constant: if true, Central Build will reject any build queue on top of allied features (eg: ally's wreck & dragon teeth).
 
 local Echo                 	= Spring.Echo
 local spGetUnitDefID		= Spring.GetUnitDefID
@@ -129,7 +131,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-	widgetHandler:RegisterGlobal("CommandNotifyMex", CommandNotifyMex) --an event which is called everytime "cmd_mex_placement.lua" handle a mex command. Reference : http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
+	widgetHandler:RegisterGlobal("CommandNotifyMex", CommandNotifyMex) --an event which is called everytime "cmd_mex_placement.lua" widget handle a mex command. Reference : http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
 end
 
 --function widget:CommandNotify(cmdID, cmdParams, cmdOpts)
@@ -207,10 +209,14 @@ end
 --  Was Update(), but Niobium says GameFrame() is more better.
 
 function widget:GameFrame(thisFrame)
-	if ( thisFrame < nextFrame ) then return end
+	if ( thisFrame < nextFrame ) then 
+		return
+	end
+	if ( groupHasChanged == true ) then 
+		UpdateOneGroupsDetails(myGroupId)
+	end
 	nextFrame = thisFrame + 30	-- try again in 1 second if nothing else triggers
-	if ( groupHasChanged == true ) then UpdateOneGroupsDetails(myGroupId) end
-	FindIdleUnits(myUnits)		-- locate idle units not found otherwise
+	FindIdleUnits(myUnits,thisFrame)		-- locate idle units not found otherwise
 end
 
 --	This function detects that a new group has been defined or changed.  Use it to set a flag
@@ -222,7 +228,7 @@ function widget:GroupChanged(groupId)
 --		local units = spGetGroupUnits(myGroupId)
 --		Echo( spGetGameFrame() .. " Change detected in group." )
 		groupHasChanged = true
-		nextFrame = math.min (spGetGameFrame() + ping() , nextFrame)
+		nextFrame = spGetGameFrame() + ping()
 	end
 end
 
@@ -257,7 +263,7 @@ end
 
 --	receive broadcasted event from "cmd_mex_placement.lua" which notify us that it has its own mex queue
 function CommandNotifyMex(id,params,options)
-	widget:CommandNotify(id, params, options, 1)
+	return widget:CommandNotify(id, params, options, 1)
 end
 
 --  If the command is issued to something in our group, flag it.
@@ -269,17 +275,11 @@ function widget:CommandNotify(id, params, options, zkMex)
 		if ( myUnits[unitID] ) then	--  was issued to one of our units.
 			if ( options.shift ) then -- used shift for build.
 				if ( id < 0 ) then
-					if zkMex == 1 then -- check if command from "cmd_mex_placement.lua". If so, send CMD.STOP to cancel them
-						Spring.GiveOrder(CMD_REMOVE, {id} ,  {"alt"} )
-					end
 					local x, y, z, h = params[1], params[2], params[3], params[4]
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
 					local hash = hash(myCmd)
 					if ( myQueue[hash] ) then	-- if dupe of existing order
 						myQueue[hash] = nil		-- must want to cancel
-						-- if zkMex == 1 then 
-						Spring.GiveOrder(CMD_REMOVE, {id} ,  {"alt"} ) --if zkMex then remove the build queue
-						-- end
 					else						-- if not a dupe
 						myQueue[hash] = myCmd	-- add to CB queue
 					end
@@ -303,18 +303,24 @@ end
 --  Thanks again to Niobium for pointing out UnitCmdDone().
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
-	if ( myUnits[unitID] and cmdID < 0) then	-- one of us building something
+	if ( myUnits[unitID] and cmdID < 0 ) then	-- one of us finish building something
 		local myCmd1 = myUnits[unitID]
-		myCmd1 = myCmd1:sub(1,4)
-		if myCmd1 ~= "asst" then
-			myUnits[unitID]="idle"
-		end
-		for unit2,myCmd in pairs(myUnits) do
-			if ( myCmd == "asst "..unitID ) then
-				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command
-				myUnits[unit2] = "idle"
+		local myCmd_header = myCmd1:sub(1,4)
+		if myCmd_header ~= "asst" then --check if this unit was GUARDing another unit. If NOT then:
+			local cmd1 = GetFirstCommand(unitID)
+			if ( cmd1 == nil ) then		-- no orders?  Must be idle.
+				myUnits[unitID]="idle"
+			else
+				myUnits[unitID]="busy" -- command done but still busy.
 			end
 		end
+		for unit2,myCmd in pairs(myUnits) do
+			if ( myCmd == myCmd1 or myCmd == "asst "..unitID ) then --check if this unit is being GUARDed or whether someone is using same command as this unit, if true:
+				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command
+				myUnits[unit2] = "idle" --set as "idle"
+			end
+		end		
+		nextFrame = spGetGameFrame() + ping() --find new work
 	end
 end
 
@@ -323,42 +329,70 @@ end
 function widget:UnitIdle(unitID, unitDefID, teamID)
 	if ( myUnits[unitID] ) then
 		myUnits[unitID] = "idle"
-		nextFrame = math.min (spGetGameFrame() + ping() , nextFrame) --find new work
+		nextFrame = spGetGameFrame() + ping() --find new work
 	end
 end
 
 --  One at a time, assign idle builders new tasks.
 
-function FindIdleUnits(myUnits)
-	local nearestOrders = {}
-	for unitID,myCmd in pairs(myUnits) do
-		local cmd1 = GetFirstCommand(unitID)
-		if ( cmd1 == nil ) then		-- no orders?  Must be idle.
-			myUnits[unitID] = "idle"
-			local tmp = GetWorkFor(unitID)
-			if ( tmp ~= nil ) then
-				table.insert( nearestOrders, tmp )	-- indexed okay here
+function FindIdleUnits(myUnits, thisFrame)
+	--HOW THIS WORK:
+	--*loop for all CBA unit,
+	--	*loop for all CBA unit,
+	--		*for each CBA unit: find nearest job
+	--			>check nearest job for assisting other constructor
+	--			>check nearest job for constructing building queue
+	--			>check whether assisting or construction is nearest
+	--		*return nearest job for each CBA unit
+	--	*return all matching jobs for all CBA units
+	--	>check how many constructor has new job order
+	--	>check which constructor is the nearest to its job
+	--	>register that constructor as worker
+	--*return command to be given to that constructor
+	-->send all command to all CBA units.
+	local orderArray={}
+	local unitArray={}
+	for _,_ in pairs(myUnits) do
+		local nearestOrders = {}
+		for unitID,myCmd in pairs(myUnits) do
+			--[[
+			local cmd1 = GetFirstCommand(unitID)
+			if ( cmd1 == nil ) then		-- no orders?  Must be idle.
+				myUnits[unitID] = "idle"
+			--]]
+			if myUnits[unitID] == "idle" then --if unit is marked as idle, then use it.
+				local tmp = GetWorkFor(unitID)
+				if ( tmp ~= nil ) then
+					table.insert( nearestOrders, tmp )	-- indexed okay here
+				end
 			end
 		end
-	end
-	if ( # nearestOrders < 1 ) then return end	-- nothing we can do
-	local closeDist = huge
-	local close = {}
-	for _, cmd in ipairs(nearestOrders) do --find unit with the closest distance to their project
-		if ( cmd[4] < closeDist ) then
-			closeDist = cmd[4]
-			close = cmd
+		if ( # nearestOrders < 1 ) then 
+			break -- no more job queue, escape the loop.
+		end	-- nothing we can do
+		local closeDist = huge
+		local close = {}
+		for _, cmd in ipairs(nearestOrders) do --find unit with the closest distance to their project
+			if ( cmd[4] < closeDist ) then
+				closeDist = cmd[4]
+				close = cmd
+			end
+		end
+		--spGiveOrderToUnit( close[1], close[2], close[3], { "" } )
+		unitArray[#unitArray+1]=close[1]
+		orderArray[#orderArray+1]={close[2], close[3], { "" }}
+		if ( close[5] == 0 ) then
+			myUnits[close[1]] = "asst "..unpack(close[3])	--  unitID we're assisting
+			--Echo(close[3])
+		else
+			myUnits[close[1]] = close[5]	--  hash of command we're executing
+			--Echo(close[5])
 		end
 	end
-	spGiveOrderToUnit( close[1], close[2], close[3], { "" } )
-	if ( close[5] == 0 ) then
-		myUnits[close[1]] = "asst "..unpack(close[3])	--  unitID we're assisting
---		Echo(close[3])
-	else
-		myUnits[close[1]] = close[5]	--  hash of command we're executing
---		Echo(close[5])
-	end
-	nextFrame = spGetGameFrame() + ping()
+	Spring.GiveOrderArrayToUnitArray (unitArray,orderArray, true)
+	unitArray = nil
+	orderArray = nil
+	--nextFrame = thisFrame + ping()
 end
 
 --	Borrowed distance calculation from Google Frog's Area Mex
@@ -384,8 +418,8 @@ function CleanOrders(myQueue)
 		cmd = abs( cmd )
 		local x, y, z, h = myCmd.x, myCmd.y, myCmd.z, myCmd.h
 		local canBuildThatThere,featureID = spTestBuildOrder(cmd,x,y,z,h)
-		if ( featureID ) then
-			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then
+		if ( checkFeatures ) and ( featureID ) then
+			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then --if feature belong to team, then don't build there. (ie: ressurectable wreck or dragon-teeth's wall)
 				canBuildThatThere = 0
 			end
 		end
@@ -428,7 +462,7 @@ function GetWorkFor(unitID)
 						end
 					end
 				end
-				local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2
+				local dist = ( Distance(ux,uz,x,z) + Distance(ux,uz,x2,z2) + Distance(x,z,x2,z2) ) / 2 --distance between busy unit & self,and btwn structure & self, and between structure & busy unit.
 				dist = dist + dist*numOfAssistant
 				if ( dist < busyDist ) then
 					busyClosestID = busyUnitID	-- busy unit who needs help
@@ -453,7 +487,7 @@ function GetWorkFor(unitID)
 					end
 				end
 			end
-			local dist = Distance(ux,uz,x2,z2) * 1.5
+			local dist = Distance(ux,uz,x2,z2) * 1.5 --distance between busy unit & self
 			dist = dist + dist*numOfAssistant
 			if ( dist < busyDist ) then
 				busyClosestID = busyUnitID	-- busy unit who needs help
@@ -560,9 +594,9 @@ end
 
 function ping()
 	local playerID = spGetLocalPlayerID()
-	local tname, _, tspec, tteam, tallyteam, tping, tcpu = spGetPlayerInfo(playerID)  	
+	local tname, _, tspec, tteam, tallyteam, tping, tcpu = spGetPlayerInfo(playerID)  
 	tping = (tping*1000-((tping*1000)%1)) /100 * 4
-	return max( tping, 3 )
+	return max( tping, 15 )
 end
 
 --	Generate unique key value for each command using its parameters.
