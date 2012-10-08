@@ -1,25 +1,6 @@
 local menu_armcsa = {
 	items = {
 	  {
-		angle = 0,
-		unit = "cormex",
-		label = "Economy",
-		items = {
-		  {
-			angle= -90,
-			unit = "armsolar",
-		  },
-		  {
-			angle= -135,
-			unit = "armwin",
-		  },
-        {
-			angle = -45,
-			unit = "armnanotc"
-		  },
-		}
-	  },
-	  {
 		angle = -90,
 		unit = "armrectr",
 		label = "Bots",
@@ -38,13 +19,16 @@ local menu_armcsa = {
 		  },
 		  { 
 			angle = 0,
-			unit = "corcrash",
+			unit = "armjeth",
 		  },
-
+		  { 
+			angle = 45,
+			unit = "armzeus",
+		  },
 		}
 	  },
 	{
-		angle = -45,
+		angle = 0,
 		unit = "armsptk",
 		label = "Walkers",
 		items = {
@@ -52,68 +36,70 @@ local menu_armcsa = {
 			angle = -90,
 			unit = "armsnipe",
 		  },
+		  { 
+			angle = 135,
+			unit = "spherecloaker",
+		  },
+		  { 
+			angle = -135,
+			unit = "core_spectre",
+		  },	
 		  {
-			angle = 0,
+			angle = -45,
 			unit = "armspy"
 		  },
-		  {
+		  { 
 			angle = 90,
+			unit = "amphtele",
+		  },		  
+		  {
+			angle = 45,
 			unit = "slowmort"
 		  },
 		}
 	  },
 	  {
-		angle = 180,
-		unit = "corllt",
-		label = "Defense",
+		angle = 90,
+		unit = "corrad",
+		label = "Support",
 		items = {
 		  {
+			angle = 0,
+			unit = "armsonar"
+		  },
+		  {
 			angle = 45,
-			unit = "corrl"
+			unit = "armarad"
 		  },
 		  {
 			angle = 135,
-			unit = "armartic"
-		  },
+			unit = "armjamt"
+		  },		  
 		  {
-			angle = -45,
-			unit = "corhlt"
-		  },
-		  {
-			angle = -135,
-			unit = "armdeva"
-		  },
-		  {
-			angle = 90,
-			unit = "corgrav"
-		  },
-		  {
-			angle = -90,
-			unit = "cortl"
-		  },	  	  
+			angle = 180,
+			unit = "armnanotc"
+		  },		  
 		}
 	  },
 	  {
-		angle = 90,
-		unit = "corrad",
-		label = "Auxillary",
+		angle = 180,
+		unit = "panther",
+		label = "Misc.",
 		items = {
 		  {
-			angle = -135,
-			unit = "armjamt"
+			angle = 90,
+			unit = "armmerl"
 		  },
 		  {
-			angle = 45,
-			unit = "armsonar"
-		  },
+			angle = 135,
+			unit = "armcomdgun"
+		  },		  
+		  {
+			angle = -90,
+			unit = "hoverassault"
+		  },		  
 		}
-	  },
-      {
-		angle = -135,
-		unit = "armcomdgun",
-		label = "Striders",
-	  },
-      
+	  },	  
   }
 }
 
