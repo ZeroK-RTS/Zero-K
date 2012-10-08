@@ -101,13 +101,26 @@ function gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
   
   gl.BeginEnd(GL.TRIANGLE_STRIP, function()
     --// top
-    for i = 1, #sinTable do
-      glVertex(x, topY, z)
+    for i = #sinTable, 1, -1 do
       glVertex(x + radius*sinTable[i], topY, z + radius*cosTable[i])
+      glVertex(x, topY, z)
     end
 
     --// degenerate
-    --glVertex(x, topY   , z+radius)
+    glVertex(x, topY   , z)
+    glVertex(x, bottomY, z)
+    glVertex(x, bottomY, z)
+
+    --// bottom
+    for i = #sinTable, 1, -1 do
+      glVertex(x + radius*sinTable[i], bottomY, z + radius*cosTable[i])
+      glVertex(x, bottomY, z)
+    end
+
+    --// degenerate
+    glVertex(x, bottomY, z)
+    glVertex(x, bottomY, z+radius)
+    glVertex(x, bottomY, z+radius)
 
     --// sides
     for i = 1, #sinTable do
@@ -115,15 +128,6 @@ function gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
       local rz = z + radius * cosTable[i]
       glVertex(rx, topY   , rz)
       glVertex(rx, bottomY, rz)
-    end
-
-    --// degenerate
-    --glVertex(x, bottomY, z+radius)
-
-    --// bottom
-    for i = 1, #sinTable do
-      glVertex(x + radius*sinTable[i], bottomY, z + radius*cosTable[i])
-      glVertex(x, bottomY, z)
     end
   end)
 end
