@@ -265,13 +265,18 @@ end
 -- 
 
 local TURNRATE_MULT = 1
-local ACCEL_MULT = 3
+local ACCEL_MULT = 4
+local ACCEL_MULT_HIGH = 8
 
 for name, ud in pairs(UnitDefs) do
 	--if  then
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
+			ud.turnrate = ud.turnrate * TURNRATE_MULT
+			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
+			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH
+		else
 			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT
 			ud.brakerate = ud.brakerate * ACCEL_MULT
