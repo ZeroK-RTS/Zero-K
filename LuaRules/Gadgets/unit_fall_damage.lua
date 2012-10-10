@@ -45,17 +45,6 @@ for unitDefID=1,#UnitDefs do
 	end
 end
 
-local excludedUnitID = {}
-GG.FallDamage = {}
-
-function GG.FallDamage.ExcludeFriendlyCollision(unitID)  --ref: http://answers.springlobby.info/questions/5/lua-unit-script-gadget-communication
-	excludedUnitID[unitID] = true
-end
-
-function GG.FallDamage.IncludeFriendlyCollision(unitID)  
-	excludedUnitID[unitID] = nil
-end
-
 local function outsideMapDamage(unitID, unitDefID)
 	local att = attributes[unitDefID]
 	local x,y,z = Spring.GetUnitPosition(unitID)
@@ -89,39 +78,26 @@ local clearTable = false
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	-- unit or wreck collision
 	if (weaponDefID == -3 or weaponDefID == -1) and attackerID == nil then
-		--Spring.Echo("COLLIDE")
+		
 		if unitCollide[damage] then
 			local data = unitCollide[damage]
-			local amongExcludedUnits = excludedUnitID[unitID] or excludedUnitID[data.unitID]
-			local skipDamage = false
-			if amongExcludedUnits then 
-				local allyID = Spring.GetUnitAllyTeam(unitID)
-				if allyID == data.unitAlliance then
-					skipDamage = true
-				end
-			end
 			local vx,vy,vz = Spring.GetUnitVelocity(unitID)
-			local damageToDeal = 0
-			if not skipDamage and (data.certainDamage or math.sqrt(vx^2 + vy^2 + vz^2) > UNIT_UNIT_SPEED) then
+			if data.certainDamage or math.sqrt(vx^2 + vy^2 + vz^2) > UNIT_UNIT_SPEED then
 				local speed = math.sqrt((vx - data.vx)^2 + (vy - data.vy)^2 + (vz - data.vz)^2)
 				local otherDamage = speedToDamage(data.unitID, data.unitDefID, speed)
 				local myDamage = speedToDamage(unitID, unitDefID, speed)
-				damageToDeal = math.min(myDamage, otherDamage) * UNIT_UNIT_DAMAGE_FACTOR -- deal the damage of the least massive unit
+				local damageToDeal = math.min(myDamage, otherDamage) * UNIT_UNIT_DAMAGE_FACTOR -- deal the damage of the least massive unit
 				Spring.AddUnitDamage(data.unitID, damageToDeal, 0, nil, -7)
+				return damageToDeal
 			end
-			return damageToDeal
 		else
-			local allyID = Spring.GetUnitAllyTeam(unitID)
 			local vx,vy,vz = Spring.GetUnitVelocity(unitID)
 			local speed = math.sqrt(vx^2 + vy^2 + vz^2)
-			local x0, y0, z0 = Spring.GetUnitPosition(unitID)
 			unitCollide[damage] = {
 				unitID = unitID,
 				unitDefID = unitDefID,
 				vx = vx, vy = vy, vz = vz,
-				x0 = x0, y0= y0, z0=z0,
 				certainDamage = speed > UNIT_UNIT_SPEED,
-				unitAlliance = allyID
 			}
 			clearTable = true
 		end
