@@ -258,6 +258,7 @@ function gadget:Shutdown()
 end
 
 function gadget:AllowResourceTransfer(oldTeam, newTeam, type, amount)
+	if(amount < 0) then return end --thx to gnurps@o2.pl for this patch. This prevent player from taking resources from his ally.
   if (resShare) then
   	--if (resShareEnemy or Spring.AreTeamsAllied(oldTeam, newTeam)) then
     local _,_,_,_,_,oldAlliance = spGetTeamInfo(oldTeam)
