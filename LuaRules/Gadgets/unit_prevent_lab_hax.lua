@@ -29,8 +29,10 @@ local spGetUnitBuildFacing  = Spring.GetUnitBuildFacing
 local spGetUnitAllyTeam  = Spring.GetUnitAllyTeam
 local spGetUnitsInBox  = Spring.GetUnitsInBox
 local spSetUnitPosition  = Spring.SetUnitPosition
+local spSetUnitVelocity = Spring.SetUnitVelocity
 local spGetUnitDefID = Spring.GetUnitDefID
 local spGetUnitBasePosition = Spring.GetUnitBasePosition
+local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
 
 local abs = math.abs
 local min = math.min
@@ -62,8 +64,10 @@ function checkLabs()
 		  
 		  if (l < r) then
 		    spSetUnitPosition(id, Lv.minx, uz)
+			spSetUnitVelocity(id, 0,0,0)
 		  else
 		    spSetUnitPosition(id, Lv.maxx, uz)
+			spSetUnitVelocity(id, 0,0,0)
 		  end
 		else
 		  local t = abs(uz-Lv.minz)
@@ -71,8 +75,10 @@ function checkLabs()
 		  
 		  if (t < b) then
 		    spSetUnitPosition(id, ux, Lv.minz)
+			spSetUnitVelocity(id, 0,0,0)
 		  else
 		    spSetUnitPosition(id, ux, Lv.maxz)
+			spSetUnitVelocity(id, 0,0,0)
 		  end
 		end
 		--[[
@@ -181,9 +187,10 @@ function gadget:UnitCreated(unitID, unitDefID)
   local name = ud.name
   if (ud.isFactory == true) and not (name == "factoryplane" or name == "factorygunship" or name == "missilesilo") then
 	local ux, uy, uz  = spGetUnitBasePosition(unitID)
+	local scl_x, scl_y, scl_z, off_x, off_y,off_z  = spGetUnitCollisionVolumeData(unitID)
 	local face = spGetUnitBuildFacing(unitID)
-	local xsize = (ud.xsize)*4
-	local zsize = (ud.ysize or ud.zsize)*4
+	local xsize = scl_x+off_x --(ud.xsize)*4
+	local zsize = scl_z+off_z --(ud.ysize or ud.zsize)*4
 	local team = spGetUnitAllyTeam(unitID)
 
 	if ((face == 0) or (face == 2))  then
@@ -228,7 +235,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].minx,0,lab[unitID].maxz)
 
 	lab[unitID].miny = spGetGroundHeight(ux,uz)
-	lab[unitID].maxy = lab[unitID].miny+100
+	lab[unitID].maxy = (scl_y+off_y+lab[unitID].miny)*0.5 --lab[unitID].miny+100
 	
   end
   
