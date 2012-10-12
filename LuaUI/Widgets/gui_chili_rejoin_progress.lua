@@ -1,9 +1,9 @@
 function widget:GetInfo()
   return {
     name      = "Chili Rejoining Progress Bar",
-    desc      = "v1.12 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
+    desc      = "v1.13 Show the progress of rejoining and temporarily turn-off Text-To-Speech while rejoining",
     author    = "msafwan (use UI from KingRaptor's Chili-Vote) ",
-    date      = "June 17, 2012",
+    date      = "Oct 10, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     experimental = false,
@@ -60,6 +60,9 @@ local functionContainer_G = function(x) end --//variable object: store a functio
 local myPlayerID_G = 0
 local gameProgressActive_G = false --//variable: signal whether GameProgress has been updated.
 local iAmReplay_G = false
+--------------------------------------------------------------------------------
+--For testing GUI---------------------------------------------------------------
+local forceDisplay = nil
 --------------------------------------------------------------------------------
 --[[
 if VFS.FileExists("Luaui/Config/ZK_data.lua") then
@@ -250,8 +253,8 @@ function widget:Initialize()
 		height = 120;
 		left = 2; 
 		y = "45%";
-		dockable = false;
-		draggable = true,
+		dockable = true;
+		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
@@ -301,11 +304,21 @@ function widget:Initialize()
 	voteCount = 0
 	voteMax = 1	-- protection against div0
 	label_title:SetCaption("Catching up.. Please Wait")
+	
+	if forceDisplay then
+		ActivateGUI_n_TTS (1, false, false, 0) --force GUI to display for testing
+		return
+	end	
 end
 
 ----------------------------------------------------------
 --fix for Game Progress delay-----------------------------
 function widget:RecvLuaMsg(bigMsg, playerID) --this function run 2nd. It read the LUA timestamp
+	if forceDisplay then
+		ActivateGUI_n_TTS (1, false, false, 0) --force GUI to display for testing
+		return
+	end
+	
 	if gameProgressActive_G or iAmReplay_G then --skip LUA message if gameProgress is already active OR game is a replay
 		return false 
 	end
