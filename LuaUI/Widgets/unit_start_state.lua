@@ -27,6 +27,7 @@ local dontFireAtRadarUnits = {
 	[UnitDefNames["armsnipe"].id] = true,
 	[UnitDefNames["armmanni"].id] = true,
 	[UnitDefNames["armanni"].id] = true,
+	[UnitDefNames["armmerl"].id] = true,
 }
 
 --local rememberToSetHoldPositionPreset = false
