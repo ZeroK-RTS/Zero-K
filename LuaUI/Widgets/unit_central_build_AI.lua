@@ -17,9 +17,9 @@
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
-    desc      = "v1.22 Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use AutoGroup or manual), and then give any of them a build queue. As result, the whole group (group 0) will share the same build queue and the work will automatically distributed among them. Use it to macro alot of idle constructors",
+    desc      = "v1.23 Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba clear\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
-    date      = "July 20, 2009, 7 Oct 2012",
+    date      = "July 20, 2009, 15 Oct 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
     enabled   = false  --  loaded by default?
@@ -290,6 +290,7 @@ function widget:CommandNotify(id, params, options, zkMex)
 						myQueue[hash] = myCmd	-- add to CB queue
 					end
 					CleanOrders(myQueue)	-- don't add if can't build there
+					nextFrame = spGetGameFrame() + 30 --wait 1 second before distribute work, so you can queue more stuff
 					return true	-- have to return true or Spring still handles command itself.
 				else --for: moving/attacking/repairing, ect
 					if myUnits[unitID] == "idle" then --unit is not doing anything
@@ -687,3 +688,14 @@ function widget:KeyPress(key, mods, isRepeat)
 		spSelectUnitMap(myUnits)
 	end
 end
+
+function widget:TextCommand(command)
+	if command == "cba clear" then
+		for key,myCmd in pairs(myQueue) do
+			myQueue[key]=nil
+		end
+		Spring.Echo("cba's command queue cleared")
+		return true
+	end
+	return false
+end   
