@@ -695,8 +695,10 @@ function widget:AddConsoleMessage(msg)
 		return
 	end
 	
-	if msg.player and msg.player.muted then
-	  return
+	local playerID = msg.player and msg.player.id --retrieve playerID from message. Ref: gui_chili_chatbubbles.lua line 260
+	local customkeys = select(10, Spring.GetPlayerInfo(playerID)) --Ref: cawidgets.lua line 1385
+	if customkeys and customkeys.muted then
+		return
 	end
 	
 	msg.dup = 1

@@ -238,7 +238,7 @@ local last_timeadded = GetTimer()
 
 -- returns true if current message is same as last one
 -- TODO: graphical representation
-function NewMessage(type, a, b, c)
+function DuplicateMessage(type, a, b, c)
 	local samemessage = false
 	if type == last_type and a == last_a and b == last_b and c == last_c then
 		if DiffTimers(GetTimer(), last_timeadded) < options.window_timeout.value then
@@ -261,10 +261,11 @@ function widget:AddChatMessage(msg)
 	local type = msg.msgtype
 	local text = msg.argument or ''
 	
-	if msg.player and msg.player.muted then return end
-	if NewMessage("chat", player, msg, type) then return end
+	if DuplicateMessage("chat", player, msg, type) then 
+		return
+	end
 
-	local playerName,active,isSpec,teamID
+	local playerName,active,isSpec,teamID, muted
 	local teamcolor
 	local avatar = nil
 	if type == 'autohost' then
@@ -275,10 +276,19 @@ function widget:AddChatMessage(msg)
 	else
 		playerName,active,isSpec,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys  = Spring.GetPlayerInfo(player)
 		teamcolor = {Spring.GetTeamColor(teamID)}
-		if (customKeys ~= nil and customKeys.avatar~=nil) then 
-			avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"
+		if (customKeys ~= nil) then
+			if (customKeys.avatar~=nil) then 
+				avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"
+			end
+			if (customKeys.muted) then
+				muted = customKeys.muted --check player's muted status
+			end
 		end 
 	end
+	if muted then
+		return --don't display message from a muted player.
+	end
+	
 	if (not active or isSpec) then
 		teamcolor = {1,1,1,0.7}
 	end
@@ -411,7 +421,7 @@ local lastPoint = nil
 
 function widget:AddMapPoint(player, caption, px, py, pz)
 
-	if NewMessage("point", player, caption) then
+	if DuplicateMessage("point", player, caption) then
 		-- update point for camera target
 		local w = windows[#windows]
 		if w then
@@ -495,7 +505,7 @@ end
 
 function widget:AddWarning(text)
 
-	if NewMessage("warning", text) then return end
+	if DuplicateMessage("warning", text) then return end
 
 	teamcolor = {1,0.5,0,1}
 
