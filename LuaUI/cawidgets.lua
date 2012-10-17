@@ -1366,19 +1366,30 @@ function widgetHandler:AddConsoleLine(msg, priority)
       return
     end
   else
-    for _,w in ipairs(self.AddConsoleLineList) do
-      w:AddConsoleLine(msg, priority)
-    end
-    
-    msg = { text = msg, priority = priority }
-    MessageProcessor:ProcessConsoleLine(msg)
-    if msg.msgtype == 'point' or msg.msgtype == 'label' then
-      -- ignore all console messages about points... those come in through the MapDrawCmd callin
-      return
-    end    
-    for _,w in ipairs(self.AddConsoleMessageList) do
-      w:AddConsoleMessage(msg)
-    end
+	--censor message for muted player (this is mandatory/not-per-player-option to prevent spec cheat. ie: player 1 see "um..", while player 2 see spec-cheat.) 
+	local newMsg = { text = msg, priority = priority }
+	MessageProcessor:ProcessConsoleLine(newMsg)
+	if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' then 
+		local playerID = newMsg.player and newMsg.player.id --retrieve playerID from message.
+		local customkeys = select(10, Spring.GetPlayerInfo(playerID))
+		if customkeys and customkeys.muted then
+			newMsg.argument="um..." --replace message with "um..." rather than nothing so that player knows his chat is not broken & can still respond to basic communication (ie: "can you hear me?" reply with:"um..."). 
+			msg = "um..."
+		end
+	end
+  
+	--send message to widget:AddConsoleLine
+	for _,w in ipairs(self.AddConsoleLineList) do
+		w:AddConsoleLine(msg, priority) 
+	end
+	
+	--send message to widget:AddConsoleMessage
+	if newMsg.msgtype == 'point' or newMsg.msgtype == 'label' then
+		return -- ignore all console messages about points... those come in through the MapDrawCmd callin
+	end    
+	for _,w in ipairs(self.AddConsoleMessageList) do
+		w:AddConsoleMessage(newMsg)
+	end
   end
 end
 

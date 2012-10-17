@@ -265,7 +265,7 @@ function widget:AddChatMessage(msg)
 		return
 	end
 
-	local playerName,active,isSpec,teamID, muted
+	local playerName,active,isSpec,teamID
 	local teamcolor
 	local avatar = nil
 	if type == 'autohost' then
@@ -276,17 +276,9 @@ function widget:AddChatMessage(msg)
 	else
 		playerName,active,isSpec,teamID,allyTeamID,pingTime,cpuUsage,country,rank, customKeys  = Spring.GetPlayerInfo(player)
 		teamcolor = {Spring.GetTeamColor(teamID)}
-		if (customKeys ~= nil) then
-			if (customKeys.avatar~=nil) then 
-				avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"
-			end
-			if (customKeys.muted) then
-				muted = customKeys.muted --check player's muted status
-			end
+		if (customKeys ~= nil) and (customKeys.avatar~=nil) then 
+			avatar = "LuaUI/Configs/Avatars/" .. customKeys.avatar .. ".png"
 		end 
-	end
-	if muted then
-		return --don't display message from a muted player.
 	end
 	
 	if (not active or isSpec) then
