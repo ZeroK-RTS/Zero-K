@@ -1373,8 +1373,8 @@ function widgetHandler:AddConsoleLine(msg, priority)
 		local playerID = newMsg.player and newMsg.player.id --retrieve playerID from message.
 		local customkeys = select(10, Spring.GetPlayerInfo(playerID))
 		if customkeys and customkeys.muted then
-			newMsg.argument="um..." --replace message with "um..." rather than nothing so that player knows his chat is not broken & can still respond to basic communication (ie: "can you hear me?" reply with:"um..."). 
-			msg = "um..."
+			newMsg.argument="<message blocked by mute>" --replace message with "um..." rather than nothing so that player knows his chat is not broken & can still respond to basic communication (ie: "can you hear me?" reply with:"um..."). 
+			msg = "<message blocked by mute>"
 		end
 	end
   
