@@ -24,6 +24,12 @@ end
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
 
+local spGetUnitStates = Spring.GetUnitStates
+local CMD_IDLEMODE = CMD.IDLEMODE
+local CMD_REPEAT = CMD.REPEAT
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
+--local spAreTeamsAllied = Spring.AreTeamsAllied
+
 local GUNSHIP_VERTICAL_MULT = 0.5 -- prevents rediculus gunship climb
 
 local impulseMult = {
@@ -177,6 +183,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			unit[unitID].z = unit[unitID].z + z
 		end
 		
+		--if moveTypeByID[unitDefID] == 1 and attackerTeam and spAreTeamsAllied(unitTeam, attackerTeam) then
+		--	unit[unitID].allied	= true
+		--end
+		
 		thereIsStuffToDo = true
 		
 		if impulseWeaponID[weaponDefID].normalDamage then
@@ -196,6 +206,13 @@ function gadget:GameFrame(f)
 			if data.moveType == 1 then
 				local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 				Spring.SetUnitVelocity(unitID, vx + data.x, vy + data.y, vz + data.z)
+				
+				--if data.allied then
+					local states = spGetUnitStates(unitID)
+					if states["repeat"] then
+						spGiveOrderToUnit(unitID, CMD_REPEAT, {0},{})
+					end
+				--end
 			else
 				Spring.AddUnitImpulse(unitID, data.x, data.y, data.z)
 				--GG.UnitEcho(unitID,data.y)
