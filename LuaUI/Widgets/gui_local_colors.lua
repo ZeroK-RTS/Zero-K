@@ -62,7 +62,6 @@ local allyColors = colorCFG.allyColors
 local enemyColors = colorCFG.enemyColors
 
 WG.LocalColor = (type(WG.LocalColor) == "table" and WG.LocalColor) or {}
-WG.LocalColor
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
