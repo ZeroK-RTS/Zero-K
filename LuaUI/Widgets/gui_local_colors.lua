@@ -62,6 +62,7 @@ local allyColors = colorCFG.allyColors
 local enemyColors = colorCFG.enemyColors
 
 WG.LocalColor = (type(WG.LocalColor) == "table" and WG.LocalColor) or {}
+WG.LocalColor
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -112,7 +113,7 @@ local function ResetOldTeamColors()
 end
 
 local function NotifyColorChange()
-	for name,func in pairs(WG.LocalColor.listeners) do
+	for name,func in pairs(WG.LocalColor.listeners or {}) do
 		if type(func) == "function" then	-- because we don't trust other widget writers to not give us random junk
 			func()				-- yeah we wouldn't even need to do this with static typing :(
 		else
