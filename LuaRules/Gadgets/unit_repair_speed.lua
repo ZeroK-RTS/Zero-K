@@ -93,12 +93,14 @@ function gadget:GameFrame(n)
 	end
 end
 
+--[[
 function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
 	if step < 0 and combatUnits[unitID] and select(5,spGetUnitHealth(unitID)) == 1 then
 		spSetUnitCosts(unitID, {buildTime = combatUnits[unitID].bt})
 	end
 	return true
 end
+]]
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if combatUnits[unitID] then

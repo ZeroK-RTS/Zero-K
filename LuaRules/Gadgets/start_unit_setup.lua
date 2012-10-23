@@ -141,9 +141,9 @@ local function CheckForShutdown()
 	end
 	
 	local cnt = 0
-	for _,_ in pairs(boost) do
-		cnt = cnt+1
-	end
+	--for _,_ in pairs(boost) do
+	--	cnt = cnt+1
+	--end
 	for _,_ in pairs(facplops) do
 		cnt = cnt+1
 	end
@@ -204,9 +204,9 @@ function gadget:UnitDestroyed(unitID)
 		--facplopsrunning[unitID] = nil
 	end
 	
-	if (boost[unitID] == nil) then return end
+	--if (boost[unitID] == nil) then return end
 
-	if gamestart then disableBoost(unitID) end
+	--if gamestart then disableBoost(unitID) end
 end
 
 
@@ -235,7 +235,7 @@ function disableBoost(unitID)
 	CheckForShutdown()
 end
 
-
+--[[
 function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
 	if plop and facplopsrunning[unitID] then
 		return true -- dont waste boost on facplops
@@ -257,6 +257,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 	end
 	return true
 end
+]]
 
 
 local function InitUnsafe()
@@ -309,8 +310,8 @@ end
 
 function gadget:Initialize()
   -- self linking
-  GG['boostHandler'] = {}
-  GG['boostHandler'].AddBoost = AddBoost
+  --GG['boostHandler'] = {}
+  --GG['boostHandler'].AddBoost = AddBoost
 
   if plop then
     for i, v in pairs(ploppables) do
