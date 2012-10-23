@@ -221,12 +221,12 @@ local function FindNearestAirpad(unitID, team)
 		freePads = airpadsPerAllyTeam[allyTeam]
 	end
 	
-	local mindist = 999999
+	local minDist = 999999
 	local closestPad
 	for airpadID in pairs(freePads) do
-		local dist = Spring.GetUnitSeparation(unitID, airpadID, true)
-		if (dist < mindist) then
-			mindist = dist
+		local dist = Spring.GetUnitSeparation(unitID, airpadID, true) or minDist
+		if (dist < minDist) then
+			minDist = dist
 			closestPad = airpadID
 		end
 	end
