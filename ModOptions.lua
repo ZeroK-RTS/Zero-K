@@ -141,23 +141,6 @@ local options = {
         desc = "First factory is free and built very fast.",
       },
       {
-        key  = "facplopboost",
-        name = "Factory Plop and Boost",
-        desc = "Commander starts with boost instead of initial resources. First factory is free and built very fast.",
-      },
-      {
-        key  = "boost",
-        name = "Boost",
-        desc = "Commanders start with boost instead of initial resources, which allows them to build using those resources at increased speed.",
-      },
-	  --[[
-      {
-        key  = "limitboost",
-        name = "Limited Boost",
-        desc = "Boost mode only commander cannot boostbuild anything with a weapon (uses normal build instead).",
-      },
-	  --]]
-      {
         key  = "classic",
         name = "Classic",
         desc = "Classic mode.",
@@ -493,6 +476,14 @@ local options = {
     def		= true,
     section	= "experimental",
   },
+  {
+    key		= "impulsejump",
+    name	= "Impulses Jump",
+    desc	= "Allow jumps that is effected by gravity and Newton, else will use a cleaner but rigid motion sequence",
+    type	= "bool",
+    def		= false,
+    section	= "experimental",
+  },  
   {
     key		= "pathfinder",
     name	= "Pathfinder type",
