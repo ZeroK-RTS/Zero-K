@@ -1430,10 +1430,6 @@ function widgetHandler:ViewResize(viewGeometry)
   return
 end
 
-local co_create = coroutine.create
-local co_status = coroutine.status
-local co_resume = coroutine.resume
-local runningThread= {}
 function widgetHandler:DrawScreen()
   if (Spring.IsGUIHidden()) then
     return
@@ -1448,30 +1444,11 @@ function widgetHandler:DrawScreen()
     gl.Color(1, 1, 1)
   end
   for _,w in ripairs(self.DrawScreenList) do
-    runningThread[w:GetInfo().name] = runningThread[w:GetInfo().name] or {} --initialize an empty table
-    local thread1,thread2 = runningThread[w:GetInfo().name][1], runningThread[w:GetInfo().name][2] --get reference to running thread
-	local thread1Alive = (thread1 and co_status(runningThread[w:GetInfo().name][1])=="running") or false --check if thread for DrawScreen is dead
-	local thread2Alive = (thread2 and co_status(runningThread[w:GetInfo().name][2])=="running") or false --check if thread for TweakDrawScreen is dead
-	if not thread1Alive then --if DrawScreen thread is dead
-	  thread1 = co_create(w.DrawScreen, w) --create new DrawScreen thread
-	  co_resume(thread1) --execute the new DrawScreen thread
-	end
-    if (self.tweakMode and w.TweakDrawScreen) then
-      if not thread2Alive then --if TweakDrawScreen thread is dead
-	    thread2 = co_create(w.TweakDrawScreen,w)  --create new TweakDrawScreen thread
-	    co_resume(thread2) --execute the new TweakDrawScreen thread
-	  end
-    end
-	runningThread[w:GetInfo().name] = {thread1,thread2} --remember the reference to the running thread
-  end
-  --[[
-  for _,w in ripairs(self.DrawScreenList) do
     w:DrawScreen()
     if (self.tweakMode and w.TweakDrawScreen) then
       w:TweakDrawScreen()
     end
   end
-  --]]
   return
 end
 
