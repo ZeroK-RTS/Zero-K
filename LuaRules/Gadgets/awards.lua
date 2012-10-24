@@ -46,6 +46,8 @@ local terraformCost = UnitDefNames["terraunit"].metalCost
 local mexDefID = UnitDefNames["cormex"].id
 local mexCost = UnitDefNames["cormex"].metalCost
 
+GG.Awards = GG.Awards or {}
+
 local airDamageList		= {}
 local friendlyDamageList= {}
 local damageList 		= {}
@@ -295,6 +297,11 @@ local function UpdateResourceStats(t)
 	end
 end
 
+local function AddTerraformCost(teamID, value)
+	terraformList[teamID] = terraformList[teamID] + value
+end
+
+GG.Awards.AddTerraformCost = AddTerraformCost
 -------------------
 -- Callins
 
@@ -402,12 +409,14 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	end
 end
 
+--[[
 function gadget:AllowUnitBuildStep(builderID, builderTeam, unitID, unitDefID, step) 
 	if terraunitDefID == unitDefID then
 		terraformList[builderTeam] = terraformList[builderTeam] + step*terraformCost
 	end
 	return true
 end
+]]--
 
 
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
@@ -443,10 +452,12 @@ function gadget:FeatureDestroyed (featureID, allyTeam)
 end
 
 
-function GG.Awards_UnitResurrected (unitDefID, teamID)
+local function UnitResurrected (unitDefID, teamID)
   local ud = UnitDefs[unitDefID]
   resurrectList[teamID] = resurrectList[teamID] + (ud and ud.metalCost or 0)
 end
+
+GG.Awards.UnitResurrected = UnitResurrected
 
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,

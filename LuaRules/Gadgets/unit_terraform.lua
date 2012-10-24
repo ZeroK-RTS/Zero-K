@@ -149,7 +149,8 @@ local terraUnitLimit = 250 -- limit on terraunits per player
 
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
 
-local terraUnitTooltip = "Spent: "
+local TOOLTIP_SPENT = "Spent: "
+local TOOLTIP_COST = "Estimated Cost: "
 
 local costMult = 1
 local modOptions = Spring.GetModOptions()
@@ -792,7 +793,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
-				spSetUnitTooltip(id, "Estimated Cost: " .. floor(pyramidCostEstimate + totalCost))
+				spSetUnitTooltip(id, TOOLTIP_COST .. floor(pyramidCostEstimate + totalCost))
 			end
 		end
 		
@@ -1277,7 +1278,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
-				spSetUnitTooltip(id, "Estimated Cost: " .. floor(pyramidCostEstimate + totalCost))
+				spSetUnitTooltip(id, TOOLTIP_COST .. floor(pyramidCostEstimate + totalCost))
 			end
 		end
 		
@@ -1838,7 +1839,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
-				spSetUnitTooltip(id, "Estimated Cost: " .. floor(pyramidCostEstimate + totalCost))
+				spSetUnitTooltip(id, TOOLTIP_COST .. floor(pyramidCostEstimate + totalCost))
 			end
 		end
 		
@@ -2865,7 +2866,13 @@ function gadget:GameFrame(n)
 				if n - terraformUnit[id].lastUpdate > updateFrequency then
 					local costDiff = health - terraformUnit[id].lastHealth
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
-					spSetUnitTooltip(id, terraUnitTooltip .. floor(terraformUnit[id].totalSpent))
+					spSetUnitTooltip(id, TOOLTIP_SPENT .. floor(terraformUnit[id].totalSpent) ..
+							  ", " .. TOOLTIP_COST .. floor(terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost) )
+					
+					if GG.Awards and GG.Awards.AddTerraformCost then
+						GG.Awards.AddTerraformCost(terraformUnit[id].team, costDiff)
+					end
+					
 					local updateVar = updateTerraform(diffProgress,health,id,i,costDiff) 
 					while updateVar == -1 do
 						if updateTerraformCost(id) then
@@ -2883,7 +2890,7 @@ function gadget:GameFrame(n)
 				else
 					i = i + 1
 				end
-				
+
 			end
 			
 		else

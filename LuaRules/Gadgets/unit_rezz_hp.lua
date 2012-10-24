@@ -38,7 +38,6 @@ local unitsCount = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
 -- Engine multiplies rezzed unit HP by 0.05 just after UnitCreated so their HP has to be changed 1 frame later
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
@@ -50,7 +49,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
       unitsCount = unitsCount + 1
       units[unitsCount] = unitID
 
-      GG.Awards_UnitResurrected (unitDefID, teamID)
+      GG.Awards.UnitResurrected (unitDefID, teamID) -- no safety checks!
     end
   end
 end
