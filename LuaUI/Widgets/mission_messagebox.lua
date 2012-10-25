@@ -9,7 +9,8 @@ function widget:GetInfo()
     date      = "Nov 2010",
     license   = "GNU GPL, v2 or later",
     layer     = 1, 
-    enabled   = true  --  loaded by default?
+    enabled   = true,  --  loaded by default?
+    handler   = true,
   }
 end
 
@@ -21,17 +22,27 @@ local msgBoxPersistent
 local imagePersistent
 local scrollPersistent
 local textPersistent
-
 local msgBoxConvo
 
 local convoQueue = {}
+
+local useChiliConvo = false
+
+local font
+local oldDrawScreenWH
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local TIME_TO_FLASH = 3	-- seconds
 local CONVO_BOX_HEIGHT = 96
+local CONVO_BOX_WIDTH_MIN = 400
 
+local convoString 	-- for non-Chili convobox; stores the current string to display
+local convoImg		-- for non-Chili convobox; stores the current image to display
+local convoFontsize = 14
 local flashTime
 local convoExpireFrame
+
+local vsx, vsy = gl.GetViewSizes()
 
 function WG.ShowMessageBox(text, width, height, fontsize, pause)  
   local vsx, vsy = gl.GetViewSizes()
@@ -204,7 +215,19 @@ function WG.HidePersistentMessageBox()
 	end
 end
 
-local function ShowConvoBox(data)
+local function ShowConvoBoxNoChili(data)
+  convoString = data.text
+  convoSize = data.fontsize
+  if data.image then
+    convoImage = data.image  
+  end
+  if data.sound then
+    Spring.PlaySoundFile(data.sound, 1, 'ui')
+  end
+  convoExpireFrame = Spring.GetGameFrame() + (data.time or 150)
+end
+
+local function ShowConvoBoxChili(data)
   local vsx, vsy = gl.GetViewSizes()
   local width, height = vsx*0.4, CONVO_BOX_HEIGHT
   
@@ -259,6 +282,14 @@ local function ShowConvoBox(data)
   convoExpireFrame = Spring.GetGameFrame() + (data.time or 150)
 end
 
+local function ShowConvoBox(data)
+  if useChiliConvo == true then
+    ShowConvoBoxChili(data)
+  else
+    ShowConvoBoxNoChili(data)
+  end
+end
+
 function WG.AddConvo(text, fontsize, image, sound, time)
   convoQueue[#convoQueue+1] = {text = text, fontsize = fontsize, image = image, sound = sound, time = time}
   if #convoQueue == 1 then ShowConvoBox(convoQueue[1]) end
@@ -270,6 +301,10 @@ function widget:GameFrame(n)
       msgBoxConvo:Dispose()
       msgBoxConvo = nil
       
+      table.remove(convoQueue, 1)
+    elseif convoString then
+      convoString = nil
+      font = nil
       table.remove(convoQueue, 1)
     end
     
@@ -288,7 +323,28 @@ function widget:Update(dt)
 	timer = timer + dt
 	if timer < UPDATE_FREQUENCY then
 		return
-	end	
+	end
+	--[[
+	if convoExpireTime then
+	  convoExpireTime = convoExpireTime - timer
+	  if convoExpireTime <= 0 then
+	    if msgBoxConvo then
+	      msgBoxConvo:Dispose()
+	      msgBoxConvo = nil
+	      
+	      table.remove(convoQueue, 1)
+	    elseif convoString then
+	      convoString = nil
+	      font = nil
+	      table.remove(convoQueue, 1)
+	    end
+	    
+	    if convoQueue[1] then
+	      ShowConvoBox(convoQueue[1])
+	    end
+	  end
+	end
+	]]--
 	flashPhase = not flashPhase
 	if msgBoxPersistent and flashTime then
 		if flashTime > 0 then
@@ -303,6 +359,82 @@ function widget:Update(dt)
 	end	
 	timer = 0
 end
+
+function widget:DrawScreen()
+  if convoString then
+  
+    local width, height = math.max(vsx*0.4, CONVO_BOX_WIDTH_MIN), CONVO_BOX_HEIGHT
+  
+    local x = math.floor((vsx - width)/2)
+    local y = vsy * 0.8	-- fits under chatbox
+    if WG.Cutscene and WG.Cutscene.IsInCutscene() then
+      y = vsy-32
+    end
+
+    if font == nil then
+      --font = FontHandler.LoadFont("FreeSansBold.otf",convoFontsize,3,3)
+      font = gl.LoadFont("FreeSansBold.otf", convoFontSize,3,3)
+      convoString = font:WrapText(convoString, width-(convoImage and height or 0), height, convoFontSize)
+    end
+    
+    gl.Color(0,0,0,0.6)
+    gl.Rect(x, y, x + width, y - height)
+    gl.Color(1,1,1,1)
+    
+    if convoImage then
+      gl.Texture(convoImage)
+      gl.TexRect(x, y - height, x + height, y)
+      gl.Texture(false)
+    end
+    
+    local textHeight, _, numLines = gl.GetTextHeight(convoString)
+    textHeight = textHeight*convoFontsize*numLines
+    local textWidth = gl.GetTextWidth(convoString)*convoFontsize
+    
+    local xt = x + (convoImage and height or 0) + 4
+    local yt = y - textHeight/numLines - 8
+    font:Begin()
+    --font:SetTextColor({1,1,1,1})
+    --font:SetOutlineColor({0,0,0,1})
+    font:SetAutoOutlineColor(true)
+    font:Print(convoString, xt, yt,  convoFontSize, "o")
+    font:End()
+  end
+end
+
+
+local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history"—yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
+local str2 = 'Enemy nuclear silo spotted!'
+
+function widget:Initialize()
+  Chili = WG.Chili
+  -- testing
+  --WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")	
+  --WG.AddConvo(str, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 22*30)
+  --WG.AddConvo(str2, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
+  
+  -- hook widgetHandler to allow us to override the DrawScreen callin
+  --local wh = widgetHandler
+  --
+  --wh.oldDrawScreenWH = wh.DrawScreen
+  --wh.DrawScreen = function()
+  --  widget:DrawScreenForce()
+  --  wh:oldDrawScreenWH()
+  --end
+end
+
+function widget:Shutdown()
+  -- restore old widgetHandler DrawScreen
+  --local wh = widgetHandler
+  --wh.DrawScreen = wh.oldDrawScreenWH
+  --wh.oldDrawScreenWH = nil
+end
+
+function widget:ViewResize(viewSizeX, viewSizeY)
+  vsx, vsy = viewSizeX, viewSizeY
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 -- for testing box changes
 --[[
@@ -321,17 +453,3 @@ function widget:Update(dt)
 	end
 end
 ]]--
-
-local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history"—yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
-local str2 = 'Enemy nuclear silo spotted!'
-
-function widget:Initialize()
-	Chili = WG.Chili
-	
-	-- testing
-	--WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")	
-	--WG.AddConvo(str, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 22*30)
-	--WG.AddConvo(str2, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------

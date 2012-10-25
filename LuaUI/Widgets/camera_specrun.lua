@@ -705,7 +705,7 @@ function widget:KeyRelease(key)
 	end
 end
 
-function widget:KeyPress(key,isRepeat)
+function widget:KeyPress(key, modifier, isRepeat)
 	local key_name = keysyms_inverted[key]
 	if (WG.SpecRunWidget["controlsEnabled"] == true) then
 		--local key_name = keysyms_inverted[key]
