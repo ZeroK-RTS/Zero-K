@@ -465,7 +465,7 @@ local function UpdateBurrowTarget(burrowID, targetArg)
 			end
 		end
 	else
-		local testDistance = spGetUnitSeparation(burrowID, targetArg, true)
+		local testDistance = spGetUnitSeparation(burrowID, targetArg, true) or data.targetDistance
 		if testDistance < data.targetDistance then
 			data.targetDistance = testDistance
 			data.targetID = targetArg
@@ -589,6 +589,7 @@ local function SpawnTurret(burrowID, turret, number, force)
   
   local x, z
   local bx, by, bz    = spGetUnitPosition(burrowID)
+  if not bx then return end
   local tries         = 0
   local s             = spawnSquare
   local spawnNumber   = number or math.max(squadSize, 1)
@@ -632,6 +633,7 @@ local function SpawnSupport(burrowID, support, number, force)
   
   local x, z
   local bx, by, bz    = spGetUnitPosition(burrowID)
+  if not bx then return end
   local tries         = 0
   local s             = spawnSquare
   local spawnNumber   = number or math.max(math.floor(squadSize), 1)
