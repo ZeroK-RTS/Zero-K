@@ -2690,7 +2690,12 @@ local function initialiseFaction(team)
 	end
 	
 	local shortname = Game.modShortName
-	if shortname == "ZK" then
+	
+	-- FIXME: 	this is to allow CAI to work in missions
+	--		it has the side effect of assuming the mod is always ZK,
+	--		which is kind of hacky and should probably be changed
+	--		on the other hand the previous code wasn't flexible either!
+	if true then	--if shortname == "ZK" then
 		a.buildDefs = a.buildConfig.robots
 		return true
 	else	-- CA reverse compatibility	-- remove?
