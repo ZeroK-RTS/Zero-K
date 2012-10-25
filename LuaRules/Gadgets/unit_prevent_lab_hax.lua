@@ -196,8 +196,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 	local ux, uy, uz  = spGetUnitBasePosition(unitID)
 	local scl_x, scl_y, scl_z, off_x, off_y,off_z  = spGetUnitCollisionVolumeData(unitID)
 	local face = spGetUnitBuildFacing(unitID)
-	local xsize = scl_x+off_x --(ud.xsize)*4
-	local zsize = scl_z+off_z --(ud.ysize or ud.zsize)*4
+	local xsize = scl_x/2+off_x --(ud.xsize)*4
+	local zsize = scl_z/2+off_z --(ud.ysize or ud.zsize)*4
 	local team = spGetUnitAllyTeam(unitID)
 
 	if ((face == 0) or (face == 2))  then
@@ -242,7 +242,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].minx,0,lab[unitID].maxz)
 
 	lab[unitID].miny = spGetGroundHeight(ux,uz)
-	lab[unitID].maxy = (scl_y+off_y+lab[unitID].miny)*0.5 --lab[unitID].miny+100
+	lab[unitID].maxy = (scl_y/2+off_y+lab[unitID].miny)*0.5 --lab[unitID].miny+100
 	
   end
   
