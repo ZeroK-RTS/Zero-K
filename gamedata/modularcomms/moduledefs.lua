@@ -681,7 +681,7 @@ for name,data in pairs(upgrades) do
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if Spring.GetModOptions().zkmode == "dota" then
+if Spring and Spring.GetModOptions and Spring.GetModOptions().zkmode == "dota" then
 	for name,data in pairs(upgrades_dota) do
 		upgrades[name] = data
 	end
