@@ -230,10 +230,10 @@ function gadget:UnitCreated(unitID, unitDefID)
 	--Spring.Echo(xsize)
 	--Spring.Echo(zsize)
 	
-	Spring.MarkerAddLine(lab[unitID].minx,0,lab[unitID].minz,lab[unitID].maxx,0,lab[unitID].minz)
-	Spring.MarkerAddLine(lab[unitID].minx,0,lab[unitID].minz,lab[unitID].minx,0,lab[unitID].maxz)
-	Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].maxx,0,lab[unitID].minz)
-	Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].minx,0,lab[unitID].maxz)
+	--Spring.MarkerAddLine(lab[unitID].minx,0,lab[unitID].minz,lab[unitID].maxx,0,lab[unitID].minz)
+	--Spring.MarkerAddLine(lab[unitID].minx,0,lab[unitID].minz,lab[unitID].minx,0,lab[unitID].maxz)
+	--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].maxx,0,lab[unitID].minz)
+	--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].minx,0,lab[unitID].maxz)
 
 	lab[unitID].miny = spGetGroundHeight(ux,uz)
 	lab[unitID].maxy = lab[unitID].miny+100
