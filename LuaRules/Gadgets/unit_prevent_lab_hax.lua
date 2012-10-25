@@ -38,6 +38,13 @@ local abs = math.abs
 local min = math.min
 
 local terraunitDefID = UnitDefNames["terraunit"].id
+
+local EXCEPTION_LIST = {
+  factoryplane = true,
+  factorygunship = true,
+  missilesilo = true,
+  armasp = true,
+}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -185,7 +192,7 @@ function gadget:UnitCreated(unitID, unitDefID)
   
   local ud = UnitDefs[unitDefID]
   local name = ud.name
-  if (ud.isFactory == true) and not (name == "factoryplane" or name == "factorygunship" or name == "missilesilo") then
+  if (ud.isFactory == true) and not (EXCEPTION_LIST[name]) then
 	local ux, uy, uz  = spGetUnitBasePosition(unitID)
 	local scl_x, scl_y, scl_z, off_x, off_y,off_z  = spGetUnitCollisionVolumeData(unitID)
 	local face = spGetUnitBuildFacing(unitID)
