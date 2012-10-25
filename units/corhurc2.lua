@@ -142,7 +142,6 @@ unitDef = {
         subs    = 2.5,
       },
 
-      dropped                 = true,
       edgeEffectiveness       = 0.7,
       explosionGenerator      = [[custom:napalm_koda]],
       fireStarter             = 250,
