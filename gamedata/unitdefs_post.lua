@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local modOptions
+local modOptions = {}
 if (Spring.GetModOptions) then
   modOptions = Spring.GetModOptions()
 end
