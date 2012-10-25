@@ -9,10 +9,7 @@ local fins = piece 'fins'
 local rflap = piece 'rflap' 
 local lflap = piece 'lflap' 
 local predrop = piece 'predrop' 
-local drop1 = piece 'drop1' 
-local drop2 = piece 'drop2' 
-local drop3 = piece 'drop3' 
-local drop4 = piece 'drop4' 
+local drop = piece 'drop' 
 local thrustl = piece 'thrustl' 
 local thrustr = piece 'thrustr' 
 local wingtipl = piece 'wingtipl' 
@@ -64,15 +61,15 @@ end
 
 function script.QueryWeapon(num)
 	--FakeUprightTurn(unitID, xp, zp, base, predrop)
-	return drop1
+	return drop
+end
+
+function script.AimFromWeapon(num)
+	return drop
 end
 
 function script.AimWeapon(num, heading, pitch)
 	return (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
-end
-
-function script.BlockShot(num)
-	return num == 1
 end
 
 function script.FireWeapon(num)
