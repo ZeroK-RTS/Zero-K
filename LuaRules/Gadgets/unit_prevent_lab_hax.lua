@@ -236,7 +236,8 @@ function gadget:UnitCreated(unitID, unitDefID)
 	--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].minx,0,lab[unitID].maxz)
 
 	lab[unitID].miny = spGetGroundHeight(ux,uz)
-	lab[unitID].maxy = lab[unitID].miny+100
+	local py = select(5,Spring.GetUnitPosition(unitID,true)) --get mid position.
+	lab[unitID].maxy = py --lab[unitID].miny+100
 	
   end
   
