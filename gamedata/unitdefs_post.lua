@@ -157,7 +157,7 @@ local function TagTree(unit, faction, newbuildoptions)
 end
 
 local function ProcessCommBuildOpts()
-	if Spring.GetModOptions().zkmode == "dota" then
+	if modOptions.zkmode == "dota" then
 	    return
 	end
 	
