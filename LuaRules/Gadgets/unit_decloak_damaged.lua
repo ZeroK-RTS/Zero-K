@@ -41,14 +41,15 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function GG.PokeDecloakUnit(unitID)
+function GG.PokeDecloakUnit(unitID, duration)
+	duration = duration or 10
 	if recloakUnitID[unitID] then
-		recloakUnit[recloakUnitID[unitID]].frames = 10
+		recloakUnit[recloakUnitID[unitID]].frames = duration
 	else
 		local cloak = Spring.GetUnitIsCloaked(unitID)
 		if cloak then
 			recloakUnits = recloakUnits + 1
-			recloakUnit[recloakUnits] = {id = unitID, frames = 10}
+			recloakUnit[recloakUnits] = {id = unitID, frames = duration}
 			recloakUnitID[unitID] = recloakUnits
 			Spring.SetUnitCloak(unitID, false, 10000)
 		end
