@@ -2,10 +2,10 @@ local name = "commweapon_disruptor"
 local weaponDef = {
     name                    = [[Disruptor Pulse Beam]],
     areaOfEffect            = 32,
-	beamdecay 				= 0.9,
-    beamTime                = 0.2,
-	beamttl                 = 50,
-    coreThickness           = 0.1,
+    beamdecay 				= 0.9,
+    beamTime                = 0.03,
+    beamttl                 = 50,
+    coreThickness           = 0.25,
     craterBoost             = 0,
     craterMult              = 0,
 
