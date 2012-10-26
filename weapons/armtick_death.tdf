@@ -7,6 +7,7 @@
   cratermult=0;
   edgeeffectiveness=0;
   explosiongenerator=custom:ELECTRIC_EXPLOSION;
+  explosionSpeed=10000;
   firestarter=90;
   impulseboost=0;
   impulsefactor=0;
