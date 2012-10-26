@@ -290,27 +290,36 @@ local function ShowConvoBox(data)
   end
 end
 
+local function ClearConvoBox(noContinue)
+  if msgBoxConvo then
+    msgBoxConvo:Dispose()
+    msgBoxConvo = nil
+    
+    table.remove(convoQueue, 1)
+  elseif convoString then
+    convoString = nil
+    font = nil
+    table.remove(convoQueue, 1)
+  end
+  
+  if (not noContinue) and convoQueue[1] then
+    ShowConvoBox(convoQueue[1])
+  end
+end
+
 function WG.AddConvo(text, fontsize, image, sound, time)
   convoQueue[#convoQueue+1] = {text = text, fontsize = fontsize, image = image, sound = sound, time = time}
   if #convoQueue == 1 then ShowConvoBox(convoQueue[1]) end
 end
 
+function WG.ClearConvoQueue()
+  ClearConvoBox(true)
+  convoQueue = {}
+end
+
 function widget:GameFrame(n)
   if convoExpireFrame and convoExpireFrame <= n then
-    if msgBoxConvo then
-      msgBoxConvo:Dispose()
-      msgBoxConvo = nil
-      
-      table.remove(convoQueue, 1)
-    elseif convoString then
-      convoString = nil
-      font = nil
-      table.remove(convoQueue, 1)
-    end
-    
-    if convoQueue[1] then
-      ShowConvoBox(convoQueue[1])
-    end
+    ClearConvoBox(false)
   end
 end
 
@@ -368,6 +377,8 @@ function widget:DrawScreen()
     local x = math.floor((vsx - width)/2)
     local y = vsy * 0.8	-- fits under chatbox
     if WG.Cutscene and WG.Cutscene.IsInCutscene() then
+      x = vsx*0.1
+      width = vsx*0.8
       y = vsy-32
     end
 
@@ -421,9 +432,15 @@ function widget:Initialize()
   --  widget:DrawScreenForce()
   --  wh:oldDrawScreenWH()
   --end
+  if WG.AddNoHideWidget then
+    WG.AddNoHideWidget(self)
+  end
 end
 
 function widget:Shutdown()
+  if WG.RemoveNoHideWidget then
+    WG.RemoveNoHideWidget(self)
+  end
   -- restore old widgetHandler DrawScreen
   --local wh = widgetHandler
   --wh.DrawScreen = wh.oldDrawScreenWH
