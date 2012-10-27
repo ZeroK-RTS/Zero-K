@@ -379,7 +379,7 @@ function widget:DrawScreen()
     if WG.Cutscene and WG.Cutscene.IsInCutscene() then
       x = vsx*0.1
       width = vsx*0.8
-      y = vsy-32
+      y = vsy-16
     end
 
     if font == nil then
@@ -389,7 +389,7 @@ function widget:DrawScreen()
     end
     
     gl.Color(0,0,0,0.6)
-    gl.Rect(x, y, x + width, y - height)
+    gl.Rect(x-2, y+2, x + width + 2, y - height - 2)
     gl.Color(1,1,1,1)
     
     if convoImage then
