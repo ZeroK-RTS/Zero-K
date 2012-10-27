@@ -72,108 +72,67 @@ unitDef = {
   weapons             = {
 
     {
-      def                = [[BOGUS_BOMB]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
-    },
-
-
-    {
       def                = [[BOMBSABOT]],
-      mainDir            = [[0 -1 0]],
-      maxAngleDif        = 120,
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
 	
-	{
+    {
       def                = [[SHIELD_CHECK]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
+    
+    --{
+    --  def                = [[TARGETINGLASER]],
+    --  mainDir            = [[0 -1 0.25]],
+    --  maxAngleDif        = 240,
+    --  onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
+    --},
+    
 
   },
 
 
   weaponDefs          = {
 
-    BOGUS_BOMB = {
-      name                    = [[Fake Bomb]],
-      areaOfEffect            = 80,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = 0,
-      },
-
-      dropped                 = true,
-      edgeEffectiveness       = 0,
-      explosionGenerator      = [[custom:NONE]],
-      impulseBoost            = 0,
-      impulseFactor           = 0,
-      interceptedByShieldType = 1,
-      manualBombSettings      = true,
-      model                   = [[]],
-      myGravity               = 1000,
-      range                   = 10,
-      reloadtime              = 10,
-      scale                   = [[0]],
-      weaponType              = [[AircraftBomb]],
-    },
-
-
     BOMBSABOT  = {
-      name                    = [[Guided Bomb]],
-      areaOfEffect            = 32,
+      name                    = [[Precision Bomb]],
+      areaOfEffect            = 48,
       avoidFeature            = false,
       avoidFriendly           = false,
-      burnblow                = true,
-      cegTag                  = [[KBOTROCKETTRAIL]],
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-	  cylinderTargeting	  = 1,
-
+ 
       damage                  = {
         default = 1200,
-        planes  = 1200,
-        subs    = 1200,
       },
 
+      edgeEffectiveness       = 1,
       explosionGenerator      = [[custom:xamelimpact]],
-      fireStarter             = 70,
-      flightTime              = 2,
-	  heightmod				  = 0,
+      fireStarter             = 120,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      interceptedByShieldType = 2,
+      interceptedByShieldType = 1,
+      manualBombSettings      = true,
       model                   = [[wep_b_paveway.s3o]],
-      range                   = 120,
-      reloadtime              = 5,
-      selfprop                = true,
-      smokedelay              = [[0.1]],
-      smokeTrail              = false,
+      myGravity               = 1,
+      noSelfDamage            = true,
+      range                   = 500,
+      reloadtime              = 10,
       soundHit                = [[weapon/bomb_hit]],
       soundStart              = [[weapon/bomb_drop]],
-      startsmoke              = [[1]],
-      startVelocity           = 300,
       targetMoveError         = 0,
-      tolerance               = 8000,
-      tracks                  = true,
-      turnRate                = 2500,
-      turret                  = true,
       waterweapon             = true,
-      weaponAcceleration      = 300,
-      weaponTimer             = 0.1,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 400,
+      weaponType              = [[AircraftBomb]],
     },
 	
-	SHIELD_CHECK = {
+    SHIELD_CHECK = {
       name                    = [[Fake Poker For Shields]],
       areaOfEffect            = 0,
-	  avoidFeature            = false,
+      avoidFeature            = false,
       avoidFriendly           = false,
       collideFeature          = false,
-	  collideFriendly         = false,
+      collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
@@ -181,7 +140,7 @@ unitDef = {
         default = -1E-06,
       },
 
-	  explosionGenerator      = [[custom:NONE]],
+      explosionGenerator      = [[custom:NONE]],
       flightTime              = 2,
       impactOnly              = true,
       impulseBoost            = 0,
@@ -191,14 +150,44 @@ unitDef = {
       reloadtime              = 2,
       rgbColor                = [[0.5 1 1]],
       size                    = 1E-06,
-	  startVelocity           = 2000,
+      startVelocity           = 2000,
       turret                  = true,
-	  trajectoryHeight        = 1.5,
+      trajectoryHeight        = 1.5,
       weaponAcceleration      = 2000,
-	  weaponTimer             = 0,
-	  weaponType              = [[MissileLauncher]],
+      weaponTimer             = 0,
+      weaponType              = [[MissileLauncher]],
       weaponVelocity          = 2000,
-	  waterWeapon             = true,
+      waterWeapon             = true,
+    },
+    
+    TARGETINGLASER = {
+      name                    = [[Targeting Laser (fake weapon)]],
+      beamTime                = 0.2,
+      coreThickness           = 0.5,
+      craterBoost             = 0,
+      craterMult              = 0,
+      cylinderTargeting       = 1,
+
+      damage                  = {
+        default = -1E-06,
+      },
+
+      explosionGenerator      = [[custom:none]],
+      fireStarter             = 100,
+      heightMod               = 0.5,
+      impactOnly              = true,
+      impulseFactor           = 0,
+      interceptedByShieldType = 1,
+      laserFlareSize          = 4,
+      minIntensity            = 1,
+      pitchtolerance          = 8192,
+      range                   = 600,
+      reloadtime              = 0.2,
+      rgbColor                = [[1 0 0]],
+      thickness               = 2,
+      tolerance               = 8192,
+      turret                  = true,
+      weaponType              = [[BeamLaser]],
     },
 
   },

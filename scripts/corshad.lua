@@ -73,11 +73,11 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	if num == 2 then
+	if num == 1 then
 		--FakeUprightTurn(unitID, xp, zp, base, predrop)
 		GG.Bomber_Dive_fired(unitID)
 		Reload()
-	elseif num == 3 then
+	elseif num == 2 then
 		GG.Bomber_Dive_fake_fired(unitID)
 	end
 end
