@@ -1431,10 +1431,6 @@ function widgetHandler:ViewResize(viewGeometry)
 end
 
 function widgetHandler:DrawScreen()
-  if (Spring.IsGUIHidden()) then
-    return
-  end
-
   if (self.tweakMode) then
     gl.Color(0, 0, 0, 0.5)
     local sx, sy, px, py = Spring.GetViewGeometry()
