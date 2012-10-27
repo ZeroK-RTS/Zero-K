@@ -93,8 +93,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 190,
-        subs    = 9.5,
+        default = 200,
+        subs    = 10,
       },
 
       explosionGenerator      = [[custom:DEFAULT]],
@@ -106,7 +106,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_maverick.s3o]],
       pitchtolerance          = [[12000]],
-      range                   = 340,
+      range                   = 360,
       reloadtime              = 4,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],
