@@ -48,6 +48,7 @@ local windows = {}
 
 local WAR_THRESHOLD = 5000
 local PEACE_THRESHOLD = 1000
+local PLAYLIST_FILE = 'sounds/music/playlist.lua'
 
 local musicType = 'peace'
 local dethklok = {} -- keeps track of the number of doods killed in each time frame
@@ -59,14 +60,16 @@ local numVisibleEnemy = 0
 local fadeVol
 local curTrack	= "no name"
 local songText	= "no name"
+local haltMusic = false
 
-local warTracks, peaceTracks, victoryTracks, defeatTracks
+local warTracks, peaceTracks, briefingTracks, victoryTracks, defeatTracks
 
 local firstTime = false
 local wasPaused = false
 local firstFade = true
 local initSeed = 0
 local initialized = false
+local gameStarted = Spring.GetGameFrame() > 0
 local gameOver = false
 
 local myTeam = Spring.GetMyTeamID()
@@ -76,40 +79,29 @@ local defeat = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
-	-- Spring.Echo(math.random(), math.random())
-	-- Spring.Echo(os.clock())
- 
-	-- for TrackName,TrackDef in pairs(peaceTracks) do
-		-- Spring.Echo("Track: " .. TrackDef)	
-	-- end
-	--math.randomseed(os.clock()* 101.01)--lurker wants you to burn in hell rgn
-	-- for i=1,20 do Spring.Echo(math.random()) end
-	
-	for i = 1, 30, 1 do
-		dethklok[i]=0
-	end
-end
-
-
-function widget:Shutdown()
+local function StartTrack(track)
+	haltMusic = false
 	Spring.StopSoundStream()
 	
-	for i=1,#windows do
-		(windows[i]):Dispose()
-	end
-end
-
-local function PlayNewTrack()
-	Spring.StopSoundStream()
 	local newTrack = previousTrack
-	repeat
-		if musicType == 'peace' then
-			newTrack = peaceTracks[math.random(1, #peaceTracks)]
-		elseif musicType == 'war' then
-			newTrack = warTracks[math.random(1, #warTracks)]
-		end
-	until newTrack ~= previousTrack
+	if track then
+		newTrack = track	-- play specified track
+	else
+		local tries = 0
+		repeat
+			if (not gameStarted) then
+				if (#briefingTracks == 0) then return end
+				newTrack = briefingTracks[math.random(1, #briefingTracks)]
+			elseif musicType == 'peace' then
+				if (#peaceTracks == 0) then return end
+				newTrack = peaceTracks[math.random(1, #peaceTracks)]
+			elseif musicType == 'war' then
+				if (#warTracks == 0) then return end
+				newTrack = warTracks[math.random(1, #warTracks)]
+			end
+			tries = tries + 1
+		until newTrack ~= previousTrack or tries >= 10
+	end
 	-- for key, val in pairs(oggInfo) do
 		-- Spring.Echo(key, val)	
 	-- end
@@ -128,100 +120,154 @@ local function PlayNewTrack()
 	WG.music_start_volume = WG.music_volume
 end
 
+local function StopTrack(noContinue)
+	Spring.StopSoundStream()
+	if noContinue then
+		haltMusic = true
+	end
+end
+
 function widget:Update(dt)
 	if gameOver then
 		return
 	end
-	if (Spring.GetGameSeconds()>0) then
-		if not initialized then
-			math.randomseed(os.clock()* 100)
-			initialized=true
-			
-			-- these are here to give epicmenu time to set the values properly
-			-- (else it's always default at startup)
-			local vfsMode = (options.useIncludedTracks.value and VFS.RAW_FIRST) or VFS.RAW
-			warTracks	=	VFS.DirList('sounds/music/war/', '*.ogg', vfsMode)
-			peaceTracks	=	VFS.DirList('sounds/music/peace/', '*.ogg', vfsMode)
-			victoryTracks	=	VFS.DirList('sounds/music/victory/', '*.ogg', vfsMode)
-			defeatTracks	=	VFS.DirList('sounds/music/defeat/', '*.ogg', vfsMode)
+	if not initialized then
+		math.randomseed(os.clock()* 100)
+		initialized=true
+		-- these are here to give epicmenu time to set the values properly
+		-- (else it's always default at startup)
+		if VFS.FileExists(PLAYLIST_FILE, VFS.RAW_FIRST) then
+			local tracks = VFS.Include(PLAYLIST_FILE, VFS.RAW_FIRST)
+			for i,v in pairs(tracks) do Spring.Echo(i,v) end
+			warTracks = tracks.war
+			peaceTracks = tracks.peace
+			briefingTracks = tracks.briefing
+			victoryTracks = tracks.victory
+			defeatTracks = tracks.defeat
 		end
 		
-		timeframetimer = timeframetimer + dt
-		if (timeframetimer > 1) then	-- every second
-			timeframetimer = 0
-			newTrackWait = newTrackWait + 1
-			local PlayerTeam = Spring.GetMyTeamID()
-			numVisibleEnemy = 0
-			local doods = Spring.GetVisibleUnits()
-			for _, u in ipairs(doods) do
-				if (Spring.IsUnitAllied(u) ~= true) then
-					numVisibleEnemy = numVisibleEnemy + 1
-				end
+		local vfsMode = (options.useIncludedTracks.value and VFS.RAW_FIRST) or VFS.RAW
+		warTracks	= warTracks or VFS.DirList('sounds/music/war/', '*.ogg', vfsMode)
+		peaceTracks	= peaceTracks or VFS.DirList('sounds/music/peace/', '*.ogg', vfsMode)
+		briefingTracks  = briefingTracks or VFS.DirList('sounds/music/briefing/', '*.ogg', vfsMode)
+		victoryTracks	= victoryTracks or VFS.DirList('sounds/music/victory/', '*.ogg', vfsMode)
+		defeatTracks	= defeatTracks or VFS.DirList('sounds/music/defeat/', '*.ogg', vfsMode)
+	end
+	
+	timeframetimer = timeframetimer + dt
+	if (timeframetimer > 1) then	-- every second
+		timeframetimer = 0
+		newTrackWait = newTrackWait + 1
+		local PlayerTeam = Spring.GetMyTeamID()
+		numVisibleEnemy = 0
+		local doods = Spring.GetVisibleUnits()
+		for _, u in ipairs(doods) do
+			if (Spring.IsUnitAllied(u) ~= true) then
+				numVisibleEnemy = numVisibleEnemy + 1
 			end
-				
-			totalKilled = 0
-			for i = 1, 10, 1 do --calculate the first half of the table (1-15)
-				totalKilled = totalKilled + (dethklok[i] * 2)
-			end
+		end
 			
-			for i = 11, 20, 1 do -- calculate the second half of the table (16-45)
-				totalKilled = totalKilled + dethklok[i]
-			end
-			
-			for i = 20, 1, -1 do -- shift value(s) to the end of table
-				dethklok[i+1] = dethklok[i]
-			end
-			dethklok[1] = 0 -- empty the first row
-			
-			--Spring.Echo (totalKilled)
-			
-			if (totalKilled > WAR_THRESHOLD) then
-				musicType = 'war'
-			end
-			
-			if (totalKilled <= PEACE_THRESHOLD) then
-				musicType = 'peace'
-			end
-			
-			if (not firstTime) then
-				PlayNewTrack()
-				firstTime = true -- pop this cherry	
-			end
-			
-			local playedTime, totalTime = Spring.GetSoundStreamTime()
-			playedTime = math.floor(playedTime)
-			totalTime = math.floor(totalTime)
-			--Spring.Echo(playedTime, totalTime)
-			
-			--Spring.Echo(playedTime, totalTime, newTrackWait)
-			
-			--if((totalTime - playedTime) <= 6 and (totalTime >= 1) ) then
-				--Spring.Echo("time left:", (totalTime - playedTime))
-				--Spring.Echo("volume:", (totalTime - playedTime)/6)
-				--if ((totalTime - playedTime)/6 >= 0) then
-				--	Spring.SetSoundStreamVolume((totalTime - playedTime)/6)
-				--else
-				--	Spring.SetSoundStreamVolume(0.1)
-				--end
-			--elseif(playedTime <= 5 )then--and not firstFade
-				--Spring.Echo("time playing:", playedTime)
-				--Spring.Echo("volume:", playedTime/5)
-				--Spring.SetSoundStreamVolume( playedTime/5)
+		totalKilled = 0
+		for i = 1, 10, 1 do --calculate the first half of the table (1-15)
+			totalKilled = totalKilled + (dethklok[i] * 2)
+		end
+		
+		for i = 11, 20, 1 do -- calculate the second half of the table (16-45)
+			totalKilled = totalKilled + dethklok[i]
+		end
+		
+		for i = 20, 1, -1 do -- shift value(s) to the end of table
+			dethklok[i+1] = dethklok[i]
+		end
+		dethklok[1] = 0 -- empty the first row
+		
+		--Spring.Echo (totalKilled)
+		
+		if (totalKilled > WAR_THRESHOLD) then
+			musicType = 'war'
+		end
+		
+		if (totalKilled <= PEACE_THRESHOLD) then
+			musicType = 'peace'
+		end
+		
+		if (not firstTime) then
+			StartTrack()
+			firstTime = true -- pop this cherry	
+		end
+		
+		local playedTime, totalTime = Spring.GetSoundStreamTime()
+		playedTime = math.floor(playedTime)
+		totalTime = math.floor(totalTime)
+		--Spring.Echo(playedTime, totalTime)
+		
+		--Spring.Echo(playedTime, totalTime, newTrackWait)
+		
+		--if((totalTime - playedTime) <= 6 and (totalTime >= 1) ) then
+			--Spring.Echo("time left:", (totalTime - playedTime))
+			--Spring.Echo("volume:", (totalTime - playedTime)/6)
+			--if ((totalTime - playedTime)/6 >= 0) then
+			--	Spring.SetSoundStreamVolume((totalTime - playedTime)/6)
+			--else
+			--	Spring.SetSoundStreamVolume(0.1)
 			--end
+		--elseif(playedTime <= 5 )then--and not firstFade
+			--Spring.Echo("time playing:", playedTime)
+			--Spring.Echo("volume:", playedTime/5)
+			--Spring.SetSoundStreamVolume( playedTime/5)
+		--end
 
-			if ( (musicType ~= previousTrackType and musicType == 'war') or (playedTime >= totalTime)) then	-- both zero means track stopped in 8
-				previousTrackType = musicType
-				PlayNewTrack()
-				
-				--Spring.Echo("Track: " .. newTrack)
-				newTrackWait = 0
-			end
+		if ( (musicType ~= previousTrackType and musicType == 'war')
+		 or (playedTime >= totalTime))
+		 and (not haltMusic) then	-- both zero means track stopped
+			previousTrackType = musicType
+			StartTrack()
+			
+			--Spring.Echo("Track: " .. newTrack)
+			newTrackWait = 0
 		end
         local _, _, paused = Spring.GetGameSpeed()
 		if (paused ~= wasPaused) and options.pausemusic.value then
 			Spring.PauseSoundStream()
 			wasPaused = paused
 		end
+	end
+end
+
+function widget:GameStart()
+	gameStarted = true
+	previousTrackType = musicType
+	StartTrack()
+	
+	--Spring.Echo("Track: " .. newTrack)
+	newTrackWait = 0	
+end
+
+function widget:Initialize()
+	WG.Music = WG.Music or {}
+	WG.Music.StartTrack = StartTrack
+	WG.Music.StopTrack = StopTrack
+
+	-- Spring.Echo(math.random(), math.random())
+	-- Spring.Echo(os.clock())
+ 
+	-- for TrackName,TrackDef in pairs(peaceTracks) do
+		-- Spring.Echo("Track: " .. TrackDef)	
+	-- end
+	--math.randomseed(os.clock()* 101.01)--lurker wants you to burn in hell rgn
+	-- for i=1,20 do Spring.Echo(math.random()) end
+	
+	for i = 1, 30, 1 do
+		dethklok[i]=0
+	end
+end
+
+function widget:Shutdown()
+	Spring.StopSoundStream()
+	WG.Music = nil
+	
+	for i=1,#windows do
+		(windows[i]):Dispose()
 	end
 end
 
