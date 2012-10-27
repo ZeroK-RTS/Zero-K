@@ -14,12 +14,13 @@
 --to do : correct  bug that infinitely order to build mobile constructors instead of just 1.
 -- because it never test the end of the build but test the validity to build another one at the same place.
 
+local version = "v1.3"
 function widget:GetInfo()
   return {
     name      = "Central Build AI",
-    desc      = "v1.23 Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba clear\255\255\255\255 to forcefully delete all stored queue",
+    desc      = version.. " Common non-hierarchical permanent build queue\n\nInstruction: add constructor(s) to group zero (use \255\90\255\90Auto Group\255\255\255\255 widget or manual), then give any of them a build queue. As a result: the whole group (group 0) will see the same build queue and they will distribute work automatically among them. Type \255\255\90\90/cba\255\255\255\255 to forcefully delete all stored queue",
     author    = "Troy H. Cheek, modified by msafwan",
-    date      = "July 20, 2009, 15 Oct 2012",
+    date      = "July 20, 2009, 27 Oct 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
     enabled   = false  --  loaded by default?
@@ -267,7 +268,7 @@ function UpdateOneGroupsDetails(myGroupId)
 	groupHasChanged = nil
 end
 
---	receive broadcasted event from "cmd_mex_placement.lua" which notify us that it has its own mex queue
+--	A compatibility function: receive broadcasted event from "cmd_mex_placement.lua" (ZK specific) which notify us that it has its own mex queue
 function CommandNotifyMex(id,params,options)
 	return widget:CommandNotify(id, params, options, 1)
 end
@@ -283,14 +284,19 @@ function widget:CommandNotify(id, params, options, zkMex)
 				if ( id < 0 ) then --for: building
 					local x, y, z, h = params[1], params[2], params[3], params[4]
 					local myCmd = { id=id, x=x, y=y, z=z, h=h }
-					local hash = hash(myCmd)
-					if ( myQueue[hash] ) then	-- if dupe of existing order
-						myQueue[hash] = nil		-- must want to cancel
-					else						-- if not a dupe
+					local isOverlap = CleanOrders(myCmd) -- check if current queue overlap with existing queue, and clear up any invalid queue 
+					if not isOverlap then
+						local hash = hash(myCmd)
+						--[[
+						if ( myQueue[hash] ) then	-- if dupe of existing order
+							myQueue[hash] = nil		-- must want to cancel
+						else						-- if not a dupe
+							myQueue[hash] = myCmd	-- add to CB queue
+						end
+						--]]
 						myQueue[hash] = myCmd	-- add to CB queue
 					end
-					CleanOrders(myQueue)	-- don't add if can't build there
-					nextFrame = spGetGameFrame() + 30 --wait 1 second before distribute work, so you can queue more stuff
+					nextFrame = spGetGameFrame() + 30 --wait 1 more second before distribute work, so user can queue more stuff
 					return true	-- have to return true or Spring still handles command itself.
 				else --for: moving/attacking/repairing, ect
 					if myUnits[unitID] == "idle" then --unit is not doing anything
@@ -324,7 +330,7 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 			local cmd1 = GetFirstCommand(unitID)
 			if ( cmd1 == nil ) then		-- no orders?  Must be idle.
 				myUnits[unitID]="idle"
-			else
+			else -- have orders?  Must be busy.
 				myUnits[unitID]="busy" -- command done but still busy.
 			end
 		end
@@ -337,7 +343,7 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 					myUnits[unit2]="busy" -- command done but still busy.
 				end
 			elseif ( myCmd == "asst "..unitID ) then  --check if this unit is being GUARDed
-				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command
+				spGiveOrderToUnit(unit2, CMD_REMOVE, {CMD_GUARD}, {"alt"} ) --remove the GUARD command from those units
 				myUnits[unit2] = "idle" --set as "idle"
 			end
 		end		
@@ -371,6 +377,7 @@ function FindIdleUnits(myUnits, thisFrame)
 	--	>register that constructor as worker
 	--*return command to be given to that constructor
 	-->send all command to all CBA units.
+	CleanOrders()	-- check build site for blockage. In case something's changed since last we checked.
 	local orderArray={}
 	local unitArray={}
 	for _,_ in pairs(myUnits) do
@@ -410,7 +417,7 @@ function FindIdleUnits(myUnits, thisFrame)
 			--Echo(close[5])
 		end
 	end
-	Spring.GiveOrderArrayToUnitArray (unitArray,orderArray, true)
+	Spring.GiveOrderArrayToUnitArray (unitArray,orderArray, true) --send command to bulk of constructor
 	unitArray = nil
 	orderArray = nil
 	--nextFrame = thisFrame + ping()
@@ -432,22 +439,63 @@ end
 
 --  Formerly remove duplicate orders, process cancel requests, delete bad builds.
 --  Now, just test for and remove bad builds.
+--  EDIT: added check for duplicate.
 
-function CleanOrders(myQueue)
-	for key,myCmd in pairs(myQueue) do
-		local cmd = myCmd.id
-		cmd = abs( cmd )
-		local x, y, z, h = myCmd.x, myCmd.y, myCmd.z, myCmd.h
-		local canBuildThatThere,featureID = spTestBuildOrder(cmd,x,y,z,h)
-		if ( checkFeatures ) and ( featureID ) then
-			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then --if feature belong to team, then don't build there. (ie: ressurectable wreck or dragon-teeth's wall)
-				canBuildThatThere = 0
-			end
-		end
-		if (canBuildThatThere < 1) then
-			myQueue[key] = nil
+function CleanOrders(newCmd)
+	local xSize = nil --variables for checking queue overlaping
+	local zSize = nil
+	local xSize_queue = nil
+	local zSize_queue = nil
+	local x_newCmd = nil
+	local z_newCmd = nil
+	local isOverlap = nil
+	if newCmd then --check the size of the new queue
+		local newCmdID = abs ( newCmd.id )
+		x_newCmd = newCmd.x
+		z_newCmd = newCmd.z
+		if newCmd.h == 0 or newCmd.h == 2 then --get building facing. Reference: unit_prevent_lab_hax.lua by googlefrog
+			xSize = UnitDefs[newCmdID].xsize*4
+			zSize = UnitDefs[newCmdID].zsize*4
+		else
+			xSize = UnitDefs[newCmdID].zsize*4
+			zSize = UnitDefs[newCmdID].xsize*4
 		end
 	end
+	for key,myCmd in pairs(myQueue) do
+		local cmdID = abs( myCmd.id )
+		local x, y, z, facing = myCmd.x, myCmd.y, myCmd.z, myCmd.h
+		
+		local canBuildThisThere,featureID = spTestBuildOrder(cmdID,x,y,z,facing) --check if build site is blocked by buildings & terrain
+		if ( checkFeatures ) and ( featureID ) then --check if build site is blocked by feature
+			if ( spGetFeatureTeam(featureID) == spGetMyTeamID() ) then --if feature belong to team, then don't reclaim or build there. (ie: dragon-teeth's wall)
+				canBuildThisThere = 0
+			end
+		end
+		if newCmd and (canBuildThisThere >= 1) then --check if build site overlap new queue
+			if facing == 0 or facing == 2 then --check the size of the queued building
+				xSize_queue = UnitDefs[cmdID].xsize*4
+				zSize_queue = UnitDefs[cmdID].zsize*4
+			else
+				xSize_queue = UnitDefs[cmdID].zsize*4
+				zSize_queue = UnitDefs[cmdID].xsize*4
+			end
+			local minTolerance = xSize_queue + xSize --check minimum tolerance in x direction
+			local axisDist = abs (x - x_newCmd) --check actual separation in x direction
+			if axisDist < minTolerance then --if too close in x directionL
+				minTolerance = zSize_queue + zSize --check minimum tolerance in z direction
+				axisDist = abs (z - z_newCmd) -- check actual separation in z direction
+				if axisDist < minTolerance then --if too close in z direction
+					canBuildThisThere = 0 --remove queue
+					isOverlap = true
+				end
+			end
+		end
+		if (canBuildThisThere < 1) then --if queue is flagged for removal
+			myQueue[key] = nil  --remove queue
+		end
+	end
+	
+	return isOverlap --return a value for "widget:CommandNotify()" to handle user's command.
 end
 
 --	This function returns closest work for a particular builder.
@@ -458,8 +506,6 @@ function GetWorkFor(unitID)
 	local queueClose = 0	-- command hash of closest project in the queue
 	local queueDist = huge	-- how far away it is.  (Thanks to Niobium.)
 	local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
-	
-	CleanOrders(myQueue)	-- just in case something's changed since last we checked.
 
 	for busyUnitID,busyCmd1 in pairs(myUnits) do	-- see if any busy units need help.
 		local cmd1 = GetFirstCommand(busyUnitID)
@@ -689,8 +735,10 @@ function widget:KeyPress(key, mods, isRepeat)
 	end
 end
 
+-- Function to help clear ALL existing command instantenously
+
 function widget:TextCommand(command)
-	if command == "cba clear" then
+	if command == "cba" then
 		for key,myCmd in pairs(myQueue) do
 			myQueue[key]=nil
 		end
@@ -698,4 +746,4 @@ function widget:TextCommand(command)
 		return true
 	end
 	return false
-end   
+end
