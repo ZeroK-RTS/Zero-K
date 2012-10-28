@@ -265,8 +265,8 @@ end
 -- 
 
 local TURNRATE_MULT = 1
-local ACCEL_MULT = 4
-local ACCEL_MULT_HIGH = 8
+local ACCEL_MULT = 3
+local ACCEL_MULT_HIGH = 5
 
 for name, ud in pairs(UnitDefs) do
 	--if  then
@@ -275,11 +275,11 @@ for name, ud in pairs(UnitDefs) do
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
 			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
-			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH
+			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH*2
 		else
 			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT
-			ud.brakerate = ud.brakerate * ACCEL_MULT
+			ud.brakerate = ud.brakerate * ACCEL_MULT*2
 		end
 	end
 end
