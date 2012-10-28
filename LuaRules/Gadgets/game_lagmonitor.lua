@@ -34,7 +34,7 @@ end
 if (gadgetHandler:IsSyncedCode()) then -- SYNCED ---
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local lineage = {}
+local lineage = {} --keep track of unit ownership: Is populated when gadget give away units, and when units is created. Depopulated when units is destroyed, or is finished construction, or when gadget return units to owner. 
 local afkTeams = {}
 local tickTockCounter = {} --remember how many second a player is in AFK mode. To add a delay before unit transfer commence.
 local unstablePlayerCounter = {} --remember how many times a player was AFK. To de-merit laggy player from receiving any units.
@@ -67,28 +67,25 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	unitAlreadyFinished[unitID] = nil
 end
 
--- Only lineage for factories so the returning player has something to do.
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	--lineage[unitID] = builderID and (lineage[builderID] or Spring.GetUnitTeam(builderID)) or unitTeam
 	if builderID ~= nil then
 		local builderDefID = spGetUnitDefID(builderID)
-		if builderDefID then
-			ud = UnitDefs[builderDefID]
-			if ud and (not ud.isFactory) then
-				local originalTeamID = lineage[builderID]
-				if originalTeamID ~= nil then
-					lineage[unitID] = originalTeamID --to return newly created unit to the owner of the construction-unit.
-				end
+		local ud = (builderDefID and UnitDefs[builderDefID])
+		if ud and (not ud.isFactory) then --(set ownership to original owner for all units except units from factory so that receipient player didn't loose his investment creating that unit)
+			local originalTeamID = lineage[builderID]
+			if originalTeamID ~= nil then
+				lineage[unitID] = originalTeamID --to return newly created unit to the owner of the constructor.
 			end
 		end
 	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam) --player who finished a unit will own that unit; its lineage will be deleted and the unit will never be returned to the lagging team.
-	if lineage[unitID] and (not unitAlreadyFinished[unitID]) and not (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory) then
-		lineage[unitID] = nil --to relinguish ownership of the unit when another player finishes the unit
+	if lineage[unitID] and (not unitAlreadyFinished[unitID]) and not (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory) then --(religuish ownership for all unit except factories so the returning player has something to do)
+		lineage[unitID] = nil --relinguish the original ownership of the unit
 	end
-	unitAlreadyFinished[unitID] = true -- reverse build
+	unitAlreadyFinished[unitID] = true --for reverse build
 end
 
 GG.allowTransfer = false
@@ -196,7 +193,7 @@ function gadget:GameFrame(n)
 				end
 			end
 		end
-		afkPlayer = afkPlayer .. "#".. players[#players] --cap the string with the largest playerID information
+		afkPlayer = afkPlayer .. "#".. players[#players] --cap the string with the largest playerID information. ie: (string)1010219899#98 can be read like this-> id:01 ally:02, id:98 ally:99, highestID:98  
 		SendToUnsynced("LagmonitorAFK",afkPlayer) --tell widget about AFK list
 		
 		for playerID, data in pairs(laggers) do

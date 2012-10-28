@@ -90,6 +90,7 @@ unitList["ZK"]["chicken_dragon"] =	{ markerText = "White Dragon" }
 unitList["ZK"]["chickenflyerqueen"] =	{ markerText = "Chicken Queen Aerial" }
 unitList["ZK"]["chickenlandqueen"] =	{ markerText = "Chicken Queen Grounded" }
 unitList["ZK"]["chickenqueenlite"] =	{ markerText = "Chicken Queen Junior" }
+unitList["ZK"]["spherepole"] =	{ markerText = "Scythe", delayedRefresh = 0 }
 
 --END OF MARKER LIST---------------------------------------
 local markerTimePerId = 0.2 --400ms
@@ -195,6 +196,11 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 	
 	if ( unitList[curModID] ~= nil ) and ( unitList[curModID][udef.name] ~= nil ) and  ( unitList[curModID][udef.name]["markerText"] ~= nil ) then
 		--the unit is in the list -> has to get marked
+		local delayedRefresh = unitList[curModID][udef.name]["delayedRefresh"] --check if this unit can refresh its marker
+		if delayedRefresh and delayedRefresh >= spGetGameSeconds() then --check if this unit is overdue for marker refreshing
+			knownUnits[unitID] = nil -- forget that this unit ever had a marker
+			unitList[curModID][udef.name]["delayedRefresh"] = spGetGameSeconds() + 10 --set next refresh 10 second later
+		end
 		if ( knownUnits[unitID] == nil ) or ( knownUnits[unitID] ~= udefId ) then
 			--unit wasnt marked already or unit changed
 			knownUnits[unitID] = udefId
@@ -253,6 +259,9 @@ if ( now >= ( myPlayerID * markerTimePerId + marker["time"] ) ) then
 end
 --[[ ]]--
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to remove markers
+	knownUnits[unitID] = nil --clear marker record for this unit
+	markersToSet[unitID] = nil
+	
 --[[	local killer = spGetLastAttacker(unitID) -- last attacker does NOT register splash or wide radius attack, only direct attack.
 	if killer == nil then
 			Echo("<Unit Marker>: killer is nil.")
@@ -274,18 +283,17 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to 
 
 
 	local unitTeamID = GetUnitTeam(unitID)
-	ud = UnitDefs[unitDefID]
+	local ud = UnitDefs[unitDefID]
 	local x, y, z = spGetUnitPosition(unitID)
 	if (ud.customParams.commtype) and (unitTeamID == GetMyTeamID()) then
 		printDebug("<Unit Marker>: " .. unitID .. " is comm !")
 		firstUnitID = unitID
-		unitChecked = Spring.GetUnitsInRectangle (x-1, z-1, x+1, z+1) -- ( number xmin, number zmin, number xmax, number zmax [,number teamID] )
+		local unitChecked = Spring.GetUnitsInRectangle (x-1, z-1, x+1, z+1) -- ( number xmin, number zmin, number xmax, number zmax [,number teamID] )
 		if unitChecked[1] ~= nil then
 			printDebug( "<Unit Marker>: something found !")
 			for i=1, #unitChecked do
-				unitID = unitChecked[i]
-				printDebug("<Unit Marker>: Found this : " .. unitID )
-				secondUnitID = unitID
+				secondUnitID = unitChecked[i]
+				printDebug("<Unit Marker>: Found this : " .. secondUnitID )
 				if ( secondUnitID == firstUnitID ) then
 					--spMarkerAddPoint( x, y, z, myName .. "\nComm\ncorpse")	-- not really important enough to merit a marker
 					--Spring.SendCommands({'say a:I lost my commander !'})	--would it kill you to actually check for spec state before doing this?
@@ -298,8 +306,10 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam) --to do: use this to 
 			end
 		else printDebug("<Unit Marker>: nothing found, very weird!")
 		end
-	else printDebug(unitID .. " is NOT comm !")
-	return end 
+	else 
+		printDebug(unitID .. " is NOT comm !")
+		return 
+	end 
 end
 
 function printDebug( value )

@@ -1,5 +1,5 @@
 -- $Id: gui_take_remind.lua 3550 2008-12-26 04:50:47Z evil4zerggin $
-local versionNumber = "v3.6"
+local versionNumber = "v3.61"
 
 function widget:GetInfo()
   return {
@@ -20,7 +20,7 @@ end
 --      and some smaller speed ups
 --  SirMaverick: works now when someone uses "/spectator"
 --  jK: now even faster
---	msafwan: implement take for quiting & AFK-er (not resigning) using game_lagmonitor.lua, and added some comment & code.
+--	msafwan: implement take for-> quit-er & AFK-er by using game_lagmonitor.lua, and added some comment & code.
 ------------------------------------------------
 ------------------------------------------------
 --Crude Documentation:
@@ -42,6 +42,7 @@ local autoTake = false
 -- local variables
 ------------------------------------------------
 local blinkTimer = 0
+local slowUpdateTimer = 0
 local vsx, vsy, posx, posy
 local count
 local myAllyTeamID
@@ -206,15 +207,19 @@ end
 
 function _Update(_,dt)
 	blinkTimer = blinkTimer + dt
-	if (blinkTimer>1) then blinkTimer = 0 end
+	slowUpdateTimer = slowUpdateTimer + dt
+	if (blinkTimer>1) then
+		blinkTimer = 0
+	end
 	colorBool = (blinkTimer > 0.5)
-
-	if (recheck) then
+	
+	if (recheck) or (slowUpdateTimer >= 5) then
 		count = UpdateUnitsToTake()
 		if (count == 0) then
 			UnbindCallins()
 		end
 		recheck = false
+		slowUpdateTimer = 0
 	end
 end
 
