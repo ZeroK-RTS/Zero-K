@@ -137,7 +137,7 @@ function widget:Update(dt)
 		-- these are here to give epicmenu time to set the values properly
 		-- (else it's always default at startup)
 		if VFS.FileExists(PLAYLIST_FILE, VFS.RAW_FIRST) then
-			local tracks = VFS.Include(PLAYLIST_FILE, VFS.RAW_FIRST)
+			local tracks = VFS.Include(PLAYLIST_FILE, nil, VFS.RAW_FIRST)
 			for i,v in pairs(tracks) do Spring.Echo(i,v) end
 			warTracks = tracks.war
 			peaceTracks = tracks.peace
