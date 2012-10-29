@@ -193,7 +193,7 @@ end
 
 function Take()
 	if droppedPlayer then --alternateTake
-		Spring.SendLuaUIMsg("TAKE")
+		Spring.SendLuaRulesMsg("TAKE")
 		Spring.Echo("sending TAKE msg")
 	else
 		Spring.SendCommands("take")
