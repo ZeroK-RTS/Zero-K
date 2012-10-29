@@ -11,6 +11,10 @@ function script.Create()
     Spring.GiveOrderToUnit(unitID, CMD.IDLEMODE, {0}, {})
 end
 
+function script.HitByWeapon()
+    return 0
+end
+
 function script.Killed(recentDamage, maxHealth)
     return 0
 end
