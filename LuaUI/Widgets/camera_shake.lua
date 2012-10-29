@@ -72,6 +72,9 @@ function widget:ShockFront(power, dx, dy, dz)
   shake = shake + power
 end
 
+function WG.ShakeCamera(power)
+  shake = shake + power
+end
 
 local function birand(val)
   return val * (1.0 - (0.002 * math.random(1000)))

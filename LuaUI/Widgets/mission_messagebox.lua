@@ -150,7 +150,7 @@ function WG.ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
 		--scrollPersistent:Invalidate()
 		textPersistent:SetText(text or '')
 		textPersistent.font.size = fontsize or 12
-		--textPersistent:Invalidate()
+		textPersistent:Invalidate()	-- for some reason the text can fail to update without this
 		
 		msgBoxPersistent:Invalidate()
 		return	-- done here, exit
