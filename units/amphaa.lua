@@ -138,7 +138,7 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 88,
-      object           = [[wreck2x2b.s3o]],
+      object           = [[amphaa_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 88,
     },
