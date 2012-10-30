@@ -1,5 +1,5 @@
 -- $Id: gui_take_remind.lua 3550 2008-12-26 04:50:47Z evil4zerggin $
-local versionNumber = "v3.61"
+local versionNumber = "v3.62"
 
 function widget:GetInfo()
   return {
@@ -20,19 +20,19 @@ end
 --      and some smaller speed ups
 --  SirMaverick: works now when someone uses "/spectator"
 --  jK: now even faster
---	msafwan: implement take for-> quit-er & AFK-er by using game_lagmonitor.lua, and added some comment & code.
+--	msafwan (2012): implement take for-> quit-er & AFK-er by using game_lagmonitor.lua, and added some comment & code.
 ------------------------------------------------
 ------------------------------------------------
 --Crude Documentation:
 -- Main Logic:
--- 1) 'widget:Player Changed' --> count lagger's units + check AFK --> reset button text to "Click here..." (textPlsWait = false)  --> show button IF units ">0" else hide
--- 2) 'widget:Player Removed' --> count lagger's units + check AFK --> reset button text to "Click here..." (textPlsWait = false)  --> show button IF units ">0" else hide
--- 3) 'RecvFromSynced(...)' (thereIsChange=true) --> count lagger's units + check AFK --> reset button text to "Click here..." (textPlsWait = false) --> show button IF units ">0" else hide
--- 4) 'widget:Unit Taken' --> count lagger's units + check AFK --> reset button text to "Click here..." (textPlsWait = false) --> show button IF units ">0" else hide
+-- 1) 'widget:Player Changed' --> count lagger's units + check AFK --> reset button text to "Click here..." (askWait = false)  --> show button IF units ">0" else hide
+-- 2) 'widget:Player Removed' --> count lagger's units + check AFK --> reset button text to "Click here..." (askWait = false)  --> show button IF units ">0" else hide
+-- 3) 'RecvFromSynced(...)' (thereIsChange=true) --> count lagger's units + check AFK --> reset button text to "Click here..." (askWait = false) --> show button IF units ">0" else hide
+-- 4) 'widget:Unit Taken' --> count lagger's units + check AFK --> reset button text to "Click here..." (askWait = false) --> show button IF units ">0" else hide
 
 -- Others:
--- 1) press the button --> count lagger's units + check AFK--> change button text to "Wait..." (textPlsWait = true) --> execute a "/take" (if droppedPlayer== false) OR execute a LUA-msg-lagmonitor (if droppedPlayer== true)
--- 2) console-message "Giving all unit.." --> count lagger's units + check AFK --> change button text to "Click here..." (textPlsWait = false) --> show button IF units ">0" else hide
+-- 1) press the button --> count lagger's units + check AFK--> change button text to "Wait..." (askWait = true) --> execute a "/take" (if notResign== false) OR execute a LUA-msg-lagmonitor (if notResign== true)
+-- 2) console-message "Giving all unit.." --> count lagger's units + check AFK --> change button text to "Click here..." (askWait = false) --> show button IF units ">0" else hide
 ------------------------------------------------
 -- config
 ------------------------------------------------
@@ -54,9 +54,9 @@ local buttonX = 240
 local buttonY = 36
 local recheck = false
 --local lastActivePlayers = 0
-local textPlsWait = false
-local droppedPlayer =nil
-local lagmonitorAFK = {}
+local askWait = false
+local notResign =nil
+local lagmonitorIsAFK = {}
 local afkString_old = "" --store previous value of 'afkString' from game_lagmonitor.lua (RecvFromSynced()). Is used for making comparison.
 
 ------------------------------------------------
@@ -85,7 +85,7 @@ local glColor = gl.Color
 -- helper functions
 ------------------------------------------------
 
-local function GetTeamIsTakeable(teamID)
+local function GetTeamIsTakeable(teamID) --Find out if team is not takeable.
 	local takeAble = true --assume whole team is takeable (spec OR afk)
 	local teamIsAFK = true --assume whole team is afk
 	local teamIsSpec = true --assume whole team is resigned
@@ -100,13 +100,16 @@ local function GetTeamIsTakeable(teamID)
 	for i=1, #players do -- check every player in a team. If one of them is not-spec/not-afk then entire team is not takeable
 		local playerID = players[i]
 		local _, active, spec = spGetPlayerInfo(playerID)
-		local afk = (not active) or lagmonitorAFK[playerID] --check whether player is outside-game OR reported as AFK
-		if afk== false then teamIsAFK = false end --if a member is not-AFK then assume whole team NOT AFK
-		if spec== false then teamIsSpec = false end --if a member is not-spec then assume whole team NOT spec
+		local afk = lagmonitorIsAFK[playerID] or (not active) --check whether player is reported as AFK or is outside-game 
 		if (not spec) and (not afk) then -- team whos player not-spectator AND not-afk is NOT takeable. In ZK resigned player goes to spectator, and exited player is afk.
-			takeAble = false --if above condition is meet (a member not-spec, and not-afk) then the team is not takeable!...
-			--break --if at least 1 player is not-spec/not-afk then skip checking the whole team
-		end
+			takeAble = false --if 1 member is not-spec & not-AFK then assume whole team NOT takeable!
+			teamIsAFK = false
+			teamIsSpec = false
+		elseif (not afk) then 
+			teamIsAFK = false  --if 1 member is not-AFK then assume whole team NOT AFK
+		elseif (not spec) then 
+			teamIsSpec = false --if 1 member is not-spec then assume whole team NOT spec
+		end 
 	end
 	return takeAble, teamIsAFK, teamIsSpec --isAFK indicate whether whole team was afk, and isSpec indicate whether whole team resigned
 end
@@ -132,7 +135,7 @@ local function UpdateUnitsToTake()
 		local takeable, isAFK, isSpec = GetTeamIsTakeable(teamID)
 		if (unitsOwned > 0 and takeable) then
 			unitCount = unitCount + unitsOwned -- count lagger's unit
-			droppedPlayer = (isAFK and not isSpec) or (not isSpec) --if team is whole AFK but not Spec then assume they exited/timeout (ie: isAFK and not isSpec), else: if only some member is not Spec then still assume they exited/timeout (ie: not isSpec), BUT if whole team is both AFK & spec then they all resigned. Exited/timeout means "dropped player", while resigned mean not "dropped player"; widget need to use /take command.
+			notResign = (isAFK and not isSpec) or (not isSpec) --if team is whole AFK but not Spec then assume they exited/timeout (ie: isAFK and not isSpec), else: if only some member is not Spec then still assume they exited/timeout (ie: not isSpec), BUT if whole team is both AFK & spec then they all resigned. Exited/timeout means "dropped player", while resigned mean NOT "dropped player"; where widget need to use /take command.
 		end
 	end
 	return unitCount
@@ -169,7 +172,8 @@ local function ProcessButton()
 	if not spGetSpectatingState() then
 		takeableTeamsCached = {}
 		myAllyTeamID = spGetMyAllyTeamID()
-		textPlsWait = false -- cancel show "Wait.."
+		askWait = false -- cancel show "Wait.."
+		slowUpdateTimer = 0 --reset auto update timer
 		count = UpdateUnitsToTake()
 		if (count > 0) then
 			if (autoTake) then
@@ -186,13 +190,14 @@ local function ProcessButton()
 end
 
 local function IsOnButton(x, y)
-  return x >= posx - buttonX and x <= posx + buttonX
-     and y >= posy           and y <= posy + buttonY
+  local sizeX = (askWait and buttonX/2) or buttonX --button half size or button full size
+  local sizeY = (askWait and buttonY/2) or buttonY
+  return x >= posx - sizeX and x <= posx + sizeX and y >= posy and y <= posy + sizeY
 end
 
 
 function Take()
-	if droppedPlayer then --alternateTake
+	if notResign then --alternateTake
 		Spring.SendLuaRulesMsg("TAKE")
 		Spring.Echo("sending TAKE msg")
 	else
@@ -219,7 +224,7 @@ function _Update(_,dt)
 			UnbindCallins()
 		end
 		recheck = false
-		slowUpdateTimer = 0
+		slowUpdateTimer =0 --do refresh again later incase the UnbindCallins() did not get called
 	end
 end
 
@@ -246,7 +251,7 @@ function _MouseRelease(_,x, y, button)
     else
       UnbindCallins()
     end
-	textPlsWait = true -- show "Wait.."
+	askWait = true -- show "Wait.."
     return -1
   end
   return false
@@ -254,24 +259,26 @@ end
 
 
 function _DrawScreen()
+  local sizeX = (askWait and buttonX/2) or buttonX --button half size or button full size
+  local sizeY = (askWait and buttonY/2) or buttonY
   gl.Color(1, 1, 0, 1)
-  gl.Shape(GL.LINE_LOOP, {{ v = { posx + buttonX, posy} }, 
-                          { v = { posx + buttonX, posy + buttonY } }, 
-                          { v = { posx - buttonX, posy + buttonY } }, 
-                          { v = { posx - buttonX, posy} }  })
+  gl.Shape(GL.LINE_LOOP, {{ v = { posx + sizeX, posy} }, 
+                          { v = { posx + sizeX, posy + sizeY } }, 
+                          { v = { posx - sizeX, posy + sizeY } }, 
+                          { v = { posx - sizeX, posy} }  })
   gl.Color(1, 1, 0, 0.15)
-  gl.Shape(GL.QUADS, {{ v = { posx + buttonX, posy} }, 
-                          { v = { posx + buttonX, posy + buttonY } }, 
-                          { v = { posx - buttonX, posy + buttonY } }, 
-                          { v = { posx - buttonX, posy} }  })
+  gl.Shape(GL.QUADS, {{ v = { posx + sizeX, posy} }, 
+                          { v = { posx + sizeX, posy + sizeY } }, 
+                          { v = { posx - sizeX, posy + sizeY } }, 
+                          { v = { posx - sizeX, posy} }  })
   local colorStr
   if (colorBool) then
     colorStr = trueColor
   else
     colorStr = falseColor
   end
-  local displayText = (textPlsWait and (trueColor .. "Wait...")) or (colorStr .. "Click here to take " .. count .. " unit(s)!")
-  gl.Text(displayText, posx, posy + buttonY * 0.5, 24, "ovc")
+  local displayText = (askWait and (trueColor .. "Waiting...")) or (colorStr .. "Click here to take " .. count .. " unit(s)!") --write "wait" or write "click here"
+  gl.Text(displayText, posx, posy + sizeY * 0.5, 24, "ovc")
 end
 
 
@@ -338,9 +345,9 @@ function UnbindCallins()
   widget.MousePress = function() end
   widget.MouseRelease = function() end
   widget.DrawScreen = function() end
-  widget.DrawWorld = function() end --Note: originally it was assigned a "nil", but when same thing performed on AddConsoleLine() it seems to not work, so added an empty-function instead as precaution.
-  widget.AddConsoleLine = function() end --Note: this is empty-function instead of "nil" because "nil" caused AddConsoleLine() on other widget to fail (eg: Chili Chat). Probably caused by cawidget.lua stopped iterating AddConsoleLine() after it found "nil" (because cawidget.lua uses ipair).
-  widget.UnitTaken = function() end
+  widget.DrawWorld = function() end 
+  widget.AddConsoleLine = function() end --Note: this is empty-function instead of simply "nil" because "nil" caused AddConsoleLine() on other widgets to fail (eg: Chili Chat). Probably caused by cawidget.lua stopped iterating AddConsoleLine() after it found "nil" (because cawidget.lua uses ipair).
+  widget.UnitTaken = function() end --Note: originally it was assigned a "nil", but "nil" seems to not work with "AddConsoleLine()", so uses empty-function incase it happen to other function too (ie: UnitTaken(), DrawWorld(), DrawScreen(), MouseRelease(), MousePress(), Update()).
   UpdateCallins()
 end
 
@@ -393,8 +400,8 @@ function LagmonitorAFK(afkString) --check for player that is marked as AFK by "g
 		afkString_old = afkString
 		local playerCountLoc = afkString:find("#",-3,true) --search '#' (the playerCount identifier) from the last 3 character
 		local playerCount = tonumber(afkString:sub(playerCountLoc+1)) --get the max playerID value
-		for i=0, playerCount do --iterate over 'lagmonitorAFK' table
-			lagmonitorAFK[i] = nil --reset the whole AFK list
+		for i=0, playerCount do --iterate over 'lagmonitorIsAFK' table
+			lagmonitorIsAFK[i] = nil --reset the whole AFK list
 		end
 		if playerCountLoc >=6 then --check if there's AFK information in that 'afkString'
 			for i=0, playerCount do --iterate for some iteration (limited to some value)
@@ -402,7 +409,7 @@ function LagmonitorAFK(afkString) --check for player that is marked as AFK by "g
 				local allyTeam = tonumber(afkString:sub(4,5)) --get allyTeamID
 				if allyTeam == myAllyTeamID then --check with myAllyTeamID
 					local playerID = tonumber(afkString:sub(2,3)) --get playerID
-					lagmonitorAFK[playerID] = true --mark playerID as AFK in 'lagmonitorAFK'
+					lagmonitorIsAFK[playerID] = true --mark playerID as AFK in 'lagmonitorIsAFK'
 				end
 				afkString = afkString:sub(6) --discard current segment, repeat again using next segment.
 			end
