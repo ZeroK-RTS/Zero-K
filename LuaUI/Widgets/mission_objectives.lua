@@ -131,7 +131,7 @@ end
 
 local function ModifyObjective(id, title, details, pos, status, color)
 	if not id then
-		Spring.Echo("<Objectives> Error: Attempt to modify objective with no ID")
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "<Objectives> Error: Attempt to modify objective with no ID")
 		return
 	end
 	local obj = objectives[id]
@@ -169,10 +169,6 @@ local function RemoveObjective(id)
 	obj.panel:Dispose()
 	objectives[id] = nil
 end
-
-WG.AddObjective = AddObjective
-WG.ModifyObjective = ModifyObjective
-WG.RemoveObjective = RemoveObjective
 
 local function MakeTestObjectives()
 	AddObjective("testObj", "Test", "This is a test", {1000, 100, 1000}, "incomplete")
@@ -311,6 +307,9 @@ function widget:Initialize()
 	
 	mainWindow:RemoveChild(mainPanel)
 	
+	WG.AddObjective = AddObjective
+	WG.ModifyObjective = ModifyObjective
+	WG.RemoveObjective = RemoveObjective
 	--MakeTestObjectives()
 end
 
