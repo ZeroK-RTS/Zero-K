@@ -48,8 +48,9 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
       --spSetUnitHealth(unitID, maxHealth)  -- does nothing, hp overwritten by engine
       unitsCount = unitsCount + 1
       units[unitsCount] = unitID
-
-      GG.Awards.UnitResurrected (unitDefID, teamID) -- no safety checks!
+      if GG.Awards then
+        GG.Awards.UnitResurrected (unitDefID, teamID)
+      end
     end
   end
 end
