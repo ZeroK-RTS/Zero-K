@@ -46,8 +46,8 @@ local unitExceptions = include("Configs/snd_music_exception.lua")
 
 local windows = {}
 
-local WAR_THRESHOLD = 5000
-local PEACE_THRESHOLD = 1000
+local warThreshold = 5000
+local peaceThreshold = 1000
 local PLAYLIST_FILE = 'sounds/music/playlist.lua'
 
 local musicType = 'peace'
@@ -127,6 +127,22 @@ local function StopTrack(noContinue)
 	end
 end
 
+local function SetWarThreshold(num)
+	if num and num >= 0 then
+		warThreshold = num
+	else
+		warThreshold = 5000
+	end
+end
+
+local function SetPeaceThreshold(num)
+	if num and num >= 0 then
+		peaceThreshold = num
+	else
+		peaceThreshold = 5000
+	end	
+end
+
 function widget:Update(dt)
 	if gameOver then
 		return
@@ -138,7 +154,6 @@ function widget:Update(dt)
 		-- (else it's always default at startup)
 		if VFS.FileExists(PLAYLIST_FILE, VFS.RAW_FIRST) then
 			local tracks = VFS.Include(PLAYLIST_FILE, nil, VFS.RAW_FIRST)
-			for i,v in pairs(tracks) do Spring.Echo(i,v) end
 			warTracks = tracks.war
 			peaceTracks = tracks.peace
 			briefingTracks = tracks.briefing
@@ -161,8 +176,8 @@ function widget:Update(dt)
 		local PlayerTeam = Spring.GetMyTeamID()
 		numVisibleEnemy = 0
 		local doods = Spring.GetVisibleUnits()
-		for _, u in ipairs(doods) do
-			if (Spring.IsUnitAllied(u) ~= true) then
+		for i=1,#doods do
+			if (Spring.IsUnitAllied(doods[i]) ~= true) then
 				numVisibleEnemy = numVisibleEnemy + 1
 			end
 		end
@@ -181,13 +196,9 @@ function widget:Update(dt)
 		end
 		dethklok[1] = 0 -- empty the first row
 		
-		--Spring.Echo (totalKilled)
-		
-		if (totalKilled > WAR_THRESHOLD) then
+		if (totalKilled >= warThreshold) then
 			musicType = 'war'
-		end
-		
-		if (totalKilled <= PEACE_THRESHOLD) then
+		elseif (totalKilled <= peaceThreshold) then
 			musicType = 'peace'
 		end
 		
@@ -247,6 +258,8 @@ function widget:Initialize()
 	WG.Music = WG.Music or {}
 	WG.Music.StartTrack = StartTrack
 	WG.Music.StopTrack = StopTrack
+	WG.Music.SetWarThreshold = SetWarThreshold
+	WG.Music.SetPeaceThreshold = SetPeaceThreshold
 
 	-- Spring.Echo(math.random(), math.random())
 	-- Spring.Echo(os.clock())
