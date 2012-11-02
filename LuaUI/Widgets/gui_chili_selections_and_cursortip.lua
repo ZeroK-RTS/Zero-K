@@ -1774,7 +1774,7 @@ local function MakeToolTip_Terra(cmdName)
 	BuildTooltip2('terra', tt_structure)
 end
 
-local function MakeTooltip()
+local function MakeTooltip(mx,my)
 	if options.showdrawtooltip.value and tildepressed and not (drawing or erasing) then
 		MakeToolTip_Draw()
 		return
@@ -1788,9 +1788,19 @@ local function MakeTooltip()
 			return
 		end
 	end
-	
-	
-	local cur_ttstr = screen0.currentTooltip or spGetCurrentTooltip()
+	----------
+	local groundTooltip
+	if WG.customToolTip then --find any custom ground tooltip placed on the ground
+		local _, pos = spTraceScreenRay(mx,my, true) --return coordinate of the ground.
+		for _, data in pairs(WG.customToolTip) do --iterate over WG.customToolTip
+			if data.box and pos and (pos[1]>= data.box.x1 and pos[1]<= data.box.x2) and (pos[3]>= data.box.z1 and pos[3]<= data.box.z2) then --check if within box side x & check if within box side z
+				groundTooltip = data.tooltip --copy tooltip
+				break
+			end
+		end
+	end
+	----------
+	local cur_ttstr = screen0.currentTooltip or groundTooltip or spGetCurrentTooltip()
 	local type, data = spTraceScreenRay(mx, my)
 	if (not changeNow) and cur_ttstr ~= '' and old_ttstr == cur_ttstr and old_data == data then
 		PlaceToolTipWindow2(mx+20,my-20)
@@ -2068,7 +2078,9 @@ function widget:Update(dt)
 		timer2 = 0
 	end	
 	--UNIT.STATUS end
-	--TOOLTIP start
+	
+	--CURSOR.TOOLTIP start--
+	------------------------
 	old_mx, old_my = mx,my
 	alt,_,meta,_ = spGetModKeyState()
 	mx,my = spGetMouseState()
@@ -2099,10 +2111,11 @@ function widget:Update(dt)
 			KillTooltip()
 			return
 		end
-		MakeTooltip()
+		MakeTooltip(mx,my)
 		changeNow = false
 	end
-	--TOOLTIP end
+	----------------------
+	--CURSOR.TOOLTIP end--
 end
 
 function widget:ViewResize(vsx, vsy)
