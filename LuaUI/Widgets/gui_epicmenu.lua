@@ -1463,7 +1463,12 @@ local function MakeMenuBar()
 				textColor = color.main_fg },
 				
 			Button:New{
-                caption = "Resign and spectate", OnMouseUp = { function() spSendCommands{"spectator"} end, }, 
+                caption = "Resign and spectate",
+                OnMouseUp = { function()
+						spSendCommands{"spectator"}
+						screen0:RemoveChild(window_exit)
+						exitWindowVisible = false
+					end, }, 
 				height=exit_menu_btn_height, 
 				width=exit_menu_btn_width,
                 x = exit_menu_width/2 - exit_menu_btn_width/2, 
