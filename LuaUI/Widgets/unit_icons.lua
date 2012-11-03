@@ -216,7 +216,7 @@ local function DrawUnitFunc(xshift, yshift)
   glTexRect(-options.iconsize.value*0.5, -9, options.iconsize.value*0.5, options.iconsize.value-9)
 end
 
---[[
+-- [[
 -- DrawWorld method
 -- the problem with this one is that it do not follow camera rotation & do not draw during icon view.
 function widget:DrawWorld()
@@ -251,7 +251,7 @@ function widget:DrawWorld()
 end
 --]]
 
--- [[
+--[[
 -- drawscreen method
 -- Fixed: draws at same size regardless of how far away the unit is
 function widget:DrawScreenEffects()
