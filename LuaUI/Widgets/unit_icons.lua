@@ -329,7 +329,7 @@ end
 
 function widget:Initialize()
 	local camFOV = Spring.GetCameraFOV()
-	fovScaleUp = camFOV/45 --at higher FOV (>45 degree) stuff usually look smaller, so we will enlarge them to maintain consistent view. 45 degree is the default FOV
+	fovScaleUp = 45/camFOV --at higher FOV (>45 degree) stuff usually look smaller, so we will enlarge them to maintain consistent view. 45 degree is the default FOV
 	
 	WG.icons.SetDisplay = SetDisplay --initialize WG.icons
 	WG.icons.SetOrder =  SetOrder
