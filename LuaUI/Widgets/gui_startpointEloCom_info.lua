@@ -1,7 +1,8 @@
+local version= "v0.9"
 function widget:GetInfo()
   return {
     name      = "Comm-n-Elo Startpos. Info",
-    desc      = "Insert Commander information and Elo icons at players startpoints (will shutdown after GameStart)",
+    desc      = version .. " Insert Commander information and Elo icons at players startpoints (will shutdown after GameStart)",
     author    = "msafwan",
     date      = "2012 Nov 2",
     license   = "GNU GPL, v2 or later",
@@ -102,7 +103,7 @@ function widget:Update(dt)
 				--playerID = commList[i][1]
 				if commList[i][1] == leadPlayerID then --if this com belong to this playerID then:
 					local comDefName = commList[i][2] --get tier5 com name. We use comm name as index & also for tooltip. 
-					WG.customToolTip[comDefName] = {box={x1 = x-10, x2 = x+10, z1= z-10, z2= z+10},tooltip="Build  ".. comDefName .. " - "} --update tooltip box position. We also added code in "gui_chili_selections_and_cursortip.lua" and "gui_contextmenu.lua" to find detect information.
+					WG.customToolTip[comDefName] = {box={x1 = x-25, x2 = x+25, z1= z-25, z2= z+25},tooltip="Build  ".. comDefName .. " - "} --update tooltip box position. We also added code in "gui_chili_selections_and_cursortip.lua" and "gui_contextmenu.lua" to find detect information.
 				end
 			end
 		end
@@ -113,7 +114,7 @@ end
 function CommSelection(playerID, commSeries, comDefNames)
 	--Use:
 	--commList
-	local sixthDefName = comDefNames[#comDefNames]
+	local sixthDefName = commSeries .. " level 5" --comDefNames[#comDefNames] --use concenatted commSeries instead of comDefNames because of issues transfering table from SYNCED to UNSYNCED in gadget.
 	commList[#commList+1] =  {playerID, sixthDefName}
 end
 
