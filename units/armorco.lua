@@ -11,7 +11,7 @@ unitDef = {
   buildTime              = 24000,
   canAttack              = true,
   canGuard               = true,
-  canManualFire          = true,
+  --canManualFire          = true,
   canMove                = true,
   canPatrol              = true,
   canstop                = [[1]],
@@ -77,7 +77,7 @@ unitDef = {
     },
 
     {
-      def                = [[TACNUKE]],
+      def                = [[DISRUPTOR]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
@@ -177,35 +177,51 @@ unitDef = {
       weaponVelocity          = 2200,
     },
 
-    TACNUKE = {
-      name                    = [[Tactical Nuke]],
-      accuracy                = 750,
-      avoidFeature            = false,
-      areaOfEffect            = 480,
-      commandFire             = true,
-      craterBoost             = 4,
-      craterMult              = 3,
-
-      damage                  = {
-        default = 6000,
+    DISRUPTOR = {
+      name                    = [[Disruptor Pulse Beam]],
+      areaOfEffect            = 32,
+      beamdecay               = 0.95,
+      beamTime                = 0.03,
+      beamttl                 = 90,
+      coreThickness           = 0.25,
+      craterBoost             = 0,
+      craterMult              = 0,
+  
+      customParams			= {
+	--timeslow_preset = [[module_disruptorbeam]],
+	timeslow_damagefactor = [[2]],
       },
-
-      explosionGenerator      = [[custom:NUKE_300]],
-      impulseBoost            = 0.5,
-      impulseFactor           = 0.2,
+	  
+      damage                  = {
+	default = 600,
+      },
+  
+      explosionGenerator      = [[custom:flash2purple]],
+      fireStarter             = 30,
+      impactOnly              = true,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      model                   = [[diskball.s3o]],
-      range                   = 750,
-      rgbColor                = [[1 0.1 0.1]],
-      reloadtime              = 30,
-      size                    = 15,
-      sizeDecay               = 0.03,
-      soundHit                = [[explosion/mini_nuke]],
-      soundStart              = [[weapon/cannon/cannon_fire2]],
-      stages                  = 30,
+      largeBeamLaser          = true,
+      laserFlareSize          = 4.33,
+      minIntensity            = 1,
+      noSelfDamage            = true,
+      range                   = 350,
+      reloadtime              = 2,
+      rgbColor                = [[0.3 0 0.4]],
+      soundStart              = [[weapon/laser/heavy_laser5]],
+      soundStartVolume        = 3,
+      soundTrigger            = true,
+      sweepfire               = false,
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
+      thickness               = 18,
+      tolerance               = 18000,
       turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 300,
+      weaponType              = [[BeamLaser]],
+      weaponVelocity          = 500,
     },
     
     TRILASER = {

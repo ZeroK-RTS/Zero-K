@@ -137,12 +137,12 @@ end
 local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
-	Sleep(2000)
+	Sleep(5000)
 	Turn( head, y_axis, 0, 2 )
 	Turn( torso, y_axis, 0, 1.5 )
 	Turn( larm, x_axis, 0, 2 )
 	Turn( rarm, x_axis, 0, 2 )
-	Turn(shouldercannon, x_axis, 0, math.rad(90))
+	Turn( shouldercannon, x_axis, 0, math.rad(90))
 	isFiring = false
 	lastTorsoHeading = 0
 end
@@ -158,10 +158,10 @@ end
 function script.AimWeapon(num, heading, pitch)
     local SIG_AIM = 2^(num+1)
     isFiring = true
-	Signal(SIG_AIM)
+    Signal(SIG_AIM)
     SetSignalMask(SIG_AIM)
 	
-	StartThread(RestoreAfterDelay)
+    StartThread(RestoreAfterDelay)
 	
     if num == 1 then
 		Turn(torso, y_axis, heading, math.rad(180))
@@ -176,7 +176,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(aagun, x_axis)
     elseif num == 3 then
 		Turn(torso, y_axis, heading, math.rad(180))
-		Turn(shouldercannon, x_axis, math.rad(90) - pitch, math.rad(180))
+		Turn(shouldercannon, x_axis, math.rad(90) - pitch, math.rad(270))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(shouldercannon, x_axis)
     elseif num == 4 then
