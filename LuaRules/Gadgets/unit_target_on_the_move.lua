@@ -25,6 +25,15 @@ local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetUnitDefID        = Spring.GetUnitDefID
 
+local validUnits = {}
+
+for i=1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if (not (ud.canFly and ud.isBomber)) and ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0  then
+		validUnits[i] = true
+	end
+end
+
 --------------------------------------------------------------------------------
 -- Globals
 
@@ -109,10 +118,6 @@ end
 --------------------------------------------------------------------------------
 -- Unit adding/removal
 
-local function validUnit(unitDefID)
-    return UnitDefs[unitDefID] and UnitDefs[unitDefID].canAttack and UnitDefs[unitDefID].canMove and UnitDefs[unitDefID].maxWeaponRange and UnitDefs[unitDefID].maxWeaponRange > 0
-end
-
 local function addUnit(unitID, data)
     if spValidUnitID(unitID) then
         spSetUnitTarget(unitID,deadUnitID)
@@ -130,7 +135,7 @@ end
 
 local function removeUnit(unitID)
     spSetUnitTarget(unitID,deadUnitID)
-	if validUnit(spGetUnitDefID(unitID)) and unitById[unitID] then
+	if validUnits[spGetUnitDefID(unitID)] and unitById[unitID] then
         if unitById[unitID] ~= unit.count then
             unit.data[unitById[unitID]] = unit.data[unit.count]
             unitById[unit.data[unit.count].id] = unitById[unitID]
@@ -160,7 +165,7 @@ function gadget:Initialize()
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
-	if validUnit(unitDefID) then
+	if validUnits[unitDefID] then
 		spInsertUnitCmdDesc(unitID, unitSetTargetCmdDesc)
 		spInsertUnitCmdDesc(unitID, unitSetTargetCircleCmdDesc)
         spInsertUnitCmdDesc(unitID, unitCancelTargetCmdDesc)
@@ -169,7 +174,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
-    if unitById[facID] and validUnit(unitDefID) then
+    if unitById[facID] and validUnits[unitDefID]	then
         local data = unit.data[unitById[facID]]
         addUnit(unitID, {
             id = unitID, 
@@ -232,7 +237,7 @@ end
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	
     if cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE then
-        if validUnit(unitDefID) then
+        if validUnits[unitDefID] then
             if #cmdParams == 6 then
 				local team = Spring.GetUnitTeam(unitID)
 				
@@ -297,7 +302,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
         end
         return false  -- command was used
     elseif cmdID == CMD_UNIT_CANCEL_TARGET then
-        removeUnit(unitID)
+		if validUnits[unitDefID] then
+			removeUnit(unitID)
+		end
         return false  -- command was used
     end
 	return true  -- command was not used
