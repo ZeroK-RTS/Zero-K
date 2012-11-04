@@ -1,4 +1,4 @@
-local version= "v0.9"
+local version= "v0.91"
 function widget:GetInfo()
   return {
     name      = "Comm-n-Elo Startpos. Info",
@@ -75,7 +75,7 @@ function widget:Initialize()
 		local leadPlayerID = select(2,Spring.GetTeamInfo(teamID)) --leader
 		local customKey = select(10,Spring.GetPlayerInfo(leadPlayerID)) --get customPlayerKey
 		local elo = (customKey and tonumber(customKey.elo)) or nil
-		local eloLevel = (elo and math.floor((elo-1000) / 200)) or nil -- for example: elo= 1500. elo 1500 minus 1000 = 500. 500 divide by 200 = 2.5. Floor 2.5 = 2. Thus show 2 bar.
+		local eloLevel = (elo and math.min(4, math.max(1, math.floor((elo-1000) / 200)))) or nil -- for example: elo= 1500. elo 1500 minus 1000 = 500. 500 divide by 200 = 2.5. Floor 2.5 = 2. Thus show 2 bar. If less than 1 show 1 (math.max), if greater than 4 show 4 (math.min)
 		local validEntry = not (x==y and x==z) and elo -- invalidate same coordinate (since they are not humanly possible), and also invalidate entry with "nil" elo.
 		playerInfo[#playerInfo +1] = {elo, eloLevel,{x,y,z},leadPlayerID,teamID, validEntry} 
 	end
@@ -89,7 +89,7 @@ function widget:Update(dt)
 	--commList
 	--WG.customToolTip
 	elapsedSecond = elapsedSecond + dt
-	if elapsedSecond>=0.66 then --update every 0.66 second (reason: 0.66 felt not too long and not too quick)
+	if elapsedSecond>=0.66 then --update every 0.66 second (reason: 0.66 felt not long and not quick)
 		for i=1, #playerInfo do
 			local teamID = playerInfo[i][5]
 			local elo = playerInfo[i][1]
@@ -114,7 +114,7 @@ end
 function CommSelection(playerID, commSeries, comDefNames)
 	--Use:
 	--commList
-	local sixthDefName = commSeries .. " level 5" --comDefNames[#comDefNames] --use concenatted commSeries instead of comDefNames because of issues transfering table from SYNCED to UNSYNCED in gadget.
+	local sixthDefName = commSeries .. " level 5" --comDefNames[#comDefNames] --used concenatted 'commSeries' instead of 'comDefNames' because of problem in transfering table from SYNCED to UNSYNCED in gadget.
 	commList[#commList+1] =  {playerID, sixthDefName}
 end
 
