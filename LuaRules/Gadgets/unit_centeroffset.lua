@@ -71,8 +71,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	--]]
 	--[[
 	local _,_,_, ux, uy, uz = Spring.GetUnitPosition(unitID, true)
-	Spring.SetUnitMidAndAimPos(unitID, ux, uy-10, uz, ux, uy, uz)
-	Spring.SetUnitRadiusAndHeight(unitID,42)
+	Spring.SetUnitMidAndAimPos(unitID, ux, uy-3, uz, ux, uy+5, uz)
+	Spring.SetUnitRadiusAndHeight(unitID,22)
 	--]]
 end
 

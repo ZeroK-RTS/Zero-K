@@ -29,6 +29,9 @@ unitDef = {
     helptext_bp    = [[O Rogue é um robô escaramuçador. Seus mísseis com trajetória verticalmente curva tem uma baixa velocidade de disparo, mas causam muito dano, tornando-o muito bom em mover-se para dentro e para fora do alcançe das unidades ou defesas inimigas, ou causar grande dano na aproximaç?o inicial. Defenda-se dele atacando-o com unidades rápidas ou com bombas rastejantes se estiverem juntos.]],
     helptext_fr    = [[Le Rogue est un tirailleur typique: longue port?e, cadence de tir lente et faible blindage. Ces deux puissants missiles ? t?tes chercheuse sont tr?s puissant mais cette unit? doit fuir le corps ? corps ? tout prix.]],
 	helptext_de    = [[Der Rogue nutzt Raketen mit einer geringen Feuerrate, dafür aber mit großem Schaden. Von daher eignet er sich gut gegen Verteidigung. Gegen schnelle Einheiten sieht er alledings recht alt aus.]],
+	aimposoffset   = [[0 5 0]],
+	midposoffset   = [[0 -3 0]],
+	modelradius    = [[22]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -48,6 +51,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[storm.s3o]],
+  script                 = [[corstorm.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
