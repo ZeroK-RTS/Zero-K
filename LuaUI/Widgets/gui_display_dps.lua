@@ -192,6 +192,9 @@ local function drawDeathDPS(damage,ux,uy,uz,textSize,red,alpha)
 end
 
 local function DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
+  if Spring.IsGUIHidden() then
+    return
+  end
   glTranslate(xshift, yshift, 0)
   glBillboard()
   gl.MultiTexCoord(1, 0.25 + (0.5 * alpha))
