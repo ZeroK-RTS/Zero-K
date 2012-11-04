@@ -313,5 +313,10 @@ function widget:Initialize()
 	--MakeTestObjectives()
 end
 
+function widget:Shutdown()
+	WG.AddObjective = nil
+	WG.ModifyObjective = nil
+	WG.RemoveObjective = nil
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
