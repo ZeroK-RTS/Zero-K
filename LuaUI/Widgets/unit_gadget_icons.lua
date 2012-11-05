@@ -6,10 +6,11 @@ function widget:GetInfo()
     name      = "Gadget Icons",
     desc      = "Shows icons from gadgets that cannot access the widget stuff by themselves.",
     author    = "CarRepairer and GoogleFrog",
-    date      = "2012-01-28",
+    date      = "2012-01-28, Oct 31",
     license   = "GNU GPL, v2 or later",
     layer     = 5,
     enabled   = true,
+	handler   = true, --allow widget to use special widgetHandler's function
   }
 end
 
@@ -92,6 +93,10 @@ end
 
 
 function widget:Initialize()
+	if (not WG.icons) or (#WG.icons==0) then --if "Unit Icons" not enabled, then enable it.
+		widgetHandler:EnableWidget("Unit Icons")
+	end
+
 	WG.icons.SetOrder( 'lowpower', 2 )
 end
 
