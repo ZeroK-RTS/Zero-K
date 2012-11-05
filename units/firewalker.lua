@@ -86,6 +86,7 @@ unitDef = {
       name                    = [[Napalm Mortar]],
       accuracy                = 400,
       areaOfEffect            = 256,
+	  avoidFeature            = false,
       craterBoost             = 1,
       craterMult              = 2,
 
