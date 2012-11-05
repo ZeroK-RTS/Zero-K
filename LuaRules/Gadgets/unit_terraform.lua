@@ -140,7 +140,7 @@ local minTotalRampLength = 32
 local minTotalRampWidth = 24
 
 local checkLoopFrames = 1200 -- how many frames it takes to check through all cons
-local terraformDecayFrames = 2400 -- how many frames a terrablock can survive for without a repair command
+local terraformDecayFrames = 1800 -- how many frames a terrablock can survive for without a repair command
 local decayCheckFrequency = 90 -- frequency of terraform decay checks
 
 local structureCheckLoopFrames = 300 -- frequency of slow update for building deformation check
