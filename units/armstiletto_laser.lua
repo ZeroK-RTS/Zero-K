@@ -131,28 +131,25 @@ unitDef = {
 
     BOGUS_BOMB       = {
       name                    = [[Fake Bomb]],
-      areaOfEffect            = 80,
+      avoidFeature            = false,
+      avoidFriendly           = false,
       burst                   = 2,
-      burstrate               = 5,
-      craterBoost             = 0,
-      craterMult              = 0,
+      burstrate               = 1,
+      collideFriendly         = false,
 
       damage                  = {
         default = 0,
       },
 
-      dropped                 = true,
-      edgeEffectiveness       = 0,
       explosionGenerator      = [[custom:NONE]],
-      impulseBoost            = 0,
-      impulseFactor           = 0,
       interceptedByShieldType = 1,
       manualBombSettings      = true,
-      myGravity               = 1000,
+      myGravity               = 0.8,
       noSelfDamage            = true,
-      range                   = 10,
+      range                   = 500,
       reloadtime              = 10,
-      scale                   = [[0]],
+	  scale                   = [[0]],
+      sprayangle              = 64000,
       weaponType              = [[AircraftBomb]],
     },
 

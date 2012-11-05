@@ -5,10 +5,8 @@ include "bombers.lua"
 local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","x","z","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
 local smokePiece = {base, jet1, jet2}
 
---cob values
-local CRASHING = 97
-local Static_Var_1, firing
 local sound_index = 0
+local BOMB_DELAY = 1
 
 function script.Create()
 	Hide( preDrop)
@@ -36,20 +34,6 @@ function script.Deactivate()
 	Turn(LwingTip, z_axis, math.rad(-30), 2) -- -30
 	Turn(RwingTip, z_axis, math.rad(30), 2) --30
 end
---[[
-function script.MoveRate(moveRate)
-	if moveRate == 2 then
-		if  not Static_Var_1   then
-			Static_Var_1 = 1
-			Turn( base , z_axis, math.rad(-(240.000000)), 120.000000 )
-			WaitForTurn(base, z_axis)
-			Turn( base , z_axis, math.rad(-(120.000000)), 180.000000 )
-			WaitForTurn(base, z_axis)
-			Turn( base , z_axis, math.rad(-(0.000000)), 120.000000 )
-			Static_Var_1 = 0
-		end
-	end
-end--]]
 
 function Hacky_Stiletto_Workaround_stiletto_func(count)
 
@@ -79,7 +63,7 @@ function script.FireWeapon1()
 	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
 		return
 	end
-	GG.Hacky_Stiletto_Workaround_gadget_func(unitID, 43, 1)
+	GG.Hacky_Stiletto_Workaround_gadget_func(unitID, BOMB_DELAY, 1)
 end
 
 -- What the fire func should look like in a hax free world
@@ -127,7 +111,9 @@ function script.QueryWeapon1()
 	return drop
 end
 
-function script.AimFromWeapon1() return drop end
+function script.AimFromWeapon1() 
+	return drop 
+end
 
 function script.AimWeapon1(heading, pitch)
 	if (GetUnitValue(CRASHING) == 1) then return false end
