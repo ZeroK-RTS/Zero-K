@@ -112,7 +112,6 @@ _G.waitingForComm = waitingForComm
 --_G.playerSides = playerSides
 --_G.teamSides = teamSides
 --_G.teamSidesAI = teamSidesAI
-_G.customComms = customComms -- allow "WrapToLuaUI" (unsynced) to reach them
 
 local loadGame = false	-- was this loaded from a savegame?
 
@@ -288,10 +287,10 @@ local function InitUnsafe()
 			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Start Unit Setup warning: ' .. err)
 		end
 
-		-- record the player's commander definition for all chassis. Comm will be selected in "GetStartUnit()" from this list.
-		customComms[id] = customComms[id] or {}
+		-- record the player's first-level comm def for each chassis
 		for commSeries, subdata in pairs(commData) do
-			customComms[id][commSeries] = subdata
+			customComms[id] = customComms[id] or {}
+			customComms[id][commSeries] = subdata[1]
 			--Spring.Echo(id,"comm"..chassis, subdata[1])
 		end
 		
@@ -383,7 +382,7 @@ local function GetStartUnit(teamID, playerID, isAI)
   playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID)) )
   if (playerID and commChoice[playerID]) then
 	--Spring.Echo("Attempting to load alternate comm")
-	local altComm = customComms[playerID][(commChoice[playerID])][1] --select level 0  com
+	local altComm = customComms[playerID][(commChoice[playerID])]
 	startUnit = (altComm and UnitDefNames[altComm] and altComm) or startUnit
   end
   
@@ -439,7 +438,7 @@ local function GetFacingDirection(x, z, teamID)
 end
 
 
-local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn) --will be called at "GameStart()" or at gameFrame > 1
+local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn)
   local luaAI = Spring.GetTeamLuaAI(teamID)
   if luaAI and string.find(string.lower(luaAI), "chicken") then
     return false
@@ -803,11 +802,8 @@ function gadget:RecvLuaMsg(msg, playerID)
 			scheduledSpawn[frame][#scheduledSpawn[frame] + 1] = {teamID, playerID}
 		end
 	elseif msg:find("customcomm:",1,true) then
-		local commSeries = msg:sub(12) --get the name of selected commander
-		_G.commSeries = commSeries --send comm name to unsynced part. Reference: http://answers.springlobby.info/questions/6/how-do-i-receive-synced-events-in-unsynced-luarules
-		SendToUnsynced("CommSelected",playerID) --activate an event called "CommSelected" that can be detected in unsynced part
-		_G.commSeries = nil --empty this vessel
-		commChoice[playerID] = commSeries --remember this name for spawning commander at "GameStart()"
+		local name = msg:sub(12)
+		commChoice[playerID] = name
 		local _,_,spec,teamID = spGetPlayerInfo(playerID)
 		if spec then return end
 		if gamestart then
@@ -901,16 +897,15 @@ function gadget:Load(zip)
 	end	
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-else-- UNSYNCED ---
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+--------------------------------------------------------------------
+-- unsynced code
+--------------------------------------------------------------------
+else
 
---local teamID 			= Spring.GetLocalTeamID()
---local spGetUnitDefID 	= Spring.GetUnitDefID
---local spGetUnitLosState = Spring.GetUnitLosState
---local spValidUnitID 	= Spring.ValidUnitID
+local teamID 			= Spring.GetLocalTeamID()
+local spGetUnitDefID 	= Spring.GetUnitDefID
+local spGetUnitLosState = Spring.GetUnitLosState
+local spValidUnitID 	= Spring.ValidUnitID
 local spAreTeamsAllied 	= Spring.AreTeamsAllied
 local spGetUnitTeam 	= Spring.GetUnitTeam
 
@@ -919,7 +914,6 @@ local boostMax = {}
 
 function gadget:Initialize()
   gadgetHandler:AddSyncAction("UpdateBoost",UpdateBoost)
-  gadgetHandler:AddSyncAction('CommSelected',WrapToLuaUI) --Associate "CommSelected" event to "WrapToLuaUI". Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
 --[[
 --  gadgetHandler:AddSyncAction('PWCreate',WrapToLuaUI)
 --  gadgetHandler:AddSyncAction("whisper", whisper)
@@ -941,23 +935,6 @@ function UpdateBoost(_, uid, value, valueMax)
 	boostMax[uid] = valueMax
 end
   
-function WrapToLuaUI(_,playerID)
-	if (Script.LuaUI('CommSelection')) then --if there is widgets subscribing to "CommSelection" function then:
-		local isSpec = Spring.GetSpectatingState() --receiver player is spectator?
-		local myAllyID = Spring.GetMyAllyTeamID() --receiver player's alliance?
-		local _,_,_,_, eventAllyID,_,_,_,_ = Spring.GetPlayerInfo(playerID) --source alliance?
-		if isSpec or myAllyID == eventAllyID then
-			local comDefNames
-			for id,comList in spairs(SYNCED.customComms) do
-				if id == playerID then
-					comDefNames = comList[SYNCED.commSeries] --get the list of defName for this commseries (defName is the human name of the commanders. ie: "abc level 0")
-					break
-				end
-			end
-			Script.LuaUI.CommSelection(playerID, SYNCED.commSeries, comDefNames) --send to widgets as event
-		end
-	end
-end
   
 local function circleLines(percentage, radius)
 	gl.BeginEnd(GL.LINE_STRIP, function()
@@ -970,10 +947,8 @@ local function circleLines(percentage, radius)
 end  
 
 function gadget:DrawWorldPreUnit()
-	if Spring.IsGUIHidden() then 
-		return
-	end
-	local teamID = Spring.GetLocalTeamID()
+	if Spring.IsGUIHidden() then return end
+	teamID = Spring.GetLocalTeamID()
 	local spec, fullview = spGetSpectatingState()
 	spec = spec or fullview
 	for unitID, value in pairs(boost) do
