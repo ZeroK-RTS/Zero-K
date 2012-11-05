@@ -60,7 +60,8 @@ end
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
 	
-	if not (attackerTeam and
+	if damage > 0 and
+		not (attackerTeam and
 		weaponID and
 		noFFWeaponDefs[weaponID] and
 		attackerID ~= unitID and
