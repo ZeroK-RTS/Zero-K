@@ -92,6 +92,7 @@ unitDef = {
       name                    = [[Rapid-Fire Plasma Artillery]],
       accuracy                = 1400,
       areaOfEffect            = 160,
+	  avoidFeature            = false,
       craterBoost             = 0.25,
       craterMult              = 0.5,
 	  
