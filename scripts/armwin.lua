@@ -80,7 +80,7 @@ local function CreateTidalWreck()
     local x,y,z = Spring.GetUnitPosition(unitID)
     local heading = Spring.GetUnitHeading(unitID)
     local team = Spring.GetUnitTeam(unitID)
-    local featureID = Spring.CreateFeature("armwin_dead_water", x, y, z, heading + baseDirection*32768/tau, team)
+    local featureID = Spring.CreateFeature("armwin_dead_water", x, y, z, heading + baseDirection*65536/tau, team)
     Spring.SetFeatureResurrect(featureID, "armwin")
 end
 
