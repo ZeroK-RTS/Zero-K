@@ -70,7 +70,6 @@ unitDef = {
       damage           = 130,
       energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
       height           = [[40]],
@@ -79,10 +78,7 @@ unitDef = {
       object           = [[arm_wind_generator_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 14,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Wind/Tidal Generator]],
@@ -90,7 +86,6 @@ unitDef = {
       category         = [[heaps]],
       damage           = 130,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
       height           = [[4]],
@@ -99,9 +94,24 @@ unitDef = {
       object           = [[debris4x4a.s3o]],
       reclaimable      = true,
       reclaimTime      = 7,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
+    
+    DEAD_WATER = {
+      description      = [[Wreckage - Wind/Tidal Generator]],
+      blocking         = true,
+      category         = [[corpses]],
+      damage           = 400,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      footprintX       = 4,
+      footprintZ       = 4,
+      height           = [[25]],
+      hitdensity       = [[100]],
+      metal            = 14,
+      object           = [[arm_wind_generator_dead_water.s3o]],
+      reclaimable      = true,
+      reclaimTime      = 14,    
+    }
 
   },
 

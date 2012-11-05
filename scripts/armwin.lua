@@ -47,7 +47,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit)
-    baseDirection = math.random(0,tau)
+        baseDirection = math.random(0,tau)
 	Turn( base , y_axis, baseDirection )
 	baseDirection = baseDirection + hpi * Spring.GetUnitBuildFacing(unitID)
 	
@@ -76,6 +76,13 @@ function script.Create()
 	end
 end
 
+local function CreateTidalWreck()
+    local x,y,z = Spring.GetUnitPosition(unitID)
+    local heading = Spring.GetUnitHeading(unitID)
+    local team = Spring.GetUnitTeam(unitID)
+    local featureID = Spring.CreateFeature("armwin_dead_water", x, y, z, heading + baseDirection*32768/tau, team)
+    Spring.SetFeatureResurrect(featureID, "armwin")
+end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
@@ -98,13 +105,15 @@ function script.Killed(recentDamage, maxHealth)
 		end
 	else
 		if  severity <= 0.25  then
-			Explode(fan, sfxSmoke)
-			Explode(cradle, sfxFire)
-			return 1
+			--Explode(fan, sfxSmoke)
+			--Explode(cradle, sfxFire)
+			CreateTidalWreck()
+			return 3
 		elseif severity <= 0.5  then
-			Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
-			Explode(cradle, sfxSmoke)
-			return 1
+			--Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
+			--Explode(cradle, sfxSmoke)
+			CreateTidalWreck()
+			return 3
 		else
 			Explode(fan, sfxShatter)
 			Explode(cradle, sfxShatter)
