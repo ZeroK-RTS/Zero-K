@@ -7,7 +7,7 @@ function widget:GetInfo()
     name      = "Show All Commands",
     desc      = "Acts like CTRL-A SHIFT all the time",
     author    = "Google Frog",
-    date      = "Sep 29, 2012",
+    date      = "Mar 1, 2009",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = false  --  loaded by default?
