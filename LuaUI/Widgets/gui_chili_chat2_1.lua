@@ -166,10 +166,20 @@ options_order = {
 	'hideSpec', 'hideAlly', 'hidePoint', 'hideLabel', 'defaultAllyChat',
 	'text_height', 'highlighted_text_height', 'max_lines',
 	'color_background', 'color_chat', 'color_ally', 'color_other', 'color_spec',
-	'dedupe_messages', 'dedupe_points', 'color_dup',
+	'dedupe_messages', 'dedupe_points','color_dup',
 	'highlight_all_private', 'highlight_filter_allies', 'highlight_filter_enemies', 'highlight_filter_specs', 'highlight_filter_other',
 	'highlight_surround', 'highlight_sound', 'color_highlight'
 }
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function onOptionsChanged()
+	RemakeConsole()
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 options = {
 	text_height = {
@@ -209,7 +219,6 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
-	
 	highlight_all_private = {
 		name = "Highlight all private messages",
 		type = 'bool',
@@ -366,14 +375,6 @@ options = {
 	},	
 	
 }
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local function onOptionsChanged()
-	RemakeConsole()
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- TODO : should these pattern/escape functions be moved to some shared file/library?
@@ -527,11 +528,11 @@ local function displayMessage(msg, remake)
 	if hideMessage(msg)	or (not WG.Chili) then
 		return
 	end
-
+	
 	-- TODO betterify this / make configurable
 	local highlight_sequence = (msg.highlight and options.highlight_surround.value and (incolor_highlight .. HIGHLIGHT_SURROUND_SEQUENCE) or '')
 	local text = (msg.dup > 1 and (incolor_dup .. msg.dup .. DEDUPE_SUFFIX) or '') .. highlight_sequence .. msg.formatted .. highlight_sequence
-	
+
 	if (msg.dup > 1 and not remake) then
 		local last = stack_console.children[#(stack_console.children)]
 		if last then
@@ -620,7 +621,6 @@ end
 
 function RemakeConsole()
 	setup()
-
 	stack_console:ClearChildren()
 	for i = 1, #messages do -- FIXME : messages collection changing while iterating (if max_lines option has been shrinked)
 		local msg = messages[i]

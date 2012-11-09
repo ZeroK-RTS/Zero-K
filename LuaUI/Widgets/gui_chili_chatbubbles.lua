@@ -261,7 +261,7 @@ function widget:AddChatMessage(msg)
 	local type = msg.msgtype
 	local text = msg.argument or ''
 	
-	if DuplicateMessage("chat", player, msg, type) then 
+	if DuplicateMessage("chat", player, msg.argument, type) then 
 		return
 	end
 
