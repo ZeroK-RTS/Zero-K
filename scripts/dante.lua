@@ -271,14 +271,16 @@ function script.AimWeapon(num, heading, pitch)
 		return true
 	elseif num == 2 then
 		if dgunning  then return false end
-		Signal( SIG_AIM2)
-		SetSignalMask( SIG_AIM2)
+		Signal( SIG_AIM_2)
+		SetSignalMask( SIG_AIM_2)
 		Turn( torso , y_axis, heading, math.rad(200) )
 		WaitForTurn(torso, y_axis)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 3 then
 		--dgunning = true
+		Signal( SIG_AIM)
+		Signal( SIG_AIM_2)
 		Signal( SIG_AIM_3)
 		SetSignalMask( SIG_AIM_3)
 		armsFree = false
@@ -292,7 +294,9 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(larm, x_axis)
 		targetHeading = heading + GetUnitValue(COB.HEADING)/32768
 		StartThread(RestoreAfterDelay)
-		dgunning = false
+		Signal( SIG_AIM)
+		Signal( SIG_AIM_2)
+		--dgunning = false
 		return true
 	elseif num == 4 then
 		if dgunning  then return false end
