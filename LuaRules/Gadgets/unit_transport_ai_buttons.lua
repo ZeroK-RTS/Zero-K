@@ -81,6 +81,7 @@ local factDefs = {
   [ UnitDefNames['factoryhover'].id ] = true,
   [ UnitDefNames['factoryveh'].id ] = true,
   [ UnitDefNames['factorytank'].id ] = true,
+  [ UnitDefNames['factoryamph'].id ] = true,
 }
 
 local hasTransports = {}
@@ -90,13 +91,7 @@ local hasTransports = {}
 --------------------------------------------------------------------------------
 
 local function AddCmdDesc(unitID)
-  local insertID = 
-    FindUnitCmdDesc(unitID, CMD_CLOAK)      or
-    FindUnitCmdDesc(unitID, CMD_ONOFF)      or
-    FindUnitCmdDesc(unitID, CMD_REPEAT)     or
-    FindUnitCmdDesc(unitID, CMD_MOVE_STATE) or
-    FindUnitCmdDesc(unitID, CMD_FIRE_STATE) or
-    123456; -- back of the pack
+  local insertID = 500
   InsertUnitCmdDesc(unitID, insertID + 1, embarkCmdDesc);
   InsertUnitCmdDesc(unitID, insertID + 2, disembarkCmdDesc);
 end
