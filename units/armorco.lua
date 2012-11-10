@@ -29,7 +29,6 @@ unitDef = {
     helptext_fr    = [[Le Detriment est le summum de la technologie. Assez solide pour résister r plusieurs missiles nucléaires, capable de repérer des unités camouflées il fait passer le Bantha pour un caniche. Son armement fait pâlir une armée enticre, et sa relative lenteur est son seul défaut. Son prix est exorbitant et éxige des sacrifices, mais une fois construit rien ne l'arrete.]],
 	helptext_de    = [[Der Detriment ist der stärkste Strider auf dem Platz. Er verteidigt sich selbst gegen Luftattacken oder nutzt seine Raketen, um entfernte Ziele zu treffen. Des Weiteren besitzt er eine Gaußkanone, die nur für einen Zweck konzipiert wurde: das schnelle und sichere Töten von starken, gegnerischen Einheiten. Beachte - der kluge Feldherr schickt seinen Detriment mit angebrachter Unterstützung aus, um Gruppen leichter Gegner, bzw. Lufteinheiten in Schach zu halten.]],
 	modelradius    = [[50]],
-	extradrawrange = 925,
   },
 
   explodeAs              = [[NUCLEAR_MISSILE]],
@@ -78,8 +77,8 @@ unitDef = {
     },
 
     {
-      def                = [[ORCONE_ROCKET]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      def                = [[DISRUPTOR]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
     {
@@ -138,6 +137,7 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 900,
     },
+
 
     AALASER         = {
       name                    = [[Anti-Air Laser Battery]],
@@ -269,46 +269,6 @@ unitDef = {
       weaponType              = [[BeamLaser]],
       weaponVelocity          = 2250,
     },    
-	
-    ORCONE_ROCKET = {
-      name                    = [[Medium-Range Missiles]],
-      areaOfEffect            = 160,
-      cegTag                  = [[raventrail]],
-      collideFriendly         = false,
-      craterBoost             = 1,
-      craterMult              = 2,
-	  
-	  customParams            = {
-	    gatherradius = [[180]],
-	    smoothradius = [[120]],
-	    smoothmult   = [[0.25]],
-	  },
-
-      damage                  = {
-        default = 850,
-        subs    = 42.5,
-      },
-
-      edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:STARFIRE]],
-      fireStarter             = 55,
-      impulseBoost            = 0,
-      impulseFactor           = 0.8,
-      interceptedByShieldType = 2,
-      model                   = [[wep_m_kickback.s3o]],
-      noSelfDamage            = true,
-      range                   = 925,
-      reloadtime              = 1.55,
-      smokedelay              = [[0.1]],
-      smokeTrail              = true,
-      soundHit                = [[weapon/missile/vlaunch_hit]],
-      soundStart              = [[weapon/missile/missile_launch]],
-      startsmoke              = [[1]],
-      weaponAcceleration      = 245,
-      weaponTimer             = 2,
-      weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 10000,
-    },
 
 
   },
