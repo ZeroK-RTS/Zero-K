@@ -1,4 +1,4 @@
-local versionName = "v2.7"
+local versionName = "v2.73"
 --------------------------------------------------------------------------------
 --
 --  file:    cmd_dynamic_Avoidance.lua
@@ -14,7 +14,7 @@ function widget:GetInfo()
     name      = "Dynamic Avoidance System",
     desc      = versionName .. " Avoidance AI behaviour for constructor, cloakies, ground-combat unit and gunships.\n\nNote: Customize the settings by Space+Click on unit-state icons.",
     author    = "msafwan",
-    date      = "October 1, 2012",
+    date      = "Nov 15, 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 20,
     enabled   = false  --  loaded by default?
@@ -62,7 +62,6 @@ local CMD_OPT_INTERNAL	= CMD.OPT_INTERNAL
 local CMD_OPT_SHIFT		= CMD.OPT_SHIFT
 --local spRequestPath = Spring.RequestPath
 local mathRandom = math.random
---local mathMax = math.max
 --local spGetUnitSensorRadius  = Spring.GetUnitSensorRadius
 --------------------------------------------------------------------------------
 -- Constant:
@@ -81,6 +80,7 @@ local obsCONSTANTg			= {math.pi/10, math.pi/4} -- obstacle graph; scale the obst
 --an antagonist to aCONSTANg (obsCONSTANTg or obstacle graph) also use math.pi/4 (45 degree left or right) but actual maximum value varies depend on number of enemy, but already normalized. Activated by 'graphCONSTANTtrigger[2]'
 local windowingFuncMultG = 1 --? (default = 1 multiplier)
 local normalizeObsGraphG = false --// if 'true': normalize turn angle to a maximum of "obsCONSTANTg", if 'false': allow turn angle to grow as big as it can (depend on number of enemy, limited by "maximumTurnAngleG").
+local stdDecloakDist_fG = 75 --//a decloak distance size for Scythe is put as standard. If other unit has bigger decloak distance then it will be scalled based on this
 
 -- Obstacle/Target competetive interaction constant:
 local cCONSTANT1g 			= {0.01,1,2} --attractor constant; effect the behaviour. ie: selection between 4 behaviour state. (default = 0.01x (All), 1x (Cloakies)) (behaviour:(MAINTAIN USER's COMMAND)|(IGNORE USER's COMMAND))
@@ -98,7 +98,7 @@ local dummyIDg = "[]" --fake ping id for Lua Message to check lag (prevent proce
 local noiseAngleG =0.1 --(default is pi/36 rad); add random angle (range from 0 to +-math.pi/36) to the new angle. To prevent a rare state that contribute to unit going straight toward enemy
 local collisionAngleG= 0.1 --(default is pi/6 rad) a "field of vision" (range from 0 to +-math.pi/366) where auto-reverse will activate 
 local fleeingAngleG= 0.7 --(default is pi/4 rad) angle of enemy (range from 0 to +-math.pi/4) where fleeing enemy is considered as fleeing(to de-activate avoidance to perform chase). Set to 0 to de-activate.
-local maximumTurnAngleG = 3.1 --(default is pi rad) safety measure. Prevent overturn (eg: 360+xx degree turn)
+local maximumTurnAngleG = math.pi --(default is pi rad) safety measure. Prevent overturn (eg: 360+xx degree turn)
 --pi is 180 degrees
 
 --Update constant:
@@ -107,7 +107,7 @@ local gps_then_DoCalculation_delayG = 0.25  --elapsed second (Wait) before issui
 
 -- Distance or velocity constant:
 local timeToContactCONSTANTg= doCalculation_then_gps_delayG + gps_then_DoCalculation_delayG --time scale for move command; to calculate collision calculation & command lenght (default = 0.5 second). Will change based on user's Ping
-local safetyDistanceCONSTANTg=205 --range toward an obstacle before unit auto-reverse (default = 205 meter, ie: half of ZK's stardust range) reference:80 is a size of BA's solar
+local safetyDistanceCONSTANT_fG=205 --range toward an obstacle before unit auto-reverse (default = 205 meter, ie: half of ZK's stardust range) reference:80 is a size of BA's solar
 local extraLOSRadiusCONSTANTg=205 --add additional distance for unit awareness over the default LOS. (default = +205 meter radius, ie: to 'see' radar blip).. Larger value measn unit detect enemy sooner, else it will rely on its own LOS.
 local velocityScalingCONSTANTg=1 --scale command lenght. (default= 1 multiplier) *Small value cause avoidance to jitter & stop prematurely*
 local velocityAddingCONSTANTg=50 --add or remove command lenght (default = 50 elmo/second) *Small value cause avoidance to jitter & stop prematurely*
@@ -126,6 +126,7 @@ local secondPerGameFrameG = 0.5/15 --engine depended second-per-frame (for calcu
 --Command Timeout constants:
 local commandTimeoutG = 2
 local consRetreatTimeoutG = 15
+
 --------------------------------------------------------------------------------
 --Variables:
 local unitInMotionG={} --store unitID
@@ -210,7 +211,7 @@ options = {
 	dbg_IgnoreSelectedCons ={
 		name = 'Debug: Ignore current selection',
 		type = 'bool',
-		value = false,
+		value = true,
 		desc = "Selected constructor(s) will be ignored by widget.\nNote: there's a second delay before unit is ignored/re-acquire after selection/de-selection.\n\nDefault:Off",
 		advanced = true,
 	},
@@ -223,18 +224,8 @@ function widget:Initialize()
 	if spec then widgetHandler:RemoveWidget() return false end
 	myTeamID_gbl= spGetMyTeamID()
 	
-	--[[
-	--Old Method: find maxUnits heuristically...
-	--count players to offset the ID of wreckage
-	local playerIDList= Spring.GetPlayerList()
-	local numberOfPlayers=#playerIDList
-	for i=1,numberOfPlayers do
-		local _,_,spectator,_,_,_,_,_,_=spGetPlayerInfo(playerIDList[i])
-		if spectator then numberOfPlayers=numberOfPlayers-1 end
-	end
-	wreckageID_offset=wreckageID_offset_initial+ (numberOfPlayers-2)*wreckageID_offset_multiplier
-	--]]
-	--2) New Method: use game call-in...
+	--find maxUnits 
+	--offset the ID of wreckage
 	wreckageID_offset = Game.maxUnits
 	--
 	
@@ -244,19 +235,8 @@ end
 function widget:PlayerChanged(playerID)
 	if Spring.GetSpectatingState() then widgetHandler:RemoveWidget() end
 	
-	--[[ 
-	--Old Method: find maxUnits heuristically...
-	--count players to offset the ID of wreckage
-	local playerIDList= Spring.GetPlayerList()
-	local numberOfPlayers=#playerIDList
-	for i=1,numberOfPlayers do
-		local _,_,spectator,_,_,_,_,_,_=spGetPlayerInfo(playerIDList[i])
-		if spectator then numberOfPlayers=numberOfPlayers-1 end
-	end
-	wreckageID_offset=wreckageID_offset_initial+ (numberOfPlayers-2)*wreckageID_offset_multiplier
-	--]]
-	
-	--New Method: use game call-in...
+	--find maxUnits
+	--offset the ID of wreckage
 	wreckageID_offset = Game.maxUnits
 	--
 end
@@ -344,6 +324,8 @@ end
 ---------------------------------Level1 Lower level
 -- return a refreshed unit list, else return nil
 function RefreshUnitList(attacker, commandTTL)
+	local stdDecloakDist = stdDecloakDist_fG
+	----------------------------------------------------------
 	local allMyUnits = spGetTeamUnits(myTeamID_gbl)
 	local arrayIndex=1
 	local relevantUnit={}
@@ -368,6 +350,7 @@ function RefreshUnitList(attacker, commandTTL)
 			local unitDefID = spGetUnitDefID(unitID)
 			local unitDef = UnitDefs[unitDefID]
 			local unitSpeed =unitDef["speed"]
+			local decloakScaling = math.max((unitDef["decloakDistance"] or 0),stdDecloakDist)/stdDecloakDist
 			local unitInView = metaForVisibleUnits[unitID] --transfer "yes" or "nil" from meta table into a local variable
 			if (unitSpeed>0) then
 				local unitType = 0 --// category that control WHEN avoidance is activated for each unit. eg: Category 2 only enabled when not in view & when guarding units. Used by 'GateKeeperOrCommandFilter()'
@@ -413,7 +396,7 @@ function RefreshUnitList(attacker, commandTTL)
 					local unitShieldPower, reloadableWeaponIndex= -1, -1
 					unitShieldPower, reloadableWeaponIndex = CheckWeaponsAndShield(unitDef)
 					arrayIndex=arrayIndex+1
-					relevantUnit[arrayIndex]={unitID, unitType, unitSpeed, fixedPointType, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
+					relevantUnit[arrayIndex]={unitID, unitType, unitSpeed, fixedPointType, decloakScaling, isVisible = unitInView, unitShieldPower = unitShieldPower, reloadableWeaponIndex = reloadableWeaponIndex}
 				end
 			end
 			if (turnOnEcho == 1) then --for debugging
@@ -474,8 +457,9 @@ function GetPreliminarySeparation(unitInMotion,commandIndexTable, attacker, sele
 						local unitSSeparation, losRadius = CatalogueMovingObject(surroundingUnits, unitID, lastPosition, losRadius) --detect initial enemy separation & alter losRadius when unit submerged
 						arrayIndex=arrayIndex+1 --// increment table index by 1, start at index 2; table lenght is stored at row 1
 						local unitSpeed = unitInMotion[i][3]
+						local decloakScaling = unitInMotion[i][5]
 						local impatienceTrigger,commandIndexTable = GetImpatience(newCommand,unitID, commandIndexTable)
-						surroundingOfActiveUnit[arrayIndex]={unitID, unitSSeparation, targetCoordinate, losRadius, cQueue, newCommand, unitSpeed,impatienceTrigger, lastPosition, graphCONSTANTtrigger, fixedPointCONSTANTtrigger} --store result for next execution
+						surroundingOfActiveUnit[arrayIndex]={unitID, unitSSeparation, targetCoordinate, losRadius, cQueue, newCommand, unitSpeed,impatienceTrigger, lastPosition, graphCONSTANTtrigger, fixedPointCONSTANTtrigger, decloakScaling} --store result for next execution
 						if (turnOnEcho == 1) then
 							Spring.Echo("unitsSeparation(GetPreliminarySeparation):")
 							Spring.Echo(unitsSeparation)
@@ -541,19 +525,20 @@ function DoCalculation (surroundingOfActiveUnit,commandIndexTable, attacker, ski
 					local newSurroundingUnits	= GetAllUnitsInRectangle(unitID, losRadius, attacker) --get the latest unit list (rather than using the preliminary list) to ensure reliable avoidance
 					local graphCONSTANTtrigger = surroundingOfActiveUnit[i][10] --//fetch information on which aCONSTANT and obsCONSTANT to use
 					local fixedPointCONSTANTtrigger = surroundingOfActiveUnit[i][11] --//fetch information on which fixedPoint constant to use
+					local decloakScaling = surroundingOfActiveUnit[i][12]
 					if (newSurroundingUnits[1] ~=nil) then --//check again if there's still any enemy to avoid. Submerged unit might return empty list if their enemy has no Sonar (their 'losRadius' became half the original value so that they don't detect/avoid unnecessarily). 
 						local avoidanceCommand = true
 						local orderArray = {nil}
 						commandTTL, avoidanceCommand,orderArray= InsertCommandQueue(cQueue, unitID, newCommand, now, commandTTL)--delete old widget command, update commandTTL, and send constructor to base for retreat
 						if avoidanceCommand or (not options.dbg_RemoveAvoidanceSplitSecond.value) then 
-							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand) --calculate move solution
+							local newX, newZ = AvoidanceCalculator(unitID, targetCoordinate,losRadius,newSurroundingUnits, unitSSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand,decloakScaling) --calculate move solution
 							local newY=spGetGroundHeight(newX,newZ)
-							--start Insert Avoidance Command Queue:--
+							--Inserting command queue:--
 							orderArray[#orderArray+1]={CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"}} --spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, newX, newY, newZ}, {"alt"} ) --insert new command
 							commandTTL[unitID][#commandTTL[unitID]+1] = {countDown = commandTimeoutG, widgetCommand= {newX, newZ}} --//remember this command on watchdog's commandTTL table. It has 4x*RefreshUnitUpdateRate* to expire
 							commandIndexTable[unitID]["widgetX"]=newX --update the memory table. So that next update can use to check if unit has new or old (widget's) command
 							commandIndexTable[unitID]["widgetZ"]=newZ
-							--end Insert Avoidance Command Queue:--
+							--end--
 							if (turnOnEcho == 1) then
 								Spring.Echo("newX(Update) " .. newX)
 								Spring.Echo("newZ(Update) " .. newZ)
@@ -935,15 +920,18 @@ function GetImpatience(newCommand, unitID, commandIndexTable)
 	return impatienceTrigger, commandIndexTable
 end
 
-function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand)
+function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUnits, unitsSeparation, unitSpeed, impatienceTrigger, lastPosition, graphCONSTANTtrigger, skippingTimer, fixedPointCONSTANTtrigger, newCommand, decloakScaling)
 	if (unitID~=nil) and (targetCoordinate ~= nil) then --prevent idle/non-existent/ unit with invalid command from using collision avoidance
 		local aCONSTANT 								= aCONSTANTg --attractor constant (amplitude multiplier)
+		local obsCONSTANT 								=obsCONSTANTg --repulsor constant (amplitude multiplier)
 		local unitDirection, _, usingLastPosition		= GetUnitDirection(unitID, lastPosition) --get unit direction
 		local targetAngle = 0
 		local fTarget = 0
 		local fTargetSlope = 0
 		----
 		aCONSTANT = aCONSTANT[graphCONSTANTtrigger[1]] --//select which 'aCONSTANT' value
+		obsCONSTANT = obsCONSTANT[graphCONSTANTtrigger[2]]*decloakScaling --//select which 'obsCONSTANT' value to use & increase obsCONSTANT value when unit has larger decloakDistance than reference unit (Scythe).
+		
 		fTarget = aCONSTANT --//maximum value is aCONSTANT
 		fTargetSlope = 1 --//slope is negative or positive
 		if targetCoordinate[1]~=-1 then --if target coordinate contain -1 then disable target for pure avoidance
@@ -961,7 +949,7 @@ function AvoidanceCalculator(unitID, targetCoordinate, losRadius, surroundingUni
 		local normalizingFactor=0
 
 		--count every enemy unit and sum its contribution to the obstacle/repulsor variable
-		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius)
+		wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, normalizingFactor=SumAllUnitAroundUnitID (unitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle,nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius,obsCONSTANT)
 		--calculate appropriate behaviour based on the constant and above summation value
 		local wTarget, wObstacle = CheckWhichFixedPointIsStable (fTargetSlope, dFobstacle, dSum, fTarget, fObstacleSum, wTotal, fixedPointCONSTANTtrigger)
 		--convert an angular command into a coordinate command
@@ -1374,14 +1362,12 @@ function GetTargetSubtendedAngle(unitID, targetCoordinate)
 end
 
 --sum the contribution from all enemy unit
-function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius)
+function SumAllUnitAroundUnitID (thisUnitID, surroundingUnits, unitDirection, wTotal, dSum, fObstacleSum,dFobstacle, nearestFrontObstacleRange, unitsSeparation, impatienceTrigger, graphCONSTANTtrigger, losRadius, obsCONSTANT)
 	local safetyMarginCONSTANT = safetyMarginCONSTANTunitG
 	local smCONSTANT = smCONSTANTunitG --?
 	local distanceCONSTANT = distanceCONSTANTunitG
-	local obsCONSTANT =obsCONSTANTg
 	local normalizeObsGraph = normalizeObsGraphG
 	----
-	obsCONSTANT = obsCONSTANT[graphCONSTANTtrigger[2]] --//select which 'obsCONSTANT' value to use
 	local normalizingFactor = 1
 	
 	if (turnOnEcho == 1) then Spring.Echo("unitID(SumAllUnitAroundUnitID)" .. thisUnitID) end
@@ -1564,7 +1550,7 @@ end
 
 --convert angular command into coordinate, plus other function
 function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unitDirection, nearestFrontObstacleRange, losRadius, unitSpeed, impatienceTrigger, normalizingFactor, skippingTimer, usingLastPosition, newCommand)
-	local safetyDistanceCONSTANT=safetyDistanceCONSTANTg
+	local safetyDistanceCONSTANT=safetyDistanceCONSTANT_fG
 	local timeToContactCONSTANT=timeToContactCONSTANTg
 	local activateAutoReverse=activateAutoReverseG
 	--local doCalculation_then_gps_delay = doCalculation_then_gps_delayG
@@ -1573,7 +1559,7 @@ function SendCommand(thisUnitID, wTarget, wObstacle, fTarget, fObstacleSum, unit
 	if (nearestFrontObstacleRange> losRadius) then nearestFrontObstacleRange = 999 end --if no obstacle infront of unit then set nearest obstacle as far as LOS to prevent infinite velocity.
 	local newUnitAngleDerived= GetNewAngle(unitDirection, wTarget, fTarget, wObstacle, fObstacleSum, normalizingFactor) --derive a new angle from calculation for move solution
 
-	local velocity=unitSpeed*(math.max(timeToContactCONSTANT, skippingTimer.networkDelay + gps_then_DoCalculation_delay)) --scale-down/scale-up command lenght based on system delay (because short command will make unit move in jittery way & avoidance stop prematurely). *NOTE: select either preset velocity (timeToContactCONSTANT==gps_then_DoCalculation_delayG + doCalculation_then_gps_delayG) or the one taking account delay measurement (skippingTimer.networkDelay + gps_then_DoCalculation_delay), which one is highest, times unitSpeed as defined by UnitDefs.
+	local velocity=unitSpeed*(math.max(timeToContactCONSTANT, skippingTimer.averageDelay/2 + gps_then_DoCalculation_delay)) --scale-down/scale-up command lenght based on system delay (because short command will make unit move in jittery way & avoidance stop prematurely). *NOTE: select either preset velocity (timeToContactCONSTANT==gps_then_DoCalculation_delayG + doCalculation_then_gps_delayG) or the one taking account delay measurement (skippingTimer.networkDelay + gps_then_DoCalculation_delay), which one is highest, times unitSpeed as defined by UnitDefs.
 	local networkDelayDrift = 0
 	if usingLastPosition then  --unit drift contributed by network lag/2 (divide-by-2 because averageDelay is a roundtrip delay and we just want the delay of stuff measured on screen), only calculated when unit is known to be moving (eg: is using lastPosition to determine direction), but network lag value is not accurate enough to yield an accurate drift prediction.
 		networkDelayDrift = unitSpeed*(skippingTimer.averageDelay/2)
@@ -1701,7 +1687,7 @@ function ConvertToXZ(thisUnitID, newUnitAngleDerived, velocity, unitDirection, n
 	local velocityScalingCONSTANT=velocityScalingCONSTANTg
 	--
 	local x,_,z = spGetUnitPosition(thisUnitID)
-	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT --add multiplier
+	local distanceToTravelInSecond=velocity*velocityScalingCONSTANT+velocityAddingCONSTANT*Sgn(velocity) --add multiplier & adder. note: we multiply "velocityAddingCONSTANT" with velocity Sign ("Sgn") because we might have reverse speed (due to auto-reverse)
 	local newX = distanceToTravelInSecond*math.sin(newUnitAngleDerived) + x -- issue a command on the ground to achieve a desired angular turn
 	local newZ = distanceToTravelInSecond*math.cos(newUnitAngleDerived) + z
 	
