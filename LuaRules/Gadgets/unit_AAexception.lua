@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
     name      = "AA exception",
-    desc      = "handle exceptional AA behaviour",
+    desc      = "Allow ground AA and air-superiority fighter to target and shot down any ground unit that is thrown up into air by Newton or explosion. AA targetting is triggered only by Newton or weapon explosion but can also be triggered externally thru GG table.",
     author    = "msafwan",
     date      = "WIP",
     license   = "GNU GPL, v2 or later",
@@ -32,6 +32,8 @@ local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
 local spSetUnitDirection  = Spring.SetUnitDirection 
 local spTransferUnit = Spring.TransferUnit
 local spGetTeamInfo = Spring.GetTeamInfo
+local spGetUnitTeam = Spring.GetUnitTeam
+local spGetUnitDefID = Spring.GetUnitDefID
 
 local spGetUnitVelocity  = Spring.GetUnitVelocity
 --local spSetUnitPhysics  = Spring.SetUnitPhysics
@@ -41,7 +43,7 @@ local spMoveCtrlEnable = Spring.MoveCtrl.Enable
 --local spMoveCtrlSetPhysics = Spring.MoveCtrl.SetPhysics
 local spMoveCtrlSetGravity = Spring.MoveCtrl.SetGravity
 local spMoveCtrlSetPosition = Spring.MoveCtrl.SetPosition
-
+--------------------------------------------------------------------------------
 --local gunshipsID = {}
 --local airplaneID = {}
 --local updateRate_1 = 1 --update rate for checking airplane landing
@@ -49,6 +51,31 @@ local measureMapGravity ={1, fakeUnitID= nil, gravity=nil}
 local flyingGroundUnitsID = {}
 local updateRate_2 = 5 --update rate for ground unit's free flying trajectory
 local updateRate_3 =1 --update rate for cloak status
+--------------------------------------------------------------------------------
+GG.isflying_watchout = {} --allow other gadget to signal gadget that this unit is flying. ie: "unit_jumpjet.lua" can do "GG.isflying_watchout[unitID]=true" to indicate that such unit is flying and should be targeted by AA.
+--[[
+	MANUAL:
+
+	Do this to trigger AA detection from other gadget:
+	1) make sure unit fulfill this condition: 
+		- upward (or downward) velocity is > Game.gravity/30/30, OR the height below unit's feet is > 100 elmo (100 elmo from feet to ground).
+	2) add the following value:
+		- GG.isflying_watchout[unitID]=true
+		
+	The following happen:
+	1) gadget iterate over the "GG.isflying_watchout",
+	2) unitID(s) is added to a watchlist
+	2) "GG.isflying_watchout" is emptied
+	3) unitID get shot by AA when:
+		- squareroot of its component-speed-squared combined is > 3.8 elmo-per-frame, AND the height below unit's feet is > 100 elmo.
+	4) unit become landed when:
+		- upward (or downward) velocity is < Game.gravity/30/30, AND the height below unit's feet is < 100 elmo.
+	5) landed unitID(s) removed from watchlist
+		
+	You can exert velocity on any unit by:
+	1) Spring.AddUnitImpulse(unitID, +velx, +vely, +velz); or...
+	2) Spring.MoveCtrl.Enable(unitID); Spring.MoveCtrl.SetVelocity(unitID, velx, vely,velz); Spring.MoveCtrl.Disable(unitID)
+--]]
 
 function gadget:GameFrame(n)
 	if n==1 and measureMapGravity[1] ==1 then --only took 2 frame to finish measurement
@@ -61,7 +88,7 @@ function gadget:GameFrame(n)
 		local gravity = select(2,spGetUnitVelocity(measureMapGravity.fakeUnitID))
 		spDestroyUnit(measureMapGravity.fakeUnitID, false, true)
 		measureMapGravity.gravity= gravity
-		--Spring.Echo("(2)Planet gravity is: "..gravity.. " unit-per-frame-per-frame")
+		--Spring.Echo("(2)Planet gravity is: "..gravity.. " elmo-per-frame-per-frame")
 		measureMapGravity[1] = 3
 	end
 	--TODO: find way to save landed airplane from AA
@@ -73,7 +100,18 @@ function gadget:GameFrame(n)
 			-- end
 		-- end
 	-- end
-	if n%updateRate_2 == 0 then --check flying units position every 5 frame. ~6fps. ballistic trajectory rarely need updates (if unit accelerate then its good for dodging!).
+	if n%updateRate_2 == 0 then --check flying units position every 5 frame. ~6fps. ballistic trajectory rarely need updates (unless unit accelerate then its good for dodging!).
+		if #GG.isflying_watchout > 0 then
+			for unitID,_ in pairs(GG.isflying_watchout) do --retrieve any new AA target from outside
+				if unitID and flyingGroundUnitsID[unitID] == nil then
+					local unitTeam = spGetUnitTeam(unitID)
+					local unitDefID = spGetUnitDefID(unitID)
+					local stealth = UnitDefs[unitDefID].stealth
+					flyingGroundUnitsID[unitID]={unitTeam=unitTeam,stealth=stealth, aaMarker=nil, teamChange=nil}
+					GG.isflying_watchout[unitID] = nil
+				end
+			end
+		end
 		for unitID,_ in pairs(flyingGroundUnitsID) do
 			local bx,by,bz,mx,my,mz = spGetUnitPosition(unitID, true)
 			local velX,velY,velZ = spGetUnitVelocity(unitID)
@@ -81,7 +119,6 @@ function gadget:GameFrame(n)
 			local landed = false
 			if by < groundHeight+100 and math.abs(velY) < math.abs(measureMapGravity.gravity) then --if low-elevation and vertical speed is less than of gravity then: assume unit has landed.
 				landed = true
-				--Spring.Echo("Landed")
 			end
 			if not landed then
 				if groundHeight+100 < by then
@@ -95,7 +132,7 @@ function gadget:GameFrame(n)
 							local _,_,_,offX,offY,offZ = spGetUnitCollisionVolumeData(unitID)
 							aaMarker = spCreateUnit("fakeunit_aatarget",mx,my+100,mz, "s", unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
 							spSetUnitRadiusAndHeight(aaMarker,0,0) --set FAKE unit's colvol as small as possible
-							spSetUnitMidAndAimPos(aaMarker,0,0,0,-offX,-100+offY,-offZ, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: We rely on AA to have "cylinderTargeting" which can detect unit at infinite height (ie: +100 elmo)
+							spSetUnitMidAndAimPos(aaMarker,0,0,0,offX,-100+offY,offZ, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: We rely on AA to have "cylinderTargeting" which can detect unit at infinite height (ie: +100 elmo)
 							spSetUnitBlocking(aaMarker, false,false) --set FAKE to not collide. But its not perfect, that's why we need to move FAKE's colvol 100elmo away
 							spSetUnitNoSelect(aaMarker, true)  --don't allow player to use the FAKE
 							spSetUnitNoDraw(aaMarker, true) --don't hint player that FAKE exist
@@ -142,10 +179,10 @@ function gadget:GameFrame(n)
 					local bx,by,bz,mx,my,mz = spGetUnitPosition(unitID, true)
 					local velX,velY,velZ = spGetUnitVelocity(unitID)
 					local _,_,_,offX,offY,offZ = spGetUnitCollisionVolumeData(unitID)
-					aaMarker = spCreateUnit("fakeunit_aatarget",mx,my+200,mz, "s", flyingGroundUnitsID[unitID].unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
+					aaMarker = spCreateUnit("fakeunit_aatarget",mx,my+100,mz, "s", flyingGroundUnitsID[unitID].unitTeam) --create FAKE AA marker 100 elmo above unit. We can't spawn it inside flying unit because they will collide.
 					flyingGroundUnitsID[unitID].aaMarker = aaMarker
 					spSetUnitRadiusAndHeight(aaMarker,0,0) --set FAKE unit's colvol as small as possible
-					spSetUnitMidAndAimPos(aaMarker,0,0,0,-offX,-100+offY,-offZ, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: We rely on AA to have "cylinderTargeting" which can detect unit at infinite height (ie: +100 elmo)
+					spSetUnitMidAndAimPos(aaMarker,0,0,0,offX,-100+offY,offZ, true)  --translate FAKE's aimpoin to flying unit's midpoint. NOTE: We rely on AA to have "cylinderTargeting" which can detect unit at infinite height (ie: +100 elmo)
 					spSetUnitBlocking(aaMarker, false,false) --set FAKE to not collide. But its not perfect, that's why we need to move FAKE's colvol 100elmo away
 					spSetUnitNoSelect(aaMarker, true)  --don't allow player to use the FAKE
 					spSetUnitNoDraw(aaMarker, true) --don't hint player that FAKE exist
@@ -232,9 +269,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		if attackerIsAA then
 			local defaultDamage = WeaponDefs[weaponDefID].damages
 			local maxDamage=0
-			for i=1, #defaultDamage do
+			for i=1, #defaultDamage do --cycle thru all armortype
 				if WeaponDefs[weaponDefID].damages[i] > maxDamage then
-					--Spring.Echo(i .. " armorType")
 					maxDamage = WeaponDefs[weaponDefID].damages[i]
 				end
 			end
