@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[amphcon]],
   name                = [[Clam]],
-  description         = [[Amphibious Construction/Resurrection Bot, Builds at 7.5 m/s]],
+  description         = [[Amphibious Construction Bot, Builds at 7.5 m/s]],
   acceleration        = 0.4,
   activateWhenBuilt	  = true,
   brakeRate           = 0.25,
