@@ -270,6 +270,8 @@ end
 
 --	A compatibility function: receive broadcasted event from "cmd_mex_placement.lua" (ZK specific) which notify us that it has its own mex queue
 function CommandNotifyMex(id,params,options)
+	local groundHeight = Spring.GetGroundHeight(params[1],params[3])
+	params[2] = math.max(0, groundHeight)
 	return widget:CommandNotify(id, params, options, 1)
 end
 
