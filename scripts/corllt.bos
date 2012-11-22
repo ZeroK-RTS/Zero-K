@@ -3,68 +3,10 @@
 #include "constants.h"
 #include "StateChg.h"
 
-piece  basebottom, flare, basetop, housing, rotor, barrel, shellleft, shellright, aim;
-
-static-var  open, open2;
+piece  base, body, barrel, turret, flare;
 
 // Signal definitions
 #define SIG_AIM				2
-
-
-
-
-
-
-//--------------------------------START DA FUNK!
-activatescr()
-{
-	//turn shellleft to y-axis <-60.000000> speed <80.000000>;
-	//turn shellright to y-axis <60.000000> speed <80.000000>;
-	//move barrel to z-axis [3.500000] speed [5.000000];
-	open = TRUE;
-	//wait-for-turn shellleft around y-axis;
-	//wait-for-turn shellright around y-axis;
-	//wait-for-move barrel along z-axis;
-	
-	//sleep 39;
-}
-
-deactivatescr()
-{
-
-	//turn shellleft to y-axis <0.000000> speed <80.000000>;
-	//turn shellright to y-axis <0.000000> speed <80.000000>;
-	//move barrel to z-axis [0.000000] speed [5.000000];
-	//wait-for-turn shellleft around y-axis;
-	//wait-for-turn shellright around y-axis;
-	//wait-for-move barrel along z-axis;
-
-	sleep 39;
-}
-
-
-Go()
-{
-	if( !open )
-	{
-		call-script activatescr();
-	}
-	open = TRUE;
-	//set ARMORED to FALSE;
-}
-
-Stop()
-{
-	//set ARMORED to TRUE;
-	open  = FALSE;	
-	call-script deactivatescr();
-}
-
-#define ACTIVATECMD	    call-script Go();
-#define DEACTIVATECMD   call-script Stop();
-#include "StateChg.h"
-//--------------------------------END DA FUNK! 
-
 
 SmokeUnit(healthpercent, sleeptime, smoketype)
 {
@@ -82,7 +24,7 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 			{
 				smoketype = 256 | 1;
 			}
-			emit-sfx smoketype from basebottom;
+			emit-sfx smoketype from base;
 		}
 		sleeptime = healthpercent * 50;
 		if( sleeptime < 200 )
@@ -93,67 +35,19 @@ SmokeUnit(healthpercent, sleeptime, smoketype)
 	}
 }
 
-
-Activate()
-{
-	open2 = TRUE;
-	start-script RequestState(ACTIVE);
-}
-
-Deactivate()
-{
-	open2 = FALSE;
-	start-script RequestState(INACTIVE);
-}
-
-
-RestoreAfterDelay()
-{
-	sleep 1200;
-	//turn shellleft to y-axis <0.000000> speed <80.000000>;
-	//turn shellright to y-axis <0.000000> speed <80.000000>;
-	//move barrel to z-axis [0.000000] speed [5.000000];
-	wait-for-turn shellleft around y-axis;
-	wait-for-turn shellright around y-axis;
-	//wait-for-move barrel along z-axis;	
-}
-
 Create()
 {
-	hide flare;
-	//hide shellleft;
-	//hide shellright;
-	move barrel to z-axis [3.500000] now;
 	start-script SmokeUnit();
-		open = FALSE;
-		open2 = FALSE;
-	set ARMORED to TRUE;
-/*	turn shellleft to y-axis <-60.000000> speed <80.000000>;
-	turn shellright to y-axis <60.000000> speed <80.000000>;
-	move barrel to z-axis [3.500000] speed [5.000000];
-	wait-for-turn shellleft around y-axis;
-	wait-for-turn shellright around y-axis;
-	wait-for-move barrel along z-axis;*/
 }
 
 AimPrimary(heading, pitch)
 {
 	signal SIG_AIM;
 	set-signal-mask SIG_AIM;
-//	turn shellleft to y-axis <-60.000000> speed <100.000000>;
-//	turn shellright to y-axis <60.000000> speed <100.000000>;
-//	move barrel to z-axis [3.500000] speed [5.500000];
-	turn basetop to y-axis heading speed <300.071429>;
-	turn housing to x-axis <0.000000> - pitch speed <200.043956>;
-	start-script activatescr();
-//	wait-for-turn shellleft around y-axis;
-//	wait-for-turn shellright around y-axis;
-//	wait-for-move barrel along z-axis;
-	wait-for-turn basetop around y-axis;
-	wait-for-turn housing around x-axis;
-	start-script RestoreAfterDelay();
-	//if( open )
-	//{ 
+	turn turret to y-axis heading speed <300.071429>;
+	turn barrel to x-axis <0.000000> - pitch speed <200.043956>;
+	wait-for-turn turret around y-axis;
+	wait-for-turn barrel around x-axis;
 	sleep 20;
 	return (1);
 		
@@ -172,7 +66,7 @@ FirePrimary()
 
 AimFromPrimary(piecenum)
 {
-	piecenum = aim;
+	piecenum = barrel;
 }
 
 QueryPrimary(piecenum)
@@ -182,7 +76,7 @@ QueryPrimary(piecenum)
 
 SweetSpot(piecenum)
 {
-	piecenum = basebottom;
+	piecenum = base;
 }
 
 Killed(severity, corpsetype)
@@ -191,33 +85,33 @@ Killed(severity, corpsetype)
 	if( severity <= 25 )
 	{
 		corpsetype = 1;
-		explode basebottom type BITMAPONLY | BITMAP1;
+		explode base type BITMAPONLY | BITMAP1;
 		explode flare type BITMAPONLY | BITMAP2;
-		explode housing type BITMAPONLY | BITMAP3;
-		explode basetop type BITMAPONLY | BITMAP4;
+		explode turret type BITMAPONLY | BITMAP3;
+		explode barrel type BITMAPONLY | BITMAP4;
 		return (0);
 	}
 	if( severity <= 50 )
 	{
 		corpsetype = 1;
-		explode basebottom type BITMAPONLY | BITMAP1;
+		explode base type BITMAPONLY | BITMAP1;
 		explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
-		explode basetop type BITMAPONLY | BITMAP4;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode barrel type BITMAPONLY | BITMAP4;
 		return (0);
 	}
 	if( severity <= 99 )
 	{
 		corpsetype = 2;
-		explode basebottom type BITMAPONLY | BITMAP1;
+		explode base type BITMAPONLY | BITMAP1;
 		explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-		explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
-		explode basetop type SHATTER | BITMAP4;
+		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+		explode barrel type SHATTER | BITMAP4;
 		return (0);
 	}
 	corpsetype = 2;
-	explode basebottom type BITMAPONLY | BITMAP1;
+	explode base type BITMAPONLY | BITMAP1;
 	explode flare type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
-	explode housing type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
-	explode basetop type SHATTER | EXPLODE_ON_HIT | BITMAP4;
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP3;
+	explode barrel type SHATTER | EXPLODE_ON_HIT | BITMAP4;
 }
