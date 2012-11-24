@@ -1,7 +1,7 @@
 unitDef = {
-  unitname              = [[fakeunit_aatarget]],
-  name                  = [[Fake AA target]],
-  description           = [[Used by the jumpjet script.]],
+  unitname              = [[fakeunit_groundtarget]],
+  name                  = [[Fake Ground target]],
+  description           = [[Used by AA_not_shoot_landed_airplane script.]],
   acceleration          = 0,
   activateWhenBuilt     = false,
   bmcode                = [[0]],
@@ -11,13 +11,13 @@ unitDef = {
   builder               = false,
   buildPic              = [[levelterra.png]],
   buildTime             = 0.45,
-  canFly                = true,
+  canFly                = false,
   canGuard              = false,
   canMove               = false,
   canPatrol             = false,
   canstop               = [[1]],
   canSubmerge           = false,
-  category              = [[FIXEDWING]],
+  category              = [[LAND]],
   cruiseAlt             = 30,
   explodeAs             = [[TINY_BUILDINGEX]],
   floater               = true,
@@ -51,4 +51,4 @@ unitDef = {
   workerTime            = 0,
 }
 
-return lowerkeys({ fakeunit_aatarget = unitDef })
+return lowerkeys({ fakeunit_groundtarget = unitDef })
