@@ -18,7 +18,8 @@ end
 --local autoOrderCG_1 = true ----//variable. A switch to enable auto "Collect Garbage"
 local memoryThreshold = 102400 --//variable. An amount of memory usage (kilobyte) before LUAUI auto reload
 local minimumInterval = 1200 --//variable. A minimum interval of second before ordering "Collect Garbage"
-
+local pauseValue = nil
+local stepmulValue = nil
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 options_path = 'Settings/Misc/Garbage Collector Control'
@@ -34,18 +35,22 @@ options = {
 		OnChange = function(self) 
 					if (self.value == 0) then --slider is at the left end
 						--if collectgarbage("isrunning") then --stop GC if started. LUA 5.2 only. Ref: http://www.lua.org/manual/5.2/manual.html#6.1 , http://www.lua.org/manual/5.2/manual.html#2.5
+						if not pauseValue or not stepmulValue then
+							pauseValue = 400-(1)*20 --output a {380,360,... 40,20} when self.value is {1,2,3,...17,18,19}
+							stepmulValue = (1)*20 --output a {20,40, ... 360,380} when self.value is {1,2,3,...17,18,19}
+							collectgarbage("setpause",pauseValue) 
+							collectgarbage("setstepmul",stepmulValue)
+						end
 						collectgarbage("stop")
-						--end
-						Spring.Echo("Garbage Collector: Stopped")
+						Spring.Echo("Garbage Collector: Pause "..pauseValue..", StepMultiplier "..stepmulValue .. " (Stopped)")
 					elseif (self.value >= 1) then --slider is on the right
 						--if not collectgarbage("isrunning") then --start GC if stopped. LUA 5.2 only. 
-						collectgarbage("restart")
-						--end
-						local pauseValue = 400-(self.value)*20 --output a {400,380,360,... 40,20,0} when self.value is {1,2,3,...9,10,11}
-						local stepmulValue = (self.value)*20 --output a {"paused",20,40, ... 360,380,400} when self.value is {1,2,3,...9,10,11}
-						Spring.Echo("Garbage Collector: Pause "..pauseValue..", StepMultiplier "..stepmulValue)
+						pauseValue = 400-(self.value)*20 --output a {380,360,... 40,20} when self.value is {1,2,3,...17,18,19}
+						stepmulValue = (self.value)*20 --output a {20,40, ... 360,380} when self.value is {1,2,3,...17,18,19}
 						collectgarbage("setpause",pauseValue) 
 						collectgarbage("setstepmul",stepmulValue)
+						collectgarbage("restart")
+						Spring.Echo("Garbage Collector: Pause "..pauseValue..", StepMultiplier "..stepmulValue)
 					end
 				end,
 	},
@@ -66,21 +71,7 @@ options = {
 					end
 				end,
 	},
-	autoOrderCG = {
-        name = "Enable auto \"Collect Garbage\"", --a switch.
-		type = 'bool',
-		value = true,
-		desc = "Enable widget to automatically issue a \"Collect Garbage\" to free memory usage (for LuaUI).\nDefault: true",
-		advanced = true,
-		OnChange = function(self)
-					autoOrderCG_1 = self.value
-					if self.value then 
-						Spring.Echo("Collect garbage: True") 
-					else 
-						Spring.Echo("Collect garbage: False")
-					end
-				end,
-	}, --]]
+	--]]
 	reloadMemThreshold = {
 		name = 'Memory Usage Threshold (25-100 MB):',
 		type = 'number',
@@ -133,11 +124,5 @@ function widget:Update(dt)
 		end
 	end
 end
-
-function widget:Initialize()
-	--collectgarbage("setpause",arg1) 
-	--collectgarbage("setstepmul",arg2)
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
