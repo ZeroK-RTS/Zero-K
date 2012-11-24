@@ -4,7 +4,7 @@
 function widget:GetInfo()
   return {
     name      = "Garbage Collector Control",
-    desc      = "Periodically call \"Collect Garbage\" to free memory usage (for LuaUI). Configure at: Settings/Misc/Garbage Collector Control ",
+    desc      = "Add aggresiveness control for LUAUI Garbage Collector, and allow user to configure periodic \"Collect Garbage\" call to free memory usage. Configure at: Settings/Misc/Garbage Collector Control ",
     author    = "msafwan",
     version   = "0.98",
     date      = "30 August 2012",
@@ -27,24 +27,22 @@ options = {
 	gcStrenght = {
 		name = 'GC aggresiveness (off-slow-fast):',
 		type = 'number',
-		value = 6,
-		desc = "Set how fast LuaUI's Garbage Collector (GC) run in the background. Higher value should work faster but will use more CPU.\nDefault: tick no.7 (200,200)", --ref:http://www.lua.org/manual/5.2/manual.html#2.5
+		value = 10,
+		desc = "Set how fast LuaUI's Garbage Collector (GC) run in the background. Higher value will make LUAUI use less memory but theoretically will make LUAUI use more CPU.\nDefault: pause 200, stepMultiplier 200", --ref:http://www.lua.org/manual/5.2/manual.html#2.5
 		advanced = true,
-		min=0,max=11,step=1,
+		min=0,max=20,step=1,
 		OnChange = function(self) 
-					if (self.value == 0) then
+					if (self.value == 0) then --slider is at the left end
 						--if collectgarbage("isrunning") then --stop GC if started. LUA 5.2 only. Ref: http://www.lua.org/manual/5.2/manual.html#6.1 , http://www.lua.org/manual/5.2/manual.html#2.5
-							--collectgarbage("stop")
-						--end
 						collectgarbage("stop")
-						Spring.Echo("Garbage Collector: Stopped")
-					elseif (self.value >= 1) then
-						--if not collectgarbage("isrunning") then --start GC if stopped. LUA 5.2 only. 
-							--collectgarbage("restart")
 						--end
+						Spring.Echo("Garbage Collector: Stopped")
+					elseif (self.value >= 1) then --slider is on the right
+						--if not collectgarbage("isrunning") then --start GC if stopped. LUA 5.2 only. 
 						collectgarbage("restart")
-						local pauseValue = 300-(self.value-1)*20 --output a {300,280,260,... 140,120,100} when self.value is {1,2,3,...9,10,11}
-						local stepmulValue = (self.value-1)*20 +100 --output a {100,120,140, ... 260,280,300} when self.value is {1,2,3,...9,10,11}
+						--end
+						local pauseValue = 400-(self.value-1)*20 --output a {400,380,360,... 40,20,"paused"} when self.value is {1,2,3,...9,10,11}
+						local stepmulValue = (self.value-1)*20 --output a {"paused",20,40, ... 360,380,400} when self.value is {1,2,3,...9,10,11}
 						Spring.Echo("Garbage Collector: Pause "..pauseValue..", StepMultiplier "..stepmulValue)
 						collectgarbage("setpause",pauseValue) 
 						collectgarbage("setstepmul",stepmulValue)
