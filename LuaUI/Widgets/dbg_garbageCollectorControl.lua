@@ -30,7 +30,7 @@ options = {
 		value = 10,
 		desc = "Set how fast LuaUI's Garbage Collector (GC) run in the background. Higher value will make LUAUI use less memory but theoretically will make LUAUI use more CPU.\nDefault: pause 200, stepMultiplier 200", --ref:http://www.lua.org/manual/5.2/manual.html#2.5
 		advanced = true,
-		min=0,max=20,step=1,
+		min=0,max=19,step=1,
 		OnChange = function(self) 
 					if (self.value == 0) then --slider is at the left end
 						--if collectgarbage("isrunning") then --stop GC if started. LUA 5.2 only. Ref: http://www.lua.org/manual/5.2/manual.html#6.1 , http://www.lua.org/manual/5.2/manual.html#2.5
@@ -41,8 +41,8 @@ options = {
 						--if not collectgarbage("isrunning") then --start GC if stopped. LUA 5.2 only. 
 						collectgarbage("restart")
 						--end
-						local pauseValue = 400-(self.value-1)*20 --output a {400,380,360,... 40,20,"paused"} when self.value is {1,2,3,...9,10,11}
-						local stepmulValue = (self.value-1)*20 --output a {"paused",20,40, ... 360,380,400} when self.value is {1,2,3,...9,10,11}
+						local pauseValue = 400-(self.value)*20 --output a {400,380,360,... 40,20,0} when self.value is {1,2,3,...9,10,11}
+						local stepmulValue = (self.value)*20 --output a {"paused",20,40, ... 360,380,400} when self.value is {1,2,3,...9,10,11}
 						Spring.Echo("Garbage Collector: Pause "..pauseValue..", StepMultiplier "..stepmulValue)
 						collectgarbage("setpause",pauseValue) 
 						collectgarbage("setstepmul",stepmulValue)
