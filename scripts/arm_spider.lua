@@ -24,34 +24,28 @@ local SIG_AIM = 2
 local SIG_BUILD = 3
 local SIG_STOPBUILD = 4
 
---local PERIOD = 0.22
+local PERIOD = 0.22
 
---local sleepTime = PERIOD*1000
-
-local legLenght = 18 --from modeler's-knowledge or ingame-measurement, in elmo
-local moveSpeed = 1.8*30 --from unitDef, in elmo-per-second
-local legSpeed = moveSpeed/legLenght --ie: angularSpeed = tangentialSpeed/radius, from--> tangentialSpeed = angularSpeed*radius, in angle-per-second
+local sleepTime = PERIOD*1000
 
 local legRaiseAngle = math.rad(30)
-local legRaiseSpeed = legSpeed -- legRaiseAngle/PERIOD
-local legLowerSpeed = legSpeed -- legRaiseAngle/PERIOD
+local legRaiseSpeed = legRaiseAngle/PERIOD
+local legLowerSpeed = legRaiseAngle/PERIOD
 
 local legForwardAngle = math.rad(20)
 local legForwardTheta = math.rad(45)
 local legForwardOffset = 0
-local legForwardSpeed = legSpeed -- legForwardAngle/PERIOD
+local legForwardSpeed = legForwardAngle/PERIOD
 
 local legMiddleAngle = math.rad(20)
 local legMiddleTheta = 0
 local legMiddleOffset = 0
-local legMiddleSpeed = legSpeed -- legMiddleAngle/PERIOD
+local legMiddleSpeed = legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(20)
 local legBackwardTheta = -math.rad(45)
 local legBackwardOffset = 0
-local legBackwardSpeed = legSpeed -- legBackwardAngle/PERIOD
-
-local sleepTime = (legForwardAngle/legSpeed)*1000 --the time required to perform a complete swing,in milisecond
+local legBackwardSpeed = legBackwardAngle/PERIOD
 
 --------------------------------------------------------------------------------
 -- variables

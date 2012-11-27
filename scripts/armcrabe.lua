@@ -36,23 +36,17 @@ local SIG_MOVE = 2
 local SIG_AIM1 = 4
 local SIG_AIM2 = 8
 
---local PACE = 1.2
+local PACE = 1.2
 
-local legLenght = 16 --from modeler's-knowledge or ingame-measurement, in elmo
-local moveSpeed = 1.35*30 --from unitDef, in elmo-per-second
-local legSpeed = moveSpeed/legLenght --ie: angularSpeed = tangentialSpeed/radius, from--> tangentialSpeed = angularSpeed*radius, in angle-per-second
-
-local legRaiseSpeed = legSpeed --math.rad(45)*PACE
+local legRaiseSpeed = math.rad(45)*PACE
 local legRaiseAngle = math.rad(20)
-local legLowerSpeed = legSpeed --math.rad(50)*PACE
+local legLowerSpeed = math.rad(50)*PACE
 
-local legForwardSpeed = legSpeed --math.rad(40)*PACE
+local legForwardSpeed = math.rad(40)*PACE
 local legForwardAngle = -math.rad(20)
-local legBackwardSpeed = legSpeed --math.rad(35)*PACE
+local legBackwardSpeed = math.rad(35)*PACE
 local legBackwardAngle = math.rad(25)
 local legBackwardAngleMinor = math.rad(10)
-
---local sleepTime = (legBackwardAngle/legSpeed)*1000 --the time required to perform a complete swing,in milisecond
 
 --------------------------------------------------------------------------------
 -- vars
@@ -67,7 +61,7 @@ local gun_0 = 0
 -- four-stroke tetrapedal walkscript
 local function Walk()
 	while true do
-		--//Drag unit forward//
+		-- Spring.Echo("left fore and right back move, left back and right fore anchor")
 		Turn(leg4, z_axis, legRaiseAngle, legRaiseSpeed)	-- LF leg up
 		Turn(leg4, y_axis, legForwardAngle, legForwardSpeed)	-- LF leg forward
 		--Turn(leg3, z_axis, 0, legLowerSpeed)	-- LB leg down
@@ -78,18 +72,17 @@ local function Walk()
 		Turn(leg2, z_axis, -legRaiseAngle, legRaiseSpeed)	-- RB leg up
 		Turn(leg2, y_axis, 0, legForwardSpeed)	-- RB leg forward	
 		
-		--//Stop//
 		WaitForTurn(leg4, z_axis)
 		WaitForTurn(leg4, y_axis)
 		Sleep(0)
 		
-		--//Put leg down//
+		-- Spring.Echo("lower left fore and right back")
 		Turn(leg4, z_axis, 0, legLowerSpeed)	-- LF leg down		
 		Turn(leg2, z_axis, 0, legLowerSpeed)	-- RB leg down
 		Sleep(0)
 		WaitForTurn(leg4, z_axis)
 		
-		--//Drag unit forward//
+		-- Spring.Echo("left back and right fore move, left fore and right back anchor")
 		--Turn(leg4, z_axis, 0, legLowerSpeed)	-- LF leg down
 		Turn(leg4, y_axis, legBackwardAngleMinor, legBackwardSpeed)	-- LF leg back
 		Turn(leg3, z_axis, legRaiseAngle, legRaiseSpeed)	-- LB leg up
@@ -99,13 +92,11 @@ local function Walk()
 		Turn(leg1, y_axis, -legForwardAngle, legForwardSpeed)	-- RF leg forward
 		--Turn(leg2, z_axis, 0, legLowerSpeed)	-- RB leg down
 		Turn(leg2, y_axis, -legBackwardAngle, legBackwardSpeed)	-- RB leg back	
-		
-		--//Stop//
 		WaitForTurn(leg1, z_axis)
 		WaitForTurn(leg1, y_axis)
 		Sleep(0)
 
-		--//Put leg down//
+		-- Spring.Echo("lower left back and right fore")
 		Turn(leg3, z_axis, 0, legLowerSpeed)	-- LB leg down		
 		Turn(leg1, z_axis, 0, legLowerSpeed)	-- RF leg down
 		Sleep(0)
