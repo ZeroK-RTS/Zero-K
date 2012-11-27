@@ -27,12 +27,17 @@ local SIG_Walk = 4
 local PI = math.pi
 local sa = math.rad(-10)
 local ma = math.rad(40)
-local la = math.rad(100)
-local pause = 450
+--local la = math.rad(100)
+--local pause = 450
 
-local forward = 2.5
-local backward = 2.3
-local up = 2
+local legLenght = 13 --from modeler's-knowledge or ingame-measurement, in elmo
+local moveSpeed = 2.55*30 --from unitDef, in elmo-per-second
+local legSpeed = moveSpeed/legLenght --ie: angularSpeed = tangentialSpeed/radius, from--> tangentialSpeed = angularSpeed*radius, in angle-per-second
+local pause = (ma/legSpeed)*1000 --the time required to perform a complete swing,in milisecond
+
+local forward = legSpeed -- 2.5
+local backward = legSpeed -- 2.3
+local up = legSpeed -- 2
 
 smokePiece = {base, barrel}
 

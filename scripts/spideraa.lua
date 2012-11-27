@@ -24,31 +24,36 @@ smokePiece = {base, turret}
 local SIG_WALK = 1
 local SIG_AIM = 2
 
-local PERIOD = 0.17
+--local PERIOD = 0.17
 
-local sleepTime = PERIOD*1000
+--local sleepTime = PERIOD*1000
+
+local legLenght = 19 --from modeler's-knowledge or ingame-measurement, in elmo
+local moveSpeed = 2.3*30 --from unitDef, in elmo-per-second
+local legSpeed = moveSpeed/legLenght --ie: angularSpeed = tangentialSpeed/radius, from--> tangentialSpeed = angularSpeed*radius, in angle-per-second
 
 local legRaiseAngle = math.rad(30)
-local legRaiseSpeed = legRaiseAngle/PERIOD
-local legLowerSpeed = legRaiseAngle/PERIOD
+local legRaiseSpeed = legSpeed --legRaiseAngle/PERIOD
+local legLowerSpeed = legSpeed --legRaiseAngle/PERIOD
 
 local legForwardAngle = math.rad(20)
 local legForwardTheta = math.rad(45)
 local legForwardOffset = 0
-local legForwardSpeed = legForwardAngle/PERIOD
+local legForwardSpeed = legSpeed --legForwardAngle/PERIOD
 
 local legMiddleAngle = math.rad(20)
 local legMiddleTheta = 0
 local legMiddleOffset = 0
-local legMiddleSpeed = legMiddleAngle/PERIOD
+local legMiddleSpeed = legSpeed --legMiddleAngle/PERIOD
 
 local legBackwardAngle = math.rad(20)
 local legBackwardTheta = -math.rad(45)
 local legBackwardOffset = 0
-local legBackwardSpeed = legBackwardAngle/PERIOD
+local legBackwardSpeed = legSpeed --legBackwardAngle/PERIOD
 
 local restore_delay = 3000
 
+local sleepTime = (legForwardAngle/legSpeed)*1000 --the time required to perform a complete swing,in milisecond
 
 -- four-stroke hexapedal walkscript
 local function Walk()

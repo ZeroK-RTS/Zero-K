@@ -23,7 +23,7 @@ local laftleg1 = piece 'laftleg1'
 local raftleg = piece 'raftleg' 
 local raftleg1 = piece 'raftleg1' 
 
-local PACE = 1.4
+--local PACE = 1.4
 
 local SIG_Walk = 1
 local SIG_Aim = 2
@@ -33,12 +33,17 @@ local SIG_Walk = 4
 local PI = math.pi
 local sa = math.rad(-10)
 local ma = math.rad(40)
-local la = math.rad(100)
-local pause = 440
+--local la = math.rad(100)
+--local pause = 440
 
-local forward = 2.2
-local backward = 2
-local up = 1
+local legLenght = 14 --from modeler's-knowledge or ingame-measurement, in elmo
+local moveSpeed = 1.7*30 --from unitDef, in elmo-per-second
+local legSpeed = moveSpeed/legLenght --ie: angularSpeed = tangentialSpeed/radius, from--> tangentialSpeed = angularSpeed*radius, in angle-per-second
+local pause = (ma/legSpeed)*1000 --the time required to perform a complete swing,in milisecond
+
+local forward = legSpeed --2.2
+local backward = legSpeed --2
+local up = legSpeed --1
 
 local gun = false
 
@@ -65,8 +70,7 @@ end
 local function Walk()
 	SetSignalMask( SIG_Walk )
 	while ( true ) do
-
- --       Move( base, y_axis,  1.5, 2*up )	
+		-- Move( base, y_axis,  1.5, 2*up )	
 		Turn( lfrontleg, y_axis, 1.5*ma, forward )   	-- right front forward
 		Turn( lfrontleg, z_axis, -ma/2, up )       	-- right front up
 		Turn( lfrontleg1, z_axis, -ma/3, up )
@@ -86,7 +90,7 @@ local function Walk()
 		Sleep( pause )
 		
 
---		Move( base, y_axis,  0, 4*up )	
+		-- Move( base, y_axis,  0, 4*up )	
 		Turn( lfrontleg, y_axis, -sa, backward ) 	-- right front backward
 		Turn( lfrontleg, z_axis, 0, 6*up )         	-- right front down
 		Turn( lfrontleg1, z_axis, 0, up )
