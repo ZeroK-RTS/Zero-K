@@ -94,7 +94,7 @@ if (Spring.IsDevLuaEnabled()) then
   end
 end
 
-local uncloakables = {armjamt}
+local uncloakables = {}
 
 for k,v in pairs(UnitDefNames) do
   if (v.customParams.cannotcloak) then
