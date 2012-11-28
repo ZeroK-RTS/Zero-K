@@ -42,7 +42,7 @@ end
 --------------------------------------------------------------------------------
 
 function GG.PokeDecloakUnit(unitID, duration)
-	duration = duration or 10
+	duration = duration or 30
 	if recloakUnitID[unitID] then
 		recloakUnit[recloakUnitID[unitID]].frames = duration
 	else

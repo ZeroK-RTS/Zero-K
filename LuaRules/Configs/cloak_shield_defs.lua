@@ -35,7 +35,7 @@ local cloakShieldDefs = {
   armjamt = {
     init = true,
     draw = true,
-    energy = 12,
+    energy = 6,
     maxrad = JammerAlign('armjamt'),
     growRate = 512,
     shrinkRate = 2048,
@@ -45,7 +45,7 @@ local cloakShieldDefs = {
   spherecloaker = {
     init = true,
     draw = true,
-    energy = 15,
+    energy = 8,
     maxrad = JammerAlign('spherecloaker'),
     growRate = 512,
     shrinkRate = 2048,
@@ -94,7 +94,7 @@ if (Spring.IsDevLuaEnabled()) then
   end
 end
 
-local uncloakables = {armjamt,spherecloaker}
+local uncloakables = {}
 
 for k,v in pairs(UnitDefNames) do
   if (v.customParams.cannotcloak) then
