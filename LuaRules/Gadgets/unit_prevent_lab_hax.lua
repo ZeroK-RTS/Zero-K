@@ -24,13 +24,12 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
   
 -- Speedups
-local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetUnitBuildFacing  = Spring.GetUnitBuildFacing
 local spGetUnitAllyTeam  = Spring.GetUnitAllyTeam
 local spGetUnitsInBox  = Spring.GetUnitsInBox
 local spSetUnitPosition  = Spring.SetUnitPosition
 local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitBasePosition = Spring.GetUnitBasePosition
+local spGetUnitPosition = Spring.GetUnitPosition
 
 local abs = math.abs
 local min = math.min
@@ -62,7 +61,7 @@ function checkLabs()
 	  local team = spGetUnitAllyTeam(id)
 	  if (team ~= Lv.team) and not fly then
 	  
-	    local ux, _, uz  = spGetUnitBasePosition(id)
+	    local ux, _, uz  = spGetUnitPosition(id)
 		
 		if (Lv.face == 1) then
 		  local l = abs(ux-Lv.minx)
@@ -177,7 +176,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID)
   
   -- http://springrts.com/mantis/view.php?id=2871
-  local ux, uy, uz  = spGetUnitBasePosition(unitID)
+  local ux, uy, uz,_, my,_  = spGetUnitPosition(unitID,true)
   local facing = spGetUnitBuildFacing(unitID)
   if not AllowUnitCreation(unitDefID, nil, nil, ux, uy, uz, facing) then
     Spring.DestroyUnit(unitID, false, true)
@@ -188,7 +187,6 @@ function gadget:UnitCreated(unitID, unitDefID)
   local ud = UnitDefs[unitDefID]
   local name = ud.name
   if (ud.isFactory == true) and not (EXCEPTION_LIST[name]) then
-	local ux, uy, uz  = spGetUnitBasePosition(unitID)
 	local face = spGetUnitBuildFacing(unitID)
 	local xsize = (ud.xsize)*4
 	local zsize = (ud.ysize or ud.zsize)*4
@@ -235,10 +233,10 @@ function gadget:UnitCreated(unitID, unitDefID)
 	--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].maxx,0,lab[unitID].minz)
 	--Spring.MarkerAddLine(lab[unitID].maxx,0,lab[unitID].maxz,lab[unitID].minx,0,lab[unitID].maxz)
 
-	lab[unitID].miny = spGetGroundHeight(ux,uz)
-	local py = lab[unitID].miny + 20 --get mid position.
-	lab[unitID].maxy = py --lab[unitID].miny+100
-	
+	local offsetY = select(5,Spring.GetUnitCollisionVolumeData(unitID)) or 0 --find if unit's hitbox is different from unit's position
+	lab[unitID].miny = my + offsetY -20 --set the box bottom -20 elmo below the factory
+	lab[unitID].maxy = lab[unitID].miny + 40 --set the box height +20 elmo above the factory
+  
   end
   
 end
