@@ -29,6 +29,18 @@ local config = {
     creep3 = {
       unitName = "slowmort",
     },
+    warrior = {
+      unitName = "armwar",
+      cost=400,
+    },    
+    glave = {
+      unitName = "armpw",
+      cost=100,
+    },     
+    zeus = {
+      unitName = "armzeus",
+      cost=500,
+    },    
   },
 }
 

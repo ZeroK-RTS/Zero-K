@@ -2,7 +2,7 @@ function gadget:GetInfo()
   return {
     name    = "DotA",
     desc    = "DotA Mode",
-    author  = "Sprung, Rafal, KingRaptor",
+    author  = "Sprung, Rafal, KingRaptor, N0U",
     date    = "25/08/2012",
     license = "PD",
     layer   = 10, -- run after most gadgets
@@ -13,6 +13,7 @@ end
 local versionNumber = "v0.30"
 
 if (Spring.GetModOptions().zkmode ~= "dota") then
+	Spring.Echo("DOTA: bad mode")
   return
 end
 
@@ -20,6 +21,7 @@ end
 local mapConfig = include("LuaRules/Configs/dota_map_defs.lua")
 
 if (not mapConfig) then
+	Spring.Echo("DOTA: can't get map conf")
   --gadgetHandler:RemoveGadget() -- doesn't work before gadget:Initialize()
   return
 end
@@ -73,6 +75,7 @@ local creepcount    = mc.startingCreepCount -- current creep count per wave
 local creepbalance  = 0
 local creepWave     = 0
 
+local additionalCreep={{},{}} -- when player buy new creep, that crepp save in that array
 
 local protectedStructures = {}
 local creepDefIDs = {}
@@ -622,14 +625,22 @@ function gadget:GameFrame(n)
       table.insert(teamCreepCounts[1], { "creep3", 1 } )
       table.insert(teamCreepCounts[2], { "creep3", 1 } )
     end
-
+    
+    -- insert additional creeps
+    for t=1,2,1 do
+		local addCrep=additionalCreep[t]
+		for j=1,#addCrep,1 do
+			table.insert(teamCreepCounts[t],{addCrep[j],1})
+		end
+	end
+	
     for path = 1, #creeperPathWaypoints do
       local creeperOrderArray = creeperOrderArrays[path]
 
       for t = 1, 2 do
         local orderArray     = creeperOrderArray[t]
         local teamCreepCount = teamCreepCounts[t]
-
+		
         for c = 1, #teamCreepCount do
           local creepName  = teamCreepCount[c][1]
           local creepDef   = creepDefs[creepName]
@@ -655,6 +666,47 @@ function gadget:GameFrame(n)
   end
 end
 
+local function buyUnit(playerID,unitName)
+	local crd=creepDefs[unitName]
+	if crd==nil then
+		return
+	elseif crd.cost==nil then
+		return
+	end
+	
+	local _,_,_,team,ally=Spring.GetPlayerInfo(playerID)
+	
+	local me=Spring.GetTeamResources(team,"metal")
+	Spring.Echo("Metall: "..tostring(me));
+	if me>=crd.cost then
+		Spring.UseTeamResource(team,"metal",crd.cost)
+		local d
+		
+		local _,_,_,_,_,al1=Spring.GetTeamInfo(team1)
+		local _,_,_,_,_,al2=Spring.GetTeamInfo(team2)
+		
+		if ally==al1 then
+			d=1
+		elseif ally==al2 then
+			d=2
+		else
+			Spring.Echo("Can't add warrior")
+			return
+		end
+		table.insert(additionalCreep[d],unitName)
+		Spring.Echo("Good")
+	end
+end
+
+function gadget:RecvLuaMsg(msg, playerID)
+	if msg=="dotashop_buy_warrior" then
+		buyUnit(playerID,"warrior")
+	elseif msg=="dotashop_buy_glave" then
+		buyUnit(playerID,"glave")	
+	elseif msg=="dotashop_buy_zeus" then
+		buyUnit(playerID,"zeus")				
+	end
+end
 --------------------------------------------------------------------------------
 -- SYNCED
 --------------------------------------------------------------------------------
@@ -722,6 +774,10 @@ local function ToggleDebugInfo (cmd, line, words, playerID)
 end
 
 
+function gadget:GotChatMsg(msg, player)
+	Spring.Echo("--> "..msg)
+end
+
 function gadget:Initialize()
   gadgetHandler:AddSyncAction("gamemode_dota_addmarker", AddMarker)
 
@@ -732,7 +788,6 @@ end
 
 function gadget:Shutdown()
   gadgetHandler:RemoveSyncAction("gamemode_dota_addmarker")
-
   gadgetHandler:RemoveChatAction("dota_debug")
   --Script.RemoveActionFallback("dota_debug") -- synced only
 end
