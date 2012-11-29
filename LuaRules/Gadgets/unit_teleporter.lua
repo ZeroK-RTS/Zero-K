@@ -11,6 +11,9 @@ function gadget:GetInfo()
   }
 end
 
+--Changelog
+-- Yanom & xponen,			28Nov2012	: add unit launch into air
+
 include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -47,6 +50,56 @@ local waitAtBeaconCmdDesc = {
 	tooltip = 'Wait to be teleported by a beacon.',
 }
 
+local function isUnitAirborne(unitID)
+    x, y, z = Spring.GetUnitBasePosition(unitID)
+    gy = Spring.GetGroundHeight(x, z)
+    diff = y-gy
+    return diff>Spring.GetUnitHeight(unitID)
+end
+
+local function magnitudeOfThreeDVector(x,y,z)
+    return math.sqrt((x*x)+(y*y)+(z*z))
+end
+
+local function capUnitSpeed(unitID, speedCap, slowPower)
+    local vx,vy,vz = Spring.GetUnitVelocity(unitID)
+    if(magnitudeOfThreeDVector(vx,vy,vz) > speedCap) then
+        newx = vx*slowPower*-1
+        newy = vy*slowPower*-1
+        newz = vz*slowPower*-1
+        Spring.AddUnitImpulse(unitID,newx,newy,newz)
+    end
+end
+
+local function FindLaunchSpeed(gravity, relX,relY,relZ, apexHeight, startX, startY,startZ)
+        local yVel = math.sqrt(4*(gravity/2)*(-1*(math.max(apexHeight, apexHeight+relY))))
+        local timeOfFlight = (-yVel - math.sqrt(yVel^2 - 4*(gravity/2)*(-relY)))/(2*(-gravity/2))
+        local isPossible = "true"
+        if (timeOfFlight ~= timeOfFlight) then --NaN check
+                isPossible = "NeedNegativeGravity"
+                return
+        end
+        ----
+        local xzDistance = math.sqrt(relX*relX+relZ*relZ)
+        local xzVel = xzDistance/timeOfFlight
+        local directionxz_radian = math.atan2(relZ/xzDistance, relX/xzDistance)
+        local xVel = math.cos(directionxz_radian)*xzVel
+        local zVel = math.sin(directionxz_radian)*xzVel
+       
+        if startX and startZ and startZ then
+                local x =nil
+                local z =nil
+                for frame=0, timeOfFlight*0.75 do
+                        x = startX + xVel*frame
+                        z = startZ + zVel*frame
+                        if (Spring.GetGroundHeight(x,z) - 30) > startY+(yVel*frame + gravity*frame*frame/2) then
+                                isPossible = "obstacle"
+                                break
+                        end
+                end
+        end
+        return isPossible, xVel,yVel,zVel, timeOfFlight
+end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -79,6 +132,7 @@ local beacon = {}
 
 local beaconWaiter = {}
 local teleportingUnit = {}
+local launchedUnits = {}
 
 --[[
 local nearRead = 1
@@ -103,6 +157,24 @@ local function callScript(unitID, funcName, args)
 		end
 	end
 	return false
+end
+
+local function backUpTheDamnQueue(teleportieeID)
+    if launchedUnits[teleportieeID] and Spring.ValidUnitID(teleportieeID) and UnitDefs[unitDefID]  then --find out if this unit is in our launch list
+        local myQueue = launchedUnits[teleportieeID].queue --retrieve saved command queue
+        local tmpQueue ={}
+        tmpQueue[1]={CMD.STOP,{},{""}} --add 1st row with STOP (to flush existing command)
+        for i=2, #myQueue do --copied from unit_jumpjet.lua by quantum. Convert command queue readable by "Spring.GiveOrderArrayToUnitArray", also start at index 2 to skip "enter teleport beacon" command at 1st row
+            local cmd = myQueue[i]
+            local cmdOpt = cmd.options
+            local opts = {"shift"} -- appending
+            if (cmdOpt.alt)   then opts[#opts+1] = "alt"   end
+            if (cmdOpt.ctrl)  then opts[#opts+1] = "ctrl"  end
+            if (cmdOpt.right) then opts[#opts+1] = "right" end
+            tmpQueue[#tmpQueue+1] = {cmd.id, cmd.params, opts}
+        end
+        Spring.GiveOrderArrayToUnitArray({teleportieeID},tmpQueue) --restore old command queue
+    end
 end
 
 local function changeSpeed(tid, bid, speed)
@@ -303,7 +375,29 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 end
 
 function gadget:GameFrame(f)
-	
+	for i = 1, teleID.count do
+		local tid = teleID.data[i]
+		local bid = tele[tid].link	
+		if bid and tele[tid].deployed then
+			--Spring.Echo("activated teleporter!")
+			--checking for flyers
+			--Spring.Echo(f)
+			local xxx,yyy,zzz = Spring.GetUnitPosition(tid)
+			local maybeFlyers = Spring.GetUnitsInSphere(xxx,yyy,zzz,200,Spring.GetUnitTeam(tid))
+			if(maybeFlyers ~= nil) then
+				for index,value in pairs(maybeFlyers) do
+					local ud = Spring.GetUnitDefID(value)
+					ud = ud and UnitDefs[ud]
+					if ((not (ud.floater or ud.canFly or value==tid)) and isUnitAirborne(value)) then
+						capUnitSpeed(value,2,1)
+						--Spring.Echo("capping unit speed")
+						--backup the damn queue
+						backUpTheDamnQueue(value)
+					end
+				end
+			end
+		end
+	end	
 	for i = 1, teleID.count do
 		local tid = teleID.data[i]	
 		local bid = tele[tid].link
@@ -354,7 +448,7 @@ function gadget:GameFrame(f)
 						if ud then
 							local size = ud.xsize
 							local ux,uy,uz = Spring.GetUnitPosition(teleportiee)		
-							local tx, _, tz = Spring.GetUnitPosition(tid)
+							local tx, ty, tz = Spring.GetUnitPosition(tid)
 							local dx, dz = tx + offset[tele[tid].offsetIndex].x*(size*4+40), tz + offset[tele[tid].offsetIndex].z*(size*4+40)
 							local dy 
 							
@@ -373,10 +467,37 @@ function gadget:GameFrame(f)
 							teleportingUnit[teleportiee] = nil
 							
 							if not callScript(teleportiee, "unit_teleported", {dx, dy, dz}) then
-								Spring.SetUnitPosition(teleportiee, dx, dz)
-								Spring.MoveCtrl.Enable(teleportiee)
-								Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
-								Spring.MoveCtrl.Disable(teleportiee)
+								                            
+								--this is where the magic happens
+								local thisGravity = -1*Game.gravity/30/30
+								local relX = ux-tx
+								local relY = uy-ty
+								local relZ = uz-tz
+								local isPossible, xvelocity, yvelocity, zvelocity, flightTime = FindLaunchSpeed(thisGravity, relX, relY, relZ, 3000, ux, uy, uz)
+
+								--Spring.Echo(xvelocity)
+								--Spring.Echo(yvelocity)
+								--Spring.Echo(zvelocity)
+
+								Spring.SetUnitVelocity(teleportiee, 0,0.1,0) --it can only reset velocity, other value won't work. Bug
+								Spring.AddUnitImpulse(teleportiee,1,1,1)
+								Spring.AddUnitImpulse(teleportiee,-1,-1,-1)
+								Spring.AddUnitImpulse(teleportiee,xvelocity,yvelocity,zvelocity)
+								--Spring.Echo(isUnitAirborne(teleportiee))
+
+
+								local myQueue = Spring.GetCommandQueue(teleportiee) --backup current command queue
+								Spring.GiveOrderToUnit(teleportiee, CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, dx, dy, dz}, {"alt"}) --insert MOVE command toward destination for visual purpose
+								launchedUnits[teleportiee]={queue = myQueue, destinationx= dx, destinationy= dy, destinationz =dz}
+
+								--if GG.FallDamage then --WIP
+								--    GG.FallDamage.ExcludeFriendlyCollision(teleportiee)
+								--end
+								
+								-- Spring.SetUnitPosition(teleportiee, dx, dz)
+								-- Spring.MoveCtrl.Enable(teleportiee)
+								-- Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
+								-- Spring.MoveCtrl.Disable(teleportiee)
 							end
 							
 							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
@@ -467,6 +588,44 @@ function gadget:GameFrame(f)
 		end
 	end
 
+end
+
+function gadget:UnitPreDamaged(teleportieeID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --copied from "unit_fall_damage.lua" gadget by googlefrog.
+    if launchedUnits[teleportieeID] and (weaponDefID == -2) and attackerID == nil  and Spring.ValidUnitID(teleportieeID) and UnitDefs[unitDefID]  then --find out if this unit is in our launch list
+        local vx,vy,vz=Spring.GetUnitVelocity(teleportieeID) --find out if unit is still bouncing
+        local fixX = 0-vx
+        local fixY = 0-vy
+        local fixZ = 0-vz
+        Spring.AddUnitImpulse(teleportieeID,fixX,fixY,fixZ) --apply negative impulse (brake) propotional to unit speed
+
+        local myQueue = launchedUnits[teleportieeID].queue --retrieve saved command queue
+        local tmpQueue ={}
+        tmpQueue[1]={CMD.STOP,{},{""}} --add 1st row with STOP (to flush existing command)
+        for i=2, #myQueue do --copied from unit_jumpjet.lua by quantum. Convert command queue readable by "Spring.GiveOrderArrayToUnitArray", also start at index 2 to skip "enter teleport beacon" command at 1st row
+            local cmd = myQueue[i]
+            local cmdOpt = cmd.options
+            local opts = {"shift"} -- appending
+            if (cmdOpt.alt)   then opts[#opts+1] = "alt"   end
+            if (cmdOpt.ctrl)  then opts[#opts+1] = "ctrl"  end
+            if (cmdOpt.right) then opts[#opts+1] = "right" end
+            tmpQueue[#tmpQueue+1] = {cmd.id, cmd.params, opts}
+        end
+        Spring.GiveOrderArrayToUnitArray({teleportieeID},tmpQueue) --restore old command queue
+       
+        local _,_,_,x,y,z=Spring.GetUnitPosition(teleportieeID,true) --check unit mid position 
+        local nearX = math.abs(x-launchedUnits[teleportieeID].destinationx) < 50 --is near to actual landing position in x direction?
+        local nearZ = math.abs(z-launchedUnits[teleportieeID].destinationz) < 50 --is near to actual landing position in z direction?
+        launchedUnits[teleportieeID] = nil --remove unit from launch list
+        if GG.FallDamage then
+            GG.FallDamage.IncludeFriendlyCollision(teleportieeID)
+        end
+        if nearX and nearZ then
+            return 0 -- as cheat: hitting ground don't hurt unit.
+        else
+            return damage
+        end
+    end
+    return damage
 end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
