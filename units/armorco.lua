@@ -327,7 +327,7 @@ unitDef = {
       height           = [[60]],
       hitdensity       = [[150]],
       metal            = 9600,
-      object           = [[armorco_dead]],
+      object           = [[Detriment_wreck.s3o]],
       reclaimable      = true,
       reclaimTime      = 9600,
     },
