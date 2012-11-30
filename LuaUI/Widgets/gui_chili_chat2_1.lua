@@ -695,6 +695,10 @@ function widget:AddConsoleMessage(msg)
 		return
 	end
 	
+    if (msg == "<message blocked by mute>" and playername != myName)
+        return
+    end
+    
 	msg.dup = 1
 	
 	detectHighlight(msg)

@@ -1182,7 +1182,7 @@ function widgetHandler:FindWidget(name)
   end
   for k,v in ipairs(self.widgets) do
     if (name == v.whInfo.name) then
-    return v,k
+      return v,k
     end
   end
   return nil
@@ -1373,7 +1373,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 		local playerID = newMsg.player and newMsg.player.id --retrieve playerID from message.
 		local customkeys = select(10, Spring.GetPlayerInfo(playerID))
 		if customkeys and customkeys.muted then
-      return
+            newMsg.argument="<message blocked by mute>" --change the muted player's message to this, which is shown only for the muted player themselves, to let them know about the mute.
 		end
 	end
   
